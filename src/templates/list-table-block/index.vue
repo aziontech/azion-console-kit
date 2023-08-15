@@ -112,7 +112,7 @@ export default {
     }
   },
   async created() {
-    await this.loadInitialData()
+    await this.loadData({page:1})
   },
   computed: {
     actionOptions() {
@@ -134,11 +134,21 @@ export default {
     }
   },
   methods: {
-    async loadInitialData() {
-      this.isLoading = true;
-      const data = await this.listService({ page: 1 })
-      this.data = data;
-      this.isLoading = false;
+    async loadData({page}) {
+      try{
+        this.isLoading = true;
+        const data = await this.listService({ page })
+        this.data = data;
+      }catch(error){
+        this.$toast.add({
+          closable: true,
+          severity: 'error',
+          summary: error,
+          life: 10000
+        })
+      }finally{
+        this.isLoading= false
+      }
     },
     navigateToAddPage() {
       this.$router.push(this.createPagePath)
