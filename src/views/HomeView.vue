@@ -10,6 +10,10 @@ export default {
     listEdgeApplicationsService:{
       required:true,
       type:Function,
+    },
+    deleteEdgeApplicationService:{
+      required:true,
+      type:Function,
     }
   }
 }
@@ -17,19 +21,31 @@ export default {
 
 <template>
   <ListTemplate 
+    :pageTitle="'Edge Applications'"
+    :addButtonLabel="'Add Edge Application'"
+    :createPagePath="'/'"
     :listService="listEdgeApplicationsService"
+    :deleteService="deleteEdgeApplicationService"
     :columns="[
     {
       field: 'name',
       header: 'Name'
     },
     {
-      field: 'editor',
+      field: 'lastEditor',
       header: 'Last Editor'
     },
     {
-      field: 'lastEdit',
+      field: 'lastModify',
       header: 'Last Modified'
+    },
+    {
+      field:'active',
+      header:'Active'
+    },
+    {
+      field:'debugRules',
+      header:'Debug rules'
     },
     {
       field: 'origins',

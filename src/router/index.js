@@ -1,7 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import HomeView from '@/views/HomeView.vue'
 import DomainsView from '@/views/DomainsView.vue'
-import {listEdgeApplicationsService} from  '@/services/edge-application-services'
+import {listEdgeApplicationsService,deleteEdgeApplicationService} from  '@/services/edge-application-services'
 import {listDomainsService} from  '@/services/domains-services'
 
 const router = createRouter({
@@ -12,7 +12,8 @@ const router = createRouter({
       name: 'home',
       component: HomeView,
       props:{
-        listEdgeApplicationsService:listEdgeApplicationsService
+        listEdgeApplicationsService:listEdgeApplicationsService,
+        deleteEdgeApplicationService:deleteEdgeApplicationService
       }
     },
     {
