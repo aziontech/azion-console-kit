@@ -18,10 +18,9 @@ export const listEdgeApplicationsService = async ({ page }) => {
 const adapt =(httpResponse)=>{
   const parsedEdgeApplications = httpResponse.body.results.map((edgeApplication)=>{
     const originNames = edgeApplication.origins.map(origin=>origin.name)?.join(',') 
-    console.log(originNames);
-    
+
     return{
-      active:edgeApplication.active ? 'active' :'disabled',
+    active:edgeApplication.active ? 'active' :'disabled',
     debugRules:edgeApplication.debug_rules ? 'active' :'disabled',
     id:edgeApplication.id,
     lastEditor: edgeApplication.last_editor,

@@ -1,10 +1,10 @@
 <script >
-import ListTemplate from '@/templates/list-template'
+import ListTableBlock from '@/templates/list-table-block'
 
 export default {
   name:'home-view',
   components:{
-    ListTemplate
+    ListTableBlock
   },
   props:{
     listEdgeApplicationsService:{
@@ -20,7 +20,7 @@ export default {
 </script>
 
 <template>
-  <ListTemplate 
+  <ListTableBlock 
     :pageTitle="'Edge Applications'"
     :addButtonLabel="'Add Edge Application'"
     :createPagePath="'/'"
@@ -52,6 +52,6 @@ export default {
       header: 'Origins'
     },
     ]"
-  ></ListTemplate>
+  ></ListTableBlock>
 </template>
 

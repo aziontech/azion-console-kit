@@ -1,6 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import HomeView from '@/views/HomeView.vue'
-import DomainsView from '@/views/DomainsView.vue'
+import EdgeApplicationsListView from '@/views/EdgeApplications/ListView.vue'
+import DomainsListView from '@/views/Domains/ListView.vue'
 import {listEdgeApplicationsService,deleteEdgeApplicationService} from  '@/services/edge-application-services'
 import {listDomainsService} from  '@/services/domains-services'
 
@@ -10,7 +10,7 @@ const router = createRouter({
     {
       path: '/',
       name: 'home',
-      component: HomeView,
+      component: EdgeApplicationsListView,
       props:{
         listEdgeApplicationsService:listEdgeApplicationsService,
         deleteEdgeApplicationService:deleteEdgeApplicationService
@@ -19,7 +19,7 @@ const router = createRouter({
     {
       path: '/domains',
       name: 'domains',
-      component: DomainsView,
+      component: DomainsListView,
       props:{
         listDomainsService:listDomainsService
       }
@@ -35,14 +35,14 @@ const router = createRouter({
     //     listService:listEdgeApplicationsService
     //   }
     // },
-    {
-      path: '/about',
-      name: 'about',
-      // route level code-splitting
-      // this generates a separate chunk (Home.[hash].js) for this route
-      // which is lazy-loaded when the route is visited.
-      component: () => import('../views/HomeView.vue')
-    }
+    // {
+    //   path: '/about',
+    //   name: 'about',
+    //   // route level code-splitting
+    //   // this generates a separate chunk (Home.[hash].js) for this route
+    //   // which is lazy-loaded when the route is visited.
+    //   component: () => import('../views/HomeView.vue')
+    // }
   ]
 })
 

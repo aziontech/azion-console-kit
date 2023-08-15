@@ -1,10 +1,10 @@
 <script >
-import ListTemplate from '@/templates/list-template'
+import ListTableBlock from '@/templates/list-table-block'
 
 export default {
   name: 'domains-view',
   components: {
-    ListTemplate
+    ListTableBlock
   },
   props: {
     listDomainsService: {
@@ -16,7 +16,7 @@ export default {
 </script>
 
 <template>
-  <ListTemplate :pageTitle="'Domains'" :addButtonLabel="'Add domains'" :listService="listDomainsService" :columns="[
+  <ListTableBlock :pageTitle="'Domains'" :addButtonLabel="'Add domains'" :listService="listDomainsService" :columns="[
     {
       field: 'name',
       header: 'Name'
@@ -37,6 +37,6 @@ export default {
       field: 'edgeApplication',
       header: 'Edge Application'
     },
-  ]"></ListTemplate>
+  ]"></ListTableBlock>
 </template>
 
