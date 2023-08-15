@@ -15,7 +15,6 @@
       removableSort
       :value="data"
       dataKey="id"
-      filterDisplay="row"
       v-model:filters="this.filters"
       paginator
       :rowsPerPageOptions="[10, 20, 50, 100]" :rows="10" :globalFilterFields="filterBy" :loading="isLoading">
