@@ -10,31 +10,40 @@ export default {
     listDomainsService: {
       required: true,
       type: Function,
+    },
+    deleteDomainsService: {
+      required: true,
+      type: Function,
     }
   }
 }
 </script>
 
 <template>
-  <ListTableBlock :pageTitle="'Domains'" :addButtonLabel="'Add domains'" :listService="listDomainsService" :columns="[
+  <ListTableBlock 
+  :pageTitle="'Domains'"
+  :addButtonLabel="'Add domains'"
+  :listService="listDomainsService"
+  :deleteService="deleteDomainsService" 
+  :columns="[
     {
-      field: 'name',
+      field: 'domainName',
       header: 'Name'
     },
     {
-      field: 'edgeCertificate',
-      header: 'Certificates'
+      field: 'digitalCertificateId',
+      header: 'Digital Certificate'
     },
     {
       field: 'domainName',
-      header: 'Domain'
+      header: 'Domain Name'
     },
     {
-      field: 'cname',
+      field: 'cnames',
       header: 'CNAME'
     },
     {
-      field: 'edgeApplication',
+      field: 'edgeApplicationName',
       header: 'Edge Application'
     },
   ]"></ListTableBlock>

@@ -2,7 +2,7 @@ import { createRouter, createWebHistory } from 'vue-router'
 import EdgeApplicationsListView from '@/views/EdgeApplications/ListView.vue'
 import DomainsListView from '@/views/Domains/ListView.vue'
 import {listEdgeApplicationsService,deleteEdgeApplicationService} from  '@/services/edge-application-services'
-import {listDomainsService} from  '@/services/domains-services'
+import {listDomainsService,deleteDomainService} from  '@/services/domains-services'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -21,7 +21,8 @@ const router = createRouter({
       name: 'domains',
       component: DomainsListView,
       props:{
-        listDomainsService:listDomainsService
+        listDomainsService:listDomainsService,
+        deleteDomainsService:deleteDomainService,
       }
     },
     // {

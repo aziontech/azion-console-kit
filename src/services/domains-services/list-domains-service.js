@@ -1,50 +1,36 @@
 import { AxiosHttpClientAdapter, parseHttpResponse } from "../axios/AxiosHttpClientAdapter";
-
-export const listDomainsService = async ({ page }) => {
+import {makeDomainsBaseUrl} from './make-domains-base-url'
+export const listDomainsService = async ({ 
+  orderBy='name',
+  sort='asc',
+  page=1,
+  pageSize=10
+}) => {
   let httpResponse = await AxiosHttpClientAdapter
     .request({
-    url:`domains?page=${page}`,
+    url:`${makeDomainsBaseUrl()}?order_by=${orderBy}&sort=${sort}&page=${page}&page_size=${pageSize}`,
     method:'GET',
   })
 
-  httpResponse = {
-    body: [
-      {
-        id:123,
-
-        name: 'Teste',
-        edgeCertificate: 'Azion (SAN)',
-        domainName: 'tk07mooer6.map.azionedge.net',
-        cname: 'teste.1.talisson.waf.com, *.teste.0.talisson.waf.com, teste.0.talisson.waf.com',
-        edgeApplication: 'Teste',
-      },
-      {
-        id:123123123,
-        name: 'teste2',
-        edgeCertificate: 'Azion (SAN)',
-        domainName: 'z94ijlfdr5.map.azionedge.net',
-        cname: 'teste2.talisson.waf.com',
-        edgeApplication: 'Teste2',
-      },
-      {
-        id:1234,
-        name: 'some test edge app',
-        edgeCertificate: 'Azion (SAN)',
-        domainName: 'n6f40j2cc3.map.azionedge.net',
-        cname: '',
-        edgeApplication: 'Teste Talisson',
-      },
-      {
-        id:12366,
-        name: 'Azion (SAN)',
-        edgeCertificate: 'kimd48f60t.map.azionedge.net',
-        domainName: 'teste.talisson.waf.com, teste.66.talisson.waf.com, teste.99.talisson.waf.com',
-        cname: '',
-        edgeApplication: 'Teste Talisson',
-      },
-    ],    
-    statusCode:200,
-  }
+  httpResponse = adapt(httpResponse);
 
   return parseHttpResponse(httpResponse)
+}
+
+const adapt = (httpResponse) => {
+  const parsedDomains = httpResponse.body.results.map((domain) => {
+    const cnames = domain.cnames.map(cname => cname)?.join(',')
+    return {
+      id:domain.id,
+      domainName:domain.domain_name,
+      cnames:cnames,
+      edgeApplicationName:domain.name,
+      digitalCertificateId:domain.digital_certificate_id,
+    }
+  })
+
+  return {
+    body: parsedDomains,
+    statusCode: httpResponse.statusCode,
+  }
 }
