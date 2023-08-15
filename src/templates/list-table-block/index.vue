@@ -1,14 +1,14 @@
 <template>
-  <div class="max-w-screen-sm lg:max-w-7xl mx-auto">
-    <Toast />
-    <header class="border-neutral-200  border-b min-h-[82px] w-full flex items-center">
-      <div class="p-4 w-full">
-        <div class="flex flex-col md:flex-row justify-between gap-4">
-          <h1 class="text-4xl font-normal text-gray-600">{{ pageTitle }}</h1>
-          <PrimeButton @click="navigateToAddPage" icon="pi pi-plus" :label="addButtonLabel" v-if="addButtonLabel" />
-        </div>
+  <Toast />
+  <header class="border-neutral-200  border-b min-h-[82px] w-full flex items-center">
+    <div class="p-4 w-full">
+      <div class="flex flex-col md:flex-row justify-between gap-4">
+        <h1 class="text-4xl font-normal text-gray-600">{{ pageTitle }}</h1>
+        <PrimeButton @click="navigateToAddPage" icon="pi pi-plus" :label="addButtonLabel" v-if="addButtonLabel" />
       </div>
-    </header>
+    </div>
+  </header>
+  <div class="max-w-screen-sm lg:max-w-7xl mx-auto">
 
     <DataTable v-if="!isLoading" 
       scrollable
