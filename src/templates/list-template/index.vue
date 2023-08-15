@@ -1,5 +1,5 @@
 <template>
-  <DataTable removableSort  :value="data" dataKey="id" filterDisplay="row" v-model:filters="this.filters" paginator
+  <DataTable removableSort :value="data" dataKey="id" filterDisplay="row" v-model:filters="this.filters" paginator
     :rowsPerPageOptions="[10, 20, 50, 100]" :rows="10" :globalFilterFields="filterBy" :loading="isLoading">
     <template #header>
       <div class="flex self-start">
@@ -45,8 +45,8 @@ export default {
     filters: {
       global: { value: '', matchMode: FilterMatchMode.CONTAINS },
     },
-    isLoading:false,
-    data:[]
+    isLoading: false,
+    data: []
   }),
   props: {
     columns: {
@@ -70,12 +70,12 @@ export default {
       required: true,
       default: () => ''
     },
-    listService:{
-      required:true,
-      type:Function
+    listService: {
+      required: true,
+      type: Function
     }
   },
-  async created(){
+  async created() {
     await this.loadInitialData()
   },
   computed: {
@@ -98,9 +98,9 @@ export default {
     }
   },
   methods: {
-    async loadInitialData(){
+    async loadInitialData() {
       this.isLoading = true;
-      const data = await this.listService({page:1})
+      const data = await this.listService({ page: 1 })
       this.data = data;
       this.isLoading = false;
     },

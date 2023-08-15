@@ -1,8 +1,10 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import HomeView from '@/views/HomeView.vue'
 import DomainsView from '@/views/DomainsView.vue'
-import {listEdgeApplicationsService} from  '@/services/edge-application-services'
-import {listDomainsService} from  '@/services/domains-services'
+import VariablesView from '@/views/VariablesView.vue'
+import { listEdgeApplicationsService } from '@/services/edge-application-services'
+import { listDomainsService } from '@/services/domains-services'
+import { listVariablesService } from '@/services/variables-services'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -11,16 +13,24 @@ const router = createRouter({
       path: '/',
       name: 'home',
       component: HomeView,
-      props:{
-        listEdgeApplicationsService:listEdgeApplicationsService
+      props: {
+        listEdgeApplicationsService: listEdgeApplicationsService
       }
     },
     {
       path: '/domains',
       name: 'domains',
       component: DomainsView,
-      props:{
-        listDomainsService:listDomainsService
+      props: {
+        listDomainsService: listDomainsService
+      }
+    },
+    {
+      path: '/variables',
+      name: 'variables',
+      component: VariablesView,
+      props: {
+        listVariablesService: listVariablesService
       }
     },
     // {

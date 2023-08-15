@@ -29,5 +29,6 @@ coverage
 
 
 #environments
-!.env
+.env
 .env.*
+!.env.sample

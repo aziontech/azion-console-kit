@@ -2,40 +2,37 @@
 import ListTemplate from '@/templates/list-template'
 
 export default {
-  name:'home-view',
-  components:{
+  name: 'home-view',
+  components: {
     ListTemplate
   },
-  props:{
-    listEdgeApplicationsService:{
-      required:true,
-      type:Function,
+  props: {
+    listEdgeApplicationsService: {
+      required: true,
+      type: Function,
     }
   }
 }
 </script>
 
 <template>
-  <ListTemplate 
-    :listService="listEdgeApplicationsService"
-    :columns="[
+  <ListTemplate :listService="listEdgeApplicationsService" :columns="[
     {
       field: 'name',
       header: 'Name'
     },
     {
-      field: 'editor',
+      field: 'last_editor',
       header: 'Last Editor'
     },
     {
-      field: 'lastEdit',
+      field: 'last_modified',
       header: 'Last Modified'
     },
     {
       field: 'origins',
       header: 'Origins'
     },
-    ]"
-  ></ListTemplate>
+  ]"></ListTemplate>
 </template>
 
