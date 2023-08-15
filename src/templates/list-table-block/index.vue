@@ -30,6 +30,11 @@
           </div>
         </template>
       </Column>
+      <template #empty>
+        <div class="flex justify-center items-center">
+          <p class="text-xl font-normal text-gray-600"> No registers found. </p>
+        </div>
+      </template>
 
     </DataTable>
 
