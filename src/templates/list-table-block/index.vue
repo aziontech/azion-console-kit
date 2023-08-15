@@ -10,14 +10,8 @@
       </div>
     </header>
 
-    <DataTable v-if="!isLoading" 
-      scrollable
-      removableSort
-      :value="data"
-      dataKey="id"
-      v-model:filters="this.filters"
-      paginator
-      :rowsPerPageOptions="[10, 20, 50, 100]" :rows="10" :globalFilterFields="filterBy" :loading="isLoading">
+    <DataTable v-if="!isLoading" scrollable removableSort :value="data" dataKey="id" v-model:filters="this.filters"
+      paginator :rowsPerPageOptions="[10, 20, 50, 100]" :rows="10" :globalFilterFields="filterBy" :loading="isLoading">
       <template #header>
         <div class="flex self-start">
           <span class="p-input-icon-left">
@@ -27,7 +21,7 @@
         </div>
       </template>
       <Column sortable v-for="col of columns" :key="col.field" :field="col.field" :header="col.header" />
-      <Column  :frozen="true" :alignFrozen="'right'" >
+      <Column :frozen="true" :alignFrozen="'right'">
         <template #body="{ data }">
           <div class="flex justify-end">
             <PrimeButton v-tooltip="'Actions'" size="small" icon="pi pi-ellipsis-h" text
@@ -36,11 +30,11 @@
           </div>
         </template>
       </Column>
-      
+
     </DataTable>
-    
+
     <DataTable v-else :value="Array(20)">
-      <Column sortable v-for="col of columns" :key="col.field" :field="col.field" :header="col.header" >
+      <Column sortable v-for="col of columns" :key="col.field" :field="col.field" :header="col.header">
         <template #body>
           <Skeleton></Skeleton>
         </template>
@@ -77,8 +71,8 @@ export default {
     filters: {
       global: { value: '', matchMode: FilterMatchMode.CONTAINS },
     },
-    isLoading:false,
-    data:[]
+    isLoading: false,
+    data: []
   }),
   props: {
     columns: {
@@ -89,9 +83,9 @@ export default {
         header: 'Name'
       }]
     },
-    pageTitle:{
-      type:String,
-      required:true
+    pageTitle: {
+      type: String,
+      required: true
     },
     createPagePath: {
       type: String,
@@ -103,16 +97,16 @@ export default {
       required: true,
       default: () => ''
     },
-    listService:{
-      required:true,
-      type:Function
+    listService: {
+      required: true,
+      type: Function
     },
-    deleteService:{
-      required:true,
-      type:Function
+    deleteService: {
+      required: true,
+      type: Function
     }
   },
-  async created(){
+  async created() {
     await this.loadInitialData()
   },
   computed: {
@@ -135,13 +129,13 @@ export default {
     }
   },
   methods: {
-    async loadInitialData(){
+    async loadInitialData() {
       this.isLoading = true;
-      const data = await this.listService({page:1})
+      const data = await this.listService({ page: 1 })
       this.data = data;
       this.isLoading = false;
     },
-    navigateToAddPage(){
+    navigateToAddPage() {
       this.$router.push(this.createPagePath)
     },
     toggleActionsMenu(event, selectedId) {
@@ -153,28 +147,28 @@ export default {
     },
     async removeItem() {
       let toastConfig = {
-          closable:true,
-          severity:'success',
-          summary:'Deleted successfully',
-          life:10000 
-        }
-      try{
+        closable: true,
+        severity: 'success',
+        summary: 'Deleted successfully',
+        life: 10000
+      }
+      try {
         this.$toast.add({
-          closable:true,
-          severity:'info',
-          summary:'Processing request',
-          life:5000 
+          closable: true,
+          severity: 'info',
+          summary: 'Processing request',
+          life: 5000
         })
         await this.deleteService(this.selectedId);
-        this.data = this.data.filter(item=>item.id !== this.selectedId)
-      }catch(error){
+        this.data = this.data.filter(item => item.id !== this.selectedId)
+      } catch (error) {
         toastConfig = {
-          closable:true,
-          severity:'error',
-          summary:error,
-          life:10000 
+          closable: true,
+          severity: 'error',
+          summary: error,
+          life: 10000
         }
-      }finally{
+      } finally {
         this.$toast.add(toastConfig);
       }
     },
