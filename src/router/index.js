@@ -2,9 +2,9 @@ import { createRouter, createWebHistory } from 'vue-router'
 import HomeView from '@/views/HomeView.vue'
 import DomainsView from '@/views/DomainsView.vue'
 import VariablesView from '@/views/VariablesView.vue'
-import { listEdgeApplicationsService } from '@/services/edge-application-services'
-import { listDomainsService } from '@/services/domains-services'
 import { listVariablesService } from '@/services/variables-services'
+import { listEdgeApplicationsService, deleteEdgeApplicationService } from '@/services/edge-application-services'
+import { listDomainsService } from '@/services/domains-services'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -14,7 +14,8 @@ const router = createRouter({
       name: 'home',
       component: HomeView,
       props: {
-        listEdgeApplicationsService: listEdgeApplicationsService
+        listEdgeApplicationsService: listEdgeApplicationsService,
+        deleteEdgeApplicationService: deleteEdgeApplicationService
       }
     },
     {

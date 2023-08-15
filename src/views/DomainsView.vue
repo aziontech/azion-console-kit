@@ -16,7 +16,7 @@ export default {
 </script>
 
 <template>
-  <ListTemplate :listService="listDomainsService" :columns="[
+  <ListTemplate :pageTitle="'Domains'" :addButtonLabel="'Add domains'" :listService="listDomainsService" :columns="[
     {
       field: 'name',
       header: 'Name'

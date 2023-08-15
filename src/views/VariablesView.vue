@@ -25,6 +25,6 @@ export default {
       field: 'value',
       header: 'Value'
     },
-  ]"></ListTemplate>
+  ]" :pageTitle="'Variables'" :addButtonLabel="'Add Variable'" :createPagePath="'/'"></ListTemplate>
 </template>
 

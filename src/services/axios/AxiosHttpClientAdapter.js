@@ -6,10 +6,14 @@ export const parseHttpResponse = (httpResponse) => {
       return httpResponse?.body || null;
     case 201:
       return 'Resource succesfully created';
+    case 204:
+      return 'Resource succesfully deleted';
     case 400:
       throw new Error('Invalid API request');
     case 403:
       throw new Error('You dont have permision to use make this action at API');
+    case 404:
+      throw new Error('Resourse not found.');
     case 500:
       throw new Error('Something went wrong, please try again.');
     default:
