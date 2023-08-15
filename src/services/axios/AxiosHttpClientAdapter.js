@@ -1,13 +1,13 @@
 import api from "./makeApi";
 
-export const parseHttpResponse = (httpResponse)=>{
+export const parseHttpResponse = (httpResponse) => {
   switch (httpResponse.statusCode) {
     case 200:
       return httpResponse?.body || null;
     case 201:
-      return 'Resource succesfully created'; 
+      return 'Resource succesfully created';
     case 204:
-      return 'Resource succesfully deleted'; 
+      return 'Resource succesfully deleted';
     case 400:
       throw new Error('Invalid API request');
     case 403:
@@ -23,7 +23,7 @@ export const parseHttpResponse = (httpResponse)=>{
 
 
 export class AxiosHttpClientAdapter {
-  static async request({url,method,headers,body}) {
+  static async request({ url, method, headers, body }) {
     let axiosResponse
     try {
       axiosResponse = await api.request({

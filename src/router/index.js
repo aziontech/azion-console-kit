@@ -1,8 +1,10 @@
 import { createRouter, createWebHistory } from 'vue-router'
+import VariablesView from '@/views/Variables/ListView.vue'
+import { listVariablesService } from '@/services/variables-services'
 import EdgeApplicationsListView from '@/views/EdgeApplications/ListView.vue'
 import DomainsListView from '@/views/Domains/ListView.vue'
-import {listEdgeApplicationsService,deleteEdgeApplicationService} from  '@/services/edge-application-services'
-import {listDomainsService,deleteDomainService} from  '@/services/domains-services'
+import { listEdgeApplicationsService, deleteEdgeApplicationService } from '@/services/edge-application-services'
+import { listDomainsService, deleteDomainService } from '@/services/domains-services'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -11,18 +13,26 @@ const router = createRouter({
       path: '/',
       name: 'home',
       component: EdgeApplicationsListView,
-      props:{
-        listEdgeApplicationsService:listEdgeApplicationsService,
-        deleteEdgeApplicationService:deleteEdgeApplicationService
+      props: {
+        listEdgeApplicationsService: listEdgeApplicationsService,
+        deleteEdgeApplicationService: deleteEdgeApplicationService
       }
     },
     {
       path: '/domains',
       name: 'domains',
       component: DomainsListView,
-      props:{
-        listDomainsService:listDomainsService,
-        deleteDomainsService:deleteDomainService,
+      props: {
+        listDomainsService: listDomainsService,
+        deleteDomainsService: deleteDomainService,
+      }
+    },
+    {
+      path: '/variables',
+      name: 'variables',
+      component: VariablesView,
+      props: {
+        listVariablesService: listVariablesService,
       }
     },
     // {
