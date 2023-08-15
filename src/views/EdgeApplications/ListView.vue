@@ -1,10 +1,10 @@
 <script >
-import ListTemplate from '@/templates/list-template'
+import ListTableBlock from '@/templates/list-table-block'
 
 export default {
   name: 'home-view',
   components: {
-    ListTemplate
+    ListTableBlock
   },
   props: {
     listEdgeApplicationsService: {
@@ -20,7 +20,7 @@ export default {
 </script>
 
 <template>
-  <ListTemplate :pageTitle="'Edge Applications'" :addButtonLabel="'Add Edge Application'" :createPagePath="'/'"
+  <ListTableBlock :pageTitle="'Edge Applications'" :addButtonLabel="'Add Edge Application'" :createPagePath="'/'"
     :listService="listEdgeApplicationsService" :deleteService="deleteEdgeApplicationService" :columns="[
       {
         field: 'name',
@@ -46,6 +46,6 @@ export default {
         field: 'origins',
         header: 'Origins'
       },
-    ]"></ListTemplate>
+    ]"></ListTableBlock>
 </template>
 

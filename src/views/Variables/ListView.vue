@@ -1,5 +1,5 @@
 <script >
-import ListTemplate from '@/templates/list-template'
+import ListTemplate from '@/templates/list-table-block'
 
 export default {
   name: 'variables-view',

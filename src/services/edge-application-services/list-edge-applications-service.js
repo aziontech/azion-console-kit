@@ -13,10 +13,11 @@ export const listEdgeApplicationsService = async ({ page }) => {
   return parseHttpResponse(httpResponse)
 }
 
+
+
 const adapt = (httpResponse) => {
   const parsedEdgeApplications = httpResponse.body.results.map((edgeApplication) => {
     const originNames = edgeApplication.origins.map(origin => origin.name)?.join(',')
-    console.log(originNames);
 
     return {
       active: edgeApplication.active ? 'active' : 'disabled',

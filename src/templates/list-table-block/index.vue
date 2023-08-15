@@ -154,6 +154,12 @@ export default {
         life: 10000
       }
       try {
+        this.$toast.add({
+          closable: true,
+          severity: 'info',
+          summary: 'Processing request',
+          life: 5000
+        })
         await this.deleteService(this.selectedId);
         this.data = this.data.filter(item => item.id !== this.selectedId)
       } catch (error) {
