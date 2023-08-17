@@ -1,5 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import VariablesView from '@/views/Variables/ListView.vue'
+import CreateVariablesView from '@/views/Variables/CreateView.vue'
 import { listVariablesService } from '@/services/variables-services'
 import EdgeApplicationsListView from '@/views/EdgeApplications/ListView.vue'
 import DomainsListView from '@/views/Domains/ListView.vue'
@@ -39,10 +40,24 @@ const router = createRouter({
     {
       path: '/variables',
       name: 'variables',
-      component: VariablesView,
-      props: {
-        listVariablesService: listVariablesService,
-      }
+      children:[
+        {
+          path:'',
+          name:'list-variables',
+          component: VariablesView,
+          props: {
+            listVariablesService: listVariablesService,
+          },
+        }
+        ,{
+          path: 'create',
+          name: 'create-variables',
+          component: CreateVariablesView,
+          props: {
+            createVariablesService: (payload)=>console.log('payload',payload)
+          },
+        }
+      ]
     },
     // {
     //   path: '/edge-application',
