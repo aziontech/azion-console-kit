@@ -1,22 +1,5 @@
-<script >
-import ListTableBlock from '@/templates/list-table-block'
-
-export default {
-  name: 'variables-view',
-  components: {
-    ListTableBlock
-  },
-  props: {
-    listVariablesService: {
-      required: true,
-      type: Function,
-    }
-  }
-}
-</script>
-
 <template>
-  <ListTemplate :listService="listVariablesService"
+  <ListTableBlock :listService="listVariablesService"
   :columns="[
     {
       field: 'key',
@@ -39,4 +22,23 @@ export default {
   :addButtonLabel="'Add Variable'" :createPagePath="'variables/create'"
   />
 </template>
+
+
+<script >
+import ListTableBlock from '@/templates/list-table-block'
+
+export default {
+  name: 'variables-view',
+  components: {
+    ListTableBlock
+  },
+  props: {
+    listVariablesService: {
+      required: true,
+      type: Function,
+    }
+  }
+}
+</script>
+
 

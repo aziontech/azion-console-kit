@@ -14,15 +14,23 @@ export const listVariablesService = async () => {
 }
 
 const adapt = (httpResponse) => {
-  const parsedVariables = httpResponse.body?.map(variable=>{
-    return{
+  
+  /**
+  * Necessary until the API gets the common pattern
+  * of returning the array of data inside results property
+  * like other andpoints.
+  */
+  const isArray = Array.isArray(httpResponse.body);
+
+
+  const parsedVariables = isArray ? httpResponse.body.map((variable)=>({
       id:variable.uuid,
       key:variable.key,
       value:variable.value,
       lastEditor:variable.last_editor,
       updatedAt:new Intl.DateTimeFormat('us', { dateStyle: 'full' }).format(new Date( variable.updated_at))
-    }
-  })
+  })) : [];
+
   return {
     body: parsedVariables,
     statusCode: httpResponse.statusCode
