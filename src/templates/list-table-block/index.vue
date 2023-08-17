@@ -3,7 +3,7 @@
   <header class="border-neutral-200  border-b min-h-[82px] w-full flex items-center">
     <div class="p-4 w-full">
       <div class="flex flex-col md:flex-row justify-between gap-4">
-        <h1 class="text-4xl font-normal text-gray-600">{{ pageTitle }}</h1>
+        <h1 class="text-4xl self-center font-normal text-gray-600">{{ pageTitle }}</h1>
         <PrimeButton @click="navigateToAddPage" icon="pi pi-plus" :label="addButtonLabel" v-if="addButtonLabel" />
       </div>
     </div>

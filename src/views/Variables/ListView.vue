@@ -16,7 +16,8 @@ export default {
 </script>
 
 <template>
-  <ListTemplate :listService="listVariablesService" :columns="[
+  <ListTemplate :listService="listVariablesService"
+  :columns="[
     {
       field: 'key',
       header: 'Key'
@@ -25,6 +26,17 @@ export default {
       field: 'value',
       header: 'Value'
     },
-  ]" :pageTitle="'Variables'" :addButtonLabel="'Add Variable'" :createPagePath="'/'"></ListTemplate>
+    {
+      field: 'lastEditor',
+      header: 'Last Editor'
+    },
+    {
+      field: 'updatedAt',
+      header: 'Last Update'
+    },
+  ]" 
+  :pageTitle="'Variables'"
+  :addButtonLabel="'Add Variable'" :createPagePath="'variables/create'"
+  />
 </template>
 

@@ -20,8 +20,13 @@ export default {
 </script>
 
 <template>
-  <ListTableBlock :pageTitle="'Edge Applications'" :addButtonLabel="'Add Edge Application'" :createPagePath="'/'"
-    :listService="listEdgeApplicationsService" :deleteService="deleteEdgeApplicationService" :columns="[
+  <ListTableBlock 
+    :pageTitle="'Edge Applications'"
+    :addButtonLabel="'Add Edge Application'"
+    :createPagePath="'/'"
+    :listService="listEdgeApplicationsService"
+    :deleteService="deleteEdgeApplicationService"
+    :columns="[
       {
         field: 'name',
         header: 'Name'
