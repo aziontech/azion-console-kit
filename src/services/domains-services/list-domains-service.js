@@ -19,7 +19,7 @@ export const listDomainsService = async ({
 }
 
 const adapt = (httpResponse) => {
-  const parsedDomains = httpResponse.body.results.map((domain) => {
+  const parsedDomains = httpResponse.body.results?.map((domain) => {
     const cnames = domain.cnames.map(cname => cname)?.join(',')
     return {
       id: domain.id,
