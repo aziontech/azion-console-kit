@@ -11,7 +11,7 @@
   <div class="max-w-screen-sm lg:max-w-7xl mx-auto">
 
     <DataTable v-if="!isLoading" scrollable removableSort :value="data" dataKey="id" v-model:filters="this.filters"
-      paginator :rowsPerPageOptions="[10, 20, 50, 100]" :rows="10" :globalFilterFields="filterBy" :loading="isLoading">
+      paginator :rowsPerPageOptions="[5, 10, 20, 50, 100]" :rows="5" :globalFilterFields="filterBy" :loading="isLoading">
       <template #header>
         <div class="flex self-start">
           <span class="p-input-icon-left">
@@ -38,7 +38,7 @@
 
     </DataTable>
 
-    <DataTable v-else :value="Array(20)">
+    <DataTable v-else :value="Array(5)">
       <Column sortable v-for="col of columns" :key="col.field" :field="col.field" :header="col.header">
         <template #body>
           <Skeleton></Skeleton>
@@ -60,7 +60,7 @@ import PrimeButton from 'primevue/button';
 import { FilterMatchMode } from 'primevue/api';
 
 export default {
-  name: 'list-template',
+  name: 'list-table-block',
   components: {
     Toast,
     DataTable,
@@ -112,7 +112,7 @@ export default {
     }
   },
   async created() {
-    await this.loadData({page:1})
+    await this.loadData({ page: 1 })
   },
   computed: {
     actionOptions() {
@@ -134,20 +134,20 @@ export default {
     }
   },
   methods: {
-    async loadData({page}) {
-      try{
+    async loadData({ page }) {
+      try {
         this.isLoading = true;
         const data = await this.listService({ page })
         this.data = data;
-      }catch(error){
+      } catch (error) {
         this.$toast.add({
           closable: true,
           severity: 'error',
           summary: error,
           life: 10000
         })
-      }finally{
-        this.isLoading= false
+      } finally {
+        this.isLoading = false
       }
     },
     navigateToAddPage() {

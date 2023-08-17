@@ -1,10 +1,10 @@
 <script >
-import ListTemplate from '@/templates/list-table-block'
+import ListTableBlock from '@/templates/list-table-block'
 
 export default {
   name: 'variables-view',
   components: {
-    ListTemplate
+    ListTableBlock
   },
   props: {
     listVariablesService: {
@@ -16,7 +16,7 @@ export default {
 </script>
 
 <template>
-  <ListTemplate :listService="listVariablesService" :columns="[
+  <ListTableBlock :listService="listVariablesService" :columns="[
     {
       field: 'key',
       header: 'Key'
@@ -25,6 +25,6 @@ export default {
       field: 'value',
       header: 'Value'
     },
-  ]" :pageTitle="'Variables'" :addButtonLabel="'Add Variable'" :createPagePath="'/'"></ListTemplate>
+  ]" :pageTitle="'Variables'" :addButtonLabel="'Add Variable'" :createPagePath="'/'"></ListTableBlock>
 </template>
 

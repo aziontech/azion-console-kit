@@ -1,12 +1,14 @@
 <script setup>
-import { RouterView } from 'vue-router';
+import { RouterView } from 'vue-router'
+import ShellBlock from '@/templates/shell-block'
+
 </script>
 
 <template>
- 
-  <main class="min-h-screen">
-    <RouterView/>
+  <main class="flex flex-col min-h-screen">
+    <ShellBlock>
+      <RouterView />
+    </ShellBlock>
   </main>
- 
 </template>
 
