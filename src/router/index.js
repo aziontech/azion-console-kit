@@ -20,6 +20,15 @@ const router = createRouter({
       }
     },
     {
+      path: '/edge-applications',
+      name: 'edge-applications',
+      component: EdgeApplicationsListView,
+      props: {
+        listEdgeApplicationsService: listEdgeApplicationsService,
+        deleteEdgeApplicationService: deleteEdgeApplicationService
+      }
+    },
+    {
       path: '/domains',
       name: 'domains',
       component: DomainsListView,

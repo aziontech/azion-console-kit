@@ -1,10 +1,10 @@
 <script >
-import ListTemplate from '@/templates/list-table-block'
+import ListTableBlock from '@/templates/list-table-block'
 
 export default {
   name: 'variables-view',
   components: {
-    ListTemplate
+    ListTableBlock
   },
   props: {
     listVariablesService: {
