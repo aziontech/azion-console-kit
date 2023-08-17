@@ -45,6 +45,10 @@ export default {
       type: Boolean,
       required: true,
     },
+    formData: {
+      type: Object,
+      required: true,
+    },
     cleanFormCallback: {
       type: Function,
       required: true,
@@ -57,7 +61,7 @@ export default {
     async validateAndSubmit() {
       try {
         this.isLoading = true;
-        await this.createService()
+        await this.createService(this.formData)
         
         this.cleanFormCallback();
         this.$toast.add({

@@ -1,7 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import VariablesView from '@/views/Variables/ListView.vue'
 import CreateVariablesView from '@/views/Variables/CreateView.vue'
-import { listVariablesService } from '@/services/variables-services'
+import { listVariablesService,createVariablesService } from '@/services/variables-services'
 import EdgeApplicationsListView from '@/views/EdgeApplications/ListView.vue'
 import DomainsListView from '@/views/Domains/ListView.vue'
 import { listEdgeApplicationsService, deleteEdgeApplicationService } from '@/services/edge-application-services'
@@ -95,7 +95,7 @@ const router = createRouter({
           name: 'create-variables',
           component: CreateVariablesView,
           props: {
-            createVariablesService: (payload)=>console.log('payload',payload)
+            createVariablesService: createVariablesService
           },
           meta:{
             breadCrumbs:[

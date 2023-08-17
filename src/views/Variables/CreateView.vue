@@ -2,6 +2,7 @@
   <CreateFormBlock 
     :pageTitle="'Create Variables'"
     :createService="props.createVariablesService"
+    :formData="values"
     :isValid="meta.valid"
     :cleanFormCallback="resetForm"
   >
@@ -22,7 +23,6 @@
           <label for="">Secret</label>
           <InputSwitch v-bind="secret"  v-model="secret.value"  :class="{ 'p-invalid': errors.secret }"/>
         </div>
-        <pre>{{ values }}</pre> 
     </template>
 </CreateFormBlock>
 </template>
@@ -35,7 +35,12 @@ import { useForm } from 'vee-validate';
 import {defineProps} from 'vue'
 import * as yup from 'yup';
 
-const props = defineProps(['createVariablesService'])
+const props = defineProps({
+  'createVariablesService':{
+    type:Function,
+    required:true,
+  }
+})
 //Validation Schema
 const validationSchema = yup.object({
     key: yup.string().required(),
@@ -44,7 +49,7 @@ const validationSchema = yup.object({
 });
 
 // validation with VeeValidate
-const {errors,defineInputBinds,meta,resetForm} = useForm({
+const {errors,defineInputBinds,meta,resetForm,values} = useForm({
   validationSchema,
 })
 
