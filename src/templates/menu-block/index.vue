@@ -52,13 +52,10 @@
 </template>
 
 <script>
-import { ref } from "vue"
 import PrimeMenu from 'primevue/menu'
 import PrimeButton from 'primevue/button'
 import Sidebar from 'primevue/sidebar'
 import Avatar from 'primevue/avatar'
-
-const sideBarVisible = ref(false)
 
 export default {
   name: 'menu-block',
@@ -76,9 +73,9 @@ export default {
   },
   data() {
     return {
-      sideBarVisible: sideBarVisible,
+      sideBarVisible: false,
       showSideBar: (state = true) => {
-        sideBarVisible.value = state
+        this.sideBarVisible = state
       },
     }
   },
