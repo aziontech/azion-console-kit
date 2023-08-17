@@ -57,7 +57,7 @@ import PrimeButton from 'primevue/button'
 import Breadcrumb from 'primevue/breadcrumb'
 import Sidebar from 'primevue/sidebar'
 import Avatar from 'primevue/avatar'
-import Divider from 'primevue/avatar'
+import Divider from 'primevue/Divider'
 
 
 export default {
