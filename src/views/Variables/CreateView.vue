@@ -18,13 +18,19 @@
           :class="{ 'p-invalid': errors.value }"
           v-tooltip.top="errors.value"
         />
+        <div class="flex gap-3 items-center">
+          <label for="">Secret</label>
+          <InputSwitch v-bind="secret"  v-model="secret.value"  :class="{ 'p-invalid': errors.secret }"/>
+        </div>
+        <pre>{{ values }}</pre> 
     </template>
-  </CreateFormBlock>
+</CreateFormBlock>
 </template>
 
 <script setup>
 import CreateFormBlock from '@/templates/create-form-block'
 import InputText from 'primevue/inputtext';
+import InputSwitch from 'primevue/inputswitch';
 import { useForm } from 'vee-validate';
 import {defineProps} from 'vue'
 import * as yup from 'yup';
@@ -34,6 +40,7 @@ const props = defineProps(['createVariablesService'])
 const validationSchema = yup.object({
     key: yup.string().required(),
     value: yup.string().required(),
+    secret:yup.boolean().required().default(false),
 });
 
 // validation with VeeValidate
@@ -43,5 +50,6 @@ const {errors,defineInputBinds,meta,resetForm} = useForm({
 
 const key = defineInputBinds('key',{validateOnInput:true})
 const value = defineInputBinds('value',{validateOnInput:true})
+const secret = defineInputBinds('secret')
 
 </script>
