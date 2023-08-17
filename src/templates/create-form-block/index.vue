@@ -9,7 +9,7 @@
     </div>
   </header>
 
-  <form @submit.prevent="validateAndSubmit" class="mt-4 p-4 max-w-screen-sm flex flex-col gap-4 h-screen lg:max-w-7xl mx-auto">
+  <form @submit.prevent="validateAndSubmit" class="mt-4 p-4 max-w-screen-sm flex flex-col gap-4  lg:max-w-7xl mx-auto">
     <slot name="form" />
 
     <div class="flex flex-wrap pb-4 gap-2 w-full justify-end mt-auto">
