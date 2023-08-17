@@ -1,5 +1,7 @@
 <template>
-  <ListTableBlock :listService="listVariablesService"
+  <ListTableBlock 
+  :listService="listVariablesService"
+  :deleteService="deleteVariablesService"
   :columns="[
     {
       field: 'key',
@@ -34,6 +36,10 @@ export default {
   },
   props: {
     listVariablesService: {
+      required: true,
+      type: Function,
+    },
+    deleteVariablesService: {
       required: true,
       type: Function,
     }
