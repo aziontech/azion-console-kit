@@ -6,7 +6,7 @@
     <div class="flex gap-3 items-center">
       <PrimeButton  @click="showSideBar" size="small" class="flex-none" text
         icon="pi pi-bars" />
-      <Breadcrumb :home="home" :model="generateBreadCrumbs" class="border: none; padding: none;">
+      <Breadcrumb :model="generateBreadCrumbs" class="border: none; padding: none;">
         <template #separator>
           <svg width="11" height="14" viewBox="0 0 11 14" fill="none" xmlns="http://www.w3.org/2000/svg">
             <path d="M10.8125 -4.75L1.3125 19.9531H0.09375L9.59375 -4.75H10.8125Z" fill="#495057" />
@@ -19,7 +19,7 @@
         icon="pi pi-search" />
       <PrimeButton  size="small" class="flex-none" text icon="pi pi-moon" />
       <Avatar @click="showProfile = true" label="P" class="cursor-pointer" />
-      <PrimeMenu ref="menu" id="overlay_menu" :model="items" :popup="true" />
+      <PrimeMenu ref="menu" id="overlay_menu" :model="[]" :popup="true" />
     </div>
   </header>
 
@@ -57,11 +57,14 @@ import PrimeButton from 'primevue/button'
 import Breadcrumb from 'primevue/breadcrumb'
 import Sidebar from 'primevue/sidebar'
 import Avatar from 'primevue/avatar'
+import Divider from 'primevue/avatar'
+
 
 export default {
   name: 'menu-block',
   components: {
     Avatar,
+    Divider,
     PrimeButton,
     Breadcrumb,
     PrimeMenu,
