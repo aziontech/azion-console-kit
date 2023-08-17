@@ -7,6 +7,11 @@ import DomainsListView from '@/views/Domains/ListView.vue'
 import { listEdgeApplicationsService, deleteEdgeApplicationService } from '@/services/edge-application-services'
 import { listDomainsService, deleteDomainService } from '@/services/domains-services'
 
+const homeBreadCrumb  ={
+  label:'Home',
+  to:'/'
+}
+
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
@@ -17,6 +22,15 @@ const router = createRouter({
       props: {
         listEdgeApplicationsService: listEdgeApplicationsService,
         deleteEdgeApplicationService: deleteEdgeApplicationService
+      },
+      meta:{
+        breadCrumbs:[
+          homeBreadCrumb,
+          {
+            label:'Edge Applications',
+            to:'/edge-applications'
+          }
+        ]
       }
     },
     {
@@ -26,6 +40,15 @@ const router = createRouter({
       props: {
         listEdgeApplicationsService: listEdgeApplicationsService,
         deleteEdgeApplicationService: deleteEdgeApplicationService
+      },
+      meta:{
+        breadCrumbs:[
+          homeBreadCrumb,
+          {
+            label:'Edge Applications',
+            to:'/edge-applications'
+          }
+        ]
       }
     },
     {
@@ -35,6 +58,15 @@ const router = createRouter({
       props: {
         listDomainsService: listDomainsService,
         deleteDomainsService: deleteDomainService,
+      },
+      meta:{
+        breadCrumbs:[
+          homeBreadCrumb,
+          {
+            label:'Domains',
+            to:'/domains'
+          }
+        ]
       }
     },
     {
@@ -48,6 +80,15 @@ const router = createRouter({
           props: {
             listVariablesService: listVariablesService,
           },
+          meta:{
+            breadCrumbs:[
+              homeBreadCrumb,
+              {
+                label:'Variables',
+                to:'/variables'
+              }
+            ]
+          }
         }
         ,{
           path: 'create',
@@ -56,20 +97,23 @@ const router = createRouter({
           props: {
             createVariablesService: (payload)=>console.log('payload',payload)
           },
+          meta:{
+            breadCrumbs:[
+              homeBreadCrumb,
+              {
+                label:'Variables',
+                to:'/variables'
+              },
+              {
+                label:'Create Variables',
+                to:'/variables/create'
+              }
+            ]
+          }
         }
       ]
     },
-    // {
-    //   path: '/edge-application',
-    //   name: 'edge-application',
-    //   // route level code-splitting
-    //   // this generates a separate chunk (Home.[hash].js) for this route
-    //   // which is lazy-loaded when the route is visited.
-    //   component: () => import('../views/HomeView'),
-    //   props:{
-    //     listService:listEdgeApplicationsService
-    //   }
-    // },
+    // example of lazy route
     // {
     //   path: '/about',
     //   name: 'about',
