@@ -10,6 +10,8 @@ export const parseHttpResponse = (httpResponse) => {
       return 'Resource succesfully deleted';
     case 400:
       throw new Error('Invalid API request');
+    case 401:
+      throw new Error('Invalid API Token');
     case 403:
       throw new Error('You dont have permision to use make this action at API');
     case 404:
