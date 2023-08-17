@@ -44,7 +44,7 @@
       </RouterLink>
       <Divider />
       <p class="font-semibold my-4 text-md text-gray-400">EDGE LIBRARIES</p>
-      <RouterLink to="/" class="mb-4 flex items-center">
+      <RouterLink to="/digital-certificates" class="mb-4 flex items-center">
         <i class="text-xl pi pi-verified mr-3" /> Digital Certificates
       </RouterLink>
     </div>
