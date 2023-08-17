@@ -77,7 +77,7 @@ export default {
         },
         {
           label:'Marketplace',
-          to:'/',
+          to:'/marketplace',
           icon:'pi-shopping-cart'
         },
         {
@@ -101,7 +101,7 @@ export default {
         {
           sectionTitle:'EDGE LIBRARIES',
           label:'Digital Certificates',
-          to:'/',
+          to:'/digital-certificates',
           icon:'pi-verified',
           showDivider:true,
         }
