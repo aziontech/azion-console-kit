@@ -40,7 +40,7 @@
         <i class="text-xl pi pi-window-minimize mr-3" /> Edge Application
       </RouterLink>
       <RouterLink to="/variables" class="mb-4 flex items-center" @click="showSideBar(false)">
-        <i class="text-xl pi pi-window-minimize mr-3" /> Variables
+        <i class="text-xl pi pi-sliders-h mr-3" /> Variables
       </RouterLink>
       <Divider />
       <p class="font-semibold my-4 text-md text-gray-400">EDGE LIBRARIES</p>
