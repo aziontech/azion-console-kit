@@ -2,7 +2,6 @@ import { AxiosHttpClientAdapter, parseHttpResponse } from "../axios/AxiosHttpCli
 import { makeVariablesBaseUrl } from "./make-variables-base-url";
 
 export const createVariablesService = async (payload) => {
-  console.log(payload)
   let httpResponse = await AxiosHttpClientAdapter
     .request({
       url: `${makeVariablesBaseUrl()}`,
