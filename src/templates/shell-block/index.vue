@@ -1,5 +1,5 @@
 <template>
-  <MenuBlock />
+  <MainMenuBlock />
   <div class="flex-grow">
     <slot></slot>
   </div>
@@ -7,14 +7,14 @@
 </template>
 
 <script>
-import MenuBlock from '@/templates/menu-block'
+import MainMenuBlock from '@/templates/main-menu-block'
 import FooterBlock from '@/templates/footer-block'
 
 export default {
   name: 'shell-block',
   components: {
     FooterBlock,
-    MenuBlock,
+    MainMenuBlock,
   }
 }
 </script>

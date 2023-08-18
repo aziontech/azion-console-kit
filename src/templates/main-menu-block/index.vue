@@ -25,28 +25,21 @@
 
   <Sidebar :visible="sideBarVisible" position="left" @update:visible="val => showSideBar(val)" @hide="showSideBar(false)">
     <div class="flex flex-col p-4">
-      <RouterLink to="/" class="mb-4 flex items-center">
-        <i class="text-xl pi pi-home mr-3" /> Home
-      </RouterLink>
-      <RouterLink to="/" class="mb-4 flex items-center">
-        <i class="text-xl pi pi-shopping-cart mr-3" /> Marketplace
-      </RouterLink>
-      <RouterLink to="/domains" class="mb-4 flex items-center">
-        <i class="text-xl pi pi-globe mr-3" /> Domains
-      </RouterLink>
-      <Divider />
-      <p class="font-semibold my-4 text-md text-gray-400">BUILD</p>
-      <RouterLink to="/edge-applications" class="mb-4 flex items-center" @click="showSideBar(false)">
-        <i class="text-xl pi pi-window-minimize mr-3" /> Edge Application
-      </RouterLink>
-      <RouterLink to="/variables" class="mb-4 flex items-center" @click="showSideBar(false)">
-        <i class="text-xl pi pi-sliders-h mr-3" /> Variables
-      </RouterLink>
-      <Divider />
-      <p class="font-semibold my-4 text-md text-gray-400">EDGE LIBRARIES</p>
-      <RouterLink to="/digital-certificates" class="mb-4 flex items-center">
-        <i class="text-xl pi pi-verified mr-3" /> Digital Certificates
-      </RouterLink>
+      <template  v-for="menuItem of menuItems" :key="menuItem.label">
+        <p v-if="menuItem.sectionTitle" class="font-semibold my-4 text-md text-gray-400">{{menuItem.sectionTitle}}</p>
+        <RouterLink
+          @click="showSideBar(false)"
+          :to="menuItem.to"
+          class="mb-4 flex items-center"
+          :activeClass="'text-orange-600'"
+          >
+          <i :class="`text-xl pi ${menuItem.icon} mr-3`" /> {{menuItem.label}}
+        </RouterLink>
+
+        <Divider v-if="menuItem.showDivider"/>
+      </template>
+      
+     
     </div>
   </Sidebar>
 </template>
@@ -69,13 +62,50 @@ export default {
     Breadcrumb,
     PrimeMenu,
     Sidebar,
-  },
+},
   data() {
     return {
       sideBarVisible: false,
       showSideBar: (state = true) => {
         this.sideBarVisible = state
       },
+      menuItems:[
+        {
+          label:'Home',
+          to:'/',
+          icon:'pi-home'
+        },
+        {
+          label:'Marketplace',
+          to:'/marketplace',
+          icon:'pi-shopping-cart'
+        },
+        {
+          label:'Domains',
+          to:'/domains',
+          icon:'pi-globe',
+          showDivider:true,
+        },
+        {
+          sectionTitle:'BUILD',
+          label:'Edge Application',
+          to:'/edge-applications',
+          icon:'pi-window-minimize',
+        },
+        {
+          label:'Variables',
+          to:'/variables',
+          icon:'pi-sliders-h',
+          showDivider:true,
+        },
+        {
+          sectionTitle:'EDGE LIBRARIES',
+          label:'Digital Certificates',
+          to:'/digital-certificates',
+          icon:'pi-verified',
+          showDivider:true,
+        }
+      ]
     }
   },
   computed:{
