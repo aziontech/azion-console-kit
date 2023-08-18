@@ -1,6 +1,7 @@
 <template>
   <ListTableBlock 
   :listService="listDigitalCertificatesService"
+  :deleteService="deleteDigitalCertificatesService"
   :columns="[
     {
       field: 'name',
@@ -39,6 +40,10 @@ export default {
   },
   props: {
     listDigitalCertificatesService: {
+      required: true,
+      type: Function,
+    },
+    deleteDigitalCertificatesService: {
       required: true,
       type: Function,
     },

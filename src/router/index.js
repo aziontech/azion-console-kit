@@ -7,7 +7,7 @@ import DigitalCertificatesView from '@/views/DigitalCertificates/ListView.vue'
 import DomainsListView from '@/views/Domains/ListView.vue'
 import { listEdgeApplicationsService, deleteEdgeApplicationService } from '@/services/edge-application-services'
 import { listDomainsService, deleteDomainService } from '@/services/domains-services'
-import { listDigitalCertificatesService } from '@/services/digital-certificates'
+import { listDigitalCertificatesService,deleteDigitalCertificatesService } from '@/services/digital-certificates'
 
 const homeBreadCrumb  ={
   label:'Home',
@@ -77,6 +77,8 @@ const router = createRouter({
       component: DigitalCertificatesView,
       props: {
         listDigitalCertificatesService: listDigitalCertificatesService,
+        deleteDigitalCertificatesService:
+        deleteDigitalCertificatesService,
       },
       meta:{
         breadCrumbs:[
