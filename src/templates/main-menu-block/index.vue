@@ -6,13 +6,15 @@
     <div class="flex gap-3 items-center">
       <PrimeButton  @click="showSideBar" size="small" class="flex-none" text
         icon="pi pi-bars" />
-      <Breadcrumb :home="generateHomeBreadCrumb" :model="generateBreadCrumbs" class="border: none; padding: none;">
+     
+      <Breadcrumb :home="generateHomeBreadCrumb" :model="generateBreadCrumbs" style="border: none; padding: none;">
         <template #separator>
           <svg width="11" height="14" viewBox="0 0 11 14" fill="none" xmlns="http://www.w3.org/2000/svg">
             <path d="M10.8125 -4.75L1.3125 19.9531H0.09375L9.59375 -4.75H10.8125Z" fill="#495057" />
           </svg>
         </template>
       </Breadcrumb>
+    
     </div>
     <div class="flex gap-3 items-center">
       <PrimeButton  @click="showSearch = true" size="small" class="flex-none" text
