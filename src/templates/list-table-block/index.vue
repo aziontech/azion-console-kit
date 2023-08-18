@@ -31,8 +31,9 @@
         </template>
       </Column>
       <template #empty>
-        <div class="flex justify-center items-center">
+        <div class="my-4 flex flex-col gap-3 justify-center items-center">
           <p class="text-xl font-normal text-gray-600"> No registers found. </p>
+          <PrimeButton icon="pi pi-plus" label="Add" @click="navigateToAddPage"/>
         </div>
       </template>
 
