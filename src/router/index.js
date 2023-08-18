@@ -3,9 +3,11 @@ import VariablesView from '@/views/Variables/ListView.vue'
 import CreateVariablesView from '@/views/Variables/CreateView.vue'
 import * as VariablesService from '@/services/variables-services'
 import EdgeApplicationsListView from '@/views/EdgeApplications/ListView.vue'
+import DigitalCertificatesView from '@/views/DigitalCertificates/ListView.vue'
 import DomainsListView from '@/views/Domains/ListView.vue'
 import { listEdgeApplicationsService, deleteEdgeApplicationService } from '@/services/edge-application-services'
 import { listDomainsService, deleteDomainService } from '@/services/domains-services'
+import { listDigitalCertificatesService } from '@/services/digital-certificates'
 
 const homeBreadCrumb  ={
   label:'Home',
@@ -65,6 +67,23 @@ const router = createRouter({
           {
             label:'Domains',
             to:'/domains'
+          }
+        ]
+      }
+    },
+    {
+      path: '/digital-certificates',
+      name: 'digital-certificates',
+      component: DigitalCertificatesView,
+      props: {
+        listDigitalCertificatesService: listDigitalCertificatesService,
+      },
+      meta:{
+        breadCrumbs:[
+          homeBreadCrumb,
+          {
+            label:'Digital Certificates',
+            to:'/digital-certificates'
           }
         ]
       }
