@@ -6,7 +6,7 @@
     <div class="flex gap-3 items-center">
       <PrimeButton  @click="showSideBar" size="small" class="flex-none" text
         icon="pi pi-bars" />
-      <Breadcrumb :model="generateBreadCrumbs" class="border: none; padding: none;">
+      <Breadcrumb :home="generateHomeBreadCrumb" :model="generateBreadCrumbs" class="border: none; padding: none;">
         <template #separator>
           <svg width="11" height="14" viewBox="0 0 11 14" fill="none" xmlns="http://www.w3.org/2000/svg">
             <path d="M10.8125 -4.75L1.3125 19.9531H0.09375L9.59375 -4.75H10.8125Z" fill="#495057" />
@@ -109,8 +109,14 @@ export default {
     }
   },
   computed:{
+    generateHomeBreadCrumb(){
+      return {
+        icon: 'pi pi-home',
+        to: '/',
+      }
+    },
     generateBreadCrumbs(){
-      return this.$router.currentRoute.value.meta.breadCrumbs ?? [{label:'Home',to:'/'},]
+      return this.$router.currentRoute.value.meta.breadCrumbs ?? []
     }
   }
 }

@@ -9,10 +9,6 @@ import { listEdgeApplicationsService, deleteEdgeApplicationService } from '@/ser
 import { listDomainsService, deleteDomainService } from '@/services/domains-services'
 import { listDigitalCertificatesService,deleteDigitalCertificatesService } from '@/services/digital-certificates'
 
-const homeBreadCrumb  ={
-  label:'Home',
-  to:'/'
-}
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -27,7 +23,6 @@ const router = createRouter({
       },
       meta:{
         breadCrumbs:[
-          homeBreadCrumb,
           {
             label:'Edge Applications',
             to:'/edge-applications'
@@ -45,7 +40,6 @@ const router = createRouter({
       },
       meta:{
         breadCrumbs:[
-          homeBreadCrumb,
           {
             label:'Edge Applications',
             to:'/edge-applications'
@@ -63,7 +57,6 @@ const router = createRouter({
       },
       meta:{
         breadCrumbs:[
-          homeBreadCrumb,
           {
             label:'Domains',
             to:'/domains'
@@ -82,7 +75,6 @@ const router = createRouter({
       },
       meta:{
         breadCrumbs:[
-          homeBreadCrumb,
           {
             label:'Digital Certificates',
             to:'/digital-certificates'
@@ -104,7 +96,6 @@ const router = createRouter({
           },
           meta:{
             breadCrumbs:[
-              homeBreadCrumb,
               {
                 label:'Variables',
                 to:'/variables'
@@ -121,7 +112,6 @@ const router = createRouter({
           },
           meta:{
             breadCrumbs:[
-              homeBreadCrumb,
               {
                 label:'Variables',
                 to:'/variables'
