@@ -1,10 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import VariablesView from '@/views/Variables/ListView.vue'
-import CreateVariablesView from '@/views/Variables/CreateView.vue'
 import * as VariablesService from '@/services/variables-services'
-import EdgeApplicationsListView from '@/views/EdgeApplications/ListView.vue'
-import DigitalCertificatesView from '@/views/DigitalCertificates/ListView.vue'
-import DomainsListView from '@/views/Domains/ListView.vue'
 import { listEdgeApplicationsService, deleteEdgeApplicationService } from '@/services/edge-application-services'
 import { listDomainsService, deleteDomainService } from '@/services/domains-services'
 import { listDigitalCertificatesService,deleteDigitalCertificatesService } from '@/services/digital-certificates'
@@ -16,7 +11,7 @@ const router = createRouter({
     {
       path: '/',
       name: 'home',
-      component: EdgeApplicationsListView,
+      component: () => import('@/views/EdgeApplications/ListView.vue'),
       props: {
         listEdgeApplicationsService: listEdgeApplicationsService,
         deleteEdgeApplicationService: deleteEdgeApplicationService
@@ -33,7 +28,7 @@ const router = createRouter({
     {
       path: '/edge-applications',
       name: 'edge-applications',
-      component: EdgeApplicationsListView,
+      component: () => import('@/views/EdgeApplications/ListView.vue'),
       props: {
         listEdgeApplicationsService: listEdgeApplicationsService,
         deleteEdgeApplicationService: deleteEdgeApplicationService
@@ -50,7 +45,7 @@ const router = createRouter({
     {
       path: '/domains',
       name: 'domains',
-      component: DomainsListView,
+      component: () => import('@/views/Domains/ListView.vue'),
       props: {
         listDomainsService: listDomainsService,
         deleteDomainsService: deleteDomainService,
@@ -67,7 +62,7 @@ const router = createRouter({
     {
       path: '/digital-certificates',
       name: 'digital-certificates',
-      component: DigitalCertificatesView,
+      component: () => import('@/views/DigitalCertificates/ListView.vue'),
       props: {
         listDigitalCertificatesService: listDigitalCertificatesService,
         deleteDigitalCertificatesService:
@@ -89,7 +84,7 @@ const router = createRouter({
         {
           path:'',
           name:'list-variables',
-          component: VariablesView,
+          component: () => import('@/views/Variables/ListView.vue'),
           props: {
             listVariablesService: VariablesService.listVariablesService,
             deleteVariablesService:VariablesService.deleteVariablesService
@@ -106,7 +101,7 @@ const router = createRouter({
         ,{
           path: 'create',
           name: 'create-variables',
-          component: CreateVariablesView,
+          component: () => import('@/views/Variables/CreateView.vue'),
           props: {
             createVariablesService: VariablesService.createVariablesService
           },

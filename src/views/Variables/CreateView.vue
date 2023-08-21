@@ -32,7 +32,6 @@ import CreateFormBlock from '@/templates/create-form-block'
 import InputText from 'primevue/inputtext';
 import InputSwitch from 'primevue/inputswitch';
 import { useForm } from 'vee-validate';
-import {defineProps} from 'vue'
 import * as yup from 'yup';
 
 const props = defineProps({
