@@ -42,7 +42,17 @@
 
     </DataTable>
 
-    <DataTable v-else :value="Array(5)">
+    <DataTable v-else :value="Array(5)" :pt="{
+        header: { class: '!border-t-0' },
+      }">
+      <template #header>
+        <div class="flex self-start">
+          <span class="p-input-icon-left">
+            <i class="pi pi-search" />
+            <InputText  class="w-full" v-model="this.filters.global.value" placeholder="Search" />
+          </span>
+        </div>
+      </template>
       <Column sortable v-for="col of columns" :key="col.field" :field="col.field" :header="col.header">
         <template #body>
           <Skeleton></Skeleton>
