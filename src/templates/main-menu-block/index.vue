@@ -33,13 +33,7 @@
     </div>
   </header>
 
-  <Sidebar :visible="sideBarVisible" position="left" @update:visible="val => showSideBar(val)" @hide="showSideBar(false)"
-  :pt="{
-        root: { class: '!top-16' },
-        mask: { class: '!bg-transparent'},
-        header: { class: '!hidden' }
-    }"
-    >
+  <Sidebar :visible="sideBarVisible" position="left" @update:visible="val => showSideBar(val)" @hide="showSideBar(false)">
     <div class="flex flex-col p-4">
       <template  v-for="menuItem of menuItems" :key="menuItem.label">
         <p v-if="menuItem.sectionTitle" class="font-semibold my-4 text-md text-gray-400">{{menuItem.sectionTitle}}</p>
