@@ -11,7 +11,10 @@
   <div class="max-w-screen-sm lg:max-w-7xl mx-auto">
 
     <DataTable v-if="!isLoading" scrollable removableSort :value="data" dataKey="id" v-model:filters="this.filters"
-      paginator :rowsPerPageOptions="[5, 10, 20, 50, 100]" :rows="5" :globalFilterFields="filterBy" :loading="isLoading">
+      paginator :rowsPerPageOptions="[5, 10, 20, 50, 100]" :rows="5" :globalFilterFields="filterBy" :loading="isLoading"
+      :pt="{
+        header: { class: '!border-t-0' },
+      }">
       <template #header>
         <div class="flex self-start">
           <span class="p-input-icon-left">
