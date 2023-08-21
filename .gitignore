@@ -32,3 +32,6 @@ coverage
 .env
 .env.*
 !.env.sample
+
+#azion vulcan folder
+azion
