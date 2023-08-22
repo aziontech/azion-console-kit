@@ -14,14 +14,13 @@ export const listIntelligentDNSService = async ({ page }) => {
 }
 
 const adapt = (httpResponse) => {
-  const isArray = Array.isArray(httpResponse.body);
+  const isArray = Array.isArray(httpResponse.body.results);
 
-
-  const parsedIntelligentDNS = isArray ? httpResponse.body.map((intelligentDNS) => ({
+  const parsedIntelligentDNS = isArray ? httpResponse.body.results.map((intelligentDNS) => ({
     id: intelligentDNS.uuid,
     name: intelligentDNS.name,
     domain: intelligentDNS.domain,
-    isActive: intelligentDNS.is_active,
+    isActive: intelligentDNS.is_active ? 'Active':'Disabled',
   })) : [];
 
   return {
