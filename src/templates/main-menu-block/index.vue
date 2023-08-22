@@ -109,6 +109,12 @@ export default {
           showDivider:true,
         },
         {
+          sectionTitle:'SECURE',
+          label:'Intelligent DNS',
+          to:'/intelligent-dns',
+          icon:'pi-share-alt',
+        },
+        {
           sectionTitle:'EDGE LIBRARIES',
           label:'Digital Certificates',
           to:'/digital-certificates',
