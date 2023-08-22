@@ -79,9 +79,7 @@ export default {
           life: 10000
         });
       } finally {
-        setTimeout(() => {
-          this.isLoading = false;
-        }, 800);
+        this.isLoading = false;
       }
     }
   }
