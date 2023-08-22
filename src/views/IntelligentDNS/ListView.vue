@@ -19,6 +19,7 @@
     :pageTitle="'Intelligent DNS'"
     :addButtonLabel="'Add Intelligent DNS'"
     :createPagePath="'intelligent/dns/create'"
+    :editPagePath="'intelligent/dns/edit'"
   />
 </template>
 
