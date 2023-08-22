@@ -23,33 +23,34 @@
           </span>
         </div>
       </template>
+
       <Column sortable v-for="col of columns" :key="col.field" :field="col.field" :header="col.header" />
       <Column :frozen="true" :alignFrozen="'right'">
-        <template #body="{ data }">
+        <template #body="{ data: rowData }">
           <div class="flex justify-end">
+            <PrimeMenu :ref="'menu'" id="overlay_menu" v-bind:model="actionOptions" :popup="true" />
             <PrimeButton v-tooltip="'Actions'" size="small" icon="pi pi-ellipsis-h" text
-              @click="(event) => toggleActionsMenu(event, data.id)" class="cursor-pointer" />
-            <PrimeMenu ref="menu" id="overlay_menu" v-bind:model="actionOptions" :popup="true" />
+              @click="(event) => toggleActionsMenu(event, rowData.id)" class="cursor-pointer" />
           </div>
         </template>
       </Column>
       <template #empty>
         <div class="my-4 flex flex-col gap-3 justify-center items-center">
           <p class="text-xl font-normal text-gray-600"> No registers found. </p>
-          <PrimeButton text icon="pi pi-plus" label="Add" @click="navigateToAddPage"/>
+          <PrimeButton text icon="pi pi-plus" label="Add" @click="navigateToAddPage" />
         </div>
       </template>
 
     </DataTable>
 
     <DataTable v-else :value="Array(5)" :pt="{
-        header: { class: '!border-t-0' },
-      }">
+      header: { class: '!border-t-0' },
+    }">
       <template #header>
         <div class="flex self-start">
           <span class="p-input-icon-left">
             <i class="pi pi-search" />
-            <InputText  class="w-full" v-model="this.filters.global.value" placeholder="Search" />
+            <InputText class="w-full" v-model="this.filters.global.value" placeholder="Search" />
           </span>
         </div>
       </template>
@@ -91,7 +92,7 @@ export default {
       global: { value: '', matchMode: FilterMatchMode.CONTAINS },
     },
     isLoading: false,
-    data: []
+    data: [],
   }),
   props: {
     columns: {
@@ -109,7 +110,12 @@ export default {
     createPagePath: {
       type: String,
       required: true,
-      default: () => '#'
+      default: () => '/'
+    },
+    editPagePath: {
+      type: String,
+      required: true,
+      default: () => '/'
     },
     addButtonLabel: {
       type: String,
@@ -172,7 +178,7 @@ export default {
       this.$refs.menu.toggle(event);
     },
     editItem() {
-      alert(this.selectedId)
+      this.$router.push({ path: `${this.editPagePath}/${this.selectedId}`, })
     },
     async removeItem() {
       let toastConfig = {
