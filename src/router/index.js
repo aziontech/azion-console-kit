@@ -3,6 +3,7 @@ import * as VariablesService from '@/services/variables-services'
 import { listEdgeApplicationsService, deleteEdgeApplicationService } from '@/services/edge-application-services'
 import { listDomainsService, deleteDomainService } from '@/services/domains-services'
 import { listDigitalCertificatesService,deleteDigitalCertificatesService } from '@/services/digital-certificates'
+import { listIntelligentDNSService } from '@/services/intelligent-dns-services'
 
 
 const router = createRouter({
@@ -114,6 +115,28 @@ const router = createRouter({
               {
                 label:'Create Variables',
                 to:'/variables/create'
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      path: '/intelligent/dns',
+      name: 'intelligent-dns',
+      children:[
+        {
+          path:'',
+          name:'list-intelligent-dns',
+          component: () => import('@/views/IntelligentDNS/ListView.vue'),
+          props: {
+            listIntelligentDNSService: listIntelligentDNSService,
+          },
+          meta:{
+            breadCrumbs:[
+              {
+                label:'Intelligent DNS',
+                to:'/create'
               }
             ]
           }
