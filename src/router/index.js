@@ -118,6 +118,26 @@ const router = createRouter({
             ]
           }
         }
+        ,{
+          path: 'edit/:id',
+          name: 'edit-variables',
+          component: () => import('@/views/Variables/EditView.vue'),
+          props: {
+            editVariableService: VariablesService.editVariableService,
+            loadVariableService: VariablesService.loadVariableService
+          },
+          meta:{
+            breadCrumbs:[
+              {
+                label:'Variables',
+                to:'/variables'
+              },
+              {
+                label:'Edit Variables',
+              }
+            ]
+          }
+        }
       ]
     },
     // example of lazy route
