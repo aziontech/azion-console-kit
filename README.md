@@ -1,6 +1,5 @@
 # azion-platform-kit
 
-
 ## Introdução
 O Azion Platform Kit é um kit de desenvolvimento front-end composto pelas tecnologias utilizadas compostas por uma gama de Tecnologias e estrutura com a finalidade de facilitar a construção de novas rotas e páginas do Real Time Manager.
 
@@ -104,4 +103,26 @@ npm run test:e2e
 
 ```sh
 npm run lint
+```
+
+### Deploy
+Para executar o deploy você pode utilizar o Azion CLI ou o Vulcan:
+
+Azion CLI (>= 0.70.0):
+```
+azioncli edge_applications init --name vueApp --type vue --mode deliver
+
+azioncli edge_applications build
+
+azioncli edge_applications publish
+
+```
+
+Vulcan:
+```
+vulcan build --preset vue --mode deliver
+
+DEBUG=true vulcan deploy
+
+DEBUG=true vulcan storage sync
 ```

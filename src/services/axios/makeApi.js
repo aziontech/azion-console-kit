@@ -1,5 +1,5 @@
 import axios from 'axios'
-const baseURL = 'https://cors-stage-api.azion.net'
+const baseURL = '/api'
 const token = import.meta.env.VITE_PERSONAL_TOKEN
 
 if(token){
