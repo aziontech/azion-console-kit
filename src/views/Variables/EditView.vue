@@ -8,9 +8,9 @@
     :formData="values"
   >
     <template #form>
-      <InputText placeholder="ex: GITHUB_API_KEY" v-model="values.key"  v-bind="key" type="text"
+      <InputText placeholder="ex: GITHUB_API_KEY"   v-bind="key" type="text"
         :class="{ 'p-invalid': errors.key }" v-tooltip.top="errors.key" />
-      <InputText placeholder="ex: MY_GITHUB_API_VALUE" v-model="values.value" v-bind="value"  type="text"
+      <InputText placeholder="ex: MY_GITHUB_API_VALUE"  v-bind="value"  type="text"
         :class="{ 'p-invalid': errors.value }" v-tooltip.top="errors.value" />
       <div class="flex gap-3 items-center">
         <label for="">Secret</label>
