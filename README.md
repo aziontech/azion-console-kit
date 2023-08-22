@@ -126,3 +126,9 @@ DEBUG=true vulcan deploy
 
 DEBUG=true vulcan storage sync
 ```
+
+
+### Usefull links
+
+[vee-validate guide](https://vee-validate.logaretm.com/v4/guide/composition-api/getting-started/)
+[yup with vee-valide guide](https://vee-validate.logaretm.com/v4/guide/composition-api/getting-started/#validating-with-yup)
