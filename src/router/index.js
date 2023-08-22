@@ -142,7 +142,7 @@ const router = createRouter({
       ]
     },
     {
-      path: '/intelligent/dns',
+      path: '/intelligent-dns',
       name: 'intelligent-dns',
       children:[
         {
@@ -157,7 +157,7 @@ const router = createRouter({
             breadCrumbs:[
               {
                 label:'Intelligent DNS',
-                to:'/intelligent/dns'
+                to:'/intelligent-dns'
               }
             ]
           }
