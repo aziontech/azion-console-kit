@@ -20,7 +20,7 @@
           v-tooltip.top="errors.domain"
         />
         <div class="flex gap-3 items-center">
-          <label for="">Is Acitve</label>
+          <label for="">Is Active</label>
           <InputSwitch v-bind="isActive"  v-model="isActive.value"  :class="{ 'p-invalid': errors.isActive }"/>
         </div>
     </template>
@@ -49,12 +49,11 @@ const validationSchema = yup.object({
 });
 
 // validation with VeeValidate
-const { errors, defineInputBinds, meta, resetForm, values} = useForm({
+const { errors, defineInputBinds, meta, resetForm, values } = useForm({
   validationSchema,
 })
 
-const name = defineInputBinds('name', { validateOnInput:true })
-const domain = defineInputBinds('domain', { validateOnInput:true })
+const name = defineInputBinds('name', { validateOnInput: true })
+const domain = defineInputBinds('domain', { validateOnInput: true })
 const isActive = defineInputBinds('isActive')
-
 </script>
