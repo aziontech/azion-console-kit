@@ -52,7 +52,7 @@
       const validationSchema = yup.object({
           name: yup.string().required(),
           domain: yup.string().required(),
-          isActive: yup.boolean().required().default(false),
+          isActive: yup.boolean().required(),
       });
 
       const { errors, defineInputBinds, meta, values, setValues } = useForm({

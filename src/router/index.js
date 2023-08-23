@@ -1,9 +1,9 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import * as VariablesService from '@/services/variables-services'
+import * as IntelligentDNS from '@/services/intelligent-dns-services'
 import { listEdgeApplicationsService, deleteEdgeApplicationService } from '@/services/edge-application-services'
 import { listDomainsService, deleteDomainService } from '@/services/domains-services'
 import { listDigitalCertificatesService,deleteDigitalCertificatesService } from '@/services/digital-certificates'
-import { listIntelligentDNSService, deleteIntelligentDNSService, createIntelligentDNSService, editIntelligentDNSService, loadIntelligentDNSService } from '@/services/intelligent-dns-services'
 
 
 const router = createRouter({
@@ -150,8 +150,8 @@ const router = createRouter({
           name:'list-intelligent-dns',
           component: () => import('@/views/IntelligentDNS/ListView.vue'),
           props: {
-            listIntelligentDNSService: listIntelligentDNSService,
-            deleteIntelligentDNSService: deleteIntelligentDNSService
+            listIntelligentDNSService: IntelligentDNS.listIntelligentDNSService,
+            deleteIntelligentDNSService: IntelligentDNS.deleteIntelligentDNSService
           },
           meta:{
             breadCrumbs:[
@@ -167,7 +167,7 @@ const router = createRouter({
           name: 'create-intelligent-dns',
           component: () => import('@/views/IntelligentDNS/CreateView.vue'),
           props: {
-            createIntelligentDNSService: createIntelligentDNSService
+            createIntelligentDNSService: IntelligentDNS.createIntelligentDNSService
           },
           meta:{
             breadCrumbs:[
@@ -187,8 +187,8 @@ const router = createRouter({
           name: 'edit-intelligent-dns',
           component: () => import('@/views/IntelligentDNS/EditView.vue'),
           props: {
-            editIntelligentDNSService: editIntelligentDNSService,
-            loadIntelligentDNSService: loadIntelligentDNSService
+            editIntelligentDNSService: IntelligentDNS.editIntelligentDNSService,
+            loadIntelligentDNSService: IntelligentDNS.loadIntelligentDNSService
           },
           meta:{
             breadCrumbs:[

@@ -18,6 +18,6 @@ const adapt = (payload) => {
   return {
     name: payload.name,
     domain: payload.domain,
-    is_active: payload.isActive ? true : false,
+    is_active: payload.isActive,
   };
 }
