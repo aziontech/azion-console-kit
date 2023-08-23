@@ -24,6 +24,7 @@
           <InputSwitch v-bind="isActive"  v-model="isActive.value"  :class="{ 'p-invalid': errors.isActive }"/>
         </div>
     </template>
+
 </CreateFormBlock>
 </template>
 
@@ -51,6 +52,9 @@ const validationSchema = yup.object({
 // validation with VeeValidate
 const { errors, defineInputBinds, meta, resetForm, values } = useForm({
   validationSchema,
+  initialValues:{
+    isActive:false
+  }
 })
 
 const name = defineInputBinds('name', { validateOnInput: true })
