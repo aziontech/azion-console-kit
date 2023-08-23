@@ -1,3 +1,11 @@
+import {
+  InternalServerError,
+  InvalidApiRequestError,
+  InvalidApiTokenError,
+  NotFoundError,
+  PermissionError,
+  UnexpectedError
+} from "./errors";
 import api from "./makeApi";
 
 export const parseHttpResponse = (httpResponse) => {
@@ -9,17 +17,17 @@ export const parseHttpResponse = (httpResponse) => {
     case 204:
       return 'Resource succesfully deleted';
     case 400:
-      throw new Error('Invalid API request');
+      throw new InvalidApiRequestError().message;
     case 401:
-      throw new Error('Invalid API Token');
+      throw new InvalidApiTokenError().message;
     case 403:
-      throw new Error('You dont have permision to use make this action at API');
+      throw new PermissionError().message;
     case 404:
-      throw new Error('Resourse not found.');
+      throw new NotFoundError().message;
     case 500:
-      throw new Error('Something went wrong, please try again.');
+      throw new InternalServerError().message;
     default:
-      throw new Error('Unexpected Error');
+      throw new UnexpectedError().message;
   }
 }
 
