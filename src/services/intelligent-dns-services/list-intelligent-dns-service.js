@@ -17,10 +17,10 @@ const adapt = (httpResponse) => {
   const isArray = Array.isArray(httpResponse.body.results);
 
   const parsedIntelligentDNS = isArray ? httpResponse.body.results.map((intelligentDNS) => ({
-    id: intelligentDNS.uuid,
+    id: intelligentDNS.id,
     name: intelligentDNS.name,
     domain: intelligentDNS.domain,
-    isActive: intelligentDNS.is_active ? 'Active':'Disabled',
+    isActive: intelligentDNS.is_active ? 'Yes' : 'No',
   })) : [];
 
   return {
