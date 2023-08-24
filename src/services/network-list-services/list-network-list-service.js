@@ -5,7 +5,7 @@ export const listNetworkListService = async ({ page}) => {
   let httpResponse = await AxiosHttpClientAdapter
     .request({
       url: `${makeNetworkListBaseUrl()}?page=${page}`,
-      method: 'get',
+      method: 'GET',
     })
 
   httpResponse = adapt(httpResponse);
@@ -20,7 +20,7 @@ const adapt = (httpResponse) => {
       name: element.name,
       lastEditor: element.last_editor,
       listType: element.list_type,
-      lastModified:  element.last_modified,
+      lastModified:  new Intl.DateTimeFormat('us', { dateStyle: 'full' }).format(new Date(element.last_modified)),
     })) : [];
   
     return {

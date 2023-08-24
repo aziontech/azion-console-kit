@@ -1,6 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import * as VariablesService from '@/services/variables-services'
-import * as IntelligentDNSService from '@/services/intelligent-dns-services'
 import { listEdgeApplicationsService, deleteEdgeApplicationService } from '@/services/edge-application-services'
 import { listDomainsService, deleteDomainService } from '@/services/domains-services'
 import { listDigitalCertificatesService,deleteDigitalCertificatesService } from '@/services/digital-certificates'
@@ -151,54 +150,14 @@ const router = createRouter({
           name:'list-intelligent-dns',
           component: () => import('@/views/IntelligentDNS/ListView.vue'),
           props: {
-            listIntelligentDNSService: IntelligentDNSService.listIntelligentDNSService,
-            deleteIntelligentDNSService: IntelligentDNSService.deleteIntelligentDNSService
+            listIntelligentDNSService: listIntelligentDNSService,
+            deleteIntelligentDNSService: deleteIntelligentDNSService
           },
           meta:{
             breadCrumbs:[
               {
                 label:'Intelligent DNS',
                 to:'/intelligent-dns'
-              }
-            ]
-          }
-        },
-        {
-          path: 'create',
-          name: 'create-intelligent-dns',
-          component: () => import('@/views/IntelligentDNS/CreateView.vue'),
-          props: {
-            createIntelligentDNSService: IntelligentDNSService.createIntelligentDNSService
-          },
-          meta:{
-            breadCrumbs:[
-              {
-                label:'Intelligent DNS',
-                to:'/intelligent-dns'
-              },
-              {
-                label:'Create Intelligent DNS',
-                to:'/intelligent-dns/create'
-              }
-            ]
-          }
-        },
-        {
-          path: 'edit/:id',
-          name: 'edit-intelligent-dns',
-          component: () => import('@/views/IntelligentDNS/EditView.vue'),
-          props: {
-            editIntelligentDNSService: IntelligentDNSService.editIntelligentDNSService,
-            loadIntelligentDNSService: IntelligentDNSService.loadIntelligentDNSService
-          },
-          meta:{
-            breadCrumbs:[
-              {
-                label:'Intelligent DNS',
-                to:'/intelligent-dns'
-              },
-              {
-                label:'Edit Intelligent DNS',
               }
             ]
           }
@@ -236,8 +195,8 @@ const router = createRouter({
           meta:{
             breadCrumbs:[
               {
-                label:'Network List',
-                to:'/network-list'
+                label:'Create Network List',
+                to:'/network-list/create'
               }
             ]
           }
