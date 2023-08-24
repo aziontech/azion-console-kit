@@ -51,7 +51,14 @@
     data: () => {
       const validationSchema = yup.object({
           name: yup.string().required(),
-          domain: yup.string().required(),
+          domain: yup.string().required().test(
+            'valid-domain',
+            'Invalid domain',
+            function (value) {
+              const domainRegex = /^(?:[-A-Za-z0-9]+\.)+[A-Za-z]{2,6}$/;
+              return domainRegex.test(value);
+            }
+          ),
           isActive: yup.boolean().required(),
       });
 
