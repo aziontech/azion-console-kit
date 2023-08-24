@@ -237,7 +237,7 @@ const router = createRouter({
             breadCrumbs:[
               {
                 label:'Create Network List',
-                to:'/network-list/create'
+                to:'/network-list/list/create'
               }
             ]
           }
