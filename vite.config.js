@@ -27,6 +27,11 @@ export default defineConfig({
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/api/, ''),
       },
+      '/graphql': {
+        target: 'http://iahcel0b0f.map.azionedge.net',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/graphql/, ''),
+      }
     }
   }
 

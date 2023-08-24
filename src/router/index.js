@@ -4,7 +4,7 @@ import { listEdgeApplicationsService, deleteEdgeApplicationService } from '@/ser
 import { listDomainsService, deleteDomainService } from '@/services/domains-services'
 import { listDigitalCertificatesService,deleteDigitalCertificatesService } from '@/services/digital-certificates'
 import { listIntelligentDNSService, deleteIntelligentDNSService } from '@/services/intelligent-dns-services'
-import { createNetworkListService } from '@/services/network-list-services'
+import { createNetworkListService, listContriesService } from '@/services/network-list-services'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -174,6 +174,7 @@ const router = createRouter({
           component: () => import('@/views/NetworkList/CreateView.vue'),
           props: {
             createNetworkListService: createNetworkListService,
+            listContriesService: listContriesService
           },
           meta:{
             breadCrumbs:[
