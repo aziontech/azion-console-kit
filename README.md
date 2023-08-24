@@ -123,6 +123,7 @@ Ao executar o comando de publicação, é possível que apresente erro ao criar 
 
 ```sh
 mkdir .edge/statics
+cp -r dist/* .edge/statics
 azioncli edge_applications publish
 ```
 
