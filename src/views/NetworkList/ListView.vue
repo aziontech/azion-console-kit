@@ -8,15 +8,15 @@
           header: 'Name'
         },
         {
-          field: 'list_type',
+          field: 'listType',
           header: 'List type'
         },
         {
-          field: 'last_editor',
+          field: 'lastEditor',
           header: 'Last editor'
         },
         {
-          field: 'last_modified',
+          field: 'lastModified',
           header: 'Last modified'
         },
       ]"

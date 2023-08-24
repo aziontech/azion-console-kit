@@ -18,9 +18,9 @@ const adapt = (httpResponse) => {
     const networkList = isArray ? httpResponse.body.results.map((element) => ({
       id: element.id,
       name: element.name,
-      last_editor: element.last_editor,
-      list_type: element.list_type,
-      last_modified:  element.last_modified,
+      lastEditor: element.last_editor,
+      listType: element.list_type,
+      lastModified:  element.last_modified,
     })) : [];
   
     return {

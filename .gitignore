@@ -30,7 +30,6 @@ coverage
 
 #environments
 .env
-.env.development
 .env.*
 !.env.sample
 
