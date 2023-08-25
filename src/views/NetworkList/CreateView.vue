@@ -103,7 +103,7 @@ export default {
   setup(props) {
     const options = ref([
       { name: 'ASN', value: 'asn' },
-      { name: 'Croutries', value: 'countries' },
+      { name: 'Countries', value: 'countries' },
       { name: 'IP/CIDR', value: 'ip_cidr' }
     ])
 
