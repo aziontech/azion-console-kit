@@ -5,6 +5,8 @@ import { listEdgeApplicationsService, deleteEdgeApplicationService } from '@/ser
 import { listDomainsService, deleteDomainService } from '@/services/domains-services'
 import { listDigitalCertificatesService,deleteDigitalCertificatesService } from '@/services/digital-certificates'
 import * as EdgeFunctionsService from '@/services/edge-functions'
+import { createNetworkListService, listNetworkListService, deleteNetworkListService } from '@/services/network-list-services'
+
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -205,6 +207,49 @@ const router = createRouter({
       ]
     },
     {
+      path: '/network-list',
+      name: 'network-list',
+      children:[
+        {
+          path:'',
+          name:'list-network-list',
+          component: () => import('@/views/NetworkList/ListView.vue'),
+          props: {
+            listNetworkListService: listNetworkListService,
+            deleteNetworkListService: deleteNetworkListService,
+          },
+          meta:{
+            breadCrumbs:[
+              {
+                label:'Network List',
+                to:'/network-list'
+              }
+            ]
+          }
+        },
+        {
+          path:'create',
+          name:'create-network-list',
+          component: () => import('@/views/NetworkList/CreateView.vue'),
+          props: {
+            createNetworkListService: createNetworkListService,
+          },
+          meta:{
+            breadCrumbs:[
+              {
+                label:'Network List',
+                to:'/network-list'
+              },
+              {
+                label:'Create Network',
+                to:'/network-list/create'
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
       path: '/edge-functions',
       name: 'edge-functions',
       children:[
@@ -214,18 +259,10 @@ const router = createRouter({
           component: () => import('@/views/EdgeFunctions/ListView.vue'),
           props: {
             listEdgeFunctionsService: EdgeFunctionsService.listEdgeFunctionsService,
-          },
-          meta:{
-            breadCrumbs:[
-              {
-                label:'Edge Functions',
-                to:'/edge-functions'
-              }
-            ]
           }
-        },
+        }
       ]
-    },
+    }
     // example of lazy route
     // {
     //   path: '/about',

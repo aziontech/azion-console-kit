@@ -3,16 +3,16 @@
 ## Introdução
 O Azion Platform Kit é um kit de desenvolvimento front-end composto pelas tecnologias utilizadas compostas por uma gama de Tecnologias e estrutura com a finalidade de facilitar a construção de novas rotas e páginas do Real Time Manager.
 
-## Features
+## Características
 1. **Multi-tenancy:** Construa conforme a sua necessidade o seu Real Time Manager consumindo os endpoints da nossa API Pública: [Azion Public API](https://api.azion.com)
 2. **UI Customizável:** configure tokens de temas ou os gere automaticamente via [Builder](https://designer.primevue.org/) em seu projeto dando o look and feel de acordo com a sua necessidade.
 3. **Estrutura simples:** separação em camadas dos blocks, components e serviços de forma que sejá fácil construir uma nova rota em pouquíssimo tempo.
 
-## What is a multi-tenant application?
+## O que é uma aplicação multi-tenant?
 
 Applicações Multi-tenant servem multiplos clientes através de diferentes domínios & subdomínios customizados com uma codebase unificada.
 
-## How to start
+## Como executar
 Você precisa da NodeJS acima da versão 18.* instalada em seu computador, ou uma imagem Docker com esta versão de Node ou superior.
 
 Instalando localmente:
@@ -22,7 +22,7 @@ Instalando localmente:
 
 A aplicação rodará no endereço: ```http://127.0.0.1:5173``` 
 
-## Recommended IDE Setup
+## Configuração recomendada na sua IDE
 
 [VSCode](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (and disable Vetur) + [TypeScript Vue Plugin (Volar)](https://marketplace.visualstudio.com/items?itemName=Vue.vscode-typescript-vue-plugin).
 
@@ -70,65 +70,55 @@ Onde, tomando como exemplo a rota de *Variables*, temos o seguinte fluxo para im
     - *src/main-menu-block*: configuração da rota, nome e ícone que serão mostrados no Sidemenu (se necessário).
 
 
-## Another stuff
-### Compile and Minify for Production
+## Extras
+### Compilar e Minificar para produção
 
 ```sh
-npm run build
+yarn build
 ```
 
-### Run Unit Tests with [Vitest](https://vitest.dev/)
+### Executar testes unitários com [Vitest](https://vitest.dev/)
 
 ```sh
-npm run test:unit
+yarn test:unit
 ```
 
-### Run End-to-End Tests with [Cypress](https://www.cypress.io/)
+### Executar testes e2e com [Cypress](https://www.cypress.io/)
 
 ```sh
-npm run test:e2e:dev
+yarn test:e2e:dev
 ```
 
-This runs the end-to-end tests against the Vite development server.
-It is much faster than the production build.
+Esse comando executa os testes e2e em um servidor de desenvolvimento Vite.
+Sendo muito mais rápido que um build para produção.
 
-But it's still recommended to test the production build with `test:e2e` before deploying (e.g. in CI environments):
+Embora ainda seja recomendado executar os testes no código buildado para produção com `test:e2e` antes de executar o deploy (ex.: ambientes de CI):
 
 ```sh
-npm run build
-npm run test:e2e
+yarn build
+yarn test:e2e
 ```
 
-### Lint with [ESLint](https://eslint.org/)
+### Formatação com [ESLint](https://eslint.org/)
 
 ```sh
-npm run lint
+yarn lint
 ```
 
 ### Deploy
-Para executar o deploy você pode utilizar o Azion CLI ou o Vulcan:
+Para executar o deploy você pode utilizar o Azion CLI:
 
 Azion CLI (>= 0.70.0):
 ```
-azioncli edge_applications init --name vueApp --type vue --mode deliver
+yarn build
 
-azioncli edge_applications build
+azioncli edge_applications init --name azion-platform-kit --type vue --mode deliver
 
-azioncli edge_applications publish
+azioncli edge_applications publish --debug
 
 ```
 
-Vulcan:
-```
-vulcan build --preset vue --mode deliver
-
-DEBUG=true vulcan deploy
-
-DEBUG=true vulcan storage sync
-```
-
-
-### Usefull links
+### Outros links
 
 [vee-validate guide](https://vee-validate.logaretm.com/v4/guide/composition-api/getting-started/)
 [yup with vee-valide guide](https://vee-validate.logaretm.com/v4/guide/composition-api/getting-started/#validating-with-yup)
