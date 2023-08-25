@@ -118,23 +118,6 @@ azioncli edge_applications publish --debug
 
 ```
 
-### Erros conhecidos no deploy
-Ao executar o comando de publicação, é possível que apresente erro ao criar o diretório `.edge/statics` na primeira vez.
-
-```sh
-mkdir .edge/statics
-cp -r dist/* .edge/statics
-azioncli edge_applications publish
-```
-
-
-Na edição de conteúdo, a cli não está atualizando o diretório dos estáticos.
-```sh
-rm -rf .edge/statics/*
-cp -r dist/* .edge/statics
-azioncli edge_applications publish
-```
-
 ### Outros links
 
 [vee-validate guide](https://vee-validate.logaretm.com/v4/guide/composition-api/getting-started/)
