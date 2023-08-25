@@ -236,8 +236,12 @@ const router = createRouter({
           meta:{
             breadCrumbs:[
               {
-                label:'Create Network List',
-                to:'/network-list/list/create'
+                label:'Network List',
+                to:'/network-list'
+              },
+              {
+                label:'Create Network',
+                to:'/network-list/create'
               }
             ]
           }
