@@ -15,11 +15,13 @@ export const createNetworkListService = async (payload) => {
 
 const adapt = (payload) => {
   let itemValue = payload.countries;
+  const checkListTypeIsAsnAndHasValue = payload.listType === 'asn' && payload.asn
+  const checkListTypeIsIPAndHasValue =payload.listType === 'ip_cidr' && payload.ipCidr
 
-  if (payload.listType === 'asn' && payload.asn) {
+  if (checkListTypeIsAsnAndHasValue) {
     itemValue = payload.asn.trim().split('\n');
   }
-  if (payload.listType === 'ip_cidr' && payload.ipCidr) {
+  if (checkListTypeIsIPAndHasValue) {
     itemValue = payload.ipCidr.trim().split('\n');
   }
 

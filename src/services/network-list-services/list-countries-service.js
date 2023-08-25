@@ -1,5 +1,5 @@
 import { AxiosHttpClientAdapter, parseHttpResponse } from "../axios/AxiosHttpClientAdapter";
-import api from "../axios/makeGraphQl";
+import graphQLApi from "../axios/makeGraphQl";
 import { makeCountriesListBaseUrl } from "./make-countries-list-base-url";
 
 export const listCountriesService = async () => {
@@ -15,7 +15,7 @@ export const listCountriesService = async () => {
       headers: {
         'Content-Type': 'application/json'
       }
-    }, api)
+    }, graphQLApi)
   
   const resultFormat = adapt(httpResponse);
   return parseHttpResponse(resultFormat)
