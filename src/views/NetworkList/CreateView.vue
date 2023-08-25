@@ -88,7 +88,10 @@ export default {
     const validationSchema = yup.object({
       name: yup.string().required(),
       networkListType: yup.string().oneOf(options.value.map(option => option.value)),
-      selectedCountries:yup.array().min(1),
+      selectedCountries:yup.array().when('networkListType',{
+        is:'countries',
+        then:(schema)=>schema.required().min(1)
+      }),
       ipCidr: yup.string().when('networkListType', {
         is: 'ip_cidr',
         then: (schema) => schema.required()
