@@ -7,14 +7,11 @@ export const listCountriesService = async () => {
     query: "query all_countries_with_code {allCountries { name, code2 } }",
   };
 
-  let httpResponse = await AxiosHttpClientAdapter
+  const httpResponse = await AxiosHttpClientAdapter
     .request({
       url: `${makeCountriesListBaseUrl()}/`,
       method: 'POST',
       body: payload,
-      headers: {
-        'Content-Type': 'application/json'
-      }
     }, graphQLApi)
   
   const resultFormat = adapt(httpResponse);

@@ -15,6 +15,7 @@ export const createNetworkListService = async (payload) => {
 
 const adapt = (payload) => {
   let itemValue = payload.countries;
+  
   const checkListTypeIsAsnAndHasValue = payload.listType === 'asn' && payload.asn
   const checkListTypeIsIPAndHasValue =payload.listType === 'ip_cidr' && payload.ipCidr
 

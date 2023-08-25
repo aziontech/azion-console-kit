@@ -21,16 +21,15 @@
       <div class="flex flex-col gap-2">
         <label for="type">Type: </label>
         <Dropdown
-          v-model="value"
+          v-model="networkType"
           :options="options"
           optionLabel="name"
           id="type"
           optionValue="value"
-          placeholder="Select a City"
           class="w-full md:w-14rem"
         />
       </div>
-      <div class="flex flex-col gap-2" v-if="value === 'asn'">
+      <div class="flex flex-col gap-2" v-if="networkType === 'asn'">
         <label for="list">List: </label>
         <div class="card flex justify-content-center">
           <textarea-component
@@ -42,7 +41,7 @@
           />
         </div>
       </div>
-      <div class="flex flex-col gap-2" v-if="value === 'ip_cidr'">
+      <div class="flex flex-col gap-2" v-if="networkType === 'ip_cidr'">
         <label for="list">List: </label>
         <div class="card flex justify-content-center">
           <textarea-component
@@ -54,7 +53,7 @@
           />
         </div>
       </div>
-      <div class="flex flex-col gap-2" v-if="value === 'countries'">
+      <div class="flex flex-col gap-2" v-if="networkType === 'countries'">
         <label for="list">Countries: </label>
         <div class="card flex justify-content-center">
           <MultiSelect
@@ -132,7 +131,7 @@ export default {
       await fetchCountries()
     })
 
-    const { value } = useField('listType')
+    const { value: networkType } = useField('listType')
     const { value: countries } = useField('countries')
 
     const name = defineInputBinds('name', { validateOnInput: true })
@@ -142,7 +141,7 @@ export default {
     return {
       props,
       options,
-      value,
+      networkType,
       name,
       ipCidr,
       asn,
