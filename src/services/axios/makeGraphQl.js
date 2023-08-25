@@ -1,5 +1,5 @@
 import axios from 'axios'
-const baseURL = '/graphql'
+const baseURL = 'https://iahcel0b0f.map.azionedge.net'
 const token = import.meta.env.VITE_PERSONAL_TOKEN
 
 if(token){

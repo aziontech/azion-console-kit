@@ -1,7 +1,7 @@
 <template>
   <CreateFormBlock
     :pageTitle="'Create Network Lists'"
-    :createService="props.createNetworkListService"
+    :createService="createNetworkListService"
     :formData="values"
     :isValid="meta.valid"
     :cleanFormCallback="resetForm"
@@ -33,14 +33,20 @@
       <div class="flex flex-col gap-2" v-if="value === 'asn'">
         <label for="list">List: </label>
         <div class="card flex justify-content-center">
-          <Textarea v-bind="asn" rows="5" cols="75" id="list" placeholder="1234&#10;4321" />
+          <textarea-component
+            v-bind="asn"
+            rows="5"
+            cols="75"
+            id="list"
+            placeholder="1234&#10;4321"
+          />
         </div>
       </div>
       <div class="flex flex-col gap-2" v-if="value === 'ip_cidr'">
         <label for="list">List: </label>
         <div class="card flex justify-content-center">
-          <Textarea
-            v-model="ipCidr"
+          <textarea-component
+            v-bind="ipCidr"
             rows="5"
             id="list"
             cols="75"
@@ -48,17 +54,17 @@
           />
         </div>
       </div>
-      <div class="flex flex-col gap-2" v-if="value === 'ip_cidr'">
+      <div class="flex flex-col gap-2" v-if="value === 'countries'">
         <label for="list">Countries: </label>
         <div class="card flex justify-content-center">
           <MultiSelect
             v-model="countries"
-            :options="cities"
+            :options="countriesList"
             filter
             optionLabel="name"
-            placeholder="Select Cities"
-            :maxSelectedLabels="3"
-            class="w-full md:w-20rem"
+            placeholder="Select Countries"
+            class="w-full"
+            optionValue="value"
           />
         </div>
       </div>
@@ -66,53 +72,88 @@
   </CreateFormBlock>
 </template>
 
-<script setup>
-import { ref } from 'vue'
+<script>
+import { ref, onMounted } from 'vue'
 import { useForm, useField } from 'vee-validate'
 import * as yup from 'yup'
 
 import CreateFormBlock from '@/templates/create-form-block'
-import Textarea from 'primevue/textarea'
+import TextareaComponent from 'primevue/textarea'
 import Dropdown from 'primevue/dropdown'
 import InputText from 'primevue/inputtext'
 import MultiSelect from 'primevue/multiselect'
 
-const options = ref([
-  { name: 'ASN', value: 'asn' },
-  { name: 'Croutries', value: 'countries' },
-  { name: 'IP/CIDR', value: 'ip_cidr' }
-])
-
-const props = defineProps({
-  createNetworkListService: {
-    type: Function,
-    required: true
+export default {
+  components: {
+    CreateFormBlock,
+    TextareaComponent,
+    Dropdown,
+    InputText,
+    MultiSelect
   },
-  listContriesService: {
-    type: Function,
-    required: true
+  props: {
+    createNetworkListService: {
+      type: Function,
+      required: true
+    },
+    listCountriesService: {
+      type: Function,
+      required: true
+    }
+  },
+  setup(props) {
+    const options = ref([
+      { name: 'ASN', value: 'asn' },
+      { name: 'Croutries', value: 'countries' },
+      { name: 'IP/CIDR', value: 'ip_cidr' }
+    ])
+
+    const countriesList = ref('')
+
+    const validationSchema = yup.object({
+      name: yup.string().required(),
+      ipCidr: yup.string(),
+      asn: yup.string()
+    })
+
+    const { errors, defineInputBinds, meta, resetForm, values } = useForm({
+      validationSchema,
+      initialValues: {
+        listType: 'asn'
+      }
+    })
+
+    const fetchCountries = async () => {
+      const result = await props.listCountriesService()
+      countriesList.value = result
+    }
+
+    onMounted(async () => {
+      await fetchCountries()
+    })
+
+    const { value } = useField('listType')
+    const { value: countries } = useField('countries')
+
+    const name = defineInputBinds('name', { validateOnInput: true })
+    const ipCidr = defineInputBinds('ipCidr', { validateOnInput: true })
+    const asn = defineInputBinds('asn', { validateOnInput: true })
+    // const countriesList = defineInputBinds('countriesList')
+    return {
+      props,
+      options,
+      value,
+      name,
+      ipCidr,
+      asn,
+      countries,
+      meta,
+      resetForm,
+      values,
+      errors,
+      fetchCountries,
+      countriesList
+    }
   }
-})
-
-const validationSchema = yup.object({
-  name: yup.string().required(),
-  ipCidr: yup.string(),
-  asn: yup.string(),
-  countries: yup.string()
-})
-
-const { errors, defineInputBinds, meta, resetForm, values } = useForm({
-  validationSchema,
-  initialValues: {
-    listType: 'asn'
-  }
-})
-
-const { value } = useField('listType')
-
-const name = defineInputBinds('name', { validateOnInput: true })
-const ipCidr = defineInputBinds('ipCidr', { validateOnInput: true })
-const asn = defineInputBinds('asn', { validateOnInput: true })
-const countries = defineInputBinds('countries', { validateOnInput: true })
-
+}
 </script>

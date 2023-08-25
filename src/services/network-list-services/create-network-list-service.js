@@ -17,10 +17,10 @@ const adapt = (payload) => {
   console.log('entrie', payload);
   let itemValue = payload.countries;
 
-  if (payload.listType === 'asn') {
+  if (payload.listType === 'asn' && payload.asn) {
     itemValue = payload.asn.trim().split('\n');
   }
-  if (payload.listType === 'ip_cidr') {
+  if (payload.listType === 'ip_cidr' && payload.ipCidr) {
     itemValue = payload.ipCidr.trim().split('\n');
   }
 
