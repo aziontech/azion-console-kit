@@ -4,7 +4,7 @@ import * as IntelligentDNSService from '@/services/intelligent-dns-services'
 import { listEdgeApplicationsService, deleteEdgeApplicationService } from '@/services/edge-application-services'
 import { listDomainsService, deleteDomainService } from '@/services/domains-services'
 import { listDigitalCertificatesService,deleteDigitalCertificatesService } from '@/services/digital-certificates'
-
+import * as EdgeFunctionsService from '@/services/edge-functions'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -202,6 +202,28 @@ const router = createRouter({
             ]
           }
         }
+      ]
+    },
+    {
+      path: '/edge-functions',
+      name: 'edge-functions',
+      children:[
+        {
+          path:'',
+          name:'list-edge-functions',
+          component: () => import('@/views/EdgeFunctions/ListView.vue'),
+          props: {
+            listEdgeFunctionsService: EdgeFunctionsService.listEdgeFunctionsService,
+          },
+          meta:{
+            breadCrumbs:[
+              {
+                label:'Edge Functions',
+                to:'/edge-functions'
+              }
+            ]
+          }
+        },
       ]
     },
     // example of lazy route
