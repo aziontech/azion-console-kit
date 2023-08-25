@@ -4,7 +4,7 @@ import * as IntelligentDNSService from '@/services/intelligent-dns-services'
 import { listEdgeApplicationsService, deleteEdgeApplicationService } from '@/services/edge-application-services'
 import { listDomainsService, deleteDomainService } from '@/services/domains-services'
 import { listDigitalCertificatesService,deleteDigitalCertificatesService } from '@/services/digital-certificates'
-import { createNetworkListService, listCountriesService } from '@/services/network-list-services'
+import { createNetworkListService, listNetworkListService, deleteNetworkListService, listCountriesService } from '@/services/network-list-services'
 
 
 const router = createRouter({
@@ -210,6 +210,23 @@ const router = createRouter({
       name: 'network-list',
       children:[
         {
+          path:'',
+          name:'list-network-list',
+          component: () => import('@/views/NetworkList/ListView.vue'),
+          props: {
+            listNetworkListService: listNetworkListService,
+            deleteNetworkListService: deleteNetworkListService,
+          },
+          meta:{
+            breadCrumbs:[
+              {
+                label:'Network List',
+                to:'/network-list'
+              }
+            ]
+          }
+        },
+        {
           path:'create',
           name:'create-network-list',
           component: () => import('@/views/NetworkList/CreateView.vue'),
@@ -220,14 +237,14 @@ const router = createRouter({
           meta:{
             breadCrumbs:[
               {
-                label:'Network List',
-                to:'/network-list'
+                label:'Create Network List',
+                to:'/network-list/list/create'
               }
             ]
           }
         }
       ]
-    }
+    },
     // example of lazy route
     // {
     //   path: '/about',

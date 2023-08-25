@@ -119,6 +119,11 @@ export default {
           label:'Digital Certificates',
           to:'/digital-certificates',
           icon:'pi-verified',
+        },
+        {
+          label:'Network Lists',
+          to:'/network-list',
+          icon:'pi-globe',
           showDivider:true,
         }
       ]
