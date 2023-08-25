@@ -14,7 +14,6 @@ export const createNetworkListService = async (payload) => {
 }
 
 const adapt = (payload) => {
-  console.log('entrie', payload);
   let itemValue = payload.countries;
 
   if (payload.listType === 'asn' && payload.asn) {

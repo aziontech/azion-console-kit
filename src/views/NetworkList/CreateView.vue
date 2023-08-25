@@ -138,7 +138,7 @@ export default {
     const name = defineInputBinds('name', { validateOnInput: true })
     const ipCidr = defineInputBinds('ipCidr', { validateOnInput: true })
     const asn = defineInputBinds('asn', { validateOnInput: true })
-    // const countriesList = defineInputBinds('countriesList')
+    
     return {
       props,
       options,
