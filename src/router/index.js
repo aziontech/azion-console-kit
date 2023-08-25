@@ -4,6 +4,7 @@ import * as IntelligentDNSService from '@/services/intelligent-dns-services'
 import { listEdgeApplicationsService, deleteEdgeApplicationService } from '@/services/edge-application-services'
 import { listDomainsService, deleteDomainService } from '@/services/domains-services'
 import { listDigitalCertificatesService,deleteDigitalCertificatesService } from '@/services/digital-certificates'
+import { createNetworkListService, listNetworkListService, deleteNetworkListService } from '@/services/network-list-services'
 
 
 const router = createRouter({
@@ -198,6 +199,45 @@ const router = createRouter({
               },
               {
                 label:'Edit Intelligent DNS',
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      path: '/network-list',
+      name: 'network-list',
+      children:[
+        {
+          path:'',
+          name:'list-network-list',
+          component: () => import('@/views/NetworkList/ListView.vue'),
+          props: {
+            listNetworkListService: listNetworkListService,
+            deleteNetworkListService: deleteNetworkListService,
+          },
+          meta:{
+            breadCrumbs:[
+              {
+                label:'Network List',
+                to:'/network-list'
+              }
+            ]
+          }
+        },
+        {
+          path:'create',
+          name:'create-network-list',
+          component: () => import('@/views/NetworkList/CreateView.vue'),
+          props: {
+            createNetworkListService: createNetworkListService,
+          },
+          meta:{
+            breadCrumbs:[
+              {
+                label:'Create Network List',
+                to:'/network-list/list/create'
               }
             ]
           }
