@@ -131,7 +131,7 @@ export default {
     const ipCidr = defineInputBinds('ipCidr', { validateOnInput: true })
     const asn = defineInputBinds('asn', { validateOnInput: true })
 
-    watch([networkListType,selectedCountries,ipCidr,asn], () => {
+    watch([name,networkListType,selectedCountries,ipCidr,asn], () => {
       switch (networkListType.value) {
         case 'countries':
           setNetworkContentList(selectedCountries.value)
