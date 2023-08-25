@@ -22,12 +22,17 @@ export default defineConfig({
   },
   server: {
     proxy: {
-      '/api': {
-        target: 'https://cors-stage-api.azion.net',
+      '/api/variables': {
+        //target: 'https://cors-stage-api.azion.net',
+        target: 'https://stage-manager.azion.com/variables/api/',
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/api/, ''),
       },
+      '/api': {
+        target: 'https://stage-manager-origin.azion.com/api/',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/api/, ''),
+      }
     }
   }
-
 })
