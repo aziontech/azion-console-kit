@@ -124,6 +124,12 @@ export default {
           showDivider: true,
         },
         {
+          sectionTitle:'OBSERVE',
+          label:'Data Streaming',
+          to:'/data-streaming',
+          icon:'pi-play',
+        },
+        {
           sectionTitle:'EDGE LIBRARIES',
           label:'Edge Functions',
           to:'/edge-functions',
