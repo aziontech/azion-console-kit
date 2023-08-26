@@ -2,10 +2,11 @@ import { createRouter, createWebHistory } from 'vue-router'
 import * as VariablesService from '@/services/variables-services'
 import * as IntelligentDNSService from '@/services/intelligent-dns-services'
 import * as EdgeFirewall from '@/services/edge-firewall'
+import * as EdgeFunctionsService from '@/services/edge-functions'
+import * as DataStreamingService from '@/services/data-streaming'
 import { listEdgeApplicationsService, deleteEdgeApplicationService } from '@/services/edge-application-services'
 import { listDomainsService, deleteDomainService } from '@/services/domains-services'
 import { listDigitalCertificatesService, deleteDigitalCertificatesService } from '@/services/digital-certificates'
-import * as EdgeFunctionsService from '@/services/edge-functions'
 import { createNetworkListService, listNetworkListService, deleteNetworkListService } from '@/services/network-list-services'
 
 
@@ -276,6 +277,20 @@ const router = createRouter({
           component: () => import('@/views/EdgeFunctions/ListView.vue'),
           props: {
             listEdgeFunctionsService: EdgeFunctionsService.listEdgeFunctionsService,
+          }
+        }
+      ]
+    },
+    {
+      path: '/data-streaming',
+      name: 'data-streaming',
+      children:[
+        {
+          path:'',
+          name:'list-data-streaming',
+          component: () => import('@/views/DataStreaming/ListView.vue'),
+          props: {
+            listDataStreamingService: DataStreamingService.listDataStreamingService,
           }
         }
       ]
