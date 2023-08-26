@@ -124,10 +124,15 @@ export default {
           showDivider: true,
         },
         {
-          sectionTitle: 'EDGE LIBRARIES',
-          label: 'Digital Certificates',
-          to: '/digital-certificates',
-          icon: 'pi-verified',
+          sectionTitle:'EDGE LIBRARIES',
+          label:'Edge Functions',
+          to:'/edge-functions',
+          icon:'pi-code',
+        },
+        {
+          label:'Digital Certificates',
+          to:'/digital-certificates',
+          icon:'pi-verified',
         },
         {
           label: 'Network Lists',
