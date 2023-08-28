@@ -7,15 +7,15 @@ export const listCountriesService = async () => {
     query: "query all_countries_with_code {allCountries { name, code2 } }",
   };
 
-  const httpResponse = await AxiosHttpClientAdapter
+  let httpResponse = await AxiosHttpClientAdapter
     .request({
       url: `${makeCountriesListBaseUrl()}/`,
       method: 'POST',
       body: payload,
     }, graphQLApi)
   
-  const resultFormat = adapt(httpResponse);
-  return parseHttpResponse(resultFormat)
+  httpResponse = adapt(httpResponse);
+  return parseHttpResponse(httpResponse)
 }
 
 const adapt = (httpResponse) => {

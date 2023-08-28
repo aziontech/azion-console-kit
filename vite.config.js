@@ -29,7 +29,7 @@ export default defineConfig({
         rewrite: (path) => path.replace(/^\/api/, ''),
       },
       '/network-list/graphql': {
-        target: 'https://iahcel0b0f.map.azionedge.net',
+        target: 'https://stage-cities.azion.com',
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/network-list\/graphql/, ''),
       },
