@@ -22,6 +22,11 @@ export default defineConfig({
   },
   server: {
     proxy: {
+      '/api/edge_services': {
+        target: 'https://stage-manager-origin.azion.com/services/api/v1/services',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/api\/edge_services/, ''),
+      },
       '/api/variables': {
         //target: 'https://cors-stage-api.azion.net',
         target: 'https://stage-manager.azion.com/variables/api/',

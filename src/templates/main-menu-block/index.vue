@@ -136,6 +136,11 @@ export default {
           icon:'pi-code',
         },
         {
+          label:'Edge Services',
+          to:'/edge-services',
+          icon:'pi-bookmark',
+        },
+        {
           label:'Digital Certificates',
           to:'/digital-certificates',
           icon:'pi-verified',
