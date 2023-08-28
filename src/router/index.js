@@ -4,10 +4,11 @@ import * as IntelligentDNSService from '@/services/intelligent-dns-services'
 import * as EdgeFirewall from '@/services/edge-firewall'
 import * as EdgeFunctionsService from '@/services/edge-functions'
 import * as DataStreamingService from '@/services/data-streaming'
+import * as EdgeServicesService from '@/services/edge-services'
 import * as NetworkListService  from '@/services/network-list-services'
-import { listEdgeApplicationsService, deleteEdgeApplicationService } from '@/services/edge-application-services'
-import { listDomainsService, deleteDomainService } from '@/services/domains-services'
-import { listDigitalCertificatesService, deleteDigitalCertificatesService } from '@/services/digital-certificates'
+import * as EdgeApplicationsService from '@/services/edge-application-services'
+import * as DomainServicesService from '@/services/domains-services'
+import * as DigitalCertificatesServices from '@/services/digital-certificates'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -17,8 +18,8 @@ const router = createRouter({
       name: 'home',
       component: () => import('@/views/EdgeApplications/ListView.vue'),
       props: {
-        listEdgeApplicationsService: listEdgeApplicationsService,
-        deleteEdgeApplicationService: deleteEdgeApplicationService
+        listEdgeApplicationsService: EdgeApplicationsService.listEdgeApplicationsService,
+        deleteEdgeApplicationService: EdgeApplicationsService.deleteEdgeApplicationService
       },
       meta: {
         breadCrumbs: [
@@ -34,8 +35,8 @@ const router = createRouter({
       name: 'edge-applications',
       component: () => import('@/views/EdgeApplications/ListView.vue'),
       props: {
-        listEdgeApplicationsService: listEdgeApplicationsService,
-        deleteEdgeApplicationService: deleteEdgeApplicationService
+        listEdgeApplicationsService: EdgeApplicationsService.listEdgeApplicationsService,
+        deleteEdgeApplicationService: EdgeApplicationsService.deleteEdgeApplicationService
       },
       meta: {
         breadCrumbs: [
@@ -51,8 +52,8 @@ const router = createRouter({
       name: 'domains',
       component: () => import('@/views/Domains/ListView.vue'),
       props: {
-        listDomainsService: listDomainsService,
-        deleteDomainsService: deleteDomainService,
+        listDomainsService: DomainServicesService.listDomainsService,
+        deleteDomainsService: DomainServicesService.deleteDomainService,
       },
       meta: {
         breadCrumbs: [
@@ -68,9 +69,8 @@ const router = createRouter({
       name: 'digital-certificates',
       component: () => import('@/views/DigitalCertificates/ListView.vue'),
       props: {
-        listDigitalCertificatesService: listDigitalCertificatesService,
-        deleteDigitalCertificatesService:
-          deleteDigitalCertificatesService,
+        listDigitalCertificatesService: DigitalCertificatesServices.listDigitalCertificatesService,
+        deleteDigitalCertificatesService: DigitalCertificatesServices.deleteDigitalCertificatesService,
       },
       meta: {
         breadCrumbs: [
@@ -291,6 +291,20 @@ const router = createRouter({
           component: () => import('@/views/DataStreaming/ListView.vue'),
           props: {
             listDataStreamingService: DataStreamingService.listDataStreamingService,
+          }
+        }
+      ]
+    },
+    {
+      path: '/edge-services',
+      name: 'edge-services',
+      children:[
+        {
+          path:'',
+          name:'list-edge-services',
+          component: () => import('@/views/EdgeServices/ListView.vue'),
+          props: {
+            listEdgeServicesService: EdgeServicesService.listEdgeServicesService,
           }
         }
       ]
