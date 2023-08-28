@@ -5,6 +5,7 @@ import { listEdgeApplicationsService, deleteEdgeApplicationService } from '@/ser
 import { listDomainsService, deleteDomainService } from '@/services/domains-services'
 import { listDigitalCertificatesService,deleteDigitalCertificatesService } from '@/services/digital-certificates'
 import * as NetworkListService  from '@/services/network-list-services'
+import * as EdgeFunctionsService from '@/services/edge-functions'
 
 
 const router = createRouter({
@@ -249,6 +250,20 @@ const router = createRouter({
         }
       ]
     },
+    {
+      path: '/edge-functions',
+      name: 'edge-functions',
+      children:[
+        {
+          path:'',
+          name:'list-edge-functions',
+          component: () => import('@/views/EdgeFunctions/ListView.vue'),
+          props: {
+            listEdgeFunctionsService: EdgeFunctionsService.listEdgeFunctionsService,
+          }
+        }
+      ]
+    }
     // example of lazy route
     // {
     //   path: '/about',
