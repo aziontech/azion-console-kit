@@ -113,12 +113,23 @@ export default {
           label:'Intelligent DNS',
           to:'/intelligent-dns',
           icon:'pi-share-alt',
+          showDivider:true,
         },
         {
           sectionTitle:'EDGE LIBRARIES',
+          label:'Edge Functions',
+          to:'/edge-functions',
+          icon:'pi-code',
+        },
+        {
           label:'Digital Certificates',
           to:'/digital-certificates',
           icon:'pi-verified',
+        },
+        {
+          label:'Network Lists',
+          to:'/network-list',
+          icon:'pi-globe',
           showDivider:true,
         }
       ]

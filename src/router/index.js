@@ -4,6 +4,8 @@ import * as IntelligentDNSService from '@/services/intelligent-dns-services'
 import { listEdgeApplicationsService, deleteEdgeApplicationService } from '@/services/edge-application-services'
 import { listDomainsService, deleteDomainService } from '@/services/domains-services'
 import { listDigitalCertificatesService,deleteDigitalCertificatesService } from '@/services/digital-certificates'
+import * as NetworkListService  from '@/services/network-list-services'
+import * as EdgeFunctionsService from '@/services/edge-functions'
 
 
 const router = createRouter({
@@ -204,6 +206,64 @@ const router = createRouter({
         }
       ]
     },
+    {
+      path: '/network-list',
+      name: 'network-list',
+      children:[
+        {
+          path:'',
+          name:'list-network-list',
+          component: () => import('@/views/NetworkList/ListView.vue'),
+          props: {
+            listNetworkListService: NetworkListService.listNetworkListService,
+            deleteNetworkListService: NetworkListService.deleteNetworkListService,
+          },
+          meta:{
+            breadCrumbs:[
+              {
+                label:'Network List',
+                to:'/network-list'
+              }
+            ]
+          }
+        },
+        {
+          path:'create',
+          name:'create-network-list',
+          component: () => import('@/views/NetworkList/CreateView.vue'),
+          props: {
+            createNetworkListService: NetworkListService.createNetworkListService,
+            listCountriesService: NetworkListService.listCountriesService
+          },
+          meta:{
+            breadCrumbs:[
+              {
+                label:'Network List',
+                to:'/network-list'
+              },
+              {
+                label:'Create Network',
+                to:'/network-list/create'
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      path: '/edge-functions',
+      name: 'edge-functions',
+      children:[
+        {
+          path:'',
+          name:'list-edge-functions',
+          component: () => import('@/views/EdgeFunctions/ListView.vue'),
+          props: {
+            listEdgeFunctionsService: EdgeFunctionsService.listEdgeFunctionsService,
+          }
+        }
+      ]
+    }
     // example of lazy route
     // {
     //   path: '/about',
