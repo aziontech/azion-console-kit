@@ -123,12 +123,14 @@ Devido à incompatibilidades com o vite na versão atual da azioncli os problema
 
 - No fluxo de deploy, na primeira vez, a cli acaba não criando o diretório `.edge/statics` e retorna uma mensagem de erro no terminal. Para solucionar esse problema, execute: 
 ```sh
-  mkdir .edge/statics && cp -r dist/* .edge/statics                         
+  mkdir .edge/statics && cp -r dist/* .edge/statics
+  azioncli edge_applications publish                     
 ```
 
 - Já nos casos de edição da edge application, os estáticos gerados em `dist` não sobrescrevem os que estão em `.edge/statics`. Antes publicar a edge application pela cli, verifique se os arquivos em `dist` e `.edge/statics` possuem o mesmo nome/conteúdo. Para solucionar esse problema, execute: 
 ```sh
-  rm -rf .edge/statics/* && cp -r dist/* .edge/statics                         
+  rm -rf .edge/statics/* && cp -r dist/* .edge/statics
+  azioncli edge_applications publish                      
 ```
 
 ### Outros links
