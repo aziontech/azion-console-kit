@@ -1,3 +1,3 @@
 export const makeNetworkListBaseUrl = ()=>{
-    return `network_lists`
-  }
+  return `network_lists`
+}
