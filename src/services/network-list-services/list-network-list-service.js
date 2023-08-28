@@ -14,12 +14,17 @@ export const listNetworkListService = async ({ page}) => {
 
 const adapt = (httpResponse) => {
     const isArray = Array.isArray(httpResponse.body.results);
+    const listTypeMap = {
+      'ip_cidr': 'IP/CIDR',
+      'asn': 'ASN',
+      'countries':'Countries'
+    }
   
     const networkList = isArray ? httpResponse.body.results.map((element) => ({
       id: element.id,
       name: element.name,
       lastEditor: element.last_editor,
-      listType: element.list_type === 'ip_cidr' || element.list_type === 'asn'? element.list_type.toUpperCase(): 'Countries',
+      listType: listTypeMap[element.list_type],
       lastModified:  new Intl.DateTimeFormat('us', { dateStyle: 'full',timeStyle: 'short' }).format(new Date(element.last_modified)),
     })) : [];
   
