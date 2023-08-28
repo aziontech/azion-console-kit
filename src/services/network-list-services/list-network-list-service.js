@@ -19,8 +19,8 @@ const adapt = (httpResponse) => {
       id: element.id,
       name: element.name,
       lastEditor: element.last_editor,
-      listType: element.list_type,
-      lastModified:  new Intl.DateTimeFormat('us', { dateStyle: 'full' }).format(new Date(element.last_modified)),
+      listType: element.list_type === 'ip_cidr' || element.list_type === 'asn'? element.list_type.toUpperCase(): 'Countries',
+      lastModified:  new Intl.DateTimeFormat('us', { dateStyle: 'full',timeStyle: 'short' }).format(new Date(element.last_modified)),
     })) : [];
   
     return {
