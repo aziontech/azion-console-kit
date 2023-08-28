@@ -21,7 +21,11 @@
         </div>
       </template>
 
-      <Column sortable v-for="col of columns" :key="col.field" :field="col.field" :header="col.header" />
+      <Column sortable v-for="col of columns" :key="col.field" :field="col.field" :header="col.header">
+        <template #body="{ data: rowData }">
+          <div v-html="rowData[col.field]" />
+        </template>
+      </Column>
       <Column :frozen="true" :alignFrozen="'right'">
         <template #body="{ data: rowData }">
           <div class="flex justify-end">
