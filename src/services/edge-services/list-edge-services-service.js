@@ -21,7 +21,6 @@ export const listEdgeServicesService = async ({
 }
 
 const adapt = (httpResponse) => {
-  console.log(httpResponse)
   const parsedEdgeServices = httpResponse.body.services?.map((edgeService) => {
     return {
       id: edgeService.id,
@@ -31,7 +30,7 @@ const adapt = (httpResponse) => {
       lastModified: new Intl.DateTimeFormat('us', { dateStyle: 'full' }).format(new Date(edgeService.updated_at)),
     }
   })
-console.log(parsedEdgeServices)
+
   return {
     body: parsedEdgeServices,
     statusCode: httpResponse.statusCode,
