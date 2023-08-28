@@ -2,7 +2,7 @@ import { createRouter, createWebHistory } from 'vue-router'
 import * as VariablesService from '@/services/variables-services'
 import { listEdgeApplicationsService, deleteEdgeApplicationService } from '@/services/edge-application-services'
 import { listDomainsService, deleteDomainService } from '@/services/domains-services'
-import { listDigitalCertificatesService,deleteDigitalCertificatesService } from '@/services/digital-certificates'
+import * as DigitalCertificatesService  from '@/services/digital-certificates'
 
 
 const router = createRouter({
@@ -62,20 +62,46 @@ const router = createRouter({
     {
       path: '/digital-certificates',
       name: 'digital-certificates',
-      component: () => import('@/views/DigitalCertificates/ListView.vue'),
-      props: {
-        listDigitalCertificatesService: listDigitalCertificatesService,
-        deleteDigitalCertificatesService:
-        deleteDigitalCertificatesService,
-      },
-      meta:{
-        breadCrumbs:[
-          {
-            label:'Digital Certificates',
-            to:'/digital-certificates'
+      children: [
+        {
+          path: '',
+          name: 'list-digital-certificates',
+          component: () => import('@/views/DigitalCertificates/ListView.vue'),
+          props: {
+            listDigitalCertificatesService: DigitalCertificatesService.listDigitalCertificatesService,
+            deleteDigitalCertificatesService:
+            DigitalCertificatesService.deleteDigitalCertificatesService,
+          },
+          meta:{
+            breadCrumbs:[
+              {
+                label: 'Digital Certificates',
+                to: '/digital-certificates'
+              }
+            ]
           }
-        ]
-      }
+        },
+        {
+          path: 'create',
+          name: 'create-digital-certificates',
+          component: () => import('@/views/DigitalCertificates/CreateView.vue'),
+          props: {
+            createDigitalCertificatesService: DigitalCertificatesService.createDigitalCertificatesService
+          },
+          meta:{
+            breadCrumbs:[
+              {
+                label:'Digital Certificates',
+                to:'/digital-certificates'
+              },
+              {
+                label:'Create Digital Certificates',
+                to:'/digital-certificates/create'
+              }
+            ]
+          }
+        },
+      ],
     },
     {
       path: '/variables',

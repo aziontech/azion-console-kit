@@ -1,7 +1,9 @@
 import { listDigitalCertificatesService } from './list-digital-certificates-service';
 import { deleteDigitalCertificatesService } from './delete-digital-certificates-service';
+import createDigitalCertificatesService from './create-digital-certificates-service';
 
 export {
   listDigitalCertificatesService,
-  deleteDigitalCertificatesService
+  deleteDigitalCertificatesService,
+  createDigitalCertificatesService,
 }
