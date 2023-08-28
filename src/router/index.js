@@ -4,11 +4,10 @@ import * as IntelligentDNSService from '@/services/intelligent-dns-services'
 import * as EdgeFirewall from '@/services/edge-firewall'
 import * as EdgeFunctionsService from '@/services/edge-functions'
 import * as DataStreamingService from '@/services/data-streaming'
+import * as NetworkListService  from '@/services/network-list-services'
 import { listEdgeApplicationsService, deleteEdgeApplicationService } from '@/services/edge-application-services'
 import { listDomainsService, deleteDomainService } from '@/services/domains-services'
 import { listDigitalCertificatesService, deleteDigitalCertificatesService } from '@/services/digital-certificates'
-import { createNetworkListService, listNetworkListService, deleteNetworkListService } from '@/services/network-list-services'
-
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -233,8 +232,8 @@ const router = createRouter({
           name: 'list-network-list',
           component: () => import('@/views/NetworkList/ListView.vue'),
           props: {
-            listNetworkListService: listNetworkListService,
-            deleteNetworkListService: deleteNetworkListService,
+            listNetworkListService: NetworkListService.listNetworkListService,
+            deleteNetworkListService: NetworkListService.deleteNetworkListService,
           },
           meta: {
             breadCrumbs: [
@@ -250,7 +249,8 @@ const router = createRouter({
           name: 'create-network-list',
           component: () => import('@/views/NetworkList/CreateView.vue'),
           props: {
-            createNetworkListService: createNetworkListService,
+            createNetworkListService: NetworkListService.createNetworkListService,
+            listCountriesService: NetworkListService.listCountriesService
           },
           meta: {
             breadCrumbs: [
