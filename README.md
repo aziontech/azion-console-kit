@@ -118,6 +118,19 @@ azioncli edge_applications publish --debug
 
 ```
 
+### Issues conhecidas na versão 0.7.0 da azioncli
+Devido à incompatibilidades com o vite na versão atual da azioncli os problemas abaixo podem ocorrer:
+
+- No fluxo de deploy, na primeira vez, a cli acaba não criando o diretório `.edge/statics` e retorna uma mensagem de erro no terminal. Para solucionar esse problema, execute: 
+```sh
+  mkdir .edge/statics && cp -r dist/* .edge/statics                         
+```
+
+- Já nos casos de edição da edge application, os estáticos gerados em `dist` não sobrescrevem os que estão em `.edge/statics`. Antes publicar a edge application pela cli, verifique se os arquivos em `dist` e `.edge/statics` possuem o mesmo nome/conteúdo. Para solucionar esse problema, execute: 
+```sh
+  rm -rf .edge/statics/* && cp -r dist/* .edge/statics                         
+```
+
 ### Outros links
 
 [vee-validate guide](https://vee-validate.logaretm.com/v4/guide/composition-api/getting-started/)
