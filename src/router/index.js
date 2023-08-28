@@ -1,8 +1,11 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import * as VariablesService from '@/services/variables-services'
+import * as IntelligentDNSService from '@/services/intelligent-dns-services'
 import { listEdgeApplicationsService, deleteEdgeApplicationService } from '@/services/edge-application-services'
 import { listDomainsService, deleteDomainService } from '@/services/domains-services'
 import * as DigitalCertificatesService  from '@/services/digital-certificates'
+import * as EdgeFunctionsService from '@/services/edge-functions'
+import { createNetworkListService, listNetworkListService, deleteNetworkListService } from '@/services/network-list-services'
 
 
 const router = createRouter({
@@ -166,6 +169,126 @@ const router = createRouter({
         }
       ]
     },
+    {
+      path: '/intelligent-dns',
+      name: 'intelligent-dns',
+      children:[
+        {
+          path:'',
+          name:'list-intelligent-dns',
+          component: () => import('@/views/IntelligentDNS/ListView.vue'),
+          props: {
+            listIntelligentDNSService: IntelligentDNSService.listIntelligentDNSService,
+            deleteIntelligentDNSService: IntelligentDNSService.deleteIntelligentDNSService
+          },
+          meta:{
+            breadCrumbs:[
+              {
+                label:'Intelligent DNS',
+                to:'/intelligent-dns'
+              }
+            ]
+          }
+        },
+        {
+          path: 'create',
+          name: 'create-intelligent-dns',
+          component: () => import('@/views/IntelligentDNS/CreateView.vue'),
+          props: {
+            createIntelligentDNSService: IntelligentDNSService.createIntelligentDNSService
+          },
+          meta:{
+            breadCrumbs:[
+              {
+                label:'Intelligent DNS',
+                to:'/intelligent-dns'
+              },
+              {
+                label:'Create Intelligent DNS',
+                to:'/intelligent-dns/create'
+              }
+            ]
+          }
+        },
+        {
+          path: 'edit/:id',
+          name: 'edit-intelligent-dns',
+          component: () => import('@/views/IntelligentDNS/EditView.vue'),
+          props: {
+            editIntelligentDNSService: IntelligentDNSService.editIntelligentDNSService,
+            loadIntelligentDNSService: IntelligentDNSService.loadIntelligentDNSService
+          },
+          meta:{
+            breadCrumbs:[
+              {
+                label:'Intelligent DNS',
+                to:'/intelligent-dns'
+              },
+              {
+                label:'Edit Intelligent DNS',
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      path: '/network-list',
+      name: 'network-list',
+      children:[
+        {
+          path:'',
+          name:'list-network-list',
+          component: () => import('@/views/NetworkList/ListView.vue'),
+          props: {
+            listNetworkListService: listNetworkListService,
+            deleteNetworkListService: deleteNetworkListService,
+          },
+          meta:{
+            breadCrumbs:[
+              {
+                label:'Network List',
+                to:'/network-list'
+              }
+            ]
+          }
+        },
+        {
+          path:'create',
+          name:'create-network-list',
+          component: () => import('@/views/NetworkList/CreateView.vue'),
+          props: {
+            createNetworkListService: createNetworkListService,
+          },
+          meta:{
+            breadCrumbs:[
+              {
+                label:'Network List',
+                to:'/network-list'
+              },
+              {
+                label:'Create Network',
+                to:'/network-list/create'
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      path: '/edge-functions',
+      name: 'edge-functions',
+      children:[
+        {
+          path:'',
+          name:'list-edge-functions',
+          component: () => import('@/views/EdgeFunctions/ListView.vue'),
+          props: {
+            listEdgeFunctionsService: EdgeFunctionsService.listEdgeFunctionsService,
+          }
+        }
+      ]
+    }
     // example of lazy route
     // {
     //   path: '/about',
