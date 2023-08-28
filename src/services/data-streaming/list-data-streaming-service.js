@@ -15,6 +15,11 @@ export const listDataStreamingService = async () => {
 }
 
 const getTemplateById = async ({ id }) => {
+  
+  /***************************************************
+   * @todo: API should be deliver this results as BFF
+   ***************************************************/
+  
   let httpResponse = await AxiosHttpClientAdapter
     .request({
       url: `${makeDataStreamingTemplateBaseUrl()}/${id}`,
@@ -41,8 +46,6 @@ const adapt = async (httpResponse) => {
     'waf': 'WAF Events'
   }
 
-
-
   const parsedDataStreamings = await Promise.all(
     httpResponse.body.results?.map(async (dataStreaming) => {
 
@@ -50,8 +53,6 @@ const adapt = async (httpResponse) => {
       return {
         id: dataStreaming.id,
         name: dataStreaming.name,
-        //lastEditor: dataStreaming.last_editor,
-        //lastModify: new Intl.DateTimeFormat('us', { dateStyle: 'full' }).format(new Date(dataStreaming.last_modified)),
         templateName: templateData.name,
         dataSource: mapDataSourceName[dataStreaming.data_source],
         active: dataStreaming.active ? 'Yes' : 'No',

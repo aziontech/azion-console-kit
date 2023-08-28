@@ -34,6 +34,11 @@ const adaptDomains = (httpResponse) => {
 }
 
 const adapt = async (httpResponse) => {
+
+  /***************************************************
+   * @todo: API should be deliver this results as BFF
+   ***************************************************/
+
   const parsedEdgeFirewalls = await Promise.all(
     httpResponse.body.results?.map(async (edgeFirewall) => {
       const domainsList = await Promise.all(
