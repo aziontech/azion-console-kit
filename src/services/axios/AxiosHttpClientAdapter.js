@@ -1,3 +1,5 @@
+import axiosAzionApi from "./makeApi";
+
 import {
   InternalServerError,
   InvalidApiRequestError,
@@ -6,7 +8,6 @@ import {
   PermissionError,
   UnexpectedError
 } from "./errors";
-import api from "./makeApi";
 
 export const parseHttpResponse = (httpResponse) => {
   switch (httpResponse.statusCode) {
@@ -33,10 +34,10 @@ export const parseHttpResponse = (httpResponse) => {
 
 
 export class AxiosHttpClientAdapter {
-  static async request({ url, method, headers, body }) {
+  static async request({ url, method, headers, body }, axios = axiosAzionApi) {
     let axiosResponse
     try {
-      axiosResponse = await api.request({
+      axiosResponse = await axios.request({
         url: url,
         method: method,
         headers: headers,
