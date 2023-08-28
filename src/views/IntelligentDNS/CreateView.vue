@@ -20,7 +20,7 @@
           v-tooltip.top="errors.domain"
         />
         <div class="flex gap-3 items-center">
-          <label for="">Is Active</label>
+          <label for="">Active</label>
           <InputSwitch v-bind="isActive"  v-model="isActive.value"  :class="{ 'p-invalid': errors.isActive }"/>
         </div>
     </template>
