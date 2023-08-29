@@ -1,4 +1,4 @@
-name: Deploy
+name: Deploy Edge Application
 
 on:
   push:
@@ -27,7 +27,7 @@ jobs:
       - name: Download Azion CLI
         run: curl https://downloads.azion.com/linux/x86_64/azioncli -o azioncli && chmod +x azioncli
       
-      - name: Configure AZION CLI
+      - name: Configure Azion CLI
         run: ./azioncli configure -t ${{ secrets.PLATFORM_KIT_TOKEN }}
 
       - name: Configure Repository
