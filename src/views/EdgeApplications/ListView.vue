@@ -2,7 +2,7 @@
 import ListTableBlock from '@/templates/list-table-block'
 
 export default {
-  name: 'home-view',
+  name: 'edge-application-view',
   components: {
     ListTableBlock
   },
@@ -20,13 +20,13 @@ export default {
 </script>
 
 <template>
-  <ListTableBlock 
-    :pageTitle="'Edge Applications'"
+  <ListTableBlock
+    :pageTitle="'Edge Applications'" 
     :addButtonLabel="'Add Edge Application'"
-    :createPagePath="'/edge-applications/create'"
+    :createPagePath="'/edge-applications/create'" 
     :editPagePath="'/edge-applications/edit'"
-    :listService="listEdgeApplicationsService"
-    :deleteService="deleteEdgeApplicationService"
+    :listService="listEdgeApplicationsService" 
+    :deleteService="deleteEdgeApplicationService" 
     :columns="[
       {
         field: 'name',

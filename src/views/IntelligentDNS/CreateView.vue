@@ -20,7 +20,7 @@
           v-tooltip.top="errors.domain"
         />
         <div class="flex gap-3 items-center">
-          <label for="">Is Active</label>
+          <label for="">Active</label>
           <InputSwitch v-bind="isActive"  v-model="isActive.value"  :class="{ 'p-invalid': errors.isActive }"/>
         </div>
     </template>
@@ -45,7 +45,10 @@ const props = defineProps({
 //Validation Schema
 const validationSchema = yup.object({
     name: yup.string().required(),
-    domain: yup.string().required(),
+    domain: yup.string().required().test('valid-domain', 'Invalid domain', function (value) {
+      const domainRegex = /^(?:[-A-Za-z0-9]+\.)+[A-Za-z]{2,6}$/;
+      return domainRegex.test(value);
+    }),
     isActive: yup.boolean().required().default(false),
 });
 
