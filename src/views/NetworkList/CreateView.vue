@@ -110,7 +110,7 @@ export default {
         networkListType: 'asn',
         asn: '',
         ipCidr: '',
-        networkContentParsed: '',
+        networkContentList: '',
       }
     })
 
