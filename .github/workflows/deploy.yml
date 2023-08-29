@@ -1,0 +1,37 @@
+name: Deploy
+
+on:
+  push:
+    branches:
+      - dev
+      - deploy-workflow
+
+jobs:
+  deploy:
+    runs-on: self-hosted
+    container:
+      image: node:18-alpine3.18
+    steps:      
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Install SO deps
+        run: apk add curl git bash
+      
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+      
+      - name: Build
+        run: yarn build
+      
+      - name: Download Azion CLI
+        run: curl https://downloads.azion.com/linux/x86_64/azioncli -o azioncli && chmod +x azioncli
+      
+      - name: Configure AZION CLI
+        run: ./azioncli configure -t ${{ secrets.PLATFORM_KIT_TOKEN }}
+
+      - name: Configure Repository
+        run: mkdir -p .edge/statics
+      
+      - name: Deploy Edge Application
+        run: ./azioncli edge_applications publish
