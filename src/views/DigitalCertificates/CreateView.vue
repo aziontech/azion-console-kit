@@ -18,7 +18,7 @@
       <div class="flex flex-wrap gap-3">
         <div class="flex align-items-center">
           <RadioButton
-            v-bind="certificateType"
+            v-model="certificateType"
             inputId="certificateType1"
             name="certificateType"
             value="edge_certificate"
@@ -27,7 +27,7 @@
         </div>
         <div class="flex align-items-center">
           <RadioButton
-            v-bind="certificateType"
+            v-model="certificateType"
             inputId="certificateType2"
             name="certificateType"
             value="trusted_ca_certificate"
@@ -39,12 +39,12 @@
       <hr />
 
       <!-- Edge Certificate Form -->
-      <template v-if="certificateType.modelValue === 'edge_certificate'">
+      <template v-if="certificateType === 'edge_certificate'">
         <b>Digital Certificates</b>
         <div class="flex flex-wrap gap-3">
           <div class="flex align-items-center">
             <RadioButton
-              v-bind="createCertificateType"
+              v-model="createCertificateType"
               inputId="createCertificateType1"
               name="createCertificateType"
               value="uploadCertificateAndPrivateKey"
@@ -53,7 +53,7 @@
           </div>
           <div class="flex align-items-center">
             <RadioButton
-              v-bind="createCertificateType"
+              v-model="createCertificateType"
               inputId="createCertificateType2"
               name="createCertificateType"
               value="generateCSR"
@@ -65,7 +65,7 @@
         </div>
 
         <!-- Upload certificate form -->
-        <template v-if="createCertificateType.modelValue === 'uploadCertificateAndPrivateKey'">
+        <template v-if="createCertificateType === 'uploadCertificateAndPrivateKey'">
           <b>Use my certificate and private key</b>
           <p>
             To upload your Digital Certificate to Azion servers, copy and paste your certificate and
@@ -73,8 +73,8 @@
           </p>
 
           <label>Certificate:</label>
-          <Textarea
-            v-bind="certificateFields.certificate"
+          <PrimeTextarea
+            v-bind="certificate"
             :class="{ 'p-invalid': errors.certificate }"
             v-tooltip.top="errors.certificate"
             placeholder="---BEGIN CERTIFICATE---"
@@ -83,8 +83,8 @@
           />
 
           <label>Private key:</label>
-          <Textarea
-            v-bind="certificateFields.privateKey"
+          <PrimeTextarea
+            v-bind="privateKey"
             :class="{ 'p-invalid': errors.privateKey }"
             v-tooltip.top="errors.privateKey"
             placeholder="---BEGIN PRIVATE KEY---"
@@ -94,7 +94,7 @@
         </template>
 
         <!-- Generate CSR form -->
-        <template v-if="createCertificateType.modelValue === 'generateCSR'">
+        <template v-if="createCertificateType === 'generateCSR'">
           <b>Generating a Certificate Signing Request (CSR) with Azion</b>
           <p>
             A Certificate Signing Request (CSR) is one of the first steps towards getting your own
@@ -104,7 +104,7 @@
           <label>Common Name: *</label>
           <InputText
             placeholder="example.com"
-            v-bind="generateCSRFields.common"
+            v-bind="common"
             type="text"
             :class="{ 'p-invalid': errors.common }"
             v-tooltip.top="errors.common"
@@ -112,7 +112,7 @@
 
           <label>Country / Region: *</label>
           <InputText
-            v-bind="generateCSRFields.country"
+            v-bind="country"
             type="text"
             :class="{ 'p-invalid': errors.country }"
             v-tooltip.top="errors.country"
@@ -120,7 +120,7 @@
 
           <label>State / Province: *</label>
           <InputText
-            v-bind="generateCSRFields.state"
+            v-bind="state"
             type="text"
             :class="{ 'p-invalid': errors.state }"
             v-tooltip.top="errors.state"
@@ -128,7 +128,7 @@
 
           <label>City / Locality: *</label>
           <InputText
-            v-bind="generateCSRFields.city"
+            v-bind="city"
             type="text"
             :class="{ 'p-invalid': errors.city }"
             v-tooltip.top="errors.city"
@@ -136,7 +136,7 @@
 
           <label>Organization: *</label>
           <InputText
-            v-bind="generateCSRFields.organization"
+            v-bind="organization"
             type="text"
             :class="{ 'p-invalid': errors.organization }"
             v-tooltip.top="errors.organization"
@@ -144,7 +144,7 @@
 
           <label>Organization Unit: *</label>
           <InputText
-            v-bind="generateCSRFields.organizationUnity"
+            v-bind="organizationUnity"
             type="text"
             :class="{ 'p-invalid': errors.organizationUnity }"
             v-tooltip.top="errors.organizationUnity"
@@ -152,7 +152,7 @@
 
           <label>Email: *</label>
           <InputText
-            v-bind="generateCSRFields.email"
+            v-bind="email"
             type="text"
             :class="{ 'p-invalid': errors.email }"
             v-tooltip.top="errors.email"
@@ -160,7 +160,7 @@
 
           <label>Private Key Type: *</label>
           <InputText
-            v-bind="generateCSRFields.privateKeyType"
+            v-bind="privateKeyType"
             type="text"
             disabled
             :class="{ 'p-invalid': errors.privateKeyType }"
@@ -168,8 +168,8 @@
           />
 
           <label>Subject Alternative Names (SAN):</label>
-          <Textarea
-            v-bind="generateCSRFields.subjectAlternativeNames"
+          <PrimeTextarea
+            v-bind="subjectAlternativeNames"
             :class="{ 'p-invalid': errors.subjectAlternativeNames }"
             v-tooltip.top="errors.subjectAlternativeNames"
             placeholder="www.example.com
@@ -183,7 +183,7 @@ support.example.com"
       </template>
 
       <!-- Trusted CA Certificate Form -->
-      <template v-if="certificateType.modelValue === 'trusted_ca_certificate'">
+      <template v-if="certificateType === 'trusted_ca_certificate'">
         <b>Use my Trusted CA Certificate</b>
         <p>
           Trusted Certificate Authority Certificate can be used for Mutual Transport Layer Security
@@ -195,7 +195,7 @@ support.example.com"
         </p>
 
         <label>Certificate:</label>
-        <Textarea
+        <PrimeTextarea
           v-bind="certificate"
           :class="{ 'p-invalid': errors.certificate }"
           v-tooltip.top="errors.certificate"
@@ -209,146 +209,149 @@ support.example.com"
   </CreateFormBlock>
 </template>
 
-<script setup>
+<script>
 import CreateFormBlock from '@/templates/create-form-block'
 import RadioButton from 'primevue/radiobutton'
-import Textarea from 'primevue/textarea'
+import PrimeTextarea from 'primevue/textarea'
 import InputText from 'primevue/inputtext'
-import { useForm } from 'vee-validate'
+import { useForm, useField } from 'vee-validate'
 import * as yup from 'yup'
 import { ref, watch } from 'vue'
 
-const props = defineProps({
-  createDigitalCertificatesService: {
-    required: true
-  }
-})
-
-const createDigitalCertificate = props.createDigitalCertificatesService.createDigitalCertificate
-const createCSR = props.createDigitalCertificatesService.createCSR
-const createServiceBySelectedType = ref(createDigitalCertificate)
-
-const schemaInitial = yup.object({
-  certificateType: yup.string(),
-  createCertificateType: yup.string(),
-  digitalCertificateName: yup.string().required()
-})
-
-const formValidate = useForm({
-  validationSchema: schemaInitial,
-  initialValues: {
-    certificateType: 'edge_certificate',
-    createCertificateType: 'uploadCertificateAndPrivateKey'
-  }
-})
-var defineComponentBinds = formValidate.defineComponentBinds
-var resetForm = formValidate.resetForm
-var errors = formValidate.errors
-var meta = formValidate.meta
-var values = formValidate.values
-
-let certificateType = '';
-let createCertificateType = '';
-
-let digitalCertificateName = '';
-const certificateFields = ref({})
-const generateCSRFields = ref({})
-
-setInitialState()
-function setInitialState() {
-  setCertificateForm()
-  certificateType = defineComponentBinds('certificateType')
-  createCertificateType = defineComponentBinds('createCertificateType')
-}
-function setGenerateCSRForm() {
-  const schemaCSR = yup.object({
-    digitalCertificateName: yup.string().required(),
-
-    //GenerateCSR fields validation
-    common: yup.string().required(),
-    country: yup.string().required(),
-    state: yup.string().required(),
-    city: yup.string().required(),
-    organization: yup.string().required(),
-    organizationUnity: yup.string().required(),
-    email: yup.string().required().email(),
-    privateKeyType: yup.string().required(),
-  })
-
-  const formValidateCSR = useForm({
-    validationSchema: schemaCSR,
-    initialValues: {
-      privateKeyType: 'RSA (2048)',
-      digitalCertificateName: digitalCertificateName.value.modelValue,
+export default {
+  components: {
+    CreateFormBlock,
+    RadioButton,
+    PrimeTextarea,
+    InputText
+  },
+  props: {
+    createDigitalCertificatesService: {
+      type: Function,
+      required: true
+    },
+    createDigitalCertificatesCSRService: {
+      type: Function,
+      required: true
     }
-  })
+  },
+  data() {
+    return {}
+  },
+  setup(props) {
+    const createDigitalCertificate = props.createDigitalCertificatesService
+    const createCSR = props.createDigitalCertificatesCSRService
 
-  defineComponentBinds = formValidateCSR.defineComponentBinds
-  resetForm = formValidateCSR.resetForm
-  errors = formValidateCSR.errors
-  meta = formValidateCSR.meta
-  values = formValidateCSR.values
+    const createServiceBySelectedType = ref(createDigitalCertificate)
 
-  digitalCertificateName = defineComponentBinds('digitalCertificateName', {
-    validateOnInput: true
-  })
+    const verifyRequiredString = {
+      is: 'generateCSR',
+      then: (schema) => schema.required()
+    }
+    const validationSchema = yup.object({
+      digitalCertificateName: yup.string().required(),
 
-  // GenerateCSR fields
-  generateCSRFields.value = {
-    common: defineComponentBinds('common', { validateOnInput: true }),
-    country: defineComponentBinds('country', { validateOnInput: true }),
-    state: defineComponentBinds('state', { validateOnInput: true }),
-    city: defineComponentBinds('city', { validateOnInput: true }),
-    organization: defineComponentBinds('organization', { validateOnInput: true }),
-    organizationUnity: defineComponentBinds('organizationUnity', { validateOnInput: true }),
-    email: defineComponentBinds('email', { validateOnInput: true }),
-    privateKeyType: defineComponentBinds('privateKeyType', { validateOnInput: true }),
-    subjectAlternativeNames: defineComponentBinds('subjectAlternativeNames', {
-      validateOnInput: true
+      // Certificate Choices
+      certificateType: yup.string().required(),
+      createCertificateType: yup.string().required(),
+
+      // Edge Certificate Fields
+      certificate: yup.string().required(),
+      privateKey: yup.string(),
+
+      // CSR Fields
+      common: yup.string().when('createCertificateType', verifyRequiredString),
+      state: yup.string().when('createCertificateType', verifyRequiredString),
+      city: yup.string().when('createCertificateType', verifyRequiredString),
+      organization: yup.string().when('createCertificateType', verifyRequiredString),
+      organizationUnity: yup.string().when('createCertificateType', verifyRequiredString),
+      privateKeyType: yup.string().when('createCertificateType', verifyRequiredString),
+      subjectAlternativeNames: yup.string().when('createCertificateType', verifyRequiredString),
+      country: yup.string().when('createCertificateType', {
+        is: 'generateCSR',
+        then: (schema) => schema.required().max(2)
+      }),
+      email: yup.string().when('createCertificateType', {
+        is: 'generateCSR',
+        then: (schema) => schema.required().email()
+      }),
     })
-  }
-}
 
-function setCertificateForm() {
-  const schemaCertificate = yup.object({
-    digitalCertificateName: yup.string().required(),
-    certificate: yup.string().required(),
-    certificateType: yup.string(),
-    createCertificateType: yup.string(),
-  })
+    const { errors, defineInputBinds, defineComponentBinds, meta, resetForm, values } = useForm({
+      validationSchema,
+      initialValues: {
+        digitalCertificateName: '',
 
-  const formCertificateValidate = useForm({
-    validationSchema: schemaCertificate,
-    initialValues: {
-      certificate: '',
-      certificateType: 'edge_certificate',
-      digitalCertificateName: digitalCertificateName?.value?.modelValue,
-      createCertificateType: 'uploadCertificateAndPrivateKey'
+        // Form Choices
+        certificateType: 'edge_certificate',
+        createCertificateType: 'uploadCertificateAndPrivateKey',
+
+        // Edge Certificate values
+        certificate: '',
+        privateKey: '',
+
+        // CSR values
+        common: '',
+        country: '',
+        state: '',
+        city: '',
+        organization: '',
+        organizationUnity: '',
+        email: '',
+        privateKeyType: 'RSA (2048)',
+        subjectAlternativeNames: '',
+      }
+    })
+
+    const digitalCertificateName = defineInputBinds('digitalCertificateName', { validateOnInput: true })
+    const certificate = defineComponentBinds('certificate', { validateOnInput: true })
+    const privateKey = defineComponentBinds('privateKey')
+
+    // CSR Binds
+    const common = defineInputBinds('common', { validateOnInput: true })
+    const country = defineInputBinds('country', { validateOnInput: true })
+    const state = defineInputBinds('state', { validateOnInput: true })
+    const city = defineInputBinds('city', { validateOnInput: true })
+    const organization = defineInputBinds('organization', { validateOnInput: true })
+    const organizationUnity = defineInputBinds('organizationUnity', { validateOnInput: true })
+    const email = defineInputBinds('email', { validateOnInput: true })
+    const privateKeyType = defineInputBinds('privateKeyType', { validateOnInput: true })
+    const subjectAlternativeNames = defineComponentBinds('subjectAlternativeNames', { validateOnInput: true })
+
+    const { value: certificateType } = useField('certificateType')
+    const { value: createCertificateType } = useField('createCertificateType')
+
+    watch([certificateType, createCertificateType], () => {
+      if (certificateType.value === 'trusted_ca_certificate') {
+        createServiceBySelectedType.value = createDigitalCertificate
+      } else if (createCertificateType.value === 'generateCSR') {
+        createServiceBySelectedType.value = createCSR
+      } else if (createCertificateType.value === 'uploadCertificateAndPrivateKey') {
+        createServiceBySelectedType.value = createDigitalCertificate
+      }
+    })
+
+    return {
+      createServiceBySelectedType,
+      meta,
+      errors,
+      values,
+      resetForm,
+      common,
+      country,
+      state,
+      city,
+      organization,
+      organizationUnity,
+      email,
+      privateKeyType,
+      certificate,
+      privateKey,
+      certificateType,
+      createCertificateType,
+      digitalCertificateName,
+      subjectAlternativeNames,
     }
-  })
-
-  defineComponentBinds = formCertificateValidate.defineComponentBinds
-  resetForm = formCertificateValidate.resetForm
-  errors = formCertificateValidate.errors
-  meta = formCertificateValidate.meta
-  values = formCertificateValidate.values
-
-  certificateFields.value = {
-    certificate: defineComponentBinds('certificate'),
-    privateKey: defineComponentBinds('privateKey')
   }
-  digitalCertificateName = defineComponentBinds('digitalCertificateName', {
-    validateOnInput: true
-  })
 }
-
-watch(createCertificateType, (selectedType) => {
-  if (selectedType.modelValue === 'generateCSR') {
-    createServiceBySelectedType.value = createCSR
-    setGenerateCSRForm()
-  } else if (selectedType.modelValue === 'uploadCertificateAndPrivateKey') {
-    createServiceBySelectedType.value = createDigitalCertificate
-    setCertificateForm()
-  }
-})
 </script>

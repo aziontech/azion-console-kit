@@ -86,6 +86,7 @@ const router = createRouter({
           name: 'create-digital-certificates',
           component: () => import('@/views/DigitalCertificates/CreateView.vue'),
           props: {
+            createDigitalCertificatesCSRService: DigitalCertificatesService.createDigitalCertificatesCSRService,
             createDigitalCertificatesService: DigitalCertificatesService.createDigitalCertificatesService
           },
           meta:{
