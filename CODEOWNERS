@@ -1,0 +1,15 @@
+
+# How to use this file: 
+#
+# 1. If your squad is the main responsible for an app, enter it
+# here to prevent any changes from being released without your consent. 
+#
+# 2. This is optional, but once your app is here, it is very  important 
+# that your squad pay attention to the sre-swe channel for code review 
+# requests to avoid blocking PR from other squads.
+#
+# 3. The order is important; the last matching pattern takes the most
+# precedence. If 2 or more squads are responsible for the same app
+# they both can be added in the same line.
+
+* @aziontech/team-product-3 @aziontech/team-product-4 @aziontech/team-product-1 @aziontech/qa
