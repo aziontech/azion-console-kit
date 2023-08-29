@@ -1,10 +1,10 @@
 import { AxiosHttpClientAdapter, parseHttpResponse } from "../axios/AxiosHttpClientAdapter";
 import { makeIntelligentDNSBaseUrl } from "./make-intelligent-dns-base-url";
 
-export const deleteIntelligentDNSRecordService = async (id, record_id) => {
+export const deleteRecordsService = async ({ id, recordId }) => {
   let httpResponse = await AxiosHttpClientAdapter
     .request({
-      url: `${makeIntelligentDNSBaseUrl()}/${id}/records/${record_id}`,
+      url: `${makeIntelligentDNSBaseUrl()}/${id}/records/${recordId}`,
       method: 'DELETE',
     })
     

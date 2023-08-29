@@ -43,12 +43,12 @@
         editPagePath="/"
         :columns="recordListColumns"
         :listService="listRecordsServiceIntelligentDNSDecorator"
-        :deleteService="() => true"
+        :deleteService="deleteRecordsServiceIntelligentDNS"
       />
     </TabPanel>
   </TabView>
 </template>
-  
+
 <script>
 import EditFormBlock from '@/templates/edit-form-block'
 import ListTableBlock from '@templates/list-table-block'
@@ -74,7 +74,11 @@ export default {
   props: {
     loadIntelligentDNSService: { type: Function, required: true },
     editIntelligentDNSService: { type: Function, required: true },
-    listRecordsService: { type: Function, required: true }
+    listRecordsService: { type: Function, required: true },
+    deleteRecordsService: {
+      type: Function,
+      required: true
+    }
   },
 
   data: () => {
@@ -153,6 +157,10 @@ export default {
 
     async listRecordsServiceIntelligentDNSDecorator(payload) {
       return await this.listRecordsService({ ...payload, id: this.intelligentDNSID })
+    },
+
+    async deleteRecordsServiceIntelligentDNS(id) {
+      return await this.deleteRecordsService({ id: this.intelligentDNSID, recordId:  id})
     }
   }
 }
