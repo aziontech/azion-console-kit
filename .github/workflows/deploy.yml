@@ -31,7 +31,7 @@ jobs:
         run: ./azioncli configure -t ${{ secrets.PLATFORM_KIT_TOKEN }}
 
       - name: Configure Repository
-        run: mkdir -p .edge/statics
+        run: mkdir -p .edge/statics && cp -r ./dist/* .edge/statics
       
       - name: Deploy Edge Application
         run: ./azioncli edge_applications publish
