@@ -45,7 +45,7 @@ jobs:
         run: echo $SETTINGS > azion/azion.json
       
       - name: Read json
-        run: echo "::warning::Image Tag: '$SETTINGS'"
+        run: echo "$SETTINGS"
 
       - name: Configure Repository
         run: mkdir -p .edge/statics && cp -r ./dist/* .edge/statics
