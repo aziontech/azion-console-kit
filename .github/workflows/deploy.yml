@@ -3,6 +3,7 @@ name: Deploy Edge Application
 on:
   push:
     branches:
+      - main
       - workflow-fix
 
 jobs:
