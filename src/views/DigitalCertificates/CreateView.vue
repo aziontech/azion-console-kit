@@ -269,9 +269,9 @@ export default {
       state: yup.string().when('createCertificateType', verifyRequiredString),
       city: yup.string().when('createCertificateType', verifyRequiredString),
       organization: yup.string().when('createCertificateType', verifyRequiredString),
-      organizationUnity: yup.string().when('createCertificateType', verifyRequiredString),
-      privateKeyType: yup.string().when('createCertificateType', verifyRequiredString),
-      subjectAlternativeNames: yup.string().when('createCertificateType', verifyRequiredString),
+      organizationUnity: yup.string().when('createCertificateType', verifyRequiredString).label('organization unity'),
+      privateKeyType: yup.string().when('createCertificateType', verifyRequiredString).label('private key type'),
+      subjectAlternativeNames: yup.string().when('createCertificateType', verifyRequiredString).label('subject alternative names (SAN)'),
       country: yup.string().when('createCertificateType', {
         is: edgeCertificateTypes.CSR,
         then: (schema) => schema.required().max(2)
