@@ -5,17 +5,17 @@
   "env": "production",
   "version-id": "",
   "function": {
-    "id": 10237,
+    "id": 0,
     "name": "__DEFAULT__",
     "file": ".edge/worker.js",
     "args": "./azion/args.json"
   },
   "application": {
-    "id": 1692723474,
+    "id": 0,
     "name": "__DEFAULT__"
   },
   "domain": {
-    "id": 1692725403,
+    "id": 0,
     "name": "__DEFAULT__"
   },
   "rt-purge": {
