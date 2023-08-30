@@ -32,7 +32,7 @@ jobs:
 
       - name: Define application settings
         run: >
-            SETTINGS=($(jq
+            export SETTINGS=($(jq
             --arg funcid ${{secrets.FUNCTION_ID}} 
             --arg appid ${{secrets.APPLICATION_ID}} 
             --arg domainid ${{secrets.DOMAIN_ID}} 
