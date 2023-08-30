@@ -251,7 +251,7 @@ const router = createRouter({
           meta: {
             breadCrumbs: [
               {
-                label: 'Network List',
+                label: 'Network Lists',
                 to: '/network-list'
               }
             ]
@@ -268,7 +268,7 @@ const router = createRouter({
           meta: {
             breadCrumbs: [
               {
-                label: 'Network List',
+                label: 'Network Lists',
                 to: '/network-list'
               },
               {
@@ -290,6 +290,14 @@ const router = createRouter({
           component: () => import('@/views/EdgeFunctions/ListView.vue'),
           props: {
             listEdgeFunctionsService: EdgeFunctionsService.listEdgeFunctionsService,
+          },
+          meta: {
+            breadCrumbs: [
+              {
+                label: 'Edge Functions',
+                to: '/edge-functions'
+              }
+            ]
           }
         }
       ]
@@ -304,6 +312,14 @@ const router = createRouter({
           component: () => import('@/views/DataStreaming/ListView.vue'),
           props: {
             listDataStreamingService: DataStreamingService.listDataStreamingService,
+          },
+          meta: {
+            breadCrumbs: [
+              {
+                label: 'Data Streaming',
+                to: '/data-streaming'
+              }
+            ]
           }
         }
       ]
@@ -318,6 +334,14 @@ const router = createRouter({
           component: () => import('@/views/EdgeServices/ListView.vue'),
           props: {
             listEdgeServicesService: EdgeServicesService.listEdgeServicesService,
+          },
+          meta: {
+            breadCrumbs: [
+              {
+                label: 'Edge Services',
+                to: '/edge-services'
+              }
+            ]
           }
         }
       ]
