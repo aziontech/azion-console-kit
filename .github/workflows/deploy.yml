@@ -3,7 +3,7 @@ name: Deploy Edge Application
 on:
   push:
     branches:
-      - dev
+      - fix-workflow
 
 jobs:
   deploy:
@@ -15,7 +15,7 @@ jobs:
         uses: actions/checkout@v3
 
       - name: Install SO deps
-        run: apk add curl git bash
+        run: apk add curl git bash jq
       
       - name: Install dependencies
         run: yarn install --frozen-lockfile
@@ -28,6 +28,10 @@ jobs:
       
       - name: Configure Azion CLI
         run: ./azioncli configure -t ${{ secrets.PLATFORM_KIT_TOKEN }}
+
+        run: SETTINGS=($(jq --arg funcid ${{secrets.FUNCTION_ID}} --arg appid ${{secrets.APPLICATION_ID}} --arg domainid ${{secrets.DOMAIN_ID}} '.function.id = $funcid | .application.id = $appid | .domain.id = $domainid' azion/azion.json))
+
+        run: echo $SETTINGS > azion/azion.json
 
       - name: Configure Repository
         run: mkdir -p .edge/statics && cp -r ./dist/* .edge/statics
