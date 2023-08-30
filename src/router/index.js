@@ -258,12 +258,12 @@ const router = createRouter({
       ]
     },
     {
-      path: '/network-list',
-      name: 'network-list',
+      path: '/network-lists',
+      name: 'network-lists',
       children: [
         {
           path: '',
-          name: 'list-network-list',
+          name: 'list-network-lists',
           component: () => import('@/views/NetworkList/ListView.vue'),
           props: {
             listNetworkListService: NetworkListService.listNetworkListService,
@@ -273,14 +273,14 @@ const router = createRouter({
             breadCrumbs: [
               {
                 label: 'Network Lists',
-                to: '/network-list'
+                to: '/network-lists'
               }
             ]
           }
         },
         {
           path: 'create',
-          name: 'create-network-list',
+          name: 'create-network-lists',
           component: () => import('@/views/NetworkList/CreateView.vue'),
           props: {
             createNetworkListService: NetworkListService.createNetworkListService,
@@ -290,11 +290,11 @@ const router = createRouter({
             breadCrumbs: [
               {
                 label: 'Network Lists',
-                to: '/network-list'
+                to: '/network-lists'
               },
               {
                 label: 'Create Network',
-                to: '/network-list/create'
+                to: '/network-lists/create'
               }
             ]
           }
