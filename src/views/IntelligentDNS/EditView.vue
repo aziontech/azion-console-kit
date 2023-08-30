@@ -47,6 +47,7 @@
       />
     </TabPanel>
   </TabView>
+  <router-view></router-view>
 </template>
   
 <script>

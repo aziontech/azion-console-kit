@@ -1,36 +1,7 @@
 <template>
   <ListTableBlock
     :listService="listRecordsServiceIntelligentDNSDecorator"
-    :columns="[
-      {
-        field: 'name',
-        header: 'Name'
-      },
-      {
-        field: 'type',
-        header: 'Type'
-      },
-      {
-        field: 'value',
-        header: 'Value'
-      },
-      {
-        field: 'ttl',
-        header: 'TTL'
-      },
-      {
-        field: 'policy',
-        header: 'Policy'
-      },
-      {
-        field: 'weight',
-        header: 'Weight'
-      },
-      {
-        field: 'description',
-        header: 'Description'
-      }
-    ]"
+    :columns="columns"
     :pageTitle="'Records'"
     :addButtonLabel="'Add Record'"
     :createPagePath="`records/create/:${meuID}`"
@@ -58,15 +29,49 @@ export default {
   },
   data() {
     return {
-      intelligentDNSID: 239063
+      intelligentDNSID: undefined
     }
   },
-  // created() {
-  //   console.log(this.$route.params)
-  // },
+  created() {
+    this.intelligentDNSID = this.$route.params.id
+  },
   methods: {
     async listRecordsServiceIntelligentDNSDecorator(payload) {
       return await this.listRecordsService({ ...payload, id: this.intelligentDNSID })
+    }
+  },
+  computed: {
+    columns() {
+      return [
+        {
+          field: 'name',
+          header: 'Name'
+        },
+        {
+          field: 'type',
+          header: 'Type'
+        },
+        {
+          field: 'value',
+          header: 'Value'
+        },
+        {
+          field: 'ttl',
+          header: 'TTL'
+        },
+        {
+          field: 'policy',
+          header: 'Policy'
+        },
+        {
+          field: 'weight',
+          header: 'Weight'
+        },
+        {
+          field: 'description',
+          header: 'Description'
+        }
+      ]
     }
   }
 }

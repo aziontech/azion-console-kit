@@ -6,19 +6,23 @@ export const createRecordsService = async (payload) => {
 
   let httpResponse = await AxiosHttpClientAdapter
     .request({
-      url: `${makeIntelligentDNSBaseUrl()}`,
+      url: `${makeIntelligentDNSBaseUrl()}/${payload.intelligentDNSID}/records`,
       method: 'POST',
       body: adaptPayload
     })
-    
+
   return parseHttpResponse(httpResponse)
 }
 
 const adapt = (payload) => {
   return {
-    record_type: payload.recordType,
-    entry: payload.entry,
+    record_type: payload.selectedRecordType._value,
+    entry: payload.name,
+    answers_list: [
+      payload.value
+    ],
     ttl: payload.ttl,
-    description: payload.description
+    description: payload.description,
+    weight: payload.selectedPolicy._value === 'weighted' ? payload.weight : undefined,
   };
 }

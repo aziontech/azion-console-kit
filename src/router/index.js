@@ -222,66 +222,26 @@ const router = createRouter({
               }
             ]
           },
-          children: [
-            {
-              path: 'records/create',
-              name: 'intelligent-dns-records-create',
-              component: () => import('@/views/IntelligentDNS/CreateRecordsView.vue'),
-              props: {
-                listRecordsService: IntelligentDNSRecordsService.listRecordsService,
-              },
-              meta: {
-                breadCrumbs: [
-                  {
-                    label: 'Intelligent DNS',
-                    to: '/intelligent-dns'
-                  },
-                  {
-                    label: 'Records',
-                  }
-                ]
-              }
-            }
-          ]
         },
-        // {
-        //   path: 'edit/:hosted_zone_id/records',
-        //   name: 'edit-intelligent-dns-records',
-        //   component: () => import('@/views/IntelligentDNS/ListRecordsView.vue'),
-        //   props: {
-        //     listRecordsService: IntelligentDNSService.listRecordsService,
-        //   },
-        //   meta: {
-        //     breadCrumbs: [
-        //       {
-        //         label: 'Intelligent DNS Records',
-        //         to: '/intelligent-dns'
-        //       },
-        //       {
-        //         label: 'Intelligent DNS Records',
-        //       }
-        //     ]
-        //   }
-        // },
-        // {
-        //   path: 'edit/:hosted_zone_id/records/create',
-        //   name: 'edit-intelligent-dns-records-create',
-        //   component: () => import('@/views/IntelligentDNS/CreateRecordsView.vue'),
-        //   props: {
-        //     createRecordsService: IntelligentDNSService.createRecordsService,
-        //   },
-        //   meta: {
-        //     breadCrumbs: [
-        //       {
-        //         label: 'Intelligent DNS Records',
-        //         to: '/intelligent-dns'
-        //       },
-        //       {
-        //         label: 'Intelligent DNS Records',
-        //       }
-        //     ]
-        //   }
-        // }
+        {
+          path: 'edit/:id/records/create',
+          name: 'edit-intelligent-dns-records-create',
+          component: () => import('@/views/IntelligentDNS/CreateRecordsView.vue'),
+          props: {
+            createRecordsService: IntelligentDNSRecordsService.createRecordsService,
+          },
+          meta: {
+            breadCrumbs: [
+              {
+                label: 'Intelligent DNS',
+                to: '/intelligent-dns'
+              },
+              {
+                label: 'Create Records',
+              }
+            ]
+          }
+        }
       ]
     },
     {
