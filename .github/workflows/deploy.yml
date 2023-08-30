@@ -43,9 +43,6 @@ jobs:
 
       - name: Save application settings
         run: echo $SETTINGS > azion/azion.json
-      
-      - name: Read json
-        run: jq '.' azion/azion.json
 
       - name: Configure Repository
         run: mkdir -p .edge/statics && cp -r ./dist/* .edge/statics
