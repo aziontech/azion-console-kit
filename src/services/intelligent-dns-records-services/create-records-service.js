@@ -23,6 +23,6 @@ const adapt = (payload) => {
     ],
     ttl: payload.ttl,
     description: payload.description,
-    weight: payload.selectedPolicy._value === 'weighted' ? payload.weight : undefined,
+    weight: payload.weight,
   };
 }

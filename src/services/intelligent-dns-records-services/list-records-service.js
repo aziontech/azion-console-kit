@@ -16,7 +16,7 @@ export const listRecordsService = async ({ page, id }) => {
 const adapt = (httpResponse) => {
   const isArray = Array.isArray(httpResponse.body.results?.records);
 
-  const parsedRecords = isArray ? httpResponse.body.results?.records.map((record) => ({
+  const parsedRecords = isArray ? httpResponse.body.results.records.map((record) => ({
     id: record.record_id,
     name: record.entry,
     type: record.record_type,
