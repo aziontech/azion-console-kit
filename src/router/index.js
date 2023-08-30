@@ -1,5 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import * as VariablesService from '@/services/variables-services'
+import * as VariablesService from '@services/variables-services'
 import * as IntelligentDNSService from '@services/intelligent-dns-services'
 import * as DigitalCertificatesService from '@services/digital-certificates'
 import * as NetworkListService from '@services/network-list-services'
