@@ -21,7 +21,7 @@
             v-model="certificateType"
             inputId="certificateType1"
             name="certificateType"
-            value="edge_certificate"
+            :value="certificateTypes.EDGE_CERTIFICATE"
           />
           <label for="certificateType1" class="ml-2">Edge Certificate</label>
         </div>
@@ -30,7 +30,7 @@
             v-model="certificateType"
             inputId="certificateType2"
             name="certificateType"
-            value="trusted_ca_certificate"
+            :value="certificateTypes.TRUSTED"
           />
           <label for="certificateType2" class="ml-2">Trusted CA Certificate</label>
         </div>
@@ -39,7 +39,7 @@
       <hr />
 
       <!-- Edge Certificate Form -->
-      <template v-if="certificateType === 'edge_certificate'">
+      <template v-if="certificateType === certificateTypes.EDGE_CERTIFICATE">
         <b>Digital Certificates</b>
         <div class="flex flex-wrap gap-3">
           <div class="flex align-items-center">
@@ -47,7 +47,7 @@
               v-model="createCertificateType"
               inputId="createCertificateType1"
               name="createCertificateType"
-              value="uploadCertificateAndPrivateKey"
+              :value="edgeCertificateTypes.UPLOAD"
             />
             <label for="certificateType1" class="ml-2">Upload my certificate and private key</label>
           </div>
@@ -56,7 +56,7 @@
               v-model="createCertificateType"
               inputId="createCertificateType2"
               name="createCertificateType"
-              value="generateCSR"
+              :value="edgeCertificateTypes.CSR"
             />
             <label for="createCertificateType2" class="ml-2"
               >Generate CSR and private key with Azion</label
@@ -65,7 +65,7 @@
         </div>
 
         <!-- Upload certificate form -->
-        <template v-if="createCertificateType === 'uploadCertificateAndPrivateKey'">
+        <template v-if="createCertificateType === edgeCertificateTypes.UPLOAD">
           <b>Use my certificate and private key</b>
           <p>
             To upload your Digital Certificate to Azion servers, copy and paste your certificate and
@@ -94,7 +94,7 @@
         </template>
 
         <!-- Generate CSR form -->
-        <template v-if="createCertificateType === 'generateCSR'">
+        <template v-if="createCertificateType === edgeCertificateTypes.CSR">
           <b>Generating a Certificate Signing Request (CSR) with Azion</b>
           <p>
             A Certificate Signing Request (CSR) is one of the first steps towards getting your own
@@ -183,7 +183,7 @@ support.example.com"
       </template>
 
       <!-- Trusted CA Certificate Form -->
-      <template v-if="certificateType === 'trusted_ca_certificate'">
+      <template v-if="certificateType === certificateTypes.TRUSTED">
         <b>Use my Trusted CA Certificate</b>
         <p>
           Trusted Certificate Authority Certificate can be used for Mutual Transport Layer Security
@@ -235,17 +235,22 @@ export default {
       required: true
     }
   },
-  data() {
-    return {}
-  },
   setup(props) {
     const createDigitalCertificate = props.createDigitalCertificatesService
     const createCSR = props.createDigitalCertificatesCSRService
-
     const createServiceBySelectedType = ref(createDigitalCertificate)
 
+    const edgeCertificateTypes = {
+      CSR: 'generateCSR',
+      UPLOAD: 'uploadCertificateAndPrivateKey',
+    }
+    const certificateTypes = {
+      EDGE_CERTIFICATE: 'edge_certificate',
+      TRUSTED: 'trusted_ca_certificate',
+    }
+
     const verifyRequiredString = {
-      is: 'generateCSR',
+      is: edgeCertificateTypes.CSR,
       then: (schema) => schema.required()
     }
     const validationSchema = yup.object({
@@ -268,13 +273,13 @@ export default {
       privateKeyType: yup.string().when('createCertificateType', verifyRequiredString),
       subjectAlternativeNames: yup.string().when('createCertificateType', verifyRequiredString),
       country: yup.string().when('createCertificateType', {
-        is: 'generateCSR',
+        is: edgeCertificateTypes.CSR,
         then: (schema) => schema.required().max(2)
       }),
       email: yup.string().when('createCertificateType', {
-        is: 'generateCSR',
+        is: edgeCertificateTypes.CSR,
         then: (schema) => schema.required().email()
-      }),
+      })
     })
 
     const { errors, defineInputBinds, defineComponentBinds, meta, resetForm, values } = useForm({
@@ -283,8 +288,8 @@ export default {
         digitalCertificateName: '',
 
         // Form Choices
-        certificateType: 'edge_certificate',
-        createCertificateType: 'uploadCertificateAndPrivateKey',
+        certificateType: certificateTypes.EDGE_CERTIFICATE,
+        createCertificateType: edgeCertificateTypes.UPLOAD,
 
         // Edge Certificate values
         certificate: '',
@@ -299,11 +304,13 @@ export default {
         organizationUnity: '',
         email: '',
         privateKeyType: 'RSA (2048)',
-        subjectAlternativeNames: '',
+        subjectAlternativeNames: ''
       }
     })
 
-    const digitalCertificateName = defineInputBinds('digitalCertificateName', { validateOnInput: true })
+    const digitalCertificateName = defineInputBinds('digitalCertificateName', {
+      validateOnInput: true
+    })
     const certificate = defineComponentBinds('certificate', { validateOnInput: true })
     const privateKey = defineComponentBinds('privateKey')
 
@@ -316,18 +323,21 @@ export default {
     const organizationUnity = defineInputBinds('organizationUnity', { validateOnInput: true })
     const email = defineInputBinds('email', { validateOnInput: true })
     const privateKeyType = defineInputBinds('privateKeyType', { validateOnInput: true })
-    const subjectAlternativeNames = defineComponentBinds('subjectAlternativeNames', { validateOnInput: true })
+    const subjectAlternativeNames = defineComponentBinds('subjectAlternativeNames', {
+      validateOnInput: true
+    })
 
     const { value: certificateType } = useField('certificateType')
     const { value: createCertificateType } = useField('createCertificateType')
 
     watch([certificateType, createCertificateType], () => {
-      if (certificateType.value === 'trusted_ca_certificate') {
-        createServiceBySelectedType.value = createDigitalCertificate
-      } else if (createCertificateType.value === 'generateCSR') {
+      const isGenerateCSR = createCertificateType.value === edgeCertificateTypes.CSR
+      const isEdgeCertificate = certificateType.value === certificateTypes.EDGE_CERTIFICATE
+
+      createServiceBySelectedType.value = createDigitalCertificate
+
+      if (isGenerateCSR && isEdgeCertificate) {
         createServiceBySelectedType.value = createCSR
-      } else if (createCertificateType.value === 'uploadCertificateAndPrivateKey') {
-        createServiceBySelectedType.value = createDigitalCertificate
       }
     })
 
@@ -351,6 +361,8 @@ export default {
       createCertificateType,
       digitalCertificateName,
       subjectAlternativeNames,
+      edgeCertificateTypes,
+      certificateTypes
     }
   }
 }

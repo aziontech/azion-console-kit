@@ -1,5 +1,5 @@
-import { AxiosHttpClientAdapter, parseHttpResponse } from "../axios/AxiosHttpClientAdapter";
-import { makeDigitalCertificatesBaseUrl } from "./make-digital-certificates-base-url";
+import { AxiosHttpClientAdapter, parseHttpResponse } from '../axios/AxiosHttpClientAdapter';
+import { makeDigitalCertificatesBaseUrl } from './make-digital-certificates-base-url';
 
 export const createDigitalCertificatesService = async (payload) => {
     let httpResponse = await AxiosHttpClientAdapter
