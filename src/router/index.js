@@ -259,7 +259,7 @@ const router = createRouter({
           meta: {
             breadCrumbs: [
               {
-                label: 'Network List',
+                label: 'Network Lists',
                 to: '/network-list'
               }
             ]
@@ -276,7 +276,7 @@ const router = createRouter({
           meta: {
             breadCrumbs: [
               {
-                label: 'Network List',
+                label: 'Network Lists',
                 to: '/network-list'
               },
               {
@@ -298,6 +298,14 @@ const router = createRouter({
           component: () => import('@/views/EdgeFunctions/ListView.vue'),
           props: {
             listEdgeFunctionsService: EdgeFunctionsService.listEdgeFunctionsService,
+          },
+          meta: {
+            breadCrumbs: [
+              {
+                label: 'Edge Functions',
+                to: '/edge-functions'
+              }
+            ]
           }
         }
       ]
@@ -312,6 +320,14 @@ const router = createRouter({
           component: () => import('@/views/DataStreaming/ListView.vue'),
           props: {
             listDataStreamingService: DataStreamingService.listDataStreamingService,
+          },
+          meta: {
+            breadCrumbs: [
+              {
+                label: 'Data Streaming',
+                to: '/data-streaming'
+              }
+            ]
           }
         }
       ]
@@ -326,19 +342,18 @@ const router = createRouter({
           component: () => import('@/views/EdgeServices/ListView.vue'),
           props: {
             listEdgeServicesService: EdgeServicesService.listEdgeServicesService,
+          },
+          meta: {
+            breadCrumbs: [
+              {
+                label: 'Edge Services',
+                to: '/edge-services'
+              }
+            ]
           }
         }
       ]
     }
-    // example of lazy route
-    // {
-    //   path: '/about',
-    //   name: 'about',
-    //   // route level code-splitting
-    //   // this generates a separate chunk (Home.[hash].js) for this route
-    //   // which is lazy-loaded when the route is visited.
-    //   component: () => import('../views/HomeView.vue')
-    // }
   ]
 })
 
