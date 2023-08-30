@@ -22,7 +22,7 @@ const adapt = (payload) => {
     organization: payload.organization,
     email: payload.email,
     organization_unity: payload.organizationUnity,
-    private_key_type: payload.privateKeyType,
+    private_key_type: 'rsa_2048',
     sans: payload.subjectAlternativeNames?.split('\n'),
   }
 }

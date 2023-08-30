@@ -12,12 +12,17 @@ export const createDigitalCertificatesService = async (payload) => {
     return parseHttpResponse(httpResponse);
   }
 
-
 const adapt = (payload) => {
-  return {
+  let adaptReturn = {
     name: payload.digitalCertificateName,
     certificate_type: payload.certificateType,
     certificate: payload.certificate,
-    private_key: payload.privateKey,
   }
+
+  const hasPrivateKey = (payload.certificateType === 'edge_certificate' && !!payload.privateKey)
+  if (hasPrivateKey) {
+    adaptReturn = { ...adaptReturn, private_key: payload.privateKey }
+  }
+
+  return adaptReturn
 }

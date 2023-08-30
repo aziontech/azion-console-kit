@@ -242,17 +242,24 @@ export default {
 
     const edgeCertificateTypes = {
       CSR: 'generateCSR',
-      UPLOAD: 'uploadCertificateAndPrivateKey',
+      UPLOAD: 'uploadCertificateAndPrivateKey'
     }
     const certificateTypes = {
       EDGE_CERTIFICATE: 'edge_certificate',
-      TRUSTED: 'trusted_ca_certificate',
+      TRUSTED: 'trusted_ca_certificate'
     }
 
-    const verifyRequiredString = {
+    const CSRRequiredField = {
       is: edgeCertificateTypes.CSR,
       then: (schema) => schema.required()
     }
+    const certificateRequiredField = (createCertificateType, certificateType) => {
+      const isUploadCertificate = createCertificateType === edgeCertificateTypes.UPLOAD
+      const isTrustedCA = certificateType === certificateTypes.TRUSTED
+
+      return isUploadCertificate || isTrustedCA
+    }
+
     const validationSchema = yup.object({
       digitalCertificateName: yup.string().required(),
 
@@ -261,17 +268,29 @@ export default {
       createCertificateType: yup.string().required(),
 
       // Edge Certificate Fields
-      certificate: yup.string().required(),
+      certificate: yup.string().when(['createCertificateType', 'certificateType'], {
+        is: certificateRequiredField,
+        then: (schema) => schema.required()
+      }),
       privateKey: yup.string(),
 
       // CSR Fields
-      common: yup.string().when('createCertificateType', verifyRequiredString),
-      state: yup.string().when('createCertificateType', verifyRequiredString),
-      city: yup.string().when('createCertificateType', verifyRequiredString),
-      organization: yup.string().when('createCertificateType', verifyRequiredString),
-      organizationUnity: yup.string().when('createCertificateType', verifyRequiredString).label('organization unity'),
-      privateKeyType: yup.string().when('createCertificateType', verifyRequiredString).label('private key type'),
-      subjectAlternativeNames: yup.string().when('createCertificateType', verifyRequiredString).label('subject alternative names (SAN)'),
+      common: yup.string().when('createCertificateType', CSRRequiredField),
+      state: yup.string().when('createCertificateType', CSRRequiredField),
+      city: yup.string().when('createCertificateType', CSRRequiredField),
+      organization: yup.string().when('createCertificateType', CSRRequiredField),
+      organizationUnity: yup
+        .string()
+        .when('createCertificateType', CSRRequiredField)
+        .label('organization unity'),
+      privateKeyType: yup
+        .string()
+        .when('createCertificateType', CSRRequiredField)
+        .label('private key type'),
+      subjectAlternativeNames: yup
+        .string()
+        .when('createCertificateType', CSRRequiredField)
+        .label('subject alternative names (SAN)'),
       country: yup.string().when('createCertificateType', {
         is: edgeCertificateTypes.CSR,
         then: (schema) => schema.required().max(2)
