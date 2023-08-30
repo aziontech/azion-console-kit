@@ -1,15 +1,15 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import * as VariablesService from '@/services/variables-services'
 import * as IntelligentDNSService from '@/services/intelligent-dns-services'
-import * as DigitalCertificatesService  from '@/services/digital-certificates'
-import * as NetworkListService  from '@/services/network-list-services'
+import * as DigitalCertificatesService from '@/services/digital-certificates'
+import * as NetworkListService from '@/services/network-list-services'
 import * as EdgeFirewall from '@/services/edge-firewall'
 import * as EdgeFunctionsService from '@/services/edge-functions'
 import * as DataStreamingService from '@/services/data-streaming'
 import * as EdgeServicesService from '@/services/edge-services'
 import * as EdgeApplicationsService from '@/services/edge-application-services'
 import * as DomainServicesService from '@/services/domains-services'
-import * as DigitalCertificatesServices from '@/services/digital-certificates'
+import * as IntelligentDNSRecordsService from '@/services/intelligent-dns-records-services'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -76,10 +76,10 @@ const router = createRouter({
           props: {
             listDigitalCertificatesService: DigitalCertificatesService.listDigitalCertificatesService,
             deleteDigitalCertificatesService:
-            DigitalCertificatesService.deleteDigitalCertificatesService,
+              DigitalCertificatesService.deleteDigitalCertificatesService,
           },
-          meta:{
-            breadCrumbs:[
+          meta: {
+            breadCrumbs: [
               {
                 label: 'Digital Certificates',
                 to: '/digital-certificates'
@@ -95,15 +95,15 @@ const router = createRouter({
             createDigitalCertificatesCSRService: DigitalCertificatesService.createDigitalCertificatesCSRService,
             createDigitalCertificatesService: DigitalCertificatesService.createDigitalCertificatesService
           },
-          meta:{
-            breadCrumbs:[
+          meta: {
+            breadCrumbs: [
               {
-                label:'Digital Certificates',
-                to:'/digital-certificates'
+                label: 'Digital Certificates',
+                to: '/digital-certificates'
               },
               {
-                label:'Create Digital Certificates',
-                to:'/digital-certificates/create'
+                label: 'Create Digital Certificates',
+                to: '/digital-certificates/create'
               }
             ]
           }
@@ -220,7 +220,9 @@ const router = createRouter({
           component: () => import('@/views/IntelligentDNS/EditView.vue'),
           props: {
             editIntelligentDNSService: IntelligentDNSService.editIntelligentDNSService,
-            loadIntelligentDNSService: IntelligentDNSService.loadIntelligentDNSService
+            loadIntelligentDNSService: IntelligentDNSService.loadIntelligentDNSService,
+            listRecordsService: IntelligentDNSRecordsService.listRecordsService,
+            deleteRecordsService: IntelligentDNSRecordsService.deleteRecordsService
           },
           meta: {
             breadCrumbs: [
@@ -230,6 +232,25 @@ const router = createRouter({
               },
               {
                 label: 'Edit Intelligent DNS',
+              }
+            ]
+          },
+        },
+        {
+          path: 'edit/:id/records/create',
+          name: 'edit-intelligent-dns-records-create',
+          component: () => import('@/views/IntelligentDNS/CreateRecordsView.vue'),
+          props: {
+            createRecordsService: IntelligentDNSRecordsService.createRecordsService,
+          },
+          meta: {
+            breadCrumbs: [
+              {
+                label: 'Intelligent DNS',
+                to: '/intelligent-dns'
+              },
+              {
+                label: 'Create Records',
               }
             ]
           }
@@ -283,10 +304,10 @@ const router = createRouter({
     {
       path: '/edge-functions',
       name: 'edge-functions',
-      children:[
+      children: [
         {
-          path:'',
-          name:'list-edge-functions',
+          path: '',
+          name: 'list-edge-functions',
           component: () => import('@/views/EdgeFunctions/ListView.vue'),
           props: {
             listEdgeFunctionsService: EdgeFunctionsService.listEdgeFunctionsService,
@@ -305,10 +326,10 @@ const router = createRouter({
     {
       path: '/data-streaming',
       name: 'data-streaming',
-      children:[
+      children: [
         {
-          path:'',
-          name:'list-data-streaming',
+          path: '',
+          name: 'list-data-streaming',
           component: () => import('@/views/DataStreaming/ListView.vue'),
           props: {
             listDataStreamingService: DataStreamingService.listDataStreamingService,
@@ -327,10 +348,10 @@ const router = createRouter({
     {
       path: '/edge-services',
       name: 'edge-services',
-      children:[
+      children: [
         {
-          path:'',
-          name:'list-edge-services',
+          path: '',
+          name: 'list-edge-services',
           component: () => import('@/views/EdgeServices/ListView.vue'),
           props: {
             listEdgeServicesService: EdgeServicesService.listEdgeServicesService,

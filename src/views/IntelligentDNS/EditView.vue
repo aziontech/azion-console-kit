@@ -1,33 +1,53 @@
 <template>
   <TabView>
     <TabPanel header="Main Settings">
-      <EditFormBlock :pageTitle="'Edit Intelligent DNS'" :editService="this.editIntelligentDNSService"
-        :loadService="this.loadIntelligentDNSService" :initialDataSetter="setValues" :isValid="meta.valid"
-        :formData="values">
+      <EditFormBlock
+        :pageTitle="'Edit Intelligent DNS'"
+        :editService="this.editIntelligentDNSService"
+        :loadService="this.loadIntelligentDNSService"
+        :initialDataSetter="setValues"
+        :isValid="meta.valid"
+        :formData="values"
+      >
         <template #form>
-          <InputText placeholder="Zone Name" v-bind="name" type="text" :class="{ 'p-invalid': errors.name }"
-            v-tooltip.top="errors.name" />
-          <InputText placeholder="Domain" v-bind="domain" type="text" :class="{ 'p-invalid': errors.domain }"
-            v-tooltip.top="errors.domain" />
+          <InputText
+            placeholder="Zone Name"
+            v-bind="name"
+            type="text"
+            :class="{ 'p-invalid': errors.name }"
+            v-tooltip.top="errors.name"
+          />
+          <InputText
+            placeholder="Domain"
+            v-bind="domain"
+            type="text"
+            :class="{ 'p-invalid': errors.domain }"
+            v-tooltip.top="errors.domain"
+          />
           <div class="flex gap-3 items-center">
             <label for="">Active</label>
-            <InputSwitch v-bind="isActive" v-model="isActive.value" :class="{ 'p-invalid': errors.isActive }" />
+            <InputSwitch
+              v-bind="isActive"
+              v-model="isActive.value"
+              :class="{ 'p-invalid': errors.isActive }"
+            />
           </div>
         </template>
       </EditFormBlock>
     </TabPanel>
     <TabPanel header="Records">
-      <ListTableBlock 
+      <ListTableBlock
         pageTitle="Records"
         addButtonLabel="Add Record"
-        createPagePath="/"
+        :createPagePath="`${intelligentDNSID}/records/create`"
         editPagePath="/"
         :columns="recordListColumns"
-        :listService="()=>[]" 
-        :deleteService="()=> true"
+        :listService="listRecordsServiceIntelligentDNSDecorator"
+        :deleteService="deleteRecordsServiceIntelligentDNSDecorator"
       />
     </TabPanel>
   </TabView>
+  <router-view></router-view>
 </template>
   
 <script>
@@ -35,10 +55,11 @@ import EditFormBlock from '@/templates/edit-form-block'
 import ListTableBlock from '@templates/list-table-block'
 import TabView from 'primevue/tabview'
 import TabPanel from 'primevue/tabpanel'
-import InputText from 'primevue/inputtext';
-import InputSwitch from 'primevue/inputswitch';
-import { useForm } from 'vee-validate';
-import * as yup from 'yup';
+import InputText from 'primevue/inputtext'
+import InputSwitch from 'primevue/inputswitch'
+import { useForm } from 'vee-validate'
+import * as yup from 'yup'
+import { ref } from 'vue'
 
 export default {
   name: 'edit-intelligent-dns-view',
@@ -48,35 +69,38 @@ export default {
     TabPanel,
     InputText,
     InputSwitch,
-    ListTableBlock,
+    ListTableBlock
   },
 
   props: {
     loadIntelligentDNSService: { type: Function, required: true },
-    editIntelligentDNSService: { type: Function, required: true }
+    editIntelligentDNSService: { type: Function, required: true },
+    listRecordsService: { type: Function, required: true },
+    deleteRecordsService: { type: Function, required: true }
   },
 
   data: () => {
     const validationSchema = yup.object({
       name: yup.string().required(),
-      domain: yup.string().required().test(
-        'valid-domain',
-        'Invalid domain',
-        function (value) {
-          const domainRegex = /^(?:[-A-Za-z0-9]+\.)+[A-Za-z]{2,6}$/;
-          return domainRegex.test(value);
-        }
-      ),
-      isActive: yup.boolean().required(),
-    });
+      domain: yup
+        .string()
+        .required()
+        .test('valid-domain', 'Invalid domain', function (value) {
+          const domainRegex = /^(?:[-A-Za-z0-9]+\.)+[A-Za-z]{2,6}$/
+          return domainRegex.test(value)
+        }),
+      isActive: yup.boolean().required()
+    })
 
     const { errors, defineInputBinds, meta, values, setValues } = useForm({
-      validationSchema,
+      validationSchema
     })
 
     const name = defineInputBinds('name', { validateOnInput: true })
     const domain = defineInputBinds('domain', { validateOnInput: true })
     const isActive = defineInputBinds('isActive')
+
+    const intelligentDNSID = ref(0)
 
     return {
       errors,
@@ -88,15 +112,15 @@ export default {
       setValues,
       recordListColumns: [
         {
-          field: 'recordName',
+          field: 'name',
           header: 'Name'
         },
         {
-          field: 'recordType',
+          field: 'type',
           header: 'Type'
         },
         {
-          field: 'recordValue',
+          field: 'value',
           header: 'Value'
         },
         {
@@ -114,11 +138,26 @@ export default {
         {
           field: 'description',
           header: 'Description'
-        },
-      ]
+        }
+      ],
+      intelligentDNSID
     }
   },
+
+  created() {
+    this.intelligentDNSID = this.$route.params.id
+  },
+
+  methods: {
+    async listRecordsServiceIntelligentDNSDecorator(payload) {
+      return await this.listRecordsService({ ...payload, id: this.intelligentDNSID })
+    },
+    async deleteRecordsServiceIntelligentDNSDecorator(recordID) {
+      return await this.deleteRecordsService({
+        recordID: recordID,
+        intelligentDNSID: this.intelligentDNSID
+      })
+    }
+  }
 }
-
-
 </script>
