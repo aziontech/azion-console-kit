@@ -32,14 +32,14 @@ jobs:
 
       - name: Define application settings
         run: >
-            export SETTINGS=($(jq
+            SETTINGS=$(jq
             --arg funcid ${{secrets.FUNCTION_ID}} 
             --arg appid ${{secrets.APPLICATION_ID}} 
             --arg domainid ${{secrets.DOMAIN_ID}} 
             '.function.id = ($funcid|tonumber)
             | .application.id = ($appid|tonumber)
             | .domain.id = ($domainid|tonumber)'
-            azion/azion.json))
+            azion/azion.json)
 
       - name: Save application settings
         run: echo $SETTINGS > azion/azion.json
