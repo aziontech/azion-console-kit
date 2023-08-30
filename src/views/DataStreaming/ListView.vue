@@ -10,6 +10,10 @@ export default {
     listDataStreamingService: {
       required: true,
       type: Function,
+    },
+    deleteDataStreamingService: {
+      required: true,
+      type: Function,
     }
   }
 }
@@ -22,6 +26,7 @@ export default {
     :createPagePath="'/data-streaming/create'"
     :editPagePath="'/data-streaming/edit'" 
     :listService="listDataStreamingService" 
+    :deleteService="deleteDataStreamingService"
     :columns="[
       {
         field: 'name',
