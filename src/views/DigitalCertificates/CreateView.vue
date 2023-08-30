@@ -84,7 +84,7 @@
 
           <label>Private key:</label>
           <PrimeTextarea
-            v-bind="privateKey"
+            v-model="privateKey"
             :class="{ 'p-invalid': errors.privateKey }"
             v-tooltip.top="errors.privateKey"
             placeholder="---BEGIN PRIVATE KEY---"
@@ -207,6 +207,7 @@ support.example.com"
       </template>
     </template>
   </CreateFormBlock>
+
 </template>
 
 <script>
@@ -312,7 +313,7 @@ export default {
 
         // Edge Certificate values
         certificate: '',
-        privateKey: '',
+        privateKey: undefined,
 
         // CSR values
         common: '',
@@ -331,7 +332,7 @@ export default {
       validateOnInput: true
     })
     const certificate = defineComponentBinds('certificate', { validateOnInput: true })
-    const privateKey = defineComponentBinds('privateKey')
+    const { value: privateKey, setValue: setPrivateKeyValue } = useField('privateKey')
 
     // CSR Binds
     const common = defineInputBinds('common', { validateOnInput: true })
@@ -358,13 +359,19 @@ export default {
       if (isGenerateCSR && isEdgeCertificate) {
         createServiceBySelectedType.value = createCSR
       }
+
+      if (!isEdgeCertificate) setPrivateKeyValue(undefined)
+    })
+
+    watch(privateKey, (privateKeyValue) => {
+      if (privateKeyValue === '') setPrivateKeyValue(undefined)
     })
 
     return {
       createServiceBySelectedType,
+      values,
       meta,
       errors,
-      values,
       resetForm,
       common,
       country,
