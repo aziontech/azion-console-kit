@@ -62,7 +62,7 @@
         type="text"
         :class="{ 'p-invalid': errors.weight }"
         v-tooltip.top="errors.weight"
-        v-if="selectedPolicy === 'weighted'"
+        v-if="isWeightedPolicy"
       />
       <InputText
         placeholder="Description:"
@@ -70,7 +70,7 @@
         type="text"
         :class="{ 'p-invalid': errors.description }"
         v-tooltip.top="errors.description"
-        v-if="selectedPolicy === 'weighted'"
+        v-if="isWeightedPolicy"
       />
     </template>
   </CreateFormBlock>
@@ -146,7 +146,10 @@ const weight = defineInputBinds('weight', { validateOnInput: true })
 const description = defineInputBinds('description', { validateOnInput: true })
 
 let formValues = { ...values, selectedRecordType, selectedPolicy }
-watch([selectedRecordType, values], () => {
+let isWeightedPolicy = false
+
+watch([selectedRecordType, selectedPolicy, values], () => {
   formValues = { ...values, selectedRecordType, selectedPolicy }
+  isWeightedPolicy = selectedPolicy.value === 'weighted'
 })
 </script>
