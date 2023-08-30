@@ -210,6 +210,7 @@ const router = createRouter({
             editIntelligentDNSService: IntelligentDNSService.editIntelligentDNSService,
             loadIntelligentDNSService: IntelligentDNSService.loadIntelligentDNSService,
             listRecordsService: IntelligentDNSRecordsService.listRecordsService,
+            deleteRecordsService: IntelligentDNSRecordsService.deleteRecordsService
           },
           meta: {
             breadCrumbs: [

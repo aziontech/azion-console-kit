@@ -1,5 +1,5 @@
 <template>
-  <TabView @tabClick="changeTab">
+  <TabView>
     <TabPanel header="Main Settings">
       <EditFormBlock
         :pageTitle="'Edit Intelligent DNS'"
@@ -43,7 +43,7 @@
         editPagePath="/"
         :columns="recordListColumns"
         :listService="listRecordsServiceIntelligentDNSDecorator"
-        :deleteService="() => true"
+        :deleteService="deleteRecordsServiceIntelligentDNSDecorator"
       />
     </TabPanel>
   </TabView>
@@ -75,7 +75,8 @@ export default {
   props: {
     loadIntelligentDNSService: { type: Function, required: true },
     editIntelligentDNSService: { type: Function, required: true },
-    listRecordsService: { type: Function, required: true }
+    listRecordsService: { type: Function, required: true },
+    deleteRecordsService: { type: Function, required: true }
   },
 
   data: () => {
@@ -148,12 +149,14 @@ export default {
   },
 
   methods: {
-    changeTab(e) {
-      console.log(e.index)
-    },
-
     async listRecordsServiceIntelligentDNSDecorator(payload) {
       return await this.listRecordsService({ ...payload, id: this.intelligentDNSID })
+    },
+    async deleteRecordsServiceIntelligentDNSDecorator(recordID) {
+      return await this.deleteRecordsService({
+        recordID: recordID,
+        intelligentDNSID: this.intelligentDNSID
+      })
     }
   }
 }
