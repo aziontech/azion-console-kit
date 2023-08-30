@@ -7,7 +7,6 @@ export const listEdgeServicesService = async ({
   page = 1,
   pageSize = 200
 }) => {
-  console.log('calll')
   const searchParams = makeSearchParams({ orderBy, sort, page, pageSize })
   let httpResponse = await AxiosHttpClientAdapter
     .request({
