@@ -9,12 +9,27 @@ jobs:
   assign-pr:
     runs-on: ubuntu-latest
     steps:
-      - name: Assign PR
-        uses: actions/github-script@v6
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v2
         with:
-          script: |
-            github.issues.addAssignees({
-              issue_number: context.payload.pull_request.number,
-              assignees: [context.payload.pull_request.user.login]
-            })
-          token: ${{ secrets.GITHUB_TOKEN }}
+          node-version: '14'
+
+      - name: Install dependencies
+        run: npm install @actions/github octokit/rest.js
+
+      - name: Assign PR
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          const { context, GitHub } = require('@actions/github');
+          const octokit = new GitHub(process.env.GITHUB_TOKEN);
+
+          octokit.issues.addAssignees({
+            issue_number: context.payload.pull_request.number,
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            assignees: [context.payload.pull_request.user.login],
+          });
