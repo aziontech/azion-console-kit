@@ -374,6 +374,7 @@ const router = createRouter({
       component: () => import('@views/EdgeFirewall/ListView.vue'),
       props: {
         listEdgeFirewallService: EdgeFirewall.listEdgeFirewallService,
+        deleteEdgeFirewallService: EdgeFirewall.deleteEdgeFirewallService,
       },
       meta: {
         breadCrumbs: [

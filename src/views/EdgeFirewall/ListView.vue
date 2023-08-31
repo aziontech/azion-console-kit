@@ -10,6 +10,10 @@ export default {
     listEdgeFirewallService: {
       required: true,
       type: Function,
+    },
+    deleteEdgeFirewallService: {
+      required: true,
+      type: Function,
     }
   }
 }
@@ -21,7 +25,8 @@ export default {
     :addButtonLabel="'Add Rule Set'" 
     :createPagePath="'/edge-firewall/create'"
     :editPagePath="'/edge-firewall/edit'" 
-    :listService="listEdgeFirewallService" 
+    :listService="listEdgeFirewallService"
+    :deleteService="deleteEdgeFirewallService"
     :columns="[
       {
         field: 'name',
