@@ -20,10 +20,10 @@
           header: 'Last modified'
         },
       ]"
-      :pageTitle="'Network List'"
+      :pageTitle="'Network Lists'"
       :addButtonLabel="'Add Network List'"
-      :createPagePath="'network-list/create'"
-      :editPagePath="'network-list/edit'"
+      :createPagePath="'network-lists/create'"
+      :editPagePath="'network-lists/edit'"
     />
   </template>
   

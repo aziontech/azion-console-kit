@@ -224,12 +224,12 @@ const router = createRouter({
       ]
     },
     {
-      path: '/network-list',
-      name: 'network-list',
+      path: '/network-lists',
+      name: 'network-lists',
       children: [
         {
           path: '',
-          name: 'list-network-list',
+          name: 'list-network-lists',
           component: () => import('@/views/NetworkList/ListView.vue'),
           props: {
             listNetworkListService: NetworkListService.listNetworkListService,
@@ -238,8 +238,8 @@ const router = createRouter({
           meta: {
             breadCrumbs: [
               {
-                label: 'Network List',
-                to: '/network-list'
+                label: 'Network Lists',
+                to: '/network-lists'
               }
             ]
           }
@@ -255,12 +255,33 @@ const router = createRouter({
           meta: {
             breadCrumbs: [
               {
-                label: 'Network List',
-                to: '/network-list'
+                label: 'Network Lists',
+                to: '/network-lists'
               },
               {
                 label: 'Create Network',
-                to: '/network-list/create'
+                to: '/network-lists/create'
+              }
+            ]
+          }
+        },
+        {
+          path: 'edit/:id',
+          name: 'edit-network-list',
+          component: () => import('@/views/NetworkList/EditView.vue'),
+          props: {
+            editNetworkListsService: NetworkListService.editNetworkListService,
+            loadNetworkListsService: NetworkListService.loadNetworkListService,
+            listCountriesService: NetworkListService.listCountriesService,
+          },
+          meta: {
+            breadCrumbs: [
+              {
+                label: 'Network Lists',
+                to: '/network-lists'
+              },
+              {
+                label: 'Edit Network',
               }
             ]
           }

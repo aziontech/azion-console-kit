@@ -147,7 +147,7 @@ export default {
         },
         {
           label: 'Network Lists',
-          to: '/network-list',
+          to: '/network-lists',
           icon: 'pi-globe',
           showDivider: true,
         }
