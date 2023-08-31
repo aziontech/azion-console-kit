@@ -2,7 +2,7 @@ import { createRouter, createWebHistory } from 'vue-router'
 import * as VariablesService from '@services/variables-services'
 import * as IntelligentDNSService from '@services/intelligent-dns-services'
 import * as DigitalCertificatesService from '@services/digital-certificates'
-import * as NetworkListService from '@services/network-list-services'
+import * as NetworkListsService from '@services/network-lists-services'
 import * as EdgeFirewall from '@services/edge-firewall'
 import * as EdgeFunctionsService from '@services/edge-functions'
 import * as DataStreamingService from '@services/data-streaming'
@@ -258,22 +258,22 @@ const router = createRouter({
       ]
     },
     {
-      path: '/network-list',
-      name: 'network-list',
+      path: '/network-lists',
+      name: 'network-lists',
       children: [
         {
           path: '',
           name: 'list-network-list',
-          component: () => import('@views/NetworkList/ListView.vue'),
+          component: () => import('@views/NetworkLists/ListView.vue'),
           props: {
-            listNetworkListService: NetworkListService.listNetworkListService,
-            deleteNetworkListService: NetworkListService.deleteNetworkListService,
+            listNetworkListService: NetworkListsService.listNetworkListService,
+            deleteNetworkListService: NetworkListsService.deleteNetworkListService,
           },
           meta: {
             breadCrumbs: [
               {
                 label: 'Network Lists',
-                to: '/network-list'
+                to: '/network-lists'
               }
             ]
           }
@@ -283,18 +283,18 @@ const router = createRouter({
           name: 'create-network-list',
           component: () => import('@views/NetworkList/CreateView.vue'),
           props: {
-            createNetworkListService: NetworkListService.createNetworkListService,
-            listCountriesService: NetworkListService.listCountriesService
+            createNetworkListService: NetworkListsService.createNetworkListService,
+            listCountriesService: NetworkListsService.listCountriesService
           },
           meta: {
             breadCrumbs: [
               {
                 label: 'Network Lists',
-                to: '/network-list'
+                to: '/network-lists'
               },
               {
                 label: 'Create Network',
-                to: '/network-list/create'
+                to: '/network-lists/create'
               }
             ]
           }
