@@ -302,7 +302,7 @@ const router = createRouter({
         {
           path: 'edit/:id',
           name: 'edit-network-list',
-          component: () => import('@/views/NetworkLists/EditView.vue'),
+          component: () => import('@views/NetworkLists/EditView.vue'),
           props: {
             editNetworkListsService: NetworkListsService.editNetworkListService,
             loadNetworkListsService: NetworkListsService.loadNetworkListService,
