@@ -1,5 +1,5 @@
 <template>
-  <TabView>
+  <TabView :activeIndex="activeTab" @tab-click="changeRouter">
     <TabPanel header="Main Settings">
       <EditFormBlock
         :pageTitle="'Edit Intelligent DNS'"
@@ -39,7 +39,7 @@
       <ListTableBlock
         pageTitle="Records"
         addButtonLabel="Add Record"
-        :createPagePath="`${intelligentDNSID}/records/create`"
+        :createPagePath="`records/create`"
         editPagePath="/"
         :columns="recordListColumns"
         :listService="listRecordsServiceIntelligentDNSDecorator"
@@ -102,6 +102,8 @@ export default {
 
     const intelligentDNSID = ref(0)
 
+    let activeTab = ref(1)
+
     return {
       errors,
       meta,
@@ -140,7 +142,8 @@ export default {
           header: 'Description'
         }
       ],
-      intelligentDNSID
+      intelligentDNSID,
+      activeTab
     }
   },
 
@@ -157,6 +160,16 @@ export default {
         recordID: recordID,
         intelligentDNSID: this.intelligentDNSID
       })
+    },
+    changeRouter(e) {
+      if (e.index === 0) {
+        this.$router.push({ name: 'edit-intelligent-dns', params: { id: this.intelligentDNSID } })
+      } else {
+        this.$router.push({
+          name: 'edit-intelligent-dns-records',
+          params: { id: this.intelligentDNSID }
+        })
+      }
     }
   }
 }
