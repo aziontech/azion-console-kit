@@ -356,6 +356,7 @@ const router = createRouter({
           component: () => import('@views/EdgeServices/ListView.vue'),
           props: {
             listEdgeServicesService: EdgeServicesService.listEdgeServicesService,
+            deleteEdgeServicesService: EdgeServicesService.deleteEdgeServicesService,
           },
           meta: {
             breadCrumbs: [
