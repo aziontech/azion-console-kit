@@ -22,8 +22,6 @@ const adapt = (httpResponse, id) => {
       itemsValues: httpResponse.body.results.items_values,
       lastModified:  new Intl.DateTimeFormat('us', { dateStyle: 'full',timeStyle: 'short' }).format(new Date(httpResponse.body.results.last_modified)),
     }
-
-    console.log(networkList);
   
     return {
       body: networkList,

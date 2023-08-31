@@ -3,7 +3,6 @@ import { makeVariablesBaseUrl } from "./make-variables-base-url";
 
 export const editVariableService = async (payload) => {
   const parsedPayload = adapt(payload)
-  console.log(payload);
   let httpResponse = await AxiosHttpClientAdapter
     .request({
       url: `${makeVariablesBaseUrl()}/${payload.id}`,
