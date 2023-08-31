@@ -1,11 +1,17 @@
 import { AxiosHttpClientAdapter, parseHttpResponse } from '../axios/AxiosHttpClientAdapter'
 import { makeDigitalCertificatesBaseUrl } from './make-digital-certificates-base-url'
-export const listDigitalCertificatesService = async ({ page = 1, pageSize = 10 }) => {
-  const searchParams = makeSearchParams({ page, pageSize })
-  let httpResponse = await AxiosHttpClientAdapter.request({
-    url: `${makeDigitalCertificatesBaseUrl()}?${searchParams.toString()}`,
-    method: 'GET'
-  })
+export const listDigitalCertificatesService = async ({
+  orderBy = 'name',
+  sort = 'asc',
+  page = 1,
+  pageSize = 200
+}) => {
+  const searchParams = makeSearchParams({ orderBy, sort, page, pageSize })
+  let httpResponse = await AxiosHttpClientAdapter
+    .request({
+      url: `${makeDigitalCertificatesBaseUrl()}?${searchParams.toString()}`,
+      method: 'GET',
+    })
 
   httpResponse = adapt(httpResponse)
 
@@ -31,10 +37,12 @@ const adapt = (httpResponse) => {
   }
 }
 
-const makeSearchParams = ({ page, pageSize }) => {
-  const searchParams = new URLSearchParams()
-  searchParams.set('page', page)
-  searchParams.set('page_size', pageSize)
+const makeSearchParams = ({ orderBy, sort, page, pageSize }) => {
+  const searchParams = new URLSearchParams();
+  searchParams.set('order_by', orderBy);
+  searchParams.set('sort', sort);
+  searchParams.set('page', page);
+  searchParams.set('page_size', pageSize);
 
-  return searchParams
+  return searchParams;
 }
