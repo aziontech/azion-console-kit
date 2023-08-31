@@ -9,11 +9,10 @@ export const listEdgeFirewallService = async ({
   pageSize = 200
 }) => {
   const searchParams = makeSearchParams({ orderBy, sort, page, pageSize })
-  let httpResponse = await AxiosHttpClientAdapter
-    .request({
-      url: `${makeEdgeFirewallBaseUrl()}?${searchParams.toString()}`,
-      method: 'GET',
-    })
+  let httpResponse = await AxiosHttpClientAdapter.request({
+    url: `${makeEdgeFirewallBaseUrl()}?${searchParams.toString()}`,
+    method: 'GET'
+  })
 
   httpResponse = await adapt(httpResponse)
 
@@ -72,11 +71,11 @@ const adapt = async (httpResponse) => {
 }
 
 const makeSearchParams = ({ orderBy, sort, page, pageSize }) => {
-  const searchParams = new URLSearchParams();
-  searchParams.set('order_by', orderBy);
-  searchParams.set('sort', sort);
-  searchParams.set('page', page);
-  searchParams.set('page_size', pageSize);
+  const searchParams = new URLSearchParams()
+  searchParams.set('order_by', orderBy)
+  searchParams.set('sort', sort)
+  searchParams.set('page', page)
+  searchParams.set('page_size', pageSize)
 
-  return searchParams;
+  return searchParams
 }
