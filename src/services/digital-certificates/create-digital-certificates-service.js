@@ -12,7 +12,6 @@ export const createDigitalCertificatesService = async (payload) => {
     return parseHttpResponse(httpResponse);
   }
 
-
 const adapt = (payload) => {
   return {
     name: payload.digitalCertificateName,
