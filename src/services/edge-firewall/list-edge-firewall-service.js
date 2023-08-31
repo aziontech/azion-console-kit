@@ -2,10 +2,16 @@ import { AxiosHttpClientAdapter, parseHttpResponse } from "../axios/AxiosHttpCli
 import { makeEdgeFirewallBaseUrl } from "./make-edge-firewall-base-url";
 import { makeDomainsBaseUrl } from '../domains-services/make-domains-base-url'
 
-export const listEdgeFirewallService = async () => {
+export const listEdgeFirewallService = async ({
+  orderBy = 'name',
+  sort = 'asc',
+  page = 1,
+  pageSize = 200
+}) => {
+  const searchParams = makeSearchParams({ orderBy, sort, page, pageSize })
   let httpResponse = await AxiosHttpClientAdapter
     .request({
-      url: `${makeEdgeFirewallBaseUrl()}`,
+      url: `${makeEdgeFirewallBaseUrl()}?${searchParams.toString()}`,
       method: 'GET',
     })
 
@@ -63,4 +69,14 @@ const adapt = async (httpResponse) => {
     body: parsedEdgeFirewalls,
     statusCode: httpResponse.statusCode
   }
+}
+
+const makeSearchParams = ({ orderBy, sort, page, pageSize }) => {
+  const searchParams = new URLSearchParams();
+  searchParams.set('order_by', orderBy);
+  searchParams.set('sort', sort);
+  searchParams.set('page', page);
+  searchParams.set('page_size', pageSize);
+
+  return searchParams;
 }

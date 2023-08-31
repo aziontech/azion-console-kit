@@ -1,10 +1,16 @@
 import { AxiosHttpClientAdapter, parseHttpResponse } from "../axios/AxiosHttpClientAdapter";
 import { makeEdgeApplicationBaseUrl } from "./make-edge-application-base-url";
 
-export const listEdgeApplicationsService = async ({ page }) => {
+export const listEdgeApplicationsService = async ({
+  orderBy = 'name',
+  sort = 'asc',
+  page = 1,
+  pageSize = 200
+}) => {
+  const searchParams = makeSearchParams({ orderBy, sort, page, pageSize })
   let httpResponse = await AxiosHttpClientAdapter
     .request({
-      url: `${makeEdgeApplicationBaseUrl()}?page=${page}`,
+      url: `${makeEdgeApplicationBaseUrl()}?${searchParams.toString()}`,
       method: 'GET',
     })
 
@@ -12,8 +18,6 @@ export const listEdgeApplicationsService = async ({ page }) => {
 
   return parseHttpResponse(httpResponse)
 }
-
-
 
 const adapt = (httpResponse) => {
   const parsedEdgeApplications = httpResponse.body.results?.map((edgeApplication) => {
@@ -34,4 +38,14 @@ const adapt = (httpResponse) => {
     body: parsedEdgeApplications,
     statusCode: httpResponse.statusCode,
   }
+}
+
+const makeSearchParams = ({ orderBy, sort, page, pageSize }) => {
+  const searchParams = new URLSearchParams();
+  searchParams.set('order_by', orderBy);
+  searchParams.set('sort', sort);
+  searchParams.set('page', page);
+  searchParams.set('page_size', pageSize);
+
+  return searchParams;
 }
