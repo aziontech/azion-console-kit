@@ -1,3 +1,3 @@
-export const makeEdgeServicesBaseUrl = ()=>{
+export const makeEdgeServicesBaseUrl = () => {
   return `edge_services`
 }

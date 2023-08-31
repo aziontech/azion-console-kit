@@ -1,3 +1,3 @@
-export const makeIntelligentDNSBaseUrl = ()=>{
+export const makeIntelligentDNSBaseUrl = () => {
   return `intelligent_dns`
 }

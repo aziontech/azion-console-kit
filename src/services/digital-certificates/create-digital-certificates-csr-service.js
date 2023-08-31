@@ -1,16 +1,15 @@
-import { AxiosHttpClientAdapter, parseHttpResponse } from '../axios/AxiosHttpClientAdapter';
-import { makeDigitalCertificatesBaseUrl } from './make-digital-certificates-base-url';
+import { AxiosHttpClientAdapter, parseHttpResponse } from '../axios/AxiosHttpClientAdapter'
+import { makeDigitalCertificatesBaseUrl } from './make-digital-certificates-base-url'
 
 export const createDigitalCertificatesCSRService = async (payload) => {
-    let httpResponse = await AxiosHttpClientAdapter
-      .request({
-        url: `${makeDigitalCertificatesBaseUrl()}/csr`,
-        method: 'POST',
-        body: adapt(payload),
-      })
+  let httpResponse = await AxiosHttpClientAdapter.request({
+    url: `${makeDigitalCertificatesBaseUrl()}/csr`,
+    method: 'POST',
+    body: adapt(payload)
+  })
 
-    return parseHttpResponse(httpResponse);
-  }
+  return parseHttpResponse(httpResponse)
+}
 
 const adapt = (payload) => {
   return {
@@ -23,6 +22,6 @@ const adapt = (payload) => {
     email: payload.email,
     organization_unity: payload.organizationUnity,
     private_key_type: 'rsa_2048',
-    sans: payload.subjectAlternativeNames?.split('\n'),
+    sans: payload.subjectAlternativeNames?.split('\n')
   }
 }

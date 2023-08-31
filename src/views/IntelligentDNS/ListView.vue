@@ -14,7 +14,7 @@
       {
         field: 'isActive',
         header: 'Active'
-      },
+      }
     ]"
     :pageTitle="'Intelligent DNS'"
     :addButtonLabel="'Add Intelligent DNS'"
@@ -34,12 +34,12 @@ export default {
   props: {
     listIntelligentDNSService: {
       required: true,
-      type: Function,
+      type: Function
     },
     deleteIntelligentDNSService: {
       required: true,
-      type: Function,
-    },
+      type: Function
+    }
   }
 }
 </script>

@@ -1,27 +1,25 @@
-import { AxiosHttpClientAdapter, parseHttpResponse } from "../axios/AxiosHttpClientAdapter";
-import { makeEdgeFirewallBaseUrl } from "./make-edge-firewall-base-url";
+import { AxiosHttpClientAdapter, parseHttpResponse } from '../axios/AxiosHttpClientAdapter'
+import { makeEdgeFirewallBaseUrl } from './make-edge-firewall-base-url'
 import { makeDomainsBaseUrl } from '../domains-services/make-domains-base-url'
 
 export const listEdgeFirewallService = async () => {
-  let httpResponse = await AxiosHttpClientAdapter
-    .request({
-      url: `${makeEdgeFirewallBaseUrl()}`,
-      method: 'GET',
-    })
+  let httpResponse = await AxiosHttpClientAdapter.request({
+    url: `${makeEdgeFirewallBaseUrl()}`,
+    method: 'GET'
+  })
 
-  httpResponse = await adapt(httpResponse);
+  httpResponse = await adapt(httpResponse)
 
   return parseHttpResponse(httpResponse)
 }
 
 const getDomainById = async ({ id }) => {
-  let httpResponse = await AxiosHttpClientAdapter
-    .request({
-      url: `${makeDomainsBaseUrl()}/${id}`,
-      method: 'GET',
-    })
+  let httpResponse = await AxiosHttpClientAdapter.request({
+    url: `${makeDomainsBaseUrl()}/${id}`,
+    method: 'GET'
+  })
 
-  httpResponse = adaptDomains(httpResponse);
+  httpResponse = adaptDomains(httpResponse)
 
   return parseHttpResponse(httpResponse)
 }
@@ -34,7 +32,6 @@ const adaptDomains = (httpResponse) => {
 }
 
 const adapt = async (httpResponse) => {
-
   /***************************************************
    * @todo: API should be deliver this results as BFF
    ***************************************************/
@@ -52,9 +49,11 @@ const adapt = async (httpResponse) => {
         id: edgeFirewall.id,
         name: edgeFirewall.name,
         lastEditor: edgeFirewall.last_editor,
-        lastModify: new Intl.DateTimeFormat('us', { dateStyle: 'full' }).format(new Date(edgeFirewall.last_modified)),
+        lastModify: new Intl.DateTimeFormat('us', { dateStyle: 'full' }).format(
+          new Date(edgeFirewall.last_modified)
+        ),
         domainsList: domainsList.join('<br>'),
-        active: edgeFirewall.active ? 'Yes' : 'No',
+        active: edgeFirewall.active ? 'Yes' : 'No'
       }
     })
   )
