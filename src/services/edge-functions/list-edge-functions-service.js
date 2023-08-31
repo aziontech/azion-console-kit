@@ -21,7 +21,7 @@ export const listEdgeFunctionsService = async ({
 const adapt = (httpResponse) => {
   const parsedEdgeFunctions = httpResponse.body.results?.map((edgeFunction) => {
     return {
-      active: edgeFunction.active ? 'active' : 'disabled',
+      active: edgeFunction.active ? 'Yes' : 'No',
       version: edgeFunction.version || '-',
       language: edgeFunction.language,
       initiatorType: edgeFunction.initiator_type,
