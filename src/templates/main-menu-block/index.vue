@@ -89,11 +89,6 @@ export default {
           icon: 'pi-home'
         },
         {
-          label: 'Marketplace',
-          to: '/marketplace',
-          icon: 'pi-shopping-cart'
-        },
-        {
           label: 'Domains',
           to: '/domains',
           icon: 'pi-globe',

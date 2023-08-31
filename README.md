@@ -105,7 +105,7 @@ yarn test:e2e
 yarn lint
 ```
 
-### Deploy
+### Deploy manual (First deploy)
 Para executar o deploy você pode utilizar o Azion CLI:
 
 Azion CLI (>= 0.70.0):
@@ -117,6 +117,15 @@ azioncli edge_applications init --name azion-platform-kit --type vue --mode deli
 azioncli edge_applications publish --debug
 
 ```
+### Deploy com GitHub Workflow
+Para usufruir do GitHub Workflow você precisa ter configurado dentro do seu repositório as seguintes SECRETS:
+- PLATFORM_KIT_TOKEN: seu Personal token da Azion para ser utilizado no CLI durante o deploy.
+- APPLICATION_ID: ID da Edge Application criada anteriormente via first deploy.
+- FUNCTION_ID: ID da Edge Function criada anteriormente via first deploy.
+- DOMAIN_ID: ID do Domain vinculado a Edge Application criado anteriormente via first deploy.
+
+---
+<font color=#ff9900>* As informações sobre os ID's necessários para os SECRETS estarão disponíveis dentro do arquivo ```azion/azion.json``` após o first deploy.</font>
 
 ### Issues conhecidas na versão 0.7.0 da azioncli
 Devido à incompatibilidades com o vite na versão atual da azioncli os problemas abaixo podem ocorrer:
