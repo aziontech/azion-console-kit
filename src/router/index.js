@@ -281,7 +281,7 @@ const router = createRouter({
         {
           path: 'create',
           name: 'create-network-list',
-          component: () => import('@views/NetworkList/CreateView.vue'),
+          component: () => import('@views/NetworkLists/CreateView.vue'),
           props: {
             createNetworkListService: NetworkListsService.createNetworkListService,
             listCountriesService: NetworkListsService.listCountriesService
