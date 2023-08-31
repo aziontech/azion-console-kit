@@ -1,6 +1,7 @@
 <template>
   <ListTableBlock 
   :listService="listEdgeServicesService"
+  :deleteService="deleteEdgeServicesService"
   :columns="[
     {
       field: 'name',
@@ -37,6 +38,10 @@ export default {
   },
   props: {
     listEdgeServicesService: {
+      required: true,
+      type: Function,
+    },
+    deleteEdgeServicesService: {
       required: true,
       type: Function,
     }
