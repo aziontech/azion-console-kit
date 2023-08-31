@@ -1,10 +1,12 @@
 import { AxiosHttpClientAdapter, parseHttpResponse } from "../axios/AxiosHttpClientAdapter";
 import { makeDigitalCertificatesBaseUrl } from './make-digital-certificates-base-url'
 export const listDigitalCertificatesService = async ({
+  orderBy = 'name',
+  sort = 'asc',
   page = 1,
-  pageSize = 10
+  pageSize = 200
 }) => {
-  const searchParams = makeSearchParams({ page, pageSize })
+  const searchParams = makeSearchParams({ orderBy, sort, page, pageSize })
   let httpResponse = await AxiosHttpClientAdapter
     .request({
       url: `${makeDigitalCertificatesBaseUrl()}?${searchParams.toString()}`,
@@ -35,8 +37,10 @@ const adapt = (httpResponse) => {
   }
 }
 
-const makeSearchParams = ({ page, pageSize }) => {
+const makeSearchParams = ({ orderBy, sort, page, pageSize }) => {
   const searchParams = new URLSearchParams();
+  searchParams.set('order_by', orderBy);
+  searchParams.set('sort', sort);
   searchParams.set('page', page);
   searchParams.set('page_size', pageSize);
 

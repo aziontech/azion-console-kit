@@ -1,12 +1,12 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import * as VariablesService from '@services/variables-services'
 import * as IntelligentDNSService from '@services/intelligent-dns-services'
-import * as DigitalCertificatesService from '@services/digital-certificates'
+import * as DigitalCertificatesService from '@services/digital-certificates-services'
 import * as NetworkListsService from '@services/network-lists-services'
-import * as EdgeFirewall from '@services/edge-firewall'
-import * as EdgeFunctionsService from '@services/edge-functions'
-import * as DataStreamingService from '@services/data-streaming'
-import * as EdgeServicesService from '@services/edge-services'
+import * as EdgeFirewall from '@services/edge-firewall-services'
+import * as EdgeFunctionsService from '@services/edge-functions-services'
+import * as DataStreamingService from '@services/data-streaming-services'
+import * as EdgeServicesService from '@services/edge-services-services'
 import * as EdgeApplicationsService from '@services/edge-application-services'
 import * as DomainServicesService from '@services/domains-services'
 import * as IntelligentDNSRecordsService from '@services/intelligent-dns-records-services'
@@ -281,7 +281,7 @@ const router = createRouter({
         {
           path: 'create',
           name: 'create-network-list',
-          component: () => import('@views/NetworkList/CreateView.vue'),
+          component: () => import('@views/NetworkLists/CreateView.vue'),
           props: {
             createNetworkListService: NetworkListsService.createNetworkListService,
             listCountriesService: NetworkListsService.listCountriesService
