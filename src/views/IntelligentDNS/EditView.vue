@@ -49,7 +49,7 @@
   </TabView>
   <router-view></router-view>
 </template>
-  
+
 <script>
 import EditFormBlock from '@/templates/edit-form-block'
 import ListTableBlock from '@templates/list-table-block'

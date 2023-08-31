@@ -1,3 +1,3 @@
-export const makeDigitalCertificatesBaseUrl = ()=>{
+export const makeDigitalCertificatesBaseUrl = () => {
   return `digital_certificates`
 }

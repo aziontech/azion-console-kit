@@ -1,3 +1,3 @@
-export const makeNetworkListBaseUrl = ()=>{
+export const makeNetworkListBaseUrl = () => {
   return `network_lists`
 }

@@ -14,7 +14,7 @@ export default {
   name: 'shell-block',
   components: {
     FooterBlock,
-    MainMenuBlock,
+    MainMenuBlock
   }
 }
 </script>

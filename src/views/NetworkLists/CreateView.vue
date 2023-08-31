@@ -1,44 +1,69 @@
 <template>
-  <CreateFormBlock :pageTitle="'Create Network Lists'" :createService="createNetworkListService" :formData="values"
-    :isValid="meta.valid" :cleanFormCallback="resetForm">
+  <CreateFormBlock
+    :pageTitle="'Create Network Lists'"
+    :createService="createNetworkListService"
+    :formData="values"
+    :isValid="meta.valid"
+    :cleanFormCallback="resetForm"
+  >
     <template #form>
       <div class="flex flex-col gap-2">
         <label for="name">Name:</label>
-        <InputText placeholder="Add Network List Name" v-bind="name" id="name" type="text"
-          :class="{ 'p-invalid': errors.name }" v-tooltip.top="errors.name" />
+        <InputText
+          placeholder="Add Network List Name"
+          v-bind="name"
+          id="name"
+          type="text"
+          :class="{ 'p-invalid': errors.name }"
+          v-tooltip.top="errors.name"
+        />
       </div>
       <div class="flex flex-col gap-2">
         <label for="type">Type: </label>
-        <Dropdown :class="{ 'p-invalid': errors.networkListType }" v-model="networkListType" :options="options"
-          optionLabel="name" optionValue="value" class="w-full md:w-14rem" />
+        <Dropdown
+          :class="{ 'p-invalid': errors.networkListType }"
+          v-model="networkListType"
+          :options="options"
+          optionLabel="name"
+          optionValue="value"
+          class="w-full md:w-14rem"
+        />
       </div>
       <div class="flex flex-col gap-2" v-if="networkListType === 'asn'">
         <label for="list">List: </label>
         <div class="card flex justify-content-center">
-          <TextareaComponent :class="{ 'p-invalid': errors.ans }" v-bind="asn" rows="5" cols="75" id="list" placeholder="1234&#10;4321" />
+          <TextareaComponent
+            :class="{ 'p-invalid': errors.ans }"
+            v-bind="asn"
+            rows="5"
+            cols="75"
+            id="list"
+            placeholder="1234&#10;4321"
+          />
         </div>
       </div>
       <div class="flex flex-col gap-2" v-if="networkListType === 'ip_cidr'">
         <label for="list">List: </label>
         <div class="card flex justify-content-center">
-          <TextareaComponent 
+          <TextareaComponent
             :class="{ 'p-invalid': errors.ipCidr }"
             v-bind="ipCidr"
             rows="5"
             id="ipCidr"
             cols="75"
-            placeholder="192.168.0.1&#10;192.168.0.2/32&#10;10.1.1.10/16" />
+            placeholder="192.168.0.1&#10;192.168.0.2/32&#10;10.1.1.10/16"
+          />
         </div>
       </div>
       <div class="flex flex-col gap-2" v-if="networkListType === 'countries'">
         <label for="list">Countries: </label>
         <div class="card flex justify-content-center">
-          <MultiSelect  
+          <MultiSelect
             v-model="selectedCountries"
             :options="countriesList"
-            filter 
+            filter
             optionLabel="name"
-            optionValue="value" 
+            optionValue="value"
             placeholder="Select Countries"
             :class="{ 'p-invalid': errors.selectedCountries }"
             class="w-full"
@@ -87,10 +112,10 @@ export default {
 
     const validationSchema = yup.object({
       name: yup.string().required(),
-      networkListType: yup.string().oneOf(options.value.map(option => option.value)),
-      selectedCountries:yup.array().when('networkListType',{
-        is:'countries',
-        then:(schema)=>schema.required().min(1)
+      networkListType: yup.string().oneOf(options.value.map((option) => option.value)),
+      selectedCountries: yup.array().when('networkListType', {
+        is: 'countries',
+        then: (schema) => schema.required().min(1)
       }),
       ipCidr: yup.string().when('networkListType', {
         is: 'ip_cidr',
@@ -99,7 +124,7 @@ export default {
       asn: yup.string().when('networkListType', {
         is: 'asn',
         then: (schema) => schema.required()
-      }),
+      })
     })
 
     const { errors, defineInputBinds, meta, resetForm, values } = useForm({
@@ -110,11 +135,9 @@ export default {
         networkListType: 'asn',
         asn: '',
         ipCidr: '',
-        networkContentList: '',
+        networkContentList: ''
       }
     })
-
-
 
     const countriesList = ref('')
     const fetchCountries = async () => {
@@ -128,26 +151,27 @@ export default {
 
     const { value: networkListType } = useField('networkListType')
     const { value: selectedCountries } = useField('selectedCountries')
-    const { value: networkContentList, setValue: setNetworkContentList } = useField('networkContentList')
+    const { value: networkContentList, setValue: setNetworkContentList } =
+      useField('networkContentList')
 
     const name = defineInputBinds('name', { validateOnInput: true })
     const ipCidr = defineInputBinds('ipCidr', { validateOnInput: true })
     const asn = defineInputBinds('asn', { validateOnInput: true })
 
-    watch([name,networkListType,selectedCountries,ipCidr,asn], () => {
+    watch([name, networkListType, selectedCountries, ipCidr, asn], () => {
       switch (networkListType.value) {
         case 'countries':
           setNetworkContentList(selectedCountries.value)
-          break;
+          break
         case 'ip_cidr':
           setNetworkContentList(ipCidr.value.value.trim().split('\n'))
-          break;
+          break
         case 'asn':
           setNetworkContentList(asn.value.value.trim().split('\n'))
-          break;
+          break
         default:
           setNetworkContentList('')
-          break;
+          break
       }
     })
 

@@ -1,3 +1,3 @@
-export const makeEdgeFunctionsBaseUrl = ()=>{
+export const makeEdgeFunctionsBaseUrl = () => {
   return `edge_functions`
 }

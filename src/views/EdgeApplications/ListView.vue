@@ -1,4 +1,4 @@
-<script >
+<script>
 import ListTableBlock from '@/templates/list-table-block'
 
 export default {
@@ -9,11 +9,11 @@ export default {
   props: {
     listEdgeApplicationsService: {
       required: true,
-      type: Function,
+      type: Function
     },
     deleteEdgeApplicationService: {
       required: true,
-      type: Function,
+      type: Function
     }
   }
 }
@@ -21,12 +21,12 @@ export default {
 
 <template>
   <ListTableBlock
-    :pageTitle="'Edge Applications'" 
+    :pageTitle="'Edge Applications'"
     :addButtonLabel="'Add Edge Application'"
-    :createPagePath="'/edge-applications/create'" 
+    :createPagePath="'/edge-applications/create'"
     :editPagePath="'/edge-applications/edit'"
-    :listService="listEdgeApplicationsService" 
-    :deleteService="deleteEdgeApplicationService" 
+    :listService="listEdgeApplicationsService"
+    :deleteService="deleteEdgeApplicationService"
     :columns="[
       {
         field: 'name',
@@ -51,7 +51,7 @@ export default {
       {
         field: 'origins',
         header: 'Origins'
-      },
-    ]"></ListTableBlock>
+      }
+    ]"
+  ></ListTableBlock>
 </template>
-
