@@ -310,6 +310,7 @@ const router = createRouter({
           name: 'list-edge-functions',
           component: () => import('@views/EdgeFunctions/ListView.vue'),
           props: {
+            deleteEdgeFunctionsService: EdgeFunctionsService.deleteEdgeFunctionsService,
             listEdgeFunctionsService: EdgeFunctionsService.listEdgeFunctionsService,
           },
           meta: {

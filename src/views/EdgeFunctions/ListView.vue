@@ -1,6 +1,7 @@
 <template>
   <ListTableBlock 
   :listService="listEdgeFunctionsService"
+  :deleteService="deleteEdgeFunctionsService"
   :columns="[
     {
       field: 'name',
@@ -42,7 +43,6 @@
   />
 </template>
 
-
 <script >
 import ListTableBlock from '@/templates/list-table-block'
 
@@ -55,9 +55,11 @@ export default {
     listEdgeFunctionsService: {
       required: true,
       type: Function,
+    },
+    deleteEdgeFunctionsService: {
+      required: true,
+      type: Function,
     }
   }
 }
 </script>
-
-
