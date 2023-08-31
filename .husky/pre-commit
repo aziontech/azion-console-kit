@@ -3,4 +3,4 @@
 
 yarn test:unit
 yarn lint
-yarn build
+yarn format
