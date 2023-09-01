@@ -1,5 +1,5 @@
-import { AxiosHttpClientAdapter, parseHttpResponse } from '../axios/AxiosHttpClientAdapter'
-import { makeIntelligentDNSBaseUrl } from './make-intelligent-dns-base-url'
+import { AxiosHttpClientAdapter, parseHttpResponse } from "../axios/AxiosHttpClientAdapter";
+import { makeIntelligentDNSBaseUrl } from "./make-intelligent-dns-base-url";
 
 export const loadIntelligentDNSService = async ({ id }) => {
   let httpResponse = await AxiosHttpClientAdapter.request({
