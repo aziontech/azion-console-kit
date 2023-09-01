@@ -1,4 +1,4 @@
-<script >
+<script>
 import ListTableBlock from '@/templates/list-table-block'
 
 export default {
@@ -9,23 +9,23 @@ export default {
   props: {
     listDataStreamingService: {
       required: true,
-      type: Function,
+      type: Function
     },
     deleteDataStreamingService: {
       required: true,
-      type: Function,
+      type: Function
     }
   }
 }
 </script>
 
 <template>
-  <ListTableBlock 
-    :pageTitle="'Data Streaming'" 
-    :addButtonLabel="'Add Streaming'" 
+  <ListTableBlock
+    :pageTitle="'Data Streaming'"
+    :addButtonLabel="'Add Streaming'"
     :createPagePath="'/data-streaming/create'"
-    :editPagePath="'/data-streaming/edit'" 
-    :listService="listDataStreamingService" 
+    :editPagePath="'/data-streaming/edit'"
+    :listService="listDataStreamingService"
     :deleteService="deleteDataStreamingService"
     :columns="[
       {
@@ -43,7 +43,7 @@ export default {
       {
         field: 'active',
         header: 'Active'
-      },
-    ]"></ListTableBlock>
+      }
+    ]"
+  ></ListTableBlock>
 </template>
-

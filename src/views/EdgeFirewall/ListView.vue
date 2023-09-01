@@ -1,4 +1,4 @@
-<script >
+<script>
 import ListTableBlock from '@/templates/list-table-block'
 
 export default {
@@ -9,22 +9,22 @@ export default {
   props: {
     listEdgeFirewallService: {
       required: true,
-      type: Function,
+      type: Function
     },
     deleteEdgeFirewallService: {
       required: true,
-      type: Function,
+      type: Function
     }
   }
 }
 </script>
 
 <template>
-  <ListTableBlock 
-    :pageTitle="'Edge Firewall'" 
-    :addButtonLabel="'Add Rule Set'" 
+  <ListTableBlock
+    :pageTitle="'Edge Firewall'"
+    :addButtonLabel="'Add Rule Set'"
     :createPagePath="'/edge-firewall/create'"
-    :editPagePath="'/edge-firewall/edit'" 
+    :editPagePath="'/edge-firewall/edit'"
     :listService="listEdgeFirewallService"
     :deleteService="deleteEdgeFirewallService"
     :columns="[
@@ -47,7 +47,7 @@ export default {
       {
         field: 'active',
         header: 'Active'
-      },
-    ]"></ListTableBlock>
+      }
+    ]"
+  ></ListTableBlock>
 </template>
-

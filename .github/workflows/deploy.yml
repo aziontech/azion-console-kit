@@ -4,6 +4,8 @@ on:
   push:
     branches:
       - main
+env:
+    HUSKY: 0
 
 jobs:
   deploy:

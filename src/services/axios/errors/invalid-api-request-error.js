@@ -1,5 +1,5 @@
-export class InvalidApiRequestError extends Error{
-  constructor(){
+export class InvalidApiRequestError extends Error {
+  constructor() {
     super('Invalid API request')
     this.name = 'InvalidApiRequestError'
   }

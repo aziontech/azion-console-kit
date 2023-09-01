@@ -1,36 +1,36 @@
 <template>
-  <ListTableBlock 
-  :listService="listDigitalCertificatesService"
-  :deleteService="deleteDigitalCertificatesService"
-  :columns="[
-    {
-      field: 'name',
-      header: 'Application Name'
-    },
-    {
-      field: 'subject_name',
-      header: 'Subject Names'
-    },
-    {
-      field: 'issuer',
-      header: 'Issuer'
-    },
-    {
-      field: 'validity',
-      header: 'Validity (not after)'
-    },
-    {
-      field: 'status',
-      header: 'Status'
-    },
-  ]" 
-  :pageTitle="'Digital Certificates'"
-  :addButtonLabel="'Add Certificate'" :createPagePath="'digital-certificates/create'"
+  <ListTableBlock
+    :listService="listDigitalCertificatesService"
+    :deleteService="deleteDigitalCertificatesService"
+    :columns="[
+      {
+        field: 'name',
+        header: 'Application Name'
+      },
+      {
+        field: 'subject_name',
+        header: 'Subject Names'
+      },
+      {
+        field: 'issuer',
+        header: 'Issuer'
+      },
+      {
+        field: 'validity',
+        header: 'Validity (not after)'
+      },
+      {
+        field: 'status',
+        header: 'Status'
+      }
+    ]"
+    :pageTitle="'Digital Certificates'"
+    :addButtonLabel="'Add Certificate'"
+    :createPagePath="'digital-certificates/create'"
   />
 </template>
 
-
-<script >
+<script>
 import ListTableBlock from '@/templates/list-table-block'
 
 export default {
@@ -41,14 +41,12 @@ export default {
   props: {
     listDigitalCertificatesService: {
       required: true,
-      type: Function,
+      type: Function
     },
     deleteDigitalCertificatesService: {
       required: true,
-      type: Function,
-    },
+      type: Function
+    }
   }
 }
 </script>
-
-
