@@ -1,4 +1,4 @@
-import * as DataStreamingService from '@/services/data-streaming-services';
+import * as DataStreamingService from '@/services/data-streaming-services'
 
 /** @type {import('vue-router').RouteRecordRaw} */
 export const dataStreamingRoutes = {
@@ -23,4 +23,4 @@ export const dataStreamingRoutes = {
       }
     }
   ]
-};
+}

@@ -1,4 +1,4 @@
-import * as EdgeFunctionsService from '@/services/edge-functions-services';
+import * as EdgeFunctionsService from '@/services/edge-functions-services'
 
 /** @type {import('vue-router').RouteRecordRaw} */
 export const edgeFunctionsRoutes = {
@@ -23,4 +23,4 @@ export const edgeFunctionsRoutes = {
       }
     }
   ]
-};
+}

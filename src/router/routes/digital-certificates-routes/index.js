@@ -1,4 +1,4 @@
-import * as DigitalCertificatesService from '@/services/digital-certificates-services';
+import * as DigitalCertificatesService from '@/services/digital-certificates-services'
 
 /** @type {import('vue-router').RouteRecordRaw} */
 export const digitalCertificatesRoutes = {
@@ -10,8 +10,7 @@ export const digitalCertificatesRoutes = {
       name: 'list-digital-certificates',
       component: () => import('@views/DigitalCertificates/ListView.vue'),
       props: {
-        listDigitalCertificatesService:
-          DigitalCertificatesService.listDigitalCertificatesService,
+        listDigitalCertificatesService: DigitalCertificatesService.listDigitalCertificatesService,
         deleteDigitalCertificatesService:
           DigitalCertificatesService.deleteDigitalCertificatesService
       },
@@ -48,4 +47,4 @@ export const digitalCertificatesRoutes = {
       }
     }
   ]
-};
+}

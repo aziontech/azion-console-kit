@@ -1,4 +1,4 @@
-import * as NetworkListsService from '@/services/network-lists-services';
+import * as NetworkListsService from '@/services/network-lists-services'
 
 /** @type {import('vue-router').RouteRecordRaw} */
 export const networkListsRoutes = {
@@ -44,4 +44,4 @@ export const networkListsRoutes = {
       }
     }
   ]
-};
+}

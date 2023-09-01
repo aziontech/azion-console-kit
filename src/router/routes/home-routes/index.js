@@ -1,7 +1,7 @@
-import * as EdgeApplicationsService from '@/services/edge-application-services';
+import * as EdgeApplicationsService from '@/services/edge-application-services'
 
 /** @type {import('vue-router').RouteRecordRaw} */
-export const homeRoutes =  {
+export const homeRoutes = {
   path: '/',
   name: 'home',
   component: () => import('@views/EdgeApplications/ListView.vue'),
@@ -17,4 +17,4 @@ export const homeRoutes =  {
       }
     ]
   }
-};
+}

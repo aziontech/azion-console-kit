@@ -1,5 +1,5 @@
-import * as IntelligentDNSService from '@/services/intelligent-dns-services';
-import * as IntelligentDNSRecordsService from '@/services/intelligent-dns-records-services';
+import * as IntelligentDNSService from '@/services/intelligent-dns-services'
+import * as IntelligentDNSRecordsService from '@/services/intelligent-dns-records-services'
 
 /** @type {import('vue-router').RouteRecordRaw} */
 export const intelligentDnsRoutes = {

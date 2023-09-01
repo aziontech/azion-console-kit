@@ -1,4 +1,4 @@
-import * as EdgeApplicationsService from '@/services/edge-application-services';
+import * as EdgeApplicationsService from '@/services/edge-application-services'
 
 /** @type {import('vue-router').RouteRecordRaw} */
 export const edgeApplicationRoutes = {
@@ -17,4 +17,4 @@ export const edgeApplicationRoutes = {
       }
     ]
   }
-};
+}

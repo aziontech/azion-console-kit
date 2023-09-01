@@ -1,4 +1,4 @@
-import * as EdgeFirewall from '@/services/edge-firewall-services';
+import * as EdgeFirewall from '@/services/edge-firewall-services'
 
 /** @type {import('vue-router').RouteRecordRaw} */
 export const edgeFirewallRoutes = {

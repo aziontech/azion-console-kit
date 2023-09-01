@@ -1,4 +1,4 @@
-import * as VariablesService from '@/services/variables-services';
+import * as VariablesService from '@/services/variables-services'
 
 /** @type {import('vue-router').RouteRecordRaw} */
 export const variablesRoutes = {
@@ -63,4 +63,4 @@ export const variablesRoutes = {
       }
     }
   ]
-};
+}

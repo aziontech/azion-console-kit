@@ -1,4 +1,4 @@
-import * as DomainServicesService from '@/services/domains-services';
+import * as DomainServicesService from '@/services/domains-services'
 
 /** @type {import('vue-router').RouteRecordRaw} */
 export const domainsRoutes = {
@@ -17,4 +17,4 @@ export const domainsRoutes = {
       }
     ]
   }
-};
+}
