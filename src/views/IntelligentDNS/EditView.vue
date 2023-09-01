@@ -182,7 +182,6 @@ export default {
 
   watch: {
     domain() {
-      console.log(this.domain)
       this.intelligentDNSStore.domain = this.domain
     }
   }
