@@ -15,7 +15,7 @@
           :class="{ 'p-invalid': errors.name }"
           v-tooltip.top="errors.name"
         />
-        <label for="youdomain">.{{ intelligentDNSStore.domain }}</label>
+        <label for="youdomain">.{{ intelligentDNSStore.domain.value }}</label>
       </div>
 
       <div class="card flex justify-content-center">
