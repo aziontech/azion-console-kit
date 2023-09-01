@@ -1,13 +1,8 @@
 import { AxiosHttpClientAdapter, parseHttpResponse } from '../axios/AxiosHttpClientAdapter'
 import { makeNetworkListBaseUrl } from './make-network-list-base-url'
 
-export const listNetworkListService = async ({
-  orderBy = 'name',
-  sort = 'asc',
-  page = 1,
-  pageSize = 200
-}) => {
-  const searchParams = makeSearchParams({ orderBy, sort, page, pageSize })
+export const listNetworkListService = async ({ page = 1 }) => {
+  const searchParams = makeSearchParams({ page })
   let httpResponse = await AxiosHttpClientAdapter.request({
     url: `${makeNetworkListBaseUrl()}?${searchParams.toString()}`,
     method: 'GET'
@@ -44,12 +39,9 @@ const adapt = (httpResponse) => {
   }
 }
 
-const makeSearchParams = ({ orderBy, sort, page, pageSize }) => {
+const makeSearchParams = ({ page }) => {
   const searchParams = new URLSearchParams()
-  searchParams.set('order_by', orderBy)
-  searchParams.set('sort', sort)
   searchParams.set('page', page)
-  searchParams.set('page_size', pageSize)
 
   return searchParams
 }
