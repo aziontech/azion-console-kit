@@ -35,46 +35,46 @@
 </template>
 
 <script>
-import EditFormBlock from '@/templates/edit-form-block'
-import InputText from 'primevue/inputtext'
-import InputSwitch from 'primevue/inputswitch'
-import { useForm } from 'vee-validate'
-import * as yup from 'yup'
+  import EditFormBlock from '@/templates/edit-form-block'
+  import InputText from 'primevue/inputtext'
+  import InputSwitch from 'primevue/inputswitch'
+  import { useForm } from 'vee-validate'
+  import * as yup from 'yup'
 
-export default {
-  name: 'edit-variable-view',
-  components: {
-    EditFormBlock,
-    InputText,
-    InputSwitch
-  },
-  props: {
-    loadVariableService: { type: Function, required: true },
-    editVariableService: { type: Function, required: true }
-  },
-  data: () => {
-    const validationSchema = yup.object({
-      key: yup.string().required(),
-      value: yup.string().required(),
-      secret: yup.boolean().required().default(false)
-    })
-    const { errors, defineInputBinds, meta, values, setValues } = useForm({
-      validationSchema
-    })
+  export default {
+    name: 'edit-variable-view',
+    components: {
+      EditFormBlock,
+      InputText,
+      InputSwitch
+    },
+    props: {
+      loadVariableService: { type: Function, required: true },
+      editVariableService: { type: Function, required: true }
+    },
+    data: () => {
+      const validationSchema = yup.object({
+        key: yup.string().required(),
+        value: yup.string().required(),
+        secret: yup.boolean().required().default(false)
+      })
+      const { errors, defineInputBinds, meta, values, setValues } = useForm({
+        validationSchema
+      })
 
-    const key = defineInputBinds('key', { validateOnInput: true })
-    const value = defineInputBinds('value', { validateOnInput: true })
-    const secret = defineInputBinds('secret')
+      const key = defineInputBinds('key', { validateOnInput: true })
+      const value = defineInputBinds('value', { validateOnInput: true })
+      const secret = defineInputBinds('secret')
 
-    return {
-      errors,
-      meta,
-      values,
-      key,
-      value,
-      secret,
-      setValues
+      return {
+        errors,
+        meta,
+        values,
+        key,
+        value,
+        secret,
+        setValues
+      }
     }
   }
-}
 </script>

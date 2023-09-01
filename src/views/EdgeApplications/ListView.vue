@@ -1,22 +1,22 @@
 <script>
-import ListTableBlock from '@/templates/list-table-block'
+  import ListTableBlock from '@/templates/list-table-block'
 
-export default {
-  name: 'edge-application-view',
-  components: {
-    ListTableBlock
-  },
-  props: {
-    listEdgeApplicationsService: {
-      required: true,
-      type: Function
+  export default {
+    name: 'edge-application-view',
+    components: {
+      ListTableBlock
     },
-    deleteEdgeApplicationService: {
-      required: true,
-      type: Function
+    props: {
+      listEdgeApplicationsService: {
+        required: true,
+        type: Function
+      },
+      deleteEdgeApplicationService: {
+        required: true,
+        type: Function
+      }
     }
   }
-}
 </script>
 
 <template>
