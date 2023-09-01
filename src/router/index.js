@@ -268,8 +268,8 @@ const router = createRouter({
           meta: {
             breadCrumbs: [
               {
-                label: 'Intelligent DNS',
-                to: '/intelligent-dns'
+                label: 'Intelligent DNS Records',
+                to: { name: 'edit-intelligent-dns-records' }
               },
               {
                 label: 'Create Records',

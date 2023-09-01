@@ -1,6 +1,6 @@
 import { AxiosHttpClientAdapter, parseHttpResponse } from "../axios/AxiosHttpClientAdapter";
 import { makeIntelligentDNSBaseUrl } from "./make-intelligent-dns-base-url";
-import { useIntelligentDNSStore } from '../../stores/intelligent-dns'
+import { useIntelligentDNSStore } from '@/stores/intelligent-dns'
 
 export const loadIntelligentDNSService = async ({ id }) => {
   let httpResponse = await AxiosHttpClientAdapter

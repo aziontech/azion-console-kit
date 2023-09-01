@@ -79,7 +79,7 @@
 <script setup>
 import { ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
-import { useIntelligentDNSStore } from '../../stores/intelligent-dns'
+import { useIntelligentDNSStore } from '@/stores/intelligent-dns'
 import CreateFormBlock from '@/templates/create-form-block'
 import InputText from 'primevue/inputtext'
 import Textarea from 'primevue/textarea'
