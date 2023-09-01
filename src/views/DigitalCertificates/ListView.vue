@@ -31,22 +31,22 @@
 </template>
 
 <script>
-import ListTableBlock from '@/templates/list-table-block'
+  import ListTableBlock from '@/templates/list-table-block'
 
-export default {
-  name: 'digital-certificates-view',
-  components: {
-    ListTableBlock
-  },
-  props: {
-    listDigitalCertificatesService: {
-      required: true,
-      type: Function
+  export default {
+    name: 'digital-certificates-view',
+    components: {
+      ListTableBlock
     },
-    deleteDigitalCertificatesService: {
-      required: true,
-      type: Function
+    props: {
+      listDigitalCertificatesService: {
+        required: true,
+        type: Function
+      },
+      deleteDigitalCertificatesService: {
+        required: true,
+        type: Function
+      }
     }
   }
-}
 </script>

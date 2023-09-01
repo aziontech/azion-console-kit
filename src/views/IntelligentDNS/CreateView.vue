@@ -34,41 +34,41 @@
 </template>
 
 <script setup>
-import CreateFormBlock from '@/templates/create-form-block'
-import InputText from 'primevue/inputtext'
-import InputSwitch from 'primevue/inputswitch'
-import { useForm } from 'vee-validate'
-import * as yup from 'yup'
+  import CreateFormBlock from '@/templates/create-form-block'
+  import InputText from 'primevue/inputtext'
+  import InputSwitch from 'primevue/inputswitch'
+  import { useForm } from 'vee-validate'
+  import * as yup from 'yup'
 
-const props = defineProps({
-  createIntelligentDNSService: {
-    type: Function,
-    required: true
-  }
-})
+  const props = defineProps({
+    createIntelligentDNSService: {
+      type: Function,
+      required: true
+    }
+  })
 
-//Validation Schema
-const validationSchema = yup.object({
-  name: yup.string().required(),
-  domain: yup
-    .string()
-    .required()
-    .test('valid-domain', 'Invalid domain', function (value) {
-      const domainRegex = /^(?:[-A-Za-z0-9]+\.)+[A-Za-z]{2,6}$/
-      return domainRegex.test(value)
-    }),
-  isActive: yup.boolean().required().default(false)
-})
+  //Validation Schema
+  const validationSchema = yup.object({
+    name: yup.string().required(),
+    domain: yup
+      .string()
+      .required()
+      .test('valid-domain', 'Invalid domain', function (value) {
+        const domainRegex = /^(?:[-A-Za-z0-9]+\.)+[A-Za-z]{2,6}$/
+        return domainRegex.test(value)
+      }),
+    isActive: yup.boolean().required().default(false)
+  })
 
-// validation with VeeValidate
-const { errors, defineInputBinds, meta, resetForm, values } = useForm({
-  validationSchema,
-  initialValues: {
-    isActive: false
-  }
-})
+  // validation with VeeValidate
+  const { errors, defineInputBinds, meta, resetForm, values } = useForm({
+    validationSchema,
+    initialValues: {
+      isActive: false
+    }
+  })
 
-const name = defineInputBinds('name', { validateOnInput: true })
-const domain = defineInputBinds('domain', { validateOnInput: true })
-const isActive = defineInputBinds('isActive')
+  const name = defineInputBinds('name', { validateOnInput: true })
+  const domain = defineInputBinds('domain', { validateOnInput: true })
+  const isActive = defineInputBinds('isActive')
 </script>

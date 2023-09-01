@@ -11,40 +11,40 @@
 </template>
 
 <script>
-import ListTableBlock from '@/templates/list-table-block'
+  import ListTableBlock from '@/templates/list-table-block'
 
-export default {
-  name: 'intelligent-dns-view',
-  components: {
-    ListTableBlock
-  },
-  props: {
-    listIntelligentDNSService: {
-      required: true,
-      type: Function
+  export default {
+    name: 'intelligent-dns-view',
+    components: {
+      ListTableBlock
     },
-    deleteIntelligentDNSService: {
-      required: true,
-      type: Function
-    }
-  },
-  computed: {
-    columns() {
-      return [
-        {
-          field: 'name',
-          header: 'Name'
-        },
-        {
-          field: 'domain',
-          header: 'Domain'
-        },
-        {
-          field: 'isActive',
-          header: 'Active'
-        }
-      ]
+    props: {
+      listIntelligentDNSService: {
+        required: true,
+        type: Function
+      },
+      deleteIntelligentDNSService: {
+        required: true,
+        type: Function
+      }
+    },
+    computed: {
+      columns() {
+        return [
+          {
+            field: 'name',
+            header: 'Name'
+          },
+          {
+            field: 'domain',
+            header: 'Domain'
+          },
+          {
+            field: 'isActive',
+            header: 'Active'
+          }
+        ]
+      }
     }
   }
-}
 </script>

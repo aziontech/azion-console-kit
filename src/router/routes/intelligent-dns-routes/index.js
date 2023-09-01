@@ -82,10 +82,10 @@ export const intelligentDnsRoutes = {
             to: '/intelligent-dns'
           },
           {
-            label: 'Edit Intelligent DNS',
+            label: 'Edit Intelligent DNS'
           }
         ]
-      },
+      }
     },
     {
       path: 'edit/:id/records/create',

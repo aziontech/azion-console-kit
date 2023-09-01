@@ -1,22 +1,22 @@
 <script>
-import ListTableBlock from '@/templates/list-table-block'
+  import ListTableBlock from '@/templates/list-table-block'
 
-export default {
-  name: 'edge-firewall-view',
-  components: {
-    ListTableBlock
-  },
-  props: {
-    listEdgeFirewallService: {
-      required: true,
-      type: Function
+  export default {
+    name: 'edge-firewall-view',
+    components: {
+      ListTableBlock
     },
-    deleteEdgeFirewallService: {
-      required: true,
-      type: Function
+    props: {
+      listEdgeFirewallService: {
+        required: true,
+        type: Function
+      },
+      deleteEdgeFirewallService: {
+        required: true,
+        type: Function
+      }
     }
   }
-}
 </script>
 
 <template>

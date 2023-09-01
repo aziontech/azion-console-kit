@@ -1,22 +1,22 @@
 <script>
-import ListTableBlock from '@/templates/list-table-block'
+  import ListTableBlock from '@/templates/list-table-block'
 
-export default {
-  name: 'domains-view',
-  components: {
-    ListTableBlock
-  },
-  props: {
-    listDomainsService: {
-      required: true,
-      type: Function
+  export default {
+    name: 'domains-view',
+    components: {
+      ListTableBlock
     },
-    deleteDomainsService: {
-      required: true,
-      type: Function
+    props: {
+      listDomainsService: {
+        required: true,
+        type: Function
+      },
+      deleteDomainsService: {
+        required: true,
+        type: Function
+      }
     }
   }
-}
 </script>
 
 <template>
