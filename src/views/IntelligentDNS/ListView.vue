@@ -24,22 +24,22 @@
 </template>
 
 <script>
-import ListTableBlock from '@/templates/list-table-block'
+  import ListTableBlock from '@/templates/list-table-block'
 
-export default {
-  name: 'intelligent-dns-view',
-  components: {
-    ListTableBlock
-  },
-  props: {
-    listIntelligentDNSService: {
-      required: true,
-      type: Function
+  export default {
+    name: 'intelligent-dns-view',
+    components: {
+      ListTableBlock
     },
-    deleteIntelligentDNSService: {
-      required: true,
-      type: Function
+    props: {
+      listIntelligentDNSService: {
+        required: true,
+        type: Function
+      },
+      deleteIntelligentDNSService: {
+        required: true,
+        type: Function
+      }
     }
   }
-}
 </script>

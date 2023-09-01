@@ -44,22 +44,22 @@
 </template>
 
 <script>
-import ListTableBlock from '@/templates/list-table-block'
+  import ListTableBlock from '@/templates/list-table-block'
 
-export default {
-  name: 'edge-functions-view',
-  components: {
-    ListTableBlock
-  },
-  props: {
-    listEdgeFunctionsService: {
-      required: true,
-      type: Function
+  export default {
+    name: 'edge-functions-view',
+    components: {
+      ListTableBlock
     },
-    deleteEdgeFunctionsService: {
-      required: true,
-      type: Function
+    props: {
+      listEdgeFunctionsService: {
+        required: true,
+        type: Function
+      },
+      deleteEdgeFunctionsService: {
+        required: true,
+        type: Function
+      }
     }
   }
-}
 </script>

@@ -3,7 +3,11 @@
   <header class="border-neutral-200 border-b min-h-[82px] w-full flex items-center">
     <div class="p-4 w-full">
       <div class="flex flex-row flex-wrap items-center justify-left gap-4">
-        <PrimeButton @click="handleCancel" text icon="pi pi-arrow-left"></PrimeButton>
+        <PrimeButton
+          @click="handleCancel"
+          text
+          icon="pi pi-arrow-left"
+        ></PrimeButton>
         <h1 class="text-4xl text-left font-normal text-gray-600">{{ pageTitle }}</h1>
       </div>
     </div>
@@ -36,91 +40,91 @@
 </template>
 
 <script>
-import Toast from 'primevue/toast'
-import PrimeButton from 'primevue/button'
+  import Toast from 'primevue/toast'
+  import PrimeButton from 'primevue/button'
 
-export default {
-  name: 'edit-form-block',
-  components: {
-    Toast,
-    PrimeButton
-  },
-  data: () => ({
-    isLoading: false
-  }),
-  props: {
-    pageTitle: {
-      type: String,
-      required: true
+  export default {
+    name: 'edit-form-block',
+    components: {
+      Toast,
+      PrimeButton
     },
-    editService: {
-      type: Function,
-      required: true
-    },
-    loadService: {
-      type: Function,
-      required: true
-    },
-    initialDataSetter: {
-      type: Function,
-      required: true
-    },
-    isValid: {
-      type: Boolean,
-      required: true
-    },
-    formData: {
-      type: Object,
-      required: true
-    }
-  },
-  async created() {
-    await this.loadInitialData()
-  },
-  methods: {
-    handleCancel() {
-      this.$router.go('-1')
-    },
-    async loadInitialData() {
-      try {
-        const { id } = this.$route.params
-        this.isLoading = true
-        const initialData = await this.loadService({ id })
-        this.initialDataSetter(initialData)
-      } catch (error) {
-        this.$toast.add({
-          closable: true,
-          severity: 'error',
-          summary: error,
-          life: 10000
-        })
-      } finally {
-        this.isLoading = false
+    data: () => ({
+      isLoading: false
+    }),
+    props: {
+      pageTitle: {
+        type: String,
+        required: true
+      },
+      editService: {
+        type: Function,
+        required: true
+      },
+      loadService: {
+        type: Function,
+        required: true
+      },
+      initialDataSetter: {
+        type: Function,
+        required: true
+      },
+      isValid: {
+        type: Boolean,
+        required: true
+      },
+      formData: {
+        type: Object,
+        required: true
       }
     },
-    async handleSubmit() {
-      try {
-        this.isLoading = true
-        await this.editService(this.formData)
-        this.$toast.add({
-          closable: true,
-          severity: 'success',
-          summary: 'edited successfully',
-          life: 10000
-        })
-      } catch (error) {
-        this.$toast.add({
-          closable: true,
-          severity: 'error',
-          summary: error,
-          life: 10000
-        })
-      } finally {
-        setTimeout(() => {
+    async created() {
+      await this.loadInitialData()
+    },
+    methods: {
+      handleCancel() {
+        this.$router.go('-1')
+      },
+      async loadInitialData() {
+        try {
+          const { id } = this.$route.params
+          this.isLoading = true
+          const initialData = await this.loadService({ id })
+          this.initialDataSetter(initialData)
+        } catch (error) {
+          this.$toast.add({
+            closable: true,
+            severity: 'error',
+            summary: error,
+            life: 10000
+          })
+        } finally {
           this.isLoading = false
-        }, 800)
+        }
+      },
+      async handleSubmit() {
+        try {
+          this.isLoading = true
+          await this.editService(this.formData)
+          this.$toast.add({
+            closable: true,
+            severity: 'success',
+            summary: 'edited successfully',
+            life: 10000
+          })
+        } catch (error) {
+          this.$toast.add({
+            closable: true,
+            severity: 'error',
+            summary: error,
+            life: 10000
+          })
+        } finally {
+          setTimeout(() => {
+            this.isLoading = false
+          }, 800)
+        }
       }
     }
   }
-}
 </script>

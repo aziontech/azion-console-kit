@@ -28,22 +28,22 @@
 </template>
 
 <script>
-import ListTableBlock from '@/templates/list-table-block'
+  import ListTableBlock from '@/templates/list-table-block'
 
-export default {
-  name: 'edge-services-view',
-  components: {
-    ListTableBlock
-  },
-  props: {
-    listEdgeServicesService: {
-      required: true,
-      type: Function
+  export default {
+    name: 'edge-services-view',
+    components: {
+      ListTableBlock
     },
-    deleteEdgeServicesService: {
-      required: true,
-      type: Function
+    props: {
+      listEdgeServicesService: {
+        required: true,
+        type: Function
+      },
+      deleteEdgeServicesService: {
+        required: true,
+        type: Function
+      }
     }
   }
-}
 </script>

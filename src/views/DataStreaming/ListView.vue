@@ -1,22 +1,22 @@
 <script>
-import ListTableBlock from '@/templates/list-table-block'
+  import ListTableBlock from '@/templates/list-table-block'
 
-export default {
-  name: 'data-streaming-view',
-  components: {
-    ListTableBlock
-  },
-  props: {
-    listDataStreamingService: {
-      required: true,
-      type: Function
+  export default {
+    name: 'data-streaming-view',
+    components: {
+      ListTableBlock
     },
-    deleteDataStreamingService: {
-      required: true,
-      type: Function
+    props: {
+      listDataStreamingService: {
+        required: true,
+        type: Function
+      },
+      deleteDataStreamingService: {
+        required: true,
+        type: Function
+      }
     }
   }
-}
 </script>
 
 <template>
