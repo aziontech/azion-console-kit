@@ -1,5 +1,5 @@
 <template>
-  <ListTableBlock 
+  <ListTableBlock
   :listService="listDigitalCertificatesService"
   :deleteService="deleteDigitalCertificatesService"
   :columns="[
@@ -23,9 +23,11 @@
       field: 'status',
       header: 'Status'
     },
-  ]" 
+  ]"
   :pageTitle="'Digital Certificates'"
-  :addButtonLabel="'Add Certificate'" :createPagePath="'digital-certificates/create'"
+  :editPagePath="'digital-certificates/edit'"
+  :addButtonLabel="'Add Certificate'"
+  :createPagePath="'digital-certificates/create'"
   />
 </template>
 

@@ -294,7 +294,7 @@ export default {
         .label('subject alternative names (SAN)'),
       country: yup.string().when('createCertificateType', {
         is: edgeCertificateTypes.CSR,
-        then: (schema) => schema.required().max(2)
+        then: (schema) => schema.required().max(2).min(2)
       }),
       email: yup.string().when('createCertificateType', {
         is: edgeCertificateTypes.CSR,
