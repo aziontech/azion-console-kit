@@ -1,5 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import { homeRoute } from '@routes/home-routes'
+import { homeRoutes } from '@routes/home-routes'
 import { edgeApplicationRoutes } from '@routes/edge-application-routes'
 import { domainsRoutes } from '@routes/domains-routes'
 import { digitalCertificatesRoutes } from '@routes/digital-certificates-routes'
@@ -14,7 +14,7 @@ import { edgeFirewallRoutes } from '@routes/edge-firewall-routes'
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
-    homeRoute,
+    homeRoutes,
     edgeApplicationRoutes,
     domainsRoutes,
     digitalCertificatesRoutes,

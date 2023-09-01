@@ -1,5 +1,5 @@
 <template>
-  <TabView>
+  <TabView :activeIndex="activeTab" @tab-click="changeRouteByClickingOnTab">
     <TabPanel header="Main Settings">
       <EditFormBlock
         :pageTitle="'Edit Intelligent DNS'"
@@ -39,7 +39,7 @@
       <ListTableBlock
         pageTitle="Records"
         addButtonLabel="Add Record"
-        :createPagePath="`${intelligentDNSID}/records/create`"
+        createPagePath="records/create"
         editPagePath="/"
         :columns="recordListColumns"
         :listService="listRecordsServiceIntelligentDNSDecorator"
@@ -51,6 +51,7 @@
 </template>
 
 <script>
+import { useIntelligentDNSStore } from '@/stores/intelligent-dns'
 import EditFormBlock from '@/templates/edit-form-block'
 import ListTableBlock from '@templates/list-table-block'
 import TabView from 'primevue/tabview'
@@ -59,7 +60,6 @@ import InputText from 'primevue/inputtext'
 import InputSwitch from 'primevue/inputswitch'
 import { useForm } from 'vee-validate'
 import * as yup from 'yup'
-import { ref } from 'vue'
 
 export default {
   name: 'edit-intelligent-dns-view',
@@ -100,7 +100,7 @@ export default {
     const domain = defineInputBinds('domain', { validateOnInput: true })
     const isActive = defineInputBinds('isActive')
 
-    const intelligentDNSID = ref(0)
+    const intelligentDNSStore = useIntelligentDNSStore()
 
     return {
       errors,
@@ -140,12 +140,15 @@ export default {
           header: 'Description'
         }
       ],
-      intelligentDNSID
+      intelligentDNSStore,
+      intelligentDNSID: 0,
+      activeTab: 0
     }
   },
 
   created() {
     this.intelligentDNSID = this.$route.params.id
+    this.renderTabCurrentRouter()
   },
 
   methods: {
@@ -157,6 +160,29 @@ export default {
         recordID: recordID,
         intelligentDNSID: this.intelligentDNSID
       })
+    },
+    renderTabCurrentRouter() {
+      if (this.$route.name === 'edit-intelligent-dns-records') {
+        this.activeTab = 1
+      } else {
+        this.activeTab = 0
+      }
+    },
+    changeRouteByClickingOnTab(e) {
+      if (e.index === 0) {
+        this.$router.push({ name: 'edit-intelligent-dns', params: { id: this.intelligentDNSID } })
+      } else {
+        this.$router.push({
+          name: 'edit-intelligent-dns-records',
+          params: { id: this.intelligentDNSID }
+        })
+      }
+    }
+  },
+
+  watch: {
+    domain() {
+      this.intelligentDNSStore.domain = this.domain
     }
   }
 }

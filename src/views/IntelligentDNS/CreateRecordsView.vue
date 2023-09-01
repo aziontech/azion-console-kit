@@ -15,7 +15,7 @@
           :class="{ 'p-invalid': errors.name }"
           v-tooltip.top="errors.name"
         />
-        <label for="youdomain">.youdomain.com</label>
+        <label for="youdomain">.{{ intelligentDNSStore.domain.value }}</label>
       </div>
 
       <div class="card flex justify-content-center">
@@ -79,6 +79,7 @@
 <script setup>
 import { ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
+import { useIntelligentDNSStore } from '@/stores/intelligent-dns'
 import CreateFormBlock from '@/templates/create-form-block'
 import InputText from 'primevue/inputtext'
 import Textarea from 'primevue/textarea'
@@ -94,6 +95,7 @@ const props = defineProps({
 })
 
 const route = useRoute()
+const intelligentDNSStore = useIntelligentDNSStore()
 
 const recordsTypes = ref([
   { label: 'A - IPv4 Address', value: 'A' },
