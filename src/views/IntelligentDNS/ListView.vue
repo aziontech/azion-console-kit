@@ -2,20 +2,7 @@
   <ListTableBlock
     :listService="listIntelligentDNSService"
     :deleteService="deleteIntelligentDNSService"
-    :columns="[
-      {
-        field: 'name',
-        header: 'Name'
-      },
-      {
-        field: 'domain',
-        header: 'Domain'
-      },
-      {
-        field: 'isActive',
-        header: 'Active'
-      }
-    ]"
+    :columns="columns"
     :pageTitle="'Intelligent DNS'"
     :addButtonLabel="'Add Intelligent DNS'"
     :createPagePath="'intelligent-dns/create'"
@@ -39,6 +26,24 @@
       deleteIntelligentDNSService: {
         required: true,
         type: Function
+      }
+    },
+    computed: {
+      columns() {
+        return [
+          {
+            field: 'name',
+            header: 'Name'
+          },
+          {
+            field: 'domain',
+            header: 'Domain'
+          },
+          {
+            field: 'isActive',
+            header: 'Active'
+          }
+        ]
       }
     }
   }
