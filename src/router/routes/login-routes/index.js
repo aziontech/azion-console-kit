@@ -1,0 +1,17 @@
+import * as LoginService from '@/services/login-services'
+
+/** @type {import('vue-router').RouteRecordRaw} */
+export const loginRoutes = {
+  path: '/login',
+  name: 'login',
+  children: [
+    {
+      path: '',
+      name: 'login',
+      component: () => import('@views/Login/LoginView.vue'),
+      props: {
+        loginService: LoginService.loginService
+      }
+    }
+  ]
+}

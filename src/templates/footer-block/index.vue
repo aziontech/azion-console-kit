@@ -1,7 +1,7 @@
 <template>
   <footer
     style="border-top: 1px solid var(--surface-border)"
-    class="bg-white z-10 flex pl-3 flex-wrap pr-3 py-2 justify-center items-center gap-3"
+    class="z-10 flex pl-3 flex-wrap pr-3 py-2 justify-center items-center gap-3"
   >
     <svg
       width="24"
