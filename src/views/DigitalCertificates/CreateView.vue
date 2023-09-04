@@ -23,7 +23,11 @@
             name="certificateType"
             :value="certificateTypes.EDGE_CERTIFICATE"
           />
-          <label for="certificateType1" class="ml-2">Edge Certificate</label>
+          <label
+            for="certificateType1"
+            class="ml-2"
+            >Edge Certificate</label
+          >
         </div>
         <div class="flex align-items-center">
           <RadioButton
@@ -32,7 +36,11 @@
             name="certificateType"
             :value="certificateTypes.TRUSTED"
           />
-          <label for="certificateType2" class="ml-2">Trusted CA Certificate</label>
+          <label
+            for="certificateType2"
+            class="ml-2"
+            >Trusted CA Certificate</label
+          >
         </div>
       </div>
 
@@ -49,7 +57,11 @@
               name="createCertificateType"
               :value="edgeCertificateTypes.UPLOAD"
             />
-            <label for="certificateType1" class="ml-2">Upload my certificate and private key</label>
+            <label
+              for="certificateType1"
+              class="ml-2"
+              >Upload my certificate and private key</label
+            >
           </div>
           <div class="flex align-items-center">
             <RadioButton
@@ -58,7 +70,9 @@
               name="createCertificateType"
               :value="edgeCertificateTypes.CSR"
             />
-            <label for="createCertificateType2" class="ml-2"
+            <label
+              for="createCertificateType2"
+              class="ml-2"
               >Generate CSR and private key with Azion</label
             >
           </div>
@@ -210,185 +224,185 @@ support.example.com"
 </template>
 
 <script>
-import CreateFormBlock from '@/templates/create-form-block'
-import RadioButton from 'primevue/radiobutton'
-import PrimeTextarea from 'primevue/textarea'
-import InputText from 'primevue/inputtext'
-import { useForm, useField } from 'vee-validate'
-import * as yup from 'yup'
-import { ref, watch } from 'vue'
+  import CreateFormBlock from '@/templates/create-form-block'
+  import RadioButton from 'primevue/radiobutton'
+  import PrimeTextarea from 'primevue/textarea'
+  import InputText from 'primevue/inputtext'
+  import { useForm, useField } from 'vee-validate'
+  import * as yup from 'yup'
+  import { ref, watch } from 'vue'
 
-export default {
-  components: {
-    CreateFormBlock,
-    RadioButton,
-    PrimeTextarea,
-    InputText
-  },
-  props: {
-    createDigitalCertificatesService: {
-      type: Function,
-      required: true
+  export default {
+    components: {
+      CreateFormBlock,
+      RadioButton,
+      PrimeTextarea,
+      InputText
     },
-    createDigitalCertificatesCSRService: {
-      type: Function,
-      required: true
-    }
-  },
-  setup(props) {
-    const createDigitalCertificate = props.createDigitalCertificatesService
-    const createCSR = props.createDigitalCertificatesCSRService
-    const createServiceBySelectedType = ref(createDigitalCertificate)
+    props: {
+      createDigitalCertificatesService: {
+        type: Function,
+        required: true
+      },
+      createDigitalCertificatesCSRService: {
+        type: Function,
+        required: true
+      }
+    },
+    setup(props) {
+      const createDigitalCertificate = props.createDigitalCertificatesService
+      const createCSR = props.createDigitalCertificatesCSRService
+      const createServiceBySelectedType = ref(createDigitalCertificate)
 
-    const edgeCertificateTypes = {
-      CSR: 'generateCSR',
-      UPLOAD: 'uploadCertificateAndPrivateKey'
-    }
-    const certificateTypes = {
-      EDGE_CERTIFICATE: 'edge_certificate',
-      TRUSTED: 'trusted_ca_certificate'
-    }
+      const edgeCertificateTypes = {
+        CSR: 'generateCSR',
+        UPLOAD: 'uploadCertificateAndPrivateKey'
+      }
+      const certificateTypes = {
+        EDGE_CERTIFICATE: 'edge_certificate',
+        TRUSTED: 'trusted_ca_certificate'
+      }
 
-    const CSRRequiredField = {
-      is: edgeCertificateTypes.CSR,
-      then: (schema) => schema.required()
-    }
-    const certificateRequiredField = (createCertificateType, certificateType) => {
-      const isUploadCertificate = createCertificateType === edgeCertificateTypes.UPLOAD
-      const isTrustedCA = certificateType === certificateTypes.TRUSTED
-
-      return isUploadCertificate || isTrustedCA
-    }
-
-    const validationSchema = yup.object({
-      digitalCertificateName: yup.string().required(),
-
-      // Certificate Choices
-      certificateType: yup.string().required(),
-      createCertificateType: yup.string().required(),
-
-      // Edge Certificate Fields
-      certificate: yup.string().when(['createCertificateType', 'certificateType'], {
-        is: certificateRequiredField,
+      const CSRRequiredField = {
+        is: edgeCertificateTypes.CSR,
         then: (schema) => schema.required()
-      }),
-      privateKey: yup.string(),
+      }
+      const certificateRequiredField = (createCertificateType, certificateType) => {
+        const isUploadCertificate = createCertificateType === edgeCertificateTypes.UPLOAD
+        const isTrustedCA = certificateType === certificateTypes.TRUSTED
 
-      // CSR Fields
-      common: yup.string().when('createCertificateType', CSRRequiredField),
-      state: yup.string().when('createCertificateType', CSRRequiredField),
-      city: yup.string().when('createCertificateType', CSRRequiredField),
-      organization: yup.string().when('createCertificateType', CSRRequiredField),
-      organizationUnity: yup
-        .string()
-        .when('createCertificateType', CSRRequiredField)
-        .label('organization unity'),
-      privateKeyType: yup
-        .string()
-        .when('createCertificateType', CSRRequiredField)
-        .label('private key type'),
-      subjectAlternativeNames: yup
-        .string()
-        .when('createCertificateType', CSRRequiredField)
-        .label('subject alternative names (SAN)'),
-      country: yup.string().when('createCertificateType', {
-        is: edgeCertificateTypes.CSR,
-        then: (schema) => schema.required().max(2).min(2)
-      }),
-      email: yup.string().when('createCertificateType', {
-        is: edgeCertificateTypes.CSR,
-        then: (schema) => schema.required().email()
+        return isUploadCertificate || isTrustedCA
+      }
+
+      const validationSchema = yup.object({
+        digitalCertificateName: yup.string().required(),
+
+        // Certificate Choices
+        certificateType: yup.string().required(),
+        createCertificateType: yup.string().required(),
+
+        // Edge Certificate Fields
+        certificate: yup.string().when(['createCertificateType', 'certificateType'], {
+          is: certificateRequiredField,
+          then: (schema) => schema.required()
+        }),
+        privateKey: yup.string(),
+
+        // CSR Fields
+        common: yup.string().when('createCertificateType', CSRRequiredField),
+        state: yup.string().when('createCertificateType', CSRRequiredField),
+        city: yup.string().when('createCertificateType', CSRRequiredField),
+        organization: yup.string().when('createCertificateType', CSRRequiredField),
+        organizationUnity: yup
+          .string()
+          .when('createCertificateType', CSRRequiredField)
+          .label('organization unity'),
+        privateKeyType: yup
+          .string()
+          .when('createCertificateType', CSRRequiredField)
+          .label('private key type'),
+        subjectAlternativeNames: yup
+          .string()
+          .when('createCertificateType', CSRRequiredField)
+          .label('subject alternative names (SAN)'),
+        country: yup.string().when('createCertificateType', {
+          is: edgeCertificateTypes.CSR,
+          then: (schema) => schema.required().max(2).min(2)
+        }),
+        email: yup.string().when('createCertificateType', {
+          is: edgeCertificateTypes.CSR,
+          then: (schema) => schema.required().email()
+        })
       })
-    })
 
-    const { errors, defineInputBinds, defineComponentBinds, meta, resetForm, values } = useForm({
-      validationSchema,
-      initialValues: {
-        digitalCertificateName: '',
+      const { errors, defineInputBinds, defineComponentBinds, meta, resetForm, values } = useForm({
+        validationSchema,
+        initialValues: {
+          digitalCertificateName: '',
 
-        // Form Choices
-        certificateType: certificateTypes.EDGE_CERTIFICATE,
-        createCertificateType: edgeCertificateTypes.UPLOAD,
+          // Form Choices
+          certificateType: certificateTypes.EDGE_CERTIFICATE,
+          createCertificateType: edgeCertificateTypes.UPLOAD,
 
-        // Edge Certificate values
-        certificate: '',
-        privateKey: undefined,
+          // Edge Certificate values
+          certificate: '',
+          privateKey: undefined,
 
-        // CSR values
-        common: '',
-        country: '',
-        state: '',
-        city: '',
-        organization: '',
-        organizationUnity: '',
-        email: '',
-        privateKeyType: 'RSA (2048)',
-        subjectAlternativeNames: ''
+          // CSR values
+          common: '',
+          country: '',
+          state: '',
+          city: '',
+          organization: '',
+          organizationUnity: '',
+          email: '',
+          privateKeyType: 'RSA (2048)',
+          subjectAlternativeNames: ''
+        }
+      })
+
+      const digitalCertificateName = defineInputBinds('digitalCertificateName', {
+        validateOnInput: true
+      })
+      const certificate = defineComponentBinds('certificate', { validateOnInput: true })
+      const { value: privateKey, setValue: setPrivateKeyValue } = useField('privateKey')
+
+      // CSR Binds
+      const common = defineInputBinds('common', { validateOnInput: true })
+      const country = defineInputBinds('country', { validateOnInput: true })
+      const state = defineInputBinds('state', { validateOnInput: true })
+      const city = defineInputBinds('city', { validateOnInput: true })
+      const organization = defineInputBinds('organization', { validateOnInput: true })
+      const organizationUnity = defineInputBinds('organizationUnity', { validateOnInput: true })
+      const email = defineInputBinds('email', { validateOnInput: true })
+      const privateKeyType = defineInputBinds('privateKeyType', { validateOnInput: true })
+      const subjectAlternativeNames = defineComponentBinds('subjectAlternativeNames', {
+        validateOnInput: true
+      })
+
+      const { value: certificateType } = useField('certificateType')
+      const { value: createCertificateType } = useField('createCertificateType')
+
+      watch([certificateType, createCertificateType], () => {
+        const isGenerateCSR = createCertificateType.value === edgeCertificateTypes.CSR
+        const isEdgeCertificate = certificateType.value === certificateTypes.EDGE_CERTIFICATE
+
+        createServiceBySelectedType.value = createDigitalCertificate
+
+        if (isGenerateCSR && isEdgeCertificate) {
+          createServiceBySelectedType.value = createCSR
+        }
+
+        if (!isEdgeCertificate) setPrivateKeyValue(undefined)
+      })
+
+      watch(privateKey, (privateKeyValue) => {
+        if (privateKeyValue === '') setPrivateKeyValue(undefined)
+      })
+
+      return {
+        createServiceBySelectedType,
+        values,
+        meta,
+        errors,
+        resetForm,
+        common,
+        country,
+        state,
+        city,
+        organization,
+        organizationUnity,
+        email,
+        privateKeyType,
+        certificate,
+        privateKey,
+        certificateType,
+        createCertificateType,
+        digitalCertificateName,
+        subjectAlternativeNames,
+        edgeCertificateTypes,
+        certificateTypes
       }
-    })
-
-    const digitalCertificateName = defineInputBinds('digitalCertificateName', {
-      validateOnInput: true
-    })
-    const certificate = defineComponentBinds('certificate', { validateOnInput: true })
-    const { value: privateKey, setValue: setPrivateKeyValue } = useField('privateKey')
-
-    // CSR Binds
-    const common = defineInputBinds('common', { validateOnInput: true })
-    const country = defineInputBinds('country', { validateOnInput: true })
-    const state = defineInputBinds('state', { validateOnInput: true })
-    const city = defineInputBinds('city', { validateOnInput: true })
-    const organization = defineInputBinds('organization', { validateOnInput: true })
-    const organizationUnity = defineInputBinds('organizationUnity', { validateOnInput: true })
-    const email = defineInputBinds('email', { validateOnInput: true })
-    const privateKeyType = defineInputBinds('privateKeyType', { validateOnInput: true })
-    const subjectAlternativeNames = defineComponentBinds('subjectAlternativeNames', {
-      validateOnInput: true
-    })
-
-    const { value: certificateType } = useField('certificateType')
-    const { value: createCertificateType } = useField('createCertificateType')
-
-    watch([certificateType, createCertificateType], () => {
-      const isGenerateCSR = createCertificateType.value === edgeCertificateTypes.CSR
-      const isEdgeCertificate = certificateType.value === certificateTypes.EDGE_CERTIFICATE
-
-      createServiceBySelectedType.value = createDigitalCertificate
-
-      if (isGenerateCSR && isEdgeCertificate) {
-        createServiceBySelectedType.value = createCSR
-      }
-
-      if (!isEdgeCertificate) setPrivateKeyValue(undefined)
-    })
-
-    watch(privateKey, (privateKeyValue) => {
-      if (privateKeyValue === '') setPrivateKeyValue(undefined)
-    })
-
-    return {
-      createServiceBySelectedType,
-      values,
-      meta,
-      errors,
-      resetForm,
-      common,
-      country,
-      state,
-      city,
-      organization,
-      organizationUnity,
-      email,
-      privateKeyType,
-      certificate,
-      privateKey,
-      certificateType,
-      createCertificateType,
-      digitalCertificateName,
-      subjectAlternativeNames,
-      edgeCertificateTypes,
-      certificateTypes
     }
   }
-}
 </script>

@@ -1,31 +1,31 @@
-<script >
-import ListTableBlock from '@/templates/list-table-block'
+<script>
+  import ListTableBlock from '@/templates/list-table-block'
 
-export default {
-  name: 'data-streaming-view',
-  components: {
-    ListTableBlock
-  },
-  props: {
-    listDataStreamingService: {
-      required: true,
-      type: Function,
+  export default {
+    name: 'data-streaming-view',
+    components: {
+      ListTableBlock
     },
-    deleteDataStreamingService: {
-      required: true,
-      type: Function,
+    props: {
+      listDataStreamingService: {
+        required: true,
+        type: Function
+      },
+      deleteDataStreamingService: {
+        required: true,
+        type: Function
+      }
     }
   }
-}
 </script>
 
 <template>
-  <ListTableBlock 
-    :pageTitle="'Data Streaming'" 
-    :addButtonLabel="'Add Streaming'" 
+  <ListTableBlock
+    :pageTitle="'Data Streaming'"
+    :addButtonLabel="'Add Streaming'"
     :createPagePath="'/data-streaming/create'"
-    :editPagePath="'/data-streaming/edit'" 
-    :listService="listDataStreamingService" 
+    :editPagePath="'/data-streaming/edit'"
+    :listService="listDataStreamingService"
     :deleteService="deleteDataStreamingService"
     :columns="[
       {
@@ -43,7 +43,7 @@ export default {
       {
         field: 'active',
         header: 'Active'
-      },
-    ]"></ListTableBlock>
+      }
+    ]"
+  ></ListTableBlock>
 </template>
-

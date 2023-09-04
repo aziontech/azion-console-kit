@@ -1,3 +1,3 @@
-export const makeVariablesBaseUrl = ()=>{
+export const makeVariablesBaseUrl = () => {
   return `variables`
 }

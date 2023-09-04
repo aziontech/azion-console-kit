@@ -1,7 +1,6 @@
 <script setup>
-import { RouterView } from 'vue-router'
-import ShellBlock from '@/templates/shell-block'
-
+  import { RouterView } from 'vue-router'
+  import ShellBlock from '@/templates/shell-block'
 </script>
 
 <template>
@@ -11,4 +10,3 @@ import ShellBlock from '@/templates/shell-block'
     </ShellBlock>
   </main>
 </template>
-

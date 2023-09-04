@@ -1,32 +1,32 @@
-<script >
-import ListTableBlock from '@/templates/list-table-block'
+<script>
+  import ListTableBlock from '@/templates/list-table-block'
 
-export default {
-  name: 'edge-application-view',
-  components: {
-    ListTableBlock
-  },
-  props: {
-    listEdgeApplicationsService: {
-      required: true,
-      type: Function,
+  export default {
+    name: 'edge-application-view',
+    components: {
+      ListTableBlock
     },
-    deleteEdgeApplicationService: {
-      required: true,
-      type: Function,
+    props: {
+      listEdgeApplicationsService: {
+        required: true,
+        type: Function
+      },
+      deleteEdgeApplicationService: {
+        required: true,
+        type: Function
+      }
     }
   }
-}
 </script>
 
 <template>
   <ListTableBlock
-    :pageTitle="'Edge Applications'" 
+    :pageTitle="'Edge Applications'"
     :addButtonLabel="'Add Edge Application'"
-    :createPagePath="'/edge-applications/create'" 
+    :createPagePath="'/edge-applications/create'"
     :editPagePath="'/edge-applications/edit'"
-    :listService="listEdgeApplicationsService" 
-    :deleteService="deleteEdgeApplicationService" 
+    :listService="listEdgeApplicationsService"
+    :deleteService="deleteEdgeApplicationService"
     :columns="[
       {
         field: 'name',
@@ -51,7 +51,7 @@ export default {
       {
         field: 'origins',
         header: 'Origins'
-      },
-    ]"></ListTableBlock>
+      }
+    ]"
+  ></ListTableBlock>
 </template>
-

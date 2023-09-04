@@ -17,7 +17,8 @@ export default defineConfig({
       '@views': fileURLToPath(new URL('./src/views', import.meta.url)),
       '@services': fileURLToPath(new URL('./src/services', import.meta.url)),
       '@stores': fileURLToPath(new URL('./src/stores', import.meta.url)),
-      '@assets': fileURLToPath(new URL('./src/assets', import.meta.url))
+      '@assets': fileURLToPath(new URL('./src/assets', import.meta.url)),
+      '@routes': fileURLToPath(new URL('./src/router/routes', import.meta.url))
     }
   },
   server: {
@@ -33,10 +34,10 @@ export default defineConfig({
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/api/, ''),
       },
-      '/network-list/graphql': {
+      '/network-lists/graphql': {
         target: 'https://stage-cities.azion.com',
         changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/network-list\/graphql/, ''),
+        rewrite: (path) => path.replace(/^\/network-lists\/graphql/, ''),
       },
       '/api': {
         target: 'https://stage-manager-origin.azion.com/api/',
