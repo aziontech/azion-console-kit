@@ -1,5 +1,6 @@
 import { AxiosHttpClientAdapter, parseHttpResponse } from "../axios/AxiosHttpClientAdapter";
 import { makeDigitalCertificatesBaseUrl } from './make-digital-certificates-base-url'
+
 export const listDigitalCertificatesService = async ({
   page = 1,
   pageSize = 200

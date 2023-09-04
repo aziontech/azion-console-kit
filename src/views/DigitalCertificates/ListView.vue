@@ -49,7 +49,7 @@ export default {
       required: true,
       type: Function,
     },
-  }
+  },
 }
 </script>
 

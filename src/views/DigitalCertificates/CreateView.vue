@@ -388,7 +388,7 @@ export default {
       digitalCertificateName,
       subjectAlternativeNames,
       edgeCertificateTypes,
-      certificateTypes
+      certificateTypes,
     }
   }
 }

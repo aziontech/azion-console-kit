@@ -11,5 +11,5 @@ export {
   createDigitalCertificatesService,
   createDigitalCertificatesCSRService,
   loadDigitalCertificateService,
-  editDigitalCertificateService
+  editDigitalCertificateService,
 }
