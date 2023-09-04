@@ -1,19 +1,18 @@
-import { AxiosHttpClientAdapter, parseHttpResponse } from '../axios/AxiosHttpClientAdapter';
-import { makeDigitalCertificatesBaseUrl } from './make-digital-certificates-base-url';
+import { AxiosHttpClientAdapter, parseHttpResponse } from '../axios/AxiosHttpClientAdapter'
+import { makeDigitalCertificatesBaseUrl } from './make-digital-certificates-base-url'
 
-export const loadDigitalCertificateService = async ({id}) => {
-  let httpResponse = await AxiosHttpClientAdapter
-    .request({
-      url: `${makeDigitalCertificatesBaseUrl()}/${id}`,
-      method: 'GET',
-    })
-  httpResponse = adapt(httpResponse);
+export const loadDigitalCertificateService = async ({ id }) => {
+  let httpResponse = await AxiosHttpClientAdapter.request({
+    url: `${makeDigitalCertificatesBaseUrl()}/${id}`,
+    method: 'GET'
+  })
+  httpResponse = adapt(httpResponse)
 
   return parseHttpResponse(httpResponse)
 }
 
 const adapt = (httpResponse) => {
-  const body = httpResponse.body.results;
+  const body = httpResponse.body.results
   const parsedVariable = {
     id: body.id,
     name: body.name,
@@ -24,7 +23,7 @@ const adapt = (httpResponse) => {
     certificateType: body.certificate_type,
     managed: body.managed,
     csr: body.csr ?? undefined,
-    certificateContent: body.certificate_content,
+    certificateContent: body.certificate_content
   }
 
   return {

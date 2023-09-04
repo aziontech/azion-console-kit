@@ -46,8 +46,8 @@ export default {
     },
     deleteDigitalCertificatesService: {
       required: true,
-      type: Function,
-    },
-  },
+      type: Function
+    }
+  }
 }
 </script>
