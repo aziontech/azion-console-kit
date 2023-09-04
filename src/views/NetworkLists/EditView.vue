@@ -37,7 +37,6 @@
             placeholder="192.168.0.1&#10;192.168.0.2/32&#10;10.1.1.10/16" />
         </div>
       </div>
-      {{selectedCountries}}
       <div class="flex flex-col gap-2" v-if="listType.value === 'countries'">
         <label for="list">Countries: </label>
         <div class="card flex justify-content-center">
@@ -116,7 +115,7 @@
       const name = defineInputBinds('name',{validateOnInput:true})
       const listType = defineInputBinds('listType',{validateOnInput:true})
       const ipCidr = defineInputBinds('itemsValues',{validateOnInput:true})
-      const { value: selectedCountries } = useField('itemValues')
+      const { value: selectedCountries } = useField('itemsValues')
       const asn = defineInputBinds('itemsValues',{validateOnInput:true})
       const { value: networkContentList, setValue: setNetworkContentList } = useField('networkContentList')
       onMounted(async () => {
