@@ -42,5 +42,5 @@ const makeSearchParams = ({ orderBy, sort, page, pageSize }) => {
   searchParams.set('page', page)
   searchParams.set('page_size', pageSize)
 
-  return searchParams;
+  return searchParams
 }

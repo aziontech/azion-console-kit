@@ -115,90 +115,90 @@
 </template>
 
 <script>
-import EditFormBlock from '@/templates/edit-form-block'
-import PrimeTextarea from 'primevue/textarea'
-import PrimeButton from 'primevue/button'
-import InputText from 'primevue/inputtext'
-import { useForm, useField } from 'vee-validate'
-import * as yup from 'yup'
-import { ref, watch } from 'vue'
+  import EditFormBlock from '@/templates/edit-form-block'
+  import PrimeTextarea from 'primevue/textarea'
+  import PrimeButton from 'primevue/button'
+  import InputText from 'primevue/inputtext'
+  import { useForm, useField } from 'vee-validate'
+  import * as yup from 'yup'
+  import { ref, watch } from 'vue'
 
-export default {
-  components: {
-    EditFormBlock,
-    PrimeTextarea,
-    InputText,
-    PrimeButton
-  },
-  props: {
-    loadDigitalCertificateService: {
-      type: Function,
-      required: true
+  export default {
+    components: {
+      EditFormBlock,
+      PrimeTextarea,
+      InputText,
+      PrimeButton
     },
-    editDigitalCertificateService: {
-      type: Function,
-      required: true
-    }
-  },
-  setup() {
-    const edgeCertificateTypes = {
-      CSR: 'generateCSR',
-      UPLOAD: 'uploadCertificateAndPrivateKey'
-    }
-    const certificateTypes = {
-      EDGE_CERTIFICATE: 'edge_certificate',
-      TRUSTED: 'trusted_ca_certificate'
-    }
+    props: {
+      loadDigitalCertificateService: {
+        type: Function,
+        required: true
+      },
+      editDigitalCertificateService: {
+        type: Function,
+        required: true
+      }
+    },
+    setup() {
+      const edgeCertificateTypes = {
+        CSR: 'generateCSR',
+        UPLOAD: 'uploadCertificateAndPrivateKey'
+      }
+      const certificateTypes = {
+        EDGE_CERTIFICATE: 'edge_certificate',
+        TRUSTED: 'trusted_ca_certificate'
+      }
 
-    const validationSchema = yup.object({
-      name: yup.string().required(),
-      certificateType: yup.string(),
-      csr: yup.string(),
-      certificate: yup.string(),
-      privateKey: yup.string()
-    })
-
-    const { setValues, errors, defineInputBinds, defineComponentBinds, meta, resetForm, values } =
-      useForm({
-        validationSchema
+      const validationSchema = yup.object({
+        name: yup.string().required(),
+        certificateType: yup.string(),
+        csr: yup.string(),
+        certificate: yup.string(),
+        privateKey: yup.string()
       })
 
-    const name = defineInputBinds('name', { validateOnInput: true })
-    const certificate = defineComponentBinds('certificate', { validateOnInput: true })
-    const csr = defineComponentBinds('csr')
+      const { setValues, errors, defineInputBinds, defineComponentBinds, meta, resetForm, values } =
+        useForm({
+          validationSchema
+        })
 
-    const { value: certificateType } = useField('certificateType')
-    const { value: createCertificateType } = useField('createCertificateType')
-    const { value: privateKey, setValue: setPrivateKeyValue } = useField('privateKey')
+      const name = defineInputBinds('name', { validateOnInput: true })
+      const certificate = defineComponentBinds('certificate', { validateOnInput: true })
+      const csr = defineComponentBinds('csr')
 
-    watch(privateKey, (privateKeyValue) => {
-      if (privateKeyValue === '') setPrivateKeyValue(undefined)
-    })
+      const { value: certificateType } = useField('certificateType')
+      const { value: createCertificateType } = useField('createCertificateType')
+      const { value: privateKey, setValue: setPrivateKeyValue } = useField('privateKey')
 
-    const csrCopied = ref(false)
-    function copyCSRToclipboard() {
-      navigator.clipboard.writeText(csr.value.modelValue).then(() => {
-        csrCopied.value = true
+      watch(privateKey, (privateKeyValue) => {
+        if (privateKeyValue === '') setPrivateKeyValue(undefined)
       })
-    }
 
-    return {
-      errors,
-      meta,
-      resetForm,
-      values,
-      setValues,
-      certificate,
-      certificateType,
-      createCertificateType,
-      name,
-      csr,
-      edgeCertificateTypes,
-      certificateTypes,
-      copyCSRToclipboard,
-      csrCopied,
-      privateKey
+      const csrCopied = ref(false)
+      function copyCSRToclipboard() {
+        navigator.clipboard.writeText(csr.value.modelValue).then(() => {
+          csrCopied.value = true
+        })
+      }
+
+      return {
+        errors,
+        meta,
+        resetForm,
+        values,
+        setValues,
+        certificate,
+        certificateType,
+        createCertificateType,
+        name,
+        csr,
+        edgeCertificateTypes,
+        certificateTypes,
+        copyCSRToclipboard,
+        csrCopied,
+        privateKey
+      }
     }
   }
-}
 </script>

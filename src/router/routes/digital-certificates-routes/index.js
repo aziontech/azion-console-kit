@@ -61,7 +61,7 @@ export const digitalCertificatesRoutes = {
             to: '/digital-certificates'
           },
           {
-            label: 'Edit Digital Certificates',
+            label: 'Edit Digital Certificates'
           }
         ]
       }
