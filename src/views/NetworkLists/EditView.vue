@@ -28,6 +28,7 @@
         <label for="list">List: </label>
         <div class="card flex justify-content-center">
           <TextareaComponent 
+            disabled
             :class="{ 'p-invalid': errors.ipCidr }"
             v-bind="ipCidr"
             rows="5"
@@ -36,6 +37,7 @@
             placeholder="192.168.0.1&#10;192.168.0.2/32&#10;10.1.1.10/16" />
         </div>
       </div>
+      {{selectedCountries}}
       <div class="flex flex-col gap-2" v-if="listType.value === 'countries'">
         <label for="list">Countries: </label>
         <div class="card flex justify-content-center">
@@ -87,7 +89,7 @@
       ])
       const validationSchema = yup.object({
       name: yup.string().required(),
-      networkListType: yup.string().oneOf(options.value.map(option => option.value)),
+      listType: yup.string().oneOf(options.value.map(option => option.value).filter(option => option !== 'ip_cidr')),
       selectedCountries:yup.array().when('networkListType',{
         is:'countries',
         then:(schema)=>schema.required().min(1)
@@ -105,30 +107,31 @@
       const {errors,defineInputBinds,meta,values,setValues} = useForm({
         validationSchema
       })
+      console.log(setValues);
       const countriesList = ref('')
       const fetchCountries = async () => {
         const result = await props.listCountriesService();
-        countriesList.value = result
+        countriesList.value = result;
       }
       const name = defineInputBinds('name',{validateOnInput:true})
       const listType = defineInputBinds('listType',{validateOnInput:true})
       const ipCidr = defineInputBinds('itemsValues',{validateOnInput:true})
-      const selectedCountries = defineInputBinds('itemsValues',{validateOnInput:true})
+      const { value: selectedCountries } = useField('itemValues')
       const asn = defineInputBinds('itemsValues',{validateOnInput:true})
       const { value: networkContentList, setValue: setNetworkContentList } = useField('networkContentList')
       onMounted(async () => {
       await fetchCountries()
     })
-    watch([name,listType,selectedCountries,ipCidr,asn], () => {
+    watch([name,listType,selectedCountries,ipCidr,asn], () => { 
       switch (listType.value.value) {
       case 'countries':
           setNetworkContentList(selectedCountries.value)
           break;
       case 'ip_cidr':
-          setNetworkContentList(ipCidr.value.value.trim().split(','))
+          setNetworkContentList(ipCidr.value.value.trim().split('\n'))
           break;
       case 'asn':
-          setNetworkContentList(asn.value.value.trim().split(','))
+          setNetworkContentList(asn.value.value.trim().split('\n'))
           break;
       default:
           setNetworkContentList('')

@@ -19,7 +19,7 @@ const adapt = (httpResponse, id) => {
       id: id,
       lastEditor: httpResponse.body.results.last_editor,
       listType: httpResponse.body.results.list_type,
-      itemsValues: httpResponse.body.results.items_values,
+      itemsValues: httpResponse.body.results.list_type ==='countries'?httpResponse.body.results.items_values: httpResponse.body.results.items_values.toString().replaceAll(',', "\n"),
       lastModified:  new Intl.DateTimeFormat('us', { dateStyle: 'full',timeStyle: 'short' }).format(new Date(httpResponse.body.results.last_modified)),
     }
   
