@@ -1,6 +1,6 @@
 <template>
   <EditFormBlock
-    :pageTitle="'Edit Digital Certificates'"
+    pageTitle="Edit Digital Certificates"
     :editService="editDigitalCertificateService"
     :loadService="loadDigitalCertificateService"
     :initialDataSetter="setValues"
@@ -160,7 +160,7 @@ export default {
 
     const { setValues, errors, defineInputBinds, defineComponentBinds, meta, resetForm, values } =
       useForm({
-        validationSchema,
+        validationSchema
       })
 
     const name = defineInputBinds('name', { validateOnInput: true })
