@@ -1,3 +1,3 @@
-export const makeDomainsBaseUrl = ()=>{
+export const makeDomainsBaseUrl = () => {
   return `domains`
 }

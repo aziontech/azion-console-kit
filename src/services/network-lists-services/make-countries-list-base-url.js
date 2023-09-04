@@ -1,3 +1,3 @@
-export const makeCountriesListBaseUrl = ()=>{
-    return `graphql`
-  }
+export const makeCountriesListBaseUrl = () => {
+  return `graphql`
+}

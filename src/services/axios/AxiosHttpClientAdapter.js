@@ -1,4 +1,4 @@
-import axiosAzionApi from "./makeApi";
+import axiosAzionApi from './makeApi'
 
 import {
   InternalServerError,
@@ -7,33 +7,32 @@ import {
   NotFoundError,
   PermissionError,
   UnexpectedError
-} from "./errors";
+} from './errors'
 
 export const parseHttpResponse = (httpResponse) => {
   switch (httpResponse.statusCode) {
     case 200:
-      return httpResponse?.body || null;
+      return httpResponse?.body || null
     case 201:
       return 'Resource succesfully created';
     case 202:
       return 'Resource succesfully updated';
     case 204:
-      return 'Resource succesfully deleted';
+      return 'Resource succesfully deleted'
     case 400:
-      throw new InvalidApiRequestError().message;
+      throw new InvalidApiRequestError().message
     case 401:
-      throw new InvalidApiTokenError().message;
+      throw new InvalidApiTokenError().message
     case 403:
-      throw new PermissionError().message;
+      throw new PermissionError().message
     case 404:
-      throw new NotFoundError().message;
+      throw new NotFoundError().message
     case 500:
-      throw new InternalServerError().message;
+      throw new InternalServerError().message
     default:
-      throw new UnexpectedError().message;
+      throw new UnexpectedError().message
   }
 }
-
 
 export class AxiosHttpClientAdapter {
   static async request({ url, method, headers, body }, axios = axiosAzionApi) {
@@ -43,7 +42,7 @@ export class AxiosHttpClientAdapter {
         url: url,
         method: method,
         headers: headers,
-        data: body,
+        data: body
       })
     } catch (error) {
       const axiosError = error
@@ -56,7 +55,7 @@ export class AxiosHttpClientAdapter {
   static adapt(axiosResponse) {
     return {
       body: axiosResponse.data,
-      statusCode: axiosResponse.status,
+      statusCode: axiosResponse.status
     }
   }
 }
