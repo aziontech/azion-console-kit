@@ -45,6 +45,26 @@ export const digitalCertificatesRoutes = {
           }
         ]
       }
+    },
+    {
+      path: 'edit/:id',
+      name: 'edit-digital-certificates',
+      component: () => import('@views/DigitalCertificates/EditView.vue'),
+      props: {
+        editDigitalCertificateService: DigitalCertificatesService.editDigitalCertificateService,
+        loadDigitalCertificateService: DigitalCertificatesService.loadDigitalCertificateService
+      },
+      meta: {
+        breadCrumbs: [
+          {
+            label: 'Digital Certificates',
+            to: '/digital-certificates'
+          },
+          {
+            label: 'Edit Digital Certificates'
+          }
+        ]
+      }
     }
   ]
 }

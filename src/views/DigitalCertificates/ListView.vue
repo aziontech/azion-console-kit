@@ -24,9 +24,10 @@
         header: 'Status'
       }
     ]"
-    :pageTitle="'Digital Certificates'"
-    :addButtonLabel="'Add Certificate'"
-    :createPagePath="'digital-certificates/create'"
+    pageTitle="Digital Certificates"
+    editPagePath="digital-certificates/edit"
+    addButtonLabel="Add Certificate"
+    createPagePath="digital-certificates/create"
   />
 </template>
 
