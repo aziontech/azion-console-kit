@@ -79,7 +79,7 @@
       },
       backUrl: {
         type: String,
-        required: true
+        required: false
       }
     },
     async created() {
