@@ -77,7 +77,7 @@
         type: Object,
         required: true
       },
-      backUrl: {
+      backURL: {
         type: String,
         required: false
       }
@@ -87,8 +87,8 @@
     },
     methods: {
       handleCancel() {
-        if (this.backUrl) {
-          this.$router.push({ path: this.backUrl })
+        if (this.backURL) {
+          this.$router.push({ path: this.backURL })
         } else {
           this.$router.go('-1')
         }
