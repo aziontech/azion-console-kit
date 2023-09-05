@@ -185,7 +185,7 @@
 
     watch: {
       domain() {
-        this.intelligentDNSStore.domain = this.domain
+        this.intelligentDNSStore.addDomain(this.domain)
       }
     }
   }
