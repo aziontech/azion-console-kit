@@ -14,7 +14,9 @@ export const parseHttpResponse = (httpResponse) => {
     case 200:
       return httpResponse?.body || null
     case 201:
-      return 'Resource succesfully created'
+      return 'Resource succesfully created';
+    case 202:
+      return 'Resource succesfully updated';
     case 204:
       return 'Resource succesfully deleted'
     case 400:
