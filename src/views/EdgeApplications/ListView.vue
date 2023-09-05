@@ -21,10 +21,10 @@
 
 <template>
   <ListTableBlock
-    :pageTitle="'Edge Applications'"
-    :addButtonLabel="'Add Edge Application'"
-    :createPagePath="'/edge-applications/create'"
-    :editPagePath="'/edge-applications/edit'"
+    pageTitle="Edge Applications"
+    addButtonLabel="Add Edge Application"
+    createPagePath="/edge-applications/create"
+    editPagePath="/edge-applications/edit"
     :listService="listEdgeApplicationsService"
     :deleteService="deleteEdgeApplicationService"
     :columns="[

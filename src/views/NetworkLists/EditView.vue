@@ -1,6 +1,6 @@
 <template>
   <EditFormBlock
-    :pageTitle="'Edit Network Lists'"
+    pageTitle="Edit Network Lists"
     :editService="this.editNetworkListsService"
     :loadService="this.loadNetworkListsService"
     :initialDataSetter="setValues"

@@ -7,13 +7,13 @@ export const useIntelligentDNSStore = defineStore({
   }),
   getters: {
     getDomain() {
-      return this.domain ? this.domain.value : localStorage.getItem('domain');
-    },
+      return this.domain ? this.domain.value : localStorage.getItem('domain')
+    }
   },
   actions: {
     addDomain(domain) {
       this.domain = domain
-      localStorage.setItem("domain", domain.value);
+      localStorage.setItem('domain', domain.value)
     }
-  },
-});
+  }
+})

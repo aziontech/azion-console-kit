@@ -1,6 +1,6 @@
 <template>
   <CreateFormBlock
-    :pageTitle="'Create Intelligent DNS Records'"
+    pageTitle="Create Intelligent DNS Records"
     :createService="props.createRecordsService"
     :formData="formValues"
     :isValid="meta.valid"

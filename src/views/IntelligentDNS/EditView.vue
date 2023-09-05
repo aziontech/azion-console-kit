@@ -5,7 +5,7 @@
   >
     <TabPanel header="Main Settings">
       <EditFormBlock
-        :pageTitle="'Edit Intelligent DNS'"
+        pageTitle="Edit Intelligent DNS"
         :editService="this.editIntelligentDNSService"
         :loadService="this.loadIntelligentDNSService"
         :initialDataSetter="setValues"

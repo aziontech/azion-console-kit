@@ -1,6 +1,6 @@
 <template>
   <CreateFormBlock
-    :pageTitle="'Create Digital Certificate'"
+    pageTitle="Create Digital Certificate"
     :createService="createServiceBySelectedType"
     :formData="values"
     :isValid="meta.valid"

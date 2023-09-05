@@ -20,10 +20,10 @@
         header: 'Last Update'
       }
     ]"
-    :pageTitle="'Variables'"
-    :addButtonLabel="'Add Variable'"
-    :createPagePath="'variables/create'"
-    :editPagePath="'variables/edit'"
+    pageTitle="Variables"
+    addButtonLabel="Add Variable"
+    createPagePath="variables/create"
+    editPagePath="variables/edit"
   />
 </template>
 

@@ -21,8 +21,10 @@
 
 <template>
   <ListTableBlock
-    :pageTitle="'Domains'"
-    :addButtonLabel="'Add domains'"
+    pageTitle="Domains"
+    addButtonLabel="Add domains"
+    createPagePath="domains/create"
+    editPagePath="domains/edit"
     :listService="listDomainsService"
     :deleteService="deleteDomainsService"
     :columns="[

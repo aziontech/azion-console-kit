@@ -20,10 +20,10 @@
         header: 'Active'
       }
     ]"
-    :pageTitle="'Edge Services'"
-    :addButtonLabel="'Add Service'"
-    :createPagePath="'edge-services/create'"
-    :editPagePath="'edge-services/edit'"
+    pageTitle="Edge Services"
+    addButtonLabel="Add Service"
+    createPagePath="edge-services/create"
+    editPagePath="edge-services/edit"
   />
 </template>
 
