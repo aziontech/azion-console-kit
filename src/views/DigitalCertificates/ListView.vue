@@ -16,6 +16,10 @@
         header: 'Issuer'
       },
       {
+        field: 'type',
+        header: 'Type'
+      },
+      {
         field: 'validity',
         header: 'Validity (not after)'
       },

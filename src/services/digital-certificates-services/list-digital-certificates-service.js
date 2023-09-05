@@ -20,12 +20,20 @@ export const listDigitalCertificatesService = async ({
 const adapt = (httpResponse) => {
   const parsedDomains = httpResponse.body.results?.map((item) => {
     const subjectNames = item.subject_name.map((subject) => subject)?.join(',')
+    const typeMap = {
+      edge_certificate: 'Edge Certificate',
+      trusted_ca: 'Trusted CA Certificate',
+    }
     return {
       id: item.id,
       name: item.name,
       issuer: item.issuer || '-',
       subject_name: subjectNames === '' ? '-' : subjectNames,
-      validity: item.validity || '-',
+      type: typeMap[item.certificate_type],
+      validity: item.validity === null ? '-' : new Intl.DateTimeFormat('us', {
+        dateStyle: 'full',
+        timeStyle: 'short'
+      }).format(new Date(item.validity)),
       status: item.status
     }
   })
