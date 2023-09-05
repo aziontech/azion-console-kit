@@ -11,6 +11,7 @@
         :initialDataSetter="setValues"
         :isValid="meta.valid"
         :formData="values"
+        backURL="/intelligent-dns"
       >
         <template #form>
           <InputText
