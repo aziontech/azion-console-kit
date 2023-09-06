@@ -62,10 +62,12 @@ A estrutura segue o seguinte padrão:
 ├── assets
 │   └── themes
 ├── router
+│   ├── routes
+│   │   ├── edge-application-routes
+│   │   └── variables-routes
 │   └── index.js
 ├── services
 │   ├── axios
-│   ├── domains-services
 │   ├── edge-application-services
 │   └── variables-services
 ├── stores
@@ -84,7 +86,23 @@ A estrutura segue o seguinte padrão:
         └── FormView.vue
 ```
 
-Onde, tomando como exemplo a rota de _Variables_, temos o seguinte fluxo para implementação para a **Listagem**:
+Onde:
+| Diretório | Descrição |
+|----------|----------|
+| assets | Arquivos estáticos do projeto (CSS, Imagens, etc) |
+| router | Estrutura de rotas, onde `index.js` centraliza todas rotas |
+| services | Serviços separados por operação do CRUD |
+| stores | Dados que precisam ser compartilhados entre as UI's/rotas |
+| templates | Blocos disponíveis para a construção do projeto, já programados para integração |
+| views | Conjunto de pastas separados por módulos, contém cada UI necessária para cada operação do CRUDL. |
+
+Abaixo você pode visualizar um diagrama da disposição destes arquivos e a forma que se interligam para implementar um módulo CRUDL de Variables:
+
+![Texto Alternativo](./docs/architecture-diagram.png)
+
+### How to: criando uma UI de listagem de Variables
+
+Tomando como exemplo a rota de _Variables_, temos o seguinte fluxo para implementação para a **Listagem**:
 
 1. Criação do Serviço
    - _src/services/variables-services_
@@ -153,10 +171,12 @@ azioncli edge_applications publish --debug
 
 Para usufruir do GitHub Workflow você precisa ter configurado dentro do seu repositório as seguintes SECRETS:
 
-- PLATFORM_KIT_TOKEN: seu Personal token da Azion para ser utilizado no CLI durante o deploy.
-- APPLICATION_ID: ID da Edge Application criada anteriormente via first deploy.
-- FUNCTION_ID: ID da Edge Function criada anteriormente via first deploy.
-- DOMAIN_ID: ID do Domain vinculado a Edge Application criado anteriormente via first deploy.
+| SECRET             | Descrição                                                                        |
+| ------------------ | -------------------------------------------------------------------------------- |
+| PLATFORM_KIT_TOKEN | seu Personal token da Azion para ser utilizado no CLI durante o deploy.          |
+| APPLICATION_ID     | ID da Edge Application criada anteriormente via first deploy.                    |
+| FUNCTION_ID        | ID da Edge Function criada anteriormente via first deploy.                       |
+| DOMAIN_ID          | ID do Domain vinculado a Edge Application criado anteriormente via first deploy. |
 
 ---
 
