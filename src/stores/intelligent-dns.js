@@ -5,15 +5,15 @@ export const useIntelligentDNSStore = defineStore({
   state: () => ({
     domain: null
   }),
+  persist: true,
   getters: {
     getDomain() {
-      return this.domain ? this.domain.value : localStorage.getItem('domain')
+      return this.domain.value
     }
   },
   actions: {
     addDomain(domain) {
       this.domain = domain
-      localStorage.setItem('domain', domain.value)
     }
   }
 })
