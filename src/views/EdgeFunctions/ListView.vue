@@ -36,10 +36,10 @@
         header: 'Active'
       }
     ]"
-    :pageTitle="'Edge Functions'"
-    :addButtonLabel="'Add Edge Function'"
-    :createPagePath="'edge-functions/create'"
-    :editPagePath="'edge-functions/edit'"
+    pageTitle="Edge Functions"
+    addButtonLabel="Add Edge Function"
+    createPagePath="edge-functions/create"
+    editPagePath="edge-functions/edit"
   />
 </template>
 

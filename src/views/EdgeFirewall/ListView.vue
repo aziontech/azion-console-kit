@@ -21,10 +21,10 @@
 
 <template>
   <ListTableBlock
-    :pageTitle="'Edge Firewall'"
-    :addButtonLabel="'Add Rule Set'"
-    :createPagePath="'/edge-firewall/create'"
-    :editPagePath="'/edge-firewall/edit'"
+    pageTitle="Edge Firewall"
+    addButtonLabel="Add Rule Set"
+    createPagePath="/edge-firewall/create"
+    editPagePath="/edge-firewall/edit"
     :listService="listEdgeFirewallService"
     :deleteService="deleteEdgeFirewallService"
     :columns="[

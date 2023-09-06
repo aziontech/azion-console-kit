@@ -21,10 +21,10 @@
 
 <template>
   <ListTableBlock
-    :pageTitle="'Data Streaming'"
-    :addButtonLabel="'Add Streaming'"
-    :createPagePath="'/data-streaming/create'"
-    :editPagePath="'/data-streaming/edit'"
+    pageTitle="Data Streaming"
+    addButtonLabel="Add Streaming"
+    createPagePath="/data-streaming/create"
+    editPagePath="/data-streaming/edit"
     :listService="listDataStreamingService"
     :deleteService="deleteDataStreamingService"
     :columns="[

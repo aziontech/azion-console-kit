@@ -1,6 +1,6 @@
 <template>
   <CreateFormBlock
-    :pageTitle="'Create Network Lists'"
+    pageTitle="Create Network Lists"
     :createService="createNetworkListService"
     :formData="values"
     :isValid="meta.valid"
