@@ -44,7 +44,7 @@
         pageTitle="Records"
         addButtonLabel="Add Record"
         createPagePath="records/create"
-        editPagePath="/"
+        editPagePath="/records/edit"
         :columns="recordListColumns"
         :listService="listRecordsServiceIntelligentDNSDecorator"
         :deleteService="deleteRecordsServiceIntelligentDNSDecorator"
