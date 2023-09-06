@@ -1,6 +1,6 @@
 <template>
   <CreateFormBlock
-    :pageTitle="'Create Variables'"
+    pageTitle="Create Variables"
     :createService="props.createVariablesService"
     :formData="values"
     :isValid="meta.valid"
@@ -34,31 +34,31 @@
 </template>
 
 <script setup>
-import CreateFormBlock from '@/templates/create-form-block'
-import InputText from 'primevue/inputtext'
-import InputSwitch from 'primevue/inputswitch'
-import { useForm } from 'vee-validate'
-import * as yup from 'yup'
+  import CreateFormBlock from '@/templates/create-form-block'
+  import InputText from 'primevue/inputtext'
+  import InputSwitch from 'primevue/inputswitch'
+  import { useForm } from 'vee-validate'
+  import * as yup from 'yup'
 
-const props = defineProps({
-  createVariablesService: {
-    type: Function,
-    required: true
-  }
-})
-//Validation Schema
-const validationSchema = yup.object({
-  key: yup.string().required(),
-  value: yup.string().required(),
-  secret: yup.boolean().required().default(false)
-})
+  const props = defineProps({
+    createVariablesService: {
+      type: Function,
+      required: true
+    }
+  })
+  //Validation Schema
+  const validationSchema = yup.object({
+    key: yup.string().required(),
+    value: yup.string().required(),
+    secret: yup.boolean().required().default(false)
+  })
 
-// validation with VeeValidate
-const { errors, defineInputBinds, meta, resetForm, values } = useForm({
-  validationSchema
-})
+  // validation with VeeValidate
+  const { errors, defineInputBinds, meta, resetForm, values } = useForm({
+    validationSchema
+  })
 
-const key = defineInputBinds('key', { validateOnInput: true })
-const value = defineInputBinds('value', { validateOnInput: true })
-const secret = defineInputBinds('secret')
+  const key = defineInputBinds('key', { validateOnInput: true })
+  const value = defineInputBinds('value', { validateOnInput: true })
+  const secret = defineInputBinds('secret')
 </script>

@@ -16,6 +16,10 @@
         header: 'Issuer'
       },
       {
+        field: 'type',
+        header: 'Type'
+      },
+      {
         field: 'validity',
         header: 'Validity (not after)'
       },
@@ -24,29 +28,30 @@
         header: 'Status'
       }
     ]"
-    :pageTitle="'Digital Certificates'"
-    :addButtonLabel="'Add Certificate'"
-    :createPagePath="'digital-certificates/create'"
+    pageTitle="Digital Certificates"
+    editPagePath="digital-certificates/edit"
+    addButtonLabel="Add Certificate"
+    createPagePath="digital-certificates/create"
   />
 </template>
 
 <script>
-import ListTableBlock from '@/templates/list-table-block'
+  import ListTableBlock from '@/templates/list-table-block'
 
-export default {
-  name: 'digital-certificates-view',
-  components: {
-    ListTableBlock
-  },
-  props: {
-    listDigitalCertificatesService: {
-      required: true,
-      type: Function
+  export default {
+    name: 'digital-certificates-view',
+    components: {
+      ListTableBlock
     },
-    deleteDigitalCertificatesService: {
-      required: true,
-      type: Function
+    props: {
+      listDigitalCertificatesService: {
+        required: true,
+        type: Function
+      },
+      deleteDigitalCertificatesService: {
+        required: true,
+        type: Function
+      }
     }
   }
-}
 </script>

@@ -20,30 +20,30 @@
         header: 'Last modified'
       }
     ]"
-    :pageTitle="'Network Lists'"
-    :addButtonLabel="'Add Network List'"
-    :createPagePath="'network-lists/create'"
-    :editPagePath="'network-lists/edit'"
+    pageTitle="Network Lists"
+    addButtonLabel="Add Network List"
+    createPagePath="network-lists/create"
+    editPagePath="network-lists/edit"
   />
 </template>
 
 <script>
-import ListTableBlock from '@/templates/list-table-block'
+  import ListTableBlock from '@/templates/list-table-block'
 
-export default {
-  name: 'network-list-view',
-  components: {
-    ListTableBlock
-  },
-  props: {
-    listNetworkListService: {
-      required: true,
-      type: Function
+  export default {
+    name: 'network-list-view',
+    components: {
+      ListTableBlock
     },
-    deleteNetworkListService: {
-      required: true,
-      type: Function
+    props: {
+      listNetworkListService: {
+        required: true,
+        type: Function
+      },
+      deleteNetworkListService: {
+        required: true,
+        type: Function
+      }
     }
   }
-}
 </script>
