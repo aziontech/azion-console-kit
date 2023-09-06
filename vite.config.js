@@ -23,7 +23,8 @@ export default defineConfig({
       '/api/token': {
         target: 'https://stage-sso.azion.com/api/token',
         changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/api\/token/, '')
+        rewrite: (path) => path.replace(/^\/api\/token/, ''),
+        cookieDomainRewrite: { '*': '' }
       },
       '/api/edge_services': {
         target: 'https://stage-manager-origin.azion.com/services/api/v1/services',
@@ -42,7 +43,7 @@ export default defineConfig({
         rewrite: (path) => path.replace(/^\/network-lists\/graphql/, '')
       },
       '/api': {
-        target: 'https://stage-manager-origin.azion.com/api/',
+        target: 'https://stage-manager-origin.azion.com/api',
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/api/, '')
       }

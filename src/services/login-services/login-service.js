@@ -1,12 +1,33 @@
 import { AxiosHttpClientAdapter, parseHttpResponse } from '../axios/AxiosHttpClientAdapter'
 import { makeLoginBaseUrl } from './make-login-base-url'
 
-export const loginService = async (payload) => {
-  console.log(payload)
+export const authenticate = async (payload) => {
   let httpResponse = await AxiosHttpClientAdapter.request({
     url: `${makeLoginBaseUrl()}`,
     method: 'POST',
-    body: payload
+    body: payload,
+  })
+
+  httpResponse = await adapt(httpResponse)
+
+  return parseHttpResponse(httpResponse)
+}
+
+export const verify = async () => {
+  let httpResponse = await AxiosHttpClientAdapter.request({
+    url: `${makeLoginBaseUrl()}/verify`,
+    method: 'POST',
+  })
+
+  httpResponse = await adapt(httpResponse)
+
+  return parseHttpResponse(httpResponse)
+}
+
+export const refresh = async () => {
+  let httpResponse = await AxiosHttpClientAdapter.request({
+    url: `${makeLoginBaseUrl()}/refresh`,
+    method: 'POST',
   })
 
   httpResponse = await adapt(httpResponse)
@@ -15,10 +36,10 @@ export const loginService = async (payload) => {
 }
 
 const adapt = async (httpResponse) => {
-  const parsedEdgeFirewalls = httpResponse.body
+  const parsedData = httpResponse.body
 
   return {
-    body: parsedEdgeFirewalls,
+    body: parsedData,
     statusCode: httpResponse.statusCode
   }
 }

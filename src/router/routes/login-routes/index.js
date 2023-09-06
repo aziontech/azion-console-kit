@@ -10,7 +10,9 @@ export const loginRoutes = {
       name: 'login',
       component: () => import('@views/Login/LoginView.vue'),
       props: {
-        loginService: LoginService.loginService
+        authenticationLoginService: LoginService.authenticate,
+        verifyLoginService: LoginService.verify,
+        refreshLoginService: LoginService.refresh,
       }
     }
   ]

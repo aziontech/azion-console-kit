@@ -1,3 +1,3 @@
-import { loginService } from './login-service'
+import { authenticate, verify, refresh } from './login-service'
 
-export { loginService }
+export { authenticate, verify, refresh }

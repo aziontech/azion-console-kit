@@ -8,20 +8,17 @@
           </div>
 
           <div>
-            {{ console.log(hasError) }}
             <Message
               severity="error"
               class="!mb-4"
               :closable="false"
               :hidden="!hasError"
-              >User not found with the given credentials.</Message
-            >
+            >User not found with the given credentials.</Message>
 
             <label
               for="email"
               class="block text-900 font-medium mb-2"
-              >Email</label
-            >
+            >Email</label>
             <InputText
               v-model="formData.email"
               id="email"
@@ -32,8 +29,7 @@
             <label
               for="password"
               class="block text-900 font-medium mb-2"
-              >Password</label
-            >
+            >Password</label>
             <InputText
               v-model="formData.password"
               id="password"
@@ -51,9 +47,7 @@
                 />
                 <label for="rememberme">Keep me logged in</label>
               </div>
-              <a class="font-medium no-underline ml-2 text-blue-500 text-right cursor-pointer"
-                >Forgot password?</a
-              >
+              <a class="font-medium no-underline ml-2 text-blue-500 text-right cursor-pointer">Forgot password?</a>
             </div>
 
             <PrimeButton
@@ -75,54 +69,73 @@
 </template>
 
 <script>
-  import { ref } from 'vue'
-  import Checkbox from 'primevue/checkbox'
-  import InputText from 'primevue/inputtext'
-  import Message from 'primevue/message'
-  import PrimeButton from 'primevue/button'
+import { ref } from 'vue'
+import { useRouter } from 'vue-router'
+import Checkbox from 'primevue/checkbox'
+import InputText from 'primevue/inputtext'
+import Message from 'primevue/message'
+import PrimeButton from 'primevue/button'
 
-  export default {
-    name: 'login-block',
-    components: {
-      Checkbox,
-      InputText,
-      Message,
-      PrimeButton
+export default {
+  name: 'login-block',
+  components: {
+    Checkbox,
+    InputText,
+    Message,
+    PrimeButton
+  },
+  props: {
+    authenticationLoginService: {
+      type: Function,
+      required: true
     },
-    props: {
-      loginService: {
-        type: Function,
-        required: true
-      }
+    verifyLoginService: {
+      type: Function,
+      required: true
     },
-    setup(props) {
-      const formData = ref({
-        email: '',
-        password: '',
-        captcha: 'default'
-      })
+    refreshLoginService: {
+      type: Function,
+      required: true
+    },
+  },
+  setup(props) {
+    const formData = ref({
+      email: '',
+      password: '',
+      captcha: 'default'
+    })
 
-      const isLoading = ref(false)
-      const hasError = ref(false)
+    const isLoading = ref(false)
+    const hasError = ref(false)
+    const router = useRouter()
 
-      const validateAndSubmit = async () => {
-        console.log('IS VALIDATING')
-        try {
-          isLoading.value = true
-          await props.loginService(formData.value)
-        } catch (error) {
-          hasError.value = true
-          isLoading.value = false
-        }
-      }
-
-      // Retornar todas as referências necessárias
-      return {
-        formData,
-        hasError,
-        isLoading,
-        validateAndSubmit
+    const validateAndSubmit = async () => {
+      try {
+        isLoading.value = true
+        await props.authenticationLoginService(formData.value)
+        await verify();
+        router.push('/')
+      } catch (error) {
+        hasError.value = true
+        isLoading.value = false
       }
     }
+
+    const verify = async () => {
+      try {
+        await props.verifyLoginService()
+      } catch (error) {
+        await props.refreshLoginService()
+      }
+    }
+
+    // Retornar todas as referências necessárias
+    return {
+      formData,
+      hasError,
+      isLoading,
+      validateAndSubmit
+    }
   }
+}
 </script>
