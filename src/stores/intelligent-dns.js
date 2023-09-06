@@ -14,7 +14,6 @@ export const useIntelligentDNSStore = defineStore({
   actions: {
     addDomain(domain) {
       this.domain = domain
-      localStorage.setItem('domain', domain.value)
     }
   }
 })
