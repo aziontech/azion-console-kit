@@ -1,236 +1,544 @@
+<!-- eslint-disable vuejs-accessibility/click-events-have-key-events -->
 <template>
+  <!-- Header Container -->
   <header
-    style="background-color: var(--surface-section); border-bottom: 1px solid var(--surface-border)"
-    class="items-center flex justify-between p-2"
+    class="surface-section border-b surface-border min-h-[60px] items-center flex justify-between px-4 w-full"
   >
-    <div class="flex gap-3 items-center flex-grow">
-      <PrimeButton
-        @click="showSideBar"
-        size="small"
-        class="flex-none"
-        text
-        icon="pi pi-bars"
-      />
-
-      <svg
-        viewBox="0 0 120 24"
-        fill="none"
-        xmlns="http://www.w3.org/2000/svg"
-        class="w-20"
-      >
-        <path
-          fill-rule="evenodd"
-          clip-rule="evenodd"
-          d="M68.8751 0L64.3906 23.4146H87.711L92.1955 0H68.8751ZM72.5179 4.42392H86.8522L84.0623 18.9907H69.728L72.5179 4.42392Z"
-          fill="#F3652B"
-        ></path>
-        <path
-          fill-rule="evenodd"
-          clip-rule="evenodd"
-          d="M60.0001 0L55.6094 23.4146H59.9992L64.3899 0H60.0001Z"
-          fill="#F3652B"
-        ></path>
-        <path
-          fill-rule="evenodd"
-          clip-rule="evenodd"
-          d="M24.3824 0L0.654522 19.9761L0 23.4146H3.41853L21.7987 7.94855L18.8361 23.4146H23.3197L27.8049 0H24.3824Z"
-          fill="#F3652B"
-        ></path>
-        <path
-          fill-rule="evenodd"
-          clip-rule="evenodd"
-          d="M115.516 0L113.526 10.3871L117.148 14.8895L120 0H115.516ZM96.6798 0L92.1953 23.4146H96.6815L99.755 7.36298L112.711 23.4146H115.516L116.069 20.5482L99.4841 0H96.6798Z"
-          fill="#F3652B"
-        ></path>
-        <path
-          fill-rule="evenodd"
-          clip-rule="evenodd"
-          d="M32.2893 0L31.4419 4.42401H46.9283L28.4682 19.9674L27.8047 23.4146H51.125L51.9724 18.9906H36.4861L54.9502 3.44385L55.6096 0H32.2893Z"
-          fill="#F3652B"
-        ></path>
-      </svg>
-
-      <Breadcrumb
-        :home="generateHomeBreadCrumb"
-        :model="generateBreadCrumbs"
-        class="!p-2 border-none"
-      >
-        <template #separator>
-          <svg
-            width="11"
-            height="14"
-            viewBox="0 0 11 14"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <path
-              d="M10.8125 -4.75L1.3125 19.9531H0.09375L9.59375 -4.75H10.8125Z"
-              fill="#495057"
-            />
-          </svg>
-        </template>
-      </Breadcrumb>
-    </div>
     <div class="flex gap-3 items-center">
       <PrimeButton
-        @click="showSearch = true"
+        @click="openSideBar"
         size="small"
-        class="flex-none"
+        class="flex-none surface-border"
         text
-        icon="pi pi-search"
+        icon="pi pi-bars"
+        style="height: 32px; width: 32px"
       />
+      <!-- Logo Azion Desktop -->
+      <svg
+        @click="this.$router.push('/')"
+        xmlns="http://www.w3.org/2000/svg"
+        class="hidden md:block cursor-pointer"
+        width="93"
+        height="18"
+        fill="none"
+        viewBox="0 0 93 18"
+      >
+        <path
+          fill="#F3652B"
+          fill-rule="evenodd"
+          d="M18.744 0 .504 15.357 0
+            18h2.628l14.13-11.89L14.48
+            18h3.447l3.448-18h-2.631Zm6.078 0-.651 3.4h11.905L21.885 15.35l-.51
+            2.65h17.927l.652-3.401H28.049L42.243 2.647 42.75 0H24.822Zm21.303
+            0L42.75 18h3.374L49.5 0h-3.375Zm6.822 0L49.5 18h17.927l3.447-18H52.947Zm2.8
+            3.4h11.02l-2.145 11.2h-11.02l2.146-11.2ZM88.802 0l-1.53 7.985 2.785 3.461L92.249
+            0h-3.447Zm-14.48 0-3.448 18h3.45l2.362-12.34L86.646 18h2.156l.426-2.204L76.478
+            0h-2.156Z"
+          clip-rule="evenodd"
+        />
+      </svg>
+      <!-- Logo Azion Mobile -->
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        class="block md:hidden"
+        width="22"
+        height="18"
+        fill="none"
+        viewBox="0 0 22 18"
+      >
+        <path
+          fill="#F3652B"
+          fill-rule="evenodd"
+          d="M18.744 0 .504 15.357
+          0 18h2.628l14.13-11.89L14.48
+          18h3.447l3.448-18h-2.631Z"
+          clip-rule="evenodd"
+        />
+      </svg>
+
+      <!-- Azion client -->
       <PrimeButton
+        v-tooltip.bottom="'Switch Account'"
+        class="ml-2 h-8 w-auto surface-border hidden md:flex gap-2 items-center"
         size="small"
-        class="flex-none"
-        text
-        icon="pi pi-moon"
+        outlined
+      >
+        <i class="pi pi-building" />
+        <span>Azion Client</span>
+      </PrimeButton>
+    </div>
+
+    <!-- Search -->
+    <span class="top-0 p-input-icon-left p-input-icon-right hidden lg:flex">
+      <i class="pi pi-search" />
+      <i class="!top-[35%]">
+        <Tag
+          class="not-italic border surface-border text-color-secondary cursor-pointer surface-100"
+          value="⌘ + K"
+          @click="openSearch"
+        />
+      </i>
+      <InputText
+        class="w-64"
+        placeholder="Search..."
+        :value="searchText"
+        @click="openSearch"
+        size="small"
       />
+    </span>
+
+    <!-- Right Buttons -->
+    <div class="flex gap-2 items-center">
+      <PrimeButton
+        icon="pi pi-search"
+        class="surface-border px-2 py-1 flex lg:hidden"
+        @click="openSearch"
+        style="height: 32px; width: 32px"
+        outlined
+      />
+
+      <!-- Create Button Desktop -->
+      <PrimeButton
+        @click="showCreateModal"
+        icon="pi pi-plus"
+        label="Create"
+        class="h-8 hidden sm:flex"
+        size="small"
+      />
+
+      <!-- Create Button Mobile -->
+      <PrimeButton
+        @click="showCreateModal"
+        icon="pi pi-plus"
+        class="h-8 sm:hidden"
+        size="small"
+        style="height: 32px; width: 32px"
+      />
+
+      <!-- Notification Button  -->
+      <PrimeButton
+        icon="pi pi-bell"
+        style="border-color: var(--surface-border); padding-left: 7px; height: 32px; width: 32px"
+        class="overflow-auto"
+        badge="9"
+        v-tooltip.bottom="'Notifications'"
+        size="small"
+        badgeClass="p-badge-danger"
+        @click="toggleNotification"
+        aria-haspopup="true"
+        aria-controls="overlay_menu"
+        outlined
+        :pt="{
+          root: { class: 'overflow-visible' },
+          badge: { class: 'absolute right-[-4px] top-[-8px]' }
+        }"
+      />
+
+      <Divider
+        layout="vertical"
+        class="px-0 mx-1 surface-border"
+      />
+
+      <!-- Avatar Desktop -->
       <Avatar
-        @click="showProfile = true"
-        label="P"
+        @click="toggleProfile"
+        label="U"
         class="cursor-pointer"
-      />
-      <PrimeMenu
-        ref="menu"
-        id="overlay_menu"
-        :model="[]"
-        :popup="true"
       />
     </div>
   </header>
 
+  <!-- Sidebar-->
   <Sidebar
-    :visible="sideBarVisible"
+    class="max-w-[280px]"
+    v-model:visible="showSidebar"
     position="left"
-    @update:visible="(val) => showSideBar(val)"
-    @hide="showSideBar(false)"
   >
-    <div class="flex flex-col p-4">
-      <template
-        v-for="menuItem of menuItems"
-        :key="menuItem.label"
-      >
-        <p
-          v-if="menuItem.sectionTitle"
-          class="font-semibold my-4 text-md text-gray-400"
-        >
-          {{ menuItem.sectionTitle }}
-        </p>
-        <RouterLink
-          @click="showSideBar(false)"
-          :to="menuItem.to"
-          class="mb-4 flex items-center"
-          :activeClass="'text-orange-600'"
-        >
-          <i :class="`text-xl pi ${menuItem.icon} mr-3`" /> {{ menuItem.label }}
-        </RouterLink>
-
-        <Divider v-if="menuItem.showDivider" />
-      </template>
+    <div class="flex flex-col p-2">
+      <PrimeMenu
+        :pt="{
+          menuitem: { class: 'overflow-auto text-sm', style: 'border-radius: 6px !important' },
+          content: { class: 'rounded-md' },
+          submenuheader: { class: 'bg-transparent text-xs font-medium leading-none' },
+          separator: { class: 'surface-border my-2' }
+        }"
+        class="bg-transparent w-full border-0"
+        :model="menuStructure"
+      />
     </div>
   </Sidebar>
+
+  <!-- Profile Menu -->
+  <PrimeMenu
+    :pt="{
+      root: { class: '!w-[240px]' },
+      submenuheader: { class: 'text-sm font-bold leading-none' },
+      separator: { class: 'surface-border' }
+    }"
+    class=""
+    ref="profile"
+    :popup="true"
+    :model="profileMenuItems"
+  >
+    <template #start>
+      <div class="border-b surface-border flex flex-column gap-0.5 pb-1">
+        <div class="flex flex-column align gap-0.5 px-3 pt-2 pb-1">
+          <span class="font-bold">Account Name</span>
+          <span class="text-xs text-color-secondary">ID: 3938124</span>
+        </div>
+        <PrimeButton
+          label="Switch Account"
+          text
+          class="w-full rounded-none flex content-start text-left md:hidden"
+        />
+      </div>
+    </template>
+
+    <template #end>
+      <div class="flex flex-row items-center px-3 pt-2.5 gap-2 pb-1.5">
+        <div class="flex flex-col gap-1.5">
+          <span class="text-sm font-bold leading-none">User Name</span>
+          <span class="text-xs text-color-secondary">user.email@azion.com</span>
+        </div>
+      </div>
+      <PrimeButton
+        class="w-full rounded-none flex content-start text-left"
+        label="Your Settings"
+        text
+      />
+      <PrimeButton
+        class="w-full rounded-none flex content-start text-left"
+        label="Personal Tokens"
+        text
+      />
+
+      <!-- Theme Switch -->
+      <div class="flex flex-row justify-between items-center align-middle px-3 py-1.5">
+        <span>Theme</span>
+        <Dropdown
+          v-model="selectedTheme"
+          :options="themeOptions"
+          optionLabel="name"
+          :pt="{
+            root: { class: 'w-auto py-0 h-8 items-center align-middle' },
+            item: { class: 'text-sm' },
+            input: { class: 'text-sm' }
+          }"
+        >
+          <template #value="slotProps">
+            <div
+              v-if="slotProps.value"
+              class="flex gap-2 align-items-center"
+            >
+              <i :class="slotProps.value.icon"></i>
+              <div>{{ slotProps.value.name }}</div>
+            </div>
+          </template>
+          <template #option="slotProps">
+            <div class="flex gap-2 align-items-center">
+              <i :class="slotProps.option.icon"></i>
+              <div>{{ slotProps.option.name }}</div>
+            </div>
+          </template>
+        </Dropdown>
+      </div>
+      <Divider class="surface-border p-1 m-0" />
+      <PrimeButton
+        class="w-full rounded-none flex content-start text-left text-red-600"
+        label="Logout"
+        icon="pi pi-sign-out"
+        text
+      />
+    </template>
+  </PrimeMenu>
+
+  <!-- Quick Search -->
+  <PrimeDialog
+    v-model:visible="showSearch"
+    modal
+    position="center"
+    :dismissableMask="true"
+    :showHeader="false"
+    :breakpoints="{ '641px': '90vw' }"
+    :style="{ marginTop: '0px', width: '540px', maxHeight: '21rem' }"
+    :pt="{
+      root: { class: 'p-0 rounded-md' },
+      content: { class: 'p-0 rounded-md' }
+    }"
+  >
+    <div class="flex flex-col">
+      <!-- Search Input -->
+      <span class="sticky top-0 z-10 p-input-icon-left p-input-icon-right border-b surface-border">
+        <i class="pi pi-search" />
+        <i class="!top-[35%]">
+          <Tag
+            @click="closeSearch"
+            class="not-italic border surface-border text-color-secondary surface-100 cursor-pointer"
+            value="esc"
+          />
+        </i>
+        <InputText
+          placeholder="Search..."
+          class="w-full rounded-none border-none h-12"
+        />
+      </span>
+      <div class="m-2 surface-border border border-dashed flex items-center h-96">
+        <p class="text-color-secondary text-center w-full">Slot</p>
+      </div>
+    </div>
+  </PrimeDialog>
+
+  <!-- Modal de create -->
+  <PrimeDialog
+    v-model:visible="showCreate"
+    modal
+    header="Create"
+    position="center"
+    :dismissableMask="true"
+    :breakpoints="{ '641px': '90vw' }"
+    :style="{ width: '65vw' }"
+  >
+
+  <!-- SLOT WIP -->
+    <div class="m-2 surface-border border border-dashed flex items-center h-96">
+      <p class="text-color-secondary text-center w-full">Slot</p>
+    </div>
+  </PrimeDialog>
+
+  <!-- Notification Menu -->
+  <PrimeMenu
+    ref="menu"
+    id="overlay_menu"
+    :model="items"
+    :popup="true"
+  >
+    <template #start>
+      <!-- SLOT WIP -->
+      <div class="m-2 surface-border border border-dashed flex items-center h-96">
+        <p class="text-color-secondary text-center w-full">Slot</p>
+      </div>
+    </template>
+  </PrimeMenu>
 </template>
 
 <script>
+  // Imports
+  import Avatar from 'primevue/avatar'
   import PrimeMenu from 'primevue/menu'
   import PrimeButton from 'primevue/button'
-  import Breadcrumb from 'primevue/breadcrumb'
   import Sidebar from 'primevue/sidebar'
-  import Avatar from 'primevue/avatar'
   import Divider from 'primevue/divider'
+  import PrimeDialog from 'primevue/dialog'
+  import InputText from 'primevue/inputtext'
+  import Tag from 'primevue/tag'
+  import Dropdown from 'primevue/dropdown'
 
+  // Export my assets and components
   export default {
-    name: 'menu-block',
+    name: 'HeaderTemplate',
     components: {
       Avatar,
-      Divider,
-      PrimeButton,
-      Breadcrumb,
       PrimeMenu,
-      Sidebar
+      PrimeButton,
+      Sidebar,
+      Divider,
+      PrimeDialog,
+      InputText,
+      Dropdown,
+      Tag
     },
+
     data() {
       return {
-        sideBarVisible: false,
-        showSideBar: (state = true) => {
-          this.sideBarVisible = state
-        },
-        menuItems: [
+        showCreate: false,
+        showSearch: false,
+        showSidebar: false,
+        showProfile: false,
+        searchText: null,
+        items: [],
+        commandOptions: [
+          {
+            label: 'Recents',
+            items: [
+              { label: 'Import project', icon: 'pi pi-file-import' },
+              { label: 'New project from template', icon: 'pi pi-plus-circle' },
+              { label: 'New domains', icon: 'pi pi-plus-circle' },
+              { label: 'Marketplace', icon: 'pi pi-shopping-cart' },
+              { label: 'Toggle Dark Mode', icon: 'pi pi-moon' }
+            ]
+          },
+          {
+            label: 'Build',
+            items: [
+              { label: 'New Edge Application', icon: 'pi pi-plus-circle' },
+              { label: 'New Edge Function', icon: 'pi pi-plus-circle' }
+            ]
+          },
+          {
+            label: 'Secure',
+            items: [{ label: 'New Edge Firewall', icon: 'pi pi-plus-circle' }]
+          },
+          {
+            label: 'Settings',
+            items: [
+              { label: 'Account Settings', icon: 'pi pi-cog' },
+              { label: 'Your Settings', icon: 'pi pi-user' },
+              { label: 'Users Management', icon: 'pi pi-users' },
+              { label: 'Team Permissions', icon: 'pi pi-user-edit' },
+              { label: 'Billing & Subscriptions', icon: 'pi pi-credit-card' },
+              { label: 'Credentials', icon: 'pi pi-id-card' },
+              { label: 'Activity History', icon: 'pi pi-history' },
+              { label: 'Personal Tokens', icon: 'pi pi-key' }
+            ]
+          }
+        ],
+        menuStructure: [
           {
             label: 'Home',
-            to: '/',
-            icon: 'pi-home'
+            icon: 'pi pi-home',
+            to: '/'
           },
           {
             label: 'Domains',
-            to: '/domains',
-            icon: 'pi-globe',
-            showDivider: true
+            icon: 'pi pi-globe',
+            to: '/domains'
+          },
+          { separator: true },
+          {
+            label: 'BUILD',
+            icon: 'pi pi-code',
+            items: [
+              {
+                label: 'Edge Application',
+                icon: 'pi pi-box',
+                to: '/'
+              },
+              {
+                label: 'Variables',
+                to: '/variables',
+                icon: 'pi pi-sliders-h'
+              },
+              { separator: true }
+            ]
           },
           {
-            sectionTitle: 'BUILD',
-            label: 'Edge Application',
-            to: '/edge-applications',
-            icon: 'pi-window-minimize'
+            label: 'SECURE',
+            icon: 'pi pi-lock',
+            items: [
+              {
+                label: 'Intelligent DNS',
+                to: '/intelligent-dns',
+                icon: 'pi pi-share-alt'
+              },
+              {
+                label: 'Edge Firewall',
+                to: '/edge-firewall',
+                icon: 'pi pi-lock',
+              },
+              { separator: true }
+            ]
           },
           {
-            label: 'Variables',
-            to: '/variables',
-            icon: 'pi-sliders-h',
-            showDivider: true
+            label: 'DEPLOY',
+            items: [
+              {
+                label: 'Edge Nodes',
+                icon: 'pi pi-database'
+              },
+              { separator: true }
+            ]
           },
           {
-            sectionTitle: 'SECURE',
-            label: 'Intelligent DNS',
-            to: '/intelligent-dns',
-            icon: 'pi-share-alt'
+            label: 'OBSERVE',
+            items: [
+              {
+                label: 'Data Streaming',
+                to: '/data-streaming',
+                icon: 'pi pi-play'
+              },
+             
+              { separator: true }
+            ]
           },
           {
-            label: 'Edge Firewall',
-            to: '/edge-firewall',
-            icon: 'pi-lock',
-            showDivider: true
-          },
-          {
-            sectionTitle: 'OBSERVE',
-            label: 'Data Streaming',
-            to: '/data-streaming',
-            icon: 'pi-play'
-          },
-          {
-            sectionTitle: 'EDGE LIBRARIES',
-            label: 'Edge Functions',
-            to: '/edge-functions',
-            icon: 'pi-code'
-          },
-          {
-            label: 'Edge Services',
-            to: '/edge-services',
-            icon: 'pi-bookmark'
-          },
-          {
-            label: 'Digital Certificates',
-            to: '/digital-certificates',
-            icon: 'pi-verified'
-          },
-          {
-            label: 'Network Lists',
-            to: '/network-lists',
-            icon: 'pi-globe',
-            showDivider: true
+            label: 'EDGE LIBRARIES',
+            items: [
+              {
+                label: 'Edge Functions',
+                to: '/edge-functions',
+                icon: 'pi pi-code'
+              },
+              {
+                label: 'Edge Services',
+                to: '/edge-services',
+                icon: 'pi pi-bookmark'
+              },
+              {
+                label: 'Digital Certificates',
+                to: '/digital-certificates',
+                icon: 'pi pi-verified'
+              },
+              {
+                label: 'Network Lists',
+                to: '/network-lists',
+                icon: 'pi pi-globe',
+              },
+            ]
           }
+        ],
+        profileMenuItems: [
+          {
+            label: 'Organization Settings',
+            items: [
+              {
+                label: 'Account Settings'
+              },
+              {
+                label: 'Users Management'
+              },
+              {
+                label: 'Billing & Subscriptions'
+              },
+              {
+                label: 'Credentials'
+              },
+              {
+                label: 'Activity History'
+              },
+              {
+                label: 'Teams Permissions'
+              },
+              { separator: true }
+            ]
+          }
+        ],
+        selectedTheme: { name: 'System', icon: 'pi pi-desktop' },
+        themeOptions: [
+          { name: 'Light', icon: 'pi pi-sun' },
+          { name: 'Dark', icon: 'pi pi-moon' },
+          { name: 'System', icon: 'pi pi-desktop' }
         ]
       }
     },
-    computed: {
-      generateHomeBreadCrumb() {
-        return {
-          icon: 'pi pi-home',
-          to: '/'
-        }
+
+    methods: {
+      toggleProfile(event) {
+        this.$refs.profile.toggle(event)
       },
-      generateBreadCrumbs() {
-        return this.$router.currentRoute.value.meta.breadCrumbs ?? []
+      toggleNotification(event) {
+        this.$refs.menu.toggle(event)
+      },
+      showCreateModal() {
+        this.showCreate = true
+      },
+      openSideBar() {
+        this.showSidebar = true
+      },
+      openSearch() {
+        this.showSearch = true
+      },
+      closeSearch() {
+        this.showSearch = false
       }
     }
   }
