@@ -298,8 +298,7 @@
     :breakpoints="{ '641px': '90vw' }"
     :style="{ width: '65vw' }"
   >
-
-  <!-- SLOT WIP -->
+    <!-- SLOT WIP -->
     <div class="m-2 surface-border border border-dashed flex items-center h-96">
       <p class="text-color-secondary text-center w-full">Slot</p>
     </div>
@@ -433,7 +432,7 @@
               {
                 label: 'Edge Firewall',
                 to: '/edge-firewall',
-                icon: 'pi pi-lock',
+                icon: 'pi pi-lock'
               },
               { separator: true }
             ]
@@ -456,7 +455,7 @@
                 to: '/data-streaming',
                 icon: 'pi pi-play'
               },
-             
+
               { separator: true }
             ]
           },
@@ -481,8 +480,8 @@
               {
                 label: 'Network Lists',
                 to: '/network-lists',
-                icon: 'pi pi-globe',
-              },
+                icon: 'pi pi-globe'
+              }
             ]
           }
         ],
