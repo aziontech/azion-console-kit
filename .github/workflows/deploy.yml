@@ -30,7 +30,7 @@ jobs:
         run: curl https://downloads.azion.com/linux/x86_64/azioncli -o azioncli && chmod +x azioncli
 
       - name: Configure Azion CLI
-        run: ./azioncli -t ${{ secrets.PLATFORM_KIT_TOKEN }}
+        run: ./azioncli configure -t ${{ secrets.PLATFORM_KIT_TOKEN }}
 
       - name: Define application settings
         run: >
@@ -47,4 +47,4 @@ jobs:
         run: mkdir -p .edge/statics && cp -r ./dist/* .edge/statics
 
       - name: Deploy Edge Application
-        run: ./azioncli deploy
+        run: ./azioncli edge_applications publish
