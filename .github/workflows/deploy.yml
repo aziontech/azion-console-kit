@@ -4,7 +4,7 @@ on:
   push:
     branches:
       - main
-      - update-deploy-workflow
+
 env:
   HUSKY: 0
 
