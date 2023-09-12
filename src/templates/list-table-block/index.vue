@@ -20,7 +20,7 @@
       removableSort
       :value="data"
       dataKey="id"
-      v-model:filters="this.filters"
+      v-model:filters="filters"
       paginator
       :rowsPerPageOptions="[5, 10, 20, 50, 100]"
       :rows="5"
@@ -33,7 +33,7 @@
             <i class="pi pi-search" />
             <InputText
               class="w-full"
-              v-model="this.filters.global.value"
+              v-model="filters.global.value"
               placeholder="Search"
             />
           </span>

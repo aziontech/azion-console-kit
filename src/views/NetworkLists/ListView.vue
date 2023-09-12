@@ -2,24 +2,7 @@
   <ListTableBlock
     :listService="listNetworkListService"
     :deleteService="deleteNetworkListService"
-    :columns="[
-      {
-        field: 'name',
-        header: 'Name'
-      },
-      {
-        field: 'listType',
-        header: 'List type'
-      },
-      {
-        field: 'lastEditor',
-        header: 'Last editor'
-      },
-      {
-        field: 'lastModified',
-        header: 'Last modified'
-      }
-    ]"
+    :columns="getColumns"
     pageTitle="Network Lists"
     addButtonLabel="Add Network List"
     createPagePath="network-lists/create"
@@ -43,6 +26,28 @@
       deleteNetworkListService: {
         required: true,
         type: Function
+      }
+    },
+    computed: {
+      getColumns() {
+        return [
+          {
+            field: 'name',
+            header: 'Name'
+          },
+          {
+            field: 'listType',
+            header: 'List type'
+          },
+          {
+            field: 'lastEditor',
+            header: 'Last editor'
+          },
+          {
+            field: 'lastModified',
+            header: 'Last modified'
+          }
+        ]
       }
     }
   }

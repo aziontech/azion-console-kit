@@ -25,15 +25,15 @@
         class="max-sm:w-full"
         type="button"
         severity="secondary"
-        :label="'Cancel'"
+        label="Cancel"
         @click="handleCancel"
       />
       <PrimeButton
         :disabled="!isValid"
         class="max-sm:w-full"
         type="submit"
+        label="Submit"
         :loading="isLoading"
-        :label="'Submit'"
       />
     </div>
   </form>
