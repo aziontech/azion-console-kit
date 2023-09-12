@@ -12,8 +12,8 @@
               severity="error"
               class="!mb-4"
               :closable="false"
-              :hidden="!hasError"
-            >User not found with the given credentials.</Message>
+              :hidden="!hasErrorMessage"
+            >{{ hasErrorMessage }}</Message>
 
             <label
               for="email"
@@ -97,6 +97,10 @@ export default {
       type: Function,
       required: true
     },
+    switchAccountLoginService: {
+      type: Function,
+      required: true
+    }
   },
   setup(props) {
     const formData = ref({
@@ -106,33 +110,46 @@ export default {
     })
 
     const isLoading = ref(false)
-    const hasError = ref(false)
+    const hasErrorMessage = ref(null)
     const router = useRouter()
 
     const validateAndSubmit = async () => {
       try {
         isLoading.value = true
         await props.authenticationLoginService(formData.value)
-        await verify();
-        router.push('/')
-      } catch (error) {
-        hasError.value = true
+        const { user_tracking_info: userInfo } = await verify()
+        await switchClientAccount(userInfo)
+      } catch {
+        hasErrorMessage.value = 'User not found with the given credentials.'
         isLoading.value = false
       }
     }
 
     const verify = async () => {
       try {
-        await props.verifyLoginService()
-      } catch (error) {
+        return await props.verifyLoginService()
+      } catch {
         await props.refreshLoginService()
+      }
+    }
+
+    const switchClientAccount = async (userInfo) => {
+      let clientId
+      try {
+        const { account_id: accountId, client_id } = userInfo.props
+        clientId = client_id
+        await props.switchAccountLoginService(accountId)
+        router.push('/')
+      } catch {
+        hasErrorMessage.value = clientId ? 'Error while processing request.' : 'User must be of type client.'
+        isLoading.value = false
       }
     }
 
     // Retornar todas as referências necessárias
     return {
       formData,
-      hasError,
+      hasErrorMessage,
       isLoading,
       validateAndSubmit
     }
