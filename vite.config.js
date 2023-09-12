@@ -26,6 +26,12 @@ export default defineConfig({
         rewrite: (path) => path.replace(/^\/api\/token/, ''),
         cookieDomainRewrite: { '*': '' }
       },
+      '/api/switch-account': {
+        target: 'https://stage-sso.azion.com/api/switch-account',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/api\/switch-account/, ''),
+        cookieDomainRewrite: { '*': '' }
+      },
       '/api/edge_services': {
         target: 'https://stage-manager-origin.azion.com/services/api/v1/services',
         changeOrigin: true,

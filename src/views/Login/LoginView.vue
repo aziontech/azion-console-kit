@@ -4,6 +4,7 @@
       :authenticationLoginService="authenticationLoginService"
       :verifyLoginService="verifyLoginService"
       :refreshLoginService="refreshLoginService"
+      :switchAccountLoginService="switchAccountLoginService"
       test="dd"
     />
   </div>
@@ -28,6 +29,10 @@ export default {
       required: true,
       type: Function
     },
+    switchAccountLoginService: {
+      required: true,
+      type: Function
+    }
   }
 }
 </script>

@@ -13,6 +13,7 @@ export const loginRoutes = {
         authenticationLoginService: LoginService.authenticate,
         verifyLoginService: LoginService.verify,
         refreshLoginService: LoginService.refresh,
+        switchAccountLoginService: LoginService.switchAccount
       }
     }
   ]

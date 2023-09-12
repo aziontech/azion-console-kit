@@ -35,6 +35,17 @@ export const refresh = async () => {
   return parseHttpResponse(httpResponse)
 }
 
+export const switchAccount = async (accountId) => {
+  let httpResponse = await AxiosHttpClientAdapter.request({
+    url: `${makeLoginBaseUrl()}/switch-account/${accountId}`,
+    method: 'POST',
+  })
+
+  httpResponse = await adapt(httpResponse)
+
+  return parseHttpResponse(httpResponse)
+}
+
 const adapt = async (httpResponse) => {
   const parsedData = httpResponse.body
 
