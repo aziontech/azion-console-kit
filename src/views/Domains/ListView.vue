@@ -15,6 +15,32 @@
         required: true,
         type: Function
       }
+    },
+    computed: {
+      getColumns() {
+        return [
+          {
+            field: 'domainName',
+            header: 'Name'
+          },
+          {
+            field: 'digitalCertificateId',
+            header: 'Digital Certificate'
+          },
+          {
+            field: 'domainName',
+            header: 'Domain Name'
+          },
+          {
+            field: 'cnames',
+            header: 'CNAME'
+          },
+          {
+            field: 'edgeApplicationName',
+            header: 'Edge Application'
+          }
+        ]
+      }
     }
   }
 </script>
@@ -27,27 +53,6 @@
     editPagePath="domains/edit"
     :listService="listDomainsService"
     :deleteService="deleteDomainsService"
-    :columns="[
-      {
-        field: 'domainName',
-        header: 'Name'
-      },
-      {
-        field: 'digitalCertificateId',
-        header: 'Digital Certificate'
-      },
-      {
-        field: 'domainName',
-        header: 'Domain Name'
-      },
-      {
-        field: 'cnames',
-        header: 'CNAME'
-      },
-      {
-        field: 'edgeApplicationName',
-        header: 'Edge Application'
-      }
-    ]"
-  ></ListTableBlock>
+    :columns="getColumns"
+  />
 </template>

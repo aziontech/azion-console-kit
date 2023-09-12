@@ -2,7 +2,7 @@
   <ListTableBlock
     :listService="listIntelligentDNSService"
     :deleteService="deleteIntelligentDNSService"
-    :columns="columns"
+    :columns="getColumns"
     pageTitle="Intelligent DNS"
     addButtonLabel="Add Intelligent DNS"
     createPagePath="intelligent-dns/create"
@@ -29,7 +29,7 @@
       }
     },
     computed: {
-      columns() {
+      getColumns() {
         return [
           {
             field: 'name',
