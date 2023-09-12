@@ -4,17 +4,11 @@ import * as LoginService from '@/services/login-services'
 export const loginRoutes = {
   path: '/login',
   name: 'login',
-  children: [
-    {
-      path: '',
-      name: 'login',
-      component: () => import('@views/Login/LoginView.vue'),
-      props: {
-        authenticationLoginService: LoginService.authenticate,
-        verifyLoginService: LoginService.verify,
-        refreshLoginService: LoginService.refresh,
-        switchAccountLoginService: LoginService.switchAccount
-      }
-    }
-  ]
+  component: () => import('@views/Login/LoginView.vue'),
+  props: {
+    authenticationLoginService: LoginService.authenticate,
+    verifyLoginService: LoginService.verify,
+    refreshLoginService: LoginService.refresh,
+    switchAccountLoginService: LoginService.switchAccount
+  }
 }
