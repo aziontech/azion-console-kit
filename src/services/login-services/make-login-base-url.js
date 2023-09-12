@@ -1,3 +1,6 @@
 export const makeLoginBaseUrl = () => {
-  return `token`
+  return {
+    token: 'token',
+    switchAccount: 'switch-account'
+  }
 }

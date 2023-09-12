@@ -3,7 +3,7 @@ import { makeLoginBaseUrl } from './make-login-base-url'
 
 export const authenticate = async (payload) => {
   let httpResponse = await AxiosHttpClientAdapter.request({
-    url: `${makeLoginBaseUrl()}`,
+    url: `${makeLoginBaseUrl().token}`,
     method: 'POST',
     body: payload,
   })
@@ -15,7 +15,7 @@ export const authenticate = async (payload) => {
 
 export const verify = async () => {
   let httpResponse = await AxiosHttpClientAdapter.request({
-    url: `${makeLoginBaseUrl()}/verify`,
+    url: `${makeLoginBaseUrl().token}/verify`,
     method: 'POST',
   })
 
@@ -26,7 +26,7 @@ export const verify = async () => {
 
 export const refresh = async () => {
   let httpResponse = await AxiosHttpClientAdapter.request({
-    url: `${makeLoginBaseUrl()}/refresh`,
+    url: `${makeLoginBaseUrl().token}/refresh`,
     method: 'POST',
   })
 
@@ -37,7 +37,7 @@ export const refresh = async () => {
 
 export const switchAccount = async (accountId) => {
   let httpResponse = await AxiosHttpClientAdapter.request({
-    url: `${makeLoginBaseUrl()}/switch-account/${accountId}`,
+    url: `${makeLoginBaseUrl().switchAccount}/${accountId}`,
     method: 'POST',
   })
 
