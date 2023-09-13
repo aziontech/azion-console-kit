@@ -7,7 +7,7 @@
   />
   <div
     class="flex w-full relative min-h-[calc(100vh-120px)] [&>.active]:!w-[calc(100%-300px)]"
-    :class="[ styleCenter, styleHelper ]"
+    :class="[styleCenter, styleHelper]"
   >
     <slot :customClass="customClass"></slot>
     <helper
