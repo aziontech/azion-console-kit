@@ -16,16 +16,14 @@ alias yarn="docker run -it --rm -p 5173:5173 -v $HOME:/root -v $PWD:/usr/src/app
 
 1) To start, clone the repository and navigate to the root folder.
 ```cmd
-  $ git clone git@github.com:aziontech/azion-platform-kit.git
-  $ cd azion-platform-kit
+git clone git@github.com:aziontech/azion-platform-kit.git
+cd azion-platform-kit
 ```
-2) TEMPORARY - Create a personal token in https://manager.azion.com/iam/personal-tokens
-
-3) TEMPORARY - Save your token into file `.env.development`
+2) TEMPORARY - Create a personal token in https://manager.azion.com/iam/personal-tokens and save it into file `.env.development`
 ```cmd
- $ echo 'VITE_PERSONAL_TOKEN=SEU_PERSONAL_TOKEN' > .env.development
+echo 'VITE_PERSONAL_TOKEN=azionXXXX' > .env.development
 ```
-4) Start the project using:
+3) Start the project using:
 ```cmd
   $ yarn install
   $ yarn dev --host
