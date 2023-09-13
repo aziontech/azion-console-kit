@@ -19,7 +19,7 @@ alias yarn="docker run -it --rm -p 5173:5173 -v $HOME:/root -v $PWD:/usr/src/app
 git clone git@github.com:aziontech/azion-platform-kit.git
 cd azion-platform-kit
 ```
-2) TEMPORARY - Create a personal token in https://manager.azion.com/iam/personal-tokens and save it into file `.env.development`
+2) TEMPORARY - Create a personal token in [Azion Realtime Manager](https://manager.azion.com/iam/personal-tokens) and save it into file `.env.development`
 ```cmd
 echo 'VITE_PERSONAL_TOKEN=azionXXXX' > .env.development
 ```
@@ -29,9 +29,7 @@ echo 'VITE_PERSONAL_TOKEN=azionXXXX' > .env.development
   $ yarn dev --host
 ```
 
-The webapp is now available on the following URL:
-
-- `http://localhost:5173` 
+The webapp is now available on the following URL: http://localhost:5173
 
 
 ## Run at Edge
