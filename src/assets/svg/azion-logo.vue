@@ -21,7 +21,7 @@
 </template>
 
 <script>
-export default {
-  name: 'azion-logo'
-}
+  export default {
+    name: 'azion-logo'
+  }
 </script>

@@ -18,7 +18,7 @@
     },
     computed: {
       getColumns() {
-      return [
+        return [
           {
             field: 'name',
             header: 'Name'
