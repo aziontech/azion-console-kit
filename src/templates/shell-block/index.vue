@@ -6,8 +6,8 @@
     :centerVisible="isCenterVisible"
   />
   <div
-    class="flex w-full min-h-[calc(100vh-120px)] relative [&>.active]:!w-[calc(100%-300px)] [&>.active-helper]:block [&>.active-helper]:transform [&>.active-helper]:translate-x-0 [&>.active-center]:block [&>.active-center]:transform [&>.active-center]:translate-x-0"
-    :class="{ active: isHelperVisible }"
+    class="flex w-full relative min-h-[calc(100vh-120px)] [&>.active]:!w-[calc(100%-300px)]"
+    :class="[ styleCenter, styleHelper ]"
   >
     <slot :customClass="customClass"></slot>
     <helper
@@ -53,6 +53,12 @@
       },
       customClassCenter() {
         return this.isCenterVisible ? 'active-center' : ''
+      },
+      styleHelper() {
+        return `[&>.active-helper]:block [&>.active-helper]:transform [&>.active-helper]:translate-x-0`
+      },
+      styleCenter() {
+        return `[&>.active-center]:block [&>.active-center]:transform [&>.active-center]:translate-x-0`
       }
     },
     methods: {
