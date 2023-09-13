@@ -52,8 +52,8 @@ The top features include:
 
 ## Contributing
 
-Before beginning development with the Kong API Gateway, please familiarize yourself with the following developer resources:
-- Contributor Guide ([CONTRIBUTING.md](CONTRIBUTING.md)) to learn about how to contribute to Kong.
+Before beginning development, please familiarize yourself with the following developer resources:
+- Contributor Guide ([CONTRIBUTING.md](CONTRIBUTING.md)) to learn about how to contribute to this project.
 - Development Guide ([DEVELOPER.md](DEVELOPER.md)): Setting up your development environment.
 - [CODE_OF_CONDUCT](CODE_OF_CONDUCT.md) 
 
