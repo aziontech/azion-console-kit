@@ -21,11 +21,11 @@ alias yarn="docker run -it --rm -p 5173:5173 -v $HOME:/root -v $PWD:/usr/src/app
 ```
 2) TEMPORARY - Create a personal token in https://manager.azion.com/iam/personal-tokens
 
-2.3) TEMPORARY - Save your token into file `.env.development`
+3) TEMPORARY - Save your token into file `.env.development`
 ```cmd
  $ echo 'VITE_PERSONAL_TOKEN=SEU_PERSONAL_TOKEN' > .env.development
 ```
-3) Start the project using:
+4) Start the project using:
 ```cmd
   $ yarn install
   $ yarn dev --host
