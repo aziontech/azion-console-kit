@@ -45,40 +45,29 @@
 
     <div class="flex flex-col p-3 gap-4">
       <div class="flex justify-between items-center">
-        <span class="text-white text-opacity-90 text-sm font-normal"
-          >Documentation</span
-        >
+        <span class="text-white text-opacity-90 text-sm font-normal">Documentation</span>
         <i class="pi pi-external-link"></i>
       </div>
       <div class="flex justify-between items-center">
-        <span class="text-white text-opacity-90 text-sm font-normal"
-          >API</span
-        >
+        <span class="text-white text-opacity-90 text-sm font-normal">API</span>
         <i class="pi pi-external-link"></i>
       </div>
       <div class="flex justify-between items-center">
-        <span class="text-white text-opacity-90 text-sm font-normal"
-          >Changelog</span
-        >
+        <span class="text-white text-opacity-90 text-sm font-normal">Changelog</span>
         <i class="pi pi-external-link"></i>
       </div>
       <div class="flex justify-between items-center">
-        <span class="text-white text-opacity-90 text-sm font-normal"
-          >Contact Support</span
-        >
+        <span class="text-white text-opacity-90 text-sm font-normal">Contact Support</span>
         <i class="pi pi-external-link"></i>
       </div>
       <div class="flex justify-between items-center">
-        <span class="text-white text-opacity-90 text-sm font-normal"
-          >Send Feedback</span
-        >
+        <span class="text-white text-opacity-90 text-sm font-normal">Send Feedback</span>
         <i class="pi pi-external-link"></i>
       </div>
     </div>
   </article>
 </template>
 <script>
-
   import PrimeButton from 'primevue/button'
   import InputText from 'primevue/inputtext'
 

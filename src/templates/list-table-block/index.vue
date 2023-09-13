@@ -1,5 +1,5 @@
 <template>
-  <div >
+  <div>
     <Toast />
     <header class="border-neutral-200 border-b min-h-[82px] w-full flex items-center">
       <div class="p-4 w-full">
@@ -271,4 +271,3 @@
     }
   }
 </script>
-

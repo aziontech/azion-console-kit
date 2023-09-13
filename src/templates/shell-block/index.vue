@@ -45,7 +45,7 @@
     },
     computed: {
       customClass() {
-        const isActive = this.isActive(this.isHelperVisible, this.isCenterVisible);
+        const isActive = this.isActive(this.isHelperVisible, this.isCenterVisible)
         return isActive ? 'active' : ''
       },
       customClassHelper() {

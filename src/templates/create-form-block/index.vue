@@ -1,5 +1,5 @@
 <template>
-  <div >
+  <div>
     <Toast />
     <header class="border-neutral-200 border-b min-h-[82px] w-full flex items-center">
       <div class="p-4 w-full">
@@ -13,7 +13,7 @@
         </div>
       </div>
     </header>
-  
+
     <form
       @submit.prevent="validateAndSubmit"
       class="mt-4 p-4 max-w-screen-sm flex flex-col gap-4 lg:max-w-7xl mx-auto"

@@ -13,7 +13,7 @@
         </div>
       </div>
     </header>
-  
+
     <form
       @submit.prevent="handleSubmit"
       class="mt-4 p-4 max-w-screen-sm flex flex-col gap-4 lg:max-w-7xl mx-auto"
