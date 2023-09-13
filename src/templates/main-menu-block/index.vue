@@ -62,6 +62,7 @@
         class="ml-2 h-8 w-auto surface-border hidden md:flex gap-2 items-center"
         size="small"
         outlined
+        @click="showCenterSidebar"
       >
         <i class="pi pi-building" />
         <span>Azion Client</span>
@@ -115,6 +116,17 @@
         style="height: 32px; width: 32px"
       />
 
+      <!-- Help Button Desktop  -->
+
+      <PrimeButton
+        icon="pi pi-question-circle"
+        size="small"
+        label="Help"
+        @click="showHelperCenter"
+        outlined
+        class="surface-border"
+      />
+
       <!-- Notification Button  -->
       <PrimeButton
         icon="pi pi-bell"
@@ -162,7 +174,7 @@
           submenuheader: { class: 'bg-transparent text-xs font-medium leading-none' },
           separator: { class: 'surface-border my-2' }
         }"
-        class="bg-transparent w-full border-0"
+        class="bg-transparent w-full border-0 text-sm"
         :model="menuStructure"
       />
     </div>
@@ -335,6 +347,7 @@
   // Export my assets and components
   export default {
     name: 'HeaderTemplate',
+    emits: ['showSlideHelper', 'showSlideCenter'],
     components: {
       Avatar,
       PrimeMenu,
@@ -346,7 +359,16 @@
       Dropdown,
       Tag
     },
-
+    props: {
+      centerVisible: {
+        type: Boolean,
+        default: false
+      },
+      helperVisible: {
+        type: Boolean,
+        default: false
+      }
+    },
     data() {
       return {
         showCreate: false,
@@ -538,6 +560,12 @@
       },
       closeSearch() {
         this.showSearch = false
+      },
+      showHelperCenter() {
+        this.$emit('showSlideHelper', !this.helperVisible)
+      },
+      showCenterSidebar() {
+        this.$emit('showSlideCenter', !this.centerVisible)
       }
     }
   }
