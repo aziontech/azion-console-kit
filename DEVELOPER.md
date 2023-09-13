@@ -79,6 +79,24 @@ Abaixo você pode visualizar um diagrama da disposição destes arquivos e a for
 
 ![Diagrama de Arquitetura](./docs/architecture-diagram.png)
 
+### How to: usar o ambiente de stage da api
+
+Para fins de desenvolvimento do time da Azion, é possivel apontar para a api de stage e executar ações restritas em produção.
+
+1. Altere o target da api no arquivo `vite.config.js` para `https://stage-api.azion.net` 
+```js
+  server: {
+    proxy: {
+      '/api': {
+        target: 'https://stage-api.azion.net',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/api/, ''),
+      }
+    }
+  }
+```
+
+
 ### How to: criando uma UI de listagem de Variables
 
 Tomando como exemplo a rota de _Variables_, temos o seguinte fluxo para implementação para a **Listagem**:
