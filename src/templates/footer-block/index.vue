@@ -36,14 +36,14 @@
 </template>
 
 <script>
-import AzionLogo from '../../assets/svg/azion-logo'
-import PrimeButton from 'primevue/button'
+  import AzionLogo from '../../assets/svg/azion-logo'
+  import PrimeButton from 'primevue/button'
 
-export default {
-  name: 'footer-block',
-  components: {
-    PrimeButton,
-    AzionLogo
+  export default {
+    name: 'footer-block',
+    components: {
+      PrimeButton,
+      AzionLogo
+    }
   }
-}
 </script>
