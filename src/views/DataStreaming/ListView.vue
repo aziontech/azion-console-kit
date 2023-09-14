@@ -15,6 +15,28 @@
         required: true,
         type: Function
       }
+    },
+    computed: {
+      getColumns() {
+        return [
+          {
+            field: 'name',
+            header: 'Name'
+          },
+          {
+            field: 'dataSource',
+            header: 'Data Source'
+          },
+          {
+            field: 'templateName',
+            header: 'Template'
+          },
+          {
+            field: 'active',
+            header: 'Active'
+          }
+        ]
+      }
     }
   }
 </script>
@@ -27,23 +49,6 @@
     editPagePath="/data-streaming/edit"
     :listService="listDataStreamingService"
     :deleteService="deleteDataStreamingService"
-    :columns="[
-      {
-        field: 'name',
-        header: 'Name'
-      },
-      {
-        field: 'dataSource',
-        header: 'Data Source'
-      },
-      {
-        field: 'templateName',
-        header: 'Template'
-      },
-      {
-        field: 'active',
-        header: 'Active'
-      }
-    ]"
+    :columns="getColumns"
   ></ListTableBlock>
 </template>

@@ -2,24 +2,7 @@
   <ListTableBlock
     :listService="listVariablesService"
     :deleteService="deleteVariablesService"
-    :columns="[
-      {
-        field: 'key',
-        header: 'Key'
-      },
-      {
-        field: 'value',
-        header: 'Value'
-      },
-      {
-        field: 'lastEditor',
-        header: 'Last Editor'
-      },
-      {
-        field: 'updatedAt',
-        header: 'Last Update'
-      }
-    ]"
+    :columns="getColumns"
     pageTitle="Variables"
     addButtonLabel="Add Variable"
     createPagePath="variables/create"
@@ -43,6 +26,28 @@
       deleteVariablesService: {
         required: true,
         type: Function
+      }
+    },
+    computed: {
+      getColumns() {
+        return [
+          {
+            field: 'key',
+            header: 'Key'
+          },
+          {
+            field: 'value',
+            header: 'Value'
+          },
+          {
+            field: 'lastEditor',
+            header: 'Last Editor'
+          },
+          {
+            field: 'updatedAt',
+            header: 'Last Update'
+          }
+        ]
       }
     }
   }
