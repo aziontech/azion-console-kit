@@ -519,7 +519,7 @@
       },
       showHelperCenter() {
         this.$emit('showSlideHelper', !this.helperVisible)
-      },
+      }
     }
   }
 </script>
