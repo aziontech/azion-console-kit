@@ -1,6 +1,6 @@
 <template>
   <article
-    class="flex flex-col surface border-l  w-slide h-full absolute right-0 transform translate-x-full transition-transform duration-300 ease-in-out"
+    class="flex flex-col surface border-l w-slide h-full absolute right-0 transform translate-x-full transition-transform duration-300 ease-in-out"
   >
     <!-- Title  -->
     <div class="flex w-full justify-between p-3 h-16 border-b">
@@ -74,7 +74,7 @@
   export default {
     name: 'TestCenter',
     components: {
-      PrimeButton,
+      PrimeButton
     },
     methods: {
       closeHelpeCenter() {
