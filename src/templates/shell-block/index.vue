@@ -12,11 +12,11 @@
     <slot :customClass="customClass"></slot>
     <helper
       :class="customClassHelper"
-      @closeRightSidebar="close"
+      @closeSlideIn="close"
     ></helper>
     <center-component
       :class="customClassCenter"
-      @closeRightSidebar="close"
+      @closeSlideIn="close"
     ></center-component>
   </div>
 

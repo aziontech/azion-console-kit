@@ -8,6 +8,7 @@
       <PrimeButton
         icon="pi pi-times"
         outlined
+        class="surface-border"
         style="height: 32px; width: 32px"
         aria-label="Cancel"
         @click="closeHelpeCenter"
@@ -78,7 +79,7 @@
     },
     methods: {
       closeHelpeCenter() {
-        this.$emit('closeRightSidebar')
+        this.$emit('closeSlideIn')
       }
     }
   }

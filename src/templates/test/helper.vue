@@ -8,9 +8,10 @@
       <PrimeButton
         icon="pi pi-times"
         outlined
+        class="surface-border"
         style="height: 32px; width: 32px"
         aria-label="Cancel"
-        @click="closeHelpeCenter"
+        @click="close"
       />
     </div>
   </article>
@@ -19,13 +20,13 @@
   import PrimeButton from 'primevue/button'
 
   export default {
-    name: 'TestHelper',
+    name: 'SlideIn',
     components: {
       PrimeButton
     },
     methods: {
-      closeHelpeCenter() {
-        this.$emit('closeRightSidebar')
+      close() {
+        this.$emit('closeSlideIn')
       }
     }
   }
