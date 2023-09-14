@@ -1,23 +1,17 @@
 <template>
   <MainMenuBlock
     @showSlideHelper="showHelperCenter"
-    @showSlideCenter="showCenter"
     :helperVisible="isHelperVisible"
-    :centerVisible="isCenterVisible"
   />
   <div
     class="flex w-full relative min-h-[calc(100vh-120px)] [&>.active]:!w-[calc(100%-300px)]"
-    :class="[styleCenter, styleHelper]"
+    :class="[styleHelper]"
   >
     <slot :customClass="customClass"></slot>
-    <helper
+    <help
       :class="customClassHelper"
       @closeSlideIn="close"
-    ></helper>
-    <center-component
-      :class="customClassCenter"
-      @closeSlideIn="close"
-    ></center-component>
+    ></help>
   </div>
 
   <FooterBlock />
@@ -26,39 +20,31 @@
 <script>
   import MainMenuBlock from '@/templates/main-menu-block'
   import FooterBlock from '@/templates/footer-block'
-  import Helper from '../test/helper.vue'
-  import Center from '../test/center.vue'
+  import Help from '../slide-in/help.vue'
 
   export default {
     name: 'shell-block',
     components: {
       FooterBlock,
       MainMenuBlock,
-      Helper,
-      'center-component': Center
+      Help
     },
     data() {
       return {
-        isHelperVisible: false,
-        isCenterVisible: false
+        isHelperVisible: false
       }
     },
     computed: {
       customClass() {
-        const isActive = this.isActive(this.isHelperVisible, this.isCenterVisible)
+        const isActive = this.isActive(this.isHelperVisible)
         return isActive ? 'active' : ''
       },
       customClassHelper() {
         return this.isHelperVisible ? 'active-helper' : ''
       },
-      customClassCenter() {
-        return this.isCenterVisible ? 'active-center' : ''
-      },
+
       styleHelper() {
         return `[&>.active-helper]:block [&>.active-helper]:transform [&>.active-helper]:translate-x-0`
-      },
-      styleCenter() {
-        return `[&>.active-center]:block [&>.active-center]:transform [&>.active-center]:translate-x-0`
       }
     },
     methods: {
@@ -67,15 +53,9 @@
       },
       showHelperCenter(value) {
         this.isHelperVisible = value
-        this.isCenterVisible = false
-      },
-      showCenter(value) {
-        this.isCenterVisible = value
-        this.isHelperVisible = false
       },
       close() {
         this.isHelperVisible = false
-        this.isCenterVisible = false
       }
     }
   }

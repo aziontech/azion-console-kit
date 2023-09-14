@@ -21,7 +21,6 @@
         class="ml-2 h-8 w-auto surface-border hidden md:flex gap-2 items-center"
         size="small"
         outlined
-        @click="showCenterSidebar"
       >
         <i class="pi pi-building" />
         <span>Azion Client</span>
@@ -321,10 +320,6 @@
       Tag
     },
     props: {
-      centerVisible: {
-        type: Boolean,
-        default: false
-      },
       helperVisible: {
         type: Boolean,
         default: false
@@ -525,9 +520,6 @@
       showHelperCenter() {
         this.$emit('showSlideHelper', !this.helperVisible)
       },
-      showCenterSidebar() {
-        this.$emit('showSlideCenter', !this.centerVisible)
-      }
     }
   }
 </script>
