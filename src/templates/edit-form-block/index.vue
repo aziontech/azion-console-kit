@@ -78,6 +78,10 @@
       formData: {
         type: Object,
         required: true
+      },
+      backURL: {
+        type: String,
+        required: false
       }
     },
     async created() {
@@ -85,7 +89,11 @@
     },
     methods: {
       handleCancel() {
-        this.$router.go('-1')
+        if (this.backURL) {
+          this.$router.push({ path: this.backURL })
+        } else {
+          this.$router.go('-1')
+        }
       },
       async loadInitialData() {
         try {

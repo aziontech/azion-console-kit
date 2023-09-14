@@ -29,7 +29,7 @@ const adapt = (httpResponse) => {
       name: item.name,
       issuer: item.issuer || '-',
       subject_name: subjectNames === '' ? '-' : subjectNames,
-      type: typeMap[item.certificate_type],
+      type: typeMap[item.certificate_type] || '-',
       validity:
         item.validity === null
           ? '-'

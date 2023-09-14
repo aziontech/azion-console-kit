@@ -2,44 +2,11 @@
   <ListTableBlock
     :listService="listEdgeFunctionsService"
     :deleteService="deleteEdgeFunctionsService"
-    :columns="[
-      {
-        field: 'name',
-        header: 'Name'
-      },
-      {
-        field: 'version',
-        header: 'Version'
-      },
-      {
-        field: 'language',
-        header: 'Language'
-      },
-      {
-        field: 'initiatorType',
-        header: 'Initiator Type'
-      },
-      {
-        field: 'lastEditor',
-        header: 'Last Editor'
-      },
-      {
-        field: 'lastModified',
-        header: 'Last Modified'
-      },
-      {
-        field: 'referenceCount',
-        header: 'Ref. Count'
-      },
-      {
-        field: 'active',
-        header: 'Active'
-      }
-    ]"
-    :pageTitle="'Edge Functions'"
-    :addButtonLabel="'Add Edge Function'"
-    :createPagePath="'edge-functions/create'"
-    :editPagePath="'edge-functions/edit'"
+    :columns="getColumns"
+    pageTitle="Edge Functions"
+    addButtonLabel="Add Edge Function"
+    createPagePath="edge-functions/create"
+    editPagePath="edge-functions/edit"
   />
 </template>
 
@@ -59,6 +26,44 @@
       deleteEdgeFunctionsService: {
         required: true,
         type: Function
+      }
+    },
+    computed: {
+      getColumns() {
+        return [
+          {
+            field: 'name',
+            header: 'Name'
+          },
+          {
+            field: 'version',
+            header: 'Version'
+          },
+          {
+            field: 'language',
+            header: 'Language'
+          },
+          {
+            field: 'initiatorType',
+            header: 'Initiator Type'
+          },
+          {
+            field: 'lastEditor',
+            header: 'Last Editor'
+          },
+          {
+            field: 'lastModified',
+            header: 'Last Modified'
+          },
+          {
+            field: 'referenceCount',
+            header: 'Ref. Count'
+          },
+          {
+            field: 'active',
+            header: 'Active'
+          }
+        ]
       }
     }
   }

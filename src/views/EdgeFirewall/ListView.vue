@@ -15,39 +15,44 @@
         required: true,
         type: Function
       }
+    },
+    computed: {
+      getColumns() {
+        return [
+          {
+            field: 'name',
+            header: 'Name'
+          },
+          {
+            field: 'lastEditor',
+            header: 'Last Editor'
+          },
+          {
+            field: 'lastModify',
+            header: 'Last Modified'
+          },
+          {
+            field: 'domainsList',
+            header: 'Domains'
+          },
+          {
+            field: 'active',
+            header: 'Active'
+          }
+        ]
+      }
     }
   }
 </script>
 
 <template>
   <ListTableBlock
-    :pageTitle="'Edge Firewall'"
-    :addButtonLabel="'Add Rule Set'"
-    :createPagePath="'/edge-firewall/create'"
-    :editPagePath="'/edge-firewall/edit'"
+    pageTitle="Edge Firewall"
+    addButtonLabel="Add Rule Set"
+    createPagePath="/edge-firewall/create"
+    editPagePath="/edge-firewall/edit"
     :listService="listEdgeFirewallService"
     :deleteService="deleteEdgeFirewallService"
-    :columns="[
-      {
-        field: 'name',
-        header: 'Name'
-      },
-      {
-        field: 'lastEditor',
-        header: 'Last Editor'
-      },
-      {
-        field: 'lastModify',
-        header: 'Last Modified'
-      },
-      {
-        field: 'domainsList',
-        header: 'Domains'
-      },
-      {
-        field: 'active',
-        header: 'Active'
-      }
-    ]"
-  ></ListTableBlock>
+    :columns="getColumns"
+  />
 </template>

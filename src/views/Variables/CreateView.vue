@@ -1,6 +1,6 @@
 <template>
   <CreateFormBlock
-    :pageTitle="'Create Variables'"
+    pageTitle="Create Variables"
     :createService="props.createVariablesService"
     :formData="values"
     :isValid="meta.valid"

@@ -1,12 +1,19 @@
-import { ref } from 'vue'
 import { defineStore } from 'pinia'
 
-export const useIntelligentDNSStore = defineStore('intelligentDNS', () => {
-  const domain = ref('mydomain.com')
-
-  const insertDomain = (domainProps) => {
-    domain.value = domainProps
+export const useIntelligentDNSStore = defineStore({
+  id: 'intelligentDNS',
+  state: () => ({
+    domain: null
+  }),
+  persist: true,
+  getters: {
+    getDomain() {
+      return this.domain.value
+    }
+  },
+  actions: {
+    addDomain(domain) {
+      this.domain = domain
+    }
   }
-
-  return { domain, insertDomain }
 })

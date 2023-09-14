@@ -1,8 +1,40 @@
-# azion-platform-kit
+# Azion Platform Kit
 
 ## Introdução
 
-O Azion Platform Kit é um kit de desenvolvimento front-end composto pelas tecnologias utilizadas compostas por uma gama de Tecnologias e estrutura com a finalidade de facilitar a construção de novas rotas e páginas do Real Time Manager.
+O Azion Platform Kit é um kit de desenvolvimento front-end composto pelas feito em Vue/Vite com framework PrimeVue e Tailwind que permite executar o RTM no ambiente de sua preferência.
+
+## Getting Started
+
+Iniciando a sua jornada em menos de 5 minutos.
+
+Certifique-se de possuir a Node 18.\* ou superior no seu ambiente ou docker.
+
+1. Para iniciar clone este repositório no seu ambiente local:
+
+```cmd
+  $ git clone git@github.com:aziontech/azion-platform-kit.git
+  $ cd azion-platform-kit
+```
+
+2. Crie um personal token no ambiente de [Stage do Azion RTM](https://stage-manager.azion.com/iam/personal-tokens).
+
+3. Crie um arquivo no raiz do projeto com o nome `.env.development` e atribua o token conforme a sintaxe abaixo:
+
+```env
+VITE_PERSONAL_TOKEN=<SEU_PERSONAL_TOKEN>
+```
+
+3. Inicie o projeto
+
+```cmd
+  $ yarn install
+  $ yarn dev
+```
+
+O servidor com a sua aplicação rodando estará atendendo na porta `5173` (padrão das aplicações Vue/Vite)
+
+- `http://localhost:5173` - acesse o endereço para navegar.
 
 ## Características
 
@@ -14,21 +46,14 @@ O Azion Platform Kit é um kit de desenvolvimento front-end composto pelas tecno
 
 Applicações Multi-tenant servem multiplos clientes através de diferentes domínios & subdomínios customizados com uma codebase unificada.
 
-## Como executar
+## Vai desenvolver?
 
-Você precisa da NodeJS acima da versão 18.\* instalada em seu computador, ou uma imagem Docker com esta versão de Node ou superior.
+### Configuração recomendada da sua IDE
 
-Instalando localmente:
-
-- Clone este repositório
-- Execute `npm install` ou `yarn install`
-- Execute `npm run dev` ou `yarn dev`
-
-A aplicação rodará no endereço: `http://127.0.0.1:5173`
-
-## Configuração recomendada na sua IDE
+Caso você opte pelo VSCode sugere-se o uso dos seguintes Plugins de forma a manter e controlar o pattern de desenvolvimento aumentando a velocidade:
 
 [VSCode](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (and disable Vetur) + [TypeScript Vue Plugin (Volar)](https://marketplace.visualstudio.com/items?itemName=Vue.vscode-typescript-vue-plugin).
+
 [Prettier](https://marketplace.visualstudio.com/items?itemName=esbenp.prettier-vscode)
 
 Outra sugestão é deixar habilitado o auto-save do VSCode configurado para aplicar as regras de formatação das definições do ESLint e Prettier.
@@ -62,10 +87,12 @@ A estrutura segue o seguinte padrão:
 ├── assets
 │   └── themes
 ├── router
+│   ├── routes
+│   │   ├── edge-application-routes
+│   │   └── variables-routes
 │   └── index.js
 ├── services
 │   ├── axios
-│   ├── domains-services
 │   ├── edge-application-services
 │   └── variables-services
 ├── stores
@@ -84,7 +111,23 @@ A estrutura segue o seguinte padrão:
         └── FormView.vue
 ```
 
-Onde, tomando como exemplo a rota de _Variables_, temos o seguinte fluxo para implementação para a **Listagem**:
+Onde:
+| Diretório | Descrição |
+|----------|----------|
+| assets | Arquivos estáticos do projeto (CSS, Imagens, etc) |
+| router | Estrutura de rotas, onde `index.js` centraliza todas rotas |
+| services | Serviços separados por operação do CRUD |
+| stores | Dados que precisam ser compartilhados entre as UI's/rotas |
+| templates | Blocos disponíveis para a construção do projeto, já programados para integração |
+| views | Conjunto de pastas separados por módulos, contém cada UI necessária para cada operação do CRUDL. |
+
+Abaixo você pode visualizar um diagrama da disposição destes arquivos e a forma que se interligam para implementar um módulo CRUDL de Variables:
+
+![Diagrama de Arquitetura](./docs/architecture-diagram.png)
+
+### How to: criando uma UI de listagem de Variables
+
+Tomando como exemplo a rota de _Variables_, temos o seguinte fluxo para implementação para a **Listagem**:
 
 1. Criação do Serviço
    - _src/services/variables-services_
@@ -153,10 +196,12 @@ azioncli edge_applications publish --debug
 
 Para usufruir do GitHub Workflow você precisa ter configurado dentro do seu repositório as seguintes SECRETS:
 
-- PLATFORM_KIT_TOKEN: seu Personal token da Azion para ser utilizado no CLI durante o deploy.
-- APPLICATION_ID: ID da Edge Application criada anteriormente via first deploy.
-- FUNCTION_ID: ID da Edge Function criada anteriormente via first deploy.
-- DOMAIN_ID: ID do Domain vinculado a Edge Application criado anteriormente via first deploy.
+| SECRET             | Descrição                                                                        |
+| ------------------ | -------------------------------------------------------------------------------- |
+| PLATFORM_KIT_TOKEN | seu Personal token da Azion para ser utilizado no CLI durante o deploy.          |
+| APPLICATION_ID     | ID da Edge Application criada anteriormente via first deploy.                    |
+| FUNCTION_ID        | ID da Edge Function criada anteriormente via first deploy.                       |
+| DOMAIN_ID          | ID do Domain vinculado a Edge Application criado anteriormente via first deploy. |
 
 ---
 

@@ -13,6 +13,7 @@ import '@/assets/themes/theme-custom.css'
 
 import { createApp } from 'vue'
 import { createPinia } from 'pinia'
+import piniaPluginPersistedstate from 'pinia-plugin-persistedstate'
 import PrimeVue from 'primevue/config'
 import Tooltip from 'primevue/tooltip'
 import ToastService from 'primevue/toastservice'
@@ -21,11 +22,13 @@ import App from './App.vue'
 import router from './router'
 
 const app = createApp(App)
+const pinia = createPinia()
+pinia.use(piniaPluginPersistedstate)
 
 app.use(PrimeVue)
 app.directive('tooltip', Tooltip)
 app.use(ToastService)
-app.use(createPinia())
+app.use(pinia)
 app.use(router)
 
 app.mount('#app')

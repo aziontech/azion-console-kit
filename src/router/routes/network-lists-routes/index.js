@@ -42,6 +42,27 @@ export const networkListsRoutes = {
           }
         ]
       }
+    },
+    {
+      path: 'edit/:id',
+      name: 'edit-network-list',
+      component: () => import('@views/NetworkLists/EditView.vue'),
+      props: {
+        editNetworkListsService: NetworkListsService.editNetworkListService,
+        loadNetworkListsService: NetworkListsService.loadNetworkListService,
+        listCountriesService: NetworkListsService.listCountriesService
+      },
+      meta: {
+        breadCrumbs: [
+          {
+            label: 'Network Lists',
+            to: '/network-lists'
+          },
+          {
+            label: 'Edit Network'
+          }
+        ]
+      }
     }
   ]
 }
