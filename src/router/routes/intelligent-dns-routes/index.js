@@ -68,7 +68,7 @@ export const intelligentDnsRoutes = {
     {
       path: 'edit/:id/records',
       name: 'edit-intelligent-dns-records',
-      component: () => import('@/views/IntelligentDNS/EditView.vue'),
+      component: () => import('@views/IntelligentDNS/EditView.vue'),
       props: {
         editIntelligentDNSService: IntelligentDNSService.editIntelligentDNSService,
         loadIntelligentDNSService: IntelligentDNSService.loadIntelligentDNSService,

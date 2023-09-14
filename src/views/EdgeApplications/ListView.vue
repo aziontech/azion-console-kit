@@ -15,43 +15,48 @@
         required: true,
         type: Function
       }
+    },
+    computed: {
+      getColumns() {
+        return [
+          {
+            field: 'name',
+            header: 'Name'
+          },
+          {
+            field: 'lastEditor',
+            header: 'Last Editor'
+          },
+          {
+            field: 'lastModify',
+            header: 'Last Modified'
+          },
+          {
+            field: 'active',
+            header: 'Active'
+          },
+          {
+            field: 'debugRules',
+            header: 'Debug rules'
+          },
+          {
+            field: 'origins',
+            header: 'Origins'
+          }
+        ]
+      }
     }
   }
 </script>
 
 <template>
   <ListTableBlock
-    :pageTitle="'Edge Applications'"
-    :addButtonLabel="'Add Edge Application'"
-    :createPagePath="'/edge-applications/create'"
-    :editPagePath="'/edge-applications/edit'"
+    pageTitle="Edge Applications"
+    addButtonLabel="Add Edge Application"
+    createPagePath="/edge-applications/create"
+    editPagePath="/edge-applications/edit"
     :listService="listEdgeApplicationsService"
     :deleteService="deleteEdgeApplicationService"
-    :columns="[
-      {
-        field: 'name',
-        header: 'Name'
-      },
-      {
-        field: 'lastEditor',
-        header: 'Last Editor'
-      },
-      {
-        field: 'lastModify',
-        header: 'Last Modified'
-      },
-      {
-        field: 'active',
-        header: 'Active'
-      },
-      {
-        field: 'debugRules',
-        header: 'Debug rules'
-      },
-      {
-        field: 'origins',
-        header: 'Origins'
-      }
-    ]"
-  ></ListTableBlock>
+    :columns="getColumns"
+  />
 </template>

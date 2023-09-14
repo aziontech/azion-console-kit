@@ -47,7 +47,7 @@ const adapt = async (httpResponse) => {
       const domainsList = await Promise.all(
         edgeFirewall.domains?.map(async (domain) => {
           const domainData = await getDomainById({ id: domain })
-          return domainData.domain_name
+          return domainData.name
         })
       )
 
@@ -59,7 +59,7 @@ const adapt = async (httpResponse) => {
           new Date(edgeFirewall.last_modified)
         ),
         domainsList: domainsList.join('<br>'),
-        active: edgeFirewall.active ? 'Yes' : 'No'
+        active: edgeFirewall.is_active ? 'Yes' : 'No'
       }
     })
   )

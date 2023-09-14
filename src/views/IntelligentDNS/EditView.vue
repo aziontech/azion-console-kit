@@ -5,12 +5,13 @@
   >
     <TabPanel header="Main Settings">
       <EditFormBlock
-        :pageTitle="'Edit Intelligent DNS'"
+        pageTitle="Edit Intelligent DNS"
         :editService="this.editIntelligentDNSService"
         :loadService="this.loadIntelligentDNSService"
         :initialDataSetter="setValues"
         :isValid="meta.valid"
         :formData="values"
+        backURL="/intelligent-dns"
       >
         <template #form>
           <InputText
@@ -43,7 +44,7 @@
         pageTitle="Records"
         addButtonLabel="Add Record"
         createPagePath="records/create"
-        editPagePath="/"
+        editPagePath="/records/edit"
         :columns="recordListColumns"
         :listService="listRecordsServiceIntelligentDNSDecorator"
         :deleteService="deleteRecordsServiceIntelligentDNSDecorator"
@@ -185,7 +186,7 @@
 
     watch: {
       domain() {
-        this.intelligentDNSStore.domain = this.domain
+        this.intelligentDNSStore.addDomain(this.domain)
       }
     }
   }

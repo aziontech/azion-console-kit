@@ -1,10 +1,11 @@
 <template>
-  <CreateFormBlock
-    pageTitle="Create Network Lists"
-    :createService="createNetworkListService"
-    :formData="values"
+  <EditFormBlock
+    pageTitle="Edit Network Lists"
+    :editService="this.editNetworkListsService"
+    :loadService="this.loadNetworkListsService"
+    :initialDataSetter="setValues"
     :isValid="meta.valid"
-    :cleanFormCallback="resetForm"
+    :formData="values"
   >
     <template #form>
       <div class="flex flex-col gap-2">
@@ -12,17 +13,18 @@
         <InputText
           placeholder="Add Network List Name"
           v-bind="name"
-          id="name"
           type="text"
-          :class="{ 'p-invalid': errors.name }"
-          v-tooltip.top="errors.name"
+          :class="{ 'p-invalid': errors.key }"
+          v-tooltip.top="errors.key"
         />
       </div>
       <div class="flex flex-col gap-2">
         <label for="type">Type: </label>
         <Dropdown
-          :class="{ 'p-invalid': errors.networkListType }"
-          v-model="networkListType"
+          :class="{ 'p-invalid': errors.type }"
+          v-model="listType.value"
+          v-bind="listType"
+          disabled
           :options="options"
           optionLabel="name"
           optionValue="value"
@@ -31,7 +33,7 @@
       </div>
       <div
         class="flex flex-col gap-2"
-        v-if="networkListType === 'asn'"
+        v-if="listType.value === 'asn'"
       >
         <label for="list">List: </label>
         <div class="card flex justify-content-center">
@@ -47,11 +49,12 @@
       </div>
       <div
         class="flex flex-col gap-2"
-        v-if="networkListType === 'ip_cidr'"
+        v-if="listType.value === 'ip_cidr'"
       >
         <label for="list">List: </label>
         <div class="card flex justify-content-center">
           <TextareaComponent
+            disabled
             :class="{ 'p-invalid': errors.ipCidr }"
             v-bind="ipCidr"
             rows="5"
@@ -63,7 +66,7 @@
       </div>
       <div
         class="flex flex-col gap-2"
-        v-if="networkListType === 'countries'"
+        v-if="listType.value === 'countries'"
       >
         <label for="list">Countries: </label>
         <div class="card flex justify-content-center">
@@ -80,48 +83,46 @@
         </div>
       </div>
     </template>
-  </CreateFormBlock>
+  </EditFormBlock>
 </template>
 
 <script>
-  import { ref, onMounted, watch } from 'vue'
+  import EditFormBlock from '@/templates/edit-form-block'
+  import InputText from 'primevue/inputtext'
+  import Dropdown from 'primevue/dropdown'
+  import MultiSelect from 'primevue/multiselect'
+  import TextareaComponent from 'primevue/textarea'
   import { useForm, useField } from 'vee-validate'
   import * as yup from 'yup'
-
-  import CreateFormBlock from '@/templates/create-form-block'
-  import TextareaComponent from 'primevue/textarea'
-  import Dropdown from 'primevue/dropdown'
-  import InputText from 'primevue/inputtext'
-  import MultiSelect from 'primevue/multiselect'
+  import { ref, onMounted, watch } from 'vue'
 
   export default {
+    name: 'edit-network-lists-view',
     components: {
-      CreateFormBlock,
-      TextareaComponent,
-      Dropdown,
+      EditFormBlock,
       InputText,
-      MultiSelect
+      Dropdown,
+      MultiSelect,
+      TextareaComponent
     },
     props: {
-      createNetworkListService: {
-        type: Function,
-        required: true
-      },
-      listCountriesService: {
-        type: Function,
-        required: true
-      }
+      loadNetworkListsService: { type: Function, required: true },
+      editNetworkListsService: { type: Function, required: true },
+      listCountriesService: { type: Function, required: true }
     },
-    setup(props) {
+    data: (props) => {
       const options = ref([
         { name: 'ASN', value: 'asn' },
         { name: 'Countries', value: 'countries' },
         { name: 'IP/CIDR', value: 'ip_cidr' }
       ])
-
       const validationSchema = yup.object({
         name: yup.string().required(),
-        networkListType: yup.string().oneOf(options.value.map((option) => option.value)),
+        listType: yup
+          .string()
+          .oneOf(
+            options.value.map((option) => option.value).filter((option) => option !== 'ip_cidr')
+          ),
         selectedCountries: yup.array().when('networkListType', {
           is: 'countries',
           then: (schema) => schema.required().min(1)
@@ -136,39 +137,27 @@
         })
       })
 
-      const { errors, defineInputBinds, meta, resetForm, values } = useForm({
-        validationSchema,
-        initialValues: {
-          name: '',
-          selectedCountries: [],
-          networkListType: 'asn',
-          asn: '',
-          ipCidr: '',
-          networkContentList: ''
-        }
+      const { errors, defineInputBinds, meta, values, setValues } = useForm({
+        validationSchema
       })
-
+      console.log(setValues)
       const countriesList = ref('')
       const fetchCountries = async () => {
         const result = await props.listCountriesService()
         countriesList.value = result
       }
-
+      const name = defineInputBinds('name', { validateOnInput: true })
+      const listType = defineInputBinds('listType', { validateOnInput: true })
+      const ipCidr = defineInputBinds('itemsValues', { validateOnInput: true })
+      const { value: selectedCountries } = useField('itemsValues')
+      const asn = defineInputBinds('itemsValues', { validateOnInput: true })
+      const { value: networkContentList, setValue: setNetworkContentList } =
+        useField('networkContentList')
       onMounted(async () => {
         await fetchCountries()
       })
-
-      const { value: networkListType } = useField('networkListType')
-      const { value: selectedCountries } = useField('selectedCountries')
-      const { value: networkContentList, setValue: setNetworkContentList } =
-        useField('networkContentList')
-
-      const name = defineInputBinds('name', { validateOnInput: true })
-      const ipCidr = defineInputBinds('ipCidr', { validateOnInput: true })
-      const asn = defineInputBinds('asn', { validateOnInput: true })
-
-      watch([name, networkListType, selectedCountries, ipCidr, asn], () => {
-        switch (networkListType.value) {
+      watch([name, listType, selectedCountries, ipCidr, asn], () => {
+        switch (listType.value.value) {
           case 'countries':
             setNetworkContentList(selectedCountries.value)
             break
@@ -185,20 +174,18 @@
       })
 
       return {
-        props,
-        options,
-        networkListType,
-        name,
-        ipCidr,
-        asn,
-        selectedCountries,
-        meta,
-        resetForm,
-        values,
         errors,
-        fetchCountries,
+        meta,
+        values,
+        name,
+        listType,
+        setValues,
+        options,
         countriesList,
-        networkContentList
+        selectedCountries,
+        networkContentList,
+        ipCidr,
+        asn
       }
     }
   }

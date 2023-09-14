@@ -2,28 +2,11 @@
   <ListTableBlock
     :listService="listEdgeServicesService"
     :deleteService="deleteEdgeServicesService"
-    :columns="[
-      {
-        field: 'name',
-        header: 'Name'
-      },
-      {
-        field: 'lastEditor',
-        header: 'Last Editor'
-      },
-      {
-        field: 'lastModified',
-        header: 'Last Modified'
-      },
-      {
-        field: 'active',
-        header: 'Active'
-      }
-    ]"
-    :pageTitle="'Edge Services'"
-    :addButtonLabel="'Add Service'"
-    :createPagePath="'edge-services/create'"
-    :editPagePath="'edge-services/edit'"
+    :columns="getColumns"
+    pageTitle="Edge Services"
+    addButtonLabel="Add Service"
+    createPagePath="edge-services/create"
+    editPagePath="edge-services/edit"
   />
 </template>
 
@@ -43,6 +26,28 @@
       deleteEdgeServicesService: {
         required: true,
         type: Function
+      }
+    },
+    computed: {
+      getColumns() {
+        return [
+          {
+            field: 'name',
+            header: 'Name'
+          },
+          {
+            field: 'lastEditor',
+            header: 'Last Editor'
+          },
+          {
+            field: 'lastModified',
+            header: 'Last Modified'
+          },
+          {
+            field: 'active',
+            header: 'Active'
+          }
+        ]
       }
     }
   }

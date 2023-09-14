@@ -15,35 +15,40 @@
         required: true,
         type: Function
       }
+    },
+    computed: {
+      getColumns() {
+        return [
+          {
+            field: 'name',
+            header: 'Name'
+          },
+          {
+            field: 'dataSource',
+            header: 'Data Source'
+          },
+          {
+            field: 'templateName',
+            header: 'Template'
+          },
+          {
+            field: 'active',
+            header: 'Active'
+          }
+        ]
+      }
     }
   }
 </script>
 
 <template>
   <ListTableBlock
-    :pageTitle="'Data Streaming'"
-    :addButtonLabel="'Add Streaming'"
-    :createPagePath="'/data-streaming/create'"
-    :editPagePath="'/data-streaming/edit'"
+    pageTitle="Data Streaming"
+    addButtonLabel="Add Streaming"
+    createPagePath="/data-streaming/create"
+    editPagePath="/data-streaming/edit"
     :listService="listDataStreamingService"
     :deleteService="deleteDataStreamingService"
-    :columns="[
-      {
-        field: 'name',
-        header: 'Name'
-      },
-      {
-        field: 'dataSource',
-        header: 'Data Source'
-      },
-      {
-        field: 'templateName',
-        header: 'Template'
-      },
-      {
-        field: 'active',
-        header: 'Active'
-      }
-    ]"
+    :columns="getColumns"
   ></ListTableBlock>
 </template>

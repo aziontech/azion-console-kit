@@ -1,6 +1,6 @@
 <template>
   <CreateFormBlock
-    :pageTitle="'Create Intelligent DNS Records'"
+    pageTitle="Create Intelligent DNS Records"
     :createService="props.createRecordsService"
     :formData="formValues"
     :isValid="meta.valid"
@@ -15,7 +15,7 @@
           :class="{ 'p-invalid': errors.name }"
           v-tooltip.top="errors.name"
         />
-        <label for="youdomain">.{{ intelligentDNSStore.domain.value }}</label>
+        <label for="youdomain">.{{ intelligentDNSStore.getDomain }}</label>
       </div>
 
       <div class="card flex justify-content-center">

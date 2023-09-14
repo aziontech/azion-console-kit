@@ -17,7 +17,7 @@
     @submit.prevent="handleSubmit"
     class="mt-4 p-4 max-w-screen-sm flex flex-col gap-4 lg:max-w-7xl mx-auto"
   >
-    <div class="flex flex-col gap-4 sm:w-full md:w-1/2">
+    <div class="flex flex-col gap-4 sm:!w-full md:!w-1/2">
       <slot name="form" />
     </div>
     <div class="flex flex-wrap pb-4 gap-2 w-full justify-end mt-auto">
@@ -25,15 +25,15 @@
         class="max-sm:w-full"
         type="button"
         severity="secondary"
-        :label="'Cancel'"
+        label="Cancel"
         @click="handleCancel"
       />
       <PrimeButton
         :disabled="!isValid"
         class="max-sm:w-full"
         type="submit"
+        label="Submit"
         :loading="isLoading"
-        :label="'Submit'"
       />
     </div>
   </form>
@@ -76,6 +76,10 @@
       formData: {
         type: Object,
         required: true
+      },
+      backURL: {
+        type: String,
+        required: false
       }
     },
     async created() {
@@ -83,7 +87,11 @@
     },
     methods: {
       handleCancel() {
-        this.$router.go('-1')
+        if (this.backURL) {
+          this.$router.push({ path: this.backURL })
+        } else {
+          this.$router.go('-1')
+        }
       },
       async loadInitialData() {
         try {

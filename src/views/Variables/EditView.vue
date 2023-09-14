@@ -1,6 +1,6 @@
 <template>
   <EditFormBlock
-    :pageTitle="'Edit Variable'"
+    pageTitle="Edit Variable"
     :editService="this.editVariableService"
     :loadService="this.loadVariableService"
     :initialDataSetter="setValues"
