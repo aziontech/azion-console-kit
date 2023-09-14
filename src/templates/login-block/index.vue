@@ -146,7 +146,6 @@ export default {
       }
     }
 
-    // Retornar todas as referências necessárias
     return {
       formData,
       hasErrorMessage,
