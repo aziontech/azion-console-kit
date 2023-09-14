@@ -1,231 +1,95 @@
 # Azion Platform Kit
 
-## Introdução
+## Introduction
 
-O Azion Platform Kit é um kit de desenvolvimento front-end composto pelas feito em Vue/Vite com framework PrimeVue e Tailwind que permite executar o RTM no ambiente de sua preferência.
+The Azion Platform Kit is a front-end development kit made in Vue/Vite with the PrimeVue and Tailwind framework that allows you to run customized Azion Realtime Manager.
 
 ## Getting Started
 
-Iniciando a sua jornada em menos de 5 minutos.
+Let’s test drive it in under 5 minutes.
 
-Certifique-se de possuir a Node 18.\* ou superior no seu ambiente ou docker.
+We suggest using `yarn` and `node 18.*` via the instructions below, but if you don't like running things on your machine you can use docker for this.
 
-1. Para iniciar clone este repositório no seu ambiente local:
+```
+alias yarn="docker run -it --rm -p 5173:5173 -v $HOME:/root -v $PWD:/usr/src/app -w /usr/src/app node:18 yarn"
+```
+
+1. To start, clone the repository and navigate to the root folder.
 
 ```cmd
-  $ git clone git@github.com:aziontech/azion-platform-kit.git
-  $ cd azion-platform-kit
+git clone git@github.com:aziontech/azion-platform-kit.git
+cd azion-platform-kit
 ```
 
-2. Crie um personal token no ambiente de [Stage do Azion RTM](https://stage-manager.azion.com/iam/personal-tokens).
+2. TEMPORARY - Create a personal token in [Azion Realtime Manager](https://manager.azion.com/iam/personal-tokens) and save it into file `.env.development`
 
-3. Crie um arquivo no raiz do projeto com o nome `.env.development` e atribua o token conforme a sintaxe abaixo:
-
-```env
-VITE_PERSONAL_TOKEN=<SEU_PERSONAL_TOKEN>
+```cmd
+echo 'VITE_PERSONAL_TOKEN=azionPERSONALTOKEN' > .env.development
 ```
 
-3. Inicie o projeto
+3. Start the project using:
 
 ```cmd
   $ yarn install
-  $ yarn dev
+  $ yarn dev --host
 ```
 
-O servidor com a sua aplicação rodando estará atendendo na porta `5173` (padrão das aplicações Vue/Vite)
+The webapp is now available on the following URL: http://localhost:5173
 
-- `http://localhost:5173` - acesse o endereço para navegar.
+## Run at Edge
 
-## Características
+Azion Platform Kit runs natively on Azion's edge thanks to Azion CLI.
 
-1. **Multi-tenancy:** Construa conforme a sua necessidade o seu Real Time Manager consumindo os endpoints da nossa API Pública: [Azion Public API](https://api.azion.com)
-2. **UI Customizável:** configure tokens de temas ou os gere automaticamente via [Builder](https://designer.primevue.org/) em seu projeto dando o look and feel de acordo com a sua necessidade.
-3. **Estrutura simples:** separação em camadas dos blocks, components e serviços de forma que sejá fácil construir uma nova rota em pouquíssimo tempo.
+1. Download and configure Azion-CLI with a [Personal Token](https://manager.azion.com/iam/personal-tokens)
 
-## O que é uma aplicação multi-tenant?
-
-Applicações Multi-tenant servem multiplos clientes através de diferentes domínios & subdomínios customizados com uma codebase unificada.
-
-## Vai desenvolver?
-
-### Configuração recomendada da sua IDE
-
-Caso você opte pelo VSCode sugere-se o uso dos seguintes Plugins de forma a manter e controlar o pattern de desenvolvimento aumentando a velocidade:
-
-[VSCode](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (and disable Vetur) + [TypeScript Vue Plugin (Volar)](https://marketplace.visualstudio.com/items?itemName=Vue.vscode-typescript-vue-plugin).
-
-[Prettier](https://marketplace.visualstudio.com/items?itemName=esbenp.prettier-vscode)
-
-Outra sugestão é deixar habilitado o auto-save do VSCode configurado para aplicar as regras de formatação das definições do ESLint e Prettier.
-Para isso crie uma pasta chamada `.vscode/settings.json` com a seguinte configuração:
-
-```
-{
-  "editor.tabSize": 2,
-  "editor.insertSpaces": true,
-  "editor.detectIndentation": true,
-  "editor.codeActionsOnSave": {
-    "source.fixAll.eslint": true,
-  },
-  "eslint.validate": [
-    "javascript"
-  ],
-  "editor.defaultFormatter": "esbenp.prettier-vscode",
-  "editor.formatOnSave": true,
-  "files.insertFinalNewline": true
-}
+```cmd
+curl https://downloads.azion.com/linux/x86_64/azioncli -o azioncli && chmod +x azioncli
+./azioncli configure -t azionPERSONALTOKEN
 ```
 
-<font color="#f3652b">Este arquivo não deve ser comitado para não afetar preferências de outros usuários na IDE</font>
+2. Build the bundler and copy the content from `dist` to `.edge/statics`
 
-## Development
-
-A estrutura segue o seguinte padrão:
-
-```
-├── App.vue
-├── assets
-│   └── themes
-├── router
-│   ├── routes
-│   │   ├── edge-application-routes
-│   │   └── variables-routes
-│   └── index.js
-├── services
-│   ├── axios
-│   ├── edge-application-services
-│   └── variables-services
-├── stores
-├── templates
-│   ├── create-form-block
-│   ├── footer-block
-│   ├── list-table-block
-│   ├── main-menu-block
-│   └── shell-block
-└── views
-    └── EdgeApplications
-        ├── ListView.vue
-        └── CreateView.vue
-    └── Variables
-        ├── ListView.vue
-        └── FormView.vue
-```
-
-Onde:
-| Diretório | Descrição |
-|----------|----------|
-| assets | Arquivos estáticos do projeto (CSS, Imagens, etc) |
-| router | Estrutura de rotas, onde `index.js` centraliza todas rotas |
-| services | Serviços separados por operação do CRUD |
-| stores | Dados que precisam ser compartilhados entre as UI's/rotas |
-| templates | Blocos disponíveis para a construção do projeto, já programados para integração |
-| views | Conjunto de pastas separados por módulos, contém cada UI necessária para cada operação do CRUDL. |
-
-Abaixo você pode visualizar um diagrama da disposição destes arquivos e a forma que se interligam para implementar um módulo CRUDL de Variables:
-
-![Diagrama de Arquitetura](./docs/architecture-diagram.png)
-
-### How to: criando uma UI de listagem de Variables
-
-Tomando como exemplo a rota de _Variables_, temos o seguinte fluxo para implementação para a **Listagem**:
-
-1. Criação do Serviço
-   - _src/services/variables-services_
-     - _make-variables-base-url.js_: método getter da URL base da API de Variables.
-     - _index.js_: interface de exposição dos métodos (Listar, Editar, Excluir, Inserir)
-     - _list-variables-service.js_: camada para chamada da API (endpoint de Listagem) e tratamento de retorno do payload (normalização, adição de helper, etc)
-2. Criação da View
-   - _ListView.vue_: através da seleção de um dos blocos (nesse exemplo: _src/templates/list-table-block_) é realizada a implementação lógica mais detalhada se necessário.
-3. Criação da Rota:
-   - _src/router/index.js_: passagem junto da rota das properties de serviço que já foram implementadas para o componente.
-4. Adição no Menu (opcional)
-   - _src/main-menu-block_: configuração da rota, nome e ícone que serão mostrados no Sidemenu (se necessário).
-
-## Extras
-
-### Compilar e Minificar para produção
-
-```sh
+```cmd
 yarn build
+mkdir -p .edge/statics && cp -r ./dist/* .edge/statics
 ```
 
-### Executar testes unitários com [Vitest](https://vitest.dev/)
+3. Publish your edge application
 
-```sh
-yarn test:unit
+```cmd
+azioncli edge_applications publish
 ```
 
-### Executar testes e2e com [Cypress](https://www.cypress.io/)
-
-```sh
-yarn test:e2e:dev
-```
-
-Esse comando executa os testes e2e em um servidor de desenvolvimento Vite.
-Sendo muito mais rápido que um build para produção.
-
-Embora ainda seja recomendado executar os testes no código buildado para produção com `test:e2e` antes de executar o deploy (ex.: ambientes de CI):
-
-```sh
-yarn build
-yarn test:e2e
-```
-
-### Formatação com [ESLint](https://eslint.org/)
-
-```sh
-yarn lint
-```
-
-### Deploy manual (First deploy)
-
-Para executar o deploy você pode utilizar o Azion CLI:
-
-Azion CLI (>= 0.70.0):
+After a few seconds, you can access your project on the Domain informed by the CLI. This is one example of CLI output
 
 ```
-yarn build
+$ azioncli edge_applications publish
+Uploading static files
+[##########] 100 .edge/statics/index.html Upload completed successfully!
+Created Edge Function PLATFORM-KIT-1 with ID 10908
+Created Edge Application PLATFORM-KIT-1 with ID 1694694931
+Created Domain PLATFORM-KIT-1 with ID 1694690266
+Created Cache Settings for web application
+Created Rules Engine for web application
+Your Edge Application was published successfully
 
-azioncli edge_applications init --name azion-platform-kit --type vue --mode deliver
-
-azioncli edge_applications publish --debug
-
+To visualize your application access the domain: https://ajahphrqah.map.azionedge.net
 ```
 
-### Deploy com GitHub Workflow
+Note: We are launching a new version of AzionCLI. Stay tuned for a new way to publish your platform kit at Edge.
 
-Para usufruir do GitHub Workflow você precisa ter configurado dentro do seu repositório as seguintes SECRETS:
+## Features
 
-| SECRET             | Descrição                                                                        |
-| ------------------ | -------------------------------------------------------------------------------- |
-| PLATFORM_KIT_TOKEN | seu Personal token da Azion para ser utilizado no CLI durante o deploy.          |
-| APPLICATION_ID     | ID da Edge Application criada anteriormente via first deploy.                    |
-| FUNCTION_ID        | ID da Edge Function criada anteriormente via first deploy.                       |
-| DOMAIN_ID          | ID do Domain vinculado a Edge Application criado anteriormente via first deploy. |
+The top features include:
 
----
+1. **Multi-tenancy:** Build your Real Time Manager according to your needs by consuming the endpoints from our Public API: [Azion Public API](https://api.azion.com)
+2. **Customizable UI:** configure theme tokens or generate them automatically via [Builder](https://designer.primevue.org/) in your project, giving the look and feel according to your needs.
+3. **Simple structure:** layered separation of blocks, components and services so that it is easy to build a new route in a very short time.
 
-<font color=#f3652b>\* As informações sobre os ID's necessários para os SECRETS estarão disponíveis dentro do arquivo `azion/azion.json` após o first deploy.</font>
+## Contributing
 
-### Issues conhecidas na versão 0.7.0 da azioncli
+Before beginning development, please familiarize yourself with the following developer resources:
 
-Devido à incompatibilidades com o vite na versão atual da azioncli os problemas abaixo podem ocorrer:
-
-- No fluxo de deploy, na primeira vez, a cli acaba não criando o diretório `.edge/statics` e retorna uma mensagem de erro no terminal. Para solucionar esse problema, execute:
-
-```sh
-  mkdir .edge/statics && cp -r dist/* .edge/statics
-  azioncli edge_applications publish
-```
-
-- Já nos casos de edição da edge application, os estáticos gerados em `dist` não sobrescrevem os que estão em `.edge/statics`. Antes publicar a edge application pela cli, verifique se os arquivos em `dist` e `.edge/statics` possuem o mesmo nome/conteúdo. Para solucionar esse problema, execute:
-
-```sh
-  rm -rf .edge/statics/* && cp -r dist/* .edge/statics
-  azioncli edge_applications publish
-```
-
-### Outros links
-
-[vee-validate guide](https://vee-validate.logaretm.com/v4/guide/composition-api/getting-started/)
-[yup with vee-valide guide](https://vee-validate.logaretm.com/v4/guide/composition-api/getting-started/#validating-with-yup)
+- Contributor Guide ([CONTRIBUTING.md](CONTRIBUTING.md)) to learn about how to contribute to this project.
+- Development Guide ([DEVELOPER.md](DEVELOPER.md)): Setting up your development environment.
+- [CODE_OF_CONDUCT](CODE_OF_CONDUCT.md)
