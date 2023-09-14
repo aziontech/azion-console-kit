@@ -21,7 +21,7 @@ cd azion-platform-kit
 ```
 2) TEMPORARY - Create a personal token in [Azion Realtime Manager](https://manager.azion.com/iam/personal-tokens) and save it into file `.env.development`
 ```cmd
-echo 'VITE_PERSONAL_TOKEN=azionXXXX' > .env.development
+echo 'VITE_PERSONAL_TOKEN=azionPERSONALTOKEN' > .env.development
 ```
 3) Start the project using:
 ```cmd
@@ -36,9 +36,39 @@ The webapp is now available on the following URL: http://localhost:5173
 
 Azion Platform Kit runs natively on Azion's edge thanks to Azion CLI.
 
+1) Download and configure Azion-CLI with a [Personal Token](https://manager.azion.com/iam/personal-tokens) 
 ```cmd
-TBD
+curl https://downloads.azion.com/linux/x86_64/azioncli -o azioncli && chmod +x azioncli
+./azioncli configure -t azionPERSONALTOKEN
 ```
+
+2) Build the bundler and copy the content from `dist` to `.edge/statics`
+```cmd
+yarn build
+mkdir -p .edge/statics && cp -r ./dist/* .edge/statics
+```
+
+3) Publish your edge application
+```cmd
+azioncli edge_applications publish   
+```
+
+After a few seconds, you can access your project on the Domain informed by the CLI. This is one example of CLI output
+```
+$ azioncli edge_applications publish
+Uploading static files
+[##########] 100 .edge/statics/index.htmlUpload completed successfully!
+Created Edge Function PLATFORM-KIT-1 with ID 10908
+Created Edge Application PLATFORM-KIT-1 with ID 1694694931
+Created Domain PLATFORM-KIT-1 with ID 1694690266
+Created Cache Settings for web application
+Created Rules Engine for web application
+Your Edge Application was published successfully
+
+To visualize your application access the domain: https://ajahphrqah.map.azionedge.net
+```
+
+Note: We are launching a new version of AzionCLI. Stay tuned for a new way to publish your platform kit at Edge.
 
 
 ## Features
