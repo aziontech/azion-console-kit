@@ -8,7 +8,7 @@
     <ShellBlock v-slot:default="{ customClass }">
       <RouterView
         :class="customClass"
-        class="w-full transition-[width] duration-500 ease-linear"
+        class="w-full transition-[width] duration-300 ease-in-out"
       />
     </ShellBlock>
   </main>

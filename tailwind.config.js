@@ -8,7 +8,10 @@ export default {
     extend: {
       transitionProperty: {
         width: "width"
-      }
+      },
+      width: {
+        'slide': '300px',
+      },
     },
   },
   plugins: [],
