@@ -134,13 +134,11 @@
     headerContent="Help"
     :pt="{
       root: { class: '!h-[90%]' },
-       header: { class: 'gap-60 text-color' }
+      header: { class: 'gap-60 text-color' }
     }"
   >
     <template #header>
-      <div class="text-color">
-        Help
-      </div>
+      <div class="text-color">Help</div>
     </template>
     <div class="flex flex-col p-2">
       <!-- content -->
