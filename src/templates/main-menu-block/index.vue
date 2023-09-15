@@ -388,7 +388,7 @@
               {
                 label: 'Edge Application',
                 icon: 'pi pi-box',
-                to: '/'
+                to: '/edge-applications'
               },
               {
                 label: 'Variables',
@@ -420,7 +420,8 @@
             items: [
               {
                 label: 'Edge Nodes',
-                icon: 'pi pi-database'
+                icon: 'pi pi-database',
+                to: '/edge-nodes'
               },
               { separator: true }
             ]
