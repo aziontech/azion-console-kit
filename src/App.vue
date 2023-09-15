@@ -1,12 +1,14 @@
 <script setup>
 import { computed } from 'vue';
-import { RouterView } from 'vue-router'
+import { RouterView, useRoute } from 'vue-router'
 import ShellBlock from '@/templates/shell-block'
 import { useAccountStore } from '@/stores/account'
 
 const accountStore = useAccountStore()
+const route = useRoute()
+
 const isLogged = computed(() => {
-  return accountStore.hasActiveUserId
+  return accountStore.hasActiveUserId && route.name !== 'login'
 })
 </script>
 
