@@ -15,8 +15,8 @@ export default async function beforeEachRoute(to, _, next) {
     const accountData = await verify()
 
     if (accountData) {
+      next()
       accountStore.setAccountData(accountData)
-      return next()
     }
   } catch {
     next('/login')
