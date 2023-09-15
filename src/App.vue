@@ -17,7 +17,6 @@
       v-else
     >
       <RouterView
-        v-if="isLogin"
         :class="customClass"
         class="w-full transition-[width] duration-300 ease-in-out"
       />
