@@ -46,6 +46,17 @@ export const switchAccount = async (accountId) => {
   return parseHttpResponse(httpResponse)
 }
 
+export const logout = async () => {
+  let httpResponse = await AxiosHttpClientAdapter.request({
+    url: `${makeLoginBaseUrl().logout}`,
+    method: 'POST',
+  })
+
+  httpResponse = await adapt(httpResponse)
+
+  return parseHttpResponse(httpResponse)
+}
+
 const adapt = async (httpResponse) => {
   const parsedData = httpResponse.body
 
