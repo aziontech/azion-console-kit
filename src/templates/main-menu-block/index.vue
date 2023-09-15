@@ -82,7 +82,17 @@
         label="Help"
         @click="showHelperCenter"
         outlined
-        class="surface-border"
+        class="surface-border hidden sm:flex"
+      />
+
+      <!-- Create Button Mobile -->
+      <PrimeButton
+        icon="pi pi-question-circle"
+        size="small"
+        outlined
+        class="sm:hidden"
+        style="height: 32px; width: 32px"
+        @click="showHelperCenterMobile"
       />
 
       <!-- Notification Button  -->
@@ -117,7 +127,25 @@
       />
     </div>
   </header>
-
+  <!-- help mobile sidebar -->
+  <Sidebar
+    v-model:visible="showHelp"
+    position="bottom"
+    headerContent="Help"
+    :pt="{
+      root: { class: '!h-[90%]' },
+       header: { class: 'gap-60 text-color' }
+    }"
+  >
+    <template #header>
+      <div class="text-color">
+        Help
+      </div>
+    </template>
+    <div class="flex flex-col p-2">
+      <!-- content -->
+    </div>
+  </Sidebar>
   <!-- Sidebar-->
   <Sidebar
     class="max-w-[280px]"
@@ -327,6 +355,7 @@
     },
     data() {
       return {
+        showHelp: false,
         showCreate: false,
         showSearch: false,
         showSidebar: false,
@@ -520,6 +549,9 @@
       },
       showHelperCenter() {
         this.$emit('showSlideHelper', !this.helperVisible)
+      },
+      showHelperCenterMobile() {
+        this.showHelp = true
       }
     }
   }
