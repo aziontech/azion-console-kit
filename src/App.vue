@@ -1,18 +1,18 @@
 <script setup>
-import { RouterView, useRoute } from 'vue-router'
-import ShellBlock from '@/templates/shell-block'
 import { computed } from 'vue';
+import { RouterView } from 'vue-router'
+import ShellBlock from '@/templates/shell-block'
+import { useAccountStore } from '@/stores/account'
 
-const route = useRoute()
-const isLogin = computed(() => {
-  return route.path === '/login'
+const accountStore = useAccountStore()
+const isLogged = computed(() => {
+  return accountStore.hasActiveUserId
 })
 </script>
 
 <template>
-  <main :class="['flex min-h-screen', !isLogin ? 'flex-col' : 'items-center']">
-    <RouterView v-if="isLogin" />
-    <ShellBlock v-else>
+  <main class="flex min-h-screen flex-col">
+    <ShellBlock :isLogged="isLogged">
       <RouterView />
     </ShellBlock>
   </main>
