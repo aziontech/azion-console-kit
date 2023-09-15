@@ -1,4 +1,4 @@
-import { logout, verify } from '@/services/login-services'
+import { logout, verify } from '@/services/auth-services'
 import { useAccountStore } from '@/stores/account'
 
 export default async function beforeEachRoute(to, _, next) {

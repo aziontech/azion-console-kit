@@ -1,5 +1,5 @@
 import { AxiosHttpClientAdapter, parseHttpResponse } from '../axios/AxiosHttpClientAdapter'
-import { makeLoginBaseUrl } from './make-login-base-url'
+import { makeLoginBaseUrl } from './make-auth-base-url'
 
 export const authenticate = async (payload) => {
   let httpResponse = await AxiosHttpClientAdapter.request({
@@ -38,17 +38,6 @@ export const refresh = async () => {
 export const switchAccount = async (accountId) => {
   let httpResponse = await AxiosHttpClientAdapter.request({
     url: `${makeLoginBaseUrl().switchAccount}/${accountId}`,
-    method: 'POST',
-  })
-
-  httpResponse = await adapt(httpResponse)
-
-  return parseHttpResponse(httpResponse)
-}
-
-export const logout = async () => {
-  let httpResponse = await AxiosHttpClientAdapter.request({
-    url: `${makeLoginBaseUrl().logout}`,
     method: 'POST',
   })
 

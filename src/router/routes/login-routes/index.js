@@ -1,4 +1,4 @@
-import * as LoginService from '@/services/login-services'
+import * as LoginService from '@/services/auth-services'
 
 /** @type {import('vue-router').RouteRecordRaw} */
 export const loginRoutes = {
