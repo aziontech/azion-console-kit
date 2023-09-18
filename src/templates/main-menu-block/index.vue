@@ -1,7 +1,7 @@
 <template>
   <header
     style="background-color: var(--surface-section); border-bottom: 1px solid var(--surface-border)"
-    class="items-center flex justify-between p-2"
+    class="items-center flex justify-between p-2 h-[54px]"
   >
     <div class="flex gap-3 items-center flex-grow">
       <PrimeButton
@@ -10,6 +10,7 @@
         class="flex-none"
         text
         icon="pi pi-bars"
+        v-if="isLogged"
       />
 
       <AzionLogo />
@@ -18,6 +19,7 @@
         :home="generateHomeBreadCrumb"
         :model="generateBreadCrumbs"
         class="!p-2 border-none"
+        v-if="isLogged"
       >
         <template #separator>
           <svg
@@ -35,7 +37,10 @@
         </template>
       </Breadcrumb>
     </div>
-    <div class="flex gap-3 items-center">
+    <div
+      class="flex gap-3 items-center"
+      v-if="isLogged"
+    >
       <PrimeButton
         @click="showSearch = true"
         size="small"
@@ -96,108 +101,109 @@
 </template>
 
 <script>
-  import PrimeMenu from 'primevue/menu'
-  import PrimeButton from 'primevue/button'
-  import Breadcrumb from 'primevue/breadcrumb'
-  import Sidebar from 'primevue/sidebar'
-  import Avatar from 'primevue/avatar'
-  import Divider from 'primevue/divider'
-  import AzionLogo from '../../assets/svg/azion'
+import PrimeMenu from 'primevue/menu'
+import PrimeButton from 'primevue/button'
+import Breadcrumb from 'primevue/breadcrumb'
+import Sidebar from 'primevue/sidebar'
+import Avatar from 'primevue/avatar'
+import Divider from 'primevue/divider'
+import AzionLogo from '../../assets/svg/azion'
 
-  export default {
-    name: 'menu-block',
-    components: {
-      Avatar,
-      Divider,
-      PrimeButton,
-      Breadcrumb,
-      PrimeMenu,
-      Sidebar,
-      AzionLogo
-    },
-    data() {
-      return {
-        sideBarVisible: false,
-        showSideBar: (state = true) => {
-          this.sideBarVisible = state
-        },
-        menuItems: [
-          {
-            label: 'Home',
-            to: '/',
-            icon: 'pi-home'
-          },
-          {
-            label: 'Domains',
-            to: '/domains',
-            icon: 'pi-globe',
-            showDivider: true
-          },
-          {
-            sectionTitle: 'BUILD',
-            label: 'Edge Application',
-            to: '/edge-applications',
-            icon: 'pi-window-minimize'
-          },
-          {
-            label: 'Variables',
-            to: '/variables',
-            icon: 'pi-sliders-h',
-            showDivider: true
-          },
-          {
-            sectionTitle: 'SECURE',
-            label: 'Intelligent DNS',
-            to: '/intelligent-dns',
-            icon: 'pi-share-alt'
-          },
-          {
-            label: 'Edge Firewall',
-            to: '/edge-firewall',
-            icon: 'pi-lock',
-            showDivider: true
-          },
-          {
-            sectionTitle: 'OBSERVE',
-            label: 'Data Streaming',
-            to: '/data-streaming',
-            icon: 'pi-play'
-          },
-          {
-            sectionTitle: 'EDGE LIBRARIES',
-            label: 'Edge Functions',
-            to: '/edge-functions',
-            icon: 'pi-code'
-          },
-          {
-            label: 'Edge Services',
-            to: '/edge-services',
-            icon: 'pi-bookmark'
-          },
-          {
-            label: 'Digital Certificates',
-            to: '/digital-certificates',
-            icon: 'pi-verified'
-          },
-          {
-            label: 'Network Lists',
-            to: '/network-lists',
-            icon: 'pi-globe',
-            showDivider: true
-          }
-        ]
-      }
-    },
-    computed: {
-      generateHomeBreadCrumb() {
-        return {
-          icon: 'pi pi-home',
-          to: '/'
-        }
+export default {
+  name: 'menu-block',
+  props: { isLogged: Boolean },
+  components: {
+    Avatar,
+    Divider,
+    PrimeButton,
+    Breadcrumb,
+    PrimeMenu,
+    Sidebar,
+    AzionLogo
+  },
+  data() {
+    return {
+      sideBarVisible: false,
+      showSideBar: (state = true) => {
+        this.sideBarVisible = state
       },
-      generateBreadCrumbs() {
-        return this.$router.currentRoute.value.meta.breadCrumbs ?? []
+      menuItems: [
+        {
+          label: 'Home',
+          to: '/',
+          icon: 'pi-home'
+        },
+        {
+          label: 'Domains',
+          to: '/domains',
+          icon: 'pi-globe',
+          showDivider: true
+        },
+        {
+          sectionTitle: 'BUILD',
+          label: 'Edge Application',
+          to: '/edge-applications',
+          icon: 'pi-window-minimize'
+        },
+        {
+          label: 'Variables',
+          to: '/variables',
+          icon: 'pi-sliders-h',
+          showDivider: true
+        },
+        {
+          sectionTitle: 'SECURE',
+          label: 'Intelligent DNS',
+          to: '/intelligent-dns',
+          icon: 'pi-share-alt'
+        },
+        {
+          label: 'Edge Firewall',
+          to: '/edge-firewall',
+          icon: 'pi-lock',
+          showDivider: true
+        },
+        {
+          sectionTitle: 'OBSERVE',
+          label: 'Data Streaming',
+          to: '/data-streaming',
+          icon: 'pi-play'
+        },
+        {
+          sectionTitle: 'EDGE LIBRARIES',
+          label: 'Edge Functions',
+          to: '/edge-functions',
+          icon: 'pi-code'
+        },
+        {
+          label: 'Edge Services',
+          to: '/edge-services',
+          icon: 'pi-bookmark'
+        },
+        {
+          label: 'Digital Certificates',
+          to: '/digital-certificates',
+          icon: 'pi-verified'
+        },
+        {
+          label: 'Network Lists',
+          to: '/network-lists',
+          icon: 'pi-globe',
+          showDivider: true
+        }
+      ]
+    }
+  },
+  computed: {
+    generateHomeBreadCrumb() {
+      return {
+        icon: 'pi pi-home',
+        to: '/'
       }
+    },
+    generateBreadCrumbs() {
+      return this.$router.currentRoute.value.meta.breadCrumbs ?? []
     }
   }
+}
 </script>

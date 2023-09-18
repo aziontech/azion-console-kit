@@ -1,5 +1,5 @@
 import { AxiosHttpClientAdapter, parseHttpResponse } from '../axios/AxiosHttpClientAdapter'
-import { makeLoginBaseUrl } from './make-login-base-url'
+import { makeLoginBaseUrl } from './make-auth-base-url'
 
 export const authenticate = async (payload) => {
   let httpResponse = await AxiosHttpClientAdapter.request({

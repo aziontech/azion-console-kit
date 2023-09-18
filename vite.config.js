@@ -20,6 +20,12 @@ export default defineConfig({
   },
   server: {
     proxy: {
+      '/logout': {
+        target: 'https://stage-sso.azion.com/logout',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/logout/, ''),
+        cookieDomainRewrite: { '*': '' }
+      },
       '/api/token': {
         target: 'https://stage-sso.azion.com/api/token',
         changeOrigin: true,
