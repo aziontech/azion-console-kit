@@ -134,7 +134,7 @@
     headerContent="Help"
     :pt="{
       root: { class: '!h-[90%]' },
-      header: { class: 'gap-60 text-color' }
+      header: { class: 'gap-60 text-color border-1 surface-border' }
     }"
   >
     <template #header>
