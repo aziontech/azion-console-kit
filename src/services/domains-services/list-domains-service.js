@@ -22,6 +22,7 @@ const adapt = (httpResponse) => {
     const cnames = domain.cnames.map((cname) => cname)?.join(',')
     return {
       id: domain.id,
+      name: domain.name,
       domainName: domain.domain_name,
       cnames: cnames,
       edgeApplicationName: domain.name,
