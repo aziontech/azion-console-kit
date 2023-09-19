@@ -16,44 +16,19 @@
 
     <form
       @submit.prevent="handleSubmit"
-      class="mt-4 p-4 max-w-screen-sm flex flex-col gap-4 lg:max-w-7xl mx-auto"
+      class="min-h- mt-4 p-4 max-w-screen-sm flex flex-col h-screen gap-4 lg:max-w-7xl mx-auto"
     >
-      <div class="flex flex-col gap-4 sm:w-full md:w-1/2">
+      <div class="flex flex-col gap-4 sm:!w-full md:!w-1/2">
         <slot name="form" />
       </div>
-      <div class="flex flex-wrap pb-4 gap-2 w-full justify-end mt-auto">
-        <PrimeButton
-          class="max-sm:w-full"
-          type="button"
-          severity="secondary"
-          :label="'Cancel'"
-          @click="handleCancel"
-        />
-        <PrimeButton
-          :disabled="!isValid"
-          class="max-sm:w-full"
-          type="submit"
-          :loading="isLoading"
-          :label="'Submit'"
-        />
-      </div>
-    </div>
-  </header>
-
-  <form
-    @submit.prevent="handleSubmit"
-    class="mt-4 p-4 max-w-screen-sm flex flex-col h-screen gap-4 lg:max-w-7xl mx-auto"
-  >
-    <div class="flex flex-col gap-4 sm:!w-full md:!w-1/2">
-      <slot name="form" />
-    </div>
-  </form>
-  <ActionBarTemplate
-    @cancel="handleCancel"
-    @submit="handleSubmit"
-    :loading="isLoading"
-    :submitDisabled="!isValid"
-  />
+    </form>
+    <ActionBarTemplate
+      @cancel="handleCancel"
+      @submit="handleSubmit"
+      :loading="isLoading"
+      :submitDisabled="!isValid"
+    />
+  </div>
 </template>
 
 <script>

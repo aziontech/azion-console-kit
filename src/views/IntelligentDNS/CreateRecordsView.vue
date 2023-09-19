@@ -18,7 +18,7 @@
         <label for="youdomain">.{{ intelligentDNSStore.getDomain }}</label>
       </div>
 
-      <div class="card flex justify-content-center">
+      <div class="card flex">
         <Dropdown
           v-model="selectedRecordType"
           :options="recordsTypes"
@@ -26,7 +26,7 @@
           optionValue="value"
           placeholder="Select a Record Type"
           :class="{ 'p-invalid': errors.type }"
-          class="w-full md:w-14rem"
+          class="w-full"
         />
       </div>
       <Textarea
@@ -45,7 +45,7 @@
         :class="{ 'p-invalid': errors.ttl }"
         v-tooltip.top="errors.ttl"
       />
-      <div class="card flex justify-content-center">
+      <div class="card flex">
         <Dropdown
           v-model="selectedPolicy"
           :options="policyList"
@@ -53,7 +53,7 @@
           optionValue="value"
           placeholder="Select a Policy"
           :class="{ 'p-invalid': errors.selectedPolicy }"
-          class="w-full md:w-14rem"
+          class="w-full"
         />
       </div>
       <InputText

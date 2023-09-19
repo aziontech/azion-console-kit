@@ -4,3 +4,7 @@ export const makeLoginBaseUrl = () => {
     switchAccount: 'switch-account'
   }
 }
+
+export const makeLogoutBaseUrl = () => {
+  return 'logout'
+}
