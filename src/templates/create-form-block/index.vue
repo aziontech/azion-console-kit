@@ -13,19 +13,17 @@
     </div>
   </header>
 
-  <form
-    class="mt-4 p-4 max-w-screen-sm flex flex-col gap-4 h-screen lg:max-w-7xl mx-auto"
-  >
+  <form class="mt-4 p-4 max-w-screen-sm flex flex-col gap-4 h-screen lg:max-w-7xl mx-auto">
     <div class="flex flex-col gap-4 sm:!w-full md:!w-1/2">
       <slot name="form" />
     </div>
   </form>
-    <ActionBarTemplate 
-      @cancel="handleCancel"
-      @submit="validateAndSubmit"
-      :loading="isLoading"
-      :submitDisabled="!isValid"
-    />
+  <ActionBarTemplate
+    @cancel="handleCancel"
+    @submit="validateAndSubmit"
+    :loading="isLoading"
+    :submitDisabled="!isValid"
+  />
 </template>
 
 <script>
@@ -38,7 +36,7 @@
     components: {
       Toast,
       PrimeButton,
-      ActionBarTemplate,
+      ActionBarTemplate
     },
     data: () => ({
       isLoading: false

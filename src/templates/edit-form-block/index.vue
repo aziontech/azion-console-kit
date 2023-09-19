@@ -21,12 +21,12 @@
       <slot name="form" />
     </div>
   </form>
-  <ActionBarTemplate 
-      @cancel="handleCancel"
-      @submit="handleSubmit"
-      :loading="isLoading"
-      :submitDisabled="!isValid"
-    />
+  <ActionBarTemplate
+    @cancel="handleCancel"
+    @submit="handleSubmit"
+    :loading="isLoading"
+    :submitDisabled="!isValid"
+  />
 </template>
 
 <script>
@@ -39,7 +39,7 @@
     components: {
       Toast,
       PrimeButton,
-      ActionBarTemplate,
+      ActionBarTemplate
     },
     data: () => ({
       isLoading: false
