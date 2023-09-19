@@ -12,8 +12,14 @@
 <template>
   <main :class="['flex min-h-screen', !isLogin ? 'flex-col' : 'items-center']">
     <RouterView v-if="isLogin" />
-    <ShellBlock v-else>
-      <RouterView />
+    <ShellBlock
+      v-slot:default="{ customClass }"
+      v-else
+    >
+      <RouterView
+        :class="customClass"
+        class="w-full transition-[width] duration-300 ease-in-out"
+      />
     </ShellBlock>
   </main>
 </template>
