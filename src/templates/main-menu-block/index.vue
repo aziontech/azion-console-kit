@@ -4,128 +4,134 @@
   <header
     class="surface-section border-b surface-border min-h-[60px] items-center flex justify-between px-4 w-full"
   >
-    <div class="flex gap-3 items-center">
-      <PrimeButton
-        @click="openSideBar"
-        size="small"
-        class="flex-none surface-border"
-        text
-        icon="pi pi-bars"
-        style="height: 32px; width: 32px"
-      />
-
-      <AzionLogo />
-      <!-- Azion client -->
-      <PrimeButton
-        v-tooltip.bottom="'Switch Account'"
-        class="ml-2 h-8 w-auto surface-border hidden md:flex gap-2 items-center"
-        size="small"
-        outlined
-      >
-        <i class="pi pi-building" />
-        <span>Azion Client</span>
-      </PrimeButton>
-    </div>
-
-    <!-- Search -->
-    <span class="top-0 p-input-icon-left p-input-icon-right hidden lg:flex">
-      <i class="pi pi-search" />
-      <i class="!top-[35%]">
-        <Tag
-          class="not-italic border surface-border text-color-secondary cursor-pointer surface-100"
-          value="⌘ + K"
-          @click="openSearch"
+    <div
+      v-if="isLogged"
+      class="w-full flex justify-between"
+    >
+      <div class="flex gap-3 items-center">
+        <PrimeButton
+          @click="openSideBar"
+          size="small"
+          class="flex-none surface-border"
+          text
+          icon="pi pi-bars"
+          style="height: 32px; width: 32px"
         />
-      </i>
-      <InputText
-        class="w-64"
-        placeholder="Search..."
-        :value="searchText"
-        @click="openSearch"
-        size="small"
-      />
-    </span>
 
-    <!-- Right Buttons -->
-    <div class="flex gap-2 items-center">
-      <PrimeButton
-        icon="pi pi-search"
-        class="surface-border px-2 py-1 flex lg:hidden"
-        @click="openSearch"
-        style="height: 32px; width: 32px"
-        outlined
-      />
+        <AzionLogo />
+        <!-- Azion client -->
+        <PrimeButton
+          v-tooltip.bottom="'Switch Account'"
+          class="ml-2 h-8 w-auto surface-border hidden md:flex gap-2 items-center"
+          size="small"
+          outlined
+          v-if="isLogged"
+        >
+          <i class="pi pi-building" />
+          <span>Azion Client</span>
+        </PrimeButton>
+      </div>
+      <!-- Search -->
+      <span class="top-0 p-input-icon-left p-input-icon-right hidden lg:flex">
+        <i class="pi pi-search" />
+        <i class="!top-[35%]">
+          <Tag
+            class="not-italic border surface-border text-color-secondary cursor-pointer surface-100"
+            value="⌘ + K"
+            @click="openSearch"
+          />
+        </i>
+        <InputText
+          class="w-64"
+          placeholder="Search..."
+          :value="searchText"
+          @click="openSearch"
+          size="small"
+        />
+      </span>
 
-      <!-- Create Button Desktop -->
-      <PrimeButton
-        @click="showCreateModal"
-        icon="pi pi-plus"
-        label="Create"
-        class="h-8 hidden sm:flex"
-        size="small"
-      />
+      <!-- Right Buttons -->
+      <div class="flex gap-2 items-center">
+        <PrimeButton
+          icon="pi pi-search"
+          class="surface-border px-2 py-1 flex lg:hidden"
+          @click="openSearch"
+          style="height: 32px; width: 32px"
+          outlined
+        />
 
-      <!-- Create Button Mobile -->
-      <PrimeButton
-        @click="showCreateModal"
-        icon="pi pi-plus"
-        class="h-8 sm:hidden"
-        size="small"
-        style="height: 32px; width: 32px"
-      />
+        <!-- Create Button Desktop -->
+        <PrimeButton
+          @click="showCreateModal"
+          icon="pi pi-plus"
+          label="Create"
+          class="h-8 hidden sm:flex"
+          size="small"
+        />
 
-      <!-- Help Button Desktop  -->
+        <!-- Create Button Mobile -->
+        <PrimeButton
+          @click="showCreateModal"
+          icon="pi pi-plus"
+          class="h-8 sm:hidden"
+          size="small"
+          style="height: 32px; width: 32px"
+        />
 
-      <PrimeButton
-        icon="pi pi-question-circle"
-        size="small"
-        label="Help"
-        @click="showHelperCenter"
-        outlined
-        class="surface-border hidden sm:flex"
-      />
+        <!-- Help Button Desktop  -->
 
-      <!-- Create Button Mobile -->
-      <PrimeButton
-        icon="pi pi-question-circle"
-        size="small"
-        outlined
-        class="sm:hidden"
-        style="height: 32px; width: 32px"
-        @click="showHelperCenterMobile"
-      />
+        <PrimeButton
+          icon="pi pi-question-circle"
+          size="small"
+          label="Help"
+          @click="showHelperCenter"
+          outlined
+          class="surface-border hidden sm:flex"
+        />
 
-      <!-- Notification Button  -->
-      <PrimeButton
-        icon="pi pi-bell"
-        style="border-color: var(--surface-border); padding-left: 7px; height: 32px; width: 32px"
-        class="overflow-auto"
-        badge="9"
-        v-tooltip.bottom="'Notifications'"
-        size="small"
-        badgeClass="p-badge-danger"
-        @click="toggleNotification"
-        aria-haspopup="true"
-        aria-controls="overlay_menu"
-        outlined
-        :pt="{
-          root: { class: 'overflow-visible' },
-          badge: { class: 'absolute right-[-4px] top-[-8px]' }
-        }"
-      />
+        <!-- Create Button Mobile -->
+        <PrimeButton
+          icon="pi pi-question-circle"
+          size="small"
+          outlined
+          class="sm:hidden"
+          style="height: 32px; width: 32px"
+          @click="showHelperCenterMobile"
+        />
 
-      <Divider
-        layout="vertical"
-        class="px-0 mx-1 surface-border"
-      />
+        <!-- Notification Button  -->
+        <PrimeButton
+          icon="pi pi-bell"
+          style="border-color: var(--surface-border); padding-left: 7px; height: 32px; width: 32px"
+          class="overflow-auto"
+          badge="9"
+          v-tooltip.bottom="'Notifications'"
+          size="small"
+          badgeClass="p-badge-danger"
+          @click="toggleNotification"
+          aria-haspopup="true"
+          aria-controls="overlay_menu"
+          outlined
+          :pt="{
+            root: { class: 'overflow-visible' },
+            badge: { class: 'absolute right-[-4px] top-[-8px]' }
+          }"
+        />
 
-      <!-- Avatar Desktop -->
-      <Avatar
-        @click="toggleProfile"
-        label="U"
-        class="cursor-pointer"
-      />
+        <Divider
+          layout="vertical"
+          class="px-0 mx-1 surface-border"
+        />
+
+        <!-- Avatar Desktop -->
+        <Avatar
+          @click="toggleProfile"
+          label="U"
+          class="cursor-pointer"
+        />
+      </div>
     </div>
+    <AzionLogo v-else />
   </header>
   <!-- help mobile sidebar -->
   <Sidebar
@@ -349,7 +355,8 @@
       helperVisible: {
         type: Boolean,
         default: false
-      }
+      },
+      isLogged: Boolean
     },
     data() {
       return {
@@ -551,6 +558,9 @@
       showHelperCenterMobile() {
         this.showHelp = true
       }
+    },
+    generateBreadCrumbs() {
+      return this.$router.currentRoute.value.meta.breadCrumbs ?? []
     }
   }
 </script>

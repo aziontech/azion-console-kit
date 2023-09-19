@@ -14,46 +14,18 @@
       </div>
     </header>
 
-    <form
-      @submit.prevent="handleSubmit"
-      class="mt-4 p-4 max-w-screen-sm flex flex-col gap-4 lg:max-w-7xl mx-auto"
-    >
-      <div class="flex flex-col gap-4 sm:w-full md:w-1/2">
+    <form class="mt-4 p-4 max-w-screen-sm flex flex-col gap-4 h-screen lg:max-w-7xl mx-auto">
+      <div class="flex flex-col gap-4 sm:!w-full md:!w-1/2">
         <slot name="form" />
       </div>
-      <div class="flex flex-wrap pb-4 gap-2 w-full justify-end mt-auto">
-        <PrimeButton
-          class="max-sm:w-full"
-          type="button"
-          severity="secondary"
-          :label="'Cancel'"
-          @click="handleCancel"
-        />
-        <PrimeButton
-          :disabled="!isValid"
-          class="max-sm:w-full"
-          type="submit"
-          :loading="isLoading"
-          :label="'Submit'"
-        />
-      </div>
-    </div>
-  </header>
-
-  <form
-    @submit.prevent="handleSubmit"
-    class="mt-4 p-4 max-w-screen-sm flex flex-col h-screen gap-4 lg:max-w-7xl mx-auto"
-  >
-    <div class="flex flex-col gap-4 sm:!w-full md:!w-1/2">
-      <slot name="form" />
-    </div>
-  </form>
-  <ActionBarTemplate
-    @cancel="handleCancel"
-    @submit="handleSubmit"
-    :loading="isLoading"
-    :submitDisabled="!isValid"
-  />
+    </form>
+    <ActionBarTemplate
+      @cancel="handleCancel"
+      @submit="validateAndSubmit"
+      :loading="isLoading"
+      :submitDisabled="!isValid"
+    />
+  </div>
 </template>
 
 <script>
@@ -62,7 +34,7 @@
   import ActionBarTemplate from '@/templates/action-bar-block'
 
   export default {
-    name: 'edit-form-block',
+    name: 'create-form-block',
     components: {
       Toast,
       PrimeButton,
@@ -76,15 +48,7 @@
         type: String,
         required: true
       },
-      editService: {
-        type: Function,
-        required: true
-      },
-      loadService: {
-        type: Function,
-        required: true
-      },
-      initialDataSetter: {
+      createService: {
         type: Function,
         required: true
       },
@@ -96,28 +60,27 @@
         type: Object,
         required: true
       },
-      backURL: {
-        type: String,
-        required: false
+      cleanFormCallback: {
+        type: Function,
+        required: true
       }
-    },
-    async created() {
-      await this.loadInitialData()
     },
     methods: {
       handleCancel() {
-        if (this.backURL) {
-          this.$router.push({ path: this.backURL })
-        } else {
-          this.$router.go('-1')
-        }
+        this.$router.go('-1')
       },
-      async loadInitialData() {
+      async validateAndSubmit() {
         try {
-          const { id } = this.$route.params
           this.isLoading = true
-          const initialData = await this.loadService({ id })
-          this.initialDataSetter(initialData)
+          await this.createService(this.formData)
+
+          this.cleanFormCallback()
+          this.$toast.add({
+            closable: true,
+            severity: 'success',
+            summary: 'created successfully',
+            life: 10000
+          })
         } catch (error) {
           this.$toast.add({
             closable: true,
@@ -127,29 +90,6 @@
           })
         } finally {
           this.isLoading = false
-        }
-      },
-      async handleSubmit() {
-        try {
-          this.isLoading = true
-          await this.editService(this.formData)
-          this.$toast.add({
-            closable: true,
-            severity: 'success',
-            summary: 'edited successfully',
-            life: 10000
-          })
-        } catch (error) {
-          this.$toast.add({
-            closable: true,
-            severity: 'error',
-            summary: error,
-            life: 10000
-          })
-        } finally {
-          setTimeout(() => {
-            this.isLoading = false
-          }, 800)
         }
       }
     }

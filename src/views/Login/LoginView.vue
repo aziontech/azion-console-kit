@@ -5,7 +5,6 @@
       :verifyLoginService="verifyLoginService"
       :refreshLoginService="refreshLoginService"
       :switchAccountLoginService="switchAccountLoginService"
-      test="dd"
     />
   </div>
 </template>

@@ -50,9 +50,9 @@
                 />
                 <label for="rememberme">Keep me logged in</label>
               </div>
-              <a class="font-medium no-underline ml-2 text-blue-500 text-right cursor-pointer"
-                >Forgot password?</a
-              >
+              <a class="font-medium no-underline ml-2 text-blue-500 text-right cursor-pointer">
+                Forgot password?
+              </a>
             </div>
 
             <PrimeButton

@@ -2,10 +2,11 @@
   <MainMenuBlock
     @showSlideHelper="showHelperCenter"
     :helperVisible="isHelperVisible"
+    :isLogged="isLogged"
   />
   <div
     class="flex w-full relative min-h-[calc(100vh-120px)] [&>.active]:!w-[calc(100%-300px)]"
-    :class="[styleHelper]"
+    :class="[styleHelper, { 'flex align-items-center': !isLogged }]"
   >
     <slot :customClass="customClass"></slot>
     <help
@@ -24,6 +25,7 @@
 
   export default {
     name: 'shell-block',
+    props: { isLogged: Boolean },
     components: {
       FooterBlock,
       MainMenuBlock,
