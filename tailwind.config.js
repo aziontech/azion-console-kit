@@ -5,7 +5,14 @@ export default {
     "./src/**/*.{vue,js,ts,jsx,tsx}",
   ],
   theme: {
-    extend: {},
+    extend: {
+      transitionProperty: {
+        width: "width"
+      },
+      width: {
+        'slide': '300px',
+      },
+    },
   },
   plugins: [],
 }
