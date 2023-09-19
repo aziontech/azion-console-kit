@@ -15,7 +15,7 @@
 
   <form
     @submit.prevent="handleSubmit"
-    class="mt-4 p-4 max-w-screen-sm flex flex-col gap-4 lg:max-w-7xl mx-auto"
+    class="mt-4 p-4 max-w-screen-sm flex flex-col h-screen gap-4 lg:max-w-7xl mx-auto"
   >
     <div class="flex flex-col gap-4 sm:!w-full md:!w-1/2">
       <slot name="form" />
