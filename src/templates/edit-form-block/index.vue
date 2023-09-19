@@ -37,19 +37,36 @@
           :label="'Submit'"
         />
       </div>
-    </form>
-  </div>
+    </div>
+  </header>
+
+  <form
+    @submit.prevent="handleSubmit"
+    class="mt-4 p-4 max-w-screen-sm flex flex-col h-screen gap-4 lg:max-w-7xl mx-auto"
+  >
+    <div class="flex flex-col gap-4 sm:!w-full md:!w-1/2">
+      <slot name="form" />
+    </div>
+  </form>
+  <ActionBarTemplate
+    @cancel="handleCancel"
+    @submit="handleSubmit"
+    :loading="isLoading"
+    :submitDisabled="!isValid"
+  />
 </template>
 
 <script>
   import Toast from 'primevue/toast'
   import PrimeButton from 'primevue/button'
+  import ActionBarTemplate from '@/templates/action-bar-block'
 
   export default {
     name: 'edit-form-block',
     components: {
       Toast,
-      PrimeButton
+      PrimeButton,
+      ActionBarTemplate
     },
     data: () => ({
       isLoading: false
