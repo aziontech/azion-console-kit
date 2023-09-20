@@ -468,6 +468,11 @@
                 to: '/data-streaming',
                 icon: 'pi pi-play'
               },
+              {
+                label: 'Edge Pulse',
+                to: '/edge-pulse',
+                icon: 'pi pi-chart-line'
+              },
 
               { separator: true }
             ]
