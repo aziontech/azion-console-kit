@@ -1,57 +1,59 @@
 <template>
-  <TabView
-    :activeIndex="activeTab"
-    @tab-click="changeRouteByClickingOnTab"
-  >
-    <TabPanel header="Main Settings">
-      <EditFormBlock
-        pageTitle="Edit Intelligent DNS"
-        :editService="this.editIntelligentDNSService"
-        :loadService="this.loadIntelligentDNSService"
-        :initialDataSetter="setValues"
-        :isValid="meta.valid"
-        :formData="values"
-        backURL="/intelligent-dns"
-      >
-        <template #form>
-          <InputText
-            placeholder="Zone Name"
-            v-bind="name"
-            type="text"
-            :class="{ 'p-invalid': errors.name }"
-            v-tooltip.top="errors.name"
-          />
-          <InputText
-            placeholder="Domain"
-            v-bind="domain"
-            type="text"
-            :class="{ 'p-invalid': errors.domain }"
-            v-tooltip.top="errors.domain"
-          />
-          <div class="flex gap-3 items-center">
-            <label for="">Active</label>
-            <InputSwitch
-              v-bind="isActive"
-              v-model="isActive.value"
-              :class="{ 'p-invalid': errors.isActive }"
+  <div>
+    <TabView
+      :activeIndex="activeTab"
+      @tab-click="changeRouteByClickingOnTab"
+    >
+      <TabPanel header="Main Settings">
+        <EditFormBlock
+          pageTitle="Edit Intelligent DNS"
+          :editService="this.editIntelligentDNSService"
+          :loadService="this.loadIntelligentDNSService"
+          :initialDataSetter="setValues"
+          :isValid="meta.valid"
+          :formData="values"
+          backURL="/intelligent-dns"
+        >
+          <template #form>
+            <InputText
+              placeholder="Zone Name"
+              v-bind="name"
+              type="text"
+              :class="{ 'p-invalid': errors.name }"
+              v-tooltip.top="errors.name"
             />
-          </div>
-        </template>
-      </EditFormBlock>
-    </TabPanel>
-    <TabPanel header="Records">
-      <ListTableBlock
-        pageTitle="Records"
-        addButtonLabel="Add Record"
-        createPagePath="records/create"
-        editPagePath="/records/edit"
-        :columns="recordListColumns"
-        :listService="listRecordsServiceIntelligentDNSDecorator"
-        :deleteService="deleteRecordsServiceIntelligentDNSDecorator"
-      />
-    </TabPanel>
-  </TabView>
-  <router-view></router-view>
+            <InputText
+              placeholder="Domain"
+              v-bind="domain"
+              type="text"
+              :class="{ 'p-invalid': errors.domain }"
+              v-tooltip.top="errors.domain"
+            />
+            <div class="flex gap-3 items-center">
+              <label for="">Active</label>
+              <InputSwitch
+                v-bind="isActive"
+                v-model="isActive.value"
+                :class="{ 'p-invalid': errors.isActive }"
+              />
+            </div>
+          </template>
+        </EditFormBlock>
+      </TabPanel>
+      <TabPanel header="Records">
+        <ListTableBlock
+          pageTitle="Records"
+          addButtonLabel="Add Record"
+          createPagePath="records/create"
+          editPagePath="/records/edit"
+          :columns="recordListColumns"
+          :listService="listRecordsServiceIntelligentDNSDecorator"
+          :deleteService="deleteRecordsServiceIntelligentDNSDecorator"
+        />
+      </TabPanel>
+    </TabView>
+    <router-view></router-view>
+  </div>
 </template>
 
 <script>
