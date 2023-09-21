@@ -4,7 +4,7 @@ import { makeLogoutBaseUrl } from './make-auth-base-url'
 export const logout = async () => {
   let httpResponse = await AxiosHttpClientAdapter.request({
     url: `${makeLogoutBaseUrl()}`,
-    method: 'POST',
+    method: 'POST'
   })
 
   httpResponse = await adapt(httpResponse)

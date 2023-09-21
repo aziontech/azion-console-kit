@@ -101,109 +101,109 @@
 </template>
 
 <script>
-import PrimeMenu from 'primevue/menu'
-import PrimeButton from 'primevue/button'
-import Breadcrumb from 'primevue/breadcrumb'
-import Sidebar from 'primevue/sidebar'
-import Avatar from 'primevue/avatar'
-import Divider from 'primevue/divider'
-import AzionLogo from '../../assets/svg/azion'
+  import PrimeMenu from 'primevue/menu'
+  import PrimeButton from 'primevue/button'
+  import Breadcrumb from 'primevue/breadcrumb'
+  import Sidebar from 'primevue/sidebar'
+  import Avatar from 'primevue/avatar'
+  import Divider from 'primevue/divider'
+  import AzionLogo from '../../assets/svg/azion'
 
-export default {
-  name: 'menu-block',
-  props: { isLogged: Boolean },
-  components: {
-    Avatar,
-    Divider,
-    PrimeButton,
-    Breadcrumb,
-    PrimeMenu,
-    Sidebar,
-    AzionLogo
-  },
-  data() {
-    return {
-      sideBarVisible: false,
-      showSideBar: (state = true) => {
-        this.sideBarVisible = state
-      },
-      menuItems: [
-        {
-          label: 'Home',
-          to: '/',
-          icon: 'pi-home'
-        },
-        {
-          label: 'Domains',
-          to: '/domains',
-          icon: 'pi-globe',
-          showDivider: true
-        },
-        {
-          sectionTitle: 'BUILD',
-          label: 'Edge Application',
-          to: '/edge-applications',
-          icon: 'pi-window-minimize'
-        },
-        {
-          label: 'Variables',
-          to: '/variables',
-          icon: 'pi-sliders-h',
-          showDivider: true
-        },
-        {
-          sectionTitle: 'SECURE',
-          label: 'Intelligent DNS',
-          to: '/intelligent-dns',
-          icon: 'pi-share-alt'
-        },
-        {
-          label: 'Edge Firewall',
-          to: '/edge-firewall',
-          icon: 'pi-lock',
-          showDivider: true
-        },
-        {
-          sectionTitle: 'OBSERVE',
-          label: 'Data Streaming',
-          to: '/data-streaming',
-          icon: 'pi-play'
-        },
-        {
-          sectionTitle: 'EDGE LIBRARIES',
-          label: 'Edge Functions',
-          to: '/edge-functions',
-          icon: 'pi-code'
-        },
-        {
-          label: 'Edge Services',
-          to: '/edge-services',
-          icon: 'pi-bookmark'
-        },
-        {
-          label: 'Digital Certificates',
-          to: '/digital-certificates',
-          icon: 'pi-verified'
-        },
-        {
-          label: 'Network Lists',
-          to: '/network-lists',
-          icon: 'pi-globe',
-          showDivider: true
-        }
-      ]
-    }
-  },
-  computed: {
-    generateHomeBreadCrumb() {
+  export default {
+    name: 'menu-block',
+    props: { isLogged: Boolean },
+    components: {
+      Avatar,
+      Divider,
+      PrimeButton,
+      Breadcrumb,
+      PrimeMenu,
+      Sidebar,
+      AzionLogo
+    },
+    data() {
       return {
-        icon: 'pi pi-home',
-        to: '/'
+        sideBarVisible: false,
+        showSideBar: (state = true) => {
+          this.sideBarVisible = state
+        },
+        menuItems: [
+          {
+            label: 'Home',
+            to: '/',
+            icon: 'pi-home'
+          },
+          {
+            label: 'Domains',
+            to: '/domains',
+            icon: 'pi-globe',
+            showDivider: true
+          },
+          {
+            sectionTitle: 'BUILD',
+            label: 'Edge Application',
+            to: '/edge-applications',
+            icon: 'pi-window-minimize'
+          },
+          {
+            label: 'Variables',
+            to: '/variables',
+            icon: 'pi-sliders-h',
+            showDivider: true
+          },
+          {
+            sectionTitle: 'SECURE',
+            label: 'Intelligent DNS',
+            to: '/intelligent-dns',
+            icon: 'pi-share-alt'
+          },
+          {
+            label: 'Edge Firewall',
+            to: '/edge-firewall',
+            icon: 'pi-lock',
+            showDivider: true
+          },
+          {
+            sectionTitle: 'OBSERVE',
+            label: 'Data Streaming',
+            to: '/data-streaming',
+            icon: 'pi-play'
+          },
+          {
+            sectionTitle: 'EDGE LIBRARIES',
+            label: 'Edge Functions',
+            to: '/edge-functions',
+            icon: 'pi-code'
+          },
+          {
+            label: 'Edge Services',
+            to: '/edge-services',
+            icon: 'pi-bookmark'
+          },
+          {
+            label: 'Digital Certificates',
+            to: '/digital-certificates',
+            icon: 'pi-verified'
+          },
+          {
+            label: 'Network Lists',
+            to: '/network-lists',
+            icon: 'pi-globe',
+            showDivider: true
+          }
+        ]
       }
     },
-    generateBreadCrumbs() {
-      return this.$router.currentRoute.value.meta.breadCrumbs ?? []
+    computed: {
+      generateHomeBreadCrumb() {
+        return {
+          icon: 'pi pi-home',
+          to: '/'
+        }
+      },
+      generateBreadCrumbs() {
+        return this.$router.currentRoute.value.meta.breadCrumbs ?? []
+      }
     }
   }
-}
 </script>

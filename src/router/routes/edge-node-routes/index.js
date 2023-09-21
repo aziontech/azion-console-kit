@@ -10,7 +10,7 @@ export const edgeNodeRoutes = {
       name: 'list-edge-node',
       component: () => import('@views/EdgeNode/ListView.vue'),
       props: {
-        listEdgeNodeService: EdgeNodeService.listEdgeNodeService,
+        listEdgeNodeService: EdgeNodeService.listEdgeNodeService
       },
       meta: {
         breadCrumbs: [
@@ -20,6 +20,6 @@ export const edgeNodeRoutes = {
           }
         ]
       }
-    },
+    }
   ]
 }

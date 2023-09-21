@@ -3,7 +3,7 @@ import { useAccountStore } from '@/stores/account'
 
 export default async function beforeEachRoute(to, _, next) {
   const accountStore = useAccountStore()
-  
+
   try {
     if (to.path === '/login') return next()
     if (to.path === '/logout') {

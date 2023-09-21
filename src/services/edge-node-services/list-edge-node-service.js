@@ -20,7 +20,7 @@ const adapt = (httpResponse) => {
         name: element.name,
         groups: element.groups,
         hashId: element.hash_id,
-        status: element.status,
+        status: element.status
       }))
     : []
 

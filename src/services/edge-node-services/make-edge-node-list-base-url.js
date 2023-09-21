@@ -1,4 +1,3 @@
 export const makeEdgeNodeListBaseUrl = () => {
-    return `edge_node`
-  }
-  
+  return `edge_node`
+}

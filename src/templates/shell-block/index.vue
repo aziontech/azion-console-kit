@@ -10,15 +10,15 @@
 </template>
 
 <script>
-import MainMenuBlock from '@/templates/main-menu-block'
-import FooterBlock from '@/templates/footer-block'
+  import MainMenuBlock from '@/templates/main-menu-block'
+  import FooterBlock from '@/templates/footer-block'
 
-export default {
-  name: 'shell-block',
-  props: { isLogged: Boolean },
-  components: {
-    FooterBlock,
-    MainMenuBlock
+  export default {
+    name: 'shell-block',
+    props: { isLogged: Boolean },
+    components: {
+      FooterBlock,
+      MainMenuBlock
+    }
   }
-}
 </script>
