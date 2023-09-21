@@ -1,53 +1,105 @@
 <template>
-  <SingleBlock pageTitle="Edge Pulse">
-    <template #content>
-      <h1>Default Tag:</h1>
-      <p>
-        Place this tag in the HTML of the switched pages to measure them. You should place it just
-        before the closing BODY tag. This script waits until the load event is complete before
-        downloading and executing the RUM Client, ensuring that the load event is uninterrupted and
-        has zero impact on user experience.
-      </p>
+  <div>
+    <Toast />
+    <SingleBlock pageTitle="Edge Pulse">
+      <template #content>
+        <div class="flex flex-col gap-4 lg:w-1/2">
+          <b>Default Tag:</b>
+          <p>
+            Place this tag in the HTML of the switched pages to measure them. You should place it
+            just before the closing BODY tag. This script waits until the load event is complete
+            before downloading and executing the RUM Client, ensuring that the load event is
+            uninterrupted and has zero impact on user experience.
+          </p>
 
-      <pre>
-        &lt;script>
-if (typeof window.addEventListener === "function") {
-    window.addEventListener("load", function() {
-        if (window.azpulse === undefined) {
-            var pulse = document.createElement("script");
-            pulse.src = "//client.azionrum.net/8900e/azion-pulse.js";
-            document.body.appendChild(pulse);
-        }
-    });
-}
-&lt;/script>
-      </pre>
-      <PrimeButton label="Copy to Clipboard" />
-
-      <h1>Pre-loading Tag:</h1>
-      <p>
-        If you're using Content Security Policy settings preventing the use of inline JavaScript
-        then place this tag just before the enclosing BODY tag. This script executes before the load
-        event has fired.
-      </p>
-      <pre>
-        &lt;script async src="//client.azionrum.net/8900e/azion-pulse.js">&lt;/script>
-      </pre>
-    </template>
-  </SingleBlock>
+          <MonacoEditor
+            :code="defaultTagCode"
+            language="javascript"
+            class="min-h-[200px]"
+          />
+          <div>
+            <PrimeButton
+              label="Copy to Clipboard"
+              @click="handleCopyDefaultTagCode"
+            />
+          </div>
+          <b>Pre-loading Tag:</b>
+          <p>
+            If you're using Content Security Policy settings preventing the use of inline JavaScript
+            then place this tag just before the enclosing BODY tag. This script executes before the
+            load event has fired.
+          </p>
+          <MonacoEditor
+            :code="preLoadingTagCode"
+            language="html"
+            class="min-h-[40px]"
+          />
+          <div>
+            <PrimeButton
+              label="Copy to Clipboard"
+              @click="handleCopyPreLoadingTagCode"
+            />
+          </div>
+        </div>
+      </template>
+    </SingleBlock>
+  </div>
 </template>
 
 <script>
+  import MonacoEditor from '@/templates/monaco-editor-block'
   import SingleBlock from '@/templates/single-block'
   import PrimeButton from 'primevue/button'
+  import Toast from 'primevue/toast'
+
+  const defaultTagCode = `<script>
+  if (typeof window.addEventListener === 'function') {
+    window.addEventListener('load', function() {
+      if (window.azpulse === undefined) {
+        var pulse = document.createElement('script');
+        pulse.src = '//client.azionrum.net/8900e/azion-pulse.js';
+        document.body.appendChild(pulse);
+      }
+    });
+  }
+<${'/'}script>`
+
+  const preLoadingTagCode = `<script async src="//client.azionrum.net/8900e/azion-pulse.js"><${'/'}script>`
 
   export default {
     name: 'edge-pulse-view',
     components: {
       PrimeButton,
-      SingleBlock
+      MonacoEditor,
+      SingleBlock,
+      Toast
     },
-    props: {},
-    computed: {}
+    methods: {
+      showToast() {
+        this.$toast.add({
+          closable: true,
+          severity: 'success',
+          summary: 'Code successfully copied',
+          life: 1000
+        })
+      },
+      handleCopyDefaultTagCode() {
+        navigator.clipboard.writeText(defaultTagCode).then(this.showToast)
+      },
+      handleCopyPreLoadingTagCode() {
+        navigator.clipboard.writeText(preLoadingTagCode).then(this.showToast)
+      }
+    },
+    data() {
+      return {
+        defaultTagCode,
+        preLoadingTagCode,
+        options: {
+          colorDecorators: true,
+          lineHeight: 24,
+          tabSize: 2
+        }
+      }
+    }
   }
 </script>

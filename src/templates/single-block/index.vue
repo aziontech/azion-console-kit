@@ -1,6 +1,5 @@
 <template>
   <div>
-    <Toast />
     <header class="border-neutral-200 border-b min-h-[82px] w-full flex items-center">
       <div class="p-4 w-full">
         <div class="flex flex-row flex-wrap items-center justify-left gap-4">
@@ -18,22 +17,12 @@
 </template>
 
 <script>
-  import Toast from 'primevue/toast'
-
   export default {
     name: 'single-block',
-    components: {
-      Toast
-    },
     props: {
       pageTitle: {
         type: String,
         required: true
-      }
-    },
-    methods: {
-      copyCode() {
-        console.log('copy')
       }
     }
   }

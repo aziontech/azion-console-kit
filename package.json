@@ -29,7 +29,8 @@
     "vee-validate": "^4.11.1",
     "vue": "^3.3.4",
     "vue-router": "^4.2.4",
-    "yup": "^1.2.0"
+    "yup": "^1.2.0",
+    "monaco-editor": "^0.33.0"
   },
   "devDependencies": {
     "@commitlint/cli": "^17.7.1",
