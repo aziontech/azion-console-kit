@@ -58,6 +58,11 @@ export default defineConfig({
         target: 'https://stage-manager-origin.azion.com/api',
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/api/, '')
+      },
+      '/api/edge_node': {
+        target: 'https://stage-manager.azion.com/edgenode/api/v1/edge-nodes',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/edge_node/, '')
       }
     }
   }
