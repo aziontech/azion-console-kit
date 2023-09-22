@@ -126,6 +126,8 @@
           await switchClientAccount(userInfo)
         } catch {
           hasErrorMessage.value = 'User not found with the given credentials.'
+        }
+        finally {
           isLoading.value = false
         }
       }
@@ -149,7 +151,6 @@
           hasErrorMessage.value = clientId
             ? 'Error while processing request.'
             : 'User must be of type client.'
-          isLoading.value = false
         }
       }
 

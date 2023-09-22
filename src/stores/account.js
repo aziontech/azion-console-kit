@@ -10,7 +10,7 @@ export const useAccountStore = defineStore({
       return state.account
     },
     hasActiveUserId(state) {
-      return !!state.account?.user_tracking_info?.id
+      return !!state.account?.id
     }
   },
   actions: {
