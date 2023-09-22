@@ -29,7 +29,6 @@ export default async function beforeEachRoute(to, _, next) {
     const accountData = await verifyToken()
     accountStore.setAccountData(accountData)
     return next()
-    
   } catch {
     next('/login')
   }
