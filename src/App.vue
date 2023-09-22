@@ -14,8 +14,14 @@
 
 <template>
   <main class="flex min-h-screen flex-col">
-    <ShellBlock :isLogged="isLogged">
-      <RouterView />
+    <ShellBlock
+      v-slot:default="{ customClass }"
+      :isLogged="isLogged"
+    >
+      <RouterView
+        :class="customClass"
+        class="w-full transition-[width] duration-300 ease-in-out"
+      />
     </ShellBlock>
   </main>
 </template>
