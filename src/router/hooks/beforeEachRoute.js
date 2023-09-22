@@ -2,7 +2,7 @@ import { getAccountInfo, getUserInfo } from '@/services/account-services'
 import { logout } from '@/services/auth-services'
 import { useAccountStore } from '@/stores/account'
 
-export default async function beforeEachRoute(to, from, next) {
+export default async function beforeEachRoute(to, _, next) {
   const accountStore = useAccountStore()
 
   if (to.path === '/logout') {
