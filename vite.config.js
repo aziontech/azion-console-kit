@@ -20,10 +20,10 @@ export default defineConfig({
   },
   server: {
     proxy: {
-      '/api/sso_api': {
+      '^/api/(account|user|token|switch-account)': {
         target: 'https://stage-sso.azion.com/api',
         changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/api\/sso_api/, ''),
+        rewrite: (path) => path.replace(/^\/api/, ''),
         cookieDomainRewrite: { '*': '' }
       },
       '/logout': {

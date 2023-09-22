@@ -1,7 +1,7 @@
 export const makeLoginBaseUrl = () => {
   return {
-    token: 'sso_api/token',
-    switchAccount: 'sso_api/switch-account'
+    token: 'token',
+    switchAccount: 'switch-account'
   }
 }
 
