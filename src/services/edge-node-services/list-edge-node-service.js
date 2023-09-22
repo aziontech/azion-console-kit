@@ -11,18 +11,19 @@ export const listEdgeNodeService = async () => {
 }
 
 const adapt = (httpResponse) => {
-  console.log(httpResponse.body);
+  console.log(httpResponse.body)
   const isArray = Array.isArray(httpResponse.body.nodes)
 
-  const edgeNodes = isArray && httpResponse.body.nodes.length
-    ? httpResponse.body.nodes.map((element) => ({
-        id: element.id,
-        name: element.name,
-        groups: element.groups,
-        hashId: element.hash_id,
-        status: element.status
-      }))
-    : []
+  const edgeNodes =
+    isArray && httpResponse.body.nodes.length
+      ? httpResponse.body.nodes.map((element) => ({
+          id: element.id,
+          name: element.name,
+          groups: element.groups,
+          hashId: element.hash_id,
+          status: element.status
+        }))
+      : []
 
   return {
     body: edgeNodes,

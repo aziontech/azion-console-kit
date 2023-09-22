@@ -5,9 +5,8 @@ export const authorizeEdgeNodeService = async (id) => {
   let httpResponse = await AxiosHttpClientAdapter.request({
     url: `${makeEdgeNodeListBaseUrl()}/${id}`,
     method: 'PATCH',
-    body: { status: 'Authorized'}
+    body: { status: 'Authorized' }
   })
 
   return parseHttpResponse(httpResponse)
 }
-

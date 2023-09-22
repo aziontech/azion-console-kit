@@ -225,7 +225,7 @@
           })
         }
         return actionOptions
-      },  
+      },
       async loadData({ page }) {
         try {
           this.isLoading = true

@@ -44,8 +44,8 @@ export class AxiosHttpClientAdapter {
         headers: headers,
         data: body
       })
-      console.log(axiosResponse);
-      console.log('url', url);
+      console.log(axiosResponse)
+      console.log('url', url)
     } catch (error) {
       const axiosError = error
       axiosResponse = axiosError.response
