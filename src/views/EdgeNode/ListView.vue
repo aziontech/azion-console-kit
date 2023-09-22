@@ -2,10 +2,13 @@
   <ListTableBlock
     :listService="listEdgeNodeService"
     :columns="getColumns"
-    pageTitle="Network Lists"
-    addButtonLabel="Add Network List"
+    :deleteService="deleteEdgeNodeService"
+    :authorizeNode="true"
+    pageTitle="Edge Nodes"
+    addButtonLabel=""
     createPagePath="network-lists/create"
     editPagePath="network-lists/edit"
+    @authorize="authorizeEdgenode"
   />
 </template>
 <script>
@@ -18,6 +21,14 @@
     },
     props: {
       listEdgeNodeService: {
+        required: true,
+        type: Function
+      },
+      deleteEdgeNodeService: {
+        required: true,
+        type: Function
+      },
+      authorizeEdgeNodeService: {
         required: true,
         type: Function
       }
@@ -42,6 +53,11 @@
             header: 'Status'
           }
         ]
+      }
+    },
+    methods: {
+      async authorizeEdgenode(id) {
+        await this.authorizeEdgeNodeService(id)
       }
     }
   }

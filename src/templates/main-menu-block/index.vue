@@ -164,6 +164,12 @@
             showDivider: true
           },
           {
+            sectionTitle: 'DEPLOY',
+            label: 'Edge Nodes',
+            to: '/edge-node',
+            icon: 'pi-database'
+          },
+          {
             sectionTitle: 'OBSERVE',
             label: 'Data Streaming',
             to: '/data-streaming',

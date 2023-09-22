@@ -6,16 +6,16 @@ export const listEdgeNodeService = async () => {
     url: `${makeEdgeNodeListBaseUrl()}`,
     method: 'GET'
   })
-
   httpResponse = adapt(httpResponse)
   return parseHttpResponse(httpResponse)
 }
 
 const adapt = (httpResponse) => {
+  console.log(httpResponse.body);
   const isArray = Array.isArray(httpResponse.body.nodes)
 
-  const edgeNodes = isArray
-    ? httpResponse.body.results.map((element) => ({
+  const edgeNodes = isArray && httpResponse.body.nodes.length
+    ? httpResponse.body.nodes.map((element) => ({
         id: element.id,
         name: element.name,
         groups: element.groups,

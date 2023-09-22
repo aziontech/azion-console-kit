@@ -60,7 +60,7 @@
             <PrimeMenu
               :ref="'menu'"
               id="overlay_menu"
-              v-bind:model="actionOptions"
+              v-bind:model="actionOptions(rowData?.status)"
               :popup="true"
             />
             <PrimeButton
@@ -181,6 +181,11 @@
         required: true,
         default: () => ''
       },
+      authorizeNode: {
+        type: Boolean,
+        required: false,
+        default: false
+      },
       listService: {
         required: true,
         type: Function
@@ -194,8 +199,13 @@
       await this.loadData({ page: 1 })
     },
     computed: {
-      actionOptions() {
-        return [
+      filterBy() {
+        return this.columns.map((item) => item.field)
+      }
+    },
+    methods: {
+      actionOptions(showAuthorize) {
+        const actionOptions = [
           {
             label: 'Edit',
             icon: 'pi pi-fw pi-pencil',
@@ -207,12 +217,15 @@
             command: () => this.removeItem()
           }
         ]
-      },
-      filterBy() {
-        return this.columns.map((item) => item.field)
-      }
-    },
-    methods: {
+        if (this.authorizeNode && showAuthorize !== 'Authorized') {
+          actionOptions.push({
+            label: 'Authorize',
+            icon: 'pi pi-lock-open',
+            command: () => this.authorizeEdgeNode()
+          })
+        }
+        return actionOptions
+      },  
       async loadData({ page }) {
         try {
           this.isLoading = true
@@ -238,6 +251,9 @@
       },
       editItem() {
         this.$router.push({ path: `${this.editPagePath}/${this.selectedId}` })
+      },
+      authorizeEdgeNode() {
+        this.$emit('authorize', this.selectedId)
       },
       async removeItem() {
         let toastConfig = {
