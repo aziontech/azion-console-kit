@@ -1,15 +1,17 @@
 <template>
-  <ListTableBlock
-    :listService="listEdgeNodeService"
-    :columns="getColumns"
-    :deleteService="deleteEdgeNodeService"
-    :authorizeNode="true"
-    pageTitle="Edge Nodes"
-    addButtonLabel=""
-    createPagePath="network-lists/create"
-    editPagePath="network-lists/edit"
-    @authorize="authorizeEdgenode"
-  />
+  <div>
+    <ListTableBlock
+      :listService="listEdgeNodeService"
+      :columns="getColumns"
+      :deleteService="deleteEdgeNodeService"
+      :authorizeNode="true"
+      pageTitle="Edge Nodes"
+      addButtonLabel=""
+      createPagePath="network-lists/create"
+      editPagePath="network-lists/edit"
+      @authorize="authorizeEdgenode"
+    />
+  </div>
 </template>
 <script>
   import ListTableBlock from '@/templates/list-table-block'

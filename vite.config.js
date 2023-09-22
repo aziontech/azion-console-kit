@@ -47,10 +47,7 @@ export default defineConfig({
         //target: 'https://cors-stage-api.azion.net',
         target: 'https://stage-manager.azion.com/variables/api/',
         changeOrigin: true,
-        rewrite: (path) => {
-          console.log('path variables', path);
-          return path.replace(/^\/api/, '')
-        }
+        rewrite: (path) =>  path.replace(/^\/api/, ''), 
       },
       '/network-lists/graphql': {
         target: 'https://stage-cities.azion.com',

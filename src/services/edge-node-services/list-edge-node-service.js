@@ -11,7 +11,6 @@ export const listEdgeNodeService = async () => {
 }
 
 const adapt = (httpResponse) => {
-  console.log(httpResponse.body)
   const isArray = Array.isArray(httpResponse.body.nodes)
 
   const edgeNodes =
