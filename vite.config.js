@@ -20,22 +20,16 @@ export default defineConfig({
   },
   server: {
     proxy: {
+      '/api/sso_api': {
+        target: 'https://stage-sso.azion.com/api',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/api\/sso_api/, ''),
+        cookieDomainRewrite: { '*': '' }
+      },
       '/logout': {
         target: 'https://stage-sso.azion.com/logout',
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/logout/, ''),
-        cookieDomainRewrite: { '*': '' }
-      },
-      '/api/token': {
-        target: 'https://stage-sso.azion.com/api/token',
-        changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/api\/token/, ''),
-        cookieDomainRewrite: { '*': '' }
-      },
-      '/api/switch-account': {
-        target: 'https://stage-sso.azion.com/api/switch-account',
-        changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/api\/switch-account/, ''),
         cookieDomainRewrite: { '*': '' }
       },
       '/api/edge_services': {
