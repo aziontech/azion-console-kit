@@ -1,35 +1,37 @@
-import { logout, verify, refresh } from '@/services/auth-services'
+import { getAccountInfo, getUserInfo } from '@/services/account-services'
+import { logout } from '@/services/auth-services'
 import { useAccountStore } from '@/stores/account'
-
-const verifyToken = async (times = 1) => {
-  try {
-    const accountData = await verify()
-    return accountData
-  } catch {
-    if (times > 0) {
-      await refresh()
-      return await verifyToken(times - 1)
-    } else {
-      throw new Error('Refresh token failed')
-    }
-  }
-}
 
 export default async function beforeEachRoute(to, _, next) {
   const accountStore = useAccountStore()
 
-  try {
-    if (to.path === '/login') return next()
-    if (to.path === '/logout') {
-      await logout()
-      accountStore.setAccountData(null)
-      return next()
-    }
-
-    const accountData = await verifyToken()
-    accountStore.setAccountData(accountData)
+  if (to.path === '/logout') {
+    await logout()
+    accountStore.setAccountData(null)
     return next()
-  } catch {
-    next('/login')
   }
+  
+  if (!accountStore.hasActiveUserId && to.path !== '/login') {
+    try {
+      const [ accountInfo, userInfo ] = await Promise.all([
+        getAccountInfo(),
+        getUserInfo(),
+      ]);
+
+      accountInfo.is_account_owner = userInfo.results.is_account_owner;
+      accountInfo.client_id = userInfo.results.client_id;
+      accountInfo.timezone = userInfo.results.timezone;
+      accountInfo.utc_offset = userInfo.results.utc_offset;
+      accountInfo.permissions = userInfo.results.permissions;
+      accountInfo.email = userInfo.results.email;
+      accountInfo.user_id = userInfo.results.id;
+
+
+      accountStore.setAccountData(accountInfo)
+      return next()
+    } catch {
+      return next('/login')
+    }
+  }
+  return next()
 }

@@ -250,6 +250,7 @@
         label="Logout"
         icon="pi pi-sign-out"
         text
+        @click="logout"
       />
     </template>
   </PrimeMenu>
@@ -557,6 +558,9 @@
       },
       showHelperCenterMobile() {
         this.showHelp = true
+      },
+      logout() {
+        window.location.href = '/logout'
       }
     },
     computed: {
