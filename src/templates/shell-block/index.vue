@@ -4,7 +4,7 @@
     :helperVisible="isHelperVisible"
     :isLogged="isLogged"
   />
-  <div
+  <main
     class="flex w-full relative min-h-[calc(100vh-120px)] [&>.active]:!w-[calc(100%-300px)]"
     :class="[styleHelper, { 'flex align-items-center': !isLogged }]"
   >
@@ -13,7 +13,7 @@
       :class="customClassHelper"
       @closeSlideIn="close"
     ></help>
-  </div>
+  </main>
 
   <FooterBlock />
 </template>

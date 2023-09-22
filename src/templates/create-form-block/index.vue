@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="flex flex-col">
     <Toast />
     <header class="border-neutral-200 border-b min-h-[82px] w-full flex items-center">
       <div class="p-4 w-full">
@@ -13,9 +13,7 @@
         </div>
       </div>
     </header>
-    <form
-      class="mt-4 p-4 max-w-screen-sm flex flex-col gap-4 h-[calc(100%-250px)] lg:max-w-7xl mx-auto"
-    >
+    <form class="w-full grow mt-4 p-4 max-w-screen-sm flex flex-col gap-4 lg:max-w-7xl mx-auto">
       <div class="flex flex-col gap-4 sm:!w-full md:!w-1/2">
         <slot name="form" />
       </div>
