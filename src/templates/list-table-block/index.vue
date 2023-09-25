@@ -61,7 +61,7 @@
               <PrimeMenu
                 :ref="'menu'"
                 id="overlay_menu"
-                v-bind:model="actionOptions"
+                v-bind:model="actionOptions(rowData?.status)"
                 :popup="true"
               />
               <PrimeButton
@@ -79,6 +79,7 @@
           <div class="my-4 flex flex-col gap-3 justify-center items-center">
             <p class="text-xl font-normal text-gray-600">No registers found.</p>
             <PrimeButton
+              v-if="!authorizeNode"
               text
               icon="pi pi-plus"
               label="Add"
@@ -183,6 +184,11 @@
         required: true,
         default: () => ''
       },
+      authorizeNode: {
+        type: Boolean,
+        required: false,
+        default: false
+      },
       listService: {
         required: true,
         type: Function
@@ -196,8 +202,13 @@
       await this.loadData({ page: 1 })
     },
     computed: {
-      actionOptions() {
-        return [
+      filterBy() {
+        return this.columns.map((item) => item.field)
+      }
+    },
+    methods: {
+      actionOptions(showAuthorize) {
+        const actionOptions = [
           {
             label: 'Edit',
             icon: 'pi pi-fw pi-pencil',
@@ -209,12 +220,15 @@
             command: () => this.removeItem()
           }
         ]
+        if (this.authorizeNode && showAuthorize !== 'Authorized') {
+          actionOptions.push({
+            label: 'Authorize',
+            icon: 'pi pi-lock-open',
+            command: () => this.authorizeEdgeNode()
+          })
+        }
+        return actionOptions
       },
-      filterBy() {
-        return this.columns.map((item) => item.field)
-      }
-    },
-    methods: {
       async loadData({ page }) {
         try {
           this.isLoading = true
@@ -240,6 +254,9 @@
       },
       editItem() {
         this.$router.push({ path: `${this.editPagePath}/${this.selectedId}` })
+      },
+      authorizeEdgeNode() {
+        this.$emit('authorize', this.selectedId)
       },
       async removeItem() {
         let toastConfig = {
