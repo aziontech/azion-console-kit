@@ -2,7 +2,6 @@ import { AxiosHttpClientAdapter, parseHttpResponse } from '../axios/AxiosHttpCli
 import { makeAccountBaseUrl } from './make-account-base-url'
 import { makeUserInfoBaseUrl } from './make-user-info-base-url'
 
-
 export const getAccountInfo = async () => {
   let httpResponse = await AxiosHttpClientAdapter.request({
     url: `${makeAccountBaseUrl()}`,
