@@ -126,8 +126,7 @@
           await switchClientAccount(userInfo)
         } catch {
           hasErrorMessage.value = 'User not found with the given credentials.'
-        }
-        finally {
+        } finally {
           isLoading.value = false
         }
       }

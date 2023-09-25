@@ -20,6 +20,11 @@ export default defineConfig({
   },
   server: {
     proxy: {
+      '/api/users': {
+        target: 'https://stage-iam.azion.com/iam/api',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/api/, '')
+      },
       '^/api/(account|user|token|switch-account)': {
         target: 'https://stage-sso.azion.com/api',
         changeOrigin: true,
@@ -47,11 +52,6 @@ export default defineConfig({
         target: 'https://stage-cities.azion.com',
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/network-lists\/graphql/, '')
-      },
-      '/api/users': {
-        target: 'https://stage-iam.azion.com/iam/api',
-        changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/api/, '')
       },
       // Should be the last one
       '/api': {

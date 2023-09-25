@@ -27,7 +27,7 @@ export const usersListsRoutes = {
       name: 'create-users',
       component: () => import('@views/Users/CreateView.vue'),
       props: {
-        createUsersService: UsersService.createUsersService,
+        createUsersService: UsersService.createUsersService
       },
       meta: {
         breadCrumbs: [
