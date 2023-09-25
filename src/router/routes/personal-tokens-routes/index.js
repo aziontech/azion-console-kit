@@ -23,6 +23,7 @@ export const personalTokensRoutes = {
       }
     },
     {
+      // It's not allowed to edit a personal token
       path: 'edit/:id',
       redirect: { name: 'list-personal-tokens' }
     }
