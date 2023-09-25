@@ -21,6 +21,10 @@ export const personalTokensRoutes = {
           }
         ]
       }
+    },
+    {
+      path: 'edit/:id',
+      redirect: { name: 'list-personal-tokens' }
     }
   ]
 }
