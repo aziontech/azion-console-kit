@@ -48,11 +48,17 @@ export default defineConfig({
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/network-lists\/graphql/, '')
       },
+      '/api/users': {
+        target: 'https://stage-iam.azion.com/iam/api',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/api/, '')
+      },
+      // Should be the last one
       '/api': {
         target: 'https://stage-manager-origin.azion.com/api',
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/api/, '')
-      }
+      },
     }
   }
 })

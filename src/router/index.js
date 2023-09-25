@@ -11,6 +11,7 @@ import { intelligentDnsRoutes } from '@routes/intelligent-dns-routes'
 import { loginRoutes } from '@routes/login-routes'
 import { networkListsRoutes } from '@routes/network-lists-routes'
 import { variablesRoutes } from '@routes/variables-routes'
+import { usersListsRoutes } from '@routes/users-routes'
 import beforeEachRoute from './hooks/beforeEachRoute'
 
 const router = createRouter({
@@ -27,7 +28,8 @@ const router = createRouter({
     intelligentDnsRoutes,
     loginRoutes,
     networkListsRoutes,
-    variablesRoutes
+    variablesRoutes,
+    usersListsRoutes
   ]
 })
 
