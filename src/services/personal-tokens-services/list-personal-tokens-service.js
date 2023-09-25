@@ -14,7 +14,7 @@ export const listPersonalTokens = async ({ page = 1, search = '' }) => {
 
 const adapt = async (httpResponse) => {
   const parsedData = httpResponse.body.results.map((item) => {
-    return { ...item, id: item.uuid }
+    return { ...item, id: item.uuid, scope: 'Global' }
   })
 
   return {
