@@ -1,7 +1,6 @@
 import { AxiosHttpClientAdapter, parseHttpResponse } from '../axios/AxiosHttpClientAdapter'
 import { makePersonalTokensBaseUrl } from './make-personal-tokens-base-url'
 
-
 export const listPersonalTokens = async ({ page = 1, search = '' }) => {
   let httpResponse = await AxiosHttpClientAdapter.request({
     url: `${makePersonalTokensBaseUrl()}?&page=${page}&search=${search}`,
@@ -15,7 +14,7 @@ export const listPersonalTokens = async ({ page = 1, search = '' }) => {
 
 const adapt = async (httpResponse) => {
   const parsedData = httpResponse.body.results.map((item) => {
-   return { ...item, id: item.uuid }
+    return { ...item, id: item.uuid }
   })
 
   return {
