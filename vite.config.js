@@ -20,16 +20,16 @@ export default defineConfig({
   },
   server: {
     proxy: {
-      '/api/token': {
-        target: 'https://stage-sso.azion.com/api/token',
+      '^/api/(account|user|token|switch-account)': {
+        target: 'https://stage-sso.azion.com/api',
         changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/api\/token/, ''),
+        rewrite: (path) => path.replace(/^\/api/, ''),
         cookieDomainRewrite: { '*': '' }
       },
-      '/api/switch-account': {
-        target: 'https://stage-sso.azion.com/api/switch-account',
+      '/logout': {
+        target: 'https://stage-sso.azion.com/logout',
         changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/api\/switch-account/, ''),
+        rewrite: (path) => path.replace(/^\/logout/, ''),
         cookieDomainRewrite: { '*': '' }
       },
       '/api/edge_services': {
@@ -41,18 +41,23 @@ export default defineConfig({
         //target: 'https://cors-stage-api.azion.net',
         target: 'https://stage-manager.azion.com/variables/api/',
         changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/api/, '')
+        rewrite: (path) =>  path.replace(/^\/api/, ''), 
       },
       '/network-lists/graphql': {
         target: 'https://stage-cities.azion.com',
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/network-lists\/graphql/, '')
       },
+      '/api/edge_node': {
+        target: 'https://stage-manager.azion.com/edgenode/api/v1/edge-nodes',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/api\/edge_node/, ''),
+      },
       '/api': {
         target: 'https://stage-manager-origin.azion.com/api',
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/api/, '')
-      }
+      },
     }
   }
 })

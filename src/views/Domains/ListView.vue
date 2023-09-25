@@ -20,7 +20,7 @@
       getColumns() {
         return [
           {
-            field: 'domainName',
+            field: 'name',
             header: 'Name'
           },
           {

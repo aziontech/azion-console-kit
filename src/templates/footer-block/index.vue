@@ -1,16 +1,15 @@
+<!-- eslint-disable vuejs-accessibility/click-events-have-key-events -->
 <template>
+  <!-- Footer -->
   <footer
-    style="border-top: 1px solid var(--surface-border)"
-    class="z-10 flex pl-3 flex-wrap pr-3 py-2 justify-center items-center gap-3"
+    class="z-10 flex px-3 flex-wrap flex-col md:flex-row pr-3 py-5 md:py-3 justify-center items-center gap-4 surface-ground border-t surface-border"
   >
     <AzionLogo />
-    <div
-      style="color: var(--text-color-secondary)"
-      class="text-sm font-normal"
-    >
-      © 2023 Azion Technologies.
-    </div>
-    <div class="flex flex-wrap items-center justify-center gap-1">
+
+    <div class="text-sm font-normal text-color">© 2023 Azion Technologies.</div>
+
+    <!-- Links -->
+    <div class="flex gap-1">
       <PrimeButton
         label="About"
         link
@@ -20,30 +19,98 @@
         link
       />
       <PrimeButton
-        label="Legal & Privacy"
+        label="Legal"
         link
       />
       <PrimeButton
         label="Docs"
         link
       />
+    </div>
+
+    <!-- System Status -->
+    <a
+      class="border flex gap-2 surface-border surface-ground text-color rounded-lg text-sm px-2 py-1 align-items-center justify-center"
+      href="https://status.azion.com/"
+      target="_blank"
+    >
+      <b>Status:</b>
+      <i
+        class="pi pi-circle-fill text-xs"
+        style="color: rgb(25, 217, 25)"
+      />
+      <span>All Systems Operational</span>
+    </a>
+
+    <div class="flex flex-row justify-between items-center align-middle px-3 py-1.5">
+      <Dropdown
+        v-model="selectedTheme"
+        :options="themeOptions"
+        optionLabel="name"
+        :pt="{
+          root: {
+            class: 'w-auto py-0 h-[30px] items-center align-middle',
+            style: 'background: var(--surface-ground) !important'
+          },
+          item: { class: 'text-sm' },
+          input: { class: 'text-sm' }
+        }"
+      >
+        <template #value="slotProps">
+          <div
+            v-if="slotProps.value"
+            class="flex gap-2 align-items-center"
+          >
+            <i :class="slotProps.value.icon"></i>
+            <div>{{ slotProps.value.name }}</div>
+          </div>
+        </template>
+        <template #option="slotProps">
+          <div class="flex gap-2 align-items-center">
+            <i :class="slotProps.option.icon"></i>
+            <div>{{ slotProps.option.name }}</div>
+          </div>
+        </template>
+      </Dropdown>
+    </div>
+
+    <!-- Social Buttons -->
+    <div class="flex gap-1">
       <PrimeButton
-        label="Status"
-        link
+        class="h-9"
+        icon="pi pi-github"
+        text
+      />
+      <PrimeButton
+        class="h-9"
+        icon="pi pi-discord"
+        text
       />
     </div>
   </footer>
 </template>
 
 <script>
-  import AzionLogo from '../../assets/svg/azion-logo'
+  import Dropdown from 'primevue/dropdown'
   import PrimeButton from 'primevue/button'
+  import AzionLogo from '@assets/svg/azion'
 
   export default {
-    name: 'footer-block',
+    name: 'FooterTemplate',
     components: {
       PrimeButton,
+      Dropdown,
       AzionLogo
+    },
+    data() {
+      return {
+        selectedTheme: { name: 'Light', icon: 'pi pi-sun' },
+        themeOptions: [
+          { name: 'Light', icon: 'pi pi-sun' },
+          { name: 'Dark', icon: 'pi pi-moon' },
+          { name: 'System', icon: 'pi pi-desktop' }
+        ]
+      }
     }
   }
 </script>

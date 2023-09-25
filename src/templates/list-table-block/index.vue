@@ -1,123 +1,126 @@
 <template>
-  <Toast />
-  <header class="border-neutral-200 border-b min-h-[82px] w-full flex items-center">
-    <div class="p-4 w-full">
-      <div class="flex flex-col md:flex-row justify-between gap-4">
-        <h1 class="text-4xl self-center font-normal text-gray-600">{{ pageTitle }}</h1>
-        <PrimeButton
-          @click="navigateToAddPage"
-          icon="pi pi-plus"
-          :label="addButtonLabel"
-          v-if="addButtonLabel"
-        />
-      </div>
-    </div>
-  </header>
-  <div class="max-w-screen-sm lg:max-w-7xl mx-auto">
-    <DataTable
-      v-if="!isLoading"
-      scrollable
-      removableSort
-      :value="data"
-      dataKey="id"
-      v-model:filters="filters"
-      paginator
-      :rowsPerPageOptions="[5, 10, 20, 50, 100]"
-      :rows="5"
-      :globalFilterFields="filterBy"
-      :loading="isLoading"
-    >
-      <template #header>
-        <div class="flex self-start">
-          <span class="p-input-icon-left">
-            <i class="pi pi-search" />
-            <InputText
-              class="w-full"
-              v-model="filters.global.value"
-              placeholder="Search"
-            />
-          </span>
+  <div>
+    <Toast />
+    <header class="border-neutral-200 border-b min-h-[82px] w-full flex items-center">
+      <div class="p-4 w-full">
+        <div class="flex flex-col md:flex-row justify-between gap-4">
+          <h1 class="text-4xl self-center font-normal text-gray-600">{{ pageTitle }}</h1>
+          <PrimeButton
+            @click="navigateToAddPage"
+            icon="pi pi-plus"
+            :label="addButtonLabel"
+            v-if="addButtonLabel"
+          />
         </div>
-      </template>
-
-      <Column
-        sortable
-        v-for="col of columns"
-        :key="col.field"
-        :field="col.field"
-        :header="col.header"
+      </div>
+    </header>
+    <div class="max-w-screen-sm lg:max-w-7xl mx-auto">
+      <DataTable
+        v-if="!isLoading"
+        scrollable
+        removableSort
+        :value="data"
+        dataKey="id"
+        v-model:filters="this.filters"
+        paginator
+        :rowsPerPageOptions="[5, 10, 20, 50, 100]"
+        :rows="5"
+        :globalFilterFields="filterBy"
+        :loading="isLoading"
       >
-        <template #body="{ data: rowData }">
-          <div v-html="rowData[col.field]" />
+        <template #header>
+          <div class="flex self-start">
+            <span class="p-input-icon-left">
+              <i class="pi pi-search" />
+              <InputText
+                class="w-full"
+                v-model="this.filters.global.value"
+                placeholder="Search"
+              />
+            </span>
+          </div>
         </template>
-      </Column>
-      <Column
-        :frozen="true"
-        :alignFrozen="'right'"
-      >
-        <template #body="{ data: rowData }">
-          <div class="flex justify-end">
-            <PrimeMenu
-              :ref="'menu'"
-              id="overlay_menu"
-              v-bind:model="actionOptions"
-              :popup="true"
-            />
+
+        <Column
+          sortable
+          v-for="col of columns"
+          :key="col.field"
+          :field="col.field"
+          :header="col.header"
+        >
+          <template #body="{ data: rowData }">
+            <div v-html="rowData[col.field]" />
+          </template>
+        </Column>
+        <Column
+          :frozen="true"
+          :alignFrozen="'right'"
+        >
+          <template #body="{ data: rowData }">
+            <div class="flex justify-end">
+              <PrimeMenu
+                :ref="'menu'"
+                id="overlay_menu"
+                v-bind:model="actionOptions(rowData?.status)"
+                :popup="true"
+              />
+              <PrimeButton
+                v-tooltip="'Actions'"
+                size="small"
+                icon="pi pi-ellipsis-h"
+                text
+                @click="(event) => toggleActionsMenu(event, rowData.id)"
+                class="cursor-pointer"
+              />
+            </div>
+          </template>
+        </Column>
+        <template #empty>
+          <div class="my-4 flex flex-col gap-3 justify-center items-center">
+            <p class="text-xl font-normal text-gray-600">No registers found.</p>
             <PrimeButton
-              v-tooltip="'Actions'"
-              size="small"
-              icon="pi pi-ellipsis-h"
+              v-if="!authorizeNode"
               text
-              @click="(event) => toggleActionsMenu(event, rowData.id)"
-              class="cursor-pointer"
+              icon="pi pi-plus"
+              label="Add"
+              @click="navigateToAddPage"
             />
           </div>
         </template>
-      </Column>
-      <template #empty>
-        <div class="my-4 flex flex-col gap-3 justify-center items-center">
-          <p class="text-xl font-normal text-gray-600">No registers found.</p>
-          <PrimeButton
-            text
-            icon="pi pi-plus"
-            label="Add"
-            @click="navigateToAddPage"
-          />
-        </div>
-      </template>
-    </DataTable>
+      </DataTable>
 
-    <DataTable
-      v-else
-      :value="Array(5)"
-      :pt="{
-        header: { class: '!border-t-0' }
-      }"
-    >
-      <template #header>
-        <div class="flex self-start">
-          <span class="p-input-icon-left">
-            <i class="pi pi-search" />
-            <InputText
-              class="w-full"
-              v-model="this.filters.global.value"
-              placeholder="Search"
-            />
-          </span>
-        </div>
-      </template>
-      <Column
-        sortable
-        v-for="col of columns"
-        :key="col.field"
-        :field="col.field"
-        :header="col.header"
+      <DataTable
+        v-else
+        :value="Array(5)"
+        :pt="{
+          header: { class: '!border-t-0' }
+        }"
       >
-        <template #body>
-          <Skeleton></Skeleton>
+        <template #header>
+          <div class="flex self-start">
+            <span class="p-input-icon-left">
+              <i class="pi pi-search" />
+              <InputText
+                class="w-full"
+                v-model="this.filters.global.value"
+                placeholder="Search"
+              />
+            </span>
+          </div>
         </template>
-      </Column>
-    </DataTable>
+        <Column
+          sortable
+          v-for="col of columns"
+          :key="col.field"
+          :field="col.field"
+          :header="col.header"
+        >
+          <template #body>
+            <Skeleton></Skeleton>
+          </template>
+        </Column>
+      </DataTable>
+    </div>
   </div>
 </template>
 
@@ -181,6 +184,11 @@
         required: true,
         default: () => ''
       },
+      authorizeNode: {
+        type: Boolean,
+        required: false,
+        default: false
+      },
       listService: {
         required: true,
         type: Function
@@ -194,8 +202,13 @@
       await this.loadData({ page: 1 })
     },
     computed: {
-      actionOptions() {
-        return [
+      filterBy() {
+        return this.columns.map((item) => item.field)
+      }
+    },
+    methods: {
+      actionOptions(showAuthorize) {
+        const actionOptions = [
           {
             label: 'Edit',
             icon: 'pi pi-fw pi-pencil',
@@ -207,12 +220,15 @@
             command: () => this.removeItem()
           }
         ]
+        if (this.authorizeNode && showAuthorize !== 'Authorized') {
+          actionOptions.push({
+            label: 'Authorize',
+            icon: 'pi pi-lock-open',
+            command: () => this.authorizeEdgeNode()
+          })
+        }
+        return actionOptions
       },
-      filterBy() {
-        return this.columns.map((item) => item.field)
-      }
-    },
-    methods: {
       async loadData({ page }) {
         try {
           this.isLoading = true
@@ -238,6 +254,9 @@
       },
       editItem() {
         this.$router.push({ path: `${this.editPagePath}/${this.selectedId}` })
+      },
+      authorizeEdgeNode() {
+        this.$emit('authorize', this.selectedId)
       },
       async removeItem() {
         let toastConfig = {
