@@ -1,22 +1,21 @@
 <template>
-  <ListTableBlock
+  <ListTableBlockNoEdit
     :listService="listPersonalTokensService"
     :deleteService="deletePersonalTokenService"
     :columns="getColumns"
     pageTitle="Personal Tokens"
     addButtonLabel="Add Personal Token"
     createPagePath="personal-tokens/create"
-    editPagePath="personal-tokens/edit"
   />
 </template>
 
 <script>
-  import ListTableBlock from '@/templates/list-table-block'
+  import ListTableBlockNoEdit from '@/templates/list-table-block/no-edit'
 
   export default {
     name: 'personal-tokens-view',
     components: {
-      ListTableBlock
+      ListTableBlockNoEdit
     },
     props: {
       listPersonalTokensService: {
