@@ -1,13 +1,15 @@
 <template>
-  <ListTableBlock
-    :listService="listUsersService"
-    :deleteService="deleteUsersService"
-    :columns="getColumns"
-    pageTitle="Users"
-    addButtonLabel="Add Users"
-    createPagePath="users/create"
-    editPagePath="users/edit"
-  />
+  <div>
+    <ListTableBlock
+      :listService="listUsersService"
+      :deleteService="deleteUsersService"
+      :columns="getColumns"
+      pageTitle="Users"
+      addButtonLabel="Add Users"
+      createPagePath="users/create"
+      editPagePath="users/edit"
+    />
+  </div>
 </template>
 
 <script>
