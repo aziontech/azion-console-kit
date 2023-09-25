@@ -91,12 +91,10 @@
 </template>
 
 <script>
-  // Imports
   import Dropdown from 'primevue/dropdown'
   import PrimeButton from 'primevue/button'
-  import AzionLogo from '../../assets/svg/azion'
+  import AzionLogo from '@assets/svg/azion'
 
-  // Export my assets and components
   export default {
     name: 'FooterTemplate',
     components: {

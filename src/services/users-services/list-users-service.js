@@ -19,7 +19,6 @@ const adapt = (httpResponse) => {
    * like other andpoints.
    */
   const isArray = Array.isArray(httpResponse.body.results)
-  console.log(httpResponse.body.results)
 
   const parsedUsers = isArray
     ? httpResponse.body.results.map((user) => ({

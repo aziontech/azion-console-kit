@@ -11,6 +11,7 @@ import { intelligentDnsRoutes } from '@routes/intelligent-dns-routes'
 import { loginRoutes } from '@routes/login-routes'
 import { networkListsRoutes } from '@routes/network-lists-routes'
 import { variablesRoutes } from '@routes/variables-routes'
+import { underDevelopmentRoutes } from '@routes/under-development-routes'
 import { edgeNodeRoutes } from '@routes/edge-node-routes'
 import { usersListsRoutes } from '@routes/users-routes'
 import beforeEachRoute from './hooks/beforeEachRoute'
@@ -30,8 +31,9 @@ const router = createRouter({
     loginRoutes,
     networkListsRoutes,
     variablesRoutes,
+    edgeNodeRoutes,
     usersListsRoutes,
-    edgeNodeRoutes
+    underDevelopmentRoutes
   ]
 })
 

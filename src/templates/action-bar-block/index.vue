@@ -27,7 +27,6 @@
 
 <script>
   import PrimeButton from 'primevue/button'
-  // Export my assets and components
   export default {
     name: 'ActionBarTemplate',
     components: {
