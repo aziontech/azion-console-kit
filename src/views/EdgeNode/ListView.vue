@@ -59,7 +59,30 @@
     },
     methods: {
       async authorizeEdgenode(id) {
-        await this.authorizeEdgeNodeService(id)
+        let toastConfig = {
+          closable: true,
+          severity: 'success',
+          summary: 'Authorize successfully',
+          life: 10000
+        }
+        try {
+          this.$toast.add({
+            closable: true,
+            severity: 'info',
+            summary: 'Processing request',
+            life: 5000
+          })
+          await this.authorizeEdgeNodeService(id)
+        } catch (error) {
+          toastConfig = {
+            closable: true,
+            severity: 'error',
+            summary: error,
+            life: 10000
+          }
+        } finally {
+          this.$toast.add(toastConfig)
+        }
       }
     }
   }
