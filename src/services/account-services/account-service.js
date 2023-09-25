@@ -1,9 +1,11 @@
 import { AxiosHttpClientAdapter, parseHttpResponse } from '../axios/AxiosHttpClientAdapter'
 import { makeAccountBaseUrl } from './make-account-base-url'
+import { makeUserInfoBaseUrl } from './make-user-info-base-url'
+
 
 export const getAccountInfo = async () => {
   let httpResponse = await AxiosHttpClientAdapter.request({
-    url: `${makeAccountBaseUrl().accountInfo}`,
+    url: `${makeAccountBaseUrl()}`,
     method: 'GET'
   })
 
@@ -14,7 +16,7 @@ export const getAccountInfo = async () => {
 
 export const getUserInfo = async () => {
   let httpResponse = await AxiosHttpClientAdapter.request({
-    url: `${makeAccountBaseUrl().userInfo}`,
+    url: `${makeUserInfoBaseUrl()}`,
     method: 'GET'
   })
 
