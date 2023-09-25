@@ -455,7 +455,7 @@
               {
                 label: 'Edge Nodes',
                 icon: 'pi pi-database',
-                to: '/edge-nodes'
+                to: '/edge-node'
               },
               { separator: true }
             ]
@@ -562,8 +562,16 @@
         window.location.href = '/logout'
       }
     },
-    generateBreadCrumbs() {
-      return this.$router.currentRoute.value.meta.breadCrumbs ?? []
+    computed: {
+      generateHomeBreadCrumb() {
+        return {
+          icon: 'pi pi-home',
+          to: '/'
+        }
+      },
+      generateBreadCrumbs() {
+        return this.$router.currentRoute.value.meta.breadCrumbs ?? []
+      }
     }
   }
 </script>
