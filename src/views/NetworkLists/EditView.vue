@@ -140,7 +140,6 @@
       const { errors, defineInputBinds, meta, values, setValues } = useForm({
         validationSchema
       })
-      console.log(setValues)
       const countriesList = ref('')
       const fetchCountries = async () => {
         const result = await props.listCountriesService()

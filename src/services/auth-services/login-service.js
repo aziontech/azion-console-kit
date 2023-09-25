@@ -5,7 +5,7 @@ export const authenticate = async (payload) => {
   let httpResponse = await AxiosHttpClientAdapter.request({
     url: `${makeLoginBaseUrl().token}`,
     method: 'POST',
-    body: payload,
+    body: payload
   })
 
   httpResponse = await adapt(httpResponse)
@@ -16,7 +16,7 @@ export const authenticate = async (payload) => {
 export const verify = async () => {
   let httpResponse = await AxiosHttpClientAdapter.request({
     url: `${makeLoginBaseUrl().token}/verify`,
-    method: 'POST',
+    method: 'POST'
   })
 
   httpResponse = await adapt(httpResponse)
@@ -27,7 +27,7 @@ export const verify = async () => {
 export const refresh = async () => {
   let httpResponse = await AxiosHttpClientAdapter.request({
     url: `${makeLoginBaseUrl().token}/refresh`,
-    method: 'POST',
+    method: 'POST'
   })
 
   httpResponse = await adapt(httpResponse)
@@ -38,7 +38,7 @@ export const refresh = async () => {
 export const switchAccount = async (accountId) => {
   let httpResponse = await AxiosHttpClientAdapter.request({
     url: `${makeLoginBaseUrl().switchAccount}/${accountId}`,
-    method: 'POST',
+    method: 'POST'
   })
 
   httpResponse = await adapt(httpResponse)
