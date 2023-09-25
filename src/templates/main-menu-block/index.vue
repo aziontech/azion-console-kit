@@ -212,6 +212,7 @@
         class="w-full rounded-none flex content-start text-left"
         label="Personal Tokens"
         text
+        @click="$router.push({ name: 'list-personal-tokens' })"
       />
 
       <!-- Theme Switch -->
