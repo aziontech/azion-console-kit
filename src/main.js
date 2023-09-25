@@ -21,6 +21,11 @@ import ToastService from 'primevue/toastservice'
 
 import App from './App.vue'
 import router from './router'
+import { Tracking, TrackClickDirective } from './tracking'
+import { AZION_ANALYTICS } from './analytics'
+
+const tracking = new Tracking(AZION_ANALYTICS)
+const trackClickDirective = TrackClickDirective(tracking)
 
 const app = createApp(App)
 const pinia = createPinia()
@@ -28,8 +33,10 @@ pinia.use(piniaPluginPersistedstate)
 
 app.use(PrimeVue)
 app.directive('tooltip', Tooltip)
+app.directive('track-click', trackClickDirective)
 app.use(ToastService)
 app.use(pinia)
 app.use(router)
+app.provide('tracking', tracking)
 
 app.mount('#app')

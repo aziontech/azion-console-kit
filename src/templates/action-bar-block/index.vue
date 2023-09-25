@@ -11,12 +11,14 @@
         severity="primary"
         label="Cancel"
         outlined
+        v-track-click:button="{ action: 'Cancel', page: $route.meta.page }"
         @click="handleCancel"
         :disabled="cancelDisabled"
       />
       <PrimeButton
         severity="primary"
         label="Submit"
+        v-track-click:button="{ action: 'Submit', page: $route.meta.page }"
         @click="handleSubmit"
         :loading="loading"
         :disabled="submitDisabled"

@@ -5,19 +5,24 @@ on:
     branches:
       - main
 env:
-    HUSKY: 0
+  HUSKY: 0
 
 jobs:
   deploy:
     runs-on: self-hosted
     container:
       image: node:18-alpine3.18
-    steps:      
+    steps:
       - name: Checkout code
         uses: actions/checkout@v3
 
       - name: Install SO deps
         run: apk add curl git bash jq
+
+      - name: Configure Env
+        run: |
+          touch .env
+          echo 'VITE_SEGMENT_TOKEN=${{ secrets.PLATFORM_KIT_SEGMENT_TOKEN }}' >> .env
 
       - name: Install dependencies
         run: yarn install --frozen-lockfile
@@ -33,14 +38,14 @@ jobs:
 
       - name: Define application settings
         run: >
-            echo $(jq
-            --arg funcid ${{secrets.FUNCTION_ID}} 
-            --arg appid ${{secrets.APPLICATION_ID}} 
-            --arg domainid ${{secrets.DOMAIN_ID}} 
-            '.function.id = ($funcid|tonumber)
-            | .application.id = ($appid|tonumber)
-            | .domain.id = ($domainid|tonumber)'
-            azion/azion.json) > azion/azion.json
+          echo $(jq
+          --arg funcid ${{secrets.FUNCTION_ID}} 
+          --arg appid ${{secrets.APPLICATION_ID}} 
+          --arg domainid ${{secrets.DOMAIN_ID}} 
+          '.function.id = ($funcid|tonumber)
+          | .application.id = ($appid|tonumber)
+          | .domain.id = ($domainid|tonumber)'
+          azion/azion.json) > azion/azion.json
 
       - name: Configure Repository
         run: mkdir -p .edge/statics && cp -r ./dist/* .edge/statics

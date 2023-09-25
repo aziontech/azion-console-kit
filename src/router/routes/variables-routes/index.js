@@ -30,6 +30,7 @@ export const variablesRoutes = {
         createVariablesService: VariablesService.createVariablesService
       },
       meta: {
+        page: 'Create Variables',
         breadCrumbs: [
           {
             label: 'Variables',
@@ -51,6 +52,7 @@ export const variablesRoutes = {
         loadVariableService: VariablesService.loadVariableService
       },
       meta: {
+        page: 'Edit Variables',
         breadCrumbs: [
           {
             label: 'Variables',

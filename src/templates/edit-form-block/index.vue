@@ -114,6 +114,7 @@
             summary: 'edited successfully',
             life: 10000
           })
+          this.tracking.track(`Success Form Submit: ${this.pageTitle}`)
         } catch (error) {
           this.$toast.add({
             closable: true,
@@ -121,6 +122,8 @@
             summary: error,
             life: 10000
           })
+          const props = { error_type: 'API', error: error }
+          this.tracking.track(`Fail Form Submit: ${this.pageTitle}`, props)
         } finally {
           setTimeout(() => {
             this.isLoading = false
