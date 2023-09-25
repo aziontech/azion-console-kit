@@ -330,13 +330,12 @@
   import PrimeButton from 'primevue/button'
   import Sidebar from 'primevue/sidebar'
   import Divider from 'primevue/divider'
-  import AzionLogo from '../../assets/svg/azion'
+  import AzionLogo from '@assets/svg/azion'
   import PrimeDialog from 'primevue/dialog'
   import InputText from 'primevue/inputtext'
   import Tag from 'primevue/tag'
   import Dropdown from 'primevue/dropdown'
 
-  // Export my assets and components
   export default {
     name: 'HeaderTemplate',
     emits: ['showSlideHelper', 'showSlideCenter'],
