@@ -35,12 +35,17 @@ export default defineConfig({
         //target: 'https://cors-stage-api.azion.net',
         target: 'https://stage-manager.azion.com/variables/api/',
         changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/api/, '')
+        rewrite: (path) => path.replace(/^\/api/, ''),
       },
       '/network-lists/graphql': {
         target: 'https://stage-cities.azion.com',
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/network-lists\/graphql/, '')
+      },
+      '/api/edge_node': {
+        target: 'https://stage-manager.azion.com/edgenode/api/v1/edge-nodes',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/api\/edge_node/, ''),
       },
       '/api/iam': {
         target: 'https://stage-manager.azion.com/iam/api',
@@ -57,7 +62,7 @@ export default defineConfig({
         target: 'https://stage-manager-origin.azion.com/api',
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/api/, '')
-      }
+      },
     }
   }
 })

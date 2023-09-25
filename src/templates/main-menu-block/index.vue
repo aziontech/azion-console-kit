@@ -331,13 +331,12 @@
   import PrimeButton from 'primevue/button'
   import Sidebar from 'primevue/sidebar'
   import Divider from 'primevue/divider'
-  import AzionLogo from '../../assets/svg/azion'
+  import AzionLogo from '@assets/svg/azion'
   import PrimeDialog from 'primevue/dialog'
   import InputText from 'primevue/inputtext'
   import Tag from 'primevue/tag'
   import Dropdown from 'primevue/dropdown'
 
-  // Export my assets and components
   export default {
     name: 'HeaderTemplate',
     emits: ['showSlideHelper', 'showSlideCenter'],
@@ -457,7 +456,7 @@
               {
                 label: 'Edge Nodes',
                 icon: 'pi pi-database',
-                to: '/edge-nodes'
+                to: '/edge-node'
               },
               { separator: true }
             ]
@@ -564,8 +563,16 @@
         window.location.href = '/logout'
       }
     },
-    generateBreadCrumbs() {
-      return this.$router.currentRoute.value.meta.breadCrumbs ?? []
+    computed: {
+      generateHomeBreadCrumb() {
+        return {
+          icon: 'pi pi-home',
+          to: '/'
+        }
+      },
+      generateBreadCrumbs() {
+        return this.$router.currentRoute.value.meta.breadCrumbs ?? []
+      }
     }
   }
 </script>
