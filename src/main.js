@@ -36,6 +36,9 @@ app.use(VueMonacoEditorPlugin, {
   paths: {
     vs: 'https://cdn.jsdelivr.net/npm/monaco-editor@0.38.0/min/vs'
   },
+  options: {
+    showSlider: 'mouseover'
+  }
 })
 
 app.mount('#app')
