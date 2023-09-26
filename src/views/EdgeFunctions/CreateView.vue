@@ -1,4 +1,5 @@
 <template>
+  <div>
   <TabView>
     <TabPanel header="Code">
       <CreateFormBlock
@@ -71,6 +72,7 @@
       </CreateFormBlock>
     </TabPanel>
   </TabView>
+    </div>
 </template>
 
 <script setup>
