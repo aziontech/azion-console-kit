@@ -15,6 +15,7 @@ import { variablesRoutes } from '@routes/variables-routes'
 import { underDevelopmentRoutes } from '@routes/under-development-routes'
 import { edgeNodeRoutes } from '@routes/edge-node-routes'
 import beforeEachRoute from './hooks/beforeEachRoute'
+import afterEachRoute from './hooks/afterEachRoute'
 import { usersListsRoutes } from '@routes/users-routes'
 
 const router = createRouter({
@@ -40,5 +41,6 @@ const router = createRouter({
 })
 
 router.beforeEach(beforeEachRoute)
+router.afterEach(afterEachRoute)
 
 export default router
