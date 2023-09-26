@@ -1,79 +1,81 @@
 <template>
-  <TabView>
-    <TabPanel header="Code">
-      <EditFormBlock
-        pageTitle="Edit Edge Functions"
-        :editService="props.editEdgeFunctionsService"
-        :loadService="props.loadEdgeFunctionsService"
-        :initialDataSetter="setValues"
-        :isValid="meta.valid"
-        :formData="values"
-      >
-        <template #form>
-          <label>Edge Function Name: *</label>
-          <InputText
-            placeholder="Insert the Edge Functions Name"
-            v-bind="name"
-            type="text"
-            :class="{ 'p-invalid': errors.name }"
-            v-tooltip.top="errors.name"
-          />
-
-          <label>Function Code: *</label>
-          <vue-monaco-editor
-            v-model:value="code"
-            language="javascript"
-            theme="vs-dark"
-            class="min-h-[50vh]"
-            :class="{ 'border-red-500 border': errorCode }"
-            @change="changeValidateCode"
-            v-tooltip.top="errorCode"
-          />
-        </template>
-      </EditFormBlock>
-    </TabPanel>
-
-    <TabPanel header="Arguments">
-      <EditFormBlock
-        pageTitle="Edit Edge Functions"
-        :editService="props.editEdgeFunctionsService"
-        :loadService="props.loadEdgeFunctionsService"
-        :initialDataSetter="setValues"
-        :isValid="meta.valid"
-        :formData="values"
-      >
-        <template #form>
-          <label>Function Args: *</label>
-          <vue-monaco-editor
-            v-model:value="jsonArgs"
-            language="javascript"
-            theme="vs-dark"
-            class="min-h-[50vh]"
-            :class="{ 'border-red-500 border': errorCode }"
-            @change="changeValidateArgs"
-            v-tooltip.top="errorCode"
-          />
-        </template>
-      </EditFormBlock>
-    </TabPanel>
-
-    <TabPanel header="Preview">
-      <EditFormBlock
-        pageTitle="Edit Edge Functions"
-        :editService="props.editEdgeFunctionsService"
-        :loadService="props.loadEdgeFunctionsService"
-        :initialDataSetter="setValues"
-        :isValid="meta.valid"
-        :formData="values"
-      >
-        <template #form>
-          <p class="flex items-center justify-center min-h-[35vh]">
-            No Preview Available...
-            </p>
-        </template>
-      </EditFormBlock>
-    </TabPanel>
-  </TabView>
+  <div>
+    <TabView>
+      <TabPanel header="Code">
+        <EditFormBlock
+          pageTitle="Edit Edge Functions"
+          :editService="props.editEdgeFunctionsService"
+          :loadService="props.loadEdgeFunctionsService"
+          :initialDataSetter="setValues"
+          :isValid="meta.valid"
+          :formData="values"
+        >
+          <template #form>
+            <label>Edge Function Name: *</label>
+            <InputText
+              placeholder="Insert the Edge Functions Name"
+              v-bind="name"
+              type="text"
+              :class="{ 'p-invalid': errors.name }"
+              v-tooltip.top="errors.name"
+            />
+  
+            <label>Function Code: *</label>
+            <vue-monaco-editor
+              v-model:value="code"
+              language="javascript"
+              theme="vs-dark"
+              class="min-h-[50vh]"
+              :class="{ 'border-red-500 border': errorCode }"
+              @change="changeValidateCode"
+              v-tooltip.top="errorCode"
+            />
+          </template>
+        </EditFormBlock>
+      </TabPanel>
+  
+      <TabPanel header="Arguments">
+        <EditFormBlock
+          pageTitle="Edit Edge Functions"
+          :editService="props.editEdgeFunctionsService"
+          :loadService="props.loadEdgeFunctionsService"
+          :initialDataSetter="setValues"
+          :isValid="meta.valid"
+          :formData="values"
+        >
+          <template #form>
+            <label>Function Args: *</label>
+            <vue-monaco-editor
+              v-model:value="jsonArgs"
+              language="javascript"
+              theme="vs-dark"
+              class="min-h-[50vh]"
+              :class="{ 'border-red-500 border': errorCode }"
+              @change="changeValidateArgs"
+              v-tooltip.top="errorCode"
+            />
+          </template>
+        </EditFormBlock>
+      </TabPanel>
+  
+      <TabPanel header="Preview">
+        <EditFormBlock
+          pageTitle="Edit Edge Functions"
+          :editService="props.editEdgeFunctionsService"
+          :loadService="props.loadEdgeFunctionsService"
+          :initialDataSetter="setValues"
+          :isValid="meta.valid"
+          :formData="values"
+        >
+          <template #form>
+            <p class="flex items-center justify-center min-h-[35vh]">
+              No Preview Available...
+              </p>
+          </template>
+        </EditFormBlock>
+      </TabPanel>
+    </TabView>
+  </div>
 </template>
 
 <script setup>
