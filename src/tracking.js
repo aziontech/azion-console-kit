@@ -12,7 +12,7 @@ const FAKE_ANALYTICS = {
  */
 export class Tracking {
   /**
-   * @param {Analytics} analytics
+   * @param {Analytics | undefined} analytics
    */
   constructor(analytics) {
     this.analytics = analytics || FAKE_ANALYTICS
@@ -21,7 +21,9 @@ export class Tracking {
 
   /**
    * Set analytics provider. Case undefined mock the methods.
-   * @param {Analytics|undefined} analytics
+   *
+   * @param {Analytics | undefined} analytics
+   * @memberof Tracking
    */
   setup(analytics) {
     this.analytics = analytics || FAKE_ANALYTICS
@@ -29,6 +31,8 @@ export class Tracking {
 
   /**
    * Track page informations.
+   *
+   * @memberof Tracking
    */
   page() {
     this.analytics.page()
@@ -36,21 +40,39 @@ export class Tracking {
 
   /**
    * Track event with props.
+   *
    * @param {String} event
    * @param {Props} props
+   * @memberof Tracking
    */
   track(event, props = {}) {
     this.analytics.track(event, { ...props, ...this.traits })
   }
 
+  /**
+   * Identify the user using the app.
+   *
+   * @param {String|Number} userId
+   * @param {Object} traits
+   * @memberof Tracking
+   */
   identify(userId, traits) {
     this.analytics.identify(`${userId}`, traits)
   }
 
+  /**
+   * @param {Object} traits
+   * @memberof Tracking
+   */
   assignTraits(traits) {
     this.traits = traits
   }
 
+  /**
+   * Delete cookie and localStorage information of analytics.
+   *
+   * @memberof Tracking
+   */
   reset() {
     this.analytics.reset()
   }
