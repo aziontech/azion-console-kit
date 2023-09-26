@@ -5,7 +5,7 @@ export const edgePulseRoutes = {
   children: [
     {
       path: '',
-      name: 'edge-pulse',
+      name: 'list-edge-pulse',
       component: () => import('@views/EdgePulse/ListView.vue'),
       meta: {
         breadCrumbs: [

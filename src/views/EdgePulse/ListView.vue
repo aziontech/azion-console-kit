@@ -11,10 +11,11 @@
             before downloading and executing the RUM Client, ensuring that the load event is
             uninterrupted and has zero impact on user experience.
           </p>
-
-          <MonacoEditor
-            :code="defaultTagCode"
+          <vue-monaco-editor
+            v-model:value="defaultTagCode"
             language="javascript"
+            theme="vs-dark"
+            :options="editorOptions"
             class="min-h-[200px]"
           />
           <div>
@@ -29,9 +30,11 @@
             then place this tag just before the enclosing BODY tag. This script executes before the
             load event has fired.
           </p>
-          <MonacoEditor
-            :code="preLoadingTagCode"
-            language="html"
+          <vue-monaco-editor
+            v-model:value="preLoadingTagCode"
+            language="javascript"
+            theme="vs-dark"
+            :options="editorOptions"
             class="min-h-[40px]"
           />
           <div>
@@ -47,7 +50,6 @@
 </template>
 
 <script>
-  import MonacoEditor from '@/templates/monaco-editor-block'
   import SingleBlock from '@/templates/single-block'
   import PrimeButton from 'primevue/button'
   import Toast from 'primevue/toast'
@@ -60,9 +62,17 @@
         pulse.src = '//client.azionrum.net/8900e/azion-pulse.js';
         document.body.appendChild(pulse);
       }
-    });
+    })
   }
 <${'/'}script>`
+
+  const editorOptions = {
+    minimap: {
+      enabled: false
+    },
+    readOnly: true,
+    scrollBeyondLastLine: false
+  }
 
   const preLoadingTagCode = `<script async src="//client.azionrum.net/8900e/azion-pulse.js"><${'/'}script>`
 
@@ -70,7 +80,6 @@
     name: 'edge-pulse-view',
     components: {
       PrimeButton,
-      MonacoEditor,
       SingleBlock,
       Toast
     },
@@ -94,11 +103,7 @@
       return {
         defaultTagCode,
         preLoadingTagCode,
-        options: {
-          colorDecorators: true,
-          lineHeight: 24,
-          tabSize: 2
-        }
+        editorOptions
       }
     }
   }
