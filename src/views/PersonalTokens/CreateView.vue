@@ -8,6 +8,7 @@
       :isValid="meta.valid"
       :cleanFormCallback="resetForm"
       @on-response="handleResponse"
+      :isRequestSuccess="!!personalTokenKey"
     >
       <template #form>
         <div class="flex flex-col gap-2">
