@@ -43,6 +43,7 @@
             v-model="customExpiration"
             :minDate="minExpirationDate"
             showIcon
+            :disabled="!!personalTokenKey"
           />
         </div>
         <div class="flex flex-col gap-2">
@@ -67,7 +68,8 @@
                 :value="personalTokenKey"
                 :placeholder="TEXT_CONSTANTS.generatedTokenPlaceholder"
                 :type="tokenField.type"
-                readonly
+                :readonly="!personalTokenKey"
+                :disabled="!!personalTokenKey"
               />
               <i
                 v-if="!!personalTokenKey"
