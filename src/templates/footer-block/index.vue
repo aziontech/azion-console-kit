@@ -29,18 +29,7 @@
     </div>
 
     <!-- System Status -->
-    <a
-      class="border flex gap-2 surface-border surface-ground text-color rounded-lg text-sm px-2 py-1 align-items-center justify-center"
-      href="https://status.azion.com/"
-      target="_blank"
-    >
-      <b>Status:</b>
-      <i
-        class="pi pi-circle-fill text-xs"
-        style="color: rgb(25, 217, 25)"
-      />
-      <span>All Systems Operational</span>
-    </a>
+    <SystemStatusBarBlock />
 
     <div class="flex flex-row justify-between items-center align-middle px-3 py-1.5">
       <Dropdown
@@ -93,6 +82,7 @@
 <script>
   import Dropdown from 'primevue/dropdown'
   import PrimeButton from 'primevue/button'
+  import SystemStatusBarBlock from '@templates/system-status-bar-block'
   import Logo from '@assets/svg/logo'
 
   export default {
@@ -100,7 +90,8 @@
     components: {
       PrimeButton,
       Dropdown,
-      Logo
+      Logo,
+      SystemStatusBarBlock
     },
     data() {
       return {
