@@ -18,7 +18,7 @@
           style="height: 32px; width: 32px"
         />
 
-        <AzionLogo />
+        <Logo />
         <!-- Azion client -->
         <PrimeButton
           v-tooltip.bottom="'Switch Account'"
@@ -131,7 +131,7 @@
         />
       </div>
     </div>
-    <AzionLogo v-else />
+    <Logo v-else />
   </header>
   <!-- help mobile sidebar -->
   <Sidebar
@@ -207,6 +207,7 @@
         class="w-full rounded-none flex content-start text-left"
         label="Your Settings"
         text
+        @click="$router.push({ name: 'list-your-settings' })"
       />
       <PrimeButton
         class="w-full rounded-none flex content-start text-left"
@@ -331,7 +332,7 @@
   import PrimeButton from 'primevue/button'
   import Sidebar from 'primevue/sidebar'
   import Divider from 'primevue/divider'
-  import AzionLogo from '@assets/svg/azion'
+  import Logo from '@assets/svg/logo'
   import PrimeDialog from 'primevue/dialog'
   import InputText from 'primevue/inputtext'
   import Tag from 'primevue/tag'
@@ -344,7 +345,7 @@
       Avatar,
       PrimeMenu,
       Sidebar,
-      AzionLogo,
+      Logo,
       PrimeButton,
       Divider,
       PrimeDialog,
@@ -510,24 +511,27 @@
             items: [
               {
                 label: 'Account Settings',
-                command: () => {
-                  this.$router.push({ path: 'users' })
-                }
+                to: '/account-settings'
               },
               {
-                label: 'Users Management'
+                label: 'Users Management',
+                to: '/users'
               },
               {
-                label: 'Billing & Subscriptions'
+                label: 'Billing & Subscriptions',
+                to: '/billing-subscriptions'
               },
               {
-                label: 'Credentials'
+                label: 'Credentials',
+                to: '/credentials'
               },
               {
-                label: 'Activity History'
+                label: 'Activity History',
+                to: '/activity-history'
               },
               {
-                label: 'Teams Permissions'
+                label: 'Teams Permissions',
+                to: '/teams'
               },
               { separator: true }
             ]

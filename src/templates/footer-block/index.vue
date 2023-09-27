@@ -4,7 +4,7 @@
   <footer
     class="z-10 flex px-3 flex-wrap flex-col md:flex-row pr-3 py-5 md:py-3 justify-center items-center gap-4 surface-ground border-t surface-border"
   >
-    <AzionLogo />
+    <Logo />
 
     <div class="text-sm font-normal text-color">© 2023 Azion Technologies.</div>
 
@@ -93,14 +93,14 @@
 <script>
   import Dropdown from 'primevue/dropdown'
   import PrimeButton from 'primevue/button'
-  import AzionLogo from '@assets/svg/azion'
+  import Logo from '@assets/svg/logo'
 
   export default {
     name: 'FooterTemplate',
     components: {
       PrimeButton,
       Dropdown,
-      AzionLogo
+      Logo
     },
     data() {
       return {
