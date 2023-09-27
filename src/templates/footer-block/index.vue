@@ -29,7 +29,7 @@
     </div>
 
     <!-- System Status -->
-    <SystemStatusBar />
+    <SystemStatusBarBlock />
 
     <div class="flex flex-row justify-between items-center align-middle px-3 py-1.5">
       <Dropdown
@@ -82,7 +82,7 @@
 <script>
   import Dropdown from 'primevue/dropdown'
   import PrimeButton from 'primevue/button'
-  import SystemStatusBar from '@templates/system-status-bar'
+  import SystemStatusBarBlock from '@templates/system-status-bar-block'
   import Logo from '@assets/svg/logo'
 
   export default {
@@ -91,7 +91,7 @@
       PrimeButton,
       Dropdown,
       Logo,
-      SystemStatusBar
+      SystemStatusBarBlock
     },
     data() {
       return {

@@ -41,7 +41,7 @@
   }
 
   export default {
-    name: 'SystemStatusBar',
+    name: 'SystemStatusBarBlock',
     data() {
       return {
         status: '',
