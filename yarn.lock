@@ -455,7 +455,7 @@
 
 "@cypress/request@^3.0.0":
   version "3.0.1"
-  resolved "https://registry.yarnpkg.com/@cypress/request/-/request-3.0.1.tgz#72d7d5425236a2413bd3d8bb66d02d9dc3168960"
+  resolved "https://registry.npmjs.org/@cypress/request/-/request-3.0.1.tgz"
   integrity sha512-TWivJlJi8ZDx2wGOw1dbLuHJKUYX7bWySw377nlnGOW3hP9/MUKIsEdXT/YngWxVdgNCHRBmFlBipE+5/2ZZlQ==
   dependencies:
     aws-sign2 "~0.7.0"
@@ -1690,7 +1690,7 @@ csstype@^3.1.1:
 
 cypress@^13.2.0:
   version "13.2.0"
-  resolved "https://registry.yarnpkg.com/cypress/-/cypress-13.2.0.tgz#10f73d06a0764764ffbb903a31e96e2118dcfc1d"
+  resolved "https://registry.npmjs.org/cypress/-/cypress-13.2.0.tgz"
   integrity sha512-AvDQxBydE771GTq0TR4ZUBvv9m9ffXuB/ueEtpDF/6gOcvFR96amgwSJP16Yhqw6VhmwqspT5nAGzoxxB+D89g==
   dependencies:
     "@cypress/request" "^3.0.0"
@@ -2192,15 +2192,10 @@ extract-zip@2.0.1:
   optionalDependencies:
     "@types/yauzl" "^2.9.1"
 
-extsprintf@1.3.0:
+extsprintf@1.3.0, extsprintf@^1.2.0:
   version "1.3.0"
   resolved "https://registry.yarnpkg.com/extsprintf/-/extsprintf-1.3.0.tgz#96918440e3041a7a414f8c52e3c574eb3c3e1e05"
   integrity sha512-11Ndz7Nv+mvAC1j0ktTa7fAb0vLyGGX+rMHNBYQviQDGU0Hw7lhctJANqbPhu9nV9/izT/IntTgZ7Im/9LJs9g==
-
-extsprintf@^1.2.0:
-  version "1.4.1"
-  resolved "https://registry.yarnpkg.com/extsprintf/-/extsprintf-1.4.1.tgz#8d172c064867f235c0c84a596806d279bf4bcc07"
-  integrity sha512-Wrk35e8ydCKDj/ArClo1VrPVmN8zph5V4AtHwIuHhvMXsKf73UT3BOD+azBIW+3wOJ4FhEH7zyaJCFvChjYvMA==
 
 fast-deep-equal@^3.1.1, fast-deep-equal@^3.1.3:
   version "3.1.3"
@@ -3677,7 +3672,7 @@ pretty-format@^29.5.0:
 
 primeflex@^3.3.1:
   version "3.3.1"
-  resolved "https://registry.yarnpkg.com/primeflex/-/primeflex-3.3.1.tgz#361dddf6eb5db50d733e4cddd4b6e376a3d7bd68"
+  resolved "https://registry.npmjs.org/primeflex/-/primeflex-3.3.1.tgz"
   integrity sha512-zaOq3YvcOYytbAmKv3zYc+0VNS9Wg5d37dfxZnveKBFPr7vEIwfV5ydrpiouTft8MVW6qNjfkaQphHSnvgQbpQ==
 
 primeicons@^6.0.1:
@@ -3692,7 +3687,7 @@ primevue@^3.31.0:
 
 process@^0.11.10:
   version "0.11.10"
-  resolved "https://registry.yarnpkg.com/process/-/process-0.11.10.tgz#7332300e840161bda3e69a1d1d91a7d4bc16f182"
+  resolved "https://registry.npmjs.org/process/-/process-0.11.10.tgz"
   integrity sha512-cdGef/drWFoydD1JsMzuFf8100nZl+GT+yacc2bEced5f9Rjk4z+WtFUTBu9PhOi9j/jfmBPu0mMEY4wIdAF8A==
 
 property-expr@^2.0.5:
@@ -3737,7 +3732,7 @@ punycode@^2.1.0, punycode@^2.1.1, punycode@^2.3.0:
 
 qs@6.10.4:
   version "6.10.4"
-  resolved "https://registry.yarnpkg.com/qs/-/qs-6.10.4.tgz#6a3003755add91c0ec9eacdc5f878b034e73f9e7"
+  resolved "https://registry.npmjs.org/qs/-/qs-6.10.4.tgz"
   integrity sha512-OQiU+C+Ds5qiH91qh/mg0w+8nwQuLjM4F4M/PbmhDOoYehPh+Fb0bDjtR1sOvy7YKxvj28Y/M0PhP5uVX0kB+g==
   dependencies:
     side-channel "^1.0.4"
