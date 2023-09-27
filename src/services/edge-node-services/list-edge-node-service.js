@@ -1,9 +1,16 @@
 import { AxiosHttpClientAdapter, parseHttpResponse } from '../axios/AxiosHttpClientAdapter'
 import { makeEdgeNodeListBaseUrl } from './make-edge-node-list-base-url'
 
-export const listEdgeNodeService = async () => {
+export const listEdgeNodeService = async ({
+  orderBy = 'id',
+  sort = 'asc',
+  page = 1,
+  pageSize = 200
+}) => {
+
+  const searchParams = makeSearchParams({ orderBy, sort, page, pageSize })
   let httpResponse = await AxiosHttpClientAdapter.request({
-    url: `${makeEdgeNodeListBaseUrl()}`,
+    url: `${makeEdgeNodeListBaseUrl()}?${searchParams.toString()}`,
     method: 'GET'
   })
   httpResponse = adapt(httpResponse)
@@ -28,4 +35,14 @@ const adapt = (httpResponse) => {
     body: edgeNodes,
     statusCode: httpResponse.statusCode
   }
+}
+
+const makeSearchParams = ({ orderBy, sort, page, pageSize }) => {
+  const searchParams = new URLSearchParams()
+  searchParams.set('order_by', orderBy)
+  searchParams.set('sort', sort)
+  searchParams.set('page', page)
+  searchParams.set('page_size', pageSize)
+
+  return searchParams
 }

@@ -1,4 +1,5 @@
 import * as EdgeNodeService from '@/services/edge-node-services'
+import * as Service from '@/services/edge-node-service-services'
 
 /** @type {import('vue-router').RouteRecordRaw} */
 export const edgeNodeRoutes = {
@@ -19,6 +20,27 @@ export const edgeNodeRoutes = {
           {
             label: 'Edge Node',
             to: '/edge-node'
+          }
+        ]
+      }
+    },
+    {
+      path: 'edit/:id',
+      name: 'edit-edge-node',
+      component: () => import('@views/EdgeNode/EditView.vue'),
+      props: {
+        loadEdgeNodeService: EdgeNodeService.loadEdgeNodeService,
+        editEdgeNodeService: EdgeNodeService.editEdgeNodeService,
+        listService: Service.listService
+      },
+      meta: {
+        breadCrumbs: [
+          {
+            label: 'Edge Nodes',
+            to: '/edge-node'
+          },
+          {
+            label: 'Edit Edge Node'
           }
         ]
       }
