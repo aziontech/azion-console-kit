@@ -2,7 +2,6 @@ import { AxiosHttpClientAdapter, parseHttpResponse } from '../axios/AxiosHttpCli
 import { makeEdgeNodeListBaseUrl } from '../edge-node-services/make-edge-node-list-base-url'
 
 export const listService = async ({ id, page }) => {
-
   let httpResponse = await AxiosHttpClientAdapter.request({
     url: `${makeEdgeNodeListBaseUrl()}/${id}/services?page=${page}`,
     method: 'GET'
@@ -23,7 +22,7 @@ const adapt = (httpResponse) => {
           lastModified: new Intl.DateTimeFormat('us', { dateStyle: 'full' }).format(
             new Date(element.updated_at)
           ),
-          status: element.is_active ? 'Enabled' : ""
+          status: element.is_active ? 'Enabled' : ''
         }))
       : []
 

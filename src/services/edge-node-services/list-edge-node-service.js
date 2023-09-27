@@ -7,7 +7,6 @@ export const listEdgeNodeService = async ({
   page = 1,
   pageSize = 200
 }) => {
-
   const searchParams = makeSearchParams({ orderBy, sort, page, pageSize })
   let httpResponse = await AxiosHttpClientAdapter.request({
     url: `${makeEdgeNodeListBaseUrl()}?${searchParams.toString()}`,

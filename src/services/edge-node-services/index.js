@@ -4,11 +4,10 @@ import { authorizeEdgeNodeService } from './authorize-edge-node-service'
 import { editEdgeNodeService } from './edit-edge-node-service'
 import { loadEdgeNodeService } from './load-edge-node-service'
 
-
 export {
-    listEdgeNodeService,
-    deleteEdgeNodeService,
-    authorizeEdgeNodeService,
-    editEdgeNodeService,
-    loadEdgeNodeService
+  listEdgeNodeService,
+  deleteEdgeNodeService,
+  authorizeEdgeNodeService,
+  editEdgeNodeService,
+  loadEdgeNodeService
 }
