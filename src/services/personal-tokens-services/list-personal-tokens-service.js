@@ -18,11 +18,11 @@ const adapt = async (httpResponse) => {
     const [expirationDate] = item.expires_at.split('T')
 
     return {
-      ...item,
       id: item.uuid,
+      name: item.name,
       created: formatExhibitionDate(creationDate),
       expiresAt: formatExhibitionDate(expirationDate),
-      scope: 'Global'
+      scope: 'Global',
     }
   })
 
