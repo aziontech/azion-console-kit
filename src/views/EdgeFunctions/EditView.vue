@@ -28,9 +28,7 @@
               :class="{ 'border-red-500 border': errorCode }"
               @change="changeValidateCode"
               v-tooltip.top="errorCode"
-              :options="{
-                tabIndex: 2
-              }"
+              :options="editorOptions"
             />
           </template>
         </EditFormBlock>
@@ -54,9 +52,7 @@
               :class="{ 'border-red-500 border': errorCode }"
               @change="changeValidateArgs"
               v-tooltip.top="errorCode"
-              :options="{
-                formatOnPaste: true
-              }"
+              :options="editorOptions"
             />
           </template>
         </EditFormBlock>
@@ -99,6 +95,11 @@
       required: true
     }
   })
+
+  const editorOptions = {
+    tabSize: 2,
+    formatOnPaste: true
+  }
 
   const validationSchema = yup.object({
     name: yup.string().required()
