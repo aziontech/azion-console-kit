@@ -509,7 +509,10 @@
             label: 'Organization Settings',
             items: [
               {
-                label: 'Account Settings'
+                label: 'Account Settings',
+                command: () => {
+                  this.$router.push({ path: 'users' })
+                }
               },
               {
                 label: 'Users Management'
