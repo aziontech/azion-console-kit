@@ -14,13 +14,14 @@ export const listPersonalTokens = async ({ page = 1, search = '' }) => {
 
 const adapt = async (httpResponse) => {
   const parsedData = httpResponse.body.results.map((item) => {
+    const [creationDate] = item.created.split('T')
+    const [expirationDate] = item.expires_at.split('T')
+
     return {
       ...item,
       id: item.uuid,
-      created: new Intl.DateTimeFormat('us', { dateStyle: 'full' }).format(new Date(item.created)),
-      expiresAt: new Intl.DateTimeFormat('us', { dateStyle: 'full' }).format(
-        new Date(item.expires_at)
-      ),
+      created: formatExhibitionDate(creationDate),
+      expiresAt: formatExhibitionDate(expirationDate),
       scope: 'Global'
     }
   })
@@ -29,4 +30,10 @@ const adapt = async (httpResponse) => {
     body: parsedData,
     statusCode: httpResponse.statusCode
   }
+}
+
+const formatExhibitionDate = (dateString) => {
+  return new Intl.DateTimeFormat('us', { dateStyle: 'full', timeZone: 'UTC' }).format(
+    new Date(dateString)
+  )
 }
