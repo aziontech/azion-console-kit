@@ -22,7 +22,7 @@ const adapt = async (httpResponse) => {
       name: item.name,
       created: formatExhibitionDate(creationDate),
       expiresAt: formatExhibitionDate(expirationDate),
-      scope: 'Global',
+      scope: 'Global'
     }
   })
 
