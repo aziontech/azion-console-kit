@@ -139,7 +139,7 @@
   const validationSchema = yup.object({
     name: yup.string().required(),
     selectedExpiration: yup.string().required(),
-    expires_at: yup.string().required()
+    expiresAt: yup.string().required()
   })
 
   const { errors, meta, resetForm, values } = useForm({ validationSchema })
@@ -147,7 +147,7 @@
   const { value: name } = useField('name')
   const { value: selectedExpiration } = useField('selectedExpiration')
   const { value: description } = useField('description')
-  const { setValue: setExpiration } = useField('expires_at')
+  const { setValue: setExpiration } = useField('expiresAt')
 
   const isTokenVisible = ref(false)
   const tokenField = computed(() => {

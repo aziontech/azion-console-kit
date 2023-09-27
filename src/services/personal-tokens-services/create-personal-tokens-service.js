@@ -2,10 +2,16 @@ import { AxiosHttpClientAdapter } from '../axios/AxiosHttpClientAdapter'
 import { makePersonalTokensBaseUrl } from './make-personal-tokens-base-url'
 
 export const createPersonalToken = async (payload) => {
+  const { name, description, expiresAt } = payload
+
   let httpResponse = await AxiosHttpClientAdapter.request({
     url: `${makePersonalTokensBaseUrl()}`,
     method: 'POST',
-    body: payload
+    body: {
+      name,
+      description,
+      expires_at: expiresAt
+    }
   })
 
   httpResponse = await adapt(httpResponse)
