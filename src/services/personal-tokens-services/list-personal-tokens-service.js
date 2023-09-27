@@ -18,7 +18,7 @@ const adapt = async (httpResponse) => {
       ...item,
       id: item.uuid,
       created: new Intl.DateTimeFormat('us', { dateStyle: 'full' }).format(new Date(item.created)),
-      expires_at: new Intl.DateTimeFormat('us', { dateStyle: 'full' }).format(
+      expiresAt: new Intl.DateTimeFormat('us', { dateStyle: 'full' }).format(
         new Date(item.expires_at)
       ),
       scope: 'Global'
