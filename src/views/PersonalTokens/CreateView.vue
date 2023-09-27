@@ -155,8 +155,6 @@
     return { icon, type }
   })
 
-  const customExpiration = ref(null)
-
   const minExpirationDate = computed(() => {
     if (selectedExpiration.value === 'custom') {
       const today = new Date()
@@ -199,26 +197,27 @@
     return formatToIsoDate(userRealDate)
   }
 
+  const customExpiration = ref(null)
   watch([selectedExpiration, customExpiration], () => {
     if (selectedExpiration.value && selectedExpiration.value !== 'custom') {
       const expirationDate = new Date()
       expirationDate.setDate(expirationDate.getDate() + parseInt(selectedExpiration.value))
       setExpiration(expiresDate(expirationDate))
     }
+
     if (selectedExpiration.value === 'custom' && customExpiration.value) {
       setExpiration(expiresDate(customExpiration.value))
     }
   })
 
   const personalTokenKey = ref('')
-  const toast = useToast()
-
   const handleResponse = (response) => {
     if (response?.body?.key) {
       personalTokenKey.value = response.body.key
     }
   }
 
+  const toast = useToast()
   const copyPersonalToken = async () => {
     const toastConfig = {
       closable: true,
