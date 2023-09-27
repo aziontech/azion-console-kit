@@ -1,17 +1,14 @@
-import axios from 'axios'
-import { makeStatusPageBaseUrl } from './make-status-page-base-url'
-import { parseHttpResponse } from '../axios/AxiosHttpClientAdapter'
+import axiosStatusPageAoi from '../axios/makeStatusPageApi'
+import { AxiosHttpClientAdapter, parseHttpResponse } from '../axios/AxiosHttpClientAdapter'
 
 export async function loadComponentsStatusService() {
-  delete axios.defaults.headers.common['Accept']
-  delete axios.defaults.headers.common['Authorization']
-  delete axios.defaults.headers.common['Access-Control-Allow-Origin']
-  axios.defaults.withCredentials = false
-
-  let httpResponse = await axios.request({
-    url: `${makeStatusPageBaseUrl()}/components.json`,
-    method: 'GET'
-  })
+  let httpResponse = await AxiosHttpClientAdapter.request(
+    {
+      url: `/components.json`,
+      method: 'GET'
+    },
+    axiosStatusPageAoi
+  )
 
   httpResponse = adapt(httpResponse)
 
@@ -19,8 +16,7 @@ export async function loadComponentsStatusService() {
 }
 
 const adapt = (httpResponse) => {
-  console.log(httpResponse)
-  const data = httpResponse.data
+  const data = httpResponse.body
 
   const body = {
     components: data.components
@@ -28,6 +24,6 @@ const adapt = (httpResponse) => {
 
   return {
     body,
-    statusCode: httpResponse.status
+    statusCode: httpResponse.statusCode
   }
 }
