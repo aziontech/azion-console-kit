@@ -10,20 +10,5 @@ export async function loadComponentsStatusService() {
     axiosStatusPageApi
   )
 
-  httpResponse = adapt(httpResponse)
-
   return parseHttpResponse(httpResponse)
-}
-
-const adapt = (httpResponse) => {
-  const data = httpResponse.body
-
-  const body = {
-    components: data.components
-  }
-
-  return {
-    body,
-    statusCode: httpResponse.statusCode
-  }
 }

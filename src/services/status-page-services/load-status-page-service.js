@@ -16,11 +16,18 @@ export async function loadStatusPageService() {
 }
 
 const adapt = (httpResponse) => {
-  const status = httpResponse.body.status
+  let body = {
+    indicator: 'none',
+    description: 'All System Operational'
+  }
 
-  const body = {
-    indicator: status.indicator,
-    description: status.description
+  if (httpResponse.body) {
+    const status = httpResponse.body.status
+
+    body = {
+      indicator: status.indicator,
+      description: status.description
+    }
   }
 
   return {

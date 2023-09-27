@@ -3,7 +3,6 @@
     class="border flex gap-x-2 surface-border surface-ground text-color rounded-lg text-sm px-2 py-1 align-items-center justify-center"
     :href="link"
     target="_blank"
-    @click="handleClick"
   >
     <b class="leading-none">Status:</b>
     <i
@@ -43,8 +42,6 @@
 
   export default {
     name: 'SystemStatusBar',
-    // TODO
-    // inject: ['tracking'],
     data() {
       return {
         status: '',
@@ -73,8 +70,12 @@
           const status = await this.getStatus(hasImpactedComponent)
           this.updateSystemStatus(status)
         } catch (error) {
-          // TODO
-          // error
+          this.$toast.add({
+            closable: true,
+            severity: 'error',
+            summary: error,
+            life: 10000
+          })
         }
       },
       async getStatus(checkStatusPage) {
@@ -96,10 +97,6 @@
         this.status = STATUS_PAGE[indicator]
         this.color = STATUS_PAGE_COLORS[indicator]
         this.label = description
-      },
-      handleClick() {
-        // TODO
-        // this.tracking.track('Click System Status')
       }
     }
   }
