@@ -19,7 +19,6 @@
               :class="{ 'p-invalid': errors.name }"
               v-tooltip.top="errors.name"
             />
-  
             <label>Function Code: *</label>
             <vue-monaco-editor
               v-model:value="code"
@@ -29,11 +28,13 @@
               :class="{ 'border-red-500 border': errorCode }"
               @change="changeValidateCode"
               v-tooltip.top="errorCode"
+              :options="{
+                tabIndex: 2
+              }"
             />
           </template>
         </EditFormBlock>
       </TabPanel>
-  
       <TabPanel header="Arguments">
         <EditFormBlock
           pageTitle="Edit Edge Functions"
@@ -47,17 +48,19 @@
             <label>Function Args: *</label>
             <vue-monaco-editor
               v-model:value="jsonArgs"
-              language="javascript"
+              language="json"
               theme="vs-dark"
               class="min-h-[50vh]"
               :class="{ 'border-red-500 border': errorCode }"
               @change="changeValidateArgs"
               v-tooltip.top="errorCode"
+              :options="{
+                formatOnPaste: true
+              }"
             />
           </template>
         </EditFormBlock>
       </TabPanel>
-  
       <TabPanel header="Preview">
         <EditFormBlock
           pageTitle="Edit Edge Functions"
@@ -108,7 +111,7 @@
       name: '',
       active: true,
       code: `'Type your code here...'`,
-      jsonArgs: ARGS_INITIAL_STATE,
+      jsonArgs: ARGS_INITIAL_STATE
     }
   })
 
