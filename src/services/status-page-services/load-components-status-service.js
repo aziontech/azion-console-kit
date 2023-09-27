@@ -1,4 +1,4 @@
-import axiosStatusPageAoi from '../axios/makeStatusPageApi'
+import axiosStatusPageApi from '../axios/makeStatusPageApi'
 import { AxiosHttpClientAdapter, parseHttpResponse } from '../axios/AxiosHttpClientAdapter'
 
 export async function loadComponentsStatusService() {
@@ -7,7 +7,7 @@ export async function loadComponentsStatusService() {
       url: `/components.json`,
       method: 'GET'
     },
-    axiosStatusPageAoi
+    axiosStatusPageApi
   )
 
   httpResponse = adapt(httpResponse)
