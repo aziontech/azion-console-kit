@@ -191,11 +191,11 @@
 
   const expiresDate = (expirationDate) => {
     const userOffset = convertOffset(account.value.utc_offset)
-    const timeZoneOffsetToMinutes = expirationDate.getTimezoneOffset() * 60000
-    const toUTC = expirationDate.getTime() + timeZoneOffsetToMinutes
-    const offsetToHours = userOffset * 3600000
+    const timeZoneOffsetMinutesToMilli = expirationDate.getTimezoneOffset() * 60000
+    const toUTC = expirationDate.getTime() + timeZoneOffsetMinutesToMilli
+    const offsetHoursToMilli = userOffset * 3600000
 
-    const userRealDate = new Date(toUTC + offsetToHours)
+    const userRealDate = new Date(toUTC + offsetHoursToMilli)
     return formatToIsoDate(userRealDate)
   }
 
