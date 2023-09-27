@@ -18,11 +18,13 @@
         <slot name="form" />
       </div>
     </form>
+    <ActionBarBlockGoBack v-if="isRequestSuccess" />
     <ActionBarTemplate
       @cancel="handleCancel"
       @submit="validateAndSubmit"
       :loading="isLoading"
       :submitDisabled="!isValid"
+      v-else
     />
   </div>
 </template>
@@ -30,12 +32,14 @@
   import Toast from 'primevue/toast'
   import PrimeButton from 'primevue/button'
   import ActionBarTemplate from '@/templates/action-bar-block'
+  import ActionBarBlockGoBack from '@/templates/action-bar-block/go-back'
   export default {
     name: 'create-form-block-with-event',
     components: {
       Toast,
       PrimeButton,
-      ActionBarTemplate
+      ActionBarTemplate,
+      ActionBarBlockGoBack
     },
     emits: ['on-response'],
     data: () => ({
@@ -61,6 +65,9 @@
       cleanFormCallback: {
         type: Function,
         required: true
+      },
+      isRequestSuccess: {
+        type: Boolean
       }
     },
     methods: {
