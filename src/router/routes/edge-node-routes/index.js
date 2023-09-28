@@ -44,6 +44,48 @@ export const edgeNodeRoutes = {
           }
         ]
       }
+    }, 
+    {
+      path: 'edit/:id/service',
+      name: 'edit-edge-node-service',
+      component: () => import('@views/EdgeNode/EditView.vue'),
+      props: {
+        loadEdgeNodeService: EdgeNodeService.loadEdgeNodeService,
+        editEdgeNodeService: EdgeNodeService.editEdgeNodeService,
+        listService: Service.listService,
+        deleteService: Service.deleteService
+      },
+      meta: {
+        breadCrumbs: [
+          {
+            label: 'Edge Nodes',
+            to: '/edge-node'
+          },
+          {
+            label: 'Edit Edge Node'
+          }
+        ]
+      }
+    },
+    {
+      path: 'edit/:id/service/add',
+      name: 'add-service-edge-node',
+      component: () => import('@views/EdgeNode/AddServiceEdgeNode.vue'),
+      props: {
+        listService: Service.listService,
+        addService: Service.addService
+      },
+      meta: {
+        breadCrumbs: [
+          {
+            label: 'Edge Nodes',
+            to: '/edge-node'
+          },
+          {
+            label: 'Edit Edge Node'
+          }
+        ]
+      }
     }
   ]
 }

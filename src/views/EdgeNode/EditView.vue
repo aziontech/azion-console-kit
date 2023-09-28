@@ -1,6 +1,9 @@
 <template>
   <div>
-    <TabView>
+    <TabView
+      :activeIndex="activeTab"
+      @tab-click="changeRouteByClickingOnTab"
+    >
       <TabPanel header="Main Settings">
         <EditFormBlock
           pageTitle="Edit Edge Node"
@@ -106,6 +109,8 @@
           addButtonLabel="Add Service"
           :listService="listServiceEdgeNode"
           :columns="servicesListColumns"
+          :deleteService="deleteServiceEdgeNode"
+          createPagePath="service/add"
         >
         </ListTableBlock>
       </TabPanel>
@@ -135,7 +140,8 @@
     props: {
       loadEdgeNodeService: { type: Function, required: true },
       editEdgeNodeService: { type: Function, required: true },
-      listService: { type: Function, required: true }
+      listService: { type: Function, required: true },
+      deleteService: { type: Function, required: true }
     },
     data: () => {
       const validationSchema = yup.object({
@@ -188,10 +194,31 @@
     },
     created() {
       this.edgeNodeId = this.$route.params.id
+      this.renderTabCurrentRouter()
     },
     methods: {
       async listServiceEdgeNode(payload) {
-        return await this.listService({ ...payload, id: this.edgeNodeId })
+        return await this.listService({ ...payload, id: this.edgeNodeId, bound: true })
+      },
+      async deleteServiceEdgeNode(serviceId) {
+        return await this.deleteService({ serviceId, edgeNodeId: this.edgeNodeId })
+      },
+      changeRouteByClickingOnTab(e) {
+        if (e.index === 0) {
+          this.$router.push({ name: 'edit-edge-node', params: { id: this.edgeNodeId } })
+        } else {
+          this.$router.push({
+            name: 'edit-edge-node-service',
+            params: { id: this.edgeNodeId }
+          })
+        }
+      },
+      renderTabCurrentRouter() {
+        if (this.$route.name === 'edit-edge-node-service') {
+          this.activeTab = 1
+        } else {
+          this.activeTab = 0
+        }
       }
     }
   }
