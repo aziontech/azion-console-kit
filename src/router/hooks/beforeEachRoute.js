@@ -13,7 +13,10 @@ export default async function beforeEachRoute(to, _, next) {
 
   if (!accountStore.hasActiveUserId && to.path !== '/login') {
     try {
-      const [accountInfo, userInfo] = await Promise.all([getAccountInfoService(), getUserInfoService()])
+      const [accountInfo, userInfo] = await Promise.all([
+        getAccountInfoService(),
+        getUserInfoService()
+      ])
 
       accountInfo.is_account_owner = userInfo.results.is_account_owner
       accountInfo.client_id = userInfo.results.client_id
