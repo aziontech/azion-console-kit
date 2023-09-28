@@ -67,9 +67,7 @@
           :formData="values"
         >
           <template #form>
-            <p class="flex items-center justify-center min-h-[35vh]">
-              No Preview Available...
-              </p>
+            <p class="flex items-center justify-center min-h-[35vh]">No Preview Available...</p>
           </template>
         </EditFormBlock>
       </TabPanel>
