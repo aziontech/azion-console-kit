@@ -140,8 +140,8 @@
 
   const validationSchema = yup.object({
     name: yup.string().required(),
-    selectedExpiration: yup.string().required(),
-    expiresAt: yup.string().required()
+    selectedExpiration: yup.string().required('Please select an option'),
+    expiresAt: yup.string().required('Please select an option')
   })
 
   const { errors, meta, resetForm, values } = useForm({ validationSchema })
