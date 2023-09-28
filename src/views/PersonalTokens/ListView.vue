@@ -43,7 +43,7 @@
             header: 'Last modified'
           },
           {
-            field: 'expires_at',
+            field: 'expiresAt',
             header: 'Expires'
           }
         ]
