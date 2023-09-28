@@ -20,7 +20,7 @@ const adapt = (httpResponse) => {
     initiatorType: body.initiator_type,
     jsonArgs: JSON.stringify(body.json_args, null, 2),
     name: body.name,
-    code: body.code,
+    code: body.code
   }
 
   return {
