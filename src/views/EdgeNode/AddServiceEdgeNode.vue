@@ -1,22 +1,32 @@
 <template>
   <CreateFormBlock
     pageTitle="Add Service"
-    :createService="addService"
+    :createService="addServiceEdgeNode"
     :formData="values"
     :isValid="meta.valid"
     :cleanFormCallback="resetForm"
   >
     <template #form>
-      <div class="flex flex-col gap-2">
-        <label for="name">Service: </label>
+      <div class="flex flex-col gap-4">
         <Dropdown
           v-model="serviceId"
           :options="services"
+          placeholder="Service"
           optionLabel="name"
           optionValue="serviceId"
           class="!w-full"
           :disabled="!services.length"
         />
+        <div class="flex flex-col gap-2">
+          <label>Variables: </label>
+          <vue-monaco-editor
+            v-model:value="variables"
+            language="javascript"
+            theme="vs-dark"
+            class="min-h-[50vh]"
+            :options="editorOptions"
+          />
+        </div>
       </div>
     </template>
   </CreateFormBlock>
@@ -45,23 +55,46 @@
       }
     },
     data: () => {
+      const editorOptions = {
+        minimap: {
+          enabled: false
+        },
+        readOnly: false,
+        scrollBeyondLastLine: false
+      }
+      yup.addMethod(yup.string, 'validateValue', function () {
+        return this.test({
+          name: 'variables',
+          exclusive: true,
+          message: 'Invalid value',
+          test: (value) => {
+            if (value) {
+              const split = value.split(/\s*\n+\s*/).filter((row) => !!row)
+              return split.every((row) => /^\w+\s*=[^"]+$/.test(row))
+            }
+            return true
+          }
+        })
+      })
+
       const validationSchema = yup.object({
         services: yup.array(),
         serviceId: yup.string().required(),
-        variables: yup.array()
+        variables: yup.string().validateValue()
       })
-
-      const { errors, defineInputBinds, meta, values, setValues } = useForm({
+      const ARGS_INITIAL_STATE = ''
+      const { errors, meta, values, resetForm, setValues } = useForm({
         validationSchema,
         initialValues: {
           services: [],
-          serviceId: ''
+          serviceId: '',
+          variables: ARGS_INITIAL_STATE
         }
       })
 
       const { value: services } = useField('services')
       const { value: serviceId } = useField('serviceId')
-      const variables = defineInputBinds('variables')
+      const { value: variables } = useField('variables')
 
       return {
         errors,
@@ -70,7 +103,9 @@
         services,
         serviceId,
         variables,
-        setValues
+        setValues,
+        editorOptions,
+        resetForm
       }
     },
     async created() {
@@ -81,8 +116,12 @@
       async listServicesEdgeNode() {
         const result = await this.listService({ id: this.edgeNodeId, bound: false })
         this.services.push(...result)
-        console.log(this.services)
+      },
+
+      async addServiceEdgeNode(payload) {
+        await this.addService(this.edgeNodeId, payload)
       }
+
     }
   }
 </script>
