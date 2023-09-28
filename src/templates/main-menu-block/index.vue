@@ -185,8 +185,8 @@
     <template #start>
       <div class="border-b surface-border flex flex-column gap-0.5 pb-1">
         <div class="flex flex-column align gap-0.5 px-3 pt-2 pb-1">
-          <span class="font-bold">Account Name</span>
-          <span class="text-xs text-color-secondary">ID: 3938124</span>
+          <span class="font-bold">{{ user.name }}</span>
+          <span class="text-xs text-color-secondary">ID: {{ user.id }}</span>
         </div>
         <PrimeButton
           label="Switch Account"
@@ -199,8 +199,8 @@
     <template #end>
       <div class="flex flex-row items-center px-3 pt-2.5 gap-2 pb-1.5">
         <div class="flex flex-col gap-1.5">
-          <span class="text-sm font-bold leading-none">User Name</span>
-          <span class="text-xs text-color-secondary">user.email@azion.com</span>
+          <span class="text-sm font-bold leading-none">{{ user.full_name }}</span>
+          <span class="text-xs text-color-secondary">{{ user.email }}</span>
         </div>
       </div>
       <PrimeButton
@@ -337,10 +337,13 @@
   import InputText from 'primevue/inputtext'
   import Tag from 'primevue/tag'
   import Dropdown from 'primevue/dropdown'
+  import { useAccountStore } from '../../stores/account'
 
   export default {
     name: 'HeaderTemplate',
+
     emits: ['showSlideHelper', 'showSlideCenter'],
+
     components: {
       Avatar,
       PrimeMenu,
@@ -353,6 +356,7 @@
       Dropdown,
       Tag
     },
+
     props: {
       helperVisible: {
         type: Boolean,
@@ -360,6 +364,7 @@
       },
       isLogged: Boolean
     },
+
     data() {
       return {
         showHelp: false,
@@ -575,6 +580,7 @@
         window.location.href = '/logout'
       }
     },
+
     computed: {
       generateHomeBreadCrumb() {
         return {
@@ -582,8 +588,15 @@
           to: '/'
         }
       },
+
       generateBreadCrumbs() {
         return this.$router.currentRoute.value.meta.breadCrumbs ?? []
+      },
+
+      user() {
+        const accountStore = useAccountStore()
+
+        return accountStore.account
       }
     }
   }
