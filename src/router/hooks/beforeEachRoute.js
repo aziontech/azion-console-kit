@@ -1,4 +1,4 @@
-import { getAccountInfo, getUserInfo } from '@/services/account-services'
+import { getUserInfoService, getAccountInfoService } from '@/services/account-services'
 import { logout } from '@/services/auth-services'
 import { useAccountStore } from '@/stores/account'
 
@@ -13,7 +13,7 @@ export default async function beforeEachRoute(to, _, next) {
 
   if (!accountStore.hasActiveUserId && to.path !== '/login') {
     try {
-      const [accountInfo, userInfo] = await Promise.all([getAccountInfo(), getUserInfo()])
+      const [accountInfo, userInfo] = await Promise.all([getAccountInfoService(), getUserInfoService()])
 
       accountInfo.is_account_owner = userInfo.results.is_account_owner
       accountInfo.client_id = userInfo.results.client_id
