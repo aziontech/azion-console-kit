@@ -1,17 +1,16 @@
 .p-inplace {
-    .p-inplace-display {
-        padding: $inplacePadding;
-        border-radius: $borderRadius;
-        transition: $formElementTransition;
+  .p-inplace-display {
+    padding: $inplacePadding;
+    border-radius: $borderRadius;
+    transition: $formElementTransition;
 
-        &:not(.p-disabled):hover {
-            background: $inplaceHoverBg;
-            color: $inplaceTextHoverColor;
-        }
-
-        &:focus {
-            @include focused();
-        }
+    &:not(.p-disabled):hover {
+      background: $inplaceHoverBg;
+      color: $inplaceTextHoverColor;
     }
-}
 
+    &:focus {
+      @include focused();
+    }
+  }
+}

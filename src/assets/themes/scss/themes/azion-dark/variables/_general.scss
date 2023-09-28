@@ -1,6 +1,6 @@
 /// Font of the theme
 /// @group general
-$fontFamily: "Roboto", sans-serif;
+$fontFamily: 'Roboto', sans-serif;
 
 /// Size of the font
 /// @group general
@@ -12,11 +12,11 @@ $fontWeight: normal;
 
 /// Primary text color
 /// @group general
-$textColor: #EDEDED;
+$textColor: #ededed;
 
 /// Secondary text color
 /// @group general
-$textSecondaryColor: #B5B5B5;
+$textSecondaryColor: #b5b5b5;
 
 /// Background of a highlighted item
 /// @group general
@@ -36,19 +36,29 @@ $borderRadius: 6px;
 
 /// Duration of the property transitions
 /// @group general
-$transitionDuration: .2s;
+$transitionDuration: 0.2s;
 
 /// Properties of a form element transition
 /// @group general
-$formElementTransition: background-color $transitionDuration, color $transitionDuration, border-color $transitionDuration, box-shadow $transitionDuration;
+$formElementTransition:
+  background-color $transitionDuration,
+  color $transitionDuration,
+  border-color $transitionDuration,
+  box-shadow $transitionDuration;
 
 /// Properties of a action icon transition
 /// @group general
-$actionIconTransition: background-color $transitionDuration, color $transitionDuration, box-shadow $transitionDuration;
+$actionIconTransition:
+  background-color $transitionDuration,
+  color $transitionDuration,
+  box-shadow $transitionDuration;
 
 /// Properties of a list item transition
 /// @group general
-$listItemTransition: background-color $transitionDuration, border-color $transitionDuration, box-shadow $transitionDuration;
+$listItemTransition:
+  background-color $transitionDuration,
+  border-color $transitionDuration,
+  box-shadow $transitionDuration;
 
 /// Size of the Icons
 /// @group general
@@ -60,11 +70,11 @@ $divider: 1px solid #3e3e3e;
 
 /// Space between two inline items
 /// @group general
-$inlineSpacing: .5rem;
+$inlineSpacing: 0.5rem;
 
 /// Opacity of the disabled elements
 /// @group general
-$disabledOpacity: .3;
+$disabledOpacity: 0.3;
 
 /// Background of the modal layer
 /// @group general
@@ -132,8 +142,8 @@ $actionIconBorderRadius: 6px;
 
 /// Scale factor of small component size
 /// @group general
-$scaleSM:0.875;
+$scaleSM: 0.875;
 
 /// Scale factor of small large size
 /// @group general
-$scaleLG:1.25;
+$scaleLG: 1.25;

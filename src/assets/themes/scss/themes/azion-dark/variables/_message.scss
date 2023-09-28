@@ -64,7 +64,9 @@ $toastBorderWidth: none;
 
 /// Box shadow of a toast message
 /// @group message
-$toastShadow: 0px 1px 4px 0px rgba(0, 0, 0, 0.08), 0px 0px 0px 1px #3E3E3E;
+$toastShadow:
+  0px 1px 4px 0px rgba(0, 0, 0, 0.08),
+  0px 0px 0px 1px #3e3e3e;
 
 /// Opacity of a toast message
 /// @group message
@@ -84,7 +86,7 @@ $infoMessageBg: #363636;
 
 /// Border of an info message
 /// @group message
-$infoMessageBorder: 1px solid #60A6F6;
+$infoMessageBorder: 1px solid #60a6f6;
 
 /// Text color of an info message
 /// @group message
@@ -92,7 +94,7 @@ $infoMessageTextColor: #ffffff;
 
 /// Icon color of an info message
 /// @group message
-$infoMessageIconColor: #60A6F6;
+$infoMessageIconColor: #60a6f6;
 
 /// Background of a success message
 /// @group message
@@ -100,7 +102,7 @@ $successMessageBg: #363636;
 
 /// Border of a success message
 /// @group message
-$successMessageBorder: 1px solid #5CE082;
+$successMessageBorder: 1px solid #5ce082;
 
 /// Text color of a success message
 /// @group message
@@ -108,7 +110,7 @@ $successMessageTextColor: #ffffff;
 
 /// Icon color of a success message
 /// @group message
-$successMessageIconColor: #5CE082;
+$successMessageIconColor: #5ce082;
 
 /// Background of a warning message
 /// @group message
@@ -116,7 +118,7 @@ $warningMessageBg: #363636;
 
 /// Border of a warning message
 /// @group message
-$warningMessageBorder: 1px solid #EEC252;
+$warningMessageBorder: 1px solid #eec252;
 
 /// Text color of a warning message
 /// @group message
@@ -124,7 +126,7 @@ $warningMessageTextColor: #fff;
 
 /// Icon color of a warning message
 /// @group message
-$warningMessageIconColor: #EEC252;
+$warningMessageIconColor: #eec252;
 
 /// Background of an error message
 /// @group message
@@ -132,7 +134,7 @@ $errorMessageBg: #363636;
 
 /// Border of an error message
 /// @group message
-$errorMessageBorder: 1px solid #F66A60;
+$errorMessageBorder: 1px solid #f66a60;
 
 /// Text color of an error message
 /// @group message
@@ -140,4 +142,4 @@ $errorMessageTextColor: #ffffff;
 
 /// Icon color of an error message
 /// @group message
-$errorMessageIconColor: #F66A60;
+$errorMessageIconColor: #f66a60;

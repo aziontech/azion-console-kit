@@ -1,10 +1,10 @@
 /// Border color of a panel header
 /// @group panel
-$panelHeaderBorderColor: #3E3E3E;
+$panelHeaderBorderColor: #3e3e3e;
 
 /// Border of a panel header
 /// @group panel
-$panelHeaderBorder: 1px solid #3E3E3E;
+$panelHeaderBorder: 1px solid #3e3e3e;
 
 /// Background of a panel header
 /// @group panel
@@ -24,7 +24,7 @@ $panelHeaderPadding: 1rem;
 
 /// Font weight of a toggleable panel header
 /// @group panel
-$panelToggleableHeaderPadding: .5rem 1rem;
+$panelToggleableHeaderPadding: 0.5rem 1rem;
 
 /// Background of a panel header in hover state e.g. toggleable state
 /// @group panel
@@ -32,7 +32,7 @@ $panelHeaderHoverBg: #e9ecef;
 
 /// Border color of a panel header in hover state e.g. toggleable state
 /// @group panel
-$panelHeaderHoverBorderColor: #3E3E3E;
+$panelHeaderHoverBorderColor: #3e3e3e;
 
 /// Text color of a panel header in hover state e.g. toggleable state
 /// @group panel
@@ -40,11 +40,11 @@ $panelHeaderTextHoverColor: #495057;
 
 /// Border color for the content section of a panel
 /// @group panel
-$panelContentBorderColor: #3E3E3E;
+$panelContentBorderColor: #3e3e3e;
 
 /// Border for the content section of a panel
 /// @group panel
-$panelContentBorder: 1px solid #3E3E3E;
+$panelContentBorder: 1px solid #3e3e3e;
 
 /// Background for the content section of a panel
 /// @group panel
@@ -64,7 +64,7 @@ $panelContentPadding: 0;
 
 /// Border for the footer section of a panel
 /// @group panel
-$panelFooterBorder: 1px solid #3E3E3E;
+$panelFooterBorder: 1px solid #3e3e3e;
 
 /// Background for the footer section of a panel
 /// @group panel
@@ -156,7 +156,7 @@ $accordionContentPadding: $panelContentPadding;
 
 /// Border for a parent element containing all the headers of a tabview
 /// @group panel
-$tabviewNavBorder: 1px solid #3E3E3E;
+$tabviewNavBorder: 1px solid #3e3e3e;
 
 /// Border width for a parent element containing all the headers of a tabview
 /// @group panel
@@ -172,7 +172,7 @@ $tabviewHeaderSpacing: 0;
 
 /// Border of a tabview header
 /// @group panel
-$tabviewHeaderBorder: solid #3E3E3E;
+$tabviewHeaderBorder: solid #3e3e3e;
 
 /// Border width of a tabview header
 /// @group panel
@@ -180,7 +180,7 @@ $tabviewHeaderBorderWidth: 0 0 4px 0;
 
 /// Border color of a tabview header
 /// @group panel
-$tabviewHeaderBorderColor: transparent transparent #3E3E3E transparent;
+$tabviewHeaderBorderColor: transparent transparent #3e3e3e transparent;
 
 /// Background of a tabview header
 /// @group panel
@@ -292,36 +292,40 @@ $cardFooterPadding: 0 0 0 0;
 
 /// Box shadow of a card
 /// @group panel
-$cardShadow: 0px 2px 1px -1px rgba(0, 0, 0, 0.02), 0px 1px 1px 0px rgba(0, 0, 0, 0.14), 0px 1px 3px 0px rgba(0, 0, 0, 0.12), 0px 0px 0px 1px #3C3C3C;
+$cardShadow:
+  0px 2px 1px -1px rgba(0, 0, 0, 0.02),
+  0px 1px 1px 0px rgba(0, 0, 0, 0.14),
+  0px 1px 3px 0px rgba(0, 0, 0, 0.12),
+  0px 0px 0px 1px #3c3c3c;
 
 /// Margin of divider in horizontal layout
 /// @group panel
-$dividerHorizontalMargin:1rem 0;
+$dividerHorizontalMargin: 1rem 0;
 
 /// Padding of divider in horizontal layout
 /// @group panel
-$dividerHorizontalPadding:0 1rem;
+$dividerHorizontalPadding: 0 1rem;
 
 /// Margin of divider in vertical layout
 /// @group panel
-$dividerVerticalMargin:0 1rem;
+$dividerVerticalMargin: 0 1rem;
 
 /// Padding of divider in vertical layout
 /// @group panel
-$dividerVerticalPadding:1rem 0;
+$dividerVerticalPadding: 1rem 0;
 
 /// Border width of the divider
 /// @group panel
-$dividerSize:1px;
+$dividerSize: 1px;
 
 /// Color of the divider border
 /// @group panel
-$dividerColor:#3E3E3E;
+$dividerColor: #3e3e3e;
 
 /// Background of the splitter gutter
 /// @group panel
-$splitterGutterBg:#f8f9fa;
+$splitterGutterBg: #f8f9fa;
 
 /// Background of the splitter gutter handle
 /// @group panel
-$splitterGutterHandleBg:#3E3E3E;
+$splitterGutterHandleBg: #3e3e3e;

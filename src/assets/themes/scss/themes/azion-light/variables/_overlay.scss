@@ -4,11 +4,13 @@ $overlayContentBorder: 0 none;
 
 /// Background of an overlay container element such as dialog or overlaypanel
 /// @group overlay
-$overlayContentBg:$panelContentBg;
+$overlayContentBg: $panelContentBg;
 
 /// Box shadow of an overlay container element such as dialog or overlaypanel
 /// @group overlay
-$overlayContainerShadow: 0px 0px 0px 1px #E7E7E7, 0px 5px 10px 0px rgba(0, 0, 0, 0.05);
+$overlayContainerShadow:
+  0px 0px 0px 1px #e7e7e7,
+  0px 5px 10px 0px rgba(0, 0, 0, 0.05);
 
 /// Background of a dialog header
 /// @group overlay
@@ -16,7 +18,7 @@ $dialogHeaderBg: #ffffff;
 
 /// Border of a dialog header
 /// @group overlay
-$dialogHeaderBorder: 1px solid #E7E7E7;
+$dialogHeaderBorder: 1px solid #e7e7e7;
 
 /// Text color of a dialog header
 /// @group overlay
@@ -40,7 +42,7 @@ $dialogContentPadding: 0 1.5rem;
 
 /// Border of a dialog footer
 /// @group overlay
-$dialogFooterBorder: 1px solid #E7E7E7;
+$dialogFooterBorder: 1px solid #e7e7e7;
 
 /// Padding of a dialog footer
 /// @group overlay
@@ -48,11 +50,11 @@ $dialogFooterPadding: 1.5rem;
 
 /// Padding of a confirmpopup content
 /// @group overlay
-$confirmPopupContentPadding:$panelContentPadding;
+$confirmPopupContentPadding: $panelContentPadding;
 
 /// Padding of a confirmpopup footer
 /// @group overlay
-$confirmPopupFooterPadding:0 1rem 1rem 1rem;
+$confirmPopupFooterPadding: 0 1rem 1rem 1rem;
 
 /// Background of a tooltip
 /// @group overlay
