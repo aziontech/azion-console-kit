@@ -5,9 +5,8 @@ import './assets/main.css'
 import 'primeicons/primeicons.css'
 import 'primeflex/primeflex.css'
 // import 'primevue/resources/themes/lara-light-blue/theme.css';
-//import '@/assets/themes/azion-dark-theme.css'
-import '@/assets/themes/azion-light-theme.css'
-//import '@/assets/themes/theme-custom.css'
+import '@/assets/themes/scss/themes/azion-light/theme.scss'
+// import '@/assets/themes/theme-custom.css'
 /**
  * ==== End of styles block ====
  */

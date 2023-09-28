@@ -1,0 +1,90 @@
+// Theme Specific Variables
+$primaryColor: #f4f4f4;
+$primaryDarkColor: hsla(0, 0%, 96%, 0.500);
+$primaryDarkerColor: #f4f4f4;
+$primaryTextColor: #1E1E1E;
+
+$colors: (
+    "blue": #2196F3,
+    "green": #4caf50,
+    "yellow": #FBC02D,
+    "cyan": #00BCD4,
+    "pink": #E91E63,
+    "indigo": #3F51B5,
+    "teal": #009688,
+    "orange": #F57C00,
+    "bluegray": #607D8B,
+    "purple": #9C27B0,
+    "red": #FF4032,
+    "primary": $primaryColor
+);
+
+// Mandatory Designer Variables
+@import './variables/general';
+@import './variables/form';
+@import './variables/button';
+@import './variables/panel';
+@import './variables/_data';
+@import './variables/_overlay';
+@import './variables/_message';
+@import './variables/_menu';
+@import './variables/_media';
+@import './variables/_misc';
+
+:root {
+    --surface-a:#ffffff;
+    --surface-b:#f8f9fa;
+    --surface-c:#e9ecef;
+    --surface-d:#dee2e6;
+    --surface-e:#ffffff;
+    --surface-f:#ffffff;
+
+    --text-color:#EDEDED;
+    --text-color-secondary:#B5B5B5;
+
+    --primary-color:#f4f4f4;
+    --primary-color-text:#1e1e1e;
+
+    --font-family: "Roboto", sans-serif;
+
+    --surface-0: #171717;
+    --surface-50: #282828;
+    --surface-100: #363636;
+    --surface-200: #747474;
+    --surface-300: #939393;
+    --surface-400: #B2B2B2;
+    --surface-500: #9E9E9E;
+    --surface-600: #EBEBEB;
+    --surface-700: #F5F5F5;
+    --surface-800: #FAFAFA;
+    --surface-900: #FFFFFF;
+
+
+    --gray-50: #282828;
+    --gray-100: #363636;
+    --gray-200: #747474;
+    --gray-300: #939393;
+    --gray-400: #B2B2B2;
+    --gray-500: #9E9E9E;
+    --gray-600: #EBEBEB;
+    --gray-700: #F5F5F5;
+    --gray-800: #FAFAFA;
+    --gray-900: #FFFFFF;
+
+
+
+    --content-padding:#{$panelContentPadding};
+    --inline-spacing:#{$inlineSpacing};
+    --border-radius:#{$borderRadius};
+    --surface-ground:#111111;
+    --surface-section:#171717;
+    --surface-card:#171717;
+    --surface-overlay:#ffffff;
+    --surface-border:#3E3E3E;
+    --surface-hover:#e9ecef;
+    --focus-ring: #{$focusShadow};
+    --maskbg: #{$maskBg};
+    --highlight-bg: #{$highlightBg};
+    --highlight-text-color: #{$highlightTextColor};
+    color-scheme: dark;
+}
