@@ -14,11 +14,11 @@ export const parseHttpResponse = (httpResponse) => {
     case 200:
       return httpResponse?.body || null
     case 201:
-      return 'Resource succesfully created'
+      return 'Resource successfully created'
     case 202:
-      return 'Resource succesfully updated'
+      return 'Resource successfully updated'
     case 204:
-      return 'Resource succesfully deleted'
+      return 'Resource successfully deleted'
     case 400:
       throw new InvalidApiRequestError().message
     case 401:
