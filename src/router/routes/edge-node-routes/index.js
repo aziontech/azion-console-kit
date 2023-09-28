@@ -44,7 +44,7 @@ export const edgeNodeRoutes = {
           }
         ]
       }
-    }, 
+    },
     {
       path: 'edit/:id/service',
       name: 'edit-edge-node-service',

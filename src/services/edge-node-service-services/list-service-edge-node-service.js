@@ -34,12 +34,11 @@ const adapt = (httpResponse) => {
   }
 }
 
-const makeSearchParams = ({  page, bound }) => {
+const makeSearchParams = ({ page, bound }) => {
   const searchParams = new URLSearchParams()
-  if(page) searchParams.set('page', page)
+  if (page) searchParams.set('page', page)
   searchParams.set('page_size', 1000000)
   searchParams.set('is_bound', bound)
 
   return searchParams
 }
-

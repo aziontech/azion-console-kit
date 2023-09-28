@@ -14,6 +14,6 @@ export const addService = async (payload) => {
 const adapt = (payload) => {
   return {
     service_id: payload.serviceId,
-    variables: payload.variables,
+    variables: payload.variables
   }
 }
