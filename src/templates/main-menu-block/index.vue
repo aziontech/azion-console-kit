@@ -18,7 +18,7 @@
           style="height: 32px; width: 32px"
         />
 
-        <AzionLogo />
+        <Logo />
         <!-- Azion client -->
         <PrimeButton
           v-tooltip.bottom="'Switch Account'"
@@ -131,7 +131,7 @@
         />
       </div>
     </div>
-    <AzionLogo v-else />
+    <Logo v-else />
   </header>
   <!-- help mobile sidebar -->
   <Sidebar
@@ -185,8 +185,8 @@
     <template #start>
       <div class="border-b surface-border flex flex-column gap-0.5 pb-1">
         <div class="flex flex-column align gap-0.5 px-3 pt-2 pb-1">
-          <span class="font-bold">Account Name</span>
-          <span class="text-xs text-color-secondary">ID: 3938124</span>
+          <span class="font-bold">{{ user.name }}</span>
+          <span class="text-xs text-color-secondary">ID: {{ user.id }}</span>
         </div>
         <PrimeButton
           label="Switch Account"
@@ -199,14 +199,15 @@
     <template #end>
       <div class="flex flex-row items-center px-3 pt-2.5 gap-2 pb-1.5">
         <div class="flex flex-col gap-1.5">
-          <span class="text-sm font-bold leading-none">User Name</span>
-          <span class="text-xs text-color-secondary">user.email@azion.com</span>
+          <span class="text-sm font-bold leading-none">{{ user.full_name }}</span>
+          <span class="text-xs text-color-secondary">{{ user.email }}</span>
         </div>
       </div>
       <PrimeButton
         class="w-full rounded-none flex content-start text-left"
         label="Your Settings"
         text
+        @click="$router.push({ name: 'list-your-settings' })"
       />
       <PrimeButton
         class="w-full rounded-none flex content-start text-left"
@@ -331,20 +332,23 @@
   import PrimeButton from 'primevue/button'
   import Sidebar from 'primevue/sidebar'
   import Divider from 'primevue/divider'
-  import AzionLogo from '@assets/svg/azion'
+  import Logo from '@assets/svg/logo'
   import PrimeDialog from 'primevue/dialog'
   import InputText from 'primevue/inputtext'
   import Tag from 'primevue/tag'
   import Dropdown from 'primevue/dropdown'
+  import { useAccountStore } from '../../stores/account'
 
   export default {
     name: 'HeaderTemplate',
+
     emits: ['showSlideHelper', 'showSlideCenter'],
+
     components: {
       Avatar,
       PrimeMenu,
       Sidebar,
-      AzionLogo,
+      Logo,
       PrimeButton,
       Divider,
       PrimeDialog,
@@ -352,6 +356,7 @@
       Dropdown,
       Tag
     },
+
     props: {
       helperVisible: {
         type: Boolean,
@@ -359,6 +364,7 @@
       },
       isLogged: Boolean
     },
+
     data() {
       return {
         showHelp: false,
@@ -469,6 +475,11 @@
                 to: '/data-streaming',
                 icon: 'pi pi-play'
               },
+              {
+                label: 'Edge Pulse',
+                to: '/edge-pulse',
+                icon: 'pi pi-chart-line'
+              },
 
               { separator: true }
             ]
@@ -504,22 +515,28 @@
             label: 'Organization Settings',
             items: [
               {
-                label: 'Account Settings'
+                label: 'Account Settings',
+                to: '/account-settings'
               },
               {
-                label: 'Users Management'
+                label: 'Users Management',
+                to: '/users'
               },
               {
-                label: 'Billing & Subscriptions'
+                label: 'Billing & Subscriptions',
+                to: '/billing-subscriptions'
               },
               {
-                label: 'Credentials'
+                label: 'Credentials',
+                to: '/credentials'
               },
               {
-                label: 'Activity History'
+                label: 'Activity History',
+                to: '/activity-history'
               },
               {
-                label: 'Teams Permissions'
+                label: 'Teams Permissions',
+                to: '/teams'
               },
               { separator: true }
             ]
@@ -563,6 +580,7 @@
         window.location.href = '/logout'
       }
     },
+
     computed: {
       generateHomeBreadCrumb() {
         return {
@@ -570,8 +588,15 @@
           to: '/'
         }
       },
+
       generateBreadCrumbs() {
         return this.$router.currentRoute.value.meta.breadCrumbs ?? []
+      },
+
+      user() {
+        const accountStore = useAccountStore()
+
+        return accountStore.account
       }
     }
   }

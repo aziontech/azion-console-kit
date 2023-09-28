@@ -21,6 +21,46 @@ export const edgeFunctionsRoutes = {
           }
         ]
       }
+    },
+    {
+      path: 'create',
+      name: 'create-edge-functions',
+      component: () => import('@views/EdgeFunctions/CreateView.vue'),
+      props: {
+        createEdgeFunctionsService: EdgeFunctionsService.createEdgeFunctionsService
+      },
+      meta: {
+        breadCrumbs: [
+          {
+            label: 'Edge Functions',
+            to: '/edge-functions'
+          },
+          {
+            label: 'Create Edge Functions',
+            to: '/edge-functions/create'
+          }
+        ]
+      }
+    },
+    {
+      path: 'edit/:id',
+      name: 'edit-edge-functions',
+      component: () => import('@views/EdgeFunctions/EditView.vue'),
+      props: {
+        loadEdgeFunctionsService: EdgeFunctionsService.loadEdgeFunctionsService,
+        editEdgeFunctionsService: EdgeFunctionsService.editEdgeFunctionsService
+      },
+      meta: {
+        breadCrumbs: [
+          {
+            label: 'Edge Functions',
+            to: '/edge-functions'
+          },
+          {
+            label: 'Edit Edge Functions'
+          }
+        ]
+      }
     }
   ]
 }

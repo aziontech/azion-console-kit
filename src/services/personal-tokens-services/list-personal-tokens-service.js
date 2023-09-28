@@ -14,7 +14,15 @@ export const listPersonalTokens = async ({ page = 1, search = '' }) => {
 
 const adapt = async (httpResponse) => {
   const parsedData = httpResponse.body.results.map((item) => {
-    return { ...item, id: item.uuid, scope: 'Global' }
+    return {
+      ...item,
+      id: item.uuid,
+      created: new Intl.DateTimeFormat('us', { dateStyle: 'full' }).format(new Date(item.created)),
+      expires_at: new Intl.DateTimeFormat('us', { dateStyle: 'full' }).format(
+        new Date(item.expires_at)
+      ),
+      scope: 'Global'
+    }
   })
 
   return {
