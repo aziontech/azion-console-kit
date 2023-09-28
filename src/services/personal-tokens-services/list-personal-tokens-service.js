@@ -1,9 +1,9 @@
 import { AxiosHttpClientAdapter, parseHttpResponse } from '../axios/AxiosHttpClientAdapter'
 import { makePersonalTokensBaseUrl } from './make-personal-tokens-base-url'
 
-export const listPersonalTokens = async ({ page = 1, search = '' }) => {
+export const listPersonalTokens = async ({ pageSize = 200, search = '' }) => {
   let httpResponse = await AxiosHttpClientAdapter.request({
-    url: `${makePersonalTokensBaseUrl()}?&page=${page}&search=${search}`,
+    url: `${makePersonalTokensBaseUrl()}?&page_size=${pageSize}&search=${search}`,
     method: 'GET'
   })
 
