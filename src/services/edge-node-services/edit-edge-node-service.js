@@ -14,9 +14,9 @@ export const editEdgeNodeService = async (payload) => {
 const adapt = (payload) => {
   return {
     name: payload.name,
-    hash_id: payload.hash_id,
+    hashId: payload.hash_id,
     modules: payload.modules,
-    has_services: payload.has_services,
+    hasServices: payload.has_services,
     groups: payload.groups,
     status: payload.status
   }

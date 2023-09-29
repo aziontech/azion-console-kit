@@ -15,91 +15,89 @@
           backURL="/edge-node"
         >
           <template #form>
-            <section>
-              <div class="flex flex-col gap-5 mb-6">
-                <h2 class="text-2xl">Main Settings</h2>
-                <div>
-                  <InputText
-                    placeholder="Name"
-                    v-bind="name"
-                    type="text"
-                    :class="{ 'p-invalid': errors.name }"
-                    v-tooltip.top="errors.name"
-                    class="w-full"
-                  />
-                </div>
-                <p>
-                  Each node needs to run the Azion Orchestration software. It enables the
-                  communication between your private node and Azion Real-Time Manager, where you can
-                  manage your Edge Applications, Edge Functions, and many other Azion services.
-                </p>
-                <div class="flex flex-col gap-2">
-                  <InputText
-                    placeholder="HashID"
-                    v-bind="hashId"
-                    type="text"
-                    class="w-full"
-                    disabled
-                  />
-                </div>
-                <div class="flex flex-col gap-2">
-                  <label for="username">Node groups</label>
-                  <small id="username-help"
-                    >Use labels to group your Edge Nodes. Groups allow you to manage multiple Edge
-                    Nodes easily in your Edge Maps for orchestration and routing.</small
-                  >
-                  <InputText
-                    id="username"
-                    aria-describedby="username-help"
-                  />
-                </div>
+            <div class="flex flex-col gap-5 mb-6">
+              <h2 class="text-2xl">Main Settings</h2>
+              <div>
+                <InputText
+                  placeholder="Name"
+                  v-bind="name"
+                  type="text"
+                  :class="{ 'p-invalid': errors.name }"
+                  v-tooltip.top="errors.name"
+                  class="w-full"
+                />
               </div>
-              <div class="flex flex-col gap-5">
-                <h2 class="text-2xl">Orchestration Modules</h2>
-                <small>Choose orchestration modules to install on your Edge Node.</small>
-                <div class="flex flex-col gap-3">
-                  <div class="flex justify-between">
-                    <label for="cells">Azion Cells</label>
-                    <InputSwitch
-                      id="cells"
-                      disabled="true"
-                    />
-                  </div>
-                  <small>
-                    Azion Cells is a lightweight software framework to build and run low-latency
-                    Edge Applications. By activating this option, you agree to install the framework
-                    on your Edge Node.
-                  </small>
-                </div>
-                <div class="flex flex-col gap-3">
-                  <div class="flex justify-between">
-                    <label for="health">Azion Health Check</label>
-                    <InputSwitch
-                      id="health"
-                      disabled="true"
-                    />
-                  </div>
-                  <small>
-                    Azion Health Check is a service that enables your Edge Node to report the
-                    availability and health constantly to Azion. By activating this option, you
-                    agree to install the service on your Edge Node.
-                  </small>
-                </div>
-                <div class="flex flex-col gap-3">
-                  <div class="flex justify-between">
-                    <label for="service">Add-On Services </label>
-                    <InputSwitch
-                      id="service"
-                      v-model="modules.value.add_services"
-                      :disabled="modules.value.add_services"
-                    />
-                  </div>
-                  <small>
-                    Enables you to instantiate add-on services from your own Services Library.
-                  </small>
-                </div>
+              <p>
+                Each node needs to run the Azion Orchestration software. It enables the
+                communication between your private node and Azion Real-Time Manager, where you can
+                manage your Edge Applications, Edge Functions, and many other Azion services.
+              </p>
+              <div class="flex flex-col gap-2">
+                <InputText
+                  placeholder="HashID"
+                  v-bind="hashId"
+                  type="text"
+                  class="w-full"
+                  disabled
+                />
               </div>
-            </section>
+              <div class="flex flex-col gap-2">
+                <label for="username">Node groups</label>
+                <small id="username-help"
+                  >Use labels to group your Edge Nodes. Groups allow you to manage multiple Edge
+                  Nodes easily in your Edge Maps for orchestration and routing.</small
+                >
+                <InputText
+                  id="username"
+                  aria-describedby="username-help"
+                />
+              </div>
+            </div>
+            <div class="flex flex-col gap-5">
+              <h2 class="text-2xl">Orchestration Modules</h2>
+              <small>Choose orchestration modules to install on your Edge Node.</small>
+              <div class="flex flex-col gap-3">
+                <div class="flex justify-between">
+                  <label for="cells">Azion Cells</label>
+                  <InputSwitch
+                    id="cells"
+                    disabled="true"
+                  />
+                </div>
+                <small>
+                  Azion Cells is a lightweight software framework to build and run low-latency Edge
+                  Applications. By activating this option, you agree to install the framework on
+                  your Edge Node.
+                </small>
+              </div>
+              <div class="flex flex-col gap-3">
+                <div class="flex justify-between">
+                  <label for="health">Azion Health Check</label>
+                  <InputSwitch
+                    id="health"
+                    disabled="true"
+                  />
+                </div>
+                <small>
+                  Azion Health Check is a service that enables your Edge Node to report the
+                  availability and health constantly to Azion. By activating this option, you agree
+                  to install the service on your Edge Node.
+                </small>
+              </div>
+              <div class="flex flex-col gap-3">
+                <div class="flex justify-between">
+                  <label for="service">Add-On Services </label>
+                  <InputSwitch
+                    id="service"
+                    v-model="modules.value.add_services"
+                    :disabled="modules.value.add_services"
+                  />
+                </div>
+                <small>
+                  Enables you to instantiate add-on services from your own Services Library.
+                </small>
+              </div>
+            </div>
           </template>
         </EditFormBlock>
       </TabPanel>
