@@ -36,7 +36,7 @@
   import * as yup from 'yup'
 
   export default {
-    name: 'add-service',
+    name: 'edit-service',
     components: {
       InputText,
       EditFormBlock
