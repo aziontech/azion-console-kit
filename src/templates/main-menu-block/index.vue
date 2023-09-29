@@ -345,9 +345,6 @@
 
   export default {
     name: 'HeaderTemplate',
-
-    emits: ['showSlideHelper', 'showSlideCenter'],
-
     components: {
       Avatar,
       PrimeMenu,
@@ -360,7 +357,6 @@
       Dropdown,
       Tag
     },
-
     props: {
       helperVisible: {
         type: Boolean,
@@ -368,7 +364,7 @@
       },
       isLogged: Boolean
     },
-
+    emits: ['showSlideHelper', 'showSlideCenter'],
     data() {
       return {
         showHelp: false,
@@ -555,16 +551,6 @@
     },
     computed: {
       ...mapState(useAccountStore, { user: 'accountData', currentTheme: 'currentTheme' }),
-      generateHomeBreadCrumb() {
-        return {
-          icon: 'pi pi-home',
-          to: '/'
-        }
-      },
-
-      generateBreadCrumbs() {
-        return this.$router.currentRoute.value.meta.breadCrumbs ?? []
-      },
       selectedTheme() {
         return this.themeOptions.find((option) => option.value === this.currentTheme)
       }
