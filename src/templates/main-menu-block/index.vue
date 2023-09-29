@@ -18,7 +18,7 @@
           style="height: 32px; width: 32px"
         />
 
-        <Logo class="max-md:hidden"/>
+        <Logo class="max-md:hidden" />
         <svg
           xmlns="http://www.w3.org/2000/svg"
           class="block md:hidden"
@@ -180,7 +180,15 @@
         }"
         class="bg-transparent w-full border-0 text-sm"
         :model="menuStructure"
-      />
+      >
+      <template #item="{ item, label, props }">
+        <a class="flex" v-bind="props.action">
+            <span v-bind="props.icon" />
+            <span v-bind="props.label">{{ label }}</span>
+            <Tag v-if="item.tag" :value="item.tag" class="ml-2"/>
+        </a>
+    </template>
+      </PrimeMenu>
     </div>
   </Sidebar>
 
@@ -368,7 +376,7 @@
       PrimeDialog,
       InputText,
       Dropdown,
-      Tag
+      Tag,
     },
 
     props: {
@@ -448,7 +456,7 @@
                 label: 'Variables',
                 to: '/variables',
                 icon: 'pi pi-sliders-h'
-              },
+              }
             ]
           },
           {
@@ -458,13 +466,15 @@
               {
                 label: 'Intelligent DNS',
                 to: '/intelligent-dns',
+                tag: 'New',
                 icon: 'pi pi-share-alt'
+                
               },
               {
                 label: 'Edge Firewall',
                 to: '/edge-firewall',
                 icon: 'pi pi-lock'
-              },
+              }
             ]
           },
           {
@@ -474,7 +484,7 @@
                 label: 'Edge Nodes',
                 icon: 'pi pi-database',
                 to: '/edge-node'
-              },
+              }
             ]
           },
           {
@@ -490,7 +500,12 @@
                 to: '/edge-pulse',
                 icon: 'pi pi-chart-line'
               },
-
+              {
+                label: 'Real Time Metrics',
+                to: '/real-time-metrics',
+                icon: 'pi pi-chart-line',
+                tag: 'Beta',
+              }
             ]
           },
           {
