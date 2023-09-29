@@ -18,24 +18,8 @@
           style="height: 32px; width: 32px"
         />
 
-        <Logo class="max-md:hidden" />
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          class="block md:hidden"
-          width="22"
-          height="18"
-          fill="none"
-          viewBox="0 0 22 18"
-        >
-          <path
-            fill="#F3652B"
-            fill-rule="evenodd"
-            d="M18.744 0 .504 15.357
-            0 18h2.628l14.13-11.89L14.48
-            18h3.447l3.448-18h-2.631Z"
-            clip-rule="evenodd"
-          />
-        </svg>
+        <Logo class="max-md:hidden cursor-pointer" @click="$router.push('/')"/>
+        <Mobilelogo class="md:hidden cursor-pointer" @click="this.$router.push('/')"/>
         <!-- Azion client -->
         <PrimeButton
           v-tooltip.bottom="'Switch Account'"
@@ -181,13 +165,20 @@
         class="bg-transparent w-full border-0 text-sm"
         :model="menuStructure"
       >
-      <template #item="{ item, label, props }">
-        <a class="flex" v-bind="props.action">
+        <template #item="{ item, label, props }">
+          <a
+            class="flex"
+            v-bind="props.action"
+          >
             <span v-bind="props.icon" />
             <span v-bind="props.label">{{ label }}</span>
-            <Tag v-if="item.tag" :value="item.tag" class="ml-2"/>
-        </a>
-    </template>
+            <Tag
+              v-if="item.tag"
+              :value="item.tag"
+              class="ml-2"
+            />
+          </a>
+        </template>
       </PrimeMenu>
     </div>
   </Sidebar>
@@ -355,6 +346,7 @@
   import Sidebar from 'primevue/sidebar'
   import Divider from 'primevue/divider'
   import Logo from '@assets/svg/logo'
+  import Mobilelogo from '@assets/svg/mobile-logo'
   import PrimeDialog from 'primevue/dialog'
   import InputText from 'primevue/inputtext'
   import Tag from 'primevue/tag'
@@ -377,6 +369,7 @@
       InputText,
       Dropdown,
       Tag,
+      Mobilelogo,
     },
 
     props: {
@@ -468,7 +461,6 @@
                 to: '/intelligent-dns',
                 tag: 'New',
                 icon: 'pi pi-share-alt'
-                
               },
               {
                 label: 'Edge Firewall',
@@ -504,7 +496,7 @@
                 label: 'Real Time Metrics',
                 to: '/real-time-metrics',
                 icon: 'pi pi-chart-line',
-                tag: 'Beta',
+                tag: 'Beta'
               }
             ]
           },
