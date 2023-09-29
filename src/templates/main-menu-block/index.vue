@@ -19,7 +19,14 @@
         />
 
         <AzionLogo class="max-md:hidden" />
-        <svg xmlns="http://www.w3.org/2000/svg" class="block md:hidden" width="22" height="18" fill="none" viewBox="0 0 22 18">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          class="block md:hidden"
+          width="22"
+          height="18"
+          fill="none"
+          viewBox="0 0 22 18"
+        >
           <path
             fill="#F3652B"
             fill-rule="evenodd"
@@ -166,7 +173,7 @@
         :pt="{
           menuitem: { class: 'overflow-auto text-sm', style: 'border-radius: 6px !important' },
           content: { class: 'rounded-md' },
-          submenuheader: { class: 'bg-transparent text-xs font-medium leading-none' },
+          submenuheader: { class: 'bg-transparent text-base font-bold leading-none' },
           separator: { class: 'surface-border my-2' }
         }"
         class="bg-transparent w-full border-0 text-sm"
@@ -420,9 +427,8 @@
             icon: 'pi pi-globe',
             to: '/domains'
           },
-          { separator: true },
           {
-            label: 'BUILD',
+            label: 'Build',
             icon: 'pi pi-code',
             items: [
               {
@@ -435,11 +441,10 @@
                 to: '/variables',
                 icon: 'pi pi-sliders-h'
               },
-              { separator: true }
             ]
           },
           {
-            label: 'SECURE',
+            label: 'Secure',
             icon: 'pi pi-lock',
             items: [
               {
@@ -452,22 +457,20 @@
                 to: '/edge-firewall',
                 icon: 'pi pi-lock'
               },
-              { separator: true }
             ]
           },
           {
-            label: 'DEPLOY',
+            label: 'Deploy',
             items: [
               {
                 label: 'Edge Nodes',
                 icon: 'pi pi-database',
                 to: '/edge-node'
               },
-              { separator: true }
             ]
           },
           {
-            label: 'OBSERVE',
+            label: 'Observe',
             items: [
               {
                 label: 'Data Streaming',
@@ -475,11 +478,10 @@
                 icon: 'pi pi-play'
               },
 
-              { separator: true }
             ]
           },
           {
-            label: 'EDGE LIBRARIES',
+            label: 'Edge Libraries ',
             items: [
               {
                 label: 'Edge Functions',
