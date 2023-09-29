@@ -160,12 +160,12 @@
     v-model:visible="showSidebar"
     position="left"
   >
-    <div class="flex flex-col p-2">
+    <div>
       <PrimeMenu
         :pt="{
-          menuitem: { class: 'overflow-auto text-sm', style: 'border-radius: 6px !important' },
+          // menuitem: { class: 'overflow-auto text-sm'},
           content: { class: 'rounded-md' },
-          submenuheader: { class: 'bg-transparent text-base font-bold leading-none mt-5' },
+          submenuheader: { class: 'text-base font-bold leading-none' },
           separator: { class: 'h-5' }
         }"
         class="bg-transparent w-full border-0 text-sm"
