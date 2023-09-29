@@ -22,7 +22,7 @@ export const useAccountStore = defineStore({
     },
     setTheme(theme) {
       this.account.colorTheme = theme
-      
+
       // TODO: remove the usage of localStorage when API returns the theme
       localStorage.setItem('theme', theme)
     }
