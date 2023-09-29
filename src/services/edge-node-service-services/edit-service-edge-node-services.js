@@ -25,6 +25,6 @@ const adapt = (payload) => {
     }
   }
   return {
-    variables,
+    variables
   }
 }
