@@ -164,16 +164,14 @@
       <PrimeMenu
         :pt="{
           // menuitem: { class: 'overflow-auto text-sm'},
-          content: { class: 'rounded-md' },
-          submenuheader: { class: 'text-base font-bold leading-none' },
-          separator: { class: 'h-5' }
+          submenuheader: { class: 'text-base font-bold leading-none mt-5' },
         }"
         class="bg-transparent w-full border-0 text-sm"
         :model="menuStructure"
       >
         <template #item="{ item, label, props }">
           <a
-            class="flex"
+            class="flex h-9"
             v-bind="props.action"
           >
             <span v-bind="props.icon" />
