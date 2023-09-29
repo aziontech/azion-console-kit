@@ -2,7 +2,7 @@
 <template>
   <!-- Header Container -->
   <header
-    class="surface-section border-b surface-border min-h-[60px] items-center flex justify-between px-4 w-full"
+    class="surface-section border-b surface-border min-h-[60px] items-center flex justify-between px-4 w-full fixed top-0 z-10"
   >
     <div
       class="flex w-full justify-between"
@@ -156,9 +156,15 @@
   </Sidebar>
   <!-- Sidebar-->
   <Sidebar
-    class="max-w-[280px]"
+    class="max-w-72 z-5"
+    style="border-right: 1px solid var(--surface-border);"
     v-model:visible="showSidebar"
     position="left"
+    :pt="{
+      header: { class: 'hidden' },
+      root: {class:'top-[60px] shadow-none'},
+      mask: {class: 'bg-transparent'},
+    }"
   >
     <div>
       <PrimeMenu
@@ -166,7 +172,7 @@
           // menuitem: { class: 'overflow-auto text-sm'},
           submenuheader: { class: 'text-base font-bold leading-none mt-5' }
         }"
-        class="bg-transparent w-full border-0 text-sm"
+        class="w-full md:px-4 px-3 border-none"
         :model="menuStructure"
       >
         <template #item="{ item, label, props }">
