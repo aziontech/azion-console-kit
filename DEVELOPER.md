@@ -79,11 +79,30 @@ Abaixo você pode visualizar um diagrama da disposição destes arquivos e a for
 
 ![Diagrama de Arquitetura](./docs/architecture-diagram.png)
 
+### Alteração do tema
+
+#### CSS
+
+A aplicação é nativamente tematizada com o _"look and feel"_ da Azion, sendo que o arquivo de theme é carregado dentro do arquivo `src/main.js` conforme exemplo abaixo:
+
+```javascript
+import '@/assets/themes/scss/themes/azion-light/theme.scss'
+```
+
+Os fontes do theme estão dentro do diretório:
+`src/assets/themes/scss`
+sendo que ao alterar os arquivos de Tokens ou qualquer arquivo destes diretórios as mesmas refletem diretamente no seu ambiente de desenvolvimento que está sendo executado.
+
+#### Logotipo
+
+Dentro do diretório `assets/svg/` encontra-se o arquivo `logo.vue` que pode ser sobrescrito por um arquivo SVG customizado.
+
 ### How to: usar o ambiente de stage da api
 
 Para fins de desenvolvimento do time da Azion, é possivel apontar para a api de stage e executar ações restritas em produção.
 
-1. Altere o target da api no arquivo `vite.config.js` para `https://stage-api.azion.net` 
+1. Altere o target da api no arquivo `vite.config.js` para `https://stage-api.azion.net`
+
 ```js
   server: {
     proxy: {
@@ -95,7 +114,6 @@ Para fins de desenvolvimento do time da Azion, é possivel apontar para a api de
     }
   }
 ```
-
 
 ### How to: criando uma UI de listagem de Variables
 
@@ -119,6 +137,12 @@ Tomando como exemplo a rota de _Variables_, temos o seguinte fluxo para implemen
 
 ```sh
 yarn build
+```
+
+### Executar localmente a versão de build
+
+```sh
+npm run preview
 ```
 
 ### Executar testes unitários com [Vitest](https://vitest.dev/)

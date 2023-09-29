@@ -6,6 +6,7 @@ import { homeRoutes } from '@routes/home-routes'
 import { edgeApplicationRoutes } from '@routes/edge-application-routes'
 import { edgeFirewallRoutes } from '@routes/edge-firewall-routes'
 import { edgeFunctionsRoutes } from '@routes/edge-functions-routes'
+import { edgePulseRoutes } from '@routes/edge-pulse-routes'
 import { edgeServicesRoutes } from '@routes/edge-services-routes'
 import { intelligentDnsRoutes } from '@routes/intelligent-dns-routes'
 import { loginRoutes } from '@routes/login-routes'
@@ -26,6 +27,7 @@ const router = createRouter({
     edgeApplicationRoutes,
     edgeFirewallRoutes,
     edgeFunctionsRoutes,
+    edgePulseRoutes,
     edgeServicesRoutes,
     homeRoutes,
     intelligentDnsRoutes,
