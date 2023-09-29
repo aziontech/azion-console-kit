@@ -3,7 +3,7 @@ import { defineStore } from 'pinia'
 export const useAccountStore = defineStore({
   id: 'account',
   state: () => ({
-    account: null
+    account: {}
   }),
   getters: {
     accountData(state) {
@@ -18,7 +18,7 @@ export const useAccountStore = defineStore({
   },
   actions: {
     setAccountData(account) {
-      this.account = account
+      this.account = { ...this.account, ...account }
     },
     setTheme(theme) {
       this.account.colorTheme = theme
