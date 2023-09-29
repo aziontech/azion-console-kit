@@ -92,6 +92,7 @@
           const { id } = this.$route.params
           this.isLoading = true
           const initialData = await this.loadService({ id })
+          console.log(initialData);
           this.initialDataSetter(initialData)
         } catch (error) {
           this.$toast.add({

@@ -58,7 +58,7 @@ export const edgeNodeRoutes = {
       meta: {
         breadCrumbs: [
           {
-            label: 'Edge Nodes',
+            label: 'Services',
             to: '/edge-node'
           },
           {
@@ -78,11 +78,31 @@ export const edgeNodeRoutes = {
       meta: {
         breadCrumbs: [
           {
-            label: 'Edge Nodes',
-            to: '/edge-node'
+            label: 'Service',
+            to: '/edit/:id/service'
           },
           {
-            label: 'Edit Edge Node'
+            label: 'Add Service'
+          }
+        ]
+      }
+    },
+    {
+      path: 'edit/:id/service/:id',
+      name: 'edit-service-edge-node',
+      component: () => import('@views/EdgeNode/EditServiceEdgeNode.vue'),
+      props: {
+        loadService: Service.loadService,
+        editService: Service.editService
+      },
+      meta: {
+        breadCrumbs: [
+          {
+            label: 'Service',
+            to: '/edit/:id/service'
+          },
+          {
+            label: 'Edit Service'
           }
         ]
       }

@@ -103,7 +103,7 @@
           </template>
         </EditFormBlock>
       </TabPanel>
-      <TabPanel header="Services">
+      <TabPanel header="Services" :disabled="!modules.value.add_services">
         <ListTableBlock
           pageTitle="Services List"
           addButtonLabel="Add Service"
@@ -111,9 +111,12 @@
           :columns="servicesListColumns"
           :deleteService="deleteServiceEdgeNode"
           createPagePath="service/add"
+          editPagePath="service"
         >
         </ListTableBlock>
       </TabPanel>
+      <TabPanel header="Routing" :disabled="true"></TabPanel>
+      <TabPanel header="Location" :disabled="true"></TabPanel>
     </TabView>
   </div>
 </template>
