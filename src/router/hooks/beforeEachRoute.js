@@ -12,7 +12,7 @@ export default async function beforeEachRoute(to, _, next) {
 
   if (to.path === '/logout') {
     await logout()
-    accountStore.setAccountData(null)
+    accountStore.setAccountData({})
     return next()
   }
 
