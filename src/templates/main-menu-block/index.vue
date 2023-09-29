@@ -18,8 +18,14 @@
           style="height: 32px; width: 32px"
         />
 
-        <Logo class="max-md:hidden cursor-pointer" @click="$router.push('/')"/>
-        <Mobilelogo class="md:hidden cursor-pointer" @click="this.$router.push('/')"/>
+        <Logo
+          class="max-md:hidden cursor-pointer"
+          @click="$router.push('/')"
+        />
+        <Mobilelogo
+          class="md:hidden cursor-pointer"
+          @click="this.$router.push('/')"
+        />
         <!-- Azion client -->
         <PrimeButton
           v-tooltip.bottom="'Switch Account'"
@@ -369,7 +375,7 @@
       InputText,
       Dropdown,
       Tag,
-      Mobilelogo,
+      Mobilelogo
     },
 
     props: {
