@@ -37,9 +37,9 @@
         @update:modelValue="selectTheme"
         optionValue="value"
         optionLabel="name"
-        placeholder="Loading..."
         :loading="!selectedTheme?.value"
         :options="themeOptions"
+        :autoOptionFocus="false"
         :pt="{
           root: {
             class: 'w-auto py-0 h-[30px] items-center align-middle',

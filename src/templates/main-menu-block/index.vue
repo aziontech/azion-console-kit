@@ -225,6 +225,7 @@
           optionValue="value"
           optionLabel="name"
           :options="themeOptions"
+          :autoOptionFocus="false"
           :pt="{
             root: { class: 'w-auto py-0 h-8 items-center align-middle' },
             item: { class: 'text-sm' },
