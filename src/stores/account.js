@@ -22,6 +22,7 @@ export const useAccountStore = defineStore({
     },
     setTheme(theme) {
       this.account.colorTheme = theme
+      localStorage.setItem('theme', theme)
     }
-  },
+  }
 })
