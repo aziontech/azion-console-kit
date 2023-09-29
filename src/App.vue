@@ -1,14 +1,23 @@
 <script setup>
-  import { computed } from 'vue'
+  import { computed, watch } from 'vue'
   import { RouterView, useRoute } from 'vue-router'
   import ShellBlock from '@/templates/shell-block'
   import { useAccountStore } from '@/stores/account'
+  import { usePrimeVue } from 'primevue/config'
+  import { themeSelect } from '@/helpers/themeSelect'
+  import { storeToRefs } from 'pinia'
 
   const accountStore = useAccountStore()
-  const route = useRoute()
+  const { currentTheme, hasActiveUserId } = storeToRefs(accountStore)
 
+  const route = useRoute()
   const isLogged = computed(() => {
-    return accountStore.hasActiveUserId && route.name !== 'login'
+    return hasActiveUserId && route.name !== 'login'
+  })
+
+  const pvInstance = usePrimeVue()
+  watch(currentTheme, (theme) => {
+    themeSelect({ pvInstance, theme })
   })
 </script>
 
