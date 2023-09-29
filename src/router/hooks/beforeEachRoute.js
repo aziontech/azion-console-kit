@@ -5,6 +5,11 @@ import { useAccountStore } from '@/stores/account'
 export default async function beforeEachRoute(to, _, next) {
   const accountStore = useAccountStore()
 
+  // Refactor: remove the use of localStorage when API returns the theme
+  const theme = localStorage.getItem('theme')
+
+  const fallbackTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
+
   if (to.path === '/logout') {
     await logout()
     accountStore.setAccountData(null)
@@ -23,9 +28,7 @@ export default async function beforeEachRoute(to, _, next) {
       accountInfo.email = userInfo.results.email
       accountInfo.user_id = userInfo.results.id
 
-      // Refactor: remove the use of localStorage when API returns this data
-      const theme = localStorage.getItem('theme')
-      accountInfo.colorTheme = theme || 'light'
+      accountInfo.colorTheme = theme || fallbackTheme
 
       accountStore.setAccountData(accountInfo)
       return next()
@@ -33,5 +36,7 @@ export default async function beforeEachRoute(to, _, next) {
       return next('/login')
     }
   }
+
+  accountStore.setTheme(theme || fallbackTheme)
   return next()
 }
