@@ -18,7 +18,24 @@
           style="height: 32px; width: 32px"
         />
 
-        <Logo />
+        <Logo class="max-md:hidden"/>
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          class="block md:hidden"
+          width="22"
+          height="18"
+          fill="none"
+          viewBox="0 0 22 18"
+        >
+          <path
+            fill="#F3652B"
+            fill-rule="evenodd"
+            d="M18.744 0 .504 15.357
+            0 18h2.628l14.13-11.89L14.48
+            18h3.447l3.448-18h-2.631Z"
+            clip-rule="evenodd"
+          />
+        </svg>
         <!-- Azion client -->
         <PrimeButton
           v-tooltip.bottom="'Switch Account'"
@@ -65,7 +82,8 @@
           @click="showCreateModal"
           icon="pi pi-plus"
           label="Create"
-          class="h-8 hidden sm:flex"
+          class="h-8 hidden sm:flex surface-border"
+          outlined
           size="small"
         />
 
@@ -73,8 +91,9 @@
         <PrimeButton
           @click="showCreateModal"
           icon="pi pi-plus"
-          class="h-8 sm:hidden"
+          class="h-8 sm:hidden surface-border"
           size="small"
+          outlined
           style="height: 32px; width: 32px"
         />
 
@@ -94,7 +113,7 @@
           icon="pi pi-question-circle"
           size="small"
           outlined
-          class="sm:hidden"
+          class="sm:hidden surface-border"
           style="height: 32px; width: 32px"
           @click="showHelperCenterMobile"
         />
@@ -156,8 +175,8 @@
         :pt="{
           menuitem: { class: 'overflow-auto text-sm', style: 'border-radius: 6px !important' },
           content: { class: 'rounded-md' },
-          submenuheader: { class: 'bg-transparent text-base font-bold leading-none' },
-          separator: { class: 'surface-border my-2' }
+          submenuheader: { class: 'bg-transparent text-base font-bold leading-none mt-5' },
+          separator: { class: 'h-5' }
         }"
         class="bg-transparent w-full border-0 text-sm"
         :model="menuStructure"
