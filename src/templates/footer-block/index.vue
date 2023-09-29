@@ -4,7 +4,7 @@
   <footer
     class="z-10 flex px-3 flex-wrap flex-col md:flex-row pr-3 py-5 md:py-3 justify-center items-center gap-4 surface-ground border-t surface-border"
   >
-    <AzionLogo />
+    <Logo />
 
     <div class="text-sm font-normal text-color">© 2023 Azion Technologies.</div>
 
@@ -29,18 +29,7 @@
     </div>
 
     <!-- System Status -->
-    <a
-      class="border flex gap-2 surface-border surface-ground text-color rounded-lg text-sm px-2 py-1 align-items-center justify-center"
-      href="https://status.azion.com/"
-      target="_blank"
-    >
-      <b>Status:</b>
-      <i
-        class="pi pi-circle-fill text-xs"
-        style="color: rgb(25, 217, 25)"
-      />
-      <span>All Systems Operational</span>
-    </a>
+    <SystemStatusBarBlock />
 
     <div class="flex flex-row justify-between items-center align-middle px-3 py-1.5">
       <Dropdown
@@ -93,14 +82,16 @@
 <script>
   import Dropdown from 'primevue/dropdown'
   import PrimeButton from 'primevue/button'
-  import AzionLogo from '@assets/svg/azion'
+  import SystemStatusBarBlock from '@templates/system-status-bar-block'
+  import Logo from '@assets/svg/logo'
 
   export default {
     name: 'FooterTemplate',
     components: {
       PrimeButton,
       Dropdown,
-      AzionLogo
+      Logo,
+      SystemStatusBarBlock
     },
     data() {
       return {
