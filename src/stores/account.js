@@ -6,16 +6,22 @@ export const useAccountStore = defineStore({
     account: null
   }),
   getters: {
-    getAccountData(state) {
+    accountData(state) {
       return state.account
     },
     hasActiveUserId(state) {
       return !!state.account?.id
+    },
+    currentTheme(state) {
+      return state.account?.colorTheme
     }
   },
   actions: {
     setAccountData(account) {
       this.account = account
+    },
+    setTheme(theme) {
+      this.account.colorTheme = theme
     }
-  }
+  },
 })
