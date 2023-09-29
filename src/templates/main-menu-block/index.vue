@@ -185,8 +185,8 @@
     <template #start>
       <div class="border-b surface-border flex flex-column gap-0.5 pb-1">
         <div class="flex flex-column align gap-0.5 px-3 pt-2 pb-1">
-          <span class="font-bold">{{ user.name }}</span>
-          <span class="text-xs text-color-secondary">ID: {{ user.id }}</span>
+          <span class="font-bold">{{ accountData.name }}</span>
+          <span class="text-xs text-color-secondary">ID: {{ accountData.id }}</span>
         </div>
         <PrimeButton
           label="Switch Account"
@@ -199,8 +199,8 @@
     <template #end>
       <div class="flex flex-row items-center px-3 pt-2.5 gap-2 pb-1.5">
         <div class="flex flex-col gap-1.5">
-          <span class="text-sm font-bold leading-none">{{ user.full_name }}</span>
-          <span class="text-xs text-color-secondary">{{ user.email }}</span>
+          <span class="text-sm font-bold leading-none">{{ accountData.full_name }}</span>
+          <span class="text-xs text-color-secondary">{{ accountData.email }}</span>
         </div>
       </div>
       <PrimeButton
@@ -220,9 +220,11 @@
       <div class="flex flex-row justify-between items-center align-middle px-3 py-1.5">
         <span>Theme</span>
         <Dropdown
-          v-model="selectedTheme"
-          :options="themeOptions"
+          :modelValue="selectedTheme"
+          @update:modelValue="selectTheme"
+          optionValue="value"
           optionLabel="name"
+          :options="themeOptions"
           :pt="{
             root: { class: 'w-auto py-0 h-8 items-center align-middle' },
             item: { class: 'text-sm' },
@@ -337,7 +339,8 @@
   import InputText from 'primevue/inputtext'
   import Tag from 'primevue/tag'
   import Dropdown from 'primevue/dropdown'
-  import { useAccountStore } from '../../stores/account'
+  import { useAccountStore } from '@/stores/account'
+  import { mapActions, mapState } from 'pinia'
 
   export default {
     name: 'HeaderTemplate',
@@ -542,16 +545,31 @@
             ]
           }
         ],
-        selectedTheme: { name: 'System', icon: 'pi pi-desktop' },
         themeOptions: [
-          { name: 'Light', icon: 'pi pi-sun' },
-          { name: 'Dark', icon: 'pi pi-moon' },
-          { name: 'System', icon: 'pi pi-desktop' }
+          { name: 'Light', value: 'light', icon: 'pi pi-sun' },
+          { name: 'Dark', value: 'dark', icon: 'pi pi-moon' },
+          { name: 'System', value: 'system', icon: 'pi pi-desktop' }
         ]
       }
     },
+    computed: {
+      ...mapState(useAccountStore, ['accountData', 'currentTheme']),
+      generateHomeBreadCrumb() {
+        return {
+          icon: 'pi pi-home',
+          to: '/'
+        }
+      },
 
+      generateBreadCrumbs() {
+        return this.$router.currentRoute.value.meta.breadCrumbs ?? []
+      },
+      selectedTheme() {
+        return this.themeOptions.find((option) => option.value === this.currentTheme)
+      }
+    },
     methods: {
+      ...mapActions(useAccountStore, ['setTheme']),
       toggleProfile(event) {
         this.$refs.profile.toggle(event)
       },
@@ -578,25 +596,9 @@
       },
       logout() {
         window.location.href = '/logout'
-      }
-    },
-
-    computed: {
-      generateHomeBreadCrumb() {
-        return {
-          icon: 'pi pi-home',
-          to: '/'
-        }
       },
-
-      generateBreadCrumbs() {
-        return this.$router.currentRoute.value.meta.breadCrumbs ?? []
-      },
-
-      user() {
-        const accountStore = useAccountStore()
-
-        return accountStore.account
+      selectTheme(theme) {
+        this.setTheme(theme)
       }
     }
   }
