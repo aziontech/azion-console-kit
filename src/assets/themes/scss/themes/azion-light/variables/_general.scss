@@ -66,7 +66,7 @@ $primeIconFontSize: 1rem;
 
 /// Separator border
 /// @group general
-$divider: 1px solid #dee2e6;
+$divider: 1px solid #e7e7e7;
 
 /// Space between two inline items
 /// @group general
@@ -118,19 +118,19 @@ $actionIconBg: transparent;
 
 /// Border of an action icon
 /// @group general
-$actionIconBorder: 0 none;
+$actionIconBorder: 1px solid #e7e7e7;
 
 /// Color of an action icon
 /// @group general
-$actionIconColor: $textSecondaryColor;
+$actionIconColor: $textColor;
 
 /// Backgroun of an action icon in hover state
 /// @group general
-$actionIconHoverBg: #e9ecef;
+$actionIconHoverBg: #1e1e1e04;
 
 /// Border of an action icon in hover state
 /// @group general
-$actionIconHoverBorderColor: transparent;
+$actionIconHoverBorderColor: 1px solid #e7e7e7;
 
 /// Color of an action icon in hover state
 /// @group general
