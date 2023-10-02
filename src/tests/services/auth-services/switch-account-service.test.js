@@ -1,4 +1,4 @@
-import { verifyAuthenticationService } from '@/services/auth-services'
+import { switchAccountService } from '@/services/auth-services'
 import { AxiosHttpClientAdapter } from '@/services/axios/AxiosHttpClientAdapter'
 import {
   InternalServerError,
@@ -11,7 +11,7 @@ import {
 import { describe, expect, it, vi } from 'vitest'
 
 const makeSut = () => {
-  const sut = verifyAuthenticationService
+  const sut = switchAccountService
 
   return {
     sut
@@ -19,38 +19,21 @@ const makeSut = () => {
 }
 
 describe.concurrent('AuthServices', () => {
-  it('should call token verification service with correct params', async () => {
-    const requestSpy = vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
+  it('should call switch account service with correct params', async () => {
+    const requestSpy = vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValue({
       statusCode: 200
     })
-
+    const accountIdMock = 332211
     const { sut } = makeSut()
 
-    await sut()
+    await sut(accountIdMock)
 
     expect(requestSpy).toHaveBeenCalledWith({
       method: 'POST',
-      url: 'token/verify'
+      url: `switch-account/${accountIdMock}`
     })
   })
-
-  it('should validate user token on success request', async () => {
-    const validUserMock = {
-      name: 'John Doe',
-      id: '123',
-      company: 'ACME'
-    }
-    vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
-      body: validUserMock,
-      statusCode: 200
-    })
-    const { sut } = makeSut()
-
-    const response = await sut()
-
-    expect(response).toEqual(validUserMock)
-  })
-
+  
   it.each([
     {
       statusCode: 400,
@@ -79,13 +62,14 @@ describe.concurrent('AuthServices', () => {
   ])(
     'should throw when request fails with statusCode $statusCode',
     async ({ statusCode, expectedError }) => {
-      vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
+      vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValue({
         statusCode,
         body: null
       })
+      const accountIdStub = 332211;
       const { sut } = makeSut()
 
-      const response = sut()
+      const response = sut(accountIdStub)
 
       expect(response).rejects.toBe(expectedError)
     }
