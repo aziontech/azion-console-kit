@@ -1,4 +1,13 @@
-import { authenticate, verify, refresh, switchAccount } from './login-service'
-import { logout } from './logout-service'
+import {switchAccountService} from './switch-account-service';
+import {loginService} from './login-service';
+import {verifyAuthenticationService} from './verify-authentication-service';
+import {refreshAuthenticationService} from './refresh-authentication-service';
+import { logoutService } from './logout-service';
 
-export { authenticate, verify, refresh, switchAccount, logout }
+export { 
+  loginService,
+  verifyAuthenticationService,
+  refreshAuthenticationService,
+  switchAccountService,
+  logoutService
+}

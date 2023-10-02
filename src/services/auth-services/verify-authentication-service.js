@@ -1,9 +1,9 @@
 import { AxiosHttpClientAdapter, parseHttpResponse } from '../axios/AxiosHttpClientAdapter'
-import { makeAuthLogoutBaseUrl } from './make-auth-logout-base-url'
+import { makeAuthTokenBaseUrl } from './make-auth-token-base-url'
 
-export const logoutService = async () => {
+export const verifyAuthenticationService = async () => {
   let httpResponse = await AxiosHttpClientAdapter.request({
-    url: `${makeAuthLogoutBaseUrl()}`,
+    url: `${makeAuthTokenBaseUrl()}/verify`,
     method: 'POST'
   })
   return parseHttpResponse(httpResponse)

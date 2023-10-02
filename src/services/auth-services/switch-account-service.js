@@ -1,10 +1,13 @@
 import { AxiosHttpClientAdapter, parseHttpResponse } from '../axios/AxiosHttpClientAdapter'
-import { makeAuthLogoutBaseUrl } from './make-auth-logout-base-url'
+import { makeSwitchAccountBaseUrl } from './make-switch-account-base-url'
 
-export const logoutService = async () => {
+
+export const switchAccountService = async (accountId) => {
   let httpResponse = await AxiosHttpClientAdapter.request({
-    url: `${makeAuthLogoutBaseUrl()}`,
+    url: `${makeSwitchAccountBaseUrl()}/${accountId}`,
     method: 'POST'
   })
+
   return parseHttpResponse(httpResponse)
 }
+
