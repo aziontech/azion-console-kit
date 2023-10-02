@@ -189,7 +189,6 @@
       { field: 'status', header: 'Status' }
     ],
     activeTab: 0,
-    groups: []
   })
 
   const route = useRoute()
@@ -226,7 +225,7 @@
   const { value: nameGroup } = useField('nameGroup')
 
   const addNewGroup = () => {
-    state.groups.push({ name: nameGroup.value })
+    groups.value.push({ name: nameGroup.value })
     addGroups.value.push(nameGroup.value)
     nameGroup.value = ''
   }
