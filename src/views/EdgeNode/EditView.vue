@@ -64,6 +64,7 @@
                   >
                     <Checkbox
                       v-model="addGroups"
+                      :name="item.name"
                       :value="item.name"
                     />
                     <label
