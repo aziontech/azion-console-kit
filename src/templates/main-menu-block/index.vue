@@ -157,13 +157,13 @@
   <!-- Sidebar-->
   <Sidebar
     class="max-w-72 z-5"
-    style="border-right: 1px solid var(--surface-border);"
+    style="border-right: 1px solid var(--surface-border)"
     v-model:visible="showSidebar"
     position="left"
     :pt="{
       header: { class: 'hidden' },
-      root: {class:'top-[60px] shadow-none'},
-      mask: {class: 'bg-transparent'},
+      root: { class: 'top-[60px] shadow-none' },
+      mask: { class: 'bg-transparent' }
     }"
   >
     <div>
@@ -179,6 +179,7 @@
           <a
             class="flex h-9"
             v-bind="props.action"
+            :href="item.to"
           >
             <span v-bind="props.icon" />
             <span v-bind="props.label">{{ label }}</span>
