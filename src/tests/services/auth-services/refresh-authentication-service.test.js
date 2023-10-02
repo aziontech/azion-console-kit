@@ -86,7 +86,7 @@ describe.only('AuthServices', () => {
 
       const response = sut()
 
-      expect(response).rejects.toBe(expectedError)
+      expect(response).rejects.toThrow(expectedError)
     }
   )
 })

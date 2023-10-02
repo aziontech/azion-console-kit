@@ -70,7 +70,7 @@ describe.concurrent('AccountServices', () => {
 
       const response = sut()
 
-      expect(response).rejects.toBe(expectedError)
+      expect(response).rejects.toThrow(expectedError)
     }
   )
 })

@@ -71,7 +71,7 @@ describe.concurrent('AuthServices', () => {
 
       const response = sut(accountIdStub)
 
-      expect(response).rejects.toBe(expectedError)
+      expect(response).rejects.toThrow(expectedError)
     }
   )
 })
