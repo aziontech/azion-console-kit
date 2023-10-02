@@ -41,10 +41,10 @@
         />
         <!--Change Twitter icon to X-->
       </div>
-  
+
       <!-- System Status -->
       <SystemStatusBarBlock />
-  
+
       <div class="flex flex-row justify-between items-center align-middle px-3 py-1.5">
         <Dropdown
           v-model="selectedTheme"

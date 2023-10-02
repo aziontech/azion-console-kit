@@ -4,7 +4,6 @@
       @showSlideHelper="showHelperCenter"
       :helperVisible="isHelperVisible"
       :isLogged="isLogged"
-      
     />
     <main
       class="flex w-full h-full relative [&>.active]:!w-[calc(100%-300px)] pt-[60px]"
@@ -16,7 +15,7 @@
         @closeSlideIn="close"
       ></help>
     </main>
-  
+
     <FooterBlock />
   </div>
 </template>
