@@ -6,7 +6,6 @@
     :initialDataSetter="setValues"
     :isValid="meta.valid"
     :formData="values"
-    backURL="/edge-node"
   >
     <template #form>
       <InputText

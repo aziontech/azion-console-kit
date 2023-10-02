@@ -18,13 +18,12 @@ export const listEdgeNodeService = async ({
 
 const adapt = (httpResponse) => {
   const isArray = Array.isArray(httpResponse.body.nodes)
-
   const edgeNodes =
     isArray && httpResponse.body.nodes.length
       ? httpResponse.body.nodes.map((element) => ({
           id: element.id,
           name: element.name,
-          groups: element.groups,
+          groups: element.groups.map(obj => obj.name).join(','),
           hashId: element.hash_id,
           status: element.status
         }))

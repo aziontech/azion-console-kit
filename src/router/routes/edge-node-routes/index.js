@@ -1,5 +1,5 @@
 import * as EdgeNodeService from '@/services/edge-node-services'
-import * as Service from '@/services/edge-node-service-services'
+import * as ServiceEdgeNode from '@/services/edge-node-service-services'
 
 /** @type {import('vue-router').RouteRecordRaw} */
 export const edgeNodeRoutes = {
@@ -31,7 +31,7 @@ export const edgeNodeRoutes = {
       props: {
         loadEdgeNodeService: EdgeNodeService.loadEdgeNodeService,
         editEdgeNodeService: EdgeNodeService.editEdgeNodeService,
-        listService: Service.listService
+        listService: ServiceEdgeNode.listService
       },
       meta: {
         breadCrumbs: [
@@ -52,8 +52,8 @@ export const edgeNodeRoutes = {
       props: {
         loadEdgeNodeService: EdgeNodeService.loadEdgeNodeService,
         editEdgeNodeService: EdgeNodeService.editEdgeNodeService,
-        listService: Service.listService,
-        deleteService: Service.deleteService
+        listService: ServiceEdgeNode.listService,
+        deleteService: ServiceEdgeNode.deleteService
       },
       meta: {
         breadCrumbs: [
@@ -72,8 +72,8 @@ export const edgeNodeRoutes = {
       name: 'add-service-edge-node',
       component: () => import('@views/EdgeNode/AddServiceEdgeNode.vue'),
       props: {
-        listService: Service.listService,
-        addService: Service.addService
+        listService: ServiceEdgeNode.listService,
+        addService: ServiceEdgeNode.addService
       },
       meta: {
         breadCrumbs: [
@@ -92,8 +92,8 @@ export const edgeNodeRoutes = {
       name: 'edit-service-edge-node',
       component: () => import('@views/EdgeNode/EditServiceEdgeNode.vue'),
       props: {
-        loadService: Service.loadService,
-        editService: Service.editService
+        loadService: ServiceEdgeNode.loadService,
+        editService: ServiceEdgeNode.editService
       },
       meta: {
         breadCrumbs: [
