@@ -169,7 +169,6 @@
     <div>
       <PrimeMenu
         :pt="{
-          // menuitem: { class: 'overflow-auto text-sm'},
           submenuheader: { class: 'text-base font-bold leading-none mt-5' }
         }"
         class="w-full md:px-4 px-3 border-none"
