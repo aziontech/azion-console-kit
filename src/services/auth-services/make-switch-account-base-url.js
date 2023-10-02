@@ -1,3 +1,3 @@
 export const makeSwitchAccountBaseUrl = () => {
-  return  'switch-account'
+  return 'switch-account'
 }

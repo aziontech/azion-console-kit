@@ -1,3 +1,3 @@
-export const makeAuthTokenBaseUrl = ()=>{
-  return 'token';
+export const makeAuthTokenBaseUrl = () => {
+  return 'token'
 }
