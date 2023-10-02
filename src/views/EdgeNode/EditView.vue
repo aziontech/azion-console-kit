@@ -64,8 +64,6 @@
                   >
                     <Checkbox
                       v-model="addGroups"
-                      inputId="ingredient1"
-                      name="pizza"
                       :value="item.name"
                     />
                     <label
