@@ -56,7 +56,7 @@ $menuitemPadding: 0.75rem 1rem;
 
 /// Border radius of a menuitem
 /// @group menu
-$menuitemBorderRadius: 0;
+$menuitemBorderRadius: 6px;
 
 /// Text color of a menuitem
 /// @group menu
@@ -76,7 +76,7 @@ $menuitemIconHoverColor: $textSecondaryColor;
 
 /// Background of a menuitem in hover state
 /// @group menu
-$menuitemHoverBg: #e9ecef;
+$menuitemHoverBg: #f4f4f4;
 
 /// Text color of a menuitem in focus state
 /// @group menu
@@ -150,7 +150,7 @@ $overlayMenuShadow:
 
 /// Padding of a vertical menu e.g. tieredmenu, contextmenu
 /// @group menu
-$verticalMenuPadding: 0.25rem 0;
+$verticalMenuPadding: 1.25rem 1rem;
 
 /// Margin of a menuitem separator
 /// @group menu
