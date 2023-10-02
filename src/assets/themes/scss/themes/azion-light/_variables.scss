@@ -31,7 +31,7 @@ $colors: (
 @import './variables/_media';
 @import './variables/_misc';
 
-:root {
+:root.azion-light {
   --surface-a: #ffffff;
   --surface-b: #f8f9fa;
   --surface-c: #e9ecef;
