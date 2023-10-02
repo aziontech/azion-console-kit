@@ -23,7 +23,7 @@ const adapt = (httpResponse) => {
       ? httpResponse.body.nodes.map((element) => ({
           id: element.id,
           name: element.name,
-          groups: element.groups.map(obj => obj.name).join(','),
+          groups: element.groups.map((obj) => obj.name).join(','),
           hashId: element.hash_id,
           status: element.status
         }))

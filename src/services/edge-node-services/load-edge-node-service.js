@@ -12,7 +12,6 @@ export const loadEdgeNodeService = async ({ id }) => {
 }
 
 const adapt = (httpResponse, id) => {
-  
   const edgeNode = {
     name: httpResponse.body.name,
     id: id,
@@ -21,7 +20,7 @@ const adapt = (httpResponse, id) => {
     hasServices: httpResponse.body.has_services,
     groups: httpResponse.body.groups,
     addService: httpResponse.body.modules.add_services,
-    addGroups: httpResponse.body.groups.map(group => group?.name)
+    addGroups: httpResponse.body.groups.map((group) => group?.name)
   }
 
   return {
