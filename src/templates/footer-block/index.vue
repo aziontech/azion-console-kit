@@ -6,7 +6,7 @@
   >
     <div class="text-sm font-normal text-color">© 2023 Azion Technologies.</div>
 
-    <div class="flex gap-8">
+    <div class="flex gap-8 items-center">
       <div class="flex gap-1">
         <PrimeButton
           label="About"
@@ -45,37 +45,35 @@
       <!-- System Status -->
       <SystemStatusBarBlock />
 
-      <div class="flex flex-row justify-between items-center align-middle px-3 py-1.5">
-        <Dropdown
-          v-model="selectedTheme"
-          :options="themeOptions"
-          optionLabel="name"
-          :pt="{
-            root: {
-              class: 'w-auto py-0 h-[30px] items-center align-middle',
-              style: 'background: var(--surface-ground) !important'
-            },
-            item: { class: 'text-sm' },
-            input: { class: 'text-sm' }
-          }"
-        >
-          <template #value="slotProps">
-            <div
-              v-if="slotProps.value"
-              class="flex gap-2 align-items-center"
-            >
-              <i :class="slotProps.value.icon"></i>
-              <div>{{ slotProps.value.name }}</div>
-            </div>
-          </template>
-          <template #option="slotProps">
-            <div class="flex gap-2 align-items-center">
-              <i :class="slotProps.option.icon"></i>
-              <div>{{ slotProps.option.name }}</div>
-            </div>
-          </template>
-        </Dropdown>
-      </div>
+      <Dropdown
+        v-model="selectedTheme"
+        :options="themeOptions"
+        optionLabel="name"
+        :pt="{
+          root: {
+            class: 'w-auto items-center h-6',
+            style: 'background: var(--surface-ground) !important'
+          },
+          item: { class: 'text-sm' },
+          input: { class: 'text-sm' }
+        }"
+      >
+        <template #value="slotProps">
+          <div
+            v-if="slotProps.value"
+            class="flex gap-2 align-items-center"
+          >
+            <i :class="slotProps.value.icon"></i>
+            <div>{{ slotProps.value.name }}</div>
+          </div>
+        </template>
+        <template #option="slotProps">
+          <div class="flex gap-2 align-items-center">
+            <i :class="slotProps.option.icon"></i>
+            <div>{{ slotProps.option.name }}</div>
+          </div>
+        </template>
+      </Dropdown>
     </div>
   </footer>
 </template>
