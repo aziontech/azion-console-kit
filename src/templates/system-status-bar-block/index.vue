@@ -1,10 +1,9 @@
 <template>
   <a
-    class="border flex gap-x-2 surface-border surface-ground text-color rounded-lg text-sm px-2 py-1 align-items-center justify-center"
+    class="border flex gap-1 surface-border surface-ground text-color rounded-lg text-sm px-2 align-items-center justify-center"
     :href="link"
     target="_blank"
   >
-    <b class="leading-none">Status:</b>
     <i
       class="pi pi-circle-fill text-xs leading-none"
       :style="colorStatus"

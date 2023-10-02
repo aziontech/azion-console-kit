@@ -1,21 +1,24 @@
 <template>
-  <MainMenuBlock
-    @showSlideHelper="showHelperCenter"
-    :helperVisible="isHelperVisible"
-    :isLogged="isLogged"
-  />
-  <main
-    class="flex w-full relative min-h-[calc(100vh-120px)] [&>.active]:!w-[calc(100%-300px)] pt-[60px]"
-    :class="[styleHelper, { 'flex align-items-center': !isLogged }]"
-  >
-    <slot :customClass="customClass"></slot>
-    <help
-      :class="customClassHelper"
-      @closeSlideIn="close"
-    ></help>
-  </main>
-
-  <FooterBlock />
+  <div class="flex flex-col h-screen">
+    <MainMenuBlock
+      @showSlideHelper="showHelperCenter"
+      :helperVisible="isHelperVisible"
+      :isLogged="isLogged"
+      
+    />
+    <main
+      class="flex w-full h-full relative [&>.active]:!w-[calc(100%-300px)] pt-[60px]"
+      :class="[styleHelper, { 'flex align-items-center': !isLogged }]"
+    >
+      <slot :customClass="customClass"></slot>
+      <help
+        :class="customClassHelper"
+        @closeSlideIn="close"
+      ></help>
+    </main>
+  
+    <FooterBlock />
+  </div>
 </template>
 
 <script>
