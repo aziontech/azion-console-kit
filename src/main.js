@@ -4,6 +4,8 @@
 import './assets/main.css'
 import 'primeicons/primeicons.css'
 import 'primeflex/primeflex.css'
+import '@assets/themes/scss/themes/azion-light/theme.scss'
+import '@assets/themes/scss/themes/azion-dark/theme.scss'
 /**
  * ==== End of styles block ====
  */
