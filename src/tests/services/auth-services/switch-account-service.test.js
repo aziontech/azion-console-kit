@@ -33,7 +33,7 @@ describe.concurrent('AuthServices', () => {
       url: `switch-account/${accountIdMock}`
     })
   })
-  
+
   it.each([
     {
       statusCode: 400,
@@ -66,7 +66,7 @@ describe.concurrent('AuthServices', () => {
         statusCode,
         body: null
       })
-      const accountIdStub = 332211;
+      const accountIdStub = 332211
       const { sut } = makeSut()
 
       const response = sut(accountIdStub)
