@@ -3,7 +3,6 @@
   import { RouterView, useRoute } from 'vue-router'
   import ShellBlock from '@/templates/shell-block'
   import { useAccountStore } from '@/stores/account'
-  import { usePrimeVue } from 'primevue/config'
   import { themeSelect } from '@/helpers/themeSelect'
   import { storeToRefs } from 'pinia'
 
@@ -15,10 +14,7 @@
     return hasActiveUserId && route.name !== 'login'
   })
 
-  const pvInstance = usePrimeVue()
-  watch(currentTheme, (theme) => {
-    themeSelect({ pvInstance, theme })
-  })
+  watch(currentTheme, (theme) => themeSelect({ theme }))
 </script>
 
 <template>
