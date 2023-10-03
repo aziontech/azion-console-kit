@@ -9,7 +9,7 @@ import './assets/main.css'
 // import '@/assets/themes/theme-custom.css'
 /**
  * ==== End of styles block ====
-*/
+ */
 
 import { createApp } from 'vue'
 import { createPinia } from 'pinia'
