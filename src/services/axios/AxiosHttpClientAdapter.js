@@ -1,5 +1,4 @@
-import axiosAzionApi from './makeApi'
-
+import defaultApi from './makeApi'
 import {
   InternalServerError,
   InvalidApiRequestError,
@@ -33,9 +32,11 @@ export const parseHttpResponse = (httpResponse) => {
       throw new UnexpectedError().message
   }
 }
-
 export class AxiosHttpClientAdapter {
-  static async request({ url, method, headers, body }, axios = axiosAzionApi) {
+  static async request(
+    { url, method, headers, body },
+    axios = defaultApi(import.meta.env.VITE_PERSONAL_TOKEN)
+  ) {
     let axiosResponse
     try {
       axiosResponse = await axios.request({
