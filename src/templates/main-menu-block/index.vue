@@ -2,7 +2,7 @@
 <template>
   <!-- Header Container -->
   <header
-    class="surface-section border-b surface-border min-h-[60px] items-center flex justify-between px-4 w-full fixed top-0 z-10"
+    class="p-3 surface-section border-b surface-border items-center flex justify-between md:px-8 md:py-3 w-full fixed top-0 z-10"
   >
     <div
       class="flex w-full justify-between"
@@ -41,10 +41,10 @@
       <!-- Search -->
       <span class="top-0 p-input-icon-left p-input-icon-right hidden lg:flex">
         <i class="pi pi-search" />
-        <i class="!top-[35%]">
+        <i class="!top-[32%]">
           <Tag
-            class="not-italic border surface-border text-color-secondary cursor-pointer surface-100"
-            value="⌘ + K"
+            class="not-italic border surface-border text-color-secondary cursor-pointer h- surface-100"
+            value="⌘ K"
             @click="openSearch"
           />
         </i>
@@ -61,7 +61,7 @@
       <div class="flex gap-2 items-center">
         <PrimeButton
           icon="pi pi-search"
-          class="surface-border px-2 py-1 flex lg:hidden"
+          class=" px-2 py-1 flex lg:hidden"
           @click="openSearch"
           style="height: 32px; width: 32px"
           outlined
@@ -72,7 +72,7 @@
           @click="showCreateModal"
           icon="pi pi-plus"
           label="Create"
-          class="h-8 hidden sm:flex surface-border"
+          class="h-8 hidden md:flex"
           outlined
           size="small"
         />
@@ -81,7 +81,7 @@
         <PrimeButton
           @click="showCreateModal"
           icon="pi pi-plus"
-          class="h-8 sm:hidden surface-border"
+          class="h-8 md:hidden"
           size="small"
           outlined
           style="height: 32px; width: 32px"
@@ -95,7 +95,7 @@
           label="Help"
           @click="showHelperCenter"
           outlined
-          class="surface-border hidden sm:flex"
+          class="hidden md:flex"
         />
 
         <!-- Create Button Mobile -->
@@ -103,7 +103,7 @@
           icon="pi pi-question-circle"
           size="small"
           outlined
-          class="sm:hidden surface-border"
+          class="md:hidden"
           style="height: 32px; width: 32px"
           @click="showHelperCenterMobile"
         />
@@ -127,11 +127,17 @@
           }"
         />
 
-        <!-- Avatar Desktop -->
+        <!-- Profile Mobile-->
         <Avatar
           @click="toggleProfile"
           label="U"
-          class="cursor-pointer"
+          class="cursor-pointer sm:hidden"
+        />
+        <!-- Profile Desktop -->
+        <Avatar
+          @click="toggleProfile"
+          label="U"
+          class="hidden sm:flex cursor-pointer"
         />
       </div>
     </div>
@@ -154,6 +160,7 @@
       <!-- content -->
     </div>
   </Sidebar>
+
   <!-- Sidebar-->
   <Sidebar
     class="max-w-72 z-5"
@@ -163,7 +170,6 @@
     :pt="{
       header: { class: 'hidden' },
       root: { class: 'top-[60px] shadow-none' },
-      mask: { class: 'bg-transparent' }
     }"
   >
     <div>
@@ -196,9 +202,8 @@
   <!-- Profile Menu -->
   <PrimeMenu
     :pt="{
-      root: { class: '!w-[240px]' },
-      submenuheader: { class: 'text-sm font-bold leading-none' },
-      separator: { class: 'surface-border' }
+      root: { class: '!w-[280px] px-0 pb-2 pt-0' },
+      menu: {class: 'p-0'},
     }"
     class=""
     ref="profile"
@@ -206,24 +211,22 @@
     :model="profileMenuItems"
   >
     <template #start>
-      <div class="border-b surface-border flex flex-column gap-0.5 pb-1">
-        <div class="flex flex-column align gap-0.5 px-3 pt-2 pb-1">
-          <span class="font-bold">{{ user.name }}</span>
-          <span class="text-xs text-color-secondary">ID: {{ user.id }}</span>
+      <div class="flex flex-column px-4 py-2.5">
+        <div class="flex flex-column align gap-1">
+          <span class=" font-medium">{{ user.name }}</span>
+          <div class="flex gap-2">
+            <span class="text-xs">ID: {{ user.id }}</span>
+            <span class="text-xs">Client ID: {{ user.client_id }}</span>
+          </div>
         </div>
-        <PrimeButton
-          label="Switch Account"
-          text
-          class="w-full rounded-none flex content-start text-left md:hidden"
-        />
       </div>
     </template>
 
     <template #end>
-      <div class="flex flex-row items-center px-3 pt-2.5 gap-2 pb-1.5">
-        <div class="flex flex-col gap-1.5">
-          <span class="text-sm font-bold leading-none">{{ user.full_name }}</span>
-          <span class="text-xs text-color-secondary">{{ user.email }}</span>
+      <div class="flex flex-row items-center">
+        <div class="flex flex-col gap-1 px-4 py-2.5">
+          <span class="text-sm font-medium leading-none">{{ user.full_name }}</span>
+          <span class="text-xs">{{ user.email }}</span>
         </div>
       </div>
       <PrimeButton
@@ -247,7 +250,7 @@
           :options="themeOptions"
           optionLabel="name"
           :pt="{
-            root: { class: 'w-auto py-0 h-8 items-center align-middle' },
+            root: { class: 'w-auto py-0 h-8 items-center align-middle surface-section' },
             item: { class: 'text-sm' },
             input: { class: 'text-sm' }
           }"
@@ -537,36 +540,35 @@
           }
         ],
         profileMenuItems: [
+        {
+            label: 'Switch Account',
+            to: '/switch-account'
+          },
           {
-            label: 'Organization Settings',
-            items: [
-              {
-                label: 'Account Settings',
-                to: '/account-settings'
-              },
-              {
-                label: 'Users Management',
-                to: '/users'
-              },
-              {
-                label: 'Billing & Subscriptions',
-                to: '/billing-subscriptions'
-              },
-              {
-                label: 'Credentials',
-                to: '/credentials'
-              },
-              {
-                label: 'Activity History',
-                to: '/activity-history'
-              },
-              {
-                label: 'Teams Permissions',
-                to: '/teams'
-              },
-              { separator: true }
-            ]
-          }
+            label: 'Account Settings',
+            to: '/account-settings'
+          },
+          {
+            label: 'Users Management',
+            to: '/users'
+          },
+          {
+            label: 'Billing & Subscriptions',
+            to: '/billing-subscriptions'
+          },
+          {
+            label: 'Credentials',
+            to: '/credentials'
+          },
+          {
+            label: 'Activity History',
+            to: '/activity-history'
+          },
+          {
+            label: 'Teams Permissions',
+            to: '/teams'
+          },
+          { separator: true }
         ],
         selectedTheme: { name: 'System', icon: 'pi pi-desktop' },
         themeOptions: [
