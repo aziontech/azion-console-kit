@@ -1,55 +1,51 @@
 <template>
-  <CreateFormBlock
-    pageTitle="Add Service"
-    :createService="addServiceEdgeNode"
-    :formData="values"
+  <EditFormBlock
+    pageTitle="Edit Edge Node"
+    :editService="this.editServiceEdgeNode"
+    :loadService="this.loadServicesEdgeNode"
+    :initialDataSetter="setValues"
     :isValid="meta.valid"
-    :cleanFormCallback="resetForm"
+    :formData="values"
   >
     <template #form>
-      <div class="flex flex-col gap-4">
-        <Dropdown
-          v-model="serviceId"
-          :options="services"
-          placeholder="Service"
-          optionLabel="name"
-          optionValue="serviceId"
-          class="!w-full"
-          :disabled="!services.length"
+      <InputText
+        placeholder="Service name"
+        v-model="serviceName"
+        type="text"
+        :disabled="true"
+      />
+      <div class="flex flex-col gap-2">
+        <label>Variables: </label>
+        <vue-monaco-editor
+          v-model:value="variables"
+          language="javascript"
+          theme="vs-dark"
+          class="min-h-[50vh]"
+          :options="editorOptions"
         />
-        <div class="flex flex-col gap-2">
-          <label>Variables: </label>
-          <vue-monaco-editor
-            v-model:value="variables"
-            language="javascript"
-            theme="vs-dark"
-            class="min-h-[50vh]"
-            :options="editorOptions"
-          />
-        </div>
       </div>
     </template>
-  </CreateFormBlock>
+  </EditFormBlock>
 </template>
 <script>
-  import CreateFormBlock from '@/templates/create-form-block'
+  import EditFormBlock from '@/templates/edit-form-block'
+  import InputText from 'primevue/inputtext'
 
   import { useForm, useField } from 'vee-validate'
   import * as yup from 'yup'
-  import Dropdown from 'primevue/dropdown'
 
   export default {
-    name: 'add-service',
+    name: 'edit-service',
     components: {
-      Dropdown,
-      CreateFormBlock
+      InputText,
+      EditFormBlock
     },
     props: {
-      addService: {
+      editEdgeNodeService: {
         type: Function,
         required: true
       },
-      listService: {
+      loadServiceEdgeNodeService: {
         type: Function,
         required: true
       }
@@ -78,30 +74,26 @@
       })
 
       const validationSchema = yup.object({
-        services: yup.array(),
-        serviceId: yup.string().required(),
+        serviceName: yup.string(),
         variables: yup.string().validateValue()
       })
       const ARGS_INITIAL_STATE = ''
       const { errors, meta, values, resetForm, setValues } = useForm({
         validationSchema,
         initialValues: {
-          services: [],
-          serviceId: '',
+          serviceName: '',
           variables: ARGS_INITIAL_STATE
         }
       })
 
-      const { value: services } = useField('services')
-      const { value: serviceId } = useField('serviceId')
+      const { value: serviceName } = useField('serviceName')
       const { value: variables } = useField('variables')
 
       return {
         errors,
         meta,
         values,
-        services,
-        serviceId,
+        serviceName,
         variables,
         setValues,
         editorOptions,
@@ -109,17 +101,16 @@
       }
     },
     async created() {
-      this.edgeNodeId = this.$route.params.id
-      await this.listServicesEdgeNode()
+      const parts = this.$route.path.split('/')
+      this.edgeNodeId = parts[3]
     },
     methods: {
-      async listServicesEdgeNode() {
-        const result = await this.listService({ id: this.edgeNodeId, bound: false })
-        this.services.push(...result)
+      async loadServicesEdgeNode(id) {
+        return await this.loadServiceEdgeNodeService({ edgeNodeId: this.edgeNodeId, ...id })
       },
 
-      async addServiceEdgeNode(payload) {
-        await this.addService(this.edgeNodeId, payload)
+      async editServiceEdgeNode(payload) {
+        await this.editEdgeNodeService(this.edgeNodeId, payload)
       }
     }
   }

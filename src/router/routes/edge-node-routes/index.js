@@ -31,7 +31,7 @@ export const edgeNodeRoutes = {
       props: {
         loadEdgeNodeService: EdgeNodeService.loadEdgeNodeService,
         editEdgeNodeService: EdgeNodeService.editEdgeNodeService,
-        listService: ServiceEdgeNode.listService
+        listServiceEdgeNodeService: ServiceEdgeNode.listServiceEdgeNodeService
       },
       meta: {
         breadCrumbs: [
@@ -52,8 +52,8 @@ export const edgeNodeRoutes = {
       props: {
         loadEdgeNodeService: EdgeNodeService.loadEdgeNodeService,
         editEdgeNodeService: EdgeNodeService.editEdgeNodeService,
-        listService: ServiceEdgeNode.listService,
-        deleteService: ServiceEdgeNode.deleteService
+        listServiceEdgeNodeService: ServiceEdgeNode.listServiceEdgeNodeService,
+        deleteEdgeNodeService: ServiceEdgeNode.deleteEdgeNodeService
       },
       meta: {
         breadCrumbs: [
@@ -70,10 +70,10 @@ export const edgeNodeRoutes = {
     {
       path: 'edit/:id/service/add',
       name: 'add-service-edge-node',
-      component: () => import('@views/EdgeNode/AddServiceEdgeNode.vue'),
+      component: () => import('@/views/EdgeNode/AddServiceEdgeNodeView.vue'),
       props: {
-        listService: ServiceEdgeNode.listService,
-        addService: ServiceEdgeNode.addService
+        listServiceEdgeNodeService: ServiceEdgeNode.listServiceEdgeNodeService,
+        addEdgeNodeService: ServiceEdgeNode.addEdgeNodeService
       },
       meta: {
         breadCrumbs: [
@@ -90,10 +90,10 @@ export const edgeNodeRoutes = {
     {
       path: 'edit/:id/service/:id',
       name: 'edit-service-edge-node',
-      component: () => import('@views/EdgeNode/EditServiceEdgeNode.vue'),
+      component: () => import('@/views/EdgeNode/EditServiceEdgeNodeView.vue'),
       props: {
-        loadService: ServiceEdgeNode.loadService,
-        editService: ServiceEdgeNode.editService
+        loadServiceEdgeNodeService: ServiceEdgeNode.loadServiceEdgeNodeService,
+        editEdgeNodeService: ServiceEdgeNode.editEdgeNodeService
       },
       meta: {
         breadCrumbs: [

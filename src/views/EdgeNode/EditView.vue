@@ -167,8 +167,8 @@
   const pros = defineProps({
     loadEdgeNodeService: { type: Function, required: true },
     editEdgeNodeService: { type: Function, required: true },
-    listService: { type: Function, required: true },
-    deleteService: { type: Function, required: true }
+    listServiceEdgeNodeService: { type: Function, required: true },
+    deleteEdgeNodeService: { type: Function, required: true }
   })
 
   const validationSchema = yup.object({
@@ -231,10 +231,10 @@
   }
 
   const listServiceEdgeNode = async (payload) =>
-    await pros.listService({ ...payload, id: route.params.id, bound: true })
+    await pros.listServiceEdgeNodeService({ ...payload, id: route.params.id, bound: true })
 
   const deleteServiceEdgeNode = async (serviceId) =>
-    await pros.deleteService({ serviceId, edgeNodeId: edgeNodeId.value })
+    await pros.deleteEdgeNodeService({ serviceId, edgeNodeId: edgeNodeId.value })
 
   const changeRouteByClickingOnTab = (event) => {
     if (event.index === 0) {

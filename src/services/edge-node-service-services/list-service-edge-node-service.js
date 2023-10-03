@@ -1,7 +1,7 @@
 import { AxiosHttpClientAdapter, parseHttpResponse } from '../axios/AxiosHttpClientAdapter'
 import { makeEdgeNodeListBaseUrl } from '../edge-node-services/make-edge-node-list-base-url'
 
-export const listService = async ({ id, page, bound }) => {
+export const listServiceEdgeNodeService = async ({ id, page, bound }) => {
   const searchParams = makeSearchParams({ bound, page })
   let httpResponse = await AxiosHttpClientAdapter.request({
     url: `${makeEdgeNodeListBaseUrl()}/${id}/services?${searchParams.toString()}`,
