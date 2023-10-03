@@ -40,34 +40,33 @@
 </template>
 
 <script setup>
-import Steps from 'primevue/steps';
-import { ref } from 'vue';
-import { useRouter, useRoute } from "vue-router";
+  import Steps from 'primevue/steps'
+  import { ref } from 'vue'
+  import { useRouter, useRoute } from 'vue-router'
 
-const router = useRouter();
-const route = useRoute();
+  const router = useRouter()
+  const route = useRoute()
 
+  const items = ref([
+    {
+      label: 'Step 1',
+      route: '/'
+    },
+    {
+      label: 'Step 2',
+      route: '/playground'
+    },
+    {
+      label: 'Step 3',
+      route: '/'
+    },
+    {
+      label: 'Step 4',
+      route: '/'
+    }
+  ])
 
-const items = ref([
-  {
-    label: 'Step 1',
-    route: "/"
-  },
-  {
-    label: 'Step 2',
-    route: "/playground",
-  },
-  {
-    label: 'Step 3',
-    route: "/",
-  },
-  {
-    label: 'Step 4',
-    route: "/",
+  const isActive = (item) => {
+    return item.route ? router.resolve(item.route).path === route.path : false
   }
-]);
-
-const isActive = (item) => {
-  return item.route ? router.resolve(item.route).path === route.path : false;
-}
 </script>
