@@ -87,105 +87,105 @@
 </template>
 
 <script setup>
-import CreateFormBlock from "@/templates/create-form-block";
-import { useForm, useField } from "vee-validate";
-import * as yup from "yup";
-import TabView from "primevue/tabview";
-import TabPanel from "primevue/tabpanel";
-import InputText from "primevue/inputtext";
-import { ref, onMounted } from "vue";
+  import CreateFormBlock from '@/templates/create-form-block'
+  import { useForm, useField } from 'vee-validate'
+  import * as yup from 'yup'
+  import TabView from 'primevue/tabview'
+  import TabPanel from 'primevue/tabpanel'
+  import InputText from 'primevue/inputtext'
+  import { ref, onMounted } from 'vue'
 
-import Splitter from "primevue/splitter";
-import SplitterPanel from "primevue/splitterpanel";
+  import Splitter from 'primevue/splitter'
+  import SplitterPanel from 'primevue/splitterpanel'
 
-const props = defineProps({
-  createEdgeFunctionsService: {
-    type: Function,
-    required: true,
-  },
-});
+  const props = defineProps({
+    createEdgeFunctionsService: {
+      type: Function,
+      required: true
+    }
+  })
 
-const editorOptions = {
-  tabSize: 2,
-  formatOnPaste: true,
-};
-
-const validationSchema = yup.object({
-  name: yup.string().required(),
-});
-const ARGS_INITIAL_STATE = "{}";
-
-const { defineInputBinds, errors, meta, resetForm, values } = useForm({
-  validationSchema,
-  initialValues: {
-    name: "",
-    active: true,
-    language: "javascript",
-    code: `'Type your code here...'`,
-    jsonArgs: ARGS_INITIAL_STATE,
-  },
-});
-
-const name = defineInputBinds("name", { validateOnInput: true });
-const { value: jsonArgs, setValue: setArgs } = useField("jsonArgs");
-const { value: code } = useField("code");
-
-let errorCode = "";
-const changeValidateCode = () => {
-  errorCode = "";
-  if (code.value === "") {
-    errorCode = "code is a required field";
-    return;
+  const editorOptions = {
+    tabSize: 2,
+    formatOnPaste: true
   }
-  postPreviewUpdates();
-};
 
-const changeValidateArgs = () => {
-  if (jsonArgs.value === "") {
-    setArgs(ARGS_INITIAL_STATE);
-    return;
+  const validationSchema = yup.object({
+    name: yup.string().required()
+  })
+  const ARGS_INITIAL_STATE = '{}'
+
+  const { defineInputBinds, errors, meta, resetForm, values } = useForm({
+    validationSchema,
+    initialValues: {
+      name: '',
+      active: true,
+      language: 'javascript',
+      code: `'Type your code here...'`,
+      jsonArgs: ARGS_INITIAL_STATE
+    }
+  })
+
+  const name = defineInputBinds('name', { validateOnInput: true })
+  const { value: jsonArgs, setValue: setArgs } = useField('jsonArgs')
+  const { value: code } = useField('code')
+
+  let errorCode = ''
+  const changeValidateCode = () => {
+    errorCode = ''
+    if (code.value === '') {
+      errorCode = 'code is a required field'
+      return
+    }
+    postPreviewUpdates()
   }
-  postPreviewUpdates();
-};
 
-const previewIframe = ref(null);
+  const changeValidateArgs = () => {
+    if (jsonArgs.value === '') {
+      setArgs(ARGS_INITIAL_STATE)
+      return
+    }
+    postPreviewUpdates()
+  }
 
-const postPreviewUpdates = () => {
-  const previewWindow = previewIframe.value.contentWindow;
-  const updateObject = {
-    code: code.value,
-    args: jsonArgs.value,
-  };
+  const previewIframe = ref(null)
 
-  previewWindow.postMessage(
-    {
-      event: "azion-code-editor",
-      eventType: "update",
-      source: window.location.href,
-      message: JSON.stringify(updateObject),
-    },
-    "*"
-  );
-};
+  const postPreviewUpdates = () => {
+    const previewWindow = previewIframe.value.contentWindow
+    const updateObject = {
+      code: code.value,
+      args: jsonArgs.value
+    }
 
-onMounted(() => {
-  setTimeout(() => {
-    postPreviewUpdates();
-  }, 300);
-});
+    previewWindow.postMessage(
+      {
+        event: 'azion-code-editor',
+        eventType: 'update',
+        source: window.location.href,
+        message: JSON.stringify(updateObject)
+      },
+      '*'
+    )
+  }
+
+  onMounted(() => {
+    setTimeout(() => {
+      postPreviewUpdates()
+    }, 300)
+  })
 </script>
 
 <style scoped>
-.responsive-iframe-wrapper {
-  position: relative;
-  overflow: hidden;
-  height: 100%;
-  padding: 20px;
-}
-.responsive-iframe-wrapper iframe {
-  width: 100%;
-  height: 100%;
-  border: 0;
-  overflow: hidden;
-}
+  .responsive-iframe-wrapper {
+    position: relative;
+    overflow: hidden;
+    height: 100%;
+    padding: 20px;
+  }
+  .responsive-iframe-wrapper iframe {
+    width: 100%;
+    height: 100%;
+    border: 0;
+    overflow: hidden;
+  }
 </style>
