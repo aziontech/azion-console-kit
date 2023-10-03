@@ -2,7 +2,7 @@
 <template>
   <!-- Header Container -->
   <header
-    class="p-3 surface-section border-b surface-border items-center flex justify-between md:px-8 md:py-3 w-full fixed top-0 z-10"
+    class="p-3 surface-section border-b surface-border items-center flex justify-between md:px-8 md:py-3 w-full fixed top-0 z-10 min-h-[56px]"
   >
     <div
       class="flex w-full justify-between"
@@ -16,7 +16,19 @@
           text
           icon="pi pi-bars"
           style="height: 32px; width: 32px"
+          v-if="!showSidebar"
         />
+
+        <PrimeButton
+          @click="openSideBar"
+          size="small"
+          class="flex-none surface-border"
+          text
+          icon="pi pi-times"
+          style="height: 32px; width: 32px"
+          v-if="showSidebar"
+        />
+
 
         <Logo
           class="max-md:hidden cursor-pointer"
@@ -169,7 +181,8 @@
     position="left"
     :pt="{
       header: { class: 'hidden' },
-      root: { class: 'top-[60px] shadow-none' },
+      root: { class: 'shadow-none' },
+      mask: {class: 'top-[57px]'},
     }"
   >
     <div>
@@ -590,7 +603,7 @@
         this.showCreate = true
       },
       openSideBar() {
-        this.showSidebar = true
+        this.showSidebar = !this.showSidebar
       },
       openSearch() {
         this.showSearch = true
