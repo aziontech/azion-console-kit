@@ -12,7 +12,7 @@ const adaptVariables = (payload) => {
     }
   }
 
-  return variables;
+  return variables
 }
 
 export default {
