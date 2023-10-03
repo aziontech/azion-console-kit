@@ -18,6 +18,6 @@ const adapt = (payload) => {
     language: payload.language,
     initiator_type: payload.initiatorType,
     json_args: JSON.parse(payload.jsonArgs),
-    active: payload.active,
+    active: payload.active
   }
 }
