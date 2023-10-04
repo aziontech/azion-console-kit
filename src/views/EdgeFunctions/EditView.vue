@@ -74,7 +74,7 @@
     </div>
 
     <div class="w-full md:w-1/2 hidden md:block">
-      <div class="relative overflow-hidden h-full p-20">
+      <div class="relative overflow-hidden h-full p-5">
         <iframe
           class="w-full h-full border-0 overflow-hidden"
           ref="previewIframe"
