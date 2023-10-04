@@ -29,6 +29,7 @@
           v-if="showSidebar"
         />
 
+
         <Logo
           class="max-md:hidden cursor-pointer"
           @click="$router.push('/')"
@@ -40,11 +41,11 @@
         <!-- Azion client -->
         <PrimeButton
           v-tooltip.bottom="'Switch Account'"
-          class="ml-2 h-8 w-auto surface-border hidden md:flex gap-2 items-center"
+          class="font-semibold ml-2 h-8 w-auto surface-border hidden md:flex gap-2 items-center"
           size="small"
           outlined
         >
-          <i class="pi pi-building" />
+          <i class="pi pi-box" />
           <span>Azion Client</span>
         </PrimeButton>
       </div>
@@ -181,7 +182,7 @@
     :pt="{
       header: { class: 'hidden' },
       root: { class: 'shadow-none' },
-      mask: { class: 'top-[57px]' }
+      mask: {class: 'top-[57px]'},
     }"
   >
     <div>

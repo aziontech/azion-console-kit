@@ -1,6 +1,6 @@
 <template>
   <a
-    class="border flex gap-1 surface-border surface-ground text-color rounded-lg text-sm px-2 align-items-center justify-center h-6"
+    class="border flex gap-1 surface-border surface-section text-color rounded-lg text-sm px-2 align-items-center justify-center h-7"
     :href="link"
     target="_blank"
   >

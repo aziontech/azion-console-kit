@@ -55,8 +55,8 @@
           optionLabel="name"
           :pt="{
             root: {
-              class: 'w-auto items-center h-6',
-              style: 'background: var(--surface-ground) !important'
+              class: 'w-auto items-center h-7',
+              style: 'background: var(--surface-section) !important'
             },
             item: { class: 'text-sm' },
             input: { class: 'text-sm' }
