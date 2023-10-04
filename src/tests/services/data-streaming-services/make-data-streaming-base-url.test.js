@@ -10,7 +10,7 @@ const makeSut = () => {
   }
 }
 
-describe('AuthServices', () => {
+describe('DataStreamingServices', () => {
   it('should return the API base url to data streaming service', () => {
     const { sut } = makeSut()
     const correctApiUrl = 'data_streaming/streamings'
