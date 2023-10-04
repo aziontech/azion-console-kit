@@ -11,7 +11,10 @@ export const accountRoutes = {
       component: () => import('@views/Account/AccountSettingsView.vue'),
       props: {
         getAccountSettingsService: AccountService.getAccountSettings,
-        updateAccountSettingsService: AccountService.updateAccountSettings
+        updateAccountSettingsService: AccountService.updateAccountSettings,
+        listCountriesService: AccountService.listCountriesService,
+        listCitiesService: AccountService.listCitiesService,
+        listRegionsService: AccountService.listRegionsService
       }
     }
   ]
