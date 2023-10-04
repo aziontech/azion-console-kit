@@ -48,7 +48,7 @@
       <div class="flex gap-4">
         <!-- System Status -->
         <SystemStatusBarBlock />
-  
+
         <Dropdown
           v-model="selectedTheme"
           :options="themeOptions"

@@ -29,7 +29,6 @@
           v-if="showSidebar"
         />
 
-
         <Logo
           class="max-md:hidden cursor-pointer"
           @click="$router.push('/')"
@@ -73,7 +72,7 @@
       <div class="flex gap-2 items-center">
         <PrimeButton
           icon="pi pi-search"
-          class=" px-2 py-1 flex lg:hidden"
+          class="px-2 py-1 flex lg:hidden"
           @click="openSearch"
           style="height: 32px; width: 32px"
           outlined
@@ -182,7 +181,7 @@
     :pt="{
       header: { class: 'hidden' },
       root: { class: 'shadow-none' },
-      mask: {class: 'top-[57px]'},
+      mask: { class: 'top-[57px]' }
     }"
   >
     <div>
@@ -216,7 +215,7 @@
   <PrimeMenu
     :pt="{
       root: { class: '!w-[280px] px-0 pb-2 pt-0' },
-      menu: {class: 'p-0'},
+      menu: { class: 'p-0' }
     }"
     class=""
     ref="profile"
@@ -226,7 +225,7 @@
     <template #start>
       <div class="flex flex-column px-4 py-2.5">
         <div class="flex flex-column align gap-1">
-          <span class=" font-medium">{{ user.name }}</span>
+          <span class="font-medium">{{ user.name }}</span>
           <div class="flex gap-2">
             <span class="text-xs">ID: {{ user.id }}</span>
             <span class="text-xs">Client ID: {{ user.client_id }}</span>
@@ -553,7 +552,7 @@
           }
         ],
         profileMenuItems: [
-        {
+          {
             label: 'Switch Account',
             to: '/switch-account'
           },
