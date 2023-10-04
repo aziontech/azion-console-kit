@@ -4,7 +4,7 @@
   <footer
     class="z-10 flex px-3 flex-wrap flex-col md:flex-row pr-3 py-5 md:py-3 justify-center items-center gap-4 surface-ground border-t surface-border"
   >
-    <AzionLogo />
+    <Logo />
 
     <div class="text-sm font-normal text-color">© 2023 Azion Technologies.</div>
 
@@ -29,24 +29,17 @@
     </div>
 
     <!-- System Status -->
-    <a
-      class="border flex gap-2 surface-border surface-ground text-color rounded-lg text-sm px-2 py-1 align-items-center justify-center"
-      href="https://status.azion.com/"
-      target="_blank"
-    >
-      <b>Status:</b>
-      <i
-        class="pi pi-circle-fill text-xs"
-        style="color: rgb(25, 217, 25)"
-      />
-      <span>All Systems Operational</span>
-    </a>
+    <SystemStatusBarBlock />
 
     <div class="flex flex-row justify-between items-center align-middle px-3 py-1.5">
       <Dropdown
-        v-model="selectedTheme"
-        :options="themeOptions"
+        :modelValue="selectedTheme"
+        @update:modelValue="selectTheme"
+        optionValue="value"
         optionLabel="name"
+        :loading="!selectedTheme?.value"
+        :options="themeOptions"
+        :autoOptionFocus="false"
         :pt="{
           root: {
             class: 'w-auto py-0 h-[30px] items-center align-middle',
@@ -93,23 +86,38 @@
 <script>
   import Dropdown from 'primevue/dropdown'
   import PrimeButton from 'primevue/button'
-  import AzionLogo from '@assets/svg/azion'
+  import SystemStatusBarBlock from '@templates/system-status-bar-block'
+  import Logo from '@assets/svg/logo'
+  import { useAccountStore } from '@/stores/account'
+  import { mapActions, mapState } from 'pinia'
 
   export default {
     name: 'FooterTemplate',
     components: {
       PrimeButton,
       Dropdown,
-      AzionLogo
+      Logo,
+      SystemStatusBarBlock
     },
     data() {
       return {
-        selectedTheme: { name: 'Light', icon: 'pi pi-sun' },
         themeOptions: [
-          { name: 'Light', icon: 'pi pi-sun' },
-          { name: 'Dark', icon: 'pi pi-moon' },
-          { name: 'System', icon: 'pi pi-desktop' }
+          { name: 'Light', value: 'light', icon: 'pi pi-sun' },
+          { name: 'Dark', value: 'dark', icon: 'pi pi-moon' },
+          { name: 'System', value: 'system', icon: 'pi pi-desktop' }
         ]
+      }
+    },
+    computed: {
+      ...mapState(useAccountStore, ['currentTheme']),
+      selectedTheme() {
+        return this.themeOptions.find((option) => option.value === this.currentTheme)
+      }
+    },
+    methods: {
+      ...mapActions(useAccountStore, ['setTheme']),
+      selectTheme(theme) {
+        this.setTheme(theme)
       }
     }
   }

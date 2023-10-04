@@ -18,7 +18,7 @@
           style="height: 32px; width: 32px"
         />
 
-        <AzionLogo />
+        <Logo />
         <!-- Azion client -->
         <PrimeButton
           v-tooltip.bottom="'Switch Account'"
@@ -131,7 +131,7 @@
         />
       </div>
     </div>
-    <AzionLogo v-else />
+    <Logo v-else />
   </header>
   <!-- help mobile sidebar -->
   <Sidebar
@@ -185,8 +185,8 @@
     <template #start>
       <div class="border-b surface-border flex flex-column gap-0.5 pb-1">
         <div class="flex flex-column align gap-0.5 px-3 pt-2 pb-1">
-          <span class="font-bold">Account Name</span>
-          <span class="text-xs text-color-secondary">ID: 3938124</span>
+          <span class="font-bold">{{ user.name }}</span>
+          <span class="text-xs text-color-secondary">ID: {{ user.id }}</span>
         </div>
         <PrimeButton
           label="Switch Account"
@@ -199,14 +199,15 @@
     <template #end>
       <div class="flex flex-row items-center px-3 pt-2.5 gap-2 pb-1.5">
         <div class="flex flex-col gap-1.5">
-          <span class="text-sm font-bold leading-none">User Name</span>
-          <span class="text-xs text-color-secondary">user.email@azion.com</span>
+          <span class="text-sm font-bold leading-none">{{ user.full_name }}</span>
+          <span class="text-xs text-color-secondary">{{ user.email }}</span>
         </div>
       </div>
       <PrimeButton
         class="w-full rounded-none flex content-start text-left"
         label="Your Settings"
         text
+        @click="$router.push({ name: 'list-your-settings' })"
       />
       <PrimeButton
         class="w-full rounded-none flex content-start text-left"
@@ -219,9 +220,12 @@
       <div class="flex flex-row justify-between items-center align-middle px-3 py-1.5">
         <span>Theme</span>
         <Dropdown
-          v-model="selectedTheme"
-          :options="themeOptions"
+          :modelValue="selectedTheme"
+          @update:modelValue="selectTheme"
+          optionValue="value"
           optionLabel="name"
+          :options="themeOptions"
+          :autoOptionFocus="false"
           :pt="{
             root: { class: 'w-auto py-0 h-8 items-center align-middle' },
             item: { class: 'text-sm' },
@@ -331,20 +335,21 @@
   import PrimeButton from 'primevue/button'
   import Sidebar from 'primevue/sidebar'
   import Divider from 'primevue/divider'
-  import AzionLogo from '@assets/svg/azion'
+  import Logo from '@assets/svg/logo'
   import PrimeDialog from 'primevue/dialog'
   import InputText from 'primevue/inputtext'
   import Tag from 'primevue/tag'
   import Dropdown from 'primevue/dropdown'
+  import { useAccountStore } from '@/stores/account'
+  import { mapActions, mapState } from 'pinia'
 
   export default {
     name: 'HeaderTemplate',
-    emits: ['showSlideHelper', 'showSlideCenter'],
     components: {
       Avatar,
       PrimeMenu,
       Sidebar,
-      AzionLogo,
+      Logo,
       PrimeButton,
       Divider,
       PrimeDialog,
@@ -359,6 +364,7 @@
       },
       isLogged: Boolean
     },
+    emits: ['showSlideHelper', 'showSlideCenter'],
     data() {
       return {
         showHelp: false,
@@ -509,37 +515,48 @@
             label: 'Organization Settings',
             items: [
               {
-                label: 'Account Settings'
+                label: 'Account Settings',
+                to: '/account-settings'
               },
               {
-                label: 'Users Management'
+                label: 'Users Management',
+                to: '/users'
               },
               {
-                label: 'Billing & Subscriptions'
+                label: 'Billing & Subscriptions',
+                to: '/billing-subscriptions'
               },
               {
-                label: 'Credentials'
+                label: 'Credentials',
+                to: '/credentials'
               },
               {
-                label: 'Activity History'
+                label: 'Activity History',
+                to: '/activity-history'
               },
               {
-                label: 'Teams Permissions'
+                label: 'Teams Permissions',
+                to: '/teams'
               },
               { separator: true }
             ]
           }
         ],
-        selectedTheme: { name: 'System', icon: 'pi pi-desktop' },
         themeOptions: [
-          { name: 'Light', icon: 'pi pi-sun' },
-          { name: 'Dark', icon: 'pi pi-moon' },
-          { name: 'System', icon: 'pi pi-desktop' }
+          { name: 'Light', value: 'light', icon: 'pi pi-sun' },
+          { name: 'Dark', value: 'dark', icon: 'pi pi-moon' },
+          { name: 'System', value: 'system', icon: 'pi pi-desktop' }
         ]
       }
     },
-
+    computed: {
+      ...mapState(useAccountStore, { user: 'accountData', currentTheme: 'currentTheme' }),
+      selectedTheme() {
+        return this.themeOptions.find((option) => option.value === this.currentTheme)
+      }
+    },
     methods: {
+      ...mapActions(useAccountStore, ['setTheme']),
       toggleProfile(event) {
         this.$refs.profile.toggle(event)
       },
@@ -566,17 +583,9 @@
       },
       logout() {
         window.location.href = '/logout'
-      }
-    },
-    computed: {
-      generateHomeBreadCrumb() {
-        return {
-          icon: 'pi pi-home',
-          to: '/'
-        }
       },
-      generateBreadCrumbs() {
-        return this.$router.currentRoute.value.meta.breadCrumbs ?? []
+      selectTheme(theme) {
+        this.setTheme(theme)
       }
     }
   }
