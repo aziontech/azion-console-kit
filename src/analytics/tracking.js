@@ -1,11 +1,3 @@
-const FAKE_ANALYTICS = {
-  track: () => {},
-  identify: () => {},
-  page: () => {},
-  assignTraits: () => {},
-  reset: () => {}
-}
-
 /**
  * Represents a generic tracking service.
  * @class
@@ -15,7 +7,7 @@ export class Tracking {
    * @param {Analytics | undefined} analytics
    */
   constructor(analytics) {
-    this.analytics = analytics || FAKE_ANALYTICS
+    this.analytics = analytics
     this.traits = {}
   }
 
@@ -26,7 +18,7 @@ export class Tracking {
    * @memberof Tracking
    */
   setup(analytics) {
-    this.analytics = analytics || FAKE_ANALYTICS
+    this.analytics = analytics
   }
 
   /**

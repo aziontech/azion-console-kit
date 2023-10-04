@@ -1,7 +1,7 @@
 import { getAccountInfo, getUserInfo } from '@/services/account-services'
 import { logout } from '@/services/auth-services'
 import { useAccountStore } from '@/stores/account'
-import { tracking } from '../../tracking-factory'
+import { tracking } from '../../analytics/tracking-factory'
 
 function identifyUser(accountInfo) {
   if (accountInfo.kind === 'client') {

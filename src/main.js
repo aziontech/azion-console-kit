@@ -21,7 +21,7 @@ import ToastService from 'primevue/toastservice'
 
 import App from './App.vue'
 import router from './router'
-import { tracking, trackClickDirective } from './tracking-factory'
+import { tracking, trackClickDirective } from './analytics/tracking-factory'
 
 const app = createApp(App)
 const pinia = createPinia()
