@@ -1,18 +1,18 @@
-import { makeDataStreamingBaseUrl } from '@/services/data-streaming-services/make-data-streaming-base-url'
+import { makeDigitalCertificatesBaseUrl } from '@/services/digital-certificates-services/make-digital-certificates-base-url'
 import { assert, describe, it } from 'vitest'
 
 const makeSut = () => {
-  const sut = makeDataStreamingBaseUrl
+  const sut = makeDigitalCertificatesBaseUrl
 
   return {
     sut
   }
 }
 
-describe('DataStreamingServices', () => {
+describe('DigitalCertificatesServices', () => {
   it('should return the API base url to data streaming service', () => {
     const { sut } = makeSut()
-    const correctApiUrl = 'data_streaming/streamings'
+    const correctApiUrl = 'digital_certificates'
 
     const baseUrl = sut()
 
