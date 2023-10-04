@@ -10,7 +10,7 @@ const makeSut = () => {
 }
 
 describe('DataStreamingServices', () => {
-  it('should return the API base url to data streaming service', () => {
+  it('should return the API base url to data streaming templates service', () => {
     const { sut } = makeSut()
     const correctApiUrl = 'data_streaming/templates'
 

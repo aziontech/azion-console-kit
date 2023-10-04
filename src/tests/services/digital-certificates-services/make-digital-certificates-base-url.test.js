@@ -10,7 +10,7 @@ const makeSut = () => {
 }
 
 describe('DigitalCertificatesServices', () => {
-  it('should return the API base url to data streaming service', () => {
+  it('should return the API base url to digital certificates service', () => {
     const { sut } = makeSut()
     const correctApiUrl = 'digital_certificates'
 
