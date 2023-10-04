@@ -42,6 +42,17 @@ describe('DigitalCertificatesServices', () => {
     })
   })
 
+  it('should return a feedback message on successfully updated', async () => {
+    vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
+      statusCode: 202
+    })
+    const { sut } = makeSut()
+
+    const feedbackMessage = await sut(fixture.payloadMock)
+
+    expect(feedbackMessage).toBe('Resource successfully updated')
+  })
+
   it.each([
     {
       statusCode: 400,

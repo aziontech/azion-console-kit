@@ -27,6 +27,18 @@ describe('DigitalCertificatesServices', () => {
     })
   })
 
+  it('should return a feedback message on successfully deleted', async () => {
+    vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
+      statusCode: 204
+    })
+    const idStub = 123
+    const { sut } = makeSut(idStub)
+
+    const feedbackMessage = await sut(idStub)
+
+    expect(feedbackMessage).toBe('Resource successfully deleted')
+  })
+
   it.each([
     {
       statusCode: 400,
