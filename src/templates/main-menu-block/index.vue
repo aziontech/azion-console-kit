@@ -181,7 +181,7 @@
     :pt="{
       header: { class: 'hidden' },
       root: { class: 'shadow-none' },
-      mask: { class: 'top-[57px]' }
+      mask: { class: 'top-[58px]' }
     }"
   >
     <div>
