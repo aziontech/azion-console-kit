@@ -1,13 +1,16 @@
 import { AxiosHttpClientAdapter } from '@/services/axios/AxiosHttpClientAdapter'
+import * as Errors from '@/services/axios/errors'
 import { editDigitalCertificateService } from '@services/digital-certificates-services'
 import { describe, expect, it, vi } from 'vitest'
 
 const fixture = {
   payloadMock: {
-    id: '9384726',
-    name: 'NAME',
-    certificate: 'CERTF',
-    privateKey: 'PRIVATE_KEY_!233'
+    id: '123456789',
+    name: 'MySSLCertificate',
+    certificate:
+      '-----BEGIN CERTIFICATE-----\nMIIE... (certificate content) ...\n-----END CERTIFICATE-----',
+    privateKey:
+      '-----BEGIN PRIVATE KEY-----\nMIIE... (private key content) ...\n-----END PRIVATE KEY-----'
   }
 }
 
@@ -38,4 +41,43 @@ describe('DigitalCertificatesServices', () => {
       }
     })
   })
+
+  it.each([
+    {
+      statusCode: 400,
+      expectedError: new Errors.InvalidApiRequestError().message
+    },
+    {
+      statusCode: 401,
+      expectedError: new Errors.InvalidApiTokenError().message
+    },
+    {
+      statusCode: 403,
+      expectedError: new Errors.PermissionError().message
+    },
+    {
+      statusCode: 404,
+      expectedError: new Errors.NotFoundError().message
+    },
+    {
+      statusCode: 500,
+      expectedError: new Errors.InternalServerError().message
+    },
+    {
+      statusCode: 'unmappedStatusCode',
+      expectedError: new Errors.UnexpectedError().message
+    }
+  ])(
+    'should throw when request fails with statusCode $statusCode',
+    async ({ statusCode, expectedError }) => {
+      vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
+        statusCode
+      })
+      const { sut } = makeSut()
+
+      const response = sut(fixture.payloadMock)
+
+      expect(response).rejects.toBe(expectedError)
+    }
+  )
 })
