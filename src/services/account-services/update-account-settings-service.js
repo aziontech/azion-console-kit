@@ -3,7 +3,7 @@ import { makeAccountIamBaseUrl } from './make-account-base-url'
 
 export const updateAccountSettings = async (payload) => {
   let httpResponse = await AxiosHttpClientAdapter.request({
-    url: `${makeAccountIamBaseUrl}`,
+    url: `${makeAccountIamBaseUrl()}`,
     method: 'PATCH',
     body: payload
   })
