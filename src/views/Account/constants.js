@@ -31,7 +31,7 @@ export const TEXT_CONSTANTS = {
     label: 'Country:',
     error: 'Country is required.'
   },
-  stateRegion: {
+  region: {
     label: 'State/Region:',
     error: 'State/Region is required.'
   },

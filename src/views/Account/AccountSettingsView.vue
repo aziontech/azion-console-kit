@@ -110,21 +110,21 @@
           <Dropdown
             id="country"
             optionLabel="name"
-            optionValue="id"
             :options="countriesOptions"
             :class="{ 'p-invalid': errors.country }"
             v-model="country"
+            @change="fetchRegionsList(country.id, true)"
           />
         </div>
         <div class="flex flex-col gap-2">
-          <label for="stateRegion">{{ TEXT_CONSTANTS.stateRegion.label }}</label>
+          <label for="region">{{ TEXT_CONSTANTS.region.label }}</label>
           <Dropdown
-            id="stateRegion"
+            id="region"
             optionLabel="name"
-            optionValue="id"
             :options="regionsOptions"
-            :class="{ 'p-invalid': errors.stateRegion }"
-            v-model="stateRegion"
+            :class="{ 'p-invalid': errors.region }"
+            v-model="region"
+            @change="fetchCitiesList(region.id)"
           />
         </div>
         <div class="flex flex-col gap-2">
@@ -132,7 +132,6 @@
           <Dropdown
             id="city"
             optionLabel="name"
-            optionValue="id"
             :options="citiesOptions"
             :class="{ 'p-invalid': errors.city }"
             v-model="city"
@@ -240,7 +239,7 @@
   const validationSchema = yup.object({
     name: yup.string().required(TEXT_CONSTANTS.accountName.error),
     country: yup.object().nullable().required(TEXT_CONSTANTS.country.error),
-    stateRegion: yup.object().nullable().required(TEXT_CONSTANTS.stateRegion.error),
+    region: yup.object().nullable().required(TEXT_CONSTANTS.region.error),
     city: yup.object().nullable().required(TEXT_CONSTANTS.city.error),
     address: yup.string().required(TEXT_CONSTANTS.address.error),
     postalCode: yup.string().required(TEXT_CONSTANTS.postalCode.error)
@@ -254,8 +253,8 @@
   const { value: uniqueIdentifier, setValue: setUniqueIdentifier } = useField('uniqueIdentifier')
   const { value: billingEmails, setValue: setBillingEmails } = useField('billingEmails')
   const { value: country, setValue: setCountry } = useField('country')
-  const { value: stateRegion } = useField('stateRegion')
-  const { value: city } = useField('city')
+  const { value: region, setValue: setRegion } = useField('region')
+  const { value: city, setValue: setCity } = useField('city')
   const { value: address, setValue: setAddress } = useField('address')
   const { value: complement, setValue: setComplement } = useField('complement')
   const { value: postalCode, setValue: setPostalCode } = useField('postalCode')
@@ -291,9 +290,9 @@
     }
   }
 
-  const setCountryOptions = (id) => {
-    const country = countriesOptions.value.find((option) => option.id === `${id}`)
-    setCountry(country)
+  const setAddressDropdownOption = (id, list, callback) => {
+    const selectedOption = list.value.find((option) => option.id === `${id}`)
+    callback(selectedOption)
   }
 
   const formatCompanySize = (str) => {
@@ -310,8 +309,9 @@
     setCompanySize(formatCompanySize(data.companySize))
     setUniqueIdentifier(data.uniqueIdentifier)
     setBillingEmails(data.billingEmails)
-    setCountryOptions(data.countryId)
-
+    setAddressDropdownOption(data.countryId, countriesOptions, setCountry)
+    fetchRegionsList(data.countryId, false)
+    fetchCitiesList(data.regionId, false)
     setAddress(data.address)
     setComplement(data.complement)
     setPostalCode(data.postalCode)
@@ -327,21 +327,33 @@
     }
   }
 
-  // const fetchRegionsList = async (selectedId) => {
-  //   try {
-  //     regionsOptions.value = await props.listRegionsService(selectedId)
-  //   } catch (error) {
-  //     displayToast(error)
-  //   }
-  // }
+  const fetchRegionsList = async (selectedId, isCountryTouched) => {
+    try {
+      if (isCountryTouched) {
+        regionsOptions.value = await props.listRegionsService(selectedId)
+      } else {
+        regionsOptions.value = await props.listRegionsService(accountSettings.value.countryId)
+        const { regionId } = accountSettings.value
+        setAddressDropdownOption(regionId, regionsOptions, setRegion)
+      }
+    } catch (error) {
+      displayToast(error)
+    }
+  }
 
-  // const fetchCitiesList = async (selectedId) => {
-  //   try {
-  //     citiesOptions.value = await props.listCitiesService(selectedId)
-  //   } catch (error) {
-  //     displayToast(error)
-  //   }
-  // }
+  const fetchCitiesList = async (selectedId, isRegionTouched) => {
+    try {
+      if (isRegionTouched) {
+        citiesOptions.value = await props.listCitiesService(selectedId)
+      } else {
+        citiesOptions.value = await props.listCitiesService(accountSettings.value.regionId)
+        const { cityId } = accountSettings.value
+        setAddressDropdownOption(cityId, citiesOptions, setCity)
+      }
+    } catch (error) {
+      displayToast(error)
+    }
+  }
 
   const handleResponse = (response) => {
     if (response?.body?.key) {
