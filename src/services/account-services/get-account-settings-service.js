@@ -1,3 +1,4 @@
+import { parseSnakeToPascal } from '@/helpers/parse-api-body'
 import { AxiosHttpClientAdapter, parseHttpResponse } from '../axios/AxiosHttpClientAdapter'
 import { makeAccountIamBaseUrl } from './make-account-base-url'
 
@@ -13,7 +14,9 @@ export const getAccountSettings = async () => {
 }
 
 const adapt = async (httpResponse) => {
-  const parsedData = httpResponse.body
+  if (httpResponse.statusCode !== 200) return httpResponse
+
+  const parsedData = parseSnakeToPascal(httpResponse.body)
 
   return {
     body: parsedData,

@@ -1,3 +1,4 @@
+import { parsePascalToSnake } from '@/helpers/parse-api-body'
 import { AxiosHttpClientAdapter, parseHttpResponse } from '../axios/AxiosHttpClientAdapter'
 import { makeAccountIamBaseUrl } from './make-account-base-url'
 
@@ -5,7 +6,7 @@ export const updateAccountSettings = async (payload) => {
   let httpResponse = await AxiosHttpClientAdapter.request({
     url: `${makeAccountIamBaseUrl()}`,
     method: 'PATCH',
-    body: payload
+    body: parsePascalToSnake(payload)
   })
 
   httpResponse = await adapt(httpResponse)
@@ -14,10 +15,9 @@ export const updateAccountSettings = async (payload) => {
 }
 
 const adapt = async (httpResponse) => {
-  const parsedData = httpResponse.body
+  if (httpResponse.statusCode !== 200) return httpResponse
 
   return {
-    body: parsedData,
     statusCode: httpResponse.statusCode
   }
 }
