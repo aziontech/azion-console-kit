@@ -14,19 +14,19 @@
       <div class="flex my-2 mx-auto">
         <TabView>
           <TabPanel header="Main Settings">
-          <div class="p-4">
-            <p>Tab 1</p>
-          </div>
+            <div class="p-4">
+              <p>Tab 1</p>
+            </div>
           </TabPanel>
           <TabPanel header="Origins">
-          <div class="p-4">
-            <p>Tab 2</p>
-          </div>
+            <div class="p-4">
+              <p>Tab 2</p>
+            </div>
           </TabPanel>
           <TabPanel header="Rules Engine">
-          <div class="p-4">
-            <p>Tab 3</p>
-          </div>
+            <div class="p-4">
+              <p>Tab 3</p>
+            </div>
           </TabPanel>
         </TabView>
       </div>
@@ -44,12 +44,12 @@
     components: {
       SelectButton,
       TabView,
-      TabPanel,
+      TabPanel
     },
     data() {
       return {
         value: 'All phases',
-        options: ['All phases', 'Request', 'Response'],
+        options: ['All phases', 'Request', 'Response']
       }
     }
   }
