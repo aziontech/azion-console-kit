@@ -1,10 +1,10 @@
 /// Background of a steps item
 /// @group menu
-$stepsItemBg: #ffffff;
+$stepsItemBg: #ffffff00;
 
 /// Border of a steps item
 /// @group menu
-$stepsItemBorder: 1px solid #c8c8c8;
+$stepsItemBorder: 1px solid #e7e7e7;
 
 /// Text color of a steps item
 /// @group menu
@@ -12,15 +12,15 @@ $stepsItemTextColor: $textSecondaryColor;
 
 /// Width of a steps itrem number
 /// @group menu
-$stepsItemNumberWidth: 2rem;
+$stepsItemNumberWidth: 1.75rem;
 
 /// Height of a steps itrem number
 /// @group menu
-$stepsItemNumberHeight: 2rem;
+$stepsItemNumberHeight: 1.75rem;
 
 /// Font size of a steps itrem number
 /// @group menu
-$stepsItemNumberFontSize: 1.143rem;
+$stepsItemNumberFontSize: 1rem;
 
 /// Color of a steps itrem number
 /// @group menu
@@ -28,7 +28,7 @@ $stepsItemNumberColor: $textColor;
 
 /// Border radius of a steps itrem number
 /// @group menu
-$stepsItemNumberBorderRadius: 50%;
+$stepsItemNumberBorderRadius: $borderRadius;
 
 /// Font weight of an active steps itrem number
 /// @group menu
@@ -116,7 +116,7 @@ $submenuHeaderMargin: 0;
 
 /// Padding of a submenu header
 /// @group menu
-$submenuHeaderPadding: 1rem 0.625rem;
+$submenuHeaderPadding: 0.75rem 1rem;
 
 /// Background of a submenu header
 /// @group menu
