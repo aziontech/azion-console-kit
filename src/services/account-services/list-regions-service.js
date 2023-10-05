@@ -2,10 +2,17 @@ import { AxiosHttpClientAdapter, parseHttpResponse } from '../axios/AxiosHttpCli
 import graphQLApi from '../axios/makeGraphQl'
 import { makeAzionCitiesBaseUrl } from './make-azion-cities-base-url'
 
-export const listRegionsService = async () => {
+export const listRegionsService = async (countryId) => {
   const payload = {
     query: `query all_countries_with_code {
-      allRegions { name },
+      country(id: ${countryId}) {
+        id
+        name
+        regionSet {
+          id
+          name
+        }
+    }
     }`
   }
 
@@ -23,11 +30,13 @@ export const listRegionsService = async () => {
 }
 
 const adapt = (httpResponse) => {
-  const regionsFormated = httpResponse.body.data.allRegions.map((regionItem) => {
-    const formattedItem = {
-      name: regionItem.name
+  if (httpResponse.statusCode !== 200) return httpResponse
+
+  const regionsFormated = httpResponse.body.data.country[0].regionSet.map((regionItem) => {
+    return {
+      name: regionItem.name,
+      id: regionItem.id
     }
-    return formattedItem
   })
 
   return {

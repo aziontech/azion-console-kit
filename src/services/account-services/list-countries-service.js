@@ -5,7 +5,7 @@ import { makeAzionCitiesBaseUrl } from './make-azion-cities-base-url'
 export const listCountriesService = async () => {
   const payload = {
     query: `query all_countries_with_code {
-      allCountries { name },
+      allCountries { name, id },
     }`
   }
 
@@ -23,11 +23,13 @@ export const listCountriesService = async () => {
 }
 
 const adapt = (httpResponse) => {
+  if (httpResponse.statusCode !== 200) return httpResponse
+
   const countriesFormated = httpResponse.body.data.allCountries.map((countryItem) => {
-    const formattedItem = {
-      name: countryItem.name
+    return {
+      name: countryItem.name,
+      id: countryItem.id
     }
-    return formattedItem
   })
 
   return {
