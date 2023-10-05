@@ -48,7 +48,6 @@
       <div class="flex gap-8">
         <!-- System Status -->
         <SystemStatusBarBlock />
-
         <Dropdown
           v-model="selectedTheme"
           :options="themeOptions"
@@ -87,7 +86,10 @@
   import Dropdown from 'primevue/dropdown'
   import PrimeButton from 'primevue/button'
   import SystemStatusBarBlock from '@templates/system-status-bar-block'
-
+  import Logo from '@assets/svg/logo'
+  import { useAccountStore } from '@/stores/account'
+  import { mapActions, mapState } from 'pinia'
+  
   export default {
     name: 'FooterTemplate',
     components: {
@@ -97,12 +99,23 @@
     },
     data() {
       return {
-        selectedTheme: { name: 'Light', icon: 'pi pi-sun' },
         themeOptions: [
-          { name: 'Light', icon: 'pi pi-sun' },
-          { name: 'Dark', icon: 'pi pi-moon' },
-          { name: 'System', icon: 'pi pi-desktop' }
+          { name: 'Light', value: 'light', icon: 'pi pi-sun' },
+          { name: 'Dark', value: 'dark', icon: 'pi pi-moon' },
+          { name: 'System', value: 'system', icon: 'pi pi-desktop' }
         ]
+      }
+    },
+    computed: {
+      ...mapState(useAccountStore, ['currentTheme']),
+      selectedTheme() {
+        return this.themeOptions.find((option) => option.value === this.currentTheme)
+      }
+    },
+    methods: {
+      ...mapActions(useAccountStore, ['setTheme']),
+      selectTheme(theme) {
+        this.setTheme(theme)
       }
     }
   }

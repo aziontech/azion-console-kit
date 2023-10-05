@@ -37,3 +37,4 @@ coverage
 azion
 .edge
 
+src/views/Playground/PlaygroundView.vue

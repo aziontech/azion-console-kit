@@ -20,23 +20,22 @@ alias yarn="docker run -it --rm -p 5173:5173 -v $HOME:/root -v $PWD:/usr/src/app
 git clone git@github.com:aziontech/azion-platform-kit.git
 cd azion-platform-kit
 ```
-
-2. TEMPORARY - Create a personal token in [Azion Realtime Manager](https://manager.azion.com/iam/personal-tokens) and save it into file `.env.development`
-
-```cmd
-echo 'VITE_PERSONAL_TOKEN=azionPERSONALTOKEN' > .env.development
-```
-
-3. Start the project using:
+2. Start the project using:
 
 ```cmd
   $ yarn install
   $ yarn dev --host
 ```
-
 The webapp is now available on the following URL: http://localhost:5173
 
-## Run at Edge
+PRO-TIP (OPTIONAL) - To save some time, you can create a personal token in [Azion Realtime Manager](https://manager.azion.com/iam/personal-tokens) and save it into file `.env.development`
+
+```cmd
+echo 'VITE_PERSONAL_TOKEN=azionPERSONALTOKEN' > .env.development
+```
+
+
+## Run on the Edge
 
 Azion Platform Kit runs natively on Azion's edge thanks to Azion CLI.
 

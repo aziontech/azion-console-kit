@@ -31,7 +31,7 @@ $colors: (
 @import './variables/_media';
 @import './variables/_misc';
 
-:root {
+:root.azion-light {
   --surface-a: #ffffff;
   --surface-b: #f8f9fa;
   --surface-c: #e9ecef;
@@ -46,17 +46,17 @@ $colors: (
 
   --font-family: 'Roboto', sans-serif;
 
-  --surface-0: #fdfefd;
-  --surface-50: #fcfdfd;
-  --surface-100: #fbfdfd;
-  --surface-200: #fbfdfd;
-  --surface-300: #fbfcfc;
-  --surface-400: #fafbfc;
-  --surface-500: #f9fafb;
-  --surface-600: #dadadc;
-  --surface-700: #bbbbbc;
-  --surface-800: #9c9c9d;
-  --surface-900: #7d7c7e;
+  --surface-0: #ffffff;
+  --surface-50: #f9fafb;
+  --surface-100: #f4f4f4;
+  --surface-200: #eeeeee;
+  --surface-300: #e8e8e8;
+  --surface-400: #e3e3e3;
+  --surface-500: #dddddd;
+  --surface-600: #d3d3d3;
+  --surface-700: #c9c9c9;
+  --surface-800: #b5b5b5;
+  --surface-900: #a7a7a7;
 
   --gray-50: #fafafa;
   --gray-100: #f5f5f5;

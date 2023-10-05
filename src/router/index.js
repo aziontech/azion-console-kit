@@ -17,6 +17,7 @@ import { underDevelopmentRoutes } from '@routes/under-development-routes'
 import { edgeNodeRoutes } from '@routes/edge-node-routes'
 import beforeEachRoute from './hooks/beforeEachRoute'
 import { usersListsRoutes } from '@routes/users-routes'
+import { playgroundRoutes } from './routes/playground-routes'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -37,7 +38,8 @@ const router = createRouter({
     variablesRoutes,
     edgeNodeRoutes,
     usersListsRoutes,
-    underDevelopmentRoutes
+    underDevelopmentRoutes,
+    playgroundRoutes
   ]
 })
 

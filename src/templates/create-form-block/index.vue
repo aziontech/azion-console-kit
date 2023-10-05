@@ -17,6 +17,8 @@
       <div class="flex flex-col gap-4 sm:!w-full md:!w-1/2">
         <slot name="form" />
       </div>
+
+      <slot name="raw-form" />
     </form>
     <ActionBarTemplate
       @cancel="handleCancel"

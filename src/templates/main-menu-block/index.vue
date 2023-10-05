@@ -258,9 +258,12 @@
       <div class="flex flex-row justify-between items-center align-middle px-3 py-1.5">
         <span>Theme</span>
         <Dropdown
-          v-model="selectedTheme"
-          :options="themeOptions"
+          :modelValue="selectedTheme"
+          @update:modelValue="selectTheme"
+          optionValue="value"
           optionLabel="name"
+          :options="themeOptions"
+          :autoOptionFocus="false"
           :pt="{
             root: { class: 'w-auto py-0 h-8 items-center align-middle surface-section' },
             item: { class: 'text-sm' },
@@ -376,13 +379,11 @@
   import InputText from 'primevue/inputtext'
   import Tag from 'primevue/tag'
   import Dropdown from 'primevue/dropdown'
-  import { useAccountStore } from '../../stores/account'
+  import { useAccountStore } from '@/stores/account'
+  import { mapActions, mapState } from 'pinia'
 
   export default {
     name: 'HeaderTemplate',
-
-    emits: ['showSlideHelper', 'showSlideCenter'],
-
     components: {
       Avatar,
       PrimeMenu,
@@ -396,7 +397,6 @@
       Tag,
       Mobilelogo
     },
-
     props: {
       helperVisible: {
         type: Boolean,
@@ -404,7 +404,7 @@
       },
       isLogged: Boolean
     },
-
+    emits: ['showSlideHelper', 'showSlideCenter'],
     data() {
       return {
         showHelp: false,
@@ -582,16 +582,21 @@
           },
           { separator: true }
         ],
-        selectedTheme: { name: 'System', icon: 'pi pi-desktop' },
         themeOptions: [
-          { name: 'Light', icon: 'pi pi-sun' },
-          { name: 'Dark', icon: 'pi pi-moon' },
-          { name: 'System', icon: 'pi pi-desktop' }
+          { name: 'Light', value: 'light', icon: 'pi pi-sun' },
+          { name: 'Dark', value: 'dark', icon: 'pi pi-moon' },
+          { name: 'System', value: 'system', icon: 'pi pi-desktop' }
         ]
       }
     },
-
+    computed: {
+      ...mapState(useAccountStore, { user: 'accountData', currentTheme: 'currentTheme' }),
+      selectedTheme() {
+        return this.themeOptions.find((option) => option.value === this.currentTheme)
+      }
+    },
     methods: {
+      ...mapActions(useAccountStore, ['setTheme']),
       toggleProfile(event) {
         this.$refs.profile.toggle(event)
       },
@@ -618,25 +623,9 @@
       },
       logout() {
         window.location.href = '/logout'
-      }
-    },
-
-    computed: {
-      generateHomeBreadCrumb() {
-        return {
-          icon: 'pi pi-home',
-          to: '/'
-        }
       },
-
-      generateBreadCrumbs() {
-        return this.$router.currentRoute.value.meta.breadCrumbs ?? []
-      },
-
-      user() {
-        const accountStore = useAccountStore()
-
-        return accountStore.account
+      selectTheme(theme) {
+        this.setTheme(theme)
       }
     }
   }
