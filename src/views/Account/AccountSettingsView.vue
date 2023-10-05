@@ -1,6 +1,6 @@
 <template>
   <div>
-    <!-- <Toast /> -->
+    <Toast />
     <CreateFormBlockWithEvent
       :pageTitle="TEXT_CONSTANTS.title"
       :createService="props.updateAccountSettingsService"
@@ -66,9 +66,9 @@
           <label for="country">{{ TEXT_CONSTANTS.country.label }}</label>
           <Dropdown
             id="country"
-            :options="[]"
-            optionLabel="label"
-            optionValue="value"
+            optionLabel="name"
+            optionValue="id"
+            :options="countriesOptions"
             :class="{ 'p-invalid': errors.country }"
             v-model="country"
           />
@@ -77,9 +77,9 @@
           <label for="stateRegion">{{ TEXT_CONSTANTS.stateRegion.label }}</label>
           <Dropdown
             id="stateRegion"
-            :options="[]"
-            optionLabel="label"
-            optionValue="value"
+            optionLabel="name"
+            optionValue="id"
+            :options="regionsOptions"
             :class="{ 'p-invalid': errors.stateRegion }"
             v-model="stateRegion"
           />
@@ -88,9 +88,9 @@
           <label for="city">{{ TEXT_CONSTANTS.city.label }}</label>
           <Dropdown
             id="city"
-            :options="[]"
-            optionLabel="label"
-            optionValue="value"
+            optionLabel="name"
+            optionValue="id"
+            :options="citiesOptions"
             :class="{ 'p-invalid': errors.city }"
             v-model="city"
           />
@@ -158,15 +158,15 @@
 </template>
 
 <script setup>
-  import { onMounted } from 'vue'
+  import { onMounted, ref, watch } from 'vue'
   import { useForm, useField } from 'vee-validate'
   import * as yup from 'yup'
   import InputText from 'primevue/inputtext'
   import InputSwitch from 'primevue/inputswitch'
   import Dropdown from 'primevue/dropdown'
   import PrimeButton from 'primevue/button'
-  // import { useToast } from 'primevue/usetoast'
-  // import Toast from 'primevue/toast'
+  import { useToast } from 'primevue/usetoast'
+  import Toast from 'primevue/toast'
   import CreateFormBlockWithEvent from '@/templates/create-form-block/form-with-event'
   import { TEXT_CONSTANTS } from './constants'
 
@@ -176,6 +176,14 @@
       required: true
     },
     listCountriesService: {
+      type: Function,
+      required: true
+    },
+    listRegionsService: {
+      type: Function,
+      required: true
+    },
+    listCitiesService: {
       type: Function,
       required: true
     }
@@ -208,8 +216,53 @@
 
   setCompanySize('10')
 
+  const countriesOptions = ref([])
+  const regionsOptions = ref([])
+  const citiesOptions = ref([])
+
+  const toast = useToast()
+  const displayToast = (summary) => {
+    toast.add({
+      severity: 'error',
+      summary,
+      life: 5000,
+      closable: true
+    })
+  }
+  const fetchCountriesList = async () => {
+    try {
+      countriesOptions.value = await props.listCountriesService()
+    } catch (error) {
+      displayToast(error)
+    }
+  }
+
+  const fetchRegionsList = async (selectedId) => {
+    try {
+      regionsOptions.value = await props.listRegionsService(selectedId)
+    } catch (error) {
+      displayToast(error)
+    }
+  }
+
+  const fetchCitiesList = async (selectedId) => {
+    try {
+      citiesOptions.value = await props.listCitiesService(selectedId)
+    } catch (error) {
+      displayToast(error)
+    }
+  }
+
   onMounted(() => {
-    props.listCountriesService()
+    fetchCountriesList()
+  })
+
+  watch(country, (selectedId) => {
+    fetchRegionsList(selectedId)
+  })
+
+  watch(stateRegion, (selectedId) => {
+    fetchCitiesList(selectedId)
   })
 
   const handleResponse = (response) => {
