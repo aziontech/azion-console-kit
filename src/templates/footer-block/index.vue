@@ -86,10 +86,9 @@
   import Dropdown from 'primevue/dropdown'
   import PrimeButton from 'primevue/button'
   import SystemStatusBarBlock from '@templates/system-status-bar-block'
-  import Logo from '@assets/svg/logo'
   import { useAccountStore } from '@/stores/account'
   import { mapActions, mapState } from 'pinia'
-  
+
   export default {
     name: 'FooterTemplate',
     components: {
