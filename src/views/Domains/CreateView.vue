@@ -159,9 +159,8 @@
       }
     },
     async created() {
-      this.edgeApps = await this.listEdgeApplicationsService({})
-      this.digitalCertificates = await this.listDigitalCertificatesService({})
-      console.log(this.digitalCertificates)
+      this.requestEdgeApplications()
+      this.requestDigitalCertificates()
     },
     computed: {
       edgeCertificates() {
@@ -251,6 +250,14 @@
         meta,
         resetForm,
         values
+      }
+    },
+    methods: {
+      async requestEdgeApplications() {
+        this.edgeApps = await this.listEdgeApplicationsService({})
+      },
+      async requestDigitalCertificates() {
+        this.digitalCertificates = await this.listDigitalCertificatesService({})
       }
     }
   }
