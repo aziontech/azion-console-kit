@@ -1,5 +1,48 @@
 <template>
   <div>
+    <PrimeDialog
+      v-model:visible="showDeleteModal"
+      modal
+      position="center"
+      :dismissableMask="true"
+      :showHeader="false"
+      :breakpoints="{ '641px': '90vw' }"
+      :style="{ marginTop: '0px', width: '540px', maxHeight: '21rem' }"
+      :pt="{
+        root: { class: 'p-0 rounded-md' },
+        content: { class: 'p-0 rounded-md' }
+      }"
+    >
+      <div class="flex flex-col p-4 gap-4">
+        <div class="flex flex-col text-center gap-2">
+          <span class="text-4xl pi pi-exclamation-triangle" />
+          <h6 class="text-lg font-bold">{{ TEXT_CONSTANTS.deleteAccount.modal.title }}</h6>
+          <small>{{ TEXT_CONSTANTS.deleteAccount.modal.description }}</small>
+        </div>
+        <div class="flex flex-col gap-2">
+          <label for="deleteAccount">{{ TEXT_CONSTANTS.deleteAccount.modal.confirmation }}</label>
+          <InputText
+            id="deleteAccount"
+            v-model="deleteConfirmation"
+            type="text"
+          />
+        </div>
+        <div class="flex justify-center gap-2">
+          <PrimeButton
+            :label="TEXT_CONSTANTS.deleteAccount.modal.cancel"
+            severity="primary"
+            outlined
+            @click="showDeleteModal = false"
+          />
+          <PrimeButton
+            :label="TEXT_CONSTANTS.deleteAccount.modal.confirm"
+            severity="primary"
+            @click="deleteAccount"
+            :disabled="!isDeletionAllowed"
+          />
+        </div>
+      </div>
+    </PrimeDialog>
     <Toast />
     <CreateFormBlockWithEvent
       :pageTitle="TEXT_CONSTANTS.title"
@@ -14,7 +57,7 @@
         <h6 class="text-lg font-bold">{{ TEXT_CONSTANTS.sections.accountProfile }}</h6>
         <div class="flex flex-col gap-2">
           <label for="id">{{ TEXT_CONSTANTS.id.label }}</label>
-          <p id="id">Test id</p>
+          <p id="id">{{ accountSettings.id }}</p>
         </div>
         <div class="flex flex-col gap-2">
           <label for="name">{{ TEXT_CONSTANTS.accountName.label }}</label>
@@ -127,7 +170,7 @@
             <label for="socialLogin">{{ TEXT_CONSTANTS.socialLogin.label }}</label>
             <InputSwitch
               id="socialLogin"
-              v-model="socialLogin"
+              v-model="isSocialLoginEnabled"
             />
           </div>
           <small>{{ TEXT_CONSTANTS.socialLogin.tipText }}</small>
@@ -137,7 +180,7 @@
             <label for="enforceMfa">{{ TEXT_CONSTANTS.enforceMFA.label }}</label>
             <InputSwitch
               id="enforceMfa"
-              v-model="enforceMFA"
+              v-model="isEnabledMfaToAllUsers"
             />
           </div>
           <small>{{ TEXT_CONSTANTS.enforceMFA.tipText }}</small>
@@ -158,19 +201,24 @@
 </template>
 
 <script setup>
-  import { onMounted, ref, watch } from 'vue'
+  import { computed, onMounted, ref } from 'vue'
   import { useForm, useField } from 'vee-validate'
   import * as yup from 'yup'
   import InputText from 'primevue/inputtext'
   import InputSwitch from 'primevue/inputswitch'
   import Dropdown from 'primevue/dropdown'
   import PrimeButton from 'primevue/button'
+  import PrimeDialog from 'primevue/dialog'
   import { useToast } from 'primevue/usetoast'
   import Toast from 'primevue/toast'
   import CreateFormBlockWithEvent from '@/templates/create-form-block/form-with-event'
   import { TEXT_CONSTANTS } from './constants'
 
   const props = defineProps({
+    getAccountSettingsService: {
+      type: Function,
+      required: true
+    },
     updateAccountSettingsService: {
       type: Function,
       required: true
@@ -191,31 +239,30 @@
 
   const validationSchema = yup.object({
     name: yup.string().required(TEXT_CONSTANTS.accountName.error),
-    country: yup.string().required(TEXT_CONSTANTS.country.error),
-    stateRegion: yup.string().required(TEXT_CONSTANTS.stateRegion.error),
-    city: yup.string().required(TEXT_CONSTANTS.city.error),
+    country: yup.object().nullable().required(TEXT_CONSTANTS.country.error),
+    stateRegion: yup.object().nullable().required(TEXT_CONSTANTS.stateRegion.error),
+    city: yup.object().nullable().required(TEXT_CONSTANTS.city.error),
     address: yup.string().required(TEXT_CONSTANTS.address.error),
     postalCode: yup.string().required(TEXT_CONSTANTS.postalCode.error)
   })
 
   const { errors, meta, resetForm, values } = useForm({ validationSchema })
 
-  const { value: name } = useField('name')
-  const { value: companyName } = useField('companyName')
+  const { value: name, setValue: setName } = useField('name')
+  const { value: companyName, setValue: setCompanyName } = useField('companyName')
   const { value: companySize, setValue: setCompanySize } = useField('companySize')
-  const { value: uniqueIdentifier } = useField('uniqueIdentifier')
-  const { value: billingEmails } = useField('billingEmails')
-  const { value: country } = useField('country')
+  const { value: uniqueIdentifier, setValue: setUniqueIdentifier } = useField('uniqueIdentifier')
+  const { value: billingEmails, setValue: setBillingEmails } = useField('billingEmails')
+  const { value: country, setValue: setCountry } = useField('country')
   const { value: stateRegion } = useField('stateRegion')
   const { value: city } = useField('city')
-  const { value: address } = useField('address')
-  const { value: complement } = useField('complement')
-  const { value: postalCode } = useField('postalCode')
-  const { value: socialLogin } = useField('socialLogin')
-  const { value: enforceMFA } = useField('enforceMFA')
+  const { value: address, setValue: setAddress } = useField('address')
+  const { value: complement, setValue: setComplement } = useField('complement')
+  const { value: postalCode, setValue: setPostalCode } = useField('postalCode')
+  const { value: isSocialLoginEnabled, setValue: setSocialLogin } = useField('socialLogin')
+  const { value: isEnabledMfaToAllUsers, setValue: setEnforceMFA } = useField('enforceMFA')
 
-  setCompanySize('10')
-
+  const accountSettings = ref({})
   const countriesOptions = ref([])
   const regionsOptions = ref([])
   const citiesOptions = ref([])
@@ -229,6 +276,49 @@
       closable: true
     })
   }
+
+  onMounted(async () => {
+    await fetchCountriesList()
+    fetchAccountSettings()
+  })
+
+  const fetchAccountSettings = async () => {
+    try {
+      accountSettings.value = await props.getAccountSettingsService()
+      setAccountFields()
+    } catch (error) {
+      displayToast(error)
+    }
+  }
+
+  const setCountryOptions = (id) => {
+    const country = countriesOptions.value.find((option) => option.id === `${id}`)
+    setCountry(country)
+  }
+
+  const formatCompanySize = (str) => {
+    // validar se existem outros formatos na string
+    const [min, max] = str.split(':')
+    return `${min} - ${max} employees`
+  }
+
+  const setAccountFields = () => {
+    const data = accountSettings.value
+
+    setName(data.name)
+    setCompanyName(data.companyName)
+    setCompanySize(formatCompanySize(data.companySize))
+    setUniqueIdentifier(data.uniqueIdentifier)
+    setBillingEmails(data.billingEmails)
+    setCountryOptions(data.countryId)
+
+    setAddress(data.address)
+    setComplement(data.complement)
+    setPostalCode(data.postalCode)
+    setSocialLogin(data.isSocialLoginEnabled)
+    setEnforceMFA(data.isEnabledMfaToAllUsers)
+  }
+
   const fetchCountriesList = async () => {
     try {
       countriesOptions.value = await props.listCountriesService()
@@ -237,33 +327,21 @@
     }
   }
 
-  const fetchRegionsList = async (selectedId) => {
-    try {
-      regionsOptions.value = await props.listRegionsService(selectedId)
-    } catch (error) {
-      displayToast(error)
-    }
-  }
+  // const fetchRegionsList = async (selectedId) => {
+  //   try {
+  //     regionsOptions.value = await props.listRegionsService(selectedId)
+  //   } catch (error) {
+  //     displayToast(error)
+  //   }
+  // }
 
-  const fetchCitiesList = async (selectedId) => {
-    try {
-      citiesOptions.value = await props.listCitiesService(selectedId)
-    } catch (error) {
-      displayToast(error)
-    }
-  }
-
-  onMounted(() => {
-    fetchCountriesList()
-  })
-
-  watch(country, (selectedId) => {
-    fetchRegionsList(selectedId)
-  })
-
-  watch(stateRegion, (selectedId) => {
-    fetchCitiesList(selectedId)
-  })
+  // const fetchCitiesList = async (selectedId) => {
+  //   try {
+  //     citiesOptions.value = await props.listCitiesService(selectedId)
+  //   } catch (error) {
+  //     displayToast(error)
+  //   }
+  // }
 
   const handleResponse = (response) => {
     if (response?.body?.key) {
@@ -271,7 +349,23 @@
     }
   }
 
+  const showDeleteModal = ref(false)
   const handleDeleteAccount = () => {
-    console.log('handleDeleteAccount')
+    showDeleteModal.value = true
+  }
+
+  const deleteConfirmation = ref('')
+  const isDeletionAllowed = computed(() => {
+    return deleteConfirmation.value === 'delete'
+  })
+  const deleteAccount = () => {
+    try {
+      // await props.updateAccountSettingsService(values)
+      showDeleteModal.value = false
+      // window.location.href = '/logout'
+    } catch (error) {
+      showDeleteModal.value = false
+      displayToast(error)
+    }
   }
 </script>

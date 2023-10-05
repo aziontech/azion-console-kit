@@ -60,6 +60,14 @@ export const TEXT_CONSTANTS = {
   },
   deleteAccount: {
     label: 'Delete Account',
-    tipText: 'This action will remove your account, its teams, users and settings.'
+    tipText: 'This action will remove your account, its teams, users and settings.',
+    modal: {
+      title: 'You are about to delete your account.',
+      description:
+        'You have a minimum term of use in your subscriptions. Please contact your Azion Account Manager to request information about early cancellation fees.',
+      confirmation: 'Type "delete" in the input to confirm:',
+      cancel: 'Cancel',
+      confirm: 'Delete account'
+    }
   }
 }
