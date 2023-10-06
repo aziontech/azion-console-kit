@@ -3,6 +3,18 @@ import { AxiosHttpClientAdapter, parseHttpResponse } from '../axios/AxiosHttpCli
 import { makeAccountIamBaseUrl } from './make-account-base-url'
 
 export const updateAccountSettings = async (payload) => {
+  payload = {
+    ...payload,
+    countryId: payload.country.id,
+    regionId: payload.region.id,
+    cityId: payload.city.id
+  }
+
+  delete payload.country
+  delete payload.region
+  delete payload.city
+  delete payload.companySize
+
   let httpResponse = await AxiosHttpClientAdapter.request({
     url: `${makeAccountIamBaseUrl()}`,
     method: 'PATCH',
@@ -15,8 +27,6 @@ export const updateAccountSettings = async (payload) => {
 }
 
 const adapt = async (httpResponse) => {
-  if (httpResponse.statusCode !== 200) return httpResponse
-
   return {
     statusCode: httpResponse.statusCode
   }
