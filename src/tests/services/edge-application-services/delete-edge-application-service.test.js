@@ -25,4 +25,17 @@ describe('EdgeApplicationServices', () => {
       url: `edge_applications/${mockId}`
     })
   })
+
+  it('should return a feedback message on successfully deleted', async () => {
+    vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
+      statusCode: 204
+    })
+    const mockId = 123
+
+    const { sut } = makeSut()
+
+    const feedbackMessage = await sut(mockId)
+
+    expect(feedbackMessage).toBe('Resource successfully deleted')
+  })
 })
