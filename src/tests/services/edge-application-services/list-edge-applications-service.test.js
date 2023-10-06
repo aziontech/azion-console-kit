@@ -54,7 +54,7 @@ describe('EdgeApplicationServices', () => {
     })
   })
 
-  it('should parsed correctly all returned domains', async () => {
+  it('should parsed correctly all returned edge applications', async () => {
     vi.setSystemTime(new Date(2023, 10, 10, 10))
     vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
       statusCode: 200,
