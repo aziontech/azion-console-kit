@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="flex flex-col min-h-[calc(100vh-120px)]">
     <Toast />
     <header class="border-neutral-200 border-b min-h-[82px] w-full flex items-center">
       <div class="p-4 w-full">

@@ -29,7 +29,6 @@
           v-if="showSidebar"
         />
 
-
         <Logo
           class="max-md:hidden cursor-pointer"
           @click="$router.push('/')"
@@ -182,7 +181,7 @@
     :pt="{
       header: { class: 'hidden' },
       root: { class: 'shadow-none' },
-      mask: {class: 'top-[57px]'},
+      mask: { class: 'top-[57px]' }
     }"
   >
     <div>
