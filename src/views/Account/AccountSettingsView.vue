@@ -300,18 +300,12 @@
     callback(selectedOption)
   }
 
-  const formatCompanySize = (str) => {
-    // validar se existem outros formatos na string
-    const [min, max] = str.split(':')
-    return `${min} - ${max} employees`
-  }
-
   const setAccountFields = () => {
     const data = accountSettings.value
 
     setName(data.name)
     setCompanyName(data.companyName)
-    setCompanySize(formatCompanySize(data.companySize))
+    setCompanySize(data.companySize)
     setUniqueIdentifier(data.uniqueIdentifier)
     setBillingEmails(data.billingEmails)
     setAddressDropdownOption(data.countryId, countriesOptions, setCountry)
