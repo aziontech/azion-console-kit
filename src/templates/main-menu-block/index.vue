@@ -189,7 +189,7 @@
         :pt="{
           submenuheader: { class: 'text-base font-bold leading-none mt-5' }
         }"
-        class="w-full md:px-4 px-3 border-none"
+        class="w-full md:px-4 px-3 border-none pb-20"
         :model="menuStructure"
       >
         <template #item="{ item, label, props }">
