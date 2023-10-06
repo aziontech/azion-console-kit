@@ -43,7 +43,7 @@ const router = createRouter({
     underDevelopmentRoutes,
     usersListsRoutes,
     variablesRoutes,
-    underDevelopmentRoutes,
+    underDevelopmentRoutes
   ]
 })
 
