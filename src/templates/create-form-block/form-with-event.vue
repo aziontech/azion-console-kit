@@ -79,12 +79,6 @@
           this.isLoading = true
           const response = await this.createService(this.formData)
           this.$emit('on-response', response)
-          this.$toast.add({
-            closable: true,
-            severity: 'success',
-            summary: 'created successfully',
-            life: 10000
-          })
         } catch (error) {
           this.$toast.add({
             closable: true,

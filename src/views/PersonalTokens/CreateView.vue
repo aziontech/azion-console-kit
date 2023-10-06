@@ -213,14 +213,20 @@
     }
   })
 
+  const toast = useToast()
   const personalTokenKey = ref('')
   const handleResponse = (response) => {
     if (response?.body?.key) {
       personalTokenKey.value = response.body.key
+      toast.add({
+        closable: true,
+        severity: 'success',
+        summary: 'Created successfully',
+        life: 10000
+      })
     }
   }
 
-  const toast = useToast()
   const copyPersonalToken = async () => {
     const toastConfig = {
       closable: true,
