@@ -203,22 +203,26 @@
   import { computed, onMounted, ref } from 'vue'
   import { useForm, useField } from 'vee-validate'
   import * as yup from 'yup'
+  import { useToast } from 'primevue/usetoast'
+  import Toast from 'primevue/toast'
   import InputText from 'primevue/inputtext'
   import InputSwitch from 'primevue/inputswitch'
   import Dropdown from 'primevue/dropdown'
   import PrimeButton from 'primevue/button'
   import PrimeDialog from 'primevue/dialog'
-  import { useToast } from 'primevue/usetoast'
-  import Toast from 'primevue/toast'
   import CreateFormBlockWithEvent from '@/templates/create-form-block/form-with-event'
   import { TEXT_CONSTANTS } from './constants'
 
   const props = defineProps({
+    deleteAccountService: {
+      type: Function,
+      required: true
+    },
     getAccountSettingsService: {
       type: Function,
       required: true
     },
-    updateAccountSettingsService: {
+    listCitiesService: {
       type: Function,
       required: true
     },
@@ -230,7 +234,7 @@
       type: Function,
       required: true
     },
-    listCitiesService: {
+    updateAccountSettingsService: {
       type: Function,
       required: true
     }
@@ -371,11 +375,12 @@
   const isDeletionAllowed = computed(() => {
     return deleteConfirmation.value === 'delete'
   })
-  const deleteAccount = () => {
+
+  const deleteAccount = async () => {
     try {
-      // await props.updateAccountSettingsService(values)
+      await props.deleteAccountService()
       showDeleteModal.value = false
-      // window.location.href = '/logout'
+      window.location.href = '/logout'
     } catch (error) {
       showDeleteModal.value = false
       displayToast('error', error)
