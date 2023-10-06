@@ -45,10 +45,9 @@
         <!--Change Twitter icon to X-->
       </div>
 
-      <div class="flex gap-4">
+      <div class="flex gap-8">
         <!-- System Status -->
         <SystemStatusBarBlock />
-
         <Dropdown
           v-model="selectedTheme"
           :options="themeOptions"
