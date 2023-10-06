@@ -19,6 +19,7 @@ import { personalTokensRoutes } from '@routes/personal-tokens-routes'
 import { underDevelopmentRoutes } from '@routes/under-development-routes'
 import { usersListsRoutes } from '@routes/users-routes'
 import { variablesRoutes } from '@routes/variables-routes'
+import { playgroundRoutes } from './routes/playground-routes'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -41,6 +42,8 @@ const router = createRouter({
     underDevelopmentRoutes,
     usersListsRoutes,
     variablesRoutes
+    underDevelopmentRoutes,
+    playgroundRoutes
   ]
 })
 

@@ -11,7 +11,7 @@
       .p-steps-number {
         color: $stepsItemNumberColor;
         border: $stepsItemBorder;
-        background: $stepsItemBg;
+        background: var(--surface-section);
         min-width: $stepsItemNumberWidth;
         height: $stepsItemNumberHeight;
         line-height: $stepsItemNumberHeight;
@@ -32,8 +32,8 @@
 
     &.p-highlight {
       .p-steps-number {
-        background: $highlightBg;
-        color: $highlightTextColor;
+        background: $primaryColor;
+        color: $primaryTextColor;
       }
 
       .p-steps-title {
