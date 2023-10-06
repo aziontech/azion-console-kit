@@ -16,10 +16,10 @@ import { intelligentDnsRoutes } from '@routes/intelligent-dns-routes'
 import { loginRoutes } from '@routes/login-routes'
 import { networkListsRoutes } from '@routes/network-lists-routes'
 import { personalTokensRoutes } from '@routes/personal-tokens-routes'
+import { playgroundRoutes } from '@/routes/playground-routes'
 import { underDevelopmentRoutes } from '@routes/under-development-routes'
 import { usersListsRoutes } from '@routes/users-routes'
 import { variablesRoutes } from '@routes/variables-routes'
-import { playgroundRoutes } from './routes/playground-routes'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -39,11 +39,11 @@ const router = createRouter({
     loginRoutes,
     networkListsRoutes,
     personalTokensRoutes,
+    playgroundRoutes,
     underDevelopmentRoutes,
     usersListsRoutes,
-    variablesRoutes
+    variablesRoutes,
     underDevelopmentRoutes,
-    playgroundRoutes
   ]
 })
 
