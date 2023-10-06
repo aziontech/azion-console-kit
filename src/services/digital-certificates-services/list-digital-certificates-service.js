@@ -17,12 +17,15 @@ export const listDigitalCertificatesService = async ({
   return parseHttpResponse(httpResponse)
 }
 
+export const EDGE_CERTIFICATE = 'Edge Certificate'
+export const TRUSTED_CA_CERTIFICATE = 'Trusted CA Certificate'
+
 const adapt = (httpResponse) => {
   const parsedDomains = httpResponse.body.results?.map((item) => {
     const subjectNames = item.subject_name.map((subject) => subject)?.join(',')
     const typeMap = {
-      edge_certificate: 'Edge Certificate',
-      trusted_ca: 'Trusted CA Certificate'
+      edge_certificate: EDGE_CERTIFICATE,
+      trusted_ca: TRUSTED_CA_CERTIFICATE
     }
     return {
       id: item.id,
