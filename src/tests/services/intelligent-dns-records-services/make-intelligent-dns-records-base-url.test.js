@@ -1,8 +1,8 @@
-import { makeIntelligentDNSBaseUrl } from '@/services/intelligent-dns-services/make-intelligent-dns-base-url'
+import { makeIntelligentDNSRecordsBaseUrl } from '@/services/intelligent-dns-records-services/make-intelligent-dns-records-base-url'
 import { assert, describe, it } from 'vitest'
 
 const makeSut = () => {
-  const sut = makeIntelligentDNSBaseUrl
+  const sut = makeIntelligentDNSRecordsBaseUrl
 
   return {
     sut
