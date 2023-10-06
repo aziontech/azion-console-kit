@@ -10,7 +10,7 @@ const makeSut = () => {
   }
 }
 
-describe('EdgeNodeServicesService', () => {
+describe('EdgeServicesServices', () => {
   it('should call API with correct params', async () => {
     const requestSpy = vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
       statusCode: 204
