@@ -50,8 +50,8 @@
       :formData="values"
       :isValid="meta.valid"
       :cleanFormCallback="resetForm"
-      @on-response="handleResponse"
-      :isRequestSuccess="false"
+      @on-response="handleUpdated"
+      :isRequestSuccess="isUpdated"
     >
       <template #form>
         <h6 class="text-lg font-bold">{{ TEXT_CONSTANTS.sections.accountProfile }}</h6>
@@ -166,9 +166,9 @@
         <h6 class="text-lg font-bold">{{ TEXT_CONSTANTS.sections.authenticationSettings }}</h6>
         <div class="flex flex-col gap-2">
           <div class="flex gap-3 items-center">
-            <label for="socialLogin">{{ TEXT_CONSTANTS.socialLogin.label }}</label>
+            <label for="isSocialLoginEnabled">{{ TEXT_CONSTANTS.socialLogin.label }}</label>
             <InputSwitch
-              id="socialLogin"
+              id="isSocialLoginEnabled"
               v-model="isSocialLoginEnabled"
             />
           </div>
@@ -176,9 +176,9 @@
         </div>
         <div class="flex flex-col gap-2">
           <div class="flex gap-3 items-center">
-            <label for="enforceMfa">{{ TEXT_CONSTANTS.enforceMFA.label }}</label>
+            <label for="isEnabledMfaToAllUsers">{{ TEXT_CONSTANTS.enforceMFA.label }}</label>
             <InputSwitch
-              id="enforceMfa"
+              id="isEnabledMfaToAllUsers"
               v-model="isEnabledMfaToAllUsers"
             />
           </div>
@@ -239,8 +239,8 @@
   const validationSchema = yup.object({
     name: yup.string().required(TEXT_CONSTANTS.accountName.error),
     country: yup.object().nullable().required(TEXT_CONSTANTS.country.error),
-    region: yup.object().nullable().required(TEXT_CONSTANTS.region.error),
-    city: yup.object().nullable().required(TEXT_CONSTANTS.city.error),
+    // region: yup.object().nullable().required(TEXT_CONSTANTS.region.error),
+    // city: yup.object().nullable().required(TEXT_CONSTANTS.city.error),
     address: yup.string().required(TEXT_CONSTANTS.address.error),
     postalCode: yup.string().required(TEXT_CONSTANTS.postalCode.error)
   })
@@ -258,8 +258,9 @@
   const { value: address, setValue: setAddress } = useField('address')
   const { value: complement, setValue: setComplement } = useField('complement')
   const { value: postalCode, setValue: setPostalCode } = useField('postalCode')
-  const { value: isSocialLoginEnabled, setValue: setSocialLogin } = useField('socialLogin')
-  const { value: isEnabledMfaToAllUsers, setValue: setEnforceMFA } = useField('enforceMFA')
+  const { value: isSocialLoginEnabled, setValue: setSocialLogin } = useField('isSocialLoginEnabled')
+  const { value: isEnabledMfaToAllUsers, setValue: setEnforceMFA } =
+    useField('isEnabledMfaToAllUsers')
 
   const accountSettings = ref({})
   const countriesOptions = ref([])
@@ -267,9 +268,9 @@
   const citiesOptions = ref([])
 
   const toast = useToast()
-  const displayToast = (summary) => {
+  const displayToast = (severity, summary) => {
     toast.add({
-      severity: 'error',
+      severity,
       summary,
       life: 5000,
       closable: true
@@ -286,7 +287,7 @@
       accountSettings.value = await props.getAccountSettingsService()
       setAccountFields()
     } catch (error) {
-      displayToast(error)
+      displayToast('error', error)
     }
   }
 
@@ -323,7 +324,7 @@
     try {
       countriesOptions.value = await props.listCountriesService()
     } catch (error) {
-      displayToast(error)
+      displayToast('error', error)
     }
   }
 
@@ -337,7 +338,7 @@
         setAddressDropdownOption(regionId, regionsOptions, setRegion)
       }
     } catch (error) {
-      displayToast(error)
+      displayToast('error', error)
     }
   }
 
@@ -351,14 +352,14 @@
         setAddressDropdownOption(cityId, citiesOptions, setCity)
       }
     } catch (error) {
-      displayToast(error)
+      displayToast('error', error)
     }
   }
 
-  const handleResponse = (response) => {
-    if (response?.body?.key) {
-      console.log(response)
-    }
+  const isUpdated = ref(false)
+  const handleUpdated = () => {
+    displayToast('success', 'Updated successfully')
+    isUpdated.value = true
   }
 
   const showDeleteModal = ref(false)
@@ -377,7 +378,7 @@
       // window.location.href = '/logout'
     } catch (error) {
       showDeleteModal.value = false
-      displayToast(error)
+      displayToast('error', error)
     }
   }
 </script>
