@@ -1,4 +1,10 @@
-import * as DomainsServices from '@/services/domains-services'
+import {
+  listDomainsService,
+  loadDomainService,
+  deleteDomainService,
+  createDomainService,
+  editDomainService
+} from '@/services/domains-services'
 import { listDigitalCertificatesService } from '@/services/digital-certificates-services'
 import { listEdgeApplicationsService } from '@/services/edge-application-services'
 
@@ -12,8 +18,8 @@ export const domainsRoutes = {
       name: 'list-domains',
       component: () => import('@views/Domains/ListView.vue'),
       props: {
-        listDomainsService: DomainsServices.listDomainsService,
-        deleteDomainsService: DomainsServices.deleteDomainService
+        listDomainsService,
+        deleteDomainService
       },
       meta: {
         breadCrumbs: [
@@ -29,7 +35,7 @@ export const domainsRoutes = {
       name: 'create-domains',
       component: () => import('@views/Domains/CreateView.vue'),
       props: {
-        createDomainService: DomainsServices.createDomainService,
+        createDomainService,
         listDigitalCertificatesService,
         listEdgeApplicationsService
       },
@@ -42,6 +48,28 @@ export const domainsRoutes = {
           {
             label: 'Create Domains',
             to: '/domains/create'
+          }
+        ]
+      }
+    },
+    {
+      path: 'edit/:id',
+      name: 'edit-domains',
+      component: () => import('@views/Domains/EditView.vue'),
+      props: {
+        editDomainService,
+        listDigitalCertificatesService,
+        listEdgeApplicationsService,
+        loadDomainService
+      },
+      meta: {
+        breadCrumbs: [
+          {
+            label: 'Domains',
+            to: '/domains'
+          },
+          {
+            label: 'Edit Domain'
           }
         ]
       }
