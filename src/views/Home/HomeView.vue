@@ -12,7 +12,10 @@
       </div>
       <!-- TabView Custom -->
       <div class="flex my-2 mx-auto">
-        <TabView :scrollable="true" class="w-full">
+        <TabView
+          :scrollable="true"
+          class="w-full"
+        >
           <TabPanel header="Main Settings">
             <div class="p-4">
               <p>Tab 1</p>
