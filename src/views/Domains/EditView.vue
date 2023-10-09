@@ -22,6 +22,11 @@
       </div>
 
       <div class="flex flex-col gap-2">
+        <label for="name">Domain:</label>
+        <p>{{ domainName.value }}</p>
+      </div>
+
+      <div class="flex flex-col gap-2">
         <label for="edge-application">Edge Application:</label>
         <Dropdown
           :class="{ 'p-invalid': errors.edgeApplication }"
@@ -209,7 +214,11 @@
       const validationSchema = yup.object({
         id: yup.string().required(),
         name: yup.string().required(),
-        cnames: yup.string().required(),
+        domainName: yup.string().required(),
+        cnames: yup.string().when('cnameAccessOnly', {
+          is: true,
+          then: (schema) => schema.required()
+        }),
         cnameAccessOnly: yup.boolean(),
         edgeApplication: yup.number(),
         edgeCertificate: yup.string().optional(),
@@ -224,7 +233,6 @@
       const { setValues, errors, defineInputBinds, meta, resetForm, values } = useForm({
         validationSchema,
         initialValues: {
-          cnames: [],
           cnameAccessOnly: true,
           edgeApplication: null,
           mtlsIsEnabled: false,
@@ -241,9 +249,11 @@
       const { value: mtlsTrustedCertificate } = useField('mtlsTrustedCertificate')
 
       const name = defineInputBinds('name', { validateOnInput: true })
+      const domainName = defineInputBinds('domainName', { validateOnInput: true })
 
       return {
         name,
+        domainName,
         cnames,
         cnameAccessOnly,
         edgeApplication,
