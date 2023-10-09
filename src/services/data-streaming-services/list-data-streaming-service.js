@@ -1,5 +1,9 @@
 import { AxiosHttpClientAdapter, parseHttpResponse } from '../axios/AxiosHttpClientAdapter'
-import { makeDataStreamingBaseUrl, makeDataStreamingDomainsBaseUrl, makeDataStreamingTemplateBaseUrl } from './make-data-streaming-base-url'
+import {
+  makeDataStreamingBaseUrl,
+  makeDataStreamingDomainsBaseUrl,
+  makeDataStreamingTemplateBaseUrl
+} from './make-data-streaming-base-url'
 
 export const listDataStreamingService = async () => {
   let httpResponse = await AxiosHttpClientAdapter.request({

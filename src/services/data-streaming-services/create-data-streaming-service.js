@@ -20,7 +20,7 @@ const adapt = (payload) => {
     data_source: payload.dataSource,
     domain_ids: allDomains ? [] : getDomains(payload.domains),
     all_domains: allDomains ? true : false,
-    endpoint: getEndpoint(payload),
+    endpoint: getEndpoint(payload)
   }
 }
 
@@ -56,7 +56,7 @@ const getEndpoint = (payload) => {
       return {
         endpoint_type: 'big_query',
         dataset_id: payload.datasetID,
-        project_id: payload.projectID, 
+        project_id: payload.projectID,
         table_id: payload.tableID,
         service_account_key: payload.serviceAccountKey
       }
@@ -115,7 +115,7 @@ const getDomains = (domains) => {
   const domainsIDs = []
   domains.forEach((domain) => {
     domainsIDs.push(domain.domainID)
-  });
+  })
 
   return domainsIDs
 }
@@ -124,7 +124,7 @@ const getHeaders = (listHeaders) => {
   const headers = {}
   listHeaders.forEach((header, index) => {
     if (header.value) {
-      headers[`header-name-${index+1}`] = header.value
+      headers[`header-name-${index + 1}`] = header.value
     }
   })
   return headers

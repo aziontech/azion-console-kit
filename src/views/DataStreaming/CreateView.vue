@@ -51,18 +51,41 @@
       <label>Options:</label>
       <div class="flex flex-wrap gap-3">
         <div class="flex align-items-center">
-          <RadioButton v-model="domainOption" inputId="filter-domain" name="filter domain" value="0" />
-          <label for="filter-domain" class="ml-2">Filter Domains</label>
+          <RadioButton
+            v-model="domainOption"
+            inputId="filter-domain"
+            name="filter domain"
+            value="0"
+          />
+          <label
+            for="filter-domain"
+            class="ml-2"
+            >Filter Domains</label
+          >
         </div>
         <div class="flex align-items-center">
-          <RadioButton v-model="domainOption" inputId="all-domain" name="all domain" value="1" />
-          <label for="all-domain" class="ml-2">All Domains</label>
+          <RadioButton
+            v-model="domainOption"
+            inputId="all-domain"
+            name="all domain"
+            value="1"
+          />
+          <label
+            for="all-domain"
+            class="ml-2"
+            >All Domains</label
+          >
         </div>
       </div>
-      
-      <div v-if="domainOption === '0'"> 
+
+      <div v-if="domainOption === '0'">
         <label>Domains:</label>
-        <PickList v-model="listDomains" listStyle="height:342px" dataKey="id" breakpoint="1400px">
+        <PickList
+          v-model="listDomains"
+          listStyle="height:342px"
+          dataKey="id"
+          breakpoint="1400px"
+        >
           <template #sourceheader>Available Domains</template>
           <template #targetheader>Chosen Domains</template>
           <template #item="slotProps">
@@ -86,9 +109,13 @@
         optionValue="value"
         class="w-full"
       />
-      
+
       <!-- Specific Sections for Different Endpoints -->
-      <div id="standard" class="flex flex-col gap-3" v-if="endpoint === 'standard'">
+      <div
+        id="standard"
+        class="flex flex-col gap-3"
+        v-if="endpoint === 'standard'"
+      >
         <label>Endpoint URL: *</label>
         <InputText
           v-model="endpointUrl"
@@ -99,15 +126,27 @@
         />
 
         <label>Custom Headers:</label>
-        <div class="p-inputgroup flex-1" v-for="(header, index) in headers" :key="index">
+        <div
+          class="p-inputgroup flex-1"
+          v-for="(header, index) in headers"
+          :key="index"
+        >
           <InputText
             v-model="header.value"
             type="text"
             placeholder="header-name: value"
           />
-          <ButtonPrimer icon="pi pi-times" severity="danger" v-if="header.deleted" @click="removeHeader(index)" />
+          <ButtonPrimer
+            icon="pi pi-times"
+            severity="danger"
+            v-if="header.deleted"
+            @click="removeHeader(index)"
+          />
         </div>
-        <ButtonPrimer label="Header" @click="addHeader()" />
+        <ButtonPrimer
+          label="Header"
+          @click="addHeader()"
+        />
 
         <h1>Payload</h1>
 
@@ -139,7 +178,11 @@
         />
       </div>
 
-      <div id="kafka" class="flex flex-col gap-3" v-if="endpoint === 'kafka'">
+      <div
+        id="kafka"
+        class="flex flex-col gap-3"
+        v-if="endpoint === 'kafka'"
+      >
         <label>Bootstrap Servers: *</label>
         <InputText
           v-model="bootstrapServers"
@@ -160,17 +203,39 @@
         <label>Use Transport Layer Security (TLS):</label>
         <div class="flex flex-wrap gap-3">
           <div class="flex align-items-center">
-            <RadioButton v-model="tlsOption" inputId="no" name="No" :value="false" />
-            <label for="no" class="ml-2">No</label>
+            <RadioButton
+              v-model="tlsOption"
+              inputId="no"
+              name="No"
+              :value="false"
+            />
+            <label
+              for="no"
+              class="ml-2"
+              >No</label
+            >
           </div>
           <div class="flex align-items-center">
-            <RadioButton v-model="tlsOption" inputId="yes" name="Yes" :value="true" />
-            <label for="yes" class="ml-2">Yes</label>
+            <RadioButton
+              v-model="tlsOption"
+              inputId="yes"
+              name="Yes"
+              :value="true"
+            />
+            <label
+              for="yes"
+              class="ml-2"
+              >Yes</label
+            >
           </div>
         </div>
       </div>
 
-      <div id="s3" class="flex flex-col gap-3" v-if="endpoint === 's3'">
+      <div
+        id="s3"
+        class="flex flex-col gap-3"
+        v-if="endpoint === 's3'"
+      >
         <label>Host URL: *</label>
         <InputText
           v-model="host"
@@ -230,7 +295,11 @@
         />
       </div>
 
-      <div id="big_query" class="flex flex-col gap-3" v-if="endpoint === 'big_query'">
+      <div
+        id="big_query"
+        class="flex flex-col gap-3"
+        v-if="endpoint === 'big_query'"
+      >
         <label>Project ID: *</label>
         <InputText
           v-model="projectID"
@@ -265,7 +334,11 @@
         />
       </div>
 
-      <div id="elasticsearch" class="flex flex-col gap-3" v-if="endpoint === 'elasticsearch'">
+      <div
+        id="elasticsearch"
+        class="flex flex-col gap-3"
+        v-if="endpoint === 'elasticsearch'"
+      >
         <label>Elasticsearch URL: *</label>
         <InputText
           v-model="elasticsearchUrl"
@@ -284,7 +357,11 @@
         />
       </div>
 
-      <div id="splunk" class="flex flex-col gap-3" v-if="endpoint === 'splunk'">
+      <div
+        id="splunk"
+        class="flex flex-col gap-3"
+        v-if="endpoint === 'splunk'"
+      >
         <label>Splunk URL: *</label>
         <InputText
           v-model="splunkUrl"
@@ -303,7 +380,11 @@
         />
       </div>
 
-      <div id="aws_kinesis_firehose" class="flex flex-col gap-3" v-if="endpoint === 'aws_kinesis_firehose'">
+      <div
+        id="aws_kinesis_firehose"
+        class="flex flex-col gap-3"
+        v-if="endpoint === 'aws_kinesis_firehose'"
+      >
         <label>Stream Name: *</label>
         <InputText
           v-model="streamName"
@@ -337,7 +418,11 @@
         />
       </div>
 
-      <div id="datadog" class="flex flex-col gap-3" v-if="endpoint === 'datadog'">
+      <div
+        id="datadog"
+        class="flex flex-col gap-3"
+        v-if="endpoint === 'datadog'"
+      >
         <label>Datadog URL: *</label>
         <InputText
           v-model="datadogUrl"
@@ -356,7 +441,11 @@
         />
       </div>
 
-      <div id="qradar" class="flex flex-col gap-3" v-if="endpoint === 'qradar'">
+      <div
+        id="qradar"
+        class="flex flex-col gap-3"
+        v-if="endpoint === 'qradar'"
+      >
         <label>QRadar URL: *</label>
         <InputText
           v-model="QRadarUrl"
@@ -367,7 +456,11 @@
         />
       </div>
 
-      <div id="azure_monitor" class="flex flex-col gap-3" v-if="endpoint === 'azure_monitor'">
+      <div
+        id="azure_monitor"
+        class="flex flex-col gap-3"
+        v-if="endpoint === 'azure_monitor'"
+      >
         <label>Log Type: *</label>
         <InputText
           v-model="logType"
@@ -401,7 +494,11 @@
         />
       </div>
 
-      <div id="azure_blob_storage" class="flex flex-col gap-3" v-if="endpoint === 'azure_blob_storage'">
+      <div
+        id="azure_blob_storage"
+        class="flex flex-col gap-3"
+        v-if="endpoint === 'azure_blob_storage'"
+      >
         <label>Storage Account: *</label>
         <InputText
           v-model="storageAccount"
@@ -431,426 +528,432 @@
 </template>
 
 <script setup>
-import { computed, onMounted, ref, watch } from 'vue'
-import { useForm, useField } from 'vee-validate'
-import * as yup from 'yup'
+  import { computed, onMounted, ref, watch } from 'vue'
+  import { useForm, useField } from 'vee-validate'
+  import * as yup from 'yup'
 
-// Import the components
-import CreateFormBlock from '@/templates/create-form-block'
-import Dropdown from 'primevue/dropdown'
-import RadioButton from 'primevue/radiobutton';
-import PickList from 'primevue/picklist';
-import InputText from 'primevue/inputtext';
-import ButtonPrimer from 'primevue/button';
-import InputNumber from 'primevue/inputnumber';
-import Textarea from 'primevue/textarea';
+  // Import the components
+  import CreateFormBlock from '@/templates/create-form-block'
+  import Dropdown from 'primevue/dropdown'
+  import RadioButton from 'primevue/radiobutton'
+  import PickList from 'primevue/picklist'
+  import InputText from 'primevue/inputtext'
+  import ButtonPrimer from 'primevue/button'
+  import InputNumber from 'primevue/inputnumber'
+  import Textarea from 'primevue/textarea'
 
-const props = defineProps({
-  createDataStreamingService: {
-    type: Function,
-    required: true
-  },
-  listDataStreamingTemplateService: {
-    type: Function,
-    required: true
-  },
-  listDataStreamingDomainsService: {
-    type: Function,
-    required: true
-  }
-})
+  const props = defineProps({
+    createDataStreamingService: {
+      type: Function,
+      required: true
+    },
+    listDataStreamingTemplateService: {
+      type: Function,
+      required: true
+    },
+    listDataStreamingDomainsService: {
+      type: Function,
+      required: true
+    }
+  })
 
-// Variables
-const listDataSources = ref([
-  { label: 'Activity History', value: 'rtm_activity' },
-  { label: 'Edge Applications', value: 'http' },
-  { label: 'Edge Functions', value: 'cells_console' },
-  { label: 'WAF Events', value: 'waf' },
-])
-const listTemplates = ref('')
-const dataSet = ref('')
-const listDomains = ref('')
-const listEndpoint = ref([
-  { label: 'Standard HTTP/HTTPS POST', value: 'standard' },
-  { label: 'Apache Kafka', value: 'kafka' },
-  { label: 'Simple Storage Service (S3)', value: 's3' },
-  { label: 'Google BigQuery', value: 'big_query' },
-  { label: 'Elasticsearch', value: 'elasticsearch' },
-  { label: 'Splunk', value: 'splunk' },
-  { label: 'AWS Kinesis Data Firehose', value: 'aws_kinesis_firehose' },
-  { label: 'Datadog', value: 'datadog' },
-  { label: 'IBM QRadar', value: 'qradar' },
-  { label: 'Azure Monitor', value: 'azure_monitor' },
-  { label: 'Azure Blob Storage', value: 'azure_blob_storage' },
-])
-const listContentType = ref([
-  { label: 'plain/text', value: 'plain/text' },
-  { label: 'application/gzip', value: 'application/gzip' },
-])
+  // Variables
+  const listDataSources = ref([
+    { label: 'Activity History', value: 'rtm_activity' },
+    { label: 'Edge Applications', value: 'http' },
+    { label: 'Edge Functions', value: 'cells_console' },
+    { label: 'WAF Events', value: 'waf' }
+  ])
+  const listTemplates = ref('')
+  const dataSet = ref('')
+  const listDomains = ref('')
+  const listEndpoint = ref([
+    { label: 'Standard HTTP/HTTPS POST', value: 'standard' },
+    { label: 'Apache Kafka', value: 'kafka' },
+    { label: 'Simple Storage Service (S3)', value: 's3' },
+    { label: 'Google BigQuery', value: 'big_query' },
+    { label: 'Elasticsearch', value: 'elasticsearch' },
+    { label: 'Splunk', value: 'splunk' },
+    { label: 'AWS Kinesis Data Firehose', value: 'aws_kinesis_firehose' },
+    { label: 'Datadog', value: 'datadog' },
+    { label: 'IBM QRadar', value: 'qradar' },
+    { label: 'Azure Monitor', value: 'azure_monitor' },
+    { label: 'Azure Blob Storage', value: 'azure_blob_storage' }
+  ])
+  const listContentType = ref([
+    { label: 'plain/text', value: 'plain/text' },
+    { label: 'application/gzip', value: 'application/gzip' }
+  ])
 
-// Schema de Validação
-const validationSchema = yup.object({
-  name: yup.string().required(),
-  dataSource: yup.string().required(),
-  template: yup.string().required(),
-  dataSet: yup.string(),
-  domainOption: yup.string().required(),
-  endpoint: yup.string().required(),
-
-  // standard
-  endpointUrl: yup.string().when('endpoint', {
-    is: 'standard',
-    then: (schema) => schema.required('endpoint url is a required field')
-  }),
-  headers: yup.array().of(
-    yup.object().shape({
-      value: yup.string().when('endpoint', {
-        is: 'standard',
-        then: (schema) => schema.required('header value is required')
-      })
-    })
-  ),
-  maxSize: yup.string().when('endpoint', {
-    is: 'standard',
-    then: (schema) => schema.required('max size is a required field')
-  }),
-  lineSeparator: yup.string().when('endpoint', {
-    is: 'standard',
-    then: (schema) => schema.required('log line separator is a required field')
-  }),
-  payloadFormat: yup.string().when('endpoint', {
-    is: 'standard',
-    then: (schema) => schema.required('payload format is a required field')
-  }),
-
-  // Kafka
-  bootstrapServers: yup.string().when('endpoint', {
-    is: 'kafka',
-    then: (schema) => schema.max(150).required('bootstrap servers is a required field')
-  }),
-  kafkaTopic: yup.string().when('endpoint', {
-    is: 'kafka',
-    then: (schema) => schema.max(150).required('kafka topic is a required field')
-  }),
-
-  // s3
-  host: yup.string().when('endpoint', {
-    is: 's3',
-    then: (schema) => schema.max(200).required('host is a required field')
-  }),
-  bucket: yup.string().when('endpoint', {
-    is: 's3',
-    then: (schema) => schema.max(150).required('bucket is a required field')
-  }),
-  region: yup.string().when('endpoint', {
-    is: 's3',
-    then: (schema) => schema.max(50).required('region is a required field')
-  }),
-  accessKey: yup.string().when('endpoint', {
-    is: 's3',
-    then: (schema) => schema.max(150).required('access key is a required field')
-  }),
-  secretKey: yup.string().when('endpoint', {
-    is: 's3',
-    then: (schema) => schema.max(150).required('secret key is a required field')
-  }),
-  objectKey: yup.string().when('endpoint', {
-    is: 's3',
-    then: (schema) => schema.max(150).required('object key prefix is a required field')
-  }),
-
-  // google big query
-  projectID: yup.string().when('endpoint', {
-    is: 'big_query',
-    then: (schema) => schema.required('Project id is a required field')
-  }),
-  datasetID: yup.string().when('endpoint', {
-    is: 'big_query',
-    then: (schema) => schema.required('dataset id is a required field')
-  }),
-  tableID: yup.string().when('endpoint', {
-    is: 'big_query',
-    then: (schema) => schema.required('table id is a required field')
-  }),
-  serviceAccountKey: yup.string().when('endpoint', {
-    is: 'big_query',
-    then: (schema) => schema.required('service account key is a required field')
-  }),
-
-  // elasticsearch
-  elasticsearchUrl: yup.string().when('endpoint', {
-    is: 'elasticsearch',
-    then: (schema) => schema.required('elasticsearch url is a required field')
-  }),
-  apiKey: yup.string().when('endpoint', {
-    is: 'elasticsearch',
-    then: (schema) => schema.required('api key is a required field')
-  }),
-
-  // splunk
-  splunkUrl: yup.string().when('endpoint', {
-    is: 'splunk',
-    then: (schema) => schema.required('splunk url is a required field')
-  }),
-  splunkApiKey: yup.string().when('endpoint', {
-    is: 'splunk',
-    then: (schema) => schema.required('api key is a required field')
-  }),
-
-  // aws_kinesis_firehose
-  streamName: yup.string().when('endpoint', {
-    is: 'aws_kinesis_firehose',
-    then: (schema) => schema.required('stream name is a required field')
-  }),
-  awsRegion: yup.string().when('endpoint', {
-    is: 'aws_kinesis_firehose',
-    then: (schema) => schema.required('region is a required field')
-  }),
-  awsAccessKey: yup.string().when('endpoint', {
-    is: 'aws_kinesis_firehose',
-    then: (schema) => schema.required('access key is a required field')
-  }),
-  awsSecretKey: yup.string().when('endpoint', {
-    is: 'aws_kinesis_firehose',
-    then: (schema) => schema.required('secret key is a required field')
-  }),
-
-  // datadog
-  datadogUrl: yup.string().when('endpoint', {
-    is: 'datadog',
-    then: (schema) => schema.required('datadog url is a required field')
-  }),
-  datadogApiKey: yup.string().when('endpoint', {
-    is: 'datadog',
-    then: (schema) => schema.required('api key is a required field')
-  }),
-
-  // QRadar
-  QRadarUrl: yup.string().when('endpoint', {
-    is: 'qradar',
-    then: (schema) => schema.required('qradar url is a required field')
-  }),
-
-  // azure_monitor
-  logType: yup.string().when('endpoint', {
-    is: 'azure_monitor',
-    then: (schema) => schema.required('log type is a required field')
-  }),
-  sharedKey: yup.string().when('endpoint', {
-    is: 'azure_monitor',
-    then: (schema) => schema.required('shared key is a required field')
-  }),
-  workspaceID: yup.string().when('endpoint', {
-    is: 'azure_monitor',
-    then: (schema) => schema.required('workspace id is a required field')
-  }),
-
-  // azure_blob_storage
-  storageAccount: yup.string().when('endpoint', {
-    is: 'azure_blob_storage',
-    then: (schema) => schema.required('storage account is a required field')
-  }),
-  containerName: yup.string().when('endpoint', {
-    is: 'azure_blob_storage',
-    then: (schema) => schema.required('container name is a required field')
-  }),
-  blobToken: yup.string().when('endpoint', {
-    is: 'azure_blob_storage',
-    then: (schema) => schema.required('blob sas token is a required field')
-  }),
-})
-
-// Form e VeeValidate
-const { errors, /*defineInputBinds,*/ meta, resetForm, values } = useForm({
-  validationSchema,
-  initialValues: {
-    name: '',
-    dataSource: 'http',
-    template: '',
-    dataSet: '',
-    domainOption: '1',
-    endpoint: '',
+  // Schema de Validação
+  const validationSchema = yup.object({
+    name: yup.string().required(),
+    dataSource: yup.string().required(),
+    template: yup.string().required(),
+    dataSet: yup.string(),
+    domainOption: yup.string().required(),
+    endpoint: yup.string().required(),
 
     // standard
-    endpointUrl: '',
-    headers: [{ value: '', deleted: false }],
-    maxSize: '',
-    lineSeparator: '\n',
-    payloadFormat: '$dataset',
+    endpointUrl: yup.string().when('endpoint', {
+      is: 'standard',
+      then: (schema) => schema.required('endpoint url is a required field')
+    }),
+    headers: yup.array().of(
+      yup.object().shape({
+        value: yup.string().when('endpoint', {
+          is: 'standard',
+          then: (schema) => schema.required('header value is required')
+        })
+      })
+    ),
+    maxSize: yup.string().when('endpoint', {
+      is: 'standard',
+      then: (schema) => schema.required('max size is a required field')
+    }),
+    lineSeparator: yup.string().when('endpoint', {
+      is: 'standard',
+      then: (schema) => schema.required('log line separator is a required field')
+    }),
+    payloadFormat: yup.string().when('endpoint', {
+      is: 'standard',
+      then: (schema) => schema.required('payload format is a required field')
+    }),
 
     // Kafka
-    bootstrapServers: '',
-    kafkaTopic: '',
-    tlsOption: false,
+    bootstrapServers: yup.string().when('endpoint', {
+      is: 'kafka',
+      then: (schema) => schema.max(150).required('bootstrap servers is a required field')
+    }),
+    kafkaTopic: yup.string().when('endpoint', {
+      is: 'kafka',
+      then: (schema) => schema.max(150).required('kafka topic is a required field')
+    }),
 
     // s3
-    host: '',
-    bucket: '',
-    region: '',
-    accessKey: '',
-    secretKey: '',
-    objectKey: '',
-    contentType: { label: 'plain/text', value: 'plain/text' },
+    host: yup.string().when('endpoint', {
+      is: 's3',
+      then: (schema) => schema.max(200).required('host is a required field')
+    }),
+    bucket: yup.string().when('endpoint', {
+      is: 's3',
+      then: (schema) => schema.max(150).required('bucket is a required field')
+    }),
+    region: yup.string().when('endpoint', {
+      is: 's3',
+      then: (schema) => schema.max(50).required('region is a required field')
+    }),
+    accessKey: yup.string().when('endpoint', {
+      is: 's3',
+      then: (schema) => schema.max(150).required('access key is a required field')
+    }),
+    secretKey: yup.string().when('endpoint', {
+      is: 's3',
+      then: (schema) => schema.max(150).required('secret key is a required field')
+    }),
+    objectKey: yup.string().when('endpoint', {
+      is: 's3',
+      then: (schema) => schema.max(150).required('object key prefix is a required field')
+    }),
 
     // google big query
-    projectID: '',
-    datasetID: '',
-    tableID: '',
-    serviceAccountKey: '',
+    projectID: yup.string().when('endpoint', {
+      is: 'big_query',
+      then: (schema) => schema.required('Project id is a required field')
+    }),
+    datasetID: yup.string().when('endpoint', {
+      is: 'big_query',
+      then: (schema) => schema.required('dataset id is a required field')
+    }),
+    tableID: yup.string().when('endpoint', {
+      is: 'big_query',
+      then: (schema) => schema.required('table id is a required field')
+    }),
+    serviceAccountKey: yup.string().when('endpoint', {
+      is: 'big_query',
+      then: (schema) => schema.required('service account key is a required field')
+    }),
 
     // elasticsearch
-    elasticsearchUrl: '',
-    apiKey: '',
+    elasticsearchUrl: yup.string().when('endpoint', {
+      is: 'elasticsearch',
+      then: (schema) => schema.required('elasticsearch url is a required field')
+    }),
+    apiKey: yup.string().when('endpoint', {
+      is: 'elasticsearch',
+      then: (schema) => schema.required('api key is a required field')
+    }),
 
     // splunk
-    splunkUrl: '',
-    splunkApiKey: '',
+    splunkUrl: yup.string().when('endpoint', {
+      is: 'splunk',
+      then: (schema) => schema.required('splunk url is a required field')
+    }),
+    splunkApiKey: yup.string().when('endpoint', {
+      is: 'splunk',
+      then: (schema) => schema.required('api key is a required field')
+    }),
 
     // aws_kinesis_firehose
-    streamName: '',
-    awsRegion: '',
-    awsAccessKey: '',
-    awsSecretKey: '',
+    streamName: yup.string().when('endpoint', {
+      is: 'aws_kinesis_firehose',
+      then: (schema) => schema.required('stream name is a required field')
+    }),
+    awsRegion: yup.string().when('endpoint', {
+      is: 'aws_kinesis_firehose',
+      then: (schema) => schema.required('region is a required field')
+    }),
+    awsAccessKey: yup.string().when('endpoint', {
+      is: 'aws_kinesis_firehose',
+      then: (schema) => schema.required('access key is a required field')
+    }),
+    awsSecretKey: yup.string().when('endpoint', {
+      is: 'aws_kinesis_firehose',
+      then: (schema) => schema.required('secret key is a required field')
+    }),
 
     // datadog
-    datadogUrl: '',
-    datadogApiKey: '',
+    datadogUrl: yup.string().when('endpoint', {
+      is: 'datadog',
+      then: (schema) => schema.required('datadog url is a required field')
+    }),
+    datadogApiKey: yup.string().when('endpoint', {
+      is: 'datadog',
+      then: (schema) => schema.required('api key is a required field')
+    }),
 
     // QRadar
-    QRadarUrl: '',
+    QRadarUrl: yup.string().when('endpoint', {
+      is: 'qradar',
+      then: (schema) => schema.required('qradar url is a required field')
+    }),
 
     // azure_monitor
-    logType: '',
-    sharedKey: '',
-    generatedField: '',
-    workspaceID: '',
+    logType: yup.string().when('endpoint', {
+      is: 'azure_monitor',
+      then: (schema) => schema.required('log type is a required field')
+    }),
+    sharedKey: yup.string().when('endpoint', {
+      is: 'azure_monitor',
+      then: (schema) => schema.required('shared key is a required field')
+    }),
+    workspaceID: yup.string().when('endpoint', {
+      is: 'azure_monitor',
+      then: (schema) => schema.required('workspace id is a required field')
+    }),
 
     // azure_blob_storage
-    storageAccount: '',
-    containerName: '',
-    blobToken: ''
-  },
-})
+    storageAccount: yup.string().when('endpoint', {
+      is: 'azure_blob_storage',
+      then: (schema) => schema.required('storage account is a required field')
+    }),
+    containerName: yup.string().when('endpoint', {
+      is: 'azure_blob_storage',
+      then: (schema) => schema.required('container name is a required field')
+    }),
+    blobToken: yup.string().when('endpoint', {
+      is: 'azure_blob_storage',
+      then: (schema) => schema.required('blob sas token is a required field')
+    })
+  })
 
-// Campos do formulário
-const { value: name } = useField('name')
-const { value: dataSource } = useField('dataSource')
-const { value: template } = useField('template')
-const { value: domainOption } = useField('domainOption')
-const { value: endpoint } = useField('endpoint')
+  // Form e VeeValidate
+  const { errors, /*defineInputBinds,*/ meta, resetForm, values } = useForm({
+    validationSchema,
+    initialValues: {
+      name: '',
+      dataSource: 'http',
+      template: '',
+      dataSet: '',
+      domainOption: '1',
+      endpoint: '',
 
-// standard
-const { value: endpointUrl } = useField('endpointUrl')
-const { value: headers } = useField('headers')
-const { value: maxSize } = useField('maxSize')
-const { value: lineSeparator } = useField('lineSeparator')
-const { value: payloadFormat } = useField('payloadFormat')
+      // standard
+      endpointUrl: '',
+      headers: [{ value: '', deleted: false }],
+      maxSize: '',
+      lineSeparator: '\n',
+      payloadFormat: '$dataset',
 
-// kafka
-const { value: bootstrapServers } = useField('bootstrapServers')
-const { value: kafkaTopic } = useField('kafkaTopic')
-const { value: tlsOption } = useField('tlsOption')
+      // Kafka
+      bootstrapServers: '',
+      kafkaTopic: '',
+      tlsOption: false,
 
-// s3
-const { value: host } = useField('host')
-const { value: bucket } = useField('bucket')
-const { value: region } = useField('region')
-const { value: accessKey } = useField('accessKey')
-const { value: secretKey } = useField('secretKey')
-const { value: objectKey } = useField('objectKey')
-const { value: contentType } = useField('contentType')
+      // s3
+      host: '',
+      bucket: '',
+      region: '',
+      accessKey: '',
+      secretKey: '',
+      objectKey: '',
+      contentType: { label: 'plain/text', value: 'plain/text' },
 
-// google big query
-const { value: projectID } = useField('projectID')
-const { value: datasetID } = useField('datasetID')
-const { value: tableID } = useField('tableID')
-const { value: serviceAccountKey } = useField('serviceAccountKey')
+      // google big query
+      projectID: '',
+      datasetID: '',
+      tableID: '',
+      serviceAccountKey: '',
 
-// elasticsearch
-const { value: elasticsearchUrl } = useField('elasticsearchUrl')
-const { value: apiKey } = useField('apiKey')
+      // elasticsearch
+      elasticsearchUrl: '',
+      apiKey: '',
 
-// splunk
-const { value: splunkUrl } = useField('splunkUrl')
-const { value: splunkApiKey } = useField('splunkApiKey')
+      // splunk
+      splunkUrl: '',
+      splunkApiKey: '',
 
-// aws_kinesis_firehose
-const { value: streamName } = useField('streamName')
-const { value: awsRegion } = useField('awsRegion')
-const { value: awsAccessKey } = useField('awsAccessKey')
-const { value: awsSecretKey } = useField('awsSecretKey')
+      // aws_kinesis_firehose
+      streamName: '',
+      awsRegion: '',
+      awsAccessKey: '',
+      awsSecretKey: '',
 
-// datadog
-const { value: datadogUrl } = useField('datadogUrl')
-const { value: datadogApiKey } = useField('datadogApiKey')
+      // datadog
+      datadogUrl: '',
+      datadogApiKey: '',
 
-// QRadar
-const { value: QRadarUrl } = useField('QRadarUrl')
+      // QRadar
+      QRadarUrl: '',
 
-// azure_monitor
-const { value: logType } = useField('logType')
-const { value: sharedKey } = useField('sharedKey')
-const { value: generatedField } = useField('generatedField')
-const { value: workspaceID } = useField('workspaceID')
+      // azure_monitor
+      logType: '',
+      sharedKey: '',
+      generatedField: '',
+      workspaceID: '',
 
-// azure_blob_storage
-const { value: storageAccount } = useField('storageAccount')
-const { value: containerName } = useField('containerName')
-const { value: blobToken } = useField('blobToken')
-
-let formValues = { ...values, listDomains }
-
-onMounted(async () => {
-  await loaderDataStreamTemplates()
-  await loaderDataStreamDomains()
-})
-
-const insertDataSet = (templateID) => {
-  const index = listTemplates.value.map((el) => el.value).indexOf(templateID)
-  dataSet.value = listTemplates.value[index].template
-}
-
-const loaderDataStreamTemplates = async () => {
-  const templates = await props.listDataStreamingTemplateService()
-  listTemplates.value = templates
-}
-
-const loaderDataStreamDomains = async () => {
-  const domains = await props.listDataStreamingDomainsService()
-  listDomains.value = [domains, []]
-}
-
-const addHeader = () => {
-  headers.value.push({ value: '', deleted: true })
-}
-
-const removeHeader = (index) => {
-  headers.value.splice(index, 1);
-}
-
-const optionsMonacoEditor = computed(() => {
-  return {
-    tabSize: 2,
-    formatOnPaste: true
-  }
-})
-
-watch(() => template.value, (templateID) => {
-  insertDataSet(templateID)
-})
-
-watch(() => domainOption.value, (option) => {
-  if (option === '1') {
-    if (listDomains.value[1].length > 0) {
-      listDomains.value[1].forEach(element => {
-        listDomains.value[0].push(element)
-      });
-      listDomains.value[1] = []
+      // azure_blob_storage
+      storageAccount: '',
+      containerName: '',
+      blobToken: ''
     }
-  }
-})
+  })
 
-watch([values, listDomains], () => {
-  formValues = { ...values, domains: listDomains.value[1] }
-})
+  // Campos do formulário
+  const { value: name } = useField('name')
+  const { value: dataSource } = useField('dataSource')
+  const { value: template } = useField('template')
+  const { value: domainOption } = useField('domainOption')
+  const { value: endpoint } = useField('endpoint')
+
+  // standard
+  const { value: endpointUrl } = useField('endpointUrl')
+  const { value: headers } = useField('headers')
+  const { value: maxSize } = useField('maxSize')
+  const { value: lineSeparator } = useField('lineSeparator')
+  const { value: payloadFormat } = useField('payloadFormat')
+
+  // kafka
+  const { value: bootstrapServers } = useField('bootstrapServers')
+  const { value: kafkaTopic } = useField('kafkaTopic')
+  const { value: tlsOption } = useField('tlsOption')
+
+  // s3
+  const { value: host } = useField('host')
+  const { value: bucket } = useField('bucket')
+  const { value: region } = useField('region')
+  const { value: accessKey } = useField('accessKey')
+  const { value: secretKey } = useField('secretKey')
+  const { value: objectKey } = useField('objectKey')
+  const { value: contentType } = useField('contentType')
+
+  // google big query
+  const { value: projectID } = useField('projectID')
+  const { value: datasetID } = useField('datasetID')
+  const { value: tableID } = useField('tableID')
+  const { value: serviceAccountKey } = useField('serviceAccountKey')
+
+  // elasticsearch
+  const { value: elasticsearchUrl } = useField('elasticsearchUrl')
+  const { value: apiKey } = useField('apiKey')
+
+  // splunk
+  const { value: splunkUrl } = useField('splunkUrl')
+  const { value: splunkApiKey } = useField('splunkApiKey')
+
+  // aws_kinesis_firehose
+  const { value: streamName } = useField('streamName')
+  const { value: awsRegion } = useField('awsRegion')
+  const { value: awsAccessKey } = useField('awsAccessKey')
+  const { value: awsSecretKey } = useField('awsSecretKey')
+
+  // datadog
+  const { value: datadogUrl } = useField('datadogUrl')
+  const { value: datadogApiKey } = useField('datadogApiKey')
+
+  // QRadar
+  const { value: QRadarUrl } = useField('QRadarUrl')
+
+  // azure_monitor
+  const { value: logType } = useField('logType')
+  const { value: sharedKey } = useField('sharedKey')
+  const { value: generatedField } = useField('generatedField')
+  const { value: workspaceID } = useField('workspaceID')
+
+  // azure_blob_storage
+  const { value: storageAccount } = useField('storageAccount')
+  const { value: containerName } = useField('containerName')
+  const { value: blobToken } = useField('blobToken')
+
+  let formValues = { ...values, listDomains }
+
+  onMounted(async () => {
+    await loaderDataStreamTemplates()
+    await loaderDataStreamDomains()
+  })
+
+  const insertDataSet = (templateID) => {
+    const index = listTemplates.value.map((el) => el.value).indexOf(templateID)
+    dataSet.value = listTemplates.value[index].template
+  }
+
+  const loaderDataStreamTemplates = async () => {
+    const templates = await props.listDataStreamingTemplateService()
+    listTemplates.value = templates
+  }
+
+  const loaderDataStreamDomains = async () => {
+    const domains = await props.listDataStreamingDomainsService()
+    listDomains.value = [domains, []]
+  }
+
+  const addHeader = () => {
+    headers.value.push({ value: '', deleted: true })
+  }
+
+  const removeHeader = (index) => {
+    headers.value.splice(index, 1)
+  }
+
+  const optionsMonacoEditor = computed(() => {
+    return {
+      tabSize: 2,
+      formatOnPaste: true
+    }
+  })
+
+  watch(
+    () => template.value,
+    (templateID) => {
+      insertDataSet(templateID)
+    }
+  )
+
+  watch(
+    () => domainOption.value,
+    (option) => {
+      if (option === '1') {
+        if (listDomains.value[1].length > 0) {
+          listDomains.value[1].forEach((element) => {
+            listDomains.value[0].push(element)
+          })
+          listDomains.value[1] = []
+        }
+      }
+    }
+  )
+
+  watch([values, listDomains], () => {
+    formValues = { ...values, domains: listDomains.value[1] }
+  })
 </script>
