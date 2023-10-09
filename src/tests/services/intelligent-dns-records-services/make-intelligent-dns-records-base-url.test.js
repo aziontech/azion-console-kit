@@ -10,7 +10,7 @@ const makeSut = () => {
 }
 
 describe('IntelligentDnsRecordsServices', () => {
-  it('should return the API base url to intelligent dns service', () => {
+  it('should return the API base url to intelligent dns records service', () => {
     const { sut } = makeSut()
     const correctApiUrl = 'intelligent_dns'
 
