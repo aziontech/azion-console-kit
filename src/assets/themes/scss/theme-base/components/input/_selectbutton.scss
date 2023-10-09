@@ -2,6 +2,8 @@
   background: var(--surface-300);
   padding: 0.25rem;
   border-radius: 0.25rem;
+  display: flex;
+  gap: 0.25rem;
 
   .p-button {
     background: none;
@@ -10,7 +12,7 @@
     font-size: 0.875rem;
     border-radius: 0.25rem !important;
     color: var(--text-color-secondary);
-    font-weight: 600;
+    font-weight: 500;
     transition: $formElementTransition;
 
     .p-button-icon-left,
@@ -21,6 +23,7 @@
     &:not(.p-disabled):not(.p-highlight):hover {
       border-color: none;
       color: var(--text-color);
+      background: var(--surface-500);
 
       .p-button-icon-left,
       .p-button-icon-right {
@@ -41,7 +44,6 @@
       }
 
       &:hover {
-        background: var(--surface-500);
         border-color: none;
         color: $toggleButtonTextActiveHoverColor;
         color: var(--text-color);
