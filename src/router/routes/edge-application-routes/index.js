@@ -18,7 +18,7 @@ export const edgeApplicationRoutes = {
           {
             label: 'Edge Applications',
             to: '/edge-applications'
-          },
+          }
         ]
       }
     },
@@ -27,7 +27,7 @@ export const edgeApplicationRoutes = {
       name: 'create-edge-applications',
       component: () => import('@views/EdgeApplications/CreateView.vue'),
       props: {
-        createEdgeApplicationService: EdgeApplicationsService.createEdgeApplicationService,
+        createEdgeApplicationService: EdgeApplicationsService.createEdgeApplicationService
       },
       meta: {
         breadCrumbs: [
@@ -38,9 +38,9 @@ export const edgeApplicationRoutes = {
           {
             label: 'Create Edge Applications',
             to: '/edge-applications/create'
-          },
+          }
         ]
       }
-    },
-  ],
+    }
+  ]
 }

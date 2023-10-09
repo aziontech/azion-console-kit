@@ -28,6 +28,6 @@ const adapt = (payload) => {
       ? payload.browserCacheSettingsMaximumTtl
       : 0,
     cdn_cache_settings: payload.cdnCacheSettings,
-    cdn_cache_settings_maximum_ttl: payload.cdnCacheSettingsMaximumTtl,
+    cdn_cache_settings_maximum_ttl: payload.cdnCacheSettingsMaximumTtl
   }
 }

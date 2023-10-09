@@ -56,7 +56,7 @@
           v-model="httpsPort"
           optionLabel="label"
           placeholder="Select a port HTTPS"
-          :disabled="deliveryProtocol === 'http'"
+          :disabled="isHttpProtocol"
         />
 
         <label>Minimum TLS version:</label>
@@ -65,7 +65,7 @@
           v-model="minimumTlsVersion"
           optionLabel="label"
           placeholder="Select a minimum TLS Version"
-          :disabled="deliveryProtocol === 'http'"
+          :disabled="isHttpProtocol"
         />
 
         <label>Supported Ciphers list:</label>
@@ -74,7 +74,7 @@
           v-model="supportedVersion"
           optionLabel="label"
           placeholder="Select a Supported Ciphers list"
-          :disabled="deliveryProtocol === 'http'"
+          :disabled="isHttpProtocol"
         />
 
         <Divider />
@@ -171,7 +171,7 @@
           :class="{ 'p-invalid': errors.browserCacheSettingsMaximumTtl }"
           v-tooltip.top="errors.browserCacheSettingsMaximumTtl"
           aria-describedby="browserCacheSettingsMaximumTtl-help"
-          :disabled="browserCacheSettings === 'honor'"
+          :disabled="isCacheTypeHonor"
         />
 
         <label>CDN Cache Settings</label>
@@ -212,6 +212,7 @@
 <script setup>
   import CreateFormBlock from '@/templates/create-form-block'
   import { useForm, useField } from 'vee-validate'
+  import { computed } from 'vue'
   import * as yup from 'yup'
 
   import InputText from 'primevue/inputtext'
@@ -259,7 +260,7 @@
     name: yup.string().required(),
     address: yup.string().required(),
     hostHeader: yup.string().required(),
-    cdnCacheSettingsMaximumTtl: yup.string().required(),
+    cdnCacheSettingsMaximumTtl: yup.string().required()
   })
 
   const { defineInputBinds, errors, meta, resetForm, values } = useForm({
@@ -300,4 +301,7 @@
   const cdnCacheSettingsMaximumTtl = defineInputBinds('cdnCacheSettingsMaximumTtl', {
     validateOnInput: true
   })
+
+  const isHttpProtocol = computed(() => deliveryProtocol === 'http')
+  const isCacheTypeHonor = computed(() => browserCacheSettings === 'honor')
 </script>
