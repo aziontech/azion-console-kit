@@ -12,7 +12,7 @@
       </div>
       <!-- TabView Custom -->
       <div class="flex my-2 mx-auto">
-        <TabView>
+        <TabView :scrollable="true" class="w-full">
           <TabPanel header="Main Settings">
             <div class="p-4">
               <p>Tab 1</p>
@@ -21,6 +21,71 @@
           <TabPanel header="Origins">
             <div class="p-4">
               <p>Tab 2</p>
+            </div>
+          </TabPanel>
+          <TabPanel header="Rules Engine">
+            <div class="p-4">
+              <p>Tab 3</p>
+            </div>
+          </TabPanel>
+          <TabPanel header="Rules Engine">
+            <div class="p-4">
+              <p>Tab 3</p>
+            </div>
+          </TabPanel>
+          <TabPanel header="Rules Engine">
+            <div class="p-4">
+              <p>Tab 3</p>
+            </div>
+          </TabPanel>
+          <TabPanel header="Rules Engine">
+            <div class="p-4">
+              <p>Tab 3</p>
+            </div>
+          </TabPanel>
+          <TabPanel header="Rules Engine">
+            <div class="p-4">
+              <p>Tab 3</p>
+            </div>
+          </TabPanel>
+          <TabPanel header="Rules Engine">
+            <div class="p-4">
+              <p>Tab 3</p>
+            </div>
+          </TabPanel>
+          <TabPanel header="Rules Engine">
+            <div class="p-4">
+              <p>Tab 3</p>
+            </div>
+          </TabPanel>
+          <TabPanel header="Rules Engine">
+            <div class="p-4">
+              <p>Tab 3</p>
+            </div>
+          </TabPanel>
+          <TabPanel header="Rules Engine">
+            <div class="p-4">
+              <p>Tab 3</p>
+            </div>
+          </TabPanel>
+          <TabPanel header="Rules Engine">
+            <div class="p-4">
+              <p>Tab 3</p>
+            </div>
+          </TabPanel>
+          <TabPanel header="Rules Engine">
+            <div class="p-4">
+              <p>Tab 3</p>
+            </div>
+          </TabPanel>
+          <TabPanel header="Rules Engine">
+            <div class="p-4">
+              <p>Tab 3</p>
+            </div>
+          </TabPanel>
+          <TabPanel header="Rules Engine">
+            <div class="p-4">
+              <p>Tab 3</p>
             </div>
           </TabPanel>
           <TabPanel header="Rules Engine">
