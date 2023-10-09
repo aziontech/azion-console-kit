@@ -1,27 +1,27 @@
 import { AxiosHttpClientAdapter } from '@/services/axios/AxiosHttpClientAdapter'
-import { deleteIntelligentDNSService } from '@/services/intelligent-dns-services'
+import { deleteNetworkListService } from '@/services/network-lists-services'
 import { describe, expect, it, vi } from 'vitest'
 
 const makeSut = () => {
-  const sut = deleteIntelligentDNSService
+  const sut = deleteNetworkListService
 
   return {
     sut
   }
 }
 
-describe('IntelligentDnsServices', () => {
+describe('NetworkListsServices', () => {
   it('should call API with correct params', async () => {
     const requestSpy = vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
       statusCode: 204
     })
-    const dnsIdMock = 8721673
     const { sut } = makeSut()
+    const networkIdMock = 987678
 
-    await sut(dnsIdMock)
+    await sut(networkIdMock)
 
     expect(requestSpy).toHaveBeenCalledWith({
-      url: `intelligent_dns/${dnsIdMock}`,
+      url: `network_lists/${networkIdMock}`,
       method: 'DELETE'
     })
   })
@@ -30,10 +30,10 @@ describe('IntelligentDnsServices', () => {
     vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
       statusCode: 204
     })
-    const dnsIdMock = 71625367
+    const networkIdMock = 987678
     const { sut } = makeSut()
 
-    const feedbackMessage = await sut(dnsIdMock)
+    const feedbackMessage = await sut(networkIdMock)
 
     expect(feedbackMessage).toBe('Resource successfully deleted')
   })

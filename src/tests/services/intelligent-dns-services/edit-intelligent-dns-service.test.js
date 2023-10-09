@@ -1,4 +1,3 @@
-// continuar daqui.
 import { AxiosHttpClientAdapter } from '@/services/axios/AxiosHttpClientAdapter'
 import { editIntelligentDNSService } from '@/services/intelligent-dns-services'
 import { describe, expect, it, vi } from 'vitest'
