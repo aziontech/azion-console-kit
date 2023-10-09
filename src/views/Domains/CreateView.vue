@@ -205,7 +205,10 @@
     setup() {
       const validationSchema = yup.object({
         name: yup.string().required(),
-        cnames: yup.string().required(),
+        cnames: yup.string().when('cnameAccessOnly', {
+          is: true,
+          then: (schema) => schema.required()
+        }),
         cnameAccessOnly: yup.boolean(),
         edgeApplication: yup.number(),
         edgeCertificate: yup.string().optional(),
@@ -221,7 +224,6 @@
       const { errors, defineInputBinds, meta, resetForm, values } = useForm({
         validationSchema,
         initialValues: {
-          cnames: [],
           cnameAccessOnly: true,
           edgeApplication: null,
           mtlsIsEnabled: false,
