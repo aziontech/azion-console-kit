@@ -1,39 +1,39 @@
 import { AxiosHttpClientAdapter } from '@/services/axios/AxiosHttpClientAdapter'
-import { createIntelligentDNSService } from '@/services/intelligent-dns-services'
+import { createNetworkListService } from '@/services/network-lists-services'
 import { describe, expect, it, vi } from 'vitest'
 
 const fixtures = {
-  dnsMock: {
-    name: 'Az-dns',
-    domain: 'example.com',
-    isActive: true
+  networkMock: {
+    name: 'teste',
+    networkListType: 'ip_cidr',
+    networkContentList: ['123.123.123.123']
   }
 }
 
 const makeSut = () => {
-  const sut = createIntelligentDNSService
+  const sut = createNetworkListService
 
   return {
     sut
   }
 }
 
-describe('IntelligentDnsServices', () => {
+describe('NetworkListsServices', () => {
   it('should call API with correct params', async () => {
     const requestSpy = vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
       statusCode: 201
     })
     const { sut } = makeSut()
 
-    await sut(fixtures.dnsMock)
+    await sut(fixtures.networkMock)
 
     expect(requestSpy).toHaveBeenCalledWith({
-      url: `intelligent_dns`,
+      url: `network_lists`,
       method: 'POST',
       body: {
-        name: fixtures.dnsMock.name,
-        domain: fixtures.dnsMock.domain,
-        is_active: fixtures.dnsMock.isActive
+        name: fixtures.networkMock.name,
+        list_type: fixtures.networkMock.networkListType,
+        items_values: fixtures.networkMock.networkContentList
       }
     })
   })
@@ -44,7 +44,7 @@ describe('IntelligentDnsServices', () => {
     })
     const { sut } = makeSut()
 
-    const feedbackMessage = await sut(fixtures.dnsMock)
+    const feedbackMessage = await sut(fixtures.networkMock)
 
     expect(feedbackMessage).toBe('Resource successfully created')
   })
