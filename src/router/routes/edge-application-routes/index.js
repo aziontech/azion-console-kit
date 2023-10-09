@@ -24,7 +24,7 @@ export const edgeApplicationRoutes = {
     },
     {
       path: 'create',
-      name: 'create-edge-applications',
+      name: 'create-edge-application',
       component: () => import('@views/EdgeApplications/CreateView.vue'),
       props: {
         createEdgeApplicationService: EdgeApplicationsService.createEdgeApplicationService
