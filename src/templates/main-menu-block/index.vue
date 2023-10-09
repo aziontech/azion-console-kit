@@ -196,7 +196,7 @@
           <a
             class="flex h-9"
             v-bind="props.action"
-            :href="item.to"
+            @click="redirect(item.to)"
           >
             <span v-bind="props.icon" />
             <span v-bind="props.label">{{ label }}</span>
@@ -599,6 +599,9 @@
       ...mapActions(useAccountStore, ['setTheme']),
       toggleProfile(event) {
         this.$refs.profile.toggle(event)
+      },
+      redirect(route) {
+        this.$router.push(route)
       },
       toggleNotification(event) {
         this.$refs.menu.toggle(event)
