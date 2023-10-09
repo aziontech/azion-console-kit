@@ -4,7 +4,7 @@ import { describe, expect, it, vi } from 'vitest'
 
 const fixtures = {
   networkMock: {
-    name: 'teste',
+    name: 'AZ network',
     networkListType: 'ip_cidr',
     networkContentList: ['123.123.123.123']
   }
