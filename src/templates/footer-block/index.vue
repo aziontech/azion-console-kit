@@ -49,13 +49,17 @@
         <!-- System Status -->
         <SystemStatusBarBlock />
         <Dropdown
-          v-model="selectedTheme"
-          :options="themeOptions"
+          :modelValue="selectedTheme"
+          @update:modelValue="selectTheme"
+          optionValue="value"
           optionLabel="name"
+          :loading="!selectedTheme?.value"
+          :options="themeOptions"
+          :autoOptionFocus="false"
           :pt="{
             root: {
-              class: 'w-auto items-center h-7',
-              style: 'background: var(--surface-section) !important'
+              class: 'w-auto py-0 h-[30px] items-center align-middle',
+              style: 'background: var(--surface-ground) !important'
             },
             item: { class: 'text-sm' },
             input: { class: 'text-sm' }
