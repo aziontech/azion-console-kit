@@ -42,11 +42,12 @@
       <div class="flex flex-col gap-2">
         <label for="cname">CNAME:</label>
         <PrimeTextarea
-          :class="{ 'p-invalid': errors.cname }"
+          :class="{ 'p-invalid': errors.cnames }"
           v-model="cnames"
           rows="5"
           cols="30"
           class="w-full"
+          v-tooltip.top="errors.cnames"
         />
       </div>
 
@@ -215,10 +216,13 @@
         id: yup.string().required(),
         name: yup.string().required(),
         domainName: yup.string().required(),
-        cnames: yup.string().when('cnameAccessOnly', {
-          is: true,
-          then: (schema) => schema.required()
-        }),
+        cnames: yup
+          .string()
+          .label('CNAME')
+          .when('cnameAccessOnly', {
+            is: true,
+            then: (schema) => schema.required()
+          }),
         cnameAccessOnly: yup.boolean(),
         edgeApplication: yup.number(),
         edgeCertificate: yup.string().optional(),
