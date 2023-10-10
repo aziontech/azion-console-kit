@@ -83,7 +83,7 @@
         <PickList
           v-model="listDomains"
           listStyle="height:342px"
-          dataKey="id"
+          dataKey="domainID"
           breakpoint="1400px"
         >
           <template #sourceheader>Available Domains</template>
@@ -564,9 +564,9 @@
     { label: 'Edge Functions', value: 'cells_console' },
     { label: 'WAF Events', value: 'waf' }
   ])
-  const listTemplates = ref('')
+  const listTemplates = ref([])
   const dataSet = ref('')
-  const listDomains = ref('')
+  const listDomains = ref([])
   const listEndpoint = ref([
     { label: 'Standard HTTP/HTTPS POST', value: 'standard' },
     { label: 'Apache Kafka', value: 'kafka' },
@@ -607,7 +607,7 @@
         })
       })
     ),
-    maxSize: yup.string().when('endpoint', {
+    maxSize: yup.number().when('endpoint', {
       is: 'standard',
       then: (schema) => schema.required('max size is a required field')
     }),
@@ -771,7 +771,7 @@
       // standard
       endpointUrl: '',
       headers: [{ value: '', deleted: false }],
-      maxSize: '',
+      maxSize: 100000,
       lineSeparator: '\n',
       payloadFormat: '$dataset',
 
@@ -910,6 +910,7 @@
   const loaderDataStreamTemplates = async () => {
     const templates = await props.listDataStreamingTemplateService()
     listTemplates.value = templates
+    if (listTemplates?.value[0]?.value) template.value = listTemplates.value[0].value
   }
 
   const loaderDataStreamDomains = async () => {
@@ -935,7 +936,7 @@
   watch(
     () => template.value,
     (templateID) => {
-      insertDataSet(templateID)
+      if (templateID) insertDataSet(templateID)
     }
   )
 

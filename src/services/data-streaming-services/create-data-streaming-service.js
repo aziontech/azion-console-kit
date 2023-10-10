@@ -112,12 +112,7 @@ const getEndpoint = (payload) => {
 }
 
 const getDomains = (domains) => {
-  const domainsIDs = []
-  domains.forEach((domain) => {
-    domainsIDs.push(domain.domainID)
-  })
-
-  return domainsIDs
+  return domains.map((domain) => domain.domainID)
 }
 
 const getHeaders = (listHeaders) => {
