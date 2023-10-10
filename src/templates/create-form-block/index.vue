@@ -13,8 +13,8 @@
         </div>
       </div>
     </header>
-    <form class="w-full grow mt-4 p-4 flex flex-col gap-4  mx-auto">
-      <div class="flex flex-col gap-4 sm:!w-full ">
+    <form class="w-full grow mt-4 p-4 flex flex-col gap-4 mx-auto">
+      <div class="flex flex-col gap-4 sm:!w-full">
         <slot name="form" />
       </div>
       <slot name="raw-form" />

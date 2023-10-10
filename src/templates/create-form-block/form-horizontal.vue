@@ -1,7 +1,6 @@
 <template>
   <fieldset
-    class="flex max-w-screen-2xl m-auto gap-16 sm:w-full surface-section
-    rounded-md border border-neutral-200 p-6 flex-wrap md:flex-nowrap"
+    class="flex max-w-screen-2xl m-auto gap-16 sm:w-full surface-section rounded-md border border-neutral-200 p-6 flex-wrap md:flex-nowrap"
   >
     <!-- title and description -->
     <div class="flex flex-col gap-2 flex-1 w-full md:min-w-[400px]">
@@ -17,8 +16,8 @@
   </fieldset>
 </template>
 <script setup>
-const pros = defineProps({
-  title: { type: String, required: true },
-  description: { type: String, required: true },
-});
+  const pros = defineProps({
+    title: { type: String, required: true },
+    description: { type: String, required: true }
+  })
 </script>

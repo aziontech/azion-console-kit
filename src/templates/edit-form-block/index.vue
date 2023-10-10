@@ -16,7 +16,7 @@
 
     <form
       @submit.prevent="handleSubmit"
-      class="min-h- mt-4 p-4 flex flex-col min-h-[calc(100vh-425px)] gap-4  mx-auto"
+      class="min-h- mt-4 p-4 flex flex-col min-h-[calc(100vh-425px)] gap-4 mx-auto"
     >
       <div class="flex flex-col gap-4 w-full">
         <slot name="form" />
