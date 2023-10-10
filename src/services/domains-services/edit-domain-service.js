@@ -1,0 +1,25 @@
+import { AxiosHttpClientAdapter, parseHttpResponse } from '../axios/AxiosHttpClientAdapter'
+import { makeDomainsBaseUrl } from './make-domains-base-url'
+
+export const editDomainService = async (payload) => {
+  let httpResponse = await AxiosHttpClientAdapter.request({
+    url: `${makeDomainsBaseUrl()}/${payload.id}`,
+    method: 'PATCH',
+    body: adapt(payload)
+  })
+
+  return parseHttpResponse(httpResponse)
+}
+
+const adapt = (payload) => {
+  return {
+    name: payload.name,
+    cnames: payload.cnames.split('\n').filter((item) => item !== ''),
+    cname_access_only: payload.cnameAccessOnly,
+    edge_application_id: payload.edgeApplication,
+    digital_certificate_id: payload.edgeCertificate,
+    is_mtls_enabled: payload.mtlsIsEnabled,
+    mtls_verification: payload.mtlsVerification,
+    mtls_trusted_ca_certificate_id: payload.mtlsTrustedCertificate
+  }
+}
