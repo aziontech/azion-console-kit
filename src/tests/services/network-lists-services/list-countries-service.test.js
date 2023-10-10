@@ -60,9 +60,9 @@ describe('NetworkListsServices', () => {
     })
     const { sut } = makeSut()
 
-    const domains = await sut()
+    const result = await sut()
 
-    expect(domains).toEqual([
+    expect(result).toEqual([
       {
         name: fixtures.BrazilMock.name,
         value: fixtures.BrazilMock.code2

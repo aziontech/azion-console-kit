@@ -61,12 +61,12 @@ describe('IntelligentDnsRecordsServices', () => {
     const pageStub = 7
     const { sut } = makeSut()
 
-    const domains = await sut({
+    const result = await sut({
       id: recordIdStub,
       page: pageStub
     })
 
-    expect(domains).toEqual([
+    expect(result).toEqual([
       {
         id: fixtures.dnsRecordMock.record_id,
         name: fixtures.dnsRecordMock.entry,

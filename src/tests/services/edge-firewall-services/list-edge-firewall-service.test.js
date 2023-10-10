@@ -64,9 +64,9 @@ describe('EdgeFirewallServices', () => {
     })
     const { sut } = makeSut()
 
-    const domains = await sut({})
+    const result = await sut({})
 
-    expect(domains).toEqual([
+    expect(result).toEqual([
       {
         id: fixtures.edgeFirewallMock.id,
         name: fixtures.edgeFirewallMock.name,
@@ -95,9 +95,9 @@ describe('EdgeFirewallServices', () => {
       })
     const { sut } = makeSut()
 
-    const domains = await sut({})
+    const result = await sut({})
 
-    expect(domains).toEqual([
+    expect(result).toEqual([
       {
         id: fixtures.edgeFirewallWithDomainsMock.id,
         name: fixtures.edgeFirewallWithDomainsMock.name,

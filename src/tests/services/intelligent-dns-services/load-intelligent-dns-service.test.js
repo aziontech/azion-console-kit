@@ -43,9 +43,9 @@ describe('IntelligentDnsServices', () => {
     })
     const { sut } = makeSut()
 
-    const domains = await sut({ id: fixtures.dnsMock.id })
+    const result = await sut({ id: fixtures.dnsMock.id })
 
-    expect(domains).toEqual({
+    expect(result).toEqual({
       id: fixtures.dnsMock.id,
       name: fixtures.dnsMock.name,
       domain: fixtures.dnsMock.domain,

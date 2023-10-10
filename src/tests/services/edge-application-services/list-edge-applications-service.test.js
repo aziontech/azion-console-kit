@@ -62,9 +62,9 @@ describe('EdgeApplicationServices', () => {
     })
     const { sut } = makeSut()
 
-    const domains = await sut({})
+    const result = await sut({})
 
-    expect(domains).toEqual([
+    expect(result).toEqual([
       {
         active: 'active',
         debugRules: 'active',

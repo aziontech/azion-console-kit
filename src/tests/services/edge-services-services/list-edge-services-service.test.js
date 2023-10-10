@@ -58,9 +58,9 @@ describe('EdgeServicesServices', () => {
     })
     const { sut } = makeSut()
 
-    const domains = await sut({})
+    const result = await sut({})
 
-    expect(domains).toEqual([
+    expect(result).toEqual([
       {
         id: fixtures.edgeServiceMock.id,
         name: fixtures.edgeServiceMock.name,

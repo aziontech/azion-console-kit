@@ -65,9 +65,9 @@ describe('NetworkListsServices', () => {
     })
     const { sut } = makeSut()
 
-    const domains = await sut({ id: fixtures.networkMock.id })
+    const result = await sut({ id: fixtures.networkMock.id })
 
-    expect(domains).toEqual({
+    expect(result).toEqual({
       name: fixtures.networkMock.name,
       id: fixtures.networkMock.id,
       lastEditor: fixtures.networkMock.last_editor,
@@ -86,9 +86,9 @@ describe('NetworkListsServices', () => {
     })
     const { sut } = makeSut()
 
-    const domains = await sut({ id: fixtures.networkMockWithCountries.id })
+    const result = await sut({ id: fixtures.networkMockWithCountries.id })
 
-    expect(domains).toEqual({
+    expect(result).toEqual({
       name: fixtures.networkMockWithCountries.name,
       id: fixtures.networkMockWithCountries.id,
       lastEditor: fixtures.networkMockWithCountries.last_editor,
