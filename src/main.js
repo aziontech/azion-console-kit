@@ -1,11 +1,13 @@
 /**
  * ==== styles block ====
  */
-import './assets/main.css'
 import 'primeicons/primeicons.css'
 import 'primeflex/primeflex.css'
+// import 'primevue/resources/themes/lara-light-blue/theme.css';
+import './assets/main.css'
 import '@assets/themes/scss/themes/azion-light/theme.scss'
 import '@assets/themes/scss/themes/azion-dark/theme.scss'
+// import '@/assets/themes/theme-custom.css'
 /**
  * ==== End of styles block ====
  */
