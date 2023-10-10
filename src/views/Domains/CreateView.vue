@@ -9,7 +9,7 @@
     <template #form>
       <b>Settings</b>
       <div class="flex flex-col gap-2">
-        <label for="name">Name:</label>
+        <label for="name">Name: *</label>
         <InputText
           placeholder="Add Domain Name"
           v-bind="name"
@@ -20,7 +20,7 @@
       </div>
 
       <div class="flex flex-col gap-2">
-        <label for="edge-application">Edge Application:</label>
+        <label for="edge-application">Edge Application: *</label>
         <Dropdown
           :class="{ 'p-invalid': errors.edgeApplication }"
           v-model="edgeApplication"
@@ -215,6 +215,11 @@
           .when('cnameAccessOnly', {
             is: true,
             then: (schema) => schema.required()
+          })
+          .test({
+            name: 'format',
+            message: `Whitespace is not allowed`,
+            test: (value) => value.includes(' ') === false
           }),
         cnameAccessOnly: yup.boolean(),
         edgeApplication: yup.number(),
