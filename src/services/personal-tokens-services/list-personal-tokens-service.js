@@ -3,7 +3,7 @@ import { makePersonalTokensBaseUrl } from './make-personal-tokens-base-url'
 
 export const listPersonalTokens = async ({ page = 1, search = '' }) => {
   let httpResponse = await AxiosHttpClientAdapter.request({
-    url: `${makePersonalTokensBaseUrl()}?&page=${page}&search=${search}`,
+    url: `${makePersonalTokensBaseUrl()}?${makeSearchParams({ page, search })}`,
     method: 'GET'
   })
 
@@ -14,11 +14,25 @@ export const listPersonalTokens = async ({ page = 1, search = '' }) => {
 
 const adapt = async (httpResponse) => {
   const parsedData = httpResponse.body.results.map((item) => {
-    return { ...item, id: item.uuid, scope: 'Global' }
+    return {
+      id: item.uuid,
+      scope: 'Global',
+      name: item.name,
+      created: item.created,
+      expiresAt: item.expires_at
+    }
   })
 
   return {
     body: parsedData,
     statusCode: httpResponse.statusCode
   }
+}
+
+const makeSearchParams = ({ page, search }) => {
+  const searchParams = new URLSearchParams()
+  searchParams.set('page', page)
+  searchParams.set('search', search)
+
+  return searchParams
 }
