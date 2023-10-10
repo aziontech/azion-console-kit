@@ -6,8 +6,8 @@ const fixtures = {
   personalTokenMock: {
     uuid: 123123123,
     name: 'Network A',
-    created: new Date(2023, 10, 10),
-    expires_at: new Date(2023, 10, 10)
+    created: new Date(2023, 10, 10).toDateString(),
+    expires_at: new Date(2023, 11, 10).toDateString()
   }
 }
 
@@ -37,10 +37,10 @@ describe('PersonalTokensServices', () => {
 
     const { sut } = makeSut()
 
-    await sut({ page: 1, search: 'search_text' })
+    await sut({ pageSize: 400, search: 'search_text' })
 
     expect(requestSpy).toHaveBeenCalledWith({
-      url: `iam/personal_tokens?page=1&search=search_text`,
+      url: `iam/personal_tokens?page_size=400&search=search_text`,
       method: 'GET'
     })
   })
@@ -62,8 +62,8 @@ describe('PersonalTokensServices', () => {
         id: fixtures.personalTokenMock.uuid,
         scope: 'Global',
         name: fixtures.personalTokenMock.name,
-        created: fixtures.personalTokenMock.created,
-        expiresAt: fixtures.personalTokenMock.expires_at
+        created: 'Friday, November 10, 2023',
+        expiresAt: 'Sunday, December 10, 2023'
       }
     ])
   })
