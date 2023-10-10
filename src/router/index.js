@@ -6,6 +6,7 @@ import { homeRoutes } from '@routes/home-routes'
 import { edgeApplicationRoutes } from '@routes/edge-application-routes'
 import { edgeFirewallRoutes } from '@routes/edge-firewall-routes'
 import { edgeFunctionsRoutes } from '@routes/edge-functions-routes'
+import { edgePulseRoutes } from '@routes/edge-pulse-routes'
 import { edgeServicesRoutes } from '@routes/edge-services-routes'
 import { intelligentDnsRoutes } from '@routes/intelligent-dns-routes'
 import { loginRoutes } from '@routes/login-routes'
@@ -16,6 +17,7 @@ import { underDevelopmentRoutes } from '@routes/under-development-routes'
 import { edgeNodeRoutes } from '@routes/edge-node-routes'
 import beforeEachRoute from './hooks/beforeEachRoute'
 import { usersListsRoutes } from '@routes/users-routes'
+import { playgroundRoutes } from './routes/playground-routes'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -26,6 +28,7 @@ const router = createRouter({
     edgeApplicationRoutes,
     edgeFirewallRoutes,
     edgeFunctionsRoutes,
+    edgePulseRoutes,
     edgeServicesRoutes,
     homeRoutes,
     intelligentDnsRoutes,
@@ -35,7 +38,8 @@ const router = createRouter({
     variablesRoutes,
     edgeNodeRoutes,
     usersListsRoutes,
-    underDevelopmentRoutes
+    underDevelopmentRoutes,
+    playgroundRoutes
   ]
 })
 

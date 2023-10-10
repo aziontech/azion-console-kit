@@ -1,0 +1,62 @@
+.p-selectbutton {
+  background: var(--surface-300);
+  padding: 0.25rem;
+  border-radius: 0.25rem;
+  display: flex;
+  gap: 0.25rem;
+
+  .p-button {
+    background: none;
+    border: none;
+    height: 1.75rem;
+    font-size: 0.875rem;
+    border-radius: 0.25rem !important;
+    color: var(--text-color-secondary);
+    font-weight: 500;
+    transition: $formElementTransition;
+
+    .p-button-icon-left,
+    .p-button-icon-right {
+      color: $toggleButtonIconColor;
+    }
+
+    &:not(.p-disabled):not(.p-highlight):hover {
+      border-color: none;
+      color: var(--text-color);
+      background: var(--surface-500);
+
+      .p-button-icon-left,
+      .p-button-icon-right {
+        color: $toggleButtonIconHoverColor;
+      }
+    }
+
+    &.p-highlight {
+      background: var(--surface-0);
+      border-color: none;
+      font-weight: 700;
+      border-radius: 0.25rem;
+      color: var(--text-color);
+
+      .p-button-icon-left,
+      .p-button-icon-right {
+        color: $toggleButtonIconActiveColor;
+      }
+
+      &:hover {
+        border-color: none;
+        color: $toggleButtonTextActiveHoverColor;
+        color: var(--text-color);
+
+        .p-button-icon-left,
+        .p-button-icon-right {
+          color: $toggleButtonIconActiveHoverColor;
+        }
+      }
+    }
+  }
+
+  &.p-invalid > .p-button {
+    @include invalid-input();
+  }
+}

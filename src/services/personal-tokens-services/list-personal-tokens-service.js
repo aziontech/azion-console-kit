@@ -1,9 +1,9 @@
 import { AxiosHttpClientAdapter, parseHttpResponse } from '../axios/AxiosHttpClientAdapter'
 import { makePersonalTokensBaseUrl } from './make-personal-tokens-base-url'
 
-export const listPersonalTokens = async ({ page = 1, search = '' }) => {
+export const listPersonalTokens = async ({ pageSize = 200, search = '' }) => {
   let httpResponse = await AxiosHttpClientAdapter.request({
-    url: `${makePersonalTokensBaseUrl()}?${makeSearchParams({ page, search })}`,
+    url: `${makePersonalTokensBaseUrl()}?${makeSearchParams({ pageSize, search })}`,
     method: 'GET'
   })
 
@@ -14,12 +14,15 @@ export const listPersonalTokens = async ({ page = 1, search = '' }) => {
 
 const adapt = async (httpResponse) => {
   const parsedData = httpResponse.body.results.map((item) => {
+    const [creationDate] = item.created.split('T')
+    const [expirationDate] = item.expires_at.split('T')
+
     return {
       id: item.uuid,
-      scope: 'Global',
       name: item.name,
-      created: item.created,
-      expiresAt: item.expires_at
+      created: formatExhibitionDate(creationDate),
+      expiresAt: formatExhibitionDate(expirationDate),
+      scope: 'Global'
     }
   })
 
@@ -29,10 +32,15 @@ const adapt = async (httpResponse) => {
   }
 }
 
-const makeSearchParams = ({ page, search }) => {
+const makeSearchParams = ({ pageSize, search }) => {
   const searchParams = new URLSearchParams()
-  searchParams.set('page', page)
+  searchParams.set('page_size', pageSize)
   searchParams.set('search', search)
-
   return searchParams
+}
+
+const formatExhibitionDate = (dateString) => {
+  return new Intl.DateTimeFormat('us', { dateStyle: 'full', timeZone: 'UTC' }).format(
+    new Date(dateString)
+  )
 }

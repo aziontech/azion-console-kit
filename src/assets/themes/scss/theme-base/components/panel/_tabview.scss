@@ -1,0 +1,74 @@
+.p-tabview {
+  .p-tabview-nav {
+    background: $tabviewNavBg;
+    border: $tabviewNavBorder;
+    border-width: $tabviewNavBorderWidth;
+    gap: 0.8rem;
+
+    li {
+      margin-right: $tabviewHeaderSpacing;
+
+      .p-tabview-nav-link {
+        border: $tabviewHeaderBorder;
+        border-width: $tabviewHeaderBorderWidth;
+        border-color: $tabviewHeaderBorderColor;
+        background: $tabviewHeaderBg;
+        color: $tabviewHeaderTextColor;
+        padding: $tabviewHeaderPadding;
+        font-weight: 500;
+        min-height: 2rem;
+        font-size: 0.9rem;
+        font-weight: $tabviewHeaderFontWeight;
+        border-radius: $borderRadius;
+        transition: $listItemTransition;
+        margin: $tabviewHeaderMargin;
+
+        &:not(.p-disabled):focus {
+          @include focused-inset();
+        }
+      }
+
+      &:not(.p-highlight):not(.p-disabled):hover {
+        .p-tabview-nav-link {
+          background: $tabviewHeaderHoverBg;
+          border-color: $tabviewHeaderHoverBorderColor;
+          color: $tabviewHeaderTextHoverColor;
+        }
+      }
+
+      &.p-highlight {
+        .p-tabview-nav-link {
+          background: $tabviewHeaderActiveBg;
+          border-color: $tabviewHeaderActiveBorderColor;
+          color: $tabviewHeaderTextActiveColor;
+        }
+      }
+    }
+  }
+
+  .p-tabview-nav-btn.p-link {
+    background-color: var(--surface-0);
+    color: $buttonBg;
+    width: 2rem;
+    border-radius: 0;
+    box-shadow: $raisedButtonShadow;
+    transition: $formElementTransition;
+
+    &:focus {
+      @include focused-inset();
+    }
+    &:enabled:hover {
+      background: var(--surface-100);
+      color: $buttonBg;
+    }
+  }
+
+  .p-tabview-panels {
+    background: transparent;
+    padding: $tabviewContentPadding;
+    border: $tabviewContentBorder;
+    color: $tabviewContentTextColor;
+    border-bottom-right-radius: $borderRadius;
+    border-bottom-left-radius: $borderRadius;
+  }
+}

@@ -21,6 +21,26 @@ export const personalTokensRoutes = {
           }
         ]
       }
+    },
+    {
+      path: 'create',
+      name: 'create-personal-token',
+      component: () => import('@views/PersonalTokens/CreateView.vue'),
+      props: {
+        createPersonalTokenService: PersonalTokensService.createPersonalToken
+      },
+      meta: {
+        breadCrumbs: [
+          {
+            label: 'Personal Tokens',
+            to: '/personal-tokens'
+          },
+          {
+            label: 'Create Personal Token',
+            to: '/personal-tokens/create'
+          }
+        ]
+      }
     }
   ]
 }

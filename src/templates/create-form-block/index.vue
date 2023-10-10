@@ -1,5 +1,5 @@
 <template>
-  <div class="flex flex-col">
+  <div class="flex flex-col min-h-[calc(100vh-120px)]">
     <Toast />
     <header class="border-neutral-200 border-b min-h-[82px] w-full flex items-center">
       <div class="p-4 w-full">
@@ -17,6 +17,8 @@
       <div class="flex flex-col gap-4 sm:!w-full md:!w-1/2">
         <slot name="form" />
       </div>
+
+      <slot name="raw-form" />
     </form>
     <ActionBarTemplate
       @cancel="handleCancel"

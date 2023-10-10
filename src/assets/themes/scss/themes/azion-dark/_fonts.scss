@@ -1,0 +1,140 @@
+// Configuration for the font-face of the theme, defaults to the system font so left as blank
+@font-face {
+  font-family: 'Roboto';
+  src: url('https://fonts.azion.com/roboto/roboto-light.eot');
+  src:
+    url('https://fonts.azion.com/roboto/roboto-light.eot?#iefix') format('embedded-opentype'),
+    url('https://fonts.azion.com/roboto/roboto-light.woff2') format('woff2'),
+    url('https://fonts.azion.com/roboto/roboto-light.woff') format('woff'),
+    url('https://fonts.azion.com/roboto/roboto-light.ttf') format('truetype'),
+    url('https://fonts.azion.com/roboto/roboto-light.svg#roboto-light') format('svg');
+  font-weight: 300;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Roboto';
+  src: url('https://fonts.azion.com/roboto/roboto-regular.eot');
+  src:
+    url('https://fonts.azion.com/roboto/roboto-regular.eot?#iefix') format('embedded-opentype'),
+    url('https://fonts.azion.com/roboto/roboto-regular.woff2') format('woff2'),
+    url('https://fonts.azion.com/roboto/roboto-regular.woff') format('woff'),
+    url('https://fonts.azion.com/roboto/roboto-regular.ttf') format('truetype'),
+    url('https://fonts.azion.com/roboto/roboto-regular.svg#Roboto-Regular') format('svg');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Roboto';
+  src: url('https://fonts.azion.com/roboto/roboto-italic.eot');
+  src:
+    url('https://fonts.azion.com/roboto/roboto-italic.eot?#iefix') format('embedded-opentype'),
+    url('https://fonts.azion.com/roboto/roboto-italic.woff2') format('woff2'),
+    url('https://fonts.azion.com/roboto/roboto-italic.woff') format('woff'),
+    url('https://fonts.azion.com/roboto/roboto-italic.ttf') format('truetype'),
+    url('https://fonts.azion.com/roboto/roboto-italic.svg#roboto-italic') format('svg');
+  font-weight: 400;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Roboto';
+  src: url('https://fonts.azion.com/roboto/roboto-medium.eot');
+  src:
+    url('https://fonts.azion.com/roboto/roboto-medium.eot?#iefix') format('embedded-opentype'),
+    url('https://fonts.azion.com/roboto/roboto-medium.woff2') format('woff2'),
+    url('https://fonts.azion.com/roboto/roboto-medium.woff') format('woff'),
+    url('https://fonts.azion.com/roboto/roboto-medium.ttf') format('truetype'),
+    url('https://fonts.azion.com/roboto/roboto-medium.svg#roboto-medium') format('svg');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Roboto';
+  src: url('https://fonts.azion.com/roboto/roboto-mediumitalic.eot');
+  src:
+    url('https://fonts.azion.com/roboto/roboto-mediumitalic.eot?#iefix') format('embedded-opentype'),
+    url('https://fonts.azion.com/roboto/roboto-mediumitalic.woff2') format('woff2'),
+    url('https://fonts.azion.com/roboto/roboto-mediumitalic.woff') format('woff'),
+    url('https://fonts.azion.com/roboto/roboto-mediumitalic.ttf') format('truetype'),
+    url('https://fonts.azion.com/roboto/roboto-mediumitalic.svg#roboto-mediumitalic') format('svg');
+  font-weight: 500;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Roboto';
+  src: url('https://fonts.azion.com/roboto/roboto-bold.eot');
+  src:
+    url('https://fonts.azion.com/roboto/roboto-bold.eot?#iefix') format('embedded-opentype'),
+    url('https://fonts.azion.com/roboto/roboto-bold.woff2') format('woff2'),
+    url('https://fonts.azion.com/roboto/roboto-bold.woff') format('woff'),
+    url('https://fonts.azion.com/roboto/roboto-bold.ttf') format('truetype'),
+    url('https://fonts.azion.com/roboto/roboto-bold.svg#roboto-bold') format('svg');
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Roboto';
+  src: url('https://fonts.azion.com/roboto/roboto-bold.eot');
+  src:
+    url('https://fonts.azion.com/roboto/roboto-bold.eot?#iefix') format('embedded-opentype'),
+    url('https://fonts.azion.com/roboto/roboto-bold.woff2') format('woff2'),
+    url('https://fonts.azion.com/roboto/roboto-bold.woff') format('woff'),
+    url('https://fonts.azion.com/roboto/roboto-bold.ttf') format('truetype'),
+    url('https://fonts.azion.com/roboto/roboto-bold.svg#roboto-bold') format('svg');
+  font-weight: bold;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Roboto';
+  src: url('https://fonts.azion.com/roboto/roboto-bolditalic.eot');
+  src:
+    url('https://fonts.azion.com/roboto/roboto-bolditalic.eot?#iefix') format('embedded-opentype'),
+    url('https://fonts.azion.com/roboto/roboto-bolditalic.woff2') format('woff2'),
+    url('https://fonts.azion.com/roboto/roboto-bolditalic.woff') format('woff'),
+    url('https://fonts.azion.com/roboto/roboto-bolditalic.ttf') format('truetype'),
+    url('https://fonts.azion.com/roboto/roboto-bolditalic.svg#roboto-bolditalic') format('svg');
+  font-weight: bold;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Roboto';
+  src: url('https://fonts.azion.com/roboto/roboto-bolditalic.eot');
+  src:
+    url('https://fonts.azion.com/roboto/roboto-bolditalic.eot?#iefix') format('embedded-opentype'),
+    url('https://fonts.azion.com/roboto/roboto-bolditalic.woff2') format('woff2'),
+    url('https://fonts.azion.com/roboto/roboto-bolditalic.woff') format('woff'),
+    url('https://fonts.azion.com/roboto/roboto-bolditalic.ttf') format('truetype'),
+    url('https://fonts.azion.com/roboto/roboto-bolditalic.svg#roboto-bold') format('svg');
+  font-weight: 600;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Roboto';
+  src: url('https://fonts.azion.com/roboto/roboto-black.eot');
+  src:
+    url('https://fonts.azion.com/roboto/roboto-black.eot?#iefix') format('embedded-opentype'),
+    url('https://fonts.azion.com/roboto/roboto-black.woff2') format('woff2'),
+    url('https://fonts.azion.com/roboto/roboto-black.woff') format('woff'),
+    url('https://fonts.azion.com/roboto/roboto-black.ttf') format('truetype'),
+    url('https://fonts.azion.com/roboto/roboto-black.svg#roboto-black') format('svg');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}

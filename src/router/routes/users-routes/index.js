@@ -21,26 +21,6 @@ export const usersListsRoutes = {
           }
         ]
       }
-    },
-    {
-      path: 'create',
-      name: 'create-users',
-      component: () => import('@views/Users/CreateView.vue'),
-      props: {
-        createUsersService: UsersService.createUsersService
-      },
-      meta: {
-        breadCrumbs: [
-          {
-            label: 'Users Lists',
-            to: '/users'
-          },
-          {
-            label: 'Create Users',
-            to: '/users/create'
-          }
-        ]
-      }
     }
   ]
 }

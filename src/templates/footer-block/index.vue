@@ -2,90 +2,86 @@
 <template>
   <!-- Footer -->
   <footer
-    class="z-10 flex px-3 flex-wrap flex-col md:flex-row pr-3 py-5 md:py-3 justify-center items-center gap-4 surface-ground border-t surface-border"
+    class="z-10 flex px-3 py-6 flex-wrap flex-col justify-center items-center gap-3 lg:gap-4 surface-ground border-t surface-border lg:flex-row pr-3 lg:py-3 lg:px-8 lg:justify-between"
   >
-    <AzionLogo />
+    <span class="text-sm text-normal text-color">© 2023 Azion Technologies.</span>
 
-    <div class="text-sm font-normal text-color">© 2023 Azion Technologies.</div>
+    <div class="flex flex-col gap-3 lg:gap-8 items-center lg:flex lg:flex-row">
+      <div class="flex gap-1">
+        <PrimeButton
+          label="About"
+          link
+        />
+        <PrimeButton
+          label="Blog"
+          link
+        />
+        <PrimeButton
+          label="Legal"
+          link
+        />
+        <PrimeButton
+          label="Docs"
+          link
+        />
+      </div>
+      <!-- Social Buttons -->
+      <div class="flex gap-2">
+        <PrimeButton
+          icon="pi pi-github"
+          text
+          size="small"
+        />
+        <PrimeButton
+          icon="pi pi-discord"
+          text
+          size="small"
+        />
+        <PrimeButton
+          icon="pi pi-twitter"
+          text
+          size="small"
+        />
+        <!--Change Twitter icon to X-->
+      </div>
 
-    <!-- Links -->
-    <div class="flex gap-1">
-      <PrimeButton
-        label="About"
-        link
-      />
-      <PrimeButton
-        label="Blog"
-        link
-      />
-      <PrimeButton
-        label="Legal"
-        link
-      />
-      <PrimeButton
-        label="Docs"
-        link
-      />
-    </div>
-
-    <!-- System Status -->
-    <a
-      class="border flex gap-2 surface-border surface-ground text-color rounded-lg text-sm px-2 py-1 align-items-center justify-center"
-      href="https://status.azion.com/"
-      target="_blank"
-    >
-      <b>Status:</b>
-      <i
-        class="pi pi-circle-fill text-xs"
-        style="color: rgb(25, 217, 25)"
-      />
-      <span>All Systems Operational</span>
-    </a>
-
-    <div class="flex flex-row justify-between items-center align-middle px-3 py-1.5">
-      <Dropdown
-        v-model="selectedTheme"
-        :options="themeOptions"
-        optionLabel="name"
-        :pt="{
-          root: {
-            class: 'w-auto py-0 h-[30px] items-center align-middle',
-            style: 'background: var(--surface-ground) !important'
-          },
-          item: { class: 'text-sm' },
-          input: { class: 'text-sm' }
-        }"
-      >
-        <template #value="slotProps">
-          <div
-            v-if="slotProps.value"
-            class="flex gap-2 align-items-center"
-          >
-            <i :class="slotProps.value.icon"></i>
-            <div>{{ slotProps.value.name }}</div>
-          </div>
-        </template>
-        <template #option="slotProps">
-          <div class="flex gap-2 align-items-center">
-            <i :class="slotProps.option.icon"></i>
-            <div>{{ slotProps.option.name }}</div>
-          </div>
-        </template>
-      </Dropdown>
-    </div>
-
-    <!-- Social Buttons -->
-    <div class="flex gap-1">
-      <PrimeButton
-        class="h-9"
-        icon="pi pi-github"
-        text
-      />
-      <PrimeButton
-        class="h-9"
-        icon="pi pi-discord"
-        text
-      />
+      <div class="flex gap-8">
+        <!-- System Status -->
+        <SystemStatusBarBlock />
+        <Dropdown
+          :modelValue="selectedTheme"
+          @update:modelValue="selectTheme"
+          optionValue="value"
+          optionLabel="name"
+          :loading="!selectedTheme?.value"
+          :options="themeOptions"
+          :autoOptionFocus="false"
+          :pt="{
+            root: {
+              class: 'w-auto py-0 h-[30px] items-center align-middle',
+              style: 'background: var(--surface-ground) !important'
+            },
+            item: { class: 'text-sm' },
+            input: { class: 'text-sm' }
+          }"
+        >
+          <template #value="slotProps">
+            <div
+              v-if="slotProps.value"
+              class="flex gap-2 align-items-center"
+            >
+              <i :class="slotProps.value.icon"></i>
+              <div>{{ slotProps.value.name }}</div>
+            </div>
+          </template>
+          <template #option="slotProps">
+            <div class="flex gap-2 align-items-center">
+              <i :class="slotProps.option.icon"></i>
+              <div>{{ slotProps.option.name }}</div>
+            </div>
+          </template>
+        </Dropdown>
+      </div>
     </div>
   </footer>
 </template>
@@ -93,23 +89,36 @@
 <script>
   import Dropdown from 'primevue/dropdown'
   import PrimeButton from 'primevue/button'
-  import AzionLogo from '@assets/svg/azion'
+  import SystemStatusBarBlock from '@templates/system-status-bar-block'
+  import { useAccountStore } from '@/stores/account'
+  import { mapActions, mapState } from 'pinia'
 
   export default {
     name: 'FooterTemplate',
     components: {
       PrimeButton,
       Dropdown,
-      AzionLogo
+      SystemStatusBarBlock
     },
     data() {
       return {
-        selectedTheme: { name: 'Light', icon: 'pi pi-sun' },
         themeOptions: [
-          { name: 'Light', icon: 'pi pi-sun' },
-          { name: 'Dark', icon: 'pi pi-moon' },
-          { name: 'System', icon: 'pi pi-desktop' }
+          { name: 'Light', value: 'light', icon: 'pi pi-sun' },
+          { name: 'Dark', value: 'dark', icon: 'pi pi-moon' },
+          { name: 'System', value: 'system', icon: 'pi pi-desktop' }
         ]
+      }
+    },
+    computed: {
+      ...mapState(useAccountStore, ['currentTheme']),
+      selectedTheme() {
+        return this.themeOptions.find((option) => option.value === this.currentTheme)
+      }
+    },
+    methods: {
+      ...mapActions(useAccountStore, ['setTheme']),
+      selectTheme(theme) {
+        this.setTheme(theme)
       }
     }
   }

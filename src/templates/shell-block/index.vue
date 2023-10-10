@@ -5,7 +5,7 @@
     :isLogged="isLogged"
   />
   <main
-    class="flex w-full relative min-h-[calc(100vh-120px)] [&>.active]:!w-[calc(100%-300px)]"
+    class="flex w-full relative min-h-[calc(100vh-120px)] [&>.active]:!w-[calc(100%-300px)] mt-[60px]"
     :class="[styleHelper, { 'flex align-items-center': !isLogged }]"
   >
     <slot :customClass="customClass"></slot>
