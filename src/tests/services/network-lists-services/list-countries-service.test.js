@@ -49,7 +49,7 @@ describe('NetworkListsServices', () => {
     )
   })
 
-  it('should parsed correctly each dns record', async () => {
+  it('should parsed correctly each country record', async () => {
     vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
       statusCode: 200,
       body: {
