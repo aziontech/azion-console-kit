@@ -6,7 +6,14 @@ const fixtures = {
   edgeNodeMock: {
     id: 1239875,
     name: 'JS Edge Node',
-    groups: 'Group 1',
+    groups: [
+      {
+        name: 'Group 1'
+      },
+      {
+        name: 'Group 2'
+      }
+    ],
     hash_id: '128973k#%(J&%@$',
     status: 'active'
   }
@@ -31,7 +38,7 @@ describe('EdgeNodeServices', () => {
     await sut({})
 
     expect(requestSpy).toHaveBeenCalledWith({
-      url: `edge_node`,
+      url: `edge_node?order_by=id&sort=asc&page=1&page_size=200`,
       method: 'GET'
     })
   })
@@ -50,7 +57,7 @@ describe('EdgeNodeServices', () => {
       {
         id: fixtures.edgeNodeMock.id,
         name: fixtures.edgeNodeMock.name,
-        groups: fixtures.edgeNodeMock.groups,
+        groups: 'Group 1,Group 2',
         hashId: fixtures.edgeNodeMock.hash_id,
         status: fixtures.edgeNodeMock.status
       }
