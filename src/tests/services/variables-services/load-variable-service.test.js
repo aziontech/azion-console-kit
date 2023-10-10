@@ -1,5 +1,5 @@
 import { AxiosHttpClientAdapter } from '@/services/axios/AxiosHttpClientAdapter'
-import { listVariablesService } from '@/services/variables-services'
+import { loadVariableService } from '@/services/variables-services'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 const fixtures = {
@@ -7,14 +7,12 @@ const fixtures = {
     uuid: '7283j-j2j3l2-82736823-j2k4m2',
     key: 'Mongo-DB-Key',
     value: 'M0nG0-t3$$t1n-k3Y',
-    last_editor: 'John Doe',
-    updated_at: new Date(2023, 5, 10),
     secret: true
   }
 }
 
 const makeSut = () => {
-  const sut = listVariablesService
+  const sut = loadVariableService
 
   return {
     sut
@@ -28,41 +26,37 @@ describe('VariablesService', () => {
   afterEach(() => {
     vi.useRealTimers()
   })
-
   it('should call api with correct params', async () => {
     const requestSpy = vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
       statusCode: 200,
-      body: null
+      body: fixtures.variableMock
     })
-
+    const variableMockId = 812783
     const { sut } = makeSut()
 
-    await sut()
+    await sut({ id: variableMockId })
 
     expect(requestSpy).toHaveBeenCalledWith({
-      url: `variables`,
+      url: `variables/${variableMockId}`,
       method: 'GET'
     })
   })
 
-  it('should parsed correctly each variable', async () => {
+  it('should parsed correctly the returned variable', async () => {
     vi.setSystemTime(new Date(2023, 10, 10, 10))
     vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
       statusCode: 200,
-      body: [fixtures.variableMock]
+      body: fixtures.variableMock
     })
     const { sut } = makeSut()
 
-    const result = await sut()
+    const result = await sut({ id: fixtures.variableMock.uuid })
 
-    expect(result).toEqual([
-      {
-        id: fixtures.variableMock.uuid,
-        key: fixtures.variableMock.key,
-        value: fixtures.variableMock.value,
-        lastEditor: fixtures.variableMock.last_editor,
-        updatedAt: 'Saturday, June 10, 2023'
-      }
-    ])
+    expect(result).toEqual({
+      id: fixtures.variableMock.uuid,
+      key: fixtures.variableMock.key,
+      value: fixtures.variableMock.value,
+      secret: fixtures.variableMock.secret
+    })
   })
 })
