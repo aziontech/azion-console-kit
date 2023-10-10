@@ -32,7 +32,7 @@ describe('NetworkListsServices', () => {
     const requestSpy = vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
       statusCode: 200,
       body: {
-        results: []
+        results: null
       }
     })
 
