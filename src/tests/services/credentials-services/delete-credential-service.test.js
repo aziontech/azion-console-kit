@@ -3,7 +3,7 @@ import * as Errors from '@/services/axios/errors'
 import { deleteCredentialService } from '@/services/credential-services'
 import { describe, expect, it, vi } from 'vitest'
 
-function makeSut() {
+const makeSut = () => {
   const sut = deleteCredentialService
 
   return { sut }
