@@ -11,7 +11,7 @@
         required: true,
         type: Function
       },
-      deleteDomainsService: {
+      deleteDomainService: {
         required: true,
         type: Function
       }
@@ -52,7 +52,7 @@
     createPagePath="domains/create"
     editPagePath="domains/edit"
     :listService="listDomainsService"
-    :deleteService="deleteDomainsService"
+    :deleteService="deleteDomainService"
     :columns="getColumns"
   />
 </template>

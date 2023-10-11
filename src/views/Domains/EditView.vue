@@ -1,7 +1,9 @@
 <template>
-  <CreateFormBlock
-    pageTitle="Create Domain"
-    :createService="createDomainService"
+  <EditFormBlock
+    pageTitle="Edit Domain"
+    :editService="editDomainService"
+    :loadService="loadDomainService"
+    :initialDataSetter="setValues"
     :formData="values"
     :isValid="meta.valid"
     :cleanFormCallback="resetForm"
@@ -17,6 +19,11 @@
           :class="{ 'p-invalid': errors.name }"
           v-tooltip.top="errors.name"
         />
+      </div>
+
+      <div class="flex flex-col gap-2">
+        <label for="name">Domain:</label>
+        <p>{{ domainName.value }}</p>
       </div>
 
       <div class="flex flex-col gap-2">
@@ -112,11 +119,11 @@
       </div>
       <div class="mb-4"></div>
     </template>
-  </CreateFormBlock>
+  </EditFormBlock>
 </template>
 
 <script>
-  import CreateFormBlock from '@/templates/create-form-block'
+  import EditFormBlock from '@/templates/edit-form-block'
   import InputText from 'primevue/inputtext'
   import Dropdown from 'primevue/dropdown'
   import PrimeTextarea from 'primevue/textarea'
@@ -134,7 +141,7 @@
 
   export default {
     components: {
-      CreateFormBlock,
+      EditFormBlock,
       InputText,
       Dropdown,
       PrimeTextarea,
@@ -142,9 +149,10 @@
       RadioButton
     },
     props: {
-      createDomainService: Function,
+      editDomainService: Function,
       listDigitalCertificatesService: Function,
-      listEdgeApplicationsService: Function
+      listEdgeApplicationsService: Function,
+      loadDomainService: Function
     },
     data() {
       return {
@@ -201,14 +209,13 @@
         if (newValue !== 0) {
           this.setEdgeCertificate(newValue)
         }
-      },
-      errors(newValue) {
-        console.log(newValue)
       }
     },
     setup() {
       const validationSchema = yup.object({
+        id: yup.string().required(),
         name: yup.string().required(),
+        domainName: yup.string().required(),
         cnames: yup
           .string()
           .label('CNAME')
@@ -217,7 +224,7 @@
             then: (schema) => schema.required()
           })
           .test({
-            name: 'format',
+            name: 'no-whitespace',
             message: `Whitespace is not allowed`,
             test: (value) => value.includes(' ') === false
           }),
@@ -226,14 +233,13 @@
         edgeCertificate: yup.string().optional(),
         mtlsIsEnabled: yup.boolean(),
         mtlsVerification: yup.string(),
-        trustedCACertificates: yup.string().optional(),
         mtlsTrustedCertificate: yup.string().when('mtlsIsEnabled', {
           is: true,
           then: (schema) => schema.required()
         })
       })
 
-      const { errors, defineInputBinds, meta, resetForm, values } = useForm({
+      const { setValues, errors, defineInputBinds, meta, resetForm, values } = useForm({
         validationSchema,
         initialValues: {
           cnameAccessOnly: true,
@@ -252,9 +258,11 @@
       const { value: mtlsTrustedCertificate } = useField('mtlsTrustedCertificate')
 
       const name = defineInputBinds('name', { validateOnInput: true })
+      const domainName = defineInputBinds('domainName', { validateOnInput: true })
 
       return {
         name,
+        domainName,
         cnames,
         cnameAccessOnly,
         edgeApplication,
@@ -265,7 +273,8 @@
         errors,
         meta,
         resetForm,
-        values
+        values,
+        setValues
       }
     },
     methods: {

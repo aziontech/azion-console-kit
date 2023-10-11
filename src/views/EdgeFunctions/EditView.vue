@@ -99,7 +99,7 @@
   import InputText from 'primevue/inputtext'
   import Divider from 'primevue/divider'
 
-  import { ref } from 'vue'
+  import { ref, watch } from 'vue'
 
   const props = defineProps({
     loadEdgeFunctionsService: {
@@ -174,4 +174,12 @@
       '*'
     )
   }
+
+  let initialLoad = false
+  watch(code, () => {
+    if (!initialLoad) {
+      postPreviewUpdates()
+      initialLoad = true
+    }
+  })
 </script>
