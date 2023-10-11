@@ -25,7 +25,7 @@ const adapt = (httpResponse) => {
     id: item.id,
     name: item.name,
     token: item.token,
-    status: item.status ? 'True' : 'False',
+    status: item.status ? 'Yes' : 'No',
     description: item.description,
     lastEditor: item.last_editor,
     lastModified: item.last_modified

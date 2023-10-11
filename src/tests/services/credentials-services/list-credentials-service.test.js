@@ -67,7 +67,7 @@ describe('ListCredentialsServices', () => {
       id: fixtures.credentialBasic.id,
       name: fixtures.credentialBasic.name,
       token: fixtures.credentialBasic.token,
-      status: 'True',
+      status: 'Yes',
       description: fixtures.credentialBasic.description,
       lastEditor: fixtures.credentialBasic.last_editor,
       lastModified: fixtures.credentialBasic.last_modified
@@ -77,7 +77,7 @@ describe('ListCredentialsServices', () => {
       id: fixtures.credentialDisabled.id,
       name: fixtures.credentialDisabled.name,
       token: fixtures.credentialDisabled.token,
-      status: 'False',
+      status: 'No',
       description: fixtures.credentialDisabled.description,
       lastEditor: fixtures.credentialDisabled.last_editor,
       lastModified: fixtures.credentialDisabled.last_modified
