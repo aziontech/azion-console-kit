@@ -1,4 +1,4 @@
-import { listCredentialsService, deleteCredentialService } from '@/services/credential-services'
+import * as CredentialServices from '@/services/credential-services'
 
 /** @type {import('vue-router').RouteRecordRaw} */
 export const credentialsRoutes = {
@@ -10,8 +10,8 @@ export const credentialsRoutes = {
       name: 'list-credentials',
       component: () => import('@views/Credentials/ListView.vue'),
       props: {
-        listCredentialsService,
-        deleteCredentialService
+        listCredentialsService: CredentialServices.listCredentialsService,
+        deleteCredentialService: CredentialServices.deleteCredentialService
       },
       meta: {
         breadCrumbs: [

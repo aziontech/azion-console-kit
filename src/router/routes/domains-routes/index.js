@@ -1,12 +1,6 @@
-import {
-  listDomainsService,
-  loadDomainService,
-  deleteDomainService,
-  createDomainService,
-  editDomainService
-} from '@/services/domains-services'
-import { listDigitalCertificatesService } from '@/services/digital-certificates-services'
-import { listEdgeApplicationsService } from '@/services/edge-application-services'
+import * as DomainServices from '@/services/domains-services'
+import * as DigitalCertificatesServices from '@/services/digital-certificates-services'
+import * as EdgeApplicationServices from '@/services/edge-application-services'
 
 /** @type {import('vue-router').RouteRecordRaw} */
 export const domainsRoutes = {
@@ -18,8 +12,8 @@ export const domainsRoutes = {
       name: 'list-domains',
       component: () => import('@views/Domains/ListView.vue'),
       props: {
-        listDomainsService,
-        deleteDomainService
+        listDomainsService: DomainServices.listDomainsService,
+        deleteDomainService: DomainServices.deleteDomainService
       },
       meta: {
         breadCrumbs: [
@@ -35,9 +29,9 @@ export const domainsRoutes = {
       name: 'create-domains',
       component: () => import('@views/Domains/CreateView.vue'),
       props: {
-        createDomainService,
-        listDigitalCertificatesService,
-        listEdgeApplicationsService
+        createDomainService: DomainServices.createDomainService,
+        listDigitalCertificatesService: DigitalCertificatesServices.listDigitalCertificatesService,
+        listEdgeApplicationsService: EdgeApplicationServices.listEdgeApplicationsService
       },
       meta: {
         breadCrumbs: [
@@ -57,10 +51,10 @@ export const domainsRoutes = {
       name: 'edit-domains',
       component: () => import('@views/Domains/EditView.vue'),
       props: {
-        editDomainService,
-        listDigitalCertificatesService,
-        listEdgeApplicationsService,
-        loadDomainService
+        editDomainService: DomainServices.editDomainService,
+        listDigitalCertificatesService: DigitalCertificatesServices.listDigitalCertificatesService,
+        listEdgeApplicationsService: EdgeApplicationServices.listEdgeApplicationsService,
+        loadDomainService: DomainServices.loadDomainService
       },
       meta: {
         breadCrumbs: [
