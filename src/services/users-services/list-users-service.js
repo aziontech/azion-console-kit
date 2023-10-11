@@ -16,7 +16,7 @@ const adapt = (httpResponse) => {
   /**
    * Necessary until the API gets the common pattern
    * of returning the array of data inside results property
-   * like other andpoints.
+   * like other endpoints.
    */
   const isArray = Array.isArray(httpResponse.body.results)
 

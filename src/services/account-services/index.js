@@ -1,3 +1,4 @@
-import { getAccountInfo, getUserInfo } from './account-service'
+import { getUserInfoService } from './get-user-info-service'
+import { getAccountInfoService } from './get-account-info-service'
 
-export { getAccountInfo, getUserInfo }
+export { getAccountInfoService, getUserInfoService }

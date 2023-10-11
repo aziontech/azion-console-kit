@@ -36,7 +36,7 @@
             header: 'Application Name'
           },
           {
-            field: 'subject_name',
+            field: 'subjectName',
             header: 'Subject Names'
           },
           {
