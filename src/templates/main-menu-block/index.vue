@@ -142,13 +142,13 @@
         <Avatar
           @click="toggleProfile"
           label="U"
-          class="cursor-pointer sm:hidden"
+          class="cursor-pointer md:hidden"
         />
         <!-- Profile Desktop -->
         <Avatar
           @click="toggleProfile"
           label="U"
-          class="hidden sm:flex cursor-pointer"
+          class="hidden md:flex cursor-pointer"
         />
       </div>
     </div>
@@ -181,7 +181,7 @@
     :pt="{
       header: { class: 'hidden' },
       root: { class: 'shadow-none' },
-      mask: { class: 'top-[57px]' }
+      mask: { class: 'top-[57.5px]' }
     }"
   >
     <div>

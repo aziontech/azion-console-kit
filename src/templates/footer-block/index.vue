@@ -6,7 +6,7 @@
   >
     <span class="text-sm text-normal text-color">© 2023 Azion Technologies.</span>
 
-    <div class="flex flex-col gap-3 lg:gap-8 items-center lg:flex lg:flex-row">
+    <div class="flex flex-col gap-3 lg:gap-4 items-center lg:flex lg:flex-row">
       <div class="flex gap-1">
         <PrimeButton
           label="About"
@@ -45,7 +45,7 @@
         <!--Change Twitter icon to X-->
       </div>
 
-      <div class="flex gap-8">
+      <div class="flex gap-4">
         <!-- System Status -->
         <SystemStatusBarBlock />
         <Dropdown
@@ -58,8 +58,8 @@
           :autoOptionFocus="false"
           :pt="{
             root: {
-              class: 'w-auto py-0 h-[30px] items-center align-middle',
-              style: 'background: var(--surface-ground) !important'
+              class: ' w-auto py-0 h-[30px] items-center align-middle',
+              style: 'background: var(--surface-section) !important'
             },
             item: { class: 'text-sm' },
             input: { class: 'text-sm' }
