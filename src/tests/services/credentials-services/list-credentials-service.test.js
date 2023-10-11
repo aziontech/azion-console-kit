@@ -1,0 +1,119 @@
+import { AxiosHttpClientAdapter } from '@/services/axios/AxiosHttpClientAdapter'
+import * as Errors from '@services/axios/errors'
+import { listCredentialsService } from '@/services/credential-services'
+import { describe, expect, it, vi } from 'vitest'
+
+const fixtures = {
+  credentialBasic: {
+    id: '1',
+    name: 'Cred 1',
+    token: 'token123',
+    status: true,
+    description: 'Some description',
+    last_editor: 'custom@email.com',
+    last_modified: '2023-10-10T00:00:00Z'
+  },
+  credentialDisabled: {
+    id: '2',
+    name: 'Cred 2',
+    token: 'token123',
+    status: false,
+    description: 'Some description',
+    last_editor: 'custom@email.com',
+    last_modified: '2023-10-11T00:00:00Z'
+  }
+}
+
+function makeSut() {
+  const sut = listCredentialsService
+
+  return { sut }
+}
+
+describe('ListCredentialsServices', () => {
+  it('should call api with correct params', async () => {
+    const requestSpy = vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
+      statusCode: 200,
+      body: []
+    })
+
+    const { sut } = makeSut()
+    await sut({})
+
+    expect(requestSpy).toHaveBeenCalledWith({
+      url: 'credentials?order_by=name&sort=asc&page=1&page_size=200',
+      method: 'GET'
+    })
+  })
+
+  it('should parse correctly each returned item', async () => {
+    vi.setSystemTime(new Date(2023, 10, 10, 10))
+    vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
+      statusCode: 200,
+      body: { credentials: [fixtures.credentialBasic, fixtures.credentialDisabled] }
+    })
+    const { sut } = makeSut()
+    const result = await sut({})
+    const [item1, item2] = result
+
+    expect(item1).toEqual({
+      id: fixtures.credentialBasic.id,
+      name: fixtures.credentialBasic.name,
+      token: fixtures.credentialBasic.token,
+      status: 'True',
+      description: fixtures.credentialBasic.description,
+      lastEditor: fixtures.credentialBasic.last_editor,
+      lastModified: fixtures.credentialBasic.last_modified
+    })
+
+    expect(item2).toEqual({
+      id: fixtures.credentialDisabled.id,
+      name: fixtures.credentialDisabled.name,
+      token: fixtures.credentialDisabled.token,
+      status: 'False',
+      description: fixtures.credentialDisabled.description,
+      lastEditor: fixtures.credentialDisabled.last_editor,
+      lastModified: fixtures.credentialDisabled.last_modified
+    })
+  })
+
+  it.each([
+    {
+      statusCode: 400,
+      expectedError: new Errors.InvalidApiRequestError().message
+    },
+    {
+      statusCode: 401,
+      expectedError: new Errors.InvalidApiTokenError().message
+    },
+    {
+      statusCode: 403,
+      expectedError: new Errors.PermissionError().message
+    },
+    {
+      statusCode: 404,
+      expectedError: new Errors.NotFoundError().message
+    },
+    {
+      statusCode: 500,
+      expectedError: new Errors.InternalServerError().message
+    },
+    {
+      statusCode: 'unmappedStatusCode',
+      expectedError: new Errors.UnexpectedError().message
+    }
+  ])(
+    'should throw when request fails with statusCode $statusCode',
+    async ({ statusCode, expectedError }) => {
+      vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
+        statusCode,
+        body: { results: [] }
+      })
+      const { sut } = makeSut()
+
+      const response = sut({})
+
+      expect(response).rejects.toBe(expectedError)
+    }
+  )
+})
