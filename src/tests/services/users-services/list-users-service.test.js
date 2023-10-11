@@ -10,6 +10,7 @@ const fixtures = {
     email: 'johndoe@example.com',
     two_factor_enabled: true,
     is_active: true,
+    teams: [],
     is_account_owner: true
   },
   disabledUserMock: {
@@ -19,6 +20,18 @@ const fixtures = {
     email: 'johndoe@example.com',
     two_factor_enabled: false,
     is_active: false,
+    teams: [
+      {
+        id: 1730,
+        name: 'Default Team',
+        is_active: true
+      },
+      {
+        id: 1731,
+        name: 'Azion Team',
+        is_active: true
+      }
+    ],
     is_account_owner: false
   }
 }
@@ -77,7 +90,7 @@ describe('UsersServices', () => {
         firstName: fixtures.disabledUserMock.first_name,
         lastName: fixtures.disabledUserMock.last_name,
         email: fixtures.disabledUserMock.email,
-        teams: fixtures.disabledUserMock.teams,
+        teams: 'Default Team, Azion Team',
         mfa: 'No',
         active: 'No',
         owner: 'No'
