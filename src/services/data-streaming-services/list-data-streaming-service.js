@@ -1,9 +1,6 @@
 import { AxiosHttpClientAdapter, parseHttpResponse } from '../axios/AxiosHttpClientAdapter'
-import {
-  makeDataStreamingBaseUrl,
-  makeDataStreamingDomainsBaseUrl,
-  makeDataStreamingTemplateBaseUrl
-} from './make-data-streaming-base-url'
+import { makeDataStreamingBaseUrl } from './make-data-streaming-base-url'
+import { makeDataStreamingTemplateBaseUrl } from './make-data-streaming-template-base-url'
 
 export const listDataStreamingService = async () => {
   let httpResponse = await AxiosHttpClientAdapter.request({
@@ -16,33 +13,7 @@ export const listDataStreamingService = async () => {
   return parseHttpResponse(httpResponse)
 }
 
-export const listDataStreamingTemplateService = async () => {
-  let httpResponse = await AxiosHttpClientAdapter.request({
-    url: `${makeDataStreamingTemplateBaseUrl()}`,
-    method: 'GET'
-  })
-
-  httpResponse = adaptListAllTemplates(httpResponse)
-
-  return parseHttpResponse(httpResponse)
-}
-
-export const listDataStreamingDomainsService = async () => {
-  let httpResponse = await AxiosHttpClientAdapter.request({
-    url: `${makeDataStreamingDomainsBaseUrl()}`,
-    method: 'GET'
-  })
-
-  httpResponse = adaptDomains(httpResponse)
-
-  return parseHttpResponse(httpResponse)
-}
-
 const getTemplateById = async ({ id }) => {
-  /***************************************************
-   * @todo: API should be deliver this results as BFF
-   ***************************************************/
-
   let httpResponse = await AxiosHttpClientAdapter.request({
     url: `${makeDataStreamingTemplateBaseUrl()}/${id}`,
     method: 'GET'
@@ -53,43 +24,9 @@ const getTemplateById = async ({ id }) => {
   return parseHttpResponse(httpResponse)
 }
 
-const adaptListAllTemplates = (httpResponse) => {
-  const isArray = Array.isArray(httpResponse.body.results)
-
-  const parsedTemplate = isArray
-    ? httpResponse.body.results.map((template) => ({
-        label: template.name,
-        value: template.id,
-        template: template.template_model
-      }))
-    : []
-
-  return {
-    body: parsedTemplate,
-    statusCode: httpResponse.statusCode
-  }
-}
-
 const adaptTemplate = (httpResponse) => {
   return {
     body: httpResponse.body.results,
-    statusCode: httpResponse.statusCode
-  }
-}
-
-const adaptDomains = (httpResponse) => {
-  const isArray = Array.isArray(httpResponse.body.results)
-
-  const parsedDomains = isArray
-    ? httpResponse.body.results.map((domain) => ({
-        domainID: domain.domain_id,
-        name: domain.name,
-        selected: domain.selected
-      }))
-    : []
-
-  return {
-    body: parsedDomains,
     statusCode: httpResponse.statusCode
   }
 }
