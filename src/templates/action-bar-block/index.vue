@@ -16,7 +16,7 @@
       />
       <PrimeButton
         severity="primary"
-        label="Submit"
+        label="Save"
         @click="handleSubmit"
         :loading="loading"
         :disabled="submitDisabled"
