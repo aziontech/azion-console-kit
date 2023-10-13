@@ -42,25 +42,17 @@
               v-tooltip.top="errors.value"
             />
           </div>
-          <div class="flex gap-3 items-center">
-            <div
-              class="w-full max-w-3xl p-4 rounded-md border surface-border justify-start items-end gap-6 inline-flex"
-            >
-              <div class="grow shrink basis-0 flex-col justify-start items-start gap-1 inline-flex">
-                <div class="self-stretch text-color text-base font-medium leading-normal">
-                  Secret
-                </div>
-                <div class="self-stretch text-color-secondary text-sm font-normal">Description</div>
-              </div>
-              <div>
-                <InputSwitch
-                  v-bind="secret"
-                  v-model="secret.value"
-                  :class="{ 'p-invalid': errors.secret }"
-                />
-              </div>
-            </div>
-          </div>
+          <Card :pt="styleCardSimple">
+            <template #title>
+              <span class="text-base">Secret</span>
+              <InputSwitch
+                v-bind="secret"
+                v-model="secret.value"
+                :class="{ 'p-invalid': errors.secret }"
+              />
+            </template>
+            <template #subtitle> Description </template>
+          </Card>
         </template>
       </form-horizontal>
     </template>
@@ -68,10 +60,13 @@
 </template>
 
 <script setup>
+ import { ref } from 'vue'
   import CreateFormBlock from '@/templates/create-form-block'
   import formHorizontal from '@/templates/create-form-block/form-horizontal'
   import InputText from 'primevue/inputtext'
   import InputSwitch from 'primevue/inputswitch'
+  import Card from 'primevue/card'
+
   import { useForm } from 'vee-validate'
   import * as yup from 'yup'
 
@@ -80,6 +75,11 @@
       type: Function,
       required: true
     }
+  })
+  const styleCardSimple = ref({
+    body: { class: 'p-4' },
+    title: { class: 'flex justify-between items-cente text-base m-0' },
+    subtitle: { class: 'text-sm font-normal text-color-secondary m-0' }
   })
   //Validation Schema
   const validationSchema = yup.object({
