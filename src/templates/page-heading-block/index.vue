@@ -3,7 +3,6 @@
     <Breadcrumb
       :home="generateHomeBreadCrumb"
       :model="generateBreadCrumbs"
-      class="!p-2 border-none"
     />
     <div class="flex w-full py-4 items-end">
       <div
@@ -11,14 +10,13 @@
         v-if="pageTitle || description"
       >
         <div
-          @click="handleCancel"
-          class="text-gray-600 text-3xl font-medium font-['Roboto'] leading-9 hover:cursor-pointer"
+          class="text-[var(--text-color)] text-3xl font-medium font-['Roboto'] leading-9 hover:cursor-pointer"
           v-if="pageTitle"
         >
           {{ pageTitle }}
         </div>
         <div
-          class="text-stone-500 text-lg font-normal font-['Roboto'] leading-7"
+          class="text-[var(--text-color-secondary)] text-lg font-normal font-['Roboto'] leading-7"
           v-if="description"
         >
           {{ description }}
@@ -104,9 +102,6 @@
       }
     },
     methods: {
-      handleCancel() {
-        this.$router.go('-1')
-      },
       handleTabChange() {
         this.$emit('tabChange', this.activeTab)
       }
