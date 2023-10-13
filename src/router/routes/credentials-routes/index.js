@@ -1,7 +1,9 @@
 import {
   listCredentialsService,
   deleteCredentialService,
-  createCredentialService
+  createCredentialService,
+  loadCredentialService,
+  editCredentialService
 } from '@/services/credential-services'
 
 /** @type {import('vue-router').RouteRecordRaw} */
@@ -42,6 +44,26 @@ export const credentialsRoutes = {
           {
             label: 'Create Credential',
             to: '/credential/create'
+          }
+        ]
+      }
+    },
+    {
+      path: 'edit/:id',
+      name: 'edit-credential',
+      component: () => import('@views/Credentials/EditView.vue'),
+      props: {
+        editCredentialService,
+        loadCredentialService
+      },
+      meta: {
+        breadCrumbs: [
+          {
+            label: 'Credentials',
+            to: '/credentials'
+          },
+          {
+            label: 'Edit Credential'
           }
         ]
       }
