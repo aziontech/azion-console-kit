@@ -60,7 +60,7 @@
 </template>
 
 <script setup>
- import { ref } from 'vue'
+  import { ref } from 'vue'
   import CreateFormBlock from '@/templates/create-form-block'
   import formHorizontal from '@/templates/create-form-block/form-horizontal'
   import InputText from 'primevue/inputtext'
