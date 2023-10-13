@@ -40,7 +40,7 @@
   import TabMenu from 'primevue/tabmenu'
 
   export default {
-    name: 'PageHeadingTemplate',
+    name: 'PageHeadingBlock',
     components: {
       Breadcrumb,
       TabMenu
