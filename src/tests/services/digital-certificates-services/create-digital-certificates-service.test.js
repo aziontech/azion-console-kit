@@ -1,0 +1,96 @@
+import { AxiosHttpClientAdapter } from '@/services/axios/AxiosHttpClientAdapter'
+import {
+  InternalServerError,
+  InvalidApiRequestError,
+  InvalidApiTokenError,
+  NotFoundError,
+  PermissionError,
+  UnexpectedError
+} from '@/services/axios/errors'
+import { createDigitalCertificatesService } from '@/services/digital-certificates-services'
+createDigitalCertificatesService
+import { describe, expect, it, vi } from 'vitest'
+
+const fixture = {
+  payloadMock: {
+    digitalCertificateName: 'MyWebsiteCertificate',
+    certificateType: 'SSL/TLS',
+    certificate:
+      '-----BEGIN CERTIFICATE-----\nMIIE... (certificate content) ...\n-----END CERTIFICATE-----',
+    privateKey:
+      '-----BEGIN PRIVATE KEY-----\nMIIE... (private key content) ...\n-----END PRIVATE KEY-----'
+  },
+  requestBodyMock: {
+    name: 'MyWebsiteCertificate',
+    certificate_type: 'SSL/TLS',
+    certificate:
+      '-----BEGIN CERTIFICATE-----\nMIIE... (certificate content) ...\n-----END CERTIFICATE-----',
+    private_key:
+      '-----BEGIN PRIVATE KEY-----\nMIIE... (private key content) ...\n-----END PRIVATE KEY-----'
+  }
+}
+
+const makeSut = () => {
+  const sut = createDigitalCertificatesService
+
+  return {
+    sut
+  }
+}
+
+describe('DigitalCertificatesServices', () => {
+  it('should call api with correct params', async () => {
+    const requestSpy = vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
+      statusCode: 201
+    })
+
+    const { sut } = makeSut()
+
+    await sut(fixture.payloadMock)
+
+    expect(requestSpy).toHaveBeenCalledWith({
+      method: 'POST',
+      url: 'digital_certificates',
+      body: fixture.requestBodyMock
+    })
+  })
+
+  it.each([
+    {
+      statusCode: 400,
+      expectedError: new InvalidApiRequestError().message
+    },
+    {
+      statusCode: 401,
+      expectedError: new InvalidApiTokenError().message
+    },
+    {
+      statusCode: 403,
+      expectedError: new PermissionError().message
+    },
+    {
+      statusCode: 404,
+      expectedError: new NotFoundError().message
+    },
+    {
+      statusCode: 500,
+      expectedError: new InternalServerError().message
+    },
+    {
+      statusCode: 'unmappedStatusCode',
+      expectedError: new UnexpectedError().message
+    }
+  ])(
+    'should throw when request fails with statusCode $statusCode',
+    async ({ statusCode, expectedError }) => {
+      vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
+        statusCode
+      })
+      const { sut } = makeSut()
+
+      const response = sut(fixture.payloadMock)
+
+      expect(response).rejects.toBe(expectedError)
+    }
+  )
+})

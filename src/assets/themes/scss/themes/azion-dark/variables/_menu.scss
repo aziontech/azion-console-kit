@@ -1,10 +1,10 @@
 /// Background of a steps item
 /// @group menu
-$stepsItemBg: #ffffff;
+$stepsItemBg: #00000000;
 
 /// Border of a steps item
 /// @group menu
-$stepsItemBorder: 1px solid #c8c8c8;
+$stepsItemBorder: 1px solid #3e3e3e;
 
 /// Text color of a steps item
 /// @group menu
@@ -12,15 +12,15 @@ $stepsItemTextColor: $textSecondaryColor;
 
 /// Width of a steps itrem number
 /// @group menu
-$stepsItemNumberWidth: 2rem;
+$stepsItemNumberWidth: 1.75rem;
 
 /// Height of a steps itrem number
 /// @group menu
-$stepsItemNumberHeight: 2rem;
+$stepsItemNumberHeight: 1.75rem;
 
 /// Font size of a steps itrem number
 /// @group menu
-$stepsItemNumberFontSize: 1.143rem;
+$stepsItemNumberFontSize: 1rem;
 
 /// Color of a steps itrem number
 /// @group menu
@@ -28,7 +28,7 @@ $stepsItemNumberColor: $textColor;
 
 /// Border radius of a steps itrem number
 /// @group menu
-$stepsItemNumberBorderRadius: 50%;
+$stepsItemNumberBorderRadius: $borderRadius;
 
 /// Font weight of an active steps itrem number
 /// @group menu
@@ -56,7 +56,7 @@ $menuitemPadding: 0.75rem 1rem;
 
 /// Border radius of a menuitem
 /// @group menu
-$menuitemBorderRadius: 0;
+$menuitemBorderRadius: 6px;
 
 /// Text color of a menuitem
 /// @group menu
@@ -152,7 +152,7 @@ $overlayMenuShadow:
 
 /// Padding of a vertical menu e.g. tieredmenu, contextmenu
 /// @group menu
-$verticalMenuPadding: 0.25rem 0;
+$verticalMenuPadding: 1.25rem 1rem;
 
 /// Margin of a menuitem separator
 /// @group menu

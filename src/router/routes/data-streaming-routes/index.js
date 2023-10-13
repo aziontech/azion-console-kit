@@ -21,6 +21,28 @@ export const dataStreamingRoutes = {
           }
         ]
       }
+    },
+    {
+      path: 'create',
+      name: 'create-data-streaming',
+      component: () => import('@views/DataStreaming/CreateView.vue'),
+      props: {
+        listDataStreamingTemplateService: DataStreamingService.listDataStreamingTemplateService,
+        listDataStreamingDomainsService: DataStreamingService.listDataStreamingDomainsService,
+        createDataStreamingService: DataStreamingService.createDataStreamingService
+      },
+      meta: {
+        breadCrumbs: [
+          {
+            label: 'Data Streaming',
+            to: '/data-streaming'
+          },
+          {
+            label: 'Create Data Streaming',
+            to: '/data-streaming/create'
+          }
+        ]
+      }
     }
   ]
 }

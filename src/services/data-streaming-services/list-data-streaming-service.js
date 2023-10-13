@@ -14,10 +14,6 @@ export const listDataStreamingService = async () => {
 }
 
 const getTemplateById = async ({ id }) => {
-  /***************************************************
-   * @todo: API should be deliver this results as BFF
-   ***************************************************/
-
   let httpResponse = await AxiosHttpClientAdapter.request({
     url: `${makeDataStreamingTemplateBaseUrl()}/${id}`,
     method: 'GET'
