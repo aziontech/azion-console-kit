@@ -41,11 +41,9 @@
   import Breadcrumb from 'primevue/breadcrumb'
   import TabMenu from 'primevue/tabmenu'
 
-  // Export my assets and components
   export default {
     name: 'PageHeadingTemplate',
     components: {
-      //    PrimeButton,
       Breadcrumb,
       TabMenu
     },
