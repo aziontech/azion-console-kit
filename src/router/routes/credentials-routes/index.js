@@ -21,6 +21,26 @@ export const credentialsRoutes = {
           }
         ]
       }
+    },
+    {
+      path: 'create',
+      name: 'create-credential',
+      component: () => import('@views/Credentials/CreateView.vue'),
+      props: {
+        createCredentialService: CredentialServices.createCredentialService
+      },
+      meta: {
+        breadCrumbs: [
+          {
+            label: 'Credentials',
+            to: '/credentials'
+          },
+          {
+            label: 'Create Credential',
+            to: '/credential/create'
+          }
+        ]
+      }
     }
   ]
 }

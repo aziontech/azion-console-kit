@@ -26,7 +26,7 @@ export const domainsRoutes = {
     },
     {
       path: 'create',
-      name: 'create-domains',
+      name: 'create-domain',
       component: () => import('@views/Domains/CreateView.vue'),
       props: {
         createDomainService: DomainServices.createDomainService,
@@ -40,7 +40,7 @@ export const domainsRoutes = {
             to: '/domains'
           },
           {
-            label: 'Create Domains',
+            label: 'Create Domain',
             to: '/domains/create'
           }
         ]
@@ -48,7 +48,7 @@ export const domainsRoutes = {
     },
     {
       path: 'edit/:id',
-      name: 'edit-domains',
+      name: 'edit-domain',
       component: () => import('@views/Domains/EditView.vue'),
       props: {
         editDomainService: DomainServices.editDomainService,
