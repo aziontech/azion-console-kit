@@ -214,8 +214,8 @@
   <!-- Profile Menu -->
   <PrimeMenu
     :pt="{
-      root: { class: '!w-[280px] px-0 pb-2 pt-0' },
-      menu: { class: 'p-0' }
+      root: { class: '!w-[280px] pb-2 pt-0' },
+      menu: { class: '' }
     }"
     class=""
     ref="profile"
@@ -223,9 +223,9 @@
     :model="profileMenuItems"
   >
     <template #start>
-      <div class="flex flex-column px-4 py-2.5">
+      <div class="flex flex-column mt-2 px-2.5 py-3">
         <div class="flex flex-column align gap-1">
-          <span class="font-medium">{{ user.name }}</span>
+          <span class="text-sm font-medium">{{ user.name }}</span>
           <div class="flex gap-2">
             <span class="text-xs">ID: {{ user.id }}</span>
             <span class="text-xs">Client ID: {{ user.client_id }}</span>
@@ -236,7 +236,7 @@
 
     <template #end>
       <div class="flex flex-row items-center">
-        <div class="flex flex-col gap-1 px-4 py-2.5">
+        <div class="flex flex-col gap-1 px-3 py-2.5">
           <span class="text-sm font-medium leading-none">{{ user.full_name }}</span>
           <span class="text-xs">{{ user.email }}</span>
         </div>

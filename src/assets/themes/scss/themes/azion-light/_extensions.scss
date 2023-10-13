@@ -1,1 +1,24 @@
 /* Customizations to the designer theme should be defined here */
+@layer primevue {
+  .p-button {
+    font-weight: 600 !important;
+  }
+  .p-dropdown-item {
+    height: 38px !important;
+    display: flex !important;
+    align-items: center !important;
+    font-size: 0.875rem !important;
+    font-weight: normal !important;
+  }
+  .p-dropdown-item-group {
+    font-size: 0.875rem !important;
+    font-weight: 500 !important;
+  }
+  .p-menu {
+    .p-menuitem {
+      .p-menuitem-content {
+        font-size: 0.875rem !important;
+      }
+    }
+  }
+}
