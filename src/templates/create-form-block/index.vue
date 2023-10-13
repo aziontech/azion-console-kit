@@ -1,7 +1,7 @@
 <template>
   <div class="flex flex-col min-h-[calc(100vh-120px)]">
     <Toast />
-    <PageHeadingTemplate :pageTitle="pageTitle"/> 
+    <PageHeadingTemplate :pageTitle="pageTitle" />
     <form class="w-full grow mt-4 p-4 max-w-screen-sm flex flex-col gap-4 lg:max-w-7xl mx-auto">
       <div class="flex flex-col gap-4 sm:!w-full md:!w-1/2">
         <slot name="form" />
@@ -22,16 +22,15 @@
   import ActionBarTemplate from '@/templates/action-bar-block'
   import PageHeadingTemplate from '@/templates/page-heading-block'
 
-
   export default {
     name: 'create-form-block',
     components: {
       Toast,
       ActionBarTemplate,
-      PageHeadingTemplate,
+      PageHeadingTemplate
     },
     data: () => ({
-      isLoading: false,
+      isLoading: false
     }),
     props: {
       pageTitle: {
