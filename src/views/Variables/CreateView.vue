@@ -42,7 +42,13 @@
               v-tooltip.top="errors.value"
             />
           </div>
-          <Card :pt="styleCardSimple">
+          <Card
+            :pt="{
+              body: { class: 'p-4' },
+              title: { class: 'flex justify-between items-cente text-base m-0' },
+              subtitle: { class: 'text-sm font-normal text-color-secondary m-0' }
+            }"
+          >
             <template #title>
               <span class="text-base">Secret</span>
               <InputSwitch
@@ -60,7 +66,6 @@
 </template>
 
 <script setup>
-  import { ref } from 'vue'
   import CreateFormBlock from '@/templates/create-form-block'
   import formHorizontal from '@/templates/create-form-block/form-horizontal'
   import InputText from 'primevue/inputtext'
@@ -76,11 +81,7 @@
       required: true
     }
   })
-  const styleCardSimple = ref({
-    body: { class: 'p-4' },
-    title: { class: 'flex justify-between items-cente text-base m-0' },
-    subtitle: { class: 'text-sm font-normal text-color-secondary m-0' }
-  })
+
   //Validation Schema
   const validationSchema = yup.object({
     key: yup.string().required(),
