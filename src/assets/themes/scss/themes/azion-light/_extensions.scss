@@ -1,40 +1,41 @@
 /* Customizations to the designer theme should be defined here */
 @layer primevue {
-  // Custom SelectButton
-  .p-selectbutton {
+    // Custom SelectButton
+    .p-selectbutton {
     background: var(--surface-hover) !important;
     padding: 4px !important;
     border-radius: 4px !important;
 
-    .p-button {
-      background: none !important;
-      border: none !important;
-      height: 28px !important;
-      font-size: 14px !important;
-      border-radius: 4px !important;
-      color: var(--text-color-secondary) !important;
-      font-weight: 600 !important;
+        .p-button {
+            background: none !important;
+            border: none !important;
+            height: 28px !important;
+            font-size: 14px !important;
+            border-radius: 4px !important;
+            color: var(--text-color-secondary) !important;
+            font-weight: 600 !important;
 
-      &:not(.p-disabled):not(.p-highlight):hover {
-        border-color: none !important;
-        color: var(--text-color) !important;
-      }
+            &:not(.p-disabled):not(.p-highlight):hover {
+            border-color: none !important;
+            color: var(--text-color) !important;
+            }
 
-      &.p-highlight {
-        background: var(--surface-0) !important;
-        border-color: none !important;
-        font-weight: 600 !important;
-        border-radius: 4px !important;
-        color: var(--text-color) !important;
+            &.p-highlight {
+            background: var(--surface-0) !important;
+            border-color: none !important;
+            font-weight: 600 !important;
+            border-radius: 4px !important;
+            color: var(--text-color) !important;
 
-        &:hover {
-          background: var(--surface-500) !important;
-          border-color: none !important;
-          color: var(--text-color) !important;
+                &:hover {
+                background: var(--surface-500) !important;
+                border-color: none !important;
+                color: $toggleButtonTextActiveHoverColor !important;
+                color: var(--text-color) !important;
+                }
+            }
         }
-      }
     }
-  }
     // Custom TabView
     .p-tabview {
         .p-tabview-nav {
@@ -42,28 +43,45 @@
 
             li {
                 .p-tabview-nav-link {
-                    font-weight: 500;
-                    min-height: 2rem;
-                    font-size: 0.9rem;
-                    border-radius: $borderRadius;
+                font-weight: 500;
+                min-height: 2rem;
+                font-size: 0.9rem;
+                border-radius: $borderRadius;
                 }
             }
         }
-        
-        .p-tabview-nav-btn.p-link {
-            background-color: var(--surface-0) !important;
-            color: $buttonBg !important;
-            width: 2rem;
-            border-radius: 0;
 
-            &:enabled:hover {
-            background: var(--surface-100) !important;
-            color: $buttonBg;
-            }
+        .p-tabview-nav-btn.p-link {
+        background-color: var(--surface-0) !important;
+        color: $buttonBg !important;
+        width: 2rem;
+        border-radius: 0;
+
+        &:enabled:hover {
+        background: var(--surface-100) !important;
+        color: $buttonBg;
         }
-        
+        }
+
         .p-tabview-panels {
             background: transparent !important;
         }
     }
+    //Custom TabMenu
+    .p-tabmenu {
+        .p-tabmenu-nav {
+            gap: 0.8rem !important;
+        
+            .p-tabmenuitem {
+        
+            .p-menuitem-link {
+                font-weight: 500 !important;
+                min-height: 2rem !important;
+                font-size: 0.9rem !important;
+                border-radius: $borderRadius !important;
+            }
+        
+            }
+        }
+    }   
 }
