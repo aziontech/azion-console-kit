@@ -1,18 +1,7 @@
 <template>
   <div class="flex flex-col min-h-[calc(100vh-120px)]">
     <Toast />
-    <header class="border-neutral-200 border-b min-h-[82px] w-full flex items-center">
-      <div class="p-4 w-full">
-        <div class="flex flex-row flex-wrap items-center justify-left gap-4">
-          <PrimeButton
-            @click="handleCancel"
-            text
-            icon="pi pi-arrow-left"
-          ></PrimeButton>
-          <h1 class="text-4xl text-left font-normal text-gray-600">{{ pageTitle }}</h1>
-        </div>
-      </div>
-    </header>
+    <PageHeadingTemplate :pageTitle="pageTitle"/> 
     <form class="w-full grow mt-4 p-4 max-w-screen-sm flex flex-col gap-4 lg:max-w-7xl mx-auto">
       <div class="flex flex-col gap-4 sm:!w-full md:!w-1/2">
         <slot name="form" />
@@ -30,17 +19,19 @@
 </template>
 <script>
   import Toast from 'primevue/toast'
-  import PrimeButton from 'primevue/button'
   import ActionBarTemplate from '@/templates/action-bar-block'
+  import PageHeadingTemplate from '@/templates/page-heading-block'
+
+
   export default {
     name: 'create-form-block',
     components: {
       Toast,
-      PrimeButton,
-      ActionBarTemplate
+      ActionBarTemplate,
+      PageHeadingTemplate,
     },
     data: () => ({
-      isLoading: false
+      isLoading: false,
     }),
     props: {
       pageTitle: {
@@ -68,6 +59,7 @@
       handleCancel() {
         this.$router.go('-1')
       },
+
       async validateAndSubmit() {
         try {
           this.isLoading = true
