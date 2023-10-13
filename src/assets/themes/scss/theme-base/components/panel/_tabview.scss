@@ -3,7 +3,6 @@
     background: $tabviewNavBg;
     border: $tabviewNavBorder;
     border-width: $tabviewNavBorderWidth;
-    gap: 0.8rem;
 
     li {
       margin-right: $tabviewHeaderSpacing;
@@ -15,11 +14,9 @@
         background: $tabviewHeaderBg;
         color: $tabviewHeaderTextColor;
         padding: $tabviewHeaderPadding;
-        font-weight: 500;
-        min-height: 2rem;
-        font-size: 0.9rem;
         font-weight: $tabviewHeaderFontWeight;
-        border-radius: $borderRadius;
+        border-top-right-radius: $borderRadius;
+        border-top-left-radius: $borderRadius;
         transition: $listItemTransition;
         margin: $tabviewHeaderMargin;
 
@@ -47,24 +44,19 @@
   }
 
   .p-tabview-nav-btn.p-link {
-    background-color: var(--surface-0);
-    color: $buttonBg;
-    width: 2rem;
-    border-radius: 0;
+    background: $tabviewHeaderActiveBg;
+    color: $tabviewHeaderTextActiveColor;
+    width: $buttonIconOnlyWidth;
     box-shadow: $raisedButtonShadow;
-    transition: $formElementTransition;
+    border-radius: 0;
 
     &:focus {
       @include focused-inset();
     }
-    &:enabled:hover {
-      background: var(--surface-100);
-      color: $buttonBg;
-    }
   }
 
   .p-tabview-panels {
-    background: transparent;
+    background: $tabviewContentBg;
     padding: $tabviewContentPadding;
     border: $tabviewContentBorder;
     color: $tabviewContentTextColor;
