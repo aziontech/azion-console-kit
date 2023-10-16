@@ -3,7 +3,6 @@
     background: $tabviewNavBg;
     border: $tabviewNavBorder;
     border-width: $tabviewNavBorderWidth;
-    gap: 0.8rem;
 
     .p-tabmenuitem {
       margin-right: $tabviewHeaderSpacing;
@@ -15,11 +14,9 @@
         background: $tabviewHeaderBg;
         color: $tabviewHeaderTextColor;
         padding: $tabviewHeaderPadding;
-        font-weight: 500;
-        min-height: 2rem;
-        font-size: 0.9rem;
         font-weight: $tabviewHeaderFontWeight;
-        border-radius: $borderRadius;
+        border-top-right-radius: $borderRadius;
+        border-top-left-radius: $borderRadius;
         transition: $listItemTransition;
         margin: $tabviewHeaderMargin;
 
