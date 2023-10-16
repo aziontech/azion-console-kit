@@ -69,7 +69,7 @@
                 size="small"
                 icon="pi pi-ellipsis-h"
                 text
-                @click="(event) => toggleActionsMenu(event, rowData.id)"
+                @click="(event) => toggleActionsMenu(event, rowData[pathIdField])"
                 class="cursor-pointer"
               />
             </div>
@@ -196,7 +196,12 @@
       deleteService: {
         required: true,
         type: Function
-      }
+      },
+      pathIdField: {
+        required: true,
+        default: 'id',
+        type: String
+      },
     },
     async created() {
       await this.loadData({ page: 1 })
