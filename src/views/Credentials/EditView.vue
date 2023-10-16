@@ -88,7 +88,8 @@
     },
     props: {
       editCredentialService: Function,
-      loadCredentialService: Function
+      loadCredentialService: Function,
+      clipboardWrite: Function
     },
     setup() {
       const validationSchema = yup.object({
@@ -123,9 +124,13 @@
     },
     methods: {
       copyToken() {
-        if (!navigator.clipboard) return
-
-        navigator.clipboard.writeText(this.token)
+        this.clipboardWrite(this.token)
+        this.$toast.add({
+          closable: true,
+          severity: 'success',
+          summary: 'token copied',
+          life: 10000
+        })
       }
     }
   }

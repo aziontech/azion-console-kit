@@ -5,6 +5,7 @@ import {
   loadCredentialService,
   editCredentialService
 } from '@/services/credential-services'
+import { clipboardWrite } from '@/helpers/clipboard'
 
 /** @type {import('vue-router').RouteRecordRaw} */
 export const credentialsRoutes = {
@@ -54,7 +55,8 @@ export const credentialsRoutes = {
       component: () => import('@views/Credentials/EditView.vue'),
       props: {
         editCredentialService,
-        loadCredentialService
+        loadCredentialService,
+        clipboardWrite
       },
       meta: {
         breadCrumbs: [
