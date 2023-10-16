@@ -18,14 +18,14 @@
 </script>
 
 <template>
-  <main class="flex min-h-screen flex-col">
+  <main class="flex flex-col">
     <ShellBlock
       v-slot:default="{ customClass }"
       :isLogged="isLogged"
     >
       <RouterView
         :class="customClass"
-        class="w-full transition-[width] duration-300 ease-in-out"
+        class="w-full transition-[width] duration-300 ease-in-out h-full"
       />
     </ShellBlock>
   </main>

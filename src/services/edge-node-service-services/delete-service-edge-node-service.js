@@ -1,9 +1,9 @@
 import { AxiosHttpClientAdapter, parseHttpResponse } from '../axios/AxiosHttpClientAdapter'
-import { makeEdgeNodeListBaseUrl } from '../edge-node-services/make-edge-node-list-base-url'
+import { makeEdgeNodeBaseUrl } from '../edge-node-services/make-edge-node-base-url'
 
 export const deleteEdgeNodeService = async ({ edgeNodeId, serviceId }) => {
   let httpResponse = await AxiosHttpClientAdapter.request({
-    url: `${makeEdgeNodeListBaseUrl()}/${edgeNodeId}/services/${serviceId}`,
+    url: `${makeEdgeNodeBaseUrl()}/${edgeNodeId}/services/${serviceId}`,
     method: 'DELETE'
   })
 

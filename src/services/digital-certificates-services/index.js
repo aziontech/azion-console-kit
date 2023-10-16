@@ -1,4 +1,8 @@
-import { listDigitalCertificatesService } from './list-digital-certificates-service'
+import {
+  listDigitalCertificatesService,
+  EDGE_CERTIFICATE,
+  TRUSTED_CA_CERTIFICATE
+} from './list-digital-certificates-service'
 import { deleteDigitalCertificatesService } from './delete-digital-certificates-service'
 import { createDigitalCertificatesService } from './create-digital-certificates-service'
 import { createDigitalCertificatesCSRService } from './create-digital-certificates-csr-service'
@@ -11,5 +15,7 @@ export {
   createDigitalCertificatesService,
   createDigitalCertificatesCSRService,
   loadDigitalCertificateService,
-  editDigitalCertificateService
+  editDigitalCertificateService,
+  EDGE_CERTIFICATE,
+  TRUSTED_CA_CERTIFICATE
 }
