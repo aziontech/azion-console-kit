@@ -18,7 +18,7 @@ const adapt = (httpResponse) => {
     name: payload.name,
     template: payload.template_id,
     dataSource: payload.data_source,
-    domainOption: payload.all_domains ?  '1' : '0',
+    domainOption: payload.all_domains ? '1' : '0',
     endpoint: payload.endpoint.endpoint_type,
     ...getInfoByEndpoint(payload)
   }

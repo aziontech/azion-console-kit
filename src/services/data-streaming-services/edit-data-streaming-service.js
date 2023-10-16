@@ -3,7 +3,7 @@ import { makeDataStreamingBaseUrl } from './make-data-streaming-base-url'
 
 export const editDataStreamingService = async (payload) => {
   let httpResponse = await AxiosHttpClientAdapter.request({
-    url: `${makeDataStreamingBaseUrl()}`,
+    url: `${makeDataStreamingBaseUrl()}/${payload.id}`,
     method: 'PUT',
     body: adapt(payload)
   })
