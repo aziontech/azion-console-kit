@@ -938,14 +938,17 @@
     }
   )
 
-  watch(() => domainOption.value, (option) => {
-    if (option === '1') {
-      if (domains.value[1].length > 0) {
-        domains.value[1].forEach((element) => {
-          domains.value[0].push(element)
-        })
-        domains.value[1] = []
+  watch(
+    () => domainOption.value,
+    (option) => {
+      if (option === '1') {
+        if (domains.value[1].length > 0) {
+          domains.value[1].forEach((element) => {
+            domains.value[0].push(element)
+          })
+          domains.value[1] = []
+        }
       }
     }
-  })
+  )
 </script>

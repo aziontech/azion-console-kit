@@ -127,13 +127,13 @@ const getDomainsOnDataStreaming = async (dataStreamingID) => {
 
   const domains = [[], []]
 
-  httpResponse.body.results.forEach(domain => {
+  httpResponse.body.results.forEach((domain) => {
     if (domain.selected) {
       domains[1].push(domain)
     } else {
       domains[0].push(domain)
     }
-  });
+  })
 
   return domains
-} 
+}
