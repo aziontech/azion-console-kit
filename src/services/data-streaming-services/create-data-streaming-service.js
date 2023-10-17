@@ -117,10 +117,9 @@ const getDomains = (domains) => {
 
 const getHeaders = (listHeaders) => {
   const headers = {}
-  listHeaders.forEach((header, index) => {
-    if (header.value) {
-      headers[`header-name-${index + 1}`] = header.value
-    }
-  })
+  listHeaders.forEach(element => {
+      const header = element.value.split(':')
+      headers[header[0]] = header[1].trim()
+  });
   return headers
 }

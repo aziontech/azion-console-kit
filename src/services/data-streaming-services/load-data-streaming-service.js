@@ -36,7 +36,8 @@ const getInfoByEndpoint = (payload) => {
         endpointUrl: payload.endpoint.url,
         payloadFormat: payload.endpoint.payload_format,
         lineSeparator: payload.endpoint.log_line_separator,
-        maxSize: payload.endpoint.max_size
+        maxSize: payload.endpoint.max_size,
+        ...getHeaders(payload)
       }
     case 'kafka':
       return {
@@ -101,5 +102,15 @@ const getInfoByEndpoint = (payload) => {
       }
     default:
       return {}
+  }
+}
+
+const getHeaders = (payload) => {
+  const headers = []
+  Object.entries(payload.endpoint?.headers).forEach(element => {
+      headers.push({ value: `${element[0]}: ${element[1]}`, deleted: true })
+  });
+  return {
+    headers: headers
   }
 }

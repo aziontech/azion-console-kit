@@ -140,7 +140,7 @@
           <ButtonPrimer
             icon="pi pi-times"
             severity="danger"
-            v-if="header.deleted"
+            v-if="header.deleted && index != 0"
             @click="removeHeader(index)"
           />
         </div>
@@ -762,7 +762,7 @@
     })
   })
 
-  const { setValues, errors, /*defineInputBinds,*/ meta, values } = useForm({
+  const { setValues, errors, meta, values } = useForm({
     validationSchema,
     initialValues: {
       name: '',
@@ -775,7 +775,7 @@
       // standard
       endpointUrl: '',
       headers: [{ value: '', deleted: false }],
-      maxSize: 100000,
+      maxSize: 1000000,
       lineSeparator: '\n',
       payloadFormat: '$dataset',
 
@@ -919,7 +919,11 @@
 
   const loaderDataStreamDomains = async () => {
     const domains = await props.listDataStreamingDomainsService()
-    listDomains.value = [domains, []]
+    if (domainOption.value === '0') {
+      listDomains.value = [[], domains]
+    } else {
+      listDomains.value = [domains, []]
+    }
   }
 
   const addHeader = () => {
@@ -959,6 +963,7 @@
   )
 
   watch([values, listDomains], () => {
+    console.log(listDomains.value)
     formValues = { ...values, domains: listDomains.value[1] }
   })
 </script>
