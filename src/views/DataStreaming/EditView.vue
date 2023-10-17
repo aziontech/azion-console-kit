@@ -5,7 +5,7 @@
     :loadService="props.loadDataStreamingService"
     :initialDataSetter="setValues"
     :isValid="meta.valid"
-    :formData="formValues"
+    :formData="values"
   >
     <template #form>
       <!-- data-source -->
@@ -82,9 +82,9 @@
       <div v-if="domainOption === '0'">
         <label>Domains:</label>
         <PickList
-          v-model="listDomains"
+          v-model="domains"
           listStyle="height:342px"
-          dataKey="domainID"
+          dataKey="domain_id"
           breakpoint="1400px"
         >
           <template #sourceheader>Available Domains</template>
@@ -571,7 +571,6 @@
   ])
   const listTemplates = ref([])
   const dataSet = ref('')
-  const listDomains = ref([])
   const listEndpoint = ref([
     { label: 'Standard HTTP/HTTPS POST', value: 'standard' },
     { label: 'Apache Kafka', value: 'kafka' },
@@ -765,11 +764,13 @@
   const { setValues, errors, meta, values } = useForm({
     validationSchema,
     initialValues: {
+      id: '',
       name: '',
       dataSource: 'http',
       template: '',
       dataSet: '',
       domainOption: '1',
+      domains: [],
       endpoint: '',
 
       // standard
@@ -838,6 +839,7 @@
   const { value: dataSource } = useField('dataSource')
   const { value: template } = useField('template')
   const { value: domainOption } = useField('domainOption')
+  const { value: domains } = useField('domains')
   const { value: endpoint } = useField('endpoint')
 
   // standard
@@ -899,11 +901,8 @@
   const { value: containerName } = useField('containerName')
   const { value: blobToken } = useField('blobToken')
 
-  let formValues = { ...values, listDomains }
-
   onMounted(async () => {
     await loaderDataStreamTemplates()
-    await loaderDataStreamDomains()
   })
 
   const insertDataSet = (templateID) => {
@@ -915,15 +914,6 @@
     const templates = await props.listDataStreamingTemplateService()
     listTemplates.value = templates
     if (listTemplates?.value[0]?.value) template.value = listTemplates.value[0].value
-  }
-
-  const loaderDataStreamDomains = async () => {
-    const domains = await props.listDataStreamingDomainsService()
-    if (domainOption.value === '0') {
-      listDomains.value = [[], domains]
-    } else {
-      listDomains.value = [domains, []]
-    }
   }
 
   const addHeader = () => {
@@ -948,22 +938,14 @@
     }
   )
 
-  watch(
-    () => domainOption.value,
-    (option) => {
-      if (option === '1') {
-        if (listDomains.value[1].length > 0) {
-          listDomains.value[1].forEach((element) => {
-            listDomains.value[0].push(element)
-          })
-          listDomains.value[1] = []
-        }
+  watch(() => domainOption.value, (option) => {
+    if (option === '1') {
+      if (domains.value[1].length > 0) {
+        domains.value[1].forEach((element) => {
+          domains.value[0].push(element)
+        })
+        domains.value[1] = []
       }
     }
-  )
-
-  watch([values, listDomains], () => {
-    console.log(listDomains.value)
-    formValues = { ...values, domains: listDomains.value[1] }
   })
 </script>

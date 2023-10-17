@@ -1,24 +1,28 @@
 import { AxiosHttpClientAdapter, parseHttpResponse } from '../axios/AxiosHttpClientAdapter'
 import { makeDataStreamingBaseUrl } from './make-data-streaming-base-url'
+import { makeDataStreamingDomainsBaseUrl } from './make-data-streaming-domains-base-url'
 
 export const loadDataStreamingService = async ({ id }) => {
   let httpResponse = await AxiosHttpClientAdapter.request({
     url: `${makeDataStreamingBaseUrl()}/${id}`,
     method: 'GET'
   })
-  httpResponse = adapt(httpResponse)
+  httpResponse = await adapt(httpResponse)
 
   return parseHttpResponse(httpResponse)
 }
 
-const adapt = (httpResponse) => {
+const adapt = async (httpResponse) => {
   const payload = httpResponse.body.results
+  const domains = await getDomainsOnDataStreaming(payload.id)
+
   const parsedVariable = {
     id: payload.id,
     name: payload.name,
     template: payload.template_id,
     dataSource: payload.data_source,
     domainOption: payload.all_domains ? '1' : '0',
+    domains,
     endpoint: payload.endpoint.endpoint_type,
     ...getInfoByEndpoint(payload)
   }
@@ -114,3 +118,22 @@ const getHeaders = (payload) => {
     headers: headers
   }
 }
+
+const getDomainsOnDataStreaming = async (dataStreamingID) => {
+  let httpResponse = await AxiosHttpClientAdapter.request({
+    url: `${makeDataStreamingDomainsBaseUrl()}?streaming_id=${dataStreamingID}`,
+    method: 'GET'
+  })
+
+  const domains = [[], []]
+
+  httpResponse.body.results.forEach(domain => {
+    if (domain.selected) {
+      domains[1].push(domain)
+    } else {
+      domains[0].push(domain)
+    }
+  });
+
+  return domains
+} 
