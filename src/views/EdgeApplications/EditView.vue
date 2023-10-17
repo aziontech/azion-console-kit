@@ -6,7 +6,10 @@
       </TabPanel>
 
       <TabPanel header="Origins">
-        <OriginsTab :listOriginsService="props.listOriginsService" />
+        <OriginsTab
+          :listOriginsService="props.listOriginsService"
+          :deleteOriginsService="props.deleteOriginsService"
+        />
       </TabPanel>
 
       <TabPanel header="Device Groups">
@@ -40,7 +43,7 @@
   import TabPanel from 'primevue/tabpanel'
 
   // Tabs
-  import OriginsTab from './Tabs/Origins/ListView.vue'
+  import OriginsTab from '../EdgeApplicationsOrigins/ListView.vue'
   // import MainSettingsTab from 'Tabs/MainSettings'
   // import DeviceGroupsTab from 'Tabs/DeviceGroups'
   // import ErrorResponsesTab from 'Tabs/ErrorResponses'
@@ -52,6 +55,10 @@
 
   const props = defineProps({
     listOriginsService: {
+      type: Function,
+      required: true
+    },
+    deleteOriginsService: {
       type: Function,
       required: true
     }

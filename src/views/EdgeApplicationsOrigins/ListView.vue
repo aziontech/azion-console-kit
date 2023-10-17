@@ -19,7 +19,10 @@
     methods: {
       async listOrigins() {
         return await this.listOriginsService({ id: this.edgeApplicationId })
-      }
+      },
+      async deleteOrigin(originKey) {
+        return await this.deleteOriginsService(originKey, this.edgeApplicationId)
+      },
     },
     computed: {
       getColumns() {
@@ -61,7 +64,7 @@
     :editPagePath="`${edgeApplicationId}/origins/edit`"
     pathIdField="originKey"
     :listService="listOrigins"
-    :deleteService="deleteOriginsService"
+    :deleteService="deleteOrigin"
     :columns="getColumns"
   />
 </template>

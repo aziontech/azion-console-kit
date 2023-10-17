@@ -1,5 +1,5 @@
 import * as EdgeApplicationsService from '@/services/edge-application-services'
-import * as OriginsService from '@/services/edge-application-services/tabs/origins-services'
+import * as OriginsService from '@/services/edge-application-origins-services'
 
 /** @type {import('vue-router').RouteRecordRaw} */
 export const edgeApplicationRoutes = {
@@ -52,6 +52,7 @@ export const edgeApplicationRoutes = {
           component: () => import('@views/EdgeApplications/EditView.vue'),
           props: {
             listOriginsService: OriginsService.listOriginsService,
+            deleteOriginsService: OriginsService.deleteOriginsService,
             editEdgeApplicationService: EdgeApplicationsService.editEdgeApplicationService
           },
           meta: {
@@ -70,9 +71,9 @@ export const edgeApplicationRoutes = {
         {
           path: 'origins/create',
           name: 'create-origin',
-          component: () => import('@views/EdgeApplications/Tabs/Origins/CreateView.vue'),
+          component: () => import('@views/EdgeApplicationsOrigins/CreateView.vue'),
           props: {
-            createOriginService: OriginsService.createOriginService,
+            createOriginService: OriginsService.createOriginService
           },
           meta: {
             breadCrumbs: [
@@ -86,10 +87,10 @@ export const edgeApplicationRoutes = {
         {
           path: 'origins/edit/:originKey',
           name: 'edit-origin',
-          component: () => import('@views/EdgeApplications/Tabs/Origins/EditView.vue'),
+          component: () => import('@views/EdgeApplicationsOrigins/EditView.vue'),
           props: {
             editOriginService: OriginsService.editOriginService,
-            loadOriginService: OriginsService.loadOriginService,
+            loadOriginService: OriginsService.loadOriginService
           },
           meta: {
             breadCrumbs: [
@@ -99,8 +100,8 @@ export const edgeApplicationRoutes = {
               }
             ]
           }
-        },
+        }
       ]
-    },
+    }
   ]
 }

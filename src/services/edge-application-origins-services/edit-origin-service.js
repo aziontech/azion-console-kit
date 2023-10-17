@@ -1,5 +1,5 @@
 import { AxiosHttpClientAdapter, parseHttpResponse } from '@/services/axios/AxiosHttpClientAdapter'
-import { makeEdgeApplicationBaseUrl } from '../../make-edge-application-base-url'
+import { makeEdgeApplicationBaseUrl } from '../edge-application-services/make-edge-application-base-url'
 
 export const editOriginService = async (payload, id) => {
   const parsedPayload = adapt(payload)
@@ -24,22 +24,22 @@ const adapt = (payload) => {
     hmac_access_key: payload.hmacAccessKey,
     hmac_secret_key: payload.hmacSecretKey,
     connection_timeout: payload.connectionTimeout,
-    timeout_between_bytes: payload.timeoutBetweenBytes,
+    timeout_between_bytes: payload.timeoutBetweenBytes
   }
 
   if (payload.originType === 'load_balancer') {
-    paylodAdapted =   {
+    paylodAdapted = {
       ...paylodAdapted,
-      method: payload.method,
+      method: payload.method
     }
   }
 
-  paylodAdapted.addresses = payload.addresses.map(address => {
+  paylodAdapted.addresses = payload.addresses.map((address) => {
     return {
       ...address,
       weight: address.weight === null ? 1 : address.weight
-    };
-  });
+    }
+  })
 
   return paylodAdapted
 }

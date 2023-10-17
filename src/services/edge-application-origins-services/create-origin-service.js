@@ -1,5 +1,5 @@
 import { AxiosHttpClientAdapter, parseHttpResponse } from '@/services/axios/AxiosHttpClientAdapter'
-import { makeEdgeApplicationBaseUrl } from '../../make-edge-application-base-url'
+import { makeEdgeApplicationBaseUrl } from '../edge-application-services/make-edge-application-base-url'
 
 export const createOriginService = async (payload, id) => {
   let httpResponse = await AxiosHttpClientAdapter.request({
@@ -24,6 +24,6 @@ const adapt = (payload) => {
     hmac_access_key: payload.hmacAccessKey,
     hmac_secret_key: payload.hmacSecretKey,
     connection_timeout: payload.connectionTimeout,
-    timeout_between_bytes: payload.timeoutBetweenBytes,
+    timeout_between_bytes: payload.timeoutBetweenBytes
   }
 }

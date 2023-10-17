@@ -1,8 +1,8 @@
 import { AxiosHttpClientAdapter, parseHttpResponse } from '@/services/axios/AxiosHttpClientAdapter'
-import { makeEdgeApplicationBaseUrl } from '../../make-edge-application-base-url'
+import { makeEdgeApplicationBaseUrl } from '../edge-application-services/make-edge-application-base-url'
 
 export const loadOriginService = async ({ id, originKey }) => {
-  console.log(originKey);
+  console.log(originKey)
   let httpResponse = await AxiosHttpClientAdapter.request({
     url: `${makeEdgeApplicationBaseUrl()}/${id}/origins/${originKey}`,
     method: 'GET'

@@ -1,5 +1,5 @@
 import { AxiosHttpClientAdapter, parseHttpResponse } from '@/services/axios/AxiosHttpClientAdapter'
-import { makeEdgeApplicationBaseUrl } from '../../make-edge-application-base-url'
+import { makeEdgeApplicationBaseUrl } from '../edge-application-services/make-edge-application-base-url'
 export const listOriginsService = async ({
   id,
   orderBy = 'origin_id',
@@ -25,11 +25,12 @@ const adapt = (httpResponse) => {
     live_ingest: 'live_ingest'
   }
   const parsedOrigin = httpResponse.body.results?.map((origin) => {
-    let formattedListOfAddresses = origin.addresses.map(val => val.address).join(', ')
+    let formattedListOfAddresses = origin.addresses.map((val) => val.address).join(', ')
 
     return {
-      originId: origin.origin_id,
+      id: origin.origin_key,
       originKey: origin.origin_key,
+      originId: origin.origin_id,
       name: origin.name,
       originType: originTypeFormat[origin.origin_type],
       addresses: formattedListOfAddresses,
