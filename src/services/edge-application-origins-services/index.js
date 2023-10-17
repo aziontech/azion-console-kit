@@ -4,4 +4,10 @@ import { editOriginService } from './edit-origin-service'
 import { loadOriginService } from './load-origin-service'
 import { deleteOriginsService } from './delete-origin-service'
 
-export { listOriginsService, createOriginService, editOriginService, loadOriginService, deleteOriginsService }
+export {
+  listOriginsService,
+  createOriginService,
+  editOriginService,
+  loadOriginService,
+  deleteOriginsService
+}

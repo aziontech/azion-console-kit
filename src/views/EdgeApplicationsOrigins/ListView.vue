@@ -22,7 +22,7 @@
       },
       async deleteOrigin(originKey) {
         return await this.deleteOriginsService(originKey, this.edgeApplicationId)
-      },
+      }
     },
     computed: {
       getColumns() {
