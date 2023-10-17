@@ -107,9 +107,9 @@ const getInfoByEndpoint = (payload) => {
 
 const getHeaders = (payload) => {
   const headers = []
-  Object.entries(payload.endpoint?.headers).forEach(element => {
-      headers.push({ value: `${element[0]}: ${element[1]}`, deleted: true })
-  });
+  Object.entries(payload.endpoint?.headers).forEach((element) => {
+    headers.push({ value: `${element[0]}: ${element[1]}`, deleted: true })
+  })
   return {
     headers: headers
   }
