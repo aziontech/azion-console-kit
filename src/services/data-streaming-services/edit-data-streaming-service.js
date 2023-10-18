@@ -1,10 +1,10 @@
 import { AxiosHttpClientAdapter, parseHttpResponse } from '../axios/AxiosHttpClientAdapter'
 import { makeDataStreamingBaseUrl } from './make-data-streaming-base-url'
 
-export const createDataStreamingService = async (payload) => {
+export const editDataStreamingService = async (payload) => {
   let httpResponse = await AxiosHttpClientAdapter.request({
-    url: `${makeDataStreamingBaseUrl()}`,
-    method: 'POST',
+    url: `${makeDataStreamingBaseUrl()}/${payload.id}`,
+    method: 'PUT',
     body: adapt(payload)
   })
 
@@ -12,13 +12,13 @@ export const createDataStreamingService = async (payload) => {
 }
 
 const adapt = (payload) => {
-  const allDomains = payload.domainOption === '1'
+  const allDomains = payload.domains[1].length <= 0
 
   return {
     name: payload.name,
     template_id: payload.template,
     data_source: payload.dataSource,
-    domain_ids: allDomains ? [] : getDomains(payload.domains),
+    domain_ids: allDomains ? [] : getDomains(payload.domains[1]),
     all_domains: allDomains ? true : false,
     endpoint: getEndpoint(payload)
   }
@@ -112,7 +112,7 @@ const getEndpoint = (payload) => {
 }
 
 const getDomains = (domains) => {
-  return domains.map((domain) => domain.domainID)
+  return domains.map((domain) => domain.domain_id)
 }
 
 const getHeaders = (listHeaders) => {

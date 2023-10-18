@@ -1,10 +1,11 @@
 <template>
-  <CreateFormBlock
-    pageTitle="Create Data Streaming"
-    :createService="props.createDataStreamingService"
-    :formData="formValues"
+  <EditFormBlock
+    pageTitle="Edit Data Streaming"
+    :editService="props.editDataStreamingService"
+    :loadService="props.loadDataStreamingService"
+    :initialDataSetter="setValues"
     :isValid="meta.valid"
-    :cleanFormCallback="resetForm"
+    :formData="values"
   >
     <template #form>
       <!-- data-source -->
@@ -81,9 +82,9 @@
       <div v-if="domainOption === '0'">
         <label>Domains:</label>
         <PickList
-          v-model="listDomains"
+          v-model="domains"
           listStyle="height:342px"
-          dataKey="domainID"
+          dataKey="domain_id"
           breakpoint="1400px"
         >
           <template #sourceheader>Available Domains</template>
@@ -139,7 +140,7 @@
           <ButtonPrimer
             icon="pi pi-times"
             severity="danger"
-            v-if="header.deleted"
+            v-if="header.deleted && index != 0"
             @click="removeHeader(index)"
           />
         </div>
@@ -524,7 +525,7 @@
         />
       </div>
     </template>
-  </CreateFormBlock>
+  </EditFormBlock>
 </template>
 
 <script setup>
@@ -533,7 +534,7 @@
   import * as yup from 'yup'
 
   // Import the components
-  import CreateFormBlock from '@/templates/create-form-block'
+  import EditFormBlock from '@/templates/edit-form-block'
   import Dropdown from 'primevue/dropdown'
   import RadioButton from 'primevue/radiobutton'
   import PickList from 'primevue/picklist'
@@ -543,15 +544,19 @@
   import Textarea from 'primevue/textarea'
 
   const props = defineProps({
-    createDataStreamingService: {
-      type: Function,
-      required: true
-    },
     listDataStreamingTemplateService: {
       type: Function,
       required: true
     },
     listDataStreamingDomainsService: {
+      type: Function,
+      required: true
+    },
+    loadDataStreamingService: {
+      type: Function,
+      required: true
+    },
+    editDataStreamingService: {
       type: Function,
       required: true
     }
@@ -566,7 +571,6 @@
   ])
   const listTemplates = ref([])
   const dataSet = ref('')
-  const listDomains = ref([])
   const listEndpoint = ref([
     { label: 'Standard HTTP/HTTPS POST', value: 'standard' },
     { label: 'Apache Kafka', value: 'kafka' },
@@ -757,15 +761,16 @@
     })
   })
 
-  // Form e VeeValidate
-  const { errors, /*defineInputBinds,*/ meta, resetForm, values } = useForm({
+  const { setValues, errors, meta, values } = useForm({
     validationSchema,
     initialValues: {
+      id: '',
       name: '',
       dataSource: 'http',
       template: '',
       dataSet: '',
       domainOption: '1',
+      domains: [],
       endpoint: '',
 
       // standard
@@ -834,6 +839,7 @@
   const { value: dataSource } = useField('dataSource')
   const { value: template } = useField('template')
   const { value: domainOption } = useField('domainOption')
+  const { value: domains } = useField('domains')
   const { value: endpoint } = useField('endpoint')
 
   // standard
@@ -895,11 +901,8 @@
   const { value: containerName } = useField('containerName')
   const { value: blobToken } = useField('blobToken')
 
-  let formValues = { ...values, listDomains }
-
   onMounted(async () => {
     await loaderDataStreamTemplates()
-    await loaderDataStreamDomains()
   })
 
   const insertDataSet = (templateID) => {
@@ -911,11 +914,6 @@
     const templates = await props.listDataStreamingTemplateService()
     listTemplates.value = templates
     if (listTemplates?.value[0]?.value) template.value = listTemplates.value[0].value
-  }
-
-  const loaderDataStreamDomains = async () => {
-    const domains = await props.listDataStreamingDomainsService()
-    listDomains.value = [domains, []]
   }
 
   const addHeader = () => {
@@ -944,17 +942,13 @@
     () => domainOption.value,
     (option) => {
       if (option === '1') {
-        if (listDomains.value[1].length > 0) {
-          listDomains.value[1].forEach((element) => {
-            listDomains.value[0].push(element)
+        if (domains.value[1].length > 0) {
+          domains.value[1].forEach((element) => {
+            domains.value[0].push(element)
           })
-          listDomains.value[1] = []
+          domains.value[1] = []
         }
       }
     }
   )
-
-  watch([values, listDomains], () => {
-    formValues = { ...values, domains: listDomains.value[1] }
-  })
 </script>

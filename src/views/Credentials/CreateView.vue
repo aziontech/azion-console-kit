@@ -12,6 +12,7 @@
         <InputText
           placeholder="Add Credential Name"
           v-model="name"
+          id="name"
           type="text"
           :class="{ 'p-invalid': errors.name }"
           v-tooltip.top="errors.name"
@@ -19,10 +20,11 @@
       </div>
 
       <div class="flex flex-col gap-2">
-        <label for="cname">Description:</label>
+        <label for="description">Description:</label>
         <PrimeTextarea
           :class="{ 'p-invalid': errors.description }"
           v-model="description"
+          id="description"
           rows="5"
           cols="30"
           class="w-full"
@@ -31,11 +33,12 @@
       </div>
 
       <div class="flex flex-col gap-2">
-        <label for="name">Token:</label>
+        <label for="token">Token:</label>
         <InputText
           placeholder="Save the credential to visualize the token in this field"
           type="text"
           readonly
+          id="token"
         />
       </div>
     </template>
