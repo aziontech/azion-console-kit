@@ -1,7 +1,7 @@
 import { AxiosHttpClientAdapter } from '@/services/axios/AxiosHttpClientAdapter'
 import { listVariablesService } from '@/services/variables-services'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { localeMock } from '@/tests/utils/localeMock';
+import { localeMock } from '@/tests/utils/localeMock'
 
 const fixtures = {
   variableMock: {
