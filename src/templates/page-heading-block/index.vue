@@ -10,7 +10,7 @@
         v-if="pageTitle || description"
       >
         <div
-          class="text-text-color text-3xl font-medium "
+          class="text-text-color text-3xl font-medium"
           v-if="pageTitle"
         >
           {{ pageTitle }}
@@ -98,8 +98,8 @@
         }
       },
       generateBreadCrumbs() {
-        console.log(this.$router);
-        console.log(this.$router.currentRoute.value.meta.breadCrumbs);
+        console.log(this.$router)
+        console.log(this.$router.currentRoute.value.meta.breadCrumbs)
         return this.$router.currentRoute.value.meta.breadCrumbs ?? []
       }
     },

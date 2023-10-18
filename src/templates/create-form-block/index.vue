@@ -1,7 +1,7 @@
 <template>
   <div class="flex flex-col min-h-[calc(100vh-120px)]">
     <Toast />
-   
+
     <PageHeadingBlock :pageTitle="pageTitle" />
     <form class="w-full grow mt-4 p-4 flex flex-col gap-4 mx-auto">
       <div class="flex flex-col gap-4 sm:!w-full">

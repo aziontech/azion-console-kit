@@ -26,7 +26,6 @@
   import ActionBarTemplate from '@/templates/action-bar-block'
   import PageHeadingBlock from '@/templates/page-heading-block'
 
-
   export default {
     name: 'edit-form-block',
     components: {

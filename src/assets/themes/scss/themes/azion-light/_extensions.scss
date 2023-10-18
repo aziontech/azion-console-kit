@@ -1,6 +1,5 @@
 /* Customizations to the designer theme should be defined here */
 @layer primevue {
-
   // Custom SelectButton
   .p-selectbutton {
     background: var(--surface-hover) !important;
@@ -37,7 +36,7 @@
       }
     }
   }
-  
+
   // Custom TabView
   .p-tabview {
     .p-tabview-nav {
@@ -66,7 +65,7 @@
       background: transparent !important;
     }
   }
-  
+
   //Custom TabMenu
   .p-tabmenu {
     .p-tabmenu-nav {
@@ -82,7 +81,7 @@
       }
     }
   }
-  
+
   //Custom Button
   .p-button {
     font-weight: 600 !important;
