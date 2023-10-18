@@ -1,6 +1,7 @@
 import { AxiosHttpClientAdapter } from '@/services/axios/AxiosHttpClientAdapter'
 import { loadNetworkListService } from '@/services/network-lists-services'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { localeMock } from '@/tests/utils/localeMock'
 
 const fixtures = {
   networkMock: {
@@ -56,6 +57,7 @@ describe('NetworkListsServices', () => {
   })
 
   it('should parsed correctly the loaded network list record', async () => {
+    localeMock()
     vi.setSystemTime(new Date(2023, 10, 10, 10))
     vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
       statusCode: 200,
@@ -73,12 +75,11 @@ describe('NetworkListsServices', () => {
       lastEditor: fixtures.networkMock.last_editor,
       listType: 'IP/CIDR',
       itemsValues: `123.123.123.123\n192.168.0.0`,
-      lastModified: new Intl.DateTimeFormat('us', { dateStyle: 'full', timeStyle: 'short' }).format(
-        fixtures.networkMock.last_modified
-      )
+      lastModified: 'Friday, November 10, 2023 at 12:00 AM'
     })
   })
   it('should parsed correctly the loaded network list record with countries', async () => {
+    localeMock()
     vi.setSystemTime(new Date(2023, 10, 10, 10))
     vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
       statusCode: 200,
@@ -96,9 +97,7 @@ describe('NetworkListsServices', () => {
       lastEditor: fixtures.networkMockWithCountries.last_editor,
       listType: 'countries',
       itemsValues: fixtures.networkMockWithCountries.items_values,
-      lastModified: new Intl.DateTimeFormat('us', { dateStyle: 'full', timeStyle: 'short' }).format(
-        fixtures.networkMockWithCountries.last_modified
-      )
+      lastModified: 'Sunday, June 11, 2023 at 12:00 AM'
     })
   })
 })

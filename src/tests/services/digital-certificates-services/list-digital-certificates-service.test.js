@@ -2,6 +2,7 @@ import { AxiosHttpClientAdapter } from '@/services/axios/AxiosHttpClientAdapter'
 import * as Errors from '@services/axios/errors'
 import { listDigitalCertificatesService } from '@/services/digital-certificates-services'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { localeMock } from '@/tests/utils/localeMock'
 
 const fixtures = {
   domainMock: {
@@ -20,11 +21,7 @@ const fixtures = {
     certificate_type: null,
     validity: null,
     status: 'active'
-  },
-  validityDate: new Intl.DateTimeFormat('us', {
-    dateStyle: 'full',
-    timeStyle: 'short'
-  }).format(new Date(2023, 10, 10))
+  }
 }
 
 const makeSut = () => {
@@ -59,6 +56,7 @@ describe('DigitalCertificatesServices', () => {
   })
 
   it('should parse correctly each returned item', async () => {
+    localeMock()
     vi.setSystemTime(new Date(2023, 10, 10, 10))
     vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
       statusCode: 200,
@@ -75,7 +73,7 @@ describe('DigitalCertificatesServices', () => {
       issuer: fixtures.domainMock.issuer,
       type: 'Edge Certificate',
       subjectName: 'Subject 1,Subject 2',
-      validity: fixtures.validityDate,
+      validity: 'Friday, November 10, 2023 at 12:00 AM',
       status: fixtures.domainMock.status
     })
     expect(parsedDomainMissingValues).toEqual({

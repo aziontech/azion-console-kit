@@ -1,6 +1,7 @@
 import { AxiosHttpClientAdapter } from '@/services/axios/AxiosHttpClientAdapter'
 import { listEdgeFirewallService } from '@/services/edge-firewall-services'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { localeMock } from '@/tests/utils/localeMock';
 
 const fixtures = {
   edgeFirewallMock: {
@@ -22,10 +23,7 @@ const fixtures = {
       { id: 2, name: 'Domain 2' }
     ]
   },
-  domainFactory: (id) => ({ id, name: `Domain ${id}` }),
-  lastModifyDate: new Intl.DateTimeFormat('us', { dateStyle: 'full' }).format(
-    new Date(2023, 10, 10)
-  )
+  domainFactory: (id) => ({ id, name: `Domain ${id}` })
 }
 
 const makeSut = () => {
@@ -60,6 +58,7 @@ describe('EdgeFirewallServices', () => {
   })
 
   it('should parsed correctly all returned firewalls', async () => {
+    localeMock()
     vi.setSystemTime(new Date(2023, 10, 10, 10))
     vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
       statusCode: 200,
@@ -74,7 +73,7 @@ describe('EdgeFirewallServices', () => {
         id: fixtures.edgeFirewallMock.id,
         name: fixtures.edgeFirewallMock.name,
         lastEditor: fixtures.edgeFirewallMock.last_editor,
-        lastModify: fixtures.lastModifyDate,
+        lastModify: 'Friday, November 10, 2023',
         domainsList: '',
         active: 'Yes'
       }
@@ -82,6 +81,7 @@ describe('EdgeFirewallServices', () => {
   })
 
   it('should parsed correctly all returned domains of an firewall', async () => {
+    localeMock()
     vi.setSystemTime(new Date(2023, 10, 10, 10))
     vi.spyOn(AxiosHttpClientAdapter, 'request')
       .mockResolvedValueOnce({
@@ -105,7 +105,7 @@ describe('EdgeFirewallServices', () => {
         id: fixtures.edgeFirewallWithDomainsMock.id,
         name: fixtures.edgeFirewallWithDomainsMock.name,
         lastEditor: fixtures.edgeFirewallWithDomainsMock.last_editor,
-        lastModify: fixtures.lastModifyDate,
+        lastModify: 'Friday, November 10, 2023',
         domainsList: `Domain 1<br>Domain 2`,
         active: 'No'
       }

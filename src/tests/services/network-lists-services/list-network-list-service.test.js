@@ -1,6 +1,7 @@
 import { AxiosHttpClientAdapter } from '@/services/axios/AxiosHttpClientAdapter'
 import { listNetworkListService } from '@/services/network-lists-services'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { localeMock } from '@/tests/utils/localeMock'
 
 const fixtures = {
   networkMock: {
@@ -47,6 +48,7 @@ describe('NetworkListsServices', () => {
   })
 
   it('should parsed correctly each network record', async () => {
+    localeMock()
     vi.setSystemTime(new Date(2023, 10, 10, 10))
     vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
       statusCode: 200,
@@ -64,10 +66,7 @@ describe('NetworkListsServices', () => {
         name: fixtures.networkMock.name,
         lastEditor: fixtures.networkMock.last_editor,
         listType: 'IP/CIDR',
-        lastModified: new Intl.DateTimeFormat('us', {
-          dateStyle: 'full',
-          timeStyle: 'short'
-        }).format(fixtures.networkMock.last_modified)
+        lastModified: 'Friday, November 10, 2023 at 12:00 AM'
       }
     ])
   })

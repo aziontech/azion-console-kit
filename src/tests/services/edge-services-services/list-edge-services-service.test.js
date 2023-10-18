@@ -2,6 +2,14 @@ import { AxiosHttpClientAdapter } from '@/services/axios/AxiosHttpClientAdapter'
 import { listEdgeServicesService } from '@/services/edge-services-services'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
+const localeMock = (locale = 'en') => {
+  const DateTimeFormat = Intl.DateTimeFormat
+   vi
+  .spyOn(window.global.Intl, 'DateTimeFormat')
+  .mockImplementationOnce((_, options) => DateTimeFormat(locale, {...options}))
+  .mockImplementationOnce((_, options) => DateTimeFormat(locale, {...options}))
+}
+
 const fixtures = {
   edgeServiceMock: {
     id: 1239875,
@@ -51,6 +59,7 @@ describe('EdgeServicesServices', () => {
   })
 
   it('should parsed correctly each edge service', async () => {
+    localeMock()
     vi.setSystemTime(new Date(2023, 10, 10, 10))
     vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
       statusCode: 200,
@@ -66,18 +75,14 @@ describe('EdgeServicesServices', () => {
         name: fixtures.edgeServiceMock.name,
         active: 'Yes',
         lastEditor: fixtures.edgeServiceMock.last_editor,
-        lastModified: new Intl.DateTimeFormat('us', { dateStyle: 'full' }).format(
-          fixtures.edgeServiceMock.updated_at
-        )
+        lastModified: 'Friday, November 10, 2023'
       },
       {
         id: fixtures.disabledEdgeServiceMock.id,
         name: fixtures.disabledEdgeServiceMock.name,
         active: 'No',
         lastEditor: fixtures.disabledEdgeServiceMock.last_editor,
-        lastModified: new Intl.DateTimeFormat('us', { dateStyle: 'full' }).format(
-          fixtures.disabledEdgeServiceMock.updated_at
-        )
+        lastModified: 'Saturday, November 11, 2023'
       }
     ])
   })
