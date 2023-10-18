@@ -1,6 +1,5 @@
 /* Customizations to the designer theme should be defined here */
 @layer primevue {
-
   // Custom SelectButton
   .p-selectbutton {
     background: var(--surface-300) !important;
@@ -37,7 +36,7 @@
       }
     }
   }
-  
+
   // Custom TabView
   .p-tabview {
     .p-tabview-nav {
@@ -66,7 +65,7 @@
       background: transparent !important;
     }
   }
-  
+
   //Custom TabMenu
   .p-tabmenu {
     .p-tabmenu-nav {
@@ -82,7 +81,7 @@
       }
     }
   }
-  
+
   //Custom Button
   .p-button {
     font-weight: 600 !important;
@@ -111,14 +110,18 @@
   }
 
   //Custom Breadcrumb
-  .p-breadcrumb { 
+  .p-breadcrumb {
     .p-breadcrumb-list {
       .p-menuitem:last-of-type {
         font-weight: 800 !important;
       }
       .p-menuitem-link {
-        padding: .25rem .1rem;
+        padding: 0.25rem 0.1rem;
         font-size: 0.875rem;
+        transition: $formElementTransition !important;
+      }
+      .p-menuitem:hover {
+        text-decoration: underline;
       }
     }
   }
