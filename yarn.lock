@@ -970,7 +970,7 @@
   dependencies:
     tinyspy "^2.1.1"
 
-"@vitest/ui@^0.34.6":
+"@vitest/ui@^0.34.5":
   version "0.34.6"
   resolved "https://registry.yarnpkg.com/@vitest/ui/-/ui-0.34.6.tgz#86a9d58d1514aaea6a4b27ddd3c430646afca488"
   integrity sha512-/fxnCwGC0Txmr3tF3BwAbo3v6U2SkBTGR9UB8zo0Ztlx0BTOXHucE0gDHY7SjwEktCOHatiGmli9kZD6gYSoWQ==

@@ -1,24 +1,130 @@
 <template>
   <div class="flex align-middle justify-center py-10">
-    <div class=" w-72  flex flex-col gap-10">
+    <div class="w-[996px] flex flex-col gap-10">
       <Menu class="w-full" :model="items" />
       <Dropdown v-model="cities" :options="cities" optionLabel="name" placeholder="Select a City" />
       <Dropdown v-model="selectedCity" :options="groupedCities" optionLabel="label" optionGroupLabel="label"
         optionGroupChildren="items" placeholder="Select a City" />
+      <!-- SelectButton -->
+      <div class="flex my-2 mx-auto">
+        <SelectButton
+          v-model="value"
+          :options="options"
+          aria-labelledby="basic"
+        />
+      </div>
+
+      <!-- TabView -->
+      <div class="flex my-2 mx-auto w-full">
+        <TabView
+          :scrollable="true"
+          class="w-full"
+        >
+          <TabPanel header="Main Settings">
+            <div class="p-4">
+              <p>Tab 1</p>
+            </div>
+          </TabPanel>
+          <TabPanel header="Origins">
+            <div class="p-4">
+              <p>Tab 2</p>
+            </div>
+          </TabPanel>
+          <TabPanel header="Rules Engine">
+            <div class="p-4">
+              <p>Tab 3</p>
+            </div>
+          </TabPanel>
+          <TabPanel header="Rules Engine">
+            <div class="p-4">
+              <p>Tab 3</p>
+            </div>
+          </TabPanel>
+          <TabPanel header="Rules Engine">
+            <div class="p-4">
+              <p>Tab 3</p>
+            </div>
+          </TabPanel>
+          <TabPanel header="Rules Engine">
+            <div class="p-4">
+              <p>Tab 3</p>
+            </div>
+          </TabPanel>
+          <TabPanel header="Rules Engine">
+            <div class="p-4">
+              <p>Tab 3</p>
+            </div>
+          </TabPanel>
+          <TabPanel header="Rules Engine">
+            <div class="p-4">
+              <p>Tab 3</p>
+            </div>
+          </TabPanel>
+          <TabPanel header="Rules Engine">
+            <div class="p-4">
+              <p>Tab 3</p>
+            </div>
+          </TabPanel>
+          <TabPanel header="Rules Engine">
+            <div class="p-4">
+              <p>Tab 3</p>
+            </div>
+          </TabPanel>
+          <TabPanel header="Rules Engine">
+            <div class="p-4">
+              <p>Tab 3</p>
+            </div>
+          </TabPanel>
+          <TabPanel header="Rules Engine">
+            <div class="p-4">
+              <p>Tab 3</p>
+            </div>
+          </TabPanel>
+          <TabPanel header="Rules Engine">
+            <div class="p-4">
+              <p>Tab 3</p>
+            </div>
+          </TabPanel>
+          <TabPanel header="Rules Engine">
+            <div class="p-4">
+              <p>Tab 3</p>
+            </div>
+          </TabPanel>
+          <TabPanel header="Rules Engine">
+            <div class="p-4">
+              <p>Tab 3</p>
+            </div>
+          </TabPanel>
+          <TabPanel header="Rules Engine">
+            <div class="p-4">
+              <p>Tab 3</p>
+            </div>
+          </TabPanel>
+        </TabView>
+      </div>
+
+      <!-- Breadcrumbs -->
+      <Breadcrumb :model="itemsbread" />
     </div>
   </div>
 </template>
 
 <script setup>
-
-
 import Menu from 'primevue/menu';
 import Dropdown from 'primevue/dropdown';
+import TabView from 'primevue/tabview'
+import TabPanel from 'primevue/tabpanel'
+import SelectButton from 'primevue/selectbutton'
+import Breadcrumb from 'primevue/breadcrumb';
+
 import { ref } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 
 const router = useRouter()
 const route = useRoute()
+
+const value = ref('All phases');
+const options = ref(['All phases', 'Response', 'Request']);
 
 const items = ref([
   { label: 'Account Settings' },
@@ -68,5 +174,10 @@ const groupedCities = ref([
       { label: 'Yokohama', value: 'Yokohama' }
     ]
   }
+]);
+
+const itemsbread = ref([
+    {label: 'Item'},
+    {label: 'Current'},
 ]);
 </script>

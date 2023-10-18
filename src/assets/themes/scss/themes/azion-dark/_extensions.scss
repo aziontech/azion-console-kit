@@ -3,7 +3,7 @@
 
   // Custom SelectButton
   .p-selectbutton {
-    background: var(--surface-hover) !important;
+    background: var(--surface-300) !important;
     padding: 4px !important;
     border-radius: 4px !important;
 
@@ -29,7 +29,7 @@
         color: var(--text-color) !important;
 
         &:hover {
-          background: var(--surface-500) !important;
+          background: var(--surface-0) !important;
           border-color: none !important;
           color: $toggleButtonTextActiveHoverColor !important;
           color: var(--text-color) !important;
@@ -106,6 +106,19 @@
     .p-menuitem {
       .p-menuitem-content {
         font-size: 0.875rem !important;
+      }
+    }
+  }
+
+  //Custom Breadcrumb
+  .p-breadcrumb { 
+    .p-breadcrumb-list {
+      .p-menuitem:last-of-type {
+        font-weight: 800 !important;
+      }
+      .p-menuitem-link {
+        padding: .25rem .1rem;
+        font-size: 0.875rem;
       }
     }
   }
