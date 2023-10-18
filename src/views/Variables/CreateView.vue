@@ -12,9 +12,9 @@
         description="Espaço livre para descrição e instruções de preenchimento. Esse conteúdo deve ser criado pensando tanto em funcionalidade quanto em em alinhamento e estética. Devemos sempre criar os blocos conforme o contexto, cuidando sempre para não ter blocos muito longos."
       >
         <template #inputs>
-          <div class="flex flex-col gap-2">
+          <div class="flex flex-col sm:max-w-lg w-full gap-2">
             <label
-              for="key"
+              for="name"
               class="text-color text-base font-medium"
               >Key</label
             >
@@ -22,14 +22,15 @@
               placeholder="ex: GITHUB_API_KEY"
               v-bind="key"
               type="text"
+              id="name"
               :class="{ 'p-invalid': errors.key }"
-              class="max-w-lg w-full"
               v-tooltip.top="errors.key"
             />
           </div>
-          <div class="flex flex-col gap-2">
+
+          <div class="flex flex-col sm:max-w-lg w-full gap-2">
             <label
-              for="value"
+              for="Value"
               class="text-color text-base font-medium"
               >Value</label
             >
@@ -37,11 +38,11 @@
               placeholder="ex: MY_GITHUB_API_VALUE"
               v-bind="value"
               type="text"
-              class="max-w-lg w-full"
               :class="{ 'p-invalid': errors.value }"
               v-tooltip.top="errors.value"
             />
           </div>
+
           <Card
             :pt="{
               body: { class: 'p-4' },

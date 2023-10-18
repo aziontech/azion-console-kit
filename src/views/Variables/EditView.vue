@@ -13,9 +13,9 @@
         description="Espaço livre para descrição e instruções de preenchimento. Esse conteúdo deve ser criado pensando tanto em funcionalidade quanto em em alinhamento e estética. Devemos sempre criar os blocos conforme o contexto, cuidando sempre para não ter blocos muito longos."
       >
         <template #inputs>
-          <div class="flex flex-col gap-2">
+          <div class="flex flex-col sm:max-w-lg w-full gap-2">
             <label
-              for="key"
+              for="name"
               class="text-color text-base font-medium"
               >Key</label
             >
@@ -23,14 +23,15 @@
               placeholder="ex: GITHUB_API_KEY"
               v-bind="key"
               type="text"
+              id="name"
               :class="{ 'p-invalid': errors.key }"
-              class="max-w-lg w-full"
               v-tooltip.top="errors.key"
             />
           </div>
-          <div class="flex flex-col gap-2">
+
+          <div class="flex flex-col sm:max-w-lg w-full gap-2">
             <label
-              for="value"
+              for="Value"
               class="text-color text-base font-medium"
               >Value</label
             >
@@ -38,30 +39,28 @@
               placeholder="ex: MY_GITHUB_API_VALUE"
               v-bind="value"
               type="text"
-              class="max-w-lg w-full"
               :class="{ 'p-invalid': errors.value }"
               v-tooltip.top="errors.value"
             />
           </div>
-          <div class="flex gap-3 items-center">
-            <div
-              class="w-full max-w-3xl p-4 rounded-md border surface-border justify-start items-end gap-6 inline-flex"
-            >
-              <div class="grow shrink basis-0 flex-col justify-start items-start gap-1 inline-flex">
-                <div class="self-stretch text-color text-base font-medium leading-normal">
-                  Secret
-                </div>
-                <div class="self-stretch text-color-secondary text-sm font-normal">Description</div>
-              </div>
-              <div>
-                <InputSwitch
-                  v-bind="secret"
-                  v-model="secret.value"
-                  :class="{ 'p-invalid': errors.secret }"
-                />
-              </div>
-            </div>
-          </div>
+
+          <Card
+            :pt="{
+              body: { class: 'p-4' },
+              title: { class: 'flex justify-between items-cente text-base m-0' },
+              subtitle: { class: 'text-sm font-normal text-color-secondary m-0' }
+            }"
+          >
+            <template #title>
+              <span class="text-base">Secret</span>
+              <InputSwitch
+                v-bind="secret"
+                v-model="secret.value"
+                :class="{ 'p-invalid': errors.secret }"
+              />
+            </template>
+            <template #subtitle> Description </template>
+          </Card>
         </template>
       </form-horizontal>
     </template>
@@ -73,6 +72,7 @@
   import formHorizontal from '@/templates/create-form-block/form-horizontal'
   import InputText from 'primevue/inputtext'
   import InputSwitch from 'primevue/inputswitch'
+  import Card from 'primevue/card'
   import { useForm } from 'vee-validate'
   import * as yup from 'yup'
 
@@ -82,6 +82,7 @@
       EditFormBlock,
       InputText,
       InputSwitch,
+      Card,
       formHorizontal
     },
     props: {
