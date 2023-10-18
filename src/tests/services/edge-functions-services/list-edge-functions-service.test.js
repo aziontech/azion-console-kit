@@ -79,8 +79,8 @@ describe('EdgeFunctionsServices', () => {
         name: fixtures.edgeFunctionMock.name,
         lastEditor: fixtures.edgeFunctionMock.last_editor,
         lastModified: new Intl.DateTimeFormat('us', { dateStyle: 'full' }).format(
-        fixtures.edgeFunctionMock.modified
-      )
+          fixtures.edgeFunctionMock.modified
+        )
       },
       {
         active: 'No',

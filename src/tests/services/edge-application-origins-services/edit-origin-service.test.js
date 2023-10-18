@@ -2,7 +2,6 @@ import { AxiosHttpClientAdapter } from '@/services/axios/AxiosHttpClientAdapter'
 import { editOriginService } from '@/services/edge-application-origins-services'
 import { describe, expect, it, vi } from 'vitest'
 
-
 const fixtures = {
   edgeApplicationId: 123,
   originMock: {
@@ -74,4 +73,4 @@ describe('EditOriginService', () => {
 
     expect(feedbackMessage).toBe('Resource successfully updated')
   })
-});
+})

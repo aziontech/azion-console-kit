@@ -2,7 +2,6 @@ import { AxiosHttpClientAdapter } from '@/services/axios/AxiosHttpClientAdapter'
 import { loadOriginService } from '@/services/edge-application-origins-services'
 import { describe, expect, it, vi } from 'vitest'
 
-
 const fixtures = {
   edgeApplicationId: 123,
   originMock: {
@@ -77,4 +76,4 @@ describe('LoadOriginService', () => {
       hmacSecretKey: fixtures.originMock.hmac_secret_key
     })
   })
-});
+})

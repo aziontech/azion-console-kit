@@ -83,7 +83,7 @@ describe('ListOriginsService', () => {
     vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
       statusCode: 200,
       body: {
-        results: [ fixtures.originSingleType, fixtures.originLoadBalancerType ]
+        results: [fixtures.originSingleType, fixtures.originLoadBalancerType]
       }
     })
 

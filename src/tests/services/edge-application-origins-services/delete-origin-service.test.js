@@ -27,7 +27,7 @@ describe('DeleteOriginService', () => {
       url: `edge_applications/${fixtures.edgeApplicationId}/origins/${fixtures.originKey}`,
       method: 'DELETE'
     })
-  });
+  })
 
   it('should return a feedback message on successfully deleted', async () => {
     vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
@@ -79,4 +79,4 @@ describe('DeleteOriginService', () => {
       expect(response).rejects.toBe(expectedError)
     }
   )
-});
+})
