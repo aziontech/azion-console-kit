@@ -1,9 +1,9 @@
 import { AxiosHttpClientAdapter, parseHttpResponse } from '../axios/AxiosHttpClientAdapter'
-import { makeIntelligentDNSBaseUrl } from './make-intelligent-dns-base-url'
+import { makeIntelligentDNSRecordsBaseUrl } from './make-intelligent-dns-records-base-url'
 
 export const listRecordsService = async ({ page, id }) => {
   let httpResponse = await AxiosHttpClientAdapter.request({
-    url: `${makeIntelligentDNSBaseUrl()}/${id}/records?page=${page}`,
+    url: `${makeIntelligentDNSRecordsBaseUrl()}/${id}/records?page=${page}`,
     method: 'GET'
   })
 

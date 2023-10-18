@@ -1,22 +1,10 @@
 import { AxiosHttpClientAdapter, parseHttpResponse } from '../axios/AxiosHttpClientAdapter'
-import { makeLogoutBaseUrl } from './make-auth-base-url'
+import { makeAuthLogoutBaseUrl } from './make-auth-logout-base-url'
 
-export const logout = async () => {
+export const logoutService = async () => {
   let httpResponse = await AxiosHttpClientAdapter.request({
-    url: `${makeLogoutBaseUrl()}`,
+    url: `${makeAuthLogoutBaseUrl()}`,
     method: 'POST'
   })
-
-  httpResponse = await adapt(httpResponse)
-
   return parseHttpResponse(httpResponse)
-}
-
-const adapt = async (httpResponse) => {
-  const parsedData = httpResponse.body
-
-  return {
-    body: parsedData,
-    statusCode: httpResponse.statusCode
-  }
 }

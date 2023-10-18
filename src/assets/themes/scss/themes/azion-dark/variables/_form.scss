@@ -76,11 +76,11 @@ $inputListBorder: $inputBorder;
 
 /// Padding of an input list
 /// @group form
-$inputListPadding: 0.5rem 0;
+$inputListPadding: 0.5rem;
 
 /// Padding for an individual itrem of an input list
 /// @group form
-$inputListItemPadding: 0.5rem 1rem;
+$inputListItemPadding: 0.75rem 0.5rem;
 
 /// Background for an individual itrem of an input list
 /// @group form
@@ -112,7 +112,7 @@ $inputListItemBorder: 0 none;
 
 /// Border radius for an individual itrem of an input list
 /// @group form
-$inputListItemBorderRadius: 0;
+$inputListItemBorderRadius: $borderRadius;
 
 /// Margin for an individual itrem of an input list
 /// @group form

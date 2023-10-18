@@ -8,11 +8,26 @@ export default mergeConfig(
   defineConfig({
     test: {
       environment: 'jsdom',
-      passWithNoTests:true,
-      exclude: [...configDefaults.exclude, 'e2e/*'],
+      passWithNoTests: true,
+      exclude: [
+        ...configDefaults.exclude,
+        'e2e/*',
+        'cypress',
+        'azion',
+        '.vscode',
+        '.husky',
+        '.vite',
+        '.github',
+        'docs',
+        'public'
+      ],
       root: fileURLToPath(new URL('./', import.meta.url)),
       transformMode: {
         web: [/\.[jt]sx$/]
+      },
+      coverage: {
+        enabled: true,
+        include: ['src/services/**', 'src/views/**']
       }
     }
   })

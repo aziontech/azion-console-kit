@@ -1,11 +1,11 @@
 import { AxiosHttpClientAdapter, parseHttpResponse } from '../axios/AxiosHttpClientAdapter'
-import { makeEdgeNodeListBaseUrl } from '../edge-node-services/make-edge-node-list-base-url'
+import { makeEdgeNodeBaseUrl } from '../edge-node-services/make-edge-node-base-url'
 import helper from './helper'
 
 export const addEdgeNodeService = async (id, payload) => {
   const bodyRequest = adapt(payload)
   let httpResponse = await AxiosHttpClientAdapter.request({
-    url: `${makeEdgeNodeListBaseUrl()}/${id}/services`,
+    url: `${makeEdgeNodeBaseUrl()}/${id}/services`,
     method: 'POST',
     body: bodyRequest
   })

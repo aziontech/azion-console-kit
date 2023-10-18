@@ -1,5 +1,4 @@
-import axiosAzionApi from './makeApi'
-
+import defaultApi from './makeApi'
 import {
   InternalServerError,
   InvalidApiRequestError,
@@ -14,11 +13,11 @@ export const parseHttpResponse = (httpResponse) => {
     case 200:
       return httpResponse?.body || null
     case 201:
-      return 'Resource succesfully created'
+      return 'Resource successfully created'
     case 202:
-      return 'Resource succesfully updated'
+      return 'Resource successfully updated'
     case 204:
-      return 'Resource succesfully deleted'
+      return 'Resource successfully deleted'
     case 400:
       throw new InvalidApiRequestError().message
     case 401:
@@ -33,9 +32,11 @@ export const parseHttpResponse = (httpResponse) => {
       throw new UnexpectedError().message
   }
 }
-
 export class AxiosHttpClientAdapter {
-  static async request({ url, method, headers, body }, axios = axiosAzionApi) {
+  static async request(
+    { url, method, headers, body },
+    axios = defaultApi(import.meta.env.VITE_PERSONAL_TOKEN)
+  ) {
     let axiosResponse
     try {
       axiosResponse = await axios.request({

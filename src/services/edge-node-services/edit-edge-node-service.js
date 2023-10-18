@@ -1,10 +1,10 @@
 import { AxiosHttpClientAdapter, parseHttpResponse } from '../axios/AxiosHttpClientAdapter'
-import { makeEdgeNodeListBaseUrl } from './make-edge-node-list-base-url'
+import { makeEdgeNodeBaseUrl } from './make-edge-node-base-url'
 
 export const editEdgeNodeService = async (payload) => {
   const bodyRequest = adapt(payload)
   let httpResponse = await AxiosHttpClientAdapter.request({
-    url: `${makeEdgeNodeListBaseUrl()}/${payload.id}`,
+    url: `${makeEdgeNodeBaseUrl()}/${payload.id}`,
     method: 'PATCH',
     body: bodyRequest
   })

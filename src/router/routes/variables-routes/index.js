@@ -57,7 +57,7 @@ export const variablesRoutes = {
             to: '/variables'
           },
           {
-            label: 'Edit Variables'
+            label: 'Edit Variables',
           }
         ]
       }

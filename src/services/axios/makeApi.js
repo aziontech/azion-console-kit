@@ -1,16 +1,19 @@
 import axios from 'axios'
-const baseURL = '/api'
-const token = import.meta.env.VITE_PERSONAL_TOKEN
 
-axios.defaults.headers.common['Accept'] = 'application/json; version=3'
-axios.defaults.withCredentials = true
+const api = (personalToken) => {
+  delete axios.defaults.headers.common['Authorization']
+  const baseURL = '/api'
 
-if (token) {
-  axios.defaults.headers.common['Authorization'] = `token ${token}`
+  axios.defaults.headers.common['Accept'] = 'application/json; version=3'
+  axios.defaults.withCredentials = true
+
+  if (personalToken) {
+    axios.defaults.headers.common['Authorization'] = `token ${personalToken}`
+  }
+
+  return axios.create({
+    baseURL
+  })
 }
-
-const api = axios.create({
-  baseURL
-})
 
 export default api

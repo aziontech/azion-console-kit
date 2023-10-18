@@ -31,7 +31,7 @@ const adapt = (httpResponse) => {
       id: item.id,
       name: item.name,
       issuer: item.issuer || '-',
-      subject_name: subjectNames === '' ? '-' : subjectNames,
+      subjectName: subjectNames === '' ? '-' : subjectNames,
       type: typeMap[item.certificate_type] || '-',
       validity:
         item.validity === null

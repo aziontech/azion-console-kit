@@ -15,6 +15,7 @@ import { personalTokensRoutes } from '@routes/personal-tokens-routes'
 import { variablesRoutes } from '@routes/variables-routes'
 import { underDevelopmentRoutes } from '@routes/under-development-routes'
 import { edgeNodeRoutes } from '@routes/edge-node-routes'
+import { credentialsRoutes } from './routes/credentials-routes'
 import beforeEachRoute from './hooks/beforeEachRoute'
 import { usersListsRoutes } from '@routes/users-routes'
 import { playgroundRoutes } from './routes/playground-routes'
@@ -37,6 +38,7 @@ const router = createRouter({
     personalTokensRoutes,
     variablesRoutes,
     edgeNodeRoutes,
+    credentialsRoutes,
     usersListsRoutes,
     underDevelopmentRoutes,
     playgroundRoutes

@@ -1,4 +1,4 @@
-import * as LoginService from '@/services/auth-services'
+import * as AuthServices from '@/services/auth-services'
 
 /** @type {import('vue-router').RouteRecordRaw} */
 export const loginRoutes = {
@@ -7,9 +7,9 @@ export const loginRoutes = {
 
   component: () => import('@views/Login/LoginView.vue'),
   props: {
-    authenticationLoginService: LoginService.authenticate,
-    verifyLoginService: LoginService.verify,
-    refreshLoginService: LoginService.refresh,
-    switchAccountLoginService: LoginService.switchAccount
+    authenticationLoginService: AuthServices.loginService,
+    verifyLoginService: AuthServices.verifyAuthenticationService,
+    refreshLoginService: AuthServices.refreshAuthenticationService,
+    switchAccountLoginService: AuthServices.switchAccountService
   }
 }

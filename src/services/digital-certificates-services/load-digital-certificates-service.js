@@ -12,22 +12,22 @@ export const loadDigitalCertificateService = async ({ id }) => {
 }
 
 const adapt = (httpResponse) => {
-  const body = httpResponse.body.results
-  const parsedVariable = {
-    id: body.id,
-    name: body.name,
-    issuer: body.issuer,
-    subjectName: body.subject_name,
-    validity: body.validity,
-    status: body.status,
-    certificateType: body.certificate_type,
-    managed: body.managed,
-    csr: body.csr ?? undefined,
-    certificateContent: body.certificate_content
+  const certificate = httpResponse.body.results
+  const parsedCertificate = {
+    id: certificate.id,
+    name: certificate.name,
+    issuer: certificate.issuer,
+    subjectName: certificate.subject_name,
+    validity: certificate.validity,
+    status: certificate.status,
+    certificateType: certificate.certificate_type,
+    managed: certificate.managed,
+    csr: certificate.csr ?? undefined,
+    certificateContent: certificate.certificate_content
   }
 
   return {
-    body: parsedVariable,
+    body: parsedCertificate,
     statusCode: httpResponse.statusCode
   }
 }
