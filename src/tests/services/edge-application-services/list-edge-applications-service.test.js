@@ -70,7 +70,9 @@ describe('EdgeApplicationServices', () => {
         debugRules: 'active',
         id: fixtures.edgeApplicationsMock.id,
         lastEditor: fixtures.edgeApplicationsMock.last_editor,
-        lastModify: 'Friday, November 10, 2023',
+        lastModify: new Intl.DateTimeFormat('us', { dateStyle: 'full' }).format(
+          fixtures.edgeApplicationsMock.last_modified
+        ),
         name: fixtures.edgeApplicationsMock.name,
         origins: `${fixtures.edgeApplicationsMock.origins.at(0).name},${
           fixtures.edgeApplicationsMock.origins.at(1).name
@@ -81,7 +83,9 @@ describe('EdgeApplicationServices', () => {
         debugRules: 'disabled',
         id: fixtures.disabledEdgeApplicationsMock.id,
         lastEditor: fixtures.disabledEdgeApplicationsMock.last_editor,
-        lastModify: 'Sunday, December 10, 2023',
+        lastModify: new Intl.DateTimeFormat('us', { dateStyle: 'full' }).format(
+          fixtures.disabledEdgeApplicationsMock.last_modified
+        ),
         name: fixtures.disabledEdgeApplicationsMock.name,
         origins: `${fixtures.disabledEdgeApplicationsMock.origins.at(0).name},${
           fixtures.disabledEdgeApplicationsMock.origins.at(1).name

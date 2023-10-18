@@ -20,7 +20,11 @@ const fixtures = {
     certificate_type: null,
     validity: null,
     status: 'active'
-  }
+  },
+  validityDate: new Intl.DateTimeFormat('us', {
+    dateStyle: 'full',
+    timeStyle: 'short'
+  }).format(new Date(2023, 10, 10))
 }
 
 const makeSut = () => {
@@ -71,7 +75,7 @@ describe('DigitalCertificatesServices', () => {
       issuer: fixtures.domainMock.issuer,
       type: 'Edge Certificate',
       subjectName: 'Subject 1,Subject 2',
-      validity: 'Friday, November 10, 2023 at 12:00 AM',
+      validity: fixtures.validityDate,
       status: fixtures.domainMock.status
     })
     expect(parsedDomainMissingValues).toEqual({

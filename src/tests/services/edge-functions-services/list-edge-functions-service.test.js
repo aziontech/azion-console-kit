@@ -78,7 +78,9 @@ describe('EdgeFunctionsServices', () => {
         id: fixtures.edgeFunctionMock.id,
         name: fixtures.edgeFunctionMock.name,
         lastEditor: fixtures.edgeFunctionMock.last_editor,
-        lastModified: 'Friday, November 10, 2023'
+        lastModified: new Intl.DateTimeFormat('us', { dateStyle: 'full' }).format(
+        fixtures.edgeFunctionMock.modified
+      )
       },
       {
         active: 'No',
@@ -89,7 +91,9 @@ describe('EdgeFunctionsServices', () => {
         id: fixtures.disabledEdgeFunctionMock.id,
         name: fixtures.disabledEdgeFunctionMock.name,
         lastEditor: fixtures.disabledEdgeFunctionMock.last_editor,
-        lastModified: 'Sunday, December 10, 2023'
+        lastModified: new Intl.DateTimeFormat('us', { dateStyle: 'full' }).format(
+          fixtures.disabledEdgeFunctionMock.modified
+        )
       }
     ])
   })

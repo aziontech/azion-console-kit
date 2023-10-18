@@ -73,7 +73,9 @@ describe('NetworkListsServices', () => {
       lastEditor: fixtures.networkMock.last_editor,
       listType: 'IP/CIDR',
       itemsValues: `123.123.123.123\n192.168.0.0`,
-      lastModified: 'Friday, November 10, 2023 at 12:00 AM'
+      lastModified: new Intl.DateTimeFormat('us', { dateStyle: 'full', timeStyle: 'short' }).format(
+        fixtures.networkMock.last_modified
+      )
     })
   })
   it('should parsed correctly the loaded network list record with countries', async () => {
@@ -94,7 +96,9 @@ describe('NetworkListsServices', () => {
       lastEditor: fixtures.networkMockWithCountries.last_editor,
       listType: 'countries',
       itemsValues: fixtures.networkMockWithCountries.items_values,
-      lastModified: 'Sunday, June 11, 2023 at 12:00 AM'
+      lastModified: new Intl.DateTimeFormat('us', { dateStyle: 'full', timeStyle: 'short' }).format(
+        fixtures.networkMockWithCountries.last_modified
+      )
     })
   })
 })

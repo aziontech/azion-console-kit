@@ -64,7 +64,10 @@ describe('NetworkListsServices', () => {
         name: fixtures.networkMock.name,
         lastEditor: fixtures.networkMock.last_editor,
         listType: 'IP/CIDR',
-        lastModified: 'Friday, November 10, 2023 at 12:00 AM'
+        lastModified: new Intl.DateTimeFormat('us', {
+          dateStyle: 'full',
+          timeStyle: 'short'
+        }).format(fixtures.networkMock.last_modified)
       }
     ])
   })

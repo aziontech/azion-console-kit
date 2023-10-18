@@ -61,7 +61,9 @@ describe('VariablesService', () => {
         key: fixtures.variableMock.key,
         value: fixtures.variableMock.value,
         lastEditor: fixtures.variableMock.last_editor,
-        updatedAt: 'Saturday, June 10, 2023'
+        updatedAt: new Intl.DateTimeFormat('us', { dateStyle: 'full' }).format(
+          fixtures.variableMock.updated_at
+        )
       }
     ])
   })

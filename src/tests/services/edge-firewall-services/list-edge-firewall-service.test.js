@@ -22,7 +22,10 @@ const fixtures = {
       { id: 2, name: 'Domain 2' }
     ]
   },
-  domainFactory: (id) => ({ id, name: `Domain ${id}` })
+  domainFactory: (id) => ({ id, name: `Domain ${id}` }),
+  lastModifyDate: new Intl.DateTimeFormat('us', { dateStyle: 'full' }).format(
+    new Date(2023, 10, 10)
+  )
 }
 
 const makeSut = () => {
@@ -71,7 +74,7 @@ describe('EdgeFirewallServices', () => {
         id: fixtures.edgeFirewallMock.id,
         name: fixtures.edgeFirewallMock.name,
         lastEditor: fixtures.edgeFirewallMock.last_editor,
-        lastModify: 'Friday, November 10, 2023',
+        lastModify: fixtures.lastModifyDate,
         domainsList: '',
         active: 'Yes'
       }
@@ -102,7 +105,7 @@ describe('EdgeFirewallServices', () => {
         id: fixtures.edgeFirewallWithDomainsMock.id,
         name: fixtures.edgeFirewallWithDomainsMock.name,
         lastEditor: fixtures.edgeFirewallWithDomainsMock.last_editor,
-        lastModify: 'Friday, November 10, 2023',
+        lastModify: fixtures.lastModifyDate,
         domainsList: `Domain 1<br>Domain 2`,
         active: 'No'
       }

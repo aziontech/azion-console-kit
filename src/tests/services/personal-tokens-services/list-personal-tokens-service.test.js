@@ -62,8 +62,12 @@ describe('PersonalTokensServices', () => {
         id: fixtures.personalTokenMock.uuid,
         scope: 'Global',
         name: fixtures.personalTokenMock.name,
-        created: 'Friday, November 10, 2023',
-        expiresAt: 'Sunday, December 10, 2023'
+        created: new Intl.DateTimeFormat('us', { dateStyle: 'full', timeZone: 'UTC' }).format(
+          new Date(2023, 10, 10)
+        ),
+        expiresAt: new Intl.DateTimeFormat('us', { dateStyle: 'full', timeZone: 'UTC' }).format(
+          new Date(2023, 11, 10)
+        )
       }
     ])
   })
