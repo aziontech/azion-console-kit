@@ -3,8 +3,8 @@
     <Toast />
 
     <PageHeadingBlock :pageTitle="pageTitle" />
-    <form class="w-full grow mt-4 p-4 flex flex-col gap-4 mx-auto">
-      <div class="flex flex-col gap-4 sm:!w-full">
+    <form class="w-full grow py-4 px-8 flex flex-col gap-4">
+      <div class="flex flex-col gap-8 w-full">
         <slot name="form" />
       </div>
       <slot name="raw-form" />
