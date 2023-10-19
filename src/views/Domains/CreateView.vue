@@ -201,9 +201,6 @@
         if (newValue !== 0) {
           this.setEdgeCertificate(newValue)
         }
-      },
-      errors(newValue) {
-        console.log(newValue)
       }
     },
     setup() {
