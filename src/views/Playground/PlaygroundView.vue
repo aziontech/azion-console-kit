@@ -103,13 +103,25 @@
     </div>
 
     <!-- Menu -->
-    <Menu class="w-[340px]" :model="items" />
+    <Menu class="w-[20rem]" :model="items" />
 
     <!-- Dropdowns -->
-    <Dropdown v-model="cities" :options="cities" optionLabel="name" placeholder="Select a City" class="w-[340px]" />
-    <Dropdown v-model="selectedCity" :options="groupedCities" optionLabel="label" optionGroupLabel="label"
-      optionGroupChildren="items" placeholder="Select a City" class="w-[340px]" />
-
+    <Dropdown
+      class="w-full md:w-[20rem]"
+      v-model="selectedCity"
+      :options="cities"
+      optionLabel="name"
+      placeholder="Select a City"
+    />
+    <Dropdown
+      class="w-full md:w-[20rem]"
+      v-model="selectedGroupedCity"
+      :options="groupedCities"
+      optionLabel="label"
+      optionGroupLabel="label"
+      optionGroupChildren="items"
+      placeholder="Select a City"
+    />
   </div>
 </template>
 
@@ -128,6 +140,12 @@ import { useRouter, useRoute } from 'vue-router'
 const router = useRouter()
 const route = useRoute()
 
+const itemsbread = ref([
+    {label: 'Page Name'},
+    {label: 'Page Name'},
+    {label: 'Current Page'},
+]);
+
 const value = ref('All phases');
 const options = ref(['All phases', 'Request', 'Response']);
 
@@ -140,50 +158,46 @@ const items = ref([
   { label: 'Teams Permissions' },
 ]);
 
+const selectedCity = ref();
 const cities = ref([
-  { name: 'New York', code: 'NY' },
-  { name: 'Rome', code: 'RM' },
-  { name: 'London', code: 'LDN' },
-  { name: 'Istanbul', code: 'IST' },
-  { name: 'Paris', code: 'PRS' }
+    { name: 'New York', code: 'NY' },
+    { name: 'Rome', code: 'RM' },
+    { name: 'London', code: 'LDN' },
+    { name: 'Istanbul', code: 'IST' },
+    { name: 'Paris', code: 'PRS' }
 ]);
 
+const selectedGroupedCity = ref();
 const groupedCities = ref([
-  {
-    label: 'Germany',
-    code: 'DE',
-    items: [
-      { label: 'Berlin', value: 'Berlin' },
-      { label: 'Frankfurt', value: 'Frankfurt' },
-      { label: 'Hamburg', value: 'Hamburg' },
-      { label: 'Munich', value: 'Munich' }
-    ]
-  },
-  {
-    label: 'USA',
-    code: 'US',
-    items: [
-      { label: 'Chicago', value: 'Chicago' },
-      { label: 'Los Angeles', value: 'Los Angeles' },
-      { label: 'New York', value: 'New York' },
-      { label: 'San Francisco', value: 'San Francisco' }
-    ]
-  },
-  {
-    label: 'Japan',
-    code: 'JP',
-    items: [
-      { label: 'Kyoto', value: 'Kyoto' },
-      { label: 'Osaka', value: 'Osaka' },
-      { label: 'Tokyo', value: 'Tokyo' },
-      { label: 'Yokohama', value: 'Yokohama' }
-    ]
-  }
-]);
-
-const itemsbread = ref([
-    {label: 'Page Name'},
-    {label: 'Page Name'},
-    {label: 'Current Page'},
+    {
+        label: 'Germany',
+        code: 'DE',
+        items: [
+            { label: 'Berlin', value: 'Berlin' },
+            { label: 'Frankfurt', value: 'Frankfurt' },
+            { label: 'Hamburg', value: 'Hamburg' },
+            { label: 'Munich', value: 'Munich' }
+        ]
+    },
+    {
+        label: 'USA',
+        code: 'US',
+        items: [
+            { label: 'Chicago', value: 'Chicago' },
+            { label: 'Los Angeles', value: 'Los Angeles' },
+            { label: 'New York', value: 'New York' },
+            { label: 'San Francisco', value: 'San Francisco' }
+        ]
+    },
+    {
+        label: 'Japan',
+        code: 'JP',
+        items: [
+            { label: 'Kyoto', value: 'Kyoto' },
+            { label: 'Osaka', value: 'Osaka' },
+            { label: 'Tokyo', value: 'Tokyo' },
+            { label: 'Yokohama', value: 'Yokohama' }
+        ]
+    }
 ]);
 </script>
