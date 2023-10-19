@@ -1,112 +1,115 @@
 <template>
-  <div class="flex align-middle justify-center py-10">
-    <div class="w-[996px] flex flex-col gap-10">
-      <Menu class="w-full" :model="items" />
-      <Dropdown v-model="cities" :options="cities" optionLabel="name" placeholder="Select a City" />
-      <Dropdown v-model="selectedCity" :options="groupedCities" optionLabel="label" optionGroupLabel="label"
-        optionGroupChildren="items" placeholder="Select a City" />
-      <!-- SelectButton -->
-      <div class="flex my-2 mx-auto w-full justify-start gap-2 items-center">
-        <SelectButton
-          v-model="value"
-          :options="options"
-          aria-labelledby="basic"
-        />
-        <PrimeButton label="Rule Set" icon="pi pi-plus" size="small"/>
-      </div>
+  <div class="w-full py-6 px-8 flex flex-col gap-4">
+    <!-- Breadcrumbs -->
+    <Breadcrumb :model="itemsbread" />
 
-      <!-- TabView -->
-      <div class="flex my-2 mx-auto w-full">
-        <TabView
-          :scrollable="true"
-          class="w-full"
-        >
-          <TabPanel header="Main Settings">
-            <div class="p-4">
-              <p>Tab 1</p>
-            </div>
-          </TabPanel>
-          <TabPanel header="Origins">
-            <div class="p-4">
-              <p>Tab 2</p>
-            </div>
-          </TabPanel>
-          <TabPanel header="Rules Engine">
-            <div class="p-4">
-              <p>Tab 3</p>
-            </div>
-          </TabPanel>
-          <TabPanel header="Rules Engine">
-            <div class="p-4">
-              <p>Tab 3</p>
-            </div>
-          </TabPanel>
-          <TabPanel header="Rules Engine">
-            <div class="p-4">
-              <p>Tab 3</p>
-            </div>
-          </TabPanel>
-          <TabPanel header="Rules Engine">
-            <div class="p-4">
-              <p>Tab 3</p>
-            </div>
-          </TabPanel>
-          <TabPanel header="Rules Engine">
-            <div class="p-4">
-              <p>Tab 3</p>
-            </div>
-          </TabPanel>
-          <TabPanel header="Rules Engine">
-            <div class="p-4">
-              <p>Tab 3</p>
-            </div>
-          </TabPanel>
-          <TabPanel header="Rules Engine">
-            <div class="p-4">
-              <p>Tab 3</p>
-            </div>
-          </TabPanel>
-          <TabPanel header="Rules Engine">
-            <div class="p-4">
-              <p>Tab 3</p>
-            </div>
-          </TabPanel>
-          <TabPanel header="Rules Engine">
-            <div class="p-4">
-              <p>Tab 3</p>
-            </div>
-          </TabPanel>
-          <TabPanel header="Rules Engine">
-            <div class="p-4">
-              <p>Tab 3</p>
-            </div>
-          </TabPanel>
-          <TabPanel header="Rules Engine">
-            <div class="p-4">
-              <p>Tab 3</p>
-            </div>
-          </TabPanel>
-          <TabPanel header="Rules Engine">
-            <div class="p-4">
-              <p>Tab 3</p>
-            </div>
-          </TabPanel>
-          <TabPanel header="Rules Engine">
-            <div class="p-4">
-              <p>Tab 3</p>
-            </div>
-          </TabPanel>
-          <TabPanel header="Rules Engine">
-            <div class="p-4">
-              <p>Tab 3</p>
-            </div>
-          </TabPanel>
-        </TabView>
-      </div>
-
-      <!-- Breadcrumbs -->
-      <Breadcrumb :model="itemsbread" />
+    <!-- TabView -->
+    <div class="flex my-2 mx-auto w-full">
+      <TabView
+        :scrollable="true"
+        class="w-full"
+      >
+        <TabPanel header="Main Settings">
+          <div class="p-4">
+            <p>Tab 1</p>
+          </div>
+        </TabPanel>
+        <TabPanel header="Origins">
+          <div class="p-4">
+            <p>Tab 2</p>
+          </div>
+        </TabPanel>
+        <TabPanel header="Rules Engine">
+          <div class="p-4">
+            <p>Tab 3</p>
+          </div>
+        </TabPanel>
+        <TabPanel header="Rules Engine">
+          <div class="p-4">
+            <p>Tab 3</p>
+          </div>
+        </TabPanel>
+        <TabPanel header="Rules Engine">
+          <div class="p-4">
+            <p>Tab 3</p>
+          </div>
+        </TabPanel>
+        <TabPanel header="Rules Engine">
+          <div class="p-4">
+            <p>Tab 3</p>
+          </div>
+        </TabPanel>
+        <TabPanel header="Rules Engine">
+          <div class="p-4">
+            <p>Tab 3</p>
+          </div>
+        </TabPanel>
+        <TabPanel header="Rules Engine">
+          <div class="p-4">
+            <p>Tab 3</p>
+          </div>
+        </TabPanel>
+        <TabPanel header="Rules Engine">
+          <div class="p-4">
+            <p>Tab 3</p>
+          </div>
+        </TabPanel>
+        <TabPanel header="Rules Engine">
+          <div class="p-4">
+            <p>Tab 3</p>
+          </div>
+        </TabPanel>
+        <TabPanel header="Rules Engine">
+          <div class="p-4">
+            <p>Tab 3</p>
+          </div>
+        </TabPanel>
+        <TabPanel header="Rules Engine">
+          <div class="p-4">
+            <p>Tab 3</p>
+          </div>
+        </TabPanel>
+        <TabPanel header="Rules Engine">
+          <div class="p-4">
+            <p>Tab 3</p>
+          </div>
+        </TabPanel>
+        <TabPanel header="Rules Engine">
+          <div class="p-4">
+            <p>Tab 3</p>
+          </div>
+        </TabPanel>
+        <TabPanel header="Rules Engine">
+          <div class="p-4">
+            <p>Tab 3</p>
+          </div>
+        </TabPanel>
+        <TabPanel header="Rules Engine">
+          <div class="p-4">
+            <p>Tab 3</p>
+          </div>
+        </TabPanel>
+      </TabView>
     </div>
+
+    <!-- SelectButton -->
+    <div class="flex my-2 mx-auto w-full justify-end gap-2 items-center">
+      <SelectButton
+        v-model="value"
+        :options="options"
+        aria-labelledby="basic"
+      />
+      <PrimeButton label="Rule Set" icon="pi pi-plus" size="small"/>
+    </div>
+
+    <!-- Menu -->
+    <Menu class="w-[340px]" :model="items" />
+
+    <!-- Dropdowns -->
+    <Dropdown v-model="cities" :options="cities" optionLabel="name" placeholder="Select a City" class="w-[340px]" />
+    <Dropdown v-model="selectedCity" :options="groupedCities" optionLabel="label" optionGroupLabel="label"
+      optionGroupChildren="items" placeholder="Select a City" class="w-[340px]" />
+
   </div>
 </template>
 
@@ -179,7 +182,8 @@ const groupedCities = ref([
 ]);
 
 const itemsbread = ref([
-    {label: 'Item'},
-    {label: 'Current'},
+    {label: 'Page Name'},
+    {label: 'Page Name'},
+    {label: 'Current Page'},
 ]);
 </script>

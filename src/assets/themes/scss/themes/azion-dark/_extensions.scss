@@ -3,15 +3,15 @@
   // Custom SelectButton
   .p-selectbutton {
     background: var(--surface-300) !important;
-    padding: .25rem !important;
+    padding: 0.25rem !important;
     border-radius: $borderRadius !important;
 
     .p-button {
       background: none !important;
       border: none !important;
-      height: 1.70rem !important;
+      height: 1.7rem !important;
       font-size: 0.875rem !important;
-      border-radius: .25rem !important;
+      border-radius: 0.25rem !important;
       color: var(--text-color-secondary) !important;
       font-weight: 600 !important;
 
@@ -24,7 +24,7 @@
         background: var(--surface-0) !important;
         border-color: none !important;
         font-weight: 600 !important;
-        border-radius: .25rem !important;
+        border-radius: 0.25rem !important;
         color: var(--text-color) !important;
 
         &:hover {
@@ -112,13 +112,14 @@
   // Custom Breadcrumb
   .p-breadcrumb {
     .p-breadcrumb-list {
-      .p-menuitem:last-of-type {
-        font-weight: 800;
-      }
+      font-weight: 500;
       .p-menuitem-link {
-        padding: 0.25rem 0.1rem;
+        padding: 0.25rem 0.125rem;
         font-size: 0.875rem;
         transition: $formElementTransition !important;
+      }
+      .p-menuitem:last-of-type {
+        font-weight: 800 !important;
       }
       .p-menuitem:hover {
         text-decoration: underline;
