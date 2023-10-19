@@ -16,12 +16,13 @@ const adapt = (payload) => {
   return {
     first_name: payload.firstName,
     last_name: payload.lastName,
-    timezone: payload.selectedTimezone,
-    language: payload.selectedLanguage,
     email: payload.email,
-    mobile: payload.mobile,
-    is_account_owner: payload.owner,
-    teams: [payload.selectedTeam],
-    two_factor_enabled: payload.mfa
+    language: payload.selectedLanguage,
+    timezone: payload.selectedTimezone,
+    country_call_code: payload.selectedCountry,
+    mobile: payload.mobile?.toString(),
+    is_account_owner: payload.userIsOwner,
+    teams: payload.selectedTeam,
+    two_factor_enabled: payload.twoFactorEnabled
   }
 }

@@ -51,6 +51,16 @@ export default defineConfig({
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/api\/iam/, '')
       },
+      '/api/account-details': {
+        target: 'https://stage-iam.azion.com/iam/api/account',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/api\/account-details/, '')
+      },
+      '/api/teams': {
+        target: 'https://stage-iam.azion.com/iam/api/teams/',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/api\/teams/, '')
+      },
       '/api/users': {
         target: 'https://stage-iam.azion.com/iam/api',
         changeOrigin: true,
