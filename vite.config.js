@@ -26,40 +26,10 @@ export default defineConfig({
         rewrite: (path) => path.replace(/^\/logout/, ''),
         cookieDomainRewrite: { '*': '' }
       },
-      '/api/edge_services': {
-        target: 'https://stage-manager-origin.azion.com/services/api/v1/services',
-        changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/api\/edge_services/, '')
-      },
-      '/api/variables': {
-        target: 'https://stage-manager.azion.com/variables/api/',
-        changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/api/, '')
-      },
       '/network-lists/graphql': {
         target: 'https://stage-cities.azion.com',
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/network-lists\/graphql/, '')
-      },
-      '/api/edge_node': {
-        target: 'https://stage-manager.azion.com/edgenode/api/v1/edge-nodes',
-        changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/api\/edge_node/, '')
-      },
-      '/api/iam': {
-        target: 'https://stage-manager.azion.com/iam/api',
-        changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/api\/iam/, '')
-      },
-      '/api/users': {
-        target: 'https://stage-iam.azion.com/iam/api',
-        changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/api/, '')
-      },
-      '/api/credentials': {
-        target: 'https://stage-manager.azion.com/credentials/api/v1/credentials',
-        changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/api\/credentials/, '')
       },
       '^/api/(account|user|token|switch-account)': {
         target: 'https://stage-sso.azion.com/api',
@@ -68,7 +38,7 @@ export default defineConfig({
         cookieDomainRewrite: { '*': '' }
       },
       '/api': {
-        target: 'https://stage-manager-origin.azion.com/api',
+        target: 'https://stage-api.azion.net',
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/api/, '')
       }

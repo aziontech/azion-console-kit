@@ -22,7 +22,7 @@ describe('EdgeNodeServices', () => {
 
     expect(requestSpy).toHaveBeenCalledWith({
       method: 'PATCH',
-      url: `edge_node/${mockId}`,
+      url: `edge_nodes/${mockId}`,
       body: {
         status: 'Authorized'
       }

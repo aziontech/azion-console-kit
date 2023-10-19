@@ -58,7 +58,7 @@ describe('UsersServices', () => {
     await sut({ page: 1, search: 'search_text' })
 
     expect(requestSpy).toHaveBeenCalledWith({
-      url: `users`,
+      url: `iam/users`,
       method: 'GET'
     })
   })

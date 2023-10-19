@@ -12,7 +12,7 @@ const makeSut = () => {
 describe('UsersServices', () => {
   it('should return the API base url to users service', () => {
     const { sut } = makeSut()
-    const correctApiUrl = 'users'
+    const correctApiUrl = 'iam/users'
 
     const baseUrl = sut()
 
