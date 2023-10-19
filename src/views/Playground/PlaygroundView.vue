@@ -6,12 +6,13 @@
       <Dropdown v-model="selectedCity" :options="groupedCities" optionLabel="label" optionGroupLabel="label"
         optionGroupChildren="items" placeholder="Select a City" />
       <!-- SelectButton -->
-      <div class="flex my-2 mx-auto">
+      <div class="flex my-2 mx-auto w-full justify-start gap-2 items-center">
         <SelectButton
           v-model="value"
           :options="options"
           aria-labelledby="basic"
         />
+        <PrimeButton label="Rule Set" icon="pi pi-plus" size="small"/>
       </div>
 
       <!-- TabView -->
@@ -116,6 +117,7 @@ import TabView from 'primevue/tabview'
 import TabPanel from 'primevue/tabpanel'
 import SelectButton from 'primevue/selectbutton'
 import Breadcrumb from 'primevue/breadcrumb';
+import PrimeButton from 'primevue/button';
 
 import { ref } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
@@ -124,7 +126,7 @@ const router = useRouter()
 const route = useRoute()
 
 const value = ref('All phases');
-const options = ref(['All phases', 'Response', 'Request']);
+const options = ref(['All phases', 'Request', 'Response']);
 
 const items = ref([
   { label: 'Account Settings' },
