@@ -1,10 +1,10 @@
 <template>
   <div class="w-full py-6 px-8 flex flex-col gap-4">
     <!-- Breadcrumbs -->
-    <Breadcrumb :model="itemsbread" />
+    <Breadcrumb :model="itemsbread" class="-ml-1" />
 
     <!-- TabView -->
-    <div class="flex my-2 mx-auto w-full">
+    <div class="flex mx-auto w-full">
       <TabView
         :scrollable="true"
         class="w-full"
@@ -93,7 +93,7 @@
     </div>
 
     <!-- SelectButton -->
-    <div class="flex my-2 mx-auto w-full justify-end gap-2 items-center">
+    <div class="flex mx-auto w-full justify-end gap-2 items-center">
       <SelectButton
         v-model="value"
         :options="options"

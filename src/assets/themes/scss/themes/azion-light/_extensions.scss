@@ -40,14 +40,19 @@
   // Custom TabView
   .p-tabview {
     .p-tabview-nav {
-      gap: 0.8rem !important;
+      gap: 0.5rem !important;
 
       li {
         .p-tabview-nav-link {
-          font-weight: 500;
+          font-weight: 600 !important;
           min-height: 2rem;
-          font-size: 0.9rem;
+          font-size: 0.875rem;
           border-radius: $borderRadius;
+        }
+        &.p-highlight {
+          .p-tabview-nav-link {
+            font-weight: 700 !important;
+          }
         }
       }
     }
@@ -69,14 +74,19 @@
   // Custom TabMenu
   .p-tabmenu {
     .p-tabmenu-nav {
-      gap: 0.8rem !important;
+      gap: 0.5rem !important;
 
       .p-tabmenuitem {
         .p-menuitem-link {
-          font-weight: 500 !important;
+          font-weight: 600 !important;
           min-height: 2rem !important;
-          font-size: 0.9rem !important;
+          font-size: 0.875rem !important;
           border-radius: $borderRadius !important;
+        }
+        &.p-highlight {
+          .p-menuitem-link {
+            font-weight: 700 !important;
+          }
         }
       }
     }
@@ -112,14 +122,14 @@
   // Custom Breadcrumb
   .p-breadcrumb {
     .p-breadcrumb-list {
-      font-weight: 500;
+      font-weight: 400;
       .p-menuitem-link {
-        padding: 0.25rem 0.125rem;
-        font-size: 0.875rem;
+        padding: 0.25rem 0.125rem !important;
         transition: $formElementTransition !important;
+        font-size: 0.875rem !important;
       }
       .p-menuitem:last-of-type {
-        font-weight: 800 !important;
+        font-weight: 600 !important;
       }
       .p-menuitem:hover {
         text-decoration: underline;
