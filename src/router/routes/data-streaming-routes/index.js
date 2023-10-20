@@ -43,6 +43,28 @@ export const dataStreamingRoutes = {
           }
         ]
       }
+    },
+    {
+      path: 'edit/:id',
+      name: 'edit-data-streaming',
+      component: () => import('@views/DataStreaming/EditView.vue'),
+      props: {
+        listDataStreamingTemplateService: DataStreamingService.listDataStreamingTemplateService,
+        listDataStreamingDomainsService: DataStreamingService.listDataStreamingDomainsService,
+        loadDataStreamingService: DataStreamingService.loadDataStreamingService,
+        editDataStreamingService: DataStreamingService.editDataStreamingService
+      },
+      meta: {
+        breadCrumbs: [
+          {
+            label: 'Data Streaming',
+            to: '/data-streaming'
+          },
+          {
+            label: 'Edit Data Streaming'
+          }
+        ]
+      }
     }
   ]
 }
