@@ -55,13 +55,13 @@ const fixtures = {
   }
 }
 
-function makeSut() {
+const makeSut = () => {
   const sut = listOriginsService
 
   return { sut }
 }
 
-describe('ListOriginsService', () => {
+describe('EdgeApplicationOriginsServices', () => {
   it('should call api with correct params', async () => {
     const requestSpy = vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
       statusCode: 200,

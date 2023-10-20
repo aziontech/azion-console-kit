@@ -8,13 +8,13 @@ const fixtures = {
   originKey: '0000000-00000000-00a0a00s0as0-000000'
 }
 
-function makeSut() {
+const makeSut = () => {
   const sut = deleteOriginsService
 
   return { sut }
 }
 
-describe('DeleteOriginService', () => {
+describe('EdgeApplicationOriginsServices', () => {
   it('should call API with correct params', async () => {
     const requestSpy = vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
       statusCode: 204
