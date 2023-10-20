@@ -42,7 +42,7 @@
                 <div class="hidden md:block">
                   <divider layout="vertical" />
                 </div>
-    
+
                 <div class="w-full md:w-1/2 hidden md:block">
                   <div class="relative overflow-hidden h-full p-5">
                     <iframe
@@ -71,46 +71,46 @@
             :isValid="meta.valid"
             :formData="values"
           >
-          <template #raw-form>
-            <div class="flex flex-col md:flex-row">
-              <div class="w-full md:w-1/2">
-                <div class="flex flex-col gap-4">
-                  <label>Function Args: *</label>
-                  <div class="w-full flex justify-center">
-                    <vue-monaco-editor
-                      v-model:value="jsonArgs"
-                      language="json"
-                      theme="vs-dark"
-                      class="min-h-[50vh] !w-[99%]"
-                      :class="{ 'border-red-500 border': errorCode }"
-                      @change="changeValidateArgs"
-                      v-tooltip.top="errorCode"
-                      :options="editorOptions"
-                    />
+            <template #raw-form>
+              <div class="flex flex-col md:flex-row">
+                <div class="w-full md:w-1/2">
+                  <div class="flex flex-col gap-4">
+                    <label>Function Args: *</label>
+                    <div class="w-full flex justify-center">
+                      <vue-monaco-editor
+                        v-model:value="jsonArgs"
+                        language="json"
+                        theme="vs-dark"
+                        class="min-h-[50vh] !w-[99%]"
+                        :class="{ 'border-red-500 border': errorCode }"
+                        @change="changeValidateArgs"
+                        v-tooltip.top="errorCode"
+                        :options="editorOptions"
+                      />
+                    </div>
+                  </div>
+                </div>
+                <div class="hidden md:block">
+                  <divider layout="vertical" />
+                </div>
+
+                <div class="w-full md:w-1/2 hidden md:block">
+                  <div class="relative overflow-hidden h-full p-5">
+                    <iframe
+                      class="w-full h-full border-0 overflow-hidden"
+                      ref="previewIframeArguments"
+                      @load="postPreviewUpdates"
+                      frameborder="0"
+                      allowfullscreen
+                      src="https://code-preview.azion.com/preview"
+                      title="preview"
+                      sandbox="allow-scripts"
+                    ></iframe>
                   </div>
                 </div>
               </div>
-              <div class="hidden md:block">
-                <divider layout="vertical" />
-              </div>
-  
-              <div class="w-full md:w-1/2 hidden md:block">
-                <div class="relative overflow-hidden h-full p-5">
-                  <iframe
-                    class="w-full h-full border-0 overflow-hidden"
-                    ref="previewIframeArguments"
-                    @load="postPreviewUpdates"
-                    frameborder="0"
-                    allowfullscreen
-                    src="https://code-preview.azion.com/preview"
-                    title="preview"
-                    sandbox="allow-scripts"
-                  ></iframe>
-                </div>
-              </div>
-            </div>
-          </template>
-        </EditFormBlock>
+            </template>
+          </EditFormBlock>
         </TabPanel>
       </TabView>
     </template>
