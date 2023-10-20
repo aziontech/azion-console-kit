@@ -1,0 +1,36 @@
+<template>
+  <div class="gap-2 flex items-center">
+    <p>{{ content }}</p>
+    <PrimeButton
+      text
+      icon="pi pi-copy"
+      @click="handleCopyContent"
+    />
+  </div>
+</template>
+
+<script>
+  import PrimeButton from 'primevue/button'
+
+  export default {
+    name: 'avatar-with-text-column',
+    components: {
+      PrimeButton
+    },
+    props: {
+      content: {
+        type: String,
+        required: true
+      },
+      copyContentService: {
+        required: true,
+        type: Function
+      }
+    },
+    methods: {
+      handleCopyContent() {
+        this.copyContentService(this.content)
+      }
+    }
+  }
+</script>
