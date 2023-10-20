@@ -19,10 +19,10 @@ const adapt = (payload) => {
     email: payload.email,
     language: payload.selectedLanguage,
     timezone: payload.selectedTimezone,
-    country_call_code: payload.selectedCountry,
+    country_call_code: payload.selectedCountry.value,
     mobile: payload.mobile?.toString(),
     is_account_owner: payload.userIsOwner,
-    teams: payload.selectedTeam,
+    teams_ids: payload.selectedTeam,
     two_factor_enabled: payload.twoFactorEnabled
   }
 }

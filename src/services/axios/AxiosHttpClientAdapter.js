@@ -32,6 +32,7 @@ export const parseHttpResponse = (httpResponse) => {
       throw new UnexpectedError().message
   }
 }
+
 export class AxiosHttpClientAdapter {
   static async request(
     { url, method, headers, body },

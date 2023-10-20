@@ -1,6 +1,5 @@
 <template>
   <div>
-    <Toast />
     <CreateFormBlock
       pageTitle="Create User"
       :createService="props.createUsersService"
@@ -64,6 +63,7 @@
             :class="{ 'p-invalid': errors.email }"
             v-tooltip.top="errors.email"
           />
+          
         </div>
         <div class="flex flex-col gap-2">
           <label for="mobile">Mobile: *</label>
@@ -87,13 +87,14 @@
                 </div>
               </template>
             </AutoComplete>
-
-            <InputNumber
+            
+            <InputMask
+              date="phone"
               v-model="mobile"
               class="w-full"
-              :useGrouping="false"
+              mask="?99999999999999999999999"
               :class="{ 'p-invalid': errors.mobile && !selectedCountry }"
-              :disabled="!!disabledFields"
+              v-tooltip.top="errors.mobile"
             />
           </div>
         </div>
@@ -104,6 +105,7 @@
             :disabled="accountIsOwner"
             :readonly="accountIsOwner"
             v-model="userIsOwner"
+            @click="handleUserIsOwner"
           />
         </div>
         <div class="flex flex-col gap-2">
@@ -112,6 +114,7 @@
             display="chip"
             filter
             id="teams"
+            :disabled="userIsOwner"
             :loading="!optionsTeams.length"
             :options="optionsTeams"
             optionLabel="label"
@@ -120,7 +123,6 @@
             :maxSelectedLabels="5"
             :class="{ 'p-invalid': errors.selectedTeam }"
             v-model="selectedTeam"
-            :disabled="!!disabledFields"
           >
             <template #footer>
               <div class="py-2 px-3">
@@ -154,6 +156,8 @@
   import Dropdown from 'primevue/dropdown'
   import InputSwitch from 'primevue/inputswitch'
   import MultiSelect from 'primevue/multiselect'
+  import InputMask from 'primevue/inputmask';
+
 
   const props = defineProps({
     getDetailAccountService: {
@@ -191,10 +195,10 @@
   const validationSchema = yup.object({
     firstName: yup.string().required(),
     lastName: yup.string().required(),
-    selectedTimezone: yup.string().required('Please select an option'),
+    selectedTimezone: yup.string().required(),
     selectedLanguage: yup.string(),
     email: yup.string().required(),
-    selectedCountry: yup.string().required('Please select an option'),
+    selectedCountry: yup.object().required(),
     mobile: yup.string().required(),
     userIsOwner: yup.boolean(),
     selectedTeam: yup.array(),
@@ -259,6 +263,12 @@
       filteredCountriesMobile.value = optionsCountriesMobile.value.filter((countryMobile) => {
         return countryMobile.label.toLowerCase().includes(event.query.toLowerCase())
       })
+    }
+  }
+
+  const handleUserIsOwner = () => {
+    if(!userIsOwner.value) {
+      selectedTeam.value = []
     }
   }
 

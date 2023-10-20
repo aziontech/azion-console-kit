@@ -9,7 +9,7 @@ const fixtures = {
     selectedTimezone: 'America/New_York',
     selectedLanguage: 'en_US',
     email: 'johndoe@example.com',
-    selectedCountry: 'AF +93',
+    selectedCountry: { value: 'AF +93' },
     mobile: '+1-123-456-7890',
     userIsOwner: true,
     selectedTeam: 'Sales Team',
@@ -42,11 +42,11 @@ describe('UsersServices', () => {
         last_name: fixtures.userMock.lastName,
         timezone: fixtures.userMock.selectedTimezone,
         language: fixtures.userMock.selectedLanguage,
-        country_call_code: fixtures.userMock.selectedCountry,
+        country_call_code: fixtures.userMock.selectedCountry.value,
         email: fixtures.userMock.email,
         mobile: fixtures.userMock.mobile,
         is_account_owner: fixtures.userMock.userIsOwner,
-        teams: fixtures.userMock.selectedTeam,
+        teams_ids: fixtures.userMock.selectedTeam,
         two_factor_enabled: fixtures.userMock.twoFactorEnabled
       }
     })
