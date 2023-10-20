@@ -122,13 +122,7 @@
             :maxSelectedLabels="5"
             :class="{ 'p-invalid': errors.selectedTeam }"
             v-model="selectedTeam"
-          >
-            <template #footer>
-              <div class="py-2 px-3">
-                <b>{{ selectedTeamsCount }}</b> {{ selectedTeamsCountLabel }} selected.
-              </div>
-            </template>
-          </MultiSelect>
+          />
         </div>
         <div class="flex flex-col gap-2">
           <label for="enable-mutual-authentication">Multi-Factor Authentication:</label>
@@ -144,7 +138,7 @@
 </template>
 
 <script setup>
-  import { ref, onMounted, computed } from 'vue'
+  import { ref, onMounted } from 'vue'
   import { useForm, useField } from 'vee-validate'
   import * as yup from 'yup'
   import { useAccountStore } from '@/stores/account'
@@ -195,7 +189,7 @@
     lastName: yup.string().required(),
     selectedTimezone: yup.string().required(),
     selectedLanguage: yup.string(),
-    email: yup.string().required(),
+    email: yup.string().email().required(),
     selectedCountry: yup.object().required(),
     mobile: yup.string().required(),
     userIsOwner: yup.boolean(),
@@ -243,9 +237,6 @@
     const result = await props.listTeamsService()
     optionsTeams.value = result
   }
-
-  const selectedTeamsCount = computed(() => (selectedTeam.value ? selectedTeam.value.length : 0))
-  const selectedTeamsCountLabel = computed(() => (selectedTeam.value.length > 1 ? 'items' : 'item'))
 
   onMounted(async () => {
     await fetchCountries()
