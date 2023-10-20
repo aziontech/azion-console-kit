@@ -1,10 +1,4 @@
-import {
-  listCredentialsService,
-  deleteCredentialService,
-  createCredentialService,
-  loadCredentialService,
-  editCredentialService
-} from '@/services/credential-services'
+import * as CredentialServices from '@/services/credential-services'
 import { clipboardWrite } from '@/helpers/clipboard'
 
 /** @type {import('vue-router').RouteRecordRaw} */
@@ -17,8 +11,8 @@ export const credentialsRoutes = {
       name: 'list-credentials',
       component: () => import('@views/Credentials/ListView.vue'),
       props: {
-        listCredentialsService,
-        deleteCredentialService
+        listCredentialsService: CredentialServices.listCredentialsService,
+        deleteCredentialService: CredentialServices.deleteCredentialService
       },
       meta: {
         breadCrumbs: [
@@ -34,7 +28,7 @@ export const credentialsRoutes = {
       name: 'create-credential',
       component: () => import('@views/Credentials/CreateView.vue'),
       props: {
-        createCredentialService
+        createCredentialService: CredentialServices.createCredentialService
       },
       meta: {
         breadCrumbs: [
@@ -54,8 +48,8 @@ export const credentialsRoutes = {
       name: 'edit-credential',
       component: () => import('@views/Credentials/EditView.vue'),
       props: {
-        editCredentialService,
-        loadCredentialService,
+        editCredentialService: CredentialServices.editCredentialService,
+        loadCredentialService: CredentialServices.loadCredentialService,
         clipboardWrite
       },
       meta: {

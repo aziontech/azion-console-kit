@@ -38,6 +38,10 @@
             header: 'Last Modified'
           },
           {
+            field: 'token',
+            header: 'Token'
+          },
+          {
             field: 'status',
             header: 'Active'
           }
