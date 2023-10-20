@@ -3,7 +3,7 @@
     class="flex flex-col surface-border border-l w-slide h-full absolute right-0 transform translate-x-full transition-transform duration-300 ease-in-out"
   >
     <!-- Title  -->
-    <div class="flex w-full justify-between pl-6 md:pr-8 pr-4 py-3 border-b surface-border">
+    <div class="flex w-full justify-between pl-6 md:pr-8 pr-3 py-3 border-b surface-border">
       <div class="text-color text-lg font-medium">Help</div>
       <PrimeButton
         icon="pi pi-times"
