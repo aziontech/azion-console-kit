@@ -1,26 +1,30 @@
 import { AxiosHttpClientAdapter } from '@/services/axios/AxiosHttpClientAdapter'
 import * as Errors from '@/services/axios/errors'
-import { deleteCredentialService } from '@/services/credential-services'
+import { deleteOriginsService } from '@/services/edge-application-origins-services'
 import { describe, expect, it, vi } from 'vitest'
 
+const fixtures = {
+  edgeApplicationId: 123,
+  originKey: '0000000-00000000-00a0a00s0as0-000000'
+}
+
 const makeSut = () => {
-  const sut = deleteCredentialService
+  const sut = deleteOriginsService
 
   return { sut }
 }
 
-describe('DeleteCredentialsServices', () => {
-  it('should call api with correct params', async () => {
+describe('EdgeApplicationOriginsServices', () => {
+  it('should call API with correct params', async () => {
     const requestSpy = vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
       statusCode: 204
     })
-    const idMock = 123
 
-    const { sut } = makeSut(idMock)
-    await sut(idMock)
+    const { sut } = makeSut()
+    await sut(fixtures.originKey, fixtures.edgeApplicationId)
 
     expect(requestSpy).toHaveBeenCalledWith({
-      url: `credentials/${idMock}`,
+      url: `edge_applications/${fixtures.edgeApplicationId}/origins/${fixtures.originKey}`,
       method: 'DELETE'
     })
   })
@@ -30,10 +34,8 @@ describe('DeleteCredentialsServices', () => {
       statusCode: 204
     })
 
-    const idMock = 123
-
-    const { sut } = makeSut(idMock)
-    const feedbackMessage = await sut(idMock)
+    const { sut } = makeSut()
+    const feedbackMessage = await sut(fixtures.originKey, fixtures.edgeApplicationId)
 
     expect(feedbackMessage).toBe('Resource successfully deleted')
   })
@@ -69,11 +71,10 @@ describe('DeleteCredentialsServices', () => {
       vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
         statusCode
       })
-      const stubId = '123'
+
       const { sut } = makeSut()
 
-      const response = sut(stubId)
-      console.log(response)
+      const response = sut(fixtures.originKey, fixtures.edgeApplicationId)
 
       expect(response).rejects.toBe(expectedError)
     }
