@@ -771,7 +771,7 @@
       // standard
       endpointUrl: '',
       headers: [{ value: '', deleted: false }],
-      maxSize: 100000,
+      maxSize: 1000000,
       lineSeparator: '\n',
       payloadFormat: '$dataset',
 
