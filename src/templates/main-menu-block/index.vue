@@ -22,9 +22,9 @@
         <PrimeButton
           @click="openSideBar"
           size="small"
-          class="flex-none surface-border"
+          class="flex-none surface-border surface-hover"
           text
-          icon="pi pi-times"
+          icon="pi pi-bars"
           style="height: 32px; width: 32px"
           v-if="showSidebar"
         />
@@ -187,7 +187,8 @@
     <div>
       <PrimeMenu
         :pt="{
-          submenuheader: { class: 'text-base font-bold leading-none mt-5' }
+          submenuheader: { class: 'text-base font-medium leading-none mt-5' },
+          content: { class: 'px-1' }
         }"
         class="w-full md:px-4 px-3 border-none pb-20"
         :model="menuStructure"
@@ -345,8 +346,10 @@
     :style="{ width: '65vw' }"
   >
     <!-- SLOT WIP -->
-    <div class="m-2 surface-border border border-dashed flex items-center h-96">
-      <p class="text-color-secondary text-center w-full">Slot</p>
+    <div class="my-4 surface-border border border-dashed rounded-md flex items-center h-96">
+      <p class="text-color text-sm font-medium text-center w-full">
+        This section is under development.
+      </p>
     </div>
   </PrimeDialog>
 
@@ -359,8 +362,10 @@
   >
     <template #start>
       <!-- SLOT WIP -->
-      <div class="m-2 surface-border border border-dashed flex items-center h-96">
-        <p class="text-color-secondary text-center w-full">Slot</p>
+      <div class="m-1 surface-border border border-dashed rounded-md flex items-center h-96">
+        <p class="text-color text-sm font-medium text-center w-full">
+          This section is under development.
+        </p>
       </div>
     </template>
   </PrimeMenu>
