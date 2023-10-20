@@ -1,10 +1,6 @@
 <template>
   <div class="flex flex-col min-h-[calc(100vh-120px)]">
     <Toast />
-    <PageHeadingBlock
-      :pageTitle="pageTitle"
-      :navigationItems="navigationItems"
-    />
     <form class="w-full grow mt-4 p-4 max-w-screen-sm flex flex-col gap-4 lg:max-w-7xl mx-auto">
       <div class="flex flex-col gap-4 sm:!w-full md:!w-1/2">
         <slot name="form" />
@@ -23,14 +19,12 @@
 <script>
   import Toast from 'primevue/toast'
   import ActionBarTemplate from '@/templates/action-bar-block'
-  import PageHeadingBlock from '@/templates/page-heading-block'
 
   export default {
     name: 'create-form-block',
     components: {
       Toast,
-      ActionBarTemplate,
-      PageHeadingBlock
+      ActionBarTemplate
     },
     data: () => ({
       isLoading: false
@@ -55,10 +49,6 @@
       cleanFormCallback: {
         type: Function,
         required: true
-      },
-      navigationItems: {
-        type: Array,
-        required: false
       }
     },
     methods: {

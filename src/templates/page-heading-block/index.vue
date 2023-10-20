@@ -26,24 +26,16 @@
         <slot></slot>
       </div>
     </div>
-    <TabMenu
-      v-model:activeIndex="activeTab"
-      @tab-change="handleTabChange"
-      v-if="navigationItems"
-      :model="navigationItems"
-    />
   </div>
 </template>
 
 <script>
   import Breadcrumb from 'primevue/breadcrumb'
-  import TabMenu from 'primevue/tabmenu'
 
   export default {
     name: 'PageHeadingBlock',
     components: {
-      Breadcrumb,
-      TabMenu
+      Breadcrumb
     },
     data() {
       return {
@@ -84,10 +76,6 @@
       description: {
         type: String,
         required: false
-      },
-      navigationItems: {
-        type: Array,
-        required: false
       }
     },
     computed: {
@@ -99,12 +87,6 @@
       },
       generateBreadCrumbs() {
         return this.$router.currentRoute.value.meta.breadCrumbs ?? []
-      }
-    },
-    methods: {
-      handleTabChange() {
-        const tabChange = new CustomEvent('tabChange', { detail: { tab: this.activeTab } })
-        document.dispatchEvent(tabChange)
       }
     }
   }
