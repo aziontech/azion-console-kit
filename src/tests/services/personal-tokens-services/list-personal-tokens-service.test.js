@@ -2,6 +2,13 @@ import { AxiosHttpClientAdapter } from '@/services/axios/AxiosHttpClientAdapter'
 import { listPersonalTokens } from '@/services/personal-tokens-services'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
+const localeMock = (locale = 'en') => {
+  const DateTimeFormat = Intl.DateTimeFormat
+  vi.spyOn(window.global.Intl, 'DateTimeFormat')
+    .mockImplementationOnce((_, options) => DateTimeFormat(locale, { ...options }))
+    .mockImplementationOnce((_, options) => DateTimeFormat(locale, { ...options }))
+}
+
 const fixtures = {
   personalTokenMock: {
     uuid: 123123123,
@@ -46,6 +53,7 @@ describe('PersonalTokensServices', () => {
   })
 
   it('should parsed correctly each personal token', async () => {
+    localeMock()
     vi.setSystemTime(new Date(2023, 10, 10, 10))
     vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
       statusCode: 200,

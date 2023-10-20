@@ -2,6 +2,7 @@ import { AxiosHttpClientAdapter } from '@/services/axios/AxiosHttpClientAdapter'
 import * as Errors from '@services/axios/errors'
 import { listDigitalCertificatesService } from '@/services/digital-certificates-services'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { localeMock } from '@/tests/utils/localeMock'
 
 const fixtures = {
   domainMock: {
@@ -55,6 +56,7 @@ describe('DigitalCertificatesServices', () => {
   })
 
   it('should parse correctly each returned item', async () => {
+    localeMock()
     vi.setSystemTime(new Date(2023, 10, 10, 10))
     vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
       statusCode: 200,

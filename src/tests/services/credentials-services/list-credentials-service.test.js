@@ -24,7 +24,7 @@ const fixtures = {
   }
 }
 
-function makeSut() {
+const makeSut = () => {
   const sut = listCredentialsService
 
   return { sut }
