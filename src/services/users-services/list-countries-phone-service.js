@@ -1,6 +1,7 @@
 import { AxiosHttpClientAdapter, parseHttpResponse } from '../axios/AxiosHttpClientAdapter'
 import graphQLApi from '../axios/makeGraphQl'
 import { makeCountriesListBaseUrl } from './make-countries-list-base-url'
+import { InvalidDataStructureError } from '../axios/errors'
 
 export const listCountriesPhoneService = async () => {
   const payload = {
@@ -24,7 +25,7 @@ const adapt = (httpResponse) => {
   const { statusCode, body } = httpResponse
 
   if (!body || !body.data?.allCountries) {
-    throw new Error('Invalid data structure in HTTP response')
+    throw new InvalidDataStructureError().message
   }
 
   const allCountriesFormatted = body.data.allCountries

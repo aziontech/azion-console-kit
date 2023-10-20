@@ -1,5 +1,6 @@
 import { AxiosHttpClientAdapter, parseHttpResponse } from '../axios/AxiosHttpClientAdapter'
 import { makeTeamsBaseUrl } from './make-teams-base-url'
+import { InvalidDataStructureError } from '../axios/errors'
 
 export const listTeamsService = async () => {
   let httpResponse = await AxiosHttpClientAdapter.request({
@@ -16,7 +17,7 @@ const adapt = (httpResponse) => {
   const { statusCode, body } = httpResponse
 
   if (!body || !Array.isArray(body)) {
-    throw new Error('Invalid data structure in HTTP response')
+    throw new InvalidDataStructureError().message
   }
 
   const teamsFormatted = body.map((item) => ({

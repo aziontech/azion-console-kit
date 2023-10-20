@@ -79,13 +79,16 @@
               @complete="search"
             >
               <template #option="slotProps">
-                  <div v-if="slotProps.option" class="flex align-items-center">                    
-                      <div>{{ slotProps.option.label }}</div>
-                  </div>
+                <div
+                  v-if="slotProps.option"
+                  class="flex align-items-center"
+                >
+                  <div>{{ slotProps.option.label }}</div>
+                </div>
               </template>
             </AutoComplete>
-          
-            <InputNumber 
+
+            <InputNumber
               v-model="mobile"
               class="w-full"
               :useGrouping="false"
@@ -105,7 +108,7 @@
         </div>
         <div class="flex flex-col gap-2">
           <label for="teams">Teams:</label>
-          <MultiSelect 
+          <MultiSelect
             display="chip"
             filter
             id="teams"
@@ -120,9 +123,9 @@
             :disabled="!!disabledFields"
           >
             <template #footer>
-                <div class="py-2 px-3">
-                    <b>{{ selectedTeamsCount }}</b> {{ selectedTeamsCountLabel }} selected.
-                </div>
+              <div class="py-2 px-3">
+                <b>{{ selectedTeamsCount }}</b> {{ selectedTeamsCountLabel }} selected.
+              </div>
             </template>
           </MultiSelect>
         </div>
@@ -140,17 +143,17 @@
 </template>
 
 <script setup>
-  import {  ref, onMounted, computed } from 'vue'
+  import { ref, onMounted, computed } from 'vue'
   import { useForm, useField } from 'vee-validate'
   import * as yup from 'yup'
   import { useAccountStore } from '@/stores/account'
   import { storeToRefs } from 'pinia'
   import CreateFormBlock from '@/templates/create-form-block'
   import InputText from 'primevue/inputtext'
-  import AutoComplete from 'primevue/autocomplete';
+  import AutoComplete from 'primevue/autocomplete'
   import Dropdown from 'primevue/dropdown'
   import InputSwitch from 'primevue/inputswitch'
-  import MultiSelect from 'primevue/multiselect';
+  import MultiSelect from 'primevue/multiselect'
 
   const props = defineProps({
     getDetailAccountService: {
@@ -172,22 +175,19 @@
     listTeamsService: {
       type: Function,
       required: true
-    },
-  });
-  
+    }
+  })
 
-  const store = useAccountStore();
-  const accountIsOwner = ref(false);
-  const optionsTimezone = ref([]);
-  const optionsTeams = ref([]);
-  const isForceMFA = ref(false);
-  const optionsCountriesMobile = ref([]);
-  const filteredCountriesMobile = ref([]);
-  const { account } = storeToRefs(store);
-  const optionsLanguage = ref([
-    { label: 'English', value: 'en' },
-  ]);
-  
+  const store = useAccountStore()
+  const accountIsOwner = ref(false)
+  const optionsTimezone = ref([])
+  const optionsTeams = ref([])
+  const isForceMFA = ref(false)
+  const optionsCountriesMobile = ref([])
+  const filteredCountriesMobile = ref([])
+  const { account } = storeToRefs(store)
+  const optionsLanguage = ref([{ label: 'English', value: 'en' }])
+
   const validationSchema = yup.object({
     firstName: yup.string().required(),
     lastName: yup.string().required(),
@@ -198,70 +198,70 @@
     mobile: yup.string().required(),
     userIsOwner: yup.boolean(),
     selectedTeam: yup.array(),
-    mfa: yup.boolean(),
-  });
+    mfa: yup.boolean()
+  })
 
-  const { errors, meta, resetForm, values } = useForm({ 
+  const { errors, meta, resetForm, values } = useForm({
     validationSchema,
-    initialValues: {      
+    initialValues: {
       userIsOwner: false,
       selectedTeam: [],
-      twoFactorEnabled: false,
+      twoFactorEnabled: false
     }
-  });
+  })
 
-  const { value: firstName } = useField('firstName');
-  const { value: lastName } = useField('lastName');
-  const { value: selectedTimezone } = useField('selectedTimezone');
-  const { value: selectedLanguage } = useField('selectedLanguage');
-  const { value: email } = useField('email');
-  const { value: selectedCountry } = useField('selectedCountry');
-  const { value: mobile } = useField('mobile');
-  const { value: userIsOwner } = useField('userIsOwner');
-  const { value: selectedTeam } = useField('selectedTeam');
-  const { value: twoFactorEnabled } = useField('twoFactorEnabled');
+  const { value: firstName } = useField('firstName')
+  const { value: lastName } = useField('lastName')
+  const { value: selectedTimezone } = useField('selectedTimezone')
+  const { value: selectedLanguage } = useField('selectedLanguage')
+  const { value: email } = useField('email')
+  const { value: selectedCountry } = useField('selectedCountry')
+  const { value: mobile } = useField('mobile')
+  const { value: userIsOwner } = useField('userIsOwner')
+  const { value: selectedTeam } = useField('selectedTeam')
+  const { value: twoFactorEnabled } = useField('twoFactorEnabled')
 
-  selectedLanguage.value = optionsLanguage.value[0].value;
+  selectedLanguage.value = optionsLanguage.value[0].value
 
-  const fetchCountries = async () => {        
-    const result = await props.listCountriesPhoneService();
-    optionsCountriesMobile.value = result;
-  };
-  const fetchTimezone = async () => {        
-    const result = await props.listTimezonesService();
-    selectedTimezone.value = result.defaultSelected;
-    optionsTimezone.value = result.listTimeZones;
-  };
+  const fetchCountries = async () => {
+    const result = await props.listCountriesPhoneService()
+    optionsCountriesMobile.value = result
+  }
+  const fetchTimezone = async () => {
+    const result = await props.listTimezonesService()
+    selectedTimezone.value = result.defaultSelected
+    optionsTimezone.value = result.listTimeZones
+  }
   const fetchDetailAccount = async () => {
-    const account = await props.getDetailAccountService();
-    isForceMFA.value = account?.is_enabled_mfa_to_all_users;
-    twoFactorEnabled.value = isForceMFA.value;
-  };
+    const account = await props.getDetailAccountService()
+    isForceMFA.value = account?.is_enabled_mfa_to_all_users
+    twoFactorEnabled.value = isForceMFA.value
+  }
   const fetchTeams = async () => {
-    const result = await props.listTeamsService();
-    optionsTeams.value = result;
-  };
+    const result = await props.listTeamsService()
+    optionsTeams.value = result
+  }
 
-  const selectedTeamsCount = computed(() =>  selectedTeam.value ? selectedTeam.value.length : 0 );
-  const selectedTeamsCountLabel = computed(() =>  selectedTeam.value.length > 1 ? 'items' : 'item' );
-  
+  const selectedTeamsCount = computed(() => (selectedTeam.value ? selectedTeam.value.length : 0))
+  const selectedTeamsCountLabel = computed(() => (selectedTeam.value.length > 1 ? 'items' : 'item'))
+
   onMounted(async () => {
-    await fetchCountries();
-    await fetchTimezone();
-    await fetchTeams();
-    await fetchDetailAccount();
-  });
+    await fetchCountries()
+    await fetchTimezone()
+    await fetchTeams()
+    await fetchDetailAccount()
+  })
 
   const search = (event) => {
     if (!event.query.trim().length) {
-      filteredCountriesMobile.value = [...optionsCountriesMobile.value];
+      filteredCountriesMobile.value = [...optionsCountriesMobile.value]
     } else {
       filteredCountriesMobile.value = optionsCountriesMobile.value.filter((countryMobile) => {
-          return countryMobile.label.toLowerCase().includes(event.query.toLowerCase());
-      });
-    };
-  };
+        return countryMobile.label.toLowerCase().includes(event.query.toLowerCase())
+      })
+    }
+  }
 
-  accountIsOwner.value = account?.is_account_owner;
-  userIsOwner.value = accountIsOwner.value;
+  accountIsOwner.value = account?.is_account_owner
+  userIsOwner.value = accountIsOwner.value
 </script>
