@@ -12,7 +12,7 @@
         v-if="pageTitle || description"
       >
         <div
-          class="text-text-color text-3xl font-medium"
+          class="text-color text-3xl font-medium"
           v-if="pageTitle"
         >
           {{ pageTitle }}
