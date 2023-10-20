@@ -24,7 +24,9 @@ const adapt = (httpResponse) => {
     ? httpResponse.body.map((variable) => ({
         id: variable.uuid,
         key: variable.key,
-        value: variable.value,
+        value: {
+          content: variable.value
+        },
         lastEditor: variable.last_editor,
         updatedAt: new Intl.DateTimeFormat('us', { dateStyle: 'full' }).format(
           new Date(variable.updated_at)

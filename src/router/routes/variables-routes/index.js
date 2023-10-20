@@ -1,3 +1,4 @@
+import { clipboardWrite } from '@/helpers/clipboard'
 import * as VariablesService from '@/services/variables-services'
 
 /** @type {import('vue-router').RouteRecordRaw} */
@@ -11,7 +12,8 @@ export const variablesRoutes = {
       component: () => import('@views/Variables/ListView.vue'),
       props: {
         listVariablesService: VariablesService.listVariablesService,
-        deleteVariablesService: VariablesService.deleteVariablesService
+        deleteVariablesService: VariablesService.deleteVariablesService,
+        clipboardWrite
       },
       meta: {
         breadCrumbs: [

@@ -61,7 +61,9 @@ describe('VariablesService', () => {
       {
         id: fixtures.variableMock.uuid,
         key: fixtures.variableMock.key,
-        value: fixtures.variableMock.value,
+        value: {
+          content: fixtures.variableMock.value
+        },
         lastEditor: fixtures.variableMock.last_editor,
         updatedAt: 'Saturday, June 10, 2023'
       }
