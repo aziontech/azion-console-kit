@@ -1,14 +1,14 @@
 <template>
   <div>
     <Toast />
-    <PageHeadingBlock :pageTitle="pageTitle">
+    <div class="flex justify-end">
       <PrimeButton
         @click="navigateToAddPage"
         icon="pi pi-plus"
         :label="addButtonLabel"
         v-if="addButtonLabel"
       />
-    </PageHeadingBlock>
+    </div>
     <div class="max-w-screen-sm lg:max-w-7xl mx-auto">
       <DataTable
         v-if="!isLoading"
@@ -56,7 +56,7 @@
               <PrimeMenu
                 :ref="'menu'"
                 id="overlay_menu"
-                v-bind:model="actionOptions"
+                v-bind:model="actionOptions(rowData?.status)"
                 :popup="true"
               />
               <PrimeButton
@@ -74,6 +74,7 @@
           <div class="my-4 flex flex-col gap-3 justify-center items-center">
             <p class="text-xl font-normal text-gray-600">No registers found.</p>
             <PrimeButton
+              v-if="!authorizeNode"
               text
               icon="pi pi-plus"
               label="Add"
@@ -127,10 +128,9 @@
   import Skeleton from 'primevue/skeleton'
   import PrimeButton from 'primevue/button'
   import { FilterMatchMode } from 'primevue/api'
-  import PageHeadingBlock from '@/templates/page-heading-block'
 
   export default {
-    name: 'list-table-block-no-edit',
+    name: 'list-table-block',
     components: {
       Toast,
       DataTable,
@@ -138,8 +138,7 @@
       InputText,
       PrimeButton,
       PrimeMenu,
-      Skeleton,
-      PageHeadingBlock
+      Skeleton
     },
     data: () => ({
       showActionsMenu: false,
@@ -170,10 +169,20 @@
         required: true,
         default: () => '/'
       },
+      editPagePath: {
+        type: String,
+        required: true,
+        default: () => '/'
+      },
       addButtonLabel: {
         type: String,
         required: true,
         default: () => ''
+      },
+      authorizeNode: {
+        type: Boolean,
+        required: false,
+        default: false
       },
       listService: {
         required: true,
@@ -188,20 +197,33 @@
       await this.loadData({ page: 1 })
     },
     computed: {
-      actionOptions() {
-        return [
+      filterBy() {
+        return this.columns.map((item) => item.field)
+      }
+    },
+    methods: {
+      actionOptions(showAuthorize) {
+        const actionOptions = [
+          {
+            label: 'Edit',
+            icon: 'pi pi-fw pi-pencil',
+            command: () => this.editItem()
+          },
           {
             label: 'Delete',
             icon: 'pi pi-fw pi-trash',
             command: () => this.removeItem()
           }
         ]
+        if (this.authorizeNode && showAuthorize !== 'Authorized') {
+          actionOptions.push({
+            label: 'Authorize',
+            icon: 'pi pi-lock-open',
+            command: () => this.authorizeEdgeNode()
+          })
+        }
+        return actionOptions
       },
-      filterBy() {
-        return this.columns.map((item) => item.field)
-      }
-    },
-    methods: {
       async loadData({ page }) {
         try {
           this.isLoading = true
@@ -224,6 +246,12 @@
       toggleActionsMenu(event, selectedId) {
         this.selectedId = selectedId
         this.$refs.menu.toggle(event)
+      },
+      editItem() {
+        this.$router.push({ path: `${this.editPagePath}/${this.selectedId}` })
+      },
+      authorizeEdgeNode() {
+        this.$emit('authorize', this.selectedId)
       },
       async removeItem() {
         let toastConfig = {
