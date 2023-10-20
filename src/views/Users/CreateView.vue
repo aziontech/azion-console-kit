@@ -63,7 +63,6 @@
             :class="{ 'p-invalid': errors.email }"
             v-tooltip.top="errors.email"
           />
-          
         </div>
         <div class="flex flex-col gap-2">
           <label for="mobile">Mobile: *</label>
@@ -87,7 +86,7 @@
                 </div>
               </template>
             </AutoComplete>
-            
+
             <InputMask
               date="phone"
               v-model="mobile"
@@ -156,8 +155,7 @@
   import Dropdown from 'primevue/dropdown'
   import InputSwitch from 'primevue/inputswitch'
   import MultiSelect from 'primevue/multiselect'
-  import InputMask from 'primevue/inputmask';
-
+  import InputMask from 'primevue/inputmask'
 
   const props = defineProps({
     getDetailAccountService: {
@@ -267,7 +265,7 @@
   }
 
   const handleUserIsOwner = () => {
-    if(!userIsOwner.value) {
+    if (!userIsOwner.value) {
       selectedTeam.value = []
     }
   }
