@@ -10,13 +10,13 @@
         v-if="pageTitle || description"
       >
         <div
-          class="text-[var(--text-color)] text-3xl font-medium font-['Roboto'] leading-9 hover:cursor-pointer"
+          class="text-[var(--text-color)] text-3xl font-medium leading-9"
           v-if="pageTitle"
         >
           {{ pageTitle }}
         </div>
         <div
-          class="text-[var(--text-color-secondary)] text-lg font-normal font-['Roboto'] leading-7"
+          class="text-[var(--text-color-secondary)] text-lg font-normal leading-7"
           v-if="description"
         >
           {{ description }}
