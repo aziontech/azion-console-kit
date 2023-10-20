@@ -1,6 +1,7 @@
 import { AxiosHttpClientAdapter } from '@/services/axios/AxiosHttpClientAdapter'
 import { loadNetworkListService } from '@/services/network-lists-services'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { localeMock } from '@/tests/utils/localeMock'
 
 const fixtures = {
   networkMock: {
@@ -56,6 +57,7 @@ describe('NetworkListsServices', () => {
   })
 
   it('should parsed correctly the loaded network list record', async () => {
+    localeMock()
     vi.setSystemTime(new Date(2023, 10, 10, 10))
     vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
       statusCode: 200,
@@ -77,6 +79,7 @@ describe('NetworkListsServices', () => {
     })
   })
   it('should parsed correctly the loaded network list record with countries', async () => {
+    localeMock()
     vi.setSystemTime(new Date(2023, 10, 10, 10))
     vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
       statusCode: 200,

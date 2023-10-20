@@ -1,6 +1,7 @@
 import { AxiosHttpClientAdapter } from '@/services/axios/AxiosHttpClientAdapter'
 import { listVariablesService } from '@/services/variables-services'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { localeMock } from '@/tests/utils/localeMock'
 
 const fixtures = {
   variableMock: {
@@ -46,6 +47,7 @@ describe('VariablesService', () => {
   })
 
   it('should parsed correctly each variable', async () => {
+    localeMock()
     vi.setSystemTime(new Date(2023, 10, 10, 10))
     vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
       statusCode: 200,
