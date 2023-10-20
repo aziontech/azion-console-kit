@@ -11,7 +11,10 @@
     <template #raw-form>
       <div class="flex flex-col md:flex-row">
         <div class="w-full md:w-1/2">
-          <TabPanel header="Code" v-if="tabActive === 0">
+          <TabPanel
+            header="Code"
+            v-if="tabActive === 0"
+          >
             <div class="flex flex-col gap-4">
               <label>Edge Function Name: *</label>
               <InputText
@@ -36,7 +39,10 @@
               </div>
             </div>
           </TabPanel>
-          <TabPanel header="Arguments" v-if="tabActive === 1">
+          <TabPanel
+            header="Arguments"
+            v-if="tabActive === 1"
+          >
             <div class="flex flex-col gap-4">
               <label>Function Args: *</label>
               <div class="w-full flex justify-center">

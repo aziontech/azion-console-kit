@@ -1,7 +1,10 @@
 <template>
   <div class="flex flex-col min-h-[calc(100vh-120px)]">
     <Toast />
-    <PageHeadingBlock :pageTitle="pageTitle" :navigationItems="navigationItems" />
+    <PageHeadingBlock
+      :pageTitle="pageTitle"
+      :navigationItems="navigationItems"
+    />
 
     <form
       @submit.prevent="handleSubmit"
