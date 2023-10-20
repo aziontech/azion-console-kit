@@ -13,7 +13,6 @@ export const edgeNodeRoutes = {
       props: {
         listEdgeNodeService: EdgeNodeService.listEdgeNodeService,
         deleteEdgeNodeService: EdgeNodeService.deleteEdgeNodeService,
-        authorizeEdgeNodeService: EdgeNodeService.authorizeEdgeNodeService
       },
       meta: {
         breadCrumbs: [
