@@ -1,36 +1,32 @@
 <template>
   <div class="gap-2 flex items-center">
     <p>{{ content }}</p>
-    <PrimeButton
-      text
-      icon="pi pi-copy"
-      @click="handleCopyContent"
-    />
+    <PrimeButton text icon="pi pi-copy" @click="handleCopyContent" v-tooltip.bottom="'Copy to clipboard'" />
   </div>
 </template>
 
 <script>
-  import PrimeButton from 'primevue/button'
+import PrimeButton from 'primevue/button'
 
-  export default {
-    name: 'avatar-with-text-column',
-    components: {
-      PrimeButton
+export default {
+  name: 'avatar-with-text-column',
+  components: {
+    PrimeButton
+  },
+  props: {
+    content: {
+      type: String,
+      required: true
     },
-    props: {
-      content: {
-        type: String,
-        required: true
-      },
-      copyContentService: {
-        required: true,
-        type: Function
-      }
-    },
-    methods: {
-      handleCopyContent() {
-        this.copyContentService(this.content)
-      }
+    copyContentService: {
+      required: true,
+      type: Function
+    }
+  },
+  methods: {
+    handleCopyContent() {
+      this.copyContentService(this.content)
     }
   }
+}
 </script>
