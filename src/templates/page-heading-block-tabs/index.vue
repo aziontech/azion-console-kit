@@ -26,6 +26,7 @@
         <slot></slot>
       </div>
     </div>
+    <slot name="tabs"></slot>
   </div>
 </template>
 
