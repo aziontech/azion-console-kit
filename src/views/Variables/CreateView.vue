@@ -7,36 +7,72 @@
     :cleanFormCallback="resetForm"
   >
     <template #form>
-      <InputText
-        placeholder="ex: GITHUB_API_KEY"
-        v-bind="key"
-        type="text"
-        :class="{ 'p-invalid': errors.key }"
-        v-tooltip.top="errors.key"
-      />
-      <InputText
-        placeholder="ex: MY_GITHUB_API_VALUE"
-        v-bind="value"
-        type="text"
-        :class="{ 'p-invalid': errors.value }"
-        v-tooltip.top="errors.value"
-      />
-      <div class="flex gap-3 items-center">
-        <label for="">Secret</label>
-        <InputSwitch
-          v-bind="secret"
-          v-model="secret.value"
-          :class="{ 'p-invalid': errors.secret }"
-        />
-      </div>
+      <form-horizontal
+        title="Variables"
+        description="Espaço livre para descrição e instruções de preenchimento. Esse conteúdo deve ser criado pensando tanto em funcionalidade quanto em em alinhamento e estética. Devemos sempre criar os blocos conforme o contexto, cuidando sempre para não ter blocos muito longos."
+      >
+        <template #inputs>
+          <div class="flex flex-col sm:max-w-lg w-full gap-2">
+            <label
+              for="name"
+              class="text-color text-base font-medium"
+              >Key</label
+            >
+            <InputText
+              placeholder="ex: GITHUB_API_KEY"
+              v-bind="key"
+              type="text"
+              id="name"
+              :class="{ 'p-invalid': errors.key }"
+              v-tooltip.top="errors.key"
+            />
+          </div>
+
+          <div class="flex flex-col sm:max-w-lg w-full gap-2">
+            <label
+              for="Value"
+              class="text-color text-base font-medium"
+              >Value</label
+            >
+            <InputText
+              placeholder="ex: MY_GITHUB_API_VALUE"
+              v-bind="value"
+              type="text"
+              :class="{ 'p-invalid': errors.value }"
+              v-tooltip.top="errors.value"
+            />
+          </div>
+
+          <Card
+            :pt="{
+              body: { class: 'p-4' },
+              title: { class: 'flex justify-between items-cente text-base m-0' },
+              subtitle: { class: 'text-sm font-normal text-color-secondary m-0' }
+            }"
+          >
+            <template #title>
+              <span class="text-base">Secret</span>
+              <InputSwitch
+                v-bind="secret"
+                v-model="secret.value"
+                :class="{ 'p-invalid': errors.secret }"
+              />
+            </template>
+            <template #subtitle> Description </template>
+          </Card>
+        </template>
+      </form-horizontal>
     </template>
   </CreateFormBlock>
 </template>
 
 <script setup>
-  import CreateFormBlock from '@/templates/create-form-block'
+  import CreateFormBlock from '@/templates/create-form-block-new'
+  import formHorizontal from '@/templates/create-form-block-new/form-horizontal'
   import InputText from 'primevue/inputtext'
   import InputSwitch from 'primevue/inputswitch'
+  import Card from 'primevue/card'
+
   import { useForm } from 'vee-validate'
   import * as yup from 'yup'
 
@@ -46,6 +82,7 @@
       required: true
     }
   })
+
   //Validation Schema
   const validationSchema = yup.object({
     key: yup.string().required(),
