@@ -2,36 +2,35 @@
   <div class="flex flex-col min-h-[calc(100vh-120px)]">
     <Toast />
     <PageHeadingBlock :pageTitle="pageTitle" />
-    <form class="w-full grow mt-4 p-4 max-w-screen-sm flex flex-col gap-4 lg:max-w-7xl mx-auto">
-      <div class="flex flex-col gap-4 sm:!w-full md:!w-1/2">
-        <slot name="form" />
-      </div>
+    <form
+      @submit.prevent="handleSubmit"
+      class="w-full grow py-4 px-8 flex flex-col gap-8"
+    >
+      <slot name="form" />
+
+      <slot name="raw-form" />
     </form>
-    <ActionBarBlockGoBack v-if="isRequestSuccess" />
     <ActionBarTemplate
       @cancel="handleCancel"
-      @submit="validateAndSubmit"
+      @submit="handleSubmit"
       :loading="isLoading"
       :submitDisabled="!isValid"
-      v-else
     />
   </div>
 </template>
+
 <script>
   import Toast from 'primevue/toast'
   import ActionBarTemplate from '@/templates/action-bar-block'
-  import ActionBarBlockGoBack from '@/templates/action-bar-block/go-back'
   import PageHeadingBlock from '@/templates/page-heading-block'
 
   export default {
-    name: 'create-form-block-with-event',
+    name: 'edit-form-block',
     components: {
       Toast,
       ActionBarTemplate,
-      ActionBarBlockGoBack,
       PageHeadingBlock
     },
-    emits: ['on-response'],
     data: () => ({
       isLoading: false
     }),
@@ -40,7 +39,15 @@
         type: String,
         required: true
       },
-      createService: {
+      editService: {
+        type: Function,
+        required: true
+      },
+      loadService: {
+        type: Function,
+        required: true
+      },
+      initialDataSetter: {
         type: Function,
         required: true
       },
@@ -52,27 +59,47 @@
         type: Object,
         required: true
       },
-      cleanFormCallback: {
-        type: Function,
-        required: true
-      },
-      isRequestSuccess: {
-        type: Boolean
+      backURL: {
+        type: String,
+        required: false
       }
+    },
+    async created() {
+      await this.loadInitialData()
     },
     methods: {
       handleCancel() {
-        this.$router.go('-1')
+        if (this.backURL) {
+          this.$router.push({ path: this.backURL })
+        } else {
+          this.$router.go('-1')
+        }
       },
-      async validateAndSubmit() {
+      async loadInitialData() {
+        try {
+          const { id } = this.$route.params
+          this.isLoading = true
+          const initialData = await this.loadService({ id })
+          this.initialDataSetter(initialData)
+        } catch (error) {
+          this.$toast.add({
+            closable: true,
+            severity: 'error',
+            summary: error,
+            life: 10000
+          })
+        } finally {
+          this.isLoading = false
+        }
+      },
+      async handleSubmit() {
         try {
           this.isLoading = true
-          const response = await this.createService(this.formData)
-          this.$emit('on-response', response)
+          await this.editService(this.formData)
           this.$toast.add({
             closable: true,
             severity: 'success',
-            summary: 'created successfully',
+            summary: 'edited successfully',
             life: 10000
           })
         } catch (error) {
@@ -83,7 +110,9 @@
             life: 10000
           })
         } finally {
-          this.isLoading = false
+          setTimeout(() => {
+            this.isLoading = false
+          }, 800)
         }
       }
     }

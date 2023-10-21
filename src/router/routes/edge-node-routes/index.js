@@ -12,8 +12,7 @@ export const edgeNodeRoutes = {
       component: () => import('@views/EdgeNode/ListView.vue'),
       props: {
         listEdgeNodeService: EdgeNodeService.listEdgeNodeService,
-        deleteEdgeNodeService: EdgeNodeService.deleteEdgeNodeService,
-        authorizeEdgeNodeService: EdgeNodeService.authorizeEdgeNodeService
+        deleteEdgeNodeService: EdgeNodeService.deleteEdgeNodeService
       },
       meta: {
         breadCrumbs: [

@@ -1,37 +1,34 @@
 <template>
   <div class="flex flex-col min-h-[calc(100vh-120px)]">
     <Toast />
+
     <PageHeadingBlock :pageTitle="pageTitle" />
-    <form class="w-full grow mt-4 p-4 max-w-screen-sm flex flex-col gap-4 lg:max-w-7xl mx-auto">
-      <div class="flex flex-col gap-4 sm:!w-full md:!w-1/2">
+    <form class="w-full grow py-4 px-8 flex flex-col gap-4">
+      <div class="flex flex-col gap-8 w-full">
         <slot name="form" />
       </div>
+      <slot name="raw-form" />
     </form>
-    <ActionBarBlockGoBack v-if="isRequestSuccess" />
     <ActionBarTemplate
       @cancel="handleCancel"
       @submit="validateAndSubmit"
       :loading="isLoading"
       :submitDisabled="!isValid"
-      v-else
     />
   </div>
 </template>
 <script>
   import Toast from 'primevue/toast'
   import ActionBarTemplate from '@/templates/action-bar-block'
-  import ActionBarBlockGoBack from '@/templates/action-bar-block/go-back'
   import PageHeadingBlock from '@/templates/page-heading-block'
 
   export default {
-    name: 'create-form-block-with-event',
+    name: 'create-form-block',
     components: {
       Toast,
       ActionBarTemplate,
-      ActionBarBlockGoBack,
       PageHeadingBlock
     },
-    emits: ['on-response'],
     data: () => ({
       isLoading: false
     }),
@@ -55,20 +52,18 @@
       cleanFormCallback: {
         type: Function,
         required: true
-      },
-      isRequestSuccess: {
-        type: Boolean
       }
     },
     methods: {
       handleCancel() {
         this.$router.go('-1')
       },
+
       async validateAndSubmit() {
         try {
           this.isLoading = true
-          const response = await this.createService(this.formData)
-          this.$emit('on-response', response)
+          await this.createService(this.formData)
+          this.cleanFormCallback()
           this.$toast.add({
             closable: true,
             severity: 'success',

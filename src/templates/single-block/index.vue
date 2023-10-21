@@ -1,12 +1,6 @@
 <template>
   <div>
-    <header class="border-neutral-200 border-b min-h-[82px] w-full flex items-center">
-      <div class="p-4 w-full">
-        <div class="flex flex-row flex-wrap items-center justify-left gap-4">
-          <h1 class="text-4xl text-left font-normal text-gray-600">{{ pageTitle }}</h1>
-        </div>
-      </div>
-    </header>
+    <PageHeadingBlock :pageTitle="pageTitle" />
 
     <div
       class="mt-4 p-4 max-w-screen-sm flex flex-col gap-4 h-[calc(100%-250px)] lg:max-w-7xl mx-auto"
@@ -17,6 +11,8 @@
 </template>
 
 <script>
+  import PageHeadingBlock from '@/templates/page-heading-block'
+
   export default {
     name: 'single-block',
     props: {
@@ -24,6 +20,9 @@
         type: String,
         required: true
       }
+    },
+    components: {
+      PageHeadingBlock
     }
   }
 </script>

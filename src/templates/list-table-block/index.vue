@@ -1,19 +1,14 @@
 <template>
   <div>
     <Toast />
-    <header class="border-neutral-200 border-b min-h-[82px] w-full flex items-center">
-      <div class="p-4 w-full">
-        <div class="flex flex-col md:flex-row justify-between gap-4">
-          <h1 class="text-4xl self-center font-normal text-gray-600">{{ pageTitle }}</h1>
-          <PrimeButton
-            @click="navigateToAddPage"
-            icon="pi pi-plus"
-            :label="addButtonLabel"
-            v-if="addButtonLabel"
-          />
-        </div>
-      </div>
-    </header>
+    <PageHeadingBlock :pageTitle="pageTitle">
+      <PrimeButton
+        @click="navigateToAddPage"
+        icon="pi pi-plus"
+        :label="addButtonLabel"
+        v-if="addButtonLabel"
+      />
+    </PageHeadingBlock>
     <div class="max-w-screen-sm lg:max-w-7xl mx-auto">
       <DataTable
         v-if="!isLoading"
@@ -49,7 +44,12 @@
           :header="col.header"
         >
           <template #body="{ data: rowData }">
-            <div v-html="rowData[col.field]" />
+            <template v-if="col.type !== 'component'">
+              <div v-html="rowData[col.field]" />
+            </template>
+            <template v-else>
+              <component :is="col.component(rowData[col.field])"></component>
+            </template>
           </template>
         </Column>
         <Column
@@ -61,7 +61,7 @@
               <PrimeMenu
                 :ref="'menu'"
                 id="overlay_menu"
-                v-bind:model="actionOptions(rowData?.status)"
+                v-bind:model="actionOptions()"
                 :popup="true"
               />
               <PrimeButton
@@ -79,10 +79,10 @@
           <div class="my-4 flex flex-col gap-3 justify-center items-center">
             <p class="text-xl font-normal text-gray-600">No registers found.</p>
             <PrimeButton
-              v-if="!authorizeNode"
               text
               icon="pi pi-plus"
               label="Add"
+              v-if="addButtonLabel"
               @click="navigateToAddPage"
             />
           </div>
@@ -133,6 +133,7 @@
   import Skeleton from 'primevue/skeleton'
   import PrimeButton from 'primevue/button'
   import { FilterMatchMode } from 'primevue/api'
+  import PageHeadingBlock from '@/templates/page-heading-block'
 
   export default {
     name: 'list-table-block',
@@ -143,10 +144,10 @@
       InputText,
       PrimeButton,
       PrimeMenu,
-      Skeleton
+      Skeleton,
+      PageHeadingBlock
     },
     data: () => ({
-      showActionsMenu: false,
       selectedId: null,
       filters: {
         global: { value: '', matchMode: FilterMatchMode.CONTAINS }
@@ -184,11 +185,6 @@
         required: true,
         default: () => ''
       },
-      authorizeNode: {
-        type: Boolean,
-        required: false,
-        default: false
-      },
       listService: {
         required: true,
         type: Function
@@ -207,7 +203,7 @@
       }
     },
     methods: {
-      actionOptions(showAuthorize) {
+      actionOptions() {
         const actionOptions = [
           {
             label: 'Edit',
@@ -220,13 +216,7 @@
             command: () => this.removeItem()
           }
         ]
-        if (this.authorizeNode && showAuthorize !== 'Authorized') {
-          actionOptions.push({
-            label: 'Authorize',
-            icon: 'pi pi-lock-open',
-            command: () => this.authorizeEdgeNode()
-          })
-        }
+
         return actionOptions
       },
       async loadData({ page }) {
@@ -254,9 +244,6 @@
       },
       editItem() {
         this.$router.push({ path: `${this.editPagePath}/${this.selectedId}` })
-      },
-      authorizeEdgeNode() {
-        this.$emit('authorize', this.selectedId)
       },
       async removeItem() {
         let toastConfig = {

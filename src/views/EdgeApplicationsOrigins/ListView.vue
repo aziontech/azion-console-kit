@@ -1,5 +1,5 @@
 <script>
-  import ListTableBlock from '@/templates/list-table-block'
+  import ListTableBlock from '@/templates/list-table-block/no-header'
 
   export default {
     name: 'origins-view',

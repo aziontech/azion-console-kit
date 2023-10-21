@@ -31,16 +31,6 @@
           v-tooltip.top="errors.description"
         />
       </div>
-
-      <div class="flex flex-col gap-2">
-        <label for="token">Token:</label>
-        <InputText
-          placeholder="Save the credential to visualize the token in this field"
-          type="text"
-          readonly
-          id="token"
-        />
-      </div>
     </template>
   </CreateFormBlock>
 </template>
