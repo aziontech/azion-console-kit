@@ -12,7 +12,7 @@ export const createDataStreamingService = async (payload) => {
 }
 
 const adapt = (payload) => {
-  const allDomains = payload.domainOption === '1'
+  const allDomains = payload.domains[1].length <= 0
 
   return {
     name: payload.name,
@@ -117,9 +117,11 @@ const getDomains = (domains) => {
 
 const getHeaders = (listHeaders) => {
   const headers = {}
-  listHeaders.forEach((element) => {
-    const header = element.value.split(':')
-    headers[header[0]] = header[1].trim()
-  })
+  if (listHeaders.length > 0) {
+    listHeaders.forEach((element) => {
+      const header = element.value.split(':')
+      headers[header[0]] = header[1]?.trim()
+    })
+  }
   return headers
 }
