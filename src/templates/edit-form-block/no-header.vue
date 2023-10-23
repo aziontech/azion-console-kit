@@ -1,8 +1,6 @@
 <template>
   <div class="flex flex-col min-h-[calc(100vh-120px)]">
     <Toast />
-    <PageHeadingBlock :pageTitle="pageTitle" />
-
     <form
       @submit.prevent="handleSubmit"
       class="w-full grow mt-4 p-4 max-w-screen-sm flex flex-col gap-4 lg:max-w-7xl mx-auto"
@@ -25,14 +23,12 @@
 <script>
   import Toast from 'primevue/toast'
   import ActionBarTemplate from '@/templates/action-bar-block'
-  import PageHeadingBlock from '@/templates/page-heading-block'
 
   export default {
     name: 'edit-form-block',
     components: {
       Toast,
-      ActionBarTemplate,
-      PageHeadingBlock
+      ActionBarTemplate
     },
     data: () => ({
       isLoading: false

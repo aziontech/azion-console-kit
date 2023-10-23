@@ -2,7 +2,7 @@
 <template>
   <!-- Header Container -->
   <header
-    class="p-3 surface-section border-b surface-border items-center flex justify-between md:px-8 md:py-3 w-full fixed top-0 z-10 min-h-[56px]"
+    class="p-3 surface-section border-b surface-border items-center flex justify-between md:px-8 md:py-3 w-full fixed top-0 z-10 h-[56px]"
   >
     <div
       class="flex w-full justify-between"
@@ -22,9 +22,9 @@
         <PrimeButton
           @click="openSideBar"
           size="small"
-          class="flex-none surface-border"
+          class="flex-none surface-border surface-hover"
           text
-          icon="pi pi-times"
+          icon="pi pi-bars"
           style="height: 32px; width: 32px"
           v-if="showSidebar"
         />
@@ -54,7 +54,7 @@
         <i class="pi pi-search" />
         <i class="!top-[32%]">
           <Tag
-            class="not-italic border surface-border text-color-secondary cursor-pointer h- surface-100"
+            class="not-italic border surface-border text-color-secondary cursor-pointer h-6 surface-100"
             value="⌘ K"
             @click="openSearch"
           />
@@ -99,7 +99,6 @@
         />
 
         <!-- Help Button Desktop  -->
-
         <PrimeButton
           icon="pi pi-question-circle"
           size="small"
@@ -160,15 +159,19 @@
     position="bottom"
     headerContent="Help"
     :pt="{
-      root: { class: '!h-[90%]' },
-      header: { class: 'gap-60 text-color border-1 surface-border' }
+      root: { class: '!h-[90%]' }
     }"
   >
     <template #header>
-      <div class="text-color">Help</div>
+      <div>Help</div>
     </template>
     <div class="flex flex-col p-2">
       <!-- content -->
+      <div class="surface-border border border-dashed rounded-md flex items-center h-96 m-2">
+        <p class="text-color text-sm font-medium text-center w-full">
+          This section is under development.
+        </p>
+      </div>
     </div>
   </Sidebar>
 
@@ -181,34 +184,34 @@
     :pt="{
       header: { class: 'hidden' },
       root: { class: 'shadow-none' },
-      mask: { class: 'top-[57.5px]' }
+      mask: { class: 'top-[56px]' },
+      content: { class: 'px-0 md:px-[1rem] pt-0' }
     }"
   >
-    <div>
-      <PrimeMenu
-        :pt="{
-          submenuheader: { class: 'text-base font-bold leading-none mt-5' }
-        }"
-        class="w-full md:px-4 px-3 border-none pb-20"
-        :model="menuStructure"
-      >
-        <template #item="{ item, label, props }">
-          <a
-            class="flex h-9"
-            v-bind="props.action"
-            @click="redirect(item.to)"
-          >
-            <span v-bind="props.icon" />
-            <span v-bind="props.label">{{ label }}</span>
-            <Tag
-              v-if="item.tag"
-              :value="item.tag"
-              class="ml-2"
-            />
-          </a>
-        </template>
-      </PrimeMenu>
-    </div>
+    <PrimeMenu
+      :pt="{
+        submenuheader: { class: 'text-base font-medium leading-none mt-5' },
+        content: { class: 'px-0.5' }
+      }"
+      class="w-full border-none pb-20 px-0 md:px-4 pt-1 md:pt-4 bg-transparent"
+      :model="menuStructure"
+    >
+      <template #item="{ item, label, props }">
+        <a
+          class="flex h-9"
+          v-bind="props.action"
+          @click="redirect(item.to)"
+        >
+          <span v-bind="props.icon" />
+          <span v-bind="props.label">{{ label }}</span>
+          <Tag
+            v-if="item.tag"
+            :value="item.tag"
+            class="ml-2"
+          />
+        </a>
+      </template>
+    </PrimeMenu>
   </Sidebar>
 
   <!-- Profile Menu -->
@@ -345,8 +348,10 @@
     :style="{ width: '65vw' }"
   >
     <!-- SLOT WIP -->
-    <div class="m-2 surface-border border border-dashed flex items-center h-96">
-      <p class="text-color-secondary text-center w-full">Slot</p>
+    <div class="surface-border border border-dashed rounded-md flex items-center h-96">
+      <p class="text-color text-sm font-medium text-center w-full">
+        This section is under development.
+      </p>
     </div>
   </PrimeDialog>
 
@@ -359,8 +364,10 @@
   >
     <template #start>
       <!-- SLOT WIP -->
-      <div class="m-2 surface-border border border-dashed flex items-center h-96">
-        <p class="text-color-secondary text-center w-full">Slot</p>
+      <div class="m-1 surface-border border border-dashed rounded-md flex items-center h-96">
+        <p class="text-color text-sm font-medium text-center w-full">
+          This section is under development.
+        </p>
       </div>
     </template>
   </PrimeMenu>
