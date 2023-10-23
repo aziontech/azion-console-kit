@@ -20,7 +20,7 @@ $panelHeaderFontWeight: 600;
 
 /// Padding of a panel header
 /// @group panel
-$panelHeaderPadding: 1rem;
+$panelHeaderPadding: 0.75rem 2rem;
 
 /// Font weight of a toggleable panel header
 /// @group panel
@@ -32,7 +32,7 @@ $panelHeaderHoverBg: #e9ecef;
 
 /// Border color of a panel header in hover state e.g. toggleable state
 /// @group panel
-$panelHeaderHoverBorderColor: #e7e7e7;
+$panelHeaderHoverBorderColor: var(--surface-border);
 
 /// Text color of a panel header in hover state e.g. toggleable state
 /// @group panel
@@ -40,7 +40,7 @@ $panelHeaderTextHoverColor: #495057;
 
 /// Border color for the content section of a panel
 /// @group panel
-$panelContentBorderColor: #e7e7e7;
+$panelContentBorderColor: var(--surface-border);
 
 /// Border for the content section of a panel
 /// @group panel
