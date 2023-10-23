@@ -193,8 +193,7 @@
         submenuheader: { class: 'text-base font-medium leading-none mt-5' },
         content: { class: 'px-0.5' }
       }"
-      class="w-full border-none pb-20 px-0 md:px-4 pt-1 md:pt-4"
-      style="background: none"
+      class="w-full border-none pb-20 px-0 md:px-4 pt-1 md:pt-4 bg-transparent"
       :model="menuStructure"
     >
       <template #item="{ item, label, props }">
