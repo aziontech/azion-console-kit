@@ -4,34 +4,36 @@ import { describe, expect, it, vi } from 'vitest'
 import { InvalidDataStructureError } from '@/services/axios/errors'
 
 const fixtures = {
-  teamsMock: [
-    {
-      id: 1,
-      is_active: true,
-      name: 'test team',
-      permissions: [
-        {
-          group: 'default_permissions 1',
-          id: 1,
-          name: 'View Content Delivery Settings',
-          slug: 'user:edit'
-        }
-      ]
-    },
-    {
-      id: 2,
-      is_active: true,
-      name: 'test team',
-      permissions: [
-        {
-          group: 'default_permissions 2',
-          id: 2,
-          name: 'View Content Delivery Settings',
-          slug: 'content_delivery:read'
-        }
-      ]
-    }
-  ]
+  teamsMock: {
+    results: [
+      {
+        id: 1,
+        is_active: true,
+        name: 'test team',
+        permissions: [
+          {
+            group: 'default_permissions 1',
+            id: 1,
+            name: 'View Content Delivery Settings',
+            slug: 'user:edit'
+          }
+        ]
+      },
+      {
+        id: 2,
+        is_active: true,
+        name: 'test team',
+        permissions: [
+          {
+            group: 'default_permissions 2',
+            id: 2,
+            name: 'View Content Delivery Settings',
+            slug: 'content_delivery:read'
+          }
+        ]
+      }
+    ]
+  }
 }
 
 const makeSut = () => {
@@ -46,7 +48,9 @@ describe('UsersServices', () => {
   it('should call api with correct params', async () => {
     const requestSpy = vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
       statusCode: 200,
-      body: []
+      body: {
+        results: []
+      }
     })
 
     const { sut } = makeSut()

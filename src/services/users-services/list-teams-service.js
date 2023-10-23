@@ -15,12 +15,12 @@ export const listTeamsService = async () => {
 
 const adapt = (httpResponse) => {
   const { statusCode, body } = httpResponse
-
-  if (!body || !Array.isArray(body)) {
+  
+  if (!body || !Array.isArray(body.results)) {
     throw new InvalidDataStructureError().message
   }
 
-  const teamsFormatted = body.map((item) => ({
+  const teamsFormatted = body.results.map((item) => ({
     label: item.name,
     value: item.id
   }))
