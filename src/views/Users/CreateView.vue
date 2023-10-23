@@ -91,7 +91,7 @@
               date="phone"
               v-model="mobile"
               class="w-full"
-              mask="?99999999999999999999999"
+              mask="?99999999999999999999"
               :class="{ 'p-invalid': errors.mobile && !selectedCountry }"
               v-tooltip.top="errors.mobile"
             />
@@ -152,7 +152,7 @@
   import InputMask from 'primevue/inputmask'
 
   const props = defineProps({
-    getDetailAccountService: {
+    loadAccountDetailsService: {
       type: Function,
       required: true
     },
@@ -185,13 +185,13 @@
   const optionsLanguage = ref([{ label: 'English', value: 'en' }])
 
   const validationSchema = yup.object({
-    firstName: yup.string().required(),
-    lastName: yup.string().required(),
+    firstName: yup.string().required().max(30),
+    lastName: yup.string().required().max(30),
     selectedTimezone: yup.string().required(),
     selectedLanguage: yup.string(),
-    email: yup.string().email().required(),
+    email: yup.string().email().required().max(254),
     selectedCountry: yup.object().required(),
-    mobile: yup.string().required(),
+    mobile: yup.string().required().max(20),
     userIsOwner: yup.boolean(),
     selectedTeam: yup.array(),
     mfa: yup.boolean()
@@ -201,8 +201,10 @@
     validationSchema,
     initialValues: {
       userIsOwner: false,
+      mobile: '',
       selectedTeam: [],
-      twoFactorEnabled: false
+      twoFactorEnabled: false,
+      selectedLanguage: 'en',
     }
   })
 
@@ -217,8 +219,6 @@
   const { value: selectedTeam } = useField('selectedTeam')
   const { value: twoFactorEnabled } = useField('twoFactorEnabled')
 
-  selectedLanguage.value = optionsLanguage.value[0].value
-
   const fetchCountries = async () => {
     const result = await props.listCountriesPhoneService()
     optionsCountriesMobile.value = result
@@ -229,7 +229,7 @@
     optionsTimezone.value = result.listTimeZones
   }
   const fetchDetailAccount = async () => {
-    const account = await props.getDetailAccountService()
+    const account = await props.loadAccountDetailsService()
     isForceMFA.value = account?.is_enabled_mfa_to_all_users
     twoFactorEnabled.value = isForceMFA.value
   }

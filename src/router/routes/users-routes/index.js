@@ -27,7 +27,7 @@ export const usersListsRoutes = {
       name: 'create-users',
       component: () => import('@views/Users/CreateView.vue'),
       props: {
-        getDetailAccountService: UsersService.getAccountDetailedService,
+        loadAccountDetailsService: UsersService.loadAccountDetailsService,
         listCountriesPhoneService: UsersService.listCountriesPhoneService,
         listTimezonesService: UsersService.listTimezonesService,
         createUsersService: UsersService.createUsersService,

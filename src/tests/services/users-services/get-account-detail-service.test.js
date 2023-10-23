@@ -1,5 +1,5 @@
 import { AxiosHttpClientAdapter } from '@/services/axios/AxiosHttpClientAdapter'
-import { getAccountDetailedService } from '@/services/users-services'
+import { loadAccountDetailsService } from '@/services/users-services'
 import { describe, expect, it, vi } from 'vitest'
 
 const fixtures = {
@@ -33,7 +33,7 @@ const fixtures = {
 }
 
 const makeSut = () => {
-  const sut = getAccountDetailedService
+  const sut = loadAccountDetailsService
 
   return {
     sut
