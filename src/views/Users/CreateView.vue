@@ -204,7 +204,7 @@
       mobile: '',
       selectedTeam: [],
       twoFactorEnabled: false,
-      selectedLanguage: 'en',
+      selectedLanguage: 'en'
     }
   })
 
