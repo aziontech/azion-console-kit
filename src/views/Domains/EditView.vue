@@ -171,7 +171,7 @@
         await Promise.all([this.requestEdgeApplications(), this.requestDigitalCertificates()])
       } catch (error) {
         this.$toast.add({
-          closable: true,
+          closable: false,
           severity: 'error',
           summary: error,
           life: 10000
