@@ -118,7 +118,15 @@
       }
     }
   }
-
+  // Custom InlineMessage
+  .p-inline-message .p-inline-message-icon {
+    font-size: 0.875rem !important;
+  }
+  .p-inline-message .p-inline-message-text {
+    font-size: 0.875rem !important;
+    line-height: 100% !important;
+    width: 100%;
+  }
   // Custom Breadcrumb
   .p-breadcrumb {
     .p-breadcrumb-list {
@@ -150,6 +158,15 @@
       padding: 2rem;
     }
   }
+
+  .p-dialog {
+    .p-dialog-footer {
+      button {
+        margin: 0 !important;
+      }
+    }
+  }
+
   @media only screen and (max-width: 768px) {
     .p-sidebar {
       .p-sidebar-header {
