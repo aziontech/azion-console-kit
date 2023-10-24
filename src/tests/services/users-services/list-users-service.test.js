@@ -55,7 +55,7 @@ describe('UsersServices', () => {
 
     const { sut } = makeSut()
 
-    await sut({ page: 1, search: 'search_text' })
+    await sut()
 
     expect(requestSpy).toHaveBeenCalledWith({
       url: `users`,

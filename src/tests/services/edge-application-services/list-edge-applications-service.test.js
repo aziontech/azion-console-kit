@@ -2,6 +2,13 @@ import { AxiosHttpClientAdapter } from '@/services/axios/AxiosHttpClientAdapter'
 import { listEdgeApplicationsService } from '@/services/edge-application-services'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
+const localeMock = (locale = 'en') => {
+  const DateTimeFormat = Intl.DateTimeFormat
+  vi.spyOn(window.global.Intl, 'DateTimeFormat')
+    .mockImplementationOnce((_, options) => DateTimeFormat(locale, { ...options }))
+    .mockImplementationOnce((_, options) => DateTimeFormat(locale, { ...options }))
+}
+
 const fixtures = {
   edgeApplicationsMock: {
     id: 1239875,
@@ -55,7 +62,7 @@ describe('EdgeApplicationServices', () => {
   })
 
   it('should parsed correctly all returned edge applications', async () => {
-    vi.setSystemTime(new Date(2023, 10, 10, 10))
+    localeMock()
     vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
       statusCode: 200,
       body: { results: [fixtures.edgeApplicationsMock, fixtures.disabledEdgeApplicationsMock] }

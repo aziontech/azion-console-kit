@@ -1,18 +1,7 @@
 <template>
   <div class="flex flex-col min-h-[calc(100vh-120px)]">
     <Toast />
-    <header class="border-neutral-200 border-b min-h-[82px] w-full flex items-center">
-      <div class="p-4 w-full">
-        <div class="flex flex-row flex-wrap items-center justify-left gap-4">
-          <PrimeButton
-            @click="handleCancel"
-            text
-            icon="pi pi-arrow-left"
-          ></PrimeButton>
-          <h1 class="text-4xl text-left font-normal text-gray-600">{{ pageTitle }}</h1>
-        </div>
-      </div>
-    </header>
+    <PageHeadingBlock :pageTitle="pageTitle" />
 
     <form
       @submit.prevent="handleSubmit"
@@ -35,15 +24,15 @@
 
 <script>
   import Toast from 'primevue/toast'
-  import PrimeButton from 'primevue/button'
   import ActionBarTemplate from '@/templates/action-bar-block'
+  import PageHeadingBlock from '@/templates/page-heading-block'
 
   export default {
     name: 'edit-form-block',
     components: {
       Toast,
-      PrimeButton,
-      ActionBarTemplate
+      ActionBarTemplate,
+      PageHeadingBlock
     },
     data: () => ({
       isLoading: false

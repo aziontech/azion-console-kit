@@ -196,7 +196,7 @@ $tabviewHeaderFontWeight: 600;
 
 /// Padding of a tabview header
 /// @group panel
-$tabviewHeaderPadding: 6px 12px;
+$tabviewHeaderPadding: 0.375px 0.75rem;
 
 /// Margin of a tabview header
 /// @group panel
@@ -300,19 +300,19 @@ $cardShadow:
 
 /// Margin of divider in horizontal layout
 /// @group panel
-$dividerHorizontalMargin: 1rem 0;
+$dividerHorizontalMargin: 0;
 
 /// Padding of divider in horizontal layout
 /// @group panel
-$dividerHorizontalPadding: 0 1rem;
+$dividerHorizontalPadding: 0;
 
 /// Margin of divider in vertical layout
 /// @group panel
-$dividerVerticalMargin: 0 1rem;
+$dividerVerticalMargin: 0;
 
 /// Padding of divider in vertical layout
 /// @group panel
-$dividerVerticalPadding: 1rem 0;
+$dividerVerticalPadding: 0;
 
 /// Border width of the divider
 /// @group panel

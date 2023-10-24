@@ -3,11 +3,9 @@
     :listService="listEdgeNodeService"
     :columns="getColumns"
     :deleteService="deleteEdgeNodeService"
-    :authorizeNode="true"
     pageTitle="Edge Nodes"
     addButtonLabel=""
     editPagePath="edge-node/edit"
-    @authorize="authorizeEdgenode"
   />
 </template>
 <script>
@@ -24,10 +22,6 @@
         type: Function
       },
       deleteEdgeNodeService: {
-        required: true,
-        type: Function
-      },
-      authorizeEdgeNodeService: {
         required: true,
         type: Function
       }
@@ -52,34 +46,6 @@
             header: 'Status'
           }
         ]
-      }
-    },
-    methods: {
-      async authorizeEdgenode(id) {
-        let toastConfig = {
-          closable: true,
-          severity: 'success',
-          summary: 'Authorize successfully',
-          life: 10000
-        }
-        try {
-          this.$toast.add({
-            closable: true,
-            severity: 'info',
-            summary: 'Processing request',
-            life: 5000
-          })
-          await this.authorizeEdgeNodeService(id)
-        } catch (error) {
-          toastConfig = {
-            closable: true,
-            severity: 'error',
-            summary: error,
-            life: 10000
-          }
-        } finally {
-          this.$toast.add(toastConfig)
-        }
       }
     }
   }

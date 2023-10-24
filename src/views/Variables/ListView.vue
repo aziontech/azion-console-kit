@@ -12,6 +12,7 @@
 
 <script>
   import ListTableBlock from '@/templates/list-table-block'
+  import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
 
   export default {
     name: 'variables-view',
@@ -26,6 +27,10 @@
       deleteVariablesService: {
         required: true,
         type: Function
+      },
+      clipboardWrite: {
+        required: true,
+        type: Function
       }
     },
     computed: {
@@ -37,7 +42,16 @@
           },
           {
             field: 'value',
-            header: 'Value'
+            header: 'Value',
+            type: 'component',
+            component: (columnData) =>
+              columnBuilder({
+                data: columnData,
+                columnAppearance: 'text-with-clipboard',
+                dependencies: {
+                  copyContentService: this.clipboardWrite
+                }
+              })
           },
           {
             field: 'lastEditor',

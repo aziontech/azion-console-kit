@@ -2,16 +2,16 @@
 @layer primevue {
   // Custom SelectButton
   .p-selectbutton {
-    background: var(--surface-hover) !important;
-    padding: 4px !important;
-    border-radius: 4px !important;
+    background: var(--surface-300) !important;
+    padding: 0.25rem !important;
+    border-radius: $borderRadius !important;
 
     .p-button {
       background: none !important;
       border: none !important;
-      height: 28px !important;
-      font-size: 14px !important;
-      border-radius: 4px !important;
+      height: 1.7rem !important;
+      font-size: 0.875rem !important;
+      border-radius: 0.25rem !important;
       color: var(--text-color-secondary) !important;
       font-weight: 600 !important;
 
@@ -24,11 +24,11 @@
         background: var(--surface-0) !important;
         border-color: none !important;
         font-weight: 600 !important;
-        border-radius: 4px !important;
+        border-radius: 0.25rem !important;
         color: var(--text-color) !important;
 
         &:hover {
-          background: var(--surface-500) !important;
+          background: var(--surface-0) !important;
           border-color: none !important;
           color: $toggleButtonTextActiveHoverColor !important;
           color: var(--text-color) !important;
@@ -40,14 +40,19 @@
   // Custom TabView
   .p-tabview {
     .p-tabview-nav {
-      gap: 0.8rem !important;
+      gap: 0.5rem !important;
 
       li {
         .p-tabview-nav-link {
-          font-weight: 500;
+          font-weight: 600 !important;
           min-height: 2rem;
-          font-size: 0.9rem;
+          font-size: 0.875rem;
           border-radius: $borderRadius;
+        }
+        &.p-highlight {
+          .p-tabview-nav-link {
+            font-weight: 700 !important;
+          }
         }
       }
     }
@@ -66,28 +71,33 @@
     }
   }
 
-  //Custom TabMenu
+  // Custom TabMenu
   .p-tabmenu {
     .p-tabmenu-nav {
-      gap: 0.8rem !important;
+      gap: 0.5rem !important;
 
       .p-tabmenuitem {
         .p-menuitem-link {
-          font-weight: 500 !important;
+          font-weight: 600 !important;
           min-height: 2rem !important;
-          font-size: 0.9rem !important;
+          font-size: 0.875rem !important;
           border-radius: $borderRadius !important;
+        }
+        &.p-highlight {
+          .p-menuitem-link {
+            font-weight: 700 !important;
+          }
         }
       }
     }
   }
 
-  //Custom Button
+  // Custom Button
   .p-button {
     font-weight: 600 !important;
   }
 
-  //Custom DropdownItem
+  // Custom DropdownItem
   .p-dropdown-item {
     height: 2.375rem !important;
     display: flex !important;
@@ -100,7 +110,7 @@
     font-weight: 500 !important;
   }
 
-  //Custom MenuItem
+  // Custom MenuItem
   .p-menu {
     .p-menuitem {
       .p-menuitem-content {
@@ -112,9 +122,61 @@
   .p-inline-message .p-inline-message-icon {
     font-size: 0.875rem !important;
   }
+  
   .p-inline-message .p-inline-message-text {
     font-size: 0.875rem !important;
     line-height: 100% !important;
     width: 100%;
+  }
+
+  // Custom Breadcrumb
+  .p-breadcrumb {
+    .p-breadcrumb-list {
+      font-weight: 600;
+      .p-menuitem-link {
+        padding: 0.25rem 0.125rem !important;
+        transition: $formElementTransition !important;
+        font-size: 0.875rem !important;
+      }
+      .p-menuitem:last-of-type {
+        font-weight: 600 !important;
+      }
+      .p-menuitem:hover {
+        text-decoration: underline;
+      }
+    }
+  }
+
+  // Custom Header Sidebar
+  .p-sidebar {
+    .p-sidebar-header {
+      justify-content: space-between;
+      font-size: 1.25rem !important;
+      font-weight: 500;
+      border-bottom: 1px solid var(--surface-border) !important;
+    }
+
+    .p-sidebar-content {
+      padding: 2rem;
+    }
+  }
+
+  .p-dialog {
+    .p-dialog-footer {
+      button {
+        margin: 0 !important;
+      }
+    }
+  }
+
+  @media only screen and (max-width: 768px) {
+    .p-sidebar {
+      .p-sidebar-header {
+        padding: 0.75rem !important;
+      }
+      .p-sidebar-content {
+        padding: 0.75rem !important;
+      }
+    }
   }
 }

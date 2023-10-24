@@ -1,49 +1,41 @@
 <template>
-  <div class="w-full flex flex-col justify-center items-start inline-flex pt-4 px-8">
+  <div class="w-full flex-col justify-center items-start inline-flex pt-4 px-8">
     <Breadcrumb
       :home="generateHomeBreadCrumb"
       :model="generateBreadCrumbs"
     />
-    <div class="flex w-full py-4 items-end">
+    <div class="flex w-full py-4 items-end justify-between">
       <div
-        class="flex flex-col gap-3"
+        class="flex flex-col gap-3 w-full"
         v-if="pageTitle || description"
       >
         <div
-          class="text-[var(--text-color)] text-3xl font-medium font-['Roboto'] leading-9 hover:cursor-pointer"
+          class="text-[var(--text-color)] text-3xl font-medium leading-9"
           v-if="pageTitle"
         >
           {{ pageTitle }}
         </div>
         <div
-          class="text-[var(--text-color-secondary)] text-lg font-normal font-['Roboto'] leading-7"
+          class="text-[var(--text-color-secondary)] text-lg font-normal leading-7"
           v-if="description"
         >
           {{ description }}
         </div>
       </div>
-      <div class="ml-auto w-40 h-9 items-end flex">
+      <div class="ml-auto w-full h-9 items-end flex justify-end">
         <slot></slot>
       </div>
     </div>
-    <TabMenu
-      v-model:activeIndex="activeTab"
-      @tab-change="handleTabChange"
-      v-if="navigationItems"
-      :model="navigationItems"
-    />
   </div>
 </template>
 
 <script>
   import Breadcrumb from 'primevue/breadcrumb'
-  import TabMenu from 'primevue/tabmenu'
 
   export default {
     name: 'PageHeadingBlock',
     components: {
-      Breadcrumb,
-      TabMenu
+      Breadcrumb
     },
     data() {
       return {
@@ -84,10 +76,6 @@
       description: {
         type: String,
         required: false
-      },
-      navigationItems: {
-        type: Array,
-        required: false
       }
     },
     computed: {
@@ -99,11 +87,6 @@
       },
       generateBreadCrumbs() {
         return this.$router.currentRoute.value.meta.breadCrumbs ?? []
-      }
-    },
-    methods: {
-      handleTabChange() {
-        this.$emit('tabChange', this.activeTab)
       }
     }
   }

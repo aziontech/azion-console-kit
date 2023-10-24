@@ -62,8 +62,7 @@ export const edgeApplicationRoutes = {
                 to: '/edge-applications'
               },
               {
-                label: 'Create Edge Application',
-                to: '/edge-applications/create'
+                label: 'Edit Edge Application'
               }
             ]
           }
@@ -80,6 +79,13 @@ export const edgeApplicationRoutes = {
               {
                 label: 'Edge Applications',
                 to: '/edge-applications'
+              },
+              {
+                label: 'Edit Edge Application',
+                to: '/edge-applications/edit/:id'
+              },
+              {
+                label: 'Create Origins'
               }
             ]
           }

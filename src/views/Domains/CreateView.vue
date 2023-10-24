@@ -214,9 +214,9 @@
             then: (schema) => schema.required()
           })
           .test({
-            name: 'format',
+            name: 'no-whitespace',
             message: `Whitespace is not allowed`,
-            test: (value) => value.includes(' ') === false
+            test: (value) => value?.includes(' ') === false
           }),
         cnameAccessOnly: yup.boolean(),
         edgeApplication: yup.number(),
@@ -233,6 +233,7 @@
       const { errors, defineInputBinds, meta, resetForm, values } = useForm({
         validationSchema,
         initialValues: {
+          cnames: '',
           cnameAccessOnly: true,
           edgeApplication: null,
           mtlsIsEnabled: false,

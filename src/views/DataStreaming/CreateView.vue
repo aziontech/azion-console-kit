@@ -2,7 +2,7 @@
   <CreateFormBlock
     pageTitle="Create Data Streaming"
     :createService="props.createDataStreamingService"
-    :formData="formValues"
+    :formData="values"
     :isValid="meta.valid"
     :cleanFormCallback="resetForm"
   >
@@ -81,7 +81,7 @@
       <div v-if="domainOption === '0'">
         <label>Domains:</label>
         <PickList
-          v-model="listDomains"
+          v-model="domains"
           listStyle="height:342px"
           dataKey="domainID"
           breakpoint="1400px"
@@ -566,7 +566,6 @@
   ])
   const listTemplates = ref([])
   const dataSet = ref('')
-  const listDomains = ref([])
   const listEndpoint = ref([
     { label: 'Standard HTTP/HTTPS POST', value: 'standard' },
     { label: 'Apache Kafka', value: 'kafka' },
@@ -766,6 +765,7 @@
       template: '',
       dataSet: '',
       domainOption: '1',
+      domains: [],
       endpoint: '',
 
       // standard
@@ -834,6 +834,7 @@
   const { value: dataSource } = useField('dataSource')
   const { value: template } = useField('template')
   const { value: domainOption } = useField('domainOption')
+  const { value: domains } = useField('domains')
   const { value: endpoint } = useField('endpoint')
 
   // standard
@@ -895,8 +896,6 @@
   const { value: containerName } = useField('containerName')
   const { value: blobToken } = useField('blobToken')
 
-  let formValues = { ...values, listDomains }
-
   onMounted(async () => {
     await loaderDataStreamTemplates()
     await loaderDataStreamDomains()
@@ -914,8 +913,8 @@
   }
 
   const loaderDataStreamDomains = async () => {
-    const domains = await props.listDataStreamingDomainsService()
-    listDomains.value = [domains, []]
+    const response = await props.listDataStreamingDomainsService()
+    domains.value = [response, []]
   }
 
   const addHeader = () => {
@@ -944,17 +943,13 @@
     () => domainOption.value,
     (option) => {
       if (option === '1') {
-        if (listDomains.value[1].length > 0) {
-          listDomains.value[1].forEach((element) => {
-            listDomains.value[0].push(element)
+        if (domains.value[1] && domains.value[1].length > 0) {
+          domains.value[1].forEach((element) => {
+            domains.value[0].push(element)
           })
-          listDomains.value[1] = []
+          domains.value[1] = []
         }
       }
     }
   )
-
-  watch([values, listDomains], () => {
-    formValues = { ...values, domains: listDomains.value[1] }
-  })
 </script>
