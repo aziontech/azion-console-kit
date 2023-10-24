@@ -16,6 +16,7 @@
         <PrimeButton
           icon="pi pi-plus"
           :label="createButtonLabel"
+          @click="navigateToCreatePage"
         />
       </div>
       <PrimeButton
@@ -33,13 +34,21 @@
 
 <script setup>
   import PrimeButton from 'primevue/button'
+  import { useRouter } from 'vue-router'
+
+  const router = useRouter()
+
   const props = defineProps({
     title: { type: String, required: true },
     description: { type: String, required: true },
     createButtonLabel: { type: String, required: true },
+    createPagePath: { type: String, required: true },
     documentationService: { type: Function, required: true }
   })
   function openDocumentation() {
     props.documentationService()
+  }
+  function navigateToCreatePage() {
+    router.push(props.createPagePath)
   }
 </script>

@@ -15,6 +15,7 @@
     title="No variables added"
     description="Create your first variable."
     createButtonLabel="Add variable"
+    createPagePath="variables/create"
     :documentationService="documentationService"
   >
     <template #illustration>
