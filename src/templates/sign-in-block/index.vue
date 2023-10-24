@@ -1,143 +1,139 @@
 <template>
   <form @submit.prevent="validateAndSubmit">
-    <Transition
-      name="fade"
-      mode="out-in"
+    <!-- Email step -->
+    <div
+      class="flex flex-col align-top items-center p-4 animate-fadeIn"
+      v-if="!showPassword"
     >
-      <!-- Email step -->
       <div
-        class="flex flex-col align-top items-center p-4 transition-opacity duration-500 ease-in-out"
-        v-if="!showPassword"
+        class="surface-card border max-w-md w-full p-6 md:p-10 rounded-md flex-col gap-6 inline-flex"
       >
-        <div
-          class="surface-card border max-w-md w-full p-6 md:p-10 rounded-md flex-col gap-6 inline-flex"
-        >
-          <div class="text-xl md:text-2xl font-medium">Real Time Manager</div>
-          <div class="flex flex-col gap-2">
-            <label
-              for="email"
-              class="font-semibold text-sm"
-              >E-mail</label
-            >
-            <InputText
-              v-bind="email"
-              id="email"
-              placeholder="Type your e-mail"
-              type="email"
-              class="w-full"
-              :class="{ 'p-invalid': errors.email }"
-              v-tooltip.top="errors.email"
-            />
-          </div>
-
-          <PrimeButton
-            class="w-full"
-            type="button"
-            label="Proceed"
-            severity="secondary"
-            :disabled="errors.email || !email.value"
-            @click="showPassword = true"
-          />
-
-          <Divider align="center">
-            <p>or</p>
-          </Divider>
-
-          <div class="flex flex-col gap-4">
-            <PrimeButton
-              class="w-full"
-              label="Continue with Google"
-              severity="primary"
-              icon="pi pi-google"
-              outlined
-            />
-            <PrimeButton
-              class="w-full"
-              label="Continue with GitHub"
-              severity="primary"
-              icon="pi pi-github"
-              outlined
-            />
-          </div>
-        </div>
-
-        <div class="flex flex-wrap justify-center items-center pt-6">
-          <div>Don't have an account?</div>
-          <PrimeButton
-            link
-            label="Create one now"
-          ></PrimeButton>
-        </div>
-      </div>
-
-      <!-- Password step -->
-      <div
-        v-else
-        class="flex flex-col align-top items-center p-4 transition-opacity duration-500 ease-in-out"
-      >
-        <div
-          class="surface-card border max-w-md w-full p-6 md:p-10 rounded-md flex-col gap-6 inline-flex"
-        >
-          <div class="text-xl md:text-2xl font-medium">Real Time Manager</div>
-          <div class="flex items-center gap-2">
-            <PrimeButton
-              class="w-7 h-7"
-              outlined
-              icon="pi pi-chevron-left"
-              @click="showPassword = false"
-            ></PrimeButton>
-            <p class="text-sm">peterson@azion.com</p>
-          </div>
-
-          <div class="flex flex-col gap-2">
-            <label
-              for="password"
-              class="font-semibold text-sm"
-              >Password</label
-            >
-            <InputText
-              v-bind="password"
-              id="password"
-              placeholder="Type your password"
-              type="password"
-              class="w-full"
-              :class="{ 'p-invalid': errors.password }"
-              v-tooltip.top="errors.password"
-            />
-          </div>
-
-          <InlineMessage
-            v-if="hasErrorMessage"
-            severity="error"
-            >{{ hasErrorMessage }}</InlineMessage
+        <div class="text-xl md:text-2xl font-medium">Real Time Manager</div>
+        <div class="flex flex-col gap-2">
+          <label
+            for="email"
+            class="font-semibold text-sm"
+            >E-mail</label
           >
-
-          <div>
-            <PrimeButton
-              link
-              class="p-0"
-              label="Forgot my password"
-            ></PrimeButton>
-          </div>
-          <PrimeButton
+          <InputText
+            v-bind="email"
+            id="email"
+            placeholder="Type your e-mail"
+            type="email"
             class="w-full"
-            :loading="isButtonLoading"
-            label="Sign in"
-            severity="secondary"
-            type="submit"
-            :disabled="errors.password || !password.value"
+            :class="{ 'p-invalid': errors.email }"
+            v-tooltip.top="errors.email"
           />
         </div>
 
-        <div class="flex flex-wrap justify-center items-center pt-6">
-          <div>Don't have an account?</div>
+        <PrimeButton
+          class="w-full"
+          type="button"
+          label="Proceed"
+          :loading="isProccedButtonLoading"
+          severity="secondary"
+          :disabled="errors.email || !email.value"
+          @click="showPasswordStep()"
+        />
+
+        <Divider align="center">
+          <p>or</p>
+        </Divider>
+
+        <div class="flex flex-col gap-4">
           <PrimeButton
-            link
-            label="Create one now"
-          ></PrimeButton>
+            class="w-full"
+            label="Continue with Google"
+            severity="primary"
+            icon="pi pi-google"
+            outlined
+          />
+          <PrimeButton
+            class="w-full"
+            label="Continue with GitHub"
+            severity="primary"
+            icon="pi pi-github"
+            outlined
+          />
         </div>
       </div>
-    </Transition>
+
+      <div class="flex flex-wrap justify-center items-center pt-6">
+        <div>Don't have an account?</div>
+        <PrimeButton
+          link
+          label="Create one now"
+        ></PrimeButton>
+      </div>
+    </div>
+
+    <!-- Password step -->
+    <div
+      v-else
+      class="flex flex-col align-top items-center p-4 animate-fadeIn"
+    >
+      <div
+        class="surface-card border max-w-md w-full p-6 md:p-10 rounded-md flex-col gap-6 inline-flex"
+      >
+        <div class="text-xl md:text-2xl font-medium">Real Time Manager</div>
+        <div class="flex items-center gap-2">
+          <PrimeButton
+            class="w-7 h-7"
+            outlined
+            icon="pi pi-chevron-left"
+            @click="showPassword = false"
+          ></PrimeButton>
+          <p class="text-sm">peterson@azion.com</p>
+        </div>
+
+        <div class="flex flex-col gap-2">
+          <label
+            for="password"
+            class="font-semibold text-sm"
+            >Password</label
+          >
+          <InputText
+            v-bind="password"
+            id="password"
+            placeholder="Type your password"
+            type="password"
+            class="w-full"
+            :class="{ 'p-invalid': errors.password }"
+            v-tooltip.top="errors.password"
+          />
+        </div>
+
+        <InlineMessage
+          v-if="hasErrorMessage"
+          severity="error"
+          >{{ hasErrorMessage }}</InlineMessage
+        >
+
+        <div>
+          <PrimeButton
+            link
+            class="p-0"
+            label="Forgot my password"
+          ></PrimeButton>
+        </div>
+        <PrimeButton
+          class="w-full"
+          :loading="isButtonLoading"
+          label="Sign in"
+          severity="secondary"
+          type="submit"
+          :disabled="errors.password || !password.value"
+        />
+      </div>
+
+      <div class="flex flex-wrap justify-center items-center pt-6">
+        <div>Don't have an account?</div>
+        <PrimeButton
+          link
+          label="Create one now"
+        ></PrimeButton>
+      </div>
+    </div>
   </form>
 </template>
 
@@ -162,6 +158,8 @@
 
   const showPassword = ref(false)
   const hasErrorMessage = ref(null)
+
+  const isProccedButtonLoading = ref(false)
   const isButtonLoading = ref(false)
 
   const props = defineProps({
@@ -186,8 +184,14 @@
   const emailValidateRegex = /^\S+@\S+\.\S+$/
 
   const validationSchema = yup.object({
-    email: yup.string().required().matches(emailValidateRegex, 'Invalid email address'),
-    password: yup.string().required().min(8, 'Password is too short - should be 8 chars minimum.')
+    email: yup
+      .string()
+      .required('E-mail is a required field')
+      .matches(emailValidateRegex, 'Invalid email address'),
+    password: yup
+      .string()
+      .required('Password is a required field')
+      .min(8, 'Password is too short - should be 8 chars minimum.')
   })
   const { defineInputBinds, errors } = useForm({
     validationSchema,
@@ -241,6 +245,14 @@
     }
   }
 
+  const showPasswordStep = () => {
+    isProccedButtonLoading.value = true
+    setTimeout(() => {
+      isProccedButtonLoading.value = false
+      showPassword.value = true
+    }, 500)
+  }
+
   defineExpose({
     showPassword,
     email,
@@ -251,14 +263,3 @@
     hasErrorMessage
   })
 </script>
-
-<style scoped>
-  .fade-enter-active,
-  .fade-leave-active {
-    transition: opacity 0.5s;
-  }
-  .fade-enter,
-  .fade-leave-to {
-    opacity: 0;
-  }
-</style>

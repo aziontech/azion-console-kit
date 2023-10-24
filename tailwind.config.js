@@ -14,6 +14,20 @@ export default {
       width: {
         'slide': '300px',
       },
+      animation: {
+        fadeIn: 'fadeIn 220ms ease-in-out',
+        fadeOut: 'fadeOut 220ms ease-in-out'
+      },
+      keyframes: {
+        fadeIn: {
+          '0%': { opacity: '0' },
+          '100%': { opacity: '1' },
+        },
+        fadeOut: {
+          '0%': { opacity: '1' },
+          '100%': { opacity: '0' },
+        }
+      }
     },
   },
   plugins: [],

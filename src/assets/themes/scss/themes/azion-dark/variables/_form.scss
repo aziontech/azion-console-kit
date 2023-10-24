@@ -32,7 +32,7 @@ $inputFocusBorderColor: $primaryColor;
 
 /// Color of an input field in invalid state
 /// @group form
-$inputErrorBorderColor: #3e3e3e #3e3e3e #3e3e3e $errorColor;
+$inputErrorBorderColor: $errorColor;
 
 /// Text color of a placeholder
 /// @group form
