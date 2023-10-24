@@ -108,4 +108,11 @@
       }
     }
   }
+  // Custom InlineMessage
+  .p-inline-message .p-inline-message-icon {
+    font-size: 0.875rem !important;
+  }
+  .p-inline-message .p-inline-message-text {
+    font-size: 0.875rem !important;
+  }
 }
