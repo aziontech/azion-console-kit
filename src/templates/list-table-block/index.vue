@@ -3,7 +3,7 @@
     <Toast />
     <PageHeadingBlock :pageTitle="pageTitle" />
 
-    <div class="max-w-full mx-8 mt-10">
+    <div class="max-w-full mx-8">
       <DataTable
         v-if="!isLoading"
         @rowReorder="onRowReorder"
@@ -129,8 +129,8 @@
         }"
       >
         <template #header>
-          <div class="flex self-start">
-            <span class="p-input-icon-left">
+          <div class="flex flex-wrap justify-between gap-2 w-full">
+            <span class="p-input-icon-left max-sm:w-full">
               <i class="pi pi-search" />
               <InputText
                 class="w-full"
@@ -138,6 +138,13 @@
                 placeholder="Search"
               />
             </span>
+            <PrimeButton
+              class="max-sm:w-full"
+              @click="navigateToAddPage"
+              icon="pi pi-plus"
+              :label="addButtonLabel"
+              v-if="addButtonLabel"
+            />
           </div>
         </template>
         <Column
@@ -171,6 +178,7 @@
 
   export default {
     name: 'list-table-block',
+    emits: ['on-load-data'],
     components: {
       Toast,
       DataTable,
@@ -324,6 +332,12 @@
         } finally {
           this.$toast.add(toastConfig)
         }
+      }
+    },
+    watch: {
+      data(currentState) {
+        const hasData = currentState.length > 0
+        this.$emit('on-load-data', hasData)
       }
     }
   }
