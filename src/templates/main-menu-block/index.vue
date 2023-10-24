@@ -2,7 +2,7 @@
 <template>
   <!-- Header Container -->
   <header
-    class="p-3 surface-section border-b surface-border items-center flex justify-between md:px-8 md:py-3 w-full fixed top-0 z-10 h-[56px]"
+    class="p-3 border-b bg-header surface-border items-center flex justify-between md:px-8 md:py-3 w-full fixed top-0 z-10 h-[56px]"
   >
     <div
       class="flex w-full justify-between"
@@ -12,7 +12,7 @@
         <PrimeButton
           @click="openSideBar"
           size="small"
-          class="flex-none surface-border"
+          class="flex-none border-header text-white"
           text
           icon="pi pi-bars"
           style="height: 32px; width: 32px"
@@ -22,7 +22,7 @@
         <PrimeButton
           @click="openSideBar"
           size="small"
-          class="flex-none surface-border surface-hover"
+          class="flex-none border-header bg-header-hover text-white"
           text
           icon="pi pi-bars"
           style="height: 32px; width: 32px"
@@ -40,7 +40,7 @@
         <!-- Azion client -->
         <PrimeButton
           v-tooltip.bottom="'Switch Account'"
-          class="font-semibold ml-2 h-8 w-auto surface-border hidden md:flex gap-2 items-center"
+          class="font-semibold ml-2 h-8 w-auto border-header hidden md:flex gap-2 items-center text-white"
           size="small"
           outlined
         >
@@ -54,7 +54,7 @@
         <i class="pi pi-search" />
         <i class="!top-[32%]">
           <Tag
-            class="not-italic border surface-border text-color-secondary cursor-pointer h-6 surface-100"
+            class="not-italic border border-header text-color-secondary cursor-pointer h-6 surface-100"
             value="⌘ K"
             @click="openSearch"
           />
@@ -72,7 +72,7 @@
       <div class="flex gap-2 items-center">
         <PrimeButton
           icon="pi pi-search"
-          class="px-2 py-1 flex lg:hidden"
+          class="px-2 py-1 flex lg:hidden text-white border-header"
           @click="openSearch"
           style="height: 32px; width: 32px"
           outlined
@@ -83,7 +83,7 @@
           @click="showCreateModal"
           icon="pi pi-plus"
           label="Create"
-          class="h-8 hidden md:flex"
+          class="h-8 hidden md:flex text-white border-header"
           outlined
           size="small"
         />
@@ -92,7 +92,7 @@
         <PrimeButton
           @click="showCreateModal"
           icon="pi pi-plus"
-          class="h-8 md:hidden"
+          class="h-8 md:hidden text-white border-header"
           size="small"
           outlined
           style="height: 32px; width: 32px"
@@ -105,7 +105,7 @@
           label="Help"
           @click="showHelperCenter"
           outlined
-          class="hidden md:flex"
+          class="hidden md:flex text-white border-header"
         />
 
         <!-- Create Button Mobile -->
@@ -113,7 +113,7 @@
           icon="pi pi-question-circle"
           size="small"
           outlined
-          class="md:hidden"
+          class="md:hidden text-white border-header"
           style="height: 32px; width: 32px"
           @click="showHelperCenterMobile"
         />
@@ -121,8 +121,8 @@
         <!-- Notification Button  -->
         <PrimeButton
           icon="pi pi-bell"
-          style="border-color: var(--surface-border); padding-left: 7px; height: 32px; width: 32px"
-          class="overflow-auto"
+          style="padding-left: 7px; height: 32px; width: 32px"
+          class="overflow-auto text-white border-header"
           badge="9"
           v-tooltip.bottom="'Notifications'"
           size="small"
