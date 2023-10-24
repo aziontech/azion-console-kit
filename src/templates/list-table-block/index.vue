@@ -1,17 +1,12 @@
 <template>
   <div>
     <Toast />
-    <PageHeadingBlock :pageTitle="pageTitle">
-      <PrimeButton
-        @click="navigateToAddPage"
-        icon="pi pi-plus"
-        :label="addButtonLabel"
-        v-if="addButtonLabel"
-      />
-    </PageHeadingBlock>
-    <div class="max-w-screen-sm lg:max-w-7xl mx-auto">
+    <PageHeadingBlock :pageTitle="pageTitle" />
+
+    <div class="max-w-full mx-8 mt-10">
       <DataTable
         v-if="!isLoading"
+        @rowReorder="onRowReorder"
         scrollable
         removableSort
         :value="data"
@@ -24,8 +19,8 @@
         :loading="isLoading"
       >
         <template #header>
-          <div class="flex self-start">
-            <span class="p-input-icon-left">
+          <div class="flex flex-wrap justify-between gap-2 w-full">
+            <span class="p-input-icon-left max-sm:w-full">
               <i class="pi pi-search" />
               <InputText
                 class="w-full"
@@ -33,12 +28,23 @@
                 placeholder="Search"
               />
             </span>
+            <PrimeButton
+              class="max-sm:w-full"
+              @click="navigateToAddPage"
+              icon="pi pi-plus"
+              :label="addButtonLabel"
+              v-if="addButtonLabel"
+            />
           </div>
         </template>
-
+        <Column
+          v-if="reorderableRows"
+          rowReorder
+          headerStyle="width: 3rem"
+        />
         <Column
           sortable
-          v-for="col of columns"
+          v-for="col of selectedColumns"
           :key="col.field"
           :field="col.field"
           :header="col.header"
@@ -55,7 +61,33 @@
         <Column
           :frozen="true"
           :alignFrozen="'right'"
+          headerStyle="width: 13rem"
         >
+          <template #header>
+            <div class="flex justify-end w-full">
+              <PrimeButton
+                outlined
+                icon="pi pi-bars"
+                @click="toggleColumnSelector"
+                v-tooltip.left="'Hidden columns'"
+              >
+              </PrimeButton>
+              <OverlayPanel ref="columnSelectorPanel">
+                <Listbox
+                  v-model="selectedColumns"
+                  multiple
+                  :options="[{ label: 'Hidden columns', items: this.columns }]"
+                  optionLabel="header"
+                  optionGroupLabel="label"
+                  optionGroupChildren="items"
+                >
+                  <template #optiongroup="slotProps">
+                    <p class="text-sm font-bold">{{ slotProps.option.label }}</p>
+                  </template>
+                </Listbox>
+              </OverlayPanel>
+            </div>
+          </template>
           <template #body="{ data: rowData }">
             <div class="flex justify-end">
               <PrimeMenu
@@ -128,9 +160,11 @@
   import DataTable from 'primevue/datatable'
   import Column from 'primevue/column'
   import Toast from 'primevue/toast'
+  import Listbox from 'primevue/listbox'
   import InputText from 'primevue/inputtext'
   import PrimeMenu from 'primevue/menu'
   import Skeleton from 'primevue/skeleton'
+  import OverlayPanel from 'primevue/overlaypanel'
   import PrimeButton from 'primevue/button'
   import { FilterMatchMode } from 'primevue/api'
   import PageHeadingBlock from '@/templates/page-heading-block'
@@ -145,6 +179,8 @@
       PrimeButton,
       PrimeMenu,
       Skeleton,
+      Listbox,
+      OverlayPanel,
       PageHeadingBlock
     },
     data: () => ({
@@ -153,7 +189,9 @@
         global: { value: '', matchMode: FilterMatchMode.CONTAINS }
       },
       isLoading: false,
-      data: []
+      showColumnSelector: false,
+      data: [],
+      selectedColumns: []
     }),
     props: {
       columns: {
@@ -192,10 +230,16 @@
       deleteService: {
         required: true,
         type: Function
+      },
+      reorderableRows: {
+        required: false,
+        type: Boolean,
+        default: false
       }
     },
     async created() {
       await this.loadData({ page: 1 })
+      this.selectedColumns = this.columns
     },
     computed: {
       filterBy() {
@@ -203,6 +247,15 @@
       }
     },
     methods: {
+      toggleColumnSelector(event) {
+        this.$refs.columnSelectorPanel.toggle(event)
+      },
+      toggleShowColumnSelector() {
+        this.showColumnSelector = !this.showColumnSelector
+      },
+      onRowReorder(event) {
+        this.data = event.value
+      },
       actionOptions() {
         const actionOptions = [
           {
