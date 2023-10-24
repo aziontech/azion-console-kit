@@ -3,7 +3,7 @@
     <Toast />
     <PageHeadingBlock :pageTitle="pageTitle" />
 
-    <div class="max-w-full mx-8 mt-10">
+    <div class="max-w-full mx-8">
       <DataTable
         v-if="!isLoading"
         @rowReorder="onRowReorder"
@@ -178,6 +178,7 @@
 
   export default {
     name: 'list-table-block',
+    emits: ['on-load-data'],
     components: {
       Toast,
       DataTable,
@@ -331,6 +332,12 @@
         } finally {
           this.$toast.add(toastConfig)
         }
+      }
+    },
+    watch: {
+      data(currentState) {
+        const hasData = currentState.length > 0
+        this.$emit('on-load-data', hasData)
       }
     }
   }
