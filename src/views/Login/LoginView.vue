@@ -1,20 +1,19 @@
 <template>
-  <div class="p-4 w-full">
-    <LoginBlock
+  <div>
+    <SignInBlock
       :authenticationLoginService="authenticationLoginService"
       :verifyLoginService="verifyLoginService"
       :refreshLoginService="refreshLoginService"
       :switchAccountLoginService="switchAccountLoginService"
-      test="dd"
-    />
+    ></SignInBlock>
   </div>
 </template>
 <script>
-  import LoginBlock from '@/templates/login-block'
+  import SignInBlock from '@/templates/sign-in-block'
   export default {
     name: 'login-view',
     components: {
-      LoginBlock
+      SignInBlock
     },
     props: {
       authenticationLoginService: {
