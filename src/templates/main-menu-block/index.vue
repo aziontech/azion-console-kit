@@ -3,6 +3,7 @@
   <!-- Header Container -->
   <header
     class="p-3 surface-section border-b surface-border items-center flex justify-between md:px-8 md:py-3 w-full fixed top-0 z-10 h-[56px]"
+    @keyup.esc="closeSideBar"
   >
     <div
       class="flex w-full justify-between"
@@ -16,17 +17,7 @@
           text
           icon="pi pi-bars"
           style="height: 32px; width: 32px"
-          v-if="!showSidebar"
-        />
-
-        <PrimeButton
-          @click="openSideBar"
-          size="small"
-          class="flex-none surface-border surface-hover"
-          text
-          icon="pi pi-bars"
-          style="height: 32px; width: 32px"
-          v-if="showSidebar"
+          v-tooltip.bottom="'Main menu'"
         />
 
         <Logo
@@ -39,7 +30,7 @@
         />
         <!-- Azion client -->
         <PrimeButton
-          v-tooltip.bottom="'Switch Account'"
+          v-tooltip.bottom="'Switch account'"
           class="font-semibold ml-2 h-8 w-auto surface-border hidden md:flex gap-2 items-center"
           size="small"
           outlined
@@ -76,6 +67,7 @@
           @click="openSearch"
           style="height: 32px; width: 32px"
           outlined
+          v-tooltip.bottom="'Search'"
         />
 
         <!-- Create Button Desktop -->
@@ -96,6 +88,7 @@
           size="small"
           outlined
           style="height: 32px; width: 32px"
+          v-tooltip.bottom="'Create'"
         />
 
         <!-- Help Button Desktop  -->
@@ -116,6 +109,7 @@
           class="md:hidden"
           style="height: 32px; width: 32px"
           @click="showHelperCenterMobile"
+          v-tooltip.bottom="'Help'"
         />
 
         <!-- Notification Button  -->
@@ -142,12 +136,14 @@
           @click="toggleProfile"
           label="U"
           class="cursor-pointer md:hidden"
+          v-tooltip.bottom="'Account'"
         />
         <!-- Profile Desktop -->
         <Avatar
           @click="toggleProfile"
           label="U"
           class="hidden md:flex cursor-pointer"
+          v-tooltip.bottom="'Account'"
         />
       </div>
     </div>
@@ -618,6 +614,9 @@
       },
       openSideBar() {
         this.showSidebar = !this.showSidebar
+      },
+      closeSideBar() {
+        this.showSidebar = false
       },
       openSearch() {
         this.showSearch = true

@@ -1,5 +1,6 @@
 <template>
   <ListTableBlock
+    v-if="hasContentToList"
     :listService="listVariablesService"
     :deleteService="deleteVariablesService"
     :columns="getColumns"
@@ -7,17 +8,34 @@
     addButtonLabel="Add Variable"
     createPagePath="variables/create"
     editPagePath="variables/edit"
+    @on-load-data="handleLoadData"
   />
+  <EmptyResultsBlock
+    v-else
+    title="No variables added"
+    description="Create your first variable."
+    createButtonLabel="Add variable"
+    createPagePath="variables/create"
+    :documentationService="documentationService"
+  >
+    <template #illustration>
+      <Illustration />
+    </template>
+  </EmptyResultsBlock>
 </template>
 
 <script>
   import ListTableBlock from '@/templates/list-table-block'
+  import EmptyResultsBlock from '@/templates/empty-results-block'
+  import Illustration from '@/assets/svg/illustration-layers.vue'
   import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
 
   export default {
     name: 'variables-view',
     components: {
-      ListTableBlock
+      ListTableBlock,
+      EmptyResultsBlock,
+      Illustration
     },
     props: {
       listVariablesService: {
@@ -31,8 +49,15 @@
       clipboardWrite: {
         required: true,
         type: Function
+      },
+      documentationService: {
+        required: true,
+        type: Function
       }
     },
+    data: () => ({
+      hasContentToList: true
+    }),
     computed: {
       getColumns() {
         return [
@@ -62,6 +87,11 @@
             header: 'Last Update'
           }
         ]
+      }
+    },
+    methods: {
+      handleLoadData(event) {
+        this.hasContentToList = event
       }
     }
   }

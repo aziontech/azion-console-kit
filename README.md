@@ -31,7 +31,7 @@ The webapp is now available on the following URL: http://localhost:5173
 PRO-TIP (OPTIONAL) - To save some time, you can create a personal token in [Azion Realtime Manager](https://manager.azion.com/iam/personal-tokens) and save it into file `.env.development`
 
 ```cmd
-echo 'VITE_PERSONAL_TOKEN=azionPERSONALTOKEN' > .env.development
+echo 'VITE_PERSONAL_TOKEN=PERSONALTOKEN' > .env.development
 ```
 
 
@@ -43,7 +43,7 @@ Azion Platform Kit runs natively on Azion's edge thanks to Azion CLI.
 
 ```cmd
 curl https://downloads.azion.com/linux/x86_64/azioncli -o azioncli && chmod +x azioncli
-./azioncli configure -t azionPERSONALTOKEN
+./azioncli configure -t PERSONALTOKEN
 ```
 
 2. Build the bundler and copy the content from `dist` to `.edge/statics`

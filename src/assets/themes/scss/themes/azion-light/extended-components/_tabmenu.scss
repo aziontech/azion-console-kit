@@ -1,0 +1,20 @@
+// Custom TabMenu
+.p-tabmenu {
+  .p-tabmenu-nav {
+    gap: 0.5rem !important;
+
+    .p-tabmenuitem {
+      .p-menuitem-link {
+        font-weight: 600 !important;
+        min-height: 2rem !important;
+        font-size: 0.875rem !important;
+        border-radius: $borderRadius !important;
+      }
+      &.p-highlight {
+        .p-menuitem-link {
+          font-weight: 700 !important;
+        }
+      }
+    }
+  }
+}
