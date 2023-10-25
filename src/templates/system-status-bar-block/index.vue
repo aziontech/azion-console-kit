@@ -5,7 +5,7 @@
     target="_blank"
   >
     <i
-      class="pi pi-circle-fill text-xs leading-none"
+      class="pi pi-circle-fill text-xs"
       :style="colorStatus"
     />
     <span class="leading-none">{{ label }}</span>
