@@ -65,7 +65,7 @@
               style: 'background: var(--surface-section) !important'
             },
             item: { class: 'w-full text-sm' },
-            input: { class: 'w-24 text-sm' }
+            input: { class: 'w-20 text-sm' }
           }"
         >
           <template #value="slotProps">
