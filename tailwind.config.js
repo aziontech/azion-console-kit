@@ -6,10 +6,14 @@ export default {
   theme: {
     colors: {
       header: '#171717',
-      'header-hover': '#ffffff32'
+      'header-hover': '#ffffff32',
+      'header-input': '#292929'
     },
     borderColor: {
       header: '#3e3e3e'
+    },
+    textColor: {
+      header: '#b5b5b5'
     },
     extend: {
       transitionProperty: {

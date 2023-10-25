@@ -51,16 +51,16 @@
 
       <!-- Search -->
       <span class="top-0 p-input-icon-left p-input-icon-right hidden lg:flex">
-        <i class="pi pi-search" />
+        <i class="pi pi-search text-white" />
         <i class="!top-[32%]">
           <Tag
-            class="not-italic border border-header text-color-secondary cursor-pointer h-6 surface-100"
+            class="not-italic border border-header bg-header text-header cursor-pointer h-6 surface-100"
             value="⌘ K"
             @click="openSearch"
           />
         </i>
         <InputText
-          class="w-64"
+          class="w-64 bg-header-input border-header"
           placeholder="Search..."
           :value="searchText"
           @click="openSearch"
