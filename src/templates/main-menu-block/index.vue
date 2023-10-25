@@ -13,20 +13,12 @@
           @click="openSideBar"
           size="small"
           class="flex-none border-header text-white"
-          text
           icon="pi pi-bars"
           style="height: 32px; width: 32px"
-          v-if="!showSidebar"
-        />
-
-        <PrimeButton
-          @click="openSideBar"
-          size="small"
-          class="flex-none border-header bg-header-hover text-white"
-          text
-          icon="pi pi-bars"
-          style="height: 32px; width: 32px"
-          v-if="showSidebar"
+          :class="{
+            'bg-header-button-enabled': showSidebar,
+            'bg-header hover:bg-header-button-hover': !showSidebar
+          }"
         />
 
         <Logo
@@ -40,7 +32,7 @@
         <!-- Azion client -->
         <PrimeButton
           v-tooltip.bottom="'Switch Account'"
-          class="font-semibold ml-2 h-8 w-auto border-header hidden md:flex gap-2 items-center text-white"
+          class="font-semibold ml-2 h-8 w-auto border-header hover:bg-header-button-hover hidden md:flex gap-2 items-center text-white"
           size="small"
           outlined
         >
@@ -54,7 +46,7 @@
         <i class="pi pi-search text-white" />
         <i class="!top-[32%]">
           <Tag
-            class="not-italic border border-header bg-header text-header cursor-pointer h-6 surface-100"
+            class="not-italic border border-header bg-header hover:bg-header-button-hover text-header cursor-pointer h-6 surface-100"
             value="⌘ K"
             @click="openSearch"
           />
@@ -86,6 +78,10 @@
           class="h-8 hidden md:flex text-white border-header"
           outlined
           size="small"
+          :class="{
+            'bg-header hover:bg-header-button-hover': !showCreate,
+            'bg-header-button-enabled': showCreate
+          }"
         />
 
         <!-- Create Button Mobile -->
@@ -96,6 +92,10 @@
           size="small"
           outlined
           style="height: 32px; width: 32px"
+          :class="{
+            'bg-header hover:bg-header-button-hover': !showCreate,
+            'bg-header-button-enabled': showCreate
+          }"
         />
 
         <!-- Help Button Desktop  -->
@@ -106,9 +106,13 @@
           @click="showHelperCenter"
           outlined
           class="hidden md:flex text-white border-header"
+          :class="{
+            'bg-header hover:bg-header-button-hover': !helperVisible,
+            'bg-header-button-enabled': helperVisible
+          }"
         />
 
-        <!-- Create Button Mobile -->
+        <!-- Help Button Mobile -->
         <PrimeButton
           icon="pi pi-question-circle"
           size="small"
@@ -116,13 +120,17 @@
           class="md:hidden text-white border-header"
           style="height: 32px; width: 32px"
           @click="showHelperCenterMobile"
+          :class="{
+            'bg-header hover:bg-header-button-hover': !helperVisible,
+            'bg-header-button-enabled': helperVisible
+          }"
         />
 
         <!-- Notification Button  -->
         <PrimeButton
           icon="pi pi-bell"
           style="padding-left: 7px; height: 32px; width: 32px"
-          class="overflow-auto text-white border-header"
+          class="overflow-auto text-white border-header hover:bg-header-button-hover"
           badge="9"
           v-tooltip.bottom="'Notifications'"
           size="small"
@@ -141,13 +149,13 @@
         <Avatar
           @click="toggleProfile"
           label="U"
-          class="cursor-pointer md:hidden"
+          class="cursor-pointer md:hidden text-avatar bg-header-avatar text-white"
         />
         <!-- Profile Desktop -->
         <Avatar
           @click="toggleProfile"
           label="U"
-          class="hidden md:flex cursor-pointer"
+          class="hidden md:flex cursor-pointer bg-header-avatar text-white"
         />
       </div>
     </div>

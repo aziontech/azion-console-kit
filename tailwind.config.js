@@ -6,8 +6,10 @@ export default {
   theme: {
     colors: {
       header: '#171717',
-      'header-hover': '#ffffff32',
-      'header-input': '#292929'
+      'header-input': '#292929',
+      'header-button-enabled': '#ffffff32',
+      'header-button-hover': 'rgba(244, 244, 244, 0.04)',
+      'header-avatar': '#363636'
     },
     borderColor: {
       header: '#3e3e3e'
