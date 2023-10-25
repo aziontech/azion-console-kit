@@ -1,4 +1,3 @@
 export const makeEventsListBaseUrl = () => {
-    return `graphql/`
-  }
-  
+  return `graphql`
+}

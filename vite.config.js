@@ -42,7 +42,7 @@ export default defineConfig({
         rewrite: (path) => path.replace(/^\/network-lists\/graphql/, '')
       },
       '/events/graphql': {
-        target: 'https://stage-manager.azion.com',
+        target: 'https://stage-api.azionapi.net',
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/events\/graphql/, '')
       },

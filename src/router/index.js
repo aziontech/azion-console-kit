@@ -43,7 +43,7 @@ const router = createRouter({
     usersListsRoutes,
     underDevelopmentRoutes,
     playgroundRoutes,
-    activityHistoryRoutes,
+    activityHistoryRoutes
   ]
 })
 
