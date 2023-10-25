@@ -5,9 +5,9 @@ const api = (personalToken) => {
   const baseURL = '/events'
 
   axios.defaults.headers.common['Accept'] = 'application/json'
-//   axios.defaults.headers.common['Accept-Encoding']= 'gzip'
-//   axios.defaults.headers.common['Content-Type'] = 'application/json; version=3'
-  console.log(personalToken);
+  //   axios.defaults.headers.common['Accept-Encoding']= 'gzip'
+  //   axios.defaults.headers.common['Content-Type'] = 'application/json; version=3'
+  console.log(personalToken)
 
   if (personalToken) {
     axios.defaults.headers.common['Authorization'] = `token ${personalToken}`
