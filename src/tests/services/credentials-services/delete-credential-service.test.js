@@ -73,7 +73,6 @@ describe('DeleteCredentialsServices', () => {
       const { sut } = makeSut()
 
       const response = sut(stubId)
-      console.log(response)
 
       expect(response).rejects.toBe(expectedError)
     }

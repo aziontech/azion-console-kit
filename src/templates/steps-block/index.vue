@@ -61,8 +61,6 @@
       const currentRoutePath = ref('')
 
       const isActive = (item) => {
-        console.log(currentRoutePath.value)
-        console.log(item.route)
         return item.route ? item.route === currentRoutePath.value : false
       }
 
