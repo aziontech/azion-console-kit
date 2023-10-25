@@ -52,7 +52,6 @@
         <!-- System Status -->
         <SystemStatusBarBlock v-tooltip.top="'System status'" />
         <Dropdown
-          class="w-"
           :modelValue="selectedTheme"
           @update:modelValue="selectTheme"
           optionValue="value"
