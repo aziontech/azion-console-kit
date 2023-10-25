@@ -3,23 +3,17 @@
   .p-toast-message {
     .p-toast-message-content {
       .p-toast-message-text {
-        
       }
 
       .p-toast-message-icon {
-
-
         &.p-icon {
-
         }
       }
 
       .p-toast-summary {
-
       }
 
       .p-toast-detail {
-
       }
     }
 
@@ -27,16 +21,14 @@
       border: 1px solid var(--surface-border) !important;
 
       &:hover {
-        
       }
 
       &:focus {
-
       }
     }
 
     &.p-toast-message-info {
-      background: var(--surface-section)!important;
+      background: var(--surface-section) !important;
 
       .p-toast-message-icon {
       }
@@ -45,34 +37,28 @@
     }
 
     &.p-toast-message-success {
-      background: var(--surface-section)!important;
+      background: var(--surface-section) !important;
 
       .p-toast-message-icon {
-
       }
       .p-toast-icon-close {
-
       }
     }
 
     &.p-toast-message-warn {
-      background: var(--surface-section)!important;
+      background: var(--surface-section) !important;
 
       .p-toast-message-icon {
-
       }
       .p-toast-icon-close {
-
       }
     }
 
     &.p-toast-message-error {
-      background: var(--surface-section)!important;
+      background: var(--surface-section) !important;
       .p-toast-message-icon {
-
       }
       .p-toast-icon-close {
-
       }
     }
   }
