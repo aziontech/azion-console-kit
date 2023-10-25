@@ -19,6 +19,7 @@ import { credentialsRoutes } from './routes/credentials-routes'
 import beforeEachRoute from './hooks/beforeEachRoute'
 import { usersListsRoutes } from '@routes/users-routes'
 import { playgroundRoutes } from './routes/playground-routes'
+import { activityHistoryRoutes } from './routes/activity-history-routes'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -41,7 +42,8 @@ const router = createRouter({
     credentialsRoutes,
     usersListsRoutes,
     underDevelopmentRoutes,
-    playgroundRoutes
+    playgroundRoutes,
+    activityHistoryRoutes,
   ]
 })
 

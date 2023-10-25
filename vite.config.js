@@ -41,6 +41,11 @@ export default defineConfig({
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/network-lists\/graphql/, '')
       },
+      '/events/graphql': {
+        target: 'https://stage-manager.azion.com',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/events\/graphql/, '')
+      },
       '/api/edge_node': {
         target: 'https://stage-manager.azion.com/edgenode/api/v1/edge-nodes',
         changeOrigin: true,
