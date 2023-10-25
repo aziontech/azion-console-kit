@@ -60,7 +60,7 @@
                 :popup="true"
               />
               <PrimeButton
-                v-tooltip="'Actions'"
+                v-tooltip.top="'Actions'"
                 size="small"
                 icon="pi pi-ellipsis-h"
                 text
