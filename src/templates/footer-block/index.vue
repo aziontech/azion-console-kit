@@ -50,8 +50,7 @@
 
       <div class="flex gap-4">
         <!-- System Status -->
-        <SystemStatusBarBlock 
-        v-tooltip.top="'System status'"/>
+        <SystemStatusBarBlock v-tooltip.top="'System status'" />
         <Dropdown
           class="w-"
           :modelValue="selectedTheme"
