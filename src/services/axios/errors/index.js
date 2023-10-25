@@ -18,6 +18,6 @@ export {
   UnexpectedError,
   UserIsNotClientError,
   UserNotFoundError,
-  ProccessRequestError
+  ProccessRequestError,
   InvalidDataStructureError
 }
