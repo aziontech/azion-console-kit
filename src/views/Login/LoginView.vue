@@ -1,12 +1,10 @@
 <template>
-  <div>
-    <SignInBlock
-      :authenticationLoginService="authenticationLoginService"
-      :verifyLoginService="verifyLoginService"
-      :refreshLoginService="refreshLoginService"
-      :switchAccountLoginService="switchAccountLoginService"
-    ></SignInBlock>
-  </div>
+  <SignInBlock
+    :authenticationLoginService="authenticationLoginService"
+    :verifyLoginService="verifyLoginService"
+    :refreshLoginService="refreshLoginService"
+    :switchAccountLoginService="switchAccountLoginService"
+  ></SignInBlock>
 </template>
 <script>
   import SignInBlock from '@/templates/sign-in-block'

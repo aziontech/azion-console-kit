@@ -5,9 +5,7 @@
       class="flex flex-col align-top items-center p-4 animate-fadeIn"
       v-if="!showPassword"
     >
-      <div
-        class="surface-card border max-w-md w-full p-6 md:p-10 rounded-md flex-col gap-6 flex"
-      >
+      <div class="surface-card border max-w-md w-full p-6 md:p-10 rounded-md flex-col gap-6 flex">
         <div class="text-xl md:text-2xl font-medium">Real Time Manager</div>
         <div class="flex flex-col gap-2">
           <label
@@ -83,7 +81,7 @@
             icon="pi pi-chevron-left"
             @click="showPassword = false"
           ></PrimeButton>
-          <p class="text-sm">peterson@azion.com</p>
+          <p class="text-sm">{{ email.value }}</p>
         </div>
 
         <div class="flex flex-col gap-2">
@@ -153,6 +151,11 @@
   import { useForm } from 'vee-validate'
   import { ref } from 'vue'
   import { useRouter } from 'vue-router'
+  import {
+    UserIsNotClientError,
+    UserNotFoundError,
+    ProccessRequestError
+  } from '@/services/axios/errors'
 
   const router = useRouter()
 
@@ -216,8 +219,8 @@
       await props.authenticationLoginService(loginData)
       const { user_tracking_info: userInfo } = await verify()
       await switchClientAccount(userInfo)
-    } catch (err) {
-      hasErrorMessage.value = `E-mail and password don't match with any account.`
+    } catch {
+      hasErrorMessage.value = new UserNotFoundError().message
     } finally {
       isButtonLoading.value = false
     }
@@ -240,8 +243,8 @@
       router.push('/')
     } catch {
       hasErrorMessage.value = clientId
-        ? 'Error while processing request.'
-        : 'User must be of type client.'
+        ? new ProccessRequestError().message
+        : new UserIsNotClientError().message
     }
   }
 
