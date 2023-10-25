@@ -5,7 +5,9 @@
       class="flex flex-col align-top items-center p-4 animate-fadeIn"
       v-if="!showPassword"
     >
-      <div class="surface-card border max-w-md w-full p-6 md:p-10 rounded-md flex-col gap-6 flex">
+      <div
+        class="surface-card surface-border border max-w-md w-full p-6 md:p-10 rounded-md flex-col gap-6 flex"
+      >
         <div class="text-xl md:text-2xl font-medium">Real Time Manager</div>
         <div class="flex flex-col gap-2">
           <label
@@ -71,7 +73,7 @@
       class="flex flex-col align-top items-center p-4 animate-fadeIn"
     >
       <div
-        class="surface-card border max-w-md w-full p-6 md:p-10 rounded-md flex-col gap-6 inline-flex"
+        class="surface-card surface-border border max-w-md w-full p-6 md:p-10 rounded-md flex-col gap-6 inline-flex"
       >
         <div class="text-xl md:text-2xl font-medium">Real Time Manager</div>
         <div class="flex items-center gap-2">
@@ -90,21 +92,24 @@
             class="font-semibold text-sm"
             >Password</label
           >
-          <InputText
-            v-bind="password"
-            id="password"
-            placeholder="Type your password"
-            type="password"
-            class="w-full"
-            :class="{ 'p-invalid': errors.password }"
-            v-tooltip.top="errors.password"
-          />
+          <div>
+            <Password
+              toggleMask
+              v-model="password"
+              id="password"
+              class="w-full"
+              placeholder="Type your password"
+              :class="{ 'p-invalid': errorPassword }"
+              :feedback="false"
+              v-tooltip.top="errorPassword"
+            />
+          </div>
         </div>
 
         <InlineMessage
-          v-if="hasErrorMessage"
+          v-if="hasRequestErrorMessage"
           severity="error"
-          >{{ hasErrorMessage }}</InlineMessage
+          >{{ hasRequestErrorMessage }}</InlineMessage
         >
 
         <div>
@@ -120,7 +125,7 @@
           label="Sign in"
           severity="secondary"
           type="submit"
-          :disabled="errors.password || !password.value"
+          :disabled="errorPassword || !password"
         />
       </div>
 
@@ -146,10 +151,12 @@
   import PrimeButton from 'primevue/button'
   import Divider from 'primevue/divider'
   import InlineMessage from 'primevue/inlinemessage'
+  import Password from 'primevue/password'
+
   import * as yup from 'yup'
 
-  import { useForm } from 'vee-validate'
-  import { ref } from 'vue'
+  import { useForm, useField } from 'vee-validate'
+  import { ref, watch } from 'vue'
   import { useRouter } from 'vue-router'
   import {
     UserIsNotClientError,
@@ -160,7 +167,8 @@
   const router = useRouter()
 
   const showPassword = ref(false)
-  const hasErrorMessage = ref(null)
+  const hasRequestErrorMessage = ref(null)
+  const errorPassword = ref('')
 
   const isProccedButtonLoading = ref(false)
   const isButtonLoading = ref(false)
@@ -186,26 +194,40 @@
 
   const emailValidateRegex = /^\S+@\S+\.\S+$/
 
-  const validationSchema = yup.object({
+  const emailValidationSchema = yup.object({
     email: yup
       .string()
       .required('E-mail is a required field')
-      .matches(emailValidateRegex, 'Invalid email address'),
+      .matches(emailValidateRegex, 'Invalid email address')
+  })
+  const passwordValidationSchema = yup.object({
     password: yup
       .string()
       .required('Password is a required field')
       .min(8, 'Password is too short - should be 8 chars minimum.')
   })
+
   const { defineInputBinds, errors } = useForm({
-    validationSchema,
+    validationSchema: emailValidationSchema,
     initialValues: {
-      email: '',
-      password: ''
+      email: ''
     }
   })
 
   const email = defineInputBinds('email', { validateOnInput: true })
-  const password = defineInputBinds('password', { validateOnInput: true })
+  const { value: password } = useField('password')
+
+  const validatePassword = async (newPassword) => {
+    try {
+      await passwordValidationSchema.validate({
+        password: newPassword
+      })
+      errorPassword.value = ''
+    } catch (error) {
+      errorPassword.value = error.errors[0]
+    }
+  }
+  watch(password, validatePassword)
 
   const validateAndSubmit = async () => {
     try {
@@ -213,14 +235,14 @@
 
       const loginData = {
         email: email.value.value,
-        password: password.value.value,
+        password: password.value,
         captcha: 'default'
       }
       await props.authenticationLoginService(loginData)
       const { user_tracking_info: userInfo } = await verify()
       await switchClientAccount(userInfo)
     } catch {
-      hasErrorMessage.value = new UserNotFoundError().message
+      hasRequestErrorMessage.value = new UserNotFoundError().message
     } finally {
       isButtonLoading.value = false
     }
@@ -242,7 +264,7 @@
       await props.switchAccountLoginService(accountId)
       router.push('/')
     } catch {
-      hasErrorMessage.value = clientId
+      hasRequestErrorMessage.value = clientId
         ? new ProccessRequestError().message
         : new UserIsNotClientError().message
     }
@@ -263,6 +285,7 @@
     errors,
     props,
     isButtonLoading,
-    hasErrorMessage
+    hasRequestErrorMessage,
+    errorPassword
   })
 </script>
