@@ -17,6 +17,7 @@
           icon="pi pi-bars"
           style="height: 32px; width: 32px"
           v-if="!showSidebar"
+          v-tooltip.bottom="'Main menu'"
         />
 
         <PrimeButton
@@ -39,7 +40,7 @@
         />
         <!-- Azion client -->
         <PrimeButton
-          v-tooltip.bottom="'Switch Account'"
+          v-tooltip.bottom="'Switch account'"
           class="font-semibold ml-2 h-8 w-auto surface-border hidden md:flex gap-2 items-center"
           size="small"
           outlined
@@ -76,6 +77,7 @@
           @click="openSearch"
           style="height: 32px; width: 32px"
           outlined
+          v-tooltip.bottom="'Search'"
         />
 
         <!-- Create Button Desktop -->
@@ -96,6 +98,7 @@
           size="small"
           outlined
           style="height: 32px; width: 32px"
+          v-tooltip.bottom="'Create'"
         />
 
         <!-- Help Button Desktop  -->
@@ -116,6 +119,7 @@
           class="md:hidden"
           style="height: 32px; width: 32px"
           @click="showHelperCenterMobile"
+          v-tooltip.bottom="'Help'"
         />
 
         <!-- Notification Button  -->
@@ -142,12 +146,14 @@
           @click="toggleProfile"
           label="U"
           class="cursor-pointer md:hidden"
+          v-tooltip.bottom="'Account settings'"
         />
         <!-- Profile Desktop -->
         <Avatar
           @click="toggleProfile"
           label="U"
           class="hidden md:flex cursor-pointer"
+          v-tooltip.bottom="'Account settings'"
         />
       </div>
     </div>
@@ -374,269 +380,269 @@
 </template>
 
 <script>
-  // Imports
-  import Avatar from 'primevue/avatar'
-  import PrimeMenu from 'primevue/menu'
-  import PrimeButton from 'primevue/button'
-  import Sidebar from 'primevue/sidebar'
-  import Divider from 'primevue/divider'
-  import Logo from '@assets/svg/logo'
-  import Mobilelogo from '@assets/svg/mobile-logo'
-  import PrimeDialog from 'primevue/dialog'
-  import InputText from 'primevue/inputtext'
-  import Tag from 'primevue/tag'
-  import Dropdown from 'primevue/dropdown'
-  import { useAccountStore } from '@/stores/account'
-  import { mapActions, mapState } from 'pinia'
+// Imports
+import Avatar from 'primevue/avatar'
+import PrimeMenu from 'primevue/menu'
+import PrimeButton from 'primevue/button'
+import Sidebar from 'primevue/sidebar'
+import Divider from 'primevue/divider'
+import Logo from '@assets/svg/logo'
+import Mobilelogo from '@assets/svg/mobile-logo'
+import PrimeDialog from 'primevue/dialog'
+import InputText from 'primevue/inputtext'
+import Tag from 'primevue/tag'
+import Dropdown from 'primevue/dropdown'
+import { useAccountStore } from '@/stores/account'
+import { mapActions, mapState } from 'pinia'
 
-  export default {
-    name: 'HeaderTemplate',
-    components: {
-      Avatar,
-      PrimeMenu,
-      Sidebar,
-      Logo,
-      PrimeButton,
-      Divider,
-      PrimeDialog,
-      InputText,
-      Dropdown,
-      Tag,
-      Mobilelogo
+export default {
+  name: 'HeaderTemplate',
+  components: {
+    Avatar,
+    PrimeMenu,
+    Sidebar,
+    Logo,
+    PrimeButton,
+    Divider,
+    PrimeDialog,
+    InputText,
+    Dropdown,
+    Tag,
+    Mobilelogo
+  },
+  props: {
+    helperVisible: {
+      type: Boolean,
+      default: false
     },
-    props: {
-      helperVisible: {
-        type: Boolean,
-        default: false
-      },
-      isLogged: Boolean
+    isLogged: Boolean
+  },
+  emits: ['showSlideHelper', 'showSlideCenter'],
+  data() {
+    return {
+      showHelp: false,
+      showCreate: false,
+      showSearch: false,
+      showSidebar: false,
+      showProfile: false,
+      searchText: null,
+      items: [],
+      commandOptions: [
+        {
+          label: 'Recents',
+          items: [
+            { label: 'Import project', icon: 'pi pi-file-import' },
+            { label: 'New project from template', icon: 'pi pi-plus-circle' },
+            { label: 'New domains', icon: 'pi pi-plus-circle' },
+            { label: 'Marketplace', icon: 'pi pi-shopping-cart' },
+            { label: 'Toggle Dark Mode', icon: 'pi pi-moon' }
+          ]
+        },
+        {
+          label: 'Build',
+          items: [
+            { label: 'New Edge Application', icon: 'pi pi-plus-circle' },
+            { label: 'New Edge Function', icon: 'pi pi-plus-circle' }
+          ]
+        },
+        {
+          label: 'Secure',
+          items: [{ label: 'New Edge Firewall', icon: 'pi pi-plus-circle' }]
+        },
+        {
+          label: 'Settings',
+          items: [
+            { label: 'Account Settings', icon: 'pi pi-cog' },
+            { label: 'Your Settings', icon: 'pi pi-user' },
+            { label: 'Users Management', icon: 'pi pi-users' },
+            { label: 'Team Permissions', icon: 'pi pi-user-edit' },
+            { label: 'Billing & Subscriptions', icon: 'pi pi-credit-card' },
+            { label: 'Credentials', icon: 'pi pi-id-card' },
+            { label: 'Activity History', icon: 'pi pi-history' },
+            { label: 'Personal Tokens', icon: 'pi pi-key' }
+          ]
+        }
+      ],
+      menuStructure: [
+        {
+          label: 'Home',
+          icon: 'pi pi-home',
+          to: '/'
+        },
+        {
+          label: 'Domains',
+          icon: 'pi pi-globe',
+          to: '/domains'
+        },
+        {
+          label: 'Build',
+          icon: 'pi pi-code',
+          items: [
+            {
+              label: 'Edge Application',
+              icon: 'pi pi-box',
+              to: '/edge-applications'
+            },
+            {
+              label: 'Variables',
+              to: '/variables',
+              icon: 'pi pi-sliders-h'
+            }
+          ]
+        },
+        {
+          label: 'Secure',
+          icon: 'pi pi-lock',
+          items: [
+            {
+              label: 'Intelligent DNS',
+              to: '/intelligent-dns',
+              tag: 'New',
+              icon: 'pi pi-share-alt'
+            },
+            {
+              label: 'Edge Firewall',
+              to: '/edge-firewall',
+              icon: 'pi pi-lock'
+            }
+          ]
+        },
+        {
+          label: 'Deploy',
+          items: [
+            {
+              label: 'Edge Nodes',
+              icon: 'pi pi-database',
+              to: '/edge-node'
+            }
+          ]
+        },
+        {
+          label: 'Observe',
+          items: [
+            {
+              label: 'Data Streaming',
+              to: '/data-streaming',
+              icon: 'pi pi-play'
+            },
+            {
+              label: 'Edge Pulse',
+              to: '/edge-pulse',
+              icon: 'pi pi-chart-line'
+            },
+            {
+              label: 'Real Time Metrics',
+              to: '/real-time-metrics',
+              icon: 'pi pi-chart-line',
+              tag: 'Beta'
+            }
+          ]
+        },
+        {
+          label: 'Edge Libraries ',
+          items: [
+            {
+              label: 'Edge Functions',
+              to: '/edge-functions',
+              icon: 'pi pi-code'
+            },
+            {
+              label: 'Edge Services',
+              to: '/edge-services',
+              icon: 'pi pi-bookmark'
+            },
+            {
+              label: 'Digital Certificates',
+              to: '/digital-certificates',
+              icon: 'pi pi-verified'
+            },
+            {
+              label: 'Network Lists',
+              to: '/network-lists',
+              icon: 'pi pi-globe'
+            }
+          ]
+        }
+      ],
+      profileMenuItems: [
+        {
+          label: 'Switch Account',
+          to: '/switch-account'
+        },
+        {
+          label: 'Account Settings',
+          to: '/account-settings'
+        },
+        {
+          label: 'Users Management',
+          to: '/users'
+        },
+        {
+          label: 'Billing & Subscriptions',
+          to: '/billing-subscriptions'
+        },
+        {
+          label: 'Credentials',
+          to: '/credentials'
+        },
+        {
+          label: 'Activity History',
+          to: '/activity-history'
+        },
+        {
+          label: 'Teams Permissions',
+          to: '/teams'
+        },
+        { separator: true }
+      ],
+      themeOptions: [
+        { name: 'Light', value: 'light', icon: 'pi pi-sun' },
+        { name: 'Dark', value: 'dark', icon: 'pi pi-moon' },
+        { name: 'System', value: 'system', icon: 'pi pi-desktop' }
+      ]
+    }
+  },
+  computed: {
+    ...mapState(useAccountStore, { user: 'accountData', currentTheme: 'currentTheme' }),
+    selectedTheme() {
+      return this.themeOptions.find((option) => option.value === this.currentTheme)
+    }
+  },
+  methods: {
+    ...mapActions(useAccountStore, ['setTheme']),
+    toggleProfile(event) {
+      this.$refs.profile.toggle(event)
     },
-    emits: ['showSlideHelper', 'showSlideCenter'],
-    data() {
-      return {
-        showHelp: false,
-        showCreate: false,
-        showSearch: false,
-        showSidebar: false,
-        showProfile: false,
-        searchText: null,
-        items: [],
-        commandOptions: [
-          {
-            label: 'Recents',
-            items: [
-              { label: 'Import project', icon: 'pi pi-file-import' },
-              { label: 'New project from template', icon: 'pi pi-plus-circle' },
-              { label: 'New domains', icon: 'pi pi-plus-circle' },
-              { label: 'Marketplace', icon: 'pi pi-shopping-cart' },
-              { label: 'Toggle Dark Mode', icon: 'pi pi-moon' }
-            ]
-          },
-          {
-            label: 'Build',
-            items: [
-              { label: 'New Edge Application', icon: 'pi pi-plus-circle' },
-              { label: 'New Edge Function', icon: 'pi pi-plus-circle' }
-            ]
-          },
-          {
-            label: 'Secure',
-            items: [{ label: 'New Edge Firewall', icon: 'pi pi-plus-circle' }]
-          },
-          {
-            label: 'Settings',
-            items: [
-              { label: 'Account Settings', icon: 'pi pi-cog' },
-              { label: 'Your Settings', icon: 'pi pi-user' },
-              { label: 'Users Management', icon: 'pi pi-users' },
-              { label: 'Team Permissions', icon: 'pi pi-user-edit' },
-              { label: 'Billing & Subscriptions', icon: 'pi pi-credit-card' },
-              { label: 'Credentials', icon: 'pi pi-id-card' },
-              { label: 'Activity History', icon: 'pi pi-history' },
-              { label: 'Personal Tokens', icon: 'pi pi-key' }
-            ]
-          }
-        ],
-        menuStructure: [
-          {
-            label: 'Home',
-            icon: 'pi pi-home',
-            to: '/'
-          },
-          {
-            label: 'Domains',
-            icon: 'pi pi-globe',
-            to: '/domains'
-          },
-          {
-            label: 'Build',
-            icon: 'pi pi-code',
-            items: [
-              {
-                label: 'Edge Application',
-                icon: 'pi pi-box',
-                to: '/edge-applications'
-              },
-              {
-                label: 'Variables',
-                to: '/variables',
-                icon: 'pi pi-sliders-h'
-              }
-            ]
-          },
-          {
-            label: 'Secure',
-            icon: 'pi pi-lock',
-            items: [
-              {
-                label: 'Intelligent DNS',
-                to: '/intelligent-dns',
-                tag: 'New',
-                icon: 'pi pi-share-alt'
-              },
-              {
-                label: 'Edge Firewall',
-                to: '/edge-firewall',
-                icon: 'pi pi-lock'
-              }
-            ]
-          },
-          {
-            label: 'Deploy',
-            items: [
-              {
-                label: 'Edge Nodes',
-                icon: 'pi pi-database',
-                to: '/edge-node'
-              }
-            ]
-          },
-          {
-            label: 'Observe',
-            items: [
-              {
-                label: 'Data Streaming',
-                to: '/data-streaming',
-                icon: 'pi pi-play'
-              },
-              {
-                label: 'Edge Pulse',
-                to: '/edge-pulse',
-                icon: 'pi pi-chart-line'
-              },
-              {
-                label: 'Real Time Metrics',
-                to: '/real-time-metrics',
-                icon: 'pi pi-chart-line',
-                tag: 'Beta'
-              }
-            ]
-          },
-          {
-            label: 'Edge Libraries ',
-            items: [
-              {
-                label: 'Edge Functions',
-                to: '/edge-functions',
-                icon: 'pi pi-code'
-              },
-              {
-                label: 'Edge Services',
-                to: '/edge-services',
-                icon: 'pi pi-bookmark'
-              },
-              {
-                label: 'Digital Certificates',
-                to: '/digital-certificates',
-                icon: 'pi pi-verified'
-              },
-              {
-                label: 'Network Lists',
-                to: '/network-lists',
-                icon: 'pi pi-globe'
-              }
-            ]
-          }
-        ],
-        profileMenuItems: [
-          {
-            label: 'Switch Account',
-            to: '/switch-account'
-          },
-          {
-            label: 'Account Settings',
-            to: '/account-settings'
-          },
-          {
-            label: 'Users Management',
-            to: '/users'
-          },
-          {
-            label: 'Billing & Subscriptions',
-            to: '/billing-subscriptions'
-          },
-          {
-            label: 'Credentials',
-            to: '/credentials'
-          },
-          {
-            label: 'Activity History',
-            to: '/activity-history'
-          },
-          {
-            label: 'Teams Permissions',
-            to: '/teams'
-          },
-          { separator: true }
-        ],
-        themeOptions: [
-          { name: 'Light', value: 'light', icon: 'pi pi-sun' },
-          { name: 'Dark', value: 'dark', icon: 'pi pi-moon' },
-          { name: 'System', value: 'system', icon: 'pi pi-desktop' }
-        ]
-      }
+    redirect(route) {
+      this.$router.push(route)
     },
-    computed: {
-      ...mapState(useAccountStore, { user: 'accountData', currentTheme: 'currentTheme' }),
-      selectedTheme() {
-        return this.themeOptions.find((option) => option.value === this.currentTheme)
-      }
+    toggleNotification(event) {
+      this.$refs.menu.toggle(event)
     },
-    methods: {
-      ...mapActions(useAccountStore, ['setTheme']),
-      toggleProfile(event) {
-        this.$refs.profile.toggle(event)
-      },
-      redirect(route) {
-        this.$router.push(route)
-      },
-      toggleNotification(event) {
-        this.$refs.menu.toggle(event)
-      },
-      showCreateModal() {
-        this.showCreate = true
-      },
-      openSideBar() {
-        this.showSidebar = !this.showSidebar
-      },
-      openSearch() {
-        this.showSearch = true
-      },
-      closeSearch() {
-        this.showSearch = false
-      },
-      showHelperCenter() {
-        this.$emit('showSlideHelper', !this.helperVisible)
-      },
-      showHelperCenterMobile() {
-        this.showHelp = true
-      },
-      logout() {
-        window.location.href = '/logout'
-      },
-      selectTheme(theme) {
-        this.setTheme(theme)
-      }
+    showCreateModal() {
+      this.showCreate = true
+    },
+    openSideBar() {
+      this.showSidebar = !this.showSidebar
+    },
+    openSearch() {
+      this.showSearch = true
+    },
+    closeSearch() {
+      this.showSearch = false
+    },
+    showHelperCenter() {
+      this.$emit('showSlideHelper', !this.helperVisible)
+    },
+    showHelperCenterMobile() {
+      this.showHelp = true
+    },
+    logout() {
+      window.location.href = '/logout'
+    },
+    selectTheme(theme) {
+      this.setTheme(theme)
     }
   }
+}
 </script>
