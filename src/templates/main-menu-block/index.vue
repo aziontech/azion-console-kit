@@ -17,7 +17,7 @@
           text
           icon="pi pi-bars"
           style="height: 32px; width: 32px"
-          v-tooltip.bottom="'Main menu'"
+          v-tooltip.bottom="{ value: 'Menu', showDelay: 200 }"
         />
 
         <Logo
@@ -30,7 +30,7 @@
         />
         <!-- Azion client -->
         <PrimeButton
-          v-tooltip.bottom="'Switch account'"
+          v-tooltip.bottom="{ value: 'Switch account', showDelay: 200 }"
           class="font-semibold ml-2 h-8 w-auto surface-border hidden md:flex gap-2 items-center"
           size="small"
           outlined
@@ -67,7 +67,7 @@
           @click="openSearch"
           style="height: 32px; width: 32px"
           outlined
-          v-tooltip.bottom="'Search'"
+          v-tooltip.bottom="{ value: 'Search', showDelay: 200 }"
         />
 
         <!-- Create Button Desktop -->
@@ -88,7 +88,7 @@
           size="small"
           outlined
           style="height: 32px; width: 32px"
-          v-tooltip.bottom="'Create'"
+          v-tooltip.bottom="{ value: 'Create', showDelay: 200 }"
         />
 
         <!-- Help Button Desktop  -->
@@ -109,7 +109,7 @@
           class="md:hidden"
           style="height: 32px; width: 32px"
           @click="showHelperCenterMobile"
-          v-tooltip.bottom="'Help'"
+          v-tooltip.bottom="{ value: 'Help', showDelay: 200 }"
         />
 
         <!-- Notification Button  -->
@@ -118,7 +118,7 @@
           style="border-color: var(--surface-border); padding-left: 7px; height: 32px; width: 32px"
           class="overflow-auto"
           badge="9"
-          v-tooltip.bottom="'Notifications'"
+          v-tooltip.bottom="{ value: 'Notifications', showDelay: 200 }"
           size="small"
           badgeClass="p-badge-danger"
           @click="toggleNotification"
@@ -136,14 +136,14 @@
           @click="toggleProfile"
           label="U"
           class="cursor-pointer md:hidden"
-          v-tooltip.bottom="'Account'"
+          v-tooltip.bottom="{ value: 'Account settings', showDelay: 200 }"
         />
         <!-- Profile Desktop -->
         <Avatar
           @click="toggleProfile"
           label="U"
           class="hidden md:flex cursor-pointer"
-          v-tooltip.bottom="'Account'"
+          v-tooltip.bottom="{ value: 'Account settings', showDelay: 200 }"
         />
       </div>
     </div>
