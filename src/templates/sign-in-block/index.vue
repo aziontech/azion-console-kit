@@ -22,7 +22,7 @@
             type="email"
             class="w-full"
             :class="{ 'p-invalid': errors.email }"
-            v-tooltip.top="errors.email"
+            v-tooltip.top="{value: errors.email, showDelay: 200}"
           />
         </div>
 
