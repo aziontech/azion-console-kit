@@ -1,4 +1,4 @@
-import { clipboardWrite } from '@/helpers/clipboard'
+import * as Helpers from '@/helpers'
 import * as VariablesService from '@/services/variables-services'
 
 /** @type {import('vue-router').RouteRecordRaw} */
@@ -13,7 +13,8 @@ export const variablesRoutes = {
       props: {
         listVariablesService: VariablesService.listVariablesService,
         deleteVariablesService: VariablesService.deleteVariablesService,
-        clipboardWrite
+        documentationService: Helpers.documentationCatalog.variables,
+        clipboardWrite: Helpers.clipboardWrite
       },
       meta: {
         breadCrumbs: [

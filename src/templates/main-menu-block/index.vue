@@ -2,7 +2,8 @@
 <template>
   <!-- Header Container -->
   <header
-    class="p-3 border-b bg-header surface-border items-center flex justify-between md:px-8 md:py-3 w-full fixed top-0 z-10 h-[56px]"
+    class="p-3 bg-header border-b surface-border items-center flex justify-between md:px-8 md:py-3 w-full fixed top-0 z-10 h-[56px]"
+    @keyup.esc="closeSideBar"
   >
     <div
       class="flex w-full justify-between"
@@ -15,6 +16,7 @@
           class="flex-none border-header text-white"
           icon="pi pi-bars"
           style="height: 32px; width: 32px"
+          v-tooltip.bottom="'Main menu'"
           :class="{
             'bg-header-button-enabled': showSidebar,
             'bg-header hover:bg-header-button-hover': !showSidebar
@@ -31,7 +33,7 @@
         />
         <!-- Azion client -->
         <PrimeButton
-          v-tooltip.bottom="'Switch Account'"
+          v-tooltip.bottom="'Switch account'"
           class="font-semibold ml-2 h-8 w-auto border-header hover:bg-header-button-hover hidden md:flex gap-2 items-center text-white"
           size="small"
           outlined
@@ -52,7 +54,7 @@
           />
         </i>
         <InputText
-          class="w-64 bg-header-input border-header"
+          class="w-64 bg-header-input border-header hover:border-header-hover"
           placeholder="Search..."
           :value="searchText"
           @click="openSearch"
@@ -65,9 +67,11 @@
         <PrimeButton
           icon="pi pi-search"
           class="px-2 py-1 flex lg:hidden text-white border-header"
+          class="px-2 py-1 flex lg:hidden text-white border-header"
           @click="openSearch"
           style="height: 32px; width: 32px"
           outlined
+          v-tooltip.bottom="'Search'"
         />
 
         <!-- Create Button Desktop -->
@@ -89,9 +93,15 @@
           @click="showCreateModal"
           icon="pi pi-plus"
           class="h-8 md:hidden text-white border-header"
+          class="h-8 md:hidden text-white border-header"
           size="small"
           outlined
           style="height: 32px; width: 32px"
+          :class="{
+            'bg-header hover:bg-header-button-hover': !showCreate,
+            'bg-header-button-enabled': showCreate
+          }"
+          v-tooltip.bottom="'Create'"
           :class="{
             'bg-header hover:bg-header-button-hover': !showCreate,
             'bg-header-button-enabled': showCreate
@@ -110,6 +120,11 @@
             'bg-header hover:bg-header-button-hover': !helperVisible,
             'bg-header-button-enabled': helperVisible
           }"
+          class="hidden md:flex text-white border-header"
+          :class="{
+            'bg-header hover:bg-header-button-hover': !helperVisible,
+            'bg-header-button-enabled': helperVisible
+          }"
         />
 
         <!-- Help Button Mobile -->
@@ -117,9 +132,14 @@
           icon="pi pi-question-circle"
           size="small"
           outlined
-          class="md:hidden text-white border-header"
+          class="md:hidden text-white border-header text-white border-header"
           style="height: 32px; width: 32px"
           @click="showHelperCenterMobile"
+          v-tooltip.bottom="'Help'"
+          :class="{
+            'bg-header hover:bg-header-button-hover': !helperVisible,
+            'bg-header-button-enabled': helperVisible
+          }"
           :class="{
             'bg-header hover:bg-header-button-hover': !helperVisible,
             'bg-header-button-enabled': helperVisible
@@ -129,6 +149,8 @@
         <!-- Notification Button  -->
         <PrimeButton
           icon="pi pi-bell"
+          style="padding-left: 7px; height: 32px; width: 32px"
+          class="overflow-auto text-white border-header hover:bg-header-button-hover"
           style="padding-left: 7px; height: 32px; width: 32px"
           class="overflow-auto text-white border-header hover:bg-header-button-hover"
           badge="9"
@@ -149,13 +171,15 @@
         <Avatar
           @click="toggleProfile"
           label="U"
-          class="cursor-pointer md:hidden text-avatar bg-header-avatar text-white"
+          v-tooltip.bottom="'Account'"
+          class="cursor-pointer md:hidden text-avatar bg-header-avatar text-white text-avatar bg-header-avatar text-white"
         />
         <!-- Profile Desktop -->
         <Avatar
           @click="toggleProfile"
           label="U"
-          class="hidden md:flex cursor-pointer bg-header-avatar text-white"
+          v-tooltip.bottom="'Account'"
+          class="hidden md:flex cursor-pointer bg-header-avatar text-white bg-header-avatar text-white"
         />
       </div>
     </div>
@@ -626,6 +650,9 @@
       },
       openSideBar() {
         this.showSidebar = !this.showSidebar
+      },
+      closeSideBar() {
+        this.showSidebar = false
       },
       openSearch() {
         this.showSearch = true

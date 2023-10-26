@@ -12,7 +12,8 @@ export default {
       'header-avatar': '#363636'
     },
     borderColor: {
-      header: '#3e3e3e'
+      header: '#3e3e3e',
+      'header-hover': '#f4f4f4'
     },
     textColor: {
       header: '#b5b5b5'
