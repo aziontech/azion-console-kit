@@ -67,7 +67,6 @@
         <PrimeButton
           icon="pi pi-search"
           class="px-2 py-1 flex lg:hidden text-white border-header"
-          class="px-2 py-1 flex lg:hidden text-white border-header"
           @click="openSearch"
           style="height: 32px; width: 32px"
           outlined
@@ -93,7 +92,6 @@
           @click="showCreateModal"
           icon="pi pi-plus"
           class="h-8 md:hidden text-white border-header"
-          class="h-8 md:hidden text-white border-header"
           size="small"
           outlined
           style="height: 32px; width: 32px"
@@ -102,10 +100,6 @@
             'bg-header-button-enabled': showCreate
           }"
           v-tooltip.bottom="'Create'"
-          :class="{
-            'bg-header hover:bg-header-button-hover': !showCreate,
-            'bg-header-button-enabled': showCreate
-          }"
         />
 
         <!-- Help Button Desktop  -->
@@ -115,11 +109,6 @@
           label="Help"
           @click="showHelperCenter"
           outlined
-          class="hidden md:flex text-white border-header"
-          :class="{
-            'bg-header hover:bg-header-button-hover': !helperVisible,
-            'bg-header-button-enabled': helperVisible
-          }"
           class="hidden md:flex text-white border-header"
           :class="{
             'bg-header hover:bg-header-button-hover': !helperVisible,
@@ -140,17 +129,11 @@
             'bg-header hover:bg-header-button-hover': !helperVisible,
             'bg-header-button-enabled': helperVisible
           }"
-          :class="{
-            'bg-header hover:bg-header-button-hover': !helperVisible,
-            'bg-header-button-enabled': helperVisible
-          }"
         />
 
         <!-- Notification Button  -->
         <PrimeButton
           icon="pi pi-bell"
-          style="padding-left: 7px; height: 32px; width: 32px"
-          class="overflow-auto text-white border-header hover:bg-header-button-hover"
           style="padding-left: 7px; height: 32px; width: 32px"
           class="overflow-auto text-white border-header hover:bg-header-button-hover"
           badge="9"
