@@ -34,7 +34,7 @@
         <!-- Azion client -->
         <PrimeButton
           v-tooltip.bottom="{ value: 'Switch account', showDelay: 200 }"
-          class="font-semibold ml-2 h-8 w-auto surface-border hidden md:flex gap-2 items-center"
+          class="font-semibold ml-2 h-8 w-auto border-header hidden md:flex gap-2 items-center text-white"
           size="small"
           outlined
         >
