@@ -15,7 +15,7 @@
           v-bind="name"
           type="text"
           :class="{ 'p-invalid': errors.name }"
-          v-tooltip.top="errors.name"
+          v-tooltip.top="{ value: errors.name, showDelay: 200 }"
         />
 
         <b>General Configuration</b>
@@ -50,7 +50,7 @@
             v-bind="hostHeader"
             type="text"
             :class="{ 'p-invalid': errors.hostHeader }"
-            v-tooltip.top="errors.hostHeader"
+            v-tooltip.top="{ value: errors.hostHeader, showDelay: 200 }"
           />
           <small>Type the host header for the CDN to pass to the origin server.</small>
         </div>
@@ -61,7 +61,7 @@
             v-bind="originPath"
             type="text"
             :class="{ 'p-invalid': errors.originPath }"
-            v-tooltip.top="errors.originPath"
+            v-tooltip.top="{ value: errors.originPath, showDelay: 200 }"
           />
           <small
             >Azion can request your content from a directory in your origin. Azion appends Origin
@@ -195,7 +195,7 @@
               v-bind="hmacRegionName"
               type="text"
               :class="{ 'p-invalid': errors.hmacRegionName }"
-              v-tooltip.top="errors.hmacRegionName"
+              v-tooltip.top="{ value: errors.hmacRegionName, showDelay: 200 }"
             />
 
             <label>Access Key *</label>
@@ -204,7 +204,7 @@
               v-bind="hmacAccessKey"
               type="text"
               :class="{ 'p-invalid': errors.hmacAccessKey }"
-              v-tooltip.top="errors.hmacAccessKey"
+              v-tooltip.top="{ value: errors.hmacAccessKey, showDelay: 200 }"
             />
 
             <label>Secret Key *</label>
@@ -213,7 +213,7 @@
               v-bind="hmacSecretKey"
               type="text"
               :class="{ 'p-invalid': errors.hmacSecretKey }"
-              v-tooltip.top="errors.hmacSecretKey"
+              v-tooltip.top="{ value: errors.hmacSecretKey, showDelay: 200 }"
             />
           </template>
         </template>

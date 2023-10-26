@@ -31,26 +31,26 @@
           icon="pi pi-github"
           text
           size="small"
-          v-tooltip.top="'Github'"
+          v-tooltip.top="{ value: 'Github', showDelay: 200 }"
         />
         <PrimeButton
           icon="pi pi-discord"
           text
           size="small"
-          v-tooltip.top="'Discord'"
+          v-tooltip.top="{ value: 'Discord', showDelay: 200 }"
         />
         <PrimeButton
           icon="pi pi-twitter"
           text
           size="small"
-          v-tooltip.top="'X'"
+          v-tooltip.top="{ value: 'X', showDelay: 200 }"
         />
         <!--Change Twitter icon to X-->
       </div>
 
       <div class="flex gap-4">
         <!-- System Status -->
-        <SystemStatusBarBlock v-tooltip.top="'System status'" />
+        <SystemStatusBarBlock v-tooltip.top="{ value: 'System status', showDelay: 200 }" />
         <Dropdown
           :modelValue="selectedTheme"
           @update:modelValue="selectTheme"
