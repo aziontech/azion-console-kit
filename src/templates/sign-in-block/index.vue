@@ -101,7 +101,7 @@
               placeholder="Type your password"
               :class="{ 'p-invalid': errorPassword }"
               :feedback="false"
-              v-tooltip.top="errorPassword"
+              v-tooltip.top="{value: errorPassword, showDelay: 200}"
             />
           </div>
         </div>
