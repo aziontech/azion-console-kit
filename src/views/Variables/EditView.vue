@@ -47,8 +47,10 @@
           <Card
             :pt="{
               body: { class: 'p-4' },
-              title: { class: 'flex justify-between items-cente text-base m-0' },
-              subtitle: { class: 'text-sm font-normal text-color-secondary m-0' }
+              title: { class: 'flex justify-between items-center text-base m-0 font-medium' },
+              subtitle: {
+                class: 'text-sm font-normal text-color-secondary m-0 pr-0 md:pr-[2.5rem]'
+              }
             }"
           >
             <template #title>
