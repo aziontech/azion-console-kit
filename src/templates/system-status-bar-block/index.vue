@@ -1,5 +1,5 @@
 <template>
-  <PrimeButton 
+  <PrimeButton
     outlined
     class="surface-section hover:surface-hover whitespace-nowrap"
     icon="pi pi-circle-fill"
@@ -45,7 +45,7 @@
   export default {
     name: 'SystemStatusBarBlock',
     components: {
-      PrimeButton,
+      PrimeButton
     },
     data() {
       return {
@@ -65,7 +65,7 @@
     },
     methods: {
       redirectToLink() {
-        window.open(this.link, '_blank');
+        window.open(this.link, '_blank')
       },
       async checkComponentStatus() {
         try {

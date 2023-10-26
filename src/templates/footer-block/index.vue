@@ -2,89 +2,92 @@
 <template>
   <!-- Footer -->
   <footer
-    class="z-10 flex px-3 py-6 flex-wrap flex-col justify-center items-center gap-3 lg:gap-4 surface-ground border-t surface-border lg:flex-row pr-3 lg:py-3 lg:px-8 lg:justify-between"
+    class="z-10 flex px-3 py-6 flex-wrap flex-col justify-center items-center gap-3 lg:gap-4 surface-ground border-t surface-border lg:flex-row pr-3 lg:py-3 lg:px-8 lg:justify-center"
   >
     <span class="text-sm text-normal text-color">© 2023 Azion Technologies.</span>
 
-    <div class="flex flex-col gap-3 lg:gap-4 items-center lg:flex lg:flex-row">
-      <div class="flex gap-1">
-        <PrimeButton
-          label="About"
-          link
-        />
-        <PrimeButton
-          label="Blog"
-          link
-        />
-        <PrimeButton
-          label="Legal"
-          link
-        />
-        <PrimeButton
-          label="Docs"
-          link
-        />
+    <div
+      class="flex flex-col gap-3 lg:gap-4 items-center lg:flex lg:flex-row flex-none md-auto md:flex-1"
+    >
+      <div class="w-full flex flex-col md:flex-row gap-3 justify-center items-center">
+        <div class="flex gap-1 lg:pl-[9%] pl-0">
+          <PrimeButton
+            label="About"
+            link
+          />
+          <PrimeButton
+            label="Blog"
+            link
+          />
+          <PrimeButton
+            label="Legal"
+            link
+          />
+          <PrimeButton
+            label="Docs"
+            link
+          />
+        </div>
+        <!-- Social Buttons -->
+        <div class="flex gap-2">
+          <PrimeButton
+            icon="pi pi-github"
+            text
+            size="small"
+            v-tooltip.top="{ value: 'Github', showDelay: 200 }"
+          />
+          <PrimeButton
+            icon="pi pi-discord"
+            text
+            size="small"
+            v-tooltip.top="{ value: 'Discord', showDelay: 200 }"
+          />
+          <PrimeButton
+            icon="pi pi-twitter"
+            text
+            size="small"
+            v-tooltip.top="{ value: 'Twitter', showDelay: 200 }"
+          />
+          <!--Change Twitter icon to X-->
+        </div>
       </div>
-      <!-- Social Buttons -->
-      <div class="flex gap-2">
-        <PrimeButton
-          icon="pi pi-github"
-          text
-          size="small"
-          v-tooltip.top="{ value: 'Github', showDelay: 200 }"
-        />
-        <PrimeButton
-          icon="pi pi-discord"
-          text
-          size="small"
-          v-tooltip.top="{ value: 'Discord', showDelay: 200 }"
-        />
-        <PrimeButton
-          icon="pi pi-twitter"
-          text
-          size="small"
-          v-tooltip.top="{ value: 'X', showDelay: 200 }"
-        />
-        <!--Change Twitter icon to X-->
-      </div>
-
-      <div class="flex gap-4">
+      <div class="flex gap-2 items-center">
         <!-- System Status -->
         <SystemStatusBarBlock v-tooltip.top="{ value: 'System status', showDelay: 200 }" />
-        <Dropdown
-          :modelValue="selectedTheme"
-          @update:modelValue="selectTheme"
-          optionValue="value"
-          optionLabel="name"
-          :loading="!selectedTheme?.value"
-          :options="themeOptions"
-          :autoOptionFocus="false"
-          :pt="{
-            root: {
-              class: ' w-auto py-0 h-[30px] items-center align-middle',
-              style: 'background: var(--surface-section) !important'
-            },
-            item: { class: 'w-full text-sm' },
-            input: { class: 'w-20 text-sm' }
-          }"
-        >
-          <template #value="slotProps">
-            <div
-              v-tooltip.top="'Theme'"
-              v-if="slotProps.value"
-              class="flex gap-2 align-items-center"
-            >
-              <i :class="slotProps.value.icon"></i>
-              <div>{{ slotProps.value.name }}</div>
-            </div>
-          </template>
-          <template #option="slotProps">
-            <div class="flex gap-2 align-items-center">
-              <i :class="slotProps.option.icon"></i>
-              <div>{{ slotProps.option.name }}</div>
-            </div>
-          </template>
-        </Dropdown>
+        <div v-tooltip.top="'Theme mode'">
+          <Dropdown
+            :modelValue="selectedTheme"
+            @update:modelValue="selectTheme"
+            optionValue="value"
+            optionLabel="name"
+            :loading="!selectedTheme?.value"
+            :options="themeOptions"
+            :autoOptionFocus="false"
+            :pt="{
+              root: {
+                style: 'background: var(--surface-section) !important'
+              },
+              item: { class: 'w-full text-sm' },
+              input: { class: 'w-auto text-sm' }
+            }"
+          >
+            <template #value="slotProps">
+              <div
+                v-if="slotProps.value"
+                class="flex gap-2 align-items-center"
+              >
+                <i :class="slotProps.value.icon"></i>
+                <div>{{ slotProps.value.name }}</div>
+              </div>
+            </template>
+            <template #option="slotProps">
+              <div class="flex gap-2 align-items-center">
+                <i :class="slotProps.option.icon"></i>
+                <div>{{ slotProps.option.name }}</div>
+              </div>
+            </template>
+          </Dropdown>
+        </div>
       </div>
     </div>
   </footer>
