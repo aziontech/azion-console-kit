@@ -2,7 +2,8 @@
 <template>
   <!-- Header Container -->
   <header
-    class="p-3 surface-section border-b surface-border items-center flex justify-between md:px-8 md:py-3 w-full fixed top-0 z-10 min-h-[56px]"
+    class="p-3 bg-header border-b surface-border items-center flex justify-between md:px-8 md:py-3 w-full fixed top-0 z-10 h-[56px]"
+    @keyup.esc="closeSideBar"
   >
     <div
       class="flex w-full justify-between"
@@ -12,21 +13,14 @@
         <PrimeButton
           @click="openSideBar"
           size="small"
-          class="flex-none surface-border"
-          text
+          class="flex-none border-header text-white"
           icon="pi pi-bars"
           style="height: 32px; width: 32px"
-          v-if="!showSidebar"
-        />
-
-        <PrimeButton
-          @click="openSideBar"
-          size="small"
-          class="flex-none surface-border"
-          text
-          icon="pi pi-times"
-          style="height: 32px; width: 32px"
-          v-if="showSidebar"
+          :class="{
+            'bg-header-button-enabled': showSidebar,
+            'bg-header hover:bg-header-button-hover': !showSidebar
+          }"
+          v-tooltip.bottom="{ value: 'Menu', showDelay: 200 }"
         />
 
         <Logo
@@ -39,8 +33,8 @@
         />
         <!-- Azion client -->
         <PrimeButton
-          v-tooltip.bottom="'Switch Account'"
-          class="font-semibold ml-2 h-8 w-auto surface-border hidden md:flex gap-2 items-center"
+          v-tooltip.bottom="{ value: 'Switch account', showDelay: 200 }"
+          class="font-semibold ml-2 h-8 w-auto border-header hidden md:flex gap-2 items-center text-white"
           size="small"
           outlined
         >
@@ -51,16 +45,16 @@
 
       <!-- Search -->
       <span class="top-0 p-input-icon-left p-input-icon-right hidden lg:flex">
-        <i class="pi pi-search" />
+        <i class="pi pi-search text-white" />
         <i class="!top-[32%]">
           <Tag
-            class="not-italic border surface-border text-color-secondary cursor-pointer h- surface-100"
+            class="not-italic border border-header bg-header hover:bg-header-button-hover text-header cursor-pointer h-6 surface-100"
             value="⌘ K"
             @click="openSearch"
           />
         </i>
         <InputText
-          class="w-64"
+          class="w-64 bg-header-input border-header hover:border-header-hover"
           placeholder="Search..."
           :value="searchText"
           @click="openSearch"
@@ -72,10 +66,11 @@
       <div class="flex gap-2 items-center">
         <PrimeButton
           icon="pi pi-search"
-          class="px-2 py-1 flex lg:hidden"
+          class="px-2 py-1 flex lg:hidden text-white border-header"
           @click="openSearch"
           style="height: 32px; width: 32px"
           outlined
+          v-tooltip.bottom="{ value: 'Search', showDelay: 200 }"
         />
 
         <!-- Create Button Desktop -->
@@ -83,49 +78,66 @@
           @click="showCreateModal"
           icon="pi pi-plus"
           label="Create"
-          class="h-8 hidden md:flex"
+          class="h-8 hidden md:flex text-white border-header"
           outlined
           size="small"
+          :class="{
+            'bg-header hover:bg-header-button-hover': !showCreate,
+            'bg-header-button-enabled': showCreate
+          }"
         />
 
         <!-- Create Button Mobile -->
         <PrimeButton
           @click="showCreateModal"
           icon="pi pi-plus"
-          class="h-8 md:hidden"
+          class="h-8 md:hidden text-white border-header"
           size="small"
           outlined
           style="height: 32px; width: 32px"
+          :class="{
+            'bg-header hover:bg-header-button-hover': !showCreate,
+            'bg-header-button-enabled': showCreate
+          }"
+          v-tooltip.bottom="{ value: 'Create', showDelay: 200 }"
         />
 
         <!-- Help Button Desktop  -->
-
         <PrimeButton
           icon="pi pi-question-circle"
           size="small"
           label="Help"
           @click="showHelperCenter"
           outlined
-          class="hidden md:flex"
+          class="hidden md:flex text-white border-header"
+          :class="{
+            'bg-header hover:bg-header-button-hover': !helperVisible,
+            'bg-header-button-enabled': helperVisible
+          }"
         />
 
-        <!-- Create Button Mobile -->
+        <!-- Help Button Mobile -->
         <PrimeButton
           icon="pi pi-question-circle"
           size="small"
           outlined
-          class="md:hidden"
+          class="md:hidden text-white border-header text-white border-header"
           style="height: 32px; width: 32px"
           @click="showHelperCenterMobile"
+          :class="{
+            'bg-header hover:bg-header-button-hover': !helperVisible,
+            'bg-header-button-enabled': helperVisible
+          }"
+          v-tooltip.bottom="{ value: 'Help', showDelay: 200 }"
         />
 
         <!-- Notification Button  -->
         <PrimeButton
           icon="pi pi-bell"
-          style="border-color: var(--surface-border); padding-left: 7px; height: 32px; width: 32px"
-          class="overflow-auto"
+          style="padding-left: 7px; height: 32px; width: 32px"
+          class="overflow-auto text-white border-header hover:bg-header-button-hover"
           badge="9"
-          v-tooltip.bottom="'Notifications'"
+          v-tooltip.bottom="{ value: 'Notifications', showDelay: 200 }"
           size="small"
           badgeClass="p-badge-danger"
           @click="toggleNotification"
@@ -142,13 +154,15 @@
         <Avatar
           @click="toggleProfile"
           label="U"
-          class="cursor-pointer md:hidden"
+          class="cursor-pointer md:hidden text-avatar bg-header-avatar text-white text-avatar bg-header-avatar text-white"
+          v-tooltip.bottom="{ value: 'Account settings', showDelay: 200 }"
         />
         <!-- Profile Desktop -->
         <Avatar
           @click="toggleProfile"
           label="U"
-          class="hidden md:flex cursor-pointer"
+          class="hidden md:flex cursor-pointer bg-header-avatar text-white bg-header-avatar text-white"
+          v-tooltip.bottom="{ value: 'Account settings', showDelay: 200 }"
         />
       </div>
     </div>
@@ -160,15 +174,19 @@
     position="bottom"
     headerContent="Help"
     :pt="{
-      root: { class: '!h-[90%]' },
-      header: { class: 'gap-60 text-color border-1 surface-border' }
+      root: { class: '!h-[90%]' }
     }"
   >
     <template #header>
-      <div class="text-color">Help</div>
+      <div>Help</div>
     </template>
     <div class="flex flex-col p-2">
       <!-- content -->
+      <div class="surface-border border border-dashed rounded-md flex items-center h-96 m-2">
+        <p class="text-color text-sm font-medium text-center w-full">
+          This section is under development.
+        </p>
+      </div>
     </div>
   </Sidebar>
 
@@ -181,34 +199,34 @@
     :pt="{
       header: { class: 'hidden' },
       root: { class: 'shadow-none' },
-      mask: { class: 'top-[57.5px]' }
+      mask: { class: 'top-[56px]' },
+      content: { class: 'px-0 md:px-[1rem] pt-0' }
     }"
   >
-    <div>
-      <PrimeMenu
-        :pt="{
-          submenuheader: { class: 'text-base font-bold leading-none mt-5' }
-        }"
-        class="w-full md:px-4 px-3 border-none pb-20"
-        :model="menuStructure"
-      >
-        <template #item="{ item, label, props }">
-          <a
-            class="flex h-9"
-            v-bind="props.action"
-            @click="redirect(item.to)"
-          >
-            <span v-bind="props.icon" />
-            <span v-bind="props.label">{{ label }}</span>
-            <Tag
-              v-if="item.tag"
-              :value="item.tag"
-              class="ml-2"
-            />
-          </a>
-        </template>
-      </PrimeMenu>
-    </div>
+    <PrimeMenu
+      :pt="{
+        submenuheader: { class: 'text-base font-medium leading-none mt-5' },
+        content: { class: 'px-0.5' }
+      }"
+      class="w-full border-none pb-20 px-0 md:px-4 pt-1 md:pt-4 bg-transparent"
+      :model="menuStructure"
+    >
+      <template #item="{ item, label, props }">
+        <a
+          class="flex h-9"
+          v-bind="props.action"
+          @click="redirect(item.to)"
+        >
+          <span v-bind="props.icon" />
+          <span v-bind="props.label">{{ label }}</span>
+          <Tag
+            v-if="item.tag"
+            :value="item.tag"
+            class="ml-2"
+          />
+        </a>
+      </template>
+    </PrimeMenu>
   </Sidebar>
 
   <!-- Profile Menu -->
@@ -345,8 +363,10 @@
     :style="{ width: '65vw' }"
   >
     <!-- SLOT WIP -->
-    <div class="m-2 surface-border border border-dashed flex items-center h-96">
-      <p class="text-color-secondary text-center w-full">Slot</p>
+    <div class="surface-border border border-dashed rounded-md flex items-center h-96">
+      <p class="text-color text-sm font-medium text-center w-full">
+        This section is under development.
+      </p>
     </div>
   </PrimeDialog>
 
@@ -359,8 +379,10 @@
   >
     <template #start>
       <!-- SLOT WIP -->
-      <div class="m-2 surface-border border border-dashed flex items-center h-96">
-        <p class="text-color-secondary text-center w-full">Slot</p>
+      <div class="m-1 surface-border border border-dashed rounded-md flex items-center h-96">
+        <p class="text-color text-sm font-medium text-center w-full">
+          This section is under development.
+        </p>
       </div>
     </template>
   </PrimeMenu>
@@ -611,6 +633,9 @@
       },
       openSideBar() {
         this.showSidebar = !this.showSidebar
+      },
+      closeSideBar() {
+        this.showSidebar = false
       },
       openSearch() {
         this.showSearch = true

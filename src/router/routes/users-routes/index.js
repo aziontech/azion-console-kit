@@ -21,6 +21,30 @@ export const usersListsRoutes = {
           }
         ]
       }
+    },
+    {
+      path: 'create',
+      name: 'create-users',
+      component: () => import('@views/Users/CreateView.vue'),
+      props: {
+        loadAccountDetailsService: UsersService.loadAccountDetailsService,
+        listCountriesPhoneService: UsersService.listCountriesPhoneService,
+        listTimezonesService: UsersService.listTimezonesService,
+        createUsersService: UsersService.createUsersService,
+        listTeamsService: UsersService.listTeamsService
+      },
+      meta: {
+        breadCrumbs: [
+          {
+            label: 'Users Lists',
+            to: '/users'
+          },
+          {
+            label: 'Create User',
+            to: '/users/create'
+          }
+        ]
+      }
     }
   ]
 }

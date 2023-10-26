@@ -12,14 +12,14 @@
         v-bind="name"
         type="text"
         :class="{ 'p-invalid': errors.name }"
-        v-tooltip.top="errors.name"
+        v-tooltip.top="{ value: errors.name, showDelay: 200 }"
       />
       <InputText
         placeholder="Domain"
         v-bind="domain"
         type="text"
         :class="{ 'p-invalid': errors.domain }"
-        v-tooltip.top="errors.domain"
+        v-tooltip.top="{ value: errors.domain, showDelay: 200 }"
       />
       <div class="flex gap-3 items-center">
         <label for="">Active</label>

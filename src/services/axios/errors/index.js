@@ -4,6 +4,10 @@ import { InvalidApiTokenError } from './invalid-api-token-error'
 import { NotFoundError } from './not-found-error'
 import { PermissionError } from './permission-error'
 import { UnexpectedError } from './unexpected-error'
+import { UserIsNotClientError } from './user-is-no-client-error'
+import { UserNotFoundError } from './user-not-found-error'
+import { ProccessRequestError } from './proccess-request-error'
+import { InvalidDataStructureError } from './invalid-data-structure-error'
 
 export {
   InternalServerError,
@@ -11,5 +15,9 @@ export {
   InvalidApiTokenError,
   NotFoundError,
   PermissionError,
-  UnexpectedError
+  UnexpectedError,
+  UserIsNotClientError,
+  UserNotFoundError,
+  ProccessRequestError,
+  InvalidDataStructureError
 }

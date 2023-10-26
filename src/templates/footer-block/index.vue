@@ -31,23 +31,26 @@
           icon="pi pi-github"
           text
           size="small"
+          v-tooltip.top="{ value: 'Github', showDelay: 200 }"
         />
         <PrimeButton
           icon="pi pi-discord"
           text
           size="small"
+          v-tooltip.top="{ value: 'Discord', showDelay: 200 }"
         />
         <PrimeButton
           icon="pi pi-twitter"
           text
           size="small"
+          v-tooltip.top="{ value: 'X', showDelay: 200 }"
         />
         <!--Change Twitter icon to X-->
       </div>
 
       <div class="flex gap-4">
         <!-- System Status -->
-        <SystemStatusBarBlock />
+        <SystemStatusBarBlock v-tooltip.top="{ value: 'System status', showDelay: 200 }" />
         <Dropdown
           :modelValue="selectedTheme"
           @update:modelValue="selectTheme"
@@ -61,12 +64,13 @@
               class: ' w-auto py-0 h-[30px] items-center align-middle',
               style: 'background: var(--surface-section) !important'
             },
-            item: { class: 'text-sm' },
-            input: { class: 'text-sm' }
+            item: { class: 'w-full text-sm' },
+            input: { class: 'w-20 text-sm' }
           }"
         >
           <template #value="slotProps">
             <div
+              v-tooltip.top="'Theme'"
               v-if="slotProps.value"
               class="flex gap-2 align-items-center"
             >

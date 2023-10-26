@@ -1,0 +1,36 @@
+// Custom SelectButton
+.p-selectbutton {
+  background: var(--surface-300) !important;
+  padding: 0.25rem !important;
+  border-radius: $borderRadius !important;
+
+  .p-button {
+    background: none !important;
+    border: none !important;
+    height: 1.7rem !important;
+    font-size: 0.875rem !important;
+    border-radius: 0.25rem !important;
+    color: var(--text-color-secondary) !important;
+    font-weight: 600 !important;
+
+    &:not(.p-disabled):not(.p-highlight):hover {
+      border-color: none !important;
+      color: var(--text-color) !important;
+    }
+
+    &.p-highlight {
+      background: var(--surface-0) !important;
+      border-color: none !important;
+      font-weight: 600 !important;
+      border-radius: 0.25rem !important;
+      color: var(--text-color) !important;
+
+      &:hover {
+        background: var(--surface-0) !important;
+        border-color: none !important;
+        color: $toggleButtonTextActiveHoverColor !important;
+        color: var(--text-color) !important;
+      }
+    }
+  }
+}

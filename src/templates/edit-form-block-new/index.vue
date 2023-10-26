@@ -4,7 +4,7 @@
     <PageHeadingBlock :pageTitle="pageTitle" />
     <form
       @submit.prevent="handleSubmit"
-      class="w-full grow py-4 px-8 flex flex-col gap-8"
+      class="w-full grow py-4 px-8 flex flex-col gap-8 mb-5"
     >
       <slot name="form" />
 
