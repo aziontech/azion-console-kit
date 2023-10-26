@@ -60,7 +60,7 @@
                 :popup="true"
               />
               <PrimeButton
-                v-tooltip.top="'Actions'"
+                v-tooltip.top="{ value: 'Actions', showDelay: 200 }"
                 size="small"
                 icon="pi pi-ellipsis-h"
                 text

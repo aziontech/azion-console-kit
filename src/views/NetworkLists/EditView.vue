@@ -15,7 +15,7 @@
           v-bind="name"
           type="text"
           :class="{ 'p-invalid': errors.key }"
-          v-tooltip.top="errors.key"
+          v-tooltip.top="{ value: errors.name, showDelay: 200 }"
         />
       </div>
       <div class="flex flex-col gap-2">

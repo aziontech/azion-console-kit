@@ -15,7 +15,7 @@
           id="name"
           type="text"
           :class="{ 'p-invalid': errors.name }"
-          v-tooltip.top="errors.name"
+          v-tooltip.top="{ value: errors.name, showDelay: 200 }"
         />
       </div>
 
@@ -28,7 +28,7 @@
           rows="5"
           cols="30"
           class="w-full"
-          v-tooltip.top="errors.description"
+          v-tooltip.top="{ value: errors.description, showDelay: 200 }"
         />
       </div>
     </template>

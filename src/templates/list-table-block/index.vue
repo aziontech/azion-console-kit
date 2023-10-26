@@ -69,7 +69,7 @@
                 outlined
                 icon="pi pi-bars"
                 @click="toggleColumnSelector"
-                v-tooltip.top="'Hidden columns'"
+                v-tooltip.top="{ value: 'Hidden columns', showDelay: 200 }"
               >
               </PrimeButton>
               <OverlayPanel ref="columnSelectorPanel">
@@ -97,7 +97,7 @@
                 :popup="true"
               />
               <PrimeButton
-                v-tooltip.top="'Actions'"
+                v-tooltip.top="{ value: 'Actions', showDelay: 200 }"
                 size="small"
                 icon="pi pi-ellipsis-h"
                 text

@@ -21,7 +21,7 @@
                       v-bind="name"
                       type="text"
                       :class="{ 'p-invalid': errors.name }"
-                      v-tooltip.top="errors.name"
+                      v-tooltip.top="{ value: errors.name, showDelay: 200 }"
                     />
                     <label>Function Code: *</label>
                     <div class="w-full flex justify-center">
@@ -32,7 +32,7 @@
                         class="min-h-[50vh] !w-[99%]"
                         :class="{ 'border-red-500 border': errorCode }"
                         @change="changeValidateCode"
-                        v-tooltip.top="errorCode"
+                        v-tooltip.top="{ value: errorCode, showDelay: 200 }"
                         :options="editorOptions"
                       />
                     </div>
@@ -84,7 +84,7 @@
                         class="min-h-[50vh] !w-[99%]"
                         :class="{ 'border-red-500 border': errorCode }"
                         @change="changeValidateArgs"
-                        v-tooltip.top="errorCode"
+                        v-tooltip.top="{ value: errorCode, showDelay: 200 }"
                         :options="editorOptions"
                       />
                     </div>

@@ -15,7 +15,7 @@
             id="firstName"
             type="text"
             :class="{ 'p-invalid': errors.firstName }"
-            v-tooltip.top="errors.firstName"
+            v-tooltip.top="{ value: errors.firstName, showDelay: 200 }"
           />
         </div>
         <div class="flex flex-col gap-2">
@@ -61,7 +61,7 @@
             type="email"
             placeholder="example@email.com"
             :class="{ 'p-invalid': errors.email }"
-            v-tooltip.top="errors.email"
+            v-tooltip.top="{ value: errors.email, showDelay: 200 }"
           />
         </div>
         <div class="flex flex-col gap-2">
@@ -93,7 +93,7 @@
               class="w-full"
               mask="?99999999999999999999"
               :class="{ 'p-invalid': errors.mobile && !selectedCountry }"
-              v-tooltip.top="errors.mobile"
+              v-tooltip.top="{ value: errors.mobile, showDelay: 200 }"
             />
           </div>
         </div>
