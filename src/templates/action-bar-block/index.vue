@@ -1,7 +1,7 @@
 <!-- eslint-disable vuejs-accessibility/click-events-have-key-events -->
 <template>
   <div
-    class="flex flex-col items-start gap-4 justify-center sm:flex-row p-4 sm:p-6 w-full sm:justify-between border-t sticky bottom-0 surface-section z-50"
+    class="flex flex-col items-start gap-4 justify-center sm:flex-row p-4 sm:py-3 sm:px-8 w-full sm:justify-between border-t surface-border sticky bottom-0 surface-section z-50"
   >
     <div class="flex w-[283px]">
       <slot name="form" />
