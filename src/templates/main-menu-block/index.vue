@@ -16,11 +16,11 @@
           class="flex-none border-header text-white"
           icon="pi pi-bars"
           style="height: 32px; width: 32px"
-          v-tooltip.bottom="'Main menu'"
           :class="{
             'bg-header-button-enabled': showSidebar,
             'bg-header hover:bg-header-button-hover': !showSidebar
           }"
+          v-tooltip.bottom="{ value: 'Menu', showDelay: 200 }"
         />
 
         <Logo
@@ -33,8 +33,8 @@
         />
         <!-- Azion client -->
         <PrimeButton
-          v-tooltip.bottom="'Switch account'"
-          class="font-semibold ml-2 h-8 w-auto border-header hover:bg-header-button-hover hidden md:flex gap-2 items-center text-white"
+          v-tooltip.bottom="{ value: 'Switch account', showDelay: 200 }"
+          class="font-semibold ml-2 h-8 w-auto surface-border hidden md:flex gap-2 items-center"
           size="small"
           outlined
         >
@@ -70,7 +70,7 @@
           @click="openSearch"
           style="height: 32px; width: 32px"
           outlined
-          v-tooltip.bottom="'Search'"
+          v-tooltip.bottom="{ value: 'Search', showDelay: 200 }"
         />
 
         <!-- Create Button Desktop -->
@@ -99,7 +99,7 @@
             'bg-header hover:bg-header-button-hover': !showCreate,
             'bg-header-button-enabled': showCreate
           }"
-          v-tooltip.bottom="'Create'"
+          v-tooltip.bottom="{ value: 'Create', showDelay: 200 }"
         />
 
         <!-- Help Button Desktop  -->
@@ -124,11 +124,11 @@
           class="md:hidden text-white border-header text-white border-header"
           style="height: 32px; width: 32px"
           @click="showHelperCenterMobile"
-          v-tooltip.bottom="'Help'"
           :class="{
             'bg-header hover:bg-header-button-hover': !helperVisible,
             'bg-header-button-enabled': helperVisible
           }"
+          v-tooltip.bottom="{ value: 'Help', showDelay: 200 }"
         />
 
         <!-- Notification Button  -->
@@ -137,7 +137,7 @@
           style="padding-left: 7px; height: 32px; width: 32px"
           class="overflow-auto text-white border-header hover:bg-header-button-hover"
           badge="9"
-          v-tooltip.bottom="'Notifications'"
+          v-tooltip.bottom="{ value: 'Notifications', showDelay: 200 }"
           size="small"
           badgeClass="p-badge-danger"
           @click="toggleNotification"
@@ -154,15 +154,15 @@
         <Avatar
           @click="toggleProfile"
           label="U"
-          v-tooltip.bottom="'Account'"
           class="cursor-pointer md:hidden text-avatar bg-header-avatar text-white text-avatar bg-header-avatar text-white"
+          v-tooltip.bottom="{ value: 'Account settings', showDelay: 200 }"
         />
         <!-- Profile Desktop -->
         <Avatar
           @click="toggleProfile"
           label="U"
-          v-tooltip.bottom="'Account'"
           class="hidden md:flex cursor-pointer bg-header-avatar text-white bg-header-avatar text-white"
+          v-tooltip.bottom="{ value: 'Account settings', showDelay: 200 }"
         />
       </div>
     </div>
