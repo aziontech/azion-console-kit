@@ -14,7 +14,7 @@
           v-bind="name"
           type="text"
           :class="{ 'p-invalid': errors.name }"
-          v-tooltip.top="errors.name"
+          v-tooltip.top="{ value: errors.name, showDelay: 200 }"
         />
 
         <Divider />
@@ -93,7 +93,7 @@
           id="address"
           v-bind="address"
           :class="{ 'p-invalid': errors.address }"
-          v-tooltip.top="errors.address"
+          v-tooltip.top="{ value: errors.address, showDelay: 200 }"
           aria-describedby="address-help"
         />
 
@@ -134,7 +134,7 @@
           id="hostHeader"
           v-bind="hostHeader"
           :class="{ 'p-invalid': errors.hostHeader }"
-          v-tooltip.top="errors.hostHeader"
+          v-tooltip.top="{ value: errors.hostHeader, showDelay: 200 }"
           aria-describedby="hostHeader-help"
         />
 
@@ -169,7 +169,7 @@
           id="browserCacheSettingsMaximumTtl"
           v-bind="browserCacheSettingsMaximumTtl"
           :class="{ 'p-invalid': errors.browserCacheSettingsMaximumTtl }"
-          v-tooltip.top="errors.browserCacheSettingsMaximumTtl"
+          v-tooltip.top="{ value: errors.browserCacheSettingsMaximumTtl, showDelay: 200 }"
           aria-describedby="browserCacheSettingsMaximumTtl-help"
           :disabled="isCacheTypeHonor"
         />
@@ -201,7 +201,7 @@
           id="cdnCacheSettingsMaximumTtl"
           v-bind="cdnCacheSettingsMaximumTtl"
           :class="{ 'p-invalid': errors.cdnCacheSettingsMaximumTtl }"
-          v-tooltip.top="errors.cdnCacheSettingsMaximumTtl"
+          v-tooltip.top="{ value: errors.cdnCacheSettingsMaximumTtl, showDelay: 200 }"
           aria-describedby="cdnCacheSettingsMaximumTtl-help"
         />
       </template>

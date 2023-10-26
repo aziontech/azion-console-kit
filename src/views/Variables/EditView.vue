@@ -25,7 +25,7 @@
               type="text"
               id="name"
               :class="{ 'p-invalid': errors.key }"
-              v-tooltip.top="errors.key"
+              v-tooltip.top="{ value: errors.key, showDelay: 200 }"
             />
           </div>
 
@@ -40,7 +40,7 @@
               v-bind="value"
               type="text"
               :class="{ 'p-invalid': errors.value }"
-              v-tooltip.top="errors.value"
+              v-tooltip.top="{ value: errors.value, showDelay: 200 }"
             />
           </div>
 
