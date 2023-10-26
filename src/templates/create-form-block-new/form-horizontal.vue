@@ -1,6 +1,6 @@
 <template>
   <fieldset
-    class="flex max-w-screen-2xl mx-auto gap-8 lg:gap-16 sm:w-full surface-section rounded-md border surface-border px-8 py-8 2xl:py-14 2xl:p-14 flex-wrap"
+    class="flex max-w-screen-2xl mx-auto gap-8 lg:gap-16 w-full surface-section rounded-md border surface-border px-8 py-8 2xl:py-14 2xl:p-14 flex-wrap"
     :class="{ 'lg:flex-nowrap': !isDrawer }"
   >
     <!-- title and description -->
