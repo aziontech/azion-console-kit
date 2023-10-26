@@ -54,7 +54,7 @@
       <div class="flex gap-2 items-center">
         <!-- System Status -->
         <SystemStatusBarBlock v-tooltip.top="{ value: 'System status', showDelay: 200 }" />
-        <div v-tooltip.top="'Theme mode'">
+        <div v-tooltip.top="{ value: 'Theme mode', showDelay: 200 }">
           <Dropdown
             :modelValue="selectedTheme"
             @update:modelValue="selectTheme"
