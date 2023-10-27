@@ -1,9 +1,9 @@
-name: Deploy Edge Application
+name: Deploy Platform Kit (STAGE)
 
 on:
   push:
     branches:
-      - main
+      - dev
 env:
   HUSKY: 0
 
@@ -34,10 +34,12 @@ jobs:
       - name: Define application settings
         run: >
           echo $(jq
-          --arg funcid ${{secrets.FUNCTION_ID}} 
-          --arg appid ${{secrets.APPLICATION_ID}} 
-          --arg domainid ${{secrets.DOMAIN_ID}} 
-          '.function.id = ($funcid|tonumber)
+          --arg name ${{secrets.STAGE_EDGE_APPLICATION_NAME}} 
+          --arg funcid ${{secrets.STAGE_EDGE_FUNCTION_ID}} 
+          --arg appid ${{secrets.STAGE_EDGE_APPLICATION_ID}} 
+          --arg domainid ${{secrets.STAGE_DOMAIN_ID}} 
+          '.name = ($name)
+          | .function.id = ($funcid|tonumber)
           | .application.id = ($appid|tonumber)
           | .domain.id = ($domainid|tonumber)'
           azion/azion.json) > azion/azion.json

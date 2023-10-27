@@ -20,12 +20,14 @@ alias yarn="docker run -it --rm -p 5173:5173 -v $HOME:/root -v $PWD:/usr/src/app
 git clone git@github.com:aziontech/azion-platform-kit.git
 cd azion-platform-kit
 ```
+
 2. Start the project using:
 
 ```cmd
   $ yarn install
   $ yarn dev --host
 ```
+
 The webapp is now available on the following URL: http://localhost:5173
 
 PRO-TIP (OPTIONAL) - To save some time, you can create a personal token in [Azion Realtime Manager](https://manager.azion.com/iam/personal-tokens) and save it into file `.env.development`
@@ -34,10 +36,9 @@ PRO-TIP (OPTIONAL) - To save some time, you can create a personal token in [Azio
 echo 'VITE_PERSONAL_TOKEN=PERSONALTOKEN' > .env.development
 ```
 
-
 ## Run on the Edge
 
-Azion Platform Kit runs natively on Azion's edge thanks to Azion CLI.
+Azion Platform Kit runs natively on Azion's edge thanks to Azion CLI (>= 0.70.0):
 
 1. Download and configure Azion-CLI with a [Personal Token](https://manager.azion.com/iam/personal-tokens)
 
@@ -56,7 +57,9 @@ mkdir -p .edge/statics && cp -r ./dist/* .edge/statics
 3. Publish your edge application
 
 ```cmd
-azioncli edge_applications publish
+azioncli edge_applications init --name azion-platform-kit --type vue --mode deliver
+
+azioncli edge_applications publish --debug
 ```
 
 After a few seconds, you can access your project on the Domain informed by the CLI. This is one example of CLI output
