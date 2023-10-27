@@ -17,7 +17,7 @@
             <label
               for="name"
               class="text-color text-base font-medium"
-              >Key</label
+              >Key: *</label
             >
             <InputText
               placeholder="ex: GITHUB_API_KEY"
@@ -27,13 +27,19 @@
               :class="{ 'p-invalid': errors.key }"
               v-tooltip.top="{ value: errors.key, showDelay: 200 }"
             />
+            <small
+              v-if="errors.key"
+              class="p-error"
+              id="text-error"
+              >{{ errors.key }}</small
+            >
           </div>
 
           <div class="flex flex-col sm:max-w-lg w-full gap-2">
             <label
               for="Value"
               class="text-color text-base font-medium"
-              >Value</label
+              >Value: *</label
             >
             <InputText
               placeholder="ex: MY_GITHUB_API_VALUE"
@@ -42,6 +48,12 @@
               :class="{ 'p-invalid': errors.value }"
               v-tooltip.top="{ value: errors.value, showDelay: 200 }"
             />
+            <small
+              v-if="errors.value"
+              class="p-error"
+              id="text-error"
+              >{{ errors.value }}</small
+            >
           </div>
 
           <Card
