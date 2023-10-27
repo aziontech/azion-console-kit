@@ -13,13 +13,7 @@
           size="small"
           @click="showHelperCenter"
         />
-        <PrimeButton
-          icon="pi pi-ellipsis-h"
-          text
-          aria-label="More options"
-          size="small"
-          @click="console.log('more options')"
-        />
+        <MoreOptionsMenu />
       </span>
     </header>
     <PrimeDivider />
@@ -46,6 +40,7 @@
   import PrimeDivider from 'primevue/divider'
   import ChartOwner from './components/chart-owner.vue'
   import AggregationInfo from './components/aggregation-info.vue'
+  import MoreOptionsMenu from './components/more-options-menu.vue'
   import { useHelpCenterStore } from '@/stores/help-center'
 
   defineOptions({ name: 'GraphsCardBlock' })
