@@ -1,5 +1,4 @@
 import { AxiosHttpClientAdapter } from '../axios/AxiosHttpClientAdapter'
-import getMsgError from './error-msg'
 import { makeDomainsBaseUrl } from './make-domains-base-url'
 import * as Errors from '@/services/axios/errors'
 
@@ -38,9 +37,9 @@ const parseHttpResponse = (httpResponse) => {
     case 201:
       return 'Your domain has been created'
     case 400:
-      throw new Error(getMsgError(httpResponse))
+      throw new Error(Object.keys(httpResponse.body)[0])
     case 409:
-      throw new Error(getMsgError(httpResponse))
+      throw new Error(Object.keys(httpResponse.body)[0])
     case 401:
       throw new Errors.InvalidApiTokenError().message
     case 403:
