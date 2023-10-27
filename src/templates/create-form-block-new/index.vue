@@ -60,12 +60,12 @@
       async validateAndSubmit() {
         try {
           this.isLoading = true
-          await this.createService(this.formData)
+          const feedback = await this.createService(this.formData)
           this.cleanFormCallback()
           this.$toast.add({
             closable: false,
             severity: 'success',
-            summary: 'created successfully',
+            summary: feedback ?? 'created successfully',
             life: 10000
           })
         } catch (error) {
