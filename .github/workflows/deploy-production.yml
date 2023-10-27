@@ -1,4 +1,4 @@
-name: Deploy Edge Application
+name: Deploy Platform Kit (PRODUCTION)
 
 on:
   push:
@@ -34,10 +34,12 @@ jobs:
       - name: Define application settings
         run: >
           echo $(jq
-          --arg funcid ${{secrets.FUNCTION_ID}} 
-          --arg appid ${{secrets.APPLICATION_ID}} 
-          --arg domainid ${{secrets.DOMAIN_ID}} 
-          '.function.id = ($funcid|tonumber)
+          --arg name ${{secrets.PROD_EDGE_APPLICATION_NAME}} 
+          --arg funcid ${{secrets.PROD_EDGE_FUNCTION_ID}} 
+          --arg appid ${{secrets.PROD_EDGE_APPLICATION_ID}} 
+          --arg domainid ${{secrets.PROD_DOMAIN_ID}} 
+          '.name = ($name|tostring)
+          | .function.id = ($funcid|tonumber)
           | .application.id = ($appid|tonumber)
           | .domain.id = ($domainid|tonumber)'
           azion/azion.json) > azion/azion.json
