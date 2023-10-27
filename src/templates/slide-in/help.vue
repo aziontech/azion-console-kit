@@ -8,10 +8,9 @@
       <PrimeButton
         icon="pi pi-times"
         outlined
-        class="surface-border"
-        style="height: 32px; width: 32px"
+        class="surface-border w-8 h-8"
         aria-label="Cancel"
-        @click="close"
+        @click="closeHelpCenter"
       />
     </div>
     <div
@@ -25,6 +24,8 @@
 </template>
 <script>
   import PrimeButton from 'primevue/button'
+  import { mapActions } from 'pinia'
+  import { useHelpCenterStore } from '@/stores/help-center'
 
   export default {
     name: 'SlideIn',
@@ -32,9 +33,7 @@
       PrimeButton
     },
     methods: {
-      close() {
-        this.$emit('closeSlideIn')
-      }
+      ...mapActions(useHelpCenterStore, ['closeHelpCenter'])
     }
   }
 </script>

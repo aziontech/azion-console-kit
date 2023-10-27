@@ -160,7 +160,7 @@
         <h2>Help</h2>
         <PrimeButton
           icon="pi pi-times"
-          @click="toggleHelpCenter"
+          @click="closeHelpCenter"
           size="small"
           class="flex-none surface-border text-sm w-8 h-8"
           text
@@ -408,10 +408,6 @@
       Mobilelogo
     },
     props: {
-      helperVisible: {
-        type: Boolean,
-        default: false
-      },
       isLogged: Boolean
     },
     emits: ['showSlideHelper', 'showSlideCenter'],
@@ -607,7 +603,7 @@
     },
     methods: {
       ...mapActions(useAccountStore, ['setTheme']),
-      ...mapActions(useHelpCenterStore, ['toggleHelpCenter']),
+      ...mapActions(useHelpCenterStore, ['toggleHelpCenter', 'closeHelpCenter']),
       toggleProfile(event) {
         this.$refs.profile.toggle(event)
       },
