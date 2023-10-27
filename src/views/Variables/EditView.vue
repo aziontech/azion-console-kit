@@ -17,7 +17,7 @@
             <label
               for="name"
               class="text-color text-base font-medium"
-              >Key: *</label
+              >Key *</label
             >
             <InputText
               placeholder="ex: GITHUB_API_KEY"
@@ -39,7 +39,7 @@
             <label
               for="Value"
               class="text-color text-base font-medium"
-              >Value: *</label
+              >Value *</label
             >
             <InputText
               placeholder="ex: MY_GITHUB_API_VALUE"
