@@ -30,7 +30,7 @@ const adapt = (payload) => {
  */
 const parseHttpResponse = (httpResponse) => {
   switch (httpResponse.statusCode) {
-    case 202:
+    case 200:
       return 'Your variable has been updated'
     case 400:
       const apiError = extractApiError(httpResponse)
