@@ -47,7 +47,7 @@
           <Card
             :pt="{
               body: { class: 'p-4' },
-              title: { class: 'flex justify-between items-cente text-base m-0' },
+              title: { class: 'flex justify-between items-center text-base m-0' },
               subtitle: { class: 'text-sm font-normal text-color-secondary m-0' }
             }"
           >
