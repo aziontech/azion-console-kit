@@ -126,7 +126,7 @@
       copyToken() {
         this.clipboardWrite(this.token)
         this.$toast.add({
-          closable: true,
+          closable: false,
           severity: 'success',
           summary: 'token copied',
           life: 10000

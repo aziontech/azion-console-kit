@@ -1,6 +1,6 @@
 <template>
   <div class="flex flex-col min-h-[calc(100vh-120px)]">
-    <Toast />
+    <ToastBlock />
     <PageHeadingBlock :pageTitle="pageTitle" />
     <form class="w-full grow mt-4 p-4 max-w-screen-sm flex flex-col gap-4 lg:max-w-7xl mx-auto">
       <div class="flex flex-col gap-4 sm:!w-full md:!w-1/2">
@@ -18,15 +18,15 @@
   </div>
 </template>
 <script>
-  import Toast from 'primevue/toast'
   import ActionBarTemplate from '@/templates/action-bar-block'
   import ActionBarBlockGoBack from '@/templates/action-bar-block/go-back'
   import PageHeadingBlock from '@/templates/page-heading-block'
+  import ToastBlock from '@/templates/toast-block'
 
   export default {
     name: 'create-form-block-with-event',
     components: {
-      Toast,
+      ToastBlock,
       ActionBarTemplate,
       ActionBarBlockGoBack,
       PageHeadingBlock
@@ -70,14 +70,14 @@
           const response = await this.createService(this.formData)
           this.$emit('on-response', response)
           this.$toast.add({
-            closable: true,
+            closable: false,
             severity: 'success',
             summary: 'created successfully',
             life: 10000
           })
         } catch (error) {
           this.$toast.add({
-            closable: true,
+            closable: false,
             severity: 'error',
             summary: error,
             life: 10000

@@ -1,6 +1,6 @@
 <template>
   <div>
-    <Toast />
+    <ToastBlock />
     <PageHeadingBlock :pageTitle="pageTitle">
       <PrimeButton
         @click="navigateToAddPage"
@@ -121,7 +121,7 @@
 <script>
   import DataTable from 'primevue/datatable'
   import Column from 'primevue/column'
-  import Toast from 'primevue/toast'
+  import ToastBlock from '@/templates/toast-block'
   import InputText from 'primevue/inputtext'
   import PrimeMenu from 'primevue/menu'
   import Skeleton from 'primevue/skeleton'
@@ -132,7 +132,7 @@
   export default {
     name: 'list-table-block-no-edit',
     components: {
-      Toast,
+      ToastBlock,
       DataTable,
       Column,
       InputText,
@@ -209,7 +209,7 @@
           this.data = data
         } catch (error) {
           this.$toast.add({
-            closable: true,
+            closable: false,
             severity: 'error',
             summary: error,
             life: 10000
@@ -227,14 +227,14 @@
       },
       async removeItem() {
         let toastConfig = {
-          closable: true,
+          closable: false,
           severity: 'success',
           summary: 'Deleted successfully',
           life: 10000
         }
         try {
           this.$toast.add({
-            closable: true,
+            closable: false,
             severity: 'info',
             summary: 'Processing request',
             life: 5000
@@ -243,7 +243,7 @@
           this.data = this.data.filter((item) => item.id !== this.selectedId)
         } catch (error) {
           toastConfig = {
-            closable: true,
+            closable: false,
             severity: 'error',
             summary: error,
             life: 10000

@@ -1,6 +1,6 @@
 <template>
   <div>
-    <Toast />
+    <ToastBlock />
     <SingleBlock pageTitle="Edge Pulse">
       <template #content>
         <div class="flex flex-col gap-4 lg:w-1/2">
@@ -52,19 +52,19 @@
 <script>
   import SingleBlock from '@/templates/single-block'
   import PrimeButton from 'primevue/button'
-  import Toast from 'primevue/toast'
+  import ToastBlock from '@/templates/toast-block'
 
   const defaultTagCode = `<script>
-  if (typeof window.addEventListener === 'function') {
-    window.addEventListener('load', function() {
-      if (window.azpulse === undefined) {
-        var pulse = document.createElement('script');
-        pulse.src = '//client.azionrum.net/8900e/azion-pulse.js';
-        document.body.appendChild(pulse);
-      }
-    })
-  }
-<${'/'}script>`
+    if (typeof window.addEventListener === 'function') {
+      window.addEventListener('load', function() {
+        if (window.azpulse === undefined) {
+          var pulse = document.createElement('script');
+          pulse.src = '//client.azionrum.net/8900e/azion-pulse.js';
+          document.body.appendChild(pulse);
+        }
+      })
+    }
+  <${'/'}script>`
 
   const editorOptions = {
     minimap: {
@@ -81,12 +81,12 @@
     components: {
       PrimeButton,
       SingleBlock,
-      Toast
+      ToastBlock
     },
     methods: {
       showToast() {
         this.$toast.add({
-          closable: true,
+          closable: false,
           severity: 'success',
           summary: 'Code successfully copied',
           life: 1000
