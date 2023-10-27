@@ -26,7 +26,6 @@ const adapt = (payload) => {
   }
 }
 
-
 /**
  * @param {Object} httpResponse - The HTTP response object.
  * @param {Object} httpResponse.body - The response body.
