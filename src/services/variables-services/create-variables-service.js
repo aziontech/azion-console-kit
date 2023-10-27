@@ -24,10 +24,8 @@ const parseHttpResponse = (httpResponse) => {
     case 201:
       return 'Your variable has been created'
     case 400:
-      const alreadyUsedKeyError = httpResponse.body['non_field_errors']?.at(0)
-      const invalidKeyCharacterError = httpResponse.body['key']?.at(0)
-      const invalidValueCharacterError = httpResponse.body['value']?.at(0)
-      throw new Error(alreadyUsedKeyError || invalidKeyCharacterError || invalidValueCharacterError)
+      const apiError = extractApiError(httpResponse)
+      throw new Error(apiError)
     case 401:
       throw new Errors.InvalidApiTokenError().message
     case 403:
@@ -39,4 +37,28 @@ const parseHttpResponse = (httpResponse) => {
     default:
       throw new Errors.UnexpectedError().message
   }
+}
+
+/**
+ * @param {Object} errorSchema - The error schema.
+ * @param {string} key - The error key of error schema.
+ * @returns {string|undefined} The result message based on the status code.
+ */
+const extractErrorKey = (errorSchema, key) => {
+  return errorSchema[key]?.[0]
+}
+
+/**
+ * @param {Object} httpResponse - The HTTP response object.
+ * @param {Object} httpResponse.body - The response body.
+ * @returns {string} The result message based on the status code.
+ */
+const extractApiError = (httpResponse) => {
+  const alreadyUsedKeyError = extractErrorKey(httpResponse.body, 'non_field_errors')
+  const invalidKeyCharacterError = extractErrorKey(httpResponse.body, 'key')
+  const invalidValueCharacterError = extractErrorKey(httpResponse.body, 'value')
+
+  const errorMessages = [alreadyUsedKeyError, invalidKeyCharacterError, invalidValueCharacterError]
+  const errorMessage = errorMessages.find((error) => !!error)
+  return errorMessage
 }
