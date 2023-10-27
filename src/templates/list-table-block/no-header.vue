@@ -1,6 +1,5 @@
 <template>
   <div>
-    <ToastBlock />
     <div class="flex justify-end">
       <PrimeButton
         @click="navigateToAddPage"
@@ -122,7 +121,6 @@
 <script>
   import DataTable from 'primevue/datatable'
   import Column from 'primevue/column'
-  import ToastBlock from '@/templates/toast-block'
   import InputText from 'primevue/inputtext'
   import PrimeMenu from 'primevue/menu'
   import Skeleton from 'primevue/skeleton'
@@ -132,7 +130,6 @@
   export default {
     name: 'list-table-block',
     components: {
-      ToastBlock,
       DataTable,
       Column,
       InputText,

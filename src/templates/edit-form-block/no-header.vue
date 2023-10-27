@@ -1,6 +1,5 @@
 <template>
   <div class="flex flex-col min-h-[calc(100vh-120px)]">
-    <ToastBlock />
     <form
       @submit.prevent="handleSubmit"
       class="w-full grow mt-4 p-4 max-w-screen-sm flex flex-col gap-4 lg:max-w-7xl mx-auto"
@@ -21,13 +20,11 @@
 </template>
 
 <script>
-  import ToastBlock from '@/templates/toast-block'
   import ActionBarTemplate from '@/templates/action-bar-block'
 
   export default {
     name: 'edit-form-block',
     components: {
-      ToastBlock,
       ActionBarTemplate
     },
     data: () => ({

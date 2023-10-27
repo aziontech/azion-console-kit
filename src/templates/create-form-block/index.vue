@@ -1,6 +1,5 @@
 <template>
   <div class="flex flex-col min-h-[calc(100vh-120px)]">
-    <ToastBlock />
     <PageHeadingBlock :pageTitle="pageTitle" />
     <form class="w-full grow mt-4 p-4 max-w-screen-sm flex flex-col gap-4 lg:max-w-7xl mx-auto">
       <div class="flex flex-col gap-4 sm:!w-full md:!w-1/2">
@@ -18,14 +17,12 @@
   </div>
 </template>
 <script>
-  import ToastBlock from '@/templates/toast-block'
   import ActionBarTemplate from '@/templates/action-bar-block'
   import PageHeadingBlock from '@/templates/page-heading-block'
 
   export default {
     name: 'create-form-block',
     components: {
-      ToastBlock,
       ActionBarTemplate,
       PageHeadingBlock
     },

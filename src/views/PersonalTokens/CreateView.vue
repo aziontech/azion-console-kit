@@ -1,6 +1,5 @@
 <template>
   <div>
-    <ToastBlock />
     <CreateFormBlockWithEvent
       pageTitle="Create Personal Token"
       :createService="props.createPersonalTokenService"
@@ -106,7 +105,6 @@
   import TextareaComponent from 'primevue/textarea'
   import Calendar from 'primevue/calendar'
   import PrimeButton from 'primevue/button'
-  import ToastBlock from '@/templates/toast-block'
 
   const props = defineProps({
     createPersonalTokenService: {

@@ -1,6 +1,5 @@
 <template>
   <div class="flex flex-col min-h-[calc(100vh-120px)]">
-    <ToastBlock />
     <PageHeadingBlock :pageTitle="pageTitle" />
     <form
       @submit.prevent="handleSubmit"
@@ -20,14 +19,12 @@
 </template>
 
 <script>
-  import ToastBlock from '@/templates/toast-block'
   import ActionBarTemplate from '@/templates/action-bar-block'
   import PageHeadingBlock from '@/templates/page-heading-block'
 
   export default {
     name: 'edit-form-block',
     components: {
-      ToastBlock,
       ActionBarTemplate,
       PageHeadingBlock
     },
