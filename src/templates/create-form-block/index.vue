@@ -55,7 +55,9 @@
       handleCancel() {
         this.$router.go('-1')
       },
-
+      goBackToList() {
+        this.$router.go(-1)
+      },
       async validateAndSubmit() {
         try {
           this.isLoading = true
@@ -67,6 +69,7 @@
             summary: feedback ?? 'created successfully',
             life: 10000
           })
+          this.goBackToList()
         } catch (error) {
           this.$toast.add({
             closable: false,
