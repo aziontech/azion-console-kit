@@ -11,7 +11,7 @@
           text
           aria-label="Get help"
           size="small"
-          @click="console.log('help')"
+          @click="showHelperCenter"
         />
         <PrimeButton
           icon="pi pi-ellipsis-h"
@@ -25,10 +25,17 @@
     <PrimeDivider />
     <div class="flex h-full flex-col gap-6 flex-auto p-6">
       <div class="flex flex-col gap-2">
-        <span class="break-all">{{ description }}</span>
-        <slot name="aggregation" />
+        <span class="break-all font-normal line-height-1">{{ description }}</span>
+        <AggregationInfo
+          :aggregationType="aggregationType"
+          :variationType="variationType"
+          :variationValue="variationValue"
+          :displayTag="displayTag"
+        />
       </div>
-      <section class="flex-auto bg-slate-400 gap-2">Chart</section>
+      <section class="flex-auto">
+        <slot name="chart" />
+      </section>
     </div>
   </div>
 </template>
@@ -38,6 +45,8 @@
   import PrimeButton from 'primevue/button'
   import PrimeDivider from 'primevue/divider'
   import ChartOwner from './components/chart-owner.vue'
+  import AggregationInfo from './components/aggregation-info.vue'
+  import { useHelpCenterStore } from '@/stores/help-center'
 
   defineOptions({ name: 'GraphsCardBlock' })
 
@@ -63,7 +72,28 @@
       validator(value) {
         return [4, 6, 8, 12].includes(value)
       }
-    }
+    },
+    aggregationType: {
+      type: String,
+      default: 'Sum',
+      validator(value) {
+        return ['Sum', 'Average'].includes(value)
+      }
+    },
+    displayTag: {
+      type: Boolean,
+      default: true
+    },
+    variationType: {
+      type: String,
+      default: 'none',
+      validator(value) {
+        return ['none', 'positive', 'negative', 'positive-inverse', 'negative-inverse'].includes(
+          value
+        )
+      }
+    },
+    variationValue: { type: String, default: '' }
   })
 
   const cardColumns = computed(() => {
@@ -79,4 +109,9 @@
         return 'lg:col-span-6'
     }
   })
+
+  const helpCenterStore = useHelpCenterStore()
+  const showHelperCenter = () => {
+    helpCenterStore.toggleHelpCenter()
+  }
 </script>
