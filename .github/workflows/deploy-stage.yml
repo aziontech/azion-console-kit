@@ -38,7 +38,7 @@ jobs:
           --arg funcid ${{secrets.STAGE_EDGE_FUNCTION_ID}} 
           --arg appid ${{secrets.STAGE_EDGE_APPLICATION_ID}} 
           --arg domainid ${{secrets.STAGE_DOMAIN_ID}} 
-          '.name = ($name)
+          '.name = $name
           | .function.id = ($funcid|tonumber)
           | .application.id = ($appid|tonumber)
           | .domain.id = ($domainid|tonumber)'
