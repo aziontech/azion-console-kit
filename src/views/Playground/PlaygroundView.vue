@@ -119,7 +119,7 @@
         aggregationType="Average"
         displayTag
         variationType="none"
-        variationValue="--%"
+        variationValue="0%"
       >
         <template #chart>
           <div class="surface-border border border-dashed flex items-center h-full">

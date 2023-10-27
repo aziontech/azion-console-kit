@@ -2,19 +2,19 @@
   <div class="flex gap-2">
     <PrimeTag
       icon="pi pi-calculator"
-      :label="aggregationType"
+      :value="aggregationType"
       :class="defaultTagClass"
     />
     <PrimeTag
       :class="tagProps?.class"
       v-if="displayTag && variationValue"
-      :label="variationValue"
+      :value="variationValue"
       :icon="tagProps?.icon"
       :severity="tagProps?.severity"
     />
     <PrimeSkeleton
       v-if="displayTag && !variationValue"
-      height="1.25rem"
+      height="26px"
       width="2.5rem"
       borderRadius="0.375rem"
     />
