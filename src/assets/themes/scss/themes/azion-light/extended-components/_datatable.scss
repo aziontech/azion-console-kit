@@ -1,0 +1,37 @@
+.p-datatable {
+  border: var(--surface-border) 1px solid !important;
+  border-radius: $borderRadius;
+
+  .p-datatable-header {
+    border-top-right-radius: $borderRadius;
+    border-top-left-radius: $borderRadius;
+  }
+
+  .p-datatable-thead > tr > th {
+    font-size: 0.875rem;
+  }
+
+  .p-sortable-column:hover {
+    .p-sortable-column-icon {
+      opacity: 1 !important;
+    }
+  }
+
+  .p-sortable-column {
+    .p-sortable-column-icon {
+      opacity: 0 !important;
+    }
+  }
+
+  .p-datatable-tbody {
+    > tr {
+      background: $tableBodyRowBg;
+      color: $tableBodyRowTextColor;
+      transition: $listItemTransition;
+
+      > td {
+        font-size: 0.875rem;
+      }
+    }
+  }
+}
