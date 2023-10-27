@@ -35,7 +35,7 @@ const adapt = (payload) => {
 const parseHttpResponse = (httpResponse) => {
   switch (httpResponse.statusCode) {
     case 201:
-      return 'Your domain has been created'
+      return 'Your domain has been edited'
     case 400:
       throw new Error(Object.keys(httpResponse.body)[0])
     case 409:
