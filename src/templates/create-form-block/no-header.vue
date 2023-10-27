@@ -1,6 +1,5 @@
 <template>
   <div class="flex flex-col min-h-[calc(100vh-120px)]">
-    <ToastBlock />
     <form class="w-full grow mt-4 p-4 max-w-screen-sm flex flex-col gap-4 lg:max-w-7xl mx-auto">
       <div class="flex flex-col gap-4 sm:!w-full md:!w-1/2">
         <slot name="form" />
@@ -17,13 +16,11 @@
   </div>
 </template>
 <script>
-  import ToastBlock from '@/templates/toast-block'
   import ActionBarTemplate from '@/templates/action-bar-block'
 
   export default {
     name: 'create-form-block',
     components: {
-      ToastBlock,
       ActionBarTemplate
     },
     data: () => ({
@@ -55,7 +52,9 @@
       handleCancel() {
         this.$router.go('-1')
       },
-
+      goBackToList() {
+        this.$router.go(-1)
+      },
       async validateAndSubmit() {
         try {
           this.isLoading = true
@@ -67,6 +66,7 @@
             summary: 'created successfully',
             life: 10000
           })
+          this.goBackToList()
         } catch (error) {
           this.$toast.add({
             closable: false,

@@ -1,6 +1,5 @@
 <template>
   <div>
-    <ToastBlock />
     <PageHeadingBlock :pageTitle="pageTitle" />
 
     <div class="max-w-full mx-8">
@@ -166,7 +165,6 @@
 <script>
   import DataTable from 'primevue/datatable'
   import Column from 'primevue/column'
-  import ToastBlock from '@/templates/toast-block'
   import Listbox from 'primevue/listbox'
   import InputText from 'primevue/inputtext'
   import PrimeMenu from 'primevue/menu'
@@ -180,7 +178,6 @@
     name: 'list-table-block',
     emits: ['on-load-data'],
     components: {
-      ToastBlock,
       DataTable,
       Column,
       InputText,

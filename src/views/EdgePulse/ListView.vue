@@ -1,6 +1,5 @@
 <template>
   <div>
-    <ToastBlock />
     <SingleBlock pageTitle="Edge Pulse">
       <template #content>
         <div class="flex flex-col gap-4 lg:w-1/2">
@@ -52,7 +51,6 @@
 <script>
   import SingleBlock from '@/templates/single-block'
   import PrimeButton from 'primevue/button'
-  import ToastBlock from '@/templates/toast-block'
 
   const defaultTagCode = `<script>
     if (typeof window.addEventListener === 'function') {
@@ -80,8 +78,7 @@
     name: 'edge-pulse-view',
     components: {
       PrimeButton,
-      SingleBlock,
-      ToastBlock
+      SingleBlock
     },
     methods: {
       showToast() {
