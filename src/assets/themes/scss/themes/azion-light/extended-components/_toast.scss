@@ -2,6 +2,8 @@
 .p-toast {
   .p-toast-message {
     .p-toast-message-content {
+      background: var(--surface-card) !important;
+      border-radius: $borderRadius !important;
       .p-toast-message-text {
       }
 
@@ -55,7 +57,7 @@
     }
 
     &.p-toast-message-error {
-      background: var(--surface-section) !important;
+      background: var(--surface-section) !important;  
       .p-toast-message-icon {
       }
       .p-toast-icon-close {
