@@ -34,7 +34,7 @@ const adapt = (payload) => {
  */
 const parseHttpResponse = (httpResponse) => {
   switch (httpResponse.statusCode) {
-    case 201:
+    case 202:
       return 'Your domain has been edited'
     case 400:
       throw new Error(Object.keys(httpResponse.body)[0])
