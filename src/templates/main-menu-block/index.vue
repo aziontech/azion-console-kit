@@ -13,10 +13,9 @@
         <PrimeButton
           @click="openSideBar"
           size="small"
-          class="flex-none surface-border"
+          class="flex-none surface-border w-8 h-8"
           text
           icon="pi pi-bars"
-          style="height: 32px; width: 32px"
           v-tooltip.bottom="'Main menu'"
         />
 
@@ -63,9 +62,8 @@
       <div class="flex gap-2 items-center">
         <PrimeButton
           icon="pi pi-search"
-          class="px-2 py-1 flex lg:hidden"
+          class="px-2 py-1 flex lg:hidden w-8 h-8"
           @click="openSearch"
-          style="height: 32px; width: 32px"
           outlined
           v-tooltip.bottom="'Search'"
         />
@@ -84,10 +82,9 @@
         <PrimeButton
           @click="showCreateModal"
           icon="pi pi-plus"
-          class="h-8 md:hidden"
+          class="h-8 w-8 md:hidden"
           size="small"
           outlined
-          style="height: 32px; width: 32px"
           v-tooltip.bottom="'Create'"
         />
 
@@ -96,7 +93,7 @@
           icon="pi pi-question-circle"
           size="small"
           label="Help"
-          @click="showHelperCenter"
+          @click="toggleHelpCenter"
           outlined
           class="hidden md:flex"
         />
@@ -106,17 +103,15 @@
           icon="pi pi-question-circle"
           size="small"
           outlined
-          class="md:hidden"
-          style="height: 32px; width: 32px"
-          @click="showHelperCenterMobile"
+          class="md:hidden h-8 w-8"
+          @click="toggleHelpCenter"
           v-tooltip.bottom="'Help'"
         />
 
         <!-- Notification Button  -->
         <PrimeButton
           icon="pi pi-bell"
-          style="border-color: var(--surface-border); padding-left: 7px; height: 32px; width: 32px"
-          class="overflow-auto"
+          class="surface-border overflow-auto h-8 w-8 pl-[7px]"
           badge="9"
           v-tooltip.bottom="'Notifications'"
           size="small"
@@ -151,15 +146,26 @@
   </header>
   <!-- help mobile sidebar -->
   <Sidebar
-    v-model:visible="showHelp"
+    :visible="showHelp"
     position="bottom"
-    headerContent="Help"
+    :show-close-icon="false"
     :pt="{
-      root: { class: '!h-[90%]' }
+      root: { class: '!h-[90%] md:hidden flex' },
+      headerContent: { class: 'w-full' },
+      mask: { class: 'md:hidden flex' }
     }"
   >
     <template #header>
-      <div>Help</div>
+      <div class="flex items-center justify-between">
+        <h2>Help</h2>
+        <PrimeButton
+          icon="pi pi-times"
+          @click="toggleHelpCenter"
+          size="small"
+          class="flex-none surface-border text-sm w-8 h-8"
+          text
+        />
+      </div>
     </template>
     <div class="flex flex-col p-2">
       <!-- content -->
@@ -384,6 +390,7 @@
   import Dropdown from 'primevue/dropdown'
   import { useAccountStore } from '@/stores/account'
   import { mapActions, mapState } from 'pinia'
+  import { useHelpCenterStore } from '@/stores/help-center'
 
   export default {
     name: 'HeaderTemplate',
@@ -410,7 +417,6 @@
     emits: ['showSlideHelper', 'showSlideCenter'],
     data() {
       return {
-        showHelp: false,
         showCreate: false,
         showSearch: false,
         showSidebar: false,
@@ -594,12 +600,14 @@
     },
     computed: {
       ...mapState(useAccountStore, { user: 'accountData', currentTheme: 'currentTheme' }),
+      ...mapState(useHelpCenterStore, { showHelp: 'isOpen' }),
       selectedTheme() {
         return this.themeOptions.find((option) => option.value === this.currentTheme)
       }
     },
     methods: {
       ...mapActions(useAccountStore, ['setTheme']),
+      ...mapActions(useHelpCenterStore, ['toggleHelpCenter']),
       toggleProfile(event) {
         this.$refs.profile.toggle(event)
       },
@@ -623,12 +631,6 @@
       },
       closeSearch() {
         this.showSearch = false
-      },
-      showHelperCenter() {
-        this.$emit('showSlideHelper', !this.helperVisible)
-      },
-      showHelperCenterMobile() {
-        this.showHelp = true
       },
       logout() {
         window.location.href = '/logout'
