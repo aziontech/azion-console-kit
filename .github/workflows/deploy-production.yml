@@ -38,7 +38,7 @@ jobs:
           --arg funcid ${{secrets.PROD_EDGE_FUNCTION_ID}} 
           --arg appid ${{secrets.PROD_EDGE_APPLICATION_ID}} 
           --arg domainid ${{secrets.PROD_DOMAIN_ID}} 
-          '.name = ($name|tostring)
+          '.name = "Console PK - Production"
           | .function.id = ($funcid|tonumber)
           | .application.id = ($appid|tonumber)
           | .domain.id = ($domainid|tonumber)'
