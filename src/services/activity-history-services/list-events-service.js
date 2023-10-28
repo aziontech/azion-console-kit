@@ -3,9 +3,34 @@ import graphQLApi from '../axios/makeEventsApi'
 import { makeEventsListBaseUrl } from './make-events-list-base-url'
 
 export const listEventsService = async () => {
+  const offSetEnd = new Date();
+  const offSetStart = new Date(Date.UTC(offSetEnd.getFullYear(), offSetEnd.getMonth(), offSetEnd.getDate()- 30));
   const payload = {
     operatioName: 'ActivityHistory',
-    query: `query EventsQuery {\n  httpEvents(\n    limit: 5, \n    filter: {\n      tsRange: {begin:"2022-11-20T10:10:10", end:"2022-11-27T10:10:10"}    },   aggregate: {count: requestUri}\n    groupBy: [requestUri]\n    orderBy: [count_DESC]\n    ) \n  { \n    requestUri\n    count\n  }\n}`,
+    query: `
+    query ActivityHistory {
+      activityHistoryEvents(
+        offset: 0
+        limit: 1000, 
+        filter: {
+          tsRange: {begin:"${offSetStart.toISOString()}", end:"${offSetEnd.toISOString()}"}
+          # tsNe: "2023-10-21T01:00:06Z"
+          # tsIn: ["2023-10-21T03:00:10Z", "2023-10-21T04:00:16Z", "2023-10-21T06:00:07Z"]
+          # titleIlike: "%BOtM%"
+        },
+        orderBy: [ts_DESC]
+        ) 
+      {	
+        ts
+        title
+        comment
+        type
+        authorName
+        authorEmail
+        accountId
+      }
+    }
+    `,
     variables: null
   }
 
@@ -18,15 +43,24 @@ export const listEventsService = async () => {
     graphQLApi(import.meta.env.VITE_PERSONAL_TOKEN)
   )
   httpResponse = adapt(httpResponse)
-
+  console.log(httpResponse);
   return parseHttpResponse(httpResponse)
 }
 
 const adapt = (httpResponse) => {
-  console.log(httpResponse)
+  const parsedEvents = httpResponse.body.data.activityHistoryEvents.map((element)=> ({
+    ts: Intl.DateTimeFormat('us', {
+      dateStyle: 'full',
+      timeStyle: 'short'
+    }).format(new Date(element.ts)),
+    title: element.title,
+    type: element.type,
+    author_name: element.authorName,
+    author_email: element.authorEmail
+  }));
 
   return {
-    body: httpResponse.data,
-    statusCode: httpResponse.statusCode
+    body: parsedEvents,
+    statusCode: httpResponse.statusCode,
   }
 }
