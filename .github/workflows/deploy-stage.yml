@@ -34,7 +34,6 @@ jobs:
       - name: Define application settings
         run: >
           echo $(jq
-          --arg name ${{secrets.STAGE_EDGE_APPLICATION_NAME}} 
           --arg funcid ${{secrets.STAGE_EDGE_FUNCTION_ID}} 
           --arg appid ${{secrets.STAGE_EDGE_APPLICATION_ID}} 
           --arg domainid ${{secrets.STAGE_DOMAIN_ID}} 
