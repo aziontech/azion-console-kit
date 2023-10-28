@@ -3,8 +3,10 @@ import graphQLApi from '../axios/makeEventsApi'
 import { makeEventsListBaseUrl } from './make-events-list-base-url'
 
 export const listEventsService = async () => {
-  const offSetEnd = new Date();
-  const offSetStart = new Date(Date.UTC(offSetEnd.getFullYear(), offSetEnd.getMonth(), offSetEnd.getDate()- 30));
+  const offSetEnd = new Date()
+  const offSetStart = new Date(
+    Date.UTC(offSetEnd.getFullYear(), offSetEnd.getMonth(), offSetEnd.getDate() - 30)
+  )
   const payload = {
     operatioName: 'ActivityHistory',
     query: `
@@ -43,12 +45,12 @@ export const listEventsService = async () => {
     graphQLApi(import.meta.env.VITE_PERSONAL_TOKEN)
   )
   httpResponse = adapt(httpResponse)
-  console.log(httpResponse);
+  console.log(httpResponse)
   return parseHttpResponse(httpResponse)
 }
 
 const adapt = (httpResponse) => {
-  const parsedEvents = httpResponse.body.data.activityHistoryEvents.map((element)=> ({
+  const parsedEvents = httpResponse.body.data.activityHistoryEvents.map((element) => ({
     ts: Intl.DateTimeFormat('us', {
       dateStyle: 'full',
       timeStyle: 'short'
@@ -57,10 +59,10 @@ const adapt = (httpResponse) => {
     type: element.type,
     author_name: element.authorName,
     author_email: element.authorEmail
-  }));
+  }))
 
   return {
     body: parsedEvents,
-    statusCode: httpResponse.statusCode,
+    statusCode: httpResponse.statusCode
   }
 }

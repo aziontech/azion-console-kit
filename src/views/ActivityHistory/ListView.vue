@@ -7,15 +7,23 @@
           <div class="border-b surface-border w-full p-3.5 flex">
             <span class="p-input-icon-left">
               <i class="pi pi-search" />
-              <InputText placeholder="Search..." v-model="search"/>
+              <InputText
+                placeholder="Search..."
+                v-model="search"
+              />
             </span>
-            <span class="flex items-center ml-auto text-secondry text-xs font-normal leading-[21px]">
+            <span
+              class="flex items-center ml-auto text-secondry text-xs font-normal leading-[21px]"
+            >
               last 30 days records
             </span>
           </div>
         </template>
         <template #content>
-          <div class="animate-pulse flex space-x-4 p-6" v-if="isLoading">
+          <div
+            class="animate-pulse flex space-x-4 p-6"
+            v-if="isLoading"
+          >
             <div class="rounded-full bg-stone-500 h-10 w-10"></div>
             <div class="flex-1 space-y-6 py-1">
               <div class="h-2 bg-stone-500 rounded"></div>
@@ -28,41 +36,53 @@
               </div>
             </div>
           </div>
-          <div class="p-6" v-if="!isLoading">
-            <span v-if="filteredEvents.length === 0" class="text-primary">No events found</span>
-            <Timeline v-if="filteredEvents" :value="filteredEvents" align="left" class="customized-timeline"
+          <div
+            class="p-6"
+            v-if="!isLoading"
+          >
+            <span
+              v-if="filteredEvents.length === 0"
+              class="text-primary"
+              >No events found</span
+            >
+            <Timeline
+              v-if="filteredEvents"
+              :value="filteredEvents"
+              align="left"
+              class="customized-timeline"
               :pt="{
                 opposite: { class: 'hidden' }
               }"
             >
-                <template #marker="slotProps">
-                    <span class="flex w-8 h-8 align-items-center justify-content-center text-white border-circle z-1 shadow-1" :style="{ backgroundColor: slotProps.item.color }">
-                        <i :class="slotProps.item.icon"></i>
-                    </span>
-                </template>
-                <template #content="slotProps">
-                  <div class="flex flex-col">
-                      <div class="text-color-secondary text-xs font-bold text-base">
-                        {{ slotProps.item.date }}
-                      </div>
-                      <div class="flex">
-                        <div class="text-color text-lg flex items-center">
-                          {{ slotProps.item.event }}
-                        </div>
-                        <div class="text-color-secondary text-xs font-normal flex items-center ml-1">
-                          by {{ slotProps.item.editor }}
-                        </div>
-                      </div>
+              <template #marker="slotProps">
+                <span
+                  class="flex w-8 h-8 align-items-center justify-content-center text-white border-circle z-1 shadow-1"
+                  :style="{ backgroundColor: slotProps.item.color }"
+                >
+                  <i :class="slotProps.item.icon"></i>
+                </span>
+              </template>
+              <template #content="slotProps">
+                <div class="flex flex-col">
+                  <div class="text-color-secondary text-xs font-bold text-base">
+                    {{ slotProps.item.date }}
                   </div>
-                </template>
+                  <div class="flex">
+                    <div class="text-color text-lg flex items-center">
+                      {{ slotProps.item.event }}
+                    </div>
+                    <div class="text-color-secondary text-xs font-normal flex items-center ml-1">
+                      by {{ slotProps.item.editor }}
+                    </div>
+                  </div>
+                </div>
+              </template>
             </Timeline>
           </div>
         </template>
         <template #footer>
           <div class="border-t">
-            <Paginator>
-              
-            </Paginator>
+            <Paginator> </Paginator>
           </div>
         </template>
       </Card>
@@ -91,23 +111,25 @@
       search: '',
       pageTitle: 'Activity History',
       isLoading: false,
-      events: [],
+      events: []
     }),
     computed: {
       filteredEvents() {
-        return this.events.filter((element)=> element.event.toLowerCase().includes(this.search.toLowerCase()))
+        return this.events.filter((element) =>
+          element.event.toLowerCase().includes(this.search.toLowerCase())
+        )
       }
     },
     async created() {
-      await this.loadData();
-      console.log(this.events[0]);
+      await this.loadData()
+      console.log(this.events[0])
     },
     methods: {
       async loadData() {
         try {
           this.isLoading = true
-          const data = await ActivityHistoryService.listEventsService();
-          const iconsMap =   {
+          const data = await ActivityHistoryService.listEventsService()
+          const iconsMap = {
             created: 'pi pi-plus-circle',
             deleted: 'pi pi-trash',
             changed: 'pi pi-pencil'
@@ -123,9 +145,9 @@
             color: colorsMap[element.type],
             event: element.title,
             editor: `${element.author_name} (${element.author_email})`
-          }));
-          this.filteredEvents = this.events;
-          console.log(this.events);
+          }))
+          this.filteredEvents = this.events
+          console.log(this.events)
         } catch (error) {
           this.$toast.add({
             closable: true,
@@ -134,10 +156,10 @@
             life: 10000
           })
         } finally {
-          console.log('finally');
+          console.log('finally')
           this.isLoading = false
         }
-      },
-    },
+      }
+    }
   }
 </script>
