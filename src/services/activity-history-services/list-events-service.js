@@ -12,6 +12,7 @@ export const listEventsService = async () => {
     query: `
     query ActivityHistory {
       activityHistoryEvents(
+        aggregate: {sum: requests}
         offset: 0
         limit: 1000, 
         filter: {
@@ -23,6 +24,7 @@ export const listEventsService = async () => {
         orderBy: [ts_DESC]
         ) 
       {	
+        sum
         ts
         title
         comment
@@ -45,7 +47,6 @@ export const listEventsService = async () => {
     graphQLApi(import.meta.env.VITE_PERSONAL_TOKEN)
   )
   httpResponse = adapt(httpResponse)
-  console.log(httpResponse)
   return parseHttpResponse(httpResponse)
 }
 
