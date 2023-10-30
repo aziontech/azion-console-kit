@@ -109,6 +109,7 @@
     },
     data: () => ({
       search: '',
+      currentPage: 0,
       pageTitle: 'Activity History',
       isLoading: false,
       events: []
@@ -144,7 +145,7 @@
             icon: iconsMap[element.type],
             color: colorsMap[element.type],
             event: element.title,
-            editor: `${element.author_name} (${element.author_email})`
+            editor: `${element.authorName} (${element.authorEmail})`
           }))
           this.filteredEvents = this.events
           console.log(this.events)

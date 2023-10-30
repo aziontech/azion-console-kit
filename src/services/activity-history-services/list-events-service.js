@@ -12,7 +12,6 @@ export const listEventsService = async () => {
     query: `
     query ActivityHistory {
       activityHistoryEvents(
-        aggregate: {sum: requests}
         offset: 0
         limit: 1000, 
         filter: {
@@ -24,7 +23,6 @@ export const listEventsService = async () => {
         orderBy: [ts_DESC]
         ) 
       {	
-        sum
         ts
         title
         comment
@@ -58,8 +56,8 @@ const adapt = (httpResponse) => {
     }).format(new Date(element.ts)),
     title: element.title,
     type: element.type,
-    author_name: element.authorName,
-    author_email: element.authorEmail
+    authorName: element.authorName,
+    authorEmail: element.authorEmail
   }))
 
   return {
