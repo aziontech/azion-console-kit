@@ -37,3 +37,25 @@
     }
   }
 }
+
+// Aguardando o @Matheus declarar a classe do dialog
+// .p-listbox-item {
+//   &::before {
+//     content: '×' !important;
+//     margin-right: 0.3rem;
+//     font-size: 1.25rem;
+//     line-height: 0.875rem;
+//   }
+//   &:hover {
+//     background: $inputListItemHoverBg !important;
+//   }
+//   &.p-highlight {
+//     background: transparent !important;
+//     &::before {
+//       content: none !important;
+//     }
+//     &:hover {
+//       background: $inputListItemHoverBg !important;
+//     }
+//   }
+// }
