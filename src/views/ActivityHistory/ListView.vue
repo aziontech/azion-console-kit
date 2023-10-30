@@ -80,11 +80,6 @@
             </Timeline>
           </div>
         </template>
-        <template #footer>
-          <div class="border-t">
-            <Paginator> </Paginator>
-          </div>
-        </template>
       </Card>
     </div>
   </div>
@@ -95,7 +90,6 @@
   import Timeline from 'primevue/timeline'
   import Card from 'primevue/card'
   import InputText from 'primevue/inputtext'
-  import Paginator from 'primevue/paginator'
   import * as ActivityHistoryService from '@/services/activity-history-services'
 
   export default {
@@ -105,7 +99,6 @@
       Timeline,
       Card,
       InputText,
-      Paginator
     },
     data: () => ({
       search: '',
