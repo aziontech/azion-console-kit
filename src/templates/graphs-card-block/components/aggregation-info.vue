@@ -3,7 +3,6 @@
     <PrimeTag
       icon="pi pi-calculator"
       :value="aggregationType"
-      :class="defaultTagClass"
     />
     <PrimeTag
       :class="tagProps?.class"
@@ -33,8 +32,6 @@
     variationValue: { type: String, required: true }
   })
 
-  const defaultTagClass = 'bg-[#cccccc] text-[#111111]'
-
   const tagProps = computed(() => {
     const { variationType } = props
 
@@ -60,9 +57,7 @@
           icon: 'pi pi-arrow-circle-down'
         }
       default:
-        return {
-          class: defaultTagClass
-        }
+        return null
     }
   })
 </script>
