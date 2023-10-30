@@ -1,6 +1,5 @@
 <template>
   <div class="flex flex-col min-h-[calc(100vh-120px)]">
-    <Toast />
     <form
       @submit.prevent="handleSubmit"
       class="w-full grow mt-4 p-4 max-w-screen-sm flex flex-col gap-4 lg:max-w-7xl mx-auto"
@@ -21,13 +20,11 @@
 </template>
 
 <script>
-  import Toast from 'primevue/toast'
   import ActionBarTemplate from '@/templates/action-bar-block'
 
   export default {
     name: 'edit-form-block',
     components: {
-      Toast,
       ActionBarTemplate
     },
     data: () => ({
@@ -82,7 +79,7 @@
           this.initialDataSetter(initialData)
         } catch (error) {
           this.$toast.add({
-            closable: true,
+            closable: false,
             severity: 'error',
             summary: error,
             life: 10000
@@ -96,14 +93,14 @@
           this.isLoading = true
           await this.editService(this.formData)
           this.$toast.add({
-            closable: true,
+            closable: false,
             severity: 'success',
             summary: 'edited successfully',
             life: 10000
           })
         } catch (error) {
           this.$toast.add({
-            closable: true,
+            closable: false,
             severity: 'error',
             summary: error,
             life: 10000

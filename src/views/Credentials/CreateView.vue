@@ -7,36 +7,52 @@
     :cleanFormCallback="resetForm"
   >
     <template #form>
-      <div class="flex flex-col gap-2">
-        <label for="name">Name: *</label>
-        <InputText
-          placeholder="Add Credential Name"
-          v-model="name"
-          id="name"
-          type="text"
-          :class="{ 'p-invalid': errors.name }"
-          v-tooltip.top="errors.name"
-        />
-      </div>
+      <FormHorizontal
+        title="Credentials"
+        description="Espaço livre para descrição e instruções de preenchimento. Esse conteúdo deve ser criado pensando tanto em funcionalidade quanto em em alinhamento e estética. Devemos sempre criar os blocos conforme o contexto, cuidando sempre para não ter blocos muito longos."
+      >
+        <template #inputs>
+          <div class="flex flex-col sm:max-w-lg w-full gap-2">
+            <label
+              for="name"
+              class="text-color text-base font-medium"
+              >Name *</label
+            >
+            <InputText
+              placeholder="Add Credential Name"
+              v-model="name"
+              id="name"
+              type="text"
+              :class="{ 'p-invalid': errors.name }"
+              v-tooltip.top="{ value: errors.name, showDelay: 200 }"
+            />
+          </div>
 
-      <div class="flex flex-col gap-2">
-        <label for="description">Description:</label>
-        <PrimeTextarea
-          :class="{ 'p-invalid': errors.description }"
-          v-model="description"
-          id="description"
-          rows="5"
-          cols="30"
-          class="w-full"
-          v-tooltip.top="errors.description"
-        />
-      </div>
+          <div class="flex flex-col sm:max-w-lg w-full gap-2">
+            <label
+              for="description"
+              class="text-color text-base font-medium"
+              >Description</label
+            >
+            <PrimeTextarea
+              v-model="description"
+              id="description"
+              rows="2"
+              cols="30"
+              class="w-full"
+              :class="{ 'p-invalid': errors.description }"
+              v-tooltip.top="{ value: errors.description, showDelay: 200 }"
+            />
+          </div>
+        </template>
+      </FormHorizontal>
     </template>
   </CreateFormBlock>
 </template>
 
 <script>
-  import CreateFormBlock from '@/templates/create-form-block'
+  import CreateFormBlock from '@/templates/create-form-block-new'
+  import FormHorizontal from '@/templates/create-form-block-new/form-horizontal'
   import InputText from 'primevue/inputtext'
   import PrimeTextarea from 'primevue/textarea'
   import { useField, useForm } from 'vee-validate'
@@ -46,7 +62,8 @@
     components: {
       CreateFormBlock,
       InputText,
-      PrimeTextarea
+      PrimeTextarea,
+      FormHorizontal
     },
     props: {
       createCredentialService: Function

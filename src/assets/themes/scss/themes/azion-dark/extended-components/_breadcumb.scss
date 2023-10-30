@@ -1,0 +1,17 @@
+// Custom Breadcrumb
+.p-breadcrumb {
+  .p-breadcrumb-list {
+    font-weight: 500;
+    .p-menuitem-link {
+      padding: 0.25rem 0.125rem !important;
+      transition: $formElementTransition !important;
+      font-size: 0.875rem !important;
+    }
+    .p-menuitem:last-of-type {
+      font-weight: 500 !important;
+    }
+    .p-menuitem:hover {
+      text-decoration: underline;
+    }
+  }
+}
