@@ -35,7 +35,6 @@
                         />
                         <small
                           id="username-help"
-                          :class="{ 'p-invalid': errors.name }"
                           class="p-error"
                           >{{ errors.name }}</small
                         >
@@ -52,7 +51,7 @@
                           v-bind="hashId"
                           type="text"
                           class="w-full"
-                          disabled
+                          :disabled="true"
                         />
                       </div>
                       <div class="flex flex-col gap-2">
@@ -96,7 +95,7 @@
                           <label for="cells">Azion Cells</label>
                           <InputSwitch
                             id="cells"
-                            disabled="true"
+                            :disabled="true"
                           />
                         </div>
                         <small>
@@ -110,7 +109,7 @@
                           <label for="health">Azion Health Check</label>
                           <InputSwitch
                             id="health"
-                            disabled="true"
+                            :disabled="true"
                           />
                         </div>
                         <small>
@@ -191,7 +190,7 @@
 
   const validationSchema = yup.object({
     name: yup.string().required('Name is a required field'),
-    hashId: yup.string().required(),
+    hashId: yup.string().required('HashID is a required field'),
     modules: yup.object(),
     addService: yup.boolean(),
     groups: yup.array(),
