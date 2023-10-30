@@ -73,5 +73,4 @@ describe('DomainsServices', () => {
 
     expect(feedbackMessage).rejects.toThrow(apiErrorMock)
   })
-
 })
