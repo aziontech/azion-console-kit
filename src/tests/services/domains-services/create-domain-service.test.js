@@ -57,7 +57,7 @@ describe('DomainsServices', () => {
     expect(feedbackMessage).toBe('Your domain has been created')
   })
 
-  it('Should return an API error for an $scenario, erro: 409', async () => {
+  it('Should return an API error for an 409 response status', async () => {
     const errorKey = 'duplicated_domain_name'
     const apiErrorMock = 'duplicated_domain_name'
 
@@ -74,7 +74,7 @@ describe('DomainsServices', () => {
     expect(feedbackMessage).rejects.toThrow(apiErrorMock)
   })
 
-  it('Should return an API error for an $scenario erro: 400', async () => {
+  it('Should return an API error for an 400 response status', async () => {
     const errorKey = 'duplicated_domain_name'
     const apiErrorMock = 'duplicated_domain_name'
 
