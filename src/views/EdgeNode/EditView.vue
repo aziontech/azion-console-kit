@@ -32,13 +32,19 @@
                           type="text"
                           :class="{ 'p-invalid': errors.name }"
                           class="w-full"
-                          />
-                        <small id="username-help" :class="{ 'p-invalid': errors.name }" class="p-error">{{ errors.name }}</small>
+                        />
+                        <small
+                          id="username-help"
+                          :class="{ 'p-invalid': errors.name }"
+                          class="p-error"
+                          >{{ errors.name }}</small
+                        >
                       </div>
                       <p>
                         Each node needs to run the Azion Orchestration software. It enables the
-                        communication between your private node and Azion Real-Time Manager, where you can
-                        manage your Edge Applications, Edge Functions, and many other Azion services.
+                        communication between your private node and Azion Real-Time Manager, where
+                        you can manage your Edge Applications, Edge Functions, and many other Azion
+                        services.
                       </p>
                       <div class="flex flex-col gap-2">
                         <InputText
@@ -52,8 +58,8 @@
                       <div class="flex flex-col gap-2">
                         <label for="groups">Node groups</label>
                         <small id="groups-help"
-                          >Use labels to group your Edge Nodes. Groups allow you to manage multiple Edge
-                          Nodes easily in your Edge Maps for orchestration and routing.</small
+                          >Use labels to group your Edge Nodes. Groups allow you to manage multiple
+                          Edge Nodes easily in your Edge Maps for orchestration and routing.</small
                         >
                         <InputText
                           id="groups"
@@ -94,9 +100,9 @@
                           />
                         </div>
                         <small>
-                          Azion Cells is a lightweight software framework to build and run low-latency Edge
-                          Applications. By activating this option, you agree to install the framework on
-                          your Edge Node.
+                          Azion Cells is a lightweight software framework to build and run
+                          low-latency Edge Applications. By activating this option, you agree to
+                          install the framework on your Edge Node.
                         </small>
                       </div>
                       <div class="flex flex-col gap-3">
@@ -109,8 +115,8 @@
                         </div>
                         <small>
                           Azion Health Check is a service that enables your Edge Node to report the
-                          availability and health constantly to Azion. By activating this option, you agree
-                          to install the service on your Edge Node.
+                          availability and health constantly to Azion. By activating this option,
+                          you agree to install the service on your Edge Node.
                         </small>
                       </div>
                       <div class="flex flex-col gap-3">
