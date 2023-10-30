@@ -149,10 +149,7 @@
 
   const onSelectedAccount = async (account) => {
     const data = await switchAccountService(account.id)
-    console.log(data)
     visible.value = false
-    router.go()
-    // accountStore.setAccountData()
-    // store.setAccount(data)
+    router.push({ name: 'home' })
   }
 </script>
