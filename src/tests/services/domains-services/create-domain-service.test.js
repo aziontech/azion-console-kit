@@ -57,15 +57,29 @@ describe('DomainsServices', () => {
     expect(feedbackMessage).toBe('Your domain has been created')
   })
 
-  it.each([
-    {
-      scenario: 'already domain name',
-      apiErrorMock: 'duplicated_domain_name',
-      errorKey: 'duplicated_domain_name'
-    }
-  ])('Should return an API error for an $scenario', async ({ errorKey, apiErrorMock }) => {
+  it('Should return an API error for an $scenario, erro: 409', async () => {
+    const errorKey = 'duplicated_domain_name'
+    const apiErrorMock = 'duplicated_domain_name'
+
     vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
       statusCode: 409,
+      body: {
+        [errorKey]: [apiErrorMock]
+      }
+    })
+    const { sut } = makeSut()
+
+    const feedbackMessage = sut(fixtures.domainMock)
+
+    expect(feedbackMessage).rejects.toThrow(apiErrorMock)
+  })
+
+  it('Should return an API error for an $scenario erro: 400', async () => {
+    const errorKey = 'duplicated_domain_name'
+    const apiErrorMock = 'duplicated_domain_name'
+
+    vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
+      statusCode: 400,
       body: {
         [errorKey]: [apiErrorMock]
       }

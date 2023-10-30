@@ -56,4 +56,22 @@ describe('DomainsServices', () => {
 
     expect(feedbackMessage).toBe('Your domain has been edited')
   })
+
+  it('Should return an API error for an $scenario', async () => {
+    const errorKey = 'duplicated_domain_name'
+    const apiErrorMock = 'duplicated_domain_name'
+
+    vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
+      statusCode: 409,
+      body: {
+        [errorKey]: [apiErrorMock]
+      }
+    })
+    const { sut } = makeSut()
+
+    const feedbackMessage = sut(fixtures.domainMock)
+
+    expect(feedbackMessage).rejects.toThrow(apiErrorMock)
+  })
+
 })
