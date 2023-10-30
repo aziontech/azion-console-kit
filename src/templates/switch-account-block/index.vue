@@ -148,7 +148,7 @@
   }
 
   const onSelectedAccount = async (account) => {
-    const data = await switchAccountService(account.id)
+    await switchAccountService(account.id)
     visible.value = false
     router.push({ name: 'home' })
   }
