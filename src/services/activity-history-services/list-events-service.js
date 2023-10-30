@@ -16,9 +16,6 @@ export const listEventsService = async () => {
         limit: 1000, 
         filter: {
           tsRange: {begin:"${offSetStart.toISOString()}", end:"${offSetEnd.toISOString()}"}
-          # tsNe: "2023-10-21T01:00:06Z"
-          # tsIn: ["2023-10-21T03:00:10Z", "2023-10-21T04:00:16Z", "2023-10-21T06:00:07Z"]
-          # titleIlike: "%BOtM%"
         },
         orderBy: [ts_DESC]
         ) 
