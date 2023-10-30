@@ -10,6 +10,13 @@
   .p-datatable-thead > tr > th {
     font-size: 0.875rem;
     line-height: 1.125rem;
+    padding: .5rem .875rem !important;
+    box-sizing: inherit !important;
+
+    .p-column-header-content {
+      min-height: 2rem;
+      vertical-align: center;
+    }
   }
 
   .p-sortable-column {
