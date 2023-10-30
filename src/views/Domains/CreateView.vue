@@ -26,6 +26,11 @@
               :class="{ 'p-invalid': errors.name }"
               v-tooltip.top="errors.name"
             />
+            <small
+              v-if="errors.name"
+              class="p-error text-xs font-normal leading-tight"
+              >{{ errors.name }}</small
+            >
           </div>
         </template>
       </form-horizontal>
@@ -50,6 +55,11 @@
               class="w-full"
               placeholder="Select an edge application"
             />
+            <small
+              v-if="errors.edgeApplication"
+              class="p-error text-xs font-normal leading-tight"
+              >{{ errors.edgeApplication }}</small
+            >
           </div>
           <div class="flex flex-col sm:max-w-lg w-full gap-2">
             <label
@@ -66,6 +76,12 @@
               class="w-full"
               v-tooltip.top="errors.cnames"
             />
+
+            <small
+              v-if="errors.cnames"
+              class="p-error text-xs font-normal leading-tight"
+              >{{ errors.cnames }}</small
+            >
           </div>
           <Card
             :pt="{
@@ -198,6 +214,11 @@
               placeholder=""
               :disabled="!mtlsIsEnabled"
             />
+            <small
+              v-if="errors.mtlsTrustedCertificate"
+              class="p-error text-xs font-normal leading-tight"
+              >{{ errors.mtlsTrustedCertificate }}</small
+            >
           </div>
         </template>
       </form-horizontal>
@@ -301,13 +322,13 @@
     },
     setup() {
       const validationSchema = yup.object({
-        name: yup.string().required(),
+        name: yup.string().required('Name is a required field'),
         cnames: yup
           .string()
           .label('CNAME')
           .when('cnameAccessOnly', {
             is: true,
-            then: (schema) => schema.required()
+            then: (schema) => schema.required('CNAME is a required field')
           })
           .test({
             name: 'no-whitespace',
@@ -315,14 +336,14 @@
             test: (value) => value?.includes(' ') === false
           }),
         cnameAccessOnly: yup.boolean(),
-        edgeApplication: yup.number(),
+        edgeApplication: yup.number().required(),
         edgeCertificate: yup.string().optional(),
         mtlsIsEnabled: yup.boolean(),
         mtlsVerification: yup.string(),
         trustedCACertificates: yup.string().optional(),
         mtlsTrustedCertificate: yup.string().when('mtlsIsEnabled', {
           is: true,
-          then: (schema) => schema.required()
+          then: (schema) => schema.required('Trusted CA Certificate is a required field')
         })
       })
 
