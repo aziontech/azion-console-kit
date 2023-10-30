@@ -9,8 +9,8 @@ const fixtures = {
     cnames: '',
     edgeApplication: 1695294281,
     mtlsIsEnabled: false,
-    mtlsVerification: "enforce",
-    name: "new dsds"
+    mtlsVerification: 'enforce',
+    name: 'new dsds'
   }
 }
 
@@ -41,7 +41,7 @@ describe('DomainsServices', () => {
         is_mtls_enabled: fixtures.domainMock.mtlsIsEnabled,
         mtls_verification: fixtures.domainMock.mtlsVerification,
         edge_application_id: fixtures.domainMock.edgeApplication,
-        mtls_trusted_ca_certificate_id: undefined,
+        mtls_trusted_ca_certificate_id: undefined
       }
     })
   })
