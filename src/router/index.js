@@ -13,13 +13,14 @@ import { loginRoutes } from '@routes/login-routes'
 import { networkListsRoutes } from '@routes/network-lists-routes'
 import { personalTokensRoutes } from '@routes/personal-tokens-routes'
 import { variablesRoutes } from '@routes/variables-routes'
-import { underDevelopmentRoutes } from '@routes/under-development-routes'
 import { edgeNodeRoutes } from '@routes/edge-node-routes'
-import { credentialsRoutes } from './routes/credentials-routes'
-import beforeEachRoute from './hooks/beforeEachRoute'
+import { credentialsRoutes } from '@routes/credentials-routes'
 import { usersListsRoutes } from '@routes/users-routes'
 import { playgroundRoutes } from './routes/playground-routes'
 import { activityHistoryRoutes } from './routes/activity-history-routes'
+import { errorRoutes } from '@routes/error-routes'
+import { playgroundRoutes } from '@routes/playground-routes'
+import beforeEachRoute from './hooks/beforeEachRoute'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -44,7 +45,8 @@ const router = createRouter({
     underDevelopmentRoutes,
     playgroundRoutes,
     activityHistoryRoutes
-  ]
+    playgroundRoutes
+  ].concat(errorRoutes)
 })
 
 router.beforeEach(beforeEachRoute)

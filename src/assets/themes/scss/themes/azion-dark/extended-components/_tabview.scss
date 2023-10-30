@@ -1,0 +1,33 @@
+// Custom TabView
+.p-tabview {
+  .p-tabview-nav {
+    gap: 0.5rem !important;
+
+    li {
+      .p-tabview-nav-link {
+        font-weight: 600 !important;
+        min-height: 2rem;
+        font-size: 0.875rem;
+        border-radius: $borderRadius;
+      }
+      &.p-highlight {
+        .p-tabview-nav-link {
+          font-weight: 700 !important;
+        }
+      }
+    }
+  }
+  .p-tabview-nav-btn.p-link {
+    background-color: var(--surface-0) !important;
+    color: $buttonBg !important;
+    width: 2rem;
+    border-radius: 0;
+    &:enabled:hover {
+      background: var(--surface-100) !important;
+      color: $buttonBg;
+    }
+  }
+  .p-tabview-panels {
+    background: transparent !important;
+  }
+}

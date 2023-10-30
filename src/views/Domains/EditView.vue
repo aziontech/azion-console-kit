@@ -9,126 +9,229 @@
     :cleanFormCallback="resetForm"
   >
     <template #form>
-      <b>Settings</b>
-      <div class="flex flex-col gap-2">
-        <label for="name">Name: *</label>
-        <InputText
-          placeholder="Add Domain Name"
-          v-bind="name"
-          type="text"
-          :class="{ 'p-invalid': errors.name }"
-          v-tooltip.top="errors.name"
-        />
-      </div>
-
-      <div class="flex flex-col gap-2">
-        <label for="name">Domain:</label>
-        <p>{{ domainName.value }}</p>
-      </div>
-
-      <div class="flex flex-col gap-2">
-        <label for="edge-application">Edge Application: *</label>
-        <Dropdown
-          :class="{ 'p-invalid': errors.edgeApplication }"
-          v-model="edgeApplication"
-          :options="edgeApplicationOptions"
-          optionLabel="name"
-          optionValue="value"
-          class="w-full"
-          placeholder="Select an edge application"
-        />
-      </div>
-
-      <div class="flex flex-col gap-2">
-        <label for="cname">CNAME:</label>
-        <PrimeTextarea
-          :class="{ 'p-invalid': errors.cnames }"
-          v-model="cnames"
-          rows="5"
-          cols="30"
-          class="w-full"
-          v-tooltip.top="errors.cnames"
-        />
-      </div>
-
-      <div class="flex flex-col gap-2">
-        <label for="cname-access-only">CNAME Access Only:</label>
-        <InputSwitch
-          :class="{ 'p-invalid': errors.cnameAccessOnly }"
-          v-model="cnameAccessOnly"
-        />
-      </div>
-
-      <div class="flex flex-col gap-2">
-        <label for="edge-certificate">Edge Certificate:</label>
-        <Dropdown
-          :class="{ 'p-invalid': errors.edgeCertificate }"
-          v-model="edgeCertificate"
-          :options="edgeCertificatesOptions"
-          optionLabel="name"
-          optionValue="value"
-          class="w-full"
-          placeholder="Select a Certificate"
-        />
-      </div>
-
-      <b>Mutual Authentication Settings</b>
-
-      <div class="flex flex-col gap-2">
-        <label for="enable-mutual-authentication">Enable Mutual Authentication:</label>
-        <InputSwitch
-          :class="{ 'p-invalid': errors.mtlsIsEnabled }"
-          v-model="mtlsIsEnabled"
-        />
-      </div>
-
-      <label for="verification">Verification:</label>
-      <div class="flex flex-wrap gap-3">
-        <div
-          v-for="item in verificationOptions"
-          :key="item.value"
-          class="flex align-items-center"
-        >
-          <RadioButton
-            :disabled="!mtlsIsEnabled"
-            v-model="mtlsVerification"
-            :inputId="item.value"
-            name="mtls-verification"
-            :value="item.value"
-          />
-          <label
-            :for="item.value"
-            class="ml-2"
-            >{{ item.name }}</label
+      <form-horizontal
+        title="General"
+        description=""
+      >
+        <template #inputs>
+          <div class="flex flex-col sm:max-w-lg w-full gap-2">
+            <label
+              for="name"
+              class="text-color text-base font-medium"
+              >Name *</label
+            >
+            <InputText
+              placeholder="Add Domain Name"
+              v-bind="name"
+              id="name"
+              type="text"
+              :class="{ 'p-invalid': errors.name }"
+              v-tooltip.top="errors.name"
+            />
+          </div>
+        </template>
+      </form-horizontal>
+      <form-horizontal
+        title="Settings"
+        description=""
+      >
+        <template #inputs>
+          <div class="flex flex-col sm:max-w-lg w-full gap-2">
+            <label
+              for="name"
+              class="text-color text-base font-medium"
+              >Domain</label
+            >
+            <InputText
+              placeholder=""
+              v-model="domainName.value"
+              id="name"
+              type="text"
+              disabled
+            />
+          </div>
+          <div class="flex flex-col w-full sm:max-w-xs gap-2">
+            <label
+              for="edge_application"
+              class="text-color text-base font-medium"
+              >Edge Application *</label
+            >
+            <Dropdown
+              id="edge_application"
+              :class="{ 'p-invalid': errors.edgeApplication }"
+              v-model="edgeApplication"
+              :options="edgeApplicationOptions"
+              optionLabel="name"
+              optionValue="value"
+              class="w-full"
+              placeholder="Select an edge application"
+            />
+          </div>
+          <div class="flex flex-col sm:max-w-lg w-full gap-2">
+            <label
+              for="cname"
+              class="text-color text-base font-medium"
+              >CNAME</label
+            >
+            <PrimeTextarea
+              id="cname"
+              :class="{ 'p-invalid': errors.cnames }"
+              v-model="cnames"
+              rows="2"
+              cols="30"
+              class="w-full"
+              v-tooltip.top="errors.cnames"
+            />
+          </div>
+          <Card
+            :pt="{
+              body: { class: 'p-4' },
+              title: { class: 'flex justify-between font-medium items-center text-base m-0' },
+              subtitle: {
+                class: 'text-sm font-normal text-color-secondary m-0 pr-0 md:pr-[2.5rem]'
+              }
+            }"
           >
-        </div>
-      </div>
+            <template #title>
+              <span class="text-base">CNAME Access Only</span>
+              <InputSwitch
+                :class="{ 'p-invalid': errors.cnameAccessOnly }"
+                v-model="cnameAccessOnly"
+              />
+            </template>
+            <template #subtitle>
+              Check this field to make content only accessible through the domains defined in the
+              CNAME field. Access attempts made through Azion's domain (e.g. 10001a.hc.azioncdn.net)
+              will not go through.
+            </template>
+          </Card>
+          <div class="flex flex-col w-full sm:max-w-xs gap-2">
+            <label
+              for="edge_application"
+              class="text-color text-base font-medium"
+              >Edge Certificate</label
+            >
+            <Dropdown
+              :class="{ 'p-invalid': errors.edgeCertificate }"
+              v-model="edgeCertificate"
+              :options="edgeCertificatesOptions"
+              optionLabel="name"
+              optionValue="value"
+              class="w-full"
+              placeholder="Select a Certificate"
+            />
+          </div>
+        </template>
+      </form-horizontal>
+      <form-horizontal
+        title="Mutual Authentication Settings"
+        description="The Mutual Authentication or mTLS, allows two parties authenticating each other at the same time in an authentication protocol."
+      >
+        <template #inputs>
+          <Card
+            :pt="{
+              body: { class: 'p-4' },
+              title: { class: 'flex justify-between font-medium items-center text-base m-0' },
+              subtitle: {
+                class: 'text-sm font-normal text-color-secondary m-0 pr-0 md:pr-[2.5rem]'
+              }
+            }"
+          >
+            <template #title>
+              <span class="text-base">Enable Mutual Authentication</span>
+              <InputSwitch
+                :class="{ 'p-invalid': errors.mtlsIsEnabled }"
+                v-model="mtlsIsEnabled"
+              />
+            </template>
+            <template #subtitle>
+              The Mutual Authentication or mTLS, allows two parties authenticating each other at the
+              same time in an authentication protocol.
+            </template>
+          </Card>
+          <div class="flex flex-col gap-2">
+            <label class="text-color text-base font-medium">Verification</label>
+            <div class="flex flex-col gap-3">
+              <Card
+                :pt="{
+                  body: { class: 'p-4' },
+                  title: { class: 'flex justify-between font-medium text-base m-0' },
+                  subtitle: {
+                    class: 'text-sm font-normal text-color-secondary m-0 pr-0 md:pr-[2.5rem]'
+                  }
+                }"
+              >
+                <template #title>
+                  <span class="text-base">Enforce</span>
+                  <RadioButton
+                    :disabled="!mtlsIsEnabled"
+                    v-model="mtlsVerification"
+                    inputId="enforce"
+                    name="mtls-verification"
+                    value="enforce"
+                  />
+                </template>
+                <template #subtitle>
+                  The Enforce option blocks the client's certificate during TLS handshake if we
+                  cannot validate with the uploaded Trusted CA.
+                </template>
+              </Card>
 
-      <div class="flex flex-col gap-2">
-        <label for="trusted-certificate">Trusted CA Certificate:</label>
-        <Dropdown
-          :class="{ 'p-invalid': errors.mtlsTrustedCertificate }"
-          v-model="mtlsTrustedCertificate"
-          :options="trustedCACertificatesOptions"
-          optionLabel="name"
-          optionValue="value"
-          class="w-full"
-          placeholder=""
-          :disabled="!mtlsIsEnabled"
-        />
-      </div>
-      <div class="mb-4"></div>
+              <Card
+                :pt="{
+                  body: { class: 'p-4' },
+                  title: { class: 'flex justify-between font-medium text-base m-0' },
+                  subtitle: {
+                    class: 'text-sm font-normal text-color-secondary m-0 pr-0 md:pr-[2.5rem]'
+                  }
+                }"
+              >
+                <template #title>
+                  <span class="text-base">Permissive</span>
+                  <RadioButton
+                    :disabled="!mtlsIsEnabled"
+                    v-model="mtlsVerification"
+                    inputId="permissive"
+                    name="mtls-verification"
+                    value="permissive"
+                  />
+                </template>
+                <template #subtitle>
+                  The Permissive option will attempt to verify the client's certificate, but will
+                  allow the TLS handshake even if the certificate cannot be validated. You can check
+                  the client certificate in Azion Firewall and conditionally block it.
+                </template>
+              </Card>
+            </div>
+          </div>
+          <div class="flex flex-col w-full sm:max-w-xs gap-2">
+            <label class="text-color text-base font-medium">Trusted CA Certificate</label>
+            <Dropdown
+              :class="{ 'p-invalid': errors.mtlsTrustedCertificate }"
+              v-model="mtlsTrustedCertificate"
+              :options="trustedCACertificatesOptions"
+              optionLabel="name"
+              optionValue="value"
+              class="w-full"
+              placeholder=""
+              :disabled="!mtlsIsEnabled"
+            />
+          </div>
+        </template>
+      </form-horizontal>
     </template>
   </EditFormBlock>
 </template>
 
 <script>
-  import EditFormBlock from '@/templates/edit-form-block'
+  import EditFormBlock from '@/templates/edit-form-block-new'
   import InputText from 'primevue/inputtext'
   import Dropdown from 'primevue/dropdown'
   import PrimeTextarea from 'primevue/textarea'
   import InputSwitch from 'primevue/inputswitch'
   import RadioButton from 'primevue/radiobutton'
+  import Card from 'primevue/card'
+  import formHorizontal from '@/templates/create-form-block-new/form-horizontal'
   import { useField, useForm } from 'vee-validate'
   import * as yup from 'yup'
   import {
@@ -146,7 +249,9 @@
       Dropdown,
       PrimeTextarea,
       InputSwitch,
-      RadioButton
+      RadioButton,
+      formHorizontal,
+      Card
     },
     props: {
       editDomainService: Function,
@@ -171,7 +276,7 @@
         await Promise.all([this.requestEdgeApplications(), this.requestDigitalCertificates()])
       } catch (error) {
         this.$toast.add({
-          closable: true,
+          closable: false,
           severity: 'error',
           summary: error,
           life: 10000

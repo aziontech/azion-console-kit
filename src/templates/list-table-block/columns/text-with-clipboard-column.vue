@@ -5,7 +5,7 @@
       text
       icon="pi pi-copy"
       @click="handleCopyContent"
-      v-tooltip.bottom="'Copy to clipboard'"
+      v-tooltip.bottom="{ value: 'Copy to clipboard', showDelay: 200 }"
     />
   </div>
 </template>

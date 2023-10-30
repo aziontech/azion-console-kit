@@ -15,7 +15,7 @@
         type="text"
         placeholder="Name for Data Streaming"
         :class="{ 'p-invalid': errors.name }"
-        v-tooltip.top="errors.name"
+        v-tooltip.top="{ value: errors.name, showDelay: 200 }"
       />
 
       <label>Data Source: *</label>
@@ -122,7 +122,7 @@
           type="text"
           placeholder="https://app.domain.com/"
           :class="{ 'p-invalid': errors.endpointUrl }"
-          v-tooltip.top="errors.endpointUrl"
+          v-tooltip.top="{ value: errors.endpointUrl, showDelay: 200 }"
         />
 
         <label>Custom Headers:</label>
@@ -156,7 +156,7 @@
           placeholder="1000000"
           :useGrouping="false"
           :class="{ 'p-invalid': errors.maxSize }"
-          v-tooltip.top="errors.maxSize"
+          v-tooltip.top="{ value: errors.maxSize, showDelay: 200 }"
         />
 
         <label>Log Line Separator:</label>
@@ -165,7 +165,7 @@
           type="text"
           placeholder="\n"
           :class="{ 'p-invalid': errors.lineSeparator }"
-          v-tooltip.top="errors.lineSeparator"
+          v-tooltip.top="{ value: errors.lineSeparator, showDelay: 200 }"
         />
 
         <label>Payload Format:</label>
@@ -174,7 +174,7 @@
           type="text"
           placeholder="$dataset"
           :class="{ 'p-invalid': errors.payloadFormat }"
-          v-tooltip.top="errors.payloadFormat"
+          v-tooltip.top="{ value: errors.payloadFormat, showDelay: 200 }"
         />
       </div>
 
@@ -189,7 +189,7 @@
           type="text"
           placeholder="host1:port1,host2:port2,..."
           :class="{ 'p-invalid': errors.bootstrapServers }"
-          v-tooltip.top="errors.bootstrapServers"
+          v-tooltip.top="{ value: errors.bootstrapServers, showDelay: 200 }"
         />
 
         <label>Kafka Topic:</label>
@@ -197,7 +197,7 @@
           v-model="kafkaTopic"
           type="text"
           :class="{ 'p-invalid': errors.kafkaTopic }"
-          v-tooltip.top="errors.kafkaTopic"
+          v-tooltip.top="{ value: errors.kafkaTopic, showDelay: 200 }"
         />
 
         <label>Use Transport Layer Security (TLS):</label>
@@ -241,7 +241,7 @@
           v-model="host"
           type="text"
           :class="{ 'p-invalid': errors.host }"
-          v-tooltip.top="errors.host"
+          v-tooltip.top="{ value: errors.host, showDelay: 200 }"
         />
 
         <label>Bucket Name: *</label>
@@ -249,7 +249,7 @@
           v-model="bucket"
           type="text"
           :class="{ 'p-invalid': errors.bucket }"
-          v-tooltip.top="errors.bucket"
+          v-tooltip.top="{ value: errors.bucket, showDelay: 200 }"
         />
 
         <label>Region: *</label>
@@ -257,7 +257,7 @@
           v-model="region"
           type="text"
           :class="{ 'p-invalid': errors.region }"
-          v-tooltip.top="errors.region"
+          v-tooltip.top="{ value: errors.region, showDelay: 200 }"
         />
 
         <label>Access Key: *</label>
@@ -265,7 +265,7 @@
           v-model="accessKey"
           type="text"
           :class="{ 'p-invalid': errors.accessKey }"
-          v-tooltip.top="errors.accessKey"
+          v-tooltip.top="{ value: errors.accessKey, showDelay: 200 }"
         />
 
         <label>Secret Key: *</label>
@@ -273,7 +273,7 @@
           v-model="secretKey"
           type="text"
           :class="{ 'p-invalid': errors.secretKey }"
-          v-tooltip.top="errors.secretKey"
+          v-tooltip.top="{ value: errors.secretKey, showDelay: 200 }"
         />
 
         <label>Object Key Prefix:</label>
@@ -281,7 +281,7 @@
           v-model="objectKey"
           type="text"
           :class="{ 'p-invalid': errors.objectKey }"
-          v-tooltip.top="errors.objectKey"
+          v-tooltip.top="{ value: errors.objectKey, showDelay: 200 }"
         />
 
         <label>Content Type:</label>
@@ -305,7 +305,7 @@
           v-model="projectID"
           type="text"
           :class="{ 'p-invalid': errors.projectID }"
-          v-tooltip.top="errors.projectID"
+          v-tooltip.top="{ value: errors.projectID, showDelay: 200 }"
         />
 
         <label>Dataset ID: *</label>
@@ -313,7 +313,7 @@
           v-model="datasetID"
           type="text"
           :class="{ 'p-invalid': errors.datasetID }"
-          v-tooltip.top="errors.datasetID"
+          v-tooltip.top="{ value: errors.datasetID, showDelay: 200 }"
         />
 
         <label>Table ID: *</label>
@@ -321,14 +321,14 @@
           v-model="tableID"
           type="text"
           :class="{ 'p-invalid': errors.tableID }"
-          v-tooltip.top="errors.tableID"
+          v-tooltip.top="{ value: errors.tableID, showDelay: 200 }"
         />
 
         <label>Service Account Key: *</label>
         <Textarea
           v-model="serviceAccountKey"
           :class="{ 'p-invalid': errors.serviceAccountKey }"
-          v-tooltip.top="errors.serviceAccountKey"
+          v-tooltip.top="{ value: errors.serviceAccountKey, showDelay: 200 }"
           rows="5"
           cols="30"
         />
@@ -345,7 +345,7 @@
           type="text"
           placeholder="https://elasticsearch-domain.com/index"
           :class="{ 'p-invalid': errors.elasticsearchUrl }"
-          v-tooltip.top="errors.elasticsearchUrl"
+          v-tooltip.top="{ value: errors.elasticsearchUrl, showDelay: 200 }"
         />
 
         <label>API Key: *</label>
@@ -353,7 +353,7 @@
           v-model="apiKey"
           type="text"
           :class="{ 'p-invalid': errors.apiKey }"
-          v-tooltip.top="errors.apiKey"
+          v-tooltip.top="{ value: errors.apiKey, showDelay: 200 }"
         />
       </div>
 
@@ -368,7 +368,7 @@
           type="text"
           placeholder="https://inputs.splunk-client.splunkcloud.com:123456/services/collector"
           :class="{ 'p-invalid': errors.splunkUrl }"
-          v-tooltip.top="errors.splunkUrl"
+          v-tooltip.top="{ value: errors.splunkUrl, showDelay: 200 }"
         />
 
         <label>API Key: *</label>
@@ -376,7 +376,7 @@
           v-model="splunkApiKey"
           type="text"
           :class="{ 'p-invalid': errors.splunkApiKey }"
-          v-tooltip.top="errors.splunkApiKey"
+          v-tooltip.top="{ value: errors.splunkApiKey, showDelay: 200 }"
         />
       </div>
 
@@ -390,7 +390,7 @@
           v-model="streamName"
           type="text"
           :class="{ 'p-invalid': errors.streamName }"
-          v-tooltip.top="errors.streamName"
+          v-tooltip.top="{ value: errors.streamName, showDelay: 200 }"
         />
 
         <label>Region: *</label>
@@ -398,7 +398,7 @@
           v-model="awsRegion"
           type="text"
           :class="{ 'p-invalid': errors.awsRegion }"
-          v-tooltip.top="errors.awsRegion"
+          v-tooltip.top="{ value: errors.awsRegion, showDelay: 200 }"
         />
 
         <label>Access Key: *</label>
@@ -406,7 +406,7 @@
           v-model="awsAccessKey"
           type="text"
           :class="{ 'p-invalid': errors.awsAccessKey }"
-          v-tooltip.top="errors.awsAccessKey"
+          v-tooltip.top="{ value: errors.awsAccessKey, showDelay: 200 }"
         />
 
         <label>Secret Key: *</label>
@@ -414,7 +414,7 @@
           v-model="awsSecretKey"
           type="text"
           :class="{ 'p-invalid': errors.awsSecretKey }"
-          v-tooltip.top="errors.awsSecretKey"
+          v-tooltip.top="{ value: errors.awsSecretKey, showDelay: 200 }"
         />
       </div>
 
@@ -429,7 +429,7 @@
           type="text"
           placeholder="https://http-intake.logs.datadoghq.com/v1/input"
           :class="{ 'p-invalid': errors.datadogUrl }"
-          v-tooltip.top="errors.datadogUrl"
+          v-tooltip.top="{ value: errors.datadogUrl, showDelay: 200 }"
         />
 
         <label>API Key: *</label>
@@ -437,7 +437,7 @@
           v-model="datadogApiKey"
           type="text"
           :class="{ 'p-invalid': errors.datadogApiKey }"
-          v-tooltip.top="errors.datadogApiKey"
+          v-tooltip.top="{ value: errors.datadogApiKey, showDelay: 200 }"
         />
       </div>
 
@@ -452,7 +452,7 @@
           type="text"
           placeholder="https://qradar-trial-abcdef.qradar.ibmcloud.com:123456"
           :class="{ 'p-invalid': errors.QRadarUrl }"
-          v-tooltip.top="errors.QRadarUrl"
+          v-tooltip.top="{ value: errors.QRadarUrl, showDelay: 200 }"
         />
       </div>
 
@@ -466,7 +466,7 @@
           v-model="logType"
           type="text"
           :class="{ 'p-invalid': errors.logType }"
-          v-tooltip.top="errors.logType"
+          v-tooltip.top="{ value: errors.logType, showDelay: 200 }"
         />
 
         <label>Shared Key: *</label>
@@ -474,7 +474,7 @@
           v-model="sharedKey"
           type="text"
           :class="{ 'p-invalid': errors.sharedKey }"
-          v-tooltip.top="errors.sharedKey"
+          v-tooltip.top="{ value: errors.sharedKey, showDelay: 200 }"
         />
 
         <label>Time Generated Field:</label>
@@ -482,7 +482,7 @@
           v-model="generatedField"
           type="text"
           :class="{ 'p-invalid': errors.generatedField }"
-          v-tooltip.top="errors.generatedField"
+          v-tooltip.top="{ value: errors.generatedField, showDelay: 200 }"
         />
 
         <label>Workspace ID: *</label>
@@ -490,7 +490,7 @@
           v-model="workspaceID"
           type="text"
           :class="{ 'p-invalid': errors.workspaceID }"
-          v-tooltip.top="errors.workspaceID"
+          v-tooltip.top="{ value: errors.workspaceID, showDelay: 200 }"
         />
       </div>
 
@@ -504,7 +504,7 @@
           v-model="storageAccount"
           type="text"
           :class="{ 'p-invalid': errors.storageAccount }"
-          v-tooltip.top="errors.storageAccount"
+          v-tooltip.top="{ value: errors.storageAccount, showDelay: 200 }"
         />
 
         <label>Container Name: *</label>
@@ -512,7 +512,7 @@
           v-model="containerName"
           type="text"
           :class="{ 'p-invalid': errors.containerName }"
-          v-tooltip.top="errors.containerName"
+          v-tooltip.top="{ value: errors.containerName, showDelay: 200 }"
         />
 
         <label>Blob SAS Token: *</label>
@@ -520,7 +520,7 @@
           v-model="blobToken"
           type="text"
           :class="{ 'p-invalid': errors.blobToken }"
-          v-tooltip.top="errors.blobToken"
+          v-tooltip.top="{ value: errors.blobToken, showDelay: 200 }"
         />
       </div>
     </template>
