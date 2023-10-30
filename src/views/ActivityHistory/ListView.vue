@@ -116,7 +116,6 @@
     },
     async created() {
       await this.loadData()
-      console.log(this.events[0])
     },
     methods: {
       async loadData() {
@@ -141,7 +140,6 @@
             editor: `${element.authorName} (${element.authorEmail})`
           }))
           this.filteredEvents = this.events
-          console.log(this.events)
         } catch (error) {
           this.$toast.add({
             closable: true,
@@ -150,7 +148,6 @@
             life: 10000
           })
         } finally {
-          console.log('finally')
           this.isLoading = false
         }
       }
