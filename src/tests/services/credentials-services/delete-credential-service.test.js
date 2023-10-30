@@ -35,13 +35,13 @@ describe('DeleteCredentialsServices', () => {
     const { sut } = makeSut(idMock)
     const feedbackMessage = await sut(idMock)
 
-    expect(feedbackMessage).toBe('Resource successfully deleted')
+    expect(feedbackMessage).toBe('Credential successfully deleted')
   })
 
   it.each([
     {
       statusCode: 400,
-      expectedError: new Errors.InvalidApiRequestError().message
+      expectedError: new Errors.NotFoundError().message
     },
     {
       statusCode: 401,

@@ -45,6 +45,6 @@ describe('CreateCredentialServices', () => {
 
     const feedbackMessage = await sut(fixtures.basic)
 
-    expect(feedbackMessage).toBe('Resource successfully created')
+    expect(feedbackMessage).toBe('Your credential has been created')
   })
 })
