@@ -29,7 +29,7 @@
             />
             <small
               v-if="errors.key"
-              class="p-error"
+              class="p-error text-xs font-normal leading-tight"
               >{{ errors.key }}</small
             >
           </div>
@@ -49,7 +49,7 @@
             />
             <small
               v-if="errors.value"
-              class="p-error"
+              class="p-error text-xs font-normal leading-tight"
               >{{ errors.value }}</small
             >
           </div>
