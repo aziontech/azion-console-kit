@@ -20,19 +20,66 @@
           </div>
         </template>
         <template #content>
-          <div
-            class="animate-pulse flex space-x-4 p-6"
-            v-if="isLoading"
-          >
-            <div class="rounded-full bg-stone-500 h-10 w-10"></div>
-            <div class="flex-1 space-y-6 py-1">
-              <div class="h-2 bg-stone-500 rounded"></div>
-              <div class="space-y-3">
-                <div class="grid grid-cols-3 gap-4">
-                  <div class="h-2 bg-stone-500 rounded col-span-2"></div>
-                  <div class="h-2 bg-stone-500 rounded col-span-1"></div>
+          <div class="flex flex-col" v-if="isLoading">
+            <div
+              class="animate-pulse flex space-x-4 px-6 py-3 items-center"
+            >
+              <div class="bg-gray-200 rounded-full h-9 w-9"></div>
+              <div class="flex py-1 flex-col">
+                <div class="bg-gray-200 rounded w-52 h-3"></div>
+                <div class="flex items-center">
+                  <div class="bg-gray-200 rounded w-80 h-5 mt-1"></div>
+                  <div class="bg-gray-200 rounded w-80 h-4 mt-1 ml-1"></div>
                 </div>
-                <div class="h-2 bg-stone-500 rounded"></div>
+              </div>
+            </div>
+            <div
+              class="animate-pulse flex space-x-4 px-6 py-3 items-center"
+            >
+              <div class="bg-gray-200 rounded-full h-9 w-9"></div>
+              <div class="flex py-1 flex-col">
+                <div class="bg-gray-200 rounded w-52 h-3"></div>
+                <div class="flex items-center">
+                  <div class="bg-gray-200 rounded w-80 h-5 mt-1"></div>
+                  <div class="bg-gray-200 rounded w-80 h-4 mt-1 ml-1"></div>
+                </div>
+              </div>
+            </div>
+            <div
+              class="animate-pulse flex space-x-4 px-6 py-3 items-center"
+            >
+              <div class="bg-gray-200 rounded-full h-9 w-9"></div>
+              <div class="flex py-1 flex-col">
+                <div class="bg-gray-200 rounded w-52 h-3"></div>
+                <div class="flex items-center">
+                  <div class="bg-gray-200 rounded w-80 h-5 mt-1"></div>
+                  <div class="bg-gray-200 rounded w-80 h-4 mt-1 ml-1"></div>
+                </div>
+              </div>
+            </div>
+            <div
+              class="animate-pulse flex space-x-4 px-6 py-3 items-center"
+            >
+              <div class="bg-gray-200 rounded-full h-9 w-9"></div>
+              <div class="flex py-1 flex-col">
+                <div class="bg-gray-200 rounded w-52 h-3"></div>
+                <div class="flex items-center">
+                  <div class="bg-gray-200 rounded w-80 h-5 mt-1"></div>
+                  <div class="bg-gray-200 rounded w-80 h-4 mt-1 ml-1"></div>
+                </div>
+              </div>
+            </div>
+
+            <div
+              class="animate-pulse flex space-x-4 px-6 py-3 items-center"
+            >
+              <div class="bg-gray-200 rounded-full h-9 w-9"></div>
+              <div class="flex py-1 flex-col">
+                <div class="bg-gray-200 rounded w-52 h-3"></div>
+                <div class="flex items-center">
+                  <div class="bg-gray-200 rounded w-80 h-5 mt-1"></div>
+                  <div class="bg-gray-200 rounded w-80 h-4 mt-1 ml-1"></div>
+                </div>
               </div>
             </div>
           </div>
