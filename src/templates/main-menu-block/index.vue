@@ -37,16 +37,9 @@
           class="md:hidden cursor-pointer"
           @click="this.$router.push('/')"
         />
-        <!-- Azion client -->
-        <PrimeButton
-          v-tooltip.bottom="'Switch Account'"
-          class="font-semibold ml-2 h-8 w-auto surface-border hidden md:flex gap-2 items-center"
-          size="small"
-          outlined
-        >
-          <i class="pi pi-box" />
-          <span>Azion Client</span>
-        </PrimeButton>
+
+        <!-- switch account -->
+        <SwitchAccountBlock :accessMenu="profileMenuItems" />
       </div>
 
       <!-- Search -->
@@ -388,6 +381,7 @@
   import Dropdown from 'primevue/dropdown'
   import { useAccountStore } from '@/stores/account'
   import { mapActions, mapState } from 'pinia'
+  import SwitchAccountBlock from '@/templates/switch-account-block'
 
   export default {
     name: 'HeaderTemplate',
@@ -402,7 +396,8 @@
       InputText,
       Dropdown,
       Tag,
-      Mobilelogo
+      Mobilelogo,
+      SwitchAccountBlock
     },
     props: {
       helperVisible: {

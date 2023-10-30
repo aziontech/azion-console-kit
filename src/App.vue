@@ -30,3 +30,10 @@
     </ShellBlock>
   </main>
 </template>
+
+<style>
+  /* https://github.com/primefaces/primevue/issues/882#issuecomment-1780802552 */
+  body.p-overflow-hidden {
+    --scrollbar-width: 0px !important;
+  }
+</style>
