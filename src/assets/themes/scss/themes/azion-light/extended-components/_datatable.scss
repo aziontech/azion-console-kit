@@ -9,12 +9,7 @@
 
   .p-datatable-thead > tr > th {
     font-size: 0.875rem;
-  }
-
-  .p-sortable-column:hover {
-    .p-sortable-column-icon {
-      opacity: 1 !important;
-    }
+    line-height: 1.125rem;
   }
 
   .p-sortable-column {
@@ -23,14 +18,21 @@
     }
   }
 
-  .p-datatable-tbody {
-    > tr {
-      background: $tableBodyRowBg;
-      color: $tableBodyRowTextColor;
-      transition: $listItemTransition;
+  .p-sortable-column:hover {
+    .p-sortable-column-icon {
+      opacity: 1 !important;
+      color: $tableHeaderCellHighlightTextColor !important;
+    }
+  }
 
-      > td {
-        font-size: 0.875rem;
+  .p-sortable-column {
+    .p-sortable-column-icon {
+      opacity: 0 ;
+    }
+
+    &.p-highlight {
+      .p-sortable-column-icon {
+        opacity: 1 !important;
       }
     }
   }
