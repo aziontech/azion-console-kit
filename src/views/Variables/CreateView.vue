@@ -29,7 +29,6 @@
             <small
               v-if="errors.key"
               class="p-error"
-              id="text-error"
               >{{ errors.key }}</small
             >
           </div>
@@ -50,7 +49,6 @@
             <small
               v-if="errors.value"
               class="p-error"
-              id="text-error"
               >{{ errors.value }}</small
             >
           </div>
