@@ -13,7 +13,7 @@
         <PrimeButton
           @click="openSideBar"
           size="small"
-          class="flex-none border-header text-white"
+          class="text-white flex-none border-header"
           icon="pi pi-bars"
           style="height: 32px; width: 32px"
           :class="{
@@ -66,7 +66,7 @@
       <div class="flex gap-2 items-center">
         <PrimeButton
           icon="pi pi-search"
-          class="px-2 py-1 flex lg:hidden text-white border-header"
+          class="px-2 py-1 flex lg:hidden !text-white border-header"
           @click="openSearch"
           style="height: 32px; width: 32px"
           outlined
@@ -78,7 +78,7 @@
           @click="showCreateModal"
           icon="pi pi-plus"
           label="Create"
-          class="h-8 hidden md:flex text-white border-header"
+          class="!text-white h-8 hidden md:flex !text-white border-header"
           outlined
           size="small"
           :class="{
@@ -109,7 +109,7 @@
           label="Help"
           @click="showHelperCenter"
           outlined
-          class="hidden md:flex text-white border-header"
+          class="hidden md:flex !text-white border-header"
           :class="{
             'bg-header hover:bg-header-button-hover': !helperVisible,
             'bg-header-button-enabled': helperVisible
@@ -120,8 +120,7 @@
         <PrimeButton
           icon="pi pi-question-circle"
           size="small"
-          outlined
-          class="md:hidden text-white border-header text-white border-header"
+          class="md:hidden text-white !text-white border-header"
           style="height: 32px; width: 32px"
           @click="showHelperCenterMobile"
           :class="{
