@@ -1,0 +1,68 @@
+.p-datatable {
+  border: var(--surface-border) 1px solid !important;
+  border-radius: $borderRadius;
+
+  .p-datatable-header {
+    border-top-right-radius: $borderRadius;
+    border-top-left-radius: $borderRadius;
+  }
+
+  .p-datatable-thead > tr > th {
+    font-size: 0.875rem;
+    line-height: 1.125rem;
+    padding: .5rem .875rem !important;
+    box-sizing: inherit !important;
+
+    .p-column-header-content {
+      min-height: 2rem;
+      vertical-align: center;
+    }
+  }
+
+  .p-sortable-column {
+    .p-sortable-column-icon {
+      opacity: 0 !important;
+    }
+  }
+
+  .p-sortable-column:hover {
+    .p-sortable-column-icon {
+      opacity: 1 !important;
+      color: $tableHeaderCellHighlightTextColor !important;
+    }
+  }
+
+  .p-sortable-column {
+    .p-sortable-column-icon {
+      opacity: 0;
+    }
+
+    &.p-highlight {
+      .p-sortable-column-icon {
+        opacity: 1 !important;
+      }
+    }
+  }
+}
+
+// Aguardando o @Matheus declarar a classe do dialog
+// .p-listbox-item {
+//   &::before {
+//     content: '×' !important;
+//     margin-right: 0.3rem;
+//     font-size: 1.25rem;
+//     line-height: 0.875rem;
+//   }
+//   &:hover {
+//     background: $inputListItemHoverBg !important;
+//   }
+//   &.p-highlight {
+//     background: transparent !important;
+//     &::before {
+//       content: none !important;
+//     }
+//     &:hover {
+//       background: $inputListItemHoverBg !important;
+//     }
+//   }
+// }

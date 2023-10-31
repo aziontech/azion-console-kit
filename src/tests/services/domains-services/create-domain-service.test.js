@@ -1,39 +1,47 @@
 import { AxiosHttpClientAdapter } from '@/services/axios/AxiosHttpClientAdapter'
-import { createCredentialService } from '@/services/credential-services'
 import * as Errors from '@/services/axios/errors'
+import { createDomainService } from '@/services/domains-services'
 import { describe, expect, it, vi } from 'vitest'
 
 const fixtures = {
-  basic: {
-    name: 'Cred A',
-    description: 'Some description'
+  domainMock: {
+    cnameAccessOnly: false,
+    cnames: '',
+    edgeApplication: 1695294281,
+    mtlsIsEnabled: false,
+    mtlsVerification: 'enforce',
+    name: 'new dsds'
   }
 }
 
 const makeSut = () => {
-  const sut = createCredentialService
+  const sut = createDomainService
 
   return {
     sut
   }
 }
 
-describe('CreateCredentialServices', () => {
+describe('DomainsServices', () => {
   it('should call API with correct params', async () => {
     const requestSpy = vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
       statusCode: 201
     })
     const { sut } = makeSut()
 
-    await sut(fixtures.basic)
+    await sut(fixtures.domainMock)
 
     expect(requestSpy).toHaveBeenCalledWith({
-      url: `credentials`,
+      url: `domains`,
       method: 'POST',
       body: {
-        name: fixtures.basic.name,
-        description: fixtures.basic.description,
-        status: true
+        name: fixtures.domainMock.name,
+        cname_access_only: fixtures.domainMock.cnameAccessOnly,
+        cnames: [],
+        is_mtls_enabled: fixtures.domainMock.mtlsIsEnabled,
+        mtls_verification: fixtures.domainMock.mtlsVerification,
+        edge_application_id: fixtures.domainMock.edgeApplication,
+        mtls_trusted_ca_certificate_id: undefined
       }
     })
   })
@@ -44,23 +52,32 @@ describe('CreateCredentialServices', () => {
     })
     const { sut } = makeSut()
 
-    const feedbackMessage = await sut(fixtures.basic)
+    const feedbackMessage = await sut(fixtures.domainMock)
 
-    expect(feedbackMessage).toBe('Your credential has been created')
+    expect(feedbackMessage).toBe('Your domain has been created')
   })
 
-  it.each([
-    {
-      scenario: 'already used name',
-      apiErrorMock: 'already used name',
-      errorKey: 'non_field_errors'
-    },
-    {
-      scenario: 'invalid character is used in name field',
-      apiErrorMock: 'invalid key',
-      errorKey: 'key'
-    }
-  ])('Should return an API error for an $scenario', async ({ errorKey, apiErrorMock }) => {
+  it('Should return an API error for an 409 response status', async () => {
+    const errorKey = 'duplicated_domain_name'
+    const apiErrorMock = 'duplicated_domain_name'
+
+    vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
+      statusCode: 409,
+      body: {
+        [errorKey]: [apiErrorMock]
+      }
+    })
+    const { sut } = makeSut()
+
+    const feedbackMessage = sut(fixtures.domainMock)
+
+    expect(feedbackMessage).rejects.toThrow(apiErrorMock)
+  })
+
+  it('Should return an API error for an 400 response status', async () => {
+    const errorKey = 'duplicated_domain_name'
+    const apiErrorMock = 'duplicated_domain_name'
+
     vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
       statusCode: 400,
       body: {
@@ -69,7 +86,7 @@ describe('CreateCredentialServices', () => {
     })
     const { sut } = makeSut()
 
-    const feedbackMessage = sut(fixtures.basic)
+    const feedbackMessage = sut(fixtures.domainMock)
 
     expect(feedbackMessage).rejects.toThrow(apiErrorMock)
   })
@@ -96,15 +113,14 @@ describe('CreateCredentialServices', () => {
       expectedError: new Errors.UnexpectedError().message
     }
   ])(
-    'should throw when request fails with statusCode $statusCode',
+    'should throw when request fails with status code $statusCode',
     async ({ statusCode, expectedError }) => {
       vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
         statusCode
       })
-      const stubId = '123'
       const { sut } = makeSut()
 
-      const response = sut(stubId)
+      const response = sut(fixtures.domainMock)
 
       expect(response).rejects.toBe(expectedError)
     }
