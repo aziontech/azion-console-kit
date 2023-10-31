@@ -36,7 +36,7 @@ $badgeFontSize: 0.75rem;
 
 /// Padding of a badge
 /// @group misc
-$tagPadding: 0.25rem 0.4rem;
+$tagPadding: 0.25rem 0.5rem;
 
 /// Height of a progress bar
 /// @group misc
@@ -136,8 +136,8 @@ $scrollTopTextColor: #f8f9fa;
 
 /// Background of a skeleton
 /// @group misc
-$skeletonBg: #e9ecef;
+$skeletonBg: 313131;
 
 /// Background of a skeleton animation
 /// @group misc
-$skeletonAnimationBg: rgba(255, 255, 255, 0.4);
+$skeletonAnimationBg: #31313199;
