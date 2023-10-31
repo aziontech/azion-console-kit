@@ -1,8 +1,8 @@
 import { AxiosHttpClientAdapter, parseHttpResponse } from '../axios/AxiosHttpClientAdapter'
 import { makeSwitchAccountBaseUrl } from '@/services/auth-services/make-switch-account-base-url'
 
-export const listTypeAccountService = async ({ type = 'resellers', snippet = '', page = 1 }) => {
-  const searchParams = makeSearchParams({ type, snippet, page })
+export const listTypeAccountService = async ({ type = 'brands', textSnippet = '', page = 1 }) => {
+  const searchParams = makeSearchParams({ type, textSnippet, page })
 
   let httpResponse = await AxiosHttpClientAdapter.request({
     url: `${makeSwitchAccountBaseUrl()}?${searchParams.toString()}`,
@@ -32,27 +32,35 @@ const adapt = (httpResponse, type) => {
   }
 
   const accounts = results.map((account) => ({
-    name: account.name,
-    type: {
-      icon: ICON_TYPE_ACCOUNT[type],
-      content: NAME_TYPE_ACCOUNT[type]
+    name: {
+      content: account.name
     },
-    id: account.id
+    type: {
+      content: {
+        value: NAME_TYPE_ACCOUNT[type],
+        icon: ICON_TYPE_ACCOUNT[type],
+        severity: ''
+      }
+    },
+    id: {
+      content: account.id.toString()
+    },
+    accountId: account.id.toString()
   }))
 
   return {
     body: {
-      accounts,
+      results: accounts,
       totalPages
     },
     statusCode: httpResponse.statusCode
   }
 }
 
-const makeSearchParams = ({ type, snippet, page }) => {
+const makeSearchParams = ({ type, textSnippet, page }) => {
   const searchParams = new URLSearchParams()
   searchParams.set('account_type', type)
-  searchParams.set('q', snippet)
+  searchParams.set('q', textSnippet)
   searchParams.set('page', page)
   return searchParams
 }

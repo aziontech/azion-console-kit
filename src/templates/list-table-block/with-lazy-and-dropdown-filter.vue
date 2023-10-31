@@ -23,46 +23,32 @@
         v-show="!isLoading"
         dataKey="id"
         ref="tableSwitch"
-        :value="listAccounts"
+        :value="listRecords"
         lazy
-        paginator
-        :first="0"
+        :paginator="totalRecords > limitShowRows"
         :rows="limitShowRows"
-        @rowSelect="onRowSelect"
-        selectionMode="single"
         scrollable
         removableSort
-        :rowsPerPageOptions="[5, 10, 20, 50, 100]"
         @page="onPage($event)"
         :totalRecords="totalRecords"
         :loading="isLoading"
         :pt="{
-          root: { class: 'border rounded' },
+          root: { class: 'border surface-border rounded' },
           header: { class: 'rounded' }
         }"
       >
         <template #header>
-          <div class="flex flex-wrap justify-between gap-2 w-full rounded">
-            <span class="p-input-icon-left max-sm:w-full">
-              <i class="pi pi-search" />
-              <InputText
-                class="w-[340px]"
-                v-model="snippet"
-                @keyup.enter="searchFilter"
-                placeholder="Search"
-              />
-            </span>
-
-            <Dropdown
-              @update:modelValue="selectedTypeAccount"
-              :options="filterType"
-              class="w-[216px]"
-              optionLabel="label"
-              optionValue="value"
-              v-model="typeSelected"
-            />
-          </div>
+          <slot
+            name="headerColumn"
+            :filter="filters"
+            :applyFilter="loadData"
+          />
         </template>
+        <Column
+          v-if="reOrderableRows"
+          rowReorder
+          headerStyle="width: 3rem"
+        />
         <Column
           v-for="col of selectedColumns"
           :key="col.field"
@@ -74,7 +60,7 @@
               <div v-html="rowData[col.field]" />
             </template>
             <template v-else>
-              <component :is="col.component(rowData[col.field])"></component>
+              <component :is="col.component({ ...rowData[col.field], value: rowData })"></component>
             </template>
           </template>
         </Column>
@@ -121,30 +107,16 @@
         :value="Array(5)"
         removableSort
         :pt="{
-          root: { class: 'border rounded' },
+          root: { class: 'border surface-border rounded' },
           header: { class: 'rounded' }
         }"
       >
         <template #header>
-          <div class="flex flex-wrap justify-between gap-2 w-full rounded">
-            <span class="p-input-icon-left max-sm:w-full">
-              <i class="pi pi-search" />
-              <InputText
-                class="w-[340px]"
-                v-model="snippet"
-                placeholder="Search"
-                @keyup.enter="searchFilter"
-              />
-            </span>
-
-            <Dropdown
-              :options="filterType"
-              class="w-[216px]"
-              optionLabel="label"
-              optionValue="value"
-              v-model="typeSelected"
-            />
-          </div>
+          <slot
+            name="headerColumn"
+            :filter="filters"
+            :applyFilter="loadData"
+          />
         </template>
         <Column
           sortable
@@ -168,18 +140,19 @@
   import Column from 'primevue/column'
   import { useToast } from 'primevue/usetoast'
   import Listbox from 'primevue/listbox'
-  import InputText from 'primevue/inputtext'
   import Skeleton from 'primevue/skeleton'
   import OverlayPanel from 'primevue/overlaypanel'
   import PrimeButton from 'primevue/button'
-  import Dropdown from 'primevue/dropdown'
-  import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
 
-  const emit = defineEmits(['selectedAccount'])
   const props = defineProps({
     pageTitle: {
       type: String,
       required: true
+    },
+    pageInitial: {
+      type: Number,
+      required: false,
+      default: 1
     },
     description: {
       type: String,
@@ -193,42 +166,39 @@
     listService: {
       required: true,
       type: Function
+    },
+    columns: {
+      type: Array,
+      required: true,
+      default: () => [
+        {
+          field: 'name',
+          header: 'Name'
+        }
+      ]
+    },
+    reOrderableRows: {
+      required: false,
+      type: Boolean,
+      default: false
+    },
+    filterHeader: {
+      required: false,
+      type: Object,
+      default: () => ({})
     }
   })
 
   const isLoading = ref(false)
-  const listAccounts = ref([])
+  const listRecords = ref([])
+  const filters = ref(props.filterHeader)
   const selectedColumns = ref([])
   const totalRecords = ref()
-  const snippet = ref('')
   const columnSelectorPanel = ref()
-  const columns = ref([
-    { field: 'name', header: 'Name' },
-    {
-      field: 'type',
-      header: 'Type',
-      type: 'component',
-      component: (columnData) =>
-        columnBuilder({
-          data: columnData,
-          columnAppearance: 'tag'
-        })
-    },
-    { field: 'id', header: 'ID' }
-  ])
-
-  const filterType = ref([
-    { label: 'Brands', value: 'brands' },
-    { label: 'Resellers', value: 'resellers' },
-    { label: 'Groups', value: 'groups' },
-    { label: 'Clients', value: 'clients' }
-  ])
-
-  const typeSelected = ref('brands')
 
   onMounted(async () => {
-    await loadData({ page: 1 })
-    selectedColumns.value = columns.value
+    await loadData()
+    selectedColumns.value = props.columns
   })
 
   const toggleColumnSelector = (event) => {
@@ -236,13 +206,16 @@
   }
 
   const toast = useToast()
-  const loadData = async ({ page, snippet = '' }) => {
+  const loadData = async ({ page = props.pageInitial } = {}) => {
     try {
       isLoading.value = true
-      const type = typeSelected.value
-      const { accounts, totalPages } = await props.listService({ page, type, snippet })
+      listRecords.value = []
+      const { results, totalPages } = await props.listService({
+        page,
+        ...filters.value
+      })
       totalRecords.value = totalPages * props.limitShowRows
-      listAccounts.value = accounts
+      listRecords.value = results
     } catch (error) {
       toast.add({
         closable: true,
@@ -255,20 +228,7 @@
     }
   }
 
-  const onRowSelect = (event) => {
-    emit('selectedAccount', event.data)
-  }
-
   const onPage = (event) => {
-    loadData({ page: event.page + 1 })
-  }
-
-  const selectedTypeAccount = (typeAccount) => {
-    typeSelected.value = typeAccount
-    loadData({ page: 1 })
-  }
-
-  const searchFilter = () => {
-    loadData({ page: 1, snippet: snippet.value })
+    loadData({ page: event.page + props.pageInitial })
   }
 </script>

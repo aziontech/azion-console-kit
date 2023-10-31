@@ -2,18 +2,19 @@
 <template>
   <div>
     <PrimeButton
-      class="font-semibold ml-2 h-8 w-auto surface-border hidden md:flex items-center"
+      class="font-semibold ml-2 h-8 w-auto hidden border-header md:flex items-center text-white"
       :label="account.name"
       size="small"
       :icon="ICON_TYPE_ACCOUNT[account.kind]"
       :loading="!account?.name"
       outlined
-      v-tooltip.bottom="'Switch Account'"
+      v-tooltip.bottom="{ value: 'Switch account', showDelay: 200 }"
       @click="visible = true"
     />
     <PrimeDialog
       :blockScroll="true"
       v-model:visible="visible"
+      @update:visible="visibleDialog"
       modal
       :breakpoints="{ '641px': '90vw' }"
       :pt="{
@@ -23,21 +24,41 @@
       }"
     >
       <template #header>
-        <h4 class="text-xl font-bold leading-[normal] w-full">Switch Account</h4>
+        <h4 class="w-full text-xl not-italic font-medium leading-7">Switch Account</h4>
       </template>
       <div class="p-8 flex flex-col gap-8">
         <PrimeCard
           class="w-fit"
           :pt="{
-            content: { class: 'p-4 rounded-md border-solid flex flex justify-between gap-4' }
+            content: {
+              class: 'p-4 rounded-md gap-4 border-solid flex flex justify-between max-sm:p-3'
+            }
           }"
         >
           <template #content>
-            <div class="flex gap-4 items-center">
-              <h3 class="text-color text-center text-lg not-italic font-medium leading-7">
-                {{ account.name }}
-              </h3>
-              <Divider layout="vertical" />
+            <div
+              class="flex gap-4 items-center justify-center max-sm:gap-3 max-sm:flex-col max-sm:items-start"
+            >
+              <div class="flex justify-between items-center self-stretch">
+                <h3 class="text-color text-center text-lg not-italic font-medium leading-7">
+                  {{ account.name }}
+                </h3>
+                <PrimeButton
+                  icon="pi pi-cog"
+                  type="button"
+                  outlined
+                  class="md:hidden"
+                  aria-label="menu"
+                  aria-haspopup="true"
+                  aria-controls="overlay_menu"
+                  @click="toggle"
+                />
+              </div>
+              <Divider
+                class="max-sm:hidden"
+                layout="vertical"
+              />
+              <Divider class="md:hidden" />
               <div class="flex items-center gap-1">
                 <span class="font-medium text-sm">ID</span>
                 <span class="font=normal text-sm">{{ account.id }}</span>
@@ -54,11 +75,12 @@
                 />
               </div>
             </div>
+
             <PrimeButton
               icon="pi pi-cog"
-              text
               type="button"
-              raised
+              outlined
+              class="max-sm:hidden"
               aria-label="menu"
               aria-haspopup="true"
               aria-controls="overlay_menu"
@@ -76,10 +98,34 @@
         <ListTableBlock
           :listService="listTypeAccountService"
           :limitShowRows="10"
-          @selected-account="onSelectedAccount"
           pageTitle="Accounts List"
+          :columns="columns"
+          :filterHeader="filterSwitch"
           description="Type your account name to filter results."
-        />
+        >
+          <template #headerColumn="{ filter, applyFilter }">
+            <div class="flex flex-wrap justify-between gap-2 w-full rounded">
+              <span class="p-input-icon-left max-sm:w-full">
+                <i class="pi pi-search" />
+                <InputText
+                  class="md:w-[340px] max-sm:w-full"
+                  v-model="filter.textSnippet"
+                  @keyup.enter="applyFilter()"
+                  placeholder="Search"
+                />
+              </span>
+
+              <Dropdown
+                @change="applyFilter"
+                :options="filterType"
+                class="md:w-[216px] max-sm:w-full"
+                optionLabel="label"
+                optionValue="value"
+                v-model="filter.type"
+              />
+            </div>
+          </template>
+        </ListTableBlock>
       </div>
     </PrimeDialog>
   </div>
@@ -91,29 +137,107 @@
   }
 </script>
 <script setup>
-  import { ref } from 'vue'
+  import { ref, watch } from 'vue'
   import PrimeDialog from 'primevue/dialog'
   import PrimeTag from 'primevue/tag'
   import PrimeButton from 'primevue/button'
   import Menu from 'primevue/menu'
+  import InputText from 'primevue/inputtext'
+  import Dropdown from 'primevue/dropdown'
   import Divider from 'primevue/divider'
   import PrimeCard from 'primevue/card'
-  import ListTableBlock from '@/templates/list-table-block/with-dropdown.vue'
+  import ListTableBlock from '@/templates/list-table-block/with-lazy-and-dropdown-filter.vue'
   import { listTypeAccountService } from '@/services/switch-account-services/list-type-account-service'
   import { switchAccountService } from '@/services/auth-services'
   import { useAccountStore } from '@/stores/account'
   import { storeToRefs } from 'pinia'
-  import { useRouter } from 'vue-router'
+  import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
 
+  const emit = defineEmits(['update:showSwitchAccount'])
   const props = defineProps({
     accessMenu: {
       type: Array,
       required: true
+    },
+    showSwitchAccount: {
+      type: Boolean,
+      required: false,
+      default: false
     }
   })
-  const router = useRouter()
+
+  const visible = ref(false)
+
+  watch(
+    () => props.showSwitchAccount,
+    (newValue) => {
+      visible.value = newValue
+    }
+  )
+
+  const visibleDialog = (value) => {
+    emit('update:showSwitchAccount', value)
+    visible.value = value
+  }
+
+  const filterSwitch = ref({
+    textSnippet: '',
+    type: 'brands'
+  })
+
   const accountStore = useAccountStore()
   const { account } = storeToRefs(accountStore)
+
+  const filterType = ref([
+    { label: 'Brands', value: 'brands' },
+    { label: 'Resellers', value: 'resellers' },
+    { label: 'Groups', value: 'groups' },
+    { label: 'Clients', value: 'clients' }
+  ])
+  const columns = ref([
+    {
+      field: 'name',
+      header: 'Name',
+      type: 'component',
+      component: (columnData) =>
+        columnBuilder({
+          data: columnData,
+          columnAppearance: 'clickable-link',
+          dependencies: {
+            clickAction: onSelectedAccount,
+            clickProps: columnData.value
+          }
+        })
+    },
+    {
+      field: 'type',
+      header: 'Type',
+      type: 'component',
+      component: (columnData) =>
+        columnBuilder({
+          data: columnData,
+          columnAppearance: 'clickable-tag',
+          dependencies: {
+            clickAction: onSelectedAccount,
+            clickProps: columnData.value
+          }
+        })
+    },
+    {
+      field: 'id',
+      header: 'ID',
+      type: 'component',
+      component: (columnData) =>
+        columnBuilder({
+          data: columnData,
+          columnAppearance: 'clickable-text',
+          dependencies: {
+            clickAction: onSelectedAccount,
+            clickProps: columnData.value
+          }
+        })
+    }
+  ])
 
   const ICON_TYPE_ACCOUNT = {
     client: 'pi pi-box',
@@ -129,27 +253,33 @@
     brand: 'Brand'
   }
 
-  const adapterAccessMenu = props.accessMenu.map((item) => {
-    return {
-      ...item,
-      command: () => {
-        visible.value = false
-      }
+  const adapterAccessMenu = props.accessMenu.slice(0, -1).reduce((result, item) => {
+    if (item.label !== 'Switch Account') {
+      result.push({
+        ...item,
+        command: () => {
+          visible.value = true
+        }
+      })
     }
-  })
-  adapterAccessMenu.pop()
+    return result
+  }, [])
 
   const items = ref(adapterAccessMenu)
-  const visible = ref(false)
+
   const menu = ref()
 
   const toggle = (event) => {
     menu.value.toggle(event)
   }
 
-  const onSelectedAccount = async (account) => {
-    await switchAccountService(account.id)
+  const onSelectedAccount = async (rowSelected) => {
+    const { first_login: firstLogin } = await switchAccountService(rowSelected.accountId)
     visible.value = false
-    router.push({ name: 'home' })
+    if (firstLogin) {
+      window.location = 'iam/additional-data'
+      return
+    }
+    window.location.replace('/')
   }
 </script>

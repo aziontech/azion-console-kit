@@ -27,20 +27,16 @@
           class="max-md:hidden cursor-pointer"
           @click="$router.push('/')"
         />
-        <Mobilelogo
+        <MobileLogo
           class="md:hidden cursor-pointer"
           @click="this.$router.push('/')"
         />
+
         <!-- Azion client -->
-        <PrimeButton
-          v-tooltip.bottom="{ value: 'Switch account', showDelay: 200 }"
-          class="font-semibold ml-2 h-8 w-auto border-header hidden md:flex gap-2 items-center text-white"
-          size="small"
-          outlined
-        >
-          <i class="pi pi-box" />
-          <span>Azion Client</span>
-        </PrimeButton>
+        <SwitchAccountBlock
+          v-model:showSwitchAccount="showSwitchAccount"
+          :accessMenu="profileMenuItems"
+        />
       </div>
 
       <!-- Search -->
@@ -396,7 +392,7 @@
   import Sidebar from 'primevue/sidebar'
   import Divider from 'primevue/divider'
   import Logo from '@assets/svg/logo'
-  import Mobilelogo from '@assets/svg/mobile-logo'
+  import MobileLogo from '@assets/svg/mobile-logo'
   import PrimeDialog from 'primevue/dialog'
   import InputText from 'primevue/inputtext'
   import Tag from 'primevue/tag'
@@ -418,7 +414,7 @@
       InputText,
       Dropdown,
       Tag,
-      Mobilelogo,
+      MobileLogo,
       SwitchAccountBlock
     },
     props: {
@@ -432,6 +428,7 @@
     data() {
       return {
         showHelp: false,
+        showSwitchAccount: false,
         showCreate: false,
         showSearch: false,
         showSidebar: false,
@@ -578,7 +575,10 @@
         profileMenuItems: [
           {
             label: 'Switch Account',
-            to: '/switch-account'
+            command: () => {
+              this.showSwitchAccount = true
+            },
+            class: 'md:hidden'
           },
           {
             label: 'Account Settings',

@@ -1,9 +1,9 @@
 <template>
   <PrimeButton
-    text
+    link
     @click="handleClick"
   >
-    <p>{{ content }}</p>
+    <p class="p-link underline">{{ content }}</p>
   </PrimeButton>
 </template>
 
@@ -11,7 +11,7 @@
   import PrimeButton from 'primevue/button'
 
   export default {
-    name: 'clickable-text-column',
+    name: 'clickable-link-column',
     components: {
       PrimeButton
     },
