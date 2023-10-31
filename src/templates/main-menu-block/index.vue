@@ -123,15 +123,15 @@
           icon="pi pi-question-circle"
           size="small"
           label="Help"
-          @click="showHelperCenter"
+          @click="toggleHelpCenter"
           :pt="{
             label: { class: 'text-white' },
             icon: { class: 'text-white' }
           }"
           class="hidden md:flex !text-white border-header"
           :class="{
-            'bg-header hover:bg-header-button-hover': !helperVisible,
-            'bg-header-button-enabled': helperVisible
+            'bg-header hover:bg-header-button-hover': !showHelp,
+            'bg-header-button-enabled': showHelp
           }"
         />
 
@@ -141,14 +141,14 @@
           size="small"
           class="md:hidden text-white !text-white border-header"
           style="height: 32px; width: 32px"
-          @click="showHelperCenterMobile"
+          @click="toggleHelpCenter"
           :pt="{
             label: { class: 'text-white' },
             icon: { class: 'text-white' }
           }"
           :class="{
-            'bg-header hover:bg-header-button-hover': !helperVisible,
-            'bg-header-button-enabled': helperVisible
+            'bg-header hover:bg-header-button-hover': !showHelp,
+            'bg-header-button-enabled': showHelp
           }"
           v-tooltip.bottom="{ value: 'Help', showDelay: 200 }"
         />
@@ -193,15 +193,27 @@
   </header>
   <!-- help mobile sidebar -->
   <Sidebar
-    v-model:visible="showHelp"
+    :visible="showHelp"
     position="bottom"
     headerContent="Help"
+    :show-close-icon="false"
     :pt="{
-      root: { class: '!h-[90%]' }
+      root: { class: '!h-[90%] md:hidden flex' },
+      headerContent: { class: 'w-full' },
+      mask: { class: 'md:hidden flex' }
     }"
   >
     <template #header>
-      <div>Help</div>
+      <div class="flex items-center justify-between">
+        <h2>Help</h2>
+        <PrimeButton
+          icon="pi pi-times"
+          @click="closeHelpCenter"
+          size="small"
+          class="flex-none surface-border text-sm w-8 h-8"
+          text
+        />
+      </div>
     </template>
     <div class="flex flex-col p-2">
       <!-- content -->
@@ -425,6 +437,7 @@
   import Tag from 'primevue/tag'
   import Dropdown from 'primevue/dropdown'
   import { useAccountStore } from '@/stores/account'
+  import { useHelpCenterStore } from '@/stores/help-center'
   import { mapActions, mapState } from 'pinia'
 
   export default {
@@ -442,17 +455,9 @@
       Tag,
       Mobilelogo
     },
-    props: {
-      helperVisible: {
-        type: Boolean,
-        default: false
-      },
-      isLogged: Boolean
-    },
-    emits: ['showSlideHelper', 'showSlideCenter'],
+    props: { isLogged: Boolean },
     data() {
       return {
-        showHelp: false,
         showCreate: false,
         showSearch: false,
         showSidebar: false,
@@ -636,12 +641,14 @@
     },
     computed: {
       ...mapState(useAccountStore, { user: 'accountData', currentTheme: 'currentTheme' }),
+      ...mapState(useHelpCenterStore, { showHelp: 'isOpen' }),
       selectedTheme() {
         return this.themeOptions.find((option) => option.value === this.currentTheme)
       }
     },
     methods: {
       ...mapActions(useAccountStore, ['setTheme']),
+      ...mapActions(useHelpCenterStore, ['toggleHelpCenter', 'closeHelpCenter']),
       toggleProfile(event) {
         this.$refs.profile.toggle(event)
       },
@@ -665,12 +672,6 @@
       },
       closeSearch() {
         this.showSearch = false
-      },
-      showHelperCenter() {
-        this.$emit('showSlideHelper', !this.helperVisible)
-      },
-      showHelperCenterMobile() {
-        this.showHelp = true
       },
       logout() {
         window.location.href = '/logout'
