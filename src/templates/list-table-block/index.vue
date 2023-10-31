@@ -307,7 +307,7 @@
         let toastConfig = {
           closable: false,
           severity: 'success',
-          summary: 'Deleted successfully',
+          summary: '',
           life: 10000
         }
         try {
@@ -317,7 +317,8 @@
             summary: 'Processing request',
             life: 5000
           })
-          await this.deleteService(this.selectedId)
+          const feedback = await this.deleteService(this.selectedId)
+          toastConfig.summary = feedback ?? 'Deleted successfully'
           this.data = this.data.filter((item) => item.id !== this.selectedId)
         } catch (error) {
           toastConfig = {

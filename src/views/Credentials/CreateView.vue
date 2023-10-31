@@ -26,6 +26,11 @@
               :class="{ 'p-invalid': errors.name }"
               v-tooltip.top="{ value: errors.name, showDelay: 200 }"
             />
+            <small
+              v-if="errors.name"
+              class="p-error text-xs font-normal leading-tight"
+              >{{ errors.name }}</small
+            >
           </div>
 
           <div class="flex flex-col sm:max-w-lg w-full gap-2">
@@ -43,6 +48,11 @@
               :class="{ 'p-invalid': errors.description }"
               v-tooltip.top="{ value: errors.description, showDelay: 200 }"
             />
+            <small
+              v-if="errors.description"
+              class="p-error text-xs font-normal leading-tight"
+              >{{ errors.description }}</small
+            >
           </div>
         </template>
       </FormHorizontal>
@@ -70,7 +80,7 @@
     },
     setup() {
       const validationSchema = yup.object({
-        name: yup.string().required(),
+        name: yup.string().required('Name is a required field'),
         description: yup.string()
       })
 

@@ -92,11 +92,11 @@
       async handleSubmit() {
         try {
           this.isLoading = true
-          await this.editService(this.formData)
+          const feedback = await this.editService(this.formData)
           this.$toast.add({
             closable: false,
             severity: 'success',
-            summary: 'edited successfully',
+            summary: feedback ?? 'edited successfully',
             life: 10000
           })
         } catch (error) {

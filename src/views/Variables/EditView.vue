@@ -17,7 +17,7 @@
             <label
               for="name"
               class="text-color text-base font-medium"
-              >Key: *</label
+              >Key *</label
             >
             <InputText
               placeholder="ex: GITHUB_API_KEY"
@@ -29,8 +29,7 @@
             />
             <small
               v-if="errors.key"
-              class="p-error"
-              id="text-error"
+              class="p-error text-xs font-normal leading-tight"
               >{{ errors.key }}</small
             >
           </div>
@@ -39,7 +38,7 @@
             <label
               for="Value"
               class="text-color text-base font-medium"
-              >Value: *</label
+              >Value *</label
             >
             <InputText
               placeholder="ex: MY_GITHUB_API_VALUE"
@@ -50,8 +49,7 @@
             />
             <small
               v-if="errors.value"
-              class="p-error"
-              id="text-error"
+              class="p-error text-xs font-normal leading-tight"
               >{{ errors.value }}</small
             >
           </div>
