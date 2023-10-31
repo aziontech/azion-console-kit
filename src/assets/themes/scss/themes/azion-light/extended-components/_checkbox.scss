@@ -1,19 +1,17 @@
 // Custom Checkbox
 .p-checkbox {
-
   .p-checkbox-box {
     border: 2px solid var(--surface-border) !important;
     .p-checkbox-icon {
       color: white !important;
 
       &.p-icon {
-
       }
     }
 
     &.p-highlight {
-      border-color: #F3652B !important;
-      background: #F3652B !important;
+      border-color: #f3652b !important;
+      background: #f3652b !important;
     }
   }
 
@@ -43,20 +41,16 @@
 .p-input-filled {
   .p-checkbox {
     .p-checkbox-box {
-      
       &.p-highlight {
-
       }
     }
 
     &:not(.p-checkbox-disabled) {
       .p-checkbox-box {
         &:hover {
-         
         }
 
         &.p-highlight:hover {
-
         }
       }
     }
@@ -67,7 +61,6 @@
   .p-highlight {
     .p-checkbox {
       .p-checkbox-box {
-        
       }
     }
   }
