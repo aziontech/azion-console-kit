@@ -17,7 +17,7 @@
           icon="pi pi-bars"
           style="height: 32px; width: 32px"
           :pt="{
-            label: { class: 'text-white' },
+            label: { class: 'text-white hover:bg-header-button-hover' },
             icon: { class: 'text-white' }
           }"
           :class="{
@@ -42,9 +42,8 @@
             label: { class: '!text-white' },
             icon: { class: '!text-white' }
           }"
-          class="!hover:bg-header-button-hover' font-semibold ml-2 h-8 w-auto border-header hidden md:flex gap-2 items-center"
+          class="font-semibold ml-2 h-8 w-auto border-header hidden md:flex gap-2 items-center bg-header hover:bg-header-button-hover"
           size="small"
-          outlined
         >
           <i class="text-white pi pi-box" />
           <span class="text-white"> Azion Client</span>
@@ -62,7 +61,7 @@
           />
         </i>
         <InputText
-          class="w-64 bg-header-input border-header hover:border-header-hover"
+          class="w-64 bg-header-input border-header placeholder:text-header text-header hover:border-header-hover"
           placeholder="Search..."
           :value="searchText"
           @click="openSearch"
@@ -74,14 +73,13 @@
       <div class="flex gap-2 items-center">
         <PrimeButton
           icon="pi pi-search"
-          class="hover:bg-header-button-hover !text-white px-2 py-1 flex lg:hidden !text-white border-header"
+          class="bg-header hover:bg-header-button-hover !text-white px-2 py-1 flex lg:hidden !text-white border-header"
           :pt="{
             label: { class: 'text-white' },
             icon: { class: 'text-white' }
           }"
           @click="openSearch"
           style="height: 32px; width: 32px"
-          outlined
           v-tooltip.bottom="{ value: 'Search', showDelay: 200 }"
         />
 
@@ -90,8 +88,7 @@
           @click="showCreateModal"
           icon="pi pi-plus"
           label="Create"
-          class="hover:bg-header-button-hover !text-white h-8 hidden md:flex !text-white border-header"
-          outlined
+          class="!text-white h-8 hidden md:flex !text-white border-header"
           size="small"
           :pt="{
             label: { class: 'text-white' },
@@ -107,9 +104,8 @@
         <PrimeButton
           @click="showCreateModal"
           icon="pi pi-plus"
-          class="hover:bg-header-button-hover h-8 md:hidden text-white border-header"
+          class="h-8 md:hidden text-white border-header"
           size="small"
-          outlined
           style="height: 32px; width: 32px"
           :pt="{
             label: { class: 'text-white' },
@@ -128,12 +124,11 @@
           size="small"
           label="Help"
           @click="showHelperCenter"
-          outlined
           :pt="{
             label: { class: 'text-white' },
             icon: { class: 'text-white' }
           }"
-          class="hover:bg-header-button-hover hidden md:flex !text-white border-header"
+          class="hidden md:flex !text-white border-header"
           :class="{
             'bg-header hover:bg-header-button-hover': !helperVisible,
             'bg-header-button-enabled': helperVisible
@@ -144,7 +139,7 @@
         <PrimeButton
           icon="pi pi-question-circle"
           size="small"
-          class="hover:bg-header-button-hover md:hidden text-white !text-white border-header"
+          class="md:hidden text-white !text-white border-header"
           style="height: 32px; width: 32px"
           @click="showHelperCenterMobile"
           :pt="{
@@ -162,7 +157,7 @@
         <PrimeButton
           icon="pi pi-bell"
           style="padding-left: 7px; height: 32px; width: 32px"
-          class="overflow-auto text-white border-header hover:bg-header-button-hover"
+          class="overflow-auto text-white border-header bg-header hover:bg-header-button-hover"
           badge="9"
           v-tooltip.bottom="{ value: 'Notifications', showDelay: 200 }"
           size="small"
@@ -170,7 +165,6 @@
           @click="toggleNotification"
           aria-haspopup="true"
           aria-controls="overlay_menu"
-          outlined
           :pt="{
             root: { class: 'overflow-visible' },
             label: { class: 'text-white' },
