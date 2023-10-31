@@ -10,8 +10,11 @@
   const { currentTheme, hasActiveUserId } = storeToRefs(accountStore)
 
   const route = useRoute()
+  const isNotLoginRoute = route.name !== 'login'
+  const isNotResetPasswordRoute = route.name !== 'login'
+
   const isLogged = computed(() => {
-    return hasActiveUserId && route.name !== 'login' && route.name !== 'reset-password'
+    return hasActiveUserId && isNotLoginRoute && isNotResetPasswordRoute
   })
 
   watch(currentTheme, (theme) => themeSelect({ theme }))
