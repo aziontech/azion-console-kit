@@ -47,12 +47,12 @@
 
 .hidden-columns-panel {
   .p-listbox-item {
-    opacity: .6;
-    font-size: .875rem;
+    opacity: 0.6;
+    font-size: 0.875rem;
     line-height: 0.875rem;
-    padding: .75rem .5rem !important;
+    padding: 0.75rem 0.5rem !important;
     &::before {
-      content: "\2298" !important;
+      content: '\2298' !important;
       color: var(--text-color-secondary);
       margin-right: 0.3rem;
       font-size: 1.25rem;
