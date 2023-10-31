@@ -10,10 +10,10 @@
   const { currentTheme, hasActiveUserId } = storeToRefs(accountStore)
 
   const route = useRoute()
-  const isNotLoginRoute = route.name !== 'login'
-  const isNotResetPasswordRoute = route.name !== 'login'
-
   const isLogged = computed(() => {
+    const isNotLoginRoute = (route.name !== 'login')
+    const isNotResetPasswordRoute = (route.name !== 'reset-password')
+
     return hasActiveUserId && isNotLoginRoute && isNotResetPasswordRoute
   })
 

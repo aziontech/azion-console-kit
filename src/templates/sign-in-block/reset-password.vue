@@ -7,6 +7,8 @@
       >
         <div class="text-xl md:text-2xl font-medium">Reset your password</div>
 
+        <InlineMessage v-if="requestError">{{ requestError }}</InlineMessage>
+
         <div class="flex flex-col gap-2">
           <label
             for="password"
@@ -108,6 +110,7 @@
 <script setup>
   import Password from 'primevue/password'
   import PrimeButton from 'primevue/button'
+  import InlineMessage from 'primevue/inlinemessage'
   import * as yup from 'yup'
   import { watch, ref, computed } from 'vue'
   import { useRoute, useRouter } from 'vue-router'
@@ -117,6 +120,7 @@
   const isPasswordReseted = ref(false)
   const errorPassword = ref('')
   const errorConfirmation = ref('')
+  const requestError = ref('')
   const passwordRequirementsList = ref([
     { value: '> 7 characters', valid: false },
     { value: 'Uppercase letter', valid: false },
@@ -175,7 +179,6 @@
   const resetPassword = async () => {
     try {
       isButtonLoading.value = true
-      console.log('route :', route)
       const { uidb64, token } = route.params
 
       const payload = {
@@ -186,6 +189,8 @@
       await props.resetPasswordService(payload)
 
       isPasswordReseted.value = true
+    } catch (err) {
+      requestError.value = err.message
     } finally {
       isButtonLoading.value = false
     }

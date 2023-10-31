@@ -37,7 +37,7 @@
           label="Send reset e-mail"
           severity="primary"
           @click="sendEmail()"
-          :disabled="errors.email || !email.value"
+          :disabled="!meta.valid"
         />
       </div>
     </div>
@@ -89,7 +89,7 @@
       .matches(emailValidateRegex, 'Invalid email address')
   })
 
-  const { defineInputBinds, errors, values } = useForm({
+  const { defineInputBinds, errors, values, meta } = useForm({
     validationSchema,
     initialValues: {
       email: ''
@@ -120,6 +120,7 @@
     errors,
     isSendingEmailLoading,
     props,
-    sendEmail
+    sendEmail,
+    meta
   })
 </script>

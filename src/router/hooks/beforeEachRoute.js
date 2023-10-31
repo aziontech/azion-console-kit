@@ -16,7 +16,10 @@ export default async function beforeEachRoute(to, _, next) {
     return next()
   }
 
-  if (!accountStore.hasActiveUserId && to.path !== '/login' && to.name !== 'reset-password') {
+  const isNotLoginRoute = to.path !== '/login'
+  const isNotResetPasswordRoute = to.name !== 'reset-password'
+
+  if (!accountStore.hasActiveUserId && isNotLoginRoute && isNotResetPasswordRoute) {
     try {
       const [accountInfo, userInfo] = await Promise.all([
         getAccountInfoService(),
