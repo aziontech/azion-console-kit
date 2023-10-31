@@ -175,7 +175,7 @@
   const resetPassword = async () => {
     try {
       isButtonLoading.value = true
-      console.log('route :', route);
+      console.log('route :', route)
       const { uidb64, token } = route.params
 
       const payload = {
