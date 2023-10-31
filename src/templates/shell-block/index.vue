@@ -1,4 +1,5 @@
 <template>
+  <ToastBlock />
   <MainMenuBlock
     @showSlideHelper="showHelperCenter"
     :helperVisible="isHelperVisible"
@@ -19,6 +20,7 @@
 </template>
 
 <script>
+  import ToastBlock from '@/templates/toast-block'
   import MainMenuBlock from '@/templates/main-menu-block'
   import FooterBlock from '@/templates/footer-block'
   import Help from '../slide-in/help.vue'
@@ -29,7 +31,8 @@
     components: {
       FooterBlock,
       MainMenuBlock,
-      Help
+      Help,
+      ToastBlock
     },
     data() {
       return {

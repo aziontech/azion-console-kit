@@ -3,6 +3,7 @@
     <Breadcrumb
       :home="generateHomeBreadCrumb"
       :model="generateBreadCrumbs"
+      class="-ml-1.5"
     />
     <div class="flex w-full py-4 items-end justify-between">
       <div

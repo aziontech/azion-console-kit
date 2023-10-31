@@ -1,10 +1,9 @@
 <template>
   <div class="flex flex-col min-h-[calc(100vh-120px)]">
-    <Toast />
     <PageHeadingBlock :pageTitle="pageTitle" />
     <form
       @submit.prevent="handleSubmit"
-      class="w-full grow py-4 px-8 flex flex-col gap-8"
+      class="w-full grow py-4 px-8 flex flex-col gap-8 mb-5"
     >
       <slot name="form" />
 
@@ -20,14 +19,12 @@
 </template>
 
 <script>
-  import Toast from 'primevue/toast'
   import ActionBarTemplate from '@/templates/action-bar-block'
   import PageHeadingBlock from '@/templates/page-heading-block'
 
   export default {
     name: 'edit-form-block',
     components: {
-      Toast,
       ActionBarTemplate,
       PageHeadingBlock
     },
@@ -83,7 +80,7 @@
           this.initialDataSetter(initialData)
         } catch (error) {
           this.$toast.add({
-            closable: true,
+            closable: false,
             severity: 'error',
             summary: error,
             life: 10000
@@ -95,16 +92,16 @@
       async handleSubmit() {
         try {
           this.isLoading = true
-          await this.editService(this.formData)
+          const feedback = await this.editService(this.formData)
           this.$toast.add({
-            closable: true,
+            closable: false,
             severity: 'success',
-            summary: 'edited successfully',
+            summary: feedback ?? 'edited successfully',
             life: 10000
           })
         } catch (error) {
           this.$toast.add({
-            closable: true,
+            closable: false,
             severity: 'error',
             summary: error,
             life: 10000

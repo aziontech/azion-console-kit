@@ -36,6 +36,6 @@ describe('EdgeNodeServices', () => {
 
     const feedbackMessage = await sut(mockId)
 
-    expect(feedbackMessage).toBe('Resource successfully deleted')
+    expect(feedbackMessage).toBe('Edge Node successfully deleted')
   })
 })

@@ -7,7 +7,7 @@
     :cleanFormCallback="resetForm"
   >
     <template #form>
-      <form-horizontal
+      <FormHorizontal
         title="Variables"
         description="Espaço livre para descrição e instruções de preenchimento. Esse conteúdo deve ser criado pensando tanto em funcionalidade quanto em em alinhamento e estética. Devemos sempre criar os blocos conforme o contexto, cuidando sempre para não ter blocos muito longos."
       >
@@ -16,7 +16,7 @@
             <label
               for="name"
               class="text-color text-base font-medium"
-              >Key</label
+              >Key *</label
             >
             <InputText
               placeholder="ex: GITHUB_API_KEY"
@@ -24,30 +24,42 @@
               type="text"
               id="name"
               :class="{ 'p-invalid': errors.key }"
-              v-tooltip.top="errors.key"
+              v-tooltip.top="{ value: errors.key, showDelay: 200 }"
             />
+            <small
+              v-if="errors.key"
+              class="p-error text-xs font-normal leading-tight"
+              >{{ errors.key }}</small
+            >
           </div>
 
           <div class="flex flex-col sm:max-w-lg w-full gap-2">
             <label
               for="Value"
               class="text-color text-base font-medium"
-              >Value</label
+              >Value *</label
             >
             <InputText
               placeholder="ex: MY_GITHUB_API_VALUE"
               v-bind="value"
               type="text"
               :class="{ 'p-invalid': errors.value }"
-              v-tooltip.top="errors.value"
+              v-tooltip.top="{ value: errors.value, showDelay: 200 }"
             />
+            <small
+              v-if="errors.value"
+              class="p-error text-xs font-normal leading-tight"
+              >{{ errors.value }}</small
+            >
           </div>
 
           <Card
             :pt="{
               body: { class: 'p-4' },
-              title: { class: 'flex justify-between items-cente text-base m-0' },
-              subtitle: { class: 'text-sm font-normal text-color-secondary m-0' }
+              title: { class: 'flex justify-between items-center text-base m-0 font-medium' },
+              subtitle: {
+                class: 'text-sm font-normal text-color-secondary m-0 pr-0 md:pr-[2.5rem]'
+              }
             }"
           >
             <template #title>
@@ -61,14 +73,14 @@
             <template #subtitle> Description </template>
           </Card>
         </template>
-      </form-horizontal>
+      </FormHorizontal>
     </template>
   </CreateFormBlock>
 </template>
 
 <script setup>
   import CreateFormBlock from '@/templates/create-form-block-new'
-  import formHorizontal from '@/templates/create-form-block-new/form-horizontal'
+  import FormHorizontal from '@/templates/create-form-block-new/form-horizontal'
   import InputText from 'primevue/inputtext'
   import InputSwitch from 'primevue/inputswitch'
   import Card from 'primevue/card'

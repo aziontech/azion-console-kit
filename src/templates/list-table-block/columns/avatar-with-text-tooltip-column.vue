@@ -1,7 +1,7 @@
 <template>
   <div
     class="gap-2 flex items-center"
-    v-tooltip.bottom="tooltipText"
+    v-tooltip.bottom="{ value: tooltipText, showDelay: 200 }"
   >
     <PrimeAvatar :label="nameInitial" />
     <p>{{ text }}</p>
