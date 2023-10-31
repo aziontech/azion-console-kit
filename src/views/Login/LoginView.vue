@@ -1,17 +1,29 @@
 <template>
-  <SignInBlock
-    :authenticationLoginService="authenticationLoginService"
-    :verifyLoginService="verifyLoginService"
-    :refreshLoginService="refreshLoginService"
-    :switchAccountLoginService="switchAccountLoginService"
-  ></SignInBlock>
+  <div>
+    <SignInBlock
+      v-if="!showForgotPasswordStep"
+      @goToForgotPassword="(value) => showForgotPasswordStep = value"
+      :authenticationLoginService="authenticationLoginService"
+      :verifyLoginService="verifyLoginService"
+      :refreshLoginService="refreshLoginService"
+      :switchAccountLoginService="switchAccountLoginService"
+    ></SignInBlock>
+
+    <ForgotPassword
+      v-if="showForgotPasswordStep"
+      :sendResetPasswordEmailService="sendResetPasswordEmailService"
+    ></ForgotPassword>
+  </div>
 </template>
+
 <script>
   import SignInBlock from '@/templates/sign-in-block'
+  import ForgotPassword from '@/templates/sign-in-block/forgot-password.vue'
   export default {
     name: 'login-view',
     components: {
-      SignInBlock
+      SignInBlock,
+      ForgotPassword
     },
     props: {
       authenticationLoginService: {
@@ -29,6 +41,15 @@
       switchAccountLoginService: {
         required: true,
         type: Function
+      },
+      sendResetPasswordEmailService: {
+        required: true,
+        type: Function
+      }
+    },
+    data() {
+      return {
+        showForgotPasswordStep: false
       }
     }
   }

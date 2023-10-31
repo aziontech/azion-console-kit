@@ -18,6 +18,7 @@ import { edgeNodeRoutes } from '@routes/edge-node-routes'
 import { credentialsRoutes } from './routes/credentials-routes'
 import beforeEachRoute from './hooks/beforeEachRoute'
 import { usersListsRoutes } from '@routes/users-routes'
+import { passwordRoutes } from '@routes/password-routes'
 import { playgroundRoutes } from './routes/playground-routes'
 
 const router = createRouter({
@@ -41,7 +42,8 @@ const router = createRouter({
     credentialsRoutes,
     usersListsRoutes,
     underDevelopmentRoutes,
-    playgroundRoutes
+    playgroundRoutes,
+    passwordRoutes
   ]
 })
 
