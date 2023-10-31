@@ -1,15 +1,17 @@
 <template>
-  <a
-    class="border flex gap-1 surface-border surface-section text-color rounded-lg text-sm px-2 align-items-center justify-center h-7"
-    :href="link"
-    target="_blank"
-  >
-    <i
-      class="pi pi-circle-fill text-xs"
-      :style="colorStatus"
-    />
-    <span class="leading-none">{{ label }}</span>
-  </a>
+  <PrimeButton
+    outlined
+    class="surface-section hover:surface-hover whitespace-nowrap"
+    icon="pi pi-circle-fill"
+    size="small"
+    :label="label"
+    :pt="{
+      root: { class: 'h-8 flex-row items-center' },
+      label: { class: 'font-normal text-sm' },
+      icon: { style: colorStatus, class: 'text-xs' }
+    }"
+    @click="redirectToLink"
+  />
 </template>
 
 <script>
@@ -17,6 +19,7 @@
     loadStatusPageService,
     loadComponentsStatusService
   } from '@/services/status-page-services'
+  import PrimeButton from 'primevue/button'
 
   const STATUS_PAGE = {
     none: 'operational',
@@ -41,6 +44,9 @@
 
   export default {
     name: 'SystemStatusBarBlock',
+    components: {
+      PrimeButton
+    },
     data() {
       return {
         status: '',
@@ -58,6 +64,9 @@
       }
     },
     methods: {
+      redirectToLink() {
+        window.open(this.link, '_blank')
+      },
       async checkComponentStatus() {
         try {
           const { components } = await loadComponentsStatusService()
@@ -70,7 +79,7 @@
           this.updateSystemStatus(status)
         } catch (error) {
           this.$toast.add({
-            closable: true,
+            closable: false,
             severity: 'error',
             summary: error,
             life: 10000

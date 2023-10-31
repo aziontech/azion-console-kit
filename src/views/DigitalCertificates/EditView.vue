@@ -15,7 +15,7 @@
         type="text"
         placeholder="Insert the Digital Certificate name"
         :class="{ 'p-invalid': errors.name }"
-        v-tooltip.top="errors.name"
+        v-tooltip.top="{ value: errors.name, showDelay: 200 }"
       />
 
       <hr />
@@ -32,7 +32,7 @@
         <PrimeTextarea
           v-bind="certificate"
           :class="{ 'p-invalid': errors.certificate }"
-          v-tooltip.top="errors.certificate"
+          v-tooltip.top="{ value: errors.certificate, showDelay: 200 }"
           placeholder="---BEGIN CERTIFICATE---"
           rows="5"
           cols="30"
@@ -42,7 +42,7 @@
         <PrimeTextarea
           v-bind="csr"
           :class="{ 'p-invalid': errors.csr }"
-          v-tooltip.top="errors.csr"
+          v-tooltip.top="{ value: errors.csr, showDelay: 200 }"
           placeholder="---BEGIN CERTIFICATE---"
           rows="5"
           cols="30"
@@ -70,7 +70,7 @@
         <PrimeTextarea
           v-bind="certificate"
           :class="{ 'p-invalid': errors.certificate }"
-          v-tooltip.top="errors.certificate"
+          v-tooltip.top="{ value: errors.certificate, showDelay: 200 }"
           placeholder="For security, the certificate cannot be seen.&#10;Paste your new certificate here to update it."
           rows="5"
           cols="30"
@@ -80,7 +80,7 @@
         <PrimeTextarea
           v-model="privateKey"
           :class="{ 'p-invalid': errors.privateKey }"
-          v-tooltip.top="errors.privateKey"
+          v-tooltip.top="{ value: errors.privateKey, showDelay: 200 }"
           placeholder="For security, the certificate cannot be seen.&#10;Paste your new certificate here to update it."
           rows="5"
           cols="30"
@@ -103,7 +103,7 @@
         <PrimeTextarea
           v-bind="certificate"
           :class="{ 'p-invalid': errors.certificate }"
-          v-tooltip.top="errors.certificate"
+          v-tooltip.top="{ value: errors.certificate, showDelay: 200 }"
           placeholder="For security, the certificate cannot be seen.&#10;Paste your new certificate here to update it."
           rows="5"
           cols="30"

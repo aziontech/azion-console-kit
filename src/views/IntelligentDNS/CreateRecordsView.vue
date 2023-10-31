@@ -13,7 +13,7 @@
           v-bind="name"
           type="text"
           :class="{ 'p-invalid': errors.name }"
-          v-tooltip.top="errors.name"
+          v-tooltip.top="{ value: errors.name, showDelay: 200 }"
         />
         <label for="youdomain">.{{ intelligentDNSStore.getDomain }}</label>
       </div>
@@ -36,14 +36,14 @@
         v-bind="value"
         type="text"
         :class="{ 'p-invalid': errors.value }"
-        v-tooltip.top="errors.value"
+        v-tooltip.top="{ value: errors.value, showDelay: 200 }"
       />
       <InputText
         placeholder="TTL (seconds):"
         v-bind="ttl"
         type="number"
         :class="{ 'p-invalid': errors.ttl }"
-        v-tooltip.top="errors.ttl"
+        v-tooltip.top="{ value: errors.ttl, showDelay: 200 }"
       />
       <div class="card flex">
         <Dropdown
@@ -61,7 +61,7 @@
         v-bind="weight"
         type="text"
         :class="{ 'p-invalid': errors.weight }"
-        v-tooltip.top="errors.weight"
+        v-tooltip.top="{ value: errors.weight, showDelay: 200 }"
         v-if="isWeightedPolicy"
       />
       <InputText
@@ -69,7 +69,7 @@
         v-bind="description"
         type="text"
         :class="{ 'p-invalid': errors.description }"
-        v-tooltip.top="errors.description"
+        v-tooltip.top="{ value: errors.description, showDelay: 200 }"
         v-if="isWeightedPolicy"
       />
     </template>

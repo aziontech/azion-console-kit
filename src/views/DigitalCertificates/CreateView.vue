@@ -13,7 +13,7 @@
         type="text"
         placeholder="Insert the Digital Certificate name"
         :class="{ 'p-invalid': errors.digitalCertificateName }"
-        v-tooltip.top="errors.digitalCertificateName"
+        v-tooltip.top="{ value: errors.digitalCertificateName, showDelay: 200 }"
       />
       <div class="flex flex-wrap gap-3">
         <div class="flex align-items-center">
@@ -90,7 +90,7 @@
           <PrimeTextarea
             v-bind="certificate"
             :class="{ 'p-invalid': errors.certificate }"
-            v-tooltip.top="errors.certificate"
+            v-tooltip.top="{ value: errors.certificate, showDelay: 200 }"
             placeholder="---BEGIN CERTIFICATE---"
             rows="5"
             cols="30"
@@ -100,7 +100,7 @@
           <PrimeTextarea
             v-model="privateKey"
             :class="{ 'p-invalid': errors.privateKey }"
-            v-tooltip.top="errors.privateKey"
+            v-tooltip.top="{ value: errors.privateKey, showDelay: 200 }"
             placeholder="---BEGIN PRIVATE KEY---"
             rows="5"
             cols="30"
@@ -121,7 +121,7 @@
             v-bind="common"
             type="text"
             :class="{ 'p-invalid': errors.common }"
-            v-tooltip.top="errors.common"
+            v-tooltip.top="{ value: errors.common, showDelay: 200 }"
           />
 
           <label>Country / Region: *</label>
@@ -129,7 +129,7 @@
             v-bind="country"
             type="text"
             :class="{ 'p-invalid': errors.country }"
-            v-tooltip.top="errors.country"
+            v-tooltip.top="{ value: errors.country, showDelay: 200 }"
           />
 
           <label>State / Province: *</label>
@@ -137,7 +137,7 @@
             v-bind="state"
             type="text"
             :class="{ 'p-invalid': errors.state }"
-            v-tooltip.top="errors.state"
+            v-tooltip.top="{ value: errors.state, showDelay: 200 }"
           />
 
           <label>City / Locality: *</label>
@@ -145,7 +145,7 @@
             v-bind="city"
             type="text"
             :class="{ 'p-invalid': errors.city }"
-            v-tooltip.top="errors.city"
+            v-tooltip.top="{ value: errors.city, showDelay: 200 }"
           />
 
           <label>Organization: *</label>
@@ -153,7 +153,7 @@
             v-bind="organization"
             type="text"
             :class="{ 'p-invalid': errors.organization }"
-            v-tooltip.top="errors.organization"
+            v-tooltip.top="{ value: errors.organization, showDelay: 200 }"
           />
 
           <label>Organization Unit: *</label>
@@ -161,7 +161,7 @@
             v-bind="organizationUnity"
             type="text"
             :class="{ 'p-invalid': errors.organizationUnity }"
-            v-tooltip.top="errors.organizationUnity"
+            v-tooltip.top="{ value: errors.organizationUnity, showDelay: 200 }"
           />
 
           <label>Email: *</label>
@@ -169,7 +169,7 @@
             v-bind="email"
             type="text"
             :class="{ 'p-invalid': errors.email }"
-            v-tooltip.top="errors.email"
+            v-tooltip.top="{ value: errors.email, showDelay: 200 }"
           />
 
           <label>Private Key Type: *</label>
@@ -178,14 +178,14 @@
             type="text"
             disabled
             :class="{ 'p-invalid': errors.privateKeyType }"
-            v-tooltip.top="errors.privateKeyType"
+            v-tooltip.top="{ value: errors.privateKeyType, showDelay: 200 }"
           />
 
           <label>Subject Alternative Names (SAN):</label>
           <PrimeTextarea
             v-bind="subjectAlternativeNames"
             :class="{ 'p-invalid': errors.subjectAlternativeNames }"
-            v-tooltip.top="errors.subjectAlternativeNames"
+            v-tooltip.top="{ value: errors.subjectAlternativeNames, showDelay: 200 }"
             placeholder="www.example.com
 example.net
 mail.example.com
@@ -212,7 +212,7 @@ support.example.com"
         <PrimeTextarea
           v-bind="certificate"
           :class="{ 'p-invalid': errors.certificate }"
-          v-tooltip.top="errors.certificate"
+          v-tooltip.top="{ value: errors.certificate, showDelay: 200 }"
           placeholder="---BEGIN CERTIFICATE---"
           rows="5"
           cols="30"

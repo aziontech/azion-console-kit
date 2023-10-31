@@ -8,7 +8,7 @@ $messagePadding: 0.5rem;
 
 /// Border width of a message
 /// @group message
-$messageBorderWidth: 0 0 0 6px;
+$messageBorderWidth: none;
 
 /// Font size of a message icon
 /// @group message
@@ -44,7 +44,7 @@ $inlineMessageBorderWidth: none;
 
 /// Font size of a toast message icon
 /// @group message
-$toastIconFontSize: 24px;
+$toastIconFontSize: 32px;
 
 /// Margin of a toast message text
 /// @group message
