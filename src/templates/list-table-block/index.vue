@@ -76,6 +76,7 @@
                   v-model="selectedColumns"
                   multiple
                   :options="[{ label: 'Hidden columns', items: this.columns }]"
+                  class="hidden-columns-panel"
                   optionLabel="header"
                   optionGroupLabel="label"
                   optionGroupChildren="items"
