@@ -171,11 +171,12 @@
       errorConfirmation.value = error.errors[0]
     }
   }
-
+  const route = useRoute()
   const resetPassword = async () => {
     try {
       isButtonLoading.value = true
-      const { uidb64, token } = useRoute().params
+      console.log('route :', route);
+      const { uidb64, token } = route.params
 
       const payload = {
         password: password.value,
@@ -190,11 +191,12 @@
     }
   }
 
+  const router = useRouter()
   const goToSignIn = () => {
     isButtonLoading.value = true
     setTimeout(() => {
       isButtonLoading.value = false
-      useRouter().push({ name: 'login' })
+      router.push({ name: 'login' })
     }, 500)
   }
 
