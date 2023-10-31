@@ -7,78 +7,97 @@
     :cleanFormCallback="resetForm"
   >
     <template #form>
-      <div class="flex flex-col gap-2">
-        <label for="name">Name:</label>
-        <InputText
-          placeholder="Add Network List Name"
-          v-bind="name"
-          id="name"
-          type="text"
-          :class="{ 'p-invalid': errors.name }"
-          v-tooltip.top="{ value: errors.name, showDelay: 200 }"
-        />
-      </div>
-      <div class="flex flex-col gap-2">
-        <label for="type">Type: </label>
-        <Dropdown
-          :class="{ 'p-invalid': errors.networkListType }"
-          v-model="networkListType"
-          :options="options"
-          optionLabel="name"
-          optionValue="value"
-          class="w-full md:w-14rem"
-        />
-      </div>
-      <div
-        class="flex flex-col gap-2"
-        v-if="networkListType === 'asn'"
-      >
-        <label for="list">List: </label>
-        <div class="card flex justify-content-center">
-          <TextareaComponent
-            :class="{ 'p-invalid': errors.ans }"
-            v-bind="asn"
-            rows="5"
-            cols="75"
-            id="list"
-            placeholder="1234&#10;4321"
-          />
-        </div>
-      </div>
-      <div
-        class="flex flex-col gap-2"
-        v-if="networkListType === 'ip_cidr'"
-      >
-        <label for="list">List: </label>
-        <div class="card flex justify-content-center">
-          <TextareaComponent
-            :class="{ 'p-invalid': errors.ipCidr }"
-            v-bind="ipCidr"
-            rows="5"
-            id="ipCidr"
-            cols="75"
-            placeholder="192.168.0.1&#10;192.168.0.2/32&#10;10.1.1.10/16"
-          />
-        </div>
-      </div>
-      <div
-        class="flex flex-col gap-2"
-        v-if="networkListType === 'countries'"
-      >
-        <label for="list">Countries: </label>
-        <div class="card flex justify-content-center">
-          <MultiSelect
-            v-model="selectedCountries"
-            :options="countriesList"
-            filter
-            optionLabel="name"
-            optionValue="value"
-            placeholder="Select Countries"
-            :class="{ 'p-invalid': errors.selectedCountries }"
-            class="w-full"
-          />
-        </div>
-      </div>
+      <FormHorizontal title="Network List">
+        <template #inputs>
+          <div class="flex flex-col sm:max-w-lg w-full gap-2">
+            <label
+              for="name"
+              class="text-color text-base font-medium"
+              >Name</label
+            >
+            <InputText
+              placeholder="Add Network List Name"
+              v-bind="name"
+              id="name"
+              type="text"
+              :class="{ 'p-invalid': errors.name }"
+              v-tooltip.top="{ value: errors.name, showDelay: 200 }"
+            />
+          </div>
+          <div class="flex flex-col w-full sm:max-w-xs gap-2">
+            <label
+              for="id"
+              class="text-color text-base font-medium"
+              >Type</label
+            >
+            <Dropdown
+              :class="{ 'p-invalid': errors.networkListType }"
+              v-model="networkListType"
+              :options="options"
+              optionLabel="name"
+              optionValue="value"
+              class="w-full md:w-14rem"
+            />
+          </div>
+          <div
+            class="flex flex-col sm:max-w-lg w-full gap-2"
+            v-if="networkListType === 'asn'"
+          >
+            <label
+              for="id"
+              class="text-color text-base font-medium"
+              >List</label
+            >
+            <TextareaComponent
+              :class="{ 'p-invalid': errors.ans }"
+              v-bind="asn"
+              rows="2"
+              cols="30"
+              id="list"
+              placeholder="1234&#10;4321"
+            />
+          </div>
+          <div
+            class="flex flex-col sm:max-w-lg w-full gap-2"
+            v-if="networkListType === 'ip_cidr'"
+          >
+            <label
+              for="id"
+              class="text-color text-base font-medium"
+              >List</label
+            >
+            <TextareaComponent
+              :class="{ 'p-invalid': errors.ipCidr }"
+              v-bind="ipCidr"
+              rows="2"
+              id="ipCidr"
+              cols="30"
+              placeholder="192.168.0.1&#10;192.168.0.2/32&#10;10.1.1.10/16"
+            />
+          </div>
+          <div
+            class="flex flex-col w-full sm:max-w-3xl gap-2"
+            v-if="networkListType === 'countries'"
+          >
+            <label
+              for="select-01"
+              class="text-color text-base font-medium"
+              >Countries</label
+            >
+            <MultiSelect
+              v-model="selectedCountries"
+              :options="countriesList"
+              filter
+              optionLabel="name"
+              optionValue="value"
+              placeholder="Select Countries"
+              :class="{ 'p-invalid': errors.selectedCountries }"
+              class="w-full"
+              display="chip"
+            />
+          </div>
+        </template>
+      </FormHorizontal>
     </template>
   </CreateFormBlock>
 </template>
@@ -88,11 +107,12 @@
   import { useForm, useField } from 'vee-validate'
   import * as yup from 'yup'
 
-  import CreateFormBlock from '@/templates/create-form-block'
+  import CreateFormBlock from '@/templates/create-form-block-new'
   import TextareaComponent from 'primevue/textarea'
   import Dropdown from 'primevue/dropdown'
   import InputText from 'primevue/inputtext'
   import MultiSelect from 'primevue/multiselect'
+  import FormHorizontal from '@/templates/create-form-block-new/form-horizontal'
 
   export default {
     components: {
@@ -100,7 +120,8 @@
       TextareaComponent,
       Dropdown,
       InputText,
-      MultiSelect
+      MultiSelect,
+      FormHorizontal
     },
     props: {
       createNetworkListService: {
