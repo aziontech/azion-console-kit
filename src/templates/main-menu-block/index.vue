@@ -13,9 +13,8 @@
         <PrimeButton
           @click="openSideBar"
           size="small"
-          class="flex-none border-header text-white"
+          class="flex-none border-header text-white h-8 w-8"
           icon="pi pi-bars"
-          style="height: 32px; width: 32px"
           :class="{
             'bg-header-button-enabled': showSidebar,
             'bg-header hover:bg-header-button-hover': !showSidebar
@@ -66,9 +65,8 @@
       <div class="flex gap-2 items-center">
         <PrimeButton
           icon="pi pi-search"
-          class="px-2 py-1 flex lg:hidden text-white border-header"
+          class="px-2 py-1 flex lg:hidden text-white border-header h-8 w-8"
           @click="openSearch"
-          style="height: 32px; width: 32px"
           outlined
           v-tooltip.bottom="{ value: 'Search', showDelay: 200 }"
         />
@@ -91,10 +89,9 @@
         <PrimeButton
           @click="showCreateModal"
           icon="pi pi-plus"
-          class="h-8 md:hidden text-white border-header"
+          class="h-8 w-8 md:hidden text-white border-header"
           size="small"
           outlined
-          style="height: 32px; width: 32px"
           :class="{
             'bg-header hover:bg-header-button-hover': !showCreate,
             'bg-header-button-enabled': showCreate
@@ -107,12 +104,12 @@
           icon="pi pi-question-circle"
           size="small"
           label="Help"
-          @click="showHelperCenter"
+          @click="toggleHelpCenter"
           outlined
           class="hidden md:flex text-white border-header"
           :class="{
-            'bg-header hover:bg-header-button-hover': !helperVisible,
-            'bg-header-button-enabled': helperVisible
+            'bg-header hover:bg-header-button-hover': !showHelp,
+            'bg-header-button-enabled': showHelp
           }"
         />
 
@@ -121,12 +118,11 @@
           icon="pi pi-question-circle"
           size="small"
           outlined
-          class="md:hidden text-white border-header text-white border-header"
-          style="height: 32px; width: 32px"
-          @click="showHelperCenterMobile"
+          class="md:hidden text-white border-header h-8 w-8"
+          @click="toggleHelpCenter"
           :class="{
-            'bg-header hover:bg-header-button-hover': !helperVisible,
-            'bg-header-button-enabled': helperVisible
+            'bg-header hover:bg-header-button-hover': !showHelp,
+            'bg-header-button-enabled': showHelp
           }"
           v-tooltip.bottom="{ value: 'Help', showDelay: 200 }"
         />
@@ -134,8 +130,7 @@
         <!-- Notification Button  -->
         <PrimeButton
           icon="pi pi-bell"
-          style="padding-left: 7px; height: 32px; width: 32px"
-          class="overflow-auto text-white border-header hover:bg-header-button-hover"
+          class="overflow-auto text-white border-header hover:bg-header-button-hover h-8 w-8 pl-[7px]"
           badge="9"
           v-tooltip.bottom="{ value: 'Notifications', showDelay: 200 }"
           size="small"
@@ -149,19 +144,11 @@
             badge: { class: 'absolute right-[-4px] top-[-8px]' }
           }"
         />
-
-        <!-- Profile Mobile-->
+        <!-- Profile Button -->
         <Avatar
           @click="toggleProfile"
           label="U"
-          class="cursor-pointer md:hidden text-avatar bg-header-avatar text-white text-avatar bg-header-avatar text-white"
-          v-tooltip.bottom="{ value: 'Account settings', showDelay: 200 }"
-        />
-        <!-- Profile Desktop -->
-        <Avatar
-          @click="toggleProfile"
-          label="U"
-          class="hidden md:flex cursor-pointer bg-header-avatar text-white bg-header-avatar text-white"
+          class="cursor-pointer text-white bg-header-avatar"
           v-tooltip.bottom="{ value: 'Account settings', showDelay: 200 }"
         />
       </div>
@@ -170,15 +157,27 @@
   </header>
   <!-- help mobile sidebar -->
   <Sidebar
-    v-model:visible="showHelp"
+    :visible="showHelp"
     position="bottom"
     headerContent="Help"
+    :show-close-icon="false"
     :pt="{
-      root: { class: '!h-[90%]' }
+      root: { class: '!h-[90%] md:hidden flex' },
+      headerContent: { class: 'w-full' },
+      mask: { class: 'md:hidden flex' }
     }"
   >
     <template #header>
-      <div>Help</div>
+      <div class="flex items-center justify-between">
+        <h2>Help</h2>
+        <PrimeButton
+          icon="pi pi-times"
+          @click="closeHelpCenter"
+          size="small"
+          class="flex-none surface-border text-sm w-8 h-8"
+          text
+        />
+      </div>
     </template>
     <div class="flex flex-col p-2">
       <!-- content -->
@@ -402,6 +401,7 @@
   import Tag from 'primevue/tag'
   import Dropdown from 'primevue/dropdown'
   import { useAccountStore } from '@/stores/account'
+  import { useHelpCenterStore } from '@/stores/help-center'
   import { mapActions, mapState } from 'pinia'
 
   export default {
@@ -419,17 +419,9 @@
       Tag,
       Mobilelogo
     },
-    props: {
-      helperVisible: {
-        type: Boolean,
-        default: false
-      },
-      isLogged: Boolean
-    },
-    emits: ['showSlideHelper', 'showSlideCenter'],
+    props: { isLogged: Boolean },
     data() {
       return {
-        showHelp: false,
         showCreate: false,
         showSearch: false,
         showSidebar: false,
@@ -613,12 +605,14 @@
     },
     computed: {
       ...mapState(useAccountStore, { user: 'accountData', currentTheme: 'currentTheme' }),
+      ...mapState(useHelpCenterStore, { showHelp: 'isOpen' }),
       selectedTheme() {
         return this.themeOptions.find((option) => option.value === this.currentTheme)
       }
     },
     methods: {
       ...mapActions(useAccountStore, ['setTheme']),
+      ...mapActions(useHelpCenterStore, ['toggleHelpCenter', 'closeHelpCenter']),
       toggleProfile(event) {
         this.$refs.profile.toggle(event)
       },
@@ -642,12 +636,6 @@
       },
       closeSearch() {
         this.showSearch = false
-      },
-      showHelperCenter() {
-        this.$emit('showSlideHelper', !this.helperVisible)
-      },
-      showHelperCenterMobile() {
-        this.showHelp = true
       },
       logout() {
         window.location.href = '/logout'
