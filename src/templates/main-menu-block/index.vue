@@ -17,15 +17,13 @@
           icon="pi pi-bars"
           style="height: 32px; width: 32px"
           :pt="{
-            label: {class: 'text-white'},
-            icon: {class: 'text-white'}
-          }" 
-
+            label: { class: 'text-white' },
+            icon: { class: 'text-white' }
+          }"
           :class="{
             'bg-header-button-enabled': showSidebar,
             'bg-header hover:bg-header-button-hover': !showSidebar
           }"
-         
           v-tooltip.bottom="{ value: 'Menu', showDelay: 200 }"
         />
 
@@ -41,13 +39,12 @@
         <PrimeButton
           v-tooltip.bottom="{ value: 'Switch account', showDelay: 200 }"
           :pt="{
-            label: {class: '!text-white'},
-            icon: {class: '!text-white'}
-          }" 
-          class=" !hover:bg-header-button-hover' font-semibold ml-2 h-8 w-auto border-header hidden md:flex gap-2 items-center"
+            label: { class: '!text-white' },
+            icon: { class: '!text-white' }
+          }"
+          class="!hover:bg-header-button-hover' font-semibold ml-2 h-8 w-auto border-header hidden md:flex gap-2 items-center"
           size="small"
           outlined
-        
         >
           <i class="text-white pi pi-box" />
           <span class="text-white"> Azion Client</span>
@@ -79,9 +76,9 @@
           icon="pi pi-search"
           class="hover:bg-header-button-hover !text-white px-2 py-1 flex lg:hidden !text-white border-header"
           :pt="{
-            label: {class: 'text-white'},
-            icon: {class: 'text-white'}
-          }" 
+            label: { class: 'text-white' },
+            icon: { class: 'text-white' }
+          }"
           @click="openSearch"
           style="height: 32px; width: 32px"
           outlined
@@ -97,9 +94,9 @@
           outlined
           size="small"
           :pt="{
-            label: {class: 'text-white'},
-            icon: {class: 'text-white'}
-          }" 
+            label: { class: 'text-white' },
+            icon: { class: 'text-white' }
+          }"
           :class="{
             'bg-header hover:bg-header-button-hover': !showCreate,
             'bg-header-button-enabled': showCreate
@@ -115,9 +112,9 @@
           outlined
           style="height: 32px; width: 32px"
           :pt="{
-            label: {class: 'text-white'},
-            icon: {class: 'text-white'}
-          }" 
+            label: { class: 'text-white' },
+            icon: { class: 'text-white' }
+          }"
           :class="{
             'bg-header hover:bg-header-button-hover': !showCreate,
             'bg-header-button-enabled': showCreate
@@ -133,10 +130,10 @@
           @click="showHelperCenter"
           outlined
           :pt="{
-            label: {class: 'text-white'},
-            icon: {class: 'text-white'}
-          }" 
-          class="hover:bg-header-button-hover  hidden md:flex !text-white border-header"
+            label: { class: 'text-white' },
+            icon: { class: 'text-white' }
+          }"
+          class="hover:bg-header-button-hover hidden md:flex !text-white border-header"
           :class="{
             'bg-header hover:bg-header-button-hover': !helperVisible,
             'bg-header-button-enabled': helperVisible
@@ -145,16 +142,15 @@
 
         <!-- Help Button Mobile -->
         <PrimeButton
-        
           icon="pi pi-question-circle"
           size="small"
           class="hover:bg-header-button-hover md:hidden text-white !text-white border-header"
           style="height: 32px; width: 32px"
           @click="showHelperCenterMobile"
           :pt="{
-            label: {class: 'text-white'},
-            icon: {class: 'text-white'}
-          }" 
+            label: { class: 'text-white' },
+            icon: { class: 'text-white' }
+          }"
           :class="{
             'bg-header hover:bg-header-button-hover': !helperVisible,
             'bg-header-button-enabled': helperVisible
@@ -175,28 +171,26 @@
           aria-haspopup="true"
           aria-controls="overlay_menu"
           outlined
-         
           :pt="{
             root: { class: 'overflow-visible' },
-            label: {class: 'text-white'},
-            icon: {class: 'text-white'},
+            label: { class: 'text-white' },
+            icon: { class: 'text-white' },
             badge: { class: 'absolute right-[-4px] top-[-8px]' }
           }"
-
         />
 
         <!-- Profile Mobile-->
         <Avatar
           @click="toggleProfile"
           label="U"
-          class="transition-all hover:border-orange-500 hover:bg-header-button-hover cursor-pointer md:hidden text-avatar text-avatar bg-header-avatar "
+          class="transition-all hover:border-orange-500 hover:bg-header-button-hover cursor-pointer md:hidden text-avatar text-avatar bg-header-avatar"
           v-tooltip.bottom="{ value: 'Account settings', showDelay: 200 }"
         />
         <!-- Profile Desktop -->
         <Avatar
           @click="toggleProfile"
           label="U"
-          class=" transition-all hover:border-orange-500 hover:bg-header-button-hover hidden md:flex cursor-pointer bg-header-avatar"
+          class="transition-all hover:border-orange-500 hover:bg-header-button-hover hidden md:flex cursor-pointer bg-header-avatar"
           v-tooltip.bottom="{ value: 'Account settings', showDelay: 200 }"
         />
       </div>
