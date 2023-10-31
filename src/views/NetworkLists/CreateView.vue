@@ -23,6 +23,11 @@
               :class="{ 'p-invalid': errors.name }"
               v-tooltip.top="{ value: errors.name, showDelay: 200 }"
             />
+            <small
+              v-if="errors.name"
+              class="p-error text-xs font-normal leading-tight"
+              >{{ errors.name }}</small
+            >
           </div>
           <div class="flex flex-col w-full sm:max-w-xs gap-2">
             <label
@@ -38,6 +43,11 @@
               optionValue="value"
               class="w-full md:w-14rem"
             />
+            <small
+              v-if="errors.networkListType"
+              class="p-error text-xs font-normal leading-tight"
+              >{{ errors.networkListType }}</small
+            >
           </div>
           <div
             class="flex flex-col sm:max-w-lg w-full gap-2"
@@ -49,13 +59,18 @@
               >List</label
             >
             <TextareaComponent
-              :class="{ 'p-invalid': errors.ans }"
+              :class="{ 'p-invalid': errors.asn }"
               v-bind="asn"
               rows="2"
               cols="30"
               id="list"
               placeholder="1234&#10;4321"
             />
+            <small
+              v-if="errors.asn"
+              class="p-error text-xs font-normal leading-tight"
+              >{{ errors.asn }}</small
+            >
           </div>
           <div
             class="flex flex-col sm:max-w-lg w-full gap-2"
@@ -74,6 +89,11 @@
               cols="30"
               placeholder="192.168.0.1&#10;192.168.0.2/32&#10;10.1.1.10/16"
             />
+            <small
+              v-if="errors.ipCidr"
+              class="p-error text-xs font-normal leading-tight"
+              >{{ errors.ipCidr }}</small
+            >
           </div>
           <div
             class="flex flex-col w-full sm:max-w-3xl gap-2"
@@ -95,6 +115,11 @@
               class="w-full"
               display="chip"
             />
+            <small
+              v-if="errors.selectedCountries"
+              class="p-error text-xs font-normal leading-tight"
+              >{{ errors.selectedCountries }}</small
+            >
           </div>
         </template>
       </FormHorizontal>
@@ -141,19 +166,19 @@
       ])
 
       const validationSchema = yup.object({
-        name: yup.string().required(),
+        name: yup.string().required('Name is a required field'),
         networkListType: yup.string().oneOf(options.value.map((option) => option.value)),
         selectedCountries: yup.array().when('networkListType', {
           is: 'countries',
-          then: (schema) => schema.required().min(1)
+          then: (schema) => schema.required('Countries is a required field').min(1)
         }),
         ipCidr: yup.string().when('networkListType', {
           is: 'ip_cidr',
-          then: (schema) => schema.required()
+          then: (schema) => schema.required('IP/CIDR is a required field')
         }),
         asn: yup.string().when('networkListType', {
           is: 'asn',
-          then: (schema) => schema.required()
+          then: (schema) => schema.required('ASN is a required field')
         })
       })
 
