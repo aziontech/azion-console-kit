@@ -2,7 +2,7 @@
   <div>
     <PageHeadingBlock :pageTitle="pageTitle" />
 
-    <div class="max-w-full mx-8">
+    <div class="max-w-full mx-3 mb-8 md:mx-8">
       <DataTable
         v-if="!isLoading"
         @rowReorder="onRowReorder"
