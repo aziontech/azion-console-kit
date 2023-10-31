@@ -1,6 +1,5 @@
 <template>
   <div class="flex flex-col min-h-[calc(100vh-120px)]">
-    <Toast />
     <header class="border-neutral-200 border-b min-h-[82px] w-full flex items-center">
       <div class="p-4 w-full">
         <div class="flex flex-row flex-wrap items-center justify-left gap-4">
@@ -29,14 +28,12 @@
   </div>
 </template>
 <script>
-  import Toast from 'primevue/toast'
   import PrimeButton from 'primevue/button'
   import ActionBarTemplate from '@/templates/action-bar-block'
   import ActionBarBlockGoBack from '@/templates/action-bar-block/go-back'
   export default {
     name: 'create-form-block-with-event',
     components: {
-      Toast,
       PrimeButton,
       ActionBarTemplate,
       ActionBarBlockGoBack
@@ -72,7 +69,10 @@
     },
     methods: {
       handleCancel() {
-        this.$router.go('-1')
+        this.$router.go(-1)
+      },
+      goBackToList() {
+        this.$router.go(-1)
       },
       async validateAndSubmit() {
         try {
@@ -80,14 +80,15 @@
           const response = await this.createService(this.formData)
           this.$emit('on-response', response)
           this.$toast.add({
-            closable: true,
+            closable: false,
             severity: 'success',
             summary: 'created successfully',
             life: 10000
           })
+          this.goBackToList()
         } catch (error) {
           this.$toast.add({
-            closable: true,
+            closable: false,
             severity: 'error',
             summary: error,
             life: 10000

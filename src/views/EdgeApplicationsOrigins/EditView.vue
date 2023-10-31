@@ -28,7 +28,6 @@
           optionLabel="label"
           option-value="value"
           :optionDisabled="(option) => option.disabled"
-          @change="changeOriginType"
         />
 
         <!-- Custom form for Origin Type : Single Origin  -->
@@ -225,8 +224,8 @@
         <label>Connection (Seconds)</label>
         <InputNumber
           suffix="s"
-          min="1"
-          max="75"
+          :min="1"
+          :max="75"
           disabled
           id="connectionInSeconds"
           v-model="connectionTimeout"
@@ -236,7 +235,7 @@
         <label>Between Bytes (Seconds)</label>
         <InputNumber
           suffix="s"
-          min="1"
+          :min="1"
           disabled
           v-model="timeoutBetweenBytes"
         />

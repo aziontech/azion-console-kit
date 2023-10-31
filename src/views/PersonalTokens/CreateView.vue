@@ -1,6 +1,5 @@
 <template>
   <div>
-    <Toast />
     <CreateFormBlockWithEvent
       pageTitle="Create Personal Token"
       :createService="props.createPersonalTokenService"
@@ -106,7 +105,6 @@
   import TextareaComponent from 'primevue/textarea'
   import Calendar from 'primevue/calendar'
   import PrimeButton from 'primevue/button'
-  import Toast from 'primevue/toast'
 
   const props = defineProps({
     createPersonalTokenService: {
@@ -223,7 +221,7 @@
   const toast = useToast()
   const copyPersonalToken = async () => {
     const toastConfig = {
-      closable: true,
+      closable: false,
       life: 3000,
       severity: 'success',
       summary: TEXT_CONSTANTS.tokenCopied
