@@ -2,7 +2,9 @@
   <div
     :class="[cardColumns, 'flex flex-col rounded-md h-[552px] border surface-border col-span-12']"
   >
-    <header class="flex w-full items-center justify-between gap-2 py-3 px-6">
+    <header
+      class="flex w-full items-center justify-between gap-2 py-3 px-6 border-b surface-border"
+    >
       <span class="w-full gap-2 flex">
         <ChartOwner :chartOwner="chartOwner" />
         <span class="font-medium overflow-ellipsis break-all line-clamp-1">{{ title }}</span>
@@ -18,10 +20,9 @@
         <MoreOptionsMenu />
       </span>
     </header>
-    <PrimeDivider />
     <div class="flex h-full flex-col gap-6 flex-auto p-6">
       <div class="flex flex-col gap-2">
-        <span class="break-all font-normal line-height-1">{{ description }}</span>
+        <span class="break-words font-normal line-height-1">{{ description }}</span>
         <AggregationInfo
           :aggregationType="aggregationType"
           :variationType="variationType"
@@ -39,7 +40,6 @@
 <script setup>
   import { computed } from 'vue'
   import PrimeButton from 'primevue/button'
-  import PrimeDivider from 'primevue/divider'
   import ChartOwner from './components/chart-owner.vue'
   import AggregationInfo from './components/aggregation-info.vue'
   import MoreOptionsMenu from './components/more-options-menu.vue'
