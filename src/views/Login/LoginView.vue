@@ -2,7 +2,7 @@
   <div>
     <SignInBlock
       v-if="!showForgotPasswordStep"
-      @goToForgotPassword="(value) => showForgotPasswordStep = value"
+      @goToForgotPassword="(value) => (showForgotPasswordStep = value)"
       :authenticationLoginService="authenticationLoginService"
       :verifyLoginService="verifyLoginService"
       :refreshLoginService="refreshLoginService"

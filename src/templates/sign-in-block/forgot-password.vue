@@ -9,7 +9,9 @@
       >
         <div class="flex flex-col gap-3">
           <div class="text-xl md:text-2xl font-medium">Reset your password</div>
-          <p class="text-color-secondary">Type in your email and we'll send you a link to reset your password.</p>
+          <p class="text-color-secondary">
+            Type in your email and we'll send you a link to reset your password.
+          </p>
         </div>
 
         <div class="flex flex-col gap-2">

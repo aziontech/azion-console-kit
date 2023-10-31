@@ -5,7 +5,7 @@ export const sendResetPasswordEmailService = async (payload) => {
   let httpResponse = await AxiosHttpClientAdapter.request({
     url: `${makeResetPasswordBaseUrl()}/request`,
     method: 'POST',
-    body: adapt(payload),
+    body: adapt(payload)
   })
   return parseHttpResponse(httpResponse)
 }

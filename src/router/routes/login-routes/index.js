@@ -10,6 +10,6 @@ export const loginRoutes = {
     verifyLoginService: AuthServices.verifyAuthenticationService,
     refreshLoginService: AuthServices.refreshAuthenticationService,
     switchAccountLoginService: AuthServices.switchAccountService,
-    sendResetPasswordEmailService: AuthServices.sendResetPasswordEmailService,
+    sendResetPasswordEmailService: AuthServices.sendResetPasswordEmailService
   }
 }
