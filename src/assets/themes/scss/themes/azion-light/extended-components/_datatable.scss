@@ -45,24 +45,32 @@
   }
 }
 
-// Aguardando o @Matheus declarar a classe do dialog
-// .p-listbox-item {
-//   &::before {
-//     content: '×' !important;
-//     margin-right: 0.3rem;
-//     font-size: 1.25rem;
-//     line-height: 0.875rem;
-//   }
-//   &:hover {
-//     background: $inputListItemHoverBg !important;
-//   }
-//   &.p-highlight {
-//     background: transparent !important;
-//     &::before {
-//       content: none !important;
-//     }
-//     &:hover {
-//       background: $inputListItemHoverBg !important;
-//     }
-//   }
-// }
+.hidden-columns-panel {
+  .p-listbox-item {
+    opacity: 0.6;
+    font-size: 0.875rem;
+    line-height: 0.875rem;
+    padding: 0.75rem 0.5rem !important;
+    &::before {
+      content: '\2298' !important;
+      color: var(--text-color-secondary);
+      margin-right: 0.3rem;
+      font-size: 1.25rem;
+      line-height: 0.875rem;
+    }
+    &:hover {
+      background: var(--surface-400) !important;
+    }
+    &.p-highlight {
+      opacity: 1;
+      color: var(--text-color) !important;
+      background: transparent !important;
+      &::before {
+        content: none !important;
+      }
+      &:hover {
+        background: $inputListItemHoverBg !important;
+      }
+    }
+  }
+}
