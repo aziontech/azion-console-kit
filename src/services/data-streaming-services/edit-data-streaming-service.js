@@ -166,21 +166,36 @@ const extractApiError = (httpResponse) => {
   const datasetError = extractErrorKey(httpResponse.body, 'payload_format_without_dataset')
 
   // kafka
-  const invalidBootstrapServersError = extractErrorKey(httpResponse.body, 'invalid_bootstrap_servers')
+  const invalidBootstrapServersError = extractErrorKey(
+    httpResponse.body,
+    'invalid_bootstrap_servers'
+  )
 
   // s3
   const invalidHostURLError = extractErrorKey(httpResponse.body, 'invalid_host_url')
 
   // google big query
-  const invalidServiceAccountError = extractErrorKey(httpResponse.body, 'invalid_service_account_key')
+  const invalidServiceAccountError = extractErrorKey(
+    httpResponse.body,
+    'invalid_service_account_key'
+  )
 
   // elasticsearch
   const elasticInvalidURLError = extractErrorKey(httpResponse.body, 'invalid_url')
 
   // Datadog
-  const datadogInvalidURLError = extractErrorKey(httpResponse.body, 'invalid_datadog_url') 
+  const datadogInvalidURLError = extractErrorKey(httpResponse.body, 'invalid_datadog_url')
 
-  const errorMessages = [invalidURLError, maxSizeError, datasetError, invalidBootstrapServersError, invalidHostURLError, invalidServiceAccountError, elasticInvalidURLError, datadogInvalidURLError]
+  const errorMessages = [
+    invalidURLError,
+    maxSizeError,
+    datasetError,
+    invalidBootstrapServersError,
+    invalidHostURLError,
+    invalidServiceAccountError,
+    elasticInvalidURLError,
+    datadogInvalidURLError
+  ]
   const errorMessage = errorMessages.find((error) => !!error)
   return errorMessage
 }
