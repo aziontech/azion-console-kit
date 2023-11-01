@@ -22,12 +22,18 @@
       },
       clickAction: {
         required: true,
-        type: Function
+        type: Function,
+        default: () => {}
+      },
+      clickProps: {
+        required: false,
+        type: Object,
+        default: () => ({})
       }
     },
     methods: {
       handleClick() {
-        this.clickAction()
+        this.clickAction(this.clickProps)
       }
     }
   }
