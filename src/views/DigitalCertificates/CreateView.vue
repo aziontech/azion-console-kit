@@ -381,16 +381,16 @@ support.example.com"
       }
 
       const validationSchema = yup.object({
-        digitalCertificateName: yup.string().required('Name is required.'),
+        digitalCertificateName: yup.string().required('Name is a required field.'),
 
         // Certificate Choices
         certificateType: yup.string().required('Certificate Type is required.'),
-        createCertificateType: yup.string().required('Certificate Type is a required field'),
+        createCertificateType: yup.string().required('Certificate Type is a required field.'),
 
         // Edge Certificate Fields
         certificate: yup.string().when(['createCertificateType', 'certificateType'], {
           is: certificateRequiredField,
-          then: (schema) => schema.required('Certificate is a required field')
+          then: (schema) => schema.required('Certificate is a required field.')
         }),
         privateKey: yup.string(),
 
@@ -413,11 +413,11 @@ support.example.com"
           .label('subject alternative names (SAN)'),
         country: yup.string().when('createCertificateType', {
           is: edgeCertificateTypes.CSR,
-          then: (schema) => schema.required('Field Required').max(2, 'Country must be 2 characters').min(2, 'Country must be 2 characters')
+          then: (schema) => schema.required('Country is a required field.').max(2, 'Country must be 2 characters.').min(2, 'Country must be 2 characters.')
         }),
         email: yup.string().when('createCertificateType', {
           is: edgeCertificateTypes.CSR,
-          then: (schema) => schema.required('Field Required').email()
+          then: (schema) => schema.required('Email is a required field.').email()
         })
       })
 
