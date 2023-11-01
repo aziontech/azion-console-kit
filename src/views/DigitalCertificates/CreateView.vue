@@ -385,7 +385,7 @@ support.example.com"
 
         // Certificate Choices
         certificateType: yup.string().required('Certificate Type is required.'),
-        createCertificateType: yup.string().required('Field Required'),
+        createCertificateType: yup.string().required('Certificate Type is a required field'),
 
         // Edge Certificate Fields
         certificate: yup.string().when(['createCertificateType', 'certificateType'], {
