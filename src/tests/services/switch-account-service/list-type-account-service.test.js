@@ -18,7 +18,8 @@ const fixtures = {
   mockFilter: {
     type: 'brands',
     textSnippet: '',
-    page: 1
+    page: 1,
+    page_size: 5
   }
 }
 
@@ -41,7 +42,7 @@ describe('UsersServices', () => {
 
     expect(requestSpy).toHaveBeenCalledWith({
       method: 'GET',
-      url: `switch-account?account_type=${fixtures.mockFilter.type}&q=${fixtures.mockFilter.textSnippet}&page=${fixtures.mockFilter.page}`
+      url: `switch-account?account_type=${fixtures.mockFilter.type}&q=${fixtures.mockFilter.textSnippet}&page=${fixtures.mockFilter.page}&page_size=${fixtures.mockFilter.page_size}`
     })
   })
 

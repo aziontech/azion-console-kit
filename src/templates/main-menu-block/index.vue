@@ -34,6 +34,7 @@
 
         <!-- Azion client -->
         <SwitchAccountBlock
+          v-if="!user?.is_client_only"
           v-model:showSwitchAccount="showSwitchAccount"
           :accessMenu="profileMenuItems"
         />

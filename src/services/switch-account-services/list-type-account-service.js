@@ -1,8 +1,13 @@
 import { AxiosHttpClientAdapter, parseHttpResponse } from '../axios/AxiosHttpClientAdapter'
 import { makeSwitchAccountBaseUrl } from '@/services/auth-services/make-switch-account-base-url'
 
-export const listTypeAccountService = async ({ type = 'brands', textSnippet = '', page = 1 }) => {
-  const searchParams = makeSearchParams({ type, textSnippet, page })
+export const listTypeAccountService = async ({
+  type = 'brands',
+  textSnippet = '',
+  page = 1,
+  page_size = 5
+}) => {
+  const searchParams = makeSearchParams({ type, textSnippet, page, page_size })
 
   let httpResponse = await AxiosHttpClientAdapter.request({
     url: `${makeSwitchAccountBaseUrl()}?${searchParams.toString()}`,
@@ -42,6 +47,9 @@ const adapt = (httpResponse, type) => {
         severity: ''
       }
     },
+    client_id: {
+      content: '-'
+    },
     id: {
       content: account.id.toString()
     },
@@ -57,10 +65,11 @@ const adapt = (httpResponse, type) => {
   }
 }
 
-const makeSearchParams = ({ type, textSnippet, page }) => {
+const makeSearchParams = ({ type, textSnippet, page, page_size }) => {
   const searchParams = new URLSearchParams()
   searchParams.set('account_type', type)
   searchParams.set('q', textSnippet)
   searchParams.set('page', page)
+  searchParams.set('page_size', page_size)
   return searchParams
 }

@@ -18,6 +18,12 @@
           {{ description }}
         </div>
       </div>
+      <InlineMessage
+        v-if="errorMessage"
+        class="mb-2"
+        severity="error"
+        >{{ errorMessage }}
+      </InlineMessage>
 
       <DataTable
         v-show="!isLoading"
@@ -27,8 +33,10 @@
         lazy
         :paginator="totalRecords > limitShowRows"
         :rows="limitShowRows"
+        :rowsPerPageOptions="[5, 10, 20, 50, 100]"
         scrollable
         removableSort
+        v-model:first="first"
         @page="onPage($event)"
         :totalRecords="totalRecords"
         :loading="isLoading"
@@ -39,9 +47,9 @@
       >
         <template #header>
           <slot
-            name="headerColumn"
+            name="headerFilters"
             :filter="filters"
-            :applyFilter="loadData"
+            :applyFilter="applyFilter"
           />
         </template>
         <Column
@@ -51,6 +59,7 @@
         />
         <Column
           v-for="col of selectedColumns"
+          class="p-2"
           :key="col.field"
           :field="col.field"
           :header="col.header"
@@ -65,9 +74,9 @@
           </template>
         </Column>
         <Column
+          class="p-2"
           :frozen="true"
           :alignFrozen="'right'"
-          headerStyle="width: 13rem"
         >
           <template #header>
             <div class="flex justify-end w-full">
@@ -105,6 +114,7 @@
       <DataTable
         v-if="isLoading"
         :value="Array(5)"
+        scrollable
         removableSort
         :pt="{
           root: { class: 'border surface-border rounded' },
@@ -113,13 +123,12 @@
       >
         <template #header>
           <slot
-            name="headerColumn"
+            name="headerFilters"
             :filter="filters"
-            :applyFilter="loadData"
+            :applyFilter="applyFilter"
           />
         </template>
         <Column
-          sortable
           v-for="col of columns"
           :key="col.field"
           :field="col.field"
@@ -138,11 +147,11 @@
   import { ref, onMounted } from 'vue'
   import DataTable from 'primevue/datatable'
   import Column from 'primevue/column'
-  import { useToast } from 'primevue/usetoast'
   import Listbox from 'primevue/listbox'
   import Skeleton from 'primevue/skeleton'
   import OverlayPanel from 'primevue/overlaypanel'
   import PrimeButton from 'primevue/button'
+  import InlineMessage from 'primevue/inlinemessage'
 
   const props = defineProps({
     pageTitle: {
@@ -182,7 +191,7 @@
       type: Boolean,
       default: false
     },
-    filterHeader: {
+    headerFilter: {
       required: false,
       type: Object,
       default: () => ({})
@@ -190,8 +199,10 @@
   })
 
   const isLoading = ref(false)
+  const first = ref(1)
+  const errorMessage = ref(null)
   const listRecords = ref([])
-  const filters = ref(props.filterHeader)
+  const filters = ref(props.headerFilter)
   const selectedColumns = ref([])
   const totalRecords = ref()
   const columnSelectorPanel = ref()
@@ -205,30 +216,32 @@
     columnSelectorPanel.value.toggle(event)
   }
 
-  const toast = useToast()
-  const loadData = async ({ page = props.pageInitial } = {}) => {
+  const loadData = async ({ page = props.pageInitial, page_size = props.limitShowRows } = {}) => {
     try {
       isLoading.value = true
+      errorMessage
       listRecords.value = []
       const { results, totalPages } = await props.listService({
         page,
+        page_size,
         ...filters.value
       })
       totalRecords.value = totalPages * props.limitShowRows
       listRecords.value = results
     } catch (error) {
-      toast.add({
-        closable: true,
-        severity: 'error',
-        summary: error,
-        life: 10000
-      })
+      errorMessage.value = error
     } finally {
       isLoading.value = false
     }
   }
 
+  const applyFilter = () => {
+    first.value = 1
+    loadData({ page: 1 })
+  }
+
   const onPage = (event) => {
-    loadData({ page: event.page + props.pageInitial })
+    const page = event.page + props.pageInitial
+    loadData({ page, page_size: event.rows })
   }
 </script>

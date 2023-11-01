@@ -31,7 +31,7 @@
           class="w-fit"
           :pt="{
             content: {
-              class: 'p-4 rounded-md gap-4 border-solid flex flex justify-between max-sm:p-3'
+              class: 'p-4 rounded-md gap-4 border-solid flex flex justify-between sm:p-3'
             }
           }"
         >
@@ -47,18 +47,20 @@
                   icon="pi pi-cog"
                   type="button"
                   outlined
-                  class="md:hidden"
+                  class="hidden max-sm:block"
                   aria-label="menu"
                   aria-haspopup="true"
                   aria-controls="overlay_menu"
                   @click="toggle"
                 />
               </div>
+
               <Divider
                 class="max-sm:hidden"
                 layout="vertical"
               />
-              <Divider class="md:hidden" />
+              <Divider class="hidden max-sm:block" />
+
               <div class="flex items-center gap-1">
                 <span class="font-medium text-sm">ID</span>
                 <span class="font=normal text-sm">{{ account.id }}</span>
@@ -97,13 +99,13 @@
         </PrimeCard>
         <ListTableBlock
           :listService="listTypeAccountService"
-          :limitShowRows="10"
+          :limitShowRows="5"
           pageTitle="Accounts List"
           :columns="columns"
-          :filterHeader="filterSwitch"
+          :headerFilter="filterSwitch"
           description="Type your account name to filter results."
         >
-          <template #headerColumn="{ filter, applyFilter }">
+          <template #headerFilters="{ filter, applyFilter }">
             <div class="flex flex-wrap justify-between gap-2 w-full rounded">
               <span class="p-input-icon-left max-sm:w-full">
                 <i class="pi pi-search" />
@@ -236,6 +238,20 @@
             clickProps: columnData.value
           }
         })
+    },
+    {
+      field: 'client_id',
+      header: 'Client ID',
+      type: 'component',
+      component: (columnData) =>
+        columnBuilder({
+          data: columnData,
+          columnAppearance: 'clickable-text',
+          dependencies: {
+            clickAction: onSelectedAccount,
+            clickProps: columnData.value
+          }
+        })
     }
   ])
 
@@ -258,7 +274,7 @@
       result.push({
         ...item,
         command: () => {
-          visible.value = true
+          visible.value = false
         }
       })
     }
