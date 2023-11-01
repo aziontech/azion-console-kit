@@ -14,7 +14,7 @@ export const editNetworkListService = async (payload) => {
 
 const adapt = (payload) => {
   let networkContentList = null
-  if(payload.networkListType !== 'countries') {
+  if (payload.networkListType !== 'countries') {
     networkContentList = payload.itemsValues.trim().split('\n')
   } else {
     networkContentList = payload.itemsValuesCountry

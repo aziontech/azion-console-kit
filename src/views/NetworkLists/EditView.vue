@@ -136,7 +136,7 @@
   import Dropdown from 'primevue/dropdown'
   import MultiSelect from 'primevue/multiselect'
   import TextareaComponent from 'primevue/textarea'
-  import { useForm, useField} from 'vee-validate'
+  import { useForm, useField } from 'vee-validate'
   import * as yup from 'yup'
   import { ref, onMounted } from 'vue'
   import FormHorizontal from '@/templates/create-form-block-new/form-horizontal'
@@ -207,7 +207,7 @@
         options,
         countriesList,
         itemsValues,
-        itemsValuesCountry,
+        itemsValuesCountry
       }
     }
   }

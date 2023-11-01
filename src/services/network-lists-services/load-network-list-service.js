@@ -17,9 +17,14 @@ const adapt = (httpResponse, id) => {
     id: id,
     lastEditor: httpResponse.body.results.last_editor,
     networkListType: httpResponse.body.results.list_type,
-    itemsValuesCountry:  httpResponse.body.results.list_type === 'countries' ? httpResponse.body.results.items_values : [],
+    itemsValuesCountry:
+      httpResponse.body.results.list_type === 'countries'
+        ? httpResponse.body.results.items_values
+        : [],
     itemsValues:
-      httpResponse.body.results.list_type !== 'countries' ? httpResponse.body.results.items_values.toString().replaceAll(',', '\n') : '',
+      httpResponse.body.results.list_type !== 'countries'
+        ? httpResponse.body.results.items_values.toString().replaceAll(',', '\n')
+        : '',
     lastModified: new Intl.DateTimeFormat('us', { dateStyle: 'full', timeStyle: 'short' }).format(
       new Date(httpResponse.body.results.last_modified)
     )
