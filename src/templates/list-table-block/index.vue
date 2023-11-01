@@ -66,7 +66,7 @@
             <div class="flex justify-end w-full">
               <PrimeButton
                 outlined
-                icon="pi pi-bars"
+                icon="ai ai-column"
                 @click="toggleColumnSelector"
                 v-tooltip.top="{ value: 'Hidden columns', showDelay: 200 }"
               >
