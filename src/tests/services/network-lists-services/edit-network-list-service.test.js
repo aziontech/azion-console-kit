@@ -3,7 +3,6 @@ import { editNetworkListService } from '@/services/network-lists-services'
 import { describe, expect, it, vi } from 'vitest'
 import * as Errors from '@/services/axios/errors'
 
-
 const fixtures = {
   networkMock: {
     id: 56782,
@@ -53,7 +52,7 @@ describe('NetworkListsServices', () => {
   })
 
   it('Should return an API error for an 400 error status', async () => {
-    const apiErrorMock = "Network name \"IP\" is already in use on this account"
+    const apiErrorMock = 'Network name "IP" is already in use on this account'
     vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
       statusCode: 400,
       body: {

@@ -2,7 +2,6 @@ import { AxiosHttpClientAdapter } from '../axios/AxiosHttpClientAdapter'
 import { makeNetworkListBaseUrl } from './make-network-list-base-url'
 import * as Errors from '@/services/axios/errors'
 
-
 export const createNetworkListService = async (payload) => {
   const bodyRequest = adapt(payload)
   let httpResponse = await AxiosHttpClientAdapter.request({
@@ -48,4 +47,3 @@ const parseHttpResponse = (httpResponse) => {
       throw new Errors.UnexpectedError().message
   }
 }
-
