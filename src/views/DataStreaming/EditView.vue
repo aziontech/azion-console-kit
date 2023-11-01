@@ -20,9 +20,13 @@
               placeholder="Name for Data Streaming"
               :class="{ 'p-invalid': errors.name }"
             />
-            <small id="name-help" class="p-error">{{ errors.name }}</small>
+            <small
+              id="name-help"
+              class="p-error"
+              >{{ errors.name }}</small
+            >
           </div>
-    
+
           <div class="flex flex-col gap-2">
             <label>Data Source: *</label>
             <Dropdown
@@ -34,7 +38,7 @@
               class="w-full"
             />
           </div>
-    
+
           <div class="flex flex-col gap-2">
             <label>Template: *</label>
             <Dropdown
@@ -46,7 +50,7 @@
               class="w-full"
             />
           </div>
-    
+
           <div class="flex flex-col gap-2">
             <label>Data Set:</label>
             <vue-monaco-editor
@@ -57,7 +61,7 @@
               class="min-h-[100px]"
             />
           </div>
-    
+
           <!-- domains -->
           <div class="flex flex-col gap-2">
             <label>Options:</label>
@@ -90,7 +94,7 @@
               </div>
             </div>
           </div>
-    
+
           <div v-if="domainOption === '0'">
             <label>Domains:</label>
             <PickList
@@ -110,10 +114,10 @@
               </template>
             </PickList>
           </div>
-    
+
           <!-- destionation -->
           <h1 class="text-xl font-medium">Destination</h1>
-    
+
           <div class="flex flex-col gap-2">
             <label>Endpoint Type: *</label>
             <Dropdown
@@ -125,7 +129,7 @@
               class="w-full"
             />
           </div>
-    
+
           <!-- Specific Sections for Different Endpoints -->
           <div
             id="standard"
@@ -140,9 +144,13 @@
                 placeholder="https://app.domain.com/"
                 :class="{ 'p-invalid': errors.endpointUrl }"
               />
-              <small id="endpoint-url-help" class="p-error">{{ errors.endpointUrl }}</small>
+              <small
+                id="endpoint-url-help"
+                class="p-error"
+                >{{ errors.endpointUrl }}</small
+              >
             </div>
-            
+
             <label>Custom Headers:</label>
             <div
               class="p-inputgroup flex-1"
@@ -165,9 +173,9 @@
               label="Header"
               @click="addHeader()"
             />
-    
+
             <h1 class="text-xl font-medium">Payload</h1>
-            
+
             <div class="flex flex-col gap-2">
               <label>Max Size:</label>
               <InputNumber
@@ -176,9 +184,13 @@
                 :useGrouping="false"
                 :class="{ 'p-invalid': errors.maxSize }"
               />
-              <small id="max-size-help" class="p-error">{{ errors.maxSize }}</small>
+              <small
+                id="max-size-help"
+                class="p-error"
+                >{{ errors.maxSize }}</small
+              >
             </div>
-            
+
             <div class="flex flex-col gap-2">
               <label>Log Line Separator:</label>
               <InputText
@@ -187,9 +199,13 @@
                 placeholder="\n"
                 :class="{ 'p-invalid': errors.lineSeparator }"
               />
-              <small id="log-line-help" class="p-error">{{ errors.lineSeparator }}</small>
+              <small
+                id="log-line-help"
+                class="p-error"
+                >{{ errors.lineSeparator }}</small
+              >
             </div>
-            
+
             <div class="flex flex-col gap-2">
               <label>Payload Format:</label>
               <InputText
@@ -198,10 +214,14 @@
                 placeholder="$dataset"
                 :class="{ 'p-invalid': errors.payloadFormat }"
               />
-              <small id="data-set-help" class="p-error">{{ errors.payloadFormat }}</small>
+              <small
+                id="data-set-help"
+                class="p-error"
+                >{{ errors.payloadFormat }}</small
+              >
             </div>
           </div>
-    
+
           <div
             id="kafka"
             class="flex flex-col gap-3"
@@ -215,9 +235,13 @@
                 placeholder="host1:port1,host2:port2,..."
                 :class="{ 'p-invalid': errors.bootstrapServers }"
               />
-              <small id="bootstrap-servers-help" class="p-error">{{ errors.bootstrapServers }}</small>
+              <small
+                id="bootstrap-servers-help"
+                class="p-error"
+                >{{ errors.bootstrapServers }}</small
+              >
             </div>
-            
+
             <div class="flex flex-col gap-2">
               <label>Kafka Topic:</label>
               <InputText
@@ -225,9 +249,13 @@
                 type="text"
                 :class="{ 'p-invalid': errors.kafkaTopic }"
               />
-              <small id="kafka-topic-help" class="p-error">{{ errors.kafkaTopic }}</small>
+              <small
+                id="kafka-topic-help"
+                class="p-error"
+                >{{ errors.kafkaTopic }}</small
+              >
             </div>
-    
+
             <label>Use Transport Layer Security (TLS):</label>
             <div class="flex flex-wrap gap-3">
               <div class="flex align-items-center">
@@ -258,7 +286,7 @@
               </div>
             </div>
           </div>
-    
+
           <div
             id="s3"
             class="flex flex-col gap-3"
@@ -271,9 +299,13 @@
                 type="text"
                 :class="{ 'p-invalid': errors.host }"
               />
-              <small id="host-help" class="p-error">{{ errors.host }}</small>
+              <small
+                id="host-help"
+                class="p-error"
+                >{{ errors.host }}</small
+              >
             </div>
-            
+
             <div class="flex flex-col gap-2">
               <label>Bucket Name: *</label>
               <InputText
@@ -282,9 +314,13 @@
                 :class="{ 'p-invalid': errors.bucket }"
                 v-tooltip.top="{ value: errors.bucket, showDelay: 200 }"
               />
-              <small id="bucket-help" class="p-error">{{ errors.bucket }}</small>
+              <small
+                id="bucket-help"
+                class="p-error"
+                >{{ errors.bucket }}</small
+              >
             </div>
-            
+
             <div class="flex flex-col gap-2">
               <label>Region: *</label>
               <InputText
@@ -292,9 +328,13 @@
                 type="text"
                 :class="{ 'p-invalid': errors.region }"
               />
-              <small id="region-help" class="p-error">{{ errors.region }}</small>
+              <small
+                id="region-help"
+                class="p-error"
+                >{{ errors.region }}</small
+              >
             </div>
-            
+
             <div class="flex flex-col gap-2">
               <label>Access Key: *</label>
               <InputText
@@ -302,9 +342,13 @@
                 type="text"
                 :class="{ 'p-invalid': errors.accessKey }"
               />
-              <small id="access-key-help" class="p-error">{{ errors.accessKey }}</small>
+              <small
+                id="access-key-help"
+                class="p-error"
+                >{{ errors.accessKey }}</small
+              >
             </div>
-            
+
             <div class="flex flex-col gap-2">
               <label>Secret Key: *</label>
               <InputText
@@ -312,9 +356,13 @@
                 type="text"
                 :class="{ 'p-invalid': errors.secretKey }"
               />
-              <small id="secret-key-help" class="p-error">{{ errors.secretKey }}</small>
+              <small
+                id="secret-key-help"
+                class="p-error"
+                >{{ errors.secretKey }}</small
+              >
             </div>
-    
+
             <div class="flex flex-col gap-2">
               <label>Object Key Prefix:</label>
               <InputText
@@ -322,9 +370,13 @@
                 type="text"
                 :class="{ 'p-invalid': errors.objectKey }"
               />
-              <small id="object-key-help" class="p-error">{{ errors.objectKey }}</small>
+              <small
+                id="object-key-help"
+                class="p-error"
+                >{{ errors.objectKey }}</small
+              >
             </div>
-    
+
             <label>Content Type:</label>
             <Dropdown
               :class="{ 'p-invalid': errors.contentType }"
@@ -335,7 +387,7 @@
               class="w-full"
             />
           </div>
-    
+
           <div
             id="big_query"
             class="flex flex-col gap-3"
@@ -348,9 +400,13 @@
                 type="text"
                 :class="{ 'p-invalid': errors.projectID }"
               />
-              <small id="project-id-help" class="p-error">{{ errors.projectID }}</small>
+              <small
+                id="project-id-help"
+                class="p-error"
+                >{{ errors.projectID }}</small
+              >
             </div>
-            
+
             <div class="flex flex-col gap-2">
               <label>Dataset ID: *</label>
               <InputText
@@ -358,9 +414,13 @@
                 type="text"
                 :class="{ 'p-invalid': errors.datasetID }"
               />
-              <small id="dataset-id-help" class="p-error">{{ errors.datasetID }}</small>
+              <small
+                id="dataset-id-help"
+                class="p-error"
+                >{{ errors.datasetID }}</small
+              >
             </div>
-    
+
             <div class="flex flex-col gap-2">
               <label>Table ID: *</label>
               <InputText
@@ -368,9 +428,13 @@
                 type="text"
                 :class="{ 'p-invalid': errors.tableID }"
               />
-              <small id="table-id-help" class="p-error">{{ errors.tableID }}</small>
+              <small
+                id="table-id-help"
+                class="p-error"
+                >{{ errors.tableID }}</small
+              >
             </div>
-            
+
             <div class="flex flex-col gap-2">
               <label>Service Account Key: *</label>
               <Textarea
@@ -379,10 +443,14 @@
                 rows="5"
                 cols="30"
               />
-              <small id="service-account-key-help" class="p-error">{{ errors.serviceAccountKey }}</small>
+              <small
+                id="service-account-key-help"
+                class="p-error"
+                >{{ errors.serviceAccountKey }}</small
+              >
             </div>
           </div>
-    
+
           <div
             id="elasticsearch"
             class="flex flex-col gap-3"
@@ -396,9 +464,13 @@
                 placeholder="https://elasticsearch-domain.com/index"
                 :class="{ 'p-invalid': errors.elasticsearchUrl }"
               />
-              <small id="elastic-search-url-help" class="p-error">{{ errors.elasticsearchUrl }}</small>
+              <small
+                id="elastic-search-url-help"
+                class="p-error"
+                >{{ errors.elasticsearchUrl }}</small
+              >
             </div>
-    
+
             <div class="flex flex-col gap-2">
               <label>API Key: *</label>
               <InputText
@@ -406,10 +478,14 @@
                 type="text"
                 :class="{ 'p-invalid': errors.apiKey }"
               />
-              <small id="api-key-help" class="p-error">{{ errors.apiKey }}</small>
+              <small
+                id="api-key-help"
+                class="p-error"
+                >{{ errors.apiKey }}</small
+              >
             </div>
           </div>
-    
+
           <div
             id="splunk"
             class="flex flex-col gap-3"
@@ -423,9 +499,13 @@
                 placeholder="https://inputs.splunk-client.splunkcloud.com:123456/services/collector"
                 :class="{ 'p-invalid': errors.splunkUrl }"
               />
-              <small id="splunk-url-help" class="p-error">{{ errors.splunkUrl }}</small>
+              <small
+                id="splunk-url-help"
+                class="p-error"
+                >{{ errors.splunkUrl }}</small
+              >
             </div>
-    
+
             <div class="flex flex-col gap-2">
               <label>API Key: *</label>
               <InputText
@@ -433,10 +513,14 @@
                 type="text"
                 :class="{ 'p-invalid': errors.splunkApiKey }"
               />
-              <small id="splunk-api-key-help" class="p-error">{{ errors.splunkApiKey }}</small>
+              <small
+                id="splunk-api-key-help"
+                class="p-error"
+                >{{ errors.splunkApiKey }}</small
+              >
             </div>
           </div>
-    
+
           <div
             id="aws_kinesis_firehose"
             class="flex flex-col gap-3"
@@ -449,9 +533,13 @@
                 type="text"
                 :class="{ 'p-invalid': errors.streamName }"
               />
-              <small id="stream-name-help" class="p-error">{{ errors.streamName }}</small>
+              <small
+                id="stream-name-help"
+                class="p-error"
+                >{{ errors.streamName }}</small
+              >
             </div>
-            
+
             <div class="flex flex-col gap-2">
               <label>Region: *</label>
               <InputText
@@ -459,9 +547,13 @@
                 type="text"
                 :class="{ 'p-invalid': errors.awsRegion }"
               />
-              <small id="aws-region-help" class="p-error">{{ errors.awsRegion }}</small>
+              <small
+                id="aws-region-help"
+                class="p-error"
+                >{{ errors.awsRegion }}</small
+              >
             </div>
-    
+
             <div class="flex flex-col gap-2">
               <label>Access Key: *</label>
               <InputText
@@ -469,9 +561,13 @@
                 type="text"
                 :class="{ 'p-invalid': errors.awsAccessKey }"
               />
-              <small id="aws-access-key-help" class="p-error">{{ errors.awsAccessKey }}</small>
+              <small
+                id="aws-access-key-help"
+                class="p-error"
+                >{{ errors.awsAccessKey }}</small
+              >
             </div>
-    
+
             <div class="flex flex-col gap-2">
               <label>Secret Key: *</label>
               <InputText
@@ -479,10 +575,14 @@
                 type="text"
                 :class="{ 'p-invalid': errors.awsSecretKey }"
               />
-              <small id="aws-secret-key-help" class="p-error">{{ errors.awsSecretKey }}</small>
+              <small
+                id="aws-secret-key-help"
+                class="p-error"
+                >{{ errors.awsSecretKey }}</small
+              >
             </div>
           </div>
-    
+
           <div
             id="datadog"
             class="flex flex-col gap-3"
@@ -496,9 +596,13 @@
                 placeholder="https://http-intake.logs.datadoghq.com/v1/input"
                 :class="{ 'p-invalid': errors.datadogUrl }"
               />
-              <small id="datadog-url-help" class="p-error">{{ errors.datadogUrl }}</small>
+              <small
+                id="datadog-url-help"
+                class="p-error"
+                >{{ errors.datadogUrl }}</small
+              >
             </div>
-    
+
             <div class="flex flex-col gap-2">
               <label>API Key: *</label>
               <InputText
@@ -506,10 +610,14 @@
                 type="text"
                 :class="{ 'p-invalid': errors.datadogApiKey }"
               />
-              <small id="datadog-api-key-help" class="p-error">{{ errors.datadogApiKey }}</small>
+              <small
+                id="datadog-api-key-help"
+                class="p-error"
+                >{{ errors.datadogApiKey }}</small
+              >
             </div>
           </div>
-    
+
           <div
             id="qradar"
             class="flex flex-col gap-3"
@@ -524,10 +632,14 @@
                 :class="{ 'p-invalid': errors.QRadarUrl }"
                 v-tooltip.top="{ value: errors.QRadarUrl, showDelay: 200 }"
               />
-              <small id="qradar-url-help" class="p-error">{{ errors.QRadarUrl }}</small>
+              <small
+                id="qradar-url-help"
+                class="p-error"
+                >{{ errors.QRadarUrl }}</small
+              >
             </div>
           </div>
-    
+
           <div
             id="azure_monitor"
             class="flex flex-col gap-3"
@@ -540,9 +652,13 @@
                 type="text"
                 :class="{ 'p-invalid': errors.logType }"
               />
-              <small id="log-type-help" class="p-error">{{ errors.logType }}</small>
+              <small
+                id="log-type-help"
+                class="p-error"
+                >{{ errors.logType }}</small
+              >
             </div>
-    
+
             <div class="flex flex-col gap-2">
               <label>Shared Key: *</label>
               <InputText
@@ -550,9 +666,13 @@
                 type="text"
                 :class="{ 'p-invalid': errors.sharedKey }"
               />
-              <small id="shared-key-help" class="p-error">{{ errors.sharedKey }}</small>
+              <small
+                id="shared-key-help"
+                class="p-error"
+                >{{ errors.sharedKey }}</small
+              >
             </div>
-    
+
             <div class="flex flex-col gap-2">
               <label>Time Generated Field:</label>
               <InputText
@@ -560,7 +680,7 @@
                 type="text"
               />
             </div>
-    
+
             <div class="flex flex-col gap-2">
               <label>Workspace ID: *</label>
               <InputText
@@ -568,10 +688,14 @@
                 type="text"
                 :class="{ 'p-invalid': errors.workspaceID }"
               />
-              <small id="workspace-id-help" class="p-error">{{ errors.workspaceID }}</small>
+              <small
+                id="workspace-id-help"
+                class="p-error"
+                >{{ errors.workspaceID }}</small
+              >
             </div>
           </div>
-    
+
           <div
             id="azure_blob_storage"
             class="flex flex-col gap-3"
@@ -584,9 +708,13 @@
                 type="text"
                 :class="{ 'p-invalid': errors.storageAccount }"
               />
-              <small id="storage-account-help" class="p-error">{{ errors.storageAccount }}</small>
+              <small
+                id="storage-account-help"
+                class="p-error"
+                >{{ errors.storageAccount }}</small
+              >
             </div>
-    
+
             <div class="flex flex-col gap-2">
               <label>Container Name: *</label>
               <InputText
@@ -594,9 +722,13 @@
                 type="text"
                 :class="{ 'p-invalid': errors.containerName }"
               />
-              <small id="container-name-help" class="p-error">{{ errors.containerName }}</small>
+              <small
+                id="container-name-help"
+                class="p-error"
+                >{{ errors.containerName }}</small
+              >
             </div>
-    
+
             <div class="flex flex-col gap-2">
               <label>Blob SAS Token: *</label>
               <InputText
@@ -604,7 +736,11 @@
                 type="text"
                 :class="{ 'p-invalid': errors.blobToken }"
               />
-              <small id="blob-token-help" class="p-error">{{ errors.blobToken }}</small>
+              <small
+                id="blob-token-help"
+                class="p-error"
+                >{{ errors.blobToken }}</small
+              >
             </div>
           </div>
         </template>
