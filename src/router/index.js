@@ -16,8 +16,9 @@ import { variablesRoutes } from '@routes/variables-routes'
 import { edgeNodeRoutes } from '@routes/edge-node-routes'
 import { credentialsRoutes } from '@routes/credentials-routes'
 import { usersListsRoutes } from '@routes/users-routes'
+import { playgroundRoutes } from './routes/playground-routes'
+import { activityHistoryRoutes } from './routes/activity-history-routes'
 import { errorRoutes } from '@routes/error-routes'
-import { playgroundRoutes } from '@routes/playground-routes'
 import beforeEachRoute from './hooks/beforeEachRoute'
 
 const router = createRouter({
@@ -40,7 +41,8 @@ const router = createRouter({
     edgeNodeRoutes,
     credentialsRoutes,
     usersListsRoutes,
-    playgroundRoutes
+    playgroundRoutes,
+    activityHistoryRoutes
   ].concat(errorRoutes)
 })
 

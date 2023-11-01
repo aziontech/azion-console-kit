@@ -1,0 +1,76 @@
+.p-datatable {
+  border: var(--surface-border) 1px solid !important;
+  border-radius: $borderRadius;
+
+  .p-datatable-header {
+    border-top-right-radius: $borderRadius;
+    border-top-left-radius: $borderRadius;
+  }
+
+  .p-datatable-thead > tr > th {
+    font-size: 0.875rem;
+    line-height: 1.125rem;
+    padding: 0.5rem 0.875rem !important;
+    box-sizing: inherit !important;
+
+    .p-column-header-content {
+      min-height: 2rem;
+      vertical-align: center;
+    }
+  }
+
+  .p-sortable-column {
+    .p-sortable-column-icon {
+      opacity: 0 !important;
+    }
+  }
+
+  .p-sortable-column:hover {
+    .p-sortable-column-icon {
+      opacity: 1 !important;
+      color: $tableHeaderCellHighlightTextColor !important;
+    }
+  }
+
+  .p-sortable-column {
+    .p-sortable-column-icon {
+      opacity: 0;
+    }
+
+    &.p-highlight {
+      .p-sortable-column-icon {
+        opacity: 1 !important;
+      }
+    }
+  }
+}
+
+.hidden-columns-panel {
+  .p-listbox-item {
+    opacity: 0.6;
+    font-size: 0.875rem;
+    line-height: 0.875rem;
+    padding: 0.75rem 0.5rem !important;
+    &::before {
+      content: '\2298' !important;
+      color: var(--text-color-secondary);
+      margin-right: 0.3rem;
+      font-size: 1.25rem;
+      line-height: 0.875rem;
+    }
+    &:hover {
+      background: var(--surface-400) !important;
+    }
+    &.p-highlight {
+      opacity: 1;
+      color: var(--text-color) !important;
+      background: transparent !important;
+      &::before {
+        content: none !important;
+      }
+      &:hover {
+        background: $inputListItemHoverBg !important;
+      }
+    }
+  }
+}

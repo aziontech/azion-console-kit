@@ -2,7 +2,7 @@
   <div>
     <PageHeadingBlock :pageTitle="pageTitle" />
 
-    <div class="max-w-full mx-8">
+    <div class="max-w-full mx-3 mb-8 md:mx-8">
       <DataTable
         v-if="!isLoading"
         @rowReorder="onRowReorder"
@@ -12,8 +12,8 @@
         dataKey="id"
         v-model:filters="this.filters"
         paginator
-        :rowsPerPageOptions="[5, 10, 20, 50, 100]"
-        :rows="5"
+        :rowsPerPageOptions="[10, 20, 50, 100]"
+        :rows="10"
         :globalFilterFields="filterBy"
         :loading="isLoading"
       >
@@ -76,6 +76,7 @@
                   v-model="selectedColumns"
                   multiple
                   :options="[{ label: 'Hidden columns', items: this.columns }]"
+                  class="hidden-columns-panel"
                   optionLabel="header"
                   optionGroupLabel="label"
                   optionGroupChildren="items"
@@ -122,7 +123,7 @@
 
       <DataTable
         v-else
-        :value="Array(5)"
+        :value="Array(10)"
         :pt="{
           header: { class: '!border-t-0' }
         }"
@@ -307,7 +308,7 @@
         let toastConfig = {
           closable: false,
           severity: 'success',
-          summary: 'Deleted successfully',
+          summary: '',
           life: 10000
         }
         try {
@@ -317,7 +318,8 @@
             summary: 'Processing request',
             life: 5000
           })
-          await this.deleteService(this.selectedId)
+          const feedback = await this.deleteService(this.selectedId)
+          toastConfig.summary = feedback ?? 'Deleted successfully'
           this.data = this.data.filter((item) => item.id !== this.selectedId)
         } catch (error) {
           toastConfig = {

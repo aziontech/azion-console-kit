@@ -26,10 +26,10 @@ export default defineConfig({
         rewrite: (path) => path.replace(/^\/logout/, ''),
         cookieDomainRewrite: { '*': '' }
       },
-      '/api/edge_services': {
+      '/api/edge-services': {
         target: 'https://stage-manager-origin.azion.com/services/api/v1/services',
         changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/api\/edge_services/, '')
+        rewrite: (path) => path.replace(/^\/api\/edge-services/, '')
       },
       '/api/variables': {
         target: 'https://stage-manager.azion.com/variables/api/',
@@ -40,6 +40,11 @@ export default defineConfig({
         target: 'https://stage-cities.azion.com',
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/network-lists\/graphql/, '')
+      },
+      '/events/graphql': {
+        target: 'https://stage-api.azion.net',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/events\/graphql\//, '')
       },
       '/api/edge_node': {
         target: 'https://stage-manager.azion.com/edgenode/api/v1/edge-nodes',

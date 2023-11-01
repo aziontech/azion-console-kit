@@ -1,3 +1,3 @@
 export const makeEdgeServicesBaseUrl = () => {
-  return `edge_services`
+  return `edge-services`
 }

@@ -16,6 +16,49 @@
         <template #inputs>
           <div class="flex flex-col sm:max-w-lg w-full gap-2">
             <label
+              for="name"
+              class="text-color text-base font-medium"
+              >Name *</label
+            >
+            <InputText
+              placeholder="Edit Credential Name"
+              v-model="name"
+              id="name"
+              type="text"
+              :class="{ 'p-invalid': errors.name }"
+              v-tooltip.top="{ value: errors.name, showDelay: 200 }"
+            />
+            <small
+              v-if="errors.name"
+              class="p-error text-xs font-normal leading-tight"
+              >{{ errors.name }}</small
+            >
+          </div>
+
+          <div class="flex flex-col sm:max-w-lg w-full gap-2">
+            <label
+              for="description"
+              class="text-color text-base font-medium"
+              >Description</label
+            >
+            <PrimeTextarea
+              :class="{ 'p-invalid': errors.description }"
+              v-model="description"
+              id="description"
+              rows="2"
+              cols="30"
+              class="w-full"
+              v-tooltip.top="{ value: errors.description, showDelay: 200 }"
+            />
+            <small
+              v-if="errors.description"
+              class="p-error text-xs font-normal leading-tight"
+              >{{ errors.description }}</small
+            >
+          </div>
+
+          <div class="flex flex-col sm:max-w-lg w-full gap-2">
+            <label
               for="token"
               class="text-color text-base font-medium"
               >Token *</label
@@ -39,39 +82,6 @@
             </div>
           </div>
 
-          <div class="flex flex-col sm:max-w-lg w-full gap-2">
-            <label
-              for="name"
-              class="text-color text-base font-medium"
-              >Name *</label
-            >
-            <InputText
-              placeholder="Edit Credential Name"
-              v-model="name"
-              id="name"
-              type="text"
-              :class="{ 'p-invalid': errors.name }"
-              v-tooltip.top="{ value: errors.name, showDelay: 200 }"
-            />
-          </div>
-
-          <div class="flex flex-col sm:max-w-lg w-full gap-2">
-            <label
-              for="description"
-              class="text-color text-base font-medium"
-              >Description</label
-            >
-            <PrimeTextarea
-              :class="{ 'p-invalid': errors.description }"
-              v-model="description"
-              id="description"
-              rows="2"
-              cols="30"
-              class="w-full"
-              v-tooltip.top="{ value: errors.description, showDelay: 200 }"
-            />
-          </div>
-
           <Card
             :pt="{
               root: { class: 'shadow-none  rounded-none' },
@@ -92,7 +102,6 @@
                 <div class="">
                   <div class="text-color text-sm font-normal">Active</div>
                 </div>
-                <div class="self-stretch text-color-secondary text-sm font-normal">Description</div>
               </div>
             </template>
           </Card>
@@ -133,7 +142,7 @@
     setup() {
       const validationSchema = yup.object({
         id: yup.string().required(),
-        name: yup.string().required(),
+        name: yup.string().required('Name is a required field'),
         description: yup.string(),
         token: yup.string(),
         status: yup.boolean()

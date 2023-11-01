@@ -28,6 +28,12 @@
               :class="{ 'p-invalid': errors.name }"
               v-tooltip.top="errors.name"
             />
+
+            <small
+              v-if="errors.name"
+              class="p-error text-xs font-normal leading-tight"
+              >{{ errors.name }}</small
+            >
           </div>
         </template>
       </form-horizontal>
@@ -66,6 +72,12 @@
               class="w-full"
               placeholder="Select an edge application"
             />
+
+            <small
+              v-if="errors.edgeApplication"
+              class="p-error text-xs font-normal leading-tight"
+              >{{ errors.edgeApplication }}</small
+            >
           </div>
           <div class="flex flex-col sm:max-w-lg w-full gap-2">
             <label
@@ -82,6 +94,11 @@
               class="w-full"
               v-tooltip.top="errors.cnames"
             />
+            <small
+              v-if="errors.cnames"
+              class="p-error text-xs font-normal leading-tight"
+              >{{ errors.cnames }}</small
+            >
           </div>
           <Card
             :pt="{
@@ -216,6 +233,11 @@
               placeholder=""
               :disabled="!mtlsIsEnabled"
             />
+            <small
+              v-if="errors.mtlsTrustedCertificate"
+              class="p-error text-xs font-normal leading-tight"
+              >{{ errors.mtlsTrustedCertificate }}</small
+            >
           </div>
         </template>
       </form-horizontal>

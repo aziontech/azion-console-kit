@@ -12,7 +12,7 @@ const makeSut = () => {
 describe('EdgeServicesServices', () => {
   it('should return the API base url to edge services service', () => {
     const { sut } = makeSut()
-    const correctApiUrl = 'edge_services'
+    const correctApiUrl = 'edge-services'
 
     const baseUrl = sut()
 

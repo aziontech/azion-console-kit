@@ -2,7 +2,7 @@
 <template>
   <!-- Header Container -->
   <header
-    class="p-3 bg-header border-b surface-border items-center flex justify-between md:px-8 md:py-3 w-full fixed top-0 z-10 h-[56px]"
+    class="p-3 bg-header text-white border-b surface-border items-center flex justify-between md:px-8 md:py-3 w-full fixed top-0 z-10 h-[56px]"
     @keyup.esc="closeSideBar"
   >
     <div
@@ -13,9 +13,13 @@
         <PrimeButton
           @click="openSideBar"
           size="small"
-          class="flex-none border-header text-white"
+          class="text-white flex-none border-header"
           icon="pi pi-bars"
           style="height: 32px; width: 32px"
+          :pt="{
+            label: { class: 'text-white hover:bg-header-button-hover' },
+            icon: { class: 'text-white' }
+          }"
           :class="{
             'bg-header-button-enabled': showSidebar,
             'bg-header hover:bg-header-button-hover': !showSidebar
@@ -27,20 +31,17 @@
           class="max-md:hidden cursor-pointer"
           @click="$router.push('/')"
         />
-        <Mobilelogo
+        <MobileLogo
           class="md:hidden cursor-pointer"
           @click="this.$router.push('/')"
         />
+
         <!-- Azion client -->
-        <PrimeButton
-          v-tooltip.bottom="{ value: 'Switch account', showDelay: 200 }"
-          class="font-semibold ml-2 h-8 w-auto border-header hidden md:flex gap-2 items-center text-white"
-          size="small"
-          outlined
-        >
-          <i class="pi pi-box" />
-          <span>Azion Client</span>
-        </PrimeButton>
+        <SwitchAccountBlock
+          v-if="!user?.is_client_only"
+          v-model:showSwitchAccount="openSwitchAccount"
+          :accessMenu="profileMenuItems"
+        />
       </div>
 
       <!-- Search -->
@@ -54,7 +55,7 @@
           />
         </i>
         <InputText
-          class="w-64 bg-header-input border-header hover:border-header-hover"
+          class="w-64 bg-header-input border-header placeholder:text-header text-header hover:border-header-hover"
           placeholder="Search..."
           :value="searchText"
           @click="openSearch"
@@ -66,10 +67,13 @@
       <div class="flex gap-2 items-center">
         <PrimeButton
           icon="pi pi-search"
-          class="px-2 py-1 flex lg:hidden text-white border-header"
+          class="bg-header hover:bg-header-button-hover !text-white px-2 py-1 flex lg:hidden !text-white border-header"
+          :pt="{
+            label: { class: 'text-white' },
+            icon: { class: 'text-white' }
+          }"
           @click="openSearch"
           style="height: 32px; width: 32px"
-          outlined
           v-tooltip.bottom="{ value: 'Search', showDelay: 200 }"
         />
 
@@ -78,9 +82,12 @@
           @click="showCreateModal"
           icon="pi pi-plus"
           label="Create"
-          class="h-8 hidden md:flex text-white border-header"
-          outlined
+          class="!text-white h-8 hidden md:flex !text-white border-header"
           size="small"
+          :pt="{
+            label: { class: 'text-white' },
+            icon: { class: 'text-white' }
+          }"
           :class="{
             'bg-header hover:bg-header-button-hover': !showCreate,
             'bg-header-button-enabled': showCreate
@@ -93,8 +100,11 @@
           icon="pi pi-plus"
           class="h-8 md:hidden text-white border-header"
           size="small"
-          outlined
           style="height: 32px; width: 32px"
+          :pt="{
+            label: { class: 'text-white' },
+            icon: { class: 'text-white' }
+          }"
           :class="{
             'bg-header hover:bg-header-button-hover': !showCreate,
             'bg-header-button-enabled': showCreate
@@ -107,12 +117,15 @@
           icon="pi pi-question-circle"
           size="small"
           label="Help"
-          @click="showHelperCenter"
-          outlined
-          class="hidden md:flex text-white border-header"
+          @click="toggleHelpCenter"
+          :pt="{
+            label: { class: 'text-white' },
+            icon: { class: 'text-white' }
+          }"
+          class="hidden md:flex !text-white border-header"
           :class="{
-            'bg-header hover:bg-header-button-hover': !helperVisible,
-            'bg-header-button-enabled': helperVisible
+            'bg-header hover:bg-header-button-hover': !showHelp,
+            'bg-header-button-enabled': showHelp
           }"
         />
 
@@ -120,13 +133,16 @@
         <PrimeButton
           icon="pi pi-question-circle"
           size="small"
-          outlined
-          class="md:hidden text-white border-header text-white border-header"
+          class="md:hidden text-white !text-white border-header"
           style="height: 32px; width: 32px"
-          @click="showHelperCenterMobile"
+          @click="toggleHelpCenter"
+          :pt="{
+            label: { class: 'text-white' },
+            icon: { class: 'text-white' }
+          }"
           :class="{
-            'bg-header hover:bg-header-button-hover': !helperVisible,
-            'bg-header-button-enabled': helperVisible
+            'bg-header hover:bg-header-button-hover': !showHelp,
+            'bg-header-button-enabled': showHelp
           }"
           v-tooltip.bottom="{ value: 'Help', showDelay: 200 }"
         />
@@ -135,7 +151,7 @@
         <PrimeButton
           icon="pi pi-bell"
           style="padding-left: 7px; height: 32px; width: 32px"
-          class="overflow-auto text-white border-header hover:bg-header-button-hover"
+          class="overflow-auto text-white border-header bg-header hover:bg-header-button-hover"
           badge="9"
           v-tooltip.bottom="{ value: 'Notifications', showDelay: 200 }"
           size="small"
@@ -143,9 +159,10 @@
           @click="toggleNotification"
           aria-haspopup="true"
           aria-controls="overlay_menu"
-          outlined
           :pt="{
             root: { class: 'overflow-visible' },
+            label: { class: 'text-white' },
+            icon: { class: 'text-white' },
             badge: { class: 'absolute right-[-4px] top-[-8px]' }
           }"
         />
@@ -154,14 +171,14 @@
         <Avatar
           @click="toggleProfile"
           label="U"
-          class="cursor-pointer md:hidden text-avatar bg-header-avatar text-white text-avatar bg-header-avatar text-white"
+          class="transition-all hover:border-orange-500 hover:bg-header-button-hover cursor-pointer md:hidden text-avatar text-avatar bg-header-avatar"
           v-tooltip.bottom="{ value: 'Account settings', showDelay: 200 }"
         />
         <!-- Profile Desktop -->
         <Avatar
           @click="toggleProfile"
           label="U"
-          class="hidden md:flex cursor-pointer bg-header-avatar text-white bg-header-avatar text-white"
+          class="transition-all hover:border-orange-500 hover:bg-header-button-hover hidden md:flex cursor-pointer bg-header-avatar"
           v-tooltip.bottom="{ value: 'Account settings', showDelay: 200 }"
         />
       </div>
@@ -170,15 +187,27 @@
   </header>
   <!-- help mobile sidebar -->
   <Sidebar
-    v-model:visible="showHelp"
+    :visible="showHelp"
     position="bottom"
     headerContent="Help"
+    :show-close-icon="false"
     :pt="{
-      root: { class: '!h-[90%]' }
+      root: { class: '!h-[90%] md:hidden flex' },
+      headerContent: { class: 'w-full' },
+      mask: { class: 'md:hidden flex' }
     }"
   >
     <template #header>
-      <div>Help</div>
+      <div class="flex items-center justify-between">
+        <h2>Help</h2>
+        <PrimeButton
+          icon="pi pi-times"
+          @click="closeHelpCenter"
+          size="small"
+          class="flex-none surface-border text-sm w-8 h-8"
+          text
+        />
+      </div>
     </template>
     <div class="flex flex-col p-2">
       <!-- content -->
@@ -396,13 +425,15 @@
   import Sidebar from 'primevue/sidebar'
   import Divider from 'primevue/divider'
   import Logo from '@assets/svg/logo'
-  import Mobilelogo from '@assets/svg/mobile-logo'
+  import MobileLogo from '@assets/svg/mobile-logo'
   import PrimeDialog from 'primevue/dialog'
   import InputText from 'primevue/inputtext'
   import Tag from 'primevue/tag'
   import Dropdown from 'primevue/dropdown'
   import { useAccountStore } from '@/stores/account'
+  import { useHelpCenterStore } from '@/stores/help-center'
   import { mapActions, mapState } from 'pinia'
+  import SwitchAccountBlock from '@/templates/switch-account-block'
 
   export default {
     name: 'HeaderTemplate',
@@ -417,19 +448,13 @@
       InputText,
       Dropdown,
       Tag,
-      Mobilelogo
+      MobileLogo,
+      SwitchAccountBlock
     },
-    props: {
-      helperVisible: {
-        type: Boolean,
-        default: false
-      },
-      isLogged: Boolean
-    },
-    emits: ['showSlideHelper', 'showSlideCenter'],
+    props: { isLogged: Boolean },
     data() {
       return {
-        showHelp: false,
+        openSwitchAccount: false,
         showCreate: false,
         showSearch: false,
         showSidebar: false,
@@ -467,7 +492,7 @@
               { label: 'Team Permissions', icon: 'pi pi-user-edit' },
               { label: 'Billing & Subscriptions', icon: 'pi pi-credit-card' },
               { label: 'Credentials', icon: 'pi pi-id-card' },
-              { label: 'Activity History', icon: 'pi pi-history' },
+              { label: 'Activity History', icon: 'pi pi-history', to: '/activity-history' },
               { label: 'Personal Tokens', icon: 'pi pi-key' }
             ]
           }
@@ -576,7 +601,10 @@
         profileMenuItems: [
           {
             label: 'Switch Account',
-            to: '/switch-account'
+            command: () => {
+              this.openSwitchAccount = true
+            },
+            class: 'md:hidden'
           },
           {
             label: 'Account Settings',
@@ -613,12 +641,14 @@
     },
     computed: {
       ...mapState(useAccountStore, { user: 'accountData', currentTheme: 'currentTheme' }),
+      ...mapState(useHelpCenterStore, { showHelp: 'isOpen' }),
       selectedTheme() {
         return this.themeOptions.find((option) => option.value === this.currentTheme)
       }
     },
     methods: {
       ...mapActions(useAccountStore, ['setTheme']),
+      ...mapActions(useHelpCenterStore, ['toggleHelpCenter', 'closeHelpCenter']),
       toggleProfile(event) {
         this.$refs.profile.toggle(event)
       },
@@ -642,12 +672,6 @@
       },
       closeSearch() {
         this.showSearch = false
-      },
-      showHelperCenter() {
-        this.$emit('showSlideHelper', !this.helperVisible)
-      },
-      showHelperCenterMobile() {
-        this.showHelp = true
       },
       logout() {
         window.location.href = '/logout'
