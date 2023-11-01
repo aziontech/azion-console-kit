@@ -6,8 +6,8 @@ const fixtures = {
   dnsMock: {
     id: 56782,
     name: 'Az network',
-    listType: 'ip_cidr',
-    networkContentList: ['123.123.123.123']
+    networkListType: 'ip_cidr',
+    itemsValues: '123.123.123.123'
   }
 }
 
@@ -33,8 +33,8 @@ describe('NetworkListsServices', () => {
       method: 'PUT',
       body: {
         name: fixtures.dnsMock.name,
-        list_type: fixtures.dnsMock.listType,
-        items_values: fixtures.dnsMock.networkContentList
+        list_type: fixtures.dnsMock.networkListType,
+        items_values: [fixtures.dnsMock.itemsValues]
       }
     })
   })

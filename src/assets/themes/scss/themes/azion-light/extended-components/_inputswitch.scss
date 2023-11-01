@@ -1,0 +1,53 @@
+// Custom Switch
+@use 'sass:math';
+
+.p-inputswitch {
+  .p-inputswitch-slider {
+    background-color: var(--gray-400) !important;
+    padding-left: 2px;
+
+    &:before {
+      margin-left: 1px;
+    }
+  }
+
+  &.p-inputswitch-checked {
+    .p-inputswitch-slider:before {
+      background-color: #fff !important;
+    }
+  }
+
+  &.p-focus {
+    .p-inputswitch-slider {
+      @include focused();
+    }
+  }
+
+  &:not(.p-disabled):hover {
+    .p-inputswitch-slider {
+      background: var(--gray-500) !important;
+    }
+  }
+
+  &.p-inputswitch-checked {
+    .p-inputswitch-slider {
+      background: #f3652b !important;
+
+      &:before {
+        background: $inputSwitchHandleOnBg;
+      }
+    }
+
+    &:not(.p-disabled):hover {
+      .p-inputswitch-slider {
+        background: #f5793f !important;
+      }
+    }
+  }
+
+  &.p-invalid {
+    .p-inputswitch-slider {
+      @include invalid-input();
+    }
+  }
+}
