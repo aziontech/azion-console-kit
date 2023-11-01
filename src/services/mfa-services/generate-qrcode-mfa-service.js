@@ -12,7 +12,7 @@ export const generateQrCodeService = async () => {
 }
 
 const adapt = (httpResponse) => {
-  console.log(httpResponse)
+  console.log('httpResponse :', httpResponse.body.url);
   const parsedVariable = {}
 
   return {
