@@ -1,6 +1,8 @@
 import { AxiosHttpClientAdapter } from '@/services/axios/AxiosHttpClientAdapter'
 import { createNetworkListService } from '@/services/network-lists-services'
 import { describe, expect, it, vi } from 'vitest'
+import * as Errors from '@/services/axios/errors'
+
 
 const fixtures = {
   networkMock: {
@@ -46,6 +48,56 @@ describe('NetworkListsServices', () => {
 
     const feedbackMessage = await sut(fixtures.networkMock)
 
-    expect(feedbackMessage).toBe('Resource successfully created')
+    expect(feedbackMessage).toBe('Your network list has been created')
   })
+
+  it('Should return an API error for an 40 error status', async () => {
+    const apiErrorMock = "Network name \"IP\" is already in use on this account"
+    vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
+      statusCode: 400,
+      body: {
+        results: [apiErrorMock]
+      }
+    })
+    const { sut } = makeSut()
+
+    const feedbackMessage = sut(fixtures.networkMock)
+
+    expect(feedbackMessage).rejects.toThrow(apiErrorMock)
+  })
+
+  it.each([
+    {
+      statusCode: 401,
+      expectedError: new Errors.InvalidApiTokenError().message
+    },
+    {
+      statusCode: 403,
+      expectedError: new Errors.PermissionError().message
+    },
+    {
+      statusCode: 404,
+      expectedError: new Errors.NotFoundError().message
+    },
+    {
+      statusCode: 500,
+      expectedError: new Errors.InternalServerError().message
+    },
+    {
+      statusCode: 'unmappedStatusCode',
+      expectedError: new Errors.UnexpectedError().message
+    }
+  ])(
+    'should throw when request fails with status code $statusCode',
+    async ({ statusCode, expectedError }) => {
+      vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
+        statusCode
+      })
+      const { sut } = makeSut()
+
+      const response = sut(fixtures.networkMock)
+
+      expect(response).rejects.toBe(expectedError)
+    }
+  )
 })

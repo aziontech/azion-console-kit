@@ -73,4 +73,21 @@ describe('DomainsServices', () => {
 
     expect(feedbackMessage).rejects.toThrow(apiErrorMock)
   })
+
+  it('Should return an API error for an 400 response status', async () => {
+    const errorKey = 'duplicated_domain_name'
+    const apiErrorMock = 'duplicated_domain_name'
+
+    vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
+      statusCode: 400,
+      body: {
+        [errorKey]: [apiErrorMock]
+      }
+    })
+    const { sut } = makeSut()
+
+    const feedbackMessage = sut(fixtures.domainMock)
+
+    expect(feedbackMessage).rejects.toThrow(apiErrorMock)
+  })
 })
