@@ -4,7 +4,7 @@ import { makeMfaBaseUrl } from './make-mfa-base-url'
 export const createMfaDeviceService = async () => {
   let httpResponse = await AxiosHttpClientAdapter.request({
     url: `${makeMfaBaseUrl()}/validate`,
-    method: 'GET',
+    method: 'GET'
   })
   httpResponse = adapt(httpResponse)
 
@@ -12,7 +12,7 @@ export const createMfaDeviceService = async () => {
 }
 
 const adapt = (httpResponse) => {
-  console.log(httpResponse);
+  console.log(httpResponse)
   const parsedVariable = {}
 
   return {

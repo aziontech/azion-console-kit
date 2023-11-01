@@ -9,15 +9,13 @@ export const mfaRoutes = {
       path: 'setup',
       name: 'setup-mfa',
       component: () => import('@views/MultifactorAuthentication/QRCodeView.vue'),
-      props: {generateQrCodeService},
+      props: { generateQrCodeService }
     },
     {
       path: 'authentication',
       name: 'authentication-mfa',
       component: () => import('@views/MultifactorAuthentication/AuthenticateView.vue'),
-      props: {
-
-      },
-    },
+      props: {}
+    }
   ]
 }
