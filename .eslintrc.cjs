@@ -18,6 +18,7 @@ module.exports = {
     ecmaVersion: 'latest'
   },
   rules: {
-    'no-case-declarations': 0
+    'no-case-declarations': 0,
+    'no-console': 'error'
   }
 }

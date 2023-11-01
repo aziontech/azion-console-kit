@@ -52,7 +52,7 @@ describe('EdgeServicesServices', () => {
     await sut({})
 
     expect(requestSpy).toHaveBeenCalledWith({
-      url: `edge_services?order_by=id&sort=asc&page=1&page_size=200`,
+      url: `edge-services?order_by=id&sort=asc&page=1&page_size=200`,
       method: 'GET'
     })
   })

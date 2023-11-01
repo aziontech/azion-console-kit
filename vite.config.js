@@ -26,10 +26,10 @@ export default defineConfig({
         rewrite: (path) => path.replace(/^\/logout/, ''),
         cookieDomainRewrite: { '*': '' }
       },
-      '/api/edge_services': {
+      '/api/edge-services': {
         target: 'https://stage-manager-origin.azion.com/services/api/v1/services',
         changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/api\/edge_services/, '')
+        rewrite: (path) => path.replace(/^\/api\/edge-services/, '')
       },
       '/api/variables': {
         target: 'https://stage-manager.azion.com/variables/api/',
