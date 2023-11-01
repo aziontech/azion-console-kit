@@ -6,17 +6,9 @@ export const resetPasswordService = async (payload) => {
   let httpResponse = await AxiosHttpClientAdapter.request({
     url: `${makeResetPasswordBaseUrl()}/new`,
     method: 'POST',
-    body: adapt(payload)
+    body: payload
   })
   return parseHttpResponse(httpResponse)
-}
-
-const adapt = (payload) => {
-  return {
-    password: payload.password,
-    uidb64: payload.uidb64,
-    token: payload.token
-  }
 }
 
 /**
@@ -32,8 +24,10 @@ const parseHttpResponse = (httpResponse) => {
       return 'Password reset successfully'
     case 400:
       const apiError = extractApiError(httpResponse)
-      throw new Error(apiError)
+      throw new Error(apiError).message
     case 401:
+      throw new Errors.InvalidApiTokenError().message
+    case 403:
       throw new Errors.InvalidApiTokenError().message
     case 404:
       throw new Errors.NotFoundError().message
@@ -59,9 +53,9 @@ const extractErrorKey = (errorSchema, key) => {
  * @returns {string} The result message based on the status code.
  */
 const extractApiError = (httpResponse) => {
-  const alreadyUsedKeyError = extractErrorKey(httpResponse.body, 'non_field_errors')
+  const tokenExpiredError = extractErrorKey(httpResponse.body, 'non_field_errors')
 
-  const errorMessages = [alreadyUsedKeyError]
+  const errorMessages = [tokenExpiredError]
   const errorMessage = errorMessages.find((error) => !!error)
   return errorMessage
 }
