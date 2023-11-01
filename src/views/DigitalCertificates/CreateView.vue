@@ -390,7 +390,7 @@ support.example.com"
         // Edge Certificate Fields
         certificate: yup.string().when(['createCertificateType', 'certificateType'], {
           is: certificateRequiredField,
-          then: (schema) => schema.required('Field Required')
+          then: (schema) => schema.required('Certificate is a required field')
         }),
         privateKey: yup.string(),
 
