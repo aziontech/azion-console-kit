@@ -20,7 +20,7 @@
       </div>
       <InlineMessage
         v-if="errorMessage"
-        class="mb-2"
+        class="mb-4"
         severity="error"
         >{{ errorMessage }}
       </InlineMessage>
@@ -33,16 +33,20 @@
         lazy
         :paginator="totalRecords > limitShowRows"
         :rows="limitShowRows"
-        :rowsPerPageOptions="[5, 10, 20, 50, 100]"
+        :rowsPerPageOptions="[10, 20, 50, 100]"
         scrollable
         removableSort
+        class="p-datatable-sm"
+        @rowSelect="onRowSelect"
+        selectionMode="single"
         v-model:first="first"
         @page="onPage($event)"
         :totalRecords="totalRecords"
         :loading="isLoading"
+        tableStyle="min-width: 50rem"
         :pt="{
           root: { class: 'border surface-border rounded' },
-          header: { class: 'rounded' }
+          header: { class: 'rounded p-3.5' }
         }"
       >
         <template #header>
@@ -59,7 +63,6 @@
         />
         <Column
           v-for="col of selectedColumns"
-          class="p-2"
           :key="col.field"
           :field="col.field"
           :header="col.header"
@@ -113,7 +116,7 @@
 
       <DataTable
         v-if="isLoading"
-        :value="Array(5)"
+        :value="Array(10)"
         scrollable
         removableSort
         :pt="{
@@ -153,6 +156,7 @@
   import PrimeButton from 'primevue/button'
   import InlineMessage from 'primevue/inlinemessage'
 
+  const emit = defineEmits(['onSelectedRow'])
   const props = defineProps({
     pageTitle: {
       type: String,
@@ -238,6 +242,10 @@
   const applyFilter = () => {
     first.value = 1
     loadData({ page: 1 })
+  }
+
+  const onRowSelect = (event) => {
+    emit('onSelectedRow', event.data)
   }
 
   const onPage = (event) => {

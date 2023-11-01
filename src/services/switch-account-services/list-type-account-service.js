@@ -41,18 +41,12 @@ const adapt = (httpResponse, type) => {
       content: account.name
     },
     type: {
-      content: {
-        value: NAME_TYPE_ACCOUNT[type],
-        icon: ICON_TYPE_ACCOUNT[type],
-        severity: ''
-      }
+      content: NAME_TYPE_ACCOUNT[type],
+      icon: ICON_TYPE_ACCOUNT[type],
+      severity: ''
     },
-    client_id: {
-      content: '-'
-    },
-    id: {
-      content: account.id.toString()
-    },
+    client_id: '-',
+    id: account.id.toString(),
     accountId: account.id.toString()
   }))
 

@@ -5,7 +5,6 @@
       class="font-semibold ml-2 h-8 w-auto border-header hidden md:flex gap-2 items-center bg-header hover:bg-header-button-hover"
       size="small"
       :loading="!account?.name"
-      outlined
       :pt="{
         label: { class: '!text-white' },
         icon: { class: '!text-white' }
@@ -39,24 +38,24 @@
         <PrimeCard
           class="w-fit"
           :pt="{
-            content: {
-              class: 'p-4 rounded-md gap-4 border-solid flex flex justify-between sm:p-3'
-            }
+            root: 'max-sm:w-full',
+            body: 'max-sm:w-full',
+            content: 'p-4 rounded-md gap-4 border-solid flex flex justify-between sm:p-3'
           }"
         >
           <template #content>
             <div
-              class="flex gap-4 items-center justify-center max-sm:gap-3 max-sm:flex-col max-sm:items-start"
+              class="flex gap-4 items-center justify-center max-sm:gap-3 max-sm:flex-col max-sm:items-start max-sm:w-full"
             >
               <div class="flex justify-between items-center self-stretch">
-                <h3 class="text-color text-center text-lg not-italic font-medium leading-7">
+                <h3 class="text-color text-lg not-italic font-medium leading-7">
                   {{ account.name }}
                 </h3>
                 <PrimeButton
                   icon="pi pi-cog"
                   type="button"
                   outlined
-                  class="hidden max-sm:block"
+                  class="hidden max-sm:flex"
                   aria-label="menu"
                   aria-haspopup="true"
                   aria-controls="overlay_menu"
@@ -108,10 +107,11 @@
         </PrimeCard>
         <ListTableBlock
           :listService="listTypeAccountService"
-          :limitShowRows="5"
+          :limitShowRows="10"
           pageTitle="Accounts List"
           :columns="columns"
           :headerFilter="filterSwitch"
+          @onSelectedRow="onSelectedAccount"
           description="Type your account name to filter results."
         >
           <template #headerFilters="{ filter, applyFilter }">
@@ -119,7 +119,7 @@
               <span class="p-input-icon-left max-sm:w-full">
                 <i class="pi pi-search" />
                 <InputText
-                  class="md:w-[340px] max-sm:w-full"
+                  class="md:w-20rem max-sm:w-full"
                   v-model="filter.textSnippet"
                   @keyup.enter="applyFilter()"
                   placeholder="Search"
@@ -129,7 +129,7 @@
               <Dropdown
                 @change="applyFilter"
                 :options="filterType"
-                class="md:w-[216px] max-sm:w-full"
+                class="md:w-14rem max-sm:w-full"
                 optionLabel="label"
                 optionValue="value"
                 v-model="filter.type"
@@ -227,40 +227,16 @@
       component: (columnData) =>
         columnBuilder({
           data: columnData,
-          columnAppearance: 'clickable-tag',
-          dependencies: {
-            clickAction: onSelectedAccount,
-            clickProps: columnData.value
-          }
+          columnAppearance: 'tag'
         })
     },
     {
       field: 'id',
-      header: 'ID',
-      type: 'component',
-      component: (columnData) =>
-        columnBuilder({
-          data: columnData,
-          columnAppearance: 'clickable-text',
-          dependencies: {
-            clickAction: onSelectedAccount,
-            clickProps: columnData.value
-          }
-        })
+      header: 'ID'
     },
     {
       field: 'client_id',
-      header: 'Client ID',
-      type: 'component',
-      component: (columnData) =>
-        columnBuilder({
-          data: columnData,
-          columnAppearance: 'clickable-text',
-          dependencies: {
-            clickAction: onSelectedAccount,
-            clickProps: columnData.value
-          }
-        })
+      header: 'Client ID'
     }
   ])
 
@@ -289,11 +265,9 @@
     }
     return result
   }, [])
-
   const items = ref(adapterAccessMenu)
 
   const menu = ref()
-
   const toggle = (event) => {
     menu.value.toggle(event)
   }
