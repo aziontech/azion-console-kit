@@ -19,6 +19,7 @@ import { usersListsRoutes } from '@routes/users-routes'
 import { passwordRoutes } from '@routes/password-routes'
 import { errorRoutes } from '@routes/error-routes'
 import { playgroundRoutes } from '@routes/playground-routes'
+import {mfaRoutes} from '@routes/mfa-routes'
 import beforeEachRoute from './hooks/beforeEachRoute'
 
 const router = createRouter({
@@ -42,7 +43,8 @@ const router = createRouter({
     credentialsRoutes,
     usersListsRoutes,
     passwordRoutes,
-    playgroundRoutes
+    playgroundRoutes,
+    mfaRoutes
   ].concat(errorRoutes)
 })
 
