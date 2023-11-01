@@ -70,7 +70,6 @@ describe('ListActivityHistoryService', () => {
     })
     const { sut } = makeSut()
     const result = await sut({})
-    console.log(result)
     expect(result).toEqual([
       {
         authorEmail: records[0].authorEmail,
