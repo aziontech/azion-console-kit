@@ -413,7 +413,7 @@ support.example.com"
           .label('subject alternative names (SAN)'),
         country: yup.string().when('createCertificateType', {
           is: edgeCertificateTypes.CSR,
-          then: (schema) => schema.required('Field Required').max(2).min(2)
+          then: (schema) => schema.required('Field Required').max(2, 'Country must be 2 characters').min(2, 'Country must be 2 characters')
         }),
         email: yup.string().when('createCertificateType', {
           is: edgeCertificateTypes.CSR,

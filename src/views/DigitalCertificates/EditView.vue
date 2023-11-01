@@ -17,6 +17,11 @@
         :class="{ 'p-invalid': errors.name }"
         v-tooltip.top="{ value: errors.name, showDelay: 200 }"
       />
+      <small
+              v-if="errors.name"
+              class="p-error text-xs font-normal leading-tight"
+              >{{ errors.name }}</small
+            >
 
       <hr />
 
@@ -37,6 +42,11 @@
           rows="5"
           cols="30"
         />
+        <small
+              v-if="errors.certificate"
+              class="p-error text-xs font-normal leading-tight"
+              >{{ errors.certificate }}</small
+            >
 
         <label>Certificate Signing Request (CSR):</label>
         <PrimeTextarea
@@ -47,6 +57,11 @@
           rows="5"
           cols="30"
         />
+        <small
+          v-if="errors.csr"
+          class="p-error text-xs font-normal leading-tight"
+          >{{ errors.csr }}</small
+        >
 
         <PrimeButton
           class="max-sm:w-full"
@@ -75,6 +90,11 @@
           rows="5"
           cols="30"
         />
+        <small
+          v-if="errors.certificate"
+          class="p-error text-xs font-normal leading-tight"
+          >{{ errors.certificate }}</small
+        >
 
         <label>Private key:</label>
         <PrimeTextarea
@@ -85,6 +105,11 @@
           rows="5"
           cols="30"
         />
+        <small
+          v-if="errors.privateKey"
+          class="p-error text-xs font-normal leading-tight"
+          >{{ errors.privateKey }}</small
+        >
       </template>
 
       <!-- Trusted CA Certificate Form -->
@@ -109,6 +134,11 @@
           cols="30"
         />
         <small>Tip: It's possible to include intermediate certificates.</small>
+        <small
+          v-if="errors.certificate"
+          class="p-error text-xs font-normal leading-tight"
+          >{{ errors.certificate }}</small
+        >
       </template>
     </template>
   </EditFormBlock>
@@ -151,8 +181,8 @@
       }
 
       const validationSchema = yup.object({
-        name: yup.string().required(),
-        certificateType: yup.string(),
+        name: yup.string().required('Field name is required'),
+        certificateType: yup.string('Field is required'),
         csr: yup.string(),
         certificate: yup.string(),
         privateKey: yup.string()
