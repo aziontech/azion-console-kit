@@ -31,23 +31,17 @@
           class="max-md:hidden cursor-pointer"
           @click="$router.push('/')"
         />
-        <Mobilelogo
+        <MobileLogo
           class="md:hidden cursor-pointer"
           @click="this.$router.push('/')"
         />
+
         <!-- Azion client -->
-        <PrimeButton
-          v-tooltip.bottom="{ value: 'Switch account', showDelay: 200 }"
-          :pt="{
-            label: { class: '!text-white' },
-            icon: { class: '!text-white' }
-          }"
-          class="font-semibold ml-2 h-8 w-auto border-header hidden md:flex gap-2 items-center bg-header hover:bg-header-button-hover"
-          size="small"
-        >
-          <i class="text-white pi pi-box" />
-          <span class="text-white"> Azion Client</span>
-        </PrimeButton>
+        <SwitchAccountBlock
+          v-if="!user?.is_client_only"
+          v-model:showSwitchAccount="openSwitchAccount"
+          :accessMenu="profileMenuItems"
+        />
       </div>
 
       <!-- Search -->
@@ -431,7 +425,7 @@
   import Sidebar from 'primevue/sidebar'
   import Divider from 'primevue/divider'
   import Logo from '@assets/svg/logo'
-  import Mobilelogo from '@assets/svg/mobile-logo'
+  import MobileLogo from '@assets/svg/mobile-logo'
   import PrimeDialog from 'primevue/dialog'
   import InputText from 'primevue/inputtext'
   import Tag from 'primevue/tag'
@@ -439,6 +433,7 @@
   import { useAccountStore } from '@/stores/account'
   import { useHelpCenterStore } from '@/stores/help-center'
   import { mapActions, mapState } from 'pinia'
+  import SwitchAccountBlock from '@/templates/switch-account-block'
 
   export default {
     name: 'HeaderTemplate',
@@ -453,11 +448,13 @@
       InputText,
       Dropdown,
       Tag,
-      Mobilelogo
+      MobileLogo,
+      SwitchAccountBlock
     },
     props: { isLogged: Boolean },
     data() {
       return {
+        openSwitchAccount: false,
         showCreate: false,
         showSearch: false,
         showSidebar: false,
@@ -604,7 +601,10 @@
         profileMenuItems: [
           {
             label: 'Switch Account',
-            to: '/switch-account'
+            command: () => {
+              this.openSwitchAccount = true
+            },
+            class: 'md:hidden'
           },
           {
             label: 'Account Settings',
