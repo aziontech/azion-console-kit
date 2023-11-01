@@ -1,0 +1,64 @@
+.p-radiobutton {
+  .p-radiobutton-box {
+    border: 2px solid var(--surface-border) !important;
+
+    &:not(.p-disabled):not(.p-highlight):hover {
+      border-color: #f3652b !important;
+    }
+
+    &:not(.p-disabled).p-focus {
+      @include focused-input();
+    }
+
+    .p-radiobutton-icon {
+    }
+
+    &.p-highlight {
+      background: #f3652b !important;
+
+      &:not(.p-disabled):hover {
+        border-color: #f3652b !important;
+        background: #f3652b !important;
+        color: #f3652b !important;
+      }
+    }
+  }
+
+  &.p-invalid > .p-radiobutton-box {
+    @include invalid-input();
+  }
+
+  &:focus {
+    outline: 0 none;
+  }
+}
+
+.p-input-filled {
+  .p-radiobutton {
+    .p-radiobutton-box {
+      background-color: #f3652b !important;
+
+      &:not(.p-disabled):hover {
+        background-color: #f3652b !important;
+      }
+
+      &.p-highlight {
+        background: #f3652b !important;
+
+        &:not(.p-disabled):hover {
+          background: #f3652b !important;
+        }
+      }
+    }
+  }
+}
+
+@if ($highlightBg == $radiobuttonActiveBg) {
+  .p-highlight {
+    .p-radiobutton {
+      .p-radiobutton-box {
+        border-color: #f3652b !important;
+      }
+    }
+  }
+}
