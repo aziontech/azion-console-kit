@@ -20,10 +20,11 @@
           </div>
         </template>
         <template #content>
-          <div class="flex flex-col" v-if="isLoading">
-            <div
-              class="animate-pulse flex space-x-4 px-6 py-3 items-center"
-            >
+          <div
+            class="flex flex-col"
+            v-if="isLoading"
+          >
+            <div class="animate-pulse flex space-x-4 px-6 py-3 items-center">
               <div class="bg-gray-200 rounded-full h-9 w-9"></div>
               <div class="flex py-1 flex-col">
                 <div class="bg-gray-200 rounded w-52 h-3"></div>
@@ -33,9 +34,7 @@
                 </div>
               </div>
             </div>
-            <div
-              class="animate-pulse flex space-x-4 px-6 py-3 items-center"
-            >
+            <div class="animate-pulse flex space-x-4 px-6 py-3 items-center">
               <div class="bg-gray-200 rounded-full h-9 w-9"></div>
               <div class="flex py-1 flex-col">
                 <div class="bg-gray-200 rounded w-52 h-3"></div>
@@ -45,9 +44,7 @@
                 </div>
               </div>
             </div>
-            <div
-              class="animate-pulse flex space-x-4 px-6 py-3 items-center"
-            >
+            <div class="animate-pulse flex space-x-4 px-6 py-3 items-center">
               <div class="bg-gray-200 rounded-full h-9 w-9"></div>
               <div class="flex py-1 flex-col">
                 <div class="bg-gray-200 rounded w-52 h-3"></div>
@@ -57,9 +54,7 @@
                 </div>
               </div>
             </div>
-            <div
-              class="animate-pulse flex space-x-4 px-6 py-3 items-center"
-            >
+            <div class="animate-pulse flex space-x-4 px-6 py-3 items-center">
               <div class="bg-gray-200 rounded-full h-9 w-9"></div>
               <div class="flex py-1 flex-col">
                 <div class="bg-gray-200 rounded w-52 h-3"></div>
@@ -70,9 +65,7 @@
               </div>
             </div>
 
-            <div
-              class="animate-pulse flex space-x-4 px-6 py-3 items-center"
-            >
+            <div class="animate-pulse flex space-x-4 px-6 py-3 items-center">
               <div class="bg-gray-200 rounded-full h-9 w-9"></div>
               <div class="flex py-1 flex-col">
                 <div class="bg-gray-200 rounded w-52 h-3"></div>
@@ -145,7 +138,7 @@
       PageHeadingBlock,
       Timeline,
       Card,
-      InputText,
+      InputText
     },
     data: () => ({
       search: '',

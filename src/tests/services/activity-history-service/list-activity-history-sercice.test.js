@@ -6,21 +6,19 @@ import graphQLApi from '../../../services/axios/makeEventsApi'
 
 const records = [
   {
-    "ts": "2023-10-25T15:00:00Z",
-    "title": "xxx was deleted",
-    "comment": "-",
-    "type": "deleted",
-    "authorName": "dummy",
-    "authorEmail": "dummy@dummy.com",
-    "accountId": "-"
-  },
+    ts: '2023-10-25T15:00:00Z',
+    title: 'xxx was deleted',
+    comment: '-',
+    type: 'deleted',
+    authorName: 'dummy',
+    authorEmail: 'dummy@dummy.com',
+    accountId: '-'
+  }
 ]
-
 
 const makeSut = () => {
   const sut = listEventsService
 
- 
   return { sut }
 }
 
@@ -37,9 +35,7 @@ describe('ListActivityHistoryService', () => {
       statusCode: 200,
       body: {
         data: {
-            activityHistoryEvents: [
-
-            ]
+          activityHistoryEvents: []
         }
       }
     })
@@ -50,31 +46,33 @@ describe('ListActivityHistoryService', () => {
     await sut(apiClient)
     const offSetEnd = new Date()
     const offSetStart = new Date(
-        Date.UTC(offSetEnd.getFullYear(), offSetEnd.getMonth(), offSetEnd.getDate() - 30)
+      Date.UTC(offSetEnd.getFullYear(), offSetEnd.getMonth(), offSetEnd.getDate() - 30)
     )
     const payload = {
-        operatioName: 'ActivityHistory',
-        query: `query ActivityHistory { activityHistoryEvents( offset: 0 limit: 1000, filter: { tsRange: {begin:"${offSetStart.toISOString()}", end:"${offSetEnd.toISOString()}"} }, orderBy: [ts_DESC] ) { ts title comment type authorName authorEmail accountId } } `,
-      }
-    expect(requestSpy).toHaveBeenCalledWith({
-      url: 'graphql',
-      method: 'POST',
-      body: payload,
-    },
-    apiClient)
+      operatioName: 'ActivityHistory',
+      query: `query ActivityHistory { activityHistoryEvents( offset: 0 limit: 1000, filter: { tsRange: {begin:"${offSetStart.toISOString()}", end:"${offSetEnd.toISOString()}"} }, orderBy: [ts_DESC] ) { ts title comment type authorName authorEmail accountId } } `
+    }
+    expect(requestSpy).toHaveBeenCalledWith(
+      {
+        url: 'graphql',
+        method: 'POST',
+        body: payload
+      },
+      apiClient
+    )
   })
 
   it('should parse correctly each returned item', async () => {
     vi.setSystemTime(new Date(2023, 10, 10, 10))
     vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
       statusCode: 200,
-      body: { data: {activityHistoryEvents: records} }
+      body: { data: { activityHistoryEvents: records } }
     })
     const { sut } = makeSut()
     const result = await sut({})
-    console.log(result);
-    expect(result).toEqual(
-      [{
+    console.log(result)
+    expect(result).toEqual([
+      {
         authorEmail: records[0].authorEmail,
         authorName: records[0].authorName,
         title: records[0].title,
@@ -82,9 +80,9 @@ describe('ListActivityHistoryService', () => {
           dateStyle: 'full',
           timeStyle: 'short'
         }).format(new Date(records[0].ts)),
-        type: records[0].type,
-      }]
-    )
+        type: records[0].type
+      }
+    ])
   })
 
   it.each([
@@ -117,9 +115,11 @@ describe('ListActivityHistoryService', () => {
     async ({ statusCode, expectedError }) => {
       vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
         statusCode,
-        body: { data: {
+        body: {
+          data: {
             activityHistoryEvents: []
-        } }
+          }
+        }
       })
       const { sut } = makeSut()
 
