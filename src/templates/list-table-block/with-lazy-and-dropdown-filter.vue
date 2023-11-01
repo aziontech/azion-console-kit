@@ -43,7 +43,7 @@
         @page="onPage($event)"
         :totalRecords="totalRecords"
         :loading="isLoading"
-        tableStyle="min-width: 50rem"
+        tableStyle="max-sm:min-width: 50rem"
         :pt="{
           root: { class: 'border surface-border rounded' },
           header: { class: 'rounded p-3.5' }
