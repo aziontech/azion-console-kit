@@ -2,15 +2,24 @@
 <template>
   <div>
     <PrimeButton
-      class="font-semibold ml-2 h-8 w-auto hidden border-header md:flex items-center text-white"
-      :label="account.name"
+      class="font-semibold ml-2 h-8 w-auto border-header hidden md:flex gap-2 items-center bg-header hover:bg-header-button-hover"
       size="small"
-      :icon="ICON_TYPE_ACCOUNT[account.kind]"
       :loading="!account?.name"
       outlined
+      :pt="{
+        label: { class: '!text-white' },
+        icon: { class: '!text-white' }
+      }"
       v-tooltip.bottom="{ value: 'Switch account', showDelay: 200 }"
       @click="visible = true"
-    />
+    >
+      <i
+        class="text-white"
+        :class="ICON_TYPE_ACCOUNT[account.kind]"
+      />
+      <span class="text-white"> {{ account.name }}</span>
+    </PrimeButton>
+
     <PrimeDialog
       :blockScroll="true"
       v-model:visible="visible"

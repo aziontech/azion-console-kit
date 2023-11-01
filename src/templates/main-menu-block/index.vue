@@ -39,7 +39,7 @@
         <!-- Azion client -->
         <SwitchAccountBlock
           v-if="!user?.is_client_only"
-          v-model:showSwitchAccount="showSwitchAccount"
+          v-model:showSwitchAccount="openSwitchAccount"
           :accessMenu="profileMenuItems"
         />
       </div>
@@ -454,7 +454,7 @@
     props: { isLogged: Boolean },
     data() {
       return {
-        showSwitchAccount: false,
+        openSwitchAccount: false,
         showCreate: false,
         showSearch: false,
         showSidebar: false,
@@ -602,7 +602,7 @@
           {
             label: 'Switch Account',
             command: () => {
-              this.showSwitchAccount = true
+              this.openSwitchAccount = true
             },
             class: 'md:hidden'
           },
