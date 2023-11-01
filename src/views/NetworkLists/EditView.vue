@@ -20,9 +20,14 @@
               placeholder="Add Network List Name"
               v-bind="name"
               type="text"
-              :class="{ 'p-invalid': errors.key }"
+              :class="{ 'p-invalid': errors.name }"
               v-tooltip.top="{ value: errors.name, showDelay: 200 }"
             />
+            <small
+              v-if="errors.name"
+              class="p-error text-xs font-normal leading-tight"
+              >{{ errors.name }}</small
+            >
           </div>
           <div class="flex flex-col w-full sm:max-w-xs gap-2">
             <label
@@ -31,19 +36,24 @@
               >Type</label
             >
             <Dropdown
-              :class="{ 'p-invalid': errors.type }"
-              v-model="listType.value"
-              v-bind="listType"
+              :class="{ 'p-invalid': errors.networkListType }"
+              v-model="networkListType.value"
+              v-bind="networkListType"
               disabled
               :options="options"
               optionLabel="name"
               optionValue="value"
               class="w-full"
             />
+            <small
+              v-if="errors.networkListType"
+              class="p-error text-xs font-normal leading-tight"
+              >{{ errors.networkListType }}</small
+            >
           </div>
           <div
             class="flex flex-col sm:max-w-lg w-full gap-2"
-            v-if="listType.value === 'asn'"
+            v-if="networkListType.value === 'asn'"
           >
             <label
               for="id"
@@ -51,17 +61,22 @@
               >List</label
             >
             <TextareaComponent
-              :class="{ 'p-invalid': errors.ans }"
-              v-bind="asn"
+              :class="{ 'p-invalid': errors.itemsValues }"
+              v-bind="itemsValues"
               rows="2"
               cols="30"
               id="list"
               placeholder="1234&#10;4321"
             />
+            <small
+              v-if="errors.itemsValues"
+              class="p-error text-xs font-normal leading-tight"
+              >{{ errors.itemsValues }}</small
+            >
           </div>
           <div
             class="flex flex-col sm:max-w-lg w-full gap-2"
-            v-if="listType.value === 'ip_cidr'"
+            v-if="networkListType.value === 'ip_cidr'"
           >
             <label
               for="id"
@@ -70,17 +85,22 @@
             >
             <TextareaComponent
               disabled
-              :class="{ 'p-invalid': errors.ipCidr }"
-              v-bind="ipCidr"
+              :class="{ 'p-invalid': errors.itemsValues }"
+              v-bind="itemsValues"
               rows="2"
               id="ipCidr"
               cols="30"
               placeholder="192.168.0.1&#10;192.168.0.2/32&#10;10.1.1.10/16"
             />
+            <small
+              v-if="errors.itemsValues"
+              class="p-error text-xs font-normal leading-tight"
+              >{{ errors.itemsValues }}</small
+            >
           </div>
           <div
             class="flex flex-col w-full sm:max-w-3xl gap-2"
-            v-if="listType.value === 'countries'"
+            v-if="networkListType.value === 'countries'"
           >
             <label
               for="select-01"
@@ -88,16 +108,21 @@
               >Countries</label
             >
             <MultiSelect
-              v-model="selectedCountries"
+              v-model="itemsValuesCountry"
               :options="countriesList"
               filter
               optionLabel="name"
               optionValue="value"
               placeholder="Select Countries"
-              :class="{ 'p-invalid': errors.selectedCountries }"
+              :class="{ 'p-invalid': errors.itemsValuesCountry }"
               class="w-full"
               display="chip"
             />
+            <small
+              v-if="errors.itemsValuesCountry"
+              class="p-error text-xs font-normal leading-tight"
+              >{{ errors.itemsValuesCountry }}</small
+            >
           </div>
         </template>
       </FormHorizontal>
@@ -111,9 +136,9 @@
   import Dropdown from 'primevue/dropdown'
   import MultiSelect from 'primevue/multiselect'
   import TextareaComponent from 'primevue/textarea'
-  import { useForm, useField } from 'vee-validate'
+  import { useForm, useField} from 'vee-validate'
   import * as yup from 'yup'
-  import { ref, onMounted, watch } from 'vue'
+  import { ref, onMounted } from 'vue'
   import FormHorizontal from '@/templates/create-form-block-new/form-horizontal'
 
   export default {
@@ -138,23 +163,21 @@
         { name: 'IP/CIDR', value: 'ip_cidr' }
       ])
       const validationSchema = yup.object({
-        name: yup.string().required(),
-        listType: yup
+        name: yup.string().required('Name is a required field'),
+        networkListType: yup.string().oneOf(options.value.map((option) => option.value)),
+        itemsValues: yup
           .string()
-          .oneOf(
-            options.value.map((option) => option.value).filter((option) => option !== 'ip_cidr')
-          ),
-        selectedCountries: yup.array().when('networkListType', {
+          .when('networkListType', {
+            is: 'asn',
+            then: (schema) => schema.required('ASN is a required field')
+          })
+          .when('networkListType', {
+            is: 'ip_cidr',
+            then: (schema) => schema.required('IP/CIDR is a required field')
+          }),
+        itemsValuesCountry: yup.array().when('networkListType', {
           is: 'countries',
-          then: (schema) => schema.required().min(1)
-        }),
-        ipCidr: yup.string().when('networkListType', {
-          is: 'ip_cidr',
-          then: (schema) => schema.required()
-        }),
-        asn: yup.string().when('networkListType', {
-          is: 'asn',
-          then: (schema) => schema.required()
+          then: (schema) => schema.required('Countries is a required field').min(1)
         })
       })
 
@@ -167,30 +190,11 @@
         countriesList.value = result
       }
       const name = defineInputBinds('name', { validateOnInput: true })
-      const listType = defineInputBinds('listType', { validateOnInput: true })
-      const ipCidr = defineInputBinds('itemsValues', { validateOnInput: true })
-      const { value: selectedCountries } = useField('itemsValues')
-      const asn = defineInputBinds('itemsValues', { validateOnInput: true })
-      const { value: networkContentList, setValue: setNetworkContentList } =
-        useField('networkContentList')
+      const itemsValues = defineInputBinds('itemsValues', { validateOnInput: true })
+      const networkListType = defineInputBinds('networkListType', { validateOnInput: true })
+      const { value: itemsValuesCountry } = useField('itemsValuesCountry')
       onMounted(async () => {
         await fetchCountries()
-      })
-      watch([name, listType, selectedCountries, ipCidr, asn], () => {
-        switch (listType.value.value) {
-          case 'countries':
-            setNetworkContentList(selectedCountries.value)
-            break
-          case 'ip_cidr':
-            setNetworkContentList(ipCidr.value.value.trim().split('\n'))
-            break
-          case 'asn':
-            setNetworkContentList(asn.value.value.trim().split('\n'))
-            break
-          default:
-            setNetworkContentList('')
-            break
-        }
       })
 
       return {
@@ -198,14 +202,12 @@
         meta,
         values,
         name,
-        listType,
+        networkListType,
         setValues,
         options,
         countriesList,
-        selectedCountries,
-        networkContentList,
-        ipCidr,
-        asn
+        itemsValues,
+        itemsValuesCountry,
       }
     }
   }

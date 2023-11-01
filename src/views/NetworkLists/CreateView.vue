@@ -179,7 +179,7 @@
         asn: yup.string().when('networkListType', {
           is: 'asn',
           then: (schema) => schema.required('ASN is a required field')
-        })
+        }),
       })
 
       const { errors, defineInputBinds, meta, resetForm, values } = useForm({
