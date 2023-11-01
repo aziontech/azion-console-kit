@@ -41,6 +41,6 @@ describe('SendResetPasswordEmailService', () => {
 
     const feedbackMessage = await sut(fixtures.validEmail)
 
-    expect(feedbackMessage).toBe('Resource successfully created')
+    expect(feedbackMessage).toBe('Email sent successfully')
   })
 })

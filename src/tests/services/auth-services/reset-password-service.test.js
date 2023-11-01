@@ -45,6 +45,6 @@ describe('ResetPasswordService', () => {
 
     const feedbackMessage = await sut(fixtures.userData)
 
-    expect(feedbackMessage).toBe('Resource successfully created')
+    expect(feedbackMessage).toBe('Password reset successfully')
   })
 })

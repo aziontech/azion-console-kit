@@ -11,8 +11,8 @@
 
   const route = useRoute()
   const isLogged = computed(() => {
-    const isNotLoginRoute = (route.name !== 'login')
-    const isNotResetPasswordRoute = (route.name !== 'reset-password')
+    const isNotLoginRoute = route.name !== 'login'
+    const isNotResetPasswordRoute = route.name !== 'reset-password'
 
     return hasActiveUserId && isNotLoginRoute && isNotResetPasswordRoute
   })
