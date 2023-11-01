@@ -2,35 +2,14 @@ import { AxiosHttpClientAdapter, parseHttpResponse } from '../axios/AxiosHttpCli
 import graphQLApi from '../axios/makeEventsApi'
 import { makeEventsListBaseUrl } from './make-events-list-base-url'
 
-export const listEventsService = async () => {
+export const listEventsService = async (apiClient = graphQLApi(import.meta.env.VITE_PERSONAL_TOKEN)) => {
   const offSetEnd = new Date()
   const offSetStart = new Date(
     Date.UTC(offSetEnd.getFullYear(), offSetEnd.getMonth(), offSetEnd.getDate() - 30)
   )
   const payload = {
     operatioName: 'ActivityHistory',
-    query: `
-    query ActivityHistory {
-      activityHistoryEvents(
-        offset: 0
-        limit: 1000, 
-        filter: {
-          tsRange: {begin:"${offSetStart.toISOString()}", end:"${offSetEnd.toISOString()}"}
-        },
-        orderBy: [ts_DESC]
-        ) 
-      {	
-        ts
-        title
-        comment
-        type
-        authorName
-        authorEmail
-        accountId
-      }
-    }
-    `,
-    variables: null
+    query: `query ActivityHistory { activityHistoryEvents( offset: 0 limit: 1000, filter: { tsRange: {begin:"${offSetStart.toISOString()}", end:"${offSetEnd.toISOString()}"} }, orderBy: [ts_DESC] ) { ts title comment type authorName authorEmail accountId } } `,
   }
 
   let httpResponse = await AxiosHttpClientAdapter.request(
@@ -39,7 +18,7 @@ export const listEventsService = async () => {
       method: 'POST',
       body: payload
     },
-    graphQLApi(import.meta.env.VITE_PERSONAL_TOKEN)
+    apiClient
   )
   httpResponse = adapt(httpResponse)
   return parseHttpResponse(httpResponse)
