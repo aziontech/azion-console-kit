@@ -495,7 +495,7 @@
               { label: 'Team Permissions', icon: 'pi pi-user-edit' },
               { label: 'Billing & Subscriptions', icon: 'pi pi-credit-card' },
               { label: 'Credentials', icon: 'pi pi-id-card' },
-              { label: 'Activity History', icon: 'pi pi-history' },
+              { label: 'Activity History', icon: 'pi pi-history', to: '/activity-history' },
               { label: 'Personal Tokens', icon: 'pi pi-key' }
             ]
           }
