@@ -38,9 +38,12 @@
 
         <!-- Azion client -->
         <SwitchAccountBlock
+          class="ml-2"
           v-if="hasAccessToSwitchAccount"
           v-model:showSwitchAccount="openSwitchAccount"
-          :accessMenu="profileMenuItems"
+          :accessMenu="profileMenuSwitchAccount"
+          :account="user"
+          :accountListService="serviceSwitchAccount"
         />
       </div>
 
@@ -433,6 +436,7 @@
   import { useAccountStore } from '@/stores/account'
   import { useHelpCenterStore } from '@/stores/help-center'
   import { mapActions, mapState } from 'pinia'
+  import { listTypeAccountService } from '@/services/switch-account-services/list-type-account-service'
   import SwitchAccountBlock from '@/templates/switch-account-block'
 
   export default {
@@ -598,14 +602,7 @@
             ]
           }
         ],
-        profileMenuItems: [
-          {
-            label: 'Switch Account',
-            command: () => {
-              this.openSwitchAccount = true
-            },
-            class: 'md:hidden'
-          },
+        profileMenuItemsDefault: [
           {
             label: 'Account Settings',
             to: '/account-settings'
@@ -629,14 +626,14 @@
           {
             label: 'Teams Permissions',
             to: '/teams'
-          },
-          { separator: true }
+          }
         ],
         themeOptions: [
           { name: 'Light', value: 'light', icon: 'pi pi-sun' },
           { name: 'Dark', value: 'dark', icon: 'pi pi-moon' },
           { name: 'System', value: 'system', icon: 'pi pi-desktop' }
-        ]
+        ],
+        serviceSwitchAccount: listTypeAccountService
       }
     },
     computed: {
@@ -646,7 +643,29 @@
         return this.themeOptions.find((option) => option.value === this.currentTheme)
       },
       hasAccessToSwitchAccount() {
-        return !this.user?.is_client_only
+        return this.user && !this.user.is_client_only
+      },
+      profileMenuSwitchAccount() {
+        return this.profileMenuItemsDefault.map((item) => ({
+          ...item,
+          command: this.closeSwitchAccountDialog
+        }))
+      },
+      profileMenuItems() {
+        const switchAccount =
+          this.user && !this.user.is_client_only
+            ? [
+                {
+                  label: 'Switch Account',
+                  command: this.openSwitchAccountDialog,
+                  class: 'md:hidden'
+                }
+              ]
+            : []
+
+        const separator = { separator: true }
+
+        return [...switchAccount, ...this.profileMenuItemsDefault, separator]
       }
     },
     methods: {
@@ -681,6 +700,12 @@
       },
       selectTheme(theme) {
         this.setTheme(theme)
+      },
+      openSwitchAccountDialog() {
+        this.openSwitchAccount = true
+      },
+      closeSwitchAccountDialog() {
+        this.openSwitchAccount = false
       }
     }
   }

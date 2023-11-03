@@ -2,7 +2,8 @@
 <template>
   <div>
     <PrimeButton
-      class="font-semibold ml-2 h-8 w-auto border-header hidden md:flex gap-2 items-center bg-header hover:bg-header-button-hover"
+      v-if="visibleButton"
+      class="font-semibold h-8 w-auto border-header hidden md:flex gap-2 items-center bg-header hover:bg-header-button-hover"
       size="small"
       :loading="!account?.name"
       :pt="{
@@ -14,7 +15,7 @@
     >
       <i
         class="text-white"
-        :class="getAccountTypeIcon(account.kind)"
+        :class="account.accountTypeIcon"
       />
       <span class="text-white"> {{ account.name }}</span>
     </PrimeButton>
@@ -75,8 +76,8 @@
               </div>
               <div class="flex items-center gap-2">
                 <PrimeTag
-                  :value="getAccountTypeName(account.kind)"
-                  :icon="getAccountTypeIcon(account.kind)"
+                  :value="account.accountTypeName"
+                  :icon="account.accountTypeIcon"
                   severity="info"
                 />
                 <PrimeTag
@@ -106,7 +107,7 @@
           </template>
         </PrimeCard>
         <ListTableBlock
-          :listService="listTypeAccountService"
+          :listService="accountListService"
           :limitShowRows="10"
           pageTitle="Accounts List"
           :columns="columns"
@@ -143,7 +144,6 @@
 </template>
 
 <script setup>
-  import { getAccountTypeIcon, getAccountTypeName } from '@/helpers/accountTypeNameMapping.js'
   import { ref, watch } from 'vue'
   import PrimeDialog from 'primevue/dialog'
   import PrimeTag from 'primevue/tag'
@@ -154,10 +154,7 @@
   import Divider from 'primevue/divider'
   import PrimeCard from 'primevue/card'
   import ListTableBlock from '@/templates/list-table-block/with-lazy-and-dropdown-filter.vue'
-  import { listTypeAccountService } from '@/services/switch-account-services/list-type-account-service'
   import { switchAccountService } from '@/services/auth-services'
-  import { useAccountStore } from '@/stores/account'
-  import { storeToRefs } from 'pinia'
   import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
 
   defineOptions({ name: 'SwitchAccountBlock' })
@@ -171,11 +168,21 @@
       type: Boolean,
       required: false,
       default: false
+    },
+    account: {
+      type: Object,
+      required: true
+    },
+    accountListService: {
+      type: Function,
+      required: true
+    },
+    visibleButton: {
+      type: Boolean,
+      required: false,
+      default: true
     }
   })
-
-  const accountStore = useAccountStore()
-  const { account } = storeToRefs(accountStore)
 
   const visible = ref(false)
   const filterSwitch = ref({
@@ -223,19 +230,7 @@
     }
   ])
   const menu = ref()
-  const items = ref(
-    props.accessMenu.slice(0, -1).reduce((result, item) => {
-      if (item.label !== 'Switch Account') {
-        result.push({
-          ...item,
-          command: () => {
-            visible.value = false
-          }
-        })
-      }
-      return result
-    }, [])
-  )
+  const items = ref(props.accessMenu)
 
   watch(
     () => props.showSwitchAccount,

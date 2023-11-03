@@ -223,7 +223,6 @@
   const loadData = async ({ page = props.pageInitial, page_size = props.limitShowRows } = {}) => {
     try {
       isLoading.value = true
-      errorMessage
       listRecords.value = []
       const { results, totalPages } = await props.listService({
         page,
