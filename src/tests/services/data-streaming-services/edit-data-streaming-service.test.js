@@ -66,7 +66,7 @@ describe('DataStreamingServices', () => {
     const { sut } = makeSut()
     const dataStreamingMockWithDomains = {
       ...fixtures.dataStreamingMock,
-      domains: [[], [{ domainID: 1 }, { domainID: 2 }]],
+      domains: [[], [{ domainID: 1 }, { domainID: 2 }]]
     }
 
     const feedbackMessage = await sut(dataStreamingMockWithDomains)
@@ -103,14 +103,14 @@ describe('DataStreamingServices', () => {
         lineSeparator: '\n',
         maxSize: '10000000',
         headers: [{ value: 'name: api' }, { value: 'teste: 1' }]
-      },
+      }
     },
     {
       endpoint: 'kafka',
       values: {
         kafkaTopic: 'example_topic',
         bootstrap_servers: 'kafka-server.com:9092,kafka-server-2.com:9092'
-      },
+      }
     },
     {
       endpoint: 's3',
@@ -121,8 +121,8 @@ describe('DataStreamingServices', () => {
         bucket: 'bucket_example',
         contentType: 'plain/text',
         host: 'http://aws-host.com',
-        secretKey: 'MYSECRETKEY',
-      },
+        secretKey: 'MYSECRETKEY'
+      }
     },
     {
       endpoint: 'big_query',
@@ -131,21 +131,21 @@ describe('DataStreamingServices', () => {
         projectID: 'my_project',
         tableID: 'my_table',
         serviceAccountKey: 'service_account_key'
-      },
+      }
     },
     {
       endpoint: 'elasticsearch',
       values: {
         elasticsearchUrl: 'http://elasticsearch.com',
         apiKey: 'XYZ_API_KEY'
-      },
+      }
     },
     {
       endpoint: 'splunk',
       values: {
         splunkUrl: 'https://inputs.splunk-client.splunkcloud.com:1337/services/collector',
         splunkApiKey: 'MYAPIKEY'
-      },
+      }
     },
     {
       endpoint: 'aws_kinesis_firehose',
@@ -154,20 +154,20 @@ describe('DataStreamingServices', () => {
         streamName: 'my_stream_name',
         awsRegion: 'us-east-1',
         awsSecretKey: 'MYSECRETKEY'
-      },
+      }
     },
     {
       endpoint: 'datadog',
       values: {
         datadogUrl: 'https://http-intake.logs.datadoghq.com/v1/input',
         datadogApiKey: 'MYAPIKEY'
-      },
+      }
     },
     {
       endpoint: 'qradar',
       values: {
-        QRadarUrl: 'https://qradar-trial-abcdef.qradar.ibmcloud.com:123456',
-      },
+        QRadarUrl: 'https://qradar-trial-abcdef.qradar.ibmcloud.com:123456'
+      }
     },
     {
       endpoint: 'azure_monitor',
@@ -176,7 +176,7 @@ describe('DataStreamingServices', () => {
         sharedKey: 'mysharedkey',
         generatedField: 'timeGeneratedField',
         workspaceID: 'anfhw-123sd-466gcs'
-      },
+      }
     },
     {
       endpoint: 'azure_blob_storage',
@@ -184,24 +184,27 @@ describe('DataStreamingServices', () => {
         storageAccount: 'mystorageaccount',
         containerName: 'log_container',
         blobToken: 'fd56e23e1f12efe'
-      },
-    },
-  ])('Should test all updated edpoints, current endpoint $endpoint', async ({ endpoint, values }) => {
-    vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
-      statusCode: 200
-    })
-    const { sut } = makeSut()
-
-    const dataStreamingEndpointMock = {
-      ...fixtures.dataStreamingMock,
-      endpoint,
-      ...values
+      }
     }
+  ])(
+    'Should test all updated edpoints, current endpoint $endpoint',
+    async ({ endpoint, values }) => {
+      vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
+        statusCode: 200
+      })
+      const { sut } = makeSut()
 
-    const feedbackMessage = await sut(dataStreamingEndpointMock)
+      const dataStreamingEndpointMock = {
+        ...fixtures.dataStreamingMock,
+        endpoint,
+        ...values
+      }
 
-    expect(feedbackMessage).toBe('Your data streaming has been updated')
-  })
+      const feedbackMessage = await sut(dataStreamingEndpointMock)
+
+      expect(feedbackMessage).toBe('Your data streaming has been updated')
+    }
+  )
 
   it.each([
     {
