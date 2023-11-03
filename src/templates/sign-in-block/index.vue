@@ -27,7 +27,7 @@
         </div>
 
         <PrimeButton
-          class="w-full"
+          class="w-full flex-row-reverse"
           type="button"
           label="Proceed"
           :loading="isProccedButtonLoading"
@@ -73,7 +73,7 @@
       class="flex flex-col align-top items-center p-4 animate-fadeIn"
     >
       <div
-        class="surface-card surface-border border max-w-md w-full p-6 md:p-10 rounded-md flex-col gap-6 inline-flex"
+        class="surface-card surface-border border max-w-md w-full p-6 md:p-10 rounded-md flex-col gap-6 flex"
       >
         <div class="text-xl md:text-2xl font-medium">Real Time Manager</div>
         <div class="flex items-center gap-2">
@@ -117,10 +117,11 @@
             link
             class="p-0"
             label="Forgot my password"
+            @click="$emit('goToForgotPassword', true)"
           ></PrimeButton>
         </div>
         <PrimeButton
-          class="w-full"
+          class="w-full flex-row-reverse"
           :loading="isButtonLoading"
           label="Sign in"
           severity="secondary"
@@ -280,6 +281,7 @@
 
   defineExpose({
     showPassword,
+    showPasswordStep,
     email,
     password,
     errors,
