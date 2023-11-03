@@ -1,56 +1,81 @@
 <template>
   <div>
-    <SingleBlock pageTitle="Edge Pulse">
-      <template #content>
-        <div class="flex flex-col gap-4 lg:w-1/2">
-          <b>Default Tag:</b>
-          <p>
-            Place this tag in the HTML of the switched pages to measure them. You should place it
-            just before the closing BODY tag. This script waits until the load event is complete
-            before downloading and executing the RUM Client, ensuring that the load event is
-            uninterrupted and has zero impact on user experience.
-          </p>
-          <vue-monaco-editor
-            v-model:value="defaultTagCode"
-            language="javascript"
-            theme="vs-dark"
-            :options="editorOptions"
-            class="min-h-[200px]"
-          />
-          <div>
-            <PrimeButton
-              label="Copy to Clipboard"
-              @click="handleCopyDefaultTagCode"
-            />
-          </div>
-          <b>Pre-loading Tag:</b>
-          <p>
-            If you're using Content Security Policy settings preventing the use of inline JavaScript
-            then place this tag just before the enclosing BODY tag. This script executes before the
-            load event has fired.
-          </p>
-          <vue-monaco-editor
-            v-model:value="preLoadingTagCode"
-            language="javascript"
-            theme="vs-dark"
-            :options="editorOptions"
-            class="min-h-[40px]"
-          />
-          <div>
-            <PrimeButton
-              label="Copy to Clipboard"
-              @click="handleCopyPreLoadingTagCode"
-            />
-          </div>
+    <PageHeadingBlock pageTitle="Edge Pulse" />
+    <TabView
+      :active-index="0"
+      class="w-full grow py-4 px-8 flex flex-col gap-8 mb-5"
+    >
+      <!-- Default -->
+      <TabPanel header="Default Tag">
+        <div class="w-full mb-5">
+          <FormHorizontal
+            title="Default Tag"
+            description="Place this tag in the HTML of the switched pages to measure them. You should place it
+                  just before the closing BODY tag. This script waits until the load event is complete
+                  before downloading and executing the RUM Client, ensuring that the load event is
+                  uninterrupted and has zero impact on user experience."
+          >
+            <template #inputs>
+              <vue-monaco-editor
+                v-model:value="defaultTagCode"
+                language="javascript"
+                theme="vs"
+                :options="editorOptions"
+                class="min-h-[200px] surface-border border rounded-md"
+              />
+              <div>
+                <PrimeButton
+                  label="Copy to Clipboard"
+                  icon="pi pi-copy"
+                  @click="handleCopyDefaultTagCode"
+                  outlined
+                />
+              </div>
+            </template>
+          </FormHorizontal>
         </div>
-      </template>
-    </SingleBlock>
+      </TabPanel>
+
+      <!-- Pre-loading -->
+      <TabPanel header="Pre-loading Tag">
+        <div class="w-full mb-5">
+          <FormHorizontal
+            title="Pre-loading Tag"
+            description="If you're using Content Security Policy settings preventing the use of inline JavaScript
+            then place this tag just before the enclosing BODY tag. This script executes before the
+            load event has fired."
+          >
+            <template #inputs>
+              <vue-monaco-editor
+                v-model:value="preLoadingTagCode"
+                language="javascript"
+                theme="vs"
+                :options="editorOptions"
+                class="min-h-[200px] surface-border border rounded-md"
+              />
+              <div>
+                <PrimeButton
+                  icon="pi pi-copy"
+                  label="Copy to Clipboard"
+                  outlined
+                  @click="handleCopyPreLoadingTagCode"
+                />
+              </div>
+            </template>
+          </FormHorizontal>
+        </div>
+      </TabPanel>
+    </TabView>
   </div>
 </template>
 
 <script>
-  import SingleBlock from '@/templates/single-block'
+  import PageHeadingBlock from '@/templates/page-heading-block'
+  import FormHorizontal from '@/templates/create-form-block-new/form-horizontal'
+  import { clipboardWrite } from '@/helpers'
   import PrimeButton from 'primevue/button'
+  import TabView from 'primevue/tabview'
+  import TabPanel from 'primevue/tabpanel'
 
   const defaultTagCode = `<script>
     if (typeof window.addEventListener === 'function') {
@@ -64,21 +89,26 @@
     }
   <${'/'}script>`
 
-  const editorOptions = {
-    minimap: {
-      enabled: false
-    },
-    readOnly: true,
-    scrollBeyondLastLine: false
-  }
-
   const preLoadingTagCode = `<script async src="//client.azionrum.net/8900e/azion-pulse.js"><${'/'}script>`
 
   export default {
-    name: 'edge-pulse-view',
     components: {
+      FormHorizontal,
+      PageHeadingBlock,
       PrimeButton,
-      SingleBlock
+      TabView,
+      TabPanel
+    },
+    data() {
+      return {
+        defaultTagCode,
+        preLoadingTagCode,
+        editorOptions: {
+          minimap: { enabled: false },
+          readOnly: true,
+          scrollBeyondLastLine: false
+        }
+      }
     },
     methods: {
       showToast() {
@@ -86,21 +116,16 @@
           closable: false,
           severity: 'success',
           summary: 'Code successfully copied',
-          life: 1000
+          life: 6000
         })
       },
       handleCopyDefaultTagCode() {
-        navigator.clipboard.writeText(defaultTagCode).then(this.showToast)
+        clipboardWrite(defaultTagCode)
+        this.showToast()
       },
       handleCopyPreLoadingTagCode() {
-        navigator.clipboard.writeText(preLoadingTagCode).then(this.showToast)
-      }
-    },
-    data() {
-      return {
-        defaultTagCode,
-        preLoadingTagCode,
-        editorOptions
+        clipboardWrite(preLoadingTagCode)
+        this.showToast()
       }
     }
   }

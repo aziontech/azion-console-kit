@@ -11,7 +11,8 @@
 
   const route = useRoute()
   const isLogged = computed(() => {
-    return hasActiveUserId && route.name !== 'login'
+    const publicRoutes = ['login', 'reset-password']
+    return hasActiveUserId && !publicRoutes.includes(route.name)
   })
 
   watch(currentTheme, (theme) => themeSelect({ theme }))

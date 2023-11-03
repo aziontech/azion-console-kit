@@ -1,28 +1,28 @@
 <template>
-  <PrimeButton
-    text
+  <PrimeTag
+    v-bind="content"
+    class="cursor-pointer"
     @click="handleClick"
-  >
-    <p>{{ content }}</p>
-  </PrimeButton>
+  />
 </template>
 
 <script>
-  import PrimeButton from 'primevue/button'
+  import PrimeTag from 'primevue/tag'
 
   export default {
-    name: 'clickable-text-column',
+    name: 'clickable-tag-column',
     components: {
-      PrimeButton
+      PrimeTag
     },
     props: {
       content: {
-        type: String,
+        type: Object,
         required: true
       },
       clickAction: {
-        required: true,
-        type: Function
+        required: false,
+        type: Function,
+        default: () => {}
       },
       clickProps: {
         required: false,

@@ -1,24 +1,14 @@
 import { AxiosHttpClientAdapter } from '../axios/AxiosHttpClientAdapter'
-import { makeNetworkListBaseUrl } from './make-network-list-base-url'
+import { makeResetPasswordBaseUrl } from './make-reset-password-base-url'
 import * as Errors from '@/services/axios/errors'
 
-export const createNetworkListService = async (payload) => {
-  const bodyRequest = adapt(payload)
+export const sendResetPasswordEmailService = async (payload) => {
   let httpResponse = await AxiosHttpClientAdapter.request({
-    url: `${makeNetworkListBaseUrl()}`,
+    url: `${makeResetPasswordBaseUrl()}/request`,
     method: 'POST',
-    body: bodyRequest
+    body: payload
   })
-
   return parseHttpResponse(httpResponse)
-}
-
-const adapt = (payload) => {
-  return {
-    name: payload.name,
-    list_type: payload.networkListType,
-    items_values: payload.networkContentList
-  }
 }
 
 /**
@@ -31,14 +21,9 @@ const adapt = (payload) => {
 const parseHttpResponse = (httpResponse) => {
   switch (httpResponse.statusCode) {
     case 201:
-      return 'Your network list has been created'
+      return 'Email sent successfully'
     case 400:
-      const apiError = httpResponse.body.results[0]
-      throw new Error(apiError)
-    case 401:
-      throw new Errors.InvalidApiTokenError().message
-    case 403:
-      throw new Errors.PermissionError().message
+      return 'Error sending email'
     case 404:
       throw new Errors.NotFoundError().message
     case 500:
