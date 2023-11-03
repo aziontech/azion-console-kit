@@ -48,15 +48,15 @@
       <span class="top-0 p-input-icon-left p-input-icon-right hidden lg:flex">
         <i class="pi pi-search text-white" />
         <i class="!top-[32%]">
-          <Tag
-            class="not-italic border border-header bg-header hover:bg-header-button-hover text-header cursor-pointer h-6 surface-100"
-            value="⌘ K"
+          <span
             @click="openSearch"
-          />
+            class="rounded-md py-1 px-2 text-xs font-semibold bg-header not-italic border border-header text-header cursor-pointer"
+            >⌘ K</span
+          >
         </i>
         <InputText
           class="w-64 bg-header-input border-header placeholder:text-header text-header hover:border-header-hover"
-          placeholder="Search..."
+          placeholder="Search"
           :value="searchText"
           @click="openSearch"
           size="small"
@@ -365,9 +365,10 @@
         <i class="pi pi-search" />
         <i class="!top-[35%]">
           <Tag
+            severity="info"
             @click="closeSearch"
             class="not-italic border surface-border text-color-secondary surface-100 cursor-pointer"
-            value="esc"
+            value="ESC"
           />
         </i>
         <InputText
