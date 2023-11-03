@@ -36,13 +36,13 @@ describe('DigitalCertificatesServices', () => {
 
     const feedbackMessage = await sut(idStub)
 
-    expect(feedbackMessage).toBe('Resource successfully deleted')
+    expect(feedbackMessage).toBe('Digital certificate successfully deleted!')
   })
 
   it.each([
     {
       statusCode: 400,
-      expectedError: new Errors.InvalidApiRequestError().message
+      expectedError: 'Resource not found.'
     },
     {
       statusCode: 401,

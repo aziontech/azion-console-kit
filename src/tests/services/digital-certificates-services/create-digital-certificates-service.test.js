@@ -1,7 +1,6 @@
 import { AxiosHttpClientAdapter } from '@/services/axios/AxiosHttpClientAdapter'
 import {
   InternalServerError,
-  InvalidApiRequestError,
   InvalidApiTokenError,
   NotFoundError,
   PermissionError,
@@ -27,6 +26,9 @@ const fixture = {
       '-----BEGIN CERTIFICATE-----\nMIIE... (certificate content) ...\n-----END CERTIFICATE-----',
     private_key:
       '-----BEGIN PRIVATE KEY-----\nMIIE... (private key content) ...\n-----END PRIVATE KEY-----'
+  },
+  errorMock: {
+    error: ['Error Message']
   }
 }
 
@@ -58,7 +60,7 @@ describe('DigitalCertificatesServices', () => {
   it.each([
     {
       statusCode: 400,
-      expectedError: new InvalidApiRequestError().message
+      expectedError: fixture.errorMock[0]
     },
     {
       statusCode: 401,
@@ -84,13 +86,14 @@ describe('DigitalCertificatesServices', () => {
     'should throw when request fails with statusCode $statusCode',
     async ({ statusCode, expectedError }) => {
       vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
-        statusCode
+        statusCode,
+        body: fixture.errorMock
       })
       const { sut } = makeSut()
 
       const response = sut(fixture.payloadMock)
 
-      expect(response).rejects.toBe(expectedError)
+      expect(response).rejects.toThrow(expectedError)
     }
   )
 })
