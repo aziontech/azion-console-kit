@@ -212,7 +212,7 @@
 
       const validationSchema = yup.object({
         name: yup.string().required('Name is a required field.'),
-        certificateType: yup.string('Certificate Type is required'),
+        certificateType: yup.string(),
         csr: yup.string(),
         certificate: yup.string(),
         privateKey: yup.string()
