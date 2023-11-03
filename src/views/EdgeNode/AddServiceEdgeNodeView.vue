@@ -7,14 +7,18 @@
     :cleanFormCallback="resetForm"
   >
     <template #form>
-      <FormHorizontal title="Service" description="">
+      <FormHorizontal
+        title="Service"
+        description=""
+      >
         <template #inputs>
           <div class="flex flex-col gap-4">
             <div class="flex flex-col w-full sm:max-w-xs gap-2">
               <label
                 for="id"
-                class="text-color text-base font-medium "
-                >Service</label>
+                class="text-color text-base font-medium"
+                >Service</label
+              >
               <Dropdown
                 v-model="serviceId"
                 :options="services"
