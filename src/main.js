@@ -7,6 +7,7 @@ import 'primeflex/primeflex.css'
 import './assets/main.css'
 import '@assets/themes/scss/themes/azion-light/theme.scss'
 import '@assets/themes/scss/themes/azion-dark/theme.scss'
+import '@assets/icons/azionicons.scss'
 // import '@/assets/themes/theme-custom.css'
 /**
  * ==== End of styles block ====
@@ -18,7 +19,6 @@ import piniaPluginPersistedstate from 'pinia-plugin-persistedstate'
 import PrimeVue from 'primevue/config'
 import Tooltip from 'primevue/tooltip'
 import ToastService from 'primevue/toastservice'
-import AzionIcons from '@/assets/icons/AzionIcons'
 import { install as VueMonacoEditorPlugin } from '@guolao/vue-monaco-editor'
 
 import App from './App.vue'
@@ -30,7 +30,6 @@ pinia.use(piniaPluginPersistedstate)
 
 app.use(PrimeVue)
 app.directive('tooltip', Tooltip)
-app.component('AzionIcons', AzionIcons)
 app.use(ToastService)
 app.use(pinia)
 app.use(router)
