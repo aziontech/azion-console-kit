@@ -194,22 +194,22 @@
     :pt="{
       root: { class: 'h-auto flex' },
       header: { class: 'hidden' },
-      mask: { class: 'flex' },
+      mask: { class: 'flex' }
     }"
     class="md:p-3"
   >
     <PrimeMenu
       :pt="{
-          root: { class: 'p-0 md:p-3 w-full border-none bg-transparent'},
-          submenuheader: { class: 'text-base font-medium leading-none mt-5' },
-          action: { class: '' }
-        }"
+        root: { class: 'p-0 md:p-3 w-full border-none bg-transparent' },
+        submenuheader: { class: 'text-base font-medium leading-none' },
+        action: { class: '' }
+      }"
       class="w-full border-none bg-transparent md:p-3"
       ref="profile"
       :model="profileMenuItems"
     >
       <template #start>
-        <div class="flex flex-column mt-2 px-2.5 py-3">
+        <div class="flex flex-column px-2.5 h-14 justify-center">
           <div class="flex flex-column align gap-1">
             <span class="text-sm font-medium">{{ user.name }}</span>
             <div class="flex gap-2">
@@ -221,17 +221,16 @@
       </template>
 
       <template #end>
-
-        <PrimeMenu 
+        <PrimeMenu
           class="w-full border-none bg-transparent"
           :pt="{
             root: {
               class: 'p-0 w-full border-none bg-transparent'
             },
-            submenuheader: { class: 'text-base font-medium leading-none mt-5' },
+            submenuheader: { class: 'text-base font-medium leading-none mt-5' }
           }"
           :model="profileMenuSettings"
-        > 
+        >
           <template #start>
             <div class="flex flex-row items-center">
               <div class="flex flex-col gap-1 px-2 py-2.5">
@@ -370,7 +369,7 @@
   <PrimeMenu
     :pt="{
       root: { class: '!w-[280px] pb-2 pt-0 invisible md:visible' },
-      menu: { class: '' },
+      menu: { class: '' }
     }"
     ref="profile"
     :popup="true"
@@ -387,69 +386,76 @@
         </div>
       </div>
     </template>
-
     <template #end>
-      <div class="flex flex-row items-center">
-        <div class="flex flex-col gap-1 px-3 py-2.5">
-          <span class="text-sm font-medium leading-none">{{ user.full_name }}</span>
-          <span class="text-xs">{{ user.email }}</span>
-        </div>
-      </div>
-      <PrimeButton
-        class="w-full rounded-none flex content-start text-left"
-        label="Your Settings"
-        text
-        @click="$router.push({ name: 'list-your-settings' })"
-      />
-      <PrimeButton
-        class="w-full rounded-none flex content-start text-left"
-        label="Personal Tokens"
-        text
-        @click="$router.push({ name: 'list-personal-tokens' })"
-      />
-
-      <!-- Theme Switch -->
-      <div class="flex flex-row justify-between items-center align-middle px-3 py-1.5">
-        <span>Theme</span>
-        <Dropdown
-          :modelValue="selectedTheme"
-          @update:modelValue="selectTheme"
-          optionValue="value"
-          optionLabel="name"
-          :options="themeOptions"
-          :autoOptionFocus="false"
+        <PrimeMenu
+          class="w-full border-none bg-transparent"
           :pt="{
-            root: { class: 'w-auto py-0 h-8 items-center align-middle surface-section' },
-            item: { class: 'text-sm' },
-            input: { class: 'text-sm' }
+            root: {
+              class: 'p-0 w-full border-none bg-transparent'
+            },
+            submenuheader: { class: 'text-base font-medium leading-none mt-5' }
           }"
+          :model="profileMenuSettings"
         >
-          <template #value="slotProps">
-            <div
-              v-if="slotProps.value"
-              class="flex gap-2 align-items-center"
-            >
-              <i :class="slotProps.value.icon"></i>
-              <div>{{ slotProps.value.name }}</div>
+          <template #start>
+            <div class="flex flex-row items-center">
+              <div class="flex flex-col gap-1 px-2 py-2.5">
+                <span class="text-sm font-medium leading-none">{{ user.full_name }}</span>
+                <span class="text-xs">{{ user.email }}</span>
+              </div>
             </div>
           </template>
-          <template #option="slotProps">
-            <div class="flex gap-2 align-items-center">
-              <i :class="slotProps.option.icon"></i>
-              <div>{{ slotProps.option.name }}</div>
-            </div>
-          </template>
-        </Dropdown>
-      </div>
-      <Divider class="surface-border p-1 m-0" />
-      <PrimeButton
-        class="w-full rounded-none flex content-start text-left text-red-600"
-        label="Logout"
-        icon="pi pi-sign-out"
-        text
-        @click="logout"
-      />
-    </template>
+        </PrimeMenu>
+        <!-- Theme Switch -->
+        <div class="flex flex-row justify-between items-center align-middle px-2 py-1.5">
+          <span>Theme</span>
+          <Dropdown
+            :modelValue="selectedTheme"
+            @update:modelValue="selectTheme"
+            optionValue="value"
+            optionLabel="name"
+            :options="themeOptions"
+            :autoOptionFocus="false"
+            :pt="{
+              root: { class: 'w-auto py-0 h-8 items-center align-middle surface-section' },
+              item: { class: 'text-sm' },
+              input: { class: 'text-sm' }
+            }"
+          >
+            <template #value="slotProps">
+              <div
+                v-if="slotProps.value"
+                class="flex gap-2 align-items-center"
+              >
+                <i :class="slotProps.value.icon"></i>
+                <div>{{ slotProps.value.name }}</div>
+              </div>
+            </template>
+            <template #option="slotProps">
+              <div class="flex gap-2 align-items-center">
+                <i :class="slotProps.option.icon"></i>
+                <div>{{ slotProps.option.name }}</div>
+              </div>
+            </template>
+          </Dropdown>
+        </div>
+        <Divider class="surface-border p-1 m-0" />
+        <PrimeButton
+          class="w-full rounded-md flex content-start text-left"
+          :pt="{
+            label: {
+              class: 'font-normal'
+            },
+            root: {
+              class: 'rounded-md hover:surface-200'
+            }
+          }"
+          label="Logout"
+          icon="pi pi-sign-out"
+          text
+          @click="logout"
+        />
+      </template>
   </PrimeMenu>
 
   <!-- Quick Search -->
@@ -746,14 +752,14 @@
           },
           {
             label: 'Personal Token',
-            to:'personal-tokens'
+            to: 'personal-tokens'
           }
         ],
         themeOptions: [
           { name: 'Light', value: 'light', icon: 'pi pi-sun' },
           { name: 'Dark', value: 'dark', icon: 'pi pi-moon' },
           { name: 'System', value: 'system', icon: 'pi pi-desktop' }
-        ],
+        ]
       }
     },
     computed: {
