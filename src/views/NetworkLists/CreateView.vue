@@ -13,7 +13,7 @@
             <label
               for="name"
               class="text-color text-base font-medium"
-              >Name</label
+              >Name *</label
             >
             <InputText
               placeholder="Add Network List Name"
@@ -33,7 +33,7 @@
             <label
               for="id"
               class="text-color text-base font-medium"
-              >Type</label
+              >Type *</label
             >
             <Dropdown
               :class="{ 'p-invalid': errors.networkListType }"
@@ -56,7 +56,7 @@
             <label
               for="id"
               class="text-color text-base font-medium"
-              >List</label
+              >List *</label
             >
             <TextareaComponent
               :class="{ 'p-invalid': errors.asn }"
@@ -79,7 +79,7 @@
             <label
               for="id"
               class="text-color text-base font-medium"
-              >List</label
+              >List *</label
             >
             <TextareaComponent
               :class="{ 'p-invalid': errors.ipCidr }"
@@ -102,7 +102,7 @@
             <label
               for="select-01"
               class="text-color text-base font-medium"
-              >Countries</label
+              >Countries *</label
             >
             <MultiSelect
               v-model="selectedCountries"

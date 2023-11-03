@@ -7,8 +7,9 @@
     :cleanFormCallback="resetForm"
   >
     <template #form>
-      <FormHorizontal title="General"
-      description="Espaço livre para descrição e instruções de preenchimento. Esse conteúdo deve ser criado pensando tanto em funcionalidade quanto em em alinhamento e estética. Devemos sempre criar os blocos conforme o contexto, cuidando sempre para não ter blocos muito longos."
+      <FormHorizontal
+        title="General"
+        description="Espaço livre para descrição e instruções de preenchimento. Esse conteúdo deve ser criado pensando tanto em funcionalidade quanto em em alinhamento e estética. Devemos sempre criar os blocos conforme o contexto, cuidando sempre para não ter blocos muito longos."
       >
         <template #inputs>
           <div class="flex flex-col sm:max-w-lg w-full gap-2">
@@ -28,102 +29,113 @@
           </div>
           <div class="flex flex-col sm:max-w-lg w-full gap-3">
             <Card
-               :pt="{
-                 body: { class: 'p-4' },
-                 title: { class: 'flex justify-between  text-base m-0 font-medium' },
-                 subtitle: { class: 'text-sm font-normal text-color-secondary m-0 pr-0 md:pr-[2.5rem]' }
-               }"
-             >
-               <template #title>
-                 <span class="text-base">Edge Certificate</span>
-                 <RadioButton
+              :pt="{
+                body: { class: 'p-4' },
+                title: { class: 'flex justify-between  text-base m-0 font-medium' },
+                subtitle: {
+                  class: 'text-sm font-normal text-color-secondary m-0 pr-0 md:pr-[2.5rem]'
+                }
+              }"
+            >
+              <template #title>
+                <span class="text-base">Edge Certificate</span>
+                <RadioButton
                   v-model="certificateType"
                   inputId="certificateType1"
                   name="certificateType"
                   :value="certificateTypes.EDGE_CERTIFICATE"
-                 />
-               </template>
-             </Card>
-             <Card
-               :pt="{
-                 body: { class: 'p-4' },
-                 title: { class: 'flex justify-between  text-base m-0 font-medium' },
-                 subtitle: { class: 'text-sm font-normal text-color-secondary m-0 pr-0 md:pr-[2.5rem]' }
-               }"
-             >
-               <template #title>
-                 <span class="text-base">Trusted CA Certificate</span>
-                 <RadioButton
+                />
+              </template>
+            </Card>
+            <Card
+              :pt="{
+                body: { class: 'p-4' },
+                title: { class: 'flex justify-between  text-base m-0 font-medium' },
+                subtitle: {
+                  class: 'text-sm font-normal text-color-secondary m-0 pr-0 md:pr-[2.5rem]'
+                }
+              }"
+            >
+              <template #title>
+                <span class="text-base">Trusted CA Certificate</span>
+                <RadioButton
                   v-model="certificateType"
                   inputId="certificateType2"
                   name="certificateType"
                   :value="certificateTypes.TRUSTED"
-                 />
-               </template>
-             </Card>
+                />
+              </template>
+            </Card>
           </div>
         </template>
       </FormHorizontal>
-      <FormHorizontal 
-      title="Edge Certificate Type"
-      description="Espaço livre para descrição e instruções de preenchimento. Esse conteúdo deve ser criado pensando tanto em funcionalidade quanto em em alinhamento e estética. Devemos sempre criar os blocos conforme o contexto, cuidando sempre para não ter blocos muito longos."
-      v-if="certificateType === certificateTypes.EDGE_CERTIFICATE"
+      <FormHorizontal
+        title="Edge Certificate Type"
+        description="Espaço livre para descrição e instruções de preenchimento. Esse conteúdo deve ser criado pensando tanto em funcionalidade quanto em em alinhamento e estética. Devemos sempre criar os blocos conforme o contexto, cuidando sempre para não ter blocos muito longos."
+        v-if="certificateType === certificateTypes.EDGE_CERTIFICATE"
       >
         <template #inputs>
           <div class="flex flex-col sm:max-w-lg w-full gap-3">
             <Card
-               :pt="{
-                 body: { class: 'p-4' },
-                 title: { class: 'flex justify-between  text-base m-0 font-medium' },
-                 subtitle: { class: 'text-sm font-normal text-color-secondary m-0 pr-0 md:pr-[2.5rem]' }
-               }"
-             >
-               <template #title>
-                 <span class="text-base">Upload my certificate and private key</span>
-                 <RadioButton
+              :pt="{
+                body: { class: 'p-4' },
+                title: { class: 'flex justify-between  text-base m-0 font-medium' },
+                subtitle: {
+                  class: 'text-sm font-normal text-color-secondary m-0 pr-0 md:pr-[2.5rem]'
+                }
+              }"
+            >
+              <template #title>
+                <span class="text-base">Upload my certificate and private key</span>
+                <RadioButton
                   v-model="createCertificateType"
                   inputId="createCertificateType1"
                   name="createCertificateType"
                   :value="edgeCertificateTypes.UPLOAD"
-                 />
-               </template>
-             </Card>
-             <Card
-               :pt="{
-                 body: { class: 'p-4' },
-                 title: { class: 'flex justify-between  text-base m-0 font-medium' },
-                 subtitle: { class: 'text-sm font-normal text-color-secondary m-0 pr-0 md:pr-[2.5rem]' }
-               }"
-             >
-               <template #title>
-                 <span class="text-base">Generate CSR and private key with Azion</span>
-                 <RadioButton
+                />
+              </template>
+            </Card>
+            <Card
+              :pt="{
+                body: { class: 'p-4' },
+                title: { class: 'flex justify-between  text-base m-0 font-medium' },
+                subtitle: {
+                  class: 'text-sm font-normal text-color-secondary m-0 pr-0 md:pr-[2.5rem]'
+                }
+              }"
+            >
+              <template #title>
+                <span class="text-base">Generate CSR and private key with Azion</span>
+                <RadioButton
                   v-model="createCertificateType"
                   inputId="createCertificateType2"
                   name="createCertificateType"
                   :value="edgeCertificateTypes.CSR"
-                 />
-               </template>
-             </Card>
+                />
+              </template>
+            </Card>
           </div>
         </template>
       </FormHorizontal>
-      <FormHorizontal 
-        v-if="createCertificateType === edgeCertificateTypes.UPLOAD && certificateType === certificateTypes.EDGE_CERTIFICATE"
+      <FormHorizontal
+        v-if="
+          createCertificateType === edgeCertificateTypes.UPLOAD &&
+          certificateType === certificateTypes.EDGE_CERTIFICATE
+        "
         title="Use my certificate and private key"
         description="To upload your Digital Certificate to Azion servers, copy and paste your certificate and private key inside the fields below."
       >
         <template #inputs>
           <div class="flex flex-col sm:max-w-lg w-full gap-2">
             <label>Certificate:</label>
-              <PrimeTextarea
-                v-bind="certificate"
-                :class="{ 'p-invalid': errors.certificate }"
-                v-tooltip.top="{ value: errors.certificate, showDelay: 200 }"
-                placeholder="---BEGIN CERTIFICATE---"
-                rows="5"
-                cols="30"
-              />
+            <PrimeTextarea
+              v-bind="certificate"
+              :class="{ 'p-invalid': errors.certificate }"
+              v-tooltip.top="{ value: errors.certificate, showDelay: 200 }"
+              placeholder="---BEGIN CERTIFICATE---"
+              rows="5"
+              cols="30"
+            />
           </div>
           <div class="flex flex-col sm:max-w-lg w-full gap-2">
             <label>Private key:</label>
@@ -141,7 +153,10 @@
       <FormHorizontal
         title="Generating a Certificate Signing Request (CSR) with Azion"
         description="A Certificate Signing Request (CSR) is one of the first steps towards getting your own SSL/TLS certificate."
-        v-if="createCertificateType === edgeCertificateTypes.CSR  && certificateType === certificateTypes.EDGE_CERTIFICATE"
+        v-if="
+          createCertificateType === edgeCertificateTypes.CSR &&
+          certificateType === certificateTypes.EDGE_CERTIFICATE
+        "
       >
         <template #inputs>
           <div class="flex flex-col sm:max-w-lg w-full gap-2">
@@ -153,7 +168,6 @@
               :class="{ 'p-invalid': errors.common }"
               v-tooltip.top="{ value: errors.common, showDelay: 200 }"
             />
-  
           </div>
           <div class="flex flex-col sm:max-w-lg w-full gap-2">
             <label>Country / Region: *</label>
@@ -200,7 +214,7 @@
               v-tooltip.top="{ value: errors.organizationUnity, showDelay: 200 }"
             />
           </div>
-          <div class="flex flex-col sm:max-w-lg w-full gap-2">       
+          <div class="flex flex-col sm:max-w-lg w-full gap-2">
             <label>Email: *</label>
             <InputText
               v-bind="email"
