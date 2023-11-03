@@ -23,6 +23,11 @@
               :class="{ 'p-invalid': errors.name }"
               v-tooltip.top="{ value: errors.name, showDelay: 200 }"
             />
+            <small
+              v-if="errors.name"
+              class="p-error text-xs font-normal leading-tight"
+              >{{ errors.name }}</small
+            >
           </div>
           <div class="flex flex-col sm:max-w-lg w-full gap-2">
             <label>Certificate:</label>
@@ -34,6 +39,11 @@
               rows="5"
               cols="30"
             />
+            <small
+              v-if="errors.certificate"
+              class="p-error text-xs font-normal leading-tight"
+              >{{ errors.certificate }}</small
+            >
           </div>
           <div class="flex flex-col sm:max-w-lg w-full gap-2">
             <label>Certificate Signing Request (CSR):</label>
@@ -45,6 +55,11 @@
               rows="5"
               cols="30"
             />
+            <small
+              v-if="errors.csr"
+              class="p-error text-xs font-normal leading-tight"
+              >{{ errors.csr }}</small
+            >
           </div>
           <div class="flex flex-col sm:max-w-lg w-full gap-2">
             <PrimeButton
@@ -73,6 +88,11 @@
               :class="{ 'p-invalid': errors.name }"
               v-tooltip.top="{ value: errors.name, showDelay: 200 }"
             />
+            <small
+              v-if="errors.name"
+              class="p-error text-xs font-normal leading-tight"
+              >{{ errors.name }}</small
+            >
           </div>
           <div class="flex flex-col sm:max-w-lg w-full gap-2">
             <label>Certificate:</label>
@@ -84,6 +104,11 @@
               rows="5"
               cols="30"
             />
+            <small
+              v-if="errors.certificate"
+              class="p-error text-xs font-normal leading-tight"
+              >{{ errors.certificate }}</small
+            >
           </div>
           <div class="flex flex-col sm:max-w-lg w-full gap-2">
             <label>Private key:</label>
@@ -95,6 +120,11 @@
               rows="5"
               cols="30"
             />
+            <small
+              v-if="errors.privateKey"
+              class="p-error text-xs font-normal leading-tight"
+              >{{ errors.privateKey }}</small
+            >
           </div>
         </template>
       </FormHorizontal>
@@ -113,6 +143,11 @@
               :class="{ 'p-invalid': errors.name }"
               v-tooltip.top="{ value: errors.name, showDelay: 200 }"
             />
+            <small
+              v-if="errors.name"
+              class="p-error text-xs font-normal leading-tight"
+              >{{ errors.name }}</small
+            >
           </div>
           <div class="flex flex-col sm:max-w-lg w-full gap-2">
             <label>Certificate:</label>
@@ -125,6 +160,11 @@
               cols="30"
             />
             <small>Tip: It's possible to include intermediate certificates.</small>
+            <small
+              v-if="errors.certificate"
+              class="p-error text-xs font-normal leading-tight"
+              >{{ errors.certificate }}</small
+            >
           </div>
         </template>
       </FormHorizontal>
@@ -171,7 +211,7 @@
       }
 
       const validationSchema = yup.object({
-        name: yup.string().required(),
+        name: yup.string().required('Name is a required field.'),
         certificateType: yup.string(),
         csr: yup.string(),
         certificate: yup.string(),
