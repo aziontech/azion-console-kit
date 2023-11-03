@@ -6,13 +6,13 @@
         v-if="pageTitle || description"
       >
         <div
-          class="self-stretch text-[var(--text-color)] text-xl not-italic font-medium leading-7"
+          class="text-xl font-medium"
           v-if="pageTitle"
         >
           {{ pageTitle }}
         </div>
         <div
-          class="self-stretch text-[var(--text-color-secondary)] text-sm not-italic font-normal leading-[normal]"
+          class="text-sm font-normal leading-[normal] text-color-secondary"
           v-if="description"
         >
           {{ description }}

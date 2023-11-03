@@ -38,7 +38,7 @@
 
         <!-- Azion client -->
         <SwitchAccountBlock
-          v-if="!user?.is_client_only"
+          v-if="hasAccessToSwitchAccount"
           v-model:showSwitchAccount="openSwitchAccount"
           :accessMenu="profileMenuItems"
         />
@@ -644,6 +644,9 @@
       ...mapState(useHelpCenterStore, { showHelp: 'isOpen' }),
       selectedTheme() {
         return this.themeOptions.find((option) => option.value === this.currentTheme)
+      },
+      hasAccessToSwitchAccount() {
+        return !this.user?.is_client_only
       }
     },
     methods: {

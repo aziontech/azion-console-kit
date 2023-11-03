@@ -14,7 +14,7 @@
     >
       <i
         class="text-white"
-        :class="ICON_TYPE_ACCOUNT[account.kind]"
+        :class="getAccountTypeIcon(account.kind)"
       />
       <span class="text-white"> {{ account.name }}</span>
     </PrimeButton>
@@ -48,7 +48,7 @@
               class="flex gap-4 items-center justify-center max-sm:gap-3 max-sm:flex-col max-sm:items-start max-sm:w-full"
             >
               <div class="flex justify-between items-center self-stretch">
-                <h3 class="text-color text-lg not-italic font-medium leading-7">
+                <h3 class="text-lg font-medium">
                   {{ account.name }}
                 </h3>
                 <PrimeButton
@@ -75,12 +75,12 @@
               </div>
               <div class="flex items-center gap-2">
                 <PrimeTag
-                  :value="NAME_TYPE_ACCOUNT[account.kind]"
-                  :icon="ICON_TYPE_ACCOUNT[account.kind]"
+                  :value="getAccountTypeName(account.kind)"
+                  :icon="getAccountTypeIcon(account.kind)"
+                  severity="info"
                 />
                 <PrimeTag
                   value="Current Logged"
-                  icon="pi pi-check-circle"
                   severity="success"
                 />
               </div>
@@ -142,12 +142,8 @@
   </div>
 </template>
 
-<script>
-  export default {
-    name: 'SwitchAccountBlock'
-  }
-</script>
 <script setup>
+  import { getAccountTypeIcon, getAccountTypeName } from '@/helpers/accountTypeNameMapping.js'
   import { ref, watch } from 'vue'
   import PrimeDialog from 'primevue/dialog'
   import PrimeTag from 'primevue/tag'
@@ -164,6 +160,7 @@
   import { storeToRefs } from 'pinia'
   import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
 
+  defineOptions({ name: 'SwitchAccountBlock' })
   const emit = defineEmits(['update:showSwitchAccount'])
   const props = defineProps({
     accessMenu: {
@@ -177,28 +174,14 @@
     }
   })
 
+  const accountStore = useAccountStore()
+  const { account } = storeToRefs(accountStore)
+
   const visible = ref(false)
-
-  watch(
-    () => props.showSwitchAccount,
-    (newValue) => {
-      visible.value = newValue
-    }
-  )
-
-  const visibleDialog = (value) => {
-    emit('update:showSwitchAccount', value)
-    visible.value = value
-  }
-
   const filterSwitch = ref({
     textSnippet: '',
     type: 'brands'
   })
-
-  const accountStore = useAccountStore()
-  const { account } = storeToRefs(accountStore)
-
   const filterType = ref([
     { label: 'Brands', value: 'brands' },
     { label: 'Resellers', value: 'resellers' },
@@ -235,43 +218,39 @@
       header: 'ID'
     },
     {
-      field: 'client_id',
+      field: 'clientID',
       header: 'Client ID'
     }
   ])
-
-  const ICON_TYPE_ACCOUNT = {
-    client: 'pi pi-box',
-    reseller: 'pi pi-folder',
-    company: 'pi pi-building',
-    brand: 'pi pi-globe'
-  }
-
-  const NAME_TYPE_ACCOUNT = {
-    client: 'Client',
-    reseller: 'Group',
-    company: 'Reseller',
-    brand: 'Brand'
-  }
-
-  const adapterAccessMenu = props.accessMenu.slice(0, -1).reduce((result, item) => {
-    if (item.label !== 'Switch Account') {
-      result.push({
-        ...item,
-        command: () => {
-          visible.value = false
-        }
-      })
-    }
-    return result
-  }, [])
-  const items = ref(adapterAccessMenu)
-
   const menu = ref()
+  const items = ref(
+    props.accessMenu.slice(0, -1).reduce((result, item) => {
+      if (item.label !== 'Switch Account') {
+        result.push({
+          ...item,
+          command: () => {
+            visible.value = false
+          }
+        })
+      }
+      return result
+    }, [])
+  )
+
+  watch(
+    () => props.showSwitchAccount,
+    (newValue) => {
+      visible.value = newValue
+    }
+  )
+
+  const visibleDialog = (value) => {
+    emit('update:showSwitchAccount', value)
+    visible.value = value
+  }
   const toggle = (event) => {
     menu.value.toggle(event)
   }
-
   const onSelectedAccount = async (rowSelected) => {
     const { first_login: firstLogin } = await switchAccountService(rowSelected.accountId)
     visible.value = false

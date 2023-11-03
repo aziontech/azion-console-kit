@@ -22,8 +22,7 @@
       },
       clickAction: {
         required: true,
-        type: Function,
-        default: () => {}
+        type: Function
       },
       clickProps: {
         required: false,
