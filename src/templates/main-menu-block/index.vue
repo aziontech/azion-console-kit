@@ -387,75 +387,75 @@
       </div>
     </template>
     <template #end>
-        <PrimeMenu
-          class="w-full border-none bg-transparent"
+      <PrimeMenu
+        class="w-full border-none bg-transparent"
+        :pt="{
+          root: {
+            class: 'p-0 w-full border-none bg-transparent'
+          },
+          submenuheader: { class: 'text-base font-medium leading-none mt-5' }
+        }"
+        :model="profileMenuSettings"
+      >
+        <template #start>
+          <div class="flex flex-row items-center">
+            <div class="flex flex-col gap-1 px-2 py-2.5">
+              <span class="text-sm font-medium leading-none">{{ user.full_name }}</span>
+              <span class="text-xs">{{ user.email }}</span>
+            </div>
+          </div>
+        </template>
+      </PrimeMenu>
+      <!-- Theme Switch -->
+      <div class="flex flex-row justify-between items-center align-middle px-2 py-1.5">
+        <span>Theme</span>
+        <Dropdown
+          :modelValue="selectedTheme"
+          @update:modelValue="selectTheme"
+          optionValue="value"
+          optionLabel="name"
+          :options="themeOptions"
+          :autoOptionFocus="false"
           :pt="{
-            root: {
-              class: 'p-0 w-full border-none bg-transparent'
-            },
-            submenuheader: { class: 'text-base font-medium leading-none mt-5' }
+            root: { class: 'w-auto py-0 h-8 items-center align-middle surface-section' },
+            item: { class: 'text-sm' },
+            input: { class: 'text-sm' }
           }"
-          :model="profileMenuSettings"
         >
-          <template #start>
-            <div class="flex flex-row items-center">
-              <div class="flex flex-col gap-1 px-2 py-2.5">
-                <span class="text-sm font-medium leading-none">{{ user.full_name }}</span>
-                <span class="text-xs">{{ user.email }}</span>
-              </div>
+          <template #value="slotProps">
+            <div
+              v-if="slotProps.value"
+              class="flex gap-2 align-items-center"
+            >
+              <i :class="slotProps.value.icon"></i>
+              <div>{{ slotProps.value.name }}</div>
             </div>
           </template>
-        </PrimeMenu>
-        <!-- Theme Switch -->
-        <div class="flex flex-row justify-between items-center align-middle px-2 py-1.5">
-          <span>Theme</span>
-          <Dropdown
-            :modelValue="selectedTheme"
-            @update:modelValue="selectTheme"
-            optionValue="value"
-            optionLabel="name"
-            :options="themeOptions"
-            :autoOptionFocus="false"
-            :pt="{
-              root: { class: 'w-auto py-0 h-8 items-center align-middle surface-section' },
-              item: { class: 'text-sm' },
-              input: { class: 'text-sm' }
-            }"
-          >
-            <template #value="slotProps">
-              <div
-                v-if="slotProps.value"
-                class="flex gap-2 align-items-center"
-              >
-                <i :class="slotProps.value.icon"></i>
-                <div>{{ slotProps.value.name }}</div>
-              </div>
-            </template>
-            <template #option="slotProps">
-              <div class="flex gap-2 align-items-center">
-                <i :class="slotProps.option.icon"></i>
-                <div>{{ slotProps.option.name }}</div>
-              </div>
-            </template>
-          </Dropdown>
-        </div>
-        <Divider class="surface-border p-1 m-0" />
-        <PrimeButton
-          class="w-full rounded-md flex content-start text-left"
-          :pt="{
-            label: {
-              class: 'font-normal'
-            },
-            root: {
-              class: 'rounded-md hover:surface-200'
-            }
-          }"
-          label="Logout"
-          icon="pi pi-sign-out"
-          text
-          @click="logout"
-        />
-      </template>
+          <template #option="slotProps">
+            <div class="flex gap-2 align-items-center">
+              <i :class="slotProps.option.icon"></i>
+              <div>{{ slotProps.option.name }}</div>
+            </div>
+          </template>
+        </Dropdown>
+      </div>
+      <Divider class="surface-border p-1 m-0" />
+      <PrimeButton
+        class="w-full rounded-md flex content-start text-left"
+        :pt="{
+          label: {
+            class: 'font-normal'
+          },
+          root: {
+            class: 'rounded-md hover:surface-200'
+          }
+        }"
+        label="Logout"
+        icon="pi pi-sign-out"
+        text
+        @click="logout"
+      />
+    </template>
   </PrimeMenu>
 
   <!-- Quick Search -->
