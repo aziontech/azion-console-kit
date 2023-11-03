@@ -13,7 +13,7 @@ export default {
     },
     borderColor: {
       header: '#3e3e3e',
-      'header-hover': '#f4f4f4'
+      'header-hover': '#F3652B'
     },
     textColor: {
       header: '#b5b5b5'
