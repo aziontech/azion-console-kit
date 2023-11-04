@@ -100,7 +100,7 @@
             <Menu
               ref="menu"
               id="overlay_menu"
-              :model="items"
+              :model="accessMenu"
               @toggle="visible = false"
               :popup="true"
             />
@@ -230,7 +230,6 @@
     }
   ])
   const menu = ref()
-  const items = ref(props.accessMenu)
 
   watch(
     () => props.showSwitchAccount,
