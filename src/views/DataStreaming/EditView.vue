@@ -8,12 +8,15 @@
     :formData="values"
   >
     <template #form>
-      <FormHorizontal title="Edit Data Streaming">
+      <FormHorizontal title="Data">
         <template #inputs>
           <!-- data-source -->
-          <h1 class="text-xl font-medium">Data</h1>
-          <div class="flex flex-col gap-2">
-            <label>Name: *</label>
+          <div class="flex flex-col sm:max-w-lg w-full gap-2">
+            <label
+              for="name"
+              class="text-color text-base font-medium"
+              >Name: *</label
+            >
             <InputText
               v-model="name"
               type="text"
@@ -27,8 +30,12 @@
             >
           </div>
 
-          <div class="flex flex-col gap-2">
-            <label>Data Source: *</label>
+          <div class="flex flex-col w-full sm:max-w-xs gap-2">
+            <label
+              for="dataSource"
+              class="text-color text-base font-medium"
+              >Data Source: *</label
+            >
             <Dropdown
               :class="{ 'p-invalid': errors.dataSource }"
               v-model="dataSource"
@@ -39,8 +46,12 @@
             />
           </div>
 
-          <div class="flex flex-col gap-2">
-            <label>Template: *</label>
+          <div class="flex flex-col w-full sm:max-w-xs gap-2">
+            <label
+              for="template"
+              class="text-color text-base font-medium"
+              >Template: *</label
+            >
             <Dropdown
               :class="{ 'p-invalid': errors.template }"
               v-model="template"
@@ -52,7 +63,11 @@
           </div>
 
           <div class="flex flex-col gap-2">
-            <label>Data Set:</label>
+            <label
+              for="dataset"
+              class="text-color text-base font-medium"
+              >Data Set:</label
+            >
             <vue-monaco-editor
               v-model:value="dataSet"
               language="json"
@@ -64,43 +79,63 @@
 
           <!-- domains -->
           <div class="flex flex-col gap-2">
-            <label>Options:</label>
-            <div class="flex flex-wrap gap-3">
-              <div class="flex align-items-center">
-                <RadioButton
-                  v-model="domainOption"
-                  inputId="filter-domain"
-                  name="filter domain"
-                  value="0"
-                />
-                <label
-                  for="filter-domain"
-                  class="ml-2"
-                  >Filter Domains</label
-                >
-              </div>
-              <div class="flex align-items-center">
-                <RadioButton
-                  v-model="domainOption"
-                  inputId="all-domain"
-                  name="all domain"
-                  value="1"
-                />
-                <label
-                  for="all-domain"
-                  class="ml-2"
-                  >All Domains</label
-                >
-              </div>
+            <label class="text-color text-base font-medium">Options:</label>
+            <div class="flex flex-col gap-3">
+              <Card
+                :pt="{
+                  body: { class: 'p-4' },
+                  title: { class: 'flex justify-between  text-base m-0 font-medium' },
+                  subtitle: {
+                    class: 'text-sm font-normal text-color-secondary m-0 pr-0 md:pr-[2.5rem]'
+                  }
+                }"
+              >
+                <template #title>
+                  <span class="text-base">Filter Domains</span>
+                  <RadioButton
+                    v-model="domainOption"
+                    inputId="filter-domain"
+                    name="filter domain"
+                    value="0"
+                  />
+                </template>
+              </Card>
+
+              <Card
+                :pt="{
+                  body: { class: 'p-4' },
+                  title: { class: 'flex justify-between  text-base m-0 font-medium' },
+                  subtitle: {
+                    class: 'text-sm font-normal text-color-secondary m-0 pr-0 md:pr-[2.5rem]'
+                  }
+                }"
+              >
+                <template #title>
+                  <span class="text-base">All Domains</span>
+                  <RadioButton
+                    v-model="domainOption"
+                    inputId="all-domain"
+                    name="all domain"
+                    value="1"
+                  />
+                </template>
+              </Card>
             </div>
           </div>
 
-          <div v-if="domainOption === '0'">
-            <label>Domains:</label>
+          <div
+            v-if="domainOption === '0'"
+            class="flex flex-col gap-2"
+          >
+            <label
+              for="domains"
+              class="text-color text-base font-medium"
+              >Domains:</label
+            >
             <PickList
               v-model="domains"
               listStyle="height:342px"
-              dataKey="domain_id"
+              dataKey="domainID"
               breakpoint="1400px"
             >
               <template #sourceheader>Available Domains</template>
@@ -114,12 +149,16 @@
               </template>
             </PickList>
           </div>
-
-          <!-- destionation -->
-          <h1 class="text-xl font-medium">Destination</h1>
-
-          <div class="flex flex-col gap-2">
-            <label>Endpoint Type: *</label>
+        </template>
+      </FormHorizontal>
+      <FormHorizontal title="Destination">
+        <template #inputs>
+          <div class="flex flex-col w-full sm:max-w-xs gap-2">
+            <label
+              for="id"
+              class="text-color text-base font-medium"
+              >Endpoint Type: *</label
+            >
             <Dropdown
               :class="{ 'p-invalid': errors.template }"
               v-model="endpoint"
@@ -136,14 +175,20 @@
             class="flex flex-col gap-3"
             v-if="endpoint === 'standard'"
           >
-            <div class="flex flex-col gap-2">
-              <label>Endpoint URL: *</label>
+            <div class="flex flex-col sm:max-w-lg w-full gap-2">
+              <label
+                for="endpointURL"
+                class="text-color text-base font-medium"
+                >Endpoint URL: *</label
+              >
               <InputText
                 v-model="endpointUrl"
                 type="text"
+                id="endpointURL"
                 placeholder="https://app.domain.com/"
                 :class="{ 'p-invalid': errors.endpointUrl }"
               />
+
               <small
                 id="endpoint-url-help"
                 class="p-error"
@@ -151,33 +196,45 @@
               >
             </div>
 
-            <label>Custom Headers:</label>
-            <div
-              class="p-inputgroup flex-1"
-              v-for="(header, index) in headers"
-              :key="index"
-            >
-              <InputText
-                v-model="header.value"
-                type="text"
-                placeholder="header-name: value"
-              />
+            <div class="flex flex-col sm:max-w-lg w-full gap-2">
+              <label
+                for="customHeaders"
+                class="text-color text-base font-medium"
+                >Custom Headers:</label
+              >
+              <div
+                class="p-inputgroup flex-1"
+                v-for="(header, index) in headers"
+                :key="index"
+              >
+                <InputText
+                  v-model="header.value"
+                  type="text"
+                  id="header-value"
+                  placeholder="header-name: value"
+                />
+                <ButtonPrimer
+                  icon="pi pi-times"
+                  severity="danger"
+                  v-if="header.deleted"
+                  @click="removeHeader(index)"
+                />
+              </div>
+
               <ButtonPrimer
-                icon="pi pi-times"
-                severity="danger"
-                v-if="header.deleted"
-                @click="removeHeader(index)"
+                label="Header"
+                @click="addHeader()"
               />
             </div>
-            <ButtonPrimer
-              label="Header"
-              @click="addHeader()"
-            />
 
             <h1 class="text-xl font-medium">Payload</h1>
 
-            <div class="flex flex-col gap-2">
-              <label>Max Size:</label>
+            <div class="flex flex-col sm:max-w-lg w-full gap-2">
+              <label
+                for="maxSize"
+                class="text-color text-base font-medium"
+                >Max Size: *</label
+              >
               <InputNumber
                 v-model="maxSize"
                 placeholder="1000000"
@@ -191,8 +248,12 @@
               >
             </div>
 
-            <div class="flex flex-col gap-2">
-              <label>Log Line Separator:</label>
+            <div class="flex flex-col sm:max-w-lg w-full gap-2">
+              <label
+                for="lineSeparator"
+                class="text-color text-base font-medium"
+                >Log Line Separator: *</label
+              >
               <InputText
                 v-model="lineSeparator"
                 type="text"
@@ -200,14 +261,18 @@
                 :class="{ 'p-invalid': errors.lineSeparator }"
               />
               <small
-                id="log-line-help"
+                id="max-size-help"
                 class="p-error"
                 >{{ errors.lineSeparator }}</small
               >
             </div>
 
-            <div class="flex flex-col gap-2">
-              <label>Payload Format:</label>
+            <div class="flex flex-col sm:max-w-lg w-full gap-2">
+              <label
+                for="payloadFormat"
+                class="text-color text-base font-medium"
+                >Payload Format: *</label
+              >
               <InputText
                 v-model="payloadFormat"
                 type="text"
@@ -227,8 +292,12 @@
             class="flex flex-col gap-3"
             v-if="endpoint === 'kafka'"
           >
-            <div class="flex flex-col gap-2">
-              <label>Bootstrap Servers: *</label>
+            <div class="flex flex-col sm:max-w-lg w-full gap-2">
+              <label
+                for="bootstrapSevers"
+                class="text-color text-base font-medium"
+                >Bootstrap Servers: *</label
+              >
               <InputText
                 v-model="bootstrapServers"
                 type="text"
@@ -242,8 +311,12 @@
               >
             </div>
 
-            <div class="flex flex-col gap-2">
-              <label>Kafka Topic:</label>
+            <div class="flex flex-col sm:max-w-lg w-full gap-2">
+              <label
+                for="kafkaTopic"
+                class="text-color text-base font-medium"
+                >Kafka Topic: *</label
+              >
               <InputText
                 v-model="kafkaTopic"
                 type="text"
@@ -256,33 +329,50 @@
               >
             </div>
 
-            <label>Use Transport Layer Security (TLS):</label>
-            <div class="flex flex-wrap gap-3">
-              <div class="flex align-items-center">
-                <RadioButton
-                  v-model="tlsOption"
-                  inputId="no"
-                  name="No"
-                  :value="false"
-                />
-                <label
-                  for="no"
-                  class="ml-2"
-                  >No</label
+            <div class="flex flex-col gap-2">
+              <label class="text-color text-base font-medium"
+                >Use Transport Layer Security (TLS):</label
+              >
+              <div class="flex flex-col gap-3">
+                <Card
+                  :pt="{
+                    body: { class: 'p-4' },
+                    title: { class: 'flex justify-between  text-base m-0 font-medium' },
+                    subtitle: {
+                      class: 'text-sm font-normal text-color-secondary m-0 pr-0 md:pr-[2.5rem]'
+                    }
+                  }"
                 >
-              </div>
-              <div class="flex align-items-center">
-                <RadioButton
-                  v-model="tlsOption"
-                  inputId="yes"
-                  name="Yes"
-                  :value="true"
-                />
-                <label
-                  for="yes"
-                  class="ml-2"
-                  >Yes</label
+                  <template #title>
+                    <span class="text-base">No</span>
+                    <RadioButton
+                      v-model="tlsOption"
+                      inputId="no"
+                      name="No"
+                      :value="false"
+                    />
+                  </template>
+                </Card>
+
+                <Card
+                  :pt="{
+                    body: { class: 'p-4' },
+                    title: { class: 'flex justify-between  text-base m-0 font-medium' },
+                    subtitle: {
+                      class: 'text-sm font-normal text-color-secondary m-0 pr-0 md:pr-[2.5rem]'
+                    }
+                  }"
                 >
+                  <template #title>
+                    <span class="text-base">Yes</span>
+                    <RadioButton
+                      v-model="tlsOption"
+                      inputId="yes"
+                      name="Yes"
+                      :value="true"
+                    />
+                  </template>
+                </Card>
               </div>
             </div>
           </div>
@@ -292,8 +382,12 @@
             class="flex flex-col gap-3"
             v-if="endpoint === 's3'"
           >
-            <div class="flex flex-col gap-2">
-              <label>Host URL: *</label>
+            <div class="flex flex-col sm:max-w-lg w-full gap-2">
+              <label
+                for="hostURL"
+                class="text-color text-base font-medium"
+                >Host URL: *</label
+              >
               <InputText
                 v-model="host"
                 type="text"
@@ -306,13 +400,16 @@
               >
             </div>
 
-            <div class="flex flex-col gap-2">
-              <label>Bucket Name: *</label>
+            <div class="flex flex-col sm:max-w-lg w-full gap-2">
+              <label
+                for="bucketName"
+                class="text-color text-base font-medium"
+                >Bucket Name: *</label
+              >
               <InputText
                 v-model="bucket"
                 type="text"
                 :class="{ 'p-invalid': errors.bucket }"
-                v-tooltip.top="{ value: errors.bucket, showDelay: 200 }"
               />
               <small
                 id="bucket-help"
@@ -321,8 +418,12 @@
               >
             </div>
 
-            <div class="flex flex-col gap-2">
-              <label>Region: *</label>
+            <div class="flex flex-col sm:max-w-lg w-full gap-2">
+              <label
+                for="region"
+                class="text-color text-base font-medium"
+                >Region: *</label
+              >
               <InputText
                 v-model="region"
                 type="text"
@@ -335,8 +436,12 @@
               >
             </div>
 
-            <div class="flex flex-col gap-2">
-              <label>Access Key: *</label>
+            <div class="flex flex-col sm:max-w-lg w-full gap-2">
+              <label
+                for="accessKey"
+                class="text-color text-base font-medium"
+                >Access Key: *</label
+              >
               <InputText
                 v-model="accessKey"
                 type="text"
@@ -349,8 +454,12 @@
               >
             </div>
 
-            <div class="flex flex-col gap-2">
-              <label>Secret Key: *</label>
+            <div class="flex flex-col sm:max-w-lg w-full gap-2">
+              <label
+                for="secretKey"
+                class="text-color text-base font-medium"
+                >Secret Key: *</label
+              >
               <InputText
                 v-model="secretKey"
                 type="text"
@@ -363,8 +472,12 @@
               >
             </div>
 
-            <div class="flex flex-col gap-2">
-              <label>Object Key Prefix:</label>
+            <div class="flex flex-col sm:max-w-lg w-full gap-2">
+              <label
+                for="objectKeyPrefix"
+                class="text-color text-base font-medium"
+                >Object Key Prefix: *</label
+              >
               <InputText
                 v-model="objectKey"
                 type="text"
@@ -377,15 +490,26 @@
               >
             </div>
 
-            <label>Content Type:</label>
-            <Dropdown
-              :class="{ 'p-invalid': errors.contentType }"
-              v-model="contentType"
-              :options="listContentType"
-              optionLabel="label"
-              optionValue="value"
-              class="w-full"
-            />
+            <div class="flex flex-col w-full sm:max-w-xs gap-2">
+              <label
+                for="contentType"
+                class="text-color text-base font-medium"
+                >Content Type: *</label
+              >
+              <Dropdown
+                :class="{ 'p-invalid': errors.contentType }"
+                v-model="contentType"
+                :options="listContentType"
+                optionLabel="label"
+                optionValue="value"
+                class="w-full"
+              />
+              <small
+                id="content-type"
+                class="p-error"
+                >{{ errors.contentType }}</small
+              >
+            </div>
           </div>
 
           <div
@@ -393,8 +517,12 @@
             class="flex flex-col gap-3"
             v-if="endpoint === 'big_query'"
           >
-            <div class="flex flex-col gap-2">
-              <label>Project ID: *</label>
+            <div class="flex flex-col sm:max-w-lg w-full gap-2">
+              <label
+                for="projectID"
+                class="text-color text-base font-medium"
+                >Project ID: *</label
+              >
               <InputText
                 v-model="projectID"
                 type="text"
@@ -407,8 +535,12 @@
               >
             </div>
 
-            <div class="flex flex-col gap-2">
-              <label>Dataset ID: *</label>
+            <div class="flex flex-col sm:max-w-lg w-full gap-2">
+              <label
+                for="datasetID"
+                class="text-color text-base font-medium"
+                >Dataset ID: *</label
+              >
               <InputText
                 v-model="datasetID"
                 type="text"
@@ -421,8 +553,12 @@
               >
             </div>
 
-            <div class="flex flex-col gap-2">
-              <label>Table ID: *</label>
+            <div class="flex flex-col sm:max-w-lg w-full gap-2">
+              <label
+                for="tableID"
+                class="text-color text-base font-medium"
+                >Table ID: *</label
+              >
               <InputText
                 v-model="tableID"
                 type="text"
@@ -435,8 +571,12 @@
               >
             </div>
 
-            <div class="flex flex-col gap-2">
-              <label>Service Account Key: *</label>
+            <div class="flex flex-col sm:max-w-lg w-full gap-2">
+              <label
+                for="serviceAccountKey"
+                class="text-color text-base font-medium"
+                >Service Account Key: *</label
+              >
               <Textarea
                 v-model="serviceAccountKey"
                 :class="{ 'p-invalid': errors.serviceAccountKey }"
@@ -456,8 +596,12 @@
             class="flex flex-col gap-3"
             v-if="endpoint === 'elasticsearch'"
           >
-            <div class="flex flex-col gap-2">
-              <label>Elasticsearch URL: *</label>
+            <div class="flex flex-col sm:max-w-lg w-full gap-2">
+              <label
+                for="elasticSearchURL"
+                class="text-color text-base font-medium"
+                >Elasticsearch URL: *</label
+              >
               <InputText
                 v-model="elasticsearchUrl"
                 type="text"
@@ -471,8 +615,12 @@
               >
             </div>
 
-            <div class="flex flex-col gap-2">
-              <label>API Key: *</label>
+            <div class="flex flex-col sm:max-w-lg w-full gap-2">
+              <label
+                for="apiKey"
+                class="text-color text-base font-medium"
+                >API Key: *</label
+              >
               <InputText
                 v-model="apiKey"
                 type="text"
@@ -491,8 +639,12 @@
             class="flex flex-col gap-3"
             v-if="endpoint === 'splunk'"
           >
-            <div class="flex flex-col gap-2">
-              <label>Splunk URL: *</label>
+            <div class="flex flex-col sm:max-w-lg w-full gap-2">
+              <label
+                for="splunkURL"
+                class="text-color text-base font-medium"
+                >Splunk URL: *</label
+              >
               <InputText
                 v-model="splunkUrl"
                 type="text"
@@ -506,8 +658,12 @@
               >
             </div>
 
-            <div class="flex flex-col gap-2">
-              <label>API Key: *</label>
+            <div class="flex flex-col sm:max-w-lg w-full gap-2">
+              <label
+                for="splunkApiKey"
+                class="text-color text-base font-medium"
+                >API Key: *</label
+              >
               <InputText
                 v-model="splunkApiKey"
                 type="text"
@@ -526,8 +682,12 @@
             class="flex flex-col gap-3"
             v-if="endpoint === 'aws_kinesis_firehose'"
           >
-            <div class="flex flex-col gap-2">
-              <label>Stream Name: *</label>
+            <div class="flex flex-col sm:max-w-lg w-full gap-2">
+              <label
+                for="streamName"
+                class="text-color text-base font-medium"
+                >Stream Name: *</label
+              >
               <InputText
                 v-model="streamName"
                 type="text"
@@ -540,8 +700,12 @@
               >
             </div>
 
-            <div class="flex flex-col gap-2">
-              <label>Region: *</label>
+            <div class="flex flex-col sm:max-w-lg w-full gap-2">
+              <label
+                for="region"
+                class="text-color text-base font-medium"
+                >Region: *</label
+              >
               <InputText
                 v-model="awsRegion"
                 type="text"
@@ -554,8 +718,12 @@
               >
             </div>
 
-            <div class="flex flex-col gap-2">
-              <label>Access Key: *</label>
+            <div class="flex flex-col sm:max-w-lg w-full gap-2">
+              <label
+                for="accessKey"
+                class="text-color text-base font-medium"
+                >Access Key: *</label
+              >
               <InputText
                 v-model="awsAccessKey"
                 type="text"
@@ -568,8 +736,12 @@
               >
             </div>
 
-            <div class="flex flex-col gap-2">
-              <label>Secret Key: *</label>
+            <div class="flex flex-col sm:max-w-lg w-full gap-2">
+              <label
+                for="accessKey"
+                class="text-color text-base font-medium"
+                >Secret Key: *</label
+              >
               <InputText
                 v-model="awsSecretKey"
                 type="text"
@@ -588,8 +760,12 @@
             class="flex flex-col gap-3"
             v-if="endpoint === 'datadog'"
           >
-            <div class="flex flex-col gap-2">
-              <label>Datadog URL: *</label>
+            <div class="flex flex-col sm:max-w-lg w-full gap-2">
+              <label
+                for="datadogURL"
+                class="text-color text-base font-medium"
+                >Datadog URL: *</label
+              >
               <InputText
                 v-model="datadogUrl"
                 type="text"
@@ -603,8 +779,12 @@
               >
             </div>
 
-            <div class="flex flex-col gap-2">
-              <label>API Key: *</label>
+            <div class="flex flex-col sm:max-w-lg w-full gap-2">
+              <label
+                for="apiKey"
+                class="text-color text-base font-medium"
+                >API Key: *</label
+              >
               <InputText
                 v-model="datadogApiKey"
                 type="text"
@@ -623,14 +803,17 @@
             class="flex flex-col gap-3"
             v-if="endpoint === 'qradar'"
           >
-            <div class="flex flex-col gap-2">
-              <label>QRadar URL: *</label>
+            <div class="flex flex-col sm:max-w-lg w-full gap-2">
+              <label
+                for="QRadarURL"
+                class="text-color text-base font-medium"
+                >QRadar URL: *</label
+              >
               <InputText
                 v-model="QRadarUrl"
                 type="text"
                 placeholder="https://qradar-trial-abcdef.qradar.ibmcloud.com:123456"
                 :class="{ 'p-invalid': errors.QRadarUrl }"
-                v-tooltip.top="{ value: errors.QRadarUrl, showDelay: 200 }"
               />
               <small
                 id="qradar-url-help"
@@ -645,8 +828,12 @@
             class="flex flex-col gap-3"
             v-if="endpoint === 'azure_monitor'"
           >
-            <div class="flex flex-col gap-2">
-              <label>Log Type: *</label>
+            <div class="flex flex-col sm:max-w-lg w-full gap-2">
+              <label
+                for="logType"
+                class="text-color text-base font-medium"
+                >Log Type: *</label
+              >
               <InputText
                 v-model="logType"
                 type="text"
@@ -659,8 +846,12 @@
               >
             </div>
 
-            <div class="flex flex-col gap-2">
-              <label>Shared Key: *</label>
+            <div class="flex flex-col sm:max-w-lg w-full gap-2">
+              <label
+                for="sharedKey"
+                class="text-color text-base font-medium"
+                >Shared Key: *</label
+              >
               <InputText
                 v-model="sharedKey"
                 type="text"
@@ -673,16 +864,24 @@
               >
             </div>
 
-            <div class="flex flex-col gap-2">
-              <label>Time Generated Field:</label>
+            <div class="flex flex-col sm:max-w-lg w-full gap-2">
+              <label
+                for="timeGeneratedField"
+                class="text-color text-base font-medium"
+                >Time Generated Field</label
+              >
               <InputText
                 v-model="generatedField"
                 type="text"
               />
             </div>
 
-            <div class="flex flex-col gap-2">
-              <label>Workspace ID: *</label>
+            <div class="flex flex-col sm:max-w-lg w-full gap-2">
+              <label
+                for="workspaceID"
+                class="text-color text-base font-medium"
+                >Workspace ID: *</label
+              >
               <InputText
                 v-model="workspaceID"
                 type="text"
@@ -701,8 +900,12 @@
             class="flex flex-col gap-3"
             v-if="endpoint === 'azure_blob_storage'"
           >
-            <div class="flex flex-col gap-2">
-              <label>Storage Account: *</label>
+            <div class="flex flex-col sm:max-w-lg w-full gap-2">
+              <label
+                for="storangeAccount"
+                class="text-color text-base font-medium"
+                >Storage Account: *</label
+              >
               <InputText
                 v-model="storageAccount"
                 type="text"
@@ -715,8 +918,12 @@
               >
             </div>
 
-            <div class="flex flex-col gap-2">
-              <label>Container Name: *</label>
+            <div class="flex flex-col sm:max-w-lg w-full gap-2">
+              <label
+                for="containerName"
+                class="text-color text-base font-medium"
+                >Container Name: *</label
+              >
               <InputText
                 v-model="containerName"
                 type="text"
@@ -729,8 +936,12 @@
               >
             </div>
 
-            <div class="flex flex-col gap-2">
-              <label>Blob SAS Token: *</label>
+            <div class="flex flex-col sm:max-w-lg w-full gap-2">
+              <label
+                for="containerName"
+                class="text-color text-base font-medium"
+                >Blob SAS Token: *</label
+              >
               <InputText
                 v-model="blobToken"
                 type="text"
