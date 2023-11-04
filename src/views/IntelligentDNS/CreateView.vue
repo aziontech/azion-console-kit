@@ -8,7 +8,7 @@
   >
     <template #form>
       <FormHorizontal
-        title="Variables"
+        title="General"
         description="Espaço livre para descrição e instruções de preenchimento. Esse conteúdo deve ser criado pensando tanto em funcionalidade quanto em em alinhamento e estética. Devemos sempre criar os blocos conforme o contexto, cuidando sempre para não ter blocos muito longos."
       >
         <template #inputs>
