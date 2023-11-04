@@ -76,7 +76,7 @@ export default defineConfig({
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/api\/credentials/, '')
       },
-      '^/api/(account|user|token|switch-account)': {
+      '^/api/(account|user|token|switch-account|password)': {
         target: 'https://stage-sso.azion.com/api',
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/api/, ''),

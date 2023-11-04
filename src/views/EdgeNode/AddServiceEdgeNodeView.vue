@@ -7,32 +7,47 @@
     :cleanFormCallback="resetForm"
   >
     <template #form>
-      <div class="flex flex-col gap-4">
-        <Dropdown
-          v-model="serviceId"
-          :options="services"
-          placeholder="Service"
-          optionLabel="name"
-          optionValue="serviceId"
-          class="!w-full"
-          :disabled="!services.length"
-        />
-        <div class="flex flex-col gap-2">
-          <label>Variables: </label>
-          <vue-monaco-editor
-            v-model:value="variables"
-            language="javascript"
-            theme="vs-dark"
-            class="min-h-[50vh]"
-            :options="editorOptions"
-          />
-        </div>
-      </div>
+      <FormHorizontal
+        title="Service"
+        description=""
+      >
+        <template #inputs>
+          <div class="flex flex-col gap-4">
+            <div class="flex flex-col w-full sm:max-w-xs gap-2">
+              <label
+                for="id"
+                class="text-color text-base font-medium"
+                >Service</label
+              >
+              <Dropdown
+                v-model="serviceId"
+                :options="services"
+                placeholder="Service"
+                optionLabel="name"
+                optionValue="serviceId"
+                class="!w-full"
+                :disabled="!services.length"
+              />
+            </div>
+            <div class="flex flex-col gap-2">
+              <label>Variables: </label>
+              <vue-monaco-editor
+                v-model:value="variables"
+                language="javascript"
+                theme="vs-dark"
+                class="min-h-[50vh]"
+                :options="editorOptions"
+              />
+            </div>
+          </div>
+        </template>
+      </FormHorizontal>
     </template>
   </CreateFormBlock>
 </template>
 <script>
-  import CreateFormBlock from '@/templates/create-form-block'
+  import CreateFormBlock from '@/templates/create-form-block-new'
+  import FormHorizontal from '@/templates/create-form-block-new/form-horizontal'
 
   import { useForm, useField } from 'vee-validate'
   import * as yup from 'yup'
@@ -42,7 +57,8 @@
     name: 'add-service',
     components: {
       Dropdown,
-      CreateFormBlock
+      CreateFormBlock,
+      FormHorizontal
     },
     props: {
       addEdgeNodeService: {

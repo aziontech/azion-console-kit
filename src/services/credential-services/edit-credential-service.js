@@ -35,13 +35,8 @@ const extractErrorKey = (errorSchema, key) => {
  * @returns {string} The result message based on the status code.
  */
 const extractApiError = (httpResponse) => {
-  const alreadyUsedKeyError = extractErrorKey(httpResponse.body, 'non_field_errors')
-  const invalidKeyCharacterError = extractErrorKey(httpResponse.body, 'key')
-  const invalidValueCharacterError = extractErrorKey(httpResponse.body, 'value')
-
-  const errorMessages = [alreadyUsedKeyError, invalidKeyCharacterError, invalidValueCharacterError]
-  const errorMessage = errorMessages.find((error) => !!error)
-  return errorMessage
+  const errors = extractErrorKey(httpResponse.body, 'errors')
+  return errors
 }
 
 /**
