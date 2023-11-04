@@ -1,14 +1,6 @@
 <template>
   <div>
-    <div class="flex justify-end">
-      <PrimeButton
-        @click="navigateToAddPage"
-        icon="pi pi-plus"
-        :label="addButtonLabel"
-        v-if="addButtonLabel"
-      />
-    </div>
-    <div class="max-w-screen-sm lg:max-w-7xl mx-auto">
+    <div class="max-w-full mx-3 mb-8 mt-8">
       <DataTable
         v-if="!isLoading"
         scrollable
@@ -23,8 +15,8 @@
         :loading="isLoading"
       >
         <template #header>
-          <div class="flex self-start">
-            <span class="p-input-icon-left">
+          <div class="flex flex-wrap justify-between gap-2 w-full">
+            <span class="p-input-icon-left max-sm:w-full">
               <i class="pi pi-search" />
               <InputText
                 class="w-full"
@@ -32,6 +24,13 @@
                 placeholder="Search"
               />
             </span>
+            <PrimeButton
+              class="max-sm:w-full"
+              @click="navigateToAddPage"
+              icon="pi pi-plus"
+              :label="addButtonLabel"
+              v-if="addButtonLabel"
+            />
           </div>
         </template>
 
