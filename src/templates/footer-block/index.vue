@@ -49,7 +49,7 @@
             @click="openDiscord"
           />
           <PrimeButton
-            icon="pi pi-twitter"
+            icon="ai ai-twitter"
             text
             size="small"
             v-tooltip.top="{ value: 'Twitter', showDelay: 200 }"
