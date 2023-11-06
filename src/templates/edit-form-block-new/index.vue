@@ -3,7 +3,8 @@
     <PageHeadingBlock :pageTitle="pageTitle" />
     <form
       @submit.prevent="handleSubmit"
-      class="w-full grow py-4 px-8 flex flex-col gap-8 mb-5"
+      class="w-full grow px-8 flex flex-col gap-8 mb-5"
+      :class="{ 'py-4': !hasTabs, 'pb-4': hasTabs }"
     >
       <slot name="form" />
 
@@ -58,6 +59,10 @@
       },
       backURL: {
         type: String,
+        required: false
+      },
+      hasTabs: {
+        type: Boolean,
         required: false
       }
     },
