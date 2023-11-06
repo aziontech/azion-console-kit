@@ -32,7 +32,7 @@ const adapt = (httpResponse, type) => {
       icon: getAccountTypeIcon(type),
       severity: 'info'
     },
-    clientID: '-',
+    clientID: account.client_id || '-',
     id: account.id.toString(),
     accountId: account.id.toString()
   }))
