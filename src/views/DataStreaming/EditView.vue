@@ -15,7 +15,7 @@
             <label
               for="name"
               class="text-color text-base font-medium"
-              >Name: *</label
+              >Name *</label
             >
             <InputText
               v-model="name"
@@ -34,7 +34,7 @@
             <label
               for="dataSource"
               class="text-color text-base font-medium"
-              >Data Source: *</label
+              >Data Source *</label
             >
             <Dropdown
               :class="{ 'p-invalid': errors.dataSource }"
@@ -50,7 +50,7 @@
             <label
               for="template"
               class="text-color text-base font-medium"
-              >Template: *</label
+              >Template *</label
             >
             <Dropdown
               :class="{ 'p-invalid': errors.template }"
@@ -66,7 +66,7 @@
             <label
               for="dataset"
               class="text-color text-base font-medium"
-              >Data Set:</label
+              >Data Set</label
             >
             <vue-monaco-editor
               v-model:value="dataSet"
@@ -79,7 +79,7 @@
 
           <!-- domains -->
           <div class="flex flex-col gap-2">
-            <label class="text-color text-base font-medium">Options:</label>
+            <label class="text-color text-base font-medium">Options</label>
             <div class="flex flex-col gap-3">
               <Card
                 :pt="{
@@ -130,7 +130,7 @@
             <label
               for="domains"
               class="text-color text-base font-medium"
-              >Domains:</label
+              >Domains</label
             >
             <PickList
               v-model="domains"
@@ -157,7 +157,7 @@
             <label
               for="id"
               class="text-color text-base font-medium"
-              >Endpoint Type: *</label
+              >Endpoint Type *</label
             >
             <Dropdown
               :class="{ 'p-invalid': errors.template }"
@@ -179,7 +179,7 @@
               <label
                 for="endpointURL"
                 class="text-color text-base font-medium"
-                >Endpoint URL: *</label
+                >Endpoint URL *</label
               >
               <InputText
                 v-model="endpointUrl"
@@ -200,7 +200,7 @@
               <label
                 for="customHeaders"
                 class="text-color text-base font-medium"
-                >Custom Headers:</label
+                >Custom Headers</label
               >
               <div
                 class="p-inputgroup flex-1"
@@ -233,7 +233,7 @@
               <label
                 for="maxSize"
                 class="text-color text-base font-medium"
-                >Max Size: *</label
+                >Max Size *</label
               >
               <InputNumber
                 v-model="maxSize"
@@ -252,7 +252,7 @@
               <label
                 for="lineSeparator"
                 class="text-color text-base font-medium"
-                >Log Line Separator: *</label
+                >Log Line Separator *</label
               >
               <InputText
                 v-model="lineSeparator"
@@ -271,7 +271,7 @@
               <label
                 for="payloadFormat"
                 class="text-color text-base font-medium"
-                >Payload Format: *</label
+                >Payload Format *</label
               >
               <InputText
                 v-model="payloadFormat"
@@ -296,7 +296,7 @@
               <label
                 for="bootstrapSevers"
                 class="text-color text-base font-medium"
-                >Bootstrap Servers: *</label
+                >Bootstrap Servers *</label
               >
               <InputText
                 v-model="bootstrapServers"
@@ -315,7 +315,7 @@
               <label
                 for="kafkaTopic"
                 class="text-color text-base font-medium"
-                >Kafka Topic: *</label
+                >Kafka Topic *</label
               >
               <InputText
                 v-model="kafkaTopic"
@@ -331,7 +331,7 @@
 
             <div class="flex flex-col gap-2">
               <label class="text-color text-base font-medium"
-                >Use Transport Layer Security (TLS):</label
+                >Use Transport Layer Security (TLS)</label
               >
               <div class="flex flex-col gap-3">
                 <Card
@@ -386,7 +386,7 @@
               <label
                 for="hostURL"
                 class="text-color text-base font-medium"
-                >Host URL: *</label
+                >Host URL *</label
               >
               <InputText
                 v-model="host"
@@ -404,7 +404,7 @@
               <label
                 for="bucketName"
                 class="text-color text-base font-medium"
-                >Bucket Name: *</label
+                >Bucket Name *</label
               >
               <InputText
                 v-model="bucket"
@@ -422,7 +422,7 @@
               <label
                 for="region"
                 class="text-color text-base font-medium"
-                >Region: *</label
+                >Region *</label
               >
               <InputText
                 v-model="region"
@@ -440,7 +440,7 @@
               <label
                 for="accessKey"
                 class="text-color text-base font-medium"
-                >Access Key: *</label
+                >Access Key *</label
               >
               <InputText
                 v-model="accessKey"
@@ -458,7 +458,7 @@
               <label
                 for="secretKey"
                 class="text-color text-base font-medium"
-                >Secret Key: *</label
+                >Secret Key *</label
               >
               <InputText
                 v-model="secretKey"
@@ -476,7 +476,7 @@
               <label
                 for="objectKeyPrefix"
                 class="text-color text-base font-medium"
-                >Object Key Prefix: *</label
+                >Object Key Prefix *</label
               >
               <InputText
                 v-model="objectKey"
@@ -494,7 +494,7 @@
               <label
                 for="contentType"
                 class="text-color text-base font-medium"
-                >Content Type: *</label
+                >Content Type *</label
               >
               <Dropdown
                 :class="{ 'p-invalid': errors.contentType }"
@@ -521,7 +521,7 @@
               <label
                 for="projectID"
                 class="text-color text-base font-medium"
-                >Project ID: *</label
+                >Project ID *</label
               >
               <InputText
                 v-model="projectID"
@@ -539,7 +539,7 @@
               <label
                 for="datasetID"
                 class="text-color text-base font-medium"
-                >Dataset ID: *</label
+                >Dataset ID *</label
               >
               <InputText
                 v-model="datasetID"
@@ -557,7 +557,7 @@
               <label
                 for="tableID"
                 class="text-color text-base font-medium"
-                >Table ID: *</label
+                >Table ID *</label
               >
               <InputText
                 v-model="tableID"
@@ -575,7 +575,7 @@
               <label
                 for="serviceAccountKey"
                 class="text-color text-base font-medium"
-                >Service Account Key: *</label
+                >Service Account Key *</label
               >
               <Textarea
                 v-model="serviceAccountKey"
@@ -600,7 +600,7 @@
               <label
                 for="elasticSearchURL"
                 class="text-color text-base font-medium"
-                >Elasticsearch URL: *</label
+                >Elasticsearch URL *</label
               >
               <InputText
                 v-model="elasticsearchUrl"
@@ -619,7 +619,7 @@
               <label
                 for="apiKey"
                 class="text-color text-base font-medium"
-                >API Key: *</label
+                >API Key *</label
               >
               <InputText
                 v-model="apiKey"
@@ -643,7 +643,7 @@
               <label
                 for="splunkURL"
                 class="text-color text-base font-medium"
-                >Splunk URL: *</label
+                >Splunk URL *</label
               >
               <InputText
                 v-model="splunkUrl"
@@ -662,7 +662,7 @@
               <label
                 for="splunkApiKey"
                 class="text-color text-base font-medium"
-                >API Key: *</label
+                >API Key *</label
               >
               <InputText
                 v-model="splunkApiKey"
@@ -686,7 +686,7 @@
               <label
                 for="streamName"
                 class="text-color text-base font-medium"
-                >Stream Name: *</label
+                >Stream Name *</label
               >
               <InputText
                 v-model="streamName"
@@ -704,7 +704,7 @@
               <label
                 for="region"
                 class="text-color text-base font-medium"
-                >Region: *</label
+                >Region *</label
               >
               <InputText
                 v-model="awsRegion"
@@ -722,7 +722,7 @@
               <label
                 for="accessKey"
                 class="text-color text-base font-medium"
-                >Access Key: *</label
+                >Access Key *</label
               >
               <InputText
                 v-model="awsAccessKey"
@@ -740,7 +740,7 @@
               <label
                 for="accessKey"
                 class="text-color text-base font-medium"
-                >Secret Key: *</label
+                >Secret Key *</label
               >
               <InputText
                 v-model="awsSecretKey"
@@ -764,7 +764,7 @@
               <label
                 for="datadogURL"
                 class="text-color text-base font-medium"
-                >Datadog URL: *</label
+                >Datadog URL *</label
               >
               <InputText
                 v-model="datadogUrl"
@@ -783,7 +783,7 @@
               <label
                 for="apiKey"
                 class="text-color text-base font-medium"
-                >API Key: *</label
+                >API Key *</label
               >
               <InputText
                 v-model="datadogApiKey"
@@ -807,7 +807,7 @@
               <label
                 for="QRadarURL"
                 class="text-color text-base font-medium"
-                >QRadar URL: *</label
+                >QRadar URL *</label
               >
               <InputText
                 v-model="QRadarUrl"
@@ -832,7 +832,7 @@
               <label
                 for="logType"
                 class="text-color text-base font-medium"
-                >Log Type: *</label
+                >Log Type *</label
               >
               <InputText
                 v-model="logType"
@@ -850,7 +850,7 @@
               <label
                 for="sharedKey"
                 class="text-color text-base font-medium"
-                >Shared Key: *</label
+                >Shared Key *</label
               >
               <InputText
                 v-model="sharedKey"
@@ -880,7 +880,7 @@
               <label
                 for="workspaceID"
                 class="text-color text-base font-medium"
-                >Workspace ID: *</label
+                >Workspace ID *</label
               >
               <InputText
                 v-model="workspaceID"
@@ -904,7 +904,7 @@
               <label
                 for="storangeAccount"
                 class="text-color text-base font-medium"
-                >Storage Account: *</label
+                >Storage Account *</label
               >
               <InputText
                 v-model="storageAccount"
@@ -922,7 +922,7 @@
               <label
                 for="containerName"
                 class="text-color text-base font-medium"
-                >Container Name: *</label
+                >Container Name *</label
               >
               <InputText
                 v-model="containerName"
@@ -940,7 +940,7 @@
               <label
                 for="containerName"
                 class="text-color text-base font-medium"
-                >Blob SAS Token: *</label
+                >Blob SAS Token *</label
               >
               <InputText
                 v-model="blobToken"
