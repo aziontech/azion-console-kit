@@ -976,6 +976,7 @@
   import ButtonPrimer from 'primevue/button'
   import InputNumber from 'primevue/inputnumber'
   import Textarea from 'primevue/textarea'
+  import Card from 'primevue/card'
 
   const props = defineProps({
     listDataStreamingTemplateService: {
