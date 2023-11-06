@@ -10,7 +10,7 @@
       class="flex flex-col gap-3 lg:gap-4 items-center lg:flex lg:flex-row flex-none md-auto md:flex-1"
     >
       <div class="w-full flex flex-col md:flex-row gap-3 justify-center items-center">
-        <div class="flex gap-1 lg:pl-[9%] pl-0">
+        <div class="flex gap-1 lg:pl-[16%] pl-0">
           <PrimeButton
             label="About"
             link
@@ -72,6 +72,7 @@
             :autoOptionFocus="false"
             :pt="{
               root: {
+                class: 'w-[7.4rem]',
                 style: 'background: var(--surface-section) !important'
               },
               item: { class: 'w-full text-sm' },
