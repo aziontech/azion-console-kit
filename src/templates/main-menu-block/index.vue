@@ -489,7 +489,7 @@
               { label: 'Account Settings', icon: 'pi pi-cog' },
               { label: 'Your Settings', icon: 'pi pi-user' },
               { label: 'Users Management', icon: 'pi pi-users' },
-              { label: 'Team Permissions', icon: 'pi pi-user-edit' },
+              { label: 'Team Permissions', icon: 'pi pi-user-edit', to: '/teams-permession' },
               { label: 'Billing & Subscriptions', icon: 'pi pi-credit-card' },
               { label: 'Credentials', icon: 'pi pi-id-card' },
               { label: 'Activity History', icon: 'pi pi-history', to: '/activity-history' },
@@ -628,7 +628,7 @@
           },
           {
             label: 'Teams Permissions',
-            to: '/teams'
+            to: '/teams-permession'
           },
           { separator: true }
         ],
