@@ -1,5 +1,6 @@
 import * as IntelligentDNSService from '@/services/intelligent-dns-services'
 import * as IntelligentDNSRecordsService from '@/services/intelligent-dns-records-services'
+import * as Helpers from '@/helpers'
 
 /** @type {import('vue-router').RouteRecordRaw} */
 export const intelligentDnsRoutes = {
@@ -12,7 +13,8 @@ export const intelligentDnsRoutes = {
       component: () => import('@views/IntelligentDNS/ListView.vue'),
       props: {
         listIntelligentDNSService: IntelligentDNSService.listIntelligentDNSService,
-        deleteIntelligentDNSService: IntelligentDNSService.deleteIntelligentDNSService
+        deleteIntelligentDNSService: IntelligentDNSService.deleteIntelligentDNSService,
+        documentationService: Helpers.documentationCatalog.intelligentDNS
       },
       meta: {
         breadCrumbs: [
