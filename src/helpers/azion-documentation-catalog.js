@@ -3,5 +3,6 @@ import { azionDocumentationWindowOpener } from './azion-documentation-window-ope
 export const documentationCatalog = {
   resources: () => azionDocumentationWindowOpener(''),
   variables: () => azionDocumentationWindowOpener('variables'),
-  edgeServices: () => azionDocumentationWindowOpener('edge services')
+  edgeServices: () => azionDocumentationWindowOpener('edge services'),
+  intelligentDNS: () => azionDocumentationWindowOpener('intelligent-dns')
 }

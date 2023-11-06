@@ -51,21 +51,19 @@ describe('CreateCredentialServices', () => {
 
   it.each([
     {
-      scenario: 'already used name',
-      apiErrorMock: 'already used name',
-      errorKey: 'non_field_errors'
+      errorKey: 'errors',
+      apiErrorMock: 'The name of the Credential cannot be empty. Try again',
+      status: 422
     },
     {
-      scenario: 'invalid character is used in name field',
-      apiErrorMock: 'invalid key',
-      errorKey: 'key'
+      errorKey: 'errors',
+      apiErrorMock: 'Your request does not have a valid body',
+      status: 400
     }
-  ])('Should return an API error for an $scenario', async ({ errorKey, apiErrorMock }) => {
+  ])('Should return an API error for an $status', async ({ errorKey, apiErrorMock, status }) => {
     vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
-      statusCode: 400,
-      body: {
-        [errorKey]: [apiErrorMock]
-      }
+      statusCode: status,
+      body: { [errorKey]: [apiErrorMock] }
     })
     const { sut } = makeSut()
 

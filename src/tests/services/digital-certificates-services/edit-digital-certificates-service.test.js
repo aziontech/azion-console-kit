@@ -11,6 +11,9 @@ const fixture = {
       '-----BEGIN CERTIFICATE-----\nMIIE... (certificate content) ...\n-----END CERTIFICATE-----',
     privateKey:
       '-----BEGIN PRIVATE KEY-----\nMIIE... (private key content) ...\n-----END PRIVATE KEY-----'
+  },
+  errorMock: {
+    error: ['Error Message']
   }
 }
 
@@ -25,7 +28,7 @@ const makeSut = () => {
 describe('DigitalCertificatesServices', () => {
   it('should call api with correct params', async () => {
     const requestSpy = vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
-      statusCode: 202
+      statusCode: 200
     })
     const { sut } = makeSut()
 
@@ -44,19 +47,19 @@ describe('DigitalCertificatesServices', () => {
 
   it('should return a feedback message on successfully updated', async () => {
     vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
-      statusCode: 202
+      statusCode: 200
     })
     const { sut } = makeSut()
 
-    const feedbackMessage = await sut(fixture.payloadMock)
+    const feedbackMessage = sut(fixture.payloadMock)
 
-    expect(feedbackMessage).toBe('Resource successfully updated')
+    expect(feedbackMessage).resolves.toBe('Your digital certificate has been updated!')
   })
 
   it.each([
     {
       statusCode: 400,
-      expectedError: new Errors.InvalidApiRequestError().message
+      expectedError: fixture.errorMock[0]
     },
     {
       statusCode: 401,
@@ -82,13 +85,14 @@ describe('DigitalCertificatesServices', () => {
     'should throw when request fails with statusCode $statusCode',
     async ({ statusCode, expectedError }) => {
       vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
-        statusCode
+        statusCode,
+        body: fixture.errorMock
       })
       const { sut } = makeSut()
 
       const response = sut(fixture.payloadMock)
 
-      expect(response).rejects.toBe(expectedError)
+      expect(response).rejects.toThrow(expectedError)
     }
   )
 })

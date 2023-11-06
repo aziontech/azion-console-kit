@@ -7,8 +7,9 @@
     :cleanFormCallback="resetForm"
   >
     <template #form>
-      <FormHorizontal title="General"
-      description="Espaço livre para descrição e instruções de preenchimento. Esse conteúdo deve ser criado pensando tanto em funcionalidade quanto em em alinhamento e estética. Devemos sempre criar os blocos conforme o contexto, cuidando sempre para não ter blocos muito longos."
+      <FormHorizontal
+        title="General"
+        description="Espaço livre para descrição e instruções de preenchimento. Esse conteúdo deve ser criado pensando tanto em funcionalidade quanto em em alinhamento e estética. Devemos sempre criar os blocos conforme o contexto, cuidando sempre para não ter blocos muito longos."
       >
         <template #inputs>
           <div class="flex flex-col sm:max-w-lg w-full gap-2">
@@ -22,108 +23,129 @@
               v-bind="digitalCertificateName"
               type="text"
               id="name"
-              :class="{ 'p-invalid': errors.key }"
+              :class="{ 'p-invalid': errors.digitalCertificateName }"
               v-tooltip.top="{ value: errors.digitalCertificateName, showDelay: 200 }"
             />
+            <small
+              v-if="errors.digitalCertificateName"
+              class="p-error text-xs font-normal leading-tight"
+              >{{ errors.digitalCertificateName }}</small
+            >
           </div>
           <div class="flex flex-col sm:max-w-lg w-full gap-3">
             <Card
-               :pt="{
-                 body: { class: 'p-4' },
-                 title: { class: 'flex justify-between  text-base m-0 font-medium' },
-                 subtitle: { class: 'text-sm font-normal text-color-secondary m-0 pr-0 md:pr-[2.5rem]' }
-               }"
-             >
-               <template #title>
-                 <span class="text-base">Edge Certificate</span>
-                 <RadioButton
+              :pt="{
+                body: { class: 'p-4' },
+                title: { class: 'flex justify-between  text-base m-0 font-medium' },
+                subtitle: {
+                  class: 'text-sm font-normal text-color-secondary m-0 pr-0 md:pr-[2.5rem]'
+                }
+              }"
+            >
+              <template #title>
+                <span class="text-base">Edge Certificate</span>
+                <RadioButton
                   v-model="certificateType"
                   inputId="certificateType1"
                   name="certificateType"
                   :value="certificateTypes.EDGE_CERTIFICATE"
-                 />
-               </template>
-             </Card>
-             <Card
-               :pt="{
-                 body: { class: 'p-4' },
-                 title: { class: 'flex justify-between  text-base m-0 font-medium' },
-                 subtitle: { class: 'text-sm font-normal text-color-secondary m-0 pr-0 md:pr-[2.5rem]' }
-               }"
-             >
-               <template #title>
-                 <span class="text-base">Trusted CA Certificate</span>
-                 <RadioButton
+                />
+              </template>
+            </Card>
+            <Card
+              :pt="{
+                body: { class: 'p-4' },
+                title: { class: 'flex justify-between  text-base m-0 font-medium' },
+                subtitle: {
+                  class: 'text-sm font-normal text-color-secondary m-0 pr-0 md:pr-[2.5rem]'
+                }
+              }"
+            >
+              <template #title>
+                <span class="text-base">Trusted CA Certificate</span>
+                <RadioButton
                   v-model="certificateType"
                   inputId="certificateType2"
                   name="certificateType"
                   :value="certificateTypes.TRUSTED"
-                 />
-               </template>
-             </Card>
+                />
+              </template>
+            </Card>
           </div>
         </template>
       </FormHorizontal>
-      <FormHorizontal 
-      title="Edge Certificate Type"
-      description="Espaço livre para descrição e instruções de preenchimento. Esse conteúdo deve ser criado pensando tanto em funcionalidade quanto em em alinhamento e estética. Devemos sempre criar os blocos conforme o contexto, cuidando sempre para não ter blocos muito longos."
-      v-if="certificateType === certificateTypes.EDGE_CERTIFICATE"
+      <FormHorizontal
+        title="Edge Certificate Type"
+        description="Espaço livre para descrição e instruções de preenchimento. Esse conteúdo deve ser criado pensando tanto em funcionalidade quanto em em alinhamento e estética. Devemos sempre criar os blocos conforme o contexto, cuidando sempre para não ter blocos muito longos."
+        v-if="certificateType === certificateTypes.EDGE_CERTIFICATE"
       >
         <template #inputs>
           <div class="flex flex-col sm:max-w-lg w-full gap-3">
             <Card
-               :pt="{
-                 body: { class: 'p-4' },
-                 title: { class: 'flex justify-between  text-base m-0 font-medium' },
-                 subtitle: { class: 'text-sm font-normal text-color-secondary m-0 pr-0 md:pr-[2.5rem]' }
-               }"
-             >
-               <template #title>
-                 <span class="text-base">Upload my certificate and private key</span>
-                 <RadioButton
+              :pt="{
+                body: { class: 'p-4' },
+                title: { class: 'flex justify-between  text-base m-0 font-medium' },
+                subtitle: {
+                  class: 'text-sm font-normal text-color-secondary m-0 pr-0 md:pr-[2.5rem]'
+                }
+              }"
+            >
+              <template #title>
+                <span class="text-base">Upload my certificate and private key</span>
+                <RadioButton
                   v-model="createCertificateType"
                   inputId="createCertificateType1"
                   name="createCertificateType"
                   :value="edgeCertificateTypes.UPLOAD"
-                 />
-               </template>
-             </Card>
-             <Card
-               :pt="{
-                 body: { class: 'p-4' },
-                 title: { class: 'flex justify-between  text-base m-0 font-medium' },
-                 subtitle: { class: 'text-sm font-normal text-color-secondary m-0 pr-0 md:pr-[2.5rem]' }
-               }"
-             >
-               <template #title>
-                 <span class="text-base">Generate CSR and private key with Azion</span>
-                 <RadioButton
+                />
+              </template>
+            </Card>
+            <Card
+              :pt="{
+                body: { class: 'p-4' },
+                title: { class: 'flex justify-between  text-base m-0 font-medium' },
+                subtitle: {
+                  class: 'text-sm font-normal text-color-secondary m-0 pr-0 md:pr-[2.5rem]'
+                }
+              }"
+            >
+              <template #title>
+                <span class="text-base">Generate CSR and private key with Azion</span>
+                <RadioButton
                   v-model="createCertificateType"
                   inputId="createCertificateType2"
                   name="createCertificateType"
                   :value="edgeCertificateTypes.CSR"
-                 />
-               </template>
-             </Card>
+                />
+              </template>
+            </Card>
           </div>
         </template>
       </FormHorizontal>
-      <FormHorizontal 
-        v-if="createCertificateType === edgeCertificateTypes.UPLOAD && certificateType === certificateTypes.EDGE_CERTIFICATE"
+      <FormHorizontal
+        v-if="
+          createCertificateType === edgeCertificateTypes.UPLOAD &&
+          certificateType === certificateTypes.EDGE_CERTIFICATE
+        "
         title="Use my certificate and private key"
         description="To upload your Digital Certificate to Azion servers, copy and paste your certificate and private key inside the fields below."
       >
         <template #inputs>
           <div class="flex flex-col sm:max-w-lg w-full gap-2">
             <label>Certificate:</label>
-              <PrimeTextarea
-                v-bind="certificate"
-                :class="{ 'p-invalid': errors.certificate }"
-                v-tooltip.top="{ value: errors.certificate, showDelay: 200 }"
-                placeholder="---BEGIN CERTIFICATE---"
-                rows="5"
-                cols="30"
-              />
+            <PrimeTextarea
+              v-bind="certificate"
+              :class="{ 'p-invalid': errors.certificate }"
+              v-tooltip.top="{ value: errors.certificate, showDelay: 200 }"
+              placeholder="---BEGIN CERTIFICATE---"
+              rows="5"
+              cols="30"
+            />
+            <small
+              v-if="errors.certificate"
+              class="p-error text-xs font-normal leading-tight"
+              >{{ errors.certificate }}</small
+            >
           </div>
           <div class="flex flex-col sm:max-w-lg w-full gap-2">
             <label>Private key:</label>
@@ -135,13 +157,21 @@
               rows="5"
               cols="30"
             />
+            <small
+              v-if="errors.privateKey"
+              class="p-error text-xs font-normal leading-tight"
+              >{{ errors.privateKey }}</small
+            >
           </div>
         </template>
       </FormHorizontal>
       <FormHorizontal
         title="Generating a Certificate Signing Request (CSR) with Azion"
         description="A Certificate Signing Request (CSR) is one of the first steps towards getting your own SSL/TLS certificate."
-        v-if="createCertificateType === edgeCertificateTypes.CSR  && certificateType === certificateTypes.EDGE_CERTIFICATE"
+        v-if="
+          createCertificateType === edgeCertificateTypes.CSR &&
+          certificateType === certificateTypes.EDGE_CERTIFICATE
+        "
       >
         <template #inputs>
           <div class="flex flex-col sm:max-w-lg w-full gap-2">
@@ -153,7 +183,11 @@
               :class="{ 'p-invalid': errors.common }"
               v-tooltip.top="{ value: errors.common, showDelay: 200 }"
             />
-  
+            <small
+              v-if="errors.common"
+              class="p-error text-xs font-normal leading-tight"
+              >{{ errors.common }}</small
+            >
           </div>
           <div class="flex flex-col sm:max-w-lg w-full gap-2">
             <label>Country / Region: *</label>
@@ -163,6 +197,11 @@
               :class="{ 'p-invalid': errors.country }"
               v-tooltip.top="{ value: errors.country, showDelay: 200 }"
             />
+            <small
+              v-if="errors.country"
+              class="p-error text-xs font-normal leading-tight"
+              >{{ errors.country }}</small
+            >
           </div>
           <div class="flex flex-col sm:max-w-lg w-full gap-2">
             <label>State / Province: *</label>
@@ -172,6 +211,11 @@
               :class="{ 'p-invalid': errors.state }"
               v-tooltip.top="{ value: errors.state, showDelay: 200 }"
             />
+            <small
+              v-if="errors.state"
+              class="p-error text-xs font-normal leading-tight"
+              >{{ errors.state }}</small
+            >
           </div>
           <div class="flex flex-col sm:max-w-lg w-full gap-2">
             <label>City / Locality: *</label>
@@ -181,6 +225,11 @@
               :class="{ 'p-invalid': errors.city }"
               v-tooltip.top="{ value: errors.city, showDelay: 200 }"
             />
+            <small
+              v-if="errors.city"
+              class="p-error text-xs font-normal leading-tight"
+              >{{ errors.city }}</small
+            >
           </div>
           <div class="flex flex-col sm:max-w-lg w-full gap-2">
             <label>Organization: *</label>
@@ -190,6 +239,11 @@
               :class="{ 'p-invalid': errors.organization }"
               v-tooltip.top="{ value: errors.organization, showDelay: 200 }"
             />
+            <small
+              v-if="errors.organization"
+              class="p-error text-xs font-normal leading-tight"
+              >{{ errors.organization }}</small
+            >
           </div>
           <div class="flex flex-col sm:max-w-lg w-full gap-2">
             <label>Organization Unit: *</label>
@@ -199,8 +253,13 @@
               :class="{ 'p-invalid': errors.organizationUnity }"
               v-tooltip.top="{ value: errors.organizationUnity, showDelay: 200 }"
             />
+            <small
+              v-if="errors.organizationUnity"
+              class="p-error text-xs font-normal leading-tight"
+              >{{ errors.organizationUnity }}</small
+            >
           </div>
-          <div class="flex flex-col sm:max-w-lg w-full gap-2">       
+          <div class="flex flex-col sm:max-w-lg w-full gap-2">
             <label>Email: *</label>
             <InputText
               v-bind="email"
@@ -208,6 +267,11 @@
               :class="{ 'p-invalid': errors.email }"
               v-tooltip.top="{ value: errors.email, showDelay: 200 }"
             />
+            <small
+              v-if="errors.email"
+              class="p-error text-xs font-normal leading-tight"
+              >{{ errors.email }}</small
+            >
           </div>
           <div class="flex flex-col sm:max-w-lg w-full gap-2">
             <label>Private Key Type: *</label>
@@ -218,6 +282,11 @@
               :class="{ 'p-invalid': errors.privateKeyType }"
               v-tooltip.top="{ value: errors.privateKeyType, showDelay: 200 }"
             />
+            <small
+              v-if="errors.privateKeyType"
+              class="p-error text-xs font-normal leading-tight"
+              >{{ errors.privateKeyType }}</small
+            >
           </div>
           <div class="flex flex-col sm:max-w-lg w-full gap-2">
             <label>Subject Alternative Names (SAN):</label>
@@ -232,6 +301,11 @@ support.example.com"
               rows="5"
               cols="30"
             />
+            <small
+              v-if="errors.subjectAlternativeNames"
+              class="p-error text-xs font-normal leading-tight"
+              >{{ errors.subjectAlternativeNames }}</small
+            >
           </div>
         </template>
       </FormHorizontal>
@@ -253,6 +327,11 @@ support.example.com"
               cols="30"
             />
             <small>Tip: It's possible to include intermediate certificates.</small>
+            <small
+              v-if="errors.certificate"
+              class="p-error text-xs font-normal leading-tight"
+              >{{ errors.certificate }}</small
+            >
           </div>
         </template>
       </FormHorizontal>
@@ -306,7 +385,7 @@ support.example.com"
 
       const CSRRequiredField = {
         is: edgeCertificateTypes.CSR,
-        then: (schema) => schema.required()
+        then: (schema) => schema.required('Field Required')
       }
       const certificateRequiredField = (createCertificateType, certificateType) => {
         const isUploadCertificate = createCertificateType === edgeCertificateTypes.UPLOAD
@@ -316,16 +395,16 @@ support.example.com"
       }
 
       const validationSchema = yup.object({
-        digitalCertificateName: yup.string().required(),
+        digitalCertificateName: yup.string().required('Name is a required field.'),
 
         // Certificate Choices
-        certificateType: yup.string().required(),
-        createCertificateType: yup.string().required(),
+        certificateType: yup.string().required('Certificate Type is required.'),
+        createCertificateType: yup.string().required('Certificate Type is a required field.'),
 
         // Edge Certificate Fields
         certificate: yup.string().when(['createCertificateType', 'certificateType'], {
           is: certificateRequiredField,
-          then: (schema) => schema.required()
+          then: (schema) => schema.required('Certificate is a required field.')
         }),
         privateKey: yup.string(),
 
@@ -348,11 +427,15 @@ support.example.com"
           .label('subject alternative names (SAN)'),
         country: yup.string().when('createCertificateType', {
           is: edgeCertificateTypes.CSR,
-          then: (schema) => schema.required().max(2).min(2)
+          then: (schema) =>
+            schema
+              .required('Country is a required field.')
+              .max(2, 'Country must be 2 characters.')
+              .min(2, 'Country must be 2 characters.')
         }),
         email: yup.string().when('createCertificateType', {
           is: edgeCertificateTypes.CSR,
-          then: (schema) => schema.required().email()
+          then: (schema) => schema.required('Email is a required field.').email()
         })
       })
 

@@ -25,7 +25,7 @@ const parseHttpResponse = (httpResponse) => {
       return 'Your variable has been created'
     case 400:
       const apiError = extractApiError(httpResponse)
-      throw new Error(apiError)
+      throw new Error(apiError).message
     case 401:
       throw new Errors.InvalidApiTokenError().message
     case 403:

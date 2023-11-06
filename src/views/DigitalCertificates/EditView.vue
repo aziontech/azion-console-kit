@@ -8,10 +8,10 @@
     :formData="values"
   >
     <template #form>
-      <FormHorizontal 
-      v-if="csr.modelValue"
-      title="Digital Certificate"
-      description="To upload your Digital Certificate to Azion servers, copy and paste your certificate inside the field below."
+      <FormHorizontal
+        v-if="csr.modelValue"
+        title="Digital Certificate"
+        description="To upload your Digital Certificate to Azion servers, copy and paste your certificate inside the field below."
       >
         <template #inputs>
           <div class="flex flex-col sm:max-w-lg w-full gap-2">
@@ -23,6 +23,11 @@
               :class="{ 'p-invalid': errors.name }"
               v-tooltip.top="{ value: errors.name, showDelay: 200 }"
             />
+            <small
+              v-if="errors.name"
+              class="p-error text-xs font-normal leading-tight"
+              >{{ errors.name }}</small
+            >
           </div>
           <div class="flex flex-col sm:max-w-lg w-full gap-2">
             <label>Certificate:</label>
@@ -34,6 +39,11 @@
               rows="5"
               cols="30"
             />
+            <small
+              v-if="errors.certificate"
+              class="p-error text-xs font-normal leading-tight"
+              >{{ errors.certificate }}</small
+            >
           </div>
           <div class="flex flex-col sm:max-w-lg w-full gap-2">
             <label>Certificate Signing Request (CSR):</label>
@@ -45,6 +55,11 @@
               rows="5"
               cols="30"
             />
+            <small
+              v-if="errors.csr"
+              class="p-error text-xs font-normal leading-tight"
+              >{{ errors.csr }}</small
+            >
           </div>
           <div class="flex flex-col sm:max-w-lg w-full gap-2">
             <PrimeButton
@@ -58,10 +73,10 @@
           </div>
         </template>
       </FormHorizontal>
-      <FormHorizontal 
-      v-if="!csr.modelValue && certificateType === certificateTypes.EDGE_CERTIFICATE"
-      title="Use my certificate and private key"
-      description="To upload your Digital Certificate to Azion servers, copy and paste your certificate inside the field below."
+      <FormHorizontal
+        v-if="!csr.modelValue && certificateType === certificateTypes.EDGE_CERTIFICATE"
+        title="Use my certificate and private key"
+        description="To upload your Digital Certificate to Azion servers, copy and paste your certificate inside the field below."
       >
         <template #inputs>
           <div class="flex flex-col sm:max-w-lg w-full gap-2">
@@ -73,6 +88,11 @@
               :class="{ 'p-invalid': errors.name }"
               v-tooltip.top="{ value: errors.name, showDelay: 200 }"
             />
+            <small
+              v-if="errors.name"
+              class="p-error text-xs font-normal leading-tight"
+              >{{ errors.name }}</small
+            >
           </div>
           <div class="flex flex-col sm:max-w-lg w-full gap-2">
             <label>Certificate:</label>
@@ -84,8 +104,13 @@
               rows="5"
               cols="30"
             />
+            <small
+              v-if="errors.certificate"
+              class="p-error text-xs font-normal leading-tight"
+              >{{ errors.certificate }}</small
+            >
           </div>
-          <div class="flex flex-col sm:max-w-lg w-full gap-2">    
+          <div class="flex flex-col sm:max-w-lg w-full gap-2">
             <label>Private key:</label>
             <PrimeTextarea
               v-model="privateKey"
@@ -95,13 +120,18 @@
               rows="5"
               cols="30"
             />
+            <small
+              v-if="errors.privateKey"
+              class="p-error text-xs font-normal leading-tight"
+              >{{ errors.privateKey }}</small
+            >
           </div>
         </template>
       </FormHorizontal>
-      <FormHorizontal 
-      v-if="certificateType === certificateTypes.TRUSTED"
-      title="Use my Trusted CA Certificate"
-      description="Trusted Certificate Authority Certificate can be used for Mutual Transport Layer Security (mTLS) configuration on Domains. To upload your Trusted CA Certificate to Azion servers, copy your certificate code and paste it inside the field below."
+      <FormHorizontal
+        v-if="certificateType === certificateTypes.TRUSTED"
+        title="Use my Trusted CA Certificate"
+        description="Trusted Certificate Authority Certificate can be used for Mutual Transport Layer Security (mTLS) configuration on Domains. To upload your Trusted CA Certificate to Azion servers, copy your certificate code and paste it inside the field below."
       >
         <template #inputs>
           <div class="flex flex-col sm:max-w-lg w-full gap-2">
@@ -113,6 +143,11 @@
               :class="{ 'p-invalid': errors.name }"
               v-tooltip.top="{ value: errors.name, showDelay: 200 }"
             />
+            <small
+              v-if="errors.name"
+              class="p-error text-xs font-normal leading-tight"
+              >{{ errors.name }}</small
+            >
           </div>
           <div class="flex flex-col sm:max-w-lg w-full gap-2">
             <label>Certificate:</label>
@@ -125,16 +160,19 @@
               cols="30"
             />
             <small>Tip: It's possible to include intermediate certificates.</small>
+            <small
+              v-if="errors.certificate"
+              class="p-error text-xs font-normal leading-tight"
+              >{{ errors.certificate }}</small
+            >
           </div>
         </template>
       </FormHorizontal>
-
     </template>
   </EditFormBlock>
 </template>
 
 <script>
-
   import EditFormBlock from '@/templates/edit-form-block-new'
   import FormHorizontal from '@/templates/create-form-block-new/form-horizontal'
   import PrimeTextarea from 'primevue/textarea'
@@ -173,7 +211,7 @@
       }
 
       const validationSchema = yup.object({
-        name: yup.string().required(),
+        name: yup.string().required('Name is a required field.'),
         certificateType: yup.string(),
         csr: yup.string(),
         certificate: yup.string(),

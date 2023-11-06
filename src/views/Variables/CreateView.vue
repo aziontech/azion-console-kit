@@ -14,7 +14,7 @@
         <template #inputs>
           <div class="flex flex-col sm:max-w-lg w-full gap-2">
             <label
-              for="name"
+              for="key"
               class="text-color text-base font-medium"
               >Key *</label
             >
@@ -22,7 +22,7 @@
               placeholder="ex: GITHUB_API_KEY"
               v-bind="key"
               type="text"
-              id="name"
+              id="key"
               :class="{ 'p-invalid': errors.key }"
               v-tooltip.top="{ value: errors.key, showDelay: 200 }"
             />
@@ -35,13 +35,14 @@
 
           <div class="flex flex-col sm:max-w-lg w-full gap-2">
             <label
-              for="Value"
+              for="value"
               class="text-color text-base font-medium"
               >Value *</label
             >
             <InputText
               placeholder="ex: MY_GITHUB_API_VALUE"
               v-bind="value"
+              id="value"
               type="text"
               :class="{ 'p-invalid': errors.value }"
               v-tooltip.top="{ value: errors.value, showDelay: 200 }"

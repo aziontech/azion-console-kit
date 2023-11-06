@@ -51,23 +51,12 @@ describe('CredentialServices', () => {
     expect(feedbackMessage).toBe('Your credential has been updated')
   })
 
-  it.each([
-    {
-      scenario: 'already used name',
-      apiErrorMock: 'already used name',
-      errorKey: 'non_field_errors'
-    },
-    {
-      scenario: 'invalid character is used in name field',
-      apiErrorMock: 'invalid key',
-      errorKey: 'key'
-    }
-  ])('Should return an API error for an $scenario', async ({ errorKey, apiErrorMock }) => {
+  it('Should return an API error for an 400', async () => {
+    const apiErrorMock = 'Your request does not have a valid body'
+
     vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
       statusCode: 400,
-      body: {
-        [errorKey]: [apiErrorMock]
-      }
+      body: { errors: [apiErrorMock] }
     })
     const { sut } = makeSut()
 

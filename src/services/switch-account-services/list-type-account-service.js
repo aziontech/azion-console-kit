@@ -1,5 +1,6 @@
 import { AxiosHttpClientAdapter, parseHttpResponse } from '../axios/AxiosHttpClientAdapter'
 import { makeSwitchAccountBaseUrl } from '@/services/auth-services/make-switch-account-base-url'
+import { getAccountTypeIcon, getAccountTypeName } from '@/helpers/accountTypeNameMapping.js'
 
 export const listTypeAccountService = async ({
   type = 'brands',
@@ -22,30 +23,16 @@ export const listTypeAccountService = async ({
 const adapt = (httpResponse, type) => {
   const { results = [], total_pages: totalPages } = httpResponse.body || {}
 
-  const ICON_TYPE_ACCOUNT = {
-    clients: 'pi pi-box',
-    groups: 'pi pi-folder',
-    resellers: 'pi pi-building',
-    brands: 'pi pi-globe'
-  }
-
-  const NAME_TYPE_ACCOUNT = {
-    clients: 'Client',
-    groups: 'Group',
-    resellers: 'Reseller',
-    brands: 'Brand'
-  }
-
   const accounts = results.map((account) => ({
     name: {
       content: account.name
     },
     type: {
-      content: NAME_TYPE_ACCOUNT[type],
-      icon: ICON_TYPE_ACCOUNT[type],
-      severity: ''
+      content: getAccountTypeName(type),
+      icon: getAccountTypeIcon(type),
+      severity: 'info'
     },
-    client_id: '-',
+    clientID: account.client_id || '-',
     id: account.id.toString(),
     accountId: account.id.toString()
   }))
