@@ -7,7 +7,7 @@ export const validateMfaCode = async (token) => {
     url: `${makeMfaBaseUrl()}/validate`,
     method: 'POST',
     headers: {
-      token: token,
+      token: token
     }
   })
   httpResponse = adapt(httpResponse)
@@ -23,28 +23,28 @@ const adapt = (httpResponse) => {
 }
 
 export const parseHttpResponse = (httpResponse) => {
-  let error;
+  let error
   switch (httpResponse.statusCode) {
     case 200:
       return httpResponse?.body || null
     case 400:
-      error = new Error(httpResponse?.body?.detail || null);
-      break;
+      error = new Error(httpResponse?.body?.detail || null)
+      break
     case 401:
-      error = new Errors.InvalidApiTokenError();
-      break;
+      error = new Errors.InvalidApiTokenError()
+      break
     case 403:
-      error = new Errors.PermissionError();
-      break;
+      error = new Errors.PermissionError()
+      break
     case 404:
-      error = new Errors.NotFoundError();
-      break;
+      error = new Errors.NotFoundError()
+      break
     case 500:
-      error = new Errors.InternalServerError();
-      break;
+      error = new Errors.InternalServerError()
+      break
     default:
-      error = new Errors.UnexpectedError();
+      error = new Errors.UnexpectedError()
   }
-  error.statusCode = httpResponse.statusCode;
-  throw error;
+  error.statusCode = httpResponse.statusCode
+  throw error
 }
