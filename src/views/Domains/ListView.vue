@@ -29,7 +29,7 @@
           },
           {
             field: 'domainName',
-            header: 'Domain Name'
+            header: 'Domain Address'
           },
           {
             field: 'cnames',
@@ -48,7 +48,7 @@
 <template>
   <ListTableBlock
     pageTitle="Domains"
-    addButtonLabel="Add domains"
+    addButtonLabel="Add"
     createPagePath="domains/create"
     editPagePath="domains/edit"
     :listService="listDomainsService"

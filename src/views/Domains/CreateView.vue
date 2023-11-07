@@ -9,7 +9,7 @@
     <template #form>
       <form-horizontal
         title="General"
-        description=""
+        description="Create a domain with Azion to launch an edge application and set up security with digital certificates."
       >
         <template #inputs>
           <div class="flex flex-col sm:max-w-lg w-full gap-2">
@@ -19,7 +19,7 @@
               >Name *</label
             >
             <InputText
-              placeholder="Add Domain Name"
+              placeholder="Domain name"
               v-bind="name"
               id="name"
               type="text"
@@ -36,7 +36,9 @@
       </form-horizontal>
       <form-horizontal
         title="Settings"
-        description=""
+        description="Determine the edge application of the domain and its digital certificate. 
+        If you already own a domain, add it to the CNAME field and
+        block access to the application via the Azion domain."
       >
         <template #inputs>
           <div class="flex flex-col w-full sm:max-w-xs gap-2">
@@ -100,9 +102,8 @@
               />
             </template>
             <template #subtitle>
-              Check this field to make content only accessible through the domains defined in the
-              CNAME field. Access attempts made through Azion's domain (e.g. 10001a.hc.azioncdn.net)
-              will not go through.
+              Check this option to make your application accessible only through the domains listed in the
+              CNAME field. Attempts to access your application through the Azion domain will be blocked.
             </template>
           </Card>
           <div class="flex flex-col w-full sm:max-w-xs gap-2">
@@ -125,7 +126,8 @@
       </form-horizontal>
       <form-horizontal
         title="Mutual Authentication Settings"
-        description="The Mutual Authentication or mTLS, allows two parties authenticating each other at the same time in an authentication protocol."
+        description="Enable Mutual Authentication (mTLS) to require that both client and server
+        present an authentication protocol to each other."
       >
         <template #inputs>
           <Card
@@ -145,8 +147,7 @@
               />
             </template>
             <template #subtitle>
-              The Mutual Authentication or mTLS, allows two parties authenticating each other at the
-              same time in an authentication protocol.
+              Enable mTLS to allow simultaneous mutual authentication between client and server.
             </template>
           </Card>
           <div class="flex flex-col gap-2">
@@ -172,8 +173,8 @@
                   />
                 </template>
                 <template #subtitle>
-                  The Enforce option blocks the client's certificate during TLS handshake if we
-                  cannot validate with the uploaded Trusted CA.
+                  This option blocks the client certificate during the TLS handshake
+                  if the uploaded Trusted CA cannot be validated.
                 </template>
               </Card>
 
@@ -195,9 +196,9 @@
                   />
                 </template>
                 <template #subtitle>
-                  The Permissive option will attempt to verify the client's certificate, but will
-                  allow the TLS handshake even if the certificate cannot be validated. You can check
-                  the client certificate in Azion Firewall and conditionally block it.
+                  This option attempts to verify the client certificate, but will
+                  allow the TLS handshake even if the Trusted CA cannot be validated. You can check
+                  which client certificate attempted the request in Edge Firewall.
                 </template>
               </Card>
             </div>
