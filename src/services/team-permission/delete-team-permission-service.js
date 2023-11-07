@@ -1,10 +1,10 @@
 import { AxiosHttpClientAdapter } from '../axios/AxiosHttpClientAdapter'
-import { makeEdgeFunctionsBaseUrl } from './make-edge-functions-base-url'
+import { makeTeamPermissionBaseUrl } from './make-team-permission-base-url'
 import * as Errors from '@/services/axios/errors'
 
-export const deleteEdgeFunctionsService = async (id) => {
+export const deleteTeamPermissionService = async (teamPermissionId) => {
   let httpResponse = await AxiosHttpClientAdapter.request({
-    url: `${makeEdgeFunctionsBaseUrl()}/${id}`,
+    url: `${makeTeamPermissionBaseUrl()}/${teamPermissionId}/`,
     method: 'DELETE'
   })
 
@@ -20,7 +20,7 @@ export const deleteEdgeFunctionsService = async (id) => {
 const parseHttpResponse = (httpResponse) => {
   switch (httpResponse.statusCode) {
     case 204:
-      return 'Edge function successfully deleted'
+      return 'Team Permission successfully deleted'
     case 400:
       throw new Errors.NotFoundError().message
     case 401:

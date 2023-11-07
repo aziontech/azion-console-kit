@@ -1,29 +1,29 @@
 import { AxiosHttpClientAdapter } from '@/services/axios/AxiosHttpClientAdapter'
-import { deleteEdgeFunctionsService } from '@/services/edge-functions-services'
+import { deleteTeamPermissionService } from '@/services/team-permission'
 import * as Errors from '@/services/axios/errors'
 import { describe, expect, it, vi } from 'vitest'
 
 const makeSut = () => {
-  const sut = deleteEdgeFunctionsService
+  const sut = deleteTeamPermissionService
 
   return {
     sut
   }
 }
 
-describe('EdgeFunctionsServices', () => {
+describe('TeamPermissionServices', () => {
   it('should call API with correct params', async () => {
     const requestSpy = vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
       statusCode: 204
     })
-    const mockId = 12387555
+    const environmentVariableIdMock = 765678
     const { sut } = makeSut()
 
-    await sut(mockId)
+    await sut(environmentVariableIdMock)
 
     expect(requestSpy).toHaveBeenCalledWith({
-      method: 'DELETE',
-      url: `edge_functions/${mockId}`
+      url: `teams/${environmentVariableIdMock}/`,
+      method: 'DELETE'
     })
   })
 
@@ -31,13 +31,12 @@ describe('EdgeFunctionsServices', () => {
     vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
       statusCode: 204
     })
-    const mockId = 123
-
+    const environmentVariableIdMock = 7816825367
     const { sut } = makeSut()
 
-    const feedbackMessage = await sut(mockId)
+    const feedbackMessage = await sut(environmentVariableIdMock)
 
-    expect(feedbackMessage).toBe('Edge function successfully deleted')
+    expect(feedbackMessage).toBe('Team Permission successfully deleted')
   })
 
   it.each([
@@ -66,15 +65,15 @@ describe('EdgeFunctionsServices', () => {
       expectedError: new Errors.UnexpectedError().message
     }
   ])(
-    'should throw when request fails with statusCode $statusCode',
+    'should throw when request fails with status code $statusCode',
     async ({ statusCode, expectedError }) => {
+      const environmentVariableIdStub = 7816825367
       vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
         statusCode
       })
-      const stubId = '123'
       const { sut } = makeSut()
 
-      const response = sut(stubId)
+      const response = sut(environmentVariableIdStub)
 
       expect(response).rejects.toBe(expectedError)
     }
