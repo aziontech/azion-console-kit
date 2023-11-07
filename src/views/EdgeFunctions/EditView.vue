@@ -264,7 +264,4 @@
   const languageText = computed(() => {
     return getLanguageText(language.value)
   })
-  // watch(language, () => {
-  //   languageText.value = getLanguageText(language.value)
-  // })
 </script>
