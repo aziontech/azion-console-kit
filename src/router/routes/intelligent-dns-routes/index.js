@@ -69,7 +69,7 @@ export const intelligentDnsRoutes = {
     },
     {
       path: 'edit/:id/records',
-      name: 'edit-intelligent-dns-records',
+      name: 'intelligent-dns-records',
       component: () => import('@views/IntelligentDNS/EditView.vue'),
       props: {
         editIntelligentDNSService: IntelligentDNSService.editIntelligentDNSService,
@@ -91,7 +91,7 @@ export const intelligentDnsRoutes = {
     },
     {
       path: 'edit/:id/records/create',
-      name: 'edit-intelligent-dns-records-create',
+      name: 'intelligent-dns-records-create',
       component: () => import('@views/IntelligentDNS/CreateRecordsView.vue'),
       props: {
         createRecordsService: IntelligentDNSRecordsService.createRecordsService
@@ -104,6 +104,26 @@ export const intelligentDnsRoutes = {
           },
           {
             label: 'Create Records'
+          }
+        ]
+      }
+    },
+    {
+      path: 'edit/:intelligentDNSId/records/edit/:id',
+      name: 'intelligent-dns-records-edit',
+      component: () => import('@views/IntelligentDNS/EditRecordsView.vue'),
+      props: {
+        editRecordsService: IntelligentDNSRecordsService.editRecordsService,
+        loadRecordsService: IntelligentDNSRecordsService.loadRecordsService
+      },
+      meta: {
+        breadCrumbs: [
+          {
+            label: 'Intelligent DNS',
+            to: '/intelligent-dns'
+          },
+          {
+            label: 'Edit Record'
           }
         ]
       }
