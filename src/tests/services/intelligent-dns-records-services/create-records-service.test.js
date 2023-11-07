@@ -10,6 +10,7 @@ const fixtures = {
     value: 'dns-answer-record-value',
     ttl: '8000',
     description: 'dns record description',
+    selectedPolicy: { _value: 'weighted' },
     weight: 0.9
   }
 }
@@ -40,6 +41,7 @@ describe('IntelligentDnsRecordsServices', () => {
         answers_list: [fixtures.dnsRecordMock.value],
         ttl: fixtures.dnsRecordMock.ttl,
         description: fixtures.dnsRecordMock.description,
+        policy: fixtures.dnsRecordMock.selectedPolicy._value,
         weight: fixtures.dnsRecordMock.weight
       }
     })

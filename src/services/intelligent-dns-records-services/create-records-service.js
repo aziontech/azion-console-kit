@@ -16,6 +16,7 @@ export const createRecordsService = async (payload) => {
 const adapt = (payload) => {
   return {
     record_type: payload.selectedRecordType._value,
+    policy: payload.selectedPolicy._value,
     entry: payload.name,
     answers_list: [payload.value],
     ttl: payload.ttl,

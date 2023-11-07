@@ -187,7 +187,7 @@
   import InputText from 'primevue/inputtext'
   import Textarea from 'primevue/textarea'
   import Dropdown from 'primevue/dropdown'
-  import { useForm } from 'vee-validate'
+  import { useField, useForm } from 'vee-validate'
   import * as yup from 'yup'
 
   const props = defineProps({
@@ -243,10 +243,10 @@
   })
 
   const name = defineInputBinds('name', { validateOnInput: true })
-  const selectedRecordType = ref(values.selectedRecordType)
+  const { value: selectedPolicy } = useField('selectedPolicy')
+  const { value: selectedRecordType } = useField('selectedRecordType')
   const value = defineInputBinds('value', { validateOnInput: true })
   const ttl = defineInputBinds('ttl', { validateOnInput: true })
-  const selectedPolicy = ref(values.selectedPolicy)
   const weight = defineInputBinds('weight', { validateOnInput: true })
   const description = defineInputBinds('description', { validateOnInput: true })
 
