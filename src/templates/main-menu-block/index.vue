@@ -502,17 +502,17 @@
   <PrimeDialog
     v-model:visible="showCreate"
     modal
-    header="Create"
+    header="Create something new"
+    :pt="{
+      content: { class: 'p-0'}
+    }"
     position="center"
     :dismissableMask="true"
     :breakpoints="{ '641px': '90vw' }"
-    :style="{ width: '65vw' }"
   >
     <!-- SLOT WIP -->
-    <div class="surface-border border border-dashed rounded-md flex items-center h-96">
-      <p class="text-color text-sm font-medium text-center w-full">
-        This section is under development.
-      </p>
+    <div>
+      <CreateModalBlock @closeModal="showCreate = false"/>
     </div>
   </PrimeDialog>
 
@@ -552,6 +552,7 @@
   import { mapActions, mapState } from 'pinia'
   import { listTypeAccountService } from '@/services/switch-account-services/list-type-account-service'
   import SwitchAccountBlock from '@/templates/switch-account-block'
+  import CreateModalBlock from '@/templates/create-modal-block'
 
   export default {
     name: 'HeaderTemplate',
@@ -567,7 +568,8 @@
       Dropdown,
       Tag,
       MobileLogo,
-      SwitchAccountBlock
+      SwitchAccountBlock,
+      CreateModalBlock
     },
     props: { isLogged: Boolean },
     data() {
