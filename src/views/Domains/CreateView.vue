@@ -102,8 +102,9 @@
               />
             </template>
             <template #subtitle>
-              Check this option to make your application accessible only through the domains listed in the
-              CNAME field. Attempts to access your application through the Azion domain will be blocked.
+              Check this option to make your application accessible only through the domains listed
+              in the CNAME field. Attempts to access your application through the Azion domain will
+              be blocked.
             </template>
           </Card>
           <div class="flex flex-col w-full sm:max-w-xs gap-2">
@@ -173,8 +174,8 @@
                   />
                 </template>
                 <template #subtitle>
-                  This option blocks the client certificate during the TLS handshake
-                  if the uploaded Trusted CA cannot be validated.
+                  This option blocks the client certificate during the TLS handshake if the uploaded
+                  Trusted CA cannot be validated.
                 </template>
               </Card>
 
@@ -196,9 +197,9 @@
                   />
                 </template>
                 <template #subtitle>
-                  This option attempts to verify the client certificate, but will
-                  allow the TLS handshake even if the Trusted CA cannot be validated. You can check
-                  which client certificate attempted the request in Edge Firewall.
+                  This option attempts to verify the client certificate, but will allow the TLS
+                  handshake even if the Trusted CA cannot be validated. You can check which client
+                  certificate attempted the request in Edge Firewall.
                 </template>
               </Card>
             </div>
