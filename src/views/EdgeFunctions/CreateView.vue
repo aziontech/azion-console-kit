@@ -149,7 +149,7 @@
   import InputText from 'primevue/inputtext'
   import Divider from 'primevue/divider'
   import HelloWorldSample from '@/helpers/edge-function-hello-world'
-  import { computed, ref } from 'vue'
+  import { ref } from 'vue'
 
   // Props
   const props = defineProps({
