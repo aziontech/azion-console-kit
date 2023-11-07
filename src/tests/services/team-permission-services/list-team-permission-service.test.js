@@ -8,7 +8,7 @@ const fixtures = {
     id: 2,
     name: 'Default',
     is_active: true,
-    permissions: [{id: 324, name: 'permission'}],
+    permissions: [{ id: 324, name: 'permission' }]
   }
 }
 
@@ -51,7 +51,7 @@ describe('TeamPermissionService', () => {
       statusCode: 200,
       body: {
         results: [fixtures.teamPermissionMock]
-      } 
+      }
     })
     const { sut } = makeSut()
 
@@ -62,7 +62,9 @@ describe('TeamPermissionService', () => {
         id: fixtures.teamPermissionMock.id,
         isActive: fixtures.teamPermissionMock.is_active,
         name: fixtures.teamPermissionMock.name,
-        permissions: fixtures.teamPermissionMock.permissions.length ? fixtures.teamPermissionMock.permissions.map((item) => item.name) : []
+        permissions: fixtures.teamPermissionMock.permissions.length
+          ? fixtures.teamPermissionMock.permissions.map((item) => item.name)
+          : []
       }
     ])
   })
