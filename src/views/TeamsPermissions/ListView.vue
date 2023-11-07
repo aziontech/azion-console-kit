@@ -16,8 +16,6 @@
   import ListTableBlock from '@/templates/list-table-block'
   import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
 
-  // import EmptyResultsBlock from '@/templates/empty-results-block'
-
   const pros = defineProps({
     listTeamPermissionService: { required: true, type: Function },
     deleteTeamPermissionService: { required: true, type: Function }
