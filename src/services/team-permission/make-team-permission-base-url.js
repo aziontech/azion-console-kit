@@ -1,4 +1,3 @@
 export const makeTeamPermissionBaseUrl = () => {
-    return `teams`
-  }
-  
+  return `teams`
+}

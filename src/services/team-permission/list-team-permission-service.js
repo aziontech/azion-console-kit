@@ -26,7 +26,7 @@ const adapt = (httpResponse) => {
     ? httpResponse.body.results.map((team) => ({
         id: team.id,
         name: team.name,
-        permissions: team.permissions.length ? team.permissions.map(item => item.name) : [],
+        permissions: team.permissions.length ? team.permissions.map((item) => item.name) : [],
         isActive: team.is_active
       }))
     : []

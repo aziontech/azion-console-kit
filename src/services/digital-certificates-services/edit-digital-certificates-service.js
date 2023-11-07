@@ -1,4 +1,4 @@
-import { AxiosHttpClientAdapter} from '../axios/AxiosHttpClientAdapter'
+import { AxiosHttpClientAdapter } from '../axios/AxiosHttpClientAdapter'
 import { makeDigitalCertificatesBaseUrl } from './make-digital-certificates-base-url'
 import * as Errors from '@/services/axios/errors'
 
@@ -12,7 +12,6 @@ export const editDigitalCertificateService = async (payload) => {
 
   return parseHttpResponse(httpResponse)
 }
-
 
 const parseHttpResponse = (httpResponse) => {
   switch (httpResponse.statusCode) {

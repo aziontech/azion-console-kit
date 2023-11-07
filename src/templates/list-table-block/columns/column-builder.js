@@ -27,7 +27,7 @@ import Tag from 'primevue/tag'
  */
 export const columnBuilder = ({ data, columnAppearance, dependencies }) => {
   switch (columnAppearance) {
-    case 'expand-column': 
+    case 'expand-column':
       return h(ExpandColumn, {
         value: data
       })
