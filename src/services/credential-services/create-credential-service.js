@@ -44,10 +44,10 @@ const parseHttpResponse = (httpResponse) => {
       return 'Your credential has been created'
     case 400:
       const apiError400 = extractApiError(httpResponse)
-      throw new Error(apiError400)
+      throw new Error(apiError400).message
     case 422:
       const apiError422 = extractApiError(httpResponse)
-      throw new Error(apiError422)
+      throw new Error(apiError422).message
     case 401:
       throw new Errors.InvalidApiTokenError().message
     case 403:

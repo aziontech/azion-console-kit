@@ -1,10 +1,8 @@
 <template>
   <div class="flex flex-col min-h-[calc(100vh-120px)]">
-    <PageHeadingBlock :pageTitle="pageTitle" />
     <form
       @submit.prevent="handleSubmit"
-      class="w-full grow px-8 flex flex-col gap-8 mb-5"
-      :class="{ 'py-4': !hasTabs, 'pb-4': hasTabs }"
+      class="w-full grow py-4 px-8 flex flex-col gap-8 mb-5"
     >
       <slot name="form" />
 
@@ -21,13 +19,11 @@
 
 <script>
   import ActionBarTemplate from '@/templates/action-bar-block'
-  import PageHeadingBlock from '@/templates/page-heading-block'
 
   export default {
     name: 'edit-form-block',
     components: {
-      ActionBarTemplate,
-      PageHeadingBlock
+      ActionBarTemplate
     },
     data: () => ({
       isLoading: false
@@ -59,10 +55,6 @@
       },
       backURL: {
         type: String,
-        required: false
-      },
-      hasTabs: {
-        type: Boolean,
         required: false
       }
     },
@@ -97,11 +89,11 @@
       async handleSubmit() {
         try {
           this.isLoading = true
-          const feedback = await this.editService(this.formData)
+          await this.editService(this.formData)
           this.$toast.add({
             closable: false,
             severity: 'success',
-            summary: feedback ?? 'edited successfully',
+            summary: 'edited successfully',
             life: 10000
           })
         } catch (error) {

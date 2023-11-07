@@ -21,7 +21,7 @@ const makeSut = () => {
 describe('DataStreamingServices', () => {
   it('should call api with correct params', async () => {
     const httpClientSpy = vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValue({
-      statusCode: 201
+      statusCode: 204
     })
     const deleteIdMock = 12346654
     const { sut } = makeSut()
