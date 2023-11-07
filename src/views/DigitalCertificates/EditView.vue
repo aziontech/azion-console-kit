@@ -8,10 +8,10 @@
     :formData="values"
   >
     <template #form>
-      <FormHorizontal 
-      v-if="csr.modelValue"
-      title="Digital Certificate"
-      description="To upload your Digital Certificate to Azion servers, copy and paste your certificate inside the field below."
+      <FormHorizontal
+        v-if="csr.modelValue"
+        title="Digital Certificate"
+        description="To upload your Digital Certificate to Azion servers, copy and paste your certificate inside the field below."
       >
         <template #inputs>
           <div class="flex flex-col sm:max-w-lg w-full gap-2">
@@ -58,10 +58,10 @@
           </div>
         </template>
       </FormHorizontal>
-      <FormHorizontal 
-      v-if="!csr.modelValue && certificateType === certificateTypes.EDGE_CERTIFICATE"
-      title="Use my certificate and private key"
-      description="To upload your Digital Certificate to Azion servers, copy and paste your certificate inside the field below."
+      <FormHorizontal
+        v-if="!csr.modelValue && certificateType === certificateTypes.EDGE_CERTIFICATE"
+        title="Use my certificate and private key"
+        description="To upload your Digital Certificate to Azion servers, copy and paste your certificate inside the field below."
       >
         <template #inputs>
           <div class="flex flex-col sm:max-w-lg w-full gap-2">
@@ -85,7 +85,7 @@
               cols="30"
             />
           </div>
-          <div class="flex flex-col sm:max-w-lg w-full gap-2">    
+          <div class="flex flex-col sm:max-w-lg w-full gap-2">
             <label>Private key:</label>
             <PrimeTextarea
               v-model="privateKey"
@@ -98,10 +98,10 @@
           </div>
         </template>
       </FormHorizontal>
-      <FormHorizontal 
-      v-if="certificateType === certificateTypes.TRUSTED"
-      title="Use my Trusted CA Certificate"
-      description="Trusted Certificate Authority Certificate can be used for Mutual Transport Layer Security (mTLS) configuration on Domains. To upload your Trusted CA Certificate to Azion servers, copy your certificate code and paste it inside the field below."
+      <FormHorizontal
+        v-if="certificateType === certificateTypes.TRUSTED"
+        title="Use my Trusted CA Certificate"
+        description="Trusted Certificate Authority Certificate can be used for Mutual Transport Layer Security (mTLS) configuration on Domains. To upload your Trusted CA Certificate to Azion servers, copy your certificate code and paste it inside the field below."
       >
         <template #inputs>
           <div class="flex flex-col sm:max-w-lg w-full gap-2">
@@ -128,13 +128,11 @@
           </div>
         </template>
       </FormHorizontal>
-
     </template>
   </EditFormBlock>
 </template>
 
 <script>
-
   import EditFormBlock from '@/templates/edit-form-block-new'
   import FormHorizontal from '@/templates/create-form-block-new/form-horizontal'
   import PrimeTextarea from 'primevue/textarea'

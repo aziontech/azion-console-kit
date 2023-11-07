@@ -11,7 +11,7 @@
 
   const route = useRoute()
   const isLogged = computed(() => {
-    const publicRoutes = ['login', 'reset-password']
+    const publicRoutes = ['login', 'reset-password', 'authentication-mfa', 'setup-mfa']
     return hasActiveUserId && !publicRoutes.includes(route.name)
   })
 

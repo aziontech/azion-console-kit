@@ -16,9 +16,9 @@ export default async function beforeEachRoute(to, _, next) {
     return next()
   }
 
-  const publicRoutes = ['login', 'reset-password']
+  const publicRoutes = ['login', 'reset-password', 'authentication-mfa', 'setup-mfa']
 
-  if (!accountStore.hasActiveUserId && !publicRoutes) {
+  if (!accountStore.hasActiveUserId && !publicRoutes.includes(to.name)) {
     try {
       const [accountInfo, userInfo] = await Promise.all([
         getAccountInfoService(),

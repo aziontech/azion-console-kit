@@ -1,6 +1,9 @@
 <template>
-  <form @submit.prevent="resetPassword()">
-    <div class="flex flex-col align-top items-center p-4 animate-fadeIn">
+  <form @submit.prevent="authorizeDevice()">
+    <div
+      class="flex flex-col align-top items-center py-6 px-3 md:py-20 animate-fadeIn"
+      @paste="handlePaste"
+    >
       <div
         class="surface-card surface-border border max-w-md w-full p-6 md:p-10 rounded-md flex-col gap-10 inline-flex"
       >
@@ -16,23 +19,34 @@
         </div>
 
         <!-- QR Code -->
-        <div>
-          <div class="flex flex-wrap justify-center items-center mt-6">
-            <PrimeButton
-              link
-              label="Cannot scan the QR code?"
-            ></PrimeButton>
-          </div>
+        <div class="flex flex-wrap justify-center items-center">
+          <Skeleton
+            v-show="!qrCode.url"
+            class="w-[10rem] h-[10rem] sm:w-[12.5rem] sm:h-[12.5rem]"
+          />
+          <QrcodeVue
+            v-show="qrCode.url"
+            :value="qrCode?.url"
+            level="H"
+            class="w-[10rem] h-[10rem] sm:w-[12.5rem] sm:h-[12.5rem]"
+          />
         </div>
 
+        <InlineMessage
+          v-if="hasRequestErrorMessage"
+          severity="error"
+          >{{ hasRequestErrorMessage }}</InlineMessage
+        >
         <div>
           <label class="font-semibold text-xs">After scanning, enter the 6-digit code</label>
-          <div class="flex gap-4 mt-4">
+          <div class="flex flex-wrap gap-1.5 sm:gap-4 mt-4">
             <InputText
               v-for="(digits, i) in digitsMfa"
               :key="i"
-              class="w-11"
-              v-model="digits.value"
+              class="grow w-7 sm:w-11 h-[2.6rem] text-lg text-center"
+              v-model="digits.value.value"
+              @input="moveFocus(i)"
+              :ref="(el) => (inputRefs[i] = el)"
             />
           </div>
         </div>
@@ -51,25 +65,82 @@
 <script setup>
   import PrimeButton from 'primevue/button'
   import InputText from 'primevue/inputtext'
+  import InlineMessage from 'primevue/inlinemessage'
+  import Skeleton from 'primevue/skeleton'
+
+  import QrcodeVue from 'qrcode.vue'
+
   import { ref, onMounted } from 'vue'
+  import { useRouter } from 'vue-router'
 
   const props = defineProps({
     generateQrCodeService: {
       required: true,
       type: Function
+    },
+    validateMfaCode: {
+      required: true,
+      type: Function
     }
   })
 
-  const digitsMfa = ref([
-    { value: '' },
-    { value: '' },
-    { value: '' },
-    { value: '' },
-    { value: '' },
-    { value: '' }
-  ])
+  const router = useRouter()
 
-  onMounted(() => {
-    props.generateQrCodeService()
+  const MFA_CODE_LENGTH = 6
+  const digitsMfa = Array.from({ length: MFA_CODE_LENGTH }, () => ref({ value: '' }))
+  const inputRefs = ref(Array.from({ length: MFA_CODE_LENGTH }, () => null))
+
+  const qrCode = ref('')
+  const hasRequestErrorMessage = ref('')
+
+  const moveFocus = (index) => {
+    const { value: digitCode } = digitsMfa[index].value
+
+    if (isNaN(digitCode) || digitCode.length > 1) {
+      digitsMfa[index].value.value = ''
+      return
+    }
+    if (digitsMfa[index].value !== '' && index < MFA_CODE_LENGTH - 1) {
+      const nextInput = inputRefs.value[index + 1]
+      if (nextInput) {
+        nextInput.$el.focus()
+      }
+    }
+  }
+  const getQrCodeSetupUrl = async () => {
+    try {
+      qrCode.value = await props.generateQrCodeService()
+    } catch (error) {
+      router.push({ name: 'login' })
+    }
+  }
+  onMounted(async () => {
+    getQrCodeSetupUrl()
   })
+
+  const handlePaste = (event) => {
+    event.preventDefault()
+    const pastedData = event.clipboardData.getData('text')
+    if (pastedData.length === MFA_CODE_LENGTH) {
+      for (let i = 0; i < pastedData.length; i++) {
+        digitsMfa[i].value = pastedData[i]
+      }
+    }
+  }
+  const joinDigitsMfa = () => {
+    return digitsMfa.map((digit) => digit.value).join('')
+  }
+  const authorizeDevice = async () => {
+    try {
+      const mfaToken = joinDigitsMfa()
+      await props.validateMfaCode(mfaToken)
+      router.push({ name: 'home' })
+    } catch (error) {
+      if (error.statusCode === 403) {
+        router.push({ name: 'login' })
+        return
+      }
+      hasRequestErrorMessage.value = error.message
+    }
+  }
 </script>
