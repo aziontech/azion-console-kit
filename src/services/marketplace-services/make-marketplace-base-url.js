@@ -1,4 +1,3 @@
 export const makeMarketplaceBaseUrl = () => {
-    return `marketplace`
-  }
-  
+  return `marketplace`
+}

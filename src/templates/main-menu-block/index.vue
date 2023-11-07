@@ -48,7 +48,9 @@
       </div>
 
       <!-- Search -->
-      <span class="top-0 p-input-icon-left p-input-icon-right hidden lg:flex md:absolute md:my-3 md:ml-[calc(50%-10rem)]">
+      <span
+        class="top-0 p-input-icon-left p-input-icon-right hidden lg:flex md:absolute md:my-3 md:ml-[calc(50%-10rem)]"
+      >
         <i class="pi pi-search text-white" />
         <i class="!top-[32%]">
           <span
@@ -504,7 +506,7 @@
     modal
     header="Create something new"
     :pt="{
-      content: { class: 'p-0'}
+      content: { class: 'p-0' }
     }"
     position="center"
     :dismissableMask="true"
@@ -512,7 +514,7 @@
   >
     <!-- SLOT WIP -->
     <div>
-      <CreateModalBlock @closeModal="showCreate = false"/>
+      <CreateModalBlock @closeModal="showCreate = false" />
     </div>
   </PrimeDialog>
 

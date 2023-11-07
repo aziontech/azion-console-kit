@@ -6,7 +6,7 @@ export const listSolutionsService = async () => {
     url: `${makeMarketplaceBaseUrl()}/solution/`,
     method: 'GET',
     headers: {
-      'Mktp-Api-Context': 'onboarding',
+      'Mktp-Api-Context': 'onboarding'
     }
   })
   httpResponse = adapt(httpResponse)
