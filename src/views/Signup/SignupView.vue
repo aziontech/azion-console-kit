@@ -1,11 +1,14 @@
 <template>
-  <div class="min-h-[calc(100vh-60px-56px)] w-full px-3 py-6 lg:py-20 lg:px-6 surface-section">
+  <div>
     <SignUpOnlineSalesBlock
       :signupService="signupService"
       @signup-success="showSuccess = true"
       v-if="!showSuccess"
     />
-    <SignupSuccess v-else />
+    <SignupSuccess
+      :resendEmailService="resendEmailService"
+      v-else
+    />
   </div>
 </template>
 
@@ -16,6 +19,10 @@
 
   defineProps({
     signupService: {
+      required: true,
+      type: Function
+    },
+    resendEmailService: {
       required: true,
       type: Function
     }

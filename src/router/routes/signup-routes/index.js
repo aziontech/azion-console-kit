@@ -10,7 +10,8 @@ export const signupRoutes = {
       name: 'signup-online-sales',
       component: () => import('@views/Signup/SignupView.vue'),
       props: {
-        signupService: SignupService.signupService
+        signupService: SignupService.signupService,
+        resendEmailService: SignupService.resendEmailService
       }
     },
     {
