@@ -1,10 +1,10 @@
 <template>
   <section
-    class="flex lg:flex-row flex-col gap-6 xl:gap-0 min-h-[calc(100vh-60px-56px)] w-full px-3 py-6 lg:py-20 lg:px-6 surface-section"
+    class="flex gap-6 xl:gap-0 px-3 py-6 lg:py-20 lg:px-6 surface-section min-h-[calc(100vh-60px-56px)]"
   >
-    <div class="w-full flex flex-col items-center justify-center">
-      <div class="min-w-max">
-        <h2 class="text-[32px] sm:text-[48px] lg:text-[56px] leading-10">Welcome to the Edge</h2>
+    <div class="w-full hidden lg:flex flex-col items-center xl:justify-center">
+      <div class="w-full max-w-md lg:justify-end">
+        <h2 class="text-4xl xl:text-6xl font-normal leading-10">Welcome to the Edge</h2>
         <div class="flex flex-col gap-3 mt-10">
           <ul
             v-for="(benefit, index) in benefitsList"
@@ -147,6 +147,7 @@
               :disabled="!meta.valid"
               type="submit"
               severity="secondary"
+              :loading="loading"
             />
           </form>
           <PrimeButton
@@ -251,7 +252,10 @@
   const toast = useToast()
   const router = useRouter()
 
+  const loading = ref(false)
+
   const signUp = async () => {
+    loading.value = true
     try {
       const captcha = await recaptcha.execute('signup')
       await props.signupService({ ...values, captcha })
@@ -259,6 +263,8 @@
       router.push({ name: 'activation', query: { email: values.email } })
     } catch (err) {
       toast.add({ life: 5000, severity: 'error', detail: err, summary: 'Error' })
+    } finally {
+      loading.value = false
     }
   }
 </script>
