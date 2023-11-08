@@ -21,6 +21,7 @@ import { playgroundRoutes } from './routes/playground-routes'
 import { activityHistoryRoutes } from './routes/activity-history-routes'
 import { errorRoutes } from '@routes/error-routes'
 import beforeEachRoute from './hooks/beforeEachRoute'
+import { signupRoutes } from './routes/signup-routes'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -44,7 +45,8 @@ const router = createRouter({
     usersListsRoutes,
     passwordRoutes,
     playgroundRoutes,
-    activityHistoryRoutes
+    activityHistoryRoutes,
+    signupRoutes
   ].concat(errorRoutes)
 })
 
