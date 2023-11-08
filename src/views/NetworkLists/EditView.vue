@@ -1,6 +1,6 @@
 <template>
   <EditFormBlock
-    pageTitle="Edit Network Lists"
+    pageTitle="Edit Network List"
     :editService="this.editNetworkListsService"
     :loadService="this.loadNetworkListsService"
     :initialDataSetter="setValues"
@@ -8,7 +8,9 @@
     :formData="values"
   >
     <template #form>
-      <FormHorizontal title="Network List">
+      <FormHorizontal title="Network List"
+      description="Create allowlists, blocklists, and even greylists based on IP addresses, geolocation (countries), or Autonomous System Number (ASN) to use with configured rule sets on Rules Engine."
+      >
         <template #inputs>
           <div class="flex flex-col sm:max-w-lg w-full gap-2">
             <label
@@ -17,7 +19,7 @@
               >Name *</label
             >
             <InputText
-              placeholder="Add Network List Name"
+              placeholder="IP Tor Exit Nodes List"
               v-bind="name"
               type="text"
               :class="{ 'p-invalid': errors.name }"
