@@ -1,7 +1,7 @@
 import { getUserInfoService, getAccountInfoService } from '@/services/account-services'
 import { logoutService } from '@/services/auth-services'
 import { useAccountStore } from '@/stores/account'
-import { isRoutePublic } from '@/router/public-routes';
+import { isRoutePublic } from '@/router/public-routes'
 
 export default async function beforeEachRoute(to, _, next) {
   const accountStore = useAccountStore()

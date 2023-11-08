@@ -5,7 +5,7 @@
   import { useAccountStore } from '@/stores/account'
   import { themeSelect } from '@/helpers/themeSelect'
   import { storeToRefs } from 'pinia'
-  import { isRoutePublic } from '@/router/public-routes';
+  import { isRoutePublic } from '@/router/public-routes'
 
   const accountStore = useAccountStore()
   const { currentTheme, hasActiveUserId } = storeToRefs(accountStore)
