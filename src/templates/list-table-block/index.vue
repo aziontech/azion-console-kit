@@ -10,10 +10,10 @@
         removableSort
         :value="data"
         dataKey="id"
-        v-model:filters="this.filters"
-        paginator
+        v-model:filters="filters"
+        :paginator="showPagination"
         :rowsPerPageOptions="[10, 20, 50, 100]"
-        :rows="10"
+        :rows="minimumOfItemsPerPage"
         :globalFilterFields="filterBy"
         :loading="isLoading"
       >
@@ -197,7 +197,8 @@
       isLoading: false,
       showColumnSelector: false,
       data: [],
-      selectedColumns: []
+      selectedColumns: [],
+      minimumOfItemsPerPage: 10
     }),
     props: {
       columns: {
@@ -250,6 +251,9 @@
     computed: {
       filterBy() {
         return this.columns.map((item) => item.field)
+      },
+      showPagination() {
+        return this.data.length > this.minimumOfItemsPerPage
       }
     },
     methods: {
