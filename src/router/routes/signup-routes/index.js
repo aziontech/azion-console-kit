@@ -14,14 +14,9 @@ export const signupRoutes = {
       }
     },
     {
-      path: 'brasil',
-      name: 'signup-brasil'
-      // component: () => import('@views/Signup/SignupBrasilView.vue'),
-    },
-    {
       path: 'activation/:email',
-      name: 'signup-activation'
-      // component: () => import('@views/Signup/SignupActivationView.vue'),
+      name: 'signup-activation',
+      component: () => import('@views/Signup/SignupActivationView.vue')
     }
   ]
 }
