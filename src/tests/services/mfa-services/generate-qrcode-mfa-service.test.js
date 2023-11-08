@@ -43,7 +43,7 @@ describe('GenerateQrcodeMfaService', () => {
     const result = await sut()
 
     expect(result).toEqual({
-      url: fixtures.qrCode.url,
+      url: fixtures.qrCode.url
     })
   })
 

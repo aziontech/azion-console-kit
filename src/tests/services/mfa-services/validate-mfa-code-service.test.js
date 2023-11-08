@@ -47,7 +47,7 @@ describe('GenerateQrcodeMfaService', () => {
     } catch (error) {
       expect(error.message).toBe(expectedError.message)
     }
-  });
+  })
 
   it.each([
     {
