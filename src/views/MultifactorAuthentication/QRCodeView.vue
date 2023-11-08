@@ -54,6 +54,7 @@
         <PrimeButton
           class="w-full flex-row-reverse"
           label="Verify code"
+          :loading="isButtonLoading"
           severity="primary"
           type="submit"
         />
@@ -78,7 +79,7 @@
       required: true,
       type: Function
     },
-    validateMfaCode: {
+    validateMfaCodeService: {
       required: true,
       type: Function
     }
@@ -92,6 +93,7 @@
 
   const qrCode = ref('')
   const hasRequestErrorMessage = ref('')
+  const isButtonLoading = ref(false)
 
   const moveFocus = (index) => {
     const { value: digitCode } = digitsMfa[index].value
@@ -128,12 +130,15 @@
     }
   }
   const joinDigitsMfa = () => {
-    return digitsMfa.map((digit) => digit.value).join('')
+    return digitsMfa.map((digit) => digit.value.value).join('')
   }
   const authorizeDevice = async () => {
     try {
+      isButtonLoading.value = true
+
       const mfaToken = joinDigitsMfa()
-      await props.validateMfaCode(mfaToken)
+      await props.validateMfaCodeService(mfaToken)
+
       router.push({ name: 'home' })
     } catch (error) {
       if (error.statusCode === 403) {
@@ -141,6 +146,8 @@
         return
       }
       hasRequestErrorMessage.value = error.message
+    } finally {
+      isButtonLoading.value = false
     }
   }
 </script>

@@ -2,7 +2,7 @@ import { AxiosHttpClientAdapter } from '../axios/AxiosHttpClientAdapter'
 import { makeMfaBaseUrl } from './make-mfa-base-url'
 import * as Errors from '@/services/axios/errors'
 
-export const validateMfaCode = async (token) => {
+export const validateMfaCodeService = async (token) => {
   let httpResponse = await AxiosHttpClientAdapter.request({
     url: `${makeMfaBaseUrl()}/validate`,
     method: 'POST',

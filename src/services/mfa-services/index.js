@@ -1,4 +1,4 @@
 import { generateQrCodeService } from './generate-qrcode-mfa-service'
-import { validateMfaCode } from './validate-mfa-code-service'
+import { validateMfaCodeService } from './validate-mfa-code-service'
 
-export { generateQrCodeService, validateMfaCode }
+export { generateQrCodeService, validateMfaCodeService }

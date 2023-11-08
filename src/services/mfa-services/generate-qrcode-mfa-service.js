@@ -27,10 +27,6 @@ export const parseHttpResponse = (httpResponse) => {
   switch (httpResponse.statusCode) {
     case 201:
       return httpResponse?.body || null
-    case 202:
-      return 'Resource successfully updated'
-    case 204:
-      return 'Resource successfully deleted'
     case 400:
       throw new Errors.InvalidApiRequestError().message
     case 401:

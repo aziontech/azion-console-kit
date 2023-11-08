@@ -1,4 +1,4 @@
-import { generateQrCodeService, validateMfaCode } from '@/services/mfa-services'
+import { generateQrCodeService, validateMfaCodeService } from '@/services/mfa-services'
 import { verifyAuthenticationService, switchAccountService } from '@/services/auth-services'
 
 /** @type {import('vue-router').RouteRecordRaw} */
@@ -12,14 +12,14 @@ export const mfaRoutes = {
       component: () => import('@views/MultifactorAuthentication/QRCodeView.vue'),
       props: {
         generateQrCodeService,
-        validateMfaCode
+        validateMfaCodeService
       }
     },
     {
       path: 'authentication',
       name: 'authentication-mfa',
       component: () => import('@views/MultifactorAuthentication/AuthenticateView.vue'),
-      props: { validateMfaCode, verifyAuthenticationService, switchAccountService }
+      props: { validateMfaCodeService, verifyAuthenticationService, switchAccountService }
     }
   ]
 }

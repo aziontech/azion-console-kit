@@ -38,6 +38,7 @@
         <PrimeButton
           class="w-full flex-row-reverse"
           label="Confirm code"
+          :loading="isButtonLoading"
           severity="primary"
           type="submit"
         />
@@ -56,7 +57,7 @@
   import { UserIsNotClientError, ProccessRequestError } from '@/services/axios/errors'
 
   const props = defineProps({
-    validateMfaCode: {
+    validateMfaCodeService: {
       required: true,
       type: Function
     },
@@ -76,6 +77,7 @@
 
   const router = useRouter()
   const hasRequestErrorMessage = ref('')
+  const isButtonLoading = ref(false)
 
   const handlePaste = (event) => {
     event.preventDefault()
@@ -109,16 +111,22 @@
 
   const validateCode = async () => {
     try {
+      isButtonLoading.value = true
+
       const mfaToken = joinDigitsMfa()
-      await props.validateMfaCode(mfaToken)
+      await props.validateMfaCodeService(mfaToken)
+
       const { user_tracking_info: userInfo } = await verifyUserData()
       await switchClientAccount(userInfo)
+
     } catch (error) {
       if (error.statusCode === 403) {
         router.push({ name: 'login' })
         return
       }
       hasRequestErrorMessage.value = error.message
+    } finally {
+      isButtonLoading.value = false
     }
   }
 
