@@ -338,7 +338,9 @@
         }
       },
       authorize() {
-        this.$emit('authorizeEdgeNode', { authorize: { edgeNodeID: this.selectedId, openDialog: true, rerender: Math.random() } })
+        this.$emit('authorizeEdgeNode', {
+          authorize: { edgeNodeID: this.selectedId, openDialog: true, rerender: Math.random() }
+        })
       }
     },
     watch: {

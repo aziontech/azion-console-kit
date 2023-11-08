@@ -206,7 +206,10 @@
                             root: { class: 'shadow-none  rounded-none' },
                             body: { class: 'py-4 border-0' },
                             title: { class: 'flex items-center text-base m-0 gap-3 font-medium' },
-                            subtitle: { class: 'text-sm font-normal text-color-secondary m-0 pr-0 md:pr-[2.5rem]' }
+                            subtitle: {
+                              class:
+                                'text-sm font-normal text-color-secondary m-0 pr-0 md:pr-[2.5rem]'
+                            }
                           }"
                         >
                           <template #title>
@@ -254,7 +257,10 @@
         </TabView>
       </template>
     </PageHeadingBlock>
-    <Authorize :authorize="authorize" @authorizeCancel="authorizeEdgeNode = false" />
+    <Authorize
+      :authorize="authorize"
+      @authorizeCancel="authorizeEdgeNode = false"
+    />
   </div>
 </template>
 <script setup>
