@@ -356,7 +356,7 @@
           })
           .test({
             name: 'no-whitespace',
-            message: `Whitespace is not allowed`,
+            message: `Space characters are not allowed.`,
             test: (value) => value?.includes(' ') === false
           }),
         cnameAccessOnly: yup.boolean(),

@@ -329,11 +329,11 @@
           .label('CNAME')
           .when('cnameAccessOnly', {
             is: true,
-            then: (schema) => schema.required('CNAME is a required field')
+            then: (schema) => schema.required('CNAME is a required field.')
           })
           .test({
             name: 'no-whitespace',
-            message: `Whitespace is not allowed`,
+            message: `Space characters are not allowed.`,
             test: (value) => value?.includes(' ') === false
           }),
         cnameAccessOnly: yup.boolean(),
@@ -344,7 +344,7 @@
         trustedCACertificates: yup.string().optional(),
         mtlsTrustedCertificate: yup.string().when('mtlsIsEnabled', {
           is: true,
-          then: (schema) => schema.required('Trusted CA Certificate is a required field')
+          then: (schema) => schema.required('Trusted CA Certificate is a required field.')
         })
       })
 
