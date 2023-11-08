@@ -3,6 +3,9 @@ import AvatarWithTextTooltipColumn from './avatar-with-text-tooltip-column.vue'
 import AvatarWithTextColumn from './avatar-with-text-column.vue'
 import TextWithClipboardColumn from './text-with-clipboard-column.vue'
 import ClickableText from './clickable-text-column.vue'
+import ClickableLink from './clickable-link-column.vue'
+import ClickableTag from './clickable-tag-column.vue'
+import ExpandColumn from './expand-column.vue'
 import Tag from 'primevue/tag'
 
 /**
@@ -24,6 +27,10 @@ import Tag from 'primevue/tag'
  */
 export const columnBuilder = ({ data, columnAppearance, dependencies }) => {
   switch (columnAppearance) {
+    case 'expand-column':
+      return h(ExpandColumn, {
+        value: data
+      })
     case 'avatar-with-text':
       return h(AvatarWithTextColumn, {
         nameInitial: data.nameInitial,
@@ -39,7 +46,20 @@ export const columnBuilder = ({ data, columnAppearance, dependencies }) => {
     case 'clickable-text':
       return h(ClickableText, {
         content: data.content,
-        clickAction: dependencies.clickAction
+        clickAction: dependencies.clickAction,
+        clickProps: dependencies.clickProps
+      })
+    case 'clickable-link':
+      return h(ClickableLink, {
+        content: data.content,
+        clickAction: dependencies.clickAction,
+        clickProps: dependencies.clickProps
+      })
+    case 'clickable-tag':
+      return h(ClickableTag, {
+        content: data.content,
+        clickAction: dependencies.clickAction,
+        clickProps: dependencies.clickProps
       })
     case 'text-with-clipboard':
       return h(TextWithClipboardColumn, {

@@ -7,6 +7,7 @@ import 'primeflex/primeflex.css'
 import './assets/main.css'
 import '@assets/themes/scss/themes/azion-light/theme.scss'
 import '@assets/themes/scss/themes/azion-dark/theme.scss'
+import '@assets/icons/azionicons.scss'
 // import '@/assets/themes/theme-custom.css'
 /**
  * ==== End of styles block ====

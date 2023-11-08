@@ -8,114 +8,173 @@
     :formData="values"
   >
     <template #form>
-      <label>Certificate Name: *</label>
-
-      <InputText
-        v-bind="name"
-        type="text"
-        placeholder="Insert the Digital Certificate name"
-        :class="{ 'p-invalid': errors.name }"
-        v-tooltip.top="{ value: errors.name, showDelay: 200 }"
-      />
-
-      <hr />
-
-      <!-- CSR Certificate Form -->
-      <template v-if="csr.modelValue">
-        <b>Digital Certificate</b>
-        <p>
-          To upload your Digital Certificate to Azion servers, copy and paste your certificate
-          inside the field below.
-        </p>
-
-        <label>Certificate:</label>
-        <PrimeTextarea
-          v-bind="certificate"
-          :class="{ 'p-invalid': errors.certificate }"
-          v-tooltip.top="{ value: errors.certificate, showDelay: 200 }"
-          placeholder="---BEGIN CERTIFICATE---"
-          rows="5"
-          cols="30"
-        />
-
-        <label>Certificate Signing Request (CSR):</label>
-        <PrimeTextarea
-          v-bind="csr"
-          :class="{ 'p-invalid': errors.csr }"
-          v-tooltip.top="{ value: errors.csr, showDelay: 200 }"
-          placeholder="---BEGIN CERTIFICATE---"
-          rows="5"
-          cols="30"
-        />
-
-        <PrimeButton
-          class="max-sm:w-full"
-          type="button"
-          severity="secondary"
-          :label="'Copy to Clipboard'"
-          @click="copyCSRToclipboard"
-        />
-        <small v-if="csrCopied">Copied successfully!</small>
-      </template>
-
-      <!-- Upload Edge Certificate Form -->
-      <template v-if="!csr.modelValue && certificateType === certificateTypes.EDGE_CERTIFICATE">
-        <b>Use my certificate and private key</b>
-        <p>
-          To upload your Digital Certificate to Azion servers, copy and paste your certificate and
-          private key inside the fields below.
-        </p>
-
-        <label>Certificate:</label>
-        <PrimeTextarea
-          v-bind="certificate"
-          :class="{ 'p-invalid': errors.certificate }"
-          v-tooltip.top="{ value: errors.certificate, showDelay: 200 }"
-          placeholder="For security, the certificate cannot be seen.&#10;Paste your new certificate here to update it."
-          rows="5"
-          cols="30"
-        />
-
-        <label>Private key:</label>
-        <PrimeTextarea
-          v-model="privateKey"
-          :class="{ 'p-invalid': errors.privateKey }"
-          v-tooltip.top="{ value: errors.privateKey, showDelay: 200 }"
-          placeholder="For security, the certificate cannot be seen.&#10;Paste your new certificate here to update it."
-          rows="5"
-          cols="30"
-        />
-      </template>
-
-      <!-- Trusted CA Certificate Form -->
-      <template v-if="certificateType === certificateTypes.TRUSTED">
-        <b>Use my Trusted CA Certificate</b>
-        <p>
-          Trusted Certificate Authority Certificate can be used for Mutual Transport Layer Security
-          (mTLS) configuration on Domains.
-        </p>
-        <p>
-          To upload your Trusted CA Certificate to Azion servers, copy your certificate code and
-          paste it inside the field below.
-        </p>
-
-        <label>Certificate:</label>
-        <PrimeTextarea
-          v-bind="certificate"
-          :class="{ 'p-invalid': errors.certificate }"
-          v-tooltip.top="{ value: errors.certificate, showDelay: 200 }"
-          placeholder="For security, the certificate cannot be seen.&#10;Paste your new certificate here to update it."
-          rows="5"
-          cols="30"
-        />
-        <small>Tip: It's possible to include intermediate certificates.</small>
-      </template>
+      <FormHorizontal
+        v-if="csr.modelValue"
+        title="Digital Certificate"
+        description="To upload your Digital Certificate to Azion servers, copy and paste your certificate inside the field below."
+      >
+        <template #inputs>
+          <div class="flex flex-col sm:max-w-lg w-full gap-2">
+            <label>Certificate Name: *</label>
+            <InputText
+              v-bind="name"
+              type="text"
+              placeholder="Insert the Digital Certificate name"
+              :class="{ 'p-invalid': errors.name }"
+              v-tooltip.top="{ value: errors.name, showDelay: 200 }"
+            />
+            <small
+              v-if="errors.name"
+              class="p-error text-xs font-normal leading-tight"
+              >{{ errors.name }}</small
+            >
+          </div>
+          <div class="flex flex-col sm:max-w-lg w-full gap-2">
+            <label>Certificate:</label>
+            <PrimeTextarea
+              v-bind="certificate"
+              :class="{ 'p-invalid': errors.certificate }"
+              v-tooltip.top="{ value: errors.certificate, showDelay: 200 }"
+              placeholder="---BEGIN CERTIFICATE---"
+              rows="5"
+              cols="30"
+            />
+            <small
+              v-if="errors.certificate"
+              class="p-error text-xs font-normal leading-tight"
+              >{{ errors.certificate }}</small
+            >
+          </div>
+          <div class="flex flex-col sm:max-w-lg w-full gap-2">
+            <label>Certificate Signing Request (CSR):</label>
+            <PrimeTextarea
+              v-bind="csr"
+              :class="{ 'p-invalid': errors.csr }"
+              v-tooltip.top="{ value: errors.csr, showDelay: 200 }"
+              placeholder="---BEGIN CERTIFICATE---"
+              rows="5"
+              cols="30"
+            />
+            <small
+              v-if="errors.csr"
+              class="p-error text-xs font-normal leading-tight"
+              >{{ errors.csr }}</small
+            >
+          </div>
+          <div class="flex flex-col sm:max-w-lg w-full gap-2">
+            <PrimeButton
+              class="max-sm:w-full"
+              type="button"
+              severity="secondary"
+              :label="'Copy to Clipboard'"
+              @click="copyCSRToclipboard"
+            />
+            <small v-if="csrCopied">Copied successfully!</small>
+          </div>
+        </template>
+      </FormHorizontal>
+      <FormHorizontal
+        v-if="!csr.modelValue && certificateType === certificateTypes.EDGE_CERTIFICATE"
+        title="Use my certificate and private key"
+        description="To upload your Digital Certificate to Azion servers, copy and paste your certificate inside the field below."
+      >
+        <template #inputs>
+          <div class="flex flex-col sm:max-w-lg w-full gap-2">
+            <label>Certificate Name: *</label>
+            <InputText
+              v-bind="name"
+              type="text"
+              placeholder="Insert the Digital Certificate name"
+              :class="{ 'p-invalid': errors.name }"
+              v-tooltip.top="{ value: errors.name, showDelay: 200 }"
+            />
+            <small
+              v-if="errors.name"
+              class="p-error text-xs font-normal leading-tight"
+              >{{ errors.name }}</small
+            >
+          </div>
+          <div class="flex flex-col sm:max-w-lg w-full gap-2">
+            <label>Certificate:</label>
+            <PrimeTextarea
+              v-bind="certificate"
+              :class="{ 'p-invalid': errors.certificate }"
+              v-tooltip.top="{ value: errors.certificate, showDelay: 200 }"
+              placeholder="For security, the certificate cannot be seen.&#10;Paste your new certificate here to update it."
+              rows="5"
+              cols="30"
+            />
+            <small
+              v-if="errors.certificate"
+              class="p-error text-xs font-normal leading-tight"
+              >{{ errors.certificate }}</small
+            >
+          </div>
+          <div class="flex flex-col sm:max-w-lg w-full gap-2">
+            <label>Private key:</label>
+            <PrimeTextarea
+              v-model="privateKey"
+              :class="{ 'p-invalid': errors.privateKey }"
+              v-tooltip.top="{ value: errors.privateKey, showDelay: 200 }"
+              placeholder="For security, the certificate cannot be seen.&#10;Paste your new certificate here to update it."
+              rows="5"
+              cols="30"
+            />
+            <small
+              v-if="errors.privateKey"
+              class="p-error text-xs font-normal leading-tight"
+              >{{ errors.privateKey }}</small
+            >
+          </div>
+        </template>
+      </FormHorizontal>
+      <FormHorizontal
+        v-if="certificateType === certificateTypes.TRUSTED"
+        title="Use my Trusted CA Certificate"
+        description="Trusted Certificate Authority Certificate can be used for Mutual Transport Layer Security (mTLS) configuration on Domains. To upload your Trusted CA Certificate to Azion servers, copy your certificate code and paste it inside the field below."
+      >
+        <template #inputs>
+          <div class="flex flex-col sm:max-w-lg w-full gap-2">
+            <label>Certificate Name: *</label>
+            <InputText
+              v-bind="name"
+              type="text"
+              placeholder="Insert the Digital Certificate name"
+              :class="{ 'p-invalid': errors.name }"
+              v-tooltip.top="{ value: errors.name, showDelay: 200 }"
+            />
+            <small
+              v-if="errors.name"
+              class="p-error text-xs font-normal leading-tight"
+              >{{ errors.name }}</small
+            >
+          </div>
+          <div class="flex flex-col sm:max-w-lg w-full gap-2">
+            <label>Certificate:</label>
+            <PrimeTextarea
+              v-bind="certificate"
+              :class="{ 'p-invalid': errors.certificate }"
+              v-tooltip.top="{ value: errors.certificate, showDelay: 200 }"
+              placeholder="For security, the certificate cannot be seen.&#10;Paste your new certificate here to update it."
+              rows="5"
+              cols="30"
+            />
+            <small>Tip: It's possible to include intermediate certificates.</small>
+            <small
+              v-if="errors.certificate"
+              class="p-error text-xs font-normal leading-tight"
+              >{{ errors.certificate }}</small
+            >
+          </div>
+        </template>
+      </FormHorizontal>
     </template>
   </EditFormBlock>
 </template>
 
 <script>
-  import EditFormBlock from '@/templates/edit-form-block'
+  import EditFormBlock from '@/templates/edit-form-block-new'
+  import FormHorizontal from '@/templates/create-form-block-new/form-horizontal'
   import PrimeTextarea from 'primevue/textarea'
   import PrimeButton from 'primevue/button'
   import InputText from 'primevue/inputtext'
@@ -128,7 +187,8 @@
       EditFormBlock,
       PrimeTextarea,
       InputText,
-      PrimeButton
+      PrimeButton,
+      FormHorizontal
     },
     props: {
       loadDigitalCertificateService: {
@@ -151,7 +211,7 @@
       }
 
       const validationSchema = yup.object({
-        name: yup.string().required(),
+        name: yup.string().required('Name is a required field.'),
         certificateType: yup.string(),
         csr: yup.string(),
         certificate: yup.string(),

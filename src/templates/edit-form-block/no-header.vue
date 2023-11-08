@@ -31,10 +31,6 @@
       isLoading: false
     }),
     props: {
-      pageTitle: {
-        type: String,
-        required: true
-      },
       editService: {
         type: Function,
         required: true
