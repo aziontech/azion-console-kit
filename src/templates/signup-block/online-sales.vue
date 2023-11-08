@@ -133,14 +133,28 @@
                 class="w-full"
                 placeholder="Type your password"
                 :class="{ 'p-invalid': errors.password }"
-                :pt="{
-                  panel: { class: 'hidden' },
-                  meter: (options) => {
-                    passwordStrength = options.state.meter?.strength || 'weak'
-                  }
-                }"
+                :feedback="false"
               />
               <small class="p-error text-xs font-normal leading-tight">{{ errors.password }}</small>
+              <ul class="text-color-secondary list-inside space-y-3">
+                <li
+                  class="flex gap-3 items-center text-color-secondary"
+                  :key="i"
+                  v-for="(requirement, i) in passwordRequirementsList"
+                >
+                  <div class="w-3">
+                    <span
+                      class="w-2 h-2 bg-[#F3652B] animate-fadeIn"
+                      v-if="!requirement.valid"
+                    />
+                    <span
+                      class="pi pi-check text-sm text-[#22C55E] animate-fadeIn"
+                      v-else
+                    />
+                  </div>
+                  <span>{{ requirement.label }}</span>
+                </li>
+              </ul>
             </div>
             <PrimeButton
               label="Next"
@@ -217,8 +231,14 @@
     'Free onboarding session'
   ]
 
-  const showForm = ref(false)
-  const passwordStrength = ref('weak')
+  const showForm = ref(true)
+
+  const passwordRequirementsList = ref([
+    { label: '> 7 characters', valid: false },
+    { label: 'Uppercase letter', valid: false },
+    { label: 'Lowercase letter', valid: false },
+    { label: 'Special character (e.g. !?<>@#$%)', valid: false }
+  ])
 
   const validationSchema = yup.object({
     name: yup
@@ -240,7 +260,17 @@
       .string()
       .test('max', 'Exceeded number of characters', (value) => value?.length <= 128)
       .test('min', 'Password is a required field', (value) => !!value)
-      .test('strength', 'Weak password', () => passwordStrength.value !== 'weak')
+      .test('requirements', '', (value) => {
+        const hasUpperCase = /[A-Z]/.test(value)
+        const hasLowerCase = /[a-z]/.test(value)
+        const hasSpecialCharacter = /[!@#$%^&*(),.?":{}|<>]/.test(value)
+        const hasMinimumLength = value?.length > 7
+        passwordRequirementsList.value[0].valid = hasMinimumLength
+        passwordRequirementsList.value[1].valid = hasUpperCase
+        passwordRequirementsList.value[2].valid = hasLowerCase
+        passwordRequirementsList.value[3].valid = hasSpecialCharacter
+        return hasMinimumLength && hasUpperCase && hasLowerCase && hasSpecialCharacter
+      })
   })
 
   const { values, meta, errors } = useForm({ validationSchema })
