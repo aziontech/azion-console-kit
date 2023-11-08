@@ -205,7 +205,7 @@
     password: yup
       .string()
       .required('Password is a required field')
-      .min(8, 'Password is too short - should be 8 chars minimum.')
+      .min(8, 'Password is too short. It should have at least 8 characters.')
   })
 
   const { defineInputBinds, errors } = useForm({
