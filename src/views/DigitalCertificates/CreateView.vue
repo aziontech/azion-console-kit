@@ -54,8 +54,8 @@
                 />
               </template>
               <template #subtitle>
-                Check this option to upload your TLS certificate and private key
-                or if you want to generate a CSR to submit to a certificate authority.
+                Check this option to upload your TLS certificate and private key or if you want to
+                generate a CSR to submit to a certificate authority.
               </template>
             </Card>
             <Card
@@ -76,9 +76,7 @@
                   :value="certificateTypes.TRUSTED"
                 />
               </template>
-              <template #subtitle>
-                Check this option to upload your mTLS certificate.
-              </template>
+              <template #subtitle> Check this option to upload your mTLS certificate. </template>
             </Card>
           </div>
         </template>
