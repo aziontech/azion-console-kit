@@ -1,7 +1,7 @@
 <!-- eslint-disable vuejs-accessibility/click-events-have-key-events -->
 <template>
   <div
-    class="flex flex-col items-start gap-4 justify-center sm:flex-row p-4 sm:py-3 sm:px-8 w-full sm:justify-between border-t surface-border sticky bottom-0 surface-section z-50"
+    class="flex flex-col items-start gap-4 w-full justify-center p-3 border-t surface-border sticky bottom-0 surface-section z-50 sm:flex-row sm:py-3 sm:px-8 sm:justify-between"
   >
     <div class="flex w-[283px]">
       <slot name="form" />
@@ -11,6 +11,7 @@
         severity="primary"
         label="Cancel"
         outlined
+        class="max-md:min-w-max"
         @click="handleCancel"
         :disabled="cancelDisabled"
       />
@@ -19,6 +20,7 @@
         label="Save"
         @click="handleSubmit"
         icon-pos="right"
+        class="max-md:w-full"
         :icon="calculateLoadIconByLoadingState"
         :disabled="isDisabled"
       />
