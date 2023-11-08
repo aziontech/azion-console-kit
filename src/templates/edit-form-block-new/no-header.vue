@@ -65,6 +65,9 @@
           this.$router.go('-1')
         }
       },
+      goBackToList() {
+        this.$router.go(-1)
+      },
       async loadInitialData() {
         try {
           const { id } = this.$route.params
@@ -92,6 +95,7 @@
             summary: 'edited successfully',
             life: 10000
           })
+          this.goBackToList()
         } catch (error) {
           this.$toast.add({
             closable: false,
