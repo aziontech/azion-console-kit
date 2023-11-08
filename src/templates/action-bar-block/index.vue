@@ -18,8 +18,9 @@
         severity="primary"
         label="Save"
         @click="handleSubmit"
-        :loading="loading"
-        :disabled="submitDisabled"
+        icon-pos="right"
+        :icon="calculateLoadIconByLoadingState"
+        :disabled="isDisabled"
       />
     </div>
   </div>
@@ -55,6 +56,14 @@
       },
       handleCancel() {
         this.$emit('cancel')
+      }
+    },
+    computed: {
+      calculateLoadIconByLoadingState() {
+        return this.loading ? 'pi pi-spin pi-spinner' : ''
+      },
+      isDisabled() {
+        return this.submitDisabled || this.loading
       }
     }
   }
