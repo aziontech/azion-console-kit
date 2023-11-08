@@ -75,7 +75,7 @@
       <div
         class="surface-card surface-border border max-w-md w-full p-6 md:p-10 rounded-md flex-col gap-6 flex"
       >
-        <div class="text-xl md:text-2xl font-medium">Real Time Manager</div>
+        <div class="text-xl md:text-2xl font-medium">Real-Time Manager</div>
         <div class="flex items-center gap-2">
           <PrimeButton
             class="w-7 h-7"
@@ -199,7 +199,7 @@
     email: yup
       .string()
       .required('Email is a required field')
-      .matches(emailValidateRegex, 'Invalid email address')
+      .matches(emailValidateRegex, 'Email not associated with any account.')
   })
   const passwordValidationSchema = yup.object({
     password: yup
