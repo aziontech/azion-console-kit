@@ -1,5 +1,7 @@
 <template>
-  <section class="flex w-full h-full lg:flex-row flex-col gap-6 xl:gap-0">
+  <section
+    class="flex lg:flex-row flex-col gap-6 xl:gap-0 min-h-[calc(100vh-60px-56px)] w-full px-3 py-6 lg:py-20 lg:px-6 surface-section"
+  >
     <div class="w-full flex flex-col items-center justify-center">
       <div class="min-w-max">
         <h2 class="text-[32px] sm:text-[48px] lg:text-[56px] leading-10">Welcome to the Edge</h2>
