@@ -2,12 +2,12 @@ import { AxiosHttpClientAdapter } from '../axios/AxiosHttpClientAdapter'
 import * as Errors from '@/services/axios/errors'
 import { makeIntelligentDNSRecordsBaseUrl } from './make-intelligent-dns-records-base-url'
 
-export const createRecordsService = async (payload) => {
+export const editRecordsService = async (payload) => {
   const adaptPayload = adapt(payload)
 
   let httpResponse = await AxiosHttpClientAdapter.request({
-    url: `${makeIntelligentDNSRecordsBaseUrl()}/${payload.intelligentDNSID}/records`,
-    method: 'POST',
+    url: `${makeIntelligentDNSRecordsBaseUrl()}/${payload.intelligentDNSId}/records/${payload.id}`,
+    method: 'PUT',
     body: adaptPayload
   })
 
@@ -16,13 +16,13 @@ export const createRecordsService = async (payload) => {
 
 const adapt = (payload) => {
   return {
-    record_type: payload.selectedRecordType._value,
-    policy: payload.selectedPolicy._value,
+    record_type: payload.recordType,
     entry: payload.name,
     answers_list: [payload.value],
     ttl: payload.ttl,
-    description: payload.description,
-    weight: payload.weight
+    policy: payload.policy,
+    weight: payload.weight,
+    description: payload.description
   }
 }
 
@@ -58,8 +58,8 @@ const extractApiError = (httpResponse) => {
  */
 const parseHttpResponse = (httpResponse) => {
   switch (httpResponse.statusCode) {
-    case 201:
-      return 'Intelligent DNS Record has been created'
+    case 200:
+      return 'Intelligent DNS Record has been updated'
     case 400:
       const apiError = extractApiError(httpResponse)
       throw new Error(apiError).message
