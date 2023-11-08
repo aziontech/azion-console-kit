@@ -3,11 +3,11 @@ import * as SignupService from '@/services/signup-services'
 /** @type {import('vue-router').RouteRecordRaw} */
 export const signupRoutes = {
   path: '/signup',
-  name: 'signup',
+  name: '',
   children: [
     {
       path: '',
-      name: 'signup-online-sales',
+      name: 'signup',
       component: () => import('@views/Signup/SignupView.vue'),
       props: {
         signupService: SignupService.signupService
@@ -15,7 +15,7 @@ export const signupRoutes = {
     },
     {
       path: 'activation',
-      name: 'signup-activation',
+      name: 'activation',
       component: () => import('@views/Signup/SignupActivationView.vue'),
       props: {
         resendEmailService: SignupService.resendEmailService

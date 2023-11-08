@@ -63,6 +63,7 @@
         <PrimeButton
           link
           label="Create one now"
+          @click="router.push({ name: 'signup' })"
         ></PrimeButton>
       </div>
     </div>
@@ -118,7 +119,7 @@
             class="p-0"
             label="Forgot my password"
             @click="$emit('goToForgotPassword', true)"
-          ></PrimeButton>
+          />
         </div>
         <PrimeButton
           class="w-full flex-row-reverse"
@@ -135,7 +136,8 @@
         <PrimeButton
           link
           label="Create one now"
-        ></PrimeButton>
+          @click="router.push({ name: 'signup' })"
+        />
       </div>
     </div>
   </form>

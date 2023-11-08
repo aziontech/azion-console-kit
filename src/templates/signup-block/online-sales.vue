@@ -177,6 +177,7 @@
           <PrimeButton
             label="Sign in here"
             severity="secondary"
+            @click="router.push({ name: 'login' })"
           />
         </div>
       </div>
@@ -255,7 +256,7 @@
       const captcha = await recaptcha.execute('signup')
       await props.signupService({ ...values, captcha })
       getInstance().hideBadge()
-      router.push({ name: 'signup-activation', query: { email: values.email } })
+      router.push({ name: 'activation', query: { email: values.email } })
     } catch (err) {
       toast.add({ life: 5000, severity: 'error', detail: err, summary: 'Error' })
     }
