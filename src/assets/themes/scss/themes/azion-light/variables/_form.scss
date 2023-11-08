@@ -8,7 +8,7 @@ $inputBg: #f4f4f4;
 
 /// Font size of an input field
 /// @group form
-$inputTextFontSize: 0.875rem;
+$inputTextFontSize: 1rem;
 
 /// Text color of an input field
 /// @group form
@@ -20,15 +20,15 @@ $inputIconColor: $textColor;
 
 /// Border of an input field
 /// @group form
-$inputBorder: 1px solid var(--surface-border);
+$inputBorder: 1px solid #e7e7e7;
 
 /// Border of an input field in hover state
 /// @group form
-$inputHoverBorderColor: #f3652b;
+$inputHoverBorderColor: $primaryColor;
 
 /// Border of an input field in focus state
 /// @group form
-$inputFocusBorderColor: #f3652b;
+$inputFocusBorderColor: $primaryColor;
 
 /// Color of an input field in invalid state
 /// @group form
@@ -162,15 +162,15 @@ $inputOverlayShadow:
 
 /// Width of a checkbox
 /// @group form
-$checkboxWidth: 20px;
+$checkboxWidth: 16px;
 
 /// Height of a checkbox
 /// @group form
-$checkboxHeight: 20px;
+$checkboxHeight: 16px;
 
 /// Border of a checkbox
 /// @group form
-$checkboxBorder: 2px solid var(--surface-border);
+$checkboxBorder: 3px solid #e7e7e7;
 
 /// Size of a checkbox icon
 /// @group form
@@ -210,11 +210,11 @@ $radiobuttonHeight: 20px;
 
 /// Border of a radiobutton
 /// @group form
-$radiobuttonBorder: 2px solid var(--surface-border);
+$radiobuttonBorder: 2px solid #e7e7e7;
 
 /// Font size of a radiobutton icon
 /// @group form
-$radiobuttonIconSize: 8px;
+$radiobuttonIconSize: 12px;
 
 /// Border color of a selected radiobutton
 /// @group form

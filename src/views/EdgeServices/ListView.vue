@@ -1,6 +1,5 @@
 <template>
   <ListTableBlock
-    v-if="hasContentToList"
     :listService="listEdgeServicesService"
     :deleteService="deleteEdgeServicesService"
     :columns="getColumns"
@@ -8,34 +7,16 @@
     addButtonLabel="Add Service"
     createPagePath="edge-services/create"
     editPagePath="edge-services/edit"
-    @on-load-data="handleLoadData"
   />
-
-  <EmptyResultsBlock
-    v-else
-    title="No edge services"
-    description="Create your first edge service."
-    createButtonLabel="Add edge service"
-    createPagePath="edge-services/create"
-    :documentationService="documentationService"
-  >
-    <template #illustration>
-      <Illustration />
-    </template>
-  </EmptyResultsBlock>
 </template>
 
 <script>
   import ListTableBlock from '@/templates/list-table-block'
-  import EmptyResultsBlock from '@/templates/empty-results-block'
-  import Illustration from '@/assets/svg/illustration-layers.vue'
 
   export default {
     name: 'edge-services-view',
     components: {
-      ListTableBlock,
-      EmptyResultsBlock,
-      Illustration
+      ListTableBlock
     },
     props: {
       listEdgeServicesService: {
@@ -45,15 +26,8 @@
       deleteEdgeServicesService: {
         required: true,
         type: Function
-      },
-      documentationService: {
-        required: true,
-        type: Function
       }
     },
-    data: () => ({
-      hasContentToList: true
-    }),
     computed: {
       getColumns() {
         return [
@@ -74,11 +48,6 @@
             header: 'Active'
           }
         ]
-      }
-    },
-    methods: {
-      handleLoadData(event) {
-        this.hasContentToList = event
       }
     }
   }

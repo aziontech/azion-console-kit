@@ -6,7 +6,7 @@ const fixtures = {
   networkMock: {
     name: 'AZ network',
     networkListType: 'ip_cidr',
-    networkContentList: '123.123.123.123'
+    networkContentList: ['123.123.123.123']
   }
 }
 

@@ -1,12 +1,19 @@
 <template>
   <ToastBlock />
-  <MainMenuBlock :isLogged="isLogged" />
+  <MainMenuBlock
+    @showSlideHelper="showHelperCenter"
+    :helperVisible="isHelperVisible"
+    :isLogged="isLogged"
+  />
   <main
-    class="flex w-full relative min-h-[calc(100vh-120px)] [&>.active]:md:w-[calc(100%-300px)] mt-14"
+    class="flex w-full relative min-h-[calc(100vh-120px)] [&>.active]:!w-[calc(100%-300px)] mt-14"
     :class="[styleHelper, { 'flex align-items-center': !isLogged }]"
   >
     <slot :customClass="customClass"></slot>
-    <HelpBlock :class="customClassHelper" />
+    <help
+      :class="customClassHelper"
+      @closeSlideIn="close"
+    ></help>
   </main>
 
   <FooterBlock />
@@ -16,9 +23,7 @@
   import ToastBlock from '@/templates/toast-block'
   import MainMenuBlock from '@/templates/main-menu-block'
   import FooterBlock from '@/templates/footer-block'
-  import HelpBlock from '@/templates/slide-in/help.vue'
-  import { mapState } from 'pinia'
-  import { useHelpCenterStore } from '@/stores/help-center'
+  import Help from '../slide-in/help.vue'
 
   export default {
     name: 'shell-block',
@@ -26,20 +31,36 @@
     components: {
       FooterBlock,
       MainMenuBlock,
-      HelpBlock,
+      Help,
       ToastBlock
     },
+    data() {
+      return {
+        isHelperVisible: false
+      }
+    },
     computed: {
-      ...mapState(useHelpCenterStore, { showHelp: 'isOpen' }),
       customClass() {
-        return this.showHelp ? 'active' : ''
+        const isActive = this.isActive(this.isHelperVisible)
+        return isActive ? 'active' : ''
       },
       customClassHelper() {
-        return this.showHelp ? 'active-helper' : ''
+        return this.isHelperVisible ? 'active-helper' : ''
       },
 
       styleHelper() {
-        return '[&>.active-helper]:block transform [&>.active-helper]:md:translate-x-0'
+        return `[&>.active-helper]:block [&>.active-helper]:transform [&>.active-helper]:translate-x-0`
+      }
+    },
+    methods: {
+      isActive(...variables) {
+        return variables.includes(true)
+      },
+      showHelperCenter(value) {
+        this.isHelperVisible = value
+      },
+      close() {
+        this.isHelperVisible = false
       }
     }
   }

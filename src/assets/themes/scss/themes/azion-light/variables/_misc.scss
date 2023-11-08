@@ -136,8 +136,8 @@ $scrollTopTextColor: #f8f9fa;
 
 /// Background of a skeleton
 /// @group misc
-$skeletonBg: #eaeaea;
+$skeletonBg: #e9ecef;
 
 /// Background of a skeleton animation
 /// @group misc
-$skeletonAnimationBg: #d6d6d6;
+$skeletonAnimationBg: rgba(255, 255, 255, 0.4);

@@ -37,14 +37,4 @@ describe('AzionDocumentationCatalog', () => {
       `https://www.azion.com/en/search-result/?q=&filter=doc`
     )
   })
-  it('should open edge service documentation with correct link', () => {
-    const openWindowSpy = vi.spyOn(window, 'open')
-    const { sut } = makeSut()
-
-    sut.edgeServices()
-
-    expect(openWindowSpy).toHaveBeenCalledWith(
-      `https://www.azion.com/en/search-result/?q=edge services&filter=doc`
-    )
-  })
 })

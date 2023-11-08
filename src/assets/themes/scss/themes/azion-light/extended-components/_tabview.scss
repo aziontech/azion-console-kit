@@ -18,12 +18,12 @@
     }
   }
   .p-tabview-nav-btn.p-link {
-    background-color: var(--surface-section) !important;
-    color: $textColor !important;
+    background-color: var(--surface-0) !important;
+    color: $buttonBg !important;
     width: 2rem;
-    transition: all 150ms;
+    border-radius: 0;
     &:enabled:hover {
-      background: var(--surface-hover) !important;
+      background: var(--surface-100) !important;
       color: $buttonBg;
     }
   }

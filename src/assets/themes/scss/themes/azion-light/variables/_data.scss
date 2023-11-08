@@ -64,7 +64,7 @@ $paginatorElementPadding: 0;
 
 /// Border of a table header
 /// @group data
-$tableHeaderBorder: 1px solid var(--surface-border);
+$tableHeaderBorder: 1px solid #e9ecef;
 
 /// Border width of a table header
 /// @group data
@@ -84,11 +84,11 @@ $tableHeaderFontWeight: 600;
 
 /// Padding of a table header, must be defined with a shorthand for vertical and horizontal values e.g. ".5rem .5rem"
 /// @group data
-$tableHeaderPadding: 0.875rem 0.875rem;
+$tableHeaderPadding: 1rem 1rem;
 
 /// Padding of a table header cell, must be defined with a shorthand for vertical and horizontal values e.g. ".5rem .5rem"
 /// @group data
-$tableHeaderCellPadding: 0.875rem 0.875rem;
+$tableHeaderCellPadding: 1rem 1rem;
 
 /// Background of a table header cell
 /// @group data
@@ -100,7 +100,7 @@ $tableHeaderCellTextColor: $textColor;
 
 /// Font weight of a table header cell
 /// @group data
-$tableHeaderCellFontWeight: 500;
+$tableHeaderCellFontWeight: 600;
 
 /// Border of a table header cell
 /// @group data

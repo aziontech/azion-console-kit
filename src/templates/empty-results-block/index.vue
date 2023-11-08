@@ -3,10 +3,10 @@
   <div class="flex flex-col gap-7 justify-center items-center p-7 self-center">
     <slot name="illustration" />
     <div class="flex flex-col gap-2">
-      <p class="text-center text-color text-lg font-bold leading-7">
+      <p class="text-center dark:text-zinc-900 text-lg font-bold leading-7">
         {{ title }}
       </p>
-      <p class="text-center text-color-secondary text-sm font-normal leading-tight">
+      <p class="text-center dark:text-zinc-900 text-sm font-normal leading-tight">
         {{ description }}
       </p>
     </div>

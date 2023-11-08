@@ -7,7 +7,7 @@
     viewBox="0 0 22 18"
   >
     <path
-      :fill="fill"
+      fill="#F3652B"
       fill-rule="evenodd"
       d="M18.744 0 .504 15.357
             0 18h2.628l14.13-11.89L14.48
@@ -19,12 +19,6 @@
 
 <script>
   export default {
-    name: 'azion-mobile-logo',
-    props: {
-      fill: {
-        type: String,
-        default: '#F3652B'
-      }
-    }
+    name: 'azion-mobile-logo'
   }
 </script>
