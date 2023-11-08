@@ -62,9 +62,22 @@ export default defineConfig({
         rewrite: (path) => path.replace(/^\/api\/account-details/, '')
       },
       '/api/teams': {
-        target: 'https://stage-iam.azion.com/iam/api/teams/',
+        target: 'https://stage-iam.azion.com/iam/api/teams',
         changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/api\/teams/, '')
+        rewrite: (path) => path.replace(/^\/api\/teams/, ''),
+        configure: (proxy, options) => {
+          proxy.on('proxyReq', (proxyReq, req) => {
+            const originalUrl = `https://${req.headers.host}${req.url}`
+            const targetUrl = options.target
+            const proxiedUrl = `${targetUrl}${req.url}`
+            console.log(`${originalUrl} => ${proxiedUrl}`)
+          })
+        }
+      },
+      '/api/permissions': {
+        target: 'https://stage-iam.azion.com/iam/api/permissions',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/api\/permissions/, '')
       },
       '/api/users': {
         target: 'https://stage-iam.azion.com/iam/api',
