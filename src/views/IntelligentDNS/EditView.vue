@@ -8,37 +8,68 @@
       >
         <TabPanel header="Main Settings">
           <EditFormBlock
-            pageTitle="Edit Intelligent DNS"
             :editService="editIntelligentDNSService"
             :loadService="loadIntelligentDNSService"
             :initialDataSetter="setValues"
             :isValid="meta.valid"
             :formData="values"
-            backURL="/intelligent-dns"
           >
             <template #form>
-              <InputText
-                placeholder="Zone Name"
-                v-bind="name"
-                type="text"
-                :class="{ 'p-invalid': errors.name }"
-                v-tooltip.top="{ value: errors.name, showDelay: 200 }"
-              />
-              <InputText
-                placeholder="Domain"
-                v-bind="domain"
-                type="text"
-                :class="{ 'p-invalid': errors.domain }"
-                v-tooltip.top="{ value: errors.domain, showDelay: 200 }"
-              />
-              <div class="flex gap-3 items-center">
-                <label for="">Active</label>
-                <InputSwitch
-                  v-bind="isActive"
-                  v-model="isActive.value"
-                  :class="{ 'p-invalid': errors.isActive }"
-                />
-              </div>
+              <FormHorizontal
+                title="General"
+                description="Espaço livre para descrição e instruções de preenchimento. Esse conteúdo deve ser criado pensando tanto em funcionalidade quanto em em alinhamento e estética. Devemos sempre criar os blocos conforme o contexto, cuidando sempre para não ter blocos muito longos."
+              >
+                <template #inputs>
+                  <div class="flex flex-col sm:max-w-lg w-full gap-2">
+                    <label
+                      for="name"
+                      class="text-color text-base font-medium"
+                      >Name *</label
+                    >
+                    <InputText
+                      placeholder="Zone Name"
+                      v-bind="name"
+                      id="name"
+                      type="text"
+                      :class="{ 'p-invalid': errors.name }"
+                      v-tooltip.top="{ value: errors.name, showDelay: 200 }"
+                    />
+                    <small
+                      v-if="errors.name"
+                      class="p-error text-xs font-normal leading-tight"
+                      >{{ errors.name }}</small
+                    >
+                  </div>
+                  <div class="flex flex-col sm:max-w-lg w-full gap-2">
+                    <label
+                      for="domain"
+                      class="text-color text-base font-medium"
+                      >Domain *</label
+                    >
+                    <InputText
+                      placeholder="Domain"
+                      id="domain"
+                      v-bind="domain"
+                      type="text"
+                      :class="{ 'p-invalid': errors.domain }"
+                      v-tooltip.top="{ value: errors.domain, showDelay: 200 }"
+                    />
+                    <small
+                      v-if="errors.domain"
+                      class="p-error text-xs font-normal leading-tight"
+                      >{{ errors.domain }}</small
+                    >
+                  </div>
+                  <div class="flex gap-3 items-center">
+                    <label for="">Active</label>
+                    <InputSwitch
+                      v-bind="isActive"
+                      v-model="isActive.value"
+                      :class="{ 'p-invalid': errors.isActive }"
+                    />
+                  </div>
+                </template>
+              </FormHorizontal>
             </template>
           </EditFormBlock>
         </TabPanel>
@@ -47,7 +78,7 @@
             pageTitle="Records"
             addButtonLabel="Add Record"
             createPagePath="records/create"
-            editPagePath="/records/edit"
+            editPagePath="records/edit"
             :columns="recordListColumns"
             :listService="listRecordsServiceIntelligentDNSDecorator"
             :deleteService="deleteRecordsServiceIntelligentDNSDecorator"
@@ -61,8 +92,9 @@
 
 <script>
   import { useIntelligentDNSStore } from '@/stores/intelligent-dns'
-  import EditFormBlock from '@/templates/edit-form-block/no-header'
-  import PageHeadingBlock from '@/templates/page-heading-block-tabs'
+  import EditFormBlock from '@templates/edit-form-block-new/no-header'
+  import FormHorizontal from '@templates/create-form-block-new/form-horizontal'
+  import PageHeadingBlock from '@templates/page-heading-block-tabs'
   import ListTableBlock from '@templates/list-table-block/no-header'
   import TabView from 'primevue/tabview'
   import TabPanel from 'primevue/tabpanel'
@@ -80,6 +112,7 @@
       InputText,
       InputSwitch,
       ListTableBlock,
+      FormHorizontal,
       PageHeadingBlock
     },
 
@@ -173,7 +206,7 @@
         })
       },
       renderTabCurrentRouter() {
-        if (this.$route.name === 'edit-intelligent-dns-records') {
+        if (this.$route.name === 'intelligent-dns-records') {
           this.activeTab = 1
         } else {
           this.activeTab = 0
@@ -184,7 +217,7 @@
           this.$router.push({ name: 'edit-intelligent-dns', params: { id: this.intelligentDNSID } })
         } else {
           this.$router.push({
-            name: 'edit-intelligent-dns-records',
+            name: 'intelligent-dns-records',
             params: { id: this.intelligentDNSID }
           })
         }

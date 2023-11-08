@@ -15,8 +15,10 @@ import { personalTokensRoutes } from '@routes/personal-tokens-routes'
 import { variablesRoutes } from '@routes/variables-routes'
 import { edgeNodeRoutes } from '@routes/edge-node-routes'
 import { credentialsRoutes } from '@routes/credentials-routes'
+import { teamsPermissionRoutes } from './routes/team-permission'
 import { usersListsRoutes } from '@routes/users-routes'
 import { passwordRoutes } from '@routes/password-routes'
+import { activityHistoryRoutes } from './routes/activity-history-routes'
 import { errorRoutes } from '@routes/error-routes'
 import { playgroundRoutes } from '@routes/playground-routes'
 import { mfaRoutes } from '@routes/mfa-routes'
@@ -44,7 +46,9 @@ const router = createRouter({
     usersListsRoutes,
     passwordRoutes,
     playgroundRoutes,
-    mfaRoutes
+    mfaRoutes,
+    activityHistoryRoutes,
+    teamsPermissionRoutes
   ].concat(errorRoutes)
 })
 

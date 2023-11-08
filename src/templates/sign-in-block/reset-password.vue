@@ -39,13 +39,13 @@
                   v-if="!requirement.valid"
                 ></div>
                 <div
-                  class="pi pi-check text-sm text-green-500 animate-fadeIn"
+                  class="pi pi-check text-sm text-[#22C55E] animate-fadeIn"
                   v-else
                 ></div>
               </div>
 
               <div>
-                {{ requirement.value }}
+                {{ requirement.label }}
               </div>
             </li>
           </ul>
@@ -122,10 +122,10 @@
   const errorConfirmation = ref('')
   const requestError = ref('')
   const passwordRequirementsList = ref([
-    { value: '> 7 characters', valid: false },
-    { value: 'Uppercase letter', valid: false },
-    { value: 'Lowercase letter', valid: false },
-    { value: 'Special character (e.g. !?<>@#$%)', valid: false }
+    { label: '> 7 characters', valid: false },
+    { label: 'Uppercase letter', valid: false },
+    { label: 'Lowercase letter', valid: false },
+    { label: 'Special character (e.g. !?<>@#$%)', valid: false }
   ])
 
   const props = defineProps({
@@ -190,7 +190,7 @@
 
       isPasswordReseted.value = true
     } catch (err) {
-      requestError.value = err.message
+      requestError.value = err
     } finally {
       isButtonLoading.value = false
     }

@@ -27,13 +27,8 @@ const extractErrorKey = (errorSchema, key) => {
  * @returns {string} The result message based on the status code.
  */
 const extractApiError = (httpResponse) => {
-  const alreadyUsedKeyError = extractErrorKey(httpResponse.body, 'non_field_errors')
-  const invalidKeyCharacterError = extractErrorKey(httpResponse.body, 'key')
-  const invalidValueCharacterError = extractErrorKey(httpResponse.body, 'value')
-
-  const errorMessages = [alreadyUsedKeyError, invalidKeyCharacterError, invalidValueCharacterError]
-  const errorMessage = errorMessages.find((error) => !!error)
-  return errorMessage
+  const errors = extractErrorKey(httpResponse.body, 'errors')
+  return errors
 }
 
 /**
@@ -48,8 +43,11 @@ const parseHttpResponse = (httpResponse) => {
     case 201:
       return 'Your credential has been created'
     case 400:
-      const apiError = extractApiError(httpResponse)
-      throw new Error(apiError)
+      const apiError400 = extractApiError(httpResponse)
+      throw new Error(apiError400).message
+    case 422:
+      const apiError422 = extractApiError(httpResponse)
+      throw new Error(apiError422).message
     case 401:
       throw new Errors.InvalidApiTokenError().message
     case 403:

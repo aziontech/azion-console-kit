@@ -1,5 +1,6 @@
 import { AxiosHttpClientAdapter } from '@/services/axios/AxiosHttpClientAdapter'
 import { createIntelligentDNSService } from '@/services/intelligent-dns-services'
+import * as Errors from '@/services/axios/errors'
 import { describe, expect, it, vi } from 'vitest'
 
 const fixtures = {
@@ -46,6 +47,56 @@ describe('IntelligentDnsServices', () => {
 
     const feedbackMessage = await sut(fixtures.dnsMock)
 
-    expect(feedbackMessage).toBe('Resource successfully created')
+    expect(feedbackMessage).toBe('Your Intelligent DNS has been created')
   })
+
+  it('Should return an API validation error to an already taken intelligent dns ', async () => {
+    const apiErrorMock = 'API validation error, this iDNS already is already taken'
+    vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
+      statusCode: 400,
+      body: {
+        errors: [apiErrorMock]
+      }
+    })
+    const { sut } = makeSut()
+
+    const feedbackMessage = sut(fixtures.dnsMock)
+
+    expect(feedbackMessage).rejects.toThrow(apiErrorMock)
+  })
+
+  it.each([
+    {
+      statusCode: 401,
+      expectedError: new Errors.InvalidApiTokenError().message
+    },
+    {
+      statusCode: 403,
+      expectedError: new Errors.PermissionError().message
+    },
+    {
+      statusCode: 404,
+      expectedError: new Errors.NotFoundError().message
+    },
+    {
+      statusCode: 500,
+      expectedError: new Errors.InternalServerError().message
+    },
+    {
+      statusCode: 'unmappedStatusCode',
+      expectedError: new Errors.UnexpectedError().message
+    }
+  ])(
+    'should throw when request fails with status code $statusCode',
+    async ({ statusCode, expectedError }) => {
+      vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
+        statusCode
+      })
+      const { sut } = makeSut()
+
+      const response = sut(fixtures.dnsMock)
+
+      expect(response).rejects.toBe(expectedError)
+    }
+  )
 })

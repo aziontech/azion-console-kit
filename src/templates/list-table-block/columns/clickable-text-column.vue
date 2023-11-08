@@ -23,11 +23,16 @@
       clickAction: {
         required: true,
         type: Function
+      },
+      clickProps: {
+        required: false,
+        type: Object,
+        default: () => ({})
       }
     },
     methods: {
       handleClick() {
-        this.clickAction()
+        this.clickAction(this.clickProps)
       }
     }
   }

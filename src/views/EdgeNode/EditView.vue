@@ -21,11 +21,21 @@
               backURL="/edge-node"
             >
               <template #form>
-                <FormHorizontal title="Edit Edge Node">
+                <FormHorizontal
+                  title="Main Settings"
+                  description="Each node needs to run the Azion Orchestration software. It enables the
+                        communication between your private node and Azion Real-Time Manager, where
+                        you can manage your Edge Applications, Edge Functions, and many other Azion
+                        services."
+                >
                   <template #inputs>
                     <div class="flex flex-col gap-5 mb-6">
-                      <h2 class="text-2xl">Main Settings</h2>
-                      <div>
+                      <div class="flex flex-col sm:max-w-lg w-full gap-2">
+                        <label
+                          for="name"
+                          class="text-color text-base font-medium"
+                          >Name</label
+                        >
                         <InputText
                           placeholder="Name"
                           v-bind="name"
@@ -33,19 +43,20 @@
                           :class="{ 'p-invalid': errors.name }"
                           class="w-full"
                         />
+
                         <small
                           id="username-help"
                           class="p-error"
                           >{{ errors.name }}</small
                         >
                       </div>
-                      <p>
-                        Each node needs to run the Azion Orchestration software. It enables the
-                        communication between your private node and Azion Real-Time Manager, where
-                        you can manage your Edge Applications, Edge Functions, and many other Azion
-                        services.
-                      </p>
-                      <div class="flex flex-col gap-2">
+
+                      <div class="flex flex-col sm:max-w-lg w-full gap-2">
+                        <label
+                          for="name"
+                          class="text-color text-base font-medium"
+                          >Hash ID</label
+                        >
                         <InputText
                           placeholder="HashID"
                           v-bind="hashId"
@@ -54,11 +65,11 @@
                           :disabled="true"
                         />
                       </div>
-                      <div class="flex flex-col gap-2">
-                        <label for="groups">Node groups</label>
-                        <small id="groups-help"
-                          >Use labels to group your Edge Nodes. Groups allow you to manage multiple
-                          Edge Nodes easily in your Edge Maps for orchestration and routing.</small
+                      <div class="flex flex-col sm:max-w-lg w-full gap-2">
+                        <label
+                          for="name"
+                          class="text-color text-base font-medium"
+                          >Node groups</label
                         >
                         <InputText
                           id="groups"
@@ -66,7 +77,16 @@
                           aria-describedby="groups-help"
                           @keyup.enter="addNewGroup"
                         />
-                        <div class="card flex flex-wrap gap-2">
+                        <small
+                          id="username-help"
+                          class="p-error"
+                          >{{ errors.name }}</small
+                        >
+                        <div class="text-color-secondary text-sm font-normal">
+                          Use labels to group your Edge Nodes. Groups allow you to manage multiple
+                          Edge Nodes easily in your Edge Maps for orchestration and routing.
+                        </div>
+                        <div class="flex gap-2">
                           <div
                             class="flex align-items-center"
                             v-for="(item, index) in groups"
@@ -87,49 +107,91 @@
                         </div>
                       </div>
                     </div>
-                    <div class="flex flex-col gap-5">
-                      <h2 class="text-2xl">Orchestration Modules</h2>
-                      <small>Choose orchestration modules to install on your Edge Node.</small>
+                  </template>
+                </FormHorizontal>
+                <FormHorizontal
+                  title="Orchestration Modules"
+                  description="Choose orchestration modules to install on your Edge Node."
+                >
+                  <template #inputs>
+                    <div class="flex flex-col gap-2">
+                      <label class="text-color text-base font-medium"></label>
                       <div class="flex flex-col gap-3">
-                        <div class="flex justify-between">
-                          <label for="cells">Azion Cells</label>
-                          <InputSwitch
-                            id="cells"
-                            :disabled="true"
-                          />
-                        </div>
-                        <small>
-                          Azion Cells is a lightweight software framework to build and run
-                          low-latency Edge Applications. By activating this option, you agree to
-                          install the framework on your Edge Node.
-                        </small>
-                      </div>
-                      <div class="flex flex-col gap-3">
-                        <div class="flex justify-between">
-                          <label for="health">Azion Health Check</label>
-                          <InputSwitch
-                            id="health"
-                            :disabled="true"
-                          />
-                        </div>
-                        <small>
-                          Azion Health Check is a service that enables your Edge Node to report the
-                          availability and health constantly to Azion. By activating this option,
-                          you agree to install the service on your Edge Node.
-                        </small>
-                      </div>
-                      <div class="flex flex-col gap-3">
-                        <div class="flex justify-between">
-                          <label for="service">Add-On Services</label>
-                          <InputSwitch
-                            id="service"
-                            v-model="addService"
-                            :disabled="modules.value.add_services"
-                          />
-                        </div>
-                        <small>
-                          Enables you to instantiate add-on services from your own Services Library.
-                        </small>
+                        <Card
+                          :pt="{
+                            body: { class: 'p-4' },
+                            title: {
+                              class: 'flex justify-between items-center text-base font-medium m-0'
+                            },
+                            subtitle: {
+                              class:
+                                'text-sm font-normal text-color-secondary m-0 pr-0 md:pr-[2.5rem]'
+                            }
+                          }"
+                        >
+                          <template #title>
+                            <span class="text-base">Azion Cells</span>
+                            <InputSwitch
+                              id="cells"
+                              :disabled="true"
+                            />
+                          </template>
+                          <template #subtitle
+                            >Azion Cells is a lightweight software framework to build and run
+                            low-latency Edge Applications. By activating this option, you agree to
+                            install the framework on your Edge Node.</template
+                          >
+                        </Card>
+                        <Card
+                          :pt="{
+                            body: { class: 'p-4' },
+                            title: {
+                              class: 'flex justify-between items-center text-base font-medium m-0'
+                            },
+                            subtitle: {
+                              class:
+                                'text-sm font-normal text-color-secondary m-0 pr-0 md:pr-[2.5rem]'
+                            }
+                          }"
+                        >
+                          <template #title>
+                            <span class="text-base">Azion Health Check</span>
+                            <InputSwitch
+                              id="health"
+                              :disabled="true"
+                            />
+                          </template>
+                          <template #subtitle
+                            >Azion Health Check is a service that enables your Edge Node to report
+                            the availability and health constantly to Azion. By activating this
+                            option, you agree to install the service on your Edge Node.</template
+                          >
+                        </Card>
+                        <Card
+                          :pt="{
+                            body: { class: 'p-4' },
+                            title: {
+                              class: 'flex justify-between items-center text-base font-medium m-0'
+                            },
+                            subtitle: {
+                              class:
+                                'text-sm font-normal text-color-secondary m-0 pr-0 md:pr-[2.5rem]'
+                            }
+                          }"
+                        >
+                          <template #title>
+                            <span class="text-base">Add-On Services</span>
+                            <InputSwitch
+                              id="service"
+                              v-model="addService"
+                              :disabled="modules.value.add_services"
+                            />
+                          </template>
+                          <template #subtitle
+                            >Enables you to instantiate add-on services from your own Services
+                            Library.</template
+                          >
+                        </Card>
                       </div>
                     </div>
                   </template>
@@ -170,7 +232,7 @@
   import { useField, useForm } from 'vee-validate'
   import * as yup from 'yup'
   import { useRoute, useRouter } from 'vue-router'
-  import EditFormBlock from '@/templates/edit-form-block/no-header'
+  import EditFormBlock from '@/templates/edit-form-block-new/no-header'
   import PageHeadingBlock from '@/templates/page-heading-block-tabs'
   import FormHorizontal from '@/templates/create-form-block-new/form-horizontal'
 
@@ -180,6 +242,7 @@
   import InputText from 'primevue/inputtext'
   import InputSwitch from 'primevue/inputswitch'
   import Checkbox from 'primevue/checkbox'
+  import Card from 'primevue/card'
 
   const pros = defineProps({
     loadEdgeNodeService: { type: Function, required: true },

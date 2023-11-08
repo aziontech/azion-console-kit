@@ -23,6 +23,7 @@ const adapt = (httpResponse) => {
         value: record.answers_list.join(','),
         ttl: record.ttl,
         policy: record.policy,
+        weight: record.weight,
         description: record.description ? record.description : '-'
       }))
     : []

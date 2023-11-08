@@ -1,12 +1,8 @@
 <template>
-  <div class="flex flex-col p-10 items-center justify-center gap-2">
-    <InlineMessage class="w-full" severity="success">Message Content</InlineMessage>
-    <InlineMessage class="w-full" severity="info">Message Content</InlineMessage>
-    <InlineMessage class="w-full" severity="warn">Message Content</InlineMessage>
-    <InlineMessage class="w-full" severity="error">Message Content</InlineMessage>
+  <div class="p-4 w-full">
+    <div class="max-w-screen-sm lg:max-w-7xl mx-auto gap-4">
+      <i class="ai ai-twitter text-lg text-color"/>
+      <i class="pi pi-twitter text-lg text-color"/>
+    </div>
   </div>
 </template>
-
-<script setup>
-import InlineMessage from 'primevue/inlinemessage';
-</script>
