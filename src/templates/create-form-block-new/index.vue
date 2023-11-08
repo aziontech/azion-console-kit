@@ -2,7 +2,7 @@
   <div class="flex flex-col min-h-[calc(100vh-120px)]">
     <PageHeadingBlock :pageTitle="pageTitle" />
     <form
-      class="w-full grow px-8 flex flex-col gap-8 mb-5"
+      class="w-full grow px-8 flex flex-col gap-8 mb-5 max-md:px-3"
       :class="{ 'py-4': !hasTabs, 'pb-4': hasTabs }"
     >
       <slot name="form" />
