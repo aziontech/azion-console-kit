@@ -11,13 +11,13 @@
         v-if="pageTitle || description"
       >
         <div
-          class="text-[var(--text-color)] text-3xl font-medium leading-9"
+          class="text-[var(--text-color)] text-3xl font-medium leading-9 max-md:text-2xl"
           v-if="pageTitle"
         >
           {{ pageTitle }}
         </div>
         <div
-          class="text-[var(--text-color-secondary)] text-lg font-normal leading-7"
+          class="text-[var(--text-color-secondary)] text-lg font-normal leading-7 max-md:text-base"
           v-if="description"
         >
           {{ description }}
