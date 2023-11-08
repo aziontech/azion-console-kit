@@ -146,6 +146,7 @@
               label="Next"
               :disabled="!meta.valid"
               type="submit"
+              severity="secondary"
             />
           </form>
           <PrimeButton
@@ -195,6 +196,7 @@
   import { azionPrivacyPolicyWindowOpener } from '@/helpers/azion-privacy-policy-opener'
   import { azionTermsAndServicesWindowOpener } from '@/helpers/azion-terms-and-services-opener'
   import { useToast } from 'primevue/usetoast'
+  import { useRouter } from 'vue-router'
 
   let recaptcha
   onMounted(async () => {
@@ -246,14 +248,14 @@
   const { value: password } = useField('password')
 
   const toast = useToast()
+  const router = useRouter()
 
-  const emit = defineEmits(['signup-success'])
   const signUp = async () => {
     try {
       const captcha = await recaptcha.execute('signup')
       await props.signupService({ ...values, captcha })
-      emit('signup-success')
       getInstance().hideBadge()
+      router.push({ name: 'signup-activation', query: { email: values.email } })
     } catch (err) {
       toast.add({ life: 5000, severity: 'error', detail: err, summary: 'Error' })
     }
