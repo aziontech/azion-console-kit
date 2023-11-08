@@ -36,8 +36,8 @@
             <label
               for="value"
               class="text-color text-base font-medium"
-              >Permissions * </label
-            >
+              >Permissions *
+            </label>
             <PickList
               v-model="permissionsList"
               listStyle="height:342px"
@@ -75,10 +75,8 @@
                 :class="{ 'p-invalid': errors.isActive }"
               />
             </template>
-            <template #subtitle>  </template>
+            <template #subtitle> </template>
           </Card>
-
-
         </template>
       </FormHorizontal>
     </template>
@@ -92,8 +90,6 @@
   import PickList from 'primevue/picklist'
   import Card from 'primevue/card'
   import InputSwitch from 'primevue/inputswitch'
-
-
 
   import { useForm, useField } from 'vee-validate'
   import * as yup from 'yup'

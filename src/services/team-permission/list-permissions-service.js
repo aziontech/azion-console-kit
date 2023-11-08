@@ -1,5 +1,5 @@
 import { AxiosHttpClientAdapter, parseHttpResponse } from '../axios/AxiosHttpClientAdapter'
-import {makePermissionBaseUrl} from './make-permissions-base-url'
+import { makePermissionBaseUrl } from './make-permissions-base-url'
 
 export const listPermissionService = async () => {
   let httpResponse = await AxiosHttpClientAdapter.request({
@@ -13,7 +13,6 @@ export const listPermissionService = async () => {
 }
 
 const adapt = (httpResponse) => {
-
   return {
     body: httpResponse.body.results,
     statusCode: httpResponse.statusCode

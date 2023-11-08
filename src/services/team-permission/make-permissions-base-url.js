@@ -1,4 +1,3 @@
 export const makePermissionBaseUrl = () => {
-    return `permissions`
-  }
-  
+  return `permissions`
+}

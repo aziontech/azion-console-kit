@@ -7,7 +7,10 @@ const fixtures = {
   teamPermissionMock: {
     name: 'Mongo-DB-Key',
     isActive: true,
-    permissions: [ { id: 1, name: 'default name' }, { id: 2, name: 'default name'} ]
+    permissions: [
+      { id: 1, name: 'default name' },
+      { id: 2, name: 'default name' }
+    ]
   }
 }
 
@@ -34,7 +37,7 @@ describe('TeamPermissionServices', () => {
       body: {
         name: fixtures.teamPermissionMock.name,
         is_active: fixtures.teamPermissionMock.isActive,
-        permissions_ids: fixtures.teamPermissionMock.permissions.map(item => item.id),
+        permissions_ids: fixtures.teamPermissionMock.permissions.map((item) => item.id)
       }
     })
   })
@@ -66,7 +69,6 @@ describe('TeamPermissionServices', () => {
 
     expect(feedbackMessage).rejects.toThrow(apiErrorMock)
   })
-
 
   it.each([
     {

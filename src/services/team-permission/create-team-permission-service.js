@@ -15,7 +15,7 @@ export const createTeamPermissionsService = async (payload) => {
 const adapt = (payload) => {
   return {
     name: payload.name,
-    permissions_ids: payload.permissions.map(item => item.id),
+    permissions_ids: payload.permissions.map((item) => item.id),
     is_active: payload.isActive
   }
 }
