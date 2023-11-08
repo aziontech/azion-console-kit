@@ -5,14 +5,14 @@
   import { useAccountStore } from '@/stores/account'
   import { themeSelect } from '@/helpers/themeSelect'
   import { storeToRefs } from 'pinia'
+  import { isRoutePublic } from '@/router/public-routes';
 
   const accountStore = useAccountStore()
   const { currentTheme, hasActiveUserId } = storeToRefs(accountStore)
 
   const route = useRoute()
   const isLogged = computed(() => {
-    const publicRoutes = ['login', 'reset-password', 'authentication-mfa', 'setup-mfa']
-    return hasActiveUserId && !publicRoutes.includes(route.name)
+    return hasActiveUserId && !isRoutePublic(route.name)
   })
 
   watch(currentTheme, (theme) => themeSelect({ theme }))

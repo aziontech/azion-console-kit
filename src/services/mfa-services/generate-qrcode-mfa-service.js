@@ -2,7 +2,7 @@ import { AxiosHttpClientAdapter } from '../axios/AxiosHttpClientAdapter'
 import { makeMfaBaseUrl } from './make-mfa-base-url'
 import * as Errors from '@/services/axios/errors'
 
-export const generateQrCodeService = async () => {
+export const generateQrCodeMfaService = async () => {
   let httpResponse = await AxiosHttpClientAdapter.request({
     url: `${makeMfaBaseUrl()}/create`,
     method: 'GET'
@@ -13,12 +13,12 @@ export const generateQrCodeService = async () => {
 }
 
 const adapt = (httpResponse) => {
-  const parsedVariable = {
+  const parsedQrCode = {
     url: httpResponse.body.url
   }
 
   return {
-    body: parsedVariable,
+    body: parsedQrCode,
     statusCode: httpResponse.statusCode
   }
 }

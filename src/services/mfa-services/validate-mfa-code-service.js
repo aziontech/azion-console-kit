@@ -26,9 +26,10 @@ export const parseHttpResponse = (httpResponse) => {
   let error
   switch (httpResponse.statusCode) {
     case 200:
-      return httpResponse?.body || null
+      return httpResponse.body
     case 400:
-      error = new Error(httpResponse?.body?.detail || null)
+      const apiErrorInvalidMfaCode = httpResponse.body.detail
+      error = new Error(apiErrorInvalidMfaCode)
       break
     case 401:
       error = new Errors.InvalidApiTokenError()

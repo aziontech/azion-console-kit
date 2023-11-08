@@ -1,5 +1,5 @@
 import { AxiosHttpClientAdapter } from '@/services/axios/AxiosHttpClientAdapter'
-import { generateQrCodeService } from '@/services/mfa-services'
+import { generateQrCodeMfaService } from '@/services/mfa-services'
 import { describe, expect, it, vi } from 'vitest'
 import * as Errors from '@services/axios/errors'
 
@@ -10,7 +10,7 @@ const fixtures = {
 }
 
 const makeSut = () => {
-  const sut = generateQrCodeService
+  const sut = generateQrCodeMfaService
 
   return {
     sut

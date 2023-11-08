@@ -1,5 +1,5 @@
-import { generateQrCodeService, validateMfaCodeService } from '@/services/mfa-services'
-import { verifyAuthenticationService, switchAccountService } from '@/services/auth-services'
+import * as MfaServices from '@/services/mfa-services'
+import * as AuthServices from '@/services/auth-services'
 
 /** @type {import('vue-router').RouteRecordRaw} */
 export const mfaRoutes = {
@@ -11,15 +11,19 @@ export const mfaRoutes = {
       name: 'setup-mfa',
       component: () => import('@views/MultifactorAuthentication/QRCodeView.vue'),
       props: {
-        generateQrCodeService,
-        validateMfaCodeService
+        generateQrCodeMfaService: MfaServices.generateQrCodeMfaService,
+        validateMfaCodeService: MfaServices.validateMfaCodeService
       }
     },
     {
       path: 'authentication',
       name: 'authentication-mfa',
       component: () => import('@views/MultifactorAuthentication/AuthenticateView.vue'),
-      props: { validateMfaCodeService, verifyAuthenticationService, switchAccountService }
+      props: {
+        validateMfaCodeService: MfaServices.validateMfaCodeService,
+        verifyAuthenticationService: AuthServices.verifyAuthenticationService,
+        switchAccountService: AuthServices.switchAccountService
+      }
     }
   ]
 }
