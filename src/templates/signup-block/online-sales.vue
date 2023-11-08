@@ -1,8 +1,6 @@
 <template>
-  <section
-    class="flex w-full lg:flex-row flex-col gap-6 xl:gap-0 px-3 py-6 lg:py-20 lg:px-6 surface-section min-h-[calc(100vh-60px-56px)]"
-  >
-    <div class="w-full flex flex-col items-center my-10">
+  <section class="flex w-full h-full lg:flex-row flex-col gap-6 xl:gap-0">
+    <div class="w-full flex flex-col items-center justify-center">
       <div class="min-w-max">
         <h2 class="text-[32px] sm:text-[48px] lg:text-[56px] leading-10">Welcome to the Edge</h2>
         <div class="flex flex-col gap-3 mt-10">
@@ -18,7 +16,7 @@
         </div>
       </div>
     </div>
-    <div class="w-full flex flex-col sm:justify-center items-center">
+    <div class="w-full flex flex-col justify-center items-center">
       <div class="w-full max-w-md">
         <div
           v-if="!showForm"
@@ -70,7 +68,7 @@
         </div>
 
         <div
-          v-if="showForm"
+          v-else
           class="card surface-border border rounded-md surface-section p-6 xl:p-10 flex flex-col gap-6 max-w-md"
         >
           <h2 class="text-center lg:text-start text-xl lg:text-2xl font-medium">
@@ -143,14 +141,13 @@
               <small class="p-error text-xs font-normal leading-tight">{{ errors.password }}</small>
             </div>
             <PrimeButton
-              label="Sign Up with E-mail"
-              outlined
+              label="Next"
               :disabled="!meta.valid"
               type="submit"
             />
           </form>
           <PrimeButton
-            label="Other login options"
+            label="Other sign up methods"
             outlined
             @click="showForm = false"
           />
@@ -189,15 +186,18 @@
   import InputText from 'primevue/inputtext'
   import InputPassword from 'primevue/password'
   import Divider from 'primevue/divider'
-  import { ref } from 'vue'
+  import { onMounted, ref } from 'vue'
   import * as yup from 'yup'
   import { useForm, useField } from 'vee-validate'
-  import { useReCaptcha } from 'vue-recaptcha-v3'
+  import { load, getInstance } from 'recaptcha-v3'
   import { azionPrivacyPolicyWindowOpener } from '@/helpers/azion-privacy-policy-opener'
   import { azionTermsAndServicesWindowOpener } from '@/helpers/azion-terms-and-services-opener'
   import { useToast } from 'primevue/usetoast'
 
-  defineOptions({ name: 'SignUpOnlineSales' })
+  let recaptcha
+  onMounted(async () => {
+    recaptcha = await load(import.meta.env.VITE_RECAPTCHA_SITE_KEY)
+  })
 
   const props = defineProps({
     signupService: { required: true, type: Function }
@@ -211,7 +211,7 @@
     'Free onboarding session'
   ]
 
-  const showForm = ref(true)
+  const showForm = ref(false)
   const passwordStrength = ref('weak')
 
   const validationSchema = yup.object({
@@ -243,15 +243,15 @@
   const { value: email } = useField('email')
   const { value: password } = useField('password')
 
-  const { recaptchaLoaded, executeRecaptcha } = useReCaptcha()
-
   const toast = useToast()
 
+  const emit = defineEmits(['signup-success'])
   const signUp = async () => {
     try {
-      await recaptchaLoaded()
-      const captcha = await executeRecaptcha('login')
+      const captcha = await recaptcha.execute('signup')
       await props.signupService({ ...values, captcha })
+      emit('signup-success')
+      getInstance().hideBadge()
     } catch (err) {
       toast.add({ life: 5000, severity: 'error', detail: err, summary: 'Error' })
     }

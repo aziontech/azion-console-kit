@@ -133,19 +133,19 @@
         <template #inputs>
           <div class="flex flex-col sm:max-w-lg w-full gap-2">
             <label>Certificate:</label>
-              <PrimeTextarea
-                v-bind="certificate"
-                :class="{ 'p-invalid': errors.certificate }"
-                v-tooltip.top="{ value: errors.certificate, showDelay: 200 }"
-                placeholder="---BEGIN CERTIFICATE---"
-                rows="5"
-                cols="30"
-              />
-              <small
+            <PrimeTextarea
+              v-bind="certificate"
+              :class="{ 'p-invalid': errors.certificate }"
+              v-tooltip.top="{ value: errors.certificate, showDelay: 200 }"
+              placeholder="---BEGIN CERTIFICATE---"
+              rows="5"
+              cols="30"
+            />
+            <small
               v-if="errors.certificate"
               class="p-error text-xs font-normal leading-tight"
               >{{ errors.certificate }}</small
-              >
+            >
           </div>
           <div class="flex flex-col sm:max-w-lg w-full gap-2">
             <label>Private key:</label>
@@ -427,7 +427,11 @@ support.example.com"
           .label('subject alternative names (SAN)'),
         country: yup.string().when('createCertificateType', {
           is: edgeCertificateTypes.CSR,
-          then: (schema) => schema.required('Country is a required field.').max(2, 'Country must be 2 characters.').min(2, 'Country must be 2 characters.')
+          then: (schema) =>
+            schema
+              .required('Country is a required field.')
+              .max(2, 'Country must be 2 characters.')
+              .min(2, 'Country must be 2 characters.')
         }),
         email: yup.string().when('createCertificateType', {
           is: edgeCertificateTypes.CSR,
