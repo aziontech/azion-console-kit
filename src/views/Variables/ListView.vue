@@ -29,6 +29,7 @@
   import EmptyResultsBlock from '@/templates/empty-results-block'
   import Illustration from '@/assets/svg/illustration-layers.vue'
   import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
+  import { h } from 'vue'
 
   export default {
     name: 'variables-view',
@@ -69,14 +70,19 @@
             field: 'value',
             header: 'Value',
             type: 'component',
-            component: (columnData) =>
-              columnBuilder({
-                data: columnData,
-                columnAppearance: 'text-with-clipboard',
-                dependencies: {
-                  copyContentService: this.clipboardWrite
-                }
-              })
+            component: (columnData) => {
+              if (columnData.isSecret) {
+                return h('span', `${columnData.content}`)
+              } else {
+                return columnBuilder({
+                  data: columnData,
+                  columnAppearance: 'text-with-clipboard',
+                  dependencies: {
+                    copyContentService: this.clipboardWrite
+                  }
+                })
+              }
+            }
           },
           {
             field: 'lastEditor',

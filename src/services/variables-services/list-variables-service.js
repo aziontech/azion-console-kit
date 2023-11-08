@@ -25,6 +25,7 @@ const adapt = (httpResponse) => {
         id: variable.uuid,
         key: variable.key,
         value: {
+          isSecret: variable.secret,
           content: variable.value
         },
         lastEditor: variable.last_editor,
