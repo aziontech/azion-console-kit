@@ -196,6 +196,35 @@
                     </div>
                   </template>
                 </FormHorizontal>
+                <FormHorizontal title="Status">
+                  <template #inputs>
+                    <div class="flex flex-col gap-2">
+                      <label class="text-color text-base font-medium"></label>
+                      <div class="flex flex-col gap-3">
+                        <Card
+                          :pt="{
+                            root: { class: 'shadow-none  rounded-none' },
+                            body: { class: 'py-4 border-0' },
+                            title: { class: 'flex items-center text-base m-0 gap-3 font-medium' },
+                            subtitle: { class: 'text-sm font-normal text-color-secondary m-0 pr-0 md:pr-[2.5rem]' }
+                          }"
+                        >
+                          <template #title>
+                            <InputSwitch
+                              id="authorizeEdgeNode"
+                              v-model="authorizeEdgeNode"
+                            />
+                            <div class="flex-col gap-1">
+                              <div class="">
+                                <div class="text-color text-sm font-normal">Authorize</div>
+                              </div>
+                            </div>
+                          </template>
+                        </Card>
+                      </div>
+                    </div>
+                  </template>
+                </FormHorizontal>
               </template>
             </EditFormBlock>
           </TabPanel>
@@ -225,10 +254,11 @@
         </TabView>
       </template>
     </PageHeadingBlock>
+    <Authorize :authorize="authorize" @authorizeCancel="authorizeEdgeNode = false" />
   </div>
 </template>
 <script setup>
-  import { reactive, ref, onMounted, onBeforeUpdate } from 'vue'
+  import { reactive, ref, onMounted, onBeforeUpdate, watch } from 'vue'
   import { useField, useForm } from 'vee-validate'
   import * as yup from 'yup'
   import { useRoute, useRouter } from 'vue-router'
@@ -243,6 +273,7 @@
   import InputSwitch from 'primevue/inputswitch'
   import Checkbox from 'primevue/checkbox'
   import Card from 'primevue/card'
+  import Authorize from './Authorize'
 
   const pros = defineProps({
     loadEdgeNodeService: { type: Function, required: true },
@@ -275,6 +306,8 @@
   const router = useRouter()
 
   let edgeNodeId = ref(null)
+  let authorizeEdgeNode = ref(false)
+  let authorize = ref({})
 
   onMounted(() => {
     edgeNodeId.value = route.params.id
@@ -331,4 +364,8 @@
       state.activeTab = 0
     }
   }
+
+  watch(authorizeEdgeNode, (newValue) => {
+    authorize.value = { edgeNodeID: route.params.id, openDialog: newValue, rerender: Math.random() }
+  })
 </script>
