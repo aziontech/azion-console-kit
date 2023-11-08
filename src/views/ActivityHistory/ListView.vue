@@ -1,7 +1,7 @@
 <template>
   <div>
     <PageHeadingBlock :pageTitle="pageTitle" />
-    <div class="flex h-full max-w-screen px-2 sm:px-8 w-full">
+    <div class="flex h-full max-w-screen pt-4 pb-8 px-8 max-md:p-3 w-full">
       <Card class="w-full mb-10">
         <template #header>
           <div class="border-b surface-border w-full p-3.5 flex">
