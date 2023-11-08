@@ -64,15 +64,7 @@ export default defineConfig({
       '/api/teams': {
         target: 'https://stage-iam.azion.com/iam/api/teams',
         changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/api\/teams/, ''),
-        configure: (proxy, options) => {
-          proxy.on('proxyReq', (proxyReq, req) => {
-            const originalUrl = `https://${req.headers.host}${req.url}`
-            const targetUrl = options.target
-            const proxiedUrl = `${targetUrl}${req.url}`
-            console.log(`${originalUrl} => ${proxiedUrl}`)
-          })
-        }
+        rewrite: (path) => path.replace(/^\/api\/teams/, '')
       },
       '/api/permissions': {
         target: 'https://stage-iam.azion.com/iam/api/permissions',

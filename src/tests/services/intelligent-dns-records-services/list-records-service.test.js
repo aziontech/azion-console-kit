@@ -9,7 +9,8 @@ const fixtures = {
     record_type: 'record Type AAA',
     answers_list: ['answer 1', 'answer 1'],
     ttl: 8000,
-    policy: 'zero thrust',
+    policy: 'weighted',
+    weight: 100,
     description: 'record description A'
   },
   dnsRecordMissingDataMock: {
@@ -76,6 +77,7 @@ describe('IntelligentDnsRecordsServices', () => {
         )},${fixtures.dnsRecordMock.answers_list.at(1)}`,
         ttl: fixtures.dnsRecordMock.ttl,
         policy: fixtures.dnsRecordMock.policy,
+        weight: fixtures.dnsRecordMock.weight,
         description: fixtures.dnsRecordMock.description
       },
       {
