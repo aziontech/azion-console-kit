@@ -23,7 +23,7 @@
           {{ description }}
         </div>
       </div>
-      <div class="ml-auto w-full h-9 items-end flex justify-end">
+      <div class="ml-auto w-full items-end flex justify-end">
         <slot></slot>
       </div>
     </div>
