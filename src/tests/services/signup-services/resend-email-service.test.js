@@ -1,54 +1,50 @@
 import { describe, expect, it, vi } from 'vitest'
 import { AxiosHttpClientAdapter } from '@/services/axios/AxiosHttpClientAdapter'
 import * as Errors from '@/services/axios/errors'
-import { signupService } from '@/services/signup-services/signup-service'
-import { makeSignupBaseUrl } from '@/services/signup-services/make-signup-url'
+import { resendEmailService } from '@/services/signup-services'
+import { makeResendEmailBaseUrl } from '@/services/signup-services/make-resend-email-url'
 
-const userPayloadMock = {
-  name: 'john doe',
-  email: 'john.doe@example.com',
-  captch: 'default'
-}
+const emailPayloadMock = { email: 'john.doe@example.com' }
 
 const makeSut = () => {
-  const sut = signupService
+  const sut = resendEmailService
 
   return {
     sut
   }
 }
 
-describe('SignupServices', () => {
+describe('ResendEmailService', () => {
   it('should call API with correct params', async () => {
     const requestSpy = vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
-      statusCode: 201
+      statusCode: 200
     })
     const { sut } = makeSut()
 
-    await sut(userPayloadMock)
+    await sut(emailPayloadMock)
 
     expect(requestSpy).toHaveBeenCalledWith({
-      url: makeSignupBaseUrl(),
+      url: makeResendEmailBaseUrl(),
       method: 'POST',
-      body: { ...userPayloadMock }
+      body: emailPayloadMock
     })
   })
 
-  it('should not return a feedback message on successfully created', async () => {
+  it('should not return a feedback message on successfully sent', async () => {
     vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
-      statusCode: 201
+      statusCode: 200
     })
     const { sut } = makeSut()
 
-    const feedbackMessage = await sut(userPayloadMock)
+    const feedbackMessage = 'Email sent successfully'
 
-    expect(feedbackMessage).toBe(null)
+    const req = await sut(emailPayloadMock)
+
+    expect(req).toBe(feedbackMessage)
   })
 
   it('Should return an API error for an 400 response status', async () => {
-    const response = {
-      email: ['This email is already taken by another account!']
-    }
+    const response = { email: ["User doesn't exist"] }
 
     vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
       statusCode: 400,
@@ -56,7 +52,7 @@ describe('SignupServices', () => {
     })
     const { sut } = makeSut()
 
-    const request = sut(userPayloadMock)
+    const request = sut(emailPayloadMock)
 
     expect(request).rejects.toThrow(response.email[0])
   })
@@ -82,7 +78,7 @@ describe('SignupServices', () => {
       })
       const { sut } = makeSut()
 
-      const request = sut(userPayloadMock)
+      const request = sut(emailPayloadMock)
 
       expect(request).rejects.toBe(expectedError)
     }
