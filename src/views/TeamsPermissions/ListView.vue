@@ -5,8 +5,8 @@
     :columns="getColumns"
     pageTitle="Teams Permissions"
     addButtonLabel="Add Team"
-    createPagePath="team-permission/create"
-    editPagePath="team-permission/edit"
+    createPagePath="teams-permission/create"
+    editPagePath="teams-permission/edit"
   >
   </ListTableBlock>
 </template>
