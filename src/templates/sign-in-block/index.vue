@@ -98,7 +98,7 @@
               v-model="password"
               id="password"
               class="w-full"
-              placeholder="P@ssw0rd123"
+              placeholder=""
               :class="{ 'p-invalid': errorPassword }"
               :feedback="false"
               v-tooltip.top="{ value: errorPassword, showDelay: 200 }"
