@@ -118,7 +118,7 @@
               }"
             >
               <template #title>
-                <span class="text-base">Generate CSR and private key with Azion</span>
+                <span class="text-base">Generate CSR and Private Key with Azion</span>
                 <RadioButton
                   v-model="createCertificateType"
                   inputId="createCertificateType2"
@@ -175,7 +175,7 @@
         </template>
       </FormHorizontal>
       <FormHorizontal
-        title="Generate CSR and private key with Azion"
+        title="Generate CSR and Private Key with Azion"
         description="To apply for a digital certificate issued by a certificate authority, you need a certificate signing request.
         Azion can generate a certificate code to submit to a certificate authority."
         v-if="

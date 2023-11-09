@@ -10,7 +10,7 @@
     <template #form>
       <FormHorizontal
         v-if="csr.modelValue"
-        title="Generate CSR and private key with Azion"
+        title="Generate CSR and Private Key with Azion"
         description="You've generated a certificate signing request (CSR) with Azion. Copy the CSR and submit it to a certificate authority.
         Once you've received your certificate, paste it in the certificate field and click save."
       >
