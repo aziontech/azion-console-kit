@@ -11,6 +11,9 @@ export const signupRoutes = {
       component: () => import('@views/Signup/SignupView.vue'),
       props: {
         signupService: SignupService.signupService
+      },
+      meta: {
+        public: true
       }
     },
     {
@@ -19,6 +22,9 @@ export const signupRoutes = {
       component: () => import('@views/Signup/SignupActivationView.vue'),
       props: {
         resendEmailService: SignupService.resendEmailService
+      },
+      meta: {
+        public: true
       }
     }
   ]

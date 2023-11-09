@@ -11,6 +11,9 @@ export const passwordRoutes = {
       component: () => import('@views/NewPassword/NewPasswordView.vue'),
       props: {
         resetPasswordService: AuthServices.resetPasswordService
+      },
+      meta: {
+        public: true
       }
     }
   ]
