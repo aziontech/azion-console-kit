@@ -17,7 +17,7 @@
             <label
               for="name"
               class="text-color text-base font-medium"
-              >Name *</label
+              >Name * </label
             >
             <InputText
               placeholder="Name"
@@ -37,7 +37,7 @@
             <label
               for="value"
               class="text-color text-base font-medium"
-              >Permissions * 
+              >Permissions *
             </label>
             <PickList
               v-model="permissionsList"
@@ -118,7 +118,7 @@
 
   const permissionsList = ref(null)
 
-  const { errors, defineInputBinds, meta, values, setValues} = useForm({
+  const { errors, defineInputBinds, meta, values, setValues } = useForm({
     validationSchema
   })
 
@@ -129,7 +129,9 @@
   const fetchPermissions = async () => {
     const response = await props.listPermissionService()
 
-    const filterResponse = response.filter(item => !permissions.value.some(permission => permission.id === item.id));
+    const filterResponse = response.filter(
+      (item) => !permissions.value.some((permission) => permission.id === item.id)
+    )
     permissionsList.value = [filterResponse, permissions.value]
   }
 

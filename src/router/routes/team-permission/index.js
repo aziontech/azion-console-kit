@@ -51,7 +51,6 @@ export const teamsPermissionRoutes = {
         editTeamPermissionService: TeamPermissionService.editTeamPermissionService,
         loadTeamPermissionService: TeamPermissionService.loadTeamPermissionService,
         listPermissionService: TeamPermissionService.listPermissionService
-
       },
       meta: {
         breadCrumbs: [
@@ -60,7 +59,7 @@ export const teamsPermissionRoutes = {
             to: '/teams-permission'
           },
           {
-            label: 'Edit Teams Permissions',
+            label: 'Edit Teams Permissions'
           }
         ]
       }

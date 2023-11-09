@@ -13,14 +13,13 @@ export const loadTeamPermissionService = async ({ id }) => {
 }
 
 const adapt = (httpResponse) => {
-
   return {
     body: {
-        id: httpResponse.body.id,
-        name: httpResponse.body.name,
-        permissions: httpResponse.body.permissions,
-        isActive: httpResponse.body.is_active
-      },
+      id: httpResponse.body.id,
+      name: httpResponse.body.name,
+      permissions: httpResponse.body.permissions,
+      isActive: httpResponse.body.is_active
+    },
     statusCode: httpResponse.statusCode
   }
 }

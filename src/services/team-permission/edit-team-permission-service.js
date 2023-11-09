@@ -33,11 +33,11 @@ const parseHttpResponse = (httpResponse) => {
     case 200:
       return 'Your Team Permission has been updated'
     case 400:
-        const key = Object.keys(httpResponse.body)[0]
-        const msg = httpResponse.body[key][0]
-  
-        const msgError = `${key} ${msg}`
-        throw new Error(msgError).message
+      const key = Object.keys(httpResponse.body)[0]
+      const msg = httpResponse.body[key][0]
+
+      const msgError = `${key} ${msg}`
+      throw new Error(msgError).message
     case 401:
       throw new Errors.InvalidApiTokenError().message
     case 403:
@@ -50,4 +50,3 @@ const parseHttpResponse = (httpResponse) => {
       throw new Errors.UnexpectedError().message
   }
 }
-
