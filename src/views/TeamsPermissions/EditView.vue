@@ -17,8 +17,8 @@
             <label
               for="name"
               class="text-color text-base font-medium"
-              >Name * </label
-            >
+              >Name *
+            </label>
             <InputText
               placeholder="Name"
               v-bind="name"

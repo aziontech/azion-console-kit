@@ -53,10 +53,10 @@ describe('TeamPermissionService', () => {
     const result = await sut({ id: fixtures.teamPermissionMock.id })
 
     expect(result).toEqual({
-        id: fixtures.teamPermissionMock.id,
-        name: fixtures.teamPermissionMock.name,
-        isActive: fixtures.teamPermissionMock.is_active,
-        permissions: fixtures.teamPermissionMock.permissions
+      id: fixtures.teamPermissionMock.id,
+      name: fixtures.teamPermissionMock.name,
+      isActive: fixtures.teamPermissionMock.is_active,
+      permissions: fixtures.teamPermissionMock.permissions
     })
   })
 })

@@ -491,7 +491,7 @@
         </i>
         <InputText
           placeholder="Search..."
-          class="w-full rounded-none border-none h-12 "
+          class="w-full rounded-none border-none h-12"
         />
       </span>
       <div class="m-2 surface-border border border-dashed flex items-center h-96">
