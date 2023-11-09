@@ -1,4 +1,5 @@
 import * as PersonalTokensService from '@/services/personal-tokens-services'
+import * as Helpers from '@/helpers'
 
 /** @type {import('vue-router').RouteRecordRaw} */
 export const personalTokensRoutes = {
@@ -11,7 +12,8 @@ export const personalTokensRoutes = {
       component: () => import('@views/PersonalTokens/ListView.vue'),
       props: {
         listPersonalTokensService: PersonalTokensService.listPersonalTokens,
-        deletePersonalTokenService: PersonalTokensService.deletePersonalToken
+        deletePersonalTokenService: PersonalTokensService.deletePersonalToken,
+        documentationService: Helpers.documentationCatalog.personalTokens
       },
       meta: {
         breadCrumbs: [
