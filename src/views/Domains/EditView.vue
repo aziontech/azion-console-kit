@@ -42,7 +42,7 @@
       <form-horizontal
         title="Settings"
         description="Determine the edge application of the domain and its digital certificate. 
-        If you already own a domain, add it to the CNAME field and
+        To link an existing domain to an application, add it to the CNAME field and
         block access to the application via the Azion domain."
       >
         <template #inputs>
