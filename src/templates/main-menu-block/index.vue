@@ -741,7 +741,17 @@
           },
           {
             label: 'Teams Permissions',
-            to: '/teams-permession'
+            to: '/teams-permission'
+          },
+          {
+            label: 'Personal Token',
+            to: 'personal-tokens'
+          }
+        ],
+        profileMenuSettings: [
+          {
+            label: 'Your Settings',
+            to: 'list-your-settings'
           },
           {
             label: 'Personal Token',

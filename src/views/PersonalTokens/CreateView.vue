@@ -1,110 +1,195 @@
 <template>
   <div>
-    <CreateFormBlockWithEvent
-      pageTitle="Create Personal Token"
+    <CreateFormBlock
+      pageTitle="New Personal Token"
       :createService="props.createPersonalTokenService"
       :formData="values"
       :isValid="meta.valid"
-      :cleanFormCallback="resetForm"
       @on-response="handleResponse"
+      :buttonBackList="!!personalTokenKey"
+      :callback="false"
       :isRequestSuccess="!!personalTokenKey"
+      :feedbackDefault="true"
     >
       <template #form>
-        <div class="flex flex-col gap-2">
-          <label for="name">Personal Token name:</label>
-          <InputText
-            v-model="name"
-            id="name"
-            type="text"
-            :class="{ 'p-invalid': errors.name }"
-            v-tooltip.top="{ value: errors.name, showDelay: 200 }"
-            :disabled="!!personalTokenKey"
-          />
-        </div>
-        <div class="flex flex-col gap-2">
-          <label for="selectedExpiration">Expires in:</label>
-          <Dropdown
-            id="selectedExpiration"
-            :options="options"
-            optionLabel="label"
-            optionValue="value"
-            :class="{ 'p-invalid': errors.selectedExpiration }"
-            v-model="selectedExpiration"
-            :disabled="!!personalTokenKey"
-          />
-          <small>{{ TEXT_CONSTANTS.expiresInTooltip }}</small>
-        </div>
-        <div
-          class="flex flex-col gap-2"
-          v-if="selectedExpiration === 'custom'"
+        <FormHorizontal
+          title="General"
+          description="Choose a name that is descriptive and easy to remember. Use the description to help you remember why the token was created and/or what it was created for."
         >
-          <Calendar
-            v-model="customExpiration"
-            :minDate="minExpirationDate"
-            showIcon
-            :disabled="!!personalTokenKey"
-          />
-        </div>
-        <div class="flex flex-col gap-2">
-          <label for="description">Description:</label>
-          <TextareaComponent
-            id="description"
-            :class="{ 'p-invalid': errors.description }"
-            rows="3"
-            v-model="description"
-            :disabled="!!personalTokenKey"
-          />
-          <small>{{ TEXT_CONSTANTS.descriptionTipText }}</small>
-        </div>
-        <div class="flex flex-col gap-2">
-          <label for="generatedToken">Generated Token:</label>
-          <span class="flex align-items-center">
-            <span class="p-input-icon-right w-full">
-              <InputText
-                id="generatedToken"
-                :class="{ 'p-invalid': errors.generatedToken }"
-                class="w-full"
-                :value="personalTokenKey"
-                :placeholder="TEXT_CONSTANTS.generatedTokenPlaceholder"
-                :type="tokenField.type"
-                :readonly="!personalTokenKey"
-                :disabled="!!personalTokenKey"
-              />
-              <i
-                v-if="!!personalTokenKey"
-                :class="tokenField.icon"
-                @click="isTokenVisible = !isTokenVisible"
-              />
-            </span>
-            <PrimeButton
-              icon="pi pi-clone"
-              text
-              aria-label="Copy Personal Token"
-              title="Copy Personal Token"
+          <template #inputs>
+            <div class="flex flex-col sm:max-w-lg w-full gap-2">
+              <label
+                for="name"
+                class="text-color text-base font-medium"
+                >Name *</label
+              >
+              <span class="p-input-icon-right">
+                <i
+                  class="pi pi-lock text-color-secondary"
+                  v-if="!!personalTokenKey"
+                />
+                <InputText
+                  class="w-full"
+                  v-bind="name"
+                  id="name"
+                  type="text"
+                  :class="{ 'p-invalid': errors.name }"
+                  v-tooltip.top="{ value: errors.name, showDelay: 200 }"
+                  :readonly="!!personalTokenKey"
+                  :disabled="!!personalTokenKey"
+                />
+              </span>
+
+              <small
+                v-if="errors.name"
+                class="p-error text-xs font-normal leading-tight"
+                >{{ errors.name }}
+              </small>
+            </div>
+            <div class="flex flex-col sm:max-w-lg w-full gap-2">
+              <label
+                for="description"
+                class="text-color text-base font-medium"
+                >Description</label
+              >
+              <span class="p-input-icon-right flex items-start">
+                <i
+                  class="pi pi-lock text-color-secondary"
+                  v-if="!!personalTokenKey"
+                />
+                <TextareaComponent
+                  id="description"
+                  class="w-full"
+                  :class="{ 'p-invalid': errors.description }"
+                  rows="1"
+                  v-bind="description"
+                  :disabled="!!personalTokenKey"
+                  :readonly="!!personalTokenKey"
+                />
+              </span>
+              <small
+                v-if="errors.description"
+                class="p-error text-xs font-normal leading-tight"
+                >{{ errors.description }}
+              </small>
+            </div>
+          </template>
+        </FormHorizontal>
+        <FormHorizontal
+          title="Token"
+          description="Define the token expiration date by selecting one of the suggested date ranges. For security matters, you can only copy the Personal Token right after you create it. In case you need the Personal Token code after that, you must create a new one."
+        >
+          <template #inputs>
+            <div class="flex flex-col w-full gap-2">
+              <label
+                for="selectedExpiration"
+                class="text-color text-base font-medium"
+                >Expires in *</label
+              >
+              <div class="flex gap-6">
+                <div class="md:w-80">
+                  <Dropdown
+                    class="w-full md:w-80"
+                    id="selectedExpiration"
+                    :options="options"
+                    optionLabel="label"
+                    optionValue="value"
+                    :class="{ 'p-invalid': errors.selectedExpiration }"
+                    v-model="selectedExpiration"
+                    :disabled="!!personalTokenKey"
+                  >
+                    <template
+                      #dropdownicon
+                      v-if="!!personalTokenKey"
+                    >
+                      <span class="pi pi-lock text-color-secondary" />
+                    </template>
+                  </Dropdown>
+                </div>
+                <div class="md:w-80">
+                  <Calendar
+                    v-if="selectedExpiration === 'custom'"
+                    class="w-full"
+                    v-model="customExpiration"
+                    placeholder="Select date from calendar"
+                    :minDate="minExpirationDate"
+                    :class="{ 'p-invalid': errors.customExpiration }"
+                    showIcon
+                    :disabled="!!personalTokenKey"
+                  />
+                  <small
+                    v-if="errors.customExpiration"
+                    class="p-error text-xs font-normal leading-tight"
+                    >{{ errors.customExpiration }}
+                  </small>
+                </div>
+              </div>
+            </div>
+
+            <div
+              class="flex flex-col w-full gap-2"
               v-if="!!personalTokenKey"
-              @click="copyPersonalToken"
-            />
-          </span>
-          <small>{{ TEXT_CONSTANTS.generatedTokenTooltip }}</small>
-        </div>
+            >
+              <label
+                for="personalToken"
+                class="text-color text-base font-medium"
+              >
+                Personal Token
+              </label>
+              <div
+                class="flex gap-6 md:align-items-center max-sm:flex-col max-sm:align-items-baseline max-sm:gap-3"
+              >
+                <span class="p-input-icon-right w-full flex max-w-lg flex-col items-start gap-2">
+                  <InputText
+                    id="personalToken"
+                    :class="{ 'p-invalid': errors.generatedToken }"
+                    class="w-full"
+                    :value="personalTokenKey"
+                    :type="tokenField.type"
+                    :readonly="!personalTokenKey"
+                    :disabled="!!personalTokenKey"
+                  />
+                  <i
+                    :class="tokenField.icon"
+                    @click="isTokenVisible = !isTokenVisible"
+                  />
+                </span>
+
+                <PrimeButton
+                  icon="pi pi-clone"
+                  outlined
+                  type="button"
+                  aria-label="Copy Personal Token"
+                  label="Copy to Clipboard"
+                  @click="copyPersonalToken"
+                />
+              </div>
+            </div>
+          </template>
+        </FormHorizontal>
       </template>
-    </CreateFormBlockWithEvent>
+    </CreateFormBlock>
   </div>
 </template>
 
 <script setup>
   import { computed, ref, watch } from 'vue'
-  import { useForm, useField } from 'vee-validate'
-  import * as yup from 'yup'
+  import CreateFormBlock from '@/templates/create-form-block-new'
+
+  import FormHorizontal from '@/templates/create-form-block-new/form-horizontal'
   import { useAccountStore } from '@/stores/account'
   import { storeToRefs } from 'pinia'
+
   import { useToast } from 'primevue/usetoast'
-  import CreateFormBlockWithEvent from '@/templates/create-form-block/form-with-event'
   import InputText from 'primevue/inputtext'
+
   import Dropdown from 'primevue/dropdown'
   import TextareaComponent from 'primevue/textarea'
   import Calendar from 'primevue/calendar'
   import PrimeButton from 'primevue/button'
+
+  import { useForm, useField } from 'vee-validate'
+  import * as yup from 'yup'
 
   const props = defineProps({
     createPersonalTokenService: {
@@ -112,19 +197,6 @@
       required: true
     }
   })
-
-  const TEXT_CONSTANTS = {
-    configuration:
-      'Define a time range for your Personal Token. For security matters, you can only copy the Personal Token right after you create it. In case you need the Personal Token code after that, you must create a new one.',
-    expiresInTooltip:
-      'Defines the token expiration date by selecting one of the suggested date ranges below.',
-    descriptionTipText: 'Tip: use this field to describe your Personal Token.',
-    generatedTokenTooltip:
-      'You can see the token only when you create it. If you leave the page you will no longer be able to see or copy it.',
-    generatedTokenPlaceholder: 'Your Personal Token will be in this field right after you save it.',
-    tokenCopied: 'Personal Token copied to clipboard!',
-    tokenNotCopied: 'The Personal Token could not be copied to clipboard. Please try again.'
-  }
 
   const options = ref([
     { label: '1 day', value: '1' },
@@ -137,17 +209,33 @@
   ])
 
   const validationSchema = yup.object({
-    name: yup.string().required(),
+    name: yup
+      .string()
+      .max(100, 'Name cannot exceed 100 characters')
+      .required('Name is a required field'),
+    description: yup.string().max(255, 'Description cannot exceed 255 characters'),
     selectedExpiration: yup.string().required('Please select an option'),
-    expiresAt: yup.string().required('Please select an option')
+    expiresAt: yup.string().required('Please select an option'),
+    customExpiration: yup.string().when('selectedExpiration', {
+      is: 'custom',
+      then: (schema) => schema.required('Expiration date is required field'),
+      otherwise: (schema) => schema.nullable()
+    })
   })
 
-  const { errors, meta, resetForm, values } = useForm({ validationSchema })
+  const { errors, defineInputBinds, meta, values } = useForm({
+    validationSchema,
+    initialValues: {
+      customExpiration: null,
+      selectedExpiration: '1'
+    }
+  })
 
-  const { value: name } = useField('name')
   const { value: selectedExpiration } = useField('selectedExpiration')
-  const { value: description } = useField('description')
   const { setValue: setExpiration } = useField('expiresAt')
+  const { value: customExpiration } = useField('customExpiration')
+  const name = defineInputBinds('name', { validateOnInput: true })
+  const description = defineInputBinds('description', { validateOnInput: true })
 
   const isTokenVisible = ref(false)
   const tokenField = computed(() => {
@@ -198,18 +286,21 @@
     return formatToIsoDate(userRealDate)
   }
 
-  const customExpiration = ref(null)
-  watch([selectedExpiration, customExpiration], () => {
-    if (selectedExpiration.value && selectedExpiration.value !== 'custom') {
-      const expirationDate = new Date()
-      expirationDate.setDate(expirationDate.getDate() + parseInt(selectedExpiration.value))
-      setExpiration(expiresDate(expirationDate))
-    }
+  watch(
+    [selectedExpiration, customExpiration],
+    () => {
+      if (selectedExpiration.value && selectedExpiration.value !== 'custom') {
+        const expirationDate = new Date()
+        expirationDate.setDate(expirationDate.getDate() + parseInt(selectedExpiration.value))
+        setExpiration(expiresDate(expirationDate))
+      }
 
-    if (selectedExpiration.value === 'custom' && customExpiration.value) {
-      setExpiration(expiresDate(customExpiration.value))
-    }
-  })
+      if (selectedExpiration.value === 'custom' && !!customExpiration.value) {
+        setExpiration(expiresDate(customExpiration.value))
+      }
+    },
+    { immediate: true }
+  )
 
   const personalTokenKey = ref('')
   const handleResponse = (response) => {
@@ -224,14 +315,18 @@
       closable: false,
       life: 3000,
       severity: 'success',
-      summary: TEXT_CONSTANTS.tokenCopied
+      summary: 'Personal Token copied to clipboard!'
     }
 
     try {
       await navigator.clipboard.writeText(personalTokenKey.value)
       toast.add({ ...toastConfig })
     } catch {
-      toast.add({ ...toastConfig, severity: 'error', detail: TEXT_CONSTANTS.tokenNotCopied })
+      toast.add({
+        ...toastConfig,
+        severity: 'error',
+        detail: 'The Personal Token could not be copied to clipboard. Please try again.'
+      })
     }
   }
 </script>

@@ -8,24 +8,29 @@
       <slot name="form" />
       <slot name="raw-form" />
     </form>
+    <ActionBarBlockGoBack v-if="buttonBackList" />
     <ActionBarTemplate
-      @cancel="handleCancel"
+      @cancel="navigateBack"
       @submit="validateAndSubmit"
       :loading="isLoading"
       :submitDisabled="!isValid"
+      v-else
     />
   </div>
 </template>
 <script>
   import ActionBarTemplate from '@/templates/action-bar-block'
   import PageHeadingBlock from '@/templates/page-heading-block'
+  import ActionBarBlockGoBack from '@/templates/action-bar-block/go-back'
 
   export default {
     name: 'create-form-block',
     components: {
       ActionBarTemplate,
-      PageHeadingBlock
+      PageHeadingBlock,
+      ActionBarBlockGoBack
     },
+    emits: ['on-response'],
     data: () => ({
       isLoading: false
     }),
@@ -48,39 +53,58 @@
       },
       cleanFormCallback: {
         type: Function,
-        required: true
+        default: () => ({})
       },
       hasTabs: {
         type: Boolean,
         required: false
+      },
+      buttonBackList: {
+        type: Boolean,
+        default: false
+      },
+      callback: {
+        type: Boolean,
+        default: true
+      },
+      feedbackDefault: {
+        type: Boolean,
+        default: false
       }
     },
     methods: {
-      handleCancel() {
+      navigateBack() {
         this.$router.go(-1)
       },
-      goBackToList() {
-        this.$router.go(-1)
+      showToast(severity, summary, life = 10000) {
+        if (!summary) return
+        this.$toast.add({
+          closable: false,
+          severity: severity,
+          summary: summary,
+          life: life
+        })
+      },
+      showFeedback(feedback) {
+        if (this.feedbackDefault) {
+          this.showToast('success', feedback.message)
+          return
+        }
+        this.showToast('success', feedback ?? 'created successfully')
+      },
+      handleSuccess(feedback) {
+        this.cleanFormCallback()
+        this.$emit('on-response', feedback)
+        this.showFeedback(feedback)
+        if (this.callback) this.navigateBack()
       },
       async validateAndSubmit() {
         try {
           this.isLoading = true
           const feedback = await this.createService(this.formData)
-          this.cleanFormCallback()
-          this.$toast.add({
-            closable: false,
-            severity: 'success',
-            summary: feedback ?? 'created successfully',
-            life: 10000
-          })
-          this.goBackToList()
+          this.handleSuccess(feedback)
         } catch (error) {
-          this.$toast.add({
-            closable: false,
-            severity: 'error',
-            summary: error,
-            life: 10000
-          })
+          this.showToast('error', error)
         } finally {
           this.isLoading = false
         }

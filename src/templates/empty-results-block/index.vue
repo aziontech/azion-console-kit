@@ -12,12 +12,13 @@
     </div>
     <div class="flex flex-col gap-5 items-center">
       <div class="flex flex-wrap gap-2">
-        <slot name="extraActions"></slot>
+        <slot name="extraActionsLeft"></slot>
         <PrimeButton
           icon="pi pi-plus"
           :label="createButtonLabel"
           @click="navigateToCreatePage"
         />
+        <slot name="extraActionsRight"></slot>
       </div>
       <PrimeButton
         outlined
