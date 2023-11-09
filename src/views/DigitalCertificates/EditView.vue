@@ -102,7 +102,7 @@
               v-bind="certificate"
               :class="{ 'p-invalid': errors.certificate }"
               v-tooltip.top="{ value: errors.certificate, showDelay: 200 }"
-              placeholder="For security reasons, the certificate can't be shown. To replace a digital certificate, paste the new certificate here."
+              placeholder="For security reasons, the certificate can't be shown.&#10;To replace a digital certificate, paste the new certificate here."
               rows="5"
               cols="30"
             />
@@ -118,7 +118,7 @@
               v-model="privateKey"
               :class="{ 'p-invalid': errors.privateKey }"
               v-tooltip.top="{ value: errors.privateKey, showDelay: 200 }"
-              placeholder="For security reasons, the certificate can't be shown. To replace a digital certificate, paste the new certificate here."
+              placeholder="For security reasons, the certificate can't be shown.&#10;To replace a digital certificate, paste the new private key here."
               rows="5"
               cols="30"
             />
