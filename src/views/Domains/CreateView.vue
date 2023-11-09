@@ -120,7 +120,7 @@
               optionLabel="name"
               optionValue="value"
               class="w-full"
-              placeholder="Select a Certificate"
+              placeholder="Select a certificate"
             />
           </div>
         </template>
@@ -213,7 +213,7 @@
               optionLabel="name"
               optionValue="value"
               class="w-full"
-              placeholder=""
+              placeholder="Select a certificate"
               :disabled="!mtlsIsEnabled"
             />
             <small
