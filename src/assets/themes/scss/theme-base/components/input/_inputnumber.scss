@@ -1,5 +1,5 @@
 .p-inputnumber {
-    &.p-invalid.p-component > .p-inputtext {
-        @include invalid-input();
-    }
+  &.p-invalid.p-component > .p-inputtext {
+    @include invalid-input();
+  }
 }
