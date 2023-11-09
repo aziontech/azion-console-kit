@@ -1,6 +1,6 @@
 import { AxiosHttpClientAdapter } from '@/services/axios/AxiosHttpClientAdapter'
 import { loadTeamPermissionService } from '@/services/team-permission'
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 
 const fixtures = {
   teamPermissionMock: {
@@ -20,12 +20,6 @@ const makeSut = () => {
 }
 
 describe('TeamPermissionService', () => {
-  beforeEach(() => {
-    vi.useFakeTimers()
-  })
-  afterEach(() => {
-    vi.useRealTimers()
-  })
   it('should call api with correct params', async () => {
     const requestSpy = vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
       statusCode: 200,
@@ -43,7 +37,6 @@ describe('TeamPermissionService', () => {
   })
 
   it('should parsed correctly the returned', async () => {
-    vi.setSystemTime(new Date(2023, 10, 10, 10))
     vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
       statusCode: 200,
       body: fixtures.teamPermissionMock
