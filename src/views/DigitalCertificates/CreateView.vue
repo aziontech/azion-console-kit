@@ -9,9 +9,9 @@
     <template #form>
       <FormHorizontal
         title="General"
-        description="Bring your TLS X.509 digital certificate and private key obtained
+        description="Bring a TLS X.509 digital certificate and private key obtained
         from a certificate authority or a Trusted CA for mTLS authentication.
-        You may also generate a Certificate Signing Request (CSR) with Azion and submit it to a certificate authority."
+        As an alternative, generate a Certificate Signing Request (CSR) with Azion and submit it to a certificate authority."
       >
         <template #inputs>
           <div class="flex flex-col sm:max-w-lg w-full gap-2">
@@ -21,7 +21,7 @@
               >Name *</label
             >
             <InputText
-              placeholder="Digital Certificate name"
+              placeholder="Digital certificate name"
               v-bind="digitalCertificateName"
               type="text"
               id="name"
@@ -54,7 +54,7 @@
                 />
               </template>
               <template #subtitle>
-                Check this option to upload your TLS certificate and private key or if you want to
+                Check this option to upload a TLS certificate and private key or to
                 generate a CSR to submit to a certificate authority.
               </template>
             </Card>
@@ -76,14 +76,14 @@
                   :value="certificateTypes.TRUSTED"
                 />
               </template>
-              <template #subtitle> Check this option to upload your mTLS certificate. </template>
+              <template #subtitle> Check this option to upload an mTLS certificate. </template>
             </Card>
           </div>
         </template>
       </FormHorizontal>
       <FormHorizontal
         title="Edge Certificate Type"
-        description="Choose whether you want to upload your digital certificate and private key or generate
+        description="Choose between uploading a digital certificate and private key or generating
         a Certificate Signing Request to submit to a certificate authority."
         v-if="certificateType === certificateTypes.EDGE_CERTIFICATE"
       >
@@ -99,7 +99,7 @@
               }"
             >
               <template #title>
-                <span class="text-base">Upload certificate and private key</span>
+                <span class="text-base">Upload Certificate and Private Key</span>
                 <RadioButton
                   v-model="createCertificateType"
                   inputId="createCertificateType1"
@@ -135,7 +135,7 @@
           createCertificateType === edgeCertificateTypes.UPLOAD &&
           certificateType === certificateTypes.EDGE_CERTIFICATE
         "
-        title="Upload certificate and private key"
+        title="Upload Certificate and Private Key"
         description="To upload your digital certificate, copy and paste your certificate and private key codes in the respective fields,
         including the begin and end tags."
       >
