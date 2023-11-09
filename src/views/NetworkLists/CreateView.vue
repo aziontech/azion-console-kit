@@ -18,7 +18,7 @@
               >Name *</label
             >
             <InputText
-              placeholder="IP Tor Exit Nodes List"
+              placeholder="My network list"
               v-bind="name"
               id="name"
               type="text"

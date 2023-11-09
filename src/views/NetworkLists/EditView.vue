@@ -19,7 +19,7 @@
               >Name *</label
             >
             <InputText
-              placeholder="IP Tor Exit Nodes List"
+              placeholder="My network list"
               v-bind="name"
               type="text"
               :class="{ 'p-invalid': errors.name }"
