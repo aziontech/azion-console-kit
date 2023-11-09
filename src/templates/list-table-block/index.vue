@@ -91,9 +91,9 @@
           <template #body="{ data: rowData }">
             <div class="flex justify-end">
               <PrimeMenu
-                :ref="'menu'"
+                :ref="`menu-${rowData.id}`"
                 id="overlay_menu"
-                v-bind:model="actionOptions()"
+                v-bind:model="actionOptions(rowData)"
                 :popup="true"
               />
               <PrimeButton
@@ -221,7 +221,6 @@
       },
       editPagePath: {
         type: String,
-        required: true,
         default: () => '/'
       },
       addButtonLabel: {
@@ -234,13 +233,20 @@
         type: Function
       },
       deleteService: {
-        required: true,
         type: Function
+      },
+      visibleEditAction: {
+        type: Boolean,
+        default: true
       },
       reorderableRows: {
         required: false,
         type: Boolean,
         default: false
+      },
+      rowActions: {
+        type: Array,
+        default: () => []
       }
     },
     async created() {
@@ -262,19 +268,37 @@
       onRowReorder(event) {
         this.data = event.value
       },
-      actionOptions() {
-        const actionOptions = [
-          {
+      addActionOption(actionOptions, option) {
+        actionOptions.push({
+          ...option
+        })
+      },
+      actionOptions(rowData) {
+        const actionOptions = []
+        if (this.visibleEditAction) {
+          actionOptions.push({
             label: 'Edit',
             icon: 'pi pi-fw pi-pencil',
             command: () => this.editItem()
-          },
-          {
+          })
+        }
+
+        if (this.deleteService) {
+          actionOptions.push({
             label: 'Delete',
             icon: 'pi pi-fw pi-trash',
             command: () => this.removeItem()
-          }
-        ]
+          })
+        }
+
+        if (this.rowActions && this.rowActions.length > 0) {
+          this.rowActions.forEach((action) => {
+            actionOptions.push({
+              ...action,
+              command: () => action.command(rowData)
+            })
+          })
+        }
 
         return actionOptions
       },
@@ -299,7 +323,7 @@
       },
       toggleActionsMenu(event, selectedId) {
         this.selectedId = selectedId
-        this.$refs.menu.toggle(event)
+        this.$refs[`menu-${selectedId}`].toggle(event)
       },
       editItem() {
         this.$router.push({ path: `${this.editPagePath}/${this.selectedId}` })

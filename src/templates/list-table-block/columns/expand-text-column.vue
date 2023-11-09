@@ -1,10 +1,7 @@
 <template>
   <ul class="flex flex-col gap-1">
-    <li
-      v-for="(item, index) in splitValue"
-      :key="index"
-    >
-      {{ item }}
+    <li>
+      {{ splitValue }}
     </li>
     <li
       v-if="displayShowMore"
@@ -17,26 +14,25 @@
 </template>
 
 <script setup>
-  defineOptions({ name: 'expand-column' })
   import { ref, computed } from 'vue'
+  defineOptions({ name: 'expand-text-column' })
   const props = defineProps({
     value: {
-      type: Array,
+      type: String,
       required: true
     }
   })
 
   const showAllItems = ref(false)
-
-  const SLICE_VALUE = 2
-
-  const formatValue = props.value.slice(0, SLICE_VALUE)
-
-  const totalItems = props.value.length - SLICE_VALUE
-  const displayShowMore = props.value.length > SLICE_VALUE
+  const textColumn = ref(props.value)
+  const SLICE_VALUE = 15
+  const displayShowMore = textColumn.value?.length > SLICE_VALUE
+  const totalItems = textColumn.value?.length - SLICE_VALUE
+  const formatValue = textColumn.value?.slice(0, SLICE_VALUE)
+  const newValue = `${formatValue}${displayShowMore ? '...' : ''}`
 
   const splitValue = computed(() => {
-    return showAllItems.value ? props.value : formatValue
+    return showAllItems.value ? textColumn.value : newValue
   })
 
   const displayRemainingItems = computed(() => {
