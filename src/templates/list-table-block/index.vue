@@ -233,7 +233,6 @@
         type: Function
       },
       deleteService: {
-        required: false,
         type: Function
       },
       visibleEditAction: {
