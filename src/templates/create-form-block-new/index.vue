@@ -86,11 +86,11 @@
         })
       },
       showFeedback(feedback) {
-        if (this.feedbackDefault || !feedback) {
-          feedback = 'Created successfully'
+        if (this.feedbackDefault) {
+          this.showToast('success', feedback.message)
+          return
         }
-
-        this.showToast('success', feedback)
+        this.showToast('success', feedback ?? 'created successfully')
       },
       handleSuccess(feedback) {
         this.cleanFormCallback()
@@ -102,7 +102,6 @@
         try {
           this.isLoading = true
           const feedback = await this.createService(this.formData)
-          console.log('🚀 ~ validateAndSubmit ~ feedback:', feedback)
           this.handleSuccess(feedback)
         } catch (error) {
           this.showToast('error', error)
