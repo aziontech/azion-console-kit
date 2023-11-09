@@ -1,10 +1,11 @@
 <template>
-  <CreateFormBlock
-    pageTitle="Create Intelligent DNS Records"
-    :createService="props.createRecordsService"
-    :formData="formValues"
+  <EditFormBlock
+    pageTitle="Edit Intelligent DNS Record"
+    :editService="editRecordServiceWithIDNSIdDecorator"
+    :loadService="loadRecordServiceWithIDNSIdDecorator"
+    :initialDataSetter="setValues"
     :isValid="meta.valid"
-    :cleanFormCallback="resetForm"
+    :formData="values"
   >
     <template #form>
       <FormHorizontal
@@ -42,7 +43,7 @@
               >Record Type *</label
             >
             <Dropdown
-              v-model="selectedRecordType"
+              v-model="recordType"
               :options="recordsTypes"
               optionLabel="label"
               id="type"
@@ -102,24 +103,24 @@
 
           <div class="flex flex-col sm:max-w-lg w-full gap-2">
             <label
-              for="selectedPolicy"
+              for="policy"
               class="text-color text-base font-medium"
               >Policy *</label
             >
             <Dropdown
-              v-model="selectedPolicy"
+              v-model="policy"
               :options="policyList"
-              id="selectedPolicy"
+              id="policy"
               optionLabel="label"
               optionValue="value"
               placeholder="Select a Policy"
-              :class="{ 'p-invalid': errors.selectedPolicy }"
+              :class="{ 'p-invalid': errors.policy }"
               class="w-full"
             />
             <small
-              v-if="errors.selectedPolicy"
+              v-if="errors.policy"
               class="p-error text-xs font-normal leading-tight"
-              >{{ errors.selectedPolicy }}</small
+              >{{ errors.policy }}</small
             >
           </div>
           <div
@@ -156,7 +157,7 @@
             <label
               for="description"
               class="text-color text-base font-medium"
-              >Description *</label
+              >Description</label
             >
             <InputText
               placeholder="add the description"
@@ -175,23 +176,28 @@
         </template>
       </FormHorizontal>
     </template>
-  </CreateFormBlock>
+  </EditFormBlock>
 </template>
 
 <script setup>
   import { ref, watch } from 'vue'
   import { useRoute } from 'vue-router'
   import { useIntelligentDNSStore } from '@/stores/intelligent-dns'
-  import CreateFormBlock from '@templates/create-form-block-new'
+  import EditFormBlock from '@templates/edit-form-block-new'
   import FormHorizontal from '@templates/create-form-block-new/form-horizontal'
   import InputText from 'primevue/inputtext'
   import Textarea from 'primevue/textarea'
   import Dropdown from 'primevue/dropdown'
-  import { useField, useForm } from 'vee-validate'
+  import { useForm, useField } from 'vee-validate'
   import * as yup from 'yup'
+  import router from '@/router'
 
   const props = defineProps({
-    createRecordsService: {
+    editRecordsService: {
+      type: Function,
+      required: true
+    },
+    loadRecordsService: {
       type: Function,
       required: true
     }
@@ -219,42 +225,47 @@
     { label: 'Weighted', value: 'weighted' }
   ])
 
-  //Validation Schema
   const validationSchema = yup.object({
     name: yup.string().required(),
-    selectedRecordType: yup.string().required('Please select an option'),
+    recordType: yup.string().required('Please select an option'),
     value: yup.string().required(),
     ttl: yup.number().required(),
-    selectedPolicy: yup.string().required('Please select an option'),
-    weight: yup.number().required('Weight is a required field'),
+    policy: yup.string().required('Please select an option'),
+    weight: yup.number().when('policy', {
+      is: 'weighted',
+      then: (schema) => schema.required('Weighted is a required field').min(1).max(255)
+    }),
     description: yup.string()
   })
 
-  // validation with VeeValidate
-  const { errors, defineInputBinds, meta, resetForm, values } = useForm({
+  const { errors, defineInputBinds, meta, values, setValues } = useForm({
     validationSchema,
     initialValues: {
-      intelligentDNSID: route.params.id,
-      selectedRecordType: 'A',
-      ttl: 3600,
-      selectedPolicy: 'simple',
-      weight: '100'
+      intelligentDNSId: router.currentRoute.value.params.intelligentDNSId
     }
   })
 
   const name = defineInputBinds('name', { validateOnInput: true })
-  const { value: selectedPolicy } = useField('selectedPolicy')
-  const { value: selectedRecordType } = useField('selectedRecordType')
+  const { value: recordType } = useField('recordType')
+  const { value: policy } = useField('policy')
   const value = defineInputBinds('value', { validateOnInput: true })
   const ttl = defineInputBinds('ttl', { validateOnInput: true })
   const weight = defineInputBinds('weight', { validateOnInput: true })
   const description = defineInputBinds('description', { validateOnInput: true })
 
-  let formValues = { ...values, selectedRecordType, selectedPolicy }
   let isWeightedPolicy = false
 
-  watch([selectedRecordType, selectedPolicy, values], () => {
-    formValues = { ...values, selectedRecordType, selectedPolicy }
-    isWeightedPolicy = selectedPolicy.value === 'weighted'
+  watch([recordType, policy, values], () => {
+    isWeightedPolicy = policy.value === 'weighted'
   })
+
+  async function loadRecordServiceWithIDNSIdDecorator(payload) {
+    const intelligentDNSId = route.params.intelligentDNSId
+    return await props.loadRecordsService({ id: payload.id, intelligentDNSId })
+  }
+
+  async function editRecordServiceWithIDNSIdDecorator(payload) {
+    const intelligentDNSId = route.params.intelligentDNSId
+    return await props.editRecordsService({ intelligentDNSId, ...payload })
+  }
 </script>

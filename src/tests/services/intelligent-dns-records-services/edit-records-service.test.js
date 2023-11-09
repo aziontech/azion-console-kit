@@ -1,23 +1,24 @@
 import { AxiosHttpClientAdapter } from '@/services/axios/AxiosHttpClientAdapter'
 import * as Errors from '@/services/axios/errors'
-import { createRecordsService } from '@/services/intelligent-dns-records-services'
+import { editRecordsService } from '@/services/intelligent-dns-records-services'
 import { describe, expect, it, vi } from 'vitest'
 
 const fixtures = {
   dnsRecordMock: {
-    intelligentDNSID: 123987902,
-    selectedRecordType: { _value: 'dns-record-value' },
+    intelligentDNSId: 123987902,
+    id: 625837692,
+    recordType: 'CNAME',
     name: 'Az-dns-name',
-    value: 'dns-answer-record-value',
+    value: 'dns-answer-record-CNAME.com',
     ttl: '8000',
     description: 'dns record description',
-    selectedPolicy: { _value: 'weighted' },
+    policy: 'weighted',
     weight: 0.9
   }
 }
 
 const makeSut = () => {
-  const sut = createRecordsService
+  const sut = editRecordsService
 
   return {
     sut
@@ -27,40 +28,40 @@ const makeSut = () => {
 describe('IntelligentDnsRecordsServices', () => {
   it('should call API with correct params', async () => {
     const requestSpy = vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
-      statusCode: 201
+      statusCode: 200
     })
     const { sut } = makeSut()
 
     await sut(fixtures.dnsRecordMock)
 
     expect(requestSpy).toHaveBeenCalledWith({
-      url: `intelligent_dns/${fixtures.dnsRecordMock.intelligentDNSID}/records`,
-      method: 'POST',
+      url: `intelligent_dns/${fixtures.dnsRecordMock.intelligentDNSId}/records/${fixtures.dnsRecordMock.id}`,
+      method: 'PUT',
       body: {
-        record_type: fixtures.dnsRecordMock.selectedRecordType._value,
+        record_type: fixtures.dnsRecordMock.recordType,
         entry: fixtures.dnsRecordMock.name,
         answers_list: [fixtures.dnsRecordMock.value],
         ttl: fixtures.dnsRecordMock.ttl,
-        description: fixtures.dnsRecordMock.description,
-        policy: fixtures.dnsRecordMock.selectedPolicy._value,
-        weight: fixtures.dnsRecordMock.weight
+        policy: fixtures.dnsRecordMock.policy,
+        weight: fixtures.dnsRecordMock.weight,
+        description: fixtures.dnsRecordMock.description
       }
     })
   })
 
-  it('should return a feedback message on successfully created', async () => {
+  it('should return a feedback message on successfully edited', async () => {
     vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
-      statusCode: 201
+      statusCode: 200
     })
     const { sut } = makeSut()
 
     const feedbackMessage = await sut(fixtures.dnsRecordMock)
 
-    expect(feedbackMessage).toBe('Intelligent DNS Record has been created')
+    expect(feedbackMessage).toBe('Intelligent DNS Record has been updated')
   })
 
-  it('Should return an API error when API detect an invalid configuration to Intelligent DNS Record', async () => {
-    const apiErrorMock = 'This is an API validation error message returned'
+  it('Should return an API error when API detect an invalid configuration to edit Intelligent DNS Record', async () => {
+    const apiErrorMock = 'Some invalid configuration has been found on the backend'
     vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
       statusCode: 400,
       body: {

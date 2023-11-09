@@ -132,10 +132,9 @@ describe('EdgeFunctionsServices', () => {
       vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
         statusCode
       })
-      const stubId = '123'
       const { sut } = makeSut()
 
-      const response = sut(stubId)
+      const response = sut(fixtures.basic)
 
       expect(response).rejects.toBe(expectedError)
     }

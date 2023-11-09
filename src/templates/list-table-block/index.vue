@@ -346,6 +346,7 @@
           const feedback = await this.deleteService(this.selectedId)
           toastConfig.summary = feedback ?? 'Deleted successfully'
           this.data = this.data.filter((item) => item.id !== this.selectedId)
+          this.$forceUpdate()
         } catch (error) {
           toastConfig = {
             closable: false,

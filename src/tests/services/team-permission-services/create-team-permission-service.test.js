@@ -1,49 +1,43 @@
 import { AxiosHttpClientAdapter } from '@/services/axios/AxiosHttpClientAdapter'
 import * as Errors from '@/services/axios/errors'
-import { createRecordsService } from '@/services/intelligent-dns-records-services'
+import { createTeamPermissionsService } from '@/services/team-permission'
 import { describe, expect, it, vi } from 'vitest'
 
 const fixtures = {
-  dnsRecordMock: {
-    intelligentDNSID: 123987902,
-    selectedRecordType: { _value: 'dns-record-value' },
-    name: 'Az-dns-name',
-    value: 'dns-answer-record-value',
-    ttl: '8000',
-    description: 'dns record description',
-    selectedPolicy: { _value: 'weighted' },
-    weight: 0.9
+  teamPermissionMock: {
+    name: 'Mongo-DB-Key',
+    isActive: true,
+    permissions: [
+      { id: 1, name: 'default name' },
+      { id: 2, name: 'default name' }
+    ]
   }
 }
 
 const makeSut = () => {
-  const sut = createRecordsService
+  const sut = createTeamPermissionsService
 
   return {
     sut
   }
 }
 
-describe('IntelligentDnsRecordsServices', () => {
+describe('TeamPermissionServices', () => {
   it('should call API with correct params', async () => {
     const requestSpy = vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
       statusCode: 201
     })
     const { sut } = makeSut()
 
-    await sut(fixtures.dnsRecordMock)
+    await sut(fixtures.teamPermissionMock)
 
     expect(requestSpy).toHaveBeenCalledWith({
-      url: `intelligent_dns/${fixtures.dnsRecordMock.intelligentDNSID}/records`,
+      url: `teams`,
       method: 'POST',
       body: {
-        record_type: fixtures.dnsRecordMock.selectedRecordType._value,
-        entry: fixtures.dnsRecordMock.name,
-        answers_list: [fixtures.dnsRecordMock.value],
-        ttl: fixtures.dnsRecordMock.ttl,
-        description: fixtures.dnsRecordMock.description,
-        policy: fixtures.dnsRecordMock.selectedPolicy._value,
-        weight: fixtures.dnsRecordMock.weight
+        name: fixtures.teamPermissionMock.name,
+        is_active: fixtures.teamPermissionMock.isActive,
+        permissions_ids: fixtures.teamPermissionMock.permissions.map((item) => item.id)
       }
     })
   })
@@ -54,24 +48,26 @@ describe('IntelligentDnsRecordsServices', () => {
     })
     const { sut } = makeSut()
 
-    const feedbackMessage = await sut(fixtures.dnsRecordMock)
+    const feedbackMessage = await sut(fixtures.teamPermissionMock)
 
-    expect(feedbackMessage).toBe('Intelligent DNS Record has been created')
+    expect(feedbackMessage).toBe('Your Team Permission has been created')
   })
 
-  it('Should return an API error when API detect an invalid configuration to Intelligent DNS Record', async () => {
-    const apiErrorMock = 'This is an API validation error message returned'
+  it('Should return an API error for an 400 response status', async () => {
+    const errorKey = 'name'
+    const apiErrorMock = 'This field is required.'
+
     vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
       statusCode: 400,
       body: {
-        errors: [apiErrorMock]
+        [errorKey]: [apiErrorMock]
       }
     })
     const { sut } = makeSut()
 
-    const feedbackMessage = sut(fixtures.dnsRecordMock)
+    const feedbackMessage = sut(fixtures.teamPermissionMock)
 
-    expect(feedbackMessage).rejects.toBe(apiErrorMock)
+    expect(feedbackMessage).rejects.toThrow(apiErrorMock)
   })
 
   it.each([
@@ -103,7 +99,7 @@ describe('IntelligentDnsRecordsServices', () => {
       })
       const { sut } = makeSut()
 
-      const response = sut(fixtures.dnsRecordMock)
+      const response = sut(fixtures.teamPermissionMock)
 
       expect(response).rejects.toBe(expectedError)
     }
