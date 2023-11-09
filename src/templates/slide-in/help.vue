@@ -14,13 +14,15 @@
       />
     </div>
     <div
-      class="surface-border border border-dashed rounded-md flex items-center h-96 ml-6 mr-4 md:mr-8 my-3"
+      class="surface-border border border-dashed rounded-md items-center h-96 ml-6 mr-4 md:mr-8 my-3"
     >
-      <p class="text-color text-sm font-medium text-center w-full">
-        <iframe :src="'https://storage.googleapis.com/gcs-docs-help-center-stage/console/welcome/index.html'" frameborder="0"></iframe>
-        <div v-html="mainContent">
-        </div>
-      </p>
+      <li
+        v-for="(content, i) in mainContent"
+        :key="i"
+        class="text-color text-sm font-medium text-center w-full"
+      >
+        {{ content }}
+      </li>
     </div>
   </article>
 </template>
@@ -28,7 +30,7 @@
   import PrimeButton from 'primevue/button'
   import { mapActions } from 'pinia'
   import { useHelpCenterStore } from '@/stores/help-center'
-  import * as HomeServices from '@/services/home-services'
+  import * as HelpCenterServices from '@/services/help-center-services'
 
   export default {
     name: 'SlideIn',
@@ -42,12 +44,16 @@
     },
     methods: {
       ...mapActions(useHelpCenterStore, ['closeHelpCenter']),
-      async getMainContent() {
-        this.mainContent = await HomeServices.getHelpCenterMainContentService()
+      async getMainContent(url) {
+        this.mainContent = await HelpCenterServices.getHelpCenterDocumentationService({ url })
       }
     },
     mounted() {
-      this.getMainContent()
+      const actualPath = this.$route.path
+
+      if (actualPath === '/') {
+        this.getMainContent()
+      }
     }
   }
 </script>
