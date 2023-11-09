@@ -19,7 +19,7 @@
               >Name *</label
             >
             <InputText
-              placeholder="Domain name"
+              placeholder="My domain"
               v-bind="name"
               id="name"
               type="text"

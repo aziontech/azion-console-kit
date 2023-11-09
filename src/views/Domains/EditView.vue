@@ -23,7 +23,7 @@
               >Name *</label
             >
             <InputText
-              placeholder="Domain name"
+              placeholder="My domain"
               v-bind="name"
               id="name"
               type="text"
@@ -160,7 +160,7 @@
             }"
           >
             <template #title>
-              <span class="text-base">Enable Mutual Authentication</span>
+              <span class="text-base">Mutual Authentication</span>
               <InputSwitch
                 :class="{ 'p-invalid': errors.mtlsIsEnabled }"
                 v-model="mtlsIsEnabled"
