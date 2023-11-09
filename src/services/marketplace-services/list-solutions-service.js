@@ -18,7 +18,7 @@ const adapt = (httpResponse) => {
   const service =
     isArray && httpResponse.body.length
       ? httpResponse.body.map((element) => ({
-          id: element.bind_id,
+          id: element.id,
           name: element.name,
           referenceId: element.solution_reference_id,
           vendor: element.vendor,

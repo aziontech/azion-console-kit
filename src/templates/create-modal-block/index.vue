@@ -1,5 +1,5 @@
 <template>
-  <div class="lg:w-[880px] sm:w-[85vw] min-h-[500px] flex p-8 gap-6">
+  <div class="lg:w-[880px] sm:w-[85vw] min-h-[500px] flex flex-col sm:flex-row p-0 sm:p-8 gap-4 sm:gap-6">
     <PrimeMenu
       v-bind:model="items"
       :tabindex="selectedTab"
@@ -11,7 +11,7 @@
       }"
     />
     <div
-      class="pb-4 h-full w-full grid md:grid-cols-2 grid-cols-1 gap-4 animate-pulse"
+      class="pb-4 h-full ml-0 w-full grid md:grid-cols-2 grid-cols-1 gap-4 animate-pulse"
       v-if="isLoading"
     >
       <PrimeCard class="w-full p-4">
@@ -100,79 +100,87 @@
       </PrimeCard>
     </div>
     <div
-      class="h-full w-full grid md:grid-cols-2 grid-cols-1 gap-4"
+      class="h-full ml-0 w-full grid md:grid-cols-2 grid-cols-1 gap-4"
       v-if="!isLoading && selectedTab === 0"
     >
       <PrimeCard
-        v-for="template in templates"
-        :key="template.id"
-        class="p-4"
-      >
-        <template #content>
-          <div class="flex gap-3.5 flex-col">
-            <div class="w-10 h-10 rounded flex justify-center items-center">
-              <img
-                class="rounded"
-                :src="template.vendor.icon"
-                alt=""
-              />
-            </div>
-            <div class="flex p-0.5 flex-col gap-1">
-              <span class="text-color text-base font-medium">
-                {{ template.name }}
-              </span>
-              <span class="text-color-secondary">
-                {{ template.headline }}
-              </span>
-            </div>
-            <div>
+          v-for="template in templates"
+          :key="template.id"
+          :pt="{
+            root: 'w-full p-4',
+            body: 'w-full h-full',
+            content: 'h-full',
+          }"
+        >
+          <template #content>
+            <div class="flex flex-col h-full justify-between gap-3.5 items-start">
+              <div class="flex gap-3.5 flex-col">
+                <div class="w-10 h-10 rounded flex justify-center items-center bg-white">
+                  <img
+                    class="rounded"
+                    :src="template.vendor.icon"
+                    alt=""
+                  />
+                </div>
+                <div class="flex p-0.5 flex-col">
+                  <span class="text-color text-base font-medium">
+                    {{ template.name }}
+                  </span>
+                  <span class="text-color-secondary">
+                    {{ template.headline }}
+                  </span>
+                </div>
+              </div>
               <PrimeButton
                 outlined
                 label="Choose"
               />
             </div>
-          </div>
-        </template>
-      </PrimeCard>
+          </template>
+        </PrimeCard>
     </div>
     <div
-      class="h-full w-full grid md:grid-cols-2 grid-cols-1 gap-4"
+      class="h-full w-full ml-0 grid md:grid-cols-2 grid-cols-1 gap-4"
       v-if="!isLoading && selectedTab === 1"
     >
       <PrimeCard
-        v-for="template in browseTemplates"
-        :key="template.id"
-        class="w-full p-4"
-      >
-        <template #content>
-          <div class="flex gap-3.5 flex-col">
-            <div class="w-10 h-10 rounded flex justify-center items-center">
-              <img
-                class="rounded"
-                :src="template.vendor.icon"
-                alt=""
-              />
-            </div>
-            <div class="flex p-0.5 flex-col gap-1">
-              <span class="text-color text-base font-medium">
-                {{ template.name }}
-              </span>
-              <span class="text-color-secondary">
-                {{ template.headline }}
-              </span>
-            </div>
-            <div>
+          v-for="template in browseTemplates"
+          :key="template.id"
+          :pt="{
+            root: 'w-full p-4',
+            body: 'w-full h-full',
+            content: 'h-full',
+          }"
+        >
+          <template #content>
+            <div class="flex flex-col h-full justify-between gap-3.5 items-start">
+              <div class="flex gap-3.5 flex-col">
+                <div class="w-10 h-10 rounded flex justify-center items-center bg-white">
+                  <img
+                    class="rounded"
+                    :src="template.vendor.icon"
+                    alt=""
+                  />
+                </div>
+                <div class="flex p-0.5 flex-col">
+                  <span class="text-color text-base font-medium">
+                    {{ template.name }}
+                  </span>
+                  <span class="text-color-secondary">
+                    {{ template.headline }}
+                  </span>
+                </div>
+              </div>
               <PrimeButton
                 outlined
                 label="Choose"
               />
             </div>
-          </div>
-        </template>
-      </PrimeCard>
+          </template>
+        </PrimeCard>
     </div>
     <div
-    class="h-full w-full grid md:grid-cols-2 grid-cols-1 gap-4"
+    class="h-full ml-0 w-full grid md:grid-cols-2 grid-cols-1 gap-4"
       v-if="!isLoading && selectedTab === 2"
     >
       <PrimeCard

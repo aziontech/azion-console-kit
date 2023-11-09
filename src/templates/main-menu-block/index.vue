@@ -101,7 +101,7 @@
 
         <!-- Create Button Mobile -->
         <PrimeButton
-          @click="showCreateModal"
+          @click="showCreateMobileModal"
           icon="pi pi-plus"
           class="h-8 md:hidden text-white border-header"
           size="small"
@@ -506,7 +506,7 @@
     modal
     header="Create something new"
     :pt="{
-      content: { class: 'p-0' }
+      content: { class: 'p-4 sm:p-0' }
     }"
     position="center"
     :dismissableMask="true"
@@ -518,6 +518,32 @@
     </div>
   </PrimeDialog>
 
+  <!-- Mobile modal Create -->
+  <Sidebar
+    v-model:visible="showCreateMobile"
+    position="bottom"
+    headerContent="Create something new"
+    :show-close-icon="false"
+    :pt="{
+      root: { class: 'h-[80%] flex p-0' },
+      headerContent: { class: 'w-full' },
+      mask: { class: 'flex' },
+    }"
+  >
+    <template #header>
+      <div class="flex items-center justify-between">
+        <h2>Create something new</h2>
+        <PrimeButton
+          icon="pi pi-times"
+          @click="closeCreateMobileModal"
+          size="small"
+          class="flex-none surface-border text-sm w-8 h-8"
+          text
+        />
+      </div>
+    </template>
+    <CreateModalBlock /> 
+  </Sidebar>
   <!-- Notification Menu -->
   <PrimeMenu
     ref="menu"
@@ -578,6 +604,7 @@
       return {
         openSwitchAccount: false,
         showCreate: false,
+        showCreateMobile: false,
         showSearch: false,
         showSidebar: false,
         showProfile: false,
@@ -811,6 +838,12 @@
       showCreateModal() {
         this.showCreate = true
       },
+      showCreateMobileModal() {
+        this.showCreateMobile = true
+      },
+      closeCreateMobileModal() {
+        this.showCreateMobile = false
+      }, 
       openSideBar() {
         this.showSidebar = !this.showSidebar
       },
