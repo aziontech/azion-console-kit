@@ -162,11 +162,7 @@
 
       router.push({ name: 'home' })
     } catch (error) {
-      if (error.statusCode === 403) {
-        router.push({ name: 'login' })
-        return
-      }
-      hasRequestErrorMessage.value = error.message
+      hasRequestErrorMessage.value = error
     } finally {
       isButtonLoading.value = false
     }

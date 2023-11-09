@@ -26,7 +26,7 @@ const adapt = (httpResponse) => {
 export const parseHttpResponse = (httpResponse) => {
   switch (httpResponse.statusCode) {
     case 201:
-      return httpResponse?.body || null
+      return httpResponse.body
     case 400:
       throw new Errors.InvalidApiRequestError().message
     case 401:

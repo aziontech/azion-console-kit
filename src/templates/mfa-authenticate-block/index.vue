@@ -137,11 +137,7 @@
       const { user_tracking_info: userInfo } = await verifyUserData()
       await switchClientAccount(userInfo)
     } catch (error) {
-      if (error.statusCode === 403) {
-        router.push({ name: 'login' })
-        return
-      }
-      hasRequestErrorMessage.value = error.message
+      hasRequestErrorMessage.value = error
     } finally {
       isButtonLoading.value = false
     }

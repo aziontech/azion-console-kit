@@ -23,29 +23,21 @@ const adapt = (httpResponse) => {
 }
 
 export const parseHttpResponse = (httpResponse) => {
-  let error
   switch (httpResponse.statusCode) {
     case 200:
       return httpResponse.body
     case 400:
       const apiErrorInvalidMfaCode = httpResponse.body.detail
-      error = new Error(apiErrorInvalidMfaCode)
-      break
+      throw new Error(apiErrorInvalidMfaCode).message
     case 401:
-      error = new Errors.InvalidApiTokenError()
-      break
+      throw new Errors.InvalidApiTokenError().message
     case 403:
-      error = new Errors.PermissionError()
-      break
+      throw new Error('Your session was expired, please login again.').message
     case 404:
-      error = new Errors.NotFoundError()
-      break
+      throw new Errors.NotFoundError().message
     case 500:
-      error = new Errors.InternalServerError()
-      break
+      throw new Errors.InternalServerError().message
     default:
-      error = new Errors.UnexpectedError()
+      throw new Errors.UnexpectedError().message
   }
-  error.statusCode = httpResponse.statusCode
-  throw error
 }
