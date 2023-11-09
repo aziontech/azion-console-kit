@@ -176,7 +176,7 @@
       </FormHorizontal>
       <FormHorizontal
         title="Generate CSR and Private Key with Azion"
-        description="To apply for a digital certificate issued by a certificate authority, a certificate signing request is required.
+        description="To apply for a digital certificate issued by a certificate authority, a Certificate Signing Request is required.
         Azion can generate a certificate code to submit to a certificate authority."
         v-if="
           createCertificateType === edgeCertificateTypes.CSR &&
