@@ -67,7 +67,7 @@
         type: Boolean,
         default: true
       },
-      feedbackDefault: {
+      disabledFeedback: {
         type: Boolean,
         default: false
       }
@@ -85,12 +85,10 @@
           life: life
         })
       },
-      showFeedback(feedback) {
-        if (this.feedbackDefault) {
-          this.showToast('success', feedback.message)
-          return
+      showFeedback(feedback = 'created successfully') {
+        if (!this.disabledFeedback) {
+          this.showToast('success', feedback)
         }
-        this.showToast('success', feedback ?? 'created successfully')
       },
       handleSuccess(feedback) {
         this.cleanFormCallback()

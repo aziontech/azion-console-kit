@@ -6,10 +6,10 @@
       :formData="values"
       :isValid="meta.valid"
       @on-response="handleResponse"
-      :buttonBackList="!!personalTokenKey"
+      :buttonBackList="generatedPersonalToken"
       :callback="false"
-      :isRequestSuccess="!!personalTokenKey"
-      :feedbackDefault="true"
+      :isRequestSuccess="generatedPersonalToken"
+      :disabledFeedback="true"
     >
       <template #form>
         <FormHorizontal
@@ -26,7 +26,7 @@
               <span class="p-input-icon-right">
                 <i
                   class="pi pi-lock text-color-secondary"
-                  v-if="!!personalTokenKey"
+                  v-if="generatedPersonalToken"
                 />
                 <InputText
                   class="w-full"
@@ -35,8 +35,7 @@
                   type="text"
                   :class="{ 'p-invalid': errors.name }"
                   v-tooltip.top="{ value: errors.name, showDelay: 200 }"
-                  :readonly="!!personalTokenKey"
-                  :disabled="!!personalTokenKey"
+                  :disabled="generatedPersonalToken"
                 />
               </span>
 
@@ -55,7 +54,7 @@
               <span class="p-input-icon-right flex items-start">
                 <i
                   class="pi pi-lock text-color-secondary"
-                  v-if="!!personalTokenKey"
+                  v-if="generatedPersonalToken"
                 />
                 <TextareaComponent
                   id="description"
@@ -63,8 +62,7 @@
                   :class="{ 'p-invalid': errors.description }"
                   rows="1"
                   v-bind="description"
-                  :disabled="!!personalTokenKey"
-                  :readonly="!!personalTokenKey"
+                  :disabled="generatedPersonalToken"
                 />
               </span>
               <small
@@ -96,11 +94,11 @@
                     optionValue="value"
                     :class="{ 'p-invalid': errors.selectedExpiration }"
                     v-model="selectedExpiration"
-                    :disabled="!!personalTokenKey"
+                    :disabled="generatedPersonalToken"
                   >
                     <template
                       #dropdownicon
-                      v-if="!!personalTokenKey"
+                      v-if="generatedPersonalToken"
                     >
                       <span class="pi pi-lock text-color-secondary" />
                     </template>
@@ -108,14 +106,14 @@
                 </div>
                 <div class="md:w-80">
                   <Calendar
-                    v-if="selectedExpiration === 'custom'"
+                    v-if="isCustomDateSelected"
                     class="w-full"
                     v-model="customExpiration"
                     placeholder="Select date from calendar"
                     :minDate="minExpirationDate"
                     :class="{ 'p-invalid': errors.customExpiration }"
                     showIcon
-                    :disabled="!!personalTokenKey"
+                    :disabled="generatedPersonalToken"
                   />
                   <small
                     v-if="errors.customExpiration"
@@ -128,7 +126,7 @@
 
             <div
               class="flex flex-col w-full gap-2"
-              v-if="!!personalTokenKey"
+              v-if="generatedPersonalToken"
             >
               <label
                 for="personalToken"
@@ -142,12 +140,10 @@
                 <span class="p-input-icon-right w-full flex max-w-lg flex-col items-start gap-2">
                   <InputText
                     id="personalToken"
-                    :class="{ 'p-invalid': errors.generatedToken }"
                     class="w-full"
                     :value="personalTokenKey"
                     :type="tokenField.type"
-                    :readonly="!personalTokenKey"
-                    :disabled="!!personalTokenKey"
+                    :disabled="generatedPersonalToken"
                   />
                   <i
                     :class="tokenField.icon"
@@ -198,6 +194,9 @@
     }
   })
 
+  const isTokenVisible = ref(false)
+  const personalTokenKey = ref('')
+  const generatedPersonalToken = ref(false)
   const options = ref([
     { label: '1 day', value: '1' },
     { label: '7 days', value: '7' },
@@ -237,11 +236,14 @@
   const name = defineInputBinds('name', { validateOnInput: true })
   const description = defineInputBinds('description', { validateOnInput: true })
 
-  const isTokenVisible = ref(false)
   const tokenField = computed(() => {
     const icon = isTokenVisible.value ? 'pi pi-eye-slash' : 'pi pi-eye'
     const type = isTokenVisible.value ? 'text' : 'password'
     return { icon, type }
+  })
+
+  const isCustomDateSelected = computed(() => {
+    return selectedExpiration.value === 'custom'
   })
 
   const minExpirationDate = computed(() => {
@@ -302,14 +304,20 @@
     { immediate: true }
   )
 
-  const personalTokenKey = ref('')
-  const handleResponse = (response) => {
-    if (response?.body?.key) {
-      personalTokenKey.value = response.body.key
+  const toast = useToast()
+  const handleResponse = ({ message, token }) => {
+    toast.add({
+      closable: false,
+      severity: 'success',
+      summary: message,
+      life: 10000
+    })
+    if (token) {
+      personalTokenKey.value = token
+      generatedPersonalToken.value = true
     }
   }
 
-  const toast = useToast()
   const copyPersonalToken = async () => {
     const toastConfig = {
       closable: false,

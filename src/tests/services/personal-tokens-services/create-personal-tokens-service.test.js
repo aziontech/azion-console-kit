@@ -22,7 +22,10 @@ const makeSut = () => {
 describe('PersonalTokensServices', () => {
   it('should call API with correct params', async () => {
     const requestSpy = vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
-      statusCode: 201
+      statusCode: 201,
+      body: {
+        key: 'test-token'
+      }
     })
     const { sut } = makeSut()
 
@@ -41,12 +44,16 @@ describe('PersonalTokensServices', () => {
 
   it('should return a feedback message on successfully created', async () => {
     vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
-      statusCode: 201
+      statusCode: 201,
+      body: {
+        key: 'test-token'
+      }
     })
     const { sut } = makeSut()
 
-    const { message } = await sut(fixtures.personalTokenMock)
+    const { message, token } = await sut(fixtures.personalTokenMock)
 
+    expect(token).toBe('test-token')
     expect(message).toBe('Your personal token has been created')
   })
 
