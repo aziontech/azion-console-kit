@@ -37,7 +37,7 @@
       <form-horizontal
         title="Settings"
         description="Determine the edge application of the domain and its digital certificate. 
-        If you already own a domain, add it to the CNAME field and
+        To link an existing domain to an application, add it to the CNAME field and
         block access to the application via the Azion domain."
       >
         <template #inputs>
@@ -198,8 +198,8 @@
                 </template>
                 <template #subtitle>
                   This option attempts to verify the client certificate, but will allow the TLS
-                  handshake even if the Trusted CA cannot be validated. You can check which client
-                  certificate attempted the request in Edge Firewall.
+                  handshake even if the Trusted CA cannot be validated. Check which client
+                  certificate attempted the request in Edge Firewall, if necessary.
                 </template>
               </Card>
             </div>
