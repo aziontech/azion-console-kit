@@ -56,7 +56,7 @@
     }
   }
 
-  &:focus {
+  &:focus-visible {
     @include focused();
   }
 
@@ -151,7 +151,7 @@
   &:enabled:hover {
   }
 
-  &:enabled:focus {
+  &:enabled:focus-visible {
   }
 
   &:enabled:active {
@@ -180,7 +180,7 @@
   &:enabled:hover {
   }
 
-  &:enabled:focus {
+  &:enabled:focus-visible {
   }
 
   &:enabled:active {
@@ -209,7 +209,7 @@
   &:enabled:hover {
   }
 
-  &:enabled:focus {
+  &:enabled:focus-visible {
   }
 
   &:enabled:active {
@@ -238,7 +238,7 @@
   &:enabled:hover {
   }
 
-  &:enabled:focus {
+  &:enabled:focus-visible {
   }
 
   &:enabled:active {
@@ -267,7 +267,7 @@
   &:enabled:hover {
   }
 
-  &:enabled:focus {
+  &:enabled:focus-visible {
   }
 
   &:enabled:active {
@@ -296,7 +296,7 @@
   &:enabled:hover {
   }
 
-  &:enabled:focus {
+  &:enabled:focus-visible {
   }
 
   &:enabled:active {
@@ -325,7 +325,7 @@
     }
   }
 
-  &:enabled:focus {
+  &:enabled:focus-visible {
   }
 
   &:enabled:active {
