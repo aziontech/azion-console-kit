@@ -1,12 +1,12 @@
 import { AxiosHttpClientAdapter, parseHttpResponse } from '../axios/AxiosHttpClientAdapter'
 import { makeMarketplaceBaseUrl } from './make-marketplace-base-url'
 
-export const listSolutionsService = async () => {
+export const listSolutionsService = async (type = 'onboarding') => {
   let httpResponse = await AxiosHttpClientAdapter.request({
     url: `${makeMarketplaceBaseUrl()}/solution/`,
     method: 'GET',
     headers: {
-      'Mktp-Api-Context': 'onboarding'
+      'Mktp-Api-Context': type
     }
   })
   httpResponse = adapt(httpResponse)
@@ -15,7 +15,7 @@ export const listSolutionsService = async () => {
 
 const adapt = (httpResponse) => {
   const isArray = Array.isArray(httpResponse.body)
-  const service =
+  const parsedServices =
     isArray && httpResponse.body.length
       ? httpResponse.body.map((element) => ({
           id: element.id,
@@ -27,7 +27,7 @@ const adapt = (httpResponse) => {
       : []
 
   return {
-    body: service,
+    body: parsedServices,
     statusCode: httpResponse.statusCode
   }
 }
