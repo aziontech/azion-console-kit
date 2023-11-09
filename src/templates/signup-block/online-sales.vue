@@ -21,35 +21,19 @@
     <div class="w-full flex flex-col justify-center items-center">
       <div class="w-full max-w-md">
         <div
-          v-if="!showForm"
           class="card surface-border border rounded-md surface-section p-6 xl:p-10 flex flex-col gap-6 max-w-md"
         >
           <h2 class="text-center lg:text-start text-xl lg:text-2xl font-medium">
             Create your Azion account
           </h2>
-          <div class="flex flex-col gap-4">
-            <PrimeButton
-              label="Continue with Google"
-              icon="pi pi-google"
-              outlined
-            />
-            <PrimeButton
-              label="Continue with Github"
-              icon="pi pi-github"
-              outlined
-            />
-          </div>
-          <div class="w-full">
-            <Divider
-              layout="horizontal"
-              align="center"
-              >or</Divider
-            >
-          </div>
-          <PrimeButton
-            label="Sign Up with E-mail"
-            outlined
-            @click="showForm = true"
+          <SocialSignup
+            @show-form="showForm = true"
+            v-if="!showForm"
+          />
+          <SsoSignup
+            @show-form="showForm = false"
+            :signupService="signupService"
+            v-else
           />
           <p class="text-sm font-normal text-center text-color-secondary">
             By signing up you agree to the
@@ -68,131 +52,12 @@
             />
           </p>
         </div>
-
-        <div
-          v-else
-          class="card surface-border border rounded-md surface-section p-6 xl:p-10 flex flex-col gap-6 max-w-md"
-        >
-          <h2 class="text-center lg:text-start text-xl lg:text-2xl font-medium">
-            Create your Azion account
-          </h2>
-          <form
-            class="flex flex-col gap-6"
-            @submit.prevent="signUp"
-          >
-            <div class="flex flex-col gap-2">
-              <label
-                for="name"
-                class="font-semibold text-sm"
-                >Full name</label
-              >
-              <InputText
-                v-model="name"
-                id="name"
-                placeholder="Type your full name"
-                type="text"
-                class="w-full"
-                :class="{ 'p-invalid': errors.name }"
-              />
-              <small
-                v-if="errors.name"
-                class="p-error text-xs font-normal leading-tight"
-                >{{ errors.name }}</small
-              >
-            </div>
-            <div class="flex flex-col gap-2">
-              <label
-                for="email"
-                class="font-semibold text-sm"
-                >E-mail</label
-              >
-              <InputText
-                v-model="email"
-                id="email"
-                placeholder="Type your e-mail"
-                type="email"
-                class="w-full"
-                :class="{ 'p-invalid': errors.email }"
-              />
-              <small
-                v-if="errors.email"
-                class="p-error text-xs font-normal leading-tight"
-                >{{ errors.email }}</small
-              >
-            </div>
-            <div class="flex flex-col gap-2">
-              <label
-                for="password"
-                class="font-semibold text-sm"
-                >Password</label
-              >
-              <InputPassword
-                toggleMask
-                v-model="password"
-                id="password"
-                class="w-full"
-                placeholder="Type your password"
-                :class="{ 'p-invalid': errors.password }"
-                :feedback="false"
-              />
-              <small class="p-error text-xs font-normal leading-tight">{{ errors.password }}</small>
-              <ul class="text-color-secondary list-inside space-y-3">
-                <li
-                  class="flex gap-3 items-center text-color-secondary"
-                  :key="i"
-                  v-for="(requirement, i) in passwordRequirementsList"
-                >
-                  <div class="w-3">
-                    <span
-                      class="w-2 h-2 bg-[#F3652B] animate-fadeIn"
-                      v-if="!requirement.valid"
-                    />
-                    <span
-                      class="pi pi-check text-sm text-[#22C55E] animate-fadeIn"
-                      v-else
-                    />
-                  </div>
-                  <span>{{ requirement.label }}</span>
-                </li>
-              </ul>
-            </div>
-            <PrimeButton
-              label="Next"
-              :disabled="!meta.valid"
-              type="submit"
-              severity="secondary"
-              :loading="loading"
-            />
-          </form>
-          <PrimeButton
-            label="Other sign up methods"
-            outlined
-            @click="showForm = false"
-          />
-          <p class="text-sm font-normal text-center text-color-secondary">
-            By signing up you agree to the
-            <PrimeButton
-              label="Terms of Service"
-              link
-              class="p-0 text-sm"
-              @click="azionTermsAndServicesWindowOpener"
-            />
-            and
-            <PrimeButton
-              label="Privacy Policy."
-              link
-              class="p-0 text-sm"
-              @click="azionPrivacyPolicyWindowOpener"
-            />
-          </p>
-        </div>
-
         <div class="flex flex-wrap justify-center items-center gap-3 mt-6 max-w-md">
           <p class="text-sm font-normal">Already have an account?</p>
           <PrimeButton
             label="Sign in here"
             severity="secondary"
-            @click="router.push({ name: 'login' })"
+            @click="$router.push({ name: 'login' })"
           />
         </div>
       </div>
@@ -202,24 +67,13 @@
 
 <script setup>
   import PrimeButton from 'primevue/button'
-  import InputText from 'primevue/inputtext'
-  import InputPassword from 'primevue/password'
-  import Divider from 'primevue/divider'
-  import { onMounted, ref } from 'vue'
-  import * as yup from 'yup'
-  import { useForm, useField } from 'vee-validate'
-  import { load, getInstance } from 'recaptcha-v3'
+  import { ref } from 'vue'
   import { azionPrivacyPolicyWindowOpener } from '@/helpers/azion-privacy-policy-opener'
   import { azionTermsAndServicesWindowOpener } from '@/helpers/azion-terms-and-services-opener'
-  import { useToast } from 'primevue/usetoast'
-  import { useRouter } from 'vue-router'
+  import SocialSignup from './components/social-signup'
+  import SsoSignup from './components/sso-form'
 
-  let recaptcha
-  onMounted(async () => {
-    recaptcha = await load(import.meta.env.VITE_RECAPTCHA_SITE_KEY)
-  })
-
-  const props = defineProps({
+  defineProps({
     signupService: { required: true, type: Function }
   })
 
@@ -231,70 +85,5 @@
     'Free onboarding session'
   ]
 
-  const showForm = ref(true)
-
-  const passwordRequirementsList = ref([
-    { label: '> 7 characters', valid: false },
-    { label: 'Uppercase letter', valid: false },
-    { label: 'Lowercase letter', valid: false },
-    { label: 'Special character (e.g. !?<>@#$%)', valid: false }
-  ])
-
-  const validationSchema = yup.object({
-    name: yup
-      .string()
-      .max(61, 'Exceeded number of characters')
-      .test('invalidChars', 'Name contains invalid characters', (value) => {
-        return !value?.match(/[><:/\\"&@]/g)
-      })
-      .test('invalidContent', 'Name contains invalid content (URL)', (value) => {
-        return !value?.match(/[a-z\d_-]+\.[a-z\d_-]+/gi)
-      })
-      .required('Full Name is a required field'),
-    email: yup
-      .string()
-      .max(254, 'Exceeded number of characters')
-      .email('Please enter a valid e-mail')
-      .required('E-mail is a required field'),
-    password: yup
-      .string()
-      .test('max', 'Exceeded number of characters', (value) => value?.length <= 128)
-      .test('min', 'Password is a required field', (value) => !!value)
-      .test('requirements', '', (value) => {
-        const hasUpperCase = /[A-Z]/.test(value)
-        const hasLowerCase = /[a-z]/.test(value)
-        const hasSpecialChar = /[!@#$%^&*(),.?":{}|<>]/.test(value)
-        const hasMinLength = value?.length > 7
-        passwordRequirementsList.value[0].valid = hasMinLength
-        passwordRequirementsList.value[1].valid = hasUpperCase
-        passwordRequirementsList.value[2].valid = hasLowerCase
-        passwordRequirementsList.value[3].valid = hasSpecialChar
-        return hasMinLength && hasUpperCase && hasLowerCase && hasSpecialChar
-      })
-  })
-
-  const { values, meta, errors } = useForm({ validationSchema })
-
-  const { value: name } = useField('name')
-  const { value: email } = useField('email')
-  const { value: password } = useField('password')
-
-  const toast = useToast()
-  const router = useRouter()
-
-  const loading = ref(false)
-
-  const signUp = async () => {
-    loading.value = true
-    try {
-      const captcha = await recaptcha.execute('signup')
-      await props.signupService({ ...values, captcha })
-      getInstance().hideBadge()
-      router.push({ name: 'activation', query: { email: values.email } })
-    } catch (err) {
-      toast.add({ life: 5000, severity: 'error', detail: err, summary: 'Error' })
-    } finally {
-      loading.value = false
-    }
-  }
+  const showForm = ref(false)
 </script>
