@@ -34,7 +34,7 @@ const parseHttpResponse = (httpResponse) => {
       return 'Your network list has been created'
     case 400:
       const apiError = httpResponse.body.results[0]
-      throw new Error(apiError)
+      throw new Error(apiError).message
     case 401:
       throw new Errors.InvalidApiTokenError().message
     case 403:

@@ -47,4 +47,14 @@ describe('AzionDocumentationCatalog', () => {
       `https://www.azion.com/en/search-result/?q=edge services&filter=doc`
     )
   })
+  it('should open intelligent DNS documentation with correct link', () => {
+    const openWindowSpy = vi.spyOn(window, 'open')
+    const { sut } = makeSut()
+
+    sut.intelligentDNS()
+
+    expect(openWindowSpy).toHaveBeenCalledWith(
+      `https://www.azion.com/en/search-result/?q=intelligent-dns&filter=doc`
+    )
+  })
 })

@@ -37,9 +37,9 @@ const parseHttpResponse = (httpResponse) => {
     case 200:
       return 'Your domain has been edited'
     case 400:
-      throw new Error(Object.keys(httpResponse.body)[0])
+      throw new Error(Object.keys(httpResponse.body)[0]).message
     case 409:
-      throw new Error(Object.keys(httpResponse.body)[0])
+      throw new Error(Object.keys(httpResponse.body)[0]).message
     case 401:
       throw new Errors.InvalidApiTokenError().message
     case 403:

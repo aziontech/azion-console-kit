@@ -38,25 +38,30 @@
 
         <!-- Azion client -->
         <SwitchAccountBlock
+          class="ml-2"
           v-if="hasAccessToSwitchAccount"
           v-model:showSwitchAccount="openSwitchAccount"
-          :accessMenu="profileMenuItems"
+          :accessMenu="profileMenuSwitchAccount"
+          :account="user"
+          :accountListService="serviceSwitchAccount"
         />
       </div>
 
       <!-- Search -->
-      <span class="top-0 p-input-icon-left p-input-icon-right hidden lg:flex">
+      <span
+        class="top-0 p-input-icon-left p-input-icon-right hidden lg:flex md:absolute md:my-3 md:ml-[calc(50%-10rem)]"
+      >
         <i class="pi pi-search text-white" />
         <i class="!top-[32%]">
-          <Tag
-            class="not-italic border border-header bg-header hover:bg-header-button-hover text-header cursor-pointer h-6 surface-100"
-            value="⌘ K"
+          <span
             @click="openSearch"
-          />
+            class="rounded-md py-1 px-2 text-xs font-semibold bg-header not-italic border border-header text-header cursor-pointer"
+            >⌘ K</span
+          >
         </i>
         <InputText
           class="w-64 bg-header-input border-header placeholder:text-header text-header hover:border-header-hover"
-          placeholder="Search..."
+          placeholder="Search"
           :value="searchText"
           @click="openSearch"
           size="small"
@@ -169,7 +174,7 @@
 
         <!-- Profile Mobile-->
         <Avatar
-          @click="toggleProfile"
+          @click="showProfile = true"
           label="U"
           class="transition-all hover:border-orange-500 hover:bg-header-button-hover cursor-pointer md:hidden text-avatar text-avatar bg-header-avatar"
           v-tooltip.bottom="{ value: 'Account settings', showDelay: 200 }"
@@ -185,6 +190,113 @@
     </div>
     <Logo v-else />
   </header>
+  <!--Mobile Profile
+  -->
+  <Sidebar
+    v-model:visible="showProfile"
+    position="bottom"
+    :show-close-icon="false"
+    :pt="{
+      root: { class: 'h-auto flex' },
+      header: { class: 'hidden' },
+      mask: { class: 'flex' }
+    }"
+    class="md:p-3"
+  >
+    <PrimeMenu
+      :pt="{
+        root: { class: 'p-0 md:p-3 w-full border-none bg-transparent' },
+        submenuheader: { class: 'text-base font-medium leading-none' },
+        action: { class: '' }
+      }"
+      class="w-full border-none bg-transparent md:p-3"
+      ref="profile"
+      :model="profileMenuItems"
+    >
+      <template #start>
+        <div class="flex flex-column px-2.5 h-14 justify-center">
+          <div class="flex flex-column align gap-1">
+            <span class="text-sm font-medium">{{ user.name }}</span>
+            <div class="flex gap-2">
+              <span class="text-xs">ID: {{ user.id }}</span>
+              <span class="text-xs">Client ID: {{ user.client_id }}</span>
+            </div>
+          </div>
+        </div>
+      </template>
+
+      <template #end>
+        <PrimeMenu
+          class="w-full border-none bg-transparent"
+          :pt="{
+            root: {
+              class: 'p-0 w-full border-none bg-transparent'
+            },
+            submenuheader: { class: 'text-base font-medium leading-none mt-5' }
+          }"
+          :model="profileMenuSettings"
+        >
+          <template #start>
+            <div class="flex flex-row items-center">
+              <div class="flex flex-col gap-1 px-2 py-2.5">
+                <span class="text-sm font-medium leading-none">{{ user.full_name }}</span>
+                <span class="text-xs">{{ user.email }}</span>
+              </div>
+            </div>
+          </template>
+        </PrimeMenu>
+        <!-- Theme Switch -->
+        <div class="flex flex-row justify-between items-center align-middle px-2 py-1.5">
+          <span>Theme</span>
+          <Dropdown
+            :modelValue="selectedTheme"
+            @update:modelValue="selectTheme"
+            optionValue="value"
+            optionLabel="name"
+            :options="themeOptions"
+            :autoOptionFocus="false"
+            :pt="{
+              root: { class: 'w-auto py-0 h-8 items-center align-middle surface-section' },
+              item: { class: 'text-sm' },
+              input: { class: 'text-sm' }
+            }"
+          >
+            <template #value="slotProps">
+              <div
+                v-if="slotProps.value"
+                class="flex gap-2 align-items-center"
+              >
+                <i :class="slotProps.value.icon"></i>
+                <div>{{ slotProps.value.name }}</div>
+              </div>
+            </template>
+            <template #option="slotProps">
+              <div class="flex gap-2 align-items-center">
+                <i :class="slotProps.option.icon"></i>
+                <div>{{ slotProps.option.name }}</div>
+              </div>
+            </template>
+          </Dropdown>
+        </div>
+        <Divider class="surface-border p-1 m-0" />
+        <PrimeButton
+          class="w-full rounded-md flex content-start text-left"
+          :pt="{
+            label: {
+              class: 'font-normal'
+            },
+            root: {
+              class: 'rounded-md hover:surface-200'
+            }
+          }"
+          label="Logout"
+          icon="pi pi-sign-out"
+          text
+          @click="logout"
+        />
+      </template>
+    </PrimeMenu>
+  </Sidebar>
   <!-- help mobile sidebar -->
   <Sidebar
     :visible="showHelp"
@@ -261,10 +373,9 @@
   <!-- Profile Menu -->
   <PrimeMenu
     :pt="{
-      root: { class: '!w-[280px] pb-2 pt-0' },
+      root: { class: '!w-[280px] pb-2 pt-0 invisible md:visible' },
       menu: { class: '' }
     }"
-    class=""
     ref="profile"
     :popup="true"
     :model="profileMenuItems"
@@ -280,29 +391,28 @@
         </div>
       </div>
     </template>
-
     <template #end>
-      <div class="flex flex-row items-center">
-        <div class="flex flex-col gap-1 px-3 py-2.5">
-          <span class="text-sm font-medium leading-none">{{ user.full_name }}</span>
-          <span class="text-xs">{{ user.email }}</span>
-        </div>
-      </div>
-      <PrimeButton
-        class="w-full rounded-none flex content-start text-left"
-        label="Your Settings"
-        text
-        @click="$router.push({ name: 'list-your-settings' })"
-      />
-      <PrimeButton
-        class="w-full rounded-none flex content-start text-left"
-        label="Personal Tokens"
-        text
-        @click="$router.push({ name: 'list-personal-tokens' })"
-      />
-
+      <PrimeMenu
+        class="w-full border-none bg-transparent"
+        :pt="{
+          root: {
+            class: 'p-0 w-full border-none bg-transparent'
+          },
+          submenuheader: { class: 'text-base font-medium leading-none mt-5' }
+        }"
+        :model="profileMenuSettings"
+      >
+        <template #start>
+          <div class="flex flex-row items-center">
+            <div class="flex flex-col gap-1 px-2 py-2.5">
+              <span class="text-sm font-medium leading-none">{{ user.full_name }}</span>
+              <span class="text-xs">{{ user.email }}</span>
+            </div>
+          </div>
+        </template>
+      </PrimeMenu>
       <!-- Theme Switch -->
-      <div class="flex flex-row justify-between items-center align-middle px-3 py-1.5">
+      <div class="flex flex-row justify-between items-center align-middle px-2 py-1.5">
         <span>Theme</span>
         <Dropdown
           :modelValue="selectedTheme"
@@ -336,7 +446,15 @@
       </div>
       <Divider class="surface-border p-1 m-0" />
       <PrimeButton
-        class="w-full rounded-none flex content-start text-left text-red-600"
+        class="w-full rounded-md flex content-start text-left"
+        :pt="{
+          label: {
+            class: 'font-normal'
+          },
+          root: {
+            class: 'rounded-md hover:surface-200'
+          }
+        }"
         label="Logout"
         icon="pi pi-sign-out"
         text
@@ -365,9 +483,10 @@
         <i class="pi pi-search" />
         <i class="!top-[35%]">
           <Tag
+            severity="info"
             @click="closeSearch"
             class="not-italic border surface-border text-color-secondary surface-100 cursor-pointer"
-            value="esc"
+            value="ESC"
           />
         </i>
         <InputText
@@ -433,6 +552,7 @@
   import { useAccountStore } from '@/stores/account'
   import { useHelpCenterStore } from '@/stores/help-center'
   import { mapActions, mapState } from 'pinia'
+  import { listTypeAccountService } from '@/services/switch-account-services/list-type-account-service'
   import SwitchAccountBlock from '@/templates/switch-account-block'
 
   export default {
@@ -489,7 +609,7 @@
               { label: 'Account Settings', icon: 'pi pi-cog' },
               { label: 'Your Settings', icon: 'pi pi-user' },
               { label: 'Users Management', icon: 'pi pi-users' },
-              { label: 'Team Permissions', icon: 'pi pi-user-edit' },
+              { label: 'Team Permissions', icon: 'pi pi-user-edit', to: '/teams-permession' },
               { label: 'Billing & Subscriptions', icon: 'pi pi-credit-card' },
               { label: 'Credentials', icon: 'pi pi-id-card' },
               { label: 'Activity History', icon: 'pi pi-history', to: '/activity-history' },
@@ -598,14 +718,7 @@
             ]
           }
         ],
-        profileMenuItems: [
-          {
-            label: 'Switch Account',
-            command: () => {
-              this.openSwitchAccount = true
-            },
-            class: 'md:hidden'
-          },
+        profileMenuItemsDefault: [
           {
             label: 'Account Settings',
             to: '/account-settings'
@@ -628,15 +741,29 @@
           },
           {
             label: 'Teams Permissions',
-            to: '/teams'
+            to: '/teams-permission'
           },
-          { separator: true }
+          {
+            label: 'Personal Token',
+            to: 'personal-tokens'
+          }
+        ],
+        profileMenuSettings: [
+          {
+            label: 'Your Settings',
+            to: 'list-your-settings'
+          },
+          {
+            label: 'Personal Token',
+            to: 'personal-tokens'
+          }
         ],
         themeOptions: [
           { name: 'Light', value: 'light', icon: 'pi pi-sun' },
           { name: 'Dark', value: 'dark', icon: 'pi pi-moon' },
           { name: 'System', value: 'system', icon: 'pi pi-desktop' }
-        ]
+        ],
+        serviceSwitchAccount: listTypeAccountService
       }
     },
     computed: {
@@ -646,7 +773,29 @@
         return this.themeOptions.find((option) => option.value === this.currentTheme)
       },
       hasAccessToSwitchAccount() {
-        return !this.user?.is_client_only
+        return this.user && !this.user.is_client_only
+      },
+      profileMenuSwitchAccount() {
+        return this.profileMenuItemsDefault.map((item) => ({
+          ...item,
+          command: this.closeSwitchAccountDialog
+        }))
+      },
+      profileMenuItems() {
+        const switchAccount =
+          this.user && !this.user.is_client_only
+            ? [
+                {
+                  label: 'Switch Account',
+                  command: this.openSwitchAccountDialog,
+                  class: 'md:hidden'
+                }
+              ]
+            : []
+
+        const separator = { separator: true }
+
+        return [...switchAccount, ...this.profileMenuItemsDefault, separator]
       }
     },
     methods: {
@@ -681,6 +830,12 @@
       },
       selectTheme(theme) {
         this.setTheme(theme)
+      },
+      openSwitchAccountDialog() {
+        this.openSwitchAccount = true
+      },
+      closeSwitchAccountDialog() {
+        this.openSwitchAccount = false
       }
     }
   }

@@ -10,22 +10,26 @@
       class="flex flex-col gap-3 lg:gap-4 items-center lg:flex lg:flex-row flex-none md-auto md:flex-1"
     >
       <div class="w-full flex flex-col md:flex-row gap-3 justify-center items-center">
-        <div class="flex gap-1 lg:pl-[9%] pl-0">
+        <div class="flex gap-1 lg:pl-[16%] pl-0">
           <PrimeButton
             label="About"
             link
+            @click="openAbout"
           />
           <PrimeButton
             label="Blog"
             link
+            @click="openBlog"
           />
           <PrimeButton
             label="Legal"
             link
+            @click="openLegal"
           />
           <PrimeButton
             label="Docs"
             link
+            @click="openDocs"
           />
         </div>
         <!-- Social Buttons -->
@@ -35,18 +39,21 @@
             text
             size="small"
             v-tooltip.top="{ value: 'Github', showDelay: 200 }"
+            @click="openGitHub"
           />
           <PrimeButton
             icon="pi pi-discord"
             text
             size="small"
             v-tooltip.top="{ value: 'Discord', showDelay: 200 }"
+            @click="openDiscord"
           />
           <PrimeButton
-            icon="pi pi-twitter"
+            icon="ai ai-twitter"
             text
             size="small"
             v-tooltip.top="{ value: 'Twitter', showDelay: 200 }"
+            @click="openX"
           />
           <!--Change Twitter icon to X-->
         </div>
@@ -65,6 +72,7 @@
             :autoOptionFocus="false"
             :pt="{
               root: {
+                class: 'w-[7.4rem]',
                 style: 'background: var(--surface-section) !important'
               },
               item: { class: 'w-full text-sm' },
@@ -126,6 +134,27 @@
       ...mapActions(useAccountStore, ['setTheme']),
       selectTheme(theme) {
         this.setTheme(theme)
+      },
+      openAbout() {
+        window.open('https://www.azion.com/', '_blank')
+      },
+      openBlog() {
+        window.open('https://www.azion.com/en/blog/', '_blank')
+      },
+      openLegal() {
+        window.open('https://www.azion.com/en/documentation/agreements/privacy-policy/', '_blank')
+      },
+      openDocs() {
+        window.open('https://www.azion.com/en/documentation/', '_blank')
+      },
+      openDiscord() {
+        window.open('https://discord.com/invite/Yp9N7RMVZy', '_blank')
+      },
+      openGitHub() {
+        window.open('https://github.com/aziontech', '_blank')
+      },
+      openX() {
+        window.open('https://twitter.com/aziontech', '_blank')
       }
     }
   }
