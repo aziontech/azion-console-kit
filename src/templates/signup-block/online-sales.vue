@@ -263,13 +263,13 @@
       .test('requirements', '', (value) => {
         const hasUpperCase = /[A-Z]/.test(value)
         const hasLowerCase = /[a-z]/.test(value)
-        const hasSpecialCharacter = /[!@#$%^&*(),.?":{}|<>]/.test(value)
-        const hasMinimumLength = value?.length > 7
-        passwordRequirementsList.value[0].valid = hasMinimumLength
+        const hasSpecialChar = /[!@#$%^&*(),.?":{}|<>]/.test(value)
+        const hasMinLength = value?.length > 7
+        passwordRequirementsList.value[0].valid = hasMinLength
         passwordRequirementsList.value[1].valid = hasUpperCase
         passwordRequirementsList.value[2].valid = hasLowerCase
-        passwordRequirementsList.value[3].valid = hasSpecialCharacter
-        return hasMinimumLength && hasUpperCase && hasLowerCase && hasSpecialCharacter
+        passwordRequirementsList.value[3].valid = hasSpecialChar
+        return hasMinLength && hasUpperCase && hasLowerCase && hasSpecialChar
       })
   })
 
