@@ -16,7 +16,7 @@
       >
         <template #inputs>
           <div class="flex flex-col sm:max-w-lg w-full gap-2">
-            <label>Name: *</label>
+            <label>Name *</label>
             <InputText
               v-bind="name"
               type="text"
@@ -31,7 +31,7 @@
             >
           </div>
           <div class="flex flex-col sm:max-w-lg w-full gap-2">
-            <label>Certificate: </label>
+            <label>Certificate </label>
             <PrimeTextarea
               v-bind="certificate"
               :class="{ 'p-invalid': errors.certificate }"
@@ -47,7 +47,7 @@
             >
           </div>
           <div class="flex flex-col sm:max-w-lg w-full gap-2">
-            <label>Certificate Signing Request (CSR):</label>
+            <label>Certificate Signing Request (CSR) </label>
             <PrimeTextarea
               v-bind="csr"
               :class="{ 'p-invalid': errors.csr }"
@@ -82,7 +82,7 @@
       >
         <template #inputs>
           <div class="flex flex-col sm:max-w-lg w-full gap-2">
-            <label>Name: *</label>
+            <label>Name *</label>
             <InputText
               v-bind="name"
               type="text"
@@ -97,7 +97,7 @@
             >
           </div>
           <div class="flex flex-col sm:max-w-lg w-full gap-2">
-            <label>Certificate: </label>
+            <label>Certificate </label>
             <PrimeTextarea
               v-bind="certificate"
               :class="{ 'p-invalid': errors.certificate }"
@@ -113,7 +113,7 @@
             >
           </div>
           <div class="flex flex-col sm:max-w-lg w-full gap-2">
-            <label>Private key: </label>
+            <label>Private key </label>
             <PrimeTextarea
               v-model="privateKey"
               :class="{ 'p-invalid': errors.privateKey }"
@@ -137,7 +137,7 @@
       >
         <template #inputs>
           <div class="flex flex-col sm:max-w-lg w-full gap-2">
-            <label>Certificate Name: *</label>
+            <label>Certificate Name *</label>
             <InputText
               v-bind="name"
               type="text"
@@ -152,7 +152,7 @@
             >
           </div>
           <div class="flex flex-col sm:max-w-lg w-full gap-2">
-            <label>Certificate:</label>
+            <label>Certificate </label>
             <PrimeTextarea
               v-bind="certificate"
               :class="{ 'p-invalid': errors.certificate }"

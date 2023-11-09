@@ -141,7 +141,7 @@
       >
         <template #inputs>
           <div class="flex flex-col sm:max-w-lg w-full gap-2">
-            <label>Certificate: *</label>
+            <label>Certificate *</label>
             <PrimeTextarea
               v-bind="certificate"
               :class="{ 'p-invalid': errors.certificate }"
@@ -157,7 +157,7 @@
             >
           </div>
           <div class="flex flex-col sm:max-w-lg w-full gap-2">
-            <label>Private key: *</label>
+            <label>Private key *</label>
             <PrimeTextarea
               v-model="privateKey"
               :class="{ 'p-invalid': errors.privateKey }"
@@ -185,7 +185,7 @@
       >
         <template #inputs>
           <div class="flex flex-col sm:max-w-lg w-full gap-2">
-            <label>Subject Name: *</label>
+            <label>Subject Name *</label>
             <InputText
               placeholder="example.com"
               v-bind="common"
@@ -200,7 +200,7 @@
             >
           </div>
           <div class="flex flex-col sm:max-w-lg w-full gap-2">
-            <label>Country/Region: *</label>
+            <label>Country/Region *</label>
             <InputText
               placeholder="BR"
               v-bind="country"
@@ -215,7 +215,7 @@
             >
           </div>
           <div class="flex flex-col sm:max-w-lg w-full gap-2">
-            <label>State/Province: *</label>
+            <label>State/Province *</label>
             <InputText
               placeholder="São Paulo"
               v-bind="state"
@@ -230,7 +230,7 @@
             >
           </div>
           <div class="flex flex-col sm:max-w-lg w-full gap-2">
-            <label>City/Locality: *</label>
+            <label>City/Locality *</label>
             <InputText
               placeholder="São Paulo"
               v-bind="city"
@@ -245,7 +245,7 @@
             >
           </div>
           <div class="flex flex-col sm:max-w-lg w-full gap-2">
-            <label>Organization: *</label>
+            <label>Organization *</label>
             <InputText
               placeholder="Company Name S.A."
               v-bind="organization"
@@ -260,7 +260,7 @@
             >
           </div>
           <div class="flex flex-col sm:max-w-lg w-full gap-2">
-            <label>Organization unit: *</label>
+            <label>Organization unit *</label>
             <InputText
               placeholder="IT Department"
               v-bind="organizationUnity"
@@ -275,7 +275,7 @@
             >
           </div>
           <div class="flex flex-col sm:max-w-lg w-full gap-2">
-            <label>Email: *</label>
+            <label>Email *</label>
             <InputText
               placeholder="example@email.com"
               v-bind="email"
@@ -290,7 +290,7 @@
             >
           </div>
           <div class="flex flex-col sm:max-w-lg w-full gap-2">
-            <label>Private Key type: </label>
+            <label>Private Key type </label>
             <InputText
               v-bind="privateKeyType"
               type="text"
@@ -305,7 +305,7 @@
             >
           </div>
           <div class="flex flex-col sm:max-w-lg w-full gap-2">
-            <label>Subject Alternative Names (SAN):</label>
+            <label>Subject Alternative Names (SAN) </label>
             <PrimeTextarea
               v-bind="subjectAlternativeNames"
               :class="{ 'p-invalid': errors.subjectAlternativeNames }"
@@ -329,7 +329,7 @@
       >
         <template #inputs>
           <div class="flex flex-col sm:max-w-lg w-full gap-2">
-            <label>Certificate: *</label>
+            <label>Certificate *</label>
             <PrimeTextarea
               v-bind="certificate"
               :class="{ 'p-invalid': errors.certificate }"
