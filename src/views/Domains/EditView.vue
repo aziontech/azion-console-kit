@@ -11,7 +11,7 @@
     <template #form>
       <form-horizontal
         title="General"
-        description="See the details of the Azion domain, including
+        description="Check the details of the Azion domain, including
         the domain address to access the application, and modify
         digital certificate options."
       >
