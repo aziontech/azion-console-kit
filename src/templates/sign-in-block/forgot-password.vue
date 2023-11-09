@@ -8,9 +8,9 @@
         class="surface-card surface-border border max-w-md w-full p-6 md:p-10 rounded-md flex-col gap-10 inline-flex"
       >
         <div class="flex flex-col gap-3">
-          <div class="text-xl md:text-2xl font-medium">Reset your password</div>
+          <div class="text-xl md:text-2xl font-medium">Reset Password</div>
           <p class="text-color-secondary">
-            Type in your email and we'll send you a link to reset your password.
+            Type your email to receive a link to reset your password.
           </p>
         </div>
 
@@ -18,12 +18,12 @@
           <label
             for="email"
             class="font-semibold text-sm"
-            >E-mail</label
+            >Email</label
           >
           <InputText
             v-bind="email"
             id="email"
-            placeholder="Type your e-mail"
+            placeholder="example@example.com"
             type="email"
             class="w-full"
             :class="{ 'p-invalid': errors.email }"
@@ -34,7 +34,7 @@
         <PrimeButton
           class="w-full flex-row-reverse"
           :loading="isSendingEmailLoading"
-          label="Send reset e-mail"
+          label="Send Email"
           severity="primary"
           @click="sendEmail()"
           :disabled="!meta.valid"
@@ -50,10 +50,9 @@
         class="surface-card surface-border border max-w-md w-full p-6 md:p-10 rounded-md flex-col gap-8 inline-flex"
       >
         <div class="flex flex-col gap-3">
-          <div class="text-xl md:text-2xl font-medium">Reset your password</div>
+          <div class="text-xl md:text-2xl font-medium">Reset Password</div>
           <p class="text-color-secondary">
-            We have sent an email containing instructions on how to reset your password. Please
-            check your inbox and spam folder.
+            We've sent you an email with instructions to reset your password. Check your inbox or spam folder and follow the instructions.
           </p>
         </div>
 
@@ -61,7 +60,7 @@
           <div>Didn't receive the email?</div>
           <PrimeButton
             link
-            label="Resend email"
+            label="Resend Email"
             @click="sendEmail()"
           ></PrimeButton>
         </div>

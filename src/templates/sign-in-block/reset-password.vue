@@ -5,7 +5,7 @@
         v-if="!isPasswordReseted"
         class="surface-card surface-border border max-w-md w-full p-6 md:p-10 rounded-md flex-col gap-10 inline-flex"
       >
-        <div class="text-xl md:text-2xl font-medium">Reset your password</div>
+        <div class="text-xl md:text-2xl font-medium">Reset Password</div>
 
         <InlineMessage v-if="requestError">{{ requestError }}</InlineMessage>
 
@@ -87,16 +87,16 @@
           class="surface-card surface-border border max-w-md w-full p-6 md:p-10 rounded-md flex-col gap-10 inline-flex"
         >
           <div class="flex flex-col gap-3">
-            <div class="text-xl md:text-2xl font-medium">Password reset complete</div>
+            <div class="text-xl md:text-2xl font-medium">Password Reset Complete</div>
             <p class="text-color-secondary">
-              Your password has been set. You may go ahead and sign in now.
+              Your password has been successfully reset. Sign in to Real-Time Manager to use Azion services.
             </p>
           </div>
 
           <PrimeButton
             class="w-full flex-row-reverse"
             :loading="isButtonLoading"
-            label="Sign in"
+            label="Sign In"
             @click="goToSignIn()"
             severity="primary"
             type="button"
@@ -122,10 +122,11 @@
   const errorConfirmation = ref('')
   const requestError = ref('')
   const passwordRequirementsList = ref([
+    { label: 'Must have at least:', valid: false },
     { label: '> 7 characters', valid: false },
-    { label: 'Uppercase letter', valid: false },
-    { label: 'Lowercase letter', valid: false },
-    { label: 'Special character (e.g. !?<>@#$%)', valid: false }
+    { label: '1 uppercase letter', valid: false },
+    { label: '1 lowercase letter', valid: false },
+    { label: '1 special character (example: !?<>@#$%)', valid: false }
   ])
 
   const props = defineProps({
