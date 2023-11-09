@@ -26,7 +26,7 @@
     >
       <RouterView
         :class="customClass"
-        class="w-full transition-[width] duration-300 ease-in-out h-full"
+        class="w-full flex flex-col max-w-full transition-[width] duration-300 ease-in-out"
       />
     </ShellBlock>
   </main>
