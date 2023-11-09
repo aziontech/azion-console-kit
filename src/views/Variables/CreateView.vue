@@ -53,26 +53,15 @@
               >{{ errors.value }}</small
             >
           </div>
-
-          <Card
-            :pt="{
-              body: { class: 'p-4' },
-              title: { class: 'flex justify-between items-center text-base m-0 font-medium' },
-              subtitle: {
-                class: 'text-sm font-normal text-color-secondary m-0 pr-0 md:pr-[2.5rem]'
-              }
-            }"
-          >
-            <template #title>
-              <span class="text-base">Secret</span>
-              <InputSwitch
-                v-bind="secret"
-                v-model="secret.value"
-                :class="{ 'p-invalid': errors.secret }"
-              />
-            </template>
-            <template #subtitle> Description </template>
-          </Card>
+          <div class="flex gap-3 items-center">
+            <InputSwitch
+              id="secret"
+              v-bind="secret"
+              v-model="secret.value"
+              :class="{ 'p-invalid': errors.secret }"
+            />
+            <label for="secret">Value Secret</label>
+          </div>
         </template>
       </FormHorizontal>
     </template>
@@ -84,7 +73,6 @@
   import FormHorizontal from '@/templates/create-form-block-new/form-horizontal'
   import InputText from 'primevue/inputtext'
   import InputSwitch from 'primevue/inputswitch'
-  import Card from 'primevue/card'
 
   import { useForm } from 'vee-validate'
   import * as yup from 'yup'
@@ -96,14 +84,12 @@
     }
   })
 
-  //Validation Schema
   const validationSchema = yup.object({
     key: yup.string().required(),
     value: yup.string().required(),
     secret: yup.boolean().required().default(false)
   })
 
-  // validation with VeeValidate
   const { errors, defineInputBinds, meta, resetForm, values } = useForm({
     validationSchema
   })
