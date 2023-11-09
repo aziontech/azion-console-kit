@@ -11,8 +11,8 @@
 
   const route = useRoute()
   const isLogged = computed(() => {
-    // evaluate as boolean will cause navbar to flicker
-    return route.meta.hideNavigation === undefined && hasActiveUserId.value
+    // evaluate as !route.meta?.hideNavigation will cause navbar to flicker
+    return route.meta.hideNavigation !== true && hasActiveUserId.value
   })
 
   watch(currentTheme, (theme) => themeSelect({ theme }))
