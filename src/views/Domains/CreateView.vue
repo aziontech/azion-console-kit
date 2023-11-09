@@ -198,7 +198,7 @@
                 </template>
                 <template #subtitle>
                   This option attempts to verify the client certificate, but will allow the TLS
-                  handshake even if the Trusted CA cannot be validated. Check which client
+                  handshake even if the Trusted CA can't be validated. Check which client
                   certificate attempted the request in Edge Firewall, if necessary.
                 </template>
               </Card>
