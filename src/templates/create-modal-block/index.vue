@@ -1,15 +1,17 @@
 <template>
-  <div class="lg:w-[880px] sm:w-[85vw] min-h-[500px] flex flex-col sm:flex-row p-0 sm:p-8 gap-4 sm:gap-6">
+  <div class="lg:w-[55rem] sm:w-[85vw] min-h-[32rem] flex flex-col sm:flex-row p-0 sm:p-8 gap-4 sm:gap-6">
+    <div class="sm:min-w-[12rem]">
     <PrimeMenu
       v-bind:model="items"
       :tabindex="selectedTab"
-      class="bg-transparent border-none sm:min-w-[200px] p-0"
+      class="bg-transparent border-none sm:min-w-[12rem] p-0 md:fixed"
       :pt="{
         submenuHeader: {
           class: 'hidden'
         }
       }"
     />
+  </div>
     <div
       class="pb-4 h-full ml-0 w-full grid md:grid-cols-2 grid-cols-1 gap-4 animate-pulse"
       v-if="isLoading"
