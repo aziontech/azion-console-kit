@@ -109,6 +109,12 @@
 
 .p-button.p-button-link {
   color: $linkButtonColor !important;
+  &:not(:disabled):focus {
+    box-shadow: none !important;
+  }
+  &:not(:disabled):focus-visible {
+    box-shadow: $linkButtonFocusShadow !important;
+  }
 }
 
 .p-button-icon-only {
