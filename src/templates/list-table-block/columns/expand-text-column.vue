@@ -14,8 +14,8 @@
 </template>
 
 <script setup>
-  defineOptions({ name: 'expand-text-column' })
   import { ref, computed } from 'vue'
+  defineOptions({ name: 'expand-text-column' })
   const props = defineProps({
     value: {
       type: String,
