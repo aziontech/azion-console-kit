@@ -23,7 +23,7 @@
           <InputText
             v-bind="email"
             id="email"
-            placeholder="example@example.com"
+            placeholder="example@email.com"
             type="email"
             class="w-full"
             :class="{ 'p-invalid': errors.email }"
@@ -52,7 +52,7 @@
         <div class="flex flex-col gap-3">
           <div class="text-xl md:text-2xl font-medium">Reset Password</div>
           <p class="text-color-secondary">
-            We've sent you an email with instructions to reset your password. Check your inbox or spam folder and follow the instructions.
+            We've sent you an email explaining how to reset your password. Check your inbox or spam folder and follow the instructions.
           </p>
         </div>
 
