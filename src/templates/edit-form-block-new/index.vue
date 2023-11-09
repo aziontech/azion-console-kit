@@ -3,7 +3,7 @@
     <PageHeadingBlock :pageTitle="pageTitle" />
     <form
       @submit.prevent="handleSubmit"
-      class="w-full grow px-8 flex flex-col gap-8 mb-5"
+      class="w-full grow px-8 flex flex-col gap-8 mb-5 max-sm:px-3 max-md:gap-6"
       :class="{ 'py-4': !hasTabs, 'pb-4': hasTabs }"
     >
       <slot name="form" />
@@ -74,8 +74,11 @@
         if (this.backURL) {
           this.$router.push({ path: this.backURL })
         } else {
-          this.$router.go('-1')
+          this.$router.go(-1)
         }
+      },
+      goBackToList() {
+        this.$router.go(-1)
       },
       async loadInitialData() {
         try {
@@ -104,6 +107,7 @@
             summary: feedback ?? 'edited successfully',
             life: 10000
           })
+          this.goBackToList()
         } catch (error) {
           this.$toast.add({
             closable: false,

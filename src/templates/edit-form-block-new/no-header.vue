@@ -2,7 +2,7 @@
   <div class="flex flex-col min-h-[calc(100vh-120px)]">
     <form
       @submit.prevent="handleSubmit"
-      class="w-full grow py-4 px-8 flex flex-col gap-8 mb-5"
+      class="w-full grow py-4 px-8 flex flex-col gap-8 mb-5 max-sm:px-3"
     >
       <slot name="form" />
 
@@ -65,6 +65,9 @@
           this.$router.go('-1')
         }
       },
+      goBackToList() {
+        this.$router.go(-1)
+      },
       async loadInitialData() {
         try {
           const { id } = this.$route.params
@@ -92,6 +95,7 @@
             summary: 'edited successfully',
             life: 10000
           })
+          this.goBackToList()
         } catch (error) {
           this.$toast.add({
             closable: false,

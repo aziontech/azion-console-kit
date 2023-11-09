@@ -8,9 +8,9 @@
         :value="data"
         dataKey="id"
         v-model:filters="this.filters"
-        paginator
-        :rowsPerPageOptions="[5, 10, 20, 50, 100]"
-        :rows="5"
+        :paginator="showPagination"
+        :rowsPerPageOptions="[10, 20, 50, 100]"
+        :rows="minimumOfItemsPerPage"
         :globalFilterFields="filterBy"
         :loading="isLoading"
       >
@@ -143,7 +143,8 @@
         global: { value: '', matchMode: FilterMatchMode.CONTAINS }
       },
       isLoading: false,
-      data: []
+      data: [],
+      minimumOfItemsPerPage: 10
     }),
     props: {
       columns: {
@@ -195,6 +196,9 @@
     computed: {
       filterBy() {
         return this.columns.map((item) => item.field)
+      },
+      showPagination() {
+        return this.data.length > this.minimumOfItemsPerPage
       }
     },
     methods: {
