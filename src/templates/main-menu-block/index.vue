@@ -743,10 +743,6 @@
             label: 'Teams Permissions',
             to: '/teams-permission'
           },
-          {
-            label: 'Personal Token',
-            to: 'personal-tokens'
-          }
         ],
         profileMenuSettings: [
           {

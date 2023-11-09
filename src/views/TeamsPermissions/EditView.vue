@@ -1,10 +1,11 @@
 <template>
-  <CreateFormBlock
-    pageTitle="Create Teams Permissions"
-    :createService="props.createTeamPermissionsService"
-    :formData="values"
+  <EditFormBlock
+    pageTitle="Edit Teams Permissions"
+    :editService="props.editTeamPermissionService"
+    :loadService="props.loadTeamPermissionService"
+    :initialDataSetter="setValues"
     :isValid="meta.valid"
-    :cleanFormCallback="resetForm"
+    :formData="values"
   >
     <template #form>
       <FormHorizontal
@@ -36,7 +37,7 @@
             <label
               for="value"
               class="text-color text-base font-medium"
-              >Permissions *
+              >Permissions * 
             </label>
             <PickList
               v-model="permissionsList"
@@ -80,11 +81,11 @@
         </template>
       </FormHorizontal>
     </template>
-  </CreateFormBlock>
+  </EditFormBlock>
 </template>
 
 <script setup>
-  import CreateFormBlock from '@/templates/create-form-block-new'
+  import EditFormBlock from '@/templates/edit-form-block-new'
   import FormHorizontal from '@/templates/create-form-block-new/form-horizontal'
   import InputText from 'primevue/inputtext'
   import PickList from 'primevue/picklist'
@@ -95,7 +96,11 @@
   import * as yup from 'yup'
   import { ref, onMounted, watch } from 'vue'
   const props = defineProps({
-    createTeamPermissionsService: {
+    editTeamPermissionService: {
+      type: Function,
+      required: true
+    },
+    loadTeamPermissionService: {
       type: Function,
       required: true
     },
@@ -113,13 +118,8 @@
 
   const permissionsList = ref(null)
 
-  const { errors, defineInputBinds, meta, resetForm, values } = useForm({
-    validationSchema,
-    initialValues: {
-      name: '',
-      permissions: [],
-      isActive: true
-    }
+  const { errors, defineInputBinds, meta, values, setValues} = useForm({
+    validationSchema
   })
 
   const name = defineInputBinds('name', { validateOnInput: true })
@@ -127,8 +127,10 @@
   const { value: permissions } = useField('permissions')
 
   const fetchPermissions = async () => {
-    const result = await props.listPermissionService()
-    permissionsList.value = [result, []]
+    const response = await props.listPermissionService()
+
+    const filterResponse = response.filter(item => !permissions.value.some(permission => permission.id === item.id));
+    permissionsList.value = [filterResponse, permissions.value]
   }
 
   onMounted(async () => {
