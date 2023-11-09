@@ -11,81 +11,88 @@
       }"
     />
     <div
-      class="pb-4 h-full w-full gap-4 animate-pulse"
+      class="pb-4 h-full w-full grid md:grid-cols-2 grid-cols-1 gap-4 animate-pulse"
       v-if="isLoading"
-      style="display: grid; grid-template-columns: repeat(auto-fit, minmax(288px, 1fr))"
     >
-      <PrimeCard
-        :pt="{
-          root: 'w-72 p-4',
-          body: 'w-full'
-        }"
-      >
+      <PrimeCard class="w-full p-4">
         <template #content>
           <div class="flex gap-3.5 flex-col">
             <div class="w-10 h-10 rounded bg-gray-200"></div>
             <div class="flex p-0.5 gap-1 flex-col">
               <div class="bg-gray-200 h-5 w-40 rounded"></div>
-              <div class="bg-gray-200 h-4 w-60 rounded"></div>
-              <div class="bg-gray-200 h-4 w-50 rounded"></div>
-              <div class="bg-gray-200 h-4 w-45 rounded"></div>
+              <div class="bg-gray-200 h-4 w-full rounded"></div>
+              <div class="bg-gray-200 h-4 w-full rounded"></div>
+              <div class="bg-gray-200 h-4 w-full rounded"></div>
             </div>
             <div class="bg-gray-200 w-20 h-9 rounded"></div>
           </div>
         </template>
       </PrimeCard>
-      <PrimeCard
-        :pt="{
-          root: 'w-72 p-4',
-          body: 'w-full'
-        }"
-      >
+      <PrimeCard class="w-full p-4">
         <template #content>
           <div class="flex gap-3.5 flex-col">
             <div class="w-10 h-10 rounded bg-gray-200"></div>
             <div class="flex p-0.5 gap-1 flex-col">
               <div class="bg-gray-200 h-5 w-40 rounded"></div>
-              <div class="bg-gray-200 h-4 w-60 rounded"></div>
-              <div class="bg-gray-200 h-4 w-50 rounded"></div>
-              <div class="bg-gray-200 h-4 w-45 rounded"></div>
+              <div class="bg-gray-200 h-4 w-full rounded"></div>
+              <div class="bg-gray-200 h-4 w-full rounded"></div>
+              <div class="bg-gray-200 h-4 w-full rounded"></div>
             </div>
             <div class="bg-gray-200 w-20 h-9 rounded"></div>
           </div>
         </template>
       </PrimeCard>
-      <PrimeCard
-        :pt="{
-          root: 'w-72 p-4',
-          body: 'w-full'
-        }"
-      >
+      <PrimeCard class="w-full p-4">
         <template #content>
           <div class="flex gap-3.5 flex-col">
             <div class="w-10 h-10 rounded bg-gray-200"></div>
             <div class="flex p-0.5 gap-1 flex-col">
               <div class="bg-gray-200 h-5 w-40 rounded"></div>
-              <div class="bg-gray-200 h-4 w-60 rounded"></div>
-              <div class="bg-gray-200 h-4 w-50 rounded"></div>
-              <div class="bg-gray-200 h-4 w-45 rounded"></div>
+              <div class="bg-gray-200 h-4 w-full rounded"></div>
+              <div class="bg-gray-200 h-4 w-full rounded"></div>
+              <div class="bg-gray-200 h-4 w-full rounded"></div>
             </div>
             <div class="bg-gray-200 w-20 h-9 rounded"></div>
           </div>
         </template>
       </PrimeCard>
-      <PrimeCard
-        :pt="{
-          root: 'w-72 p-4',
-          body: 'w-full'
-        }"
-      >
+      <PrimeCard class="w-full p-4">
         <template #content>
           <div class="flex gap-3.5 flex-col">
             <div class="w-10 h-10 rounded bg-gray-200"></div>
             <div class="flex p-0.5 gap-1 flex-col">
               <div class="bg-gray-200 h-5 w-40 rounded"></div>
-              <div class="bg-gray-200 h-4 w-60 rounded"></div>
-              <div class="bg-gray-200 h-4 w-50 rounded"></div>
-              <div class="bg-gray-200 h-4 w-45 rounded"></div>
+              <div class="bg-gray-200 h-4 w-full rounded"></div>
+              <div class="bg-gray-200 h-4 w-full rounded"></div>
+              <div class="bg-gray-200 h-4 w-full rounded"></div>
+            </div>
+            <div class="bg-gray-200 w-20 h-9 rounded"></div>
+          </div>
+        </template>
+      </PrimeCard>
+      <PrimeCard class="w-full p-4">
+        <template #content>
+          <div class="flex gap-3.5 flex-col">
+            <div class="w-10 h-10 rounded bg-gray-200"></div>
+            <div class="flex p-0.5 gap-1 flex-col">
+              <div class="bg-gray-200 h-5 w-40 rounded"></div>
+              <div class="bg-gray-200 h-4 w-full rounded"></div>
+              <div class="bg-gray-200 h-4 w-full rounded"></div>
+              <div class="bg-gray-200 h-4 w-full rounded"></div>
+            </div>
+            <div class="bg-gray-200 w-20 h-9 rounded"></div>
+          </div>
+        </template>
+      </PrimeCard>
+      <PrimeCard class="w-full p-4">
+        <template #content>
+          <div class="flex gap-3.5 flex-col">
+            <div class="w-10 h-10 rounded bg-gray-200"></div>
+            <div class="flex p-0.5 gap-1 flex-col">
+              <div class="bg-gray-200 h-5 w-40 rounded"></div>
+              <div class="bg-gray-200 h-4 w-full rounded"></div>
+              <div class="bg-gray-200 h-4 w-full rounded"></div>
+              <div class="bg-gray-200 h-4 w-full rounded"></div>
             </div>
             <div class="bg-gray-200 w-20 h-9 rounded"></div>
           </div>
@@ -93,17 +100,13 @@
       </PrimeCard>
     </div>
     <div
-      class="h-full w-full gap-4"
+      class="h-full w-full grid md:grid-cols-2 grid-cols-1 gap-4"
       v-if="!isLoading && selectedTab === 0"
-      style="display: grid; grid-template-columns: repeat(auto-fit, minmax(288px, 1fr))"
     >
       <PrimeCard
         v-for="template in templates"
         :key="template.id"
-        :pt="{
-          root: 'w-72 p-4',
-          body: 'w-full'
-        }"
+        class="p-4"
       >
         <template #content>
           <div class="flex gap-3.5 flex-col">
@@ -114,7 +117,7 @@
                 alt=""
               />
             </div>
-            <div class="flex p-0.5 flex-col">
+            <div class="flex p-0.5 flex-col gap-1">
               <span class="text-color text-base font-medium">
                 {{ template.name }}
               </span>
@@ -133,17 +136,13 @@
       </PrimeCard>
     </div>
     <div
-      class="h-full w-full gap-4"
+      class="h-full w-full grid md:grid-cols-2 grid-cols-1 gap-4"
       v-if="!isLoading && selectedTab === 1"
-      style="display: grid; grid-template-columns: repeat(auto-fit, minmax(288px, 1fr))"
     >
       <PrimeCard
         v-for="template in browseTemplates"
         :key="template.id"
-        :pt="{
-          root: 'w-72 p-4',
-          body: 'w-full'
-        }"
+        class="w-full p-4"
       >
         <template #content>
           <div class="flex gap-3.5 flex-col">
@@ -154,7 +153,7 @@
                 alt=""
               />
             </div>
-            <div class="flex p-0.5 flex-col">
+            <div class="flex p-0.5 flex-col gap-1">
               <span class="text-color text-base font-medium">
                 {{ template.name }}
               </span>
@@ -173,21 +172,17 @@
       </PrimeCard>
     </div>
     <div
-      class="h-full w-full gap-4"
+    class="h-full w-full grid md:grid-cols-2 grid-cols-1 gap-4"
       v-if="!isLoading && selectedTab === 2"
-      style="display: grid; grid-template-columns: repeat(auto-fit, minmax(288px, 1fr))"
     >
       <PrimeCard
         v-for="resource in resources"
         :key="resource.to"
-        :pt="{
-          root: 'w-72 p-4',
-          body: 'w-full'
-        }"
+        class="w-full p-4"
       >
         <template #content>
           <div class="flex gap-3.5 flex-col">
-            <div class="flex p-0.5 flex-col">
+            <div class="flex p-0.5 flex-col gap-1">
               <span class="text-color text-base font-medium">
                 {{ resource.label }}
               </span>
