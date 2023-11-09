@@ -45,7 +45,7 @@ describe('GenerateQrcodeMfaService', () => {
     try {
       await sut(fixtures.mfaToken)
     } catch (error) {
-      expect(error.message).toBe(expectedError.message)
+      expect(error).toBe(expectedError.message)
     }
   })
 
@@ -56,7 +56,7 @@ describe('GenerateQrcodeMfaService', () => {
     },
     {
       statusCode: 403,
-      expectedError: new Errors.PermissionError()
+      expectedError: new Error('Your session was expired, please login again.')
     },
     {
       statusCode: 404,
@@ -82,7 +82,7 @@ describe('GenerateQrcodeMfaService', () => {
       try {
         await sut(fixtures.mfaToken)
       } catch (error) {
-        expect(error.message).toBe(expectedError.message)
+        expect(error).toBe(expectedError.message)
       }
     }
   )
