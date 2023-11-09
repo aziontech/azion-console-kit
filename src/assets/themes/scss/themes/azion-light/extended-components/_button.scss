@@ -320,17 +320,20 @@
 }
 
 .p-button.p-button-link {
-  &:enabled:hover {
+  color: $linkButtonColor !important;
+
+  &:not(:disabled):hover {
     .p-button-label {
     }
   }
 
-  &:enabled:focus-visible {
+  &:not(:disabled):focus {
   }
 
-  &:enabled:active {
+  &:not(:disabled):active {
   }
 }
+
 .p-button-icon-only {
   width: 2rem !important;
   height: 2rem !important;
