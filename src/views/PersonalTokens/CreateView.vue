@@ -35,7 +35,6 @@
                   type="text"
                   :class="{ 'p-invalid': errors.name }"
                   v-tooltip.top="{ value: errors.name, showDelay: 200 }"
-                  :readonly="generatedPersonalToken"
                   :disabled="generatedPersonalToken"
                 />
               </span>
@@ -64,7 +63,6 @@
                   rows="1"
                   v-bind="description"
                   :disabled="generatedPersonalToken"
-                  :readonly="generatedPersonalToken"
                 />
               </span>
               <small
@@ -145,7 +143,6 @@
                     class="w-full"
                     :value="personalTokenKey"
                     :type="tokenField.type"
-                    :readonly="generatedPersonalToken"
                     :disabled="generatedPersonalToken"
                   />
                   <i
