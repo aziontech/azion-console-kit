@@ -11,7 +11,7 @@
     <template #form>
       <form-horizontal
         title="General"
-        description="See the details of your Azion domain, including
+        description="See the details of the Azion domain, including
         the domain address to access the application, and modify
         digital certificate options."
       >
@@ -53,7 +53,7 @@
               >Domain Address</label
             >
             <InputText
-              placeholder=""
+              placeholder="example.com"
               v-model="domainName.value"
               id="name"
               type="text"
@@ -194,7 +194,7 @@
                 </template>
                 <template #subtitle>
                   This option blocks the client certificate during the TLS handshake if the uploaded
-                  Trusted CA cannot be validated.
+                  Trusted CA can't be validated.
                 </template>
               </Card>
 
@@ -219,7 +219,7 @@
                 </template>
                 <template #subtitle>
                   This option attempts to verify the client certificate, but will allow the TLS
-                  handshake even if the Trusted CA cannot be validated. You can check which client
+                  handshake even if the Trusted CA can't be validated. You can check which client
                   certificate attempted the request in Edge Firewall.
                 </template>
               </Card>
@@ -356,7 +356,7 @@
           })
           .test({
             name: 'no-whitespace',
-            message: `Space characters are not allowed.`,
+            message: `Space characters aren't allowed.`,
             test: (value) => value?.includes(' ') === false
           }),
         cnameAccessOnly: yup.boolean(),

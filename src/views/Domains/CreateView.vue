@@ -102,8 +102,8 @@
               />
             </template>
             <template #subtitle>
-              Check this option to make your application accessible only through the domains listed
-              in the CNAME field. Attempts to access your application through the Azion domain will
+              Check this option to make the application accessible only through the domains listed
+              in the CNAME field. Attempts to access the application through the Azion domain will
               be blocked.
             </template>
           </Card>
@@ -175,7 +175,7 @@
                 </template>
                 <template #subtitle>
                   This option blocks the client certificate during the TLS handshake if the uploaded
-                  Trusted CA cannot be validated.
+                  Trusted CA can't be validated.
                 </template>
               </Card>
 
@@ -334,7 +334,7 @@
           })
           .test({
             name: 'no-whitespace',
-            message: `Space characters are not allowed.`,
+            message: `Space characters aren't allowed.`,
             test: (value) => value?.includes(' ') === false
           }),
         cnameAccessOnly: yup.boolean(),
