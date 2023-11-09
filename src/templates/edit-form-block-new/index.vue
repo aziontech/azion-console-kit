@@ -10,8 +10,13 @@
 
       <slot name="raw-form" />
     </form>
+    <DialogUnsavedBlock
+      v-model:visible="dialogUnsaved"
+      @leavePage="leavePage"
+      @keepEditing="keepEditing"
+    />
     <ActionBarTemplate
-      @cancel="handleCancel"
+      @cancel="openDialogUnsaved"
       @submit="handleSubmit"
       :loading="isLoading"
       :submitDisabled="!isValid"
@@ -20,6 +25,7 @@
 </template>
 
 <script>
+  import DialogUnsavedBlock from '@/templates/dialog-unsaved-block'
   import ActionBarTemplate from '@/templates/action-bar-block'
   import PageHeadingBlock from '@/templates/page-heading-block'
 
@@ -27,10 +33,12 @@
     name: 'edit-form-block',
     components: {
       ActionBarTemplate,
-      PageHeadingBlock
+      PageHeadingBlock,
+      DialogUnsavedBlock
     },
     data: () => ({
-      isLoading: false
+      isLoading: false,
+      dialogUnsaved: false
     }),
     props: {
       pageTitle: {
@@ -64,12 +72,30 @@
       hasTabs: {
         type: Boolean,
         required: false
+      },
+      formMeta: {
+        type: Object,
+        required: true
       }
     },
     async created() {
       await this.loadInitialData()
     },
     methods: {
+      leavePage() {
+        this.dialogUnsaved = false
+        this.handleCancel()
+      },
+      keepEditing() {
+        this.dialogUnsaved = false
+      },
+      openDialogUnsaved() {
+        if (this.formMeta.touched) {
+          this.dialogUnsaved = true
+          return
+        }
+        this.handleCancel()
+      },
       handleCancel() {
         if (this.backURL) {
           this.$router.push({ path: this.backURL })
