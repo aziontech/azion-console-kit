@@ -21,7 +21,7 @@
               >Name *</label
             >
             <InputText
-              placeholder="Digital certificate name"
+              placeholder="My digital certificate"
               v-bind="digitalCertificateName"
               type="text"
               id="name"

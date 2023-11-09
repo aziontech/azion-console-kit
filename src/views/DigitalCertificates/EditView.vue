@@ -20,7 +20,7 @@
             <InputText
               v-bind="name"
               type="text"
-              placeholder="Digital certificate name"
+              placeholder="My digital certificate"
               :class="{ 'p-invalid': errors.name }"
               v-tooltip.top="{ value: errors.name, showDelay: 200 }"
             />
@@ -86,7 +86,7 @@
             <InputText
               v-bind="name"
               type="text"
-              placeholder="Digital certificate name"
+              placeholder="My digital certificate"
               :class="{ 'p-invalid': errors.name }"
               v-tooltip.top="{ value: errors.name, showDelay: 200 }"
             />
@@ -137,7 +137,7 @@
       >
         <template #inputs>
           <div class="flex flex-col sm:max-w-lg w-full gap-2">
-            <label>Certificate Name *</label>
+            <label>Name *</label>
             <InputText
               v-bind="name"
               type="text"
