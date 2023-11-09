@@ -11,8 +11,8 @@
       <FormHorizontal
         v-if="csr.modelValue"
         title="Generate CSR and Private Key with Azion"
-        description="You've generated a certificate signing request (CSR) with Azion. Copy the CSR and submit it to a certificate authority.
-        Once you've received your certificate, paste it in the certificate field and click save."
+        description="The Certificate Signing Request (CSR) with Azion was generated. Copy the CSR and submit it to a certificate authority.
+        Paste the certificate in the respective field and click Save."
       >
         <template #inputs>
           <div class="flex flex-col sm:max-w-lg w-full gap-2">
@@ -20,7 +20,7 @@
             <InputText
               v-bind="name"
               type="text"
-              placeholder="Digital Certificate name"
+              placeholder="Digital certificate name"
               :class="{ 'p-invalid': errors.name }"
               v-tooltip.top="{ value: errors.name, showDelay: 200 }"
             />
@@ -76,8 +76,8 @@
       </FormHorizontal>
       <FormHorizontal
         v-if="!csr.modelValue && certificateType === certificateTypes.EDGE_CERTIFICATE"
-        title="Upload certificate and private key"
-        description="To update your digital certificate, copy and paste your certificate and private key codes in the respective fields,
+        title="Upload Certificate and Private Key"
+        description="To update a digital certificate, copy and paste the certificate and private key codes in the respective fields,
         including the begin and end tags."
       >
         <template #inputs>
@@ -86,7 +86,7 @@
             <InputText
               v-bind="name"
               type="text"
-              placeholder="Digital Certificate name"
+              placeholder="Digital certificate name"
               :class="{ 'p-invalid': errors.name }"
               v-tooltip.top="{ value: errors.name, showDelay: 200 }"
             />
@@ -102,7 +102,7 @@
               v-bind="certificate"
               :class="{ 'p-invalid': errors.certificate }"
               v-tooltip.top="{ value: errors.certificate, showDelay: 200 }"
-              placeholder="For security reasons, the certificate cannot be shown.&#10;To replace your digital certificate, paste the new certificate here."
+              placeholder="For security reasons, the certificate can't be shown. To replace a digital certificate, paste the new certificate here."
               rows="5"
               cols="30"
             />
@@ -118,7 +118,7 @@
               v-model="privateKey"
               :class="{ 'p-invalid': errors.privateKey }"
               v-tooltip.top="{ value: errors.privateKey, showDelay: 200 }"
-              placeholder="For security reasons, the private key cannot be shown.&#10;To replace your digital certificate, paste the new private key here."
+              placeholder="For security reasons, the certificate can't be shown. To replace a digital certificate, paste the new certificate here."
               rows="5"
               cols="30"
             />
@@ -133,7 +133,7 @@
       <FormHorizontal
         v-if="certificateType === certificateTypes.TRUSTED"
         title="Upload Trusted CA Certificate"
-        description="A Trusted Certificate Authority (CA) certificate can be used for Mutual Transport Layer Security (mTLS) configuration. To update your Trusted CA Certificate to Azion, paste your certificate code in the respective field."
+        description="A Trusted Certificate Authority (CA) certificate can be used for Mutual Transport Layer Security (mTLS) configuration. To update a Trusted CA Certificate to Azion, paste the certificate code in the respective field."
       >
         <template #inputs>
           <div class="flex flex-col sm:max-w-lg w-full gap-2">
@@ -157,11 +157,11 @@
               v-bind="certificate"
               :class="{ 'p-invalid': errors.certificate }"
               v-tooltip.top="{ value: errors.certificate, showDelay: 200 }"
-              placeholder="For security reasons, the certificate cannot be shown.&#10;Paste a new certificate in this field to update it."
+              placeholder="For security reasons, the certificate can't be shown.&#10;Paste a new certificate in this field to update it."
               rows="5"
               cols="30"
             />
-            <small>You can include intermediate certificates.</small>
+            <small>Intermediate certificates are accepted.</small>
             <small
               v-if="errors.certificate"
               class="p-error text-xs font-normal leading-tight"

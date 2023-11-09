@@ -136,7 +136,7 @@
           certificateType === certificateTypes.EDGE_CERTIFICATE
         "
         title="Upload Certificate and Private Key"
-        description="To upload your digital certificate, copy and paste your certificate and private key codes in the respective fields,
+        description="To upload a digital certificate, copy and paste the certificate and private key codes in the respective fields,
         including the begin and end tags."
       >
         <template #inputs>
@@ -176,7 +176,7 @@
       </FormHorizontal>
       <FormHorizontal
         title="Generate CSR and Private Key with Azion"
-        description="To apply for a digital certificate issued by a certificate authority, you need a certificate signing request.
+        description="To apply for a digital certificate issued by a certificate authority, a certificate signing request is required.
         Azion can generate a certificate code to submit to a certificate authority."
         v-if="
           createCertificateType === edgeCertificateTypes.CSR &&
@@ -324,7 +324,7 @@
       </FormHorizontal>
       <FormHorizontal
         title="Upload Trusted CA certificate"
-        description="A Trusted Certificate Authority (CA) certificate can be used for Mutual Transport Layer Security (mTLS) configuration. To upload your Trusted CA Certificate to Azion, paste your certificate code in the respective field."
+        description="A Trusted Certificate Authority (CA) certificate can be used for Mutual Transport Layer Security (mTLS) configuration. To upload a Trusted CA Certificate to Azion, paste the certificate code in the respective field."
         v-if="certificateType === certificateTypes.TRUSTED"
       >
         <template #inputs>
@@ -338,7 +338,7 @@
               rows="5"
               cols="30"
             />
-            <small>You can include intermediate certificates.</small>
+            <small>Intermediate certificates are accepted.</small>
             <small
               v-if="errors.certificate"
               class="p-error text-xs font-normal leading-tight"

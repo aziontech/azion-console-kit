@@ -49,7 +49,7 @@
           },
           {
             field: 'validity',
-            header: 'Expiration date'
+            header: 'Expiration Date'
           },
           {
             field: 'status',
