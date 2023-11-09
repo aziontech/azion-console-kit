@@ -11,5 +11,9 @@ export const loginRoutes = {
     refreshLoginService: AuthServices.refreshAuthenticationService,
     switchAccountLoginService: AuthServices.switchAccountService,
     sendResetPasswordEmailService: AuthServices.sendResetPasswordEmailService
+  },
+  meta: {
+    isPublic: true,
+    hideNavigation: true
   }
 }
