@@ -240,7 +240,18 @@
         captcha: 'default'
       }
       await props.authenticationLoginService(loginData)
-      const { user_tracking_info: userInfo } = await verify()
+      const { user_tracking_info: userInfo, twoFactor, trustedDevice } = await verify()
+
+      if (twoFactor && !trustedDevice) {
+        router.push('/mfa/setup')
+        return
+      }
+
+      if (trustedDevice) {
+        router.push('/mfa/authentication')
+        return
+      }
+
       await switchClientAccount(userInfo)
     } catch {
       hasRequestErrorMessage.value = new UserNotFoundError().message
