@@ -7,12 +7,12 @@
           <span class="p-input-icon-left">
             <i class="pi pi-search" />
             <InputText
-              placeholder="Search..."
+              placeholder="Search by event"
               v-model="search"
             />
           </span>
           <span class="flex items-center ml-auto text-sm font-normal leading-5">
-            last 30 days records
+            Records from the last 30 days
           </span>
         </div>
       </template>
@@ -43,7 +43,7 @@
           <span
             v-if="noEventsFound"
             class="text-primary"
-            >No events found</span
+            >No events found.</span
           >
           <Timeline
             v-else
