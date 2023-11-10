@@ -90,8 +90,10 @@
   import Card from 'primevue/card'
   import Tag from 'primevue/tag'
   import InputText from 'primevue/inputtext'
-  import { ref, computed, onMounted } from 'vue'
+  import { ref, computed, onMounted, watch } from 'vue'
   import { useToast } from 'primevue/usetoast'
+
+  const emit = defineEmits(['on-load-data'])
 
   const toast = useToast()
   const search = ref('')
@@ -149,5 +151,10 @@
 
   onMounted(async () => {
     await loadData()
+  })
+
+  watch(events, (currentState) => {
+    const hasData = currentState.length > 0
+    emit('on-load-data', hasData)
   })
 </script>
