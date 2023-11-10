@@ -4,12 +4,15 @@
     :benefitsList="benefitsList"
     :formTitle="formTitle"
   >
-    <template #form> Form </template>
+    <template #form>
+      <AdditionalDataFormBlock />
+    </template>
   </PageWithFormBlock>
 </template>
 
 <script setup>
   import PageWithFormBlock from '@/templates/page-with-form-block'
+  import AdditionalDataFormBlock from '@/templates/additional-data-form-block'
 
   const pageTitle = 'Almost there!'
   const benefitsList = [
