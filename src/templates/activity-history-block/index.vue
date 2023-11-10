@@ -12,7 +12,7 @@
             />
           </span>
           <span class="flex items-center ml-auto text-sm font-normal leading-5">
-            records from the last 30 days
+            Records from the last 30 days
           </span>
         </div>
       </template>
