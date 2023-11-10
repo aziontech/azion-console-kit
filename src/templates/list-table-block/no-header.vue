@@ -261,12 +261,6 @@
           life: 10000
         }
         try {
-          this.$toast.add({
-            closable: false,
-            severity: 'info',
-            summary: 'Processing request',
-            life: 5000
-          })
           const feedback = await this.deleteService(this.selectedId)
           toastConfig.summary = feedback ?? 'Deleted successfully'
           this.data = this.data.filter((item) => item.id !== this.selectedId)
