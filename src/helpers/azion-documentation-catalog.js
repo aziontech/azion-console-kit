@@ -6,5 +6,6 @@ export const documentationCatalog = {
   edgeServices: () => azionDocumentationWindowOpener('edge services'),
   intelligentDNS: () => azionDocumentationWindowOpener('intelligent-dns'),
   personalTokens: () => azionDocumentationWindowOpener('personal tokens'),
-  domains: () => azionDocumentationWindowOpener('domains')
+  domains: () => azionDocumentationWindowOpener('domains'),
+  getStarted: () => azionDocumentationWindowOpener('get started')
 }
