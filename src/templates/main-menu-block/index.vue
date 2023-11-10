@@ -697,7 +697,7 @@
             ]
           },
           {
-            label: 'Tools', 
+            label: 'Tools',
             items: [
               {
                 label: 'Real-Time Purge',

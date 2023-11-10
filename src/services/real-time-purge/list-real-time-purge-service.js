@@ -13,7 +13,6 @@ export const listRealTimePurgeService = async () => {
 }
 
 const adapt = (httpResponse) => {
-
   return {
     body: httpResponse.body,
     statusCode: httpResponse.statusCode

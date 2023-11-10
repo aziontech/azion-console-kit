@@ -10,7 +10,7 @@ export const realTimePurgeRoutes = {
       name: 'real-time-purge',
       component: () => import('@views/RealTimePurge/ListView.vue'),
       props: {
-        listRealTimePurgeService: RealTimePurgeService.listRealTimePurgeService,
+        listRealTimePurgeService: RealTimePurgeService.listRealTimePurgeService
       },
       meta: {
         breadCrumbs: [
@@ -20,6 +20,6 @@ export const realTimePurgeRoutes = {
           }
         ]
       }
-    },
+    }
   ]
 }
