@@ -1,5 +1,6 @@
 <script>
   import ListTableBlock from '@/templates/list-table-block'
+  import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
 
   export default {
     name: 'domains-view',
@@ -34,6 +35,16 @@
           {
             field: 'cnames',
             header: 'CNAME'
+          },
+          {
+            field: 'active',
+            header: 'Status',
+            type: 'component',
+            component: (columnData) =>
+              columnBuilder({
+                data: columnData,
+                columnAppearance: 'tag'
+              })
           },
           {
             field: 'edgeApplicationName',

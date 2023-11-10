@@ -12,6 +12,7 @@
   />
   <EmptyResultsBlock
     v-else
+    pageTitle="Intelligent DNS"
     title="No Intelligent DNS added"
     description="Create your first Intelligent DNS."
     createButtonLabel="Add Intelligent DNS"
