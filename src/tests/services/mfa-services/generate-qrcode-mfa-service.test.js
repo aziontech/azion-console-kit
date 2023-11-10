@@ -17,7 +17,7 @@ const makeSut = () => {
   }
 }
 
-describe('GenerateQrcodeMfaService', () => {
+describe('MfaServices', () => {
   it('should call api correctly', async () => {
     const requestSpy = vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
       statusCode: 201,
@@ -83,7 +83,7 @@ describe('GenerateQrcodeMfaService', () => {
 
       const response = sut({})
 
-      expect(response).rejects.toBe(expectedError)
+      expect(response).rejects.toThrow(expectedError)
     }
   )
 })

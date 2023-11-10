@@ -15,7 +15,7 @@ const makeSut = () => {
   }
 }
 
-describe('GenerateQrcodeMfaService', () => {
+describe('MfaServices', () => {
   it('should call api with correct headers', async () => {
     const requestSpy = vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
       statusCode: 200,
@@ -52,23 +52,23 @@ describe('GenerateQrcodeMfaService', () => {
   it.each([
     {
       statusCode: 401,
-      expectedError: new Errors.InvalidApiTokenError()
+      expectedError: new Errors.InvalidApiTokenError().message
     },
     {
       statusCode: 403,
-      expectedError: new Error('Your session was expired, please login again.')
+      expectedError: new Error('Your session was expired, please login again.').message
     },
     {
       statusCode: 404,
-      expectedError: new Errors.NotFoundError()
+      expectedError: new Errors.NotFoundError().message
     },
     {
       statusCode: 500,
-      expectedError: new Errors.InternalServerError()
+      expectedError: new Errors.InternalServerError().message
     },
     {
       statusCode: 'unmappedStatusCode',
-      expectedError: new Errors.UnexpectedError()
+      expectedError: new Errors.UnexpectedError().message
     }
   ])(
     'should throw when request fails with statusCode $statusCode',
@@ -79,11 +79,9 @@ describe('GenerateQrcodeMfaService', () => {
       })
       const { sut } = makeSut()
 
-      try {
-        await sut(fixtures.mfaToken)
-      } catch (error) {
-        expect(error).toBe(expectedError.message)
-      }
+      const response = sut(fixtures.mfaToken)
+
+      expect(response).rejects.toThrow(expectedError.message)
     }
   )
 })
