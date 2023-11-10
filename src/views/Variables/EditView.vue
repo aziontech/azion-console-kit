@@ -5,6 +5,7 @@
     :loadService="props.loadVariableService"
     :initialDataSetter="setValues"
     :isValid="meta.valid"
+    :formMeta="meta"
     :formData="values"
   >
     <template #form>

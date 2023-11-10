@@ -4,6 +4,7 @@
       pageTitle="New Personal Token"
       :createService="props.createPersonalTokenService"
       :formData="values"
+      :formMeta="meta"
       :isValid="meta.valid"
       @on-response="handleResponse"
       :buttonBackList="generatedPersonalToken"

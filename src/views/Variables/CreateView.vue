@@ -3,6 +3,7 @@
     pageTitle="Create Variables"
     :createService="props.createVariablesService"
     :formData="values"
+    :formMeta="meta"
     :isValid="meta.valid"
     :cleanFormCallback="resetForm"
   >

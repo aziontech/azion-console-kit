@@ -13,6 +13,7 @@
             :initialDataSetter="setValues"
             :isValid="meta.valid"
             :formData="values"
+            :formMeta="meta"
           >
             <template #form>
               <FormHorizontal
