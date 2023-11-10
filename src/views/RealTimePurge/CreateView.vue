@@ -174,7 +174,7 @@
   import Card from 'primevue/card'
   import PrimeTextarea from 'primevue/textarea'
 
-  import { useForm, useField} from 'vee-validate'
+  import { useForm, useField } from 'vee-validate'
   import * as yup from 'yup'
 
   const props = defineProps({
@@ -197,5 +197,4 @@
   const layer = defineInputBinds('layer', { validateOnInput: true })
   const purge_type = defineInputBinds('purge_type', { validateOnInput: true })
   const { value: argumentsPurge } = useField('argumentsPurge', { validateOnInput: true })
-
 </script>
