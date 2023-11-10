@@ -43,7 +43,7 @@
           <span
             v-if="noEventsFound"
             class="text-primary"
-            >No events found</span
+            >No events found.</span
           >
           <Timeline
             v-else
