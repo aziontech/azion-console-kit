@@ -260,7 +260,7 @@
             >
           </div>
           <div class="flex flex-col sm:max-w-lg w-full gap-2">
-            <label>Organization unit *</label>
+            <label>Organization Unit *</label>
             <InputText
               placeholder="IT Department"
               v-bind="organizationUnity"
@@ -290,7 +290,7 @@
             >
           </div>
           <div class="flex flex-col sm:max-w-lg w-full gap-2">
-            <label>Private Key type </label>
+            <label>Private Key Type</label>
             <InputText
               v-bind="privateKeyType"
               type="text"
