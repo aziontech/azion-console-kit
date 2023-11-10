@@ -2,8 +2,9 @@
   <div>
     <PageHeadingBlock :pageTitle="pageTitle" />
 
-    <div class="max-w-full mx-3 mb-8 md:mx-8">
+    <div class=" max-w-full mx-3 mb-8 md:mx-8">
       <DataTable
+        class=" overflow-clip rounded-md"
         v-if="!isLoading"
         @rowReorder="onRowReorder"
         scrollable
