@@ -1,10 +1,11 @@
+<!-- eslint-disable vuejs-accessibility/click-events-have-key-events -->
 <template>
   <div>
     <PrimeButton
       v-if="visibleButton"
       class="font-semibold h-8 w-auto border-header hidden md:flex gap-2 items-center bg-header hover:bg-header-button-hover"
       size="small"
-      :loading="!account?.accountTypeName"
+      :loading="isLoadingAccount"
       :pt="{
         label: { class: '!text-white' },
         icon: { class: '!text-white' }
@@ -143,7 +144,7 @@
 </template>
 
 <script setup>
-  import { ref, watch } from 'vue'
+  import { ref, watch, computed } from 'vue'
   import PrimeDialog from 'primevue/dialog'
   import PrimeTag from 'primevue/tag'
   import PrimeButton from 'primevue/button'
@@ -230,6 +231,8 @@
   ])
   const menu = ref()
 
+  const isLoadingAccount = computed(() => !props.account?.accountTypeIcon)
+
   watch(
     () => props.showSwitchAccount,
     (newValue) => {
@@ -245,8 +248,8 @@
     menu.value.toggle(event)
   }
   const onSelectedAccount = async (rowSelected) => {
-    const { first_login: firstLogin } = await switchAccountService(rowSelected.accountId)
     visible.value = false
+    const { first_login: firstLogin } = await switchAccountService(rowSelected.accountId)
     if (firstLogin) {
       window.location = 'iam/additional-data'
       return
