@@ -12,7 +12,9 @@
     <template #form>
       <form-horizontal
         title="General"
-        description=""
+        description="Check the details of the Azion domain, including
+        the domain address to access the application, and modify
+        digital certificate options."
       >
         <template #inputs>
           <div class="flex flex-col sm:max-w-lg w-full gap-2">
@@ -22,7 +24,7 @@
               >Name *</label
             >
             <InputText
-              placeholder="Add Domain Name"
+              placeholder="My domain"
               v-bind="name"
               id="name"
               type="text"
@@ -39,7 +41,9 @@
       </form-horizontal>
       <form-horizontal
         title="Settings"
-        description=""
+        description="Determine the edge application of the domain and its digital certificate. 
+        To link an existing domain to an application, add it to the CNAME field and
+        block access to the application via the Azion domain."
       >
         <template #inputs>
           <div class="flex flex-col w-full sm:max-w-xs gap-2">
@@ -82,9 +86,9 @@
               />
             </template>
             <template #subtitle>
-              Check this field to make content only accessible through the domains defined in the
-              CNAME field. Access attempts made through Azion's domain (e.g. 10001a.hc.azioncdn.net)
-              will not go through.
+              Check this option to make your application accessible only through the domains listed
+              in the CNAME field. Attempts to access your application through the Azion domain will
+              be blocked.
             </template>
           </Card>
 
@@ -123,14 +127,15 @@
               optionLabel="name"
               optionValue="value"
               class="w-full"
-              placeholder="Select a Certificate"
+              placeholder="Select a certificate"
             />
           </div>
         </template>
       </form-horizontal>
       <form-horizontal
         title="Mutual Authentication Settings"
-        description="The Mutual Authentication or mTLS, allows two parties authenticating each other at the same time in an authentication protocol."
+        description="Enable Mutual Authentication (mTLS) to require that both client and server
+        present an authentication protocol to each other."
       >
         <template #inputs>
           <div class="flex gap-3 items-center">
@@ -142,7 +147,7 @@
             <label
               for="mtls"
               class="text-base"
-              >Enable Mutual Authentication</label
+              >Mutual Authentication</label
             >
           </div>
 
@@ -172,8 +177,8 @@
                   />
                 </template>
                 <template #subtitle>
-                  The Enforce option blocks the client's certificate during TLS handshake if we
-                  cannot validate with the uploaded Trusted CA.
+                  This option blocks the client certificate during the TLS handshake if the uploaded
+                  Trusted CA can't be validated.
                 </template>
               </Card>
 
@@ -195,9 +200,9 @@
                   />
                 </template>
                 <template #subtitle>
-                  The Permissive option will attempt to verify the client's certificate, but will
-                  allow the TLS handshake even if the certificate cannot be validated. You can check
-                  the client certificate in Azion Firewall and conditionally block it.
+                  This option attempts to verify the client certificate, but will allow the TLS
+                  handshake even if the Trusted CA can't be validated. You can check which client
+                  certificate attempted the request in Edge Firewall.
                 </template>
               </Card>
             </div>
@@ -214,7 +219,7 @@
               optionLabel="name"
               optionValue="value"
               class="w-full"
-              placeholder=""
+              placeholder="Select a certificate"
               :disabled="!mtlsIsEnabled"
             />
             <small class="text-xs font-normal text-color-secondary leading-tight">
@@ -366,7 +371,7 @@
           })
           .test({
             name: 'no-whitespace',
-            message: `Whitespace is not allowed`,
+            message: `Space characters aren't allowed.`,
             test: (value) => value?.includes(' ') === false
           }),
         cnameAccessOnly: yup.boolean(),
