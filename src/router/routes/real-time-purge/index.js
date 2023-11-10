@@ -20,6 +20,26 @@ export const realTimePurgeRoutes = {
           }
         ]
       }
+    },
+    {
+      path: 'create',
+      name: 'create-real-time-purge',
+      component: () => import('@views/RealTimePurge/CreateView.vue'),
+      props: {
+        createRealTimePurgeService: RealTimePurgeService.createRealTimePurgeService
+      },
+      meta: {
+        breadCrumbs: [
+          {
+            label: 'Real-Time Purge',
+            to: '/real-time-purge'
+          },
+          {
+            label: 'Create Real-Time Purge',
+            to: '/real-time-purge/create'
+          }
+        ]
+      }
     }
   ]
 }
