@@ -16,13 +16,17 @@
     <div
       class="surface-border border border-dashed rounded-md items-center h-96 ml-6 mr-4 md:mr-8 my-3"
     >
-      <li
+      <PrimeButton
         v-for="(content, i) in mainContent"
         :key="i"
+        @click="getHtmlArticle(content)"
         class="text-color text-sm font-medium text-center w-full"
+        link
       >
         {{ content }}
-      </li>
+      </PrimeButton>
+
+      <div v-html="articleContent"></div>
     </div>
   </article>
 </template>
@@ -39,21 +43,49 @@
     },
     data() {
       return {
-        mainContent: ''
+        mainContent: '',
+        articleContent: ''
       }
     },
     methods: {
       ...mapActions(useHelpCenterStore, ['closeHelpCenter']),
-      async getMainContent(url) {
-        this.mainContent = await HelpCenterServices.getHelpCenterDocumentationService({ url })
+      async getMainContent() {
+        const currentPath = this.getCurrentPath()
+
+        this.mainContent = await HelpCenterServices.getHelpCenterDocumentationService({
+          url: currentPath
+        })
+      },
+      async getHtmlArticle(filename) {
+        const currentPath = this.getCurrentPath()
+        const parsedFilename = this.parseFilename(filename)
+
+        this.articleContent = await this.fetchArticleContent(currentPath, parsedFilename)
+      },
+      getCurrentPath() {
+        return window.location.pathname
+      },
+      parseFilename(filename) {
+        const article = filename.replaceAll(' ', '-').toLowerCase()
+        const [articleNameParsed] = article.split('#')
+
+        return articleNameParsed.concat('/index.html')
+      },
+      async fetchArticleContent(currentPath, filename) {
+        return await HelpCenterServices.getHelpCenterDocumentationService({
+          url: currentPath,
+          filename: filename
+        })
+      },
+      onRouteChange() {
+        this.getMainContent()
       }
     },
     mounted() {
-      const actualPath = this.$route.path
-
-      if (actualPath === '/') {
-        this.getMainContent()
-      }
+      this.getMainContent()
+    },
+    watch: {
+      $route: 'onRouteChange'
     }
   }
 </script>
