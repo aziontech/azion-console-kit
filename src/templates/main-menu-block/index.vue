@@ -697,6 +697,16 @@
             ]
           },
           {
+            label: 'Tools', 
+            items: [
+              {
+                label: 'Real-Time Purge',
+                to: '/real-time-purge',
+                icon: 'pi pi-refresh'
+              }
+            ]
+          },
+          {
             label: 'Edge Libraries ',
             items: [
               {
