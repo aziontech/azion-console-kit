@@ -3,6 +3,7 @@
     pageTitle="Create Network List"
     :createService="createNetworkListService"
     :formData="values"
+    :formMeta="meta"
     :isValid="meta.valid"
     :cleanFormCallback="resetForm"
   >
