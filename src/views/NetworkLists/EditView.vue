@@ -9,8 +9,9 @@
     :formMeta="meta"
   >
     <template #form>
-      <FormHorizontal title="Network List"
-      description="Create allowlists, blocklists, and even greylists based on IP addresses, geolocation (countries), or Autonomous System Number (ASN) to use with configured rule sets on Rules Engine."
+      <FormHorizontal
+        title="Network List"
+        description="Create allowlists, blocklists, and even greylists based on IP addresses, geolocation (countries), or Autonomous System Number (ASN) to use with configured rule sets on Rules Engine."
       >
         <template #inputs>
           <div class="flex flex-col sm:max-w-lg w-full gap-2">
