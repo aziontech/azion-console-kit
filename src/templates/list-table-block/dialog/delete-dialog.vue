@@ -60,87 +60,89 @@
 </template>
 
 <script>
-import PrimeButton from 'primevue/button'
-import PrimeDialog from 'primevue/dialog'
-import Message from 'primevue/message'
-import InputText from 'primevue/inputtext'
-import Divider from 'primevue/divider'
+  import PrimeButton from 'primevue/button'
+  import PrimeDialog from 'primevue/dialog'
+  import Message from 'primevue/message'
+  import InputText from 'primevue/inputtext'
+  import Divider from 'primevue/divider'
 
-export default {
-  props: {
-    informationForDeletion: {
-      type: Object,
-      required: true
-    }
-  },
-
-  components: {
-    PrimeButton,
-    PrimeDialog,
-    Message,
-    InputText,
-    Divider
-  },
-
-  data() {
-    return {
-      deleteDialogVisible: false,
-      confirmDeleteText: '',
-      processOfExclusion: false
-    }
-  },
-
-  methods: {
-    async removeItem() {
-      this.processOfExclusion = true
-      let toastConfig = {
-        closable: false,
-        severity: 'success',
-        summary: '',
-        life: 10000
+  export default {
+    props: {
+      informationForDeletion: {
+        type: Object,
+        required: true
       }
+    },
 
-      try {
-        const feedback = await this.informationForDeletion.deleteService(this.informationForDeletion.selectedID)
-        toastConfig.summary = feedback ?? 'Deleted successfully'
-        this.deleteDialogVisible = false
-        this.$emit('successfullyDeleted')
-      } catch (error) {
-        toastConfig = {
+    components: {
+      PrimeButton,
+      PrimeDialog,
+      Message,
+      InputText,
+      Divider
+    },
+
+    data() {
+      return {
+        deleteDialogVisible: false,
+        confirmDeleteText: '',
+        processOfExclusion: false
+      }
+    },
+
+    methods: {
+      async removeItem() {
+        this.processOfExclusion = true
+        let toastConfig = {
           closable: false,
-          severity: 'error',
-          summary: error,
+          severity: 'success',
+          summary: '',
           life: 10000
         }
-      } finally {
-        this.$toast.add(toastConfig)
-        this.processOfExclusion = false
+
+        try {
+          const feedback = await this.informationForDeletion.deleteService(
+            this.informationForDeletion.selectedID
+          )
+          toastConfig.summary = feedback ?? 'Deleted successfully'
+          this.deleteDialogVisible = false
+          this.$emit('successfullyDeleted')
+        } catch (error) {
+          toastConfig = {
+            closable: false,
+            severity: 'error',
+            summary: error,
+            life: 10000
+          }
+        } finally {
+          this.$toast.add(toastConfig)
+          this.processOfExclusion = false
+        }
+      },
+
+      cancelDialog() {
+        this.deleteDialogVisible = false
       }
     },
 
-    cancelDialog() {
-      this.deleteDialogVisible = false
-    }
-  },
+    computed: {
+      isAbleToDelete() {
+        return this.confirmDeleteText === 'delete'
+      },
 
-  computed: {
-    isAbleToDelete() {
-      return this.confirmDeleteText === 'delete'
+      enableDeleteButton() {
+        return !this.isAbleToDelete || this.processOfExclusion
+      }
     },
 
-    enableDeleteButton() {
-      return !this.isAbleToDelete || this.processOfExclusion
-    }
-  },
-
-  watch: {
-    informationForDeletion: {
-      deep: true,
-      handler() {
-        this.confirmDeleteText = ''
-        this.deleteDialogVisible = this.informationForDeletion.deleteDialogVisible
+    watch: {
+      informationForDeletion: {
+        deep: true,
+        handler() {
+          this.confirmDeleteText = ''
+          this.deleteDialogVisible = this.informationForDeletion.deleteDialogVisible
+        }
       }
     }
   }
-}
 </script>

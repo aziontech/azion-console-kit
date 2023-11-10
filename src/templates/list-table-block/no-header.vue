@@ -114,7 +114,10 @@
         </Column>
       </DataTable>
     </div>
-    <DeleteDialog :informationForDeletion="informationForDeletion" @successfullyDeleted="updatedTable()" />
+    <DeleteDialog
+      :informationForDeletion="informationForDeletion"
+      @successfullyDeleted="updatedTable()"
+    />
   </div>
 </template>
 
