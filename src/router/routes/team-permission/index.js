@@ -42,6 +42,27 @@ export const teamsPermissionRoutes = {
           }
         ]
       }
+    },
+    {
+      path: 'edit/:id',
+      name: 'edit-teams-permission',
+      component: () => import('@views/TeamsPermissions/EditView.vue'),
+      props: {
+        editTeamPermissionService: TeamPermissionService.editTeamPermissionService,
+        loadTeamPermissionService: TeamPermissionService.loadTeamPermissionService,
+        listPermissionService: TeamPermissionService.listPermissionService
+      },
+      meta: {
+        breadCrumbs: [
+          {
+            label: 'Teams Permessions',
+            to: '/teams-permission'
+          },
+          {
+            label: 'Edit Teams Permissions'
+          }
+        ]
+      }
     }
   ]
 }

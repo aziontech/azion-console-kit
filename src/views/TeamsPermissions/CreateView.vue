@@ -1,8 +1,9 @@
 <template>
   <CreateFormBlock
-    pageTitle="Create Variables"
+    pageTitle="Create Teams Permissions"
     :createService="props.createTeamPermissionsService"
     :formData="values"
+    :formMeta="meta"
     :isValid="meta.valid"
     :cleanFormCallback="resetForm"
   >
@@ -16,8 +17,8 @@
             <label
               for="name"
               class="text-color text-base font-medium"
-              >Name *</label
-            >
+              >Name *
+            </label>
             <InputText
               placeholder="Name"
               v-bind="name"

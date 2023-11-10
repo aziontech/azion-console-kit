@@ -8,17 +8,17 @@
       <div
         class="surface-card surface-border border max-w-md w-full p-6 md:p-10 rounded-md flex-col gap-6 flex"
       >
-        <div class="text-xl md:text-2xl font-medium">Real Time Manager</div>
+        <div class="text-xl md:text-2xl font-medium">Real-Time Manager</div>
         <div class="flex flex-col gap-2">
           <label
             for="email"
             class="font-semibold text-sm"
-            >E-mail</label
+            >Email</label
           >
           <InputText
             v-bind="email"
             id="email"
-            placeholder="Type your e-mail"
+            placeholder="example@email.com"
             type="email"
             class="w-full"
             :class="{ 'p-invalid': errors.email }"
@@ -29,7 +29,7 @@
         <PrimeButton
           class="w-full flex-row-reverse"
           type="button"
-          label="Proceed"
+          label="Next"
           :loading="isProccedButtonLoading"
           severity="secondary"
           :disabled="errors.email || !email.value"
@@ -62,7 +62,7 @@
         <div>Don't have an account?</div>
         <PrimeButton
           link
-          label="Create one now"
+          label="Create One"
         ></PrimeButton>
       </div>
     </div>
@@ -75,7 +75,7 @@
       <div
         class="surface-card surface-border border max-w-md w-full p-6 md:p-10 rounded-md flex-col gap-6 flex"
       >
-        <div class="text-xl md:text-2xl font-medium">Real Time Manager</div>
+        <div class="text-xl md:text-2xl font-medium">Real-Time Manager</div>
         <div class="flex items-center gap-2">
           <PrimeButton
             class="w-7 h-7"
@@ -98,7 +98,7 @@
               v-model="password"
               id="password"
               class="w-full"
-              placeholder="Type your password"
+              placeholder=""
               :class="{ 'p-invalid': errorPassword }"
               :feedback="false"
               v-tooltip.top="{ value: errorPassword, showDelay: 200 }"
@@ -116,14 +116,14 @@
           <PrimeButton
             link
             class="p-0"
-            label="Forgot my password"
+            label="Forgot Password?"
             @click="$emit('goToForgotPassword', true)"
           ></PrimeButton>
         </div>
         <PrimeButton
           class="w-full flex-row-reverse"
           :loading="isButtonLoading"
-          label="Sign in"
+          label="Sign In"
           severity="secondary"
           type="submit"
           :disabled="errorPassword || !password"
@@ -134,7 +134,7 @@
         <div>Don't have an account?</div>
         <PrimeButton
           link
-          label="Create one now"
+          label="Create One"
         ></PrimeButton>
       </div>
     </div>
@@ -198,14 +198,14 @@
   const emailValidationSchema = yup.object({
     email: yup
       .string()
-      .required('E-mail is a required field')
-      .matches(emailValidateRegex, 'Invalid email address')
+      .required('Email is a required field')
+      .matches(emailValidateRegex, 'Email not associated with any account.')
   })
   const passwordValidationSchema = yup.object({
     password: yup
       .string()
       .required('Password is a required field')
-      .min(8, 'Password is too short - should be 8 chars minimum.')
+      .min(8, 'Password is too short. It should have at least 8 characters.')
   })
 
   const { defineInputBinds, errors } = useForm({
@@ -240,7 +240,18 @@
         captcha: 'default'
       }
       await props.authenticationLoginService(loginData)
-      const { user_tracking_info: userInfo } = await verify()
+      const { user_tracking_info: userInfo, twoFactor, trustedDevice } = await verify()
+
+      if (twoFactor && !trustedDevice) {
+        router.push('/mfa/setup')
+        return
+      }
+
+      if (trustedDevice) {
+        router.push('/mfa/authentication')
+        return
+      }
+
       await switchClientAccount(userInfo)
     } catch {
       hasRequestErrorMessage.value = new UserNotFoundError().message

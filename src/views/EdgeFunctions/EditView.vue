@@ -5,6 +5,7 @@
     :loadService="props.loadEdgeFunctionsService"
     :initialDataSetter="setValues"
     :formData="values"
+    :formMeta="meta"
     :isValid="meta.valid"
     :cleanFormCallback="resetForm"
     :hasTabs="true"

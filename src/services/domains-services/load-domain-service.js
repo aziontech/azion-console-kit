@@ -24,6 +24,7 @@ const adapt = (httpResponse) => {
     edgeApplication: body?.edge_application_id,
     digitalCertificate: body?.digital_certificate_id,
     mtlsIsEnabled: body?.mtls_is_enabled,
+    active: body.is_active,
     mtlsVerification: body?.mtls_verification,
     mtlsTrustedCertificate: body?.mtls_trusted_ca_certificate_id || undefined
   }

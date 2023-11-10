@@ -15,18 +15,7 @@ export const createPersonalToken = async (payload) => {
     }
   })
 
-  httpResponse = await adapt(httpResponse)
-
   return parseHttpResponse(httpResponse)
-}
-
-const adapt = async (httpResponse) => {
-  const parsedData = httpResponse.body
-
-  return {
-    body: parsedData,
-    statusCode: httpResponse.statusCode
-  }
 }
 
 /**
@@ -39,8 +28,11 @@ const adapt = async (httpResponse) => {
 const parseHttpResponse = (httpResponse) => {
   switch (httpResponse.statusCode) {
     case 201:
-      httpResponse.message = 'Your personal token has been created'
-      return httpResponse
+      const result = {
+        message: 'Your personal token has been created',
+        token: httpResponse.body.key
+      }
+      return result
     case 401:
       throw new Errors.InvalidApiTokenError().message
     case 403:

@@ -8,9 +8,14 @@
       <slot name="form" />
       <slot name="raw-form" />
     </form>
+    <DialogUnsavedBlock
+      v-model:visible="dialogUnsaved"
+      @leavePage="leavePage"
+      @keepEditing="keepEditing"
+    />
     <ActionBarBlockGoBack v-if="buttonBackList" />
     <ActionBarTemplate
-      @cancel="navigateBack"
+      @cancel="openDialogUnsaved"
       @submit="validateAndSubmit"
       :loading="isLoading"
       :submitDisabled="!isValid"
@@ -19,6 +24,7 @@
   </div>
 </template>
 <script>
+  import DialogUnsavedBlock from '@/templates/dialog-unsaved-block'
   import ActionBarTemplate from '@/templates/action-bar-block'
   import PageHeadingBlock from '@/templates/page-heading-block'
   import ActionBarBlockGoBack from '@/templates/action-bar-block/go-back'
@@ -28,11 +34,13 @@
     components: {
       ActionBarTemplate,
       PageHeadingBlock,
-      ActionBarBlockGoBack
+      ActionBarBlockGoBack,
+      DialogUnsavedBlock
     },
     emits: ['on-response'],
     data: () => ({
-      isLoading: false
+      isLoading: false,
+      dialogUnsaved: false
     }),
     props: {
       pageTitle: {
@@ -67,12 +75,30 @@
         type: Boolean,
         default: true
       },
-      feedbackDefault: {
+      disabledFeedback: {
         type: Boolean,
         default: false
+      },
+      formMeta: {
+        type: Object,
+        required: true
       }
     },
     methods: {
+      leavePage() {
+        this.dialogUnsaved = false
+        this.navigateBack()
+      },
+      keepEditing() {
+        this.dialogUnsaved = false
+      },
+      openDialogUnsaved() {
+        if (this.formMeta.touched) {
+          this.dialogUnsaved = true
+          return
+        }
+        this.navigateBack()
+      },
       navigateBack() {
         this.$router.go(-1)
       },
@@ -85,12 +111,10 @@
           life: life
         })
       },
-      showFeedback(feedback) {
-        if (this.feedbackDefault) {
-          this.showToast('success', feedback.message)
-          return
+      showFeedback(feedback = 'created successfully') {
+        if (!this.disabledFeedback) {
+          this.showToast('success', feedback)
         }
-        this.showToast('success', feedback ?? 'created successfully')
       },
       handleSuccess(feedback) {
         this.cleanFormCallback()

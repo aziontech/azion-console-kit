@@ -12,6 +12,7 @@
   />
   <EmptyResultsBlock
     v-else
+    pageTitle="Personal Tokens"
     title="No personal tokens added"
     description="Create your first personal token."
     createButtonLabel="Add personal token"
