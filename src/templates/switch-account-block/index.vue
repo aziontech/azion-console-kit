@@ -1,11 +1,10 @@
-<!-- eslint-disable vuejs-accessibility/click-events-have-key-events -->
 <template>
   <div>
     <PrimeButton
       v-if="visibleButton"
       class="font-semibold h-8 w-auto border-header hidden md:flex gap-2 items-center bg-header hover:bg-header-button-hover"
       size="small"
-      :loading="!account?.name"
+      :loading="!account?.accountTypeName"
       :pt="{
         label: { class: '!text-white' },
         icon: { class: '!text-white' }
