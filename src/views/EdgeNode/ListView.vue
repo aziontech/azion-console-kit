@@ -1,20 +1,26 @@
 <template>
-  <ListTableBlock
-    :listService="listEdgeNodeService"
-    :columns="getColumns"
-    :deleteService="deleteEdgeNodeService"
-    pageTitle="Edge Nodes"
-    addButtonLabel=""
-    editPagePath="edge-node/edit"
-  />
+  <div class="w-full">
+    <ListTableBlock
+      :listService="listEdgeNodeService"
+      :columns="getColumns"
+      :deleteService="deleteEdgeNodeService"
+      @authorizeEdgeNode="authorize = $event.authorize"
+      pageTitle="Edge Nodes"
+      addButtonLabel=""
+      editPagePath="edge-node/edit"
+    />
+  </div>
+  <Authorize :authorize="authorize" />
 </template>
 <script>
-  import ListTableBlock from '@/templates/list-table-block'
+  import ListTableBlock from '@/templates/list-table-block/with-authorize'
+  import Authorize from './Authorize'
 
   export default {
     name: 'edge-node-view',
     components: {
-      ListTableBlock
+      ListTableBlock,
+      Authorize
     },
     props: {
       listEdgeNodeService: {
@@ -24,6 +30,11 @@
       deleteEdgeNodeService: {
         required: true,
         type: Function
+      }
+    },
+    data() {
+      return {
+        authorize: {}
       }
     },
     computed: {

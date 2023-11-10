@@ -4,6 +4,7 @@
     :createService="props.createEdgeFunctionsService"
     :formData="values"
     :isValid="meta.valid"
+    :formMeta="meta"
     :cleanFormCallback="resetForm"
     :hasTabs="true"
   >
@@ -37,10 +38,36 @@
               </div>
             </template>
           </FormHorizontal>
+
+          <FormHorizontal
+            class="mt-8"
+            title="Language"
+            description="It is currently not possible to choose a language to code a new Edge function."
+          >
+            <template #inputs>
+              <div class="flex flex-col w-full sm:max-w-lg gap-2">
+                <label
+                  for="language"
+                  class="text-color text-base font-medium"
+                  >Language</label
+                >
+                <span class="p-input-icon-right">
+                  <i class="pi pi-lock text-[var(--text-color-secondary)]" />
+                  <InputText
+                    :value="languageText"
+                    id="language"
+                    type="text"
+                    class="w-full"
+                    readonly
+                  />
+                </span>
+              </div>
+            </template>
+          </FormHorizontal>
         </TabPanel>
         <TabPanel header="Code">
           <div class="flex flex-col md:flex-row mt-8">
-            <div class="w-full lg:w-1/2 lg:pr-8">
+            <div class="w-full lg:w-2/3 lg:pr-8">
               <vue-monaco-editor
                 v-model:value="code"
                 language="javascript"
@@ -75,7 +102,7 @@
         </TabPanel>
         <TabPanel header="Arguments">
           <div class="flex flex-col lg:flex-row mt-8">
-            <div class="w-full lg:w-1/2 pr-8">
+            <div class="w-full lg:w-2/3 pr-8">
               <vue-monaco-editor
                 v-model:value="jsonArgs"
                 language="json"
@@ -122,6 +149,7 @@
   import TabPanel from 'primevue/tabpanel'
   import InputText from 'primevue/inputtext'
   import Divider from 'primevue/divider'
+  import HelloWorldSample from '@/helpers/edge-function-hello-world'
   import { ref } from 'vue'
 
   // Props
@@ -134,6 +162,7 @@
 
   // Data
   const ARGS_INITIAL_STATE = '{}'
+  const languageText = 'JavaScript'
   const editorOptions = {
     tabSize: 2,
     formatOnPaste: true
@@ -209,7 +238,7 @@
       name: '',
       active: true,
       language: 'javascript',
-      code: `'Type your code here...'`,
+      code: HelloWorldSample,
       jsonArgs: ARGS_INITIAL_STATE
     }
   })

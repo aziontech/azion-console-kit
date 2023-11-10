@@ -1,29 +1,29 @@
 <template>
-  <div class="w-full flex-col justify-center items-start inline-flex pt-4 px-8">
+  <div class="w-full flex-col justify-center items-start inline-flex pt-4 px-8 max-md:px-3">
     <Breadcrumb
       :home="generateHomeBreadCrumb"
       :model="generateBreadCrumbs"
-      class="-ml-1.5"
+      class="-ml-1.5 overflow-auto w-full"
     />
-    <div class="flex w-full py-4 items-end justify-between">
+    <div class="flex flex-wrap w-full py-4 items-end justify-between">
       <div
         class="flex flex-col gap-3 w-full"
         v-if="pageTitle || description"
       >
         <div
-          class="text-[var(--text-color)] text-3xl font-medium leading-9"
+          class="text-[var(--text-color)] text-3xl font-medium leading-9 max-md:text-2xl"
           v-if="pageTitle"
         >
           {{ pageTitle }}
         </div>
         <div
-          class="text-[var(--text-color-secondary)] text-lg font-normal leading-7"
+          class="text-[var(--text-color-secondary)] text-lg font-normal leading-7 max-md:text-base"
           v-if="description"
         >
           {{ description }}
         </div>
       </div>
-      <div class="ml-auto w-full h-9 items-end flex justify-end">
+      <div class="ml-auto w-full items-end flex justify-end">
         <slot></slot>
       </div>
     </div>

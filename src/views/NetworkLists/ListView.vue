@@ -37,15 +37,15 @@
           },
           {
             field: 'listType',
-            header: 'List type'
+            header: 'List Type'
           },
           {
             field: 'lastEditor',
-            header: 'Last editor'
+            header: 'Last Editor'
           },
           {
             field: 'lastModified',
-            header: 'Last modified'
+            header: 'Last Modified'
           }
         ]
       }

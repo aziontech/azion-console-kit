@@ -2,32 +2,45 @@
   <div class="flex flex-col min-h-[calc(100vh-120px)]">
     <PageHeadingBlock :pageTitle="pageTitle" />
     <form
-      class="w-full grow px-8 flex flex-col gap-8 mb-5"
+      class="w-full grow px-8 flex flex-col gap-8 mb-5 max-md:px-3 max-md:gap-6"
       :class="{ 'py-4': !hasTabs, 'pb-4': hasTabs }"
     >
       <slot name="form" />
       <slot name="raw-form" />
     </form>
+    <DialogUnsavedBlock
+      v-model:visible="dialogUnsaved"
+      @leavePage="leavePage"
+      @keepEditing="keepEditing"
+    />
+    <ActionBarBlockGoBack v-if="buttonBackList" />
     <ActionBarTemplate
-      @cancel="handleCancel"
+      @cancel="openDialogUnsaved"
       @submit="validateAndSubmit"
       :loading="isLoading"
       :submitDisabled="!isValid"
+      v-else
     />
   </div>
 </template>
 <script>
+  import DialogUnsavedBlock from '@/templates/dialog-unsaved-block'
   import ActionBarTemplate from '@/templates/action-bar-block'
   import PageHeadingBlock from '@/templates/page-heading-block'
+  import ActionBarBlockGoBack from '@/templates/action-bar-block/go-back'
 
   export default {
     name: 'create-form-block',
     components: {
       ActionBarTemplate,
-      PageHeadingBlock
+      PageHeadingBlock,
+      ActionBarBlockGoBack,
+      DialogUnsavedBlock
     },
+    emits: ['on-response'],
     data: () => ({
-      isLoading: false
+      isLoading: false,
+      dialogUnsaved: false
     }),
     props: {
       pageTitle: {
@@ -48,39 +61,74 @@
       },
       cleanFormCallback: {
         type: Function,
-        required: true
+        default: () => ({})
       },
       hasTabs: {
         type: Boolean,
         required: false
+      },
+      buttonBackList: {
+        type: Boolean,
+        default: false
+      },
+      callback: {
+        type: Boolean,
+        default: true
+      },
+      disabledFeedback: {
+        type: Boolean,
+        default: false
+      },
+      formMeta: {
+        type: Object,
+        required: true
       }
     },
     methods: {
-      handleCancel() {
+      leavePage() {
+        this.dialogUnsaved = false
+        this.navigateBack()
+      },
+      keepEditing() {
+        this.dialogUnsaved = false
+      },
+      openDialogUnsaved() {
+        if (this.formMeta.touched) {
+          this.dialogUnsaved = true
+          return
+        }
+        this.navigateBack()
+      },
+      navigateBack() {
         this.$router.go(-1)
       },
-      goBackToList() {
-        this.$router.go(-1)
+      showToast(severity, summary, life = 10000) {
+        if (!summary) return
+        this.$toast.add({
+          closable: false,
+          severity: severity,
+          summary: summary,
+          life: life
+        })
+      },
+      showFeedback(feedback = 'created successfully') {
+        if (!this.disabledFeedback) {
+          this.showToast('success', feedback)
+        }
+      },
+      handleSuccess(feedback) {
+        this.cleanFormCallback()
+        this.$emit('on-response', feedback)
+        this.showFeedback(feedback)
+        if (this.callback) this.navigateBack()
       },
       async validateAndSubmit() {
         try {
           this.isLoading = true
           const feedback = await this.createService(this.formData)
-          this.cleanFormCallback()
-          this.$toast.add({
-            closable: false,
-            severity: 'success',
-            summary: feedback ?? 'created successfully',
-            life: 10000
-          })
-          this.goBackToList()
+          this.handleSuccess(feedback)
         } catch (error) {
-          this.$toast.add({
-            closable: false,
-            severity: 'error',
-            summary: error,
-            life: 10000
-          })
+          this.showToast('error', error)
         } finally {
           this.isLoading = false
         }

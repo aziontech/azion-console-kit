@@ -5,6 +5,7 @@
     :loadService="props.loadEdgeFunctionsService"
     :initialDataSetter="setValues"
     :formData="values"
+    :formMeta="meta"
     :isValid="meta.valid"
     :cleanFormCallback="resetForm"
     :hasTabs="true"
@@ -36,6 +37,32 @@
                   class="p-error text-xs font-normal leading-tight"
                   >{{ errors.name }}</small
                 >
+              </div>
+            </template>
+          </FormHorizontal>
+
+          <FormHorizontal
+            class="mt-8"
+            title="Language"
+            description="It is currently not possible to choose a language to code a new Edge function."
+          >
+            <template #inputs>
+              <div class="flex flex-col w-full sm:max-w-lg gap-2">
+                <label
+                  for="language"
+                  class="text-color text-base font-medium"
+                  >Language</label
+                >
+                <span class="p-input-icon-right">
+                  <i class="pi pi-lock text-[var(--text-color-secondary)]" />
+                  <InputText
+                    v-model="languageText"
+                    id="language"
+                    type="text"
+                    class="w-full text-[var(--text-color-secondary)]"
+                    readonly
+                  />
+                </span>
               </div>
             </template>
           </FormHorizontal>
@@ -126,7 +153,7 @@
   import TabPanel from 'primevue/tabpanel'
   import InputText from 'primevue/inputtext'
   import Divider from 'primevue/divider'
-  import { ref, watch } from 'vue'
+  import { computed, ref, watch } from 'vue'
 
   // Props
   const props = defineProps({
@@ -197,6 +224,12 @@
     )
   }
 
+  const getLanguageText = (language) => {
+    if (language === 'javascript') return 'JavaScript'
+    if (language === 'lua') return 'Lua'
+    return language
+  }
+
   // Validations
 
   const validationSchema = yup.object({
@@ -217,6 +250,7 @@
 
   const { value: jsonArgs, setValue: setArgs } = useField('jsonArgs')
   const { value: code } = useField('code')
+  const { value: language } = useField('language')
 
   // Watchs
 
@@ -226,5 +260,9 @@
       postPreviewUpdates()
       initialLoad = true
     }
+  })
+
+  const languageText = computed(() => {
+    return getLanguageText(language.value)
   })
 </script>

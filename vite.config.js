@@ -62,9 +62,14 @@ export default defineConfig({
         rewrite: (path) => path.replace(/^\/api\/account-details/, '')
       },
       '/api/teams': {
-        target: 'https://stage-iam.azion.com/iam/api/teams/',
+        target: 'https://stage-iam.azion.com/iam/api/teams',
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/api\/teams/, '')
+      },
+      '/api/permissions': {
+        target: 'https://stage-iam.azion.com/iam/api/permissions',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/api\/permissions/, '')
       },
       '/api/users': {
         target: 'https://stage-iam.azion.com/iam/api',
@@ -76,7 +81,7 @@ export default defineConfig({
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/api\/credentials/, '')
       },
-      '^/api/(account|user|token|switch-account|password)': {
+      '^/api/(account|user|token|switch-account|password|totp)': {
         target: 'https://stage-sso.azion.com/api',
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/api/, ''),

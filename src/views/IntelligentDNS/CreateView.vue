@@ -3,6 +3,7 @@
     pageTitle="Create Intelligent DNS"
     :createService="props.createIntelligentDNSService"
     :formData="values"
+    :formMeta="meta"
     :isValid="meta.valid"
     :cleanFormCallback="resetForm"
   >

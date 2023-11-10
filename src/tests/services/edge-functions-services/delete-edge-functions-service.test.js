@@ -1,5 +1,6 @@
 import { AxiosHttpClientAdapter } from '@/services/axios/AxiosHttpClientAdapter'
 import { deleteEdgeFunctionsService } from '@/services/edge-functions-services'
+import * as Errors from '@/services/axios/errors'
 import { describe, expect, it, vi } from 'vitest'
 
 const makeSut = () => {
@@ -36,6 +37,46 @@ describe('EdgeFunctionsServices', () => {
 
     const feedbackMessage = await sut(mockId)
 
-    expect(feedbackMessage).toBe('Resource successfully deleted')
+    expect(feedbackMessage).toBe('Edge function successfully deleted')
   })
+
+  it.each([
+    {
+      statusCode: 400,
+      expectedError: new Errors.NotFoundError().message
+    },
+    {
+      statusCode: 401,
+      expectedError: new Errors.InvalidApiTokenError().message
+    },
+    {
+      statusCode: 403,
+      expectedError: new Errors.PermissionError().message
+    },
+    {
+      statusCode: 404,
+      expectedError: new Errors.NotFoundError().message
+    },
+    {
+      statusCode: 500,
+      expectedError: new Errors.InternalServerError().message
+    },
+    {
+      statusCode: 'unmappedStatusCode',
+      expectedError: new Errors.UnexpectedError().message
+    }
+  ])(
+    'should throw when request fails with statusCode $statusCode',
+    async ({ statusCode, expectedError }) => {
+      vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
+        statusCode
+      })
+      const stubId = '123'
+      const { sut } = makeSut()
+
+      const response = sut(stubId)
+
+      expect(response).rejects.toBe(expectedError)
+    }
+  )
 })

@@ -1,10 +1,11 @@
 <template>
   <EditFormBlock
     pageTitle="Edit Variable"
-    :editService="this.editVariableService"
-    :loadService="this.loadVariableService"
+    :editService="props.editVariableService"
+    :loadService="props.loadVariableService"
     :initialDataSetter="setValues"
     :isValid="meta.valid"
+    :formMeta="meta"
     :formData="values"
   >
     <template #form>
@@ -53,77 +54,45 @@
               >{{ errors.value }}</small
             >
           </div>
-
-          <Card
-            :pt="{
-              body: { class: 'p-4' },
-              title: { class: 'flex justify-between items-center text-base m-0 font-medium' },
-              subtitle: {
-                class: 'text-sm font-normal text-color-secondary m-0 pr-0 md:pr-[2.5rem]'
-              }
-            }"
-          >
-            <template #title>
-              <span class="text-base">Secret</span>
-              <InputSwitch
-                v-bind="secret"
-                v-model="secret.value"
-                :class="{ 'p-invalid': errors.secret }"
-              />
-            </template>
-            <template #subtitle> Description </template>
-          </Card>
+          <div class="flex gap-3 items-center">
+            <InputSwitch
+              id="secret"
+              v-bind="secret"
+              v-model="secret.value"
+              :class="{ 'p-invalid': errors.secret }"
+            />
+            <label for="secret">Value Secret</label>
+          </div>
         </template>
       </FormHorizontal>
     </template>
   </EditFormBlock>
 </template>
 
-<script>
+<script setup>
   import EditFormBlock from '@/templates/edit-form-block-new'
   import FormHorizontal from '@/templates/create-form-block-new/form-horizontal'
   import InputText from 'primevue/inputtext'
   import InputSwitch from 'primevue/inputswitch'
-  import Card from 'primevue/card'
   import { useForm } from 'vee-validate'
   import * as yup from 'yup'
 
-  export default {
-    name: 'edit-variable-view',
-    components: {
-      EditFormBlock,
-      InputText,
-      InputSwitch,
-      Card,
-      FormHorizontal
-    },
-    props: {
-      loadVariableService: { type: Function, required: true },
-      editVariableService: { type: Function, required: true }
-    },
-    data: () => {
-      const validationSchema = yup.object({
-        key: yup.string().required(),
-        value: yup.string().required(),
-        secret: yup.boolean().required().default(false)
-      })
-      const { errors, defineInputBinds, meta, values, setValues } = useForm({
-        validationSchema
-      })
+  const props = defineProps({
+    loadVariableService: { type: Function, required: true },
+    editVariableService: { type: Function, required: true }
+  })
 
-      const key = defineInputBinds('key', { validateOnInput: true })
-      const value = defineInputBinds('value', { validateOnInput: true })
-      const secret = defineInputBinds('secret')
+  const validationSchema = yup.object({
+    key: yup.string().required(),
+    value: yup.string().required(),
+    secret: yup.boolean().required().default(false)
+  })
 
-      return {
-        errors,
-        meta,
-        values,
-        key,
-        value,
-        secret,
-        setValues
-      }
-    }
-  }
+  const { errors, defineInputBinds, meta, values, setValues } = useForm({
+    validationSchema
+  })
+
+  const key = defineInputBinds('key', { validateOnInput: true })
+  const value = defineInputBinds('value', { validateOnInput: true })
+  const secret = defineInputBinds('secret')
 </script>

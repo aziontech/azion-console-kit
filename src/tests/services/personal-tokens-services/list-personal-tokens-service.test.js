@@ -69,6 +69,7 @@ describe('PersonalTokensServices', () => {
       {
         id: fixtures.personalTokenMock.uuid,
         scope: 'Global',
+        description: '',
         name: fixtures.personalTokenMock.name,
         created: 'Friday, November 10, 2023',
         expiresAt: 'Sunday, December 10, 2023'

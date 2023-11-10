@@ -5,6 +5,8 @@ import TextWithClipboardColumn from './text-with-clipboard-column.vue'
 import ClickableText from './clickable-text-column.vue'
 import ClickableLink from './clickable-link-column.vue'
 import ClickableTag from './clickable-tag-column.vue'
+import ExpandColumn from './expand-column.vue'
+import ExpandTextColumn from './expand-text-column.vue'
 import Tag from 'primevue/tag'
 
 /**
@@ -26,6 +28,14 @@ import Tag from 'primevue/tag'
  */
 export const columnBuilder = ({ data, columnAppearance, dependencies }) => {
   switch (columnAppearance) {
+    case 'expand-column':
+      return h(ExpandColumn, {
+        value: data
+      })
+    case 'expand-text-column':
+      return h(ExpandTextColumn, {
+        value: data
+      })
     case 'avatar-with-text':
       return h(AvatarWithTextColumn, {
         nameInitial: data.nameInitial,

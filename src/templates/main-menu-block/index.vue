@@ -48,7 +48,9 @@
       </div>
 
       <!-- Search -->
-      <span class="top-0 p-input-icon-left p-input-icon-right hidden lg:flex md:absolute md:my-3 md:ml-[calc(50%-10rem)]">
+      <span
+        class="top-0 p-input-icon-left p-input-icon-right hidden lg:flex md:absolute md:my-3 md:ml-[calc(50%-10rem)]"
+      >
         <i class="pi pi-search text-white" />
         <i class="!top-[32%]">
           <span
@@ -186,7 +188,11 @@
         />
       </div>
     </div>
-    <Logo v-else />
+    <Logo
+      class="cursor-pointer"
+      @click="$router.push({ name: 'login' })"
+      v-else
+    />
   </header>
   <!--Mobile Profile
   -->
@@ -607,7 +613,7 @@
               { label: 'Account Settings', icon: 'pi pi-cog' },
               { label: 'Your Settings', icon: 'pi pi-user' },
               { label: 'Users Management', icon: 'pi pi-users' },
-              { label: 'Team Permissions', icon: 'pi pi-user-edit' },
+              { label: 'Team Permissions', icon: 'pi pi-user-edit', to: '/teams-permession' },
               { label: 'Billing & Subscriptions', icon: 'pi pi-credit-card' },
               { label: 'Credentials', icon: 'pi pi-id-card' },
               { label: 'Activity History', icon: 'pi pi-history', to: '/activity-history' },
@@ -739,7 +745,7 @@
           },
           {
             label: 'Teams Permissions',
-            to: '/teams'
+            to: '/teams-permission'
           }
         ],
         profileMenuSettings: [
