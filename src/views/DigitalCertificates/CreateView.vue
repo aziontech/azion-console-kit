@@ -55,8 +55,8 @@
                 />
               </template>
               <template #subtitle>
-                Check this option to upload a TLS certificate and private key or to
-                generate a CSR to submit to a certificate authority.
+                Check this option to upload a TLS certificate and private key or to generate a CSR
+                to submit to a certificate authority.
               </template>
             </Card>
             <Card
