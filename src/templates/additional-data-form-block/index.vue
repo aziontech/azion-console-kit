@@ -3,255 +3,135 @@
     class="w-full flex flex-col gap-6"
     @submit.prevent="submitForm"
   >
-    <div class="flex flex-col gap-3">
+    <div class="flex flex-col gap-2">
       <label class="font-semibold text-sm">What description best fits your work? </label>
-      <div class="flex flex-wrap gap-2">
-        <PrimeButton
-          outlined
-          class="min-w-fit"
-        >
-          <label
-            for="occupation1"
-            class="mr-2 text-xs"
-            >Developer</label
-          >
+      <div class="flex flex-col gap-3 mb-8">
+        <label
+          class="w-full border-1 rounded-md surface-border font-medium flex align-items-center justify-between p-4 gap-2"
+          >Developer
           <PrimeRadio
             v-model="occupation"
-            inputId="occupation1"
-            name="occupation"
-            value="Developer"
+            value="developer"
           />
-        </PrimeButton>
-        <PrimeButton
-          outlined
-          class="min-w-fit"
-        >
-          <label
-            for="occupation2"
-            class="mr-2 text-xs"
-            >DevOps</label
-          >
+        </label>
+        <label
+          class="w-full border-1 rounded-md surface-border font-medium flex align-items-center justify-between p-4 gap-2"
+          >DevOps
           <PrimeRadio
             v-model="occupation"
-            inputId="occupation2"
-            name="occupation"
-            value="DevOps"
+            value="devops"
           />
-        </PrimeButton>
-        <PrimeButton
-          outlined
-          class="min-w-fit"
-        >
-          <label
-            for="occupation3"
-            class="mr-2 text-xs"
-            >System Admin</label
-          >
+        </label>
+        <label
+          class="w-full border-1 rounded-md surface-border font-medium flex align-items-center justify-between p-4 gap-2"
+          >System Admin
           <PrimeRadio
             v-model="occupation"
-            inputId="occupation3"
-            name="occupation"
-            value="System Admin"
+            value="system_admin"
           />
-        </PrimeButton>
-        <PrimeButton
-          outlined
-          class="min-w-fit"
-        >
-          <label
-            for="occupation4"
-            class="mr-2 text-xs"
-            >Security Analyst</label
-          >
+        </label>
+        <label
+          class="w-full border-1 rounded-md surface-border font-medium flex align-items-center justify-between p-4 gap-2"
+          >Security Analyst
           <PrimeRadio
             v-model="occupation"
-            inputId="occupation4"
-            name="occupation"
-            value="Security Analyst"
+            value="security_analyst"
           />
-        </PrimeButton>
-        <PrimeButton
-          outlined
-          class="min-w-fit"
-        >
-          <label
-            for="occupation5"
-            class="mr-2 text-xs"
-            >Team Lead</label
-          >
+        </label>
+        <label
+          class="w-full border-1 rounded-md surface-border font-medium flex align-items-center justify-between p-4 gap-2"
+          >Team Lead
           <PrimeRadio
             v-model="occupation"
-            inputId="occupation5"
-            name="occupation"
-            value="Team Lead"
+            value="team_lead"
           />
-        </PrimeButton>
-        <PrimeButton
-          outlined
-          class="min-w-fit"
-        >
-          <label
-            for="occupation6"
-            class="mr-2 text-xs"
-            >Other</label
-          >
+        </label>
+        <label
+          class="w-full border-1 rounded-md surface-border font-medium flex align-items-center justify-between p-4 gap-2"
+          >Other
           <PrimeRadio
             v-model="occupation"
-            inputId="occupation6"
-            name="occupation"
-            value="Other"
+            value="other"
           />
-        </PrimeButton>
+        </label>
       </div>
       <label class="font-semibold text-sm">What would you like to build with Azion? </label>
-      <div class="flex flex-wrap gap-2">
-        <PrimeButton
-          outlined
-          class="min-w-fit"
-        >
-          <label
-            for="intention1"
-            class="mr-2 text-xs"
-            >Just a personal project</label
-          >
+      <div class="flex flex-wrap gap-3 mb-8">
+        <label
+          class="w-full border-1 rounded-md surface-border font-medium flex align-items-center justify-between p-4 gap-2"
+          >Just a personal project
           <PrimeRadio
             v-model="intention"
-            inputId="intention1"
-            name="intention"
-            value="Just a personal project"
+            value="personal"
           />
-        </PrimeButton>
-        <PrimeButton
-          outlined
-          class="min-w-fit"
-        >
-          <label
-            for="intention2"
-            class="mr-2 text-xs"
-            >Projects for my company</label
-          >
+        </label>
+        <label
+          class="w-full border-1 rounded-md surface-border font-medium flex align-items-center justify-between p-4 gap-2"
+          >Projects for my company
           <PrimeRadio
             v-model="intention"
-            inputId="intention2"
-            name="intention"
-            value="Projects for my company"
+            value="single_company"
           />
-        </PrimeButton>
-        <PrimeButton
-          outlined
-          class="min-w-fit"
-        >
-          <label
-            for="intention3"
-            class="mr-2 text-xs"
-            >Multiple projects for other companies</label
-          >
+        </label>
+        <label
+          class="w-full border-1 rounded-md surface-border font-medium flex align-items-center justify-between p-4 gap-2"
+          >Multiple projects for other companies
           <PrimeRadio
             v-model="intention"
-            inputId="intention3"
-            name="intention"
-            value="Multiple projects for other companies"
+            value="multiple_projects"
           />
-        </PrimeButton>
-        <PrimeButton
-          outlined
-          class="min-w-fit"
-        >
-          <label
-            for="intention4"
-            class="mr-2 text-xs"
-            >Other</label
-          >
+        </label>
+        <label
+          class="w-full border-1 rounded-md surface-border font-medium flex align-items-center justify-between p-4 gap-2"
+          >Other
           <PrimeRadio
             v-model="intention"
-            inputId="intention4"
-            name="intention"
-            value="Other"
+            value="other"
           />
-        </PrimeButton>
+        </label>
       </div>
       <label class="font-semibold text-sm">What are you building? </label>
-      <div class="flex flex-wrap gap-2">
-        <PrimeButton
-          outlined
-          class="min-w-fit"
-        >
-          <label
-            for="building1"
-            class="mr-2 text-xs"
-            >Web Apps</label
-          >
+      <div class="flex flex-wrap gap-3">
+        <label
+          class="w-full border-1 rounded-md surface-border font-medium flex align-items-center justify-between p-4 gap-2"
+          >Web Apps
           <PrimeRadio
-            v-model="building"
-            inputId="building1"
-            name="building"
-            value="Web Apps"
+            v-model="product"
+            value="web_apps"
           />
-        </PrimeButton>
-        <PrimeButton
-          outlined
-          class="min-w-fit"
-        >
-          <label
-            for="building2"
-            class="mr-2 text-xs"
-            >Mobile Apps</label
-          >
+        </label>
+        <label
+          class="w-full border-1 rounded-md surface-border font-medium flex align-items-center justify-between p-4 gap-2"
+          >Mobile Apps
           <PrimeRadio
-            v-model="building"
-            inputId="building2"
-            name="building"
-            value="Mobile Apps"
+            v-model="product"
+            value="mobile_apps"
           />
-        </PrimeButton>
-        <PrimeButton
-          outlined
-          class="min-w-fit"
-        >
-          <label
-            for="building3"
-            class="mr-2 text-xs"
-            >Static Websites</label
-          >
+        </label>
+        <label
+          class="w-full border-1 rounded-md surface-border font-medium flex align-items-center justify-between p-4 gap-2"
+          >Static Websites
           <PrimeRadio
-            v-model="building"
-            inputId="building3"
-            name="building"
-            value="Static Websites"
+            v-model="product"
+            value="static_websites"
           />
-        </PrimeButton>
-        <PrimeButton
-          outlined
-          class="min-w-fit"
-        >
-          <label
-            for="building4"
-            class="mr-2 text-xs"
-            >Blogs</label
-          >
+        </label>
+        <label
+          class="w-full border-1 rounded-md surface-border font-medium flex align-items-center justify-between p-4 gap-2"
+          >Blogs
           <PrimeRadio
-            v-model="building"
-            inputId="building4"
-            name="building"
-            value="Blogs"
+            v-model="product"
+            value="blogs"
           />
-        </PrimeButton>
-        <PrimeButton
-          outlined
-          class="min-w-fit"
-        >
-          <label
-            for="building5"
-            class="mr-2 text-xs"
-            >Firewall</label
-          >
+        </label>
+        <label
+          class="w-full border-1 rounded-md surface-border font-medium flex align-items-center justify-between p-4 gap-2"
+          >Firewall
           <PrimeRadio
-            v-model="building"
-            inputId="building5"
-            name="building"
-            value="Firewall"
+            v-model="product"
+            value="firewall"
           />
-        </PrimeButton>
+        </label>
       </div>
     </div>
     <PrimeButton
@@ -259,6 +139,7 @@
       type="submit"
       severity="secondary"
       :disabled="!meta.valid"
+      :loading="loading"
     />
   </form>
 </template>
@@ -268,6 +149,7 @@
   import PrimeButton from 'primevue/button'
   import { useForm, useField } from 'vee-validate'
   import * as yup from 'yup'
+  import { ref } from 'vue'
 
   defineOptions({
     name: 'additional-data-form-block'
@@ -283,8 +165,9 @@
 
   const { value: occupation } = useField('occupation')
   const { value: intention } = useField('intention')
-  const { value: building } = useField('building')
+  const { value: product } = useField('building')
 
+  const loading = ref(false)
   const submitForm = () => {
     return values
   }
