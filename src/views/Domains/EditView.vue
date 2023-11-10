@@ -5,6 +5,7 @@
     :loadService="loadDomainService"
     :initialDataSetter="setValues"
     :formData="values"
+    :formMeta="meta"
     :isValid="meta.valid"
     :cleanFormCallback="resetForm"
   >
@@ -30,7 +31,6 @@
               :class="{ 'p-invalid': errors.name }"
               v-tooltip.top="errors.name"
             />
-
             <small
               v-if="errors.name"
               class="p-error text-xs font-normal leading-tight"
@@ -46,20 +46,6 @@
         block access to the application via the Azion domain."
       >
         <template #inputs>
-          <div class="flex flex-col sm:max-w-lg w-full gap-2">
-            <label
-              for="name"
-              class="text-color text-base font-medium"
-              >Domain Address</label
-            >
-            <InputText
-              placeholder="example.com"
-              v-model="domainName.value"
-              id="name"
-              type="text"
-              disabled
-            />
-          </div>
           <div class="flex flex-col w-full sm:max-w-xs gap-2">
             <label
               for="edge_application"
@@ -76,34 +62,13 @@
               class="w-full"
               placeholder="Select an edge application"
             />
-
             <small
               v-if="errors.edgeApplication"
               class="p-error text-xs font-normal leading-tight"
               >{{ errors.edgeApplication }}</small
             >
           </div>
-          <div class="flex flex-col sm:max-w-lg w-full gap-2">
-            <label
-              for="cname"
-              class="text-color text-base font-medium"
-              >CNAME</label
-            >
-            <PrimeTextarea
-              id="cname"
-              :class="{ 'p-invalid': errors.cnames }"
-              v-model="cnames"
-              rows="2"
-              cols="30"
-              class="w-full"
-              v-tooltip.top="errors.cnames"
-            />
-            <small
-              v-if="errors.cnames"
-              class="p-error text-xs font-normal leading-tight"
-              >{{ errors.cnames }}</small
-            >
-          </div>
+
           <Card
             :pt="{
               body: { class: 'p-4' },
@@ -126,6 +91,29 @@
               be blocked.
             </template>
           </Card>
+
+          <div class="flex flex-col sm:max-w-lg w-full gap-2">
+            <label
+              for="cname"
+              class="text-color text-base font-medium"
+              >{{ CNAMELabel }}</label
+            >
+            <PrimeTextarea
+              id="cname"
+              :class="{ 'p-invalid': errors.cnames }"
+              v-model="cnames"
+              rows="2"
+              cols="30"
+              class="w-full"
+              v-tooltip.top="errors.cnames"
+            />
+            <small
+              v-if="errors.cnames"
+              class="p-error text-xs font-normal leading-tight"
+              >{{ errors.cnames }}</small
+            >
+          </div>
+
           <div class="flex flex-col w-full sm:max-w-xs gap-2">
             <label
               for="edge_application"
@@ -150,27 +138,23 @@
         present an authentication protocol to each other."
       >
         <template #inputs>
-          <Card
-            :pt="{
-              body: { class: 'p-4' },
-              title: { class: 'flex justify-between font-medium items-center text-base m-0' },
-              subtitle: {
-                class: 'text-sm font-normal text-color-secondary m-0 pr-0 md:pr-[2.5rem]'
-              }
-            }"
+          <div class="flex gap-3 items-center">
+            <InputSwitch
+              id="mtls"
+              :class="{ 'p-invalid': errors.mtlsIsEnabled }"
+              v-model="mtlsIsEnabled"
+            />
+            <label
+              for="mtls"
+              class="text-base"
+              >Mutual Authentication</label
+            >
+          </div>
+
+          <div
+            v-if="mtlsIsEnabled"
+            class="flex flex-col gap-2"
           >
-            <template #title>
-              <span class="text-base">Mutual Authentication</span>
-              <InputSwitch
-                :class="{ 'p-invalid': errors.mtlsIsEnabled }"
-                v-model="mtlsIsEnabled"
-              />
-            </template>
-            <template #subtitle>
-              Enable mTLS to allow simultaneous mutual authentication between client and server.
-            </template>
-          </Card>
-          <div class="flex flex-col gap-2">
             <label class="text-color text-base font-medium">Verification</label>
             <div class="flex flex-col gap-3">
               <Card
@@ -202,9 +186,7 @@
                 :pt="{
                   body: { class: 'p-4' },
                   title: { class: 'flex justify-between font-medium text-base m-0' },
-                  subtitle: {
-                    class: 'text-sm font-normal text-color-secondary m-0 pr-0 md:pr-[2.5rem]'
-                  }
+                  subtitle: { class: 'text-sm font-normal text-color-secondary m-0 pr-[2.5rem]' }
                 }"
               >
                 <template #title>
@@ -225,7 +207,10 @@
               </Card>
             </div>
           </div>
-          <div class="flex flex-col w-full sm:max-w-xs gap-2">
+          <div
+            v-if="mtlsIsEnabled"
+            class="flex flex-col w-full sm:max-w-xs gap-2"
+          >
             <label class="text-color text-base font-medium">Trusted CA Certificate</label>
             <Dropdown
               :class="{ 'p-invalid': errors.mtlsTrustedCertificate }"
@@ -237,10 +222,30 @@
               placeholder="Select a certificate"
               :disabled="!mtlsIsEnabled"
             />
+            <small class="text-xs font-normal text-color-secondary leading-tight">
+              Mutual Authentification requires a Trusted CA Certificate, add it in Digital
+              Certificate Library.
+            </small>
             <small
               v-if="errors.mtlsTrustedCertificate"
               class="p-error text-xs font-normal leading-tight"
               >{{ errors.mtlsTrustedCertificate }}</small
+            >
+          </div>
+        </template>
+      </form-horizontal>
+
+      <form-horizontal title="Status">
+        <template #inputs>
+          <div class="flex gap-3 items-center">
+            <InputSwitch
+              id="active"
+              v-model="active"
+            />
+            <label
+              for="active"
+              class="text-base"
+              >Active</label
             >
           </div>
         </template>
@@ -310,6 +315,9 @@
       }
     },
     computed: {
+      CNAMELabel() {
+        return this.cnameAccessOnly ? 'CNAME *' : 'CNAME'
+      },
       edgeCertificates() {
         return this.digitalCertificates.filter(
           (certificate) => certificate.type === EDGE_CERTIFICATE
@@ -324,15 +332,21 @@
         return this.edgeApps.map((edgeApp) => ({ name: edgeApp.name, value: edgeApp.id }))
       },
       edgeCertificatesOptions() {
-        const def = [
+        const defaultCertificate = [
           { name: 'Azion (SAN)', value: 0 },
           { name: "Let's Encrypt (BETA)", value: 'lets_encrypt' }
         ]
-        let items = this.edgeCertificates.map((i) => ({ name: i.name, value: i.id }))
-        return [...def, ...items]
+        const parsedCertificates = this.edgeCertificates?.map((certificate) => ({
+          name: certificate.name,
+          value: certificate.id
+        }))
+        return [...defaultCertificate, ...parsedCertificates]
       },
       trustedCACertificatesOptions() {
-        return this.trustedCACertificates.map((i) => ({ name: i.name, value: i.id }))
+        return this.trustedCACertificates.map((certificate) => ({
+          name: certificate.name,
+          value: certificate.id
+        }))
       }
     },
     watch: {
@@ -347,6 +361,7 @@
         id: yup.string().required(),
         name: yup.string().required(),
         domainName: yup.string().required(),
+        active: yup.boolean(),
         cnames: yup
           .string()
           .label('CNAME')
@@ -377,6 +392,7 @@
           cnameAccessOnly: true,
           edgeApplication: null,
           mtlsIsEnabled: false,
+          active: false,
           mtlsVerification: MTLS_VERIFICATION_ENFORCE
         }
       })
@@ -386,6 +402,7 @@
       const { value: edgeApplication } = useField('edgeApplication')
       const { setValue: setEdgeCertificate } = useField('edgeCertificate')
       const { value: mtlsIsEnabled } = useField('mtlsIsEnabled')
+      const { value: active } = useField('active')
       const { value: mtlsVerification } = useField('mtlsVerification')
       const { value: mtlsTrustedCertificate } = useField('mtlsTrustedCertificate')
 
@@ -400,6 +417,7 @@
         edgeApplication,
         setEdgeCertificate,
         mtlsIsEnabled,
+        active,
         mtlsVerification,
         mtlsTrustedCertificate,
         errors,

@@ -8,13 +8,12 @@
       >
         <TabPanel header="Main Settings">
           <EditFormBlock
-            pageTitle="Edit Intelligent DNS"
             :editService="editIntelligentDNSService"
             :loadService="loadIntelligentDNSService"
             :initialDataSetter="setValues"
             :isValid="meta.valid"
             :formData="values"
-            backURL="/intelligent-dns"
+            :formMeta="meta"
           >
             <template #form>
               <FormHorizontal
@@ -80,7 +79,7 @@
             pageTitle="Records"
             addButtonLabel="Add Record"
             createPagePath="records/create"
-            editPagePath="/records/edit"
+            editPagePath="records/edit"
             :columns="recordListColumns"
             :listService="listRecordsServiceIntelligentDNSDecorator"
             :deleteService="deleteRecordsServiceIntelligentDNSDecorator"
@@ -208,7 +207,7 @@
         })
       },
       renderTabCurrentRouter() {
-        if (this.$route.name === 'edit-intelligent-dns-records') {
+        if (this.$route.name === 'intelligent-dns-records') {
           this.activeTab = 1
         } else {
           this.activeTab = 0
@@ -219,7 +218,7 @@
           this.$router.push({ name: 'edit-intelligent-dns', params: { id: this.intelligentDNSID } })
         } else {
           this.$router.push({
-            name: 'edit-intelligent-dns-records',
+            name: 'intelligent-dns-records',
             params: { id: this.intelligentDNSID }
           })
         }

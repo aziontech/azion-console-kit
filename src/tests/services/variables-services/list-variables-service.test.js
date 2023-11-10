@@ -62,6 +62,7 @@ describe('VariablesService', () => {
         id: fixtures.variableMock.uuid,
         key: fixtures.variableMock.key,
         value: {
+          isSecret: fixtures.variableMock.secret,
           content: fixtures.variableMock.value
         },
         lastEditor: fixtures.variableMock.last_editor,

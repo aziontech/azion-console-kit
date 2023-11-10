@@ -5,7 +5,7 @@
     :columns="getColumns"
     pageTitle="Digital Certificates"
     editPagePath="digital-certificates/edit"
-    addButtonLabel="Add Certificate"
+    addButtonLabel="Add"
     createPagePath="digital-certificates/create"
   />
 </template>
@@ -33,7 +33,7 @@
         return [
           {
             field: 'name',
-            header: 'Application Name'
+            header: 'Name'
           },
           {
             field: 'subjectName',
@@ -49,7 +49,7 @@
           },
           {
             field: 'validity',
-            header: 'Validity (not after)'
+            header: 'Expiration Date'
           },
           {
             field: 'status',

@@ -1,13 +1,17 @@
 <template>
   <CreateFormBlock
-    pageTitle="Create Network Lists"
+    pageTitle="Create Network List"
     :createService="createNetworkListService"
     :formData="values"
+    :formMeta="meta"
     :isValid="meta.valid"
     :cleanFormCallback="resetForm"
   >
     <template #form>
-      <FormHorizontal title="Network List">
+      <FormHorizontal
+        title="Network List"
+        description="Create allowlists, blocklists, and even greylists based on IP addresses, geolocation (countries), or Autonomous System Number (ASN) to use with configured rule sets on Rules Engine."
+      >
         <template #inputs>
           <div class="flex flex-col sm:max-w-lg w-full gap-2">
             <label
@@ -16,7 +20,7 @@
               >Name *</label
             >
             <InputText
-              placeholder="Add Network List Name"
+              placeholder="My network list"
               v-bind="name"
               id="name"
               type="text"

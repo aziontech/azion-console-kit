@@ -10,10 +10,10 @@
         removableSort
         :value="data"
         dataKey="id"
-        v-model:filters="this.filters"
-        paginator
+        v-model:filters="filters"
+        :paginator="showPagination"
         :rowsPerPageOptions="[10, 20, 50, 100]"
-        :rows="10"
+        :rows="minimumOfItemsPerPage"
         :globalFilterFields="filterBy"
         :loading="isLoading"
       >
@@ -91,9 +91,9 @@
           <template #body="{ data: rowData }">
             <div class="flex justify-end">
               <PrimeMenu
-                :ref="'menu'"
+                :ref="`menu-${rowData.id}`"
                 id="overlay_menu"
-                v-bind:model="actionOptions()"
+                v-bind:model="actionOptions(rowData)"
                 :popup="true"
               />
               <PrimeButton
@@ -160,6 +160,10 @@
         </Column>
       </DataTable>
     </div>
+    <DeleteDialog
+      :informationForDeletion="informationForDeletion"
+      @successfullyDeleted="updatedTable()"
+    />
   </div>
 </template>
 
@@ -174,6 +178,7 @@
   import PrimeButton from 'primevue/button'
   import { FilterMatchMode } from 'primevue/api'
   import PageHeadingBlock from '@/templates/page-heading-block'
+  import DeleteDialog from './dialog/delete-dialog'
 
   export default {
     name: 'list-table-block',
@@ -187,7 +192,8 @@
       Skeleton,
       Listbox,
       OverlayPanel,
-      PageHeadingBlock
+      PageHeadingBlock,
+      DeleteDialog
     },
     data: () => ({
       selectedId: null,
@@ -197,7 +203,9 @@
       isLoading: false,
       showColumnSelector: false,
       data: [],
-      selectedColumns: []
+      selectedColumns: [],
+      minimumOfItemsPerPage: 10,
+      informationForDeletion: {}
     }),
     props: {
       columns: {
@@ -221,7 +229,6 @@
       },
       editPagePath: {
         type: String,
-        required: true,
         default: () => '/'
       },
       addButtonLabel: {
@@ -234,13 +241,20 @@
         type: Function
       },
       deleteService: {
-        required: true,
         type: Function
+      },
+      visibleEditAction: {
+        type: Boolean,
+        default: true
       },
       reorderableRows: {
         required: false,
         type: Boolean,
         default: false
+      },
+      rowActions: {
+        type: Array,
+        default: () => []
       }
     },
     async created() {
@@ -250,6 +264,9 @@
     computed: {
       filterBy() {
         return this.columns.map((item) => item.field)
+      },
+      showPagination() {
+        return this.data.length > this.minimumOfItemsPerPage
       }
     },
     methods: {
@@ -262,19 +279,37 @@
       onRowReorder(event) {
         this.data = event.value
       },
-      actionOptions() {
-        const actionOptions = [
-          {
+      addActionOption(actionOptions, option) {
+        actionOptions.push({
+          ...option
+        })
+      },
+      actionOptions(rowData) {
+        const actionOptions = []
+        if (this.visibleEditAction) {
+          actionOptions.push({
             label: 'Edit',
             icon: 'pi pi-fw pi-pencil',
             command: () => this.editItem()
-          },
-          {
+          })
+        }
+
+        if (this.deleteService) {
+          actionOptions.push({
             label: 'Delete',
             icon: 'pi pi-fw pi-trash',
-            command: () => this.removeItem()
-          }
-        ]
+            command: () => this.openDeleteDialog()
+          })
+        }
+
+        if (this.rowActions && this.rowActions.length > 0) {
+          this.rowActions.forEach((action) => {
+            actionOptions.push({
+              ...action,
+              command: () => action.command(rowData)
+            })
+          })
+        }
 
         return actionOptions
       },
@@ -299,38 +334,23 @@
       },
       toggleActionsMenu(event, selectedId) {
         this.selectedId = selectedId
-        this.$refs.menu.toggle(event)
+        this.$refs[`menu-${selectedId}`].toggle(event)
       },
       editItem() {
         this.$router.push({ path: `${this.editPagePath}/${this.selectedId}` })
       },
-      async removeItem() {
-        let toastConfig = {
-          closable: false,
-          severity: 'success',
-          summary: '',
-          life: 10000
+      openDeleteDialog() {
+        this.informationForDeletion = {
+          title: this.pageTitle,
+          selectedID: this.selectedId,
+          deleteService: this.deleteService,
+          deleteDialogVisible: true,
+          rerender: Math.random()
         }
-        try {
-          this.$toast.add({
-            closable: false,
-            severity: 'info',
-            summary: 'Processing request',
-            life: 5000
-          })
-          const feedback = await this.deleteService(this.selectedId)
-          toastConfig.summary = feedback ?? 'Deleted successfully'
-          this.data = this.data.filter((item) => item.id !== this.selectedId)
-        } catch (error) {
-          toastConfig = {
-            closable: false,
-            severity: 'error',
-            summary: error,
-            life: 10000
-          }
-        } finally {
-          this.$toast.add(toastConfig)
-        }
+      },
+      updatedTable() {
+        this.data = this.data.filter((item) => item.id !== this.selectedId)
+        this.$forceUpdate()
       }
     },
     watch: {

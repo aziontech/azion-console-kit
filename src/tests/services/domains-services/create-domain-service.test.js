@@ -7,10 +7,13 @@ const fixtures = {
   domainMock: {
     cnameAccessOnly: false,
     cnames: '',
+    active: false,
+    edgeCertificate: 123321,
     edgeApplication: 1695294281,
     mtlsIsEnabled: false,
     mtlsVerification: 'enforce',
-    name: 'new dsds'
+    name: 'space X',
+    mtlsTrustedCertificate: 'mtls-certf-mock'
   }
 }
 
@@ -37,11 +40,13 @@ describe('DomainsServices', () => {
       body: {
         name: fixtures.domainMock.name,
         cname_access_only: fixtures.domainMock.cnameAccessOnly,
+        digital_certificate_id: fixtures.domainMock.edgeCertificate,
         cnames: [],
+        is_active: fixtures.domainMock.active,
         is_mtls_enabled: fixtures.domainMock.mtlsIsEnabled,
         mtls_verification: fixtures.domainMock.mtlsVerification,
         edge_application_id: fixtures.domainMock.edgeApplication,
-        mtls_trusted_ca_certificate_id: undefined
+        mtls_trusted_ca_certificate_id: fixtures.domainMock.mtlsTrustedCertificate
       }
     })
   })

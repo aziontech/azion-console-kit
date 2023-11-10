@@ -8,9 +8,9 @@
         :value="data"
         dataKey="id"
         v-model:filters="this.filters"
-        paginator
-        :rowsPerPageOptions="[5, 10, 20, 50, 100]"
-        :rows="5"
+        :paginator="showPagination"
+        :rowsPerPageOptions="[10, 20, 50, 100]"
+        :rows="minimumOfItemsPerPage"
         :globalFilterFields="filterBy"
         :loading="isLoading"
       >
@@ -114,6 +114,10 @@
         </Column>
       </DataTable>
     </div>
+    <DeleteDialog
+      :informationForDeletion="informationForDeletion"
+      @successfullyDeleted="updatedTable()"
+    />
   </div>
 </template>
 
@@ -125,6 +129,7 @@
   import Skeleton from 'primevue/skeleton'
   import PrimeButton from 'primevue/button'
   import { FilterMatchMode } from 'primevue/api'
+  import DeleteDialog from './dialog/delete-dialog'
 
   export default {
     name: 'list-table-block',
@@ -134,7 +139,8 @@
       InputText,
       PrimeButton,
       PrimeMenu,
-      Skeleton
+      Skeleton,
+      DeleteDialog
     },
     data: () => ({
       showActionsMenu: false,
@@ -143,7 +149,9 @@
         global: { value: '', matchMode: FilterMatchMode.CONTAINS }
       },
       isLoading: false,
-      data: []
+      data: [],
+      minimumOfItemsPerPage: 10,
+      informationForDeletion: {}
     }),
     props: {
       columns: {
@@ -195,6 +203,9 @@
     computed: {
       filterBy() {
         return this.columns.map((item) => item.field)
+      },
+      showPagination() {
+        return this.data.length > this.minimumOfItemsPerPage
       }
     },
     methods: {
@@ -208,7 +219,7 @@
           {
             label: 'Delete',
             icon: 'pi pi-fw pi-trash',
-            command: () => this.removeItem()
+            command: () => this.openDeleteDialog()
           }
         ]
         if (this.authorizeNode && showAuthorize !== 'Authorized') {
@@ -249,33 +260,18 @@
       authorizeEdgeNode() {
         this.$emit('authorize', this.selectedId)
       },
-      async removeItem() {
-        let toastConfig = {
-          closable: false,
-          severity: 'success',
-          summary: '',
-          life: 10000
+      openDeleteDialog() {
+        this.informationForDeletion = {
+          title: this.pageTitle,
+          selectedID: this.selectedId,
+          deleteService: this.deleteService,
+          deleteDialogVisible: true,
+          rerender: Math.random()
         }
-        try {
-          this.$toast.add({
-            closable: false,
-            severity: 'info',
-            summary: 'Processing request',
-            life: 5000
-          })
-          const feedback = await this.deleteService(this.selectedId)
-          toastConfig.summary = feedback ?? 'Deleted successfully'
-          this.data = this.data.filter((item) => item.id !== this.selectedId)
-        } catch (error) {
-          toastConfig = {
-            closable: false,
-            severity: 'error',
-            summary: error,
-            life: 10000
-          }
-        } finally {
-          this.$toast.add(toastConfig)
-        }
+      },
+      updatedTable() {
+        this.data = this.data.filter((item) => item.id !== this.selectedId)
+        this.$forceUpdate()
       }
     }
   }

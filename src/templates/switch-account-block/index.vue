@@ -113,7 +113,7 @@
           :columns="columns"
           :headerFilter="filterSwitch"
           @onSelectedRow="onSelectedAccount"
-          description="Type your account name to filter results."
+          description="Type the account name to filter results."
         >
           <template #headerFilters="{ filter, applyFilter }">
             <div class="flex flex-wrap justify-between gap-2 w-full rounded">
@@ -123,7 +123,7 @@
                   class="md:w-20rem max-sm:w-full"
                   v-model="filter.textSnippet"
                   @keyup.enter="applyFilter()"
-                  placeholder="Search"
+                  placeholder="Search by name or ID"
                 />
               </span>
 

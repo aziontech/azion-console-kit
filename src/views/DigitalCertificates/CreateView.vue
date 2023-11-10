@@ -3,13 +3,16 @@
     pageTitle="Create Digital Certificate"
     :createService="createServiceBySelectedType"
     :formData="values"
+    :formMeta="meta"
     :isValid="meta.valid"
     :cleanFormCallback="resetForm"
   >
     <template #form>
       <FormHorizontal
         title="General"
-        description="Espaço livre para descrição e instruções de preenchimento. Esse conteúdo deve ser criado pensando tanto em funcionalidade quanto em em alinhamento e estética. Devemos sempre criar os blocos conforme o contexto, cuidando sempre para não ter blocos muito longos."
+        description="Bring a TLS X.509 digital certificate and private key obtained
+        from a certificate authority or a Trusted CA for mTLS authentication.
+        As an alternative, generate a Certificate Signing Request (CSR) with Azion and submit it to a certificate authority."
       >
         <template #inputs>
           <div class="flex flex-col sm:max-w-lg w-full gap-2">
@@ -19,7 +22,7 @@
               >Name *</label
             >
             <InputText
-              placeholder="Insert the Digital Certificate name"
+              placeholder="My digital certificate"
               v-bind="digitalCertificateName"
               type="text"
               id="name"
@@ -51,6 +54,10 @@
                   :value="certificateTypes.EDGE_CERTIFICATE"
                 />
               </template>
+              <template #subtitle>
+                Check this option to upload a TLS certificate and private key or to
+                generate a CSR to submit to a certificate authority.
+              </template>
             </Card>
             <Card
               :pt="{
@@ -70,13 +77,15 @@
                   :value="certificateTypes.TRUSTED"
                 />
               </template>
+              <template #subtitle> Check this option to upload an mTLS certificate. </template>
             </Card>
           </div>
         </template>
       </FormHorizontal>
       <FormHorizontal
         title="Edge Certificate Type"
-        description="Espaço livre para descrição e instruções de preenchimento. Esse conteúdo deve ser criado pensando tanto em funcionalidade quanto em em alinhamento e estética. Devemos sempre criar os blocos conforme o contexto, cuidando sempre para não ter blocos muito longos."
+        description="Choose between uploading a digital certificate and private key or generating
+        a Certificate Signing Request to submit to a certificate authority."
         v-if="certificateType === certificateTypes.EDGE_CERTIFICATE"
       >
         <template #inputs>
@@ -91,7 +100,7 @@
               }"
             >
               <template #title>
-                <span class="text-base">Upload my certificate and private key</span>
+                <span class="text-base">Upload Certificate and Private Key</span>
                 <RadioButton
                   v-model="createCertificateType"
                   inputId="createCertificateType1"
@@ -110,7 +119,7 @@
               }"
             >
               <template #title>
-                <span class="text-base">Generate CSR and private key with Azion</span>
+                <span class="text-base">Generate CSR and Private Key with Azion</span>
                 <RadioButton
                   v-model="createCertificateType"
                   inputId="createCertificateType2"
@@ -127,17 +136,18 @@
           createCertificateType === edgeCertificateTypes.UPLOAD &&
           certificateType === certificateTypes.EDGE_CERTIFICATE
         "
-        title="Use my certificate and private key"
-        description="To upload your Digital Certificate to Azion servers, copy and paste your certificate and private key inside the fields below."
+        title="Upload Certificate and Private Key"
+        description="To upload a digital certificate, copy and paste the certificate and private key codes in the respective fields,
+        including the begin and end tags."
       >
         <template #inputs>
           <div class="flex flex-col sm:max-w-lg w-full gap-2">
-            <label>Certificate:</label>
+            <label>Certificate *</label>
             <PrimeTextarea
               v-bind="certificate"
               :class="{ 'p-invalid': errors.certificate }"
               v-tooltip.top="{ value: errors.certificate, showDelay: 200 }"
-              placeholder="---BEGIN CERTIFICATE---"
+              placeholder="-----BEGIN CERTIFICATE-----&#10;-----END CERTIFICATE-----"
               rows="5"
               cols="30"
             />
@@ -148,12 +158,12 @@
             >
           </div>
           <div class="flex flex-col sm:max-w-lg w-full gap-2">
-            <label>Private key:</label>
+            <label>Private key *</label>
             <PrimeTextarea
               v-model="privateKey"
               :class="{ 'p-invalid': errors.privateKey }"
               v-tooltip.top="{ value: errors.privateKey, showDelay: 200 }"
-              placeholder="---BEGIN PRIVATE KEY---"
+              placeholder="-----BEGIN PRIVATE KEY-----&#10;-----END PRIVATE KEY-----"
               rows="5"
               cols="30"
             />
@@ -166,8 +176,9 @@
         </template>
       </FormHorizontal>
       <FormHorizontal
-        title="Generating a Certificate Signing Request (CSR) with Azion"
-        description="A Certificate Signing Request (CSR) is one of the first steps towards getting your own SSL/TLS certificate."
+        title="Generate CSR and Private Key with Azion"
+        description="To apply for a digital certificate issued by a certificate authority, a Certificate Signing Request is required.
+        Azion can generate a certificate code to submit to a certificate authority."
         v-if="
           createCertificateType === edgeCertificateTypes.CSR &&
           certificateType === certificateTypes.EDGE_CERTIFICATE
@@ -175,7 +186,7 @@
       >
         <template #inputs>
           <div class="flex flex-col sm:max-w-lg w-full gap-2">
-            <label>Common Name: *</label>
+            <label>Subject Name *</label>
             <InputText
               placeholder="example.com"
               v-bind="common"
@@ -190,8 +201,9 @@
             >
           </div>
           <div class="flex flex-col sm:max-w-lg w-full gap-2">
-            <label>Country / Region: *</label>
+            <label>Country/Region *</label>
             <InputText
+              placeholder="BR"
               v-bind="country"
               type="text"
               :class="{ 'p-invalid': errors.country }"
@@ -204,8 +216,9 @@
             >
           </div>
           <div class="flex flex-col sm:max-w-lg w-full gap-2">
-            <label>State / Province: *</label>
+            <label>State/Province *</label>
             <InputText
+              placeholder="São Paulo"
               v-bind="state"
               type="text"
               :class="{ 'p-invalid': errors.state }"
@@ -218,8 +231,9 @@
             >
           </div>
           <div class="flex flex-col sm:max-w-lg w-full gap-2">
-            <label>City / Locality: *</label>
+            <label>City/Locality *</label>
             <InputText
+              placeholder="São Paulo"
               v-bind="city"
               type="text"
               :class="{ 'p-invalid': errors.city }"
@@ -232,8 +246,9 @@
             >
           </div>
           <div class="flex flex-col sm:max-w-lg w-full gap-2">
-            <label>Organization: *</label>
+            <label>Organization *</label>
             <InputText
+              placeholder="Company Name S.A."
               v-bind="organization"
               type="text"
               :class="{ 'p-invalid': errors.organization }"
@@ -246,8 +261,9 @@
             >
           </div>
           <div class="flex flex-col sm:max-w-lg w-full gap-2">
-            <label>Organization Unit: *</label>
+            <label>Organization Unit *</label>
             <InputText
+              placeholder="IT Department"
               v-bind="organizationUnity"
               type="text"
               :class="{ 'p-invalid': errors.organizationUnity }"
@@ -260,8 +276,9 @@
             >
           </div>
           <div class="flex flex-col sm:max-w-lg w-full gap-2">
-            <label>Email: *</label>
+            <label>Email *</label>
             <InputText
+              placeholder="example@email.com"
               v-bind="email"
               type="text"
               :class="{ 'p-invalid': errors.email }"
@@ -274,7 +291,7 @@
             >
           </div>
           <div class="flex flex-col sm:max-w-lg w-full gap-2">
-            <label>Private Key Type: *</label>
+            <label>Private Key Type</label>
             <InputText
               v-bind="privateKeyType"
               type="text"
@@ -289,15 +306,12 @@
             >
           </div>
           <div class="flex flex-col sm:max-w-lg w-full gap-2">
-            <label>Subject Alternative Names (SAN):</label>
+            <label>Subject Alternative Names (SAN) </label>
             <PrimeTextarea
               v-bind="subjectAlternativeNames"
               :class="{ 'p-invalid': errors.subjectAlternativeNames }"
               v-tooltip.top="{ value: errors.subjectAlternativeNames, showDelay: 200 }"
-              placeholder="www.example.com
-example.net
-mail.example.com
-support.example.com"
+              placeholder="www.example.com&#10;example.net&#10;mail.example.com&#10;support.example.com"
               rows="5"
               cols="30"
             />
@@ -310,14 +324,13 @@ support.example.com"
         </template>
       </FormHorizontal>
       <FormHorizontal
-        title="Use my Trusted CA Certificate"
-        description="Trusted Certificate Authority Certificate can be used for Mutual Transport Layer Security (mTLS) configuration on Domains. To upload your Trusted CA Certificate to Azion servers, copy your certificate code and
-        paste it inside the field below."
+        title="Upload Trusted CA certificate"
+        description="A Trusted Certificate Authority (CA) certificate can be used for Mutual Transport Layer Security (mTLS) configuration. To upload a Trusted CA Certificate to Azion, paste the certificate code in the respective field."
         v-if="certificateType === certificateTypes.TRUSTED"
       >
         <template #inputs>
           <div class="flex flex-col sm:max-w-lg w-full gap-2">
-            <label>Certificate:</label>
+            <label>Certificate *</label>
             <PrimeTextarea
               v-bind="certificate"
               :class="{ 'p-invalid': errors.certificate }"
@@ -326,7 +339,7 @@ support.example.com"
               rows="5"
               cols="30"
             />
-            <small>Tip: It's possible to include intermediate certificates.</small>
+            <small>Intermediate certificates are accepted.</small>
             <small
               v-if="errors.certificate"
               class="p-error text-xs font-normal leading-tight"
@@ -398,8 +411,8 @@ support.example.com"
         digitalCertificateName: yup.string().required('Name is a required field.'),
 
         // Certificate Choices
-        certificateType: yup.string().required('Certificate Type is required.'),
-        createCertificateType: yup.string().required('Certificate Type is a required field.'),
+        certificateType: yup.string().required('Choose a certificate type.'),
+        createCertificateType: yup.string().required('Choose a certificate type.'),
 
         // Edge Certificate Fields
         certificate: yup.string().when(['createCertificateType', 'certificateType'], {
@@ -429,9 +442,9 @@ support.example.com"
           is: edgeCertificateTypes.CSR,
           then: (schema) =>
             schema
-              .required('Country is a required field.')
-              .max(2, 'Country must be 2 characters.')
-              .min(2, 'Country must be 2 characters.')
+              .required('Country/Region is a required field.')
+              .max(2, 'Country/Region must be a 2-character country code.')
+              .min(2, 'Country/Region must be a 2-character country code.')
         }),
         email: yup.string().when('createCertificateType', {
           is: edgeCertificateTypes.CSR,

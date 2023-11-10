@@ -188,7 +188,11 @@
         />
       </div>
     </div>
-    <Logo v-else />
+    <Logo
+      class="cursor-pointer"
+      @click="$router.push({ name: 'login' })"
+      v-else
+    />
   </header>
   <!--Mobile Profile
   -->
@@ -741,7 +745,13 @@
           },
           {
             label: 'Teams Permissions',
-            to: '/teams-permession'
+            to: '/teams-permission'
+          }
+        ],
+        profileMenuSettings: [
+          {
+            label: 'Your Settings',
+            to: 'list-your-settings'
           },
           {
             label: 'Personal Token',

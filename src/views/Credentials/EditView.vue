@@ -6,6 +6,7 @@
     :initialDataSetter="setValues"
     :formData="values"
     :isValid="meta.valid"
+    :formMeta="meta"
     :cleanFormCallback="resetForm"
   >
     <template #form>
