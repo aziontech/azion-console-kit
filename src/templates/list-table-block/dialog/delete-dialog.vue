@@ -23,18 +23,24 @@
       <Divider class="-ml-5 w-[calc(100%_+_40px)]" />
 
       <div>
-        <div class="flex flex-col gap-2">
+        <div class="flex flex-col sm:max-w-lg w-full gap-2">
           <label
-            class="font-semibold text-sm"
             for="confirm-input"
+            class="font-semibold text-sm"
+            >To confirm, type “delete” in the box below:</label
           >
-            To confirm, type “delete” in the box below:
-          </label>
           <InputText
             id="confirm-input"
             type="text"
-            v-model="confirmDeleteText"
+            v-model="confirmation"
+            :class="{ 'p-invalid': errors.confirmation }"
+            v-tooltip.top="{ value: errors.confirmation, showDelay: 200 }"
           />
+          <small
+            v-if="errors.confirmation"
+            class="p-error text-xs font-normal leading-tight"
+            >{{ errors.confirmation }}</small
+          >
         </div>
       </div>
     </div>
@@ -49,10 +55,12 @@
           @click="cancelDialog()"
         ></PrimeButton>
         <PrimeButton
-          :disabled="enableDeleteButton"
           severity="danger"
           label="Delete"
+          icon-pos="right"
           @click="removeItem()"
+          :icon="calculateLoadIconByLoadingState"
+          :disabled="isDisabled"
         ></PrimeButton>
       </div>
     </template>
@@ -65,6 +73,8 @@
   import Message from 'primevue/message'
   import InputText from 'primevue/inputtext'
   import Divider from 'primevue/divider'
+  import { useField, useForm } from 'vee-validate'
+  import * as yup from 'yup'
 
   export default {
     props: {
@@ -73,7 +83,6 @@
         required: true
       }
     },
-
     components: {
       PrimeButton,
       PrimeDialog,
@@ -81,18 +90,37 @@
       InputText,
       Divider
     },
-
     data() {
       return {
-        deleteDialogVisible: false,
-        confirmDeleteText: '',
-        processOfExclusion: false
+        loading: false,
+        deleteDialogVisible: false
       }
     },
+    setup() {
+      const validationSchema = yup.object({
+        confirmation: yup.string().equals(['delete'], '').required('This is a required field')
+      })
 
+      const { errors, meta, values, resetForm } = useForm({
+        validationSchema,
+        initialValues: {
+          confirmation: ''
+        }
+      })
+
+      const { value: confirmation } = useField('confirmation')
+
+      return {
+        confirmation,
+        errors,
+        meta,
+        values,
+        resetForm
+      }
+    },
     methods: {
       async removeItem() {
-        this.processOfExclusion = true
+        this.loading = true
         let toastConfig = {
           closable: false,
           severity: 'success',
@@ -105,8 +133,8 @@
             this.informationForDeletion.selectedID
           )
           toastConfig.summary = feedback ?? 'Deleted successfully'
-          this.deleteDialogVisible = false
           this.$emit('successfullyDeleted')
+          this.resetForm()
         } catch (error) {
           toastConfig = {
             closable: false,
@@ -115,8 +143,9 @@
             life: 10000
           }
         } finally {
+          this.deleteDialogVisible = false
           this.$toast.add(toastConfig)
-          this.processOfExclusion = false
+          this.loading = false
         }
       },
 
@@ -126,20 +155,17 @@
     },
 
     computed: {
-      isAbleToDelete() {
-        return this.confirmDeleteText === 'delete'
+      calculateLoadIconByLoadingState() {
+        return this.loading ? 'pi pi-spin pi-spinner' : ''
       },
-
-      enableDeleteButton() {
-        return !this.isAbleToDelete || this.processOfExclusion
+      isDisabled() {
+        return !this.meta.valid || this.loading
       }
     },
-
     watch: {
       informationForDeletion: {
         deep: true,
         handler() {
-          this.confirmDeleteText = ''
           this.deleteDialogVisible = this.informationForDeletion.deleteDialogVisible
         }
       }
