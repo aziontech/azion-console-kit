@@ -160,6 +160,10 @@
         </Column>
       </DataTable>
     </div>
+    <DeleteDialog
+      :informationForDeletion="informationForDeletion"
+      @successfullyDeleted="updatedTable()"
+    />
   </div>
 </template>
 
@@ -174,6 +178,7 @@
   import PrimeButton from 'primevue/button'
   import { FilterMatchMode } from 'primevue/api'
   import PageHeadingBlock from '@/templates/page-heading-block'
+  import DeleteDialog from './dialog/delete-dialog'
 
   export default {
     name: 'list-table-block',
@@ -187,7 +192,8 @@
       Skeleton,
       Listbox,
       OverlayPanel,
-      PageHeadingBlock
+      PageHeadingBlock,
+      DeleteDialog
     },
     data: () => ({
       selectedId: null,
@@ -197,7 +203,8 @@
       isLoading: false,
       showColumnSelector: false,
       data: [],
-      selectedColumns: []
+      selectedColumns: [],
+      informationForDeletion: {}
     }),
     props: {
       columns: {
@@ -272,7 +279,7 @@
           {
             label: 'Delete',
             icon: 'pi pi-fw pi-trash',
-            command: () => this.removeItem()
+            command: () => this.openDeleteDialog()
           },
           {
             label: 'Authorize',
@@ -309,27 +316,18 @@
       editItem() {
         this.$router.push({ path: `${this.editPagePath}/${this.selectedId}` })
       },
-      async removeItem() {
-        let toastConfig = {
-          closable: false,
-          severity: 'success',
-          summary: '',
-          life: 10000
+      openDeleteDialog() {
+        this.informationForDeletion = {
+          title: this.pageTitle,
+          selectedID: this.selectedId,
+          deleteService: this.deleteService,
+          deleteDialogVisible: true,
+          rerender: Math.random()
         }
-        try {
-          const feedback = await this.deleteService(this.selectedId)
-          toastConfig.summary = feedback ?? 'Deleted successfully'
-          this.data = this.data.filter((item) => item.id !== this.selectedId)
-        } catch (error) {
-          toastConfig = {
-            closable: false,
-            severity: 'error',
-            summary: error,
-            life: 10000
-          }
-        } finally {
-          this.$toast.add(toastConfig)
-        }
+      },
+      updatedTable() {
+        this.data = this.data.filter((item) => item.id !== this.selectedId)
+        this.$forceUpdate()
       },
       authorize() {
         this.$emit('authorizeEdgeNode', {
