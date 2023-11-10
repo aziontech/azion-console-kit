@@ -34,7 +34,7 @@ describe('MfaServices', () => {
     })
   })
 
-  it('should validate if code not exist', async () => {
+  it('should return error message to an invalid code', async () => {
     vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
       statusCode: 400,
       body: { detail: 'The inputted code is incorrect.' }
@@ -42,11 +42,8 @@ describe('MfaServices', () => {
     const { sut } = makeSut()
     const expectedError = new Error('The inputted code is incorrect.')
 
-    try {
-      await sut(fixtures.mfaToken)
-    } catch (error) {
-      expect(error).toBe(expectedError.message)
-    }
+    const response = sut(fixtures.mfaToken)
+    expect(response).rejects.toThrow(expectedError.message)
   })
 
   it.each([
