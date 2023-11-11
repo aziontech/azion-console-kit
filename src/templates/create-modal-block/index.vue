@@ -1,31 +1,40 @@
 <template>
-  <div class="lg:w-[55rem] sm:w-[85vw] min-h-[32rem] flex flex-col sm:flex-row p-0 sm:p-8 gap-4 sm:gap-6">
+  <div
+    class="lg:w-[55rem] sm:w-[85vw] min-h-[32rem] flex flex-col sm:flex-row p-0 sm:p-8 gap-4 sm:gap-6"
+  >
     <div class="sm:min-w-[12rem]">
-    <Listbox 
-      :options="items"
-      v-model="selectedTab"
-      optionLabel="label"
-      optionValue="value"
-      :pt="{
-        list:{ class:'p-0' }
-      }"
-      @change="changeTab"
-      class="bg-transparent border-none sm:min-w-[12rem] p-0 md:fixed"
-    />
-  </div>
+      <Listbox
+        @change="onMenuChange"
+        v-model="selectedTabControl"
+        :options="items"
+        optionLabel="label"
+        :disabled="isLoading"
+        optionValue="value"
+        :pt="{
+          list: { class: 'p-0' }
+        }"
+        class="bg-transparent border-none sm:min-w-[12rem] p-0 md:fixed"
+      />
+    </div>
     <div
       class="pb-4 h-full ml-0 w-full grid md:grid-cols-2 grid-cols-1 gap-4 animate-pulse"
       v-if="isLoading"
     >
-      <PrimeCard class="w-full p-4"
-        v-for="skeletonItem of 6" :key="skeletonItem"
+      <PrimeCard
+        class="w-full p-4"
+        v-for="skeletonItem of 6"
+        :key="skeletonItem"
       >
         <template #content>
           <div class="flex gap-3.5 flex-col">
             <div class="w-10 h-10 rounded bg-gray-200"></div>
             <div class="flex p-0.5 gap-1 flex-col">
               <div class="bg-gray-200 h-5 w-40 rounded"></div>
-              <div class="bg-gray-200 h-4 w-full rounded" v-for="skeletonLine of 3" :key="skeletonLine"></div>
+              <div
+                class="bg-gray-200 h-4 w-full rounded"
+                v-for="skeletonLine of 3"
+                :key="skeletonLine"
+              ></div>
             </div>
             <div class="bg-gray-200 w-20 h-9 rounded"></div>
           </div>
@@ -37,84 +46,84 @@
       v-else-if="showRecommended"
     >
       <PrimeCard
-          v-for="template in templates"
-          :key="template.id"
-          :pt="{
-            root: 'w-full p-4',
-            body: 'w-full h-full',
-            content: 'h-full',
-          }"
-        >
-          <template #content>
-            <div class="flex flex-col h-full justify-between gap-3.5 items-start">
-              <div class="flex gap-3.5 flex-col">
-                <div class="w-10 h-10 rounded flex justify-center items-center bg-white">
-                  <img
-                    class="rounded"
-                    :src="template.vendor.icon"
-                    alt=""
-                  />
-                </div>
-                <div class="flex p-0.5 flex-col">
-                  <span class="text-color text-base font-medium">
-                    {{ template.name }}
-                  </span>
-                  <span class="text-color-secondary">
-                    {{ template.headline }}
-                  </span>
-                </div>
+        v-for="template in templates"
+        :key="template.id"
+        :pt="{
+          root: 'w-full p-4',
+          body: 'w-full h-full',
+          content: 'h-full'
+        }"
+      >
+        <template #content>
+          <div class="flex flex-col h-full justify-between gap-3.5 items-start">
+            <div class="flex gap-3.5 flex-col">
+              <div class="w-10 h-10 rounded flex justify-center items-center bg-white">
+                <img
+                  class="rounded"
+                  :src="template.vendor.icon"
+                  alt=""
+                />
               </div>
-              <PrimeButton
-                outlined
-                label="Choose"
-              />
+              <div class="flex p-0.5 flex-col">
+                <span class="text-color text-base font-medium">
+                  {{ template.name }}
+                </span>
+                <span class="text-color-secondary">
+                  {{ template.headline }}
+                </span>
+              </div>
             </div>
-          </template>
-        </PrimeCard>
+            <PrimeButton
+              outlined
+              label="Choose"
+            />
+          </div>
+        </template>
+      </PrimeCard>
     </div>
     <div
       class="h-full w-full ml-0 grid md:grid-cols-2 grid-cols-1 gap-4"
       v-else-if="showBrowse"
     >
       <PrimeCard
-          v-for="template in browseTemplates"
-          :key="template.id"
-          :pt="{
-            root: 'w-full p-4',
-            body: 'w-full h-full',
-            content: 'h-full',
-          }"
-        >
-          <template #content>
-            <div class="flex flex-col h-full justify-between gap-3.5 items-start">
-              <div class="flex gap-3.5 flex-col">
-                <div class="w-10 h-10 rounded flex justify-center items-center bg-white">
-                  <img
-                    class="rounded"
-                    :src="template.vendor.icon"
-                    alt=""
-                  />
-                </div>
-                <div class="flex p-0.5 flex-col">
-                  <span class="text-color text-base font-medium">
-                    {{ template.name }}
-                  </span>
-                  <span class="text-color-secondary">
-                    {{ template.headline }}
-                  </span>
-                </div>
+        v-for="template in browseTemplates"
+        :key="template.id"
+        :pt="{
+          root: 'w-full p-4',
+          body: 'w-full h-full',
+          content: 'h-full'
+        }"
+      >
+        <template #content>
+          <div class="flex flex-col h-full justify-between gap-3.5 items-start">
+            <div class="flex gap-3.5 flex-col">
+              <div class="w-10 h-10 rounded flex justify-center items-center bg-white">
+                <img
+                  class="rounded"
+                  :src="template.vendor.icon"
+                  alt=""
+                />
               </div>
-              <PrimeButton
-                outlined
-                label="Choose"
-              />
+              <div class="flex p-0.5 flex-col">
+                <span class="text-color text-base font-medium">
+                  {{ template.name }}
+                </span>
+                <span class="text-color-secondary">
+                  {{ template.headline }}
+                </span>
+              </div>
             </div>
-          </template>
-        </PrimeCard>
+            <PrimeButton
+              outlined
+              label="Choose"
+            />
+          </div>
+        </template>
+      </PrimeCard>
     </div>
     <div
-    class="h-full ml-0 w-full grid md:grid-cols-2 grid-cols-1 gap-4"
-      v-if="showResource"
+      class="h-full ml-0 w-full grid md:grid-cols-2 grid-cols-1 gap-4"
+      v-else-if="showResource"
     >
       <PrimeCard
         v-for="resource in resources"
@@ -147,7 +156,7 @@
 <script>
   import PrimeButton from 'primevue/button'
   import * as MarketplaceService from '@/services/marketplace-services'
-  import Listbox from 'primevue/listbox';
+  import Listbox from 'primevue/listbox'
   import PrimeCard from 'primevue/card'
 
   export default {
@@ -164,9 +173,10 @@
       isLoading: false,
       templates: [],
       browseTemplates: [],
-      selectedTab: 'recommended',
+      selectedTabControl: 'recommended',
+      selectedTab : 'recommended',
       browHeader: 'browse-templates',
-      recommendedHeader: 'recommended-for-you', 
+      recommendedHeader: 'recommended-for-you',
       resources: [
         {
           label: 'Domains',
@@ -242,13 +252,19 @@
       }
     },
     methods: {
-      changeTab() {
-        if( this.selectedTab === 'browse') {
+      onMenuChange(target) {
+        if( target.value === null) {
+          this.selectedTabControl = this.selectedTab
+        }else {
+          this.selectedTab = target.value
+        }
+        if (target.value === 'browse') {
           if (this.browseTemplates.length === 0) {
             this.loadBrowse()
           }
         }
-      },
+      },  
+
       redirect(toLink) {
         this.$router.push(toLink)
         this.$emit('closeModal')

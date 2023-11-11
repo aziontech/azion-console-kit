@@ -527,7 +527,7 @@
     :pt="{
       root: { class: 'h-[80%] flex p-0' },
       headerContent: { class: 'w-full' },
-      mask: { class: 'flex' },
+      mask: { class: 'flex' }
     }"
   >
     <template #header>
@@ -542,7 +542,7 @@
         />
       </div>
     </template>
-    <CreateModalBlock /> 
+    <CreateModalBlock />
   </Sidebar>
   <!-- Notification Menu -->
   <PrimeMenu
@@ -843,7 +843,7 @@
       },
       closeCreateMobileModal() {
         this.showCreateMobile = false
-      }, 
+      },
       openSideBar() {
         this.showSidebar = !this.showSidebar
       },

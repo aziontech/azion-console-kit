@@ -12,21 +12,21 @@ const fixtures = {
       name: 'Azion',
       slug: 'azion',
       url: 'https://azion.com',
-      icon: 'https://azion-images-stage.s3.amazonaws.com/media/1214e.png',
+      icon: 'https://azion-images-stage.s3.amazonaws.com/media/1214e.png'
     },
     category: [
       {
         name: 'Security',
-        slug: 'security',
+        slug: 'security'
       },
       {
         name: 'Performance',
-        slug: 'performance',
+        slug: 'performance'
       },
       {
         name: 'Networking',
-        slug: 'networking',
-      },
+        slug: 'networking'
+      }
     ],
     new_release: true,
     solution_reference_id: '123',
@@ -37,9 +37,9 @@ const fixtures = {
     instance_type: {
       name: 'Edge Function',
       slug: 'edge_function',
-      is_template: false,
-    },
-  }, 
+      is_template: false
+    }
+  }
 }
 
 const makeSut = () => {
@@ -82,12 +82,11 @@ describe('MarketplaceServices', () => {
   it('should parsed correctly each solution record', async () => {
     vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
       statusCode: 200,
-      body: [fixtures.solutionSample] 
+      body: [fixtures.solutionSample]
     })
     const { sut } = makeSut()
 
     const result = await sut({})
-
 
     expect(result).toEqual([
       {
@@ -95,8 +94,8 @@ describe('MarketplaceServices', () => {
         id: fixtures.solutionSample.id,
         name: fixtures.solutionSample.name,
         referenceId: fixtures.solutionSample.solution_reference_id,
-        vendor: fixtures.solutionSample.vendor,
+        vendor: fixtures.solutionSample.vendor
       }
-    ]);
+    ])
   })
 })
