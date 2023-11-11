@@ -174,7 +174,7 @@
       templates: [],
       browseTemplates: [],
       selectedTabControl: 'recommended',
-      selectedTab : 'recommended',
+      selectedTab: 'recommended',
       browHeader: 'browse-templates',
       recommendedHeader: 'recommended-for-you',
       resources: [
@@ -253,9 +253,9 @@
     },
     methods: {
       onMenuChange(target) {
-        if( target.value === null) {
+        if (target.value === null) {
           this.selectedTabControl = this.selectedTab
-        }else {
+        } else {
           this.selectedTab = target.value
         }
         if (target.value === 'browse') {
@@ -263,7 +263,7 @@
             this.loadBrowse()
           }
         }
-      },  
+      },
 
       redirect(toLink) {
         this.$router.push(toLink)
