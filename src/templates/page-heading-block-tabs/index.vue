@@ -1,5 +1,5 @@
 <template>
-  <div class="w-full flex-col justify-center items-start inline-flex pt-4 px-8 max-md:px-3">
+  <div class="w-full flex-col items-start inline-flex pt-4 px-8 max-md:px-3">
     <Breadcrumb
       :home="generateHomeBreadCrumb"
       :model="generateBreadCrumbs"
