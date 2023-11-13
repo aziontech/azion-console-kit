@@ -1,5 +1,5 @@
 <template>
-  <article
+  <div
     class="flex flex-col surface-border border-l w-slide h-full fixed right-0 transform translate-x-full transition-transform duration-300 ease-in-out"
   >
     <!-- Title  -->
@@ -13,25 +13,75 @@
         @click="closeHelpCenter"
       />
     </div>
-    <div
-      class="surface-border border border-dashed rounded-md items-center h-96 ml-6 mr-4 md:mr-8 my-3"
-    >
-      <PrimeButton
-        v-for="(content, i) in mainContent"
-        :key="i"
-        @click="getHtmlArticle(content)"
-        class="text-color text-sm font-medium text-center w-full"
-        link
-      >
-        {{ content }}
-      </PrimeButton>
 
-      <div v-html="articleContent"></div>
+    <!-- Content body -->
+    <div class="h-full overflow-auto">
+      <div class="pl-6 pr-8">
+        <!-- Input Search  -->
+        <div class="mt-6">
+          <span class="p-input-icon-left w-full">
+            <i class="pi pi-search" />
+            <InputText
+              class="w-full"
+              placeholder="Search articles..."
+              v-model="search"
+            />
+          </span>
+        </div>
+
+        <!-- List items -->
+        <ul v-if="!articleContent" class="py-3">
+          <li class="py-2 text-sm font-semibold">
+            <span>Recommended articles</span>
+          </li>
+          <li
+            class="flex items-center justify-between text-sm h-[35px] cursor-pointer hover:opacity-70"
+            v-for="(item, i) in mainContent"
+            :key="i"
+            @click="getHtmlArticle(item)"
+          >
+            <span>{{ item }}</span>
+            <i class="pi pi-chevron-right text-sm"></i>
+          </li>
+        </ul>
+
+        <!-- Article Content -->
+        <div v-if="articleContent" class="pt-6 ">
+          <PrimeButton
+            outlined
+            icon="pi pi-chevron-left"
+            label="Back"
+            @click="backToMenu()"
+          ></PrimeButton>
+
+          <article class="pt-4 prose dark:prose-invert" v-html="articleContent"></article>
+        </div>
+      </div>
+
+      <!-- Menu -->
+      <div class="border-t surface-border">
+        <ul class="pl-6 pr-8 pt-2">
+          <li
+            class="flex items-center justify-between text-sm h-[35px] cursor-pointer hover:opacity-70"
+            v-for="(item, i) in menuItems"
+            :key="i"
+          >
+            <span>{{ item.label }}</span>
+            <i class="pi pi-external-link text-sm"></i>
+          </li>
+
+          <li class="flex items-center gap-2 text-sm h-[35px] cursor-pointer hover:opacity-70">
+            <i class="pi pi-send text-sm"></i>
+            <span>Send Feedback</span>
+          </li>
+        </ul>
+      </div>
     </div>
-  </article>
+  </div>
 </template>
 <script>
   import PrimeButton from 'primevue/button'
+  import InputText from 'primevue/inputtext'
   import { mapActions } from 'pinia'
   import { useHelpCenterStore } from '@/stores/help-center'
   import * as HelpCenterServices from '@/services/help-center-services'
@@ -39,12 +89,19 @@
   export default {
     name: 'SlideIn',
     components: {
-      PrimeButton
+      PrimeButton,
+      InputText
     },
     data() {
       return {
         mainContent: '',
-        articleContent: ''
+        articleContent: '',
+        menuItems: [
+          { label: 'Documentation', link: '' },
+          { label: 'API', link: '' },
+          { label: 'Changelog', link: '' },
+          { label: 'Contact Support', link: '' }
+        ]
       }
     },
     methods: {
@@ -52,9 +109,11 @@
       async getMainContent() {
         const currentPath = this.getCurrentPath()
 
-        this.mainContent = await HelpCenterServices.getHelpCenterDocumentationService({
+        const mainDocumentation = await HelpCenterServices.getHelpCenterDocumentationService({
           url: currentPath
         })
+
+        this.mainContent = mainDocumentation
       },
       async getHtmlArticle(filename) {
         const currentPath = this.getCurrentPath()
@@ -79,6 +138,9 @@
       },
       onRouteChange() {
         this.getMainContent()
+      },
+      backToMenu() {
+        this.articleContent = null
       }
     },
     mounted() {

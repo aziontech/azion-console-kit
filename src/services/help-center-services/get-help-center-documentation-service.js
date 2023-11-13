@@ -2,10 +2,12 @@ import { AxiosHttpClientAdapter, parseHttpResponse } from '../axios/AxiosHttpCli
 import { getDocumentationBaseUrl } from './get-documentation-base-url'
 import { makeGoogleStorageApi } from '../axios/makeGoogleStorageApi'
 import { markdownToHtml } from './markdown-to-html'
+import { useHelpCenterStore } from '@/stores/help-center'
 
-const DEFAULT_DOCUMENT = 'index.md';
-const WELCOME_PATH = '/welcome';
+const DEFAULT_DOCUMENT = 'index.md'
+const WELCOME_PATH = '/welcome'
 
+// PENSAR EM SALVAR O WELCOME NA STORE PARA NAO FAZER REQUESTS TODA VEZ
 const getHelpCenterDocumentationService = async ({ url, filename }) => {
   const baseUrl = getDocumentationBaseUrl('stage')
   const documentUrl = url === '/' ? WELCOME_PATH : getFirstPathSegment(url)
@@ -22,14 +24,25 @@ const getHelpCenterDocumentationService = async ({ url, filename }) => {
 const fetchAndParseDocument = async (documentUrl, documentFilename, baseUrl) => {
   let fullRequestPath = `${documentUrl}/${documentFilename}`
   let httpResponse, responseDocument
+  const store = useHelpCenterStore()
 
   try {
     httpResponse = await fetchDocument(fullRequestPath, baseUrl)
     responseDocument = parseHttpResponse(httpResponse)
   } catch (error) {
-    fullRequestPath = `${WELCOME_PATH}/${documentFilename}`
-    httpResponse = await fetchDocument(fullRequestPath, baseUrl)
-    responseDocument = parseHttpResponse(httpResponse)
+    const welcomeDefaultDocument = store.getWelcomeDefaultDocument
+    console.log(welcomeDefaultDocument)
+    console.log(!!welcomeDefaultDocument)
+
+    responseDocument = store.getWelcomeDefaultDocument
+
+    if (!responseDocument) {
+      fullRequestPath = `${WELCOME_PATH}/${documentFilename}`
+      httpResponse = await fetchDocument(fullRequestPath, baseUrl)
+      responseDocument = parseHttpResponse(httpResponse)
+
+      store.setWelcomeDefaultDocument(responseDocument)
+    }
   }
 
   return responseDocument
@@ -40,8 +53,8 @@ const isMarkdown = (filename) => {
 }
 
 const getFirstPathSegment = (url) => {
-  const pathParts = url.split('/');
-  const firstPartOfPath = '/' + pathParts[1];
+  const pathParts = url.split('/')
+  const firstPartOfPath = '/' + pathParts[1]
 
   return firstPartOfPath
 }

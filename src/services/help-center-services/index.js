@@ -1,3 +1,3 @@
-import { getHelpCenterDocumentationService } from './get-help-center-main-content-service'
+import { getHelpCenterDocumentationService } from './get-help-center-documentation-service'
 
 export { getHelpCenterDocumentationService }

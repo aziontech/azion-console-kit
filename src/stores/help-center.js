@@ -3,7 +3,8 @@ import { defineStore } from 'pinia'
 export const useHelpCenterStore = defineStore({
   id: 'helpCenter',
   state: () => ({
-    isOpen: false
+    isOpen: false,
+    welcomeDefaultDocument: ''
   }),
   actions: {
     toggleHelpCenter() {
@@ -11,6 +12,13 @@ export const useHelpCenterStore = defineStore({
     },
     closeHelpCenter() {
       this.isOpen = false
+    },
+    setWelcomeDefaultDocument(payload) {
+      console.log('payload :', payload);
+      this.welcomeDefaultDocument = payload
     }
-  }
+  },
+  getters: {
+    getWelcomeDefaultDocument: (state) => state.welcomeDefaultDocument,
+  },
 })
