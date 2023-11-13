@@ -23,8 +23,11 @@
           {{ description }}
         </div>
       </div>
-      <div class="ml-auto w-full h-9 items-end flex justify-end">
-        <slot></slot>
+      <div
+        v-if="hasDefaultSlot"
+        class="ml-auto w-full h-9 items-end flex justify-end"
+      >
+        <slot name="default"></slot>
       </div>
     </div>
     <slot name="tabs"></slot>
@@ -89,6 +92,9 @@
       },
       generateBreadCrumbs() {
         return this.$router.currentRoute.value.meta.breadCrumbs ?? []
+      },
+      hasDefaultSlot() {
+        return !!this.$slots.default
       }
     }
   }
