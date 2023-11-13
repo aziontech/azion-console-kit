@@ -99,9 +99,8 @@
         }
         this.navigateBack()
       },
-      navigateBack(ID) {
-        const currentPath = this.$route?.matched[0]?.path
-        this.$router.push({ path: `${currentPath}/edit/${ID}` })
+      navigateBack(redirectURL) {
+        this.$router.push({ path: redirectURL })
       },
       showToast(severity, summary, life = 10000) {
         if (!summary) return
@@ -117,17 +116,17 @@
           this.showToast('success', feedback)
         }
       },
-      handleSuccess(feedback, ID) {
+      handleSuccess(feedback, redirectURL) {
         this.cleanFormCallback()
         this.$emit('on-response', feedback)
         this.showFeedback(feedback)
-        if (this.callback) this.navigateBack(ID)
+        if (this.callback) this.navigateBack(redirectURL)
       },
       async validateAndSubmit() {
         try {
           this.isLoading = true
           const data = await this.createService(this.formData)
-          this.handleSuccess(data.feedback, data.ID)
+          this.handleSuccess(data.feedback, data.redirectURL)
         } catch (error) {
           this.showToast('error', error)
         } finally {

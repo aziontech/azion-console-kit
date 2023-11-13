@@ -22,7 +22,7 @@ export const createVariablesService = async (payload) => {
 const parseHttpResponse = (httpResponse) => {
   switch (httpResponse.statusCode) {
     case 201:
-      return { feedback: 'Your variable has been created', ID: httpResponse.body?.uuid }
+      return { feedback: 'Your variable has been created', redirectURL: `/variables/edit/${httpResponse.body?.uuid}` }
     case 400:
       const apiError = extractApiError(httpResponse)
       throw new Error(apiError).message
