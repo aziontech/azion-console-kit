@@ -1,39 +1,39 @@
 .p-inputnumber-button {
-    color: $secondaryButtonTextColor;
-    background: $secondaryButtonBg;
-    border: $secondaryButtonBorder;
+  color: $secondaryButtonTextColor;
+  background: $secondaryButtonBg;
+  border: $secondaryButtonBorder;
+
+  &:enabled:hover {
+    background: $secondaryButtonHoverBg;
+    color: $secondaryButtonTextHoverColor;
+    border-color: $secondaryButtonHoverBorderColor;
+  }
+
+  &:enabled:focus {
+    box-shadow: $secondaryButtonFocusShadow;
+  }
+
+  &:enabled:active {
+    background: $secondaryButtonActiveBg;
+    color: $secondaryButtonTextActiveColor;
+    border-color: $secondaryButtonActiveBorderColor;
+  }
+
+  &.p-button-outlined {
+    background-color: transparent;
+    color: $secondaryButtonBg;
+    border: $outlinedButtonBorder;
 
     &:enabled:hover {
-        background: $secondaryButtonHoverBg;
-        color: $secondaryButtonTextHoverColor;
-        border-color: $secondaryButtonHoverBorderColor;
-    }
-
-    &:enabled:focus {
-        box-shadow: $secondaryButtonFocusShadow;
+      background: rgba($secondaryButtonBg, $textButtonHoverBgOpacity);
+      color: $secondaryButtonBg;
+      border: $outlinedButtonBorder;
     }
 
     &:enabled:active {
-        background: $secondaryButtonActiveBg;
-        color: $secondaryButtonTextActiveColor;
-        border-color: $secondaryButtonActiveBorderColor;
+      background: rgba($secondaryButtonBg, $textButtonActiveBgOpacity);
+      color: $secondaryButtonBg;
+      border: $outlinedButtonBorder;
     }
-    
-    &.p-button-outlined {
-        background-color: transparent;
-        color: $secondaryButtonBg;
-        border: $outlinedButtonBorder;
-
-        &:enabled:hover {
-            background: rgba($secondaryButtonBg, $textButtonHoverBgOpacity);
-            color: $secondaryButtonBg;
-            border: $outlinedButtonBorder;
-        }
-
-        &:enabled:active {
-            background: rgba($secondaryButtonBg, $textButtonActiveBgOpacity);
-            color: $secondaryButtonBg;
-            border: $outlinedButtonBorder;
-        }
-    }
+  }
 }
