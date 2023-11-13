@@ -100,7 +100,7 @@
 
         <!-- Create Button Mobile -->
         <PrimeButton
-          @click="showCreateModal"
+          @click="showCreateMobileModal"
           icon="pi pi-plus"
           class="h-8 md:hidden text-white border-header"
           size="small"
@@ -514,20 +514,46 @@
   <PrimeDialog
     v-model:visible="showCreate"
     modal
-    header="Create"
+    header="Create something new"
+    :pt="{
+      content: { class: 'p-4 sm:p-0' }
+    }"
     position="center"
     :dismissableMask="true"
     :breakpoints="{ '641px': '90vw' }"
-    :style="{ width: '65vw' }"
   >
     <!-- SLOT WIP -->
-    <div class="surface-border border border-dashed rounded-md flex items-center h-96">
-      <p class="text-color text-sm font-medium text-center w-full">
-        This section is under development.
-      </p>
+    <div>
+      <CreateModalBlock @closeModal="showCreate = false" />
     </div>
   </PrimeDialog>
 
+  <!-- Mobile modal Create -->
+  <Sidebar
+    v-model:visible="showCreateMobile"
+    position="bottom"
+    headerContent="Create something new"
+    :show-close-icon="false"
+    :pt="{
+      root: { class: 'h-[80%] flex p-0' },
+      headerContent: { class: 'w-full' },
+      mask: { class: 'flex' }
+    }"
+  >
+    <template #header>
+      <div class="flex items-center justify-between">
+        <h2>Create something new</h2>
+        <PrimeButton
+          icon="pi pi-times"
+          @click="closeCreateMobileModal"
+          size="small"
+          class="flex-none surface-border text-sm w-8 h-8"
+          text
+        />
+      </div>
+    </template>
+    <CreateModalBlock />
+  </Sidebar>
   <!-- Notification Menu -->
   <PrimeMenu
     ref="menu"
@@ -564,6 +590,7 @@
   import { mapActions, mapState } from 'pinia'
   import { listTypeAccountService } from '@/services/switch-account-services/list-type-account-service'
   import SwitchAccountBlock from '@/templates/switch-account-block'
+  import CreateModalBlock from '@/templates/create-modal-block'
 
   export default {
     name: 'HeaderTemplate',
@@ -579,13 +606,15 @@
       Dropdown,
       Tag,
       MobileLogo,
-      SwitchAccountBlock
+      SwitchAccountBlock,
+      CreateModalBlock
     },
     props: { isLogged: Boolean },
     data() {
       return {
         openSwitchAccount: false,
         showCreate: false,
+        showCreateMobile: false,
         showSearch: false,
         showSidebar: false,
         showProfile: false,
@@ -822,6 +851,12 @@
       },
       showCreateModal() {
         this.showCreate = true
+      },
+      showCreateMobileModal() {
+        this.showCreateMobile = true
+      },
+      closeCreateMobileModal() {
+        this.showCreateMobile = false
       },
       openSideBar() {
         this.showSidebar = !this.showSidebar
