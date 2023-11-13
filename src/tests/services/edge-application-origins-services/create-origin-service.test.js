@@ -67,8 +67,8 @@ describe('EdgeApplicationOriginsServices', () => {
     })
     const { sut } = makeSut()
 
-    const feedbackMessage = await sut(fixtures.originMock, fixtures.edgeApplicationId)
+    const data = await sut(fixtures.originMock, fixtures.edgeApplicationId)
 
-    expect(feedbackMessage).toBe('Resource successfully created')
+    expect(data.feedback).toBe('Your Origin has been created')
   })
 })
