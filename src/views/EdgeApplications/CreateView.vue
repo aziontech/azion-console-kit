@@ -8,209 +8,367 @@
       :cleanFormCallback="resetForm"
     >
       <template #form>
-        <label>Edge Application Name: *</label>
-        <InputText
-          placeholder="Insert the Edge Application Name"
-          v-bind="name"
-          type="text"
-          :class="{ 'p-invalid': errors.name }"
-          v-tooltip.top="{ value: errors.name, showDelay: 200 }"
-        />
-
-        <Divider />
-        <b>Main Settings</b>
-
-        <label>Delivery Protocol</label>
-        <div class="flex flex-wrap gap-3">
-          <div class="flex align-items-center">
-            <RadioButton
-              v-model="deliveryProtocol"
-              inputId="http"
-              name="http"
-              value="http"
+        <FormHorizontal title="General">
+          <template #inputs>
+          <div class="flex flex-col sm:max-w-lg w-full gap-2">
+            <label
+              for="name"
+              class="text-color text-base font-medium"
+              >Edge Application Name *</label
+            >
+            <InputText
+              placeholder="Insert the Edge Application Name"
+              v-bind="name"
+              type="text"
+              :class="{ 'p-invalid': errors.name }"
             />
-            <label class="ml-2">HTTP</label>
+            <small
+              v-if="errors.name"
+              class="p-error text-xs font-normal leading-tight"
+              >{{ errors.name }}</small
+            >
           </div>
-          <div class="flex align-items-center">
-            <RadioButton
-              v-model="deliveryProtocol"
-              inputId="https"
-              name="https"
-              value="http,https"
-            />
-            <label class="ml-2">HTTP & HTTPS</label>
-          </div>
-        </div>
+        </template>
+        </FormHorizontal>
 
-        <label>Port HTTP:</label>
-        <Dropdown
-          :options="HTTP_PORT_LIST_OPTIONS"
-          v-model="httpPort"
-          optionLabel="label"
-          placeholder="Select a port HTTP"
-        />
+        <FormHorizontal title="Main Settings">
+          <template #inputs>
+            <div class="flex flex-col gap-2">
+              <label class="text-color text-base font-medium">Delivery Protocol</label>
+              <div class="flex flex-col gap-3">
+                <Card
+                  :pt="{
+                    body: { class: 'p-4' },
+                    title: { class: 'flex justify-between  text-base m-0 font-medium' },
+                    subtitle: { class: 'text-sm font-normal text-color-secondary m-0 pr-0 md:pr-[2.5rem]' }
+                  }"
+                >
+                  <template #title>
+                    <span class="text-base">HTTP</span>
+                    <RadioButton
+                      v-model="deliveryProtocol"
+                      inputId="http"
+                      name="http"
+                      value="http"
+                    />
+                  </template>
+                </Card>
 
-        <label>Port HTTPS:</label>
-        <Dropdown
-          :options="HTTPS_PORT_LIST_OPTIONS"
-          v-model="httpsPort"
-          optionLabel="label"
-          placeholder="Select a port HTTPS"
-          :disabled="isHttpProtocol"
-        />
+                <Card
+                  :pt="{
+                    body: { class: 'p-4' },
+                    title: { class: 'flex justify-between  text-base m-0 font-medium' },
+                    subtitle: { class: 'text-sm font-normal text-color-secondary m-0 pr-0 md:pr-[2.5rem]' }
+                  }"
+                >
+                  <template #title>
+                    <span class="text-base">HTTP & HTTPS</span>
+                    <RadioButton
+                      v-model="deliveryProtocol"
+                      inputId="https"
+                      name="https"
+                      value="http,https"
+                    />
+                  </template>
+                </Card>
+              </div>
+            </div>
 
-        <label>Minimum TLS version:</label>
-        <Dropdown
-          :options="TLS_VERSIONS_OPTIONS"
-          v-model="minimumTlsVersion"
-          optionLabel="label"
-          placeholder="Select a minimum TLS Version"
-          :disabled="isHttpProtocol"
-        />
+            <div class="flex flex-col w-full sm:max-w-xs gap-2">
+              <label
+                for="port-http"
+                class="text-color text-base font-medium "
+                >Port HTTP</label
+              >
+              <Dropdown
+                :options="HTTP_PORT_LIST_OPTIONS"
+                v-model="httpPort"
+                optionLabel="label"
+                placeholder="Select a port HTTP"
+              />
+            </div>
 
-        <label>Supported Ciphers list:</label>
-        <Dropdown
-          :options="SUPPORTED_LIST_OPTIONS"
-          v-model="supportedVersion"
-          optionLabel="label"
-          placeholder="Select a Supported Ciphers list"
-          :disabled="isHttpProtocol"
-        />
+            <div class="flex flex-col w-full sm:max-w-xs gap-2">
+              <label
+                for="port-https"
+                class="text-color text-base font-medium "
+                >Port HTTPS</label
+              >
+              <Dropdown
+                :options="HTTPS_PORT_LIST_OPTIONS"
+                v-model="httpsPort"
+                optionLabel="label"
+                placeholder="Select a port HTTPS"
+                :disabled="isHttpProtocol"
+              />
+            </div>
 
-        <Divider />
-        <b>Origins</b>
+            <div class="flex flex-col w-full sm:max-w-xs gap-2">
+              <label
+                for="tls-version"
+                class="text-color text-base font-medium "
+                >Minimum TLS version</label
+              >
+              <Dropdown
+                :options="TLS_VERSIONS_OPTIONS"
+                v-model="minimumTlsVersion"
+                optionLabel="label"
+                placeholder="Select a minimum TLS Version"
+                :disabled="isHttpProtocol"
+              />
+            </div>
 
-        <label>Origin Type:</label>
-        <Dropdown
-          :options="ORIGIN_TYPE_LIST_OPTIONS"
-          v-model="originType"
-          optionLabel="label"
-          placeholder="Select a Origin Type"
-        />
+            <div class="flex flex-col w-full sm:max-w-xs gap-2">
+              <label
+                for="ciphers-list"
+                class="text-color text-base font-medium "
+                >Supported Ciphers list</label
+              >
+              <Dropdown
+                :options="SUPPORTED_LIST_OPTIONS"
+                v-model="supportedVersion"
+                optionLabel="label"
+                placeholder="Select a Supported Ciphers list"
+                :disabled="isHttpProtocol"
+              />
+            </div>
+          </template>
+        </FormHorizontal>
 
-        <label>Address: *</label>
-        <InputText
-          id="address"
-          v-bind="address"
-          :class="{ 'p-invalid': errors.address }"
-          v-tooltip.top="{ value: errors.address, showDelay: 200 }"
-          aria-describedby="address-help"
-        />
+        <FormHorizontal title="Origins">
+          <template #inputs>
+            <div class="flex flex-col w-full sm:max-w-xs gap-2">
+              <label
+                for="origin-type"
+                class="text-color text-base font-medium "
+                >Origin Type</label
+              >
+              <Dropdown
+                :options="ORIGIN_TYPE_LIST_OPTIONS"
+                v-model="originType"
+                optionLabel="label"
+                placeholder="Select a Origin Type"
+              />
+            </div>
 
-        <label>Origin Protocol Policy</label>
+            <div class="flex flex-col sm:max-w-lg w-full gap-2">
+              <label
+                for="address"
+                class="text-color text-base font-medium"
+                >Address *</label
+              >
+              <InputText
+                id="address"
+                v-bind="address"
+                :class="{ 'p-invalid': errors.address }"
+                aria-describedby="address-help"
+              />
+              <small
+                v-if="errors.address"
+                class="p-error text-xs font-normal leading-tight"
+                >{{ errors.address }}</small
+              >
+            </div>
 
-        <div class="flex flex-wrap gap-3">
-          <div class="flex align-items-center">
-            <RadioButton
-              v-model="originProtocolPolicy"
-              inputId="preserve"
-              name="preserve"
-              value="preserve"
-            />
-            <label class="ml-2">Preserve HTTP/HTTPS protocol</label>
-          </div>
-          <div class="flex align-items-center">
-            <RadioButton
-              v-model="originProtocolPolicy"
-              inputId="http"
-              name="http"
-              value="http"
-            />
-            <label class="ml-2">Enforce HTTP</label>
-          </div>
-          <div class="flex align-items-center">
-            <RadioButton
-              v-model="originProtocolPolicy"
-              inputId="https"
-              name="https"
-              value="https"
-            />
-            <label class="ml-2">Enforce HTTPS</label>
-          </div>
-        </div>
+            <div class="flex flex-col gap-2">
+              <label class="text-color text-base font-medium">Origin Protocol Policy</label>
+              <div class="flex flex-col gap-3">
+                <Card
+                  :pt="{
+                    body: { class: 'p-4' },
+                    title: { class: 'flex justify-between  text-base m-0 font-medium' },
+                    subtitle: { class: 'text-sm font-normal text-color-secondary m-0 pr-0 md:pr-[2.5rem]' }
+                  }"
+                >
+                  <template #title>
+                    <span class="text-base">Preserve HTTP/HTTPS protocol</span>
+                    <RadioButton
+                      v-model="originProtocolPolicy"
+                      inputId="preserve"
+                      name="preserve"
+                      value="preserve"
+                    />
+                  </template>
+                </Card>
 
-        <label>Host Header: *</label>
-        <InputText
-          id="hostHeader"
-          v-bind="hostHeader"
-          :class="{ 'p-invalid': errors.hostHeader }"
-          v-tooltip.top="{ value: errors.hostHeader, showDelay: 200 }"
-          aria-describedby="hostHeader-help"
-        />
+                <Card
+                  :pt="{
+                    body: { class: 'p-4' },
+                    title: { class: 'flex justify-between  text-base m-0 font-medium' },
+                    subtitle: { class: 'text-sm font-normal text-color-secondary m-0 pr-0 md:pr-[2.5rem]' }
+                  }"
+                >
+                  <template #title>
+                    <span class="text-base">Enforce HTTP</span>
+                    <RadioButton
+                      v-model="originProtocolPolicy"
+                      inputId="http"
+                      name="http"
+                      value="http"
+                    />
+                  </template>
+                </Card>
 
-        <Divider />
-        <b>Cache Settings</b>
+                <Card
+                  :pt="{
+                    body: { class: 'p-4' },
+                    title: { class: 'flex justify-between  text-base m-0 font-medium' },
+                    subtitle: { class: 'text-sm font-normal text-color-secondary m-0 pr-0 md:pr-[2.5rem]' }
+                  }"
+                >
+                  <template #title>
+                    <span class="text-base">Enforce HTTPS</span>
+                    <RadioButton
+                      v-model="originProtocolPolicy"
+                      inputId="https"
+                      name="https"
+                      value="https"
+                    />
+                  </template>
+                </Card>
+              </div>
+            </div>
 
-        <label>Browser Cache Settings</label>
+            <div class="flex flex-col sm:max-w-lg w-full gap-2">
+              <label
+                for="host-header"
+                class="text-color text-base font-medium"
+                >Host Header *</label
+              >
+              <InputText
+                id="hostHeader"
+                v-bind="hostHeader"
+                :class="{ 'p-invalid': errors.hostHeader }"
+                aria-describedby="hostHeader-help"
+              />
+              <small
+                v-if="errors.hostHeader"
+                class="p-error text-xs font-normal leading-tight"
+                >{{ errors.hostHeader }}</small
+              >
+            </div>
+          </template>
+        </FormHorizontal>
 
-        <div class="flex flex-wrap gap-3">
-          <div class="flex align-items-center">
-            <RadioButton
-              v-model="browserCacheSettings"
-              inputId="honor"
-              name="honor"
-              value="honor"
-            />
-            <label class="ml-2">Honor Origin Cache Headers</label>
-          </div>
-          <div class="flex align-items-center">
-            <RadioButton
-              v-model="browserCacheSettings"
-              inputId="override"
-              name="override"
-              value="override"
-            />
-            <label class="ml-2">Override Cache Settings</label>
-          </div>
-        </div>
+        <FormHorizontal title="Cache Settings">
+          <template #inputs>
+            <div class="flex flex-col gap-2">
+              <label class="text-color text-base font-medium">Browser Cache Settings</label>
+              <div class="flex flex-col gap-3">
+                <Card
+                  :pt="{
+                    body: { class: 'p-4' },
+                    title: { class: 'flex justify-between  text-base m-0 font-medium' },
+                    subtitle: { class: 'text-sm font-normal text-color-secondary m-0 pr-0 md:pr-[2.5rem]' }
+                  }"
+                >
+                  <template #title>
+                    <span class="text-base">Honor Origin Cache Headers</span>
+                    <RadioButton
+                      v-model="browserCacheSettings"
+                      inputId="honor"
+                      name="honor"
+                      value="honor"
+                    />
+                  </template>
+                </Card>
 
-        <label>Maximum TTL (seconds):</label>
-        <InputText
-          id="browserCacheSettingsMaximumTtl"
-          v-bind="browserCacheSettingsMaximumTtl"
-          :class="{ 'p-invalid': errors.browserCacheSettingsMaximumTtl }"
-          v-tooltip.top="{ value: errors.browserCacheSettingsMaximumTtl, showDelay: 200 }"
-          aria-describedby="browserCacheSettingsMaximumTtl-help"
-          :disabled="isCacheTypeHonor"
-        />
+                <Card
+                  :pt="{
+                    body: { class: 'p-4' },
+                    title: { class: 'flex justify-between  text-base m-0 font-medium' },
+                    subtitle: { class: 'text-sm font-normal text-color-secondary m-0 pr-0 md:pr-[2.5rem]' }
+                  }"
+                >
+                  <template #title>
+                    <span class="text-base">Override Cache Settings</span>
+                    <RadioButton
+                      v-model="browserCacheSettings"
+                      inputId="override"
+                      name="override"
+                      value="override"
+                    />
+                  </template>
+                </Card>
+              </div>
+            </div>
 
-        <label>CDN Cache Settings</label>
-        <div class="flex flex-wrap gap-3">
-          <div class="flex align-items-center">
-            <RadioButton
-              v-model="cdnCacheSettings"
-              inputId="honor"
-              name="honor"
-              value="honor"
-            />
-            <label class="ml-2">Honor Origin Cache Settings</label>
-          </div>
-          <div class="flex align-items-center">
-            <RadioButton
-              v-model="cdnCacheSettings"
-              inputId="override"
-              name="override"
-              value="override"
-            />
-            <label class="ml-2">Override Cache Settings</label>
-          </div>
-        </div>
+            <div class="flex flex-col sm:max-w-lg w-full gap-2">
+              <label
+                for="maximun-ttl-seconds"
+                class="text-color text-base font-medium"
+                >Maximum TTL (seconds)</label
+              >
+              <InputText
+                id="browserCacheSettingsMaximumTtl"
+                v-bind="browserCacheSettingsMaximumTtl"
+                aria-describedby="browserCacheSettingsMaximumTtl-help"
+                :disabled="isCacheTypeHonor"
+              />
+            </div>
 
-        <label>Default TTL (seconds):</label>
-        <InputText
-          id="cdnCacheSettingsMaximumTtl"
-          v-bind="cdnCacheSettingsMaximumTtl"
-          :class="{ 'p-invalid': errors.cdnCacheSettingsMaximumTtl }"
-          v-tooltip.top="{ value: errors.cdnCacheSettingsMaximumTtl, showDelay: 200 }"
-          aria-describedby="cdnCacheSettingsMaximumTtl-help"
-        />
+            <div class="flex flex-col gap-2">
+              <label class="text-color text-base font-medium">CDN Cache Settings</label>
+              <div class="flex flex-col gap-3">
+                <Card
+                  :pt="{
+                    body: { class: 'p-4' },
+                    title: { class: 'flex justify-between  text-base m-0 font-medium' },
+                    subtitle: { class: 'text-sm font-normal text-color-secondary m-0 pr-0 md:pr-[2.5rem]' }
+                  }"
+                >
+                  <template #title>
+                    <span class="text-base">Honor Origin Cache Settings</span>
+                    <RadioButton
+                      v-model="cdnCacheSettings"
+                      inputId="honor"
+                      name="honor"
+                      value="honor"
+                    />
+                  </template>
+                </Card>
+
+                <Card
+                  :pt="{
+                    body: { class: 'p-4' },
+                    title: { class: 'flex justify-between  text-base m-0 font-medium' },
+                    subtitle: { class: 'text-sm font-normal text-color-secondary m-0 pr-0 md:pr-[2.5rem]' }
+                  }"
+                >
+                  <template #title>
+                    <span class="text-base">Override Cache Settings</span>
+                    <RadioButton
+                      v-model="cdnCacheSettings"
+                      inputId="override"
+                      name="override"
+                      value="override"
+                    />
+                  </template>
+                </Card>
+              </div>
+            </div>
+
+            <div class="flex flex-col sm:max-w-lg w-full gap-2">
+              <label
+                for="default-ttl-seconds"
+                class="text-color text-base font-medium"
+                >Default TTL (seconds)</label
+              >
+              <InputText
+                id="cdnCacheSettingsMaximumTtl"
+                v-bind="cdnCacheSettingsMaximumTtl"
+                aria-describedby="cdnCacheSettingsMaximumTtl-help"
+              />
+            </div>
+          </template>
+        </FormHorizontal>
       </template>
     </CreateFormBlock>
   </div>
 </template>
 
 <script setup>
-  import CreateFormBlock from '@/templates/create-form-block'
+  import CreateFormBlock from '@/templates/create-form-block-new'
   import { useForm, useField } from 'vee-validate'
   import { computed } from 'vue'
   import * as yup from 'yup'
@@ -218,7 +376,8 @@
   import InputText from 'primevue/inputtext'
   import RadioButton from 'primevue/radiobutton'
   import Dropdown from 'primevue/dropdown'
-  import Divider from 'primevue/divider'
+  import Card from 'primevue/card'
+  import FormHorizontal from '@/templates/create-form-block-new/form-horizontal'
 
   const props = defineProps({
     createEdgeApplicationService: {

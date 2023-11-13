@@ -36,7 +36,7 @@ const adapt = (payload) => {
 const parseHttpResponse = (httpResponse) => {
   switch (httpResponse.statusCode) {
     case 201:
-      return 'Your domain has been created'
+      return { feedback: 'Your domain has been created', ID: httpResponse.body?.results?.id }
     case 400:
       throw new Error(Object.keys(httpResponse.body)[0]).message
     case 409:

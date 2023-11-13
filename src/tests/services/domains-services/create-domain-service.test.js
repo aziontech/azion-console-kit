@@ -59,7 +59,7 @@ describe('DomainsServices', () => {
 
     const feedbackMessage = await sut(fixtures.domainMock)
 
-    expect(feedbackMessage).toBe('Your domain has been created')
+    expect(feedbackMessage.feedback).toBe('Your domain has been created')
   })
 
   it('Should return an API error for an 409 response status', async () => {
