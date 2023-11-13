@@ -10,25 +10,25 @@
       <template #form>
         <FormHorizontal title="General">
           <template #inputs>
-          <div class="flex flex-col sm:max-w-lg w-full gap-2">
-            <label
-              for="name"
-              class="text-color text-base font-medium"
-              >Edge Application Name *</label
-            >
-            <InputText
-              placeholder="Insert the Edge Application Name"
-              v-bind="name"
-              type="text"
-              :class="{ 'p-invalid': errors.name }"
-            />
-            <small
-              v-if="errors.name"
-              class="p-error text-xs font-normal leading-tight"
-              >{{ errors.name }}</small
-            >
-          </div>
-        </template>
+            <div class="flex flex-col sm:max-w-lg w-full gap-2">
+              <label
+                for="name"
+                class="text-color text-base font-medium"
+                >Edge Application Name *</label
+              >
+              <InputText
+                placeholder="Insert the Edge Application Name"
+                v-bind="name"
+                type="text"
+                :class="{ 'p-invalid': errors.name }"
+              />
+              <small
+                v-if="errors.name"
+                class="p-error text-xs font-normal leading-tight"
+                >{{ errors.name }}</small
+              >
+            </div>
+          </template>
         </FormHorizontal>
 
         <FormHorizontal title="Main Settings">
@@ -40,7 +40,9 @@
                   :pt="{
                     body: { class: 'p-4' },
                     title: { class: 'flex justify-between  text-base m-0 font-medium' },
-                    subtitle: { class: 'text-sm font-normal text-color-secondary m-0 pr-0 md:pr-[2.5rem]' }
+                    subtitle: {
+                      class: 'text-sm font-normal text-color-secondary m-0 pr-0 md:pr-[2.5rem]'
+                    }
                   }"
                 >
                   <template #title>
@@ -58,7 +60,9 @@
                   :pt="{
                     body: { class: 'p-4' },
                     title: { class: 'flex justify-between  text-base m-0 font-medium' },
-                    subtitle: { class: 'text-sm font-normal text-color-secondary m-0 pr-0 md:pr-[2.5rem]' }
+                    subtitle: {
+                      class: 'text-sm font-normal text-color-secondary m-0 pr-0 md:pr-[2.5rem]'
+                    }
                   }"
                 >
                   <template #title>
@@ -77,7 +81,7 @@
             <div class="flex flex-col w-full sm:max-w-xs gap-2">
               <label
                 for="port-http"
-                class="text-color text-base font-medium "
+                class="text-color text-base font-medium"
                 >Port HTTP</label
               >
               <Dropdown
@@ -91,7 +95,7 @@
             <div class="flex flex-col w-full sm:max-w-xs gap-2">
               <label
                 for="port-https"
-                class="text-color text-base font-medium "
+                class="text-color text-base font-medium"
                 >Port HTTPS</label
               >
               <Dropdown
@@ -106,7 +110,7 @@
             <div class="flex flex-col w-full sm:max-w-xs gap-2">
               <label
                 for="tls-version"
-                class="text-color text-base font-medium "
+                class="text-color text-base font-medium"
                 >Minimum TLS version</label
               >
               <Dropdown
@@ -121,7 +125,7 @@
             <div class="flex flex-col w-full sm:max-w-xs gap-2">
               <label
                 for="ciphers-list"
-                class="text-color text-base font-medium "
+                class="text-color text-base font-medium"
                 >Supported Ciphers list</label
               >
               <Dropdown
@@ -140,7 +144,7 @@
             <div class="flex flex-col w-full sm:max-w-xs gap-2">
               <label
                 for="origin-type"
-                class="text-color text-base font-medium "
+                class="text-color text-base font-medium"
                 >Origin Type</label
               >
               <Dropdown
@@ -177,7 +181,9 @@
                   :pt="{
                     body: { class: 'p-4' },
                     title: { class: 'flex justify-between  text-base m-0 font-medium' },
-                    subtitle: { class: 'text-sm font-normal text-color-secondary m-0 pr-0 md:pr-[2.5rem]' }
+                    subtitle: {
+                      class: 'text-sm font-normal text-color-secondary m-0 pr-0 md:pr-[2.5rem]'
+                    }
                   }"
                 >
                   <template #title>
@@ -195,7 +201,9 @@
                   :pt="{
                     body: { class: 'p-4' },
                     title: { class: 'flex justify-between  text-base m-0 font-medium' },
-                    subtitle: { class: 'text-sm font-normal text-color-secondary m-0 pr-0 md:pr-[2.5rem]' }
+                    subtitle: {
+                      class: 'text-sm font-normal text-color-secondary m-0 pr-0 md:pr-[2.5rem]'
+                    }
                   }"
                 >
                   <template #title>
@@ -213,7 +221,9 @@
                   :pt="{
                     body: { class: 'p-4' },
                     title: { class: 'flex justify-between  text-base m-0 font-medium' },
-                    subtitle: { class: 'text-sm font-normal text-color-secondary m-0 pr-0 md:pr-[2.5rem]' }
+                    subtitle: {
+                      class: 'text-sm font-normal text-color-secondary m-0 pr-0 md:pr-[2.5rem]'
+                    }
                   }"
                 >
                   <template #title>
@@ -259,7 +269,9 @@
                   :pt="{
                     body: { class: 'p-4' },
                     title: { class: 'flex justify-between  text-base m-0 font-medium' },
-                    subtitle: { class: 'text-sm font-normal text-color-secondary m-0 pr-0 md:pr-[2.5rem]' }
+                    subtitle: {
+                      class: 'text-sm font-normal text-color-secondary m-0 pr-0 md:pr-[2.5rem]'
+                    }
                   }"
                 >
                   <template #title>
@@ -277,7 +289,9 @@
                   :pt="{
                     body: { class: 'p-4' },
                     title: { class: 'flex justify-between  text-base m-0 font-medium' },
-                    subtitle: { class: 'text-sm font-normal text-color-secondary m-0 pr-0 md:pr-[2.5rem]' }
+                    subtitle: {
+                      class: 'text-sm font-normal text-color-secondary m-0 pr-0 md:pr-[2.5rem]'
+                    }
                   }"
                 >
                   <template #title>
@@ -314,7 +328,9 @@
                   :pt="{
                     body: { class: 'p-4' },
                     title: { class: 'flex justify-between  text-base m-0 font-medium' },
-                    subtitle: { class: 'text-sm font-normal text-color-secondary m-0 pr-0 md:pr-[2.5rem]' }
+                    subtitle: {
+                      class: 'text-sm font-normal text-color-secondary m-0 pr-0 md:pr-[2.5rem]'
+                    }
                   }"
                 >
                   <template #title>
@@ -332,7 +348,9 @@
                   :pt="{
                     body: { class: 'p-4' },
                     title: { class: 'flex justify-between  text-base m-0 font-medium' },
-                    subtitle: { class: 'text-sm font-normal text-color-secondary m-0 pr-0 md:pr-[2.5rem]' }
+                    subtitle: {
+                      class: 'text-sm font-normal text-color-secondary m-0 pr-0 md:pr-[2.5rem]'
+                    }
                   }"
                 >
                   <template #title>

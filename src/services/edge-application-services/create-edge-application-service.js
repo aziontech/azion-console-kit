@@ -43,7 +43,10 @@ const adapt = (payload) => {
 const parseHttpResponse = (httpResponse) => {
   switch (httpResponse.statusCode) {
     case 201:
-      return { feedback: 'Your edge application has been created', ID: httpResponse.body?.results?.id }
+      return {
+        feedback: 'Your edge application has been created',
+        ID: httpResponse.body?.results?.id
+      }
     case 400:
       throw new Error(Object.keys(httpResponse.body)[0]).message
     case 409:
