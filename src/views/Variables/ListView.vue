@@ -12,6 +12,7 @@
   />
   <EmptyResultsBlock
     v-else
+    pageTitle="Variables"
     title="No variables added"
     description="Create your first variable."
     createButtonLabel="Add variable"

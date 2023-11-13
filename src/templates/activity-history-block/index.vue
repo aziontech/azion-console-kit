@@ -7,12 +7,12 @@
           <span class="p-input-icon-left">
             <i class="pi pi-search" />
             <InputText
-              placeholder="Search..."
+              placeholder="Search by event"
               v-model="search"
             />
           </span>
           <span class="flex items-center ml-auto text-sm font-normal leading-5">
-            last 30 days records
+            Records from the last 30 days
           </span>
         </div>
       </template>
@@ -43,7 +43,7 @@
           <span
             v-if="noEventsFound"
             class="text-primary"
-            >No events found</span
+            >No events found.</span
           >
           <Timeline
             v-else
@@ -55,12 +55,14 @@
             }"
           >
             <template #marker="{ item }">
-              <span
-                class="flex w-8 h-8 align-items-center justify-content-center text-white border-circle z-1 shadow-1"
-                :style="{ backgroundColor: item.color }"
-              >
-                <i :class="item.icon"></i>
-              </span>
+              <Tag
+                :severity="severityByType[item.type]"
+                :icon="item.icon"
+                :pt="{
+                  root: { class: 'p-2.5 h-8 rounded-full' },
+                  icon: { class: 'mr-0' }
+                }"
+              />
             </template>
             <template #content="{ item }">
               <div class="flex flex-col">
@@ -86,9 +88,12 @@
 <script setup>
   import Timeline from 'primevue/timeline'
   import Card from 'primevue/card'
+  import Tag from 'primevue/tag'
   import InputText from 'primevue/inputtext'
-  import { ref, computed, onMounted } from 'vue'
+  import { ref, computed, onMounted, watch } from 'vue'
   import { useToast } from 'primevue/usetoast'
+
+  const emit = defineEmits(['on-load-data'])
 
   const toast = useToast()
   const search = ref('')
@@ -96,14 +101,14 @@
   const events = ref([])
 
   const iconsMap = ref({
-    created: 'pi pi-plus-circle',
-    deleted: 'pi pi-trash',
-    changed: 'pi pi-pencil'
+    created: 'pi pi-plus-circle text-xs',
+    deleted: 'pi pi-trash text-xs',
+    changed: 'pi pi-pencil text-xs'
   })
-  const colorsMap = ref({
-    created: '#188236',
-    deleted: '#C4160A',
-    changed: '#1E1E1E'
+  const severityByType = ref({
+    created: 'success',
+    deleted: 'danger',
+    changed: 'info'
   })
 
   const props = defineProps({
@@ -125,12 +130,12 @@
     try {
       isLoading.value = true
       const data = await props.listEventsService()
-      events.value = data.map((element) => ({
-        date: element.ts,
-        icon: iconsMap.value[element.type],
-        color: colorsMap.value[element.type],
-        event: element.title,
-        editor: `${element.authorName} (${element.authorEmail})`
+      events.value = data.map((historyEvent) => ({
+        date: historyEvent.ts,
+        icon: iconsMap.value[historyEvent.type],
+        event: historyEvent.title,
+        editor: `${historyEvent.authorName} (${historyEvent.authorEmail})`,
+        type: historyEvent.type
       }))
     } catch (error) {
       toast.add({
@@ -146,5 +151,10 @@
 
   onMounted(async () => {
     await loadData()
+  })
+
+  watch(events, (currentState) => {
+    const hasData = currentState.length > 0
+    emit('on-load-data', hasData)
   })
 </script>

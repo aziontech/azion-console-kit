@@ -7,12 +7,12 @@
       :verifyLoginService="verifyLoginService"
       :refreshLoginService="refreshLoginService"
       :switchAccountLoginService="switchAccountLoginService"
-    ></SignInBlock>
+    />
 
     <ForgotPassword
       v-if="showForgotPasswordStep"
       :sendResetPasswordEmailService="sendResetPasswordEmailService"
-    ></ForgotPassword>
+    />
   </div>
 </template>
 

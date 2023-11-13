@@ -2,12 +2,6 @@
 .p-button {
   font-weight: 500 !important;
 
-  &:enabled:hover {
-  }
-
-  &:enabled:active {
-  }
-
   &.p-button-outlined {
     color: $textColor !important;
 
@@ -56,34 +50,6 @@
     }
   }
 
-  &:focus {
-    @include focused();
-  }
-
-  .p-button-label {
-  }
-
-  .p-button-icon-left {
-  }
-
-  .p-button-icon-right {
-  }
-
-  .p-button-icon-bottom {
-  }
-
-  .p-button-icon-top {
-  }
-
-  .p-badge {
-  }
-
-  &.p-button-raised {
-  }
-
-  &.p-button-rounded {
-  }
-
   &.p-button-icon-only {
     color: $textColor !important;
 
@@ -117,10 +83,6 @@
   }
 
   &.p-button-loading-label-only {
-    .p-button-label {
-      margin-left: $inlineSpacing;
-    }
-
     .p-button-loading-icon {
       margin-right: 0;
     }
@@ -145,192 +107,16 @@
   }
 }
 
-.p-button.p-button-secondary,
-.p-buttonset.p-button-secondary > .p-button,
-.p-splitbutton.p-button-secondary > .p-button {
-  &:enabled:hover {
-  }
-
-  &:enabled:focus {
-  }
-
-  &:enabled:active {
-  }
-
-  &.p-button-outlined {
-    &:enabled:hover {
-    }
-
-    &:enabled:active {
-    }
-  }
-
-  &.p-button-text {
-    &:enabled:hover {
-    }
-
-    &:enabled:active {
-    }
-  }
-}
-
-.p-button.p-button-info,
-.p-buttonset.p-button-info > .p-button,
-.p-splitbutton.p-button-info > .p-button {
-  &:enabled:hover {
-  }
-
-  &:enabled:focus {
-  }
-
-  &:enabled:active {
-  }
-
-  &.p-button-outlined {
-    &:enabled:hover {
-    }
-
-    &:enabled:active {
-    }
-  }
-
-  &.p-button-text {
-    &:enabled:hover {
-    }
-
-    &:enabled:active {
-    }
-  }
-}
-
-.p-button.p-button-success,
-.p-buttonset.p-button-success > .p-button,
-.p-splitbutton.p-button-success > .p-button {
-  &:enabled:hover {
-  }
-
-  &:enabled:focus {
-  }
-
-  &:enabled:active {
-  }
-
-  &.p-button-outlined {
-    &:enabled:hover {
-    }
-
-    &:enabled:active {
-    }
-  }
-
-  &.p-button-text {
-    &:enabled:hover {
-    }
-
-    &:enabled:active {
-    }
-  }
-}
-
-.p-button.p-button-warning,
-.p-buttonset.p-button-warning > .p-button,
-.p-splitbutton.p-button-warning > .p-button {
-  &:enabled:hover {
-  }
-
-  &:enabled:focus {
-  }
-
-  &:enabled:active {
-  }
-
-  &.p-button-outlined {
-    &:enabled:hover {
-    }
-
-    &:enabled:active {
-    }
-  }
-
-  &.p-button-text {
-    &:enabled:hover {
-    }
-
-    &:enabled:active {
-    }
-  }
-}
-
-.p-button.p-button-help,
-.p-buttonset.p-button-help > .p-button,
-.p-splitbutton.p-button-help > .p-button {
-  &:enabled:hover {
-  }
-
-  &:enabled:focus {
-  }
-
-  &:enabled:active {
-  }
-
-  &.p-button-outlined {
-    &:enabled:hover {
-    }
-
-    &:enabled:active {
-    }
-  }
-
-  &.p-button-text {
-    &:enabled:hover {
-    }
-
-    &:enabled:active {
-    }
-  }
-}
-
-.p-button.p-button-danger,
-.p-buttonset.p-button-danger > .p-button,
-.p-splitbutton.p-button-danger > .p-button {
-  &:enabled:hover {
-  }
-
-  &:enabled:focus {
-  }
-
-  &:enabled:active {
-  }
-
-  &.p-button-outlined {
-    &:enabled:hover {
-    }
-
-    &:enabled:active {
-    }
-  }
-
-  &.p-button-text {
-    &:enabled:hover {
-    }
-
-    &:enabled:active {
-    }
-  }
-}
-
 .p-button.p-button-link {
-  &:enabled:hover {
-    .p-button-label {
-    }
+  color: $linkButtonColor !important;
+  &:not(:disabled):focus {
+    box-shadow: none !important;
   }
-
-  &:enabled:focus {
-  }
-
-  &:enabled:active {
+  &:not(:disabled):focus-visible {
+    box-shadow: $linkButtonFocusShadow !important;
   }
 }
+
 .p-button-icon-only {
   width: 2rem !important;
   height: 2rem !important;

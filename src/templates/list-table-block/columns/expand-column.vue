@@ -8,7 +8,7 @@
     </li>
     <li
       v-if="displayShowMore"
-      @click="showAll"
+      @click="toggleShowAll"
       class="underline cursor-pointer"
     >
       {{ displayRemainingItems }}
@@ -19,6 +19,7 @@
 <script setup>
   defineOptions({ name: 'expand-column' })
   import { ref, computed } from 'vue'
+
   const props = defineProps({
     value: {
       type: Array,
@@ -29,9 +30,7 @@
   const showAllItems = ref(false)
 
   const SLICE_VALUE = 2
-
   const formatValue = props.value.slice(0, SLICE_VALUE)
-
   const totalItems = props.value.length - SLICE_VALUE
   const displayShowMore = props.value.length > SLICE_VALUE
 
@@ -43,7 +42,7 @@
     return showAllItems.value ? 'Show less' : `Show more (${totalItems})`
   })
 
-  const showAll = () => {
+  const toggleShowAll = () => {
     showAllItems.value = !showAllItems.value
   }
 </script>

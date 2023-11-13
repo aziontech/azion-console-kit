@@ -13,6 +13,7 @@
 
   <EmptyResultsBlock
     v-else
+    pageTitle="Edge Services"
     title="No edge services"
     description="Create your first edge service."
     createButtonLabel="Add edge service"

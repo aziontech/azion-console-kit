@@ -4,6 +4,7 @@
     :createService="props.createEdgeService"
     :formData="values"
     :isValid="meta.valid"
+    :formMeta="meta"
     :cleanFormCallback="resetForm"
   >
     <template #form>

@@ -1,4 +1,3 @@
-<!-- eslint-disable vuejs-accessibility/click-events-have-key-events -->
 <template>
   <!-- Header Container -->
   <header
@@ -174,7 +173,7 @@
 
         <!-- Profile Mobile-->
         <Avatar
-          @click="showProfile = true"
+          @click="toggleProfileMobile"
           label="U"
           class="transition-all hover:border-orange-500 hover:bg-header-button-hover cursor-pointer md:hidden text-avatar text-avatar bg-header-avatar"
           v-tooltip.bottom="{ value: 'Account settings', showDelay: 200 }"
@@ -188,10 +187,13 @@
         />
       </div>
     </div>
-    <Logo v-else />
+    <Logo
+      class="cursor-pointer"
+      @click="$router.push({ name: 'login' })"
+      v-else
+    />
   </header>
-  <!--Mobile Profile
-  -->
+  <!-- Mobile Profile  -->
   <Sidebar
     v-model:visible="showProfile"
     position="bottom"
@@ -202,6 +204,7 @@
       mask: { class: 'flex' }
     }"
     class="md:p-3"
+    @click="toggleProfileMobile"
   >
     <PrimeMenu
       :pt="{
@@ -214,7 +217,10 @@
       :model="profileMenuItems"
     >
       <template #start>
-        <div class="flex flex-column px-2.5 h-14 justify-center">
+        <div
+          class="flex flex-column px-2.5 h-14 justify-center"
+          @click="toggleProfile"
+        >
           <div class="flex flex-column align gap-1">
             <span class="text-sm font-medium">{{ user.name }}</span>
             <div class="flex gap-2">
@@ -381,7 +387,10 @@
     :model="profileMenuItems"
   >
     <template #start>
-      <div class="flex flex-column mt-2 px-2.5 py-3">
+      <div
+        class="flex flex-column mt-2 px-2.5 py-3"
+        @click="toggleProfile"
+      >
         <div class="flex flex-column align gap-1">
           <span class="text-sm font-medium">{{ user.name }}</span>
           <div class="flex gap-2">
@@ -400,6 +409,7 @@
           },
           submenuheader: { class: 'text-base font-medium leading-none mt-5' }
         }"
+        @click="toggleProfile"
         :model="profileMenuSettings"
       >
         <template #start>
@@ -742,10 +752,6 @@
           {
             label: 'Teams Permissions',
             to: '/teams-permission'
-          },
-          {
-            label: 'Personal Token',
-            to: 'personal-tokens'
           }
         ],
         profileMenuSettings: [
@@ -801,10 +807,14 @@
     methods: {
       ...mapActions(useAccountStore, ['setTheme']),
       ...mapActions(useHelpCenterStore, ['toggleHelpCenter', 'closeHelpCenter']),
+      toggleProfileMobile() {
+        this.showProfile = !this.showProfile
+      },
       toggleProfile(event) {
         this.$refs.profile.toggle(event)
       },
       redirect(route) {
+        this.showSidebar = false
         this.$router.push(route)
       },
       toggleNotification(event) {

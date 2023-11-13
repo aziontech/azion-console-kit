@@ -19,9 +19,10 @@ import { credentialsRoutes } from '@routes/credentials-routes'
 import { teamsPermissionRoutes } from '@routes/team-permission'
 import { usersListsRoutes } from '@routes/users-routes'
 import { passwordRoutes } from '@routes/password-routes'
-import { playgroundRoutes } from '@routes/playground-routes'
-import { activityHistoryRoutes } from '@routes/activity-history-routes'
+import { activityHistoryRoutes } from './routes/activity-history-routes'
 import { errorRoutes } from '@routes/error-routes'
+import { playgroundRoutes } from '@routes/playground-routes'
+import { mfaRoutes } from '@routes/mfa-routes'
 import beforeEachRoute from './hooks/beforeEachRoute'
 
 const router = createRouter({
@@ -47,6 +48,7 @@ const router = createRouter({
     usersListsRoutes,
     passwordRoutes,
     playgroundRoutes,
+    mfaRoutes,
     activityHistoryRoutes,
     teamsPermissionRoutes
   ].concat(errorRoutes)
