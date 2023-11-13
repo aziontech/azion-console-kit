@@ -35,11 +35,11 @@
             >
               <div class="w-3">
                 <div
-                  class="w-2 h-2 bg-[#F3652B] animate-fadeIn"
+                  class="w-2 h-2 bg-orange-bullet animate-fadeIn"
                   v-if="!requirement.valid"
                 ></div>
                 <div
-                  class="pi pi-check text-sm text-[#22C55E] animate-fadeIn"
+                  class="pi pi-check text-sm text-success-check animate-fadeIn"
                   v-else
                 ></div>
               </div>

@@ -10,7 +10,7 @@
           v-for="item in jobFunctionList"
           :key="item.value"
           class="w-full border-1 rounded-md surface-border font-medium flex align-items-center justify-between p-4 gap-2"
-          :class="{ 'border-[#F3652B]': jobFunction === item.value }"
+          :class="{ 'border-radio-card-active': jobFunction === item.value }"
           >{{ item.label }}
           <PrimeRadio
             v-model="jobFunction"
@@ -24,7 +24,7 @@
           v-for="item in projectTypeSelectionList"
           :key="item.value"
           class="w-full border-1 rounded-md surface-border font-medium flex align-items-center justify-between p-4 gap-2"
-          :class="{ 'border-[#F3652B]': projectTypeSelection === item.value }"
+          :class="{ 'border-radio-card-active': projectTypeSelection === item.value }"
           >{{ item.label }}
           <PrimeRadio
             v-model="projectTypeSelection"
@@ -38,7 +38,7 @@
           v-for="item in productList"
           :key="item.value"
           class="w-full border-1 rounded-md surface-border font-medium flex align-items-center justify-between p-4 gap-2"
-          :class="{ 'border-[#F3652B]': product === item.value }"
+          :class="{ 'border-radio-card-active': product === item.value }"
           >{{ item.label }}
           <PrimeRadio
             v-model="product"
