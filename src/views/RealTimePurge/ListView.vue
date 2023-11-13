@@ -17,6 +17,7 @@
     description="Create your first Real-Time Purge."
     createButtonLabel="Add purge"
     createPagePath="real-time-purge/create"
+    :documentationService="documentationService"
   >
     <template #illustration>
       <Illustration />
@@ -31,7 +32,11 @@
   import Illustration from '@/assets/svg/illustration-layers.vue'
 
   const pros = defineProps({
-    listRealTimePurgeService: { required: true, type: Function }
+    listRealTimePurgeService: { required: true, type: Function },
+    documentationService: {
+      required: true,
+      type: Function
+    }
   })
 
   const hasContentToList = ref(false)
