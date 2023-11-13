@@ -7,129 +7,42 @@
       <label class="font-semibold text-sm">What description best fits your work? </label>
       <div class="flex flex-col gap-3 mb-8">
         <label
+          v-for="item in jobFunctionList"
+          :key="item.value"
           class="w-full border-1 rounded-md surface-border font-medium flex align-items-center justify-between p-4 gap-2"
-          >Developer
+          :class="{ 'border-[#F3652B]': jobFunction === item.value }"
+          >{{ item.label }}
           <PrimeRadio
-            v-model="occupation"
-            value="developer"
-          />
-        </label>
-        <label
-          class="w-full border-1 rounded-md surface-border font-medium flex align-items-center justify-between p-4 gap-2"
-          >DevOps
-          <PrimeRadio
-            v-model="occupation"
-            value="devops"
-          />
-        </label>
-        <label
-          class="w-full border-1 rounded-md surface-border font-medium flex align-items-center justify-between p-4 gap-2"
-          >System Admin
-          <PrimeRadio
-            v-model="occupation"
-            value="system_admin"
-          />
-        </label>
-        <label
-          class="w-full border-1 rounded-md surface-border font-medium flex align-items-center justify-between p-4 gap-2"
-          >Security Analyst
-          <PrimeRadio
-            v-model="occupation"
-            value="security_analyst"
-          />
-        </label>
-        <label
-          class="w-full border-1 rounded-md surface-border font-medium flex align-items-center justify-between p-4 gap-2"
-          >Team Lead
-          <PrimeRadio
-            v-model="occupation"
-            value="team_lead"
-          />
-        </label>
-        <label
-          class="w-full border-1 rounded-md surface-border font-medium flex align-items-center justify-between p-4 gap-2"
-          >Other
-          <PrimeRadio
-            v-model="occupation"
-            value="other"
+            v-model="jobFunction"
+            :value="item.value"
           />
         </label>
       </div>
       <label class="font-semibold text-sm">What would you like to build with Azion? </label>
       <div class="flex flex-wrap gap-3 mb-8">
         <label
+          v-for="item in intentionList"
+          :key="item.value"
           class="w-full border-1 rounded-md surface-border font-medium flex align-items-center justify-between p-4 gap-2"
-          >Just a personal project
+          :class="{ 'border-[#F3652B]': intention === item.value }"
+          >{{ item.label }}
           <PrimeRadio
             v-model="intention"
-            value="personal"
-          />
-        </label>
-        <label
-          class="w-full border-1 rounded-md surface-border font-medium flex align-items-center justify-between p-4 gap-2"
-          >Projects for my company
-          <PrimeRadio
-            v-model="intention"
-            value="single_company"
-          />
-        </label>
-        <label
-          class="w-full border-1 rounded-md surface-border font-medium flex align-items-center justify-between p-4 gap-2"
-          >Multiple projects for other companies
-          <PrimeRadio
-            v-model="intention"
-            value="multiple_projects"
-          />
-        </label>
-        <label
-          class="w-full border-1 rounded-md surface-border font-medium flex align-items-center justify-between p-4 gap-2"
-          >Other
-          <PrimeRadio
-            v-model="intention"
-            value="other"
+            :value="item.value"
           />
         </label>
       </div>
       <label class="font-semibold text-sm">What are you building? </label>
       <div class="flex flex-wrap gap-3">
         <label
+          v-for="item in projectTypeSelectionList"
+          :key="item.value"
           class="w-full border-1 rounded-md surface-border font-medium flex align-items-center justify-between p-4 gap-2"
-          >Web Apps
+          :class="{ 'border-[#F3652B]': projectTypeSelection === item.value }"
+          >{{ item.label }}
           <PrimeRadio
-            v-model="product"
-            value="web_apps"
-          />
-        </label>
-        <label
-          class="w-full border-1 rounded-md surface-border font-medium flex align-items-center justify-between p-4 gap-2"
-          >Mobile Apps
-          <PrimeRadio
-            v-model="product"
-            value="mobile_apps"
-          />
-        </label>
-        <label
-          class="w-full border-1 rounded-md surface-border font-medium flex align-items-center justify-between p-4 gap-2"
-          >Static Websites
-          <PrimeRadio
-            v-model="product"
-            value="static_websites"
-          />
-        </label>
-        <label
-          class="w-full border-1 rounded-md surface-border font-medium flex align-items-center justify-between p-4 gap-2"
-          >Blogs
-          <PrimeRadio
-            v-model="product"
-            value="blogs"
-          />
-        </label>
-        <label
-          class="w-full border-1 rounded-md surface-border font-medium flex align-items-center justify-between p-4 gap-2"
-          >Firewall
-          <PrimeRadio
-            v-model="product"
-            value="firewall"
+            v-model="projectTypeSelection"
+            :value="item.value"
           />
         </label>
       </div>
@@ -155,17 +68,41 @@
     name: 'additional-data-form-block'
   })
 
+  const jobFunctionList = [
+    { label: 'Developer', value: 'developer' },
+    { label: 'DevOps', value: 'devops' },
+    { label: 'System Admin', value: 'system_admin' },
+    { label: 'Security Analyst', value: 'security_analyst' },
+    { label: 'Team Lead', value: 'team_lead' },
+    { label: 'Other', value: 'other' }
+  ]
+
+  const intentionList = [
+    { label: 'Just a personal project', value: 'personal' },
+    { label: 'Projects for my company', value: 'single_company' },
+    { label: 'Multiple projects for other companies', value: 'multiple_projects' },
+    { label: 'Other', value: 'other' }
+  ]
+
+  const projectTypeSelectionList = [
+    { label: 'Web Apps', value: 'web_apps' },
+    { label: 'Mobile Apps', value: 'mobile_apps' },
+    { label: 'Static Websites', value: 'static_websites' },
+    { label: 'Blogs', value: 'blogs' },
+    { label: 'Firewall', value: 'firewall' }
+  ]
+
   const validationSchema = yup.object({
-    occupation: yup.string().required(),
+    jobFunction: yup.string().required(),
     intention: yup.string().required(),
     building: yup.string().required()
   })
 
   const { values, meta } = useForm({ validationSchema })
 
-  const { value: occupation } = useField('occupation')
+  const { value: jobFunction } = useField('jobFunction')
   const { value: intention } = useField('intention')
-  const { value: product } = useField('building')
+  const { value: projectTypeSelection } = useField('building')
 
   const loading = ref(false)
   const submitForm = () => {

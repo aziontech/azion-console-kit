@@ -17,7 +17,7 @@
       </div>
     </div>
     <div
-      class="w-full flex flex-col justify-start items-center mt-10 overflow-y-auto max-h-[calc(100vh-60px-56px-2rem)] pb-8"
+      class="w-full flex flex-col justify-start items-center pt-10 pb-20 overflow-y-auto max-h-[calc(100vh-60px-56px-2rem)]"
     >
       <div
         class="card surface-border border rounded-md surface-section p-6 xl:p-10 flex flex-col gap-6 max-w-md"
