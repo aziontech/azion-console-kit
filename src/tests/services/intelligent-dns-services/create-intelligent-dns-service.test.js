@@ -45,9 +45,9 @@ describe('IntelligentDnsServices', () => {
     })
     const { sut } = makeSut()
 
-    const feedbackMessage = await sut(fixtures.dnsMock)
+    const data = await sut(fixtures.dnsMock)
 
-    expect(feedbackMessage).toBe('Your Intelligent DNS has been created')
+    expect(data.feedback).toBe('Your Intelligent DNS has been created')
   })
 
   it('Should return an API validation error to an already taken intelligent dns ', async () => {
