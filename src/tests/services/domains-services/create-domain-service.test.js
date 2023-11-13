@@ -57,9 +57,9 @@ describe('DomainsServices', () => {
     })
     const { sut } = makeSut()
 
-    const feedbackMessage = await sut(fixtures.domainMock)
+    const data = await sut(fixtures.domainMock)
 
-    expect(feedbackMessage.feedback).toBe('Your domain has been created')
+    expect(data.feedback).toBe('Your domain has been created')
   })
 
   it('Should return an API error for an 409 response status', async () => {
@@ -74,9 +74,9 @@ describe('DomainsServices', () => {
     })
     const { sut } = makeSut()
 
-    const feedbackMessage = sut(fixtures.domainMock)
+    const data = sut(fixtures.domainMock)
 
-    expect(feedbackMessage).rejects.toThrow(apiErrorMock)
+    expect(data).rejects.toThrow(apiErrorMock)
   })
 
   it('Should return an API error for an 400 response status', async () => {

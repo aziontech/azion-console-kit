@@ -43,9 +43,9 @@ describe('VariablesServices', () => {
     })
     const { sut } = makeSut()
 
-    const feedbackMessage = await sut(fixtures.variableMock)
+    const data = await sut(fixtures.variableMock)
 
-    expect(feedbackMessage.feedback).toBe('Your variable has been created')
+    expect(data.feedback).toBe('Your variable has been created')
   })
 
   it.each([
