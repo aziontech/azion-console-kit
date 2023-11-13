@@ -53,9 +53,9 @@ describe('DataStreamingServices', () => {
       statusCode: 201
     })
     const { sut } = makeSut()
-    const feedbackMessage = await sut(fixtures.dataStreamingMock)
+    const data = await sut(fixtures.dataStreamingMock)
 
-    expect(feedbackMessage).toBe('Your data streaming has been created')
+    expect(data.feedback).toBe('Your data streaming has been created')
   })
 
   it('should return a feedback message on successfully created with domains', async () => {
@@ -68,9 +68,9 @@ describe('DataStreamingServices', () => {
       domains: [[], [{ domainID: 1 }, { domainID: 2 }]]
     }
 
-    const feedbackMessage = await sut(dataStreamingMockWithDomains)
+    const data = await sut(dataStreamingMockWithDomains)
 
-    expect(feedbackMessage).toBe('Your data streaming has been created')
+    expect(data.feedback).toBe('Your data streaming has been created')
   })
 
   it('should return a feedback message on successfully created with endpoint standard and list of headers', async () => {
@@ -88,9 +88,9 @@ describe('DataStreamingServices', () => {
       headers: [{ value: 'name: api' }, { value: 'teste: 1' }]
     }
 
-    const feedbackMessage = await sut(dataStreamingMockWithDomains)
+    const data = await sut(dataStreamingMockWithDomains)
 
-    expect(feedbackMessage).toBe('Your data streaming has been created')
+    expect(data.feedback).toBe('Your data streaming has been created')
   })
 
   it.each([
@@ -197,9 +197,9 @@ describe('DataStreamingServices', () => {
       ...values
     }
 
-    const feedbackMessage = await sut(dataStreamingEndpointMock)
+    const data = await sut(dataStreamingEndpointMock)
 
-    expect(feedbackMessage).toBe('Your data streaming has been created')
+    expect(data.feedback).toBe('Your data streaming has been created')
   })
 
   it.each([
