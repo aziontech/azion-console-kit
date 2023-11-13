@@ -50,9 +50,9 @@ describe('EdgeFunctionsServices', () => {
     })
     const { sut } = makeSut()
 
-    const feedbackMessage = await sut(fixtures.basic)
+    const data = await sut(fixtures.basic)
 
-    expect(feedbackMessage).toBe('Your edge function has been created')
+    expect(data.feedback).toBe('Your edge function has been created')
   })
 
   it('Should return an API error for an key with value String', () => {
