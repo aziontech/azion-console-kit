@@ -12,7 +12,7 @@ export const realTimePurgeRoutes = {
       component: () => import('@views/RealTimePurge/ListView.vue'),
       props: {
         listRealTimePurgeService: RealTimePurgeService.listRealTimePurgeService,
-        documentationService: Helpers.documentationCatalog.realTimePurge,
+        documentationService: Helpers.documentationCatalog.realTimePurge
       },
       meta: {
         breadCrumbs: [
