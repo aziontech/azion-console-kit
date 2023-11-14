@@ -67,6 +67,7 @@
               <PrimeButton
                 outlined
                 icon="ai ai-column"
+                class="table-button"
                 @click="toggleColumnSelector"
                 v-tooltip.top="{ value: 'Hidden Columns', showDelay: 200 }"
               >
@@ -102,7 +103,7 @@
                 icon="pi pi-ellipsis-h"
                 text
                 @click="(event) => toggleActionsMenu(event, rowData.id)"
-                class="cursor-pointer"
+                class="cursor-pointer table-button"
               />
             </div>
           </template>

@@ -7,14 +7,16 @@
     border-top-left-radius: $borderRadius;
   }
 
-  .p-datatable-thead > tr > th {
-    font-size: 0.875rem;
-    line-height: 1.125rem;
-    padding: 0.5rem 0.875rem !important;
+  .p-datatable-tbody > tr > td {
     box-sizing: inherit !important;
+    font-size: 0.875rem;
+  }
+
+  .p-datatable-thead > tr > th {
+    box-sizing: inherit !important;
+    font-size: 0.875rem;
 
     .p-column-header-content {
-      min-height: 2rem;
       vertical-align: center;
     }
   }
