@@ -29,6 +29,7 @@
             id="email"
             placeholder="example@email.com"
             type="email"
+            autofocus
             @keydown.enter="showPasswordStep"
             class="w-full"
             :class="{ 'p-invalid': hasErrorEmail }"
