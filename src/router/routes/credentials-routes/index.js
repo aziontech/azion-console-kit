@@ -38,7 +38,7 @@ export const credentialsRoutes = {
           },
           {
             label: 'Create Credential',
-            to: '/credential/create'
+            to: '/credentials/create'
           }
         ]
       }
