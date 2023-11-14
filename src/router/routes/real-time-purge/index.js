@@ -1,5 +1,6 @@
-// import * as Helpers from '@/helpers'
+import * as Helpers from '@/helpers'
 import * as RealTimePurgeService from '@/services/real-time-purge'
+
 /** @type {import('vue-router').RouteRecordRaw} */
 export const realTimePurgeRoutes = {
   path: '/real-time-purge',
@@ -10,7 +11,8 @@ export const realTimePurgeRoutes = {
       name: 'real-time-purge',
       component: () => import('@views/RealTimePurge/ListView.vue'),
       props: {
-        listRealTimePurgeService: RealTimePurgeService.listRealTimePurgeService
+        listRealTimePurgeService: RealTimePurgeService.listRealTimePurgeService,
+        documentationService: Helpers.documentationCatalog.realTimePurge
       },
       meta: {
         breadCrumbs: [

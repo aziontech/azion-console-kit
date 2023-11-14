@@ -27,16 +27,17 @@ export const listEventsService = async (
 }
 
 const adapt = (httpResponse) => {
-  const parsedEvents = httpResponse.body.data.activityHistoryEvents.map((element) => ({
-    ts: Intl.DateTimeFormat('us', {
-      dateStyle: 'full',
-      timeStyle: 'short'
-    }).format(new Date(element.ts)),
-    title: element.title,
-    type: element.type,
-    authorName: element.authorName,
-    authorEmail: element.authorEmail
-  }))
+  const parsedEvents =
+    httpResponse.body.data?.activityHistoryEvents?.map((element) => ({
+      ts: Intl.DateTimeFormat('us', {
+        dateStyle: 'full',
+        timeStyle: 'short'
+      }).format(new Date(element.ts)),
+      title: element.title,
+      type: element.type,
+      authorName: element.authorName,
+      authorEmail: element.authorEmail
+    })) || []
 
   return {
     body: parsedEvents,

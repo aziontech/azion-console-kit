@@ -77,4 +77,24 @@ describe('AzionDocumentationCatalog', () => {
       `https://www.azion.com/en/search-result/?q=domains&filter=doc`
     )
   })
+  it('should open get started documentation with correct link', () => {
+    const openWindowSpy = vi.spyOn(window, 'open')
+    const { sut } = makeSut()
+
+    sut.getStarted()
+
+    expect(openWindowSpy).toHaveBeenCalledWith(
+      `https://www.azion.com/en/search-result/?q=get started&filter=doc`
+    )
+  })
+  it('should open real-time purge documentation with correct link', () => {
+    const openWindowSpy = vi.spyOn(window, 'open')
+    const { sut } = makeSut()
+
+    sut.realTimePurge()
+
+    expect(openWindowSpy).toHaveBeenCalledWith(
+      `https://www.azion.com/en/search-result/?q=real-time-purge&filter=doc`
+    )
+  })
 })
