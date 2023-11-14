@@ -48,9 +48,9 @@ describe('TeamPermissionServices', () => {
     })
     const { sut } = makeSut()
 
-    const feedbackMessage = await sut(fixtures.teamPermissionMock)
+    const data = await sut(fixtures.teamPermissionMock)
 
-    expect(feedbackMessage).toBe('Your Team Permission has been created')
+    expect(data.feedback).toBe('Your Team Permission has been created')
   })
 
   it('Should return an API error for an 400 response status', async () => {
