@@ -293,7 +293,6 @@
                  <div class="w-12 h-12">
                    <img
                      class="w-full"
-                     src="../../assets/Icon.png"
                      alt=""
                    />
                  </div>
@@ -342,7 +341,6 @@
                  <div class="w-12 h-12">
                    <img
                      class="w-full"
-                     src="../../assets/Icon.png"
                      alt=""
                    />
                  </div>
