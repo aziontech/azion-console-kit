@@ -5,14 +5,14 @@
   import { useAccountStore } from '@/stores/account'
   import { themeSelect } from '@/helpers/themeSelect'
   import { storeToRefs } from 'pinia'
-  import { isRoutePublic } from '@/router/public-routes'
 
   const accountStore = useAccountStore()
   const { currentTheme, hasActiveUserId } = storeToRefs(accountStore)
 
   const route = useRoute()
   const isLogged = computed(() => {
-    return hasActiveUserId && !isRoutePublic(route.name)
+    // evaluate as !route.meta?.hideNavigation will cause navbar to flicker
+    return route.meta.hideNavigation !== true && hasActiveUserId.value
   })
 
   watch(currentTheme, (theme) => themeSelect({ theme }))
