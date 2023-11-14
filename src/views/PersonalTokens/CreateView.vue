@@ -15,7 +15,7 @@
       <template #form>
         <FormHorizontal
           title="General"
-          description="Choose a name that is descriptive and easy to remember. Include a description to specify the token's purpose or usage."
+          description="Choose a descriptive and easy to remember name. Include a description to specify the token's purpose or usage."
         >
           <template #inputs>
             <div class="flex flex-col sm:max-w-lg w-full gap-2">
@@ -76,7 +76,7 @@
         </FormHorizontal>
         <FormHorizontal
           title="Token"
-          description="Define the token's expiration date from the available options. Due to security reasons, the token will only be available immediately after it is created and cannot be edited in the future."
+          description="Define the token's expiration date from the available options. Due to security reasons, the token will only be available immediately after it's created and can't be edited in the future."
         >
           <template #inputs>
             <div class="flex flex-col w-full gap-2">
@@ -133,7 +133,7 @@
                 for="personalToken"
                 class="text-color text-base font-medium"
               >
-                Personal Token value
+                Personal Token Value
               </label>
               <div
                 class="flex gap-6 md:align-items-center max-sm:flex-col max-sm:align-items-baseline max-sm:gap-3"
