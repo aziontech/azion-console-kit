@@ -786,11 +786,11 @@
         profileMenuSettings: [
           {
             label: 'Your Settings',
-            to: 'list-your-settings'
+            to: '/list-your-settings'
           },
           {
             label: 'Personal Token',
-            to: 'personal-tokens'
+            to: '/personal-tokens'
           }
         ],
         themeOptions: [
