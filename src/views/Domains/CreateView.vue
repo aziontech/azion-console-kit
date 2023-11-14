@@ -381,7 +381,7 @@
           cnameAccessOnly: true,
           edgeApplication: null,
           mtlsIsEnabled: false,
-          active: false,
+          active: true,
           mtlsVerification: MTLS_VERIFICATION_ENFORCE
         }
       })
