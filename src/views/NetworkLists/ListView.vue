@@ -4,10 +4,12 @@
     :deleteService="deleteNetworkListService"
     :columns="getColumns"
     pageTitle="Network Lists"
-    addButtonLabel="Add Network List"
+    addButtonLabel="Network List"
     createPagePath="network-lists/create"
     editPagePath="network-lists/edit"
   />
+  <!-- 
+  // empty-results-block -->
 </template>
 
 <script>

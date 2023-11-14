@@ -10,8 +10,8 @@
   >
     <template #form>
       <FormHorizontal
-        title="Network List"
-        description="Create allowlists, blocklists, and even greylists based on IP addresses, geolocation (countries), or Autonomous System Number (ASN) to use with configured rule sets on Rules Engine."
+        title="General"
+        description="description"
       >
         <template #inputs>
           <div class="flex flex-col sm:max-w-lg w-full gap-2">
@@ -33,7 +33,14 @@
               >{{ errors.name }}</small
             >
           </div>
-          <div class="flex flex-col w-full sm:max-w-xs gap-2">
+        </template>
+      </FormHorizontal>
+      <FormHorizontal
+        title="List Settings"
+        description="description"
+      >
+        <template #inputs>
+          <div class="flex flex-col w-full sm:max-w-lg gap-2">
             <label
               for="id"
               class="text-color text-base font-medium"
@@ -44,6 +51,7 @@
               v-model="networkListType.value"
               v-bind="networkListType"
               disabled
+              dropdown-icon="pi pi-lock"
               :options="options"
               optionLabel="name"
               optionValue="value"
