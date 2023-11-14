@@ -126,7 +126,10 @@
           </div>
         </template>
       </form-horizontal>
-      <form-horizontal title="Mutual Authentication Settings">
+      <form-horizontal
+        title="Mutual Authentication Settings"
+        description="Enable Mutual Authentication (mTLS) to require that both client and server present an authentication protocol to each other."
+      >
         <template #inputs>
           <div class="flex gap-2 items-top">
             <InputSwitch
@@ -141,10 +144,6 @@
                 class="text-sm font-normal leading-tight"
                 >Mutual Authentication</label
               >
-              <small class="text-color-secondary text-sm font-normal leading-tight">
-                Enable Mutual Authentication (mTLS) to require that both client and server present
-                an authentication protocol to each other.
-              </small>
             </div>
           </div>
 
