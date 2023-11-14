@@ -28,7 +28,11 @@ export const createEdgeServiceService = async (payload) => {
 const parseHttpResponse = (httpResponse) => {
   switch (httpResponse.statusCode) {
     case 201:
-      return 'Your Edge Service has been created'
+      return {
+        feedback: 'Your Edge Service has been created',
+        // redirectURL: `/edge-services/edit/${httpResponse.body?.id}`
+        redirectURL: `/edge-services`
+      }
     case 422:
       const apiError = extractApiError(httpResponse)
       throw new Error(apiError).message
