@@ -6,34 +6,58 @@
     <div class="flex flex-col gap-2">
       <label class="font-semibold text-sm">I'm a</label>
       <div class="flex flex-col gap-3 mb-8">
-        <label
-          v-for="item in jobFunctionList"
-          :key="item.value"
-          class="w-full border-1 rounded-md surface-border font-medium flex align-items-center justify-between p-4 gap-2"
-          :class="{ 'border-radio-card-active': jobFunction === item.value }"
-          >{{ item.label }}
-          <PrimeRadio
-            v-model="jobFunction"
-            :value="item.value"
+        <template v-if="!jobFunctionList.length">
+          <PrimeSkeleton
+            class="w-full h-14"
+            v-for="item in [...Array(5).keys()]"
+            :key="item"
           />
-        </label>
+        </template>
+        <template v-else>
+          <label
+            v-for="item in jobFunctionList"
+            :key="item.value"
+            class="w-full border-1 rounded-md surface-border font-medium flex align-items-center justify-between p-4 gap-2"
+            :class="{ 'border-radio-card-active': jobFunction === item.value }"
+            >{{ item.label }}
+            <PrimeRadio
+              v-model="jobFunction"
+              :value="item.value"
+            />
+          </label>
+        </template>
       </div>
       <label class="font-semibold text-sm">What would you like to build with Azion?</label>
       <div class="flex flex-wrap gap-3 mb-8">
-        <label
-          v-for="item in projectTypeList"
-          :key="item.value"
-          class="w-full border-1 rounded-md surface-border font-medium flex align-items-center justify-between p-4 gap-2"
-          :class="{ 'border-radio-card-active': projectType === item.value }"
-          >{{ item.label }}
-          <PrimeRadio
-            v-model="projectType"
-            :value="item.value"
+        <template v-if="!jobFunctionList.length">
+          <PrimeSkeleton
+            class="w-full h-14"
+            v-for="item in [...Array(5).keys()]"
+            :key="item"
           />
-        </label>
+        </template>
+        <template v-else>
+          <label
+            v-for="item in projectTypeList"
+            :key="item.value"
+            class="w-full border-1 rounded-md surface-border font-medium flex align-items-center justify-between p-4 gap-2"
+            :class="{ 'border-radio-card-active': projectType === item.value }"
+            >{{ item.label }}
+            <PrimeRadio
+              v-model="projectType"
+              :value="item.value"
+            />
+          </label>
+        </template>
       </div>
       <div class="flex flex-col gap-8">
-        <label class="font-semibold text-sm gap-2 flex flex-col"
+        <PrimeSkeleton
+          class="w-full h-8"
+          v-if="!countriesList.length"
+        />
+        <label
+          class="font-semibold text-sm gap-2 flex flex-col"
+          v-else
           >Company name
           <PrimeInputText
             placeholder="Company Name"
@@ -41,7 +65,13 @@
             type="text"
           />
         </label>
-        <label class="font-semibold text-sm gap-2 flex flex-col"
+        <PrimeSkeleton
+          class="w-full h-8"
+          v-if="!countriesList.length"
+        />
+        <label
+          class="font-semibold text-sm gap-2 flex flex-col"
+          v-else
           >Company size
           <PrimeDropdown
             placeholder="Select an option"
@@ -51,7 +81,13 @@
             optionValue="value"
           />
         </label>
-        <label class="font-semibold text-sm gap-2 flex flex-col"
+        <PrimeSkeleton
+          class="w-full h-8"
+          v-if="!countriesList.length"
+        />
+        <label
+          class="font-semibold text-sm gap-2 flex flex-col"
+          v-else
           >Country
           <PrimeDropdown
             placeholder="Select an option"
@@ -79,6 +115,7 @@
   import PrimeButton from 'primevue/button'
   import PrimeInputText from 'primevue/inputtext'
   import PrimeDropdown from 'primevue/dropdown'
+  import PrimeSkeleton from 'primevue/skeleton'
   import { useForm, useField } from 'vee-validate'
   import * as yup from 'yup'
   import { ref, onMounted } from 'vue'
