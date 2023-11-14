@@ -5,7 +5,6 @@
       :createService="props.createPersonalTokenService"
       :formData="values"
       :formMeta="meta"
-      :isValid="meta.valid"
       @on-response="handleResponse"
       :buttonBackList="generatedPersonalToken"
       :callback="false"

@@ -16,7 +16,6 @@
               :editService="pros.editEdgeNodeService"
               :loadService="pros.loadEdgeNodeService"
               :initialDataSetter="setValues"
-              :isValid="meta.valid"
               :formData="values"
               :formMeta="meta"
               backURL="/edge-node"

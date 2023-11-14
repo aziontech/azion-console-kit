@@ -787,11 +787,11 @@
         profileMenuSettings: [
           {
             label: 'Your Settings',
-            to: 'list-your-settings'
+            to: '/list-your-settings'
           },
           {
-            label: 'Personal Tokens',
-            to: 'personal-tokens'
+            label: 'Personal Token',
+            to: '/personal-tokens'
           }
         ],
         themeOptions: [
