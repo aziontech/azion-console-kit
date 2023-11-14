@@ -12,7 +12,8 @@ export const credentialsRoutes = {
       component: () => import('@views/Credentials/ListView.vue'),
       props: {
         listCredentialsService: CredentialServices.listCredentialsService,
-        deleteCredentialService: CredentialServices.deleteCredentialService
+        deleteCredentialService: CredentialServices.deleteCredentialService,
+        documentationService: Helpers.documentationCatalog.credentials,
       },
       meta: {
         breadCrumbs: [

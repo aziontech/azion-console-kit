@@ -9,5 +9,6 @@ export const documentationCatalog = {
   domains: () => azionDocumentationWindowOpener('domains'),
   realTimePurge: () => azionDocumentationWindowOpener('real-time-purge'),
   getStarted: () => azionDocumentationWindowOpener('get started'),
-  digitalCertificates: () => azionDocumentationWindowOpener('digital certificates')
+  digitalCertificates: () => azionDocumentationWindowOpener('digital certificates'),
+  credentials: () => azionDocumentationWindowOpener('credentials')
 }
