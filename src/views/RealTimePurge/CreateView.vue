@@ -1,7 +1,7 @@
 <template>
   <CreateFormBlock
     pageTitle="Create Real-Time Purge"
-    :createService="props.createVariablesService"
+    :createService="props.createRealTimePurgeService"
     :formData="values"
     :formMeta="meta"
     :isValid="meta.valid"
@@ -28,10 +28,11 @@
                 <template #title>
                   <span class="text-base">Edge Caching</span>
                   <RadioButton
-                    inputId="label"
-                    name="label"
-                    value="label08"
-                    v-bind="layer"
+                    inputId="inputId1"
+                    name="layer"
+                    value="edge_caching"
+                    :disabled="true"
+                    v-model="layer"
                   />
                 </template>
                 <template #subtitle>Purge web content delivered at the Edge</template>
@@ -49,10 +50,11 @@
                 <template #title>
                   <span class="text-base">L2 Caching</span>
                   <RadioButton
-                    inputId="label"
-                    name="label"
-                    value="label07"
-                    v-bind="layer"
+                    inputId="inputId1"
+                    name="layer"
+                    :disabled="true"
+                    value="l2_caching"
+                    v-model="layer"
                   />
                 </template>
                 <template #subtitle>
@@ -76,10 +78,10 @@
                 <template #title>
                   <span class="text-base">Cache Key</span>
                   <RadioButton
-                    inputId="label"
-                    name="label"
-                    value="label08"
-                    v-bind="purge_type"
+                    inputId="inputId1"
+                    name="type"
+                    value="cachekey"
+                    v-model="purge_type"
                   />
                 </template>
                 <template #subtitle
@@ -100,10 +102,10 @@
                 <template #title>
                   <span class="text-base">URL</span>
                   <RadioButton
-                    inputId="label"
-                    name="label"
-                    value="label07"
-                    v-bind="purge_type"
+                    inputId="inputId2"
+                    name="type"
+                    value="url"
+                    v-model="purge_type"
                   />
                 </template>
                 <template #subtitle>
@@ -124,10 +126,10 @@
                 <template #title>
                   <span class="text-base">Wildcard</span>
                   <RadioButton
-                    inputId="label"
-                    name="label"
-                    value="label07"
-                    v-bind="purge_type"
+                    inputId="inputId3"
+                    name="type"
+                    value="wildcard"
+                    v-model="purge_type"
                   />
                 </template>
                 <template #subtitle
@@ -148,8 +150,9 @@
               autoResize
               rows="2"
               cols="30"
+              :placeholder="placeholder"
               :class="{ 'p-invalid': errors.argumentsPurge }"
-              v-model="argumentsPurge"
+              v-bind="argumentsPurge"
             />
             <small
               v-if="errors.argumentsPurge"
@@ -176,9 +179,12 @@
 
   import { useForm, useField } from 'vee-validate'
   import * as yup from 'yup'
+  import { computed } from 'vue'
+
+  // a computed ref
 
   const props = defineProps({
-    createVariablesService: {
+    createRealTimePurgeService: {
       type: Function,
       required: true
     }
@@ -187,14 +193,29 @@
   const validationSchema = yup.object({
     layer: yup.string().required(),
     purge_type: yup.string().required(),
-    argumentsPurge: yup.string().required()
+    argumentsPurge: yup.string().required('Arguments is a required field')
   })
 
   const { errors, defineInputBinds, meta, resetForm, values } = useForm({
-    validationSchema
+    validationSchema,
+    initialValues: {
+      layer: 'edge_caching',
+      purge_type: 'cachekey',
+      argumentsPurge: ''
+    }
   })
 
-  const layer = defineInputBinds('layer', { validateOnInput: true })
-  const purge_type = defineInputBinds('purge_type', { validateOnInput: true })
-  const { value: argumentsPurge } = useField('argumentsPurge', { validateOnInput: true })
+  const { value: layer } = useField('layer', { validateOnInput: true })
+  const argumentsPurge = defineInputBinds('argumentsPurge', { validateOnInput: true })
+  const { value: purge_type } = useField('purge_type', { validateOnInput: true })
+
+  const placeholder = computed(() => {
+    if (purge_type.value === 'cachekey') {
+      return 'httpswww.example.com.br/index.html'
+    }
+    if (purge_type.value === 'wildcard') {
+      return 'www.example.com/*'
+    }
+    return 'www.example.com'
+  })
 </script>

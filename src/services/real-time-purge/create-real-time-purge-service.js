@@ -3,14 +3,30 @@ import * as Errors from '@/services/axios/errors'
 import { makeRealTimePurgeBaseUrl } from './make-real-time-purge-service'
 
 export const createRealTimePurgeService = async (payload) => {
+  const bodyRequest = adapt(payload)
+
   let httpResponse = await AxiosHttpClientAdapter.request({
-    url: `${makeRealTimePurgeBaseUrl()}`,
+    url: `${makeRealTimePurgeBaseUrl()}/${payload.purge_type}`,
     method: 'POST',
-    body: payload
+    body: bodyRequest
   })
 
   return parseHttpResponse(httpResponse)
 }
+
+const adapt = (payload) => {
+  const request = {
+    urls: payload.argumentsPurge.trim().split('\n'),
+    method: "delete",
+  }
+
+  if(payload.purge_type === 'cachekey') {
+    request.layer = payload.layer
+  }
+
+  return request
+}
+
 
 /**
  * @param {Object} httpResponse - The HTTP response object.
@@ -24,7 +40,9 @@ const parseHttpResponse = (httpResponse) => {
     case 201:
       return 'Your purge has been created'
     case 400:
-      throw new Error(httpResponse).message
+      const key = Object.keys(httpResponse.body)[0]
+      const msg = httpResponse.body[key]
+      throw new Error(msg).message
     case 401:
       throw new Errors.InvalidApiTokenError().message
     case 403:
