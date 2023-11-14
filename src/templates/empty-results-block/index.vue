@@ -3,7 +3,7 @@
   <div class="flex flex-col">
     <PageHeadingBlock :pageTitle="pageTitle" />
     <div
-      class="flex flex-col h-full border border-surface gap-7 justify-center items-center rounded-md mx-8 py-7 mb-8 max-md:mx-3"
+      class="flex flex-col h-full border surface-border gap-7 justify-center items-center rounded-md mx-8 py-7 mb-8 max-md:mx-3"
     >
       <slot name="illustration" />
       <div class="flex flex-col gap-2">
