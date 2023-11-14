@@ -24,7 +24,6 @@
               >Name *</label
             >
             <InputText
-              placeholder="My domain"
               v-bind="name"
               id="name"
               type="text"
