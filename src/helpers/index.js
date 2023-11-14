@@ -6,6 +6,7 @@ import {
   openContactSupport
 } from './azion-documentation-window-opener'
 import InviteSession from './invite-session'
+import { useCreateBoardManager } from './use-create-board-manager'
 
 export {
   clipboardWrite,
@@ -14,5 +15,6 @@ export {
   openDocumentation,
   openAPIDocumentation,
   openContactSupport,
-  InviteSession
+  InviteSession,
+  useCreateBoardManager
 }

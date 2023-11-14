@@ -83,7 +83,7 @@
 
         <!-- Create Button Desktop -->
         <PrimeButton
-          @click="showCreateModal"
+          @click="createBoardManager.open()"
           icon="pi pi-plus"
           label="Create"
           class="!text-white h-8 hidden md:flex !text-white border-header"
@@ -100,7 +100,7 @@
 
         <!-- Create Button Mobile -->
         <PrimeButton
-          @click="showCreateMobileModal"
+          @click="createBoardManager.open()"
           icon="pi pi-plus"
           class="h-8 md:hidden text-white border-header"
           size="small"
@@ -503,32 +503,34 @@
 
   <!-- Modal de create -->
   <PrimeDialog
-    v-model:visible="showCreate"
+    v-model:visible="createBoardManager.enabled"
     modal
     header="Create something new"
     :pt="{
+      root: { class: 'hidden sm:flex' },
       content: { class: 'p-4 sm:p-0' }
     }"
     position="center"
     :dismissableMask="true"
     :breakpoints="{ '641px': '90vw' }"
+    @update:visible="createBoardManager.close()"
   >
     <!-- SLOT WIP -->
     <div>
-      <CreateModalBlock @closeModal="showCreate = false" />
+      <CreateModalBlock @closeModal="createBoardManager.close()" />
     </div>
   </PrimeDialog>
 
   <!-- Mobile modal Create -->
   <Sidebar
-    v-model:visible="showCreateMobile"
+    v-model:visible="createBoardManager.enabled"
     position="bottom"
     headerContent="Create something new"
     :show-close-icon="false"
     :pt="{
-      root: { class: 'h-[80%] flex p-0' },
+      root: { class: 'h-[80%] flex p-0 sm:hidden' },
       headerContent: { class: 'w-full' },
-      mask: { class: 'flex' }
+      mask: { class: 'flex sm:hidden' }
     }"
   >
     <template #header>
@@ -536,7 +538,7 @@
         <h2>Create something new</h2>
         <PrimeButton
           icon="pi pi-times"
-          @click="closeCreateMobileModal"
+          @click="createBoardManager.close()"
           size="small"
           class="flex-none surface-border text-sm w-8 h-8"
           text
@@ -601,6 +603,7 @@
       CreateModalBlock
     },
     props: { isLogged: Boolean },
+    inject: ['createBoardManager'],
     data() {
       return {
         openSwitchAccount: false,

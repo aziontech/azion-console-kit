@@ -1,11 +1,12 @@
 <script setup>
-  import { computed, watch } from 'vue'
+  import { computed, provide, watch } from 'vue'
   import { RouterView, useRoute } from 'vue-router'
   import ShellBlock from '@/templates/shell-block'
   import { useAccountStore } from '@/stores/account'
   import { themeSelect } from '@/helpers/themeSelect'
   import { storeToRefs } from 'pinia'
   import { isRoutePublic } from '@/router/public-routes'
+  import { useCreateBoardManager } from '@/helpers/use-create-board-manager'
 
   const accountStore = useAccountStore()
   const { currentTheme, hasActiveUserId } = storeToRefs(accountStore)
@@ -16,6 +17,8 @@
   })
 
   watch(currentTheme, (theme) => themeSelect({ theme }))
+
+  provide('createBoardManager', useCreateBoardManager())
 </script>
 
 <template>

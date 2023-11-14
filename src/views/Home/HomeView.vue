@@ -16,6 +16,7 @@
           label="Create something new"
           type="button"
           size="small"
+          @click="createBoardManager.open()"
         />
       </div>
     </div>
@@ -253,6 +254,7 @@
       InputText,
       Dropdown
     },
+    inject: ['createBoardManager'],
     props: {
       listTeamsService: {
         type: Function,
