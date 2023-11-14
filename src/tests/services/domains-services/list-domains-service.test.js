@@ -73,8 +73,8 @@ describe('DomainsServices', () => {
         domainName: fixtures.disabledDomainMock.domain_name,
         cnames: 'CName 3,CName 4',
         active: {
-          content: 'Disabled',
-          severity: 'info'
+          content: 'Inactive',
+          severity: 'danger'
         },
         edgeApplicationName: fixtures.disabledDomainMock.name,
         digitalCertificateId: fixtures.disabledDomainMock.digital_certificate_id

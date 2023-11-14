@@ -26,7 +26,7 @@
 </template>
 
 <script setup>
-  import { defineProps, computed, ref } from 'vue'
+  import { computed, ref } from 'vue'
   import ListTableBlock from '@/templates/list-table-block'
   import EmptyResultsBlock from '@/templates/empty-results-block'
   import Illustration from '@/assets/svg/illustration-layers.vue'

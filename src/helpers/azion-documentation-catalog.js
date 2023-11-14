@@ -9,6 +9,7 @@ export const documentationCatalog = {
   domains: () => openSearchResult('domains'),
   realTimePurge: () => openSearchResult('real-time-purge'),
   getStarted: () => openSearchResult('get started'),
+  networkLists: () => openSearchResult('network lists'),
   digitalCertificates: () => openSearchResult('digital certificates')
 }
 

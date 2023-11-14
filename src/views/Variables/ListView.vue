@@ -5,7 +5,7 @@
     :deleteService="deleteVariablesService"
     :columns="getColumns"
     pageTitle="Variables"
-    addButtonLabel="Add Variable"
+    addButtonLabel="Variable"
     createPagePath="variables/create"
     editPagePath="variables/edit"
     @on-load-data="handleLoadData"
@@ -15,7 +15,7 @@
     pageTitle="Variables"
     title="No variables added"
     description="Create your first variable."
-    createButtonLabel="Add variable"
+    createButtonLabel="Variable"
     createPagePath="variables/create"
     :documentationService="documentationService"
   >
