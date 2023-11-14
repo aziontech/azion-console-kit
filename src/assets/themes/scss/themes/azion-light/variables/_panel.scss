@@ -1,14 +1,14 @@
 /// Border color of a panel header
 /// @group panel
-$panelHeaderBorderColor: #e7e7e7;
+$panelHeaderBorderColor: var(--surface-border);
 
 /// Border of a panel header
 /// @group panel
-$panelHeaderBorder: 1px solid #e7e7e7;
+$panelHeaderBorder: 1px solid var(--surface-border);
 
 /// Background of a panel header
 /// @group panel
-$panelHeaderBg: #ffffff;
+$panelHeaderBg: var(--surface-section);
 
 /// Text color of a panel header
 /// @group panel
@@ -16,11 +16,11 @@ $panelHeaderTextColor: $textColor;
 
 /// Font weight of a panel header
 /// @group panel
-$panelHeaderFontWeight: 600;
+$panelHeaderFontWeight: 500;
 
 /// Padding of a panel header
 /// @group panel
-$panelHeaderPadding: 0.75rem 2rem;
+$panelHeaderPadding: 1rem;
 
 /// Font weight of a toggleable panel header
 /// @group panel
@@ -28,7 +28,7 @@ $panelToggleableHeaderPadding: 0.5rem 1rem;
 
 /// Background of a panel header in hover state e.g. toggleable state
 /// @group panel
-$panelHeaderHoverBg: #e9ecef;
+$panelHeaderHoverBg: var(--surface-hover);
 
 /// Border color of a panel header in hover state e.g. toggleable state
 /// @group panel
@@ -36,7 +36,7 @@ $panelHeaderHoverBorderColor: var(--surface-border);
 
 /// Text color of a panel header in hover state e.g. toggleable state
 /// @group panel
-$panelHeaderTextHoverColor: #495057;
+$panelHeaderTextHoverColor: $textColor;
 
 /// Border color for the content section of a panel
 /// @group panel
@@ -44,7 +44,7 @@ $panelContentBorderColor: var(--surface-border);
 
 /// Border for the content section of a panel
 /// @group panel
-$panelContentBorder: 1px solid #e7e7e7;
+$panelContentBorder: 1px solid var(--surface-border);
 
 /// Background for the content section of a panel
 /// @group panel
@@ -60,15 +60,15 @@ $panelContentTextColor: $textColor;
 
 /// Padding for the content section of a panel
 /// @group panel
-$panelContentPadding: none;
+$panelContentPadding: 1.25rem;
 
 /// Border for the footer section of a panel
 /// @group panel
-$panelFooterBorder: 1px solid #e7e7e7;
+$panelFooterBorder: 1px solid var(--surface-border);
 
 /// Background for the footer section of a panel
 /// @group panel
-$panelFooterBg: #ffffff;
+$panelFooterBg: var(--surface-section);
 
 /// Text color for the footer section of a panel
 /// @group panel
@@ -104,7 +104,7 @@ $accordionHeaderPadding: $panelHeaderPadding;
 
 /// Background of an accordion panel header in hover state
 /// @group panel
-$accordionHeaderHoverBg: #e9ecef;
+$accordionHeaderHoverBg: var(--surface-hover);
 
 /// Border of an accordion panel header in hover state
 /// @group panel
@@ -120,7 +120,7 @@ $accordionHeaderActiveBg: $panelHeaderBg;
 
 /// Border of an accordion panel header in expanded state
 /// @group panel
-$accordionHeaderActiveBorderColor: #dee2e6;
+$accordionHeaderActiveBorderColor: var(--surface-border);
 
 /// Text color of an accordion panel header in expanded state
 /// @group panel
@@ -128,11 +128,11 @@ $accordionHeaderTextActiveColor: $textColor;
 
 /// Hover background of an accordion panel header in expanded state
 /// @group panel
-$accordionHeaderActiveHoverBg: #e9ecef;
+$accordionHeaderActiveHoverBg: var(--surface-hover);
 
 /// Hover border of an accordion panel header in expanded state
 /// @group panel
-$accordionHeaderActiveHoverBorderColor: #dee2e6;
+$accordionHeaderActiveHoverBorderColor:var(--surface-border);
 
 /// Text color of an accordion panel header in expanded state
 /// @group panel
