@@ -12,7 +12,7 @@ export const listCountriesService = async () => {
 
   let httpResponse = await AxiosHttpClientAdapter.request(
     {
-      url: `${makeAzionCitiesBaseUrl()}`,
+      url: `${makeAzionCitiesBaseUrl()}/`,
       method: 'POST',
       body: payload
     },

@@ -1,6 +1,6 @@
 import { AxiosHttpClientAdapter } from '../axios/AxiosHttpClientAdapter'
 import * as Errors from '@/services/axios/errors'
-import { makeResendEmailBaseUrl } from './make-resend-email-url'
+import { makeResendEmailBaseUrl } from './make-resend-email-base-url'
 
 export const resendEmailService = async (payload) => {
   let httpResponse = await AxiosHttpClientAdapter.request({
