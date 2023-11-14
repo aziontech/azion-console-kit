@@ -1,3 +1,3 @@
 export const makeRealTimePurgeBaseUrl = () => {
-  return `real-time-purge`
+  return `purge`
 }

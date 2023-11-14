@@ -36,6 +36,15 @@ PRO-TIP (OPTIONAL) - To save some time, you can create a personal token in [Azio
 echo 'VITE_PERSONAL_TOKEN=PERSONALTOKEN' > .env.development
 ```
 
+## Pointing the API's
+
+Currently the Platform Kit uses the STAGE stack to connect with the Azion API's.
+But, if you want to point your application to PRODUCTION stack you just need to add the follow command in the `.env.development` file:
+
+```
+VITE_ENVIRONMENT='PRODUCTION'
+```
+
 ## Run on the Edge
 
 Azion Platform Kit runs natively on Azion's edge thanks to Azion CLI (>= 0.70.0):
