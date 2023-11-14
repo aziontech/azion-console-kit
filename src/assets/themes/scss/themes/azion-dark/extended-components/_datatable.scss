@@ -52,10 +52,11 @@
     line-height: 0.875rem;
     padding: 0.75rem 0.5rem !important;
     &::before {
-      content: '\2298' !important;
+      font-family: primeicons;
+      content: '\e965' !important;
       color: var(--text-color-secondary);
       margin-right: 0.3rem;
-      font-size: 1.25rem;
+      font-size: 0.875rem;
       line-height: 0.875rem;
     }
     &:hover {
