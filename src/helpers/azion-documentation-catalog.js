@@ -7,5 +7,6 @@ export const documentationCatalog = {
   intelligentDNS: () => azionDocumentationWindowOpener('intelligent-dns'),
   personalTokens: () => azionDocumentationWindowOpener('personal tokens'),
   domains: () => azionDocumentationWindowOpener('domains'),
+  realTimePurge: () => azionDocumentationWindowOpener('real-time-purge'),
   getStarted: () => azionDocumentationWindowOpener('get started')
 }

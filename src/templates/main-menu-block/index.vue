@@ -100,7 +100,7 @@
 
         <!-- Create Button Mobile -->
         <PrimeButton
-          @click="showCreateModal"
+          @click="showCreateMobileModal"
           icon="pi pi-plus"
           class="h-8 md:hidden text-white border-header"
           size="small"
@@ -193,7 +193,7 @@
       v-else
     />
   </header>
-  <!-- Mobile Profile  -->
+  <!-- Mobile Profile Menu  -->
   <Sidebar
     v-model:visible="showProfile"
     position="bottom"
@@ -217,10 +217,7 @@
       :model="profileMenuItems"
     >
       <template #start>
-        <div
-          class="flex flex-column px-2.5 h-14 justify-center"
-          @click="toggleProfile"
-        >
+        <div class="flex flex-column px-2.5 h-14 justify-center">
           <div class="flex flex-column align gap-1">
             <span class="text-sm font-medium">{{ user.name }}</span>
             <div class="flex gap-2">
@@ -387,10 +384,7 @@
     :model="profileMenuItems"
   >
     <template #start>
-      <div
-        class="flex flex-column mt-2 px-2.5 py-3"
-        @click="toggleProfile"
-      >
+      <div class="flex flex-column mt-2 px-2.5 py-3">
         <div class="flex flex-column align gap-1">
           <span class="text-sm font-medium">{{ user.name }}</span>
           <div class="flex gap-2">
@@ -401,6 +395,12 @@
       </div>
     </template>
     <template #end>
+      <div class="flex flex-row items-center">
+        <div class="flex flex-col gap-1 px-2 py-2.5">
+          <span class="text-sm font-medium leading-none">{{ user.full_name }}</span>
+          <span class="text-xs">{{ user.email }}</span>
+        </div>
+      </div>
       <PrimeMenu
         class="w-full border-none bg-transparent"
         :pt="{
@@ -411,16 +411,7 @@
         }"
         @click="toggleProfile"
         :model="profileMenuSettings"
-      >
-        <template #start>
-          <div class="flex flex-row items-center">
-            <div class="flex flex-col gap-1 px-2 py-2.5">
-              <span class="text-sm font-medium leading-none">{{ user.full_name }}</span>
-              <span class="text-xs">{{ user.email }}</span>
-            </div>
-          </div>
-        </template>
-      </PrimeMenu>
+      />
       <!-- Theme Switch -->
       <div class="flex flex-row justify-between items-center align-middle px-2 py-1.5">
         <span>Theme</span>
@@ -514,20 +505,46 @@
   <PrimeDialog
     v-model:visible="showCreate"
     modal
-    header="Create"
+    header="Create something new"
+    :pt="{
+      content: { class: 'p-4 sm:p-0' }
+    }"
     position="center"
     :dismissableMask="true"
     :breakpoints="{ '641px': '90vw' }"
-    :style="{ width: '65vw' }"
   >
     <!-- SLOT WIP -->
-    <div class="surface-border border border-dashed rounded-md flex items-center h-96">
-      <p class="text-color text-sm font-medium text-center w-full">
-        This section is under development.
-      </p>
+    <div>
+      <CreateModalBlock @closeModal="showCreate = false" />
     </div>
   </PrimeDialog>
 
+  <!-- Mobile modal Create -->
+  <Sidebar
+    v-model:visible="showCreateMobile"
+    position="bottom"
+    headerContent="Create something new"
+    :show-close-icon="false"
+    :pt="{
+      root: { class: 'h-[80%] flex p-0' },
+      headerContent: { class: 'w-full' },
+      mask: { class: 'flex' }
+    }"
+  >
+    <template #header>
+      <div class="flex items-center justify-between">
+        <h2>Create something new</h2>
+        <PrimeButton
+          icon="pi pi-times"
+          @click="closeCreateMobileModal"
+          size="small"
+          class="flex-none surface-border text-sm w-8 h-8"
+          text
+        />
+      </div>
+    </template>
+    <CreateModalBlock />
+  </Sidebar>
   <!-- Notification Menu -->
   <PrimeMenu
     ref="menu"
@@ -564,6 +581,7 @@
   import { mapActions, mapState } from 'pinia'
   import { listTypeAccountService } from '@/services/switch-account-services/list-type-account-service'
   import SwitchAccountBlock from '@/templates/switch-account-block'
+  import CreateModalBlock from '@/templates/create-modal-block'
 
   export default {
     name: 'HeaderTemplate',
@@ -579,13 +597,15 @@
       Dropdown,
       Tag,
       MobileLogo,
-      SwitchAccountBlock
+      SwitchAccountBlock,
+      CreateModalBlock
     },
     props: { isLogged: Boolean },
     data() {
       return {
         openSwitchAccount: false,
         showCreate: false,
+        showCreateMobile: false,
         showSearch: false,
         showSidebar: false,
         showProfile: false,
@@ -699,6 +719,16 @@
                 to: '/real-time-metrics',
                 icon: 'pi pi-chart-line',
                 tag: 'Beta'
+              }
+            ]
+          },
+          {
+            label: 'Tools',
+            items: [
+              {
+                label: 'Real-Time Purge',
+                to: '/real-time-purge',
+                icon: 'pi pi-refresh'
               }
             ]
           },
@@ -822,6 +852,12 @@
       },
       showCreateModal() {
         this.showCreate = true
+      },
+      showCreateMobileModal() {
+        this.showCreateMobile = true
+      },
+      closeCreateMobileModal() {
+        this.showCreateMobile = false
       },
       openSideBar() {
         this.showSidebar = !this.showSidebar

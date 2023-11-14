@@ -10,7 +10,7 @@
     }
 
     &:enabled:active {
-      background-color: var(--gray-200) !important;
+      background-color: var(--surface-hover) !important;
     }
 
     &.p-button-plain {
@@ -31,14 +31,17 @@
 
     &:enabled:hover {
       color: $textColor !important;
+      background-color:  var(--surface-hover);
     }
 
     &:enabled:active {
       color: $textColor !important;
+      background-color:  var(--surface-hover);
     }
 
     &.p-button-plain {
       color: $textColor !important;
+      background-color:  var(--surface-hover);
 
       &:enabled:hover {
         color: $textColor !important;
@@ -46,6 +49,7 @@
 
       &:enabled:active {
         color: $textColor !important;
+        background-color:  var(--surface-hover);
       }
     }
   }

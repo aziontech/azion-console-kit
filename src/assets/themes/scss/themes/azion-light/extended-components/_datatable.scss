@@ -1,6 +1,8 @@
 .p-datatable {
   border: var(--surface-border) 1px solid !important;
   border-radius: $borderRadius;
+  font-size: 0.875rem !important;
+  text-wrap: nowrap !important;
 
   .p-datatable-header {
     border-top-right-radius: $borderRadius;
@@ -12,6 +14,7 @@
     line-height: 1.125rem;
     padding: 0.5rem 0.875rem !important;
     box-sizing: inherit !important;
+    text-wrap: nowrap !important;
 
     .p-column-header-content {
       min-height: 2rem;
@@ -20,6 +23,7 @@
   }
 
   .p-sortable-column {
+    text-wrap: nowrap !important;
     .p-sortable-column-icon {
       opacity: 0 !important;
     }
@@ -33,6 +37,7 @@
   }
 
   .p-sortable-column {
+    text-wrap: nowrap !important;
     .p-sortable-column-icon {
       opacity: 0;
     }
