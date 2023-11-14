@@ -1,7 +1,8 @@
 .p-inputnumber-button {
-  color: $secondaryButtonTextColor;
-  background: $secondaryButtonBg;
-  border: $secondaryButtonBorder;
+  color: $inputIconColor;
+  background: $inputBg;
+  border: $inputBorder;
+  border-left: none;
 
   &:enabled:hover {
     background: $secondaryButtonHoverBg;

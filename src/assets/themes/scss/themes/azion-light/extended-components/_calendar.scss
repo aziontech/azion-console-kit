@@ -1,8 +1,9 @@
 .p-calendar {
   .p-button-icon-only {
-    color: $secondaryButtonTextColor;
-    background: $secondaryButtonBg;
-    border: $secondaryButtonBorder;
+    color: $inputIconColor;
+    background: $inputBg;
+    border: $inputBorder;
+    border-left: none;
 
     &:enabled:hover {
       background: $secondaryButtonHoverBg;
