@@ -65,14 +65,25 @@ describe('RealTimePurgeServices', () => {
     expect(feedbackMessage).rejects.toThrow(apiErrorMock)
   })
 
+  it('Should return an API error for an 403 error status', async () => {
+    const apiErrorMock = 'Unauthorized domain for your account'
+    vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
+      statusCode: 403,
+      body: {
+        detail: apiErrorMock
+      }
+    })
+    const { sut } = makeSut()
+
+    const feedbackMessage = sut(fixtures.realTimePurgeMock)
+
+    expect(feedbackMessage).rejects.toThrow(apiErrorMock)
+  })
+
   it.each([
     {
       statusCode: 401,
       expectedError: new Errors.InvalidApiTokenError().message
-    },
-    {
-      statusCode: 403,
-      expectedError: new Errors.PermissionError().message
     },
     {
       statusCode: 404,

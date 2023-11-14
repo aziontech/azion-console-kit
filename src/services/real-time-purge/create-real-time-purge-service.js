@@ -45,7 +45,8 @@ const parseHttpResponse = (httpResponse) => {
     case 401:
       throw new Errors.InvalidApiTokenError().message
     case 403:
-      throw new Errors.PermissionError().message
+      const keyError = Object.keys(httpResponse.body)[0]
+      throw new Error(httpResponse.body[keyError]).message
     case 404:
       throw new Errors.NotFoundError().message
     case 500:
