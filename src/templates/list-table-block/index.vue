@@ -2,8 +2,9 @@
   <div>
     <PageHeadingBlock :pageTitle="pageTitle" />
 
-    <div class="max-w-full mx-3 mb-8 md:mx-8">
+    <div class=" max-w-full mx-3 mb-8 md:mx-8">
       <DataTable
+        class=" overflow-clip rounded-md"
         v-if="!isLoading"
         @rowReorder="onRowReorder"
         scrollable
@@ -109,7 +110,7 @@
         </Column>
         <template #empty>
           <div class="my-4 flex flex-col gap-3 justify-center items-center">
-            <p class="text-xl font-normal text-gray-600">No registers found.</p>
+            <p class="text-xl font-normal text-secondary">No registers found.</p>
             <PrimeButton
               text
               icon="pi pi-plus"

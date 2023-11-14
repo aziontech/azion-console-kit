@@ -1,0 +1,14 @@
+.p-listbox {
+  &.p-focus {
+    border-color: none !important;
+    outline: none !important;
+    outline-offset: none !important;
+    box-shadow: none !important;
+  }
+  &.p-focus:focus-visible {
+    border-color: yellow !important;
+    outline: $focusOutline !important;
+    outline-offset: $focusOutlineOffset !important;
+    box-shadow: $focusShadow !important;
+  }
+}

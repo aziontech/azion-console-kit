@@ -6,7 +6,9 @@ export const documentationCatalog = {
   edgeServices: () => openSearchResult('edge services'),
   intelligentDNS: () => openSearchResult('intelligent-dns'),
   personalTokens: () => openSearchResult('personal tokens'),
-  domains: () => openSearchResult('domains')
+  domains: () => openSearchResult('domains'),
+  realTimePurge: () => openSearchResult('real-time-purge'),
+  getStarted: () => openSearchResult('get started')
 }
 
 export const documentationGuideProducts = {

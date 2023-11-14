@@ -11,7 +11,7 @@
     <template #form>
       <FormHorizontal
         title="Variables"
-        description="Espaço livre para descrição e instruções de preenchimento. Esse conteúdo deve ser criado pensando tanto em funcionalidade quanto em em alinhamento e estética. Devemos sempre criar os blocos conforme o contexto, cuidando sempre para não ter blocos muito longos."
+        description="Edit an environment variable or secret to use with configured edge functions."
       >
         <template #inputs>
           <div class="flex flex-col sm:max-w-lg w-full gap-2">
@@ -21,7 +21,7 @@
               >Key *</label
             >
             <InputText
-              placeholder="ex: GITHUB_API_KEY"
+              placeholder="GITHUB_API_KEY"
               v-bind="key"
               type="text"
               id="name"
@@ -42,7 +42,7 @@
               >Value *</label
             >
             <InputText
-              placeholder="ex: MY_GITHUB_API_VALUE"
+              placeholder="MY_GITHUB_API_VALUE"
               v-bind="value"
               type="text"
               :class="{ 'p-invalid': errors.value }"
@@ -61,7 +61,7 @@
               v-model="secret.value"
               :class="{ 'p-invalid': errors.secret }"
             />
-            <label for="secret">Value Secret</label>
+            <label for="secret">Secret</label>
           </div>
         </template>
       </FormHorizontal>
