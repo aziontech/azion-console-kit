@@ -52,9 +52,9 @@
     pageTitle: { type: String, required: true },
     title: { type: String, required: true },
     description: { type: String, required: true },
-    createButtonLabel: { type: String, required: true },
-    createPagePath: { type: String, required: true },
-    documentationService: { type: Function, required: true }
+    documentationService: { type: Function, required: true },
+    createPagePath: { type: String, required: false },
+    createButtonLabel: { type: String, required: false }
   })
   function openDocumentation() {
     props.documentationService()
