@@ -131,20 +131,17 @@
         description="Enable Mutual Authentication (mTLS) to require that both client and server present an authentication protocol to each other."
       >
         <template #inputs>
-          <div class="flex gap-2 items-top">
+          <div class="flex gap-3 items-center">
             <InputSwitch
               id="mtls"
-              class="flex-shrink-0 flex-grow"
               :class="{ 'p-invalid': errors.mtlsIsEnabled }"
               v-model="mtlsIsEnabled"
             />
-            <div class="flex flex-col gap-1">
-              <label
-                for="mtls"
-                class="text-sm font-normal leading-tight"
-                >Mutual Authentication</label
-              >
-            </div>
+            <label
+              for="mtls"
+              class="text-base"
+              >Mutual Authentication</label
+            >
           </div>
 
           <div
