@@ -14,8 +14,7 @@ export const digitalCertificatesRoutes = {
         listDigitalCertificatesService: DigitalCertificatesService.listDigitalCertificatesService,
         deleteDigitalCertificatesService:
           DigitalCertificatesService.deleteDigitalCertificatesService,
-        documentationService: Helpers.documentationCatalog.digitalCertificates,
-
+        documentationService: Helpers.documentationCatalog.digitalCertificates
       },
       meta: {
         breadCrumbs: [
