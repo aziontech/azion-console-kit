@@ -790,7 +790,7 @@
             to: 'list-your-settings'
           },
           {
-            label: 'Personal Token',
+            label: 'Personal Tokens',
             to: 'personal-tokens'
           }
         ],

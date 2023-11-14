@@ -1,7 +1,7 @@
 <template>
   <div>
     <CreateFormBlock
-      pageTitle="New Personal Token"
+      pageTitle="Create Personal Token"
       :createService="props.createPersonalTokenService"
       :formData="values"
       :formMeta="meta"
@@ -15,7 +15,7 @@
       <template #form>
         <FormHorizontal
           title="General"
-          description="Choose a name that is descriptive and easy to remember. Use the description to help you remember why the token was created and/or what it was created for."
+          description="Choose a name that is descriptive and easy to remember. Include a description to specify the token's purpose or usage."
         >
           <template #inputs>
             <div class="flex flex-col sm:max-w-lg w-full gap-2">
@@ -76,14 +76,14 @@
         </FormHorizontal>
         <FormHorizontal
           title="Token"
-          description="Define the token expiration date by selecting one of the suggested date ranges. For security matters, you can only copy the Personal Token right after you create it. In case you need the Personal Token code after that, you must create a new one."
+          description="Define the token's expiration date from the available options. Due to security reasons, the token will only be available immediately after it is created and cannot be edited in the future."
         >
           <template #inputs>
             <div class="flex flex-col w-full gap-2">
               <label
                 for="selectedExpiration"
                 class="text-color text-base font-medium"
-                >Expires in *</label
+                >Expires within *</label
               >
               <div class="flex gap-6">
                 <div class="md:w-80">
@@ -133,7 +133,7 @@
                 for="personalToken"
                 class="text-color text-base font-medium"
               >
-                Personal Token
+                Personal Token value
               </label>
               <div
                 class="flex gap-6 md:align-items-center max-sm:flex-col max-sm:align-items-baseline max-sm:gap-3"
@@ -157,7 +157,7 @@
                   outlined
                   type="button"
                   aria-label="Copy Personal Token"
-                  label="Copy to Clipboard"
+                  label="Copy"
                   @click="copyPersonalToken"
                 />
               </div>

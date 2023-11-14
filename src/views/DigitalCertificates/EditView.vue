@@ -1,6 +1,6 @@
 <template>
   <EditFormBlock
-    pageTitle="Edit Digital Certificates"
+    pageTitle="Edit Digital Certificate"
     :editService="editDigitalCertificateService"
     :loadService="loadDigitalCertificateService"
     :initialDataSetter="setValues"
