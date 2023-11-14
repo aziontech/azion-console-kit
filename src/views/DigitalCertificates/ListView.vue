@@ -5,7 +5,7 @@
     :columns="getColumns"
     pageTitle="Digital Certificates"
     editPagePath="digital-certificates/edit"
-    addButtonLabel="Add"
+    addButtonLabel="Digital Certificates"
     createPagePath="digital-certificates/create"
   />
 </template>

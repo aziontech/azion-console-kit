@@ -5,7 +5,7 @@
     :deleteService="deletePersonalTokenService"
     :columns="getColumns"
     pageTitle="Personal Tokens"
-    addButtonLabel="Add Personal Token"
+    addButtonLabel="Personal Token"
     createPagePath="personal-tokens/create"
     @on-load-data="handleLoadData"
     :visibleEditAction="false"
@@ -15,7 +15,7 @@
     pageTitle="Personal Tokens"
     title="No personal tokens added"
     description="Create your first personal token."
-    createButtonLabel="Add personal token"
+    createButtonLabel="Personal Token"
     createPagePath="personal-tokens/create"
     :documentationService="documentationService"
   >
