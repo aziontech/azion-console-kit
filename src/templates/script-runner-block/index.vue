@@ -1,29 +1,48 @@
 <template>
   <Accordion :activeIndex="active">
-    <AccordionTab :header="title" :disabled="!isPolling" ref="accordion">
+    <AccordionTab
+      :header="title"
+      :disabled="!isPolling"
+      ref="accordion"
+      :pt="{
+        content: {class: 'p-0 pl-5'}
+      }"
+    >
       <template #header>
         <div class="w-full flex">
           <div class="ml-auto flex justify-center items-center">
-            <ProgressSpinner v-if="!pollEnded" class="w-6 h-6" strokeWidth="6"/>
+            <ProgressSpinner
+              v-if="!pollEnded"
+              class="w-6 h-6 text-color"
+              strokeWidth="6"
+            />
           </div>
         </div>
       </template>
-      <div class="bg-transparent flex w-full h-60 flex-col overflow-auto pl-5 pb-3" ref="runner">
-        <p class="w-full text-color text-base font-['Menlo']" v-for="(log, index) in this.currentLogs" :key="index">
-          <span>
-            [{{ log.timeStamp }}]
-          </span>
+      <div
+        class="bg-transparent flex w-full h-60 flex-col overflow-auto pt-1 pb-3"
+        ref="runner"
+      >
+        <p
+          class="w-full text-color text-base"
+          v-for="(log, index) in this.currentLogs"
+          :key="index"
+        >
+          <span> [{{ log.timeStamp }}] </span>
           ›
-          <span class="w-full" v-html="log.content"></span>
+          <span
+            class="w-full"
+            v-html="log.content"
+          ></span>
         </p>
       </div>
     </AccordionTab>
   </Accordion>
 </template>
 <script>
-  import Accordion from 'primevue/accordion';
-  import AccordionTab from 'primevue/accordiontab';
-  import ProgressSpinner from 'primevue/progressspinner';
+  import Accordion from 'primevue/accordion'
+  import AccordionTab from 'primevue/accordiontab'
+  import ProgressSpinner from 'primevue/progressspinner'
 
   export default {
     name: 'script-runner-block',
@@ -42,7 +61,7 @@
       isPolling: false,
       status: undefined,
       emptyLogs: false,
-      pollEnded: false,
+      pollEnded: false
     }),
     props: {
       title: {
@@ -61,7 +80,7 @@
     methods: {
       startPolling() {
         this.polling = setInterval(() => {
-          this.handlePoll();
+          this.handlePoll()
         }, 3000)
       },
       async getlogs() {
@@ -71,7 +90,7 @@
           this.currentLogs = data.logs
           this.status = data.status
           if (stopStatusList.includes(this.status)) {
-            clearInterval(this.polling);
+            clearInterval(this.polling)
             this.pollEnded = true
           }
         } catch (error) {
@@ -88,13 +107,15 @@
         await this.getlogs()
         this.isPolling = true
         this.active = 0
-        setTimeout(() => {this.scrollScriptRunnerLogs()}, 100)
+        setTimeout(() => {
+          this.scrollScriptRunnerLogs()
+        }, 100)
       },
 
       scrollScriptRunnerLogs() {
-        const positionY = this.$refs.runner.scrollHeight;
+        const positionY = this.$refs.runner.scrollHeight
         this.$refs.runner.scrollTo(0, positionY)
-      },
+      }
     }
   }
 </script>

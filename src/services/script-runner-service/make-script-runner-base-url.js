@@ -1,5 +1,3 @@
 export const makeScriptRunnerBaseUrl = () => {
-    return `script-runner`
-  }
-  
-  
+  return `script-runner`
+}
