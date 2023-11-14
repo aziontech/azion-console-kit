@@ -140,7 +140,6 @@
           class="w-full flex-row-reverse"
           :loading="isButtonLoading"
           label="Sign In"
-          severity="secondary"
           type="button"
           @click="validateAndSubmit"
           :disabled="!password"
