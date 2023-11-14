@@ -13,7 +13,7 @@
         dataKey="id"
         v-model:selection="selectedRow"
         selectionMode="single"
-        @row-click="editItemSelected($event)"
+        @row-click="editItemSelected"
         v-model:filters="filters"
         :paginator="showPagination"
         :rowsPerPageOptions="[10, 20, 50, 100]"

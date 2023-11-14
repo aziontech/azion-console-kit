@@ -15,7 +15,7 @@
         :loading="isLoading"
         v-model:selection="selectedRow"
         selectionMode="single"
-        @row-click="editItemSelected($event)"
+        @row-click="editItemSelected"
       >
         <template #header>
           <div class="flex flex-wrap justify-between gap-2 w-full">
