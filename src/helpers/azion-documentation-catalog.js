@@ -8,7 +8,8 @@ export const documentationCatalog = {
   personalTokens: () => openSearchResult('personal tokens'),
   domains: () => openSearchResult('domains'),
   realTimePurge: () => openSearchResult('real-time-purge'),
-  getStarted: () => openSearchResult('get started')
+  getStarted: () => openSearchResult('get started'),
+  digitalCertificates: () => openSearchResult('digital certificates')
 }
 
 export const documentationGuideProducts = {
