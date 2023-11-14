@@ -1,5 +1,6 @@
 <template>
   <ListTableBlock
+    v-if="hasContentToList"
     :listService="listDigitalCertificatesService"
     :deleteService="deleteDigitalCertificatesService"
     :columns="getColumns"
@@ -7,16 +8,35 @@
     editPagePath="digital-certificates/edit"
     addButtonLabel="Add"
     createPagePath="digital-certificates/create"
+    @on-load-data="handleLoadData"
   />
+
+  <EmptyResultsBlock
+    v-else
+    pageTitle="Digital Certificates"
+    title="No digital certificates added"
+    description="Create your first digital certificates."
+    createButtonLabel="Add digital certificates"
+    createPagePath="digital-certificates/create"
+    :documentationService="documentationService"
+  >
+    <template #illustration>
+      <Illustration />
+    </template>
+  </EmptyResultsBlock>
 </template>
 
 <script>
   import ListTableBlock from '@/templates/list-table-block'
+  import EmptyResultsBlock from '@/templates/empty-results-block'
+  import Illustration from '@/assets/svg/illustration-layers.vue'
 
   export default {
     name: 'digital-certificates-view',
     components: {
-      ListTableBlock
+      ListTableBlock,
+      EmptyResultsBlock,
+      Illustration
     },
     props: {
       listDigitalCertificatesService: {
@@ -26,8 +46,15 @@
       deleteDigitalCertificatesService: {
         required: true,
         type: Function
+      },
+      documentationService: {
+        required: true,
+        type: Function
       }
     },
+    data: () => ({
+      hasContentToList: true
+    }),
     computed: {
       getColumns() {
         return [
@@ -56,6 +83,11 @@
             header: 'Status'
           }
         ]
+      }
+    },
+    methods: {
+      handleLoadData(event) {
+        this.hasContentToList = event
       }
     }
   }
