@@ -43,11 +43,6 @@
         @page="onPage($event)"
         :totalRecords="totalRecords"
         :loading="isLoading"
-        tableStyle="max-sm:min-width: 50rem"
-        :pt="{
-          root: { class: 'border surface-border rounded' },
-          header: { class: 'rounded p-3.5' }
-        }"
       >
         <template #header>
           <slot
@@ -85,22 +80,24 @@
             <div class="flex justify-end w-full">
               <PrimeButton
                 outlined
-                icon="pi pi-bars"
+                icon="ai ai-column"
+                class="table-button"
                 @click="toggleColumnSelector"
-                v-tooltip.left="'Hidden columns'"
+                v-tooltip.top="{ value: 'Hidden Columns', showDelay: 200 }"
               >
               </PrimeButton>
               <OverlayPanel ref="columnSelectorPanel">
                 <Listbox
                   v-model="selectedColumns"
                   multiple
-                  :options="[{ label: 'Hidden columns', items: columns }]"
+                  :options="[{ label: 'Hidden Columns', items: this.columns }]"
+                  class="hidden-columns-panel"
                   optionLabel="header"
                   optionGroupLabel="label"
                   optionGroupChildren="items"
                 >
                   <template #optiongroup="slotProps">
-                    <p class="text-sm font-bold">{{ slotProps.option.label }}</p>
+                    <p class="text-sm font-medium">{{ slotProps.option.label }}</p>
                   </template>
                 </Listbox>
               </OverlayPanel>
@@ -118,11 +115,8 @@
         v-if="isLoading"
         :value="Array(10)"
         scrollable
+        class="p-datatable-sm"
         removableSort
-        :pt="{
-          root: { class: 'border surface-border rounded' },
-          header: { class: 'rounded' }
-        }"
       >
         <template #header>
           <slot

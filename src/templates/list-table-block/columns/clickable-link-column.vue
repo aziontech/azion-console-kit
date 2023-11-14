@@ -1,9 +1,11 @@
 <template>
   <PrimeButton
     link
+    size="small"
+    class="p-link underline px-0"
     @click="handleClick"
   >
-    <p class="p-link underline">{{ content }}</p>
+    {{ content }}
   </PrimeButton>
 </template>
 
