@@ -10,16 +10,16 @@
 
       <slot name="raw-form" />
     </form>
+
     <DialogUnsavedBlock
-      v-model:visible="dialogUnsaved"
-      @leavePage="leavePage"
-      @keepEditing="keepEditing"
+      :leavePage="leavePage"
+      :blockRedirectUnsaved="hasModifications"
     />
     <ActionBarTemplate
-      @cancel="openDialogUnsaved"
+      @cancel="handleCancel"
       @submit="handleSubmit"
       :loading="isLoading"
-      :submitDisabled="!isValid"
+      :submitDisabled="!formMeta.valid"
     />
   </div>
 </template>
@@ -38,7 +38,7 @@
     },
     data: () => ({
       isLoading: false,
-      dialogUnsaved: false
+      blockViewRedirection: true
     }),
     props: {
       pageTitle: {
@@ -55,10 +55,6 @@
       },
       initialDataSetter: {
         type: Function,
-        required: true
-      },
-      isValid: {
-        type: Boolean,
         required: true
       },
       formData: {
@@ -82,19 +78,10 @@
       await this.loadInitialData()
     },
     methods: {
-      leavePage() {
-        this.dialogUnsaved = false
+      leavePage(dialogUnsaved) {
+        dialogUnsaved = false
         this.handleCancel()
-      },
-      keepEditing() {
-        this.dialogUnsaved = false
-      },
-      openDialogUnsaved() {
-        if (this.formMeta.touched) {
-          this.dialogUnsaved = true
-          return
-        }
-        this.handleCancel()
+        return dialogUnsaved
       },
       handleCancel() {
         if (this.backURL) {
@@ -133,8 +120,10 @@
             summary: feedback ?? 'edited successfully',
             life: 10000
           })
+          this.blockViewRedirection = false
           this.goBackToList()
         } catch (error) {
+          this.blockViewRedirection = true
           this.$toast.add({
             closable: false,
             severity: 'error',
@@ -146,6 +135,11 @@
             this.isLoading = false
           }, 800)
         }
+      }
+    },
+    computed: {
+      hasModifications() {
+        return this.formMeta.touched && this.blockViewRedirection
       }
     }
   }

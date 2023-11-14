@@ -11,7 +11,6 @@
             :editService="editIntelligentDNSService"
             :loadService="loadIntelligentDNSService"
             :initialDataSetter="setValues"
-            :isValid="meta.valid"
             :formData="values"
             :formMeta="meta"
           >

@@ -1,4 +1,5 @@
 import * as DigitalCertificatesService from '@/services/digital-certificates-services'
+import * as Helpers from '@/helpers'
 
 /** @type {import('vue-router').RouteRecordRaw} */
 export const digitalCertificatesRoutes = {
@@ -12,7 +13,8 @@ export const digitalCertificatesRoutes = {
       props: {
         listDigitalCertificatesService: DigitalCertificatesService.listDigitalCertificatesService,
         deleteDigitalCertificatesService:
-          DigitalCertificatesService.deleteDigitalCertificatesService
+          DigitalCertificatesService.deleteDigitalCertificatesService,
+        documentationService: Helpers.documentationCatalog.digitalCertificates
       },
       meta: {
         breadCrumbs: [

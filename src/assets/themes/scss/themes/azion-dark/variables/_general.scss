@@ -20,7 +20,7 @@ $textSecondaryColor: #b5b5b5;
 
 /// Background of a highlighted item
 /// @group general
-$highlightBg: rgba($primaryColor, 0.04);
+$highlightBg: rgba($primaryColor, 0.06);
 
 /// Text color of a highlighted item
 /// @group general
@@ -28,7 +28,7 @@ $highlightTextColor: none;
 
 /// Background of a highlighted item in focus state
 /// @group general
-$highlightFocusBg: rgba($primaryColor, 0.08) !default;
+$highlightFocusBg: rgba($primaryColor, 0.08);
 
 /// Radius of the corners
 /// @group general

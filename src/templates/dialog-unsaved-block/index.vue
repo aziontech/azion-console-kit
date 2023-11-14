@@ -1,4 +1,3 @@
-<!-- eslint-disable vuejs-accessibility/click-events-have-key-events -->
 <template>
   <div>
     <PrimeDialog
@@ -40,36 +39,70 @@
 </template>
 
 <script setup>
-  import { computed } from 'vue'
+  import { computed, ref } from 'vue'
   import PrimeDialog from 'primevue/dialog'
   import PrimeButton from 'primevue/button'
+  import { onBeforeRouteLeave, useRouter } from 'vue-router'
 
   defineOptions({ name: 'dialog-unsaved-block' })
-  const emit = defineEmits(['update:visible', 'keepEditing', 'leavePage'])
+  const emit = defineEmits(['update:visible'])
 
   const props = defineProps({
     visible: {
       type: Boolean,
-      required: true
+      default: false
+    },
+    blockRedirectUnsaved: {
+      type: Boolean,
+      default: true
+    },
+    leavePage: {
+      type: Function
+    },
+    keepEditing: {
+      type: Function
     }
   })
 
+  const showDialog = ref(props.visible)
+  const unsavedDisabled = ref(false)
   const visibleDialog = computed({
-    get: () => props.visible,
+    get: () => showDialog.value,
     set: (value) => {
+      showDialog.value = value
       emit('update:visible', value)
     }
   })
+
+  const router = useRouter()
 
   const openDialogUnsaved = (value) => {
     visibleDialog.value = value
   }
 
   const onLeavePage = () => {
-    emit('leavePage')
+    unsavedDisabled.value = true
+    if (props.leavePage) {
+      props.leavePage(visibleDialog)
+      return
+    }
+    openDialogUnsaved(false)
+    router.go(-1)
   }
 
   const onKeepEditing = () => {
-    emit('keepEditing')
+    if (props.keepEditing) {
+      props.keepEditing()
+      return
+    }
+    openDialogUnsaved(false)
   }
+
+  onBeforeRouteLeave((to, from, next) => {
+    if (props.blockRedirectUnsaved && !unsavedDisabled.value) {
+      visibleDialog.value = true
+      return next(false)
+    }
+    return next()
+  })
 </script>

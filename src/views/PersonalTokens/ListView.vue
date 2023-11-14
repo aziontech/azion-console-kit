@@ -13,7 +13,7 @@
   <EmptyResultsBlock
     v-else
     pageTitle="Personal Tokens"
-    title="No personal tokens added"
+    title="No personal tokens found"
     description="Create your first personal token."
     createButtonLabel="Personal Token"
     createPagePath="personal-tokens/create"
@@ -53,7 +53,7 @@
   const getColumns = ref([
     {
       field: 'name',
-      header: 'Token Name'
+      header: 'Name'
     },
     {
       field: 'description',
@@ -68,11 +68,11 @@
     },
     {
       field: 'created',
-      header: 'Last modified'
+      header: 'Last Modified'
     },
     {
       field: 'expiresAt',
-      header: 'Expires'
+      header: 'Expiration Date'
     }
   ])
 
