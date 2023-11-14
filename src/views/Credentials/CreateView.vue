@@ -3,7 +3,6 @@
     pageTitle="Create Credential"
     :createService="createCredentialService"
     :formData="values"
-    :isValid="meta.valid"
     :formMeta="meta"
     :cleanFormCallback="resetForm"
   >

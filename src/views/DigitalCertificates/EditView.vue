@@ -4,7 +4,6 @@
     :editService="editDigitalCertificateService"
     :loadService="loadDigitalCertificateService"
     :initialDataSetter="setValues"
-    :isValid="meta.valid"
     :formData="values"
     :formMeta="meta"
   >

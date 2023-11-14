@@ -3,7 +3,6 @@
     pageTitle="Create Edge Service"
     :createService="props.createEdgeService"
     :formData="values"
-    :isValid="meta.valid"
     :formMeta="meta"
     :cleanFormCallback="resetForm"
   >
