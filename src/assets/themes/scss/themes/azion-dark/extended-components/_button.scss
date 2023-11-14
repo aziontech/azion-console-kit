@@ -54,9 +54,10 @@
     }
   }
 
-  &.p-button-icon-only {
+  &.p-button-icon-only:not(.p-datepicker-trigger, .p-inputnumber-button) {
     color: $textColor !important;
-
+    width: 2rem !important;
+    height: 2rem !important;
     .p-button-icon-left,
     .p-button-icon-right {
       margin: 0;
@@ -119,9 +120,4 @@
   &:not(:disabled):focus-visible {
     box-shadow: $linkButtonFocusShadow !important;
   }
-}
-
-.p-button-icon-only {
-  width: 2rem !important;
-  height: 2rem !important;
 }
