@@ -181,8 +181,6 @@
   import * as yup from 'yup'
   import { computed } from 'vue'
 
-  // a computed ref
-
   const props = defineProps({
     createRealTimePurgeService: {
       type: Function,
@@ -211,7 +209,7 @@
 
   const placeholder = computed(() => {
     if (purge_type.value === 'cachekey') {
-      return 'httpswww.example.com.br/index.html'
+      return 'https://www.example.com.br/index.html'
     }
     if (purge_type.value === 'wildcard') {
       return 'www.example.com/*'
