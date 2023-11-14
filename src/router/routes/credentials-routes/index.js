@@ -13,7 +13,7 @@ export const credentialsRoutes = {
       props: {
         listCredentialsService: CredentialServices.listCredentialsService,
         deleteCredentialService: CredentialServices.deleteCredentialService,
-        documentationService: Helpers.documentationCatalog.credentials,
+        documentationService: Helpers.documentationCatalog.credentials
       },
       meta: {
         breadCrumbs: [
