@@ -31,6 +31,11 @@ export default defineConfig({
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/api\/edge-services/, '')
       },
+      '/api/script-runner': {
+        target: 'https://stage-manager.azion.com/script-runner/api/',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/api\/script-runner/, '')
+      },
       '/api/variables': {
         target: 'https://stage-manager.azion.com/variables/api/',
         changeOrigin: true,
