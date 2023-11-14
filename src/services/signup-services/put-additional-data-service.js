@@ -1,32 +1,31 @@
 import { AxiosHttpClientAdapter } from '../axios/AxiosHttpClientAdapter'
 import * as Errors from '@/services/axios/errors'
-import { makeAdditionalDataBaseUrl } from './make-additional-data-base-url'
+import { makeAccountInfoBaseUrl } from './make-account-info-base-url'
+import { parseCamelToSnake } from '@/helpers/parse-api-body'
 
-export const listAdditionalDataInfoService = async () => {
+export const putAdditionalDataService = async (payload) => {
   let httpResponse = await AxiosHttpClientAdapter.request({
-    url: `${makeAdditionalDataBaseUrl()}`,
-    method: 'GET'
+    url: `${makeAccountInfoBaseUrl()}`,
+    method: 'PUT',
+    body: parseCamelToSnake(payload)
   })
-
   return parseHttpResponse(httpResponse)
 }
 
 /**
- * Parses the HTTP response and handles different status codes.
- *
  * @param {Object} httpResponse - The HTTP response object.
- * @return {Object} httpResponse.body - The response body.
+ * @param {Object} httpResponse.body - The response body.
+ * @param {String} httpResponse.statusCode - The HTTP status code.
+ * @returns {String} The result message based on the status code.
  * @throws {Error} If there is an error with the response.
  */
 
-export const parseHttpResponse = (httpResponse) => {
+const parseHttpResponse = (httpResponse) => {
   switch (httpResponse.statusCode) {
     case 200:
-      return httpResponse.body
+      return null
     case 400:
       throw new Errors.InvalidApiRequestError().message
-    case 401:
-      throw new Errors.InvalidApiTokenError().message
     case 403:
       throw new Errors.PermissionError().message
     case 404:

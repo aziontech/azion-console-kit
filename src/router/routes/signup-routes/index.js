@@ -35,7 +35,8 @@ export const signupRoutes = {
       component: () => import('@views/Signup/AdditionalDataView.vue'),
       props: {
         listAdditionalDataInfoService: SignupService.listAdditionalDataInfoService,
-        listCountriesService: SignupService.listCountriesService
+        listCountriesService: SignupService.listCountriesService,
+        putAdditionalDataService: SignupService.putAdditionalDataService
       },
       meta: {
         hideNavigation: true,

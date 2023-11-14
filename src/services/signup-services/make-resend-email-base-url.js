@@ -1,3 +1,3 @@
 export const makeResendEmailBaseUrl = () => {
-  return '/user/activation/request'
+  return 'user/activation/request'
 }
