@@ -17,16 +17,15 @@ export const createRealTimePurgeService = async (payload) => {
 const adapt = (payload) => {
   const request = {
     urls: payload.argumentsPurge.trim().split('\n'),
-    method: "delete",
+    method: 'delete'
   }
 
-  if(payload.purge_type === 'cachekey') {
+  if (payload.purge_type === 'cachekey') {
     request.layer = payload.layer
   }
 
   return request
 }
-
 
 /**
  * @param {Object} httpResponse - The HTTP response object.
