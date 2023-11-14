@@ -8,6 +8,7 @@
       <AdditionalDataFormBlock
         :listAdditionalDataInfoService="listAdditionalDataInfoService"
         :listCountriesService="listCountriesService"
+        :putAdditionalDataService="putAdditionalDataService"
       />
     </template>
   </PageWithFormBlock>
@@ -23,6 +24,10 @@
       required: true
     },
     listCountriesService: {
+      type: Function,
+      required: true
+    },
+    putAdditionalDataService: {
       type: Function,
       required: true
     }

@@ -38,13 +38,13 @@
         </template>
         <template v-else>
           <label
-            v-for="item in projectTypeList"
+            v-for="item in projectTypeSelectionList"
             :key="item.value"
             class="w-full border-1 rounded-md surface-border font-medium flex align-items-center justify-between p-4 gap-2"
-            :class="{ 'border-radio-card-active': projectType === item.value }"
+            :class="{ 'border-radio-card-active': projectTypeSelection === item.value }"
             >{{ item.label }}
             <PrimeRadio
-              v-model="projectType"
+              v-model="projectTypeSelection"
               :value="item.value"
             />
           </label>
@@ -119,6 +119,8 @@
   import { useForm, useField } from 'vee-validate'
   import * as yup from 'yup'
   import { ref, onMounted } from 'vue'
+  import { useRouter } from 'vue-router'
+  import { useToast } from 'primevue/usetoast'
 
   defineOptions({
     name: 'additional-data-form-block'
@@ -130,6 +132,10 @@
       required: true
     },
     listCountriesService: {
+      type: Function,
+      required: true
+    },
+    putAdditionalDataService: {
       type: Function,
       required: true
     }
@@ -155,7 +161,7 @@
   const companySizeList = ref([])
   const countriesList = ref([])
   const jobFunctionList = ref([])
-  const projectTypeList = [
+  const projectTypeSelectionList = [
     { label: 'Just a personal project', value: 'personal' },
     { label: 'Internal project for my company', value: 'internal' },
     { label: 'Multiple projects for other companies', value: 'multiple_project' },
@@ -166,19 +172,19 @@
 
   const validationSchema = yup.object({
     jobFunction: yup.string().required(),
-    projectType: yup.string().required(),
-    companyName: yup.string().when('projectType', {
+    projectTypeSelection: yup.string().required(),
+    companyName: yup.string().when('projectTypeSelection', {
       is: typeToEnableCompanyFields,
       then: yup
         .string()
         .max(50, 'Exceeded number of characters')
         .required('Company name is required')
     }),
-    companySize: yup.string().when('projectType', {
+    companySize: yup.string().when('projectTypeSelection', {
       is: typeToEnableCompanyFields,
       then: yup.string().required('Company size is required')
     }),
-    country: yup.string().when('projectType', {
+    country: yup.string().when('projectTypeSelection', {
       is: typeToEnableCompanyFields,
       then: yup.string().required('Country is required')
     })
@@ -187,14 +193,26 @@
   const { values, meta } = useForm({ validationSchema })
 
   const { value: jobFunction } = useField('jobFunction')
-  const { value: projectType } = useField('projectType')
+  const { value: projectTypeSelection } = useField('projectTypeSelection')
   const { value: companyName } = useField('companyName')
   const { value: companySize } = useField('companySize')
   const { value: country } = useField('country')
 
   const loading = ref(false)
 
-  const submitForm = () => {
-    return values
+  const router = useRouter()
+  const toast = useToast()
+
+  const submitForm = async () => {
+    loading.value = true
+
+    try {
+      await props.putAdditionalDataService({ ...values })
+      router.push({ name: 'home' })
+    } catch (err) {
+      toast.add({ life: 5000, severity: 'error', detail: err, summary: 'Error' })
+    } finally {
+      loading.value = false
+    }
   }
 </script>
