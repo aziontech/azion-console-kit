@@ -4,7 +4,6 @@
     :createService="createNetworkListService"
     :formData="values"
     :formMeta="meta"
-    :isValid="meta.valid"
     :cleanFormCallback="resetForm"
   >
     <template #form>

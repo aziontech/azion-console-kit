@@ -16,7 +16,7 @@
       @cancel="handleCancel"
       @submit="handleSubmit"
       :loading="isLoading"
-      :submitDisabled="!formMeta.invalid"
+      :submitDisabled="!formMeta.valid"
     />
   </div>
 </template>

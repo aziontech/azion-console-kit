@@ -4,7 +4,6 @@
     :editService="this.editNetworkListsService"
     :loadService="this.loadNetworkListsService"
     :initialDataSetter="setValues"
-    :isValid="meta.valid"
     :formData="values"
     :formMeta="meta"
   >

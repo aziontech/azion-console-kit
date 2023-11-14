@@ -3,7 +3,6 @@
     pageTitle="New Edge Function"
     :createService="props.createEdgeFunctionsService"
     :formData="values"
-    :isValid="meta.valid"
     :formMeta="meta"
     :cleanFormCallback="resetForm"
     :hasTabs="true"
