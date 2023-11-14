@@ -89,8 +89,8 @@
             icon="pi pi-external-link"
             iconPos="right"
             size="small"
-            :pt="{ 
-              label: { class: 'w-fit' } 
+            :pt="{
+              label: { class: 'w-fit' }
             }"
             @click="openDocsRealTimeMetrics"
           />
@@ -254,9 +254,22 @@
       Dropdown
     },
     props: {
-      listTeamsService: Function,
-      inviteYourTeamService: Function,
-      inviteSession: Object
+      listTeamsService: {
+        type: Function,
+        required: true
+      },
+      inviteYourTeamService: {
+        type: Function,
+        required: true
+      },
+      inviteSession: {
+        type: Object,
+        required: true
+      },
+      windowManager: {
+        type: Object,
+        required: true
+      }
     },
     data() {
       return {
@@ -283,25 +296,19 @@
       },
       navigateToRealTimeMetrics() {},
       openDocsEdgeApplication() {
-        window.open(
-          'https://www.azion.com/en/documentation/products/guides/build/build-an-application/',
-          '_blank'
-        )
+        this.windowManager.documentationGuideProducts.edgeApplication()
       },
       openDocsRealTimeMetrics() {
-        window.open('https://www.azion.com/en/documentation/products/real-time-metrics/', '_blank')
+        this.windowManager.documentationGuideProducts.realTimeMetrics()
       },
       openProductDocumentation() {
-        window.open('https://www.azion.com/en/documentation/', '_blank')
+        this.windowManager.openDocumentation()
       },
       openAPIDocumentation() {
-        window.open('https://api.azion.com/', '_blank')
+        this.windowManager.openAPIDocumentation()
       },
       openContactSupport() {
-        window.open('https://tickets.azion.com/en/support/home', '_blank')
-      },
-      createTeamService() {
-        // TODO
+        this.windowManager.openContactSupport()
       },
       async handleSubmit() {
         try {

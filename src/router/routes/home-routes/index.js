@@ -1,5 +1,11 @@
 import * as UsersService from '@/services/users-services'
-import InviteSession from '@/tests/helpers/invite-session'
+import {
+  InviteSession,
+  documentationGuideProducts,
+  openDocumentation,
+  openAPIDocumentation,
+  openContactSupport
+} from '@/helpers'
 
 /** @type {import('vue-router').RouteRecordRaw} */
 export const homeRoutes = {
@@ -9,6 +15,12 @@ export const homeRoutes = {
   props: {
     listTeamsService: UsersService.listTeamsService,
     inviteYourTeamService: UsersService.inviteYourTeamService,
-    inviteSession: InviteSession
+    inviteSession: InviteSession,
+    windowManager: {
+      documentationGuideProducts,
+      openDocumentation,
+      openAPIDocumentation,
+      openContactSupport
+    }
   }
 }
