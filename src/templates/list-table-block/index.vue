@@ -68,21 +68,21 @@
                 outlined
                 icon="ai ai-column"
                 @click="toggleColumnSelector"
-                v-tooltip.top="{ value: 'Hidden columns', showDelay: 200 }"
+                v-tooltip.top="{ value: 'Hidden Columns', showDelay: 200 }"
               >
               </PrimeButton>
               <OverlayPanel ref="columnSelectorPanel">
                 <Listbox
                   v-model="selectedColumns"
                   multiple
-                  :options="[{ label: 'Hidden columns', items: this.columns }]"
+                  :options="[{ label: 'Hidden Columns', items: this.columns }]"
                   class="hidden-columns-panel"
                   optionLabel="header"
                   optionGroupLabel="label"
                   optionGroupChildren="items"
                 >
                   <template #optiongroup="slotProps">
-                    <p class="text-sm font-bold">{{ slotProps.option.label }}</p>
+                    <p class="text-sm font-medium">{{ slotProps.option.label }}</p>
                   </template>
                 </Listbox>
               </OverlayPanel>

@@ -45,6 +45,9 @@
   }
 }
 
+.p-overlaypanel:has(.hidden-columns-panel) {
+  box-shadow: none !important;
+}
 .hidden-columns-panel {
   .p-listbox-item {
     font-size: 0.875rem;
