@@ -26,6 +26,7 @@
             placeholder="example@email.com"
             type="email"
             class="w-full"
+            @keyup.enter="showPasswordStep()"
             :class="{ 'p-invalid': errors.email }"
             v-tooltip.top="{ value: errors.email, showDelay: 200 }"
           />
@@ -86,7 +87,7 @@
             class="w-7 h-7"
             outlined
             icon="pi pi-chevron-left"
-            @click="showPassword = false"
+            @click="resetPasswordStep"
           ></PrimeButton>
           <p class="text-sm">{{ email.value }}</p>
         </div>
@@ -105,6 +106,7 @@
               class="w-full"
               placeholder=""
               :class="{ 'p-invalid': errorPassword }"
+              @keyup.enter="submit"
               :feedback="false"
               v-tooltip.top="{ value: errorPassword, showDelay: 200 }"
             />
@@ -237,6 +239,7 @@
 
   const validateAndSubmit = async () => {
     try {
+      if (!email.value.value) return
       isButtonLoading.value = true
 
       const loginData = {
@@ -247,13 +250,9 @@
       await props.authenticationLoginService(loginData)
       const { user_tracking_info: userInfo, twoFactor, trustedDevice } = await verify()
 
-      if (twoFactor && !trustedDevice) {
-        router.push('/mfa/setup')
-        return
-      }
-
-      if (trustedDevice) {
-        router.push('/mfa/authentication')
+      if (twoFactor) {
+        const mfaRoute = trustedDevice ? 'authentication' : 'setup'
+        router.push(`/mfa/${mfaRoute}`)
         return
       }
 
@@ -292,7 +291,14 @@
     setTimeout(() => {
       isProccedButtonLoading.value = false
       showPassword.value = true
+      hasRequestErrorMessage.value = null
     }, 500)
+  }
+
+  const resetPasswordStep = () => {
+    showPassword.value = false
+    hasRequestErrorMessage.value = null
+    password.value = null
   }
 
   defineExpose({
