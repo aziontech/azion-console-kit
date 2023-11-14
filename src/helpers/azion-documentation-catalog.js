@@ -8,5 +8,6 @@ export const documentationCatalog = {
   personalTokens: () => azionDocumentationWindowOpener('personal tokens'),
   domains: () => azionDocumentationWindowOpener('domains'),
   realTimePurge: () => azionDocumentationWindowOpener('real-time-purge'),
-  getStarted: () => azionDocumentationWindowOpener('get started')
+  getStarted: () => azionDocumentationWindowOpener('get started'),
+  digitalCertificates: () =>  azionDocumentationWindowOpener('digital certificates')
 }
