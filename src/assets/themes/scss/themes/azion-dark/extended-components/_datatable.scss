@@ -1,6 +1,8 @@
 .p-datatable {
   border: var(--surface-border) 1px solid !important;
   border-radius: $borderRadius;
+  font-size: 0.875rem !important;
+  text-wrap: nowrap !important;
 
   .p-datatable-header {
     border-top-right-radius: $borderRadius;
@@ -15,6 +17,7 @@
   .p-datatable-thead > tr > th {
     box-sizing: inherit !important;
     font-size: 0.875rem;
+    text-wrap: nowrap !important;
 
     .p-column-header-content {
       vertical-align: center;
