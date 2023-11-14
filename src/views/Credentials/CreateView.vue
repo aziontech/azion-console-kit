@@ -3,14 +3,13 @@
     pageTitle="Create Credential"
     :createService="createCredentialService"
     :formData="values"
-    :isValid="meta.valid"
     :formMeta="meta"
     :cleanFormCallback="resetForm"
   >
     <template #form>
       <FormHorizontal
         title="Credentials"
-        description="Espaço livre para descrição e instruções de preenchimento. Esse conteúdo deve ser criado pensando tanto em funcionalidade quanto em em alinhamento e estética. Devemos sempre criar os blocos conforme o contexto, cuidando sempre para não ter blocos muito longos."
+        description="Create credentials to use and authenticate Edge Orchestrator services."
       >
         <template #inputs>
           <div class="flex flex-col sm:max-w-lg w-full gap-2">
@@ -20,7 +19,6 @@
               >Name *</label
             >
             <InputText
-              placeholder="Add Credential Name"
               v-model="name"
               id="name"
               type="text"

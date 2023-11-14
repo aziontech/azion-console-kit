@@ -4,13 +4,12 @@
     :createService="createNetworkListService"
     :formData="values"
     :formMeta="meta"
-    :isValid="meta.valid"
     :cleanFormCallback="resetForm"
   >
     <template #form>
       <FormHorizontal
-        title="Network List"
-        description="Create allowlists, blocklists, and even greylists based on IP addresses, geolocation (countries), or Autonomous System Number (ASN) to use with configured rule sets on Rules Engine."
+        title="General"
+        description="description"
       >
         <template #inputs>
           <div class="flex flex-col sm:max-w-lg w-full gap-2">
@@ -20,7 +19,6 @@
               >Name *</label
             >
             <InputText
-              placeholder="My network list"
               v-bind="name"
               id="name"
               type="text"
@@ -33,6 +31,13 @@
               >{{ errors.name }}</small
             >
           </div>
+        </template>
+      </FormHorizontal>
+      <FormHorizontal
+        title="List Settings"
+        description="description"
+      >
+        <template #inputs>
           <div class="flex flex-col w-full sm:max-w-xs gap-2">
             <label
               for="id"
@@ -74,6 +79,10 @@
               v-if="errors.asn"
               class="p-error text-xs font-normal leading-tight"
               >{{ errors.asn }}</small
+            >
+            <small class="text-xs text-color-secondary font-normal leading-tight"
+              >Separate ASN (e.g. 1234) using a new line. Duplicate entries will be automatically
+              removed.</small
             >
           </div>
           <div

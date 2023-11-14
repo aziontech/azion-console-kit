@@ -29,8 +29,8 @@ const adapt = (httpResponse) => {
             severity: 'success'
           }
         : {
-            content: 'Disabled',
-            severity: 'info'
+            content: 'Inactive',
+            severity: 'danger'
           },
       domainName: domain.domain_name,
       cnames: cnames,

@@ -1,25 +1,31 @@
 .p-datatable {
   border: var(--surface-border) 1px solid !important;
   border-radius: $borderRadius;
+  font-size: 0.875rem !important;
+  text-wrap: nowrap !important;
 
   .p-datatable-header {
     border-top-right-radius: $borderRadius;
     border-top-left-radius: $borderRadius;
   }
 
-  .p-datatable-thead > tr > th {
-    font-size: 0.875rem;
-    line-height: 1.125rem;
-    padding: 0.5rem 0.875rem !important;
+  .p-datatable-tbody > tr > td {
     box-sizing: inherit !important;
+    font-size: 0.875rem;
+  }
+
+  .p-datatable-thead > tr > th {
+    box-sizing: inherit !important;
+    font-size: 0.875rem;
+    text-wrap: nowrap !important;
 
     .p-column-header-content {
-      min-height: 2rem;
       vertical-align: center;
     }
   }
 
   .p-sortable-column {
+    text-wrap: nowrap !important;
     .p-sortable-column-icon {
       opacity: 0 !important;
     }
@@ -33,6 +39,7 @@
   }
 
   .p-sortable-column {
+    text-wrap: nowrap !important;
     .p-sortable-column-icon {
       opacity: 0;
     }
@@ -45,28 +52,35 @@
   }
 }
 
+.p-overlaypanel:has(.hidden-columns-panel) {
+  box-shadow: none !important;
+}
 .hidden-columns-panel {
   .p-listbox-item {
-    opacity: 0.6;
     font-size: 0.875rem;
     line-height: 0.875rem;
     padding: 0.75rem 0.5rem !important;
+    color: var(--surface-700) !important;
+    background: transparent;
     &::before {
-      content: '\2298' !important;
-      color: var(--text-color-secondary);
-      margin-right: 0.3rem;
-      font-size: 1.25rem;
+      font-family: primeicons;
+      content: '\e965' !important;
+      color: var(--surface-700);
+      margin-right: 0.5rem;
+      font-size: 0.875rem;
       line-height: 0.875rem;
     }
     &:hover {
-      background: var(--surface-400) !important;
+      background: $inputListItemHoverBg !important;
     }
     &.p-highlight {
       opacity: 1;
       color: var(--text-color) !important;
       background: transparent !important;
       &::before {
-        content: none !important;
+        font-family: primeicons;
+        content: '\e966' !important;
+        color: var(--text-color);
       }
       &:hover {
         background: $inputListItemHoverBg !important;

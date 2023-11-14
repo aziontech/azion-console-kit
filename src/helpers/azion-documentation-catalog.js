@@ -1,11 +1,19 @@
-import { azionDocumentationWindowOpener } from './azion-documentation-window-opener'
+import { openSearchResult, openDocumentationProducts } from './azion-documentation-window-opener'
 
 export const documentationCatalog = {
-  resources: () => azionDocumentationWindowOpener(''),
-  variables: () => azionDocumentationWindowOpener('variables'),
-  edgeServices: () => azionDocumentationWindowOpener('edge services'),
-  intelligentDNS: () => azionDocumentationWindowOpener('intelligent-dns'),
-  personalTokens: () => azionDocumentationWindowOpener('personal tokens'),
-  domains: () => azionDocumentationWindowOpener('domains'),
-  getStarted: () => azionDocumentationWindowOpener('get started')
+  resources: () => openSearchResult(''),
+  variables: () => openSearchResult('variables'),
+  edgeServices: () => openSearchResult('edge services'),
+  intelligentDNS: () => openSearchResult('intelligent-dns'),
+  personalTokens: () => openSearchResult('personal tokens'),
+  domains: () => openSearchResult('domains'),
+  realTimePurge: () => openSearchResult('real-time-purge'),
+  getStarted: () => openSearchResult('get started'),
+  networkLists: () => openSearchResult('network lists'),
+  digitalCertificates: () => openSearchResult('digital certificates')
+}
+
+export const documentationGuideProducts = {
+  edgeApplication: () => openDocumentationProducts('guides/build/build-an-application/'),
+  realTimeMetrics: () => openDocumentationProducts('guides/use-real-time-metrics/')
 }

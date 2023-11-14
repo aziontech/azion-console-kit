@@ -1,5 +1,5 @@
 <template>
-  <div v-if="hasContentToList">
+  <div v-if="!hasContentToList">
     <PageHeadingBlock :pageTitle="pageTitle" />
     <ActivityHistoryBlock
       :listEventsService="listEventsService"
@@ -11,12 +11,17 @@
     :pageTitle="pageTitle"
     title="No activity has been recorded yet."
     description="Start using services and products to view your account's activity."
-    createButtonLabel="Quick Start"
-    createPagePath="edge-applications/create"
     :documentationService="documentationService"
   >
     <template #illustration>
       <Illustration />
+    </template>
+    <template #default>
+      <PrimeButton
+        severity="secondary"
+        label="Go to Home"
+        @click="navigateToHomePage"
+      />
     </template>
   </EmptyResultsBlock>
 </template>
@@ -26,6 +31,7 @@
   import ActivityHistoryBlock from '@templates/activity-history-block'
   import EmptyResultsBlock from '@/templates/empty-results-block'
   import Illustration from '@/assets/svg/illustration-layers.vue'
+  import PrimeButton from 'primevue/button'
 
   export default {
     name: 'activity-history-view',
@@ -33,7 +39,8 @@
       PageHeadingBlock,
       ActivityHistoryBlock,
       EmptyResultsBlock,
-      Illustration
+      Illustration,
+      PrimeButton
     },
     data: () => ({
       pageTitle: 'Activity History',
@@ -52,6 +59,9 @@
     methods: {
       handleLoadData(event) {
         this.hasContentToList = event
+      },
+      navigateToHomePage() {
+        this.$router.push('/')
       }
     }
   }

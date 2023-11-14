@@ -10,7 +10,7 @@
     }
 
     &:enabled:active {
-      background-color: var(--gray-200) !important;
+      background-color: var(--surface-hover) !important;
     }
 
     &.p-button-plain {
@@ -31,14 +31,17 @@
 
     &:enabled:hover {
       color: $textColor !important;
+      background-color: var(--surface-hover);
     }
 
     &:enabled:active {
       color: $textColor !important;
+      background-color: var(--surface-hover);
     }
 
     &.p-button-plain {
       color: $textColor !important;
+      background-color: var(--surface-hover);
 
       &:enabled:hover {
         color: $textColor !important;
@@ -46,13 +49,15 @@
 
       &:enabled:active {
         color: $textColor !important;
+        background-color: var(--surface-hover);
       }
     }
   }
 
-  &.p-button-icon-only {
+  &.p-button-icon-only:not(.p-datepicker-trigger, .p-inputnumber-button) {
     color: $textColor !important;
-
+    width: 2rem !important;
+    height: 2rem !important;
     .p-button-icon-left,
     .p-button-icon-right {
       margin: 0;
@@ -115,9 +120,4 @@
   &:not(:disabled):focus-visible {
     box-shadow: $linkButtonFocusShadow !important;
   }
-}
-
-.p-button-icon-only {
-  width: 2rem !important;
-  height: 2rem !important;
 }

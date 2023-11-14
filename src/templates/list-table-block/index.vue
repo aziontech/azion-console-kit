@@ -4,12 +4,16 @@
 
     <div class="max-w-full mx-3 mb-8 md:mx-8">
       <DataTable
+        class="overflow-clip rounded-md"
         v-if="!isLoading"
         @rowReorder="onRowReorder"
         scrollable
         removableSort
         :value="data"
         dataKey="id"
+        v-model:selection="selectedRow"
+        selectionMode="single"
+        @dblclick.prevent="editItemSelected(selectedRow)"
         v-model:filters="filters"
         :paginator="showPagination"
         :rowsPerPageOptions="[10, 20, 50, 100]"
@@ -67,22 +71,23 @@
               <PrimeButton
                 outlined
                 icon="ai ai-column"
+                class="table-button"
                 @click="toggleColumnSelector"
-                v-tooltip.top="{ value: 'Hidden columns', showDelay: 200 }"
+                v-tooltip.top="{ value: 'Hidden Columns', showDelay: 200 }"
               >
               </PrimeButton>
               <OverlayPanel ref="columnSelectorPanel">
                 <Listbox
                   v-model="selectedColumns"
                   multiple
-                  :options="[{ label: 'Hidden columns', items: this.columns }]"
+                  :options="[{ label: 'Hidden Columns', items: this.columns }]"
                   class="hidden-columns-panel"
                   optionLabel="header"
                   optionGroupLabel="label"
                   optionGroupChildren="items"
                 >
                   <template #optiongroup="slotProps">
-                    <p class="text-sm font-bold">{{ slotProps.option.label }}</p>
+                    <p class="text-sm font-medium">{{ slotProps.option.label }}</p>
                   </template>
                 </Listbox>
               </OverlayPanel>
@@ -102,14 +107,14 @@
                 icon="pi pi-ellipsis-h"
                 text
                 @click="(event) => toggleActionsMenu(event, rowData.id)"
-                class="cursor-pointer"
+                class="cursor-pointer table-button"
               />
             </div>
           </template>
         </Column>
         <template #empty>
           <div class="my-4 flex flex-col gap-3 justify-center items-center">
-            <p class="text-xl font-normal text-gray-600">No registers found.</p>
+            <p class="text-xl font-normal text-secondary">No registers found.</p>
             <PrimeButton
               text
               icon="pi pi-plus"
@@ -335,6 +340,9 @@
       toggleActionsMenu(event, selectedId) {
         this.selectedId = selectedId
         this.$refs[`menu-${selectedId}`].toggle(event)
+      },
+      editItemSelected(item) {
+        this.$router.push({ path: `${this.editPagePath}/${item.id}` })
       },
       editItem() {
         this.$router.push({ path: `${this.editPagePath}/${this.selectedId}` })

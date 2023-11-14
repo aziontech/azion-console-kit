@@ -13,6 +13,9 @@
         :rows="minimumOfItemsPerPage"
         :globalFilterFields="filterBy"
         :loading="isLoading"
+        v-model:selection="selectedRow"
+        selectionMode="single"
+        @dblclick.prevent="editItemSelected(selectedRow)"
       >
         <template #header>
           <div class="flex flex-wrap justify-between gap-2 w-full">
@@ -70,7 +73,7 @@
         </Column>
         <template #empty>
           <div class="my-4 flex flex-col gap-3 justify-center items-center">
-            <p class="text-xl font-normal text-gray-600">No registers found.</p>
+            <p class="text-xl font-normal text-secondary">No registers found.</p>
             <PrimeButton
               v-if="!authorizeNode"
               text
@@ -253,6 +256,9 @@
       toggleActionsMenu(event, selectedId) {
         this.selectedId = selectedId
         this.$refs.menu.toggle(event)
+      },
+      editItemSelected(item) {
+        this.$router.push({ path: `${this.editPagePath}/${item.id}` })
       },
       editItem() {
         this.$router.push({ path: `${this.editPagePath}/${this.selectedId}` })
