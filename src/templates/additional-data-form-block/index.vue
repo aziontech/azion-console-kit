@@ -4,7 +4,7 @@
     @submit.prevent="submitForm"
   >
     <div class="flex flex-col gap-2">
-      <label class="font-semibold text-sm">What description best fits your work? </label>
+      <label class="font-semibold text-sm">I'm a</label>
       <div class="flex flex-col gap-3 mb-8">
         <label
           v-for="item in jobFunctionList"
@@ -18,31 +18,48 @@
           />
         </label>
       </div>
-      <label class="font-semibold text-sm">What would you like to build with Azion? </label>
+      <label class="font-semibold text-sm">What would you like to build with Azion?</label>
       <div class="flex flex-wrap gap-3 mb-8">
         <label
-          v-for="item in projectTypeSelectionList"
+          v-for="item in projectTypeList"
           :key="item.value"
           class="w-full border-1 rounded-md surface-border font-medium flex align-items-center justify-between p-4 gap-2"
-          :class="{ 'border-radio-card-active': projectTypeSelection === item.value }"
+          :class="{ 'border-radio-card-active': projectType === item.value }"
           >{{ item.label }}
           <PrimeRadio
-            v-model="projectTypeSelection"
+            v-model="projectType"
             :value="item.value"
           />
         </label>
       </div>
-      <label class="font-semibold text-sm">What are you building? </label>
-      <div class="flex flex-wrap gap-3">
-        <label
-          v-for="item in productList"
-          :key="item.value"
-          class="w-full border-1 rounded-md surface-border font-medium flex align-items-center justify-between p-4 gap-2"
-          :class="{ 'border-radio-card-active': product === item.value }"
-          >{{ item.label }}
-          <PrimeRadio
-            v-model="product"
-            :value="item.value"
+      <div class="flex flex-col gap-8">
+        <label class="font-semibold text-sm gap-2 flex flex-col"
+          >Company name
+          <PrimeInputText
+            placeholder="Company Name"
+            v-model="companyName"
+            type="text"
+          />
+        </label>
+        <label class="font-semibold text-sm gap-2 flex flex-col"
+          >Company size
+          <PrimeDropdown
+            placeholder="Select an option"
+            v-model="companySize"
+            :options="companySizeList"
+            optionLabel="label"
+            optionValue="value"
+          />
+        </label>
+        <label class="font-semibold text-sm gap-2 flex flex-col"
+          >Country
+          <PrimeDropdown
+            placeholder="Select an option"
+            v-model="country"
+            :options="countriesList"
+            optionLabel="name"
+            optionValue="id"
+            filter
           />
         </label>
       </div>
@@ -60,49 +77,83 @@
 <script setup>
   import PrimeRadio from 'primevue/radiobutton'
   import PrimeButton from 'primevue/button'
+  import PrimeInputText from 'primevue/inputtext'
+  import PrimeDropdown from 'primevue/dropdown'
   import { useForm, useField } from 'vee-validate'
   import * as yup from 'yup'
-  import { ref } from 'vue'
+  import { ref, onMounted } from 'vue'
 
   defineOptions({
     name: 'additional-data-form-block'
   })
 
-  const jobFunctionList = [
-    { label: 'Developer', value: 'developer' },
-    { label: 'DevOps', value: 'devops' },
-    { label: 'System Admin', value: 'system_admin' },
-    { label: 'Security Analyst', value: 'security_analyst' },
-    { label: 'Team Lead', value: 'team_lead' },
-    { label: 'Other', value: 'other' }
-  ]
+  const props = defineProps({
+    listAdditionalDataInfoService: {
+      type: Function,
+      required: true
+    },
+    listCountriesService: {
+      type: Function,
+      required: true
+    }
+  })
 
-  const projectTypeSelectionList = [
+  const fetchAdditionalDataInfo = async () => {
+    const results = await props.listAdditionalDataInfoService()
+    const { company_sizes, job_functions } = results
+    companySizeList.value = company_sizes
+    jobFunctionList.value = job_functions
+  }
+
+  const fetchCountries = async () => {
+    const { countries } = await props.listCountriesService()
+    countriesList.value = countries
+  }
+
+  onMounted(() => {
+    fetchAdditionalDataInfo()
+    fetchCountries()
+  })
+
+  const jobFunctionList = ref([])
+  const projectTypeList = [
     { label: 'Just a personal project', value: 'personal' },
-    { label: 'Projects for my company', value: 'internal' },
+    { label: 'Internal project for my company', value: 'internal' },
     { label: 'Multiple projects for other companies', value: 'multiple_project' },
     { label: 'Other', value: 'other' }
   ]
 
-  const productList = [
-    { label: 'Web Apps', value: 'web_apps' },
-    { label: 'Mobile Apps', value: 'mobile_apps' },
-    { label: 'Static Websites', value: 'static_websites' },
-    { label: 'Blogs', value: 'blogs' },
-    { label: 'Firewall', value: 'firewall' }
-  ]
+  const typeToEnableCompanyFields = 'internal'
+  const companySizeList = ref([])
+  const countriesList = ref([])
 
   const validationSchema = yup.object({
     jobFunction: yup.string().required(),
-    projectTypeSelection: yup.string().required(),
-    building: yup.string().required()
+    projectType: yup.string().required(),
+    companyName: yup.string().when('projectType', {
+      is: typeToEnableCompanyFields,
+      then: yup
+        .string()
+        .max(50, 'Exceeded number of characters')
+        .required('Company name is required')
+    }),
+    companySize: yup.string().when('projectType', {
+      is: typeToEnableCompanyFields,
+      then: yup.string().required('Company size is required')
+    }),
+    country: yup.string().when('projectType', {
+      is: typeToEnableCompanyFields,
+      then: yup.string().required('Country is required')
+    })
   })
 
   const { values, meta } = useForm({ validationSchema })
 
   const { value: jobFunction } = useField('jobFunction')
-  const { value: projectTypeSelection } = useField('projectTypeSelection')
-  const { value: product } = useField('building')
+  const { value: projectType } = useField('projectType')
+  const { value: companyName } = useField('companyName')
+  const { value: companySize } = useField('companySize')
+  const { value: country } = useField('country')
 
   const loading = ref(false)
   const submitForm = () => {
