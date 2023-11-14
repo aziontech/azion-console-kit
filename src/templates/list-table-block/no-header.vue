@@ -15,7 +15,7 @@
         :loading="isLoading"
         v-model:selection="selectedRow"
         selectionMode="single"
-        @dblclick.prevent="editItemSelected(selectedRow)"
+        @row-click="editItemSelected($event)"
       >
         <template #header>
           <div class="flex flex-wrap justify-between gap-2 w-full">
@@ -257,7 +257,7 @@
         this.selectedId = selectedId
         this.$refs.menu.toggle(event)
       },
-      editItemSelected(item) {
+      editItemSelected({ data: item }) {
         this.$router.push({ path: `${this.editPagePath}/${item.id}` })
       },
       editItem() {
