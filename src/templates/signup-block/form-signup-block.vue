@@ -17,6 +17,7 @@
           type="text"
           class="w-full"
           :class="{ 'p-invalid': errors.name }"
+          v-tooltip.top="{ value: errors.name, showDelay: 200 }"
         />
         <small
           v-if="errors.name"
@@ -37,6 +38,7 @@
           type="email"
           class="w-full"
           :class="{ 'p-invalid': errors.email }"
+          v-tooltip.top="{ value: errors.email, showDelay: 200 }"
         />
         <small
           v-if="errors.email"
@@ -58,6 +60,7 @@
           placeholder="Type your password"
           :class="{ 'p-invalid': errors.password }"
           :feedback="false"
+          v-tooltip.top="{ value: errors.password, showDelay: 200 }"
         />
         <small class="p-error text-xs font-normal leading-tight">{{ errors.password }}</small>
         <ul class="text-color-secondary list-inside space-y-3">
@@ -136,7 +139,7 @@
       .test('invalidContent', 'Name contains invalid content (URL)', (value) => {
         return !value?.match(/[a-z\d_-]+\.[a-z\d_-]+/gi)
       })
-      .required('Full Name is a required field'),
+      .required('Full name is a required field'),
     email: yup
       .string()
       .max(254, 'Exceeded number of characters')

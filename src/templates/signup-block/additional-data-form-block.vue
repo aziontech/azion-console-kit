@@ -65,6 +65,7 @@
               placeholder="Company Name"
               v-bind="companyName"
               type="text"
+              v-tooltip.top="{ value: errors.companyName, showDelay: 200 }"
             />
           </label>
           <small

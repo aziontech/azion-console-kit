@@ -39,8 +39,7 @@ export const signupRoutes = {
         putAdditionalDataService: SignupService.putAdditionalDataService
       },
       meta: {
-        hideNavigation: true,
-        isPublic: true
+        hideNavigation: true
       }
     }
   ]
