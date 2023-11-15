@@ -53,14 +53,15 @@
     return re.test(email)
   }
 
-  const isEmailValid = ref(validateEmail(email))
+  const decodedEmail = decodeURIComponent(email)
+  const isEmailValid = ref(validateEmail(decodedEmail))
   if (!isEmailValid.value) {
     toast.add({ life: 5000, severity: 'error', detail: 'Invalid email format', summary: 'Error' })
   }
 
   const resendEmail = async () => {
     try {
-      const res = await props.resendEmailService({ email })
+      const res = await props.resendEmailService({ email: decodedEmail })
       toast.add({ life: 5000, severity: 'success', detail: res, summary: 'Email sent' })
     } catch (err) {
       toast.add({ life: 5000, severity: 'error', detail: err, summary: 'Error' })
