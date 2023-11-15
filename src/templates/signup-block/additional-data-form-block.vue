@@ -206,12 +206,7 @@
     })
   })
 
-  const { defineInputBinds, values, meta, errors } = useForm({
-    validationSchema,
-    initialValues: {
-      companyName: ''
-    }
-  })
+  const { defineInputBinds, values, meta, errors } = useForm({ validationSchema })
 
   const isInternal = computed(() => {
     return projectTypeSelection.value === typeToEnableCompanyFields
