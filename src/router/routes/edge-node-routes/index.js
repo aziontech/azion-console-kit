@@ -87,7 +87,7 @@ export const edgeNodeRoutes = {
       }
     },
     {
-      path: 'edit/:id/service/:id',
+      path: 'edit/:edgeNodeId/service/:id',
       name: 'edit-service-edge-node',
       component: () => import('@/views/EdgeNode/EditServiceEdgeNodeView.vue'),
       props: {

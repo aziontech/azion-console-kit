@@ -101,8 +101,8 @@
       }
     },
     async created() {
-      const parts = this.$route.path.split('/')
-      this.edgeNodeId = parts[3]
+      const { edgeNodeId } = this.$route.params
+      this.edgeNodeId = edgeNodeId
     },
     methods: {
       async loadServicesEdgeNode(id) {
