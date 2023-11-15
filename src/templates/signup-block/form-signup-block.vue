@@ -11,7 +11,7 @@
           >Full name</label
         >
         <InputText
-          v-model="name"
+          v-bind="name"
           id="name"
           placeholder="Type your full name"
           type="text"
@@ -31,7 +31,7 @@
           >E-mail</label
         >
         <InputText
-          v-model="email"
+          v-bind="email"
           id="email"
           placeholder="Type your e-mail"
           type="email"
@@ -144,8 +144,8 @@
       .required('E-mail is a required field'),
     password: yup
       .string()
-      .test('max', 'Exceeded number of characters', (value) => value?.length <= 128)
       .test('min', 'Password is a required field', (value) => !!value)
+      .test('max', 'Exceeded number of characters', (value) => value?.length <= 128)
       .test('requirements', '', (value) => {
         const hasUpperCase = value && /[A-Z]/.test(value)
         const hasLowerCase = value && /[a-z]/.test(value)
@@ -159,9 +159,9 @@
       })
   })
 
-  const { values, meta, errors } = useForm({ validationSchema })
-  const { value: name } = useField('name')
-  const { value: email } = useField('email')
+  const { defineInputBinds, values, meta, errors } = useForm({ validationSchema })
+  const name = defineInputBinds('name', { validateOnInput: true })
+  const email = defineInputBinds('email', { validateOnInput: true })
   const { value: password } = useField('password')
 
   const toast = useToast()
