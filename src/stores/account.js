@@ -16,7 +16,7 @@ export const useAccountStore = defineStore({
       return state.account?.colorTheme
     },
     isFirstLogin(state) {
-      return !state.account?.first_login
+      return state.account?.first_login
     }
   },
   actions: {
