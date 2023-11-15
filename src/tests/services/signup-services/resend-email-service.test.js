@@ -2,7 +2,6 @@ import { describe, expect, it, vi } from 'vitest'
 import { AxiosHttpClientAdapter } from '@/services/axios/AxiosHttpClientAdapter'
 import * as Errors from '@/services/axios/errors'
 import { resendEmailService } from '@/services/signup-services'
-import { makeResendEmailBaseUrl } from '@/services/signup-services/make-resend-email-base-url'
 
 const emailPayloadMock = { email: 'john.doe@example.com' }
 
@@ -24,7 +23,7 @@ describe('ResendEmailService', () => {
     await sut(emailPayloadMock)
 
     expect(requestSpy).toHaveBeenCalledWith({
-      url: makeResendEmailBaseUrl(),
+      url: 'user/activation/request',
       method: 'POST',
       body: emailPayloadMock
     })

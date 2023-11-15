@@ -2,7 +2,6 @@ import { describe, expect, it, vi } from 'vitest'
 import { AxiosHttpClientAdapter } from '@/services/axios/AxiosHttpClientAdapter'
 import * as Errors from '@/services/axios/errors'
 import { signupService } from '@/services/signup-services/signup-service'
-import { makeSignupBaseUrl } from '@/services/signup-services/make-signup-base-url'
 
 const userPayloadMock = {
   name: 'john doe',
@@ -28,7 +27,7 @@ describe('SignupServices', () => {
     await sut(userPayloadMock)
 
     expect(requestSpy).toHaveBeenCalledWith({
-      url: makeSignupBaseUrl(),
+      url: 'signup',
       method: 'POST',
       body: { ...userPayloadMock }
     })

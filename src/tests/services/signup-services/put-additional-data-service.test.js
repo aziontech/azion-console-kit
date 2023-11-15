@@ -2,7 +2,6 @@ import { describe, expect, it, vi } from 'vitest'
 import { AxiosHttpClientAdapter } from '@/services/axios/AxiosHttpClientAdapter'
 import * as Errors from '@/services/axios/errors'
 import { putAdditionalDataService } from '@/services/signup-services'
-import { makeAccountInfoBaseUrl } from '@/services/signup-services/make-account-info-base-url'
 
 const additionalDataPayloadMock = {
   project_type_selection: 'type1',
@@ -29,7 +28,7 @@ describe('PutAdditionalDataService', () => {
     await sut(additionalDataPayloadMock)
 
     expect(requestSpy).toHaveBeenCalledWith({
-      url: makeAccountInfoBaseUrl(),
+      url: 'account/info',
       method: 'PUT',
       body: additionalDataPayloadMock
     })
