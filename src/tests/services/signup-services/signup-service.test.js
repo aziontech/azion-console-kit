@@ -6,7 +6,7 @@ import { signupService } from '@/services/signup-services/signup-service'
 const userPayloadMock = {
   name: 'john doe',
   email: 'john.doe@example.com',
-  captch: 'default'
+  captcha: 'default'
 }
 
 const makeSut = () => {
