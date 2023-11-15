@@ -50,54 +50,72 @@
           </label>
         </template>
       </div>
-      <div class="flex flex-col gap-8">
+      <div
+        class="flex flex-col gap-8"
+        v-if="isInternal"
+      >
         <PrimeSkeleton
           class="w-full h-8"
           v-if="!countriesList.length"
         />
-        <label
-          class="font-semibold text-sm gap-2 flex flex-col"
-          v-else
-          >Company name
-          <PrimeInputText
-            placeholder="Company Name"
-            v-model="companyName"
-            type="text"
-          />
-        </label>
+        <div v-else>
+          <label class="font-semibold text-sm gap-2 flex flex-col"
+            >Company name
+            <PrimeInputText
+              placeholder="Company Name"
+              v-bind="companyName"
+              type="text"
+            />
+          </label>
+          <small
+            v-if="errors.companyName"
+            class="p-error text-xs font-normal leading-tight"
+            >{{ errors.companyName }}</small
+          >
+        </div>
         <PrimeSkeleton
           class="w-full h-8"
           v-if="!countriesList.length"
         />
-        <label
-          class="font-semibold text-sm gap-2 flex flex-col"
-          v-else
-          >Company size
-          <PrimeDropdown
-            placeholder="Select an option"
-            v-model="companySize"
-            :options="companySizeList"
-            optionLabel="label"
-            optionValue="value"
-          />
-        </label>
+        <div v-else>
+          <label class="font-semibold text-sm gap-2 flex flex-col"
+            >Company size
+            <PrimeDropdown
+              placeholder="Select an option"
+              v-model="companySize"
+              :options="companySizeList"
+              optionLabel="label"
+              optionValue="value"
+            />
+          </label>
+          <small
+            v-if="errors.companySize"
+            class="p-error text-xs font-normal leading-tight"
+            >{{ errors.companySize }}</small
+          >
+        </div>
         <PrimeSkeleton
           class="w-full h-8"
           v-if="!countriesList.length"
         />
-        <label
-          class="font-semibold text-sm gap-2 flex flex-col"
-          v-else
-          >Country
-          <PrimeDropdown
-            placeholder="Select an option"
-            v-model="country"
-            :options="countriesList"
-            optionLabel="name"
-            optionValue="id"
-            filter
-          />
-        </label>
+        <div v-else>
+          <label class="font-semibold text-sm gap-2 flex flex-col"
+            >Country
+            <PrimeDropdown
+              placeholder="Select an option"
+              v-model="country"
+              :options="countriesList"
+              optionLabel="name"
+              optionValue="id"
+              filter
+            />
+          </label>
+          <small
+            v-if="errors.country"
+            class="p-error text-xs font-normal leading-tight"
+            >{{ errors.country }}</small
+          >
+        </div>
       </div>
     </div>
     <PrimeButton
@@ -118,7 +136,7 @@
   import PrimeSkeleton from 'primevue/skeleton'
   import { useForm, useField } from 'vee-validate'
   import * as yup from 'yup'
-  import { ref, onMounted } from 'vue'
+  import { ref, onMounted, computed } from 'vue'
   import { useRouter } from 'vue-router'
   import { useToast } from 'primevue/usetoast'
 
@@ -175,28 +193,35 @@
     projectTypeSelection: yup.string().required(),
     companyName: yup.string().when('projectTypeSelection', {
       is: typeToEnableCompanyFields,
-      then: yup
-        .string()
-        .max(50, 'Exceeded number of characters')
-        .required('Company name is required')
+      then: () =>
+        yup.string().max(50, 'Exceeded number of characters').required('Company name is required')
     }),
     companySize: yup.string().when('projectTypeSelection', {
       is: typeToEnableCompanyFields,
-      then: yup.string().required('Company size is required')
+      then: () => yup.string().required('Company size is required')
     }),
     country: yup.string().when('projectTypeSelection', {
       is: typeToEnableCompanyFields,
-      then: yup.string().required('Country is required')
+      then: () => yup.string().required('Country is required')
     })
   })
 
-  const { values, meta } = useForm({ validationSchema })
+  const { defineInputBinds, values, meta, errors } = useForm({
+    validationSchema,
+    initialValues: {
+      companyName: ''
+    }
+  })
+
+  const isInternal = computed(() => {
+    return projectTypeSelection.value === typeToEnableCompanyFields
+  })
 
   const { value: jobFunction } = useField('jobFunction')
   const { value: projectTypeSelection } = useField('projectTypeSelection')
-  const { value: companyName } = useField('companyName')
   const { value: companySize } = useField('companySize')
   const { value: country } = useField('country')
+  const companyName = defineInputBinds('companyName', { validateOnInput: true })
 
   const loading = ref(false)
 
@@ -207,7 +232,14 @@
     loading.value = true
 
     try {
-      await props.putAdditionalDataService({ ...values })
+      const form = { ...values }
+      if (!isInternal.value) {
+        delete form.companyName
+        delete form.companySize
+        delete form.country
+      }
+
+      await props.putAdditionalDataService(form)
       router.push({ name: 'home' })
     } catch (err) {
       toast.add({ life: 5000, severity: 'error', detail: err, summary: 'Error' })
