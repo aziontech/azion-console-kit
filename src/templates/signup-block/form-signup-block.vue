@@ -179,9 +179,8 @@
       await props.signupService({ ...values, captcha })
       router.push({ name: 'activation', query: { email: values.email } })
     } catch (err) {
-      toast.add({ life: 5000, severity: 'error', detail: err, summary: 'Error' })
-    } finally {
       loading.value = false
+      toast.add({ life: 5000, severity: 'error', detail: err, summary: 'Error' })
     }
   }
 
