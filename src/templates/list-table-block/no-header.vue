@@ -13,6 +13,9 @@
         :rows="minimumOfItemsPerPage"
         :globalFilterFields="filterBy"
         :loading="isLoading"
+        v-model:selection="selectedRow"
+        selectionMode="single"
+        @dblclick.prevent="editItemSelected(selectedRow)"
       >
         <template #header>
           <div class="flex flex-wrap justify-between gap-2 w-full">
@@ -253,6 +256,9 @@
       toggleActionsMenu(event, selectedId) {
         this.selectedId = selectedId
         this.$refs.menu.toggle(event)
+      },
+      editItemSelected(item) {
+        this.$router.push({ path: `${this.editPagePath}/${item.id}` })
       },
       editItem() {
         this.$router.push({ path: `${this.editPagePath}/${this.selectedId}` })

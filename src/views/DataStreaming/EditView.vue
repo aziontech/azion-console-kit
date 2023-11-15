@@ -4,7 +4,6 @@
     :editService="props.editDataStreamingService"
     :loadService="props.loadDataStreamingService"
     :initialDataSetter="setValues"
-    :isValid="meta.valid"
     :formData="values"
     :formMeta="meta"
   >

@@ -3,7 +3,6 @@
     pageTitle="Create Credential"
     :createService="createCredentialService"
     :formData="values"
-    :isValid="meta.valid"
     :formMeta="meta"
     :cleanFormCallback="resetForm"
   >
@@ -20,7 +19,6 @@
               >Name *</label
             >
             <InputText
-              placeholder="My credential"
               v-model="name"
               id="name"
               type="text"

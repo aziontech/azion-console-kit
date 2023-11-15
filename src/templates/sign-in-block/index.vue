@@ -254,7 +254,7 @@
         return
       }
 
-      if (trustedDevice) {
+      if (trustedDevice && twoFactor) {
         router.push('/mfa/authentication')
         return
       }
