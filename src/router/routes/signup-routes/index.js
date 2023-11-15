@@ -40,6 +40,14 @@ export const signupRoutes = {
       },
       meta: {
         hideNavigation: true
+      },
+      beforeEnter: (_, from, next) => {
+        // only accessible when coming from login
+        if (from.name === 'login') {
+          next()
+        } else {
+          next({ name: 'login' })
+        }
       }
     }
   ]
