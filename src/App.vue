@@ -11,7 +11,7 @@
 
   const route = useRoute()
   const isLogged = computed(() => {
-    // evaluate as !route.meta?.hideNavigation will cause navbar to flicker
+    // evaluating as !route.meta?.hideNavigation will cause navbar to flicker
     return route.meta.hideNavigation !== true && hasActiveUserId.value
   })
 
