@@ -1,4 +1,5 @@
 import * as SignupService from '@/services/signup-services'
+import { useAccountStore } from '@/stores/account'
 
 /** @type {import('vue-router').RouteRecordRaw} */
 export const signupRoutes = {
@@ -41,12 +42,12 @@ export const signupRoutes = {
       meta: {
         hideNavigation: true
       },
-      beforeEnter: (_, from, next) => {
-        // only accessible when coming from login
-        if (from.name === 'login') {
+      beforeEnter: (_, __, next) => {
+        const accountStore = useAccountStore()
+        if (accountStore.isFirstLogin) {
           next()
         } else {
-          next({ name: 'login' })
+          next({ name: 'home' })
         }
       }
     }
