@@ -49,7 +49,12 @@ const makeSut = () => {
 describe('DigitalCertificatesServices', () => {
   it('should call api with correct params', async () => {
     const requestSpy = vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
-      statusCode: 201
+      statusCode: 201,
+      body: {
+        results: {
+          id: 1
+        }
+      }
     })
 
     const { sut } = makeSut()

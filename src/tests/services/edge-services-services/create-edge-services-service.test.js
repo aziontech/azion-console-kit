@@ -45,9 +45,9 @@ describe('EdgeServicesServices', () => {
 
     const { sut } = makeSut()
 
-    const feedbackMessage = await sut(edgeServiceMock)
+    const data = await sut(edgeServiceMock)
 
-    expect(feedbackMessage).toBe('Your Edge Service has been created')
+    expect(data.feedback).toBe('Your Edge Service has been created')
   })
 
   it('Should return an API error to an invalid edge service name', async () => {

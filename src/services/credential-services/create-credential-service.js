@@ -41,7 +41,10 @@ const extractApiError = (httpResponse) => {
 const parseHttpResponse = (httpResponse) => {
   switch (httpResponse.statusCode) {
     case 201:
-      return 'Your credential has been created'
+      return {
+        feedback: 'Your credential has been created',
+        redirectURL: `/credentials`
+      }
     case 400:
       const apiError400 = extractApiError(httpResponse)
       throw new Error(apiError400).message
