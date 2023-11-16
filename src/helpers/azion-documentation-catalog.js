@@ -11,7 +11,7 @@ export const documentationCatalog = {
   getStarted: () => openSearchResult('get started'),
   digitalCertificates: () => openSearchResult('digital certificates'),
   credentials: () => openSearchResult('credentials'),
-  networkLists: () => openSearchResult('network lists'),
+  networkLists: () => openSearchResult('network lists')
 }
 
 export const documentationGuideProducts = {
