@@ -1,7 +1,7 @@
 import { AxiosHttpClientAdapter } from '../axios/AxiosHttpClientAdapter'
 import * as Errors from '@/services/axios/errors'
 import { makeAccountInfoBaseUrl } from './make-account-info-base-url'
-import { parseCamelToSnake } from '@/helpers/parse-api-body'
+import { parseCamelToSnake } from '@/helpers'
 
 export const putAdditionalDataService = async (payload) => {
   let httpResponse = await AxiosHttpClientAdapter.request({
