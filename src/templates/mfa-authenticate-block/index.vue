@@ -15,7 +15,7 @@
         </div>
 
         <div>
-          <label class="font-semibold text-xs">Authentication code</label>
+          <label class="font-semibold text-xs">Authentication Code</label>
           <div class="flex flex-wrap gap-1.5 sm:gap-4 mt-4">
             <InputText
               v-for="(digits, i) in digitsMfa"
