@@ -61,7 +61,7 @@ describe('SignupServices', () => {
 
     vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
       statusCode: 403,
-      body: { ...response }
+      body: response
     })
     const { sut } = makeSut()
 
