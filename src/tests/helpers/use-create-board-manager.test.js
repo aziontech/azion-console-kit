@@ -7,13 +7,11 @@ const makeSut = () => {
 }
 
 describe('useCreateBoardManager', () => {
-  it('Should return basic object', () => {
+  it('Should start with enabled false', () => {
     const { sut } = makeSut()
     const createBoardManager = sut()
 
     expect(createBoardManager.enabled.value).toBe(false)
-    expect(createBoardManager.open).toBeTypeOf('function')
-    expect(createBoardManager.close).toBeTypeOf('function')
   })
 
   it('Should change value of enabled on open', () => {
