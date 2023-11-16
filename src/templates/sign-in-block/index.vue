@@ -78,7 +78,8 @@
         <PrimeButton
           severity="secondary"
           label="Create One"
-        ></PrimeButton>
+          @click="goToSignup"
+        />
       </div>
     </div>
 
@@ -134,7 +135,7 @@
             class="p-0"
             label="Forgot Password?"
             @click="$emit('goToForgotPassword', true)"
-          ></PrimeButton>
+          />
         </div>
         <PrimeButton
           class="w-full flex-row-reverse"
@@ -151,7 +152,8 @@
         <PrimeButton
           severity="secondary"
           label="Create One"
-        ></PrimeButton>
+          @click="goToSignup"
+        />
       </div>
     </div>
   </form>
@@ -219,6 +221,10 @@
 
   const { value: email } = useField('email')
   const { value: password, resetField } = useField('password')
+
+  const goToSignup = () => {
+    router.push({ name: 'signup' })
+  }
 
   const validateAndSubmit = async () => {
     try {

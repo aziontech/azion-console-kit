@@ -13,6 +13,10 @@ export const mfaRoutes = {
       props: {
         generateQrCodeMfaService: MfaServices.generateQrCodeMfaService,
         validateMfaCodeService: MfaServices.validateMfaCodeService
+      },
+      meta: {
+        isPublic: true,
+        hideNavigation: true
       }
     },
     {
@@ -23,6 +27,10 @@ export const mfaRoutes = {
         validateMfaCodeService: MfaServices.validateMfaCodeService,
         verifyAuthenticationService: AuthServices.verifyAuthenticationService,
         switchAccountService: AuthServices.switchAccountService
+      },
+      meta: {
+        isPublic: true,
+        hideNavigation: true
       }
     }
   ]
