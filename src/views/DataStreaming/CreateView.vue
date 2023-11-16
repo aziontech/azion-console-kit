@@ -136,6 +136,8 @@
               listStyle="height:342px"
               dataKey="domainID"
               breakpoint="1400px"
+              :showSourceControls="false"
+              :showTargetControls="false"
             >
               <template #sourceheader>Available Domains</template>
               <template #targetheader>Chosen Domains</template>
