@@ -1,6 +1,6 @@
 <template>
   <div
-    class="px-3 pt-4 pb-8 md:px-8 md:pt-8 flex flex-col gap-6 lg:gap-8 w-full max-w-screen-2xl mx-auto transition-[width] duration-300 ease-in-out"
+    class="px-3 pt-4 pb-8 md:px-8 md:pt-8 flex flex-col gap-6 lg:gap-8 w-full transition-[width] duration-300 ease-in-out"
   >
     <!-- Getting Started -->
     <div
