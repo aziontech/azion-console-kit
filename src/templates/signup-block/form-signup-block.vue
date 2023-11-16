@@ -173,12 +173,16 @@
 
   const loading = ref(false)
 
+  const encodeEmail = (email) => {
+    return encodeURIComponent(email)
+  }
+
   const signUp = async () => {
     loading.value = true
     try {
       const captcha = await recaptcha.execute('signup')
       await props.signupService({ ...values, captcha })
-      router.push({ name: 'activation', query: { email: values.email } })
+      router.push({ name: 'activation', query: { email: encodeEmail(values.email) } })
     } catch (err) {
       loading.value = false
       toast.add({ life: 5000, severity: 'error', detail: err, summary: 'Error' })
