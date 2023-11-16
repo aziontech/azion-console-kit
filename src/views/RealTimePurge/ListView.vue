@@ -15,7 +15,7 @@
     pageTitle="Real-Time Purge"
     title="No purge added"
     description="Create your first Real-Time Purge."
-    createButtonLabel="Add purge"
+    createButtonLabel="Real-Time Purge"
     createPagePath="real-time-purge/create"
     :documentationService="documentationService"
   >

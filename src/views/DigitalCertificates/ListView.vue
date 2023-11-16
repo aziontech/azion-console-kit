@@ -16,7 +16,7 @@
     pageTitle="Digital Certificates"
     title="No digital certificates added"
     description="Create your first digital certificates."
-    createButtonLabel="Add digital certificates"
+    createButtonLabel="Digital Certificates"
     createPagePath="digital-certificates/create"
     :documentationService="documentationService"
   >

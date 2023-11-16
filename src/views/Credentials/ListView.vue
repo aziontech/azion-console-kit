@@ -15,7 +15,7 @@
     pageTitle="Credentials"
     title="No credentials added"
     description="Create your first credentials."
-    createButtonLabel="Add credentials"
+    createButtonLabel="Credential"
     createPagePath="credentials/create"
     :documentationService="documentationService"
   >
