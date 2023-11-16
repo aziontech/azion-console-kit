@@ -29,7 +29,8 @@ export const credentialsRoutes = {
       name: 'create-credential',
       component: () => import('@views/Credentials/CreateView.vue'),
       props: {
-        createCredentialService: CredentialServices.createCredentialService
+        createCredentialService: CredentialServices.createCredentialService,
+        clipboardWrite: Helpers.clipboardWrite
       },
       meta: {
         breadCrumbs: [

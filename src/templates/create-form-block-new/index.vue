@@ -8,7 +8,7 @@
       <slot name="form" />
       <slot name="raw-form" />
     </form>
-    <DialogUnsavedBlock :blockRedirectUnsaved="formMeta.touched" />
+    <DialogUnsavedBlock :blockRedirectUnsaved="hasModifications" />
     <ActionBarBlockGoBack v-if="buttonBackList" />
     <ActionBarTemplate
       @cancel="navigateBack"
@@ -35,7 +35,8 @@
     },
     emits: ['on-response'],
     data: () => ({
-      isLoading: false
+      isLoading: false,
+      blockViewRedirection: true
     }),
     props: {
       pageTitle: {
@@ -103,12 +104,19 @@
         try {
           this.isLoading = true
           const feedback = await this.createService(this.formData)
+          this.blockViewRedirection = false
           this.handleSuccess(feedback)
         } catch (error) {
           this.showToast('error', error)
+          this.blockViewRedirection = true
         } finally {
           this.isLoading = false
         }
+      }
+    },
+    computed: {
+      hasModifications() {
+        return this.formMeta.touched && this.blockViewRedirection
       }
     }
   }
