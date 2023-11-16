@@ -181,4 +181,15 @@ describe('AzionDocumentationCatalog', () => {
       `https://www.azion.com/en/search-result/?q=edge application&filter=doc`
     )
   })
+
+  it('should open users documentation with correct link', () => {
+    const openWindowSpy = vi.spyOn(window, 'open')
+    const { sut } = makeSut()
+
+    sut.users()
+
+    expect(openWindowSpy).toHaveBeenCalledWith(
+      `https://www.azion.com/en/search-result/?q=users&filter=doc`
+    )
+  })
 })

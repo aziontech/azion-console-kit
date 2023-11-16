@@ -1,3 +1,4 @@
+import * as Helpers from '@/helpers'
 import * as UsersService from '@/services/users-services'
 
 /** @type {import('vue-router').RouteRecordRaw} */
@@ -11,7 +12,8 @@ export const usersListsRoutes = {
       component: () => import('@views/Users/ListView.vue'),
       props: {
         listUsersService: UsersService.listUsersService,
-        deleteUsersService: UsersService.deleteUsersService
+        deleteUsersService: UsersService.deleteUsersService,
+        documentationService: Helpers.documentationCatalog.users,
       },
       meta: {
         breadCrumbs: [
