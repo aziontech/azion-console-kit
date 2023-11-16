@@ -87,7 +87,7 @@
     },
     methods: {
       handleLoadData(event) {
-        this.hasContentToList = !!event
+        this.hasContentToList = event
       }
     }
   }
