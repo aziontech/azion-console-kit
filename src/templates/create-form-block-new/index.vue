@@ -8,17 +8,13 @@
       <slot name="form" />
       <slot name="raw-form" />
     </form>
-    <DialogUnsavedBlock
-      v-model:visible="dialogUnsaved"
-      @leavePage="leavePage"
-      @keepEditing="keepEditing"
-    />
+    <DialogUnsavedBlock :blockRedirectUnsaved="formMeta.touched" />
     <ActionBarBlockGoBack v-if="buttonBackList" />
     <ActionBarTemplate
-      @cancel="openDialogUnsaved"
+      @cancel="navigateBack"
       @submit="validateAndSubmit"
       :loading="isLoading"
-      :submitDisabled="!isValid"
+      :submitDisabled="!formMeta.valid"
       v-else
     />
   </div>
@@ -39,8 +35,7 @@
     },
     emits: ['on-response'],
     data: () => ({
-      isLoading: false,
-      dialogUnsaved: false
+      isLoading: false
     }),
     props: {
       pageTitle: {
@@ -49,10 +44,6 @@
       },
       createService: {
         type: Function,
-        required: true
-      },
-      isValid: {
-        type: Boolean,
         required: true
       },
       formData: {
@@ -85,20 +76,6 @@
       }
     },
     methods: {
-      leavePage() {
-        this.dialogUnsaved = false
-        this.navigateBack()
-      },
-      keepEditing() {
-        this.dialogUnsaved = false
-      },
-      openDialogUnsaved() {
-        if (this.formMeta.touched) {
-          this.dialogUnsaved = true
-          return
-        }
-        this.navigateBack()
-      },
       navigateBack() {
         this.$router.go(-1)
       },

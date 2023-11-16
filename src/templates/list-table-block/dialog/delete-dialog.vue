@@ -150,6 +150,7 @@
       },
 
       cancelDialog() {
+        this.resetForm()
         this.deleteDialogVisible = false
       }
     },

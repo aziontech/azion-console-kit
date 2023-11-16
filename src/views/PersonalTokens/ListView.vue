@@ -5,7 +5,7 @@
     :deleteService="deletePersonalTokenService"
     :columns="getColumns"
     pageTitle="Personal Tokens"
-    addButtonLabel="Add Personal Token"
+    addButtonLabel="Add"
     createPagePath="personal-tokens/create"
     @on-load-data="handleLoadData"
     :visibleEditAction="false"
@@ -13,9 +13,9 @@
   <EmptyResultsBlock
     v-else
     pageTitle="Personal Tokens"
-    title="No personal tokens added"
+    title="No personal tokens found"
     description="Create your first personal token."
-    createButtonLabel="Add personal token"
+    createButtonLabel="Add Personal Token"
     createPagePath="personal-tokens/create"
     :documentationService="documentationService"
   >
@@ -53,7 +53,7 @@
   const getColumns = ref([
     {
       field: 'name',
-      header: 'Token Name'
+      header: 'Name'
     },
     {
       field: 'description',
@@ -68,11 +68,11 @@
     },
     {
       field: 'created',
-      header: 'Last modified'
+      header: 'Last Modified'
     },
     {
       field: 'expiresAt',
-      header: 'Expires'
+      header: 'Expiration Date'
     }
   ])
 

@@ -5,14 +5,13 @@
     :loadService="loadCredentialService"
     :initialDataSetter="setValues"
     :formData="values"
-    :isValid="meta.valid"
     :formMeta="meta"
     :cleanFormCallback="resetForm"
   >
     <template #form>
       <FormHorizontal
         title="Credentials"
-        description="Espaço livre para descrição e instruções de preenchimento. Esse conteúdo deve ser criado pensando tanto em funcionalidade quanto em em alinhamento e estética. Devemos sempre criar os blocos conforme o contexto, cuidando sempre para não ter blocos muito longos."
+        description="Edit a credential to use and authenticate Edge Orchestrator services."
       >
         <template #inputs>
           <div class="flex flex-col sm:max-w-lg w-full gap-2">
@@ -22,7 +21,7 @@
               >Name *</label
             >
             <InputText
-              placeholder="Edit Credential Name"
+              placeholder="My credential"
               v-model="name"
               id="name"
               type="text"
@@ -67,7 +66,7 @@
             <div class="flex gap-2">
               <Password
                 id="token"
-                placeholder="Token"
+                placeholder="Token value"
                 v-model="token"
                 type="text"
                 class="flex flex-col w-full"

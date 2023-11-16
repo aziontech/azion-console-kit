@@ -4,11 +4,11 @@ import { describe, expect, it, vi } from 'vitest'
 
 const fixtures = {
   logsResult: {
-    status: "succeeded",
+    status: 'succeeded',
     logs: [
       {
-        content: "Hello World",
-        timestamp: "2023-11-16 03:16:06.300"
+        content: 'Hello World',
+        timestamp: '2023-11-16 03:16:06.300'
       }
     ]
   },
@@ -18,7 +18,7 @@ const fixtures = {
 
 const makeSut = () => {
   const sut = getLogs
-  
+
   return {
     sut
   }

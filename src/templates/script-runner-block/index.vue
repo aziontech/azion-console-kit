@@ -5,7 +5,7 @@
       :disabled="!isPolling"
       ref="accordion"
       :pt="{
-        content: {class: 'p-0 pl-5'}
+        content: { class: 'p-0 pl-5' }
       }"
     >
       <template #header>
