@@ -49,7 +49,7 @@
           <PrimeButton
             label="Sign in here"
             severity="secondary"
-            @click="$router.push({ name: 'login' })"
+            @click="goToLogin"
           />
         </div>
       </div>
@@ -60,6 +60,7 @@
 <script setup>
   import PrimeButton from 'primevue/button'
   import { azionPrivacyPolicyWindowOpener, azionTermsAndServicesWindowOpener } from '@/helpers'
+  import { useRouter } from 'vue-router'
 
   defineOptions({
     name: 'page-with-form-block'
@@ -79,4 +80,9 @@
       required: true
     }
   })
+
+  const router = useRouter()
+  const goToLogin = () => {
+    router.push({ name: 'login' })
+  }
 </script>

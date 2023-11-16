@@ -9,7 +9,7 @@
         <template v-if="!jobFunctionList.length">
           <PrimeSkeleton
             class="w-full h-14"
-            v-for="item in [...Array(5).keys()]"
+            v-for="item in 5"
             :key="item"
           />
         </template>
@@ -32,7 +32,7 @@
         <template v-if="!jobFunctionList.length">
           <PrimeSkeleton
             class="w-full h-14"
-            v-for="item in [...Array(5).keys()]"
+            v-for="item in 5"
             :key="item"
           />
         </template>
@@ -107,7 +107,7 @@
               v-model="country"
               :options="countriesList"
               optionLabel="name"
-              optionValue="id"
+              optionValue="name"
               filter
             />
           </label>
@@ -161,9 +161,9 @@
 
   const fetchAdditionalDataInfo = async () => {
     const results = await props.listAdditionalDataInfoService()
-    const { company_sizes, job_functions } = results
-    companySizeList.value = company_sizes
-    jobFunctionList.value = job_functions
+    const { companySizes, jobFunctions } = results
+    companySizeList.value = companySizes
+    jobFunctionList.value = jobFunctions
   }
 
   const fetchCountries = async () => {

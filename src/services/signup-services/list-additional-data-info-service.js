@@ -1,6 +1,7 @@
 import { AxiosHttpClientAdapter } from '../axios/AxiosHttpClientAdapter'
 import * as Errors from '@/services/axios/errors'
 import { makeAdditionalDataBaseUrl } from './make-additional-data-base-url'
+import { parseSnakeToCamel } from '@/helpers'
 
 export const listAdditionalDataInfoService = async () => {
   let httpResponse = await AxiosHttpClientAdapter.request({
@@ -22,7 +23,7 @@ export const listAdditionalDataInfoService = async () => {
 export const parseHttpResponse = (httpResponse) => {
   switch (httpResponse.statusCode) {
     case 200:
-      return httpResponse.body
+      return parseSnakeToCamel(httpResponse.body)
     case 400:
       throw new Errors.InvalidApiRequestError().message
     case 401:

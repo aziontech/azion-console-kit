@@ -21,7 +21,7 @@
       </section>
       <PrimeButton
         label="Return to our website"
-        @click="$router.push({ name: 'login' })"
+        @click="goToLogin"
         severity="secondary"
       />
     </div>
@@ -68,5 +68,9 @@
     } catch (err) {
       toast.add({ life: 5000, severity: 'error', detail: err, summary: 'Error' })
     }
+  }
+
+  const goToLogin = () => {
+    router.push({ name: 'login' })
   }
 </script>
