@@ -71,7 +71,7 @@
             <vue-monaco-editor
               v-model:value="dataSet"
               language="json"
-              theme="vs-dark"
+              :theme="theme"
               :options="optionsMonacoEditor"
               class="min-h-[100px]"
             />
@@ -964,6 +964,7 @@
   import { computed, onMounted, ref, watch } from 'vue'
   import { useForm, useField } from 'vee-validate'
   import * as yup from 'yup'
+  import { useAccountStore } from '@/stores/account'
 
   // Import the components
   import EditFormBlock from '@/templates/edit-form-block-new'
@@ -1358,6 +1359,13 @@
   const removeHeader = (index) => {
     headers.value.splice(index, 1)
   }
+
+  // Using the store
+  const store = useAccountStore()
+
+  const theme = computed(() => {
+    return store.currentTheme === 'light' ? 'vs' : 'vs-dark'
+  })
 
   const optionsMonacoEditor = computed(() => {
     return {

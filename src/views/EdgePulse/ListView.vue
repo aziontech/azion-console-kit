@@ -19,7 +19,7 @@
               <vue-monaco-editor
                 v-model:value="defaultTagCode"
                 language="javascript"
-                theme="vs"
+                :theme="theme"
                 :options="editorOptions"
                 class="min-h-[200px] overflow-clip surface-border border rounded-md"
               />
@@ -50,7 +50,7 @@
               <vue-monaco-editor
                 v-model:value="preLoadingTagCode"
                 language="javascript"
-                theme="vs"
+                :theme="theme"
                 :options="editorOptions"
                 class="min-h-[56px] surface-border overflow-clip border rounded-md"
               />
@@ -78,6 +78,8 @@
   import PrimeButton from 'primevue/button'
   import TabView from 'primevue/tabview'
   import TabPanel from 'primevue/tabpanel'
+  import { useAccountStore } from '@/stores/account'
+  import { mapState } from 'pinia'
 
   const defaultTagCode = `<script>
     if (typeof window.addEventListener === 'function') {
@@ -110,6 +112,12 @@
           readOnly: true,
           scrollBeyondLastLine: false
         }
+      }
+    },
+    computed: {
+      ...mapState(useAccountStore, ['currentTheme']),
+      theme() {
+        return this.currentTheme === 'light' ? 'vs' : 'vs-dark'
       }
     },
     methods: {
