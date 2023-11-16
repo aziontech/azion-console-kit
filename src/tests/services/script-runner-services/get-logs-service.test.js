@@ -1,28 +1,23 @@
 import { AxiosHttpClientAdapter } from '@/services/axios/AxiosHttpClientAdapter'
-import { getLogsService } from '@/services/script-runner-service'
+import { getLogs } from '@/services/script-runner-service'
 import { describe, expect, it, vi } from 'vitest'
 
 const fixtures = {
-  domainMock: {
-    id: '1234',
-    name: 'Edge App X',
-    domain_name: 'domain A',
-    cnames: ['CName 1', 'CName 2'],
-    is_active: true,
-    digital_certificate_id: '862026'
+  logsResult: {
+    status: "succeeded",
+    logs: [
+      {
+        content: "Hello World",
+        timestamp: "2023-11-16 03:16:06.300"
+      }
+    ]
   },
-  disabledDomainMock: {
-    id: '4132123',
-    name: 'Edge App Y',
-    domain_name: 'domain B',
-    cnames: ['CName 3', 'CName 4'],
-    is_active: false,
-    digital_certificate_id: '69870'
-  }
+  parsedTimeStamp: '03:16:06',
+  executionId: 'xx'
 }
 
 const makeSut = () => {
-  const sut = getLogsService
+  const sut = getLogs
   
   return {
     sut
@@ -33,14 +28,14 @@ describe('DomainsServices', () => {
   it('should call api with correct params', async () => {
     const requestSpy = vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
       statusCode: 200,
-      body: { results: [] }
+      body: { logs: [], status: null }
     })
     const { sut } = makeSut()
 
-    await sut({})
+    await sut(fixtures.executionId)
 
     expect(requestSpy).toHaveBeenCalledWith({
-      url: `domains?order_by=name&sort=asc&page=1&page_size=200`,
+      url: `script-runner/executions/${fixtures.executionId}/logs`,
       method: 'GET'
     })
   })
@@ -48,37 +43,20 @@ describe('DomainsServices', () => {
   it('should parsed correctly all returned domains', async () => {
     vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
       statusCode: 200,
-      body: { results: [fixtures.domainMock, fixtures.disabledDomainMock] }
+      body: fixtures.logsResult
     })
     const { sut } = makeSut()
 
     const result = await sut({})
 
-    expect(result).toEqual([
-      {
-        id: fixtures.domainMock.id,
-        name: fixtures.domainMock.name,
-        domainName: fixtures.domainMock.domain_name,
-        cnames: 'CName 1,CName 2',
-        active: {
-          content: 'Active',
-          severity: 'success'
-        },
-        edgeApplicationName: fixtures.domainMock.name,
-        digitalCertificateId: fixtures.domainMock.digital_certificate_id
-      },
-      {
-        id: fixtures.disabledDomainMock.id,
-        name: fixtures.disabledDomainMock.name,
-        domainName: fixtures.disabledDomainMock.domain_name,
-        cnames: 'CName 3,CName 4',
-        active: {
-          content: 'Disabled',
-          severity: 'info'
-        },
-        edgeApplicationName: fixtures.disabledDomainMock.name,
-        digitalCertificateId: fixtures.disabledDomainMock.digital_certificate_id
-      }
-    ])
+    expect(result).toEqual({
+      status: fixtures.logsResult.status,
+      logs: [
+        {
+          content: fixtures.logsResult.logs[0].content,
+          timeStamp: fixtures.parsedTimeStamp
+        }
+      ]
+    })
   })
 })
