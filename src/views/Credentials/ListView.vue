@@ -5,7 +5,7 @@
     :deleteService="deleteCredentialService"
     :columns="getColumns"
     pageTitle="Credentials"
-    addButtonLabel="Add Credential"
+    addButtonLabel="Credential"
     editPagePath="credentials/edit"
     createPagePath="credentials/create"
     @on-load-data="handleLoadData"

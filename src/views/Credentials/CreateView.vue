@@ -19,7 +19,6 @@
               >Name *</label
             >
             <InputText
-              placeholder="My credential"
               v-model="name"
               id="name"
               type="text"

@@ -10,7 +10,8 @@ export const documentationCatalog = {
   realTimePurge: () => openSearchResult('real-time-purge'),
   getStarted: () => openSearchResult('get started'),
   digitalCertificates: () => openSearchResult('digital certificates'),
-  credentials: () => openSearchResult('credentials')
+  credentials: () => openSearchResult('credentials'),
+  networkLists: () => openSearchResult('network lists'),
 }
 
 export const documentationGuideProducts = {
