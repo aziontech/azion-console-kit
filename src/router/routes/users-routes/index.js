@@ -13,7 +13,7 @@ export const usersListsRoutes = {
       props: {
         listUsersService: UsersService.listUsersService,
         deleteUsersService: UsersService.deleteUsersService,
-        documentationService: Helpers.documentationCatalog.users,
+        documentationService: Helpers.documentationCatalog.users
       },
       meta: {
         breadCrumbs: [
