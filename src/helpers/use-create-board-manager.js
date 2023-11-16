@@ -1,14 +1,14 @@
 import { ref } from 'vue'
 
 export function useCreateBoardManager() {
-  const enabled = ref(0)
+  const enabled = ref(false)
 
   function open() {
-    enabled.value = 1
+    enabled.value = true
   }
 
   function close() {
-    enabled.value = 0
+    enabled.value = false
   }
 
   return {

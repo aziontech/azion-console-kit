@@ -55,6 +55,10 @@
             iconPos="right"
             size="small"
             @click="openDocsEdgeApplication"
+            :pt="{
+              root: { class: 'justify-center' },
+              label: { class: 'grow-0' }
+            }"
           />
         </div>
       </div>
@@ -90,10 +94,11 @@
             icon="pi pi-external-link"
             iconPos="right"
             size="small"
-            :pt="{
-              label: { class: 'w-fit' }
-            }"
             @click="openDocsRealTimeMetrics"
+            :pt="{
+              root: { class: 'justify-center' },
+              label: { class: 'grow-0' }
+            }"
           />
         </div>
       </div>
@@ -123,7 +128,7 @@
         @submit.prevent="handleSubmit"
       >
         <!-- Input Name -->
-        <div class="flex flex-col lg:max-w-lg w-full gap-2">
+        <div class="flex flex-col w-full gap-2">
           <label
             for="name"
             class="text-color text-sm font-medium"
@@ -144,7 +149,7 @@
         </div>
 
         <!-- Input Email -->
-        <div class="flex flex-col lg:max-w-lg w-full gap-2">
+        <div class="flex flex-col w-full gap-2">
           <label
             for="email"
             class="text-color text-sm font-medium"
@@ -165,7 +170,7 @@
         </div>
 
         <!-- Input Team -->
-        <div class="flex flex-col lg:max-w-lg w-full gap-2">
+        <div class="flex flex-col w-full gap-2">
           <label
             for="team"
             class="text-color text-sm font-medium"
