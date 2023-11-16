@@ -14,8 +14,7 @@ export const edgeFunctionsRoutes = {
       props: {
         deleteEdgeFunctionsService: EdgeFunctionsService.deleteEdgeFunctionsService,
         listEdgeFunctionsService: EdgeFunctionsService.listEdgeFunctionsService,
-        documentationService: Helpers.documentationCatalog.edgeFunctions,
-
+        documentationService: Helpers.documentationCatalog.edgeFunctions
       },
       meta: {
         breadCrumbs: [

@@ -10,8 +10,7 @@ export const edgeFirewallRoutes = {
   props: {
     listEdgeFirewallService: EdgeFirewall.listEdgeFirewallService,
     deleteEdgeFirewallService: EdgeFirewall.deleteEdgeFirewallService,
-    documentationService: Helpers.documentationCatalog.edgeFirewall,
-
+    documentationService: Helpers.documentationCatalog.edgeFirewall
   },
   meta: {
     breadCrumbs: [
