@@ -11,7 +11,7 @@
           class="w-100"
           severity="warn"
           :closable="false"
-          >After confirming the deletion, this action will be irreversible.</Message
+          >Once confirmed, this action cannot be reversed.</Message
         >
 
         <p class="pt-3.5 text-color-secondary">
