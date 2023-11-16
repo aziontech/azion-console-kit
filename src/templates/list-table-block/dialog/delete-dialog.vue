@@ -16,7 +16,7 @@
 
         <p class="pt-3.5 text-color-secondary">
           This edge application will be deleted along with any associated device groups, origins,
-          rule sets, cache, and settings.
+          rules, instantiated functions, and cache settings.
         </p>
       </div>
 
