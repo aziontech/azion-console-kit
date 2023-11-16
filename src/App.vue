@@ -3,10 +3,9 @@
   import { RouterView, useRoute } from 'vue-router'
   import ShellBlock from '@/templates/shell-block'
   import { useAccountStore } from '@/stores/account'
-  import { themeSelect } from '@/helpers/themeSelect'
   import { storeToRefs } from 'pinia'
   import { isRoutePublic } from '@/router/public-routes'
-  import { useCreateBoardManager } from '@/helpers/use-create-board-manager'
+  import { themeSelect, useCreateBoardManager } from '@/helpers'
 
   const accountStore = useAccountStore()
   const { currentTheme, hasActiveUserId } = storeToRefs(accountStore)

@@ -1,4 +1,4 @@
-import { useCreateBoardManager } from '@/helpers/use-create-board-manager'
+import { useCreateBoardManager } from '@/helpers/composables/use-create-board-manager'
 import { describe, expect, it } from 'vitest'
 
 const makeSut = () => {

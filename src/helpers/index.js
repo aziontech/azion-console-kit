@@ -6,9 +6,11 @@ import {
   openContactSupport
 } from './azion-documentation-window-opener'
 import InviteSession from './invite-session'
-import { useCreateBoardManager } from './use-create-board-manager'
+import { useCreateBoardManager } from './composables/use-create-board-manager'
+import { themeSelect } from './themeSelect'
 
 export {
+  themeSelect,
   clipboardWrite,
   documentationCatalog,
   documentationGuideProducts,
