@@ -28,7 +28,12 @@ const makeSut = () => {
 describe('DomainsServices', () => {
   it('should call API with correct params', async () => {
     const requestSpy = vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
-      statusCode: 201
+      statusCode: 201,
+      body: {
+        results: {
+          id: 1
+        }
+      }
     })
     const { sut } = makeSut()
 
@@ -53,13 +58,18 @@ describe('DomainsServices', () => {
 
   it('should return a feedback message on successfully created', async () => {
     vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
-      statusCode: 201
+      statusCode: 201,
+      body: {
+        results: {
+          id: 1
+        }
+      }
     })
     const { sut } = makeSut()
 
-    const feedbackMessage = await sut(fixtures.domainMock)
+    const data = await sut(fixtures.domainMock)
 
-    expect(feedbackMessage).toBe('Your domain has been created')
+    expect(data.feedback).toBe('Your domain has been created')
   })
 
   it('Should return an API error for an 409 response status', async () => {
@@ -74,9 +84,9 @@ describe('DomainsServices', () => {
     })
     const { sut } = makeSut()
 
-    const feedbackMessage = sut(fixtures.domainMock)
+    const data = sut(fixtures.domainMock)
 
-    expect(feedbackMessage).rejects.toThrow(apiErrorMock)
+    expect(data).rejects.toThrow(apiErrorMock)
   })
 
   it('Should return an API error for an 400 response status', async () => {

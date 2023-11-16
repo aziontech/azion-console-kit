@@ -31,7 +31,10 @@ const adapt = (payload) => {
 const parseHttpResponse = (httpResponse) => {
   switch (httpResponse.statusCode) {
     case 201:
-      return 'Your network list has been created'
+      return {
+        feedback: 'Your network list has been created',
+        redirectURL: `/network-lists/edit/${httpResponse.body.results.id}`
+      }
     case 400:
       const apiError = httpResponse.body.results[0]
       throw new Error(apiError).message

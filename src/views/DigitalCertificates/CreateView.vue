@@ -157,7 +157,7 @@
             >
           </div>
           <div class="flex flex-col sm:max-w-lg w-full gap-2">
-            <label>Private key *</label>
+            <label>Private key</label>
             <PrimeTextarea
               v-model="privateKey"
               :class="{ 'p-invalid': errors.privateKey }"

@@ -5,133 +5,215 @@
       :createService="props.createUsersService"
       :formData="values"
       :isValid="meta.valid"
+      :formMeta="meta"
       :cleanFormCallback="resetForm"
     >
       <template #form>
-        <div class="flex flex-col gap-2">
-          <label for="name">First name: *</label>
-          <InputText
-            v-model="firstName"
-            id="firstName"
-            type="text"
-            :class="{ 'p-invalid': errors.firstName }"
-            v-tooltip.top="{ value: errors.firstName, showDelay: 200 }"
-          />
-        </div>
-        <div class="flex flex-col gap-2">
-          <label for="name">Last name: *</label>
-          <InputText
-            v-model="lastName"
-            id="lastName"
-            type="text"
-            :class="{ 'p-invalid': errors.lastName }"
-          />
-        </div>
-        <div class="flex flex-col gap-2">
-          <label for="selectedTimezone">Timezone: *</label>
-          <Dropdown
-            id="selectedTimezone"
-            filter
-            :options="optionsTimezone"
-            optionLabel="label"
-            optionValue="value"
-            placeholder="Loading..."
-            :loading="!selectedTimezone"
-            :class="{ 'p-invalid': errors.selectedTimezone }"
-            v-model="selectedTimezone"
-          />
-        </div>
-        <div class="flex flex-col gap-2">
-          <label for="selectedLanguage">Language:</label>
-          <Dropdown
-            id="selectedLanguage"
-            :options="optionsLanguage"
-            optionLabel="label"
-            optionValue="value"
-            :class="{ 'p-invalid': errors.selectedLanguage }"
-            v-model="selectedLanguage"
-            disabled
-          />
-        </div>
-        <div class="flex flex-col gap-2">
-          <label for="email">E-mail: *</label>
-          <InputText
-            v-model="email"
-            id="email"
-            type="email"
-            placeholder="example@email.com"
-            :class="{ 'p-invalid': errors.email }"
-            v-tooltip.top="{ value: errors.email, showDelay: 200 }"
-          />
-        </div>
-        <div class="flex flex-col gap-2">
-          <label for="mobile">Mobile: *</label>
-          <div class="flex flex-row gap-2">
-            <AutoComplete
-              :suggestions="filteredCountriesMobile"
-              optionLabel="labelFormat"
-              dropdown
-              :loading="!optionsCountriesMobile.length"
-              :class="{ 'p-invalid': errors.selectedCountry }"
-              v-model="selectedCountry"
-              forceSelection
-              @complete="search"
-            >
-              <template #option="slotProps">
-                <div
-                  v-if="slotProps.option"
-                  class="flex align-items-center"
+        <FormHorizontal title="General">
+          <template #inputs>
+            <div class="flex flex-col sm:max-w-lg w-full gap-2">
+              <label
+                for="name"
+                class="text-color text-base font-medium"
+                >First name *</label
+              >
+              <InputText
+                v-model="firstName"
+                id="firstName"
+                type="text"
+                :class="{ 'p-invalid': errors.firstName }"
+              />
+              <small
+                id="name-help"
+                class="p-error"
+                >{{ errors.firstName }}</small
+              >
+            </div>
+            <div class="flex flex-col sm:max-w-lg w-full gap-2">
+              <label
+                for="name"
+                class="text-color text-base font-medium"
+                >Last name *</label
+              >
+              <InputText
+                v-model="lastName"
+                id="lastName"
+                type="text"
+                :class="{ 'p-invalid': errors.lastName }"
+              />
+              <small
+                id="name-help"
+                class="p-error"
+                >{{ errors.lastName }}</small
+              >
+            </div>
+            <div class="flex flex-col w-full sm:max-w-xs gap-2">
+              <label
+                for="selectedTimezone"
+                class="text-color text-base font-medium"
+                >Timezone *</label
+              >
+              <Dropdown
+                id="selectedTimezone"
+                filter
+                :options="optionsTimezone"
+                optionLabel="label"
+                optionValue="value"
+                placeholder="Loading..."
+                :loading="!selectedTimezone"
+                :class="{ 'p-invalid': errors.selectedTimezone }"
+                v-model="selectedTimezone"
+              />
+            </div>
+            <div class="flex flex-col w-full sm:max-w-xs gap-2">
+              <label
+                for="selectedLanguage"
+                class="text-color text-base font-medium"
+                >Language</label
+              >
+              <Dropdown
+                id="selectedLanguage"
+                :options="optionsLanguage"
+                optionLabel="label"
+                optionValue="value"
+                :class="{ 'p-invalid': errors.selectedLanguage }"
+                v-model="selectedLanguage"
+                disabled
+              />
+            </div>
+            <div class="flex flex-col sm:max-w-lg w-full gap-2">
+              <label
+                for="email"
+                class="text-color text-base font-medium"
+                >E-mail *</label
+              >
+              <InputText
+                v-model="email"
+                id="email"
+                type="email"
+                placeholder="example@email.com"
+                :class="{ 'p-invalid': errors.email }"
+              />
+              <small
+                id="name-help"
+                class="p-error"
+                >{{ errors.email }}</small
+              >
+            </div>
+            <div class="flex flex-col sm:max-w-lg w-full gap-2">
+              <label
+                for="email"
+                class="text-color text-base font-medium"
+                >Mobile *</label
+              >
+              <div class="flex gap-2">
+                <AutoComplete
+                  :suggestions="filteredCountriesMobile"
+                  optionLabel="labelFormat"
+                  dropdown
+                  :loading="!optionsCountriesMobile.length"
+                  :class="{ 'p-invalid': errors.selectedCountry }"
+                  v-model="selectedCountry"
+                  forceSelection
+                  @complete="search"
                 >
-                  <div>{{ slotProps.option.label }}</div>
+                  <template #option="slotProps">
+                    <div
+                      v-if="slotProps.option"
+                      class="flex align-items-center"
+                    >
+                      <div>{{ slotProps.option.label }}</div>
+                    </div>
+                  </template>
+                </AutoComplete>
+
+                <InputMask
+                  date="phone"
+                  v-model="mobile"
+                  class="w-full"
+                  mask="?99999999999999999999"
+                  :class="{ 'p-invalid': errors.mobile && !selectedCountry }"
+                />
+              </div>
+              <small
+                id="name-help"
+                class="p-error"
+                >{{ errors.mobile }}</small
+              >
+            </div>
+
+            <Card
+              :pt="{
+                root: { class: 'shadow-none  rounded-none' },
+                body: { class: 'py-4 border-0' },
+                title: { class: 'flex items-center text-base m-0 gap-3 font-medium' },
+                subtitle: {
+                  class: 'text-sm font-normal text-color-secondary m-0 pr-0 md:pr-[2.5rem]'
+                }
+              }"
+            >
+              <template #title>
+                <InputSwitch
+                  :class="{ 'p-invalid': errors.userIsOwner }"
+                  :disabled="accountIsOwner"
+                  :readonly="accountIsOwner"
+                  v-model="userIsOwner"
+                  @click="handleUserIsOwner"
+                />
+                <div class="flex-col gap-1">
+                  <div class="">
+                    <div class="text-color text-sm font-normal">Account owner</div>
+                  </div>
                 </div>
               </template>
-            </AutoComplete>
+            </Card>
 
-            <InputMask
-              date="phone"
-              v-model="mobile"
-              class="w-full"
-              mask="?99999999999999999999"
-              :class="{ 'p-invalid': errors.mobile && !selectedCountry }"
-              v-tooltip.top="{ value: errors.mobile, showDelay: 200 }"
-            />
-          </div>
-        </div>
-        <div class="flex flex-col gap-2">
-          <label for="enable-mutual-authentication">Account owner:</label>
-          <InputSwitch
-            :class="{ 'p-invalid': errors.userIsOwner }"
-            :disabled="accountIsOwner"
-            :readonly="accountIsOwner"
-            v-model="userIsOwner"
-            @click="handleUserIsOwner"
-          />
-        </div>
-        <div class="flex flex-col gap-2">
-          <label for="teams">Teams:</label>
-          <MultiSelect
-            display="chip"
-            filter
-            id="teams"
-            :disabled="userIsOwner"
-            :loading="!optionsTeams.length"
-            :options="optionsTeams"
-            optionLabel="label"
-            optionValue="value"
-            placeholder="Nothing selected"
-            :maxSelectedLabels="5"
-            :class="{ 'p-invalid': errors.selectedTeam }"
-            v-model="selectedTeam"
-          />
-        </div>
-        <div class="flex flex-col gap-2">
-          <label for="enable-mutual-authentication">Multi-Factor Authentication:</label>
-          <InputSwitch
-            :class="{ 'p-invalid': errors.twoFactorEnabled }"
-            :readonly="isForceMFA"
-            v-model="twoFactorEnabled"
-          />
-        </div>
+            <div class="flex flex-col w-full sm:max-w-3xl gap-2">
+              <label
+                for="teams"
+                class="text-color text-base font-medium"
+                >Teams</label
+              >
+              <MultiSelect
+                display="chip"
+                filter
+                id="teams"
+                :disabled="userIsOwner"
+                :loading="!optionsTeams.length"
+                :options="optionsTeams"
+                optionLabel="label"
+                optionValue="value"
+                placeholder="Nothing selected"
+                :maxSelectedLabels="5"
+                :class="{ 'p-invalid': errors.selectedTeam }"
+                v-model="selectedTeam"
+              />
+            </div>
+            <Card
+              :pt="{
+                root: { class: 'shadow-none  rounded-none' },
+                body: { class: 'py-4 border-0' },
+                title: { class: 'flex items-center text-base m-0 gap-3 font-medium' },
+                subtitle: {
+                  class: 'text-sm font-normal text-color-secondary m-0 pr-0 md:pr-[2.5rem]'
+                }
+              }"
+            >
+              <template #title>
+                <InputSwitch
+                  :class="{ 'p-invalid': errors.twoFactorEnabled }"
+                  :readonly="isForceMFA"
+                  v-model="twoFactorEnabled"
+                />
+                <div class="flex-col gap-1">
+                  <div class="">
+                    <div class="text-color text-sm font-normal">Multi-Factor Authentication</div>
+                  </div>
+                </div>
+              </template>
+            </Card>
+          </template>
+        </FormHorizontal>
       </template>
     </CreateFormBlock>
   </div>
@@ -143,13 +225,15 @@
   import * as yup from 'yup'
   import { useAccountStore } from '@/stores/account'
   import { storeToRefs } from 'pinia'
-  import CreateFormBlock from '@/templates/create-form-block'
+  import CreateFormBlock from '@/templates/create-form-block-new'
+  import FormHorizontal from '@/templates/create-form-block-new/form-horizontal'
   import InputText from 'primevue/inputtext'
   import AutoComplete from 'primevue/autocomplete'
   import Dropdown from 'primevue/dropdown'
   import InputSwitch from 'primevue/inputswitch'
   import MultiSelect from 'primevue/multiselect'
   import InputMask from 'primevue/inputmask'
+  import Card from 'primevue/card'
 
   const props = defineProps({
     loadAccountDetailsService: {
@@ -185,13 +269,13 @@
   const optionsLanguage = ref([{ label: 'English', value: 'en' }])
 
   const validationSchema = yup.object({
-    firstName: yup.string().required().max(30),
-    lastName: yup.string().required().max(30),
-    selectedTimezone: yup.string().required(),
+    firstName: yup.string().required('first name is a required field').max(30),
+    lastName: yup.string().required('last name is a required field').max(30),
+    selectedTimezone: yup.string().required('timezone is a required field'),
     selectedLanguage: yup.string(),
-    email: yup.string().email().required().max(254),
-    selectedCountry: yup.object().required(),
-    mobile: yup.string().required().max(20),
+    email: yup.string().email().required('e-mail is a required field').max(254),
+    selectedCountry: yup.object().required('country is a required field'),
+    mobile: yup.string().required('mobile phone is a required field').max(20),
     userIsOwner: yup.boolean(),
     selectedTeam: yup.array(),
     mfa: yup.boolean()
