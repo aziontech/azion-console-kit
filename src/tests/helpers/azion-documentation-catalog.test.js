@@ -127,4 +127,14 @@ describe('AzionDocumentationCatalog', () => {
       `https://www.azion.com/en/search-result/?q=credentials&filter=doc`
     )
   })
+  it('should open team permissions documentation with correct link', () => {
+    const openWindowSpy = vi.spyOn(window, 'open')
+    const { sut } = makeSut()
+
+    sut.teamPermissions()
+
+    expect(openWindowSpy).toHaveBeenCalledWith(
+      `https://www.azion.com/en/search-result/?q=team permissions&filter=doc`
+    )
+  })
 })
