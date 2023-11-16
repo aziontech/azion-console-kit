@@ -1,10 +1,14 @@
 <script>
   import ListTableBlock from '@/templates/list-table-block'
+  import EmptyResultsBlock from '@/templates/empty-results-block'
+  import Illustration from '@/assets/svg/illustration-layers.vue'
 
   export default {
     name: 'data-streaming-view',
     components: {
-      ListTableBlock
+      ListTableBlock,
+      EmptyResultsBlock,
+      Illustration
     },
     props: {
       listDataStreamingService: {
@@ -14,8 +18,15 @@
       deleteDataStreamingService: {
         required: true,
         type: Function
+      },
+      documentationService: {
+        required: true,
+        type: Function
       }
     },
+    data: () => ({
+      hasContentToList: true
+    }),
     computed: {
       getColumns() {
         return [
@@ -37,18 +48,39 @@
           }
         ]
       }
+    },
+    methods: {
+      handleLoadData(event) {
+        this.hasContentToList = event
+      }
     }
   }
 </script>
 
 <template>
   <ListTableBlock
+    v-if="hasContentToList"
     pageTitle="Data Streaming"
-    addButtonLabel="Add Streaming"
+    addButtonLabel="Data Streaming"
     createPagePath="/data-streaming/create"
     editPagePath="/data-streaming/edit"
     :listService="listDataStreamingService"
     :deleteService="deleteDataStreamingService"
     :columns="getColumns"
+    @on-load-data="handleLoadData"
+
   ></ListTableBlock>
+  <EmptyResultsBlock
+    v-else
+    pageTitle="Data Streaming"
+    title="No data streaming added"
+    description="Create your first data streaming."
+    createButtonLabel="Data Streaming"
+    createPagePath="data-streaming/create"
+    :documentationService="documentationService"
+  >
+    <template #illustration>
+      <Illustration />
+    </template>
+  </EmptyResultsBlock>
 </template>

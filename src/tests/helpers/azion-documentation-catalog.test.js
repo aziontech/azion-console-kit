@@ -137,4 +137,15 @@ describe('AzionDocumentationCatalog', () => {
       `https://www.azion.com/en/search-result/?q=team permissions&filter=doc`
     )
   })
+
+  it('should open data streaming documentation with correct link', () => {
+    const openWindowSpy = vi.spyOn(window, 'open')
+    const { sut } = makeSut()
+
+    sut.dataStreaming()
+
+    expect(openWindowSpy).toHaveBeenCalledWith(
+      `https://www.azion.com/en/search-result/?q=data streaming&filter=doc`
+    )
+  })
 })

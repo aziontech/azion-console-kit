@@ -12,7 +12,8 @@ export const documentationCatalog = {
   digitalCertificates: () => openSearchResult('digital certificates'),
   credentials: () => openSearchResult('credentials'),
   networkLists: () => openSearchResult('network lists'),
-  teamPermissions: () => openSearchResult('team permissions')
+  teamPermissions: () => openSearchResult('team permissions'),
+  dataStreaming: () => openSearchResult('data streaming')
 }
 
 export const documentationGuideProducts = {

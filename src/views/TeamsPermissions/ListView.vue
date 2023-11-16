@@ -17,7 +17,7 @@
     title="No team permissions added"
     description="Create your first team permissions."
     createButtonLabel="Team Permissions"
-    createPagePath="variables/create"
+    createPagePath="teams-permission/create"
     :documentationService="documentationService"
   >
     <template #illustration>
@@ -35,9 +35,10 @@
 
   const pros = defineProps({
     listTeamPermissionService: { required: true, type: Function },
-    deleteTeamPermissionService: { required: true, type: Function }
+    deleteTeamPermissionService: { required: true, type: Function },
+    documentationService: { required: true, type: Function }
   })
-  const hasContentToList = ref(false)
+  const hasContentToList = ref(true)
 
   const handleLoadData = (event) => {
     hasContentToList.value = event
