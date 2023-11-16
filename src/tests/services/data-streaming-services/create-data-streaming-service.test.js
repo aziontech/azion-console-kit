@@ -25,7 +25,12 @@ const makeSut = () => {
 describe('DataStreamingServices', () => {
   it('should call API with correct params', async () => {
     const requestSpy = vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
-      statusCode: 201
+      statusCode: 201,
+      body: {
+        results: {
+          id: 1
+        }
+      }
     })
     const { sut } = makeSut()
 
@@ -50,17 +55,27 @@ describe('DataStreamingServices', () => {
 
   it('should return a feedback message on successfully created', async () => {
     vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
-      statusCode: 201
+      statusCode: 201,
+      body: {
+        results: {
+          id: 1
+        }
+      }
     })
     const { sut } = makeSut()
-    const feedbackMessage = await sut(fixtures.dataStreamingMock)
+    const data = await sut(fixtures.dataStreamingMock)
 
-    expect(feedbackMessage).toBe('Your data streaming has been created')
+    expect(data.feedback).toBe('Your data streaming has been created')
   })
 
   it('should return a feedback message on successfully created with domains', async () => {
     vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
-      statusCode: 201
+      statusCode: 201,
+      body: {
+        results: {
+          id: 1
+        }
+      }
     })
     const { sut } = makeSut()
     const dataStreamingMockWithDomains = {
@@ -68,14 +83,19 @@ describe('DataStreamingServices', () => {
       domains: [[], [{ domainID: 1 }, { domainID: 2 }]]
     }
 
-    const feedbackMessage = await sut(dataStreamingMockWithDomains)
+    const data = await sut(dataStreamingMockWithDomains)
 
-    expect(feedbackMessage).toBe('Your data streaming has been created')
+    expect(data.feedback).toBe('Your data streaming has been created')
   })
 
   it('should return a feedback message on successfully created with endpoint standard and list of headers', async () => {
     vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
-      statusCode: 201
+      statusCode: 201,
+      body: {
+        results: {
+          id: 1
+        }
+      }
     })
     const { sut } = makeSut()
     const dataStreamingMockWithDomains = {
@@ -88,9 +108,9 @@ describe('DataStreamingServices', () => {
       headers: [{ value: 'name: api' }, { value: 'teste: 1' }]
     }
 
-    const feedbackMessage = await sut(dataStreamingMockWithDomains)
+    const data = await sut(dataStreamingMockWithDomains)
 
-    expect(feedbackMessage).toBe('Your data streaming has been created')
+    expect(data.feedback).toBe('Your data streaming has been created')
   })
 
   it.each([
@@ -187,7 +207,12 @@ describe('DataStreamingServices', () => {
     }
   ])('Should test all edpoints, current endpoint $endpoint', async ({ endpoint, values }) => {
     vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
-      statusCode: 201
+      statusCode: 201,
+      body: {
+        results: {
+          id: 1
+        }
+      }
     })
     const { sut } = makeSut()
 
@@ -197,9 +222,9 @@ describe('DataStreamingServices', () => {
       ...values
     }
 
-    const feedbackMessage = await sut(dataStreamingEndpointMock)
+    const data = await sut(dataStreamingEndpointMock)
 
-    expect(feedbackMessage).toBe('Your data streaming has been created')
+    expect(data.feedback).toBe('Your data streaming has been created')
   })
 
   it.each([

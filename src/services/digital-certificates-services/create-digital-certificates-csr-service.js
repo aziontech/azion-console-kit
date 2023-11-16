@@ -15,7 +15,10 @@ export const createDigitalCertificatesCSRService = async (payload) => {
 const parseHttpResponse = (httpResponse) => {
   switch (httpResponse.statusCode) {
     case 201:
-      return 'Your digital certificate has been created!'
+      return {
+        feedback: 'Your digital certificate has been created!',
+        redirectURL: `/digital-certificates/edit/${httpResponse.body.results.id}`
+      }
     case 400:
       const apiError = httpResponse.body.error[0]
       throw new Error(apiError).message

@@ -59,7 +59,10 @@ const extractApiError = (httpResponse) => {
 const parseHttpResponse = (httpResponse) => {
   switch (httpResponse.statusCode) {
     case 201:
-      return 'Intelligent DNS Record has been created'
+      return {
+        feedback: 'Intelligent DNS Record has been created',
+        redirectURL: `/intelligent-dns/edit/${httpResponse.body.results.zone_id}/records/edit/${httpResponse.body.results.id}`
+      }
     case 400:
       const apiError = extractApiError(httpResponse)
       throw new Error(apiError).message
