@@ -15,7 +15,7 @@ export const signupService = async (payload) => {
  * @param {Object} httpResponse - The HTTP response object.
  * @param {Object} httpResponse.body - The response body.
  * @param {String} httpResponse.statusCode - The HTTP status code.
- * @returns {string} The result message based on the status code.
+ * @returns {String || null} The result message based on the status code.
  * @throws {Error} If there is an error with the response.
  */
 
@@ -25,7 +25,7 @@ const parseHttpResponse = (httpResponse) => {
       return null
     case 400:
       const apiError = Object.values(httpResponse.body)[0][0]
-      throw new Error(apiError)
+      throw new Error(apiError).message
     case 404:
       throw new Errors.NotFoundError().message
     case 500:

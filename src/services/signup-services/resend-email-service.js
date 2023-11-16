@@ -25,7 +25,10 @@ const parseHttpResponse = (httpResponse) => {
       return 'Email sent successfully'
     case 400:
       const apiError = httpResponse.body.email[0]
-      throw new Error(apiError)
+      throw new Error(apiError).message
+    case 403:
+      const forbiddenError = httpResponse.body.detail
+      throw new Error(forbiddenError).message
     case 404:
       throw new Errors.NotFoundError().message
     case 500:

@@ -78,7 +78,7 @@
         <PrimeButton
           severity="secondary"
           label="Create One"
-          @click="$router.push({ name: 'signup' })"
+          @click="goToSignup"
         />
       </div>
     </div>
@@ -152,7 +152,7 @@
         <PrimeButton
           severity="secondary"
           label="Create One"
-          @click="$router.push({ name: 'signup' })"
+          @click="goToSignup"
         />
       </div>
     </div>
@@ -221,6 +221,10 @@
 
   const { value: email } = useField('email')
   const { value: password, resetField } = useField('password')
+
+  const goToSignup = () => {
+    router.push({ name: 'signup' })
+  }
 
   const validateAndSubmit = async () => {
     try {

@@ -56,6 +56,20 @@ describe('ResendEmailService', () => {
     expect(request).rejects.toThrow(response.email[0])
   })
 
+  it('Should return a forbidden error for a 403 response status', async () => {
+    const response = { detail: 'Forbidden' }
+
+    vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
+      statusCode: 403,
+      body: { ...response }
+    })
+    const { sut } = makeSut()
+
+    const request = sut(emailPayloadMock)
+
+    expect(request).rejects.toThrow(new Error(response.detail).message)
+  })
+
   it.each([
     {
       statusCode: 404,

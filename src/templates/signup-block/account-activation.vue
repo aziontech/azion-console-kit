@@ -51,7 +51,7 @@
   }
 
   const validateEmail = (email) => {
-    const re = /^[a-zA-Z0-9._+-]+@[a-zA-Z0-9.-]+\.\S+$/
+    const re = /^\S+@\S+\.\S+$/
     return re.test(email)
   }
 
