@@ -14,7 +14,7 @@ export const edgeApplicationRoutes = {
       props: {
         listEdgeApplicationsService: EdgeApplicationsService.listEdgeApplicationsService,
         deleteEdgeApplicationService: EdgeApplicationsService.deleteEdgeApplicationService,
-        documentationService: Helpers.documentationCatalog.edgeApplication,
+        documentationService: Helpers.documentationCatalog.edgeApplication
       },
       meta: {
         breadCrumbs: [
