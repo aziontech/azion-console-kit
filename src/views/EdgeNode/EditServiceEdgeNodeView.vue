@@ -19,7 +19,7 @@
         <vue-monaco-editor
           v-model:value="variables"
           language="javascript"
-          theme="vs-dark"
+          :theme="theme"
           class="min-h-[50vh]"
           :options="editorOptions"
         />
@@ -33,6 +33,9 @@
 
   import { useForm, useField } from 'vee-validate'
   import * as yup from 'yup'
+
+  import { useAccountStore } from '@/stores/account'
+  import { mapState } from 'pinia'
 
   export default {
     name: 'edit-service',
@@ -48,6 +51,12 @@
       loadServiceEdgeNodeService: {
         type: Function,
         required: true
+      }
+    },
+    computed: {
+      ...mapState(useAccountStore, ['currentTheme']),
+      theme() {
+        return this.currentTheme === 'light' ? 'vs' : 'vs-dark'
       }
     },
     data: () => {

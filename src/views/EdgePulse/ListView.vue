@@ -13,15 +13,15 @@
                   just before the closing BODY tag. This script waits until the load event is complete
                   before downloading and executing the RUM Client, ensuring that the load event is
                   uninterrupted and has zero impact on user experience."
-        >
-          <template #inputs>
-            <vue-monaco-editor
-              v-model:value="defaultTagCode"
-              language="javascript"
-              theme="vs-dark"
-              :options="editorOptions"
-              class="min-h-[200px] overflow-clip surface-border border rounded-md"
-            />
+          >
+            <template #inputs>
+              <vue-monaco-editor
+                v-model:value="defaultTagCode"
+                language="javascript"
+                :theme="theme"
+                :options="editorOptions"
+                class="min-h-[200px] overflow-clip surface-border border rounded-md"
+              />
             <div>
               <PrimeButton
                 label="Copy to Clipboard"
@@ -48,7 +48,7 @@
               <vue-monaco-editor
                 v-model:value="preLoadingTagCode"
                 language="javascript"
-                theme="vs"
+                :theme="theme"
                 :options="editorOptions"
                 class="min-h-[56px] surface-border overflow-clip border rounded-md"
               />
@@ -76,6 +76,8 @@
   import PrimeButton from 'primevue/button'
   import TabView from 'primevue/tabview'
   import TabPanel from 'primevue/tabpanel'
+  import { useAccountStore } from '@/stores/account'
+  import { mapState } from 'pinia'
 
   const defaultTagCode = `<script>
     if (typeof window.addEventListener === 'function') {
@@ -108,6 +110,12 @@
           readOnly: true,
           scrollBeyondLastLine: false
         }
+      }
+    },
+    computed: {
+      ...mapState(useAccountStore, ['currentTheme']),
+      theme() {
+        return this.currentTheme === 'light' ? 'vs' : 'vs-dark'
       }
     },
     methods: {
