@@ -68,7 +68,6 @@
     :deleteService="deleteDataStreamingService"
     :columns="getColumns"
     @on-load-data="handleLoadData"
-
   ></ListTableBlock>
   <EmptyResultsBlock
     v-else

@@ -148,4 +148,26 @@ describe('AzionDocumentationCatalog', () => {
       `https://www.azion.com/en/search-result/?q=data streaming&filter=doc`
     )
   })
+
+  it('should open edge functions documentation with correct link', () => {
+    const openWindowSpy = vi.spyOn(window, 'open')
+    const { sut } = makeSut()
+
+    sut.edgeFunctions()
+
+    expect(openWindowSpy).toHaveBeenCalledWith(
+      `https://www.azion.com/en/search-result/?q=edge functions&filter=doc`
+    )
+  })
+
+  it('should open edge firewall documentation with correct link', () => {
+    const openWindowSpy = vi.spyOn(window, 'open')
+    const { sut } = makeSut()
+
+    sut.edgeFirewall()
+
+    expect(openWindowSpy).toHaveBeenCalledWith(
+      `https://www.azion.com/en/search-result/?q=edge firewall&filter=doc`
+    )
+  })
 })

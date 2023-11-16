@@ -13,7 +13,9 @@ export const documentationCatalog = {
   credentials: () => openSearchResult('credentials'),
   networkLists: () => openSearchResult('network lists'),
   teamPermissions: () => openSearchResult('team permissions'),
-  dataStreaming: () => openSearchResult('data streaming')
+  dataStreaming: () => openSearchResult('data streaming'),
+  edgeFunctions: () => openSearchResult('edge functions'),
+  edgeFirewall: () => openSearchResult('edge firewall')
 }
 
 export const documentationGuideProducts = {

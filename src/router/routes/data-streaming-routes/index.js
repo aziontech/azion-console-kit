@@ -13,7 +13,7 @@ export const dataStreamingRoutes = {
       props: {
         listDataStreamingService: DataStreamingService.listDataStreamingService,
         deleteDataStreamingService: DataStreamingService.deleteDataStreamingService,
-        documentationService: Helpers.documentationCatalog.dataStreaming,
+        documentationService: Helpers.documentationCatalog.dataStreaming
       },
       meta: {
         breadCrumbs: [
