@@ -30,7 +30,6 @@ const parseHttpResponse = (httpResponse) => {
     case 201:
       return {
         feedback: 'Your Edge Service has been created',
-        // redirectURL: `/edge-services/edit/${httpResponse.body?.id}`
         redirectURL: `/edge-services`
       }
     case 422:

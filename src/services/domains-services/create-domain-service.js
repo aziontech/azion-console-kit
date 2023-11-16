@@ -38,7 +38,7 @@ const parseHttpResponse = (httpResponse) => {
     case 201:
       return {
         feedback: 'Your domain has been created',
-        redirectURL: `/domains/edit/${httpResponse.body?.results?.id}`
+        redirectURL: `/domains/edit/${httpResponse.body.results.id}`
       }
     case 400:
       throw new Error(Object.keys(httpResponse.body)[0]).message

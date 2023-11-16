@@ -57,7 +57,7 @@ const parseHttpResponse = (httpResponse) => {
     case 201:
       return {
         feedback: 'Your edge function has been created',
-        redirectURL: `/edge-functions/edit/${httpResponse.body?.results?.id}`
+        redirectURL: `/edge-functions/edit/${httpResponse.body.results.id}`
       }
     case 400:
       const apiError400 = extractApiError(httpResponse)

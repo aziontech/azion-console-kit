@@ -32,7 +32,7 @@ const parseHttpResponse = (httpResponse) => {
     case 201:
       return {
         feedback: 'Your Team Permission has been created',
-        redirectURL: `/teams-permission/edit/${httpResponse.body?.id}`
+        redirectURL: `/teams-permission/edit/${httpResponse.body.id}`
       }
     case 400:
       const key = Object.keys(httpResponse.body)[0]

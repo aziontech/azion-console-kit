@@ -25,7 +25,12 @@ const makeSut = () => {
 describe('DataStreamingServices', () => {
   it('should call API with correct params', async () => {
     const requestSpy = vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
-      statusCode: 201
+      statusCode: 201,
+      body: {
+        results: {
+          id: 1
+        }
+      }
     })
     const { sut } = makeSut()
 
@@ -50,7 +55,12 @@ describe('DataStreamingServices', () => {
 
   it('should return a feedback message on successfully created', async () => {
     vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
-      statusCode: 201
+      statusCode: 201,
+      body: {
+        results: {
+          id: 1
+        }
+      }
     })
     const { sut } = makeSut()
     const data = await sut(fixtures.dataStreamingMock)
@@ -60,7 +70,12 @@ describe('DataStreamingServices', () => {
 
   it('should return a feedback message on successfully created with domains', async () => {
     vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
-      statusCode: 201
+      statusCode: 201,
+      body: {
+        results: {
+          id: 1
+        }
+      }
     })
     const { sut } = makeSut()
     const dataStreamingMockWithDomains = {
@@ -75,7 +90,12 @@ describe('DataStreamingServices', () => {
 
   it('should return a feedback message on successfully created with endpoint standard and list of headers', async () => {
     vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
-      statusCode: 201
+      statusCode: 201,
+      body: {
+        results: {
+          id: 1
+        }
+      }
     })
     const { sut } = makeSut()
     const dataStreamingMockWithDomains = {
@@ -187,7 +207,12 @@ describe('DataStreamingServices', () => {
     }
   ])('Should test all edpoints, current endpoint $endpoint', async ({ endpoint, values }) => {
     vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
-      statusCode: 201
+      statusCode: 201,
+      body: {
+        results: {
+          id: 1
+        }
+      }
     })
     const { sut } = makeSut()
 

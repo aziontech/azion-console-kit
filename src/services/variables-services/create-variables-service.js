@@ -24,7 +24,7 @@ const parseHttpResponse = (httpResponse) => {
     case 201:
       return {
         feedback: 'Your variable has been created',
-        redirectURL: `/variables/edit/${httpResponse.body?.uuid}`
+        redirectURL: `/variables/edit/${httpResponse.body.uuid}`
       }
     case 400:
       const apiError = extractApiError(httpResponse)
