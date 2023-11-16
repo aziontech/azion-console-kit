@@ -13,7 +13,7 @@
         dataKey="id"
         v-model:selection="selectedRow"
         selectionMode="single"
-        @dblclick.prevent="editItemSelected(selectedRow)"
+        @row-click="editItemSelected"
         v-model:filters="filters"
         :paginator="showPagination"
         :rowsPerPageOptions="[10, 20, 50, 100]"
@@ -341,7 +341,7 @@
         this.selectedId = selectedId
         this.$refs[`menu-${selectedId}`].toggle(event)
       },
-      editItemSelected(item) {
+      editItemSelected({ data: item }) {
         this.$router.push({ path: `${this.editPagePath}/${item.id}` })
       },
       editItem() {
