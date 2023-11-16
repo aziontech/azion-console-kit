@@ -248,7 +248,7 @@
       deleteService: {
         type: Function
       },
-      visibleEditAction: {
+      enableEditClick: {
         type: Boolean,
         default: true
       },
@@ -291,13 +291,6 @@
       },
       actionOptions(rowData) {
         const actionOptions = []
-        if (this.visibleEditAction) {
-          actionOptions.push({
-            label: 'Edit',
-            icon: 'pi pi-fw pi-pencil',
-            command: () => this.editItem()
-          })
-        }
 
         if (this.deleteService) {
           actionOptions.push({
@@ -342,7 +335,9 @@
         this.$refs[`menu-${selectedId}`].toggle(event)
       },
       editItemSelected({ data: item }) {
-        this.$router.push({ path: `${this.editPagePath}/${item.id}` })
+        if(enableEditClick) {
+          this.$router.push({ path: `${this.editPagePath}/${item.id}` })
+        }
       },
       editItem() {
         this.$router.push({ path: `${this.editPagePath}/${this.selectedId}` })

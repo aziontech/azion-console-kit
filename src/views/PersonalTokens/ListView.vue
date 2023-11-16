@@ -8,7 +8,7 @@
     addButtonLabel="Personal Token"
     createPagePath="personal-tokens/create"
     @on-load-data="handleLoadData"
-    :visibleEditAction="false"
+    :enableEditClick="false"
   />
   <EmptyResultsBlock
     v-else
