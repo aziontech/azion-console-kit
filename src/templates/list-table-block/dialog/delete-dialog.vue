@@ -16,7 +16,7 @@
 
         <p class="pt-3.5 text-color-secondary">
           This edge application will be deleted along with any associated settings or instances.
-          Open Help Center for more details.
+          Check Help Center for more details.
         </p>
       </div>
 
