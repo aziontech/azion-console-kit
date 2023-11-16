@@ -78,7 +78,10 @@
           class="w-full h-8"
           v-if="!countriesList.length"
         />
-        <div v-else>
+        <div
+          v-else
+          class="animate-fadeIn"
+        >
           <label class="font-semibold text-sm gap-2 flex flex-col"
             >Company size
             <PrimeDropdown
