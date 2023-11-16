@@ -233,7 +233,7 @@
       }
 
       await props.authenticationLoginService(loginData)
-      const { twoFactor, trustedDevice } = await verify()
+      const { twoFactor, trustedDevice, user_tracking_info: userInfo } = await verify()
 
       if (twoFactor) {
         const mfaRoute = trustedDevice ? 'authentication' : 'setup'
@@ -241,7 +241,7 @@
         return
       }
 
-      await switchClientAccount()
+      await switchClientAccount(userInfo.props)
     } catch {
       hasRequestErrorMessage.value = new UserNotFoundError().message
     } finally {
@@ -277,10 +277,18 @@
     }
   }
 
-  const switchClientAccount = async () => {
+  const getAccountId = async (accountId) => {
+    if (!accountId) {
+      const { accountId } = await searchAccount()
+      return accountId
+    }
+    return accountId
+  }
+
+  const switchClientAccount = async ({ account_id }) => {
     try {
-      const account = await searchAccount()
-      const { first_login: firstLogin } = await props.switchAccountLoginService(account.id)
+      const accountId = await getAccountId(account_id)
+      const { first_login: firstLogin } = await props.switchAccountLoginService(accountId)
       if (firstLogin) {
         router.push({ name: 'additional-data' })
         return

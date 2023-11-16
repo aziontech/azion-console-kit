@@ -76,8 +76,8 @@
       }
     },
     methods: {
-      navigateBack() {
-        this.$router.go(-1)
+      navigateBack(redirectURL) {
+        this.$router.push({ path: redirectURL })
       },
       showToast(severity, summary, life = 10000) {
         if (!summary) return
@@ -93,17 +93,17 @@
           this.showToast('success', feedback)
         }
       },
-      handleSuccess(feedback) {
+      handleSuccess(feedback, redirectURL) {
         this.cleanFormCallback()
         this.$emit('on-response', feedback)
         this.showFeedback(feedback)
-        if (this.callback) this.navigateBack()
+        if (this.callback) this.navigateBack(redirectURL)
       },
       async validateAndSubmit() {
         try {
           this.isLoading = true
-          const feedback = await this.createService(this.formData)
-          this.handleSuccess(feedback)
+          const data = await this.createService(this.formData)
+          this.handleSuccess(data.feedback, data.redirectURL)
         } catch (error) {
           this.showToast('error', error)
         } finally {
