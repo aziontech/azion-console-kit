@@ -1,4 +1,5 @@
 import * as AuthServices from '@/services/auth-services'
+import { listTypeAccountService } from '@/services/switch-account-services/list-type-account-service'
 
 /** @type {import('vue-router').RouteRecordRaw} */
 export const loginRoutes = {
@@ -10,7 +11,8 @@ export const loginRoutes = {
     verifyLoginService: AuthServices.verifyAuthenticationService,
     refreshLoginService: AuthServices.refreshAuthenticationService,
     switchAccountLoginService: AuthServices.switchAccountService,
-    sendResetPasswordEmailService: AuthServices.sendResetPasswordEmailService
+    sendResetPasswordEmailService: AuthServices.sendResetPasswordEmailService,
+    listTypeAccountService
   },
   meta: {
     isPublic: true,

@@ -32,6 +32,7 @@
           <InputText
             id="confirm-input"
             type="text"
+            autofocus
             v-model="confirmation"
             :class="{ 'p-invalid': errors.confirmation }"
             v-tooltip.top="{ value: errors.confirmation, showDelay: 200 }"

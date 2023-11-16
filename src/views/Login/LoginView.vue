@@ -7,6 +7,7 @@
       :verifyLoginService="verifyLoginService"
       :refreshLoginService="refreshLoginService"
       :switchAccountLoginService="switchAccountLoginService"
+      :listTypeAccountService="listTypeAccountService"
     />
 
     <ForgotPassword
@@ -43,6 +44,10 @@
         type: Function
       },
       sendResetPasswordEmailService: {
+        required: true,
+        type: Function
+      },
+      listTypeAccountService: {
         required: true,
         type: Function
       }
