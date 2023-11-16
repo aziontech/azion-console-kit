@@ -59,8 +59,7 @@
 
 <script setup>
   import PrimeButton from 'primevue/button'
-  import { azionPrivacyPolicyWindowOpener } from '@/helpers/azion-privacy-policy-opener'
-  import { azionTermsAndServicesWindowOpener } from '@/helpers/azion-terms-and-services-opener'
+  import { azionPrivacyPolicyWindowOpener, azionTermsAndServicesWindowOpener } from '@/helpers'
 
   defineOptions({
     name: 'page-with-form-block'

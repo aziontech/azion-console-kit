@@ -6,6 +6,8 @@ import {
   openContactSupport
 } from './azion-documentation-window-opener'
 import InviteSession from './invite-session'
+import { azionPrivacyPolicyWindowOpener } from './azion-privacy-policy-opener'
+import { azionTermsAndServicesWindowOpener } from './azion-terms-and-services-opener'
 
 export {
   clipboardWrite,
@@ -14,5 +16,7 @@ export {
   openDocumentation,
   openAPIDocumentation,
   openContactSupport,
-  InviteSession
+  InviteSession,
+  azionPrivacyPolicyWindowOpener,
+  azionTermsAndServicesWindowOpener
 }
