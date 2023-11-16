@@ -6,27 +6,6 @@
     >
       <div class="flex flex-col gap-2">
         <label
-          for="name"
-          class="font-semibold text-sm"
-          >Full name</label
-        >
-        <InputText
-          v-bind="name"
-          id="name"
-          placeholder="Type your full name"
-          type="text"
-          class="w-full"
-          :class="{ 'p-invalid': errors.name }"
-          v-tooltip.top="{ value: errors.name, showDelay: 200 }"
-        />
-        <small
-          v-if="errors.name"
-          class="p-error text-xs font-normal leading-tight"
-          >{{ errors.name }}</small
-        >
-      </div>
-      <div class="flex flex-col gap-2">
-        <label
           for="email"
           class="font-semibold text-sm"
           >E-mail</label
@@ -34,7 +13,6 @@
         <InputText
           v-bind="email"
           id="email"
-          placeholder="Type your e-mail"
           type="email"
           class="w-full"
           :class="{ 'p-invalid': errors.email }"
@@ -48,6 +26,26 @@
       </div>
       <div class="flex flex-col gap-2">
         <label
+          for="name"
+          class="font-semibold text-sm"
+          >Full name</label
+        >
+        <InputText
+          v-bind="name"
+          id="name"
+          type="text"
+          class="w-full"
+          :class="{ 'p-invalid': errors.name }"
+          v-tooltip.top="{ value: errors.name, showDelay: 200 }"
+        />
+        <small
+          v-if="errors.name"
+          class="p-error text-xs font-normal leading-tight"
+          >{{ errors.name }}</small
+        >
+      </div>
+      <div class="flex flex-col gap-2">
+        <label
           for="password"
           class="font-semibold text-sm"
           >Password</label
@@ -57,12 +55,13 @@
           v-model="password"
           id="password"
           class="w-full"
-          placeholder="Type your password"
           :class="{ 'p-invalid': errors.password }"
           :feedback="false"
           v-tooltip.top="{ value: errors.password, showDelay: 200 }"
         />
         <small class="p-error text-xs font-normal leading-tight">{{ errors.password }}</small>
+
+        <label class="font-semibold text-sm my-2">Must have at least:</label>
         <ul class="text-color-secondary list-inside space-y-3">
           <li
             class="flex gap-3 items-center text-color-secondary"
@@ -71,11 +70,11 @@
           >
             <div class="w-3">
               <span
-                class="w-2 h-2 bg-orange-bullet animate-fadeIn"
-                v-if="!requirement.valid"
-              />
-              <span
                 class="pi pi-check text-sm text-success-check animate-fadeIn"
+                v-if="requirement.valid"
+              />
+              <div
+                class="w-2 h-2 bg-orange-bullet animate-fadeIn"
                 v-else
               />
             </div>
@@ -87,10 +86,10 @@
         label="Next"
         :disabled="!meta.valid"
         type="submit"
-        severity="secondary"
         :loading="loading"
       />
     </form>
+    <PrimeDivider />
     <PrimeButton
       label="Other sign up methods"
       outlined
@@ -109,6 +108,7 @@
   import InputText from 'primevue/inputtext'
   import InputPassword from 'primevue/password'
   import PrimeButton from 'primevue/button'
+  import PrimeDivider from 'primevue/divider'
 
   defineEmits(['change-signup-method'])
 

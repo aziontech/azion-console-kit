@@ -10,10 +10,10 @@
         </p>
       </section>
       <section class="w-full flex gap-2">
-        <p class="text-start text-color-secondary">Didn't receive the email?</p>
+        <p class="text-start">Didn't receive the email?</p>
         <PrimeButton
           label="Resend email"
-          class="p-0 text-sm"
+          class="p-0"
           link
           @click="resendEmail"
           :disabled="!isEmailValid"
@@ -22,6 +22,7 @@
       <PrimeButton
         label="Return to our website"
         @click="$router.push({ name: 'login' })"
+        severity="secondary"
       />
     </div>
   </div>
@@ -50,7 +51,7 @@
   }
 
   const validateEmail = (email) => {
-    const re = /^\S+@\S+\.\S+$/
+    const re = /^[a-zA-Z0-9._+-]+@[a-zA-Z0-9.-]+\.\S+$/
     return re.test(email)
   }
 

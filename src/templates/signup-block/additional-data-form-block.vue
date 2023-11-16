@@ -122,7 +122,6 @@
     <PrimeButton
       label="Finish Signup"
       type="submit"
-      severity="secondary"
       :disabled="!meta.valid"
       :loading="loading"
     />
