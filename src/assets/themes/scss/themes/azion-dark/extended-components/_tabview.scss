@@ -2,6 +2,7 @@
 .p-tabview {
   .p-tabview-nav {
     gap: 0.5rem !important;
+    padding: 0 !important;
 
     li {
       .p-tabview-nav-link {
@@ -30,5 +31,6 @@
   }
   .p-tabview-panels {
     background: transparent !important;
+    padding: 0 !important;
   }
 }
