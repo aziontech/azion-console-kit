@@ -6,14 +6,11 @@ import graphQLApi from '@services/axios/makeGraphQl'
 
 const citiesMockResponse = {
   data: {
-    allCountries: [
-      {
-        name: 'Afghanistan',
-        id: '1'
-      }
-    ]
+    allCountries: [{ name: 'Brazil' }]
   }
 }
+
+const formattedMockResponse = [{ name: 'Brazil' }]
 
 const makeSut = () => {
   const sut = listCountriesService
@@ -23,54 +20,46 @@ const makeSut = () => {
   }
 }
 
-describe('ListCountriesService', () => {
+describe('SignupServices', () => {
   it('should call API with correct params', async () => {
     const requestSpy = vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
       statusCode: 200,
       body: citiesMockResponse
     })
+
+    const mockPayload = {
+      query: `query all_countries_with_code {
+      allCountries { name },
+    }`
+    }
+
     const { sut } = makeSut()
 
     await sut()
-
-    const payload = {
-      query: `query all_countries_with_code {
-      allCountries { name, id },
-    }`
-    }
 
     expect(requestSpy).toHaveBeenCalledWith(
       {
         url: 'cities/',
         method: 'POST',
-        body: payload
+        body: mockPayload
       },
       graphQLApi
     )
   })
 
   it('should return correct data on success', async () => {
-    const mockResponse = {
+    vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
       statusCode: 200,
       body: citiesMockResponse
-    }
-
-    const formattedMockResponse = {
-      countries: [
-        {
-          name: 'Afghanistan',
-          id: '1'
-        }
-      ],
-      statusCode: 200
-    }
-
-    vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce(mockResponse)
+    })
     const { sut } = makeSut()
 
     const result = await sut()
 
-    expect(result).toEqual(formattedMockResponse)
+    expect(result).toEqual({
+      statusCode: 200,
+      countries: formattedMockResponse
+    })
   })
 
   it.each([

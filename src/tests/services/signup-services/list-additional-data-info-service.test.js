@@ -3,6 +3,23 @@ import { AxiosHttpClientAdapter } from '@/services/axios/AxiosHttpClientAdapter'
 import * as Errors from '@/services/axios/errors'
 import { listAdditionalDataInfoService } from '@/services/signup-services'
 
+const mockResponse = {
+  jobFunctions: [
+    {
+      label: 'job',
+      value: 'job',
+      order: 1
+    }
+  ],
+  companySizes: [
+    {
+      label: 'company',
+      value: 'company',
+      order: 1
+    }
+  ]
+}
+
 const makeSut = () => {
   const sut = listAdditionalDataInfoService
 
@@ -11,11 +28,13 @@ const makeSut = () => {
   }
 }
 
-describe('ListAdditionalDataInfoService', () => {
+describe('SignupServices', () => {
   it('should call API with correct params', async () => {
     const requestSpy = vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
-      statusCode: 200
+      statusCode: 200,
+      body: mockResponse
     })
+
     const { sut } = makeSut()
 
     await sut()
@@ -27,41 +46,15 @@ describe('ListAdditionalDataInfoService', () => {
   })
 
   it('should return correct data on success', async () => {
-    const mockResponse = {
+    vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
       statusCode: 200,
-      body: {
-        job_functions: [
-          {
-            label: 'Developer',
-            value: 'developer',
-            order: 1
-          },
-          {
-            label: 'DevOps',
-            value: 'devops',
-            order: 2
-          }
-        ],
-        company_sizes: [
-          {
-            label: 'Just me',
-            value: '1:1',
-            order: 1
-          },
-          {
-            label: '2 - 99 employees',
-            value: '2:99',
-            order: 2
-          }
-        ]
-      }
-    }
-    vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce(mockResponse)
+      body: mockResponse
+    })
     const { sut } = makeSut()
 
     const result = await sut()
 
-    expect(result).toEqual(mockResponse.body)
+    expect(result).toEqual(mockResponse)
   })
 
   it.each([

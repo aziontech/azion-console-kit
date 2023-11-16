@@ -13,7 +13,7 @@ const makeSut = () => {
   }
 }
 
-describe('ResendEmailService', () => {
+describe('SignupServices', () => {
   it('should call API with correct params', async () => {
     const requestSpy = vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
       statusCode: 200
@@ -47,7 +47,7 @@ describe('ResendEmailService', () => {
 
     vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
       statusCode: 400,
-      body: { ...response }
+      body: response
     })
     const { sut } = makeSut()
 

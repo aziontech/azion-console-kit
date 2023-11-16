@@ -24,9 +24,11 @@ describe('IntelligentDnsServices', () => {
     const requestSpy = vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
       statusCode: 201,
       body: {
-        results: [{
-          id: 1
-        }]
+        results: [
+          {
+            id: 1
+          }
+        ]
       }
     })
     const { sut } = makeSut()
@@ -48,9 +50,11 @@ describe('IntelligentDnsServices', () => {
     vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
       statusCode: 201,
       body: {
-        results: [{
-          id: 1
-        }]
+        results: [
+          {
+            id: 1
+          }
+        ]
       }
     })
     const { sut } = makeSut()

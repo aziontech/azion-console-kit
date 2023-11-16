@@ -29,7 +29,7 @@ describe('SignupServices', () => {
     expect(requestSpy).toHaveBeenCalledWith({
       url: 'signup',
       method: 'POST',
-      body: { ...userPayloadMock }
+      body: userPayloadMock
     })
   })
 
@@ -51,7 +51,7 @@ describe('SignupServices', () => {
 
     vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
       statusCode: 400,
-      body: { ...response }
+      body: response
     })
     const { sut } = makeSut()
 
