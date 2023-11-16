@@ -57,7 +57,7 @@ describe('SignupServices', () => {
 
     const request = sut(userPayloadMock)
 
-    expect(request).rejects.toThrow(response.email[0])
+    expect(request).rejects.toThrow(response.email[0].message)
   })
 
   it.each([

@@ -53,7 +53,7 @@ describe('ResendEmailService', () => {
 
     const request = sut(emailPayloadMock)
 
-    expect(request).rejects.toThrow(response.email[0])
+    expect(request).rejects.toThrow(response.email[0].message)
   })
 
   it('Should return a forbidden error for a 403 response status', async () => {
