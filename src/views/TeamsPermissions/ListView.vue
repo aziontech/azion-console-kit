@@ -9,7 +9,6 @@
     createPagePath="teams-permission/create"
     editPagePath="teams-permission/edit"
     @on-load-data="handleLoadData"
-
   >
   </ListTableBlock>
   <EmptyResultsBlock

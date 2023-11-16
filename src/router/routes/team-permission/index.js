@@ -12,7 +12,7 @@ export const teamsPermissionRoutes = {
       props: {
         listTeamPermissionService: TeamPermissionService.listTeamPermissionService,
         deleteTeamPermissionService: TeamPermissionService.deleteTeamPermissionService,
-        documentationService: Helpers.documentationCatalog.teamPermissions,
+        documentationService: Helpers.documentationCatalog.teamPermissions
       },
       meta: {
         breadCrumbs: [
