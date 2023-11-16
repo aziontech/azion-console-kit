@@ -170,4 +170,15 @@ describe('AzionDocumentationCatalog', () => {
       `https://www.azion.com/en/search-result/?q=edge firewall&filter=doc`
     )
   })
+
+  it('should open edge application documentation with correct link', () => {
+    const openWindowSpy = vi.spyOn(window, 'open')
+    const { sut } = makeSut()
+
+    sut.edgeApplication()
+
+    expect(openWindowSpy).toHaveBeenCalledWith(
+      `https://www.azion.com/en/search-result/?q=edge application&filter=doc`
+    )
+  })
 })
