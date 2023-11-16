@@ -147,8 +147,9 @@
       .required('E-mail is a required field'),
     password: yup
       .string()
-      .test('min', 'Password is a required field', (value) => !!value)
+      .required('Password is a required field')
       .test('max', 'Exceeded number of characters', (value) => value?.length <= 128)
+      .test('noSpaces', 'Spaces are not allowed', (value) => !value?.match(/\s/g))
       .test('requirements', '', (value) => {
         const hasUpperCase = value && /[A-Z]/.test(value)
         const hasLowerCase = value && /[a-z]/.test(value)
@@ -163,8 +164,8 @@
   })
 
   const { defineInputBinds, values, meta, errors } = useForm({ validationSchema })
-  const name = defineInputBinds('name', { validateOnInput: true })
-  const email = defineInputBinds('email', { validateOnInput: true })
+  const name = defineInputBinds('name')
+  const email = defineInputBinds('email')
   const { value: password } = useField('password')
 
   const toast = useToast()

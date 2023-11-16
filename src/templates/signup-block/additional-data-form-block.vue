@@ -217,7 +217,7 @@
   const { value: projectTypeSelection } = useField('projectTypeSelection')
   const { value: companySize } = useField('companySize')
   const { value: country } = useField('country')
-  const companyName = defineInputBinds('companyName', { validateOnInput: true })
+  const companyName = defineInputBinds('companyName')
 
   const loading = ref(false)
 
