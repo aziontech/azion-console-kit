@@ -20,7 +20,7 @@ const fixtures = {
     subject_name: [],
     certificate_type: null,
     validity: null,
-    status: 'active'
+    status: 'pending'
   }
 }
 
@@ -74,13 +74,19 @@ describe('DigitalCertificatesServices', () => {
       type: 'Edge Certificate',
       subjectName: 'Subject 1,Subject 2',
       validity: 'Friday, November 10, 2023 at 12:00 AM',
-      status: fixtures.domainMock.status
+      status: {
+        content: 'Active',
+        severity: 'success'
+      }
     })
     expect(parsedDomainMissingValues).toEqual({
       id: 2,
       issuer: '-',
       name: 'Certificate 2',
-      status: 'active',
+      status: {
+        content: 'Inactive',
+        severity: 'danger'
+      },
       subjectName: '-',
       type: '-',
       validity: '-'
