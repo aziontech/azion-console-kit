@@ -43,7 +43,8 @@
   import PrimeDialog from 'primevue/dialog'
   import PrimeButton from 'primevue/button'
   import { onBeforeRouteLeave, useRouter } from 'vue-router'
-
+  import { useIsFormDirty } from 'vee-validate'
+  
   defineOptions({ name: 'dialog-unsaved-block' })
   const emit = defineEmits(['update:visible'])
 
@@ -65,6 +66,7 @@
   })
 
   const showDialog = ref(props.visible)
+  const redirectToUnsaved = ref('')
   const unsavedDisabled = ref(false)
   const visibleDialog = computed({
     get: () => showDialog.value,
@@ -87,6 +89,10 @@
       return
     }
     openDialogUnsaved(false)
+    if (redirectToUnsaved.value) {
+      router.push({ name: redirectToUnsaved.value })
+      return
+    }
     router.go(-1)
   }
 
@@ -98,7 +104,14 @@
     openDialogUnsaved(false)
   }
 
+  const isFormDirty = computed(() => {
+    return useIsFormDirty()
+  })
+
   onBeforeRouteLeave((to, from, next) => {
+    // console.log(isFormDirty.value);
+    // next(false)
+    redirectToUnsaved.value = to.name
     if (props.blockRedirectUnsaved && !unsavedDisabled.value) {
       visibleDialog.value = true
       return next(false)
