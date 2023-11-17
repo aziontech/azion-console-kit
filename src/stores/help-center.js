@@ -14,7 +14,6 @@ export const useHelpCenterStore = defineStore({
       this.isOpen = false
     },
     setWelcomeDefaultDocument(payload) {
-      console.log('payload :', payload);
       this.welcomeDefaultDocument = payload
     }
   },

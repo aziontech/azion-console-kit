@@ -32,7 +32,7 @@ export default {
         width: 'width'
       },
       width: {
-        'slide': '300px',
+        'slide': '384px',
       },
       animation: {
         fadeIn: 'fadeIn 220ms ease-in-out',

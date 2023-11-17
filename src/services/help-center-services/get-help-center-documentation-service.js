@@ -26,22 +26,20 @@ const fetchAndParseDocument = async (documentUrl, documentFilename, baseUrl) => 
   let httpResponse, responseDocument
   const store = useHelpCenterStore()
 
+  store.setWelcomeDefaultDocument('teste')
+  responseDocument = store.getWelcomeDefaultDocument
+  console.log('responseDocument :', responseDocument);
+
   try {
     httpResponse = await fetchDocument(fullRequestPath, baseUrl)
     responseDocument = parseHttpResponse(httpResponse)
   } catch (error) {
-    const welcomeDefaultDocument = store.getWelcomeDefaultDocument
-    console.log(welcomeDefaultDocument)
-    console.log(!!welcomeDefaultDocument)
-
-    responseDocument = store.getWelcomeDefaultDocument
 
     if (!responseDocument) {
       fullRequestPath = `${WELCOME_PATH}/${documentFilename}`
       httpResponse = await fetchDocument(fullRequestPath, baseUrl)
       responseDocument = parseHttpResponse(httpResponse)
 
-      store.setWelcomeDefaultDocument(responseDocument)
     }
   }
 

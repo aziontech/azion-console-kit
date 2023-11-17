@@ -297,39 +297,6 @@
       </template>
     </PrimeMenu>
   </Sidebar>
-  <!-- help mobile sidebar -->
-  <Sidebar
-    :visible="showHelp"
-    position="bottom"
-    headerContent="Help"
-    :show-close-icon="false"
-    :pt="{
-      root: { class: '!h-[90%] md:hidden flex' },
-      headerContent: { class: 'w-full' },
-      mask: { class: 'md:hidden flex' }
-    }"
-  >
-    <template #header>
-      <div class="flex items-center justify-between">
-        <h2>Help</h2>
-        <PrimeButton
-          icon="pi pi-times"
-          @click="closeHelpCenter"
-          size="small"
-          class="flex-none surface-border text-sm w-8 h-8"
-          text
-        />
-      </div>
-    </template>
-    <div class="flex flex-col p-2">
-      <!-- content -->
-      <div class="surface-border border border-dashed rounded-md flex items-center h-96 m-2">
-        <p class="text-color text-sm font-medium text-center w-full">
-          This section is under development.
-        </p>
-      </div>
-    </div>
-  </Sidebar>
 
   <!-- Sidebar-->
   <Sidebar
