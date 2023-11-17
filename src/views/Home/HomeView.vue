@@ -272,7 +272,7 @@
         required: true
       },
       inviteSession: {
-        type: Object,
+        type: Function,
         required: true
       },
       windowManager: {
