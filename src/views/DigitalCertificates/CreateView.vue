@@ -7,6 +7,19 @@
     :cleanFormCallback="resetForm"
   >
     <template #form>
+      <InlineMessage
+        class="w-fit"
+        severity="info"
+        >Now you can easily create a Let's Encrypt™ digital certificate directly from
+        <PrimeButton
+          link
+          size="small"
+          class="p-0"
+          @click="navigateToDomains"
+        >
+          Domains
+        </PrimeButton>
+      </InlineMessage>
       <FormHorizontal
         title="General"
         description="Bring a TLS X.509 digital certificate and private key obtained
@@ -340,7 +353,9 @@
   import Card from 'primevue/card'
   import RadioButton from 'primevue/radiobutton'
   import PrimeTextarea from 'primevue/textarea'
+  import PrimeButton from 'primevue/button'
   import InputText from 'primevue/inputtext'
+  import InlineMessage from 'primevue/inlinemessage'
   import FormHorizontal from '@/templates/create-form-block-new/form-horizontal'
   import { useForm, useField } from 'vee-validate'
   import * as yup from 'yup'
@@ -351,9 +366,11 @@
       CreateFormBlock,
       FormHorizontal,
       RadioButton,
+      PrimeButton,
       Card,
       PrimeTextarea,
-      InputText
+      InputText,
+      InlineMessage
     },
     props: {
       createDigitalCertificatesService: {
@@ -513,6 +530,11 @@
         digitalCertificateName,
         subjectAlternativeNames,
         certificateTypes
+      }
+    },
+    methods: {
+      navigateToDomains() {
+        this.$router.push({ name: 'list-domains' })
       }
     }
   }
