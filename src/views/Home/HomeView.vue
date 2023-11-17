@@ -1,6 +1,8 @@
 <template>
   <div>
-    <section class="w-full max-w-screen-2xl md:mx-auto flex flex-col gap-6 lg:gap-8 px-3 pt-4 pb-8 md:px-8 md:pt-8">
+    <section
+      class="w-full max-w-screen-2xl md:mx-auto flex flex-col gap-6 lg:gap-8 px-3 pt-4 pb-8 md:px-8 md:pt-8"
+    >
       <!-- Getting Started -->
       <div
         class="w-full p-3 sm:p-8 surface-border border rounded-md flex flex-col gap-6 lg:gap-10 justify-between"
