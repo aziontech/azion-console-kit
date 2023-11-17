@@ -15,8 +15,8 @@
         >
 
         <p class="pt-3.5 text-color-secondary">
-          This {{informationForDeletion.title}} will be deleted along with any associated settings or instances.
-          Check Help Center for more details.
+          This {{ informationForDeletion.title }} will be deleted along with any associated settings
+          or instances. Check Help Center for more details.
         </p>
       </div>
 

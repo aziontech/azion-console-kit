@@ -213,7 +213,7 @@
     },
     methods: {
       actionOptions(showAuthorize) {
-        const actionOptions = [        
+        const actionOptions = [
           {
             label: 'Delete',
             icon: 'pi pi-fw pi-trash',
