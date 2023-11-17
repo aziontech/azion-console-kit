@@ -52,7 +52,8 @@ export const dataStreamingRoutes = {
         listDataStreamingTemplateService: DataStreamingService.listDataStreamingTemplateService,
         listDataStreamingDomainsService: DataStreamingService.listDataStreamingDomainsService,
         loadDataStreamingService: DataStreamingService.loadDataStreamingService,
-        editDataStreamingService: DataStreamingService.editDataStreamingService
+        editDataStreamingService: DataStreamingService.editDataStreamingService,
+        updatedRedirect: 'list-data-streaming'
       },
       meta: {
         breadCrumbs: [

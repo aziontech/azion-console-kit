@@ -1,6 +1,3 @@
-<!-- eslint-disable vue/require-prop-type-constructor -->
-<!-- eslint-disable vue/valid-define-props -->
-<!-- eslint-disable vue/valid-define-props -->
 <template>
   <div>
     <PageHeadingBlock pageTitle="Edit Edge Node">
@@ -248,7 +245,8 @@
     loadEdgeNodeService: { type: Function, required: true },
     editEdgeNodeService: { type: Function, required: true },
     listServiceEdgeNodeService: { type: Function, required: true },
-    deleteEdgeNodeService: { type: Function, required: true }
+    deleteEdgeNodeService: { type: Function, required: true },
+    updatedRedirect: { type: String, required: true }
   })
 
   const validationSchema = yup.object({

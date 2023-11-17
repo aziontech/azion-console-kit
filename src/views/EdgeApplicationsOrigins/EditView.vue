@@ -405,7 +405,7 @@
     loadOriginService: {
       type: Function,
       required: true
-    }
+    },    
   })
 
   async function editOrigin() {

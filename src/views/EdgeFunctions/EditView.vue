@@ -8,6 +8,7 @@
     :formMeta="meta"
     :cleanFormCallback="resetForm"
     :hasTabs="true"
+    :updatedRedirect="updatedRedirect"
   >
     <template #form>
       <TabView class="w-full">
@@ -155,7 +156,6 @@
   import { computed, ref, watch } from 'vue'
   import { useAccountStore } from '@/stores/account'
 
-  // Props
   const props = defineProps({
     loadEdgeFunctionsService: {
       type: Function,
@@ -164,10 +164,14 @@
     editEdgeFunctionsService: {
       type: Function,
       required: true
+    },
+    updatedRedirect: {
+      type: String,
+      required: true
     }
   })
 
-  // Data
+
   const ARGS_INITIAL_STATE = '{}'
   const editorOptions = {
     tabSize: 2,
@@ -176,15 +180,10 @@
   const previewIframe = ref(null)
   const previewIframeArguments = ref(null)
 
-  // Using the store
   const store = useAccountStore()
-
-  //computed
   const theme = computed(() => {
     return store.currentTheme === 'light' ? 'vs' : 'vs-dark'
   })
-
-  // Methods
 
   let errorCode = ''
   const changeValidateCode = () => {
@@ -237,8 +236,6 @@
     if (language === 'lua') return 'Lua'
     return language
   }
-
-  // Validations
 
   const validationSchema = yup.object({
     name: yup.string().required('Name is a required field')

@@ -52,7 +52,8 @@ export const credentialsRoutes = {
       props: {
         editCredentialService: CredentialServices.editCredentialService,
         loadCredentialService: CredentialServices.loadCredentialService,
-        clipboardWrite: Helpers.clipboardWrite
+        clipboardWrite: Helpers.clipboardWrite,
+        updatedRedirect: 'list-credentials'
       },
       meta: {
         breadCrumbs: [

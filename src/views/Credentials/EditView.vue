@@ -7,6 +7,7 @@
     :formData="values"
     :formMeta="meta"
     :cleanFormCallback="resetForm"
+    :updatedRedirect="updatedRedirect"
   >
     <template #form>
       <FormHorizontal
@@ -138,6 +139,10 @@
     },
     clipboardWrite: {
       type: Function,
+      required: true
+    },
+    updatedRedirect: {
+      type: String,
       required: true
     }
   })
