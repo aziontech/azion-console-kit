@@ -6,11 +6,14 @@ import {
   openContactSupport
 } from './azion-documentation-window-opener'
 import InviteSession from './invite-session'
+import { useCreateBoardManager } from './composables/use-create-board-manager'
+import { themeSelect } from './themeSelect'
 import { azionPrivacyPolicyWindowOpener } from './azion-privacy-policy-opener'
 import { azionTermsAndServicesWindowOpener } from './azion-terms-and-services-opener'
 import { parseCamelToSnake, parseSnakeToCamel } from './parse-api-body'
 
 export {
+  themeSelect,
   clipboardWrite,
   documentationCatalog,
   documentationGuideProducts,
@@ -18,6 +21,7 @@ export {
   openAPIDocumentation,
   openContactSupport,
   InviteSession,
+  useCreateBoardManager,
   azionPrivacyPolicyWindowOpener,
   azionTermsAndServicesWindowOpener,
   parseCamelToSnake,

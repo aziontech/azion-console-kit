@@ -1,8 +1,10 @@
 <template>
-  <div class="px-3 sm:px-8 pt-4 sm:pt-8 pb-14 flex flex-col gap-8 sm:gap-6 w-full">
+  <div
+    class="px-3 pt-4 pb-8 md:px-8 md:pt-8 flex flex-col gap-6 lg:gap-8 w-full transition-[width] duration-300 ease-in-out"
+  >
     <!-- Getting Started -->
     <div
-      class="w-full px-3 py-4 sm:px-8 sm:py-8 surface-border border rounded-md flex flex-col gap-6 sm:gap-10 justify-between"
+      class="w-full p-3 sm:p-8 surface-border border rounded-md flex flex-col gap-6 lg:gap-10 justify-between"
     >
       <div class="flex flex-col gap-4 max-w-4xl">
         <h1 class="text-color text-2xl md:text-3xl font-medium">Get Started</h1>
@@ -12,17 +14,18 @@
       </div>
       <div>
         <PrimeButton
-          class="w-full md:w-auto"
+          class="w-full sm:w-auto"
           label="Create something new"
           type="button"
           size="small"
+          @click="createBoardManager.open()"
         />
       </div>
     </div>
 
-    <div class="flex flex-col xl:flex-row gap-4 sm:gap-6">
+    <div class="flex flex-col xl:flex-row gap-6">
       <!-- Manage Applications -->
-      <div class="w-full p-4 sm:p-6 flex flex-col gap-6 surface-border border rounded-md">
+      <div class="w-full p-3 sm:p-6 flex flex-col gap-6 surface-border border rounded-md">
         <div class="flex flex-row justify-start gap-3">
           <div
             class="w-11 h-11 flex flex-shrink-0 justify-center items-center rounded-md surface-200"
@@ -54,11 +57,15 @@
             iconPos="right"
             size="small"
             @click="openDocsEdgeApplication"
+            :pt="{
+              root: { class: 'justify-center' },
+              label: { class: 'grow-0' }
+            }"
           />
         </div>
       </div>
       <!-- View Analytics -->
-      <div class="w-full p-4 sm:p-6 flex flex-col gap-6 surface-border border rounded-md">
+      <div class="w-full p-3 sm:p-6 flex flex-col gap-6 surface-border border rounded-md">
         <div class="flex flex-row justify-start gap-3">
           <div
             class="w-11 h-11 flex flex-shrink-0 justify-center items-center rounded-md surface-200"
@@ -89,17 +96,18 @@
             icon="pi pi-external-link"
             iconPos="right"
             size="small"
-            :pt="{
-              label: { class: 'w-fit' }
-            }"
             @click="openDocsRealTimeMetrics"
+            :pt="{
+              root: { class: 'justify-center' },
+              label: { class: 'grow-0' }
+            }"
           />
         </div>
       </div>
     </div>
 
     <div
-      class="w-full px-3 py-4 sm:px-6 sm:py-6 surface-border border rounded-md flex flex-col gap-6 sm:gap-10 justify-between relative"
+      class="w-full p-3 sm:p-6 surface-border border rounded-md flex flex-col gap-6 justify-between relative"
       v-if="showInviteSession"
     >
       <PrimeButton
@@ -110,97 +118,97 @@
         type="button"
         @click="closeInviteSession"
       />
-      <div class="flex flex-col gap-4">
+      <div class="flex flex-col gap-2">
         <div class="text-lg sm:text-xl font-medium">Invite your team</div>
         <div class="text-xs sm:text-sm text-color-secondary">
           All Azion plans include unlimited seats for your team. Invite your colleagues to start
           building with you.
         </div>
-        <form
-          class="flex flex-col md:flex-row justify-between gap-4 md:gap-6"
-          @submit.prevent="handleSubmit"
-        >
-          <!-- Input Name -->
-          <div class="flex flex-col md:max-w-lg w-full gap-2">
-            <label
-              for="name"
-              class="text-color text-sm font-medium"
-              >Name</label
-            >
-            <InputText
-              v-model="name"
-              id="name"
-              type="text"
-              :class="{ 'p-invalid': errors.name }"
-              v-tooltip.top="{ value: errors.name, showDelay: 200 }"
-            />
-            <small
-              v-if="errors.name"
-              class="p-error text-xs font-normal leading-tight"
-              >{{ errors.name }}</small
-            >
-          </div>
-
-          <!-- Input Email -->
-          <div class="flex flex-col md:max-w-lg w-full gap-2">
-            <label
-              for="email"
-              class="text-color text-sm font-medium"
-              >E-mail</label
-            >
-            <InputText
-              v-model="email"
-              id="email"
-              type="text"
-              :class="{ 'p-invalid': errors.email }"
-              v-tooltip.top="{ value: errors.email, showDelay: 200 }"
-            />
-            <small
-              v-if="errors.email"
-              class="p-error text-xs font-normal leading-tight"
-              >{{ errors.email }}</small
-            >
-          </div>
-
-          <!-- Input Team -->
-          <div class="flex flex-col md:max-w-lg w-full gap-2">
-            <label
-              for="team"
-              class="text-color text-sm font-medium"
-              >Team</label
-            >
-            <Dropdown
-              id="team"
-              :class="{ 'p-invalid': errors.team }"
-              v-model="team"
-              :options="teams"
-              optionLabel="label"
-              optionValue="value"
-              class="w-full"
-              placeholder="Choose a team"
-            />
-            <small
-              v-if="errors.team"
-              class="p-error text-xs font-normal leading-tight"
-              >{{ errors.team }}</small
-            >
-          </div>
-
-          <div class="md:mt-7">
-            <PrimeButton
-              severity="secondary"
-              type="submit"
-              label="Invite"
-              size="small"
-              :disabled="isDisabled"
-              class="w-full px-4 md:w-auto"
-            />
-          </div>
-        </form>
       </div>
+      <form
+        class="flex flex-col lg:flex-row justify-between gap-3 sm:gap-6"
+        @submit.prevent="handleSubmit"
+      >
+        <!-- Input Name -->
+        <div class="flex flex-col w-full gap-2">
+          <label
+            for="name"
+            class="text-color text-sm font-medium"
+            >Name</label
+          >
+          <InputText
+            v-model="name"
+            id="name"
+            type="text"
+            :class="{ 'p-invalid': errors.name }"
+            v-tooltip.top="{ value: errors.name, showDelay: 200 }"
+          />
+          <small
+            v-if="errors.name"
+            class="p-error text-xs font-normal leading-tight"
+            >{{ errors.name }}</small
+          >
+        </div>
+
+        <!-- Input Email -->
+        <div class="flex flex-col w-full gap-2">
+          <label
+            for="email"
+            class="text-color text-sm font-medium"
+            >E-mail</label
+          >
+          <InputText
+            v-model="email"
+            id="email"
+            type="text"
+            :class="{ 'p-invalid': errors.email }"
+            v-tooltip.top="{ value: errors.email, showDelay: 200 }"
+          />
+          <small
+            v-if="errors.email"
+            class="p-error text-xs font-normal leading-tight"
+            >{{ errors.email }}</small
+          >
+        </div>
+
+        <!-- Input Team -->
+        <div class="flex flex-col w-full gap-2">
+          <label
+            for="team"
+            class="text-color text-sm font-medium"
+            >Team</label
+          >
+          <Dropdown
+            id="team"
+            :class="{ 'p-invalid': errors.team }"
+            v-model="team"
+            :options="teams"
+            optionLabel="label"
+            optionValue="value"
+            class="w-full"
+            placeholder="Choose a team"
+          />
+          <small
+            v-if="errors.team"
+            class="p-error text-xs font-normal leading-tight"
+            >{{ errors.team }}</small
+          >
+        </div>
+
+        <div class="mt-auto lg:mt-7">
+          <PrimeButton
+            severity="secondary"
+            type="submit"
+            label="Invite"
+            size="small"
+            :disabled="isDisabled"
+            class="w-full px-4 lg:w-auto"
+          />
+        </div>
+      </form>
     </div>
 
-    <div class="w-full flex flex-col lg:flex-row gap-4 sm:gap-6 justify-between">
+    <div class="w-full flex flex-col lg:flex-row gap-6 justify-between">
       <!-- Product -->
       <button
         type="button"
@@ -253,6 +261,7 @@
       InputText,
       Dropdown
     },
+    inject: ['createBoardManager'],
     props: {
       listTeamsService: {
         type: Function,
@@ -263,7 +272,7 @@
         required: true
       },
       inviteSession: {
-        type: Object,
+        type: Function,
         required: true
       },
       windowManager: {
