@@ -213,12 +213,7 @@
     },
     methods: {
       actionOptions(showAuthorize) {
-        const actionOptions = [
-          {
-            label: 'Edit',
-            icon: 'pi pi-fw pi-pencil',
-            command: () => this.editItem()
-          },
+        const actionOptions = [        
           {
             label: 'Delete',
             icon: 'pi pi-fw pi-trash',
@@ -259,9 +254,6 @@
       },
       editItemSelected({ data: item }) {
         this.$router.push({ path: `${this.editPagePath}/${item.id}` })
-      },
-      editItem() {
-        this.$router.push({ path: `${this.editPagePath}/${this.selectedId}` })
       },
       authorizeEdgeNode() {
         this.$emit('authorize', this.selectedId)
