@@ -131,10 +131,12 @@
           </div>
         </template>
       </FormHorizontal>
+
+      <!-- Trusted case -->
       <FormHorizontal
         v-if="certificateType === certificateTypes.TRUSTED"
-        title="Upload Trusted CA Certificate"
-        description="A Trusted Certificate Authority (CA) certificate can be used for Mutual Transport Layer Security (mTLS) configuration. To update a Trusted CA Certificate to Azion, paste the certificate code in the respective field."
+        title="General"
+        description="description"
       >
         <template #inputs>
           <div class="flex flex-col sm:max-w-lg w-full gap-2">
@@ -142,7 +144,6 @@
             <InputText
               v-bind="name"
               type="text"
-              placeholder="Insert the Digital Certificate name"
               :class="{ 'p-invalid': errors.name }"
               v-tooltip.top="{ value: errors.name, showDelay: 200 }"
             />
@@ -152,6 +153,14 @@
               >{{ errors.name }}</small
             >
           </div>
+        </template>
+      </FormHorizontal>
+      <FormHorizontal
+        v-if="certificateType === certificateTypes.TRUSTED"
+        title="Upload Trusted CA Certificate"
+        description="A Trusted Certificate Authority (CA) certificate can be used for Mutual Transport Layer Security (mTLS) configuration. To update a Trusted CA Certificate to Azion, paste the certificate code in the respective field."
+      >
+        <template #inputs>
           <div class="flex flex-col sm:max-w-lg w-full gap-2">
             <label>Certificate </label>
             <PrimeTextarea
@@ -162,7 +171,9 @@
               rows="5"
               cols="30"
             />
-            <small>Intermediate certificates are accepted.</small>
+            <small class="text-color-secondary text-xs font-normal leading-tight"
+              >Intermediate certificates are accepted.</small
+            >
             <small
               v-if="errors.certificate"
               class="p-error text-xs font-normal leading-tight"
