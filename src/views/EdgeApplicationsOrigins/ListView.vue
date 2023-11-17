@@ -14,7 +14,7 @@
       deleteOriginsService: {
         required: true,
         type: Function
-      },
+      }
     },
     methods: {
       async listOrigins() {
