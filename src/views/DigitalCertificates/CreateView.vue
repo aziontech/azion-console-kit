@@ -461,7 +461,7 @@
           digitalCertificateName: '',
 
           // Form Choices
-          certificateType: certificateTypes.EDGE_CERTIFICATE,
+          certificateType: certificateTypes.TRUSTED,
           createCertificateType: edgeCertificateTypes.UPLOAD,
 
           // Edge Certificate values
