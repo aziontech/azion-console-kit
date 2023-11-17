@@ -8,15 +8,14 @@
         class="surface-card surface-border border max-w-md w-full p-6 md:p-10 rounded-md flex-col gap-10 inline-flex"
       >
         <div class="flex flex-col gap-3">
-          <div class="text-xl font-medium">Authenticate your account</div>
+          <div class="text-xl font-medium">Multi-Factor Authentication</div>
           <div class="text-color-secondary">
-            Confirm your account by opening your Google Authenticator app and enter the code for
-            Azion.
+            Open your authentication app and enter the generated code to access Real-Time Manager.
           </div>
         </div>
 
         <div>
-          <label class="font-semibold text-xs">Verification code</label>
+          <label class="font-semibold text-xs">Authentication Code</label>
           <div class="flex flex-wrap gap-1.5 sm:gap-4 mt-4">
             <InputText
               v-for="(digits, i) in digitsMfa"
@@ -37,7 +36,7 @@
 
         <PrimeButton
           class="w-full flex-row-reverse"
-          label="Confirm code"
+          label="Verify"
           :loading="isButtonLoading"
           severity="primary"
           type="submit"

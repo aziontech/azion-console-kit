@@ -28,11 +28,11 @@ export const createPersonalToken = async (payload) => {
 const parseHttpResponse = (httpResponse) => {
   switch (httpResponse.statusCode) {
     case 201:
-      const result = {
-        message: 'Your personal token has been created',
-        token: httpResponse.body.key
+      return {
+        feedback: 'Your personal token has been created',
+        token: httpResponse.body.key,
+        redirectURL: '/personal-tokens'
       }
-      return result
     case 401:
       throw new Errors.InvalidApiTokenError().message
     case 403:

@@ -43,17 +43,27 @@ const makeSut = () => {
 describe('DigitalCertificatesServices', () => {
   it('should call api with correct params', async () => {
     const requestSpy = vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
-      statusCode: 201
+      statusCode: 201,
+      body: {
+        results: {
+          id: 1
+        }
+      }
     })
 
     const { sut } = makeSut()
 
-    await sut(fixture.payloadMock)
+    const result = await sut(fixture.payloadMock)
 
     expect(requestSpy).toHaveBeenCalledWith({
       method: 'POST',
       url: 'digital_certificates',
       body: fixture.requestBodyMock
+    })
+
+    expect(result).toEqual({
+      feedback: 'Your digital certificate has been created!',
+      redirectURL: `/digital-certificates/edit/1`
     })
   })
 
