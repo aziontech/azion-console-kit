@@ -21,6 +21,7 @@
           <label
             for="email"
             class="font-semibold text-sm"
+            :class="{ 'p-error': errors.email }"
           >
             Email
           </label>
@@ -32,15 +33,16 @@
             autofocus
             @keydown.enter="showPasswordStep"
             class="w-full"
-            :class="{ 'p-invalid': hasErrorEmail }"
+            :class="{ 'p-invalid': errors.email }"
           />
+          <small
+            class="p-error text-xs font-normal leading-tight"
+            v-if="errors.email"
+            severity="error"
+          >
+            {{ errors.email }}
+          </small>
         </div>
-
-        <InlineMessage
-          v-if="hasErrorEmail"
-          severity="error"
-          >{{ hasErrorEmail }}</InlineMessage
-        >
 
         <PrimeButton
           class="w-full flex-row-reverse"
@@ -107,28 +109,27 @@
           <label
             for="password"
             class="font-semibold text-sm"
+            :class="{ 'p-error': hasRequestErrorMessage }"
           >
             Password
           </label>
-          <div>
-            <Password
-              toggleMask
-              v-model="password"
-              id="password"
-              class="w-full"
-              :class="{ 'p-invalid': hasRequestErrorMessage }"
-              @keydown.enter="validateAndSubmit"
-              :feedback="false"
-            />
-          </div>
+          <Password
+            toggleMask
+            v-model="password"
+            id="password"
+            class="w-full"
+            :class="{ 'p-invalid': hasRequestErrorMessage }"
+            @keydown.enter="validateAndSubmit"
+            :feedback="false"
+          />
+          <small
+            class="p-error text-xs font-normal leading-tight"
+            v-if="hasRequestErrorMessage"
+          >
+            {{ hasRequestErrorMessage }}
+          </small>
+
         </div>
-
-        <InlineMessage
-          v-if="hasRequestErrorMessage"
-          severity="error"
-          >{{ hasRequestErrorMessage }}</InlineMessage
-        >
-
         <div>
           <PrimeButton
             link
@@ -163,7 +164,6 @@
   import InputText from 'primevue/inputtext'
   import PrimeButton from 'primevue/button'
   import Divider from 'primevue/divider'
-  import InlineMessage from 'primevue/inlinemessage'
   import Password from 'primevue/password'
   import * as yup from 'yup'
   import { useField, useForm } from 'vee-validate'
@@ -179,7 +179,6 @@
   const hasRequestErrorMessage = ref(false)
   const isProccedButtonLoading = ref(false)
   const isButtonLoading = ref(false)
-  const hasErrorEmail = ref(false)
 
   const props = defineProps({
     authenticationLoginService: {
@@ -207,7 +206,7 @@
   const emailValidateRegex = /^\S+@\S+\.\S+$/
 
   const validationSchema = yup.object({
-    email: yup.string().matches(emailValidateRegex, 'Email must be a valid email'),
+    email: yup.string().matches(emailValidateRegex, 'Use a valid email to sign in.'),
     password: yup.string().required()
   })
 
@@ -228,7 +227,8 @@
 
   const validateAndSubmit = async () => {
     try {
-      if (!password.value) return
+      if (!password.value || isButtonLoading.value) return
+
       isButtonLoading.value = true
       hasRequestErrorMessage.value = false
 
@@ -306,8 +306,7 @@
   }
 
   const showPasswordStep = () => {
-    hasErrorEmail.value = errors.value.email
-    if (hasErrorEmail.value || !email.value) return
+    if (errors.value.email || !email.value) return
 
     isProccedButtonLoading.value = true
     setTimeout(() => {
@@ -319,7 +318,6 @@
 
   const resetPasswordStep = () => {
     hasRequestErrorMessage.value = false
-    hasErrorEmail.value = false
     showPassword.value = false
     resetField()
   }
