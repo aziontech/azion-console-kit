@@ -3,6 +3,7 @@
     :pageTitle="pageTitle"
     :benefitsList="benefitsList"
     :formTitle="formTitle"
+    class="animate-fadeIn"
   >
     <template #form>
       <SocialSignupBlock

@@ -1,5 +1,5 @@
 <template>
-  <div class="flex flex-col gap-4">
+  <div class="flex flex-col gap-4 animate-fadeIn">
     <PrimeButton
       label="Continue with Google"
       icon="pi pi-google"

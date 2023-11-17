@@ -1,5 +1,5 @@
 <template>
-  <div class="w-full flex flex-col gap-6">
+  <div class="w-full flex flex-col gap-6 animate-fadeIn">
     <form
       class="flex flex-col gap-6"
       @submit.prevent="signUp"
