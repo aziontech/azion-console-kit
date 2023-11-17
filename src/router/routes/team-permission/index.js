@@ -50,7 +50,8 @@ export const teamsPermissionRoutes = {
       props: {
         editTeamPermissionService: TeamPermissionService.editTeamPermissionService,
         loadTeamPermissionService: TeamPermissionService.loadTeamPermissionService,
-        listPermissionService: TeamPermissionService.listPermissionService
+        listPermissionService: TeamPermissionService.listPermissionService,
+        updatedRedirect: 'teams-permission'
       },
       meta: {
         breadCrumbs: [

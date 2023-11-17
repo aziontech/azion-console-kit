@@ -6,6 +6,7 @@
     :initialDataSetter="setValues"
     :formData="values"
     :formMeta="meta"
+    :updatedRedirect="updatedRedirect"
   >
     <template #form>
       <FormHorizontal
@@ -199,6 +200,10 @@
       },
       editDigitalCertificateService: {
         type: Function,
+        required: true
+      },
+      updatedRedirect: {
+        type: String,
         required: true
       }
     },

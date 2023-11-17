@@ -61,7 +61,7 @@ const parseHttpResponse = (httpResponse) => {
     case 201:
       return {
         feedback: 'Intelligent DNS Record has been created',
-        redirectURL: `/intelligent-dns/edit/${httpResponse.body.results.zone_id}/records/edit/${httpResponse.body.results.id}`
+        urlToEditView: `/intelligent-dns/edit/${httpResponse.body.results.zone_id}/records/edit/${httpResponse.body.results.id}`
       }
     case 400:
       const apiError = extractApiError(httpResponse)

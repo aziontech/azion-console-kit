@@ -53,7 +53,7 @@ const parseHttpResponse = (httpResponse) => {
     case 201:
       return {
         feedback: 'Your Intelligent DNS has been created',
-        redirectURL: `/intelligent-dns/edit/${httpResponse.body.results[0].id}`
+        urlToEditView: `/intelligent-dns/edit/${httpResponse.body.results[0].id}`
       }
     case 400:
       const apiError = extractApiError(httpResponse)

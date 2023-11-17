@@ -40,7 +40,7 @@ const parseHttpResponse = (httpResponse) => {
     case 201:
       return {
         feedback: 'Your user has been created',
-        redirectURL: '/users'
+        urlToEditView: '/users'
       }
     case 401:
       throw new Errors.InvalidApiTokenError().message

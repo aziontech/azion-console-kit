@@ -132,7 +132,7 @@ const parseHttpResponse = (httpResponse) => {
     case 201:
       return {
         feedback: 'Your data streaming has been created',
-        redirectURL: `/data-streaming/edit/${httpResponse.body.results.id}`
+        urlToEditView: `/data-streaming/edit/${httpResponse.body.results.id}`
       }
     case 400:
       const apiError = extractApiError(httpResponse)

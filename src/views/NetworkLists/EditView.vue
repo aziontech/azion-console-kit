@@ -6,6 +6,7 @@
     :initialDataSetter="setValues"
     :formData="values"
     :formMeta="meta"
+    :updatedRedirect="updatedRedirect"
   >
     <template #form>
       <FormHorizontal
@@ -165,7 +166,8 @@
     props: {
       loadNetworkListsService: { type: Function, required: true },
       editNetworkListsService: { type: Function, required: true },
-      listCountriesService: { type: Function, required: true }
+      listCountriesService: { type: Function, required: true },
+      updatedRedirect: { type: String, required: true }
     },
     data: (props) => {
       const options = ref([

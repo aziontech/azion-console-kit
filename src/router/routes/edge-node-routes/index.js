@@ -30,7 +30,8 @@ export const edgeNodeRoutes = {
       props: {
         loadEdgeNodeService: EdgeNodeService.loadEdgeNodeService,
         editEdgeNodeService: EdgeNodeService.editEdgeNodeService,
-        listServiceEdgeNodeService: ServiceEdgeNode.listServiceEdgeNodeService
+        listServiceEdgeNodeService: ServiceEdgeNode.listServiceEdgeNodeService,
+        updatedRedirect: 'list-edge-node'
       },
       meta: {
         breadCrumbs: [

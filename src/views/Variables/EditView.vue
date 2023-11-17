@@ -6,6 +6,7 @@
     :initialDataSetter="setValues"
     :formMeta="meta"
     :formData="values"
+    :updatedRedirect="updatedRedirect"
   >
     <template #form>
       <FormHorizontal
@@ -78,7 +79,8 @@
 
   const props = defineProps({
     loadVariableService: { type: Function, required: true },
-    editVariableService: { type: Function, required: true }
+    editVariableService: { type: Function, required: true },
+    updatedRedirect: { type: String, required: true }
   })
 
   const validationSchema = yup.object({

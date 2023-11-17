@@ -43,7 +43,7 @@ const parseHttpResponse = (httpResponse) => {
       const currentRouteID = router.currentRoute._value.params.id
       return {
         feedback: 'Your Origin has been created',
-        redirectURL: `/edge-applications/edit/${currentRouteID}/origins/edit/${httpResponse.body.results.origin_key}`
+        urlToEditView: `/edge-applications/edit/${currentRouteID}/origins/edit/${httpResponse.body.results.origin_key}`
       }
     case 400:
       throw new Error(Object.keys(httpResponse.body)[0]).message
