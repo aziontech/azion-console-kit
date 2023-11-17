@@ -40,7 +40,7 @@ const adapt = async (httpResponse) => {
   }
 
   const parsedDataStreamings = await Promise.all(
-    httpResponse.body.results?.map(async (dataStreaming) => {
+    httpResponse.body?.results?.map(async (dataStreaming) => {
       const templateData = await getTemplateById({ id: dataStreaming.template_id })
       return {
         id: dataStreaming.id,
@@ -49,7 +49,7 @@ const adapt = async (httpResponse) => {
         dataSource: mapDataSourceName[dataStreaming.data_source],
         active: dataStreaming.active ? 'Yes' : 'No'
       }
-    })
+    }) ?? []
   )
 
   return {
