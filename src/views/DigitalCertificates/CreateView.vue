@@ -40,7 +40,7 @@
         description="description"
       >
         <template #inputs>
-          <div class="flex flex-col sm:max-w-lg w-full gap-3">
+          <div class="flex flex-col w-full gap-3">
             <Card
               :pt="{
                 body: { class: 'p-4' },
@@ -122,6 +122,9 @@
               rows="5"
               cols="30"
             />
+            <small class="text-color-secondary text-xs font-normal leading-tight"
+              >Intermediate certificates are accepted.</small
+            >
             <small
               v-if="errors.certificate"
               class="p-error text-xs font-normal leading-tight"
@@ -288,6 +291,10 @@
               rows="5"
               cols="30"
             />
+            <small class="text-color-secondary text-xs font-normal leading-tight"
+              >Separate SAN using a new line. Duplicate entries will be automatically
+              removed.</small
+            >
             <small
               v-if="errors.subjectAlternativeNames"
               class="p-error text-xs font-normal leading-tight"
@@ -313,7 +320,9 @@
               rows="5"
               cols="30"
             />
-            <small>Intermediate certificates are accepted.</small>
+            <small class="text-color-secondary text-xs font-normal leading-tight"
+              >Intermediate certificates are accepted.</small
+            >
             <small
               v-if="errors.certificate"
               class="p-error text-xs font-normal leading-tight"
@@ -428,7 +437,7 @@
           digitalCertificateName: '',
 
           // Form Choices
-          certificateType: certificateTypes.TRUSTED,
+          certificateType: certificateTypes.EDGE_CERTIFICATE_UPLOAD,
 
           // Edge Certificate values
           certificate: '',
