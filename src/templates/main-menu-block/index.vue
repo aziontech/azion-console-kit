@@ -86,15 +86,15 @@
           @click="createBoardManager.open()"
           icon="pi pi-plus"
           label="Create"
-          class="!text-white h-8 hidden md:flex !text-white border-header"
+          class="!text-white h-8 hidden md:flex border-header"
           size="small"
           :pt="{
             label: { class: 'text-white' },
             icon: { class: 'text-white' }
           }"
           :class="{
-            'bg-header hover:bg-header-button-hover': !showCreate,
-            'bg-header-button-enabled': showCreate
+            'bg-header hover:bg-header-button-hover': !createBoardManager.enabled.value,
+            'bg-header-button-enabled': createBoardManager.enabled.value
           }"
         />
 
@@ -110,8 +110,8 @@
             icon: { class: 'text-white' }
           }"
           :class="{
-            'bg-header hover:bg-header-button-hover': !showCreate,
-            'bg-header-button-enabled': showCreate
+            'bg-header hover:bg-header-button-hover': !createBoardManager.enabled.value,
+            'bg-header-button-enabled': createBoardManager.enabled.value
           }"
           v-tooltip.bottom="{ value: 'Create', showDelay: 200 }"
         />
@@ -607,8 +607,6 @@
     data() {
       return {
         openSwitchAccount: false,
-        showCreate: false,
-        showCreateMobile: false,
         showSearch: false,
         showSidebar: false,
         showProfile: false,
@@ -852,15 +850,6 @@
       },
       toggleNotification(event) {
         this.$refs.menu.toggle(event)
-      },
-      showCreateModal() {
-        this.showCreate = true
-      },
-      showCreateMobileModal() {
-        this.showCreateMobile = true
-      },
-      closeCreateMobileModal() {
-        this.showCreateMobile = false
       },
       openSideBar() {
         this.showSidebar = !this.showSidebar
