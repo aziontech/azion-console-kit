@@ -1,4 +1,4 @@
-// import * as Helpers from '@/helpers'
+import * as Helpers from '@/helpers'
 import * as TeamPermissionService from '@/services/team-permission'
 /** @type {import('vue-router').RouteRecordRaw} */
 export const teamsPermissionRoutes = {
@@ -11,7 +11,8 @@ export const teamsPermissionRoutes = {
       component: () => import('@views/TeamsPermissions/ListView.vue'),
       props: {
         listTeamPermissionService: TeamPermissionService.listTeamPermissionService,
-        deleteTeamPermissionService: TeamPermissionService.deleteTeamPermissionService
+        deleteTeamPermissionService: TeamPermissionService.deleteTeamPermissionService,
+        documentationService: Helpers.documentationCatalog.teamPermissions
       },
       meta: {
         breadCrumbs: [
