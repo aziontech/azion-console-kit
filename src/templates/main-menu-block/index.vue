@@ -642,7 +642,7 @@
               { label: 'Account Settings', icon: 'pi pi-cog' },
               { label: 'Your Settings', icon: 'pi pi-user' },
               { label: 'Users Management', icon: 'pi pi-users' },
-              { label: 'Team Permissions', icon: 'pi pi-user-edit', to: '/teams-permession' },
+              { label: 'Team Permissions', icon: 'pi pi-user-edit', to: '/teams-permission' },
               { label: 'Billing & Subscriptions', icon: 'pi pi-credit-card' },
               { label: 'Credentials', icon: 'pi pi-id-card' },
               { label: 'Activity History', icon: 'pi pi-history', to: '/activity-history' },

@@ -13,7 +13,7 @@
         dataKey="id"
         v-model:selection="selectedRow"
         selectionMode="single"
-        @dblclick.prevent="editItemSelected(selectedRow)"
+        @row-click="editItemSelected"
         v-model:filters="filters"
         :paginator="showPagination"
         :rowsPerPageOptions="[10, 20, 50, 100]"
@@ -248,7 +248,7 @@
       deleteService: {
         type: Function
       },
-      visibleEditAction: {
+      enableEditClick: {
         type: Boolean,
         default: true
       },
@@ -291,13 +291,6 @@
       },
       actionOptions(rowData) {
         const actionOptions = []
-        if (this.visibleEditAction) {
-          actionOptions.push({
-            label: 'Edit',
-            icon: 'pi pi-fw pi-pencil',
-            command: () => this.editItem()
-          })
-        }
 
         if (this.deleteService) {
           actionOptions.push({
@@ -341,11 +334,10 @@
         this.selectedId = selectedId
         this.$refs[`menu-${selectedId}`].toggle(event)
       },
-      editItemSelected(item) {
-        this.$router.push({ path: `${this.editPagePath}/${item.id}` })
-      },
-      editItem() {
-        this.$router.push({ path: `${this.editPagePath}/${this.selectedId}` })
+      editItemSelected({ data: item }) {
+        if(this.enableEditClick) {
+          this.$router.push({ path: `${this.editPagePath}/${item.id}` })
+        }
       },
       openDeleteDialog() {
         this.informationForDeletion = {

@@ -55,7 +55,10 @@ const extractApiError = (httpResponse) => {
 const parseHttpResponse = (httpResponse) => {
   switch (httpResponse.statusCode) {
     case 201:
-      return 'Your edge function has been created'
+      return {
+        feedback: 'Your edge function has been created',
+        urlToEditView: `/edge-functions/edit/${httpResponse.body.results.id}`
+      }
     case 400:
       const apiError400 = extractApiError(httpResponse)
       throw new Error(apiError400)

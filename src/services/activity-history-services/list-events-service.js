@@ -13,7 +13,6 @@ export const listEventsService = async (
     operatioName: 'ActivityHistory',
     query: `query ActivityHistory { activityHistoryEvents( offset: 0 limit: 1000, filter: { tsRange: {begin:"${offSetStart.toISOString()}", end:"${offSetEnd.toISOString()}"} }, orderBy: [ts_DESC] ) { ts title comment type authorName authorEmail accountId } } `
   }
-
   let httpResponse = await AxiosHttpClientAdapter.request(
     {
       url: `${makeEventsListBaseUrl()}`,

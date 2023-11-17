@@ -17,12 +17,14 @@
       <div class="flex flex-col gap-5 items-center">
         <div class="flex flex-wrap gap-2">
           <slot name="extraActionsLeft"></slot>
-          <PrimeButton
-            severity="secondary"
-            icon="pi pi-plus"
-            :label="createButtonLabel"
-            @click="navigateToCreatePage"
-          />
+          <slot name="default">
+            <PrimeButton
+              severity="secondary"
+              icon="pi pi-plus"
+              :label="createButtonLabel"
+              @click="navigateToCreatePage"
+            />
+          </slot>
           <slot name="extraActionsRight"></slot>
         </div>
         <PrimeButton
@@ -50,9 +52,9 @@
     pageTitle: { type: String, required: true },
     title: { type: String, required: true },
     description: { type: String, required: true },
-    createButtonLabel: { type: String, required: true },
-    createPagePath: { type: String, required: true },
-    documentationService: { type: Function, required: true }
+    documentationService: { type: Function, required: true },
+    createPagePath: { type: String, required: false },
+    createButtonLabel: { type: String, required: false }
   })
   function openDocumentation() {
     props.documentationService()

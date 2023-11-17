@@ -157,7 +157,7 @@
             >
           </div>
           <div class="flex flex-col sm:max-w-lg w-full gap-2">
-            <label>Private key *</label>
+            <label>Private key</label>
             <PrimeTextarea
               v-model="privateKey"
               :class="{ 'p-invalid': errors.privateKey }"
@@ -291,13 +291,17 @@
           </div>
           <div class="flex flex-col sm:max-w-lg w-full gap-2">
             <label>Private Key Type</label>
-            <InputText
-              v-bind="privateKeyType"
-              type="text"
-              disabled
-              :class="{ 'p-invalid': errors.privateKeyType }"
-              v-tooltip.top="{ value: errors.privateKeyType, showDelay: 200 }"
-            />
+            <span class="p-input-icon-right w-full">
+              <i class="pi pi-lock text-color-secondary" />
+              <InputText
+                v-bind="privateKeyType"
+                type="text"
+                disabled
+                class="w-full"
+                :class="{ 'p-invalid': errors.privateKeyType }"
+                v-tooltip.top="{ value: errors.privateKeyType, showDelay: 200 }"
+              />
+            </span>
             <small
               v-if="errors.privateKeyType"
               class="p-error text-xs font-normal leading-tight"

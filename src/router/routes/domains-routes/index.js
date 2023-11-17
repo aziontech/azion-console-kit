@@ -56,7 +56,8 @@ export const domainsRoutes = {
         editDomainService: DomainServices.editDomainService,
         listDigitalCertificatesService: DigitalCertificatesServices.listDigitalCertificatesService,
         listEdgeApplicationsService: EdgeApplicationServices.listEdgeApplicationsService,
-        loadDomainService: DomainServices.loadDomainService
+        loadDomainService: DomainServices.loadDomainService,
+        updatedRedirect: 'list-domains'
       },
       meta: {
         breadCrumbs: [

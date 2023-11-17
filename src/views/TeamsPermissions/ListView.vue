@@ -12,7 +12,7 @@
 </template>
 
 <script setup>
-  import { defineProps, computed } from 'vue'
+  import { computed } from 'vue'
   import ListTableBlock from '@/templates/list-table-block'
   import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
 

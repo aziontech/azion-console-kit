@@ -1,11 +1,12 @@
 <template>
   <EditFormBlock
-    pageTitle="Edit Digital Certificates"
+    pageTitle="Edit Digital Certificate"
     :editService="editDigitalCertificateService"
     :loadService="loadDigitalCertificateService"
     :initialDataSetter="setValues"
     :formData="values"
     :formMeta="meta"
+    :updatedRedirect="updatedRedirect"
   >
     <template #form>
       <FormHorizontal
@@ -199,6 +200,10 @@
       },
       editDigitalCertificateService: {
         type: Function,
+        required: true
+      },
+      updatedRedirect: {
+        type: String,
         required: true
       }
     },

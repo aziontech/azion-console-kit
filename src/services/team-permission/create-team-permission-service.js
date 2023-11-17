@@ -30,7 +30,10 @@ const adapt = (payload) => {
 const parseHttpResponse = (httpResponse) => {
   switch (httpResponse.statusCode) {
     case 201:
-      return 'Your Team Permission has been created'
+      return {
+        feedback: 'Your Team Permission has been created',
+        urlToEditView: `/teams-permission/edit/${httpResponse.body.id}`
+      }
     case 400:
       const key = Object.keys(httpResponse.body)[0]
       const msg = httpResponse.body[key][0]

@@ -1,8 +1,11 @@
 <template>
-  <form @submit.prevent="validateAndSubmit">
+  <form
+    class="max-sm:min-h-[calc(100vh-120px)]"
+    @submit.prevent
+  >
     <!-- Email step -->
     <div
-      class="flex flex-col align-top items-center p-4 animate-fadeIn"
+      class="flex flex-col align-top items-center p-4 animate-fadeIn max-sm:px-3 max-sm:py-6"
       v-if="!showPassword"
     >
       <div
@@ -18,17 +21,27 @@
           <label
             for="email"
             class="font-semibold text-sm"
-            >Email</label
+            :class="{ 'p-error': errors.email }"
           >
+            Email
+          </label>
           <InputText
-            v-bind="email"
+            v-model="email"
             id="email"
             placeholder="example@email.com"
             type="email"
+            autofocus
+            @keydown.enter="showPasswordStep"
             class="w-full"
             :class="{ 'p-invalid': errors.email }"
-            v-tooltip.top="{ value: errors.email, showDelay: 200 }"
           />
+          <small
+            class="p-error text-xs font-normal leading-tight"
+            v-if="errors.email"
+            severity="error"
+          >
+            {{ errors.email }}
+          </small>
         </div>
 
         <PrimeButton
@@ -36,9 +49,8 @@
           type="button"
           label="Next"
           :loading="isProccedButtonLoading"
-          severity="secondary"
-          :disabled="errors.email || !email.value"
-          @click="showPasswordStep()"
+          :disabled="!email"
+          @click="showPasswordStep"
         />
 
         <Divider align="center">
@@ -63,12 +75,13 @@
         </div>
       </div>
 
-      <div class="flex flex-wrap justify-center items-center pt-6">
+      <div class="flex flex-wrap justify-center items-center pt-6 gap-3">
         <div>Don't have an account?</div>
         <PrimeButton
-          link
+          severity="secondary"
           label="Create One"
-        ></PrimeButton>
+          @click="goToSignup"
+        />
       </div>
     </div>
 
@@ -83,99 +96,87 @@
         <div class="text-xl md:text-2xl font-medium">Real-Time Manager</div>
         <div class="flex items-center gap-2">
           <PrimeButton
+            v-tooltip.top="{ value: 'Back', showDelay: 200 }"
             class="w-7 h-7"
             outlined
             icon="pi pi-chevron-left"
-            @click="showPassword = false"
+            @click="resetPasswordStep"
           ></PrimeButton>
-          <p class="text-sm">{{ email.value }}</p>
+          <p class="text-sm">{{ email }}</p>
         </div>
 
         <div class="flex flex-col gap-2">
           <label
             for="password"
             class="font-semibold text-sm"
-            >Password</label
+            :class="{ 'p-error': hasRequestErrorMessage }"
           >
-          <div>
-            <Password
-              toggleMask
-              v-model="password"
-              id="password"
-              class="w-full"
-              placeholder=""
-              :class="{ 'p-invalid': errorPassword }"
-              :feedback="false"
-              v-tooltip.top="{ value: errorPassword, showDelay: 200 }"
-            />
-          </div>
+            Password
+          </label>
+          <Password
+            toggleMask
+            v-model="password"
+            id="password"
+            class="w-full"
+            :class="{ 'p-invalid': hasRequestErrorMessage }"
+            @keydown.enter="validateAndSubmit"
+            :feedback="false"
+          />
+          <small
+            class="p-error text-xs font-normal leading-tight"
+            v-if="hasRequestErrorMessage"
+          >
+            {{ hasRequestErrorMessage }}
+          </small>
+
         </div>
-
-        <InlineMessage
-          v-if="hasRequestErrorMessage"
-          severity="error"
-          >{{ hasRequestErrorMessage }}</InlineMessage
-        >
-
         <div>
           <PrimeButton
             link
             class="p-0"
             label="Forgot Password?"
             @click="$emit('goToForgotPassword', true)"
-          ></PrimeButton>
+          />
         </div>
         <PrimeButton
           class="w-full flex-row-reverse"
           :loading="isButtonLoading"
           label="Sign In"
-          severity="secondary"
-          type="submit"
-          :disabled="errorPassword || !password"
+          type="button"
+          @click="validateAndSubmit"
+          :disabled="!password"
         />
       </div>
 
-      <div class="flex flex-wrap justify-center items-center pt-6">
+      <div class="flex flex-wrap justify-center items-center pt-6 gap-3">
         <div>Don't have an account?</div>
         <PrimeButton
-          link
+          severity="secondary"
           label="Create One"
-        ></PrimeButton>
+          @click="goToSignup"
+        />
       </div>
     </div>
   </form>
 </template>
 
-<script>
-  export default {
-    name: 'signInBlock'
-  }
-</script>
-
 <script setup>
   import InputText from 'primevue/inputtext'
   import PrimeButton from 'primevue/button'
   import Divider from 'primevue/divider'
-  import InlineMessage from 'primevue/inlinemessage'
   import Password from 'primevue/password'
-
   import * as yup from 'yup'
-
-  import { useForm, useField } from 'vee-validate'
-  import { ref, watch } from 'vue'
+  import { useField, useForm } from 'vee-validate'
+  import { ref } from 'vue'
   import { useRouter } from 'vue-router'
-  import {
-    UserIsNotClientError,
-    UserNotFoundError,
-    ProccessRequestError
-  } from '@/services/axios/errors'
+  import { UserNotFoundError, ProccessRequestError } from '@/services/axios/errors'
+
+  defineOptions({ name: 'signInBlock' })
 
   const router = useRouter()
 
   const showPassword = ref(false)
-  const hasRequestErrorMessage = ref(null)
-  const errorPassword = ref('')
-
+  const hasRequestErrorMessage = ref(false)
   const isProccedButtonLoading = ref(false)
   const isButtonLoading = ref(false)
 
@@ -195,69 +196,58 @@
     switchAccountLoginService: {
       type: Function,
       required: true
+    },
+    listTypeAccountService: {
+      type: Function,
+      required: true
     }
   })
 
   const emailValidateRegex = /^\S+@\S+\.\S+$/
 
-  const emailValidationSchema = yup.object({
-    email: yup
-      .string()
-      .required('Email is a required field')
-      .matches(emailValidateRegex, 'Email not associated with any account.')
-  })
-  const passwordValidationSchema = yup.object({
-    password: yup
-      .string()
-      .required('Password is a required field')
-      .min(8, 'Password is too short. It should have at least 8 characters.')
+  const validationSchema = yup.object({
+    email: yup.string().matches(emailValidateRegex, 'Use a valid email to sign in.'),
+    password: yup.string().required()
   })
 
-  const { defineInputBinds, errors } = useForm({
-    validationSchema: emailValidationSchema,
+  const { errors, values } = useForm({
+    validationSchema,
     initialValues: {
-      email: ''
+      email: '',
+      password: ''
     }
   })
 
-  const email = defineInputBinds('email', { validateOnInput: true })
-  const { value: password } = useField('password')
+  const { value: email } = useField('email')
+  const { value: password, resetField } = useField('password')
 
-  const validatePassword = async (newPassword) => {
-    try {
-      await passwordValidationSchema.validate({
-        password: newPassword
-      })
-      errorPassword.value = ''
-    } catch (error) {
-      errorPassword.value = error.errors[0]
-    }
+  const goToSignup = () => {
+    router.push({ name: 'signup' })
   }
-  watch(password, validatePassword)
 
   const validateAndSubmit = async () => {
     try {
+      if (!password.value || isButtonLoading.value) return
+
       isButtonLoading.value = true
+      hasRequestErrorMessage.value = false
 
       const loginData = {
-        email: email.value.value,
-        password: password.value,
+        email: values.email,
+        password: values.password,
         captcha: 'default'
       }
+
       await props.authenticationLoginService(loginData)
-      const { user_tracking_info: userInfo, twoFactor, trustedDevice } = await verify()
+      const { twoFactor, trustedDevice, user_tracking_info: userInfo } = await verify()
 
-      if (twoFactor && !trustedDevice) {
-        router.push('/mfa/setup')
+      if (twoFactor) {
+        const mfaRoute = trustedDevice ? 'authentication' : 'setup'
+        router.push(`/mfa/${mfaRoute}`)
         return
       }
 
-      if (trustedDevice && twoFactor) {
-        router.push('/mfa/authentication')
-        return
-      }
-
-      await switchClientAccount(userInfo)
+      await switchClientAccount(userInfo.props)
     } catch {
       hasRequestErrorMessage.value = new UserNotFoundError().message
     } finally {
@@ -273,37 +263,62 @@
     }
   }
 
-  const switchClientAccount = async (userInfo) => {
-    let clientId
+  const searchAccount = async () => {
+    //deprecated: method will be replaced by an api in the future
     try {
-      const { account_id: accountId, client_id } = userInfo.props
-      clientId = client_id
-      await props.switchAccountLoginService(accountId)
-      router.push('/')
+      const accountTypes = ['brands', 'resellers', 'groups', 'clients']
+
+      for (const typeAccount of accountTypes) {
+        const { results: [firstResult] = [] } = await props.listTypeAccountService({
+          type: typeAccount,
+          page_size: 1
+        })
+
+        if (firstResult) {
+          return firstResult
+        }
+      }
+    } catch (error) {
+      throw new error()
+    }
+  }
+
+  const getAccountId = async (accountId) => {
+    if (!accountId) {
+      const { accountId } = await searchAccount()
+      return accountId
+    }
+    return accountId
+  }
+
+  const switchClientAccount = async ({ account_id }) => {
+    try {
+      const accountId = await getAccountId(account_id)
+      const { first_login: firstLogin } = await props.switchAccountLoginService(accountId)
+      if (firstLogin) {
+        router.push({ name: 'additional-data' })
+        return
+      }
+      router.push({ name: 'home' })
     } catch {
-      hasRequestErrorMessage.value = clientId
-        ? new ProccessRequestError().message
-        : new UserIsNotClientError().message
+      hasRequestErrorMessage.value = new ProccessRequestError().message
     }
   }
 
   const showPasswordStep = () => {
+    if (errors.value.email || !email.value) return
+
     isProccedButtonLoading.value = true
     setTimeout(() => {
       isProccedButtonLoading.value = false
       showPassword.value = true
+      resetField()
     }, 500)
   }
 
-  defineExpose({
-    showPassword,
-    showPasswordStep,
-    email,
-    password,
-    errors,
-    props,
-    isButtonLoading,
-    hasRequestErrorMessage,
-    errorPassword
-  })
+  const resetPasswordStep = () => {
+    hasRequestErrorMessage.value = false
+    showPassword.value = false
+    resetField()
+  }
 </script>

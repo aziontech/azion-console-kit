@@ -4,7 +4,6 @@
   import ShellBlock from '@/templates/shell-block'
   import { useAccountStore } from '@/stores/account'
   import { storeToRefs } from 'pinia'
-  import { isRoutePublic } from '@/router/public-routes'
   import { themeSelect, useCreateBoardManager } from '@/helpers'
 
   const accountStore = useAccountStore()
@@ -12,7 +11,8 @@
 
   const route = useRoute()
   const isLogged = computed(() => {
-    return hasActiveUserId && !isRoutePublic(route.name)
+    // evaluating as !route.meta?.hideNavigation will cause navbar to flicker
+    return route.meta.hideNavigation !== true && hasActiveUserId.value
   })
 
   watch(currentTheme, (theme) => themeSelect({ theme }))

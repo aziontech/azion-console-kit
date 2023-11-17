@@ -34,7 +34,12 @@ const makeSut = () => {
 describe('EdgeApplicationOriginsServices', () => {
   it('should call API with correct params', async () => {
     const requestSpy = vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
-      statusCode: 201
+      statusCode: 201,
+      body: {
+        results: {
+          id: 1
+        }
+      }
     })
 
     const { sut } = makeSut()
@@ -63,12 +68,17 @@ describe('EdgeApplicationOriginsServices', () => {
 
   it('should return a feedback message on successfully created', async () => {
     vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
-      statusCode: 201
+      statusCode: 201,
+      body: {
+        results: {
+          id: 1
+        }
+      }
     })
     const { sut } = makeSut()
 
-    const feedbackMessage = await sut(fixtures.originMock, fixtures.edgeApplicationId)
+    const data = await sut(fixtures.originMock, fixtures.edgeApplicationId)
 
-    expect(feedbackMessage).toBe('Resource successfully created')
+    expect(data.feedback).toBe('Your Origin has been created')
   })
 })

@@ -24,7 +24,6 @@
   import Illustration404 from '@/assets/svg/error-404'
   import PrimeButton from 'primevue/button'
   import ErrorPageBlock from '@/templates/error-page-block'
-  import { defineProps } from 'vue'
   import { useRouter } from 'vue-router'
   const router = useRouter()
 

@@ -8,6 +8,7 @@
     :formMeta="meta"
     :cleanFormCallback="resetForm"
     :hasTabs="true"
+    :updatedRedirect="updatedRedirect"
   >
     <template #form>
       <TabView class="w-full">
@@ -73,7 +74,7 @@
               <vue-monaco-editor
                 v-model:value="code"
                 language="javascript"
-                theme="vs"
+                :theme="theme"
                 class="min-h-[50vh] !w-[99%] surface-border border rounded-md"
                 :class="{ 'border-red-500 border': errorCode }"
                 v-tooltip.top="{ value: errorCode, showDelay: 200 }"
@@ -109,7 +110,7 @@
               <vue-monaco-editor
                 v-model:value="jsonArgs"
                 language="json"
-                theme="vs"
+                :theme="theme"
                 class="min-h-[50vh] !w-[99%] surface-border border rounded-md"
                 :class="{ 'border-red-500 border': errorCode }"
                 @change="changeValidateArgs"
@@ -153,8 +154,8 @@
   import InputText from 'primevue/inputtext'
   import Divider from 'primevue/divider'
   import { computed, ref, watch } from 'vue'
+  import { useAccountStore } from '@/stores/account'
 
-  // Props
   const props = defineProps({
     loadEdgeFunctionsService: {
       type: Function,
@@ -163,10 +164,13 @@
     editEdgeFunctionsService: {
       type: Function,
       required: true
+    },
+    updatedRedirect: {
+      type: String,
+      required: true
     }
   })
 
-  // Data
   const ARGS_INITIAL_STATE = '{}'
   const editorOptions = {
     tabSize: 2,
@@ -175,7 +179,10 @@
   const previewIframe = ref(null)
   const previewIframeArguments = ref(null)
 
-  // Methods
+  const store = useAccountStore()
+  const theme = computed(() => {
+    return store.currentTheme === 'light' ? 'vs' : 'vs-dark'
+  })
 
   let errorCode = ''
   const changeValidateCode = () => {
@@ -228,8 +235,6 @@
     if (language === 'lua') return 'Lua'
     return language
   }
-
-  // Validations
 
   const validationSchema = yup.object({
     name: yup.string().required('Name is a required field')

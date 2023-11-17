@@ -7,6 +7,7 @@
     :formData="values"
     :formMeta="meta"
     :cleanFormCallback="resetForm"
+    :updatedRedirect="updatedRedirect"
   >
     <template #form>
       <form-horizontal
@@ -23,7 +24,6 @@
               >Name *</label
             >
             <InputText
-              placeholder="My domain"
               v-bind="name"
               id="name"
               type="text"
@@ -125,26 +125,22 @@
           </div>
         </template>
       </form-horizontal>
-      <form-horizontal title="Mutual Authentication Settings">
+      <form-horizontal
+        title="Mutual Authentication Settings"
+        description="Enable Mutual Authentication (mTLS) to require that both client and server present an authentication protocol to each other."
+      >
         <template #inputs>
-          <div class="flex gap-2 items-top">
+          <div class="flex gap-3 items-center">
             <InputSwitch
               id="mtls"
-              class="flex-shrink-0 flex-grow"
               :class="{ 'p-invalid': errors.mtlsIsEnabled }"
               v-model="mtlsIsEnabled"
             />
-            <div class="flex flex-col gap-1">
-              <label
-                for="mtls"
-                class="text-sm font-normal leading-tight"
-                >Mutual Authentication</label
-              >
-              <small class="text-color-secondary text-sm font-normal leading-tight">
-                Enable Mutual Authentication (mTLS) to require that both client and server present
-                an authentication protocol to each other.
-              </small>
-            </div>
+            <label
+              for="mtls"
+              class="text-base"
+              >Mutual Authentication</label
+            >
           </div>
 
           <div
@@ -281,10 +277,26 @@
       Card
     },
     props: {
-      editDomainService: Function,
-      listDigitalCertificatesService: Function,
-      listEdgeApplicationsService: Function,
-      loadDomainService: Function
+      editDomainService: {
+        type: Function,
+        required: true
+      },
+      listDigitalCertificatesService: {
+        type: Function,
+        required: true
+      },
+      listEdgeApplicationsService: {
+        type: Function,
+        required: true
+      },
+      loadDomainService: {
+        type: Function,
+        required: true
+      },
+      updatedRedirect: {
+        type: String,
+        required: true
+      }
     },
     data() {
       return {

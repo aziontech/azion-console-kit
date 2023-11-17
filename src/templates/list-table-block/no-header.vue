@@ -15,7 +15,7 @@
         :loading="isLoading"
         v-model:selection="selectedRow"
         selectionMode="single"
-        @dblclick.prevent="editItemSelected(selectedRow)"
+        @row-click="editItemSelected"
       >
         <template #header>
           <div class="flex flex-wrap justify-between gap-2 w-full">
@@ -213,12 +213,7 @@
     },
     methods: {
       actionOptions(showAuthorize) {
-        const actionOptions = [
-          {
-            label: 'Edit',
-            icon: 'pi pi-fw pi-pencil',
-            command: () => this.editItem()
-          },
+        const actionOptions = [        
           {
             label: 'Delete',
             icon: 'pi pi-fw pi-trash',
@@ -257,11 +252,8 @@
         this.selectedId = selectedId
         this.$refs.menu.toggle(event)
       },
-      editItemSelected(item) {
+      editItemSelected({ data: item }) {
         this.$router.push({ path: `${this.editPagePath}/${item.id}` })
-      },
-      editItem() {
-        this.$router.push({ path: `${this.editPagePath}/${this.selectedId}` })
       },
       authorizeEdgeNode() {
         this.$emit('authorize', this.selectedId)

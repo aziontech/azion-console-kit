@@ -18,7 +18,7 @@
         :loading="isLoading"
         v-model:selection="selectedRow"
         selectionMode="single"
-        @dblclick.prevent="editItemSelected(selectedRow)"
+        @row-click="editItemSelected"
       >
         <template #header>
           <div class="flex flex-wrap justify-between gap-2 w-full">
@@ -275,11 +275,6 @@
       actionOptions() {
         const actionOptions = [
           {
-            label: 'Edit',
-            icon: 'pi pi-fw pi-pencil',
-            command: () => this.editItem()
-          },
-          {
             label: 'Delete',
             icon: 'pi pi-fw pi-trash',
             command: () => this.openDeleteDialog()
@@ -316,11 +311,8 @@
         this.selectedId = selectedId
         this.$refs.menu.toggle(event)
       },
-      editItemSelected(item) {
+      editItemSelected({ data: item }) {
         this.$router.push({ path: `${this.editPagePath}/${item.id}` })
-      },
-      editItem() {
-        this.$router.push({ path: `${this.editPagePath}/${this.selectedId}` })
       },
       openDeleteDialog() {
         this.informationForDeletion = {

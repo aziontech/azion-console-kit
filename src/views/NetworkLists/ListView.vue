@@ -1,22 +1,41 @@
 <template>
   <ListTableBlock
+    v-if="hasContentToList"
     :listService="listNetworkListService"
     :deleteService="deleteNetworkListService"
     :columns="getColumns"
     pageTitle="Network Lists"
-    addButtonLabel="Add Network List"
+    addButtonLabel="Network List"
     createPagePath="network-lists/create"
     editPagePath="network-lists/edit"
+    @on-load-data="handleLoadData"
   />
+  <EmptyResultsBlock
+    v-else
+    pageTitle="Network Lists"
+    title="No network list added"
+    description="Create your first networkist."
+    createButtonLabel="Network Lists"
+    createPagePath="network-lists/create"
+    :documentationService="documentationService"
+  >
+    <template #illustration>
+      <Illustration />
+    </template>
+  </EmptyResultsBlock>
 </template>
 
 <script>
   import ListTableBlock from '@/templates/list-table-block'
+  import EmptyResultsBlock from '@/templates/empty-results-block'
+  import Illustration from '@/assets/svg/illustration-layers.vue'
 
   export default {
     name: 'network-list-view',
     components: {
-      ListTableBlock
+      ListTableBlock,
+      EmptyResultsBlock,
+      Illustration
     },
     props: {
       listNetworkListService: {
@@ -26,8 +45,15 @@
       deleteNetworkListService: {
         required: true,
         type: Function
+      },
+      documentationService: {
+        required: true,
+        type: Function
       }
     },
+    data: () => ({
+      hasContentToList: true
+    }),
     computed: {
       getColumns() {
         return [
@@ -48,6 +74,11 @@
             header: 'Last Modified'
           }
         ]
+      }
+    },
+    methods: {
+      handleLoadData(event) {
+        this.hasContentToList = event
       }
     }
   }

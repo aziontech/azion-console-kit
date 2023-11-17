@@ -51,7 +51,8 @@ export const variablesRoutes = {
       component: () => import('@views/Variables/EditView.vue'),
       props: {
         editVariableService: VariablesService.editVariableService,
-        loadVariableService: VariablesService.loadVariableService
+        loadVariableService: VariablesService.loadVariableService,
+        updatedRedirect: 'list-variables'
       },
       meta: {
         breadCrumbs: [

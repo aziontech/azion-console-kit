@@ -37,7 +37,10 @@ const adapt = (payload) => {
 const parseHttpResponse = (httpResponse) => {
   switch (httpResponse.statusCode) {
     case 201:
-      return 'Your purge has been created'
+      return {
+        feedback: 'Your purge has been created',
+        urlToEditView: `/real-time-purge`
+      }
     case 400:
       const key = Object.keys(httpResponse.body)[0]
       const msg = httpResponse.body[key]

@@ -1,4 +1,5 @@
 import * as NetworkListsService from '@/services/network-lists-services'
+import * as Helpers from '@/helpers'
 
 /** @type {import('vue-router').RouteRecordRaw} */
 export const networkListsRoutes = {
@@ -11,7 +12,8 @@ export const networkListsRoutes = {
       component: () => import('@views/NetworkLists/ListView.vue'),
       props: {
         listNetworkListService: NetworkListsService.listNetworkListService,
-        deleteNetworkListService: NetworkListsService.deleteNetworkListService
+        deleteNetworkListService: NetworkListsService.deleteNetworkListService,
+        documentationService: Helpers.documentationCatalog.networkLists
       },
       meta: {
         breadCrumbs: [
@@ -50,7 +52,8 @@ export const networkListsRoutes = {
       props: {
         editNetworkListsService: NetworkListsService.editNetworkListService,
         loadNetworkListsService: NetworkListsService.loadNetworkListService,
-        listCountriesService: NetworkListsService.listCountriesService
+        listCountriesService: NetworkListsService.listCountriesService,
+        updatedRedirect: 'list-network-list'
       },
       meta: {
         breadCrumbs: [

@@ -48,7 +48,8 @@ export const edgeFunctionsRoutes = {
       component: () => import('@views/EdgeFunctions/EditView.vue'),
       props: {
         loadEdgeFunctionsService: EdgeFunctionsService.loadEdgeFunctionsService,
-        editEdgeFunctionsService: EdgeFunctionsService.editEdgeFunctionsService
+        editEdgeFunctionsService: EdgeFunctionsService.editEdgeFunctionsService,
+        updatedRedirect: 'list-edge-functions'
       },
       meta: {
         breadCrumbs: [
