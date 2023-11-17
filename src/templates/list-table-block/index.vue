@@ -335,7 +335,7 @@
         this.$refs[`menu-${selectedId}`].toggle(event)
       },
       editItemSelected({ data: item }) {
-        if(this.enableEditClick) {
+        if (this.enableEditClick) {
           this.$router.push({ path: `${this.editPagePath}/${item.id}` })
         }
       },
