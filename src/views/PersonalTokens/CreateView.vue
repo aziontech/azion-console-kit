@@ -1,21 +1,19 @@
 <template>
   <div>
     <CreateFormBlock
-      pageTitle="New Personal Token"
+      pageTitle="Create Personal Token"
       :createService="props.createPersonalTokenService"
       :formData="values"
       :formMeta="meta"
-      :isValid="meta.valid"
       @on-response="handleResponse"
       :buttonBackList="generatedPersonalToken"
       :callback="false"
-      :isRequestSuccess="generatedPersonalToken"
       :disabledFeedback="true"
     >
       <template #form>
         <FormHorizontal
           title="General"
-          description="Choose a name that is descriptive and easy to remember. Use the description to help you remember why the token was created and/or what it was created for."
+          description="Choose a descriptive and easy to remember name. Include a description to specify the token's purpose or usage."
         >
           <template #inputs>
             <div class="flex flex-col sm:max-w-lg w-full gap-2">
@@ -83,7 +81,7 @@
               <label
                 for="selectedExpiration"
                 class="text-color text-base font-medium"
-                >Expires in *</label
+                >Expires within *</label
               >
               <div class="flex gap-6">
                 <div class="md:w-80">
@@ -125,39 +123,34 @@
               </div>
             </div>
 
-            <div
-              class="flex flex-col w-full gap-2"
-              v-if="generatedPersonalToken"
-            >
+            <div class="flex flex-col w-full gap-2">
               <label
                 for="personalToken"
                 class="text-color text-base font-medium"
               >
-                Personal Token
+                Personal Token Value
               </label>
               <div
                 class="flex gap-6 md:align-items-center max-sm:flex-col max-sm:align-items-baseline max-sm:gap-3"
               >
                 <span class="p-input-icon-right w-full flex max-w-lg flex-col items-start gap-2">
-                  <InputText
+                  <PrimePassword
                     id="personalToken"
-                    class="w-full"
-                    :value="personalTokenKey"
-                    :type="tokenField.type"
-                    :disabled="generatedPersonalToken"
-                  />
-                  <i
-                    :class="tokenField.icon"
-                    @click="isTokenVisible = !isTokenVisible"
+                    v-model="personalTokenKey"
+                    type="text"
+                    class="flex flex-col w-full"
+                    :feedback="false"
+                    toggleMask
+                    disabled
                   />
                 </span>
-
                 <PrimeButton
                   icon="pi pi-clone"
                   outlined
                   type="button"
                   aria-label="Copy Personal Token"
                   label="Copy to Clipboard"
+                  :disabled="!generatedPersonalToken"
                   @click="copyPersonalToken"
                 />
               </div>
@@ -181,6 +174,7 @@
   import InputText from 'primevue/inputtext'
 
   import Dropdown from 'primevue/dropdown'
+  import PrimePassword from 'primevue/password'
   import TextareaComponent from 'primevue/textarea'
   import Calendar from 'primevue/calendar'
   import PrimeButton from 'primevue/button'
@@ -195,7 +189,6 @@
     }
   })
 
-  const isTokenVisible = ref(false)
   const personalTokenKey = ref('')
   const generatedPersonalToken = ref(false)
   const options = ref([
@@ -236,12 +229,6 @@
   const { value: customExpiration } = useField('customExpiration')
   const name = defineInputBinds('name', { validateOnInput: true })
   const description = defineInputBinds('description', { validateOnInput: true })
-
-  const tokenField = computed(() => {
-    const icon = isTokenVisible.value ? 'pi pi-eye-slash' : 'pi pi-eye'
-    const type = isTokenVisible.value ? 'text' : 'password'
-    return { icon, type }
-  })
 
   const isCustomDateSelected = computed(() => {
     return selectedExpiration.value === 'custom'
@@ -306,11 +293,11 @@
   )
 
   const toast = useToast()
-  const handleResponse = ({ message, token }) => {
+  const handleResponse = ({ feedback, token }) => {
     toast.add({
       closable: false,
       severity: 'success',
-      summary: message,
+      summary: feedback,
       life: 10000
     })
     if (token) {
@@ -322,7 +309,7 @@
   const copyPersonalToken = async () => {
     const toastConfig = {
       closable: false,
-      life: 3000,
+      life: 10000,
       severity: 'success',
       summary: 'Personal Token copied to clipboard!'
     }

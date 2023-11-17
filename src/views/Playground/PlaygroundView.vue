@@ -1,8 +1,28 @@
+
 <template>
-  <div class="p-4 w-full">
-    <div class="max-w-screen-sm lg:max-w-7xl mx-auto gap-4">
-      <i class="ai ai-twitter text-lg text-color"/>
-      <i class="pi pi-twitter text-lg text-color"/>
-    </div>
+  <div>
+    <ScriptRunnerBlock
+      title="Build"
+      :executionId="uuid"
+      :scriptRunnerService="getLogs"></ScriptRunnerBlock>
+      
   </div>
 </template>
+  <script>
+    import ScriptRunnerBlock from '@/templates/script-runner-block'
+    import {getLogs} from '@/services/script-runner-service'
+    export default {
+      name: 'script-runner-test-block',
+      components: {
+        ScriptRunnerBlock
+      },
+      async created() {
+        //
+      },
+      data: () => ({
+        uuid: 'xx',
+        getLogs
+      }),
+    }
+  </script>
+  

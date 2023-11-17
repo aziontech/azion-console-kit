@@ -4,8 +4,9 @@
     :editService="props.editTeamPermissionService"
     :loadService="props.loadTeamPermissionService"
     :initialDataSetter="setValues"
-    :isValid="meta.valid"
     :formData="values"
+    :formMeta="meta"
+    :updatedRedirect="updatedRedirect"
   >
     <template #form>
       <FormHorizontal
@@ -106,6 +107,10 @@
     },
     listPermissionService: {
       type: Function,
+      required: true
+    },
+    updatedRedirect: {
+      type: String,
       required: true
     }
   })

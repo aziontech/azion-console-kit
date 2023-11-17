@@ -1,9 +1,9 @@
-// import * as Helpers from '@/helpers'
+import * as Helpers from '@/helpers'
 import * as TeamPermissionService from '@/services/team-permission'
 /** @type {import('vue-router').RouteRecordRaw} */
 export const teamsPermissionRoutes = {
   path: '/teams-permission',
-  name: 'teams-permession',
+  name: 'teams-permission',
   children: [
     {
       path: '',
@@ -11,12 +11,13 @@ export const teamsPermissionRoutes = {
       component: () => import('@views/TeamsPermissions/ListView.vue'),
       props: {
         listTeamPermissionService: TeamPermissionService.listTeamPermissionService,
-        deleteTeamPermissionService: TeamPermissionService.deleteTeamPermissionService
+        deleteTeamPermissionService: TeamPermissionService.deleteTeamPermissionService,
+        documentationService: Helpers.documentationCatalog.teamPermissions
       },
       meta: {
         breadCrumbs: [
           {
-            label: 'Teams Permessions',
+            label: 'Teams Permissions',
             to: '/teams-permission'
           }
         ]
@@ -33,7 +34,7 @@ export const teamsPermissionRoutes = {
       meta: {
         breadCrumbs: [
           {
-            label: 'Teams Permessions',
+            label: 'Teams Permissions',
             to: '/teams-permission'
           },
           {
@@ -50,12 +51,13 @@ export const teamsPermissionRoutes = {
       props: {
         editTeamPermissionService: TeamPermissionService.editTeamPermissionService,
         loadTeamPermissionService: TeamPermissionService.loadTeamPermissionService,
-        listPermissionService: TeamPermissionService.listPermissionService
+        listPermissionService: TeamPermissionService.listPermissionService,
+        updatedRedirect: 'teams-permission'
       },
       meta: {
         breadCrumbs: [
           {
-            label: 'Teams Permessions',
+            label: 'Teams Permissions',
             to: '/teams-permission'
           },
           {

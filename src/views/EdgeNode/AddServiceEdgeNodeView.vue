@@ -4,7 +4,6 @@
     :createService="addServiceEdgeNode"
     :formData="values"
     :formMeta="meta"
-    :isValid="meta.valid"
     :cleanFormCallback="resetForm"
   >
     <template #form>
@@ -35,7 +34,7 @@
               <vue-monaco-editor
                 v-model:value="variables"
                 language="javascript"
-                theme="vs-dark"
+                :theme="theme"
                 class="min-h-[50vh]"
                 :options="editorOptions"
               />
@@ -49,7 +48,8 @@
 <script>
   import CreateFormBlock from '@/templates/create-form-block-new'
   import FormHorizontal from '@/templates/create-form-block-new/form-horizontal'
-
+  import { useAccountStore } from '@/stores/account'
+  import { mapState } from 'pinia'
   import { useForm, useField } from 'vee-validate'
   import * as yup from 'yup'
   import Dropdown from 'primevue/dropdown'
@@ -69,6 +69,12 @@
       listServiceEdgeNodeService: {
         type: Function,
         required: true
+      }
+    },
+    computed: {
+      ...mapState(useAccountStore, ['currentTheme']),
+      theme() {
+        return this.currentTheme === 'light' ? 'vs' : 'vs-dark'
       }
     },
     data: () => {

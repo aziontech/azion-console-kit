@@ -9,15 +9,14 @@
       <slot name="raw-form" />
     </form>
     <DialogUnsavedBlock
-      v-model:visible="dialogUnsaved"
-      @leavePage="leavePage"
-      @keepEditing="keepEditing"
+      :leavePage="leavePage"
+      :blockRedirectUnsaved="hasModifications"
     />
     <ActionBarTemplate
       @cancel="handleCancel"
       @submit="handleSubmit"
       :loading="isLoading"
-      :submitDisabled="!isValid"
+      :submitDisabled="!formMeta.valid"
     />
   </div>
 </template>
@@ -34,7 +33,7 @@
     },
     data: () => ({
       isLoading: false,
-      dialogUnsaved: false
+      blockViewRedirection: true
     }),
     props: {
       editService: {
@@ -49,10 +48,6 @@
         type: Function,
         required: true
       },
-      isValid: {
-        type: Boolean,
-        required: true
-      },
       formData: {
         type: Object,
         required: true
@@ -64,35 +59,34 @@
       formMeta: {
         type: Object,
         required: true
+      },
+      updatedRedirect: {
+        type: String,
+        required: true
       }
     },
     async created() {
       await this.loadInitialData()
     },
     methods: {
-      leavePage() {
-        this.dialogUnsaved = false
+      leavePage(dialogUnsaved) {
+        dialogUnsaved = false
         this.handleCancel()
+        return dialogUnsaved
       },
-      keepEditing() {
-        this.dialogUnsaved = false
-      },
-      openDialogUnsaved() {
-        if (this.formMeta.touched) {
-          this.dialogUnsaved = true
+      goBackToList() {
+        if (this.updatedRedirect) {
+          this.$router.push({ name: this.updatedRedirect })
           return
         }
-        this.handleCancel()
+        this.$router.go(-1)
       },
       handleCancel() {
         if (this.backURL) {
           this.$router.push({ path: this.backURL })
         } else {
-          this.$router.go('-1')
+          this.goBackToList()
         }
-      },
-      goBackToList() {
-        this.$router.go(-1)
       },
       async loadInitialData() {
         try {
@@ -121,8 +115,10 @@
             summary: 'edited successfully',
             life: 10000
           })
+          this.blockViewRedirection = false
           this.goBackToList()
         } catch (error) {
+          this.blockViewRedirection = true
           this.$toast.add({
             closable: false,
             severity: 'error',
@@ -134,6 +130,11 @@
             this.isLoading = false
           }, 800)
         }
+      }
+    },
+    computed: {
+      hasModifications() {
+        return this.formMeta.touched && this.blockViewRedirection
       }
     }
   }

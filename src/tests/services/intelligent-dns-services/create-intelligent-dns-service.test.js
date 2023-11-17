@@ -22,7 +22,14 @@ const makeSut = () => {
 describe('IntelligentDnsServices', () => {
   it('should call API with correct params', async () => {
     const requestSpy = vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
-      statusCode: 201
+      statusCode: 201,
+      body: {
+        results: [
+          {
+            id: 1
+          }
+        ]
+      }
     })
     const { sut } = makeSut()
 
@@ -41,13 +48,20 @@ describe('IntelligentDnsServices', () => {
 
   it('should return a feedback message on successfully created', async () => {
     vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
-      statusCode: 201
+      statusCode: 201,
+      body: {
+        results: [
+          {
+            id: 1
+          }
+        ]
+      }
     })
     const { sut } = makeSut()
 
-    const feedbackMessage = await sut(fixtures.dnsMock)
+    const data = await sut(fixtures.dnsMock)
 
-    expect(feedbackMessage).toBe('Your Intelligent DNS has been created')
+    expect(data.feedback).toBe('Your Intelligent DNS has been created')
   })
 
   it('Should return an API validation error to an already taken intelligent dns ', async () => {

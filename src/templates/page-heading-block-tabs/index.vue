@@ -1,5 +1,5 @@
 <template>
-  <div class="w-full flex-col justify-center items-start inline-flex pt-4 px-8 max-md:px-3">
+  <div class="w-full flex-col items-start inline-flex pt-4 px-8 max-md:px-3">
     <Breadcrumb
       :home="generateHomeBreadCrumb"
       :model="generateBreadCrumbs"
@@ -23,8 +23,11 @@
           {{ description }}
         </div>
       </div>
-      <div class="ml-auto w-full h-9 items-end flex justify-end">
-        <slot></slot>
+      <div
+        v-if="hasDefaultSlot"
+        class="ml-auto w-full h-9 items-end flex justify-end"
+      >
+        <slot name="default"></slot>
       </div>
     </div>
     <slot name="tabs"></slot>
@@ -89,6 +92,9 @@
       },
       generateBreadCrumbs() {
         return this.$router.currentRoute.value.meta.breadCrumbs ?? []
+      },
+      hasDefaultSlot() {
+        return !!this.$slots.default
       }
     }
   }

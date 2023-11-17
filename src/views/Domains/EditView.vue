@@ -6,8 +6,8 @@
     :initialDataSetter="setValues"
     :formData="values"
     :formMeta="meta"
-    :isValid="meta.valid"
     :cleanFormCallback="resetForm"
+    :updatedRedirect="updatedRedirect"
   >
     <template #form>
       <form-horizontal
@@ -24,7 +24,6 @@
               >Name *</label
             >
             <InputText
-              placeholder="My domain"
               v-bind="name"
               id="name"
               type="text"
@@ -69,28 +68,22 @@
             >
           </div>
 
-          <Card
-            :pt="{
-              body: { class: 'p-4' },
-              title: { class: 'flex justify-between font-medium items-center text-base m-0' },
-              subtitle: {
-                class: 'text-sm font-normal text-color-secondary m-0 pr-0 md:pr-[2.5rem]'
-              }
-            }"
-          >
-            <template #title>
-              <span class="text-base">CNAME Access Only</span>
-              <InputSwitch
-                :class="{ 'p-invalid': errors.cnameAccessOnly }"
-                v-model="cnameAccessOnly"
-              />
-            </template>
-            <template #subtitle>
-              Check this option to make your application accessible only through the domains listed
-              in the CNAME field. Attempts to access your application through the Azion domain will
-              be blocked.
-            </template>
-          </Card>
+          <div class="flex gap-2 items-top">
+            <InputSwitch
+              id="cnameAccessOnly"
+              class="flex-shrink-0 flex-grow"
+              :class="{ 'p-invalid': errors.cnameAccessOnly }"
+              v-model="cnameAccessOnly"
+            />
+            <div class="flex flex-col gap-1">
+              <label class="text-sm font-normal leading-tight">CNAME Access Only </label>
+              <small class="text-color-secondary text-sm font-normal leading-tight">
+                Check this option to make the application accessible only through the domains listed
+                in the CNAME field. Attempts to access the application through the Azion domain will
+                be blocked.
+              </small>
+            </div>
+          </div>
 
           <div class="flex flex-col sm:max-w-lg w-full gap-2">
             <label
@@ -134,8 +127,7 @@
       </form-horizontal>
       <form-horizontal
         title="Mutual Authentication Settings"
-        description="Enable Mutual Authentication (mTLS) to require that both client and server
-        present an authentication protocol to each other."
+        description="Enable Mutual Authentication (mTLS) to require that both client and server present an authentication protocol to each other."
       >
         <template #inputs>
           <div class="flex gap-3 items-center">
@@ -285,10 +277,26 @@
       Card
     },
     props: {
-      editDomainService: Function,
-      listDigitalCertificatesService: Function,
-      listEdgeApplicationsService: Function,
-      loadDomainService: Function
+      editDomainService: {
+        type: Function,
+        required: true
+      },
+      listDigitalCertificatesService: {
+        type: Function,
+        required: true
+      },
+      listEdgeApplicationsService: {
+        type: Function,
+        required: true
+      },
+      loadDomainService: {
+        type: Function,
+        required: true
+      },
+      updatedRedirect: {
+        type: String,
+        required: true
+      }
     },
     data() {
       return {
@@ -389,7 +397,7 @@
         validationSchema,
         initialValues: {
           cnames: '',
-          cnameAccessOnly: true,
+          cnameAccessOnly: false,
           edgeApplication: null,
           mtlsIsEnabled: false,
           active: false,

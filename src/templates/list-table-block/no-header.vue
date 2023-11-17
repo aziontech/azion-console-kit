@@ -13,6 +13,9 @@
         :rows="minimumOfItemsPerPage"
         :globalFilterFields="filterBy"
         :loading="isLoading"
+        v-model:selection="selectedRow"
+        selectionMode="single"
+        @row-click="editItemSelected"
       >
         <template #header>
           <div class="flex flex-wrap justify-between gap-2 w-full">
@@ -70,7 +73,7 @@
         </Column>
         <template #empty>
           <div class="my-4 flex flex-col gap-3 justify-center items-center">
-            <p class="text-xl font-normal text-gray-600">No registers found.</p>
+            <p class="text-xl font-normal text-secondary">No registers found.</p>
             <PrimeButton
               v-if="!authorizeNode"
               text
@@ -212,11 +215,6 @@
       actionOptions(showAuthorize) {
         const actionOptions = [
           {
-            label: 'Edit',
-            icon: 'pi pi-fw pi-pencil',
-            command: () => this.editItem()
-          },
-          {
             label: 'Delete',
             icon: 'pi pi-fw pi-trash',
             command: () => this.openDeleteDialog()
@@ -254,8 +252,8 @@
         this.selectedId = selectedId
         this.$refs.menu.toggle(event)
       },
-      editItem() {
-        this.$router.push({ path: `${this.editPagePath}/${this.selectedId}` })
+      editItemSelected({ data: item }) {
+        this.$router.push({ path: `${this.editPagePath}/${item.id}` })
       },
       authorizeEdgeNode() {
         this.$emit('authorize', this.selectedId)

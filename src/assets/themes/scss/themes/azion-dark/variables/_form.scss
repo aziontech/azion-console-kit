@@ -92,7 +92,7 @@ $inputListItemTextColor: $textColor;
 
 /// Hover state background for an individual itrem of an input list
 /// @group form
-$inputListItemHoverBg: rgba($primaryColor, 0.04);
+$inputListItemHoverBg: rgba($primaryColor, 0.06);
 
 /// Hover state text color for an individual itrem of an input list
 /// @group form
@@ -100,7 +100,7 @@ $inputListItemTextHoverColor: $textColor;
 
 /// Focus state background for an individual itrem of an input list
 /// @group form
-$inputListItemFocusBg: rgba($primaryColor, 0.16);
+$inputListItemFocusBg: rgba($primaryColor, 0.06);
 
 /// Focus state text color for an individual itrem of an input list
 /// @group form

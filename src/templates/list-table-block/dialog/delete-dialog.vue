@@ -11,12 +11,12 @@
           class="w-100"
           severity="warn"
           :closable="false"
-          >Warning: This action is not reversible. Please be certain.</Message
+          >Once confirmed, this action can't be reversed.</Message
         >
 
         <p class="pt-3.5 text-color-secondary">
-          This Edge Application will be deleted along, Device Groups, Origins settings, Cache
-          Settings and Rule Sets.
+          This {{ informationForDeletion.title }} will be deleted along with any associated settings
+          or instances. Check Help Center for more details.
         </p>
       </div>
 
@@ -27,11 +27,12 @@
           <label
             for="confirm-input"
             class="font-semibold text-sm"
-            >To confirm, type “delete” in the box below:</label
+            >Type “delete” to confirm:</label
           >
           <InputText
             id="confirm-input"
             type="text"
+            autofocus
             v-model="confirmation"
             :class="{ 'p-invalid': errors.confirmation }"
             v-tooltip.top="{ value: errors.confirmation, showDelay: 200 }"
@@ -132,7 +133,7 @@
           const feedback = await this.informationForDeletion.deleteService(
             this.informationForDeletion.selectedID
           )
-          toastConfig.summary = feedback ?? 'Deleted successfully'
+          toastConfig.summary = feedback ?? 'Deleted successfully!'
           this.$emit('successfullyDeleted')
           this.resetForm()
         } catch (error) {
@@ -150,6 +151,7 @@
       },
 
       cancelDialog() {
+        this.resetForm()
         this.deleteDialogVisible = false
       }
     },

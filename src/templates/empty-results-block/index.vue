@@ -3,7 +3,7 @@
   <div class="flex flex-col">
     <PageHeadingBlock :pageTitle="pageTitle" />
     <div
-      class="flex flex-col h-full border border-surface gap-7 justify-center items-center rounded-md mx-8 py-7 mb-8 max-md:mx-3"
+      class="flex flex-col h-full border surface-border gap-7 justify-center items-center rounded-md mx-8 py-7 mb-8 max-md:mx-3"
     >
       <slot name="illustration" />
       <div class="flex flex-col gap-2">
@@ -17,12 +17,14 @@
       <div class="flex flex-col gap-5 items-center">
         <div class="flex flex-wrap gap-2">
           <slot name="extraActionsLeft"></slot>
-          <PrimeButton
-            severity="secondary"
-            icon="pi pi-plus"
-            :label="createButtonLabel"
-            @click="navigateToCreatePage"
-          />
+          <slot name="default">
+            <PrimeButton
+              severity="secondary"
+              icon="pi pi-plus"
+              :label="createButtonLabel"
+              @click="navigateToCreatePage"
+            />
+          </slot>
           <slot name="extraActionsRight"></slot>
         </div>
         <PrimeButton
@@ -50,9 +52,9 @@
     pageTitle: { type: String, required: true },
     title: { type: String, required: true },
     description: { type: String, required: true },
-    createButtonLabel: { type: String, required: true },
-    createPagePath: { type: String, required: true },
-    documentationService: { type: Function, required: true }
+    documentationService: { type: Function, required: true },
+    createPagePath: { type: String, required: false },
+    createButtonLabel: { type: String, required: false }
   })
   function openDocumentation() {
     props.documentationService()

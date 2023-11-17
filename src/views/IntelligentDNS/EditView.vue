@@ -11,9 +11,9 @@
             :editService="editIntelligentDNSService"
             :loadService="loadIntelligentDNSService"
             :initialDataSetter="setValues"
-            :isValid="meta.valid"
             :formData="values"
             :formMeta="meta"
+            :updatedRedirect="updatedRedirect"
           >
             <template #form>
               <FormHorizontal
@@ -121,7 +121,8 @@
       loadIntelligentDNSService: { type: Function, required: true },
       editIntelligentDNSService: { type: Function, required: true },
       listRecordsService: { type: Function, required: true },
-      deleteRecordsService: { type: Function, required: true }
+      deleteRecordsService: { type: Function, required: true },
+      updatedRedirect: { type: String, required: true }
     },
 
     data: () => {
