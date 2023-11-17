@@ -171,7 +171,6 @@
     }
   })
 
-
   const ARGS_INITIAL_STATE = '{}'
   const editorOptions = {
     tabSize: 2,

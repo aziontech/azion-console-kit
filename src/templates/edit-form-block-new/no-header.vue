@@ -87,7 +87,7 @@
         } else {
           this.goBackToList()
         }
-      },      
+      },
       async loadInitialData() {
         try {
           const { id } = this.$route.params

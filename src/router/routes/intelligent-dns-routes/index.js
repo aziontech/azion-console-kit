@@ -76,7 +76,7 @@ export const intelligentDnsRoutes = {
         editIntelligentDNSService: IntelligentDNSService.editIntelligentDNSService,
         loadIntelligentDNSService: IntelligentDNSService.loadIntelligentDNSService,
         listRecordsService: IntelligentDNSRecordsService.listRecordsService,
-        deleteRecordsService: IntelligentDNSRecordsService.deleteRecordsService,
+        deleteRecordsService: IntelligentDNSRecordsService.deleteRecordsService
       },
       meta: {
         breadCrumbs: [
