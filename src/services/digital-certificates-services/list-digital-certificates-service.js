@@ -20,6 +20,22 @@ export const listDigitalCertificatesService = async ({
 export const EDGE_CERTIFICATE = 'Edge Certificate'
 export const TRUSTED_CA_CERTIFICATE = 'Trusted CA Certificate'
 
+const parseStatusData = (status) => {
+  const isActive = status.toUpperCase() === 'ACTIVE'
+
+  const parsedStatus = isActive
+    ? {
+        content: 'Active',
+        severity: 'success'
+      }
+    : {
+        content: 'Inactive',
+        severity: 'danger'
+      }
+
+  return parsedStatus
+}
+
 const adapt = (httpResponse) => {
   const parsedDomains = httpResponse.body.results?.map((item) => {
     const subjectNames = item.subject_name.map((subject) => subject)?.join(',')
@@ -40,7 +56,7 @@ const adapt = (httpResponse) => {
               dateStyle: 'full',
               timeStyle: 'short'
             }).format(new Date(item.validity)),
-      status: item.status
+      status: parseStatusData(item.status)
     }
   })
 
