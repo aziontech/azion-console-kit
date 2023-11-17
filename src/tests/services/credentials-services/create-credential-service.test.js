@@ -51,10 +51,10 @@ describe('CreateCredentialServices', () => {
     })
     const { sut } = makeSut()
 
-    const { message, token } = await sut(fixtures.basic)
+    const { feedback, token } = await sut(fixtures.basic)
 
     expect(token).toBe('test-token')
-    expect(message).toBe('Your credential token has been created')
+    expect(feedback).toBe('Your credential token has been created')
   })
 
   it.each([

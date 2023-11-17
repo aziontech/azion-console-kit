@@ -293,11 +293,11 @@
   )
 
   const toast = useToast()
-  const handleResponse = ({ message, token }) => {
+  const handleResponse = ({ feedback, token }) => {
     toast.add({
       closable: false,
       severity: 'success',
-      summary: message,
+      summary: feedback,
       life: 10000
     })
     if (token) {

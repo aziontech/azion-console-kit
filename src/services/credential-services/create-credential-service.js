@@ -41,9 +41,9 @@ const extractApiError = (httpResponse) => {
 const parseHttpResponse = (httpResponse) => {
   switch (httpResponse.statusCode) {
     case 201:
-      return {        
+      return {
         feedback: 'Your credential token has been created',
-        redirectURL: `/credentials`,
+        urlToEditView: '/credentials',
         token: httpResponse.body.token
       }
     case 400:

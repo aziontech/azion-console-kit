@@ -31,7 +31,7 @@ const parseHttpResponse = (httpResponse) => {
       return {
         feedback: 'Your personal token has been created',
         token: httpResponse.body.key,
-        redirectURL: '/personal-tokens'
+        urlToEditView: '/personal-tokens'
       }
     case 401:
       throw new Errors.InvalidApiTokenError().message

@@ -17,7 +17,7 @@ const parseHttpResponse = (httpResponse) => {
     case 201:
       return {
         feedback: 'Your digital certificate has been created!',
-        redirectURL: `/digital-certificates/edit/${httpResponse.body.results.id}`
+        urlToEditView: `/digital-certificates/edit/${httpResponse.body.results.id}`
       }
     case 400:
       const apiError = httpResponse.body.error[0]

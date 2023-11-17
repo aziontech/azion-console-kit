@@ -13,15 +13,15 @@
                   just before the closing BODY tag. This script waits until the load event is complete
                   before downloading and executing the RUM Client, ensuring that the load event is
                   uninterrupted and has zero impact on user experience."
-          >
-            <template #inputs>
-              <vue-monaco-editor
-                v-model:value="defaultTagCode"
-                language="javascript"
-                :theme="theme"
-                :options="editorOptions"
-                class="min-h-[200px] overflow-clip surface-border border rounded-md"
-              />
+        >
+          <template #inputs>
+            <vue-monaco-editor
+              v-model:value="defaultTagCode"
+              language="javascript"
+              :theme="theme"
+              :options="editorOptions"
+              class="min-h-[200px] overflow-clip surface-border border rounded-md"
+            />
             <div>
               <PrimeButton
                 label="Copy to Clipboard"

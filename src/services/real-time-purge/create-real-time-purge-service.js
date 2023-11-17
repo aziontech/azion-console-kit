@@ -39,7 +39,7 @@ const parseHttpResponse = (httpResponse) => {
     case 201:
       return {
         feedback: 'Your purge has been created',
-        redirectURL: `/real-time-purge`
+        urlToEditView: `/real-time-purge`
       }
     case 400:
       const key = Object.keys(httpResponse.body)[0]
