@@ -7,6 +7,19 @@
     :cleanFormCallback="resetForm"
   >
     <template #form>
+      <InlineMessage
+        class="w-fit"
+        severity="info"
+        >Now you can easily create a Let's Encrypt™ digital certificate directly from
+        <PrimeButton
+          link
+          size="small"
+          class="p-0"
+          @click="navigateToDomains"
+        >
+          Domains
+        </PrimeButton>
+      </InlineMessage>
       <FormHorizontal
         title="General"
         description="Bring a TLS X.509 digital certificate and private key obtained
@@ -40,7 +53,7 @@
         description="description"
       >
         <template #inputs>
-          <div class="flex flex-col sm:max-w-lg w-full gap-3">
+          <div class="flex flex-col w-full gap-3">
             <Card
               :pt="{
                 body: { class: 'p-4' },
@@ -122,6 +135,9 @@
               rows="5"
               cols="30"
             />
+            <small class="text-color-secondary text-xs font-normal leading-tight"
+              >Intermediate certificates are accepted.</small
+            >
             <small
               v-if="errors.certificate"
               class="p-error text-xs font-normal leading-tight"
@@ -288,6 +304,10 @@
               rows="5"
               cols="30"
             />
+            <small class="text-color-secondary text-xs font-normal leading-tight"
+              >Separate SAN using a new line. Duplicate entries will be automatically
+              removed.</small
+            >
             <small
               v-if="errors.subjectAlternativeNames"
               class="p-error text-xs font-normal leading-tight"
@@ -313,7 +333,9 @@
               rows="5"
               cols="30"
             />
-            <small>Intermediate certificates are accepted.</small>
+            <small class="text-color-secondary text-xs font-normal leading-tight"
+              >Intermediate certificates are accepted.</small
+            >
             <small
               v-if="errors.certificate"
               class="p-error text-xs font-normal leading-tight"
@@ -331,7 +353,9 @@
   import Card from 'primevue/card'
   import RadioButton from 'primevue/radiobutton'
   import PrimeTextarea from 'primevue/textarea'
+  import PrimeButton from 'primevue/button'
   import InputText from 'primevue/inputtext'
+  import InlineMessage from 'primevue/inlinemessage'
   import FormHorizontal from '@/templates/create-form-block-new/form-horizontal'
   import { useForm, useField } from 'vee-validate'
   import * as yup from 'yup'
@@ -342,9 +366,11 @@
       CreateFormBlock,
       FormHorizontal,
       RadioButton,
+      PrimeButton,
       Card,
       PrimeTextarea,
-      InputText
+      InputText,
+      InlineMessage
     },
     props: {
       createDigitalCertificatesService: {
@@ -428,7 +454,7 @@
           digitalCertificateName: '',
 
           // Form Choices
-          certificateType: certificateTypes.TRUSTED,
+          certificateType: certificateTypes.EDGE_CERTIFICATE_UPLOAD,
 
           // Edge Certificate values
           certificate: '',
@@ -504,6 +530,11 @@
         digitalCertificateName,
         subjectAlternativeNames,
         certificateTypes
+      }
+    },
+    methods: {
+      navigateToDomains() {
+        this.$router.push({ name: 'list-domains' })
       }
     }
   }

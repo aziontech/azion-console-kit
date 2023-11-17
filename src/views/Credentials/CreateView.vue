@@ -164,21 +164,21 @@
   const generatedToken = ref(false)
 
   const toast = useToast()
-  const handleResponse = ({ message, token }) => {
+  const handleResponse = (data) => {
     toast.add({
       closable: false,
       severity: 'success',
-      summary: message,
+      summary: data.feedback,
       life: 10000
     })
-    if (token) {
-      token.value = token
+    if (data.token) {
+      token.value = data.token
       generatedToken.value = true
     }
   }
 
   const copyToken = async () => {
-    props.clipboardWrite(this.token)
+    props.clipboardWrite(token.value)
     toast.add({
       closable: false,
       severity: 'success',
