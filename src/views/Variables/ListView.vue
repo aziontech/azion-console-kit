@@ -5,6 +5,7 @@
     :deleteService="deleteVariablesService"
     :columns="getColumns"
     pageTitle="Variables"
+    pageTitleDelete="Variable"
     addButtonLabel="Variable"
     createPagePath="variables/create"
     editPagePath="variables/edit"

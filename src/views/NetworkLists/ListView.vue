@@ -5,6 +5,7 @@
     :deleteService="deleteNetworkListService"
     :columns="getColumns"
     pageTitle="Network Lists"
+    pageTitleDelete="Network List"
     addButtonLabel="Network List"
     createPagePath="network-lists/create"
     editPagePath="network-lists/edit"

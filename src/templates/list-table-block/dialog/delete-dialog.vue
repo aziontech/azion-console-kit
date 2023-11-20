@@ -3,7 +3,7 @@
     v-model:visible="deleteDialogVisible"
     modal
     :header="`Delete ${informationForDeletion.title}`"
-    class="w-[40vw]"
+    class="w-[95vw] md:w-[40vw]"
   >
     <div class="flex flex-col gap-5">
       <div>

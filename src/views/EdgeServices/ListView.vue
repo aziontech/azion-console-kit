@@ -5,6 +5,7 @@
     :deleteService="deleteEdgeServicesService"
     :columns="getColumns"
     pageTitle="Edge Services"
+    pageTitleDelete="Edge Service"
     addButtonLabel="Edge Services"
     createPagePath="edge-services/create"
     editPagePath="edge-services/edit"

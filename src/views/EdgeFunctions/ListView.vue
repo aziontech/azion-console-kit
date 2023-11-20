@@ -5,6 +5,7 @@
     :deleteService="deleteEdgeFunctionsService"
     :columns="getColumns"
     pageTitle="Edge Functions"
+    pageTitleDelete="Edge Function"
     addButtonLabel="Edge Functions"
     createPagePath="edge-functions/create"
     editPagePath="edge-functions/edit"

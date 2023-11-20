@@ -5,6 +5,7 @@
     :deleteService="deleteIntelligentDNSService"
     :columns="getColumns"
     pageTitle="Intelligent DNS"
+    pageTitleDelete="Intelligent DNS"
     addButtonLabel="Intelligent DNS"
     createPagePath="intelligent-dns/create"
     editPagePath="intelligent-dns/edit"

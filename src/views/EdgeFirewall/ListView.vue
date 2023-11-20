@@ -65,6 +65,7 @@
   <ListTableBlock
     v-if="hasContentToList"
     pageTitle="Edge Firewall"
+    pageTitleDelete="Edge Firewal"
     addButtonLabel="Edge Firewall"
     createPagePath="/edge-firewall/create"
     editPagePath="/edge-firewall/edit"

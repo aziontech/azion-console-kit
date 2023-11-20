@@ -227,6 +227,10 @@
         type: String,
         required: true
       },
+      pageTitleDelete: {
+        type: String,
+        required: true
+      },
       createPagePath: {
         type: String,
         required: true,
@@ -341,7 +345,7 @@
       },
       openDeleteDialog() {
         this.informationForDeletion = {
-          title: this.pageTitle,
+          title: this.pageTitleDelete,
           selectedID: this.selectedId,
           deleteService: this.deleteService,
           deleteDialogVisible: true,

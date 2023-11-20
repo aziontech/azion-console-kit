@@ -5,6 +5,7 @@
     :deleteService="deletePersonalTokenService"
     :columns="getColumns"
     pageTitle="Personal Tokens"
+    pageTitleDelete="Personal Token"
     addButtonLabel="Personal Token"
     createPagePath="personal-tokens/create"
     @on-load-data="handleLoadData"
