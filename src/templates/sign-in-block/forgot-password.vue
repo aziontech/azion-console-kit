@@ -1,11 +1,11 @@
 <template>
   <div>
     <div
-      class="flex flex-col align-top items-center p-4 animate-fadeIn"
+      class="flex flex-col align-top items-center animate-fadeIn"
       v-if="!emailSended"
     >
       <div
-        class="surface-card surface-border border max-w-md w-full p-6 md:p-10 rounded-md flex-col gap-10 inline-flex"
+        class="surface-card surface-border border max-w-md w-full p-6 sm:p-8 rounded-md flex-col gap-10 inline-flex"
       >
         <div class="flex flex-col gap-3">
           <div class="text-xl md:text-2xl font-medium">Reset Password</div>
@@ -48,11 +48,11 @@
     </div>
 
     <div
-      class="flex flex-col align-top items-center p-4 animate-fadeIn"
+      class="flex flex-col align-top items-center animate-fadeIn"
       v-else
     >
       <div
-        class="surface-card surface-border border max-w-md w-full p-6 md:p-10 rounded-md flex-col gap-8 inline-flex"
+        class="surface-card surface-border border max-w-md w-full p-6 sm:p-8 rounded-md flex-col gap-8 inline-flex"
       >
         <div class="flex flex-col gap-3">
           <div class="text-xl md:text-2xl font-medium">Reset Password</div>
