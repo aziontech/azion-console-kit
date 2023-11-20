@@ -32,8 +32,8 @@
           <small
             v-if="errors.email"
             class="p-error text-xs font-normal leading-tight"
-            >{{ errors.email }}</small
-          >
+            >{{ errors.email }}
+          </small>
         </div>
 
         <PrimeButton
@@ -67,8 +67,9 @@
           <PrimeButton
             link
             label="Resend Email"
-            @click="sendEmail()"
-          ></PrimeButton>
+            @click="resendEmail()"
+            :disabled="isEmailResent"
+          />
         </div>
       </div>
     </div>
@@ -82,6 +83,7 @@
   import * as yup from 'yup'
   import { useForm } from 'vee-validate'
   import { ref } from 'vue'
+  import { useToast } from 'primevue/usetoast'
 
   const emailSended = ref(false)
   const isSendingEmailLoading = ref(false)
@@ -110,14 +112,37 @@
     }
   })
 
+  const toast = useToast()
+
   const sendEmail = async () => {
     try {
       isSendingEmailLoading.value = true
-      await props.sendResetPasswordEmailService(values)
+      const res = await props.sendResetPasswordEmailService(values)
+      toast.add({ life: 5000, severity: 'success', detail: res, summary: 'Email sent' })
       emailSended.value = true
+    } catch (err) {
+      toast.add({ life: 5000, severity: 'error', detail: err, summary: 'Error' })
     } finally {
       isSendingEmailLoading.value = false
     }
+  }
+
+  const resendEmail = async () => {
+    disableSubmitByTimer(5000)
+    try {
+      const res = await props.sendResetPasswordEmailService(values)
+      toast.add({ life: 5000, severity: 'success', detail: res, summary: 'Email sent' })
+    } catch (err) {
+      toast.add({ life: 5000, severity: 'error', detail: err, summary: 'Error' })
+    }
+  }
+
+  const isEmailResent = ref(false)
+  const disableSubmitByTimer = (t) => {
+    isEmailResent.value = true
+    setTimeout(() => {
+      isEmailResent.value = false
+    }, t)
   }
 
   defineExpose({
