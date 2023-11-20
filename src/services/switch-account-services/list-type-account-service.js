@@ -1,6 +1,6 @@
 import { AxiosHttpClientAdapter, parseHttpResponse } from '../axios/AxiosHttpClientAdapter'
 import { makeSwitchAccountBaseUrl } from '@/services/auth-services/make-switch-account-base-url'
-import { getAccountTypeIcon, getAccountTypeName } from '@/helpers/accountTypeNameMapping.js'
+import { getAccountTypeIcon, getAccountTypeName } from '@/helpers/account-type-name-mapping.js'
 
 export const listTypeAccountService = async ({
   type = 'brands',

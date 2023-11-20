@@ -1,4 +1,4 @@
-import { getAccountTypeIcon, getAccountTypeName } from '@/helpers/accountTypeNameMapping'
+import { getAccountTypeIcon, getAccountTypeName } from '@/helpers/account-type-name-mapping'
 import { describe, expect, it } from 'vitest'
 
 const makeSut = () => {
