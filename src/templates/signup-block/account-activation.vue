@@ -16,7 +16,7 @@
           class="p-0"
           link
           @click="resendEmail"
-          :disabled="!isEmailValid"
+          :disabled="!isEmailValid || isRequested"
         />
       </section>
       <PrimeButton
@@ -61,10 +61,12 @@
     toast.add({ life: 5000, severity: 'error', detail: 'Invalid email format', summary: 'Error' })
   }
 
+  const isRequested = ref(false)
   const resendEmail = async () => {
     try {
       const res = await props.resendEmailService({ email: decodedEmail })
       toast.add({ life: 5000, severity: 'success', detail: res, summary: 'Email sent' })
+      isRequested.value = true
     } catch (err) {
       toast.add({ life: 5000, severity: 'error', detail: err, summary: 'Error' })
     }
