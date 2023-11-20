@@ -2,6 +2,7 @@
   import ListTableBlock from '@/templates/list-table-block'
   import EmptyResultsBlock from '@/templates/empty-results-block'
   import Illustration from '@/assets/svg/illustration-layers.vue'
+  import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
 
   export default {
     name: 'data-streaming-view',
@@ -43,8 +44,18 @@
             header: 'Template'
           },
           {
+            field: 'endpointType',
+            header: 'Endpoint Type'
+          },
+          {
             field: 'active',
-            header: 'Active'
+            header: 'Active',
+            type: 'component',
+            component: (columnData) =>
+              columnBuilder({
+                data: columnData,
+                columnAppearance: 'tag'
+              })
           }
         ]
       }
