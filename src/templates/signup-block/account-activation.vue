@@ -61,15 +61,22 @@
     toast.add({ life: 5000, severity: 'error', detail: 'Invalid email format', summary: 'Error' })
   }
 
-  const isRequested = ref(false)
   const resendEmail = async () => {
+    disableSubmitByTimer(5000)
     try {
       const res = await props.resendEmailService({ email: decodedEmail })
       toast.add({ life: 5000, severity: 'success', detail: res, summary: 'Email sent' })
-      isRequested.value = true
     } catch (err) {
       toast.add({ life: 5000, severity: 'error', detail: err, summary: 'Error' })
     }
+  }
+
+  const isRequested = ref(false)
+  const disableSubmitByTimer = (t) => {
+    isRequested.value = true
+    setTimeout(() => {
+      isRequested.value = false
+    }, t)
   }
 
   const goToLogin = () => {
