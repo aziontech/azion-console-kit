@@ -22,9 +22,7 @@
       </InlineMessage>
       <FormHorizontal
         title="General"
-        description="Bring a TLS X.509 digital certificate and private key obtained
-        from a certificate authority or a Trusted CA for mTLS authentication.
-        As an alternative, generate a Certificate Signing Request (CSR) with Azion and submit it to a certificate authority."
+        description="Description"
       >
         <template #inputs>
           <div class="flex flex-col sm:max-w-lg w-full gap-2">
@@ -50,7 +48,9 @@
       </FormHorizontal>
       <FormHorizontal
         title="Certificate Type"
-        description="description"
+        description="Bring a TLS X.509 digital certificate and private key obtained
+        from a certificate authority or a Trusted CA for mTLS authentication.
+        As an alternative, generate a Certificate Signing Request (CSR) with Azion and submit it to a certificate authority."
       >
         <template #inputs>
           <div class="flex flex-col w-full gap-3">

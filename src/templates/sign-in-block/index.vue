@@ -5,11 +5,11 @@
   >
     <!-- Email step -->
     <div
-      class="flex flex-col align-top items-center p-4 animate-fadeIn max-sm:px-3 max-sm:py-6"
+      class="flex flex-col align-top items-center animate-fadeIn"
       v-if="!showPassword"
     >
       <div
-        class="surface-card surface-border border max-w-md w-full p-6 md:p-10 rounded-md flex-col gap-6 flex"
+        class="surface-card surface-border border max-w-md w-full p-6 sm:p-8 rounded-md flex-col gap-6 flex"
       >
         <div
           data-testid="title"
@@ -88,10 +88,10 @@
     <!-- Password step -->
     <div
       v-else
-      class="flex flex-col align-top items-center p-4 animate-fadeIn"
+      class="flex flex-col align-top items-center animate-fadeIn"
     >
       <div
-        class="surface-card surface-border border max-w-md w-full p-6 md:p-10 rounded-md flex-col gap-6 flex"
+        class="surface-card surface-border border max-w-md w-full p-6 sm:p-8 rounded-md flex-col gap-6 flex"
       >
         <div class="text-xl md:text-2xl font-medium">Real-Time Manager</div>
         <div class="flex items-center gap-2">
