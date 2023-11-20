@@ -29,6 +29,11 @@
             :class="{ 'p-invalid': errors.email }"
             v-tooltip.top="{ value: errors.email, showDelay: 200 }"
           />
+          <small
+            v-if="errors.email"
+            class="p-error text-xs font-normal leading-tight"
+            >{{ errors.email }}</small
+          >
         </div>
 
         <PrimeButton
