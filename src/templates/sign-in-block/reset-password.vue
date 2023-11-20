@@ -5,7 +5,7 @@
         v-if="!isPasswordReseted"
         class="surface-card surface-border border max-w-md w-full p-6 md:p-10 rounded-md flex-col gap-10 inline-flex"
       >
-        <div class="text-xl md:text-2xl font-medium">Reset Password</div>
+        <h2 class="text-xl md:text-2xl font-medium">Reset Password</h2>
 
         <InlineMessage v-if="requestError">{{ requestError }}</InlineMessage>
 
@@ -28,6 +28,7 @@
           </div>
 
           <ul class="text-color-secondary list-inside space-y-3">
+            <span class="font-semibold text-sm text-color">Must have at least:</span>
             <li
               class="flex gap-3 items-center text-color-secondary"
               :key="i"
@@ -123,7 +124,6 @@
   const errorConfirmation = ref('')
   const requestError = ref('')
   const passwordRequirementsList = ref([
-    { label: 'Must have at least:', valid: false },
     { label: '> 7 characters', valid: false },
     { label: '1 uppercase letter', valid: false },
     { label: '1 lowercase letter', valid: false },
