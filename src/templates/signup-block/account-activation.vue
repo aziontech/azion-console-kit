@@ -16,7 +16,7 @@
           class="p-0"
           link
           @click="resendEmail"
-          :disabled="!isEmailValid"
+          :disabled="isSubmitDisabled"
         />
       </section>
       <PrimeButton
@@ -31,7 +31,7 @@
 <script setup>
   import PrimeButton from 'primevue/button'
   import { useToast } from 'primevue/usetoast'
-  import { ref } from 'vue'
+  import { computed, ref } from 'vue'
   import { useRoute, useRouter } from 'vue-router'
 
   const props = defineProps({
@@ -62,6 +62,7 @@
   }
 
   const resendEmail = async () => {
+    disableSubmitByTimer(5000)
     try {
       const res = await props.resendEmailService({ email: decodedEmail })
       toast.add({ life: 5000, severity: 'success', detail: res, summary: 'Email sent' })
@@ -69,6 +70,18 @@
       toast.add({ life: 5000, severity: 'error', detail: err, summary: 'Error' })
     }
   }
+
+  const isRequested = ref(false)
+  const disableSubmitByTimer = (timeInMs) => {
+    isRequested.value = true
+    setTimeout(() => {
+      isRequested.value = false
+    }, timeInMs)
+  }
+
+  const isSubmitDisabled = computed(() => {
+    return !isEmailValid.value || isRequested.value
+  })
 
   const goToLogin = () => {
     router.push({ name: 'login' })
