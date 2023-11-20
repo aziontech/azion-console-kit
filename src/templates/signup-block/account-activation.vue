@@ -9,7 +9,7 @@
           Verify your account by clicking the link in the confirmation email we just sent you.
         </p>
       </section>
-      <section class="w-full flex gap-2">
+      <section class="w-full flex flex-wrap gap-2">
         <p class="text-start">Didn't receive the email?</p>
         <PrimeButton
           label="Resend email"
@@ -17,6 +17,12 @@
           link
           @click="resendEmail"
           :disabled="isSubmitDisabled"
+        />
+        <PrimeBadge
+          class="rounded-xl px-1 animate-fadeIn"
+          :value="counter"
+          severity="info"
+          v-if="counter > 0"
         />
       </section>
       <PrimeButton
@@ -30,9 +36,12 @@
 
 <script setup>
   import PrimeButton from 'primevue/button'
+  import PrimeBadge from 'primevue/badge'
   import { useToast } from 'primevue/usetoast'
   import { computed, ref } from 'vue'
   import { useRoute, useRouter } from 'vue-router'
+
+  const SUBMIT_TIMER = 60
 
   const props = defineProps({
     resendEmailService: {
@@ -62,7 +71,7 @@
   }
 
   const resendEmail = async () => {
-    disableSubmitByTimer(5000)
+    disableSubmitByTimer(SUBMIT_TIMER)
     try {
       const res = await props.resendEmailService({ email: decodedEmail })
       toast.add({ life: 5000, severity: 'success', detail: res, summary: 'Email sent' })
@@ -72,11 +81,17 @@
   }
 
   const isRequested = ref(false)
-  const disableSubmitByTimer = (timeInMs) => {
+  const counter = ref(0)
+  const countdown = () => counter.value--
+
+  const disableSubmitByTimer = (timeInSec) => {
     isRequested.value = true
+    counter.value = timeInSec
+    const interval = setInterval(countdown, 1000)
     setTimeout(() => {
       isRequested.value = false
-    }, timeInMs)
+      clearInterval(interval)
+    }, timeInSec * 1000)
   }
 
   const isSubmitDisabled = computed(() => {

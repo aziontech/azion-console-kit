@@ -62,13 +62,20 @@
           </p>
         </div>
 
-        <div class="flex flex-wrap items-center">
-          <div>Didn't receive the email?</div>
+        <div class="w-full flex flex-wrap gap-2">
+          <p class="text-start">Didn't receive the email?</p>
           <PrimeButton
+            class="p-0"
             link
             label="Resend Email"
             @click="resendEmail()"
             :disabled="isEmailResent"
+          />
+          <PrimeBadge
+            class="rounded-xl px-1 animate-fadeIn"
+            :value="counter"
+            severity="info"
+            v-if="counter > 0"
           />
         </div>
       </div>
@@ -79,11 +86,14 @@
 <script setup>
   import InputText from 'primevue/inputtext'
   import PrimeButton from 'primevue/button'
+  import PrimeBadge from 'primevue/badge'
 
   import * as yup from 'yup'
   import { useForm } from 'vee-validate'
   import { ref } from 'vue'
   import { useToast } from 'primevue/usetoast'
+
+  const SUBMIT_TIMER = 60
 
   const emailSended = ref(false)
   const isSendingEmailLoading = ref(false)
@@ -128,7 +138,7 @@
   }
 
   const resendEmail = async () => {
-    disableSubmitByTimer(5000)
+    disableSubmitByTimer(SUBMIT_TIMER)
     try {
       const res = await props.sendResetPasswordEmailService(values)
       toast.add({ life: 5000, severity: 'success', detail: res, summary: 'Email sent' })
@@ -138,11 +148,17 @@
   }
 
   const isEmailResent = ref(false)
-  const disableSubmitByTimer = (timeInMs) => {
+  const counter = ref(0)
+  const countdown = () => counter.value--
+
+  const disableSubmitByTimer = (timeInSec) => {
     isEmailResent.value = true
+    counter.value = timeInSec
+    const interval = setInterval(countdown, 1000)
     setTimeout(() => {
       isEmailResent.value = false
-    }, timeInMs)
+      clearInterval(interval)
+    }, timeInSec * 1000)
   }
 
   defineExpose({
