@@ -12,7 +12,8 @@ export const mfaRoutes = {
       component: () => import('@views/MultifactorAuthentication/QRCodeView.vue'),
       props: {
         generateQrCodeMfaService: MfaServices.generateQrCodeMfaService,
-        validateMfaCodeService: MfaServices.validateMfaCodeService
+        validateMfaCodeService: MfaServices.validateMfaCodeService,
+        verifyAuthenticationService: AuthServices.verifyAuthenticationService
       },
       meta: {
         isPublic: true,
@@ -25,8 +26,7 @@ export const mfaRoutes = {
       component: () => import('@views/MultifactorAuthentication/AuthenticateView.vue'),
       props: {
         validateMfaCodeService: MfaServices.validateMfaCodeService,
-        verifyAuthenticationService: AuthServices.verifyAuthenticationService,
-        switchAccountService: AuthServices.switchAccountService
+        verifyAuthenticationService: AuthServices.verifyAuthenticationService
       },
       meta: {
         isPublic: true,

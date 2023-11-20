@@ -2,7 +2,6 @@
   <MfaAuthenticateBlock
     :validateMfaCodeService="validateMfaCodeService"
     :verifyAuthenticationService="verifyAuthenticationService"
-    :switchAccountService="switchAccountService"
   />
 </template>
 
@@ -15,10 +14,6 @@
       type: Function
     },
     verifyAuthenticationService: {
-      required: true,
-      type: Function
-    },
-    switchAccountService: {
       required: true,
       type: Function
     }

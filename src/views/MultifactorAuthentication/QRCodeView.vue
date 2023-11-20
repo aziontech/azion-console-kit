@@ -2,6 +2,7 @@
   <MfaSetupBlock
     :validateMfaCodeService="validateMfaCodeService"
     :generateQrCodeMfaService="generateQrCodeMfaService"
+    :verifyAuthenticationService="verifyAuthenticationService"
   />
 </template>
 
@@ -14,6 +15,10 @@
       type: Function
     },
     validateMfaCodeService: {
+      required: true,
+      type: Function
+    },
+    verifyAuthenticationService: {
       required: true,
       type: Function
     }

@@ -6,8 +6,6 @@
       :authenticationLoginService="authenticationLoginService"
       :verifyLoginService="verifyLoginService"
       :refreshLoginService="refreshLoginService"
-      :switchAccountLoginService="switchAccountLoginService"
-      :listTypeAccountService="listTypeAccountService"
     />
 
     <ForgotPassword
@@ -39,15 +37,7 @@
         required: true,
         type: Function
       },
-      switchAccountLoginService: {
-        required: true,
-        type: Function
-      },
       sendResetPasswordEmailService: {
-        required: true,
-        type: Function
-      },
-      listTypeAccountService: {
         required: true,
         type: Function
       }

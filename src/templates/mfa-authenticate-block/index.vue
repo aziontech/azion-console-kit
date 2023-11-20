@@ -20,6 +20,7 @@
             <InputText
               v-for="(digits, i) in digitsMfa"
               :key="i"
+              :disabled="isButtonLoading"
               class="grow w-7 sm:w-11 h-[2.6rem] text-lg text-center"
               v-model="digits.value.value"
               @input="moveFocus(i)"
@@ -60,6 +61,7 @@
   import { ref } from 'vue'
   import { useRouter } from 'vue-router'
   import { UserIsNotClientError, ProccessRequestError } from '@/services/axios/errors'
+  import { switchAccountLogin } from '@/helpers/handle-switch-account'
 
   const props = defineProps({
     validateMfaCodeService: {
@@ -67,10 +69,6 @@
       type: Function
     },
     verifyAuthenticationService: {
-      required: true,
-      type: Function
-    },
-    switchAccountService: {
       required: true,
       type: Function
     }
@@ -134,7 +132,7 @@
       await props.validateMfaCodeService(mfaToken)
 
       const { user_tracking_info: userInfo } = await verifyUserData()
-      await switchClientAccount(userInfo)
+      await switchClientAccount(userInfo.props.account_id)
     } catch (error) {
       hasRequestErrorMessage.value = error
     } finally {
@@ -150,13 +148,10 @@
     }
   }
 
-  const switchClientAccount = async (userInfo) => {
-    let clientId
+  const switchClientAccount = async (clientId) => {
     try {
-      const { account_id: accountId, client_id } = userInfo.props
-      clientId = client_id
-      await props.switchAccountService(accountId)
-      router.push({ name: 'home' })
+      const redirect = await switchAccountLogin(clientId)
+      router.push(redirect)
     } catch {
       hasRequestErrorMessage.value = clientId
         ? new ProccessRequestError().message
