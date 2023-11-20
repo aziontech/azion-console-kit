@@ -16,7 +16,7 @@
           class="p-0"
           link
           @click="resendEmail"
-          :disabled="!isEmailValid || isRequested"
+          :disabled="isSubmitDisabled"
         />
       </section>
       <PrimeButton
@@ -31,7 +31,7 @@
 <script setup>
   import PrimeButton from 'primevue/button'
   import { useToast } from 'primevue/usetoast'
-  import { ref } from 'vue'
+  import { computed, ref } from 'vue'
   import { useRoute, useRouter } from 'vue-router'
 
   const props = defineProps({
@@ -78,6 +78,10 @@
       isRequested.value = false
     }, t)
   }
+
+  const isSubmitDisabled = computed(() => {
+    return !isEmailValid.value || isRequested.value
+  })
 
   const goToLogin = () => {
     router.push({ name: 'login' })
