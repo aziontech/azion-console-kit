@@ -5,7 +5,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { localeMock } from '@/tests/utils/localeMock'
 
 const fixtures = {
-  domainMock: {
+  certificateMock: {
     id: 1,
     name: 'Certificate 1',
     issuer: 'Issuer 1',
@@ -14,7 +14,16 @@ const fixtures = {
     validity: new Date(2023, 10, 10),
     status: 'active'
   },
-  domainWithMissedValuesMock: {
+  trustedCertificateMock: {
+    id: 3,
+    name: 'Certificate 3',
+    issuer: 'Issuer 3',
+    subject_name: ['Subject 1', 'Subject 2'],
+    certificate_type: 'trusted_ca_certificate',
+    validity: new Date(2023, 10, 10),
+    status: 'active'
+  },
+  certificateWithMissingData: {
     id: 2,
     name: 'Certificate 2',
     subject_name: [],
@@ -60,7 +69,13 @@ describe('DigitalCertificatesServices', () => {
     vi.setSystemTime(new Date(2023, 10, 10, 10))
     vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
       statusCode: 200,
-      body: { results: [fixtures.domainMock, fixtures.domainWithMissedValuesMock] }
+      body: {
+        results: [
+          fixtures.certificateMock,
+          fixtures.certificateWithMissingData,
+          fixtures.trustedCertificateMock
+        ]
+      }
     })
     const { sut } = makeSut()
 
@@ -68,12 +83,12 @@ describe('DigitalCertificatesServices', () => {
     const [parsedDomain, parsedDomainMissingValues] = result
 
     expect(parsedDomain).toEqual({
-      id: fixtures.domainMock.id,
-      name: fixtures.domainMock.name,
-      issuer: fixtures.domainMock.issuer,
+      id: fixtures.certificateMock.id,
+      name: fixtures.certificateMock.name,
+      issuer: fixtures.certificateMock.issuer,
       type: 'Edge Certificate',
       subjectName: 'Subject 1,Subject 2',
-      validity: 'Friday, November 10, 2023 at 12:00 AM',
+      validity: 'Nov 10, 2023, 12:00 AM',
       status: {
         content: 'Active',
         severity: 'success'
@@ -90,6 +105,61 @@ describe('DigitalCertificatesServices', () => {
       subjectName: '-',
       type: '-',
       validity: '-'
+    })
+    it('should parse correctly each returned item', async () => {
+      localeMock()
+      vi.setSystemTime(new Date(2023, 10, 10, 10))
+      vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
+        statusCode: 200,
+        body: {
+          results: [
+            fixtures.certificateMock,
+            fixtures.certificateWithMissingData,
+            fixtures.trustedCertificateMock
+          ]
+        }
+      })
+      const { sut } = makeSut()
+
+      const result = await sut({})
+      const [parsedDomain, parsedDomainMissingValues, trustedCertificate] = result
+
+      expect(parsedDomain).toEqual({
+        id: fixtures.certificateMock.id,
+        name: fixtures.certificateMock.name,
+        issuer: fixtures.certificateMock.issuer,
+        type: 'Edge Certificate',
+        subjectName: 'Subject 1,Subject 2',
+        validity: 'Nov 10, 2023, 12:00 AM',
+        status: {
+          content: 'Active',
+          severity: 'success'
+        }
+      })
+      expect(parsedDomainMissingValues).toEqual({
+        id: 2,
+        issuer: '-',
+        name: 'Certificate 2',
+        status: {
+          content: 'Inactive',
+          severity: 'danger'
+        },
+        subjectName: '-',
+        type: '-',
+        validity: '-'
+      })
+      expect(trustedCertificate).toEqual({
+        id: fixtures.trustedCertificate.id,
+        name: fixtures.trustedCertificate.name,
+        issuer: fixtures.trustedCertificate.issuer,
+        type: 'Trusted CA Certificate',
+        subjectName: 'Subject 1,Subject 2',
+        validity: 'Nov 10, 2023, 12:00 AM',
+        status: {
+          content: 'Active',
+          severity: 'success'
+        }
+      })
     })
   })
 

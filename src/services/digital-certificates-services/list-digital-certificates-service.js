@@ -35,13 +35,27 @@ const parseStatusData = (status) => {
 
   return parsedStatus
 }
+const parseValidityDate = (validity) => {
+  const formatOptions = {
+    month: 'short',
+    day: 'numeric',
+    year: 'numeric',
+    hour: 'numeric',
+    minute: 'numeric',
+    hour12: true
+  }
+
+  const dateFormatted = new Intl.DateTimeFormat('en-US', formatOptions).format(new Date(validity))
+
+  return dateFormatted
+}
 
 const adapt = (httpResponse) => {
   const parsedDomains = httpResponse.body.results?.map((item) => {
     const subjectNames = item.subject_name.map((subject) => subject)?.join(',')
     const typeMap = {
       edge_certificate: EDGE_CERTIFICATE,
-      trusted_ca: TRUSTED_CA_CERTIFICATE
+      trusted_ca_certificate: TRUSTED_CA_CERTIFICATE
     }
     return {
       id: item.id,
@@ -49,13 +63,7 @@ const adapt = (httpResponse) => {
       issuer: item.issuer || '-',
       subjectName: subjectNames === '' ? '-' : subjectNames,
       type: typeMap[item.certificate_type] || '-',
-      validity:
-        item.validity === null
-          ? '-'
-          : new Intl.DateTimeFormat('us', {
-              dateStyle: 'full',
-              timeStyle: 'short'
-            }).format(new Date(item.validity)),
+      validity: item.validity === null ? '-' : parseValidityDate(item.validity),
       status: parseStatusData(item.status)
     }
   })
