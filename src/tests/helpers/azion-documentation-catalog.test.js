@@ -192,4 +192,25 @@ describe('AzionDocumentationCatalog', () => {
       `https://www.azion.com/en/search-result/?q=users&filter=doc`
     )
   })
+
+  it('should open activity history documentation with correct link', () => {
+    const openWindowSpy = vi.spyOn(window, 'open')
+    const { sut } = makeSut()
+
+    sut.activityHistory()
+
+    expect(openWindowSpy).toHaveBeenCalledWith(
+      `https://www.azion.com/en/search-result/?q=activity history&filter=doc`
+    )
+  })
+  it('should open edge nodes documentation with correct link', () => {
+    const openWindowSpy = vi.spyOn(window, 'open')
+    const { sut } = makeSut()
+
+    sut.edgeNodes()
+
+    expect(openWindowSpy).toHaveBeenCalledWith(
+      `https://www.azion.com/en/search-result/?q=edge nodes&filter=doc`
+    )
+  })
 })
