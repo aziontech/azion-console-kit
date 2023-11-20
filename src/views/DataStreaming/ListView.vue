@@ -49,7 +49,7 @@
           },
           {
             field: 'active',
-            header: 'Active',
+            header: 'Status',
             type: 'component',
             component: (columnData) =>
               columnBuilder({
