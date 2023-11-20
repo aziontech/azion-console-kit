@@ -20,12 +20,13 @@ const adapt = (payload) => {
     template_id: payload.template,
     data_source: payload.dataSource,
     domain_ids: allDomains ? [] : getDomains(payload.domains),
-    all_domains: allDomains ? true : false,
-    endpoint: getEndpoint(payload)
+    all_domains: allDomains,
+    active: payload.status,
+    endpoint: parseByEndpointType(payload)
   }
 }
 
-const getEndpoint = (payload) => {
+const parseByEndpointType = (payload) => {
   switch (payload.endpoint) {
     case 'standard':
       return {

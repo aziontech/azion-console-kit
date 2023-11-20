@@ -7,9 +7,11 @@
     :cleanFormCallback="resetForm"
   >
     <template #form>
-      <FormHorizontal title="Data">
+      <FormHorizontal
+        title="General"
+        description="description"
+      >
         <template #inputs>
-          <!-- data-source -->
           <div class="flex flex-col sm:max-w-lg w-full gap-2">
             <label
               for="name"
@@ -19,7 +21,6 @@
             <InputText
               v-model="name"
               type="text"
-              placeholder="Name for Data Streaming"
               :class="{ 'p-invalid': errors.name }"
             />
             <small
@@ -28,37 +29,54 @@
               >{{ errors.name }}</small
             >
           </div>
+        </template>
+      </FormHorizontal>
 
-          <div class="flex flex-col w-full sm:max-w-xs gap-2">
-            <label
-              for="dataSource"
-              class="text-color text-base font-medium"
-              >Data Source *</label
-            >
-            <Dropdown
-              :class="{ 'p-invalid': errors.dataSource }"
-              v-model="dataSource"
-              :options="listDataSources"
-              optionLabel="label"
-              optionValue="value"
-              class="w-full"
-            />
-          </div>
+      <FormHorizontal
+        title="Data Settings"
+        description="Description"
+      >
+        <template #inputs>
+          <div class="flex flex-wrap gap-6">
+            <div class="flex flex-col w-full sm:max-w-xs gap-2">
+              <label
+                for="dataSource"
+                class="text-color text-base font-medium"
+                >Data Source *</label
+              >
+              <Dropdown
+                :class="{ 'p-invalid': errors.dataSource }"
+                v-model="dataSource"
+                :options="listDataSources"
+                optionLabel="label"
+                optionValue="value"
+                class="w-full"
+              />
+              <small class="text-color-secondary text-xs font-normal leading-tight">
+                Data Source is the Azion Platform that generates the events from where you want to
+                collect data.
+              </small>
+            </div>
 
-          <div class="flex flex-col w-full sm:max-w-xs gap-2">
-            <label
-              for="template"
-              class="text-color text-base font-medium"
-              >Template *</label
-            >
-            <Dropdown
-              :class="{ 'p-invalid': errors.template }"
-              v-model="template"
-              :options="listTemplates"
-              optionLabel="label"
-              optionValue="value"
-              class="w-full"
-            />
+            <div class="flex flex-col w-full sm:max-w-xs gap-2">
+              <label
+                for="template"
+                class="text-color text-base font-medium"
+                >Template *</label
+              >
+              <Dropdown
+                :class="{ 'p-invalid': errors.template }"
+                v-model="template"
+                :options="listTemplates"
+                optionLabel="label"
+                optionValue="value"
+                class="w-full"
+              />
+              <small class="text-color-secondary text-xs font-normal leading-tight">
+                You can use a preset of data, or you can customize the format by choosing the Custom
+                Template.
+              </small>
+            </div>
           </div>
 
           <div class="flex flex-col gap-2">
@@ -74,9 +92,18 @@
               :options="optionsMonacoEditor"
               class="min-h-[100px]"
             />
+            <small class="text-color-secondary text-xs font-normal leading-tight">
+              Data Set is a format chosen to send the data to your endpoint. It must be a valid JSON
+              format. The requests are separated from each other by \n character.
+            </small>
           </div>
-
-          <!-- domains -->
+        </template>
+      </FormHorizontal>
+      <FormHorizontal
+        title="Domains"
+        description="Description"
+      >
+        <template #inputs>
           <div class="flex flex-col gap-2">
             <label class="text-color text-base font-medium">Options</label>
             <div class="flex flex-col gap-3">
@@ -152,6 +179,7 @@
           </div>
         </template>
       </FormHorizontal>
+
       <FormHorizontal title="Destination">
         <template #inputs>
           <div class="flex flex-col w-full sm:max-w-xs gap-2">
@@ -957,6 +985,25 @@
           </div>
         </template>
       </FormHorizontal>
+      <FormHorizontal title="Status">
+        <template #inputs>
+          <div class="flex flex-col w-full gap-2">
+            <div
+              class="flex gap-6 md:align-items-center max-sm:flex-col max-sm:align-items-baseline max-sm:gap-3"
+            >
+              <span class="p-input-icon-right w-full flex max-w-lg items-start gap-2 pb-3 pt-2">
+                <InputSwitch
+                  v-model="status"
+                  id="active"
+                />
+                <div class="flex-col gap-1">
+                  <div class="text-color text-sm font-normal leading-5">Active</div>
+                </div>
+              </span>
+            </div>
+          </div>
+        </template>
+      </FormHorizontal>
     </template>
   </CreateFormBlock>
 </template>
@@ -975,6 +1022,7 @@
   import RadioButton from 'primevue/radiobutton'
   import PickList from 'primevue/picklist'
   import InputText from 'primevue/inputtext'
+  import InputSwitch from 'primevue/inputswitch'
   import ButtonPrimer from 'primevue/button'
   import InputNumber from 'primevue/inputnumber'
   import Textarea from 'primevue/textarea'
@@ -1030,6 +1078,7 @@
     dataSet: yup.string(),
     domainOption: yup.string().required(),
     endpoint: yup.string().required(),
+    status: yup.boolean(),
 
     // standard
     endpointUrl: yup.string().when('endpoint', {
@@ -1195,7 +1244,7 @@
   })
 
   // Form e VeeValidate
-  const { errors, /*defineInputBinds,*/ meta, resetForm, values } = useForm({
+  const { errors, meta, resetForm, values } = useForm({
     validationSchema,
     initialValues: {
       name: '',
@@ -1205,6 +1254,7 @@
       domainOption: '1',
       domains: [],
       endpoint: '',
+      status: true,
 
       // standard
       endpointUrl: '',
@@ -1274,6 +1324,7 @@
   const { value: domainOption } = useField('domainOption')
   const { value: domains } = useField('domains')
   const { value: endpoint } = useField('endpoint')
+  const { value: status } = useField('status')
 
   // standard
   const { value: endpointUrl } = useField('endpointUrl')
