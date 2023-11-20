@@ -5,6 +5,7 @@
     :deleteService="deleteDigitalCertificatesService"
     :columns="getColumns"
     pageTitle="Digital Certificates"
+    pageTitleDelete="Digital Certificate"
     editPagePath="digital-certificates/edit"
     addButtonLabel="Digital Certificates"
     createPagePath="digital-certificates/create"

@@ -69,6 +69,7 @@
   <ListTableBlock
     v-if="hasContentToList"
     pageTitle="Edge Applications"
+    pageTitleDelete="Edge Application"
     addButtonLabel="Edge Application"
     createPagePath="/edge-applications/create"
     editPagePath="/edge-applications/edit"

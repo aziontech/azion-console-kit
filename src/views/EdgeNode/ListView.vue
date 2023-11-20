@@ -7,6 +7,7 @@
       :deleteService="deleteEdgeNodeService"
       @authorizeEdgeNode="authorize = $event.authorize"
       pageTitle="Edge Nodes"
+      pageTitleDelete="Edge Node"
       addButtonLabel=""
       editPagePath="edge-node/edit"
       @on-load-data="handleLoadData"

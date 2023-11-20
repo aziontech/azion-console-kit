@@ -2,6 +2,7 @@
   <ListTableBlock
     v-if="hasContentToList"
     pageTitle="Domains"
+    pageTitleDelete="Domain"
     addButtonLabel="Domains"
     createPagePath="domains/create"
     editPagePath="domains/edit"

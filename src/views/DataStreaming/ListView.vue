@@ -61,6 +61,7 @@
   <ListTableBlock
     v-if="hasContentToList"
     pageTitle="Data Streaming"
+    pageTitleDelete="Data Streaming"
     addButtonLabel="Data Streaming"
     createPagePath="/data-streaming/create"
     editPagePath="/data-streaming/edit"

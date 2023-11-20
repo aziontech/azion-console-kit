@@ -4,6 +4,7 @@
     :listService="pros.listRealTimePurgeService"
     :columns="getColumns"
     pageTitle="Real-Time Purge"
+    pageTitleDelete="Real-Time Purge"
     addButtonLabel="Real-Time Purge"
     createPagePath="real-time-purge/create"
     editPagePath="real-time-purge/edit"

@@ -202,6 +202,7 @@
           >
             <ListTableBlock
               pageTitle="Services List"
+              pageTitleDelete="Service"
               addButtonLabel="Add Service"
               :listService="listServiceEdgeNode"
               :columns="state.servicesListColumns"

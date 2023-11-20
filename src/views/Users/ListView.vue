@@ -6,6 +6,7 @@
       :deleteService="deleteUsersService"
       :columns="getColumns"
       pageTitle="Users"
+      pageTitleDelete="User"
       addButtonLabel="Users"
       createPagePath="users/create"
       editPagePath="users/edit"

@@ -5,6 +5,7 @@
     :deleteService="pros.deleteTeamPermissionService"
     :columns="getColumns"
     pageTitle="Teams Permissions"
+    pageTitleDelete="Team Permission"
     addButtonLabel="Team Permissions"
     createPagePath="teams-permission/create"
     editPagePath="teams-permission/edit"
