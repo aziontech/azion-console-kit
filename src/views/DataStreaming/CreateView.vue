@@ -105,47 +105,28 @@
       >
         <template #inputs>
           <div class="flex flex-col gap-2">
-            <label class="text-color text-base font-medium">Options</label>
+            <label class="text-color text-sm font-medium leading-tight">Option</label>
             <div class="flex flex-col gap-3">
-              <Card
-                :pt="{
-                  body: { class: 'p-4' },
-                  title: { class: 'flex justify-between  text-base m-0 font-medium' },
-                  subtitle: {
-                    class: 'text-sm font-normal text-color-secondary m-0 pr-0 md:pr-[2.5rem]'
-                  }
-                }"
-              >
-                <template #title>
-                  <span class="text-base">Filter Domains</span>
-                  <RadioButton
-                    v-model="domainOption"
-                    inputId="filter-domain"
-                    name="filter domain"
-                    value="0"
-                  />
-                </template>
-              </Card>
-
-              <Card
-                :pt="{
-                  body: { class: 'p-4' },
-                  title: { class: 'flex justify-between  text-base m-0 font-medium' },
-                  subtitle: {
-                    class: 'text-sm font-normal text-color-secondary m-0 pr-0 md:pr-[2.5rem]'
-                  }
-                }"
-              >
-                <template #title>
-                  <span class="text-base">All Domains</span>
-                  <RadioButton
-                    v-model="domainOption"
-                    inputId="all-domain"
-                    name="all domain"
-                    value="1"
-                  />
-                </template>
-              </Card>
+              <div class="flex no-wrap gap-2 items-center">
+                <RadioButton
+                  v-model="domainOption"
+                  inputId="all-domain"
+                  name="all domain"
+                  value="1"
+                />
+                <label class="text-color text-sm font-normal leading-tight"
+                  >All domains and upcoming</label
+                >
+              </div>
+              <div class="flex no-wrap gap-2 items-center">
+                <RadioButton
+                  v-model="domainOption"
+                  inputId="filter-domain"
+                  name="filter domain"
+                  value="0"
+                />
+                <label class="text-color text-sm font-normal leading-tight">Filter Domains </label>
+              </div>
             </div>
           </div>
 
@@ -160,7 +141,10 @@
             >
             <PickList
               v-model="domains"
-              listStyle="height:342px"
+              :pt="{
+                sourceList: { class: ['h-80'] },
+                targetList: { class: ['h-80'] }
+              }"
               dataKey="domainID"
               breakpoint="1400px"
               :showSourceControls="false"
@@ -171,7 +155,7 @@
               <template #item="slotProps">
                 <div class="flex flex-wrap p-2 align-items-center gap-3">
                   <div class="flex-1 flex flex-column gap-2">
-                    <span class="font-bold">{{ slotProps.item.name }}</span>
+                    <span class="font-normal">{{ slotProps.item.name }}</span>
                   </div>
                 </div>
               </template>
@@ -1253,7 +1237,7 @@
       dataSet: '',
       domainOption: '1',
       domains: [],
-      endpoint: '',
+      endpoint: 'standard',
       status: true,
 
       // standard
