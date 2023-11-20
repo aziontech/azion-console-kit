@@ -9,6 +9,7 @@ const fixtures = {
     template: 4,
     dataSource: 'http',
     domains: [[], []],
+    status: true,
     endpoint: 'qradar',
     QRadarUrl: 'https://qradar-trial-abcdef.qradar.ibmcloud.com:123456'
   }
@@ -44,6 +45,7 @@ describe('DataStreamingServices', () => {
         template_id: fixtures.dataStreamingMock.template,
         data_source: fixtures.dataStreamingMock.dataSource,
         domain_ids: [],
+        active: fixtures.dataStreamingMock.status,
         all_domains: true,
         endpoint: {
           endpoint_type: fixtures.dataStreamingMock.endpoint,
