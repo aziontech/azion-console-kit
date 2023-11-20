@@ -1,6 +1,7 @@
 <template>
   <div class="w-full">
     <ListTableBlock
+      v-if="hasContentToList"
       :listService="listEdgeNodeService"
       :columns="getColumns"
       :deleteService="deleteEdgeNodeService"
@@ -8,19 +9,34 @@
       pageTitle="Edge Nodes"
       addButtonLabel=""
       editPagePath="edge-node/edit"
+      @on-load-data="handleLoadData"
     />
+    <EmptyEdgeNode
+      v-else
+      pageTitle="Edge Nodes"
+      :documentationService="documentationService"
+    >
+      <template #illustration>
+        <Illustration />
+      </template>
+    </EmptyEdgeNode>
   </div>
   <Authorize :authorize="authorize" />
 </template>
 <script>
   import ListTableBlock from '@/templates/list-table-block/with-authorize'
+  import EmptyEdgeNode from '@/templates/empty-results-block/empty-edge-node.vue'
+  import Illustration from '@/assets/svg/illustration-layers.vue'
+
   import Authorize from './Authorize'
 
   export default {
     name: 'edge-node-view',
     components: {
       ListTableBlock,
-      Authorize
+      Authorize,
+      EmptyEdgeNode,
+      Illustration
     },
     props: {
       listEdgeNodeService: {
@@ -30,11 +46,16 @@
       deleteEdgeNodeService: {
         required: true,
         type: Function
+      },
+      documentationService: {
+        required: true,
+        type: Function
       }
     },
     data() {
       return {
-        authorize: {}
+        authorize: {},
+        hasContentToList: true
       }
     },
     computed: {
@@ -57,6 +78,11 @@
             header: 'Status'
           }
         ]
+      }
+    },
+    methods: {
+      handleLoadData(event) {
+        this.hasContentToList = event
       }
     }
   }

@@ -1,5 +1,5 @@
 <template>
-  <div v-if="!hasContentToList">
+  <div v-if="hasContentToList">
     <PageHeadingBlock :pageTitle="pageTitle" />
     <ActivityHistoryBlock
       :listEventsService="listEventsService"
