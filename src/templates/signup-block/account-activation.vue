@@ -72,11 +72,11 @@
   }
 
   const isRequested = ref(false)
-  const disableSubmitByTimer = (t) => {
+  const disableSubmitByTimer = (timeInMs) => {
     isRequested.value = true
     setTimeout(() => {
       isRequested.value = false
-    }, t)
+    }, timeInMs)
   }
 
   const isSubmitDisabled = computed(() => {

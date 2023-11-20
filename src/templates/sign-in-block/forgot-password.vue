@@ -138,11 +138,11 @@
   }
 
   const isEmailResent = ref(false)
-  const disableSubmitByTimer = (t) => {
+  const disableSubmitByTimer = (timeInMs) => {
     isEmailResent.value = true
     setTimeout(() => {
       isEmailResent.value = false
-    }, t)
+    }, timeInMs)
   }
 
   defineExpose({
