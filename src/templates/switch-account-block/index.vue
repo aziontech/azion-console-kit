@@ -249,11 +249,13 @@
   }
   const onSelectedAccount = async (rowSelected) => {
     visible.value = false
-    const { first_login: firstLogin } = await switchAccountService(rowSelected.accountId)
+    const { firstLogin } = await switchAccountService(rowSelected.accountId)
+
     if (firstLogin) {
-      window.location = 'iam/additional-data'
+      window.location = '/signup/additional-data'
       return
     }
+
     window.location.replace('/')
   }
 </script>

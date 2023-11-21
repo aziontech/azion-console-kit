@@ -6,6 +6,7 @@
       :authenticationLoginService="authenticationLoginService"
       :verifyLoginService="verifyLoginService"
       :refreshLoginService="refreshLoginService"
+      :accountHandler="accountHandler"
     />
 
     <ForgotPassword
@@ -40,6 +41,10 @@
       sendResetPasswordEmailService: {
         required: true,
         type: Function
+      },
+      accountHandler: {
+        required: true,
+        type: Object
       }
     },
     data() {

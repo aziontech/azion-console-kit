@@ -169,7 +169,6 @@
   import { ref } from 'vue'
   import { useRouter } from 'vue-router'
   import { UserNotFoundError, ProccessRequestError } from '@/services/axios/errors'
-  import { switchAccountLogin } from '@/helpers/handle-switch-account'
 
   defineOptions({ name: 'signInBlock' })
 
@@ -191,6 +190,10 @@
     },
     refreshLoginService: {
       type: Function,
+      required: true
+    },
+    accountHandler: {
+      type: Object,
       required: true
     }
   })
@@ -257,7 +260,7 @@
 
   const switchClientAccount = async ({ account_id }) => {
     try {
-      const redirect = await switchAccountLogin(account_id)
+      const redirect = await props.accountHandler.switchAndReturnAccountPage(account_id)
       router.push(redirect)
     } catch {
       hasRequestErrorMessage.value = new ProccessRequestError().message

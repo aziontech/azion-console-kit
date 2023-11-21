@@ -1,32 +1,38 @@
-import { listTypeAccountService } from '@/services/switch-account-services/list-type-account-service'
-import { switchAccountService } from '@/services/auth-services/switch-account-service'
+import { AccountNotFoundError } from '@/services/axios/errors/account-not-found-error'
 
-//deprecated: method will be replaced by an api in the future
-const searchAccount = async (id) => {
-  if (id) return id
+export class AccountHandler {
+  constructor(switchAccountService, listTypeAccountService) {
+    this.switchAccountService = switchAccountService
+    this.listTypeAccountService = listTypeAccountService
+  }
 
-  const accountTypes = ['brands', 'resellers', 'groups', 'clients']
+  //deprecated: method will be replaced by an api in the future
+  async searchAccount(id) {
+    if (id) return id
 
-  for (const accountType of accountTypes) {
-    const { results: [firstResult] = [] } = await listTypeAccountService({
-      type: accountType,
-      page_size: 1
-    })
+    const accountTypes = ['brands', 'resellers', 'groups', 'clients']
 
-    if (firstResult && firstResult.accountId) {
-      return firstResult.accountId
+    for (const accountType of accountTypes) {
+      const { results: [firstResult] = [] } = await this.listTypeAccountService({
+        type: accountType,
+        pageSize: 1
+      })
+
+      if (firstResult && firstResult.accountId) {
+        return firstResult.accountId
+      }
     }
-  }
-  
-  throw new Error('No account found')
-}
 
-export const switchAccountLogin = async (clientId) => {
-  const accountId = await searchAccount(clientId)
-
-  const { first_login: firstLogin } = await switchAccountService(accountId)
-  if (firstLogin) {
-    return { name: 'additional-data' }
+    throw new AccountNotFoundError().message
   }
-  return { name: 'home' }
+
+  async switchAndReturnAccountPage(clientId) {
+    const accountId = await this.searchAccount(clientId)
+
+    const { firstLogin } = await this.switchAccountService(accountId)
+    if (firstLogin) {
+      return { name: 'additional-data' }
+    }
+    return { name: 'home' }
+  }
 }

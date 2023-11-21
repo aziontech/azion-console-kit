@@ -1,10 +1,12 @@
-import * as exportSwitchAccount from '@/services/auth-services/switch-account-service'
-import * as exportListAccount from '@/services/switch-account-services/list-type-account-service'
-import { switchAccountLogin } from '@/helpers/handle-switch-account'
+import { AccountHandler } from '@/helpers/handle-switch-account'
+import { AccountNotFoundError } from '@/services/axios/errors/account-not-found-error'
 import { describe, expect, it, vi } from 'vitest'
 
-const makeSut = () => {
-  const sut = switchAccountLogin
+const makeSut = ({ accountId, firstLogin }) => {
+  const mockSwitch = vi.fn().mockResolvedValueOnce({ firstLogin })
+  const listService = vi.fn().mockResolvedValue({ results: [{ accountId }] })
+
+  const sut = new AccountHandler(mockSwitch, listService)
 
   return {
     sut
@@ -13,103 +15,42 @@ const makeSut = () => {
 
 describe('HandleSwitchAccount', () => {
   it('should return additional-data if firstLogin is true', async () => {
-    const { sut } = makeSut()
-    const accountId = 'mockedAccountId'
-    const mockSwitchAccountService = vi
-      .spyOn(exportSwitchAccount, 'switchAccountService')
-      .mockResolvedValueOnce({
-        first_login: true
-      })
+    const { sut } = makeSut({ accountId: '1', firstLogin: true })
 
-    const result = await sut(accountId)
+    const result = await sut.switchAndReturnAccountPage('1')
 
     expect(result).toEqual({ name: 'additional-data' })
-    expect(mockSwitchAccountService).toHaveBeenCalledWith(accountId)
   })
 
   it('should return home if firstLogin is false', async () => {
-    const { sut } = makeSut()
-    const accountId = 'mockedAccountId'
-    const mockSwitchAccountService = vi
-      .spyOn(exportSwitchAccount, 'switchAccountService')
-      .mockResolvedValueOnce({
-        first_login: false
-      })
+    const { sut } = makeSut({ accountId: '1', firstLogin: false })
 
-    const result = await sut(accountId)
+    const result = await sut.switchAndReturnAccountPage('1')
 
     expect(result).toEqual({ name: 'home' })
-    expect(mockSwitchAccountService).toHaveBeenCalledWith(accountId)
   })
 
-  it.each([
-    {
-      scenario: 'type brands',
-      accountId: 'accountIdBrands',
-      call: 1
-    },
-    {
-      scenario: 'type resellers',
-      accountId: 'accountIdResellers',
-      call: 2
-    },
-    {
-      scenario: 'type groups',
-      accountId: 'accountIdGroups',
-      call: 3
-    },
-    {
-      scenario: 'type clients',
-      accountId: 'accountIdClients',
-      call: 4
-    }
-  ])(
-    'Should return an API response for $scenario and verify the number of calls to listTypeAccountService',
-    async ({ accountId, call }) => {
-      const mockSwitchAccountService = vi
-        .spyOn(exportSwitchAccount, 'switchAccountService')
-        .mockResolvedValueOnce({
-          first_login: false
-        })
+  it('should return home if the first login is false and no account identification is present', async () => {
+    const { sut } = makeSut({ accountId: '1', firstLogin: false })
 
-      const mockListAccount = vi
-        .spyOn(exportListAccount, 'listTypeAccountService')
-        .mockImplementation(() => {
-          if (mockListAccount.mock.calls.length === call) {
-            return Promise.resolve({
-              results: [{ accountId }]
-            })
-          }
+    const response = await sut.switchAndReturnAccountPage()
 
-          return Promise.resolve({
-            results: []
-          })
-        })
+    expect(response).toEqual({ name: 'home' })
+  })
 
-      const { sut } = makeSut()
+  it('should return additional data if the first login is true and no account identification is present', async () => {
+    const { sut } = makeSut({ accountId: '1', firstLogin: true })
 
-      await sut()
+    const response = await sut.switchAndReturnAccountPage()
 
-      expect(mockSwitchAccountService).toHaveBeenCalledTimes(1)
-      expect(mockListAccount).toHaveBeenCalledTimes(call)
-      expect(mockSwitchAccountService).toHaveBeenCalledWith(accountId)
-    }
-  )
+    expect(response).toEqual({ name: 'additional-data' })
+  })
 
-  it('should throw an error when no account is found', async () => {
-    const mockSwitchAccountService = vi
-      .spyOn(exportSwitchAccount, 'switchAccountService')
-      .mockResolvedValueOnce({
-        first_login: false
-      })
+  it('should throw an AccountNotFoundError if called without a valid account', async () => {
+    const { sut } = makeSut({ accountId: undefined, firstLogin: false })
 
-    vi.spyOn(exportListAccount, 'listTypeAccountService').mockResolvedValueOnce({ results: [] })
+    const response = sut.switchAndReturnAccountPage()
 
-    const { sut } = makeSut()
-
-    const response = sut()
-
-    expect(response).rejects.toThrow('No account found')
-    expect(mockSwitchAccountService).not.toHaveBeenCalled()
+    expect(response).rejects.toThrow(new AccountNotFoundError().message)
   })
 })

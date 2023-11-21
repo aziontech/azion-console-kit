@@ -6,9 +6,9 @@ export const listTypeAccountService = async ({
   type = 'brands',
   textSnippet = '',
   page = 1,
-  page_size = 5
+  pageSize = 5
 }) => {
-  const searchParams = makeSearchParams({ type, textSnippet, page, page_size })
+  const searchParams = makeSearchParams({ type, textSnippet, page, pageSize })
 
   let httpResponse = await AxiosHttpClientAdapter.request({
     url: `${makeSwitchAccountBaseUrl()}?${searchParams.toString()}`,
@@ -46,11 +46,11 @@ const adapt = (httpResponse, type) => {
   }
 }
 
-const makeSearchParams = ({ type, textSnippet, page, page_size }) => {
+const makeSearchParams = ({ type, textSnippet, page, pageSize }) => {
   const searchParams = new URLSearchParams()
   searchParams.set('account_type', type)
   searchParams.set('q', textSnippet)
   searchParams.set('page', page)
-  searchParams.set('page_size', page_size)
+  searchParams.set('page_size', pageSize)
   return searchParams
 }

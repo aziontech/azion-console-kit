@@ -3,6 +3,7 @@
     :validateMfaCodeService="validateMfaCodeService"
     :generateQrCodeMfaService="generateQrCodeMfaService"
     :verifyAuthenticationService="verifyAuthenticationService"
+    :accountHandler="accountHandler"
   />
 </template>
 
@@ -21,6 +22,10 @@
     verifyAuthenticationService: {
       required: true,
       type: Function
+    },
+    accountHandler: {
+      required: true,
+      type: Object
     }
   })
 </script>

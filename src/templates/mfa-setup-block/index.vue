@@ -81,7 +81,6 @@
 
   import { ref, onMounted } from 'vue'
   import { useRouter } from 'vue-router'
-  import { switchAccountLogin } from '@/helpers/handle-switch-account'
 
   const props = defineProps({
     generateQrCodeMfaService: {
@@ -95,6 +94,10 @@
     verifyAuthenticationService: {
       required: true,
       type: Function
+    },
+    accountHandler: {
+      required: true,
+      type: Object
     }
   })
 
@@ -175,7 +178,9 @@
       const mfaToken = joinDigitsMfa()
       await props.validateMfaCodeService(mfaToken)
       const { user_tracking_info: userInfo } = await verifyUserData()
-      const redirect = await switchAccountLogin(userInfo.props.account_id)
+      const redirect = await props.accountHandler.switchAndReturnAccountPage(
+        userInfo.props.account_id
+      )
       router.push(redirect)
     } catch (error) {
       hasRequestErrorMessage.value = error

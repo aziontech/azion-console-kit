@@ -61,7 +61,6 @@
   import { ref } from 'vue'
   import { useRouter } from 'vue-router'
   import { UserIsNotClientError, ProccessRequestError } from '@/services/axios/errors'
-  import { switchAccountLogin } from '@/helpers/handle-switch-account'
 
   const props = defineProps({
     validateMfaCodeService: {
@@ -71,6 +70,10 @@
     verifyAuthenticationService: {
       required: true,
       type: Function
+    },
+    accountHandler: {
+      required: true,
+      type: Object
     }
   })
 
@@ -150,7 +153,7 @@
 
   const switchClientAccount = async (clientId) => {
     try {
-      const redirect = await switchAccountLogin(clientId)
+      const redirect = await props.accountHandler.switchAndReturnAccountPage(clientId)
       router.push(redirect)
     } catch {
       hasRequestErrorMessage.value = clientId
