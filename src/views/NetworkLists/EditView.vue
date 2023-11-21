@@ -27,7 +27,9 @@
               :class="{ 'p-invalid': errors.name }"
               v-tooltip.top="{ value: errors.name, showDelay: 200 }"
             />
-            <small class="text-xs text-color-secondary font-normal leading-tight" > Give a unique and easy-to-remember name.</small>
+            <small class="text-xs text-color-secondary font-normal leading-tight">
+              Give a unique and easy-to-remember name.</small
+            >
             <small
               v-if="errors.name"
               class="p-error text-xs font-normal leading-tight"
@@ -58,7 +60,9 @@
               optionValue="value"
               class="w-full"
             />
-            <small class="text-xs text-color-secondary font-normal leading-tight" > Each list type accepts different values.</small>
+            <small class="text-xs text-color-secondary font-normal leading-tight">
+              Each list type accepts different values.</small
+            >
             <small
               v-if="errors.networkListType"
               class="p-error text-xs font-normal leading-tight"
@@ -87,9 +91,10 @@
               class="p-error text-xs font-normal leading-tight"
               >{{ errors.itemsValues }}</small
             >
-            <small class="text-xs text-color-secondary font-normal leading-tight"
-              > Separate each ASN value by using a new line. Duplicated entries are automatically
-              removed.</small>
+            <small class="text-xs text-color-secondary font-normal leading-tight">
+              Separate each ASN value by using a new line. Duplicated entries are automatically
+              removed.</small
+            >
           </div>
           <div
             class="flex flex-col sm:max-w-lg w-full gap-2"
@@ -114,9 +119,10 @@
               class="p-error text-xs font-normal leading-tight"
               >{{ errors.itemsValues }}</small
             >
-            <small class="text-xs text-color-secondary font-normal leading-tight"
-              > Separate each address value by using a new line. Duplicated entries are automatically
-              removed. </small>
+            <small class="text-xs text-color-secondary font-normal leading-tight">
+              Separate each address value by using a new line. Duplicated entries are automatically
+              removed.
+            </small>
           </div>
           <div
             class="flex flex-col w-full sm:max-w-3xl gap-2"
@@ -143,8 +149,9 @@
               class="p-error text-xs font-normal leading-tight"
               >{{ errors.itemsValuesCountry }}</small
             >
-            <small class="text-xs text-color-secondary font-normal leading-tight"
-              > Select one or more country name.</small>
+            <small class="text-xs text-color-secondary font-normal leading-tight">
+              Select one or more country name.</small
+            >
           </div>
         </template>
       </FormHorizontal>
