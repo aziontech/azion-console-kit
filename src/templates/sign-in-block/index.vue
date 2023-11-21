@@ -9,50 +9,51 @@
       v-if="!showPassword"
     >
       <div
-        class="surface-card surface-border border max-w-md w-full p-6 sm:p-8 rounded-md flex-col gap-6 flex"
+        class="surface-card surface-border border max-w-md w-full p-6 sm:p-8 rounded-md flex-col gap-6 sm:gap-8 flex"
       >
-        <div
+        <h3
           data-testid="title"
           class="text-xl md:text-2xl font-medium"
         >
           Real-Time Manager
-        </div>
-        <div class="flex flex-col gap-2">
-          <label
-            for="email"
-            class="font-semibold text-sm"
-            :class="{ 'p-error': errors.email }"
-          >
-            Email
-          </label>
-          <InputText
-            v-model="email"
-            id="email"
-            placeholder="example@email.com"
-            type="email"
-            autofocus
-            @keydown.enter="showPasswordStep"
-            class="w-full"
-            :class="{ 'p-invalid': errors.email }"
+        </h3>
+        <div class="flex flex-col gap-6">
+          <div class="flex flex-col gap-2">
+            <label
+              for="email"
+              class="font-semibold text-sm"
+              :class="{ 'p-error': errors.email }"
+            >
+              Email
+            </label>
+            <InputText
+              v-model="email"
+              id="email"
+              placeholder="example@email.com"
+              type="email"
+              autofocus
+              @keydown.enter="showPasswordStep"
+              class="w-full"
+              :class="{ 'p-invalid': errors.email }"
+            />
+            <small
+              class="p-error text-xs font-normal leading-tight"
+              v-if="errors.email"
+              severity="error"
+            >
+              {{ errors.email }}
+            </small>
+          </div>
+
+          <PrimeButton
+            class="w-full flex-row-reverse"
+            type="button"
+            label="Next"
+            :loading="isProccedButtonLoading"
+            :disabled="!email"
+            @click="showPasswordStep"
           />
-          <small
-            class="p-error text-xs font-normal leading-tight"
-            v-if="errors.email"
-            severity="error"
-          >
-            {{ errors.email }}
-          </small>
         </div>
-
-        <PrimeButton
-          class="w-full flex-row-reverse"
-          type="button"
-          label="Next"
-          :loading="isProccedButtonLoading"
-          :disabled="!email"
-          @click="showPasswordStep"
-        />
-
         <Divider align="center">
           <p>or</p>
         </Divider>
@@ -93,41 +94,42 @@
       <div
         class="surface-card surface-border border max-w-md w-full p-6 sm:p-8 rounded-md flex-col gap-6 flex"
       >
-        <div class="text-xl md:text-2xl font-medium">Real-Time Manager</div>
-        <div class="flex items-center gap-2">
-          <PrimeButton
-            v-tooltip.top="{ value: 'Back', showDelay: 200 }"
-            class="w-7 h-7"
-            outlined
-            icon="pi pi-chevron-left"
-            @click="resetPasswordStep"
-          ></PrimeButton>
-          <p class="text-sm">{{ email }}</p>
-        </div>
-
-        <div class="flex flex-col gap-2">
-          <label
-            for="password"
-            class="font-semibold text-sm"
-            :class="{ 'p-error': hasRequestErrorMessage }"
-          >
-            Password
-          </label>
-          <Password
-            toggleMask
-            v-model="password"
-            id="password"
-            class="w-full"
-            :class="{ 'p-invalid': hasRequestErrorMessage }"
-            @keydown.enter="validateAndSubmit"
-            :feedback="false"
-          />
-          <small
-            class="p-error text-xs font-normal leading-tight"
-            v-if="hasRequestErrorMessage"
-          >
-            {{ hasRequestErrorMessage }}
-          </small>
+        <div class="flex flex-col gap-6 sm:gap-8">
+          <h3 class="text-xl md:text-2xl font-medium">Real-Time Manager</h3>
+          <div class="flex items-center gap-2">
+            <PrimeButton
+              v-tooltip.top="{ value: 'Back', showDelay: 200 }"
+              class="w-7 h-7"
+              outlined
+              icon="pi pi-chevron-left"
+              @click="resetPasswordStep"
+            />
+            <p class="text-sm">{{ email }}</p>
+          </div>
+          <div class="flex flex-col gap-2">
+            <label
+              for="password"
+              class="font-semibold text-sm"
+              :class="{ 'p-error': hasRequestErrorMessage }"
+            >
+              Password
+            </label>
+            <Password
+              toggleMask
+              v-model="password"
+              id="password"
+              class="w-full"
+              :class="{ 'p-invalid': hasRequestErrorMessage }"
+              @keydown.enter="validateAndSubmit"
+              :feedback="false"
+            />
+            <small
+              class="p-error text-xs font-normal leading-tight"
+              v-if="hasRequestErrorMessage"
+            >
+              {{ hasRequestErrorMessage }}
+            </small>
+          </div>
         </div>
         <div>
           <PrimeButton

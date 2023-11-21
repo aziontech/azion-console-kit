@@ -5,7 +5,7 @@
         v-if="!isPasswordReseted"
         class="surface-card surface-border border max-w-md w-full p-6 sm:p-8 rounded-md flex-col gap-10 inline-flex"
       >
-        <h2 class="text-xl md:text-2xl font-medium">Reset Password</h2>
+        <h3 class="text-xl md:text-2xl font-medium">Reset Password</h3>
 
         <InlineMessage v-if="requestError">{{ requestError }}</InlineMessage>
 
