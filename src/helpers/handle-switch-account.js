@@ -17,8 +17,8 @@ const searchAccount = async (id) => {
       return firstResult.accountId
     }
   }
-
-  return id
+  
+  throw new Error('No account found')
 }
 
 export const switchAccountLogin = async (clientId) => {
