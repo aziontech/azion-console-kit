@@ -16,7 +16,7 @@
     pageTitle="Network Lists"
     title="No network list added"
     description="Create a network list based on ASNs, countries, or IP addresses."
-    createButtonLabel="Network Lists"
+    createButtonLabel="Add"
     createPagePath="network-lists/create"
     :documentationService="documentationService"
   >

@@ -39,7 +39,7 @@
       </FormHorizontal>
       <FormHorizontal
         title="Network List Settings"
-        description="Specificy the type of network list you want to create and the properties that will compose the list."
+        description="Specificy the type of network list you want to create and the properties that'll compose the list."
       >
         <template #inputs>
           <div class="flex flex-col w-full sm:max-w-xs gap-2">
@@ -146,7 +146,7 @@
               >{{ errors.selectedCountries }}</small
             >
             <small class="text-xs text-color-secondary font-normal leading-tight">
-              Select one or more country name.</small
+              Select one or more countries.</small
             >
           </div>
         </template>
