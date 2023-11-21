@@ -2,7 +2,7 @@ import * as MfaServices from '@/services/mfa-services'
 import * as AuthServices from '@/services/auth-services'
 import { listTypeAccountService } from '@/services/switch-account-services/list-type-account-service'
 import { switchAccountService } from '@/services/auth-services/switch-account-service'
-import { AccountHandler } from '@/helpers/handle-switch-account'
+import { AccountHandler } from '@/helpers/account-handler'
 
 /** @type {import('vue-router').RouteRecordRaw} */
 export const mfaRoutes = {
