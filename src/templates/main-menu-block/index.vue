@@ -190,6 +190,7 @@
     </div>
     <Logo v-else />
   </header>
+
   <!--Mobile Profile
   -->
   <Sidebar

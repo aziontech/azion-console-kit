@@ -11,5 +11,4 @@ const makeGoogleStorageApi = (baseURL) => {
   return api
 }
 
-
 export { makeGoogleStorageApi }

@@ -1,6 +1,6 @@
-import fm from 'front-matter';
+import fm from 'front-matter'
 
 export const markdownToHtml = (document) => {
-  const content = fm(document);
-  return content.attributes.docs;
+  const content = fm(document)
+  return content.attributes.docs
 }

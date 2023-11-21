@@ -1,15 +1,13 @@
 import { AxiosHttpClientAdapter, parseHttpResponse } from '../axios/AxiosHttpClientAdapter'
-import { getDocumentationBaseUrl } from './get-documentation-base-url'
+import { makeDocumentationBaseUrl } from './make-documentation-base-url'
 import { makeGoogleStorageApi } from '../axios/makeGoogleStorageApi'
 import { markdownToHtml } from './markdown-to-html'
-import { useHelpCenterStore } from '@/stores/help-center'
 
 const DEFAULT_DOCUMENT = 'index.md'
 const WELCOME_PATH = '/welcome'
 
-// PENSAR EM SALVAR O WELCOME NA STORE PARA NAO FAZER REQUESTS TODA VEZ
 const getHelpCenterDocumentationService = async ({ url, filename }) => {
-  const baseUrl = getDocumentationBaseUrl('stage')
+  const baseUrl = makeDocumentationBaseUrl('stage')
   const documentUrl = url === '/' ? WELCOME_PATH : getFirstPathSegment(url)
   const documentFilename = filename || DEFAULT_DOCUMENT
 
@@ -24,23 +22,14 @@ const getHelpCenterDocumentationService = async ({ url, filename }) => {
 const fetchAndParseDocument = async (documentUrl, documentFilename, baseUrl) => {
   let fullRequestPath = `${documentUrl}/${documentFilename}`
   let httpResponse, responseDocument
-  const store = useHelpCenterStore()
-
-  store.setWelcomeDefaultDocument('teste')
-  responseDocument = store.getWelcomeDefaultDocument
-  console.log('responseDocument :', responseDocument);
 
   try {
     httpResponse = await fetchDocument(fullRequestPath, baseUrl)
     responseDocument = parseHttpResponse(httpResponse)
   } catch (error) {
-
-    if (!responseDocument) {
-      fullRequestPath = `${WELCOME_PATH}/${documentFilename}`
-      httpResponse = await fetchDocument(fullRequestPath, baseUrl)
-      responseDocument = parseHttpResponse(httpResponse)
-
-    }
+    fullRequestPath = `${WELCOME_PATH}/${documentFilename}`
+    httpResponse = await fetchDocument(fullRequestPath, baseUrl)
+    responseDocument = parseHttpResponse(httpResponse)
   }
 
   return responseDocument
