@@ -15,7 +15,7 @@
     v-else
     pageTitle="Network Lists"
     title="No network list added"
-    description="Create your first networkist."
+    description="Create a network list based on ASNs, countries, or IP addresses."
     createButtonLabel="Network Lists"
     createPagePath="network-lists/create"
     :documentationService="documentationService"
