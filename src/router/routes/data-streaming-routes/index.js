@@ -1,3 +1,4 @@
+import * as Helpers from '@/helpers'
 import * as DataStreamingService from '@/services/data-streaming-services'
 
 /** @type {import('vue-router').RouteRecordRaw} */
@@ -11,7 +12,8 @@ export const dataStreamingRoutes = {
       component: () => import('@views/DataStreaming/ListView.vue'),
       props: {
         listDataStreamingService: DataStreamingService.listDataStreamingService,
-        deleteDataStreamingService: DataStreamingService.deleteDataStreamingService
+        deleteDataStreamingService: DataStreamingService.deleteDataStreamingService,
+        documentationService: Helpers.documentationCatalog.dataStreaming
       },
       meta: {
         breadCrumbs: [
@@ -52,7 +54,8 @@ export const dataStreamingRoutes = {
         listDataStreamingTemplateService: DataStreamingService.listDataStreamingTemplateService,
         listDataStreamingDomainsService: DataStreamingService.listDataStreamingDomainsService,
         loadDataStreamingService: DataStreamingService.loadDataStreamingService,
-        editDataStreamingService: DataStreamingService.editDataStreamingService
+        editDataStreamingService: DataStreamingService.editDataStreamingService,
+        updatedRedirect: 'list-data-streaming'
       },
       meta: {
         breadCrumbs: [

@@ -5,13 +5,16 @@
     :loadService="loadDomainService"
     :initialDataSetter="setValues"
     :formData="values"
-    :isValid="meta.valid"
+    :formMeta="meta"
     :cleanFormCallback="resetForm"
+    :updatedRedirect="updatedRedirect"
   >
     <template #form>
       <form-horizontal
         title="General"
-        description=""
+        description="Check the details of the Azion domain, including
+        the domain address to access the application, and modify
+        digital certificate options."
       >
         <template #inputs>
           <div class="flex flex-col sm:max-w-lg w-full gap-2">
@@ -21,14 +24,12 @@
               >Name *</label
             >
             <InputText
-              placeholder="Add Domain Name"
               v-bind="name"
               id="name"
               type="text"
               :class="{ 'p-invalid': errors.name }"
               v-tooltip.top="errors.name"
             />
-
             <small
               v-if="errors.name"
               class="p-error text-xs font-normal leading-tight"
@@ -39,23 +40,11 @@
       </form-horizontal>
       <form-horizontal
         title="Settings"
-        description=""
+        description="Determine the edge application of the domain and its digital certificate. 
+        To link an existing domain to an application, add it to the CNAME field and
+        block access to the application via the Azion domain."
       >
         <template #inputs>
-          <div class="flex flex-col sm:max-w-lg w-full gap-2">
-            <label
-              for="name"
-              class="text-color text-base font-medium"
-              >Domain</label
-            >
-            <InputText
-              placeholder=""
-              v-model="domainName.value"
-              id="name"
-              type="text"
-              disabled
-            />
-          </div>
           <div class="flex flex-col w-full sm:max-w-xs gap-2">
             <label
               for="edge_application"
@@ -72,18 +61,35 @@
               class="w-full"
               placeholder="Select an edge application"
             />
-
             <small
               v-if="errors.edgeApplication"
               class="p-error text-xs font-normal leading-tight"
               >{{ errors.edgeApplication }}</small
             >
           </div>
+
+          <div class="flex gap-2 items-top">
+            <InputSwitch
+              id="cnameAccessOnly"
+              class="flex-shrink-0 flex-grow"
+              :class="{ 'p-invalid': errors.cnameAccessOnly }"
+              v-model="cnameAccessOnly"
+            />
+            <div class="flex flex-col gap-1">
+              <label class="text-sm font-normal leading-tight">CNAME Access Only </label>
+              <small class="text-color-secondary text-sm font-normal leading-tight">
+                Check this option to make the application accessible only through the domains listed
+                in the CNAME field. Attempts to access the application through the Azion domain will
+                be blocked.
+              </small>
+            </div>
+          </div>
+
           <div class="flex flex-col sm:max-w-lg w-full gap-2">
             <label
               for="cname"
               class="text-color text-base font-medium"
-              >CNAME</label
+              >{{ CNAMELabel }}</label
             >
             <PrimeTextarea
               id="cname"
@@ -100,28 +106,7 @@
               >{{ errors.cnames }}</small
             >
           </div>
-          <Card
-            :pt="{
-              body: { class: 'p-4' },
-              title: { class: 'flex justify-between font-medium items-center text-base m-0' },
-              subtitle: {
-                class: 'text-sm font-normal text-color-secondary m-0 pr-0 md:pr-[2.5rem]'
-              }
-            }"
-          >
-            <template #title>
-              <span class="text-base">CNAME Access Only</span>
-              <InputSwitch
-                :class="{ 'p-invalid': errors.cnameAccessOnly }"
-                v-model="cnameAccessOnly"
-              />
-            </template>
-            <template #subtitle>
-              Check this field to make content only accessible through the domains defined in the
-              CNAME field. Access attempts made through Azion's domain (e.g. 10001a.hc.azioncdn.net)
-              will not go through.
-            </template>
-          </Card>
+
           <div class="flex flex-col w-full sm:max-w-xs gap-2">
             <label
               for="edge_application"
@@ -135,38 +120,33 @@
               optionLabel="name"
               optionValue="value"
               class="w-full"
-              placeholder="Select a Certificate"
+              placeholder="Select a certificate"
             />
           </div>
         </template>
       </form-horizontal>
       <form-horizontal
         title="Mutual Authentication Settings"
-        description="The Mutual Authentication or mTLS, allows two parties authenticating each other at the same time in an authentication protocol."
+        description="Enable Mutual Authentication (mTLS) to require that both client and server present an authentication protocol to each other."
       >
         <template #inputs>
-          <Card
-            :pt="{
-              body: { class: 'p-4' },
-              title: { class: 'flex justify-between font-medium items-center text-base m-0' },
-              subtitle: {
-                class: 'text-sm font-normal text-color-secondary m-0 pr-0 md:pr-[2.5rem]'
-              }
-            }"
+          <div class="flex gap-3 items-center">
+            <InputSwitch
+              id="mtls"
+              :class="{ 'p-invalid': errors.mtlsIsEnabled }"
+              v-model="mtlsIsEnabled"
+            />
+            <label
+              for="mtls"
+              class="text-base"
+              >Mutual Authentication</label
+            >
+          </div>
+
+          <div
+            v-if="mtlsIsEnabled"
+            class="flex flex-col gap-2"
           >
-            <template #title>
-              <span class="text-base">Enable Mutual Authentication</span>
-              <InputSwitch
-                :class="{ 'p-invalid': errors.mtlsIsEnabled }"
-                v-model="mtlsIsEnabled"
-              />
-            </template>
-            <template #subtitle>
-              The Mutual Authentication or mTLS, allows two parties authenticating each other at the
-              same time in an authentication protocol.
-            </template>
-          </Card>
-          <div class="flex flex-col gap-2">
             <label class="text-color text-base font-medium">Verification</label>
             <div class="flex flex-col gap-3">
               <Card
@@ -189,8 +169,8 @@
                   />
                 </template>
                 <template #subtitle>
-                  The Enforce option blocks the client's certificate during TLS handshake if we
-                  cannot validate with the uploaded Trusted CA.
+                  This option blocks the client certificate during the TLS handshake if the uploaded
+                  Trusted CA can't be validated.
                 </template>
               </Card>
 
@@ -198,9 +178,7 @@
                 :pt="{
                   body: { class: 'p-4' },
                   title: { class: 'flex justify-between font-medium text-base m-0' },
-                  subtitle: {
-                    class: 'text-sm font-normal text-color-secondary m-0 pr-0 md:pr-[2.5rem]'
-                  }
+                  subtitle: { class: 'text-sm font-normal text-color-secondary m-0 pr-[2.5rem]' }
                 }"
               >
                 <template #title>
@@ -214,14 +192,17 @@
                   />
                 </template>
                 <template #subtitle>
-                  The Permissive option will attempt to verify the client's certificate, but will
-                  allow the TLS handshake even if the certificate cannot be validated. You can check
-                  the client certificate in Azion Firewall and conditionally block it.
+                  This option attempts to verify the client certificate, but will allow the TLS
+                  handshake even if the Trusted CA can't be validated. You can check which client
+                  certificate attempted the request in Edge Firewall.
                 </template>
               </Card>
             </div>
           </div>
-          <div class="flex flex-col w-full sm:max-w-xs gap-2">
+          <div
+            v-if="mtlsIsEnabled"
+            class="flex flex-col w-full sm:max-w-xs gap-2"
+          >
             <label class="text-color text-base font-medium">Trusted CA Certificate</label>
             <Dropdown
               :class="{ 'p-invalid': errors.mtlsTrustedCertificate }"
@@ -230,13 +211,33 @@
               optionLabel="name"
               optionValue="value"
               class="w-full"
-              placeholder=""
+              placeholder="Select a certificate"
               :disabled="!mtlsIsEnabled"
             />
+            <small class="text-xs font-normal text-color-secondary leading-tight">
+              Mutual Authentification requires a Trusted CA Certificate, add it in Digital
+              Certificate Library.
+            </small>
             <small
               v-if="errors.mtlsTrustedCertificate"
               class="p-error text-xs font-normal leading-tight"
               >{{ errors.mtlsTrustedCertificate }}</small
+            >
+          </div>
+        </template>
+      </form-horizontal>
+
+      <form-horizontal title="Status">
+        <template #inputs>
+          <div class="flex gap-3 items-center">
+            <InputSwitch
+              id="active"
+              v-model="active"
+            />
+            <label
+              for="active"
+              class="text-base"
+              >Active</label
             >
           </div>
         </template>
@@ -276,10 +277,26 @@
       Card
     },
     props: {
-      editDomainService: Function,
-      listDigitalCertificatesService: Function,
-      listEdgeApplicationsService: Function,
-      loadDomainService: Function
+      editDomainService: {
+        type: Function,
+        required: true
+      },
+      listDigitalCertificatesService: {
+        type: Function,
+        required: true
+      },
+      listEdgeApplicationsService: {
+        type: Function,
+        required: true
+      },
+      loadDomainService: {
+        type: Function,
+        required: true
+      },
+      updatedRedirect: {
+        type: String,
+        required: true
+      }
     },
     data() {
       return {
@@ -306,6 +323,9 @@
       }
     },
     computed: {
+      CNAMELabel() {
+        return this.cnameAccessOnly ? 'CNAME *' : 'CNAME'
+      },
       edgeCertificates() {
         return this.digitalCertificates.filter(
           (certificate) => certificate.type === EDGE_CERTIFICATE
@@ -320,15 +340,21 @@
         return this.edgeApps.map((edgeApp) => ({ name: edgeApp.name, value: edgeApp.id }))
       },
       edgeCertificatesOptions() {
-        const def = [
+        const defaultCertificate = [
           { name: 'Azion (SAN)', value: 0 },
           { name: "Let's Encrypt (BETA)", value: 'lets_encrypt' }
         ]
-        let items = this.edgeCertificates.map((i) => ({ name: i.name, value: i.id }))
-        return [...def, ...items]
+        const parsedCertificates = this.edgeCertificates?.map((certificate) => ({
+          name: certificate.name,
+          value: certificate.id
+        }))
+        return [...defaultCertificate, ...parsedCertificates]
       },
       trustedCACertificatesOptions() {
-        return this.trustedCACertificates.map((i) => ({ name: i.name, value: i.id }))
+        return this.trustedCACertificates.map((certificate) => ({
+          name: certificate.name,
+          value: certificate.id
+        }))
       }
     },
     watch: {
@@ -343,6 +369,7 @@
         id: yup.string().required(),
         name: yup.string().required(),
         domainName: yup.string().required(),
+        active: yup.boolean(),
         cnames: yup
           .string()
           .label('CNAME')
@@ -352,7 +379,7 @@
           })
           .test({
             name: 'no-whitespace',
-            message: `Whitespace is not allowed`,
+            message: `Space characters aren't allowed.`,
             test: (value) => value?.includes(' ') === false
           }),
         cnameAccessOnly: yup.boolean(),
@@ -370,9 +397,10 @@
         validationSchema,
         initialValues: {
           cnames: '',
-          cnameAccessOnly: true,
+          cnameAccessOnly: false,
           edgeApplication: null,
           mtlsIsEnabled: false,
+          active: false,
           mtlsVerification: MTLS_VERIFICATION_ENFORCE
         }
       })
@@ -382,6 +410,7 @@
       const { value: edgeApplication } = useField('edgeApplication')
       const { setValue: setEdgeCertificate } = useField('edgeCertificate')
       const { value: mtlsIsEnabled } = useField('mtlsIsEnabled')
+      const { value: active } = useField('active')
       const { value: mtlsVerification } = useField('mtlsVerification')
       const { value: mtlsTrustedCertificate } = useField('mtlsTrustedCertificate')
 
@@ -396,6 +425,7 @@
         edgeApplication,
         setEdgeCertificate,
         mtlsIsEnabled,
+        active,
         mtlsVerification,
         mtlsTrustedCertificate,
         errors,

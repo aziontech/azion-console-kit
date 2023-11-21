@@ -1,21 +1,23 @@
 <script setup>
-  import { computed, watch } from 'vue'
+  import { computed, provide, watch } from 'vue'
   import { RouterView, useRoute } from 'vue-router'
   import ShellBlock from '@/templates/shell-block'
   import { useAccountStore } from '@/stores/account'
-  import { themeSelect } from '@/helpers/themeSelect'
   import { storeToRefs } from 'pinia'
+  import { themeSelect, useCreateBoardManager } from '@/helpers'
 
   const accountStore = useAccountStore()
   const { currentTheme, hasActiveUserId } = storeToRefs(accountStore)
 
   const route = useRoute()
   const isLogged = computed(() => {
-    const publicRoutes = ['login', 'reset-password']
-    return hasActiveUserId && !publicRoutes.includes(route.name)
+    // evaluating as !route.meta?.hideNavigation will cause navbar to flicker
+    return route.meta.hideNavigation !== true && hasActiveUserId.value
   })
 
   watch(currentTheme, (theme) => themeSelect({ theme }))
+
+  provide('createBoardManager', useCreateBoardManager())
 </script>
 
 <template>
@@ -26,7 +28,7 @@
     >
       <RouterView
         :class="customClass"
-        class="w-full transition-[width] duration-300 ease-in-out h-full"
+        class="w-full flex flex-col max-w-full transition-[width] duration-300 ease-in-out"
       />
     </ShellBlock>
   </main>

@@ -1,10 +1,14 @@
 <script>
   import ListTableBlock from '@/templates/list-table-block'
+  import EmptyResultsBlock from '@/templates/empty-results-block'
+  import Illustration from '@/assets/svg/illustration-layers.vue'
 
   export default {
     name: 'edge-firewall-view',
     components: {
-      ListTableBlock
+      ListTableBlock,
+      EmptyResultsBlock,
+      Illustration
     },
     props: {
       listEdgeFirewallService: {
@@ -14,8 +18,15 @@
       deleteEdgeFirewallService: {
         required: true,
         type: Function
+      },
+      documentationService: {
+        required: true,
+        type: Function
       }
     },
+    data: () => ({
+      hasContentToList: true
+    }),
     computed: {
       getColumns() {
         return [
@@ -41,18 +52,39 @@
           }
         ]
       }
+    },
+    methods: {
+      handleLoadData(event) {
+        this.hasContentToList = event
+      }
     }
   }
 </script>
 
 <template>
   <ListTableBlock
+    v-if="hasContentToList"
     pageTitle="Edge Firewall"
-    addButtonLabel="Add Rule Set"
+    pageTitleDelete="Edge Firewal"
+    addButtonLabel="Edge Firewall"
     createPagePath="/edge-firewall/create"
     editPagePath="/edge-firewall/edit"
     :listService="listEdgeFirewallService"
     :deleteService="deleteEdgeFirewallService"
     :columns="getColumns"
+    @on-load-data="handleLoadData"
   />
+  <EmptyResultsBlock
+    v-else
+    pageTitle="Edge Firewall"
+    title="No edge firewall added"
+    description="Create your first edge firewall."
+    createButtonLabel="Edge Firewall"
+    createPagePath="/edge-firewall/create"
+    :documentationService="documentationService"
+  >
+    <template #illustration>
+      <Illustration />
+    </template>
+  </EmptyResultsBlock>
 </template>

@@ -3,7 +3,7 @@
     pageTitle="Create Intelligent DNS Records"
     :createService="props.createRecordsService"
     :formData="formValues"
-    :isValid="meta.valid"
+    :formMeta="meta"
     :cleanFormCallback="resetForm"
   >
     <template #form>

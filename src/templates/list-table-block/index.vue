@@ -4,16 +4,20 @@
 
     <div class="max-w-full mx-3 mb-8 md:mx-8">
       <DataTable
+        class="overflow-clip rounded-md"
         v-if="!isLoading"
         @rowReorder="onRowReorder"
         scrollable
         removableSort
         :value="data"
         dataKey="id"
-        v-model:filters="this.filters"
-        paginator
+        v-model:selection="selectedRow"
+        selectionMode="single"
+        @row-click="editItemSelected"
+        v-model:filters="filters"
+        :paginator="showPagination"
         :rowsPerPageOptions="[10, 20, 50, 100]"
-        :rows="10"
+        :rows="minimumOfItemsPerPage"
         :globalFilterFields="filterBy"
         :loading="isLoading"
       >
@@ -67,22 +71,23 @@
               <PrimeButton
                 outlined
                 icon="ai ai-column"
+                class="table-button"
                 @click="toggleColumnSelector"
-                v-tooltip.top="{ value: 'Hidden columns', showDelay: 200 }"
+                v-tooltip.top="{ value: 'Hidden Columns', showDelay: 200 }"
               >
               </PrimeButton>
               <OverlayPanel ref="columnSelectorPanel">
                 <Listbox
                   v-model="selectedColumns"
                   multiple
-                  :options="[{ label: 'Hidden columns', items: this.columns }]"
+                  :options="[{ label: 'Hidden Columns', items: this.columns }]"
                   class="hidden-columns-panel"
                   optionLabel="header"
                   optionGroupLabel="label"
                   optionGroupChildren="items"
                 >
                   <template #optiongroup="slotProps">
-                    <p class="text-sm font-bold">{{ slotProps.option.label }}</p>
+                    <p class="text-sm font-medium">{{ slotProps.option.label }}</p>
                   </template>
                 </Listbox>
               </OverlayPanel>
@@ -91,9 +96,9 @@
           <template #body="{ data: rowData }">
             <div class="flex justify-end">
               <PrimeMenu
-                :ref="'menu'"
+                :ref="`menu-${rowData.id}`"
                 id="overlay_menu"
-                v-bind:model="actionOptions()"
+                v-bind:model="actionOptions(rowData)"
                 :popup="true"
               />
               <PrimeButton
@@ -102,14 +107,14 @@
                 icon="pi pi-ellipsis-h"
                 text
                 @click="(event) => toggleActionsMenu(event, rowData.id)"
-                class="cursor-pointer"
+                class="cursor-pointer table-button"
               />
             </div>
           </template>
         </Column>
         <template #empty>
           <div class="my-4 flex flex-col gap-3 justify-center items-center">
-            <p class="text-xl font-normal text-gray-600">No registers found.</p>
+            <p class="text-xl font-normal text-secondary">No registers found.</p>
             <PrimeButton
               text
               icon="pi pi-plus"
@@ -160,6 +165,10 @@
         </Column>
       </DataTable>
     </div>
+    <DeleteDialog
+      :informationForDeletion="informationForDeletion"
+      @successfullyDeleted="updatedTable()"
+    />
   </div>
 </template>
 
@@ -174,6 +183,7 @@
   import PrimeButton from 'primevue/button'
   import { FilterMatchMode } from 'primevue/api'
   import PageHeadingBlock from '@/templates/page-heading-block'
+  import DeleteDialog from './dialog/delete-dialog'
 
   export default {
     name: 'list-table-block',
@@ -187,7 +197,8 @@
       Skeleton,
       Listbox,
       OverlayPanel,
-      PageHeadingBlock
+      PageHeadingBlock,
+      DeleteDialog
     },
     data: () => ({
       selectedId: null,
@@ -197,7 +208,9 @@
       isLoading: false,
       showColumnSelector: false,
       data: [],
-      selectedColumns: []
+      selectedColumns: [],
+      minimumOfItemsPerPage: 10,
+      informationForDeletion: {}
     }),
     props: {
       columns: {
@@ -214,6 +227,10 @@
         type: String,
         required: true
       },
+      pageTitleDelete: {
+        type: String,
+        required: true
+      },
       createPagePath: {
         type: String,
         required: true,
@@ -221,7 +238,6 @@
       },
       editPagePath: {
         type: String,
-        required: true,
         default: () => '/'
       },
       addButtonLabel: {
@@ -234,13 +250,20 @@
         type: Function
       },
       deleteService: {
-        required: true,
         type: Function
+      },
+      enableEditClick: {
+        type: Boolean,
+        default: true
       },
       reorderableRows: {
         required: false,
         type: Boolean,
         default: false
+      },
+      rowActions: {
+        type: Array,
+        default: () => []
       }
     },
     async created() {
@@ -250,6 +273,9 @@
     computed: {
       filterBy() {
         return this.columns.map((item) => item.field)
+      },
+      showPagination() {
+        return this.data.length > this.minimumOfItemsPerPage
       }
     },
     methods: {
@@ -262,19 +288,30 @@
       onRowReorder(event) {
         this.data = event.value
       },
-      actionOptions() {
-        const actionOptions = [
-          {
-            label: 'Edit',
-            icon: 'pi pi-fw pi-pencil',
-            command: () => this.editItem()
-          },
-          {
+      addActionOption(actionOptions, option) {
+        actionOptions.push({
+          ...option
+        })
+      },
+      actionOptions(rowData) {
+        const actionOptions = []
+
+        if (this.deleteService) {
+          actionOptions.push({
             label: 'Delete',
             icon: 'pi pi-fw pi-trash',
-            command: () => this.removeItem()
-          }
-        ]
+            command: () => this.openDeleteDialog()
+          })
+        }
+
+        if (this.rowActions && this.rowActions.length > 0) {
+          this.rowActions.forEach((action) => {
+            actionOptions.push({
+              ...action,
+              command: () => action.command(rowData)
+            })
+          })
+        }
 
         return actionOptions
       },
@@ -299,39 +336,25 @@
       },
       toggleActionsMenu(event, selectedId) {
         this.selectedId = selectedId
-        this.$refs.menu.toggle(event)
+        this.$refs[`menu-${selectedId}`].toggle(event)
       },
-      editItem() {
-        this.$router.push({ path: `${this.editPagePath}/${this.selectedId}` })
+      editItemSelected({ data: item }) {
+        if (this.enableEditClick) {
+          this.$router.push({ path: `${this.editPagePath}/${item.id}` })
+        }
       },
-      async removeItem() {
-        let toastConfig = {
-          closable: false,
-          severity: 'success',
-          summary: '',
-          life: 10000
+      openDeleteDialog() {
+        this.informationForDeletion = {
+          title: this.pageTitleDelete,
+          selectedID: this.selectedId,
+          deleteService: this.deleteService,
+          deleteDialogVisible: true,
+          rerender: Math.random()
         }
-        try {
-          this.$toast.add({
-            closable: false,
-            severity: 'info',
-            summary: 'Processing request',
-            life: 5000
-          })
-          const feedback = await this.deleteService(this.selectedId)
-          toastConfig.summary = feedback ?? 'Deleted successfully'
-          this.data = this.data.filter((item) => item.id !== this.selectedId)
-          this.$forceUpdate()
-        } catch (error) {
-          toastConfig = {
-            closable: false,
-            severity: 'error',
-            summary: error,
-            life: 10000
-          }
-        } finally {
-          this.$toast.add(toastConfig)
-        }
+      },
+      updatedTable() {
+        this.data = this.data.filter((item) => item.id !== this.selectedId)
+        this.$forceUpdate()
       }
     },
     watch: {

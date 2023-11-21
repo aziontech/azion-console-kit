@@ -92,7 +92,7 @@ $inputListItemTextColor: $textColor;
 
 /// Hover state background for an individual itrem of an input list
 /// @group form
-$inputListItemHoverBg: rgba($primaryColor, 0.08);
+$inputListItemHoverBg: rgba($primaryColor, 0.06);
 
 /// Hover state text color for an individual itrem of an input list
 /// @group form
@@ -100,7 +100,7 @@ $inputListItemTextHoverColor: $textColor;
 
 /// Focus state background for an individual itrem of an input list
 /// @group form
-$inputListItemFocusBg: rgba($primaryColor, 0.16);
+$inputListItemFocusBg: rgba($primaryColor, 0.06);
 
 /// Focus state text color for an individual itrem of an input list
 /// @group form
@@ -511,6 +511,9 @@ $fileUploadProgressBarHeight: 0.25rem;
 /// Padding of the fileupload content section
 /// @group form
 $fileUploadContentPadding: 2rem 1rem;
+
+/// Border of the fileupload content section
+$fileUploadContentHoverBorder: 1px dashed $primaryColor !default;
 
 /// Border of the fileupload content item section
 /// @group form

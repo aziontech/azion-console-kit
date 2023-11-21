@@ -1,5 +1,6 @@
 import * as EdgeNodeService from '@/services/edge-node-services'
 import * as ServiceEdgeNode from '@/services/edge-node-service-services'
+import * as Helpers from '@/helpers'
 
 /** @type {import('vue-router').RouteRecordRaw} */
 export const edgeNodeRoutes = {
@@ -12,7 +13,8 @@ export const edgeNodeRoutes = {
       component: () => import('@views/EdgeNode/ListView.vue'),
       props: {
         listEdgeNodeService: EdgeNodeService.listEdgeNodeService,
-        deleteEdgeNodeService: EdgeNodeService.deleteEdgeNodeService
+        deleteEdgeNodeService: EdgeNodeService.deleteEdgeNodeService,
+        documentationService: Helpers.documentationCatalog.edgeNodes
       },
       meta: {
         breadCrumbs: [
@@ -30,7 +32,8 @@ export const edgeNodeRoutes = {
       props: {
         loadEdgeNodeService: EdgeNodeService.loadEdgeNodeService,
         editEdgeNodeService: EdgeNodeService.editEdgeNodeService,
-        listServiceEdgeNodeService: ServiceEdgeNode.listServiceEdgeNodeService
+        listServiceEdgeNodeService: ServiceEdgeNode.listServiceEdgeNodeService,
+        updatedRedirect: 'list-edge-node'
       },
       meta: {
         breadCrumbs: [
@@ -87,7 +90,7 @@ export const edgeNodeRoutes = {
       }
     },
     {
-      path: 'edit/:id/service/:id',
+      path: 'edit/:edgeNodeId/service/:id',
       name: 'edit-service-edge-node',
       component: () => import('@/views/EdgeNode/EditServiceEdgeNodeView.vue'),
       props: {

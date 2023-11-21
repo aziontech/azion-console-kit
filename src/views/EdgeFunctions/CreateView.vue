@@ -3,7 +3,7 @@
     pageTitle="New Edge Function"
     :createService="props.createEdgeFunctionsService"
     :formData="values"
-    :isValid="meta.valid"
+    :formMeta="meta"
     :cleanFormCallback="resetForm"
     :hasTabs="true"
   >
@@ -70,7 +70,7 @@
               <vue-monaco-editor
                 v-model:value="code"
                 language="javascript"
-                theme="vs"
+                :theme="theme"
                 class="min-h-[50vh] !w-[99%] surface-border border rounded-md"
                 :class="{ 'border-red-500 border': errorCode }"
                 v-tooltip.top="{ value: errorCode, showDelay: 200 }"
@@ -105,7 +105,7 @@
               <vue-monaco-editor
                 v-model:value="jsonArgs"
                 language="json"
-                theme="vs"
+                :theme="theme"
                 class="min-h-[50vh] !w-[99%] surface-border border rounded-md"
                 :class="{ 'border-red-500 border': errorCode }"
                 @change="changeValidateArgs"
@@ -149,7 +149,8 @@
   import InputText from 'primevue/inputtext'
   import Divider from 'primevue/divider'
   import HelloWorldSample from '@/helpers/edge-function-hello-world'
-  import { ref } from 'vue'
+  import { ref, computed } from 'vue'
+  import { useAccountStore } from '@/stores/account'
 
   // Props
   const props = defineProps({
@@ -168,6 +169,14 @@
   }
   const previewIframe = ref(null)
   const previewIframeArguments = ref(null)
+
+  // Using the store
+  const store = useAccountStore()
+
+  //computed
+  const theme = computed(() => {
+    return store.currentTheme === 'light' ? 'vs' : 'vs-dark'
+  })
 
   // Methods
   let errorCode = ''

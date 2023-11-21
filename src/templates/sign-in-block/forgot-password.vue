@@ -1,69 +1,84 @@
 <template>
   <div>
     <div
-      class="flex flex-col align-top items-center p-4 animate-fadeIn"
+      class="flex flex-col align-top items-center animate-fadeIn"
       v-if="!emailSended"
     >
       <div
-        class="surface-card surface-border border max-w-md w-full p-6 md:p-10 rounded-md flex-col gap-10 inline-flex"
+        class="surface-card surface-border border max-w-md w-full p-6 sm:p-8 rounded-md flex-col sm:gap-8 gap-6 inline-flex"
       >
         <div class="flex flex-col gap-3">
-          <div class="text-xl md:text-2xl font-medium">Reset your password</div>
+          <h3 class="text-xl md:text-2xl font-medium">Reset Password</h3>
           <p class="text-color-secondary">
-            Type in your email and we'll send you a link to reset your password.
+            Type your email to receive a link to reset your password.
           </p>
         </div>
 
-        <div class="flex flex-col gap-2">
-          <label
-            for="email"
-            class="font-semibold text-sm"
-            >E-mail</label
-          >
-          <InputText
-            v-bind="email"
-            id="email"
-            placeholder="Type your e-mail"
-            type="email"
-            class="w-full"
-            :class="{ 'p-invalid': errors.email }"
-            v-tooltip.top="{ value: errors.email, showDelay: 200 }"
+        <div class="flex flex-col gap-6">
+          <div class="flex flex-col gap-2">
+            <label
+              for="email"
+              class="font-semibold text-sm"
+              >Email</label
+            >
+            <InputText
+              v-bind="email"
+              id="email"
+              placeholder="example@email.com"
+              type="email"
+              class="w-full"
+              :class="{ 'p-invalid': errors.email }"
+              v-tooltip.top="{ value: errors.email, showDelay: 200 }"
+            />
+            <small
+              v-if="errors.email"
+              class="p-error text-xs font-normal leading-tight"
+              >{{ errors.email }}
+            </small>
+          </div>
+
+          <PrimeButton
+            class="w-full flex-row-reverse"
+            :loading="isSendingEmailLoading"
+            label="Send Email"
+            severity="secondary"
+            @click="sendEmail()"
+            :disabled="!meta.valid"
           />
         </div>
-
-        <PrimeButton
-          class="w-full flex-row-reverse"
-          :loading="isSendingEmailLoading"
-          label="Send reset e-mail"
-          severity="primary"
-          @click="sendEmail()"
-          :disabled="!meta.valid"
-        />
       </div>
     </div>
 
     <div
-      class="flex flex-col align-top items-center p-4 animate-fadeIn"
+      class="flex flex-col align-top items-center animate-fadeIn"
       v-else
     >
       <div
-        class="surface-card surface-border border max-w-md w-full p-6 md:p-10 rounded-md flex-col gap-8 inline-flex"
+        class="surface-card surface-border border max-w-md w-full p-6 sm:p-8 rounded-md flex-col sm:gap-8 gap-6 inline-flex"
       >
         <div class="flex flex-col gap-3">
-          <div class="text-xl md:text-2xl font-medium">Reset your password</div>
+          <h3 class="text-xl md:text-2xl font-medium">Reset Password</h3>
           <p class="text-color-secondary">
-            We have sent an email containing instructions on how to reset your password. Please
-            check your inbox and spam folder.
+            We've sent you an email explaining how to reset your password. Check your inbox or spam
+            folder and follow the instructions.
           </p>
         </div>
 
-        <div class="flex flex-wrap items-center">
-          <div>Didn't receive the email?</div>
+        <div class="w-full flex flex-wrap gap-2">
+          <p class="text-start">Didn't receive the email?</p>
           <PrimeButton
+            class="p-0"
             link
-            label="Resend email"
-            @click="sendEmail()"
-          ></PrimeButton>
+            label="Resend Email"
+            @click="resendEmail()"
+            :disabled="isEmailResent"
+          />
+          <PrimeBadge
+            class="rounded-xl px-1 animate-fadeIn"
+            :value="counter"
+            severity="info"
+            v-if="counter > 0"
+          />
         </div>
       </div>
     </div>
@@ -73,10 +88,14 @@
 <script setup>
   import InputText from 'primevue/inputtext'
   import PrimeButton from 'primevue/button'
+  import PrimeBadge from 'primevue/badge'
 
   import * as yup from 'yup'
   import { useForm } from 'vee-validate'
   import { ref } from 'vue'
+  import { useToast } from 'primevue/usetoast'
+
+  const SUBMIT_TIMER = 60
 
   const emailSended = ref(false)
   const isSendingEmailLoading = ref(false)
@@ -105,14 +124,43 @@
     }
   })
 
+  const toast = useToast()
+
   const sendEmail = async () => {
     try {
       isSendingEmailLoading.value = true
-      await props.sendResetPasswordEmailService(values)
+      const res = await props.sendResetPasswordEmailService(values)
+      toast.add({ life: 5000, severity: 'success', detail: res, summary: 'Email sent' })
       emailSended.value = true
+    } catch (err) {
+      toast.add({ life: 5000, severity: 'error', detail: err, summary: 'Error' })
     } finally {
       isSendingEmailLoading.value = false
     }
+  }
+
+  const resendEmail = async () => {
+    disableSubmitByTimer(SUBMIT_TIMER)
+    try {
+      const res = await props.sendResetPasswordEmailService(values)
+      toast.add({ life: 5000, severity: 'success', detail: res, summary: 'Email sent' })
+    } catch (err) {
+      toast.add({ life: 5000, severity: 'error', detail: err, summary: 'Error' })
+    }
+  }
+
+  const isEmailResent = ref(false)
+  const counter = ref(0)
+  const countdown = () => counter.value--
+
+  const disableSubmitByTimer = (timeInSec) => {
+    isEmailResent.value = true
+    counter.value = timeInSec
+    const interval = setInterval(countdown, 1000)
+    setTimeout(() => {
+      isEmailResent.value = false
+      clearInterval(interval)
+    }, timeInSec * 1000)
   }
 
   defineExpose({

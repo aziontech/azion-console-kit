@@ -1,24 +1,44 @@
 <template>
   <div>
     <ListTableBlock
+      v-if="hasContentToList"
       :listService="listUsersService"
       :deleteService="deleteUsersService"
       :columns="getColumns"
       pageTitle="Users"
-      addButtonLabel="Add Users"
+      pageTitleDelete="User"
+      addButtonLabel="Users"
       createPagePath="users/create"
       editPagePath="users/edit"
+      @on-load-data="handleLoadData"
     />
+    <EmptyResultsBlock
+      v-else
+      pageTitle="Users"
+      title="No users added"
+      description="Create your first users."
+      createButtonLabel="Users"
+      createPagePath="users/create"
+      :documentationService="documentationService"
+    >
+      <template #illustration>
+        <Illustration />
+      </template>
+    </EmptyResultsBlock>
   </div>
 </template>
 
 <script>
   import ListTableBlock from '@/templates/list-table-block'
+  import EmptyResultsBlock from '@/templates/empty-results-block'
+  import Illustration from '@/assets/svg/illustration-layers.vue'
 
   export default {
     name: 'variables-view',
     components: {
-      ListTableBlock
+      ListTableBlock,
+      EmptyResultsBlock,
+      Illustration
     },
     props: {
       listUsersService: {
@@ -28,8 +48,15 @@
       deleteUsersService: {
         required: true,
         type: Function
+      },
+      documentationService: {
+        required: true,
+        type: Function
       }
     },
+    data: () => ({
+      hasContentToList: true
+    }),
     computed: {
       getColumns() {
         return [
@@ -62,6 +89,11 @@
             header: 'Owner'
           }
         ]
+      }
+    },
+    methods: {
+      handleLoadData(event) {
+        this.hasContentToList = event
       }
     }
   }

@@ -31,6 +31,20 @@ const adaptTemplate = (httpResponse) => {
   }
 }
 
+const parseStatusData = (status) => {
+  const parsedStatus = status
+    ? {
+        content: 'Active',
+        severity: 'success'
+      }
+    : {
+        content: 'Inactive',
+        severity: 'danger'
+      }
+
+  return parsedStatus
+}
+
 const adapt = async (httpResponse) => {
   const mapDataSourceName = {
     http: 'Edge Applications',
@@ -40,16 +54,17 @@ const adapt = async (httpResponse) => {
   }
 
   const parsedDataStreamings = await Promise.all(
-    httpResponse.body.results?.map(async (dataStreaming) => {
+    httpResponse.body?.results?.map(async (dataStreaming) => {
       const templateData = await getTemplateById({ id: dataStreaming.template_id })
       return {
         id: dataStreaming.id,
         name: dataStreaming.name,
         templateName: templateData.name,
         dataSource: mapDataSourceName[dataStreaming.data_source],
-        active: dataStreaming.active ? 'Yes' : 'No'
+        endpointType: dataStreaming.endpoint.endpoint_type,
+        active: parseStatusData(dataStreaming.active)
       }
-    })
+    }) ?? []
   )
 
   return {

@@ -1,3 +1,4 @@
+import * as Helpers from '@/helpers'
 import * as DomainServices from '@/services/domains-services'
 import * as DigitalCertificatesServices from '@/services/digital-certificates-services'
 import * as EdgeApplicationServices from '@/services/edge-application-services'
@@ -13,7 +14,8 @@ export const domainsRoutes = {
       component: () => import('@views/Domains/ListView.vue'),
       props: {
         listDomainsService: DomainServices.listDomainsService,
-        deleteDomainService: DomainServices.deleteDomainService
+        deleteDomainService: DomainServices.deleteDomainService,
+        documentationService: Helpers.documentationCatalog.domains
       },
       meta: {
         breadCrumbs: [
@@ -54,7 +56,8 @@ export const domainsRoutes = {
         editDomainService: DomainServices.editDomainService,
         listDigitalCertificatesService: DigitalCertificatesServices.listDigitalCertificatesService,
         listEdgeApplicationsService: EdgeApplicationServices.listEdgeApplicationsService,
-        loadDomainService: DomainServices.loadDomainService
+        loadDomainService: DomainServices.loadDomainService,
+        updatedRedirect: 'list-domains'
       },
       meta: {
         breadCrumbs: [

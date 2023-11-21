@@ -25,7 +25,12 @@ const makeSut = () => {
 describe('EdgeFunctionsServices', () => {
   it('should call API with correct params', async () => {
     const requestSpy = vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
-      statusCode: 201
+      statusCode: 201,
+      body: {
+        results: {
+          id: 1
+        }
+      }
     })
     const { sut } = makeSut()
     await sut(fixtures.basic)
@@ -46,13 +51,18 @@ describe('EdgeFunctionsServices', () => {
 
   it('should return a feedback message on successfully created', async () => {
     vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
-      statusCode: 201
+      statusCode: 201,
+      body: {
+        results: {
+          id: 1
+        }
+      }
     })
     const { sut } = makeSut()
 
-    const feedbackMessage = await sut(fixtures.basic)
+    const data = await sut(fixtures.basic)
 
-    expect(feedbackMessage).toBe('Your edge function has been created')
+    expect(data.feedback).toBe('Your edge function has been created')
   })
 
   it('Should return an API error for an key with value String', () => {

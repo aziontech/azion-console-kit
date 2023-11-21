@@ -1,3 +1,4 @@
+import * as Helpers from '@/helpers'
 import * as EdgeApplicationsService from '@/services/edge-application-services'
 import * as OriginsService from '@/services/edge-application-origins-services'
 
@@ -12,7 +13,8 @@ export const edgeApplicationRoutes = {
       component: () => import('@views/EdgeApplications/ListView.vue'),
       props: {
         listEdgeApplicationsService: EdgeApplicationsService.listEdgeApplicationsService,
-        deleteEdgeApplicationService: EdgeApplicationsService.deleteEdgeApplicationService
+        deleteEdgeApplicationService: EdgeApplicationsService.deleteEdgeApplicationService,
+        documentationService: Helpers.documentationCatalog.edgeApplication
       },
       meta: {
         breadCrumbs: [

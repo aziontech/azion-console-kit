@@ -8,11 +8,14 @@
         :value="data"
         dataKey="id"
         v-model:filters="this.filters"
-        paginator
-        :rowsPerPageOptions="[5, 10, 20, 50, 100]"
-        :rows="5"
+        :paginator="showPagination"
+        :rowsPerPageOptions="[10, 20, 50, 100]"
+        :rows="minimumOfItemsPerPage"
         :globalFilterFields="filterBy"
         :loading="isLoading"
+        v-model:selection="selectedRow"
+        selectionMode="single"
+        @row-click="editItemSelected"
       >
         <template #header>
           <div class="flex flex-wrap justify-between gap-2 w-full">
@@ -70,7 +73,7 @@
         </Column>
         <template #empty>
           <div class="my-4 flex flex-col gap-3 justify-center items-center">
-            <p class="text-xl font-normal text-gray-600">No registers found.</p>
+            <p class="text-xl font-normal text-secondary">No registers found.</p>
             <PrimeButton
               v-if="!authorizeNode"
               text
@@ -114,6 +117,10 @@
         </Column>
       </DataTable>
     </div>
+    <DeleteDialog
+      :informationForDeletion="informationForDeletion"
+      @successfullyDeleted="updatedTable()"
+    />
   </div>
 </template>
 
@@ -125,6 +132,7 @@
   import Skeleton from 'primevue/skeleton'
   import PrimeButton from 'primevue/button'
   import { FilterMatchMode } from 'primevue/api'
+  import DeleteDialog from './dialog/delete-dialog'
 
   export default {
     name: 'list-table-block',
@@ -134,7 +142,8 @@
       InputText,
       PrimeButton,
       PrimeMenu,
-      Skeleton
+      Skeleton,
+      DeleteDialog
     },
     data: () => ({
       showActionsMenu: false,
@@ -143,7 +152,9 @@
         global: { value: '', matchMode: FilterMatchMode.CONTAINS }
       },
       isLoading: false,
-      data: []
+      data: [],
+      minimumOfItemsPerPage: 10,
+      informationForDeletion: {}
     }),
     props: {
       columns: {
@@ -157,6 +168,10 @@
         ]
       },
       pageTitle: {
+        type: String,
+        required: true
+      },
+      pageTitleDelete: {
         type: String,
         required: true
       },
@@ -195,20 +210,18 @@
     computed: {
       filterBy() {
         return this.columns.map((item) => item.field)
+      },
+      showPagination() {
+        return this.data.length > this.minimumOfItemsPerPage
       }
     },
     methods: {
       actionOptions(showAuthorize) {
         const actionOptions = [
           {
-            label: 'Edit',
-            icon: 'pi pi-fw pi-pencil',
-            command: () => this.editItem()
-          },
-          {
             label: 'Delete',
             icon: 'pi pi-fw pi-trash',
-            command: () => this.removeItem()
+            command: () => this.openDeleteDialog()
           }
         ]
         if (this.authorizeNode && showAuthorize !== 'Authorized') {
@@ -243,40 +256,24 @@
         this.selectedId = selectedId
         this.$refs.menu.toggle(event)
       },
-      editItem() {
-        this.$router.push({ path: `${this.editPagePath}/${this.selectedId}` })
+      editItemSelected({ data: item }) {
+        this.$router.push({ path: `${this.editPagePath}/${item.id}` })
       },
       authorizeEdgeNode() {
         this.$emit('authorize', this.selectedId)
       },
-      async removeItem() {
-        let toastConfig = {
-          closable: false,
-          severity: 'success',
-          summary: '',
-          life: 10000
+      openDeleteDialog() {
+        this.informationForDeletion = {
+          title: this.pageTitleDelete,
+          selectedID: this.selectedId,
+          deleteService: this.deleteService,
+          deleteDialogVisible: true,
+          rerender: Math.random()
         }
-        try {
-          this.$toast.add({
-            closable: false,
-            severity: 'info',
-            summary: 'Processing request',
-            life: 5000
-          })
-          const feedback = await this.deleteService(this.selectedId)
-          toastConfig.summary = feedback ?? 'Deleted successfully'
-          this.data = this.data.filter((item) => item.id !== this.selectedId)
-          this.$forceUpdate()
-        } catch (error) {
-          toastConfig = {
-            closable: false,
-            severity: 'error',
-            summary: error,
-            life: 10000
-          }
-        } finally {
-          this.$toast.add(toastConfig)
-        }
+      },
+      updatedTable() {
+        this.data = this.data.filter((item) => item.id !== this.selectedId)
+        this.$forceUpdate()
       }
     }
   }

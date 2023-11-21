@@ -3,23 +3,29 @@
     <PageHeadingBlock :pageTitle="pageTitle" />
     <form
       @submit.prevent="handleSubmit"
-      class="w-full grow px-8 flex flex-col gap-8 mb-5"
+      class="w-full grow px-8 flex flex-col gap-8 mb-5 max-sm:px-3 max-md:gap-6"
       :class="{ 'py-4': !hasTabs, 'pb-4': hasTabs }"
     >
       <slot name="form" />
 
       <slot name="raw-form" />
     </form>
+
+    <DialogUnsavedBlock
+      :leavePage="leavePage"
+      :blockRedirectUnsaved="hasModifications"
+    />
     <ActionBarTemplate
       @cancel="handleCancel"
       @submit="handleSubmit"
       :loading="isLoading"
-      :submitDisabled="!isValid"
+      :submitDisabled="!formMeta.valid"
     />
   </div>
 </template>
 
 <script>
+  import DialogUnsavedBlock from '@/templates/dialog-unsaved-block'
   import ActionBarTemplate from '@/templates/action-bar-block'
   import PageHeadingBlock from '@/templates/page-heading-block'
 
@@ -27,10 +33,12 @@
     name: 'edit-form-block',
     components: {
       ActionBarTemplate,
-      PageHeadingBlock
+      PageHeadingBlock,
+      DialogUnsavedBlock
     },
     data: () => ({
-      isLoading: false
+      isLoading: false,
+      blockViewRedirection: true
     }),
     props: {
       pageTitle: {
@@ -49,10 +57,6 @@
         type: Function,
         required: true
       },
-      isValid: {
-        type: Boolean,
-        required: true
-      },
       formData: {
         type: Object,
         required: true
@@ -64,17 +68,37 @@
       hasTabs: {
         type: Boolean,
         required: false
+      },
+      formMeta: {
+        type: Object,
+        required: true
+      },
+      updatedRedirect: {
+        type: String,
+        required: true
       }
     },
     async created() {
       await this.loadInitialData()
     },
     methods: {
+      leavePage(dialogUnsaved) {
+        dialogUnsaved = false
+        this.handleCancel()
+        return dialogUnsaved
+      },
+      goBackToList() {
+        if (this.updatedRedirect) {
+          this.$router.push({ name: this.updatedRedirect })
+          return
+        }
+        this.$router.go(-1)
+      },
       handleCancel() {
         if (this.backURL) {
           this.$router.push({ path: this.backURL })
         } else {
-          this.$router.go('-1')
+          this.goBackToList()
         }
       },
       async loadInitialData() {
@@ -104,7 +128,10 @@
             summary: feedback ?? 'edited successfully',
             life: 10000
           })
+          this.blockViewRedirection = false
+          this.goBackToList()
         } catch (error) {
+          this.blockViewRedirection = true
           this.$toast.add({
             closable: false,
             severity: 'error',
@@ -116,6 +143,11 @@
             this.isLoading = false
           }, 800)
         }
+      }
+    },
+    computed: {
+      hasModifications() {
+        return this.formMeta.touched && this.blockViewRedirection
       }
     }
   }

@@ -5,13 +5,14 @@
     :loadService="loadCredentialService"
     :initialDataSetter="setValues"
     :formData="values"
-    :isValid="meta.valid"
+    :formMeta="meta"
     :cleanFormCallback="resetForm"
+    :updatedRedirect="updatedRedirect"
   >
     <template #form>
       <FormHorizontal
-        title="Credentials"
-        description="Espaço livre para descrição e instruções de preenchimento. Esse conteúdo deve ser criado pensando tanto em funcionalidade quanto em em alinhamento e estética. Devemos sempre criar os blocos conforme o contexto, cuidando sempre para não ter blocos muito longos."
+        title="General"
+        description="Choose a name that is descriptive and easy to remember. Use the description to help you remember why the token was created and/or what it was created for."
       >
         <template #inputs>
           <div class="flex flex-col sm:max-w-lg w-full gap-2">
@@ -21,7 +22,6 @@
               >Name *</label
             >
             <InputText
-              placeholder="Edit Credential Name"
               v-model="name"
               id="name"
               type="text"
@@ -42,144 +42,139 @@
               >Description</label
             >
             <PrimeTextarea
-              :class="{ 'p-invalid': errors.description }"
               v-model="description"
               id="description"
               rows="2"
               cols="30"
               class="w-full"
-              v-tooltip.top="{ value: errors.description, showDelay: 200 }"
             />
-            <small
-              v-if="errors.description"
-              class="p-error text-xs font-normal leading-tight"
-              >{{ errors.description }}</small
-            >
+            <small class="text-color-secondary text-xs font-normal leading-5">
+              Description of credential, e.g.: Credential used for clients XYZ.
+            </small>
           </div>
-
-          <div class="flex flex-col sm:max-w-lg w-full gap-2">
+        </template>
+      </FormHorizontal>
+      <FormHorizontal
+        title="Token"
+        description="Save the credential to visualize the token."
+      >
+        <template #inputs>
+          <div class="flex flex-col w-full gap-2">
             <label
-              for="token"
+              for="personalToken"
               class="text-color text-base font-medium"
-              >Token *</label
             >
-            <div class="flex gap-2">
-              <Password
-                id="token"
-                placeholder="Token"
-                v-model="token"
-                type="text"
-                class="flex flex-col w-full"
-                :feedback="false"
-                toggleMask
-                disabled
-              />
+              Credential Token
+            </label>
+            <div
+              class="flex gap-6 md:align-items-center max-sm:flex-col max-sm:align-items-baseline max-sm:gap-3"
+            >
+              <span class="p-input-icon-right w-full flex max-w-lg flex-col items-start gap-2">
+                <PrimePassword
+                  id="personalToken"
+                  v-model="token"
+                  type="text"
+                  class="flex flex-col w-full"
+                  :feedback="false"
+                  toggleMask
+                  disabled
+                />
+              </span>
               <PrimeButton
-                icon="pi pi-copy"
-                aria-label="Copy"
+                icon="pi pi-clone"
+                outlined
+                type="button"
+                aria-label="Copy Token"
+                label="Copy to Clipboard"
+                :disabled="!generatedToken"
                 @click="copyToken"
               />
             </div>
           </div>
-
-          <Card
-            :pt="{
-              root: { class: 'shadow-none  rounded-none' },
-              body: { class: 'py-4 border-0' },
-              title: { class: 'flex items-center text-base m-0 gap-3 font-medium' },
-              subtitle: {
-                class: 'text-sm font-normal text-color-secondary m-0 pr-0 md:pr-[2.5rem]'
-              }
-            }"
-          >
-            <template #title>
-              <InputSwitch
-                :class="{ 'p-invalid': errors.status }"
-                v-model="status"
-                id="active"
-              />
-              <div class="flex-col gap-1">
-                <div class="">
-                  <div class="text-color text-sm font-normal">Active</div>
+        </template>
+      </FormHorizontal>
+      <FormHorizontal title="Status">
+        <template #inputs>
+          <div class="flex flex-col w-full gap-2">
+            <div
+              class="flex gap-6 md:align-items-center max-sm:flex-col max-sm:align-items-baseline max-sm:gap-3"
+            >
+              <span class="p-input-icon-right w-full flex max-w-lg items-start gap-2 pb-3 pt-2">
+                <InputSwitch
+                  v-model="status"
+                  id="active"
+                />
+                <div class="flex-col gap-1">
+                  <div class="text-color text-sm font-normal leading-5">Active</div>
                 </div>
-              </div>
-            </template>
-          </Card>
+              </span>
+            </div>
+          </div>
         </template>
       </FormHorizontal>
     </template>
   </EditFormBlock>
 </template>
 
-<script>
+<script setup>
   import EditFormBlock from '@/templates/edit-form-block-new'
   import FormHorizontal from '@/templates/create-form-block-new/form-horizontal'
   import InputText from 'primevue/inputtext'
-  import Password from 'primevue/password'
-  import PrimeButton from 'primevue/button'
   import PrimeTextarea from 'primevue/textarea'
+  import PrimePassword from 'primevue/password'
+  import PrimeButton from 'primevue/button'
   import InputSwitch from 'primevue/inputswitch'
-  import Card from 'primevue/card'
   import { useField, useForm } from 'vee-validate'
   import * as yup from 'yup'
+  import { useToast } from 'primevue/usetoast'
 
-  export default {
-    components: {
-      EditFormBlock,
-      InputText,
-      Password,
-      PrimeButton,
-      PrimeTextarea,
-      InputSwitch,
-      FormHorizontal,
-      Card
+  const props = defineProps({
+    editCredentialService: {
+      type: Function,
+      required: true
     },
-    props: {
-      editCredentialService: Function,
-      loadCredentialService: Function,
-      clipboardWrite: Function
+    loadCredentialService: {
+      type: Function,
+      required: true
     },
-    setup() {
-      const validationSchema = yup.object({
-        id: yup.string().required(),
-        name: yup.string().required('Name is a required field'),
-        description: yup.string(),
-        token: yup.string(),
-        status: yup.boolean()
-      })
-
-      const { setValues, errors, meta, resetForm, values } = useForm({
-        validationSchema,
-        initialValues: {}
-      })
-
-      const { value: name } = useField('name')
-      const { value: token } = useField('token')
-      const { value: description } = useField('description')
-      const { value: status } = useField('status')
-
-      return {
-        name,
-        token,
-        description,
-        status,
-        errors,
-        meta,
-        resetForm,
-        values,
-        setValues
-      }
+    clipboardWrite: {
+      type: Function,
+      required: true
     },
-    methods: {
-      copyToken() {
-        this.clipboardWrite(this.token)
-        this.$toast.add({
-          closable: false,
-          severity: 'success',
-          summary: 'token copied',
-          life: 10000
-        })
-      }
+    updatedRedirect: {
+      type: String,
+      required: true
     }
+  })
+
+  const validationSchema = yup.object({
+    id: yup.string().required(),
+    name: yup.string().required('Name is a required field'),
+    description: yup.string(),
+    token: yup.string(),
+    status: yup.boolean()
+  })
+
+  const { setValues, errors, meta, resetForm, values } = useForm({
+    validationSchema,
+    initialValues: {
+      status: true
+    }
+  })
+
+  const { value: name } = useField('name')
+  const { value: token } = useField('token')
+  const { value: description } = useField('description')
+  const { value: status } = useField('status')
+
+  const toast = useToast()
+  const copyToken = async () => {
+    props.clipboardWrite(this.token)
+    toast.add({
+      closable: false,
+      severity: 'success',
+      summary: 'token copied',
+      life: 10000
+    })
   }
 </script>

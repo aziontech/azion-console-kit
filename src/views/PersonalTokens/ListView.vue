@@ -1,53 +1,83 @@
 <template>
-  <ListTableBlockNoEdit
+  <ListTableBlock
+    v-if="hasContentToList"
     :listService="listPersonalTokensService"
     :deleteService="deletePersonalTokenService"
     :columns="getColumns"
     pageTitle="Personal Tokens"
-    addButtonLabel="Add Personal Token"
+    pageTitleDelete="Personal Token"
+    addButtonLabel="Personal Token"
     createPagePath="personal-tokens/create"
+    @on-load-data="handleLoadData"
+    :enableEditClick="false"
   />
+  <EmptyResultsBlock
+    v-else
+    pageTitle="Personal Tokens"
+    title="No personal tokens found"
+    description="Create your first personal token."
+    createButtonLabel="Personal Token"
+    createPagePath="personal-tokens/create"
+    :documentationService="documentationService"
+  >
+    <template #illustration>
+      <Illustration />
+    </template>
+  </EmptyResultsBlock>
 </template>
 
-<script>
-  import ListTableBlockNoEdit from '@/templates/list-table-block/no-edit'
+<script setup>
+  import { ref } from 'vue'
+  import ListTableBlock from '@/templates/list-table-block'
 
-  export default {
-    name: 'personal-tokens-view',
-    components: {
-      ListTableBlockNoEdit
+  import EmptyResultsBlock from '@/templates/empty-results-block'
+  import Illustration from '@/assets/svg/illustration-layers.vue'
+  import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
+
+  defineProps({
+    listPersonalTokensService: {
+      type: Function,
+      required: true
     },
-    props: {
-      listPersonalTokensService: {
-        required: true,
-        type: Function
-      },
-      deletePersonalTokenService: {
-        required: true,
-        type: Function
-      }
+    deletePersonalTokenService: {
+      type: Function,
+      required: true
     },
-    computed: {
-      getColumns() {
-        return [
-          {
-            field: 'name',
-            header: 'Token Name'
-          },
-          {
-            field: 'scope',
-            header: 'Scope'
-          },
-          {
-            field: 'created',
-            header: 'Last modified'
-          },
-          {
-            field: 'expiresAt',
-            header: 'Expires'
-          }
-        ]
-      }
+    documentationService: {
+      required: true,
+      type: Function
     }
+  })
+
+  const hasContentToList = ref(true)
+
+  const getColumns = ref([
+    {
+      field: 'name',
+      header: 'Name'
+    },
+    {
+      field: 'description',
+      header: 'Description',
+      type: 'component',
+      component: (columnData) =>
+        columnBuilder({ data: columnData, columnAppearance: 'expand-text-column' })
+    },
+    {
+      field: 'scope',
+      header: 'Scope'
+    },
+    {
+      field: 'created',
+      header: 'Last Modified'
+    },
+    {
+      field: 'expiresAt',
+      header: 'Expiration Date'
+    }
+  ])
+
+  const handleLoadData = (event) => {
+    hasContentToList.value = event
   }
 </script>

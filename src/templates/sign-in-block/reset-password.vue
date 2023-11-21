@@ -1,11 +1,11 @@
 <template>
   <form @submit.prevent="resetPassword()">
-    <div class="flex flex-col align-top items-center p-4 animate-fadeIn">
+    <div class="flex flex-col align-top items-center animate-fadeIn">
       <div
         v-if="!isPasswordReseted"
-        class="surface-card surface-border border max-w-md w-full p-6 md:p-10 rounded-md flex-col gap-10 inline-flex"
+        class="surface-card surface-border border max-w-md w-full p-6 sm:p-8 rounded-md flex-col gap-10 inline-flex"
       >
-        <div class="text-xl md:text-2xl font-medium">Reset your password</div>
+        <h3 class="text-xl md:text-2xl font-medium">Reset Password</h3>
 
         <InlineMessage v-if="requestError">{{ requestError }}</InlineMessage>
 
@@ -28,6 +28,7 @@
           </div>
 
           <ul class="text-color-secondary list-inside space-y-3">
+            <span class="font-semibold text-sm text-color">Must have at least:</span>
             <li
               class="flex gap-3 items-center text-color-secondary"
               :key="i"
@@ -35,11 +36,11 @@
             >
               <div class="w-3">
                 <div
-                  class="w-2 h-2 bg-[#F3652B] animate-fadeIn"
+                  class="w-2 h-2 bg-orange-bullet animate-fadeIn"
                   v-if="!requirement.valid"
                 ></div>
                 <div
-                  class="pi pi-check text-sm text-[#22C55E] animate-fadeIn"
+                  class="pi pi-check text-sm text-success-check animate-fadeIn"
                   v-else
                 ></div>
               </div>
@@ -87,16 +88,17 @@
           class="surface-card surface-border border max-w-md w-full p-6 md:p-10 rounded-md flex-col gap-10 inline-flex"
         >
           <div class="flex flex-col gap-3">
-            <div class="text-xl md:text-2xl font-medium">Password reset complete</div>
+            <div class="text-xl md:text-2xl font-medium">Password Reset Complete</div>
             <p class="text-color-secondary">
-              Your password has been set. You may go ahead and sign in now.
+              Your password has been successfully reset. Sign in to Real-Time Manager to use Azion
+              products and services.
             </p>
           </div>
 
           <PrimeButton
             class="w-full flex-row-reverse"
             :loading="isButtonLoading"
-            label="Sign in"
+            label="Sign In"
             @click="goToSignIn()"
             severity="primary"
             type="button"
@@ -123,9 +125,9 @@
   const requestError = ref('')
   const passwordRequirementsList = ref([
     { label: '> 7 characters', valid: false },
-    { label: 'Uppercase letter', valid: false },
-    { label: 'Lowercase letter', valid: false },
-    { label: 'Special character (e.g. !?<>@#$%)', valid: false }
+    { label: '1 uppercase letter', valid: false },
+    { label: '1 lowercase letter', valid: false },
+    { label: '1 special character (example: !?<>@#$%)', valid: false }
   ])
 
   const props = defineProps({
