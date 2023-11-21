@@ -7,7 +7,7 @@
     <template #content>
       <div class="flex flex-col h-full">
         <div
-          class="flex flex-col h-full border surface-border gap-7 justify-center items-center rounded-md mx-8 py-7 mb-8 max-md:mx-3"
+          class="flex flex-col h-full border surface-border gap-7 justify-center items-center rounded-md"
         >
           <slot name="illustration" />
           <div class="flex flex-col gap-2">

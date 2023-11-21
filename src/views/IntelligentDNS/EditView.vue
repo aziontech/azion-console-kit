@@ -1,4 +1,8 @@
 <template>
+  <ContentBlock>
+    <template #heading>
+    </template>
+  </ContentBlock>
   <PageHeadingBlock pageTitle="Edit Intelligent DNS">
     <template #tabs>
       <TabView
@@ -98,6 +102,7 @@
   import FormHorizontal from '@templates/create-form-block-new/form-horizontal'
   import PageHeadingBlock from '@templates/page-heading-block-tabs'
   import ListTableBlock from '@templates/list-table-block/no-header'
+  import ContentBlock from '@/templates/content-block/ContentBlock.vue'
   import TabView from 'primevue/tabview'
   import TabPanel from 'primevue/tabpanel'
   import InputText from 'primevue/inputtext'
@@ -115,7 +120,8 @@
       InputSwitch,
       ListTableBlock,
       FormHorizontal,
-      PageHeadingBlock
+      PageHeadingBlock,
+      ContentBlock
     },
 
     props: {
