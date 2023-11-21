@@ -31,7 +31,8 @@ const adapt = (httpResponse) => {
         lastEditor: variable.last_editor,
         updatedAt: new Intl.DateTimeFormat('us', { dateStyle: 'full' }).format(
           new Date(variable.updated_at)
-        )
+        ),
+        updatedAtDate: variable.updated_at
       }))
     : []
 

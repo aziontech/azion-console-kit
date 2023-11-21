@@ -14,7 +14,7 @@ const fixtures = {
     uuid: 123123123,
     name: 'Network A',
     created: new Date(2023, 10, 10).toDateString(),
-    expires_at: new Date(2023, 11, 10).toDateString()
+    expires_at: new Date(2023, 11, 10).toDateString(),
   }
 }
 
@@ -72,7 +72,9 @@ describe('PersonalTokensServices', () => {
         description: '',
         name: fixtures.personalTokenMock.name,
         created: 'Friday, November 10, 2023',
-        expiresAt: 'Sunday, December 10, 2023'
+        createdDate: 'Fri Nov 10 2023',
+        expiresAt: 'Sunday, December 10, 2023',
+        expiresAtDate: 'Sun Dec 10 2023'
       }
     ])
   })
