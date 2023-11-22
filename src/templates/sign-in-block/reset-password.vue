@@ -58,7 +58,7 @@
             class="font-semibold text-sm"
             >Confirm Password</label
           >
-          <div>
+          <div class="flex flex-col gap-2">
             <Password
               toggleMask
               v-model="confirmPassword"
@@ -68,6 +68,11 @@
               :feedback="false"
               v-tooltip.top="errorConfirmation"
             />
+            <small
+              v-if="errorConfirmation"
+              class="p-error text-xs font-normal leading-tight"
+              >{{ errorConfirmation }}
+            </small>
           </div>
         </div>
         <PrimeButton
