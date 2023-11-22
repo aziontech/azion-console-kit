@@ -29,6 +29,7 @@ const adapt = (httpResponse) => {
       lastModified: new Intl.DateTimeFormat('us', { dateStyle: 'full' }).format(
         new Date(edgeFunction.modified)
       ),
+      lastModifiedDate: edgeFunction.modified,
       name: edgeFunction.name,
       referenceCount: edgeFunction.reference_count
     }

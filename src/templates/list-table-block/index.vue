@@ -51,6 +51,7 @@
           :key="col.field"
           :field="col.field"
           :header="col.header"
+          :sortField="col?.sortField"
         >
           <template #body="{ data: rowData }">
             <template v-if="col.type !== 'component'">
