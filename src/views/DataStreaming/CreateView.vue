@@ -666,6 +666,10 @@
                 placeholder="https://elasticsearch-domain.com/index"
                 :class="{ 'p-invalid': errors.elasticsearchUrl }"
               />
+              <small class="text-color-secondary text-sm font-normal leading-tight">
+                The URL plus the index of the Elasticsearch to receive the collected data from Data
+                Streaming.
+              </small>
               <small
                 id="elastic-search-url-help"
                 class="p-error"
@@ -679,11 +683,15 @@
                 class="text-color text-base font-medium"
                 >API Key *</label
               >
-              <InputText
+              <Textarea
                 v-model="apiKey"
-                type="text"
                 :class="{ 'p-invalid': errors.apiKey }"
+                rows="5"
+                cols="30"
               />
+              <small class="text-color-secondary text-sm font-normal leading-tight">
+                The API Key in base64 used for Elasticsearch authorization.
+              </small>
               <small
                 id="api-key-help"
                 class="p-error"
