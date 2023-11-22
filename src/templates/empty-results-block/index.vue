@@ -1,56 +1,47 @@
 <!-- eslint-disable vue/multi-word-component-names -->
 <template>
-  <ContentBlock>
-    <template #heading>
-      <PageHeadingBlock :pageTitle="pageTitle" />
-    </template>
-    <template #content>
-      <div class="flex flex-col h-full">
-        <div
-          class="flex flex-col h-full border surface-border gap-7 justify-center items-center rounded-md"
-        >
-          <slot name="illustration" />
-          <div class="flex flex-col gap-2">
-            <p class="text-center text-color text-lg font-bold leading-7">
-              {{ title }}
-            </p>
-            <p class="text-center text-color-secondary text-sm font-normal leading-tight">
-              {{ description }}
-            </p>
-          </div>
-          <div class="flex flex-col gap-5 items-center">
-            <div class="flex flex-wrap gap-2">
-              <slot name="extraActionsLeft"></slot>
-              <slot name="default">
-                <PrimeButton
-                  severity="secondary"
-                  icon="pi pi-plus"
-                  :label="createButtonLabel"
-                  @click="navigateToCreatePage"
-                />
-              </slot>
-              <slot name="extraActionsRight"></slot>
-            </div>
-            <PrimeButton
-              outlined
-              text
-              class="w-fit"
-              icon-pos="right"
-              icon="pi pi-external-link"
-              label="Learn more"
-              @click="openDocumentation"
-            />
-          </div>
-        </div>
+  <div class="flex flex-col h-full">
+    <div
+      class="flex flex-col h-full border surface-border gap-7 justify-center items-center rounded-md"
+    >
+      <slot name="illustration" />
+      <div class="flex flex-col gap-2">
+        <p class="text-center text-color text-lg font-bold leading-7">
+          {{ title }}
+        </p>
+        <p class="text-center text-color-secondary text-sm font-normal leading-tight">
+          {{ description }}
+        </p>
       </div>
-    </template>
-  </ContentBlock>
+      <div class="flex flex-col gap-5 items-center">
+        <div class="flex flex-wrap gap-2">
+          <slot name="extraActionsLeft"></slot>
+          <slot name="default">
+            <PrimeButton
+              severity="secondary"
+              icon="pi pi-plus"
+              :label="createButtonLabel"
+              @click="navigateToCreatePage"
+            />
+          </slot>
+          <slot name="extraActionsRight"></slot>
+        </div>
+        <PrimeButton
+          outlined
+          text
+          class="w-fit"
+          icon-pos="right"
+          icon="pi pi-external-link"
+          label="Learn more"
+          @click="openDocumentation"
+        />
+      </div>
+    </div>
+  </div>
 </template>
 
 <script setup>
-  import PageHeadingBlock from '@/templates/page-heading-block'
   import PrimeButton from 'primevue/button'
-  import ContentBlock from '@/templates/content-block'
 
   import { useRouter } from 'vue-router'
 
