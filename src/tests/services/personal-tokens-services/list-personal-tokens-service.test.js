@@ -14,7 +14,7 @@ const fixtures = {
     uuid: 123123123,
     name: 'Network A',
     created: new Date(2023, 10, 10).toDateString(),
-    expires_at: new Date(2023, 11, 10).toDateString(),
+    expires_at: new Date(2023, 11, 10).toDateString()
   }
 }
 

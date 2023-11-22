@@ -3,7 +3,7 @@
     <div class="flex flex-col align-top items-center animate-fadeIn">
       <div
         v-if="!isPasswordReseted"
-        class="surface-card surface-border border max-w-md w-full p-6 sm:p-8 rounded-md flex-col gap-10 inline-flex"
+        class="surface-card surface-border border max-w-md w-full p-6 sm:p-8 rounded-md flex-col sm:gap-8 gap-6 inline-flex"
       >
         <h3 class="text-xl md:text-2xl font-medium">Reset Password</h3>
 
@@ -58,7 +58,7 @@
             class="font-semibold text-sm"
             >Confirm Password</label
           >
-          <div>
+          <div class="flex flex-col gap-2">
             <Password
               toggleMask
               v-model="confirmPassword"
@@ -68,13 +68,18 @@
               :feedback="false"
               v-tooltip.top="errorConfirmation"
             />
+            <small
+              v-if="errorConfirmation"
+              class="p-error text-xs font-normal leading-tight"
+              >{{ errorConfirmation }}
+            </small>
           </div>
         </div>
         <PrimeButton
           class="w-full flex-row-reverse"
           :loading="isButtonLoading"
           label="Reset Password"
-          severity="primary"
+          severity="secondary"
           type="submit"
           :disabled="hasInvalidRequirement() || !confirmationIsValid"
         />
@@ -85,7 +90,7 @@
         class="flex flex-col align-top items-center p-4 animate-fadeIn"
       >
         <div
-          class="surface-card surface-border border max-w-md w-full p-6 md:p-10 rounded-md flex-col gap-10 inline-flex"
+          class="surface-card surface-border border max-w-md w-full p-6 md:p-10 rounded-md flex-col gap-8 inline-flex"
         >
           <div class="flex flex-col gap-3">
             <div class="text-xl md:text-2xl font-medium">Password Reset Complete</div>
@@ -100,7 +105,7 @@
             :loading="isButtonLoading"
             label="Sign In"
             @click="goToSignIn()"
-            severity="primary"
+            severity="secondary"
             type="button"
           />
         </div>
