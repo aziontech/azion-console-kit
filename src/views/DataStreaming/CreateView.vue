@@ -311,12 +311,16 @@
                 class="text-color text-base font-medium"
                 >Bootstrap Servers *</label
               >
-              <InputText
+              <Textarea
                 v-model="bootstrapServers"
-                type="text"
                 placeholder="host1:port1,host2:port2,..."
                 :class="{ 'p-invalid': errors.bootstrapServers }"
+                rows="5"
+                cols="30"
               />
+              <small class="text-color-secondary text-xs font-normal leading-tight">
+                The list of host and port (comma-separated) from Kafka brokers.
+              </small>
               <small
                 id="bootstrap-servers-help"
                 class="p-error"
@@ -332,9 +336,13 @@
               >
               <InputText
                 v-model="kafkaTopic"
+                id="kafkaTopic"
                 type="text"
                 :class="{ 'p-invalid': errors.kafkaTopic }"
               />
+              <small class="text-color-secondary text-xs font-normal leading-tight">
+                The topic name from Kafka brokers.
+              </small>
               <small
                 id="kafka-topic-help"
                 class="p-error"
@@ -342,50 +350,23 @@
               >
             </div>
 
-            <div class="flex flex-col gap-2">
-              <label class="text-color text-base font-medium"
-                >Use Transport Layer Security (TLS)</label
-              >
-              <div class="flex flex-col gap-3">
-                <Card
-                  :pt="{
-                    body: { class: 'p-4' },
-                    title: { class: 'flex justify-between  text-base m-0 font-medium' },
-                    subtitle: {
-                      class: 'text-sm font-normal text-color-secondary m-0 pr-0 md:pr-[2.5rem]'
-                    }
-                  }"
+            <div class="flex sm:max-w-lg w-full gap-2 items-top">
+              <InputSwitch
+                v-model="tlsOption"
+                id="tlsOption"
+                class="flex-shrink-0 flex-grow"
+                :class="{ 'p-invalid': errors.tlsOption }"
+              />
+              <div class="flex flex-col gap-1">
+                <label
+                  for="tlsOption"
+                  class="text-sm font-normal leading-tight"
+                  >Use Transport Layer Security (TLS)</label
                 >
-                  <template #title>
-                    <span class="text-base">No</span>
-                    <RadioButton
-                      v-model="tlsOption"
-                      inputId="no"
-                      name="No"
-                      :value="false"
-                    />
-                  </template>
-                </Card>
-
-                <Card
-                  :pt="{
-                    body: { class: 'p-4' },
-                    title: { class: 'flex justify-between  text-base m-0 font-medium' },
-                    subtitle: {
-                      class: 'text-sm font-normal text-color-secondary m-0 pr-0 md:pr-[2.5rem]'
-                    }
-                  }"
-                >
-                  <template #title>
-                    <span class="text-base">Yes</span>
-                    <RadioButton
-                      v-model="tlsOption"
-                      inputId="yes"
-                      name="Yes"
-                      :value="true"
-                    />
-                  </template>
-                </Card>
+                <small class="text-color-secondary text-sm font-normal leading-tight">
+                  If you need secure logging, use Transport Layer Security (TLS). Make sure your
+                  server uses a trusted CA certificate.
+                </small>
               </div>
             </div>
           </div>
@@ -1010,7 +991,6 @@
   import ButtonPrimer from 'primevue/button'
   import InputNumber from 'primevue/inputnumber'
   import Textarea from 'primevue/textarea'
-  import Card from 'primevue/card'
 
   const props = defineProps({
     createDataStreamingService: {
