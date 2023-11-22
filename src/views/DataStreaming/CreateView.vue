@@ -717,6 +717,10 @@
                 placeholder="https://inputs.splunk-client.splunkcloud.com:123456/services/collector"
                 :class="{ 'p-invalid': errors.splunkUrl }"
               />
+              <small class="text-color-secondary text-sm font-normal leading-tight">
+                The URL that will receive the collected data from Data Streaming, if you have an
+                alternative index to point, you can do at the end of the URL.
+              </small>
               <small
                 id="splunk-url-help"
                 class="p-error"
@@ -730,11 +734,15 @@
                 class="text-color text-base font-medium"
                 >API Key *</label
               >
-              <InputText
+              <Textarea
                 v-model="splunkApiKey"
-                type="text"
                 :class="{ 'p-invalid': errors.splunkApiKey }"
+                rows="5"
+                cols="30"
               />
+              <small class="text-color-secondary text-sm font-normal leading-tight">
+                The HTTP Event Collector Token, provided by your Splunk installation.
+              </small>
               <small
                 id="splunk-api-key-help"
                 class="p-error"
