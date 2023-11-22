@@ -2,7 +2,7 @@
   <MfaAuthenticateBlock
     :validateMfaCodeService="validateMfaCodeService"
     :verifyAuthenticationService="verifyAuthenticationService"
-    :switchAccountService="switchAccountService"
+    :accountHandler="accountHandler"
   />
 </template>
 
@@ -18,9 +18,9 @@
       required: true,
       type: Function
     },
-    switchAccountService: {
+    accountHandler: {
       required: true,
-      type: Function
+      type: Object
     }
   })
 </script>
