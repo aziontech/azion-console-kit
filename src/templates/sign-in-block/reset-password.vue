@@ -21,11 +21,12 @@
               v-model="password"
               id="password"
               class="w-full"
-              :class="{ 'p-invalid': errorPassword }"
+              :class="{ 'p-invalid': errors.password }"
               :feedback="false"
-              v-tooltip.top="errorPassword"
+              v-tooltip.top="{ value: errors.password, showDelay: 200 }"
             />
           </div>
+          <small class="p-error text-xs font-normal leading-tight">{{ errors.password }}</small>
 
           <ul class="text-color-secondary list-inside space-y-3">
             <span class="font-semibold text-sm text-color">Must have at least:</span>
@@ -64,15 +65,22 @@
               v-model="confirmPassword"
               id="confirm-password"
               class="w-full"
-              :class="{ 'p-invalid': errorConfirmation }"
+              :class="{ 'p-invalid': errors.confirmPassword }"
               :feedback="false"
-              v-tooltip.top="errorConfirmation"
+              v-tooltip.top="{ value: errors.confirmPassword, showDelay: 200 }"
             />
             <InlineMessage
-              v-if="errorConfirmation"
+              v-if="isMatchError"
               severity="error"
-              >{{ errorConfirmation }}</InlineMessage
             >
+              {{ errors.confirmPassword }}
+            </InlineMessage>
+            <small
+              v-if="otherPasswordErrors"
+              class="p-error text-xs font-normal leading-tight"
+            >
+              {{ errors.confirmPassword }}
+            </small>
           </div>
         </div>
         <PrimeButton
@@ -81,7 +89,7 @@
           label="Reset Password"
           severity="secondary"
           type="submit"
-          :disabled="hasInvalidRequirement() || !confirmationIsValid"
+          :disabled="!meta.valid"
         />
       </div>
 
@@ -119,69 +127,59 @@
   import PrimeButton from 'primevue/button'
   import InlineMessage from 'primevue/inlinemessage'
   import * as yup from 'yup'
-  import { watch, ref, computed } from 'vue'
+  import { computed, ref } from 'vue'
   import { useRoute, useRouter } from 'vue-router'
-  import { useField } from 'vee-validate'
+  import { useField, useForm } from 'vee-validate'
+
+  const MATCH_ERROR_MESSAGE = 'The passwords do not match'
+  const isMatchError = computed(() => {
+    return errors.value.confirmPassword === MATCH_ERROR_MESSAGE
+  })
+  const otherPasswordErrors = computed(() => {
+    return errors.value.confirmPassword !== MATCH_ERROR_MESSAGE
+  })
 
   const isButtonLoading = ref(false)
   const isPasswordReseted = ref(false)
-  const errorPassword = ref('')
-  const errorConfirmation = ref('')
   const requestError = ref('')
   const passwordRequirementsList = ref([
     { label: '> 7 characters', valid: false },
-    { label: '1 uppercase letter', valid: false },
-    { label: '1 lowercase letter', valid: false },
-    { label: '1 special character (example: !?<>@#$%)', valid: false }
+    { label: 'Uppercase letter', valid: false },
+    { label: 'Lowercase letter', valid: false },
+    { label: 'Special character (e.g. !?<>@#$%)', valid: false }
   ])
 
   const props = defineProps({
     resetPasswordService: { type: Function, required: true }
   })
 
-  const passwordValidationSchema = yup.object({
-    password: yup.string().required('Password is a required field'),
+  const validationSchema = yup.object({
+    password: yup
+      .string()
+      .required('Password is a required field')
+      .test('max', 'Exceeded number of characters', (value) => value?.length <= 128)
+      .test('noSpaces', 'Spaces are not allowed', (value) => !value?.match(/\s/g))
+      .test('requirements', '', (value) => {
+        const hasUpperCase = value && /[A-Z]/.test(value)
+        const hasLowerCase = value && /[a-z]/.test(value)
+        const hasSpecialChar = value && /[!@#$%^&*(),.?":{}|<>]/.test(value)
+        const hasMinLength = value?.length > 7
+        passwordRequirementsList.value[0].valid = hasMinLength
+        passwordRequirementsList.value[1].valid = hasUpperCase
+        passwordRequirementsList.value[2].valid = hasLowerCase
+        passwordRequirementsList.value[3].valid = hasSpecialChar
+        return hasMinLength && hasUpperCase && hasLowerCase && hasSpecialChar
+      }),
     confirmPassword: yup
       .string()
-      .test('match', 'The passwords do not match', (value) => !value || password.value === value)
       .required('Confirm Password is a required field')
+      .test('match', MATCH_ERROR_MESSAGE, (value) => value === values.password)
   })
 
+  const { errors, values, meta } = useForm({ validationSchema })
   const { value: password } = useField('password')
   const { value: confirmPassword } = useField('confirmPassword')
 
-  const validatePasswordRequirements = (newPassword) => {
-    const hasUpperCase = /[A-Z]/.test(newPassword)
-    const hasLowerCase = /[a-z]/.test(newPassword)
-    const hasSpecialCharacter = /[!@#$%^&*(),.?":{}|<>]/.test(newPassword)
-    const hasMinimumLength = newPassword.length > 7
-
-    passwordRequirementsList.value[0].valid = hasMinimumLength
-    passwordRequirementsList.value[1].valid = hasUpperCase
-    passwordRequirementsList.value[2].valid = hasLowerCase
-    passwordRequirementsList.value[3].valid = hasSpecialCharacter
-  }
-
-  const hasInvalidRequirement = () => {
-    return passwordRequirementsList.value.some((requirement) => !requirement.valid)
-  }
-
-  const validateConfirmationPassword = async (passwords) => {
-    try {
-      let newPassword = passwords[0]
-      let newConfirmPassword = passwords[1] || ''
-
-      validatePasswordRequirements(newPassword)
-
-      await passwordValidationSchema.validate({
-        password: newPassword,
-        confirmPassword: newConfirmPassword
-      })
-      errorConfirmation.value = ''
-    } catch (error) {
-      errorConfirmation.value = error.errors[0]
-    }
-  }
   const route = useRoute()
   const resetPassword = async () => {
     try {
@@ -189,7 +187,7 @@
       const { uidb64, token } = route.params
 
       const payload = {
-        password: password.value,
+        password: values.password,
         uidb64,
         token
       }
@@ -211,24 +209,4 @@
       router.push({ name: 'login' })
     }, 500)
   }
-
-  watch([password, confirmPassword], validateConfirmationPassword)
-
-  const confirmationIsValid = computed(() => {
-    return !errorConfirmation.value && confirmPassword.value
-  })
-
-  defineExpose({
-    isButtonLoading,
-    errorPassword,
-    errorConfirmation,
-    props,
-    password,
-    confirmPassword,
-    goToSignIn,
-    confirmationIsValid,
-    passwordRequirementsList,
-    hasInvalidRequirement,
-    validateConfirmationPassword
-  })
 </script>

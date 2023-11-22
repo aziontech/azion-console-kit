@@ -19,7 +19,7 @@
           :disabled="isSubmitDisabled"
         />
         <PrimeBadge
-          class="rounded-md px-1 animate-fadeIn"
+          class="rounded-md animate-fadeIn"
           :value="counter"
           v-if="counter > 0"
         />
