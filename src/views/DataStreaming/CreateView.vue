@@ -201,7 +201,9 @@
                 placeholder="https://app.domain.com/"
                 :class="{ 'p-invalid': errors.endpointUrl }"
               />
-
+              <small class="text-color-secondary text-xs font-normal leading-tight">
+                The URL to receive the collected data from Data Streaming.
+              </small>
               <small
                 id="endpoint-url-help"
                 class="p-error"
@@ -224,7 +226,7 @@
                   v-model="header.value"
                   type="text"
                   id="header-value"
-                  placeholder="header-name: value"
+                  placeholder="Value"
                 />
                 <ButtonPrimer
                   icon="pi pi-trash"
@@ -245,43 +247,6 @@
                 @click="addHeader()"
               />
             </div>
-            <div class="flex flex-col sm:max-w-lg w-full gap-2">
-              <label
-                for="maxSize"
-                class="text-color text-base font-medium"
-                >Max Size *</label
-              >
-              <InputNumber
-                v-model="maxSize"
-                placeholder="1000000"
-                :useGrouping="false"
-                :class="{ 'p-invalid': errors.maxSize }"
-              />
-              <small
-                id="max-size-help"
-                class="p-error"
-                >{{ errors.maxSize }}</small
-              >
-            </div>
-
-            <div class="flex flex-col sm:max-w-lg w-full gap-2">
-              <label
-                for="lineSeparator"
-                class="text-color text-base font-medium"
-                >Log Line Separator *</label
-              >
-              <InputText
-                v-model="lineSeparator"
-                type="text"
-                placeholder="\n"
-                :class="{ 'p-invalid': errors.lineSeparator }"
-              />
-              <small
-                id="max-size-help"
-                class="p-error"
-                >{{ errors.lineSeparator }}</small
-              >
-            </div>
 
             <div class="flex flex-col sm:max-w-lg w-full gap-2">
               <label
@@ -295,10 +260,60 @@
                 placeholder="$dataset"
                 :class="{ 'p-invalid': errors.payloadFormat }"
               />
+              <small class="text-color-secondary text-xs font-normal leading-tight">
+                The format that payload will be sent. The $dataset variable will be replaced by all
+                logs already with the log line separator applied.
+              </small>
               <small
                 id="data-set-help"
                 class="p-error"
                 >{{ errors.payloadFormat }}</small
+              >
+            </div>
+
+            <div class="flex flex-col sm:max-w-lg w-full gap-2">
+              <label
+                for="lineSeparator"
+                class="text-color text-base font-medium"
+                >Log Line Separator Payload *</label
+              >
+              <InputText
+                v-model="lineSeparator"
+                type="text"
+                placeholder="\n"
+                :class="{ 'p-invalid': errors.lineSeparator }"
+              />
+              <small class="text-color-secondary text-xs font-normal leading-tight">
+                The format that payload will be sent. The $dataset variable will be replaced by all
+                logs already with the log line separator applied.
+              </small>
+              <small
+                id="max-size-help"
+                class="p-error"
+                >{{ errors.lineSeparator }}</small
+              >
+            </div>
+
+            <div class="flex flex-col sm:max-w-lg w-full gap-2">
+              <label
+                for="maxSize"
+                class="text-color text-base font-medium"
+                >Max Size Payload *</label
+              >
+              <InputNumber
+                v-model="maxSize"
+                placeholder="1000000"
+                :useGrouping="false"
+                :class="{ 'p-invalid': errors.maxSize }"
+              />
+              <small class="text-color-secondary text-xs font-normal leading-tight">
+                You can define the maximum size of data packets in bytes. Use a value starting from
+                1000000.
+              </small>
+              <small
+                id="max-size-help"
+                class="p-error"
+                >{{ errors.maxSize }}</small
               >
             </div>
           </div>
