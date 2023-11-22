@@ -767,6 +767,9 @@
                 type="text"
                 :class="{ 'p-invalid': errors.streamName }"
               />
+              <small class="text-color-secondary text-sm font-normal leading-tight">
+                The name of your delivery Kinesis Firehose stream.
+              </small>
               <small
                 id="stream-name-help"
                 class="p-error"
@@ -778,13 +781,16 @@
               <label
                 for="region"
                 class="text-color text-base font-medium"
-                >Region *</label
+                >Country / Region *</label
               >
               <InputText
                 v-model="awsRegion"
                 type="text"
                 :class="{ 'p-invalid': errors.awsRegion }"
               />
+              <small class="text-color-secondary text-sm font-normal leading-tight">
+                The region of your S3 bucket.
+              </small>
               <small
                 id="aws-region-help"
                 class="p-error"
@@ -798,11 +804,18 @@
                 class="text-color text-base font-medium"
                 >Access Key *</label
               >
-              <InputText
+              <PrimePassword
+                id="awsAccessKey"
                 v-model="awsAccessKey"
                 type="text"
+                class="flex flex-col w-full"
                 :class="{ 'p-invalid': errors.awsAccessKey }"
+                :feedback="false"
+                toggleMask
               />
+              <small class="text-color-secondary text-sm font-normal leading-tight">
+                The access key of your Kinesis Firehose stream.
+              </small>
               <small
                 id="aws-access-key-help"
                 class="p-error"
@@ -816,11 +829,18 @@
                 class="text-color text-base font-medium"
                 >Secret Key *</label
               >
-              <InputText
+              <PrimePassword
+                id="awsSecretKey"
                 v-model="awsSecretKey"
                 type="text"
+                class="flex flex-col w-full"
                 :class="{ 'p-invalid': errors.awsSecretKey }"
+                :feedback="false"
+                toggleMask
               />
+              <small class="text-color-secondary text-sm font-normal leading-tight">
+                The secret key of your Kinesis Firehose stream.
+              </small>
               <small
                 id="aws-secret-key-help"
                 class="p-error"
