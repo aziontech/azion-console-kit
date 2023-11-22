@@ -943,10 +943,16 @@
                 >Log Type *</label
               >
               <InputText
+                id="logType"
                 v-model="logType"
                 type="text"
                 :class="{ 'p-invalid': errors.logType }"
               />
+              <small class="text-color-secondary text-sm font-normal leading-tight">
+                Specify the record type of the data that's being submitted. It can contain only
+                letters, numbers, and the underscore (_) character, and it can't exceed 100
+                characters.
+              </small>
               <small
                 id="log-type-help"
                 class="p-error"
@@ -960,11 +966,18 @@
                 class="text-color text-base font-medium"
                 >Shared Key *</label
               >
-              <InputText
+              <PrimePassword
+                id="sharedKey"
                 v-model="sharedKey"
                 type="text"
+                class="flex flex-col w-full"
                 :class="{ 'p-invalid': errors.sharedKey }"
+                :feedback="false"
+                toggleMask
               />
+              <small class="text-color-secondary text-sm font-normal leading-tight">
+                The Shared Key of the Workspace.
+              </small>
               <small
                 id="shared-key-help"
                 class="p-error"
@@ -982,6 +995,10 @@
                 v-model="generatedField"
                 type="text"
               />
+              <small class="text-color-secondary text-sm font-normal leading-tight">
+                The field that will be used for the TimeGenerated field. When not specified, It'll
+                use the ingestion time.
+              </small>
             </div>
 
             <div class="flex flex-col sm:max-w-lg w-full gap-2">
@@ -995,6 +1012,9 @@
                 type="text"
                 :class="{ 'p-invalid': errors.workspaceID }"
               />
+              <small class="text-color-secondary text-sm font-normal leading-tight">
+                The ID of your Workspace.
+              </small>
               <small
                 id="workspace-id-help"
                 class="p-error"
