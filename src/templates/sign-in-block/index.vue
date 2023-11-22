@@ -194,12 +194,8 @@
       type: Function,
       required: true
     },
-    switchAccountLoginService: {
-      type: Function,
-      required: true
-    },
-    listTypeAccountService: {
-      type: Function,
+    accountHandler: {
+      type: Object,
       required: true
     }
   })
@@ -264,43 +260,10 @@
     }
   }
 
-  const searchAccount = async () => {
-    //deprecated: method will be replaced by an api in the future
-    try {
-      const accountTypes = ['brands', 'resellers', 'groups', 'clients']
-
-      for (const typeAccount of accountTypes) {
-        const { results: [firstResult] = [] } = await props.listTypeAccountService({
-          type: typeAccount,
-          page_size: 1
-        })
-
-        if (firstResult) {
-          return firstResult
-        }
-      }
-    } catch (error) {
-      throw new error()
-    }
-  }
-
-  const getAccountId = async (accountId) => {
-    if (!accountId) {
-      const { accountId } = await searchAccount()
-      return accountId
-    }
-    return accountId
-  }
-
   const switchClientAccount = async ({ account_id }) => {
     try {
-      const accountId = await getAccountId(account_id)
-      const { first_login: firstLogin } = await props.switchAccountLoginService(accountId)
-      if (firstLogin) {
-        router.push({ name: 'additional-data' })
-        return
-      }
-      router.push({ name: 'home' })
+      const redirect = await props.accountHandler.switchAndReturnAccountPage(account_id)
+      router.push(redirect)
     } catch {
       hasRequestErrorMessage.value = new ProccessRequestError().message
     }

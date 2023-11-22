@@ -28,6 +28,7 @@
             v-show="qrCode.url"
             :value="qrCode?.url"
             level="H"
+            :size="250"
             class="w-[10rem] h-[10rem] sm:w-[12.5rem] sm:h-[12.5rem]"
           />
         </div>
@@ -45,6 +46,7 @@
               :key="i"
               class="grow w-7 sm:w-11 h-[2.6rem] text-lg text-center"
               v-model="digits.value.value"
+              :disabled="isButtonLoading"
               @input="moveFocus(i)"
               :ref="(el) => (inputRefs[i] = el)"
             />
@@ -88,6 +90,14 @@
     validateMfaCodeService: {
       required: true,
       type: Function
+    },
+    verifyAuthenticationService: {
+      required: true,
+      type: Function
+    },
+    accountHandler: {
+      required: true,
+      type: Object
     }
   })
 
@@ -153,14 +163,25 @@
   const joinDigitsMfa = () => {
     return digitsMfa.map((digit) => digit.value.value).join('')
   }
+
+  const verifyUserData = async () => {
+    try {
+      return await props.verifyAuthenticationService()
+    } catch (err) {
+      router.push({ name: 'login' })
+    }
+  }
+
   const authorizeDevice = async () => {
     try {
       isButtonLoading.value = true
-
       const mfaToken = joinDigitsMfa()
       await props.validateMfaCodeService(mfaToken)
-
-      router.push({ name: 'home' })
+      const { user_tracking_info: userInfo } = await verifyUserData()
+      const redirect = await props.accountHandler.switchAndReturnAccountPage(
+        userInfo.props.account_id
+      )
+      router.push(redirect)
     } catch (error) {
       hasRequestErrorMessage.value = error
     } finally {

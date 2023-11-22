@@ -42,7 +42,8 @@
           v-model:showSwitchAccount="openSwitchAccount"
           :accessMenu="profileMenuSwitchAccount"
           :account="user"
-          :accountListService="serviceSwitchAccount"
+          :listTypeAccountService="listTypeAccountService"
+          :accountHandler="accountHandler"
         />
       </div>
 
@@ -581,7 +582,6 @@
   import { useAccountStore } from '@/stores/account'
   import { useHelpCenterStore } from '@/stores/help-center'
   import { mapActions, mapState } from 'pinia'
-  import { listTypeAccountService } from '@/services/switch-account-services/list-type-account-service'
   import SwitchAccountBlock from '@/templates/switch-account-block'
   import CreateModalBlock from '@/templates/create-modal-block'
 
@@ -602,7 +602,17 @@
       SwitchAccountBlock,
       CreateModalBlock
     },
-    props: { isLogged: Boolean },
+    props: {
+      isLogged: Boolean,
+      listTypeAccountService: {
+        type: Function,
+        required: true
+      },
+      accountHandler: {
+        type: Object,
+        required: true
+      }
+    },
     inject: ['createBoardManager'],
     data() {
       return {
@@ -799,8 +809,7 @@
           { name: 'Light', value: 'light', icon: 'pi pi-sun' },
           { name: 'Dark', value: 'dark', icon: 'pi pi-moon' },
           { name: 'System', value: 'system', icon: 'pi pi-desktop' }
-        ],
-        serviceSwitchAccount: listTypeAccountService
+        ]
       }
     },
     computed: {

@@ -220,13 +220,13 @@
     columnSelectorPanel.value.toggle(event)
   }
 
-  const loadData = async ({ page = props.pageInitial, page_size = props.limitShowRows } = {}) => {
+  const loadData = async ({ page = props.pageInitial, pageSize = props.limitShowRows } = {}) => {
     try {
       isLoading.value = true
       listRecords.value = []
       const { results, totalPages } = await props.listService({
         page,
-        page_size,
+        pageSize,
         ...filters.value
       })
       totalRecords.value = totalPages * props.limitShowRows
@@ -249,6 +249,6 @@
 
   const onPage = (event) => {
     const page = event.page + props.pageInitial
-    loadData({ page, page_size: event.rows })
+    loadData({ page, pageSize: event.rows })
   }
 </script>

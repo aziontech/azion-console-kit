@@ -107,7 +107,7 @@
           </template>
         </PrimeCard>
         <ListTableBlock
-          :listService="accountListService"
+          :listService="listTypeAccountService"
           :limitShowRows="10"
           pageTitle="Accounts List"
           :columns="columns"
@@ -154,7 +154,6 @@
   import Divider from 'primevue/divider'
   import PrimeCard from 'primevue/card'
   import ListTableBlock from '@/templates/list-table-block/with-lazy-and-dropdown-filter.vue'
-  import { switchAccountService } from '@/services/auth-services'
   import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
 
   defineOptions({ name: 'SwitchAccountBlock' })
@@ -173,7 +172,7 @@
       type: Object,
       required: true
     },
-    accountListService: {
+    listTypeAccountService: {
       type: Function,
       required: true
     },
@@ -181,6 +180,10 @@
       type: Boolean,
       required: false,
       default: true
+    },
+    accountHandler: {
+      type: Object,
+      required: true
     }
   })
 
@@ -249,11 +252,6 @@
   }
   const onSelectedAccount = async (rowSelected) => {
     visible.value = false
-    const { first_login: firstLogin } = await switchAccountService(rowSelected.accountId)
-    if (firstLogin) {
-      window.location = 'iam/additional-data'
-      return
-    }
-    window.location.replace('/')
+    props.accountHandler.switchAccountAndRedirect(rowSelected.accountId)
   }
 </script>
