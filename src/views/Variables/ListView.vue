@@ -92,6 +92,7 @@
           },
           {
             field: 'updatedAt',
+            sortField: 'updatedAtDate',
             header: 'Last Update'
           }
         ]
