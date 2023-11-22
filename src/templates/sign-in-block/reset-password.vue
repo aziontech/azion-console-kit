@@ -68,11 +68,11 @@
               :feedback="false"
               v-tooltip.top="errorConfirmation"
             />
-            <small
+            <InlineMessage
               v-if="errorConfirmation"
-              class="p-error text-xs font-normal leading-tight"
-              >{{ errorConfirmation }}
-            </small>
+              severity="error"
+              >{{ errorConfirmation }}</InlineMessage
+            >
           </div>
         </div>
         <PrimeButton
