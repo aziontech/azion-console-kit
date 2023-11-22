@@ -10,13 +10,13 @@
         <div class="flex flex-col gap-4 max-w-4xl">
           <h1 class="text-color text-2xl md:text-3xl font-medium">Get Started</h1>
           <h2 class="text-sm md:text-xl text-color-secondary font-normal">
-            Great to have you on board! Fell free to explore, or get a head start below.
+            Welcome aboard! Feel free to explore or get a head start below.
           </h2>
         </div>
         <div>
           <PrimeButton
             class="w-full sm:w-auto"
-            label="Create something new"
+            label="Create"
             type="button"
             size="small"
             @click="createBoardManager.open()"
@@ -34,9 +34,9 @@
               <span class="pi pi-box"></span>
             </div>
             <div class="flex flex-col gap-2">
-              <div class="text-lg sm:text-xl font-medium">Manage your applications</div>
+              <div class="text-lg sm:text-xl font-medium">Manage your Applications</div>
               <div class="text-xs sm:text-sm text-color-secondary">
-                Add and manage custom domains to your edge applications.
+                Add and manage custom domains, main settings, and protocols for edge applications.
               </div>
             </div>
           </div>
@@ -74,9 +74,9 @@
               <span class="pi pi-chart-line"></span>
             </div>
             <div class="flex flex-col gap-2">
-              <div class="text-lg sm:text-xl font-medium">View analytics</div>
+              <div class="text-lg sm:text-xl font-medium">View Analytics</div>
               <div class="text-xs sm:text-sm text-color-secondary">
-                Gain powerful insights into your performance, availability, and security.
+                Get powerful insights into applications performance, availability, and security.
               </div>
             </div>
           </div>
@@ -120,10 +120,10 @@
           @click="closeInviteSession"
         />
         <div class="flex flex-col gap-2">
-          <div class="text-lg sm:text-xl font-medium">Invite your team</div>
+          <div class="text-lg sm:text-xl font-medium">Invite the Team</div>
           <div class="text-xs sm:text-sm text-color-secondary">
-            All Azion plans include unlimited seats for your team. Invite your colleagues to start
-            building with you.
+            All Azion plans include unlimited team seats. Invite colleagues to start
+            building together.
           </div>
         </div>
         <form
@@ -156,7 +156,7 @@
             <label
               for="email"
               class="text-color text-sm font-medium"
-              >E-mail</label
+              >Email</label
             >
             <InputText
               v-model="email"
@@ -187,7 +187,7 @@
               optionLabel="label"
               optionValue="value"
               class="w-full"
-              placeholder="Choose a team"
+              placeholder="Select a team"
             />
             <small
               v-if="errors.team"
@@ -218,7 +218,7 @@
         >
           <div class="text-lg font-medium">Product Documentation</div>
           <div class="text-sm text-color-secondary">
-            Detailed documentation on each of our products and their features.
+            Get to know and learn how to configure all Azion products and their features.
           </div>
         </button>
         <!-- API -->
@@ -229,8 +229,7 @@
         >
           <div class="text-lg font-medium">API Documentation</div>
           <div class="text-sm text-color-secondary">
-            Azion's API exposes the entire Azion product portfolio via a standardized programmatic
-            interface.
+            Use the Azion API to fully interact with Azion products through HTTPS requests.
           </div>
         </button>
         <!-- Contact -->
@@ -241,7 +240,7 @@
         >
           <div class="text-lg font-medium">Contact Support</div>
           <div class="text-sm text-color-secondary">
-            Send queries, suggestions or report to our specialized support team.
+            Send queries, suggestions, or report incidents to the specialized support team.
           </div>
         </button>
       </div>
