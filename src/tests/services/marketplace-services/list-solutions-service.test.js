@@ -61,10 +61,10 @@ describe('MarketplaceServices', () => {
 
     const { sut } = makeSut()
 
-    await sut()
+    await sut({})
 
     expect(requestSpy).toHaveBeenCalledWith({
-      url: `marketplace/solution/`,
+      url: `marketplace/solution/?`,
       headers: {
         'Mktp-Api-Context': 'onboarding'
       },
@@ -87,7 +87,9 @@ describe('MarketplaceServices', () => {
         id: fixtures.solutionSample.id,
         name: fixtures.solutionSample.name,
         referenceId: fixtures.solutionSample.solution_reference_id,
-        vendor: fixtures.solutionSample.vendor
+        vendor: fixtures.solutionSample.vendor,
+        released: fixtures.solutionSample.new_release,
+        featured: fixtures.solutionSample.featured
       }
     ])
   })
