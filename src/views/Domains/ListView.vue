@@ -32,6 +32,7 @@
   import Illustration from '@/assets/svg/illustration-layers.vue'
   import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
   import { computed, ref } from 'vue'
+  import * as Helpers from '@/helpers'
 
   defineProps({
     listDomainsService: {
@@ -62,7 +63,17 @@
       },
       {
         field: 'domainName',
-        header: 'Domain Name'
+        header: 'Domain Name',
+        type: 'component',
+        component: (columnData) => {
+          return columnBuilder({
+            data: columnData,
+            columnAppearance: 'text-with-clipboard',
+            dependencies: {
+              copyContentService: Helpers.clipboardWrite
+            }
+          })
+        }
       },
       {
         field: 'cnames',
