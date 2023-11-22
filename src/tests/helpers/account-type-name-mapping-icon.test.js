@@ -6,7 +6,7 @@ const makeSut = () => {
   return { sut }
 }
 
-describe('AccountTypeNameMapping method getAccountTypeIcon', () => {
+describe('AccountTypeNameMapping', () => {
   it('should return correct account type icon for client', () => {
     const { sut } = makeSut()
     const accountTypeIcon = sut.getAccountTypeIcon('client')

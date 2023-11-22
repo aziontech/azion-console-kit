@@ -10,7 +10,7 @@ const makeSut = () => {
   }
 }
 
-describe('AccountTypeNameMapping method getAccountTypeName', () => {
+describe('AccountTypeNameMapping', () => {
   it('should return correct account type name for client', () => {
     const { sut } = makeSut()
     const accountTypeName = sut.getAccountTypeName('client')
