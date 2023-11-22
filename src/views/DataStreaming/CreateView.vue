@@ -464,10 +464,14 @@
                 class="text-color text-base font-medium"
                 >Access Key *</label
               >
-              <InputText
+              <PrimePassword
+                id="accessKey"
                 v-model="accessKey"
                 type="text"
+                class="flex flex-col w-full"
                 :class="{ 'p-invalid': errors.accessKey }"
+                :feedback="false"
+                toggleMask
               />
               <small class="text-color-secondary text-sm font-normal leading-tight">
                 The access key of your S3 bucket.
@@ -485,10 +489,14 @@
                 class="text-color text-base font-medium"
                 >Secret Key *</label
               >
-              <InputText
+              <PrimePassword
+                id="secretKey"
                 v-model="secretKey"
                 type="text"
+                class="flex flex-col w-full"
                 :class="{ 'p-invalid': errors.secretKey }"
+                :feedback="false"
+                toggleMask
               />
               <small class="text-color-secondary text-sm font-normal leading-tight">
                 The secret key of your S3 bucket.
@@ -506,10 +514,14 @@
                 class="text-color text-base font-medium"
                 >Object Key Prefix *</label
               >
-              <InputText
+              <PrimePassword
+                id="objectKey"
                 v-model="objectKey"
                 type="text"
+                class="flex flex-col w-full"
                 :class="{ 'p-invalid': errors.objectKey }"
+                :feedback="false"
+                toggleMask
               />
               <small class="text-color-secondary text-sm font-normal leading-tight">
                 The format of the object that will be created in your S3 bucket.
@@ -1023,6 +1035,7 @@
 
   import Dropdown from 'primevue/dropdown'
   import RadioButton from 'primevue/radiobutton'
+  import PrimePassword from 'primevue/password'
   import PickList from 'primevue/picklist'
   import InputText from 'primevue/inputtext'
   import InputSwitch from 'primevue/inputswitch'
