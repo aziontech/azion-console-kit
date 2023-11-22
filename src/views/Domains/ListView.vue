@@ -33,7 +33,7 @@
   import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
   import { computed, ref } from 'vue'
 
-  defineProps({
+  const props = defineProps({
     listDomainsService: {
       required: true,
       type: Function
@@ -43,6 +43,10 @@
       type: Function
     },
     documentationService: {
+      required: true,
+      type: Function
+    },
+    clipboardWrite: {
       required: true,
       type: Function
     }
@@ -62,7 +66,17 @@
       },
       {
         field: 'domainName',
-        header: 'Domain Name'
+        header: 'Domain Name',
+        type: 'component',
+        component: (columnData) => {
+          return columnBuilder({
+            data: columnData,
+            columnAppearance: 'text-with-clipboard',
+            dependencies: {
+              copyContentService: props.clipboardWrite
+            }
+          })
+        }
       },
       {
         field: 'cnames',

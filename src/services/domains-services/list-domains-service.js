@@ -32,7 +32,9 @@ const adapt = (httpResponse) => {
             content: 'Inactive',
             severity: 'danger'
           },
-      domainName: domain.domain_name,
+      domainName: {
+        content: domain.domain_name
+      },
       cnames: cnames,
       edgeApplicationName: domain.name,
       digitalCertificateId: domain.digital_certificate_id
