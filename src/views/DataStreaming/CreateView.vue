@@ -329,7 +329,7 @@
                 class="text-color text-base font-medium"
                 >Bootstrap Servers *</label
               >
-              <Textarea
+              <TextArea
                 v-model="bootstrapServers"
                 placeholder="host1:port1,host2:port2,..."
                 :class="{ 'p-invalid': errors.bootstrapServers }"
@@ -683,7 +683,8 @@
                 class="text-color text-base font-medium"
                 >API Key *</label
               >
-              <Textarea
+              <TextArea
+                id="apiKey"
                 v-model="apiKey"
                 :class="{ 'p-invalid': errors.apiKey }"
                 rows="5"
@@ -734,7 +735,7 @@
                 class="text-color text-base font-medium"
                 >API Key *</label
               >
-              <Textarea
+              <TextArea
                 v-model="splunkApiKey"
                 :class="{ 'p-invalid': errors.splunkApiKey }"
                 rows="5"
@@ -866,6 +867,9 @@
                 placeholder="https://http-intake.logs.datadoghq.com/v1/input"
                 :class="{ 'p-invalid': errors.datadogUrl }"
               />
+              <small class="text-color-secondary text-sm font-normal leading-tight">
+                The URI that will receive the collected data from Data Streaming.
+              </small>
               <small
                 id="datadog-url-help"
                 class="p-error"
@@ -879,11 +883,18 @@
                 class="text-color text-base font-medium"
                 >API Key *</label
               >
-              <InputText
+              <TextArea
+                id="datadogApiKey"
                 v-model="datadogApiKey"
-                type="text"
                 :class="{ 'p-invalid': errors.datadogApiKey }"
+                rows="5"
+                cols="30"
               />
+              <small class="text-color-secondary text-sm font-normal leading-tight">
+                API Keys are generated through the Datadog panel and they're unique to your
+                organization. An API Key is required by the Datadog agent to submit metrics and
+                events to Datadog.
+              </small>
               <small
                 id="datadog-api-key-help"
                 class="p-error"
@@ -1091,7 +1102,7 @@
   import InputSwitch from 'primevue/inputswitch'
   import ButtonPrimer from 'primevue/button'
   import InputNumber from 'primevue/inputnumber'
-  import Textarea from 'primevue/textarea'
+  import TextArea from 'primevue/textarea'
 
   const props = defineProps({
     createDataStreamingService: {
