@@ -1,6 +1,6 @@
 
 <template>
-  <div>
+  <div class="p-5">
     <ScriptRunnerBlock
       title="Build"
       :executionId="uuid"
@@ -20,7 +20,7 @@
         //
       },
       data: () => ({
-        uuid: 'xx',
+        uuid: '34d68c80-5d3e-438b-ba5c-ea1e5bc96849',
         getLogs
       }),
     }

@@ -87,7 +87,8 @@ describe('MarketplaceServices', () => {
         id: fixtures.solutionSample.id,
         name: fixtures.solutionSample.name,
         referenceId: fixtures.solutionSample.solution_reference_id,
-        vendor: fixtures.solutionSample.vendor
+        vendor: fixtures.solutionSample.vendor,
+        slug: fixtures.solutionSample.slug
       }
     ])
   })

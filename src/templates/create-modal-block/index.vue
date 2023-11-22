@@ -76,6 +76,7 @@
             <PrimeButton
               outlined
               label="Choose"
+              @click="redirectToSolution(template)"
             />
           </div>
         </template>
@@ -116,6 +117,7 @@
             <PrimeButton
               outlined
               label="Choose"
+              @click="redirectToSolution(template)"
             />
           </div>
         </template>
@@ -252,6 +254,10 @@
       }
     },
     methods: {
+      redirectToSolution(template) {
+        this.$router.push(`/create/${template.vendor.slug}/${template.slug}`)
+        this.$emit('closeModal')
+      },
       onMenuChange(target) {
         if (target.value === null) {
           this.selectedTabControl = this.selectedTab
