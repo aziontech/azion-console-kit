@@ -216,7 +216,7 @@
                 >Custom Headers</label
               >
               <div
-                class="p-inputgroup flex-1"
+                class="flex p-inputgroup"
                 v-for="(header, index) in headers"
                 :key="index"
               >
@@ -227,15 +227,21 @@
                   placeholder="header-name: value"
                 />
                 <ButtonPrimer
-                  icon="pi pi-times"
-                  severity="danger"
+                  icon="pi pi-trash"
+                  size="small"
+                  outlined
                   v-if="header.deleted"
                   @click="removeHeader(index)"
                 />
               </div>
 
               <ButtonPrimer
+                outlined
+                icon="pi pi-plus-circle"
+                iconPos="left"
                 label="Header"
+                size="small"
+                class="w-fit"
                 @click="addHeader()"
               />
             </div>
