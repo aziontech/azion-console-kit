@@ -15,7 +15,8 @@ export const domainsRoutes = {
       props: {
         listDomainsService: DomainServices.listDomainsService,
         deleteDomainService: DomainServices.deleteDomainService,
-        documentationService: Helpers.documentationCatalog.domains
+        documentationService: Helpers.documentationCatalog.domains,
+        clipboardWrite: Helpers.clipboardWrite
       },
       meta: {
         breadCrumbs: [
