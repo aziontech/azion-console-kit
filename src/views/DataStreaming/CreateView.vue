@@ -920,6 +920,9 @@
                 placeholder="https://qradar-trial-abcdef.qradar.ibmcloud.com:123456"
                 :class="{ 'p-invalid': errors.QRadarUrl }"
               />
+              <small class="text-color-secondary text-sm font-normal leading-tight">
+                The URL that will receive the collected data from Data Streaming.
+              </small>
               <small
                 id="qradar-url-help"
                 class="p-error"
