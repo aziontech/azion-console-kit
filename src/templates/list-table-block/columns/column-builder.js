@@ -72,7 +72,7 @@ export const columnBuilder = ({ data, columnAppearance, dependencies }) => {
       })
     case 'text-with-clipboard':
       return h(TextWithClipboardColumn, {
-        content: data.content ? data.content : data,
+        content: data.content || data,
         copyContentService: dependencies.copyContentService
       })
     case 'tag':
