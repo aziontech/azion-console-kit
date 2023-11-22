@@ -572,6 +572,10 @@
                 type="text"
                 :class="{ 'p-invalid': errors.projectID }"
               />
+              <small class="text-color-secondary text-sm font-normal leading-tight">
+                The ID of your project in Google Cloud.
+              </small>
+
               <small
                 id="project-id-help"
                 class="p-error"
@@ -590,6 +594,9 @@
                 type="text"
                 :class="{ 'p-invalid': errors.datasetID }"
               />
+              <small class="text-color-secondary text-sm font-normal leading-tight">
+                The ID of your dataset created on Google BigQuery.
+              </small>
               <small
                 id="dataset-id-help"
                 class="p-error"
@@ -608,6 +615,9 @@
                 type="text"
                 :class="{ 'p-invalid': errors.tableID }"
               />
+              <small class="text-color-secondary text-sm font-normal leading-tight">
+                The ID of your table that will receive the streamed data.
+              </small>
               <small
                 id="table-id-help"
                 class="p-error"
@@ -615,18 +625,22 @@
               >
             </div>
 
-            <div class="flex flex-col sm:max-w-lg w-full gap-2">
+            <div class="flex flex-col w-full gap-2">
               <label
                 for="serviceAccountKey"
                 class="text-color text-base font-medium"
                 >Service Account Key *</label
               >
-              <Textarea
-                v-model="serviceAccountKey"
-                :class="{ 'p-invalid': errors.serviceAccountKey }"
-                rows="5"
-                cols="30"
+              <vue-monaco-editor
+                v-model:value="serviceAccountKey"
+                language="json"
+                :theme="theme"
+                :options="optionsMonacoEditor"
+                class="min-h-[100px]"
               />
+              <small class="text-color-secondary text-sm font-normal leading-tight">
+                The JSON file with the key that will be used to authenticate with Google services.
+              </small>
               <small
                 id="service-account-key-help"
                 class="p-error"
