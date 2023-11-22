@@ -1,5 +1,4 @@
 <template>
-  <!-- <div class="w-52 h-8 rounded bg-gray-200"></div> -->
   <Skeleton class="w-52 h-8 rounded" />
   <div class="ml-0 w-full mt-0 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
     <PrimeButton

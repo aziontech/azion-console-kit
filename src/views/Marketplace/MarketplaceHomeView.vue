@@ -65,29 +65,45 @@
 
       <!-- Templates -->
       <div class="flex flex-col p-3 sm:p-8 gap-6 w-full">
+        <!-- Loading -->
         <template v-if="loading">
           <LoadingListTemplate />
         </template>
-        <template v-else>
-          <template v-if="selectedCategory.code === 'all' && !searching">
-            <div class="text-2xl font-medium">Featured</div>
-            <ListTemplates :templates="featured" />
-            <div class="text-base font-medium">New releases</div>
-            <ListTemplates :templates="released" />
-          </template>
-          <template v-else>
-            <div v-if="searching">
+        <!-- Default View -->
+        <template v-else-if="selectedCategory.code === 'all' && !searching">
+          <div class="text-2xl font-medium">Featured</div>
+          <ListTemplates :templates="featured" />
+          <div class="text-base font-medium">New releases</div>
+          <ListTemplates :templates="released" />
+        </template>
+        <!-- Searched -->
+        <template v-else-if="searching">
+          <template v-if="templates.length > 0">
+            <div class="text-sm">
               {{ templates.length }} search results for
               <span class="font-medium">“{{ search }}”</span>
             </div>
-            <div
-              class="text-2xl font-medium"
-              v-else
-            >
-              {{ selectedCategory.name }}
-            </div>
             <ListTemplates :templates="templates" />
           </template>
+          <template v-else>
+            <div class="text-sm">
+              <span>No results found</span>
+              <PrimeButton
+                label="See full integrations list."
+                link
+                class="ml-3 p-0"
+                size="small"
+              />
+            </div>
+            <LoadingEmptySearch />
+          </template>
+        </template>
+        <!-- Category -->
+        <template v-else>
+          <div class="text-2xl font-medium">
+            {{ selectedCategory.name }}
+          </div>
+          <ListTemplates :templates="templates" />
         </template>
       </div>
     </div>
@@ -99,9 +115,11 @@
   import InputText from 'primevue/inputtext'
   import Listbox from 'primevue/listbox'
   import Badge from 'primevue/badge'
+  import PrimeButton from 'primevue/button'
   import * as MarketplaceService from '@/services/marketplace-services'
   import ListTemplates from './ListTemplates.vue'
-  import LoadingListTemplate from './LoadingListTemplate.vue'
+  import LoadingListTemplate from './LoadingListTemplate'
+  import LoadingEmptySearch from './LoadingEmptySearch'
   import { useToast } from 'primevue/usetoast'
 
   const selectedCategory = ref({ name: 'All', code: 'all' })
