@@ -1,10 +1,9 @@
 <template>
   <ContentBlock>
     <template #heading>
+      <PageHeadingBlock pageTitle="Edit Intelligent DNS"> </PageHeadingBlock>
     </template>
-  </ContentBlock>
-  <PageHeadingBlock pageTitle="Edit Intelligent DNS">
-    <template #tabs>
+    <template #content>
       <TabView
         :activeIndex="activeTab"
         @tab-click="changeRouteByClickingOnTab"
@@ -93,14 +92,14 @@
       </TabView>
       <router-view></router-view>
     </template>
-  </PageHeadingBlock>
+  </ContentBlock>
 </template>
 
 <script>
   import { useIntelligentDNSStore } from '@/stores/intelligent-dns'
   import EditFormBlock from '@templates/edit-form-block-new/no-header'
   import FormHorizontal from '@templates/create-form-block-new/form-horizontal'
-  import PageHeadingBlock from '@templates/page-heading-block-tabs'
+  import PageHeadingBlock from '@templates/page-heading-block'
   import ListTableBlock from '@templates/list-table-block/no-header'
   import ContentBlock from '@/templates/content-block/ContentBlock.vue'
   import TabView from 'primevue/tabview'

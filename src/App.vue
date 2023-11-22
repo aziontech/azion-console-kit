@@ -21,7 +21,7 @@
 </script>
 
 <template>
-  <div class="flex flex-col ">
+  <div class="flex flex-col">
     <ShellBlock
       v-slot:default="{ customClass }"
       :isLogged="isLogged"

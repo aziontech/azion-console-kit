@@ -1,27 +1,25 @@
 <template>
-  <div class="w-full">
-    <ListTableBlock
-      v-if="hasContentToList"
-      :listService="listEdgeNodeService"
-      :columns="getColumns"
-      :deleteService="deleteEdgeNodeService"
-      @authorizeEdgeNode="authorize = $event.authorize"
-      pageTitle="Edge Nodes"
-      pageTitleDelete="Edge Node"
-      addButtonLabel=""
-      editPagePath="edge-node/edit"
-      @on-load-data="handleLoadData"
-    />
-    <EmptyEdgeNode
-      v-else
-      pageTitle="Edge Nodes"
-      :documentationService="documentationService"
-    >
-      <template #illustration>
-        <Illustration />
-      </template>
-    </EmptyEdgeNode>
-  </div>
+  <ListTableBlock
+    v-if="true"
+    :listService="listEdgeNodeService"
+    :columns="getColumns"
+    :deleteService="deleteEdgeNodeService"
+    @authorizeEdgeNode="authorize = $event.authorize"
+    pageTitle="Edge Nodes"
+    pageTitleDelete="Edge Node"
+    addButtonLabel=""
+    editPagePath="edge-node/edit"
+    @on-load-data="handleLoadData"
+  />
+  <EmptyEdgeNode
+    v-else
+    pageTitle="Edge Nodes"
+    :documentationService="documentationService"
+  >
+    <template #illustration>
+      <Illustration />
+    </template>
+  </EmptyEdgeNode>
   <Authorize :authorize="authorize" />
 </template>
 <script>
