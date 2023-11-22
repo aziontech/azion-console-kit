@@ -26,77 +26,92 @@
   </EmptyResultsBlock>
 </template>
 
-<script setup>
+<script>
   import ListTableBlock from '@/templates/list-table-block'
   import EmptyResultsBlock from '@/templates/empty-results-block'
   import Illustration from '@/assets/svg/illustration-layers.vue'
   import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
-  import { computed, ref } from 'vue'
-  import * as Helpers from '@/helpers'
 
-  defineProps({
-    listDomainsService: {
-      required: true,
-      type: Function
+  export default {
+    name: 'domains-view',
+    components: {
+      ListTableBlock,
+      EmptyResultsBlock,
+      Illustration
     },
-    deleteDomainService: {
-      required: true,
-      type: Function
-    },
-    documentationService: {
-      required: true,
-      type: Function
-    }
-  })
-
-  const hasContentToList = ref(true)
-
-  const getColumns = computed(() => {
-    return [
-      {
-        field: 'name',
-        header: 'Name'
+    props: {
+      listDomainsService: {
+        required: true,
+        type: Function
       },
-      {
-        field: 'digitalCertificateId',
-        header: 'Digital Certificate'
+      deleteDomainService: {
+        required: true,
+        type: Function
       },
-      {
-        field: 'domainName',
-        header: 'Domain Name',
-        type: 'component',
-        component: (columnData) => {
-          return columnBuilder({
-            data: columnData,
-            columnAppearance: 'text-with-clipboard',
-            dependencies: {
-              copyContentService: Helpers.clipboardWrite
-            }
-          })
-        }
+      documentationService: {
+        required: true,
+        type: Function
       },
-      {
-        field: 'cnames',
-        header: 'CNAME'
-      },
-      {
-        field: 'active',
-        header: 'Status',
-        type: 'component',
-        component: (columnData) =>
-          columnBuilder({
-            data: columnData,
-            columnAppearance: 'tag'
-          })
-      },
-      {
-        field: 'edgeApplicationName',
-        header: 'Edge Application'
+      clipboardWrite: {
+        required: true,
+        type: Function
       }
-    ]
-  })
-
-  function handleLoadData(event) {
-    hasContentToList.value = event
+    },
+    data() {
+      return {
+        hasContentToList: true
+      }
+    },
+    computed: {
+      getColumns() {
+        return [
+          {
+            field: 'name',
+            header: 'Name'
+          },
+          {
+            field: 'digitalCertificateId',
+            header: 'Digital Certificate'
+          },
+          {
+            field: 'domainName',
+            header: 'Domain Name',
+            type: 'component',
+            component: (columnData) => {
+              return columnBuilder({
+                data: columnData,
+                columnAppearance: 'text-with-clipboard',
+                dependencies: {
+                  copyContentService: this.clipboardWrite
+                }
+              })
+            }
+          },
+          {
+            field: 'cnames',
+            header: 'CNAME'
+          },
+          {
+            field: 'active',
+            header: 'Status',
+            type: 'component',
+            component: (columnData) =>
+              columnBuilder({
+                data: columnData,
+                columnAppearance: 'tag'
+              })
+          },
+          {
+            field: 'edgeApplicationName',
+            header: 'Edge Application'
+          }
+        ]
+      }
+    },
+    methods: {
+      handleLoadData(event) {
+        this.hasContentToList = event
+      }
+    }
   }
 </script>

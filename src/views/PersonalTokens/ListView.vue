@@ -70,7 +70,7 @@
     {
       field: 'created',
       sortField: 'createdDate',
-      header: 'Last Modified',
+      header: 'Last Modified'
     },
     {
       field: 'expiresAt',

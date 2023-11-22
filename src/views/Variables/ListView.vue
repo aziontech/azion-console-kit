@@ -77,7 +77,7 @@
                 return h('span', `${columnData.content}`)
               } else {
                 return columnBuilder({
-                  data: columnData,
+                  data: columnData.content,
                   columnAppearance: 'text-with-clipboard',
                   dependencies: {
                     copyContentService: this.clipboardWrite
