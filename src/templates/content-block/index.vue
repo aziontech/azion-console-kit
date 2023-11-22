@@ -14,10 +14,15 @@
         <slot name="content"></slot>
       </div>
     </section>
-    <div class="sticky bottom-0" id="action-bar_98978"></div>
+    <div
+      class="sticky bottom-0"
+      id="action-bar_98978"
+    ></div>
   </section>
 </template>
 <script setup>
+  defineOptions({ name: 'ContentBlock' })
+
   import { computed, useSlots } from 'vue'
   const slots = useSlots()
   const hasHeadingSlot = computed(() => !!slots.heading)

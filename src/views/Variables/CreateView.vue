@@ -73,7 +73,6 @@
         </template>
       </CreateFormBlock>
     </template>
-
   </ContentBlock>
 </template>
 
@@ -82,7 +81,7 @@
   import FormHorizontal from '@/templates/create-form-block-new/form-horizontal'
   import InputText from 'primevue/inputtext'
   import InputSwitch from 'primevue/inputswitch'
-  import ContentBlock from '@/templates/content-block/ContentBlock.vue'
+  import ContentBlock from '@/templates/content-block'
   import PageHeadingBlock from '@/templates/page-heading-block'
 
   import { useForm } from 'vee-validate'

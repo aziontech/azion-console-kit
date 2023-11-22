@@ -186,7 +186,7 @@
   import { FilterMatchMode } from 'primevue/api'
   import PageHeadingBlock from '@/templates/page-heading-block'
   import DeleteDialog from './dialog/delete-dialog'
-  import ContentBlock from '@/templates/content-block/ContentBlock.vue'
+  import ContentBlock from '@/templates/content-block'
 
   export default {
     name: 'list-table-block',

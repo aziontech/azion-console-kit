@@ -101,7 +101,7 @@
   import FormHorizontal from '@templates/create-form-block-new/form-horizontal'
   import PageHeadingBlock from '@templates/page-heading-block'
   import ListTableBlock from '@templates/list-table-block/no-header'
-  import ContentBlock from '@/templates/content-block/ContentBlock.vue'
+  import ContentBlock from '@/templates/content-block'
   import TabView from 'primevue/tabview'
   import TabPanel from 'primevue/tabpanel'
   import InputText from 'primevue/inputtext'

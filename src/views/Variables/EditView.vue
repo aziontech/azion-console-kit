@@ -82,7 +82,7 @@
   import InputText from 'primevue/inputtext'
   import InputSwitch from 'primevue/inputswitch'
   import { useForm } from 'vee-validate'
-  import ContentBlock from '@/templates/content-block/ContentBlock.vue'
+  import ContentBlock from '@/templates/content-block'
   import PageHeadingBlock from '@/templates/page-heading-block'
 
   import * as yup from 'yup'

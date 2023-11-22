@@ -46,7 +46,7 @@
 <script setup>
   import PageHeadingBlock from '@/templates/page-heading-block'
   import PrimeButton from 'primevue/button'
-  import ContentBlock from '@/templates/content-block/ContentBlock.vue'
+  import ContentBlock from '@/templates/content-block'
 
   const props = defineProps({
     pageTitle: { type: String, required: true },
