@@ -992,6 +992,7 @@
                 >Time Generated Field</label
               >
               <InputText
+                id="timeGeneratedField"
                 v-model="generatedField"
                 type="text"
               />
@@ -1008,6 +1009,7 @@
                 >Workspace ID *</label
               >
               <InputText
+                id="workspaceID"
                 v-model="workspaceID"
                 type="text"
                 :class="{ 'p-invalid': errors.workspaceID }"
@@ -1030,15 +1032,19 @@
           >
             <div class="flex flex-col sm:max-w-lg w-full gap-2">
               <label
-                for="storangeAccount"
+                for="storageAccount"
                 class="text-color text-base font-medium"
                 >Storage Account *</label
               >
               <InputText
+                id="storageAccount"
                 v-model="storageAccount"
                 type="text"
                 :class="{ 'p-invalid': errors.storageAccount }"
               />
+              <small class="text-color-secondary text-sm font-normal leading-tight">
+                The storage account of your Azure Blob Storage.
+              </small>
               <small
                 id="storage-account-help"
                 class="p-error"
@@ -1053,10 +1059,14 @@
                 >Container Name *</label
               >
               <InputText
+                id="containerName"
                 v-model="containerName"
                 type="text"
                 :class="{ 'p-invalid': errors.containerName }"
               />
+              <small class="text-color-secondary text-sm font-normal leading-tight">
+                The name of your Azure Blob Storage container.
+              </small>
               <small
                 id="container-name-help"
                 class="p-error"
@@ -1066,15 +1076,19 @@
 
             <div class="flex flex-col sm:max-w-lg w-full gap-2">
               <label
-                for="containerName"
+                for="blobToken"
                 class="text-color text-base font-medium"
                 >Blob SAS Token *</label
               >
               <InputText
+                id="blobToken"
                 v-model="blobToken"
                 type="text"
                 :class="{ 'p-invalid': errors.blobToken }"
               />
+              <small class="text-color-secondary text-sm font-normal leading-tight">
+                The blob SAS token of your Azure Blob Storage.
+              </small>
               <small
                 id="blob-token-help"
                 class="p-error"
