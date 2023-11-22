@@ -13,12 +13,17 @@
       :blockRedirectUnsaved="hasModifications"
     />
   </div>
-  <ActionBarTemplate
-    @cancel="handleCancel"
-    @submit="handleSubmit"
-    :loading="isLoading"
-    :submitDisabled="!formMeta.valid"
-  />
+  <Teleport
+    to="#action-bar_98978"
+    v-if="teleportLoad"
+  >
+    <ActionBarTemplate
+      @cancel="handleCancel"
+      @submit="handleSubmit"
+      :loading="isLoading"
+      :submitDisabled="!formMeta.valid"
+    />
+  </Teleport>
 </template>
 
 <script>
@@ -29,11 +34,12 @@
     name: 'edit-form-block-no-header',
     components: {
       ActionBarTemplate,
-      DialogUnsavedBlock,
+      DialogUnsavedBlock
     },
     data: () => ({
       isLoading: false,
-      blockViewRedirection: true
+      blockViewRedirection: true,
+      teleportLoad: false
     }),
     props: {
       editService: {
@@ -67,6 +73,9 @@
     },
     async created() {
       await this.loadInitialData()
+    },
+    mounted() {
+      this.teleportLoad = true
     },
     methods: {
       leavePage(dialogUnsaved) {
