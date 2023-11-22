@@ -12,7 +12,7 @@
     </div>
     <!-- inputs  -->
     <div
-      class="max-w-3xl w-full flex flex-col gap-8"
+      class="max-w-3xl w-full flex flex-col gap-8 max-md:gap-6"
       :class="{ '-mt-8': isDrawer }"
     >
       <slot name="inputs"></slot>

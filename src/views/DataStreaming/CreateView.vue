@@ -185,7 +185,7 @@
           <!-- Specific Sections for Different Endpoints -->
           <div
             id="standard"
-            class="flex flex-col gap-3"
+            class="flex flex-col gap-8 max-md:gap-6"
             v-if="endpoint === 'standard'"
           >
             <div class="flex flex-col sm:max-w-lg w-full gap-2">
@@ -239,9 +239,6 @@
                 @click="addHeader()"
               />
             </div>
-
-            <h1 class="text-xl font-medium">Payload</h1>
-
             <div class="flex flex-col sm:max-w-lg w-full gap-2">
               <label
                 for="maxSize"
@@ -302,7 +299,7 @@
 
           <div
             id="kafka"
-            class="flex flex-col gap-3"
+            class="flex flex-col gap-8 max-md:gap-6"
             v-if="endpoint === 'kafka'"
           >
             <div class="flex flex-col sm:max-w-lg w-full gap-2">
@@ -373,7 +370,7 @@
 
           <div
             id="s3"
-            class="flex flex-col gap-3"
+            class="flex flex-col gap-8 max-md:gap-6"
             v-if="endpoint === 's3'"
           >
             <div class="flex flex-col sm:max-w-lg w-full gap-2">
@@ -387,6 +384,10 @@
                 type="text"
                 :class="{ 'p-invalid': errors.host }"
               />
+              <small class="text-color-secondary text-sm font-normal leading-tight">
+                The URL of your S3 host. You may connect with every provider that works with S3
+                protocol, for example: AWS, Google Cloud Plataform, Azion, etc..
+              </small>
               <small
                 id="host-help"
                 class="p-error"
@@ -405,6 +406,9 @@
                 type="text"
                 :class="{ 'p-invalid': errors.bucket }"
               />
+              <small class="text-color-secondary text-sm font-normal leading-tight">
+                The name of your S3 bucket.
+              </small>
               <small
                 id="bucket-help"
                 class="p-error"
@@ -423,6 +427,9 @@
                 type="text"
                 :class="{ 'p-invalid': errors.region }"
               />
+              <small class="text-color-secondary text-sm font-normal leading-tight">
+                The region of your S3 bucket.
+              </small>
               <small
                 id="region-help"
                 class="p-error"
@@ -441,6 +448,9 @@
                 type="text"
                 :class="{ 'p-invalid': errors.accessKey }"
               />
+              <small class="text-color-secondary text-sm font-normal leading-tight">
+                The access key of your S3 bucket.
+              </small>
               <small
                 id="access-key-help"
                 class="p-error"
@@ -459,6 +469,9 @@
                 type="text"
                 :class="{ 'p-invalid': errors.secretKey }"
               />
+              <small class="text-color-secondary text-sm font-normal leading-tight">
+                The secret key of your S3 bucket.
+              </small>
               <small
                 id="secret-key-help"
                 class="p-error"
@@ -477,6 +490,9 @@
                 type="text"
                 :class="{ 'p-invalid': errors.objectKey }"
               />
+              <small class="text-color-secondary text-sm font-normal leading-tight">
+                The format of the object that will be created in your S3 bucket.
+              </small>
               <small
                 id="object-key-help"
                 class="p-error"
@@ -484,31 +500,32 @@
               >
             </div>
 
-            <div class="flex flex-col w-full sm:max-w-xs gap-2">
-              <label
-                for="contentType"
-                class="text-color text-base font-medium"
-                >Content Type *</label
-              >
-              <Dropdown
-                :class="{ 'p-invalid': errors.contentType }"
-                v-model="contentType"
-                :options="listContentType"
-                optionLabel="label"
-                optionValue="value"
-                class="w-full"
-              />
-              <small
-                id="content-type"
-                class="p-error"
-                >{{ errors.contentType }}</small
-              >
+            <div class="flex flex-col gap-2">
+              <label class="text-color text-sm font-medium leading-tight">Content Type</label>
+              <div class="flex flex-col gap-3">
+                <div
+                  class="flex no-wrap gap-2 items-center"
+                  v-for="contentTypeItem of listContentType"
+                  :key="contentTypeItem.value"
+                >
+                  <RadioButton
+                    :class="{ 'p-invalid': errors.contentType }"
+                    v-model="contentType"
+                    inputId="contentType"
+                    :name="contentTypeItem.value"
+                    :value="contentTypeItem.value"
+                  />
+                  <label class="text-color text-sm font-normal leading-tight">{{
+                    contentTypeItem.label
+                  }}</label>
+                </div>
+              </div>
             </div>
           </div>
 
           <div
             id="big_query"
-            class="flex flex-col gap-3"
+            class="flex flex-col gap-8 max-md:gap-6"
             v-if="endpoint === 'big_query'"
           >
             <div class="flex flex-col sm:max-w-lg w-full gap-2">
@@ -587,7 +604,7 @@
 
           <div
             id="elasticsearch"
-            class="flex flex-col gap-3"
+            class="flex flex-col gap-8 max-md:gap-6"
             v-if="endpoint === 'elasticsearch'"
           >
             <div class="flex flex-col sm:max-w-lg w-full gap-2">
@@ -630,7 +647,7 @@
 
           <div
             id="splunk"
-            class="flex flex-col gap-3"
+            class="flex flex-col gap-8 max-md:gap-6"
             v-if="endpoint === 'splunk'"
           >
             <div class="flex flex-col sm:max-w-lg w-full gap-2">
@@ -673,7 +690,7 @@
 
           <div
             id="aws_kinesis_firehose"
-            class="flex flex-col gap-3"
+            class="flex flex-col gap-8 max-md:gap-6"
             v-if="endpoint === 'aws_kinesis_firehose'"
           >
             <div class="flex flex-col sm:max-w-lg w-full gap-2">
@@ -751,7 +768,7 @@
 
           <div
             id="datadog"
-            class="flex flex-col gap-3"
+            class="flex flex-col gap-8 max-md:gap-6"
             v-if="endpoint === 'datadog'"
           >
             <div class="flex flex-col sm:max-w-lg w-full gap-2">
@@ -794,7 +811,7 @@
 
           <div
             id="qradar"
-            class="flex flex-col gap-3"
+            class="flex flex-col gap-8 max-md:gap-6"
             v-if="endpoint === 'qradar'"
           >
             <div class="flex flex-col sm:max-w-lg w-full gap-2">
@@ -819,7 +836,7 @@
 
           <div
             id="azure_monitor"
-            class="flex flex-col gap-3"
+            class="flex flex-col gap-8 max-md:gap-6"
             v-if="endpoint === 'azure_monitor'"
           >
             <div class="flex flex-col sm:max-w-lg w-full gap-2">
@@ -891,7 +908,7 @@
 
           <div
             id="azure_blob_storage"
-            class="flex flex-col gap-3"
+            class="flex flex-col gap-8 max-md:gap-6"
             v-if="endpoint === 'azure_blob_storage'"
           >
             <div class="flex flex-col sm:max-w-lg w-full gap-2">
@@ -1030,8 +1047,8 @@
     { label: 'Azure Blob Storage', value: 'azure_blob_storage' }
   ])
   const listContentType = ref([
-    { label: 'plain/text', value: 'plain/text' },
-    { label: 'application/gzip', value: 'application/gzip' }
+    { label: 'Plain/text', value: 'plain/text' },
+    { label: 'Application/gzip', value: 'application/gzip' }
   ])
 
   // Schema de Validação
@@ -1104,6 +1121,10 @@
     objectKey: yup.string().when('endpoint', {
       is: 's3',
       then: (schema) => schema.max(150).required('Object Key prefix is a required field')
+    }),
+    contentType: yup.string().when('endpoint', {
+      is: 's3',
+      then: (schema) => schema.required('Content Type is a required field')
     }),
 
     // google big query
@@ -1239,7 +1260,7 @@
       accessKey: '',
       secretKey: '',
       objectKey: '',
-      contentType: { label: 'plain/text', value: 'plain/text' },
+      contentType: 'plain/text',
 
       // google big query
       projectID: '',
