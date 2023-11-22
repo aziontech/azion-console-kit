@@ -30,9 +30,9 @@ pinia.use(piniaPluginPersistedstate)
 
 app.use(PrimeVue)
 app.directive('tooltip', Tooltip)
-app.use(ToastService)
+app.use(ToastService).provide('toast', app.config.globalProperties.$toast)
 app.use(pinia)
-app.use(router)
+app.use(router).provide('route', app.config.globalProperties.$route)
 app.use(VueMonacoEditorPlugin, {
   paths: {
     vs: 'https://cdn.jsdelivr.net/npm/monaco-editor@0.38.0/min/vs'

@@ -20,7 +20,7 @@ const adapt = (httpResponse) => {
       name: httpResponse.body.name,
       templateType: httpResponse.body.template_type,
       updatedAt: httpResponse.body.updated_at,
-      uuid: httpResponse.body.uuid,
+      uuid: httpResponse.body.uuid
     },
     statusCode: httpResponse.statusCode
   }

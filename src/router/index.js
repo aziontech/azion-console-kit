@@ -22,7 +22,7 @@ import { passwordRoutes } from '@routes/password-routes'
 import { activityHistoryRoutes } from './routes/activity-history-routes'
 import { errorRoutes } from '@routes/error-routes'
 import { playgroundRoutes } from '@routes/playground-routes'
-import { createNewRoutes } from './routes/create-something-new-routes';
+import { createNewRoutes } from './routes/create-something-new-routes'
 import { mfaRoutes } from '@routes/mfa-routes'
 import beforeEachRoute from './hooks/beforeEachRoute'
 
