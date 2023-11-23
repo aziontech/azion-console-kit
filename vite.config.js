@@ -25,12 +25,12 @@ const getConfig = () => {
     },
     server: {
       proxy: {
-        '/logout': {
-          target: `${URLStartPrefix}sso.azion.com/logout`,
-          changeOrigin: true,
-          rewrite: (path) => path.replace(/^\/logout/, ''),
-          cookieDomainRewrite: { '*': '' }
-        },
+        // '/logout': {
+        //   target: `${URLStartPrefix}sso.azion.com/logout`,
+        //   changeOrigin: true,
+        //   rewrite: (path) => path.replace(/^\/logout/, ''),
+        //   cookieDomainRewrite: { '*': '' }
+        // },
         // '/api/edge-services': {
         //   target: `${URLStartPrefix}manager-origin.azion.com/services/api/v1/services`,
         //   changeOrigin: true,
@@ -41,11 +41,7 @@ const getConfig = () => {
         //   changeOrigin: true,
         //   rewrite: (path) => path.replace(/^\/api/, '')
         // },
-        '/graphql/cities': {
-          target: `${URLStartPrefix}cities.azion.com/graphql`,
-          changeOrigin: true,
-          rewrite: (path) => path.replace(/^\/graphql\/cities/, '')
-        },
+
         // '/api/marketplace': {
         //   target: `${URLStartPrefix}manager.azion.com/marketplace/api/`,
         //   changeOrigin: true,
@@ -56,17 +52,7 @@ const getConfig = () => {
         //   changeOrigin: true,
         //   rewrite: (path) => path.replace(/^\/api\/script-runner/, '')
         // },
-        '^/api/(marketplace|script-runner)': {
-          //target: `${URLStartPrefix}manager.azion.com/marketplace/api/`,
-          target: `${URLStartPrefix}manager.azion.com/`,
-          changeOrigin: true,
-          rewrite: (path) => path.replace(/^\/api\/(marketplace|script-runner)/, '/$1/api')
-        },
-        '/events/graphql': {
-          target: `${URLStartPrefix}api.azion.net`,
-          changeOrigin: true,
-          rewrite: (path) => path.replace(/^\/events\/graphql\//, '')
-        },
+
         // '/api/edge_node': {
         //   target: `${URLStartPrefix}manager.azion.com/edgenode/api/v1/edge-nodes`,
         //   changeOrigin: true,
@@ -78,11 +64,6 @@ const getConfig = () => {
         //   changeOrigin: true,
         //   rewrite: (path) => path.replace(/^\/api\/iam/, '')
         // },
-        '/api/account-details': {
-          target: `${URLStartPrefix}iam.azion.com/iam/api/account`,
-          changeOrigin: true,
-          rewrite: (path) => path.replace(/^\/api\/account-details/, '')
-        },
         // '/api/teams': {
         //   target: `${URLStartPrefix}iam.azion.com/iam/api/teams`,
         //   changeOrigin: true,
@@ -108,7 +89,28 @@ const getConfig = () => {
         //   changeOrigin: true,
         //   rewrite: (path) => path.replace(/^\/api\/credentials/, '')
         // },
-        '^/api/(account|user|token|switch-account|password|totp)': {
+        '/graphql/cities': {
+          target: `${URLStartPrefix}cities.azion.com/graphql`,
+          changeOrigin: true,
+          rewrite: (path) => path.replace(/^\/graphql\/cities/, '')
+        },
+        '^/api/(marketplace|script-runner)': {
+          //target: `${URLStartPrefix}manager.azion.com/marketplace/api/`,
+          target: `${URLStartPrefix}manager.azion.com/`,
+          changeOrigin: true,
+          rewrite: (path) => path.replace(/^\/api\/(marketplace|script-runner)/, '/$1/api')
+        },
+        '/events/graphql': {
+          target: `${URLStartPrefix}api.azion.net`,
+          changeOrigin: true,
+          rewrite: (path) => path.replace(/^\/events\/graphql\//, '')
+        },
+        '/api/account-details': {
+          target: `${URLStartPrefix}iam.azion.com/iam/api/account`,
+          changeOrigin: true,
+          rewrite: (path) => path.replace(/^\/api\/account-details/, '')
+        },
+        '^/api/(account|user|token|switch-account|password|totp)|^/logout': {
           //target: `${URLStartPrefix}sso.azion.com/api`,
           target: `${URLStartPrefix}sso.azion.com`,
           changeOrigin: true,
