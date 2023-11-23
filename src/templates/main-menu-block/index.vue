@@ -692,7 +692,6 @@
               {
                 label: 'Intelligent DNS',
                 to: '/intelligent-dns',
-                tag: 'New',
                 icon: 'pi pi-share-alt'
               },
               {
@@ -721,15 +720,20 @@
                 icon: 'pi pi-play'
               },
               {
-                label: 'Edge Pulse',
-                to: '/edge-pulse',
+                label: 'Real Time Metrics',
+                to: '/real-time-metrics',
                 icon: 'pi pi-chart-line'
               },
               {
-                label: 'Real Time Metrics',
-                to: '/real-time-metrics',
-                icon: 'pi pi-chart-line',
-                tag: 'Beta'
+                label: 'Real Time Events',
+                to: '/real-time-events',
+                icon: 'pi pi-server',
+                tag: 'Preview'
+              },
+              {
+                label: 'Edge Pulse',
+                to: '/edge-pulse',
+                icon: 'pi pi-chart-line'
               }
             ]
           },
