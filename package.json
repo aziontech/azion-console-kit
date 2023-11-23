@@ -13,6 +13,7 @@
     "preview": "vite preview",
     "ci": "yarn install --frozen-lockfile",
     "test:unit": "vitest --ui",
+    "test:unit-headless": "vitest --ui",
     "test:unit:coverage": "vitest run --coverage",
     "test:e2e": "start-server-and-test preview http://localhost:4173 'cypress run --e2e'",
     "test:e2e:dev": "start-server-and-test 'vite dev --port 4173' http://localhost:4173 'cypress open --e2e'",
