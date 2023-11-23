@@ -39,7 +39,7 @@ describe('NetworkListsServices', () => {
 
     expect(requestSpy).toHaveBeenCalledWith(
       {
-        url: `graphql/`,
+        url: `cities/`,
         method: 'POST',
         body: {
           query: 'query all_countries_with_code {allCountries { name, code2 } }'

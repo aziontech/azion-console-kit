@@ -63,7 +63,7 @@ describe('DigitalCertificatesServices', () => {
 
     expect(result).toEqual({
       feedback: 'Your digital certificate has been created!',
-      redirectURL: `/digital-certificates/edit/1`
+      urlToEditView: `/digital-certificates/edit/1`
     })
   })
 

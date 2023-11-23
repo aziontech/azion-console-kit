@@ -9,10 +9,7 @@
       <TabPanel header="Default Tag">
         <FormHorizontal
           title="Default Tag"
-          description="Place this tag in the HTML of the switched pages to measure them. You should place it
-                  just before the closing BODY tag. This script waits until the load event is complete
-                  before downloading and executing the RUM Client, ensuring that the load event is
-                  uninterrupted and has zero impact on user experience."
+          description="The script waits until the loading event is completed before downloading and running the RUM Client. The loading event isn’t interrupted and doesn’t affect the user experience."
         >
           <template #inputs>
             <vue-monaco-editor
@@ -24,7 +21,7 @@
             />
             <div>
               <PrimeButton
-                label="Copy to Clipboard"
+                label="Copy"
                 icon="pi pi-copy"
                 class="max-md:w-full"
                 @click="handleCopyDefaultTagCode"
@@ -40,9 +37,7 @@
         <div class="w-full">
           <FormHorizontal
             title="Pre-loading Tag"
-            description="If you're using Content Security Policy settings preventing the use of inline JavaScript
-            then place this tag just before the enclosing BODY tag. This script executes before the
-            load event has fired."
+            description="The script executes before the load event is fired. Recommended when using Content Security Policy settings that prevent the use of inline JavaScript."
           >
             <template #inputs>
               <vue-monaco-editor
@@ -55,7 +50,7 @@
               <div>
                 <PrimeButton
                   icon="pi pi-copy"
-                  label="Copy to Clipboard"
+                  label="Copy"
                   class="max-md:w-full"
                   outlined
                   @click="handleCopyPreLoadingTagCode"
@@ -123,7 +118,7 @@
         this.$toast.add({
           closable: false,
           severity: 'success',
-          summary: 'Code successfully copied',
+          summary: 'Copied successfully!',
           life: 6000
         })
       },

@@ -12,7 +12,7 @@ export const activityHistoryRoutes = {
       component: () => import('@views/ActivityHistory/ListView.vue'),
       props: {
         listEventsService: ActivityHistoryService.listEventsService,
-        documentationService: Helpers.documentationCatalog.getStarted
+        documentationService: Helpers.documentationCatalog.activityHistory
       },
       meta: {
         breadCrumbs: [

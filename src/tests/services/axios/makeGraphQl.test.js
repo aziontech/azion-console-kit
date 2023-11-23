@@ -19,6 +19,6 @@ describe('makeGraphQl', () => {
   it('should have the correct base URL', () => {
     const { sut } = makeSut()
 
-    expect(sut.defaults.baseURL).toBe('/network-lists/graphql')
+    expect(sut.defaults.baseURL).toBe('/graphql')
   })
 })

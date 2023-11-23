@@ -7,6 +7,7 @@
     :formData="values"
     :formMeta="meta"
     :cleanFormCallback="resetForm"
+    :updatedRedirect="updatedRedirect"
   >
     <template #form>
       <form-horizontal
@@ -276,10 +277,26 @@
       Card
     },
     props: {
-      editDomainService: Function,
-      listDigitalCertificatesService: Function,
-      listEdgeApplicationsService: Function,
-      loadDomainService: Function
+      editDomainService: {
+        type: Function,
+        required: true
+      },
+      listDigitalCertificatesService: {
+        type: Function,
+        required: true
+      },
+      listEdgeApplicationsService: {
+        type: Function,
+        required: true
+      },
+      loadDomainService: {
+        type: Function,
+        required: true
+      },
+      updatedRedirect: {
+        type: String,
+        required: true
+      }
     },
     data() {
       return {

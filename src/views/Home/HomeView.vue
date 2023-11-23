@@ -1,127 +1,137 @@
 <template>
-  <div class="px-3 sm:px-8 pt-4 sm:pt-8 pb-14 flex flex-col gap-8 sm:gap-6 w-full">
-    <!-- Getting Started -->
-    <div
-      class="w-full px-3 py-4 sm:px-8 sm:py-8 surface-border border rounded-md flex flex-col gap-6 sm:gap-10 justify-between"
+  <div>
+    <section
+      class="w-full max-w-screen-2xl md:mx-auto flex flex-col gap-6 lg:gap-8 px-3 pt-4 pb-8 md:px-8 md:pt-8"
     >
-      <div class="flex flex-col gap-4 max-w-4xl">
-        <h1 class="text-color text-2xl md:text-3xl font-medium">Get Started</h1>
-        <h2 class="text-sm md:text-xl text-color-secondary font-normal">
-          Great to have you on board! Fell free to explore, or get a head start below.
-        </h2>
+      <!-- Getting Started -->
+      <div
+        class="w-full p-3 sm:p-8 surface-border border rounded-md flex flex-col gap-6 lg:gap-10 justify-between"
+      >
+        <div class="flex flex-col gap-4 max-w-4xl">
+          <h1 class="text-color text-2xl md:text-3xl font-medium">Get Started</h1>
+          <h2 class="text-sm md:text-xl text-color-secondary font-normal">
+            Great to have you on board! Fell free to explore, or get a head start below.
+          </h2>
+        </div>
+        <div>
+          <PrimeButton
+            class="w-full sm:w-auto"
+            label="Create something new"
+            type="button"
+            size="small"
+            @click="createBoardManager.open()"
+          />
+        </div>
       </div>
-      <div>
+
+      <div class="flex flex-col xl:flex-row gap-6">
+        <!-- Manage Applications -->
+        <div class="w-full p-3 sm:p-6 flex flex-col gap-6 surface-border border rounded-md">
+          <div class="flex flex-row justify-start gap-3">
+            <div
+              class="w-11 h-11 flex flex-shrink-0 justify-center items-center rounded-md surface-200"
+            >
+              <span class="pi pi-box"></span>
+            </div>
+            <div class="flex flex-col gap-2">
+              <div class="text-lg sm:text-xl font-medium">Manage your applications</div>
+              <div class="text-xs sm:text-sm text-color-secondary">
+                Add and manage custom domains to your edge applications.
+              </div>
+            </div>
+          </div>
+          <div class="flex flex-col items-start sm:flex-row gap-3 sm:gap-4">
+            <PrimeButton
+              type="button"
+              label="Manage Applications"
+              outlined
+              class="w-full sm:w-auto"
+              size="small"
+              @click="navigateToEdgeApplications"
+            />
+            <PrimeButton
+              type="button"
+              label="Learn how to edit an application"
+              link
+              class="w-full sm:w-auto"
+              icon="pi pi-external-link"
+              iconPos="right"
+              size="small"
+              @click="openDocsEdgeApplication"
+              :pt="{
+                root: { class: 'justify-center' },
+                label: { class: 'grow-0' }
+              }"
+            />
+          </div>
+        </div>
+        <!-- View Analytics -->
+        <div class="w-full p-3 sm:p-6 flex flex-col gap-6 surface-border border rounded-md">
+          <div class="flex flex-row justify-start gap-3">
+            <div
+              class="w-11 h-11 flex flex-shrink-0 justify-center items-center rounded-md surface-200"
+            >
+              <span class="pi pi-chart-line"></span>
+            </div>
+            <div class="flex flex-col gap-2">
+              <div class="text-lg sm:text-xl font-medium">View analytics</div>
+              <div class="text-xs sm:text-sm text-color-secondary">
+                Gain powerful insights into your performance, availability, and security.
+              </div>
+            </div>
+          </div>
+          <div class="flex flex-col items-start sm:flex-row gap-3 sm:gap-4">
+            <PrimeButton
+              type="button"
+              class="sm:w-auto w-full"
+              label="View Real-Time Metrics"
+              outlined
+              size="small"
+              @click="navigateToRealTimeMetrics"
+            />
+            <PrimeButton
+              type="button"
+              label="About Real-Time Metrics"
+              link
+              class="w-full sm:w-auto"
+              icon="pi pi-external-link"
+              iconPos="right"
+              size="small"
+              @click="openDocsRealTimeMetrics"
+              :pt="{
+                root: { class: 'justify-center' },
+                label: { class: 'grow-0' }
+              }"
+            />
+          </div>
+        </div>
+      </div>
+
+      <div
+        class="w-full p-3 sm:p-6 surface-border border rounded-md flex flex-col gap-6 justify-between relative"
+        v-if="showInviteSession"
+      >
         <PrimeButton
-          class="w-full md:w-auto"
-          label="Create something new"
-          type="button"
+          icon="pi pi-times"
+          outlined
+          class="absolute right-3 top-3 sm:right-6 sm:top-6"
           size="small"
+          type="button"
+          @click="closeInviteSession"
         />
-      </div>
-    </div>
-
-    <div class="flex flex-col xl:flex-row gap-4 sm:gap-6">
-      <!-- Manage Applications -->
-      <div class="w-full p-4 sm:p-6 flex flex-col gap-6 surface-border border rounded-md">
-        <div class="flex flex-row justify-start gap-3">
-          <div
-            class="w-11 h-11 flex flex-shrink-0 justify-center items-center rounded-md surface-200"
-          >
-            <span class="pi pi-box"></span>
+        <div class="flex flex-col gap-2">
+          <div class="text-lg sm:text-xl font-medium">Invite your team</div>
+          <div class="text-xs sm:text-sm text-color-secondary">
+            All Azion plans include unlimited seats for your team. Invite your colleagues to start
+            building with you.
           </div>
-          <div class="flex flex-col gap-2">
-            <div class="text-lg sm:text-xl font-medium">Manage your applications</div>
-            <div class="text-xs sm:text-sm text-color-secondary">
-              Add and manage custom domains to your edge applications.
-            </div>
-          </div>
-        </div>
-        <div class="flex flex-col items-start sm:flex-row gap-3 sm:gap-4">
-          <PrimeButton
-            type="button"
-            label="Manage Applications"
-            outlined
-            class="w-full sm:w-auto"
-            size="small"
-            @click="navigateToEdgeApplications"
-          />
-          <PrimeButton
-            type="button"
-            label="Learn how to edit an application"
-            link
-            class="w-full sm:w-auto"
-            icon="pi pi-external-link"
-            iconPos="right"
-            size="small"
-            @click="openDocsEdgeApplication"
-          />
-        </div>
-      </div>
-      <!-- View Analytics -->
-      <div class="w-full p-4 sm:p-6 flex flex-col gap-6 surface-border border rounded-md">
-        <div class="flex flex-row justify-start gap-3">
-          <div
-            class="w-11 h-11 flex flex-shrink-0 justify-center items-center rounded-md surface-200"
-          >
-            <span class="pi pi-chart-line"></span>
-          </div>
-          <div class="flex flex-col gap-2">
-            <div class="text-lg sm:text-xl font-medium">View analytics</div>
-            <div class="text-xs sm:text-sm text-color-secondary">
-              Gain powerful insights into your performance, availability, and security.
-            </div>
-          </div>
-        </div>
-        <div class="flex flex-col items-start sm:flex-row gap-3 sm:gap-4">
-          <PrimeButton
-            type="button"
-            class="sm:w-auto w-full"
-            label="View Real-Time Metrics"
-            outlined
-            size="small"
-            @click="navigateToRealTimeMetrics"
-          />
-          <PrimeButton
-            type="button"
-            label="About Real-Time Metrics"
-            link
-            class="w-full sm:w-auto"
-            icon="pi pi-external-link"
-            iconPos="right"
-            size="small"
-            :pt="{
-              label: { class: 'w-fit' }
-            }"
-            @click="openDocsRealTimeMetrics"
-          />
-        </div>
-      </div>
-    </div>
-
-    <div
-      class="w-full px-3 py-4 sm:px-6 sm:py-6 surface-border border rounded-md flex flex-col gap-6 sm:gap-10 justify-between relative"
-      v-if="showInviteSession"
-    >
-      <PrimeButton
-        icon="pi pi-times"
-        outlined
-        class="absolute right-3 top-3 sm:right-6 sm:top-6"
-        size="small"
-        type="button"
-        @click="closeInviteSession"
-      />
-      <div class="flex flex-col gap-4">
-        <div class="text-lg sm:text-xl font-medium">Invite your team</div>
-        <div class="text-xs sm:text-sm text-color-secondary">
-          All Azion plans include unlimited seats for your team. Invite your colleagues to start
-          building with you.
         </div>
         <form
-          class="flex flex-col md:flex-row justify-between gap-4 md:gap-6"
+          class="flex flex-col lg:flex-row justify-between gap-3 sm:gap-6"
           @submit.prevent="handleSubmit"
         >
           <!-- Input Name -->
-          <div class="flex flex-col md:max-w-lg w-full gap-2">
+          <div class="flex flex-col w-full gap-2">
             <label
               for="name"
               class="text-color text-sm font-medium"
@@ -142,7 +152,7 @@
           </div>
 
           <!-- Input Email -->
-          <div class="flex flex-col md:max-w-lg w-full gap-2">
+          <div class="flex flex-col w-full gap-2">
             <label
               for="email"
               class="text-color text-sm font-medium"
@@ -163,7 +173,7 @@
           </div>
 
           <!-- Input Team -->
-          <div class="flex flex-col md:max-w-lg w-full gap-2">
+          <div class="flex flex-col w-full gap-2">
             <label
               for="team"
               class="text-color text-sm font-medium"
@@ -186,56 +196,56 @@
             >
           </div>
 
-          <div class="md:mt-7">
+          <div class="mt-auto lg:mt-7">
             <PrimeButton
               severity="secondary"
               type="submit"
               label="Invite"
               size="small"
               :disabled="isDisabled"
-              class="w-full px-4 md:w-auto"
+              class="w-full px-4 lg:w-auto"
             />
           </div>
         </form>
       </div>
-    </div>
 
-    <div class="w-full flex flex-col lg:flex-row gap-4 sm:gap-6 justify-between">
-      <!-- Product -->
-      <button
-        type="button"
-        class="sm:h-auto lg:h-40 hover:border-primary transition-all w-full p-3 sm:p-6 text-start flex flex-col gap-2 surface-border border rounded-md"
-        @click="openProductDocumentation"
-      >
-        <div class="text-lg font-medium">Product Documentation</div>
-        <div class="text-sm text-color-secondary">
-          Detailed documentation on each of our products and their features.
-        </div>
-      </button>
-      <!-- API -->
-      <button
-        type="button"
-        class="sm:h-auto lg:h-40 hover:border-primary transition-all w-full p-3 sm:p-6 text-start flex flex-col gap-2 surface-border border rounded-md"
-        @click="openAPIDocumentation"
-      >
-        <div class="text-lg font-medium">API Documentation</div>
-        <div class="text-sm text-color-secondary">
-          Azion's API exposes the entire Azion product portfolio via a standardized programmatic
-          interface.
-        </div>
-      </button>
-      <!-- Contact -->
-      <button
-        type="button"
-        class="sm:h-auto lg:h-40 hover:border-primary transition-all w-full p-3 sm:p-6 text-start flex flex-col gap-2 surface-border border rounded-md"
-        @click="openContactSupport"
-      >
-        <div class="text-lg font-medium">Contact Support</div>
-        <div class="text-sm text-color-secondary">
-          Send queries, suggestions or report to our specialized support team.
-        </div>
-      </button>
-    </div>
+      <div class="w-full flex flex-col lg:flex-row gap-6 justify-between">
+        <!-- Product -->
+        <button
+          type="button"
+          class="sm:h-auto lg:h-40 hover:border-primary transition-all w-full p-3 sm:p-6 text-start flex flex-col gap-2 surface-border border rounded-md"
+          @click="openProductDocumentation"
+        >
+          <div class="text-lg font-medium">Product Documentation</div>
+          <div class="text-sm text-color-secondary">
+            Detailed documentation on each of our products and their features.
+          </div>
+        </button>
+        <!-- API -->
+        <button
+          type="button"
+          class="sm:h-auto lg:h-40 hover:border-primary transition-all w-full p-3 sm:p-6 text-start flex flex-col gap-2 surface-border border rounded-md"
+          @click="openAPIDocumentation"
+        >
+          <div class="text-lg font-medium">API Documentation</div>
+          <div class="text-sm text-color-secondary">
+            Azion's API exposes the entire Azion product portfolio via a standardized programmatic
+            interface.
+          </div>
+        </button>
+        <!-- Contact -->
+        <button
+          type="button"
+          class="sm:h-auto lg:h-40 hover:border-primary transition-all w-full p-3 sm:p-6 text-start flex flex-col gap-2 surface-border border rounded-md"
+          @click="openContactSupport"
+        >
+          <div class="text-lg font-medium">Contact Support</div>
+          <div class="text-sm text-color-secondary">
+            Send queries, suggestions or report to our specialized support team.
+          </div>
+        </button>
+      </div>
+    </section>
   </div>
 </template>
 
@@ -253,6 +263,7 @@
       InputText,
       Dropdown
     },
+    inject: ['createBoardManager'],
     props: {
       listTeamsService: {
         type: Function,
@@ -263,7 +274,7 @@
         required: true
       },
       inviteSession: {
-        type: Object,
+        type: Function,
         required: true
       },
       windowManager: {

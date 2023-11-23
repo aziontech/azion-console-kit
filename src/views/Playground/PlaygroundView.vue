@@ -1,42 +1,16 @@
 
 <template>
-  <div class="flex flex-col min-h-[calc(100vh-120px)] pt-5">
-    <TemplateEngineBlock
-      :getTemplateService="getTemplate"
-      :postTemplateService="instantiateTemplate"
-      :templateId="uuid"
-      ref="template"
-    />
-
+  <div class="items-center">
+    <Badge class="w-fit" value="2"></Badge>
+    <Badge class="w-fit" value="8" severity="success"></Badge>
+    <Badge class="w-fit" value="4" severity="info"></Badge>
+    <Badge class="w-fit" value="12" severity="warning"></Badge>
+    <Badge class="w-fit" value="3" severity="danger"></Badge>
   </div>
-  
-  
+
 </template>
-  <script>
-    import TemplateEngineBlock from '@/templates/template-engine-block'
-    import { getTemplate, instantiateTemplate } from '@/services/template-engine-services';
-
-    export default {
-      name: 'script-runner-test-block',
-      components: {
-        TemplateEngineBlock,
-
-      },
-      async created() {
-        //
-
-      },
-      data: () => ({
-        uuid: '9cd54b7d-666a-4e45-8097-47ae1fb70014',
-        getTemplate,
-        instantiateTemplate
-      }),
-      methods: {
-        submit() {
-          this.$refs.template.validateAndSubmit()
   
-        }
-      }
-    }
+  <script setup>
+    import Badge from 'primevue/badge';
   </script>
   

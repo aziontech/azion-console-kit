@@ -171,6 +171,10 @@
         type: String,
         required: true
       },
+      pageTitleDelete: {
+        type: String,
+        required: true
+      },
       createPagePath: {
         type: String,
         required: true,
@@ -215,11 +219,6 @@
       actionOptions(showAuthorize) {
         const actionOptions = [
           {
-            label: 'Edit',
-            icon: 'pi pi-fw pi-pencil',
-            command: () => this.editItem()
-          },
-          {
             label: 'Delete',
             icon: 'pi pi-fw pi-trash',
             command: () => this.openDeleteDialog()
@@ -260,15 +259,12 @@
       editItemSelected({ data: item }) {
         this.$router.push({ path: `${this.editPagePath}/${item.id}` })
       },
-      editItem() {
-        this.$router.push({ path: `${this.editPagePath}/${this.selectedId}` })
-      },
       authorizeEdgeNode() {
         this.$emit('authorize', this.selectedId)
       },
       openDeleteDialog() {
         this.informationForDeletion = {
-          title: this.pageTitle,
+          title: this.pageTitleDelete,
           selectedID: this.selectedId,
           deleteService: this.deleteService,
           deleteDialogVisible: true,

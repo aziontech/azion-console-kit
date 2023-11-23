@@ -3,7 +3,7 @@
     v-model:visible="deleteDialogVisible"
     modal
     :header="`Delete ${informationForDeletion.title}`"
-    class="w-[40vw]"
+    class="w-[95vw] md:w-[40vw]"
   >
     <div class="flex flex-col gap-5">
       <div>
@@ -11,12 +11,12 @@
           class="w-100"
           severity="warn"
           :closable="false"
-          >Warning: This action is not reversible. Please be certain.</Message
+          >Once confirmed, this action can't be reversed.</Message
         >
 
         <p class="pt-3.5 text-color-secondary">
-          This Edge Application will be deleted along, Device Groups, Origins settings, Cache
-          Settings and Rule Sets.
+          This {{ informationForDeletion.title }} will be deleted along with any associated settings
+          or instances. Check Help Center for more details.
         </p>
       </div>
 
@@ -27,7 +27,7 @@
           <label
             for="confirm-input"
             class="font-semibold text-sm"
-            >To confirm, type “delete” in the box below:</label
+            >Type “delete” to confirm:</label
           >
           <InputText
             id="confirm-input"
@@ -133,7 +133,7 @@
           const feedback = await this.informationForDeletion.deleteService(
             this.informationForDeletion.selectedID
           )
-          toastConfig.summary = feedback ?? 'Deleted successfully'
+          toastConfig.summary = feedback ?? 'Deleted successfully!'
           this.$emit('successfullyDeleted')
           this.resetForm()
         } catch (error) {

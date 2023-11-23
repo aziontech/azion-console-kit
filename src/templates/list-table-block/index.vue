@@ -51,6 +51,7 @@
           :key="col.field"
           :field="col.field"
           :header="col.header"
+          :sortField="col?.sortField"
         >
           <template #body="{ data: rowData }">
             <template v-if="col.type !== 'component'">
@@ -227,6 +228,10 @@
         type: String,
         required: true
       },
+      pageTitleDelete: {
+        type: String,
+        required: true
+      },
       createPagePath: {
         type: String,
         required: true,
@@ -248,7 +253,7 @@
       deleteService: {
         type: Function
       },
-      visibleEditAction: {
+      enableEditClick: {
         type: Boolean,
         default: true
       },
@@ -291,13 +296,6 @@
       },
       actionOptions(rowData) {
         const actionOptions = []
-        if (this.visibleEditAction) {
-          actionOptions.push({
-            label: 'Edit',
-            icon: 'pi pi-fw pi-pencil',
-            command: () => this.editItem()
-          })
-        }
 
         if (this.deleteService) {
           actionOptions.push({
@@ -342,14 +340,13 @@
         this.$refs[`menu-${selectedId}`].toggle(event)
       },
       editItemSelected({ data: item }) {
-        this.$router.push({ path: `${this.editPagePath}/${item.id}` })
-      },
-      editItem() {
-        this.$router.push({ path: `${this.editPagePath}/${this.selectedId}` })
+        if (this.enableEditClick) {
+          this.$router.push({ path: `${this.editPagePath}/${item.id}` })
+        }
       },
       openDeleteDialog() {
         this.informationForDeletion = {
-          title: this.pageTitle,
+          title: this.pageTitleDelete,
           selectedID: this.selectedId,
           deleteService: this.deleteService,
           deleteDialogVisible: true,

@@ -6,11 +6,12 @@
     :initialDataSetter="setValues"
     :formData="values"
     :formMeta="meta"
+    :updatedRedirect="updatedRedirect"
   >
     <template #form>
       <FormHorizontal
         title="General"
-        description="description"
+        description="Edit allowlists, blocklists, and even greylists based on IP addresses, geolocation (countries), or Autonomous System Number (ASN) to use with configured rule sets on Rules Engine."
       >
         <template #inputs>
           <div class="flex flex-col sm:max-w-lg w-full gap-2">
@@ -26,6 +27,9 @@
               :class="{ 'p-invalid': errors.name }"
               v-tooltip.top="{ value: errors.name, showDelay: 200 }"
             />
+            <small class="text-xs text-color-secondary font-normal leading-tight">
+              Give a unique and easy-to-remember name.</small
+            >
             <small
               v-if="errors.name"
               class="p-error text-xs font-normal leading-tight"
@@ -35,8 +39,8 @@
         </template>
       </FormHorizontal>
       <FormHorizontal
-        title="List Settings"
-        description="description"
+        title="Network List Settings"
+        description="Specificy the type of network list you want to create and the properties that'll compose the list."
       >
         <template #inputs>
           <div class="flex flex-col w-full sm:max-w-lg gap-2">
@@ -56,6 +60,9 @@
               optionValue="value"
               class="w-full"
             />
+            <small class="text-xs text-color-secondary font-normal leading-tight">
+              Each list type accepts different values.</small
+            >
             <small
               v-if="errors.networkListType"
               class="p-error text-xs font-normal leading-tight"
@@ -84,6 +91,10 @@
               class="p-error text-xs font-normal leading-tight"
               >{{ errors.itemsValues }}</small
             >
+            <small class="text-xs text-color-secondary font-normal leading-tight">
+              Separate each ASN value by using a new line. Duplicated entries are automatically
+              removed.</small
+            >
           </div>
           <div
             class="flex flex-col sm:max-w-lg w-full gap-2"
@@ -108,6 +119,10 @@
               class="p-error text-xs font-normal leading-tight"
               >{{ errors.itemsValues }}</small
             >
+            <small class="text-xs text-color-secondary font-normal leading-tight">
+              Separate each address value by using a new line. Duplicated entries are automatically
+              removed.
+            </small>
           </div>
           <div
             class="flex flex-col w-full sm:max-w-3xl gap-2"
@@ -133,6 +148,9 @@
               v-if="errors.itemsValuesCountry"
               class="p-error text-xs font-normal leading-tight"
               >{{ errors.itemsValuesCountry }}</small
+            >
+            <small class="text-xs text-color-secondary font-normal leading-tight">
+              Select one or more countries.</small
             >
           </div>
         </template>
@@ -165,7 +183,8 @@
     props: {
       loadNetworkListsService: { type: Function, required: true },
       editNetworkListsService: { type: Function, required: true },
-      listCountriesService: { type: Function, required: true }
+      listCountriesService: { type: Function, required: true },
+      updatedRedirect: { type: String, required: true }
     },
     data: (props) => {
       const options = ref([

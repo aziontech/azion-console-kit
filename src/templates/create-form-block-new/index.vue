@@ -8,7 +8,7 @@
       <slot name="form" />
       <slot name="raw-form" />
     </form>
-    <DialogUnsavedBlock :blockRedirectUnsaved="formMeta.touched" />
+    <DialogUnsavedBlock :blockRedirectUnsaved="hasModifications" />
     <ActionBarBlockGoBack v-if="buttonBackList" />
     <ActionBarTemplate
       @cancel="navigateBack"
@@ -35,7 +35,8 @@
     },
     emits: ['on-response'],
     data: () => ({
-      isLoading: false
+      isLoading: false,
+      blockViewRedirection: true
     }),
     props: {
       pageTitle: {
@@ -76,8 +77,11 @@
       }
     },
     methods: {
-      navigateBack(redirectURL) {
-        this.$router.push({ path: redirectURL })
+      navigateBack() {
+        this.$router.go(-1)
+      },
+      redirectToUrl(path) {
+        this.$router.push({ path })
       },
       showToast(severity, summary, life = 10000) {
         if (!summary) return
@@ -93,22 +97,28 @@
           this.showToast('success', feedback)
         }
       },
-      handleSuccess(feedback, redirectURL) {
+      handleSuccess(response) {
         this.cleanFormCallback()
-        this.$emit('on-response', feedback)
-        this.showFeedback(feedback)
-        if (this.callback) this.navigateBack(redirectURL)
+        this.$emit('on-response', response)
+        this.showFeedback(response.feedback)
+        if (this.callback) this.redirectToUrl(response.urlToEditView)
       },
       async validateAndSubmit() {
         try {
           this.isLoading = true
-          const data = await this.createService(this.formData)
-          this.handleSuccess(data.feedback, data.redirectURL)
+          const response = await this.createService(this.formData)
+          this.handleSuccess(response)
         } catch (error) {
           this.showToast('error', error)
+          this.blockViewRedirection = true
         } finally {
           this.isLoading = false
         }
+      }
+    },
+    computed: {
+      hasModifications() {
+        return this.formMeta.touched && this.blockViewRedirection
       }
     }
   }

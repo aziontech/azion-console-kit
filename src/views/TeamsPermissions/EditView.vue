@@ -6,6 +6,7 @@
     :initialDataSetter="setValues"
     :formData="values"
     :formMeta="meta"
+    :updatedRedirect="updatedRedirect"
   >
     <template #form>
       <FormHorizontal
@@ -106,6 +107,10 @@
     },
     listPermissionService: {
       type: Function,
+      required: true
+    },
+    updatedRedirect: {
+      type: String,
       required: true
     }
   })

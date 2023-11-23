@@ -54,7 +54,8 @@ export const digitalCertificatesRoutes = {
       component: () => import('@views/DigitalCertificates/EditView.vue'),
       props: {
         editDigitalCertificateService: DigitalCertificatesService.editDigitalCertificateService,
-        loadDigitalCertificateService: DigitalCertificatesService.loadDigitalCertificateService
+        loadDigitalCertificateService: DigitalCertificatesService.loadDigitalCertificateService,
+        updatedRedirect: 'list-digital-certificates'
       },
       meta: {
         breadCrumbs: [

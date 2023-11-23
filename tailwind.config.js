@@ -19,12 +19,17 @@ export default {
         'header-button-hover': 'rgba(244, 244, 244, 0.04)',
         'header-avatar': '#363636'
       },
+      backgroundColor: {
+        'orange-bullet': '#F3652B',
+      },
       borderColor: {
         header: '#3e3e3e',
-        'header-hover': '#F3652B'
+        'header-hover': '#F3652B',
+        'radio-card-active': '#F3652B'
       },
       textColor: {
-        header: '#b5b5b5'
+        header: '#b5b5b5',
+        'success-check': '#22C55E',
       },
       transitionProperty: {
         width: 'width'

@@ -33,7 +33,7 @@ const parseHttpResponse = (httpResponse) => {
     case 201:
       return {
         feedback: 'Your network list has been created',
-        redirectURL: `/network-lists/edit/${httpResponse.body.results.id}`
+        urlToEditView: `/network-lists/edit/${httpResponse.body.results.id}`
       }
     case 400:
       const apiError = httpResponse.body.results[0]

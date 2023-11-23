@@ -127,4 +127,90 @@ describe('AzionDocumentationCatalog', () => {
       `https://www.azion.com/en/search-result/?q=credentials&filter=doc`
     )
   })
+  it('should open team permissions documentation with correct link', () => {
+    const openWindowSpy = vi.spyOn(window, 'open')
+    const { sut } = makeSut()
+
+    sut.teamPermissions()
+
+    expect(openWindowSpy).toHaveBeenCalledWith(
+      `https://www.azion.com/en/search-result/?q=team permissions&filter=doc`
+    )
+  })
+
+  it('should open data streaming documentation with correct link', () => {
+    const openWindowSpy = vi.spyOn(window, 'open')
+    const { sut } = makeSut()
+
+    sut.dataStreaming()
+
+    expect(openWindowSpy).toHaveBeenCalledWith(
+      `https://www.azion.com/en/search-result/?q=data streaming&filter=doc`
+    )
+  })
+
+  it('should open edge functions documentation with correct link', () => {
+    const openWindowSpy = vi.spyOn(window, 'open')
+    const { sut } = makeSut()
+
+    sut.edgeFunctions()
+
+    expect(openWindowSpy).toHaveBeenCalledWith(
+      `https://www.azion.com/en/search-result/?q=edge functions&filter=doc`
+    )
+  })
+
+  it('should open edge firewall documentation with correct link', () => {
+    const openWindowSpy = vi.spyOn(window, 'open')
+    const { sut } = makeSut()
+
+    sut.edgeFirewall()
+
+    expect(openWindowSpy).toHaveBeenCalledWith(
+      `https://www.azion.com/en/search-result/?q=edge firewall&filter=doc`
+    )
+  })
+
+  it('should open edge application documentation with correct link', () => {
+    const openWindowSpy = vi.spyOn(window, 'open')
+    const { sut } = makeSut()
+
+    sut.edgeApplication()
+
+    expect(openWindowSpy).toHaveBeenCalledWith(
+      `https://www.azion.com/en/search-result/?q=edge application&filter=doc`
+    )
+  })
+
+  it('should open users documentation with correct link', () => {
+    const openWindowSpy = vi.spyOn(window, 'open')
+    const { sut } = makeSut()
+
+    sut.users()
+
+    expect(openWindowSpy).toHaveBeenCalledWith(
+      `https://www.azion.com/en/search-result/?q=users&filter=doc`
+    )
+  })
+
+  it('should open activity history documentation with correct link', () => {
+    const openWindowSpy = vi.spyOn(window, 'open')
+    const { sut } = makeSut()
+
+    sut.activityHistory()
+
+    expect(openWindowSpy).toHaveBeenCalledWith(
+      `https://www.azion.com/en/search-result/?q=activity history&filter=doc`
+    )
+  })
+  it('should open edge nodes documentation with correct link', () => {
+    const openWindowSpy = vi.spyOn(window, 'open')
+    const { sut } = makeSut()
+
+    sut.edgeNodes()
+
+    expect(openWindowSpy).toHaveBeenCalledWith(
+      `https://www.azion.com/en/search-result/?q=edge nodes&filter=doc`
+    )
+  })
 })

@@ -27,7 +27,8 @@ const adapt = (httpResponse) => {
       lastEditor: edgeService.last_editor,
       lastModified: new Intl.DateTimeFormat('us', { dateStyle: 'full' }).format(
         new Date(edgeService.updated_at)
-      )
+      ),
+      lastModifiedDate: edgeService.updated_at
     }
   })
 
