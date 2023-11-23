@@ -12,7 +12,7 @@ const makeSut = () => {
 describe('HelpCenterServices', () => {
   it('should return the API base url to get documentation', () => {
     const { sut } = makeSut()
-    const correctApiUrl = 'https://storage.googleapis.com/gcs-docs-help-center-stage'
+    const correctApiUrl = 'https://storage.googleapis.com/gcs-docs-help-center-stage/console/'
 
     const baseUrl = sut('stage')
 

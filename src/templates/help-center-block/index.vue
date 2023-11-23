@@ -221,8 +221,8 @@
   import Sidebar from 'primevue/sidebar'
   import { mapActions, mapState } from 'pinia'
   import { useHelpCenterStore } from '@/stores/help-center'
-  import * as HelpCenterServices from '@/services/help-center-services'
   import BannerDiscord from './banner-discord.vue'
+  import { getEnvironmentFromUrl } from '@/helpers/get-environment-from-url'
 
   import PrimeMenu from 'primevue/menu'
 
@@ -253,7 +253,7 @@
           },
           {
             label: 'Contact Support',
-            link: `https://stage-manager.azion.com/tickets/`,
+            link: `${this.makeContactSupportUrl()}/tickets/`,
             isLinkExternal: true
           },
           {
@@ -281,11 +281,19 @@
       async getMainContent() {
         const currentPath = this.getCurrentPath()
 
-        const mainDocumentation = await HelpCenterServices.getHelpCenterDocumentationService({
+        const mainDocumentation = await this.HelpCenterServices.getHelpCenterDocumentationService({
           url: currentPath
         })
 
         this.mainContent = mainDocumentation
+      },
+      makeContactSupportUrl() {
+        const environment = getEnvironmentFromUrl(window.location.href)
+        if (environment === 'stage') {
+          return 'https://stage-manager.azion.com'
+        }
+
+        return 'https://manager.azion.com'
       },
       async getHtmlArticle(filename) {
         const currentPath = this.getCurrentPath()
@@ -303,7 +311,7 @@
         return articleNameParsed.concat('/index.html')
       },
       async fetchArticleContent(currentPath, filename) {
-        return await HelpCenterServices.getHelpCenterDocumentationService({
+        return await this.HelpCenterServices.getHelpCenterDocumentationService({
           url: currentPath,
           filename: filename
         })

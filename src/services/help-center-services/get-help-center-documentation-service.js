@@ -2,12 +2,14 @@ import { AxiosHttpClientAdapter, parseHttpResponse } from '../axios/AxiosHttpCli
 import { makeDocumentationBaseUrl } from './make-documentation-base-url'
 import { makeGoogleStorageApi } from '../axios/makeGoogleStorageApi'
 import { markdownToHtml } from './markdown-to-html'
+import { getEnvironmentFromUrl } from '../../helpers/get-environment-from-url'
 
 const DEFAULT_DOCUMENT = 'index.md'
 const WELCOME_PATH = '/welcome'
 
 const getHelpCenterDocumentationService = async ({ url, filename }) => {
-  const baseUrl = makeDocumentationBaseUrl('stage')
+  const environment = getEnvironmentFromUrl(window.location.href)
+  const baseUrl = makeDocumentationBaseUrl(environment)
   const documentUrl = url === '/' ? WELCOME_PATH : getFirstPathSegment(url)
   const documentFilename = filename || DEFAULT_DOCUMENT
 

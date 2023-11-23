@@ -20,6 +20,7 @@ import PrimeVue from 'primevue/config'
 import Tooltip from 'primevue/tooltip'
 import ToastService from 'primevue/toastservice'
 import { install as VueMonacoEditorPlugin } from '@guolao/vue-monaco-editor'
+import * as HelpCenterServices from '@/services/help-center-services'
 
 import App from './App.vue'
 import router from './router'
@@ -28,6 +29,7 @@ const app = createApp(App)
 const pinia = createPinia()
 pinia.use(piniaPluginPersistedstate)
 
+app.config.globalProperties.HelpCenterServices = HelpCenterServices
 app.use(PrimeVue)
 app.directive('tooltip', Tooltip)
 app.use(ToastService)
