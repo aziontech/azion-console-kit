@@ -1,9 +1,9 @@
 <template>
   <div class="flex flex-col">
-    <div
-      class="border-b surface-border surface-ground"
-    >
-      <div class="px-3 py-4 sm:px-8 sm:py-8 gap-4 flex 2xl:px-8 2xl:py-16 flex-col max-w-screen-2xl mx-auto w-full">
+    <div class="border-b surface-border surface-ground">
+      <div
+        class="px-3 py-4 sm:px-8 sm:py-8 gap-4 flex 2xl:px-8 2xl:py-16 flex-col max-w-screen-2xl mx-auto w-full"
+      >
         <div class="text-2xl sm:text-3xl font-medium">
           The place to find, deploy, and manage third-party solutions
         </div>
@@ -13,7 +13,7 @@
       </div>
     </div>
 
-    <div class=" 2xl:mx-auto max-w-screen-2xl w-full flex flex-col md:flex-row gap-6 lg:gap-8 mb-8">
+    <div class="2xl:mx-auto max-w-screen-2xl w-full flex flex-col md:flex-row gap-6 lg:gap-8 mb-8">
       <!-- Sidebar -->
       <div
         class="flex flex-col md:flex-shrink-0 gap-8 px-3 pt-8 pb-0 sm:px-8 w-full md:w-80 md:sticky md:top-10 self-start"
@@ -39,7 +39,7 @@
         <!-- Filters -->
         <div class="flex flex-col gap-3">
           <label class="text-color text-base font-medium">Filters</label>
-          <div class="card  flex justify-content-center">
+          <div class="card flex justify-content-center">
             <Listbox
               v-model="selectedCategory"
               :options="categoriesList"
