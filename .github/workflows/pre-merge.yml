@@ -30,4 +30,4 @@ jobs:
         run: yarn lint
 
       - name: Run tests
-        run: yarn test:unit-headless
+        run: yarn test:unit:headless
