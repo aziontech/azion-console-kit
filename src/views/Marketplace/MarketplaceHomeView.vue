@@ -56,7 +56,6 @@
                   <Badge
                     v-if="slotProps.option.code !== 'all'"
                     :value="slotProps.option.total"
-                    severity="info"
                   />
                 </div>
               </template>
