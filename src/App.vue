@@ -31,4 +31,3 @@
     </ShellBlock>
   </main>
 </template>
-@/helpers/theme-select
