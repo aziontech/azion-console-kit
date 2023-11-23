@@ -3,6 +3,13 @@ import * as Errors from '@services/axios/errors'
 import { listCredentialsService } from '@/services/credential-services'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
+const localeMock = (locale = 'en') => {
+  const DateTimeFormat = Intl.DateTimeFormat
+  vi.spyOn(window.global.Intl, 'DateTimeFormat')
+    .mockImplementationOnce((_, options) => DateTimeFormat(locale, { ...options }))
+    .mockImplementationOnce((_, options) => DateTimeFormat(locale, { ...options }))
+}
+
 const fixtures = {
   credentialBasic: {
     id: '1',
@@ -54,6 +61,7 @@ describe('ListCredentialsServices', () => {
   })
 
   it('should parse correctly each returned item', async () => {
+    localeMock()
     vi.setSystemTime(new Date(2023, 10, 10, 10))
     vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
       statusCode: 200,

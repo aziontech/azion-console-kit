@@ -3,14 +3,16 @@ import { documentationCatalog, documentationGuideProducts } from './azion-docume
 import {
   openDocumentation,
   openAPIDocumentation,
-  openContactSupport
+  openContactSupport,
+  openSearchResult
 } from './azion-documentation-window-opener'
 import InviteSession from './invite-session'
 import { useCreateBoardManager } from './composables/use-create-board-manager'
-import { themeSelect } from './themeSelect'
+import { themeSelect } from './theme-select'
 import { azionPrivacyPolicyWindowOpener } from './azion-privacy-policy-opener'
 import { azionTermsAndServicesWindowOpener } from './azion-terms-and-services-opener'
 import { parseCamelToSnake, parseSnakeToCamel } from './parse-api-body'
+import { getEnvironmentFromUrl } from './get-environment-from-url'
 
 export {
   themeSelect,
@@ -25,5 +27,7 @@ export {
   azionPrivacyPolicyWindowOpener,
   azionTermsAndServicesWindowOpener,
   parseCamelToSnake,
-  parseSnakeToCamel
+  parseSnakeToCamel,
+  openSearchResult,
+  getEnvironmentFromUrl
 }

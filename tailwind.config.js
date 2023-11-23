@@ -1,3 +1,5 @@
+import typography from '@tailwindcss/typography';
+
 /** @type {import('tailwindcss').Config} */
 export default {
   important: true,
@@ -35,7 +37,7 @@ export default {
         width: 'width'
       },
       width: {
-        slide: '300px'
+        'slide': '384px',
       },
       animation: {
         fadeIn: 'fadeIn 220ms ease-in-out',
@@ -53,5 +55,7 @@ export default {
       }
     }
   },
-  plugins: []
+  plugins: [
+    typography,
+  ]
 }
