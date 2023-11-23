@@ -36,11 +36,11 @@ const getConfig = () => {
         //   changeOrigin: true,
         //   rewrite: (path) => path.replace(/^\/api\/edge-services/, '')
         // },
-        '/api/variables': {
-          target: `${URLStartPrefix}manager.azion.com/variables/api/`,
-          changeOrigin: true,
-          rewrite: (path) => path.replace(/^\/api/, '')
-        },
+        // '/api/variables': {
+        //   target: `${URLStartPrefix}manager.azion.com/variables/api/`,
+        //   changeOrigin: true,
+        //   rewrite: (path) => path.replace(/^\/api/, '')
+        // },
         '/api/marketplace': {
           target: `${URLStartPrefix}manager.azion.com/marketplace/api/`,
           changeOrigin: true,
@@ -61,11 +61,11 @@ const getConfig = () => {
           changeOrigin: true,
           rewrite: (path) => path.replace(/^\/events\/graphql\//, '')
         },
-        '/api/edge_node': {
-          target: `${URLStartPrefix}manager.azion.com/edgenode/api/v1/edge-nodes`,
-          changeOrigin: true,
-          rewrite: (path) => path.replace(/^\/api\/edge_node/, '')
-        },
+        // '/api/edge_node': {
+        //   target: `${URLStartPrefix}manager.azion.com/edgenode/api/v1/edge-nodes`,
+        //   changeOrigin: true,
+        //   rewrite: (path) => path.replace(/^\/api\/edge_node/, '')
+        // },
         '/api/iam': {
           target: `${URLStartPrefix}manager.azion.com/iam/api`,
           changeOrigin: true,

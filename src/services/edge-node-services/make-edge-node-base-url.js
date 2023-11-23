@@ -1,3 +1,3 @@
 export const makeEdgeNodeBaseUrl = () => {
-  return `edge_node`
+  return `edge_nodes`
 }
