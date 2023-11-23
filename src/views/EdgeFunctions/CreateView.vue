@@ -105,7 +105,7 @@
         </TabPanel>
         <TabPanel header="Arguments">
           <div class="flex flex-col lg:flex-row mt-8">
-            <div class="w-full lg:w-2/3 pr-8">
+            <div class="w-full lg:w-2/3 lg:pr-8">
               <vue-monaco-editor
                 v-model:value="jsonArgs"
                 language="json"
@@ -221,12 +221,17 @@
   const validationSchema = yup.object({
     name: yup.string().required('Name is a required field'),
     code: yup.string().required('Code is a required field'),
-    jsonArgs: yup.string().test('empty', '', (value) => {
-      if (!value) {
-        setArgs(ARGS_INITIAL_STATE)
-      }
-      return true
-    })
+    jsonArgs: yup
+      .string()
+      .test('curly', 'Invalid JSON', (value) => {
+        return /^\{.*\}$/.test(value)
+      })
+      .test('empty', '', (value) => {
+        if (!value) {
+          setArgs(ARGS_INITIAL_STATE)
+        }
+        return true
+      })
   })
 
   const { defineInputBinds, errors, meta, resetForm, values } = useForm({
