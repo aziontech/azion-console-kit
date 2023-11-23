@@ -97,11 +97,11 @@ const getConfig = () => {
         //   changeOrigin: true,
         //   rewrite: (path) => path.replace(/^\/api/, '')
         // },
-        '/api/credentials': {
-          target: `${URLStartPrefix}manager.azion.com/credentials/api/v1/credentials`,
-          changeOrigin: true,
-          rewrite: (path) => path.replace(/^\/api\/credentials/, '')
-        },
+        // '/api/credentials': {
+        //   target: `${URLStartPrefix}manager.azion.com/credentials/api/v1/credentials`,
+        //   changeOrigin: true,
+        //   rewrite: (path) => path.replace(/^\/api\/credentials/, '')
+        // },
         '^/api/(account|user|token|switch-account|password|totp)': {
           //target: `${URLStartPrefix}sso.azion.com/api`,
           target: `${URLStartPrefix}sso.azion.com`,
