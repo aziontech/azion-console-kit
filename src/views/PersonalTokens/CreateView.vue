@@ -87,9 +87,9 @@
                   >Expires within *</label
                 >
                 <div class="flex gap-6">
-                  <div class="md:w-80">
+                  <div>
                     <Dropdown
-                      class="w-full md:w-80"
+                      class="w-full"
                       id="selectedExpiration"
                       :options="options"
                       optionLabel="label"
@@ -106,7 +106,7 @@
                       </template>
                     </Dropdown>
                   </div>
-                  <div class="md:w-80">
+                  <div>
                     <Calendar
                       v-if="isCustomDateSelected"
                       class="w-full"
