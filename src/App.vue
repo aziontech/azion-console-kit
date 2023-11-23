@@ -3,7 +3,7 @@
   import { RouterView, useRoute } from 'vue-router'
   import ShellBlock from '@/templates/shell-block'
   import { useAccountStore } from '@/stores/account'
-  import { themeSelect } from '@/helpers/themeSelect'
+  import { themeSelect } from '@/helpers/theme-select'
   import { storeToRefs } from 'pinia'
 
   const accountStore = useAccountStore()
@@ -31,3 +31,4 @@
     </ShellBlock>
   </main>
 </template>
+@/helpers/theme-select
