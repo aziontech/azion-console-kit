@@ -1,6 +1,8 @@
 <template>
   <div class="flex flex-col">
-    <div class="px-3 py-4 sm:px-8 sm:py-8 lg:pb-16 flex flex-col gap-4 border-b surface-border">
+    <div
+      class="px-3 py-4 sm:px-8 sm:py-8 lg:pb-16 flex flex-col gap-4 border-b surface-border surface-ground"
+    >
       <div class="text-2xl sm:text-3xl font-medium">
         The place to find, deploy, and manage third-party solutions
       </div>
@@ -94,6 +96,7 @@
                 link
                 class="ml-3 p-0"
                 size="small"
+                @click="resetFilters"
               />
             </div>
             <LoadingEmptySearch />
@@ -193,7 +196,7 @@
 
   const searchSolutions = debounce(async (event) => {
     try {
-      selectedCategory.value = CATEGORY_ALL
+      selectedCategory.value = {}
       searching.value = !!event.target.value
       loading.value = true
       const payload = { type: PAGE_TYPE, search: event.target.value }
@@ -204,6 +207,22 @@
       loading.value = false
     }
   })
+
+  const resetFilters = async () => {
+    try {
+      loading.value = true
+      selectedCategory.value = CATEGORY_ALL
+      searching.value = false
+      search.value = ''
+
+      const payload = { type: PAGE_TYPE }
+      templates.value = await loadSolutions(payload)
+    } catch (error) {
+      $toast.add({ ...ERROR_PROPS, summary: error })
+    } finally {
+      loading.value = false
+    }
+  }
 
   const featured = computed(() => {
     return templates.value.filter((i) => i.featured)
@@ -217,7 +236,7 @@
     const mapped = categories.value.map((i) => ({
       name: i.name,
       code: i.slug,
-      total: i.solutions_count
+      total: i.solutionsCount
     }))
 
     return mapped.length ? [CATEGORY_ALL, ...mapped] : []

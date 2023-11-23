@@ -54,9 +54,7 @@ describe('MarketplaceServices', () => {
   it('should call api with correct params', async () => {
     const requestSpy = vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
       statusCode: 200,
-      body: {
-        results: null
-      }
+      body: []
     })
 
     const { sut } = makeSut()
@@ -65,9 +63,58 @@ describe('MarketplaceServices', () => {
 
     expect(requestSpy).toHaveBeenCalledWith({
       url: `marketplace/solution/?`,
-      headers: {
-        'Mktp-Api-Context': 'onboarding'
-      },
+      headers: { 'Mktp-Api-Context': 'onboarding' },
+      method: 'GET'
+    })
+  })
+
+  it('should call api with search params', async () => {
+    const requestSpy = vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
+      statusCode: 200,
+      body: []
+    })
+
+    const { sut } = makeSut()
+
+    await sut({ search: 'Hello' })
+
+    expect(requestSpy).toHaveBeenCalledWith({
+      url: `marketplace/solution/?search=Hello`,
+      headers: { 'Mktp-Api-Context': 'onboarding' },
+      method: 'GET'
+    })
+  })
+
+  it('should call api with category params', async () => {
+    const requestSpy = vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
+      statusCode: 200,
+      body: []
+    })
+
+    const { sut } = makeSut()
+
+    await sut({ category: 'security' })
+
+    expect(requestSpy).toHaveBeenCalledWith({
+      url: `marketplace/solution/?category=security`,
+      headers: { 'Mktp-Api-Context': 'onboarding' },
+      method: 'GET'
+    })
+  })
+
+  it('should call api with type params', async () => {
+    const requestSpy = vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
+      statusCode: 200,
+      body: []
+    })
+
+    const { sut } = makeSut()
+
+    await sut({ type: 'marketplace' })
+
+    expect(requestSpy).toHaveBeenCalledWith({
+      url: `marketplace/solution/?`,
+      headers: { 'Mktp-Api-Context': 'marketplace' },
       method: 'GET'
     })
   })
