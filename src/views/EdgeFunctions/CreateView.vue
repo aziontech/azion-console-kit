@@ -27,7 +27,6 @@
                   id="name"
                   type="text"
                   :class="{ 'p-invalid': errors.name }"
-                  v-tooltip.top="{ value: errors.name, showDelay: 200 }"
                 />
                 <small
                   v-if="errors.name"
@@ -67,16 +66,22 @@
         <TabPanel header="Code">
           <div class="flex flex-col md:flex-row mt-8">
             <div class="w-full lg:w-2/3 lg:pr-8">
-              <vue-monaco-editor
-                v-model:value="code"
-                language="javascript"
-                :theme="theme"
-                class="min-h-[50vh] !w-[99%] surface-border border rounded-md"
-                :class="{ 'border-red-500 border': errorCode }"
-                v-tooltip.top="{ value: errorCode, showDelay: 200 }"
-                :options="editorOptions"
-                @change="changeValidateCode"
-              />
+              <div class="w-full">
+                <vue-monaco-editor
+                  v-model:value="code"
+                  language="javascript"
+                  :theme="theme"
+                  class="min-h-[50vh] !w-[99%] surface-border border rounded-md"
+                  :class="{ 'border-red-500 border': errors.code }"
+                  :options="editorOptions"
+                />
+              </div>
+              <small
+                v-if="errors.code"
+                class="p-error text-xs font-normal"
+              >
+                {{ errors.code }}
+              </small>
             </div>
 
             <div class="hidden lg:block">
@@ -88,7 +93,6 @@
                 <iframe
                   class="w-full h-full border-0 overflow-hidden"
                   ref="previewIframe"
-                  frameborder="0"
                   @load="postPreviewUpdates"
                   allowfullscreen
                   src="https://code-preview.azion.com/preview"
@@ -101,15 +105,13 @@
         </TabPanel>
         <TabPanel header="Arguments">
           <div class="flex flex-col lg:flex-row mt-8">
-            <div class="w-full lg:w-2/3 pr-8">
+            <div class="w-full lg:w-2/3 lg:pr-8">
               <vue-monaco-editor
                 v-model:value="jsonArgs"
                 language="json"
                 :theme="theme"
                 class="min-h-[50vh] !w-[99%] surface-border border rounded-md"
-                :class="{ 'border-red-500 border': errorCode }"
-                @change="changeValidateArgs"
-                v-tooltip.top="{ value: errorCode, showDelay: 200 }"
+                :class="{ 'border-red-500 border': errors.jsonArgs }"
                 :options="editorOptions"
               />
             </div>
@@ -123,7 +125,6 @@
                 <iframe
                   class="w-full h-full border-0 overflow-hidden"
                   ref="previewIframeArguments"
-                  frameborder="0"
                   @load="postPreviewUpdates"
                   allowfullscreen
                   src="https://code-preview.azion.com/preview"
@@ -178,27 +179,8 @@
     return store.currentTheme === 'light' ? 'vs' : 'vs-dark'
   })
 
-  // Methods
-  let errorCode = ''
-  const changeValidateCode = () => {
-    errorCode = ''
-    if (code.value === '') {
-      errorCode = 'Code is a required field'
-      return
-    }
-    postPreviewUpdates()
-  }
-
-  const changeValidateArgs = () => {
-    if (jsonArgs.value === '') {
-      setArgs(ARGS_INITIAL_STATE)
-      return
-    }
-    postPreviewUpdates()
-  }
-
   const postPreviewUpdates = () => {
-    if (previewIframe.value && previewIframe.value.contentWindow) {
+    if (previewIframe.value?.contentWindow) {
       const previewWindow = previewIframe.value.contentWindow
       const updateObject = {
         code: code.value,
@@ -216,7 +198,7 @@
       )
     }
 
-    if (previewIframeArguments.value && previewIframeArguments.value.contentWindow) {
+    if (previewIframeArguments.value?.contentWindow) {
       const previewWindow = previewIframeArguments.value.contentWindow
       const updateObject = {
         code: code.value,
@@ -237,7 +219,19 @@
 
   // Validations
   const validationSchema = yup.object({
-    name: yup.string().required('Name is a required field')
+    name: yup.string().required('Name is a required field'),
+    code: yup.string().required('Code is a required field'),
+    jsonArgs: yup
+      .string()
+      .test('curly', 'Invalid JSON', (value) => {
+        return /^\{.*\}$/.test(value)
+      })
+      .test('empty', '', (value) => {
+        if (!value) {
+          setArgs(ARGS_INITIAL_STATE)
+        }
+        return true
+      })
   })
 
   const { defineInputBinds, errors, meta, resetForm, values } = useForm({
@@ -251,7 +245,7 @@
     }
   })
 
-  const name = defineInputBinds('name', { validateOnInput: true })
+  const name = defineInputBinds('name')
   const { value: jsonArgs, setValue: setArgs } = useField('jsonArgs')
   const { value: code } = useField('code')
 </script>

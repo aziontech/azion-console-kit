@@ -33,7 +33,6 @@
                       id="name"
                       type="text"
                       :class="{ 'p-invalid': errors.name }"
-                      v-tooltip.top="{ value: errors.name, showDelay: 200 }"
                     />
                     <small
                       v-if="errors.name"
@@ -53,7 +52,6 @@
                       v-bind="domain"
                       type="text"
                       :class="{ 'p-invalid': errors.domain }"
-                      v-tooltip.top="{ value: errors.domain, showDelay: 200 }"
                     />
                     <small
                       v-if="errors.domain"
