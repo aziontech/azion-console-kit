@@ -87,11 +87,11 @@ const getConfig = () => {
           changeOrigin: true,
           rewrite: (path) => path.replace(/^\/api\/purge/, '')
         },
-        '/api/permissions': {
-          target: `${URLStartPrefix}iam.azion.com/iam/api/permissions`,
-          changeOrigin: true,
-          rewrite: (path) => path.replace(/^\/api\/permissions/, '')
-        },
+        // '/api/permissions': {
+        //   target: `${URLStartPrefix}iam.azion.com/iam/api/permissions`,
+        //   changeOrigin: true,
+        //   rewrite: (path) => path.replace(/^\/api\/permissions/, '')
+        // },
         // '/api/users': {
         //   target: `${URLStartPrefix}iam.azion.com/iam/api`,
         //   changeOrigin: true,
