@@ -120,7 +120,6 @@
   import Listbox from 'primevue/listbox'
   import Badge from 'primevue/badge'
   import PrimeButton from 'primevue/button'
-  import * as MarketplaceService from '@/services/marketplace-services'
   import ListTemplates from './ListTemplates.vue'
   import LoadingListTemplate from './LoadingListTemplate'
   import LoadingEmptySearch from './LoadingEmptySearch'
@@ -141,6 +140,17 @@
   }
   const CATEGORY_ALL = { name: 'All', code: 'all' }
 
+  const props = defineProps({
+    listCategoriesService: {
+      type: Function,
+      required: true
+    },
+    listSolutionsService: {
+      type: Function,
+      required: true
+    }
+  })
+
   onBeforeMount(() => {
     loadData()
   })
@@ -149,7 +159,7 @@
     try {
       loading.value = true
       const payload = { type: PAGE_TYPE }
-      const promises = [MarketplaceService.listCategoriesService(payload), loadSolutions(payload)]
+      const promises = [props.listCategoriesService(payload), loadSolutions(payload)]
 
       const [categoriesData, templatesData] = await Promise.all(promises)
       categories.value = categoriesData
@@ -162,7 +172,7 @@
   }
 
   const loadSolutions = (payload) => {
-    return MarketplaceService.listSolutionsService(payload)
+    return props.listSolutionsService(payload)
   }
 
   const changeCategory = async () => {
