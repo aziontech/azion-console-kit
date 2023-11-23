@@ -6,7 +6,7 @@
     :columns="getColumns"
     pageTitle="Teams Permissions"
     pageTitleDelete="Team Permission"
-    addButtonLabel="Team Permissions"
+    addButtonLabel="Team Permission"
     createPagePath="teams-permission/create"
     editPagePath="teams-permission/edit"
     @on-load-data="handleLoadData"
@@ -17,7 +17,7 @@
     pageTitle="Team Permissions"
     title="No team permissions added"
     description="Create your first team permissions."
-    createButtonLabel="Team Permissions"
+    createButtonLabel="Team Permission"
     createPagePath="teams-permission/create"
     :documentationService="documentationService"
   >
