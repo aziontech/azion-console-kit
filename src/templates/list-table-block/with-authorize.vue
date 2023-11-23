@@ -331,7 +331,6 @@
         this.$forceUpdate()
       },
       authorize() {
-        console.log('authorizeEdgeNode')
         this.$emit('authorizeEdgeNode', {
           authorize: { edgeNodeID: this.selectedId, openDialog: true, rerender: Math.random() }
         })
