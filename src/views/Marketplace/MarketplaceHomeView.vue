@@ -181,7 +181,7 @@
     }
   }
 
-  const debounce = (func, timeout = 300) => {
+  const debounce = (func, timeout = 400) => {
     let timer
     return (...args) => {
       clearTimeout(timer)
