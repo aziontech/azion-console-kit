@@ -2,6 +2,6 @@
 
 .azion-dark {
   @import './_fonts';
-  @import '../../theme-base/_components';
+  @import '../node_modules/primevue-sass-theme/theme-base/components.scss';
   @import './_extensions';
 }

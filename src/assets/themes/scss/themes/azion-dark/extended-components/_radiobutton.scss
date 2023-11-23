@@ -29,7 +29,7 @@
     @include invalid-input();
   }
 
-  &:focus {
+  &:focus-visible {
     outline: 0 none;
   }
 }

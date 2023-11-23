@@ -2,31 +2,38 @@
   <div class="flex flex-col min-h-[calc(100vh-120px)]">
     <form
       @submit.prevent="handleSubmit"
-      class="w-full grow py-4 px-8 flex flex-col gap-8 mb-5"
+      class="w-full grow py-4 px-8 flex flex-col gap-8 mb-5 max-sm:px-3"
     >
       <slot name="form" />
 
       <slot name="raw-form" />
     </form>
+    <DialogUnsavedBlock
+      :leavePage="leavePage"
+      :blockRedirectUnsaved="hasModifications"
+    />
     <ActionBarTemplate
       @cancel="handleCancel"
       @submit="handleSubmit"
       :loading="isLoading"
-      :submitDisabled="!isValid"
+      :submitDisabled="!formMeta.valid"
     />
   </div>
 </template>
 
 <script>
+  import DialogUnsavedBlock from '@/templates/dialog-unsaved-block'
   import ActionBarTemplate from '@/templates/action-bar-block'
 
   export default {
-    name: 'edit-form-block',
+    name: 'edit-form-block-no-header',
     components: {
-      ActionBarTemplate
+      ActionBarTemplate,
+      DialogUnsavedBlock
     },
     data: () => ({
-      isLoading: false
+      isLoading: false,
+      blockViewRedirection: true
     }),
     props: {
       editService: {
@@ -41,10 +48,6 @@
         type: Function,
         required: true
       },
-      isValid: {
-        type: Boolean,
-        required: true
-      },
       formData: {
         type: Object,
         required: true
@@ -52,17 +55,37 @@
       backURL: {
         type: String,
         required: false
+      },
+      formMeta: {
+        type: Object,
+        required: true
+      },
+      updatedRedirect: {
+        type: String,
+        required: true
       }
     },
     async created() {
       await this.loadInitialData()
     },
     methods: {
+      leavePage(dialogUnsaved) {
+        dialogUnsaved = false
+        this.handleCancel()
+        return dialogUnsaved
+      },
+      goBackToList() {
+        if (this.updatedRedirect) {
+          this.$router.push({ name: this.updatedRedirect })
+          return
+        }
+        this.$router.go(-1)
+      },
       handleCancel() {
         if (this.backURL) {
           this.$router.push({ path: this.backURL })
         } else {
-          this.$router.go('-1')
+          this.goBackToList()
         }
       },
       async loadInitialData() {
@@ -92,7 +115,10 @@
             summary: 'edited successfully',
             life: 10000
           })
+          this.blockViewRedirection = false
+          this.goBackToList()
         } catch (error) {
+          this.blockViewRedirection = true
           this.$toast.add({
             closable: false,
             severity: 'error',
@@ -104,6 +130,11 @@
             this.isLoading = false
           }, 800)
         }
+      }
+    },
+    computed: {
+      hasModifications() {
+        return this.formMeta.touched && this.blockViewRedirection
       }
     }
   }

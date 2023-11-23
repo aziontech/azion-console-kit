@@ -23,7 +23,18 @@ const adapt = (httpResponse) => {
     return {
       id: domain.id,
       name: domain.name,
-      domainName: domain.domain_name,
+      active: domain.is_active
+        ? {
+            content: 'Active',
+            severity: 'success'
+          }
+        : {
+            content: 'Inactive',
+            severity: 'danger'
+          },
+      domainName: {
+        content: domain.domain_name
+      },
       cnames: cnames,
       edgeApplicationName: domain.name,
       digitalCertificateId: domain.digital_certificate_id

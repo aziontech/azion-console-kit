@@ -3,60 +3,55 @@
     <PageHeadingBlock pageTitle="Edge Pulse" />
     <TabView
       :active-index="0"
-      class="w-full grow py-4 px-8 flex flex-col gap-8 mb-5"
+      class="w-full grow px-8 flex flex-col gap-8 mb-8 max-md:px-3"
     >
       <!-- Default -->
       <TabPanel header="Default Tag">
-        <div class="w-full mb-5">
-          <FormHorizontal
-            title="Default Tag"
-            description="Place this tag in the HTML of the switched pages to measure them. You should place it
-                  just before the closing BODY tag. This script waits until the load event is complete
-                  before downloading and executing the RUM Client, ensuring that the load event is
-                  uninterrupted and has zero impact on user experience."
-          >
-            <template #inputs>
-              <vue-monaco-editor
-                v-model:value="defaultTagCode"
-                language="javascript"
-                theme="vs"
-                :options="editorOptions"
-                class="min-h-[200px] surface-border border rounded-md"
+        <FormHorizontal
+          title="Default Tag"
+          description="The script waits until the loading event is completed before downloading and running the RUM Client. The loading event isn’t interrupted and doesn’t affect the user experience."
+        >
+          <template #inputs>
+            <vue-monaco-editor
+              v-model:value="defaultTagCode"
+              language="javascript"
+              :theme="theme"
+              :options="editorOptions"
+              class="min-h-[200px] overflow-clip surface-border border rounded-md"
+            />
+            <div>
+              <PrimeButton
+                label="Copy"
+                icon="pi pi-copy"
+                class="max-md:w-full"
+                @click="handleCopyDefaultTagCode"
+                outlined
               />
-              <div>
-                <PrimeButton
-                  label="Copy to Clipboard"
-                  icon="pi pi-copy"
-                  @click="handleCopyDefaultTagCode"
-                  outlined
-                />
-              </div>
-            </template>
-          </FormHorizontal>
-        </div>
+            </div>
+          </template>
+        </FormHorizontal>
       </TabPanel>
 
       <!-- Pre-loading -->
       <TabPanel header="Pre-loading Tag">
-        <div class="w-full mb-5">
+        <div class="w-full">
           <FormHorizontal
             title="Pre-loading Tag"
-            description="If you're using Content Security Policy settings preventing the use of inline JavaScript
-            then place this tag just before the enclosing BODY tag. This script executes before the
-            load event has fired."
+            description="The script executes before the load event is fired. Recommended when using Content Security Policy settings that prevent the use of inline JavaScript."
           >
             <template #inputs>
               <vue-monaco-editor
                 v-model:value="preLoadingTagCode"
                 language="javascript"
-                theme="vs"
+                :theme="theme"
                 :options="editorOptions"
-                class="min-h-[200px] surface-border border rounded-md"
+                class="min-h-[56px] surface-border overflow-clip border rounded-md"
               />
               <div>
                 <PrimeButton
                   icon="pi pi-copy"
-                  label="Copy to Clipboard"
+                  label="Copy"
+                  class="max-md:w-full"
                   outlined
                   @click="handleCopyPreLoadingTagCode"
                 />
@@ -76,6 +71,8 @@
   import PrimeButton from 'primevue/button'
   import TabView from 'primevue/tabview'
   import TabPanel from 'primevue/tabpanel'
+  import { useAccountStore } from '@/stores/account'
+  import { mapState } from 'pinia'
 
   const defaultTagCode = `<script>
     if (typeof window.addEventListener === 'function') {
@@ -110,12 +107,18 @@
         }
       }
     },
+    computed: {
+      ...mapState(useAccountStore, ['currentTheme']),
+      theme() {
+        return this.currentTheme === 'light' ? 'vs' : 'vs-dark'
+      }
+    },
     methods: {
       showToast() {
         this.$toast.add({
           closable: false,
           severity: 'success',
-          summary: 'Code successfully copied',
+          summary: 'Copied successfully!',
           life: 6000
         })
       },

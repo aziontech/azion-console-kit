@@ -1,11 +1,11 @@
 <template>
   <form @submit.prevent="resetPassword()">
-    <div class="flex flex-col align-top items-center p-4 animate-fadeIn">
+    <div class="flex flex-col align-top items-center animate-fadeIn">
       <div
         v-if="!isPasswordReseted"
-        class="surface-card surface-border border max-w-md w-full p-6 md:p-10 rounded-md flex-col gap-10 inline-flex"
+        class="surface-card surface-border border max-w-md w-full p-6 sm:p-8 rounded-md flex-col sm:gap-8 gap-6 inline-flex"
       >
-        <div class="text-xl md:text-2xl font-medium">Reset your password</div>
+        <h3 class="text-xl md:text-2xl font-medium">Reset Password</h3>
 
         <InlineMessage v-if="requestError">{{ requestError }}</InlineMessage>
 
@@ -21,13 +21,15 @@
               v-model="password"
               id="password"
               class="w-full"
-              :class="{ 'p-invalid': errorPassword }"
+              :class="{ 'p-invalid': errors.password }"
               :feedback="false"
-              v-tooltip.top="errorPassword"
+              v-tooltip.top="{ value: errors.password, showDelay: 200 }"
             />
           </div>
+          <small class="p-error text-xs font-normal leading-tight">{{ errors.password }}</small>
 
           <ul class="text-color-secondary list-inside space-y-3">
+            <span class="font-semibold text-sm text-color">Must have at least:</span>
             <li
               class="flex gap-3 items-center text-color-secondary"
               :key="i"
@@ -35,11 +37,11 @@
             >
               <div class="w-3">
                 <div
-                  class="w-2 h-2 bg-[#F3652B] animate-fadeIn"
+                  class="w-2 h-2 bg-orange-bullet animate-fadeIn"
                   v-if="!requirement.valid"
                 ></div>
                 <div
-                  class="pi pi-check text-sm text-[#22C55E] animate-fadeIn"
+                  class="pi pi-check text-sm text-success-check animate-fadeIn"
                   v-else
                 ></div>
               </div>
@@ -57,25 +59,37 @@
             class="font-semibold text-sm"
             >Confirm Password</label
           >
-          <div>
+          <div class="flex flex-col gap-2">
             <Password
               toggleMask
               v-model="confirmPassword"
               id="confirm-password"
               class="w-full"
-              :class="{ 'p-invalid': errorConfirmation }"
+              :class="{ 'p-invalid': errors.confirmPassword }"
               :feedback="false"
-              v-tooltip.top="errorConfirmation"
+              v-tooltip.top="{ value: errors.confirmPassword, showDelay: 200 }"
             />
+            <InlineMessage
+              v-if="isMatchError"
+              severity="error"
+            >
+              {{ errors.confirmPassword }}
+            </InlineMessage>
+            <small
+              v-if="otherPasswordErrors"
+              class="p-error text-xs font-normal leading-tight"
+            >
+              {{ errors.confirmPassword }}
+            </small>
           </div>
         </div>
         <PrimeButton
           class="w-full flex-row-reverse"
           :loading="isButtonLoading"
           label="Reset Password"
-          severity="primary"
+          severity="secondary"
           type="submit"
-          :disabled="hasInvalidRequirement() || !confirmationIsValid"
+          :disabled="!meta.valid"
         />
       </div>
 
@@ -84,21 +98,22 @@
         class="flex flex-col align-top items-center p-4 animate-fadeIn"
       >
         <div
-          class="surface-card surface-border border max-w-md w-full p-6 md:p-10 rounded-md flex-col gap-10 inline-flex"
+          class="surface-card surface-border border max-w-md w-full p-6 md:p-10 rounded-md flex-col gap-8 inline-flex"
         >
           <div class="flex flex-col gap-3">
-            <div class="text-xl md:text-2xl font-medium">Password reset complete</div>
+            <div class="text-xl md:text-2xl font-medium">Password Reset Complete</div>
             <p class="text-color-secondary">
-              Your password has been set. You may go ahead and sign in now.
+              Your password has been successfully reset. Sign in to Real-Time Manager to use Azion
+              products and services.
             </p>
           </div>
 
           <PrimeButton
             class="w-full flex-row-reverse"
             :loading="isButtonLoading"
-            label="Sign in"
+            label="Sign In"
             @click="goToSignIn()"
-            severity="primary"
+            severity="secondary"
             type="button"
           />
         </div>
@@ -112,14 +127,20 @@
   import PrimeButton from 'primevue/button'
   import InlineMessage from 'primevue/inlinemessage'
   import * as yup from 'yup'
-  import { watch, ref, computed } from 'vue'
+  import { computed, ref } from 'vue'
   import { useRoute, useRouter } from 'vue-router'
-  import { useField } from 'vee-validate'
+  import { useField, useForm } from 'vee-validate'
+
+  const MATCH_ERROR_MESSAGE = 'The passwords do not match'
+  const isMatchError = computed(() => {
+    return errors.value.confirmPassword === MATCH_ERROR_MESSAGE
+  })
+  const otherPasswordErrors = computed(() => {
+    return errors.value.confirmPassword !== MATCH_ERROR_MESSAGE
+  })
 
   const isButtonLoading = ref(false)
   const isPasswordReseted = ref(false)
-  const errorPassword = ref('')
-  const errorConfirmation = ref('')
   const requestError = ref('')
   const passwordRequirementsList = ref([
     { label: '> 7 characters', valid: false },
@@ -132,49 +153,33 @@
     resetPasswordService: { type: Function, required: true }
   })
 
-  const passwordValidationSchema = yup.object({
-    password: yup.string().required('Password is a required field'),
+  const validationSchema = yup.object({
+    password: yup
+      .string()
+      .required('Password is a required field')
+      .test('max', 'Exceeded number of characters', (value) => value?.length <= 128)
+      .test('noSpaces', 'Spaces are not allowed', (value) => !value?.match(/\s/g))
+      .test('requirements', '', (value) => {
+        const hasUpperCase = value && /[A-Z]/.test(value)
+        const hasLowerCase = value && /[a-z]/.test(value)
+        const hasSpecialChar = value && /[!@#$%^&*(),.?":{}|<>]/.test(value)
+        const hasMinLength = value?.length > 7
+        passwordRequirementsList.value[0].valid = hasMinLength
+        passwordRequirementsList.value[1].valid = hasUpperCase
+        passwordRequirementsList.value[2].valid = hasLowerCase
+        passwordRequirementsList.value[3].valid = hasSpecialChar
+        return hasMinLength && hasUpperCase && hasLowerCase && hasSpecialChar
+      }),
     confirmPassword: yup
       .string()
-      .test('match', 'The passwords do not match', (value) => !value || password.value === value)
       .required('Confirm Password is a required field')
+      .test('match', MATCH_ERROR_MESSAGE, (value) => value === values.password)
   })
 
+  const { errors, values, meta } = useForm({ validationSchema })
   const { value: password } = useField('password')
   const { value: confirmPassword } = useField('confirmPassword')
 
-  const validatePasswordRequirements = (newPassword) => {
-    const hasUpperCase = /[A-Z]/.test(newPassword)
-    const hasLowerCase = /[a-z]/.test(newPassword)
-    const hasSpecialCharacter = /[!@#$%^&*(),.?":{}|<>]/.test(newPassword)
-    const hasMinimumLength = newPassword.length > 7
-
-    passwordRequirementsList.value[0].valid = hasMinimumLength
-    passwordRequirementsList.value[1].valid = hasUpperCase
-    passwordRequirementsList.value[2].valid = hasLowerCase
-    passwordRequirementsList.value[3].valid = hasSpecialCharacter
-  }
-
-  const hasInvalidRequirement = () => {
-    return passwordRequirementsList.value.some((requirement) => !requirement.valid)
-  }
-
-  const validateConfirmationPassword = async (passwords) => {
-    try {
-      let newPassword = passwords[0]
-      let newConfirmPassword = passwords[1] || ''
-
-      validatePasswordRequirements(newPassword)
-
-      await passwordValidationSchema.validate({
-        password: newPassword,
-        confirmPassword: newConfirmPassword
-      })
-      errorConfirmation.value = ''
-    } catch (error) {
-      errorConfirmation.value = error.errors[0]
-    }
-  }
   const route = useRoute()
   const resetPassword = async () => {
     try {
@@ -182,7 +187,7 @@
       const { uidb64, token } = route.params
 
       const payload = {
-        password: password.value,
+        password: values.password,
         uidb64,
         token
       }
@@ -204,24 +209,4 @@
       router.push({ name: 'login' })
     }, 500)
   }
-
-  watch([password, confirmPassword], validateConfirmationPassword)
-
-  const confirmationIsValid = computed(() => {
-    return !errorConfirmation.value && confirmPassword.value
-  })
-
-  defineExpose({
-    isButtonLoading,
-    errorPassword,
-    errorConfirmation,
-    props,
-    password,
-    confirmPassword,
-    goToSignIn,
-    confirmationIsValid,
-    passwordRequirementsList,
-    hasInvalidRequirement,
-    validateConfirmationPassword
-  })
 </script>

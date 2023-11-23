@@ -1,6 +1,10 @@
 <template>
   <ToastBlock />
-  <MainMenuBlock :isLogged="isLogged" />
+  <MainMenuBlock
+    :isLogged="isLogged"
+    :listTypeAccountService="listTypeAccountService"
+    :accountHandler="accountHandler"
+  />
   <main
     class="flex w-full relative min-h-[calc(100vh-120px)] [&>.active]:md:w-[calc(100%-384px)] mt-14"
     :class="[styleHelper, { 'flex align-items-center': !isLogged }]"
@@ -19,10 +23,19 @@
   import HelpBlock from '@/templates/help-center-block'
   import { mapState } from 'pinia'
   import { useHelpCenterStore } from '@/stores/help-center'
+  import { listTypeAccountService } from '@/services/switch-account-services/list-type-account-service'
+  import { switchAccountService } from '@/services/auth-services/switch-account-service'
+  import { AccountHandler } from '@/helpers/account-handler'
 
   export default {
     name: 'shell-block',
     props: { isLogged: Boolean },
+    data() {
+      return {
+        listTypeAccountService,
+        accountHandler: new AccountHandler(switchAccountService, listTypeAccountService)
+      }
+    },
     components: {
       FooterBlock,
       MainMenuBlock,

@@ -7,10 +7,13 @@ const fixtures = {
   domainMock: {
     cnameAccessOnly: false,
     cnames: '',
+    active: false,
+    edgeCertificate: 123321,
     edgeApplication: 1695294281,
     mtlsIsEnabled: false,
     mtlsVerification: 'enforce',
-    name: 'new dsds'
+    name: 'space X',
+    mtlsTrustedCertificate: 'mtls-certf-mock'
   }
 }
 
@@ -25,7 +28,12 @@ const makeSut = () => {
 describe('DomainsServices', () => {
   it('should call API with correct params', async () => {
     const requestSpy = vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
-      statusCode: 201
+      statusCode: 201,
+      body: {
+        results: {
+          id: 1
+        }
+      }
     })
     const { sut } = makeSut()
 
@@ -37,24 +45,31 @@ describe('DomainsServices', () => {
       body: {
         name: fixtures.domainMock.name,
         cname_access_only: fixtures.domainMock.cnameAccessOnly,
+        digital_certificate_id: fixtures.domainMock.edgeCertificate,
         cnames: [],
+        is_active: fixtures.domainMock.active,
         is_mtls_enabled: fixtures.domainMock.mtlsIsEnabled,
         mtls_verification: fixtures.domainMock.mtlsVerification,
         edge_application_id: fixtures.domainMock.edgeApplication,
-        mtls_trusted_ca_certificate_id: undefined
+        mtls_trusted_ca_certificate_id: fixtures.domainMock.mtlsTrustedCertificate
       }
     })
   })
 
   it('should return a feedback message on successfully created', async () => {
     vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
-      statusCode: 201
+      statusCode: 201,
+      body: {
+        results: {
+          id: 1
+        }
+      }
     })
     const { sut } = makeSut()
 
-    const feedbackMessage = await sut(fixtures.domainMock)
+    const data = await sut(fixtures.domainMock)
 
-    expect(feedbackMessage).toBe('Your domain has been created')
+    expect(data.feedback).toBe('Your domain has been created')
   })
 
   it('Should return an API error for an 409 response status', async () => {
@@ -69,9 +84,9 @@ describe('DomainsServices', () => {
     })
     const { sut } = makeSut()
 
-    const feedbackMessage = sut(fixtures.domainMock)
+    const data = sut(fixtures.domainMock)
 
-    expect(feedbackMessage).rejects.toThrow(apiErrorMock)
+    expect(data).rejects.toThrow(apiErrorMock)
   })
 
   it('Should return an API error for an 400 response status', async () => {

@@ -7,45 +7,42 @@
       {{ item }}
     </li>
     <li
-      v-if="!showAllItens && value.length > 2"
-      @click="showAll"
+      v-if="displayShowMore"
+      @click.stop="toggleShowAll"
       class="underline cursor-pointer"
     >
-      Show more ({{ value.length - 2 }})
-    </li>
-    <li
-      v-if="showAllItens && value.length > 2"
-      @click="showAll"
-      class="underline cursor-pointer"
-    >
-      Show less
+      {{ displayRemainingItems }}
     </li>
   </ul>
 </template>
 
-<script>
-  export default {
-    name: 'expand-column',
-    props: {
-      value: {
-        type: Array,
-        required: true
-      }
-    },
-    data() {
-      return {
-        showAllItens: false
-      }
-    },
-    computed: {
-      splitValue() {
-        return this.showAllItens ? this.value : this.value.slice(0, 2)
-      }
-    },
-    methods: {
-      showAll() {
-        this.showAllItens = !this.showAllItens
-      }
+<script setup>
+  defineOptions({ name: 'expand-column' })
+  import { ref, computed } from 'vue'
+
+  const props = defineProps({
+    value: {
+      type: Array,
+      required: true
     }
+  })
+
+  const showAllItems = ref(false)
+
+  const SLICE_VALUE = 2
+  const formatValue = props.value.slice(0, SLICE_VALUE)
+  const totalItems = props.value.length - SLICE_VALUE
+  const displayShowMore = props.value.length > SLICE_VALUE
+
+  const splitValue = computed(() => {
+    return showAllItems.value ? props.value : formatValue
+  })
+
+  const displayRemainingItems = computed(() => {
+    return showAllItems.value ? 'Show less' : `Show more (${totalItems})`
+  })
+
+  const toggleShowAll = () => {
+    showAllItems.value = !showAllItems.value
   }
 </script>

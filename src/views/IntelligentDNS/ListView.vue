@@ -5,16 +5,18 @@
     :deleteService="deleteIntelligentDNSService"
     :columns="getColumns"
     pageTitle="Intelligent DNS"
-    addButtonLabel="Add Intelligent DNS"
+    pageTitleDelete="Intelligent DNS"
+    addButtonLabel="Intelligent DNS"
     createPagePath="intelligent-dns/create"
     editPagePath="intelligent-dns/edit"
     @on-load-data="handleLoadData"
   />
   <EmptyResultsBlock
     v-else
-    title="No Intelligent DNS added"
-    description="Create your first Intelligent DNS."
-    createButtonLabel="Add Intelligent DNS"
+    pageTitle="Intelligent DNS"
+    title="No intelligent dns added"
+    description="Create your first intelligent dns."
+    createButtonLabel="Intelligent DNS"
     createPagePath="intelligent-dns/create"
     :documentationService="documentationService"
   >

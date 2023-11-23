@@ -20,8 +20,11 @@ const adapt = async (httpResponse) => {
     return {
       id: item.uuid,
       name: item.name,
+      description: item.description || '',
       created: formatExhibitionDate(creationDate),
+      createdDate: creationDate,
       expiresAt: formatExhibitionDate(expirationDate),
+      expiresAtDate: expirationDate,
       scope: 'Global'
     }
   })

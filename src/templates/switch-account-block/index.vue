@@ -5,7 +5,7 @@
       v-if="visibleButton"
       class="font-semibold h-8 w-auto border-header hidden md:flex gap-2 items-center bg-header hover:bg-header-button-hover"
       size="small"
-      :loading="!account?.name"
+      :loading="isLoadingAccount"
       :pt="{
         label: { class: '!text-white' },
         icon: { class: '!text-white' }
@@ -107,13 +107,13 @@
           </template>
         </PrimeCard>
         <ListTableBlock
-          :listService="accountListService"
+          :listService="listTypeAccountService"
           :limitShowRows="10"
           pageTitle="Accounts List"
           :columns="columns"
           :headerFilter="filterSwitch"
           @onSelectedRow="onSelectedAccount"
-          description="Type your account name to filter results."
+          description="Type the account name to filter results."
         >
           <template #headerFilters="{ filter, applyFilter }">
             <div class="flex flex-wrap justify-between gap-2 w-full rounded">
@@ -123,7 +123,7 @@
                   class="md:w-20rem max-sm:w-full"
                   v-model="filter.textSnippet"
                   @keyup.enter="applyFilter()"
-                  placeholder="Search"
+                  placeholder="Search by name or ID"
                 />
               </span>
 
@@ -144,7 +144,7 @@
 </template>
 
 <script setup>
-  import { ref, watch } from 'vue'
+  import { ref, watch, computed } from 'vue'
   import PrimeDialog from 'primevue/dialog'
   import PrimeTag from 'primevue/tag'
   import PrimeButton from 'primevue/button'
@@ -154,7 +154,6 @@
   import Divider from 'primevue/divider'
   import PrimeCard from 'primevue/card'
   import ListTableBlock from '@/templates/list-table-block/with-lazy-and-dropdown-filter.vue'
-  import { switchAccountService } from '@/services/auth-services'
   import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
 
   defineOptions({ name: 'SwitchAccountBlock' })
@@ -173,7 +172,7 @@
       type: Object,
       required: true
     },
-    accountListService: {
+    listTypeAccountService: {
       type: Function,
       required: true
     },
@@ -181,6 +180,10 @@
       type: Boolean,
       required: false,
       default: true
+    },
+    accountHandler: {
+      type: Object,
+      required: true
     }
   })
 
@@ -231,6 +234,8 @@
   ])
   const menu = ref()
 
+  const isLoadingAccount = computed(() => !props.account?.accountTypeIcon)
+
   watch(
     () => props.showSwitchAccount,
     (newValue) => {
@@ -246,12 +251,7 @@
     menu.value.toggle(event)
   }
   const onSelectedAccount = async (rowSelected) => {
-    const { first_login: firstLogin } = await switchAccountService(rowSelected.accountId)
     visible.value = false
-    if (firstLogin) {
-      window.location = 'iam/additional-data'
-      return
-    }
-    window.location.replace('/')
+    props.accountHandler.switchAccountAndRedirect(rowSelected.accountId)
   }
 </script>

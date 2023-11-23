@@ -5,16 +5,18 @@
     :deleteService="deleteVariablesService"
     :columns="getColumns"
     pageTitle="Variables"
-    addButtonLabel="Add Variable"
+    pageTitleDelete="Variable"
+    addButtonLabel="Variable"
     createPagePath="variables/create"
     editPagePath="variables/edit"
     @on-load-data="handleLoadData"
   />
   <EmptyResultsBlock
     v-else
+    pageTitle="Variables"
     title="No variables added"
     description="Create your first variable."
-    createButtonLabel="Add variable"
+    createButtonLabel="Variable"
     createPagePath="variables/create"
     :documentationService="documentationService"
   >
@@ -90,6 +92,7 @@
           },
           {
             field: 'updatedAt',
+            sortField: 'updatedAtDate',
             header: 'Last Update'
           }
         ]

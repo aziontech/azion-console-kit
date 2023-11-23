@@ -20,6 +20,7 @@ const adapt = (payload) => {
     edge_application_id: payload.edgeApplication,
     digital_certificate_id: payload.edgeCertificate,
     is_mtls_enabled: payload.mtlsIsEnabled,
+    is_active: payload.active,
     mtls_verification: payload.mtlsVerification,
     mtls_trusted_ca_certificate_id: payload.mtlsTrustedCertificate
   }
@@ -35,7 +36,10 @@ const adapt = (payload) => {
 const parseHttpResponse = (httpResponse) => {
   switch (httpResponse.statusCode) {
     case 201:
-      return 'Your domain has been created'
+      return {
+        feedback: 'Your domain has been created',
+        urlToEditView: `/domains/edit/${httpResponse.body.results.id}`
+      }
     case 400:
       throw new Error(Object.keys(httpResponse.body)[0]).message
     case 409:

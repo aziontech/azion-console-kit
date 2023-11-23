@@ -130,7 +130,10 @@ const getHeaders = (listHeaders) => {
 const parseHttpResponse = (httpResponse) => {
   switch (httpResponse.statusCode) {
     case 201:
-      return 'Your data streaming has been created'
+      return {
+        feedback: 'Your data streaming has been created',
+        urlToEditView: `/data-streaming/edit/${httpResponse.body.results.id}`
+      }
     case 400:
       const apiError = extractApiError(httpResponse)
       throw new Error(apiError)

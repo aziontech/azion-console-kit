@@ -1,8 +1,16 @@
+
 <template>
-  <div class="p-4 w-full">
-    <div class="max-w-screen-sm lg:max-w-7xl mx-auto gap-4">
-      <i class="ai ai-twitter text-lg text-color"/>
-      <i class="pi pi-twitter text-lg text-color"/>
-    </div>
+  <div class="items-center">
+    <Badge class="w-fit" value="2"></Badge>
+    <Badge class="w-fit" value="8" severity="success"></Badge>
+    <Badge class="w-fit" value="4" severity="info"></Badge>
+    <Badge class="w-fit" value="12" severity="warning"></Badge>
+    <Badge class="w-fit" value="3" severity="danger"></Badge>
   </div>
+
 </template>
+  
+  <script setup>
+    import Badge from 'primevue/badge';
+  </script>
+  
