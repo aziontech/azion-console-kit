@@ -79,7 +79,6 @@
         </TabPanel>
         <TabPanel header="Records">
           <ListTableBlock
-            pageTitle="Records"
             pageTitleDelete="Record"
             addButtonLabel="Add Record"
             createPagePath="records/create"

@@ -5,7 +5,6 @@
     </template>
     <template #content>
       <CreateFormBlock
-        pageTitle="Create Variables"
         :createService="props.createVariablesService"
         :formData="values"
         :formMeta="meta"

@@ -16,7 +16,6 @@
         :enableEditClick="false" />
       <EmptyResultsBlock
         v-else
-        pageTitle="Personal Tokens"
         title="No personal tokens found"
         description="Create your first personal token."
         createButtonLabel="Personal Token"

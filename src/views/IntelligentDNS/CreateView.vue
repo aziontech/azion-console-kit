@@ -5,7 +5,6 @@
     </template>
     <template #content>
       <CreateFormBlock
-        pageTitle="Create Intelligent DNS"
         :createService="props.createIntelligentDNSService"
         :formData="values"
         :formMeta="meta"

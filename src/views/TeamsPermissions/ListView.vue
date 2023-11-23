@@ -18,7 +18,6 @@
       </ListTableBlock>
       <EmptyResultsBlock
         v-else
-        pageTitle="Team Permissions"
         title="No team permissions added"
         description="Create your first team permissions."
         createButtonLabel="Team Permissions"

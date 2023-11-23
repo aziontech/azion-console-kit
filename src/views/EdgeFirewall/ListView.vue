@@ -84,7 +84,6 @@
       />
       <EmptyResultsBlock
         v-else
-        pageTitle="Edge Firewall"
         title="No edge firewall added"
         description="Create your first edge firewall."
         createButtonLabel="Edge Firewall"

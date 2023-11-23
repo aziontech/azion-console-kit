@@ -5,7 +5,6 @@
     </template>
     <template #content>
       <EditFormBlock
-        pageTitle="Edit Variable"
         :editService="props.editVariableService"
         :loadService="props.loadVariableService"
         :initialDataSetter="setValues"

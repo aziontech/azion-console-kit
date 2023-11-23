@@ -1,30 +1,28 @@
 <template>
-  <div>
-    <DialogAuthorize
-      v-model:visible="authorizeDialogVisible"
-      modal
-      header="Are you sure?"
-      class="w-[40vw]"
-    >
-      <p class="text-color-secondary">1 nodes will be authorized.</p>
+  <DialogAuthorize
+    v-model:visible="authorizeDialogVisible"
+    modal
+    header="Are you sure?"
+    class="w-[40vw]"
+  >
+    <p class="text-color-secondary">1 nodes will be authorized.</p>
 
-      <template #footer>
-        <div class="flex gap-2 flex-col-reverse lg:flex-row justify-end">
-          <PrimeButton
-            severity="primary"
-            outlined
-            label="Cancel"
-            @click="authorizeDialogVisible = false"
-          ></PrimeButton>
-          <PrimeButton
-            severity="primary"
-            label="Confirm"
-            @click="authorizeEdgeNode()"
-          ></PrimeButton>
-        </div>
-      </template>
-    </DialogAuthorize>
-  </div>
+    <template #footer>
+      <div class="flex gap-2 flex-col-reverse lg:flex-row justify-end">
+        <PrimeButton
+          severity="primary"
+          outlined
+          label="Cancel"
+          @click="authorizeDialogVisible = false"
+        ></PrimeButton>
+        <PrimeButton
+          severity="primary"
+          label="Confirm"
+          @click="authorizeEdgeNode()"
+        ></PrimeButton>
+      </div>
+    </template>
+  </DialogAuthorize>
 </template>
 
 <script>
@@ -49,7 +47,7 @@
 
     data() {
       return {
-        authorizeDialogVisible: false
+        authorizeDialogVisible: true
       }
     },
 
@@ -86,7 +84,7 @@
       authorize: {
         deep: true,
         handler() {
-          this.authorizeDialogVisible = this.authorize.openDialog
+          this.authorizeDialogVisible = true
         }
       },
       authorizeDialogVisible() {

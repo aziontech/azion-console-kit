@@ -2,13 +2,13 @@
   <section class="w-full min-h-[calc(100vh-120px)] relative">
     <section class="w-full h-full flex flex-col max-w-screen-2xl mx-auto">
       <div
-        class="mx-8 mt-4"
+        class="mx-3 sm:mx-8 mt-4"
         v-if="hasHeadingSlot"
       >
         <slot name="heading"></slot>
       </div>
       <div
-        class="mx-8 mb-8 h-full"
+        class="mx-3 sm:mx-8 mb-8 h-full"
         :class="{ 'mt-8': !hasHeadingSlot, 'mt-4': hasHeadingSlot }"
       >
         <slot name="content"></slot>

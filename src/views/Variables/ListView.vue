@@ -9,7 +9,6 @@
         :listService="listVariablesService"
         :deleteService="deleteVariablesService"
         :columns="getColumns"
-        pageTitle="Variables"
         pageTitleDelete="Variable"
         addButtonLabel="Variable"
         createPagePath="variables/create"
@@ -18,7 +17,6 @@
       />
       <EmptyResultsBlock
         v-else
-        pageTitle="Variables"
         title="No variables added"
         description="Create your first variable."
         createButtonLabel="Variable"

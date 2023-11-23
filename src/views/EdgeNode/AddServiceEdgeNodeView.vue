@@ -5,7 +5,6 @@
     </template>
     <template #content>
       <CreateFormBlock
-        pageTitle="Add Service"
         :createService="addServiceEdgeNode"
         :formData="values"
         :formMeta="meta"

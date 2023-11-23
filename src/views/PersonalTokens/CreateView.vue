@@ -5,7 +5,6 @@
     </template>
     <template #content>
       <CreateFormBlock
-        pageTitle="Create Personal Token"
         :createService="props.createPersonalTokenService"
         :formData="values"
         :formMeta="meta"

@@ -11,7 +11,6 @@
       >
         <TabPanel header="Main Settings">
           <EditFormBlock
-            pageTitle="Edit Edge Node"
             :editService="pros.editEdgeNodeService"
             :loadService="pros.loadEdgeNodeService"
             :initialDataSetter="setValues"
@@ -203,7 +202,6 @@
           :disabled="!modules.value.add_services"
         >
           <ListTableBlock
-            pageTitle="Services List"
             pageTitleDelete="Service"
             addButtonLabel="Add Service"
             :listService="listServiceEdgeNode"

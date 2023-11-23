@@ -17,7 +17,6 @@
       />
       <EmptyResultsBlock
         v-else
-        pageTitle="Users"
         title="No users added"
         description="Create your first users."
         createButtonLabel="Users"

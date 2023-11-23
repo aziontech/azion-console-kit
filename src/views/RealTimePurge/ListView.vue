@@ -17,7 +17,6 @@
       </ListTableBlock>
       <EmptyResultsBlock
         v-else
-        pageTitle="Real-Time Purge"
         title="No purge added"
         description="Create your first Real-Time Purge."
         createButtonLabel="Real-Time Purge"

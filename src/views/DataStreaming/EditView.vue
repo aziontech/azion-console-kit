@@ -5,7 +5,6 @@
     </template>
     <template #content>
       <EditFormBlock
-        pageTitle="Edit Data Streaming"
         :editService="props.editDataStreamingService"
         :loadService="props.loadDataStreamingService"
         :initialDataSetter="setValues"

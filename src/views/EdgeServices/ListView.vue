@@ -9,7 +9,6 @@
         :listService="listEdgeServicesService"
         :deleteService="deleteEdgeServicesService"
         :columns="getColumns"
-        pageTitle="Edge Services"
         pageTitleDelete="Edge Service"
         addButtonLabel="Edge Services"
         createPagePath="edge-services/create"
@@ -19,7 +18,6 @@
 
       <EmptyResultsBlock
         v-else
-        pageTitle="Edge Services"
         title="No edge services added"
         description="Create your first edge service."
         createButtonLabel="Edge Services"

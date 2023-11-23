@@ -183,7 +183,7 @@
 
   export default {
     name: 'list-table-block',
-    emits: ['on-load-data', 'authorize-edge-node'],
+    emits: ['on-load-data', 'authorize-edge-node', 'authorizeEdgeNode'],
     components: {
       DataTable,
       Column,
@@ -331,6 +331,7 @@
         this.$forceUpdate()
       },
       authorize() {
+        console.log('authorizeEdgeNode')
         this.$emit('authorizeEdgeNode', {
           authorize: { edgeNodeID: this.selectedId, openDialog: true, rerender: Math.random() }
         })

@@ -80,7 +80,6 @@
     <template #content>
       <ListTableBlock
         v-if="hasContentToList"
-        pageTitleDelete="Data Streaming"
         addButtonLabel="Data Streaming"
         createPagePath="/data-streaming/create"
         editPagePath="/data-streaming/edit"
