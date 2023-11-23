@@ -27,7 +27,6 @@
               type="text"
               :disabled="generatedToken"
               :class="{ 'p-invalid': errors.name }"
-              v-tooltip.top="{ value: errors.name, showDelay: 200 }"
             />
             <small
               v-if="errors.name"
