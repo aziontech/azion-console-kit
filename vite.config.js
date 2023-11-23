@@ -102,9 +102,10 @@ const getConfig = () => {
           rewrite: (path) => path.replace(/^\/api\/credentials/, '')
         },
         '^/api/(account|user|token|switch-account|password|totp)': {
-          target: `${URLStartPrefix}sso.azion.com/api`,
+          //target: `${URLStartPrefix}sso.azion.com/api`,
+          target: `${URLStartPrefix}sso.azion.com`,
           changeOrigin: true,
-          rewrite: (path) => path.replace(/^\/api/, ''),
+          //rewrite: (path) => path.replace(/^\/api/, ''),
           cookieDomainRewrite: { '*': '' }
         },
         '/api': {
