@@ -9,7 +9,7 @@
     <template #form>
       <FormHorizontal
         title="Teams Permissions"
-        description="Use permissions to manage and oversee users by dictating and refining access levels of client accounts. Teams can be created based on the role and tasks of assigned clients."
+        description="Use permissions to manage and oversee users by defining access levels of client accounts. Teams can be created based on the role and tasks of assigned clients."
       >
         <template #inputs>
           <div class="flex flex-col sm:max-w-lg w-full gap-2">
@@ -60,8 +60,8 @@
               </template>
             </PickList>
             <small class="text-xs text-color-secondary font-normal leading-tight">
-              Choose from the available permissions by clicking the permission and the right arrow
-              to move it to the selected permissions. Use the double line arrows to move all
+              Choose a type of permission from the list and then use the right arrow
+              to move it to the selected permissions field. Use the double-line arrows to move all
               permissions.
             </small>
           </div>
