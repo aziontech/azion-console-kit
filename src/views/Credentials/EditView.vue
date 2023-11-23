@@ -12,7 +12,7 @@
     <template #form>
       <FormHorizontal
         title="General"
-        description="Choose a name that is descriptive and easy to remember. Use the description to help you remember why the token was created and/or what it was created for."
+        description="Edit a credential to use and authenticate Edge Orchestrator services."
       >
         <template #inputs>
           <div class="flex flex-col sm:max-w-lg w-full gap-2">
@@ -49,14 +49,15 @@
               class="w-full"
             />
             <small class="text-color-secondary text-xs font-normal leading-5">
-              Description of credential, e.g.: Credential used for clients XYZ.
+              Open field to describe the credential with information such as for what purpose it was
+              created.
             </small>
           </div>
         </template>
       </FormHorizontal>
       <FormHorizontal
         title="Token"
-        description="Save the credential to visualize the token."
+        description="Save the credential to visualize and copy it."
       >
         <template #inputs>
           <div class="flex flex-col w-full gap-2">
@@ -85,7 +86,7 @@
                 outlined
                 type="button"
                 aria-label="Copy Token"
-                label="Copy to Clipboard"
+                label="Copy"
                 :disabled="!generatedToken"
                 @click="copyToken"
               />
