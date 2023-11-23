@@ -1,6 +1,6 @@
 <template>
   <CreateFormBlock
-    pageTitle="Create Teams Permissions"
+    pageTitle="Create Team Permissions"
     :createService="props.createTeamPermissionsService"
     :formData="values"
     :formMeta="meta"
@@ -9,7 +9,7 @@
     <template #form>
       <FormHorizontal
         title="Teams Permissions"
-        description=""
+        description="Use permissions to manage and oversee users by dictating and refining access levels of client accounts. Teams can be created based on the role and tasks of assigned clients."
       >
         <template #inputs>
           <div class="flex flex-col sm:max-w-lg w-full gap-2">
@@ -19,12 +19,15 @@
               >Name *
             </label>
             <InputText
-              placeholder="Name"
+              placeholder="My team"
               v-bind="name"
               type="text"
               id="name"
               :class="{ 'p-invalid': errors.name }"
             />
+            <small class="text-xs text-color-secondary font-normal leading-tight">
+              Give a unique and easy-to-remember name.
+            </small>
             <small
               v-if="errors.name"
               class="p-error text-xs font-normal leading-tight"
@@ -47,7 +50,7 @@
               :showTargetControls="false"
             >
               <template #sourceheader>Available Permissions</template>
-              <template #targetheader>Chosen Permissions</template>
+              <template #targetheader>Selected Permissions</template>
               <template #item="slotProps">
                 <div class="flex flex-wrap p-2 align-items-center gap-3">
                   <div class="flex-1 flex flex-column gap-2">
@@ -56,6 +59,9 @@
                 </div>
               </template>
             </PickList>
+            <small class="text-xs text-color-secondary font-normal leading-tight">
+              Choose from the available permissions by clicking the permission and the right arrow to move it to the selected permissions. Use the double line arrows to move all permissions.
+            </small>
           </div>
 
           <Card
@@ -75,7 +81,9 @@
                 :class="{ 'p-invalid': errors.isActive }"
               />
             </template>
-            <template #subtitle> </template>
+            <template #subtitle>
+              Activate or deactivate the team permissions for all clients within the team.
+            </template>
           </Card>
         </template>
       </FormHorizontal>

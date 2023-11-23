@@ -6,7 +6,7 @@
     :columns="getColumns"
     pageTitle="Teams Permissions"
     pageTitleDelete="Team Permission"
-    addButtonLabel="Team Permissions"
+    addButtonLabel="Add"
     createPagePath="teams-permission/create"
     editPagePath="teams-permission/edit"
     @on-load-data="handleLoadData"
@@ -16,7 +16,7 @@
     v-else
     pageTitle="Team Permissions"
     title="No team permissions added"
-    description="Create your first team permissions."
+    description="Create your first team permission."
     createButtonLabel="Team Permissions"
     createPagePath="teams-permission/create"
     :documentationService="documentationService"
@@ -49,11 +49,11 @@
     return [
       {
         field: 'name',
-        header: 'Team'
+        header: 'Name'
       },
       {
         field: 'permissions',
-        header: 'Permission',
+        header: 'Permissions',
         type: 'component',
         component: (columnData) =>
           columnBuilder({ data: columnData, columnAppearance: 'expand-column' })
