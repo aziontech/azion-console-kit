@@ -1,31 +1,40 @@
 <template>
-  <ListTableBlock
-    v-if="true"
-    :listService="listEdgeNodeService"
-    :columns="getColumns"
-    :deleteService="deleteEdgeNodeService"
-    @authorizeEdgeNode="authorize = $event.authorize"
-    pageTitle="Edge Nodes"
-    pageTitleDelete="Edge Node"
-    addButtonLabel=""
-    editPagePath="edge-node/edit"
-    @on-load-data="handleLoadData"
-  />
-  <EmptyEdgeNode
-    v-else
-    pageTitle="Edge Nodes"
-    :documentationService="documentationService"
-  >
-    <template #illustration>
-      <Illustration />
+  <ContentBlock>
+    <template #heading>
+      <PageHeadingBlock pageTitle="Edge Nodes"></PageHeadingBlock>
     </template>
-  </EmptyEdgeNode>
-  <Authorize :authorize="authorize" />
+    <template #content>
+      <ListTableBlock
+        v-if="false"
+        :listService="listEdgeNodeService"
+        :columns="getColumns"
+        :deleteService="deleteEdgeNodeService"
+        @authorizeEdgeNode="authorize = $event.authorize"
+        pageTitleDelete="Edge Node"
+        addButtonLabel=""
+        editPagePath="edge-node/edit"
+        @on-load-data="handleLoadData"
+      />
+      <EmptyEdgeNode
+        v-else
+        pageTitle="Edge Nodes"
+        :documentationService="documentationService"
+      >
+        <template #illustration>
+          <Illustration />
+        </template>
+      </EmptyEdgeNode>
+    </template>
+    <Authorize :authorize="authorize" />
+  </ContentBlock>
+
 </template>
 <script>
   import ListTableBlock from '@/templates/list-table-block/with-authorize'
   import EmptyEdgeNode from '@/templates/empty-results-block/empty-edge-node.vue'
   import Illustration from '@/assets/svg/illustration-layers.vue'
+  import ContentBlock from '@/templates/content-block'
+  import PageHeadingBlock from '@/templates/page-heading-block'
 
   import Authorize from './Authorize'
 
@@ -35,7 +44,9 @@
       ListTableBlock,
       Authorize,
       EmptyEdgeNode,
-      Illustration
+      Illustration,
+      ContentBlock,
+      PageHeadingBlock
     },
     props: {
       listEdgeNodeService: {

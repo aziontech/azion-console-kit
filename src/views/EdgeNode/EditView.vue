@@ -1,229 +1,230 @@
 <template>
-  <div>
-    <PageHeadingBlock pageTitle="Edit Edge Node">
-      <template #tabs>
-        <TabView
-          :activeIndex="state.activeTab"
-          @tab-click="changeRouteByClickingOnTab"
-          class="w-full"
-        >
-          <TabPanel header="Main Settings">
-            <EditFormBlock
-              pageTitle="Edit Edge Node"
-              :editService="pros.editEdgeNodeService"
-              :loadService="pros.loadEdgeNodeService"
-              :initialDataSetter="setValues"
-              :formData="values"
-              :formMeta="meta"
-              backURL="/edge-node"
-            >
-              <template #form>
-                <FormHorizontal
-                  title="Main Settings"
-                  description="Each node needs to run the Azion Orchestration software. It enables the
+  <ContentBlock>
+    <template #heading>
+      <PageHeadingBlock pageTitle="Edit Edge Node" />
+    </template>
+    <template #content>
+      <TabView
+        :activeIndex="state.activeTab"
+        @tab-click="changeRouteByClickingOnTab"
+        class="w-full"
+      >
+        <TabPanel header="Main Settings">
+          <EditFormBlock
+            pageTitle="Edit Edge Node"
+            :editService="pros.editEdgeNodeService"
+            :loadService="pros.loadEdgeNodeService"
+            :initialDataSetter="setValues"
+            :formData="values"
+            :formMeta="meta"
+            backURL="/edge-node"
+          >
+            <template #form>
+              <FormHorizontal
+                title="Main Settings"
+                description="Each node needs to run the Azion Orchestration software. It enables the
                         communication between your private node and Azion Real-Time Manager, where
                         you can manage your Edge Applications, Edge Functions, and many other Azion
                         services."
-                >
-                  <template #inputs>
-                    <div class="flex flex-col gap-5 mb-6">
-                      <div class="flex flex-col sm:max-w-lg w-full gap-2">
-                        <label
-                          for="name"
-                          class="text-color text-base font-medium"
-                          >Name</label
-                        >
-                        <InputText
-                          placeholder="Name"
-                          v-bind="name"
-                          type="text"
-                          :class="{ 'p-invalid': errors.name }"
-                          class="w-full"
-                        />
+              >
+                <template #inputs>
+                  <div class="flex flex-col gap-5 mb-6">
+                    <div class="flex flex-col sm:max-w-lg w-full gap-2">
+                      <label
+                        for="name"
+                        class="text-color text-base font-medium"
+                        >Name</label
+                      >
+                      <InputText
+                        placeholder="Name"
+                        v-bind="name"
+                        type="text"
+                        :class="{ 'p-invalid': errors.name }"
+                        class="w-full"
+                      />
 
-                        <small
-                          id="username-help"
-                          class="p-error"
-                          >{{ errors.name }}</small
-                        >
-                      </div>
+                      <small
+                        id="username-help"
+                        class="p-error"
+                        >{{ errors.name }}</small
+                      >
+                    </div>
 
-                      <div class="flex flex-col sm:max-w-lg w-full gap-2">
-                        <label
-                          for="name"
-                          class="text-color text-base font-medium"
-                          >Hash ID</label
-                        >
-                        <InputText
-                          placeholder="HashID"
-                          v-bind="hashId"
-                          type="text"
-                          class="w-full"
-                          :disabled="true"
-                        />
+                    <div class="flex flex-col sm:max-w-lg w-full gap-2">
+                      <label
+                        for="name"
+                        class="text-color text-base font-medium"
+                        >Hash ID</label
+                      >
+                      <InputText
+                        placeholder="HashID"
+                        v-bind="hashId"
+                        type="text"
+                        class="w-full"
+                        :disabled="true"
+                      />
+                    </div>
+                    <div class="flex flex-col sm:max-w-lg w-full gap-2">
+                      <label
+                        for="name"
+                        class="text-color text-base font-medium"
+                        >Node groups</label
+                      >
+                      <InputText
+                        id="groups"
+                        v-model="nameGroup"
+                        aria-describedby="groups-help"
+                        @keyup.enter="addNewGroup"
+                      />
+                      <small
+                        id="username-help"
+                        class="p-error"
+                        >{{ errors.name }}</small
+                      >
+                      <div class="text-color-secondary text-sm font-normal">
+                        Use labels to group your Edge Nodes. Groups allow you to manage multiple
+                        Edge Nodes easily in your Edge Maps for orchestration and routing.
                       </div>
-                      <div class="flex flex-col sm:max-w-lg w-full gap-2">
-                        <label
-                          for="name"
-                          class="text-color text-base font-medium"
-                          >Node groups</label
+                      <div class="flex gap-2">
+                        <div
+                          class="flex align-items-center"
+                          v-for="(item, index) in groups"
+                          :key="index"
                         >
-                        <InputText
-                          id="groups"
-                          v-model="nameGroup"
-                          aria-describedby="groups-help"
-                          @keyup.enter="addNewGroup"
-                        />
-                        <small
-                          id="username-help"
-                          class="p-error"
-                          >{{ errors.name }}</small
-                        >
-                        <div class="text-color-secondary text-sm font-normal">
-                          Use labels to group your Edge Nodes. Groups allow you to manage multiple
-                          Edge Nodes easily in your Edge Maps for orchestration and routing.
-                        </div>
-                        <div class="flex gap-2">
-                          <div
-                            class="flex align-items-center"
-                            v-for="(item, index) in groups"
-                            :key="index"
+                          <Checkbox
+                            v-model="addGroups"
+                            :name="item.name"
+                            :value="item.name"
+                          />
+                          <label
+                            for="ingredient1"
+                            class="ml-2"
                           >
-                            <Checkbox
-                              v-model="addGroups"
-                              :name="item.name"
-                              :value="item.name"
-                            />
-                            <label
-                              for="ingredient1"
-                              class="ml-2"
-                            >
-                              {{ item.name }}
-                            </label>
-                          </div>
+                            {{ item.name }}
+                          </label>
                         </div>
                       </div>
                     </div>
-                  </template>
-                </FormHorizontal>
-                <FormHorizontal
-                  title="Orchestration Modules"
-                  description="Choose orchestration modules to install on your Edge Node."
-                >
-                  <template #inputs>
-                    <div class="flex flex-col gap-2">
-                      <label class="text-color text-base font-medium"></label>
-                      <div class="flex flex-col gap-3">
-                        <Card
-                          :pt="{
-                            body: { class: 'p-4' },
-                            title: {
-                              class: 'flex justify-between items-center text-base font-medium m-0'
-                            },
-                            subtitle: {
-                              class:
-                                'text-sm font-normal text-color-secondary m-0 pr-0 md:pr-[2.5rem]'
-                            }
-                          }"
+                  </div>
+                </template>
+              </FormHorizontal>
+              <FormHorizontal
+                title="Orchestration Modules"
+                description="Choose orchestration modules to install on your Edge Node."
+              >
+                <template #inputs>
+                  <div class="flex flex-col gap-2">
+                    <label class="text-color text-base font-medium"></label>
+                    <div class="flex flex-col gap-3">
+                      <Card
+                        :pt="{
+                          body: { class: 'p-4' },
+                          title: {
+                            class: 'flex justify-between items-center text-base font-medium m-0'
+                          },
+                          subtitle: {
+                            class:
+                              'text-sm font-normal text-color-secondary m-0 pr-0 md:pr-[2.5rem]'
+                          }
+                        }"
+                      >
+                        <template #title>
+                          <span class="text-base">Azion Cells</span>
+                          <InputSwitch
+                            id="cells"
+                            :disabled="true"
+                          />
+                        </template>
+                        <template #subtitle
+                          >Azion Cells is a lightweight software framework to build and run
+                          low-latency Edge Applications. By activating this option, you agree to
+                          install the framework on your Edge Node.</template
                         >
-                          <template #title>
-                            <span class="text-base">Azion Cells</span>
-                            <InputSwitch
-                              id="cells"
-                              :disabled="true"
-                            />
-                          </template>
-                          <template #subtitle
-                            >Azion Cells is a lightweight software framework to build and run
-                            low-latency Edge Applications. By activating this option, you agree to
-                            install the framework on your Edge Node.</template
-                          >
-                        </Card>
-                        <Card
-                          :pt="{
-                            body: { class: 'p-4' },
-                            title: {
-                              class: 'flex justify-between items-center text-base font-medium m-0'
-                            },
-                            subtitle: {
-                              class:
-                                'text-sm font-normal text-color-secondary m-0 pr-0 md:pr-[2.5rem]'
-                            }
-                          }"
+                      </Card>
+                      <Card
+                        :pt="{
+                          body: { class: 'p-4' },
+                          title: {
+                            class: 'flex justify-between items-center text-base font-medium m-0'
+                          },
+                          subtitle: {
+                            class:
+                              'text-sm font-normal text-color-secondary m-0 pr-0 md:pr-[2.5rem]'
+                          }
+                        }"
+                      >
+                        <template #title>
+                          <span class="text-base">Azion Health Check</span>
+                          <InputSwitch
+                            id="health"
+                            :disabled="true"
+                          />
+                        </template>
+                        <template #subtitle
+                          >Azion Health Check is a service that enables your Edge Node to report the
+                          availability and health constantly to Azion. By activating this option,
+                          you agree to install the service on your Edge Node.</template
                         >
-                          <template #title>
-                            <span class="text-base">Azion Health Check</span>
-                            <InputSwitch
-                              id="health"
-                              :disabled="true"
-                            />
-                          </template>
-                          <template #subtitle
-                            >Azion Health Check is a service that enables your Edge Node to report
-                            the availability and health constantly to Azion. By activating this
-                            option, you agree to install the service on your Edge Node.</template
-                          >
-                        </Card>
-                        <Card
-                          :pt="{
-                            body: { class: 'p-4' },
-                            title: {
-                              class: 'flex justify-between items-center text-base font-medium m-0'
-                            },
-                            subtitle: {
-                              class:
-                                'text-sm font-normal text-color-secondary m-0 pr-0 md:pr-[2.5rem]'
-                            }
-                          }"
+                      </Card>
+                      <Card
+                        :pt="{
+                          body: { class: 'p-4' },
+                          title: {
+                            class: 'flex justify-between items-center text-base font-medium m-0'
+                          },
+                          subtitle: {
+                            class:
+                              'text-sm font-normal text-color-secondary m-0 pr-0 md:pr-[2.5rem]'
+                          }
+                        }"
+                      >
+                        <template #title>
+                          <span class="text-base">Add-On Services</span>
+                          <InputSwitch
+                            id="service"
+                            v-model="addService"
+                            :disabled="modules.value.add_services"
+                          />
+                        </template>
+                        <template #subtitle
+                          >Enables you to instantiate add-on services from your own Services
+                          Library.</template
                         >
-                          <template #title>
-                            <span class="text-base">Add-On Services</span>
-                            <InputSwitch
-                              id="service"
-                              v-model="addService"
-                              :disabled="modules.value.add_services"
-                            />
-                          </template>
-                          <template #subtitle
-                            >Enables you to instantiate add-on services from your own Services
-                            Library.</template
-                          >
-                        </Card>
-                      </div>
+                      </Card>
                     </div>
-                  </template>
-                </FormHorizontal>
-              </template>
-            </EditFormBlock>
-          </TabPanel>
-          <TabPanel
-            header="Services"
-            :disabled="!modules.value.add_services"
+                  </div>
+                </template>
+              </FormHorizontal>
+            </template>
+          </EditFormBlock>
+        </TabPanel>
+        <TabPanel
+          header="Services"
+          :disabled="!modules.value.add_services"
+        >
+          <ListTableBlock
+            pageTitle="Services List"
+            pageTitleDelete="Service"
+            addButtonLabel="Add Service"
+            :listService="listServiceEdgeNode"
+            :columns="state.servicesListColumns"
+            :deleteService="deleteServiceEdgeNode"
+            createPagePath="service/add"
+            editPagePath="service"
           >
-            <ListTableBlock
-              pageTitle="Services List"
-              pageTitleDelete="Service"
-              addButtonLabel="Add Service"
-              :listService="listServiceEdgeNode"
-              :columns="state.servicesListColumns"
-              :deleteService="deleteServiceEdgeNode"
-              createPagePath="service/add"
-              editPagePath="service"
-            >
-            </ListTableBlock>
-          </TabPanel>
-          <TabPanel
-            header="Routing"
-            :disabled="true"
-          ></TabPanel>
-          <TabPanel
-            header="Location"
-            :disabled="true"
-          ></TabPanel>
-        </TabView>
-      </template>
-    </PageHeadingBlock>
-  </div>
+          </ListTableBlock>
+        </TabPanel>
+        <TabPanel
+          header="Routing"
+          :disabled="true"
+        ></TabPanel>
+        <TabPanel
+          header="Location"
+          :disabled="true"
+        ></TabPanel>
+      </TabView>
+    </template>
+  </ContentBlock>
 </template>
 <script setup>
   import { reactive, ref, onMounted, onBeforeUpdate } from 'vue'
@@ -231,8 +232,9 @@
   import * as yup from 'yup'
   import { useRoute, useRouter } from 'vue-router'
   import EditFormBlock from '@/templates/edit-form-block-new/no-header'
-  import PageHeadingBlock from '@/templates/page-heading-block-tabs'
   import FormHorizontal from '@/templates/create-form-block-new/form-horizontal'
+  import ContentBlock from '@/templates/content-block'
+  import PageHeadingBlock from '@/templates/page-heading-block'
 
   import TabView from 'primevue/tabview'
   import TabPanel from 'primevue/tabpanel'

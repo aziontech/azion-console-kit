@@ -1,43 +1,53 @@
 <template>
-  <ListTableBlock
-    v-if="hasContentToList"
-    :listService="listEdgeServicesService"
-    :deleteService="deleteEdgeServicesService"
-    :columns="getColumns"
-    pageTitle="Edge Services"
-    pageTitleDelete="Edge Service"
-    addButtonLabel="Edge Services"
-    createPagePath="edge-services/create"
-    editPagePath="edge-services/edit"
-    @on-load-data="handleLoadData"
-  />
-
-  <EmptyResultsBlock
-    v-else
-    pageTitle="Edge Services"
-    title="No edge services added"
-    description="Create your first edge service."
-    createButtonLabel="Edge Services"
-    createPagePath="edge-services/create"
-    :documentationService="documentationService"
-  >
-    <template #illustration>
-      <Illustration />
+  <ContentBlock>
+    <template #heading>
+      <PageHeadingBlock pageTitle="Edge Services"></PageHeadingBlock>
     </template>
-  </EmptyResultsBlock>
-</template>
+    <template #content>
+      <ListTableBlock
+        v-if="hasContentToList"
+        :listService="listEdgeServicesService"
+        :deleteService="deleteEdgeServicesService"
+        :columns="getColumns"
+        pageTitle="Edge Services"
+        pageTitleDelete="Edge Service"
+        addButtonLabel="Edge Services"
+        createPagePath="edge-services/create"
+        editPagePath="edge-services/edit"
+        @on-load-data="handleLoadData"
+      />
 
+      <EmptyResultsBlock
+        v-else
+        pageTitle="Edge Services"
+        title="No edge services added"
+        description="Create your first edge service."
+        createButtonLabel="Edge Services"
+        createPagePath="edge-services/create"
+        :documentationService="documentationService"
+      >
+        <template #illustration>
+          <Illustration />
+        </template>
+      </EmptyResultsBlock>
+    </template>
+  </ContentBlock>
+</template>
 <script>
   import ListTableBlock from '@/templates/list-table-block'
   import EmptyResultsBlock from '@/templates/empty-results-block'
   import Illustration from '@/assets/svg/illustration-layers.vue'
+  import ContentBlock from '@/templates/content-block'
+  import PageHeadingBlock from '@/templates/page-heading-block'
 
   export default {
     name: 'edge-services-view',
     components: {
       ListTableBlock,
       EmptyResultsBlock,
-      Illustration
+      Illustration,
+      PageHeadingBlock,
+      ContentBlock
     },
     props: {
       listEdgeServicesService: {

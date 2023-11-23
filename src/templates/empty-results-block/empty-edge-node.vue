@@ -1,52 +1,43 @@
 <!-- eslint-disable vue/multi-word-component-names -->
 <template>
-  <ContentBlock>
-    <template #heading>
-      <PageHeadingBlock :pageTitle="pageTitle" />
-    </template>
-    <template #content>
-      <div class="flex flex-col h-full">
-        <div
-          class="flex flex-col h-full border surface-border gap-7 justify-center items-center rounded-md"
-        >
-          <slot name="illustration" />
-          <div class="flex flex-col gap-2">
-            <p class="text-center text-color text-lg font-bold">No Edge Node list added.</p>
-            <p class="text-center text-color-secondary text-sm font-normal">
-              To begin the Edge Node installation process, you must download the Edge Orchestrator
-              installation binary of your choice.
-            </p>
-          </div>
-          <div class="flex flex-col gap-5 items-center">
-            <div class="flex flex-wrap gap-2">
-              <PrimeButton
-                severity="secondary"
-                outlined
-                icon="pi pi-download"
-                label="Edge Orchestrator"
-                @click="downloadOrchestrator"
-              />
-            </div>
-            <PrimeButton
-              outlined
-              text
-              class="w-fit"
-              icon-pos="right"
-              icon="pi pi-external-link"
-              label="Learn more"
-              @click="openDocumentation"
-            />
-          </div>
-        </div>
+  <div class="flex flex-col h-full">
+    <div
+      class="flex flex-col h-full border surface-border gap-7 justify-center items-center rounded-md"
+    >
+      <slot name="illustration" />
+      <div class="flex flex-col gap-2">
+        <p class="text-center text-color text-lg font-bold">No Edge Node list added.</p>
+        <p class="text-center text-color-secondary text-sm font-normal">
+          To begin the Edge Node installation process, you must download the Edge Orchestrator
+          installation binary of your choice.
+        </p>
       </div>
-    </template>
-  </ContentBlock>
+      <div class="flex flex-col gap-5 items-center">
+        <div class="flex flex-wrap gap-2">
+          <PrimeButton
+            severity="secondary"
+            outlined
+            icon="pi pi-download"
+            label="Edge Orchestrator"
+            @click="downloadOrchestrator"
+          />
+        </div>
+        <PrimeButton
+          outlined
+          text
+          class="w-fit"
+          icon-pos="right"
+          icon="pi pi-external-link"
+          label="Learn more"
+          @click="openDocumentation"
+        />
+      </div>
+    </div>
+  </div>
 </template>
 
 <script setup>
-  import PageHeadingBlock from '@/templates/page-heading-block'
   import PrimeButton from 'primevue/button'
-  import ContentBlock from '@/templates/content-block'
 
   const props = defineProps({
     pageTitle: { type: String, required: true },

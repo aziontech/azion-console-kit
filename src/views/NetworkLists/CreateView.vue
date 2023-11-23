@@ -1,143 +1,149 @@
 <template>
-  <CreateFormBlock
-    pageTitle="Create Network List"
-    :createService="createNetworkListService"
-    :formData="values"
-    :formMeta="meta"
-    :cleanFormCallback="resetForm"
-  >
-    <template #form>
-      <FormHorizontal
-        title="General"
-        description="description"
-      >
-        <template #inputs>
-          <div class="flex flex-col sm:max-w-lg w-full gap-2">
-            <label
-              for="name"
-              class="text-color text-base font-medium"
-              >Name *</label
-            >
-            <InputText
-              v-bind="name"
-              id="name"
-              type="text"
-              :class="{ 'p-invalid': errors.name }"
-              v-tooltip.top="{ value: errors.name, showDelay: 200 }"
-            />
-            <small
-              v-if="errors.name"
-              class="p-error text-xs font-normal leading-tight"
-              >{{ errors.name }}</small
-            >
-          </div>
-        </template>
-      </FormHorizontal>
-      <FormHorizontal
-        title="List Settings"
-        description="description"
-      >
-        <template #inputs>
-          <div class="flex flex-col w-full sm:max-w-xs gap-2">
-            <label
-              for="id"
-              class="text-color text-base font-medium"
-              >Type *</label
-            >
-            <Dropdown
-              :class="{ 'p-invalid': errors.networkListType }"
-              v-model="networkListType"
-              :options="options"
-              optionLabel="name"
-              optionValue="value"
-              class="w-full md:w-14rem"
-            />
-            <small
-              v-if="errors.networkListType"
-              class="p-error text-xs font-normal leading-tight"
-              >{{ errors.networkListType }}</small
-            >
-          </div>
-          <div
-            class="flex flex-col sm:max-w-lg w-full gap-2"
-            v-if="networkListType === 'asn'"
-          >
-            <label
-              for="id"
-              class="text-color text-base font-medium"
-              >List *</label
-            >
-            <TextareaComponent
-              :class="{ 'p-invalid': errors.asn }"
-              v-bind="asn"
-              rows="2"
-              cols="30"
-              id="list"
-              placeholder="1234&#10;4321"
-            />
-            <small
-              v-if="errors.asn"
-              class="p-error text-xs font-normal leading-tight"
-              >{{ errors.asn }}</small
-            >
-            <small class="text-xs text-color-secondary font-normal leading-tight"
-              >Separate ASN (e.g. 1234) using a new line. Duplicate entries will be automatically
-              removed.</small
-            >
-          </div>
-          <div
-            class="flex flex-col sm:max-w-lg w-full gap-2"
-            v-if="networkListType === 'ip_cidr'"
-          >
-            <label
-              for="id"
-              class="text-color text-base font-medium"
-              >List *</label
-            >
-            <TextareaComponent
-              :class="{ 'p-invalid': errors.ipCidr }"
-              v-bind="ipCidr"
-              rows="2"
-              id="ipCidr"
-              cols="30"
-              placeholder="192.168.0.1&#10;192.168.0.2/32&#10;10.1.1.10/16"
-            />
-            <small
-              v-if="errors.ipCidr"
-              class="p-error text-xs font-normal leading-tight"
-              >{{ errors.ipCidr }}</small
-            >
-          </div>
-          <div
-            class="flex flex-col w-full sm:max-w-3xl gap-2"
-            v-if="networkListType === 'countries'"
-          >
-            <label
-              for="select-01"
-              class="text-color text-base font-medium"
-              >Countries *</label
-            >
-            <MultiSelect
-              v-model="selectedCountries"
-              :options="countriesList"
-              filter
-              optionLabel="name"
-              optionValue="value"
-              placeholder="Select Countries"
-              :class="{ 'p-invalid': errors.selectedCountries }"
-              class="w-full"
-              display="chip"
-            />
-            <small
-              v-if="errors.selectedCountries"
-              class="p-error text-xs font-normal leading-tight"
-              >{{ errors.selectedCountries }}</small
-            >
-          </div>
-        </template>
-      </FormHorizontal>
+  <ContentBlock>
+    <template #heading>
+      <PageHeadingBlock pageTitle="Create Network List"></PageHeadingBlock>
     </template>
-  </CreateFormBlock>
+    <template #content>
+      <CreateFormBlock
+        :createService="createNetworkListService"
+        :formData="values"
+        :formMeta="meta"
+        :cleanFormCallback="resetForm"
+      >
+        <template #form>
+          <FormHorizontal
+            title="General"
+            description="description"
+          >
+            <template #inputs>
+              <div class="flex flex-col sm:max-w-lg w-full gap-2">
+                <label
+                  for="name"
+                  class="text-color text-base font-medium"
+                  >Name *</label
+                >
+                <InputText
+                  v-bind="name"
+                  id="name"
+                  type="text"
+                  :class="{ 'p-invalid': errors.name }"
+                  v-tooltip.top="{ value: errors.name, showDelay: 200 }"
+                />
+                <small
+                  v-if="errors.name"
+                  class="p-error text-xs font-normal leading-tight"
+                  >{{ errors.name }}</small
+                >
+              </div>
+            </template>
+          </FormHorizontal>
+          <FormHorizontal
+            title="List Settings"
+            description="description"
+          >
+            <template #inputs>
+              <div class="flex flex-col w-full sm:max-w-xs gap-2">
+                <label
+                  for="id"
+                  class="text-color text-base font-medium"
+                  >Type *</label
+                >
+                <Dropdown
+                  :class="{ 'p-invalid': errors.networkListType }"
+                  v-model="networkListType"
+                  :options="options"
+                  optionLabel="name"
+                  optionValue="value"
+                  class="w-full md:w-14rem"
+                />
+                <small
+                  v-if="errors.networkListType"
+                  class="p-error text-xs font-normal leading-tight"
+                  >{{ errors.networkListType }}</small
+                >
+              </div>
+              <div
+                class="flex flex-col sm:max-w-lg w-full gap-2"
+                v-if="networkListType === 'asn'"
+              >
+                <label
+                  for="id"
+                  class="text-color text-base font-medium"
+                  >List *</label
+                >
+                <TextareaComponent
+                  :class="{ 'p-invalid': errors.asn }"
+                  v-bind="asn"
+                  rows="2"
+                  cols="30"
+                  id="list"
+                  placeholder="1234&#10;4321"
+                />
+                <small
+                  v-if="errors.asn"
+                  class="p-error text-xs font-normal leading-tight"
+                  >{{ errors.asn }}</small
+                >
+                <small class="text-xs text-color-secondary font-normal leading-tight"
+                  >Separate ASN (e.g. 1234) using a new line. Duplicate entries will be
+                  automatically removed.</small
+                >
+              </div>
+              <div
+                class="flex flex-col sm:max-w-lg w-full gap-2"
+                v-if="networkListType === 'ip_cidr'"
+              >
+                <label
+                  for="id"
+                  class="text-color text-base font-medium"
+                  >List *</label
+                >
+                <TextareaComponent
+                  :class="{ 'p-invalid': errors.ipCidr }"
+                  v-bind="ipCidr"
+                  rows="2"
+                  id="ipCidr"
+                  cols="30"
+                  placeholder="192.168.0.1&#10;192.168.0.2/32&#10;10.1.1.10/16"
+                />
+                <small
+                  v-if="errors.ipCidr"
+                  class="p-error text-xs font-normal leading-tight"
+                  >{{ errors.ipCidr }}</small
+                >
+              </div>
+              <div
+                class="flex flex-col w-full sm:max-w-3xl gap-2"
+                v-if="networkListType === 'countries'"
+              >
+                <label
+                  for="select-01"
+                  class="text-color text-base font-medium"
+                  >Countries *</label
+                >
+                <MultiSelect
+                  v-model="selectedCountries"
+                  :options="countriesList"
+                  filter
+                  optionLabel="name"
+                  optionValue="value"
+                  placeholder="Select Countries"
+                  :class="{ 'p-invalid': errors.selectedCountries }"
+                  class="w-full"
+                  display="chip"
+                />
+                <small
+                  v-if="errors.selectedCountries"
+                  class="p-error text-xs font-normal leading-tight"
+                  >{{ errors.selectedCountries }}</small
+                >
+              </div>
+            </template>
+          </FormHorizontal>
+        </template>
+      </CreateFormBlock>
+    </template>
+  </ContentBlock>
 </template>
 
 <script>
@@ -151,7 +157,9 @@
   import InputText from 'primevue/inputtext'
   import MultiSelect from 'primevue/multiselect'
   import FormHorizontal from '@/templates/create-form-block-new/form-horizontal'
-
+  import ContentBlock from '@/templates/content-block'
+  import PageHeadingBlock from '@/templates/page-heading-block'
+  
   export default {
     components: {
       CreateFormBlock,
@@ -159,7 +167,9 @@
       Dropdown,
       InputText,
       MultiSelect,
-      FormHorizontal
+      FormHorizontal,
+      PageHeadingBlock,
+      ContentBlock
     },
     props: {
       createNetworkListService: {
