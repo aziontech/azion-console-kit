@@ -25,100 +25,27 @@ const getConfig = () => {
     },
     server: {
       proxy: {
-        // '/logout': {
-        //   target: `${URLStartPrefix}sso.azion.com/logout`,
-        //   changeOrigin: true,
-        //   rewrite: (path) => path.replace(/^\/logout/, ''),
-        //   cookieDomainRewrite: { '*': '' }
-        // },
-        // '/api/edge-services': {
-        //   target: `${URLStartPrefix}manager-origin.azion.com/services/api/v1/services`,
-        //   changeOrigin: true,
-        //   rewrite: (path) => path.replace(/^\/api\/edge-services/, '')
-        // },
-        // '/api/variables': {
-        //   target: `${URLStartPrefix}manager.azion.com/variables/api/`,
-        //   changeOrigin: true,
-        //   rewrite: (path) => path.replace(/^\/api/, '')
-        // },
-
-        // '/api/marketplace': {
-        //   target: `${URLStartPrefix}manager.azion.com/marketplace/api/`,
-        //   changeOrigin: true,
-        //   rewrite: (path) => path.replace(/^\/api\/marketplace/, '')
-        // },
-        // '/api/script-runner': {
-        //   target: `${URLStartPrefix}manager.azion.com/script-runner/api/`,
-        //   changeOrigin: true,
-        //   rewrite: (path) => path.replace(/^\/api\/script-runner/, '')
-        // },
-
-        // '/api/edge_node': {
-        //   target: `${URLStartPrefix}manager.azion.com/edgenode/api/v1/edge-nodes`,
-        //   changeOrigin: true,
-        //   rewrite: (path) => path.replace(/^\/api\/edge_node/, '')
-        // },
-        // '/api/iam': {
-        //   //target: `${URLStartPrefix}manager.azion.com/iam/api`,
-        //   target: `${URLStartPrefix}api.azion.net/iam`,
-        //   changeOrigin: true,
-        //   rewrite: (path) => path.replace(/^\/api\/iam/, '')
-        // },
-        // '/api/teams': {
-        //   target: `${URLStartPrefix}iam.azion.com/iam/api/teams`,
-        //   changeOrigin: true,
-        //   rewrite: (path) => path.replace(/^\/api\/teams/, '')
-        // },
-        // '/api/purge': {
-        //   target: 'https://stage-manager.azion.com/api/purge',
-        //   changeOrigin: true,
-        //   rewrite: (path) => path.replace(/^\/api\/purge/, '')
-        // },
-        // '/api/permissions': {
-        //   target: `${URLStartPrefix}iam.azion.com/iam/api/permissions`,
-        //   changeOrigin: true,
-        //   rewrite: (path) => path.replace(/^\/api\/permissions/, '')
-        // },
-        // '/api/users': {
-        //   target: `${URLStartPrefix}iam.azion.com/iam/api`,
-        //   changeOrigin: true,
-        //   rewrite: (path) => path.replace(/^\/api/, '')
-        // },
-        // '/api/credentials': {
-        //   target: `${URLStartPrefix}manager.azion.com/credentials/api/v1/credentials`,
-        //   changeOrigin: true,
-        //   rewrite: (path) => path.replace(/^\/api\/credentials/, '')
-        // },
         '/graphql/cities': {
           target: `${URLStartPrefix}cities.azion.com/graphql`,
           changeOrigin: true,
           rewrite: (path) => path.replace(/^\/graphql\/cities/, '')
         },
         '^/api/(marketplace|script-runner)': {
-          //target: `${URLStartPrefix}manager.azion.com/marketplace/api/`,
           target: `${URLStartPrefix}manager.azion.com/`,
           changeOrigin: true,
           rewrite: (path) => path.replace(/^\/api\/(marketplace|script-runner)/, '/$1/api')
         },
-        // '/events/graphql': {
-        //   target: `${URLStartPrefix}api.azion.net`,
-        //   changeOrigin: true,
-        //   rewrite: (path) => path.replace(/^\/events\/graphql\//, '')
-        // },
         '/api/account-details': {
           target: `${URLStartPrefix}iam.azion.com/iam/api/account`,
           changeOrigin: true,
           rewrite: (path) => path.replace(/^\/api\/account-details/, '')
         },
         '^/api/(account|user|token|switch-account|password|totp)|^/logout': {
-          //target: `${URLStartPrefix}sso.azion.com/api`,
           target: `${URLStartPrefix}sso.azion.com`,
           changeOrigin: true,
-          //rewrite: (path) => path.replace(/^\/api/, ''),
           cookieDomainRewrite: { '*': '' }
         },
         '/api': {
-          //target: `${URLStartPrefix}manager-origin.azion.com/api`,
           target: `${URLStartPrefix}api.azion.net`,
           changeOrigin: true,
           rewrite: (path) => path.replace(/^\/api/, '')
