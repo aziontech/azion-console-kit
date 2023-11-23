@@ -36,7 +36,6 @@
               type="text"
               id="name"
               :class="{ 'p-invalid': errors.digitalCertificateName }"
-              v-tooltip.top="{ value: errors.digitalCertificateName, showDelay: 200 }"
             />
             <small
               v-if="errors.digitalCertificateName"
@@ -130,7 +129,6 @@
             <PrimeTextarea
               v-bind="certificate"
               :class="{ 'p-invalid': errors.certificate }"
-              v-tooltip.top="{ value: errors.certificate, showDelay: 200 }"
               placeholder="-----BEGIN CERTIFICATE-----&#10;-----END CERTIFICATE-----"
               rows="5"
               cols="30"
@@ -149,7 +147,6 @@
             <PrimeTextarea
               v-model="privateKey"
               :class="{ 'p-invalid': errors.privateKey }"
-              v-tooltip.top="{ value: errors.privateKey, showDelay: 200 }"
               placeholder="-----BEGIN PRIVATE KEY-----&#10;-----END PRIVATE KEY-----"
               rows="5"
               cols="30"
@@ -177,7 +174,6 @@
               v-bind="common"
               type="text"
               :class="{ 'p-invalid': errors.common }"
-              v-tooltip.top="{ value: errors.common, showDelay: 200 }"
             />
             <small
               v-if="errors.common"
@@ -192,7 +188,6 @@
               v-bind="country"
               type="text"
               :class="{ 'p-invalid': errors.country }"
-              v-tooltip.top="{ value: errors.country, showDelay: 200 }"
             />
             <small
               v-if="errors.country"
@@ -207,7 +202,6 @@
               v-bind="state"
               type="text"
               :class="{ 'p-invalid': errors.state }"
-              v-tooltip.top="{ value: errors.state, showDelay: 200 }"
             />
             <small
               v-if="errors.state"
@@ -222,7 +216,6 @@
               v-bind="city"
               type="text"
               :class="{ 'p-invalid': errors.city }"
-              v-tooltip.top="{ value: errors.city, showDelay: 200 }"
             />
             <small
               v-if="errors.city"
@@ -237,7 +230,6 @@
               v-bind="organization"
               type="text"
               :class="{ 'p-invalid': errors.organization }"
-              v-tooltip.top="{ value: errors.organization, showDelay: 200 }"
             />
             <small
               v-if="errors.organization"
@@ -252,7 +244,6 @@
               v-bind="organizationUnity"
               type="text"
               :class="{ 'p-invalid': errors.organizationUnity }"
-              v-tooltip.top="{ value: errors.organizationUnity, showDelay: 200 }"
             />
             <small
               v-if="errors.organizationUnity"
@@ -267,7 +258,6 @@
               v-bind="email"
               type="text"
               :class="{ 'p-invalid': errors.email }"
-              v-tooltip.top="{ value: errors.email, showDelay: 200 }"
             />
             <small
               v-if="errors.email"
@@ -285,7 +275,6 @@
                 disabled
                 class="w-full"
                 :class="{ 'p-invalid': errors.privateKeyType }"
-                v-tooltip.top="{ value: errors.privateKeyType, showDelay: 200 }"
               />
             </span>
             <small
@@ -299,7 +288,6 @@
             <PrimeTextarea
               v-bind="subjectAlternativeNames"
               :class="{ 'p-invalid': errors.subjectAlternativeNames }"
-              v-tooltip.top="{ value: errors.subjectAlternativeNames, showDelay: 200 }"
               placeholder="www.example.com&#10;example.net&#10;mail.example.com&#10;support.example.com"
               rows="5"
               cols="30"
@@ -328,7 +316,6 @@
             <PrimeTextarea
               v-bind="certificate"
               :class="{ 'p-invalid': errors.certificate }"
-              v-tooltip.top="{ value: errors.certificate, showDelay: 200 }"
               placeholder="---BEGIN CERTIFICATE---"
               rows="5"
               cols="30"

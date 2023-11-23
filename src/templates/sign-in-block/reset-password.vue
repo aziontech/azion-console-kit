@@ -23,7 +23,6 @@
               class="w-full"
               :class="{ 'p-invalid': errors.password }"
               :feedback="false"
-              v-tooltip.top="{ value: errors.password, showDelay: 200 }"
             />
           </div>
           <small class="p-error text-xs font-normal leading-tight">{{ errors.password }}</small>
@@ -67,7 +66,6 @@
               class="w-full"
               :class="{ 'p-invalid': errors.confirmPassword }"
               :feedback="false"
-              v-tooltip.top="{ value: errors.confirmPassword, showDelay: 200 }"
             />
             <InlineMessage
               v-if="isMatchError"

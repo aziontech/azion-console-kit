@@ -16,7 +16,6 @@
           type="email"
           class="w-full"
           :class="{ 'p-invalid': errors.email }"
-          v-tooltip.top="{ value: errors.email, showDelay: 200 }"
         />
         <small
           v-if="errors.email"
@@ -36,7 +35,6 @@
           type="text"
           class="w-full"
           :class="{ 'p-invalid': errors.name }"
-          v-tooltip.top="{ value: errors.name, showDelay: 200 }"
         />
         <small
           v-if="errors.name"
@@ -57,7 +55,6 @@
           class="w-full"
           :class="{ 'p-invalid': errors.password }"
           :feedback="false"
-          v-tooltip.top="{ value: errors.password, showDelay: 200 }"
         />
         <small class="p-error text-xs font-normal leading-tight">{{ errors.password }}</small>
 
