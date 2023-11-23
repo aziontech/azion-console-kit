@@ -24,6 +24,13 @@ const fixtures = {
   }
 }
 
+const localeMock = (locale = 'en') => {
+  const DateTimeFormat = Intl.DateTimeFormat
+  vi.spyOn(window.global.Intl, 'DateTimeFormat')
+    .mockImplementationOnce((_, options) => DateTimeFormat(locale, { ...options }))
+    .mockImplementationOnce((_, options) => DateTimeFormat(locale, { ...options }))
+}
+
 const makeSut = () => {
   const sut = listCredentialsService
 
@@ -54,6 +61,7 @@ describe('ListCredentialsServices', () => {
   })
 
   it('should parse correctly each returned item', async () => {
+    localeMock()
     vi.setSystemTime(new Date(2023, 10, 10, 10))
     vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
       statusCode: 200,
@@ -73,7 +81,7 @@ describe('ListCredentialsServices', () => {
       },
       description: fixtures.credentialBasic.description,
       lastEditor: fixtures.credentialBasic.last_editor,
-      lastModified: 'segunda-feira, 9 de outubro de 2023 21:00',
+      lastModified: 'Monday, October 9, 2023 at 9:00 PM',
       lastModifiedDate: '2023-10-10T00:00:00Z'
     })
 
@@ -87,7 +95,7 @@ describe('ListCredentialsServices', () => {
       },
       description: fixtures.credentialDisabled.description,
       lastEditor: fixtures.credentialDisabled.last_editor,
-      lastModified: 'terça-feira, 10 de outubro de 2023 21:00',
+      lastModified: 'Tuesday, October 10, 2023 at 9:00 PM',
       lastModifiedDate: '2023-10-11T00:00:00Z'
     })
   })

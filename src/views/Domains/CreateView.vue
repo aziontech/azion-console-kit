@@ -5,7 +5,7 @@
     :formData="values"
     :formMeta="meta"
     @on-response="handleResponse"
-    :buttonBackList="generatedDomainName"
+    :buttonBackList="hasDomainName"
     :callback="false"
     :disabledFeedback="true"
   >
@@ -25,7 +25,7 @@
               v-bind="name"
               id="name"
               type="text"
-              :disabled="generatedDomainName"
+              :disabled="hasDomainName"
               :class="{ 'p-invalid': errors.name }"
               v-tooltip.top="errors.name"
             />
@@ -63,7 +63,6 @@
                   :feedback="false"
                   disabled
                 />
-                <!-- pi-lock -->
               </span>
               <PrimeButton
                 icon="pi pi-clone"
@@ -71,7 +70,7 @@
                 type="button"
                 aria-label="Copy Domain Name"
                 label="Copy to Clipboard"
-                :disabled="!generatedDomainName"
+                :disabled="!hasDomainName"
                 @click="copyDomainName"
               />
             </div>
@@ -101,7 +100,7 @@
               optionValue="value"
               class="w-full"
               placeholder="Select an edge application"
-              :disabled="generatedDomainName"
+              :disabled="hasDomainName"
             />
             <small
               v-if="errors.edgeApplication"
@@ -116,7 +115,7 @@
               class="flex-shrink-0 flex-grow"
               :class="{ 'p-invalid': errors.cnameAccessOnly }"
               v-model="cnameAccessOnly"
-              :disabled="generatedDomainName"
+              :disabled="hasDomainName"
             />
             <div class="flex flex-col gap-1">
               <label class="text-sm font-normal leading-tight">CNAME Access Only </label>
@@ -142,7 +141,7 @@
               cols="30"
               class="w-full"
               v-tooltip.top="errors.cnames"
-              :disabled="generatedDomainName"
+              :disabled="hasDomainName"
             />
             <small
               v-if="errors.cnames"
@@ -165,7 +164,7 @@
               optionValue="value"
               class="w-full"
               placeholder="Select a certificate"
-              :disabled="generatedDomainName"
+              :disabled="hasDomainName"
             />
           </div>
         </template>
@@ -345,7 +344,7 @@
         digitalCertificates: [],
         edgeCertificate: 0,
         domainName: '',
-        generatedDomainName: false
+        hasDomainName: false
       }
     },
     async created() {
@@ -485,7 +484,7 @@
         })
         if (data.domainName) {
           this.domainName = data.domainName
-          this.generatedDomainName = true
+          this.hasDomainName = true
         }
       },
       copyDomainName() {
