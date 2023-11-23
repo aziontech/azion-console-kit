@@ -33,7 +33,7 @@ describe('TeamPermissionServices', () => {
     await sut(fixtures.teamPermissionMock)
 
     expect(requestSpy).toHaveBeenCalledWith({
-      url: `teams/${fixtures.teamPermissionMock.id}`,
+      url: `iam/teams/${fixtures.teamPermissionMock.id}`,
       method: 'PUT',
       body: {
         name: fixtures.teamPermissionMock.name,

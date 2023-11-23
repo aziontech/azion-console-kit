@@ -77,16 +77,16 @@ const getConfig = () => {
           changeOrigin: true,
           rewrite: (path) => path.replace(/^\/api\/account-details/, '')
         },
-        '/api/teams': {
-          target: `${URLStartPrefix}iam.azion.com/iam/api/teams`,
-          changeOrigin: true,
-          rewrite: (path) => path.replace(/^\/api\/teams/, '')
-        },
-        '/api/purge': {
-          target: 'https://stage-manager.azion.com/api/purge',
-          changeOrigin: true,
-          rewrite: (path) => path.replace(/^\/api\/purge/, '')
-        },
+        // '/api/teams': {
+        //   target: `${URLStartPrefix}iam.azion.com/iam/api/teams`,
+        //   changeOrigin: true,
+        //   rewrite: (path) => path.replace(/^\/api\/teams/, '')
+        // },
+        // '/api/purge': {
+        //   target: 'https://stage-manager.azion.com/api/purge',
+        //   changeOrigin: true,
+        //   rewrite: (path) => path.replace(/^\/api\/purge/, '')
+        // },
         // '/api/permissions': {
         //   target: `${URLStartPrefix}iam.azion.com/iam/api/permissions`,
         //   changeOrigin: true,

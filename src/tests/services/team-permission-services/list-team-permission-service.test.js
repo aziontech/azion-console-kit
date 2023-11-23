@@ -39,7 +39,7 @@ describe('TeamPermissionService', () => {
     await sut()
 
     expect(requestSpy).toHaveBeenCalledWith({
-      url: `teams`,
+      url: `iam/teams`,
       method: 'GET'
     })
   })

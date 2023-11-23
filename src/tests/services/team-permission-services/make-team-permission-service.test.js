@@ -12,7 +12,7 @@ const makeSut = () => {
 describe('TeamPermissionService', () => {
   it('should return the API base url to variables service', () => {
     const { sut } = makeSut()
-    const correctApiUrl = 'teams'
+    const correctApiUrl = 'iam/teams'
 
     const baseUrl = sut()
 

@@ -22,7 +22,7 @@ describe('TeamPermissionServices', () => {
     await sut(environmentVariableIdMock)
 
     expect(requestSpy).toHaveBeenCalledWith({
-      url: `teams/${environmentVariableIdMock}/`,
+      url: `iam/teams/${environmentVariableIdMock}/`,
       method: 'DELETE'
     })
   })
