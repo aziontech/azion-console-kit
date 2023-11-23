@@ -7,9 +7,11 @@
     :cleanFormCallback="resetForm"
   >
     <template #form>
-      <FormHorizontal title="Data">
+      <FormHorizontal
+        title="General"
+        description="description"
+      >
         <template #inputs>
-          <!-- data-source -->
           <div class="flex flex-col sm:max-w-lg w-full gap-2">
             <label
               for="name"
@@ -19,7 +21,6 @@
             <InputText
               v-model="name"
               type="text"
-              placeholder="Name for Data Streaming"
               :class="{ 'p-invalid': errors.name }"
             />
             <small
@@ -28,37 +29,54 @@
               >{{ errors.name }}</small
             >
           </div>
+        </template>
+      </FormHorizontal>
 
-          <div class="flex flex-col w-full sm:max-w-xs gap-2">
-            <label
-              for="dataSource"
-              class="text-color text-base font-medium"
-              >Data Source *</label
-            >
-            <Dropdown
-              :class="{ 'p-invalid': errors.dataSource }"
-              v-model="dataSource"
-              :options="listDataSources"
-              optionLabel="label"
-              optionValue="value"
-              class="w-full"
-            />
-          </div>
+      <FormHorizontal
+        title="Data Settings"
+        description="Description"
+      >
+        <template #inputs>
+          <div class="flex flex-wrap gap-6">
+            <div class="flex flex-col w-full sm:max-w-xs gap-2">
+              <label
+                for="dataSource"
+                class="text-color text-base font-medium"
+                >Data Source *</label
+              >
+              <Dropdown
+                :class="{ 'p-invalid': errors.dataSource }"
+                v-model="dataSource"
+                :options="listDataSources"
+                optionLabel="label"
+                optionValue="value"
+                class="w-full"
+              />
+              <small class="text-color-secondary text-xs font-normal leading-tight">
+                Data Source is the Azion Platform that generates the events from where you want to
+                collect data.
+              </small>
+            </div>
 
-          <div class="flex flex-col w-full sm:max-w-xs gap-2">
-            <label
-              for="template"
-              class="text-color text-base font-medium"
-              >Template *</label
-            >
-            <Dropdown
-              :class="{ 'p-invalid': errors.template }"
-              v-model="template"
-              :options="listTemplates"
-              optionLabel="label"
-              optionValue="value"
-              class="w-full"
-            />
+            <div class="flex flex-col w-full sm:max-w-xs gap-2">
+              <label
+                for="template"
+                class="text-color text-base font-medium"
+                >Template *</label
+              >
+              <Dropdown
+                :class="{ 'p-invalid': errors.template }"
+                v-model="template"
+                :options="listTemplates"
+                optionLabel="label"
+                optionValue="value"
+                class="w-full"
+              />
+              <small class="text-color-secondary text-xs font-normal leading-tight">
+                You can use a preset of data, or you can customize the format by choosing the Custom
+                Template.
+              </small>
+            </div>
           </div>
 
           <div class="flex flex-col gap-2">
@@ -74,51 +92,41 @@
               :options="optionsMonacoEditor"
               class="min-h-[100px]"
             />
+            <small class="text-color-secondary text-xs font-normal leading-tight">
+              Data Set is a format chosen to send the data to your endpoint. It must be a valid JSON
+              format. The requests are separated from each other by \n character.
+            </small>
           </div>
-
-          <!-- domains -->
+        </template>
+      </FormHorizontal>
+      <FormHorizontal
+        title="Domains"
+        description="Description"
+      >
+        <template #inputs>
           <div class="flex flex-col gap-2">
-            <label class="text-color text-base font-medium">Options</label>
+            <label class="text-color text-sm font-medium leading-tight">Option</label>
             <div class="flex flex-col gap-3">
-              <Card
-                :pt="{
-                  body: { class: 'p-4' },
-                  title: { class: 'flex justify-between  text-base m-0 font-medium' },
-                  subtitle: {
-                    class: 'text-sm font-normal text-color-secondary m-0 pr-0 md:pr-[2.5rem]'
-                  }
-                }"
-              >
-                <template #title>
-                  <span class="text-base">Filter Domains</span>
-                  <RadioButton
-                    v-model="domainOption"
-                    inputId="filter-domain"
-                    name="filter domain"
-                    value="0"
-                  />
-                </template>
-              </Card>
-
-              <Card
-                :pt="{
-                  body: { class: 'p-4' },
-                  title: { class: 'flex justify-between  text-base m-0 font-medium' },
-                  subtitle: {
-                    class: 'text-sm font-normal text-color-secondary m-0 pr-0 md:pr-[2.5rem]'
-                  }
-                }"
-              >
-                <template #title>
-                  <span class="text-base">All Domains</span>
-                  <RadioButton
-                    v-model="domainOption"
-                    inputId="all-domain"
-                    name="all domain"
-                    value="1"
-                  />
-                </template>
-              </Card>
+              <div class="flex no-wrap gap-2 items-center">
+                <RadioButton
+                  v-model="domainOption"
+                  inputId="all-domain"
+                  name="all domain"
+                  value="1"
+                />
+                <label class="text-color text-sm font-normal leading-tight"
+                  >All domains and upcoming</label
+                >
+              </div>
+              <div class="flex no-wrap gap-2 items-center">
+                <RadioButton
+                  v-model="domainOption"
+                  inputId="filter-domain"
+                  name="filter domain"
+                  value="0"
+                />
+                <label class="text-color text-sm font-normal leading-tight">Filter Domains </label>
+              </div>
             </div>
           </div>
 
@@ -133,7 +141,10 @@
             >
             <PickList
               v-model="domains"
-              listStyle="height:342px"
+              :pt="{
+                sourceList: { class: ['h-80'] },
+                targetList: { class: ['h-80'] }
+              }"
               dataKey="domainID"
               breakpoint="1400px"
               :showSourceControls="false"
@@ -144,7 +155,7 @@
               <template #item="slotProps">
                 <div class="flex flex-wrap p-2 align-items-center gap-3">
                   <div class="flex-1 flex flex-column gap-2">
-                    <span class="font-bold">{{ slotProps.item.name }}</span>
+                    <span class="font-normal">{{ slotProps.item.name }}</span>
                   </div>
                 </div>
               </template>
@@ -152,6 +163,7 @@
           </div>
         </template>
       </FormHorizontal>
+
       <FormHorizontal title="Destination">
         <template #inputs>
           <div class="flex flex-col w-full sm:max-w-xs gap-2">
@@ -173,7 +185,7 @@
           <!-- Specific Sections for Different Endpoints -->
           <div
             id="standard"
-            class="flex flex-col gap-3"
+            class="flex flex-col gap-8 max-md:gap-6"
             v-if="endpoint === 'standard'"
           >
             <div class="flex flex-col sm:max-w-lg w-full gap-2">
@@ -189,7 +201,9 @@
                 placeholder="https://app.domain.com/"
                 :class="{ 'p-invalid': errors.endpointUrl }"
               />
-
+              <small class="text-color-secondary text-xs font-normal leading-tight">
+                The URL to receive the collected data from Data Streaming.
+              </small>
               <small
                 id="endpoint-url-help"
                 class="p-error"
@@ -204,7 +218,7 @@
                 >Custom Headers</label
               >
               <div
-                class="p-inputgroup flex-1"
+                class="flex p-inputgroup"
                 v-for="(header, index) in headers"
                 :key="index"
               >
@@ -212,60 +226,26 @@
                   v-model="header.value"
                   type="text"
                   id="header-value"
-                  placeholder="header-name: value"
+                  placeholder="Value"
                 />
                 <ButtonPrimer
-                  icon="pi pi-times"
-                  severity="danger"
+                  icon="pi pi-trash"
+                  size="small"
+                  outlined
                   v-if="header.deleted"
                   @click="removeHeader(index)"
                 />
               </div>
 
               <ButtonPrimer
+                outlined
+                icon="pi pi-plus-circle"
+                iconPos="left"
                 label="Header"
+                size="small"
+                class="w-fit"
                 @click="addHeader()"
               />
-            </div>
-
-            <h1 class="text-xl font-medium">Payload</h1>
-
-            <div class="flex flex-col sm:max-w-lg w-full gap-2">
-              <label
-                for="maxSize"
-                class="text-color text-base font-medium"
-                >Max Size *</label
-              >
-              <InputNumber
-                v-model="maxSize"
-                placeholder="1000000"
-                :useGrouping="false"
-                :class="{ 'p-invalid': errors.maxSize }"
-              />
-              <small
-                id="max-size-help"
-                class="p-error"
-                >{{ errors.maxSize }}</small
-              >
-            </div>
-
-            <div class="flex flex-col sm:max-w-lg w-full gap-2">
-              <label
-                for="lineSeparator"
-                class="text-color text-base font-medium"
-                >Log Line Separator *</label
-              >
-              <InputText
-                v-model="lineSeparator"
-                type="text"
-                placeholder="\n"
-                :class="{ 'p-invalid': errors.lineSeparator }"
-              />
-              <small
-                id="max-size-help"
-                class="p-error"
-                >{{ errors.lineSeparator }}</small
-              >
             </div>
 
             <div class="flex flex-col sm:max-w-lg w-full gap-2">
@@ -280,17 +260,67 @@
                 placeholder="$dataset"
                 :class="{ 'p-invalid': errors.payloadFormat }"
               />
+              <small class="text-color-secondary text-xs font-normal leading-tight">
+                The format that payload will be sent. The $dataset variable will be replaced by all
+                logs already with the log line separator applied.
+              </small>
               <small
                 id="data-set-help"
                 class="p-error"
                 >{{ errors.payloadFormat }}</small
               >
             </div>
+
+            <div class="flex flex-col sm:max-w-lg w-full gap-2">
+              <label
+                for="lineSeparator"
+                class="text-color text-base font-medium"
+                >Log Line Separator Payload *</label
+              >
+              <InputText
+                v-model="lineSeparator"
+                type="text"
+                placeholder="\n"
+                :class="{ 'p-invalid': errors.lineSeparator }"
+              />
+              <small class="text-color-secondary text-xs font-normal leading-tight">
+                The format that payload will be sent. The $dataset variable will be replaced by all
+                logs already with the log line separator applied.
+              </small>
+              <small
+                id="max-size-help"
+                class="p-error"
+                >{{ errors.lineSeparator }}</small
+              >
+            </div>
+
+            <div class="flex flex-col sm:max-w-lg w-full gap-2">
+              <label
+                for="maxSize"
+                class="text-color text-base font-medium"
+                >Max Size Payload *</label
+              >
+              <InputNumber
+                v-model="maxSize"
+                placeholder="1000000"
+                :useGrouping="false"
+                :class="{ 'p-invalid': errors.maxSize }"
+              />
+              <small class="text-color-secondary text-xs font-normal leading-tight">
+                You can define the maximum size of data packets in bytes. Use a value starting from
+                1000000.
+              </small>
+              <small
+                id="max-size-help"
+                class="p-error"
+                >{{ errors.maxSize }}</small
+              >
+            </div>
           </div>
 
           <div
             id="kafka"
-            class="flex flex-col gap-3"
+            class="flex flex-col gap-8 max-md:gap-6"
             v-if="endpoint === 'kafka'"
           >
             <div class="flex flex-col sm:max-w-lg w-full gap-2">
@@ -299,12 +329,16 @@
                 class="text-color text-base font-medium"
                 >Bootstrap Servers *</label
               >
-              <InputText
+              <TextArea
                 v-model="bootstrapServers"
-                type="text"
                 placeholder="host1:port1,host2:port2,..."
                 :class="{ 'p-invalid': errors.bootstrapServers }"
+                rows="5"
+                cols="30"
               />
+              <small class="text-color-secondary text-xs font-normal leading-tight">
+                The list of host and port (comma-separated) from Kafka brokers.
+              </small>
               <small
                 id="bootstrap-servers-help"
                 class="p-error"
@@ -320,9 +354,13 @@
               >
               <InputText
                 v-model="kafkaTopic"
+                id="kafkaTopic"
                 type="text"
                 :class="{ 'p-invalid': errors.kafkaTopic }"
               />
+              <small class="text-color-secondary text-xs font-normal leading-tight">
+                The topic name from Kafka brokers.
+              </small>
               <small
                 id="kafka-topic-help"
                 class="p-error"
@@ -330,57 +368,30 @@
               >
             </div>
 
-            <div class="flex flex-col gap-2">
-              <label class="text-color text-base font-medium"
-                >Use Transport Layer Security (TLS)</label
-              >
-              <div class="flex flex-col gap-3">
-                <Card
-                  :pt="{
-                    body: { class: 'p-4' },
-                    title: { class: 'flex justify-between  text-base m-0 font-medium' },
-                    subtitle: {
-                      class: 'text-sm font-normal text-color-secondary m-0 pr-0 md:pr-[2.5rem]'
-                    }
-                  }"
+            <div class="flex sm:max-w-lg w-full gap-2 items-top">
+              <InputSwitch
+                v-model="tlsOption"
+                id="tlsOption"
+                class="flex-shrink-0 flex-grow"
+                :class="{ 'p-invalid': errors.tlsOption }"
+              />
+              <div class="flex flex-col gap-1">
+                <label
+                  for="tlsOption"
+                  class="text-sm font-normal leading-tight"
+                  >Use Transport Layer Security (TLS)</label
                 >
-                  <template #title>
-                    <span class="text-base">No</span>
-                    <RadioButton
-                      v-model="tlsOption"
-                      inputId="no"
-                      name="No"
-                      :value="false"
-                    />
-                  </template>
-                </Card>
-
-                <Card
-                  :pt="{
-                    body: { class: 'p-4' },
-                    title: { class: 'flex justify-between  text-base m-0 font-medium' },
-                    subtitle: {
-                      class: 'text-sm font-normal text-color-secondary m-0 pr-0 md:pr-[2.5rem]'
-                    }
-                  }"
-                >
-                  <template #title>
-                    <span class="text-base">Yes</span>
-                    <RadioButton
-                      v-model="tlsOption"
-                      inputId="yes"
-                      name="Yes"
-                      :value="true"
-                    />
-                  </template>
-                </Card>
+                <small class="text-color-secondary text-sm font-normal leading-tight">
+                  If you need secure logging, use Transport Layer Security (TLS). Make sure your
+                  server uses a trusted CA certificate.
+                </small>
               </div>
             </div>
           </div>
 
           <div
             id="s3"
-            class="flex flex-col gap-3"
+            class="flex flex-col gap-8 max-md:gap-6"
             v-if="endpoint === 's3'"
           >
             <div class="flex flex-col sm:max-w-lg w-full gap-2">
@@ -394,6 +405,10 @@
                 type="text"
                 :class="{ 'p-invalid': errors.host }"
               />
+              <small class="text-color-secondary text-sm font-normal leading-tight">
+                The URL of your S3 host. You may connect with every provider that works with S3
+                protocol, for example: AWS, Google Cloud Plataform, Azion, etc..
+              </small>
               <small
                 id="host-help"
                 class="p-error"
@@ -412,6 +427,9 @@
                 type="text"
                 :class="{ 'p-invalid': errors.bucket }"
               />
+              <small class="text-color-secondary text-sm font-normal leading-tight">
+                The name of your S3 bucket.
+              </small>
               <small
                 id="bucket-help"
                 class="p-error"
@@ -430,6 +448,9 @@
                 type="text"
                 :class="{ 'p-invalid': errors.region }"
               />
+              <small class="text-color-secondary text-sm font-normal leading-tight">
+                The region of your S3 bucket.
+              </small>
               <small
                 id="region-help"
                 class="p-error"
@@ -443,11 +464,18 @@
                 class="text-color text-base font-medium"
                 >Access Key *</label
               >
-              <InputText
+              <PrimePassword
+                id="accessKey"
                 v-model="accessKey"
                 type="text"
+                class="flex flex-col w-full"
                 :class="{ 'p-invalid': errors.accessKey }"
+                :feedback="false"
+                toggleMask
               />
+              <small class="text-color-secondary text-sm font-normal leading-tight">
+                The access key of your S3 bucket.
+              </small>
               <small
                 id="access-key-help"
                 class="p-error"
@@ -461,11 +489,18 @@
                 class="text-color text-base font-medium"
                 >Secret Key *</label
               >
-              <InputText
+              <PrimePassword
+                id="secretKey"
                 v-model="secretKey"
                 type="text"
+                class="flex flex-col w-full"
                 :class="{ 'p-invalid': errors.secretKey }"
+                :feedback="false"
+                toggleMask
               />
+              <small class="text-color-secondary text-sm font-normal leading-tight">
+                The secret key of your S3 bucket.
+              </small>
               <small
                 id="secret-key-help"
                 class="p-error"
@@ -479,11 +514,18 @@
                 class="text-color text-base font-medium"
                 >Object Key Prefix *</label
               >
-              <InputText
+              <PrimePassword
+                id="objectKey"
                 v-model="objectKey"
                 type="text"
+                class="flex flex-col w-full"
                 :class="{ 'p-invalid': errors.objectKey }"
+                :feedback="false"
+                toggleMask
               />
+              <small class="text-color-secondary text-sm font-normal leading-tight">
+                The format of the object that will be created in your S3 bucket.
+              </small>
               <small
                 id="object-key-help"
                 class="p-error"
@@ -491,31 +533,32 @@
               >
             </div>
 
-            <div class="flex flex-col w-full sm:max-w-xs gap-2">
-              <label
-                for="contentType"
-                class="text-color text-base font-medium"
-                >Content Type *</label
-              >
-              <Dropdown
-                :class="{ 'p-invalid': errors.contentType }"
-                v-model="contentType"
-                :options="listContentType"
-                optionLabel="label"
-                optionValue="value"
-                class="w-full"
-              />
-              <small
-                id="content-type"
-                class="p-error"
-                >{{ errors.contentType }}</small
-              >
+            <div class="flex flex-col gap-2">
+              <label class="text-color text-sm font-medium leading-tight">Content Type</label>
+              <div class="flex flex-col gap-3">
+                <div
+                  class="flex no-wrap gap-2 items-center"
+                  v-for="contentTypeItem of listContentType"
+                  :key="contentTypeItem.value"
+                >
+                  <RadioButton
+                    :class="{ 'p-invalid': errors.contentType }"
+                    v-model="contentType"
+                    inputId="contentType"
+                    :name="contentTypeItem.value"
+                    :value="contentTypeItem.value"
+                  />
+                  <label class="text-color text-sm font-normal leading-tight">{{
+                    contentTypeItem.label
+                  }}</label>
+                </div>
+              </div>
             </div>
           </div>
 
           <div
             id="big_query"
-            class="flex flex-col gap-3"
+            class="flex flex-col gap-8 max-md:gap-6"
             v-if="endpoint === 'big_query'"
           >
             <div class="flex flex-col sm:max-w-lg w-full gap-2">
@@ -529,6 +572,10 @@
                 type="text"
                 :class="{ 'p-invalid': errors.projectID }"
               />
+              <small class="text-color-secondary text-sm font-normal leading-tight">
+                The ID of your project in Google Cloud.
+              </small>
+
               <small
                 id="project-id-help"
                 class="p-error"
@@ -547,6 +594,9 @@
                 type="text"
                 :class="{ 'p-invalid': errors.datasetID }"
               />
+              <small class="text-color-secondary text-sm font-normal leading-tight">
+                The ID of your dataset created on Google BigQuery.
+              </small>
               <small
                 id="dataset-id-help"
                 class="p-error"
@@ -565,6 +615,9 @@
                 type="text"
                 :class="{ 'p-invalid': errors.tableID }"
               />
+              <small class="text-color-secondary text-sm font-normal leading-tight">
+                The ID of your table that will receive the streamed data.
+              </small>
               <small
                 id="table-id-help"
                 class="p-error"
@@ -572,18 +625,22 @@
               >
             </div>
 
-            <div class="flex flex-col sm:max-w-lg w-full gap-2">
+            <div class="flex flex-col w-full gap-2">
               <label
                 for="serviceAccountKey"
                 class="text-color text-base font-medium"
                 >Service Account Key *</label
               >
-              <Textarea
-                v-model="serviceAccountKey"
-                :class="{ 'p-invalid': errors.serviceAccountKey }"
-                rows="5"
-                cols="30"
+              <vue-monaco-editor
+                v-model:value="serviceAccountKey"
+                language="json"
+                :theme="theme"
+                :options="optionsMonacoEditor"
+                class="min-h-[100px]"
               />
+              <small class="text-color-secondary text-sm font-normal leading-tight">
+                The JSON file with the key that will be used to authenticate with Google services.
+              </small>
               <small
                 id="service-account-key-help"
                 class="p-error"
@@ -594,7 +651,7 @@
 
           <div
             id="elasticsearch"
-            class="flex flex-col gap-3"
+            class="flex flex-col gap-8 max-md:gap-6"
             v-if="endpoint === 'elasticsearch'"
           >
             <div class="flex flex-col sm:max-w-lg w-full gap-2">
@@ -609,6 +666,10 @@
                 placeholder="https://elasticsearch-domain.com/index"
                 :class="{ 'p-invalid': errors.elasticsearchUrl }"
               />
+              <small class="text-color-secondary text-sm font-normal leading-tight">
+                The URL plus the index of the Elasticsearch to receive the collected data from Data
+                Streaming.
+              </small>
               <small
                 id="elastic-search-url-help"
                 class="p-error"
@@ -622,11 +683,16 @@
                 class="text-color text-base font-medium"
                 >API Key *</label
               >
-              <InputText
+              <TextArea
+                id="apiKey"
                 v-model="apiKey"
-                type="text"
                 :class="{ 'p-invalid': errors.apiKey }"
+                rows="5"
+                cols="30"
               />
+              <small class="text-color-secondary text-sm font-normal leading-tight">
+                The API Key in base64 used for Elasticsearch authorization.
+              </small>
               <small
                 id="api-key-help"
                 class="p-error"
@@ -637,7 +703,7 @@
 
           <div
             id="splunk"
-            class="flex flex-col gap-3"
+            class="flex flex-col gap-8 max-md:gap-6"
             v-if="endpoint === 'splunk'"
           >
             <div class="flex flex-col sm:max-w-lg w-full gap-2">
@@ -652,6 +718,10 @@
                 placeholder="https://inputs.splunk-client.splunkcloud.com:123456/services/collector"
                 :class="{ 'p-invalid': errors.splunkUrl }"
               />
+              <small class="text-color-secondary text-sm font-normal leading-tight">
+                The URL that will receive the collected data from Data Streaming, if you have an
+                alternative index to point, you can do at the end of the URL.
+              </small>
               <small
                 id="splunk-url-help"
                 class="p-error"
@@ -665,11 +735,15 @@
                 class="text-color text-base font-medium"
                 >API Key *</label
               >
-              <InputText
+              <TextArea
                 v-model="splunkApiKey"
-                type="text"
                 :class="{ 'p-invalid': errors.splunkApiKey }"
+                rows="5"
+                cols="30"
               />
+              <small class="text-color-secondary text-sm font-normal leading-tight">
+                The HTTP Event Collector Token, provided by your Splunk installation.
+              </small>
               <small
                 id="splunk-api-key-help"
                 class="p-error"
@@ -680,7 +754,7 @@
 
           <div
             id="aws_kinesis_firehose"
-            class="flex flex-col gap-3"
+            class="flex flex-col gap-8 max-md:gap-6"
             v-if="endpoint === 'aws_kinesis_firehose'"
           >
             <div class="flex flex-col sm:max-w-lg w-full gap-2">
@@ -694,6 +768,9 @@
                 type="text"
                 :class="{ 'p-invalid': errors.streamName }"
               />
+              <small class="text-color-secondary text-sm font-normal leading-tight">
+                The name of your delivery Kinesis Firehose stream.
+              </small>
               <small
                 id="stream-name-help"
                 class="p-error"
@@ -705,13 +782,16 @@
               <label
                 for="region"
                 class="text-color text-base font-medium"
-                >Region *</label
+                >Country / Region *</label
               >
               <InputText
                 v-model="awsRegion"
                 type="text"
                 :class="{ 'p-invalid': errors.awsRegion }"
               />
+              <small class="text-color-secondary text-sm font-normal leading-tight">
+                The region of your S3 bucket.
+              </small>
               <small
                 id="aws-region-help"
                 class="p-error"
@@ -725,11 +805,18 @@
                 class="text-color text-base font-medium"
                 >Access Key *</label
               >
-              <InputText
+              <PrimePassword
+                id="awsAccessKey"
                 v-model="awsAccessKey"
                 type="text"
+                class="flex flex-col w-full"
                 :class="{ 'p-invalid': errors.awsAccessKey }"
+                :feedback="false"
+                toggleMask
               />
+              <small class="text-color-secondary text-sm font-normal leading-tight">
+                The access key of your Kinesis Firehose stream.
+              </small>
               <small
                 id="aws-access-key-help"
                 class="p-error"
@@ -743,11 +830,18 @@
                 class="text-color text-base font-medium"
                 >Secret Key *</label
               >
-              <InputText
+              <PrimePassword
+                id="awsSecretKey"
                 v-model="awsSecretKey"
                 type="text"
+                class="flex flex-col w-full"
                 :class="{ 'p-invalid': errors.awsSecretKey }"
+                :feedback="false"
+                toggleMask
               />
+              <small class="text-color-secondary text-sm font-normal leading-tight">
+                The secret key of your Kinesis Firehose stream.
+              </small>
               <small
                 id="aws-secret-key-help"
                 class="p-error"
@@ -758,7 +852,7 @@
 
           <div
             id="datadog"
-            class="flex flex-col gap-3"
+            class="flex flex-col gap-8 max-md:gap-6"
             v-if="endpoint === 'datadog'"
           >
             <div class="flex flex-col sm:max-w-lg w-full gap-2">
@@ -773,6 +867,9 @@
                 placeholder="https://http-intake.logs.datadoghq.com/v1/input"
                 :class="{ 'p-invalid': errors.datadogUrl }"
               />
+              <small class="text-color-secondary text-sm font-normal leading-tight">
+                The URI that will receive the collected data from Data Streaming.
+              </small>
               <small
                 id="datadog-url-help"
                 class="p-error"
@@ -786,11 +883,18 @@
                 class="text-color text-base font-medium"
                 >API Key *</label
               >
-              <InputText
+              <TextArea
+                id="datadogApiKey"
                 v-model="datadogApiKey"
-                type="text"
                 :class="{ 'p-invalid': errors.datadogApiKey }"
+                rows="5"
+                cols="30"
               />
+              <small class="text-color-secondary text-sm font-normal leading-tight">
+                API Keys are generated through the Datadog panel and they're unique to your
+                organization. An API Key is required by the Datadog agent to submit metrics and
+                events to Datadog.
+              </small>
               <small
                 id="datadog-api-key-help"
                 class="p-error"
@@ -801,7 +905,7 @@
 
           <div
             id="qradar"
-            class="flex flex-col gap-3"
+            class="flex flex-col gap-8 max-md:gap-6"
             v-if="endpoint === 'qradar'"
           >
             <div class="flex flex-col sm:max-w-lg w-full gap-2">
@@ -816,6 +920,9 @@
                 placeholder="https://qradar-trial-abcdef.qradar.ibmcloud.com:123456"
                 :class="{ 'p-invalid': errors.QRadarUrl }"
               />
+              <small class="text-color-secondary text-sm font-normal leading-tight">
+                The URL that will receive the collected data from Data Streaming.
+              </small>
               <small
                 id="qradar-url-help"
                 class="p-error"
@@ -826,7 +933,7 @@
 
           <div
             id="azure_monitor"
-            class="flex flex-col gap-3"
+            class="flex flex-col gap-8 max-md:gap-6"
             v-if="endpoint === 'azure_monitor'"
           >
             <div class="flex flex-col sm:max-w-lg w-full gap-2">
@@ -836,10 +943,16 @@
                 >Log Type *</label
               >
               <InputText
+                id="logType"
                 v-model="logType"
                 type="text"
                 :class="{ 'p-invalid': errors.logType }"
               />
+              <small class="text-color-secondary text-sm font-normal leading-tight">
+                Specify the record type of the data that's being submitted. It can contain only
+                letters, numbers, and the underscore (_) character, and it can't exceed 100
+                characters.
+              </small>
               <small
                 id="log-type-help"
                 class="p-error"
@@ -853,11 +966,18 @@
                 class="text-color text-base font-medium"
                 >Shared Key *</label
               >
-              <InputText
+              <PrimePassword
+                id="sharedKey"
                 v-model="sharedKey"
                 type="text"
+                class="flex flex-col w-full"
                 :class="{ 'p-invalid': errors.sharedKey }"
+                :feedback="false"
+                toggleMask
               />
+              <small class="text-color-secondary text-sm font-normal leading-tight">
+                The Shared Key of the Workspace.
+              </small>
               <small
                 id="shared-key-help"
                 class="p-error"
@@ -872,9 +992,14 @@
                 >Time Generated Field</label
               >
               <InputText
+                id="timeGeneratedField"
                 v-model="generatedField"
                 type="text"
               />
+              <small class="text-color-secondary text-sm font-normal leading-tight">
+                The field that will be used for the TimeGenerated field. When not specified, It'll
+                use the ingestion time.
+              </small>
             </div>
 
             <div class="flex flex-col sm:max-w-lg w-full gap-2">
@@ -884,10 +1009,14 @@
                 >Workspace ID *</label
               >
               <InputText
+                id="workspaceID"
                 v-model="workspaceID"
                 type="text"
                 :class="{ 'p-invalid': errors.workspaceID }"
               />
+              <small class="text-color-secondary text-sm font-normal leading-tight">
+                The ID of your Workspace.
+              </small>
               <small
                 id="workspace-id-help"
                 class="p-error"
@@ -898,20 +1027,24 @@
 
           <div
             id="azure_blob_storage"
-            class="flex flex-col gap-3"
+            class="flex flex-col gap-8 max-md:gap-6"
             v-if="endpoint === 'azure_blob_storage'"
           >
             <div class="flex flex-col sm:max-w-lg w-full gap-2">
               <label
-                for="storangeAccount"
+                for="storageAccount"
                 class="text-color text-base font-medium"
                 >Storage Account *</label
               >
               <InputText
+                id="storageAccount"
                 v-model="storageAccount"
                 type="text"
                 :class="{ 'p-invalid': errors.storageAccount }"
               />
+              <small class="text-color-secondary text-sm font-normal leading-tight">
+                The storage account of your Azure Blob Storage.
+              </small>
               <small
                 id="storage-account-help"
                 class="p-error"
@@ -926,10 +1059,14 @@
                 >Container Name *</label
               >
               <InputText
+                id="containerName"
                 v-model="containerName"
                 type="text"
                 :class="{ 'p-invalid': errors.containerName }"
               />
+              <small class="text-color-secondary text-sm font-normal leading-tight">
+                The name of your Azure Blob Storage container.
+              </small>
               <small
                 id="container-name-help"
                 class="p-error"
@@ -939,20 +1076,43 @@
 
             <div class="flex flex-col sm:max-w-lg w-full gap-2">
               <label
-                for="containerName"
+                for="blobToken"
                 class="text-color text-base font-medium"
                 >Blob SAS Token *</label
               >
               <InputText
+                id="blobToken"
                 v-model="blobToken"
                 type="text"
                 :class="{ 'p-invalid': errors.blobToken }"
               />
+              <small class="text-color-secondary text-sm font-normal leading-tight">
+                The blob SAS token of your Azure Blob Storage.
+              </small>
               <small
                 id="blob-token-help"
                 class="p-error"
                 >{{ errors.blobToken }}</small
               >
+            </div>
+          </div>
+        </template>
+      </FormHorizontal>
+      <FormHorizontal title="Status">
+        <template #inputs>
+          <div class="flex flex-col w-full gap-2">
+            <div
+              class="flex gap-6 md:align-items-center max-sm:flex-col max-sm:align-items-baseline max-sm:gap-3"
+            >
+              <span class="p-input-icon-right w-full flex max-w-lg items-start gap-2 pb-3 pt-2">
+                <InputSwitch
+                  v-model="status"
+                  id="active"
+                />
+                <div class="flex-col gap-1">
+                  <div class="text-color text-sm font-normal leading-5">Active</div>
+                </div>
+              </span>
             </div>
           </div>
         </template>
@@ -973,12 +1133,13 @@
 
   import Dropdown from 'primevue/dropdown'
   import RadioButton from 'primevue/radiobutton'
+  import PrimePassword from 'primevue/password'
   import PickList from 'primevue/picklist'
   import InputText from 'primevue/inputtext'
+  import InputSwitch from 'primevue/inputswitch'
   import ButtonPrimer from 'primevue/button'
   import InputNumber from 'primevue/inputnumber'
-  import Textarea from 'primevue/textarea'
-  import Card from 'primevue/card'
+  import TextArea from 'primevue/textarea'
 
   const props = defineProps({
     createDataStreamingService: {
@@ -1018,8 +1179,8 @@
     { label: 'Azure Blob Storage', value: 'azure_blob_storage' }
   ])
   const listContentType = ref([
-    { label: 'plain/text', value: 'plain/text' },
-    { label: 'application/gzip', value: 'application/gzip' }
+    { label: 'Plain/text', value: 'plain/text' },
+    { label: 'Application/gzip', value: 'application/gzip' }
   ])
 
   // Schema de Validação
@@ -1030,6 +1191,7 @@
     dataSet: yup.string(),
     domainOption: yup.string().required(),
     endpoint: yup.string().required(),
+    status: yup.boolean(),
 
     // standard
     endpointUrl: yup.string().when('endpoint', {
@@ -1091,6 +1253,10 @@
     objectKey: yup.string().when('endpoint', {
       is: 's3',
       then: (schema) => schema.max(150).required('Object Key prefix is a required field')
+    }),
+    contentType: yup.string().when('endpoint', {
+      is: 's3',
+      then: (schema) => schema.required('Content Type is a required field')
     }),
 
     // google big query
@@ -1195,7 +1361,7 @@
   })
 
   // Form e VeeValidate
-  const { errors, /*defineInputBinds,*/ meta, resetForm, values } = useForm({
+  const { errors, meta, resetForm, values } = useForm({
     validationSchema,
     initialValues: {
       name: '',
@@ -1204,7 +1370,8 @@
       dataSet: '',
       domainOption: '1',
       domains: [],
-      endpoint: '',
+      endpoint: 'standard',
+      status: true,
 
       // standard
       endpointUrl: '',
@@ -1225,7 +1392,7 @@
       accessKey: '',
       secretKey: '',
       objectKey: '',
-      contentType: { label: 'plain/text', value: 'plain/text' },
+      contentType: 'plain/text',
 
       // google big query
       projectID: '',
@@ -1274,6 +1441,7 @@
   const { value: domainOption } = useField('domainOption')
   const { value: domains } = useField('domains')
   const { value: endpoint } = useField('endpoint')
+  const { value: status } = useField('status')
 
   // standard
   const { value: endpointUrl } = useField('endpointUrl')

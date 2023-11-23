@@ -22,6 +22,7 @@ const adapt = async (httpResponse) => {
     template: payload.template_id,
     dataSource: payload.data_source,
     domainOption: payload.all_domains ? '1' : '0',
+    status: payload.active,
     domains,
     endpoint: payload.endpoint.endpoint_type,
     ...getInfoByEndpoint(payload)
