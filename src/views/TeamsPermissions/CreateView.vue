@@ -60,7 +60,9 @@
               </template>
             </PickList>
             <small class="text-xs text-color-secondary font-normal leading-tight">
-              Choose from the available permissions by clicking the permission and the right arrow to move it to the selected permissions. Use the double line arrows to move all permissions.
+              Choose from the available permissions by clicking the permission and the right arrow
+              to move it to the selected permissions. Use the double line arrows to move all
+              permissions.
             </small>
           </div>
 
