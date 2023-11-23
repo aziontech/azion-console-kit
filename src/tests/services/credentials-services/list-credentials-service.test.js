@@ -70,7 +70,7 @@ describe('ListCredentialsServices', () => {
       status: 'Yes',
       description: fixtures.credentialBasic.description,
       lastEditor: fixtures.credentialBasic.last_editor,
-      lastModified: 'Monday, October 9, 2023 at 9:00 PM',
+      lastModified: 'Tuesday, October 10, 2023 at 12:00 AM',
       lastModifiedDate: '2023-10-10T00:00:00Z'
     })
 
@@ -81,7 +81,7 @@ describe('ListCredentialsServices', () => {
       status: 'No',
       description: fixtures.credentialDisabled.description,
       lastEditor: fixtures.credentialDisabled.last_editor,
-      lastModified: 'Tuesday, October 10, 2023 at 9:00 PM',
+      lastModified: 'Wednesday, October 11, 2023 at 12:00 AM',
       lastModifiedDate: '2023-10-11T00:00:00Z'
     })
   })
