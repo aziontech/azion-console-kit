@@ -165,6 +165,7 @@
     :informationForDeletion="informationForDeletion"
     @successfullyDeleted="updatedTable()"
   />
+  <Authorize :authorize="edgeNodeSelected"></Authorize>
 </template>
 
 <script>
@@ -179,6 +180,7 @@
   import { FilterMatchMode } from 'primevue/api'
   import PageHeadingBlock from '@/templates/page-heading-block'
   import DeleteDialog from './dialog/delete-dialog'
+  import Authorize from './dialog/authorize.vue'
   import ContentBlock from '@/templates/content-block'
 
   export default {
@@ -195,7 +197,8 @@
       OverlayPanel,
       PageHeadingBlock,
       DeleteDialog,
-      ContentBlock
+      ContentBlock,
+      Authorize
     },
     data: () => ({
       selectedId: null,
@@ -206,7 +209,8 @@
       showColumnSelector: false,
       data: [],
       selectedColumns: [],
-      informationForDeletion: {}
+      informationForDeletion: {},
+      edgeNodeSelected: null
     }),
     props: {
       columns: {
@@ -307,6 +311,8 @@
           this.isLoading = false
         }
       },
+      async authorizeEdgeNode() {},
+
       navigateToAddPage() {
         this.$router.push(this.createPagePath)
       },
@@ -331,9 +337,11 @@
         this.$forceUpdate()
       },
       authorize() {
-        this.$emit('authorizeEdgeNode', {
-          authorize: { edgeNodeID: this.selectedId, openDialog: true, rerender: Math.random() }
-        })
+        this.edgeNodeSelected = {
+          edgeNodeID: this.selectedId,
+          openDialog: true,
+          rerender: Math.random()
+        }
       }
     },
     watch: {

@@ -9,7 +9,6 @@
         :listService="listEdgeNodeService"
         :columns="getColumns"
         :deleteService="deleteEdgeNodeService"
-        @authorizeEdgeNode="authorizeEdgeNode"
         pageTitleDelete="Edge Node"
         addButtonLabel=""
         editPagePath="edge-node/edit"
@@ -32,7 +31,6 @@
   import Illustration from '@/assets/svg/illustration-layers.vue'
   import ContentBlock from '@/templates/content-block'
   import PageHeadingBlock from '@/templates/page-heading-block'
-  import * as EdgeNodeService from '@/services/edge-node-services'
 
   export default {
     name: 'edge-node-view',
@@ -91,32 +89,6 @@
     methods: {
       handleLoadData(event) {
         this.hasContentToList = event
-      },
-      async authorizeEdgeNode({ authorize }) {
-        try {
-          this.$toast.add({
-            closable: false,
-            severity: 'info',
-            summary: 'Processing request',
-            life: 2000
-          })
-          await EdgeNodeService.authorizeEdgeNodeService(authorize.edgeNodeID)
-        } catch (error) {
-          this.$toast.add({
-            closable: false,
-            severity: 'error',
-            summary: error,
-            life: 10000
-          })
-        } finally {
-          this.$toast.add({
-            closable: false,
-            severity: 'success',
-            summary: 'Edge Nodes authorized successfully!',
-            life: 10000
-          })
-          this.authorizeDialogVisible = false
-        }
       }
     }
   }
