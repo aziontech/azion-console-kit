@@ -67,10 +67,13 @@ describe('ListCredentialsServices', () => {
       id: fixtures.credentialBasic.id,
       name: fixtures.credentialBasic.name,
       token: fixtures.credentialBasic.token,
-      status: 'Yes',
+      status: {
+        content: 'Active',
+        severity: 'success'
+      },
       description: fixtures.credentialBasic.description,
       lastEditor: fixtures.credentialBasic.last_editor,
-      lastModified: 'Monday, October 9, 2023 at 9:00 PM',
+      lastModified: 'segunda-feira, 9 de outubro de 2023 21:00',
       lastModifiedDate: '2023-10-10T00:00:00Z'
     })
 
@@ -78,10 +81,13 @@ describe('ListCredentialsServices', () => {
       id: fixtures.credentialDisabled.id,
       name: fixtures.credentialDisabled.name,
       token: fixtures.credentialDisabled.token,
-      status: 'No',
+      status: {
+        content: 'Inactive',
+        severity: 'danger'
+      },
       description: fixtures.credentialDisabled.description,
       lastEditor: fixtures.credentialDisabled.last_editor,
-      lastModified: 'Tuesday, October 10, 2023 at 9:00 PM',
+      lastModified: 'terça-feira, 10 de outubro de 2023 21:00',
       lastModifiedDate: '2023-10-11T00:00:00Z'
     })
   })

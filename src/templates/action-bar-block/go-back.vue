@@ -8,6 +8,7 @@
     <div class="flex gap-4 self-stretch items-center max-sm:justify-end">
       <PrimeButton
         severity="primary"
+        outlined
         label="Back to list"
         @click="goBack"
       />
