@@ -110,14 +110,14 @@
       required: true
     }
   })
+  const permissionsList = ref(null)
+
   //Validation Schema
   const validationSchema = yup.object({
     name: yup.string().required('Name is a required field'),
     permissions: yup.array().required('Permission is a required field').min(1),
     isActive: yup.boolean()
   })
-
-  const permissionsList = ref(null)
 
   const { errors, meta, resetForm, values } = useForm({
     validationSchema,
@@ -127,14 +127,14 @@
       isActive: true
     }
   })
-
   const { value: name } = useField('name')
   const { value: isActive } = useField('isActive')
   const { value: permissions } = useField('permissions')
 
   const fetchPermissions = async () => {
-    const result = await props.listPermissionService()
-    permissionsList.value = [result, []]
+    const availablePermissions = await props.listPermissionService()
+    const selectedPermissions = []
+    permissionsList.value = [availablePermissions, selectedPermissions]
   }
 
   onMounted(async () => {
