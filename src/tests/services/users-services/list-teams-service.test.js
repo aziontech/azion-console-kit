@@ -58,7 +58,7 @@ describe('UsersServices', () => {
     await sut()
 
     expect(requestSpy).toHaveBeenCalledWith({
-      url: `teams`,
+      url: `iam/teams`,
       method: 'GET'
     })
   })

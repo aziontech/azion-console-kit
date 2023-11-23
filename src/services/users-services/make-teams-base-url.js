@@ -1,3 +1,3 @@
 export const makeTeamsBaseUrl = () => {
-  return `teams`
+  return `iam/teams`
 }
