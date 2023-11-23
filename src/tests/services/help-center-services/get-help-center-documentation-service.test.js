@@ -97,7 +97,7 @@ describe('HelpCenterServices', () => {
     )
   })
 
-  it('should not convert if alredy is html', async () => {
+  it('should not convert when already is html', async () => {
     vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
       statusCode: 200
     })
@@ -116,7 +116,7 @@ describe('HelpCenterServices', () => {
     { statusCode: 404 },
     { statusCode: 500 },
     { statusCode: 'unmappedStatusCode' }
-  ])('should call API for default document in case of $statusCode', async ({ statusCode }) => {
+  ])('should call API for default document on error $statusCode', async ({ statusCode }) => {
     const requestSpy = vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
       statusCode
     })

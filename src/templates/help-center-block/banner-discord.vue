@@ -15,7 +15,7 @@
         Join Discord</a
       >
     </div>
-    <DiscordLogo></DiscordLogo>
+    <DiscordLogo />
   </div>
 </template>
 

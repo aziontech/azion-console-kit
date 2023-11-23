@@ -3,7 +3,6 @@
   import { RouterView, useRoute } from 'vue-router'
   import ShellBlock from '@/templates/shell-block'
   import { useAccountStore } from '@/stores/account'
-  import { themeSelect } from '@/helpers/theme-select'
   import { storeToRefs } from 'pinia'
   import { themeSelect, useCreateBoardManager } from '@/helpers'
 

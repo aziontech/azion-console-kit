@@ -4,7 +4,7 @@
   >
     <!-- Title  -->
     <div class="flex w-full justify-between pl-6 md:pr-8 pr-3 py-3 border-b surface-border">
-      <div class="text-color text-lg font-medium">Help</div>
+      <h3 class="text-color text-lg font-medium">Help</h3>
       <PrimeButton
         icon="pi pi-times"
         outlined
@@ -33,7 +33,7 @@
 
           <!-- List items -->
           <template v-if="!articleContent">
-            <div class="pl-6 mb-2 mt-5 text-sm font-semibold">Recommended articles</div>
+            <p class="pl-6 mb-2 mt-5 text-sm font-semibold">Recommended articles</p>
             <PrimeMenu
               :model="mainContent"
               class="w-full border-0 p-0 m-0 text-sm pl-4 pb-3 pt-2 bg-transparent"
@@ -222,7 +222,7 @@
   import { mapActions, mapState } from 'pinia'
   import { useHelpCenterStore } from '@/stores/help-center'
   import BannerDiscord from './banner-discord.vue'
-  import { getEnvironmentFromUrl } from '@/helpers/get-environment-from-url'
+  import { getEnvironmentFromUrl, openSearchResult } from '@/helpers'
 
   import PrimeMenu from 'primevue/menu'
 
@@ -302,7 +302,7 @@
         this.articleContent = await this.fetchArticleContent(currentPath, parsedFilename)
       },
       getCurrentPath() {
-        return window.location.pathname
+        return this.$route.path
       },
       parseFilename(filename) {
         const article = filename.replaceAll(' ', '-').toLowerCase()
@@ -326,8 +326,7 @@
         window.open(link)
       },
       searchDocumentation() {
-        const url = `https://www.azion.com/en/search-result?q=${this.search}&filter=doc`
-        window.open(url)
+        openSearchResult(this.search)
       }
     },
     computed: {
