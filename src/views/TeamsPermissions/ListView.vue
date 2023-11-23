@@ -59,8 +59,14 @@
           columnBuilder({ data: columnData, columnAppearance: 'expand-column' })
       },
       {
-        field: 'isActive',
-        header: 'Active'
+        field: 'status',
+        header: 'Status',
+        type: 'component',
+        component: (columnData) =>
+          columnBuilder({
+            data: columnData,
+            columnAppearance: 'tag'
+          })
       }
     ]
   })
