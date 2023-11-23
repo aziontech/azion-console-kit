@@ -55,6 +55,7 @@
               class="flex gap-6 md:align-items-center max-sm:flex-col max-sm:align-items-baseline max-sm:gap-3"
             >
               <span class="p-input-icon-right w-full flex max-w-lg flex-col items-start gap-2">
+                <i class="pi pi-lock" />
                 <InputText
                   id="domainName"
                   v-bind="domainName"
@@ -341,7 +342,7 @@
       clipboardWrite: {
         type: Function,
         required: true
-      },
+      }
     },
     data() {
       return {
