@@ -66,11 +66,12 @@ const getConfig = () => {
         //   changeOrigin: true,
         //   rewrite: (path) => path.replace(/^\/api\/edge_node/, '')
         // },
-        '/api/iam': {
-          target: `${URLStartPrefix}manager.azion.com/iam/api`,
-          changeOrigin: true,
-          rewrite: (path) => path.replace(/^\/api\/iam/, '')
-        },
+        // '/api/iam': {
+        //   //target: `${URLStartPrefix}manager.azion.com/iam/api`,
+        //   target: `${URLStartPrefix}api.azion.net/iam`,
+        //   changeOrigin: true,
+        //   rewrite: (path) => path.replace(/^\/api\/iam/, '')
+        // },
         '/api/account-details': {
           target: `${URLStartPrefix}iam.azion.com/iam/api/account`,
           changeOrigin: true,
