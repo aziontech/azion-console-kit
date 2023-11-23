@@ -21,6 +21,7 @@ const adapt = (payload) => {
     data_source: payload.dataSource,
     domain_ids: allDomains ? [] : getDomains(payload.domains[1]),
     all_domains: allDomains ? true : false,
+    active: payload.status,
     endpoint: getEndpoint(payload)
   }
 }
@@ -108,7 +109,7 @@ const getEndpoint = (payload) => {
         blob_sas_token: payload.blobToken
       }
     default:
-      return {}
+      throw new Errors.InvalidDataStreamingEndpointType().message
   }
 }
 
@@ -120,7 +121,7 @@ const getHeaders = (listHeaders) => {
   const headers = {}
   listHeaders.forEach((element) => {
     const header = element.value.split(':')
-    headers[header[0]] = header[1].trim()
+    headers[header[0]] = header[1]?.trim() ?? header[0]
   })
   return headers
 }
