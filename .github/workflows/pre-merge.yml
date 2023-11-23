@@ -25,7 +25,7 @@ jobs:
         run: apk add curl bash
 
       - name: Install dependencies
-        run: yarn ci
+        run: yarn install
 
       - name: Run lint
         run: yarn lint
