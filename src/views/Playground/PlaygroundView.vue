@@ -1,28 +1,42 @@
 
 <template>
-  <div class="p-5">
-    <ScriptRunnerBlock
-      title="Build"
-      :executionId="uuid"
-      :scriptRunnerService="getLogs"></ScriptRunnerBlock>
-      
+  <div class="flex flex-col min-h-[calc(100vh-120px)] pt-5">
+    <TemplateEngineBlock
+      :getTemplateService="getTemplate"
+      :postTemplateService="instantiateTemplate"
+      :templateId="uuid"
+      ref="template"
+    />
+
   </div>
+  
+  
 </template>
   <script>
-    import ScriptRunnerBlock from '@/templates/script-runner-block'
-    import {getLogs} from '@/services/script-runner-service'
+    import TemplateEngineBlock from '@/templates/template-engine-block'
+    import { getTemplate, instantiateTemplate } from '@/services/template-engine-services';
+
     export default {
       name: 'script-runner-test-block',
       components: {
-        ScriptRunnerBlock
+        TemplateEngineBlock,
+
       },
       async created() {
         //
+
       },
       data: () => ({
-        uuid: '34d68c80-5d3e-438b-ba5c-ea1e5bc96849',
-        getLogs
+        uuid: '9cd54b7d-666a-4e45-8097-47ae1fb70014',
+        getTemplate,
+        instantiateTemplate
       }),
+      methods: {
+        submit() {
+          this.$refs.template.validateAndSubmit()
+  
+        }
+      }
     }
   </script>
   

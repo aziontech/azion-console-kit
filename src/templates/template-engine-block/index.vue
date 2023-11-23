@@ -1,9 +1,7 @@
 <template>
-  <div
-    class="flex flex-col min-h-[calc(100vh-120px)]"
-  >
+  <div class="flex flex-col min-h-[calc(100vh-120px)]" v-if="!instantiated">
     <PageHeadingBlock :pageTitle="solution.name" />
-    <div class="px-8 max-md:px-3 flex flex-col lg:flex-row gap-4 lg:items-center">
+    <div class="px-8 max-md:px-3 flex flex-col lg:flex-row gap-4 lg:items-center mb-4">
       <div class="flex flex-col sm:flex-row gap-4 sm:items-center">
         <div class="w-10 h-10 hidden rounded sm:flex justify-center items-center bg-white">
           <img
@@ -45,8 +43,8 @@
       <slot name="form" />
     </form>
     <DialogUnsavedBlock
-      v-if="formMeta"
-      :blockRedirectUnsaved="formMeta.touched"
+      v-if="!instantiated"
+      :blockRedirectUnsaved="blockRedirectUnsaved"
     />
     <PrimeDialog
       v-model:visible="showDetails"
@@ -114,6 +112,7 @@
     <ActionBarTemplate
       @cancel="navigateBack"
       @submit="validateAndSubmit"
+      :submitDisabled="!formMeta.valid || !formMeta.touched"
       :loading="isLoading"
     />
     <!-- :submitDisabled="!formMeta.valid" -->
@@ -137,13 +136,11 @@
     },
     data: () => ({
       showDetails: false,
-      isLoading: false
+      isLoading: false,
+      instantiated: false,
+      feedback: ''
     }),
     props: {
-      cleanFormCallback: {
-        type: Function,
-        default: () => ({})
-      },
       createService: {
         type: Function,
         required: true
@@ -151,6 +148,10 @@
       callback: {
         type: Boolean,
         default: true
+      },
+      cleanFormCallback: {
+        type: Function,
+        default: () => ({})
       },
       disabledFeedback: {
         type: Boolean,
@@ -174,7 +175,7 @@
         this.showDetails = true
       },
       navigateBack(redirectURL) {
-        this.$router.push({ path: redirectURL })
+        this.$router.push(redirectURL)
       },
       showToast(severity, summary, life = 10000) {
         if (!summary) return
@@ -185,16 +186,9 @@
           life: life
         })
       },
-      showFeedback(feedback = 'created successfully') {
-        if (!this.disabledFeedback) {
-          this.showToast('success', feedback)
-        }
-      },
-      handleSuccess(feedback, redirectURL) {
+      handleSuccess(redirectURL) {
         this.cleanFormCallback()
-        this.$emit('on-response', feedback)
-        this.showFeedback(feedback)
-        if (this.callback) this.navigateBack(redirectURL)
+        this.navigateBack(redirectURL)
       },
       async validateAndSubmit() {
         try {
@@ -209,6 +203,7 @@
             })
           }
           payload.forEach((_, index) => {
+            payload[index] = JSON.parse(JSON.stringify(payload[index]))
             const val = payload[index].value.value
             payload[index].field = payload[index].name
             delete payload[index].name
@@ -223,13 +218,19 @@
             delete payload[index].attrs
             payload[index].value = val
           })
-          const data = await this.createService(this.solution.referenceId, payload)
-          this.handleSuccess(data.feedback, data.redirectURL)
+          const response = await this.createService(this.solution.referenceId, payload)
+          this.instantiated = true
+          this.handleSuccess(response.redirectURL)
         } catch (error) {
           this.showToast('error', error)
-        } finally {
+        } finally{
           this.isLoading = false
         }
+      }
+    },
+    computed: {
+      blockRedirectUnsaved() {
+        return this.formMeta.touched && !this.instantiated
       }
     }
   }

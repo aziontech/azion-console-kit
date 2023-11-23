@@ -255,7 +255,8 @@
     },
     methods: {
       redirectToSolution(template) {
-        this.$router.push(`/create/${template.vendor.slug}/${template.slug}`)
+        this.showSidebar = false
+        this.$router.push(`/create/${template.vendor.slug}/${template.slug}`).then(() => {this.$router.go()})
         this.$emit('closeModal')
       },
       onMenuChange(target) {
