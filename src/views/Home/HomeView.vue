@@ -15,7 +15,7 @@
         </div>
         <div>
           <PrimeButton
-          icon="pi pi-plus-circle"
+            icon="pi pi-plus-circle"
             class="w-full sm:w-auto"
             label="Create"
             type="button"
