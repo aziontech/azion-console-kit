@@ -229,7 +229,7 @@
         >
           <div class="text-lg font-medium">API Documentation</div>
           <div class="text-sm text-color-secondary">
-            Use the Azion API to fully interact with Azion products through HTTPS requests.
+            Use the Azion API to interact with Azion products through HTTPS requests.
           </div>
         </button>
         <!-- Contact -->
