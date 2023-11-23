@@ -41,20 +41,26 @@ const getConfig = () => {
         //   changeOrigin: true,
         //   rewrite: (path) => path.replace(/^\/api/, '')
         // },
-        '/api/marketplace': {
-          target: `${URLStartPrefix}manager.azion.com/marketplace/api/`,
-          changeOrigin: true,
-          rewrite: (path) => path.replace(/^\/api\/marketplace/, '')
-        },
         '/graphql/cities': {
           target: `${URLStartPrefix}cities.azion.com/graphql`,
           changeOrigin: true,
           rewrite: (path) => path.replace(/^\/graphql\/cities/, '')
         },
-        '/api/script-runner': {
-          target: `${URLStartPrefix}manager.azion.com/script-runner/api/`,
+        // '/api/marketplace': {
+        //   target: `${URLStartPrefix}manager.azion.com/marketplace/api/`,
+        //   changeOrigin: true,
+        //   rewrite: (path) => path.replace(/^\/api\/marketplace/, '')
+        // },
+        // '/api/script-runner': {
+        //   target: `${URLStartPrefix}manager.azion.com/script-runner/api/`,
+        //   changeOrigin: true,
+        //   rewrite: (path) => path.replace(/^\/api\/script-runner/, '')
+        // },
+        '^/api/(marketplace|script-runner)': {
+          //target: `${URLStartPrefix}manager.azion.com/marketplace/api/`,
+          target: `${URLStartPrefix}manager.azion.com/`,
           changeOrigin: true,
-          rewrite: (path) => path.replace(/^\/api\/script-runner/, '')
+          rewrite: (path) => path.replace(/^\/api\/(marketplace|script-runner)/, '/$1/api')
         },
         '/events/graphql': {
           target: `${URLStartPrefix}api.azion.net`,
