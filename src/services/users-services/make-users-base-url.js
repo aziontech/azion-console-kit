@@ -1,3 +1,3 @@
 export const makeUsersBaseUrl = () => {
-  return `users`
+  return `iam/users`
 }

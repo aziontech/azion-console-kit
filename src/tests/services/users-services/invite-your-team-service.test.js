@@ -29,7 +29,7 @@ describe('UsersServices', () => {
     await sut(fixtures.guest)
 
     expect(requestSpy).toHaveBeenCalledWith({
-      url: `users`,
+      url: `iam/users`,
       method: 'POST',
       body: {
         first_name: 'Jack',

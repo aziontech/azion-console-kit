@@ -21,7 +21,7 @@ describe('UsersServices', () => {
     await sut(userIdMock)
 
     expect(requestSpy).toHaveBeenCalledWith({
-      url: `users/${userIdMock}`,
+      url: `iam/users/${userIdMock}`,
       method: 'DELETE'
     })
   })
