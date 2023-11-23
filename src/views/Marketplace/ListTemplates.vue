@@ -1,6 +1,6 @@
 <template>
   <div class="ml-0 w-full mt-0 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-    <PrimeButton
+    <PrimeButton 
       v-for="template in props.templates"
       :key="template.id"
       class="p-4 text-left border-solid border surface-border hover:border-primary transition-all"

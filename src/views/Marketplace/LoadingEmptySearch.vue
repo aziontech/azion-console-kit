@@ -1,7 +1,7 @@
 <template>
   <div class="ml-0 w-full mt-0 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 relative">
     <div
-      class="h-72 w-full bg-gradient-to-t text-[var(--surface-ground)] from-current absolute z-10 bottom-0 left-0"
+      class="h-72 w-full bg-gradient-to-t text-[var(--surface-section)] from-current absolute z-10 bottom-0 left-0"
     ></div>
     <PrimeButton
       v-for="item of 9"
