@@ -30,7 +30,7 @@ describe('EdgeServicesServices', () => {
 
     expect(requestSpy).toHaveBeenCalledWith({
       method: 'POST',
-      url: `edge-services`,
+      url: `edge_services`,
       body: edgeServiceMock
     })
   })

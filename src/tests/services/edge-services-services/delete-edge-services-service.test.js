@@ -22,7 +22,7 @@ describe('EdgeServicesServices', () => {
 
     expect(requestSpy).toHaveBeenCalledWith({
       method: 'DELETE',
-      url: `edge-services/${mockId}`
+      url: `edge_services/${mockId}`
     })
   })
 
