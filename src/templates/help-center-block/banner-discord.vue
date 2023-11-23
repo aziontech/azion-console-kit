@@ -25,7 +25,7 @@
   export default {
     name: 'BannerDiscord',
     components: {
-      DiscordLogo,
-    },
+      DiscordLogo
+    }
   }
 </script>
