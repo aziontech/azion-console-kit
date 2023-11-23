@@ -1,963 +1,970 @@
 <template>
-  <EditFormBlock
-    pageTitle="Edit Data Streaming"
-    :editService="props.editDataStreamingService"
-    :loadService="props.loadDataStreamingService"
-    :initialDataSetter="setValues"
-    :formData="values"
-    :formMeta="meta"
-  >
-    <template #form>
-      <FormHorizontal title="Data">
-        <template #inputs>
-          <!-- data-source -->
-          <div class="flex flex-col sm:max-w-lg w-full gap-2">
-            <label
-              for="name"
-              class="text-color text-base font-medium"
-              >Name *</label
-            >
-            <InputText
-              v-model="name"
-              type="text"
-              placeholder="Name for Data Streaming"
-              :class="{ 'p-invalid': errors.name }"
-            />
-            <small
-              id="name-help"
-              class="p-error"
-              >{{ errors.name }}</small
-            >
-          </div>
+  <ContentBlock>
+    <template #heading>
+      <PageHeadingBlock pageTitle="Edit Data Streaming"></PageHeadingBlock>
+    </template>
+    <template #content>
+      <EditFormBlock
+        pageTitle="Edit Data Streaming"
+        :editService="props.editDataStreamingService"
+        :loadService="props.loadDataStreamingService"
+        :initialDataSetter="setValues"
+        :formData="values"
+        :formMeta="meta"
+      >
+        <template #form>
+          <FormHorizontal title="Data">
+            <template #inputs>
+              <!-- data-source -->
+              <div class="flex flex-col sm:max-w-lg w-full gap-2">
+                <label
+                  for="name"
+                  class="text-color text-base font-medium"
+                  >Name *</label
+                >
+                <InputText
+                  v-model="name"
+                  type="text"
+                  placeholder="Name for Data Streaming"
+                  :class="{ 'p-invalid': errors.name }"
+                />
+                <small
+                  id="name-help"
+                  class="p-error"
+                  >{{ errors.name }}</small
+                >
+              </div>
 
-          <div class="flex flex-col w-full sm:max-w-xs gap-2">
-            <label
-              for="dataSource"
-              class="text-color text-base font-medium"
-              >Data Source *</label
-            >
-            <Dropdown
-              :class="{ 'p-invalid': errors.dataSource }"
-              v-model="dataSource"
-              :options="listDataSources"
-              optionLabel="label"
-              optionValue="value"
-              class="w-full"
-            />
-          </div>
+              <div class="flex flex-col w-full sm:max-w-xs gap-2">
+                <label
+                  for="dataSource"
+                  class="text-color text-base font-medium"
+                  >Data Source *</label
+                >
+                <Dropdown
+                  :class="{ 'p-invalid': errors.dataSource }"
+                  v-model="dataSource"
+                  :options="listDataSources"
+                  optionLabel="label"
+                  optionValue="value"
+                  class="w-full"
+                />
+              </div>
 
-          <div class="flex flex-col w-full sm:max-w-xs gap-2">
-            <label
-              for="template"
-              class="text-color text-base font-medium"
-              >Template *</label
-            >
-            <Dropdown
-              :class="{ 'p-invalid': errors.template }"
-              v-model="template"
-              :options="listTemplates"
-              optionLabel="label"
-              optionValue="value"
-              class="w-full"
-            />
-          </div>
+              <div class="flex flex-col w-full sm:max-w-xs gap-2">
+                <label
+                  for="template"
+                  class="text-color text-base font-medium"
+                  >Template *</label
+                >
+                <Dropdown
+                  :class="{ 'p-invalid': errors.template }"
+                  v-model="template"
+                  :options="listTemplates"
+                  optionLabel="label"
+                  optionValue="value"
+                  class="w-full"
+                />
+              </div>
 
-          <div class="flex flex-col gap-2">
-            <label
-              for="dataset"
-              class="text-color text-base font-medium"
-              >Data Set</label
-            >
-            <vue-monaco-editor
-              v-model:value="dataSet"
-              language="json"
-              :theme="theme"
-              :options="optionsMonacoEditor"
-              class="min-h-[100px]"
-            />
-          </div>
+              <div class="flex flex-col gap-2">
+                <label
+                  for="dataset"
+                  class="text-color text-base font-medium"
+                  >Data Set</label
+                >
+                <vue-monaco-editor
+                  v-model:value="dataSet"
+                  language="json"
+                  :theme="theme"
+                  :options="optionsMonacoEditor"
+                  class="min-h-[100px]"
+                />
+              </div>
 
-          <!-- domains -->
-          <div class="flex flex-col gap-2">
-            <label class="text-color text-base font-medium">Options</label>
-            <div class="flex flex-col gap-3">
-              <Card
-                :pt="{
-                  body: { class: 'p-4' },
-                  title: { class: 'flex justify-between  text-base m-0 font-medium' },
-                  subtitle: {
-                    class: 'text-sm font-normal text-color-secondary m-0 pr-0 md:pr-[2.5rem]'
-                  }
-                }"
+              <!-- domains -->
+              <div class="flex flex-col gap-2">
+                <label class="text-color text-base font-medium">Options</label>
+                <div class="flex flex-col gap-3">
+                  <Card
+                    :pt="{
+                      body: { class: 'p-4' },
+                      title: { class: 'flex justify-between  text-base m-0 font-medium' },
+                      subtitle: {
+                        class: 'text-sm font-normal text-color-secondary m-0 pr-0 md:pr-[2.5rem]'
+                      }
+                    }"
+                  >
+                    <template #title>
+                      <span class="text-base">Filter Domains</span>
+                      <RadioButton
+                        v-model="domainOption"
+                        inputId="filter-domain"
+                        name="filter domain"
+                        value="0"
+                      />
+                    </template>
+                  </Card>
+
+                  <Card
+                    :pt="{
+                      body: { class: 'p-4' },
+                      title: { class: 'flex justify-between  text-base m-0 font-medium' },
+                      subtitle: {
+                        class: 'text-sm font-normal text-color-secondary m-0 pr-0 md:pr-[2.5rem]'
+                      }
+                    }"
+                  >
+                    <template #title>
+                      <span class="text-base">All Domains</span>
+                      <RadioButton
+                        v-model="domainOption"
+                        inputId="all-domain"
+                        name="all domain"
+                        value="1"
+                      />
+                    </template>
+                  </Card>
+                </div>
+              </div>
+
+              <div
+                v-if="domainOption === '0'"
+                class="flex flex-col gap-2"
               >
-                <template #title>
-                  <span class="text-base">Filter Domains</span>
-                  <RadioButton
-                    v-model="domainOption"
-                    inputId="filter-domain"
-                    name="filter domain"
-                    value="0"
-                  />
-                </template>
-              </Card>
+                <label
+                  for="domains"
+                  class="text-color text-base font-medium"
+                  >Domains</label
+                >
+                <PickList
+                  v-model="domains"
+                  listStyle="height:342px"
+                  dataKey="domainID"
+                  breakpoint="1400px"
+                >
+                  <template #sourceheader>Available Domains</template>
+                  <template #targetheader>Chosen Domains</template>
+                  <template #item="slotProps">
+                    <div class="flex flex-wrap p-2 align-items-center gap-3">
+                      <div class="flex-1 flex flex-column gap-2">
+                        <span class="font-bold">{{ slotProps.item.name }}</span>
+                      </div>
+                    </div>
+                  </template>
+                </PickList>
+              </div>
+            </template>
+          </FormHorizontal>
+          <FormHorizontal title="Destination">
+            <template #inputs>
+              <div class="flex flex-col w-full sm:max-w-xs gap-2">
+                <label
+                  for="id"
+                  class="text-color text-base font-medium"
+                  >Endpoint Type *</label
+                >
+                <Dropdown
+                  :class="{ 'p-invalid': errors.template }"
+                  v-model="endpoint"
+                  :options="listEndpoint"
+                  optionLabel="label"
+                  optionValue="value"
+                  class="w-full"
+                />
+              </div>
 
-              <Card
-                :pt="{
-                  body: { class: 'p-4' },
-                  title: { class: 'flex justify-between  text-base m-0 font-medium' },
-                  subtitle: {
-                    class: 'text-sm font-normal text-color-secondary m-0 pr-0 md:pr-[2.5rem]'
-                  }
-                }"
+              <!-- Specific Sections for Different Endpoints -->
+              <div
+                id="standard"
+                class="flex flex-col gap-3"
+                v-if="endpoint === 'standard'"
               >
-                <template #title>
-                  <span class="text-base">All Domains</span>
-                  <RadioButton
-                    v-model="domainOption"
-                    inputId="all-domain"
-                    name="all domain"
-                    value="1"
+                <div class="flex flex-col sm:max-w-lg w-full gap-2">
+                  <label
+                    for="endpointURL"
+                    class="text-color text-base font-medium"
+                    >Endpoint URL *</label
+                  >
+                  <InputText
+                    v-model="endpointUrl"
+                    type="text"
+                    id="endpointURL"
+                    placeholder="https://app.domain.com/"
+                    :class="{ 'p-invalid': errors.endpointUrl }"
                   />
-                </template>
-              </Card>
-            </div>
-          </div>
 
-          <div
-            v-if="domainOption === '0'"
-            class="flex flex-col gap-2"
-          >
-            <label
-              for="domains"
-              class="text-color text-base font-medium"
-              >Domains</label
-            >
-            <PickList
-              v-model="domains"
-              listStyle="height:342px"
-              dataKey="domainID"
-              breakpoint="1400px"
-            >
-              <template #sourceheader>Available Domains</template>
-              <template #targetheader>Chosen Domains</template>
-              <template #item="slotProps">
-                <div class="flex flex-wrap p-2 align-items-center gap-3">
-                  <div class="flex-1 flex flex-column gap-2">
-                    <span class="font-bold">{{ slotProps.item.name }}</span>
+                  <small
+                    id="endpoint-url-help"
+                    class="p-error"
+                    >{{ errors.endpointUrl }}</small
+                  >
+                </div>
+
+                <div class="flex flex-col sm:max-w-lg w-full gap-2">
+                  <label
+                    for="customHeaders"
+                    class="text-color text-base font-medium"
+                    >Custom Headers</label
+                  >
+                  <div
+                    class="p-inputgroup flex-1"
+                    v-for="(header, index) in headers"
+                    :key="index"
+                  >
+                    <InputText
+                      v-model="header.value"
+                      type="text"
+                      id="header-value"
+                      placeholder="header-name: value"
+                    />
+                    <ButtonPrimer
+                      icon="pi pi-times"
+                      severity="danger"
+                      v-if="header.deleted"
+                      @click="removeHeader(index)"
+                    />
+                  </div>
+
+                  <ButtonPrimer
+                    label="Header"
+                    @click="addHeader()"
+                  />
+                </div>
+
+                <h1 class="text-xl font-medium">Payload</h1>
+
+                <div class="flex flex-col sm:max-w-lg w-full gap-2">
+                  <label
+                    for="maxSize"
+                    class="text-color text-base font-medium"
+                    >Max Size *</label
+                  >
+                  <InputNumber
+                    v-model="maxSize"
+                    placeholder="1000000"
+                    :useGrouping="false"
+                    :class="{ 'p-invalid': errors.maxSize }"
+                  />
+                  <small
+                    id="max-size-help"
+                    class="p-error"
+                    >{{ errors.maxSize }}</small
+                  >
+                </div>
+
+                <div class="flex flex-col sm:max-w-lg w-full gap-2">
+                  <label
+                    for="lineSeparator"
+                    class="text-color text-base font-medium"
+                    >Log Line Separator *</label
+                  >
+                  <InputText
+                    v-model="lineSeparator"
+                    type="text"
+                    placeholder="\n"
+                    :class="{ 'p-invalid': errors.lineSeparator }"
+                  />
+                  <small
+                    id="max-size-help"
+                    class="p-error"
+                    >{{ errors.lineSeparator }}</small
+                  >
+                </div>
+
+                <div class="flex flex-col sm:max-w-lg w-full gap-2">
+                  <label
+                    for="payloadFormat"
+                    class="text-color text-base font-medium"
+                    >Payload Format *</label
+                  >
+                  <InputText
+                    v-model="payloadFormat"
+                    type="text"
+                    placeholder="$dataset"
+                    :class="{ 'p-invalid': errors.payloadFormat }"
+                  />
+                  <small
+                    id="data-set-help"
+                    class="p-error"
+                    >{{ errors.payloadFormat }}</small
+                  >
+                </div>
+              </div>
+
+              <div
+                id="kafka"
+                class="flex flex-col gap-3"
+                v-if="endpoint === 'kafka'"
+              >
+                <div class="flex flex-col sm:max-w-lg w-full gap-2">
+                  <label
+                    for="bootstrapSevers"
+                    class="text-color text-base font-medium"
+                    >Bootstrap Servers *</label
+                  >
+                  <InputText
+                    v-model="bootstrapServers"
+                    type="text"
+                    placeholder="host1:port1,host2:port2,..."
+                    :class="{ 'p-invalid': errors.bootstrapServers }"
+                  />
+                  <small
+                    id="bootstrap-servers-help"
+                    class="p-error"
+                    >{{ errors.bootstrapServers }}</small
+                  >
+                </div>
+
+                <div class="flex flex-col sm:max-w-lg w-full gap-2">
+                  <label
+                    for="kafkaTopic"
+                    class="text-color text-base font-medium"
+                    >Kafka Topic *</label
+                  >
+                  <InputText
+                    v-model="kafkaTopic"
+                    type="text"
+                    :class="{ 'p-invalid': errors.kafkaTopic }"
+                  />
+                  <small
+                    id="kafka-topic-help"
+                    class="p-error"
+                    >{{ errors.kafkaTopic }}</small
+                  >
+                </div>
+
+                <div class="flex flex-col gap-2">
+                  <label class="text-color text-base font-medium"
+                    >Use Transport Layer Security (TLS)</label
+                  >
+                  <div class="flex flex-col gap-3">
+                    <Card
+                      :pt="{
+                        body: { class: 'p-4' },
+                        title: { class: 'flex justify-between  text-base m-0 font-medium' },
+                        subtitle: {
+                          class: 'text-sm font-normal text-color-secondary m-0 pr-0 md:pr-[2.5rem]'
+                        }
+                      }"
+                    >
+                      <template #title>
+                        <span class="text-base">No</span>
+                        <RadioButton
+                          v-model="tlsOption"
+                          inputId="no"
+                          name="No"
+                          :value="false"
+                        />
+                      </template>
+                    </Card>
+
+                    <Card
+                      :pt="{
+                        body: { class: 'p-4' },
+                        title: { class: 'flex justify-between  text-base m-0 font-medium' },
+                        subtitle: {
+                          class: 'text-sm font-normal text-color-secondary m-0 pr-0 md:pr-[2.5rem]'
+                        }
+                      }"
+                    >
+                      <template #title>
+                        <span class="text-base">Yes</span>
+                        <RadioButton
+                          v-model="tlsOption"
+                          inputId="yes"
+                          name="Yes"
+                          :value="true"
+                        />
+                      </template>
+                    </Card>
                   </div>
                 </div>
-              </template>
-            </PickList>
-          </div>
-        </template>
-      </FormHorizontal>
-      <FormHorizontal title="Destination">
-        <template #inputs>
-          <div class="flex flex-col w-full sm:max-w-xs gap-2">
-            <label
-              for="id"
-              class="text-color text-base font-medium"
-              >Endpoint Type *</label
-            >
-            <Dropdown
-              :class="{ 'p-invalid': errors.template }"
-              v-model="endpoint"
-              :options="listEndpoint"
-              optionLabel="label"
-              optionValue="value"
-              class="w-full"
-            />
-          </div>
+              </div>
 
-          <!-- Specific Sections for Different Endpoints -->
-          <div
-            id="standard"
-            class="flex flex-col gap-3"
-            v-if="endpoint === 'standard'"
-          >
-            <div class="flex flex-col sm:max-w-lg w-full gap-2">
-              <label
-                for="endpointURL"
-                class="text-color text-base font-medium"
-                >Endpoint URL *</label
-              >
-              <InputText
-                v-model="endpointUrl"
-                type="text"
-                id="endpointURL"
-                placeholder="https://app.domain.com/"
-                :class="{ 'p-invalid': errors.endpointUrl }"
-              />
-
-              <small
-                id="endpoint-url-help"
-                class="p-error"
-                >{{ errors.endpointUrl }}</small
-              >
-            </div>
-
-            <div class="flex flex-col sm:max-w-lg w-full gap-2">
-              <label
-                for="customHeaders"
-                class="text-color text-base font-medium"
-                >Custom Headers</label
-              >
               <div
-                class="p-inputgroup flex-1"
-                v-for="(header, index) in headers"
-                :key="index"
+                id="s3"
+                class="flex flex-col gap-3"
+                v-if="endpoint === 's3'"
               >
-                <InputText
-                  v-model="header.value"
-                  type="text"
-                  id="header-value"
-                  placeholder="header-name: value"
-                />
-                <ButtonPrimer
-                  icon="pi pi-times"
-                  severity="danger"
-                  v-if="header.deleted"
-                  @click="removeHeader(index)"
-                />
+                <div class="flex flex-col sm:max-w-lg w-full gap-2">
+                  <label
+                    for="hostURL"
+                    class="text-color text-base font-medium"
+                    >Host URL *</label
+                  >
+                  <InputText
+                    v-model="host"
+                    type="text"
+                    :class="{ 'p-invalid': errors.host }"
+                  />
+                  <small
+                    id="host-help"
+                    class="p-error"
+                    >{{ errors.host }}</small
+                  >
+                </div>
+
+                <div class="flex flex-col sm:max-w-lg w-full gap-2">
+                  <label
+                    for="bucketName"
+                    class="text-color text-base font-medium"
+                    >Bucket Name *</label
+                  >
+                  <InputText
+                    v-model="bucket"
+                    type="text"
+                    :class="{ 'p-invalid': errors.bucket }"
+                  />
+                  <small
+                    id="bucket-help"
+                    class="p-error"
+                    >{{ errors.bucket }}</small
+                  >
+                </div>
+
+                <div class="flex flex-col sm:max-w-lg w-full gap-2">
+                  <label
+                    for="region"
+                    class="text-color text-base font-medium"
+                    >Region *</label
+                  >
+                  <InputText
+                    v-model="region"
+                    type="text"
+                    :class="{ 'p-invalid': errors.region }"
+                  />
+                  <small
+                    id="region-help"
+                    class="p-error"
+                    >{{ errors.region }}</small
+                  >
+                </div>
+
+                <div class="flex flex-col sm:max-w-lg w-full gap-2">
+                  <label
+                    for="accessKey"
+                    class="text-color text-base font-medium"
+                    >Access Key *</label
+                  >
+                  <InputText
+                    v-model="accessKey"
+                    type="text"
+                    :class="{ 'p-invalid': errors.accessKey }"
+                  />
+                  <small
+                    id="access-key-help"
+                    class="p-error"
+                    >{{ errors.accessKey }}</small
+                  >
+                </div>
+
+                <div class="flex flex-col sm:max-w-lg w-full gap-2">
+                  <label
+                    for="secretKey"
+                    class="text-color text-base font-medium"
+                    >Secret Key *</label
+                  >
+                  <InputText
+                    v-model="secretKey"
+                    type="text"
+                    :class="{ 'p-invalid': errors.secretKey }"
+                  />
+                  <small
+                    id="secret-key-help"
+                    class="p-error"
+                    >{{ errors.secretKey }}</small
+                  >
+                </div>
+
+                <div class="flex flex-col sm:max-w-lg w-full gap-2">
+                  <label
+                    for="objectKeyPrefix"
+                    class="text-color text-base font-medium"
+                    >Object Key Prefix *</label
+                  >
+                  <InputText
+                    v-model="objectKey"
+                    type="text"
+                    :class="{ 'p-invalid': errors.objectKey }"
+                  />
+                  <small
+                    id="object-key-help"
+                    class="p-error"
+                    >{{ errors.objectKey }}</small
+                  >
+                </div>
+
+                <div class="flex flex-col w-full sm:max-w-xs gap-2">
+                  <label
+                    for="contentType"
+                    class="text-color text-base font-medium"
+                    >Content Type *</label
+                  >
+                  <Dropdown
+                    :class="{ 'p-invalid': errors.contentType }"
+                    v-model="contentType"
+                    :options="listContentType"
+                    optionLabel="label"
+                    optionValue="value"
+                    class="w-full"
+                  />
+                  <small
+                    id="content-type"
+                    class="p-error"
+                    >{{ errors.contentType }}</small
+                  >
+                </div>
               </div>
 
-              <ButtonPrimer
-                label="Header"
-                @click="addHeader()"
-              />
-            </div>
+              <div
+                id="big_query"
+                class="flex flex-col gap-3"
+                v-if="endpoint === 'big_query'"
+              >
+                <div class="flex flex-col sm:max-w-lg w-full gap-2">
+                  <label
+                    for="projectID"
+                    class="text-color text-base font-medium"
+                    >Project ID *</label
+                  >
+                  <InputText
+                    v-model="projectID"
+                    type="text"
+                    :class="{ 'p-invalid': errors.projectID }"
+                  />
+                  <small
+                    id="project-id-help"
+                    class="p-error"
+                    >{{ errors.projectID }}</small
+                  >
+                </div>
 
-            <h1 class="text-xl font-medium">Payload</h1>
+                <div class="flex flex-col sm:max-w-lg w-full gap-2">
+                  <label
+                    for="datasetID"
+                    class="text-color text-base font-medium"
+                    >Dataset ID *</label
+                  >
+                  <InputText
+                    v-model="datasetID"
+                    type="text"
+                    :class="{ 'p-invalid': errors.datasetID }"
+                  />
+                  <small
+                    id="dataset-id-help"
+                    class="p-error"
+                    >{{ errors.datasetID }}</small
+                  >
+                </div>
 
-            <div class="flex flex-col sm:max-w-lg w-full gap-2">
-              <label
-                for="maxSize"
-                class="text-color text-base font-medium"
-                >Max Size *</label
-              >
-              <InputNumber
-                v-model="maxSize"
-                placeholder="1000000"
-                :useGrouping="false"
-                :class="{ 'p-invalid': errors.maxSize }"
-              />
-              <small
-                id="max-size-help"
-                class="p-error"
-                >{{ errors.maxSize }}</small
-              >
-            </div>
+                <div class="flex flex-col sm:max-w-lg w-full gap-2">
+                  <label
+                    for="tableID"
+                    class="text-color text-base font-medium"
+                    >Table ID *</label
+                  >
+                  <InputText
+                    v-model="tableID"
+                    type="text"
+                    :class="{ 'p-invalid': errors.tableID }"
+                  />
+                  <small
+                    id="table-id-help"
+                    class="p-error"
+                    >{{ errors.tableID }}</small
+                  >
+                </div>
 
-            <div class="flex flex-col sm:max-w-lg w-full gap-2">
-              <label
-                for="lineSeparator"
-                class="text-color text-base font-medium"
-                >Log Line Separator *</label
-              >
-              <InputText
-                v-model="lineSeparator"
-                type="text"
-                placeholder="\n"
-                :class="{ 'p-invalid': errors.lineSeparator }"
-              />
-              <small
-                id="max-size-help"
-                class="p-error"
-                >{{ errors.lineSeparator }}</small
-              >
-            </div>
-
-            <div class="flex flex-col sm:max-w-lg w-full gap-2">
-              <label
-                for="payloadFormat"
-                class="text-color text-base font-medium"
-                >Payload Format *</label
-              >
-              <InputText
-                v-model="payloadFormat"
-                type="text"
-                placeholder="$dataset"
-                :class="{ 'p-invalid': errors.payloadFormat }"
-              />
-              <small
-                id="data-set-help"
-                class="p-error"
-                >{{ errors.payloadFormat }}</small
-              >
-            </div>
-          </div>
-
-          <div
-            id="kafka"
-            class="flex flex-col gap-3"
-            v-if="endpoint === 'kafka'"
-          >
-            <div class="flex flex-col sm:max-w-lg w-full gap-2">
-              <label
-                for="bootstrapSevers"
-                class="text-color text-base font-medium"
-                >Bootstrap Servers *</label
-              >
-              <InputText
-                v-model="bootstrapServers"
-                type="text"
-                placeholder="host1:port1,host2:port2,..."
-                :class="{ 'p-invalid': errors.bootstrapServers }"
-              />
-              <small
-                id="bootstrap-servers-help"
-                class="p-error"
-                >{{ errors.bootstrapServers }}</small
-              >
-            </div>
-
-            <div class="flex flex-col sm:max-w-lg w-full gap-2">
-              <label
-                for="kafkaTopic"
-                class="text-color text-base font-medium"
-                >Kafka Topic *</label
-              >
-              <InputText
-                v-model="kafkaTopic"
-                type="text"
-                :class="{ 'p-invalid': errors.kafkaTopic }"
-              />
-              <small
-                id="kafka-topic-help"
-                class="p-error"
-                >{{ errors.kafkaTopic }}</small
-              >
-            </div>
-
-            <div class="flex flex-col gap-2">
-              <label class="text-color text-base font-medium"
-                >Use Transport Layer Security (TLS)</label
-              >
-              <div class="flex flex-col gap-3">
-                <Card
-                  :pt="{
-                    body: { class: 'p-4' },
-                    title: { class: 'flex justify-between  text-base m-0 font-medium' },
-                    subtitle: {
-                      class: 'text-sm font-normal text-color-secondary m-0 pr-0 md:pr-[2.5rem]'
-                    }
-                  }"
-                >
-                  <template #title>
-                    <span class="text-base">No</span>
-                    <RadioButton
-                      v-model="tlsOption"
-                      inputId="no"
-                      name="No"
-                      :value="false"
-                    />
-                  </template>
-                </Card>
-
-                <Card
-                  :pt="{
-                    body: { class: 'p-4' },
-                    title: { class: 'flex justify-between  text-base m-0 font-medium' },
-                    subtitle: {
-                      class: 'text-sm font-normal text-color-secondary m-0 pr-0 md:pr-[2.5rem]'
-                    }
-                  }"
-                >
-                  <template #title>
-                    <span class="text-base">Yes</span>
-                    <RadioButton
-                      v-model="tlsOption"
-                      inputId="yes"
-                      name="Yes"
-                      :value="true"
-                    />
-                  </template>
-                </Card>
+                <div class="flex flex-col sm:max-w-lg w-full gap-2">
+                  <label
+                    for="serviceAccountKey"
+                    class="text-color text-base font-medium"
+                    >Service Account Key *</label
+                  >
+                  <Textarea
+                    v-model="serviceAccountKey"
+                    :class="{ 'p-invalid': errors.serviceAccountKey }"
+                    rows="5"
+                    cols="30"
+                  />
+                  <small
+                    id="service-account-key-help"
+                    class="p-error"
+                    >{{ errors.serviceAccountKey }}</small
+                  >
+                </div>
               </div>
-            </div>
-          </div>
 
-          <div
-            id="s3"
-            class="flex flex-col gap-3"
-            v-if="endpoint === 's3'"
-          >
-            <div class="flex flex-col sm:max-w-lg w-full gap-2">
-              <label
-                for="hostURL"
-                class="text-color text-base font-medium"
-                >Host URL *</label
+              <div
+                id="elasticsearch"
+                class="flex flex-col gap-3"
+                v-if="endpoint === 'elasticsearch'"
               >
-              <InputText
-                v-model="host"
-                type="text"
-                :class="{ 'p-invalid': errors.host }"
-              />
-              <small
-                id="host-help"
-                class="p-error"
-                >{{ errors.host }}</small
-              >
-            </div>
+                <div class="flex flex-col sm:max-w-lg w-full gap-2">
+                  <label
+                    for="elasticSearchURL"
+                    class="text-color text-base font-medium"
+                    >Elasticsearch URL *</label
+                  >
+                  <InputText
+                    v-model="elasticsearchUrl"
+                    type="text"
+                    placeholder="https://elasticsearch-domain.com/index"
+                    :class="{ 'p-invalid': errors.elasticsearchUrl }"
+                  />
+                  <small
+                    id="elastic-search-url-help"
+                    class="p-error"
+                    >{{ errors.elasticsearchUrl }}</small
+                  >
+                </div>
 
-            <div class="flex flex-col sm:max-w-lg w-full gap-2">
-              <label
-                for="bucketName"
-                class="text-color text-base font-medium"
-                >Bucket Name *</label
-              >
-              <InputText
-                v-model="bucket"
-                type="text"
-                :class="{ 'p-invalid': errors.bucket }"
-              />
-              <small
-                id="bucket-help"
-                class="p-error"
-                >{{ errors.bucket }}</small
-              >
-            </div>
+                <div class="flex flex-col sm:max-w-lg w-full gap-2">
+                  <label
+                    for="apiKey"
+                    class="text-color text-base font-medium"
+                    >API Key *</label
+                  >
+                  <InputText
+                    v-model="apiKey"
+                    type="text"
+                    :class="{ 'p-invalid': errors.apiKey }"
+                  />
+                  <small
+                    id="api-key-help"
+                    class="p-error"
+                    >{{ errors.apiKey }}</small
+                  >
+                </div>
+              </div>
 
-            <div class="flex flex-col sm:max-w-lg w-full gap-2">
-              <label
-                for="region"
-                class="text-color text-base font-medium"
-                >Region *</label
+              <div
+                id="splunk"
+                class="flex flex-col gap-3"
+                v-if="endpoint === 'splunk'"
               >
-              <InputText
-                v-model="region"
-                type="text"
-                :class="{ 'p-invalid': errors.region }"
-              />
-              <small
-                id="region-help"
-                class="p-error"
-                >{{ errors.region }}</small
-              >
-            </div>
+                <div class="flex flex-col sm:max-w-lg w-full gap-2">
+                  <label
+                    for="splunkURL"
+                    class="text-color text-base font-medium"
+                    >Splunk URL *</label
+                  >
+                  <InputText
+                    v-model="splunkUrl"
+                    type="text"
+                    placeholder="https://inputs.splunk-client.splunkcloud.com:123456/services/collector"
+                    :class="{ 'p-invalid': errors.splunkUrl }"
+                  />
+                  <small
+                    id="splunk-url-help"
+                    class="p-error"
+                    >{{ errors.splunkUrl }}</small
+                  >
+                </div>
 
-            <div class="flex flex-col sm:max-w-lg w-full gap-2">
-              <label
-                for="accessKey"
-                class="text-color text-base font-medium"
-                >Access Key *</label
-              >
-              <InputText
-                v-model="accessKey"
-                type="text"
-                :class="{ 'p-invalid': errors.accessKey }"
-              />
-              <small
-                id="access-key-help"
-                class="p-error"
-                >{{ errors.accessKey }}</small
-              >
-            </div>
+                <div class="flex flex-col sm:max-w-lg w-full gap-2">
+                  <label
+                    for="splunkApiKey"
+                    class="text-color text-base font-medium"
+                    >API Key *</label
+                  >
+                  <InputText
+                    v-model="splunkApiKey"
+                    type="text"
+                    :class="{ 'p-invalid': errors.splunkApiKey }"
+                  />
+                  <small
+                    id="splunk-api-key-help"
+                    class="p-error"
+                    >{{ errors.splunkApiKey }}</small
+                  >
+                </div>
+              </div>
 
-            <div class="flex flex-col sm:max-w-lg w-full gap-2">
-              <label
-                for="secretKey"
-                class="text-color text-base font-medium"
-                >Secret Key *</label
+              <div
+                id="aws_kinesis_firehose"
+                class="flex flex-col gap-3"
+                v-if="endpoint === 'aws_kinesis_firehose'"
               >
-              <InputText
-                v-model="secretKey"
-                type="text"
-                :class="{ 'p-invalid': errors.secretKey }"
-              />
-              <small
-                id="secret-key-help"
-                class="p-error"
-                >{{ errors.secretKey }}</small
-              >
-            </div>
+                <div class="flex flex-col sm:max-w-lg w-full gap-2">
+                  <label
+                    for="streamName"
+                    class="text-color text-base font-medium"
+                    >Stream Name *</label
+                  >
+                  <InputText
+                    v-model="streamName"
+                    type="text"
+                    :class="{ 'p-invalid': errors.streamName }"
+                  />
+                  <small
+                    id="stream-name-help"
+                    class="p-error"
+                    >{{ errors.streamName }}</small
+                  >
+                </div>
 
-            <div class="flex flex-col sm:max-w-lg w-full gap-2">
-              <label
-                for="objectKeyPrefix"
-                class="text-color text-base font-medium"
-                >Object Key Prefix *</label
-              >
-              <InputText
-                v-model="objectKey"
-                type="text"
-                :class="{ 'p-invalid': errors.objectKey }"
-              />
-              <small
-                id="object-key-help"
-                class="p-error"
-                >{{ errors.objectKey }}</small
-              >
-            </div>
+                <div class="flex flex-col sm:max-w-lg w-full gap-2">
+                  <label
+                    for="region"
+                    class="text-color text-base font-medium"
+                    >Region *</label
+                  >
+                  <InputText
+                    v-model="awsRegion"
+                    type="text"
+                    :class="{ 'p-invalid': errors.awsRegion }"
+                  />
+                  <small
+                    id="aws-region-help"
+                    class="p-error"
+                    >{{ errors.awsRegion }}</small
+                  >
+                </div>
 
-            <div class="flex flex-col w-full sm:max-w-xs gap-2">
-              <label
-                for="contentType"
-                class="text-color text-base font-medium"
-                >Content Type *</label
-              >
-              <Dropdown
-                :class="{ 'p-invalid': errors.contentType }"
-                v-model="contentType"
-                :options="listContentType"
-                optionLabel="label"
-                optionValue="value"
-                class="w-full"
-              />
-              <small
-                id="content-type"
-                class="p-error"
-                >{{ errors.contentType }}</small
-              >
-            </div>
-          </div>
+                <div class="flex flex-col sm:max-w-lg w-full gap-2">
+                  <label
+                    for="accessKey"
+                    class="text-color text-base font-medium"
+                    >Access Key *</label
+                  >
+                  <InputText
+                    v-model="awsAccessKey"
+                    type="text"
+                    :class="{ 'p-invalid': errors.awsAccessKey }"
+                  />
+                  <small
+                    id="aws-access-key-help"
+                    class="p-error"
+                    >{{ errors.awsAccessKey }}</small
+                  >
+                </div>
 
-          <div
-            id="big_query"
-            class="flex flex-col gap-3"
-            v-if="endpoint === 'big_query'"
-          >
-            <div class="flex flex-col sm:max-w-lg w-full gap-2">
-              <label
-                for="projectID"
-                class="text-color text-base font-medium"
-                >Project ID *</label
-              >
-              <InputText
-                v-model="projectID"
-                type="text"
-                :class="{ 'p-invalid': errors.projectID }"
-              />
-              <small
-                id="project-id-help"
-                class="p-error"
-                >{{ errors.projectID }}</small
-              >
-            </div>
+                <div class="flex flex-col sm:max-w-lg w-full gap-2">
+                  <label
+                    for="accessKey"
+                    class="text-color text-base font-medium"
+                    >Secret Key *</label
+                  >
+                  <InputText
+                    v-model="awsSecretKey"
+                    type="text"
+                    :class="{ 'p-invalid': errors.awsSecretKey }"
+                  />
+                  <small
+                    id="aws-secret-key-help"
+                    class="p-error"
+                    >{{ errors.awsSecretKey }}</small
+                  >
+                </div>
+              </div>
 
-            <div class="flex flex-col sm:max-w-lg w-full gap-2">
-              <label
-                for="datasetID"
-                class="text-color text-base font-medium"
-                >Dataset ID *</label
+              <div
+                id="datadog"
+                class="flex flex-col gap-3"
+                v-if="endpoint === 'datadog'"
               >
-              <InputText
-                v-model="datasetID"
-                type="text"
-                :class="{ 'p-invalid': errors.datasetID }"
-              />
-              <small
-                id="dataset-id-help"
-                class="p-error"
-                >{{ errors.datasetID }}</small
-              >
-            </div>
+                <div class="flex flex-col sm:max-w-lg w-full gap-2">
+                  <label
+                    for="datadogURL"
+                    class="text-color text-base font-medium"
+                    >Datadog URL *</label
+                  >
+                  <InputText
+                    v-model="datadogUrl"
+                    type="text"
+                    placeholder="https://http-intake.logs.datadoghq.com/v1/input"
+                    :class="{ 'p-invalid': errors.datadogUrl }"
+                  />
+                  <small
+                    id="datadog-url-help"
+                    class="p-error"
+                    >{{ errors.datadogUrl }}</small
+                  >
+                </div>
 
-            <div class="flex flex-col sm:max-w-lg w-full gap-2">
-              <label
-                for="tableID"
-                class="text-color text-base font-medium"
-                >Table ID *</label
-              >
-              <InputText
-                v-model="tableID"
-                type="text"
-                :class="{ 'p-invalid': errors.tableID }"
-              />
-              <small
-                id="table-id-help"
-                class="p-error"
-                >{{ errors.tableID }}</small
-              >
-            </div>
+                <div class="flex flex-col sm:max-w-lg w-full gap-2">
+                  <label
+                    for="apiKey"
+                    class="text-color text-base font-medium"
+                    >API Key *</label
+                  >
+                  <InputText
+                    v-model="datadogApiKey"
+                    type="text"
+                    :class="{ 'p-invalid': errors.datadogApiKey }"
+                  />
+                  <small
+                    id="datadog-api-key-help"
+                    class="p-error"
+                    >{{ errors.datadogApiKey }}</small
+                  >
+                </div>
+              </div>
 
-            <div class="flex flex-col sm:max-w-lg w-full gap-2">
-              <label
-                for="serviceAccountKey"
-                class="text-color text-base font-medium"
-                >Service Account Key *</label
+              <div
+                id="qradar"
+                class="flex flex-col gap-3"
+                v-if="endpoint === 'qradar'"
               >
-              <Textarea
-                v-model="serviceAccountKey"
-                :class="{ 'p-invalid': errors.serviceAccountKey }"
-                rows="5"
-                cols="30"
-              />
-              <small
-                id="service-account-key-help"
-                class="p-error"
-                >{{ errors.serviceAccountKey }}</small
-              >
-            </div>
-          </div>
+                <div class="flex flex-col sm:max-w-lg w-full gap-2">
+                  <label
+                    for="QRadarURL"
+                    class="text-color text-base font-medium"
+                    >QRadar URL *</label
+                  >
+                  <InputText
+                    v-model="QRadarUrl"
+                    type="text"
+                    placeholder="https://qradar-trial-abcdef.qradar.ibmcloud.com:123456"
+                    :class="{ 'p-invalid': errors.QRadarUrl }"
+                  />
+                  <small
+                    id="qradar-url-help"
+                    class="p-error"
+                    >{{ errors.QRadarUrl }}</small
+                  >
+                </div>
+              </div>
 
-          <div
-            id="elasticsearch"
-            class="flex flex-col gap-3"
-            v-if="endpoint === 'elasticsearch'"
-          >
-            <div class="flex flex-col sm:max-w-lg w-full gap-2">
-              <label
-                for="elasticSearchURL"
-                class="text-color text-base font-medium"
-                >Elasticsearch URL *</label
+              <div
+                id="azure_monitor"
+                class="flex flex-col gap-3"
+                v-if="endpoint === 'azure_monitor'"
               >
-              <InputText
-                v-model="elasticsearchUrl"
-                type="text"
-                placeholder="https://elasticsearch-domain.com/index"
-                :class="{ 'p-invalid': errors.elasticsearchUrl }"
-              />
-              <small
-                id="elastic-search-url-help"
-                class="p-error"
-                >{{ errors.elasticsearchUrl }}</small
-              >
-            </div>
+                <div class="flex flex-col sm:max-w-lg w-full gap-2">
+                  <label
+                    for="logType"
+                    class="text-color text-base font-medium"
+                    >Log Type *</label
+                  >
+                  <InputText
+                    v-model="logType"
+                    type="text"
+                    :class="{ 'p-invalid': errors.logType }"
+                  />
+                  <small
+                    id="log-type-help"
+                    class="p-error"
+                    >{{ errors.logType }}</small
+                  >
+                </div>
 
-            <div class="flex flex-col sm:max-w-lg w-full gap-2">
-              <label
-                for="apiKey"
-                class="text-color text-base font-medium"
-                >API Key *</label
-              >
-              <InputText
-                v-model="apiKey"
-                type="text"
-                :class="{ 'p-invalid': errors.apiKey }"
-              />
-              <small
-                id="api-key-help"
-                class="p-error"
-                >{{ errors.apiKey }}</small
-              >
-            </div>
-          </div>
+                <div class="flex flex-col sm:max-w-lg w-full gap-2">
+                  <label
+                    for="sharedKey"
+                    class="text-color text-base font-medium"
+                    >Shared Key *</label
+                  >
+                  <InputText
+                    v-model="sharedKey"
+                    type="text"
+                    :class="{ 'p-invalid': errors.sharedKey }"
+                  />
+                  <small
+                    id="shared-key-help"
+                    class="p-error"
+                    >{{ errors.sharedKey }}</small
+                  >
+                </div>
 
-          <div
-            id="splunk"
-            class="flex flex-col gap-3"
-            v-if="endpoint === 'splunk'"
-          >
-            <div class="flex flex-col sm:max-w-lg w-full gap-2">
-              <label
-                for="splunkURL"
-                class="text-color text-base font-medium"
-                >Splunk URL *</label
-              >
-              <InputText
-                v-model="splunkUrl"
-                type="text"
-                placeholder="https://inputs.splunk-client.splunkcloud.com:123456/services/collector"
-                :class="{ 'p-invalid': errors.splunkUrl }"
-              />
-              <small
-                id="splunk-url-help"
-                class="p-error"
-                >{{ errors.splunkUrl }}</small
-              >
-            </div>
+                <div class="flex flex-col sm:max-w-lg w-full gap-2">
+                  <label
+                    for="timeGeneratedField"
+                    class="text-color text-base font-medium"
+                    >Time Generated Field</label
+                  >
+                  <InputText
+                    v-model="generatedField"
+                    type="text"
+                  />
+                </div>
 
-            <div class="flex flex-col sm:max-w-lg w-full gap-2">
-              <label
-                for="splunkApiKey"
-                class="text-color text-base font-medium"
-                >API Key *</label
-              >
-              <InputText
-                v-model="splunkApiKey"
-                type="text"
-                :class="{ 'p-invalid': errors.splunkApiKey }"
-              />
-              <small
-                id="splunk-api-key-help"
-                class="p-error"
-                >{{ errors.splunkApiKey }}</small
-              >
-            </div>
-          </div>
+                <div class="flex flex-col sm:max-w-lg w-full gap-2">
+                  <label
+                    for="workspaceID"
+                    class="text-color text-base font-medium"
+                    >Workspace ID *</label
+                  >
+                  <InputText
+                    v-model="workspaceID"
+                    type="text"
+                    :class="{ 'p-invalid': errors.workspaceID }"
+                  />
+                  <small
+                    id="workspace-id-help"
+                    class="p-error"
+                    >{{ errors.workspaceID }}</small
+                  >
+                </div>
+              </div>
 
-          <div
-            id="aws_kinesis_firehose"
-            class="flex flex-col gap-3"
-            v-if="endpoint === 'aws_kinesis_firehose'"
-          >
-            <div class="flex flex-col sm:max-w-lg w-full gap-2">
-              <label
-                for="streamName"
-                class="text-color text-base font-medium"
-                >Stream Name *</label
+              <div
+                id="azure_blob_storage"
+                class="flex flex-col gap-3"
+                v-if="endpoint === 'azure_blob_storage'"
               >
-              <InputText
-                v-model="streamName"
-                type="text"
-                :class="{ 'p-invalid': errors.streamName }"
-              />
-              <small
-                id="stream-name-help"
-                class="p-error"
-                >{{ errors.streamName }}</small
-              >
-            </div>
+                <div class="flex flex-col sm:max-w-lg w-full gap-2">
+                  <label
+                    for="storangeAccount"
+                    class="text-color text-base font-medium"
+                    >Storage Account *</label
+                  >
+                  <InputText
+                    v-model="storageAccount"
+                    type="text"
+                    :class="{ 'p-invalid': errors.storageAccount }"
+                  />
+                  <small
+                    id="storage-account-help"
+                    class="p-error"
+                    >{{ errors.storageAccount }}</small
+                  >
+                </div>
 
-            <div class="flex flex-col sm:max-w-lg w-full gap-2">
-              <label
-                for="region"
-                class="text-color text-base font-medium"
-                >Region *</label
-              >
-              <InputText
-                v-model="awsRegion"
-                type="text"
-                :class="{ 'p-invalid': errors.awsRegion }"
-              />
-              <small
-                id="aws-region-help"
-                class="p-error"
-                >{{ errors.awsRegion }}</small
-              >
-            </div>
+                <div class="flex flex-col sm:max-w-lg w-full gap-2">
+                  <label
+                    for="containerName"
+                    class="text-color text-base font-medium"
+                    >Container Name *</label
+                  >
+                  <InputText
+                    v-model="containerName"
+                    type="text"
+                    :class="{ 'p-invalid': errors.containerName }"
+                  />
+                  <small
+                    id="container-name-help"
+                    class="p-error"
+                    >{{ errors.containerName }}</small
+                  >
+                </div>
 
-            <div class="flex flex-col sm:max-w-lg w-full gap-2">
-              <label
-                for="accessKey"
-                class="text-color text-base font-medium"
-                >Access Key *</label
-              >
-              <InputText
-                v-model="awsAccessKey"
-                type="text"
-                :class="{ 'p-invalid': errors.awsAccessKey }"
-              />
-              <small
-                id="aws-access-key-help"
-                class="p-error"
-                >{{ errors.awsAccessKey }}</small
-              >
-            </div>
-
-            <div class="flex flex-col sm:max-w-lg w-full gap-2">
-              <label
-                for="accessKey"
-                class="text-color text-base font-medium"
-                >Secret Key *</label
-              >
-              <InputText
-                v-model="awsSecretKey"
-                type="text"
-                :class="{ 'p-invalid': errors.awsSecretKey }"
-              />
-              <small
-                id="aws-secret-key-help"
-                class="p-error"
-                >{{ errors.awsSecretKey }}</small
-              >
-            </div>
-          </div>
-
-          <div
-            id="datadog"
-            class="flex flex-col gap-3"
-            v-if="endpoint === 'datadog'"
-          >
-            <div class="flex flex-col sm:max-w-lg w-full gap-2">
-              <label
-                for="datadogURL"
-                class="text-color text-base font-medium"
-                >Datadog URL *</label
-              >
-              <InputText
-                v-model="datadogUrl"
-                type="text"
-                placeholder="https://http-intake.logs.datadoghq.com/v1/input"
-                :class="{ 'p-invalid': errors.datadogUrl }"
-              />
-              <small
-                id="datadog-url-help"
-                class="p-error"
-                >{{ errors.datadogUrl }}</small
-              >
-            </div>
-
-            <div class="flex flex-col sm:max-w-lg w-full gap-2">
-              <label
-                for="apiKey"
-                class="text-color text-base font-medium"
-                >API Key *</label
-              >
-              <InputText
-                v-model="datadogApiKey"
-                type="text"
-                :class="{ 'p-invalid': errors.datadogApiKey }"
-              />
-              <small
-                id="datadog-api-key-help"
-                class="p-error"
-                >{{ errors.datadogApiKey }}</small
-              >
-            </div>
-          </div>
-
-          <div
-            id="qradar"
-            class="flex flex-col gap-3"
-            v-if="endpoint === 'qradar'"
-          >
-            <div class="flex flex-col sm:max-w-lg w-full gap-2">
-              <label
-                for="QRadarURL"
-                class="text-color text-base font-medium"
-                >QRadar URL *</label
-              >
-              <InputText
-                v-model="QRadarUrl"
-                type="text"
-                placeholder="https://qradar-trial-abcdef.qradar.ibmcloud.com:123456"
-                :class="{ 'p-invalid': errors.QRadarUrl }"
-              />
-              <small
-                id="qradar-url-help"
-                class="p-error"
-                >{{ errors.QRadarUrl }}</small
-              >
-            </div>
-          </div>
-
-          <div
-            id="azure_monitor"
-            class="flex flex-col gap-3"
-            v-if="endpoint === 'azure_monitor'"
-          >
-            <div class="flex flex-col sm:max-w-lg w-full gap-2">
-              <label
-                for="logType"
-                class="text-color text-base font-medium"
-                >Log Type *</label
-              >
-              <InputText
-                v-model="logType"
-                type="text"
-                :class="{ 'p-invalid': errors.logType }"
-              />
-              <small
-                id="log-type-help"
-                class="p-error"
-                >{{ errors.logType }}</small
-              >
-            </div>
-
-            <div class="flex flex-col sm:max-w-lg w-full gap-2">
-              <label
-                for="sharedKey"
-                class="text-color text-base font-medium"
-                >Shared Key *</label
-              >
-              <InputText
-                v-model="sharedKey"
-                type="text"
-                :class="{ 'p-invalid': errors.sharedKey }"
-              />
-              <small
-                id="shared-key-help"
-                class="p-error"
-                >{{ errors.sharedKey }}</small
-              >
-            </div>
-
-            <div class="flex flex-col sm:max-w-lg w-full gap-2">
-              <label
-                for="timeGeneratedField"
-                class="text-color text-base font-medium"
-                >Time Generated Field</label
-              >
-              <InputText
-                v-model="generatedField"
-                type="text"
-              />
-            </div>
-
-            <div class="flex flex-col sm:max-w-lg w-full gap-2">
-              <label
-                for="workspaceID"
-                class="text-color text-base font-medium"
-                >Workspace ID *</label
-              >
-              <InputText
-                v-model="workspaceID"
-                type="text"
-                :class="{ 'p-invalid': errors.workspaceID }"
-              />
-              <small
-                id="workspace-id-help"
-                class="p-error"
-                >{{ errors.workspaceID }}</small
-              >
-            </div>
-          </div>
-
-          <div
-            id="azure_blob_storage"
-            class="flex flex-col gap-3"
-            v-if="endpoint === 'azure_blob_storage'"
-          >
-            <div class="flex flex-col sm:max-w-lg w-full gap-2">
-              <label
-                for="storangeAccount"
-                class="text-color text-base font-medium"
-                >Storage Account *</label
-              >
-              <InputText
-                v-model="storageAccount"
-                type="text"
-                :class="{ 'p-invalid': errors.storageAccount }"
-              />
-              <small
-                id="storage-account-help"
-                class="p-error"
-                >{{ errors.storageAccount }}</small
-              >
-            </div>
-
-            <div class="flex flex-col sm:max-w-lg w-full gap-2">
-              <label
-                for="containerName"
-                class="text-color text-base font-medium"
-                >Container Name *</label
-              >
-              <InputText
-                v-model="containerName"
-                type="text"
-                :class="{ 'p-invalid': errors.containerName }"
-              />
-              <small
-                id="container-name-help"
-                class="p-error"
-                >{{ errors.containerName }}</small
-              >
-            </div>
-
-            <div class="flex flex-col sm:max-w-lg w-full gap-2">
-              <label
-                for="containerName"
-                class="text-color text-base font-medium"
-                >Blob SAS Token *</label
-              >
-              <InputText
-                v-model="blobToken"
-                type="text"
-                :class="{ 'p-invalid': errors.blobToken }"
-              />
-              <small
-                id="blob-token-help"
-                class="p-error"
-                >{{ errors.blobToken }}</small
-              >
-            </div>
-          </div>
+                <div class="flex flex-col sm:max-w-lg w-full gap-2">
+                  <label
+                    for="containerName"
+                    class="text-color text-base font-medium"
+                    >Blob SAS Token *</label
+                  >
+                  <InputText
+                    v-model="blobToken"
+                    type="text"
+                    :class="{ 'p-invalid': errors.blobToken }"
+                  />
+                  <small
+                    id="blob-token-help"
+                    class="p-error"
+                    >{{ errors.blobToken }}</small
+                  >
+                </div>
+              </div>
+            </template>
+          </FormHorizontal>
         </template>
-      </FormHorizontal>
+      </EditFormBlock>
     </template>
-  </EditFormBlock>
+  </ContentBlock>
 </template>
 
 <script setup>
@@ -969,6 +976,8 @@
   // Import the components
   import EditFormBlock from '@/templates/edit-form-block-new'
   import FormHorizontal from '@/templates/create-form-block-new/form-horizontal'
+  import ContentBlock from '@/templates/content-block'
+  import PageHeadingBlock from '@/templates/page-heading-block'
 
   import Dropdown from 'primevue/dropdown'
   import RadioButton from 'primevue/radiobutton'

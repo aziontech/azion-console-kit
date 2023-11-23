@@ -1,7 +1,7 @@
 <template>
   <ContentBlock>
     <template #content>
-      <section class="w-full flex flex-col gap-6 lg:gap-8 ">
+      <section class="w-full flex flex-col gap-6 lg:gap-8">
         <!-- Getting Started -->
         <div
           class="w-full p-3 sm:p-8 surface-border border rounded-md flex flex-col gap-6 lg:gap-10 justify-between"

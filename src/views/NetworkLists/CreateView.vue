@@ -159,7 +159,7 @@
   import FormHorizontal from '@/templates/create-form-block-new/form-horizontal'
   import ContentBlock from '@/templates/content-block'
   import PageHeadingBlock from '@/templates/page-heading-block'
-  
+
   export default {
     components: {
       CreateFormBlock,

@@ -27,7 +27,6 @@
     </template>
     <Authorize :authorize="authorize" />
   </ContentBlock>
-
 </template>
 <script>
   import ListTableBlock from '@/templates/list-table-block/with-authorize'
