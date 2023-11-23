@@ -6,7 +6,7 @@
     <template #content>
       <TabView
         :active-index="0"
-        class="w-full grow px-8 flex flex-col gap-8 mb-8 max-md:px-3"
+        class="w-full grow flex flex-col gap-8"
       >
         <!-- Default -->
         <TabPanel header="Default Tag">
