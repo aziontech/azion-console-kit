@@ -90,14 +90,82 @@
             </OverlayPanel>
           </div>
         </template>
-        <template #body="{ data: rowData }">
-          <div class="flex justify-end">
-            <PrimeMenu
-              :ref="`menu-${rowData.id}`"
-              id="overlay_menu"
-              v-bind:model="actionOptions(rowData)"
-              :popup="true"
-            />
+        <Column
+          v-if="reorderableRows"
+          rowReorder
+          headerStyle="width: 3rem"
+        />
+        <Column
+          sortable
+          v-for="col of selectedColumns"
+          :key="col.field"
+          :field="col.field"
+          :header="col.header"
+          :sortField="col?.sortField"
+        >
+          <template #body="{ data: rowData }">
+            <template v-if="col.type !== 'component'">
+              <div v-html="rowData[col.field]" />
+            </template>
+            <template v-else>
+              <component :is="col.component(rowData[col.field])"></component>
+            </template>
+          </template>
+        </Column>
+        <Column
+          :frozen="true"
+          :alignFrozen="'right'"
+          headerStyle="width: 13rem"
+        >
+          <template #header>
+            <div class="flex justify-end w-full">
+              <PrimeButton
+                outlined
+                icon="ai ai-column"
+                class="table-button"
+                @click="toggleColumnSelector"
+                v-tooltip.top="{ value: 'Hidden Columns', showDelay: 200 }"
+              >
+              </PrimeButton>
+              <OverlayPanel ref="columnSelectorPanel">
+                <Listbox
+                  v-model="selectedColumns"
+                  multiple
+                  :options="[{ label: 'Hidden Columns', items: this.columns }]"
+                  class="hidden-columns-panel"
+                  optionLabel="header"
+                  optionGroupLabel="label"
+                  optionGroupChildren="items"
+                >
+                  <template #optiongroup="slotProps">
+                    <p class="text-sm font-medium">{{ slotProps.option.label }}</p>
+                  </template>
+                </Listbox>
+              </OverlayPanel>
+            </div>
+          </template>
+          <template #body="{ data: rowData }">
+            <div class="flex justify-end">
+              <PrimeMenu
+                :ref="`menu-${rowData.id}`"
+                id="overlay_menu"
+                v-bind:model="actionOptions(rowData)"
+                :popup="true"
+              />
+              <PrimeButton
+                v-tooltip.top="{ value: 'Actions', showDelay: 200 }"
+                size="small"
+                icon="pi pi-ellipsis-h"
+                text
+                @click="(event) => toggleActionsMenu(event, rowData.id)"
+                class="cursor-pointer table-button"
+              />
+            </div>
+          </template>
+        </Column>
+        <template #empty>
+          <div class="my-4 flex flex-col gap-3 justify-center items-center">
+            <p class="text-xl font-normal text-secondary">No registers found.</p>
             <PrimeButton
               v-tooltip.top="{ value: 'Actions', showDelay: 200 }"
               size="small"

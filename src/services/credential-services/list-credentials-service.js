@@ -28,7 +28,11 @@ const adapt = (httpResponse) => {
     status: item.status ? 'Yes' : 'No',
     description: item.description,
     lastEditor: item.last_editor,
-    lastModified: item.last_modified
+    lastModified: new Intl.DateTimeFormat('us', {
+      dateStyle: 'full',
+      timeStyle: 'short'
+    }).format(new Date(item.last_modified)),
+    lastModifiedDate: item.last_modified
   }))
 
   return {

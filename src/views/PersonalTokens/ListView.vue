@@ -74,10 +74,12 @@
     },
     {
       field: 'created',
+      sortField: 'createdDate',
       header: 'Last Modified'
     },
     {
       field: 'expiresAt',
+      sortField: 'expiresAtDate',
       header: 'Expiration Date'
     }
   ])

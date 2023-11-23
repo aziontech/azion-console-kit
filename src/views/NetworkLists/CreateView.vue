@@ -13,7 +13,7 @@
         <template #form>
           <FormHorizontal
             title="General"
-            description="description"
+            description="Create allowlists, blocklists, and even greylists based on IP addresses, geolocation (countries), or Autonomous System Number (ASN) to use with configured rule sets on Rules Engine."
           >
             <template #inputs>
               <div class="flex flex-col sm:max-w-lg w-full gap-2">
@@ -23,12 +23,16 @@
                   >Name *</label
                 >
                 <InputText
+                  placeholder="My network list"
                   v-bind="name"
                   id="name"
                   type="text"
                   :class="{ 'p-invalid': errors.name }"
                   v-tooltip.top="{ value: errors.name, showDelay: 200 }"
                 />
+                <small class="text-xs text-color-secondary font-normal leading-tight">
+                  Give a unique and easy-to-remember name.</small
+                >
                 <small
                   v-if="errors.name"
                   class="p-error text-xs font-normal leading-tight"
@@ -38,8 +42,8 @@
             </template>
           </FormHorizontal>
           <FormHorizontal
-            title="List Settings"
-            description="description"
+            title="Network List Settings"
+            description="Specificy the type of network list you want to create and the properties that'll compose the list."
           >
             <template #inputs>
               <div class="flex flex-col w-full sm:max-w-xs gap-2">
@@ -56,6 +60,9 @@
                   optionValue="value"
                   class="w-full md:w-14rem"
                 />
+                <small class="text-xs text-color-secondary font-normal leading-tight">
+                  Each list type accepts different values.</small
+                >
                 <small
                   v-if="errors.networkListType"
                   class="p-error text-xs font-normal leading-tight"
@@ -84,9 +91,9 @@
                   class="p-error text-xs font-normal leading-tight"
                   >{{ errors.asn }}</small
                 >
-                <small class="text-xs text-color-secondary font-normal leading-tight"
-                  >Separate ASN (e.g. 1234) using a new line. Duplicate entries will be
-                  automatically removed.</small
+                <small class="text-xs text-color-secondary font-normal leading-tight">
+                  Separate each ASN value by using a new line. Duplicated entries are automatically
+                  removed.</small
                 >
               </div>
               <div
@@ -106,11 +113,16 @@
                   cols="30"
                   placeholder="192.168.0.1&#10;192.168.0.2/32&#10;10.1.1.10/16"
                 />
+
                 <small
                   v-if="errors.ipCidr"
                   class="p-error text-xs font-normal leading-tight"
                   >{{ errors.ipCidr }}</small
                 >
+                <small class="text-xs text-color-secondary font-normal leading-tight">
+                  Separate each address value by using a new line. Duplicated entries are
+                  automatically removed.
+                </small>
               </div>
               <div
                 class="flex flex-col w-full sm:max-w-3xl gap-2"
@@ -136,6 +148,9 @@
                   v-if="errors.selectedCountries"
                   class="p-error text-xs font-normal leading-tight"
                   >{{ errors.selectedCountries }}</small
+                >
+                <small class="text-xs text-color-secondary font-normal leading-tight">
+                  Select one or more countries.</small
                 >
               </div>
             </template>

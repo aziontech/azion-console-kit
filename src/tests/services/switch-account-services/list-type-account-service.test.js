@@ -9,7 +9,7 @@ const fixtures = {
     type: 'brands',
     textSnippet: '',
     page: 1,
-    page_size: 5
+    pageSize: 5
   }
 }
 
@@ -34,7 +34,7 @@ describe('Switch-account-services', () => {
 
     expect(requestSpy).toHaveBeenCalledWith({
       method: 'GET',
-      url: `switch-account?account_type=${fixtures.mockFilter.type}&q=${fixtures.mockFilter.textSnippet}&page=${fixtures.mockFilter.page}&page_size=${fixtures.mockFilter.page_size}`
+      url: `switch-account?account_type=${fixtures.mockFilter.type}&q=${fixtures.mockFilter.textSnippet}&page=${fixtures.mockFilter.page}&page_size=${fixtures.mockFilter.pageSize}`
     })
   })
 

@@ -28,7 +28,8 @@ const adapt = (httpResponse) => {
         lastModified: new Intl.DateTimeFormat('us', {
           dateStyle: 'full',
           timeStyle: 'short'
-        }).format(new Date(element.last_modified))
+        }).format(new Date(element.last_modified)),
+        lastModifiedDate: element.last_modified
       }))
     : []
 

@@ -42,7 +42,8 @@
           v-model:showSwitchAccount="openSwitchAccount"
           :accessMenu="profileMenuSwitchAccount"
           :account="user"
-          :accountListService="serviceSwitchAccount"
+          :listTypeAccountService="listTypeAccountService"
+          :accountHandler="accountHandler"
         />
       </div>
 
@@ -176,14 +177,14 @@
           @click="toggleProfileMobile"
           label="U"
           class="transition-all hover:border-orange-500 hover:bg-header-button-hover cursor-pointer md:hidden text-avatar text-avatar bg-header-avatar"
-          v-tooltip.bottom="{ value: 'Account settings', showDelay: 200 }"
+          v-tooltip.bottom="{ value: 'Account', showDelay: 200 }"
         />
         <!-- Profile Desktop -->
         <Avatar
           @click="toggleProfile"
           label="U"
           class="transition-all hover:border-orange-500 hover:bg-header-button-hover hidden md:flex cursor-pointer bg-header-avatar"
-          v-tooltip.bottom="{ value: 'Account settings', showDelay: 200 }"
+          v-tooltip.bottom="{ value: 'Account', showDelay: 200 }"
         />
       </div>
     </div>
@@ -581,7 +582,6 @@
   import { useAccountStore } from '@/stores/account'
   import { useHelpCenterStore } from '@/stores/help-center'
   import { mapActions, mapState } from 'pinia'
-  import { listTypeAccountService } from '@/services/switch-account-services/list-type-account-service'
   import SwitchAccountBlock from '@/templates/switch-account-block'
   import CreateModalBlock from '@/templates/create-modal-block'
 
@@ -602,7 +602,17 @@
       SwitchAccountBlock,
       CreateModalBlock
     },
-    props: { isLogged: Boolean },
+    props: {
+      isLogged: Boolean,
+      listTypeAccountService: {
+        type: Function,
+        required: true
+      },
+      accountHandler: {
+        type: Object,
+        required: true
+      }
+    },
     inject: ['createBoardManager'],
     data() {
       return {
@@ -682,7 +692,6 @@
               {
                 label: 'Intelligent DNS',
                 to: '/intelligent-dns',
-                tag: 'New',
                 icon: 'pi pi-share-alt'
               },
               {
@@ -711,15 +720,20 @@
                 icon: 'pi pi-play'
               },
               {
-                label: 'Edge Pulse',
-                to: '/edge-pulse',
+                label: 'Real Time Metrics',
+                to: '/real-time-metrics',
                 icon: 'pi pi-chart-line'
               },
               {
-                label: 'Real Time Metrics',
-                to: '/real-time-metrics',
-                icon: 'pi pi-chart-line',
-                tag: 'Beta'
+                label: 'Real Time Events',
+                to: '/real-time-events',
+                icon: 'pi pi-server',
+                tag: 'Preview'
+              },
+              {
+                label: 'Edge Pulse',
+                to: '/edge-pulse',
+                icon: 'pi pi-chart-line'
               }
             ]
           },
@@ -799,8 +813,7 @@
           { name: 'Light', value: 'light', icon: 'pi pi-sun' },
           { name: 'Dark', value: 'dark', icon: 'pi pi-moon' },
           { name: 'System', value: 'system', icon: 'pi pi-desktop' }
-        ],
-        serviceSwitchAccount: listTypeAccountService
+        ]
       }
     },
     computed: {

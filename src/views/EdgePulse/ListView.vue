@@ -1,21 +1,18 @@
 <template>
   <ContentBlock>
     <template #heading>
-      <PageHeadingBlock pageTitle="Edge Pulse" />
+      <PageHeadingBlock pageTitle="Edge Pulse"></PageHeadingBlock>
     </template>
     <template #content>
       <TabView
         :active-index="0"
-        class="w-full grow flex flex-col gap-8"
+        class="w-full grow px-8 flex flex-col gap-8 mb-8 max-md:px-3"
       >
         <!-- Default -->
         <TabPanel header="Default Tag">
           <FormHorizontal
             title="Default Tag"
-            description="Place this tag in the HTML of the switched pages to measure them. You should place it
-                  just before the closing BODY tag. This script waits until the load event is complete
-                  before downloading and executing the RUM Client, ensuring that the load event is
-                  uninterrupted and has zero impact on user experience."
+            description="The script waits until the loading event is completed before downloading and running the RUM Client. The loading event isn’t interrupted and doesn’t affect the user experience."
           >
             <template #inputs>
               <vue-monaco-editor
@@ -27,7 +24,7 @@
               />
               <div>
                 <PrimeButton
-                  label="Copy to Clipboard"
+                  label="Copy"
                   icon="pi pi-copy"
                   class="max-md:w-full"
                   @click="handleCopyDefaultTagCode"
@@ -36,6 +33,35 @@
               </div>
             </template>
           </FormHorizontal>
+        </TabPanel>
+
+        <!-- Pre-loading -->
+        <TabPanel header="Pre-loading Tag">
+          <div class="w-full">
+            <FormHorizontal
+              title="Pre-loading Tag"
+              description="The script executes before the load event is fired. Recommended when using Content Security Policy settings that prevent the use of inline JavaScript."
+            >
+              <template #inputs>
+                <vue-monaco-editor
+                  v-model:value="defaultTagCode"
+                  language="javascript"
+                  :theme="theme"
+                  :options="editorOptions"
+                  class="min-h-[200px] overflow-clip surface-border border rounded-md"
+                />
+                <div>
+                  <PrimeButton
+                    icon="pi pi-copy"
+                    label="Copy"
+                    class="max-md:w-full"
+                    @click="handleCopyDefaultTagCode"
+                    outlined
+                  />
+                </div>
+              </template>
+            </FormHorizontal>
+          </div>
         </TabPanel>
 
         <!-- Pre-loading -->
@@ -129,7 +155,7 @@
         this.$toast.add({
           closable: false,
           severity: 'success',
-          summary: 'Code successfully copied',
+          summary: 'Copied successfully!',
           life: 6000
         })
       },
