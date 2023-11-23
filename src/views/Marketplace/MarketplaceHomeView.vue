@@ -1,6 +1,6 @@
 <template>
-  <div class="flex flex-col min-h-[calc(100vh-120px)]">
-    <div class="px-3 py-4 sm:px-8 sm:py-8 lg:pb-16 flex flex-col gap-4">
+  <div class="flex flex-col">
+    <div class="px-3 py-4 sm:px-8 sm:py-8 lg:pb-16 flex flex-col gap-4 border-b surface-border">
       <div class="text-2xl sm:text-3xl font-medium">
         The place to find, deploy, and manage third-party solutions
       </div>
@@ -9,9 +9,11 @@
       </div>
     </div>
 
-    <div class="flex flex-col md:flex-row gap-6 lg:gap-8 mb-8 border-t surface-border">
+    <div class="flex flex-col md:flex-row gap-6 lg:gap-8 mb-8">
       <!-- Sidebar -->
-      <div class="flex flex-col md:flex-shrink-0 gap-8 px-3 pt-8 pb-0 sm:px-8 w-full md:w-80">
+      <div
+        class="flex flex-col md:flex-shrink-0 gap-8 px-3 pt-8 pb-0 sm:px-8 w-full md:w-80 md:sticky md:top-10 self-start"
+      >
         <!-- Search -->
         <div class="flex flex-col w-full gap-3">
           <label
