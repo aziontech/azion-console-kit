@@ -100,11 +100,11 @@ const getConfig = () => {
           changeOrigin: true,
           rewrite: (path) => path.replace(/^\/api\/(marketplace|script-runner)/, '/$1/api')
         },
-        '/events/graphql': {
-          target: `${URLStartPrefix}api.azion.net`,
-          changeOrigin: true,
-          rewrite: (path) => path.replace(/^\/events\/graphql\//, '')
-        },
+        // '/events/graphql': {
+        //   target: `${URLStartPrefix}api.azion.net`,
+        //   changeOrigin: true,
+        //   rewrite: (path) => path.replace(/^\/events\/graphql\//, '')
+        // },
         '/api/account-details': {
           target: `${URLStartPrefix}iam.azion.com/iam/api/account`,
           changeOrigin: true,
