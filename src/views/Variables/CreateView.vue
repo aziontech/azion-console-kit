@@ -24,7 +24,6 @@
               type="text"
               id="key"
               :class="{ 'p-invalid': errors.key }"
-              v-tooltip.top="{ value: errors.key, showDelay: 200 }"
             />
             <small
               v-if="errors.key"
@@ -45,7 +44,6 @@
               id="value"
               type="text"
               :class="{ 'p-invalid': errors.value }"
-              v-tooltip.top="{ value: errors.value, showDelay: 200 }"
             />
             <small
               v-if="errors.value"

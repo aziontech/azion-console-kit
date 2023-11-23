@@ -1,4 +1,4 @@
-import { themeSelect } from '@/helpers/themeSelect'
+import { themeSelect } from '@/helpers/theme-select'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 const makeSut = ({ matchesSystemThemeDark, initialTheme }) => {
