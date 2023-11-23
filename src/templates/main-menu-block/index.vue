@@ -177,14 +177,14 @@
           @click="toggleProfileMobile"
           label="U"
           class="transition-all hover:border-orange-500 hover:bg-header-button-hover cursor-pointer md:hidden text-avatar text-avatar bg-header-avatar"
-          v-tooltip.bottom="{ value: 'Account settings', showDelay: 200 }"
+          v-tooltip.bottom="{ value: 'Account', showDelay: 200 }"
         />
         <!-- Profile Desktop -->
         <Avatar
           @click="toggleProfile"
           label="U"
           class="transition-all hover:border-orange-500 hover:bg-header-button-hover hidden md:flex cursor-pointer bg-header-avatar"
-          v-tooltip.bottom="{ value: 'Account settings', showDelay: 200 }"
+          v-tooltip.bottom="{ value: 'Account', showDelay: 200 }"
         />
       </div>
     </div>
