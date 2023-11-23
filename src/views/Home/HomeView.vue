@@ -218,7 +218,7 @@
         >
           <div class="text-lg font-medium">Product Documentation</div>
           <div class="text-sm text-color-secondary">
-            Understand and find out how to configure all Azion products and their features.
+            Understand how to configure all Azion products and their features.
           </div>
         </button>
         <!-- API -->
