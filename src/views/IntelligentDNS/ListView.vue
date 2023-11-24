@@ -91,9 +91,20 @@
             field: 'name',
             header: 'Name'
           },
+
           {
             field: 'domain',
-            header: 'Domain'
+            header: 'Domain',
+            type: 'component',
+            component: (columnData) => {
+              return columnBuilder({
+                data: columnData,
+                columnAppearance: 'text-with-clipboard',
+                dependencies: {
+                  copyContentService: this.clipboardWrite
+                }
+              })
+            }
           },
           {
             field: 'status',

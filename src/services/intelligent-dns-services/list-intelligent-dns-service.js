@@ -39,7 +39,9 @@ const adapt = (httpResponse) => {
     ? httpResponse.body.results.map((intelligentDNS) => ({
         id: intelligentDNS.id,
         name: intelligentDNS.name,
-        domain: intelligentDNS.domain,
+        domain: {
+          content: intelligentDNS.domain
+        },
         status: parseStatusData(intelligentDNS.is_active)
       }))
     : []

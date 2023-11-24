@@ -55,7 +55,7 @@ describe('IntelligentDnsServices', () => {
       {
         id: fixtures.dnsMock.id,
         name: fixtures.dnsMock.name,
-        domain: fixtures.dnsMock.domain,
+        domain: { content: fixtures.dnsMock.domain },
         status: {
           content: 'Active',
           severity: 'success'
@@ -64,7 +64,7 @@ describe('IntelligentDnsServices', () => {
       {
         id: fixtures.dnsDisabledMock.id,
         name: fixtures.dnsDisabledMock.name,
-        domain: fixtures.dnsDisabledMock.domain,
+        domain: { content: fixtures.dnsDisabledMock.domain },
         status: {
           content: 'Inactive',
           severity: 'danger'
