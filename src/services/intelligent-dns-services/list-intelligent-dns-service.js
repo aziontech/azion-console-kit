@@ -18,6 +18,20 @@ export const listIntelligentDNSService = async ({
   return parseHttpResponse(httpResponse)
 }
 
+const parseStatusData = (status) => {
+  const parsedStatus = status
+    ? {
+        content: 'Active',
+        severity: 'success'
+      }
+    : {
+        content: 'Inactive',
+        severity: 'danger'
+      }
+
+  return parsedStatus
+}
+
 const adapt = (httpResponse) => {
   const isArray = Array.isArray(httpResponse.body.results)
 
@@ -26,7 +40,7 @@ const adapt = (httpResponse) => {
         id: intelligentDNS.id,
         name: intelligentDNS.name,
         domain: intelligentDNS.domain,
-        isActive: intelligentDNS.is_active ? 'Yes' : 'No'
+        status: parseStatusData(intelligentDNS.is_active)
       }))
     : []
 

@@ -51,6 +51,7 @@
   import ContentBlock from '@/templates/content-block'
   import PrimeButton from 'primevue/button'
   import PageHeadingBlock from '@/templates/page-heading-block'
+  import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
 
   export default {
     name: 'intelligent-dns-view',
@@ -95,8 +96,14 @@
             header: 'Domain'
           },
           {
-            field: 'isActive',
-            header: 'Active'
+            field: 'status',
+            header: 'Status',
+            type: 'component',
+            component: (columnData) =>
+              columnBuilder({
+                data: columnData,
+                columnAppearance: 'tag'
+              })
           }
         ]
       }
