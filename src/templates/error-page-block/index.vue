@@ -1,4 +1,3 @@
-<!-- eslint-disable vue/multi-word-component-names -->
 <template>
   <div class="py-20 px-8 self-center items-center flex flex-col gap-10">
     <slot name="illustration" />
@@ -18,6 +17,7 @@
 </template>
 
 <script setup>
+defineOptions({ name: 'error-page-block' })
   defineProps({
     title: { type: String, required: true },
     description: { type: String, required: true }

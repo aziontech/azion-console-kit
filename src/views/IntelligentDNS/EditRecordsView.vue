@@ -1,177 +1,183 @@
 <template>
-  <EditFormBlock
-    pageTitle="Edit Intelligent DNS Record"
-    :editService="editRecordServiceWithIDNSIdDecorator"
-    :loadService="loadRecordServiceWithIDNSIdDecorator"
-    :initialDataSetter="setValues"
-    :formData="values"
-    :formMeta="meta"
-  >
-    <template #form>
-      <FormHorizontal
-        title="General"
-        description="Espaço livre para descrição e instruções de preenchimento. Esse conteúdo deve ser criado pensando tanto em funcionalidade quanto em em alinhamento e estética. Devemos sempre criar os blocos conforme o contexto, cuidando sempre para não ter blocos muito longos."
-      >
-        <template #inputs>
-          <div class="flex flex-col sm:max-w-lg w-full gap-2">
-            <label
-              for="name"
-              class="text-color text-base font-medium"
-              >Name *</label
-            >
-            <div class="p-inputgroup">
-              <InputText
-                v-bind="name"
-                id="name"
-                type="text"
-                :class="{ 'p-invalid': errors.name }"
-              />
-              <span class="p-inputgroup-addon"> .{{ intelligentDNSStore.getDomain }} </span>
-            </div>
-
-            <small
-              v-if="errors.name"
-              class="p-error text-xs font-normal leading-tight"
-              >{{ errors.name }}</small
-            >
-          </div>
-          <div class="flex flex-col sm:max-w-lg w-full gap-2">
-            <label
-              for="type"
-              class="text-color text-base font-medium"
-              >Record Type *</label
-            >
-            <Dropdown
-              v-model="recordType"
-              :options="recordsTypes"
-              optionLabel="label"
-              id="type"
-              optionValue="value"
-              placeholder="Select a Record Type"
-              :class="{ 'p-invalid': errors.type }"
-              class="w-full"
-            />
-            <small
-              v-if="errors.type"
-              class="p-error text-xs font-normal leading-tight"
-              >{{ errors.type }}</small
-            >
-          </div>
-          <div class="flex flex-col sm:max-w-lg w-full gap-2">
-            <label
-              for="value"
-              class="text-color text-base font-medium"
-              >Value *</label
-            >
-            <Textarea
-              rows="5"
-              cols="30"
-              placeholder="Value"
-              v-bind="value"
-              id="value"
-              type="text"
-              :class="{ 'p-invalid': errors.value }"
-            />
-            <small
-              v-if="errors.value"
-              class="p-error text-xs font-normal leading-tight"
-              >{{ errors.value }}</small
-            >
-          </div>
-          <div class="flex flex-col sm:max-w-lg w-full gap-2">
-            <label
-              for="ttl"
-              class="text-color text-base font-medium"
-              >TTL *</label
-            >
-            <InputText
-              placeholder="TTL (seconds):"
-              v-bind="ttl"
-              id="ttl"
-              type="number"
-              :class="{ 'p-invalid': errors.ttl }"
-            />
-            <small
-              v-if="errors.ttl"
-              class="p-error text-xs font-normal leading-tight"
-              >{{ errors.ttl }}</small
-            >
-          </div>
-
-          <div class="flex flex-col sm:max-w-lg w-full gap-2">
-            <label
-              for="policy"
-              class="text-color text-base font-medium"
-              >Policy *</label
-            >
-            <Dropdown
-              v-model="policy"
-              :options="policyList"
-              id="policy"
-              optionLabel="label"
-              optionValue="value"
-              placeholder="Select a Policy"
-              :class="{ 'p-invalid': errors.policy }"
-              class="w-full"
-            />
-            <small
-              v-if="errors.policy"
-              class="p-error text-xs font-normal leading-tight"
-              >{{ errors.policy }}</small
-            >
-          </div>
-          <div
-            class="flex flex-col sm:max-w-lg w-full gap-2"
-            v-if="isWeightedPolicy"
-          >
-            <label
-              for="weight"
-              class="text-color text-base font-medium"
-              >Weight *</label
-            >
-            <InputText
-              placeholder="Weight"
-              v-bind="weight"
-              id="weight"
-              type="number"
-              min="0"
-              max="255"
-              :class="{ 'p-invalid': errors.weight }"
-              v-if="isWeightedPolicy"
-            />
-            <small
-              v-if="errors.weight"
-              class="p-error text-xs font-normal leading-tight"
-              >{{ errors.weight }}</small
-            >
-          </div>
-
-          <div
-            class="flex flex-col sm:max-w-lg w-full gap-2"
-            v-if="isWeightedPolicy"
-          >
-            <label
-              for="description"
-              class="text-color text-base font-medium"
-              >Description</label
-            >
-            <InputText
-              placeholder="add the description"
-              v-bind="description"
-              type="text"
-              :class="{ 'p-invalid': errors.description }"
-              v-if="isWeightedPolicy"
-            />
-            <small
-              v-if="errors.description"
-              class="p-error text-xs font-normal leading-tight"
-              >{{ errors.description }}</small
-            >
-          </div>
-        </template>
-      </FormHorizontal>
+  <ContentBlock>
+    <template #heading>
+      <PageHeadingBlock pageTitle="Edit Intelligent DNS Record"> </PageHeadingBlock>
     </template>
-  </EditFormBlock>
+    <template #content>
+      <EditFormBlock
+        :editService="editRecordServiceWithIDNSIdDecorator"
+        :loadService="loadRecordServiceWithIDNSIdDecorator"
+        :initialDataSetter="setValues"
+        :formData="values"
+        :formMeta="meta"
+      >
+        <template #form>
+          <FormHorizontal
+            title="General"
+            description="Espaço livre para descrição e instruções de preenchimento. Esse conteúdo deve ser criado pensando tanto em funcionalidade quanto em em alinhamento e estética. Devemos sempre criar os blocos conforme o contexto, cuidando sempre para não ter blocos muito longos."
+          >
+            <template #inputs>
+              <div class="flex flex-col sm:max-w-lg w-full gap-2">
+                <label
+                  for="name"
+                  class="text-color text-base font-medium"
+                  >Name *</label
+                >
+                <div class="p-inputgroup">
+                  <InputText
+                    v-bind="name"
+                    id="name"
+                    type="text"
+                    :class="{ 'p-invalid': errors.name }"
+                  />
+                  <span class="p-inputgroup-addon"> .{{ intelligentDNSStore.getDomain }} </span>
+                </div>
+
+                <small
+                  v-if="errors.name"
+                  class="p-error text-xs font-normal leading-tight"
+                  >{{ errors.name }}</small
+                >
+              </div>
+              <div class="flex flex-col sm:max-w-lg w-full gap-2">
+                <label
+                  for="type"
+                  class="text-color text-base font-medium"
+                  >Record Type *</label
+                >
+                <Dropdown
+                  v-model="recordType"
+                  :options="recordsTypes"
+                  optionLabel="label"
+                  id="type"
+                  optionValue="value"
+                  placeholder="Select a Record Type"
+                  :class="{ 'p-invalid': errors.type }"
+                  class="w-full"
+                />
+                <small
+                  v-if="errors.type"
+                  class="p-error text-xs font-normal leading-tight"
+                  >{{ errors.type }}</small
+                >
+              </div>
+              <div class="flex flex-col sm:max-w-lg w-full gap-2">
+                <label
+                  for="value"
+                  class="text-color text-base font-medium"
+                  >Value *</label
+                >
+                <Textarea
+                  rows="5"
+                  cols="30"
+                  placeholder="Value"
+                  v-bind="value"
+                  id="value"
+                  type="text"
+                  :class="{ 'p-invalid': errors.value }"
+                />
+                <small
+                  v-if="errors.value"
+                  class="p-error text-xs font-normal leading-tight"
+                  >{{ errors.value }}</small
+                >
+              </div>
+              <div class="flex flex-col sm:max-w-lg w-full gap-2">
+                <label
+                  for="ttl"
+                  class="text-color text-base font-medium"
+                  >TTL *</label
+                >
+                <InputText
+                  placeholder="TTL (seconds):"
+                  v-bind="ttl"
+                  id="ttl"
+                  type="number"
+                  :class="{ 'p-invalid': errors.ttl }"
+                />
+                <small
+                  v-if="errors.ttl"
+                  class="p-error text-xs font-normal leading-tight"
+                  >{{ errors.ttl }}</small
+                >
+              </div>
+
+              <div class="flex flex-col sm:max-w-lg w-full gap-2">
+                <label
+                  for="policy"
+                  class="text-color text-base font-medium"
+                  >Policy *</label
+                >
+                <Dropdown
+                  v-model="policy"
+                  :options="policyList"
+                  id="policy"
+                  optionLabel="label"
+                  optionValue="value"
+                  placeholder="Select a Policy"
+                  :class="{ 'p-invalid': errors.policy }"
+                  class="w-full"
+                />
+                <small
+                  v-if="errors.policy"
+                  class="p-error text-xs font-normal leading-tight"
+                  >{{ errors.policy }}</small
+                >
+              </div>
+              <div
+                class="flex flex-col sm:max-w-lg w-full gap-2"
+                v-if="isWeightedPolicy"
+              >
+                <label
+                  for="weight"
+                  class="text-color text-base font-medium"
+                  >Weight *</label
+                >
+                <InputText
+                  placeholder="Weight"
+                  v-bind="weight"
+                  id="weight"
+                  type="number"
+                  min="0"
+                  max="255"
+                  :class="{ 'p-invalid': errors.weight }"
+                  v-if="isWeightedPolicy"
+                />
+                <small
+                  v-if="errors.weight"
+                  class="p-error text-xs font-normal leading-tight"
+                  >{{ errors.weight }}</small
+                >
+              </div>
+
+              <div
+                class="flex flex-col sm:max-w-lg w-full gap-2"
+                v-if="isWeightedPolicy"
+              >
+                <label
+                  for="description"
+                  class="text-color text-base font-medium"
+                  >Description</label
+                >
+                <InputText
+                  placeholder="add the description"
+                  v-bind="description"
+                  type="text"
+                  :class="{ 'p-invalid': errors.description }"
+                  v-if="isWeightedPolicy"
+                />
+                <small
+                  v-if="errors.description"
+                  class="p-error text-xs font-normal leading-tight"
+                  >{{ errors.description }}</small
+                >
+              </div>
+            </template>
+          </FormHorizontal>
+        </template>
+      </EditFormBlock>
+    </template>
+  </ContentBlock>
 </template>
 
 <script setup>
@@ -183,6 +189,9 @@
   import InputText from 'primevue/inputtext'
   import Textarea from 'primevue/textarea'
   import Dropdown from 'primevue/dropdown'
+  import ContentBlock from '@/templates/content-block'
+  import PageHeadingBlock from '@templates/page-heading-block'
+
   import { useForm, useField } from 'vee-validate'
   import * as yup from 'yup'
   import router from '@/router'

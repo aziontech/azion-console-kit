@@ -1,164 +1,168 @@
 <template>
-  <div>
-    <CreateFormBlock
-      pageTitle="Create Personal Token"
-      :createService="props.createPersonalTokenService"
-      :formData="values"
-      :formMeta="meta"
-      @on-response="handleResponse"
-      :buttonBackList="generatedPersonalToken"
-      :callback="false"
-      :disabledFeedback="true"
-    >
-      <template #form>
-        <FormHorizontal
-          title="General"
-          description="Choose a descriptive and easy to remember name. Include a description to specify the token's purpose or usage."
-        >
-          <template #inputs>
-            <div class="flex flex-col sm:max-w-lg w-full gap-2">
-              <label
-                for="name"
-                class="text-color text-base font-medium"
-                >Name *</label
-              >
-              <span class="p-input-icon-right">
-                <i
-                  class="pi pi-lock text-color-secondary"
-                  v-if="generatedPersonalToken"
-                />
-                <InputText
-                  class="w-full"
-                  v-bind="name"
-                  id="name"
-                  type="text"
-                  :class="{ 'p-invalid': errors.name }"
-                  :disabled="generatedPersonalToken"
-                />
-              </span>
-
-              <small
-                v-if="errors.name"
-                class="p-error text-xs font-normal leading-tight"
-                >{{ errors.name }}
-              </small>
-            </div>
-            <div class="flex flex-col sm:max-w-lg w-full gap-2">
-              <label
-                for="description"
-                class="text-color text-base font-medium"
-                >Description</label
-              >
-              <span class="p-input-icon-right flex items-start">
-                <i
-                  class="pi pi-lock text-color-secondary"
-                  v-if="generatedPersonalToken"
-                />
-                <TextareaComponent
-                  id="description"
-                  class="w-full"
-                  :class="{ 'p-invalid': errors.description }"
-                  rows="1"
-                  v-bind="description"
-                  :disabled="generatedPersonalToken"
-                />
-              </span>
-              <small
-                v-if="errors.description"
-                class="p-error text-xs font-normal leading-tight"
-                >{{ errors.description }}
-              </small>
-            </div>
-          </template>
-        </FormHorizontal>
-        <FormHorizontal
-          title="Token"
-          description="Define the token expiration date by selecting one of the suggested date ranges. For security matters, you can only copy the Personal Token right after you create it. In case you need the Personal Token code after that, you must create a new one."
-        >
-          <template #inputs>
-            <div class="flex flex-col w-full gap-2">
-              <label
-                for="selectedExpiration"
-                class="text-color text-base font-medium"
-                >Expires within *</label
-              >
-              <div class="flex gap-6">
-                <div class="md:w-80">
-                  <Dropdown
-                    class="w-full md:w-80"
-                    id="selectedExpiration"
-                    :options="options"
-                    optionLabel="label"
-                    optionValue="value"
-                    :class="{ 'p-invalid': errors.selectedExpiration }"
-                    v-model="selectedExpiration"
-                    :disabled="generatedPersonalToken"
-                  >
-                    <template
-                      #dropdownicon
-                      v-if="generatedPersonalToken"
-                    >
-                      <span class="pi pi-lock text-color-secondary" />
-                    </template>
-                  </Dropdown>
-                </div>
-                <div class="md:w-80">
-                  <Calendar
-                    v-if="isCustomDateSelected"
-                    class="w-full"
-                    v-model="customExpiration"
-                    placeholder="Select date from calendar"
-                    :minDate="minExpirationDate"
-                    :class="{ 'p-invalid': errors.customExpiration }"
-                    showIcon
-                    :disabled="generatedPersonalToken"
+  <ContentBlock>
+    <template #heading>
+      <PageHeadingBlock pageTitle="Create Personal Token"></PageHeadingBlock>
+    </template>
+    <template #content>
+      <CreateFormBlock
+        :createService="props.createPersonalTokenService"
+        :formData="values"
+        :formMeta="meta"
+        @on-response="handleResponse"
+        :buttonBackList="generatedPersonalToken"
+        :callback="false"
+        :disabledFeedback="true"
+      >
+        <template #form>
+          <FormHorizontal
+            title="General"
+            description="Choose a descriptive and easy to remember name. Include a description to specify the token's purpose or usage."
+          >
+            <template #inputs>
+              <div class="flex flex-col sm:max-w-lg w-full gap-2">
+                <label
+                  for="name"
+                  class="text-color text-base font-medium"
+                  >Name *</label
+                >
+                <span class="p-input-icon-right">
+                  <i
+                    class="pi pi-lock text-color-secondary"
+                    v-if="generatedPersonalToken"
                   />
-                  <small
-                    v-if="errors.customExpiration"
-                    class="p-error text-xs font-normal leading-tight"
-                    >{{ errors.customExpiration }}
-                  </small>
-                </div>
-              </div>
-            </div>
-
-            <div class="flex flex-col w-full gap-2">
-              <label
-                for="personalToken"
-                class="text-color text-base font-medium"
-              >
-                Personal Token Value
-              </label>
-              <div
-                class="flex gap-6 md:align-items-center max-sm:flex-col max-sm:align-items-baseline max-sm:gap-3"
-              >
-                <span class="p-input-icon-right w-full flex max-w-lg flex-col items-start gap-2">
-                  <PrimePassword
-                    id="personalToken"
-                    v-model="personalTokenKey"
+                  <InputText
+                    class="w-full"
+                    v-bind="name"
+                    id="name"
                     type="text"
-                    class="flex flex-col w-full"
-                    :feedback="false"
-                    toggleMask
-                    disabled
+                    :class="{ 'p-invalid': errors.name }"
+                    :disabled="generatedPersonalToken"
                   />
                 </span>
-                <PrimeButton
-                  icon="pi pi-clone"
-                  outlined
-                  type="button"
-                  aria-label="Copy Personal Token"
-                  label="Copy to Clipboard"
-                  :disabled="!generatedPersonalToken"
-                  @click="copyPersonalToken"
-                />
+
+                <small
+                  v-if="errors.name"
+                  class="p-error text-xs font-normal leading-tight"
+                  >{{ errors.name }}
+                </small>
               </div>
-            </div>
-          </template>
-        </FormHorizontal>
-      </template>
-    </CreateFormBlock>
-  </div>
+              <div class="flex flex-col sm:max-w-lg w-full gap-2">
+                <label
+                  for="description"
+                  class="text-color text-base font-medium"
+                  >Description</label
+                >
+                <span class="p-input-icon-right flex items-start">
+                  <i
+                    class="pi pi-lock text-color-secondary"
+                    v-if="generatedPersonalToken"
+                  />
+                  <TextareaComponent
+                    id="description"
+                    class="w-full"
+                    :class="{ 'p-invalid': errors.description }"
+                    rows="1"
+                    v-bind="description"
+                    :disabled="generatedPersonalToken"
+                  />
+                </span>
+                <small
+                  v-if="errors.description"
+                  class="p-error text-xs font-normal leading-tight"
+                  >{{ errors.description }}
+                </small>
+              </div>
+            </template>
+          </FormHorizontal>
+          <FormHorizontal
+            title="Token"
+            description="Define the token expiration date by selecting one of the suggested date ranges. For security matters, you can only copy the Personal Token right after you create it. In case you need the Personal Token code after that, you must create a new one."
+          >
+            <template #inputs>
+              <div class="flex flex-col w-full gap-2">
+                <label
+                  for="selectedExpiration"
+                  class="text-color text-base font-medium"
+                  >Expires within *</label
+                >
+                <div class="flex gap-6">
+                  <div>
+                    <Dropdown
+                      class="w-full"
+                      id="selectedExpiration"
+                      :options="options"
+                      optionLabel="label"
+                      optionValue="value"
+                      :class="{ 'p-invalid': errors.selectedExpiration }"
+                      v-model="selectedExpiration"
+                      :disabled="generatedPersonalToken"
+                    >
+                      <template
+                        #dropdownicon
+                        v-if="generatedPersonalToken"
+                      >
+                        <span class="pi pi-lock text-color-secondary" />
+                      </template>
+                    </Dropdown>
+                  </div>
+                  <div>
+                    <Calendar
+                      v-if="isCustomDateSelected"
+                      class="w-full"
+                      v-model="customExpiration"
+                      placeholder="Select date from calendar"
+                      :minDate="minExpirationDate"
+                      :class="{ 'p-invalid': errors.customExpiration }"
+                      showIcon
+                      :disabled="generatedPersonalToken"
+                    />
+                    <small
+                      v-if="errors.customExpiration"
+                      class="p-error text-xs font-normal leading-tight"
+                      >{{ errors.customExpiration }}
+                    </small>
+                  </div>
+                </div>
+              </div>
+
+              <div class="flex flex-col w-full gap-2">
+                <label
+                  for="personalToken"
+                  class="text-color text-base font-medium"
+                >
+                  Personal Token Value
+                </label>
+                <div
+                  class="flex gap-6 md:align-items-center max-sm:flex-col max-sm:align-items-baseline flex-wrap max-sm:gap-3"
+                >
+                  <span class="p-input-icon-right w-full flex max-w-lg flex-col items-start gap-2">
+                    <PrimePassword
+                      id="personalToken"
+                      v-model="personalTokenKey"
+                      type="text"
+                      class="flex flex-col w-full"
+                      :feedback="false"
+                      toggleMask
+                      disabled
+                    />
+                  </span>
+                  <PrimeButton
+                    icon="pi pi-clone"
+                    outlined
+                    type="button"
+                    aria-label="Copy Personal Token"
+                    label="Copy to Clipboard"
+                    :disabled="!generatedPersonalToken"
+                    @click="copyPersonalToken"
+                  />
+                </div>
+              </div>
+            </template>
+          </FormHorizontal>
+        </template>
+      </CreateFormBlock>
+    </template>
+  </ContentBlock>
 </template>
 
 <script setup>
@@ -177,6 +181,8 @@
   import TextareaComponent from 'primevue/textarea'
   import Calendar from 'primevue/calendar'
   import PrimeButton from 'primevue/button'
+  import ContentBlock from '@/templates/content-block'
+  import PageHeadingBlock from '@/templates/page-heading-block'
 
   import { useForm, useField } from 'vee-validate'
   import * as yup from 'yup'
