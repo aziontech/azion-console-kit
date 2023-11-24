@@ -4,7 +4,10 @@
     :createService="createDomainService"
     :formData="values"
     :formMeta="meta"
-    :cleanFormCallback="resetForm"
+    @on-response="handleResponse"
+    :buttonBackList="hasDomainName"
+    :callback="false"
+    :disabledFeedback="true"
   >
     <template #form>
       <form-horizontal
@@ -22,6 +25,7 @@
               v-bind="name"
               id="name"
               type="text"
+              :disabled="hasDomainName"
               :class="{ 'p-invalid': errors.name }"
               v-tooltip.top="errors.name"
             />
@@ -33,6 +37,47 @@
           </div>
         </template>
       </form-horizontal>
+
+      <form-horizontal
+        title="Domain"
+        description="Save the domain to visualize the Domain name attributed by Azion to this configuration."
+      >
+        <template #inputs>
+          <div class="flex flex-col w-full gap-2">
+            <label
+              for="domainName"
+              class="text-color text-base font-medium"
+            >
+              Domain Name
+            </label>
+            <div
+              class="flex gap-6 md:align-items-center max-sm:flex-col max-sm:align-items-baseline max-sm:gap-3"
+            >
+              <span class="p-input-icon-right w-full flex max-w-lg flex-col items-start gap-2">
+                <i class="pi pi-lock" />
+                <InputText
+                  id="domainName"
+                  v-model="domainName"
+                  type="text"
+                  class="flex flex-col w-full"
+                  :feedback="false"
+                  disabled
+                />
+              </span>
+              <PrimeButton
+                icon="pi pi-clone"
+                outlined
+                type="button"
+                aria-label="Copy Domain Name"
+                label="Copy to Clipboard"
+                :disabled="!hasDomainName"
+                @click="copyDomainName"
+              />
+            </div>
+          </div>
+        </template>
+      </form-horizontal>
+
       <form-horizontal
         title="Settings"
         description="Determine the edge application of the domain and its digital certificate. 
@@ -55,6 +100,7 @@
               optionValue="value"
               class="w-full"
               placeholder="Select an edge application"
+              :disabled="hasDomainName"
             />
             <small
               v-if="errors.edgeApplication"
@@ -69,6 +115,7 @@
               class="flex-shrink-0 flex-grow"
               :class="{ 'p-invalid': errors.cnameAccessOnly }"
               v-model="cnameAccessOnly"
+              :disabled="hasDomainName"
             />
             <div class="flex flex-col gap-1">
               <label class="text-sm font-normal leading-tight">CNAME Access Only </label>
@@ -94,6 +141,7 @@
               cols="30"
               class="w-full"
               v-tooltip.top="errors.cnames"
+              :disabled="hasDomainName"
             />
             <small
               v-if="errors.cnames"
@@ -116,6 +164,7 @@
               optionValue="value"
               class="w-full"
               placeholder="Select a certificate"
+              :disabled="hasDomainName"
             />
           </div>
         </template>
@@ -244,6 +293,7 @@
 <script>
   import CreateFormBlock from '@/templates/create-form-block-new'
   import InputText from 'primevue/inputtext'
+  import PrimeButton from 'primevue/button'
   import Dropdown from 'primevue/dropdown'
   import PrimeTextarea from 'primevue/textarea'
   import InputSwitch from 'primevue/inputswitch'
@@ -271,12 +321,17 @@
       InputSwitch,
       RadioButton,
       formHorizontal,
-      Card
+      Card,
+      PrimeButton
     },
     props: {
       createDomainService: Function,
       listDigitalCertificatesService: Function,
-      listEdgeApplicationsService: Function
+      listEdgeApplicationsService: Function,
+      clipboardWrite: {
+        type: Function,
+        required: true
+      }
     },
     data() {
       return {
@@ -287,7 +342,9 @@
         trustedCertificateOptions: [],
         edgeApps: [],
         digitalCertificates: [],
-        edgeCertificate: 0
+        edgeCertificate: 0,
+        domainName: '',
+        hasDomainName: false
       }
     },
     async created() {
@@ -417,6 +474,27 @@
       },
       async requestDigitalCertificates() {
         this.digitalCertificates = await this.listDigitalCertificatesService({})
+      },
+      handleResponse(data) {
+        this.$toast.add({
+          closable: false,
+          severity: 'success',
+          summary: data.feedback,
+          life: 10000
+        })
+        if (data.domainName) {
+          this.domainName = data.domainName
+          this.hasDomainName = true
+        }
+      },
+      copyDomainName() {
+        this.clipboardWrite(this.domainName)
+        this.$toast.add({
+          closable: false,
+          severity: 'success',
+          summary: 'domain name copied',
+          life: 10000
+        })
       }
     }
   }
