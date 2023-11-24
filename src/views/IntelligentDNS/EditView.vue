@@ -77,14 +77,29 @@
         </TabPanel>
         <TabPanel header="Records">
           <ListTableBlock
+            v-if="hasContentToList"
             pageTitleDelete="Record"
-            addButtonLabel="Add Record"
+            addButtonLabel="Record"
             createPagePath="records/create"
             editPagePath="records/edit"
             :columns="recordListColumns"
             :listService="listRecordsServiceIntelligentDNSDecorator"
             :deleteService="deleteRecordsServiceIntelligentDNSDecorator"
+            @on-load-data="handleLoadData"
           />
+          <EmptyResultsBlock
+            v-else
+            title="No record added"
+            description="Create your first record."
+            createButtonLabel="Record"
+            createPagePath="records/create"
+            :documentationService="documentationService"
+            :inTabs="true"
+          >
+            <template #illustration>
+              <Illustration />
+            </template>
+          </EmptyResultsBlock>
         </TabPanel>
       </TabView>
       <router-view></router-view>
@@ -103,6 +118,8 @@
   import TabPanel from 'primevue/tabpanel'
   import InputText from 'primevue/inputtext'
   import InputSwitch from 'primevue/inputswitch'
+  import EmptyResultsBlock from '@/templates/empty-results-block'
+  import Illustration from '@/assets/svg/illustration-layers.vue'
   import { useForm } from 'vee-validate'
   import * as yup from 'yup'
 
@@ -117,7 +134,9 @@
       ListTableBlock,
       FormHorizontal,
       PageHeadingBlock,
-      ContentBlock
+      ContentBlock,
+      EmptyResultsBlock,
+      Illustration
     },
 
     props: {
@@ -125,10 +144,12 @@
       editIntelligentDNSService: { type: Function, required: true },
       listRecordsService: { type: Function, required: true },
       deleteRecordsService: { type: Function, required: true },
-      updatedRedirect: { type: String, required: true }
+      updatedRedirect: { type: String, required: true },
+      documentationService: { type: Function, required: true }
     },
 
     data: () => {
+      const hasContentToList = true
       const validationSchema = yup.object({
         name: yup.string().required(),
         domain: yup
@@ -159,6 +180,7 @@
         domain,
         isActive,
         setValues,
+        hasContentToList,
         recordListColumns: [
           {
             field: 'name',
@@ -226,6 +248,9 @@
             params: { id: this.intelligentDNSID }
           })
         }
+      },
+      handleLoadData(event) {
+        this.hasContentToList = event
       }
     },
 
