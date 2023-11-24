@@ -5,10 +5,11 @@
     :deleteService="deletePersonalTokenService"
     :columns="getColumns"
     pageTitle="Personal Tokens"
+    pageTitleDelete="Personal Token"
     addButtonLabel="Personal Token"
     createPagePath="personal-tokens/create"
     @on-load-data="handleLoadData"
-    :visibleEditAction="false"
+    :enableEditClick="false"
   />
   <EmptyResultsBlock
     v-else
@@ -68,10 +69,12 @@
     },
     {
       field: 'created',
+      sortField: 'createdDate',
       header: 'Last Modified'
     },
     {
       field: 'expiresAt',
+      sortField: 'expiresAtDate',
       header: 'Expiration Date'
     }
   ])

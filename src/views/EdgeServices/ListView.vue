@@ -5,7 +5,8 @@
     :deleteService="deleteEdgeServicesService"
     :columns="getColumns"
     pageTitle="Edge Services"
-    addButtonLabel="Add Service"
+    pageTitleDelete="Edge Service"
+    addButtonLabel="Edge Services"
     createPagePath="edge-services/create"
     editPagePath="edge-services/edit"
     @on-load-data="handleLoadData"
@@ -14,9 +15,9 @@
   <EmptyResultsBlock
     v-else
     pageTitle="Edge Services"
-    title="No edge services"
+    title="No edge services added"
     description="Create your first edge service."
-    createButtonLabel="Add edge service"
+    createButtonLabel="Edge Services"
     createPagePath="edge-services/create"
     :documentationService="documentationService"
   >
@@ -68,6 +69,7 @@
           },
           {
             field: 'lastModified',
+            sortField: 'lastModifiedDate',
             header: 'Last Modified'
           },
           {

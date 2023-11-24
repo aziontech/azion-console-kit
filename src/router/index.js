@@ -19,11 +19,12 @@ import { realTimePurgeRoutes } from '@routes/real-time-purge'
 import { teamsPermissionRoutes } from '@routes/team-permission'
 import { usersListsRoutes } from '@routes/users-routes'
 import { passwordRoutes } from '@routes/password-routes'
-import { activityHistoryRoutes } from './routes/activity-history-routes'
+import { activityHistoryRoutes } from '@routes/activity-history-routes'
 import { errorRoutes } from '@routes/error-routes'
 import { playgroundRoutes } from '@routes/playground-routes'
 import { createNewRoutes } from './routes/create-something-new-routes'
 import { mfaRoutes } from '@routes/mfa-routes'
+import { signupRoutes } from '@routes/signup-routes'
 import beforeEachRoute from './hooks/beforeEachRoute'
 
 const router = createRouter({
@@ -52,10 +53,11 @@ const router = createRouter({
     mfaRoutes,
     activityHistoryRoutes,
     realTimePurgeRoutes,
-    teamsPermissionRoutes
+    teamsPermissionRoutes,
+    signupRoutes
   ].concat(errorRoutes)
 })
 
-router.beforeEach(beforeEachRoute)
+router.beforeResolve(beforeEachRoute)
 
 export default router

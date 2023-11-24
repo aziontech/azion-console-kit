@@ -42,7 +42,8 @@
           v-model:showSwitchAccount="openSwitchAccount"
           :accessMenu="profileMenuSwitchAccount"
           :account="user"
-          :accountListService="serviceSwitchAccount"
+          :listTypeAccountService="listTypeAccountService"
+          :accountHandler="accountHandler"
         />
       </div>
 
@@ -83,24 +84,24 @@
 
         <!-- Create Button Desktop -->
         <PrimeButton
-          @click="showCreateModal"
+          @click="createBoardManager.open()"
           icon="pi pi-plus"
           label="Create"
-          class="!text-white h-8 hidden md:flex !text-white border-header"
+          class="!text-white h-8 hidden md:flex border-header"
           size="small"
           :pt="{
             label: { class: 'text-white' },
             icon: { class: 'text-white' }
           }"
           :class="{
-            'bg-header hover:bg-header-button-hover': !showCreate,
-            'bg-header-button-enabled': showCreate
+            'bg-header hover:bg-header-button-hover': !createBoardManager.enabled.value,
+            'bg-header-button-enabled': createBoardManager.enabled.value
           }"
         />
 
         <!-- Create Button Mobile -->
         <PrimeButton
-          @click="showCreateMobileModal"
+          @click="createBoardManager.open()"
           icon="pi pi-plus"
           class="h-8 md:hidden text-white border-header"
           size="small"
@@ -110,8 +111,8 @@
             icon: { class: 'text-white' }
           }"
           :class="{
-            'bg-header hover:bg-header-button-hover': !showCreate,
-            'bg-header-button-enabled': showCreate
+            'bg-header hover:bg-header-button-hover': !createBoardManager.enabled.value,
+            'bg-header-button-enabled': createBoardManager.enabled.value
           }"
           v-tooltip.bottom="{ value: 'Create', showDelay: 200 }"
         />
@@ -176,14 +177,14 @@
           @click="toggleProfileMobile"
           label="U"
           class="transition-all hover:border-orange-500 hover:bg-header-button-hover cursor-pointer md:hidden text-avatar text-avatar bg-header-avatar"
-          v-tooltip.bottom="{ value: 'Account settings', showDelay: 200 }"
+          v-tooltip.bottom="{ value: 'Account', showDelay: 200 }"
         />
         <!-- Profile Desktop -->
         <Avatar
           @click="toggleProfile"
           label="U"
           class="transition-all hover:border-orange-500 hover:bg-header-button-hover hidden md:flex cursor-pointer bg-header-avatar"
-          v-tooltip.bottom="{ value: 'Account settings', showDelay: 200 }"
+          v-tooltip.bottom="{ value: 'Account', showDelay: 200 }"
         />
       </div>
     </div>
@@ -503,32 +504,34 @@
 
   <!-- Modal de create -->
   <PrimeDialog
-    v-model:visible="showCreate"
+    v-model:visible="createBoardManager.enabled"
     modal
     header="Create something new"
     :pt="{
+      root: { class: 'hidden sm:flex' },
       content: { class: 'p-4 sm:p-0' }
     }"
     position="center"
     :dismissableMask="true"
     :breakpoints="{ '641px': '90vw' }"
+    @update:visible="createBoardManager.close()"
   >
     <!-- SLOT WIP -->
     <div>
-      <CreateModalBlock @closeModal="showCreate = false" />
+      <CreateModalBlock @closeModal="createBoardManager.close()" />
     </div>
   </PrimeDialog>
 
   <!-- Mobile modal Create -->
   <Sidebar
-    v-model:visible="showCreateMobile"
+    v-model:visible="createBoardManager.enabled"
     position="bottom"
     headerContent="Create something new"
     :show-close-icon="false"
     :pt="{
-      root: { class: 'h-[80%] flex p-0' },
+      root: { class: 'h-[80%] flex p-0 sm:hidden' },
       headerContent: { class: 'w-full' },
-      mask: { class: 'flex' }
+      mask: { class: 'flex sm:hidden' }
     }"
   >
     <template #header>
@@ -536,7 +539,7 @@
         <h2>Create something new</h2>
         <PrimeButton
           icon="pi pi-times"
-          @click="closeCreateMobileModal"
+          @click="createBoardManager.close()"
           size="small"
           class="flex-none surface-border text-sm w-8 h-8"
           text
@@ -579,7 +582,6 @@
   import { useAccountStore } from '@/stores/account'
   import { useHelpCenterStore } from '@/stores/help-center'
   import { mapActions, mapState } from 'pinia'
-  import { listTypeAccountService } from '@/services/switch-account-services/list-type-account-service'
   import SwitchAccountBlock from '@/templates/switch-account-block'
   import CreateModalBlock from '@/templates/create-modal-block'
 
@@ -600,12 +602,21 @@
       SwitchAccountBlock,
       CreateModalBlock
     },
-    props: { isLogged: Boolean },
+    props: {
+      isLogged: Boolean,
+      listTypeAccountService: {
+        type: Function,
+        required: true
+      },
+      accountHandler: {
+        type: Object,
+        required: true
+      }
+    },
+    inject: ['createBoardManager'],
     data() {
       return {
         openSwitchAccount: false,
-        showCreate: false,
-        showCreateMobile: false,
         showSearch: false,
         showSidebar: false,
         showProfile: false,
@@ -681,7 +692,6 @@
               {
                 label: 'Intelligent DNS',
                 to: '/intelligent-dns',
-                tag: 'New',
                 icon: 'pi pi-share-alt'
               },
               {
@@ -710,15 +720,20 @@
                 icon: 'pi pi-play'
               },
               {
-                label: 'Edge Pulse',
-                to: '/edge-pulse',
+                label: 'Real Time Metrics',
+                to: '/real-time-metrics',
                 icon: 'pi pi-chart-line'
               },
               {
-                label: 'Real Time Metrics',
-                to: '/real-time-metrics',
-                icon: 'pi pi-chart-line',
-                tag: 'Beta'
+                label: 'Real Time Events',
+                to: '/real-time-events',
+                icon: 'pi pi-server',
+                tag: 'Preview'
+              },
+              {
+                label: 'Edge Pulse',
+                to: '/edge-pulse',
+                icon: 'pi pi-chart-line'
               }
             ]
           },
@@ -798,8 +813,7 @@
           { name: 'Light', value: 'light', icon: 'pi pi-sun' },
           { name: 'Dark', value: 'dark', icon: 'pi pi-moon' },
           { name: 'System', value: 'system', icon: 'pi pi-desktop' }
-        ],
-        serviceSwitchAccount: listTypeAccountService
+        ]
       }
     },
     computed: {
@@ -849,15 +863,6 @@
       },
       toggleNotification(event) {
         this.$refs.menu.toggle(event)
-      },
-      showCreateModal() {
-        this.showCreate = true
-      },
-      showCreateMobileModal() {
-        this.showCreateMobile = true
-      },
-      closeCreateMobileModal() {
-        this.showCreateMobile = false
       },
       openSideBar() {
         this.showSidebar = !this.showSidebar

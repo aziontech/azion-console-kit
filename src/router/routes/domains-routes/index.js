@@ -15,7 +15,8 @@ export const domainsRoutes = {
       props: {
         listDomainsService: DomainServices.listDomainsService,
         deleteDomainService: DomainServices.deleteDomainService,
-        documentationService: Helpers.documentationCatalog.domains
+        documentationService: Helpers.documentationCatalog.domains,
+        clipboardWrite: Helpers.clipboardWrite
       },
       meta: {
         breadCrumbs: [
@@ -56,7 +57,8 @@ export const domainsRoutes = {
         editDomainService: DomainServices.editDomainService,
         listDigitalCertificatesService: DigitalCertificatesServices.listDigitalCertificatesService,
         listEdgeApplicationsService: EdgeApplicationServices.listEdgeApplicationsService,
-        loadDomainService: DomainServices.loadDomainService
+        loadDomainService: DomainServices.loadDomainService,
+        updatedRedirect: 'list-domains'
       },
       meta: {
         breadCrumbs: [

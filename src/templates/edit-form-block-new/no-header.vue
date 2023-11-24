@@ -59,6 +59,10 @@
       formMeta: {
         type: Object,
         required: true
+      },
+      updatedRedirect: {
+        type: String,
+        required: true
       }
     },
     async created() {
@@ -70,15 +74,19 @@
         this.handleCancel()
         return dialogUnsaved
       },
+      goBackToList() {
+        if (this.updatedRedirect) {
+          this.$router.push({ name: this.updatedRedirect })
+          return
+        }
+        this.$router.go(-1)
+      },
       handleCancel() {
         if (this.backURL) {
           this.$router.push({ path: this.backURL })
         } else {
-          this.$router.go('-1')
+          this.goBackToList()
         }
-      },
-      goBackToList() {
-        this.$router.go(-1)
       },
       async loadInitialData() {
         try {

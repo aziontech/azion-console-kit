@@ -30,7 +30,7 @@ const parseHttpResponse = (httpResponse) => {
     case 201:
       return {
         feedback: 'Your Edge Service has been created',
-        redirectURL: `/edge-services`
+        urlToEditView: `/edge-services`
       }
     case 422:
       const apiError = extractApiError(httpResponse)

@@ -19,13 +19,14 @@ const adapt = (payload) => {
     name: payload.name,
     template_id: payload.template,
     data_source: payload.dataSource,
-    domain_ids: allDomains ? [] : getDomains(payload.domains),
-    all_domains: allDomains ? true : false,
-    endpoint: getEndpoint(payload)
+    domain_ids: allDomains ? [] : getDomains(payload.domains[1]),
+    all_domains: allDomains,
+    active: payload.status,
+    endpoint: parseByEndpointType(payload)
   }
 }
 
-const getEndpoint = (payload) => {
+const parseByEndpointType = (payload) => {
   switch (payload.endpoint) {
     case 'standard':
       return {
@@ -108,7 +109,7 @@ const getEndpoint = (payload) => {
         blob_sas_token: payload.blobToken
       }
     default:
-      return {}
+      throw new Errors.InvalidDataStreamingEndpointType().message
   }
 }
 
@@ -121,7 +122,7 @@ const getHeaders = (listHeaders) => {
   if (listHeaders.length > 0) {
     listHeaders.forEach((element) => {
       const header = element.value.split(':')
-      headers[header[0]] = header[1]?.trim()
+      headers[header[0]] = header[1]?.trim() ?? header[0]
     })
   }
   return headers
@@ -132,7 +133,7 @@ const parseHttpResponse = (httpResponse) => {
     case 201:
       return {
         feedback: 'Your data streaming has been created',
-        redirectURL: `/data-streaming/edit/${httpResponse.body.results.id}`
+        urlToEditView: `/data-streaming/edit/${httpResponse.body.results.id}`
       }
     case 400:
       const apiError = extractApiError(httpResponse)

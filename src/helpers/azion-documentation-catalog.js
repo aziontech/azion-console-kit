@@ -11,7 +11,15 @@ export const documentationCatalog = {
   getStarted: () => openSearchResult('get started'),
   digitalCertificates: () => openSearchResult('digital certificates'),
   credentials: () => openSearchResult('credentials'),
-  networkLists: () => openSearchResult('network lists')
+  networkLists: () => openSearchResult('network lists'),
+  teamPermissions: () => openSearchResult('team permissions'),
+  dataStreaming: () => openSearchResult('data streaming'),
+  edgeFunctions: () => openSearchResult('edge functions'),
+  edgeFirewall: () => openSearchResult('edge firewall'),
+  edgeApplication: () => openSearchResult('edge application'),
+  users: () => openSearchResult('users'),
+  activityHistory: () => openSearchResult('activity history'),
+  edgeNodes: () => openSearchResult('edge nodes')
 }
 
 export const documentationGuideProducts = {

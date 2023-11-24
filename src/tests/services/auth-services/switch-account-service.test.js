@@ -21,6 +21,7 @@ const makeSut = () => {
 describe.concurrent('AuthServices', () => {
   it('should call switch account service with correct params', async () => {
     const requestSpy = vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValue({
+      body: {},
       statusCode: 200
     })
     const accountIdMock = 332211
@@ -64,7 +65,7 @@ describe.concurrent('AuthServices', () => {
     async ({ statusCode, expectedError }) => {
       vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValue({
         statusCode,
-        body: null
+        body: {}
       })
       const accountIdStub = 332211
       const { sut } = makeSut()

@@ -1,28 +1,16 @@
 
 <template>
-  <div class="p-5">
-    <ScriptRunnerBlock
-      title="Build"
-      :executionId="uuid"
-      :scriptRunnerService="getLogs"></ScriptRunnerBlock>
-      
+  <div class="items-center">
+    <Badge class="w-fit" value="2"></Badge>
+    <Badge class="w-fit" value="8" severity="success"></Badge>
+    <Badge class="w-fit" value="4" severity="info"></Badge>
+    <Badge class="w-fit" value="12" severity="warning"></Badge>
+    <Badge class="w-fit" value="3" severity="danger"></Badge>
   </div>
+
 </template>
-  <script>
-    import ScriptRunnerBlock from '@/templates/script-runner-block'
-    import {getLogs} from '@/services/script-runner-service'
-    export default {
-      name: 'script-runner-test-block',
-      components: {
-        ScriptRunnerBlock
-      },
-      async created() {
-        //
-      },
-      data: () => ({
-        uuid: 'f7f7cea5-ad9d-4432-aec0-f31ce4102dda',
-        getLogs
-      }),
-    }
+  
+  <script setup>
+    import Badge from 'primevue/badge';
   </script>
   

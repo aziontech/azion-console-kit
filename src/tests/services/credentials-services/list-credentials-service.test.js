@@ -70,7 +70,8 @@ describe('ListCredentialsServices', () => {
       status: 'Yes',
       description: fixtures.credentialBasic.description,
       lastEditor: fixtures.credentialBasic.last_editor,
-      lastModified: fixtures.credentialBasic.last_modified
+      lastModified: 'Monday, October 9, 2023 at 9:00 PM',
+      lastModifiedDate: '2023-10-10T00:00:00Z'
     })
 
     expect(item2).toEqual({
@@ -80,7 +81,8 @@ describe('ListCredentialsServices', () => {
       status: 'No',
       description: fixtures.credentialDisabled.description,
       lastEditor: fixtures.credentialDisabled.last_editor,
-      lastModified: fixtures.credentialDisabled.last_modified
+      lastModified: 'Tuesday, October 10, 2023 at 9:00 PM',
+      lastModifiedDate: '2023-10-11T00:00:00Z'
     })
   })
 

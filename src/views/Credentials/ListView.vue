@@ -5,6 +5,7 @@
     :deleteService="deleteCredentialService"
     :columns="getColumns"
     pageTitle="Credentials"
+    pageTitleDelete="Credential"
     addButtonLabel="Credential"
     editPagePath="credentials/edit"
     createPagePath="credentials/create"
@@ -15,7 +16,7 @@
     pageTitle="Credentials"
     title="No credentials added"
     description="Create your first credentials."
-    createButtonLabel="Add credentials"
+    createButtonLabel="Credential"
     createPagePath="credentials/create"
     :documentationService="documentationService"
   >
@@ -58,6 +59,7 @@
           },
           {
             field: 'lastModified',
+            sortField: 'lastModifiedDate',
             header: 'Last Modified'
           },
           {

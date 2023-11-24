@@ -5,6 +5,7 @@
     :deleteService="deleteNetworkListService"
     :columns="getColumns"
     pageTitle="Network Lists"
+    pageTitleDelete="Network List"
     addButtonLabel="Network List"
     createPagePath="network-lists/create"
     editPagePath="network-lists/edit"
@@ -14,8 +15,8 @@
     v-else
     pageTitle="Network Lists"
     title="No network list added"
-    description="Create your first networkist."
-    createButtonLabel="Network Lists"
+    description="Create a network list based on ASNs, countries, or IP addresses."
+    createButtonLabel="Add"
     createPagePath="network-lists/create"
     :documentationService="documentationService"
   >
@@ -71,6 +72,7 @@
           },
           {
             field: 'lastModified',
+            sortField: 'lastModifiedDate',
             header: 'Last Modified'
           }
         ]
