@@ -3,7 +3,6 @@ import * as TeamPermissionService from '@/services/team-permission'
 /** @type {import('vue-router').RouteRecordRaw} */
 export const teamsPermissionRoutes = {
   path: '/teams-permission',
-  name: 'teams-permission',
   children: [
     {
       path: '',

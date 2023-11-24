@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div class="max-w-full mx-3 mb-8 mt-8">
+    <div class="max-w-full mt-4">
       <DataTable
         v-if="!isLoading"
         scrollable
@@ -171,6 +171,10 @@
         type: String,
         required: true
       },
+      pageTitleDelete: {
+        type: String,
+        required: true
+      },
       createPagePath: {
         type: String,
         required: true,
@@ -260,7 +264,7 @@
       },
       openDeleteDialog() {
         this.informationForDeletion = {
-          title: this.pageTitle,
+          title: this.pageTitleDelete,
           selectedID: this.selectedId,
           deleteService: this.deleteService,
           deleteDialogVisible: true,

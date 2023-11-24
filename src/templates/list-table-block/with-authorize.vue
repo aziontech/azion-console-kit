@@ -1,173 +1,171 @@
 <template>
-  <div>
-    <PageHeadingBlock :pageTitle="pageTitle" />
-
-    <div class="max-w-full mx-3 mb-8 md:mx-8">
-      <DataTable
-        v-if="!isLoading"
-        @rowReorder="onRowReorder"
-        scrollable
-        removableSort
-        :value="data"
-        dataKey="id"
-        v-model:filters="this.filters"
-        paginator
-        :rowsPerPageOptions="[10, 20, 50, 100]"
-        :rows="10"
-        :globalFilterFields="filterBy"
-        :loading="isLoading"
-        v-model:selection="selectedRow"
-        selectionMode="single"
-        @row-click="editItemSelected"
+  <div class="max-w-full">
+    <DataTable
+      v-if="!isLoading"
+      class="overflow-clip rounded-md"
+      @rowReorder="onRowReorder"
+      scrollable
+      removableSort
+      :value="data"
+      dataKey="id"
+      v-model:filters="this.filters"
+      paginator
+      :rowsPerPageOptions="[10, 20, 50, 100]"
+      :rows="10"
+      :globalFilterFields="filterBy"
+      :loading="isLoading"
+      v-model:selection="selectedRow"
+      selectionMode="single"
+      @row-click="editItemSelected"
+    >
+      <template #header>
+        <div class="flex flex-wrap justify-between gap-2 w-full">
+          <span class="p-input-icon-left max-sm:w-full">
+            <i class="pi pi-search" />
+            <InputText
+              class="w-full"
+              v-model="this.filters.global.value"
+              placeholder="Search"
+            />
+          </span>
+          <PrimeButton
+            class="max-sm:w-full"
+            @click="navigateToAddPage"
+            icon="pi pi-plus"
+            :label="addButtonLabel"
+            v-if="addButtonLabel"
+          />
+        </div>
+      </template>
+      <Column
+        v-if="reorderableRows"
+        rowReorder
+        headerStyle="width: 3rem"
+      />
+      <Column
+        sortable
+        v-for="col of selectedColumns"
+        :key="col.field"
+        :field="col.field"
+        :header="col.header"
+      >
+        <template #body="{ data: rowData }">
+          <template v-if="col.type !== 'component'">
+            <div v-html="rowData[col.field]" />
+          </template>
+          <template v-else>
+            <component :is="col.component(rowData[col.field])"></component>
+          </template>
+        </template>
+      </Column>
+      <Column
+        :frozen="true"
+        :alignFrozen="'right'"
+        headerStyle="width: 13rem"
       >
         <template #header>
-          <div class="flex flex-wrap justify-between gap-2 w-full">
-            <span class="p-input-icon-left max-sm:w-full">
-              <i class="pi pi-search" />
-              <InputText
-                class="w-full"
-                v-model="this.filters.global.value"
-                placeholder="Search"
-              />
-            </span>
+          <div class="flex justify-end w-full">
             <PrimeButton
-              class="max-sm:w-full"
-              @click="navigateToAddPage"
-              icon="pi pi-plus"
-              :label="addButtonLabel"
-              v-if="addButtonLabel"
-            />
-          </div>
-        </template>
-        <Column
-          v-if="reorderableRows"
-          rowReorder
-          headerStyle="width: 3rem"
-        />
-        <Column
-          sortable
-          v-for="col of selectedColumns"
-          :key="col.field"
-          :field="col.field"
-          :header="col.header"
-        >
-          <template #body="{ data: rowData }">
-            <template v-if="col.type !== 'component'">
-              <div v-html="rowData[col.field]" />
-            </template>
-            <template v-else>
-              <component :is="col.component(rowData[col.field])"></component>
-            </template>
-          </template>
-        </Column>
-        <Column
-          :frozen="true"
-          :alignFrozen="'right'"
-          headerStyle="width: 13rem"
-        >
-          <template #header>
-            <div class="flex justify-end w-full">
-              <PrimeButton
-                outlined
-                icon="pi pi-bars"
-                @click="toggleColumnSelector"
-                v-tooltip.top="{ value: 'Hidden columns', showDelay: 200 }"
+              outlined
+              icon="pi pi-bars"
+              @click="toggleColumnSelector"
+              v-tooltip.top="{ value: 'Hidden columns', showDelay: 200 }"
+            >
+            </PrimeButton>
+            <OverlayPanel ref="columnSelectorPanel">
+              <Listbox
+                v-model="selectedColumns"
+                multiple
+                :options="[{ label: 'Hidden columns', items: this.columns }]"
+                class="hidden-columns-panel"
+                optionLabel="header"
+                optionGroupLabel="label"
+                optionGroupChildren="items"
               >
-              </PrimeButton>
-              <OverlayPanel ref="columnSelectorPanel">
-                <Listbox
-                  v-model="selectedColumns"
-                  multiple
-                  :options="[{ label: 'Hidden columns', items: this.columns }]"
-                  class="hidden-columns-panel"
-                  optionLabel="header"
-                  optionGroupLabel="label"
-                  optionGroupChildren="items"
-                >
-                  <template #optiongroup="slotProps">
-                    <p class="text-sm font-bold">{{ slotProps.option.label }}</p>
-                  </template>
-                </Listbox>
-              </OverlayPanel>
-            </div>
-          </template>
-          <template #body="{ data: rowData }">
-            <div class="flex justify-end">
-              <PrimeMenu
-                :ref="'menu'"
-                id="overlay_menu"
-                v-bind:model="actionOptions()"
-                :popup="true"
-              />
-              <PrimeButton
-                v-tooltip.top="{ value: 'Actions', showDelay: 200 }"
-                size="small"
-                icon="pi pi-ellipsis-h"
-                text
-                @click="(event) => toggleActionsMenu(event, rowData.id)"
-                class="cursor-pointer"
-              />
-            </div>
-          </template>
-        </Column>
-        <template #empty>
-          <div class="my-4 flex flex-col gap-3 justify-center items-center">
-            <p class="text-xl font-normal text-gray-600">No registers found.</p>
+                <template #optiongroup="slotProps">
+                  <p class="text-sm font-bold">{{ slotProps.option.label }}</p>
+                </template>
+              </Listbox>
+            </OverlayPanel>
+          </div>
+        </template>
+        <template #body="{ data: rowData }">
+          <div class="flex justify-end">
+            <PrimeMenu
+              :ref="'menu'"
+              id="overlay_menu"
+              v-bind:model="actionOptions()"
+              :popup="true"
+            />
             <PrimeButton
+              v-tooltip.top="{ value: 'Actions', showDelay: 200 }"
+              size="small"
+              icon="pi pi-ellipsis-h"
               text
-              icon="pi pi-plus"
-              label="Add"
-              v-if="addButtonLabel"
-              @click="navigateToAddPage"
+              @click="(event) => toggleActionsMenu(event, rowData.id)"
+              class="cursor-pointer"
             />
           </div>
         </template>
-      </DataTable>
+      </Column>
+      <template #empty>
+        <div class="my-4 flex flex-col gap-3 justify-center items-center">
+          <p class="text-xl font-normal text-gray-600">No registers found.</p>
+          <PrimeButton
+            text
+            icon="pi pi-plus"
+            label="Add"
+            v-if="addButtonLabel"
+            @click="navigateToAddPage"
+          />
+        </div>
+      </template>
+    </DataTable>
 
-      <DataTable
-        v-else
-        :value="Array(10)"
-        :pt="{
-          header: { class: '!border-t-0' }
-        }"
-      >
-        <template #header>
-          <div class="flex flex-wrap justify-between gap-2 w-full">
-            <span class="p-input-icon-left max-sm:w-full">
-              <i class="pi pi-search" />
-              <InputText
-                class="w-full"
-                v-model="this.filters.global.value"
-                placeholder="Search"
-              />
-            </span>
-            <PrimeButton
-              class="max-sm:w-full"
-              @click="navigateToAddPage"
-              icon="pi pi-plus"
-              :label="addButtonLabel"
-              v-if="addButtonLabel"
+    <DataTable
+      v-else
+      :value="Array(10)"
+      :pt="{
+        header: { class: '!border-t-0' }
+      }"
+    >
+      <template #header>
+        <div class="flex flex-wrap justify-between gap-2 w-full">
+          <span class="p-input-icon-left max-sm:w-full">
+            <i class="pi pi-search" />
+            <InputText
+              class="w-full"
+              v-model="this.filters.global.value"
+              placeholder="Search"
             />
-          </div>
+          </span>
+          <PrimeButton
+            class="max-sm:w-full"
+            @click="navigateToAddPage"
+            icon="pi pi-plus"
+            :label="addButtonLabel"
+            v-if="addButtonLabel"
+          />
+        </div>
+      </template>
+      <Column
+        sortable
+        v-for="col of columns"
+        :key="col.field"
+        :field="col.field"
+        :header="col.header"
+      >
+        <template #body>
+          <Skeleton></Skeleton>
         </template>
-        <Column
-          sortable
-          v-for="col of columns"
-          :key="col.field"
-          :field="col.field"
-          :header="col.header"
-        >
-          <template #body>
-            <Skeleton></Skeleton>
-          </template>
-        </Column>
-      </DataTable>
-    </div>
-    <DeleteDialog
-      :informationForDeletion="informationForDeletion"
-      @successfullyDeleted="updatedTable()"
-    />
+      </Column>
+    </DataTable>
   </div>
+  <DeleteDialog
+    :informationForDeletion="informationForDeletion"
+    @successfullyDeleted="updatedTable()"
+  />
+  <Authorize :authorize="edgeNodeSelected"></Authorize>
 </template>
 
 <script>
@@ -182,10 +180,12 @@
   import { FilterMatchMode } from 'primevue/api'
   import PageHeadingBlock from '@/templates/page-heading-block'
   import DeleteDialog from './dialog/delete-dialog'
+  import Authorize from './dialog/authorize.vue'
+  import ContentBlock from '@/templates/content-block'
 
   export default {
     name: 'list-table-block',
-    emits: ['on-load-data', 'authorize-edge-node'],
+    emits: ['on-load-data'],
     components: {
       DataTable,
       Column,
@@ -196,7 +196,9 @@
       Listbox,
       OverlayPanel,
       PageHeadingBlock,
-      DeleteDialog
+      DeleteDialog,
+      ContentBlock,
+      Authorize
     },
     data: () => ({
       selectedId: null,
@@ -207,7 +209,8 @@
       showColumnSelector: false,
       data: [],
       selectedColumns: [],
-      informationForDeletion: {}
+      informationForDeletion: {},
+      edgeNodeSelected: null
     }),
     props: {
       columns: {
@@ -221,6 +224,10 @@
         ]
       },
       pageTitle: {
+        type: String,
+        required: true
+      },
+      pageTitleDelete: {
         type: String,
         required: true
       },
@@ -304,6 +311,7 @@
           this.isLoading = false
         }
       },
+
       navigateToAddPage() {
         this.$router.push(this.createPagePath)
       },
@@ -316,7 +324,7 @@
       },
       openDeleteDialog() {
         this.informationForDeletion = {
-          title: this.pageTitle,
+          title: this.pageTitleDelete,
           selectedID: this.selectedId,
           deleteService: this.deleteService,
           deleteDialogVisible: true,
@@ -328,9 +336,11 @@
         this.$forceUpdate()
       },
       authorize() {
-        this.$emit('authorizeEdgeNode', {
-          authorize: { edgeNodeID: this.selectedId, openDialog: true, rerender: Math.random() }
-        })
+        this.edgeNodeSelected = {
+          edgeNodeID: this.selectedId,
+          openDialog: true,
+          rerender: Math.random()
+        }
       }
     },
     watch: {

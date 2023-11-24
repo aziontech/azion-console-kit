@@ -9,14 +9,19 @@
           Verify your account by clicking the link in the confirmation email we just sent you.
         </p>
       </section>
-      <section class="w-full flex gap-2">
+      <section class="w-full flex flex-wrap gap-2">
         <p class="text-start">Didn't receive the email?</p>
         <PrimeButton
           label="Resend email"
           class="p-0"
           link
           @click="resendEmail"
-          :disabled="!isEmailValid"
+          :disabled="isSubmitDisabled"
+        />
+        <PrimeBadge
+          class="rounded-md animate-fadeIn"
+          :value="counter"
+          v-if="counter > 0"
         />
       </section>
       <PrimeButton
@@ -30,9 +35,12 @@
 
 <script setup>
   import PrimeButton from 'primevue/button'
+  import PrimeBadge from 'primevue/badge'
   import { useToast } from 'primevue/usetoast'
-  import { ref } from 'vue'
+  import { computed, ref } from 'vue'
   import { useRoute, useRouter } from 'vue-router'
+
+  const SUBMIT_TIMER = 60
 
   const props = defineProps({
     resendEmailService: {
@@ -62,6 +70,7 @@
   }
 
   const resendEmail = async () => {
+    disableSubmitByTimer(SUBMIT_TIMER)
     try {
       const res = await props.resendEmailService({ email: decodedEmail })
       toast.add({ life: 5000, severity: 'success', detail: res, summary: 'Email sent' })
@@ -69,6 +78,24 @@
       toast.add({ life: 5000, severity: 'error', detail: err, summary: 'Error' })
     }
   }
+
+  const isRequested = ref(false)
+  const counter = ref(0)
+  const countdown = () => counter.value--
+
+  const disableSubmitByTimer = (timeInSec) => {
+    isRequested.value = true
+    counter.value = timeInSec
+    const interval = setInterval(countdown, 1000)
+    setTimeout(() => {
+      isRequested.value = false
+      clearInterval(interval)
+    }, timeInSec * 1000)
+  }
+
+  const isSubmitDisabled = computed(() => {
+    return !isEmailValid.value || isRequested.value
+  })
 
   const goToLogin = () => {
     router.push({ name: 'login' })

@@ -3,7 +3,7 @@
     v-model:visible="deleteDialogVisible"
     modal
     :header="`Delete ${informationForDeletion.title}`"
-    class="w-[40vw]"
+    class="w-[95vw] md:w-[40vw]"
   >
     <div class="flex flex-col gap-5">
       <div>
@@ -35,7 +35,6 @@
             autofocus
             v-model="confirmation"
             :class="{ 'p-invalid': errors.confirmation }"
-            v-tooltip.top="{ value: errors.confirmation, showDelay: 200 }"
           />
           <small
             v-if="errors.confirmation"

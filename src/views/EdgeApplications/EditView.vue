@@ -1,6 +1,9 @@
 <template>
-  <PageHeadingBlock :pageTitle="pageTitle">
-    <template #tabs>
+  <ContentBlock>
+    <template #heading>
+      <PageHeadingBlock pageTitle="Edge Application"></PageHeadingBlock>
+    </template>
+    <template #content>
       <TabView
         :active-index="0"
         class="w-full"
@@ -40,13 +43,14 @@
         </TabPanel>
       </TabView>
     </template>
-  </PageHeadingBlock>
+  </ContentBlock>
 </template>
 
 <script setup>
   import TabView from 'primevue/tabview'
   import TabPanel from 'primevue/tabpanel'
-  import PageHeadingBlock from '@/templates/page-heading-block-tabs'
+  import ContentBlock from '@/templates/content-block'
+  import PageHeadingBlock from '@/templates/page-heading-block'
 
   // Tabs
   import OriginsTab from '../EdgeApplicationsOrigins/ListView.vue'
@@ -63,6 +67,4 @@
       required: true
     }
   })
-
-  const pageTitle = 'Edge Application'
 </script>

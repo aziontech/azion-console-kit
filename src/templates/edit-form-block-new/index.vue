@@ -1,44 +1,46 @@
 <template>
-  <div class="flex flex-col min-h-[calc(100vh-120px)]">
-    <PageHeadingBlock :pageTitle="pageTitle" />
+  <div class="flex flex-col min-h-[calc(100vh-300px)]">
     <form
       @submit.prevent="handleSubmit"
-      class="w-full grow px-8 flex flex-col gap-8 mb-5 max-sm:px-3 max-md:gap-6"
-      :class="{ 'py-4': !hasTabs, 'pb-4': hasTabs }"
+      class="w-full grow flex flex-col gap-8 max-md:gap-6"
     >
       <slot name="form" />
 
       <slot name="raw-form" />
     </form>
+  </div>
 
-    <DialogUnsavedBlock
-      :leavePage="leavePage"
-      :blockRedirectUnsaved="hasModifications"
-    />
+  <DialogUnsavedBlock
+    :leavePage="leavePage"
+    :blockRedirectUnsaved="hasModifications"
+  />
+  <Teleport
+    to="#action-bar"
+    v-if="teleportLoad"
+  >
     <ActionBarTemplate
       @cancel="handleCancel"
       @submit="handleSubmit"
       :loading="isLoading"
       :submitDisabled="!formMeta.valid"
     />
-  </div>
+  </Teleport>
 </template>
 
 <script>
   import DialogUnsavedBlock from '@/templates/dialog-unsaved-block'
   import ActionBarTemplate from '@/templates/action-bar-block'
-  import PageHeadingBlock from '@/templates/page-heading-block'
 
   export default {
     name: 'edit-form-block',
     components: {
       ActionBarTemplate,
-      PageHeadingBlock,
       DialogUnsavedBlock
     },
     data: () => ({
       isLoading: false,
-      blockViewRedirection: true
+      blockViewRedirection: true,
+      teleportLoad: false
     }),
     props: {
       pageTitle: {
@@ -80,6 +82,9 @@
     },
     async created() {
       await this.loadInitialData()
+    },
+    mounted() {
+      this.teleportLoad = true
     },
     methods: {
       leavePage(dialogUnsaved) {

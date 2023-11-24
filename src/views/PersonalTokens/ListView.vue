@@ -1,34 +1,39 @@
 <template>
-  <ListTableBlock
-    v-if="hasContentToList"
-    :listService="listPersonalTokensService"
-    :deleteService="deletePersonalTokenService"
-    :columns="getColumns"
-    pageTitle="Personal Tokens"
-    addButtonLabel="Personal Token"
-    createPagePath="personal-tokens/create"
-    @on-load-data="handleLoadData"
-    :enableEditClick="false"
-  />
-  <EmptyResultsBlock
-    v-else
-    pageTitle="Personal Tokens"
-    title="No personal tokens found"
-    description="Create your first personal token."
-    createButtonLabel="Personal Token"
-    createPagePath="personal-tokens/create"
-    :documentationService="documentationService"
-  >
-    <template #illustration>
-      <Illustration />
+  <ContentBlock>
+    <template #heading>
+      <PageHeadingBlock pageTitle="Personal Tokens"></PageHeadingBlock>
     </template>
-  </EmptyResultsBlock>
+    <template #content>
+      <ListTableBlock
+        v-if="hasContentToList"
+        :listService="listPersonalTokensService"
+        :deleteService="deletePersonalTokenService"
+        :columns="getColumns"
+        pageTitleDelete="Personal Token"
+        addButtonLabel="Personal Token"
+        createPagePath="personal-tokens/create"
+        @on-load-data="handleLoadData"
+        :enableEditClick="false" />
+      <EmptyResultsBlock
+        v-else
+        title="No personal tokens found"
+        description="Create your first personal token."
+        createButtonLabel="Personal Token"
+        createPagePath="personal-tokens/create"
+        :documentationService="documentationService"
+      >
+        <template #illustration>
+          <Illustration />
+        </template> </EmptyResultsBlock
+    ></template>
+  </ContentBlock>
 </template>
 
 <script setup>
   import { ref } from 'vue'
   import ListTableBlock from '@/templates/list-table-block'
-
+  import ContentBlock from '@/templates/content-block'
+  import PageHeadingBlock from '@/templates/page-heading-block'
   import EmptyResultsBlock from '@/templates/empty-results-block'
   import Illustration from '@/assets/svg/illustration-layers.vue'
   import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
@@ -68,10 +73,12 @@
     },
     {
       field: 'created',
+      sortField: 'createdDate',
       header: 'Last Modified'
     },
     {
       field: 'expiresAt',
+      sortField: 'expiresAtDate',
       header: 'Expiration Date'
     }
   ])

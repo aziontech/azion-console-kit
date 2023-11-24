@@ -74,14 +74,16 @@ describe('EdgeServicesServices', () => {
         name: fixtures.edgeServiceMock.name,
         active: 'Yes',
         lastEditor: fixtures.edgeServiceMock.last_editor,
-        lastModified: 'Friday, November 10, 2023'
+        lastModified: 'Friday, November 10, 2023',
+        lastModifiedDate: new Date('2023-11-10T00:00:00.000Z')
       },
       {
         id: fixtures.disabledEdgeServiceMock.id,
         name: fixtures.disabledEdgeServiceMock.name,
         active: 'No',
         lastEditor: fixtures.disabledEdgeServiceMock.last_editor,
-        lastModified: 'Saturday, November 11, 2023'
+        lastModified: 'Saturday, November 11, 2023',
+        lastModifiedDate: new Date('2023-11-11T00:00:00.000Z')
       }
     ])
   })

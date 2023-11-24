@@ -17,7 +17,9 @@ export const documentationCatalog = {
   edgeFunctions: () => openSearchResult('edge functions'),
   edgeFirewall: () => openSearchResult('edge firewall'),
   edgeApplication: () => openSearchResult('edge application'),
-  users: () => openSearchResult('users')
+  users: () => openSearchResult('users'),
+  activityHistory: () => openSearchResult('activity history'),
+  edgeNodes: () => openSearchResult('edge nodes')
 }
 
 export const documentationGuideProducts = {

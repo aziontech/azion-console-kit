@@ -5,14 +5,14 @@
   >
     <!-- title and description -->
     <div class="flex flex-col gap-2 flex-1 w-full md:min-w-[20rem]">
-      <div class="text-color text-xl font-medium">{{ pros.title }}</div>
+      <div class="text-color text-xl font-medium">{{ props.title }}</div>
       <div class="text-color-secondary text-sm font-normal">
-        {{ pros.description }}
+        {{ props.description }}
       </div>
     </div>
     <!-- inputs  -->
     <div
-      class="max-w-3xl w-full flex flex-col gap-8"
+      class="max-w-3xl w-full flex flex-col gap-8 max-md:gap-6"
       :class="{ '-mt-8': isDrawer }"
     >
       <slot name="inputs"></slot>
@@ -20,7 +20,7 @@
   </fieldset>
 </template>
 <script setup>
-  const pros = defineProps({
+  const props = defineProps({
     title: { type: String, required: true },
     description: { type: String, required: false },
     isDrawer: { type: Boolean, default: false, required: false }

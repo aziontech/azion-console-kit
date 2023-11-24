@@ -66,7 +66,8 @@ describe('VariablesService', () => {
           content: fixtures.variableMock.value
         },
         lastEditor: fixtures.variableMock.last_editor,
-        updatedAt: 'Saturday, June 10, 2023'
+        updatedAt: 'Saturday, June 10, 2023',
+        updatedAtDate: new Date('2023-06-10T00:00:00.000Z')
       }
     ])
   })

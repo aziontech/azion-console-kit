@@ -9,6 +9,7 @@ const fixtures = {
     template: 4,
     dataSource: 'http',
     domains: [[], []],
+    status: true,
     endpoint: 'qradar',
     QRadarUrl: 'https://qradar-trial-abcdef.qradar.ibmcloud.com:123456'
   }
@@ -44,10 +45,58 @@ describe('DataStreamingServices', () => {
         template_id: fixtures.dataStreamingMock.template,
         data_source: fixtures.dataStreamingMock.dataSource,
         domain_ids: [],
+        active: fixtures.dataStreamingMock.status,
         all_domains: true,
         endpoint: {
           endpoint_type: fixtures.dataStreamingMock.endpoint,
           url: fixtures.dataStreamingMock.QRadarUrl
+        }
+      }
+    })
+  })
+
+  it('should use the provided text on invalid headers of standard endpoint type', async () => {
+    const requestSpy = vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
+      statusCode: 201,
+      body: {
+        results: {
+          id: 1
+        }
+      }
+    })
+    const { sut } = makeSut()
+
+    const dataStreamingMock = {
+      ...fixtures.dataStreamingMock,
+      endpoint: 'standard',
+      payloadFormat: 'format-payload',
+      lineSeparator: 'separator-test',
+      maxSize: '123321',
+      headers: [{ value: 'PORT:1010' }, { value: 'invalid-header' }]
+    }
+
+    await sut(dataStreamingMock)
+
+    expect(requestSpy).toHaveBeenCalledWith({
+      url: `data_streaming/streamings`,
+      method: 'POST',
+      body: {
+        name: fixtures.dataStreamingMock.name,
+        template_id: fixtures.dataStreamingMock.template,
+        data_source: fixtures.dataStreamingMock.dataSource,
+        domain_ids: [],
+        all_domains: true,
+        active: fixtures.dataStreamingMock.status,
+        endpoint: {
+          endpoint_type: 'standard',
+          url: fixtures.dataStreamingMock.endpointUrl,
+          payload_format: 'format-payload',
+          log_line_separator: 'separator-test',
+          max_size: '123321',
+          headers: {
+            PORT: '1010',
+            'invalid-header': 'invalid-header'
+          }
         }
       }
     })
@@ -99,18 +148,28 @@ describe('DataStreamingServices', () => {
     })
     const { sut } = makeSut()
     const dataStreamingMockWithDomains = {
-      ...fixtures.dataStreamingMock,
-      endpoint: 'standard',
-      endpointUrl: 'https://app.domain.com/',
-      payloadFormat: '$dataset',
-      lineSeparator: '\n',
-      maxSize: '10000000',
-      headers: [{ value: 'name: api' }, { value: 'teste: 1' }]
+      ...fixtures.dataStreamingMock
     }
 
     const data = await sut(dataStreamingMockWithDomains)
 
     expect(data.feedback).toBe('Your data streaming has been created')
+  })
+
+  it('should throw an error on a invalid Data Streaming endpoint is used', async () => {
+    vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
+      statusCode: 200
+    })
+    const { sut } = makeSut()
+
+    const dataStreamingMock = {
+      ...fixtures.dataStreamingMock,
+      endpoint: 'invalid-enpoint-type'
+    }
+
+    const result = sut(dataStreamingMock)
+
+    expect(result).rejects.toBe('Invalid Data Streaming Endpoint Type')
   })
 
   it.each([

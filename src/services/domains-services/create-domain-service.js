@@ -38,7 +38,8 @@ const parseHttpResponse = (httpResponse) => {
     case 201:
       return {
         feedback: 'Your domain has been created',
-        urlToEditView: `/domains/edit/${httpResponse.body.results.id}`
+        urlToEditView: `/domains/edit/${httpResponse.body.results.id}`,
+        domainName: httpResponse.body.results.domain_name
       }
     case 400:
       throw new Error(Object.keys(httpResponse.body)[0]).message
