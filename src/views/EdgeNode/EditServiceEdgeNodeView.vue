@@ -1,35 +1,43 @@
 <template>
-  <EditFormBlock
-    pageTitle="Edit Edge Node"
-    :editService="this.editServiceEdgeNode"
-    :loadService="this.loadServicesEdgeNode"
-    :initialDataSetter="setValues"
-    :isValid="meta.valid"
-    :formData="values"
-  >
-    <template #form>
-      <InputText
-        placeholder="Service name"
-        v-model="serviceName"
-        type="text"
-        :disabled="true"
-      />
-      <div class="flex flex-col gap-2">
-        <label>Variables: </label>
-        <vue-monaco-editor
-          v-model:value="variables"
-          language="javascript"
-          :theme="theme"
-          class="min-h-[50vh]"
-          :options="editorOptions"
-        />
-      </div>
+  <ContentBlock>
+    <template #heading>
+      <PageHeadingBlock pageTitle="Edit Edge Node"></PageHeadingBlock>
     </template>
-  </EditFormBlock>
+    <template #content>
+      <EditFormBlock
+        :editService="this.editServiceEdgeNode"
+        :loadService="this.loadServicesEdgeNode"
+        :initialDataSetter="setValues"
+        :isValid="meta.valid"
+        :formData="values"
+      >
+        <template #form>
+          <InputText
+            placeholder="Service name"
+            v-model="serviceName"
+            type="text"
+            :disabled="true"
+          />
+          <div class="flex flex-col gap-2">
+            <label>Variables: </label>
+            <vue-monaco-editor
+              v-model:value="variables"
+              language="javascript"
+              :theme="theme"
+              class="min-h-[50vh]"
+              :options="editorOptions"
+            />
+          </div>
+        </template>
+      </EditFormBlock>
+    </template>
+  </ContentBlock>
 </template>
 <script>
-  import EditFormBlock from '@/templates/edit-form-block'
+  import EditFormBlock from '@/templates/edit-form-block-new'
   import InputText from 'primevue/inputtext'
+  import ContentBlock from '@/templates/content-block'
+  import PageHeadingBlock from '@/templates/page-heading-block'
 
   import { useForm, useField } from 'vee-validate'
   import * as yup from 'yup'
@@ -41,7 +49,9 @@
     name: 'edit-service',
     components: {
       InputText,
-      EditFormBlock
+      EditFormBlock,
+      PageHeadingBlock,
+      ContentBlock
     },
     props: {
       editEdgeNodeService: {
