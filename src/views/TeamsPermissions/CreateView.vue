@@ -12,8 +12,8 @@
       >
         <template #form>
           <FormHorizontal
-            title="Teams Permissions"
-            description=""
+            title="General"
+            description="Description"
           >
             <template #inputs>
               <div class="flex flex-col sm:max-w-lg w-full gap-2">
@@ -23,8 +23,7 @@
                   >Name *
                 </label>
                 <InputText
-                  placeholder="Name"
-                  v-bind="name"
+                  v-model="name"
                   type="text"
                   id="name"
                   :class="{ 'p-invalid': errors.name }"
@@ -35,7 +34,13 @@
                   >{{ errors.name }}</small
                 >
               </div>
-
+            </template>
+          </FormHorizontal>
+          <FormHorizontal
+            title="Teams Permissions"
+            description="Select the teams permissions"
+          >
+            <template #inputs>
               <div class="flex flex-col sm:max-w-3xl w-full gap-2">
                 <label
                   for="value"
@@ -44,7 +49,10 @@
                 </label>
                 <PickList
                   v-model="permissionsList"
-                  listStyle="height:342px"
+                  :pt="{
+                    sourceList: { class: ['h-80'] },
+                    targetList: { class: ['h-80'] }
+                  }"
                   dataKey="id"
                   breakpoint="1400px"
                   :showSourceControls="false"
@@ -55,32 +63,31 @@
                   <template #item="slotProps">
                     <div class="flex flex-wrap p-2 align-items-center gap-3">
                       <div class="flex-1 flex flex-column gap-2">
-                        <span class="font-bold">{{ slotProps.item.name }}</span>
+                        <span class="font-normal">{{ slotProps.item.name }}</span>
                       </div>
                     </div>
                   </template>
                 </PickList>
               </div>
-
-              <Card
-                :pt="{
-                  body: { class: 'p-4' },
-                  title: { class: 'flex justify-between items-center text-base m-0 font-medium' },
-                  subtitle: {
-                    class: 'text-sm font-normal text-color-secondary m-0 pr-0 md:pr-[2.5rem]'
-                  }
-                }"
-              >
-                <template #title>
-                  <span class="text-base">Active</span>
-                  <InputSwitch
-                    v-bind="isActive"
-                    v-model="isActive.value"
-                    :class="{ 'p-invalid': errors.isActive }"
-                  />
-                </template>
-                <template #subtitle> </template>
-              </Card>
+            </template>
+          </FormHorizontal>
+          <FormHorizontal title="Status">
+            <template #inputs>
+              <div class="flex flex-col w-full gap-2">
+                <div
+                  class="flex gap-6 md:align-items-center max-sm:flex-col max-sm:align-items-baseline max-sm:gap-3"
+                >
+                  <span class="p-input-icon-right w-full flex max-w-lg items-start gap-2 pb-3 pt-2">
+                    <InputSwitch
+                      v-model="isActive"
+                      id="active"
+                    />
+                    <div class="flex-col gap-1">
+                      <span class="text-color text-sm font-normal leading-5">Active</span>
+                    </div>
+                  </span>
+                </div>
+              </div>
             </template>
           </FormHorizontal>
         </template>
@@ -94,7 +101,6 @@
   import FormHorizontal from '@/templates/create-form-block-new/form-horizontal'
   import InputText from 'primevue/inputtext'
   import PickList from 'primevue/picklist'
-  import Card from 'primevue/card'
   import InputSwitch from 'primevue/inputswitch'
   import ContentBlock from '@/templates/content-block'
   import PageHeadingBlock from '@/templates/page-heading-block'
@@ -112,6 +118,8 @@
       required: true
     }
   })
+  const permissionsList = ref(null)
+
   //Validation Schema
   const validationSchema = yup.object({
     name: yup.string().required('Name is a required field'),
@@ -119,9 +127,7 @@
     isActive: yup.boolean()
   })
 
-  const permissionsList = ref(null)
-
-  const { errors, defineInputBinds, meta, resetForm, values } = useForm({
+  const { errors, meta, resetForm, values } = useForm({
     validationSchema,
     initialValues: {
       name: '',
@@ -129,14 +135,14 @@
       isActive: true
     }
   })
-
-  const name = defineInputBinds('name', { validateOnInput: true })
-  const isActive = defineInputBinds('isActive', { validateOnInput: true })
+  const { value: name } = useField('name')
+  const { value: isActive } = useField('isActive')
   const { value: permissions } = useField('permissions')
 
   const fetchPermissions = async () => {
-    const result = await props.listPermissionService()
-    permissionsList.value = [result, []]
+    const availablePermissions = await props.listPermissionService()
+    const selectedPermissions = []
+    permissionsList.value = [availablePermissions, selectedPermissions]
   }
 
   onMounted(async () => {

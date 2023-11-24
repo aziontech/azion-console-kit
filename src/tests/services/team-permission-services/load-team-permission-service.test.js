@@ -4,10 +4,12 @@ import { describe, expect, it, vi } from 'vitest'
 
 const fixtures = {
   teamPermissionMock: {
-    id: 2,
-    name: 'Default',
-    is_active: true,
-    permissions: [{ id: 324, name: 'permission' }]
+    data: {
+      id: 2,
+      name: 'Default',
+      is_active: true,
+      permissions: [{ id: 324, name: 'permission' }]
+    }
   }
 }
 
@@ -46,10 +48,10 @@ describe('TeamPermissionService', () => {
     const result = await sut({ id: fixtures.teamPermissionMock.id })
 
     expect(result).toEqual({
-      id: fixtures.teamPermissionMock.id,
-      name: fixtures.teamPermissionMock.name,
-      isActive: fixtures.teamPermissionMock.is_active,
-      permissions: fixtures.teamPermissionMock.permissions
+      id: fixtures.teamPermissionMock.data.id,
+      name: fixtures.teamPermissionMock.data.name,
+      isActive: fixtures.teamPermissionMock.data.is_active,
+      permissions: fixtures.teamPermissionMock.data.permissions
     })
   })
 })

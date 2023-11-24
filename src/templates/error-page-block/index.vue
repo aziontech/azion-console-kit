@@ -17,7 +17,7 @@
 </template>
 
 <script setup>
-defineOptions({ name: 'error-page-block' })
+  defineOptions({ name: 'error-page-block' })
   defineProps({
     title: { type: String, required: true },
     description: { type: String, required: true }
