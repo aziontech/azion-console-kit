@@ -1,148 +1,156 @@
 <template>
-  <EditFormBlock
-    pageTitle="Edit Edge Functions"
-    :editService="props.editEdgeFunctionsService"
-    :loadService="props.loadEdgeFunctionsService"
-    :initialDataSetter="setValues"
-    :formData="values"
-    :formMeta="meta"
-    :cleanFormCallback="resetForm"
-    :hasTabs="true"
-    :updatedRedirect="updatedRedirect"
-  >
-    <template #form>
-      <TabView class="w-full">
-        <TabPanel header="Main Settings">
-          <FormHorizontal
-            class="mt-8"
-            title="General"
-            description="Describe the Edge Function and choose a name to better identify."
-          >
-            <template #inputs>
-              <div class="flex flex-col sm:max-w-lg w-full gap-2">
-                <label
-                  for="name"
-                  class="text-color text-base font-medium"
-                  >Name *</label
-                >
-                <InputText
-                  v-bind="name"
-                  id="name"
-                  type="text"
-                  :class="{ 'p-invalid': errors.name }"
-                />
-                <small
-                  v-if="errors.name"
-                  class="p-error text-xs font-normal leading-tight"
-                  >{{ errors.name }}</small
-                >
-              </div>
-            </template>
-          </FormHorizontal>
-
-          <FormHorizontal
-            class="mt-8"
-            title="Language"
-            description="It is currently not possible to choose a language to code a new Edge function."
-          >
-            <template #inputs>
-              <div class="flex flex-col w-full sm:max-w-lg gap-2">
-                <label
-                  for="language"
-                  class="text-color text-base font-medium"
-                  >Language</label
-                >
-                <span class="p-input-icon-right">
-                  <i class="pi pi-lock text-[var(--text-color-secondary)]" />
-                  <InputText
-                    v-model="languageText"
-                    id="language"
-                    type="text"
-                    class="w-full text-[var(--text-color-secondary)]"
-                    readonly
-                  />
-                </span>
-              </div>
-            </template>
-          </FormHorizontal>
-        </TabPanel>
-
-        <TabPanel header="Code">
-          <div class="flex flex-col lg:flex-row mt-8">
-            <div class="w-full lg:w-2/3 lg:pr-8">
-              <div class="w-full">
-                <vue-monaco-editor
-                  v-model:value="code"
-                  language="javascript"
-                  :theme="theme"
-                  class="min-h-[50vh] !w-[99%] surface-border border rounded-md"
-                  :class="{ 'border-red-500 border': errors.code }"
-                  :options="editorOptions"
-                />
-              </div>
-              <small
-                v-if="errors.code"
-                class="p-error text-xs font-normal"
-              >
-                {{ errors.code }}
-              </small>
-            </div>
-
-            <div class="hidden lg:block">
-              <divider layout="vertical" />
-            </div>
-
-            <div class="w-full lg:w-1/2 hidden lg:block">
-              <div class="relative overflow-hidden h-full p-5">
-                <iframe
-                  class="w-full h-full border-0 overflow-hidden"
-                  ref="previewIframe"
-                  @load="postPreviewUpdates"
-                  allowfullscreen
-                  src="https://code-preview.azion.com/preview"
-                  title="preview"
-                  sandbox="allow-scripts"
-                ></iframe>
-              </div>
-            </div>
-          </div>
-        </TabPanel>
-
-        <TabPanel header="Arguments">
-          <div class="flex flex-col lg:flex-row mt-8">
-            <div class="w-full lg:w-2/3 lg:pr-8">
-              <vue-monaco-editor
-                v-model:value="jsonArgs"
-                language="json"
-                :theme="theme"
-                class="min-h-[50vh] !w-[99%] surface-border border rounded-md"
-                :class="{ 'border-red-500 border': errors.jsonArgs }"
-                :options="editorOptions"
-              />
-            </div>
-
-            <div class="hidden lg:block">
-              <divider layout="vertical" />
-            </div>
-
-            <div class="w-full lg:w-1/2 hidden lg:block">
-              <div class="relative overflow-hidden h-full p-5">
-                <iframe
-                  class="w-full h-full border-0 overflow-hidden"
-                  ref="previewIframeArguments"
-                  @load="postPreviewUpdates"
-                  allowfullscreen
-                  src="https://code-preview.azion.com/preview"
-                  title="preview"
-                  sandbox="allow-scripts"
-                ></iframe>
-              </div>
-            </div>
-          </div>
-        </TabPanel>
-      </TabView>
+  <ContentBlock>
+    <template #heading>
+      <PageHeadingBlock pageTitle="Edit Edge Functions"></PageHeadingBlock>
     </template>
-  </EditFormBlock>
+    <template #content>
+      <EditFormBlock
+        :editService="props.editEdgeFunctionsService"
+        :loadService="props.loadEdgeFunctionsService"
+        :initialDataSetter="setValues"
+        :formData="values"
+        :formMeta="meta"
+        :cleanFormCallback="resetForm"
+        :hasTabs="true"
+        :updatedRedirect="updatedRedirect"
+      >
+        <template #form>
+          <TabView class="w-full">
+            <TabPanel header="Main Settings">
+              <FormHorizontal
+                class="mt-8"
+                title="General"
+                description="Describe the Edge Function and choose a name to better identify."
+              >
+                <template #inputs>
+                  <div class="flex flex-col sm:max-w-lg w-full gap-2">
+                    <label
+                      for="name"
+                      class="text-color text-base font-medium"
+                      >Name *</label
+                    >
+                    <InputText
+                      v-bind="name"
+                      id="name"
+                      type="text"
+                      :class="{ 'p-invalid': errors.name }"
+                    />
+                    <small
+                      v-if="errors.name"
+                      class="p-error text-xs font-normal leading-tight"
+                      >{{ errors.name }}</small
+                    >
+                  </div>
+                </template>
+              </FormHorizontal>
+
+              <FormHorizontal
+                class="mt-8"
+                title="Language"
+                description="It is currently not possible to choose a language to code a new Edge function."
+              >
+                <template #inputs>
+                  <div class="flex flex-col w-full sm:max-w-lg gap-2">
+                    <label
+                      for="language"
+                      class="text-color text-base font-medium"
+                      >Language</label
+                    >
+                    <span class="p-input-icon-right">
+                      <i class="pi pi-lock text-[var(--text-color-secondary)]" />
+                      <InputText
+                        v-model="languageText"
+                        id="language"
+                        type="text"
+                        class="w-full text-[var(--text-color-secondary)]"
+                        readonly
+                      />
+                    </span>
+                  </div>
+                </template>
+              </FormHorizontal>
+            </TabPanel>
+
+            <TabPanel header="Code">
+              <div class="flex flex-col lg:flex-row mt-8">
+                <div class="w-full lg:w-1/2 pr-8">
+                  <div class="w-full">
+                    <vue-monaco-editor
+                      v-model:value="code"
+                      language="javascript"
+                      :theme="theme"
+                      class="min-h-[50vh] !w-[99%] surface-border border rounded-md"
+                      :class="{ 'border-red-500 border': errors.code }"
+                      :options="editorOptions"
+                    />
+                  </div>
+                  <small
+                    v-if="errors.code"
+                    class="p-error text-xs font-normal"
+                  >
+                    {{ errors.code }}
+                  </small>
+                </div>
+
+                <div class="hidden lg:block">
+                  <divider layout="vertical" />
+                </div>
+
+                <div class="w-full lg:w-1/2 hidden lg:block">
+                  <div class="relative overflow-hidden h-full p-5">
+                    <iframe
+                      class="w-full h-full border-0 overflow-hidden"
+                      ref="previewIframe"
+                      @load="postPreviewUpdates"
+                      allowfullscreen
+                      src="https://code-preview.azion.com/preview"
+                      title="preview"
+                      sandbox="allow-scripts"
+                    ></iframe>
+                  </div>
+                </div>
+              </div>
+            </TabPanel>
+
+            <TabPanel header="Arguments">
+              <div class="flex flex-col lg:flex-row mt-8">
+                <div class="w-full lg:w-1/2 lg-8">
+                  <vue-monaco-editor
+                    v-model:value="jsonArgs"
+                    language="json"
+                    :theme="theme"
+                    class="min-h-[50vh] !w-[99%] surface-border border rounded-md"
+                    :class="{ 'border-red-500 border': errors.jsonArgs }"
+                    @change="changeValidateArgs"
+                    :options="editorOptions"
+                  />
+                </div>
+
+                <div class="hidden lg:block">
+                  <divider layout="vertical" />
+                </div>
+
+                <div class="w-full lg:w-1/2 hidden lg:block">
+                  <div class="relative overflow-hidden h-full p-5">
+                    <iframe
+                      class="w-full h-full border-0 overflow-hidden"
+                      ref="previewIframeArguments"
+                      frameborder="0"
+                      @load="postPreviewUpdates"
+                      allowfullscreen
+                      src="https://code-preview.azion.com/preview"
+                      title="preview"
+                      sandbox="allow-scripts"
+                    ></iframe>
+                  </div>
+                </div>
+              </div>
+            </TabPanel>
+          </TabView>
+        </template>
+      </EditFormBlock>
+    </template>
+  </ContentBlock>
 </template>
 
 <script setup>
@@ -156,6 +164,8 @@
   import Divider from 'primevue/divider'
   import { computed, ref, watch } from 'vue'
   import { useAccountStore } from '@/stores/account'
+  import ContentBlock from '@/templates/content-block'
+  import PageHeadingBlock from '@/templates/page-heading-block'
 
   const props = defineProps({
     loadEdgeFunctionsService: {

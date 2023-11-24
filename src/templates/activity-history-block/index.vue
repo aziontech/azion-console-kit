@@ -1,6 +1,5 @@
-<!-- eslint-disable vue/multi-word-component-names -->
 <template>
-  <div class="flex h-full max-w-screen pt-4 pb-8 px-8 max-md:p-3 w-full">
+  <div class="flex h-full w-full">
     <Card class="w-full mb-10">
       <template #header>
         <div class="border-b surface-border w-full p-3.5 flex">
@@ -86,6 +85,7 @@
   </div>
 </template>
 <script setup>
+  defineOptions({ name: 'activity-history-block' })
   import Timeline from 'primevue/timeline'
   import Card from 'primevue/card'
   import Tag from 'primevue/tag'
