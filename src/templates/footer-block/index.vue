@@ -38,21 +38,18 @@
             icon="pi pi-github"
             text
             size="small"
-            v-tooltip.top="{ value: 'Github', showDelay: 200 }"
             @click="openGitHub"
           />
           <PrimeButton
             icon="pi pi-discord"
             text
             size="small"
-            v-tooltip.top="{ value: 'Discord', showDelay: 200 }"
             @click="openDiscord"
           />
           <PrimeButton
             icon="ai ai-twitter"
             text
             size="small"
-            v-tooltip.top="{ value: 'Twitter', showDelay: 200 }"
             @click="openX"
           />
           <!--Change Twitter icon to X-->

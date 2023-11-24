@@ -9,14 +9,14 @@
       </div>
       <div
         class="mx-3 sm:mx-8 mb-8 h-full"
-        :class="{ 'mt-8': !hasHeadingSlot, 'mt-4': hasHeadingSlot }"
+        :class="{ 'mt-4 sm:mt-8': !hasHeadingSlot, 'mt-4': hasHeadingSlot }"
       >
         <slot name="content"></slot>
       </div>
     </section>
     <div
       class="sticky bottom-0"
-      id="action-bar_98978"
+      id="action-bar"
     ></div>
   </section>
 </template>

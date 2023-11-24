@@ -30,7 +30,6 @@
                   type="text"
                   id="name"
                   :class="{ 'p-invalid': errors.key }"
-                  v-tooltip.top="{ value: errors.key, showDelay: 200 }"
                 />
                 <small
                   v-if="errors.key"
@@ -50,7 +49,6 @@
                   v-bind="value"
                   type="text"
                   :class="{ 'p-invalid': errors.value }"
-                  v-tooltip.top="{ value: errors.value, showDelay: 200 }"
                 />
                 <small
                   v-if="errors.value"

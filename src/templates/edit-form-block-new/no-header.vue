@@ -14,7 +14,7 @@
     />
   </div>
   <Teleport
-    to="#action-bar_98978"
+    to="#action-bar"
     v-if="teleportLoad"
   >
     <ActionBarTemplate

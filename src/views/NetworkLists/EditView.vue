@@ -29,7 +29,6 @@
                   v-bind="name"
                   type="text"
                   :class="{ 'p-invalid': errors.name }"
-                  v-tooltip.top="{ value: errors.name, showDelay: 200 }"
                 />
                 <small class="text-xs text-color-secondary font-normal leading-tight">
                   Give a unique and easy-to-remember name.</small

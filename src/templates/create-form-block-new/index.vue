@@ -7,7 +7,7 @@
     <DialogUnsavedBlock :blockRedirectUnsaved="hasModifications" />
     <Teleport
       v-if="teleportLoad"
-      to="#action-bar_98978"
+      to="#action-bar"
     >
       <ActionBarBlockGoBack v-if="buttonBackList" />
       <ActionBarTemplate

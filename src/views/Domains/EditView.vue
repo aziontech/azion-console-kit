@@ -32,7 +32,6 @@
                   id="name"
                   type="text"
                   :class="{ 'p-invalid': errors.name }"
-                  v-tooltip.top="errors.name"
                 />
                 <small
                   v-if="errors.name"
@@ -102,7 +101,6 @@
                   rows="2"
                   cols="30"
                   class="w-full"
-                  v-tooltip.top="errors.cnames"
                 />
                 <small
                   v-if="errors.cnames"

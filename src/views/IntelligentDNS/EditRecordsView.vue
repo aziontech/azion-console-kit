@@ -29,7 +29,6 @@
                     id="name"
                     type="text"
                     :class="{ 'p-invalid': errors.name }"
-                    v-tooltip.top="{ value: errors.name, showDelay: 200 }"
                   />
                   <span class="p-inputgroup-addon"> .{{ intelligentDNSStore.getDomain }} </span>
                 </div>
@@ -76,7 +75,6 @@
                   id="value"
                   type="text"
                   :class="{ 'p-invalid': errors.value }"
-                  v-tooltip.top="{ value: errors.value, showDelay: 200 }"
                 />
                 <small
                   v-if="errors.value"
@@ -96,7 +94,6 @@
                   id="ttl"
                   type="number"
                   :class="{ 'p-invalid': errors.ttl }"
-                  v-tooltip.top="{ value: errors.ttl, showDelay: 200 }"
                 />
                 <small
                   v-if="errors.ttl"
@@ -144,7 +141,6 @@
                   min="0"
                   max="255"
                   :class="{ 'p-invalid': errors.weight }"
-                  v-tooltip.top="{ value: errors.weight, showDelay: 200 }"
                   v-if="isWeightedPolicy"
                 />
                 <small
@@ -168,7 +164,6 @@
                   v-bind="description"
                   type="text"
                   :class="{ 'p-invalid': errors.description }"
-                  v-tooltip.top="{ value: errors.description, showDelay: 200 }"
                   v-if="isWeightedPolicy"
                 />
                 <small
