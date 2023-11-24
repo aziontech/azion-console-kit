@@ -83,7 +83,7 @@
                       id="active"
                     />
                     <div class="flex-col gap-1">
-                      <div class="text-color text-sm font-normal leading-5">Active</div>
+                      <span class="text-color text-sm font-normal leading-5">Active</span>
                     </div>
                   </span>
                 </div>
