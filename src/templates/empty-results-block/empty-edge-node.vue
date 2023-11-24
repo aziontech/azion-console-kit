@@ -36,7 +36,7 @@
 </template>
 
 <script setup>
-defineOptions({ name: 'empty-results-block' })
+  defineOptions({ name: 'empty-results-block' })
   import PrimeButton from 'primevue/button'
 
   const props = defineProps({
