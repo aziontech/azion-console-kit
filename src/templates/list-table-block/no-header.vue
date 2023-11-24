@@ -136,6 +136,7 @@
 
   export default {
     name: 'list-table-block',
+    emits: ['on-load-data'],
     components: {
       DataTable,
       Column,
@@ -274,6 +275,12 @@
       updatedTable() {
         this.data = this.data.filter((item) => item.id !== this.selectedId)
         this.$forceUpdate()
+      }
+    },
+    watch: {
+      data(currentState) {
+        const hasData = currentState.length > 0
+        this.$emit('on-load-data', hasData)
       }
     }
   }
