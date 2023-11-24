@@ -51,6 +51,19 @@ describe('MarketplaceServices', () => {
     ])
   })
 
+  it('should parsed correctly empty list returned', async () => {
+    vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
+      statusCode: 200,
+      body: []
+    })
+
+    const { sut } = makeSut()
+
+    const result = await sut()
+
+    expect(result).toEqual([])
+  })
+
   it.each([
     {
       statusCode: 400,
