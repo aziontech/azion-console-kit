@@ -74,15 +74,22 @@
             <TabPanel header="Code">
               <div class="flex flex-col lg:flex-row mt-8">
                 <div class="w-full lg:w-1/2 pr-8">
-                  <vue-monaco-editor
-                    v-model:value="code"
-                    language="javascript"
-                    :theme="theme"
-                    class="min-h-[50vh] !w-[99%] surface-border border rounded-md"
-                    :class="{ 'border-red-500 border': errorCode }"
-                    :options="editorOptions"
-                    @change="changeValidateCode"
-                  />
+                  <div class="w-full">
+                    <vue-monaco-editor
+                      v-model:value="code"
+                      language="javascript"
+                      :theme="theme"
+                      class="min-h-[50vh] !w-[99%] surface-border border rounded-md"
+                      :class="{ 'border-red-500 border': errors.code }"
+                      :options="editorOptions"
+                    />
+                  </div>
+                  <small
+                    v-if="errors.code"
+                    class="p-error text-xs font-normal"
+                  >
+                    {{ errors.code }}
+                  </small>
                 </div>
 
                 <div class="hidden lg:block">
@@ -94,7 +101,6 @@
                     <iframe
                       class="w-full h-full border-0 overflow-hidden"
                       ref="previewIframe"
-                      frameborder="0"
                       @load="postPreviewUpdates"
                       allowfullscreen
                       src="https://code-preview.azion.com/preview"
@@ -108,13 +114,13 @@
 
             <TabPanel header="Arguments">
               <div class="flex flex-col lg:flex-row mt-8">
-                <div class="w-full lg:w-1/2 pr-8">
+                <div class="w-full lg:w-1/2 lg-8">
                   <vue-monaco-editor
                     v-model:value="jsonArgs"
                     language="json"
                     :theme="theme"
                     class="min-h-[50vh] !w-[99%] surface-border border rounded-md"
-                    :class="{ 'border-red-500 border': errorCode }"
+                    :class="{ 'border-red-500 border': errors.jsonArgs }"
                     @change="changeValidateArgs"
                     :options="editorOptions"
                   />
