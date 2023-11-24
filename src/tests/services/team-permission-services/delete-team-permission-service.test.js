@@ -14,7 +14,7 @@ const makeSut = () => {
 describe('TeamPermissionServices', () => {
   it('should call API with correct params', async () => {
     const requestSpy = vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
-      statusCode: 204
+      statusCode: 200
     })
     const environmentVariableIdMock = 765678
     const { sut } = makeSut()
@@ -22,14 +22,14 @@ describe('TeamPermissionServices', () => {
     await sut(environmentVariableIdMock)
 
     expect(requestSpy).toHaveBeenCalledWith({
-      url: `teams/${environmentVariableIdMock}/`,
+      url: `teams/${environmentVariableIdMock}`,
       method: 'DELETE'
     })
   })
 
   it('should return a feedback message on successfully deleted', async () => {
     vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
-      statusCode: 204
+      statusCode: 200
     })
     const environmentVariableIdMock = 7816825367
     const { sut } = makeSut()
