@@ -4,7 +4,7 @@
     <PrimeButton
       v-for="item of 12"
       :key="item"
-      class="p-4 text-left border-solid border surface-border hover:border-primary transition-all"
+      class="p-4 text-left border-solid border surface-border transition-all"
       link
     >
       <div class="flex flex-col h-full justify-between gap-3.5 items-start">
@@ -24,7 +24,7 @@
     <PrimeButton
       v-for="item of 6"
       :key="item"
-      class="p-4 text-left border-solid border surface-border hover:border-primary transition-all"
+      class="p-4 text-left border-solid border surface-border transition-all"
       link
     >
       <div class="flex flex-col h-full justify-between gap-3.5 items-start">

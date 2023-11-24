@@ -19,7 +19,8 @@ export const documentationCatalog = {
   edgeApplication: () => openSearchResult('edge application'),
   users: () => openSearchResult('users'),
   activityHistory: () => openSearchResult('activity history'),
-  edgeNodes: () => openSearchResult('edge nodes')
+  edgeNodes: () => openSearchResult('edge nodes'),
+  records: () => openSearchResult('records')
 }
 
 export const documentationGuideProducts = {

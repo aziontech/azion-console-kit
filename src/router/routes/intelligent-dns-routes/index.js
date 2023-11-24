@@ -80,7 +80,8 @@ export const intelligentDnsRoutes = {
         loadIntelligentDNSService: IntelligentDNSService.loadIntelligentDNSService,
         listRecordsService: IntelligentDNSRecordsService.listRecordsService,
         deleteRecordsService: IntelligentDNSRecordsService.deleteRecordsService,
-        clipboardWrite: Helpers.clipboardWrite
+        clipboardWrite: Helpers.clipboardWrite,
+        documentationService: Helpers.documentationCatalog.records
       },
       meta: {
         breadCrumbs: [
