@@ -1,37 +1,43 @@
 <template>
-  <div v-if="hasContentToList">
-    <PageHeadingBlock :pageTitle="pageTitle" />
-    <ActivityHistoryBlock
-      :listEventsService="listEventsService"
-      @on-load-data="handleLoadData"
-    />
-  </div>
-  <EmptyResultsBlock
-    v-else
-    :pageTitle="pageTitle"
-    title="No activity has been recorded yet."
-    description="Start using services and products to view your account's activity."
-    :documentationService="documentationService"
-  >
-    <template #illustration>
-      <Illustration />
+  <ContentBlock>
+    <template #heading>
+      <PageHeadingBlock pageTitle="Activity History"></PageHeadingBlock>
     </template>
-    <template #default>
-      <PrimeButton
-        severity="secondary"
-        label="Go to Home"
-        @click="navigateToHomePage"
-      />
+    <template #content>
+      <div v-if="hasContentToList">
+        <ActivityHistoryBlock
+          :listEventsService="listEventsService"
+          @on-load-data="handleLoadData"
+        />
+      </div>
+      <EmptyResultsBlock
+        v-else
+        title="No activity has been recorded yet."
+        description="Start using services and products to view your account's activity."
+        :documentationService="documentationService"
+      >
+        <template #illustration>
+          <Illustration />
+        </template>
+        <template #default>
+          <PrimeButton
+            severity="secondary"
+            label="Go to Home"
+            @click="navigateToHomePage"
+          />
+        </template>
+      </EmptyResultsBlock>
     </template>
-  </EmptyResultsBlock>
+  </ContentBlock>
 </template>
 
 <script>
-  import PageHeadingBlock from '@templates/page-heading-block'
   import ActivityHistoryBlock from '@templates/activity-history-block'
   import EmptyResultsBlock from '@/templates/empty-results-block'
   import Illustration from '@/assets/svg/illustration-layers.vue'
   import PrimeButton from 'primevue/button'
+  import ContentBlock from '@/templates/content-block'
+  import PageHeadingBlock from '@/templates/page-heading-block'
 
   export default {
     name: 'activity-history-view',
@@ -40,7 +46,8 @@
       ActivityHistoryBlock,
       EmptyResultsBlock,
       Illustration,
-      PrimeButton
+      PrimeButton,
+      ContentBlock
     },
     data: () => ({
       pageTitle: 'Activity History',

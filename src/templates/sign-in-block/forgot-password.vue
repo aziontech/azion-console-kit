@@ -28,7 +28,6 @@
               type="email"
               class="w-full"
               :class="{ 'p-invalid': errors.email }"
-              v-tooltip.top="{ value: errors.email, showDelay: 200 }"
             />
             <small
               v-if="errors.email"

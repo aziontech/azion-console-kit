@@ -14,7 +14,7 @@
           />
         </div>
         <div class="flex gap-3 items-center">
-          <div class="flex gap-1  items-center">
+          <div class="flex gap-1 items-center">
             <span class="text-xs font-medium text-color-primary">By</span>
             <PrimeButton
               link
@@ -127,8 +127,8 @@
         mask: { class: 'flex' }
       }"
     >
-        <template #header>
-          <div class="w-full flex flex-col gap-2">
+      <template #header>
+        <div class="w-full flex flex-col gap-2">
           <div class="flex gap-2 items-center">
             <div class="w-10 h-10 rounded flex justify-center items-center bg-white">
               <img
@@ -160,8 +160,8 @@
             </div>
           </div>
         </div>
-        </template>
-        <div class="flex flex-col gap-6 w-full">
+      </template>
+      <div class="flex flex-col gap-6 w-full">
         <div class="flex flex-col gap-2">
           <span class="text-lg font-medium"> Overview </span>
           <div

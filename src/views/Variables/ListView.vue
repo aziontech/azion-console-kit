@@ -1,29 +1,34 @@
 <template>
-  <ListTableBlock
-    v-if="hasContentToList"
-    :listService="listVariablesService"
-    :deleteService="deleteVariablesService"
-    :columns="getColumns"
-    pageTitle="Variables"
-    pageTitleDelete="Variable"
-    addButtonLabel="Variable"
-    createPagePath="variables/create"
-    editPagePath="variables/edit"
-    @on-load-data="handleLoadData"
-  />
-  <EmptyResultsBlock
-    v-else
-    pageTitle="Variables"
-    title="No variables added"
-    description="Create your first variable."
-    createButtonLabel="Variable"
-    createPagePath="variables/create"
-    :documentationService="documentationService"
-  >
-    <template #illustration>
-      <Illustration />
+  <ContentBlock>
+    <template #heading>
+      <PageHeadingBlock pageTitle="Variables" />
     </template>
-  </EmptyResultsBlock>
+    <template #content>
+      <ListTableBlock
+        v-if="hasContentToList"
+        :listService="listVariablesService"
+        :deleteService="deleteVariablesService"
+        :columns="getColumns"
+        pageTitleDelete="Variable"
+        addButtonLabel="Variable"
+        createPagePath="variables/create"
+        editPagePath="variables/edit"
+        @on-load-data="handleLoadData"
+      />
+      <EmptyResultsBlock
+        v-else
+        title="No variables added"
+        description="Create your first variable."
+        createButtonLabel="Variable"
+        createPagePath="variables/create"
+        :documentationService="documentationService"
+      >
+        <template #illustration>
+          <Illustration />
+        </template>
+      </EmptyResultsBlock>
+    </template>
+  </ContentBlock>
 </template>
 
 <script>
@@ -31,6 +36,9 @@
   import EmptyResultsBlock from '@/templates/empty-results-block'
   import Illustration from '@/assets/svg/illustration-layers.vue'
   import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
+  import ContentBlock from '@/templates/content-block'
+  import PageHeadingBlock from '@/templates/page-heading-block'
+
   import { h } from 'vue'
 
   export default {
@@ -38,7 +46,9 @@
     components: {
       ListTableBlock,
       EmptyResultsBlock,
-      Illustration
+      Illustration,
+      ContentBlock,
+      PageHeadingBlock
     },
     props: {
       listVariablesService: {

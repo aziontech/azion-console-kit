@@ -2,13 +2,16 @@
   import ListTableBlock from '@/templates/list-table-block'
   import EmptyResultsBlock from '@/templates/empty-results-block'
   import Illustration from '@/assets/svg/illustration-layers.vue'
-
+  import ContentBlock from '@/templates/content-block'
+  import PageHeadingBlock from '@/templates/page-heading-block'
   export default {
     name: 'edge-firewall-view',
     components: {
       ListTableBlock,
       EmptyResultsBlock,
-      Illustration
+      Illustration,
+      ContentBlock,
+      PageHeadingBlock
     },
     props: {
       listEdgeFirewallService: {
@@ -63,29 +66,34 @@
 </script>
 
 <template>
-  <ListTableBlock
-    v-if="hasContentToList"
-    pageTitle="Edge Firewall"
-    pageTitleDelete="Edge Firewal"
-    addButtonLabel="Edge Firewall"
-    createPagePath="/edge-firewall/create"
-    editPagePath="/edge-firewall/edit"
-    :listService="listEdgeFirewallService"
-    :deleteService="deleteEdgeFirewallService"
-    :columns="getColumns"
-    @on-load-data="handleLoadData"
-  />
-  <EmptyResultsBlock
-    v-else
-    pageTitle="Edge Firewall"
-    title="No edge firewall added"
-    description="Create your first edge firewall."
-    createButtonLabel="Edge Firewall"
-    createPagePath="/edge-firewall/create"
-    :documentationService="documentationService"
-  >
-    <template #illustration>
-      <Illustration />
+  <ContentBlock>
+    <template #heading>
+      <PageHeadingBlock pageTitle="Edge Firewall"></PageHeadingBlock>
     </template>
-  </EmptyResultsBlock>
+    <template #content>
+      <ListTableBlock
+        v-if="hasContentToList"
+        pageTitleDelete="Edge Firewal"
+        addButtonLabel="Edge Firewall"
+        createPagePath="/edge-firewall/create"
+        editPagePath="/edge-firewall/edit"
+        :listService="listEdgeFirewallService"
+        :deleteService="deleteEdgeFirewallService"
+        :columns="getColumns"
+        @on-load-data="handleLoadData"
+      />
+      <EmptyResultsBlock
+        v-else
+        title="No edge firewall added"
+        description="Create your first edge firewall."
+        createButtonLabel="Edge Firewall"
+        createPagePath="/edge-firewall/create"
+        :documentationService="documentationService"
+      >
+        <template #illustration>
+          <Illustration />
+        </template>
+      </EmptyResultsBlock>
+    </template>
+  </ContentBlock>
 </template>

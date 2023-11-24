@@ -1,9 +1,10 @@
 import { AxiosHttpClientAdapter, parseHttpResponse } from '../axios/AxiosHttpClientAdapter'
 import { makeMarketplaceBaseUrl } from './make-marketplace-base-url'
 
-export const listSolutionsService = async (type = 'onboarding') => {
+export const listSolutionsService = async ({ category = '', search = '', type = 'onboarding' }) => {
+  const searchParams = makeSearchParams({ category, search })
   let httpResponse = await AxiosHttpClientAdapter.request({
-    url: `${makeMarketplaceBaseUrl()}/solution/`,
+    url: `${makeMarketplaceBaseUrl()}/solution/?${searchParams.toString()}`,
     method: 'GET',
     headers: {
       'Mktp-Api-Context': type
@@ -11,6 +12,19 @@ export const listSolutionsService = async (type = 'onboarding') => {
   })
   httpResponse = adapt(httpResponse)
   return parseHttpResponse(httpResponse)
+}
+
+const makeSearchParams = ({ category, search }) => {
+  const searchParams = new URLSearchParams()
+
+  if (category) {
+    searchParams.set('category', category)
+  }
+  if (search) {
+    searchParams.set('search', search)
+  }
+
+  return searchParams
 }
 
 const adapt = (httpResponse) => {
@@ -23,7 +37,9 @@ const adapt = (httpResponse) => {
           referenceId: element.solution_reference_id,
           vendor: element.vendor,
           headline: element.headline,
-          slug: element.slug
+          slug: element.slug,
+          featured: element.featured,
+          released: element.new_release
         }))
       : []
 

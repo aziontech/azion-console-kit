@@ -1,9 +1,7 @@
-<!-- eslint-disable vue/multi-word-component-names -->
 <template>
   <div class="flex flex-col h-full">
-    <PageHeadingBlock :pageTitle="pageTitle" />
     <div
-      class="flex flex-col h-full border surface-border gap-7 justify-center items-center rounded-md mx-8 py-7 mb-8 max-md:mx-3"
+      class="flex flex-col h-full border surface-border gap-7 justify-center items-center rounded-md"
     >
       <slot name="illustration" />
       <div class="flex flex-col gap-2">
@@ -38,7 +36,7 @@
 </template>
 
 <script setup>
-  import PageHeadingBlock from '@/templates/page-heading-block'
+  defineOptions({ name: 'empty-results-block' })
   import PrimeButton from 'primevue/button'
 
   const props = defineProps({

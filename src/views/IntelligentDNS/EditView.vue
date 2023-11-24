@@ -1,6 +1,9 @@
 <template>
-  <PageHeadingBlock pageTitle="Edit Intelligent DNS">
-    <template #tabs>
+  <ContentBlock>
+    <template #heading>
+      <PageHeadingBlock pageTitle="Edit Intelligent DNS"> </PageHeadingBlock>
+    </template>
+    <template #content>
       <TabView
         :activeIndex="activeTab"
         @tab-click="changeRouteByClickingOnTab"
@@ -33,7 +36,6 @@
                       id="name"
                       type="text"
                       :class="{ 'p-invalid': errors.name }"
-                      v-tooltip.top="{ value: errors.name, showDelay: 200 }"
                     />
                     <small
                       v-if="errors.name"
@@ -53,7 +55,6 @@
                       v-bind="domain"
                       type="text"
                       :class="{ 'p-invalid': errors.domain }"
-                      v-tooltip.top="{ value: errors.domain, showDelay: 200 }"
                     />
                     <small
                       v-if="errors.domain"
@@ -76,7 +77,6 @@
         </TabPanel>
         <TabPanel header="Records">
           <ListTableBlock
-            pageTitle="Records"
             pageTitleDelete="Record"
             addButtonLabel="Add Record"
             createPagePath="records/create"
@@ -89,15 +89,16 @@
       </TabView>
       <router-view></router-view>
     </template>
-  </PageHeadingBlock>
+  </ContentBlock>
 </template>
 
 <script>
   import { useIntelligentDNSStore } from '@/stores/intelligent-dns'
   import EditFormBlock from '@templates/edit-form-block-new/no-header'
   import FormHorizontal from '@templates/create-form-block-new/form-horizontal'
-  import PageHeadingBlock from '@templates/page-heading-block-tabs'
+  import PageHeadingBlock from '@templates/page-heading-block'
   import ListTableBlock from '@templates/list-table-block/no-header'
+  import ContentBlock from '@/templates/content-block'
   import TabView from 'primevue/tabview'
   import TabPanel from 'primevue/tabpanel'
   import InputText from 'primevue/inputtext'
@@ -115,7 +116,8 @@
       InputSwitch,
       ListTableBlock,
       FormHorizontal,
-      PageHeadingBlock
+      PageHeadingBlock,
+      ContentBlock
     },
 
     props: {
