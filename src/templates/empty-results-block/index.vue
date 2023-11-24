@@ -1,4 +1,3 @@
-<!-- eslint-disable vue/multi-word-component-names -->
 <template>
   <div class="flex flex-col h-full">
     <div
@@ -41,6 +40,7 @@
 </template>
 
 <script setup>
+defineOptions({ name: 'empty-results-block' })
   import PrimeButton from 'primevue/button'
 
   import { useRouter } from 'vue-router'

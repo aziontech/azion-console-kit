@@ -185,7 +185,7 @@
 
   export default {
     name: 'list-table-block',
-    emits: ['on-load-data', 'authorize-edge-node', 'authorizeEdgeNode'],
+    emits: ['on-load-data'],
     components: {
       DataTable,
       Column,
@@ -311,7 +311,6 @@
           this.isLoading = false
         }
       },
-      async authorizeEdgeNode() {},
 
       navigateToAddPage() {
         this.$router.push(this.createPagePath)
