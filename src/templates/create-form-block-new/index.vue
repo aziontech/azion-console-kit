@@ -1,42 +1,42 @@
 <template>
-  <div class="flex flex-col min-h-[calc(100vh-120px)]">
-    <PageHeadingBlock :pageTitle="pageTitle" />
-    <form
-      class="w-full grow px-8 flex flex-col gap-8 mb-5 max-md:px-3 max-md:gap-6"
-      :class="{ 'py-4': !hasTabs, 'pb-4': hasTabs }"
-    >
+  <div class="flex flex-col min-h-[calc(100vh-300px)]">
+    <form class="w-full grow flex flex-col gap-8 max-md:gap-6">
       <slot name="form" />
       <slot name="raw-form" />
     </form>
     <DialogUnsavedBlock :blockRedirectUnsaved="hasModifications" />
-    <ActionBarBlockGoBack v-if="buttonBackList" />
-    <ActionBarTemplate
-      @cancel="navigateBack"
-      @submit="validateAndSubmit"
-      :loading="isLoading"
-      :submitDisabled="!formMeta.valid"
-      v-else
-    />
+    <Teleport
+      v-if="teleportLoad"
+      to="#action-bar"
+    >
+      <ActionBarBlockGoBack v-if="buttonBackList" />
+      <ActionBarTemplate
+        @cancel="navigateBack"
+        @submit="validateAndSubmit"
+        :loading="isLoading"
+        :submitDisabled="!formMeta.valid"
+        v-else
+      />
+    </Teleport>
   </div>
 </template>
 <script>
   import DialogUnsavedBlock from '@/templates/dialog-unsaved-block'
   import ActionBarTemplate from '@/templates/action-bar-block'
-  import PageHeadingBlock from '@/templates/page-heading-block'
   import ActionBarBlockGoBack from '@/templates/action-bar-block/go-back'
 
   export default {
     name: 'create-form-block',
     components: {
       ActionBarTemplate,
-      PageHeadingBlock,
       ActionBarBlockGoBack,
       DialogUnsavedBlock
     },
     emits: ['on-response'],
     data: () => ({
       isLoading: false,
-      blockViewRedirection: true
+      blockViewRedirection: true,
+      teleportLoad: false
     }),
     props: {
       pageTitle: {
@@ -75,6 +75,9 @@
         type: Object,
         required: true
       }
+    },
+    mounted() {
+      this.teleportLoad = true
     },
     methods: {
       navigateBack() {

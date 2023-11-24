@@ -21,7 +21,7 @@
 </script>
 
 <template>
-  <main class="flex flex-col">
+  <div class="flex flex-col">
     <ShellBlock
       v-slot:default="{ customClass }"
       :isLogged="isLogged"
@@ -31,5 +31,5 @@
         class="w-full flex flex-col max-w-full transition-[width] duration-300 ease-in-out"
       />
     </ShellBlock>
-  </main>
+  </div>
 </template>

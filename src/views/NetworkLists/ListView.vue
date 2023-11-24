@@ -1,42 +1,51 @@
 <template>
-  <ListTableBlock
-    v-if="hasContentToList"
-    :listService="listNetworkListService"
-    :deleteService="deleteNetworkListService"
-    :columns="getColumns"
-    pageTitle="Network Lists"
-    pageTitleDelete="Network List"
-    addButtonLabel="Network List"
-    createPagePath="network-lists/create"
-    editPagePath="network-lists/edit"
-    @on-load-data="handleLoadData"
-  />
-  <EmptyResultsBlock
-    v-else
-    pageTitle="Network Lists"
-    title="No network list added"
-    description="Create a network list based on ASNs, countries, or IP addresses."
-    createButtonLabel="Add"
-    createPagePath="network-lists/create"
-    :documentationService="documentationService"
-  >
-    <template #illustration>
-      <Illustration />
+  <ContentBlock>
+    <template #heading>
+      <PageHeadingBlock pageTitle="Network Lists"></PageHeadingBlock>
     </template>
-  </EmptyResultsBlock>
+    <template #content>
+      <ListTableBlock
+        v-if="hasContentToList"
+        :listService="listNetworkListService"
+        :deleteService="deleteNetworkListService"
+        :columns="getColumns"
+        pageTitleDelete="Network List"
+        addButtonLabel="Network List"
+        createPagePath="network-lists/create"
+        editPagePath="network-lists/edit"
+        @on-load-data="handleLoadData"
+      />
+      <EmptyResultsBlock
+        v-else
+        title="No network list added"
+        description="Create a network list based on ASNs, countries, or IP addresses."
+        createButtonLabel="Add"
+        createPagePath="network-lists/create"
+        :documentationService="documentationService"
+      >
+        <template #illustration>
+          <Illustration />
+        </template>
+      </EmptyResultsBlock>
+    </template>
+  </ContentBlock>
 </template>
 
 <script>
   import ListTableBlock from '@/templates/list-table-block'
   import EmptyResultsBlock from '@/templates/empty-results-block'
   import Illustration from '@/assets/svg/illustration-layers.vue'
+  import ContentBlock from '@/templates/content-block'
+  import PageHeadingBlock from '@/templates/page-heading-block'
 
   export default {
     name: 'network-list-view',
     components: {
       ListTableBlock,
       EmptyResultsBlock,
-      Illustration
+      Illustration,
+      PageHeadingBlock,
+      ContentBlock
     },
     props: {
       listNetworkListService: {
