@@ -16,7 +16,7 @@
         <template #form>
           <FormHorizontal
             title="General"
-            description="Choose a name that is descriptive and easy to remember. Use the description to help you remember why the token was created and/or what it was created for."
+            description="Edit a credential to use and authenticate Edge Orchestrator services."
           >
             <template #inputs>
               <div class="flex flex-col sm:max-w-lg w-full gap-2">
@@ -59,7 +59,7 @@
           </FormHorizontal>
           <FormHorizontal
             title="Token"
-            description="Save the credential to visualize the token."
+            description="Save the credential to visualize and copy it."
           >
             <template #inputs>
               <div class="flex flex-col w-full gap-2">
