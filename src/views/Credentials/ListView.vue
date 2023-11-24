@@ -30,7 +30,6 @@
   import ListTableBlock from '@/templates/list-table-block'
   import EmptyResultsBlock from '@/templates/empty-results-block'
   import Illustration from '@/assets/svg/illustration-layers.vue'
-  import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
 
   export default {
     name: 'credentials-view',
@@ -65,14 +64,7 @@
           },
           {
             field: 'status',
-            header: 'Status',
-            type: 'component',
-            component: (columnData) => {
-              return columnBuilder({
-                data: columnData,
-                columnAppearance: 'tag'
-              })
-            }
+            header: 'Active'
           }
         ]
       }

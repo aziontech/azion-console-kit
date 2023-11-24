@@ -25,15 +25,7 @@ const adapt = (httpResponse) => {
     id: item.id,
     name: item.name,
     token: item.token,
-    status: item.status
-      ? {
-          content: 'Active',
-          severity: 'success'
-        }
-      : {
-          content: 'Inactive',
-          severity: 'danger'
-        },
+    status: item.status ? 'Yes' : 'No',
     description: item.description,
     lastEditor: item.last_editor,
     lastModified: new Intl.DateTimeFormat('us', {

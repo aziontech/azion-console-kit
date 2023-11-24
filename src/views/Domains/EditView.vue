@@ -38,46 +38,6 @@
           </div>
         </template>
       </form-horizontal>
-
-      <form-horizontal
-        title="Domain"
-        description="Save the domain to visualize the Domain name attributed by Azion to this configuration."
-      >
-        <template #inputs>
-          <div class="flex flex-col w-full gap-2">
-            <label
-              for="domainName"
-              class="text-color text-base font-medium"
-            >
-              Domain Name
-            </label>
-            <div
-              class="flex gap-6 md:align-items-center max-sm:flex-col max-sm:align-items-baseline max-sm:gap-3"
-            >
-              <span class="p-input-icon-right w-full flex max-w-lg flex-col items-start gap-2">
-                <i class="pi pi-lock" />
-                <InputText
-                  id="domainName"
-                  v-bind="domainName"
-                  type="text"
-                  class="flex flex-col w-full"
-                  :feedback="false"
-                  disabled
-                />
-              </span>
-              <PrimeButton
-                icon="pi pi-clone"
-                outlined
-                type="button"
-                aria-label="Copy Domain Name"
-                label="Copy to Clipboard"
-                @click="copyDomainName"
-              />
-            </div>
-          </div>
-        </template>
-      </form-horizontal>
-
       <form-horizontal
         title="Settings"
         description="Determine the edge application of the domain and its digital certificate. 
@@ -294,7 +254,6 @@
   import InputSwitch from 'primevue/inputswitch'
   import RadioButton from 'primevue/radiobutton'
   import Card from 'primevue/card'
-  import PrimeButton from 'primevue/button'
   import formHorizontal from '@/templates/create-form-block-new/form-horizontal'
   import { useField, useForm } from 'vee-validate'
   import * as yup from 'yup'
@@ -315,8 +274,7 @@
       InputSwitch,
       RadioButton,
       formHorizontal,
-      Card,
-      PrimeButton
+      Card
     },
     props: {
       editDomainService: {
@@ -337,10 +295,6 @@
       },
       updatedRedirect: {
         type: String,
-        required: true
-      },
-      clipboardWrite: {
-        type: Function,
         required: true
       }
     },
@@ -487,15 +441,6 @@
       },
       async requestDigitalCertificates() {
         this.digitalCertificates = await this.listDigitalCertificatesService({})
-      },
-      copyDomainName() {
-        this.clipboardWrite(this.domainName.value)
-        this.$toast.add({
-          closable: false,
-          severity: 'success',
-          summary: 'domain name copied',
-          life: 10000
-        })
       }
     }
   }
