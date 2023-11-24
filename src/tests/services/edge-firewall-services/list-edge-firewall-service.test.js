@@ -74,7 +74,7 @@ describe('EdgeFirewallServices', () => {
         name: fixtures.edgeFirewallMock.name,
         lastEditor: fixtures.edgeFirewallMock.last_editor,
         lastModify: 'Friday, November 10, 2023',
-        lastModifyDate: new Date('2023-11-10T03:00:00.000Z'),
+        lastModifyDate: new Date('2023-11-10T00:00:00.000Z'),
         domainsList: '',
         active: 'Yes'
       }
@@ -107,7 +107,7 @@ describe('EdgeFirewallServices', () => {
         name: fixtures.edgeFirewallWithDomainsMock.name,
         lastEditor: fixtures.edgeFirewallWithDomainsMock.last_editor,
         lastModify: 'Friday, November 10, 2023',
-        lastModifyDate: new Date('2023-11-10T03:00:00.000Z'),
+        lastModifyDate: new Date('2023-11-10T00:00:00.000Z'),
         domainsList: `Domain 1<br>Domain 2`,
         active: 'No'
       }

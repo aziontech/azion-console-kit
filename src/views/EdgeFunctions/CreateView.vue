@@ -186,27 +186,8 @@
     return store.currentTheme === 'light' ? 'vs' : 'vs-dark'
   })
 
-  // Methods
-  let errorCode = ''
-  const changeValidateCode = () => {
-    errorCode = ''
-    if (code.value === '') {
-      errorCode = 'Code is a required field'
-      return
-    }
-    postPreviewUpdates()
-  }
-
-  const changeValidateArgs = () => {
-    if (jsonArgs.value === '') {
-      setArgs(ARGS_INITIAL_STATE)
-      return
-    }
-    postPreviewUpdates()
-  }
-
   const postPreviewUpdates = () => {
-    if (previewIframe.value && previewIframe.value.contentWindow) {
+    if (previewIframe.value?.contentWindow) {
       const previewWindow = previewIframe.value.contentWindow
       const updateObject = {
         code: code.value,
@@ -224,7 +205,7 @@
       )
     }
 
-    if (previewIframeArguments.value && previewIframeArguments.value.contentWindow) {
+    if (previewIframeArguments.value?.contentWindow) {
       const previewWindow = previewIframeArguments.value.contentWindow
       const updateObject = {
         code: code.value,
@@ -245,7 +226,19 @@
 
   // Validations
   const validationSchema = yup.object({
-    name: yup.string().required('Name is a required field')
+    name: yup.string().required('Name is a required field'),
+    code: yup.string().required('Code is a required field'),
+    jsonArgs: yup
+      .string()
+      .test('curly', 'Invalid JSON', (value) => {
+        return /^\{.*\}$/.test(value)
+      })
+      .test('empty', '', (value) => {
+        if (!value) {
+          setArgs(ARGS_INITIAL_STATE)
+        }
+        return true
+      })
   })
 
   const { defineInputBinds, errors, meta, resetForm, values } = useForm({
@@ -259,7 +252,7 @@
     }
   })
 
-  const name = defineInputBinds('name', { validateOnInput: true })
+  const name = defineInputBinds('name')
   const { value: jsonArgs, setValue: setArgs } = useField('jsonArgs')
   const { value: code } = useField('code')
 </script>

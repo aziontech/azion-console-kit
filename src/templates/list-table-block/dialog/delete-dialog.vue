@@ -35,7 +35,6 @@
             autofocus
             v-model="confirmation"
             :class="{ 'p-invalid': errors.confirmation }"
-            v-tooltip.top="{ value: errors.confirmation, showDelay: 200 }"
           />
           <small
             v-if="errors.confirmation"
