@@ -272,7 +272,8 @@
       async loadData() {
         try {
           this.isLoading = true
-          this.templates = await MarketplaceService.listSolutionsService(this.recommendedHeader)
+          const payload = { type: this.recommendedHeader }
+          this.templates = await MarketplaceService.listSolutionsService(payload)
         } catch (error) {
           this.$toast.add({
             closable: true,
@@ -287,7 +288,8 @@
       async loadBrowse() {
         try {
           this.isLoading = true
-          this.browseTemplates = await MarketplaceService.listSolutionsService(this.browseHeader)
+          const payload = { type: this.browseHeader }
+          this.browseTemplates = await MarketplaceService.listSolutionsService(payload)
         } catch (error) {
           this.$toast.add({
             closable: true,
