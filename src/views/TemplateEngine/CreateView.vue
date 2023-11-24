@@ -26,12 +26,13 @@
               <label
                 for="name"
                 class="text-color text-base font-medium"
-                >{{ field.label }} <span v-if="field.attrs"><span v-if="field.attrs.required">*</span></span></label
+                >{{ field.label }}
+                <span v-if="field.attrs"><span v-if="field.attrs.required">*</span></span></label
               >
               <InputText
                 :key="field.name"
                 id="name"
-                :type="field.type === 'textfield'? 'text' : 'password'"
+                :type="field.type === 'textfield' ? 'text' : 'password'"
                 v-bind="field.value"
                 :class="{ 'p-invalid': formTools.errors[field.name] }"
               />
@@ -63,7 +64,8 @@
                 <label
                   for="name"
                   class="text-color text-base font-medium"
-                  >{{ field.label }} <span v-if="field.attrs"><span v-if="field.attrs.required">*</span></span></label
+                  >{{ field.label }}
+                  <span v-if="field.attrs"><span v-if="field.attrs.required">*</span></span></label
                 >
                 <Password
                   v-if="field.type === 'password'"
@@ -119,8 +121,8 @@
     },
     props: {
       getTemplateService: {
-      type: Function,
-      required: true
+        type: Function,
+        required: true
       },
       postTemplateService: {
         type: Function
@@ -177,13 +179,20 @@
           schema.value.fields.forEach((element) => {
             auxValidator[element.name] = yup.string()
             if (element.attrs.required) {
-              auxValidator[element.name] = auxValidator[element.name].required('This field is required')
+              auxValidator[element.name] =
+                auxValidator[element.name].required('This field is required')
             }
             if (element.attrs.maxLength) {
-              auxValidator[element.name] = auxValidator[element.name].max(element.attrs.maxLength, `This field cannot exceed ${element.attrs.maxLength} characters`)
+              auxValidator[element.name] = auxValidator[element.name].max(
+                element.attrs.maxLength,
+                `This field cannot exceed ${element.attrs.maxLength} characters`
+              )
             }
             if (element.attrs.minLength) {
-              auxValidator[element.name] = auxValidator[element.name].max(element.attrs.minLength, `This field must have at least ${element.attrs.minLength} characters`)
+              auxValidator[element.name] = auxValidator[element.name].max(
+                element.attrs.minLength,
+                `This field must have at least ${element.attrs.minLength} characters`
+              )
             }
             if (element.validators) {
               element.validators.forEach((validator) => {
@@ -208,10 +217,16 @@
                   auxValidator[element.name].required('This field is required')
               }
               if (element.attrs.maxLength) {
-              auxValidator[element.name] = auxValidator[element.name].max(element.attrs.maxLength, `This field cannot exceed ${element.attrs.maxLength} characters`)
+                auxValidator[element.name] = auxValidator[element.name].max(
+                  element.attrs.maxLength,
+                  `This field cannot exceed ${element.attrs.maxLength} characters`
+                )
               }
               if (element.attrs.minLength) {
-                auxValidator[element.name] = auxValidator[element.name].max(element.attrs.minLength, `This field must have at least ${element.attrs.minLength} characters`)
+                auxValidator[element.name] = auxValidator[element.name].max(
+                  element.attrs.minLength,
+                  `This field must have at least ${element.attrs.minLength} characters`
+                )
               }
               if (element.validators) {
                 element.validators.forEach((validator) => {
@@ -229,7 +244,7 @@
           })
         }
         validationSchema.value = yup.object(auxValidator)
-        formTools.value = { errors, meta,resetForm, values }
+        formTools.value = { errors, meta, resetForm, values }
         if (schema.value.fields) {
           schema.value.fields.forEach((element) => {
             element.value = defineInputBinds(element.name, { validateOnInput: true })
@@ -244,7 +259,7 @@
         }
         isLoading.value = false
       }
-      const { errors, meta, defineInputBinds,resetForm, values, setFieldValue } = useForm({
+      const { errors, meta, defineInputBinds, resetForm, values, setFieldValue } = useForm({
         validationSchema,
         initialValues: {
           gh_token: 'test'

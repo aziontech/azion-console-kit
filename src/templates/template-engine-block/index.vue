@@ -1,7 +1,10 @@
 <template>
-  <div class="flex flex-col min-h-[calc(100vh-120px)]" v-if="!instantiated">
+  <div
+    class="flex flex-col min-h-[calc(100vh-120px)]"
+    v-if="!instantiated"
+  >
     <PageHeadingBlock :pageTitle="solution.name" />
-    <div class="px-8 max-md:px-3 flex flex-col lg:flex-row gap-4 lg:items-center mb-4">
+    <div class="px-8 max-md:px-3 flex flex-col sm:flex-row gap-4 lg:items-center mb-4">
       <div class="flex flex-col sm:flex-row gap-4 sm:items-center">
         <div class="w-10 h-10 hidden rounded sm:flex justify-center items-center bg-white">
           <img
@@ -10,32 +13,36 @@
             alt=""
           />
         </div>
-        <div class="flex gap-3">
-          <div class="flex gap-1">
+        <div class="flex gap-3 items-center">
+          <div class="flex gap-1  items-center">
             <span class="text-xs font-medium text-color-primary">By</span>
-            <span class="text-xs font-medium text-color-secondary">{{ solution.vendor.name }}</span>
+            <PrimeButton
+              link
+              :pt="{
+                label: { class: 'text-xs' },
+                icon: { class: 'text-xs' }
+              }"
+              class="px-0 py-1"
+              :label="solution.vendor.name"
+              icon="pi pi-external-link"
+              iconPos="right"
+            />
           </div>
-          <div class="flex gap-1">
+          <div class="flex gap-1 items-center">
             <span class="text-xs font-medium text-color-primary">Version</span>
             <span class="text-xs font-medium text-color-secondary">{{ solution.version }}</span>
           </div>
-          <div class="flex gap-1">
+          <div class="flex gap-1 items-center">
             <span class="text-xs font-medium text-color-primary">Last Updated</span>
             <span class="text-xs font-medium text-color-secondary">{{ solution.lastUpdate }}</span>
           </div>
         </div>
       </div>
-      <div class="flex flex-col sm:flex-row ml-0 lg:ml-auto gap-3">
+      <div class="flex flex-col sm:flex-row ml-0 sm:ml-auto">
         <PrimeButton
           label="More details"
           outlined
           @click="openDetails"
-        />
-        <PrimeButton
-          link
-          label="azion.com"
-          icon="pi pi-external-link"
-          iconPos="right"
         />
       </div>
     </div>
@@ -47,7 +54,6 @@
       :blockRedirectUnsaved="blockRedirectUnsaved"
     />
     <PrimeDialog
-      v-model:visible="showDetails"
       modal
       class="w-full max-w-2xl"
       :pt="{
@@ -109,6 +115,69 @@
         </div>
       </div>
     </PrimeDialog>
+    <Sidebar
+      v-model:visible="showDetails"
+      position="bottom"
+      headerContent="Create something new"
+      :show-close-icon="true"
+      :pt="{
+        root: { class: 'h-[80%] flex p-0' },
+        headerContent: { class: 'w-full' },
+        header: { class: 'px-3 py-2 items-start' },
+        mask: { class: 'flex' }
+      }"
+    >
+        <template #header>
+          <div class="w-full flex flex-col gap-2">
+          <div class="flex gap-2 items-center">
+            <div class="w-10 h-10 rounded flex justify-center items-center bg-white">
+              <img
+                class="rounded"
+                :src="solution.vendor.icon"
+                alt=""
+              />
+            </div>
+            <span class="text-xl font-medium">
+              {{ solution.name }}
+            </span>
+          </div>
+          <div class="flex gap-3">
+            <div class="flex gap-1">
+              <span class="text-xs font-medium text-color-primary">By</span>
+              <span class="text-xs font-medium text-color-secondary">{{
+                solution.vendor.name
+              }}</span>
+            </div>
+            <div class="flex gap-1">
+              <span class="text-xs font-medium text-color-primary">Version</span>
+              <span class="text-xs font-medium text-color-secondary">{{ solution.version }}</span>
+            </div>
+            <div class="flex gap-1">
+              <span class="text-xs font-medium text-color-primary">Last Updated</span>
+              <span class="text-xs font-medium text-color-secondary">{{
+                solution.lastUpdate
+              }}</span>
+            </div>
+          </div>
+        </div>
+        </template>
+        <div class="flex flex-col gap-6 w-full">
+        <div class="flex flex-col gap-2">
+          <span class="text-lg font-medium"> Overview </span>
+          <div
+            class="bg-transparent"
+            v-html="solution.overview"
+          ></div>
+        </div>
+        <div class="flex flex-col gap-2">
+          <span class="text-lg font-medium"> Usage </span>
+          <div
+            class="bg-transparent"
+            v-html="solution.usage"
+          ></div>
+        </div>
+      </div>
+    </Sidebar>
     <ActionBarTemplate
       @cancel="navigateBack"
       @submit="validateAndSubmit"
@@ -119,6 +188,7 @@
   </div>
 </template>
 <script>
+  import Sidebar from 'primevue/sidebar'
   import DialogUnsavedBlock from '@/templates/dialog-unsaved-block'
   import ActionBarTemplate from '@/templates/action-bar-block'
   import PageHeadingBlock from '@/templates/page-heading-block'
@@ -132,7 +202,8 @@
       PageHeadingBlock,
       DialogUnsavedBlock,
       PrimeButton,
-      PrimeDialog
+      PrimeDialog,
+      Sidebar
     },
     data: () => ({
       showDetails: false,
@@ -223,7 +294,7 @@
           this.handleSuccess(response.redirectURL)
         } catch (error) {
           this.showToast('error', error)
-        } finally{
+        } finally {
           this.isLoading = false
         }
       }
