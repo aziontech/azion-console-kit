@@ -2,7 +2,7 @@
   <div class="flex flex-col">
     <div class="border-b surface-border surface-ground">
       <div
-        class="px-3 py-4 sm:px-8 sm:py-8 gap-4 flex 2xl:px-8 2xl:py-16 flex-col max-w-screen-2xl mx-auto w-full"
+        class="px-3 py-4 sm:px-8 sm:py-8 gap-4 flex lg:px-8 lg:py-16 flex-col max-w-screen-2xl mx-auto w-full"
       >
         <div class="text-2xl sm:text-3xl font-medium">
           The place to find, deploy, and manage third-party solutions
