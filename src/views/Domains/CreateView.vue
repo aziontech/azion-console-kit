@@ -76,7 +76,7 @@
               </div>
             </template>
           </form-horizontal>
-  
+
           <form-horizontal
             title="Settings"
             description="Determine the edge application of the domain and its digital certificate. 
