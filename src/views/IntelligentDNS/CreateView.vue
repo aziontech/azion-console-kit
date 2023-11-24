@@ -13,7 +13,7 @@
         <template #form>
           <FormHorizontal
             title="General"
-            description="Espaço livre para descrição e instruções de preenchimento. Esse conteúdo deve ser criado pensando tanto em funcionalidade quanto em em alinhamento e estética. Devemos sempre criar os blocos conforme o contexto, cuidando sempre para não ter blocos muito longos."
+            description="Description"
           >
             <template #inputs>
               <div class="flex flex-col sm:max-w-lg w-full gap-2">
@@ -23,8 +23,7 @@
                   >Name *</label
                 >
                 <InputText
-                  placeholder="Zone Name"
-                  v-bind="name"
+                  v-model="name"
                   id="name"
                   type="text"
                   :class="{ 'p-invalid': errors.name }"
@@ -35,6 +34,13 @@
                   >{{ errors.name }}</small
                 >
               </div>
+            </template>
+          </FormHorizontal>
+          <FormHorizontal
+            title="Title Section"
+            description="Description"
+          >
+            <template #inputs>
               <div class="flex flex-col sm:max-w-lg w-full gap-2">
                 <label
                   for="domain"
@@ -42,9 +48,8 @@
                   >Domain *</label
                 >
                 <InputText
-                  placeholder="Domain"
                   id="domain"
-                  v-bind="domain"
+                  v-model="domain"
                   type="text"
                   :class="{ 'p-invalid': errors.domain }"
                 />
@@ -54,11 +59,17 @@
                   >{{ errors.domain }}</small
                 >
               </div>
+            </template>
+          </FormHorizontal>
+          <FormHorizontal
+            title="Status"
+            description="Description"
+          >
+            <template #inputs>
               <div class="flex gap-3 items-center">
                 <label for="">Active</label>
                 <InputSwitch
-                  v-bind="isActive"
-                  v-model="isActive.value"
+                  v-model="isActive"
                   :class="{ 'p-invalid': errors.isActive }"
                 />
               </div>
@@ -75,7 +86,7 @@
   import FormHorizontal from '@templates/create-form-block-new/form-horizontal'
   import InputText from 'primevue/inputtext'
   import InputSwitch from 'primevue/inputswitch'
-  import { useForm } from 'vee-validate'
+  import { useForm, useField } from 'vee-validate'
   import * as yup from 'yup'
   import ContentBlock from '@/templates/content-block'
   import PageHeadingBlock from '@/templates/page-heading-block'
@@ -97,18 +108,18 @@
         const domainRegex = /^(?:[-A-Za-z0-9]+\.)+[A-Za-z]{2,6}$/
         return domainRegex.test(value)
       }),
-    isActive: yup.boolean().required().default(false)
+    isActive: yup.boolean()
   })
 
   // validation with VeeValidate
-  const { errors, defineInputBinds, meta, resetForm, values } = useForm({
+  const { errors, meta, resetForm, values } = useForm({
     validationSchema,
     initialValues: {
-      isActive: false
+      isActive: true
     }
   })
 
-  const name = defineInputBinds('name', { validateOnInput: true })
-  const domain = defineInputBinds('domain', { validateOnInput: true })
-  const isActive = defineInputBinds('isActive')
+  const { value: name } = useField('name')
+  const { value: domain } = useField('domain')
+  const { value: isActive } = useField('isActive')
 </script>
