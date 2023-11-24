@@ -37,6 +37,7 @@
   import Illustration from '@/assets/svg/illustration-layers.vue'
   import ContentBlock from '@/templates/content-block'
   import PageHeadingBlock from '@/templates/page-heading-block'
+  import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
 
   export default {
     name: 'credentials-view',
@@ -73,7 +74,14 @@
           },
           {
             field: 'status',
-            header: 'Active'
+            header: 'Status',
+            type: 'component',
+            component: (columnData) => {
+              return columnBuilder({
+                data: columnData,
+                columnAppearance: 'tag'
+              })
+            }
           }
         ]
       }
