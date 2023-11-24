@@ -1,8 +1,22 @@
 <template>
   <ContentBlock>
     <template #heading>
-      <PageHeadingBlock pageTitle="Create Intelligent DNS"></PageHeadingBlock>
+      <PageHeadingBlock
+        pageTitle="Create Intelligent DNS"
+        description="Copy the Nameservers values for change your domain's authoritative DNS servers to use Azion Intelligent DNS."
+      >
+        <template #default>
+          <PrimeButton
+            outlined
+            icon="pi pi-copy"
+            class="max-md:w-full"
+            label="Copy Nameservers"
+            @click="handleCopyNameServers"
+          ></PrimeButton>
+        </template>
+      </PageHeadingBlock>
     </template>
+
     <template #content>
       <CreateFormBlock
         :createService="props.createIntelligentDNSService"
@@ -88,15 +102,22 @@
   import InputSwitch from 'primevue/inputswitch'
   import { useForm, useField } from 'vee-validate'
   import * as yup from 'yup'
+  import PrimeButton from 'primevue/button'
   import ContentBlock from '@/templates/content-block'
   import PageHeadingBlock from '@/templates/page-heading-block'
+  import { useToast } from 'primevue/usetoast'
 
   const props = defineProps({
     createIntelligentDNSService: {
       type: Function,
       required: true
+    },
+    clipboardWrite: {
+      type: Function,
+      required: true
     }
   })
+  const toast = useToast()
 
   //Validation Schema
   const validationSchema = yup.object({
@@ -122,4 +143,14 @@
   const { value: name } = useField('name')
   const { value: domain } = useField('domain')
   const { value: isActive } = useField('isActive')
+
+  const handleCopyNameServers = () => {
+    props.clipboardWrite('ns1.aziondns.net;ns2.aziondns.com;ns3.aziondns.org')
+    toast.add({
+      closable: false,
+      severity: 'success',
+      summary: 'Nameservers copied',
+      life: 10000
+    })
+  }
 </script>

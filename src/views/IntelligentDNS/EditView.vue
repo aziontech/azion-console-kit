@@ -1,7 +1,20 @@
 <template>
   <ContentBlock>
     <template #heading>
-      <PageHeadingBlock pageTitle="Edit Intelligent DNS"> </PageHeadingBlock>
+      <PageHeadingBlock
+        pageTitle="Edit Intelligent DNS"
+        description="Copy the Nameservers values for change your domain's authoritative DNS servers to use Azion Intelligent DNS."
+      >
+        <template #default>
+          <PrimeButton
+            outlined
+            icon="pi pi-copy"
+            class="max-md:w-full"
+            label="Copy Nameservers"
+            @click="handleCopyNameServers"
+          ></PrimeButton>
+        </template>
+      </PageHeadingBlock>
     </template>
     <template #content>
       <TabView
@@ -114,8 +127,10 @@
   import TabView from 'primevue/tabview'
   import TabPanel from 'primevue/tabpanel'
   import InputText from 'primevue/inputtext'
+  import PrimeButton from 'primevue/button'
   import InputSwitch from 'primevue/inputswitch'
   import { useForm, useField } from 'vee-validate'
+
   import * as yup from 'yup'
 
   export default {
@@ -129,6 +144,7 @@
       ListTableBlock,
       FormHorizontal,
       PageHeadingBlock,
+      PrimeButton,
       ContentBlock
     },
 
@@ -137,6 +153,7 @@
       editIntelligentDNSService: { type: Function, required: true },
       listRecordsService: { type: Function, required: true },
       deleteRecordsService: { type: Function, required: true },
+      clipboardWrite: { type: Function, required: true },
       updatedRedirect: { type: String, required: true }
     },
 
@@ -238,6 +255,15 @@
             params: { id: this.intelligentDNSID }
           })
         }
+      },
+      handleCopyNameServers() {
+        this.clipboardWrite('ns1.aziondns.net;ns2.aziondns.com;ns3.aziondns.org')
+        this.$toast.add({
+          closable: false,
+          severity: 'success',
+          summary: 'Nameservers copied',
+          life: 10000
+        })
       }
     },
     computed: {

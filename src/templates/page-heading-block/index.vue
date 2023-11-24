@@ -7,7 +7,7 @@
     />
     <div class="flex flex-wrap w-full py-4 items-end justify-between">
       <div
-        class="flex flex-col gap-3 w-full"
+        class="flex flex-col gap-3 max-md:w-full"
         v-if="pageTitle || description"
       >
         <div
@@ -25,7 +25,7 @@
       </div>
       <div
         v-if="hasDefaultSlot"
-        class="ml-auto w-full items-end flex justify-end"
+        class="ml-auto items-end flex justify-end max-md:w-full"
       >
         <slot></slot>
       </div>
