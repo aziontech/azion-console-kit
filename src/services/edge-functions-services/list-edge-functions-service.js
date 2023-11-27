@@ -17,12 +17,34 @@ export const listEdgeFunctionsService = async ({
   return parseHttpResponse(httpResponse)
 }
 
+const STATUS_AS_TAG = {
+  true: {
+    content: 'Active',
+    severity: 'success'
+  },
+  false: {
+    content: 'Inactive',
+    severity: 'danger'
+  }
+}
+
+const LANGUAGE_AS_TAG = {
+  javascript: {
+    content: 'Javascript',
+    icon: 'javascript'
+  },
+  lua: {
+    content: 'Lua',
+    icon: 'lua'
+  }
+}
+
 const adapt = (httpResponse) => {
   const parsedEdgeFunctions = httpResponse.body.results?.map((edgeFunction) => {
     return {
-      active: edgeFunction.active ? 'Yes' : 'No',
+      status: STATUS_AS_TAG[edgeFunction.active],
       version: edgeFunction.version || '-',
-      language: edgeFunction.language,
+      language: LANGUAGE_AS_TAG[edgeFunction.language],
       initiatorType: edgeFunction.initiator_type,
       id: edgeFunction.id,
       lastEditor: edgeFunction.last_editor,

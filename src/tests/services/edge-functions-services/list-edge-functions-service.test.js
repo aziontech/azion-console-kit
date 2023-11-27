@@ -13,7 +13,7 @@ const fixtures = {
   edgeFunctionMock: {
     active: true,
     version: '1.0.0',
-    language: 'js',
+    language: 'javascript',
     initiator_type: 'Initiator',
     id: 1239875,
     last_editor: 'az editor',
@@ -24,7 +24,7 @@ const fixtures = {
   disabledEdgeFunctionMock: {
     active: false,
     version: null,
-    language: 'Go',
+    language: 'lua',
     initiator_type: 'Initiator 2',
     id: 852030,
     last_editor: 'az editor 2',
@@ -78,9 +78,9 @@ describe('EdgeFunctionsServices', () => {
 
     expect(result).toEqual([
       {
-        active: 'Yes',
+        status: { content: 'Active', severity: 'success' },
         version: fixtures.edgeFunctionMock.version,
-        language: fixtures.edgeFunctionMock.language,
+        language: { content: 'Javascript', icon: 'javascript' },
         initiatorType: fixtures.edgeFunctionMock.initiator_type,
         referenceCount: fixtures.edgeFunctionMock.reference_count,
         id: fixtures.edgeFunctionMock.id,
@@ -90,9 +90,9 @@ describe('EdgeFunctionsServices', () => {
         lastModifiedDate: new Date('2023-11-10T00:00:00.000Z')
       },
       {
-        active: 'No',
+        status: { content: 'Inactive', severity: 'danger' },
         version: '-',
-        language: fixtures.disabledEdgeFunctionMock.language,
+        language: { content: 'Lua', icon: 'lua' },
         initiatorType: fixtures.disabledEdgeFunctionMock.initiator_type,
         referenceCount: fixtures.disabledEdgeFunctionMock.reference_count,
         id: fixtures.disabledEdgeFunctionMock.id,

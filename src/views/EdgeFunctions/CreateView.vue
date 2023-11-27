@@ -97,7 +97,6 @@
                     <iframe
                       class="w-full h-full border-0 overflow-hidden"
                       ref="previewIframe"
-                      frameborder="0"
                       @load="postPreviewUpdates"
                       allowfullscreen
                       src="https://code-preview.azion.com/preview"
