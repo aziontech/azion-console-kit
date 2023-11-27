@@ -29,6 +29,9 @@
                 @keyup.enter="searchDocumentation()"
               />
             </span>
+            <small v-if="search">
+              Search "<span class="font-semibold">{{ search }}</span>" on Documentation
+            </small>
           </div>
 
           <!-- List items -->
@@ -59,6 +62,7 @@
               outlined
               icon="pi pi-chevron-left"
               label="Back"
+              size="small"
               @click="backToMenu()"
             ></PrimeButton>
 
@@ -239,6 +243,7 @@
       return {
         mainContent: '',
         articleContent: '',
+        search: '',
         menuItems: [
           {
             label: 'Documentation',
