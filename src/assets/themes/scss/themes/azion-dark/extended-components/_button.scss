@@ -1,4 +1,5 @@
 //Custom Button
+
 .p-button {
   font-weight: 500 !important;
 
@@ -62,11 +63,6 @@
     .p-button-icon-right {
       margin: 0;
     }
-
-    &.p-button-rounded {
-      border-radius: 50%;
-      height: $buttonIconOnlyWidth;
-    }
   }
 
   &.p-button-sm {
@@ -119,5 +115,17 @@
   }
   &:not(:disabled):focus-visible {
     box-shadow: $linkButtonFocusShadow !important;
+  }
+}
+
+.p-inputgroup > .p-button {
+  &.p-button-icon-only {
+      color: initial;
+      width: initial;
+      height: initial !important;
+      .p-button-icon-left,
+      .p-button-icon-right {
+        margin: initial;
+    }
   }
 }
