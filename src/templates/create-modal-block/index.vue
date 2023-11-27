@@ -56,6 +56,7 @@
                   {{ template.headline }}
                 </span>
               </div>
+              <div class="bg-gray-200 w-20 h-9 rounded"></div>
             </div>
           </div>
         </PrimeButton>
@@ -90,6 +91,11 @@
                   {{ template.headline }}
                 </span>
               </div>
+              <PrimeButton
+                outlined
+                label="Choose"
+                @click="redirectToSolution(template)"
+              />
             </div>
           </div>
         </PrimeButton>
@@ -125,6 +131,7 @@
         </PrimeCard>
       </div>
     </div>
+    
   </div>
 </template>
 <script>

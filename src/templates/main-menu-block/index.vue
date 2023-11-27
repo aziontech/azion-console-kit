@@ -473,14 +473,13 @@
   <PrimeDialog
     v-model:visible="createBoardManager.enabled"
     modal
-    header="Create something new"
+    header="New"
     :pt="{
       root: { class: 'hidden sm:flex' },
-      content: { class: 'p-4 sm:p-0' }
+      content: { class: 'p-0' }
     }"
     position="center"
     :dismissableMask="true"
-    :breakpoints="{ '641px': '90vw' }"
     @update:visible="createBoardManager.close()"
   >
     <!-- SLOT WIP -->
