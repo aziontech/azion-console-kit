@@ -94,7 +94,7 @@
                   language="json"
                   :theme="theme"
                   :options="optionsMonacoEditor"
-                  class="min-h-[100px]"
+                  class="min-h-[100px] surface-border border rounded-sm overflow-hidden"
                 />
                 <small class="text-color-secondary text-xs font-normal leading-tight">
                   Data Set is a format chosen to send the data to your endpoint. It must be a valid
@@ -166,6 +166,10 @@
                     </div>
                   </template>
                 </PickList>
+
+                <small class="text-color-secondary text-sm font-normal leading-tight">
+                  Hold <code>command</code> or <code>ctrl</code> to select multiple items.
+                </small>
               </div>
             </template>
           </FormHorizontal>
@@ -642,7 +646,7 @@
                     language="json"
                     :theme="theme"
                     :options="optionsMonacoEditor"
-                    class="min-h-[100px]"
+                    class="min-h-[100px] surface-border border rounded-md overflow-hidden"
                   />
                   <small class="text-color-secondary text-sm font-normal leading-tight">
                     The JSON file with the key that will be used to authenticate with Google
