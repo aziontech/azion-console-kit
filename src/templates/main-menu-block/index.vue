@@ -476,7 +476,8 @@
     header="New"
     :pt="{
       root: { class: 'hidden sm:flex' },
-      content: { class: 'p-0' }
+      content: { class: 'p-0' },
+      mask: { class: 'hidden sm:flex' }
     }"
     position="center"
     :dismissableMask="true"

@@ -1,6 +1,6 @@
 <template>
-  <div class="w-full max-w-4xl flex flex-col sm:flex-row p-0 sm:pl-5 sm:pr-7 gap-4">
-    <div class="sm:min-w-[12rem] mt-4">
+  <div class="w-full max-w-4xl flex flex-col sm:flex-row p-0 sm:pl-5 sm:pr-[18px] gap-4">
+    <div class="sm:min-w-[240px] mt-4">
       <Listbox
         @change="onMenuChange"
         v-model="selectedTabControl"
@@ -11,7 +11,7 @@
         :pt="{
           list: { class: 'p-0' }
         }"
-        class="bg-transparent border-none sm:min-w-[12rem] p-0 md:fixed"
+        class="bg-transparent border-none sm:min-w-[240px] p-0 md:fixed"
       />
     </div>
 
@@ -52,11 +52,10 @@
                 <span class="text-color text-sm font-medium">
                   {{ template.name }}
                 </span>
-                <span class="h-10 pb-4 text-sm text-color-secondary mt-1.5 line-clamp-2">
+                <span class="h-10 pb-4 text-sm font-normal text-color-secondary mt-1.5 line-clamp-2">
                   {{ template.headline }}
                 </span>
               </div>
-              <div class="bg-gray-200 w-20 h-9 rounded"></div>
             </div>
           </div>
         </PrimeButton>
@@ -87,51 +86,40 @@
                 <span class="text-color text-sm font-medium">
                   {{ template.name }}
                 </span>
-                <span class="h-10 pb-4 text-sm text-color-secondary mt-1.5 line-clamp-2">
+                <span class="h-10 pb-4 text-sm font-normal text-color-secondary mt-1.5 line-clamp-2">
                   {{ template.headline }}
                 </span>
               </div>
-              <PrimeButton
-                outlined
-                label="Choose"
-                @click="redirectToSolution(template)"
-              />
             </div>
           </div>
         </PrimeButton>
       </div>
       <div
-        class="h-full ml-0 w-full grid md:grid-cols-2 grid-cols-1 gap-4"
+        class="mx-0 w-full mt-0 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols- gap-4"
         v-else-if="showResource"
       >
-        <PrimeCard
+        <PrimeButton
           v-for="resource in resources"
           :key="resource.to"
-          class="w-full p-4"
+          @click="redirect(resource.to)"
+          class="p-4 text-left border-solid border surface-border hover:border-primary transition-all"
+          link
         >
-          <template #content>
+          <div class="flex flex-col h-full justify-between gap-3.5 items-start">
             <div class="flex gap-3.5 flex-col">
-              <div class="flex p-0.5 flex-col gap-1">
-                <span class="text-color text-base font-medium">
+              <div class="flex p-0.5 flex-col">
+                <span class="text-color text-sm font-medium">
                   {{ resource.label }}
                 </span>
-                <span class="text-color-secondary">
+                <span class="h-10 pb-4 text-sm font-normal text-color-secondary mt-1.5 line-clamp-2">
                   Brief description lorem ipsum dolor sit amet, consectetur adipiscing elit
                 </span>
               </div>
-              <div>
-                <PrimeButton
-                  outlined
-                  label="Choose"
-                  @click="redirect(resource.to)"
-                />
-              </div>
             </div>
-          </template>
-        </PrimeCard>
+          </div>
+        </PrimeButton>
       </div>
     </div>
-    
   </div>
 </template>
 <script>
@@ -139,12 +127,10 @@
   import * as MarketplaceService from '@/services/marketplace-services'
   import LoadingListTemplate from './LoadingListTemplate'
   import Listbox from 'primevue/listbox'
-  import PrimeCard from 'primevue/card'
 
   export default {
     name: 'create-modal-block',
     components: {
-      PrimeCard,
       PrimeButton,
       Listbox,
       LoadingListTemplate
