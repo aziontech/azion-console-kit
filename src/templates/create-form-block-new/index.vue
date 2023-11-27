@@ -1,128 +1,103 @@
+<script setup>
+  import DialogUnsavedBlock from '@/templates/dialog-unsaved-block'
+  import { useForm, useIsFormDirty } from 'vee-validate'
+  import { computed, ref } from 'vue'
+  import { useRouter } from 'vue-router'
+  import { useToast } from 'primevue/usetoast'
+
+  defineOptions({ name: 'create-form-block' })
+
+  const props = defineProps({
+    createService: {
+      type: Function,
+      required: true
+    },
+    schema: {
+      type: Object,
+      required: true
+    },
+    disabledFeedback: {
+      type: Boolean,
+      default: false
+    },
+    disabledRedirect: {
+      type: Boolean,
+      default: false
+    }
+  })
+
+  const emit = defineEmits(['on-response'])
+
+  const router = useRouter()
+  const toast = useToast()
+  const blockViewRedirection = ref(true)
+
+  const formHasChanges = computed(() => {
+    const isDirty = useIsFormDirty()
+    return blockViewRedirection.value && isDirty.value
+  })
+
+  const { meta, errors, handleSubmit, isSubmitting } = useForm({
+    validationSchema: props.schema
+  })
+
+  const onCancel = () => {
+    router.go(-1)
+  }
+
+  const showToast = (severity, summary, life = 10000) => {
+    if (!summary) return
+    toast.add({
+      closable: false,
+      severity: severity,
+      summary: summary,
+      life: life
+    })
+  }
+
+  const showFeedback = (feedback = 'created successfully') => {
+    if (props.disabledFeedback) return
+    showToast('success', feedback)
+  }
+
+  const redirectToUrl = (path) => {
+    router.push({ path })
+  }
+
+  const handleSuccess = (response) => {
+    emit('on-response', response)
+    showFeedback(response.feedback)
+    if (props.disabledCallback) return
+    redirectToUrl(response.urlToEditView)
+  }
+
+  const onSubmit = handleSubmit(async (values, actions) => {
+    try {
+      const response = await props.createService(values)
+      handleSuccess(response)
+      actions.resetForm()
+      blockViewRedirection.value = false
+    } catch (error) {
+      showToast('error', error)
+      blockViewRedirection.value = true
+    }
+  })
+</script>
+
 <template>
   <div class="flex flex-col min-h-[calc(100vh-300px)]">
     <form class="w-full grow flex flex-col gap-8 max-md:gap-6">
       <slot name="form" />
       <slot name="raw-form" />
     </form>
-    <DialogUnsavedBlock :blockRedirectUnsaved="hasModifications" />
-    <Teleport
-      v-if="teleportLoad"
-      to="#action-bar"
-    >
-      <ActionBarBlockGoBack v-if="buttonBackList" />
-      <ActionBarTemplate
-        @cancel="navigateBack"
-        @submit="validateAndSubmit"
-        :loading="isLoading"
-        :submitDisabled="!formMeta.valid"
-        v-else
-      />
-    </Teleport>
+    <DialogUnsavedBlock :blockRedirectUnsaved="formHasChanges" />
+    <slot
+      name="action-bar"
+      :onSubmit="onSubmit"
+      :formValid="meta.valid"
+      :onCancel="onCancel"
+      :errors="errors"
+      :loading="isSubmitting"
+    />
   </div>
 </template>
-<script>
-  import DialogUnsavedBlock from '@/templates/dialog-unsaved-block'
-  import ActionBarTemplate from '@/templates/action-bar-block'
-  import ActionBarBlockGoBack from '@/templates/action-bar-block/go-back'
-
-  export default {
-    name: 'create-form-block',
-    components: {
-      ActionBarTemplate,
-      ActionBarBlockGoBack,
-      DialogUnsavedBlock
-    },
-    emits: ['on-response'],
-    data: () => ({
-      isLoading: false,
-      blockViewRedirection: true,
-      teleportLoad: false
-    }),
-    props: {
-      pageTitle: {
-        type: String,
-        required: true
-      },
-      createService: {
-        type: Function,
-        required: true
-      },
-      formData: {
-        type: Object,
-        required: true
-      },
-      cleanFormCallback: {
-        type: Function,
-        default: () => ({})
-      },
-      hasTabs: {
-        type: Boolean,
-        required: false
-      },
-      buttonBackList: {
-        type: Boolean,
-        default: false
-      },
-      callback: {
-        type: Boolean,
-        default: true
-      },
-      disabledFeedback: {
-        type: Boolean,
-        default: false
-      },
-      formMeta: {
-        type: Object,
-        required: true
-      }
-    },
-    mounted() {
-      this.teleportLoad = true
-    },
-    methods: {
-      navigateBack() {
-        this.$router.go(-1)
-      },
-      redirectToUrl(path) {
-        this.$router.push({ path })
-      },
-      showToast(severity, summary, life = 10000) {
-        if (!summary) return
-        this.$toast.add({
-          closable: false,
-          severity: severity,
-          summary: summary,
-          life: life
-        })
-      },
-      showFeedback(feedback = 'created successfully') {
-        if (!this.disabledFeedback) {
-          this.showToast('success', feedback)
-        }
-      },
-      handleSuccess(response) {
-        this.cleanFormCallback()
-        this.$emit('on-response', response)
-        this.showFeedback(response.feedback)
-        if (this.callback) this.redirectToUrl(response.urlToEditView)
-      },
-      async validateAndSubmit() {
-        try {
-          this.isLoading = true
-          const response = await this.createService(this.formData)
-          this.handleSuccess(response)
-        } catch (error) {
-          this.showToast('error', error)
-          this.blockViewRedirection = true
-        } finally {
-          this.isLoading = false
-        }
-      }
-    },
-    computed: {
-      hasModifications() {
-        return this.formMeta.touched && this.blockViewRedirection
-      }
-    }
-  }
-</script>

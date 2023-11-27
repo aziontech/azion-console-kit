@@ -10,7 +10,6 @@
         :initialDataSetter="setValues"
         :formData="values"
         :formMeta="meta"
-        :cleanFormCallback="resetForm"
         :updatedRedirect="updatedRedirect"
       >
         <template #form>

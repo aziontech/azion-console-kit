@@ -8,7 +8,6 @@
       removableSort
       :value="data"
       dataKey="id"
-      v-model:selection="selectedRow"
       selectionMode="single"
       @row-click="editItemSelected"
       v-model:filters="filters"

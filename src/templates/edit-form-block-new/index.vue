@@ -1,3 +1,101 @@
+
+<script setup>
+  import DialogUnsavedBlock from '@/templates/dialog-unsaved-block'
+  import { useForm, useIsFormDirty } from 'vee-validate'
+  import { computed, ref } from 'vue'
+  import { useRouter, useRoute } from 'vue-router'
+  import { useToast } from 'primevue/usetoast'
+
+  defineOptions({ name: 'edit-form-block' })
+
+  const props = defineProps({
+    editService: {
+      type: Function,
+      required: true
+    },
+    loadService: {
+      type: Function,
+      required: true
+    },
+    backURL: {
+      type: String,
+      required: false
+    },
+    updatedRedirect: {
+      type: String,
+      required: true
+    },
+    schema: {
+      type: Object,
+      required: true
+    }
+  })
+
+  const router = useRouter()
+  const route = useRoute()
+  const toast = useToast()
+  const blockViewRedirection = ref(true)
+
+  const { meta, errors, handleSubmit, isSubmitting, resetForm } = useForm({
+    validationSchema: props.schema
+  })
+
+  const formHasChanges = computed(() => {
+    const isDirty = useIsFormDirty()
+    return blockViewRedirection.value && isDirty.value
+  })
+
+  const goBackToList = () => {
+    if (props.updatedRedirect) {
+      router.push({ name: props.updatedRedirect })
+      return
+    }
+    router.go(-1)
+  }
+
+  const onCancel = () => {
+    if (props.backURL) {
+      router.push({ path: props.backURL })
+    } else {
+      goBackToList()
+    }
+  }
+
+  const showToast = (severity, summary, life = 10000) => {
+    if (!summary) return
+    toast.add({
+      closable: false,
+      severity: severity,
+      summary: summary,
+      life: life
+    })
+  }
+
+  const loadInitialData = async () => {
+    try {
+      const { id } = route.params
+      const initialValues = await props.loadService({ id })
+      resetForm({ values: initialValues })
+    } catch (error) {
+      showToast('error', error)
+    }
+  }
+
+  const onSubmit = handleSubmit(async (values) => {
+    try {
+      const feedback = await props.editService(values)
+      showToast('success', feedback ?? 'edited successfully')
+      blockViewRedirection.value = false
+      goBackToList()
+    } catch (error) {
+      blockViewRedirection.value = true
+      showToast('error', error)
+    }
+  })
+
+  loadInitialData()
+</script>
+
 <template>
   <div class="flex flex-col min-h-[calc(100vh-300px)]">
     <form
@@ -10,150 +108,13 @@
     </form>
   </div>
 
-  <DialogUnsavedBlock
-    :leavePage="leavePage"
-    :blockRedirectUnsaved="hasModifications"
+  <DialogUnsavedBlock :blockRedirectUnsaved="formHasChanges" />
+  <slot
+    name="action-bar"
+    :onSubmit="onSubmit"
+    :formValid="meta.valid"
+    :onCancel="onCancel"
+    :errors="errors"
+    :loading="isSubmitting"
   />
-  <Teleport
-    to="#action-bar"
-    v-if="teleportLoad"
-  >
-    <ActionBarTemplate
-      @cancel="handleCancel"
-      @submit="handleSubmit"
-      :loading="isLoading"
-      :submitDisabled="!formMeta.valid"
-    />
-  </Teleport>
 </template>
-
-<script>
-  import DialogUnsavedBlock from '@/templates/dialog-unsaved-block'
-  import ActionBarTemplate from '@/templates/action-bar-block'
-
-  export default {
-    name: 'edit-form-block',
-    components: {
-      ActionBarTemplate,
-      DialogUnsavedBlock
-    },
-    data: () => ({
-      isLoading: false,
-      blockViewRedirection: true,
-      teleportLoad: false
-    }),
-    props: {
-      pageTitle: {
-        type: String,
-        required: true
-      },
-      editService: {
-        type: Function,
-        required: true
-      },
-      loadService: {
-        type: Function,
-        required: true
-      },
-      initialDataSetter: {
-        type: Function,
-        required: true
-      },
-      formData: {
-        type: Object,
-        required: true
-      },
-      backURL: {
-        type: String,
-        required: false
-      },
-      hasTabs: {
-        type: Boolean,
-        required: false
-      },
-      formMeta: {
-        type: Object,
-        required: true
-      },
-      updatedRedirect: {
-        type: String,
-        required: true
-      }
-    },
-    async created() {
-      await this.loadInitialData()
-    },
-    mounted() {
-      this.teleportLoad = true
-    },
-    methods: {
-      leavePage(dialogUnsaved) {
-        dialogUnsaved = false
-        this.handleCancel()
-        return dialogUnsaved
-      },
-      goBackToList() {
-        if (this.updatedRedirect) {
-          this.$router.push({ name: this.updatedRedirect })
-          return
-        }
-        this.$router.go(-1)
-      },
-      handleCancel() {
-        if (this.backURL) {
-          this.$router.push({ path: this.backURL })
-        } else {
-          this.goBackToList()
-        }
-      },
-      async loadInitialData() {
-        try {
-          const { id } = this.$route.params
-          this.isLoading = true
-          const initialData = await this.loadService({ id })
-          this.initialDataSetter(initialData)
-        } catch (error) {
-          this.$toast.add({
-            closable: false,
-            severity: 'error',
-            summary: error,
-            life: 10000
-          })
-        } finally {
-          this.isLoading = false
-        }
-      },
-      async handleSubmit() {
-        try {
-          this.isLoading = true
-          const feedback = await this.editService(this.formData)
-          this.$toast.add({
-            closable: false,
-            severity: 'success',
-            summary: feedback ?? 'edited successfully',
-            life: 10000
-          })
-          this.blockViewRedirection = false
-          this.goBackToList()
-        } catch (error) {
-          this.blockViewRedirection = true
-          this.$toast.add({
-            closable: false,
-            severity: 'error',
-            summary: error,
-            life: 10000
-          })
-        } finally {
-          setTimeout(() => {
-            this.isLoading = false
-          }, 800)
-        }
-      }
-    },
-    computed: {
-      hasModifications() {
-        return this.formMeta.touched && this.blockViewRedirection
-      }
-    }
-  }
-</script>
