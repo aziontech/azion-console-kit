@@ -39,10 +39,6 @@
       teleportLoad: false
     }),
     props: {
-      pageTitle: {
-        type: String,
-        required: true
-      },
       createService: {
         type: Function,
         required: true
