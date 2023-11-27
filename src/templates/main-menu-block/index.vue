@@ -1,7 +1,7 @@
 <template>
   <!-- Header Container -->
   <header
-    class="p-3 bg-header text-white border-b surface-border items-center flex justify-between md:px-8 md:py-3 w-full fixed top-0 z-10 h-[56px]"
+    class="p-3 bg-header text-white border-b surface-border items-center flex justify-between px-4 md:px-8 md:py-3 w-full fixed top-0 z-10 h-[56px]"
     @keyup.esc="closeSideBar"
   >
     <div
