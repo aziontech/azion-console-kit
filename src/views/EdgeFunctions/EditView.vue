@@ -1,7 +1,7 @@
 <template>
   <ContentBlock>
     <template #heading>
-      <PageHeadingBlock pageTitle="Edit Edge Functions"></PageHeadingBlock>
+      <PageHeadingBlock pageTitle="Edit Edge Function" />
     </template>
     <template #content>
       <EditFormBlock
@@ -69,18 +69,34 @@
                   </div>
                 </template>
               </FormHorizontal>
+
+              <FormHorizontal
+                class="mt-8"
+                title="Status"
+              >
+                <template #inputs>
+                  <div class="flex w-full sm:max-w-lg gap-2">
+                    <InputSwitch v-model="active" />
+                    <label
+                      for="active"
+                      class="text-color text-base font-medium"
+                      >Active
+                    </label>
+                  </div>
+                </template>
+              </FormHorizontal>
             </TabPanel>
 
             <TabPanel header="Code">
-              <div class="flex flex-col lg:flex-row mt-8">
-                <div class="w-full lg:w-1/2 pr-8">
+              <div class="flex flex-col lg:flex-row mt-8 surface-border border rounded-md">
+                <div class="w-full lg:w-2/3 pr-0 lg:pr-8">
                   <div class="w-full">
                     <vue-monaco-editor
                       v-model:value="code"
                       language="javascript"
                       :theme="theme"
-                      class="min-h-[50vh] !w-[99%] surface-border border rounded-md"
-                      :class="{ 'border-red-500 border': errors.code }"
+                      class="min-h-[50vh] !w-[99%] surface-border border-r"
+                      :class="{ 'border-red-500 border rounded-md': errors.code }"
                       :options="editorOptions"
                     />
                   </div>
@@ -96,7 +112,7 @@
                   <divider layout="vertical" />
                 </div>
 
-                <div class="w-full lg:w-1/2 hidden lg:block">
+                <div class="w-full lg:w-1/3 hidden lg:block">
                   <div class="relative overflow-hidden h-full p-5">
                     <iframe
                       class="w-full h-full border-0 overflow-hidden"
@@ -113,15 +129,14 @@
             </TabPanel>
 
             <TabPanel header="Arguments">
-              <div class="flex flex-col lg:flex-row mt-8">
-                <div class="w-full lg:w-1/2 lg-8">
+              <div class="flex flex-col lg:flex-row mt-8 surface-border border rounded-md">
+                <div class="w-full lg:w-2/3 pr-0 lg:pr-8">
                   <vue-monaco-editor
                     v-model:value="jsonArgs"
                     language="json"
                     :theme="theme"
-                    class="min-h-[50vh] !w-[99%] surface-border border rounded-md"
-                    :class="{ 'border-red-500 border': errors.jsonArgs }"
-                    @change="changeValidateArgs"
+                    class="min-h-[50vh] !w-[99%] surface-border border-r"
+                    :class="{ 'border-red-500 border rounded-md': errors.jsonArgs }"
                     :options="editorOptions"
                   />
                 </div>
@@ -130,12 +145,11 @@
                   <divider layout="vertical" />
                 </div>
 
-                <div class="w-full lg:w-1/2 hidden lg:block">
+                <div class="w-full lg:w-1/3 hidden lg:block">
                   <div class="relative overflow-hidden h-full p-5">
                     <iframe
                       class="w-full h-full border-0 overflow-hidden"
                       ref="previewIframeArguments"
-                      frameborder="0"
                       @load="postPreviewUpdates"
                       allowfullscreen
                       src="https://code-preview.azion.com/preview"
@@ -166,6 +180,7 @@
   import { useAccountStore } from '@/stores/account'
   import ContentBlock from '@/templates/content-block'
   import PageHeadingBlock from '@/templates/page-heading-block'
+  import InputSwitch from 'primevue/inputswitch'
 
   const props = defineProps({
     loadEdgeFunctionsService: {
@@ -259,6 +274,7 @@
   const { value: jsonArgs, setValue: setArgs } = useField('jsonArgs')
   const { value: code } = useField('code')
   const { value: language } = useField('language')
+  const { value: active } = useField('active')
 
   // Watchs
 
