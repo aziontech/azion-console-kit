@@ -126,8 +126,8 @@
 
 <script setup>
   import { ref } from 'vue'
-  import CreateFormBlock from '@/templates/create-form-block-new'
-  import FormHorizontal from '@/templates/create-form-block-new/form-horizontal'
+  import CreateFormBlock from '@/templates/create-form-block'
+  import FormHorizontal from '@/templates/create-form-block/form-horizontal'
   import InputText from 'primevue/inputtext'
   import PrimeTextarea from 'primevue/textarea'
   import PrimePassword from 'primevue/password'

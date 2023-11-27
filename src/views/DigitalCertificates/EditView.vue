@@ -185,8 +185,8 @@
 </template>
 
 <script>
-  import EditFormBlock from '@/templates/edit-form-block-new'
-  import FormHorizontal from '@/templates/create-form-block-new/form-horizontal'
+  import EditFormBlock from '@/templates/edit-form-block'
+  import FormHorizontal from '@/templates/create-form-block/form-horizontal'
   import PrimeTextarea from 'primevue/textarea'
   import PrimeButton from 'primevue/button'
   import InputText from 'primevue/inputtext'

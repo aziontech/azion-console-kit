@@ -229,8 +229,8 @@
   import { useField, useForm } from 'vee-validate'
   import * as yup from 'yup'
   import { useRoute, useRouter } from 'vue-router'
-  import EditFormBlock from '@/templates/edit-form-block-new/no-header'
-  import FormHorizontal from '@/templates/create-form-block-new/form-horizontal'
+  import EditFormBlock from '@/templates/edit-form-block/no-header'
+  import FormHorizontal from '@/templates/create-form-block/form-horizontal'
   import ContentBlock from '@/templates/content-block'
   import PageHeadingBlock from '@/templates/page-heading-block'
 

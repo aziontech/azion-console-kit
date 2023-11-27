@@ -165,12 +165,12 @@
   import { useForm, useField } from 'vee-validate'
   import * as yup from 'yup'
 
-  import CreateFormBlock from '@/templates/create-form-block-new'
+  import CreateFormBlock from '@/templates/create-form-block'
   import TextareaComponent from 'primevue/textarea'
   import Dropdown from 'primevue/dropdown'
   import InputText from 'primevue/inputtext'
   import MultiSelect from 'primevue/multiselect'
-  import FormHorizontal from '@/templates/create-form-block-new/form-horizontal'
+  import FormHorizontal from '@/templates/create-form-block/form-horizontal'
   import ContentBlock from '@/templates/content-block'
   import PageHeadingBlock from '@/templates/page-heading-block'
 

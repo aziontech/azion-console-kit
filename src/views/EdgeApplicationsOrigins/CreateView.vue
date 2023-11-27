@@ -386,7 +386,7 @@
 </template>
 
 <script setup>
-  import CreateFormBlock from '@/templates/create-form-block-new'
+  import CreateFormBlock from '@/templates/create-form-block'
   import { useForm, useField, useFieldArray } from 'vee-validate'
   import { computed } from 'vue'
   import * as yup from 'yup'
@@ -398,7 +398,7 @@
   import PrimeButton from 'primevue/button'
   import Dropdown from 'primevue/dropdown'
   import Card from 'primevue/card'
-  import FormHorizontal from '@/templates/create-form-block-new/form-horizontal'
+  import FormHorizontal from '@/templates/create-form-block/form-horizontal'
   import ContentBlock from '@/templates/content-block'
   import PageHeadingBlock from '@/templates/page-heading-block'
 

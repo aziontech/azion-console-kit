@@ -149,8 +149,8 @@
 </template>
 
 <script setup>
-  import CreateFormBlock from '@/templates/create-form-block-new'
-  import FormHorizontal from '@/templates/create-form-block-new/form-horizontal'
+  import CreateFormBlock from '@/templates/create-form-block'
+  import FormHorizontal from '@/templates/create-form-block/form-horizontal'
   import { useForm, useField } from 'vee-validate'
   import * as yup from 'yup'
   import TabView from 'primevue/tabview'

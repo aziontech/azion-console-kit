@@ -34,7 +34,7 @@
   </ContentBlock>
 </template>
 <script>
-  import EditFormBlock from '@/templates/edit-form-block-new'
+  import EditFormBlock from '@/templates/edit-form-block'
   import InputText from 'primevue/inputtext'
   import ContentBlock from '@/templates/content-block'
   import PageHeadingBlock from '@/templates/page-heading-block'

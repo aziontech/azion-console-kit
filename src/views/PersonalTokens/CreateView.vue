@@ -167,9 +167,9 @@
 
 <script setup>
   import { computed, ref, watch } from 'vue'
-  import CreateFormBlock from '@/templates/create-form-block-new'
+  import CreateFormBlock from '@/templates/create-form-block'
 
-  import FormHorizontal from '@/templates/create-form-block-new/form-horizontal'
+  import FormHorizontal from '@/templates/create-form-block/form-horizontal'
   import { useAccountStore } from '@/stores/account'
   import { storeToRefs } from 'pinia'
 

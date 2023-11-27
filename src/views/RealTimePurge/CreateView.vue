@@ -177,8 +177,8 @@
 </template>
 
 <script setup>
-  import CreateFormBlock from '@/templates/create-form-block-new'
-  import FormHorizontal from '@/templates/create-form-block-new/form-horizontal'
+  import CreateFormBlock from '@/templates/create-form-block'
+  import FormHorizontal from '@/templates/create-form-block/form-horizontal'
   import RadioButton from 'primevue/radiobutton'
   import Card from 'primevue/card'
   import PrimeTextarea from 'primevue/textarea'

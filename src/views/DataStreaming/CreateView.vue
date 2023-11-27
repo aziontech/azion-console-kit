@@ -1137,8 +1137,8 @@
   import { useAccountStore } from '@/stores/account'
 
   // Import the components
-  import CreateFormBlock from '@/templates/create-form-block-new'
-  import FormHorizontal from '@/templates/create-form-block-new/form-horizontal'
+  import CreateFormBlock from '@/templates/create-form-block'
+  import FormHorizontal from '@/templates/create-form-block/form-horizontal'
 
   import Dropdown from 'primevue/dropdown'
   import RadioButton from 'primevue/radiobutton'

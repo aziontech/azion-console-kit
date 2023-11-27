@@ -1,5 +1,5 @@
 <script setup>
-  import EditFormBlock from '@/templates/edit-form-block-new'
+  import EditFormBlock from '@/templates/edit-form-block'
   import ContentBlock from '@/templates/content-block'
   import PageHeadingBlock from '@/templates/page-heading-block'
   import ActionBarTemplate from '@/templates/action-bar-block'

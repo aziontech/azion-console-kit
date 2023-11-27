@@ -344,7 +344,7 @@
 </template>
 
 <script>
-  import CreateFormBlock from '@/templates/create-form-block-new'
+  import CreateFormBlock from '@/templates/create-form-block'
   import Card from 'primevue/card'
   import RadioButton from 'primevue/radiobutton'
   import PrimeTextarea from 'primevue/textarea'
@@ -353,7 +353,7 @@
   import InlineMessage from 'primevue/inlinemessage'
   import ContentBlock from '@/templates/content-block'
   import PageHeadingBlock from '@/templates/page-heading-block'
-  import FormHorizontal from '@/templates/create-form-block-new/form-horizontal'
+  import FormHorizontal from '@/templates/create-form-block/form-horizontal'
   import { useForm, useField } from 'vee-validate'
   import * as yup from 'yup'
   import { ref, watch } from 'vue'

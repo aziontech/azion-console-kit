@@ -219,10 +219,6 @@
           }
         ]
       },
-      pageTitle: {
-        type: String,
-        required: true
-      },
       pageTitleDelete: {
         type: String,
         required: true

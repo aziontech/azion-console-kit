@@ -97,8 +97,8 @@
 </template>
 
 <script setup>
-  import CreateFormBlock from '@/templates/create-form-block-new'
-  import FormHorizontal from '@/templates/create-form-block-new/form-horizontal'
+  import CreateFormBlock from '@/templates/create-form-block'
+  import FormHorizontal from '@/templates/create-form-block/form-horizontal'
   import InputText from 'primevue/inputtext'
   import PickList from 'primevue/picklist'
   import InputSwitch from 'primevue/inputswitch'

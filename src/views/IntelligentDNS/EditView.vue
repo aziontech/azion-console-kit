@@ -109,8 +109,8 @@
 
 <script>
   import { useIntelligentDNSStore } from '@/stores/intelligent-dns'
-  import EditFormBlock from '@templates/edit-form-block-new/no-header'
-  import FormHorizontal from '@templates/create-form-block-new/form-horizontal'
+  import EditFormBlock from '@templates/edit-form-block/no-header'
+  import FormHorizontal from '@templates/create-form-block/form-horizontal'
   import PageHeadingBlock from '@templates/page-heading-block'
   import ListTableBlock from '@templates/list-table-block/no-header'
   import ContentBlock from '@/templates/content-block'

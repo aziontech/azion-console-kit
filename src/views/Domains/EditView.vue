@@ -294,7 +294,7 @@
 </template>
 
 <script>
-  import EditFormBlock from '@/templates/edit-form-block-new'
+  import EditFormBlock from '@/templates/edit-form-block'
   import InputText from 'primevue/inputtext'
   import Dropdown from 'primevue/dropdown'
   import PrimeTextarea from 'primevue/textarea'
@@ -304,7 +304,7 @@
   import PageHeadingBlock from '@/templates/page-heading-block'
   import Card from 'primevue/card'
   import PrimeButton from 'primevue/button'
-  import formHorizontal from '@/templates/create-form-block-new/form-horizontal'
+  import formHorizontal from '@/templates/create-form-block/form-horizontal'
   import { useField, useForm } from 'vee-validate'
   import * as yup from 'yup'
   import {

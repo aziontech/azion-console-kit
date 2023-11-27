@@ -1,5 +1,5 @@
 <script setup>
-  import FormHorizontal from '@/templates/create-form-block-new/form-horizontal'
+  import FormHorizontal from '@/templates/create-form-block/form-horizontal'
   import InputSwitch from 'primevue/inputswitch'
   import InputText from 'primevue/inputtext'
   import { useField } from 'vee-validate'

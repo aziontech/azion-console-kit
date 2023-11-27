@@ -1,5 +1,5 @@
 <script setup>
-  import CreateFormBlock from '@/templates/create-form-block-new'
+  import CreateFormBlock from '@/templates/create-form-block'
   import ContentBlock from '@/templates/content-block'
   import PageHeadingBlock from '@/templates/page-heading-block'
   import ActionBarTemplate from '@/templates/action-bar-block'

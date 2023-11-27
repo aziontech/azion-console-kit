@@ -165,7 +165,7 @@
 </template>
 
 <script>
-  import EditFormBlock from '@/templates/edit-form-block-new'
+  import EditFormBlock from '@/templates/edit-form-block'
   import InputText from 'primevue/inputtext'
   import Dropdown from 'primevue/dropdown'
   import MultiSelect from 'primevue/multiselect'
@@ -173,7 +173,7 @@
   import { useForm, useField } from 'vee-validate'
   import * as yup from 'yup'
   import { ref, onMounted } from 'vue'
-  import FormHorizontal from '@/templates/create-form-block-new/form-horizontal'
+  import FormHorizontal from '@/templates/create-form-block/form-horizontal'
   import ContentBlock from '@/templates/content-block'
   import PageHeadingBlock from '@/templates/page-heading-block'
 

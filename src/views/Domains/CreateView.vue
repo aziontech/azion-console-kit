@@ -290,7 +290,7 @@
 </template>
 
 <script>
-  import CreateFormBlock from '@/templates/create-form-block-new'
+  import CreateFormBlock from '@/templates/create-form-block'
   import InputText from 'primevue/inputtext'
   import PrimeButton from 'primevue/button'
   import Dropdown from 'primevue/dropdown'
@@ -298,7 +298,7 @@
   import InputSwitch from 'primevue/inputswitch'
   import RadioButton from 'primevue/radiobutton'
   import Card from 'primevue/card'
-  import formHorizontal from '@/templates/create-form-block-new/form-horizontal'
+  import formHorizontal from '@/templates/create-form-block/form-horizontal'
   import ContentBlock from '@/templates/content-block'
   import PageHeadingBlock from '@/templates/page-heading-block'
 

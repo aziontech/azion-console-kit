@@ -100,7 +100,7 @@
 </template>
 
 <script>
-  import FormHorizontal from '@/templates/create-form-block-new/form-horizontal'
+  import FormHorizontal from '@/templates/create-form-block/form-horizontal'
   import { clipboardWrite } from '@/helpers'
   import PrimeButton from 'primevue/button'
   import TabView from 'primevue/tabview'
