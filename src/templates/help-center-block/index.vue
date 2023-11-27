@@ -30,7 +30,8 @@
               />
             </span>
             <small v-if="search">
-              Search "<span class="font-semibold">{{ search }}</span>" on Documentation
+              Search "<span class="font-semibold">{{ search }}</span
+              >" on Documentation
             </small>
           </div>
 
