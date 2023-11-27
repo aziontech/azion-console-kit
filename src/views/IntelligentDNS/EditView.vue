@@ -1,16 +1,30 @@
 <template>
   <ContentBlock>
     <template #heading>
-      <PageHeadingBlock pageTitle="Edit Intelligent DNS"> </PageHeadingBlock>
+      <PageHeadingBlock
+        pageTitle="Edit Intelligent DNS"
+        description="Copy the Nameservers values for change your domain's authoritative DNS servers to use Azion Intelligent DNS."
+      >
+        <template #default>
+          <PrimeButton
+            outlined
+            icon="pi pi-copy"
+            class="max-md:w-full"
+            label="Copy Nameservers"
+            @click="handleCopyNameServers"
+          ></PrimeButton>
+        </template>
+      </PageHeadingBlock>
     </template>
     <template #content>
       <TabView
-        :activeIndex="activeTab"
+        v-model:activeIndex="activeTab"
         @tab-click="changeRouteByClickingOnTab"
         class="w-full"
       >
         <TabPanel header="Main Settings">
           <EditFormBlock
+            v-if="showEditFormWithActionTab"
             :editService="editIntelligentDNSService"
             :loadService="loadIntelligentDNSService"
             :initialDataSetter="setValues"
@@ -21,7 +35,7 @@
             <template #form>
               <FormHorizontal
                 title="General"
-                description="Espaço livre para descrição e instruções de preenchimento. Esse conteúdo deve ser criado pensando tanto em funcionalidade quanto em em alinhamento e estética. Devemos sempre criar os blocos conforme o contexto, cuidando sempre para não ter blocos muito longos."
+                description="Description"
               >
                 <template #inputs>
                   <div class="flex flex-col sm:max-w-lg w-full gap-2">
@@ -31,8 +45,7 @@
                       >Name *</label
                     >
                     <InputText
-                      placeholder="Zone Name"
-                      v-bind="name"
+                      v-model="name"
                       id="name"
                       type="text"
                       :class="{ 'p-invalid': errors.name }"
@@ -43,6 +56,13 @@
                       >{{ errors.name }}</small
                     >
                   </div>
+                </template>
+              </FormHorizontal>
+              <FormHorizontal
+                title="Title Section"
+                description="Description"
+              >
+                <template #inputs>
                   <div class="flex flex-col sm:max-w-lg w-full gap-2">
                     <label
                       for="domain"
@@ -50,9 +70,8 @@
                       >Domain *</label
                     >
                     <InputText
-                      placeholder="Domain"
                       id="domain"
-                      v-bind="domain"
+                      v-model="domain"
                       type="text"
                       :class="{ 'p-invalid': errors.domain }"
                     />
@@ -62,11 +81,17 @@
                       >{{ errors.domain }}</small
                     >
                   </div>
+                </template>
+              </FormHorizontal>
+              <FormHorizontal
+                title="Status"
+                description="Description"
+              >
+                <template #inputs>
                   <div class="flex gap-3 items-center">
                     <label for="">Active</label>
                     <InputSwitch
-                      v-bind="isActive"
-                      v-model="isActive.value"
+                      v-model="isActive"
                       :class="{ 'p-invalid': errors.isActive }"
                     />
                   </div>
@@ -117,10 +142,11 @@
   import TabView from 'primevue/tabview'
   import TabPanel from 'primevue/tabpanel'
   import InputText from 'primevue/inputtext'
+  import PrimeButton from 'primevue/button'
   import InputSwitch from 'primevue/inputswitch'
+  import { useForm, useField } from 'vee-validate'
   import EmptyResultsBlock from '@/templates/empty-results-block'
   import Illustration from '@/assets/svg/illustration-layers.vue'
-  import { useForm } from 'vee-validate'
   import * as yup from 'yup'
 
   export default {
@@ -134,6 +160,7 @@
       ListTableBlock,
       FormHorizontal,
       PageHeadingBlock,
+      PrimeButton,
       ContentBlock,
       EmptyResultsBlock,
       Illustration
@@ -144,6 +171,7 @@
       editIntelligentDNSService: { type: Function, required: true },
       listRecordsService: { type: Function, required: true },
       deleteRecordsService: { type: Function, required: true },
+      clipboardWrite: { type: Function, required: true },
       updatedRedirect: { type: String, required: true },
       documentationService: { type: Function, required: true }
     },
@@ -162,13 +190,13 @@
         isActive: yup.boolean().required()
       })
 
-      const { errors, defineInputBinds, meta, values, setValues } = useForm({
+      const { errors, meta, values, setValues } = useForm({
         validationSchema
       })
 
-      const name = defineInputBinds('name', { validateOnInput: true })
-      const domain = defineInputBinds('domain', { validateOnInput: true })
-      const isActive = defineInputBinds('isActive')
+      const { value: name } = useField('name')
+      const { value: domain } = useField('domain')
+      const { value: isActive } = useField('isActive')
 
       const intelligentDNSStore = useIntelligentDNSStore()
 
@@ -249,14 +277,31 @@
           })
         }
       },
+      handleCopyNameServers() {
+        this.clipboardWrite('ns1.aziondns.net;ns2.aziondns.com;ns3.aziondns.org')
+        this.$toast.add({
+          closable: false,
+          severity: 'success',
+          summary: 'Nameservers copied',
+          life: 10000
+        })
+      },
       handleLoadData(event) {
         this.hasContentToList = event
+      }
+    },
+    computed: {
+      showEditFormWithActionTab() {
+        return this.activeTab === 0
       }
     },
 
     watch: {
       domain() {
         this.intelligentDNSStore.addDomain(this.domain)
+      },
+      $router() {
+        this.renderTabCurrentRouter()
       }
     }
   }
