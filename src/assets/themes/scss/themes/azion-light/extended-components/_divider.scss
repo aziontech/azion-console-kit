@@ -1,7 +1,16 @@
-.p-divider-horizontal {
-  border-bottom: $divider;
+.p-divider-horizontal::before {
+  border-bottom-width: $dividerSize;
+  border-bottom-color: $dividerColor;
 }
 
-.p-divider-vertical {
-  border-left: $divider;
+.p-divider-vertical::before {
+  border-left-width: $dividerSize;
+  border-left-color: $dividerColor;
+}
+
+.p-divider-dashed::before {
+  border-style: dashed;
+}
+.p-divider-dotted::before {
+  border-style: dotted;
 }
