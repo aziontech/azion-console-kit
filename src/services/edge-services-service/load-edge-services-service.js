@@ -10,9 +10,9 @@ export const loadEdgeServicesService = async ({ id }) => {
   return parseHttpResponse(httpResponse)
 }
 
-// const adapt = (httpResponse) => {  
+// const adapt = (httpResponse) => {
 //   const parsedVariable = {
-//     ...httpResponse.body    
+//     ...httpResponse.body
 //   }
 
 //   return {

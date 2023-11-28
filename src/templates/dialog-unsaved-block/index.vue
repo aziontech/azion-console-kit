@@ -13,7 +13,7 @@
       default: false
     },
     blockRedirectUnsaved: {
-      type: Boolean,
+      type: Boolean
     }
   })
 
