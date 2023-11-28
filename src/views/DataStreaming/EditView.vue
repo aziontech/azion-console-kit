@@ -5,7 +5,7 @@
   import FormFieldsDataStreaming from './FormFields/FormFieldsDataStreaming'
   import ContentBlock from '@/templates/content-block'
   import PageHeadingBlock from '@/templates/page-heading-block'
-  import ActionBarTemplate from '@/templates/action-bar-block'
+  import ActionBarBlockWithTeleport from '@/templates/action-bar-block/action-bar-with-teleport'
 
   const props = defineProps({
     listDataStreamingTemplateService: {
@@ -226,7 +226,7 @@
           />
         </template>
         <template #action-bar="{ onSubmit, formValid, onCancel, loading }">
-          <ActionBarTemplate
+          <ActionBarBlockWithTeleport
             @onSubmit="onSubmit"
             @onCancel="onCancel"
             :loading="loading"
