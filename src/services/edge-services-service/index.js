@@ -9,10 +9,5 @@ export {
   deleteEdgeServicesService,
   createEdgeServicesService,
   editEdgeServicesService,
-  loadEdgeServicesService,
-  // createEdgeServicesResources,
-  // loadEdgeServicesResources,
-  // editEdgeServicesResources,
-  // listEdgeServicesResources,
-  // deleteEdgeServicesResourcesService
+  loadEdgeServicesService
 }
