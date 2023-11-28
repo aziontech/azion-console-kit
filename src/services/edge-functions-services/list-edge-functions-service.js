@@ -30,7 +30,7 @@ const STATUS_AS_TAG = {
 
 const LANGUAGE_AS_TAG = {
   javascript: {
-    content: 'Javascript',
+    content: 'JavaScript',
     icon: 'javascript'
   },
   lua: {
