@@ -55,14 +55,20 @@ describe('IntelligentDnsServices', () => {
       {
         id: fixtures.dnsMock.id,
         name: fixtures.dnsMock.name,
-        domain: fixtures.dnsMock.domain,
-        isActive: 'Yes'
+        domain: { content: fixtures.dnsMock.domain },
+        status: {
+          content: 'Active',
+          severity: 'success'
+        }
       },
       {
         id: fixtures.dnsDisabledMock.id,
         name: fixtures.dnsDisabledMock.name,
-        domain: fixtures.dnsDisabledMock.domain,
-        isActive: 'No'
+        domain: { content: fixtures.dnsDisabledMock.domain },
+        status: {
+          content: 'Inactive',
+          severity: 'danger'
+        }
       }
     ])
   })
