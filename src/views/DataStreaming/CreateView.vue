@@ -714,7 +714,7 @@
                     cols="30"
                   />
                   <small class="text-color-secondary text-sm font-normal leading-tight">
-                    API key used for Elasticsearch authorization. Format in base64 encode.
+                    API key used for Elasticsearch authorization in base64 encode format.
                   </small>
                   <small
                     id="api-key-help"
