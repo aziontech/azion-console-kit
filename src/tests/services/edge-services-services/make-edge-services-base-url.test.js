@@ -1,4 +1,4 @@
-import { makeEdgeServicesBaseUrl } from '@/services/edge-services-services/make-edge-services-base-url'
+import { makeEdgeServicesBaseUrl } from '@/services/edge-services-service/make-edge-services-base-url'
 import { assert, describe, it } from 'vitest'
 
 const makeSut = () => {

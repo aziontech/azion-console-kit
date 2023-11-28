@@ -1,5 +1,5 @@
 import { AxiosHttpClientAdapter } from '@/services/axios/AxiosHttpClientAdapter'
-import { deleteEdgeServicesService } from '@/services/edge-services-services'
+import { deleteEdgeServicesService } from '@/services/edge-services-service'
 import { describe, expect, it, vi } from 'vitest'
 
 const makeSut = () => {

@@ -1,5 +1,5 @@
 import { AxiosHttpClientAdapter } from '@/services/axios/AxiosHttpClientAdapter'
-import { listEdgeServicesService } from '@/services/edge-services-services'
+import { listEdgeServicesService } from '@/services/edge-services-service'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 const localeMock = (locale = 'en') => {

@@ -3,6 +3,7 @@
   import InputSwitch from 'primevue/inputswitch'
   import InputText from 'primevue/inputtext'
   import { useField } from 'vee-validate'
+  defineOptions({ name: 'form-fields-variables' })
 
   const { value: key, errorMessage: keyError } = useField('key')
   const { value: value, errorMessage: valueError } = useField('value')

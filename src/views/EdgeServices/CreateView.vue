@@ -6,36 +6,19 @@
     <template #content>
       <CreateFormBlock
         :createService="props.createEdgeService"
-        :formData="values"
-        :formMeta="meta"
-        :cleanFormCallback="resetForm"
+        :schema="validationSchema"
+        :initialValues="initialValues"
       >
         <template #form>
-          <FormHorizontal
-            title="Edge Service"
-            description="Espaço livre para descrição e instruções de preenchimento. Esse conteúdo deve ser criado pensando tanto em funcionalidade quanto em em alinhamento e estética. Devemos sempre criar os blocos conforme o contexto, cuidando sempre para não ter blocos muito longos."
-          >
-            <template #inputs>
-              <div class="flex flex-col sm:max-w-lg w-full gap-2">
-                <label
-                  for="name"
-                  class="text-color text-base font-medium"
-                  >Name *</label
-                >
-                <InputText
-                  placeholder="ex: X Edge Service "
-                  v-bind="name"
-                  type="text"
-                  :class="{ 'p-invalid': errors.name }"
-                />
-                <small
-                  v-if="errors.name"
-                  class="p-error text-xs font-normal leading-tight"
-                  >{{ errors.name }}</small
-                >
-              </div>
-            </template>
-          </FormHorizontal>
+          <FormCreateEdgeService />
+        </template>
+        <template #action-bar="{ onSubmit, formValid, onCancel, loading }">
+          <ActionBarTemplate
+            @onSubmit="onSubmit"
+            @onCancel="onCancel"
+            :loading="loading"
+            :submitDisabled="!formValid"
+          />
         </template>
       </CreateFormBlock>
     </template>
@@ -44,13 +27,12 @@
 
 <script setup>
   import CreateFormBlock from '@/templates/create-form-block'
-  import FormHorizontal from '@/templates/create-form-block/form-horizontal'
-  import InputText from 'primevue/inputtext'
+  import ActionBarTemplate from '@/templates/action-bar-block'
   import ContentBlock from '@/templates/content-block'
   import PageHeadingBlock from '@/templates/page-heading-block'
-
-  import { useForm } from 'vee-validate'
+  import FormCreateEdgeService from './form/FormCreateEdgeService.vue'
   import * as yup from 'yup'
+  import edgeServiceHelloWorld from '@/helpers/edge-service-hello-world'
 
   const props = defineProps({
     createEdgeService: {
@@ -58,11 +40,16 @@
       required: true
     }
   })
+
   const validationSchema = yup.object({
-    name: yup.string().required()
+    name: yup.string().required(),
+    code: yup.string().required(),
+    active: yup.boolean().required()
   })
-  const { errors, defineInputBinds, meta, resetForm, values } = useForm({
-    validationSchema
-  })
-  const name = defineInputBinds('name', { validateOnInput: true })
+
+  const initialValues = {
+    name: '',
+    code: edgeServiceHelloWorld,
+    active: false
+  }
 </script>

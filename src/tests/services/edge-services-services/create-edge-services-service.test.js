@@ -1,6 +1,6 @@
 import { AxiosHttpClientAdapter } from '@/services/axios/AxiosHttpClientAdapter'
 import * as Errors from '@/services/axios/errors'
-import { createEdgeServiceService } from '@/services/edge-services-services'
+import { createEdgeServiceService } from '@/services/edge-services-service'
 import { describe, expect, it, vi } from 'vitest'
 
 const fixtures = {

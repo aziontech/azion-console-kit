@@ -92,20 +92,22 @@
         </template>
         <template #body="{ data: rowData }">
           <div class="flex justify-end">
-            <PrimeMenu
-              :ref="`menu-${rowData.id}`"
-              id="overlay_menu"
-              v-bind:model="actionOptions(rowData)"
-              :popup="true"
-            />
-            <PrimeButton
-              v-tooltip.top="{ value: 'Actions', showDelay: 200 }"
-              size="small"
-              icon="pi pi-ellipsis-h"
-              text
-              @click="(event) => toggleActionsMenu(event, rowData.id)"
-              class="cursor-pointer table-button"
-            />
+            <slot >
+              <PrimeMenu
+                :ref="`menu-${rowData.id}`"
+                id="overlay_menu"
+                v-bind:model="actionOptions(rowData)"
+                :popup="true"
+              />
+              <PrimeButton
+                v-tooltip.top="{ value: 'Actions', showDelay: 200 }"
+                size="small"
+                icon="pi pi-ellipsis-h"
+                text
+                @click="(event) => toggleActionsMenu(event, rowData.id)"
+                class="cursor-pointer table-button"
+              />
+            </slot>
           </div>
         </template>
       </Column>
@@ -178,7 +180,6 @@
   import OverlayPanel from 'primevue/overlaypanel'
   import PrimeButton from 'primevue/button'
   import { FilterMatchMode } from 'primevue/api'
-  import PageHeadingBlock from '@/templates/page-heading-block'
   import DeleteDialog from './dialog/delete-dialog'
 
   export default {
@@ -193,7 +194,6 @@
       Skeleton,
       Listbox,
       OverlayPanel,
-      PageHeadingBlock,
       DeleteDialog
     },
     data: () => ({
@@ -288,20 +288,23 @@
       actionOptions(rowData) {
         const actionOptions = []
 
-        if (this.deleteService) {
-          actionOptions.push({
-            label: 'Delete',
-            icon: 'pi pi-fw pi-trash',
-            command: () => this.openDeleteDialog()
-          })
-        }
-
         if (this.rowActions && this.rowActions.length > 0) {
           this.rowActions.forEach((action) => {
+            if (action.visibleAction && action.visibleAction(rowData)) return
+
             actionOptions.push({
               ...action,
               command: () => action.command(rowData)
             })
+          })
+        }
+
+        if (this.deleteService) {
+          actionOptions.push({
+            label: 'Delete',
+            icon: 'pi pi-fw pi-trash',
+            severity: 'error',
+            command: () => this.openDeleteDialog()
           })
         }
 

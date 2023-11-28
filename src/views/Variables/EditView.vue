@@ -3,7 +3,7 @@
   import ContentBlock from '@/templates/content-block'
   import PageHeadingBlock from '@/templates/page-heading-block'
   import ActionBarTemplate from '@/templates/action-bar-block'
-  import FormVariable from './form/FormVariable.vue'
+  import FormFieldsVariables from './FormFields/FormFieldsVariables.vue'
   import * as yup from 'yup'
 
   const props = defineProps({
@@ -31,7 +31,7 @@
         :schema="validationSchema"
       >
         <template #form>
-          <FormVariable />
+          <FormFieldsVariables />
         </template>
         <template #action-bar="{ onSubmit, formValid, onCancel, loading }">
           <ActionBarTemplate

@@ -17,13 +17,27 @@ export const listEdgeServicesService = async ({
 
   return parseHttpResponse(httpResponse)
 }
+const parseStatusData = (status) => {
+  const parsedStatus = status
+    ? {
+        content: 'Active',
+        severity: 'success'
+      }
+    : {
+        content: 'Inactive',
+        severity: 'danger'
+      }
+
+  return parsedStatus
+}
 
 const adapt = (httpResponse) => {
   const parsedEdgeServices = httpResponse.body.services?.map((edgeService) => {
     return {
       id: edgeService.id,
       name: edgeService.name,
-      active: edgeService.active ? 'Yes' : 'No',
+      labelActive: parseStatusData(edgeService.active),
+      active: edgeService.active,
       lastEditor: edgeService.last_editor,
       lastModified: new Intl.DateTimeFormat('us', { dateStyle: 'full' }).format(
         new Date(edgeService.updated_at)
