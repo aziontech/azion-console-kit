@@ -1,13 +1,13 @@
 
 <template>
-  <div class="p-20 flex flex-col">
+  <div class="p-20 flex flex-col gap-6">
     <div class="flex flex-col sm:max-w-lg w-full gap-2">
         <label
           for="customHeaders"
           class="text-color text-base font-medium"
           >Custom Headers</label
         >
-        <InputGroup>
+        <div class="p-inputgroup">
           <InputText
             id="header-value"
             placeholder="Value"
@@ -16,18 +16,16 @@
             icon="pi pi-trash"
             outlined
           />
-      </InputGroup>
+        </div>
     </div>
-    <Divider layout="vertical">
-      teste
-    </Divider>
-        <div class="flex flex-col sm:max-w-lg w-full gap-2">
+    <Divider/>
+    <div class="flex flex-col sm:max-w-lg w-full gap-2">
         <label
           for="customHeaders"
           class="text-color text-base font-medium"
           >Custom Headers</label
         >
-        <InputGroup>
+        <div class="p-inputgroup">
           <InputText
             id="header-value"
             placeholder="Value"
@@ -36,7 +34,7 @@
             icon="pi pi-trash"
             outlined
           />
-      </InputGroup>
+        </div>
     </div>
   </div>
 </template>
@@ -45,5 +43,4 @@
   import Divider from 'primevue/divider';
   import PrimeButton from 'primevue/button';
   import InputText from 'primevue/inputtext';
-  import InputGroup from 'primevue/inputgroup';
 </script>
