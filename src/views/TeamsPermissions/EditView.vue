@@ -44,7 +44,7 @@
           </FormHorizontal>
           <FormHorizontal
             title="Teams Permissions"
-            description="Teams can be created based on the role and tasks of assigned clients. Determine the level of access of the clients and assign permissions according to their team."
+            description="Determine the level of access of the clients and assign permissions according to their team. Teams can be created based on the role and tasks of assigned clients. "
           >
             <template #inputs>
               <div class="flex flex-col sm:max-w-3xl w-full gap-2">
