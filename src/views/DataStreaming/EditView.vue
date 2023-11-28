@@ -107,7 +107,7 @@
           </FormHorizontal>
           <FormHorizontal
             title="Domains"
-            description="Associate registered domains with this specific data streaming to decide the addresses data will be collected from."
+            description="Associate registered domains with this data streaming to define the addresses from which the data will be collected."
           >
             <template #inputs>
               <div class="flex flex-col gap-2">
@@ -543,7 +543,7 @@
                     toggleMask
                   />
                   <small class="text-color-secondary text-sm font-normal leading-tight">
-                    Prefix that you can add to your uploaded object to the files that will be sent. Composed of Prefix + Timestamp + UUID.
+                    Prefix added to the name of the uploaded object to appear on the files that will be sent. Composed of Prefix + Timestamp + UUID.
                   </small>
                   <small
                     id="object-key-help"
