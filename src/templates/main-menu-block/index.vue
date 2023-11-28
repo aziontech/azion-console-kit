@@ -632,6 +632,11 @@
             to: '/'
           },
           {
+            label: 'Marketplace',
+            icon: 'pi pi-cart-plus',
+            to: '/marketplace'
+          },
+          {
             label: 'Domains',
             icon: 'pi pi-globe',
             to: '/domains'
