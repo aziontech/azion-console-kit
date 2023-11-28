@@ -1,8 +1,8 @@
 <template>
   <div class="ml-0 w-full mt-0 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
     <PrimeButton
-      v-for="template in props.templates"
-      :key="template.id"
+      v-for="solution in props.solutions"
+      :key="solution.id"
       class="p-4 text-left border-solid border surface-border hover:border-primary transition-all"
       link
     >
@@ -13,16 +13,16 @@
           >
             <img
               class="rounded"
-              :src="template.vendor.icon"
+              :src="solution.vendor.icon"
               alt=""
             />
           </div>
           <div class="flex p-0.5 flex-col">
             <span class="text-color text-sm font-medium">
-              {{ template.name }}
+              {{ solution.name }}
             </span>
             <span class="h-10 pb-4 text-sm text-color-secondary mt-1.5 line-clamp-2">
-              {{ template.headline }}
+              {{ solution.headline }}
             </span>
           </div>
         </div>
@@ -35,6 +35,6 @@
   import PrimeButton from 'primevue/button'
 
   const props = defineProps({
-    templates: Array
+    solutions: Array
   })
 </script>

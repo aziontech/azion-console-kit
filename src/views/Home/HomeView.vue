@@ -19,7 +19,7 @@
               label="Create"
               type="button"
               size="small"
-              @click="createBoardManager.open()"
+              @click="createModalStore.toggle()"
             />
           </div>
         </div>
@@ -254,6 +254,7 @@
   import { useField, useForm } from 'vee-validate'
   import * as yup from 'yup'
   import ContentBlock from '@/templates/content-block'
+  import { useCreateModalStore } from '@/stores/create-modal'
 
   export default {
     name: 'home-view',
@@ -263,7 +264,6 @@
       Dropdown,
       ContentBlock
     },
-    inject: ['createBoardManager'],
     props: {
       listTeamsService: {
         type: Function,
@@ -350,6 +350,8 @@
       }
     },
     setup() {
+      const createModalStore = useCreateModalStore()
+
       const validationSchema = yup.object({
         name: yup.string().required('Name is a required field'),
         email: yup.string().email('Must be a valid email').required('E-mail is a required field'),
@@ -373,7 +375,8 @@
         errors,
         meta,
         resetForm,
-        values
+        values,
+        createModalStore
       }
     }
   }
