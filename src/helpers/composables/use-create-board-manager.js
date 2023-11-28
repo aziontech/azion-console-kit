@@ -6,7 +6,7 @@ export function useCreateBoardManager() {
   function open() {
     enabled.value = true
   }
-
+  
   function close() {
     enabled.value = false
   }
