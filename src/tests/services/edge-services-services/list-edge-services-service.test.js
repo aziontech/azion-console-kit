@@ -13,14 +13,14 @@ const fixtures = {
   edgeServiceMock: {
     id: 1239875,
     name: 'Edge Service A',
-    active: true,
+    active: "Yes",
     last_editor: 'az editor',
     updated_at: new Date(2023, 10, 10)
   },
   disabledEdgeServiceMock: {
     id: 927376237,
     name: 'Edge Service B',
-    active: false,
+    active: "No",
     last_editor: 'az editor 2',
     updated_at: new Date(2023, 10, 11)
   }
@@ -73,6 +73,10 @@ describe('EdgeServicesServices', () => {
         id: fixtures.edgeServiceMock.id,
         name: fixtures.edgeServiceMock.name,
         active: 'Yes',
+        labelActive:  {
+                content: 'Active',
+                severity: 'success',
+              },
         lastEditor: fixtures.edgeServiceMock.last_editor,
         lastModified: 'Friday, November 10, 2023',
         lastModifiedDate: new Date('2023-11-10T00:00:00.000Z')
@@ -81,6 +85,10 @@ describe('EdgeServicesServices', () => {
         id: fixtures.disabledEdgeServiceMock.id,
         name: fixtures.disabledEdgeServiceMock.name,
         active: 'No',
+        labelActive:  {
+          content: 'Active',
+           severity: 'success',
+        },
         lastEditor: fixtures.disabledEdgeServiceMock.last_editor,
         lastModified: 'Saturday, November 11, 2023',
         lastModifiedDate: new Date('2023-11-11T00:00:00.000Z')

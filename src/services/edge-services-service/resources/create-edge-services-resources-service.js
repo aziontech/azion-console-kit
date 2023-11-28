@@ -8,7 +8,7 @@ import { makeEdgeServicesBaseUrl } from './make-edge-services-base-url'
  * @returns {Promise<string>} The result message based on the status code.
  * @throws {Error} If there is an error with the response.
  */
-export const createEdgeServicesService = async (payload) => {
+export const createEdgeServicesService = async (payload, id) => {
   let httpResponse = await AxiosHttpClientAdapter.request({
     url: `${makeEdgeServicesBaseUrl()}/${id}/resources`,
     method: 'POST',

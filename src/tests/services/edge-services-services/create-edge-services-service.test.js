@@ -1,6 +1,6 @@
 import { AxiosHttpClientAdapter } from '@/services/axios/AxiosHttpClientAdapter'
 import * as Errors from '@/services/axios/errors'
-import { createEdgeServiceService } from '@/services/edge-services-service'
+import { createEdgeServicesService } from '@/services/edge-services-service'
 import { describe, expect, it, vi } from 'vitest'
 
 const fixtures = {
@@ -9,7 +9,7 @@ const fixtures = {
   }
 }
 const makeSut = () => {
-  const sut = createEdgeServiceService
+  const sut = createEdgeServicesService
 
   return {
     sut
