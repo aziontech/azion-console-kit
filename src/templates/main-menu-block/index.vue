@@ -72,7 +72,7 @@
       <div class="flex gap-2 items-center">
         <PrimeButton
           icon="pi pi-search"
-          class="bg-header hover:bg-header-button-hover !text-white px-2 py-1 flex lg:hidden !text-white border-header"
+          class="bg-header hover:bg-header-button-hover !text-white px-2 py-1 flex lg:hidden border-header"
           :pt="{
             label: { class: 'text-white' },
             icon: { class: 'text-white' }
@@ -138,7 +138,7 @@
         <PrimeButton
           icon="pi pi-question-circle"
           size="small"
-          class="md:hidden text-white !text-white border-header"
+          class="md:hidden text-white border-header"
           style="height: 32px; width: 32px"
           @click="toggleHelpCenter"
           :pt="{
@@ -471,7 +471,7 @@
 
   <!-- Modal de create -->
   <PrimeDialog
-    v-model:visible="createBoardManager.enabled"
+    v-model:visible="createBoardManager.enabled.value"
     modal
     header="Create something new"
     :pt="{
@@ -491,7 +491,7 @@
 
   <!-- Mobile modal Create -->
   <Sidebar
-    v-model:visible="createBoardManager.enabled"
+    v-model:visible="createBoardManager.enabled.value"
     position="bottom"
     headerContent="Create something new"
     :show-close-icon="false"
