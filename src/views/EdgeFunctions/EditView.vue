@@ -10,7 +10,6 @@
         :initialDataSetter="setValues"
         :formData="values"
         :formMeta="meta"
-        :cleanFormCallback="resetForm"
         :hasTabs="true"
         :updatedRedirect="updatedRedirect"
       >
@@ -59,7 +58,7 @@
                     <span class="p-input-icon-right">
                       <i class="pi pi-lock text-[var(--text-color-secondary)]" />
                       <InputText
-                        v-model="languageText"
+                        v-model="langLabel"
                         id="language"
                         type="text"
                         class="w-full text-[var(--text-color-secondary)]"
@@ -76,7 +75,10 @@
               >
                 <template #inputs>
                   <div class="flex w-full sm:max-w-lg gap-2">
-                    <InputSwitch v-model="active" />
+                    <InputSwitch
+                      v-model="active"
+                      id="active"
+                    />
                     <label
                       for="active"
                       class="text-color text-base font-medium"
@@ -88,77 +90,64 @@
             </TabPanel>
 
             <TabPanel header="Code">
-              <div class="flex flex-col lg:flex-row mt-8 surface-border border rounded-md">
-                <div class="w-full lg:w-2/3 pr-0 lg:pr-8">
-                  <div class="w-full">
-                    <vue-monaco-editor
-                      v-model:value="code"
-                      language="javascript"
-                      :theme="theme"
-                      class="min-h-[50vh] !w-[99%] surface-border border-r"
-                      :class="{ 'border-red-500 border rounded-md': errors.code }"
-                      :options="editorOptions"
-                    />
-                  </div>
+              <Splitter
+                :style="{ height: getSplitterHeight }"
+                class="mt-8 surface-border border rounded-md"
+                @resizestart="showPreview = false"
+                @resizeend="showPreview = true"
+                :layout="getSplitterLayout"
+              >
+                <SplitterPanel
+                  :size="getSplitterPanelSize[0]"
+                  class="flex flex-col h-full gap-2"
+                >
+                  <CodeEditor
+                    v-model="code"
+                    :initialValue="initialCodeValue"
+                    language="javascript"
+                    :errors="!!errors.code"
+                  />
                   <small
                     v-if="errors.code"
                     class="p-error text-xs font-normal"
                   >
                     {{ errors.code }}
                   </small>
-                </div>
+                </SplitterPanel>
 
-                <div class="hidden lg:block">
-                  <divider layout="vertical" />
-                </div>
-
-                <div class="w-full lg:w-1/3 hidden lg:block">
-                  <div class="relative overflow-hidden h-full p-5">
-                    <iframe
-                      class="w-full h-full border-0 overflow-hidden"
-                      ref="previewIframe"
-                      @load="postPreviewUpdates"
-                      allowfullscreen
-                      src="https://code-preview.azion.com/preview"
-                      title="preview"
-                      sandbox="allow-scripts"
-                    ></iframe>
-                  </div>
-                </div>
-              </div>
+                <SplitterPanel :size="getSplitterPanelSize[1]">
+                  <CodePreview
+                    v-if="showPreview"
+                    :updateObject="updateObject"
+                  />
+                </SplitterPanel>
+              </Splitter>
             </TabPanel>
 
             <TabPanel header="Arguments">
-              <div class="flex flex-col lg:flex-row mt-8 surface-border border rounded-md">
-                <div class="w-full lg:w-2/3 pr-0 lg:pr-8">
-                  <vue-monaco-editor
-                    v-model:value="jsonArgs"
+              <Splitter
+                :style="{ height: getSplitterHeight }"
+                class="mt-8 surface-border border rounded-md"
+                @resizestart="showPreview = false"
+                @resizeend="showPreview = true"
+                :layout="getSplitterLayout"
+              >
+                <SplitterPanel :size="getSplitterPanelSize[0]">
+                  <CodeEditor
+                    v-model="jsonArgs"
+                    :initialValue="initialJsonArgsValue"
                     language="json"
-                    :theme="theme"
-                    class="min-h-[50vh] !w-[99%] surface-border border-r"
-                    :class="{ 'border-red-500 border rounded-md': errors.jsonArgs }"
-                    :options="editorOptions"
+                    :errors="!!errors.jsonArgs"
                   />
-                </div>
+                </SplitterPanel>
 
-                <div class="hidden lg:block">
-                  <divider layout="vertical" />
-                </div>
-
-                <div class="w-full lg:w-1/3 hidden lg:block">
-                  <div class="relative overflow-hidden h-full p-5">
-                    <iframe
-                      class="w-full h-full border-0 overflow-hidden"
-                      ref="previewIframeArguments"
-                      @load="postPreviewUpdates"
-                      allowfullscreen
-                      src="https://code-preview.azion.com/preview"
-                      title="preview"
-                      sandbox="allow-scripts"
-                    ></iframe>
-                  </div>
-                </div>
-              </div>
+                <SplitterPanel :size="getSplitterPanelSize[1]">
+                  <CodePreview
+                    v-if="showPreview"
+                    :updateObject="updateObject"
+                  />
+                </SplitterPanel>
+              </Splitter>
             </TabPanel>
           </TabView>
         </template>
@@ -168,19 +157,22 @@
 </template>
 
 <script setup>
-  import EditFormBlock from '@/templates/edit-form-block-new'
-  import FormHorizontal from '@/templates/create-form-block-new/form-horizontal'
+  import { computed, ref, watch } from 'vue'
   import { useForm, useField } from 'vee-validate'
   import * as yup from 'yup'
+  import { useWindowSize } from '@/helpers'
+  import InputText from 'primevue/inputtext'
+  import InputSwitch from 'primevue/inputswitch'
+  import Splitter from 'primevue/splitter'
+  import SplitterPanel from 'primevue/splitterpanel'
   import TabView from 'primevue/tabview'
   import TabPanel from 'primevue/tabpanel'
-  import InputText from 'primevue/inputtext'
-  import Divider from 'primevue/divider'
-  import { computed, ref, watch } from 'vue'
-  import { useAccountStore } from '@/stores/account'
   import ContentBlock from '@/templates/content-block'
+  import EditFormBlock from '@/templates/edit-form-block-new'
+  import FormHorizontal from '@/templates/create-form-block-new/form-horizontal'
   import PageHeadingBlock from '@/templates/page-heading-block'
-  import InputSwitch from 'primevue/inputswitch'
+  import CodeEditor from './components/code-editor.vue'
+  import CodePreview from './components/code-preview.vue'
 
   const props = defineProps({
     loadEdgeFunctionsService: {
@@ -197,67 +189,32 @@
     }
   })
 
-  const ARGS_INITIAL_STATE = '{}'
-  const editorOptions = {
-    tabSize: 2,
-    formatOnPaste: true
-  }
-  const previewIframe = ref(null)
-  const previewIframeArguments = ref(null)
+  const TAILWIND_MD_BREAKPOINT = 768
+  const { width } = useWindowSize()
 
-  const store = useAccountStore()
-  const theme = computed(() => {
-    return store.currentTheme === 'light' ? 'vs' : 'vs-dark'
+  const getSplitterLayout = computed(() => {
+    return width.value > TAILWIND_MD_BREAKPOINT ? 'horizontal' : 'vertical'
   })
 
-  const postPreviewUpdates = () => {
-    const previewWindow = previewIframe.value.contentWindow
-    const previewWindowArguments = previewIframeArguments.value.contentWindow
-    const updateObject = {
-      code: code.value,
-      args: jsonArgs.value
-    }
+  const getSplitterHeight = computed(() => {
+    return width.value > TAILWIND_MD_BREAKPOINT ? '50vh' : '800px'
+  })
 
-    previewWindow.postMessage(
-      {
-        event: 'azion-code-editor',
-        eventType: 'update',
-        source: window.location.href,
-        message: JSON.stringify(updateObject)
-      },
-      '*'
-    )
-    previewWindowArguments.postMessage(
-      {
-        event: 'azion-code-editor',
-        eventType: 'update',
-        source: window.location.href,
-        message: JSON.stringify(updateObject)
-      },
-      '*'
-    )
-  }
+  const getSplitterPanelSize = computed(() => {
+    return width.value > TAILWIND_MD_BREAKPOINT ? [66, 34] : [50, 50]
+  })
 
-  const getLanguageText = (language) => {
-    if (language === 'javascript') return 'JavaScript'
-    if (language === 'lua') return 'Lua'
-    return language
-  }
+  const showPreview = ref(true)
+
+  const ARGS_INITIAL_STATE = '{}'
 
   const validationSchema = yup.object({
     name: yup.string().required('Name is a required field'),
     code: yup.string().required('Code is a required field'),
-    jsonArgs: yup
-      .string()
-      .test('curly', 'Invalid JSON', (value) => {
-        return /^\{.*\}$/.test(value)
-      })
-      .test('empty', '', (value) => {
-        if (!value) {
-          setArgs(ARGS_INITIAL_STATE)
-        }
-        return true
-      })
+    jsonArgs: yup.string().test('empty', '', (value) => {
+      if (!value) setArgs(ARGS_INITIAL_STATE)
+      return true
+    })
   })
 
   const { setValues, defineInputBinds, errors, meta, values } = useForm({
@@ -276,17 +233,30 @@
   const { value: language } = useField('language')
   const { value: active } = useField('active')
 
-  // Watchs
+  let initialCodeValue = ''
+  let initialJsonArgsValue = ARGS_INITIAL_STATE
+  const unwatch = watch(values, () => {
+    initialCodeValue = code.value
+    initialJsonArgsValue = jsonArgs.value
 
-  let initialLoad = false
-  watch(code, () => {
-    if (!initialLoad) {
-      postPreviewUpdates()
-      initialLoad = true
+    if (initialCodeValue) {
+      unwatch()
     }
   })
 
-  const languageText = computed(() => {
-    return getLanguageText(language.value)
+  const langLabel = computed(() => {
+    const langLabels = {
+      javascript: 'JavaScript',
+      lua: 'Lua'
+    }
+
+    return langLabels[language.value]
+  })
+
+  const updateObject = computed(() => {
+    return {
+      code: code.value,
+      args: jsonArgs.value
+    }
   })
 </script>
