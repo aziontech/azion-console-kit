@@ -1,4 +1,3 @@
-
 <template>
   <div class="p-20 flex flex-col gap-6">
     <div class="flex flex-col sm:max-w-lg w-full gap-2">
@@ -38,7 +37,7 @@
     </div>
   </div>
 </template>
-  
+
 <script setup>
   import Divider from 'primevue/divider';
   import PrimeButton from 'primevue/button';
