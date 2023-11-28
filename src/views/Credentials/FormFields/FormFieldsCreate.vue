@@ -1,7 +1,6 @@
 <!-- eslint-disable vue/no-mutating-props -->
 <script setup>
-    import { computed } from 'vue'
-
+  import { computed } from 'vue'
 
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
   import InputText from 'primevue/inputtext'
@@ -30,8 +29,6 @@
   const tokenValue = computed(() => {
     return props.token
   })
-
-
 </script>
 <template>
   <FormHorizontal
