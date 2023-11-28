@@ -13,6 +13,7 @@ import { azionPrivacyPolicyWindowOpener } from './azion-privacy-policy-opener'
 import { azionTermsAndServicesWindowOpener } from './azion-terms-and-services-opener'
 import { parseCamelToSnake, parseSnakeToCamel } from './parse-api-body'
 import { getEnvironmentFromUrl } from './get-environment-from-url'
+import { useWindowSize } from './composables/use-window-resize'
 
 export {
   themeSelect,
@@ -29,5 +30,6 @@ export {
   parseCamelToSnake,
   parseSnakeToCamel,
   openSearchResult,
-  getEnvironmentFromUrl
+  getEnvironmentFromUrl,
+  useWindowSize
 }
