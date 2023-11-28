@@ -276,7 +276,7 @@
                     :class="{ 'p-invalid': errors.payloadFormat }"
                   />
                   <small class="text-color-secondary text-xs font-normal leading-tight">
-                    Which information will be sent in your data. The $dataset variable calls all variables from the chosen template in NDJSON format.
+                    Which information will be sent in your data. The "$dataset" variable calls all variables from the chosen template in NDJSON format.
                   </small>
                   <small
                     id="data-set-help"
@@ -298,7 +298,7 @@
                     :class="{ 'p-invalid': errors.lineSeparator }"
                   />
                   <small class="text-color-secondary text-xs font-normal leading-tight">
-                    What information will be used at the end of each log line. The \n separator breaks values into different lines in NDJSON format.
+                    Character that will be used at the end of each log line. The "\n" escape sequence breaks values into different lines in NDJSON format.
                   </small>
                   <small
                     id="max-size-help"
@@ -616,7 +616,7 @@
                     placeholder="myGBQdataset"
                   />
                   <small class="text-color-secondary text-sm font-normal leading-tight">
-                    Name of the dataset created on Google BigQuery. Case sensitive.
+                    Name of the dataset created on Google BigQuery. Case sensitive field.
                   </small>
                   <small
                     id="dataset-id-help"
