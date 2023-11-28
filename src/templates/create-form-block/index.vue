@@ -27,6 +27,10 @@
     disabledRedirect: {
       type: Boolean,
       default: false
+    },
+    cleanForm: {
+      type: Boolean,
+      default: true
     }
   })
 
@@ -72,7 +76,7 @@
   const handleSuccess = (response) => {
     emit('on-response', response)
     showFeedback(response.feedback)
-    if (props.disabledCallback) return
+    if (props.disabledFeedback) return
     redirectToUrl(response.urlToEditView)
   }
 
@@ -80,7 +84,7 @@
     try {
       const response = await props.createService(values)
       handleSuccess(response)
-      actions.resetForm()
+      if (props.cleanForm) actions.resetForm()
       blockViewRedirection.value = false
     } catch (error) {
       showToast('error', error)
