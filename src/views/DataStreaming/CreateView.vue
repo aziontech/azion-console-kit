@@ -176,7 +176,7 @@
           </FormHorizontal>
 
           <FormHorizontal title="Destination"
-            description="Decide to which data platform your collected data will be sent to.">
+            description="Decide to which data platform your collected data will be sent to. All fields must be filled in with information provided by the third-party platform.">
             <template #inputs>
               <div class="flex flex-col w-full sm:max-w-xs gap-2">
                 <label
