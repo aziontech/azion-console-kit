@@ -84,7 +84,7 @@
 
         <!-- Create Button Desktop -->
         <PrimeButton
-          @click="createBoardManager.open()"
+          @click="createModalStore.toggle()"
           icon="pi pi-plus"
           label="Create"
           class="!text-white h-8 hidden md:flex border-header"
@@ -94,14 +94,14 @@
             icon: { class: 'text-white' }
           }"
           :class="{
-            'bg-header hover:bg-header-button-hover': !createBoardManager.enabled.value,
-            'bg-header-button-enabled': createBoardManager.enabled.value
+            'bg-header hover:bg-header-button-hover': !createModalStore.isOpen,
+            'bg-header-button-enabled': createModalStore.isOpen
           }"
         />
 
         <!-- Create Button Mobile -->
         <PrimeButton
-          @click="createBoardManager.open()"
+          @click="createModalStore.toggle()"
           icon="pi pi-plus"
           class="h-8 md:hidden text-white border-header"
           size="small"
@@ -111,8 +111,8 @@
             icon: { class: 'text-white' }
           }"
           :class="{
-            'bg-header hover:bg-header-button-hover': !createBoardManager.enabled.value,
-            'bg-header-button-enabled': createBoardManager.enabled.value
+            'bg-header hover:bg-header-button-hover': !createModalStore.isOpen,
+            'bg-header-button-enabled': createModalStore.isOpen
           }"
           v-tooltip.bottom="{ value: 'Create', showDelay: 200 }"
         />
@@ -471,7 +471,7 @@
 
   <!-- Modal de create -->
   <PrimeDialog
-    v-model:visible="createBoardManager.enabled"
+    v-model:visible="createModalStore.isOpen"
     modal
     header="Create something new"
     :pt="{
@@ -481,7 +481,7 @@
     position="center"
     :dismissableMask="true"
     :breakpoints="{ '641px': '90vw' }"
-    @update:visible="createBoardManager.close()"
+    @update:visible="createModalStore.close()"
   >
     <!-- SLOT WIP -->
     <div>
@@ -491,7 +491,7 @@
 
   <!-- Mobile modal Create -->
   <Sidebar
-    v-model:visible="createBoardManager.enabled"
+    v-model:visible="createModalStore.isOpen"
     position="bottom"
     headerContent="Create something new"
     :show-close-icon="false"
@@ -506,7 +506,7 @@
         <h2>Create something new</h2>
         <PrimeButton
           icon="pi pi-times"
-          @click="createBoardManager.close()"
+          @click="createModalStore.close()"
           size="small"
           class="flex-none surface-border text-sm w-8 h-8"
           text
@@ -548,6 +548,7 @@
   import Dropdown from 'primevue/dropdown'
   import { useAccountStore } from '@/stores/account'
   import { useHelpCenterStore } from '@/stores/help-center'
+  import { useCreateModalStore } from '@/stores/create-modal'
   import { mapActions, mapState } from 'pinia'
   import SwitchAccountBlock from '@/templates/switch-account-block'
   import CreateModalBlock from '@/templates/create-modal-block'
@@ -580,7 +581,6 @@
         required: true
       }
     },
-    inject: ['createBoardManager'],
     data() {
       return {
         openSwitchAccount: false,
@@ -856,8 +856,9 @@
     },
     setup() {
       const helpCenterStore = useHelpCenterStore()
+      const createModalStore = useCreateModalStore()
 
-      return { helpCenterStore }
+      return { helpCenterStore, createModalStore }
     }
   }
 </script>
