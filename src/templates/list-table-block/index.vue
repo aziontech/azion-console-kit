@@ -92,7 +92,7 @@
         </template>
         <template #body="{ data: rowData }">
           <div class="flex justify-end">
-            <slot >
+            <slot>
               <PrimeMenu
                 :ref="`menu-${rowData.id}`"
                 id="overlay_menu"

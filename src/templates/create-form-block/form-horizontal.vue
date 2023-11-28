@@ -23,6 +23,6 @@
   const props = defineProps({
     title: { type: String, required: true },
     description: { type: String },
-    isDrawer: { type: Boolean, default: false, }
+    isDrawer: { type: Boolean, default: false }
   })
 </script>
