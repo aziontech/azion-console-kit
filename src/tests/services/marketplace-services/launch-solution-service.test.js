@@ -1,6 +1,6 @@
 import { AxiosHttpClientAdapter } from '@/services/axios/AxiosHttpClientAdapter'
-import { loadSolutionService } from '@/services/marketplace-services'
-import * as Errors from '@services/axios/errors'
+import * as Errors from '@/services/axios/errors'
+import { launchSolutionService } from '@/services/marketplace-services'
 import { describe, expect, it, vi } from 'vitest'
 
 const fixtures = {
@@ -44,7 +44,7 @@ const fixtures = {
 }
 
 const makeSut = () => {
-  const sut = loadSolutionService
+  const sut = launchSolutionService
 
   return {
     sut
@@ -55,8 +55,8 @@ describe('MarketplaceServices', () => {
   it('should call api with correct params', async () => {
     const solution = fixtures.solutionSample
     const requestSpy = vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
-      statusCode: 200,
-      body: []
+      statusCode: 201,
+      body: null
     })
 
     const { sut } = makeSut()
@@ -67,50 +67,45 @@ describe('MarketplaceServices', () => {
     })
 
     expect(requestSpy).toHaveBeenCalledWith({
-      url: `marketplace/solution/${solution.vendor.slug}/${solution.slug}`,
-      method: 'GET'
+      url: `marketplace/solution/launch/${solution.vendor.slug}/${solution.slug}/latest`,
+      method: 'POST'
     })
   })
 
-  it('should parse correctly each returned item', async () => {
+  it('should return a feedback message on successfully created', async () => {
     const solution = fixtures.solutionSample
     vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
-      statusCode: 200,
-      body: solution
+      statusCode: 201,
+      body: null
     })
-
     const { sut } = makeSut()
-    const result = await sut({
+
+    const { feedback } = await sut({
       vendor: solution.vendor.slug,
       solution: solution.slug
     })
 
-    expect(result).toEqual({
-      id: solution.id,
-      name: solution.name,
-      referenceId: solution.solution_reference_id,
-      vendor: solution.vendor,
-      headline: solution.headline,
-      version: solution.version,
-      latestVersion: solution.latest_version,
-      latestVersionChangelog: solution.latest_version_changelog,
-      lastUpdate: solution.updated_at,
-      usage: solution.usage,
-      overview: solution.overview,
-      support: solution.support,
-      isPayAsYouGo: solution.is_pay_as_you_go,
-      isLaunched: solution.is_launched,
-      isUpdated: solution.is_updated,
-      newLaunchFlow: solution.new_launch_flow,
-      slug: solution.slug
+    expect(feedback).toBe('Integration installation was successful')
+  })
+
+  it('Should return an API error for status 400', async () => {
+    const solution = fixtures.solutionSample
+    const message = 'There was a problem in the process. Please try again in a few minutes.'
+    vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
+      statusCode: 400,
+      body: message
     })
+    const { sut } = makeSut()
+
+    const feedbackMessage = sut({
+      vendor: solution.vendor.slug,
+      solution: solution.slug
+    })
+
+    expect(feedbackMessage).rejects.toThrow(message)
   })
 
   it.each([
-    {
-      statusCode: 400,
-      expectedError: new Errors.InvalidApiRequestError().message
-    },
     {
       statusCode: 401,
       expectedError: new Errors.InvalidApiTokenError().message
@@ -137,7 +132,7 @@ describe('MarketplaceServices', () => {
       const solution = fixtures.solutionSample
       vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
         statusCode,
-        body: null
+        body: []
       })
       const { sut } = makeSut()
 
