@@ -163,7 +163,7 @@
             </template>
           </FormHorizontal>
 
-          <DialogAttetionTokenBlock
+          <CopyTokenDialog
             v-model:visible="showCopyTokenDialog"
             :personalToken="personalTokenKey"
             :copy="copyPersonalToken"
@@ -193,7 +193,7 @@
   import PrimeButton from 'primevue/button'
   import ContentBlock from '@/templates/content-block'
   import PageHeadingBlock from '@/templates/page-heading-block'
-  import DialogAttetionTokenBlock from '@/templates/dialog-attention-token-block'
+  import CopyTokenDialog from './dialog/CopyTokenDialog'
 
   import { useForm, useField } from 'vee-validate'
   import * as yup from 'yup'
