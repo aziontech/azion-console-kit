@@ -9,6 +9,7 @@ export default async function beforeEachRoute(to, _, next) {
   const theme = localStorage.getItem('theme')
 
   const fallbackTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
+  accountStore.setTheme(theme || fallbackTheme)
 
   if (to.path === '/logout') {
     await logoutService()
@@ -40,6 +41,5 @@ export default async function beforeEachRoute(to, _, next) {
     }
   }
 
-  accountStore.setTheme(theme || fallbackTheme)
   return next()
 }
