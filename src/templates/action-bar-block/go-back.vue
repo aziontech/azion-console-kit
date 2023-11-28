@@ -10,7 +10,7 @@
         severity="primary"
         outlined
         label="Back to list"
-        @click="goBack"
+        @click="handleClick"
       />
     </div>
   </div>
@@ -23,8 +23,17 @@
     components: {
       PrimeButton
     },
+    props: {
+      goBack: {
+        type: Function
+      }
+    },
     methods: {
-      goBack() {
+      handleClick() {
+        if (this.goBack) {
+          this.goBack()
+          return
+        }
         this.$router.go(-1)
       }
     }

@@ -12,6 +12,8 @@
         :buttonBackList="generatedPersonalToken"
         :callback="false"
         :disabledFeedback="true"
+        :goBack="openCopyTokenDialog"
+        :blockRedirect="!generatedPersonalToken"
       >
         <template #form>
           <FormHorizontal
@@ -57,8 +59,9 @@
                     class="pi pi-lock text-color-secondary"
                     v-if="generatedPersonalToken"
                   />
-                  <TextareaComponent
+                  <PrimeTextarea
                     id="description"
+                    autoResize
                     class="w-full"
                     :class="{ 'p-invalid': errors.description }"
                     rows="1"
@@ -79,14 +82,14 @@
             description="Define the token expiration date by selecting one of the suggested date ranges. For security matters, you can only copy the Personal Token right after you create it. In case you need the Personal Token code after that, you must create a new one."
           >
             <template #inputs>
-              <div class="flex flex-col w-full gap-2">
+              <div class="flex flex-col gap-2">
                 <label
                   for="selectedExpiration"
                   class="text-color text-base font-medium"
                   >Expires within *</label
                 >
-                <div class="flex gap-6">
-                  <div>
+                <div class="flex sm:flex-row w-full flex-col gap-6">
+                  <div class="w-full sm:max-w-xs">
                     <Dropdown
                       class="w-full"
                       id="selectedExpiration"
@@ -105,7 +108,7 @@
                       </template>
                     </Dropdown>
                   </div>
-                  <div>
+                  <div class="w-full sm:max-w-xs">
                     <Calendar
                       v-if="isCustomDateSelected"
                       class="w-full"
@@ -159,6 +162,13 @@
               </div>
             </template>
           </FormHorizontal>
+
+          <DialogAttetionTokenBlock
+            v-model:visible="showCopyTokenDialog"
+            :personalToken="personalTokenKey"
+            :copy="copyPersonalToken"
+            :tokenAlredySaved="generatedPersonalToken"
+          />
         </template>
       </CreateFormBlock>
     </template>
@@ -178,11 +188,12 @@
 
   import Dropdown from 'primevue/dropdown'
   import PrimePassword from 'primevue/password'
-  import TextareaComponent from 'primevue/textarea'
+  import PrimeTextarea from 'primevue/textarea'
   import Calendar from 'primevue/calendar'
   import PrimeButton from 'primevue/button'
   import ContentBlock from '@/templates/content-block'
   import PageHeadingBlock from '@/templates/page-heading-block'
+  import DialogAttetionTokenBlock from '@/templates/dialog-attention-token-block'
 
   import { useForm, useField } from 'vee-validate'
   import * as yup from 'yup'
@@ -196,6 +207,7 @@
 
   const personalTokenKey = ref('')
   const generatedPersonalToken = ref(false)
+  const showCopyTokenDialog = ref(false)
   const options = ref([
     { label: '1 day', value: '1' },
     { label: '7 days', value: '7' },
@@ -329,5 +341,9 @@
         detail: 'The Personal Token could not be copied to clipboard. Please try again.'
       })
     }
+  }
+
+  const openCopyTokenDialog = () => {
+    showCopyTokenDialog.value = true
   }
 </script>
