@@ -4,7 +4,7 @@
   import Sidebar from 'primevue/sidebar'
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
   import MultiSelect from 'primevue/multiselect'
-  import ActionBarTemplate from '@/templates/action-bar-block'
+  import ActionBarTemplate from '@/templates/action-bar-block/action-bar-with-teleport'
 
   const emit = defineEmits(['update:visible'])
 

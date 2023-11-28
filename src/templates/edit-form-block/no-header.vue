@@ -28,7 +28,7 @@
 
 <script>
   import DialogUnsavedBlock from '@/templates/dialog-unsaved-block'
-  import ActionBarTemplate from '@/templates/action-bar-block'
+  import ActionBarTemplate from '@/templates/action-bar-block/action-bar-with-teleport'
 
   export default {
     name: 'edit-form-block-no-header',
