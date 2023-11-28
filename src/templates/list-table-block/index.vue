@@ -92,22 +92,20 @@
         </template>
         <template #body="{ data: rowData }">
           <div class="flex justify-end">
-            <slot >
-              <PrimeMenu
-                :ref="`menu-${rowData.id}`"
-                id="overlay_menu"
-                v-bind:model="actionOptions(rowData)"
-                :popup="true"
-              />
-              <PrimeButton
-                v-tooltip.top="{ value: 'Actions', showDelay: 200 }"
-                size="small"
-                icon="pi pi-ellipsis-h"
-                text
-                @click="(event) => toggleActionsMenu(event, rowData.id)"
-                class="cursor-pointer table-button"
-              />
-            </slot>
+            <PrimeMenu
+              :ref="`menu-${rowData.id}`"
+              id="overlay_menu"
+              v-bind:model="actionOptions(rowData)"
+              :popup="true"
+            />
+            <PrimeButton
+              v-tooltip.top="{ value: 'Actions', showDelay: 200 }"
+              size="small"
+              icon="pi pi-ellipsis-h"
+              text
+              @click="(event) => toggleActionsMenu(event, rowData.id)"
+              class="cursor-pointer table-button"
+            />
           </div>
         </template>
       </Column>
