@@ -27,7 +27,7 @@
 
 <script setup>
   import CreateFormBlock from '@/templates/create-form-block'
-  import ActionBarTemplate from '@/templates/action-bar-block'
+  import ActionBarTemplate from '@/templates/action-bar-block/action-bar-with-teleport'
   import ContentBlock from '@/templates/content-block'
   import PageHeadingBlock from '@/templates/page-heading-block'
   import FormCreateEdgeService from './form/FormCreateEdgeService.vue'

@@ -4,7 +4,7 @@
   import Sidebar from 'primevue/sidebar'
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
   import MultiSelect from 'primevue/multiselect'
-  import ActionBarTemplate from '@/templates/action-bar-block'
+  import ActionBarTemplate from '@/templates/action-bar-block/action-bar-with-teleport'
 
   const emit = defineEmits(['update:visible'])
 
@@ -22,6 +22,7 @@
       default: () => ({})
     }
   })
+  const actionBarDrawer = ref('#action-bar-drawer')
 
   const selectedCities = ref()
   const cities = ref([
@@ -45,6 +46,7 @@
 
   const closeSideBar = () => {
     openDrawer(false)
+    visibleDrawer.value = false
   }
 </script>
 
@@ -96,6 +98,13 @@
         </form-horizontal>
       </form>
     </div>
-    <action-bar-template @cancel="closeSideBar"></action-bar-template>
+    <div
+      class="sticky bottom-0"
+      id="action-bar-drawer"
+    ></div>
+    <action-bar-template
+      @cancel="closeSideBar"
+      :id="actionBarDrawer"
+    ></action-bar-template>
   </Sidebar>
 </template>

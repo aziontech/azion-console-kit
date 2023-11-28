@@ -1,6 +1,6 @@
 <script setup>
   import EditFormBlock from '@/templates/edit-form-block'
-  import ActionBarTemplate from '@/templates/action-bar-block'
+  import ActionBarTemplate from '@/templates/action-bar-block/action-bar-with-teleport'
   import FormCreateEdgeService from './FormCreateEdgeService.vue'
   import * as yup from 'yup'
 

@@ -2,7 +2,7 @@
   import CreateFormBlock from '@/templates/create-form-block'
   import ContentBlock from '@/templates/content-block'
   import PageHeadingBlock from '@/templates/page-heading-block'
-  import ActionBarTemplate from '@/templates/action-bar-block'
+  import ActionBarTemplate from '@/templates/action-bar-block/action-bar-with-teleport'
   import FormFieldsVariables from './FormFields/FormFieldsVariables.vue'
   import * as yup from 'yup'
 
