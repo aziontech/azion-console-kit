@@ -40,35 +40,6 @@
           <div class="w-full">
             <FormHorizontal
               title="Pre-loading Tag"
-              description="The script executes before the load event is fired. Recommended when using Content Security Policy settings that prevent the use of inline JavaScript."
-            >
-              <template #inputs>
-                <vue-monaco-editor
-                  v-model:value="defaultTagCode"
-                  language="javascript"
-                  :theme="theme"
-                  :options="editorOptions"
-                  class="min-h-[200px] overflow-clip surface-border border rounded-md"
-                />
-                <div>
-                  <PrimeButton
-                    icon="pi pi-copy"
-                    label="Copy"
-                    class="max-md:w-full"
-                    @click="handleCopyDefaultTagCode"
-                    outlined
-                  />
-                </div>
-              </template>
-            </FormHorizontal>
-          </div>
-        </TabPanel>
-
-        <!-- Pre-loading -->
-        <TabPanel header="Pre-loading Tag">
-          <div class="w-full">
-            <FormHorizontal
-              title="Pre-loading Tag"
               description="If you're using Content Security Policy settings preventing the use of inline JavaScript
             then place this tag just before the enclosing BODY tag. This script executes before the
             load event has fired."

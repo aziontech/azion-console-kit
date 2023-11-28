@@ -1,7 +1,20 @@
 <template>
   <ContentBlock>
     <template #heading>
-      <PageHeadingBlock pageTitle="Intelligent DNS"></PageHeadingBlock>
+      <PageHeadingBlock
+        pageTitle="Intelligent DNS"
+        description="Copy the Nameservers values for change your domain's authoritative DNS servers to use Azion Intelligent DNS."
+      >
+        <template #default>
+          <PrimeButton
+            outlined
+            icon="pi pi-copy"
+            class="max-md:w-full"
+            label="Copy Nameservers"
+            @click="handleCopyNameServers"
+          ></PrimeButton>
+        </template>
+      </PageHeadingBlock>
     </template>
     <template #content>
       <ListTableBlock
@@ -36,7 +49,9 @@
   import EmptyResultsBlock from '@/templates/empty-results-block'
   import Illustration from '@/assets/svg/illustration-layers.vue'
   import ContentBlock from '@/templates/content-block'
+  import PrimeButton from 'primevue/button'
   import PageHeadingBlock from '@/templates/page-heading-block'
+  import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
 
   export default {
     name: 'intelligent-dns-view',
@@ -45,6 +60,7 @@
       EmptyResultsBlock,
       Illustration,
       ContentBlock,
+      PrimeButton,
       PageHeadingBlock
     },
     data: () => ({
@@ -62,6 +78,10 @@
       documentationService: {
         required: true,
         type: Function
+      },
+      clipboardWrite: {
+        required: true,
+        type: Function
       }
     },
     computed: {
@@ -71,13 +91,30 @@
             field: 'name',
             header: 'Name'
           },
+
           {
             field: 'domain',
-            header: 'Domain'
+            header: 'Domain',
+            type: 'component',
+            component: (columnData) => {
+              return columnBuilder({
+                data: columnData,
+                columnAppearance: 'text-with-clipboard',
+                dependencies: {
+                  copyContentService: this.clipboardWrite
+                }
+              })
+            }
           },
           {
-            field: 'isActive',
-            header: 'Active'
+            field: 'status',
+            header: 'Status',
+            type: 'component',
+            component: (columnData) =>
+              columnBuilder({
+                data: columnData,
+                columnAppearance: 'tag'
+              })
           }
         ]
       }
@@ -85,6 +122,15 @@
     methods: {
       handleLoadData(event) {
         this.hasContentToList = event
+      },
+      handleCopyNameServers() {
+        this.clipboardWrite('ns1.aziondns.net;ns2.aziondns.com;ns3.aziondns.org')
+        this.$toast.add({
+          closable: false,
+          severity: 'success',
+          summary: 'Nameservers copied',
+          life: 10000
+        })
       }
     }
   }

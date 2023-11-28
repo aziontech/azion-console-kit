@@ -70,6 +70,9 @@
                     </div>
                   </template>
                 </PickList>
+                <small class="text-color-secondary text-sm font-normal leading-tight">
+                  Hold <code>command</code> or <code>ctrl</code> to select multiple items.
+                </small>
               </div>
             </template>
           </FormHorizontal>

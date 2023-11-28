@@ -15,5 +15,8 @@ export const loginRoutes = {
     sendResetPasswordEmailService: AuthServices.sendResetPasswordEmailService,
     accountHandler: new AccountHandler(switchAccountService, listTypeAccountService)
   },
-  meta: {}
+  meta: {
+    isPublic: true,
+    hideNavigation: true
+  }
 }

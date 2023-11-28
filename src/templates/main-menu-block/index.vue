@@ -122,15 +122,15 @@
           icon="pi pi-question-circle"
           size="small"
           label="Help"
-          @click="toggleHelpCenter"
+          @click="helpCenterStore.toggle()"
           :pt="{
             label: { class: 'text-white' },
             icon: { class: 'text-white' }
           }"
           class="hidden md:flex !text-white border-header"
           :class="{
-            'bg-header hover:bg-header-button-hover': !showHelp,
-            'bg-header-button-enabled': showHelp
+            'bg-header hover:bg-header-button-hover': !helpCenterStore.isOpen,
+            'bg-header-button-enabled': helpCenterStore.isOpen
           }"
         />
 
@@ -140,14 +140,14 @@
           size="small"
           class="md:hidden text-white !text-white border-header"
           style="height: 32px; width: 32px"
-          @click="toggleHelpCenter"
+          @click="helpCenterStore.toggle()"
           :pt="{
             label: { class: 'text-white' },
             icon: { class: 'text-white' }
           }"
           :class="{
-            'bg-header hover:bg-header-button-hover': !showHelp,
-            'bg-header-button-enabled': showHelp
+            'bg-header hover:bg-header-button-hover': !helpCenterStore.isOpen,
+            'bg-header-button-enabled': helpCenterStore.isOpen
           }"
           v-tooltip.bottom="{ value: 'Help', showDelay: 200 }"
         />
@@ -785,7 +785,6 @@
     },
     computed: {
       ...mapState(useAccountStore, { user: 'accountData', currentTheme: 'currentTheme' }),
-      ...mapState(useHelpCenterStore, { showHelp: 'isOpen' }),
       selectedTheme() {
         return this.themeOptions.find((option) => option.value === this.currentTheme)
       },
@@ -817,7 +816,6 @@
     },
     methods: {
       ...mapActions(useAccountStore, ['setTheme']),
-      ...mapActions(useHelpCenterStore, ['toggleHelpCenter', 'closeHelpCenter']),
       toggleProfileMobile() {
         this.showProfile = !this.showProfile
       },
@@ -855,6 +853,11 @@
       closeSwitchAccountDialog() {
         this.openSwitchAccount = false
       }
+    },
+    setup() {
+      const helpCenterStore = useHelpCenterStore()
+
+      return { helpCenterStore }
     }
   }
 </script>
