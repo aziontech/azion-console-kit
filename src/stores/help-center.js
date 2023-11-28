@@ -6,10 +6,10 @@ export const useHelpCenterStore = defineStore({
     isOpen: false
   }),
   actions: {
-    toggleHelpCenter() {
+    toggle() {
       this.isOpen = !this.isOpen
     },
-    closeHelpCenter() {
+    close() {
       this.isOpen = false
     }
   }
