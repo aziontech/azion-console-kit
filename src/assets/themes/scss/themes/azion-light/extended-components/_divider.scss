@@ -4,8 +4,8 @@
 }
 
 .p-divider-vertical::before {
-  border-left-width: $dividerSize;
-  border-left-color: $dividerColor;
+  border-right-width: $dividerSize;
+  border-right-color: $dividerColor;
 }
 
 .p-divider-dashed::before {

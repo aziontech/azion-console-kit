@@ -18,8 +18,8 @@
           />
       </InputGroup>
     </div>
-    <Divider align="left">
-      Center
+    <Divider layout="vertical">
+      teste
     </Divider>
         <div class="flex flex-col sm:max-w-lg w-full gap-2">
         <label
