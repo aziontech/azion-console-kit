@@ -84,6 +84,11 @@
   const { value: hmacSecretKey, errorMessage: hmacSecretKeyError } = useField('hmacSecretKey')
   const { value: originPath, errorMessage: originPathError } = useField('originPath')
 
+  const isSingleOriginType = computed(() => originType.value === 'single_origin')
+  const isLoadBalancerOriginType = computed(() => originType.value === 'load_balancer')
+  const isHmacAuthentication = computed(() => !!hmacAuthentication.value)
+  const isIpHashMethod = computed(() => method.value === 'ip_hash')
+
   function addAddress() {
     pushAddress({
       address: '',
@@ -92,11 +97,6 @@
       isActive: true
     })
   }
-
-  const isSingleOriginType = computed(() => originType.value === 'single_origin')
-  const isLoadBalancerOriginType = computed(() => originType.value === 'load_balancer')
-  const isHmacAuthentication = computed(() => !!hmacAuthentication.value)
-  const isIpHashMethod = computed(() => method.value === 'ip_hash')
 </script>
 
 <template>
@@ -109,6 +109,7 @@
           >Origin Name *</label
         >
         <InputText
+          placeholder="Insert the Origin Name"
           v-model="name"
           type="text"
           :class="{ 'p-invalid': nameError }"
@@ -393,7 +394,7 @@
             >
             <InputText
               required
-              v-model="hmacAccessKey"
+              v-bind="hmacAccessKey"
               type="text"
               :class="{ 'p-invalid': hmacAccessKeyError }"
             />
@@ -412,7 +413,7 @@
             >
             <InputText
               required
-              v-model="hmacSecretKey"
+              v-bind="hmacSecretKey"
               type="text"
               :class="{ 'p-invalid': hmacSecretKeyError }"
             />
