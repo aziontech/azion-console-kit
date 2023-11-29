@@ -23,11 +23,6 @@
       type: Array,
       required: true
     },
-    domainName: {
-      type: String,
-      required: false,
-      default: ''
-    },
     hasDomainName: {
       type: Boolean,
       required: false,
@@ -43,16 +38,13 @@
   const { setValue: setEdgeCertificate } = useField('edgeCertificate')
   const { value: mtlsIsEnabled, errorMessage: errorMtlsIsEnabled } = useField('mtlsIsEnabled')
   const { value: active } = useField('active')
+  const { value: domainName } = useField('domainName')
   const { value: mtlsVerification } = useField('mtlsVerification')
   const { value: mtlsTrustedCertificate, errorMessage: errorMtlsTrustedCertificate } =
     useField('mtlsTrustedCertificate')
 
   const CNAMELabel = computed(() => {
     return cnameAccessOnly ? 'CNAME *' : 'CNAME'
-  })
-
-  const getDomainName = computed(() => {
-    return props.domainName
   })
 
   const edgeCertificates = computed(() => {
@@ -137,7 +129,7 @@
             <i class="pi pi-lock" />
             <InputText
               id="domainName"
-              v-model="getDomainName"
+              v-model="domainName"
               type="text"
               class="flex flex-col w-full"
               :feedback="false"
@@ -151,7 +143,7 @@
             aria-label="Copy Domain Name"
             label="Copy to Clipboard"
             :disabled="!props.hasDomainName"
-            @click="$emit('copyDomainName', { name: props.domainName })"
+            @click="$emit('copyDomainName', { name: domainName })"
           />
         </div>
       </div>
