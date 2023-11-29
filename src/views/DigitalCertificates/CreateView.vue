@@ -65,23 +65,18 @@
   const createDigitalCertificateService = props.createDigitalCertificatesService
   const createCSRService = props.createDigitalCertificatesCSRService
 
-  const CSRConditionalValidations = {
-    is: certificateTypes.value.EDGE_CERTIFICATE_CSR,
-    then: (schema) => schema.required('Field Required')
-  }
-  const certificateRequiredField = (certificateType) => {
-    const isUploadCertificate = certificateType === certificateTypes.value.EDGE_CERTIFICATE_UPLOAD
-    const isTrustedCA = certificateType === certificateTypes.value.TRUSTED
-
-    return isUploadCertificate || isTrustedCA
-  }
-
-  const createServiceBySelectedType = ref(createDigitalCertificateService)
   const certificateTypes = ref({
     EDGE_CERTIFICATE_UPLOAD: 'edge_certificate',
     EDGE_CERTIFICATE_CSR: 'generateCSR',
     TRUSTED: 'trusted_ca_certificate'
   })
+  const CSRConditionalValidations = {
+    is: certificateTypes.value.EDGE_CERTIFICATE_CSR,
+    then: (schema) => schema.required('Field Required')
+  }
+
+  const createServiceBySelectedType = ref(createDigitalCertificateService)
+
   const certificateSelection = ref('uploadCertificateAndPrivateKey')
   const initialValues = ref({
     digitalCertificateName: '',
@@ -101,6 +96,12 @@
     subjectAlternativeNames: ''
   })
 
+  const certificateRequiredField = (certificateType) => {
+    const isUploadCertificate = certificateType === certificateTypes.value.EDGE_CERTIFICATE_UPLOAD
+    const isTrustedCA = certificateType === certificateTypes.value.TRUSTED
+
+    return isUploadCertificate || isTrustedCA
+  }
   const validationSchema = yup.object({
     digitalCertificateName: yup.string().required('Name is a required field.'),
 
