@@ -77,9 +77,7 @@
   })
 
   watch(edgeCertificate, async (newEdgeCertificate) => {
-    if (newEdgeCertificate !== 0) {
-      setEdgeCertificate(newEdgeCertificate)
-    }
+    setEdgeCertificate(newEdgeCertificate)
   })
 </script>
 
