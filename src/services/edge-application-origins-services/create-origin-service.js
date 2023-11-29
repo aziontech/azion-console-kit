@@ -1,7 +1,6 @@
 import { AxiosHttpClientAdapter } from '@/services/axios/AxiosHttpClientAdapter'
 import { makeEdgeApplicationBaseUrl } from '../edge-application-services/make-edge-application-base-url'
 import * as Errors from '@/services/axios/errors'
-import router from '../../router'
 
 export const createOriginService = async (payload, id) => {
   let httpResponse = await AxiosHttpClientAdapter.request({
@@ -10,7 +9,7 @@ export const createOriginService = async (payload, id) => {
     body: adapt(payload)
   })
 
-  return parseHttpResponse(httpResponse)
+  return parseHttpResponse(httpResponse, id)
 }
 
 const adapt = (payload) => {
@@ -66,13 +65,12 @@ const extractApiError = (httpResponse) => {
  * @returns {string} The result message based on the status code.
  * @throws {Error} If there is an error with the response.
  */
-const parseHttpResponse = (httpResponse) => {
+const parseHttpResponse = (httpResponse, edgeApplicationId) => {
   switch (httpResponse.statusCode) {
     case 201:
-      const currentRouteID = router.currentRoute._value.params.id
       return {
         feedback: 'Your Origin has been created',
-        urlToEditView: `/edge-applications/edit/${currentRouteID}/origins/edit/${httpResponse.body.results.origin_key}`
+        urlToEditView: `/edge-applications/edit/${edgeApplicationId}/origins/edit/${httpResponse.body.results.origin_key}`
       }
     case 400:
       const apiError = extractApiError(httpResponse)
