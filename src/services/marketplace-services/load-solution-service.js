@@ -1,7 +1,7 @@
 import { AxiosHttpClientAdapter, parseHttpResponse } from '../axios/AxiosHttpClientAdapter'
 import { makeMarketplaceBaseUrl } from './make-marketplace-base-url'
 
-export const listSolution = async (vendor, solution) => {
+export const loadSolution = async (vendor, solution) => {
   let httpResponse = await AxiosHttpClientAdapter.request({
     url: `${makeMarketplaceBaseUrl()}/solution/${vendor}/${solution}`,
     method: 'GET'

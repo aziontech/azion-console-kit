@@ -1,8 +1,8 @@
 <template>
-  <ContentBlock>
+  <ContentBlock v-if="!isLoading">
     <template #heading>
-      <PageHeadingBlock pageTitle="Create" />
-      <div class="px-8 max-md:px-3 flex flex-col sm:flex-row gap-4 lg:items-center mb-4">
+      <PageHeadingBlock :pageTitle="solution.name" />
+      <div class=" flex flex-col sm:flex-row gap-4 lg:items-center">
         <div class="flex flex-col sm:flex-row gap-4 sm:items-center">
           <div class="w-10 h-10 hidden rounded sm:flex justify-center items-center bg-white">
             <img
@@ -47,7 +47,14 @@
         </div>
       </div>
     </template>
-    <PrimeDialog
+    <template #content>
+      <TemplateEngineBlock
+        @instantiate="handleInstantiate"
+        :getTemplateService="getTemplate"
+        :postTemplateService="instantiateTemplate"
+        :templateId="uuid"
+      />
+      <PrimeDialog
       modal
       v-model:visible="showDetails"
       class="w-full max-w-2xl"
@@ -95,7 +102,7 @@
           </div>
         </div>
       </template>
-      <div class="flex flex-col gap-6 w-full">
+      <div class="flex flex-col gap-6 max-w-2xl">
         <div class="flex flex-col gap-2">
           <span class="text-lg font-medium"> Overview </span>
           <div
@@ -175,18 +182,11 @@
         </div>
       </div>
     </Sidebar>
-    <template #content>
-      <TemplateEngineBlock
-        @instantiate="handleInstantiate"
-        :getTemplateService="getTemplate"
-        :postTemplateService="instantiateTemplate"
-        :templateId="uuid"
-      />
     </template>
   </ContentBlock>
 </template>
 <script>
-  import TemplateEngineBlock from '@/templates/template-engine-new-block'
+  import TemplateEngineBlock from '@/templates/template-engine-block'
   import PrimeButton from 'primevue/button'
   import PrimeDialog from 'primevue/dialog'
   import ContentBlock from '@/templates/content-block'
@@ -198,9 +198,9 @@
       TemplateEngineBlock,
       ContentBlock,
       PageHeadingBlock,
-      Sidebar,
       PrimeButton,
-      PrimeDialog
+      PrimeDialog,
+      Sidebar
     },
     data: () => ({
       isLoading: false,
@@ -248,7 +248,7 @@
         this.showDetails = true
       },
       handleInstantiate(element) {
-        console.log(element)
+        this.$route.push(element.redirectURL)
       }
     }
   }

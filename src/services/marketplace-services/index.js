@@ -1,5 +1,5 @@
 import { listSolutionsService } from './list-solutions-service'
-import { listSolution } from './list-solution-service'
+import { loadSolution } from './load-solution-service'
 import { listCategoriesService } from './list-categories-service'
 
-export { listSolutionsService, listCategoriesService, listSolution }
+export { listSolutionsService, listCategoriesService, loadSolution }

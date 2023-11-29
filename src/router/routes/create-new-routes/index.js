@@ -9,17 +9,17 @@ export const createNewRoutes = {
     {
       path: ':vendor/:solution',
       name: 'create-something-new',
-      component: () => import('@views/TemplateEngine/CreateView.vue'),
+      component: () => import('@views/CreateNew/CreateView.vue'),
       props: {
         getTemplateService: TemplateEngineService.getTemplate,
-        getSolutionService: MarketplaceService.listSolution,
+        getSolutionService: MarketplaceService.loadSolution,
         postTemplateService: TemplateEngineService.instantiateTemplate
       },
       meta: {
         breadCrumbs: [
           {
             label: 'Create New',
-            to: '/create'
+            to: '/'
           }
         ]
       }
