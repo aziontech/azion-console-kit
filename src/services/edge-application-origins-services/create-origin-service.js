@@ -18,7 +18,13 @@ const adapt = (payload) => {
     name: payload.name,
     host_header: payload.hostHeader,
     method: payload.method,
-    addresses: payload.addresses,
+    addresses: payload.addresses?.map((addressItem) => ({
+      address: addressItem.address,
+      weight: addressItem.weight,
+      server_role: addressItem.serverRole,
+      is_active: addressItem.isActive,
+      name: addressItem.name
+    })),
     origin_path: payload.originPath,
     origin_protocol_policy: payload.originProtocolPolicy,
     hmac_authentication: payload.hmacAuthentication,
@@ -28,6 +34,29 @@ const adapt = (payload) => {
     connection_timeout: payload.connectionTimeout,
     timeout_between_bytes: payload.timeoutBetweenBytes
   }
+}
+
+/**
+ * @param {Object} errorSchema - The error schema.
+ * @param {string} key - The error key of error schema.
+ * @returns {string|undefined} The result message based on the status code.
+ */
+const extractErrorKey = (errorSchema, key) => {
+  if (Array.isArray(errorSchema[key])) {
+    return errorSchema[key]?.[0]
+  }
+  return errorSchema[key]
+}
+
+/**
+ * @param {Object} httpResponse - The HTTP response object.
+ * @param {Object} httpResponse.body - The response body.
+ * @returns {string} The result message based on the status code.
+ */
+const extractApiError = (httpResponse) => {
+  const errorKey = Object.keys(httpResponse.body)[0]
+  const apiError = extractErrorKey(httpResponse.body, errorKey)
+  return `${errorKey}: ${apiError}`
 }
 
 /**
@@ -46,7 +75,8 @@ const parseHttpResponse = (httpResponse) => {
         urlToEditView: `/edge-applications/edit/${currentRouteID}/origins/edit/${httpResponse.body.results.origin_key}`
       }
     case 400:
-      throw new Error(Object.keys(httpResponse.body)[0]).message
+      const apiError = extractApiError(httpResponse)
+      throw new Error(apiError).message
     case 401:
       throw new Errors.InvalidApiTokenError().message
     case 403:
