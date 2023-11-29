@@ -23,7 +23,9 @@
               Domains
             </PrimeButton>
           </InlineMessage>
-          <FormFieldsDigitalCertificates v-model:certificate-selection="certificateSelection" />
+          <FormFieldsCreateDigitalCertificates
+            v-model:certificate-selection="certificateSelection"
+          />
         </template>
 
         <template #action-bar="{ onSubmit, formValid, onCancel, loading }">
@@ -49,7 +51,7 @@
   import * as yup from 'yup'
   import { ref, watch } from 'vue'
   import { useRouter } from 'vue-router'
-  import FormFieldsDigitalCertificates from './FormFields/FormFieldsDigitalCertificates.vue'
+  import FormFieldsCreateDigitalCertificates from './FormFields/FormFieldsCreateDigitalCertificates.vue'
   const router = useRouter()
 
   const props = defineProps({
