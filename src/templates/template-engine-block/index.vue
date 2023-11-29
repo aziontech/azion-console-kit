@@ -109,7 +109,7 @@
 </template>
 <script setup>
   import Password from 'primevue/password'
-  import { ref, onBeforeMount, defineEmits, defineProps, defineOptions } from 'vue'
+  import { ref, onBeforeMount, defineOptions } from 'vue'
   import FormHorizontal from '@templates/create-form-block-new/form-horizontal'
   import ActionBarTemplate from '@templates/action-bar-block'
   import InputText from 'primevue/inputtext'

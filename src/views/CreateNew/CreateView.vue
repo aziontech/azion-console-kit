@@ -248,7 +248,7 @@
         this.showDetails = true
       },
       handleInstantiate(element) {
-        this.$route.push(element.redirectURL)
+        this.$router.push(element.redirectURL)
       }
     }
   }
