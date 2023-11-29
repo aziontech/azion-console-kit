@@ -2,13 +2,7 @@
   <ContentBlock>
     <template #heading>
       <PageHeadingBlock pageTitle="New Edge Function">
-        <PrimeButton
-          label="Preview"
-          severity="primary"
-          outlined
-          class="flex md:hidden"
-          @click="showMobilePreview = true"
-        />
+        <MobileCodePreview :updateObject="updateObject" />
       </PageHeadingBlock>
     </template>
     <template #content>
@@ -182,31 +176,6 @@
           </TabView>
         </template>
       </CreateFormBlock>
-      <Sidebar
-        :visible="showMobilePreview"
-        position="bottom"
-        :show-close-icon="false"
-        :pt="{
-          root: { class: '!h-[90%] md:hidden' },
-          mask: { class: 'md:hidden' }
-        }"
-      >
-        <template #header>
-          <div class="flex w-full items-center justify-between">
-            <h2>Preview</h2>
-            <PrimeButton
-              icon="pi pi-times"
-              size="small"
-              class="flex-none surface-border text-sm w-8 h-8"
-              text
-              @click="showMobilePreview = false"
-            />
-          </div>
-        </template>
-        <div class="h-full w-full">
-          <CodePreview :updateObject="updateObject" />
-        </div>
-      </Sidebar>
     </template>
   </ContentBlock>
 </template>
@@ -218,8 +187,6 @@
   import HelloWorldSample from '@/helpers/edge-function-hello-world'
   import InputText from 'primevue/inputtext'
   import InputSwitch from 'primevue/inputswitch'
-  import PrimeButton from 'primevue/button'
-  import Sidebar from 'primevue/sidebar'
   import Splitter from 'primevue/splitter'
   import SplitterPanel from 'primevue/splitterpanel'
   import TabView from 'primevue/tabview'
@@ -230,6 +197,7 @@
   import PageHeadingBlock from '@/templates/page-heading-block'
   import CodeEditor from './components/code-editor.vue'
   import CodePreview from './components/code-preview.vue'
+  import MobileCodePreview from './components/mobile-code-preview.vue'
 
   const props = defineProps({
     createEdgeFunctionsService: {
@@ -245,7 +213,6 @@
   }
 
   const showPreview = ref(true)
-  const showMobilePreview = ref(false)
 
   const ARGS_INITIAL_STATE = '{}'
   const LANGUAGE_LABEL = 'JavaScript'
