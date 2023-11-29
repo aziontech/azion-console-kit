@@ -70,7 +70,14 @@
         return [
           {
             field: 'name',
-            header: 'Name'
+            header: 'Name',
+            type: 'component',
+            component: (columnData) => {
+              return columnBuilder({
+                data: columnData,
+                columnAppearance: 'text-with-tag'
+              })
+            }
           },
           {
             field: 'version',

@@ -39,6 +39,27 @@ const LANGUAGE_AS_TAG = {
   }
 }
 
+const parseName = (edgeFunctionData) => {
+  const nameProps = { text: edgeFunctionData.name, tagProps: {} }
+
+  if (edgeFunctionData?.version && edgeFunctionData?.vendor) {
+    nameProps.tagProps = {
+      icon: 'pi pi-cart-plus',
+      value: 'Integration',
+      outlined: true,
+      severity: 'info'
+    }
+  }
+
+  return nameProps
+}
+
+const parseLastEditor = (edgeFunctionData) => {
+  return edgeFunctionData?.version && edgeFunctionData?.vendor
+    ? edgeFunctionData.vendor
+    : edgeFunctionData.last_editor
+}
+
 const adapt = (httpResponse) => {
   const parsedEdgeFunctions = httpResponse.body.results?.map((edgeFunction) => {
     return {
@@ -47,12 +68,12 @@ const adapt = (httpResponse) => {
       language: LANGUAGE_AS_TAG[edgeFunction.language],
       initiatorType: edgeFunction.initiator_type,
       id: edgeFunction.id,
-      lastEditor: edgeFunction.last_editor,
+      lastEditor: parseLastEditor(edgeFunction),
       lastModified: new Intl.DateTimeFormat('us', { dateStyle: 'full' }).format(
         new Date(edgeFunction.modified)
       ),
       lastModifiedDate: edgeFunction.modified,
-      name: edgeFunction.name,
+      name: parseName(edgeFunction),
       referenceCount: edgeFunction.reference_count
     }
   })

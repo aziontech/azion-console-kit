@@ -9,7 +9,7 @@ import ExpandColumn from './expand-column.vue'
 import ExpandTextColumn from './expand-text-column.vue'
 import Tag from 'primevue/tag'
 import LanguageIconWithTextColumn from './language-icon-with-text-column.vue'
-
+import TextWithTagColumn from './text-with-tag-column.vue'
 /**
  * Build and return a specific column based on the given appearance.
  *
@@ -26,6 +26,7 @@ import LanguageIconWithTextColumn from './language-icon-with-text-column.vue'
  *   - 'clickable-link'
  *   - 'tag'
  *   - 'language-icon-with-text'
+ *   - 'text-with-tag'
  * @param {Object} params.data - The data with specific properties of the column appearance.
  * @param {Object} [params.dependencies]- (Optional) The dependencies needed for rendering this column appearance.
  *
@@ -87,6 +88,11 @@ export const columnBuilder = ({ data, columnAppearance, dependencies }) => {
       return h(LanguageIconWithTextColumn, {
         language: data.icon,
         value: data.content
+      })
+    case 'text-with-tag':
+      return h(TextWithTagColumn, {
+        text: data.text,
+        tagProps: data.tagProps
       })
     default:
       throw new Error('Invalid column appearance')
