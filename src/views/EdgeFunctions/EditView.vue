@@ -60,7 +60,7 @@
                     <span class="p-input-icon-right">
                       <i class="pi pi-lock text-[var(--text-color-secondary)]" />
                       <InputText
-                        v-model="langLabel"
+                        v-model="languageLabel"
                         id="language"
                         type="text"
                         class="w-full text-[var(--text-color-secondary)]"
@@ -262,13 +262,13 @@
     }
   })
 
-  const langLabel = computed(() => {
-    const langLabels = {
+  const languageLabel = computed(() => {
+    const languageLabels = {
       javascript: 'JavaScript',
       lua: 'Lua'
     }
 
-    return langLabels[language.value]
+    return languageLabels[language.value]
   })
 
   const updateObject = computed(() => {
