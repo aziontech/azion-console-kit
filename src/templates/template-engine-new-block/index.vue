@@ -1,6 +1,6 @@
 <template>
   <div
-    class="w-full grow px-8 flex flex-col gap-8 mb-5 max-md:px-3 max-md:gap-6"
+    class="w-full flex flex-col gap-8 max-md:gap-6"
     v-if="!isLoading"
   >
     <FormHorizontal
@@ -97,17 +97,21 @@
         </template>
       </FormHorizontal>
     </div>
+    <Teleport
+      to="#action-bar"
+    >  
+      <ActionBarTemplate
+        v-if="!isLoading"
+        @submit="validateAndSubmit"
+        :submitDisabled="!formTools.meta.valid || !formTools.meta.touched"
+        :loading="isLoading"
+      />
+    </Teleport>
   </div>
-  <ActionBarTemplate
-    v-if="!isLoading"
-    @submit="validateAndSubmit"
-    :submitDisabled="!formTools.meta.valid || !formTools.meta.touched"
-    :loading="isLoading"
-  />
 </template>
 <script setup>
     import Password from 'primevue/password'
-    import { ref, onBeforeMount } from 'vue'
+    import { ref, onBeforeMount, defineEmits, defineProps, defineOptions} from 'vue'
     import FormHorizontal from '@templates/create-form-block-new/form-horizontal'
     import ActionBarTemplate from '@templates/action-bar-block'
     import InputText from 'primevue/inputtext'
@@ -116,6 +120,9 @@
     import { useToast } from 'primevue/usetoast'
 
     defineOptions({ name: 'templateEngineBlock' })
+
+    const emit = defineEmits(['instantiate'])
+
 
     const props = defineProps({
         getTemplateService: {
@@ -152,7 +159,6 @@
       }
 
       onBeforeMount(async () => {
-        console.log(props.templateId)
         await loadTemplate(props.templateId)
       })
 
@@ -281,7 +287,8 @@
             payload[index].value = val
           })
           const response = await props.postTemplateService(props.templateId, payload)
-          console.log(response)
+          emit('instantiate', response)
+          
         } catch (error) {
           toast.add({
             closable: false,

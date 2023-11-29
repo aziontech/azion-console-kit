@@ -1,8 +1,8 @@
 <template>
   <Skeleton class="w-52 h-8 rounded mt-4 mb-3" />
-  <div class="ml-0 w-full mt-0 grid grid-cols-1 sm:grid-cols-2 gap-4">
+  <div class="mx-0 w-full mt-0 grid grid-cols-1 sm:grid-cols-2 gap-4">
     <PrimeButton
-      v-for="item of 6"
+      v-for="item of 8"
       :key="item"
       class="p-4 text-left border-solid border surface-border transition-all"
       link
@@ -12,7 +12,7 @@
           <Skeleton class="w-10 h-10 rounded" />
           <div class="flex p-0.5 flex-col gap-1.5">
             <Skeleton class="w-48 h-5 rounded" />
-            <Skeleton class="w-60 h-5 rounded" />
+            <Skeleton class=" w-64 h-5 rounded" />
             <Skeleton class="w-32 h-5 rounded" />
           </div>
         </div>

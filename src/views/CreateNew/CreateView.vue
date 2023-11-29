@@ -1,8 +1,8 @@
 <template>
-  <ContentBlock v-if="!isLoading">
+  <ContentBlock>
     <template #heading>
       <PageHeadingBlock pageTitle="Create" />
-      <div class=" flex flex-col sm:flex-row gap-4 lg:items-center">
+      <div class="px-8 max-md:px-3 flex flex-col sm:flex-row gap-4 lg:items-center mb-4">
         <div class="flex flex-col sm:flex-row gap-4 sm:items-center">
           <div class="w-10 h-10 hidden rounded sm:flex justify-center items-center bg-white">
             <img
@@ -47,14 +47,7 @@
         </div>
       </div>
     </template>
-    <template #content>
-      <TemplateEngineBlock
-        @instantiate="handleInstantiate"
-        :getTemplateService="getTemplate"
-        :postTemplateService="instantiateTemplate"
-        :templateId="uuid"
-      />
-      <PrimeDialog
+    <PrimeDialog
       modal
       v-model:visible="showDetails"
       class="w-full max-w-2xl"
@@ -102,7 +95,7 @@
           </div>
         </div>
       </template>
-      <div class="flex flex-col gap-6 max-w-2xl">
+      <div class="flex flex-col gap-6 w-full">
         <div class="flex flex-col gap-2">
           <span class="text-lg font-medium"> Overview </span>
           <div
@@ -182,6 +175,13 @@
         </div>
       </div>
     </Sidebar>
+    <template #content>
+      <TemplateEngineBlock
+        @instantiate="handleInstantiate"
+        :getTemplateService="getTemplate"
+        :postTemplateService="instantiateTemplate"
+        :templateId="uuid"
+      />
     </template>
   </ContentBlock>
 </template>
@@ -198,9 +198,9 @@
       TemplateEngineBlock,
       ContentBlock,
       PageHeadingBlock,
+      Sidebar,
       PrimeButton,
-      PrimeDialog,
-      Sidebar
+      PrimeDialog
     },
     data: () => ({
       isLoading: false,
