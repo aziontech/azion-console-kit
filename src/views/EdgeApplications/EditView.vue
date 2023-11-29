@@ -8,39 +8,23 @@
         :active-index="0"
         class="w-full"
       >
-        <TabPanel header="Main Settings">
-          <!-- <MainSettingsTab /> -->
-        </TabPanel>
-
+        <TabPanel header="Main Settings"> </TabPanel>
         <TabPanel header="Origins">
-          <OriginsTab
+          <EdgeApplicationsOriginsListView
             :listOriginsService="props.listOriginsService"
             :deleteOriginsService="props.deleteOriginsService"
           />
         </TabPanel>
 
-        <TabPanel header="Device Groups">
-          <!-- <DeviceGroupsTab /> -->
-        </TabPanel>
-
-        <TabPanel header="Error Responses">
-          <!-- <ErrorResponsesTab /> -->
-        </TabPanel>
-
-        <TabPanel header="Cache Settings">
-          <!-- <CacheSettingsTab /> -->
-        </TabPanel>
-
+        <TabPanel header="Device Groups"> </TabPanel>
+        <TabPanel header="Error Responses"> </TabPanel>
+        <TabPanel header="Cache Settings"> </TabPanel>
         <TabPanel
           v-if="activatedFunctions"
           header="Functions"
         >
-          <!-- <EdgeFunctionsTab /> -->
         </TabPanel>
-
-        <TabPanel header="Rules Engine">
-          <!-- <RulesEngineTab /> -->
-        </TabPanel>
+        <TabPanel header="Rules Engine"> </TabPanel>
       </TabView>
     </template>
   </ContentBlock>
@@ -51,9 +35,7 @@
   import TabPanel from 'primevue/tabpanel'
   import ContentBlock from '@/templates/content-block'
   import PageHeadingBlock from '@/templates/page-heading-block'
-
-  // Tabs
-  import OriginsTab from '../EdgeApplicationsOrigins/ListView.vue'
+  import EdgeApplicationsOriginsListView from '../EdgeApplicationsOrigins/ListView.vue'
 
   const activatedFunctions = false
 
