@@ -2,7 +2,7 @@
   <ContentBlock v-if="!isLoading">
     <template #heading>
       <PageHeadingBlock :pageTitle="solution.name" />
-      <div class=" flex flex-col sm:flex-row gap-4 lg:items-center">
+      <div class="flex flex-col sm:flex-row gap-4 lg:items-center">
         <div class="flex flex-col sm:flex-row gap-4 sm:items-center">
           <div class="w-10 h-10 hidden rounded sm:flex justify-center items-center bg-white">
             <img
@@ -55,133 +55,133 @@
         :templateId="uuid"
       />
       <PrimeDialog
-      modal
-      v-model:visible="showDetails"
-      class="w-full max-w-2xl"
-      :pt="{
-        root: { class: 'hidden sm:flex'},
-        mask: { class: 'hidden sm:flex' },
-        content: { class: 'p-5' },
-        header: { class: 'px-5 py-3 items-start' }
-      }"
-      position="center"
-      :dismissableMask="true"
-      :breakpoints="{ '641px': '90vw' }"
-    >
-      <template #header>
-        <div class="w-full flex flex-col gap-2">
-          <div class="flex gap-2 items-center">
-            <div class="w-10 h-10 rounded flex justify-center items-center bg-white">
-              <img
-                class="rounded"
-                :src="solution.vendor.icon"
-                alt=""
-              />
+        modal
+        v-model:visible="showDetails"
+        class="w-full max-w-2xl"
+        :pt="{
+          root: { class: 'hidden sm:flex' },
+          mask: { class: 'hidden sm:flex' },
+          content: { class: 'p-5' },
+          header: { class: 'px-5 py-3 items-start' }
+        }"
+        position="center"
+        :dismissableMask="true"
+        :breakpoints="{ '641px': '90vw' }"
+      >
+        <template #header>
+          <div class="w-full flex flex-col gap-2">
+            <div class="flex gap-2 items-center">
+              <div class="w-10 h-10 rounded flex justify-center items-center bg-white">
+                <img
+                  class="rounded"
+                  :src="solution.vendor.icon"
+                  alt=""
+                />
+              </div>
+              <span class="text-xl font-medium">
+                {{ solution.name }}
+              </span>
             </div>
-            <span class="text-xl font-medium">
-              {{ solution.name }}
-            </span>
-          </div>
-          <div class="flex gap-3">
-            <div class="flex gap-1">
-              <span class="text-xs font-medium text-color-primary">By</span>
-              <span class="text-xs font-medium text-color-secondary">{{
-                solution.vendor.name
-              }}</span>
-            </div>
-            <div class="flex gap-1">
-              <span class="text-xs font-medium text-color-primary">Version</span>
-              <span class="text-xs font-medium text-color-secondary">{{ solution.version }}</span>
-            </div>
-            <div class="flex gap-1">
-              <span class="text-xs font-medium text-color-primary">Last Updated</span>
-              <span class="text-xs font-medium text-color-secondary">{{
-                solution.lastUpdate
-              }}</span>
-            </div>
-          </div>
-        </div>
-      </template>
-      <div class="flex flex-col gap-6 max-w-2xl">
-        <div class="flex flex-col gap-2">
-          <span class="text-lg font-medium"> Overview </span>
-          <div
-            class="bg-transparent"
-            v-html="solution.overview"
-          ></div>
-        </div>
-        <div class="flex flex-col gap-2">
-          <span class="text-lg font-medium"> Usage </span>
-          <div
-            class="bg-transparent"
-            v-html="solution.usage"
-          ></div>
-        </div>
-      </div>
-    </PrimeDialog>
-    <Sidebar
-      v-model:visible="showDetails"
-      position="bottom"
-      headerContent="Create something new"
-      :show-close-icon="true"
-      :pt="{
-        root: { class: 'h-[80%] flex p-0 sm:hidden' },
-        headerContent: { class: 'w-full' },
-        header: { class: 'px-3 py-2 items-start' },
-        mask: { class: 'flex sm:hidden' }
-      }"
-    >
-      <template #header>
-        <div class="w-full flex flex-col gap-2">
-          <div class="flex gap-2 items-center">
-            <div class="w-10 h-10 rounded flex justify-center items-center bg-white">
-              <img
-                class="rounded"
-                :src="solution.vendor.icon"
-                alt=""
-              />
-            </div>
-            <span class="text-xl font-medium">
-              {{ solution.name }}
-            </span>
-          </div>
-          <div class="flex gap-3">
-            <div class="flex gap-1">
-              <span class="text-xs font-medium text-color-primary">By</span>
-              <span class="text-xs font-medium text-color-secondary">{{
-                solution.vendor.name
-              }}</span>
-            </div>
-            <div class="flex gap-1">
-              <span class="text-xs font-medium text-color-primary">Version</span>
-              <span class="text-xs font-medium text-color-secondary">{{ solution.version }}</span>
-            </div>
-            <div class="flex gap-1">
-              <span class="text-xs font-medium text-color-primary">Last Updated</span>
-              <span class="text-xs font-medium text-color-secondary">{{
-                solution.lastUpdate
-              }}</span>
+            <div class="flex gap-3">
+              <div class="flex gap-1">
+                <span class="text-xs font-medium text-color-primary">By</span>
+                <span class="text-xs font-medium text-color-secondary">{{
+                  solution.vendor.name
+                }}</span>
+              </div>
+              <div class="flex gap-1">
+                <span class="text-xs font-medium text-color-primary">Version</span>
+                <span class="text-xs font-medium text-color-secondary">{{ solution.version }}</span>
+              </div>
+              <div class="flex gap-1">
+                <span class="text-xs font-medium text-color-primary">Last Updated</span>
+                <span class="text-xs font-medium text-color-secondary">{{
+                  solution.lastUpdate
+                }}</span>
+              </div>
             </div>
           </div>
+        </template>
+        <div class="flex flex-col gap-6 max-w-2xl">
+          <div class="flex flex-col gap-2">
+            <span class="text-lg font-medium"> Overview </span>
+            <div
+              class="bg-transparent"
+              v-html="solution.overview"
+            ></div>
+          </div>
+          <div class="flex flex-col gap-2">
+            <span class="text-lg font-medium"> Usage </span>
+            <div
+              class="bg-transparent"
+              v-html="solution.usage"
+            ></div>
+          </div>
         </div>
-      </template>
-      <div class="flex flex-col gap-6 w-full">
-        <div class="flex flex-col gap-2">
-          <span class="text-lg font-medium"> Overview </span>
-          <div
-            class="bg-transparent"
-            v-html="solution.overview"
-          ></div>
+      </PrimeDialog>
+      <Sidebar
+        v-model:visible="showDetails"
+        position="bottom"
+        headerContent="Create something new"
+        :show-close-icon="true"
+        :pt="{
+          root: { class: 'h-[80%] flex p-0 sm:hidden' },
+          headerContent: { class: 'w-full' },
+          header: { class: 'px-3 py-2 items-start' },
+          mask: { class: 'flex sm:hidden' }
+        }"
+      >
+        <template #header>
+          <div class="w-full flex flex-col gap-2">
+            <div class="flex gap-2 items-center">
+              <div class="w-10 h-10 rounded flex justify-center items-center bg-white">
+                <img
+                  class="rounded"
+                  :src="solution.vendor.icon"
+                  alt=""
+                />
+              </div>
+              <span class="text-xl font-medium">
+                {{ solution.name }}
+              </span>
+            </div>
+            <div class="flex gap-3">
+              <div class="flex gap-1">
+                <span class="text-xs font-medium text-color-primary">By</span>
+                <span class="text-xs font-medium text-color-secondary">{{
+                  solution.vendor.name
+                }}</span>
+              </div>
+              <div class="flex gap-1">
+                <span class="text-xs font-medium text-color-primary">Version</span>
+                <span class="text-xs font-medium text-color-secondary">{{ solution.version }}</span>
+              </div>
+              <div class="flex gap-1">
+                <span class="text-xs font-medium text-color-primary">Last Updated</span>
+                <span class="text-xs font-medium text-color-secondary">{{
+                  solution.lastUpdate
+                }}</span>
+              </div>
+            </div>
+          </div>
+        </template>
+        <div class="flex flex-col gap-6 w-full">
+          <div class="flex flex-col gap-2">
+            <span class="text-lg font-medium"> Overview </span>
+            <div
+              class="bg-transparent"
+              v-html="solution.overview"
+            ></div>
+          </div>
+          <div class="flex flex-col gap-2">
+            <span class="text-lg font-medium"> Usage </span>
+            <div
+              class="bg-transparent"
+              v-html="solution.usage"
+            ></div>
+          </div>
         </div>
-        <div class="flex flex-col gap-2">
-          <span class="text-lg font-medium"> Usage </span>
-          <div
-            class="bg-transparent"
-            v-html="solution.usage"
-          ></div>
-        </div>
-      </div>
-    </Sidebar>
+      </Sidebar>
     </template>
   </ContentBlock>
 </template>

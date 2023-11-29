@@ -73,7 +73,6 @@
 </template>
 
 <script setup>
-
   import CreateFormBlock from '@/templates/create-form-block-new'
   import FormHorizontal from '@/templates/create-form-block-new/form-horizontal'
   import InputText from 'primevue/inputtext'

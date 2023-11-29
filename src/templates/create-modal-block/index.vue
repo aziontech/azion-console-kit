@@ -17,15 +17,21 @@
 
     <div class="w-full flex flex-col">
       <div v-if="!isLoading">
-        <div class="text-base font-medium mt-5 mb-3" v-if="showResource">
+        <div
+          class="text-base font-medium mt-5 mb-3"
+          v-if="showResource"
+        >
           Choose a resource
         </div>
-        <div class="text-base font-medium mt-5 mb-3" v-else>
+        <div
+          class="text-base font-medium mt-5 mb-3"
+          v-else
+        >
           Choose a template
         </div>
       </div>
 
-      <LoadingListTemplate v-if="isLoading"/>
+      <LoadingListTemplate v-if="isLoading" />
       <div
         class="mx-0 w-full mt-0 grid grid-cols-1 sm:grid-cols-2 gap-4"
         v-if="showRecommended"
@@ -52,7 +58,9 @@
                 <span class="text-color text-sm font-medium">
                   {{ template.name }}
                 </span>
-                <span class="h-10 pb-4 text-sm font-normal text-color-secondary mt-1.5 line-clamp-2">
+                <span
+                  class="h-10 pb-4 text-sm font-normal text-color-secondary mt-1.5 line-clamp-2"
+                >
                   {{ template.headline }}
                 </span>
               </div>
@@ -86,7 +94,9 @@
                 <span class="text-color text-sm font-medium">
                   {{ template.name }}
                 </span>
-                <span class="h-10 pb-4 text-sm font-normal text-color-secondary mt-1.5 line-clamp-2">
+                <span
+                  class="h-10 pb-4 text-sm font-normal text-color-secondary mt-1.5 line-clamp-2"
+                >
                   {{ template.headline }}
                 </span>
               </div>
@@ -111,7 +121,9 @@
                 <span class="text-color text-sm font-medium">
                   {{ resource.label }}
                 </span>
-                <span class="h-10 pb-4 text-sm font-normal text-color-secondary mt-1.5 line-clamp-2">
+                <span
+                  class="h-10 pb-4 text-sm font-normal text-color-secondary mt-1.5 line-clamp-2"
+                >
                   Brief description lorem ipsum dolor sit amet, consectetur adipiscing elit
                 </span>
               </div>

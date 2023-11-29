@@ -97,9 +97,7 @@
         </template>
       </FormHorizontal>
     </div>
-    <Teleport
-      to="#action-bar"
-    >  
+    <Teleport to="#action-bar">
       <ActionBarTemplate
         v-if="!isLoading"
         @submit="validateAndSubmit"
@@ -110,194 +108,192 @@
   </div>
 </template>
 <script setup>
-    import Password from 'primevue/password'
-    import { ref, onBeforeMount, defineEmits, defineProps, defineOptions} from 'vue'
-    import FormHorizontal from '@templates/create-form-block-new/form-horizontal'
-    import ActionBarTemplate from '@templates/action-bar-block'
-    import InputText from 'primevue/inputtext'
-    import { useForm } from 'vee-validate'
-    import * as yup from 'yup'
-    import { useToast } from 'primevue/usetoast'
+  import Password from 'primevue/password'
+  import { ref, onBeforeMount, defineEmits, defineProps, defineOptions } from 'vue'
+  import FormHorizontal from '@templates/create-form-block-new/form-horizontal'
+  import ActionBarTemplate from '@templates/action-bar-block'
+  import InputText from 'primevue/inputtext'
+  import { useForm } from 'vee-validate'
+  import * as yup from 'yup'
+  import { useToast } from 'primevue/usetoast'
 
-    defineOptions({ name: 'templateEngineBlock' })
+  defineOptions({ name: 'templateEngineBlock' })
 
-    const emit = defineEmits(['instantiate'])
+  const emit = defineEmits(['instantiate'])
 
+  const props = defineProps({
+    getTemplateService: {
+      type: Function,
+      required: true
+    },
+    postTemplateService: {
+      type: Function
+    },
+    templateId: {
+      type: String,
+      required: true
+    }
+  })
 
-    const props = defineProps({
-        getTemplateService: {
-          type: Function,
-          required: true
-        },
-        postTemplateService: {
-          type: Function
-        },
-        templateId: {
-          type: String,
-          required: true
+  const toast = useToast()
+  const schema = ref({})
+  const validationSchema = ref()
+  const formTools = ref({})
+  const isLoading = ref(true)
+
+  const loadTemplate = async (id) => {
+    try {
+      const initialData = await props.getTemplateService(id)
+      schemaLoaded(initialData.inputSchema)
+    } catch (error) {
+      toast.add({
+        closable: false,
+        severity: 'error',
+        summary: error,
+        life: 10000
+      })
+    }
+  }
+
+  onBeforeMount(async () => {
+    await loadTemplate(props.templateId)
+  })
+
+  const schemaLoaded = (inputSchema) => {
+    schema.value = inputSchema
+    const auxValidator = {}
+    if (schema.value.fields) {
+      schema.value.fields.forEach((element) => {
+        auxValidator[element.name] = yup.string()
+        if (element.attrs.required) {
+          auxValidator[element.name] = auxValidator[element.name].required(
+            `${element.name} is required`
+          )
+        }
+        if (element.attrs.maxLength) {
+          auxValidator[element.name] = auxValidator[element.name].max(
+            element.attrs.maxLength,
+            `This field cannot exceed ${element.attrs.maxLength} characters`
+          )
+        }
+        if (element.attrs.minLength) {
+          auxValidator[element.name] = auxValidator[element.name].max(
+            element.attrs.minLength,
+            `This field must have at least ${element.attrs.minLength} characters`
+          )
+        }
+        if (element.validators) {
+          element.validators.forEach((validator) => {
+            auxValidator[element.name] = auxValidator[element.name].test(
+              `valid-${element.name}`,
+              validator.errorMessage,
+              function (value) {
+                const domainRegex = new RegExp(validator.regex)
+                return domainRegex.test(value)
+              }
+            )
+          })
         }
       })
-
-      const toast = useToast()
-      const schema = ref({})
-      const validationSchema = ref()
-      const formTools = ref({})
-      const isLoading = ref(true)
-
-      const loadTemplate = async (id) => {
-        try {
-          const initialData = await props.getTemplateService(id)
-          schemaLoaded(initialData.inputSchema)
-        } catch (error) {
-          toast.add({
-            closable: false,
-            severity: 'error',
-            summary: error,
-            life: 10000
-          })
-        }
-      }
-
-      onBeforeMount(async () => {
-        await loadTemplate(props.templateId)
-      })
-
-      const schemaLoaded = (inputSchema) => {
-        schema.value = inputSchema
-        const auxValidator = {}
-        if (schema.value.fields) {
-          schema.value.fields.forEach((element) => {
-            auxValidator[element.name] = yup.string()
-            if (element.attrs.required) {
-              auxValidator[element.name] =
-                auxValidator[element.name].required(`${element.name} is required`)
-            }
-            if (element.attrs.maxLength) {
-              auxValidator[element.name] = auxValidator[element.name].max(
-                element.attrs.maxLength,
-                `This field cannot exceed ${element.attrs.maxLength} characters`
+    }
+    if (schema.value.groups) {
+      schema.value.groups.forEach((group) => {
+        group.fields.forEach((element) => {
+          auxValidator[element.name] = yup.string()
+          if (element.attrs.required) {
+            auxValidator[element.name] = auxValidator[element.name].required(
+              `${element.name} is required`
+            )
+          }
+          if (element.attrs.maxLength) {
+            auxValidator[element.name] = auxValidator[element.name].max(
+              element.attrs.maxLength,
+              `This field cannot exceed ${element.attrs.maxLength} characters`
+            )
+          }
+          if (element.attrs.minLength) {
+            auxValidator[element.name] = auxValidator[element.name].max(
+              element.attrs.minLength,
+              `This field must have at least ${element.attrs.minLength} characters`
+            )
+          }
+          if (element.validators) {
+            element.validators.forEach((validator) => {
+              auxValidator[element.name] = auxValidator[element.name].test(
+                `valid-${element.name}`,
+                validator.errorMessage,
+                function (value) {
+                  const domainRegex = new RegExp(validator.regex)
+                  return domainRegex.test(value)
+                }
               )
-            }
-            if (element.attrs.minLength) {
-              auxValidator[element.name] = auxValidator[element.name].max(
-                element.attrs.minLength,
-                `This field must have at least ${element.attrs.minLength} characters`
-              )
-            }
-            if (element.validators) {
-              element.validators.forEach((validator) => {
-                auxValidator[element.name] = auxValidator[element.name].test(
-                  `valid-${element.name}`,
-                  validator.errorMessage,
-                  function (value) {
-                    const domainRegex = new RegExp(validator.regex)
-                    return domainRegex.test(value)
-                  }
-                )
-              })
-            }
-          })
-        }
-        if (schema.value.groups) {
-          schema.value.groups.forEach((group) => {
-            group.fields.forEach((element) => {
-              auxValidator[element.name] = yup.string()
-              if (element.attrs.required) {
-                auxValidator[element.name] =
-                  auxValidator[element.name].required(`${element.name} is required`)
-              }
-              if (element.attrs.maxLength) {
-                auxValidator[element.name] = auxValidator[element.name].max(
-                  element.attrs.maxLength,
-                  `This field cannot exceed ${element.attrs.maxLength} characters`
-                )
-              }
-              if (element.attrs.minLength) {
-                auxValidator[element.name] = auxValidator[element.name].max(
-                  element.attrs.minLength,
-                  `This field must have at least ${element.attrs.minLength} characters`
-                )
-              }
-              if (element.validators) {
-                element.validators.forEach((validator) => {
-                  auxValidator[element.name] = auxValidator[element.name].test(
-                    `valid-${element.name}`,
-                    validator.errorMessage,
-                    function (value) {
-                      const domainRegex = new RegExp(validator.regex)
-                      return domainRegex.test(value)
-                    }
-                  )
-                })
-              }
             })
-          })
-        }
-        validationSchema.value = yup.object(auxValidator)
-
-        formTools.value = { errors, meta, resetForm, values }
-        if (schema.value.fields) {
-          schema.value.fields.forEach((element) => {
-            element.value = defineInputBinds(element.name, { validateOnInput: true })
-          })
-        }
-        if (schema.value.groups) {
-          schema.value.groups.forEach((group) => {
-            group.fields.forEach((element) => {
-              element.value = defineInputBinds(element.name, { validateOnInput: true })
-            })
-          })
-        }
-        isLoading.value = false
-      }
-
-      const { errors, meta, defineInputBinds, resetForm, values, setFieldValue } = useForm({
-          validationSchema
+          }
         })
+      })
+    }
+    validationSchema.value = yup.object(auxValidator)
 
-      const inputPassword = (inputName, text) => {
-        setFieldValue(inputName, text)
+    formTools.value = { errors, meta, resetForm, values }
+    if (schema.value.fields) {
+      schema.value.fields.forEach((element) => {
+        element.value = defineInputBinds(element.name, { validateOnInput: true })
+      })
+    }
+    if (schema.value.groups) {
+      schema.value.groups.forEach((group) => {
+        group.fields.forEach((element) => {
+          element.value = defineInputBinds(element.name, { validateOnInput: true })
+        })
+      })
+    }
+    isLoading.value = false
+  }
+
+  const { errors, meta, defineInputBinds, resetForm, values, setFieldValue } = useForm({
+    validationSchema
+  })
+
+  const inputPassword = (inputName, text) => {
+    setFieldValue(inputName, text)
+  }
+
+  const validateAndSubmit = async () => {
+    try {
+      const payload = []
+      if (schema.value.fields) {
+        payload.push(...schema.value.fields)
       }
-      
-      const validateAndSubmit = async () => {
-        try {
-          const payload = []
-          if (schema.value.fields) {
-            payload.push(...schema.value.fields)
-          }
-          if (schema.value.groups) {
-            schema.value.groups.forEach((group) => {
-              payload.push(...group.fields)
-            })
-          }
-          payload.forEach((_, index) => {
-            payload[index] = JSON.parse(JSON.stringify(payload[index]))
-            const val = payload[index].value.value
-            payload[index].field = payload[index].name
-            delete payload[index].name
-            delete payload[index].value
-            delete payload[index].hidden
-            delete payload[index].type
-            delete payload[index].label
-            delete payload[index].info
-            delete payload[index].description
-            delete payload[index].placeholder
-            delete payload[index].validators
-            delete payload[index].attrs
-            payload[index].value = val
-          })
-          const response = await props.postTemplateService(props.templateId, payload)
-          emit('instantiate', response)
-          
-        } catch (error) {
-          toast.add({
-            closable: false,
-            severity: 'error',
-            summary: error,
-            life: 10000
-          })
-        }
+      if (schema.value.groups) {
+        schema.value.groups.forEach((group) => {
+          payload.push(...group.fields)
+        })
       }
-    
-  
+      payload.forEach((_, index) => {
+        payload[index] = JSON.parse(JSON.stringify(payload[index]))
+        const val = payload[index].value.value
+        payload[index].field = payload[index].name
+        delete payload[index].name
+        delete payload[index].value
+        delete payload[index].hidden
+        delete payload[index].type
+        delete payload[index].label
+        delete payload[index].info
+        delete payload[index].description
+        delete payload[index].placeholder
+        delete payload[index].validators
+        delete payload[index].attrs
+        payload[index].value = val
+      })
+      const response = await props.postTemplateService(props.templateId, payload)
+      emit('instantiate', response)
+    } catch (error) {
+      toast.add({
+        closable: false,
+        severity: 'error',
+        summary: error,
+        life: 10000
+      })
+    }
+  }
 </script>
