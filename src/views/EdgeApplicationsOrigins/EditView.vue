@@ -8,7 +8,7 @@
         :editService="editOriginWithEdgeApplicationIdDecorator"
         :loadService="loadOrigin"
         :schema="validationSchema"
-        :updatedRedirect="''"
+        :updatedRedirect="updatedRedirect"
       >
         <template #form>
           <FormFieldsEditEdgeApplicationsOrigins />
@@ -45,6 +45,10 @@
     },
     loadOriginService: {
       type: Function,
+      required: true
+    },
+    updatedRedirect: {
+      type: String,
       required: true
     }
   })

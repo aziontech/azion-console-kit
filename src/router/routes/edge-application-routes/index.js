@@ -98,7 +98,8 @@ export const edgeApplicationRoutes = {
           component: () => import('@views/EdgeApplicationsOrigins/EditView.vue'),
           props: {
             editOriginService: OriginsService.editOriginService,
-            loadOriginService: OriginsService.loadOriginService
+            loadOriginService: OriginsService.loadOriginService,
+            updatedRedirect: 'list-edge-applications'
           },
           meta: {
             breadCrumbs: [
