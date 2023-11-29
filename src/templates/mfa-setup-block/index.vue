@@ -1,5 +1,8 @@
 <template>
-  <form @submit.prevent="authorizeDevice()" class="max-sm:min-h-[calc(100vh-120px)]">
+  <form
+    @submit.prevent="authorizeDevice()"
+    class="max-sm:min-h-[calc(100vh-120px)]"
+  >
     <div
       class="flex flex-col align-top items-center py-6 px-3 md:py-20 animate-fadeIn"
       @paste="handlePaste"
