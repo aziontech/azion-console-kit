@@ -21,7 +21,7 @@
                 link
                 label="Google Authenticator"
                 class="p-0"
-                @click="openGoogleAuthenticatorAppDocumentation"
+                @click="props.openGoogleAuthenticatorAppDocumentation"
               ></PrimeButton>
               on your device.
             </li>
@@ -89,7 +89,6 @@
   import InputText from 'primevue/inputtext'
   import InlineMessage from 'primevue/inlinemessage'
   import Skeleton from 'primevue/skeleton'
-
   import QrcodeVue from 'qrcode.vue'
 
   import { ref, onMounted } from 'vue'
@@ -105,6 +104,10 @@
       type: Function
     },
     verifyAuthenticationService: {
+      required: true,
+      type: Function
+    },
+    openGoogleAuthenticatorAppDocumentation: {
       required: true,
       type: Function
     },
@@ -200,9 +203,5 @@
     } finally {
       isButtonLoading.value = false
     }
-  }
-
-  const openGoogleAuthenticatorAppDocumentation = () => {
-    window.open('https://support.google.com/accounts/answer/1066447')
   }
 </script>
