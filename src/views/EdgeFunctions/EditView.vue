@@ -1,7 +1,15 @@
 <template>
   <ContentBlock>
     <template #heading>
-      <PageHeadingBlock pageTitle="Edit Edge Function" />
+      <PageHeadingBlock pageTitle="Edit Edge Function">
+        <PrimeButton
+          label="Preview"
+          severity="primary"
+          outlined
+          class="flex md:hidden"
+          @click="showMobilePreview = true"
+        />
+      </PageHeadingBlock>
     </template>
     <template #content>
       <EditFormBlock
@@ -91,14 +99,14 @@
 
             <TabPanel header="Code">
               <Splitter
-                :style="{ height: getSplitterHeight }"
-                class="mt-8 surface-border border rounded-md"
+                :style="{ height: SPLITTER_PROPS.height }"
+                class="mt-8 surface-border border rounded-md hidden md:flex"
                 @resizestart="showPreview = false"
                 @resizeend="showPreview = true"
-                :layout="getSplitterLayout"
+                :layout="SPLITTER_PROPS.layout"
               >
                 <SplitterPanel
-                  :size="getSplitterPanelSize[0]"
+                  :size="SPLITTER_PROPS.panelsSizes[0]"
                   class="flex flex-col h-full gap-2"
                 >
                   <CodeEditor
@@ -115,24 +123,41 @@
                   </small>
                 </SplitterPanel>
 
-                <SplitterPanel :size="getSplitterPanelSize[1]">
+                <SplitterPanel :size="SPLITTER_PROPS.panelsSizes[1]">
                   <CodePreview
                     v-if="showPreview"
                     :updateObject="updateObject"
                   />
                 </SplitterPanel>
               </Splitter>
+
+              <div
+                class="flex flex-col mt-8 surface-border border rounded-md gap-2 md:hidden h-[50vh]"
+              >
+                <CodeEditor
+                  v-model="code"
+                  :initialValue="initialCodeValue"
+                  language="javascript"
+                  :errors="!!errors.code"
+                />
+                <small
+                  v-if="errors.code"
+                  class="p-error text-xs font-normal"
+                >
+                  {{ errors.code }}
+                </small>
+              </div>
             </TabPanel>
 
             <TabPanel header="Arguments">
               <Splitter
-                :style="{ height: getSplitterHeight }"
-                class="mt-8 surface-border border rounded-md"
+                :style="{ height: SPLITTER_PROPS.height }"
+                class="mt-8 surface-border border rounded-md hidden md:flex"
                 @resizestart="showPreview = false"
                 @resizeend="showPreview = true"
-                :layout="getSplitterLayout"
+                :layout="SPLITTER_PROPS.layout"
               >
-                <SplitterPanel :size="getSplitterPanelSize[0]">
+                <SplitterPanel :size="SPLITTER_PROPS.panelsSizes[0]">
                   <CodeEditor
                     v-model="jsonArgs"
                     :initialValue="initialJsonArgsValue"
@@ -141,17 +166,50 @@
                   />
                 </SplitterPanel>
 
-                <SplitterPanel :size="getSplitterPanelSize[1]">
+                <SplitterPanel :size="SPLITTER_PROPS.panelsSizes[1]">
                   <CodePreview
                     v-if="showPreview"
                     :updateObject="updateObject"
                   />
                 </SplitterPanel>
               </Splitter>
+              <div class="flex flex-col mt-8 surface-border border rounded-md md:hidden h-[50vh]">
+                <CodeEditor
+                  v-model="jsonArgs"
+                  :initialValue="initialJsonArgsValue"
+                  language="json"
+                  :errors="!!errors.jsonArgs"
+                />
+              </div>
             </TabPanel>
           </TabView>
         </template>
       </EditFormBlock>
+      <Sidebar
+        :visible="showMobilePreview"
+        position="bottom"
+        :show-close-icon="false"
+        :pt="{
+          root: { class: '!h-[90%] md:hidden' },
+          mask: { class: 'md:hidden' }
+        }"
+      >
+        <template #header>
+          <div class="flex w-full items-center justify-between">
+            <h2>Preview</h2>
+            <PrimeButton
+              icon="pi pi-times"
+              size="small"
+              class="flex-none surface-border text-sm w-8 h-8"
+              text
+              @click="showMobilePreview = false"
+            />
+          </div>
+        </template>
+        <div class="h-full w-full">
+          <CodePreview :updateObject="updateObject" />
+        </div>
+      </Sidebar>
     </template>
   </ContentBlock>
 </template>
@@ -160,9 +218,10 @@
   import { computed, ref, watch } from 'vue'
   import { useForm, useField } from 'vee-validate'
   import * as yup from 'yup'
-  import { useWindowSize } from '@/helpers'
   import InputText from 'primevue/inputtext'
   import InputSwitch from 'primevue/inputswitch'
+  import PrimeButton from 'primevue/button'
+  import Sidebar from 'primevue/sidebar'
   import Splitter from 'primevue/splitter'
   import SplitterPanel from 'primevue/splitterpanel'
   import TabView from 'primevue/tabview'
@@ -189,22 +248,14 @@
     }
   })
 
-  const TAILWIND_MD_BREAKPOINT = 768
-  const { width } = useWindowSize()
-
-  const getSplitterLayout = computed(() => {
-    return width.value > TAILWIND_MD_BREAKPOINT ? 'horizontal' : 'vertical'
-  })
-
-  const getSplitterHeight = computed(() => {
-    return width.value > TAILWIND_MD_BREAKPOINT ? '50vh' : '800px'
-  })
-
-  const getSplitterPanelSize = computed(() => {
-    return width.value > TAILWIND_MD_BREAKPOINT ? [66, 34] : [50, 50]
-  })
+  const SPLITTER_PROPS = {
+    height: '50vh',
+    layout: 'horizontal',
+    panelsSizes: [66, 34]
+  }
 
   const showPreview = ref(true)
+  const showMobilePreview = ref(false)
 
   const ARGS_INITIAL_STATE = '{}'
 
