@@ -5,7 +5,7 @@
       :model="generateBreadCrumbs"
       class="-ml-1.5 overflow-auto w-full"
     />
-    <div class="flex flex-wrap w-full py-4 items-end justify-between">
+    <div class="flex w-full py-4 items-center justify-between">
       <div
         class="flex flex-col gap-3 max-md:w-full"
         v-if="pageTitle || description"
