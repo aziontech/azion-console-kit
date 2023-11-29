@@ -6,10 +6,10 @@ export const useCreateModalStore = defineStore({
     isOpen: false
   }),
   actions: {
-    toggleCreate() {
+    toggle() {
       this.isOpen = !this.isOpen
     },
-    closeCreate() {
+    close() {
       this.isOpen = false
     }
   }

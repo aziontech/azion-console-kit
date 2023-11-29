@@ -1,32 +1,45 @@
 <template>
-  <ContentBlock>
-    <template #heading>
-      <PageHeadingBlock pageTitle="Create"/>
-    </template>
-    <template #content>
-      <TemplateEngineBlock  :getTemplateService="getTemplate" :postTemplateService="instantiateTemplate" :templateId="uuid" />
-    </template>
-  </ContentBlock>
+  <div class="p-20 flex flex-col gap-6">
+    <div class="flex flex-col sm:max-w-lg w-full gap-2">
+        <label
+          for="customHeaders"
+          class="text-color text-base font-medium"
+          >Custom Headers</label
+        >
+        <div class="p-inputgroup">
+          <InputText
+            id="header-value"
+            placeholder="Value"
+          />
+          <PrimeButton
+            icon="pi pi-trash"
+            outlined
+          />
+        </div>
+    </div>
+    <Divider/>
+    <div class="flex flex-col sm:max-w-lg w-full gap-2">
+        <label
+          for="customHeaders"
+          class="text-color text-base font-medium"
+          >Custom Headers</label
+        >
+        <div class="p-inputgroup">
+          <InputText
+            id="header-value"
+            placeholder="Value"
+          />
+          <PrimeButton
+            icon="pi pi-trash"
+            outlined
+          />
+        </div>
+    </div>
+  </div>
 </template>
-  <script>
-    import TemplateEngineBlock from '@/templates/template-engine-block'
-    import ContentBlock from '@/templates/content-block'
-    import PageHeadingBlock from '@/templates/page-heading-block'
-    import {getTemplate, instantiateTemplate} from '@/services/template-engine-services'
-    export default {
-      name: 'CreateNew',
-      components: {
-        TemplateEngineBlock,
-        ContentBlock,
-        PageHeadingBlock
-      },
-      async created() {
-        //
-      },
-      data: () => ({
-        uuid: 'xx',
-        getTemplate,
-        instantiateTemplate
-      }),
-    }
-  </script>
+
+<script setup>
+  import Divider from 'primevue/divider';
+  import PrimeButton from 'primevue/button';
+  import InputText from 'primevue/inputtext';
+</script>
