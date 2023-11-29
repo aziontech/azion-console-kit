@@ -38,14 +38,12 @@
   import { ref, onMounted } from 'vue'
 
   import EditFormBlock from '@/templates/edit-form-block'
-  import FormFieldsCreate from './FormFields/FormFieldsCreate.vue'
+  import FormFieldsCreate from './FormFields/FormFieldsDomains.vue'
   import ContentBlock from '@/templates/content-block'
   import PageHeadingBlock from '@/templates/page-heading-block'
   import ActionBarTemplate from '@/templates/action-bar-block/action-bar-with-teleport'
   import * as yup from 'yup'
   import { useToast } from 'primevue/usetoast'
-
-  
 
   const props = defineProps({
     editDomainService: {
@@ -137,5 +135,4 @@
       then: (schema) => schema.required()
     })
   })
-
 </script>

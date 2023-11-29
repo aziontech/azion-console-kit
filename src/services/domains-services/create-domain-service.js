@@ -24,7 +24,7 @@ const adapt = (payload) => {
     mtls_trusted_ca_certificate_id: payload.mtlsTrustedCertificate
   }
 
-  if(payload.edgeCertificate !== 0) {
+  if (payload.edgeCertificate !== 0) {
     dataRequest.digital_certificate_id = payload.edgeCertificate
   }
 
