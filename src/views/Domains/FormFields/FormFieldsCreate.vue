@@ -36,7 +36,7 @@
   })
 
   const edgeCertificate = ref(0)
-  const { value: name,  errorMessage: errorName } = useField('name')
+  const { value: name, errorMessage: errorName } = useField('name')
   const { value: cnames, errorMessage: errorCnames } = useField('cnames')
   const { value: cnameAccessOnly, errorMessage: errorCnameAccessOnly } = useField('cnameAccessOnly')
   const { value: edgeApplication, errorMessage: errorEdgeApplication } = useField('edgeApplication')
@@ -44,7 +44,8 @@
   const { value: mtlsIsEnabled, errorMessage: errorMtlsIsEnabled } = useField('mtlsIsEnabled')
   const { value: active } = useField('active')
   const { value: mtlsVerification } = useField('mtlsVerification')
-  const { value: mtlsTrustedCertificate, errorMessage: errorMtlsTrustedCertificate } = useField('mtlsTrustedCertificate')
+  const { value: mtlsTrustedCertificate, errorMessage: errorMtlsTrustedCertificate } =
+    useField('mtlsTrustedCertificate')
 
   const CNAMELabel = computed(() => {
     return cnameAccessOnly ? 'CNAME *' : 'CNAME'
@@ -95,7 +96,6 @@
     title="General"
     description="Create a domain with Azion to launch an edge application and set up security with digital certificates."
   >
-  
     <template #inputs>
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
         <label

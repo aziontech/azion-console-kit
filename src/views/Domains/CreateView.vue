@@ -40,7 +40,7 @@
   import ActionBarTemplate from '@/templates/action-bar-block/action-bar-with-teleport'
 
   import * as yup from 'yup'
- 
+
   const MTLS_VERIFICATION_ENFORCE = 'enforce'
   const MTLS_VERIFICATION_PERMISSIVE = 'permissive'
 
@@ -115,13 +115,13 @@
         })
       })
 
-      const initialValues =  {
-          cnames: '',
-          cnameAccessOnly: true,
-          edgeApplication: null,
-          mtlsIsEnabled: false,
-          active: true,
-          mtlsVerification: MTLS_VERIFICATION_ENFORCE
+      const initialValues = {
+        cnames: '',
+        cnameAccessOnly: true,
+        edgeApplication: null,
+        mtlsIsEnabled: false,
+        active: true,
+        mtlsVerification: MTLS_VERIFICATION_ENFORCE
       }
 
       return {
