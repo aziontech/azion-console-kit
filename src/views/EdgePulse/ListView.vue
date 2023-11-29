@@ -34,7 +34,7 @@
   import PageHeadingBlock from '@/templates/page-heading-block'
   import FormFieldsDefault from './FormFields/FormFieldsDefault.vue'
   import FormFieldsTag from './FormFields/FormFieldsTag.vue'
-  
+
   const toast = useToast()
 
   const showToast = () => {
