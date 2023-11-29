@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia'
 
-export const useHelpCenterStore = defineStore({
-  id: 'helpCenter',
+export const useCreateModalStore = defineStore({
+  id: 'createModal',
   state: () => ({
     isOpen: false
   }),

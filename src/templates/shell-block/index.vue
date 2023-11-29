@@ -21,7 +21,6 @@
   import MainMenuBlock from '@/templates/main-menu-block'
   import FooterBlock from '@/templates/footer-block'
   import HelpBlock from '@/templates/help-center-block'
-  import { mapState } from 'pinia'
   import { useHelpCenterStore } from '@/stores/help-center'
   import { listTypeAccountService } from '@/services/switch-account-services/list-type-account-service'
   import { switchAccountService } from '@/services/auth-services/switch-account-service'
@@ -43,17 +42,21 @@
       ToastBlock
     },
     computed: {
-      ...mapState(useHelpCenterStore, { showHelp: 'isOpen' }),
       customClass() {
-        return this.showHelp ? 'active' : ''
+        return this.helpCenterStore.isOpen ? 'active' : ''
       },
       customClassHelper() {
-        return this.showHelp ? 'active-helper' : ''
+        return this.helpCenterStore.isOpen ? 'active-helper' : ''
       },
 
       styleHelper() {
         return '[&>.active-helper]:block transform [&>.active-helper]:md:translate-x-0'
       }
+    },
+    setup() {
+      const helpCenterStore = useHelpCenterStore()
+
+      return { helpCenterStore }
     }
   }
 </script>
