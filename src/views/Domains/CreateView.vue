@@ -7,7 +7,6 @@
       <CreateFormBlock
         :createService="createDomainService"
         :cleanFormCallback="resetForm"
-        @on-response="handleResponse"
         :schema="validationSchema"
         :initialValues="initialValues"
       >
