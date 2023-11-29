@@ -11,7 +11,7 @@
         :schema="validationSchema"
       >
         <template #form>
-         <FormFieldsRecords></FormFieldsRecords>
+          <FormFieldsRecords></FormFieldsRecords>
         </template>
         <template #action-bar="{ onSubmit, formValid, onCancel, loading }">
           <ActionBarTemplate
@@ -49,7 +49,6 @@
   })
 
   const route = useRoute()
-
 
   const validationSchema = yup.object({
     name: yup.string().required(),

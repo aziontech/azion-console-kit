@@ -132,8 +132,6 @@
         isActive: yup.boolean().required()
       })
 
-
-
       const intelligentDNSStore = useIntelligentDNSStore()
 
       return {

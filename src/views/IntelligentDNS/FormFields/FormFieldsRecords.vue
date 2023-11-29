@@ -17,7 +17,6 @@
   const { value: weight, errorMessage: errorWeight } = useField('weight')
   const { value: description, errorMessage: errorDescription } = useField('description')
 
-
   const intelligentDNSStore = useIntelligentDNSStore()
 
   const policyList = ref([
@@ -42,7 +41,6 @@
   const isWeightedPolicy = computed(() => {
     return selectedPolicy.value === 'weighted'
   })
-
 </script>
 
 <template>

@@ -101,11 +101,11 @@
 </script>
 
 <template>
-  <div class="flex flex-col min-h-[calc(100vh-300px)]" >
+  <div class="flex flex-col min-h-[calc(100vh-300px)]">
     <form
       @submit.prevent="handleSubmit"
       class="w-full grow flex flex-col gap-8 max-md:gap-6"
-      :class="{'mt-4': isTabs}"
+      :class="{ 'mt-4': isTabs }"
     >
       <slot name="form" />
 

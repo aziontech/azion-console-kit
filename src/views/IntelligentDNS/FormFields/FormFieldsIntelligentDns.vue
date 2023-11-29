@@ -7,7 +7,6 @@
   const { value: name, errorMessage: errorName } = useField('name')
   const { value: domain, errorMessage: errorDomain } = useField('domain')
   const { value: isActive } = useField('isActive')
-
 </script>
 
 <template>
@@ -68,9 +67,7 @@
     <template #inputs>
       <div class="flex gap-3 items-center">
         <label for="">Active</label>
-        <InputSwitch
-          v-model="isActive"
-        />
+        <InputSwitch v-model="isActive" />
       </div>
     </template>
   </FormHorizontal>

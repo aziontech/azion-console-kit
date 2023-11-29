@@ -48,7 +48,6 @@
   import { useToast } from 'primevue/usetoast'
   import ActionBarTemplate from '@/templates/action-bar-block/action-bar-with-teleport'
 
-
   const props = defineProps({
     createIntelligentDNSService: {
       type: Function,
