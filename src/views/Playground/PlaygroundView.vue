@@ -9,7 +9,7 @@
   </ContentBlock>
 </template>
   <script>
-    import TemplateEngineBlock from '@/templates/template-engine-new-block'
+    import TemplateEngineBlock from '@/templates/template-engine-block'
     import ContentBlock from '@/templates/content-block'
     import PageHeadingBlock from '@/templates/page-heading-block'
     import {getTemplate, instantiateTemplate} from '@/services/template-engine-services'
