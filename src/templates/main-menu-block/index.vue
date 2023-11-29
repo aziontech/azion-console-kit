@@ -490,6 +490,7 @@
   </PrimeDialog>
 
   <!-- Mobile modal Create -->
+  <Sidebar
     v-model:visible="createModalStore.isOpen"
     position="bottom"
     headerContent="Create something new"
