@@ -13,10 +13,14 @@ export const getTemplate = async (templateId) => {
 const adapt = (httpResponse) => {
   return {
     body: {
-import { parseSnakeToCamel } from '@/helpers'
-[...]
-
-body: parseSnakeToCamel(httpResponse.body)   
+      createdAt: httpResponse.body.created_at,
+      inputSchema: httpResponse.body.input_schema,
+      instantiationData: httpResponse.body.instantiation_data,
+      isActive: httpResponse.body.is_active,
+      name: httpResponse.body.name,
+      templateType: httpResponse.body.template_type,
+      updatedAt: httpResponse.body.updated_at,
+      uuid: httpResponse.body.uuid
     },
     statusCode: httpResponse.statusCode
   }

@@ -4,7 +4,7 @@
       <PageHeadingBlock pageTitle="Create"/>
     </template>
     <template #content>
-      <TemplateEngineBlock  @instantiate="handleInstantiate" :getTemplateService="getTemplate" :postTemplateService="instantiateTemplate" :templateId="uuid" />
+      <TemplateEngineBlock  :getTemplateService="getTemplate" :postTemplateService="instantiateTemplate" :templateId="uuid" />
     </template>
   </ContentBlock>
 </template>
@@ -23,13 +23,8 @@
       async created() {
         //
       },
-      methods: {
-        handleInstantiate(element) {
-          console.log(element)
-        }
-      },
       data: () => ({
-        uuid: '9cd54b7d-666a-4e45-8097-47ae1fb70014',
+        uuid: 'xx',
         getTemplate,
         instantiateTemplate
       }),
