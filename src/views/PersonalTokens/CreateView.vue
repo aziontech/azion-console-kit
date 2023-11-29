@@ -202,6 +202,10 @@
     createPersonalTokenService: {
       type: Function,
       required: true
+    },
+    clipboardWrite: {
+      type: Function,
+      required: true
     }
   })
 
@@ -332,7 +336,7 @@
     }
 
     try {
-      await navigator.clipboard.writeText(personalTokenKey.value)
+      props.clipboardWrite(personalTokenKey.value)
       toast.add({ ...toastConfig })
     } catch {
       toast.add({
