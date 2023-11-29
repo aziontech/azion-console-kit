@@ -8,7 +8,7 @@
       type: Array,
       required: true,
       default: () => []
-    },
+    }
   })
 
   const { value: name, errorMessage: errorName } = useField('name')
