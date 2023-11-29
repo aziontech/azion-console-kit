@@ -2,7 +2,7 @@
   import DialogUnsavedBlock from '@/templates/dialog-unsaved-block'
   import { useForm, useIsFormDirty } from 'vee-validate'
   import { computed, ref } from 'vue'
-  import { useRouter } from 'vue-router'
+  import { useRouter} from 'vue-router'
   import { useToast } from 'primevue/usetoast'
 
   defineOptions({ name: 'create-form-block' })
@@ -31,7 +31,11 @@
     cleanForm: {
       type: Boolean,
       default: true
-    }
+    },
+    goBack: {
+      type: Boolean,
+      required: true
+    },
   })
 
   const emit = defineEmits(['on-response'])
@@ -44,6 +48,8 @@
     const isDirty = useIsFormDirty()
     return blockViewRedirection.value && isDirty.value
   })
+
+
 
   const { meta, errors, handleSubmit, isSubmitting } = useForm({
     validationSchema: props.schema,
@@ -84,6 +90,7 @@
     try {
       const response = await props.createService(values)
       handleSuccess(response)
+      if (props.goBack) onCancel()
       if (props.cleanForm) actions.resetForm()
       blockViewRedirection.value = false
     } catch (error) {

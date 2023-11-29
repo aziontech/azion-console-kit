@@ -20,10 +20,10 @@ const adapt = (httpResponse, recordId) => {
   const parsedRecord = {
     id: record.record_id,
     name: record.entry,
-    recordType: record.record_type,
+    selectedRecordType: record.record_type,
     value: record.answers_list.join(','),
     ttl: record.ttl,
-    policy: record.policy,
+    selectedPolicy: record.policy,
     weight: record.weight,
     description: record.description
   }
