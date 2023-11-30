@@ -138,7 +138,7 @@
         <PrimeButton
           icon="pi pi-question-circle"
           size="small"
-          class="md:hidden !text-white border-header"
+          class="md:hidden text-white border-header"
           style="height: 32px; width: 32px"
           @click="helpCenterStore.toggle()"
           :pt="{
