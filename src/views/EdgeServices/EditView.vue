@@ -2,15 +2,18 @@
   import PageHeadingBlock from '@/templates/page-heading-block'
   import TabView from 'primevue/tabview'
   import TabPanel from 'primevue/tabpanel'
-  import FormEditEdgeService from './form/FormEditEdgeService.vue'
+  import FormEditEdgeService from './FormFields/FormEditEdgeService.vue'
   import ContentBlock from '@/templates/content-block'
   import { useRoute, useRouter } from 'vue-router'
   import { ref } from 'vue'
-  import ListViewResources from './ListViewResources.vue'
+  import ListViewResources from './FormFields/ListViewResources.vue'
 
   const props = defineProps({
     loadEdgeService: { type: Function, required: true },
     editEdgeService: { type: Function, required: true },
+    deleteResourcesServices: { type: Function, required: true },
+    listResourcesServices: { type: Function, required: true },
+    documentationServiceResource: { type: Function, required: true },
     updatedRedirect: { type: String, required: true }
   })
 
@@ -38,6 +41,13 @@
   }
 
   renderTabCurrentRouter()
+
+  const editEdgeServiceServicesWithDecorator = async (payload) => {
+    return await props.editEdgeService({
+      ...payload,
+      edgeServiceID: route.params.id
+    })
+  }
 </script>
 
 <template>
@@ -49,21 +59,26 @@
       <TabView
         :activeIndex="activeTab"
         @tab-click="changeRouteByClickingOnTab"
-        class="w-full"
+        class="w-full h-full"
       >
         <TabPanel header="Main Settings">
           <FormEditEdgeService
             :loadService="props.loadEdgeService"
-            :editService="props.editEdgeService"
+            :editService="editEdgeServiceServicesWithDecorator"
             :updatedRedirect="props.updatedRedirect"
             :showActionBar="!activeTab"
           />
         </TabPanel>
         <TabPanel header="Resources">
-          <ListViewResources />
+          <ListViewResources
+            v-if="activeTab"
+            :idEdgeService="route.params.id"
+            :listResourcesServices="props.listResourcesServices"
+            :deleteResourcesServices="props.deleteResourcesServices"
+            :documentationServiceResource="props.documentationServiceResource"
+          />
         </TabPanel>
       </TabView>
-      <router-view></router-view>
     </template>
   </ContentBlock>
 </template>

@@ -161,7 +161,7 @@
     status: yup.boolean()
   })
 
-  const { setValues, errors, meta, resetForm, values } = useForm({
+  const { setValues, errors, meta, values } = useForm({
     validationSchema,
     initialValues: {
       status: true

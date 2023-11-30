@@ -1,3 +1,37 @@
+<script setup>
+  import CreateFormBlock from '@/templates/create-form-block'
+  import ActionBarTemplate from '@/templates/action-bar-block/action-bar-with-teleport'
+  import ContentBlock from '@/templates/content-block'
+  import PageHeadingBlock from '@/templates/page-heading-block'
+  import FormCreateEdgeService from './FormFields/FormFieldsEdgeService.vue'
+  import * as yup from 'yup'
+
+  const props = defineProps({
+    createEdgeServiceServices: {
+      type: Function,
+      required: true
+    }
+  })
+
+  const validateCode = (val = '') => {
+    const split = val.split(/\s*\n+\s*/).filter((row) => !!row)
+    const isValid = split.every((row) => /^\w+\s*=[^]+$/.test(row))
+    return isValid
+  }
+
+  const validationSchema = yup.object({
+    name: yup.string().required(),
+    active: yup.boolean(),
+    code: yup.string().test('formatInvalid', 'The format is invalid', validateCode)
+  })
+
+  const initialValues = {
+    name: '',
+    code: '',
+    active: false
+  }
+</script>
+
 <template>
   <ContentBlock>
     <template #heading>
@@ -5,7 +39,7 @@
     </template>
     <template #content>
       <CreateFormBlock
-        :createService="props.createEdgeService"
+        :createService="props.createEdgeServiceServices"
         :schema="validationSchema"
         :initialValues="initialValues"
       >
@@ -24,32 +58,3 @@
     </template>
   </ContentBlock>
 </template>
-
-<script setup>
-  import CreateFormBlock from '@/templates/create-form-block'
-  import ActionBarTemplate from '@/templates/action-bar-block/action-bar-with-teleport'
-  import ContentBlock from '@/templates/content-block'
-  import PageHeadingBlock from '@/templates/page-heading-block'
-  import FormCreateEdgeService from './form/FormCreateEdgeService.vue'
-  import * as yup from 'yup'
-  import edgeServiceHelloWorld from '@/helpers/edge-service-hello-world'
-
-  const props = defineProps({
-    createEdgeService: {
-      type: Function,
-      required: true
-    }
-  })
-
-  const validationSchema = yup.object({
-    name: yup.string().required(),
-    code: yup.string().required(),
-    active: yup.boolean().required()
-  })
-
-  const initialValues = {
-    name: '',
-    code: edgeServiceHelloWorld,
-    active: false
-  }
-</script>

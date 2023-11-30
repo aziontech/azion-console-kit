@@ -1,5 +1,5 @@
 import { AxiosHttpClientAdapter } from '@/services/axios/AxiosHttpClientAdapter'
-import { listEdgeServicesService } from '@/services/edge-services-service'
+import { listResourcesServices } from '@/services/edge-service-resources-services'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 const localeMock = (locale = 'en') => {
@@ -10,31 +10,35 @@ const localeMock = (locale = 'en') => {
 }
 
 const fixtures = {
-  edgeServiceMock: {
-    id: 1239875,
-    name: 'Edge Service A',
-    active: true,
-    last_editor: 'az editor',
-    updated_at: new Date(2023, 10, 10)
-  },
-  disabledEdgeServiceMock: {
-    id: 927376237,
-    name: 'Edge Service B',
-    active: false,
-    last_editor: 'az editor 2',
-    updated_at: new Date(2023, 10, 11)
-  }
+  mock: [
+    {
+      id: 1239875,
+      name: 'Edge Service A',
+      trigger: 'some trigger',
+      content_type: 'some content type',
+      last_editor: 'az editor',
+      updated_at: new Date(2023, 10, 10)
+    },
+    {
+      id: 927376237,
+      name: 'Edge Service B',
+      trigger: 'some trigger',
+      content_type: 'some content type',
+      last_editor: 'az editor 2',
+      updated_at: new Date(2023, 10, 11)
+    }
+  ]
 }
 
 const makeSut = () => {
-  const sut = listEdgeServicesService
+  const sut = listResourcesServices
 
   return {
     sut
   }
 }
 
-describe('EdgeServicesServices', () => {
+describe('EdgeServiceResourcesServices', () => {
   beforeEach(() => {
     vi.useFakeTimers()
   })
@@ -47,12 +51,15 @@ describe('EdgeServicesServices', () => {
       statusCode: 200,
       body: { results: [] }
     })
+    const edgeServiceIdMock = 1
     const { sut } = makeSut()
 
-    await sut({})
+    await sut({
+      id: edgeServiceIdMock
+    })
 
     expect(requestSpy).toHaveBeenCalledWith({
-      url: `edge-services?order_by=id&sort=asc&page=1&page_size=200`,
+      url: `edge_services/${edgeServiceIdMock}/resources?filter=&order_by=name&sort=asc&page=1&page_size=10`,
       method: 'GET'
     })
   })
@@ -62,26 +69,28 @@ describe('EdgeServicesServices', () => {
     vi.setSystemTime(new Date(2023, 10, 10, 10))
     vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
       statusCode: 200,
-      body: { services: [fixtures.edgeServiceMock, fixtures.disabledEdgeServiceMock] }
+      body: { results: { resources: fixtures.mock } }
     })
     const { sut } = makeSut()
 
-    const result = await sut({})
+    const result = await sut({ id: 1 })
 
     expect(result).toEqual([
       {
-        id: fixtures.edgeServiceMock.id,
-        name: fixtures.edgeServiceMock.name,
-        active: 'Yes',
-        lastEditor: fixtures.edgeServiceMock.last_editor,
+        id: fixtures.mock[0].id,
+        name: fixtures.mock[0].name,
+        trigger: fixtures.mock[0].trigger,
+        contentType: fixtures.mock[0].content_type,
+        lastEditor: fixtures.mock[0].last_editor,
         lastModified: 'Friday, November 10, 2023',
         lastModifiedDate: new Date('2023-11-10T00:00:00.000Z')
       },
       {
-        id: fixtures.disabledEdgeServiceMock.id,
-        name: fixtures.disabledEdgeServiceMock.name,
-        active: 'No',
-        lastEditor: fixtures.disabledEdgeServiceMock.last_editor,
+        id: fixtures.mock[1].id,
+        name: fixtures.mock[1].name,
+        trigger: fixtures.mock[1].trigger,
+        contentType: fixtures.mock[1].content_type,
+        lastEditor: fixtures.mock[1].last_editor,
         lastModified: 'Saturday, November 11, 2023',
         lastModifiedDate: new Date('2023-11-11T00:00:00.000Z')
       }

@@ -2,13 +2,13 @@
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
   import InputText from 'primevue/inputtext'
   import InputSwitch from 'primevue/inputswitch'
-  import { useField } from 'vee-validate'
   import { computed } from 'vue'
   import { useAccountStore } from '@/stores/account'
+  import { useField } from 'vee-validate'
 
   const { value: name, errorMessage: nameError } = useField('name')
+  const { value: code, errorMessage: codeError } = useField('code')
   const { value: active } = useField('active')
-  const { value: code } = useField('code')
 
   const editorOptions = {
     minimap: { enabled: false },
@@ -52,13 +52,22 @@
     description="Variables are dynamic values that affect the Services' orchestration. They are reserved spaces for stored information within the system that passes on data to the orchestration scripts. For example: port=3306."
   >
     <template #inputs>
-      <vue-monaco-editor
-        v-model:value="code"
-        language="shell"
-        :theme="theme"
-        class="min-h-[200px] overflow-clip surface-border border rounded-md"
-        :options="editorOptions"
-      />
+      <div class="flex flex-col h-full gap-2">
+        <vue-monaco-editor
+          v-model:value="code"
+          language="shell"
+          :theme="theme"
+          class="min-h-[200px] overflow-clip surface-border border rounded-md"
+          :class="{ 'border-red-500 border': codeError }"
+          :options="editorOptions"
+        />
+        <small
+          v-if="codeError"
+          class="p-error text-xs font-normal leading-tight"
+        >
+          {{ codeError }}
+        </small>
+      </div>
     </template>
   </FormHorizontal>
   <FormHorizontal title="Status">

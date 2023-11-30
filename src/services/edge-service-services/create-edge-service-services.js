@@ -1,6 +1,6 @@
 import { AxiosHttpClientAdapter } from '../axios/AxiosHttpClientAdapter'
 import * as Errors from '@/services/axios/errors'
-import { makeEdgeServicesBaseUrl } from './make-edge-services-base-url'
+import { makeEdgeServiceBaseUrl } from './make-edge-service-base-url'
 
 /**
  * @param {Object} payload - The HTTP request payload.
@@ -8,14 +8,36 @@ import { makeEdgeServicesBaseUrl } from './make-edge-services-base-url'
  * @returns {Promise<string>} The result message based on the status code.
  * @throws {Error} If there is an error with the response.
  */
-export const createEdgeServicesService = async (payload) => {
+export const createEdgeServiceServices = async (payload) => {
+  const adaptPayload = adapt(payload)
   let httpResponse = await AxiosHttpClientAdapter.request({
-    url: `${makeEdgeServicesBaseUrl()}`,
+    url: `${makeEdgeServiceBaseUrl()}`,
     method: 'POST',
-    body: payload
+    body: adaptPayload
   })
 
   return parseHttpResponse(httpResponse)
+}
+
+const parseCodeToVariables = (code) => {
+  const lines = code.trim().split(/\r?\n/)
+
+  const mapped = lines.map((line) => {
+    const [name, ...rest] = line.split('=')
+    const value = rest.join('=')
+    return { name: name.trim(), value: value.trim() }
+  })
+
+  return mapped
+}
+
+const adapt = (payload) => {
+  const { active, name, code } = payload
+  return {
+    active,
+    name,
+    variables: parseCodeToVariables(code)
+  }
 }
 
 /**
@@ -30,7 +52,7 @@ const parseHttpResponse = (httpResponse) => {
     case 201:
       return {
         feedback: 'Your Edge Service has been created',
-        urlToEditView: `/edge-services`
+        urlToEditView: `/edge-services/edit/${httpResponse.body.id}`
       }
     case 422:
       const apiError = extractApiError(httpResponse)

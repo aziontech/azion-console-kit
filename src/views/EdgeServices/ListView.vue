@@ -12,15 +12,15 @@
   defineOptions({ name: 'edge-services-view' })
 
   const props = defineProps({
-    listEdgeServicesService: {
+    listEdgeServiceServices: {
       type: Function,
       required: true
     },
-    deleteEdgeServicesService: {
+    deleteEdgeServiceServices: {
       type: Function,
       required: true
     },
-    editEdgeServicesService: {
+    editEdgeServiceServices: {
       type: Function,
       required: true
     },
@@ -97,14 +97,14 @@
     <template #content>
       <EdgeServicesToggleStatus
         v-model:visible="visibleDialog"
-        :serviceUpdate="props.editEdgeServicesService"
+        :serviceUpdate="props.editEdgeServiceServices"
         :selectRow="selectRow"
         @updateService="updateView"
       />
       <ListTableBlock
         v-if="hasContentToList"
-        :listService="props.listEdgeServicesService"
-        :deleteService="props.deleteEdgeServicesService"
+        :listService="props.listEdgeServiceServices"
+        :deleteService="props.deleteEdgeServiceServices"
         :columns="getColumns"
         pageTitleDelete="Edge Service"
         addButtonLabel="Edge Services"
