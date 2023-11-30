@@ -72,7 +72,7 @@
       <div class="flex gap-2 items-center">
         <PrimeButton
           icon="pi pi-search"
-          class="bg-header hover:bg-header-button-hover !text-white px-2 py-1 flex lg:hidden  border-header"
+          class="bg-header hover:bg-header-button-hover !text-white px-2 py-1 flex lg:hidden border-header"
           :pt="{
             label: { class: 'text-white' },
             icon: { class: 'text-white' }
