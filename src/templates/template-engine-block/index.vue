@@ -282,7 +282,7 @@
         const sanitizedField = {
           field: payload[index].name,
           instantiation_data_path: payload[index].instantiation_data_path,
-          value: payload[index].value.value
+          value: payload[index].value.value? payload[index].value.value : ''
         }
         payload[index] = sanitizedField
       })
