@@ -11,7 +11,7 @@
           >E-mail</label
         >
         <InputText
-          v-bind="email"
+          v-model="email"
           id="email"
           type="email"
           class="w-full"
@@ -30,7 +30,7 @@
           >Full name</label
         >
         <InputText
-          v-bind="name"
+          v-model="name"
           id="name"
           type="text"
           class="w-full"
@@ -160,11 +160,11 @@
       })
   })
 
-  const { defineInputBinds, values, meta, errors } = useForm({ validationSchema })
-  const name = defineInputBinds('name')
-  const email = defineInputBinds('email')
-  const { value: password } = useField('password')
+  const { values, meta, errors } = useForm({ validationSchema })
 
+  const { value: password } = useField('password')
+  const { value: email } = useField('email')
+  const { value: name } = useField('name')
   const toast = useToast()
   const router = useRouter()
 
