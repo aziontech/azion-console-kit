@@ -1,7 +1,7 @@
 <!-- eslint-disable vue/no-mutating-props -->
 <script setup>
   import { ref, onMounted } from 'vue'
-  import {  useField } from 'vee-validate'
+  import { useField } from 'vee-validate'
   import { useAccountStore } from '@/stores/account'
   import { storeToRefs } from 'pinia'
 
@@ -43,17 +43,19 @@
   const { account } = storeToRefs(store)
   const optionsLanguage = ref([{ label: 'English', value: 'en' }])
 
-  const { value: firstName, errorMessage: errorFirstName  } = useField('firstName')
-  const { value: lastName, errorMessage: errorLastName  } = useField('lastName')
-  const { value: selectedTimezone, errorMessage: errorSelectedTimezone } = useField('selectedTimezone')
-  const { value: selectedLanguage, errorMessage: errorSelectedLanguage } = useField('selectedLanguage')
+  const { value: firstName, errorMessage: errorFirstName } = useField('firstName')
+  const { value: lastName, errorMessage: errorLastName } = useField('lastName')
+  const { value: selectedTimezone, errorMessage: errorSelectedTimezone } =
+    useField('selectedTimezone')
+  const { value: selectedLanguage, errorMessage: errorSelectedLanguage } =
+    useField('selectedLanguage')
   const { value: email, errorMessage: errorEmail } = useField('email')
-  const { value: selectedCountry, errorMessage: errorSelectedCountry  } = useField('selectedCountry')
+  const { value: selectedCountry, errorMessage: errorSelectedCountry } = useField('selectedCountry')
   const { value: mobile, errorMessage: errorMobile } = useField('mobile')
-  const { value: userIsOwner, errorMessage: errorUserIsOwner  } = useField('userIsOwner')
+  const { value: userIsOwner, errorMessage: errorUserIsOwner } = useField('userIsOwner')
   const { value: selectedTeam, errorMessage: errorSelectedTeam } = useField('selectedTeam')
-  const { value: twoFactorEnabled, errorMessage: errorTwoFactorEnabled  } = useField('twoFactorEnabled')
-
+  const { value: twoFactorEnabled, errorMessage: errorTwoFactorEnabled } =
+    useField('twoFactorEnabled')
 
   const fetchCountries = async () => {
     const result = await props.listCountriesPhoneService()
@@ -99,7 +101,6 @@
 
   accountIsOwner.value = account?.is_account_owner
   userIsOwner.value = accountIsOwner.value
-
 </script>
 <template>
   <FormHorizontal title="General">

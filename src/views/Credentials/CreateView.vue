@@ -34,7 +34,7 @@
 <script setup>
   import { ref } from 'vue'
   import CreateFormBlock from '@/templates/create-form-block'
-  import FormFieldsCreate from './FormFields/FormFieldsCreate.vue'
+  import FormFieldsCreate from './FormFields/FormFieldsCreateCredentials.vue'
   import ContentBlock from '@/templates/content-block'
   import PageHeadingBlock from '@/templates/page-heading-block'
   import ActionBarTemplate from '@/templates/action-bar-block/action-bar-with-teleport'

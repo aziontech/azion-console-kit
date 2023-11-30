@@ -28,7 +28,7 @@
 
 <script setup>
   import EditFormBlock from '@/templates/edit-form-block'
-  import FormFieldsEdit from './FormFields/FormFieldsEdit.vue'
+  import FormFieldsEdit from './FormFields/FormFieldsEditCredentials.vue'
   import { useToast } from 'primevue/usetoast'
   import ContentBlock from '@/templates/content-block'
   import PageHeadingBlock from '@/templates/page-heading-block'

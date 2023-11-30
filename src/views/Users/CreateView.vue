@@ -38,7 +38,6 @@
   import FormFieldsUsers from './FormsFields/FormFieldsUsers.vue'
   import ActionBarTemplate from '@/templates/action-bar-block/action-bar-with-teleport'
 
-
   const props = defineProps({
     loadAccountDetailsService: {
       type: Function,

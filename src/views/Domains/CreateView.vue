@@ -11,10 +11,10 @@
         :initialValues="initialValues"
       >
         <template #form>
-          <FormFieldsCreate
+          <FormFieldsCreateDomains
             :digitalCertificates="digitalCertificates"
             :edgeApps="edgeApps"
-          ></FormFieldsCreate>
+          ></FormFieldsCreateDomains>
         </template>
         <template #action-bar="{ onSubmit, formValid, onCancel, loading }">
           <ActionBarTemplate
@@ -36,7 +36,7 @@
   import CreateFormBlock from '@/templates/create-form-block'
   import ContentBlock from '@/templates/content-block'
   import PageHeadingBlock from '@/templates/page-heading-block'
-  import FormFieldsCreate from './FormFields/FormFieldsDomains.vue'
+  import FormFieldsCreateDomains from './FormFields/FormFieldsCreateDomains.vue'
   import ActionBarTemplate from '@/templates/action-bar-block/action-bar-with-teleport'
 
   import * as yup from 'yup'

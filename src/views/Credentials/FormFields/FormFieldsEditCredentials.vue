@@ -17,7 +17,7 @@
 <template>
   <FormHorizontal
     title="General"
-    description="Edit credentials to use and authenticate Edge Orchestrator services."
+    description="Edit a credential to use and authenticate Edge Orchestrator services."
   >
     <template #inputs>
       <div class="flex flex-col sm:max-w-lg w-full gap-2">

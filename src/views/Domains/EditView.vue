@@ -13,13 +13,13 @@
         :initialValues="initialValues"
       >
         <template #form>
-          <FormFieldsCreate
+          <FormFieldsEditDomains
             :digitalCertificates="digitalCertificates"
             :edgeApps="edgeApps"
             :domainName="domainName"
             :hasDomainName="true"
             @copyDomainName="copyDomainName"
-          ></FormFieldsCreate>
+          ></FormFieldsEditDomains>
         </template>
         <template #action-bar="{ onSubmit, formValid, onCancel, loading }">
           <ActionBarTemplate
@@ -38,7 +38,7 @@
   import { ref, onMounted } from 'vue'
 
   import EditFormBlock from '@/templates/edit-form-block'
-  import FormFieldsCreate from './FormFields/FormFieldsDomains.vue'
+  import FormFieldsEditDomains from './FormFields/FormFieldsEditDomains.vue'
   import ContentBlock from '@/templates/content-block'
   import PageHeadingBlock from '@/templates/page-heading-block'
   import ActionBarTemplate from '@/templates/action-bar-block/action-bar-with-teleport'
