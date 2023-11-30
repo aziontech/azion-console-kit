@@ -9,7 +9,9 @@
   import CodeEditor from '../components/code-editor.vue'
   import CodePreview from '../components/code-preview.vue'
   import { useField } from 'vee-validate'
-  import { computed, ref, watch } from 'vue'
+  import { computed, ref, watch, defineEmits } from 'vue'
+  defineProps(['previewData'])
+  const emit = defineEmits(['update:previewData'])
 
   const SPLITTER_PROPS = {
     height: '50vh',
@@ -55,10 +57,12 @@
   })
 
   const updateObject = computed(() => {
-    return {
+    const previewValues = {
       code: code.value,
       args: jsonArgs.value
     }
+    emit('update:previewData', previewValues)
+    return previewValues
   })
 </script>
 

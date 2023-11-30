@@ -13,7 +13,7 @@
         :schema="validationSchema"
       >
         <template #form>
-          <FormFieldsEditEdgeFunctions />
+          <FormFieldsEditEdgeFunctions v-model:preview-data="updateObject" />
         </template>
         <template #action-bar="{ onSubmit, formValid, onCancel, loading }">
           <ActionBarBlockWithTeleport
@@ -36,6 +36,7 @@
   import PageHeadingBlock from '@/templates/page-heading-block'
   import ActionBarBlockWithTeleport from '@templates/action-bar-block/action-bar-with-teleport'
   import MobileCodePreview from './components/mobile-code-preview.vue'
+  import { ref } from 'vue'
 
   const props = defineProps({
     loadEdgeFunctionsService: {
@@ -51,6 +52,7 @@
       required: true
     }
   })
+  const updateObject = ref({})
 
   const validationSchema = yup.object({
     name: yup.string().required('Name is a required field'),
@@ -63,6 +65,8 @@
         isValidJson = false
       }
       return isValidJson
-    })
+    }),
+    active: yup.boolean(),
+    language: yup.string()
   })
 </script>

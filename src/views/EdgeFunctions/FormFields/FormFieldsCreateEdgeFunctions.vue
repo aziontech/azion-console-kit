@@ -8,8 +8,11 @@
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
   import CodeEditor from '../components/code-editor.vue'
   import CodePreview from '../components/code-preview.vue'
+  import HelloWorldSample from '@/helpers/edge-function-hello-world'
   import { computed, ref } from 'vue'
   import { useField } from 'vee-validate'
+  defineProps(['previewData'])
+  const emit = defineEmits(['update:previewData'])
   const SPLITTER_PROPS = {
     height: '50vh',
     layout: 'horizontal',
@@ -24,7 +27,9 @@
   const { value: jsonArgs, errorMessage: jsonArgsError } = useField('jsonArgs', null, {
     initialValue: ARGS_INITIAL_STATE
   })
-  const { value: code, errorMessage: codeError } = useField('code')
+  const { value: code, errorMessage: codeError } = useField('code', null, {
+    initialValue: HelloWorldSample
+  })
   const { value: active } = useField('active')
 
   const hasCodeError = computed(() => {
@@ -36,10 +41,12 @@
   })
 
   const updateObject = computed(() => {
-    return {
+    const previewValues = {
       code: code.value,
       args: jsonArgs.value
     }
+    emit('update:previewData', previewValues)
+    return previewValues
   })
 </script>
 
