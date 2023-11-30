@@ -19,7 +19,7 @@
     { name: 'Countries', value: 'countries' },
     { name: 'IP/CIDR', value: 'ip_cidr' }
   ])
-  const countriesList = ref('')
+  const countriesList = ref([])
 
   const { value: networkListType, errorMessage: networkListTypeError } = useField('networkListType')
   const { value: selectedCountries, errorMessage: selectedCountriesError } =
