@@ -1,20 +1,26 @@
 <script setup>
   import EditFormBlock from '@/templates/edit-form-block'
   import ActionBarTemplate from '@/templates/action-bar-block/action-bar-with-teleport'
-  import FormCreateEdgeService from './FormCreateEdgeService.vue'
+  import FormCreateEdgeService from './FormFieldsEdgeService.vue'
   import * as yup from 'yup'
 
   const props = defineProps({
     loadService: { type: Function, required: true },
     editService: { type: Function, required: true },
     updatedRedirect: { type: String, required: true },
-    showActionBar: { type: Boolean, required: false, default: true }
+    showActionBar: { type: Boolean, default: true }
   })
+
+  const validateCode = (val = '') => {
+    const split = val.split(/\s*\n+\s*/).filter((row) => !!row)
+    const isValid = split.every((row) => /^\w+\s*=[^]+$/.test(row))
+    return isValid
+  }
 
   const validationSchema = yup.object({
     name: yup.string().required(),
-    code: yup.string(),
-    active: yup.boolean()
+    active: yup.boolean(),
+    code: yup.string().test('formatInvalid', 'The format is invalid', validateCode)
   })
 </script>
 

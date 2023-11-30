@@ -63,7 +63,7 @@
     if (!props.selectRow?.id) return
     try {
       const { id, active } = props.selectRow
-      const feedback = await props.serviceUpdate({ id, active: !active })
+      const feedback = await props.serviceUpdate({ edgeServiceID: id, active: !active })
       openDialog(false)
       showToast('success', feedback)
       emit('updateService')

@@ -1,19 +1,12 @@
-import { AxiosHttpClientAdapter } from '../axios/AxiosHttpClientAdapter'
 import * as Errors from '@/services/axios/errors'
-import { makeEdgeServicesBaseUrl } from './make-edge-services-base-url'
+import { AxiosHttpClientAdapter } from '../axios/AxiosHttpClientAdapter'
+import { makeResourcesBaseUrl } from './make-resources-base-url'
 
-/**
- * @param {Object} payload - The HTTP request payload.
- * @param {String} payload.name
- * @returns {Promise<string>} The result message based on the status code.
- * @throws {Error} If there is an error with the response.
- */
-export const editEdgeServicesService = async (payload) => {
-  const { id, active } = payload
+export const deleteResourcesServices = async (payload) => {
+  const { resourceID, edgeServiceID } = payload
   let httpResponse = await AxiosHttpClientAdapter.request({
-    url: `${makeEdgeServicesBaseUrl()}/${id}`,
-    method: 'PATCH',
-    body: { active }
+    url: `${makeResourcesBaseUrl()}/${edgeServiceID}/resources/${resourceID}`,
+    method: 'DELETE'
   })
 
   return parseHttpResponse(httpResponse)
@@ -27,8 +20,8 @@ export const editEdgeServicesService = async (payload) => {
  */
 const parseHttpResponse = (httpResponse) => {
   switch (httpResponse.statusCode) {
-    case 200:
-      return `Your edge service ${httpResponse.body.name} has been updated`
+    case 204:
+      return 'Edge Service Resource successfully deleted'
     case 400:
       throw new Errors.NotFoundError().message
     case 401:

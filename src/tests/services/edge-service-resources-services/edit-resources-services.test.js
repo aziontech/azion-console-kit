@@ -1,68 +1,76 @@
 import { AxiosHttpClientAdapter } from '@/services/axios/AxiosHttpClientAdapter'
-import * as Errors from '@/services/axios/errors'
-import { createEdgeServicesService } from '@/services/edge-services-service'
+import { editResourcesServices } from '@/services/edge-service-resources-services'
 import { describe, expect, it, vi } from 'vitest'
+import * as Errors from '@/services/axios/errors'
 
 const fixtures = {
-  edgeServiceMock: {
-    name: 'X Edge Service'
+  mockPayload: {
+    resourcesID: 123,
+    edgeServiceID: 123,
+    content: 'some content',
+    contentType: 'some content type',
+    trigger: 'some trigger',
+    name: 'some name'
+  },
+  mockResponse: {
+    content: 'some content',
+    content_type: 'some content type',
+    trigger: 'some trigger',
+    name: 'some name'
   }
 }
+
 const makeSut = () => {
-  const sut = createEdgeServicesService
+  const sut = editResourcesServices
 
   return {
     sut
   }
 }
 
-describe('EdgeServicesServices', () => {
+describe('EdgeServiceResourcesServices', () => {
   it('should call API with correct params', async () => {
     const requestSpy = vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
-      statusCode: 201
+      statusCode: 200,
+      body: fixtures.mockResponse
     })
-    const edgeServiceMock = {
-      name: 'X edge service'
-    }
     const { sut } = makeSut()
 
-    await sut(edgeServiceMock)
+    await sut(fixtures.mockPayload)
+    const { resourcesID, edgeServiceID } = fixtures.mockPayload
 
     expect(requestSpy).toHaveBeenCalledWith({
-      method: 'POST',
-      url: `edge-services`,
-      body: edgeServiceMock
+      url: `edge_services/${edgeServiceID}/resources/${resourcesID}`,
+      method: 'PATCH',
+      body: fixtures.mockResponse
     })
   })
 
-  it('should return a feedback message on successfully created', async () => {
+  it('should return a feedback message on successfully edited', async () => {
     vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
-      statusCode: 201
+      statusCode: 200,
+      body: fixtures.mockResponse
     })
-    const edgeServiceMock = {
-      name: 'X edge service'
-    }
-
     const { sut } = makeSut()
 
-    const data = await sut(edgeServiceMock)
+    const feedbackMessage = await sut(fixtures.mockPayload)
 
-    expect(data.feedback).toBe('Your Edge Service has been created')
+    expect(feedbackMessage).toBe('Edge Service Resource has been updated')
   })
 
-  it('Should return an API error to an invalid edge service name', async () => {
-    const apiErrorMock = 'name should not be empty'
+  it('Should return an API error when API detect an invalid configuration to edge service resource', async () => {
+    const apiErrorMock = 'Some invalid configuration has been found on the backend'
     vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
-      statusCode: 422,
+      statusCode: 400,
       body: {
         errors: [apiErrorMock]
       }
     })
     const { sut } = makeSut()
 
-    const feedbackMessage = sut(fixtures.variableMock)
+    const feedbackMessage = sut(fixtures.mockPayload)
 
-    expect(feedbackMessage).rejects.toThrow(apiErrorMock)
+    expect(feedbackMessage).rejects.toBe(apiErrorMock)
   })
 
   it.each([
@@ -94,7 +102,7 @@ describe('EdgeServicesServices', () => {
       })
       const { sut } = makeSut()
 
-      const response = sut(fixtures.edgeServiceMock)
+      const response = sut(fixtures.mockPayload)
 
       expect(response).rejects.toBe(expectedError)
     }

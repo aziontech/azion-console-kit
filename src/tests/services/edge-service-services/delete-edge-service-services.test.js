@@ -1,16 +1,16 @@
 import { AxiosHttpClientAdapter } from '@/services/axios/AxiosHttpClientAdapter'
-import { deleteEdgeServicesService } from '@/services/edge-services-service'
+import { deleteEdgeServiceServices } from '@/services/edge-service-services'
 import { describe, expect, it, vi } from 'vitest'
 
 const makeSut = () => {
-  const sut = deleteEdgeServicesService
+  const sut = deleteEdgeServiceServices
 
   return {
     sut
   }
 }
 
-describe('EdgeServicesServices', () => {
+describe('EdgeServiceServices', () => {
   it('should call API with correct params', async () => {
     const requestSpy = vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
       statusCode: 204
@@ -22,7 +22,7 @@ describe('EdgeServicesServices', () => {
 
     expect(requestSpy).toHaveBeenCalledWith({
       method: 'DELETE',
-      url: `edge-services/${mockId}`
+      url: `edge_services/${mockId}`
     })
   })
 

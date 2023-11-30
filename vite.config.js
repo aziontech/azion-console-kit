@@ -31,10 +31,10 @@ const getConfig = () => {
           rewrite: (path) => path.replace(/^\/logout/, ''),
           cookieDomainRewrite: { '*': '' }
         },
-        '/api/edge-services': {
-          target: `${URLStartPrefix}manager-origin.azion.com/services/api/v1/services`,
+        '/api/edge_services': {
+          target: `${URLStartPrefix}api.azion.net`,
           changeOrigin: true,
-          rewrite: (path) => path.replace(/^\/api\/edge-services/, '')
+          rewrite: (path) => path.replace(/^\/edge_services/, '')
         },
         '/api/variables': {
           target: `${URLStartPrefix}manager.azion.com/variables/api/`,

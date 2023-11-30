@@ -314,6 +314,7 @@
           const data = await this.listService({ page })
           this.data = data
         } catch (error) {
+          this.data = []
           this.$toast.add({
             closable: false,
             severity: 'error',

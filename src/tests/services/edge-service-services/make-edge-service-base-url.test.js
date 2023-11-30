@@ -1,18 +1,18 @@
-import { makeEdgeServicesBaseUrl } from '@/services/edge-services-service/make-edge-services-base-url'
+import { makeEdgeServiceBaseUrl } from '@/services/edge-service-services/make-edge-service-base-url'
 import { assert, describe, it } from 'vitest'
 
 const makeSut = () => {
-  const sut = makeEdgeServicesBaseUrl
+  const sut = makeEdgeServiceBaseUrl
 
   return {
     sut
   }
 }
 
-describe('EdgeServicesServices', () => {
+describe('EdgeServiceServices', () => {
   it('should return the API base url to edge services service', () => {
     const { sut } = makeSut()
-    const correctApiUrl = 'edge-services'
+    const correctApiUrl = 'edge_services'
 
     const baseUrl = sut()
 

@@ -1,7 +1,7 @@
 import { AxiosHttpClientAdapter, parseHttpResponse } from '../axios/AxiosHttpClientAdapter'
-import { makeEdgeServicesBaseUrl } from './make-edge-services-base-url'
+import { makeEdgeServiceBaseUrl } from './make-edge-service-base-url'
 
-export const listEdgeServicesService = async ({
+export const listEdgeServiceServices = async ({
   orderBy = 'id',
   sort = 'asc',
   page = 1,
@@ -9,7 +9,7 @@ export const listEdgeServicesService = async ({
 }) => {
   const searchParams = makeSearchParams({ orderBy, sort, page, pageSize })
   let httpResponse = await AxiosHttpClientAdapter.request({
-    url: `${makeEdgeServicesBaseUrl()}?${searchParams.toString()}`,
+    url: `${makeEdgeServiceBaseUrl()}?${searchParams.toString()}`,
     method: 'GET'
   })
 

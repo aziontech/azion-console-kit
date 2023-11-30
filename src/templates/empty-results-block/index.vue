@@ -51,7 +51,6 @@
   const router = useRouter()
 
   const props = defineProps({
-    pageTitle: { type: String, required: true },
     title: { type: String, required: true },
     description: { type: String, required: true },
     documentationService: { type: Function, required: true },
