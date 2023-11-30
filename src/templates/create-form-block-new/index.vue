@@ -9,7 +9,10 @@
       v-if="teleportLoad"
       to="#action-bar"
     >
-      <ActionBarBlockGoBack v-if="buttonBackList" />
+      <ActionBarBlockGoBack
+        :goBack="goBack"
+        v-if="buttonBackList"
+      />
       <ActionBarTemplate
         @cancel="navigateBack"
         @submit="validateAndSubmit"
@@ -39,6 +42,14 @@
       teleportLoad: false
     }),
     props: {
+      goBack: {
+        type: Function,
+        required: false
+      },
+      pageTitle: {
+        type: String,
+        required: true
+      },
       createService: {
         type: Function,
         required: true
@@ -70,6 +81,11 @@
       formMeta: {
         type: Object,
         required: true
+      },
+      blockRedirect: {
+        type: Boolean,
+        required: false,
+        default: true
       }
     },
     mounted() {
@@ -117,7 +133,7 @@
     },
     computed: {
       hasModifications() {
-        return this.formMeta.touched && this.blockViewRedirection
+        return this.formMeta.touched && this.blockViewRedirection && this.blockRedirect
       }
     }
   }
