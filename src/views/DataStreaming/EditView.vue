@@ -30,7 +30,7 @@
                   :class="{ 'p-invalid': errors.name }"
                 />
                 <small class="text-xs text-color-secondary font-normal leading-tight">
-                Give a unique and easy-to-remember name.</small
+                  Give a unique and easy-to-remember name.</small
                 >
                 <small
                   id="name-help"
@@ -81,7 +81,8 @@
                     class="w-full"
                   />
                   <small class="text-color-secondary text-xs font-normal leading-tight">
-                    Represents a preset of variables for specific sources or an open template to choose variables.
+                    Represents a preset of variables for specific sources or an open template to
+                    choose variables.
                   </small>
                 </div>
               </div>
@@ -100,7 +101,8 @@
                   class="min-h-[100px] surface-border border rounded-sm overflow-hidden"
                 />
                 <small class="text-color-secondary text-xs font-normal leading-tight">
-                  Exhibits or allows you to write the variables that'll be sent to your connector in a JSON format.
+                  Exhibits or allows you to write the variables that'll be sent to your connector in
+                  a JSON format.
                 </small>
               </div>
             </template>
@@ -169,14 +171,18 @@
                   </template>
                 </PickList>
                 <small class="text-color-secondary text-sm font-normal leading-tight">
-                  Select an item from the list and then use the arrows to move it between the available and selected domains boxes. Use the double-line arrows to move all items.
+                  Select an item from the list and then use the arrows to move it between the
+                  available and selected domains boxes. Use the double-line arrows to move all
+                  items.
                 </small>
               </div>
             </template>
           </FormHorizontal>
 
-          <FormHorizontal title="Destination"
-            description="Decide to which data platform your collected data will be sent to. All fields must be filled in with information provided by the third-party platform.">
+          <FormHorizontal
+            title="Destination"
+            description="Decide to which data platform your collected data will be sent to. All fields must be filled in with information provided by the third-party platform."
+          >
             <template #inputs>
               <div class="flex flex-col w-full sm:max-w-xs gap-2">
                 <label
@@ -276,7 +282,8 @@
                     :class="{ 'p-invalid': errors.payloadFormat }"
                   />
                   <small class="text-color-secondary text-xs font-normal leading-tight">
-                    Which information will be sent in your data. The "$dataset" variable calls all variables from the chosen template in NDJSON format.
+                    Which information will be sent in your data. The "$dataset" variable calls all
+                    variables from the chosen template in NDJSON format.
                   </small>
                   <small
                     id="data-set-help"
@@ -298,7 +305,8 @@
                     :class="{ 'p-invalid': errors.lineSeparator }"
                   />
                   <small class="text-color-secondary text-xs font-normal leading-tight">
-                    Character that will be used at the end of each log line. The "\n" escape sequence breaks values into different lines in NDJSON format.
+                    Character that will be used at the end of each log line. The "\n" escape
+                    sequence breaks values into different lines in NDJSON format.
                   </small>
                   <small
                     id="max-size-help"
@@ -320,8 +328,8 @@
                     :class="{ 'p-invalid': errors.maxSize }"
                   />
                   <small class="text-color-secondary text-xs font-normal leading-tight">
-                    Customizable maximum size of data packets in bytes. Accepts values starting
-                    from 1000000.
+                    Customizable maximum size of data packets in bytes. Accepts values starting from
+                    1000000.
                   </small>
                   <small
                     id="max-size-help"
@@ -350,7 +358,8 @@
                     cols="30"
                   />
                   <small class="text-color-secondary text-xs font-normal leading-tight">
-                    List of hosts and ports in a Kafka cluster. Separate items by comma and no space.
+                    List of hosts and ports in a Kafka cluster. Separate items by comma and no
+                    space.
                   </small>
                   <small
                     id="bootstrap-servers-help"
@@ -396,7 +405,8 @@
                       >Enable Transport Layer Security (TLS)</label
                     >
                     <small class="text-color-secondary text-sm font-normal leading-tight">
-                      Send encrypted data to secure communication. Make sure the receiving connector uses a trusted CA certificate.
+                      Send encrypted data to secure communication. Make sure the receiving connector
+                      uses a trusted CA certificate.
                     </small>
                   </div>
                 </div>
@@ -420,8 +430,8 @@
                     :class="{ 'p-invalid': errors.host }"
                   />
                   <small class="text-color-secondary text-sm font-normal leading-tight">
-                    Specific URL that'll receive the collected data. Accepts all providers that work with an S3
-                    protocol.
+                    Specific URL that'll receive the collected data. Accepts all providers that work
+                    with an S3 protocol.
                   </small>
                   <small
                     id="host-help"
@@ -543,7 +553,8 @@
                     toggleMask
                   />
                   <small class="text-color-secondary text-sm font-normal leading-tight">
-                    Prefix added to the name of the uploaded object to appear on the files that will be sent. Composed of Prefix + Timestamp + UUID.
+                    Prefix added to the name of the uploaded object to appear on the files that will
+                    be sent. Composed of Prefix + Timestamp + UUID.
                   </small>
                   <small
                     id="object-key-help"
@@ -661,8 +672,7 @@
                     class="min-h-[100px] surface-border border rounded-md overflow-hidden"
                   />
                   <small class="text-color-secondary text-sm font-normal leading-tight">
-                    JSON file provided by Google Cloud used to authenticate with Google
-                    services.
+                    JSON file provided by Google Cloud used to authenticate with Google services.
                   </small>
                   <small
                     id="service-account-key-help"
@@ -742,8 +752,8 @@
                     :class="{ 'p-invalid': errors.splunkUrl }"
                   />
                   <small class="text-color-secondary text-sm font-normal leading-tight">
-                    URL that'll receive the collected data. If you have an
-                    alternative index to point, add it at the end of the URL.
+                    URL that'll receive the collected data. If you have an alternative index to
+                    point, add it at the end of the URL.
                   </small>
                   <small
                     id="splunk-url-help"
@@ -977,9 +987,8 @@
                     :class="{ 'p-invalid': errors.logType }"
                   />
                   <small class="text-color-secondary text-sm font-normal leading-tight">
-                    Record type of the data that's being submitted. Accepts only
-                    letters, numbers, and the underscore (_) character, and it can't exceed 100
-                    characters.
+                    Record type of the data that's being submitted. Accepts only letters, numbers,
+                    and the underscore (_) character, and it can't exceed 100 characters.
                   </small>
                   <small
                     id="log-type-help"
@@ -1027,7 +1036,8 @@
                     type="text"
                   />
                   <small class="text-color-secondary text-sm font-normal leading-tight">
-                    Specifies how long it’ll take for the log to be available after collection. Uses ingestion time if not specified.
+                    Specifies how long it’ll take for the log to be available after collection. Uses
+                    ingestion time if not specified.
                   </small>
                 </div>
 
@@ -1120,7 +1130,8 @@
                     :class="{ 'p-invalid': errors.blobToken }"
                   />
                   <small class="text-color-secondary text-sm font-normal leading-tight">
-                    Token generated by Blob Storage. It should have create, read, write, and list accesses granted.
+                    Token generated by Blob Storage. It should have create, read, write, and list
+                    accesses granted.
                   </small>
                   <small
                     id="blob-token-help"
