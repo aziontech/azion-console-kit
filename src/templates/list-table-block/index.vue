@@ -8,7 +8,6 @@
       removableSort
       :value="data"
       dataKey="id"
-      v-model:selection="selectedRow"
       selectionMode="single"
       @row-click="editItemSelected"
       v-model:filters="filters"
@@ -219,10 +218,6 @@
             header: 'Name'
           }
         ]
-      },
-      pageTitle: {
-        type: String,
-        required: true
       },
       pageTitleDelete: {
         type: String,
