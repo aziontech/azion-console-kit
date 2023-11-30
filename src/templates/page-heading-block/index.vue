@@ -2,7 +2,7 @@
   <div class="w-full flex-col justify-center items-start inline-flex">
     <Breadcrumb
       :home="generateHomeBreadCrumb"
-      :model="generateBreadCrumbs"
+      :model="breadcrumbs.items"
       class="-ml-1.5 overflow-auto w-full"
     />
     <div class="flex w-full py-4 items-center justify-between">
@@ -34,7 +34,9 @@
 </template>
 
 <script>
+  import { useBreadcrumbs } from '@/stores/breadcrumbs'
   import Breadcrumb from 'primevue/breadcrumb'
+  import { useRouter } from 'vue-router'
 
   export default {
     name: 'PageHeadingBlock',
@@ -89,12 +91,16 @@
           to: '/'
         }
       },
-      generateBreadCrumbs() {
-        return this.$router.currentRoute.value.meta.breadCrumbs ?? []
-      },
       hasDefaultSlot() {
         return !!this.$slots.default
       }
+    },
+    setup() {
+      const $router = useRouter()
+      const breadcrumbs = useBreadcrumbs()
+      breadcrumbs.update($router.currentRoute.value.meta.breadCrumbs ?? [])
+
+      return { breadcrumbs }
     }
   }
 </script>
