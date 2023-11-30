@@ -124,3 +124,15 @@
     box-shadow: $linkButtonFocusShadow !important;
   }
 }
+
+.p-inputgroup > .p-button {
+  &.p-button-icon-only {
+    color: initial;
+    width: initial;
+    height: initial !important;
+    .p-button-icon-left,
+    .p-button-icon-right {
+      margin: initial;
+    }
+  }
+}

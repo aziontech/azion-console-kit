@@ -10,7 +10,7 @@
         :deleteService="pros.deleteTeamPermissionService"
         :columns="getColumns"
         pageTitleDelete="Team Permission"
-        addButtonLabel="Team Permissions"
+        addButtonLabel="Add"
         createPagePath="teams-permission/create"
         editPagePath="teams-permission/edit"
         @on-load-data="handleLoadData"
@@ -18,9 +18,9 @@
       </ListTableBlock>
       <EmptyResultsBlock
         v-else
-        title="No team permissions added"
-        description="Create your first team permissions."
-        createButtonLabel="Team Permissions"
+        title="No teams permissions has been created"
+        description="Click the button below to initiate the setup process and create your teams permissions."
+        createButtonLabel="Add"
         createPagePath="teams-permission/create"
         :documentationService="documentationService"
       >
@@ -56,11 +56,11 @@
     return [
       {
         field: 'name',
-        header: 'Team'
+        header: 'Name'
       },
       {
         field: 'permissions',
-        header: 'Permission',
+        header: 'Permissions',
         type: 'component',
         component: (columnData) =>
           columnBuilder({ data: columnData, columnAppearance: 'expand-column' })

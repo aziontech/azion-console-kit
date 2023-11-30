@@ -13,7 +13,7 @@
         <template #form>
           <FormHorizontal
             title="General"
-            description="Description"
+            description="Use permissions to manage and oversee users by defining access levels of client accounts."
           >
             <template #inputs>
               <div class="flex flex-col sm:max-w-lg w-full gap-2">
@@ -27,7 +27,11 @@
                   type="text"
                   id="name"
                   :class="{ 'p-invalid': errors.name }"
+                  placeholder="My teams permissions"
                 />
+                <small class="text-xs text-color-secondary font-normal leading-tight">
+                  Give a unique and easy-to-remember name.
+                </small>
                 <small
                   v-if="errors.name"
                   class="p-error text-xs font-normal leading-tight"
@@ -38,7 +42,7 @@
           </FormHorizontal>
           <FormHorizontal
             title="Teams Permissions"
-            description="Select the teams permissions"
+            description="Determine the level of access of the clients and assign permissions according to their team. Teams can be created based on the role and tasks of assigned clients."
           >
             <template #inputs>
               <div class="flex flex-col sm:max-w-3xl w-full gap-2">
@@ -68,6 +72,11 @@
                     </div>
                   </template>
                 </PickList>
+                <small class="text-color-secondary text-sm font-normal leading-tight">
+                  Select an item from the list and then use the arrows to move it between the
+                  available and selected permissions boxes. Use the double-line arrows to move all
+                  items.
+                </small>
               </div>
             </template>
           </FormHorizontal>
@@ -87,6 +96,9 @@
                     </div>
                   </span>
                 </div>
+                <small class="text-color-secondary text-sm font-normal leading-tight">
+                  Activate or deactivate the team permissions for all clients within the team.
+                </small>
               </div>
             </template>
           </FormHorizontal>

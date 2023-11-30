@@ -10,7 +10,7 @@
         outlined
         class="surface-border h-8 w-8"
         aria-label="Cancel"
-        @click="closeHelpCenter"
+        @click="helpCenterStore.close()"
       />
     </div>
 
@@ -29,6 +29,10 @@
                 @keyup.enter="searchDocumentation()"
               />
             </span>
+            <small v-if="search">
+              Search "<span class="font-semibold">{{ search }}</span
+              >" on Documentation
+            </small>
           </div>
 
           <!-- List items -->
@@ -59,6 +63,7 @@
               outlined
               icon="pi pi-chevron-left"
               label="Back"
+              size="small"
               @click="backToMenu()"
             ></PrimeButton>
 
@@ -105,7 +110,7 @@
 
     <!-- help mobile sidebar -->
     <Sidebar
-      :visible="showHelp"
+      :visible="helpCenterStore.isOpen"
       position="bottom"
       headerContent="Help"
       :show-close-icon="false"
@@ -121,7 +126,7 @@
           <h2>Help</h2>
           <PrimeButton
             icon="pi pi-times"
-            @click="closeHelpCenter"
+            @click="helpCenterStore.close()"
             size="small"
             class="flex-none surface-border text-sm w-8 h-8"
             text
@@ -219,7 +224,6 @@
   import PrimeButton from 'primevue/button'
   import InputText from 'primevue/inputtext'
   import Sidebar from 'primevue/sidebar'
-  import { mapActions, mapState } from 'pinia'
   import { useHelpCenterStore } from '@/stores/help-center'
   import BannerDiscord from './banner-discord.vue'
   import { getEnvironmentFromUrl, openSearchResult } from '@/helpers'
@@ -237,8 +241,9 @@
     },
     data() {
       return {
-        mainContent: '',
+        mainContent: [],
         articleContent: '',
+        search: '',
         menuItems: [
           {
             label: 'Documentation',
@@ -277,7 +282,6 @@
       }
     },
     methods: {
-      ...mapActions(useHelpCenterStore, ['closeHelpCenter', 'closeHelpCenter']),
       async getMainContent() {
         const currentPath = this.getCurrentPath()
 
@@ -329,11 +333,15 @@
         openSearchResult(this.search)
       }
     },
-    computed: {
-      ...mapState(useHelpCenterStore, { showHelp: 'isOpen' })
-    },
     watch: {
       $route: 'onRouteChange'
+    },
+    setup() {
+      const helpCenterStore = useHelpCenterStore()
+
+      return {
+        helpCenterStore
+      }
     }
   }
 </script>

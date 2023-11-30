@@ -151,7 +151,7 @@
         window.open('https://discord.com/invite/Yp9N7RMVZy', '_blank')
       },
       openGitHub() {
-        window.open('https://github.com/aziontech', '_blank')
+        window.open('https://github.com/aziontech/azion-platform-kit', '_blank')
       },
       openX() {
         window.open('https://twitter.com/aziontech', '_blank')

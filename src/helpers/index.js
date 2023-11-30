@@ -4,10 +4,10 @@ import {
   openDocumentation,
   openAPIDocumentation,
   openContactSupport,
-  openSearchResult
+  openSearchResult,
+  openGoogleAuthenticatorAppDocumentation
 } from './azion-documentation-window-opener'
 import InviteSession from './invite-session'
-import { useCreateBoardManager } from './composables/use-create-board-manager'
 import { themeSelect } from './theme-select'
 import { azionPrivacyPolicyWindowOpener } from './azion-privacy-policy-opener'
 import { azionTermsAndServicesWindowOpener } from './azion-terms-and-services-opener'
@@ -23,11 +23,11 @@ export {
   openAPIDocumentation,
   openContactSupport,
   InviteSession,
-  useCreateBoardManager,
   azionPrivacyPolicyWindowOpener,
   azionTermsAndServicesWindowOpener,
   parseCamelToSnake,
   parseSnakeToCamel,
   openSearchResult,
-  getEnvironmentFromUrl
+  getEnvironmentFromUrl,
+  openGoogleAuthenticatorAppDocumentation
 }

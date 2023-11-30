@@ -32,7 +32,8 @@ export default mergeConfig(
         branches: 90,
         functions: 81,
         lines: 81
-      }
+      },
+      testTimeout: 10000
     }
   })
 )

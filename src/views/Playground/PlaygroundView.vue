@@ -1,16 +1,45 @@
-
 <template>
-  <div class="items-center">
-    <Badge class="w-fit" value="2"></Badge>
-    <Badge class="w-fit" value="8" severity="success"></Badge>
-    <Badge class="w-fit" value="4" severity="info"></Badge>
-    <Badge class="w-fit" value="12" severity="warning"></Badge>
-    <Badge class="w-fit" value="3" severity="danger"></Badge>
+  <div class="p-20 flex flex-col gap-6">
+    <div class="flex flex-col sm:max-w-lg w-full gap-2">
+        <label
+          for="customHeaders"
+          class="text-color text-base font-medium"
+          >Custom Headers</label
+        >
+        <div class="p-inputgroup">
+          <InputText
+            id="header-value"
+            placeholder="Value"
+          />
+          <PrimeButton
+            icon="pi pi-trash"
+            outlined
+          />
+        </div>
+    </div>
+    <Divider/>
+    <div class="flex flex-col sm:max-w-lg w-full gap-2">
+        <label
+          for="customHeaders"
+          class="text-color text-base font-medium"
+          >Custom Headers</label
+        >
+        <div class="p-inputgroup">
+          <InputText
+            id="header-value"
+            placeholder="Value"
+          />
+          <PrimeButton
+            icon="pi pi-trash"
+            outlined
+          />
+        </div>
+    </div>
   </div>
-
 </template>
-  
-  <script setup>
-    import Badge from 'primevue/badge';
-  </script>
-  
+
+<script setup>
+  import Divider from 'primevue/divider';
+  import PrimeButton from 'primevue/button';
+  import InputText from 'primevue/inputtext';
+</script>

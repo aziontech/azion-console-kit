@@ -1,5 +1,8 @@
 <template>
-  <form @submit.prevent="validateCode()">
+  <form
+    @submit.prevent="validateCode()"
+    class="max-sm:min-h-[calc(100vh-120px)]"
+  >
     <div
       class="flex flex-col align-top items-center py-6 px-3 md:py-20 animate-fadeIn"
       @paste="handlePaste"
@@ -32,6 +35,7 @@
         <InlineMessage
           v-if="hasRequestErrorMessage"
           severity="error"
+          class="animate-fadeIn"
           >{{ hasRequestErrorMessage }}</InlineMessage
         >
 
@@ -39,7 +43,7 @@
           class="w-full flex-row-reverse"
           label="Verify"
           :loading="isButtonLoading"
-          severity="primary"
+          severity="secondary"
           type="submit"
         />
       </div>
