@@ -205,7 +205,6 @@
       mask: { class: 'flex' }
     }"
     class="md:p-3"
-    @click="toggleProfileMobile"
   >
     <PrimeMenu
       :pt="{
