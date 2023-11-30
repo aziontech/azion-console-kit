@@ -12,6 +12,14 @@
         <template #form>
           <FormFieldsCreateRealTimePurge />
         </template>
+        <template #action-bar="{ onSubmit, formValid, onCancel, loading }">
+          <ActionBarBlockWithTeleport
+            @onSubmit="onSubmit"
+            @onCancel="onCancel"
+            :loading="loading"
+            :submitDisabled="!formValid"
+          />
+        </template>
       </CreateFormBlock>
     </template>
   </ContentBlock>
@@ -22,6 +30,7 @@
   import ContentBlock from '@/templates/content-block'
   import PageHeadingBlock from '@/templates/page-heading-block'
   import FormFieldsCreateRealTimePurge from './FormFields/FormFieldsCreateRealTimePurge'
+  import ActionBarBlockWithTeleport from '@templates/action-bar-block/action-bar-with-teleport'
   import * as yup from 'yup'
   import { ref } from 'vue'
 
