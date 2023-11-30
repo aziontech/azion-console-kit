@@ -1,5 +1,8 @@
 <template>
-  <form @submit.prevent="authorizeDevice()">
+  <form
+    @submit.prevent="authorizeDevice()"
+    class="max-sm:min-h-[calc(100vh-120px)]"
+  >
     <div
       class="flex flex-col align-top items-center py-6 px-3 md:py-20 animate-fadeIn"
       @paste="handlePaste"
@@ -12,7 +15,16 @@
 
           <!-- Steps -->
           <ul class="list-decimal text-color-secondary list-inside">
-            <li>Intall Google Authenticator on your device.</li>
+            <li>
+              Install
+              <PrimeButton
+                link
+                label="Google Authenticator"
+                class="p-0"
+                @click="props.openGoogleAuthenticatorAppDocumentation"
+              ></PrimeButton>
+              on your device.
+            </li>
             <li>Open the app and tap "+" button.</li>
             <li>Tap ”Scan QR Code” and point your phone camera to the code below.</li>
           </ul>
@@ -29,13 +41,14 @@
             :value="qrCode?.url"
             level="H"
             :size="250"
-            class="w-[10rem] h-[10rem] sm:w-[12.5rem] sm:h-[12.5rem]"
+            class="w-[10rem] h-[10rem] sm:w-[12.5rem] sm:h-[12.5rem] rounded-md surface-border border p-2"
           />
         </div>
 
         <InlineMessage
           v-if="hasRequestErrorMessage"
           severity="error"
+          class="animate-fadeIn"
           >{{ hasRequestErrorMessage }}</InlineMessage
         >
         <div>
@@ -57,7 +70,7 @@
           class="w-full flex-row-reverse"
           label="Verify code"
           :loading="isButtonLoading"
-          severity="primary"
+          severity="secondary"
           type="submit"
         />
       </div>
@@ -76,7 +89,6 @@
   import InputText from 'primevue/inputtext'
   import InlineMessage from 'primevue/inlinemessage'
   import Skeleton from 'primevue/skeleton'
-
   import QrcodeVue from 'qrcode.vue'
 
   import { ref, onMounted } from 'vue'
@@ -92,6 +104,10 @@
       type: Function
     },
     verifyAuthenticationService: {
+      required: true,
+      type: Function
+    },
+    openGoogleAuthenticatorAppDocumentation: {
       required: true,
       type: Function
     },

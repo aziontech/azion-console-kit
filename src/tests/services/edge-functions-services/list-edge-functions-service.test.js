@@ -13,18 +13,19 @@ const fixtures = {
   edgeFunctionMock: {
     active: true,
     version: '1.0.0',
-    language: 'js',
+    language: 'javascript',
     initiator_type: 'Initiator',
     id: 1239875,
     last_editor: 'az editor',
     modified: new Date(2023, 10, 10),
     name: 'AZ firewall',
-    reference_count: '2'
+    reference_count: '2',
+    vendor: 'Azion'
   },
   disabledEdgeFunctionMock: {
     active: false,
     version: null,
-    language: 'Go',
+    language: 'lua',
     initiator_type: 'Initiator 2',
     id: 852030,
     last_editor: 'az editor 2',
@@ -78,25 +79,36 @@ describe('EdgeFunctionsServices', () => {
 
     expect(result).toEqual([
       {
-        active: 'Yes',
+        status: { content: 'Active', severity: 'success' },
         version: fixtures.edgeFunctionMock.version,
-        language: fixtures.edgeFunctionMock.language,
+        language: { content: 'JavaScript', icon: 'javascript' },
         initiatorType: fixtures.edgeFunctionMock.initiator_type,
         referenceCount: fixtures.edgeFunctionMock.reference_count,
         id: fixtures.edgeFunctionMock.id,
-        name: fixtures.edgeFunctionMock.name,
-        lastEditor: fixtures.edgeFunctionMock.last_editor,
+        name: {
+          text: fixtures.edgeFunctionMock.name,
+          tagProps: {
+            icon: 'pi pi-cart-plus',
+            outlined: true,
+            severity: 'info',
+            value: 'Integration'
+          }
+        },
+        lastEditor: fixtures.edgeFunctionMock.vendor,
         lastModified: 'Friday, November 10, 2023',
         lastModifiedDate: new Date('2023-11-10T00:00:00.000Z')
       },
       {
-        active: 'No',
+        status: { content: 'Inactive', severity: 'danger' },
         version: '-',
-        language: fixtures.disabledEdgeFunctionMock.language,
+        language: { content: 'Lua', icon: 'lua' },
         initiatorType: fixtures.disabledEdgeFunctionMock.initiator_type,
         referenceCount: fixtures.disabledEdgeFunctionMock.reference_count,
         id: fixtures.disabledEdgeFunctionMock.id,
-        name: fixtures.disabledEdgeFunctionMock.name,
+        name: {
+          text: fixtures.disabledEdgeFunctionMock.name,
+          tagProps: {}
+        },
         lastEditor: fixtures.disabledEdgeFunctionMock.last_editor,
         lastModified: 'Sunday, December 10, 2023',
         lastModifiedDate: new Date('2023-12-10T00:00:00.000Z')

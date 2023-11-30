@@ -18,12 +18,12 @@
         </div>
       </div>
       <div
-        class="w-full flex flex-col justify-start items-center pt-10 pb-20 my-auto overflow-y-auto max-h-[calc(100vh-60px-56px)]"
+        class="w-full flex flex-col justify-start items-center pt-4 sm:pt-10 pb-20 my-auto overflow-y-auto max-sm:min-h-[calc(100vh-120px)] max-h-[calc(100vh-60px-56px)]"
       >
         <div
           class="card surface-border border rounded-md surface-section p-6 xl:p-10 flex flex-col gap-6 max-w-md"
         >
-          <h2 class="text-center lg:text-start text-xl lg:text-2xl font-medium">
+          <h2 class="text-start text-xl lg:text-2xl font-medium">
             {{ formTitle }}
           </h2>
           <slot name="form" />

@@ -41,7 +41,7 @@
           },
           {
             field: 'dataSource',
-            header: 'Data Source'
+            header: 'Source'
           },
           {
             field: 'templateName',
@@ -49,7 +49,7 @@
           },
           {
             field: 'endpointType',
-            header: 'Endpoint Type'
+            header: 'Connector'
           },
           {
             field: 'active',
@@ -80,7 +80,7 @@
     <template #content>
       <ListTableBlock
         v-if="hasContentToList"
-        addButtonLabel="Data Streaming"
+        addButtonLabel="Add"
         createPagePath="/data-streaming/create"
         editPagePath="/data-streaming/edit"
         :listService="listDataStreamingService"
@@ -90,9 +90,9 @@
       ></ListTableBlock>
       <EmptyResultsBlock
         v-else
-        title="No data streaming added"
-        description="Create your first data streaming."
-        createButtonLabel="Data Streaming"
+        title="No data streaming has been created"
+        description="Click the button below to initiate the setup process and create your first data streaming."
+        createButtonLabel="Add"
         createPagePath="data-streaming/create"
         :documentationService="documentationService"
       >
