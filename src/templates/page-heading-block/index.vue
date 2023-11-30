@@ -2,10 +2,10 @@
   <div class="w-full flex-col justify-center items-start inline-flex">
     <Breadcrumb
       :home="generateHomeBreadCrumb"
-      :model="generateBreadCrumbs"
+      :model="breadcrumbs.items"
       class="-ml-1.5 overflow-auto w-full"
     />
-    <div class="flex flex-wrap w-full py-4 items-end justify-between">
+    <div class="flex w-full py-4 items-center justify-between">
       <div
         class="flex flex-col gap-3 max-md:w-full"
         v-if="pageTitle || description"
@@ -34,7 +34,9 @@
 </template>
 
 <script>
+  import { useBreadcrumbs } from '@/stores/breadcrumbs'
   import Breadcrumb from 'primevue/breadcrumb'
+  import { useRouter } from 'vue-router'
 
   export default {
     name: 'PageHeadingBlock',
@@ -89,12 +91,16 @@
           to: '/'
         }
       },
-      generateBreadCrumbs() {
-        return this.$router.currentRoute.value.meta.breadCrumbs ?? []
-      },
       hasDefaultSlot() {
         return !!this.$slots.default
       }
+    },
+    setup() {
+      const $router = useRouter()
+      const breadcrumbs = useBreadcrumbs()
+      breadcrumbs.update($router.currentRoute.value.meta.breadCrumbs ?? [])
+
+      return { breadcrumbs }
     }
   }
 </script>

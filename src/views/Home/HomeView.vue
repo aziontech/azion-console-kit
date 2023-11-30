@@ -14,12 +14,12 @@
           </div>
           <div>
             <PrimeButton
-              icon="pi pi-plus-circle"
+              icon="pi pi-plus"
               class="w-full sm:w-auto"
               label="Create"
               type="button"
               size="small"
-              @click="createBoardManager.open()"
+              @click="createModalStore.toggle()"
             />
           </div>
         </div>
@@ -51,7 +51,7 @@
               />
               <PrimeButton
                 type="button"
-                label="Learn how to edit an application"
+                label="How to edit an application"
                 link
                 class="w-full sm:w-auto"
                 icon="pi pi-external-link"
@@ -91,7 +91,7 @@
               />
               <PrimeButton
                 type="button"
-                label="About Real-Time Metrics"
+                label="How to use Real-Time Metrics"
                 link
                 class="w-full sm:w-auto"
                 icon="pi pi-external-link"
@@ -254,6 +254,7 @@
   import { useField, useForm } from 'vee-validate'
   import * as yup from 'yup'
   import ContentBlock from '@/templates/content-block'
+  import { useCreateModalStore } from '@/stores/create-modal'
 
   export default {
     name: 'home-view',
@@ -263,7 +264,6 @@
       Dropdown,
       ContentBlock
     },
-    inject: ['createBoardManager'],
     props: {
       listTeamsService: {
         type: Function,
@@ -350,6 +350,8 @@
       }
     },
     setup() {
+      const createModalStore = useCreateModalStore()
+
       const validationSchema = yup.object({
         name: yup.string().required('Name is a required field'),
         email: yup.string().email('Must be a valid email').required('E-mail is a required field'),
@@ -373,7 +375,8 @@
         errors,
         meta,
         resetForm,
-        values
+        values,
+        createModalStore
       }
     }
   }

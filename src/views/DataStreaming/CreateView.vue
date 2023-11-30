@@ -37,7 +37,7 @@
     // standard
     endpointUrl: yup.string().when('endpoint', {
       is: 'standard',
-      then: (schema) => schema.required('Endpoint url is a required field')
+      then: (schema) => schema.required('Endpoint URL is a required field')
     }),
     headers: yup.array().of(
       yup.object().shape({
@@ -49,11 +49,11 @@
     ),
     maxSize: yup.number().when('endpoint', {
       is: 'standard',
-      then: (schema) => schema.required('Max Size is a required field')
+      then: (schema) => schema.required('Payload Max Size is a required field')
     }),
     lineSeparator: yup.string().when('endpoint', {
       is: 'standard',
-      then: (schema) => schema.required('Log Line Separator is a required field')
+      then: (schema) => schema.required('Payload Log Line Separator is a required field')
     }),
     payloadFormat: yup.string().when('endpoint', {
       is: 'standard',
@@ -93,7 +93,7 @@
     }),
     objectKey: yup.string().when('endpoint', {
       is: 's3',
-      then: (schema) => schema.max(150).required('Object Key prefix is a required field')
+      then: (schema) => schema.max(150).required('Object Key Prefix is a required field')
     }),
     contentType: yup.string().when('endpoint', {
       is: 's3',
@@ -125,7 +125,7 @@
     }),
     apiKey: yup.string().when('endpoint', {
       is: 'elasticsearch',
-      then: (schema) => schema.required('Api Key is a required field')
+      then: (schema) => schema.required('API Key is a required field')
     }),
 
     // splunk
@@ -135,7 +135,7 @@
     }),
     splunkApiKey: yup.string().when('endpoint', {
       is: 'splunk',
-      then: (schema) => schema.required('Api Key is a required field')
+      then: (schema) => schema.required('API Key is a required field')
     }),
 
     // aws_kinesis_firehose
@@ -159,17 +159,17 @@
     // datadog
     datadogUrl: yup.string().when('endpoint', {
       is: 'datadog',
-      then: (schema) => schema.required('Datadog URL is a required field')
+      then: (schema) => schema.required('URL is a required field')
     }),
     datadogApiKey: yup.string().when('endpoint', {
       is: 'datadog',
-      then: (schema) => schema.required('Api Key is a required field')
+      then: (schema) => schema.required('API Key is a required field')
     }),
 
     // QRadar
     QRadarUrl: yup.string().when('endpoint', {
       is: 'qradar',
-      then: (schema) => schema.required('Qradar URL is a required field')
+      then: (schema) => schema.required('URL is a required field')
     }),
 
     // azure_monitor
