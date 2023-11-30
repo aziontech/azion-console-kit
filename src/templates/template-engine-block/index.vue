@@ -1,7 +1,8 @@
 <template>
+  <FormLoading v-if="isLoading"/>
   <div
     class="w-full flex flex-col gap-8 max-md:gap-6"
-    v-if="!isLoading"
+    v-else-if="!isLoading"
   >
     <FormHorizontal
       v-if="schema.fields"
@@ -100,9 +101,9 @@
     <Teleport to="#action-bar">
       <ActionBarTemplate
         v-if="!isLoading"
+        :loading="submitLoading"
         @submit="validateAndSubmit"
         :submitDisabled="!formTools.meta.valid || !formTools.meta.touched"
-        :loading="isLoading"
       />
     </Teleport>
   </div>
@@ -112,6 +113,7 @@
   import { ref, onBeforeMount, defineOptions } from 'vue'
   import FormHorizontal from '@templates/create-form-block-new/form-horizontal'
   import ActionBarTemplate from '@templates/action-bar-block'
+  import FormLoading from './FormLoading'
   import InputText from 'primevue/inputtext'
   import { useForm } from 'vee-validate'
   import * as yup from 'yup'
@@ -140,6 +142,7 @@
   const validationSchema = ref()
   const formTools = ref({})
   const isLoading = ref(true)
+  const submitLoading = ref(false)
 
   const loadTemplate = async (id) => {
     try {
@@ -167,7 +170,7 @@
         auxValidator[element.name] = yup.string()
         if (element.attrs.required) {
           auxValidator[element.name] = auxValidator[element.name].required(
-            `${element.name} is required`
+            `${element.label} is required`
           )
         }
         if (element.attrs.maxLength) {
@@ -202,7 +205,7 @@
           auxValidator[element.name] = yup.string()
           if (element.attrs.required) {
             auxValidator[element.name] = auxValidator[element.name].required(
-              `${element.name} is required`
+              `${element.label} is required`
             )
           }
           if (element.attrs.maxLength) {
@@ -259,6 +262,7 @@
   }
 
   const validateAndSubmit = async () => {
+    submitLoading.value = true
     try {
       const payload = []
       if (schema.value.fields) {
@@ -287,6 +291,7 @@
       })
       const response = await props.postTemplateService(props.templateId, payload)
       emit('instantiate', response)
+      submitLoading.value = false
     } catch (error) {
       toast.add({
         closable: false,

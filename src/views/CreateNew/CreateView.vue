@@ -1,8 +1,26 @@
-<template>
-  <ContentBlock v-if="!isLoading">
+<template> 
+<ContentBlock>
     <template #heading>
-      <PageHeadingBlock :pageTitle="solution.name" />
-      <div class="flex flex-col sm:flex-row gap-4 lg:items-center">
+      <div class="flex flex-col gap-4" v-if="isLoading">
+        <div class="flex gap-3">
+          <Skeleton class="h-4 w-10"/>
+          <Skeleton class="h-4 w-24"/>
+        </div>
+        <Skeleton class="h-9 w-64"/>
+        <div class="flex gap-4">
+          <Skeleton class="hidden sm:flex w-10 h-10"/>
+          <div class="flex flex-col gap-4 sm:flex-row w-full">
+            <div class="flex items-center gap-3">
+              <Skeleton class="h-4 w-20"/>
+              <Skeleton class="h-4 w-20"/>
+              <Skeleton class="h-4 w-36"/>
+            </div>
+            <Skeleton class="sm:ml-auto h-9 sm:w-28"/>
+          </div>
+        </div>
+      </div>
+      <PageHeadingBlock :pageTitle="solution.name" v-if="!isLoading"/>
+      <div class="flex flex-col sm:flex-row gap-4 lg:items-center" v-if="!isLoading">
         <div class="flex flex-col sm:flex-row gap-4 sm:items-center">
           <div class="w-10 h-10 hidden rounded sm:flex justify-center items-center bg-white">
             <img
@@ -191,6 +209,7 @@
   import PrimeDialog from 'primevue/dialog'
   import ContentBlock from '@/templates/content-block'
   import Sidebar from 'primevue/sidebar'
+  import Skeleton from 'primevue/skeleton'
   import PageHeadingBlock from '@/templates/page-heading-block'
   import { getTemplate, instantiateTemplate } from '@/services/template-engine-services'
   export default {
@@ -200,7 +219,8 @@
       PageHeadingBlock,
       PrimeButton,
       PrimeDialog,
-      Sidebar
+      Sidebar,
+      Skeleton,
     },
     data: () => ({
       isLoading: false,
@@ -224,6 +244,7 @@
         required: true
       }
     },
+
     async beforeMount() {
       await this.loadSolution()
     },

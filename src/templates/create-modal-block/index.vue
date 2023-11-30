@@ -1,5 +1,5 @@
 <template>
-  <div class="w-full max-w-4xl flex flex-col sm:flex-row p-0 sm:pl-5 sm:pr-[18px] gap-4">
+  <div class="w-full max-w-4xl flex flex-col sm:flex-row p-0 sm:pl-5 sm:pr-[18px] gap-4 pb-4">
     <div class="sm:min-w-[240px] mt-4">
       <Listbox
         @change="onMenuChange"
