@@ -107,7 +107,7 @@
                     v-model="code"
                     :initialValue="initialCodeValue"
                     language="javascript"
-                    :errors="!!errors.code"
+                    :errors="hasCodeError"
                   />
                   <small
                     v-if="errors.code"
@@ -132,7 +132,7 @@
                   v-model="code"
                   :initialValue="initialCodeValue"
                   language="javascript"
-                  :errors="!!errors.code"
+                  :errors="hasCodeError"
                 />
                 <small
                   v-if="errors.code"
@@ -156,7 +156,7 @@
                     v-model="jsonArgs"
                     :initialValue="initialJsonArgsValue"
                     language="json"
-                    :errors="!!errors.jsonArgs"
+                    :errors="hasArgsError"
                   />
                 </SplitterPanel>
 
@@ -172,7 +172,7 @@
                   v-model="jsonArgs"
                   :initialValue="initialJsonArgsValue"
                   language="json"
-                  :errors="!!errors.jsonArgs"
+                  :errors="hasArgsError"
                 />
               </div>
             </TabPanel>
@@ -269,6 +269,14 @@
     }
 
     return languageLabels[language.value]
+  })
+
+  const hasCodeError = computed(() => {
+    return !!errors.code
+  })
+
+  const hasArgsError = computed(() => {
+    return !!errors.jsonArgs
   })
 
   const updateObject = computed(() => {

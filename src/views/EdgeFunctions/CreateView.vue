@@ -104,7 +104,7 @@
                     v-model="code"
                     :initialValue="HelloWorldSample"
                     language="javascript"
-                    :errors="!!errors.code"
+                    :errors="hasCodeError"
                   />
                   <small
                     v-if="errors.code"
@@ -129,7 +129,7 @@
                   v-model="code"
                   :initialValue="HelloWorldSample"
                   language="javascript"
-                  :errors="!!errors.code"
+                  :errors="hasCodeError"
                 />
                 <small
                   v-if="errors.code"
@@ -153,7 +153,7 @@
                     v-model="jsonArgs"
                     :initialValue="ARGS_INITIAL_STATE"
                     language="json"
-                    :errors="!!errors.jsonArgs"
+                    :errors="hasArgsError"
                   />
                 </SplitterPanel>
 
@@ -169,7 +169,7 @@
                   v-model="jsonArgs"
                   :initialValue="ARGS_INITIAL_STATE"
                   language="json"
-                  :errors="!!errors.jsonArgs"
+                  :errors="hasArgsError"
                 />
               </div>
             </TabPanel>
@@ -243,6 +243,14 @@
   const { value: jsonArgs, setValue: setArgs } = useField('jsonArgs')
   const { value: code } = useField('code')
   const { value: active } = useField('active')
+
+  const hasCodeError = computed(() => {
+    return !!errors.code
+  })
+
+  const hasArgsError = computed(() => {
+    return !!errors.jsonArgs
+  })
 
   const updateObject = computed(() => {
     return {
