@@ -8,7 +8,9 @@ import {
   AZION_DOCUMENTATION_PRODUCTS,
   AZION_SEARCH_RESULT,
   AZION_CONTACT_SUPPORT,
-  openContactSupport
+  openContactSupport,
+  openGoogleAuthenticatorAppDocumentation,
+  GOOGLE_AUTHENTICATOR_DOCUMENTATION
 } from '@/helpers/azion-documentation-window-opener'
 import { afterAll, describe, expect, it, vi } from 'vitest'
 
@@ -63,5 +65,13 @@ describe('AzionDocumentationWindowOpener', () => {
     openContactSupport()
 
     expect(openWindowSpy).toHaveBeenCalledWith(AZION_CONTACT_SUPPORT, '_blank')
+  })
+
+  it('should open a new window with Google Authenticator documentation link', () => {
+    const openWindowSpy = vi.spyOn(window, 'open')
+
+    openGoogleAuthenticatorAppDocumentation()
+
+    expect(openWindowSpy).toHaveBeenCalledWith(GOOGLE_AUTHENTICATOR_DOCUMENTATION, '_blank')
   })
 })

@@ -4,7 +4,8 @@ import {
   openDocumentation,
   openAPIDocumentation,
   openContactSupport,
-  openSearchResult
+  openSearchResult,
+  openGoogleAuthenticatorAppDocumentation
 } from './azion-documentation-window-opener'
 import InviteSession from './invite-session'
 import { themeSelect } from './theme-select'
@@ -27,5 +28,6 @@ export {
   parseCamelToSnake,
   parseSnakeToCamel,
   openSearchResult,
-  getEnvironmentFromUrl
+  getEnvironmentFromUrl,
+  openGoogleAuthenticatorAppDocumentation
 }
