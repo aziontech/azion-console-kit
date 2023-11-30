@@ -12,8 +12,8 @@ export const createNewRoutes = {
       component: () => import('@views/CreateNew/CreateView.vue'),
       props: {
         getTemplateService: TemplateEngineService.getTemplate,
-        getSolutionService: MarketplaceService.loadSolution,
-        postTemplateService: TemplateEngineService.instantiateTemplate
+        loadSolutionService: MarketplaceService.loadSolutionService,
+        instantiateTemplateService: TemplateEngineService.instantiateTemplate
       },
       meta: {
         breadCrumbs: [

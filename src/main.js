@@ -30,7 +30,7 @@ pinia.use(piniaPluginPersistedstate)
 app.config.globalProperties.HelpCenterServices = HelpCenterServices
 app.use(PrimeVue)
 app.directive('tooltip', Tooltip)
-app.use(ToastService).provide('toast', app.config.globalProperties.$toast)
+app.use(ToastService)
 app.use(pinia)
 app.use(router)
 app.use(VueMonacoEditorPlugin, {

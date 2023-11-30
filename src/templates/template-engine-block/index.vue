@@ -11,7 +11,7 @@
       <template #inputs>
         <div
           class="flex flex-col sm:max-w-lg w-full gap-2"
-          v-for="field in schema.fields.filter((element) => !element.hidden)"
+          v-for="field in removeHiddenFields(schema.fields)"
           :key="field.name"
         >
           <label
@@ -59,7 +59,7 @@
         <template #inputs>
           <div
             class="flex flex-col sm:max-w-lg w-full gap-2"
-            v-for="field in group.fields.filter((element) => !element.hidden)"
+            v-for="field in removeHiddenFields(group.fields)"
             :key="field.name"
           >
             <label
@@ -128,7 +128,7 @@
       type: Function,
       required: true
     },
-    postTemplateService: {
+    instantiateTemplateService: {
       type: Function
     },
     templateId: {
@@ -257,6 +257,10 @@
     validationSchema
   })
 
+  const removeHiddenFields = (fields) => {
+    return fields.filter((field) => !field.hidden)
+  }
+
   const inputPassword = (inputName, text) => {
     setFieldValue(inputName, text)
   }
@@ -275,21 +279,14 @@
       }
       payload.forEach((_, index) => {
         payload[index] = JSON.parse(JSON.stringify(payload[index]))
-        const val = payload[index].value.value
-        payload[index].field = payload[index].name
-        delete payload[index].name
-        delete payload[index].value
-        delete payload[index].hidden
-        delete payload[index].type
-        delete payload[index].label
-        delete payload[index].info
-        delete payload[index].description
-        delete payload[index].placeholder
-        delete payload[index].validators
-        delete payload[index].attrs
-        payload[index].value = val
+        const sanitizedField = {
+          field: payload[index].name,
+          instantiation_data_path: payload[index].instantiation_data_path,
+          value: payload[index].value.value
+        }
+        payload[index] = sanitizedField
       })
-      const response = await props.postTemplateService(props.templateId, payload)
+      const response = await props.instantiateTemplateService(props.templateId, payload)
       emit('instantiate', response)
       submitLoading.value = false
     } catch (error) {

@@ -66,11 +66,13 @@
       </div>
     </template>
     <template #content>
+      <FormLoading v-if="isLoading" />
       <TemplateEngineBlock
+        v-else
         @instantiate="handleInstantiate"
-        :getTemplateService="getTemplate"
-        :postTemplateService="instantiateTemplate"
-        :templateId="uuid"
+        :getTemplateService="getTemplateService"
+        :instantiateTemplateService="instantiateTemplateService"
+        :templateId="solution.referenceId"
       />
       <PrimeDialog
         modal
@@ -210,8 +212,9 @@
   import ContentBlock from '@/templates/content-block'
   import Sidebar from 'primevue/sidebar'
   import Skeleton from 'primevue/skeleton'
+  import FormLoading from '@/templates/template-engine-block/FormLoading'
   import PageHeadingBlock from '@/templates/page-heading-block'
-  import { getTemplate, instantiateTemplate } from '@/services/template-engine-services'
+
   export default {
     components: {
       TemplateEngineBlock,
@@ -221,39 +224,39 @@
       PrimeDialog,
       Sidebar,
       Skeleton,
+      FormLoading
     },
     data: () => ({
       isLoading: false,
       showDetails: false,
       solution: {},
-      uuid: '9cd54b7d-666a-4e45-8097-47ae1fb70014',
-      getTemplate,
-      instantiateTemplate
     }),
     props: {
       getTemplateService: {
         type: Function,
         required: true
       },
-      postTemplateService: {
+      instantiateTemplateService: {
         type: Function,
         required: true
       },
-      getSolutionService: {
+      loadSolutionService: {
         type: Function,
         required: true
       }
     },
 
-    async beforeMount() {
+    async created() {
       await this.loadSolution()
     },
     methods: {
       async loadSolution() {
         try {
           this.isLoading = true
-          const { vendor, solution } = this.$route.params
-          this.solution = await this.getSolutionService(vendor, solution)
+          this.solution = await this.loadSolutionService({
+            vendor: this.$route.params.vendor,
+            solution: this.$route.params.solution
+          })
         } catch (error) {
           this.$toast.add({
             closable: false,
@@ -269,7 +272,7 @@
         this.showDetails = true
       },
       handleInstantiate(element) {
-        this.$router.push(element.redirectURL)
+        this.$router.push(`/deploy/${element.uuid}`)
       }
     }
   }

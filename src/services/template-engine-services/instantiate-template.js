@@ -14,9 +14,7 @@ export const instantiateTemplate = async (templateId, body) => {
 const parseHttpResponse = (httpResponse) => {
   switch (httpResponse.statusCode) {
     case 201:
-      return {
-        redirectURL: `/deploy/${httpResponse.body.uuid}`
-      }
+      return httpResponse.body
     case 400:
       const apiError = httpResponse.body.error[0]
       throw new Error(apiError).message
