@@ -187,6 +187,6 @@
   }
 
   onUnmounted(() => {
-    getInstance().hideBadge()
+    getInstance()?.hideBadge()
   })
 </script>

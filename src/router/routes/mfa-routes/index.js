@@ -3,6 +3,7 @@ import * as AuthServices from '@/services/auth-services'
 import { listTypeAccountService } from '@/services/switch-account-services/list-type-account-service'
 import { switchAccountService } from '@/services/auth-services/switch-account-service'
 import { AccountHandler } from '@/helpers/account-handler'
+import * as Helpers from '@/helpers'
 
 /** @type {import('vue-router').RouteRecordRaw} */
 export const mfaRoutes = {
@@ -17,6 +18,7 @@ export const mfaRoutes = {
         generateQrCodeMfaService: MfaServices.generateQrCodeMfaService,
         validateMfaCodeService: MfaServices.validateMfaCodeService,
         verifyAuthenticationService: AuthServices.verifyAuthenticationService,
+        openGoogleAuthenticatorAppDocumentation: Helpers.openGoogleAuthenticatorAppDocumentation,
         accountHandler: new AccountHandler(switchAccountService, listTypeAccountService)
       },
       meta: {

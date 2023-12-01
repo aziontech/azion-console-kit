@@ -20,11 +20,7 @@
       type: Object,
       default: () => ({})
     },
-    disabledFeedback: {
-      type: Boolean,
-      default: false
-    },
-    disabledRedirect: {
+    disabledCallback: {
       type: Boolean,
       default: false
     },
@@ -69,7 +65,6 @@
   }
 
   const showFeedback = (feedback = 'created successfully') => {
-    if (props.disabledFeedback) return
     showToast('success', feedback)
   }
 
@@ -79,17 +74,16 @@
 
   const handleSuccess = (response) => {
     emit('on-response', response)
+    if (props.disabledCallback) return
+
     showFeedback(response.feedback)
-    if (props.disabledFeedback) return
     redirectToUrl(response.urlToEditView)
   }
 
-  const onSubmit = handleSubmit(async (values, actions) => {
+  const onSubmit = handleSubmit(async (values) => {
     try {
       const response = await props.createService(values)
       handleSuccess(response)
-      if (props.goBack) onCancel()
-      if (props.cleanForm) actions.resetForm()
       blockViewRedirection.value = false
     } catch (error) {
       showToast('error', error)

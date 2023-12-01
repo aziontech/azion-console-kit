@@ -1,4 +1,5 @@
-import * as EdgeServicesService from '@/services/edge-services-service'
+import * as EdgeServiceServices from '@/services/edge-service-services'
+import * as EdgeServiceResourcesServices from '@/services/edge-service-resources-services'
 import * as Helpers from '@/helpers'
 
 /** @type {import('vue-router').RouteRecordRaw} */
@@ -11,9 +12,9 @@ export const edgeServicesRoutes = {
       name: 'list-edge-services',
       component: () => import('@views/EdgeServices/ListView.vue'),
       props: {
-        listEdgeServicesService: EdgeServicesService.listEdgeServicesService,
-        deleteEdgeServicesService: EdgeServicesService.deleteEdgeServicesService,
-        editEdgeServicesService: EdgeServicesService.editEdgeServicesService,
+        listEdgeServiceServices: EdgeServiceServices.listEdgeServiceServices,
+        deleteEdgeServiceServices: EdgeServiceServices.deleteEdgeServiceServices,
+        editEdgeServiceServices: EdgeServiceServices.editEdgeServiceServices,
         documentationService: Helpers.documentationCatalog.edgeServices
       },
       meta: {
@@ -30,7 +31,7 @@ export const edgeServicesRoutes = {
       name: 'create-edge-services',
       component: () => import('@views/EdgeServices/CreateView.vue'),
       props: {
-        createEdgeService: EdgeServicesService.createEdgeServicesService
+        createEdgeServiceServices: EdgeServiceServices.createEdgeServiceServices
       },
       meta: {
         breadCrumbs: [
@@ -50,15 +51,11 @@ export const edgeServicesRoutes = {
       name: 'edit-edge-services',
       component: () => import('@views/EdgeServices/EditView.vue'),
       props: {
-        loadEdgeService: EdgeServicesService.loadEdgeServicesService,
-        editEdgeService: EdgeServicesService.editEdgeServicesService,
-
-        createEdgeServicesResources: EdgeServicesService.createEdgeServicesResourcesService,
-        loadEdgeServicesResources: EdgeServicesService.loadEdgeServicesResourcesService,
-        editEdgeServicesResources: EdgeServicesService.editEdgeServicesResourcesService,
-        listEdgeServicesResources: EdgeServicesService.listEdgeServicesResourcesService,
-        deleteEdgeServicesResourcesService: EdgeServicesService.deleteEdgeServicesResourcesService,
-
+        loadEdgeService: EdgeServiceServices.loadEdgeServiceServices,
+        editEdgeService: EdgeServiceServices.editEdgeServiceServices,
+        listResourcesServices: EdgeServiceResourcesServices.listResourcesServices,
+        deleteResourcesServices: EdgeServiceResourcesServices.deleteResourcesServices,
+        documentationServiceResource: Helpers.documentationGuideProducts.edgeServicesResources,
         updatedRedirect: 'list-edge-services'
       },
       meta: {

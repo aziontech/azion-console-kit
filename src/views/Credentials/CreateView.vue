@@ -9,7 +9,6 @@
         :schema="validationSchema"
         @on-response="handleResponse"
         :disabledFeedback="true"
-        :cleanForm="false"
       >
         <template #form>
           <FormFieldsCreate

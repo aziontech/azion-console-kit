@@ -241,7 +241,7 @@
     },
     data() {
       return {
-        mainContent: '',
+        mainContent: [],
         articleContent: '',
         search: '',
         menuItems: [

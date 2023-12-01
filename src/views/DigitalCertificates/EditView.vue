@@ -5,280 +5,59 @@
     </template>
     <template #content>
       <EditFormBlock
-        :editService="editDigitalCertificateService"
-        :loadService="loadDigitalCertificateService"
-        :initialDataSetter="setValues"
-        :formData="values"
-        :formMeta="meta"
-        :updatedRedirect="updatedRedirect"
+        :editService="props.editDigitalCertificateService"
+        :loadService="props.loadDigitalCertificateService"
+        :schema="validationSchema"
+        :updatedRedirect="props.updatedRedirect"
       >
         <template #form>
-          <FormHorizontal
-            v-if="csr.modelValue"
-            title="Generate CSR and Private Key with Azion"
-            description="The Certificate Signing Request with Azion was generated. Copy the certificate and submit it to a certificate authority.
-        Paste the certificate in the respective field and click Save."
-          >
-            <template #inputs>
-              <div class="flex flex-col sm:max-w-lg w-full gap-2">
-                <label>Name *</label>
-                <InputText
-                  v-bind="name"
-                  type="text"
-                  placeholder="My digital certificate"
-                  :class="{ 'p-invalid': errors.name }"
-                />
-                <small
-                  v-if="errors.name"
-                  class="p-error text-xs font-normal leading-tight"
-                  >{{ errors.name }}</small
-                >
-              </div>
-              <div class="flex flex-col sm:max-w-lg w-full gap-2">
-                <label>Certificate </label>
-                <PrimeTextarea
-                  v-bind="certificate"
-                  :class="{ 'p-invalid': errors.certificate }"
-                  placeholder="-----BEGIN CERTIFICATE-----&#10;-----END CERTIFICATE-----"
-                  rows="5"
-                  cols="30"
-                />
-                <small
-                  v-if="errors.certificate"
-                  class="p-error text-xs font-normal leading-tight"
-                  >{{ errors.certificate }}</small
-                >
-              </div>
-              <div class="flex flex-col sm:max-w-lg w-full gap-2">
-                <label>Certificate Signing Request (CSR) </label>
-                <PrimeTextarea
-                  v-bind="csr"
-                  :class="{ 'p-invalid': errors.csr }"
-                  placeholder="-----BEGIN CERTIFICATE REQUEST-----&#10;-----END CERTIFICATE REQUEST-----"
-                  rows="5"
-                  cols="30"
-                />
-                <small
-                  v-if="errors.csr"
-                  class="p-error text-xs font-normal leading-tight"
-                  >{{ errors.csr }}</small
-                >
-              </div>
-              <div class="flex flex-col sm:max-w-lg w-full gap-2">
-                <PrimeButton
-                  class="max-sm:w-full"
-                  type="button"
-                  severity="secondary"
-                  :label="'Copy to Clipboard'"
-                  @click="copyCSRToclipboard"
-                />
-                <small v-if="csrCopied">Copied successfully!</small>
-              </div>
-            </template>
-          </FormHorizontal>
-          <FormHorizontal
-            v-if="!csr.modelValue && certificateType === certificateTypes.EDGE_CERTIFICATE"
-            title="Upload Certificate and Private Key"
-            description="To update a digital certificate, copy and paste the certificate and private key codes in the respective fields,
-        including the begin and end tags."
-          >
-            <template #inputs>
-              <div class="flex flex-col sm:max-w-lg w-full gap-2">
-                <label>Name *</label>
-                <InputText
-                  v-bind="name"
-                  type="text"
-                  placeholder="My digital certificate"
-                  :class="{ 'p-invalid': errors.name }"
-                />
-                <small
-                  v-if="errors.name"
-                  class="p-error text-xs font-normal leading-tight"
-                  >{{ errors.name }}</small
-                >
-              </div>
-              <div class="flex flex-col sm:max-w-lg w-full gap-2">
-                <label>Certificate </label>
-                <PrimeTextarea
-                  v-bind="certificate"
-                  :class="{ 'p-invalid': errors.certificate }"
-                  placeholder="For security reasons, the certificate can't be shown.&#10;To replace a digital certificate, paste the new certificate here."
-                  rows="5"
-                  cols="30"
-                />
-                <small
-                  v-if="errors.certificate"
-                  class="p-error text-xs font-normal leading-tight"
-                  >{{ errors.certificate }}</small
-                >
-              </div>
-              <div class="flex flex-col sm:max-w-lg w-full gap-2">
-                <label>Private key </label>
-                <PrimeTextarea
-                  v-model="privateKey"
-                  :class="{ 'p-invalid': errors.privateKey }"
-                  placeholder="For security reasons, the certificate can't be shown.&#10;To replace a digital certificate, paste the new private key here."
-                  rows="5"
-                  cols="30"
-                />
-                <small
-                  v-if="errors.privateKey"
-                  class="p-error text-xs font-normal leading-tight"
-                  >{{ errors.privateKey }}</small
-                >
-              </div>
-            </template>
-          </FormHorizontal>
-
-          <!-- Trusted case -->
-          <FormHorizontal
-            v-if="certificateType === certificateTypes.TRUSTED"
-            title="General"
-            description="description"
-          >
-            <template #inputs>
-              <div class="flex flex-col sm:max-w-lg w-full gap-2">
-                <label>Name *</label>
-                <InputText
-                  v-bind="name"
-                  type="text"
-                  :class="{ 'p-invalid': errors.name }"
-                />
-                <small
-                  v-if="errors.name"
-                  class="p-error text-xs font-normal leading-tight"
-                  >{{ errors.name }}</small
-                >
-              </div>
-            </template>
-          </FormHorizontal>
-          <FormHorizontal
-            v-if="certificateType === certificateTypes.TRUSTED"
-            title="Upload Trusted CA Certificate"
-            description="A Trusted Certificate Authority (CA) certificate can be used for Mutual Transport Layer Security (mTLS) configuration. To update a Trusted CA Certificate to Azion, paste the certificate code in the respective field."
-          >
-            <template #inputs>
-              <div class="flex flex-col sm:max-w-lg w-full gap-2">
-                <label>Certificate </label>
-                <PrimeTextarea
-                  v-bind="certificate"
-                  :class="{ 'p-invalid': errors.certificate }"
-                  placeholder="For security reasons, the certificate can't be shown.&#10;Paste a new certificate in this field to update it."
-                  rows="5"
-                  cols="30"
-                />
-                <small class="text-color-secondary text-xs font-normal leading-tight"
-                  >Intermediate certificates are accepted.</small
-                >
-                <small
-                  v-if="errors.certificate"
-                  class="p-error text-xs font-normal leading-tight"
-                  >{{ errors.certificate }}</small
-                >
-              </div>
-            </template>
-          </FormHorizontal>
+          <FormFieldsEditDigitalCertificates :clipboardWrite="clipboardWrite" />
+        </template>
+        <template #action-bar="{ onSubmit, formValid, onCancel, loading }">
+          <ActionBarBlockWithTeleport
+            @onSubmit="onSubmit"
+            @onCancel="onCancel"
+            :loading="loading"
+            :submitDisabled="!formValid"
+          />
         </template>
       </EditFormBlock>
     </template>
   </ContentBlock>
 </template>
 
-<script>
+<script setup>
   import EditFormBlock from '@/templates/edit-form-block'
-  import FormHorizontal from '@/templates/create-form-block/form-horizontal'
-  import PrimeTextarea from 'primevue/textarea'
-  import PrimeButton from 'primevue/button'
-  import InputText from 'primevue/inputtext'
+  import ActionBarBlockWithTeleport from '@/templates/action-bar-block/action-bar-with-teleport'
   import ContentBlock from '@/templates/content-block'
   import PageHeadingBlock from '@/templates/page-heading-block'
-  import { useForm, useField } from 'vee-validate'
+  import FormFieldsEditDigitalCertificates from './FormFields/FormFieldsEditDigitalCertificates.vue'
   import * as yup from 'yup'
-  import { ref, watch } from 'vue'
 
-  export default {
-    components: {
-      EditFormBlock,
-      PrimeTextarea,
-      InputText,
-      PrimeButton,
-      FormHorizontal,
-      ContentBlock,
-      PageHeadingBlock
+  const props = defineProps({
+    loadDigitalCertificateService: {
+      type: Function,
+      required: true
     },
-    props: {
-      loadDigitalCertificateService: {
-        type: Function,
-        required: true
-      },
-      editDigitalCertificateService: {
-        type: Function,
-        required: true
-      },
-      updatedRedirect: {
-        type: String,
-        required: true
-      }
+    editDigitalCertificateService: {
+      type: Function,
+      required: true
     },
-    setup() {
-      const edgeCertificateTypes = {
-        CSR: 'generateCSR',
-        UPLOAD: 'uploadCertificateAndPrivateKey'
-      }
-      const certificateTypes = {
-        EDGE_CERTIFICATE: 'edge_certificate',
-        TRUSTED: 'trusted_ca_certificate'
-      }
-
-      const validationSchema = yup.object({
-        name: yup.string().required('Name is a required field.'),
-        certificateType: yup.string(),
-        csr: yup.string(),
-        certificate: yup.string(),
-        privateKey: yup.string()
-      })
-
-      const { setValues, errors, defineInputBinds, defineComponentBinds, meta, resetForm, values } =
-        useForm({
-          validationSchema
-        })
-
-      const name = defineInputBinds('name', { validateOnInput: true })
-      const certificate = defineComponentBinds('certificate', { validateOnInput: true })
-      const csr = defineComponentBinds('csr')
-
-      const { value: certificateType } = useField('certificateType')
-      const { value: createCertificateType } = useField('createCertificateType')
-      const { value: privateKey, setValue: setPrivateKeyValue } = useField('privateKey')
-
-      watch(privateKey, (privateKeyValue) => {
-        if (privateKeyValue === '') setPrivateKeyValue(undefined)
-      })
-
-      const csrCopied = ref(false)
-      function copyCSRToclipboard() {
-        navigator.clipboard.writeText(csr.value.modelValue).then(() => {
-          csrCopied.value = true
-        })
-      }
-
-      return {
-        errors,
-        meta,
-        resetForm,
-        values,
-        setValues,
-        certificate,
-        certificateType,
-        createCertificateType,
-        name,
-        csr,
-        edgeCertificateTypes,
-        certificateTypes,
-        copyCSRToclipboard,
-        csrCopied,
-        privateKey
-      }
+    updatedRedirect: {
+      type: String,
+      required: true
+    },
+    clipboardWrite: {
+      type: Function,
+      required: true
     }
-  }
+  })
+
+  const validationSchema = yup.object({
+    name: yup.string().required('Name is a required field.'),
+    certificateType: yup.string(),
+    csr: yup.string(),
+    certificate: yup.string(),
+    privateKey: yup.string()
+  })
 </script>
