@@ -1034,7 +1034,7 @@
         <label
           for="payloadFormat"
           class="text-color text-base font-medium"
-          >Format *</label
+          >Format</label
         >
         <InputText
           v-model="payloadFormat"
@@ -1057,7 +1057,7 @@
         <label
           for="lineSeparator"
           class="text-color text-base font-medium"
-          >Log Line Separator *</label
+          >Log Line Separator</label
         >
         <InputText
           v-model="lineSeparator"
@@ -1079,7 +1079,7 @@
         <label
           for="maxSize"
           class="text-color text-base font-medium"
-          >Max Size *</label
+          >Max Size</label
         >
         <InputNumber
           v-model="maxSize"
