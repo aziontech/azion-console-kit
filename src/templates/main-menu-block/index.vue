@@ -196,6 +196,7 @@
   </header>
   <!-- Mobile Profile Menu  -->
   <Sidebar
+    @click="toggleProfileMobile"
     v-model:visible="showProfile"
     position="bottom"
     :show-close-icon="false"
@@ -254,6 +255,7 @@
           <Dropdown
             :modelValue="selectedTheme"
             @update:modelValue="selectTheme"
+            @click="preventSidebarClick"
             optionValue="value"
             optionLabel="name"
             :options="themeOptions"
@@ -819,6 +821,9 @@
       }
     },
     methods: {
+      preventSidebarClick(event) {
+        event.stopPropagation();
+      },
       ...mapActions(useAccountStore, ['setTheme']),
       toggleProfileMobile() {
         this.showProfile = !this.showProfile
