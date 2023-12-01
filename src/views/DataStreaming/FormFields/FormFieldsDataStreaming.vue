@@ -243,75 +243,6 @@
             @click="addHeader()"
           />
         </div>
-
-        <div class="flex flex-col sm:max-w-lg w-full gap-2">
-          <label
-            for="payloadFormat"
-            class="text-color text-base font-medium"
-            >Payload Format *</label
-          >
-          <InputText
-            v-model="payloadFormat"
-            type="text"
-            placeholder="$dataset"
-            :class="{ 'p-invalid': payloadFormatError }"
-          />
-          <small class="text-color-secondary text-xs font-normal leading-tight">
-            The format that payload will be sent. The $dataset variable will be replaced by all logs
-            already with the log line separator applied.
-          </small>
-          <small
-            id="data-set-help"
-            class="p-error"
-            >{{ payloadFormatError }}</small
-          >
-        </div>
-
-        <div class="flex flex-col sm:max-w-lg w-full gap-2">
-          <label
-            for="lineSeparator"
-            class="text-color text-base font-medium"
-            >Log Line Separator Payload *</label
-          >
-          <InputText
-            v-model="lineSeparator"
-            type="text"
-            placeholder="\n"
-            :class="{ 'p-invalid': lineSeparatorError }"
-          />
-          <small class="text-color-secondary text-xs font-normal leading-tight">
-            The format that payload will be sent. The $dataset variable will be replaced by all logs
-            already with the log line separator applied.
-          </small>
-          <small
-            id="max-size-help"
-            class="p-error"
-            >{{ lineSeparatorError }}</small
-          >
-        </div>
-
-        <div class="flex flex-col sm:max-w-lg w-full gap-2">
-          <label
-            for="maxSize"
-            class="text-color text-base font-medium"
-            >Max Size Payload *</label
-          >
-          <InputNumber
-            v-model="maxSize"
-            placeholder="1000000"
-            :useGrouping="false"
-            :class="{ 'p-invalid': maxSizeError }"
-          />
-          <small class="text-color-secondary text-xs font-normal leading-tight">
-            You can define the maximum size of data packets in bytes. Use a value starting from
-            1000000.
-          </small>
-          <small
-            id="max-size-help"
-            class="p-error"
-            >{{ maxSizeError }}</small
-          >
-        </div>
       </div>
 
       <div
@@ -508,7 +439,7 @@
           <label
             for="objectKeyPrefix"
             class="text-color text-base font-medium"
-            >Object Key Prefix *</label
+            >Object Key Prefix</label
           >
           <PrimePassword
             id="objectKey"
@@ -1090,6 +1021,82 @@
             >{{ blobTokenError }}</small
           >
         </div>
+      </div>
+    </template>
+  </FormHorizontal>
+  <FormHorizontal
+    title="Payload"
+    description="Description"
+    v-if="endpoint === 'standard'"
+  >
+    <template #inputs>
+      <div class="flex flex-col sm:max-w-lg w-full gap-2">
+        <label
+          for="payloadFormat"
+          class="text-color text-base font-medium"
+          >Format *</label
+        >
+        <InputText
+          v-model="payloadFormat"
+          type="text"
+          placeholder="$dataset"
+          :class="{ 'p-invalid': payloadFormatError }"
+        />
+        <small class="text-color-secondary text-xs font-normal leading-tight">
+          The format that payload will be sent. The $dataset variable will be replaced by all logs
+          already with the log line separator applied.
+        </small>
+        <small
+          id="data-set-help"
+          class="p-error"
+          >{{ payloadFormatError }}</small
+        >
+      </div>
+
+      <div class="flex flex-col sm:max-w-lg w-full gap-2">
+        <label
+          for="lineSeparator"
+          class="text-color text-base font-medium"
+          >Log Line Separator *</label
+        >
+        <InputText
+          v-model="lineSeparator"
+          type="text"
+          placeholder="\n"
+          :class="{ 'p-invalid': lineSeparatorError }"
+        />
+        <small class="text-color-secondary text-xs font-normal leading-tight">
+          The format that payload will be sent. The $dataset variable will be replaced by all logs
+          already with the log line separator applied.
+        </small>
+        <small
+          id="max-size-help"
+          class="p-error"
+          >{{ lineSeparatorError }}</small
+        >
+      </div>
+
+      <div class="flex flex-col sm:max-w-lg w-full gap-2">
+        <label
+          for="maxSize"
+          class="text-color text-base font-medium"
+          >Max Size *</label
+        >
+        <InputNumber
+          v-model="maxSize"
+          placeholder="1000000"
+          :useGrouping="false"
+          :class="{ 'p-invalid': maxSizeError }"
+        />
+        <small class="text-color-secondary text-xs font-normal leading-tight">
+          You can define the maximum size of data packets in bytes. Use a value starting from
+          1000000.
+        </small>
+        <small
+          id="max-size-help"
+          class="p-error"
+          >{{ maxSizeError }}</small
+        >
       </div>
     </template>
   </FormHorizontal>
