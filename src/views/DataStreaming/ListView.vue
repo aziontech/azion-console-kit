@@ -75,7 +75,7 @@
 <template>
   <ContentBlock>
     <template #heading>
-      <PageHeadingBlock pageTitle="Data Streaming"></PageHeadingBlock>
+      <PageHeadingBlock pageTitle="Data Streaming" />
     </template>
     <template #content>
       <ListTableBlock
@@ -83,11 +83,12 @@
         addButtonLabel="Add"
         createPagePath="/data-streaming/create"
         editPagePath="/data-streaming/edit"
+        pageTitleDelete="Delete Data Streaming"
         :listService="listDataStreamingService"
         :deleteService="deleteDataStreamingService"
         :columns="getColumns"
         @on-load-data="handleLoadData"
-      ></ListTableBlock>
+      />
       <EmptyResultsBlock
         v-else
         title="No data streaming has been created"
