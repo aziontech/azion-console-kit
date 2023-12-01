@@ -255,7 +255,7 @@
           <Dropdown
             :modelValue="selectedTheme"
             @update:modelValue="selectTheme"
-            @click="preventSidebarClick"
+            @click.stop
             optionValue="value"
             optionLabel="name"
             :options="themeOptions"
@@ -821,9 +821,6 @@
       }
     },
     methods: {
-      preventSidebarClick(event) {
-        event.stopPropagation()
-      },
       ...mapActions(useAccountStore, ['setTheme']),
       toggleProfileMobile() {
         this.showProfile = !this.showProfile
