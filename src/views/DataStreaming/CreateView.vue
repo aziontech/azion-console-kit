@@ -1,7 +1,7 @@
 <template>
   <ContentBlock>
     <template #heading>
-      <PageHeadingBlock pageTitle="Create Data Streaming"></PageHeadingBlock>
+      <PageHeadingBlock pageTitle="Create Data Streaming" />
     </template>
     <template #content>
       <CreateFormBlock
@@ -301,7 +301,6 @@
                   <InputText
                     v-model="lineSeparator"
                     type="text"
-                    placeholder="\n"
                     :class="{ 'p-invalid': errors.lineSeparator }"
                   />
                   <small class="text-color-secondary text-xs font-normal leading-tight">
@@ -1425,7 +1424,7 @@
       endpointUrl: '',
       headers: [{ value: '', deleted: false }],
       maxSize: 1000000,
-      lineSeparator: '\n',
+      lineSeparator: '\\n',
       payloadFormat: '$dataset',
 
       // Kafka
