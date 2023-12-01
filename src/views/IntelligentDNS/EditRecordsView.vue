@@ -8,7 +8,9 @@
         :editService="editRecordServiceWithIDNSIdDecorator"
         :loadService="loadRecordServiceWithIDNSIdDecorator"
         :initialValues="initialValues"
+        :disableRedirect="true"
         :schema="validationSchema"
+        @on-edit-success="handleEditSuccess"
       >
         <template #form>
           <FormFieldsRecords></FormFieldsRecords>
@@ -45,6 +47,10 @@
     loadRecordsService: {
       type: Function,
       required: true
+    },
+    updatedRedirect: {
+      type: String,
+      required: true
     }
   })
 
@@ -67,13 +73,20 @@
     intelligentDNSId: router.currentRoute.value.params.intelligentDNSId
   }
 
-  async function loadRecordServiceWithIDNSIdDecorator(payload) {
+  const loadRecordServiceWithIDNSIdDecorator = async (payload) => {
     const intelligentDNSId = route.params.intelligentDNSId
     return await props.loadRecordsService({ id: payload.id, intelligentDNSId })
   }
 
-  async function editRecordServiceWithIDNSIdDecorator(payload) {
+  const editRecordServiceWithIDNSIdDecorator = async (payload) => {
     const intelligentDNSId = route.params.intelligentDNSId
     return await props.editRecordsService({ intelligentDNSId, ...payload })
+  }
+  const handleEditSuccess = () => {
+    const pathToListIDNSRecords = props.updatedRedirect.replace(
+      ':intelligentDNSId',
+      route.params.intelligentDNSId
+    )
+    router.push({ path: pathToListIDNSRecords })
   }
 </script>

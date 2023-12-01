@@ -25,6 +25,10 @@
       type: String,
       required: false
     },
+    disableRedirect: {
+      type: Boolean,
+      default: false
+    },
     updatedRedirect: {
       type: String,
       required: true
@@ -34,6 +38,8 @@
       required: true
     }
   })
+
+  const emit = defineEmits(['on-edit-success'])
 
   const router = useRouter()
   const route = useRoute()
@@ -90,6 +96,10 @@
       const feedback = await props.editService(values)
       showToast('success', feedback ?? 'edited successfully')
       blockViewRedirection.value = false
+      emit('on-edit-success', feedback)
+      if (props.disableRedirect) {
+        return
+      }
       goBackToList()
     } catch (error) {
       blockViewRedirection.value = true
