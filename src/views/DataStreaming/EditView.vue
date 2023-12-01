@@ -1,7 +1,7 @@
 <template>
   <ContentBlock>
     <template #heading>
-      <PageHeadingBlock pageTitle="Edit Data Streaming"></PageHeadingBlock>
+      <PageHeadingBlock pageTitle="Edit Data Streaming" />
     </template>
     <template #content>
       <EditFormBlock
@@ -10,6 +10,7 @@
         :initialDataSetter="setValues"
         :formData="values"
         :formMeta="meta"
+        updatedRedirect="list-data-streaming"
       >
         <template #form>
           <FormHorizontal
