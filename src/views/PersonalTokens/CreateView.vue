@@ -38,21 +38,15 @@
   })
 
   const initialValues = {
+    name: '',
     customExpiration: null,
+    description: '',
     selectedExpiration: '1'
   }
 
   const toast = useToast()
-  const handleResponse = ({ feedback, token }) => {
-    toast.add({
-      closable: false,
-      severity: 'success',
-      summary: feedback,
-      life: 10000
-    })
-    if (token) {
-      personalTokenKey.value = token
-    }
+  const handleResponse = ({ token }) => {
+    personalTokenKey.value = token
   }
 
   const copyPersonalToken = async () => {

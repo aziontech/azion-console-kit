@@ -27,10 +27,6 @@
     cleanForm: {
       type: Boolean,
       default: true
-    },
-    goBack: {
-      type: Boolean,
-      required: true
     }
   })
 
@@ -74,9 +70,8 @@
 
   const handleSuccess = (response) => {
     emit('on-response', response)
-    if (props.disabledCallback) return
-
     showFeedback(response.feedback)
+    if (props.disabledCallback) return
     redirectToUrl(response.urlToEditView)
   }
 

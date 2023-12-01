@@ -7,8 +7,9 @@
       <CreateFormBlock
         :createService="props.createCredentialService"
         :schema="validationSchema"
+        :initialValues="initialValues"
+        :disabledCallback="true"
         @on-response="handleResponse"
-        :disabledFeedback="true"
       >
         <template #form>
           <FormFieldsCreate
@@ -53,27 +54,25 @@
   })
 
   const validationSchema = yup.object({
-    name: yup.string().required('Name is a required field'),
+    name: yup.string().required().label('Name'),
     description: yup.string(),
     token: yup.string(),
-    status: yup.boolean().default(true)
+    status: yup.boolean()
   })
+  const initialValues = {
+    name: '',
+    description: '',
+    token: '',
+    status: true
+  }
 
   const token = ref('')
   const generatedToken = ref(false)
 
   const toast = useToast()
   const handleResponse = (data) => {
-    toast.add({
-      closable: false,
-      severity: 'success',
-      summary: data.feedback,
-      life: 10000
-    })
-    if (data.token) {
-      token.value = data.token
-      generatedToken.value = true
-    }
+    token.value = data.token
+    generatedToken.value = true
   }
 
   const copyToken = async () => {
