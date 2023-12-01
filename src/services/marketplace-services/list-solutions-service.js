@@ -36,8 +36,8 @@ const adapt = (httpResponse) => {
           name: element.name,
           referenceId: element.solution_reference_id,
           vendor: element.vendor,
-          headline: element.headline,
           slug: element.slug,
+          headline: element.headline,
           featured: element.featured,
           released: element.new_release
         }))
