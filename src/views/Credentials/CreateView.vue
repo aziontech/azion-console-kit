@@ -175,8 +175,7 @@
     toast.add({
       closable: true,
       severity: 'success',
-      summary: data.feedback,
-      
+      summary: data.feedback
     })
     if (data.token) {
       token.value = data.token
@@ -189,8 +188,7 @@
     toast.add({
       closable: true,
       severity: 'success',
-      summary: 'token copied',
-      
+      summary: 'token copied'
     })
   }
 </script>

@@ -374,8 +374,7 @@
         this.$toast.add({
           closable: true,
           severity: 'error',
-          summary: error,
-          
+          summary: error
         })
       }
     },
@@ -504,8 +503,7 @@
         this.$toast.add({
           closable: true,
           severity: 'success',
-          summary: 'domain name copied',
-          
+          summary: 'domain name copied'
         })
       }
     }

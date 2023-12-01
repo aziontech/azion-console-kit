@@ -124,8 +124,7 @@
         let toastConfig = {
           closable: true,
           severity: 'success',
-          summary: '',
-          
+          summary: ''
         }
 
         try {

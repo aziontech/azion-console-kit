@@ -141,8 +141,7 @@
   const PAGE_TYPE = 'marketplace'
   const ERROR_PROPS = {
     closable: true,
-    severity: 'error',
-    
+    severity: 'error'
   }
   const CATEGORY_ALL = { name: 'All', code: 'all' }
 

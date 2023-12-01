@@ -149,8 +149,7 @@
     toast.add({
       closable: true,
       severity: 'success',
-      summary: 'Nameservers copied',
-      
+      summary: 'Nameservers copied'
     })
   }
 </script>

@@ -141,8 +141,7 @@
       toast.add({
         closable: true,
         severity: 'error',
-        summary: error,
-        
+        summary: error
       })
     } finally {
       isLoading.value = false

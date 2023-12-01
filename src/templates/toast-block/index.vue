@@ -1,5 +1,8 @@
 <template>
-  <Toast class="" :pt="toast">
+  <Toast
+    class=""
+    :pt="toast"
+  >
     <template #message="slotProps">
       <div class="flex flex-column flex-grow">
         <header class="flex gap-2 items-center justify-between">
@@ -9,10 +12,17 @@
               :severity="parseSeverity(slotProps.message.severity)"
               :pt="{ icon: { class: 'mr-0' }, root: { class: 'w-6 h-6' } }"
             />
-            <h5 class="text-color text-base font-semibold">{{ getTitle(slotProps.message.summary) }}</h5>
+            <h5 class="text-color text-base font-semibold">
+              {{ getTitle(slotProps.message.summary) }}
+            </h5>
           </div>
         </header>
-        <p class="text-sm font-normal mt-3" v-if="slotProps.message.detail">{{ slotProps.message.detail }}</p>
+        <p
+          class="text-sm font-normal mt-3"
+          v-if="slotProps.message.detail"
+        >
+          {{ slotProps.message.detail }}
+        </p>
 
         <!-- Link -->
         <PrimeButton

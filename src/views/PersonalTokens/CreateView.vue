@@ -318,8 +318,7 @@
     toast.add({
       closable: true,
       severity: 'success',
-      summary: feedback,
-      
+      summary: feedback
     })
     if (token) {
       personalTokenKey.value = token

@@ -73,8 +73,7 @@
           this.$toast.add({
             closable: true,
             severity: 'success',
-            summary: 'Edge Nodes authorized successfully!',
-            
+            summary: 'Edge Nodes authorized successfully!'
           })
           this.authorizeDialogVisible = false
         }

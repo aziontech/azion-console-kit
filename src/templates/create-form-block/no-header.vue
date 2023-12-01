@@ -63,8 +63,7 @@
           this.$toast.add({
             closable: true,
             severity: 'success',
-            summary: 'created successfully',
-            
+            summary: 'created successfully'
           })
           this.goBackToList()
         } catch (error) {

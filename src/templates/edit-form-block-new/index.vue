@@ -125,8 +125,7 @@
           this.$toast.add({
             closable: true,
             severity: 'success',
-            summary: feedback ?? 'edited successfully',
-            
+            summary: feedback ?? 'edited successfully'
           })
           this.blockViewRedirection = false
           this.goBackToList()
