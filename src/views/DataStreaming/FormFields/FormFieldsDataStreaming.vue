@@ -1062,7 +1062,6 @@
         <InputText
           v-model="lineSeparator"
           type="text"
-          placeholder="\n"
           :class="{ 'p-invalid': lineSeparatorError }"
         />
         <small class="text-color-secondary text-xs font-normal leading-tight">
