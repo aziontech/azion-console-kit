@@ -144,9 +144,9 @@
 
   const solution = ref()
   const loading = ref(false)
-  const $route = useRoute()
-  const $router = useRouter()
-  const $toast = useToast()
+  const route = useRoute()
+  const router = useRouter()
+  const toast = useToast()
   const breadcrumbs = useBreadcrumbs()
   const animateMessage = ref(false)
   const ERROR_PROPS = {
@@ -176,19 +176,19 @@
 
     const solutionBran = {
       label: solution.value.name,
-      to: $route.path
+      to: route.path
     }
-    breadcrumbs.update([...$route.meta.breadCrumbs, solutionBran])
+    breadcrumbs.update([...route.meta.breadCrumbs, solutionBran])
   })
 
   const loadSolution = async () => {
     try {
       solution.value = await props.loadSolutionService({
-        vendor: $route.params.vendor,
-        solution: $route.params.solution
+        vendor: route.params.vendor,
+        solution: route.params.solution
       })
     } catch (error) {
-      $toast.add({ ...ERROR_PROPS, summary: error })
+      toast.add({ ...ERROR_PROPS, summary: error })
     }
   }
 
@@ -200,7 +200,7 @@
     if (!solution.value.newLaunchFlow) {
       launchSolution()
     } else {
-      $toast.add({
+      toast.add({
         severity: 'warn',
         summary: 'Solution not ready to be lauch, development in progress.'
       })
@@ -208,7 +208,7 @@
   }
 
   const showFeedback = (feedback) => {
-    $toast.add({
+    toast.add({
       closable: false,
       severity: 'success',
       summary: feedback,
@@ -216,7 +216,7 @@
       link: {
         label: 'Go to Edge Function',
         callback: () => {
-          $router.push({ name: 'list-edge-functions' })
+          router.push({ name: 'list-edge-functions' })
         }
       }
     })
@@ -238,7 +238,7 @@
         showFeedback(feedback)
       }, 150)
     } catch (error) {
-      $toast.add({ ...ERROR_PROPS, summary: error })
+      toast.add({ ...ERROR_PROPS, summary: error })
     }
   }
 
