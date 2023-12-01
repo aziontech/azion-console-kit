@@ -142,7 +142,7 @@
         closable: true,
         severity: 'error',
         summary: error,
-        life: 10000
+        
       })
     } finally {
       isLoading.value = false

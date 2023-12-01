@@ -173,10 +173,10 @@
   const toast = useToast()
   const handleResponse = (data) => {
     toast.add({
-      closable: false,
+      closable: true,
       severity: 'success',
       summary: data.feedback,
-      life: 10000
+      
     })
     if (data.token) {
       token.value = data.token
@@ -187,10 +187,10 @@
   const copyToken = async () => {
     props.clipboardWrite(token.value)
     toast.add({
-      closable: false,
+      closable: true,
       severity: 'success',
       summary: 'token copied',
-      life: 10000
+      
     })
   }
 </script>

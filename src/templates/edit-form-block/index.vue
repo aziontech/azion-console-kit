@@ -86,10 +86,9 @@
           this.initialDataSetter(initialData)
         } catch (error) {
           this.$toast.add({
-            closable: false,
+            closable: true,
             severity: 'error',
-            summary: error,
-            life: 10000
+            summary: error
           })
         } finally {
           this.isLoading = false
@@ -100,18 +99,17 @@
           this.isLoading = true
           await this.editService(this.formData)
           this.$toast.add({
-            closable: false,
+            closable: true,
             severity: 'success',
             summary: 'edited successfully',
-            life: 10000
+            
           })
           this.goBackToList()
         } catch (error) {
           this.$toast.add({
-            closable: false,
+            closable: true,
             severity: 'error',
-            summary: error,
-            life: 10000
+            summary: error
           })
         } finally {
           setTimeout(() => {

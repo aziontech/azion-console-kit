@@ -61,18 +61,17 @@
           await this.createService(this.formData)
           this.cleanFormCallback()
           this.$toast.add({
-            closable: false,
+            closable: true,
             severity: 'success',
             summary: 'created successfully',
-            life: 10000
+            
           })
           this.goBackToList()
         } catch (error) {
           this.$toast.add({
-            closable: false,
+            closable: true,
             severity: 'error',
-            summary: error,
-            life: 10000
+            summary: error
           })
         } finally {
           this.isLoading = false

@@ -316,10 +316,10 @@
   const toast = useToast()
   const handleResponse = ({ feedback, token }) => {
     toast.add({
-      closable: false,
+      closable: true,
       severity: 'success',
       summary: feedback,
-      life: 10000
+      
     })
     if (token) {
       personalTokenKey.value = token
@@ -329,8 +329,7 @@
 
   const copyPersonalToken = async () => {
     const toastConfig = {
-      closable: false,
-      life: 10000,
+      closable: true,
       severity: 'success',
       summary: 'Personal Token copied to clipboard!'
     }

@@ -280,10 +280,10 @@
       handleCopyNameServers() {
         this.clipboardWrite('ns1.aziondns.net;ns2.aziondns.com;ns3.aziondns.org')
         this.$toast.add({
-          closable: false,
+          closable: true,
           severity: 'success',
           summary: 'Nameservers copied',
-          life: 10000
+          
         })
       },
       handleLoadData(event) {

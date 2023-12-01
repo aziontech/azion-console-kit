@@ -142,7 +142,7 @@
   const ERROR_PROPS = {
     closable: true,
     severity: 'error',
-    life: 10000
+    
   }
   const CATEGORY_ALL = { name: 'All', code: 'all' }
 

@@ -372,10 +372,10 @@
         await Promise.all([this.requestEdgeApplications(), this.requestDigitalCertificates()])
       } catch (error) {
         this.$toast.add({
-          closable: false,
+          closable: true,
           severity: 'error',
           summary: error,
-          life: 10000
+          
         })
       }
     },
@@ -502,10 +502,10 @@
       copyDomainName() {
         this.clipboardWrite(this.domainName.value)
         this.$toast.add({
-          closable: false,
+          closable: true,
           severity: 'success',
           summary: 'domain name copied',
-          life: 10000
+          
         })
       }
     }

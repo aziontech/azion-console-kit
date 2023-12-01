@@ -101,7 +101,7 @@
       showToast(severity, summary, life = 10000) {
         if (!summary) return
         this.$toast.add({
-          closable: false,
+          closable: true,
           severity: severity,
           summary: summary,
           life: life

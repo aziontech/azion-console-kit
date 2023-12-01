@@ -1,5 +1,5 @@
 <template>
-  <Toast>
+  <Toast class="" :pt="toast">
     <template #message="slotProps">
       <div class="flex flex-column flex-grow">
         <header class="flex gap-2 items-center justify-between">
@@ -7,27 +7,22 @@
             <Tag
               :icon="composeIconStyle(slotProps.message.severity)"
               :severity="parseSeverity(slotProps.message.severity)"
-              :pt="{ icon: { class: 'mr-0' } }"
+              :pt="{ icon: { class: 'mr-0' }, root: { class: 'w-6 h-6' } }"
             />
-            <h5 class="text-color text-base font-semibold">{{ slotProps.message.summary }}</h5>
+            <h5 class="text-color text-base font-semibold">{{ getTitle(slotProps.message.summary) }}</h5>
           </div>
-
-          <!-- Link -->
-          <PrimeButton
-            v-if="slotProps.message.link"
-            :label="slotProps.message.link.label"
-            size="small"
-            link
-            class="align-self-end"
-            @click="handleClick(slotProps.message, slotProps.message.link.callback)"
-          />
         </header>
-        <p
-          class="text-sm mt-3"
-          v-if="slotProps.message.detail"
-        >
-          {{ slotProps.message.detail }}
-        </p>
+        <p class="text-sm font-normal mt-3" v-if="slotProps.message.detail">{{ slotProps.message.detail }}</p>
+
+        <!-- Link -->
+        <PrimeButton
+          v-if="slotProps.message.link"
+          :label="slotProps.message.link.label"
+          size="small"
+          link
+          class="align-self-end"
+          @click="handleClick(slotProps.message, slotProps.message.link.callback)"
+        />
 
         <div
           class="flex flex-row gap-2 align-self-end mt-5"
@@ -49,16 +44,6 @@
             @click="handleClick(slotProps.message, slotProps.message.primary.callback)"
           />
         </div>
-
-        <template v-bind="startProgress(slotProps.message)"></template>
-        <ProgressBar
-          v-if="slotProps.message.life"
-          class="mt-4"
-          :value="getValue(slotProps.message)"
-          style="height: 6px"
-          :show-value="false"
-          :pt="getProgressBarStyle(slotProps.message)"
-        ></ProgressBar>
       </div>
     </template>
   </Toast>
@@ -68,45 +53,34 @@
   import PrimeButton from 'primevue/button'
   import Toast from 'primevue/toast'
   import Tag from 'primevue/tag'
-  import ProgressBar from 'primevue/progressbar'
 
   export default {
     name: 'ToastBlock',
     components: {
       PrimeButton,
       Toast,
-      Tag,
-      ProgressBar
+      Tag
     },
     data() {
       return {
-        progress: []
+        progress: [],
+        toast: {
+          root: {
+            class: 'pl-3 pr-3 w-full md:w-[25rem] md:pl-0 md:pr-0 !right-0 md:right-8 top-[68px]'
+          },
+          content: {
+            class: 'relative'
+          },
+          closeButton: {
+            class: 'absolute right-4 top-3'
+          },
+          closeIcon: {
+            class: 'text-color'
+          }
+        }
       }
     },
     methods: {
-      startProgress({ id, life }) {
-        if (this.progress.find((i) => i.id === id)) {
-          return
-        }
-
-        let value = 0
-        const frameTime = 120
-        this.progress.push({ id, value, life })
-
-        const load = () => {
-          let message = this.progress.find((i) => i.id === id)
-          let value = message.value
-
-          const coef = frameTime / life + 0.006
-          message.value = value + coef * 100
-
-          if (value <= 100) {
-            setTimeout(() => load(), frameTime)
-          }
-        }
-
-        load()
-      },
       getValue({ id }) {
         return this.progress.find((i) => i.id === id)?.value || 0
       },
@@ -138,6 +112,20 @@
       },
       closeMessage(message) {
         this.$toast.remove(message)
+      },
+      getTitle(str) {
+        // const maxcharacters = 20
+        // if (str.length > maxcharacters) {
+        //   return str.substring(0, maxcharacters)
+        // }
+        return str
+      },
+      getSubtitle(str) {
+        const maxcharacters = 125
+        if (str.length > maxcharacters) {
+          return str.substring(0, maxcharacters)
+        }
+        return str
       }
     }
   }
