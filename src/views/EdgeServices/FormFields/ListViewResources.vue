@@ -4,7 +4,7 @@
   import Illustration from '@/assets/svg/illustration-layers.vue'
   import { computed, ref } from 'vue'
   import PrimeButton from 'primevue/button'
-  import CreateResource from '../drawer/CreateResource.vue'
+  import CreateResource from '@/views/EdgeServices/Drawer/CreateResource'
 
   defineOptions({ name: 'edge-services-view' })
 
