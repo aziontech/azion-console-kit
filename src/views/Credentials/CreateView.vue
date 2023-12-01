@@ -57,7 +57,7 @@
     name: yup.string().required('Name is a required field'),
     description: yup.string(),
     token: yup.string(),
-    status: yup.boolean().default(false)
+    status: yup.boolean().default(true)
   })
 
   const token = ref('')
