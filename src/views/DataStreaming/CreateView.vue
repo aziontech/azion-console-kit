@@ -268,74 +268,6 @@
                     @click="addHeader()"
                   />
                 </div>
-
-                <div class="flex flex-col sm:max-w-lg w-full gap-2">
-                  <label
-                    for="payloadFormat"
-                    class="text-color text-base font-medium"
-                    >Payload Format *</label
-                  >
-                  <InputText
-                    v-model="payloadFormat"
-                    type="text"
-                    placeholder="$dataset"
-                    :class="{ 'p-invalid': errors.payloadFormat }"
-                  />
-                  <small class="text-color-secondary text-xs font-normal leading-tight">
-                    Which information will be sent in your data. The "$dataset" variable calls all
-                    variables from the chosen template in NDJSON format.
-                  </small>
-                  <small
-                    id="data-set-help"
-                    class="p-error"
-                    >{{ errors.payloadFormat }}</small
-                  >
-                </div>
-
-                <div class="flex flex-col sm:max-w-lg w-full gap-2">
-                  <label
-                    for="lineSeparator"
-                    class="text-color text-base font-medium"
-                    >Payload Log Line Separator *</label
-                  >
-                  <InputText
-                    v-model="lineSeparator"
-                    type="text"
-                    :class="{ 'p-invalid': errors.lineSeparator }"
-                  />
-                  <small class="text-color-secondary text-xs font-normal leading-tight">
-                    Character that will be used at the end of each log line. The "\n" escape
-                    sequence breaks values into different lines in NDJSON format.
-                  </small>
-                  <small
-                    id="max-size-help"
-                    class="p-error"
-                    >{{ errors.lineSeparator }}</small
-                  >
-                </div>
-
-                <div class="flex flex-col sm:max-w-lg w-full gap-2">
-                  <label
-                    for="maxSize"
-                    class="text-color text-base font-medium"
-                    >Payload Max Size</label
-                  >
-                  <InputNumber
-                    v-model="maxSize"
-                    placeholder="1000000"
-                    :useGrouping="false"
-                    :class="{ 'p-invalid': errors.maxSize }"
-                  />
-                  <small class="text-color-secondary text-xs font-normal leading-tight">
-                    Customizable maximum size of data packets in bytes. Accepts values starting from
-                    1000000.
-                  </small>
-                  <small
-                    id="max-size-help"
-                    class="p-error"
-                    >{{ errors.maxSize }}</small
-                  >
-                </div>
               </div>
 
               <div
@@ -1138,6 +1070,81 @@
                     >{{ errors.blobToken }}</small
                   >
                 </div>
+              </div>
+            </template>
+          </FormHorizontal>
+          <FormHorizontal
+            v-if="endpoint === 'standard'"
+            title="Payload"
+            description="Description"
+          >
+            <template #inputs>
+              <div class="flex flex-col sm:max-w-lg w-full gap-2">
+                <label
+                  for="payloadFormat"
+                  class="text-color text-base font-medium"
+                  >Format *</label
+                >
+                <InputText
+                  v-model="payloadFormat"
+                  type="text"
+                  placeholder="$dataset"
+                  :class="{ 'p-invalid': errors.payloadFormat }"
+                />
+                <small class="text-color-secondary text-xs font-normal leading-tight">
+                  Which information will be sent in your data. The "$dataset" variable calls all
+                  variables from the chosen template in NDJSON format.
+                </small>
+                <small
+                  id="data-set-help"
+                  class="p-error"
+                  >{{ errors.payloadFormat }}</small
+                >
+              </div>
+
+              <div class="flex flex-col sm:max-w-lg w-full gap-2">
+                <label
+                  for="lineSeparator"
+                  class="text-color text-base font-medium"
+                  >Log Line Separator *</label
+                >
+                <InputText
+                  v-model="lineSeparator"
+                  type="text"
+                  :class="{ 'p-invalid': errors.lineSeparator }"
+                />
+                <small class="text-color-secondary text-xs font-normal leading-tight">
+                  Character that will be used at the end of each log line. The "\n" escape sequence
+                  breaks values into different lines in NDJSON format.
+                </small>
+                <small
+                  id="max-size-help"
+                  class="p-error"
+                  >{{ errors.lineSeparator }}</small
+                >
+              </div>
+
+              <div class="flex flex-col sm:max-w-lg w-full gap-2">
+                <label
+                  for="maxSize"
+                  class="text-color text-base font-medium"
+                  >Max Size</label
+                >
+                <InputNumber
+                  v-model="maxSize"
+                  placeholder="1000000"
+                  :useGrouping="false"
+                  :class="{ 'p-invalid': errors.maxSize }"
+                />
+                <small class="text-color-secondary text-xs font-normal leading-tight">
+                  Customizable maximum size of data packets in bytes. Accepts values starting from
+                  1000000.
+                </small>
+                <small
+                  id="max-size-help"
+                  class="p-error"
+                  >{{ errors.maxSize }}</small
+                >
               </div>
             </template>
           </FormHorizontal>
