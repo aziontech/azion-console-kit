@@ -6,10 +6,10 @@ const fixtures = {
   dnsRecordMock: {
     record_id: 812783,
     entry: 'entry A',
-    record_type: 'record Type AAA',
+    selectedRecordType: 'record Type AAA',
     answers_list: ['123.123.123.11', '123.123.123.9'],
     ttl: 8000,
-    policy: 'weighted',
+    selectedPolicy: 'weighted',
     weight: 100,
     description: 'record description A'
   }

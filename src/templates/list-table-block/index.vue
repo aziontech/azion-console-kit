@@ -178,7 +178,6 @@
   import OverlayPanel from 'primevue/overlaypanel'
   import PrimeButton from 'primevue/button'
   import { FilterMatchMode } from 'primevue/api'
-  import PageHeadingBlock from '@/templates/page-heading-block'
   import DeleteDialog from './dialog/delete-dialog'
 
   export default {
@@ -193,7 +192,6 @@
       Skeleton,
       Listbox,
       OverlayPanel,
-      PageHeadingBlock,
       DeleteDialog
     },
     data: () => ({
@@ -288,20 +286,23 @@
       actionOptions(rowData) {
         const actionOptions = []
 
-        if (this.deleteService) {
-          actionOptions.push({
-            label: 'Delete',
-            icon: 'pi pi-fw pi-trash',
-            command: () => this.openDeleteDialog()
-          })
-        }
-
         if (this.rowActions && this.rowActions.length > 0) {
           this.rowActions.forEach((action) => {
+            if (action.visibleAction && action.visibleAction(rowData)) return
+
             actionOptions.push({
               ...action,
               command: () => action.command(rowData)
             })
+          })
+        }
+
+        if (this.deleteService) {
+          actionOptions.push({
+            label: 'Delete',
+            icon: 'pi pi-fw pi-trash',
+            severity: 'error',
+            command: () => this.openDeleteDialog()
           })
         }
 
@@ -313,6 +314,7 @@
           const data = await this.listService({ page })
           this.data = data
         } catch (error) {
+          this.data = []
           this.$toast.add({
             closable: false,
             severity: 'error',

@@ -5,249 +5,64 @@
     </template>
     <template #content>
       <EditFormBlock
-        :editService="this.editNetworkListsService"
-        :loadService="this.loadNetworkListsService"
-        :initialDataSetter="setValues"
-        :formData="values"
-        :formMeta="meta"
-        :updatedRedirect="updatedRedirect"
+        :editService="props.editNetworkListsService"
+        :loadService="props.loadNetworkListsService"
+        :updatedRedirect="props.updatedRedirect"
+        :schema="validationSchema"
       >
         <template #form>
-          <FormHorizontal
-            title="General"
-            description="Edit allowlists, blocklists, and even greylists based on IP addresses, geolocation (countries), or Autonomous System Number (ASN) to use with configured rule sets on Rules Engine."
-          >
-            <template #inputs>
-              <div class="flex flex-col sm:max-w-lg w-full gap-2">
-                <label
-                  for="name"
-                  class="text-color text-base font-medium"
-                  >Name *</label
-                >
-                <InputText
-                  placeholder="My network list"
-                  v-bind="name"
-                  type="text"
-                  :class="{ 'p-invalid': errors.name }"
-                />
-                <small class="text-xs text-color-secondary font-normal leading-tight">
-                  Give a unique and easy-to-remember name.</small
-                >
-                <small
-                  v-if="errors.name"
-                  class="p-error text-xs font-normal leading-tight"
-                  >{{ errors.name }}</small
-                >
-              </div>
-            </template>
-          </FormHorizontal>
-          <FormHorizontal
-            title="Network List Settings"
-            description="Specificy the type of network list you want to create and the properties that'll compose the list."
-          >
-            <template #inputs>
-              <div class="flex flex-col w-full sm:max-w-lg gap-2">
-                <label
-                  for="id"
-                  class="text-color text-base font-medium"
-                  >Type *</label
-                >
-                <Dropdown
-                  :class="{ 'p-invalid': errors.networkListType }"
-                  v-model="networkListType.value"
-                  v-bind="networkListType"
-                  disabled
-                  dropdown-icon="pi pi-lock"
-                  :options="options"
-                  optionLabel="name"
-                  optionValue="value"
-                  class="w-full"
-                />
-                <small class="text-xs text-color-secondary font-normal leading-tight">
-                  Each list type accepts different values.</small
-                >
-                <small
-                  v-if="errors.networkListType"
-                  class="p-error text-xs font-normal leading-tight"
-                  >{{ errors.networkListType }}</small
-                >
-              </div>
-              <div
-                class="flex flex-col sm:max-w-lg w-full gap-2"
-                v-if="networkListType.value === 'asn'"
-              >
-                <label
-                  for="id"
-                  class="text-color text-base font-medium"
-                  >List *</label
-                >
-                <TextareaComponent
-                  :class="{ 'p-invalid': errors.itemsValues }"
-                  v-bind="itemsValues"
-                  rows="2"
-                  cols="30"
-                  id="list"
-                  placeholder="1234&#10;4321"
-                />
-                <small
-                  v-if="errors.itemsValues"
-                  class="p-error text-xs font-normal leading-tight"
-                  >{{ errors.itemsValues }}</small
-                >
-                <small class="text-xs text-color-secondary font-normal leading-tight">
-                  Separate each ASN value by using a new line. Duplicated entries are automatically
-                  removed.</small
-                >
-              </div>
-              <div
-                class="flex flex-col sm:max-w-lg w-full gap-2"
-                v-if="networkListType.value === 'ip_cidr'"
-              >
-                <label
-                  for="id"
-                  class="text-color text-base font-medium"
-                  >List *</label
-                >
-                <TextareaComponent
-                  disabled
-                  :class="{ 'p-invalid': errors.itemsValues }"
-                  v-bind="itemsValues"
-                  rows="2"
-                  id="ipCidr"
-                  cols="30"
-                  placeholder="192.168.0.1&#10;192.168.0.2/32&#10;10.1.1.10/16"
-                />
-                <small
-                  v-if="errors.itemsValues"
-                  class="p-error text-xs font-normal leading-tight"
-                  >{{ errors.itemsValues }}</small
-                >
-                <small class="text-xs text-color-secondary font-normal leading-tight">
-                  Separate each address value by using a new line. Duplicated entries are
-                  automatically removed.
-                </small>
-              </div>
-              <div
-                class="flex flex-col w-full sm:max-w-3xl gap-2"
-                v-if="networkListType.value === 'countries'"
-              >
-                <label
-                  for="select-01"
-                  class="text-color text-base font-medium"
-                  >Countries *</label
-                >
-                <MultiSelect
-                  v-model="itemsValuesCountry"
-                  :options="countriesList"
-                  filter
-                  optionLabel="name"
-                  optionValue="value"
-                  placeholder="Select Countries"
-                  :class="{ 'p-invalid': errors.itemsValuesCountry }"
-                  class="w-full"
-                  display="chip"
-                />
-                <small
-                  v-if="errors.itemsValuesCountry"
-                  class="p-error text-xs font-normal leading-tight"
-                  >{{ errors.itemsValuesCountry }}</small
-                >
-                <small class="text-xs text-color-secondary font-normal leading-tight">
-                  Select one or more countries.</small
-                >
-              </div>
-            </template>
-          </FormHorizontal>
+          <FormFieldsEditNetworkLists :listCountriesService="props.listCountriesService" />
+        </template>
+        <template #action-bar="{ onSubmit, formValid, onCancel, loading }">
+          <ActionBarBlockWithTeleport
+            @onSubmit="onSubmit"
+            @onCancel="onCancel"
+            :loading="loading"
+            :submitDisabled="!formValid"
+          />
         </template>
       </EditFormBlock>
     </template>
   </ContentBlock>
 </template>
 
-<script>
-  import EditFormBlock from '@/templates/edit-form-block-new'
-  import InputText from 'primevue/inputtext'
-  import Dropdown from 'primevue/dropdown'
-  import MultiSelect from 'primevue/multiselect'
-  import TextareaComponent from 'primevue/textarea'
-  import { useForm, useField } from 'vee-validate'
+<script setup>
+  import EditFormBlock from '@/templates/edit-form-block'
+  import FormFieldsEditNetworkLists from './FormFields/FormFieldsEditNetworkLists'
+  import ActionBarBlockWithTeleport from '@templates/action-bar-block/action-bar-with-teleport'
   import * as yup from 'yup'
-  import { ref, onMounted } from 'vue'
-  import FormHorizontal from '@/templates/create-form-block-new/form-horizontal'
+  import { ref } from 'vue'
   import ContentBlock from '@/templates/content-block'
   import PageHeadingBlock from '@/templates/page-heading-block'
 
-  export default {
-    name: 'edit-network-lists-view',
-    components: {
-      EditFormBlock,
-      InputText,
-      Dropdown,
-      MultiSelect,
-      TextareaComponent,
-      FormHorizontal,
-      PageHeadingBlock,
-      ContentBlock
-    },
-    props: {
-      loadNetworkListsService: { type: Function, required: true },
-      editNetworkListsService: { type: Function, required: true },
-      listCountriesService: { type: Function, required: true },
-      updatedRedirect: { type: String, required: true }
-    },
-    data: (props) => {
-      const options = ref([
-        { name: 'ASN', value: 'asn' },
-        { name: 'Countries', value: 'countries' },
-        { name: 'IP/CIDR', value: 'ip_cidr' }
-      ])
-      const validationSchema = yup.object({
-        name: yup.string().required('Name is a required field'),
-        networkListType: yup.string().oneOf(options.value.map((option) => option.value)),
-        itemsValues: yup
-          .string()
-          .when('networkListType', {
-            is: 'asn',
-            then: (schema) => schema.required('ASN is a required field')
-          })
-          .when('networkListType', {
-            is: 'ip_cidr',
-            then: (schema) => schema.required('IP/CIDR is a required field')
-          }),
-        itemsValuesCountry: yup.array().when('networkListType', {
-          is: 'countries',
-          then: (schema) => schema.required('Countries is a required field').min(1)
-        })
+  const props = defineProps({
+    loadNetworkListsService: { type: Function, required: true },
+    editNetworkListsService: { type: Function, required: true },
+    listCountriesService: { type: Function, required: true },
+    updatedRedirect: { type: String, required: true }
+  })
+  const options = ref([
+    { name: 'ASN', value: 'asn' },
+    { name: 'Countries', value: 'countries' },
+    { name: 'IP/CIDR', value: 'ip_cidr' }
+  ])
+  const validationSchema = yup.object({
+    name: yup.string().required('Name is a required field'),
+    networkListType: yup.string().oneOf(options.value.map((option) => option.value)),
+    itemsValues: yup
+      .string()
+      .when('networkListType', {
+        is: 'asn',
+        then: (schema) => schema.required('ASN is a required field')
       })
-
-      const { errors, defineInputBinds, meta, values, setValues } = useForm({
-        validationSchema
-      })
-      const countriesList = ref('')
-      const fetchCountries = async () => {
-        const result = await props.listCountriesService()
-        countriesList.value = result
-      }
-      const name = defineInputBinds('name', { validateOnInput: true })
-      const itemsValues = defineInputBinds('itemsValues', { validateOnInput: true })
-      const networkListType = defineInputBinds('networkListType', { validateOnInput: true })
-      const { value: itemsValuesCountry } = useField('itemsValuesCountry')
-      onMounted(async () => {
-        await fetchCountries()
-      })
-
-      return {
-        errors,
-        meta,
-        values,
-        name,
-        networkListType,
-        setValues,
-        options,
-        countriesList,
-        itemsValues,
-        itemsValuesCountry
-      }
-    }
-  }
+      .when('networkListType', {
+        is: 'ip_cidr',
+        then: (schema) => schema.required('IP/CIDR is a required field')
+      }),
+    itemsValuesCountry: yup.array().when('networkListType', {
+      is: 'countries',
+      then: (schema) =>
+        schema.required('Countries is a required field').min(1, 'Select at least one country')
+    })
+  })
 </script>

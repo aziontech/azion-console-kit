@@ -1,5 +1,5 @@
 <template>
-  <FormLoading v-if="isLoading"/>
+  <FormLoading v-if="isLoading" />
   <div
     class="w-full flex flex-col gap-8 max-md:gap-6"
     v-else-if="!isLoading"
@@ -111,7 +111,7 @@
 <script setup>
   import Password from 'primevue/password'
   import { ref, onBeforeMount, defineOptions } from 'vue'
-  import FormHorizontal from '@templates/create-form-block-new/form-horizontal'
+  import FormHorizontal from '@templates/create-form-block/form-horizontal'
   import ActionBarTemplate from '@templates/action-bar-block'
   import FormLoading from './FormLoading'
   import InputText from 'primevue/inputtext'
@@ -282,7 +282,7 @@
         const sanitizedField = {
           field: payload[index].name,
           instantiation_data_path: payload[index].instantiation_data_path,
-          value: payload[index].value.value? payload[index].value.value : ''
+          value: payload[index].value.value ? payload[index].value.value : ''
         }
         payload[index] = sanitizedField
       })

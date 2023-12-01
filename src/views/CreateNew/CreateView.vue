@@ -1,26 +1,35 @@
-<template> 
-<ContentBlock>
+<template>
+  <ContentBlock>
     <template #heading>
-      <div class="flex flex-col gap-4" v-if="isLoading">
+      <div
+        class="flex flex-col gap-4"
+        v-if="isLoading"
+      >
         <div class="flex gap-3">
-          <Skeleton class="h-4 w-10"/>
-          <Skeleton class="h-4 w-24"/>
+          <Skeleton class="h-4 w-10" />
+          <Skeleton class="h-4 w-24" />
         </div>
-        <Skeleton class="h-9 w-64"/>
+        <Skeleton class="h-9 w-64" />
         <div class="flex gap-4">
-          <Skeleton class="hidden sm:flex w-10 h-10"/>
+          <Skeleton class="hidden sm:flex w-10 h-10" />
           <div class="flex flex-col gap-4 sm:flex-row w-full">
             <div class="flex items-center gap-3">
-              <Skeleton class="h-4 w-20"/>
-              <Skeleton class="h-4 w-20"/>
-              <Skeleton class="h-4 w-36"/>
+              <Skeleton class="h-4 w-20" />
+              <Skeleton class="h-4 w-20" />
+              <Skeleton class="h-4 w-36" />
             </div>
-            <Skeleton class="sm:ml-auto h-9 sm:w-28"/>
+            <Skeleton class="sm:ml-auto h-9 sm:w-28" />
           </div>
         </div>
       </div>
-      <PageHeadingBlock :pageTitle="solution.name" v-if="!isLoading"/>
-      <div class="flex flex-col sm:flex-row gap-4 lg:items-center" v-if="!isLoading">
+      <PageHeadingBlock
+        :pageTitle="solution.name"
+        v-if="!isLoading"
+      />
+      <div
+        class="flex flex-col sm:flex-row gap-4 lg:items-center"
+        v-if="!isLoading"
+      >
         <div class="flex flex-col sm:flex-row gap-4 sm:items-center">
           <div class="w-10 h-10 hidden rounded sm:flex justify-center items-center bg-white">
             <img
@@ -229,7 +238,7 @@
     data: () => ({
       isLoading: false,
       showDetails: false,
-      solution: {},
+      solution: {}
     }),
     props: {
       getTemplateService: {

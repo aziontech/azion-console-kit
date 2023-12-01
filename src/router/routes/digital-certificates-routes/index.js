@@ -55,7 +55,8 @@ export const digitalCertificatesRoutes = {
       props: {
         editDigitalCertificateService: DigitalCertificatesService.editDigitalCertificateService,
         loadDigitalCertificateService: DigitalCertificatesService.loadDigitalCertificateService,
-        updatedRedirect: 'list-digital-certificates'
+        updatedRedirect: 'list-digital-certificates',
+        clipboardWrite: Helpers.clipboardWrite
       },
       meta: {
         breadCrumbs: [
