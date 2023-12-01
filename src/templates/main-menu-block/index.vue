@@ -822,7 +822,7 @@
     },
     methods: {
       preventSidebarClick(event) {
-        event.stopPropagation();
+        event.stopPropagation()
       },
       ...mapActions(useAccountStore, ['setTheme']),
       toggleProfileMobile() {
