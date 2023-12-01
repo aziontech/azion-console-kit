@@ -4,7 +4,7 @@
   import Illustration from '@/assets/svg/illustration-layers.vue'
   import ContentBlock from '@/templates/content-block'
   import PageHeadingBlock from '@/templates/page-heading-block'
-  import EdgeServicesToggleStatus from './dialog/EdgeServicesToggleStatus'
+  import EdgeServicesToggleStatus from '@/views/EdgeServices/Dialog/EdgeServicesToggleStatus'
   import { computed, ref } from 'vue'
   import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
 

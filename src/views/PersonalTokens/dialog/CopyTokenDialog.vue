@@ -99,7 +99,7 @@
       type: String,
       required: true
     },
-    tokenAlredySaved: {
+    tokenAlreadySaved: {
       type: Boolean,
       default: true
     },
@@ -135,7 +135,7 @@
   }
 
   onBeforeRouteLeave((to, from, next) => {
-    if (props.tokenAlredySaved && !userAgreed.value) {
+    if (props.tokenAlreadySaved && !userAgreed.value) {
       toggleAttentionDialog(true)
       return next(false)
     }

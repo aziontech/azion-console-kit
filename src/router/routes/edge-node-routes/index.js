@@ -69,45 +69,5 @@ export const edgeNodeRoutes = {
         ]
       }
     },
-    {
-      path: 'edit/:id/service/add',
-      name: 'add-service-edge-node',
-      component: () => import('@/views/EdgeNode/AddServiceEdgeNodeView.vue'),
-      props: {
-        listServiceEdgeNodeService: ServiceEdgeNode.listServiceEdgeNodeService,
-        addEdgeNodeService: ServiceEdgeNode.addEdgeNodeService
-      },
-      meta: {
-        breadCrumbs: [
-          {
-            label: 'Service',
-            to: '/edit/:id/service'
-          },
-          {
-            label: 'Add Service'
-          }
-        ]
-      }
-    },
-    {
-      path: 'edit/:edgeNodeId/service/:id',
-      name: 'edit-service-edge-node',
-      component: () => import('@/views/EdgeNode/EditServiceEdgeNodeView.vue'),
-      props: {
-        loadServiceEdgeNodeService: ServiceEdgeNode.loadServiceEdgeNodeService,
-        editEdgeNodeService: ServiceEdgeNode.editEdgeNodeService
-      },
-      meta: {
-        breadCrumbs: [
-          {
-            label: 'Service',
-            to: '/edit/:id/service'
-          },
-          {
-            label: 'Edit Service'
-          }
-        ]
-      }
-    }
   ]
 }
