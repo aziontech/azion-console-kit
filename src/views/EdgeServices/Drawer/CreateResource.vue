@@ -1,4 +1,3 @@
-<!-- { content : "test content" , content_type : "Text", name : "/resources.sh" } -->
 <script setup>
   import { computed, ref, watch } from 'vue'
   import * as ResourcesServices from '@/services/edge-service-resources-services'
