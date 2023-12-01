@@ -1,5 +1,5 @@
 <template>
-  <FormLoading v-if="isLoading"/>
+  <FormLoading v-if="isLoading" />
   <div
     class="w-full flex flex-col gap-8 max-md:gap-6"
     v-else-if="!isLoading"
@@ -282,7 +282,7 @@
         const sanitizedField = {
           field: payload[index].name,
           instantiation_data_path: payload[index].instantiation_data_path,
-          value: payload[index].value.value? payload[index].value.value : ''
+          value: payload[index].value.value ? payload[index].value.value : ''
         }
         payload[index] = sanitizedField
       })
