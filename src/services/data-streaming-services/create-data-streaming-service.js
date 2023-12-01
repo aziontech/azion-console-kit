@@ -33,7 +33,7 @@ const parseByEndpointType = (payload) => {
         endpoint_type: 'standard',
         url: payload.endpointUrl,
         payload_format: payload.payloadFormat,
-        log_line_separator: payload.lineSeparator,
+        log_line_separator: payload.lineSeparator === '\\n' ? '\n' : payload.lineSeparator,
         max_size: payload.maxSize,
         headers: getHeaders(payload.headers)
       }

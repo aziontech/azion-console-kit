@@ -10,7 +10,6 @@
   const props = defineProps({
     isTabs: {
       type: Boolean,
-      required: true,
       default: false
     },
     editService: {
