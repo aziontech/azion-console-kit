@@ -54,15 +54,15 @@
     ),
     maxSize: yup.number().when('endpoint', {
       is: 'standard',
-      then: (schema) => schema.required('Payload Max Size is a required field')
+      then: (schema) => schema.required('Max Size is a required field')
     }),
     lineSeparator: yup.string().when('endpoint', {
       is: 'standard',
-      then: (schema) => schema.required('Payload Log Line Separator is a required field')
+      then: (schema) => schema.required('Log Line Separator is a required field')
     }),
     payloadFormat: yup.string().when('endpoint', {
       is: 'standard',
-      then: (schema) => schema.required('Payload Format is a required field')
+      then: (schema) => schema.required('Format is a required field')
     }),
 
     // Kafka
@@ -98,7 +98,7 @@
     }),
     objectKey: yup.string().when('endpoint', {
       is: 's3',
-      then: (schema) => schema.max(150).required('Object Key Prefix is a required field')
+      then: (schema) => schema.max(150)
     }),
     contentType: yup.string().when('endpoint', {
       is: 's3',
