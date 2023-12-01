@@ -46,10 +46,6 @@
         type: Function,
         required: false
       },
-      pageTitle: {
-        type: String,
-        required: true
-      },
       createService: {
         type: Function,
         required: true
