@@ -8,8 +8,7 @@
         :createService="props.createRecordsService"
         :schema="validationSchema"
         :initialValues="initialValues"
-        :updatedRedirect="`intelligent-dns/edit/${route.params.id}/records`"
-        :goBack="true"
+        @on-response="handleAfterCreate"
       >
         <template #form>
           <FormFieldsRecords></FormFieldsRecords>
@@ -28,13 +27,12 @@
 </template>
 
 <script setup>
-  import { useRoute } from 'vue-router'
+  import { useRoute, useRouter } from 'vue-router'
   import CreateFormBlock from '@templates/create-form-block'
   import ContentBlock from '@/templates/content-block'
   import PageHeadingBlock from '@templates/page-heading-block'
   import FormFieldsRecords from './FormFields/FormFieldsRecords.vue'
   import ActionBarTemplate from '@/templates/action-bar-block/action-bar-with-teleport'
-
   import * as yup from 'yup'
 
   const props = defineProps({
@@ -44,6 +42,7 @@
     }
   })
 
+  const router = useRouter()
   const route = useRoute()
 
   //Validation Schema
@@ -54,14 +53,22 @@
     ttl: yup.number().required(),
     selectedPolicy: yup.string().required('Please select an option').default('simple'),
     weight: yup.number().required('Weight is a required field'),
-    description: yup.string()
+    description: yup.string(),
+    intelligentDNSID: yup.number()
   })
 
   const initialValues = {
-    intelligentDNSID: route.params.id,
+    name: '',
     selectedRecordType: 'A',
+    value: '',
     ttl: 3600,
     selectedPolicy: 'simple',
-    weight: '100'
+    weight: '100',
+    description: '',
+    intelligentDNSID: route.params.id
+  }
+
+  const handleAfterCreate = ({ urlToEditView }) => {
+    router.push(urlToEditView)
   }
 </script>
