@@ -46,13 +46,18 @@ const getConfig = () => {
           changeOrigin: true,
           rewrite: (path) => path.replace(/^\/api\/marketplace/, '')
         },
+        '/api/template-engine': {
+          target: `${URLStartPrefix}manager.azion.com/template-engine/api/`,
+          changeOrigin: true,
+          rewrite: (path) => path.replace(/^\/api\/template-engine/, '')
+        },
         '/graphql/cities': {
           target: `${URLStartPrefix}cities.azion.com/graphql`,
           changeOrigin: true,
           rewrite: (path) => path.replace(/^\/graphql\/cities/, '')
         },
         '/api/script-runner': {
-          target: `${URLStartPrefix}manager.azion.com/script-runner/api/`,
+          target: `https://api.azionapi.net/script-runner/api/`,
           changeOrigin: true,
           rewrite: (path) => path.replace(/^\/api\/script-runner/, '')
         },

@@ -473,10 +473,11 @@
   <PrimeDialog
     v-model:visible="createModalStore.isOpen"
     modal
-    header="Create something new"
+    header="New"
     :pt="{
       root: { class: 'hidden sm:flex' },
-      content: { class: 'p-4 sm:p-0' }
+      content: { class: 'p-0' },
+      mask: { class: 'hidden sm:flex' }
     }"
     position="center"
     :dismissableMask="true"

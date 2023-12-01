@@ -1,6 +1,6 @@
 import { AxiosHttpClientAdapter } from '@/services/axios/AxiosHttpClientAdapter'
+import { loadSolutionService } from '@/services/marketplace-services'
 import * as Errors from '@services/axios/errors'
-import { listSolutionsService } from '@/services/marketplace-services'
 import { describe, expect, it, vi } from 'vitest'
 
 const fixtures = {
@@ -44,7 +44,7 @@ const fixtures = {
 }
 
 const makeSut = () => {
-  const sut = listSolutionsService
+  const sut = loadSolutionService
 
   return {
     sut
@@ -53,6 +53,7 @@ const makeSut = () => {
 
 describe('MarketplaceServices', () => {
   it('should call api with correct params', async () => {
+    const solution = fixtures.solutionSample
     const requestSpy = vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
       statusCode: 200,
       body: []
@@ -60,87 +61,49 @@ describe('MarketplaceServices', () => {
 
     const { sut } = makeSut()
 
-    await sut({})
+    await sut({
+      vendor: solution.vendor.slug,
+      solution: solution.slug
+    })
 
     expect(requestSpy).toHaveBeenCalledWith({
-      url: `marketplace/solution/?`,
-      headers: { 'Mktp-Api-Context': 'onboarding' },
+      url: `marketplace/solution/${solution.vendor.slug}/${solution.slug}`,
       method: 'GET'
     })
   })
 
-  it('should call api with search params', async () => {
-    const requestSpy = vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
-      statusCode: 200,
-      body: []
-    })
-
-    const { sut } = makeSut()
-
-    await sut({ search: 'Hello' })
-
-    expect(requestSpy).toHaveBeenCalledWith({
-      url: `marketplace/solution/?search=Hello`,
-      headers: { 'Mktp-Api-Context': 'onboarding' },
-      method: 'GET'
-    })
-  })
-
-  it('should call api with category params', async () => {
-    const requestSpy = vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
-      statusCode: 200,
-      body: []
-    })
-
-    const { sut } = makeSut()
-
-    await sut({ category: 'security' })
-
-    expect(requestSpy).toHaveBeenCalledWith({
-      url: `marketplace/solution/?category=security`,
-      headers: { 'Mktp-Api-Context': 'onboarding' },
-      method: 'GET'
-    })
-  })
-
-  it('should call api with type params', async () => {
-    const requestSpy = vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
-      statusCode: 200,
-      body: []
-    })
-
-    const { sut } = makeSut()
-
-    await sut({ type: 'marketplace' })
-
-    expect(requestSpy).toHaveBeenCalledWith({
-      url: `marketplace/solution/?`,
-      headers: { 'Mktp-Api-Context': 'marketplace' },
-      method: 'GET'
-    })
-  })
-
-  it('should parsed correctly each solution record', async () => {
+  it('should parse correctly each returned item', async () => {
+    const solution = fixtures.solutionSample
     vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
       statusCode: 200,
-      body: [fixtures.solutionSample]
+      body: solution
     })
+
     const { sut } = makeSut()
+    const result = await sut({
+      vendor: solution.vendor.slug,
+      solution: solution.slug
+    })
 
-    const result = await sut({})
-
-    expect(result).toEqual([
-      {
-        headline: fixtures.solutionSample.headline,
-        id: fixtures.solutionSample.id,
-        name: fixtures.solutionSample.name,
-        referenceId: fixtures.solutionSample.solution_reference_id,
-        vendor: fixtures.solutionSample.vendor,
-        slug: fixtures.solutionSample.slug,
-        released: fixtures.solutionSample.new_release,
-        featured: fixtures.solutionSample.featured
-      }
-    ])
+    expect(result).toEqual({
+      id: solution.id,
+      name: solution.name,
+      referenceId: solution.solution_reference_id,
+      vendor: solution.vendor,
+      headline: solution.headline,
+      version: solution.version,
+      latestVersion: solution.latest_version,
+      latestVersionChangelog: solution.latest_version_changelog,
+      lastUpdate: solution.updated_at,
+      usage: solution.usage,
+      overview: solution.overview,
+      support: solution.support,
+      isPayAsYouGo: solution.is_pay_as_you_go,
+      isLaunched: solution.is_launched,
+      isUpdated: solution.is_updated,
+      newLaunchFlow: solution.new_launch_flow,
+      slug: solution.slug
+    })
   })
 
   it.each([
@@ -171,13 +134,17 @@ describe('MarketplaceServices', () => {
   ])(
     'should throw when request fails with statusCode $statusCode',
     async ({ statusCode, expectedError }) => {
+      const solution = fixtures.solutionSample
       vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
         statusCode,
-        body: []
+        body: null
       })
       const { sut } = makeSut()
 
-      const response = sut({})
+      const response = sut({
+        vendor: solution.vendor.slug,
+        solution: solution.slug
+      })
 
       expect(response).rejects.toBe(expectedError)
     }
