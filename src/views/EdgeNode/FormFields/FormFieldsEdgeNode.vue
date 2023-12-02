@@ -25,7 +25,7 @@
   <FormHorizontal
     title="Main Settings"
     description="Each node needs to run the Azion Orchestration software. It enables the
-                        communication between your private node and Azion Real-Time Manager, where
+                        communication between your private node and Azion Console, where
                         you can manage your Edge Applications, Edge Functions, and many other Azion
                         services."
   >

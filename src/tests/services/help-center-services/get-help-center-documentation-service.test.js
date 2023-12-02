@@ -70,7 +70,7 @@ describe('HelpCenterServices', () => {
     await sut(fixtures.markdownDocument)
     const document = `---
       docs: [
-      'Get to know Real-Time Manager',
+      'Get to know Azion Console',
       'Get started'
       ]
     ---
