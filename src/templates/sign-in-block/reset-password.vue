@@ -101,7 +101,7 @@
           <div class="flex flex-col gap-3">
             <div class="text-xl md:text-2xl font-medium">Password Reset Complete</div>
             <p class="text-color-secondary">
-              Your password has been successfully reset. Sign in to Real-Time Manager to use Azion
+              Your password has been successfully reset. Sign in to Azion Console to use Azion
               products and services.
             </p>
           </div>
