@@ -16,11 +16,11 @@ export const editRecordsService = async (payload) => {
 
 const adapt = (payload) => {
   return {
-    record_type: payload.recordType,
+    record_type: payload.selectedRecordType,
     entry: payload.name,
     answers_list: [payload.value],
     ttl: payload.ttl,
-    policy: payload.policy,
+    policy: payload.selectedPolicy,
     weight: payload.weight,
     description: payload.description
   }

@@ -1,77 +1,46 @@
 <template>
   <ContentBlock>
     <template #heading>
-      <PageHeadingBlock pageTitle="Edit Intelligent DNS"> </PageHeadingBlock>
+      <PageHeadingBlock
+        pageTitle="Edit Intelligent DNS"
+        description="Copy the Nameservers values for change your domain's authoritative DNS servers to use Azion Intelligent DNS."
+      >
+        <template #default>
+          <PrimeButton
+            outlined
+            icon="pi pi-copy"
+            class="max-md:w-full"
+            label="Copy Nameservers"
+            @click="handleCopyNameServers"
+          ></PrimeButton>
+        </template>
+      </PageHeadingBlock>
     </template>
     <template #content>
       <TabView
-        :activeIndex="activeTab"
+        v-model:activeIndex="activeTab"
         @tab-click="changeRouteByClickingOnTab"
         class="w-full"
       >
         <TabPanel header="Main Settings">
           <EditFormBlock
+            v-if="showEditFormWithActionTab"
             :editService="editIntelligentDNSService"
             :loadService="loadIntelligentDNSService"
-            :initialDataSetter="setValues"
-            :formData="values"
-            :formMeta="meta"
+            :schema="validationSchema"
             :updatedRedirect="updatedRedirect"
+            :isTabs="true"
           >
             <template #form>
-              <FormHorizontal
-                title="General"
-                description="Espaço livre para descrição e instruções de preenchimento. Esse conteúdo deve ser criado pensando tanto em funcionalidade quanto em em alinhamento e estética. Devemos sempre criar os blocos conforme o contexto, cuidando sempre para não ter blocos muito longos."
-              >
-                <template #inputs>
-                  <div class="flex flex-col sm:max-w-lg w-full gap-2">
-                    <label
-                      for="name"
-                      class="text-color text-base font-medium"
-                      >Name *</label
-                    >
-                    <InputText
-                      placeholder="Zone Name"
-                      v-bind="name"
-                      id="name"
-                      type="text"
-                      :class="{ 'p-invalid': errors.name }"
-                    />
-                    <small
-                      v-if="errors.name"
-                      class="p-error text-xs font-normal leading-tight"
-                      >{{ errors.name }}</small
-                    >
-                  </div>
-                  <div class="flex flex-col sm:max-w-lg w-full gap-2">
-                    <label
-                      for="domain"
-                      class="text-color text-base font-medium"
-                      >Domain *</label
-                    >
-                    <InputText
-                      placeholder="Domain"
-                      id="domain"
-                      v-bind="domain"
-                      type="text"
-                      :class="{ 'p-invalid': errors.domain }"
-                    />
-                    <small
-                      v-if="errors.domain"
-                      class="p-error text-xs font-normal leading-tight"
-                      >{{ errors.domain }}</small
-                    >
-                  </div>
-                  <div class="flex gap-3 items-center">
-                    <label for="">Active</label>
-                    <InputSwitch
-                      v-bind="isActive"
-                      v-model="isActive.value"
-                      :class="{ 'p-invalid': errors.isActive }"
-                    />
-                  </div>
-                </template>
-              </FormHorizontal>
+              <FormFieldsIntelligentDnsCreate></FormFieldsIntelligentDnsCreate>
+            </template>
+            <template #action-bar="{ onSubmit, formValid, onCancel, loading }">
+              <ActionBarTemplate
+                @onSubmit="onSubmit"
+                @onCancel="onCancel"
+                :loading="loading"
+                :submitDisabled="!formValid"
+              />
             </template>
           </EditFormBlock>
         </TabPanel>
@@ -109,18 +78,18 @@
 
 <script>
   import { useIntelligentDNSStore } from '@/stores/intelligent-dns'
-  import EditFormBlock from '@templates/edit-form-block-new/no-header'
-  import FormHorizontal from '@templates/create-form-block-new/form-horizontal'
+  import EditFormBlock from '@templates/edit-form-block'
   import PageHeadingBlock from '@templates/page-heading-block'
   import ListTableBlock from '@templates/list-table-block/no-header'
   import ContentBlock from '@/templates/content-block'
   import TabView from 'primevue/tabview'
   import TabPanel from 'primevue/tabpanel'
-  import InputText from 'primevue/inputtext'
-  import InputSwitch from 'primevue/inputswitch'
+  import PrimeButton from 'primevue/button'
   import EmptyResultsBlock from '@/templates/empty-results-block'
   import Illustration from '@/assets/svg/illustration-layers.vue'
-  import { useForm } from 'vee-validate'
+  import FormFieldsIntelligentDnsCreate from './FormFields/FormFieldsIntelligentDns.vue'
+  import ActionBarTemplate from '@/templates/action-bar-block/action-bar-with-teleport'
+
   import * as yup from 'yup'
 
   export default {
@@ -129,14 +98,14 @@
       EditFormBlock,
       TabView,
       TabPanel,
-      InputText,
-      InputSwitch,
       ListTableBlock,
-      FormHorizontal,
       PageHeadingBlock,
+      PrimeButton,
       ContentBlock,
       EmptyResultsBlock,
-      Illustration
+      Illustration,
+      ActionBarTemplate,
+      FormFieldsIntelligentDnsCreate
     },
 
     props: {
@@ -144,6 +113,7 @@
       editIntelligentDNSService: { type: Function, required: true },
       listRecordsService: { type: Function, required: true },
       deleteRecordsService: { type: Function, required: true },
+      clipboardWrite: { type: Function, required: true },
       updatedRedirect: { type: String, required: true },
       documentationService: { type: Function, required: true }
     },
@@ -162,25 +132,11 @@
         isActive: yup.boolean().required()
       })
 
-      const { errors, defineInputBinds, meta, values, setValues } = useForm({
-        validationSchema
-      })
-
-      const name = defineInputBinds('name', { validateOnInput: true })
-      const domain = defineInputBinds('domain', { validateOnInput: true })
-      const isActive = defineInputBinds('isActive')
-
       const intelligentDNSStore = useIntelligentDNSStore()
 
       return {
-        errors,
-        meta,
-        values,
-        name,
-        domain,
-        isActive,
-        setValues,
         hasContentToList,
+        validationSchema,
         recordListColumns: [
           {
             field: 'name',
@@ -249,14 +205,31 @@
           })
         }
       },
+      handleCopyNameServers() {
+        this.clipboardWrite('ns1.aziondns.net;ns2.aziondns.com;ns3.aziondns.org')
+        this.$toast.add({
+          closable: false,
+          severity: 'success',
+          summary: 'Nameservers copied',
+          life: 10000
+        })
+      },
       handleLoadData(event) {
         this.hasContentToList = event
+      }
+    },
+    computed: {
+      showEditFormWithActionTab() {
+        return this.activeTab === 0
       }
     },
 
     watch: {
       domain() {
         this.intelligentDNSStore.addDomain(this.domain)
+      },
+      $router() {
+        this.renderTabCurrentRouter()
       }
     }
   }

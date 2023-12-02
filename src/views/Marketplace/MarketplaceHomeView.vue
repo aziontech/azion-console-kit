@@ -18,7 +18,7 @@
       <div class="w-full flex flex-col md:flex-row gap-6 lg:gap-8">
         <!-- Sidebar -->
         <div
-          class="flex flex-col md:flex-shrink-0 gap-8 px-3 pt-8 pb-0 sm:px-8 w-full md:w-80 md:sticky md:top-10 self-start"
+          class="flex flex-col md:flex-shrink-0 gap-8 px-3 pt-8 pb-0 sm:px-8 w-full md:w-80 md:sticky md:top-14 self-start"
         >
           <!-- Search -->
           <div class="flex flex-col w-full gap-3">
@@ -70,27 +70,27 @@
           </div>
         </div>
 
-        <!-- Templates -->
+        <!-- Solutions -->
         <div class="flex flex-col p-3 sm:p-8 gap-6 w-full">
           <!-- Loading -->
           <template v-if="loading">
-            <LoadingListTemplate />
+            <LoadingList />
           </template>
           <!-- Default View -->
           <template v-else-if="allSelected">
             <div class="text-2xl font-medium">Featured</div>
-            <ListTemplates :templates="featured" />
+            <ListSolutions :solutions="featured" />
             <div class="text-base font-medium">New releases</div>
-            <ListTemplates :templates="released" />
+            <ListSolutions :solutions="released" />
           </template>
           <!-- Searched -->
           <template v-else-if="searching">
-            <template v-if="templates.length > 0">
+            <template v-if="solutions.length > 0">
               <div class="text-sm">
-                {{ templates.length }} search results for
+                {{ solutions.length }} search results for
                 <span class="font-medium">“{{ search }}”</span>
               </div>
-              <ListTemplates :templates="templates" />
+              <ListSolutions :solutions="solutions" />
             </template>
             <template v-else>
               <div class="text-sm">
@@ -111,7 +111,7 @@
             <div class="text-2xl font-medium">
               {{ selectedCategory.name }}
             </div>
-            <ListTemplates :templates="templates" />
+            <ListSolutions :solutions="solutions" />
           </template>
         </div>
       </div>
@@ -126,8 +126,8 @@
   import Listbox from 'primevue/listbox'
   import Badge from 'primevue/badge'
   import PrimeButton from 'primevue/button'
-  import ListTemplates from './ListTemplates.vue'
-  import LoadingListTemplate from './LoadingListTemplate'
+  import ListSolutions from './ListSolutions.vue'
+  import LoadingList from './LoadingList'
   import LoadingEmptySearch from './LoadingEmptySearch'
   import { useToast } from 'primevue/usetoast'
 
@@ -135,7 +135,7 @@
   const categories = ref([])
   const $toast = useToast()
   const loading = ref(false)
-  const templates = ref([])
+  const solutions = ref([])
   const searching = ref(false)
   const search = ref('')
   const PAGE_TYPE = 'marketplace'
@@ -171,7 +171,7 @@
 
       const [categoriesData, templatesData] = await Promise.all(promises)
       categories.value = categoriesData
-      templates.value = templatesData
+      solutions.value = templatesData
     } catch (error) {
       $toast.add({ ...ERROR_PROPS, summary: error })
     } finally {
@@ -191,7 +191,7 @@
       loading.value = true
       search.value = ''
       searching.value = false
-      templates.value = await loadSolutions({
+      solutions.value = await loadSolutions({
         type: PAGE_TYPE,
         category
       })
@@ -223,7 +223,7 @@
       searching.value = !!search.value
       loading.value = true
       const payload = { type: PAGE_TYPE, search: search.value }
-      templates.value = await loadSolutions(payload)
+      solutions.value = await loadSolutions(payload)
     } catch (error) {
       $toast.add({ ...ERROR_PROPS, summary: error })
     } finally {
@@ -239,7 +239,7 @@
       search.value = ''
 
       const payload = { type: PAGE_TYPE }
-      templates.value = await loadSolutions(payload)
+      solutions.value = await loadSolutions(payload)
     } catch (error) {
       $toast.add({ ...ERROR_PROPS, summary: error })
     } finally {
@@ -248,11 +248,11 @@
   }
 
   const featured = computed(() => {
-    return templates.value.filter((i) => i.featured)
+    return solutions.value.filter((i) => i.featured)
   })
 
   const released = computed(() => {
-    return templates.value.filter((i) => i.released)
+    return solutions.value.filter((i) => i.released)
   })
 
   const allSelected = computed(() => {

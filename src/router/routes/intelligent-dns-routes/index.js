@@ -14,7 +14,8 @@ export const intelligentDnsRoutes = {
       props: {
         listIntelligentDNSService: IntelligentDNSService.listIntelligentDNSService,
         deleteIntelligentDNSService: IntelligentDNSService.deleteIntelligentDNSService,
-        documentationService: Helpers.documentationCatalog.intelligentDNS
+        documentationService: Helpers.documentationCatalog.intelligentDNS,
+        clipboardWrite: Helpers.clipboardWrite
       },
       meta: {
         breadCrumbs: [
@@ -30,7 +31,8 @@ export const intelligentDnsRoutes = {
       name: 'create-intelligent-dns',
       component: () => import('@views/IntelligentDNS/CreateView.vue'),
       props: {
-        createIntelligentDNSService: IntelligentDNSService.createIntelligentDNSService
+        createIntelligentDNSService: IntelligentDNSService.createIntelligentDNSService,
+        clipboardWrite: Helpers.clipboardWrite
       },
       meta: {
         breadCrumbs: [
@@ -54,6 +56,7 @@ export const intelligentDnsRoutes = {
         loadIntelligentDNSService: IntelligentDNSService.loadIntelligentDNSService,
         listRecordsService: IntelligentDNSRecordsService.listRecordsService,
         deleteRecordsService: IntelligentDNSRecordsService.deleteRecordsService,
+        clipboardWrite: Helpers.clipboardWrite,
         updatedRedirect: 'list-intelligent-dns'
       },
       meta: {
@@ -77,6 +80,7 @@ export const intelligentDnsRoutes = {
         loadIntelligentDNSService: IntelligentDNSService.loadIntelligentDNSService,
         listRecordsService: IntelligentDNSRecordsService.listRecordsService,
         deleteRecordsService: IntelligentDNSRecordsService.deleteRecordsService,
+        clipboardWrite: Helpers.clipboardWrite,
         documentationService: Helpers.documentationCatalog.records
       },
       meta: {
@@ -116,7 +120,8 @@ export const intelligentDnsRoutes = {
       component: () => import('@views/IntelligentDNS/EditRecordsView.vue'),
       props: {
         editRecordsService: IntelligentDNSRecordsService.editRecordsService,
-        loadRecordsService: IntelligentDNSRecordsService.loadRecordsService
+        loadRecordsService: IntelligentDNSRecordsService.loadRecordsService,
+        updatedRedirect: '/intelligent-dns/edit/:intelligentDNSId/records'
       },
       meta: {
         breadCrumbs: [
