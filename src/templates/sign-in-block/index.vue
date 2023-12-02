@@ -13,9 +13,9 @@
       >
         <h3
           data-testid="title"
-          class="text-xl md:text-2xl font-medium"
+          class="text-xl md:text-2xl font-medium text-center"
         >
-          Real-Time Manager
+          Azion Console
         </h3>
         <div class="flex flex-col gap-6">
           <div class="flex flex-col gap-2">
@@ -95,7 +95,7 @@
         class="surface-card surface-border border max-w-md w-full p-6 sm:p-8 rounded-md flex-col gap-6 flex"
       >
         <div class="flex flex-col gap-6 sm:gap-8">
-          <h3 class="text-xl md:text-2xl font-medium">Real-Time Manager</h3>
+          <h3 class="text-xl md:text-2xl font-medium">Azion Console</h3>
           <div class="flex items-center gap-2">
             <PrimeButton
               v-tooltip.top="{ value: 'Back', showDelay: 200 }"

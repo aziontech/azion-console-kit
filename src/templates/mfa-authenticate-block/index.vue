@@ -13,7 +13,7 @@
         <div class="flex flex-col gap-3">
           <div class="text-xl font-medium">Multi-Factor Authentication</div>
           <div class="text-color-secondary">
-            Open your authentication app and enter the generated code to access Real-Time Manager.
+            Open your authentication app and enter the generated code to access Azion Console.
           </div>
         </div>
 
