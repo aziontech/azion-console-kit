@@ -151,8 +151,7 @@
   const animateMessage = ref(false)
   const ERROR_PROPS = {
     closable: true,
-    severity: 'error',
-    life: 10000
+    severity: 'error'
   }
 
   const props = defineProps({
@@ -209,10 +208,9 @@
 
   const showFeedback = (feedback) => {
     toast.add({
-      closable: false,
+      closable: true,
       severity: 'success',
       summary: feedback,
-      life: 10000,
       link: {
         label: 'Go to Edge Function',
         callback: () => {

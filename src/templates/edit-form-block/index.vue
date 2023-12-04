@@ -70,13 +70,12 @@
     }
   }
 
-  const showToast = (severity, summary, life = 10000) => {
+  const showToast = (severity, summary) => {
     if (!summary) return
     toast.add({
-      closable: false,
+      closable: true,
       severity: severity,
-      summary: summary,
-      life: life
+      summary: summary
     })
   }
 

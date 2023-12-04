@@ -122,10 +122,9 @@
       async removeItem() {
         this.loading = true
         let toastConfig = {
-          closable: false,
+          closable: true,
           severity: 'success',
-          summary: '',
-          life: 10000
+          summary: ''
         }
 
         try {
@@ -137,10 +136,9 @@
           this.resetForm()
         } catch (error) {
           toastConfig = {
-            closable: false,
+            closable: true,
             severity: 'error',
-            summary: error,
-            life: 10000
+            summary: error
           }
         } finally {
           this.deleteDialogVisible = false

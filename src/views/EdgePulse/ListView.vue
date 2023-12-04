@@ -39,7 +39,7 @@
 
   const showToast = () => {
     toast.add({
-      closable: false,
+      closable: true,
       severity: 'success',
       summary: 'Copied successfully!',
       life: 6000

@@ -240,10 +240,9 @@
         } catch (error) {
           this.data = []
           this.$toast.add({
-            closable: false,
+            closable: true,
             severity: 'error',
-            summary: error,
-            life: 10000
+            summary: error
           })
         } finally {
           this.isLoading = false

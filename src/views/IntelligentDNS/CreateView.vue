@@ -82,10 +82,9 @@
   const handleCopyNameServers = () => {
     props.clipboardWrite('ns1.aziondns.net;ns2.aziondns.com;ns3.aziondns.org')
     toast.add({
-      closable: false,
+      closable: true,
       severity: 'success',
-      summary: 'Nameservers copied',
-      life: 10000
+      summary: 'Nameservers copied'
     })
   }
 </script>

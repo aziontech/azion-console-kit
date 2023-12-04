@@ -150,10 +150,9 @@
       schemaLoaded(initialData.inputSchema)
     } catch (error) {
       toast.add({
-        closable: false,
+        closable: true,
         severity: 'error',
-        summary: error,
-        life: 10000
+        summary: error
       })
     }
   }
@@ -291,10 +290,9 @@
       submitLoading.value = false
     } catch (error) {
       toast.add({
-        closable: false,
+        closable: true,
         severity: 'error',
-        summary: error,
-        life: 10000
+        summary: error
       })
     }
   }

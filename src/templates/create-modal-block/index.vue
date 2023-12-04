@@ -266,8 +266,7 @@
           this.$toast.add({
             closable: true,
             severity: 'error',
-            summary: error,
-            life: 10000
+            summary: error
           })
         } finally {
           this.isLoading = false
@@ -282,8 +281,7 @@
           this.$toast.add({
             closable: true,
             severity: 'error',
-            summary: error,
-            life: 10000
+            summary: error
           })
         } finally {
           this.isLoading = false
