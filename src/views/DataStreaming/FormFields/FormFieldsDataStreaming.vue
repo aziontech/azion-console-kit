@@ -194,6 +194,8 @@
           <InputNumber
             v-model="samplingPercentage"
             showButtons
+            :min="0"
+            :max="100"
             :class="{ 'p-invalid': samplingPercentageError }"
           />
           <small class="text-color-secondary text-xs font-normal leading-tight">

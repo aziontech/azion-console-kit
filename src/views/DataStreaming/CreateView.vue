@@ -39,7 +39,9 @@
       is: true,
       then: (schema) =>
         schema
-          .test('nonNegative', 'Sampling Percentage must not be negative', (value) => value >= 0)
+          .test('minmax', 'Sampling Percentage must be between 0 and 100', (value) => {
+            return value >= 0 && value <= 100
+          })
           .required('Sampling Percentage is a required field')
     }),
 
