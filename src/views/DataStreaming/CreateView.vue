@@ -4,7 +4,7 @@
 
   // Import the components
   import FormFieldsDataStreaming from './FormFields/FormFieldsDataStreaming'
-  import SamplingDialog from './Dialog/SamplingDialog.vue'
+  import SamplingDialog from './Dialog/SamplingDialog'
   import CreateFormBlock from '@/templates/create-form-block'
   import ContentBlock from '@/templates/content-block'
   import PageHeadingBlock from '@/templates/page-heading-block'

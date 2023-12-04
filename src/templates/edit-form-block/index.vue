@@ -45,7 +45,7 @@
   const toast = useToast()
   const blockViewRedirection = ref(true)
 
-  const { meta, errors, handleSubmit, isSubmitting, resetForm } = useForm({
+  const { meta, errors, handleSubmit, isSubmitting, resetForm, values } = useForm({
     validationSchema: props.schema
   })
 
@@ -130,5 +130,6 @@
     :onCancel="onCancel"
     :errors="errors"
     :loading="isSubmitting"
+    :values="values"
   />
 </template>
