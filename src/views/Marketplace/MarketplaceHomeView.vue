@@ -49,7 +49,7 @@
                 option-label="name"
                 class="w-full md:w-14rem border-none sm:min-w-[12rem]"
                 :pt="{
-                  item: { class: 'text-sm py-2 px-3' },
+                  item: { class: '' },
                   list: { class: 'p-0' }
                 }"
               >
@@ -58,7 +58,7 @@
                 </template>
                 <template #option="slotProps">
                   <div class="flex align-items-center justify-between">
-                    <div>{{ slotProps.option.name }}</div>
+                    <div class="mr-2">{{ slotProps.option.name }}</div>
                     <Badge
                       v-if="slotProps.option.code !== 'all'"
                       :value="slotProps.option.total"
