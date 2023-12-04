@@ -1,7 +1,5 @@
 <template>
-  <Toast
-    :pt="toast"
-  >
+  <Toast :pt="toast">
     <template #message="slotProps">
       <div class="flex flex-column flex-grow">
         <header class="flex gap-2 items-center justify-between">
@@ -124,10 +122,6 @@
         this.$toast.remove(message)
       },
       getTitle(str) {
-        // const maxcharacters = 20
-        // if (str.length > maxcharacters) {
-        //   return str.substring(0, maxcharacters)
-        // }
         return str
       },
       getSubtitle(str) {
