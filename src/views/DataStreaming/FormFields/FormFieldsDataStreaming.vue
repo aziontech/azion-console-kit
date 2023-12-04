@@ -171,10 +171,7 @@
         >
           <span class="p-input-icon-right w-full flex max-w-lg gap-2 pb-3 pt-2">
             <div class="w-fit">
-              <InputSwitch
-                v-model="hasSampling"
-                id="hasSampling"
-              />
+              <InputSwitch v-model="hasSampling" />
             </div>
             <div class="flex-col gap-1">
               <span class="text-color text-sm font-normal leading-5">Active</span>
