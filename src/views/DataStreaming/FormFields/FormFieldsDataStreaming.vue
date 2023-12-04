@@ -159,6 +159,65 @@
       </div>
     </template>
   </FormHorizontal>
+  <FormHorizontal
+    v-if="domainOption === '1'"
+    title="Sampling"
+    description="Enable this option to reduce costs of data collection and analysis"
+  >
+    <template #inputs>
+      <div class="flex flex-col w-full gap-8">
+        <div
+          class="flex gap-6 md:align-items-center max-sm:flex-col max-sm:align-items-baseline max-sm:gap-3"
+        >
+          <span class="p-input-icon-right w-full flex max-w-lg gap-2 pb-3 pt-2">
+            <div class="w-fit">
+              <InputSwitch
+                v-model="hasSampling"
+                id="hasSampling"
+              />
+            </div>
+            <div class="flex-col gap-1">
+              <span class="text-color text-sm font-normal leading-5">Active</span>
+              <p class="text-color-secondary text-sm font-normal">
+                Once enabled, you can only have one active data streaming in your account. If it's
+                later disabled, the Add option will become available again on the creation page.
+              </p>
+            </div>
+          </span>
+        </div>
+        <div
+          class="flex flex-col sm:max-w-lg w-full gap-2"
+          v-if="hasSampling"
+        >
+          <label
+            for="samplingPercentage"
+            class="text-color text-base font-medium"
+            >Sampling Percentage(%)</label
+          >
+          <InputNumber
+            v-model="samplingPercentage"
+            showButtons
+            :class="{ 'p-invalid': samplingPercentageError }"
+          />
+          <small class="text-color-secondary text-xs font-normal leading-tight">
+            Percentage value received in return of the total data related to all domains.
+          </small>
+          <small
+            v-if="samplingPercentageError"
+            class="p-error"
+            >{{ samplingPercentageError }}</small
+          >
+        </div>
+        <InlineMessage
+          class="w-fit"
+          severity="warn"
+          v-if="hasSampling"
+        >
+          After activating and saving the settings, all other data streamings will become inactive.
+        </InlineMessage>
+      </div>
+    </template>
+  </FormHorizontal>
 
   <FormHorizontal title="Destination">
     <template #inputs>
@@ -1111,7 +1170,7 @@
               id="active"
             />
             <div class="flex-col gap-1">
-              <div class="text-color text-sm font-normal leading-5">Active</div>
+              <span class="text-color text-sm font-normal leading-5">Active</span>
             </div>
           </span>
         </div>
@@ -1131,6 +1190,7 @@
   import InputSwitch from 'primevue/inputswitch'
   import ButtonPrimer from 'primevue/button'
   import InputNumber from 'primevue/inputnumber'
+  import InlineMessage from 'primevue/inlinemessage'
   import TextArea from 'primevue/textarea'
   import { onMounted, ref, computed, watch } from 'vue'
   import { useField } from 'vee-validate'
@@ -1181,6 +1241,9 @@
   const { value: domains } = useField('domains')
   const { value: endpoint } = useField('endpoint')
   const { value: status } = useField('status')
+  const { value: hasSampling } = useField('hasSampling')
+  const { value: samplingPercentage, errorMessage: samplingPercentageError } =
+    useField('samplingPercentage')
 
   // standard
   const { value: endpointUrl, errorMessage: endpointUrlError } = useField('endpointUrl')

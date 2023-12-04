@@ -39,6 +39,15 @@
     domainOption: yup.string().required(),
     endpoint: yup.string().required(),
     status: yup.boolean(),
+    hasSampling: yup.boolean(),
+    samplingPercentage: yup.number().when('hasSampling', {
+      is: true,
+      then: (schema) =>
+        schema
+          .test('nonNegative', 'Sampling Percentage must not be negative', (value) => value >= 0)
+          .required('Sampling Percentage is a required field')
+    }),
+
     // standard
     endpointUrl: yup.string().when('endpoint', {
       is: 'standard',
