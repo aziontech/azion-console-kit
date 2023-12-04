@@ -1,6 +1,5 @@
 <template>
   <Toast
-    class=""
     :pt="toast"
   >
     <template #message="slotProps">
