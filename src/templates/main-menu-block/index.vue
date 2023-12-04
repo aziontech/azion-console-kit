@@ -196,6 +196,7 @@
   </header>
   <!-- Mobile Profile Menu  -->
   <Sidebar
+    @click="toggleProfileMobile"
     v-model:visible="showProfile"
     position="bottom"
     :show-close-icon="false"
@@ -205,7 +206,6 @@
       mask: { class: 'flex' }
     }"
     class="md:p-3"
-    @click="toggleProfileMobile"
   >
     <PrimeMenu
       :pt="{
@@ -255,6 +255,7 @@
           <Dropdown
             :modelValue="selectedTheme"
             @update:modelValue="selectTheme"
+            @click.stop
             optionValue="value"
             optionLabel="name"
             :options="themeOptions"
