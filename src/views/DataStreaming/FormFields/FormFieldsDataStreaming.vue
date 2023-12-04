@@ -212,7 +212,8 @@
           severity="warn"
           v-if="hasSampling"
         >
-          After activating and saving the settings, all other data streamings will become inactive.
+          After activating and saving these settings, all other data streamings will become
+          inactive.
         </InlineMessage>
       </div>
     </template>
