@@ -1,121 +1,133 @@
-<template>
-  <div class="flex flex-col min-h-[calc(100vh-120px)]">
-    <PageHeadingBlock :pageTitle="pageTitle" />
+<script setup>
+  import DialogUnsavedBlock from '@/templates/dialog-unsaved-block'
+  import { useForm, useIsFormDirty } from 'vee-validate'
+  import { computed, ref } from 'vue'
+  import { useRouter, useRoute } from 'vue-router'
+  import { useToast } from 'primevue/usetoast'
 
+  defineOptions({ name: 'edit-form-block' })
+
+  const props = defineProps({
+    isTabs: {
+      type: Boolean,
+      default: false
+    },
+    editService: {
+      type: Function,
+      required: true
+    },
+    loadService: {
+      type: Function,
+      required: true
+    },
+    backURL: {
+      type: String,
+      required: false
+    },
+    disableRedirect: {
+      type: Boolean,
+      default: false
+    },
+    updatedRedirect: {
+      type: String,
+      required: true
+    },
+    schema: {
+      type: Object,
+      required: true
+    }
+  })
+
+  const emit = defineEmits(['on-edit-success'])
+
+  const router = useRouter()
+  const route = useRoute()
+  const toast = useToast()
+  const blockViewRedirection = ref(true)
+
+  const { meta, errors, handleSubmit, isSubmitting, resetForm } = useForm({
+    validationSchema: props.schema
+  })
+
+  const formHasChanges = computed(() => {
+    const isDirty = useIsFormDirty()
+    return blockViewRedirection.value && isDirty.value
+  })
+
+  const goBackToList = () => {
+    if (props.updatedRedirect) {
+      router.push({ name: props.updatedRedirect })
+      return
+    }
+    router.go(-1)
+  }
+
+  const onCancel = () => {
+    if (props.backURL) {
+      router.push({ path: props.backURL })
+    } else {
+      goBackToList()
+    }
+  }
+
+  const showToast = (severity, summary) => {
+    if (!summary) return
+    toast.add({
+      closable: true,
+      severity: severity,
+      summary: summary
+    })
+  }
+
+  const loadInitialData = async () => {
+    try {
+      const { id } = route.params
+      const initialValues = await props.loadService({ id })
+      resetForm({ values: initialValues })
+    } catch (error) {
+      showToast('error', error)
+    }
+  }
+
+  const onSubmit = handleSubmit(async (values) => {
+    try {
+      const feedback = await props.editService(values)
+      showToast('success', feedback ?? 'edited successfully')
+      blockViewRedirection.value = false
+      emit('on-edit-success', feedback)
+      if (props.disableRedirect) {
+        return
+      }
+      goBackToList()
+    } catch (error) {
+      blockViewRedirection.value = true
+      showToast('error', error)
+    }
+  })
+
+  loadInitialData()
+</script>
+
+<template>
+  <div class="flex flex-col min-h-[calc(100vh-300px)]">
     <form
       @submit.prevent="handleSubmit"
-      class="w-full grow mt-4 p-4 max-w-screen-sm flex flex-col gap-4 lg:max-w-7xl mx-auto"
+      class="w-full grow flex flex-col gap-8 max-md:gap-6"
+      :class="{ 'mt-4': isTabs }"
     >
-      <div class="flex flex-col gap-4 sm:!w-full md:!w-1/2">
-        <slot name="form" />
-      </div>
+      <slot name="form" />
 
       <slot name="raw-form" />
     </form>
-    <ActionBarTemplate
-      @cancel="handleCancel"
-      @submit="handleSubmit"
-      :loading="isLoading"
-      :submitDisabled="!isValid"
-    />
   </div>
+
+  <DialogUnsavedBlock :blockRedirectUnsaved="formHasChanges" />
+  <slot
+    name="action-bar"
+    :onSubmit="onSubmit"
+    :formValid="meta.valid"
+    :onCancel="onCancel"
+    :errors="errors"
+    :loading="isSubmitting"
+  />
 </template>
-
-<script>
-  import ActionBarTemplate from '@/templates/action-bar-block'
-  import PageHeadingBlock from '@/templates/page-heading-block'
-
-  export default {
-    name: 'edit-form-block',
-    components: {
-      ActionBarTemplate,
-      PageHeadingBlock
-    },
-    data: () => ({
-      isLoading: false
-    }),
-    props: {
-      pageTitle: {
-        type: String,
-        required: true
-      },
-      editService: {
-        type: Function,
-        required: true
-      },
-      loadService: {
-        type: Function,
-        required: true
-      },
-      initialDataSetter: {
-        type: Function,
-        required: true
-      },
-      isValid: {
-        type: Boolean,
-        required: true
-      },
-      formData: {
-        type: Object,
-        required: true
-      },
-      backURL: {
-        type: String,
-        required: false
-      }
-    },
-    async created() {
-      await this.loadInitialData()
-    },
-    methods: {
-      handleCancel() {
-        if (this.backURL) {
-          this.$router.push({ path: this.backURL })
-        } else {
-          this.$router.go(-1)
-        }
-      },
-      goBackToList() {
-        this.$router.go(-1)
-      },
-      async loadInitialData() {
-        try {
-          const { id } = this.$route.params
-          this.isLoading = true
-          const initialData = await this.loadService({ id })
-          this.initialDataSetter(initialData)
-        } catch (error) {
-          this.$toast.add({
-            closable: true,
-            severity: 'error',
-            summary: error
-          })
-        } finally {
-          this.isLoading = false
-        }
-      },
-      async handleSubmit() {
-        try {
-          this.isLoading = true
-          await this.editService(this.formData)
-          this.$toast.add({
-            closable: true,
-            severity: 'success',
-            summary: 'edited successfully'
-          })
-          this.goBackToList()
-        } catch (error) {
-          this.$toast.add({
-            closable: true,
-            severity: 'error',
-            summary: error
-          })
-        } finally {
-          setTimeout(() => {
-            this.isLoading = false
-          }, 800)
-        }
-      }
-    }
-  }
-</script>

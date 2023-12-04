@@ -1,84 +1,105 @@
-<template>
-  <div class="flex flex-col min-h-[calc(100vh-120px)]">
-    <PageHeadingBlock :pageTitle="pageTitle" />
-    <form class="w-full grow mt-4 p-4 max-w-screen-sm flex flex-col gap-4 lg:max-w-7xl mx-auto">
-      <div class="flex flex-col gap-4 sm:!w-full md:!w-1/2">
-        <slot name="form" />
-      </div>
+<script setup>
+  import DialogUnsavedBlock from '@/templates/dialog-unsaved-block'
+  import { useForm, useIsFormDirty } from 'vee-validate'
+  import { computed, ref } from 'vue'
+  import { useRouter } from 'vue-router'
+  import { useToast } from 'primevue/usetoast'
 
+  defineOptions({ name: 'create-form-block' })
+
+  const props = defineProps({
+    createService: {
+      type: Function,
+      required: true
+    },
+    schema: {
+      type: Object,
+      required: true
+    },
+    initialValues: {
+      type: Object,
+      default: () => ({})
+    },
+    disabledCallback: {
+      type: Boolean,
+      default: false
+    },
+    cleanForm: {
+      type: Boolean,
+      default: true
+    }
+  })
+
+  const emit = defineEmits(['on-response'])
+
+  const router = useRouter()
+  const toast = useToast()
+  const blockViewRedirection = ref(true)
+
+  const formHasChanges = computed(() => {
+    const isDirty = useIsFormDirty()
+    return blockViewRedirection.value && isDirty.value
+  })
+
+  const { meta, errors, handleSubmit, isSubmitting } = useForm({
+    validationSchema: props.schema,
+    initialValues: props.initialValues
+  })
+
+  const onCancel = () => {
+    router.go(-1)
+  }
+
+  const showToast = (severity, summary) => {
+    if (!summary) return
+    toast.add({
+      closable: true,
+      severity: severity,
+      summary: summary
+    })
+  }
+
+  const showFeedback = (feedback = 'created successfully') => {
+    showToast('success', feedback)
+  }
+
+  const redirectToUrl = (path) => {
+    router.push({ path })
+  }
+
+  const handleSuccess = (response) => {
+    emit('on-response', response)
+    showFeedback(response.feedback)
+    if (props.disabledCallback) return
+    redirectToUrl(response.urlToEditView)
+  }
+
+  const onSubmit = handleSubmit(async (values) => {
+    try {
+      const response = await props.createService(values)
+      handleSuccess(response)
+      blockViewRedirection.value = false
+    } catch (error) {
+      showToast('error', error)
+      blockViewRedirection.value = true
+    }
+  })
+</script>
+
+<template>
+  <div class="flex flex-col min-h-[calc(100vh-300px)]">
+    <form class="w-full grow flex flex-col gap-8 max-md:gap-6">
+      <slot name="form" />
       <slot name="raw-form" />
     </form>
-    <ActionBarTemplate
-      @cancel="handleCancel"
-      @submit="validateAndSubmit"
-      :loading="isLoading"
-      :submitDisabled="!isValid"
+    <DialogUnsavedBlock :blockRedirectUnsaved="formHasChanges" />
+    <slot
+      name="action-bar"
+      :onSubmit="onSubmit"
+      :formValid="meta.valid"
+      :onCancel="onCancel"
+      :errors="errors"
+      :loading="isSubmitting"
     />
   </div>
 </template>
-<script>
-  import ActionBarTemplate from '@/templates/action-bar-block'
-  import PageHeadingBlock from '@/templates/page-heading-block'
-
-  export default {
-    name: 'create-form-block',
-    components: {
-      ActionBarTemplate,
-      PageHeadingBlock
-    },
-    data: () => ({
-      isLoading: false
-    }),
-    props: {
-      pageTitle: {
-        type: String,
-        required: true
-      },
-      createService: {
-        type: Function,
-        required: true
-      },
-      isValid: {
-        type: Boolean,
-        required: true
-      },
-      formData: {
-        type: Object,
-        required: true
-      },
-      cleanFormCallback: {
-        type: Function,
-        required: true
-      }
-    },
-    methods: {
-      handleCancel() {
-        this.$router.go('-1')
-      },
-      goBackToList() {
-        this.$router.go(-1)
-      },
-      async validateAndSubmit() {
-        try {
-          this.isLoading = true
-          const feedback = await this.createService(this.formData)
-          this.cleanFormCallback()
-          this.$toast.add({
-            closable: true,
-            severity: 'success',
-            summary: feedback ?? 'created successfully'
-          })
-          this.goBackToList()
-        } catch (error) {
-          this.$toast.add({
-            closable: true,
-            severity: 'error',
-            summary: error
-          })
-        } finally {
-          this.isLoading = false
-        }
-      }
-    }
-  }
-</script>

@@ -5,6 +5,8 @@
       :key="solution.id"
       class="p-4 text-left border-solid border surface-border hover:border-primary transition-all"
       link
+      type="button"
+      @click="goToSolution(solution)"
     >
       <div class="flex flex-col h-full justify-between gap-3.5 items-start">
         <div class="flex gap-3.5 flex-col">
@@ -33,8 +35,19 @@
 
 <script setup>
   import PrimeButton from 'primevue/button'
+  import { useRouter } from 'vue-router'
+
+  const $router = useRouter()
 
   const props = defineProps({
     solutions: Array
   })
+
+  const goToSolution = (solution) => {
+    const params = {
+      vendor: solution.vendor.slug,
+      solution: solution.slug
+    }
+    $router.push({ name: 'marketplace-solution', params })
+  }
 </script>

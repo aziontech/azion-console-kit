@@ -63,7 +63,7 @@
             >Company name
             <PrimeInputText
               placeholder="Company Name"
-              v-bind="companyName"
+              v-model="companyName"
               type="text"
             />
           </label>
@@ -208,7 +208,7 @@
     })
   })
 
-  const { defineInputBinds, values, meta, errors } = useForm({ validationSchema })
+  const { values, meta, errors } = useForm({ validationSchema })
 
   const isInternal = computed(() => {
     return projectTypeSelection.value === typeToEnableCompanyFields
@@ -218,7 +218,7 @@
   const { value: projectTypeSelection } = useField('projectTypeSelection')
   const { value: companySize } = useField('companySize')
   const { value: country } = useField('country')
-  const companyName = defineInputBinds('companyName')
+  const { value: companyName } = useField('companyName')
 
   const loading = ref(false)
 

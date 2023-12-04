@@ -98,13 +98,12 @@
       redirectToUrl(path) {
         this.$router.push({ path })
       },
-      showToast(severity, summary, life = 10000) {
+      showToast(severity, summary) {
         if (!summary) return
         this.$toast.add({
           closable: true,
           severity: severity,
-          summary: summary,
-          life: life
+          summary: summary
         })
       },
       showFeedback(feedback = 'created successfully') {

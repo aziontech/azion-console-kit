@@ -20,7 +20,7 @@ const adapt = (payload) => {
     template_id: payload.template,
     data_source: payload.dataSource,
     domain_ids: allDomains ? [] : getDomains(payload.domains[1]),
-    all_domains: allDomains ? true : false,
+    all_domains: allDomains,
     active: payload.status,
     endpoint: getEndpoint(payload)
   }
@@ -33,7 +33,7 @@ const getEndpoint = (payload) => {
         endpoint_type: 'standard',
         url: payload.endpointUrl,
         payload_format: payload.payloadFormat,
-        log_line_separator: payload.lineSeparator,
+        log_line_separator: payload.lineSeparator === '\\n' ? '\n' : payload.lineSeparator,
         max_size: payload.maxSize,
         headers: getHeaders(payload.headers)
       }
