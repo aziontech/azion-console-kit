@@ -50,40 +50,51 @@
                   >{{ errors.lastName }}</small
                 >
               </div>
-              <div class="flex flex-col w-full sm:max-w-xs gap-2">
-                <label
-                  for="selectedTimezone"
-                  class="text-color text-base font-medium"
-                  >Timezone *</label
-                >
-                <Dropdown
-                  id="selectedTimezone"
-                  filter
-                  :options="optionsTimezone"
-                  optionLabel="label"
-                  optionValue="value"
-                  placeholder="Loading..."
-                  :loading="!selectedTimezone"
-                  :class="{ 'p-invalid': errors.selectedTimezone }"
-                  v-model="selectedTimezone"
-                />
+              <div class="flex sm:flex-row w-full flex-col gap-6">
+                <div class="flex flex-col w-full sm:max-w-xs gap-2">
+                  <label
+                    for="selectedTimezone"
+                    class="text-color text-base font-medium"
+                    >Timezone *</label
+                  >
+                  <Dropdown
+                    id="selectedTimezone"
+                    filter
+                    :options="optionsTimezone"
+                    optionLabel="label"
+                    optionValue="value"
+                    placeholder="Loading..."
+                    :loading="!selectedTimezone"
+                    :class="{ 'p-invalid': errors.selectedTimezone }"
+                    v-model="selectedTimezone"
+                  />
+                </div>
+                <div class="flex flex-col w-full sm:max-w-xs gap-2">
+                  <label
+                    for="selectedLanguage"
+                    class="text-color text-base font-medium"
+                    >Language</label
+                  >
+                  <Dropdown
+                    id="selectedLanguage"
+                    :options="optionsLanguage"
+                    optionLabel="label"
+                    optionValue="value"
+                    :class="{ 'p-invalid': errors.selectedLanguage }"
+                    v-model="selectedLanguage"
+                    disabled
+                  >
+                    <template #dropdownicon>
+                      <span class="pi pi-lock text-color-secondary" />
+                    </template>
+                  </Dropdown>
+                </div>
               </div>
-              <div class="flex flex-col w-full sm:max-w-xs gap-2">
-                <label
-                  for="selectedLanguage"
-                  class="text-color text-base font-medium"
-                  >Language</label
-                >
-                <Dropdown
-                  id="selectedLanguage"
-                  :options="optionsLanguage"
-                  optionLabel="label"
-                  optionValue="value"
-                  :class="{ 'p-invalid': errors.selectedLanguage }"
-                  v-model="selectedLanguage"
-                  disabled
-                />
-              </div>
+            </template>
+          </FormHorizontal>
+
+          <FormHorizontal title="Contact information">
+            <template #inputs>
               <div class="flex flex-col sm:max-w-lg w-full gap-2">
                 <label
                   for="email"
@@ -144,33 +155,11 @@
                   >{{ errors.mobile }}</small
                 >
               </div>
+            </template>
+          </FormHorizontal>
 
-              <Card
-                :pt="{
-                  root: { class: 'shadow-none  rounded-none' },
-                  body: { class: 'py-4 border-0' },
-                  title: { class: 'flex items-center text-base m-0 gap-3 font-medium' },
-                  subtitle: {
-                    class: 'text-sm font-normal text-color-secondary m-0 pr-0 md:pr-[2.5rem]'
-                  }
-                }"
-              >
-                <template #title>
-                  <InputSwitch
-                    :class="{ 'p-invalid': errors.userIsOwner }"
-                    :disabled="accountIsOwner"
-                    :readonly="accountIsOwner"
-                    v-model="userIsOwner"
-                    @click="handleUserIsOwner"
-                  />
-                  <div class="flex-col gap-1">
-                    <div class="">
-                      <div class="text-color text-sm font-normal">Account owner</div>
-                    </div>
-                  </div>
-                </template>
-              </Card>
-
+          <FormHorizontal title="Security settings">
+            <template #inputs>
               <div class="flex flex-col w-full sm:max-w-3xl gap-2">
                 <label
                   for="teams"
@@ -192,29 +181,82 @@
                   v-model="selectedTeam"
                 />
               </div>
-              <Card
-                :pt="{
-                  root: { class: 'shadow-none  rounded-none' },
-                  body: { class: 'py-4 border-0' },
-                  title: { class: 'flex items-center text-base m-0 gap-3 font-medium' },
-                  subtitle: {
-                    class: 'text-sm font-normal text-color-secondary m-0 pr-0 md:pr-[2.5rem]'
-                  }
-                }"
-              >
-                <template #title>
-                  <InputSwitch
-                    :class="{ 'p-invalid': errors.twoFactorEnabled }"
-                    :readonly="isForceMFA"
-                    v-model="twoFactorEnabled"
-                  />
-                  <div class="flex-col gap-1">
-                    <div class="">
-                      <div class="text-color text-sm font-normal">Multi-Factor Authentication</div>
+
+              <div>
+                <Card
+                  :pt="{
+                    root: { class: 'shadow-none  rounded-none' },
+                    body: { class: 'py-4 border-0' },
+                    content: { class: 'ml-12' },
+                    title: { class: 'flex items-center text-base m-0 gap-3 font-medium' },
+                    subtitle: {
+                      class: 'text-sm font-normal text-color-secondary m-0 pr-0 md:pr-[2.5rem]'
+                    }
+                  }"
+                >
+                  <template #title>
+                    <InputSwitch
+                      :class="{ 'p-invalid': errors.userIsOwner }"
+                      :disabled="accountIsOwner"
+                      :readonly="accountIsOwner"
+                      v-model="userIsOwner"
+                      @click="handleUserIsOwner"
+                    />
+                    <div class="flex-col gap-1">
+                      <div>
+                        <div class="text-color text-sm font-normal">Account owner</div>
+                      </div>
                     </div>
-                  </div>
-                </template>
-              </Card>
+                  </template>
+
+                  <template #content>
+                    <div class="text-color-secondary text-sm">
+                      Account owner: Full access to all features, including account and solution
+                      management. Non-owner: Restricted access to solution management, based on
+                      Teams permissions.
+                    </div>
+                  </template>
+                </Card>
+
+                <Divider></Divider>
+
+                <Card
+                  :pt="{
+                    root: { class: 'shadow-none  rounded-none' },
+                    body: { class: 'py-4 border-0' },
+                    content: { class: 'ml-12' },
+                    title: { class: 'flex items-center text-base m-0 gap-3 font-medium' },
+                    subtitle: {
+                      class: 'text-sm font-normal text-color-secondary m-0 pr-0 md:pr-[2.5rem]'
+                    }
+                  }"
+                >
+                  <template #title>
+                    <InputSwitch
+                      :class="{ 'p-invalid': errors.twoFactorEnabled }"
+                      :readonly="isForceMFA"
+                      v-model="twoFactorEnabled"
+                    />
+                    <div class="flex-col gap-1">
+                      <div class="">
+                        <div class="text-color text-sm font-normal">
+                          Multi-Factor Authentication
+                        </div>
+                      </div>
+                    </div>
+                  </template>
+
+                  <template #content>
+                    <div class="text-color-secondary text-sm">
+                      Multi-factor authentication adds an extra layer of security to your account.
+                      In addition to your username and password, you will need an application like
+                      Google Authenticator on your phone to get verification codes when prompted.
+                      Enabling multi-factor authentication, you MUST set up an account on Google
+                      Authenticator on your next login.
+                    </div>
+                  </template>
+                </Card>
+              </div>
             </template>
           </FormHorizontal>
         </template>
@@ -238,6 +280,7 @@
   import MultiSelect from 'primevue/multiselect'
   import InputMask from 'primevue/inputmask'
   import Card from 'primevue/card'
+  import Divider from 'primevue/divider'
   import ContentBlock from '@/templates/content-block'
   import PageHeadingBlock from '@/templates/page-heading-block'
 
