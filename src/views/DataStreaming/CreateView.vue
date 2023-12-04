@@ -4,6 +4,7 @@
 
   // Import the components
   import FormFieldsDataStreaming from './FormFields/FormFieldsDataStreaming'
+  import SamplingDialog from './Dialog/SamplingDialog.vue'
   import CreateFormBlock from '@/templates/create-form-block'
   import ContentBlock from '@/templates/content-block'
   import PageHeadingBlock from '@/templates/page-heading-block'
@@ -280,12 +281,21 @@
     containerName: '',
     blobToken: ''
   })
+
+  const displaySamplingDialog = ref(false)
+  const formSubmit = (onSubmit, values) => {
+    if (!values.hasSampling) {
+      onSubmit()
+    } else {
+      displaySamplingDialog.value = true
+    }
+  }
 </script>
 
 <template>
   <ContentBlock>
     <template #heading>
-      <PageHeadingBlock pageTitle="Create Data Streaming"></PageHeadingBlock>
+      <PageHeadingBlock pageTitle="Create Data Streaming" />
     </template>
     <template #content>
       <CreateFormBlock
@@ -299,12 +309,18 @@
             :listDataStreamingDomainsService="props.listDataStreamingDomainsService"
           />
         </template>
-        <template #action-bar="{ onSubmit, formValid, onCancel, loading }">
+        <template #action-bar="{ onSubmit, formValid, onCancel, loading, values }">
           <ActionBarBlockWithTeleport
-            @onSubmit="onSubmit"
+            ref="actionBar"
+            @onSubmit="formSubmit(onSubmit, values)"
             @onCancel="onCancel"
             :loading="loading"
             :submitDisabled="!formValid"
+          />
+          <SamplingDialog
+            v-model:visible="displaySamplingDialog"
+            @confirm="onSubmit"
+            @cancel="displaySamplingDialog = false"
           />
         </template>
       </CreateFormBlock>
