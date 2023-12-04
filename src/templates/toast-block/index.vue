@@ -48,6 +48,7 @@
           />
           <!-- Primary Button -->
           <PrimeButton
+            severity="secondary"
             v-if="slotProps.message.primary"
             size="small"
             :label="slotProps.message.primary.label"
