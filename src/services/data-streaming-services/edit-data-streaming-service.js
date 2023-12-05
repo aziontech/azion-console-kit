@@ -22,6 +22,7 @@ const adapt = (payload) => {
     domain_ids: allDomains ? [] : getDomains(payload.domains[1]),
     all_domains: allDomains,
     active: payload.status,
+    sampling_percentage: payload.samplingPercentage,
     endpoint: getEndpoint(payload)
   }
 }
@@ -161,6 +162,9 @@ const extractErrorKey = (errorSchema, key) => {
  * @returns {string} The result message based on the status code.
  */
 const extractApiError = (httpResponse) => {
+  // flag
+  const noFlagError = extractErrorKey(httpResponse.body, 'user_has_no_flag')
+
   // standard
   const invalidURLError = extractErrorKey(httpResponse.body, 'invalid_url')
   const maxSizeError = extractErrorKey(httpResponse.body, 'max_size_out_of_range')
@@ -188,6 +192,7 @@ const extractApiError = (httpResponse) => {
   const datadogInvalidURLError = extractErrorKey(httpResponse.body, 'invalid_datadog_url')
 
   const errorMessages = [
+    noFlagError,
     invalidURLError,
     maxSizeError,
     datasetError,
