@@ -15,16 +15,21 @@ export const editDataStreamingService = async (payload) => {
 const adapt = (payload) => {
   const allDomains = payload.domains[1].length <= 0
 
-  return {
+  const parsedPayload = {
     name: payload.name,
     template_id: payload.template,
     data_source: payload.dataSource,
     domain_ids: allDomains ? [] : getDomains(payload.domains[1]),
     all_domains: allDomains,
     active: payload.status,
-    sampling_percentage: payload.samplingPercentage,
     endpoint: getEndpoint(payload)
   }
+
+  if (payload.hasSampling) {
+    parsedPayload.sampling_percentage = payload.samplingPercentage
+  }
+
+  return parsedPayload
 }
 
 const getEndpoint = (payload) => {

@@ -15,16 +15,21 @@ export const createDataStreamingService = async (payload) => {
 const adapt = (payload) => {
   const allDomains = payload.domains[1].length <= 0
 
-  return {
+  const parsedPayload = {
     name: payload.name,
     template_id: payload.template,
     data_source: payload.dataSource,
     domain_ids: allDomains ? [] : getDomains(payload.domains[1]),
     all_domains: allDomains,
     active: payload.status,
-    sampling_percentage: payload.samplingPercentage,
     endpoint: parseByEndpointType(payload)
   }
+
+  if (payload.hasSampling) {
+    parsedPayload.sampling_percentage = payload.samplingPercentage
+  }
+
+  return parsedPayload
 }
 
 const parseByEndpointType = (payload) => {
@@ -134,7 +139,7 @@ const parseHttpResponse = (httpResponse) => {
     case 201:
       return {
         feedback: 'Your data streaming has been created',
-        urlToEditView: `/data-streaming/edit/${httpResponse.body.results.id}`
+        urlToEditView: `/data-streaming`
       }
     case 400:
       const apiError = extractApiError(httpResponse)
