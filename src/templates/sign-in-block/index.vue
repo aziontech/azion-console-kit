@@ -13,7 +13,7 @@
       >
         <h3
           data-testid="title"
-          class="text-xl md:text-2xl font-medium text-center"
+          class="text-xl md:text-2xl font-medium text-left"
         >
           Azion Console
         </h3>
