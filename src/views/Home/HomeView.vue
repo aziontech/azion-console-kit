@@ -4,11 +4,11 @@
       <section class="w-full flex flex-col gap-6 lg:gap-8">
         <!-- Getting Started -->
         <div
-        v-if="user.status === 'TRIAL'"
+          v-if="showExperimental"
           class="w-full p-3 sm:p-8 surface-border border rounded-md flex gap-6 lg:gap-10 justify-between items-center"
         >
           <p class="text-color-secondary">
-           {{ disclaimer }}
+            {{ disclaimer }}
           </p>
           <PrimeButton
             type="button"
@@ -210,7 +210,6 @@
   import { mapState } from 'pinia'
   import { useAccountStore } from '@/stores/account'
 
-
   export default {
     name: 'home-view',
     components: {
@@ -257,8 +256,10 @@
       ...mapState(useAccountStore, { user: 'accountData', currentTheme: 'currentTheme' }),
       disclaimer() {
         return this.user.disclaimer.replace(/<a[^>]+>[^<]+<\/a>/g, '')
+      },
+      showExperimental() {
+        return this.user.disclaimer
       }
-
     },
     methods: {
       navigateToEdgeApplications() {
