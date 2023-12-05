@@ -24,6 +24,7 @@ export default async function beforeEachRoute(to, _, next) {
         getUserInfoService()
       ])
 
+      
       accountInfo.is_account_owner = userInfo.results.is_account_owner
       accountInfo.client_id = userInfo.results.client_id
       accountInfo.timezone = userInfo.results.timezone
@@ -31,7 +32,7 @@ export default async function beforeEachRoute(to, _, next) {
       accountInfo.permissions = userInfo.results.permissions
       accountInfo.email = userInfo.results.email
       accountInfo.user_id = userInfo.results.id
-
+      
       accountInfo.colorTheme = theme || fallbackTheme
 
       accountStore.setAccountData(accountInfo)
