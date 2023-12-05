@@ -49,7 +49,6 @@
                 option-label="name"
                 class="w-full md:w-14rem border-none sm:min-w-[12rem]"
                 :pt="{
-                  item: { class: '' },
                   list: { class: 'p-0' }
                 }"
               >
