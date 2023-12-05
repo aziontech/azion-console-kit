@@ -119,6 +119,9 @@
             />
             <label class="text-color text-sm font-normal leading-tight">Filter Domains </label>
           </div>
+          <small class="text-color-secondary text-xs font-normal leading-tight"
+            >In case you select the All Domains option, you can activate the Sampling option</small
+          >
         </div>
       </div>
 
