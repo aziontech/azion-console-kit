@@ -1096,7 +1096,7 @@
         <label
           for="payloadFormat"
           class="text-color text-base font-medium"
-          >Format</label
+          >Format *</label
         >
         <InputText
           v-model="payloadFormat"
@@ -1119,7 +1119,7 @@
         <label
           for="lineSeparator"
           class="text-color text-base font-medium"
-          >Log Line Separator</label
+          >Log Line Separator *</label
         >
         <InputText
           v-model="lineSeparator"
@@ -1147,17 +1147,11 @@
           v-model="maxSize"
           placeholder="1000000"
           :useGrouping="false"
-          :class="{ 'p-invalid': maxSizeError }"
         />
         <small class="text-color-secondary text-xs font-normal leading-tight">
           You can define the maximum size of data packets in bytes. Use a value starting from
           1000000.
         </small>
-        <small
-          id="max-size-help"
-          class="p-error"
-          >{{ maxSizeError }}</small
-        >
       </div>
     </template>
   </FormHorizontal>

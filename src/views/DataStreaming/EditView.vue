@@ -65,10 +65,6 @@
         })
       })
     ),
-    maxSize: yup.number().when('endpoint', {
-      is: 'standard',
-      then: (schema) => schema.required('Max Size is a required field')
-    }),
     lineSeparator: yup.string().when('endpoint', {
       is: 'standard',
       then: (schema) => schema.required('Log Line Separator is a required field')
