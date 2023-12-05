@@ -5,8 +5,8 @@
         severity="warn"
         :closable="false"
         :pt="{
-          root: { class: 'bg-orange-50 mx-3 sm:mx-8 mt-4',  },
-          wrapper: {class: 'py-3 px-8 '}
+          root: { class: 'bg-orange-50 mx-3 sm:mx-8 mt-4' },
+          wrapper: { class: 'py-3 px-8 ' }
         }"
       >
         <p class="text-color-secondary">
