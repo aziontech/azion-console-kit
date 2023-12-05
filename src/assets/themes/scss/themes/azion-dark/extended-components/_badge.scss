@@ -3,8 +3,8 @@
   border: 1px solid var(--surface-border) !important;
   border-radius: $borderRadius;
   color: $badgeTextColor;
-  font-size: $badgeFontSize;
-  font-weight: $badgeFontWeight;
+  font-size: 0.75rem !important;
+  font-weight: normal !important;
   min-width: $badgeMinWidth;
   height: $badgeHeight;
 
