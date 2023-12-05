@@ -69,7 +69,7 @@
       :closable="false"
       :pt="{
         root: { class: 'p-0 w-[576px]' },
-        header: { class: 'flex pt-5 pb-5 items-center self-stretch border-b border-solid' },
+        header: { class: 'flex p-5 items-center self-stretch border-b border-solid' },
         content: { class: 'p-0 h-full' },
         footer: {
           class: 'flex p-5 justify-end items-end border-t border-solid'
