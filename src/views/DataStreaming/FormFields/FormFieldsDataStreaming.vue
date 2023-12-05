@@ -1245,7 +1245,7 @@
   // standard
   const { value: endpointUrl, errorMessage: endpointUrlError } = useField('endpointUrl')
   const { value: headers } = useField('headers')
-  const { value: maxSize, errorMessage: maxSizeError } = useField('maxSize')
+  const { value: maxSize } = useField('maxSize')
   const { value: lineSeparator, errorMessage: lineSeparatorError } = useField('lineSeparator')
   const { value: payloadFormat, errorMessage: payloadFormatError } = useField('payloadFormat')
 
