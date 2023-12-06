@@ -4,6 +4,18 @@ import { editDataStreamingService } from '@/services/data-streaming-services'
 import { describe, expect, it, vi } from 'vitest'
 
 const fixtures = {
+  dataStreamingMockWithSampling: {
+    id: 3563,
+    name: 'Data Streaming Name',
+    template: 4,
+    dataSource: 'http',
+    domains: [[], []],
+    status: true,
+    hasSampling: true,
+    samplingPercentage: 100,
+    endpoint: 'qradar',
+    QRadarUrl: 'https://qradar-trial-abcdef.qradar.ibmcloud.com:123456'
+  },
   dataStreamingMock: {
     id: 3563,
     name: 'Data Streaming Name',
@@ -11,6 +23,7 @@ const fixtures = {
     dataSource: 'http',
     domains: [[], []],
     status: true,
+    hasSampling: false,
     endpoint: 'qradar',
     QRadarUrl: 'https://qradar-trial-abcdef.qradar.ibmcloud.com:123456'
   }
@@ -31,21 +44,22 @@ describe('DataStreamingServices', () => {
     })
     const { sut } = makeSut()
 
-    await sut(fixtures.dataStreamingMock)
+    await sut(fixtures.dataStreamingMockWithSampling)
 
     expect(requestSpy).toHaveBeenCalledWith({
-      url: `data_streaming/streamings/${fixtures.dataStreamingMock.id}`,
+      url: `data_streaming/streamings/${fixtures.dataStreamingMockWithSampling.id}`,
       method: 'PUT',
       body: {
-        name: fixtures.dataStreamingMock.name,
-        template_id: fixtures.dataStreamingMock.template,
-        data_source: fixtures.dataStreamingMock.dataSource,
+        name: fixtures.dataStreamingMockWithSampling.name,
+        template_id: fixtures.dataStreamingMockWithSampling.template,
+        data_source: fixtures.dataStreamingMockWithSampling.dataSource,
         domain_ids: [],
-        active: fixtures.dataStreamingMock.status,
+        active: fixtures.dataStreamingMockWithSampling.status,
         all_domains: true,
+        sampling_percentage: fixtures.dataStreamingMockWithSampling.samplingPercentage,
         endpoint: {
-          endpoint_type: fixtures.dataStreamingMock.endpoint,
-          url: fixtures.dataStreamingMock.QRadarUrl
+          endpoint_type: fixtures.dataStreamingMockWithSampling.endpoint,
+          url: fixtures.dataStreamingMockWithSampling.QRadarUrl
         }
       }
     })
@@ -258,6 +272,11 @@ describe('DataStreamingServices', () => {
       scenario: 'used url invalid',
       apiErrorMock: 'URL is not on correct format.',
       errorKey: 'invalid_url'
+    },
+    {
+      scenario: 'user does not have sampling client flag',
+      apiErrorMock: 'You do not have permission to use Data Streaming sampling',
+      errorKey: 'user_has_no_flag'
     },
     {
       scenario: 'used max size invalid',

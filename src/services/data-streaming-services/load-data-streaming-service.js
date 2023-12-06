@@ -25,6 +25,7 @@ const adapt = async (httpResponse) => {
     status: payload.active,
     domains,
     endpoint: payload.endpoint.endpoint_type,
+    samplingPercentage: payload.sampling_percentage,
     ...getInfoByEndpoint(payload)
   }
 
