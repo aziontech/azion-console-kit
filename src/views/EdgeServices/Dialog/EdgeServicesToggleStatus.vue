@@ -104,7 +104,7 @@
         <h5 class="text-lg not-italic font-bold leading-5">{{ title }}</h5>
       </template>
       <div class="flex items-center flex-1 text-color-secondary text-sm font-normal leading-5">
-        {{ description }}?
+        {{ description }}
       </div>
       <template #footer>
         <PrimeButton
