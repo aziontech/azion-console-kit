@@ -31,7 +31,7 @@ export const createNewRoutes = {
       component: () => import('@views/CreateNew/DeployView.vue'),
       props: {
         getLogsService: ScriptRunnerService.getLogs,
-        getResultsService: ScriptRunnerService.getResults,
+        getResultsService: ScriptRunnerService.getResults
       },
       meta: {
         breadCrumbs: [

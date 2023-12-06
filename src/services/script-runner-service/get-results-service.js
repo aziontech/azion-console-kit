@@ -8,4 +8,3 @@ export const getResults = async (executionId) => {
   })
   return parseHttpResponse(httpResponse)
 }
-

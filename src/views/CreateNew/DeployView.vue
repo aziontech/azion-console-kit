@@ -73,9 +73,15 @@
             </div>
           </template>
         </PrimeCard>
-        <div class="w-full flex flex-col gap-5" v-if="results && !results.error">
-          <Divider align="left" type="dashed">
-              <b>Next Steps</b>
+        <div
+          class="w-full flex flex-col gap-5"
+          v-if="results && !results.error"
+        >
+          <Divider
+            align="left"
+            type="dashed"
+          >
+            <b>Next Steps</b>
           </Divider>
           <div class="ml-0 w-full mt-0 grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-4 gap-4">
             <PrimeButton
@@ -87,9 +93,7 @@
               <div class="flex flex-col h-36 justify-between gap-3.5 items-start">
                 <div class="flex gap-3.5 flex-col">
                   <div class="flex p-0.5 flex-col">
-                    <span class="text-color text-base font-medium">
-                      Customize Domain
-                    </span>
+                    <span class="text-color text-base font-medium"> Customize Domain </span>
                     <span class="pb-4 text-base text-color-secondary mt-1.5 line-clamp-2">
                       Manage your Domain settings
                     </span>
@@ -106,10 +110,8 @@
               <div class="flex flex-col h-36 justify-between gap-3.5 items-start">
                 <div class="flex gap-3.5 flex-col">
                   <div class="flex p-0.5 flex-col">
-                    <span class="text-color text-base font-medium">
-                      Point Traffic
-                    </span>
-                    <span class=" pb-4 text-base text-color-secondary mt-1.5 line-clamp-2">
+                    <span class="text-color text-base font-medium"> Point Traffic </span>
+                    <span class="pb-4 text-base text-color-secondary mt-1.5 line-clamp-2">
                       See Point Traffic docs
                     </span>
                   </div>
@@ -124,9 +126,7 @@
               <div class="flex flex-col h-36 justify-between gap-3.5 items-start">
                 <div class="flex gap-3.5 flex-col">
                   <div class="flex p-0.5 flex-col">
-                    <span class="text-color text-base font-medium">
-                      View Analytics
-                    </span>
+                    <span class="text-color text-base font-medium"> View Analytics </span>
                     <span class="pb-4 text-base text-color-secondary mt-1.5 line-clamp-2">
                       Gain powerful insights into your performance, availability, and security.
                     </span>
@@ -192,11 +192,14 @@
   }
 
   const iconType = computed(() => {
-    return !results.value.error? 'pi pi-check text-xs':'pi pi-times text-xs'
+    return !results.value.error ? 'pi pi-check text-xs' : 'pi pi-times text-xs'
   })
 
   const pointTraffic = () => {
-    window.open('https://www.azion.com/en/documentation/products/guides/point-domain-to-azion/', '_blank')
+    window.open(
+      'https://www.azion.com/en/documentation/products/guides/point-domain-to-azion/',
+      '_blank'
+    )
   }
 
   const openUrl = () => {
@@ -211,16 +214,14 @@
     router.push(`/domains/edit/${results.value.domain.id}`)
   }
 
- 
-
   const severity = computed(() => {
-    return !results.value.error? 'success' : 'danger'
+    return !results.value.error ? 'success' : 'danger'
   })
 
   onMounted(() => {
-    setInterval(()=>{
+    setInterval(() => {
       seconds.value += 1
-    }, 1000);
+    }, 1000)
     executionId.value = route.params.id
   })
 </script>

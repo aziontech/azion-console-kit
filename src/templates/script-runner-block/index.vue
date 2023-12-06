@@ -6,7 +6,7 @@
       ref="accordion"
       :pt="{
         content: { class: 'p-0 pl-5' },
-        headerTitle: { class: 'w-full'}
+        headerTitle: { class: 'w-full' }
       }"
     >
       <template #header>
@@ -41,7 +41,6 @@
   </Accordion>
 </template>
 <script>
-  
   import Accordion from 'primevue/accordion'
   import AccordionTab from 'primevue/accordiontab'
   import ProgressSpinner from 'primevue/progressspinner'
