@@ -1,7 +1,7 @@
 <template>
   <div
     class="flex flex-col h-full"
-    :class="{ 'mt-4': inTabs }"
+    :class="{ 'mt-4 pb-8': inTabs }"
   >
     <div
       class="flex flex-col h-full border surface-border gap-7 justify-center items-center rounded-md"

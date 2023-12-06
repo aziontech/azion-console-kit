@@ -95,18 +95,16 @@
       modal
       :pt="{
         root: { class: 'p-0 w-[576px]' },
-        header: { class: 'flex pt-5 pb-5 items-center self-stretch border-b border-solid' },
-        content: { class: 'p-0 h-full' },
-        footer: {
-          class: 'flex p-5 justify-end items-end border-t border-solid'
-        }
+        header: { class: 'flex p-5' },
+        content: { class: 'p-5 h-full' },
+        footer: { class: 'flex p-5 justify-end items-end border-t border-solid' }
       }"
     >
       <template #header>
         <h5 class="text-lg not-italic font-bold leading-5">{{ title }}</h5>
       </template>
-      <div class="flex p-5 items-center flex-1 text-secondary-color text-sm font-normal leading-5">
-        {{ description }}?
+      <div class="flex items-center flex-1 text-color-secondary text-sm font-normal leading-5">
+        {{ description }}
       </div>
       <template #footer>
         <PrimeButton
@@ -116,7 +114,8 @@
           @click="onCancel"
         />
         <PrimeButton
-          severity="Secondary"
+          class="m-0"
+          severity="secondary"
           label="Confirm"
           @click="onConfirm"
         />
