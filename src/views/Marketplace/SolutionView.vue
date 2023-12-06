@@ -129,6 +129,22 @@
       </div>
     </template>
   </ContentBlock>
+  <IntegrationInstall
+    v-if="solution"
+    v-model:visible="showIntegration"
+    :solution="solution"
+    :availableApps="availableApps"
+    :getTemplateService="props.getTemplateService"
+    :instantiateTemplateService="props.instantiateTemplateService"
+    :checkStatusScriptRunnerService="props.checkStatusScriptRunnerService"
+    :getScriptRunnerResults="props.getScriptRunnerResults"
+    :windowOpen="props.windowOpen"
+    v-model:showSidebarSecond="showCreateEdgeApp"
+    @success="handleIntegrationSuccess"
+    @fail="handleIntegrationFail"
+    @loading="handleLoading"
+  />
+  <CreateEdgeApplication v-model:visible="showCreateEdgeApp" />
 </template>
 
 <script setup>
@@ -141,21 +157,35 @@
   import { useRoute, useRouter } from 'vue-router'
   import { useToast } from 'primevue/usetoast'
   import { useBreadcrumbs } from '@/stores/breadcrumbs'
+  import IntegrationInstall from './drawer/IntegrationInstall'
+  import CreateEdgeApplication from './drawer/CreateEdgeApplication'
 
-  const solution = ref()
-  const loading = ref(false)
-  const route = useRoute()
-  const router = useRouter()
-  const toast = useToast()
-  const breadcrumbs = useBreadcrumbs()
-  const animateMessage = ref(false)
   const ERROR_PROPS = {
     closable: true,
     severity: 'error'
   }
 
+  const solution = ref()
+  const loading = ref(false)
+  const showIntegration = ref(false)
+  const animateMessage = ref(false)
+  const showCreateEdgeApp = ref(false)
+  const availableApps = ref([])
+  const route = useRoute()
+  const router = useRouter()
+  const toast = useToast()
+  const breadcrumbs = useBreadcrumbs()
+
   const props = defineProps({
     loadSolutionService: {
+      type: Function,
+      required: true
+    },
+    listEdgeApplicationsAvailablesService: {
+      type: Function,
+      required: true
+    },
+    getTemplateService: {
       type: Function,
       required: true
     },
@@ -166,11 +196,20 @@
     launchSolutionService: {
       type: Function,
       required: true
+    },
+    instantiateTemplateService: {
+      type: Function,
+      required: true
+    },
+    checkStatusScriptRunnerService: {
+      type: Function,
+      required: true
     }
   })
 
   onBeforeMount(async () => {
     await loadSolution()
+    listEdgeApplicationsAvailables()
     animateMessage.value = !isLastVersion.value
 
     const solutionBran = {
@@ -199,10 +238,7 @@
     if (!solution.value.newLaunchFlow) {
       launchSolution()
     } else {
-      toast.add({
-        severity: 'warn',
-        summary: 'Solution not ready to be lauch, development in progress.'
-      })
+      showIntegration.value = true
     }
   }
 
@@ -230,19 +266,48 @@
       }
       const { feedback } = await props.launchSolutionService(params)
 
-      setTimeout(async () => {
-        await loadSolution()
-        loading.value = false
-        showFeedback(feedback)
-      }, 150)
+      reloadSolution(feedback)
     } catch (error) {
       toast.add({ ...ERROR_PROPS, summary: error })
     }
   }
 
+  const handleIntegrationSuccess = async (feedback) => {
+    showIntegration.value = false
+    reloadSolution(feedback)
+    listEdgeApplicationsAvailables()
+  }
+
+  const handleIntegrationFail = async (error) => {
+    showIntegration.value = false
+    loading.value = false
+    toast.add({ ...ERROR_PROPS, summary: error })
+    await loadSolution()
+  }
+
+  const reloadSolution = (feedback) => {
+    setTimeout(async () => {
+      await loadSolution()
+      loading.value = false
+      showFeedback(feedback)
+    }, 150)
+  }
+
+  const listEdgeApplicationsAvailables = async () => {
+    const payload = {
+      vendor: solution.value.vendor.slug,
+      solution: solution.value.slug
+    }
+    availableApps.value = await props.listEdgeApplicationsAvailablesService(payload)
+  }
+
+  const handleLoading = () => {
+    loading.value = true
+  }
+
   const isLastVersion = computed(() => {
-    const { isLaunched, isUpdated } = solution.value
-    return isLaunched && isUpdated
+    const { isLaunched, isUpdated, newLaunchFlow } = solution.value
+    return isLaunched && isUpdated && !newLaunchFlow
   })
 
   const isOutdated = computed(() => {

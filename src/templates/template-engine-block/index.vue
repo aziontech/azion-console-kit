@@ -7,6 +7,7 @@
     <FormHorizontal
       v-if="schema.fields"
       title="General"
+      :isDrawer="props.isDrawer"
     >
       <template #inputs>
         <div
@@ -26,18 +27,20 @@
             :key="`password${field.name}`"
             :modelValue="field.value.value"
             @input="(event) => inputPassword(field.name, event.target.value)"
-            id="name"
+            :id="field.name"
             class="w-full"
             :class="{ 'p-invalid': formTools.errors[field.name] }"
             :feedback="false"
+            :disabled="submitLoading"
           />
           <InputText
             v-else
             :key="field.name"
-            id="name"
+            :id="field.name"
             type="text"
             v-bind="field.value"
             :class="{ 'p-invalid': formTools.errors[field.name] }"
+            :disabled="submitLoading"
           />
           <small class="text-xs font-normal text-color-secondary">{{ field.description }}</small>
           <small
@@ -55,6 +58,7 @@
         v-for="group in schema.groups"
         :key="group.name"
         :title="group.label"
+        :isDrawer="props.isDrawer"
       >
         <template #inputs>
           <div
@@ -74,18 +78,20 @@
               :key="`password${field.name}`"
               :modelValue="field.value.value"
               @input="(event) => inputPassword(field.name, event.target.value)"
-              id="name"
+              :id="field.name"
               class="w-full"
               :class="{ 'p-invalid': formTools.errors[field.name] }"
               :feedback="false"
+              :disabled="submitLoading"
             />
             <InputText
               v-else
               :key="field.name"
-              id="name"
+              :id="field.name"
               type="text"
               v-bind="field.value"
               :class="{ 'p-invalid': formTools.errors[field.name] }"
+              :disabled="submitLoading"
             />
             <small class="tet-xs font-normal text-color-secondary">{{ field.description }}</small>
             <small
@@ -98,7 +104,10 @@
         </template>
       </FormHorizontal>
     </div>
-    <Teleport to="#action-bar">
+    <Teleport
+      :to="actionBarId"
+      v-if="isMounted"
+    >
       <ActionBarTemplate
         v-if="!isLoading"
         :loading="submitLoading"
@@ -108,9 +117,10 @@
     </Teleport>
   </div>
 </template>
+
 <script setup>
   import Password from 'primevue/password'
-  import { ref, onBeforeMount, defineOptions } from 'vue'
+  import { ref, onBeforeMount, defineOptions, watch, onMounted } from 'vue'
   import FormHorizontal from '@templates/create-form-block/form-horizontal'
   import ActionBarTemplate from '@templates/action-bar-block'
   import FormLoading from './FormLoading'
@@ -134,6 +144,23 @@
     templateId: {
       type: String,
       required: true
+    },
+    actionBarId: {
+      type: String,
+      default: '#action-bar'
+    },
+    hiddenFields: {
+      type: Array,
+      required: false,
+      default: () => []
+    },
+    freezeLoading: {
+      type: Boolean,
+      default: false
+    },
+    isDrawer: {
+      type: Boolean,
+      default: false
     }
   })
 
@@ -143,6 +170,7 @@
   const formTools = ref({})
   const isLoading = ref(true)
   const submitLoading = ref(false)
+  const isMounted = ref(false)
 
   const loadTemplate = async (id) => {
     try {
@@ -161,47 +189,19 @@
     await loadTemplate(props.templateId)
   })
 
+  onMounted(() => {
+    setTimeout(() => {
+      isMounted.value = true
+    }, 100)
+  })
+
   const schemaLoaded = (inputSchema) => {
     schema.value = inputSchema
     const auxValidator = {}
     if (schema.value.fields) {
       schema.value.fields.forEach((element) => {
         auxValidator[element.name] = yup.string()
-        if (element.attrs.required) {
-          auxValidator[element.name] = auxValidator[element.name].required(
-            `${element.label} is required`
-          )
-        }
-        if (element.attrs.maxLength) {
-          auxValidator[element.name] = auxValidator[element.name].max(
-            element.attrs.maxLength,
-            `This field cannot exceed ${element.attrs.maxLength} characters`
-          )
-        }
-        if (element.attrs.minLength) {
-          auxValidator[element.name] = auxValidator[element.name].max(
-            element.attrs.minLength,
-            `This field must have at least ${element.attrs.minLength} characters`
-          )
-        }
-        if (element.validators) {
-          element.validators.forEach((validator) => {
-            auxValidator[element.name] = auxValidator[element.name].test(
-              `valid-${element.name}`,
-              validator.errorMessage,
-              function (value) {
-                const domainRegex = new RegExp(validator.regex)
-                return domainRegex.test(value)
-              }
-            )
-          })
-        }
-      })
-    }
-    if (schema.value.groups) {
-      schema.value.groups.forEach((group) => {
-        group.fields.forEach((element) => {
-          auxValidator[element.name] = yup.string()
+        if (!element.hidden) {
           if (element.attrs.required) {
             auxValidator[element.name] = auxValidator[element.name].required(
               `${element.label} is required`
@@ -234,7 +234,7 @@
           if (element.value.length > 0) {
             setFieldValue(element.name, element.value)
           }
-        })
+        }
       })
     }
     validationSchema.value = yup.object(auxValidator)
@@ -269,6 +269,8 @@
 
   const validateAndSubmit = async () => {
     submitLoading.value = true
+    emit('loading')
+
     try {
       const payload = []
       if (schema.value.fields) {
@@ -286,11 +288,21 @@
           instantiation_data_path: payload[index].instantiation_data_path,
           value: payload[index].value.value ? payload[index].value.value : ''
         }
+
+        // Hidden field
+        const hiddenField = props.hiddenFields.find((i) => i.name === payload[index].name)
+        if (hiddenField) {
+          sanitizedField.value = hiddenField.value
+        }
+
         payload[index] = sanitizedField
       })
+
       const response = await props.instantiateTemplateService(props.templateId, payload)
       emit('instantiate', response)
-      submitLoading.value = false
+
+      // Let submit loading for others operations
+      submitLoading.value = props.freezeLoading
     } catch (error) {
       toast.add({
         closable: true,
@@ -299,4 +311,12 @@
       })
     }
   }
+
+  watch(
+    () => props.freezeLoading,
+    () => {
+      // Finished the opeations after instantiate
+      submitLoading.value = false
+    }
+  )
 </script>

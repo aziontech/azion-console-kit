@@ -125,9 +125,9 @@
   import Listbox from 'primevue/listbox'
   import Badge from 'primevue/badge'
   import PrimeButton from 'primevue/button'
-  import ListSolutions from './ListSolutions.vue'
-  import LoadingList from './LoadingList'
-  import LoadingEmptySearch from './LoadingEmptySearch'
+  import ListSolutions from './components/ListSolutions'
+  import LoadingList from './components/LoadingList'
+  import LoadingEmptySearch from './components/LoadingEmptySearch'
   import { useToast } from 'primevue/usetoast'
 
   const selectedCategory = ref({ name: 'All', code: 'all' })
