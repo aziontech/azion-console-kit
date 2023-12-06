@@ -41,14 +41,16 @@
     tabSize: 2,
     formatOnPaste: true
   }
+  const defaultTrigger = 'Install'
+  const contentTypeShellScript = 'Shell Script'
+
   const loading = ref(false)
   const initialValues = {
     name: '',
-    contentType: 'Shell Script',
-    trigger: 'Install',
+    contentType: contentTypeShellScript,
+    trigger: defaultTrigger,
     content: ''
   }
-
   const validationSchema = yup.object({
     name: yup
       .string()
@@ -56,10 +58,14 @@
       .test('validateFilePath', 'Must be a valid file path', (val) => {
         const isValid = /^(\/\.?[\w][\w.-]*)+$/.test(val)
         return isValid
-      }),
+      })
+      .label('Name'),
     contentType: yup.string().required(),
-    trigger: yup.string().required(),
-    content: yup.string().required()
+    trigger: yup.string().when('contentType', {
+      is: contentTypeShellScript,
+      then: (schema) => schema.required()
+    }),
+    content: yup.string().required().label('Content')
   })
   const { meta, errors, handleSubmit, isSubmitting, setValues, resetForm } = useForm({
     validationSchema,
@@ -68,7 +74,7 @@
 
   const { value: name } = useField('name')
   const { value: contentType } = useField('contentType')
-  const { value: trigger } = useField('trigger')
+  const { value: trigger, setValue: setTrigger } = useField('trigger')
   const { value: content } = useField('content')
 
   const visibleDrawer = computed({
@@ -79,25 +85,33 @@
     }
   })
 
+  const isShellScript = computed(() => {
+    return contentType.value === contentTypeShellScript
+  })
+
   const disabledFields = computed(() => {
     return isSubmitting.value || loading.value
   })
 
-  const openDrawer = (value) => {
-    visibleDrawer.value = value
+  const titleDrawer = computed(() => {
+    return props.resourceID ? 'Edit Resource' : 'Create Resource'
+  })
+
+  const toggleDrawerVisibility = (isVisible) => {
+    visibleDrawer.value = isVisible
   }
 
-  const closeSideBar = () => {
-    openDrawer(false)
-    visibleDrawer.value = false
+  const closeDrawer = () => {
+    toggleDrawerVisibility(false)
   }
 
-  const showToast = (severity, summary) => {
+  const showToast = (severity, summary, life = 10000) => {
     if (!summary) return
     toast.add({
-      closable: true,
+      closable: false,
       severity: severity,
-      summary: summary
+      summary: summary,
+      life: life
     })
   }
 
@@ -108,7 +122,7 @@
       resourcesID: props.resourceID
     })
 
-    emit('onSuccess')
+    emit('onSuccess', response)
     showToast('success', response)
   }
 
@@ -123,14 +137,26 @@
   }
 
   const loadResource = async () => {
+    const { edgeServiceID, resourceID } = props
     loading.value = true
-    const response = await ResourcesServices.loadResourcesServices({
-      edgeServiceID: props.edgeServiceID,
-      resourcesID: props.resourceID
-    })
 
-    setValues(response)
-    loading.value = false
+    try {
+      const response = await ResourcesServices.loadResourcesServices({
+        edgeServiceID,
+        resourcesID: resourceID
+      })
+
+      setValues(response)
+    } catch (error) {
+      closeDrawer()
+      showToast('error', error)
+    } finally {
+      loading.value = false
+    }
+  }
+
+  const handleShellScriptOption = () => {
+    setTrigger(trigger.value || defaultTrigger)
   }
 
   const onSubmit = handleSubmit(async (values, actions) => {
@@ -138,7 +164,7 @@
       const onService = props.resourceID ? editResource : createResource
       await onService(values)
       actions.resetForm()
-      openDrawer(false)
+      toggleDrawerVisibility(false)
     } catch (error) {
       showToast('error', error)
     }
@@ -158,8 +184,8 @@
 <template>
   <Sidebar
     v-model:visible="visibleDrawer"
-    :update:visible="openDrawer"
-    :position="props.position"
+    :update:visible="toggleDrawerVisibility"
+    position="right"
     :pt="{
       root: { class: 'max-w-4xl w-full p-0' },
       header: { class: 'flex justify-between text-xl font-medium px-8' },
@@ -168,10 +194,10 @@
     }"
   >
     <template #header>
-      <div>New Resource</div>
+      <div>{{ titleDrawer }}</div>
     </template>
-    <div class="w-full flex flex-col p-8">
-      <form class="w-full flex flex-col gap-8 mb-5">
+    <div class="flex w-full md:p-8 pb-0">
+      <form class="w-full flex flex-col gap-8">
         <form-horizontal
           :isDrawer="true"
           title="Resource Settingn"
@@ -210,6 +236,7 @@
                       inputId="shell-script"
                       name="shell-script"
                       value="Shell Script"
+                      @change="handleShellScriptOption"
                       :disabled="disabledFields"
                     />
                     <label
@@ -237,7 +264,7 @@
             </div>
             <div
               class="flex flex-col w-full sm:max-w-3xl gap-2"
-              v-if="contentType === 'Shell Script'"
+              v-if="isShellScript"
             >
               <div class="flex flex-col gap-2">
                 <label class="text-color text-sm not-italic font-medium leading-5"
@@ -333,10 +360,10 @@
     </div>
     <div class="sticky bottom-0">
       <action-bar-template
-        @onCancel="closeSideBar"
+        @onCancel="closeDrawer"
         @onSubmit="onSubmit"
         :loading="isSubmitting"
-        :submitDisabled="!meta.valid"
+        :submitDisabled="!meta.valid || disabledFields"
       />
     </div>
   </Sidebar>
