@@ -193,7 +193,6 @@
   import { useCreateModalStore } from '@/stores/create-modal'
   import { loadingStore } from '@/stores/loading'
 
-
   export default {
     name: 'home-view',
     components: {

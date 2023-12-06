@@ -182,7 +182,6 @@
     }
     breadcrumbs.update([...route.meta.breadCrumbs, solutionBran])
     dispatchLoading.hideLoading()
-
   })
 
   const loadSolution = async () => {
