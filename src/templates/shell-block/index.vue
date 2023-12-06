@@ -9,9 +9,9 @@
     class="top-[3.5rem] sticky"
     mode="indeterminate"
     style="height: 0.375rem"
-    v-if="setLoading"
+    v-if="startLoading"
     :pt="{
-      value: { class: 'bg-orange-bullet' }
+      value: { class: 'bg-orange-base' }
     }"
   ></ProgressBar>
   <main
@@ -37,7 +37,7 @@
   import { listTypeAccountService } from '@/services/switch-account-services/list-type-account-service'
   import { switchAccountService } from '@/services/auth-services/switch-account-service'
   import { AccountHandler } from '@/helpers/account-handler'
-  import { loadingStore } from '@/stores/loading'
+  import { useLoadingStore } from '@/stores/loading'
 
   export default {
     name: 'shell-block',
@@ -67,9 +67,9 @@
         return '[&>.active-helper]:block transform [&>.active-helper]:md:translate-x-0'
       },
 
-      setLoading() {
-        const stateLoading = loadingStore()
-        return stateLoading.isLoading
+      startLoading() {
+        const store = useLoadingStore()
+        return store.showLoading
       }
     },
     setup() {

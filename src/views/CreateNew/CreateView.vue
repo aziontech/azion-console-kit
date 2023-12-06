@@ -223,7 +223,7 @@
   import Skeleton from 'primevue/skeleton'
   import FormLoading from '@/templates/template-engine-block/FormLoading'
   import PageHeadingBlock from '@/templates/page-heading-block'
-  import { loadingStore } from '@/stores/loading'
+  import { useLoadingStore } from '@/stores/loading'
 
   export default {
     components: {
@@ -257,10 +257,10 @@
     },
 
     async created() {
-      const dispatchLoading = loadingStore()
-      dispatchLoading.setLoading()
+      const store = useLoadingStore()
+      store.startLoading()
       await this.loadSolution()
-      dispatchLoading.hideLoading()
+      store.finishLoading()
     },
     methods: {
       async loadSolution() {

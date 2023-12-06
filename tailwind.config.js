@@ -19,7 +19,8 @@ export default {
         'header-input': '#292929',
         'header-button-enabled': '#ffffff32',
         'header-button-hover': 'rgba(244, 244, 244, 0.04)',
-        'header-avatar': '#363636'
+        'header-avatar': '#363636',
+        'orange-base': '#F3652B'
       },
       backgroundColor: {
         'orange-bullet': '#F3652B',

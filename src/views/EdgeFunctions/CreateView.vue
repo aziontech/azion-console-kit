@@ -38,7 +38,7 @@
   import PageHeadingBlock from '@/templates/page-heading-block'
   import MobileCodePreview from './components/mobile-code-preview.vue'
   import { ref, onMounted } from 'vue'
-  import { loadingStore } from '@/stores/loading'
+  import { useLoadingStore } from '@/stores/loading'
 
   const props = defineProps({
     createEdgeFunctionsService: {
@@ -49,10 +49,10 @@
   const ARGS_INITIAL_STATE = '{}'
 
   onMounted(() => {
-    const dispatchLoading = loadingStore()
-    dispatchLoading.setLoading()
+    const store = useLoadingStore()
+    store.startLoading()
     if (document.readyState == 'complete') {
-      dispatchLoading.hideLoading()
+      store.finishLoading()
     }
   })
 
