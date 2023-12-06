@@ -6,9 +6,9 @@
     :pt="{
       root: { class: 'p-0 w-[576px]' },
       header: {
-        class: 'flex pt-5 pb-5 items-center self-stretch border-b border-solid'
+        class: 'flex py-5 border-b border-solid'
       },
-      content: { class: 'p-0 h-full' },
+      content: { class: 'p-5 h-full' },
       footer: {
         class: 'flex p-5 justify-end items-end border-t border-solid'
       }
@@ -18,7 +18,7 @@
       <h5 class="text-lg font-semibold leading-tight">Attention</h5>
     </template>
 
-    <div class="flex p-5 flex-col gap-3.5">
+    <div class="flex flex-col gap-3.5">
       <InlineMessage severity="warn">
         After activating and saving these settings, all other data streamings will become inactive.
       </InlineMessage>

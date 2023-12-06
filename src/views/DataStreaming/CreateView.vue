@@ -309,7 +309,6 @@
         </template>
         <template #action-bar="{ onSubmit, formValid, onCancel, loading, values }">
           <ActionBarBlockWithTeleport
-            ref="actionBar"
             @onSubmit="formSubmit(onSubmit, values)"
             @onCancel="onCancel"
             :loading="loading"

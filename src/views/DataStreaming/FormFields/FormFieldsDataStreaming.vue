@@ -172,12 +172,19 @@
         <div
           class="flex gap-6 md:align-items-center max-sm:flex-col max-sm:align-items-baseline max-sm:gap-3"
         >
-          <span class="p-input-icon-right w-full flex max-w-lg gap-2 pb-3 pt-2">
-            <div class="w-fit">
-              <InputSwitch v-model="hasSampling" />
+          <span class="w-full flex flex-col gap-2 pb-3 pt-2">
+            <div class="flex gap-1">
+              <InputSwitch
+                v-model="hasSampling"
+                inputId="sampling"
+              />
+              <label
+                class="text-color text-sm font-normal leading-5"
+                for="sampling"
+                >Active</label
+              >
             </div>
-            <div class="flex-col gap-1">
-              <span class="text-color text-sm font-normal leading-5">Active</span>
+            <div class="flex-col gap-1 pl-10">
               <p class="text-color-secondary text-sm font-normal">
                 Once enabled, you can only have one active data streaming in your account. If it's
                 later disabled, the Add option will become available again on the creation page.
@@ -1164,11 +1171,13 @@
           <span class="p-input-icon-right w-full flex max-w-lg items-start gap-2 pb-3 pt-2">
             <InputSwitch
               v-model="status"
-              id="active"
+              inputId="active"
             />
-            <div class="flex-col gap-1">
-              <span class="text-color text-sm font-normal leading-5">Active</span>
-            </div>
+            <label
+              class="text-color text-sm font-normal leading-5"
+              for="active"
+              >Active</label
+            >
           </span>
         </div>
       </div>
