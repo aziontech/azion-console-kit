@@ -94,9 +94,8 @@
               >{{ nameError }}</small
             >
             <small class="text-xs text-color-secondary font-normal leading-tight">
-          Give a unique and easy-to-remember name.</small
-        
-        >
+              Give a unique and easy-to-remember name.</small
+            >
           </div>
         </template>
       </FormHorizontal>
@@ -123,7 +122,8 @@
                 readonly
               />
               <small class="text-xs text-color-secondary font-normal leading-tight">
-          Language isn't an editable field.</small>
+                Language isn't an editable field.</small
+              >
             </span>
           </div>
         </template>

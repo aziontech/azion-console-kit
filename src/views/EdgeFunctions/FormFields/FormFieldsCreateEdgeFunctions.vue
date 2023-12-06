@@ -72,8 +72,8 @@
               :class="{ 'p-invalid': nameError }"
             />
             <small class="text-xs text-color-secondary font-normal leading-tight">
-          Give a unique and easy-to-remember name.</small
-        >
+              Give a unique and easy-to-remember name.</small
+            >
             <small
               v-if="nameError"
               class="p-error text-xs font-normal leading-tight"
@@ -105,7 +105,8 @@
                 readonly
               />
               <small class="text-xs text-color-secondary font-normal leading-tight">
-          Currently, only JavaScript is supported.</small>
+                Currently, only JavaScript is supported.</small
+              >
             </span>
           </div>
         </template>
