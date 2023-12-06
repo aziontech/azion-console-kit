@@ -56,7 +56,7 @@
       <FormHorizontal
         class="mt-8"
         title="General"
-        description="Describe the Edge Function and choose a name to better identify."
+        description="Create edge functions that run closer to users to use with Edge Application or Edge Firewall."
       >
         <template #inputs>
           <div class="flex flex-col sm:max-w-lg w-full gap-2">
@@ -71,6 +71,9 @@
               type="text"
               :class="{ 'p-invalid': nameError }"
             />
+            <small class="text-xs text-color-secondary font-normal leading-tight">
+              Give a unique and easy-to-remember name.</small
+            >
             <small
               v-if="nameError"
               class="p-error text-xs font-normal leading-tight"
@@ -83,7 +86,7 @@
       <FormHorizontal
         class="mt-8"
         title="Language"
-        description="It is currently not possible to choose a language to code a new Edge function."
+        description="The language the edge function is written in."
       >
         <template #inputs>
           <div class="flex flex-col w-full sm:max-w-lg gap-2">
@@ -101,6 +104,9 @@
                 class="w-full"
                 readonly
               />
+              <small class="text-xs text-color-secondary font-normal leading-tight">
+                Currently, only JavaScript is supported.</small
+              >
             </span>
           </div>
         </template>
