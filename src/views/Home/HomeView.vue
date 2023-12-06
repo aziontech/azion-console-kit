@@ -191,6 +191,8 @@
   import ContentBlock from '@/templates/content-block'
   import FormFieldsHome from './FormFields/FormFieldsHome.vue'
   import { useCreateModalStore } from '@/stores/create-modal'
+  import { loadingStore } from '@/stores/loading'
+
 
   export default {
     name: 'home-view',
@@ -225,11 +227,14 @@
       }
     },
     async created() {
+      const dispatchLoading = loadingStore()
+      dispatchLoading.showLoading()
       this.teams = await this.listTeamsService()
 
       if (this.inviteSession.sessionIsExpired()) {
         this.inviteSession.turnInviteBlockVisable()
       }
+      dispatchLoading.hideLoading()
     },
     computed: {
       isDisabled() {

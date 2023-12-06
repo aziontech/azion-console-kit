@@ -5,6 +5,15 @@
     :listTypeAccountService="listTypeAccountService"
     :accountHandler="accountHandler"
   />
+  <ProgressBar
+    class="top-[56px] sticky"
+    mode="indeterminate"
+    style="height: 6px"
+    v-if="showLoadingState"
+    :pt="{
+      value: { class: 'bg-orange-bullet' }
+    }"
+  ></ProgressBar>
   <main
     class="flex w-full relative min-h-[calc(100vh-120px)] [&>.active]:md:w-[calc(100%-384px)] mt-14"
     :class="[styleHelper, { 'flex align-items-center': !isLogged }]"
@@ -21,10 +30,14 @@
   import MainMenuBlock from '@/templates/main-menu-block'
   import FooterBlock from '@/templates/footer-block'
   import HelpBlock from '@/templates/help-center-block'
+
+  import ProgressBar from 'primevue/progressbar'
+
   import { useHelpCenterStore } from '@/stores/help-center'
   import { listTypeAccountService } from '@/services/switch-account-services/list-type-account-service'
   import { switchAccountService } from '@/services/auth-services/switch-account-service'
   import { AccountHandler } from '@/helpers/account-handler'
+  import { loadingStore } from '@/stores/loading'
 
   export default {
     name: 'shell-block',
@@ -39,7 +52,8 @@
       FooterBlock,
       MainMenuBlock,
       HelpBlock,
-      ToastBlock
+      ToastBlock,
+      ProgressBar
     },
     computed: {
       customClass() {
@@ -51,6 +65,11 @@
 
       styleHelper() {
         return '[&>.active-helper]:block transform [&>.active-helper]:md:translate-x-0'
+      },
+
+      showLoadingState() {
+        const stateLoading = loadingStore()
+        return stateLoading.show
       }
     },
     setup() {
