@@ -56,7 +56,7 @@
       <FormHorizontal
         class="mt-8"
         title="General"
-        description="Create edge functions that run closer to users to use with Edge Applications or Edge Firewall."
+        description="Create edge functions that run closer to users to use with Edge Application or Edge Firewall."
       >
         <template #inputs>
           <div class="flex flex-col sm:max-w-lg w-full gap-2">
