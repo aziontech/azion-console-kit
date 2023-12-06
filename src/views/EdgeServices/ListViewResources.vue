@@ -30,6 +30,7 @@
   const hasContentToList = ref(true)
   const visibleDrawer = ref(false)
   const resourceID = ref()
+  const listResources = ref('')
 
   const getColumns = computed(() => [
     {
@@ -37,7 +38,7 @@
       header: 'Name'
     },
     {
-      field: 'content_type',
+      field: 'contentType',
       header: 'Type'
     },
     {
@@ -45,7 +46,7 @@
       header: 'Trigger'
     },
     {
-      field: 'last_editor',
+      field: 'lastEditor',
       header: 'Last Editor'
     },
     {
@@ -74,15 +75,15 @@
     })
   }
 
-  const clearResource = () => {
-    resourceID.value
+  const reloadList = () => {
+    listResources.value.loadData({ page: 1 })
   }
 </script>
 
 <template>
   <div class="flex flex-col h-full">
-    {{ resourceID }}
     <ListTableNoHeaderBlock
+      ref="listResources"
       v-if="hasContentToList"
       :listService="listResourcesServicesWithDecorator"
       :deleteService="deleteResourcesServicesWithDecorator"
@@ -120,12 +121,12 @@
         <Illustration />
       </template>
     </EmptyResultsBlock>
+    <CreateResource
+      v-if="visibleDrawer"
+      v-model:visible="visibleDrawer"
+      :resourceID="resourceID"
+      :edgeServiceID="props.idEdgeService"
+      @onSuccess="reloadList"
+    />
   </div>
-  <CreateResource
-    v-if="visibleDrawer"
-    v-model:visible="visibleDrawer"
-    :resourceID="resourceID"
-    :edgeServiceID="props.idEdgeService"
-    @onSuccess="clearResource"
-  />
 </template>
