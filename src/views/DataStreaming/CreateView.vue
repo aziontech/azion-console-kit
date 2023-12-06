@@ -4,6 +4,7 @@
 
   // Import the components
   import FormFieldsDataStreaming from './FormFields/FormFieldsDataStreaming'
+  import SamplingDialog from './Dialog/SamplingDialog'
   import CreateFormBlock from '@/templates/create-form-block'
   import ContentBlock from '@/templates/content-block'
   import PageHeadingBlock from '@/templates/page-heading-block'
@@ -33,6 +34,16 @@
     domainOption: yup.string().required(),
     endpoint: yup.string().required(),
     status: yup.boolean(),
+    hasSampling: yup.boolean(),
+    samplingPercentage: yup.number().when('hasSampling', {
+      is: true,
+      then: (schema) =>
+        schema
+          .test('minmax', 'Sampling Percentage must be between 0 and 100', (value) => {
+            return value >= 0 && value <= 100
+          })
+          .required('Sampling Percentage is a required field')
+    }),
 
     // standard
     endpointUrl: yup.string().when('endpoint', {
@@ -47,10 +58,6 @@
         })
       })
     ),
-    maxSize: yup.number().when('endpoint', {
-      is: 'standard',
-      then: (schema) => schema.required('Max Size is a required field')
-    }),
     lineSeparator: yup.string().when('endpoint', {
       is: 'standard',
       then: (schema) => schema.required('Log Line Separator is a required field')
@@ -210,6 +217,8 @@
     domains: [],
     endpoint: 'standard',
     status: true,
+    hasSampling: false,
+    samplingPercentage: 0,
 
     // standard
     endpointUrl: '',
@@ -270,12 +279,21 @@
     containerName: '',
     blobToken: ''
   })
+
+  const displaySamplingDialog = ref(false)
+  const formSubmit = (onSubmit, values) => {
+    if (!values.hasSampling) {
+      onSubmit()
+    } else {
+      displaySamplingDialog.value = true
+    }
+  }
 </script>
 
 <template>
   <ContentBlock>
     <template #heading>
-      <PageHeadingBlock pageTitle="Create Data Streaming"></PageHeadingBlock>
+      <PageHeadingBlock pageTitle="Create Data Streaming" />
     </template>
     <template #content>
       <CreateFormBlock
@@ -289,12 +307,18 @@
             :listDataStreamingDomainsService="props.listDataStreamingDomainsService"
           />
         </template>
-        <template #action-bar="{ onSubmit, formValid, onCancel, loading }">
+        <template #action-bar="{ onSubmit, formValid, onCancel, loading, values }">
           <ActionBarBlockWithTeleport
-            @onSubmit="onSubmit"
+            ref="actionBar"
+            @onSubmit="formSubmit(onSubmit, values)"
             @onCancel="onCancel"
             :loading="loading"
             :submitDisabled="!formValid"
+          />
+          <SamplingDialog
+            v-model:visible="displaySamplingDialog"
+            @confirm="onSubmit"
+            @cancel="displaySamplingDialog = false"
           />
         </template>
       </CreateFormBlock>

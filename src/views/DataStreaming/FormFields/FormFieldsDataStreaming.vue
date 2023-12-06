@@ -119,6 +119,9 @@
             />
             <label class="text-color text-sm font-normal leading-tight">Filter Domains </label>
           </div>
+          <small class="text-color-secondary text-xs font-normal leading-tight"
+            >In case you select the All Domains option, you can activate the Sampling option</small
+          >
         </div>
       </div>
 
@@ -156,6 +159,65 @@
         <small class="text-color-secondary text-sm font-normal leading-tight">
           Hold <code>command</code> or <code>ctrl</code> to select multiple items.
         </small>
+      </div>
+    </template>
+  </FormHorizontal>
+  <FormHorizontal
+    v-if="domainOption === '1'"
+    title="Sampling"
+    description="Enable this option to reduce costs of data collection and analysis"
+  >
+    <template #inputs>
+      <div class="flex flex-col w-full gap-8">
+        <div
+          class="flex gap-6 md:align-items-center max-sm:flex-col max-sm:align-items-baseline max-sm:gap-3"
+        >
+          <span class="p-input-icon-right w-full flex max-w-lg gap-2 pb-3 pt-2">
+            <div class="w-fit">
+              <InputSwitch v-model="hasSampling" />
+            </div>
+            <div class="flex-col gap-1">
+              <span class="text-color text-sm font-normal leading-5">Active</span>
+              <p class="text-color-secondary text-sm font-normal">
+                Once enabled, you can only have one active data streaming in your account. If it's
+                later disabled, the Add option will become available again on the creation page.
+              </p>
+            </div>
+          </span>
+        </div>
+        <div
+          class="flex flex-col sm:max-w-lg w-full gap-2"
+          v-if="hasSampling"
+        >
+          <label
+            for="samplingPercentage"
+            class="text-color text-base font-medium"
+            >Sampling Percentage(%)</label
+          >
+          <InputNumber
+            v-model="samplingPercentage"
+            showButtons
+            :min="0"
+            :max="100"
+            :class="{ 'p-invalid': samplingPercentageError }"
+          />
+          <small class="text-color-secondary text-xs font-normal leading-tight">
+            Percentage value received in return of the total data related to all domains.
+          </small>
+          <small
+            v-if="samplingPercentageError"
+            class="p-error"
+            >{{ samplingPercentageError }}</small
+          >
+        </div>
+        <InlineMessage
+          class="w-fit"
+          severity="warn"
+          v-if="hasSampling"
+        >
+          After activating and saving these settings, all other data streamings will become
+          inactive.
+        </InlineMessage>
       </div>
     </template>
   </FormHorizontal>
@@ -1034,7 +1096,7 @@
         <label
           for="payloadFormat"
           class="text-color text-base font-medium"
-          >Format</label
+          >Format *</label
         >
         <InputText
           v-model="payloadFormat"
@@ -1057,7 +1119,7 @@
         <label
           for="lineSeparator"
           class="text-color text-base font-medium"
-          >Log Line Separator</label
+          >Log Line Separator *</label
         >
         <InputText
           v-model="lineSeparator"
@@ -1085,17 +1147,11 @@
           v-model="maxSize"
           placeholder="1000000"
           :useGrouping="false"
-          :class="{ 'p-invalid': maxSizeError }"
         />
         <small class="text-color-secondary text-xs font-normal leading-tight">
           You can define the maximum size of data packets in bytes. Use a value starting from
           1000000.
         </small>
-        <small
-          id="max-size-help"
-          class="p-error"
-          >{{ maxSizeError }}</small
-        >
       </div>
     </template>
   </FormHorizontal>
@@ -1111,7 +1167,7 @@
               id="active"
             />
             <div class="flex-col gap-1">
-              <div class="text-color text-sm font-normal leading-5">Active</div>
+              <span class="text-color text-sm font-normal leading-5">Active</span>
             </div>
           </span>
         </div>
@@ -1131,6 +1187,7 @@
   import InputSwitch from 'primevue/inputswitch'
   import ButtonPrimer from 'primevue/button'
   import InputNumber from 'primevue/inputnumber'
+  import InlineMessage from 'primevue/inlinemessage'
   import TextArea from 'primevue/textarea'
   import { onMounted, ref, computed, watch } from 'vue'
   import { useField } from 'vee-validate'
@@ -1181,11 +1238,14 @@
   const { value: domains } = useField('domains')
   const { value: endpoint } = useField('endpoint')
   const { value: status } = useField('status')
+  const { value: hasSampling } = useField('hasSampling')
+  const { value: samplingPercentage, errorMessage: samplingPercentageError } =
+    useField('samplingPercentage')
 
   // standard
   const { value: endpointUrl, errorMessage: endpointUrlError } = useField('endpointUrl')
   const { value: headers } = useField('headers')
-  const { value: maxSize, errorMessage: maxSizeError } = useField('maxSize')
+  const { value: maxSize } = useField('maxSize')
   const { value: lineSeparator, errorMessage: lineSeparatorError } = useField('lineSeparator')
   const { value: payloadFormat, errorMessage: payloadFormatError } = useField('payloadFormat')
 
