@@ -209,7 +209,7 @@
                   <label
                     for="name"
                     class="text-color text-sm not-italic font-medium leading-5"
-                    >Filepath*</label
+                    >Filepath *</label
                   >
                   <InputText
                     v-model="name"
@@ -227,7 +227,7 @@
             </div>
             <div class="flex flex-col w-full sm:max-w-3xl gap-2">
               <div class="flex flex-col gap-2">
-                <label class="text-color text-sm not-italic font-medium leading-5">Type*</label>
+                <label class="text-color text-sm not-italic font-medium leading-5">Type *</label>
                 <div class="flex flex-col gap-3">
                   <div class="flex no-wrap gap-2 items-center">
                     <RadioButton
@@ -267,7 +267,7 @@
             >
               <div class="flex flex-col gap-2">
                 <label class="text-color text-sm not-italic font-medium leading-5"
-                  >Trigger Type*</label
+                  >Trigger Type *</label
                 >
                 <div class="flex flex-col gap-3">
                   <div class="flex no-wrap gap-2 items-center">
@@ -326,7 +326,7 @@
                   <label
                     for="name"
                     class="text-color text-sm not-italic font-medium leading-5"
-                    >Content*</label
+                    >Content *</label
                   >
                   <div class="flex flex-col h-full gap-2">
                     <vue-monaco-editor
