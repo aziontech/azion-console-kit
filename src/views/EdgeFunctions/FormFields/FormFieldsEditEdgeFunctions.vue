@@ -9,7 +9,8 @@
   import CodeEditor from '../components/code-editor.vue'
   import CodePreview from '../components/code-preview.vue'
   import { useField } from 'vee-validate'
-  import { computed, ref, watch, defineEmits } from 'vue'
+  import { computed, ref, watch } from 'vue'
+
   defineProps(['previewData'])
   const emit = defineEmits(['update:previewData'])
 
@@ -130,11 +131,11 @@
           <div class="flex w-full sm:max-w-lg gap-2">
             <InputSwitch
               v-model="active"
-              id="active"
+              inputId="active"
             />
             <label
               for="active"
-              class="text-color text-base font-medium"
+              class="text-color-secondary text-sm font-normal"
               >Active
             </label>
           </div>

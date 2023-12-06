@@ -20,7 +20,7 @@
   }
 
   const validationSchema = yup.object({
-    name: yup.string().required(),
+    name: yup.string().required().label('Name'),
     active: yup.boolean(),
     code: yup.string().test('formatInvalid', 'The format is invalid', validateCode)
   })
@@ -28,7 +28,7 @@
   const initialValues = {
     name: '',
     code: '',
-    active: false
+    active: true
   }
 </script>
 

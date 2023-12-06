@@ -114,11 +114,11 @@
           <div class="flex w-full sm:max-w-lg gap-2">
             <InputSwitch
               v-model="active"
-              id="active"
+              inputId="active"
             />
             <label
               for="active"
-              class="text-color text-base font-medium"
+              class="text-color-secondary text-sm font-normal"
               >Active
             </label>
           </div>
