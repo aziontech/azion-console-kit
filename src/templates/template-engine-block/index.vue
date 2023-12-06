@@ -102,7 +102,7 @@
       <ActionBarTemplate
         v-if="!isLoading"
         :loading="submitLoading"
-        @submit="validateAndSubmit"
+        @onSubmit="validateAndSubmit"
         :submitDisabled="!formTools.meta.valid || !formTools.meta.touched"
       />
     </Teleport>

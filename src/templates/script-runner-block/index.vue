@@ -5,7 +5,8 @@
       :disabled="!isPolling"
       ref="accordion"
       :pt="{
-        content: { class: 'p-0 pl-5' }
+        content: { class: 'p-0 pl-5' },
+        headerTitle: { class: 'w-full'}
       }"
     >
       <template #header>
@@ -40,6 +41,7 @@
   </Accordion>
 </template>
 <script>
+  
   import Accordion from 'primevue/accordion'
   import AccordionTab from 'primevue/accordiontab'
   import ProgressSpinner from 'primevue/progressspinner'
@@ -72,7 +74,7 @@
         type: String,
         required: true
       },
-      scriptRunnerService: {
+      getLogsService: {
         type: Function,
         required: true
       }
@@ -85,13 +87,14 @@
       },
       async getlogs() {
         try {
-          const data = await this.scriptRunnerService(this.executionId)
+          const data = await this.getLogsService(this.executionId)
           const stopStatusList = ['succeeded', 'failed', 'pending finish']
           this.currentLogs = data.logs
           this.status = data.status
           if (stopStatusList.includes(this.status)) {
             clearInterval(this.polling)
             this.pollEnded = true
+            this.$emit('onFinish', this.status)
           }
         } catch (error) {
           this.$toast.add({
