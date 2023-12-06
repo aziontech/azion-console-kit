@@ -50,7 +50,7 @@
 
   onMounted(() => {
     const dispatchLoading = loadingStore()
-    dispatchLoading.showLoading()
+    dispatchLoading.setLoading()
     if (document.readyState == 'complete') {
       dispatchLoading.hideLoading()
     }

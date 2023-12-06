@@ -227,7 +227,7 @@
     },
     async created() {
       const dispatchLoading = loadingStore()
-      dispatchLoading.showLoading()
+      dispatchLoading.setLoading()
       this.teams = await this.listTeamsService()
 
       if (this.inviteSession.sessionIsExpired()) {

@@ -6,10 +6,10 @@
     :accountHandler="accountHandler"
   />
   <ProgressBar
-    class="top-[56px] sticky"
+    class="top-[3.5rem] sticky"
     mode="indeterminate"
-    style="height: 6px"
-    v-if="showLoadingState"
+    style="height: 0.375rem"
+    v-if="setLoading"
     :pt="{
       value: { class: 'bg-orange-bullet' }
     }"
@@ -67,9 +67,9 @@
         return '[&>.active-helper]:block transform [&>.active-helper]:md:translate-x-0'
       },
 
-      showLoadingState() {
+      setLoading() {
         const stateLoading = loadingStore()
-        return stateLoading.show
+        return stateLoading.isLoading
       }
     },
     setup() {

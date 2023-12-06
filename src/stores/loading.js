@@ -1,13 +1,13 @@
 import { defineStore } from 'pinia'
 
 export const loadingStore = defineStore('loadingProgress', {
-  state: () => ({ show: false }),
+  state: () => ({ isLoading: false }),
   actions: {
-    showLoading() {
-      this.show = true
+    setLoading() {
+      this.isLoading = true
     },
     hideLoading() {
-      this.show = false
+      this.isLoading = false
     }
   }
 })

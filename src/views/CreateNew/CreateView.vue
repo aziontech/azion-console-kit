@@ -258,7 +258,7 @@
 
     async created() {
       const dispatchLoading = loadingStore()
-      dispatchLoading.showLoading()
+      dispatchLoading.setLoading()
       await this.loadSolution()
       dispatchLoading.hideLoading()
     },

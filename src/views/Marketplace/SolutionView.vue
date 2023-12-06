@@ -172,7 +172,7 @@
 
   onBeforeMount(async () => {
     const dispatchLoading = loadingStore()
-    dispatchLoading.showLoading()
+    dispatchLoading.setLoading()
     await loadSolution()
     animateMessage.value = !isLastVersion.value
 
