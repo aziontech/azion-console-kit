@@ -44,6 +44,9 @@ const parseHttpResponse = (httpResponse) => {
       }
     case 401:
       throw new Errors.InvalidApiTokenError().message
+    case 400:
+      const apiError = httpResponse.body.email[0]
+      throw new Error(apiError).message
     case 403:
       throw new Errors.PermissionError().message
     case 404:
