@@ -1,7 +1,7 @@
 <template>
   <ContentBlock>
     <template #heading>
-      <PageHeadingBlock pageTitle="New Edge Function">
+      <PageHeadingBlock pageTitle="Create Edge Function">
         <MobileCodePreview :updateObject="updateObject" />
       </PageHeadingBlock>
     </template>
