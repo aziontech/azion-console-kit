@@ -115,7 +115,7 @@
         />
         <PrimeButton
           class="m-0"
-          severity="Secondary"
+          severity="secondary"
           label="Confirm"
           @click="onConfirm"
         />
