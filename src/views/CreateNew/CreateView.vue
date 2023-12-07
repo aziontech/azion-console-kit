@@ -84,18 +84,18 @@
         :templateId="solution.referenceId"
       />
       <PrimeDialog
+        :draggable="false"
         modal
         v-model:visible="showDetails"
         class="w-full max-w-2xl"
         :pt="{
-          root: { class: 'hidden sm:flex' },
+          root: { class: ' w-full lg:max-w-screen-lg h-[640px]] hidden sm:flex' },
           mask: { class: 'hidden sm:flex' },
-          content: { class: 'p-5' },
+          content: { class: 'p-5 w-full' },
           header: { class: 'px-5 py-3 items-start' }
         }"
         position="center"
         :dismissableMask="true"
-        :breakpoints="{ '641px': '90vw' }"
       >
         <template #header>
           <div class="w-full flex flex-col gap-2">
@@ -131,7 +131,7 @@
             </div>
           </div>
         </template>
-        <div class="flex flex-col gap-6 max-w-2xl">
+        <div class="flex flex-col gap-6 w-full">
           <div class="flex flex-col gap-2">
             <span class="text-lg font-medium"> Overview </span>
             <div
