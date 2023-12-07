@@ -16,7 +16,6 @@ const parseHttpResponse = (httpResponse) => {
       if(!httpResponse.body.result.error){
         return httpResponse.body
       }
-      console.log(httpResponse.body)
       throw new Error(httpResponse.body.result.message).message
     case 400:
       throw new Errors.NotFoundError().message
