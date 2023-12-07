@@ -40,7 +40,7 @@ export default {
         'slide': '384px',
       },
       fontFamily: {
-        'roboto-mono': ['Roboto Mono']
+        robotomono: ['Roboto Mono']
       },
       animation: {
         fadeIn: 'fadeIn 220ms ease-in-out',
