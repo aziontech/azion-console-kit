@@ -12,32 +12,33 @@
                 <div class="flex flex-col sm:flex-row sm:items-center gap-3 w-full">
                   <div class="flex gap-3">
                     <Tag
-                      v-if="results"
+                      v-if="!isUnfinished"
                       :icon="iconType"
                       :severity="severity"
                       :pt="{ icon: { class: 'mr-0' }, root: { class: 'w-8 h-8' } }"
                     />
                     <span
                       class="text-primary text-xl font-medium"
-                      v-if="!results"
+                      v-if="isUnfinished"
                     >
                       Project is being deployed
                     </span>
+                    
                     <span
                       class="text-primary text-xl font-medium"
-                      v-else-if="results && !results.error"
+                      v-else-if="isSuccessfullyFinished"
                     >
                       {{ results.edge_application.name }}
                     </span>
                     <span
                       class="text-primary text-xl font-medium"
-                      v-else
+                      v-else-if="deployFailed"
                     >
                       Deploy failed
                     </span>
                   </div>
                   <PrimeButton
-                    v-if="results && !results.error"
+                    v-if="isSuccessfullyFinished"
                     link
                     :pt="{
                       label: { class: 'text-xs' },
@@ -45,21 +46,21 @@
                     }"
                     class="px-0 py-1"
                     :label="results.domain.url"
-                    @click="openUrl"
+                    @click="goToUrl"
                     icon="pi pi-external-link"
                     iconPos="right"
                   />
                   <PrimeButton
-                    v-if="results && !results.error"
+                    v-if="isSuccessfullyFinished"
                     class="sm:ml-auto"
                     outlined
-                    @click="manage"
+                    @click="goToEdgeApplicationEditView"
                     label="Manage"
                   />
                 </div>
                 <span
                   class="text-sm font-normal text-color-secondary"
-                  v-if="!results"
+                  v-if="isUnfinished"
                 >
                   Project started {{ seconds }}s ago
                 </span>
@@ -75,7 +76,7 @@
         </PrimeCard>
         <div
           class="w-full flex flex-col gap-5"
-          v-if="results && !results.error"
+          v-if="isSuccessfullyFinished"
         >
           <Divider
             align="left"
@@ -85,50 +86,19 @@
           </Divider>
           <div class="ml-0 w-full mt-0 grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-4 gap-4">
             <PrimeButton
+              v-for="(step, index) in nextSteps"
+              :key="index"
               class="p-4 text-left border-solid border surface-border hover:border-primary transition-all"
               link
               type="button"
-              @click="customizeDomain"
+              @click="step.handle"
             >
               <div class="flex flex-col h-36 justify-between gap-3.5 items-start">
                 <div class="flex gap-3.5 flex-col">
                   <div class="flex p-0.5 flex-col">
-                    <span class="text-color text-base font-medium"> Customize Domain </span>
+                    <span class="text-color text-base font-medium"> {{ step.title }} </span>
                     <span class="pb-4 text-base text-color-secondary mt-1.5 line-clamp-2">
-                      Manage your Domain settings
-                    </span>
-                  </div>
-                </div>
-              </div>
-            </PrimeButton>
-            <PrimeButton
-              class="p-4 text-left border-solid border surface-border hover:border-primary transition-all"
-              link
-              type="button"
-              @click="pointTraffic"
-            >
-              <div class="flex flex-col h-36 justify-between gap-3.5 items-start">
-                <div class="flex gap-3.5 flex-col">
-                  <div class="flex p-0.5 flex-col">
-                    <span class="text-color text-base font-medium"> Point Traffic </span>
-                    <span class="pb-4 text-base text-color-secondary mt-1.5 line-clamp-2">
-                      See Point Traffic docs
-                    </span>
-                  </div>
-                </div>
-              </div>
-            </PrimeButton>
-            <PrimeButton
-              class="p-4 text-left border-solid border surface-border hover:border-primary transition-all"
-              link
-              type="button"
-            >
-              <div class="flex flex-col h-36 justify-between gap-3.5 items-start">
-                <div class="flex gap-3.5 flex-col">
-                  <div class="flex p-0.5 flex-col">
-                    <span class="text-color text-base font-medium"> View Analytics </span>
-                    <span class="pb-4 text-base text-color-secondary mt-1.5 line-clamp-2">
-                      Gain powerful insights into your performance, availability, and security.
+                      {{ step.description }}
                     </span>
                   </div>
                 </div>
@@ -142,7 +112,7 @@
 </template>
 
 <script setup>
-  import { computed, onMounted, ref } from 'vue'
+  import { computed, onMounted, onUnmounted, ref } from 'vue'
   import Tag from 'primevue/tag'
   import Divider from 'primevue/divider'
   import ContentBlock from '@/templates/content-block'
@@ -161,7 +131,11 @@
     getResultsService: {
       type: Function,
       required: true
-    }
+    },
+    windowOpen: {
+      type: Function,
+      required: true
+    },
   })
 
   const executionId = ref('')
@@ -170,58 +144,95 @@
   const toast = useToast()
   const results = ref()
   const seconds = ref(0)
+  const intervalRef = ref()
+  const deployFailed = ref(false)
+  const nextSteps = ref([
+    {
+      title: 'Customize Domain',
+      description: 'Manage your Domain settings.',
+      handle: () => goToDomainEditView()
+    },
+    {
+      title: 'Point Traffic',
+      description: 'See Point Traffic docs.',
+      handle: () => goToPointTraffic()
+    },
+    {
+      title: 'View Analytics',
+      description: 'Gain powerful insights into your performance, availability, and security.',
+      handle: () => goToAnalytics()
+    }
+  ])
 
   const handleFinish = async () => {
-    const response = await props.getResultsService(route.params.id)
-    results.value = response.result
-    if (!results.value.error) {
+    try {
+      const response = await props.getResultsService(route.params.id)
+      results.value = response.result
       toast.add({
         closable: true,
         severity: 'success',
         summary: 'Created successfully',
         detail: 'The project was deployed successfully'
       })
-    } else {
+    } catch (error) {
+      deployFailed.value = true
       toast.add({
         closable: true,
         severity: 'error',
         summary: 'Deploy failed',
-        detail: results.value.message
+        detail: error
       })
     }
   }
 
-  const iconType = computed(() => {
-    return !results.value.error ? 'pi pi-check text-xs' : 'pi pi-times text-xs'
+
+  const severity = computed(() => {
+    return !deployFailed.value ? 'success' : 'danger'
   })
 
-  const pointTraffic = () => {
-    window.open(
+  const iconType = computed(() => {
+    return !deployFailed.value ? 'pi pi-check text-xs' : 'pi pi-times text-xs'
+  })
+
+  const isUnfinished = computed(() => {
+    return !results.value && !deployFailed.value
+  })
+
+  const isSuccessfullyFinished = computed(() => {
+    return results.value && !deployFailed.value
+  })
+
+  const goToPointTraffic = () => {
+    props.windowOpen(
       'https://www.azion.com/en/documentation/products/guides/point-domain-to-azion/',
       '_blank'
     )
   }
 
-  const openUrl = () => {
-    window.open(results.value.domain.url, '_blank')
+  const goToUrl = () => {
+    props.windowOpen('http://'+results.value.domain.url, '_blank')
   }
 
-  const manage = () => {
+  const goToAnalytics = () =>{
+    //
+  }
+
+  const goToEdgeApplicationEditView = () => {
     router.push(`/edge-applications/edit/${results.value.edge_application.id}`)
   }
 
-  const customizeDomain = () => {
+  const goToDomainEditView = () => {
     router.push(`/domains/edit/${results.value.domain.id}`)
   }
 
-  const severity = computed(() => {
-    return !results.value.error ? 'success' : 'danger'
-  })
-
   onMounted(() => {
-    setInterval(() => {
+    intervalRef.value = setInterval(() => {
       seconds.value += 1
     }, 1000)
     executionId.value = route.params.id
+  })
+
+  onUnmounted(() => {
+    clearInterval(intervalRef.value)
   })
 </script>

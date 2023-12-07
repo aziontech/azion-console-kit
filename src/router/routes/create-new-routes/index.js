@@ -1,6 +1,7 @@
 import * as TemplateEngineService from '@/services/template-engine-services'
 import * as MarketplaceService from '@/services/marketplace-services'
 import * as ScriptRunnerService from '@/services/script-runner-service'
+import { windowOpen } from '@/helpers/window-open'
 
 /** @type {import('vue-router').RouteRecordRaw} */
 export const createNewRoutes = {
@@ -30,8 +31,9 @@ export const createNewRoutes = {
       name: 'creation-deploy',
       component: () => import('@views/CreateNew/DeployView.vue'),
       props: {
-        getLogsService: ScriptRunnerService.getLogs,
-        getResultsService: ScriptRunnerService.getResults
+        getLogsService: ScriptRunnerService.getScriptRunnerLogs,
+        getResultsService: ScriptRunnerService.getScriptRunnerResults,
+        windowOpen
       },
       meta: {
         breadCrumbs: [

@@ -231,6 +231,9 @@
               )
             })
           }
+          if (element.value.length > 0) {
+            setFieldValue(element.name, element.value)
+          }
         })
       })
     }

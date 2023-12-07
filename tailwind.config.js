@@ -39,6 +39,9 @@ export default {
       width: {
         'slide': '384px',
       },
+      fontFamily: {
+        'roboto-mono': ['Roboto Mono']
+      },
       animation: {
         fadeIn: 'fadeIn 220ms ease-in-out',
         fadeOut: 'fadeOut 220ms ease-in-out'

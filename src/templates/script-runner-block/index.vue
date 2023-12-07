@@ -2,7 +2,7 @@
   <Accordion :activeIndex="active">
     <AccordionTab
       :header="title"
-      :disabled="!isPolling"
+      :disabled="!isPolling || currentLogs.length === 0"
       ref="accordion"
       :pt="{
         content: { class: 'p-0 pl-5' },
@@ -25,7 +25,7 @@
         ref="runner"
       >
         <p
-          class="w-full text-color text-base"
+          class="w-full text-color text-base font-roboto-mono"
           v-for="(log, index) in this.currentLogs"
           :key="index"
         >
