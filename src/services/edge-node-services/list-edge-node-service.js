@@ -25,7 +25,10 @@ const adapt = (httpResponse) => {
           name: element.name,
           groups: element.groups.map((obj) => obj.name).join(','),
           hashId: element.hash_id,
-          status: element.status
+          status: {
+            content: element.status,
+            severity: element.status === 'Authorized' ? 'success' : 'warning'
+          }
         }))
       : []
 

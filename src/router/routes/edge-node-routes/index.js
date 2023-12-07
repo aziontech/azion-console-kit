@@ -26,41 +26,25 @@ export const edgeNodeRoutes = {
       }
     },
     {
-      path: 'edit/:id',
+      path: 'edit/:id/:services?',
       name: 'edit-edge-node',
-      component: () => import('@views/EdgeNode/EditView.vue'),
+      component: () => import('@views/EdgeNode/TabView.vue'),
       props: {
         loadEdgeNodeService: EdgeNodeService.loadEdgeNodeService,
         editEdgeNodeService: EdgeNodeService.editEdgeNodeService,
+        listGroupsEdgeNodeService: EdgeNodeService.listGroupsEdgeNodeService,
         listServiceEdgeNodeService: ServiceEdgeNode.listServiceEdgeNodeService,
+        deleteServiceEdgeNodeService: ServiceEdgeNode.deleteServiceEdgeNodeService,
+        addServiceEdgeNodeService: ServiceEdgeNode.addServiceEdgeNodeService,
+        loadServiceEdgeNodeService: ServiceEdgeNode.loadServiceEdgeNodeService,
+        editServiceEdgeNodeService: ServiceEdgeNode.editServiceEdgeNodeService,
+        documentationServiceServices: Helpers.documentationCatalog.edgeServices,
         updatedRedirect: 'list-edge-node'
       },
       meta: {
         breadCrumbs: [
           {
             label: 'Edge Nodes',
-            to: '/edge-node'
-          },
-          {
-            label: 'Edit Edge Node'
-          }
-        ]
-      }
-    },
-    {
-      path: 'edit/:id/service',
-      name: 'edit-edge-node-service',
-      component: () => import('@views/EdgeNode/EditView.vue'),
-      props: {
-        loadEdgeNodeService: EdgeNodeService.loadEdgeNodeService,
-        editEdgeNodeService: EdgeNodeService.editEdgeNodeService,
-        listServiceEdgeNodeService: ServiceEdgeNode.listServiceEdgeNodeService,
-        deleteEdgeNodeService: ServiceEdgeNode.deleteEdgeNodeService
-      },
-      meta: {
-        breadCrumbs: [
-          {
-            label: 'Services',
             to: '/edge-node'
           },
           {

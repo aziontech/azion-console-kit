@@ -14,10 +14,12 @@ export const editEdgeNodeService = async (payload) => {
 
 const adapt = (payload) => {
   let groups = []
-  if (payload.addGroups.length) {
-    groups = payload.addGroups.map((item1) => {
-      let item2 = payload.groups.find((item) => item.name === item1)
-      return item2 ? { id: item2.id, name: item1 } : { name: item1 }
+  if (payload.groups.length) {
+    groups = payload.groups.map((item) => {
+      return {
+        name: item.name,
+        value: item
+      }
     })
   }
   return {
@@ -27,7 +29,7 @@ const adapt = (payload) => {
       add_services: payload.addService
     },
     hasServices: payload.has_services,
-    groups: groups,
+    groups,
     status: payload.status
   }
 }
