@@ -17,7 +17,6 @@
     ></ProgressBar>
   </div>
   <main
-    
     class="flex w-full relative min-h-[calc(100vh-120px)] [&>.active]:md:w-[calc(100%-384px)] mt-14"
     :class="[styleHelper, { 'flex align-items-center': !props.isLogged }]"
   >
