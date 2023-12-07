@@ -51,10 +51,6 @@
       type: Function,
       required: true
     },
-    getScriptRunnerResults: {
-      type: Function,
-      required: true
-    },
     windowOpen: {
       type: Function,
       required: true

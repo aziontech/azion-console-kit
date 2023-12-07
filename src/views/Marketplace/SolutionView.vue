@@ -137,7 +137,6 @@
     :getTemplateService="props.getTemplateService"
     :instantiateTemplateService="props.instantiateTemplateService"
     :checkStatusScriptRunnerService="props.checkStatusScriptRunnerService"
-    :getScriptRunnerResults="props.getScriptRunnerResults"
     :windowOpen="props.windowOpen"
     v-model:showSidebarSecond="showCreateEdgeApp"
     @success="handleIntegrationSuccess"
