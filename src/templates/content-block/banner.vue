@@ -5,10 +5,16 @@
         severity="warn"
         :closable="false"
         :pt="{
-          root: { class: 'bg-orange-50 mx-3 sm:mx-8 my-4' },
+          root: { class: 'mx-3 sm:mx-8 mt-4' },
           wrapper: { class: 'py-3 px-8 ' }
         }"
       >
+        <template #messageicon>
+          <Avatar
+            icon="pi pi-exclamation-triangle"
+            class="bg-yellow-600 bg-opacity-20 text-yellow-600 mr-2"
+          />
+        </template>
         <p class="text-color-secondary">
           <b class="text-color">Experiment in progress.</b>
           You're currently using Azion's Platform Kit. Avoid complex setups as this platform is
@@ -25,4 +31,6 @@
 <script setup>
   defineOptions({ name: 'BannerContentBlock' })
   import Message from 'primevue/message'
+  import Avatar from 'primevue/avatar'
+
 </script>
