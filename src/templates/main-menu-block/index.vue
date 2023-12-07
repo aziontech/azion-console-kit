@@ -471,6 +471,7 @@
 
   <!-- Modal de create -->
   <PrimeDialog
+    :draggable="false"
     v-model:visible="createModalStore.isOpen"
     modal
     header="New"

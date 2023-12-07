@@ -112,17 +112,25 @@
               </span>
             </div>
             <div class="flex gap-3">
-              <div class="flex gap-1">
+              <div class="flex items-center gap-1">
                 <span class="text-xs font-medium text-color-primary">By</span>
-                <span class="text-xs font-medium text-color-secondary">{{
-                  solution.vendor.name
-                }}</span>
+                <PrimeButton
+                  link
+                  :pt="{
+                    label: { class: 'text-xs' },
+                    icon: { class: 'text-xs' }
+                  }"
+                  class="px-0 py-1"
+                  :label="solution.vendor.name"
+                  icon="pi pi-external-link"
+                  iconPos="right"
+                />
               </div>
-              <div class="flex gap-1">
+              <div class="flex items-center gap-1">
                 <span class="text-xs font-medium text-color-primary">Version</span>
                 <span class="text-xs font-medium text-color-secondary">{{ solution.version }}</span>
               </div>
-              <div class="flex gap-1">
+              <div class="flex items-center gap-1">
                 <span class="text-xs font-medium text-color-primary">Last Updated</span>
                 <span class="text-xs font-medium text-color-secondary">{{
                   solution.lastUpdate
