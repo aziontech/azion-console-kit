@@ -181,7 +181,6 @@
                   v-model="selectedTeam"
                 />
               </div>
-
               <div>
                 <Card
                   :pt="{
@@ -369,6 +368,7 @@
   const fetchTeams = async () => {
     const result = await props.listTeamsService()
     optionsTeams.value = result
+    selectedTeam.value = [result[0].value]
   }
 
   onMounted(async () => {
