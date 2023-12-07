@@ -208,8 +208,8 @@
                   <label
                     for="edge_application"
                     class="text-color text-base font-medium"
-                    >Edge Application * {{ props.showSidebarSecond }}</label
-                  >
+                    >Edge Application *
+                  </label>
                   <Dropdown
                     id="edge_application"
                     :class="{ 'p-invalid': errors.edgeApplication }"
