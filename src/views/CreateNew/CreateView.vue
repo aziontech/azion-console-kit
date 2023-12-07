@@ -282,6 +282,11 @@
       handleInstantiate(element) {
         this.$router.push(`/deploy/${element.uuid}`)
       }
+    },
+    watch: {
+      $route (){
+        this.loadSolution()
+      }
     }
   }
 </script>
