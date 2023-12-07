@@ -486,7 +486,7 @@
   >
     <!-- SLOT WIP -->
     <div>
-      <CreateModalBlock @closeModal="createBoardManager.close()" />
+      <CreateModalBlock @closeModal="createModalStore.close()" />
     </div>
   </PrimeDialog>
 
