@@ -9,7 +9,7 @@
           <template #content>
             <div class="flex flex-col p-3 md:p-8 gap-8">
               <div class="flex flex-col gap-2">
-                <div class="flex flex-col sm:flex-row sm:items-center gap-3 w-full">
+                <div class="flex flex-col md:flex-row md:items-center gap-3 w-full">
                   <div class="flex gap-3">
                     <Tag
                       v-if="!isUnfinished"
@@ -18,26 +18,26 @@
                       :pt="{ icon: { class: 'mr-0' }, root: { class: 'w-8 h-8' } }"
                     />
                     <span
-                      class="text-primary text-xl font-medium"
+                      class="text-primary text-xl whitespace-nowrap  font-medium"
                       v-if="isUnfinished"
                     >
                       Project is being deployed
                     </span>
                     
                     <span
-                      class="text-primary text-xl font-medium"
+                      class="text-primary text-xl whitespace-nowrap font-medium"
                       v-else-if="isSuccessfullyFinished"
                     >
                       {{ results.edge_application.name }}
                     </span>
                     <span
-                      class="text-primary text-xl font-medium"
+                      class="text-primary text-xl font-medium whitespace-nowrap "
                       v-else-if="deployFailed"
                     >
                       Deploy failed
                     </span>
                   </div>
-                    <div class="flex w-full justify-between flex-col-reverse gap-4 sm:flex-row" >
+                    <div class="flex w-full justify-between flex-col-reverse gap-4 md:flex-row" >
                         <PrimeButton
                           v-if="isSuccessfullyFinished"
                           link
