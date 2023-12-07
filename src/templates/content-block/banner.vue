@@ -32,5 +32,4 @@
   defineOptions({ name: 'BannerContentBlock' })
   import Message from 'primevue/message'
   import Avatar from 'primevue/avatar'
-
 </script>
