@@ -191,6 +191,8 @@
   import ContentBlock from '@/templates/content-block'
   import FormFieldsHome from './FormFields/FormFieldsHome.vue'
   import { useCreateModalStore } from '@/stores/create-modal'
+  import { useLoadingStore } from '@/stores/loading'
+  import { mapActions } from 'pinia'
 
   export default {
     name: 'home-view',
@@ -225,11 +227,13 @@
       }
     },
     async created() {
+      this.startLoading()
       this.teams = await this.listTeamsService()
 
       if (this.inviteSession.sessionIsExpired()) {
         this.inviteSession.turnInviteBlockVisable()
       }
+      this.finishLoading()
     },
     computed: {
       isDisabled() {
@@ -237,6 +241,7 @@
       }
     },
     methods: {
+      ...mapActions(useLoadingStore, ['startLoading', 'finishLoading']),
       navigateToEdgeApplications() {
         this.$router.push({ name: 'list-edge-applications' })
       },

@@ -37,7 +37,8 @@
   import ActionBarBlockWithTeleport from '@templates/action-bar-block/action-bar-with-teleport'
   import PageHeadingBlock from '@/templates/page-heading-block'
   import MobileCodePreview from './components/mobile-code-preview.vue'
-  import { ref } from 'vue'
+  import { ref, onMounted } from 'vue'
+  import { useLoadingStore } from '@/stores/loading'
 
   const props = defineProps({
     createEdgeFunctionsService: {
@@ -46,6 +47,14 @@
     }
   })
   const ARGS_INITIAL_STATE = '{}'
+
+  onMounted(() => {
+    const store = useLoadingStore()
+    store.startLoading()
+    if (document.readyState == 'complete') {
+      store.finishLoading()
+    }
+  })
 
   const validationSchema = yup.object({
     name: yup.string().required('Name is a required field'),

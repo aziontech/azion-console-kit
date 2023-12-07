@@ -48,11 +48,11 @@ $progressBarBorder: 0 none;
 
 /// Background of a progress bar
 /// @group misc
-$progressBarBg: #dee2e6;
+$progressBarBg: var(--surface-600);
 
 /// Background of a progress bar value
 /// @group misc
-$progressBarValueBg: $primaryColor;
+$progressBarValueBg: #f3652b;
 
 /// Text color of a progress bar value
 /// @group misc
