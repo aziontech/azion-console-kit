@@ -475,13 +475,13 @@
     modal
     header="New"
     :pt="{
-      root: { class: 'hidden sm:flex' },
-      content: { class: 'p-0' },
+      root: { class:  'hidden w-full lg:max-w-screen-lg 2xl:max-w-screen-xl h-[640px] sm:flex' },
+      content: { class: ' w-full  h-full p-0' },
       mask: { class: 'hidden sm:flex' }
     }"
     position="center"
+    class="w-full"
     :dismissableMask="true"
-    :breakpoints="{ '641px': '90vw' }"
     @update:visible="createModalStore.close()"
   >
     <!-- SLOT WIP -->
