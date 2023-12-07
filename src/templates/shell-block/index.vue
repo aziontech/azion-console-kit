@@ -7,7 +7,7 @@
   />
 
   <div
-    class="bg-black/50 z-50 mt-[3.5rem] min-h-screen cursor-progress fixed w-full"
+    class="bg-black/20 z-50 mt-[3.5rem] min-h-screen cursor-progress fixed w-full"
     v-if="isLoading.showLoading.value"
   >
     <ProgressBar
