@@ -139,7 +139,7 @@
       modal
       :breakpoints="{ '641px': '90vw' }"
       :pt="{
-        root: { class: 'p-0 w-[880px] h-[632px]' },
+        root: { class: 'p-0 w-[880px] h-[632px] mx-3 sm:mx-8' },
         header: { class: 'px-8 py-3 gap-3' },
         content: { class: 'p-0 h-full' }
       }"
@@ -147,7 +147,7 @@
       <template #header>
         <h4 class="w-full text-xl not-italic font-medium leading-7">Switch Account</h4>
       </template>
-      <div class="p-8 flex flex-col gap-8">
+      <div class="p-8 flex flex-col gap-8 max-sm:gap-6">
         <PrimeCard
           class="w-fit"
           :pt="{
@@ -168,7 +168,7 @@
                   icon="pi pi-cog"
                   type="button"
                   outlined
-                  class="hidden max-sm:flex"
+                  class="hidden max-sm:flex flex-shrink-0"
                   aria-label="menu"
                   aria-haspopup="true"
                   aria-controls="overlay_menu"
@@ -187,7 +187,10 @@
                   <span class="font-medium text-sm">ID</span>
                   <span class="font=normal text-sm">{{ account.id }}</span>
                 </div>
-                <div v-if="account.client_id" class="flex gap-1">
+                <div
+                  v-if="account.client_id"
+                  class="flex gap-1"
+                >
                   <span class="font-medium text-sm">Client ID</span>
                   <span class="font=normal text-sm">{{ account.client_id }}</span>
                 </div>

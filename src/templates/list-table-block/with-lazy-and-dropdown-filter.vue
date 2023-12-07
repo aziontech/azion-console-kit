@@ -32,7 +32,7 @@
         :value="listRecords"
         lazy
         :paginator="totalRecords > limitShowRows"
-        :rows="limitShowRows"
+        v-model:rows="limitRows"
         :rowsPerPageOptions="[10, 20, 50, 100]"
         scrollable
         removableSort
@@ -46,7 +46,7 @@
         tableStyle="max-sm:min-width: 50rem"
         :pt="{
           root: { class: 'border surface-border rounded' },
-          header: { class: 'rounded p-3.5' }
+          header: { class: 'p-3.5' }
         }"
       >
         <template #header>
@@ -204,6 +204,7 @@
 
   const isLoading = ref(false)
   const first = ref(1)
+  const limitRows = ref(props.limitShowRows)
   const errorMessage = ref(null)
   const listRecords = ref([])
   const filters = ref(props.headerFilter)
@@ -238,7 +239,8 @@
     }
   }
 
-  const applyFilter = () => {
+  const applyFilter = () => {    
+    limitRows.value = props.limitShowRows
     first.value = 1
     loadData({ page: 1 })
   }
