@@ -137,9 +137,9 @@
       v-model:visible="visible"
       @update:visible="visibleDialog"
       modal
-      :breakpoints="{ '641px': '90vw' }"
+      :breakpoints="{ '460px': '95vw' }"
       :pt="{
-        root: { class: 'p-0 w-[880px] h-[632px] mx-3 sm:mx-8' },
+        root: { class: 'p-0 w-[880px] h-[632px] mx-3 sm:mx-8 md:mx-8' },
         header: { class: 'px-8 py-3 gap-3' },
         content: { class: 'p-0 h-full' }
       }"
