@@ -9,7 +9,8 @@
   import CodeEditor from '../components/code-editor.vue'
   import CodePreview from '../components/code-preview.vue'
   import { useField } from 'vee-validate'
-  import { computed, ref, watch, defineEmits } from 'vue'
+  import { computed, ref, watch } from 'vue'
+
   defineProps(['previewData'])
   const emit = defineEmits(['update:previewData'])
 
@@ -72,7 +73,7 @@
       <FormHorizontal
         class="mt-8"
         title="General"
-        description="Describe the Edge Function and choose a name to better identify."
+        description="Edit an edge function that runs closer to users to use with Edge Application or Edge Firewall."
       >
         <template #inputs>
           <div class="flex flex-col sm:max-w-lg w-full gap-2">
@@ -92,6 +93,9 @@
               class="p-error text-xs font-normal leading-tight"
               >{{ nameError }}</small
             >
+            <small class="text-xs text-color-secondary font-normal leading-tight">
+              Give a unique and easy-to-remember name.</small
+            >
           </div>
         </template>
       </FormHorizontal>
@@ -99,7 +103,7 @@
       <FormHorizontal
         class="mt-8"
         title="Language"
-        description="It is currently not possible to choose a language to code a new Edge function."
+        description="The language the edge function is written in."
       >
         <template #inputs>
           <div class="flex flex-col w-full sm:max-w-lg gap-2">
@@ -117,6 +121,9 @@
                 class="w-full text-[var(--text-color-secondary)]"
                 readonly
               />
+              <small class="text-xs text-color-secondary font-normal leading-tight">
+                Language isn't an editable field.</small
+              >
             </span>
           </div>
         </template>
@@ -130,11 +137,11 @@
           <div class="flex w-full sm:max-w-lg gap-2">
             <InputSwitch
               v-model="active"
-              id="active"
+              inputId="active"
             />
             <label
               for="active"
-              class="text-color text-base font-medium"
+              class="text-color-secondary text-sm font-normal"
               >Active
             </label>
           </div>

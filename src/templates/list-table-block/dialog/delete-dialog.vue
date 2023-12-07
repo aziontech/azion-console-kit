@@ -4,6 +4,9 @@
     modal
     :header="`Delete ${informationForDeletion.title}`"
     class="w-[95vw] md:w-[40vw]"
+    :pt="{
+      header: { class: 'p-5' }
+    }"
   >
     <div class="flex flex-col gap-5">
       <div>
@@ -23,7 +26,7 @@
       <Divider class="-ml-5 w-[calc(100%_+_40px)]" />
 
       <div>
-        <div class="flex flex-col sm:max-w-lg w-full gap-2">
+        <div class="flex flex-col w-full gap-2">
           <label
             for="confirm-input"
             class="font-semibold text-sm"
@@ -55,6 +58,7 @@
           @click="cancelDialog()"
         ></PrimeButton>
         <PrimeButton
+          class="w-full lg:w-auto mr-0"
           severity="danger"
           label="Delete"
           icon-pos="right"

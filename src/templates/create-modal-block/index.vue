@@ -235,9 +235,7 @@
     methods: {
       redirectToSolution(template) {
         this.showSidebar = false
-        this.$router.push(`/create/${template.vendor.slug}/${template.slug}`).then(() => {
-          this.$router.go()
-        })
+        this.$router.push(`/create/${template.vendor.slug}/${template.slug}`)
         this.$emit('closeModal')
       },
       onMenuChange(target) {

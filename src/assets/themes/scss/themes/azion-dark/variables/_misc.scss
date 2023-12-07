@@ -28,11 +28,11 @@ $badgeHeight: 1.25rem;
 
 /// Font weight of a badge
 /// @group misc
-$badgeFontWeight: 600;
+$badgeFontWeight: 400;
 
 /// Font size of a badge
 /// @group misc
-$badgeFontSize: 0.6255rem;
+$badgeFontSize: 0.75rem;
 
 /// Padding of a badge
 /// @group misc
@@ -48,7 +48,7 @@ $progressBarBorder: 0 none;
 
 /// Background of a progress bar
 /// @group misc
-$progressBarBg: #dee2e6;
+$progressBarBg: var(--surface-600);
 
 /// Background of a progress bar value
 /// @group misc
@@ -60,7 +60,7 @@ $progressBarValueTextColor: $primaryTextColor;
 
 /// Stroke color of a progress spinner
 /// @group misc
-$progressSpinnerStrokeColor: $errorMessageTextColor !default;
+$progressSpinnerStrokeColor: var(--surface-600) !default;
 
 /// First spinner color of a progress spinner
 /// @group misc

@@ -132,6 +132,7 @@
 </template>
 
 <script setup>
+  import { useLoadingStore } from '@/stores/loading'
   import { computed, onBeforeMount, ref } from 'vue'
   import ContentBlock from '@/templates/content-block'
   import PageHeadingBlock from '@/templates/page-heading-block'
@@ -170,6 +171,8 @@
   })
 
   onBeforeMount(async () => {
+    const stores = useLoadingStore()
+    stores.startLoading()
     await loadSolution()
     animateMessage.value = !isLastVersion.value
 
@@ -178,6 +181,7 @@
       to: route.path
     }
     breadcrumbs.update([...route.meta.breadCrumbs, solutionBran])
+    stores.finishLoading()
   })
 
   const loadSolution = async () => {

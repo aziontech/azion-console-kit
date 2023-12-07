@@ -57,7 +57,7 @@ const getConfig = () => {
           rewrite: (path) => path.replace(/^\/graphql\/cities/, '')
         },
         '/api/script-runner': {
-          target: `https://api.azionapi.net/script-runner/api/`,
+          target: `${URLStartPrefix}manager.azion.com/script-runner/api/`,
           changeOrigin: true,
           rewrite: (path) => path.replace(/^\/api\/script-runner/, '')
         },
