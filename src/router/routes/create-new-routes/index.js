@@ -31,8 +31,8 @@ export const createNewRoutes = {
       name: 'creation-deploy',
       component: () => import('@views/CreateNew/DeployView.vue'),
       props: {
-        getLogsService: ScriptRunnerService.getScriptRunnerLogs,
-        getResultsService: ScriptRunnerService.getScriptRunnerResults,
+        getLogsService: ScriptRunnerService.getScriptRunnerLogsService,
+        getResultsService: ScriptRunnerService.getScriptRunnerResultsService,
         windowOpen
       },
       meta: {

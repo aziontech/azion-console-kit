@@ -2,7 +2,7 @@
   <Accordion :activeIndex="active">
     <AccordionTab
       :header="title"
-      :disabled="!isPolling || currentLogs.length === 0"
+      :disabled="disableAccordion"
       ref="accordion"
       :pt="{
         content: { class: 'p-0 pl-5' },
@@ -76,6 +76,11 @@
       getLogsService: {
         type: Function,
         required: true
+      }
+    },
+    computed: {
+      disableAccordion() {
+        return !this.isPolling || this.currentLogs.length === 0
       }
     },
     methods: {
