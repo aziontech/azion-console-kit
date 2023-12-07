@@ -8,7 +8,7 @@
 
   <div
     class="bg-black/20 z-50 mt-[3.5rem] min-h-screen cursor-progress fixed w-full"
-    v-if="isLoading.showLoading.value"
+    v-if="showLoading"
   >
     <ProgressBar
       class="sticky"
@@ -58,5 +58,5 @@
   const styleHelper = '[&>.active-helper]:block transform [&>.active-helper]:md:translate-x-0'
   const store = useLoadingStore()
 
-  const isLoading = storeToRefs(store)
+  const { showLoading } = storeToRefs(store)
 </script>
