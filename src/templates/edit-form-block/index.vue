@@ -30,7 +30,6 @@
     },
     updatedRedirect: {
       type: String,
-      required: true
     },
     schema: {
       type: Object,

@@ -1,135 +1,135 @@
 <script setup>
-  import { ref, onMounted, onBeforeUpdate } from 'vue'
-  import * as yup from 'yup'
-  import { useRoute, useRouter } from 'vue-router'
-  import EditFormBlock from '@/templates/edit-form-block'
-  import ContentBlock from '@/templates/content-block'
-  import PageHeadingBlock from '@/templates/page-heading-block'
-  import TabView from 'primevue/tabview'
-  import TabPanel from 'primevue/tabpanel'
-  import ListTableBlock from '@templates/list-table-block'
-  import FormFieldsEdgeNode from '@/views/EdgeNode/FormFields/FormFieldsEdgeNode.vue'
+  import ListTableBlock from '@/templates/list-table-block'
+  import EmptyResultsBlock from '@/templates/empty-results-block'
+  import Illustration from '@/assets/svg/illustration-layers.vue'
+  import { computed, ref } from 'vue'
+  import PrimeButton from 'primevue/button'
+  import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
+  import CreateService from '@/views/EdgeNode/Drawer/CreateService'
+  import EditService from '@/views/EdgeNode/Drawer/EditService'
 
-  
   const props = defineProps({
-    loadEdgeNodeService: { type: Function, required: true },
-    editEdgeNodeService: { type: Function, required: true },
+    edgeNodeId: { type: String, required: true },
     listServiceEdgeNodeService: { type: Function, required: true },
-    deleteEdgeNodeService: { type: Function, required: true },
-    updatedRedirect: { type: String, required: true }
+    deleteServiceEdgeNodeService: { type: Function, required: true },
+    documentationServiceServices: { type: Function, required: true }
   })
 
-  const validationSchema = yup.object({
-    name: yup.string().required(),
-    hashId: yup.string().required(),
-    groups: yup.array(),    
-  })
+  const hasContentToList = ref(true)
+  const visibleDrawerCreate = ref(false)
+  const visibleDrawerEdit = ref(false)
+  const listServiceEdgeNode = ref('')
+  const serviceIdEdgeNode = ref('')
 
-  const servicesListColumns = ref([
-    { field: 'name', header: 'Name' },
-    { field: 'lastEditor', header: 'Last Editor' },
-    { field: 'lastModified', header: 'Last Modified' },
-    { field: 'status', header: 'Status' }
+  const getColumns = computed(() => [
+    {
+      field: 'name',
+      header: 'Name'
+    },
+    {
+      field: 'status',
+      header: 'Status',
+      type: 'component',
+      component: (columnData) =>
+        columnBuilder({
+          data: columnData,
+          columnAppearance: 'tag'
+        })
+    },
+    {
+      field: 'lastEditor',
+      header: 'Last Editor'
+    },
+    {
+      field: 'lastModified',
+      header: 'Last Modified'
+    }
   ])
-  const activeTab = ref(0)
 
-  const route = useRoute()
-  const router = useRouter()
-
-  let edgeNodeId = ref(null)
-
-  onMounted(() => {
-    edgeNodeId.value = route.params.id
-    renderTabCurrentRouter()
-  })
-
-  onBeforeUpdate(() => {
-    renderTabCurrentRouter()
-  })
-
-  const initialValues = {
-    modules: { add_services: false },
-    addService: false,
-    groups: [],
-    addGroups: [],
-    nameGroup: ''
+  const handleLoadData = (event) => {
+    hasContentToList.value = event
   }
 
-  const listServiceEdgeNode = async (payload) => {
-    await props.listServiceEdgeNodeService({ ...payload, id: route.params.id, bound: true })
+  const openCreateServiceDrawer = () => {
+    visibleDrawerCreate.value = true
   }
 
-  const deleteServiceEdgeNode = async (serviceId) => {
-    await props.deleteEdgeNodeService({ serviceId, edgeNodeId: edgeNodeId.value })
+  const openEditServiceDrawer = (item) => {
+    serviceIdEdgeNode.value = item.id
+    visibleDrawerEdit.value = true
   }
 
-  const changeRouteByClickingOnTab = (event) => {
-    if (event.index === 0) {
-      router.push({ name: 'edit-edge-node', params: { id: edgeNodeId.value } })
-    } else {
-      router.push({ name: 'edit-edge-node-service', params: { id: edgeNodeId.value } })
-    }
+  const listServicesWithDecorator = async (payload) => {
+    return await props.listServiceEdgeNodeService({ ...payload, id: props.edgeNodeId, bound: true })
   }
 
-  const renderTabCurrentRouter = () => {
-    if (router.currentRoute.value.name === 'edit-edge-node-service') {
-      activeTab.value = 1
-    } else {
-      activeTab.value = 0
-    }
+  const deleteServicesWithDecorator = async (payload) => {
+    return await props.deleteServiceEdgeNodeService({
+      edgeNodeId: props.edgeNodeId,
+      serviceId: payload
+    })
+  }
+
+  const reloadList = () => {
+    listServiceEdgeNode.value.loadData({ page: 1 })
   }
 </script>
 
 <template>
-  <ContentBlock>
-    <template #heading>
-      <PageHeadingBlock pageTitle="Edit Edge Node" />
-    </template>
-    <template #content>
-      <TabView
-        :activeIndex="activeTab"
-        @tab-click="changeRouteByClickingOnTab"
-        class="w-full"
-      >
-        <TabPanel header="Main Settings">
-          <div class="mt-4">
-            <EditFormBlock
-              :editService="props.editEdgeNodeService"
-              :loadService="props.loadEdgeNodeService"
-              :updatedRedirect="updatedRedirect"
-              :initialValues="initialValues"
-              :schema="validationSchema"
-              backURL="/edge-node"
-            >
-              <template #form>
-                <FormFieldsEdgeNode />
-              </template>
-            </EditFormBlock>
-          </div>
-        </TabPanel>
-        <TabPanel header="Services">
-          <div class="mt-4">
-            <ListTableBlock
-              pageTitleDelete="Service"
-              addButtonLabel="Add Service"
-              :listService="listServiceEdgeNode"
-              :columns="servicesListColumns"
-              :deleteService="deleteServiceEdgeNode"
-              createPagePath="service/add"
-              editPagePath="service"
-            >
-            </ListTableBlock>
-          </div>
-        </TabPanel>
-        <TabPanel
-          header="Routing"
-          :disabled="true"
-        ></TabPanel>
-        <TabPanel
-          header="Location"
-          :disabled="true"
-        ></TabPanel>
-      </TabView>
-    </template>
-  </ContentBlock>
+  <div class="flex flex-col h-full">
+    <CreateService
+      v-if="visibleDrawerCreate"
+      v-model:visible="visibleDrawerCreate"
+      :edgeNodeId="props.edgeNodeId"
+      @onSuccess="reloadList"
+      @onCancel="visibleDrawer = false"
+    />
+    <EditService
+      v-if="visibleDrawerEdit"
+      v-model:visible="visibleDrawerEdit"
+      :serviceIdEdgeNode="serviceIdEdgeNode"
+      :edgeNodeId="props.edgeNodeId"
+      @onSuccess="reloadList"
+      @onCancel="visibleDrawer = false"
+    />
+    <ListTableBlock
+      ref="listServiceEdgeNode"
+      v-if="hasContentToList"
+      :listService="listServicesWithDecorator"
+      :deleteService="deleteServicesWithDecorator"
+      :columns="getColumns"
+      createPagePath=""
+      addButtonLabel=""
+      pageTitleDelete="Edge Node Service"
+      :editInDrawer="openEditServiceDrawer"
+      @on-load-data="handleLoadData"
+    >
+      <template #addButton>
+        <PrimeButton
+          icon="pi pi-plus"
+          label="Services"
+          @click="openCreateServiceDrawer"
+        />
+      </template>
+    </ListTableBlock>
+    <EmptyResultsBlock
+      v-else
+      title="No Services added."
+      description="Create your first Service."
+      :documentationService="props.documentationServiceResource"
+      :inTabs="true"
+    >
+      <template #default>
+        <PrimeButton
+          severity="secondary"
+          icon="pi pi-plus"
+          label="Service"
+          @click="openCreateServiceDrawer"
+        />
+      </template>
+      <template #illustration>
+        <Illustration />
+      </template>
+    </EmptyResultsBlock>
+  </div>
 </template>

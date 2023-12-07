@@ -27,13 +27,15 @@
               placeholder="Search"
             />
           </span>
-          <PrimeButton
-            class="max-sm:w-full"
-            @click="navigateToAddPage"
-            icon="pi pi-plus"
-            :label="addButtonLabel"
-            v-if="addButtonLabel"
-          />
+          <slot name="addButton">
+            <PrimeButton
+              class="max-sm:w-full"
+              @click="navigateToAddPage"
+              icon="pi pi-plus"
+              :label="addButtonLabel"
+              v-if="addButtonLabel"
+            />
+          </slot>
         </div>
       </template>
       <Column
@@ -230,6 +232,9 @@
         type: String,
         default: () => '/'
       },
+      editInDrawer: {
+        type: Function
+      },
       addButtonLabel: {
         type: String,
         required: true,
@@ -332,6 +337,10 @@
         this.$refs[`menu-${selectedId}`].toggle(event)
       },
       editItemSelected({ data: item }) {
+        if (this.editInDrawer) {
+          this.editInDrawer(item)
+          return
+        }
         if (this.enableEditClick) {
           this.$router.push({ path: `${this.editPagePath}/${item.id}` })
         }

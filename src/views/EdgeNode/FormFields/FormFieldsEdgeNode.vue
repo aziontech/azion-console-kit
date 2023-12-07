@@ -90,14 +90,11 @@
           >
             Node groups
           </label>
-          <div>- {{ groupsList }}</div>
-          <div>- {{ groups }}</div>
           <MultiSelect
             v-model="groups"
             :options="groupsList"
             filter
             optionLabel="name"
-            optionValue="id"
             placeholder="Select groups"
             class="w-full"
             display="chip"

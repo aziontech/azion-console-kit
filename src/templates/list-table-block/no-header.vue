@@ -178,8 +178,7 @@
         default: () => '/'
       },
       editInDrawer: {
-        type: Function,
-        default: () => '/'
+        type: Function
       },
       editPagePath: {
         type: String,

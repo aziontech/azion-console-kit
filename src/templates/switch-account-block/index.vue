@@ -178,7 +178,6 @@
     },
     visibleButton: {
       type: Boolean,
-      required: false,
       default: true
     },
     accountHandler: {

@@ -5,20 +5,16 @@
   import PageHeadingBlock from '@/templates/page-heading-block'
   import TabView from 'primevue/tabview'
   import TabPanel from 'primevue/tabpanel'
-  import EditView from '@/views/EdgeNode/EditView.vue'
+  import EditView from '@/views/EdgeNode/EditView'
+  import ListViewServices from '@/views/EdgeNode/ListViewServices'
 
   const props = defineProps({
     loadEdgeNodeService: { type: Function, required: true },
     editEdgeNodeService: { type: Function, required: true },
     listGroupsEdgeNodeService: { type: Function, required: true },
-    
     listServiceEdgeNodeService: { type: Function, required: true },
-    deleteServiceEdgeNodeService: { type: Function, required: true },
-    addServiceEdgeNodeService: { type: Function, required: true },
-    loadServiceEdgeNodeService: { type: Function, required: true },
-    editServiceEdgeNodeService: { type: Function, required: true },
+    deleteServiceEdgeNodeService: { type: Function, required: true },    
     documentationServiceServices: { type: Function, required: true },
-    
     updatedRedirect: { type: String, required: true }
   })
 
@@ -63,6 +59,7 @@
         <TabPanel header="Main Settings">
           <div class="mt-4">
             <EditView
+              v-if="!activeTab"
               :edgeNodeId="edgeNodeId"
               :listGroupsEdgeNodeService="props.listGroupsEdgeNodeService"
               :loadEdgeNodeService="props.loadEdgeNodeService"
@@ -73,16 +70,13 @@
         </TabPanel>
         <TabPanel header="Services">
           <div class="mt-4">
-            <!-- <ListTableBlock
-              pageTitleDelete="Service"
-              addButtonLabel="Add Service"
-              :listService="listServiceEdgeNode"
-              :columns="servicesListColumns"
-              :deleteService="deleteServiceEdgeNode"
-              createPagePath="service/add"
-              editPagePath="service"
-            >
-            </ListTableBlock> -->
+            <ListViewServices
+              v-if="activeTab"
+              :edgeNodeId="edgeNodeId"
+              :listServiceEdgeNodeService="props.listServiceEdgeNodeService"
+              :deleteServiceEdgeNodeService="props.deleteServiceEdgeNodeService"              
+              :documentationServiceServices="props.documentationServiceServices"
+            />
           </div>
         </TabPanel>
       </TabView>
