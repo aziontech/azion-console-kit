@@ -1,5 +1,5 @@
 import { AxiosHttpClientAdapter } from '@/services/axios/AxiosHttpClientAdapter'
-import { getLogs } from '@/services/script-runner-service'
+import { getScriptRunnerLogs } from '@/services/script-runner-service'
 import { describe, expect, it, vi } from 'vitest'
 
 const fixtures = {
@@ -17,14 +17,14 @@ const fixtures = {
 }
 
 const makeSut = () => {
-  const sut = getLogs
+  const sut = getScriptRunnerLogs
 
   return {
     sut
   }
 }
 
-describe('DomainsServices', () => {
+describe('ScriptRunnerServices', () => {
   it('should call api with correct params', async () => {
     const requestSpy = vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
       statusCode: 200,
