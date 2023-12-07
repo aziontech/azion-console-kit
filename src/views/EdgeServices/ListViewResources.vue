@@ -76,7 +76,7 @@
   }
 
   const reloadList = () => {
-    listResources.value.loadData()
+    listResources.value.loadData({ page: 1 })
   }
 </script>
 
