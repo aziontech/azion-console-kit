@@ -1,5 +1,5 @@
 <template>
-  <div class="relative bg-black/50 card z-10 flex h-screen justify-content-start">
+  <div class="relative bg-black/50 z-10 flex h-screen justify-content-start">
     <!-- <ProgressSpinner />  -->
     <ProgressBar class="top-[56px] sticky" mode="indeterminate" style="height: 6px"></ProgressBar>
   </div>
