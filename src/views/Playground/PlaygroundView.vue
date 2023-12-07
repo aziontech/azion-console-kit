@@ -1,15 +1,12 @@
 <template>
-  <div class="relative bg-black/30 card z-10 flex h-screen justify-content-start">
-      <ProgressBar class=" " mode="indeterminate" style="height: 6px"></ProgressBar>
+  <div class="relative bg-black/50 card z-10 flex h-screen justify-content-start">
+    <!-- <ProgressSpinner />  -->
+    <ProgressBar class="top-[56px] sticky" mode="indeterminate" style="height: 6px"></ProgressBar>
   </div>
-  
 </template>
-
 
 <script setup>
   import ProgressBar from 'primevue/progressbar';
+  // import ProgressSpinner from 'primevue/progressspinner';
 </script>
-
-
-
 
