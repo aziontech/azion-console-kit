@@ -239,7 +239,7 @@
     }
   }
 
-  const applyFilter = () => {    
+  const applyFilter = () => {
     limitRows.value = props.limitShowRows
     first.value = 1
     loadData({ page: 1 })
