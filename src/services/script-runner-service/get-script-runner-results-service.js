@@ -13,7 +13,7 @@ export const getScriptRunnerResultsService = async (executionId) => {
 const parseHttpResponse = (httpResponse) => {
   switch (httpResponse.statusCode) {
     case 200:
-      if(!httpResponse.body.result.error){
+      if (!httpResponse.body.result.error) {
         return httpResponse.body
       }
       throw new Error(httpResponse.body.result.message).message
