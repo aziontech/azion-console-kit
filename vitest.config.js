@@ -32,9 +32,9 @@ export default mergeConfig(
         branches: 90,
         functions: 81,
         lines: 81,
-        reporter: ['text-summary', 'lcov']
+        reporter: ['text', 'json', 'html', 'lcov']
       },
-      reporters: ['vitest-sonar-reporter'],
+      reporters: ['default', 'vitest-sonar-reporter'],
       outputFile: {
         'vitest-sonar-reporter': './coverage/sonar-report.xml',
       },
