@@ -241,7 +241,7 @@
                       </div>
                     </template>
                     <template #footer>
-                      <Divider  class="mb-2" />
+                      <Divider class="mb-2" />
                       <div class="px-2">
                         <PrimeButton
                           label="Create New"

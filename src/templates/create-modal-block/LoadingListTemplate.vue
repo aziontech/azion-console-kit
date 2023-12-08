@@ -1,5 +1,5 @@
 <template>
- <Skeleton class="w-52 h-8 rounded mt-4 mb-3" />
+  <Skeleton class="w-52 h-8 rounded mt-4 mb-3" />
   <div class="mx-0 w-full mt-0 grid grid-cols-1 lg:grid-cols-2 2xl:grid-cols-3 gap-4">
     <PrimeButton
       v-for="item of 8"

@@ -173,7 +173,7 @@
     } catch (error) {
       $toast.add({ ...ERROR_PROPS, summary: error })
     } finally {
-      loading.value = true
+      loading.value = false
     }
   }
 
@@ -258,11 +258,12 @@
   })
 
   const categoriesList = computed(() => {
-    const mapped = categories.value.map((i) => ({
+    let mapped = categories.value.map((i) => ({
       name: i.name,
       code: i.slug,
       total: i.solutionsCount
     }))
+    mapped = mapped.filter((i) => i.total > 0)
 
     return mapped.length ? [CATEGORY_ALL, ...mapped] : []
   })
