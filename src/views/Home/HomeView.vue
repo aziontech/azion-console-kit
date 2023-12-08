@@ -7,14 +7,14 @@
           v-if="showExperimental"
           class="w-full p-3 surface-border border rounded-md flex flex-col gap-4 justify-between items-center sm:flex-row sm:p-8 lg:gap-10"
         >
-          <p class="text-color-secondary w-full max-w-screen-lg	 ">
+          <p class="text-color-secondary w-full max-w-screen-lg sm:max-w-6xl">
             {{ disclaimer }}
           </p>
           <PrimeButton
             type="button"
             label="Add payment method"
             outlined
-            class="w-full sm:w-auto"
+            class="w-full sm:min-w-[10rem] sm:max-w-[10rem]"
             size="small"
             @click="navigateToPayment"
           />
