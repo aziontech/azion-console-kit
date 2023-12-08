@@ -120,7 +120,8 @@ export const intelligentDnsRoutes = {
       component: () => import('@views/IntelligentDNS/EditRecordsView.vue'),
       props: {
         editRecordsService: IntelligentDNSRecordsService.editRecordsService,
-        loadRecordsService: IntelligentDNSRecordsService.loadRecordsService
+        loadRecordsService: IntelligentDNSRecordsService.loadRecordsService,
+        updatedRedirect: '/intelligent-dns/edit/:intelligentDNSId/records'
       },
       meta: {
         breadCrumbs: [

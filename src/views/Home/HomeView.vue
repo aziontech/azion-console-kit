@@ -130,70 +130,7 @@
             class="flex flex-col lg:flex-row justify-between gap-3 sm:gap-6"
             @submit.prevent="handleSubmit"
           >
-            <!-- Input Name -->
-            <div class="flex flex-col w-full gap-2">
-              <label
-                for="name"
-                class="text-color text-sm font-medium"
-                >Name</label
-              >
-              <InputText
-                v-model="name"
-                id="name"
-                type="text"
-                :class="{ 'p-invalid': errors.name }"
-              />
-              <small
-                v-if="errors.name"
-                class="p-error text-xs font-normal leading-tight"
-                >{{ errors.name }}</small
-              >
-            </div>
-
-            <!-- Input Email -->
-            <div class="flex flex-col w-full gap-2">
-              <label
-                for="email"
-                class="text-color text-sm font-medium"
-                >Email</label
-              >
-              <InputText
-                v-model="email"
-                id="email"
-                type="text"
-                :class="{ 'p-invalid': errors.email }"
-              />
-              <small
-                v-if="errors.email"
-                class="p-error text-xs font-normal leading-tight"
-                >{{ errors.email }}</small
-              >
-            </div>
-
-            <!-- Input Team -->
-            <div class="flex flex-col w-full gap-2">
-              <label
-                for="team"
-                class="text-color text-sm font-medium"
-                >Team</label
-              >
-              <Dropdown
-                id="team"
-                :class="{ 'p-invalid': errors.team }"
-                v-model="team"
-                :options="teams"
-                optionLabel="label"
-                optionValue="value"
-                class="w-full"
-                placeholder="Select a team"
-              />
-              <small
-                v-if="errors.team"
-                class="p-error text-xs font-normal leading-tight"
-                >{{ errors.team }}</small
-              >
-            </div>
-
+            <FormFieldsHome :teams="teams"></FormFieldsHome>
             <div class="mt-auto lg:mt-7">
               <PrimeButton
                 severity="secondary"
@@ -249,20 +186,18 @@
 
 <script>
   import PrimeButton from 'primevue/button'
-  import InputText from 'primevue/inputtext'
-  import Dropdown from 'primevue/dropdown'
-  import { useField, useForm } from 'vee-validate'
+  import { useForm } from 'vee-validate'
   import * as yup from 'yup'
   import ContentBlock from '@/templates/content-block'
+  import FormFieldsHome from './FormFields/FormFieldsHome.vue'
   import { useCreateModalStore } from '@/stores/create-modal'
 
   export default {
     name: 'home-view',
     components: {
       PrimeButton,
-      InputText,
-      Dropdown,
-      ContentBlock
+      ContentBlock,
+      FormFieldsHome
     },
     props: {
       listTeamsService: {
@@ -336,12 +271,11 @@
         this.resetForm()
         this.showToast('success', feedback)
       },
-      showToast(severity, summary, life = 10000) {
+      showToast(severity, summary) {
         this.$toast.add({
-          closable: false,
+          closable: true,
           severity: severity,
-          summary: summary,
-          life: life
+          summary: summary
         })
       },
       closeInviteSession() {
@@ -359,18 +293,10 @@
       })
 
       const { errors, meta, resetForm, values } = useForm({
-        validationSchema,
-        initialValues: {}
+        validationSchema
       })
 
-      const { value: name } = useField('name')
-      const { value: email } = useField('email')
-      const { value: team } = useField('team')
-
       return {
-        name,
-        email,
-        team,
         validationSchema,
         errors,
         meta,

@@ -12,6 +12,7 @@
     :show-close-icon="false"
     :pt="{
       root: { class: '!h-[90%] md:hidden' },
+      headerContent: { class: 'w-full' },
       mask: { class: 'md:hidden' }
     }"
   >

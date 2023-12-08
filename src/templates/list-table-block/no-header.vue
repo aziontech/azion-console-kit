@@ -13,7 +13,6 @@
         :rows="minimumOfItemsPerPage"
         :globalFilterFields="filterBy"
         :loading="isLoading"
-        v-model:selection="selectedRow"
         selectionMode="single"
         @row-click="editItemSelected"
       >
@@ -27,13 +26,15 @@
                 placeholder="Search"
               />
             </span>
-            <PrimeButton
-              class="max-sm:w-full"
-              @click="navigateToAddPage"
-              icon="pi pi-plus"
-              :label="addButtonLabel"
-              v-if="addButtonLabel"
-            />
+            <slot name="addButton">
+              <PrimeButton
+                class="max-sm:w-full"
+                @click="navigateToAddPage"
+                icon="pi pi-plus"
+                :label="addButtonLabel"
+                v-if="addButtonLabel"
+              />
+            </slot>
           </div>
         </template>
 
@@ -168,27 +169,24 @@
           }
         ]
       },
-      pageTitle: {
-        type: String,
-        required: true
-      },
       pageTitleDelete: {
         type: String,
         required: true
       },
       createPagePath: {
         type: String,
-        required: true,
+        default: () => '/'
+      },
+      editInDrawer: {
+        type: Function,
         default: () => '/'
       },
       editPagePath: {
         type: String,
-        required: true,
         default: () => '/'
       },
       addButtonLabel: {
         type: String,
-        required: true,
         default: () => ''
       },
       authorizeNode: {
@@ -240,11 +238,11 @@
           const data = await this.listService({ page })
           this.data = data
         } catch (error) {
+          this.data = []
           this.$toast.add({
-            closable: false,
+            closable: true,
             severity: 'error',
-            summary: error,
-            life: 10000
+            summary: error
           })
         } finally {
           this.isLoading = false
@@ -258,6 +256,10 @@
         this.$refs.menu.toggle(event)
       },
       editItemSelected({ data: item }) {
+        if (this.editInDrawer) {
+          this.editInDrawer(item)
+          return
+        }
         this.$router.push({ path: `${this.editPagePath}/${item.id}` })
       },
       authorizeEdgeNode() {

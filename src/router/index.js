@@ -22,6 +22,7 @@ import { passwordRoutes } from '@routes/password-routes'
 import { activityHistoryRoutes } from '@routes/activity-history-routes'
 import { errorRoutes } from '@routes/error-routes'
 import { playgroundRoutes } from '@routes/playground-routes'
+import { createNewRoutes } from '@routes/create-new-routes'
 import { mfaRoutes } from '@routes/mfa-routes'
 import { signupRoutes } from '@routes/signup-routes'
 import { marketplaceRoutes } from '@routes/marketplace-routes'
@@ -49,6 +50,7 @@ const router = createRouter({
     usersListsRoutes,
     passwordRoutes,
     playgroundRoutes,
+    createNewRoutes,
     mfaRoutes,
     activityHistoryRoutes,
     realTimePurgeRoutes,

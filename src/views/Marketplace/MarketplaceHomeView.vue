@@ -18,7 +18,7 @@
       <div class="w-full flex flex-col md:flex-row gap-6 lg:gap-8">
         <!-- Sidebar -->
         <div
-          class="flex flex-col md:flex-shrink-0 gap-8 px-3 pt-8 pb-0 sm:px-8 w-full md:w-80 md:sticky md:top-10 self-start"
+          class="flex flex-col md:flex-shrink-0 gap-8 px-3 pt-8 pb-0 sm:px-8 w-full md:w-80 md:sticky md:top-14 self-start"
         >
           <!-- Search -->
           <div class="flex flex-col w-full gap-3">
@@ -49,7 +49,6 @@
                 option-label="name"
                 class="w-full md:w-14rem border-none sm:min-w-[12rem]"
                 :pt="{
-                  item: { class: 'text-sm py-2 px-3' },
                   list: { class: 'p-0' }
                 }"
               >
@@ -58,7 +57,7 @@
                 </template>
                 <template #option="slotProps">
                   <div class="flex align-items-center justify-between">
-                    <div>{{ slotProps.option.name }}</div>
+                    <div class="mr-2">{{ slotProps.option.name }}</div>
                     <Badge
                       v-if="slotProps.option.code !== 'all'"
                       :value="slotProps.option.total"
@@ -141,8 +140,7 @@
   const PAGE_TYPE = 'marketplace'
   const ERROR_PROPS = {
     closable: true,
-    severity: 'error',
-    life: 10000
+    severity: 'error'
   }
   const CATEGORY_ALL = { name: 'All', code: 'all' }
 

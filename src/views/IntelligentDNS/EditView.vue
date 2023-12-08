@@ -27,76 +27,20 @@
             v-if="showEditFormWithActionTab"
             :editService="editIntelligentDNSService"
             :loadService="loadIntelligentDNSService"
-            :initialDataSetter="setValues"
-            :formData="values"
-            :formMeta="meta"
+            :schema="validationSchema"
             :updatedRedirect="updatedRedirect"
+            :isTabs="true"
           >
             <template #form>
-              <FormHorizontal
-                title="General"
-                description="Description"
-              >
-                <template #inputs>
-                  <div class="flex flex-col sm:max-w-lg w-full gap-2">
-                    <label
-                      for="name"
-                      class="text-color text-base font-medium"
-                      >Name *</label
-                    >
-                    <InputText
-                      v-model="name"
-                      id="name"
-                      type="text"
-                      :class="{ 'p-invalid': errors.name }"
-                    />
-                    <small
-                      v-if="errors.name"
-                      class="p-error text-xs font-normal leading-tight"
-                      >{{ errors.name }}</small
-                    >
-                  </div>
-                </template>
-              </FormHorizontal>
-              <FormHorizontal
-                title="Title Section"
-                description="Description"
-              >
-                <template #inputs>
-                  <div class="flex flex-col sm:max-w-lg w-full gap-2">
-                    <label
-                      for="domain"
-                      class="text-color text-base font-medium"
-                      >Domain *</label
-                    >
-                    <InputText
-                      id="domain"
-                      v-model="domain"
-                      type="text"
-                      :class="{ 'p-invalid': errors.domain }"
-                    />
-                    <small
-                      v-if="errors.domain"
-                      class="p-error text-xs font-normal leading-tight"
-                      >{{ errors.domain }}</small
-                    >
-                  </div>
-                </template>
-              </FormHorizontal>
-              <FormHorizontal
-                title="Status"
-                description="Description"
-              >
-                <template #inputs>
-                  <div class="flex gap-3 items-center">
-                    <label for="">Active</label>
-                    <InputSwitch
-                      v-model="isActive"
-                      :class="{ 'p-invalid': errors.isActive }"
-                    />
-                  </div>
-                </template>
-              </FormHorizontal>
+              <FormFieldsIntelligentDnsCreate></FormFieldsIntelligentDnsCreate>
+            </template>
+            <template #action-bar="{ onSubmit, formValid, onCancel, loading }">
+              <ActionBarTemplate
+                @onSubmit="onSubmit"
+                @onCancel="onCancel"
+                :loading="loading"
+                :submitDisabled="!formValid"
+              />
             </template>
           </EditFormBlock>
         </TabPanel>
@@ -134,19 +78,18 @@
 
 <script>
   import { useIntelligentDNSStore } from '@/stores/intelligent-dns'
-  import EditFormBlock from '@templates/edit-form-block-new/no-header'
-  import FormHorizontal from '@templates/create-form-block-new/form-horizontal'
+  import EditFormBlock from '@templates/edit-form-block'
   import PageHeadingBlock from '@templates/page-heading-block'
   import ListTableBlock from '@templates/list-table-block/no-header'
   import ContentBlock from '@/templates/content-block'
   import TabView from 'primevue/tabview'
   import TabPanel from 'primevue/tabpanel'
-  import InputText from 'primevue/inputtext'
   import PrimeButton from 'primevue/button'
-  import InputSwitch from 'primevue/inputswitch'
-  import { useForm, useField } from 'vee-validate'
   import EmptyResultsBlock from '@/templates/empty-results-block'
   import Illustration from '@/assets/svg/illustration-layers.vue'
+  import FormFieldsIntelligentDnsCreate from './FormFields/FormFieldsIntelligentDns.vue'
+  import ActionBarTemplate from '@/templates/action-bar-block/action-bar-with-teleport'
+
   import * as yup from 'yup'
 
   export default {
@@ -155,15 +98,14 @@
       EditFormBlock,
       TabView,
       TabPanel,
-      InputText,
-      InputSwitch,
       ListTableBlock,
-      FormHorizontal,
       PageHeadingBlock,
       PrimeButton,
       ContentBlock,
       EmptyResultsBlock,
-      Illustration
+      Illustration,
+      ActionBarTemplate,
+      FormFieldsIntelligentDnsCreate
     },
 
     props: {
@@ -190,25 +132,11 @@
         isActive: yup.boolean().required()
       })
 
-      const { errors, meta, values, setValues } = useForm({
-        validationSchema
-      })
-
-      const { value: name } = useField('name')
-      const { value: domain } = useField('domain')
-      const { value: isActive } = useField('isActive')
-
       const intelligentDNSStore = useIntelligentDNSStore()
 
       return {
-        errors,
-        meta,
-        values,
-        name,
-        domain,
-        isActive,
-        setValues,
         hasContentToList,
+        validationSchema,
         recordListColumns: [
           {
             field: 'name',
@@ -280,10 +208,9 @@
       handleCopyNameServers() {
         this.clipboardWrite('ns1.aziondns.net;ns2.aziondns.com;ns3.aziondns.org')
         this.$toast.add({
-          closable: false,
+          closable: true,
           severity: 'success',
-          summary: 'Nameservers copied',
-          life: 10000
+          summary: 'Nameservers copied'
         })
       },
       handleLoadData(event) {

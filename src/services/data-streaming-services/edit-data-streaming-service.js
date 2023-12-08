@@ -15,15 +15,21 @@ export const editDataStreamingService = async (payload) => {
 const adapt = (payload) => {
   const allDomains = payload.domains[1].length <= 0
 
-  return {
+  const parsedPayload = {
     name: payload.name,
     template_id: payload.template,
     data_source: payload.dataSource,
     domain_ids: allDomains ? [] : getDomains(payload.domains[1]),
-    all_domains: allDomains ? true : false,
+    all_domains: allDomains,
     active: payload.status,
     endpoint: getEndpoint(payload)
   }
+
+  if (payload.hasSampling) {
+    parsedPayload.sampling_percentage = payload.samplingPercentage
+  }
+
+  return parsedPayload
 }
 
 const getEndpoint = (payload) => {
@@ -33,7 +39,7 @@ const getEndpoint = (payload) => {
         endpoint_type: 'standard',
         url: payload.endpointUrl,
         payload_format: payload.payloadFormat,
-        log_line_separator: payload.lineSeparator,
+        log_line_separator: payload.lineSeparator === '\\n' ? '\n' : payload.lineSeparator,
         max_size: payload.maxSize,
         headers: getHeaders(payload.headers)
       }
@@ -161,6 +167,9 @@ const extractErrorKey = (errorSchema, key) => {
  * @returns {string} The result message based on the status code.
  */
 const extractApiError = (httpResponse) => {
+  // flag
+  const noFlagError = extractErrorKey(httpResponse.body, 'user_has_no_flag')
+
   // standard
   const invalidURLError = extractErrorKey(httpResponse.body, 'invalid_url')
   const maxSizeError = extractErrorKey(httpResponse.body, 'max_size_out_of_range')
@@ -188,6 +197,7 @@ const extractApiError = (httpResponse) => {
   const datadogInvalidURLError = extractErrorKey(httpResponse.body, 'invalid_datadog_url')
 
   const errorMessages = [
+    noFlagError,
     invalidURLError,
     maxSizeError,
     datasetError,

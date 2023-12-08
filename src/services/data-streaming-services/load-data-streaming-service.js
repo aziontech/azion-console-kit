@@ -25,6 +25,7 @@ const adapt = async (httpResponse) => {
     status: payload.active,
     domains,
     endpoint: payload.endpoint.endpoint_type,
+    samplingPercentage: payload.sampling_percentage,
     ...getInfoByEndpoint(payload)
   }
 
@@ -40,7 +41,10 @@ const getInfoByEndpoint = (payload) => {
       return {
         endpointUrl: payload.endpoint.url,
         payloadFormat: payload.endpoint.payload_format,
-        lineSeparator: payload.endpoint.log_line_separator,
+        lineSeparator:
+          payload.endpoint.log_line_separator === '\n'
+            ? '\\n'
+            : payload.endpoint.log_line_separator,
         maxSize: payload.endpoint.max_size,
         ...getHeaders(payload)
       }

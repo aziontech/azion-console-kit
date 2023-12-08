@@ -42,12 +42,12 @@ describe('IntelligentDnsRecordsServices', () => {
       url: `intelligent_dns/${fixtures.dnsRecordMock.intelligentDNSID}/records`,
       method: 'POST',
       body: {
-        record_type: fixtures.dnsRecordMock.selectedRecordType._value,
+        record_type: fixtures.dnsRecordMock.selectedRecordType,
         entry: fixtures.dnsRecordMock.name,
         answers_list: [fixtures.dnsRecordMock.value],
         ttl: fixtures.dnsRecordMock.ttl,
         description: fixtures.dnsRecordMock.description,
-        policy: fixtures.dnsRecordMock.selectedPolicy._value,
+        policy: fixtures.dnsRecordMock.selectedPolicy,
         weight: fixtures.dnsRecordMock.weight
       }
     })

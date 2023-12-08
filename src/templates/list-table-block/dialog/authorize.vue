@@ -57,7 +57,7 @@
       async authorizeEdgeNode() {
         try {
           this.$toast.add({
-            closable: false,
+            closable: true,
             severity: 'info',
             summary: 'Processing request',
             life: 2000
@@ -65,17 +65,15 @@
           await EdgeNodeService.authorizeEdgeNodeService(this.authorize.edgeNodeID)
         } catch (error) {
           this.$toast.add({
-            closable: false,
+            closable: true,
             severity: 'error',
-            summary: error,
-            life: 10000
+            summary: error
           })
         } finally {
           this.$toast.add({
-            closable: false,
+            closable: true,
             severity: 'success',
-            summary: 'Edge Nodes authorized successfully!',
-            life: 10000
+            summary: 'Edge Nodes authorized successfully!'
           })
           this.authorizeDialogVisible = false
         }

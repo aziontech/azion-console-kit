@@ -1,4 +1,6 @@
 import { listSolutionsService } from './list-solutions-service'
+import { loadSolutionService } from './load-solution-service'
 import { listCategoriesService } from './list-categories-service'
+import { launchSolutionService } from './launch-solution-service'
 
-export { listSolutionsService, listCategoriesService }
+export { loadSolutionService, listSolutionsService, listCategoriesService, launchSolutionService }

@@ -1,3 +1,37 @@
+<script setup>
+  import CreateFormBlock from '@/templates/create-form-block'
+  import ActionBarTemplate from '@/templates/action-bar-block/action-bar-with-teleport'
+  import ContentBlock from '@/templates/content-block'
+  import PageHeadingBlock from '@/templates/page-heading-block'
+  import FormCreateEdgeService from './FormFields/FormFieldsEdgeService.vue'
+  import * as yup from 'yup'
+
+  const props = defineProps({
+    createEdgeServiceServices: {
+      type: Function,
+      required: true
+    }
+  })
+
+  const validateCode = (val = '') => {
+    const split = val.split(/\s*\n+\s*/).filter((row) => !!row)
+    const isValid = split.every((row) => /^\w+\s*=[^]+$/.test(row))
+    return isValid
+  }
+
+  const validationSchema = yup.object({
+    name: yup.string().required().label('Name'),
+    active: yup.boolean(),
+    code: yup.string().test('formatInvalid', 'The format is invalid', validateCode)
+  })
+
+  const initialValues = {
+    name: '',
+    code: '',
+    active: true
+  }
+</script>
+
 <template>
   <ContentBlock>
     <template #heading>
@@ -5,64 +39,22 @@
     </template>
     <template #content>
       <CreateFormBlock
-        :createService="props.createEdgeService"
-        :formData="values"
-        :formMeta="meta"
-        :cleanFormCallback="resetForm"
+        :createService="props.createEdgeServiceServices"
+        :schema="validationSchema"
+        :initialValues="initialValues"
       >
         <template #form>
-          <FormHorizontal
-            title="Edge Service"
-            description="Espaço livre para descrição e instruções de preenchimento. Esse conteúdo deve ser criado pensando tanto em funcionalidade quanto em em alinhamento e estética. Devemos sempre criar os blocos conforme o contexto, cuidando sempre para não ter blocos muito longos."
-          >
-            <template #inputs>
-              <div class="flex flex-col sm:max-w-lg w-full gap-2">
-                <label
-                  for="name"
-                  class="text-color text-base font-medium"
-                  >Name *</label
-                >
-                <InputText
-                  placeholder="ex: X Edge Service "
-                  v-bind="name"
-                  type="text"
-                  :class="{ 'p-invalid': errors.name }"
-                />
-                <small
-                  v-if="errors.name"
-                  class="p-error text-xs font-normal leading-tight"
-                  >{{ errors.name }}</small
-                >
-              </div>
-            </template>
-          </FormHorizontal>
+          <FormCreateEdgeService />
+        </template>
+        <template #action-bar="{ onSubmit, formValid, onCancel, loading }">
+          <ActionBarTemplate
+            @onSubmit="onSubmit"
+            @onCancel="onCancel"
+            :loading="loading"
+            :submitDisabled="!formValid"
+          />
         </template>
       </CreateFormBlock>
     </template>
   </ContentBlock>
 </template>
-
-<script setup>
-  import CreateFormBlock from '@/templates/create-form-block-new'
-  import FormHorizontal from '@/templates/create-form-block-new/form-horizontal'
-  import InputText from 'primevue/inputtext'
-  import ContentBlock from '@/templates/content-block'
-  import PageHeadingBlock from '@/templates/page-heading-block'
-
-  import { useForm } from 'vee-validate'
-  import * as yup from 'yup'
-
-  const props = defineProps({
-    createEdgeService: {
-      type: Function,
-      required: true
-    }
-  })
-  const validationSchema = yup.object({
-    name: yup.string().required()
-  })
-  const { errors, defineInputBinds, meta, resetForm, values } = useForm({
-    validationSchema
-  })
-  const name = defineInputBinds('name', { validateOnInput: true })
-</script>

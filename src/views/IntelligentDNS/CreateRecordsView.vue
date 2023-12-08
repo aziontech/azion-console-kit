@@ -6,173 +6,20 @@
     <template #content>
       <CreateFormBlock
         :createService="props.createRecordsService"
-        :formData="formValues"
-        :formMeta="meta"
-        :cleanFormCallback="resetForm"
+        :schema="validationSchema"
+        :initialValues="initialValues"
+        @on-response="handleAfterCreate"
       >
         <template #form>
-          <FormHorizontal
-            title="General"
-            description="Espaço livre para descrição e instruções de preenchimento. Esse conteúdo deve ser criado pensando tanto em funcionalidade quanto em em alinhamento e estética. Devemos sempre criar os blocos conforme o contexto, cuidando sempre para não ter blocos muito longos."
-          >
-            <template #inputs>
-              <div class="flex flex-col sm:max-w-lg w-full gap-2">
-                <label
-                  for="name"
-                  class="text-color text-base font-medium"
-                  >Name *</label
-                >
-                <div class="p-inputgroup">
-                  <InputText
-                    v-bind="name"
-                    id="name"
-                    type="text"
-                    :class="{ 'p-invalid': errors.name }"
-                  />
-                  <span class="p-inputgroup-addon"> .{{ intelligentDNSStore.getDomain }} </span>
-                </div>
-
-                <small
-                  v-if="errors.name"
-                  class="p-error text-xs font-normal leading-tight"
-                  >{{ errors.name }}</small
-                >
-              </div>
-              <div class="flex flex-col sm:max-w-lg w-full gap-2">
-                <label
-                  for="type"
-                  class="text-color text-base font-medium"
-                  >Record Type *</label
-                >
-                <Dropdown
-                  v-model="selectedRecordType"
-                  :options="recordsTypes"
-                  optionLabel="label"
-                  id="type"
-                  optionValue="value"
-                  placeholder="Select a Record Type"
-                  :class="{ 'p-invalid': errors.type }"
-                  class="w-full"
-                />
-                <small
-                  v-if="errors.type"
-                  class="p-error text-xs font-normal leading-tight"
-                  >{{ errors.type }}</small
-                >
-              </div>
-              <div class="flex flex-col sm:max-w-lg w-full gap-2">
-                <label
-                  for="value"
-                  class="text-color text-base font-medium"
-                  >Value *</label
-                >
-                <Textarea
-                  rows="5"
-                  cols="30"
-                  placeholder="Value"
-                  v-bind="value"
-                  id="value"
-                  type="text"
-                  :class="{ 'p-invalid': errors.value }"
-                />
-                <small
-                  v-if="errors.value"
-                  class="p-error text-xs font-normal leading-tight"
-                  >{{ errors.value }}</small
-                >
-              </div>
-              <div class="flex flex-col sm:max-w-lg w-full gap-2">
-                <label
-                  for="ttl"
-                  class="text-color text-base font-medium"
-                  >TTL *</label
-                >
-                <InputText
-                  placeholder="TTL (seconds):"
-                  v-bind="ttl"
-                  id="ttl"
-                  type="number"
-                  :class="{ 'p-invalid': errors.ttl }"
-                />
-                <small
-                  v-if="errors.ttl"
-                  class="p-error text-xs font-normal leading-tight"
-                  >{{ errors.ttl }}</small
-                >
-              </div>
-
-              <div class="flex flex-col sm:max-w-lg w-full gap-2">
-                <label
-                  for="selectedPolicy"
-                  class="text-color text-base font-medium"
-                  >Policy *</label
-                >
-                <Dropdown
-                  v-model="selectedPolicy"
-                  :options="policyList"
-                  id="selectedPolicy"
-                  optionLabel="label"
-                  optionValue="value"
-                  placeholder="Select a Policy"
-                  :class="{ 'p-invalid': errors.selectedPolicy }"
-                  class="w-full"
-                />
-                <small
-                  v-if="errors.selectedPolicy"
-                  class="p-error text-xs font-normal leading-tight"
-                  >{{ errors.selectedPolicy }}</small
-                >
-              </div>
-              <div
-                class="flex flex-col sm:max-w-lg w-full gap-2"
-                v-if="isWeightedPolicy"
-              >
-                <label
-                  for="weight"
-                  class="text-color text-base font-medium"
-                  >Weight *</label
-                >
-                <InputText
-                  placeholder="Weight"
-                  v-bind="weight"
-                  id="weight"
-                  type="number"
-                  min="0"
-                  max="255"
-                  :class="{ 'p-invalid': errors.weight }"
-                  v-if="isWeightedPolicy"
-                />
-                <small
-                  v-if="errors.weight"
-                  class="p-error text-xs font-normal leading-tight"
-                  >{{ errors.weight }}</small
-                >
-              </div>
-
-              <div
-                class="flex flex-col sm:max-w-lg w-full gap-2"
-                v-if="isWeightedPolicy"
-              >
-                <label
-                  for="description"
-                  class="text-color text-base font-medium"
-                  >Description *</label
-                >
-                <InputText
-                  placeholder="add the description"
-                  v-bind="description"
-                  type="text"
-                  :class="{ 'p-invalid': errors.description }"
-                  v-if="isWeightedPolicy"
-                />
-                <small
-                  v-if="errors.description"
-                  class="p-error text-xs font-normal leading-tight"
-                  >{{ errors.description }}</small
-                >
-              </div>
-            </template>
-          </FormHorizontal>
+          <FormFieldsRecords></FormFieldsRecords>
+        </template>
+        <template #action-bar="{ onSubmit, formValid, onCancel, loading }">
+          <ActionBarTemplate
+            @onSubmit="onSubmit"
+            @onCancel="onCancel"
+            :loading="loading"
+            :submitDisabled="!formValid"
+          />
         </template>
       </CreateFormBlock>
     </template>
@@ -180,18 +27,12 @@
 </template>
 
 <script setup>
-  import { ref, watch } from 'vue'
-  import { useRoute } from 'vue-router'
-  import { useIntelligentDNSStore } from '@/stores/intelligent-dns'
-  import CreateFormBlock from '@templates/create-form-block-new'
-  import FormHorizontal from '@templates/create-form-block-new/form-horizontal'
-  import InputText from 'primevue/inputtext'
-  import Textarea from 'primevue/textarea'
-  import Dropdown from 'primevue/dropdown'
+  import { useRoute, useRouter } from 'vue-router'
+  import CreateFormBlock from '@templates/create-form-block'
   import ContentBlock from '@/templates/content-block'
   import PageHeadingBlock from '@templates/page-heading-block'
-
-  import { useField, useForm } from 'vee-validate'
+  import FormFieldsRecords from './FormFields/FormFieldsRecords.vue'
+  import ActionBarTemplate from '@/templates/action-bar-block/action-bar-with-teleport'
   import * as yup from 'yup'
 
   const props = defineProps({
@@ -201,27 +42,8 @@
     }
   })
 
+  const router = useRouter()
   const route = useRoute()
-  const intelligentDNSStore = useIntelligentDNSStore()
-
-  const recordsTypes = ref([
-    { label: 'A - IPv4 Address', value: 'A' },
-    { label: 'AAAA - IPv6 Address', value: 'AAAA' },
-    { label: 'ANAME - Maps a name to another name', value: 'ANAME' },
-    { label: 'CAA - Certification Authority Authorization', value: 'CAA' },
-    { label: 'CNAME - Canonical name', value: 'CNAME' },
-    { label: 'DS - Delegation Signer', value: 'DS' },
-    { label: 'MX - Mail exchange', value: 'MX' },
-    { label: 'NS - Name Servers', value: 'NS' },
-    { label: 'PTR - Reverse DNS lookup', value: 'PTR' },
-    { label: 'SRV - Location of server or service', value: 'SRV' },
-    { label: 'TXT - Text', value: 'TXT' }
-  ])
-
-  const policyList = ref([
-    { label: 'Simple', value: 'simple' },
-    { label: 'Weighted', value: 'weighted' }
-  ])
 
   //Validation Schema
   const validationSchema = yup.object({
@@ -229,36 +51,24 @@
     selectedRecordType: yup.string().required('Please select an option'),
     value: yup.string().required(),
     ttl: yup.number().required(),
-    selectedPolicy: yup.string().required('Please select an option'),
+    selectedPolicy: yup.string().required('Please select an option').default('simple'),
     weight: yup.number().required('Weight is a required field'),
-    description: yup.string()
+    description: yup.string(),
+    intelligentDNSID: yup.number()
   })
 
-  // validation with VeeValidate
-  const { errors, defineInputBinds, meta, resetForm, values } = useForm({
-    validationSchema,
-    initialValues: {
-      intelligentDNSID: route.params.id,
-      selectedRecordType: 'A',
-      ttl: 3600,
-      selectedPolicy: 'simple',
-      weight: '100'
-    }
-  })
+  const initialValues = {
+    name: '',
+    selectedRecordType: 'A',
+    value: '',
+    ttl: 3600,
+    selectedPolicy: 'simple',
+    weight: '100',
+    description: '',
+    intelligentDNSID: route.params.id
+  }
 
-  const name = defineInputBinds('name', { validateOnInput: true })
-  const { value: selectedPolicy } = useField('selectedPolicy')
-  const { value: selectedRecordType } = useField('selectedRecordType')
-  const value = defineInputBinds('value', { validateOnInput: true })
-  const ttl = defineInputBinds('ttl', { validateOnInput: true })
-  const weight = defineInputBinds('weight', { validateOnInput: true })
-  const description = defineInputBinds('description', { validateOnInput: true })
-
-  let formValues = { ...values, selectedRecordType, selectedPolicy }
-  let isWeightedPolicy = false
-
-  watch([selectedRecordType, selectedPolicy, values], () => {
-    formValues = { ...values, selectedRecordType, selectedPolicy }
-    isWeightedPolicy = selectedPolicy.value === 'weighted'
-  })
+  const handleAfterCreate = ({ urlToEditView }) => {
+    router.push(urlToEditView)
+  }
 </script>

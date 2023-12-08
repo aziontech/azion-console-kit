@@ -30,7 +30,7 @@ cd azion-platform-kit
 
 The webapp is now available on the following URL: http://localhost:5173
 
-PRO-TIP (OPTIONAL) - To save some time, you can create a personal token in [Azion Realtime Manager](https://manager.azion.com/iam/personal-tokens) and save it into file `.env.development`
+PRO-TIP (OPTIONAL) - To save some time, you can create a personal token in [Real Time Manager](https://manager.azion.com/iam/personal-tokens) and save it into file `.env.development`
 
 ```cmd
 echo 'VITE_PERSONAL_TOKEN=PERSONALTOKEN' > .env.development
@@ -93,7 +93,7 @@ Note: We are launching a new version of AzionCLI. Stay tuned for a new way to pu
 
 The top features include:
 
-1. **Multi-tenancy:** Build your Real Time Manager according to your needs by consuming the endpoints from our Public API: [Azion Public API](https://api.azion.com)
+1. **Multi-tenancy:** Build your Azion Console according to your needs by consuming the endpoints from our Public API: [Azion Public API](https://api.azion.com)
 2. **Customizable UI:** configure theme tokens or generate them automatically via [Builder](https://designer.primevue.org/) in your project, giving the look and feel according to your needs.
 3. **Simple structure:** layered separation of blocks, components and services so that it is easy to build a new route in a very short time.
 
