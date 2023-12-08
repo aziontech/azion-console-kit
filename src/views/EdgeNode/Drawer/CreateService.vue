@@ -57,7 +57,7 @@
   }
 
   const createService = async (payload) => {
-    return await ServiceEdgeNode.addServiceEdgeNodeService({
+    return await ServiceEdgeNode.createServiceEdgeNodeService({
       ...payload,
       id: props.edgeNodeId
     })

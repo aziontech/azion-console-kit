@@ -2,11 +2,12 @@ import * as Errors from '@/services/axios/errors'
 import { AxiosHttpClientAdapter } from '../axios/AxiosHttpClientAdapter'
 import { makeEdgeNodeBaseUrl } from '../edge-node-services/make-edge-node-base-url'
 
-export const editServiceEdgeNodeService = async (payload) => {
+export const createServiceEdgeNodeService = async (payload) => {
+  const { id } = payload
   const bodyRequest = adapt(payload)
   let httpResponse = await AxiosHttpClientAdapter.request({
-    url: `${makeEdgeNodeBaseUrl()}/${payload.id}/services/${payload.serviceId}`,
-    method: 'PATCH',
+    url: `${makeEdgeNodeBaseUrl()}/${id}/services`,
+    method: 'POST',
     body: bodyRequest
   })
   return parseHttpResponse(httpResponse)
@@ -25,27 +26,54 @@ const parseCodeToVariables = (code) => {
   return mapped
 }
 
-const adapt = ({ id, serviceId, name, variables }) => {
+const adapt = (payload) => {
+  const variables = parseCodeToVariables(payload.variables)
   return {
-    id,
-    service_id: serviceId,
-    service_name: name,
-    variables: parseCodeToVariables(variables)
+    service_id: payload.service.serviceId,
+    variables
   }
 }
 
 /**
+ * @param {Object} errorSchema - The error schema.
+ * @param {string} key - The error key of error schema.
+ * @returns {string|undefined} The result message based on the status code.
+ */
+const extractErrorKey = (errorSchema, key) => {
+  return errorSchema[key]?.[0]
+}
+
+/**
  * @param {Object} httpResponse - The HTTP response object.
+ * @param {Object} httpResponse.body - The response body.
+ * @returns {string} The result message based on the status code.
+ */
+const extractApiError = (httpResponse) => {
+  const apiValidationErros = extractErrorKey(httpResponse.body, 'errors')
+
+  const errorMessages = [apiValidationErros]
+  const errorMessage = errorMessages.find((error) => !!error)
+
+  return errorMessage
+}
+
+/**
+ * @param {Object} httpResponse - The HTTP response object.
+ * @param {Object} httpResponse.body - The response body.
  * @param {String} httpResponse.statusCode - The HTTP status code.
  * @returns {string} The result message based on the status code.
  * @throws {Error} If there is an error with the response.
  */
 const parseHttpResponse = (httpResponse) => {
   switch (httpResponse.statusCode) {
-    case 200:
-      return 'Your service on edge node has been updated'
+    case 201:
+      return {
+        feedback: `Service was added to an edge node`,
+        resource: httpResponse.body
+      }
     case 400:
-      throw new Errors.NotFoundError().message
+      const apiError = extractApiError(httpResponse)
+      throw new Error(apiError).message
     case 401:
       throw new Errors.InvalidApiTokenError().message
     case 403:

@@ -35,7 +35,7 @@ export const edgeNodeRoutes = {
         listGroupsEdgeNodeService: EdgeNodeService.listGroupsEdgeNodeService,
         listServiceEdgeNodeService: ServiceEdgeNode.listServiceEdgeNodeService,
         deleteServiceEdgeNodeService: ServiceEdgeNode.deleteServiceEdgeNodeService,
-        addServiceEdgeNodeService: ServiceEdgeNode.addServiceEdgeNodeService,
+        createServiceEdgeNodeService: ServiceEdgeNode.createServiceEdgeNodeService,
         loadServiceEdgeNodeService: ServiceEdgeNode.loadServiceEdgeNodeService,
         editServiceEdgeNodeService: ServiceEdgeNode.editServiceEdgeNodeService,
         documentationServiceServices: Helpers.documentationCatalog.edgeServices,

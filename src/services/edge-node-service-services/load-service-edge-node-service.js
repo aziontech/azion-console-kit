@@ -13,6 +13,7 @@ export const loadServiceEdgeNodeService = async ({ serviceId, id }) => {
 
 const adapt = (httpResponse, id) => {
   let variables = ''
+
   if (httpResponse.body.variables?.length) {
     variables = httpResponse.body.variables.map((obj) => `${obj.name}=${obj.value}`).join('\n')
   }
@@ -23,7 +24,6 @@ const adapt = (httpResponse, id) => {
       name: httpResponse.body.service_name,
       serviceId: httpResponse.body.service_id,
       id: httpResponse.body.id,
-      disabled: true
     },
     variables: variables
   }

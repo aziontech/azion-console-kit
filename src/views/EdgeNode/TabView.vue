@@ -13,7 +13,7 @@
     editEdgeNodeService: { type: Function, required: true },
     listGroupsEdgeNodeService: { type: Function, required: true },
     listServiceEdgeNodeService: { type: Function, required: true },
-    deleteServiceEdgeNodeService: { type: Function, required: true },    
+    deleteServiceEdgeNodeService: { type: Function, required: true },
     documentationServiceServices: { type: Function, required: true },
     updatedRedirect: { type: String, required: true }
   })
@@ -69,15 +69,13 @@
           </div>
         </TabPanel>
         <TabPanel header="Services">
-          <div class="mt-4">
-            <ListViewServices
-              v-if="activeTab"
-              :edgeNodeId="edgeNodeId"
-              :listServiceEdgeNodeService="props.listServiceEdgeNodeService"
-              :deleteServiceEdgeNodeService="props.deleteServiceEdgeNodeService"              
-              :documentationServiceServices="props.documentationServiceServices"
-            />
-          </div>
+          <ListViewServices
+            v-if="activeTab"
+            :edgeNodeId="edgeNodeId"
+            :listServiceEdgeNodeService="props.listServiceEdgeNodeService"
+            :deleteServiceEdgeNodeService="props.deleteServiceEdgeNodeService"
+            :documentationServiceServices="props.documentationServiceServices"
+          />
         </TabPanel>
       </TabView>
     </template>

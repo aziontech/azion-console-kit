@@ -66,7 +66,10 @@
     },
     {
       field: 'groups',
-      header: 'Group'
+      header: 'Group',
+      type: 'component',
+      component: (columnData) =>
+        columnBuilder({ data: columnData, columnAppearance: 'expand-column' })
     },
     {
       field: 'status',

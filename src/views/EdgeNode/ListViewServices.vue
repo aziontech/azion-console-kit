@@ -92,31 +92,35 @@
       @onSuccess="reloadList"
       @onCancel="visibleDrawer = false"
     />
-    <ListTableBlock
-      ref="listServiceEdgeNode"
+    <div
+      class="mt-4"
       v-if="hasContentToList"
-      :listService="listServicesWithDecorator"
-      :deleteService="deleteServicesWithDecorator"
-      :columns="getColumns"
-      createPagePath=""
-      addButtonLabel=""
-      pageTitleDelete="Edge Node Service"
-      :editInDrawer="openEditServiceDrawer"
-      @on-load-data="handleLoadData"
     >
-      <template #addButton>
-        <PrimeButton
-          icon="pi pi-plus"
-          label="Services"
-          @click="openCreateServiceDrawer"
-        />
-      </template>
-    </ListTableBlock>
+      <ListTableBlock
+        ref="listServiceEdgeNode"
+        :listService="listServicesWithDecorator"
+        :deleteService="deleteServicesWithDecorator"
+        :columns="getColumns"
+        createPagePath=""
+        addButtonLabel=""
+        pageTitleDelete="Edge Node Service"
+        :editInDrawer="openEditServiceDrawer"
+        @on-load-data="handleLoadData"
+      >
+        <template #addButton>
+          <PrimeButton
+            icon="pi pi-plus"
+            label="Services"
+            @click="openCreateServiceDrawer"
+          />
+        </template>
+      </ListTableBlock>
+    </div>
     <EmptyResultsBlock
       v-else
       title="No Services added."
       description="Create your first Service."
-      :documentationService="props.documentationServiceResource"
+      :documentationService="props.documentationServiceServices"
       :inTabs="true"
     >
       <template #default>
