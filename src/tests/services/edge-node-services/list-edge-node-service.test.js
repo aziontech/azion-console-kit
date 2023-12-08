@@ -57,7 +57,7 @@ describe('EdgeNodeServices', () => {
       {
         id: fixtures.edgeNodeMock.id,
         name: fixtures.edgeNodeMock.name,
-        groups: 'Group 1,Group 2',
+        groups: ['Group 1', 'Group 2'],
         hashId: fixtures.edgeNodeMock.hash_id,
         status: {
           content: 'active',
