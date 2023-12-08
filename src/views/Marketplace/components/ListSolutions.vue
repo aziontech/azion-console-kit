@@ -20,7 +20,7 @@
             />
           </div>
           <div class="flex flex-col">
-            <span class="text-color text-sm font-medium">
+            <span class="line-clamp-1 h-5 text-color text-sm font-medium">
               {{ solution.name }}
             </span>
             <span class="h-10 pb-4 text-sm font-normal text-color-secondary mt-1.5 line-clamp-2">
