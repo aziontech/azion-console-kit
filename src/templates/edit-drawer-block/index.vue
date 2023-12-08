@@ -13,7 +13,7 @@
   const props = defineProps({
     id: {
       type: String,
-      require: true
+      required: true
     },
     visible: {
       type: Boolean,
