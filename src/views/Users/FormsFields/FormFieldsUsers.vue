@@ -61,7 +61,7 @@
     const result = await props.listCountriesPhoneService()
     optionsCountriesMobile.value = result
     filteredCountriesMobile.value = [...optionsCountriesMobile.value]
-    selectedCountry.value = optionsCountriesMobile.value[0].value
+    selectedCountry.value = optionsCountriesMobile.value[0]
   }
 
   const fetchTimezone = async () => {
@@ -213,7 +213,6 @@
               filter
               :options="filteredCountriesMobile"
               optionLabel="label"
-              optionValue="value"
               placeholder="Loading..."
               :loading="!filteredCountriesMobile.length"
               :class="{ 'p-invalid': errorSelectedCountry }"
@@ -226,7 +225,7 @@
               v-model="mobile"
               class="w-full"
               mask="?99999999999999999999"
-              :class="{ 'p-invalid': errorMobile && !selectedCountry }"
+              :class="{ 'p-invalid': errorMobile || !selectedCountry }"
             />
           </div>
         </div>
