@@ -31,7 +31,13 @@ export default mergeConfig(
         statements: 81,
         branches: 90,
         functions: 81,
-        lines: 81
+        lines: 81,
+        reporter: ['lcov'],
+        reportsDirectory: './coverage'
+      },
+      reporters: ['vitest-sonar-reporter'],
+      outputFile: {
+        'vitest-sonar-reporter': './coverage/sonar-report.xml',
       },
       testTimeout: 10000
     }
