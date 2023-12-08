@@ -11,11 +11,11 @@
     >
       <div class="flex flex-col w-full h-full justify-between gap-3.5 items-start">
         <div class="flex w-full gap-3.5 flex-col">
-          <div class="w-10 h-10 rounded bg-gray-200"></div>
+          <div class="w-10 h-10 rounded surface-200"></div>
           <div class="flex p-0.5 flex-col gap-1.5">
-            <div class="max-w-[12rem] h-5 rounded bg-gray-200"></div>
-            <div class="max-w-[15rem] h-5 rounded bg-gray-200"></div>
-            <div class="max-w-[8rem] h-5 rounded bg-gray-200"></div>
+            <div class="max-w-[12rem] h-5 rounded surface-200"></div>
+            <div class="max-w-[15rem] h-5 rounded surface-200"></div>
+            <div class="max-w-[8rem] h-5 rounded surface-200"></div>
           </div>
         </div>
       </div>
