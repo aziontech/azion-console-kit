@@ -6,13 +6,13 @@
         :closable="false"
         :pt="{
           root: { class: 'mx-3 sm:mx-8 mt-4' },
-          wrapper: { class: 'py-3 px-8 ' }
+          wrapper: { class: 'py-3 px-3 sm:px-8 items-start sm:items-center' }
         }"
       >
         <template #messageicon>
           <Avatar
             icon="pi pi-exclamation-triangle"
-            class="bg-yellow-600 bg-opacity-20 text-yellow-600 mr-2 min-w-[32px]"
+            class="bg-yellow-600 bg-opacity-20 text-yellow-600 mr-2 min-w-[2rem]"
           />
         </template>
         <p class="text-color-secondary">
