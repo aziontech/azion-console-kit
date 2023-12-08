@@ -45,6 +45,14 @@
   })
   const loading = ref(false)
 
+  const disableEdit = computed(() => {
+    return !meta.value.valid || loading.value
+  })
+
+  const isLoading = computed(() => {
+    return isSubmitting.value || loading.value
+  })
+
   const visibleDrawer = computed({
     get: () => props.visible,
     set: (value) => {
@@ -125,8 +133,8 @@
       <ActionBarBlock
         @onCancel="closeDrawer"
         @onSubmit="onSubmit"
-        :loading="isSubmitting"
-        :submitDisabled="!meta.valid || loading"
+        :loading="isLoading"
+        :submitDisabled="disableEdit"
       />
     </div>
   </Sidebar>
