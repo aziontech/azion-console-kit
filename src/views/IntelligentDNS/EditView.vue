@@ -1,3 +1,215 @@
+<script setup>
+  import EditFormBlock from '@templates/edit-form-block'
+  import EditDrawerBlock from '@templates/edit-drawer-block'
+  import PageHeadingBlock from '@templates/page-heading-block'
+  import ListTableNoHeaderBlock from '@templates/list-table-block/no-header'
+  import FormFieldsRecords from './FormFields/FormFieldsRecords'
+  import CreateDrawerBlock from '@templates/create-drawer-block'
+  import ContentBlock from '@/templates/content-block'
+  import TabView from 'primevue/tabview'
+  import TabPanel from 'primevue/tabpanel'
+  import PrimeButton from 'primevue/button'
+  import EmptyResultsBlock from '@/templates/empty-results-block'
+  import Illustration from '@/assets/svg/illustration-layers.vue'
+  import FormFieldsIntelligentDnsCreate from './FormFields/FormFieldsIntelligentDns.vue'
+  import ActionBarTemplate from '@/templates/action-bar-block/action-bar-with-teleport'
+  import * as yup from 'yup'
+  import { useRoute, useRouter } from 'vue-router'
+  import { computed, onBeforeMount, ref, watch } from 'vue'
+  import { useToast } from 'primevue/usetoast'
+
+  const props = defineProps({
+    loadIntelligentDNSService: { type: Function, required: true },
+    editIntelligentDNSService: { type: Function, required: true },
+
+    listRecordsService: { type: Function, required: true },
+    deleteRecordsService: { type: Function, required: true },
+    loadRecordsService: { type: Function, required: true },
+    editRecordsService: { type: Function, required: true },
+
+    clipboardWrite: { type: Function, required: true },
+    updatedRedirect: { type: String, required: true },
+    documentationService: { type: Function, required: true },
+    createRecordsService: {
+      type: Function,
+      required: true
+    }
+  })
+
+  const route = useRoute()
+  const router = useRouter()
+  const toast = useToast()
+  const hasContentToList = ref(true)
+  const showCreateRecordDrawer = ref(false)
+  const showEditRecordDrawer = ref(false)
+  const listIDNSResourcesRef = ref('')
+  const intelligentDNSID = ref(0)
+  const activeTab = ref(0)
+  const selectedIdnsRecordToEdit = ref(0)
+  const recordListColumns = ref([
+    {
+      field: 'name',
+      header: 'Name'
+    },
+    {
+      field: 'type',
+      header: 'Type'
+    },
+    {
+      field: 'value',
+      header: 'Value'
+    },
+    {
+      field: 'ttl',
+      header: 'TTL'
+    },
+    {
+      field: 'policy',
+      header: 'Policy'
+    },
+    {
+      field: 'weight',
+      header: 'Weight'
+    },
+    {
+      field: 'description',
+      header: 'Description'
+    }
+  ])
+  const RECORD_TYPE_WITHOUT_TTL = 'ANAME'
+
+  const validationSchemaEditIDNS = yup.object({
+    name: yup.string().required(),
+    domain: yup
+      .string()
+      .required()
+      .test('valid-domain', 'Invalid domain', function (value) {
+        const domainRegex = /^(?:[-A-Za-z0-9]+\.)+[A-Za-z]{2,6}$/
+        return domainRegex.test(value)
+      }),
+    isActive: yup.boolean().required()
+  })
+
+  const validationSchemaIDNSRecords = yup.object({
+    name: yup.string().required(),
+    selectedRecordType: yup.string().required('Please select an option'),
+    value: yup.string().required(),
+    ttl: yup
+      .number()
+      .label('TTL')
+      .transform((value) => (Number.isNaN(value) ? null : value))
+      .when('selectedRecordType', {
+        is: RECORD_TYPE_WITHOUT_TTL,
+        then: (schema) => schema.notRequired(),
+        otherwise: (schema) => schema.min(0).max(3600).required()
+      }),
+    selectedPolicy: yup.string().required('Please select an option').default('simple'),
+    weight: yup.number().when('selectedPolicy', {
+      is: 'weighted',
+      then: (schema) => schema.required().label('Weight')
+    }),
+
+    description: yup.string().when('selectedPolicy', {
+      is: 'weighted',
+      then: (schema) => schema.required().label('Weight')
+    }),
+    intelligentDNSID: yup.number()
+  })
+  const initialValuesCreateRecords = {
+    name: '',
+    selectedRecordType: 'A',
+    value: '',
+    ttl: 3600,
+    selectedPolicy: 'simple',
+    weight: '100',
+    description: '',
+    intelligentDNSID: route.params.id
+  }
+
+  const reloadResourcesList = () => {
+    if (hasContentToList.value) {
+      listIDNSResourcesRef.value.reload()
+      return
+    }
+    hasContentToList.value = true
+  }
+
+  const listRecordsServiceIntelligentDNSDecorator = async (payload) => {
+    return await props.listRecordsService({ ...payload, id: intelligentDNSID.value })
+  }
+
+  const deleteRecordsServiceIntelligentDNSDecorator = async (recordID) => {
+    return await props.deleteRecordsService({
+      recordID: recordID,
+      intelligentDNSID: intelligentDNSID.value
+    })
+  }
+
+  const openCreateDrawerIDNSResource = () => {
+    showCreateRecordDrawer.value = true
+  }
+  const openEditDrawerIDNSResource = (event) => {
+    selectedIdnsRecordToEdit.value = event.id
+    showEditRecordDrawer.value = true
+  }
+
+  const renderTabByRouterPath = () => {
+    if (route.name === 'intelligent-dns-records') {
+      activeTab.value = 1
+    } else {
+      activeTab.value = 0
+    }
+  }
+
+  const changeRouteByClickingOnTab = (e) => {
+    if (e.index === 0) {
+      router.push({ name: 'edit-intelligent-dns', params: { id: intelligentDNSID.value } })
+    } else {
+      router.push({
+        name: 'intelligent-dns-records',
+        params: { id: intelligentDNSID.value }
+      })
+    }
+  }
+
+  const handleCopyNameServers = () => {
+    props.clipboardWrite('ns1.aziondns.net;ns2.aziondns.com;ns3.aziondns.org')
+    toast.add({
+      closable: true,
+      severity: 'success',
+      summary: 'Nameservers copied'
+    })
+  }
+
+  const handleLoadData = (event) => {
+    hasContentToList.value = event
+  }
+
+  const showEditFormWithActionTab = computed(() => {
+    return activeTab.value === 0
+  })
+
+  const loadRecordServiceWithIDNSIdDecorator = async (payload) => {
+    return await props.loadRecordsService({
+      id: payload.id,
+      intelligentDNSId: intelligentDNSID.value
+    })
+  }
+
+  const editRecordServiceWithIDNSIdDecorator = async (payload) => {
+    return await props.editRecordsService({ intelligentDNSId: intelligentDNSID.value, ...payload })
+  }
+
+  watch(route, () => {
+    renderTabByRouterPath()
+  })
+
+  onBeforeMount(() => {
+    intelligentDNSID.value = route.params.id
+    renderTabByRouterPath()
+  })
+</script>
+
 <template>
   <ContentBlock>
     <template #heading>
@@ -24,10 +236,9 @@
       >
         <TabPanel header="Main Settings">
           <EditFormBlock
-            v-if="showEditFormWithActionTab"
             :editService="editIntelligentDNSService"
             :loadService="loadIntelligentDNSService"
-            :schema="validationSchema"
+            :schema="validationSchemaEditIDNS"
             :updatedRedirect="updatedRedirect"
             :isTabs="true"
           >
@@ -36,6 +247,7 @@
             </template>
             <template #action-bar="{ onSubmit, formValid, onCancel, loading }">
               <ActionBarTemplate
+                v-if="showEditFormWithActionTab"
                 @onSubmit="onSubmit"
                 @onCancel="onCancel"
                 :loading="loading"
@@ -45,17 +257,26 @@
           </EditFormBlock>
         </TabPanel>
         <TabPanel header="Records">
-          <ListTableBlock
+          <ListTableNoHeaderBlock
+            ref="listIDNSResourcesRef"
             v-if="hasContentToList"
             pageTitleDelete="Record"
             addButtonLabel="Record"
-            createPagePath="records/create"
-            editPagePath="records/edit"
+            :editInDrawer="openEditDrawerIDNSResource"
             :columns="recordListColumns"
             :listService="listRecordsServiceIntelligentDNSDecorator"
             :deleteService="deleteRecordsServiceIntelligentDNSDecorator"
             @on-load-data="handleLoadData"
-          />
+          >
+            <template #addButton>
+              <PrimeButton
+                icon="pi pi-plus"
+                label="Record"
+                @click="openCreateDrawerIDNSResource"
+              />
+            </template>
+          </ListTableNoHeaderBlock>
+
           <EmptyResultsBlock
             v-else
             title="No record added"
@@ -65,171 +286,50 @@
             :documentationService="documentationService"
             :inTabs="true"
           >
+            <template #default>
+              <PrimeButton
+                severity="secondary"
+                icon="pi pi-plus"
+                label="Add Record"
+                @click="openCreateDrawerIDNSResource"
+              />
+            </template>
             <template #illustration>
               <Illustration />
             </template>
           </EmptyResultsBlock>
+
+          <CreateDrawerBlock
+            v-if="showCreateRecordDrawer"
+            v-model:visible="showCreateRecordDrawer"
+            :createService="createRecordsService"
+            :schema="validationSchemaIDNSRecords"
+            :initialValues="initialValuesCreateRecords"
+            @onSuccess="reloadResourcesList"
+            title="Create Intelligent DNS Record"
+          >
+            <template #formFields>
+              <FormFieldsRecords></FormFieldsRecords>
+            </template>
+          </CreateDrawerBlock>
+
+          <EditDrawerBlock
+            v-if="showEditRecordDrawer"
+            :id="selectedIdnsRecordToEdit"
+            v-model:visible="showEditRecordDrawer"
+            :loadService="loadRecordServiceWithIDNSIdDecorator"
+            :editService="editRecordServiceWithIDNSIdDecorator"
+            :schema="validationSchemaIDNSRecords"
+            @onSuccess="reloadResourcesList"
+            title="Edit Intelligent DNS Record"
+          >
+            <template #formFields>
+              <FormFieldsRecords></FormFieldsRecords>
+            </template>
+          </EditDrawerBlock>
         </TabPanel>
       </TabView>
       <router-view></router-view>
     </template>
   </ContentBlock>
 </template>
-
-<script>
-  import { useIntelligentDNSStore } from '@/stores/intelligent-dns'
-  import EditFormBlock from '@templates/edit-form-block'
-  import PageHeadingBlock from '@templates/page-heading-block'
-  import ListTableBlock from '@templates/list-table-block/no-header'
-  import ContentBlock from '@/templates/content-block'
-  import TabView from 'primevue/tabview'
-  import TabPanel from 'primevue/tabpanel'
-  import PrimeButton from 'primevue/button'
-  import EmptyResultsBlock from '@/templates/empty-results-block'
-  import Illustration from '@/assets/svg/illustration-layers.vue'
-  import FormFieldsIntelligentDnsCreate from './FormFields/FormFieldsIntelligentDns.vue'
-  import ActionBarTemplate from '@/templates/action-bar-block/action-bar-with-teleport'
-
-  import * as yup from 'yup'
-
-  export default {
-    name: 'edit-intelligent-dns-view',
-    components: {
-      EditFormBlock,
-      TabView,
-      TabPanel,
-      ListTableBlock,
-      PageHeadingBlock,
-      PrimeButton,
-      ContentBlock,
-      EmptyResultsBlock,
-      Illustration,
-      ActionBarTemplate,
-      FormFieldsIntelligentDnsCreate
-    },
-
-    props: {
-      loadIntelligentDNSService: { type: Function, required: true },
-      editIntelligentDNSService: { type: Function, required: true },
-      listRecordsService: { type: Function, required: true },
-      deleteRecordsService: { type: Function, required: true },
-      clipboardWrite: { type: Function, required: true },
-      updatedRedirect: { type: String, required: true },
-      documentationService: { type: Function, required: true }
-    },
-
-    data: () => {
-      const hasContentToList = true
-      const validationSchema = yup.object({
-        name: yup.string().required(),
-        domain: yup
-          .string()
-          .required()
-          .test('valid-domain', 'Invalid domain', function (value) {
-            const domainRegex = /^(?:[-A-Za-z0-9]+\.)+[A-Za-z]{2,6}$/
-            return domainRegex.test(value)
-          }),
-        isActive: yup.boolean().required()
-      })
-
-      const intelligentDNSStore = useIntelligentDNSStore()
-
-      return {
-        hasContentToList,
-        validationSchema,
-        recordListColumns: [
-          {
-            field: 'name',
-            header: 'Name'
-          },
-          {
-            field: 'type',
-            header: 'Type'
-          },
-          {
-            field: 'value',
-            header: 'Value'
-          },
-          {
-            field: 'ttl',
-            header: 'TTL'
-          },
-          {
-            field: 'policy',
-            header: 'Policy'
-          },
-          {
-            field: 'weight',
-            header: 'Weight'
-          },
-          {
-            field: 'description',
-            header: 'Description'
-          }
-        ],
-        intelligentDNSStore,
-        intelligentDNSID: 0,
-        activeTab: 0
-      }
-    },
-
-    created() {
-      this.intelligentDNSID = this.$route.params.id
-      this.renderTabCurrentRouter()
-    },
-
-    methods: {
-      async listRecordsServiceIntelligentDNSDecorator(payload) {
-        return await this.listRecordsService({ ...payload, id: this.intelligentDNSID })
-      },
-      async deleteRecordsServiceIntelligentDNSDecorator(recordID) {
-        return await this.deleteRecordsService({
-          recordID: recordID,
-          intelligentDNSID: this.intelligentDNSID
-        })
-      },
-      renderTabCurrentRouter() {
-        if (this.$route.name === 'intelligent-dns-records') {
-          this.activeTab = 1
-        } else {
-          this.activeTab = 0
-        }
-      },
-      changeRouteByClickingOnTab(e) {
-        if (e.index === 0) {
-          this.$router.push({ name: 'edit-intelligent-dns', params: { id: this.intelligentDNSID } })
-        } else {
-          this.$router.push({
-            name: 'intelligent-dns-records',
-            params: { id: this.intelligentDNSID }
-          })
-        }
-      },
-      handleCopyNameServers() {
-        this.clipboardWrite('ns1.aziondns.net;ns2.aziondns.com;ns3.aziondns.org')
-        this.$toast.add({
-          closable: true,
-          severity: 'success',
-          summary: 'Nameservers copied'
-        })
-      },
-      handleLoadData(event) {
-        this.hasContentToList = event
-      }
-    },
-    computed: {
-      showEditFormWithActionTab() {
-        return this.activeTab === 0
-      }
-    },
-
-    watch: {
-      domain() {
-        this.intelligentDNSStore.addDomain(this.domain)
-      },
-      $router() {
-        this.renderTabCurrentRouter()
-      }
-    }
-  }
-</script>
