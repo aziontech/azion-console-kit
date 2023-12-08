@@ -4,14 +4,14 @@ import { describe, expect, it, vi } from 'vitest'
 import * as Errors from '@/services/axios/errors'
 
 const fixtures = {
-    executionId: 'xx',
-    deploymentFailed: {
-        result: {
-            error: true,
-            message: 'deploy failed'
-        }
-    },
+  executionId: 'xx',
+  deploymentFailed: {
+    result: {
+      error: true,
+      message: 'deploy failed'
+    }
   }
+}
 
 const makeSut = () => {
   const sut = getScriptRunnerResultsService
@@ -82,5 +82,4 @@ describe('ScriptRunnerServices', () => {
       expect(response).rejects.toBe(expectedError)
     }
   )
-  
 })

@@ -23,7 +23,7 @@
                     >
                       Project is being deployed
                     </span>
-                    
+
                     <span
                       class="text-primary text-xl font-medium"
                       v-else-if="isSuccessfullyFinished"
@@ -135,7 +135,7 @@
     windowOpen: {
       type: Function,
       required: true
-    },
+    }
   })
 
   const executionId = ref('')
@@ -185,7 +185,6 @@
     }
   }
 
-
   const severity = computed(() => {
     return !deployFailed.value ? 'success' : 'danger'
   })
@@ -210,10 +209,10 @@
   }
 
   const goToUrl = () => {
-    props.windowOpen('http://'+results.value.domain.url, '_blank')
+    props.windowOpen('http://' + results.value.domain.url, '_blank')
   }
 
-  const goToAnalytics = () =>{
+  const goToAnalytics = () => {
     //
   }
 

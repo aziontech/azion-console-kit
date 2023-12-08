@@ -4,6 +4,22 @@
       <section class="w-full flex flex-col gap-6 lg:gap-8">
         <!-- Getting Started -->
         <div
+          v-if="showExperimental"
+          class="w-full p-3 sm:p-8 surface-border border rounded-md flex gap-6 lg:gap-10 justify-between items-center"
+        >
+          <p class="text-color-secondary">
+            {{ disclaimer }}
+          </p>
+          <PrimeButton
+            type="button"
+            label="Add payment method"
+            outlined
+            class="w-full sm:w-auto"
+            size="small"
+            @click="navigateToPayment"
+          />
+        </div>
+        <div
           class="w-full p-3 sm:p-8 surface-border border rounded-md flex flex-col gap-6 lg:gap-10 justify-between"
         >
           <div class="flex flex-col gap-4 max-w-4xl">
@@ -191,8 +207,8 @@
   import ContentBlock from '@/templates/content-block'
   import FormFieldsHome from './FormFields/FormFieldsHome.vue'
   import { useCreateModalStore } from '@/stores/create-modal'
-  import { useLoadingStore } from '@/stores/loading'
-  import { mapActions } from 'pinia'
+  import { mapState } from 'pinia'
+  import { useAccountStore } from '@/stores/account'
 
   export default {
     name: 'home-view',
@@ -227,23 +243,30 @@
       }
     },
     async created() {
-      this.startLoading()
       this.teams = await this.listTeamsService()
 
       if (this.inviteSession.sessionIsExpired()) {
         this.inviteSession.turnInviteBlockVisable()
       }
-      this.finishLoading()
     },
     computed: {
       isDisabled() {
         return !this.meta?.valid || this.isLoading
+      },
+      ...mapState(useAccountStore, { user: 'accountData', currentTheme: 'currentTheme' }),
+      disclaimer() {
+        return this.user.disclaimer.replace(/<a[^>]+>[^<]+<\/a>/g, '')
+      },
+      showExperimental() {
+        return this.user.disclaimer
       }
     },
     methods: {
-      ...mapActions(useLoadingStore, ['startLoading', 'finishLoading']),
       navigateToEdgeApplications() {
         this.$router.push({ name: 'list-edge-applications' })
+      },
+      navigateToPayment() {
+        this.$router.push({ path: '/billing-subscriptions/payment-methods/add' })
       },
       navigateToRealTimeMetrics() {},
       openDocsEdgeApplication() {
