@@ -32,7 +32,7 @@ export default mergeConfig(
         branches: 90,
         functions: 81,
         lines: 81,
-        reporter: ['text', 'json', 'html', 'lcov']
+        reporter: ['text', 'lcov']
       },
       reporters: ['default', 'vitest-sonar-reporter'],
       outputFile: {
