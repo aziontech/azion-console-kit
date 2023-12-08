@@ -36,10 +36,12 @@ describe('EdgeNodeServices', () => {
         id: fixtures.mock.id,
         service_id: fixtures.mock.serviceId,
         service_name: fixtures.mock.name,
-        variables: [{
-          name: 'port',
-          value: '53'
-        }]
+        variables: [
+          {
+            name: 'port',
+            value: '53'
+          }
+        ]
       }
     })
   })
