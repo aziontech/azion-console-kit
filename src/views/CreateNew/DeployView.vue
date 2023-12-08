@@ -7,9 +7,9 @@
       <div class="flex flex-col w-full gap-8">
         <PrimeCard class="w-full">
           <template #content>
-            <div class="flex flex-col p-8 gap-8">
+            <div class="flex flex-col p-3 md:p-8 gap-8">
               <div class="flex flex-col gap-2">
-                <div class="flex flex-col sm:flex-row sm:items-center gap-3 w-full">
+                <div class="flex flex-col md:flex-row md:items-center gap-3 w-full">
                   <div class="flex gap-3">
                     <Tag
                       v-if="!isUnfinished"
@@ -18,45 +18,46 @@
                       :pt="{ icon: { class: 'mr-0' }, root: { class: 'w-8 h-8' } }"
                     />
                     <span
-                      class="text-primary text-xl font-medium"
+                      class="text-primary text-xl whitespace-nowrap  font-medium"
                       v-if="isUnfinished"
                     >
                       Project is being deployed
                     </span>
 
                     <span
-                      class="text-primary text-xl font-medium"
+                      class="text-primary text-xl whitespace-nowrap font-medium"
                       v-else-if="isSuccessfullyFinished"
                     >
                       {{ results.edge_application.name }}
                     </span>
                     <span
-                      class="text-primary text-xl font-medium"
+                      class="text-primary text-xl font-medium whitespace-nowrap "
                       v-else-if="deployFailed"
                     >
                       Deploy failed
                     </span>
                   </div>
-                  <PrimeButton
-                    v-if="isSuccessfullyFinished"
-                    link
-                    :pt="{
-                      label: { class: 'text-xs' },
-                      icon: { class: 'text-xs' }
-                    }"
-                    class="px-0 py-1"
-                    :label="results.domain.url"
-                    @click="goToUrl"
-                    icon="pi pi-external-link"
-                    iconPos="right"
-                  />
-                  <PrimeButton
-                    v-if="isSuccessfullyFinished"
-                    class="sm:ml-auto"
-                    outlined
-                    @click="goToEdgeApplicationEditView"
-                    label="Manage"
-                  />
+                    <div class="flex w-full justify-between flex-col-reverse gap-4 md:flex-row" >
+                        <PrimeButton
+                          v-if="isSuccessfullyFinished"
+                          link
+                          :pt="{
+                            root: { class: 'justify-center' },
+                            label: { class: 'grow-0' }
+                          }"
+                          class="px-0 py-1"
+                          :label="results.domain.url"
+                          @click="goToUrl"
+                          icon="pi pi-external-link"
+                          iconPos="right"
+                        />
+                        <PrimeButton
+                          v-if="isSuccessfullyFinished"
+                          outlined
+                          @click="goToEdgeApplicationEditView"
+                          label="Manage"
+                        />
+                    </div>
                 </div>
                 <span
                   class="text-sm font-normal text-color-secondary"
@@ -84,20 +85,20 @@
           >
             <b>Next Steps</b>
           </Divider>
-          <div class="ml-0 w-full mt-0 grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+          <div class=" ml-0 mt-0  w-full max-w-screen-lg grid grid-cols-1 lg:grid-cols-3 gap-4">
             <PrimeButton
               v-for="(step, index) in nextSteps"
               :key="index"
-              class="p-4 text-left border-solid border surface-border hover:border-primary transition-all"
+              class="p-6 lg:h-36 w-full text-left h-auto items-start justify-start border-solid border surface-border hover:border-primary transition-all"
               link
               type="button"
               @click="step.handle"
             >
-              <div class="flex flex-col h-36 justify-between gap-3.5 items-start">
+              <div class="flex flex-col justify-between gap-2 items-start">
                 <div class="flex gap-3.5 flex-col">
-                  <div class="flex p-0.5 flex-col">
+                  <div class="flex gap-1 flex-col">
                     <span class="text-color text-base font-medium"> {{ step.title }} </span>
-                    <span class="pb-4 text-base text-color-secondary mt-1.5 line-clamp-2">
+                    <span class="text-sm font-normal text-color-secondary line-clamp-2">
                       {{ step.description }}
                     </span>
                   </div>
