@@ -104,14 +104,17 @@
         otherwise: (schema) => schema.min(0).max(3600).required()
       }),
     selectedPolicy: yup.string().required('Please select an option').default('simple'),
-    weight: yup.number().when('selectedPolicy', {
-      is: 'weighted',
-      then: (schema) => schema.required().label('Weight')
-    }),
-
+    weight: yup
+      .number()
+      .label('Weight')
+      .transform((value) => (Number.isNaN(value) ? null : value))
+      .when('selectedPolicy', {
+        is: 'weighted',
+        then: (schema) => schema.min(0).max(255).required()
+      }),
     description: yup.string().when('selectedPolicy', {
       is: 'weighted',
-      then: (schema) => schema.required().label('Weight')
+      then: (schema) => schema.required().label('Description')
     }),
     intelligentDNSID: yup.number()
   })

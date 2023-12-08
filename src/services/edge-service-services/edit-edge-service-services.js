@@ -21,7 +21,7 @@ export const editEdgeServiceServices = async (payload) => {
 }
 
 const parseCodeToVariables = (code) => {
-  if(!code) return []
+  if (!code) return []
   const lines = code.trim().split(/\r?\n/)
 
   const mapped = lines.map((line) => {

@@ -1,7 +1,7 @@
 <script setup>
   import { ref, computed } from 'vue'
   import { useIntelligentDNSStore } from '@/stores/intelligent-dns'
-
+  import InputNumber from 'primevue/inputnumber'
   import InputText from 'primevue/inputtext'
   import Textarea from 'primevue/textarea'
   import Dropdown from 'primevue/dropdown'
@@ -120,13 +120,18 @@
             class="text-color text-base font-medium"
             >TTL *</label
           >
-          <InputText
+
+          <InputNumber
+            showButtons
             placeholder="TTL (seconds):"
             v-model="ttl"
             id="ttl"
-            type="number"
+            :min="0"
+            :max="3600"
+            step="1"
             :class="{ 'p-invalid': errorTtl }"
           />
+
           <small class="text-color-secondary text-sm font-normal leading-tight">
             Time-to-live (TTL) is a value in an Internet Protocol (IP) packet that tells a network
             router whether or not the packet has been in the network too long and should be
@@ -209,15 +214,15 @@
             class="text-color text-base font-medium"
             >Weight *</label
           >
-          <InputText
+          <InputNumber
+            showButtons
             placeholder="Weight"
             v-model="weight"
             id="weight"
-            type="number"
-            min="0"
-            max="255"
+            :min="0"
+            :max="255"
+            step="1"
             :class="{ 'p-invalid': errorWeight }"
-            v-if="isWeightedPolicy"
           />
           <small class="text-color-secondary text-sm font-normal leading-tight">
             You can choose a number between 0 and 255 to specify the weight for each record. When
@@ -241,12 +246,15 @@
           class="text-color text-base font-medium"
           >Description *</label
         >
-        <InputText
+        <Textarea
+          v-if="isWeightedPolicy"
+          rows="5"
+          cols="30"
           placeholder="add the description"
           v-model="description"
+          id="description"
           type="text"
           :class="{ 'p-invalid': errorDescription }"
-          v-if="isWeightedPolicy"
         />
         <small class="text-color-secondary text-sm font-normal leading-tight">
           To differentiate records with the same name and type, add a description that identifies
