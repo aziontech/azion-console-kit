@@ -6,8 +6,8 @@
           severity="warn"
           :closable="false"
           :pt="{
-            root: { class: 'mx-3 sm:mx-8 mt-4' },
-            wrapper: { class: 'py-3 px-3 sm:px-8 items-start sm:items-center' }
+            root: { class: 'mx-3 mt-4 sm:mx-8' },
+            wrapper: { class: 'py-3 px-3 items-start sm:items-center sm:px-8' }
           }"
         >
           <template #messageicon>
