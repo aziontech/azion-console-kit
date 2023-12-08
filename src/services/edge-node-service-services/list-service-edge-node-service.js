@@ -11,6 +11,20 @@ export const listServiceEdgeNodeService = async ({ id, page, bound }) => {
   return parseHttpResponse(httpResponse)
 }
 
+const parseStatusData = (status) => {
+  const parsedStatus = status
+    ? {
+        content: 'Active',
+        severity: 'success'
+      }
+    : {
+        content: 'Inactive',
+        severity: 'danger'
+      }
+
+  return parsedStatus
+}
+
 const adapt = (httpResponse) => {
   const isArray = Array.isArray(httpResponse.body.services)
 
@@ -24,7 +38,7 @@ const adapt = (httpResponse) => {
           lastModified: new Intl.DateTimeFormat('us', { dateStyle: 'full' }).format(
             new Date(element.updated_at)
           ),
-          status: element.is_active ? 'Enabled' : ''
+          status: parseStatusData(element.is_active)
         }))
       : []
 

@@ -20,6 +20,7 @@ export const createEdgeServiceServices = async (payload) => {
 }
 
 const parseCodeToVariables = (code) => {
+  if(!code) return []
   const lines = code.trim().split(/\r?\n/)
 
   const mapped = lines.map((line) => {
