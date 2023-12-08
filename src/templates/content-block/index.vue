@@ -16,9 +16,8 @@
           />
         </template>
         <p class="text-color-secondary">
-          <b class="text-color">Experiment in progress.</b>
-          You're currently using Azion's Platform Kit. Avoid complex setups as this platform is
-          currently undergoing testing and fine-tuning.
+          <b class="text-color">Ongoing Experiment.</b>
+          Our platform is currently in its early release stage. We appreciate your understanding as occasional instability or bugs may occur during this time.
         </p>
       </Message>
       <div
