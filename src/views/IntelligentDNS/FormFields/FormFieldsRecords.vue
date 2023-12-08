@@ -19,6 +19,8 @@
 
   const intelligentDNSStore = useIntelligentDNSStore()
 
+  const RECORD_TYPE_WITHOUT_TTL = 'ANAME'
+
   const policyList = ref([
     { label: 'Simple', value: 'simple' },
     { label: 'Weighted', value: 'weighted' }
@@ -41,19 +43,24 @@
   const isWeightedPolicy = computed(() => {
     return selectedPolicy.value === 'weighted'
   })
+
+  const showTTLField = computed(() => {
+    return selectedRecordType.value !== RECORD_TYPE_WITHOUT_TTL
+  })
 </script>
 
 <template>
   <FormHorizontal
-    title="General"
-    description="Espaço livre para descrição e instruções de preenchimento. Esse conteúdo deve ser criado pensando tanto em funcionalidade quanto em em alinhamento e estética. Devemos sempre criar os blocos conforme o contexto, cuidando sempre para não ter blocos muito longos."
+    :isDrawer="true"
+    title="Settings"
+    description="Description"
   >
     <template #inputs>
-      <div class="flex flex-col sm:max-w-lg w-full gap-2">
+      <div class="flex flex-col w-full gap-2">
         <label
           for="name"
           class="text-color text-base font-medium"
-          >Name *</label
+          >Record Name *</label
         >
         <div class="p-inputgroup">
           <InputText
@@ -62,8 +69,12 @@
             type="text"
             :class="{ 'p-invalid': errorName }"
           />
-          <span class="p-inputgroup-addon"> .{{ intelligentDNSStore.getDomain }} </span>
+          <span class="p-inputgroup-addon"> .{{ intelligentDNSStore.domain }} </span>
         </div>
+        <small class="text-color-secondary text-sm font-normal leading-tight">
+          A record is used to find the IP address of a computer connected to the internet from a
+          name.
+        </small>
 
         <small
           v-if="errorName"
@@ -71,28 +82,64 @@
           >{{ errorName }}</small
         >
       </div>
-      <div class="flex flex-col sm:max-w-lg w-full gap-2">
-        <label
-          for="type"
-          class="text-color text-base font-medium"
-          >Record Type *</label
+      <div class="flex flex-wrap gap-6">
+        <div class="flex flex-col sm:max-w-xs w-full gap-2">
+          <label
+            for="type"
+            class="text-color text-base font-medium"
+            >Record Type *</label
+          >
+          <Dropdown
+            v-model="selectedRecordType"
+            :options="recordsTypes"
+            optionLabel="label"
+            id="type"
+            optionValue="value"
+            placeholder="Select a Record Type"
+            :class="{ 'p-invalid': errorSelectedRecordType }"
+            class="w-full"
+          />
+          <small class="text-color-secondary text-sm font-normal leading-tight">
+            Address Mapping record (A Record)— also known as a DNS host record, stores a hostname
+            and its corresponding IPv4 address.
+          </small>
+
+          <small
+            v-if="errorSelectedRecordType"
+            class="p-error text-xs font-normal leading-tight"
+            >{{ errorSelectedRecordType }}</small
+          >
+        </div>
+
+        <div
+          v-if="showTTLField"
+          class="flex flex-col sm:max-w-xs w-full gap-2"
         >
-        <Dropdown
-          v-model="selectedRecordType"
-          :options="recordsTypes"
-          optionLabel="label"
-          id="type"
-          optionValue="value"
-          placeholder="Select a Record Type"
-          :class="{ 'p-invalid': errorSelectedRecordType }"
-          class="w-full"
-        />
-        <small
-          v-if="errorSelectedRecordType"
-          class="p-error text-xs font-normal leading-tight"
-          >{{ errorSelectedRecordType }}</small
-        >
+          <label
+            for="ttl"
+            class="text-color text-base font-medium"
+            >TTL *</label
+          >
+          <InputText
+            placeholder="TTL (seconds):"
+            v-model="ttl"
+            id="ttl"
+            type="number"
+            :class="{ 'p-invalid': errorTtl }"
+          />
+          <small class="text-color-secondary text-sm font-normal leading-tight">
+            Time-to-live (TTL) is a value in an Internet Protocol (IP) packet that tells a network
+            router whether or not the packet has been in the network too long and should be
+            discarded.
+          </small>
+          <small
+            v-if="errorTtl"
+            class="p-error text-xs font-normal leading-tight"
+            >{{ errorTtl }}</small
+          >
+        </div>
       </div>
+
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
         <label
           for="value"
@@ -108,78 +155,81 @@
           type="text"
           :class="{ 'p-invalid': errorValue }"
         />
+        <small class="text-color-secondary text-sm font-normal leading-tight">
+          Enter multiple values on separate lines. Only IPV4 formats.
+        </small>
+
         <small
           v-if="errorValue"
           class="p-error text-xs font-normal leading-tight"
           >{{ errorValue }}</small
         >
       </div>
-      <div class="flex flex-col sm:max-w-lg w-full gap-2">
-        <label
-          for="ttl"
-          class="text-color text-base font-medium"
-          >TTL *</label
-        >
-        <InputText
-          placeholder="TTL (seconds):"
-          v-model="ttl"
-          id="ttl"
-          type="number"
-          :class="{ 'p-invalid': errorTtl }"
-        />
-        <small
-          v-if="errorTtl"
-          class="p-error text-xs font-normal leading-tight"
-          >{{ errorTtl }}</small
-        >
-      </div>
+    </template>
+  </FormHorizontal>
+  <FormHorizontal
+    :isDrawer="true"
+    title="Policy"
+    description="Description"
+  >
+    <template #inputs>
+      <div class="flex gap-6 flex-wrap">
+        <div class="flex flex-col sm:max-w-xs w-full gap-2">
+          <label
+            for="selectedPolicy"
+            class="text-color text-base font-medium"
+            >Policy Type *</label
+          >
+          <Dropdown
+            v-model="selectedPolicy"
+            :options="policyList"
+            id="selectedPolicy"
+            optionLabel="label"
+            optionValue="value"
+            placeholder="Select a Policy"
+            :class="{ 'p-invalid': errorSelectedPolicy }"
+            class="w-full"
+          />
+          <small class="text-color-secondary text-sm font-normal leading-tight">
+            Choose this policy to specify the amount of traffic to send to each record.
+          </small>
 
-      <div class="flex flex-col sm:max-w-lg w-full gap-2">
-        <label
-          for="selectedPolicy"
-          class="text-color text-base font-medium"
-          >Policy *</label
-        >
-        <Dropdown
-          v-model="selectedPolicy"
-          :options="policyList"
-          id="selectedPolicy"
-          optionLabel="label"
-          optionValue="value"
-          placeholder="Select a Policy"
-          :class="{ 'p-invalid': errorSelectedPolicy }"
-          class="w-full"
-        />
-        <small
-          v-if="errorSelectedPolicy"
-          class="p-error text-xs font-normal leading-tight"
-          >{{ errorSelectedPolicy }}</small
-        >
-      </div>
-      <div
-        class="flex flex-col sm:max-w-lg w-full gap-2"
-        v-if="isWeightedPolicy"
-      >
-        <label
-          for="weight"
-          class="text-color text-base font-medium"
-          >Weight *</label
-        >
-        <InputText
-          placeholder="Weight"
-          v-model="weight"
-          id="weight"
-          type="number"
-          min="0"
-          max="255"
-          :class="{ 'p-invalid': errorWeight }"
+          <small
+            v-if="errorSelectedPolicy"
+            class="p-error text-xs font-normal leading-tight"
+            >{{ errorSelectedPolicy }}</small
+          >
+        </div>
+        <div
+          class="flex flex-col sm:max-w-xs w-full gap-2"
           v-if="isWeightedPolicy"
-        />
-        <small
-          v-if="errorWeight"
-          class="p-error text-xs font-normal leading-tight"
-          >{{ errorWeight }}</small
         >
+          <label
+            for="weight"
+            class="text-color text-base font-medium"
+            >Weight *</label
+          >
+          <InputText
+            placeholder="Weight"
+            v-model="weight"
+            id="weight"
+            type="number"
+            min="0"
+            max="255"
+            :class="{ 'p-invalid': errorWeight }"
+            v-if="isWeightedPolicy"
+          />
+          <small class="text-color-secondary text-sm font-normal leading-tight">
+            You can choose a number between 0 and 255 to specify the weight for each record. When
+            you choose 0, Intelligent DNS stops using this record.
+          </small>
+
+          <small
+            v-if="errorWeight"
+            class="p-error text-xs font-normal leading-tight"
+            >{{ errorWeight }}</small
+          >
+        </div>
       </div>
 
       <div
@@ -198,6 +248,11 @@
           :class="{ 'p-invalid': errorDescription }"
           v-if="isWeightedPolicy"
         />
+        <small class="text-color-secondary text-sm font-normal leading-tight">
+          To differentiate records with the same name and type, add a description that identifies
+          each record.
+        </small>
+
         <small
           v-if="errorDescription"
           class="p-error text-xs font-normal leading-tight"
