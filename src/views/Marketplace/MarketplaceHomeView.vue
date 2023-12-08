@@ -173,7 +173,7 @@
     } catch (error) {
       $toast.add({ ...ERROR_PROPS, summary: error })
     } finally {
-      loading.value = false
+      loading.value = true
     }
   }
 
