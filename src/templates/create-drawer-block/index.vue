@@ -101,6 +101,7 @@
       <ActionBarBlock
         @onCancel="closeDrawer"
         @onSubmit="onSubmit"
+        :inDrawer="true"
         :loading="isSubmitting"
         :submitDisabled="!meta.valid || loading"
       />

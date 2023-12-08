@@ -133,6 +133,7 @@
       <ActionBarBlock
         @onCancel="closeDrawer"
         @onSubmit="onSubmit"
+        :inDrawer="true"
         :loading="isLoading"
         :submitDisabled="disableEdit"
       />
