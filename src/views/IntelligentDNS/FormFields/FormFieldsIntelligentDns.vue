@@ -74,8 +74,11 @@
   >
     <template #inputs>
       <div class="flex gap-3 items-center">
-        <label for="">Active</label>
-        <InputSwitch v-model="isActive" />
+        <InputSwitch
+          id="active"
+          v-model="isActive"
+        />
+        <label id="active">Active</label>
       </div>
     </template>
   </FormHorizontal>
