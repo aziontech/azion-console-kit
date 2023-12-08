@@ -191,8 +191,8 @@
     :position="props.position"
     :pt="{
       root: { class: styleRoot },
-      header: { class: 'flex justify-between text-xl font-medium px-8' },
-      closeButton: { class: 'border surface-border' },
+      header: { class: 'px-8' },
+      closeButton: { class: '' },
       content: { class: '[&::-webkit-scrollbar]:hidden p-0 flex flex-col justify-between' }
     }"
   >
@@ -241,8 +241,8 @@
                       </div>
                     </template>
                     <template #footer>
+                      <Divider  class="mb-2" />
                       <div class="px-2">
-                        <Divider />
                         <PrimeButton
                           label="Create New"
                           icon-pos="left"

@@ -18,7 +18,7 @@
       <div class="w-full flex flex-col md:flex-row gap-6 lg:gap-8">
         <!-- Sidebar -->
         <div
-          class="flex flex-col md:flex-shrink-0 gap-8 px-3 pt-8 pb-0 sm:px-8 w-full md:w-80 md:sticky md:top-14 self-start"
+          class="flex flex-col md:flex-shrink-0 gap-8 px-3 pt-8 pb-0 sm:px-8 w-full md:pr-0 md:w-80 md:sticky md:top-14 self-start"
         >
           <!-- Search -->
           <div class="flex flex-col w-full gap-3">
@@ -70,14 +70,14 @@
         </div>
 
         <!-- Solutions -->
-        <div class="flex flex-col p-3 sm:p-8 gap-6 w-full">
+        <div class="flex flex-col p-3 md:pl-0 sm:p-8 gap-6 w-full">
           <!-- Loading -->
           <template v-if="loading">
             <LoadingList />
           </template>
           <!-- Default View -->
           <template v-else-if="allSelected">
-            <div class="text-2xl font-medium">Featured</div>
+            <div class="md:text-base lg:text-2xl font-medium">Featured</div>
             <ListSolutions :solutions="featured" />
             <div class="text-base font-medium">New releases</div>
             <ListSolutions :solutions="released" />
@@ -107,7 +107,7 @@
           </template>
           <!-- Category -->
           <template v-else>
-            <div class="text-2xl font-medium">
+            <div class="md:text-base lg:text-2xl font-medium">
               {{ selectedCategory.name }}
             </div>
             <ListSolutions :solutions="solutions" />

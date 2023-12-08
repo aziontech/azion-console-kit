@@ -26,8 +26,6 @@
     :position="props.position"
     :pt="{
       root: { class: 'max-w-4xl w-full p-0' },
-      header: { class: 'flex justify-between text-xl font-medium px-8' },
-      closeButton: { class: 'border surface-border' },
       content: { class: '[&::-webkit-scrollbar]:hidden p-0 flex flex-col justify-between' }
     }"
   >
