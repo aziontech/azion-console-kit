@@ -5,7 +5,7 @@
         <!-- Getting Started -->
         <div
           v-if="showExperimental"
-          class="w-full p-3 sm:p-8 surface-border border rounded-md flex gap-6 lg:gap-10 justify-between items-center"
+          class="w-full p-3 sm:p-8 surface-border border rounded-md flex flex-col sm:flex-row gap-6 lg:gap-10 justify-between items-center"
         >
           <p class="text-color-secondary">
             {{ disclaimer }}
