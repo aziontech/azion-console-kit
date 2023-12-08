@@ -1,3 +1,3 @@
 export const makeTimezonesListBaseUrl = () => {
-  return `graphql`
+  return `cities`
 }

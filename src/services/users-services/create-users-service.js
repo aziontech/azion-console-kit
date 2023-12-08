@@ -44,6 +44,9 @@ const parseHttpResponse = (httpResponse) => {
       }
     case 401:
       throw new Errors.InvalidApiTokenError().message
+    case 400:
+      const apiError = getFirstApiError(httpResponse.body)
+      throw new Error(apiError).message
     case 403:
       throw new Errors.PermissionError().message
     case 404:
@@ -53,4 +56,13 @@ const parseHttpResponse = (httpResponse) => {
     default:
       throw new Errors.UnexpectedError().message
   }
+}
+
+const getFirstApiError = (body) => {
+  for (let key in body) {
+    if (Array.isArray(body[key]) && body[key].length > 0) {
+      return body[key][0]
+    }
+  }
+  return null
 }

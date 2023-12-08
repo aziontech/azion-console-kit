@@ -55,10 +55,10 @@ describe('UsersServices', () => {
 
     const { sut } = makeSut()
 
-    await sut()
+    await sut({})
 
     expect(requestSpy).toHaveBeenCalledWith({
-      url: `users`,
+      url: `users?order_by=id&sort=asc&page=1&page_size=200`,
       method: 'GET'
     })
   })
@@ -72,7 +72,7 @@ describe('UsersServices', () => {
     })
     const { sut } = makeSut()
 
-    const result = await sut()
+    const result = await sut({})
 
     expect(result).toEqual([
       {
