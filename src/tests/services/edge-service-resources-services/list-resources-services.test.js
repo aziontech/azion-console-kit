@@ -59,7 +59,7 @@ describe('EdgeServiceResourcesServices', () => {
     })
 
     expect(requestSpy).toHaveBeenCalledWith({
-      url: `edge_services/${edgeServiceIdMock}/resources?filter=&order_by=name&sort=asc&page=1&page_size=10`,
+      url: `edge_services/${edgeServiceIdMock}/resources?filter=&order_by=name&sort=asc&page=1&page_size=200`,
       method: 'GET'
     })
   })
