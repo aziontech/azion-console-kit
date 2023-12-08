@@ -4846,6 +4846,11 @@ vite-node@0.33.0:
   optionalDependencies:
     fsevents "~2.3.2"
 
+vitest-sonar-reporter@^1.0.0:
+  version "1.0.0"
+  resolved "https://registry.npmjs.org/vitest-sonar-reporter/-/vitest-sonar-reporter-1.0.0.tgz"
+  integrity sha512-NVxgvLSBXevYqEZImfjEMJlX82hH2tOrBeJkmRmILl6LohBIASdLjwjWQn6fyUlLsaBWjlrekMZ/znfX5f05dA==
+
 vitest@^0.33.0:
   version "0.33.0"
   resolved "https://registry.npmjs.org/vitest/-/vitest-0.33.0.tgz"
