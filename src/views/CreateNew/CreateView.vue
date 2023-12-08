@@ -43,6 +43,7 @@
               <span class="text-xs font-medium text-color-primary">By</span>
               <PrimeButton
                 link
+                @click="goToVendorPage"
                 :pt="{
                   label: { class: 'text-xs' },
                   icon: { class: 'text-xs' }
@@ -120,6 +121,7 @@
                     label: { class: 'text-xs' },
                     icon: { class: 'text-xs' }
                   }"
+                  @click="goToVendorPage"
                   class="px-0 py-1"
                   :label="solution.vendor.name"
                   icon="pi pi-external-link"
@@ -261,6 +263,10 @@
       loadSolutionService: {
         type: Function,
         required: true
+      },
+      windowOpen: {
+        type: Function,
+        required: true
       }
     },
 
@@ -287,6 +293,9 @@
         } finally {
           this.isLoading = false
         }
+      },
+      goToVendorPage() {
+        this.windowOpen(this.solution.vendor.url, '_blank')
       },
       openDetails() {
         this.showDetails = true
