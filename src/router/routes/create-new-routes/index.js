@@ -15,7 +15,8 @@ export const createNewRoutes = {
       props: {
         getTemplateService: TemplateEngineService.getTemplate,
         loadSolutionService: MarketplaceService.loadSolutionService,
-        instantiateTemplateService: TemplateEngineService.instantiateTemplate
+        instantiateTemplateService: TemplateEngineService.instantiateTemplate,
+        windowOpen
       },
       meta: {
         breadCrumbs: [
