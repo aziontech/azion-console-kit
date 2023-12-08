@@ -281,7 +281,7 @@
               :readonly="accountIsOwner"
               v-model="userIsOwner"
               @click="handleUserIsOwner"
-              id="accountOwner"
+              inputId="accountOwner"
             />
             <div class="flex-col gap-1">
               <label
@@ -318,7 +318,7 @@
               :class="{ 'p-invalid': errorTwoFactorEnabled }"
               :readonly="isForceMFA"
               v-model="twoFactorEnabled"
-              id="twoFactor"
+              inputId="twoFactor"
             />
             <div class="flex-col gap-1">
               <label

@@ -284,7 +284,7 @@
       }
     },
     watch: {
-      $route (){
+      $route() {
         this.loadSolution()
       }
     }
