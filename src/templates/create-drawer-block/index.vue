@@ -1,10 +1,13 @@
-<!-- eslint-disable vue/multi-word-component-names -->
 <script setup>
   import { computed, ref } from 'vue'
   import { useForm } from 'vee-validate'
   import { useToast } from 'primevue/usetoast'
   import ActionBarBlock from '@/templates/action-bar-block'
   import Sidebar from 'primevue/sidebar'
+
+  defineOptions({
+    name: 'create-drawer-block'
+  })
 
   const emit = defineEmits(['update:visible', 'onSuccess'])
   const props = defineProps({
