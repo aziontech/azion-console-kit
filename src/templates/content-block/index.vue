@@ -17,7 +17,8 @@
         </template>
         <p class="text-color-secondary">
           <b class="text-color">Ongoing Experiment.</b>
-          Our platform is in its early release stage. Please bear with us as occasional instability or bugs may occur during this time.
+          Our platform is in its early release stage. Please bear with us as occasional instability
+          or bugs may occur during this time.
         </p>
       </Message>
       <div
