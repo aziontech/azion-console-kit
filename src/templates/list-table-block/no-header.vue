@@ -248,6 +248,9 @@
           this.isLoading = false
         }
       },
+      async reload() {
+        await this.loadData({ page: 1 })
+      },
       navigateToAddPage() {
         this.$router.push(this.createPagePath)
       },
