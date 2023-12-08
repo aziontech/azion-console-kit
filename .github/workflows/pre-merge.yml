@@ -61,8 +61,8 @@ jobs:
 
       - name: Fix code coverage paths - lcov.info
         run: |
-          sed -i 's:/__w/credentials-ui/credentials-ui/:/github/workspace/:' lcov.info
-          sed -i 's:/__w/credentials-ui/credentials-ui/:/github/workspace/:' sonar-report.xml
+          sed -i 's:/__w/azion-platform-kit/azion-platform-kit/:/github/workspace/:' lcov.info
+          sed -i 's:/__w/azion-platform-kit/azion-platform-kit/:/github/workspace/:' sonar-report.xml
       - name: SonarQube Scan
         uses: sonarsource/sonarqube-scan-action@master
         env:
