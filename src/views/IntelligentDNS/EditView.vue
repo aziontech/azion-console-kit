@@ -309,7 +309,7 @@
             title="Create Intelligent DNS Record"
           >
             <template #formFields>
-              <FormFieldsRecords></FormFieldsRecords>
+              <FormFieldsRecords />
             </template>
           </CreateDrawerBlock>
 
@@ -324,7 +324,7 @@
             title="Edit Intelligent DNS Record"
           >
             <template #formFields>
-              <FormFieldsRecords></FormFieldsRecords>
+              <FormFieldsRecords />
             </template>
           </EditDrawerBlock>
         </TabPanel>

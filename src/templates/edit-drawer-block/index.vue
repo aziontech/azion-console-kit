@@ -31,10 +31,6 @@
     schema: {
       type: Object,
       required: true
-    },
-    initialValues: {
-      type: Object,
-      required: true
     }
   })
 
