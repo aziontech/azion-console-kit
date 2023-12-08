@@ -112,6 +112,7 @@
         v-if="!isLoading"
         :loading="submitLoading"
         @onSubmit="validateAndSubmit"
+        @onCancel="handleCancel"
         :submitDisabled="!formTools.meta.valid || !formTools.meta.touched"
       />
     </Teleport>
@@ -131,7 +132,7 @@
 
   defineOptions({ name: 'templateEngineBlock' })
 
-  const emit = defineEmits(['instantiate'])
+  const emit = defineEmits(['instantiate', 'cancel'])
 
   const props = defineProps({
     getTemplateService: {
@@ -195,7 +196,12 @@
     }, 100)
   })
 
-  const schemaLoaded = (inputSchema) => {
+  const { errors, meta, defineInputBinds, resetForm, values, setFieldValue, validate, setTouched } =
+    useForm({
+      validationSchema
+    })
+
+  const schemaLoaded = async (inputSchema) => {
     schema.value = inputSchema
     const auxValidator = {}
     if (schema.value.fields) {
@@ -253,11 +259,13 @@
       })
     }
     isLoading.value = false
-  }
 
-  const { errors, meta, defineInputBinds, resetForm, values, setFieldValue } = useForm({
-    validationSchema
-  })
+    // If all fields is valid on load, allow submit
+    const { valid } = await validate()
+    if (valid) {
+      setTouched(true)
+    }
+  }
 
   const removeHiddenFields = (fields) => {
     return fields.filter((field) => !field.hidden)
@@ -310,6 +318,10 @@
         summary: error
       })
     }
+  }
+
+  const handleCancel = () => {
+    emit('cancel')
   }
 
   watch(

@@ -159,6 +159,11 @@
     emit('loading')
   }
 
+  const handleCancel = () => {
+    resetForm()
+    toggleSidebar()
+  }
+
   const warnUpdate = computed(() => {
     const app = edgeApps.value.find((i) => i.value === edgeApplication.value)
     return app?.upgradeable
@@ -282,6 +287,7 @@
               actionBarId="#action-bar-integration"
               @instantiate="handleLaunchSolution"
               @loading="handleLoading"
+              @cancel="handleCancel"
             />
 
             <PermissionsFieldset
