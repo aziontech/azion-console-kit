@@ -48,6 +48,14 @@
     }
   })
 
+  const isLoading = computed(() => {
+    return isSubmitting.value || loading.value
+  })
+
+  const disableFields = computed(() => {
+    return !meta.value.valid || loading.value
+  })
+
   const toggleDrawerVisibility = (isVisible) => {
     visibleDrawer.value = isVisible
   }
@@ -93,7 +101,7 @@
     }"
   >
     <template #header>
-      <div>{{ title }}</div>
+      <h2>{{ title }}</h2>
     </template>
     <div class="flex w-full md:p-8 pb-0">
       <form class="w-full flex flex-col gap-8">
@@ -105,8 +113,8 @@
         @onCancel="closeDrawer"
         @onSubmit="onSubmit"
         :inDrawer="true"
-        :loading="isSubmitting"
-        :submitDisabled="!meta.valid || loading"
+        :loading="isLoading"
+        :submitDisabled="disableFields"
       />
     </div>
   </Sidebar>

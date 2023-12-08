@@ -121,7 +121,7 @@
     }"
   >
     <template #header>
-      <div>{{ title }}</div>
+      <h2>{{ title }}</h2>
     </template>
     <div class="flex w-full md:p-8 pb-0">
       <form class="w-full flex flex-col gap-8">
