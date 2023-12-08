@@ -132,6 +132,7 @@
 </template>
 
 <script setup>
+  import { useLoadingStore } from '@/stores/loading'
   import { computed, onBeforeMount, ref } from 'vue'
   import ContentBlock from '@/templates/content-block'
   import PageHeadingBlock from '@/templates/page-heading-block'
@@ -151,8 +152,7 @@
   const animateMessage = ref(false)
   const ERROR_PROPS = {
     closable: true,
-    severity: 'error',
-    life: 10000
+    severity: 'error'
   }
 
   const props = defineProps({
@@ -171,6 +171,8 @@
   })
 
   onBeforeMount(async () => {
+    const stores = useLoadingStore()
+    stores.startLoading()
     await loadSolution()
     animateMessage.value = !isLastVersion.value
 
@@ -179,6 +181,7 @@
       to: route.path
     }
     breadcrumbs.update([...route.meta.breadCrumbs, solutionBran])
+    stores.finishLoading()
   })
 
   const loadSolution = async () => {
@@ -209,10 +212,9 @@
 
   const showFeedback = (feedback) => {
     toast.add({
-      closable: false,
+      closable: true,
       severity: 'success',
       summary: feedback,
-      life: 10000,
       link: {
         label: 'Go to Edge Function',
         callback: () => {

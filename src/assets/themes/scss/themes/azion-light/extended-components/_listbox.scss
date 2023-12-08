@@ -1,9 +1,10 @@
 .p-listbox {
   .p-listbox-list {
     .p-listbox-item {
+      display: flex !important;
+      gap: 12px !important;
       padding: 0 12px;
-      height: 2rem !important;
-      display: flex;
+      height: 38px !important;
       align-items: center;
       font-size: 0.875rem;
     }

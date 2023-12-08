@@ -102,7 +102,7 @@
       <ActionBarTemplate
         v-if="!isLoading"
         :loading="submitLoading"
-        @submit="validateAndSubmit"
+        @onSubmit="validateAndSubmit"
         :submitDisabled="!formTools.meta.valid || !formTools.meta.touched"
       />
     </Teleport>
@@ -150,10 +150,9 @@
       schemaLoaded(initialData.inputSchema)
     } catch (error) {
       toast.add({
-        closable: false,
+        closable: true,
         severity: 'error',
-        summary: error,
-        life: 10000
+        summary: error
       })
     }
   }
@@ -232,6 +231,9 @@
               )
             })
           }
+          if (element.value.length > 0) {
+            setFieldValue(element.name, element.value)
+          }
         })
       })
     }
@@ -291,10 +293,9 @@
       submitLoading.value = false
     } catch (error) {
       toast.add({
-        closable: false,
+        closable: true,
         severity: 'error',
-        summary: error,
-        life: 10000
+        summary: error
       })
     }
   }

@@ -33,7 +33,7 @@
 
     &:enabled:hover {
       color: $textColor !important;
-      background-color: var(--surface-hover);
+      background-color: var(--surface-300) !important;
     }
 
     &:enabled:active {

@@ -1,5 +1,5 @@
 <template>
-  <div class="w-full max-w-4xl flex flex-col sm:flex-row p-0 sm:pl-5 sm:pr-[18px] gap-4 pb-4">
+  <div class="w-full h-full  flex flex-col sm:flex-row p-0 sm:pl-5 sm:pr-8 gap-4 pb-4">
     <div class="sm:min-w-[240px] mt-4">
       <Listbox
         @change="onMenuChange"
@@ -33,14 +33,14 @@
 
       <LoadingListTemplate v-if="isLoading" />
       <div
-        class="mx-0 w-full mt-0 grid grid-cols-1 sm:grid-cols-2 gap-4"
+        class="mx-0 w-full mt-0 grid grid-cols-1 lg:grid-cols-2 2xl:grid-cols-3 gap-4"
         v-if="showRecommended"
       >
         <PrimeButton
           v-for="template in templates"
           :key="template.id"
           @click="redirectToSolution(template)"
-          class="p-4 text-left border-solid border surface-border hover:border-primary transition-all"
+          class="p-6 text-left border-solid border surface-border hover:border-primary transition-all"
           link
         >
           <div class="flex flex-col h-full justify-between gap-3.5 items-start">
@@ -54,8 +54,8 @@
                   alt=""
                 />
               </div>
-              <div class="flex p-0.5 flex-col">
-                <span class="text-color text-sm font-medium">
+              <div class="flex flex-col">
+                <span class="line-clamp-1 h-5 text-color text-sm font-medium">
                   {{ template.name }}
                 </span>
                 <span
@@ -69,14 +69,14 @@
         </PrimeButton>
       </div>
       <div
-        class="mx-0 w-full mt-0 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols- gap-4"
+        class="mx-0 w-full mt-0 grid grid-cols-1 lg:grid-cols-2 2xl:grid-cols-3 gap-4"
         v-else-if="showBrowse"
       >
         <PrimeButton
           v-for="template in browseTemplates"
           :key="template.id"
           @click="redirectToSolution(template)"
-          class="p-4 text-left border-solid border surface-border hover:border-primary transition-all"
+          class="p-6 text-left border-solid border surface-border hover:border-primary transition-all"
           link
         >
           <div class="flex flex-col h-full justify-between gap-3.5 items-start">
@@ -90,8 +90,8 @@
                   alt=""
                 />
               </div>
-              <div class="flex p-0.5 flex-col">
-                <span class="text-color text-sm font-medium">
+              <div class="flex flex-col">
+                <span class="line-clamp-1 h-5 text-color text-sm font-medium">
                   {{ template.name }}
                 </span>
                 <span
@@ -105,20 +105,20 @@
         </PrimeButton>
       </div>
       <div
-        class="mx-0 w-full mt-0 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols- gap-4"
+        class="mx-0 w-full mt-0 grid grid-cols-1 lg:grid-cols-2 2xl:grid-cols-3 gap-4"
         v-else-if="showResource"
       >
         <PrimeButton
           v-for="resource in resources"
           :key="resource.to"
           @click="redirect(resource.to)"
-          class="p-4 text-left border-solid border surface-border hover:border-primary transition-all"
+          class="p-6 text-left border-solid border surface-border hover:border-primary transition-all"
           link
         >
           <div class="flex flex-col h-full justify-between gap-3.5 items-start">
             <div class="flex gap-3.5 flex-col">
-              <div class="flex p-0.5 flex-col">
-                <span class="text-color text-sm font-medium">
+              <div class="flex flex-col">
+                <span class="line-clamp-1 h-5 text-color text-sm font-medium">
                   {{ resource.label }}
                 </span>
                 <span
@@ -235,9 +235,7 @@
     methods: {
       redirectToSolution(template) {
         this.showSidebar = false
-        this.$router.push(`/create/${template.vendor.slug}/${template.slug}`).then(() => {
-          this.$router.go()
-        })
+        this.$router.push(`/create/${template.vendor.slug}/${template.slug}`)
         this.$emit('closeModal')
       },
       onMenuChange(target) {
@@ -266,8 +264,7 @@
           this.$toast.add({
             closable: true,
             severity: 'error',
-            summary: error,
-            life: 10000
+            summary: error
           })
         } finally {
           this.isLoading = false
@@ -282,8 +279,7 @@
           this.$toast.add({
             closable: true,
             severity: 'error',
-            summary: error,
-            life: 10000
+            summary: error
           })
         } finally {
           this.isLoading = false

@@ -65,10 +65,9 @@
   const copyToken = async ({ token }) => {
     props.clipboardWrite(token)
     toast.add({
-      closable: false,
+      closable: true,
       severity: 'success',
-      summary: 'token copied',
-      life: 10000
+      summary: 'token copied'
     })
   }
 </script>

@@ -6,7 +6,7 @@
   import ContentBlock from '@/templates/content-block'
   import { useRoute, useRouter } from 'vue-router'
   import { ref } from 'vue'
-  import ListViewResources from './FormFields/ListViewResources.vue'
+  import ListViewResources from './ListViewResources.vue'
 
   const props = defineProps({
     loadEdgeService: { type: Function, required: true },

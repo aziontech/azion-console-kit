@@ -23,9 +23,12 @@ const adapt = (httpResponse) => {
       ? httpResponse.body.nodes.map((element) => ({
           id: element.id,
           name: element.name,
-          groups: element.groups.map((obj) => obj.name).join(','),
+          groups: element.groups.map((obj) => obj.name),
           hashId: element.hash_id,
-          status: element.status
+          status: {
+            content: element.status,
+            severity: element.status === 'Authorized' ? 'success' : 'warning'
+          }
         }))
       : []
 

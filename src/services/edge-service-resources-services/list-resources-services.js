@@ -6,7 +6,7 @@ export const listResourcesServices = async ({
   orderBy = 'name',
   sort = 'asc',
   page = 1,
-  pageSize = 10
+  pageSize = 200
 }) => {
   const searchParams = makeSearchParams({ orderBy, sort, page, pageSize })
   let httpResponse = await AxiosHttpClientAdapter.request({
@@ -20,10 +20,10 @@ export const listResourcesServices = async ({
 }
 
 const adapt = (httpResponse) => {
-  const isArray = Array.isArray(httpResponse.body.results?.resources)
+  const isArray = Array.isArray(httpResponse.body.resources)
 
   const parsedRecords = isArray
-    ? httpResponse.body.results.resources.map((resource) => ({
+    ? httpResponse.body.resources.map((resource) => ({
         id: resource.id,
         name: resource.name,
         trigger: resource.trigger,

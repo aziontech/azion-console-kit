@@ -49,7 +49,7 @@ describe('EdgeServiceResourcesServices', () => {
   it('should call api with correct params', async () => {
     const requestSpy = vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
       statusCode: 200,
-      body: { results: [] }
+      body: []
     })
     const edgeServiceIdMock = 1
     const { sut } = makeSut()
@@ -59,7 +59,7 @@ describe('EdgeServiceResourcesServices', () => {
     })
 
     expect(requestSpy).toHaveBeenCalledWith({
-      url: `edge_services/${edgeServiceIdMock}/resources?filter=&order_by=name&sort=asc&page=1&page_size=10`,
+      url: `edge_services/${edgeServiceIdMock}/resources?filter=&order_by=name&sort=asc&page=1&page_size=200`,
       method: 'GET'
     })
   })
@@ -69,7 +69,7 @@ describe('EdgeServiceResourcesServices', () => {
     vi.setSystemTime(new Date(2023, 10, 10, 10))
     vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
       statusCode: 200,
-      body: { results: { resources: fixtures.mock } }
+      body: { resources: fixtures.mock }
     })
     const { sut } = makeSut()
 

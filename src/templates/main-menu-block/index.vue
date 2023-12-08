@@ -196,6 +196,7 @@
   </header>
   <!-- Mobile Profile Menu  -->
   <Sidebar
+    @click="toggleProfileMobile"
     v-model:visible="showProfile"
     position="bottom"
     :show-close-icon="false"
@@ -205,7 +206,6 @@
       mask: { class: 'flex' }
     }"
     class="md:p-3"
-    @click="toggleProfileMobile"
   >
     <PrimeMenu
       :pt="{
@@ -255,6 +255,7 @@
           <Dropdown
             :modelValue="selectedTheme"
             @update:modelValue="selectTheme"
+            @click.stop
             optionValue="value"
             optionLabel="name"
             :options="themeOptions"
@@ -282,7 +283,7 @@
             </template>
           </Dropdown>
         </div>
-        <Divider class="surface-border p-1 m-0" />
+        <Divider class="-ml-2 w-[calc(100%+1rem)] mt-2.5 mb-2" />
         <PrimeButton
           class="w-full rounded-md flex content-start text-left"
           :pt="{
@@ -325,13 +326,13 @@
     >
       <template #item="{ item, label, props }">
         <a
-          class="flex h-9"
           v-bind="props.action"
           @click="redirect(item.to)"
         >
           <span v-bind="props.icon" />
           <span v-bind="props.label">{{ label }}</span>
           <Tag
+            severity="info"
             v-if="item.tag"
             :value="item.tag"
             class="ml-2"
@@ -363,6 +364,7 @@
       </div>
     </template>
     <template #end>
+      <Divider class="-ml-2 w-[calc(100%+1rem)] mt-3 mb-2" />
       <div class="flex flex-row items-center">
         <div class="flex flex-col gap-1 px-2 py-2.5">
           <span class="text-sm font-medium leading-none">{{ user.full_name }}</span>
@@ -382,7 +384,7 @@
       />
       <!-- Theme Switch -->
       <div class="flex flex-row justify-between items-center align-middle px-2 py-1.5">
-        <span>Theme</span>
+        <span class="text-sm">Theme</span>
         <Dropdown
           :modelValue="selectedTheme"
           @update:modelValue="selectTheme"
@@ -391,9 +393,7 @@
           :options="themeOptions"
           :autoOptionFocus="false"
           :pt="{
-            root: { class: 'w-auto py-0 h-8 items-center align-middle surface-section' },
-            item: { class: 'text-sm' },
-            input: { class: 'text-sm' }
+            root: { class: 'w-auto items-center align-middle' }
           }"
         >
           <template #value="slotProps">
@@ -413,12 +413,12 @@
           </template>
         </Dropdown>
       </div>
-      <Divider class="surface-border p-1 m-0" />
+      <Divider class="-ml-2 w-[calc(100%+1rem)] mb-3 mt-2" />
       <PrimeButton
-        class="w-full rounded-md flex content-start text-left"
+        class="w-full h-[38px] rounded-md flex content-start text-left"
         :pt="{
           label: {
-            class: 'font-normal'
+            class: 'text-sm font-normal'
           },
           root: {
             class: 'rounded-md hover:surface-200'
@@ -471,22 +471,23 @@
 
   <!-- Modal de create -->
   <PrimeDialog
+    :draggable="false"
     v-model:visible="createModalStore.isOpen"
     modal
     header="New"
     :pt="{
-      root: { class: 'hidden sm:flex' },
-      content: { class: 'p-0' },
+      root: { class:  'hidden w-full lg:max-w-screen-lg 2xl:max-w-screen-xl h-[640px] sm:flex' },
+      content: { class: ' w-full  h-full p-0' },
       mask: { class: 'hidden sm:flex' }
     }"
     position="center"
+    class="w-full"
     :dismissableMask="true"
-    :breakpoints="{ '641px': '90vw' }"
     @update:visible="createModalStore.close()"
   >
     <!-- SLOT WIP -->
     <div>
-      <CreateModalBlock @closeModal="createBoardManager.close()" />
+      <CreateModalBlock @closeModal="createModalStore.close()" />
     </div>
   </PrimeDialog>
 
@@ -815,9 +816,7 @@
               ]
             : []
 
-        const separator = { separator: true }
-
-        return [...switchAccount, ...this.profileMenuItemsDefault, separator]
+        return [...switchAccount, ...this.profileMenuItemsDefault]
       }
     },
     methods: {

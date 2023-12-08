@@ -21,6 +21,7 @@
       <CreateFormBlock
         :createService="props.createIntelligentDNSService"
         :schema="validationSchema"
+        :initialValues="initialValues"
       >
         <template #form>
           <FormFieldsIntelligentDnsCreate></FormFieldsIntelligentDnsCreate>
@@ -69,16 +70,21 @@
         const domainRegex = /^(?:[-A-Za-z0-9]+\.)+[A-Za-z]{2,6}$/
         return domainRegex.test(value)
       }),
-    isActive: yup.boolean().default(true)
+    isActive: yup.boolean()
   })
+
+  const initialValues = {
+    name: '',
+    domain: '',
+    isActive: true
+  }
 
   const handleCopyNameServers = () => {
     props.clipboardWrite('ns1.aziondns.net;ns2.aziondns.com;ns3.aziondns.org')
     toast.add({
-      closable: false,
+      closable: true,
       severity: 'success',
-      summary: 'Nameservers copied',
-      life: 10000
+      summary: 'Nameservers copied'
     })
   }
 </script>

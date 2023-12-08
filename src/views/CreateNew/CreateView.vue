@@ -43,6 +43,7 @@
               <span class="text-xs font-medium text-color-primary">By</span>
               <PrimeButton
                 link
+                @click="goToVendorPage"
                 :pt="{
                   label: { class: 'text-xs' },
                   icon: { class: 'text-xs' }
@@ -84,18 +85,18 @@
         :templateId="solution.referenceId"
       />
       <PrimeDialog
+        :draggable="false"
         modal
         v-model:visible="showDetails"
         class="w-full max-w-2xl"
         :pt="{
-          root: { class: 'hidden sm:flex' },
+          root: { class: ' w-full lg:max-w-screen-lg h-[640px]] hidden sm:flex' },
           mask: { class: 'hidden sm:flex' },
-          content: { class: 'p-5' },
+          content: { class: 'p-5 w-full' },
           header: { class: 'px-5 py-3 items-start' }
         }"
         position="center"
         :dismissableMask="true"
-        :breakpoints="{ '641px': '90vw' }"
       >
         <template #header>
           <div class="w-full flex flex-col gap-2">
@@ -112,17 +113,26 @@
               </span>
             </div>
             <div class="flex gap-3">
-              <div class="flex gap-1">
+              <div class="flex items-center gap-1">
                 <span class="text-xs font-medium text-color-primary">By</span>
-                <span class="text-xs font-medium text-color-secondary">{{
-                  solution.vendor.name
-                }}</span>
+                <PrimeButton
+                  link
+                  :pt="{
+                    label: { class: 'text-xs' },
+                    icon: { class: 'text-xs' }
+                  }"
+                  @click="goToVendorPage"
+                  class="px-0 py-1"
+                  :label="solution.vendor.name"
+                  icon="pi pi-external-link"
+                  iconPos="right"
+                />
               </div>
-              <div class="flex gap-1">
+              <div class="flex items-center gap-1">
                 <span class="text-xs font-medium text-color-primary">Version</span>
                 <span class="text-xs font-medium text-color-secondary">{{ solution.version }}</span>
               </div>
-              <div class="flex gap-1">
+              <div class="flex items-center gap-1">
                 <span class="text-xs font-medium text-color-primary">Last Updated</span>
                 <span class="text-xs font-medium text-color-secondary">{{
                   solution.lastUpdate
@@ -131,7 +141,7 @@
             </div>
           </div>
         </template>
-        <div class="flex flex-col gap-6 max-w-2xl">
+        <div class="flex flex-col gap-6 w-full">
           <div class="flex flex-col gap-2">
             <span class="text-lg font-medium"> Overview </span>
             <div
@@ -223,6 +233,7 @@
   import Skeleton from 'primevue/skeleton'
   import FormLoading from '@/templates/template-engine-block/FormLoading'
   import PageHeadingBlock from '@/templates/page-heading-block'
+  import { useLoadingStore } from '@/stores/loading'
 
   export default {
     components: {
@@ -252,11 +263,18 @@
       loadSolutionService: {
         type: Function,
         required: true
+      },
+      windowOpen: {
+        type: Function,
+        required: true
       }
     },
 
     async created() {
+      const store = useLoadingStore()
+      store.startLoading()
       await this.loadSolution()
+      store.finishLoading()
     },
     methods: {
       async loadSolution() {
@@ -268,20 +286,27 @@
           })
         } catch (error) {
           this.$toast.add({
-            closable: false,
+            closable: true,
             severity: 'error',
-            summary: error,
-            life: 10000
+            summary: error
           })
         } finally {
           this.isLoading = false
         }
       },
+      goToVendorPage() {
+        this.windowOpen(this.solution.vendor.url, '_blank')
+      },
       openDetails() {
         this.showDetails = true
       },
       handleInstantiate(element) {
-        this.$router.push(`/deploy/${element.uuid}`)
+        this.$router.push(`/create/deploy/${element.uuid}`)
+      }
+    },
+    watch: {
+      $route() {
+        this.loadSolution()
       }
     }
   }

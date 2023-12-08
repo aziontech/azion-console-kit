@@ -30,7 +30,6 @@
     },
     updatedRedirect: {
       type: String,
-      required: true
     },
     schema: {
       type: Object,
@@ -45,7 +44,7 @@
   const toast = useToast()
   const blockViewRedirection = ref(true)
 
-  const { meta, errors, handleSubmit, isSubmitting, resetForm } = useForm({
+  const { meta, errors, handleSubmit, isSubmitting, resetForm, values } = useForm({
     validationSchema: props.schema
   })
 
@@ -70,13 +69,12 @@
     }
   }
 
-  const showToast = (severity, summary, life = 10000) => {
+  const showToast = (severity, summary) => {
     if (!summary) return
     toast.add({
-      closable: false,
+      closable: true,
       severity: severity,
-      summary: summary,
-      life: life
+      summary: summary
     })
   }
 
@@ -130,5 +128,6 @@
     :onCancel="onCancel"
     :errors="errors"
     :loading="isSubmitting"
+    :values="values"
   />
 </template>

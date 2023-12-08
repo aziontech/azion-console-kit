@@ -85,10 +85,9 @@
   }
   const showToast = (severity, summary) => {
     toast.add({
-      closable: false,
+      closable: true,
       severity,
-      summary,
-      life: 10000
+      summary
     })
   }
 

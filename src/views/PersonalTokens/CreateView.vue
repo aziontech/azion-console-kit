@@ -51,8 +51,7 @@
 
   const copyPersonalToken = async () => {
     const toastConfig = {
-      closable: false,
-      life: 10000,
+      closable: true,
       severity: 'success',
       summary: 'Personal Token copied to clipboard!'
     }

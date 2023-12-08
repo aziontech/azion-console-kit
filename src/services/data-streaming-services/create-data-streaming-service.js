@@ -15,7 +15,7 @@ export const createDataStreamingService = async (payload) => {
 const adapt = (payload) => {
   const allDomains = payload.domains[1].length <= 0
 
-  return {
+  const parsedPayload = {
     name: payload.name,
     template_id: payload.template,
     data_source: payload.dataSource,
@@ -24,6 +24,12 @@ const adapt = (payload) => {
     active: payload.status,
     endpoint: parseByEndpointType(payload)
   }
+
+  if (payload.hasSampling) {
+    parsedPayload.sampling_percentage = payload.samplingPercentage
+  }
+
+  return parsedPayload
 }
 
 const parseByEndpointType = (payload) => {
@@ -133,7 +139,7 @@ const parseHttpResponse = (httpResponse) => {
     case 201:
       return {
         feedback: 'Your data streaming has been created',
-        urlToEditView: `/data-streaming/edit/${httpResponse.body.results.id}`
+        urlToEditView: `/data-streaming`
       }
     case 400:
       const apiError = extractApiError(httpResponse)
@@ -166,6 +172,9 @@ const extractErrorKey = (errorSchema, key) => {
  * @returns {string} The result message based on the status code.
  */
 const extractApiError = (httpResponse) => {
+  //flag
+  const noFlagError = extractErrorKey(httpResponse.body, 'user_has_no_flag')
+
   // standard
   const invalidURLError = extractErrorKey(httpResponse.body, 'invalid_url')
   const maxSizeError = extractErrorKey(httpResponse.body, 'max_size_out_of_range')
@@ -193,6 +202,7 @@ const extractApiError = (httpResponse) => {
   const datadogInvalidURLError = extractErrorKey(httpResponse.body, 'invalid_datadog_url')
 
   const errorMessages = [
+    noFlagError,
     invalidURLError,
     maxSizeError,
     datasetError,

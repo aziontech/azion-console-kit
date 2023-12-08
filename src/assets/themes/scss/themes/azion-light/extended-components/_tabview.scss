@@ -29,7 +29,12 @@
     }
   }
   .p-tabview-panels {
+    height: 100%;
     background: transparent !important;
     padding: 0 !important;
+
+    .p-tabview-panel {
+      height: 100%;
+    }
   }
 }

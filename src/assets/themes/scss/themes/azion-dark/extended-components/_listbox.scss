@@ -2,8 +2,9 @@
   .p-listbox-list {
     .p-listbox-item {
       padding: 0 12px;
-      height: 2rem !important;
-      display: flex;
+      height: 38px !important;
+      display: flex !important;
+      gap: 12px !important;
       align-items: center;
       font-size: 0.875rem;
     }
@@ -14,7 +15,7 @@
       box-shadow: none !important;
     }
     &.p-focus:focus-visible {
-      border-color: yellow !important;
+      border-color: none !important;
       outline: $focusOutline !important;
       outline-offset: $focusOutlineOffset !important;
       box-shadow: $focusShadow !important;
