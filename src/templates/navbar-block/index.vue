@@ -21,7 +21,10 @@
           @click="redirectToRoute('home')"
         />
 
-        <SwitchAccount :listTypeAccountService="listTypeAccountService" :accountHandler="accountHandler" />
+        <SwitchAccount
+          :listTypeAccountService="listTypeAccountService"
+          :accountHandler="accountHandler"
+        />
       </div>
 
       <div class="ml-auto">
@@ -45,50 +48,54 @@
 </template>
 
 <script setup>
-import { ref, provide, watch } from 'vue'
-import { useRouter } from 'vue-router'
-import { useWindowSize } from '@vueuse/core'
+  import { ref, provide, watch } from 'vue'
+  import { useRouter } from 'vue-router'
+  import { useWindowSize } from '@vueuse/core'
 
-import AzionLogo from '@assets/svg/logo'
-import AzionMobileLogo from '@assets/svg/mobile-logo'
-import SidebarBlock from '@templates/sidebar-block'
-import SearchBlock from '@templates/search-block'
-import Create from './create'
-import Help from './help'
-import Notification from './notification'
-import SwitchAccount from './switch-account'
-import ProfileBlock from '@templates/profile-block'
+  import AzionLogo from '@assets/svg/logo'
+  import AzionMobileLogo from '@assets/svg/mobile-logo'
+  import SidebarBlock from '@templates/sidebar-block'
+  import SearchBlock from '@templates/search-block'
+  import Create from './create'
+  import Help from './help'
+  import Notification from './notification'
+  import SwitchAccount from './switch-account'
+  import ProfileBlock from '@templates/profile-block'
 
-defineOptions({ name: 'navbar-block' })
+  defineOptions({ name: 'navbar-block' })
 
-const router = useRouter()
-const { width } = useWindowSize()
-const currentWidth = ref()
-const openSwitchAccount = ref(false)
+  const router = useRouter()
+  const { width } = useWindowSize()
+  const currentWidth = ref()
+  const openSwitchAccount = ref(false)
 
-provide('currentWidth', currentWidth)
-provide('openSwitchAccount', openSwitchAccount)
+  provide('currentWidth', currentWidth)
+  provide('openSwitchAccount', openSwitchAccount)
 
-const props = defineProps({
-  userIsLogged: {
-    type: Boolean,
-    required: true
-  },
-  listTypeAccountService: {
-    type: Function,
-    required: true
-  },
-  accountHandler: {
-    type: Object,
-    required: true
+  const props = defineProps({
+    userIsLogged: {
+      type: Boolean,
+      required: true
+    },
+    listTypeAccountService: {
+      type: Function,
+      required: true
+    },
+    accountHandler: {
+      type: Object,
+      required: true
+    }
+  })
+
+  const redirectToRoute = (name) => {
+    router.push({ name })
   }
-})
 
-const redirectToRoute = (name) => {
-  router.push({ name })
-}
-
-watch(width, () => {
-  currentWidth.value = width.value
-}, { immediate: true })
+  watch(
+    width,
+    () => {
+      currentWidth.value = width.value
+    },
+    { immediate: true }
+  )
 </script>

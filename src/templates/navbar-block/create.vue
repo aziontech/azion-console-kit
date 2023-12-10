@@ -38,29 +38,29 @@
 </template>
 
 <script setup>
-import { onMounted, ref, computed } from 'vue'
-import { useCreateModalStore } from '@/stores/create-modal'
+  import { onMounted, ref, computed } from 'vue'
+  import { useCreateModalStore } from '@/stores/create-modal'
 
-import PrimeButton from 'primevue/button'
-import PrimeDialog from 'primevue/dialog'
-import CreateModalBlock from '@/templates/create-modal-block'
+  import PrimeButton from 'primevue/button'
+  import PrimeDialog from 'primevue/dialog'
+  import CreateModalBlock from '@/templates/create-modal-block'
 
-defineOptions({ name: 'navbar-create-block' })
+  defineOptions({ name: 'navbar-create-block' })
 
-const createModalStore = useCreateModalStore()
-const currentWidth = ref(0)
+  const createModalStore = useCreateModalStore()
+  const currentWidth = ref(0)
 
-onMounted(() => {
-  currentWidth.value = window.innerWidth
-  window.addEventListener('resize', () => {
+  onMounted(() => {
     currentWidth.value = window.innerWidth
+    window.addEventListener('resize', () => {
+      currentWidth.value = window.innerWidth
+    })
   })
-})
 
-const currentLabel = computed(() => {
-  if (currentWidth.value > 768) {
-    return 'Create'
-  }
-  return ''
-})
+  const currentLabel = computed(() => {
+    if (currentWidth.value > 768) {
+      return 'Create'
+    }
+    return ''
+  })
 </script>

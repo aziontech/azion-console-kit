@@ -55,36 +55,36 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
-import { useRouter } from 'vue-router'
+  import { ref, computed } from 'vue'
+  import { useRouter } from 'vue-router'
 
-import PrimeButton from 'primevue/button'
-import PrimeMenu from 'primevue/menu'
-import Sidebar from 'primevue/sidebar'
-import { listSidebarMenusService } from '@services/sidebar-menus-services'
+  import PrimeButton from 'primevue/button'
+  import PrimeMenu from 'primevue/menu'
+  import Sidebar from 'primevue/sidebar'
+  import { listSidebarMenusService } from '@services/sidebar-menus-services'
 
-defineOptions({ name: 'sidebar-block' })
+  defineOptions({ name: 'sidebar-block' })
 
-const router = useRouter()
+  const router = useRouter()
 
-const showSidebar = ref(false)
+  const showSidebar = ref(false)
 
-const openSideBar = () => {
-  showSidebar.value = !showSidebar.value
-}
+  const openSideBar = () => {
+    showSidebar.value = !showSidebar.value
+  }
 
-const closeSideBar = () => {
-  showSidebar.value = false
-}
+  const closeSideBar = () => {
+    showSidebar.value = false
+  }
 
-const redirectToRoute = (route) => {
-  closeSideBar()
-  router.push(route)
-}
+  const redirectToRoute = (route) => {
+    closeSideBar()
+    router.push(route)
+  }
 
-const menus = computed(() => {
-  const response = listSidebarMenusService()
+  const menus = computed(() => {
+    const response = listSidebarMenusService()
 
-  return response.body.menus
-})
+    return response.body.menus
+  })
 </script>

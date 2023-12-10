@@ -34,16 +34,16 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+  import { ref } from 'vue'
 
-import PrimeButton from 'primevue/button'
-import PrimeMenu from 'primevue/menu'
+  import PrimeButton from 'primevue/button'
+  import PrimeMenu from 'primevue/menu'
 
-defineOptions({ name: 'navbar-notiication-block' })
+  defineOptions({ name: 'navbar-notiication-block' })
 
-const menu = ref(null)
+  const menu = ref(null)
 
-const toggleNotification = (event) => {
-  menu.value.toggle(event)
-}
+  const toggleNotification = (event) => {
+    menu.value.toggle(event)
+  }
 </script>

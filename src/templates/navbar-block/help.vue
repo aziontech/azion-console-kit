@@ -18,27 +18,27 @@
 </template>
 
 <script setup>
-import { onMounted, computed, ref } from 'vue'
-import { useHelpCenterStore } from '@/stores/help-center'
+  import { onMounted, computed, ref } from 'vue'
+  import { useHelpCenterStore } from '@/stores/help-center'
 
-import PrimeButton from 'primevue/button'
+  import PrimeButton from 'primevue/button'
 
-defineOptions({ name: 'navbar-help-block' })
+  defineOptions({ name: 'navbar-help-block' })
 
-const helpCenterStore = useHelpCenterStore()
-const currentWidth = ref(0)
+  const helpCenterStore = useHelpCenterStore()
+  const currentWidth = ref(0)
 
-onMounted(() => {
-  currentWidth.value = window.innerWidth
-  window.addEventListener('resize', () => {
+  onMounted(() => {
     currentWidth.value = window.innerWidth
+    window.addEventListener('resize', () => {
+      currentWidth.value = window.innerWidth
+    })
   })
-})
 
-const currentLabel = computed(() => {
-  if (currentWidth.value > 768) {
-    return 'Help'
-  }
-  return ''
-})
+  const currentLabel = computed(() => {
+    if (currentWidth.value > 768) {
+      return 'Help'
+    }
+    return ''
+  })
 </script>

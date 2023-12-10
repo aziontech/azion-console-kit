@@ -1,7 +1,5 @@
 <template>
-  <div
-    class="top-0 p-input-icon-left p-input-icon-right hidden md:flex md:my-3"
-  >
+  <div class="top-0 p-input-icon-left p-input-icon-right hidden md:flex md:my-3">
     <i class="pi pi-search text-white" />
     <i class="!top-[32%]">
       <span
@@ -69,32 +67,32 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+  import { ref } from 'vue'
 
-import Tag from 'primevue/tag'
-import InputText from 'primevue/inputtext'
-import PrimeDialog from 'primevue/dialog'
-import PrimeButton from 'primevue/button'
+  import Tag from 'primevue/tag'
+  import InputText from 'primevue/inputtext'
+  import PrimeDialog from 'primevue/dialog'
+  import PrimeButton from 'primevue/button'
 
-defineOptions({ name: 'search-block' })
+  defineOptions({ name: 'search-block' })
 
-const search = ref('')
-const showSearch = ref(false)
+  const search = ref('')
+  const showSearch = ref(false)
 
-const openSearch = () => {
-  showSearch.value = true
-}
+  const openSearch = () => {
+    showSearch.value = true
+  }
 
-const listenerKeyDown = () => {
-  document.addEventListener('keydown', (event) => {
-    const isCommandKeyPressed = event.metaKey || event.ctrlKey
-    const isKKeyPressed = event.key === 'k' || event.key === 'K'
-  
-    if (isCommandKeyPressed && isKKeyPressed) {
-      showSearch.value = true
-    }
-  })
-}
+  const listenerKeyDown = () => {
+    document.addEventListener('keydown', (event) => {
+      const isCommandKeyPressed = event.metaKey || event.ctrlKey
+      const isKKeyPressed = event.key === 'k' || event.key === 'K'
 
-listenerKeyDown()
+      if (isCommandKeyPressed && isKKeyPressed) {
+        showSearch.value = true
+      }
+    })
+  }
+
+  listenerKeyDown()
 </script>

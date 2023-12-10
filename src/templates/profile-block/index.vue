@@ -198,122 +198,122 @@
 </template>
 
 <script setup>
-import { ref, computed, inject, watch } from 'vue'
-import { useAccountStore } from '@/stores/account'
+  import { ref, computed, inject, watch } from 'vue'
+  import { useAccountStore } from '@/stores/account'
 
-import Sidebar from 'primevue/sidebar'
-import Avatar from 'primevue/avatar'
-import PrimeMenu from 'primevue/menu'
-import Dropdown from 'primevue/dropdown'
-import Divider from 'primevue/divider'
-import PrimeButton from 'primevue/button'
+  import Sidebar from 'primevue/sidebar'
+  import Avatar from 'primevue/avatar'
+  import PrimeMenu from 'primevue/menu'
+  import Dropdown from 'primevue/dropdown'
+  import Divider from 'primevue/divider'
+  import PrimeButton from 'primevue/button'
 
-defineOptions({ name: 'profile-block' })
+  defineOptions({ name: 'profile-block' })
 
-const user = useAccountStore().accountData
-const currentTheme = useAccountStore().currentTheme
-const setTheme = useAccountStore().setTheme
+  const user = useAccountStore().accountData
+  const currentTheme = useAccountStore().currentTheme
+  const setTheme = useAccountStore().setTheme
 
-const profile = ref(null)
-const showProfile = ref(false)
-const profileMenuDefault = [
-  {
-    label: 'Configurações da Conta',
-    to: '/account-settings'
-  },
-  {
-    label: 'Gerenciamento de Usuários',
-    to: '/users'
-  },
-  {
-    label: 'Billing & Subscriptions',
-    to: '/billing-subscriptions'
-  },
-  {
-    label: 'Credentials',
-    to: '/credentials'
-  },
-  {
-    label: 'Activity History',
-    to: '/activity-history'
-  },
-  {
-    label: 'Teams Permissions',
-    to: '/teams-permission'
+  const profile = ref(null)
+  const showProfile = ref(false)
+  const profileMenuDefault = [
+    {
+      label: 'Configurações da Conta',
+      to: '/account-settings'
+    },
+    {
+      label: 'Gerenciamento de Usuários',
+      to: '/users'
+    },
+    {
+      label: 'Billing & Subscriptions',
+      to: '/billing-subscriptions'
+    },
+    {
+      label: 'Credentials',
+      to: '/credentials'
+    },
+    {
+      label: 'Activity History',
+      to: '/activity-history'
+    },
+    {
+      label: 'Teams Permissions',
+      to: '/teams-permission'
+    }
+  ]
+  const profileMenuSettings = [
+    {
+      label: 'Your Settings',
+      to: '/list-your-settings'
+    },
+    {
+      label: 'Personal Token',
+      to: '/personal-tokens'
+    }
+  ]
+  const themeOptions = [
+    { name: 'Light', value: 'light', icon: 'pi pi-sun' },
+    { name: 'Dark', value: 'dark', icon: 'pi pi-moon' },
+    { name: 'System', value: 'system', icon: 'pi pi-desktop' }
+  ]
+  const currentWidth = inject('currentWidth')
+  const openSwitchAccount = inject('openSwitchAccount')
+
+  const toggleProfile = (event) => {
+    if (window.innerWidth <= 768) {
+      showProfile.value = !showProfile.value
+    } else {
+      profile.value.toggle(event)
+    }
   }
-]
-const profileMenuSettings = [
-  {
-    label: 'Your Settings',
-    to: '/list-your-settings'
-  },
-  {
-    label: 'Personal Token',
-    to: '/personal-tokens'
+
+  const closeMobileMenu = () => {
+    showProfile.value = false
   }
-]
-const themeOptions = [
-  { name: 'Light', value: 'light', icon: 'pi pi-sun' },
-  { name: 'Dark', value: 'dark', icon: 'pi pi-moon' },
-  { name: 'System', value: 'system', icon: 'pi pi-desktop' }
-]
-const currentWidth = inject('currentWidth')
-const openSwitchAccount = inject('openSwitchAccount')
 
-const toggleProfile = (event) => {
-  if (window.innerWidth <= 768) {
-    showProfile.value = !showProfile.value
-  } else {
-    profile.value.toggle(event)
+  const closeDesktopMenu = () => {
+    profile.value.hide()
   }
-}
 
-const closeMobileMenu = () => {
-  showProfile.value = false
-}
-
-const closeDesktopMenu = () => {
-  profile.value.hide()
-}
-
-const setSelectedTheme = (theme) => {
-  setTheme(theme)
-}
-
-const logout = () => {
-  window.location.href = '/logout'
-}
-
-const openSwitchAccountDialog = () => {
-  openSwitchAccount.value = true
-}
-
-const selectedTheme = computed(() => {
-  return themeOptions.find((option) => option.value === currentTheme)
-})
-
-const profileMenuItems = computed(() => {
-  const switchAccount =
-    user && !user.is_client_only
-      ? [
-          {
-            label: 'Switch Account',
-            command: openSwitchAccountDialog,
-            class: 'md:hidden'
-          }
-        ]
-      : []
-
-  const separator = { separator: true }
-
-  return [...switchAccount, ...profileMenuDefault, separator]
-})
-
-watch(currentWidth, async (width) => {
-  if (width <= 768) {
-    closeDesktopMenu()
-  } else if (width > 768 && showProfile.value) {
-    closeMobileMenu()
+  const setSelectedTheme = (theme) => {
+    setTheme(theme)
   }
-})
+
+  const logout = () => {
+    window.location.href = '/logout'
+  }
+
+  const openSwitchAccountDialog = () => {
+    openSwitchAccount.value = true
+  }
+
+  const selectedTheme = computed(() => {
+    return themeOptions.find((option) => option.value === currentTheme)
+  })
+
+  const profileMenuItems = computed(() => {
+    const switchAccount =
+      user && !user.is_client_only
+        ? [
+            {
+              label: 'Switch Account',
+              command: openSwitchAccountDialog,
+              class: 'md:hidden'
+            }
+          ]
+        : []
+
+    const separator = { separator: true }
+
+    return [...switchAccount, ...profileMenuDefault, separator]
+  })
+
+  watch(currentWidth, async (width) => {
+    if (width <= 768) {
+      closeDesktopMenu()
+    } else if (width > 768 && showProfile.value) {
+      closeMobileMenu()
+    }
+  })
 </script>

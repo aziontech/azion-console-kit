@@ -7,7 +7,7 @@ export const listSidebarMenusService = () => {
 const adapt = (menus) => {
   return {
     body: {
-      menus,
+      menus
     },
     statusCode: 200
   }
