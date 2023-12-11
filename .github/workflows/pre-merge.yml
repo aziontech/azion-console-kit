@@ -15,7 +15,7 @@ jobs:
   run-tests:
     runs-on: [self-hosted, stage]
     container:
-      image: node:16-alpine3.14
+      image: node:18-alpine3.18
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -59,6 +59,12 @@ jobs:
         with:
           name: coverage_unit_report
 
+      - name: List files in coverage directory
+        run: ls -R /github/workspace/coverage
+
+      - name: List files in directory
+        run: ls -R /github/workspace/
+        
       - name: Fix code coverage paths - lcov.info
         run: |
           sed -i 's:/__w/azion-platform-kit/azion-platform-kit/:/github/workspace/:' lcov.info
