@@ -9,7 +9,9 @@
     loading: Boolean,
     inDrawer: Boolean,
     cancelDisabled: Boolean,
-    submitDisabled: Boolean
+    submitDisabled: Boolean,
+    primaryActionLabel: { type: String, default: 'Save' },
+    secondaryActionLabel: { type: String, default: 'Cancel' },
   })
 
   const handleSubmit = () => {
@@ -49,7 +51,7 @@
       <div class="flex gap-4 self-stretch items-center justify-end w-full">
         <PrimeButton
           severity="primary"
-          label="Cancel"
+          :label="props.secondaryActionLabel"
           outlined
           class="max-md:min-w-max"
           @click="handleCancel"
@@ -57,7 +59,7 @@
         />
         <PrimeButton
           severity="primary"
-          label="Save"
+          :label="props.primaryActionLabel"
           @click="handleSubmit"
           icon-pos="right"
           class="max-md:w-full"
