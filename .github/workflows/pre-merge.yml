@@ -58,17 +58,11 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           name: coverage_unit_report
-
-      - name: List files in current directory
-        run: ls -R
-
-      - name: List files in directory
-        run: ls -R /github/workspace/
         
       - name: Fix code coverage paths - lcov.info
         run: |
-          sed -i 's:/__w/azion-platform-kit/azion-platform-kit/:/github/workspace/:' lcov.info
-          sed -i 's:/__w/azion-platform-kit/azion-platform-kit/:/github/workspace/:' sonar-report.xml
+          sed -i 's:/__w/azion-platform-kit/azion-platform-kit/:' lcov.info
+          sed -i 's:/__w/azion-platform-kit/azion-platform-kit/:' sonar-report.xml
 
       - name: SonarQube Scan
         uses: sonarsource/sonarqube-scan-action@master
