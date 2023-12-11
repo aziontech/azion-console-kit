@@ -23,6 +23,7 @@ import { activityHistoryRoutes } from './routes/activity-history-routes'
 import { errorRoutes } from '@routes/error-routes'
 import { playgroundRoutes } from '@routes/playground-routes'
 import { mfaRoutes } from '@routes/mfa-routes'
+import { metricsRoutes } from '@routes/metrics-routes'
 import beforeEachRoute from './hooks/beforeEachRoute'
 
 const router = createRouter({
@@ -50,7 +51,8 @@ const router = createRouter({
     mfaRoutes,
     activityHistoryRoutes,
     realTimePurgeRoutes,
-    teamsPermissionRoutes
+    teamsPermissionRoutes,
+    metricsRoutes
   ].concat(errorRoutes)
 })
 
