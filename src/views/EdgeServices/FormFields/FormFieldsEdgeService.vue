@@ -67,9 +67,11 @@
           :options="editorOptions"
         />
         <small class="text-color-secondary text-sm font-normal leading-tight">
-          Enter the list of variables and values for the resource. Example: <code>port = 3306</code>.
-          <br>
-          You can add variables to the resource content by referencing the tag <code>&#123;&#123; VARNAME &#125;&#125;</code>.
+          Enter the list of variables and values for the resource. Example:
+          <code>port = 3306</code>.
+          <br />
+          You can add variables to the resource content by referencing the tag
+          <code>&#123;&#123; VARNAME &#125;&#125;</code>.
         </small>
         <small
           v-if="codeError"

@@ -88,7 +88,7 @@
       :listService="listResourcesServicesWithDecorator"
       :deleteService="deleteResourcesServicesWithDecorator"
       :columns="getColumns"
-      pageTitleDelete="Edge Service Resource"
+      pageTitleDelete="Resource"
       :editInDrawer="openDrawer"
       @on-load-data="handleLoadData"
     >
