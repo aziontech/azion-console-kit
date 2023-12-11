@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - dev
-      - ENG-28384-ajustes-recaptcha
 env:
   HUSKY: 0
 
