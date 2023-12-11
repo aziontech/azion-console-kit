@@ -18,7 +18,14 @@
         <p class="text-color-secondary">
           <b class="text-color">Ongoing Experiment.</b>
           Our platform is in its early release stage. Please bear with us as occasional instability
-          or bugs may occur during this time.
+          or bugs may occur during this time. If you encounter any issue,
+          <ButtonPrime
+            class="p-0"
+            label="let us know"
+            icon="pi pi-external-link"
+            iconPos="right"
+            link
+          />
         </p>
       </Message>
       <div
@@ -45,6 +52,7 @@
 
   import Message from 'primevue/message'
   import Avatar from 'primevue/avatar'
+  import ButtonPrime from 'primevue/button'
 
   import { computed, useSlots } from 'vue'
   const slots = useSlots()
