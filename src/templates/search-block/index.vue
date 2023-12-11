@@ -87,7 +87,7 @@
     document.addEventListener('keydown', () => {
       const isCommandKeyPressed = event.metaKey || event.ctrlKey
       const isKKeyPressed = event.key === 'k' || event.key === 'K'
-  
+
       if (isCommandKeyPressed && isKKeyPressed) {
         showSearch.value = true
       }
