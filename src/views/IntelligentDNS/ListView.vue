@@ -30,8 +30,8 @@
       />
       <EmptyResultsBlock
         v-else
-        title="No intelligent DNS has been created"
-        description=" Click the button below to initiate the setup process and create your first intelligent DNS."
+        title="No zone has been created"
+        description="Click the button below to initiate the setup process and create your first zone."
         createButtonLabel="Add"
         createPagePath="intelligent-dns/create"
         :documentationService="documentationService"

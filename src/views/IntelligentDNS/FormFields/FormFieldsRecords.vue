@@ -65,7 +65,7 @@
         <div class="p-inputgroup">
           <InputText
             v-model="name"
-            placeholder="My intelligent DNS"
+            placeholder="My record"
             id="name"
             type="text"
             :class="{ 'p-invalid': errorName }"
@@ -117,7 +117,7 @@
           <label
             for="ttl"
             class="text-color text-base font-medium"
-            >TTL (seconds)*</label
+            >TTL (seconds) *</label
           >
           <InputText
             placeholder="TTL (seconds):"
@@ -146,7 +146,7 @@
         <Textarea
           rows="5"
           cols="30"
-          placeholder="Value items"
+          placeholder="Value"
           v-model="value"
           id="value"
           type="text"
@@ -187,7 +187,7 @@
             class="w-full"
           />
           <small class="text-color-secondary text-sm font-normal leading-tight">
-            Choose <code>Simple</code> to use the standard DNS functionality or <code>Weighted</code> to specify the amount of traffic to send to each record.
+            Choose <code>Simple</code> to use the standard DNS functionality or <code>Weighted</code> to specify the amount of traffic sent to each record.
           </small>
 
           <small
@@ -216,7 +216,7 @@
             v-if="isWeightedPolicy"
           />
           <small class="text-color-secondary text-sm font-normal leading-tight">
-            Specify the weight for each record. Accepts numbers between 0 and 255.
+            Specify the weight for each record. Accepts integers between 0 and 255.
           </small>
 
           <small

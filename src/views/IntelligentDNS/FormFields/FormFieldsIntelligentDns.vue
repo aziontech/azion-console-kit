@@ -31,7 +31,7 @@
         >
         <InputText
           v-model="name"
-          placeholder="My intelligent DNS"
+          placeholder="My zone"
           id="name"
           type="text"
           :class="{ 'p-invalid': errorName }"
@@ -66,7 +66,7 @@
           :class="{ 'p-invalid': errorDomain }"
         />
         <small class="text-xs text-color-secondary font-normal leading-tight">
-          Describe the name of the domain. Example: <code>mydomain</code> in <code>mydomain.com</code></small
+          Add the name of the domain. Example: <code>mydomain</code> in <code>mydomain.com</code></small
         >
         <small
           v-if="errorDomain"
