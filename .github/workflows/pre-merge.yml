@@ -65,11 +65,6 @@ jobs:
           sudo apt-get install -y nodejs
           node --version
 
-      - name: Verify Git status
-        run: |
-          git status
-          git log -n 5
-
       - name: Download coverage reports
         uses: actions/download-artifact@v3
         with:
