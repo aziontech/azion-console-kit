@@ -51,31 +51,8 @@ jobs:
       image: ubuntu:22.04
 
     steps:
-      - name: Install curl and sudo
-        run: |
-          apt-get update
-          apt-get install -y curl sudo
-
       - name: Checkout code
         uses: actions/checkout@v3
-
-      - name: Install Node.js
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y ca-certificates curl gnupg
-          sudo mkdir -p /etc/apt/keyrings
-          curl -fsSL https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key | sudo gpg --dearmor -o /etc/apt/keyrings/nodesource.gpg
-  
-          NODE_MAJOR=16
-          echo "deb [signed-by=/etc/apt/keyrings/nodesource.gpg] https://deb.nodesource.com/node_$NODE_MAJOR.x nodistro main" | sudo tee /etc/apt/sources.list.d/nodesource.list
-  
-          sudo apt-get update
-          sudo apt-get install nodejs -y
-
-      - name: Use Node.js v16
-        run: |
-          sudo ln -sf $(which node16) /usr/local/bin/node
-          node --version
 
       - name: Download coverage reports
         uses: actions/download-artifact@v3
