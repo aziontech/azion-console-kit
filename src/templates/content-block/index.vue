@@ -25,6 +25,7 @@
             icon="pi pi-external-link"
             iconPos="right"
             link
+            @click="goToCreateIssue"
           />
         </p>
       </Message>
@@ -57,4 +58,8 @@
   import { computed, useSlots } from 'vue'
   const slots = useSlots()
   const hasHeadingSlot = computed(() => !!slots.heading)
+
+  const goToCreateIssue = () => {
+    window.open('https://github.com/aziontech/azion-platform-kit/issues/new', '_blank')
+  }
 </script>
