@@ -1,14 +1,14 @@
 <template>
   <PrimeButton
     :label="currentLabel"
-    @click="helpCenterStore.toggle()"
+    @click="openHelpCenter()"
     :pt="{
       label: { class: 'text-white' },
       icon: { class: 'text-white' }
     }"
     :class="{
-      'bg-header hover:bg-header-button-hover': !helpCenterStore.isOpen,
-      'bg-header-button-enabled': helpCenterStore.isOpen
+      'bg-header hover:bg-header-button-hover': !helpCenterIsOpen,
+      'bg-header-button-enabled': helpCenterIsOpen
     }"
     icon="pi pi-question-circle"
     size="small"
@@ -18,7 +18,7 @@
 </template>
 
 <script setup>
-  import { onMounted, computed, ref } from 'vue'
+  import { computed, inject } from 'vue'
   import { useHelpCenterStore } from '@/stores/help-center'
 
   import PrimeButton from 'primevue/button'
@@ -26,19 +26,21 @@
   defineOptions({ name: 'navbar-help-block' })
 
   const helpCenterStore = useHelpCenterStore()
-  const currentWidth = ref(0)
+  const currentWidth = inject('currentWidth')
+  const SCREEN_BREAKPOINT_MD = 768
 
-  onMounted(() => {
-    currentWidth.value = window.innerWidth
-    window.addEventListener('resize', () => {
-      currentWidth.value = window.innerWidth
-    })
-  })
+  const openHelpCenter = () => {
+    helpCenterStore.toggle()
+  }
 
   const currentLabel = computed(() => {
-    if (currentWidth.value > 768) {
+    if (currentWidth.value > SCREEN_BREAKPOINT_MD) {
       return 'Help'
     }
     return ''
+  })
+
+  const helpCenterIsOpen = computed(() => {
+    return helpCenterStore.isOpen
   })
 </script>

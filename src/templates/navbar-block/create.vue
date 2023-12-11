@@ -1,6 +1,6 @@
 <template>
   <PrimeButton
-    @click="createModalStore.toggle()"
+    @click="openCreateModalStore()"
     icon="pi pi-plus"
     :label="currentLabel"
     class="h-8 w-8 md:w-fit text-white border-header"
@@ -10,14 +10,15 @@
       icon: { class: 'text-white' }
     }"
     :class="{
-      'bg-header hover:bg-header-button-hover': !createModalStore.isOpen,
-      'bg-header-button-enabled': createModalStore.isOpen
+      'bg-header hover:bg-header-button-hover': !createModalIsOpen,
+      'bg-header-button-enabled': createModalIsOpen
     }"
     v-tooltip.bottom="{ value: 'Create', showDelay: 200 }"
   />
 
   <PrimeDialog
-    v-model:visible="createModalStore.isOpen"
+    :draggable="false"
+    v-model:visible="createModalIsOpen"
     modal
     header="New"
     :pt="{
@@ -28,39 +29,72 @@
     position="center"
     :dismissableMask="true"
     :breakpoints="{ '641px': '90vw' }"
-    @update:visible="createModalStore.close()"
+    @update:visible="closeCreateModalStore()"
   >
     <!-- SLOT WIP -->
     <div>
       <CreateModalBlock @closeModal="createBoardManager.close()" />
     </div>
   </PrimeDialog>
+
+  <Sidebar
+    v-model:visible="createModalIsOpen"
+    position="bottom"
+    headerContent="Create something new"
+    :show-close-icon="false"
+    :pt="{
+      root: { class: 'h-[80%] flex p-0 sm:hidden' },
+      headerContent: { class: 'w-full' },
+      mask: { class: 'flex sm:hidden' }
+    }"
+  >
+    <template #header>
+      <div class="flex items-center justify-between">
+        <h2>Create something new</h2>
+        <PrimeButton
+          icon="pi pi-times"
+          @click="closeCreateModalStore()"
+          size="small"
+          class="flex-none surface-border text-sm w-8 h-8"
+          text
+        />
+      </div>
+    </template>
+    <CreateModalBlock />
+  </Sidebar>
 </template>
 
 <script setup>
-  import { onMounted, ref, computed } from 'vue'
+  import { computed, inject } from 'vue'
   import { useCreateModalStore } from '@/stores/create-modal'
 
   import PrimeButton from 'primevue/button'
   import PrimeDialog from 'primevue/dialog'
+  import Sidebar from 'primevue/sidebar'
   import CreateModalBlock from '@/templates/create-modal-block'
 
   defineOptions({ name: 'navbar-create-block' })
 
   const createModalStore = useCreateModalStore()
-  const currentWidth = ref(0)
+  const currentWidth = inject('currentWidth')
+  const SCREEN_BREAKPOINT_MD = 768
 
-  onMounted(() => {
-    currentWidth.value = window.innerWidth
-    window.addEventListener('resize', () => {
-      currentWidth.value = window.innerWidth
-    })
-  })
+  const openCreateModalStore = () => {
+    createModalStore.toggle()
+  }
+
+  const closeCreateModalStore = () => {
+    createModalStore.close()
+  }
 
   const currentLabel = computed(() => {
-    if (currentWidth.value > 768) {
+    if (currentWidth.value > SCREEN_BREAKPOINT_MD) {
       return 'Create'
     }
     return ''
+  })
+
+  const createModalIsOpen = computed(() => {
+    return createModalStore.isOpen
   })
 </script>
