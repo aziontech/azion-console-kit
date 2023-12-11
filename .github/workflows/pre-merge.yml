@@ -74,7 +74,7 @@ jobs:
 
       - name: Use Node.js v16
         run: |
-          sudo ln -s /usr/bin/nodejs /usr/local/bin/node
+          sudo ln -sf $(which node16) /usr/local/bin/node
           node --version
 
       - name: Download coverage reports
