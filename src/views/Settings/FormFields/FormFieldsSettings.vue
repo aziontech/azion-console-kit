@@ -5,6 +5,7 @@
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
   import InputText from 'primevue/inputtext'
   import Dropdown from 'primevue/dropdown'
+  import InputPassword from 'primevue/password'
   import InputSwitch from 'primevue/inputswitch'
   import InputMask from 'primevue/inputmask'
   import Card from 'primevue/card'
@@ -47,6 +48,10 @@
   const { value: twoFactorEnabled, errorMessage: errorTwoFactorEnabled } =
     useField('twoFactorEnabled')
 
+  const { value: password, errorMessage: errorPassword } = useField('password')
+  const { value: oldPassword, errorMessage: errorOldPassword } = useField('oldPassword')
+
+
   const fetchCountries = async () => {
     const result = await props.listCountriesPhoneService()
     optionsCountriesMobile.value = result
@@ -75,6 +80,25 @@
     await fetchTeams()
     await fetchDetailAccount()
   })
+
+  const passwordRequirementsList = ref([
+    { label: '> 7 characters', valid: false },
+    { label: 'Uppercase letter', valid: false },
+    { label: 'Lowercase letter', valid: false },
+    { label: 'Special character (e.g. !?<>@#$%)', valid: false }
+  ])
+
+  const validation = () => {
+    const hasUpperCase = password.value && /[A-Z]/.test(password.value)
+    const hasLowerCase = password.value && /[a-z]/.test(password.value)
+    const hasSpecialChar = password.value && /[!@#$%^&*(),.?":{}|<>]/.test(password.value)
+    const hasMinLength = password.value?.length > 7
+    passwordRequirementsList.value[0].valid = hasMinLength
+    passwordRequirementsList.value[1].valid = hasUpperCase
+    passwordRequirementsList.value[2].valid = hasLowerCase
+    passwordRequirementsList.value[3].valid = hasSpecialChar
+    return hasMinLength && hasUpperCase && hasLowerCase && hasSpecialChar
+  }
 </script>
 
 <template>
@@ -220,6 +244,64 @@
 
   <FormHorizontal title="Security settings">
     <template #inputs>
+      <div class="flex flex-col sm:max-w-lg w-full gap-2">
+        <label
+          for="oldPassword"
+          class="text-color text-base font-medium"
+          >Old password *</label
+        >
+        <InputPassword
+          toggleMask
+          v-model="oldPassword"
+          id="oldPassword"
+          class="w-full"
+          :class="{ 'p-invalid': errorOldPassword }"
+          :feedback="false"
+        />
+        <small
+          id="name-help"
+          class="p-error"
+          >{{ errorOldPassword }}</small
+        >
+      </div>
+      <div class="flex flex-col sm:max-w-lg gap-2">
+        <label
+          for="password"
+          class="font-semibold text-sm"
+          >New password *</label
+        >
+        <InputPassword
+          toggleMask
+          v-model="password"
+          id="password"
+          class="w-full"
+          @input="validation()"
+          :class="{ 'p-invalid': errorPassword }"
+          :feedback="false"
+        />
+        <small class="p-error text-xs font-normal leading-tight">{{ errorPassword }}</small>
+
+        <label class="font-semibold text-sm my-2">Must have at least:</label>
+        <ul class="text-color-secondary list-inside space-y-3">
+          <li
+            class="flex gap-3 items-center text-color-secondary"
+            :key="i"
+            v-for="(requirement, i) in passwordRequirementsList"
+          >
+            <div class="w-3">
+              <span
+                class="pi pi-check text-sm text-success-check animate-fadeIn"
+                v-if="requirement.valid"
+              />
+              <div
+                class="w-2 h-2 bg-orange-bullet animate-fadeIn"
+                v-else
+              />
+            </div>
+            <span>{{ requirement.label }}</span>
+          </li>
+        </ul>
+      </div>
       <Card
         :pt="{
           root: { class: 'shadow-none  rounded-none' },
