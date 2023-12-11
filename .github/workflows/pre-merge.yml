@@ -59,8 +59,8 @@ jobs:
         with:
           name: coverage_unit_report
 
-      - name: List files in coverage directory
-        run: ls -R /github/workspace/coverage
+      - name: List files in current directory
+        run: ls -R
 
       - name: List files in directory
         run: ls -R /github/workspace/
