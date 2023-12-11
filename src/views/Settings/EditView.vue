@@ -38,7 +38,6 @@
   import * as yup from 'yup'
   import { ref } from 'vue'
 
-
   const props = defineProps({
     loadAccountDetailsService: {
       type: Function,

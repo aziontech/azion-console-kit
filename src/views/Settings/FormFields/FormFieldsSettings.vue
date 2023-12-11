@@ -51,7 +51,6 @@
   const { value: password, errorMessage: errorPassword } = useField('password')
   const { value: oldPassword, errorMessage: errorOldPassword } = useField('oldPassword')
 
-
   const fetchCountries = async () => {
     const result = await props.listCountriesPhoneService()
     optionsCountriesMobile.value = result
