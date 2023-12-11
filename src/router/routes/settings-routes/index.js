@@ -21,7 +21,7 @@ export const settingsRoutes = {
           {
             label: 'Your Settings',
             to: '/settings'
-          },
+          }
         ]
       }
     }

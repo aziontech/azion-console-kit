@@ -476,7 +476,7 @@
     modal
     header="New"
     :pt="{
-      root: { class:  'hidden w-full lg:max-w-screen-lg 2xl:max-w-screen-xl h-[640px] sm:flex' },
+      root: { class: 'hidden w-full lg:max-w-screen-lg 2xl:max-w-screen-xl h-[640px] sm:flex' },
       content: { class: ' w-full  h-full p-0' },
       mask: { class: 'hidden sm:flex' }
     }"
