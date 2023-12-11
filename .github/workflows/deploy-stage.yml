@@ -24,6 +24,8 @@ jobs:
 
       - name: Build
         run: yarn build
+        env:
+          VITE_RECAPTCHA_SITE_KEY: ${{ secrets.STAGE_RECAPTCHA_SITE_KEY }}
 
       - name: Download Azion CLI
         run: curl https://downloads.azion.com/linux/x86_64/azioncli -o azioncli && chmod +x azioncli
