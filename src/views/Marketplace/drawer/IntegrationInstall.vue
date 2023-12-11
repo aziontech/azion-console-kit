@@ -6,8 +6,10 @@
   import Dropdown from 'primevue/dropdown'
   import Divider from 'primevue/divider'
   import InlineMessage from 'primevue/inlinemessage'
+  import ProgressBar from 'primevue/progressbar'
   import { useField, useForm } from 'vee-validate'
   import * as yup from 'yup'
+  import { useLoadingStore } from '@/stores/loading'
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
   import TemplateEngineBlock from '@/templates/template-engine-block'
   import { InternalServerError } from '@/services/axios/errors'
@@ -58,6 +60,10 @@
     showSidebarSecond: {
       type: Boolean,
       default: false
+    },
+    loadingEdges: {
+      type: Boolean,
+      default: false
     }
   })
 
@@ -84,6 +90,7 @@
   const freezeLoading = ref(true)
   const hiddenFields = ref([])
   const initialValues = { edgeApplication: '' }
+  const loadingStore = useLoadingStore()
 
   const validationSchema = yup.object({
     edgeApplication: yup.string().required()
@@ -94,10 +101,6 @@
   })
 
   const { value: edgeApplication } = useField('edgeApplication')
-
-  const disabledFields = computed(() => {
-    return loading.value
-  })
 
   const edgeApps = computed(() => {
     const apps = props.availableApps.filter((i) => i.elegibleForInstall)
@@ -143,7 +146,7 @@
     loading.value = false
     resetForm()
 
-    setTimeout(() => (freezeLoading.value = false), 100)
+    setTimeout(() => (freezeLoading.value = true), 100)
   }
 
   const handleLaunchSolution = async ({ result, feedback }) => {
@@ -156,11 +159,13 @@
 
   const handleLoading = () => {
     loading.value = true
+    loadingStore.startLoading()
     emit('loading')
   }
 
   const handleCancel = () => {
     resetForm()
+    loadingStore.finishLoading()
     toggleSidebar()
   }
 
@@ -200,7 +205,17 @@
       <div>Installing integration</div>
     </template>
     <template #default>
-      <div class="flex flex-col w-full md:p-8 pb-0">
+      <div class="flex flex-col w-full md:p-8 pb-0 relative">
+        <div
+          class="bg-black/20 z-10 mt-[3.5rem] h-[calc(100%-7rem)] cursor-progress fixed w-full top-0 left-0"
+          v-if="loading"
+        >
+          <ProgressBar
+            class="sticky"
+            mode="indeterminate"
+            style="height: 0.375rem"
+          ></ProgressBar>
+        </div>
         <form class="w-full flex flex-col gap-8">
           <FormHorizontal
             :isDrawer="true"
@@ -226,9 +241,9 @@
                     placeholder="Select an edge application"
                     filter
                     filterIcon="pi pi-search"
-                    :disabled="disabledFields"
                     emptyMessage="No applications with integrations to install or update."
                     :pt="{ emptyMessage: { class: 'text-sm' }, list: { class: 'pb-0' } }"
+                    :loading="loadingEdges"
                   >
                     <template #option="slotProps">
                       <div class="w-full flex align-items-center justify-between">
@@ -299,7 +314,7 @@
       </div>
       <div
         id="action-bar-integration"
-        class="sticky bottom-0"
+        class="sticky bottom-0 z-20"
       ></div>
     </template>
   </Sidebar>

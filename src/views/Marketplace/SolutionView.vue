@@ -138,6 +138,7 @@
     :instantiateTemplateService="props.instantiateTemplateService"
     :checkStatusScriptRunnerService="props.checkStatusScriptRunnerService"
     :windowOpen="props.windowOpen"
+    :loadingEdges="loadingEdges"
     v-model:showSidebarSecond="showCreateEdgeApp"
     @success="handleIntegrationSuccess"
     @fail="handleIntegrationFail"
@@ -147,7 +148,6 @@
 </template>
 
 <script setup>
-  import { useLoadingStore } from '@/stores/loading'
   import { computed, onBeforeMount, ref } from 'vue'
   import ContentBlock from '@/templates/content-block'
   import PageHeadingBlock from '@/templates/page-heading-block'
@@ -156,6 +156,7 @@
   import InlineMessage from 'primevue/inlinemessage'
   import { useRoute, useRouter } from 'vue-router'
   import { useToast } from 'primevue/usetoast'
+  import { useLoadingStore } from '@/stores/loading'
   import { useBreadcrumbs } from '@/stores/breadcrumbs'
   import IntegrationInstall from './drawer/IntegrationInstall'
   import CreateEdgeApplication from './drawer/CreateEdgeApplication'
@@ -167,6 +168,7 @@
 
   const solution = ref()
   const loading = ref(false)
+  const loadingEdges = ref(false)
   const showIntegration = ref(false)
   const animateMessage = ref(false)
   const showCreateEdgeApp = ref(false)
@@ -175,6 +177,7 @@
   const router = useRouter()
   const toast = useToast()
   const breadcrumbs = useBreadcrumbs()
+  const loadingStore = useLoadingStore()
 
   const props = defineProps({
     loadSolutionService: {
@@ -292,16 +295,19 @@
     setTimeout(async () => {
       await loadSolution()
       loading.value = false
+      loadingStore.finishLoading()
       showFeedback(feedback)
     }, 150)
   }
 
   const listEdgeApplicationsAvailables = async () => {
+    loadingEdges.value = true
     const payload = {
       vendor: solution.value.vendor.slug,
       solution: solution.value.slug
     }
     availableApps.value = await props.listEdgeApplicationsAvailablesService(payload)
+    loadingEdges.value = false
   }
 
   const handleLoading = () => {

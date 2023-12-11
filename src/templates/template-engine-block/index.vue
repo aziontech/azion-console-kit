@@ -31,7 +31,6 @@
             class="w-full"
             :class="{ 'p-invalid': formTools.errors[field.name] }"
             :feedback="false"
-            :disabled="submitLoading"
           />
           <InputText
             v-else
@@ -40,7 +39,6 @@
             type="text"
             v-bind="field.value"
             :class="{ 'p-invalid': formTools.errors[field.name] }"
-            :disabled="submitLoading"
           />
           <small class="text-xs font-normal text-color-secondary">{{ field.description }}</small>
           <small
@@ -82,7 +80,6 @@
               class="w-full"
               :class="{ 'p-invalid': formTools.errors[field.name] }"
               :feedback="false"
-              :disabled="submitLoading"
             />
             <InputText
               v-else
@@ -91,7 +88,6 @@
               type="text"
               v-bind="field.value"
               :class="{ 'p-invalid': formTools.errors[field.name] }"
-              :disabled="submitLoading"
             />
             <small class="tet-xs font-normal text-color-secondary">{{ field.description }}</small>
             <small
