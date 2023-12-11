@@ -51,6 +51,12 @@ jobs:
       image: ubuntu:22.04
 
     steps:
+      - name: Install Node.js 14
+        run: |
+          curl -fsSL https://deb.nodesource.com/setup_14.x | sudo -E bash -
+          sudo apt-get install -y nodejs
+          node --version
+
       - name: Checkout code
         uses: actions/checkout@v3
 
