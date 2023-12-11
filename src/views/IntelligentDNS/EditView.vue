@@ -61,7 +61,7 @@
     },
     {
       field: 'ttl',
-      header: 'TTL'
+      header: 'TTL (seconds)'
     },
     {
       field: 'policy',
@@ -92,7 +92,7 @@
 
   const validationSchemaIDNSRecords = yup.object({
     name: yup.string().required(),
-    selectedRecordType: yup.string().required('Please select an option'),
+    selectedRecordType: yup.string().required('Select an option'),
     value: yup.string().required(),
     ttl: yup
       .number()
@@ -180,7 +180,7 @@
     toast.add({
       closable: true,
       severity: 'success',
-      summary: 'Nameservers copied'
+      summary: 'Copied successfully!'
     })
   }
 
@@ -218,14 +218,14 @@
     <template #heading>
       <PageHeadingBlock
         pageTitle="Edit Intelligent DNS"
-        description="Copy the Nameservers values for change your domain's authoritative DNS servers to use Azion Intelligent DNS."
+        description="Set Azion Intelligent DNS as the authoritative DNS server for your domain by copying the nameservers values."
       >
         <template #default>
           <PrimeButton
             outlined
             icon="pi pi-copy"
             class="max-md:w-full"
-            label="Copy Nameservers"
+            label="Copy"
             @click="handleCopyNameServers"
           ></PrimeButton>
         </template>
@@ -264,7 +264,7 @@
             ref="listIDNSResourcesRef"
             v-if="hasContentToList"
             pageTitleDelete="Record"
-            addButtonLabel="Record"
+            addButtonLabel="Add"
             :editInDrawer="openEditDrawerIDNSResource"
             :columns="recordListColumns"
             :listService="listRecordsServiceIntelligentDNSDecorator"
@@ -274,7 +274,7 @@
             <template #addButton>
               <PrimeButton
                 icon="pi pi-plus"
-                label="Record"
+                label="Add"
                 @click="openCreateDrawerIDNSResource"
               />
             </template>
@@ -282,9 +282,9 @@
 
           <EmptyResultsBlock
             v-else
-            title="No record added"
-            description="Create your first record."
-            createButtonLabel="Record"
+            title="No record has been created"
+            description=" Click the button below to initiate the setup process and create your first record."
+            createButtonLabel="Add"
             createPagePath="records/create"
             :documentationService="documentationService"
             :inTabs="true"
@@ -293,7 +293,7 @@
               <PrimeButton
                 severity="secondary"
                 icon="pi pi-plus"
-                label="Add Record"
+                label="Add"
                 @click="openCreateDrawerIDNSResource"
               />
             </template>
