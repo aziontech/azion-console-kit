@@ -2,7 +2,7 @@ name: Pre-merge
 
 on:
   pull_request:
-    types: [opened, reopened, ready_for_review]
+    types: [opened, synchronize, reopened, ready_for_review]
   push:
     branches:
       - dev
@@ -13,7 +13,7 @@ env:
 
 jobs:
   run-tests:
-    runs-on: self-hosted
+    runs-on: [self-hosted, stage]
     container:
       image: node:18-alpine3.18
     steps:
@@ -44,8 +44,8 @@ jobs:
   sonarqube-analysis:
     name: SonarQube Analysis
     if: ${{ github.actor != 'dependabot[bot]' }}
-    needs: run-tests
-    runs-on: [self-hosted, sonarqube]
+    needs: [run-tests]
+    runs-on: [self-hosted, sonarqube, stage]
     timeout-minutes: 5
     container:
       image: ubuntu:22.04
