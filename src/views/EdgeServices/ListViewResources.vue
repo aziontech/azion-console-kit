@@ -102,9 +102,9 @@
     </ListTableNoHeaderBlock>
     <EmptyResultsBlock
       v-else
-      title="No Resource added"
-      description="Add the resource that your service needs to run."
-      createButtonLabel="Add Resource"
+      title="No resources have been created"
+      description="Click the button below to initiate the setup process and create the first resource your service should run."
+      createButtonLabel="Add"
       createPagePath="edge-services/create"
       :documentationService="props.documentationServiceResource"
       :inTabs="true"
@@ -113,7 +113,7 @@
         <PrimeButton
           severity="secondary"
           icon="pi pi-plus"
-          label="Add Resource"
+          label="Add"
           @click="openDrawer"
         />
       </template>

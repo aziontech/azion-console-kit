@@ -199,8 +199,9 @@
       <form class="w-full flex flex-col gap-8">
         <form-horizontal
           :isDrawer="true"
-          title="Resource Settingn"
-          description="Description"
+          title="Resource"
+          description="To be able to orchestrate services on your device, you must configure
+          the resources needed to install, uninstall, and reload your services."
         >
           <template #inputs>
             <div class="flex flex-col w-full sm:max-w-3xl gap-2">
@@ -209,7 +210,7 @@
                   <label
                     for="name"
                     class="text-color text-sm not-italic font-medium leading-5"
-                    >Filepath *</label
+                    >Path *</label
                   >
                   <InputText
                     v-model="name"
@@ -217,6 +218,9 @@
                     :class="{ 'p-invalid': errors.name }"
                     :disabled="disabledFields"
                   />
+                  <small class="text-color-secondary text-sm font-normal leading-tight">
+                    The absolute path of the resource.
+                  </small>
                   <small
                     v-if="errors.name"
                     class="p-error text-xs font-normal leading-tight"
@@ -269,6 +273,11 @@
                 <label class="text-color text-sm not-italic font-medium leading-5"
                   >Trigger Type *</label
                 >
+                <small class="text-color-secondary text-xs not-italic font-normal leading-5">
+                  Action performed when the resource state changes in the edge node. For
+                  example, a resource with an install trigger is executed the first time it is
+                  copied to the edge node.
+                </small>
                 <div class="flex flex-col gap-3">
                   <div class="flex no-wrap gap-2 items-center">
                     <RadioButton
@@ -313,11 +322,6 @@
                     </label>
                   </div>
                 </div>
-                <small class="text-color-secondary text-xs not-italic font-normal leading-5">
-                  Defines actions performed when the resource state changes in the Edge Node. For
-                  example, a resource with an Install trigger is executed the first time it is
-                  copied to the Edge Node.
-                </small>
               </div>
             </div>
             <div class="flex flex-col w-full sm:max-w-3xl gap-2">
@@ -345,9 +349,9 @@
                       {{ errors.content }}
                     </small>
                     <small class="text-color-secondary text-xs not-italic font-normal leading-5">
-                      The content of the resource, to be copied to the Edge Node. When the type is
-                      “Shell Script”, it must be a valid POSIX shell script. If you want it to work
-                      with resource content variables, you must add .
+                      The content of the resource to be copied to the edge node. <strong>Shell Script</strong> resources
+                      must carry a <code>sh-bang</code> in the content header. In the absence of one,
+                      the POSIX-compliant shell on the device (<code>/bin/sh</code>) will be used.
                     </small>
                   </div>
                 </div>
