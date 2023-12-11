@@ -1,9 +1,15 @@
 import { AxiosHttpClientAdapter, parseHttpResponse } from '../axios/AxiosHttpClientAdapter'
 import { makeUsersBaseUrl } from './make-users-base-url'
 
-export const listUsersService = async () => {
+export const listUsersService = async ({
+  orderBy = 'id',
+  sort = 'asc',
+  page = 1,
+  pageSize = 200
+}) => {
+  const searchParams = makeSearchParams({ orderBy, sort, page, pageSize })
   let httpResponse = await AxiosHttpClientAdapter.request({
-    url: `${makeUsersBaseUrl()}`,
+    url: `${makeUsersBaseUrl()}?${searchParams.toString()}`,
     method: 'GET'
   })
 
@@ -40,4 +46,14 @@ const adapt = (httpResponse) => {
     body: parsedUsers,
     statusCode: httpResponse.statusCode
   }
+}
+
+const makeSearchParams = ({ orderBy, sort, page, pageSize }) => {
+  const searchParams = new URLSearchParams()
+  searchParams.set('order_by', orderBy)
+  searchParams.set('sort', sort)
+  searchParams.set('page', page)
+  searchParams.set('page_size', pageSize)
+
+  return searchParams
 }

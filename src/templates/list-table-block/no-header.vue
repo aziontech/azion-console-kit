@@ -22,7 +22,7 @@
               <i class="pi pi-search" />
               <InputText
                 class="w-full"
-                v-model="this.filters.global.value"
+                v-model.trim="this.filters.global.value"
                 placeholder="Search"
               />
             </span>
@@ -178,8 +178,7 @@
         default: () => '/'
       },
       editInDrawer: {
-        type: Function,
-        default: () => '/'
+        type: Function
       },
       editPagePath: {
         type: String,
@@ -247,6 +246,9 @@
         } finally {
           this.isLoading = false
         }
+      },
+      async reload() {
+        await this.loadData({ page: 1 })
       },
       navigateToAddPage() {
         this.$router.push(this.createPagePath)

@@ -53,7 +53,7 @@ describe('UserServices', () => {
 
     expect(requestSpy).toHaveBeenCalledWith(
       {
-        url: `graphql/`,
+        url: `cities/`,
         method: 'POST',
         body: {
           query: 'query alltimezones { allTimezones }'

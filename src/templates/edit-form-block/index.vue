@@ -29,8 +29,7 @@
       default: false
     },
     updatedRedirect: {
-      type: String,
-      required: true
+      type: String
     },
     schema: {
       type: Object,

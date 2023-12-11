@@ -36,6 +36,7 @@
       :loading="props.loading"
       :cancelDisabled="props.cancelDisabled"
       :submitDisabled="props.submitDisabled"
+      :inDrawer="false"
       @onSubmit="handleSubmit"
       @onCancel="handleCancel"
     />
