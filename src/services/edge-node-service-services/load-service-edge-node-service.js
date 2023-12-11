@@ -23,7 +23,7 @@ const adapt = (httpResponse, id) => {
     service: {
       name: httpResponse.body.service_name,
       serviceId: httpResponse.body.service_id,
-      id: httpResponse.body.id,
+      id: httpResponse.body.id
     },
     variables: variables
   }

@@ -11,7 +11,6 @@ export const deleteServiceEdgeNodeService = async ({ edgeNodeId, serviceId }) =>
   return parseHttpResponse(httpResponse)
 }
 
-
 const parseHttpResponse = (httpResponse) => {
   switch (httpResponse.statusCode) {
     case 204:

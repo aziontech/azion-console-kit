@@ -30,9 +30,7 @@
     <template #form>
       <FormFieldsEdgeNode :listGroupsService="props.listGroupsEdgeNodeService" />
     </template>
-    <template
-      #action-bar="{ onSubmit, formValid, onCancel, loading }"
-    >
+    <template #action-bar="{ onSubmit, formValid, onCancel, loading }">
       <ActionBarTemplate
         @onSubmit="onSubmit"
         @onCancel="onCancel"
