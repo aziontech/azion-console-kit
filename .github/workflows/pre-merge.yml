@@ -51,14 +51,19 @@ jobs:
       image: ubuntu:22.04
 
     steps:
+      - name: Install curl and sudo
+        run: |
+          apt-get update
+          apt-get install -y curl sudo
+
+      - name: Checkout code
+        uses: actions/checkout@v3
+
       - name: Install Node.js 14
         run: |
           curl -fsSL https://deb.nodesource.com/setup_14.x | sudo -E bash -
           sudo apt-get install -y nodejs
           node --version
-
-      - name: Checkout code
-        uses: actions/checkout@v3
 
       - name: Download coverage reports
         uses: actions/download-artifact@v3
