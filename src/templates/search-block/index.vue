@@ -67,7 +67,7 @@
 </template>
 
 <script setup>
-  import { ref } from 'vue'
+  import { ref, onUnmounted } from 'vue'
 
   import Tag from 'primevue/tag'
   import InputText from 'primevue/inputtext'
@@ -83,18 +83,20 @@
     showSearch.value = true
   }
 
-  // const listenerKeyDown = (event) => {
-  //   const isCommandKeyPressed = event.metaKey || event.ctrlKey
-  //   const isKKeyPressed = event.key === 'k' || event.key === 'K'
+  const listenerKeyDown = () => {
+    document.addEventListener('keydown', () => {
+      const isCommandKeyPressed = event.metaKey || event.ctrlKey
+      const isKKeyPressed = event.key === 'k' || event.key === 'K'
+  
+      if (isCommandKeyPressed && isKKeyPressed) {
+        showSearch.value = true
+      }
+    })
+  }
 
-  //   if (isCommandKeyPressed && isKKeyPressed) {
-  //     showSearch.value = true
-  //   }
-  // }
+  listenerKeyDown()
 
-  // document.addEventListener('keydown', listenerKeyDown)
-
-  // onUnmounted(() => {
-  //   document.removeEventListener('keydown', listenerKeyDown)
-  // })
+  onUnmounted(() => {
+    document.removeEventListener('keydown', () => {})
+  })
 </script>
