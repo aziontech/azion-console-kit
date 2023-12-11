@@ -50,6 +50,8 @@
 </template>
 <script setup>
   defineOptions({ name: 'ContentBlock' })
+  import { windowOpen } from '@/helpers/window-open'
+
 
   import Message from 'primevue/message'
   import Avatar from 'primevue/avatar'
@@ -60,6 +62,6 @@
   const hasHeadingSlot = computed(() => !!slots.heading)
 
   const goToCreateIssue = () => {
-    window.open('https://github.com/aziontech/azion-platform-kit/issues/new', '_blank')
+    windowOpen('https://github.com/aziontech/azion-platform-kit/issues/new', '_blank')
   }
 </script>
