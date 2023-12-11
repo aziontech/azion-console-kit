@@ -24,9 +24,9 @@ const parseHttpResponse = (httpResponse) => {
     case 200:
       return httpResponse.body
     case 400:
-      throw new Errors.BadRequestError().message
+      throw new Errors.InvalidApiRequestError().message
     case 403:
-      throw new Errors.ForbiddenError().message
+      throw new Errors.PermissionError().message
     case 404:
       throw new Errors.NotFoundError().message
     case 500:
