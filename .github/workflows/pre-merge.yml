@@ -59,11 +59,16 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Install Node.js 14
+      - name: Install Node.js 16
         run: |
-          curl -fsSL https://deb.nodesource.com/setup_14.x | sudo -E bash -
+          curl -fsSL https://deb.nodesource.com/setup_16.x | sudo -E bash -
           sudo apt-get install -y nodejs
           node --version
+
+      - name: Verify Git status
+        run: |
+          git status
+          git log -n 5
 
       - name: Download coverage reports
         uses: actions/download-artifact@v3
