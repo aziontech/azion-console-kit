@@ -8,7 +8,7 @@
     </li>
     <li
       v-if="displayShowMore"
-      @click="toggleShowAll"
+      @click.stop="toggleShowAll"
       class="underline cursor-pointer"
     >
       {{ displayRemainingItems }}

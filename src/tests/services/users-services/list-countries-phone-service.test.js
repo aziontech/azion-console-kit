@@ -44,7 +44,7 @@ describe('UsersServices', () => {
 
     expect(requestSpy).toHaveBeenCalledWith(
       {
-        url: `graphql/`,
+        url: `cities/`,
         method: 'POST',
         body: {
           query: 'query allCountries {allCountries { name, code2, phone } }'

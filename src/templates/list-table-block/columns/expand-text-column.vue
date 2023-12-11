@@ -5,7 +5,7 @@
     </li>
     <li
       v-if="displayShowMore"
-      @click="showAll"
+      @click.stop="showAll"
       class="underline cursor-pointer"
     >
       {{ displayRemainingItems }}

@@ -4,7 +4,7 @@ import * as Errors from '@/services/axios/errors'
 
 export const deleteTeamPermissionService = async (teamPermissionId) => {
   let httpResponse = await AxiosHttpClientAdapter.request({
-    url: `${makeTeamPermissionBaseUrl()}/${teamPermissionId}/`,
+    url: `${makeTeamPermissionBaseUrl()}/${teamPermissionId}`,
     method: 'DELETE'
   })
 
@@ -19,7 +19,7 @@ export const deleteTeamPermissionService = async (teamPermissionId) => {
  */
 const parseHttpResponse = (httpResponse) => {
   switch (httpResponse.statusCode) {
-    case 204:
+    case 200:
       return 'Team Permission successfully deleted'
     case 400:
       throw new Errors.NotFoundError().message

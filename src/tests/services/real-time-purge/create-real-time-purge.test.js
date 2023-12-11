@@ -5,9 +5,9 @@ import { describe, expect, it, vi } from 'vitest'
 
 const fixtures = {
   realTimePurgeMock: {
-    argumentsPurge: 'www.example.com',
+    argumentsPurge: `www.example.com\nwww.test.com.br `,
     layer: 'edge_caching',
-    purge_type: 'cachekey'
+    purgeType: 'cachekey'
   }
 }
 
@@ -32,7 +32,7 @@ describe('RealTimePurgeServices', () => {
       url: `purge/cachekey`,
       method: 'POST',
       body: {
-        urls: fixtures.realTimePurgeMock.argumentsPurge.trim().split('\n'),
+        urls: ['www.example.com', 'www.test.com.br'],
         method: 'delete',
         layer: fixtures.realTimePurgeMock.layer
       }
@@ -45,9 +45,9 @@ describe('RealTimePurgeServices', () => {
     })
     const { sut } = makeSut()
 
-    const feedbackMessage = await sut(fixtures.realTimePurgeMock)
+    const data = await sut(fixtures.realTimePurgeMock)
 
-    expect(feedbackMessage).toBe('Your purge has been created')
+    expect(data.feedback).toBe('Your purge has been created')
   })
 
   it('Should return an API error for an 400 error status', async () => {

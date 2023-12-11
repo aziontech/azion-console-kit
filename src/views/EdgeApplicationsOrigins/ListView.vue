@@ -58,7 +58,7 @@
 
 <template>
   <ListTableBlock
-    pageTitle="Origins"
+    pageTitleDelete="Origin"
     addButtonLabel="Add origins"
     :createPagePath="`${edgeApplicationId}/origins/create`"
     :editPagePath="`${edgeApplicationId}/origins/edit`"

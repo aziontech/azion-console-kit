@@ -1,8 +1,236 @@
+<script setup>
+  import EditFormBlock from '@templates/edit-form-block'
+  import EditDrawerBlock from '@templates/edit-drawer-block'
+  import PageHeadingBlock from '@templates/page-heading-block'
+  import ListTableNoHeaderBlock from '@templates/list-table-block/no-header'
+  import FormFieldsRecords from './FormFields/FormFieldsRecords'
+  import CreateDrawerBlock from '@templates/create-drawer-block'
+  import ContentBlock from '@/templates/content-block'
+  import TabView from 'primevue/tabview'
+  import TabPanel from 'primevue/tabpanel'
+  import PrimeButton from 'primevue/button'
+  import EmptyResultsBlock from '@/templates/empty-results-block'
+  import Illustration from '@/assets/svg/illustration-layers.vue'
+  import FormFieldsIntelligentDnsCreate from './FormFields/FormFieldsIntelligentDns.vue'
+  import ActionBarTemplate from '@/templates/action-bar-block/action-bar-with-teleport'
+  import * as yup from 'yup'
+  import { useRoute, useRouter } from 'vue-router'
+  import { computed, onBeforeMount, ref, watch } from 'vue'
+  import { useToast } from 'primevue/usetoast'
+
+  const props = defineProps({
+    loadIntelligentDNSService: { type: Function, required: true },
+    editIntelligentDNSService: { type: Function, required: true },
+
+    listRecordsService: { type: Function, required: true },
+    deleteRecordsService: { type: Function, required: true },
+    loadRecordsService: { type: Function, required: true },
+    editRecordsService: { type: Function, required: true },
+
+    clipboardWrite: { type: Function, required: true },
+    updatedRedirect: { type: String, required: true },
+    documentationService: { type: Function, required: true },
+    createRecordsService: {
+      type: Function,
+      required: true
+    }
+  })
+
+  const route = useRoute()
+  const router = useRouter()
+  const toast = useToast()
+  const hasContentToList = ref(true)
+  const showCreateRecordDrawer = ref(false)
+  const showEditRecordDrawer = ref(false)
+  const listIDNSResourcesRef = ref('')
+  const intelligentDNSID = ref(0)
+  const activeTab = ref(0)
+  const selectedIdnsRecordToEdit = ref(0)
+  const recordListColumns = ref([
+    {
+      field: 'name',
+      header: 'Name'
+    },
+    {
+      field: 'type',
+      header: 'Type'
+    },
+    {
+      field: 'value',
+      header: 'Value'
+    },
+    {
+      field: 'ttl',
+      header: 'TTL'
+    },
+    {
+      field: 'policy',
+      header: 'Policy'
+    },
+    {
+      field: 'weight',
+      header: 'Weight'
+    },
+    {
+      field: 'description',
+      header: 'Description'
+    }
+  ])
+  const RECORD_TYPE_WITHOUT_TTL = 'ANAME'
+
+  const validationSchemaEditIDNS = yup.object({
+    name: yup.string().required(),
+    domain: yup
+      .string()
+      .required()
+      .test('valid-domain', 'Invalid domain', function (value) {
+        const domainRegex = /^(?:[-A-Za-z0-9]+\.)+[A-Za-z]{2,6}$/
+        return domainRegex.test(value)
+      }),
+    isActive: yup.boolean().required()
+  })
+
+  const validationSchemaIDNSRecords = yup.object({
+    name: yup.string().required(),
+    selectedRecordType: yup.string().required('Please select an option'),
+    value: yup.string().required(),
+    ttl: yup
+      .number()
+      .label('TTL')
+      .transform((value) => (Number.isNaN(value) ? null : value))
+      .when('selectedRecordType', {
+        is: RECORD_TYPE_WITHOUT_TTL,
+        then: (schema) => schema.notRequired(),
+        otherwise: (schema) => schema.min(0).max(3600).required()
+      }),
+    selectedPolicy: yup.string().required('Please select an option').default('simple'),
+    weight: yup.number().when('selectedPolicy', {
+      is: 'weighted',
+      then: (schema) => schema.required().label('Weight')
+    }),
+
+    description: yup.string().when('selectedPolicy', {
+      is: 'weighted',
+      then: (schema) => schema.required().label('Weight')
+    }),
+    intelligentDNSID: yup.number()
+  })
+  const initialValuesCreateRecords = {
+    name: '',
+    selectedRecordType: 'A',
+    value: '',
+    ttl: 3600,
+    selectedPolicy: 'simple',
+    weight: '100',
+    description: '',
+    intelligentDNSID: route.params.id
+  }
+
+  const reloadResourcesList = () => {
+    if (hasContentToList.value) {
+      listIDNSResourcesRef.value.reload()
+      return
+    }
+    hasContentToList.value = true
+  }
+
+  const listRecordsServiceIntelligentDNSDecorator = async (payload) => {
+    return await props.listRecordsService({ ...payload, id: intelligentDNSID.value })
+  }
+
+  const deleteRecordsServiceIntelligentDNSDecorator = async (recordID) => {
+    return await props.deleteRecordsService({
+      recordID: recordID,
+      intelligentDNSID: intelligentDNSID.value
+    })
+  }
+
+  const openCreateDrawerIDNSResource = () => {
+    showCreateRecordDrawer.value = true
+  }
+  const openEditDrawerIDNSResource = (event) => {
+    selectedIdnsRecordToEdit.value = event.id
+    showEditRecordDrawer.value = true
+  }
+
+  const renderTabByRouterPath = () => {
+    if (route.name === 'intelligent-dns-records') {
+      activeTab.value = 1
+    } else {
+      activeTab.value = 0
+    }
+  }
+
+  const changeRouteByClickingOnTab = (e) => {
+    if (e.index === 0) {
+      router.push({ name: 'edit-intelligent-dns', params: { id: intelligentDNSID.value } })
+    } else {
+      router.push({
+        name: 'intelligent-dns-records',
+        params: { id: intelligentDNSID.value }
+      })
+    }
+  }
+
+  const handleCopyNameServers = () => {
+    props.clipboardWrite('ns1.aziondns.net;ns2.aziondns.com;ns3.aziondns.org')
+    toast.add({
+      closable: true,
+      severity: 'success',
+      summary: 'Nameservers copied'
+    })
+  }
+
+  const handleLoadData = (event) => {
+    hasContentToList.value = event
+  }
+
+  const showEditFormWithActionTab = computed(() => {
+    return activeTab.value === 0
+  })
+
+  const loadRecordServiceWithIDNSIdDecorator = async (payload) => {
+    return await props.loadRecordsService({
+      id: payload.id,
+      intelligentDNSId: intelligentDNSID.value
+    })
+  }
+
+  const editRecordServiceWithIDNSIdDecorator = async (payload) => {
+    return await props.editRecordsService({ intelligentDNSId: intelligentDNSID.value, ...payload })
+  }
+
+  watch(route, () => {
+    renderTabByRouterPath()
+  })
+
+  onBeforeMount(() => {
+    intelligentDNSID.value = route.params.id
+    renderTabByRouterPath()
+  })
+</script>
+
 <template>
-  <PageHeadingBlock pageTitle="Edit Intelligent DNS">
-    <template #tabs>
+  <ContentBlock>
+    <template #heading>
+      <PageHeadingBlock
+        pageTitle="Edit Intelligent DNS"
+        description="Copy the Nameservers values for change your domain's authoritative DNS servers to use Azion Intelligent DNS."
+      >
+        <template #default>
+          <PrimeButton
+            outlined
+            icon="pi pi-copy"
+            class="max-md:w-full"
+            label="Copy Nameservers"
+            @click="handleCopyNameServers"
+          ></PrimeButton>
+        </template>
+      </PageHeadingBlock>
+    </template>
+    <template #content>
       <TabView
-        :activeIndex="activeTab"
+        v-model:activeIndex="activeTab"
         @tab-click="changeRouteByClickingOnTab"
         class="w-full"
       >
@@ -10,224 +238,98 @@
           <EditFormBlock
             :editService="editIntelligentDNSService"
             :loadService="loadIntelligentDNSService"
-            :initialDataSetter="setValues"
-            :formData="values"
-            :formMeta="meta"
+            :schema="validationSchemaEditIDNS"
+            :updatedRedirect="updatedRedirect"
+            :isTabs="true"
           >
             <template #form>
-              <FormHorizontal
-                title="General"
-                description="Espaço livre para descrição e instruções de preenchimento. Esse conteúdo deve ser criado pensando tanto em funcionalidade quanto em em alinhamento e estética. Devemos sempre criar os blocos conforme o contexto, cuidando sempre para não ter blocos muito longos."
-              >
-                <template #inputs>
-                  <div class="flex flex-col sm:max-w-lg w-full gap-2">
-                    <label
-                      for="name"
-                      class="text-color text-base font-medium"
-                      >Name *</label
-                    >
-                    <InputText
-                      placeholder="Zone Name"
-                      v-bind="name"
-                      id="name"
-                      type="text"
-                      :class="{ 'p-invalid': errors.name }"
-                      v-tooltip.top="{ value: errors.name, showDelay: 200 }"
-                    />
-                    <small
-                      v-if="errors.name"
-                      class="p-error text-xs font-normal leading-tight"
-                      >{{ errors.name }}</small
-                    >
-                  </div>
-                  <div class="flex flex-col sm:max-w-lg w-full gap-2">
-                    <label
-                      for="domain"
-                      class="text-color text-base font-medium"
-                      >Domain *</label
-                    >
-                    <InputText
-                      placeholder="Domain"
-                      id="domain"
-                      v-bind="domain"
-                      type="text"
-                      :class="{ 'p-invalid': errors.domain }"
-                      v-tooltip.top="{ value: errors.domain, showDelay: 200 }"
-                    />
-                    <small
-                      v-if="errors.domain"
-                      class="p-error text-xs font-normal leading-tight"
-                      >{{ errors.domain }}</small
-                    >
-                  </div>
-                  <div class="flex gap-3 items-center">
-                    <label for="">Active</label>
-                    <InputSwitch
-                      v-bind="isActive"
-                      v-model="isActive.value"
-                      :class="{ 'p-invalid': errors.isActive }"
-                    />
-                  </div>
-                </template>
-              </FormHorizontal>
+              <FormFieldsIntelligentDnsCreate></FormFieldsIntelligentDnsCreate>
+            </template>
+            <template #action-bar="{ onSubmit, formValid, onCancel, loading }">
+              <ActionBarTemplate
+                v-if="showEditFormWithActionTab"
+                @onSubmit="onSubmit"
+                @onCancel="onCancel"
+                :loading="loading"
+                :submitDisabled="!formValid"
+              />
             </template>
           </EditFormBlock>
         </TabPanel>
         <TabPanel header="Records">
-          <ListTableBlock
-            pageTitle="Records"
-            addButtonLabel="Add Record"
-            createPagePath="records/create"
-            editPagePath="records/edit"
+          <ListTableNoHeaderBlock
+            ref="listIDNSResourcesRef"
+            v-if="hasContentToList"
+            pageTitleDelete="Record"
+            addButtonLabel="Record"
+            :editInDrawer="openEditDrawerIDNSResource"
             :columns="recordListColumns"
             :listService="listRecordsServiceIntelligentDNSDecorator"
             :deleteService="deleteRecordsServiceIntelligentDNSDecorator"
-          />
+            @on-load-data="handleLoadData"
+          >
+            <template #addButton>
+              <PrimeButton
+                icon="pi pi-plus"
+                label="Record"
+                @click="openCreateDrawerIDNSResource"
+              />
+            </template>
+          </ListTableNoHeaderBlock>
+
+          <EmptyResultsBlock
+            v-else
+            title="No record added"
+            description="Create your first record."
+            createButtonLabel="Record"
+            createPagePath="records/create"
+            :documentationService="documentationService"
+            :inTabs="true"
+          >
+            <template #default>
+              <PrimeButton
+                severity="secondary"
+                icon="pi pi-plus"
+                label="Add Record"
+                @click="openCreateDrawerIDNSResource"
+              />
+            </template>
+            <template #illustration>
+              <Illustration />
+            </template>
+          </EmptyResultsBlock>
+
+          <CreateDrawerBlock
+            v-if="showCreateRecordDrawer"
+            v-model:visible="showCreateRecordDrawer"
+            :createService="createRecordsService"
+            :schema="validationSchemaIDNSRecords"
+            :initialValues="initialValuesCreateRecords"
+            @onSuccess="reloadResourcesList"
+            title="Create Intelligent DNS Record"
+          >
+            <template #formFields>
+              <FormFieldsRecords />
+            </template>
+          </CreateDrawerBlock>
+
+          <EditDrawerBlock
+            v-if="showEditRecordDrawer"
+            :id="selectedIdnsRecordToEdit"
+            v-model:visible="showEditRecordDrawer"
+            :loadService="loadRecordServiceWithIDNSIdDecorator"
+            :editService="editRecordServiceWithIDNSIdDecorator"
+            :schema="validationSchemaIDNSRecords"
+            @onSuccess="reloadResourcesList"
+            title="Edit Intelligent DNS Record"
+          >
+            <template #formFields>
+              <FormFieldsRecords />
+            </template>
+          </EditDrawerBlock>
         </TabPanel>
       </TabView>
       <router-view></router-view>
     </template>
-  </PageHeadingBlock>
+  </ContentBlock>
 </template>
-
-<script>
-  import { useIntelligentDNSStore } from '@/stores/intelligent-dns'
-  import EditFormBlock from '@templates/edit-form-block-new/no-header'
-  import FormHorizontal from '@templates/create-form-block-new/form-horizontal'
-  import PageHeadingBlock from '@templates/page-heading-block-tabs'
-  import ListTableBlock from '@templates/list-table-block/no-header'
-  import TabView from 'primevue/tabview'
-  import TabPanel from 'primevue/tabpanel'
-  import InputText from 'primevue/inputtext'
-  import InputSwitch from 'primevue/inputswitch'
-  import { useForm } from 'vee-validate'
-  import * as yup from 'yup'
-
-  export default {
-    name: 'edit-intelligent-dns-view',
-    components: {
-      EditFormBlock,
-      TabView,
-      TabPanel,
-      InputText,
-      InputSwitch,
-      ListTableBlock,
-      FormHorizontal,
-      PageHeadingBlock
-    },
-
-    props: {
-      loadIntelligentDNSService: { type: Function, required: true },
-      editIntelligentDNSService: { type: Function, required: true },
-      listRecordsService: { type: Function, required: true },
-      deleteRecordsService: { type: Function, required: true }
-    },
-
-    data: () => {
-      const validationSchema = yup.object({
-        name: yup.string().required(),
-        domain: yup
-          .string()
-          .required()
-          .test('valid-domain', 'Invalid domain', function (value) {
-            const domainRegex = /^(?:[-A-Za-z0-9]+\.)+[A-Za-z]{2,6}$/
-            return domainRegex.test(value)
-          }),
-        isActive: yup.boolean().required()
-      })
-
-      const { errors, defineInputBinds, meta, values, setValues } = useForm({
-        validationSchema
-      })
-
-      const name = defineInputBinds('name', { validateOnInput: true })
-      const domain = defineInputBinds('domain', { validateOnInput: true })
-      const isActive = defineInputBinds('isActive')
-
-      const intelligentDNSStore = useIntelligentDNSStore()
-
-      return {
-        errors,
-        meta,
-        values,
-        name,
-        domain,
-        isActive,
-        setValues,
-        recordListColumns: [
-          {
-            field: 'name',
-            header: 'Name'
-          },
-          {
-            field: 'type',
-            header: 'Type'
-          },
-          {
-            field: 'value',
-            header: 'Value'
-          },
-          {
-            field: 'ttl',
-            header: 'TTL'
-          },
-          {
-            field: 'policy',
-            header: 'Policy'
-          },
-          {
-            field: 'weight',
-            header: 'Weight'
-          },
-          {
-            field: 'description',
-            header: 'Description'
-          }
-        ],
-        intelligentDNSStore,
-        intelligentDNSID: 0,
-        activeTab: 0
-      }
-    },
-
-    created() {
-      this.intelligentDNSID = this.$route.params.id
-      this.renderTabCurrentRouter()
-    },
-
-    methods: {
-      async listRecordsServiceIntelligentDNSDecorator(payload) {
-        return await this.listRecordsService({ ...payload, id: this.intelligentDNSID })
-      },
-      async deleteRecordsServiceIntelligentDNSDecorator(recordID) {
-        return await this.deleteRecordsService({
-          recordID: recordID,
-          intelligentDNSID: this.intelligentDNSID
-        })
-      },
-      renderTabCurrentRouter() {
-        if (this.$route.name === 'intelligent-dns-records') {
-          this.activeTab = 1
-        } else {
-          this.activeTab = 0
-        }
-      },
-      changeRouteByClickingOnTab(e) {
-        if (e.index === 0) {
-          this.$router.push({ name: 'edit-intelligent-dns', params: { id: this.intelligentDNSID } })
-        } else {
-          this.$router.push({
-            name: 'intelligent-dns-records',
-            params: { id: this.intelligentDNSID }
-          })
-        }
-      }
-    },
-
-    watch: {
-      domain() {
-        this.intelligentDNSStore.addDomain(this.domain)
-      }
-    }
-  }
-</script>

@@ -15,7 +15,7 @@
           text
           aria-label="Get help"
           size="small"
-          @click="toggleHelperCenter"
+          @click="helpCenterStore.toggle()"
         />
         <MoreOptionsMenu />
       </span>
@@ -108,7 +108,4 @@
   })
 
   const helpCenterStore = useHelpCenterStore()
-  const toggleHelperCenter = () => {
-    helpCenterStore.toggleHelpCenter()
-  }
 </script>

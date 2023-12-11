@@ -1,5 +1,8 @@
 <template>
-  <form @submit.prevent="validateCode()">
+  <form
+    @submit.prevent="validateCode()"
+    class="max-sm:min-h-[calc(100vh-120px)]"
+  >
     <div
       class="flex flex-col align-top items-center py-6 px-3 md:py-20 animate-fadeIn"
       @paste="handlePaste"
@@ -8,19 +11,19 @@
         class="surface-card surface-border border max-w-md w-full p-6 md:p-10 rounded-md flex-col gap-10 inline-flex"
       >
         <div class="flex flex-col gap-3">
-          <div class="text-xl font-medium">Authenticate your account</div>
+          <div class="text-xl font-medium">Multi-Factor Authentication</div>
           <div class="text-color-secondary">
-            Confirm your account by opening your Google Authenticator app and enter the code for
-            Azion.
+            Open your authentication app and enter the generated code to access Azion Console.
           </div>
         </div>
 
         <div>
-          <label class="font-semibold text-xs">Verification code</label>
+          <label class="font-semibold text-xs">Authentication Code</label>
           <div class="flex flex-wrap gap-1.5 sm:gap-4 mt-4">
             <InputText
               v-for="(digits, i) in digitsMfa"
               :key="i"
+              :disabled="isButtonLoading"
               class="grow w-7 sm:w-11 h-[2.6rem] text-lg text-center"
               v-model="digits.value.value"
               @input="moveFocus(i)"
@@ -32,14 +35,15 @@
         <InlineMessage
           v-if="hasRequestErrorMessage"
           severity="error"
+          class="animate-fadeIn"
           >{{ hasRequestErrorMessage }}</InlineMessage
         >
 
         <PrimeButton
           class="w-full flex-row-reverse"
-          label="Confirm code"
+          label="Verify"
           :loading="isButtonLoading"
-          severity="primary"
+          severity="secondary"
           type="submit"
         />
       </div>
@@ -71,9 +75,9 @@
       required: true,
       type: Function
     },
-    switchAccountService: {
+    accountHandler: {
       required: true,
-      type: Function
+      type: Object
     }
   })
 
@@ -135,7 +139,7 @@
       await props.validateMfaCodeService(mfaToken)
 
       const { user_tracking_info: userInfo } = await verifyUserData()
-      await switchClientAccount(userInfo)
+      await switchClientAccount(userInfo.props.account_id)
     } catch (error) {
       hasRequestErrorMessage.value = error
     } finally {
@@ -151,13 +155,10 @@
     }
   }
 
-  const switchClientAccount = async (userInfo) => {
-    let clientId
+  const switchClientAccount = async (clientId) => {
     try {
-      const { account_id: accountId, client_id } = userInfo.props
-      clientId = client_id
-      await props.switchAccountService(accountId)
-      router.push({ name: 'home' })
+      const redirect = await props.accountHandler.switchAndReturnAccountPage(clientId)
+      router.push(redirect)
     } catch {
       hasRequestErrorMessage.value = clientId
         ? new ProccessRequestError().message

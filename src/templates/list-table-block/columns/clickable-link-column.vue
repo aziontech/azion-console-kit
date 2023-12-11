@@ -1,7 +1,7 @@
 <template>
   <PrimeButton
     link
-    @click="handleClick"
+    @click.stop="handleClick"
   >
     <p class="p-link underline">{{ content }}</p>
   </PrimeButton>

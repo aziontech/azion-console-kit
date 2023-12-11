@@ -1,6 +1,6 @@
 import { AxiosHttpClientAdapter, parseHttpResponse } from '../axios/AxiosHttpClientAdapter'
 import { makeAccountBaseUrl } from './make-account-base-url'
-import { getAccountTypeIcon, getAccountTypeName } from '@/helpers/accountTypeNameMapping.js'
+import { getAccountTypeIcon, getAccountTypeName } from '@/helpers/account-type-name-mapping.js'
 
 export const getAccountInfoService = async () => {
   let httpResponse = await AxiosHttpClientAdapter.request({

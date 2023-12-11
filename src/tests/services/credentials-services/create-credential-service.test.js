@@ -6,7 +6,8 @@ import { describe, expect, it, vi } from 'vitest'
 const fixtures = {
   basic: {
     name: 'Cred A',
-    description: 'Some description'
+    description: 'Some description',
+    token: 'test-token'
   }
 }
 
@@ -21,7 +22,10 @@ const makeSut = () => {
 describe('CreateCredentialServices', () => {
   it('should call API with correct params', async () => {
     const requestSpy = vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
-      statusCode: 201
+      statusCode: 201,
+      body: {
+        token: 'test-token'
+      }
     })
     const { sut } = makeSut()
 
@@ -40,13 +44,17 @@ describe('CreateCredentialServices', () => {
 
   it('should return a feedback message on successfully created', async () => {
     vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
-      statusCode: 201
+      statusCode: 201,
+      body: {
+        token: 'test-token'
+      }
     })
     const { sut } = makeSut()
 
-    const feedbackMessage = await sut(fixtures.basic)
+    const { feedback, token } = await sut(fixtures.basic)
 
-    expect(feedbackMessage).toBe('Your credential has been created')
+    expect(token).toBe('test-token')
+    expect(feedback).toBe('Your credential token has been created')
   })
 
   it.each([

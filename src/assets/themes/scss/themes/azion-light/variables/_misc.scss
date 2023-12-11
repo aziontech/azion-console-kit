@@ -12,11 +12,11 @@ $inplaceTextHoverColor: $textColor;
 
 /// Background of a badge
 /// @group misc
-$badgeBg: $primaryColor;
+$badgeBg: var(--surface-section);
 
 /// Text color of a badge
 /// @group misc
-$badgeTextColor: $primaryTextColor;
+$badgeTextColor: $textColor;
 
 /// Minimum width of a badge
 /// @group misc
@@ -24,11 +24,11 @@ $badgeMinWidth: 1.5rem;
 
 /// Height of a badge
 /// @group misc
-$badgeHeight: 1.5rem;
+$badgeHeight: 1.25rem;
 
 /// Font weight of a badge
 /// @group misc
-$badgeFontWeight: 700;
+$badgeFontWeight: 500;
 
 /// Font size of a badge
 /// @group misc
@@ -48,11 +48,11 @@ $progressBarBorder: 0 none;
 
 /// Background of a progress bar
 /// @group misc
-$progressBarBg: #dee2e6;
+$progressBarBg: var(--surface-600);
 
 /// Background of a progress bar value
 /// @group misc
-$progressBarValueBg: $primaryColor;
+$progressBarValueBg: #f3652b;
 
 /// Text color of a progress bar value
 /// @group misc

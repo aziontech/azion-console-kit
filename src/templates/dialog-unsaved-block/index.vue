@@ -1,3 +1,64 @@
+<script setup>
+  import { computed, ref } from 'vue'
+  import PrimeDialog from 'primevue/dialog'
+  import PrimeButton from 'primevue/button'
+  import { onBeforeRouteLeave, useRouter } from 'vue-router'
+
+  defineOptions({ name: 'dialog-unsaved-block' })
+  const emit = defineEmits(['update:visible'])
+
+  const props = defineProps({
+    visible: {
+      type: Boolean,
+      default: false
+    },
+    blockRedirectUnsaved: {
+      type: Boolean
+    }
+  })
+
+  const router = useRouter()
+  const showDialog = ref(props.visible)
+  const redirectToUnsaved = ref('home')
+  const unsavedDisabled = ref(false)
+
+  const visibleDialog = computed({
+    get: () => showDialog.value,
+    set: (value) => {
+      showDialog.value = value
+      emit('update:visible', value)
+    }
+  })
+
+  const openDialogUnsaved = (value) => {
+    visibleDialog.value = value
+  }
+
+  const onLeavePage = () => {
+    unsavedDisabled.value = true
+    openDialogUnsaved(false)
+    if (!redirectToUnsaved.value) {
+      router.go(-1)
+      return
+    }
+
+    router.push({ name: redirectToUnsaved.value })
+  }
+
+  const onKeepEditing = () => {
+    openDialogUnsaved(false)
+  }
+
+  onBeforeRouteLeave((to, from, next) => {
+    redirectToUnsaved.value = to.name
+    if (props.blockRedirectUnsaved && !unsavedDisabled.value) {
+      visibleDialog.value = true
+      return next(false)
+    }
+    return next()
+  })
+</script>
+
 <template>
   <div>
     <PrimeDialog
@@ -8,7 +69,7 @@
       :closable="false"
       :pt="{
         root: { class: 'p-0 w-[576px]' },
-        header: { class: 'flex pt-5 pb-5 items-center self-stretch border-b border-solid' },
+        header: { class: 'flex p-5 items-center self-stretch border-b border-solid' },
         content: { class: 'p-0 h-full' },
         footer: {
           class: 'flex p-5 justify-end items-end border-t border-solid'
@@ -37,72 +98,3 @@
     </PrimeDialog>
   </div>
 </template>
-
-<script setup>
-  import { computed, ref } from 'vue'
-  import PrimeDialog from 'primevue/dialog'
-  import PrimeButton from 'primevue/button'
-  import { onBeforeRouteLeave, useRouter } from 'vue-router'
-
-  defineOptions({ name: 'dialog-unsaved-block' })
-  const emit = defineEmits(['update:visible'])
-
-  const props = defineProps({
-    visible: {
-      type: Boolean,
-      default: false
-    },
-    blockRedirectUnsaved: {
-      type: Boolean,
-      default: true
-    },
-    leavePage: {
-      type: Function
-    },
-    keepEditing: {
-      type: Function
-    }
-  })
-
-  const showDialog = ref(props.visible)
-  const unsavedDisabled = ref(false)
-  const visibleDialog = computed({
-    get: () => showDialog.value,
-    set: (value) => {
-      showDialog.value = value
-      emit('update:visible', value)
-    }
-  })
-
-  const router = useRouter()
-
-  const openDialogUnsaved = (value) => {
-    visibleDialog.value = value
-  }
-
-  const onLeavePage = () => {
-    unsavedDisabled.value = true
-    if (props.leavePage) {
-      props.leavePage(visibleDialog)
-      return
-    }
-    openDialogUnsaved(false)
-    router.go(-1)
-  }
-
-  const onKeepEditing = () => {
-    if (props.keepEditing) {
-      props.keepEditing()
-      return
-    }
-    openDialogUnsaved(false)
-  }
-
-  onBeforeRouteLeave((to, from, next) => {
-    if (props.blockRedirectUnsaved && !unsavedDisabled.value) {
-      visibleDialog.value = true
-      return next(false)
-    }
-    return next()
-  })
-</script>

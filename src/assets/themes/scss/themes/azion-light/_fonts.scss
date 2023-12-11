@@ -126,6 +126,22 @@
 }
 
 @font-face {
+  font-family: 'Roboto Mono';
+  src: url('https://fonts.azion.com/roboto-mono/roboto-mono-regular.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Roboto Mono';
+  src: url('https://fonts.azion.com/roboto-mono/roboto-mono-light.ttf') format('truetype');
+  font-weight: 300;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
   font-family: 'Roboto';
   src: url('https://fonts.azion.com/roboto/roboto-black.eot');
   src:

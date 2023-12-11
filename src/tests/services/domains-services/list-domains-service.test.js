@@ -59,7 +59,9 @@ describe('DomainsServices', () => {
       {
         id: fixtures.domainMock.id,
         name: fixtures.domainMock.name,
-        domainName: fixtures.domainMock.domain_name,
+        domainName: {
+          content: fixtures.domainMock.domain_name
+        },
         cnames: 'CName 1,CName 2',
         active: {
           content: 'Active',
@@ -71,7 +73,9 @@ describe('DomainsServices', () => {
       {
         id: fixtures.disabledDomainMock.id,
         name: fixtures.disabledDomainMock.name,
-        domainName: fixtures.disabledDomainMock.domain_name,
+        domainName: {
+          content: fixtures.disabledDomainMock.domain_name
+        },
         cnames: 'CName 3,CName 4',
         active: {
           content: 'Inactive',

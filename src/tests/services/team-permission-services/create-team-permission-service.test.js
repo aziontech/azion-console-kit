@@ -25,7 +25,12 @@ const makeSut = () => {
 describe('TeamPermissionServices', () => {
   it('should call API with correct params', async () => {
     const requestSpy = vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
-      statusCode: 201
+      statusCode: 201,
+      body: {
+        data: {
+          id: 1
+        }
+      }
     })
     const { sut } = makeSut()
 
@@ -42,15 +47,23 @@ describe('TeamPermissionServices', () => {
     })
   })
 
-  it('should return a feedback message on successfully created', async () => {
+  it('should return a feedback message with redirect url on successfully created', async () => {
     vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
-      statusCode: 201
+      statusCode: 201,
+      body: {
+        data: {
+          id: 1
+        }
+      }
     })
     const { sut } = makeSut()
 
-    const feedbackMessage = await sut(fixtures.teamPermissionMock)
+    const result = await sut(fixtures.teamPermissionMock)
 
-    expect(feedbackMessage).toBe('Your Team Permission has been created')
+    expect(result).toEqual({
+      urlToEditView: '/teams-permission/edit/1',
+      feedback: 'Your Team Permission has been created'
+    })
   })
 
   it('Should return an API error for an 400 response status', async () => {

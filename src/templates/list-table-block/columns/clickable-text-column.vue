@@ -1,7 +1,7 @@
 <template>
   <PrimeButton
     text
-    @click="handleClick"
+    @click.stop="handleClick"
   >
     <p>{{ content }}</p>
   </PrimeButton>

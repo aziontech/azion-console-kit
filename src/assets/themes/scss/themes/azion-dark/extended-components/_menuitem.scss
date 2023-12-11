@@ -2,7 +2,21 @@
 .p-menu {
   .p-menuitem {
     .p-menuitem-content {
-      font-size: 0.875rem !important;
+      .p-menuitem-link {
+        height: 38px !important;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        .p-menuitem-text {
+          font-size: 0.875rem !important;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+        }
+        .p-menuitem-icon {
+          font-size: 0.875rem !important;
+        }
+      }
     }
   }
 }

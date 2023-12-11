@@ -4,7 +4,7 @@
     <PrimeButton
       text
       icon="pi pi-copy"
-      @click="handleCopyContent"
+      @click.stop="handleCopyContent"
       v-tooltip.bottom="{ value: 'Copy to clipboard', showDelay: 200 }"
     />
   </div>

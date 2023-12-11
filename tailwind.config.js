@@ -1,3 +1,5 @@
+import typography from '@tailwindcss/typography';
+
 /** @type {import('tailwindcss').Config} */
 export default {
   important: true,
@@ -17,20 +19,29 @@ export default {
         'header-input': '#292929',
         'header-button-enabled': '#ffffff32',
         'header-button-hover': 'rgba(244, 244, 244, 0.04)',
-        'header-avatar': '#363636'
+        'header-avatar': '#363636',
+        'orange-base': '#F3652B'
+      },
+      backgroundColor: {
+        'orange-bullet': '#F3652B',
       },
       borderColor: {
         header: '#3e3e3e',
-        'header-hover': '#F3652B'
+        'header-hover': '#F3652B',
+        'radio-card-active': '#F3652B'
       },
       textColor: {
-        header: '#b5b5b5'
+        header: '#b5b5b5',
+        'success-check': '#22C55E',
       },
       transitionProperty: {
         width: 'width'
       },
       width: {
-        slide: '300px'
+        'slide': '384px',
+      },
+      fontFamily: {
+        robotomono: ['Roboto Mono']
       },
       animation: {
         fadeIn: 'fadeIn 220ms ease-in-out',
@@ -48,5 +59,7 @@ export default {
       }
     }
   },
-  plugins: []
+  plugins: [
+    typography,
+  ]
 }

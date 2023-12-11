@@ -18,7 +18,7 @@ const makeSut = () => {
   }
 }
 
-describe.only('AuthServices', () => {
+describe('AuthServices', () => {
   beforeEach(() => {
     vi.clearAllMocks()
   })

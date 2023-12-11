@@ -2,7 +2,7 @@
   <PrimeTag
     v-bind="content"
     class="cursor-pointer"
-    @click="handleClick"
+    @click.stop="handleClick"
   />
 </template>
 

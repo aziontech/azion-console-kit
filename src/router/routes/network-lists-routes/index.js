@@ -52,7 +52,8 @@ export const networkListsRoutes = {
       props: {
         editNetworkListsService: NetworkListsService.editNetworkListService,
         loadNetworkListsService: NetworkListsService.loadNetworkListService,
-        listCountriesService: NetworkListsService.listCountriesService
+        listCountriesService: NetworkListsService.listCountriesService,
+        updatedRedirect: 'list-network-list'
       },
       meta: {
         breadCrumbs: [

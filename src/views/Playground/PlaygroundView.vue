@@ -1,28 +1,10 @@
-
 <template>
-  <div>
-    <ScriptRunnerBlock
-      title="Build"
-      :executionId="uuid"
-      :scriptRunnerService="getLogs"></ScriptRunnerBlock>
-      
+  <div class="relative bg-black/50 z-10 flex h-screen justify-content-start">
+    <ProgressBar class="top-[56px] sticky" mode="indeterminate" style="height: 6px"></ProgressBar>
   </div>
 </template>
-  <script>
-    import ScriptRunnerBlock from '@/templates/script-runner-block'
-    import {getLogs} from '@/services/script-runner-service'
-    export default {
-      name: 'script-runner-test-block',
-      components: {
-        ScriptRunnerBlock
-      },
-      async created() {
-        //
-      },
-      data: () => ({
-        uuid: 'xx',
-        getLogs
-      }),
-    }
-  </script>
-  
+
+<script setup>
+  import ProgressBar from 'primevue/progressbar';
+</script>
+

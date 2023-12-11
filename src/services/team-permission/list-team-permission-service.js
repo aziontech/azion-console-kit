@@ -11,6 +11,19 @@ export const listTeamPermissionService = async () => {
 
   return parseHttpResponse(httpResponse)
 }
+const parseStatusData = (status) => {
+  const parsedStatus = status
+    ? {
+        content: 'Active',
+        severity: 'success'
+      }
+    : {
+        content: 'Inactive',
+        severity: 'danger'
+      }
+
+  return parsedStatus
+}
 
 const adapt = (httpResponse) => {
   /**
@@ -27,7 +40,7 @@ const adapt = (httpResponse) => {
         id: team.id,
         name: team.name,
         permissions: team.permissions.length ? team.permissions.map((item) => item.name) : [],
-        isActive: team.is_active
+        status: parseStatusData(team.is_active)
       }))
     : []
   return {

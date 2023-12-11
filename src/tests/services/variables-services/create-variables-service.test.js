@@ -21,7 +21,10 @@ const makeSut = () => {
 describe('VariablesServices', () => {
   it('should call API with correct params', async () => {
     const requestSpy = vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
-      statusCode: 201
+      statusCode: 201,
+      body: {
+        uuid: 1
+      }
     })
     const { sut } = makeSut()
 
@@ -39,13 +42,16 @@ describe('VariablesServices', () => {
 
   it('should return a feedback message on successfully created', async () => {
     vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
-      statusCode: 201
+      statusCode: 201,
+      body: {
+        uuid: 1
+      }
     })
     const { sut } = makeSut()
 
-    const feedbackMessage = await sut(fixtures.variableMock)
+    const data = await sut(fixtures.variableMock)
 
-    expect(feedbackMessage).toBe('Your variable has been created')
+    expect(data.feedback).toBe('Your variable has been created')
   })
 
   it.each([

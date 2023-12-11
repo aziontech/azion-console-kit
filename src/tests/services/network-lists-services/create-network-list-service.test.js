@@ -22,7 +22,12 @@ const makeSut = () => {
 describe('NetworkListsServices', () => {
   it('should call API with correct params', async () => {
     const requestSpy = vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
-      statusCode: 201
+      statusCode: 201,
+      body: {
+        results: {
+          id: 1
+        }
+      }
     })
     const { sut } = makeSut()
 
@@ -41,13 +46,18 @@ describe('NetworkListsServices', () => {
 
   it('should return a feedback message on successfully created', async () => {
     vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
-      statusCode: 201
+      statusCode: 201,
+      body: {
+        results: {
+          id: 1
+        }
+      }
     })
     const { sut } = makeSut()
 
-    const feedbackMessage = await sut(fixtures.networkMock)
+    const data = await sut(fixtures.networkMock)
 
-    expect(feedbackMessage).toBe('Your network list has been created')
+    expect(data.feedback).toBe('Your network list has been created')
   })
 
   it('Should return an API error for an 40 error status', async () => {

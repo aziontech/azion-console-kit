@@ -6,7 +6,7 @@ export const createRealTimePurgeService = async (payload) => {
   const bodyRequest = adapt(payload)
 
   let httpResponse = await AxiosHttpClientAdapter.request({
-    url: `${makeRealTimePurgeBaseUrl()}/${payload.purge_type}`,
+    url: `${makeRealTimePurgeBaseUrl()}/${payload.purgeType}`,
     method: 'POST',
     body: bodyRequest
   })
@@ -20,7 +20,7 @@ const adapt = (payload) => {
     method: 'delete'
   }
 
-  if (payload.purge_type === 'cachekey') {
+  if (payload.purgeType === 'cachekey') {
     request.layer = payload.layer
   }
 
@@ -37,7 +37,10 @@ const adapt = (payload) => {
 const parseHttpResponse = (httpResponse) => {
   switch (httpResponse.statusCode) {
     case 201:
-      return 'Your purge has been created'
+      return {
+        feedback: 'Your purge has been created',
+        urlToEditView: `/real-time-purge`
+      }
     case 400:
       const key = Object.keys(httpResponse.body)[0]
       const msg = httpResponse.body[key]

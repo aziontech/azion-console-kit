@@ -25,10 +25,22 @@ const adapt = (httpResponse) => {
     id: item.id,
     name: item.name,
     token: item.token,
-    status: item.status ? 'Yes' : 'No',
+    status: item.status
+      ? {
+          content: 'Active',
+          severity: 'success'
+        }
+      : {
+          content: 'Inactive',
+          severity: 'danger'
+        },
     description: item.description,
     lastEditor: item.last_editor,
-    lastModified: item.last_modified
+    lastModified: new Intl.DateTimeFormat('us', {
+      dateStyle: 'full',
+      timeStyle: 'short'
+    }).format(new Date(item.last_modified)),
+    lastModifiedDate: item.last_modified
   }))
 
   return {

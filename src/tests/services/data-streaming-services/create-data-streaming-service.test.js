@@ -4,11 +4,24 @@ import { createDataStreamingService } from '@/services/data-streaming-services'
 import { describe, expect, it, vi } from 'vitest'
 
 const fixtures = {
+  dataStreamingMockWithSampling: {
+    name: 'Data Streaming Name',
+    template: 4,
+    dataSource: 'http',
+    domains: [[], []],
+    status: true,
+    hasSampling: true,
+    samplingPercentage: 100,
+    endpoint: 'qradar',
+    QRadarUrl: 'https://qradar-trial-abcdef.qradar.ibmcloud.com:123456'
+  },
   dataStreamingMock: {
     name: 'Data Streaming Name',
     template: 4,
     dataSource: 'http',
     domains: [[], []],
+    status: true,
+    hasSampling: false,
     endpoint: 'qradar',
     QRadarUrl: 'https://qradar-trial-abcdef.qradar.ibmcloud.com:123456'
   }
@@ -25,11 +38,57 @@ const makeSut = () => {
 describe('DataStreamingServices', () => {
   it('should call API with correct params', async () => {
     const requestSpy = vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
-      statusCode: 201
+      statusCode: 201,
+      body: {
+        results: {
+          id: 1
+        }
+      }
     })
     const { sut } = makeSut()
 
-    await sut(fixtures.dataStreamingMock)
+    await sut(fixtures.dataStreamingMockWithSampling)
+
+    expect(requestSpy).toHaveBeenCalledWith({
+      url: `data_streaming/streamings`,
+      method: 'POST',
+      body: {
+        name: fixtures.dataStreamingMockWithSampling.name,
+        template_id: fixtures.dataStreamingMockWithSampling.template,
+        data_source: fixtures.dataStreamingMockWithSampling.dataSource,
+        domain_ids: [],
+        active: fixtures.dataStreamingMockWithSampling.status,
+        all_domains: true,
+        sampling_percentage: fixtures.dataStreamingMockWithSampling.samplingPercentage,
+        endpoint: {
+          endpoint_type: fixtures.dataStreamingMockWithSampling.endpoint,
+          url: fixtures.dataStreamingMockWithSampling.QRadarUrl
+        }
+      }
+    })
+  })
+
+  it('should use the provided text on invalid headers of standard endpoint type', async () => {
+    const requestSpy = vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
+      statusCode: 201,
+      body: {
+        results: {
+          id: 1
+        }
+      }
+    })
+    const { sut } = makeSut()
+
+    const dataStreamingMock = {
+      ...fixtures.dataStreamingMock,
+      endpoint: 'standard',
+      payloadFormat: 'format-payload',
+      lineSeparator: 'separator-test',
+      maxSize: '123321',
+      headers: [{ value: 'PORT:1010' }, { value: 'invalid-header' }]
+    }
+
+    await sut(dataStreamingMock)
 
     expect(requestSpy).toHaveBeenCalledWith({
       url: `data_streaming/streamings`,
@@ -40,9 +99,17 @@ describe('DataStreamingServices', () => {
         data_source: fixtures.dataStreamingMock.dataSource,
         domain_ids: [],
         all_domains: true,
+        active: fixtures.dataStreamingMock.status,
         endpoint: {
-          endpoint_type: fixtures.dataStreamingMock.endpoint,
-          url: fixtures.dataStreamingMock.QRadarUrl
+          endpoint_type: 'standard',
+          url: fixtures.dataStreamingMock.endpointUrl,
+          payload_format: 'format-payload',
+          log_line_separator: 'separator-test',
+          max_size: '123321',
+          headers: {
+            PORT: '1010',
+            'invalid-header': 'invalid-header'
+          }
         }
       }
     })
@@ -50,17 +117,27 @@ describe('DataStreamingServices', () => {
 
   it('should return a feedback message on successfully created', async () => {
     vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
-      statusCode: 201
+      statusCode: 201,
+      body: {
+        results: {
+          id: 1
+        }
+      }
     })
     const { sut } = makeSut()
-    const feedbackMessage = await sut(fixtures.dataStreamingMock)
+    const data = await sut(fixtures.dataStreamingMock)
 
-    expect(feedbackMessage).toBe('Your data streaming has been created')
+    expect(data.feedback).toBe('Your data streaming has been created')
   })
 
   it('should return a feedback message on successfully created with domains', async () => {
     vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
-      statusCode: 201
+      statusCode: 201,
+      body: {
+        results: {
+          id: 1
+        }
+      }
     })
     const { sut } = makeSut()
     const dataStreamingMockWithDomains = {
@@ -68,29 +145,44 @@ describe('DataStreamingServices', () => {
       domains: [[], [{ domainID: 1 }, { domainID: 2 }]]
     }
 
-    const feedbackMessage = await sut(dataStreamingMockWithDomains)
+    const data = await sut(dataStreamingMockWithDomains)
 
-    expect(feedbackMessage).toBe('Your data streaming has been created')
+    expect(data.feedback).toBe('Your data streaming has been created')
   })
 
   it('should return a feedback message on successfully created with endpoint standard and list of headers', async () => {
     vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
-      statusCode: 201
+      statusCode: 201,
+      body: {
+        results: {
+          id: 1
+        }
+      }
     })
     const { sut } = makeSut()
     const dataStreamingMockWithDomains = {
-      ...fixtures.dataStreamingMock,
-      endpoint: 'standard',
-      endpointUrl: 'https://app.domain.com/',
-      payloadFormat: '$dataset',
-      lineSeparator: '\n',
-      maxSize: '10000000',
-      headers: [{ value: 'name: api' }, { value: 'teste: 1' }]
+      ...fixtures.dataStreamingMock
     }
 
-    const feedbackMessage = await sut(dataStreamingMockWithDomains)
+    const data = await sut(dataStreamingMockWithDomains)
 
-    expect(feedbackMessage).toBe('Your data streaming has been created')
+    expect(data.feedback).toBe('Your data streaming has been created')
+  })
+
+  it('should throw an error on a invalid Data Streaming endpoint is used', async () => {
+    vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
+      statusCode: 200
+    })
+    const { sut } = makeSut()
+
+    const dataStreamingMock = {
+      ...fixtures.dataStreamingMock,
+      endpoint: 'invalid-enpoint-type'
+    }
+
+    const result = sut(dataStreamingMock)
+
+    expect(result).rejects.toBe('Invalid Data Streaming Endpoint Type')
   })
 
   it.each([
@@ -187,7 +279,12 @@ describe('DataStreamingServices', () => {
     }
   ])('Should test all edpoints, current endpoint $endpoint', async ({ endpoint, values }) => {
     vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
-      statusCode: 201
+      statusCode: 201,
+      body: {
+        results: {
+          id: 1
+        }
+      }
     })
     const { sut } = makeSut()
 
@@ -197,9 +294,9 @@ describe('DataStreamingServices', () => {
       ...values
     }
 
-    const feedbackMessage = await sut(dataStreamingEndpointMock)
+    const data = await sut(dataStreamingEndpointMock)
 
-    expect(feedbackMessage).toBe('Your data streaming has been created')
+    expect(data.feedback).toBe('Your data streaming has been created')
   })
 
   it.each([
@@ -207,6 +304,11 @@ describe('DataStreamingServices', () => {
       scenario: 'used url invalid',
       apiErrorMock: 'URL is not on correct format.',
       errorKey: 'invalid_url'
+    },
+    {
+      scenario: 'user does not have sampling client flag',
+      apiErrorMock: 'You do not have permission to use Data Streaming sampling',
+      errorKey: 'user_has_no_flag'
     },
     {
       scenario: 'used max size invalid',

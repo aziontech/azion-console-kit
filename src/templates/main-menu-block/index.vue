@@ -42,7 +42,8 @@
           v-model:showSwitchAccount="openSwitchAccount"
           :accessMenu="profileMenuSwitchAccount"
           :account="user"
-          :accountListService="serviceSwitchAccount"
+          :listTypeAccountService="listTypeAccountService"
+          :accountHandler="accountHandler"
         />
       </div>
 
@@ -71,7 +72,7 @@
       <div class="flex gap-2 items-center">
         <PrimeButton
           icon="pi pi-search"
-          class="bg-header hover:bg-header-button-hover !text-white px-2 py-1 flex lg:hidden !text-white border-header"
+          class="bg-header hover:bg-header-button-hover !text-white px-2 py-1 flex lg:hidden border-header"
           :pt="{
             label: { class: 'text-white' },
             icon: { class: 'text-white' }
@@ -83,24 +84,24 @@
 
         <!-- Create Button Desktop -->
         <PrimeButton
-          @click="showCreateModal"
+          @click="createModalStore.toggle()"
           icon="pi pi-plus"
           label="Create"
-          class="!text-white h-8 hidden md:flex !text-white border-header"
+          class="!text-white h-8 hidden md:flex border-header"
           size="small"
           :pt="{
             label: { class: 'text-white' },
             icon: { class: 'text-white' }
           }"
           :class="{
-            'bg-header hover:bg-header-button-hover': !showCreate,
-            'bg-header-button-enabled': showCreate
+            'bg-header hover:bg-header-button-hover': !createModalStore.isOpen,
+            'bg-header-button-enabled': createModalStore.isOpen
           }"
         />
 
         <!-- Create Button Mobile -->
         <PrimeButton
-          @click="showCreateMobileModal"
+          @click="createModalStore.toggle()"
           icon="pi pi-plus"
           class="h-8 md:hidden text-white border-header"
           size="small"
@@ -110,8 +111,8 @@
             icon: { class: 'text-white' }
           }"
           :class="{
-            'bg-header hover:bg-header-button-hover': !showCreate,
-            'bg-header-button-enabled': showCreate
+            'bg-header hover:bg-header-button-hover': !createModalStore.isOpen,
+            'bg-header-button-enabled': createModalStore.isOpen
           }"
           v-tooltip.bottom="{ value: 'Create', showDelay: 200 }"
         />
@@ -121,15 +122,15 @@
           icon="pi pi-question-circle"
           size="small"
           label="Help"
-          @click="toggleHelpCenter"
+          @click="helpCenterStore.toggle()"
           :pt="{
             label: { class: 'text-white' },
             icon: { class: 'text-white' }
           }"
           class="hidden md:flex !text-white border-header"
           :class="{
-            'bg-header hover:bg-header-button-hover': !showHelp,
-            'bg-header-button-enabled': showHelp
+            'bg-header hover:bg-header-button-hover': !helpCenterStore.isOpen,
+            'bg-header-button-enabled': helpCenterStore.isOpen
           }"
         />
 
@@ -137,16 +138,16 @@
         <PrimeButton
           icon="pi pi-question-circle"
           size="small"
-          class="md:hidden text-white !text-white border-header"
+          class="md:hidden text-white border-header"
           style="height: 32px; width: 32px"
-          @click="toggleHelpCenter"
+          @click="helpCenterStore.toggle()"
           :pt="{
             label: { class: 'text-white' },
             icon: { class: 'text-white' }
           }"
           :class="{
-            'bg-header hover:bg-header-button-hover': !showHelp,
-            'bg-header-button-enabled': showHelp
+            'bg-header hover:bg-header-button-hover': !helpCenterStore.isOpen,
+            'bg-header-button-enabled': helpCenterStore.isOpen
           }"
           v-tooltip.bottom="{ value: 'Help', showDelay: 200 }"
         />
@@ -176,14 +177,14 @@
           @click="toggleProfileMobile"
           label="U"
           class="transition-all hover:border-orange-500 hover:bg-header-button-hover cursor-pointer md:hidden text-avatar text-avatar bg-header-avatar"
-          v-tooltip.bottom="{ value: 'Account settings', showDelay: 200 }"
+          v-tooltip.bottom="{ value: 'Account', showDelay: 200 }"
         />
         <!-- Profile Desktop -->
         <Avatar
           @click="toggleProfile"
           label="U"
           class="transition-all hover:border-orange-500 hover:bg-header-button-hover hidden md:flex cursor-pointer bg-header-avatar"
-          v-tooltip.bottom="{ value: 'Account settings', showDelay: 200 }"
+          v-tooltip.bottom="{ value: 'Account', showDelay: 200 }"
         />
       </div>
     </div>
@@ -195,6 +196,7 @@
   </header>
   <!-- Mobile Profile Menu  -->
   <Sidebar
+    @click="toggleProfileMobile"
     v-model:visible="showProfile"
     position="bottom"
     :show-close-icon="false"
@@ -204,7 +206,6 @@
       mask: { class: 'flex' }
     }"
     class="md:p-3"
-    @click="toggleProfileMobile"
   >
     <PrimeMenu
       :pt="{
@@ -254,6 +255,7 @@
           <Dropdown
             :modelValue="selectedTheme"
             @update:modelValue="selectTheme"
+            @click.stop
             optionValue="value"
             optionLabel="name"
             :options="themeOptions"
@@ -281,7 +283,7 @@
             </template>
           </Dropdown>
         </div>
-        <Divider class="surface-border p-1 m-0" />
+        <Divider class="-ml-2 w-[calc(100%+1rem)] mt-2.5 mb-2" />
         <PrimeButton
           class="w-full rounded-md flex content-start text-left"
           :pt="{
@@ -299,39 +301,6 @@
         />
       </template>
     </PrimeMenu>
-  </Sidebar>
-  <!-- help mobile sidebar -->
-  <Sidebar
-    :visible="showHelp"
-    position="bottom"
-    headerContent="Help"
-    :show-close-icon="false"
-    :pt="{
-      root: { class: '!h-[90%] md:hidden flex' },
-      headerContent: { class: 'w-full' },
-      mask: { class: 'md:hidden flex' }
-    }"
-  >
-    <template #header>
-      <div class="flex items-center justify-between">
-        <h2>Help</h2>
-        <PrimeButton
-          icon="pi pi-times"
-          @click="closeHelpCenter"
-          size="small"
-          class="flex-none surface-border text-sm w-8 h-8"
-          text
-        />
-      </div>
-    </template>
-    <div class="flex flex-col p-2">
-      <!-- content -->
-      <div class="surface-border border border-dashed rounded-md flex items-center h-96 m-2">
-        <p class="text-color text-sm font-medium text-center w-full">
-          This section is under development.
-        </p>
-      </div>
-    </div>
   </Sidebar>
 
   <!-- Sidebar-->
@@ -357,13 +326,13 @@
     >
       <template #item="{ item, label, props }">
         <a
-          class="flex h-9"
           v-bind="props.action"
           @click="redirect(item.to)"
         >
           <span v-bind="props.icon" />
           <span v-bind="props.label">{{ label }}</span>
           <Tag
+            severity="info"
             v-if="item.tag"
             :value="item.tag"
             class="ml-2"
@@ -395,6 +364,7 @@
       </div>
     </template>
     <template #end>
+      <Divider class="-ml-2 w-[calc(100%+1rem)] mt-3 mb-2" />
       <div class="flex flex-row items-center">
         <div class="flex flex-col gap-1 px-2 py-2.5">
           <span class="text-sm font-medium leading-none">{{ user.full_name }}</span>
@@ -414,7 +384,7 @@
       />
       <!-- Theme Switch -->
       <div class="flex flex-row justify-between items-center align-middle px-2 py-1.5">
-        <span>Theme</span>
+        <span class="text-sm">Theme</span>
         <Dropdown
           :modelValue="selectedTheme"
           @update:modelValue="selectTheme"
@@ -423,9 +393,7 @@
           :options="themeOptions"
           :autoOptionFocus="false"
           :pt="{
-            root: { class: 'w-auto py-0 h-8 items-center align-middle surface-section' },
-            item: { class: 'text-sm' },
-            input: { class: 'text-sm' }
+            root: { class: 'w-auto items-center align-middle' }
           }"
         >
           <template #value="slotProps">
@@ -445,12 +413,12 @@
           </template>
         </Dropdown>
       </div>
-      <Divider class="surface-border p-1 m-0" />
+      <Divider class="-ml-2 w-[calc(100%+1rem)] mb-3 mt-2" />
       <PrimeButton
-        class="w-full rounded-md flex content-start text-left"
+        class="w-full h-[38px] rounded-md flex content-start text-left"
         :pt="{
           label: {
-            class: 'font-normal'
+            class: 'text-sm font-normal'
           },
           root: {
             class: 'rounded-md hover:surface-200'
@@ -503,32 +471,36 @@
 
   <!-- Modal de create -->
   <PrimeDialog
-    v-model:visible="showCreate"
+    :draggable="false"
+    v-model:visible="createModalStore.isOpen"
     modal
-    header="Create something new"
+    header="New"
     :pt="{
-      content: { class: 'p-4 sm:p-0' }
+      root: { class: 'hidden w-full lg:max-w-screen-lg 2xl:max-w-screen-xl h-[640px] sm:flex' },
+      content: { class: ' w-full  h-full p-0' },
+      mask: { class: 'hidden sm:flex' }
     }"
     position="center"
+    class="w-full"
     :dismissableMask="true"
-    :breakpoints="{ '641px': '90vw' }"
+    @update:visible="createModalStore.close()"
   >
     <!-- SLOT WIP -->
     <div>
-      <CreateModalBlock @closeModal="showCreate = false" />
+      <CreateModalBlock @closeModal="createModalStore.close()" />
     </div>
   </PrimeDialog>
 
   <!-- Mobile modal Create -->
   <Sidebar
-    v-model:visible="showCreateMobile"
+    v-model:visible="createModalStore.isOpen"
     position="bottom"
     headerContent="Create something new"
     :show-close-icon="false"
     :pt="{
-      root: { class: 'h-[80%] flex p-0' },
+      root: { class: 'h-[80%] flex p-0 sm:hidden' },
       headerContent: { class: 'w-full' },
-      mask: { class: 'flex' }
+      mask: { class: 'flex sm:hidden' }
     }"
   >
     <template #header>
@@ -536,7 +508,7 @@
         <h2>Create something new</h2>
         <PrimeButton
           icon="pi pi-times"
-          @click="closeCreateMobileModal"
+          @click="createModalStore.close()"
           size="small"
           class="flex-none surface-border text-sm w-8 h-8"
           text
@@ -578,8 +550,8 @@
   import Dropdown from 'primevue/dropdown'
   import { useAccountStore } from '@/stores/account'
   import { useHelpCenterStore } from '@/stores/help-center'
+  import { useCreateModalStore } from '@/stores/create-modal'
   import { mapActions, mapState } from 'pinia'
-  import { listTypeAccountService } from '@/services/switch-account-services/list-type-account-service'
   import SwitchAccountBlock from '@/templates/switch-account-block'
   import CreateModalBlock from '@/templates/create-modal-block'
 
@@ -600,12 +572,20 @@
       SwitchAccountBlock,
       CreateModalBlock
     },
-    props: { isLogged: Boolean },
+    props: {
+      isLogged: Boolean,
+      listTypeAccountService: {
+        type: Function,
+        required: true
+      },
+      accountHandler: {
+        type: Object,
+        required: true
+      }
+    },
     data() {
       return {
         openSwitchAccount: false,
-        showCreate: false,
-        showCreateMobile: false,
         showSearch: false,
         showSidebar: false,
         showProfile: false,
@@ -639,7 +619,7 @@
               { label: 'Account Settings', icon: 'pi pi-cog' },
               { label: 'Your Settings', icon: 'pi pi-user' },
               { label: 'Users Management', icon: 'pi pi-users' },
-              { label: 'Team Permissions', icon: 'pi pi-user-edit', to: '/teams-permession' },
+              { label: 'Team Permissions', icon: 'pi pi-user-edit', to: '/teams-permission' },
               { label: 'Billing & Subscriptions', icon: 'pi pi-credit-card' },
               { label: 'Credentials', icon: 'pi pi-id-card' },
               { label: 'Activity History', icon: 'pi pi-history', to: '/activity-history' },
@@ -652,6 +632,11 @@
             label: 'Home',
             icon: 'pi pi-home',
             to: '/'
+          },
+          {
+            label: 'Marketplace',
+            icon: 'pi pi-cart-plus',
+            to: '/marketplace'
           },
           {
             label: 'Domains',
@@ -681,7 +666,6 @@
               {
                 label: 'Intelligent DNS',
                 to: '/intelligent-dns',
-                tag: 'New',
                 icon: 'pi pi-share-alt'
               },
               {
@@ -710,15 +694,20 @@
                 icon: 'pi pi-play'
               },
               {
-                label: 'Edge Pulse',
-                to: '/edge-pulse',
+                label: 'Real Time Metrics',
+                to: '/real-time-metrics',
                 icon: 'pi pi-chart-line'
               },
               {
-                label: 'Real Time Metrics',
-                to: '/real-time-metrics',
-                icon: 'pi pi-chart-line',
-                tag: 'Beta'
+                label: 'Real Time Events',
+                to: '/real-time-events',
+                icon: 'pi pi-server',
+                tag: 'Preview'
+              },
+              {
+                label: 'Edge Pulse',
+                to: '/edge-pulse',
+                icon: 'pi pi-chart-line'
               }
             ]
           },
@@ -798,13 +787,11 @@
           { name: 'Light', value: 'light', icon: 'pi pi-sun' },
           { name: 'Dark', value: 'dark', icon: 'pi pi-moon' },
           { name: 'System', value: 'system', icon: 'pi pi-desktop' }
-        ],
-        serviceSwitchAccount: listTypeAccountService
+        ]
       }
     },
     computed: {
       ...mapState(useAccountStore, { user: 'accountData', currentTheme: 'currentTheme' }),
-      ...mapState(useHelpCenterStore, { showHelp: 'isOpen' }),
       selectedTheme() {
         return this.themeOptions.find((option) => option.value === this.currentTheme)
       },
@@ -829,14 +816,11 @@
               ]
             : []
 
-        const separator = { separator: true }
-
-        return [...switchAccount, ...this.profileMenuItemsDefault, separator]
+        return [...switchAccount, ...this.profileMenuItemsDefault]
       }
     },
     methods: {
       ...mapActions(useAccountStore, ['setTheme']),
-      ...mapActions(useHelpCenterStore, ['toggleHelpCenter', 'closeHelpCenter']),
       toggleProfileMobile() {
         this.showProfile = !this.showProfile
       },
@@ -849,15 +833,6 @@
       },
       toggleNotification(event) {
         this.$refs.menu.toggle(event)
-      },
-      showCreateModal() {
-        this.showCreate = true
-      },
-      showCreateMobileModal() {
-        this.showCreateMobile = true
-      },
-      closeCreateMobileModal() {
-        this.showCreateMobile = false
       },
       openSideBar() {
         this.showSidebar = !this.showSidebar
@@ -883,6 +858,12 @@
       closeSwitchAccountDialog() {
         this.openSwitchAccount = false
       }
+    },
+    setup() {
+      const helpCenterStore = useHelpCenterStore()
+      const createModalStore = useCreateModalStore()
+
+      return { helpCenterStore, createModalStore }
     }
   }
 </script>

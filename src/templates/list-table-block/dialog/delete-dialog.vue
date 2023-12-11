@@ -3,7 +3,10 @@
     v-model:visible="deleteDialogVisible"
     modal
     :header="`Delete ${informationForDeletion.title}`"
-    class="w-[40vw]"
+    class="w-[95vw] md:w-[40vw]"
+    :pt="{
+      header: { class: 'p-5' }
+    }"
   >
     <div class="flex flex-col gap-5">
       <div>
@@ -11,23 +14,23 @@
           class="w-100"
           severity="warn"
           :closable="false"
-          >Warning: This action is not reversible. Please be certain.</Message
+          >Once confirmed, this action can't be reversed.</Message
         >
 
         <p class="pt-3.5 text-color-secondary">
-          This Edge Application will be deleted along, Device Groups, Origins settings, Cache
-          Settings and Rule Sets.
+          This {{ informationForDeletion.title }} will be deleted along with any associated settings
+          or instances. Check Help Center for more details.
         </p>
       </div>
 
       <Divider class="-ml-5 w-[calc(100%_+_40px)]" />
 
       <div>
-        <div class="flex flex-col sm:max-w-lg w-full gap-2">
+        <div class="flex flex-col w-full gap-2">
           <label
             for="confirm-input"
             class="font-semibold text-sm"
-            >To confirm, type “delete” in the box below:</label
+            >Type “delete” to confirm:</label
           >
           <InputText
             id="confirm-input"
@@ -35,7 +38,6 @@
             autofocus
             v-model="confirmation"
             :class="{ 'p-invalid': errors.confirmation }"
-            v-tooltip.top="{ value: errors.confirmation, showDelay: 200 }"
           />
           <small
             v-if="errors.confirmation"
@@ -56,6 +58,7 @@
           @click="cancelDialog()"
         ></PrimeButton>
         <PrimeButton
+          class="w-full lg:w-auto mr-0"
           severity="danger"
           label="Delete"
           icon-pos="right"
@@ -123,25 +126,23 @@
       async removeItem() {
         this.loading = true
         let toastConfig = {
-          closable: false,
+          closable: true,
           severity: 'success',
-          summary: '',
-          life: 10000
+          summary: ''
         }
 
         try {
           const feedback = await this.informationForDeletion.deleteService(
             this.informationForDeletion.selectedID
           )
-          toastConfig.summary = feedback ?? 'Deleted successfully'
+          toastConfig.summary = feedback ?? 'Deleted successfully!'
           this.$emit('successfullyDeleted')
           this.resetForm()
         } catch (error) {
           toastConfig = {
-            closable: false,
+            closable: true,
             severity: 'error',
-            summary: error,
-            life: 10000
+            summary: error
           }
         } finally {
           this.deleteDialogVisible = false

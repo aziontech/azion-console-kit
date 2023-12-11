@@ -7,12 +7,12 @@ const fixtures = {
   dnsRecordMock: {
     intelligentDNSId: 123987902,
     id: 625837692,
-    recordType: 'CNAME',
+    selectedRecordType: 'CNAME',
     name: 'Az-dns-name',
     value: 'dns-answer-record-CNAME.com',
     ttl: '8000',
     description: 'dns record description',
-    policy: 'weighted',
+    selectedPolicy: 'weighted',
     weight: 0.9
   }
 }
@@ -38,11 +38,11 @@ describe('IntelligentDnsRecordsServices', () => {
       url: `intelligent_dns/${fixtures.dnsRecordMock.intelligentDNSId}/records/${fixtures.dnsRecordMock.id}`,
       method: 'PUT',
       body: {
-        record_type: fixtures.dnsRecordMock.recordType,
+        record_type: fixtures.dnsRecordMock.selectedRecordType,
         entry: fixtures.dnsRecordMock.name,
         answers_list: [fixtures.dnsRecordMock.value],
         ttl: fixtures.dnsRecordMock.ttl,
-        policy: fixtures.dnsRecordMock.policy,
+        policy: fixtures.dnsRecordMock.selectedPolicy,
         weight: fixtures.dnsRecordMock.weight,
         description: fixtures.dnsRecordMock.description
       }

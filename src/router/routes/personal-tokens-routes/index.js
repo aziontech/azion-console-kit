@@ -29,7 +29,8 @@ export const personalTokensRoutes = {
       name: 'create-personal-token',
       component: () => import('@views/PersonalTokens/CreateView.vue'),
       props: {
-        createPersonalTokenService: PersonalTokensService.createPersonalToken
+        createPersonalTokenService: PersonalTokensService.createPersonalToken,
+        clipboardWrite: Helpers.clipboardWrite
       },
       meta: {
         breadCrumbs: [

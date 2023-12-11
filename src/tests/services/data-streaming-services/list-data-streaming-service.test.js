@@ -19,6 +19,9 @@ const fixtures = {
     id: 789,
     name: 'data streaming name',
     data_source: 'http',
+    endpoint: {
+      endpoint_type: 'standard'
+    },
     active: true
   },
   dataStreamingDisabledMock: {
@@ -26,6 +29,9 @@ const fixtures = {
     id: 444,
     name: 'data streaming name',
     data_source: 'http',
+    endpoint: {
+      endpoint_type: 'kafka'
+    },
     active: false
   }
 }
@@ -78,11 +84,15 @@ describe('DataStreamingServices', () => {
     expect(httpClientSpy).toHaveBeenCalledTimes(2)
     expect(result).toEqual([
       {
-        active: 'Yes',
         dataSource: 'Edge Applications',
         id: 789,
         name: 'data streaming name',
-        templateName: 'template name'
+        templateName: 'template name',
+        endpointType: 'standard',
+        active: {
+          content: 'Active',
+          severity: 'success'
+        }
       }
     ])
   })
@@ -108,20 +118,47 @@ describe('DataStreamingServices', () => {
 
     expect(result).toEqual([
       {
-        active: 'Yes',
         dataSource: 'Edge Applications',
         id: 789,
         name: 'data streaming name',
-        templateName: 'template name'
+        templateName: 'template name',
+        endpointType: 'standard',
+        active: {
+          content: 'Active',
+          severity: 'success'
+        }
       },
       {
-        active: 'No',
         dataSource: 'Edge Applications',
         id: 444,
         name: 'data streaming name',
-        templateName: 'template name'
+        templateName: 'template name',
+        endpointType: 'kafka',
+        active: {
+          content: 'Inactive',
+          severity: 'danger'
+        }
       }
     ])
+  })
+  it('should return no registers on invalid dataStreaming schema', async () => {
+    vi.spyOn(AxiosHttpClientAdapter, 'request')
+      .mockResolvedValueOnce({
+        statusCode: 200,
+        body: null
+      })
+      .mockResolvedValue({
+        statusCode: 200,
+        body: {
+          results: fixtures.templateMock
+        }
+      })
+
+    const { sut } = makeSut()
+
+    const result = await sut()
+
+    expect(result).toEqual([])
   })
 
   it.each([

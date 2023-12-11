@@ -4,7 +4,7 @@
   <footer
     class="z-10 flex px-3 py-6 flex-wrap flex-col justify-center items-center gap-3 lg:gap-4 surface-ground border-t surface-border lg:flex-row pr-3 lg:py-3 lg:px-8 lg:justify-center"
   >
-    <span class="text-sm text-normal text-color">© 2023 Azion Technologies.</span>
+    <span class="text-sm text-normal text-color">© 2024 Azion</span>
 
     <div
       class="flex flex-col gap-3 lg:gap-4 items-center lg:flex lg:flex-row flex-none md-auto md:flex-1"
@@ -151,7 +151,7 @@
         window.open('https://discord.com/invite/Yp9N7RMVZy', '_blank')
       },
       openGitHub() {
-        window.open('https://github.com/aziontech', '_blank')
+        window.open('https://github.com/aziontech/azion-platform-kit', '_blank')
       },
       openX() {
         window.open('https://twitter.com/aziontech', '_blank')

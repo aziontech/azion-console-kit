@@ -14,7 +14,7 @@ export const listPermissionService = async () => {
 
 const adapt = (httpResponse) => {
   return {
-    body: httpResponse.body.results,
+    body: [...httpResponse.body.results],
     statusCode: httpResponse.statusCode
   }
 }

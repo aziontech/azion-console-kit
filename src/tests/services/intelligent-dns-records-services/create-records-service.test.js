@@ -27,7 +27,12 @@ const makeSut = () => {
 describe('IntelligentDnsRecordsServices', () => {
   it('should call API with correct params', async () => {
     const requestSpy = vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
-      statusCode: 201
+      statusCode: 201,
+      body: {
+        results: {
+          id: 1
+        }
+      }
     })
     const { sut } = makeSut()
 
@@ -37,12 +42,12 @@ describe('IntelligentDnsRecordsServices', () => {
       url: `intelligent_dns/${fixtures.dnsRecordMock.intelligentDNSID}/records`,
       method: 'POST',
       body: {
-        record_type: fixtures.dnsRecordMock.selectedRecordType._value,
+        record_type: fixtures.dnsRecordMock.selectedRecordType,
         entry: fixtures.dnsRecordMock.name,
         answers_list: [fixtures.dnsRecordMock.value],
         ttl: fixtures.dnsRecordMock.ttl,
         description: fixtures.dnsRecordMock.description,
-        policy: fixtures.dnsRecordMock.selectedPolicy._value,
+        policy: fixtures.dnsRecordMock.selectedPolicy,
         weight: fixtures.dnsRecordMock.weight
       }
     })
@@ -50,13 +55,18 @@ describe('IntelligentDnsRecordsServices', () => {
 
   it('should return a feedback message on successfully created', async () => {
     vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
-      statusCode: 201
+      statusCode: 201,
+      body: {
+        results: {
+          id: 1
+        }
+      }
     })
     const { sut } = makeSut()
 
-    const feedbackMessage = await sut(fixtures.dnsRecordMock)
+    const data = await sut(fixtures.dnsRecordMock)
 
-    expect(feedbackMessage).toBe('Intelligent DNS Record has been created')
+    expect(data.feedback).toBe('Intelligent DNS Record has been created')
   })
 
   it('Should return an API error when API detect an invalid configuration to Intelligent DNS Record', async () => {

@@ -1,55 +1,41 @@
 <template>
-  <PageHeadingBlock :pageTitle="pageTitle">
-    <template #tabs>
+  <ContentBlock>
+    <template #heading>
+      <PageHeadingBlock pageTitle="Edge Application"></PageHeadingBlock>
+    </template>
+    <template #content>
       <TabView
         :active-index="0"
         class="w-full"
       >
-        <TabPanel header="Main Settings">
-          <!-- <MainSettingsTab /> -->
-        </TabPanel>
-
+        <TabPanel header="Main Settings"> </TabPanel>
         <TabPanel header="Origins">
-          <OriginsTab
+          <EdgeApplicationsOriginsListView
             :listOriginsService="props.listOriginsService"
             :deleteOriginsService="props.deleteOriginsService"
           />
         </TabPanel>
 
-        <TabPanel header="Device Groups">
-          <!-- <DeviceGroupsTab /> -->
-        </TabPanel>
-
-        <TabPanel header="Error Responses">
-          <!-- <ErrorResponsesTab /> -->
-        </TabPanel>
-
-        <TabPanel header="Cache Settings">
-          <!-- <CacheSettingsTab /> -->
-        </TabPanel>
-
+        <TabPanel header="Device Groups"> </TabPanel>
+        <TabPanel header="Error Responses"> </TabPanel>
+        <TabPanel header="Cache Settings"> </TabPanel>
         <TabPanel
           v-if="activatedFunctions"
           header="Functions"
         >
-          <!-- <EdgeFunctionsTab /> -->
         </TabPanel>
-
-        <TabPanel header="Rules Engine">
-          <!-- <RulesEngineTab /> -->
-        </TabPanel>
+        <TabPanel header="Rules Engine"> </TabPanel>
       </TabView>
     </template>
-  </PageHeadingBlock>
+  </ContentBlock>
 </template>
 
 <script setup>
   import TabView from 'primevue/tabview'
   import TabPanel from 'primevue/tabpanel'
-  import PageHeadingBlock from '@/templates/page-heading-block-tabs'
-
-  // Tabs
-  import OriginsTab from '../EdgeApplicationsOrigins/ListView.vue'
+  import ContentBlock from '@/templates/content-block'
+  import PageHeadingBlock from '@/templates/page-heading-block'
+  import EdgeApplicationsOriginsListView from '../EdgeApplicationsOrigins/ListView.vue'
 
   const activatedFunctions = false
 
@@ -63,6 +49,4 @@
       required: true
     }
   })
-
-  const pageTitle = 'Edge Application'
 </script>

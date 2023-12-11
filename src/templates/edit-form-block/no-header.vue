@@ -2,33 +2,44 @@
   <div class="flex flex-col min-h-[calc(100vh-120px)]">
     <form
       @submit.prevent="handleSubmit"
-      class="w-full grow mt-4 p-4 max-w-screen-sm flex flex-col gap-4 lg:max-w-7xl mx-auto"
+      class="w-full grow flex flex-col gap-8 mt-4"
     >
-      <div class="flex flex-col gap-4 w-full sm:!w-full">
-        <slot name="form" />
-      </div>
+      <slot name="form" />
 
       <slot name="raw-form" />
     </form>
+    <DialogUnsavedBlock
+      :leavePage="leavePage"
+      :blockRedirectUnsaved="hasModifications"
+    />
+  </div>
+  <Teleport
+    to="#action-bar"
+    v-if="teleportLoad"
+  >
     <ActionBarTemplate
       @cancel="handleCancel"
       @submit="handleSubmit"
       :loading="isLoading"
-      :submitDisabled="!isValid"
+      :submitDisabled="!formMeta.valid"
     />
-  </div>
+  </Teleport>
 </template>
 
 <script>
-  import ActionBarTemplate from '@/templates/action-bar-block'
+  import DialogUnsavedBlock from '@/templates/dialog-unsaved-block'
+  import ActionBarTemplate from '@/templates/action-bar-block/action-bar-with-teleport'
 
   export default {
-    name: 'edit-form-block',
+    name: 'edit-form-block-no-header',
     components: {
-      ActionBarTemplate
+      ActionBarTemplate,
+      DialogUnsavedBlock
     },
     data: () => ({
-      isLoading: false
+      isLoading: false,
+      blockViewRedirection: true,
+      teleportLoad: false
     }),
     props: {
       editService: {
@@ -43,10 +54,6 @@
         type: Function,
         required: true
       },
-      isValid: {
-        type: Boolean,
-        required: true
-      },
       formData: {
         type: Object,
         required: true
@@ -54,21 +61,41 @@
       backURL: {
         type: String,
         required: false
+      },
+      formMeta: {
+        type: Object,
+        required: true
+      },
+      updatedRedirect: {
+        type: String,
+        required: true
       }
     },
     async created() {
       await this.loadInitialData()
     },
+    mounted() {
+      this.teleportLoad = true
+    },
     methods: {
+      leavePage(dialogUnsaved) {
+        dialogUnsaved = false
+        this.handleCancel()
+        return dialogUnsaved
+      },
+      goBackToList() {
+        if (this.updatedRedirect) {
+          this.$router.push({ name: this.updatedRedirect })
+          return
+        }
+        this.$router.go(-1)
+      },
       handleCancel() {
         if (this.backURL) {
           this.$router.push({ path: this.backURL })
         } else {
-          this.$router.go(-1)
+          this.goBackToList()
         }
-      },
-      goBackToList() {
-        this.$router.go(-1)
       },
       async loadInitialData() {
         try {
@@ -78,10 +105,9 @@
           this.initialDataSetter(initialData)
         } catch (error) {
           this.$toast.add({
-            closable: false,
+            closable: true,
             severity: 'error',
-            summary: error,
-            life: 10000
+            summary: error
           })
         } finally {
           this.isLoading = false
@@ -92,24 +118,29 @@
           this.isLoading = true
           await this.editService(this.formData)
           this.$toast.add({
-            closable: false,
+            closable: true,
             severity: 'success',
-            summary: 'edited successfully',
-            life: 10000
+            summary: 'edited successfully'
           })
+          this.blockViewRedirection = false
           this.goBackToList()
         } catch (error) {
+          this.blockViewRedirection = true
           this.$toast.add({
-            closable: false,
+            closable: true,
             severity: 'error',
-            summary: error,
-            life: 10000
+            summary: error
           })
         } finally {
           setTimeout(() => {
             this.isLoading = false
           }, 800)
         }
+      }
+    },
+    computed: {
+      hasModifications() {
+        return this.formMeta.touched && this.blockViewRedirection
       }
     }
   }

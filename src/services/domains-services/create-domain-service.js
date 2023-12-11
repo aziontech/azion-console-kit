@@ -13,17 +13,22 @@ export const createDomainService = async (payload) => {
 }
 
 const adapt = (payload) => {
-  return {
+  const dataRequest = {
     name: payload.name,
     cnames: payload.cnames.split('\n').filter((item) => item !== ''),
     cname_access_only: payload.cnameAccessOnly,
     edge_application_id: payload.edgeApplication,
-    digital_certificate_id: payload.edgeCertificate,
     is_mtls_enabled: payload.mtlsIsEnabled,
     is_active: payload.active,
     mtls_verification: payload.mtlsVerification,
     mtls_trusted_ca_certificate_id: payload.mtlsTrustedCertificate
   }
+
+  if (payload.edgeCertificate !== 0) {
+    dataRequest.digital_certificate_id = payload.edgeCertificate
+  }
+
+  return dataRequest
 }
 
 /**
@@ -36,7 +41,11 @@ const adapt = (payload) => {
 const parseHttpResponse = (httpResponse) => {
   switch (httpResponse.statusCode) {
     case 201:
-      return 'Your domain has been created'
+      return {
+        feedback: 'Your domain has been created',
+        urlToEditView: `/domains/edit/${httpResponse.body.results.id}`,
+        domainName: httpResponse.body.results.domain_name
+      }
     case 400:
       throw new Error(Object.keys(httpResponse.body)[0]).message
     case 409:

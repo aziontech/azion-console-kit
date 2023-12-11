@@ -1,24 +1,50 @@
 <template>
-  <div>
-    <ListTableBlock
-      :listService="listUsersService"
-      :deleteService="deleteUsersService"
-      :columns="getColumns"
-      pageTitle="Users"
-      addButtonLabel="Add Users"
-      createPagePath="users/create"
-      editPagePath="users/edit"
-    />
-  </div>
+  <ContentBlock>
+    <template #heading>
+      <PageHeadingBlock pageTitle="Users"></PageHeadingBlock>
+    </template>
+    <template #content>
+      <ListTableBlock
+        v-if="hasContentToList"
+        :listService="listUsersService"
+        :deleteService="deleteUsersService"
+        :columns="getColumns"
+        pageTitleDelete="User"
+        addButtonLabel="Users"
+        createPagePath="users/create"
+        editPagePath="users/edit"
+        @on-load-data="handleLoadData"
+      />
+      <EmptyResultsBlock
+        v-else
+        title="No users added"
+        description="Create your first users."
+        createButtonLabel="Users"
+        createPagePath="users/create"
+        :documentationService="documentationService"
+      >
+        <template #illustration>
+          <Illustration />
+        </template>
+      </EmptyResultsBlock>
+    </template>
+  </ContentBlock>
 </template>
 
 <script>
   import ListTableBlock from '@/templates/list-table-block'
-
+  import EmptyResultsBlock from '@/templates/empty-results-block'
+  import Illustration from '@/assets/svg/illustration-layers.vue'
+  import ContentBlock from '@/templates/content-block'
+  import PageHeadingBlock from '@/templates/page-heading-block'
   export default {
     name: 'variables-view',
     components: {
-      ListTableBlock
+      ListTableBlock,
+      EmptyResultsBlock,
+      Illustration,
+      ContentBlock,
+      PageHeadingBlock
     },
     props: {
       listUsersService: {
@@ -28,8 +54,15 @@
       deleteUsersService: {
         required: true,
         type: Function
+      },
+      documentationService: {
+        required: true,
+        type: Function
       }
     },
+    data: () => ({
+      hasContentToList: true
+    }),
     computed: {
       getColumns() {
         return [
@@ -62,6 +95,11 @@
             header: 'Owner'
           }
         ]
+      }
+    },
+    methods: {
+      handleLoadData(event) {
+        this.hasContentToList = event
       }
     }
   }

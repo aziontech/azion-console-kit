@@ -1,10 +1,17 @@
 <script>
   import ListTableBlock from '@/templates/list-table-block'
-
+  import EmptyResultsBlock from '@/templates/empty-results-block'
+  import Illustration from '@/assets/svg/illustration-layers.vue'
+  import ContentBlock from '@/templates/content-block'
+  import PageHeadingBlock from '@/templates/page-heading-block'
   export default {
     name: 'edge-application-view',
     components: {
-      ListTableBlock
+      ListTableBlock,
+      EmptyResultsBlock,
+      Illustration,
+      PageHeadingBlock,
+      ContentBlock
     },
     props: {
       listEdgeApplicationsService: {
@@ -14,8 +21,15 @@
       deleteEdgeApplicationService: {
         required: true,
         type: Function
+      },
+      documentationService: {
+        required: true,
+        type: Function
       }
     },
+    data: () => ({
+      hasContentToList: true
+    }),
     computed: {
       getColumns() {
         return [
@@ -29,6 +43,7 @@
           },
           {
             field: 'lastModify',
+            sortField: 'lastModifyDate',
             header: 'Last Modified'
           },
           {
@@ -45,18 +60,44 @@
           }
         ]
       }
+    },
+    methods: {
+      handleLoadData(event) {
+        this.hasContentToList = event
+      }
     }
   }
 </script>
 
 <template>
-  <ListTableBlock
-    pageTitle="Edge Applications"
-    addButtonLabel="Add Edge Application"
-    createPagePath="/edge-applications/create"
-    editPagePath="/edge-applications/edit"
-    :listService="listEdgeApplicationsService"
-    :deleteService="deleteEdgeApplicationService"
-    :columns="getColumns"
-  />
+  <ContentBlock>
+    <template #heading>
+      <PageHeadingBlock pageTitle="Edge Applications"></PageHeadingBlock>
+    </template>
+    <template #content>
+      <ListTableBlock
+        v-if="hasContentToList"
+        pageTitleDelete="Edge Application"
+        addButtonLabel="Edge Application"
+        createPagePath="/edge-applications/create"
+        editPagePath="/edge-applications/edit"
+        :listService="listEdgeApplicationsService"
+        :deleteService="deleteEdgeApplicationService"
+        :columns="getColumns"
+        @on-load-data="handleLoadData"
+      />
+      <EmptyResultsBlock
+        v-else
+        title="No edge application added"
+        description="Create your first edge application."
+        createButtonLabel="Edge Application"
+        createPagePath="/edge-applications/create"
+        :documentationService="documentationService"
+      >
+        <template #illustration>
+          <Illustration />
+        </template>
+      </EmptyResultsBlock>
+    </template>
+  </ContentBlock>
 </template>

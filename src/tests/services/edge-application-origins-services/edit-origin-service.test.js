@@ -37,7 +37,7 @@ const makeSut = () => {
 describe('EdgeApplicationOriginsServices', () => {
   it('should call API with correct params', async () => {
     const requestSpy = vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
-      statusCode: 201
+      statusCode: 200
     })
 
     const { sut } = makeSut()
@@ -65,12 +65,12 @@ describe('EdgeApplicationOriginsServices', () => {
 
   it('should return a feedback message on successfully updated', async () => {
     vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
-      statusCode: 202
+      statusCode: 200
     })
     const { sut } = makeSut()
 
     const feedbackMessage = await sut(fixtures.originMock, fixtures.edgeApplicationId)
 
-    expect(feedbackMessage).toBe('Resource successfully updated')
+    expect(feedbackMessage).toBe('Your Origin has been edited')
   })
 })

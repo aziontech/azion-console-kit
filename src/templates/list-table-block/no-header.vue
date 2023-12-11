@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div class="max-w-full mx-3 mb-8 mt-8">
+    <div class="max-w-full mt-4">
       <DataTable
         v-if="!isLoading"
         scrollable
@@ -13,7 +13,6 @@
         :rows="minimumOfItemsPerPage"
         :globalFilterFields="filterBy"
         :loading="isLoading"
-        v-model:selection="selectedRow"
         selectionMode="single"
         @row-click="editItemSelected"
       >
@@ -23,17 +22,19 @@
               <i class="pi pi-search" />
               <InputText
                 class="w-full"
-                v-model="this.filters.global.value"
+                v-model.trim="this.filters.global.value"
                 placeholder="Search"
               />
             </span>
-            <PrimeButton
-              class="max-sm:w-full"
-              @click="navigateToAddPage"
-              icon="pi pi-plus"
-              :label="addButtonLabel"
-              v-if="addButtonLabel"
-            />
+            <slot name="addButton">
+              <PrimeButton
+                class="max-sm:w-full"
+                @click="navigateToAddPage"
+                icon="pi pi-plus"
+                :label="addButtonLabel"
+                v-if="addButtonLabel"
+              />
+            </slot>
           </div>
         </template>
 
@@ -136,6 +137,7 @@
 
   export default {
     name: 'list-table-block',
+    emits: ['on-load-data'],
     components: {
       DataTable,
       Column,
@@ -167,23 +169,23 @@
           }
         ]
       },
-      pageTitle: {
+      pageTitleDelete: {
         type: String,
         required: true
       },
       createPagePath: {
         type: String,
-        required: true,
         default: () => '/'
+      },
+      editInDrawer: {
+        type: Function
       },
       editPagePath: {
         type: String,
-        required: true,
         default: () => '/'
       },
       addButtonLabel: {
         type: String,
-        required: true,
         default: () => ''
       },
       authorizeNode: {
@@ -215,11 +217,6 @@
       actionOptions(showAuthorize) {
         const actionOptions = [
           {
-            label: 'Edit',
-            icon: 'pi pi-fw pi-pencil',
-            command: () => this.editItem()
-          },
-          {
             label: 'Delete',
             icon: 'pi pi-fw pi-trash',
             command: () => this.openDeleteDialog()
@@ -240,15 +237,18 @@
           const data = await this.listService({ page })
           this.data = data
         } catch (error) {
+          this.data = []
           this.$toast.add({
-            closable: false,
+            closable: true,
             severity: 'error',
-            summary: error,
-            life: 10000
+            summary: error
           })
         } finally {
           this.isLoading = false
         }
+      },
+      async reload() {
+        await this.loadData({ page: 1 })
       },
       navigateToAddPage() {
         this.$router.push(this.createPagePath)
@@ -258,17 +258,18 @@
         this.$refs.menu.toggle(event)
       },
       editItemSelected({ data: item }) {
+        if (this.editInDrawer) {
+          this.editInDrawer(item)
+          return
+        }
         this.$router.push({ path: `${this.editPagePath}/${item.id}` })
-      },
-      editItem() {
-        this.$router.push({ path: `${this.editPagePath}/${this.selectedId}` })
       },
       authorizeEdgeNode() {
         this.$emit('authorize', this.selectedId)
       },
       openDeleteDialog() {
         this.informationForDeletion = {
-          title: this.pageTitle,
+          title: this.pageTitleDelete,
           selectedID: this.selectedId,
           deleteService: this.deleteService,
           deleteDialogVisible: true,
@@ -278,6 +279,12 @@
       updatedTable() {
         this.data = this.data.filter((item) => item.id !== this.selectedId)
         this.$forceUpdate()
+      }
+    },
+    watch: {
+      data(currentState) {
+        const hasData = currentState.length > 0
+        this.$emit('on-load-data', hasData)
       }
     }
   }

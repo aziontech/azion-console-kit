@@ -1,7 +1,6 @@
 import { getUserInfoService, getAccountInfoService } from '@/services/account-services'
 import { logoutService } from '@/services/auth-services'
 import { useAccountStore } from '@/stores/account'
-import { isRoutePublic } from '@/router/public-routes'
 
 export default async function beforeEachRoute(to, _, next) {
   const accountStore = useAccountStore()
@@ -10,6 +9,7 @@ export default async function beforeEachRoute(to, _, next) {
   const theme = localStorage.getItem('theme')
 
   const fallbackTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
+  accountStore.setTheme(theme || fallbackTheme)
 
   if (to.path === '/logout') {
     await logoutService()
@@ -17,7 +17,7 @@ export default async function beforeEachRoute(to, _, next) {
     return next()
   }
 
-  if (!accountStore.hasActiveUserId && !isRoutePublic(to.name)) {
+  if (!accountStore.hasActiveUserId && !to.meta.isPublic) {
     try {
       const [accountInfo, userInfo] = await Promise.all([
         getAccountInfoService(),
@@ -41,6 +41,5 @@ export default async function beforeEachRoute(to, _, next) {
     }
   }
 
-  accountStore.setTheme(theme || fallbackTheme)
   return next()
 }

@@ -9,6 +9,12 @@ const fixtures = {
     name: 'Default',
     is_active: true,
     permissions: [{ id: 324, name: 'permission' }]
+  },
+  disabledTeamPermissionMock: {
+    id: 3,
+    name: 'Foo Permission',
+    is_active: false,
+    permissions: [{ id: 32333, name: 'permission 2' }]
   }
 }
 
@@ -50,7 +56,7 @@ describe('TeamPermissionService', () => {
     vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
       statusCode: 200,
       body: {
-        results: [fixtures.teamPermissionMock]
+        results: [fixtures.teamPermissionMock, fixtures.disabledTeamPermissionMock]
       }
     })
     const { sut } = makeSut()
@@ -60,10 +66,24 @@ describe('TeamPermissionService', () => {
     expect(result).toEqual([
       {
         id: fixtures.teamPermissionMock.id,
-        isActive: fixtures.teamPermissionMock.is_active,
+        status: {
+          content: 'Active',
+          severity: 'success'
+        },
         name: fixtures.teamPermissionMock.name,
         permissions: fixtures.teamPermissionMock.permissions.length
           ? fixtures.teamPermissionMock.permissions.map((item) => item.name)
+          : []
+      },
+      {
+        id: fixtures.disabledTeamPermissionMock.id,
+        status: {
+          content: 'Inactive',
+          severity: 'danger'
+        },
+        name: fixtures.disabledTeamPermissionMock.name,
+        permissions: fixtures.disabledTeamPermissionMock.permissions.length
+          ? fixtures.disabledTeamPermissionMock.permissions.map((item) => item.name)
           : []
       }
     ])

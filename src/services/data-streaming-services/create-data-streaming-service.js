@@ -15,24 +15,31 @@ export const createDataStreamingService = async (payload) => {
 const adapt = (payload) => {
   const allDomains = payload.domains[1].length <= 0
 
-  return {
+  const parsedPayload = {
     name: payload.name,
     template_id: payload.template,
     data_source: payload.dataSource,
-    domain_ids: allDomains ? [] : getDomains(payload.domains),
-    all_domains: allDomains ? true : false,
-    endpoint: getEndpoint(payload)
+    domain_ids: allDomains ? [] : getDomains(payload.domains[1]),
+    all_domains: allDomains,
+    active: payload.status,
+    endpoint: parseByEndpointType(payload)
   }
+
+  if (payload.hasSampling) {
+    parsedPayload.sampling_percentage = payload.samplingPercentage
+  }
+
+  return parsedPayload
 }
 
-const getEndpoint = (payload) => {
+const parseByEndpointType = (payload) => {
   switch (payload.endpoint) {
     case 'standard':
       return {
         endpoint_type: 'standard',
         url: payload.endpointUrl,
         payload_format: payload.payloadFormat,
-        log_line_separator: payload.lineSeparator,
+        log_line_separator: payload.lineSeparator === '\\n' ? '\n' : payload.lineSeparator,
         max_size: payload.maxSize,
         headers: getHeaders(payload.headers)
       }
@@ -108,7 +115,7 @@ const getEndpoint = (payload) => {
         blob_sas_token: payload.blobToken
       }
     default:
-      return {}
+      throw new Errors.InvalidDataStreamingEndpointType().message
   }
 }
 
@@ -121,7 +128,7 @@ const getHeaders = (listHeaders) => {
   if (listHeaders.length > 0) {
     listHeaders.forEach((element) => {
       const header = element.value.split(':')
-      headers[header[0]] = header[1]?.trim()
+      headers[header[0]] = header[1]?.trim() ?? header[0]
     })
   }
   return headers
@@ -130,7 +137,10 @@ const getHeaders = (listHeaders) => {
 const parseHttpResponse = (httpResponse) => {
   switch (httpResponse.statusCode) {
     case 201:
-      return 'Your data streaming has been created'
+      return {
+        feedback: 'Your data streaming has been created',
+        urlToEditView: `/data-streaming`
+      }
     case 400:
       const apiError = extractApiError(httpResponse)
       throw new Error(apiError)
@@ -162,6 +172,9 @@ const extractErrorKey = (errorSchema, key) => {
  * @returns {string} The result message based on the status code.
  */
 const extractApiError = (httpResponse) => {
+  //flag
+  const noFlagError = extractErrorKey(httpResponse.body, 'user_has_no_flag')
+
   // standard
   const invalidURLError = extractErrorKey(httpResponse.body, 'invalid_url')
   const maxSizeError = extractErrorKey(httpResponse.body, 'max_size_out_of_range')
@@ -189,6 +202,7 @@ const extractApiError = (httpResponse) => {
   const datadogInvalidURLError = extractErrorKey(httpResponse.body, 'invalid_datadog_url')
 
   const errorMessages = [
+    noFlagError,
     invalidURLError,
     maxSizeError,
     datasetError,

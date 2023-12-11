@@ -1,28 +1,34 @@
 <template>
-  <ListTableBlock
-    v-if="hasContentToList"
-    pageTitle="Domains"
-    addButtonLabel="Domains"
-    createPagePath="domains/create"
-    editPagePath="domains/edit"
-    :listService="listDomainsService"
-    :deleteService="deleteDomainService"
-    :columns="getColumns"
-    @on-load-data="handleLoadData"
-  />
-  <EmptyResultsBlock
-    v-else
-    pageTitle="Domains"
-    title="You don't have any Domain created"
-    description="Create your first domain."
-    createButtonLabel="Domains"
-    createPagePath="domains/create"
-    :documentationService="documentationService"
-  >
-    <template #illustration>
-      <Illustration />
+  <ContentBlock>
+    <template #heading>
+      <PageHeadingBlock pageTitle="Domains"></PageHeadingBlock>
     </template>
-  </EmptyResultsBlock>
+    <template #content>
+      <ListTableBlock
+        v-if="hasContentToList"
+        pageTitleDelete="Domain"
+        addButtonLabel="Domains"
+        createPagePath="domains/create"
+        editPagePath="domains/edit"
+        :listService="listDomainsService"
+        :deleteService="deleteDomainService"
+        :columns="getColumns"
+        @on-load-data="handleLoadData"
+      />
+      <EmptyResultsBlock
+        v-else
+        title="You don't have any Domain created"
+        description="Create your first domain."
+        createButtonLabel="Domains"
+        createPagePath="domains/create"
+        :documentationService="documentationService"
+      >
+        <template #illustration>
+          <Illustration />
+        </template>
+      </EmptyResultsBlock>
+    </template>
+  </ContentBlock>
 </template>
 
 <script setup>
@@ -31,8 +37,10 @@
   import Illustration from '@/assets/svg/illustration-layers.vue'
   import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
   import { computed, ref } from 'vue'
+  import ContentBlock from '@/templates/content-block'
+  import PageHeadingBlock from '@/templates/page-heading-block'
 
-  defineProps({
+  const props = defineProps({
     listDomainsService: {
       required: true,
       type: Function
@@ -42,6 +50,10 @@
       type: Function
     },
     documentationService: {
+      required: true,
+      type: Function
+    },
+    clipboardWrite: {
       required: true,
       type: Function
     }
@@ -61,7 +73,17 @@
       },
       {
         field: 'domainName',
-        header: 'Domain Name'
+        header: 'Domain Name',
+        type: 'component',
+        component: (columnData) => {
+          return columnBuilder({
+            data: columnData,
+            columnAppearance: 'text-with-clipboard',
+            dependencies: {
+              copyContentService: props.clipboardWrite
+            }
+          })
+        }
       },
       {
         field: 'cnames',

@@ -32,7 +32,7 @@
         :value="listRecords"
         lazy
         :paginator="totalRecords > limitShowRows"
-        :rows="limitShowRows"
+        v-model:rows="limitRows"
         :rowsPerPageOptions="[10, 20, 50, 100]"
         scrollable
         removableSort
@@ -46,7 +46,7 @@
         tableStyle="max-sm:min-width: 50rem"
         :pt="{
           root: { class: 'border surface-border rounded' },
-          header: { class: 'rounded p-3.5' }
+          header: { class: 'p-3.5' }
         }"
       >
         <template #header>
@@ -204,6 +204,7 @@
 
   const isLoading = ref(false)
   const first = ref(1)
+  const limitRows = ref(props.limitShowRows)
   const errorMessage = ref(null)
   const listRecords = ref([])
   const filters = ref(props.headerFilter)
@@ -220,13 +221,13 @@
     columnSelectorPanel.value.toggle(event)
   }
 
-  const loadData = async ({ page = props.pageInitial, page_size = props.limitShowRows } = {}) => {
+  const loadData = async ({ page = props.pageInitial, pageSize = props.limitShowRows } = {}) => {
     try {
       isLoading.value = true
       listRecords.value = []
       const { results, totalPages } = await props.listService({
         page,
-        page_size,
+        pageSize,
         ...filters.value
       })
       totalRecords.value = totalPages * props.limitShowRows
@@ -239,6 +240,7 @@
   }
 
   const applyFilter = () => {
+    limitRows.value = props.limitShowRows
     first.value = 1
     loadData({ page: 1 })
   }
@@ -249,6 +251,6 @@
 
   const onPage = (event) => {
     const page = event.page + props.pageInitial
-    loadData({ page, page_size: event.rows })
+    loadData({ page, pageSize: event.rows })
   }
 </script>

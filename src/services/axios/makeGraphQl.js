@@ -1,5 +1,5 @@
 import axios from 'axios'
-const baseURL = '/network-lists/graphql'
+const baseURL = '/graphql'
 
 axios.defaults.headers.common['Content-Type'] = 'application/json; version=3'
 

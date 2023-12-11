@@ -33,7 +33,7 @@
 
     &:enabled:hover {
       color: $textColor !important;
-      background-color: var(--surface-hover);
+      background-color: var(--surface-300) !important;
     }
 
     &:enabled:active {
@@ -122,5 +122,17 @@
   }
   &:not(:disabled):focus-visible {
     box-shadow: $linkButtonFocusShadow !important;
+  }
+}
+
+.p-inputgroup > .p-button {
+  &.p-button-icon-only {
+    color: initial;
+    width: initial;
+    height: initial !important;
+    .p-button-icon-left,
+    .p-button-icon-right {
+      margin: initial;
+    }
   }
 }

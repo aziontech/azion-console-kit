@@ -8,6 +8,7 @@ import { UserIsNotClientError } from './user-is-no-client-error'
 import { UserNotFoundError } from './user-not-found-error'
 import { ProccessRequestError } from './proccess-request-error'
 import { InvalidDataStructureError } from './invalid-data-structure-error'
+import { InvalidDataStreamingEndpointType } from './invalid-data-streaming-endpoint-type'
 
 export {
   InternalServerError,
@@ -19,5 +20,6 @@ export {
   UserIsNotClientError,
   UserNotFoundError,
   ProccessRequestError,
-  InvalidDataStructureError
+  InvalidDataStructureError,
+  InvalidDataStreamingEndpointType
 }

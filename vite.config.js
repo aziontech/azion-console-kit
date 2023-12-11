@@ -31,10 +31,10 @@ const getConfig = () => {
           rewrite: (path) => path.replace(/^\/logout/, ''),
           cookieDomainRewrite: { '*': '' }
         },
-        '/api/edge-services': {
-          target: `${URLStartPrefix}manager-origin.azion.com/services/api/v1/services`,
+        '/api/edge_services': {
+          target: `${URLStartPrefix}api.azion.net`,
           changeOrigin: true,
-          rewrite: (path) => path.replace(/^\/api\/edge-services/, '')
+          rewrite: (path) => path.replace(/^\/edge_services/, '')
         },
         '/api/variables': {
           target: `${URLStartPrefix}manager.azion.com/variables/api/`,
@@ -46,10 +46,15 @@ const getConfig = () => {
           changeOrigin: true,
           rewrite: (path) => path.replace(/^\/api\/marketplace/, '')
         },
-        '/network-lists/graphql': {
-          target: `${URLStartPrefix}cities.azion.com`,
+        '/api/template-engine': {
+          target: `${URLStartPrefix}manager.azion.com/template-engine/api/`,
           changeOrigin: true,
-          rewrite: (path) => path.replace(/^\/network-lists\/graphql/, '')
+          rewrite: (path) => path.replace(/^\/api\/template-engine/, '')
+        },
+        '/graphql/cities': {
+          target: `${URLStartPrefix}cities.azion.com/graphql`,
+          changeOrigin: true,
+          rewrite: (path) => path.replace(/^\/graphql\/cities/, '')
         },
         '/metrics/graphql': {
           target: `${URLStartPrefix}stage-manager.azion.com/metrics/graphql`,
@@ -116,6 +121,11 @@ const getConfig = () => {
           target: `${URLStartPrefix}manager-origin.azion.com/api`,
           changeOrigin: true,
           rewrite: (path) => path.replace(/^\/api/, '')
+        },
+         '/api/storage-google': {
+          target: 'https://storage.googleapis.com',
+          changeOrigin: true,
+          rewrite: (path) => path.replace(/^\/storage/, '')
         }
       }
     }

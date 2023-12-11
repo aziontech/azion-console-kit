@@ -12,7 +12,7 @@ const makeSut = () => {
 describe('NetworkListsServices', () => {
   it('should return the API base url to graphql api', () => {
     const { sut } = makeSut()
-    const correctApiUrl = 'graphql'
+    const correctApiUrl = 'cities'
 
     const baseUrl = sut()
 

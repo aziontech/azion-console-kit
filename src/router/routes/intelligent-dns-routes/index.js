@@ -14,7 +14,8 @@ export const intelligentDnsRoutes = {
       props: {
         listIntelligentDNSService: IntelligentDNSService.listIntelligentDNSService,
         deleteIntelligentDNSService: IntelligentDNSService.deleteIntelligentDNSService,
-        documentationService: Helpers.documentationCatalog.intelligentDNS
+        documentationService: Helpers.documentationCatalog.intelligentDNS,
+        clipboardWrite: Helpers.clipboardWrite
       },
       meta: {
         breadCrumbs: [
@@ -30,7 +31,8 @@ export const intelligentDnsRoutes = {
       name: 'create-intelligent-dns',
       component: () => import('@views/IntelligentDNS/CreateView.vue'),
       props: {
-        createIntelligentDNSService: IntelligentDNSService.createIntelligentDNSService
+        createIntelligentDNSService: IntelligentDNSService.createIntelligentDNSService,
+        clipboardWrite: Helpers.clipboardWrite
       },
       meta: {
         breadCrumbs: [
@@ -53,7 +55,9 @@ export const intelligentDnsRoutes = {
         editIntelligentDNSService: IntelligentDNSService.editIntelligentDNSService,
         loadIntelligentDNSService: IntelligentDNSService.loadIntelligentDNSService,
         listRecordsService: IntelligentDNSRecordsService.listRecordsService,
-        deleteRecordsService: IntelligentDNSRecordsService.deleteRecordsService
+        deleteRecordsService: IntelligentDNSRecordsService.deleteRecordsService,
+        clipboardWrite: Helpers.clipboardWrite,
+        updatedRedirect: 'list-intelligent-dns'
       },
       meta: {
         breadCrumbs: [
@@ -75,7 +79,12 @@ export const intelligentDnsRoutes = {
         editIntelligentDNSService: IntelligentDNSService.editIntelligentDNSService,
         loadIntelligentDNSService: IntelligentDNSService.loadIntelligentDNSService,
         listRecordsService: IntelligentDNSRecordsService.listRecordsService,
-        deleteRecordsService: IntelligentDNSRecordsService.deleteRecordsService
+        deleteRecordsService: IntelligentDNSRecordsService.deleteRecordsService,
+        createRecordsService: IntelligentDNSRecordsService.createRecordsService,
+        editRecordsService: IntelligentDNSRecordsService.editRecordsService,
+        loadRecordsService: IntelligentDNSRecordsService.loadRecordsService,
+        clipboardWrite: Helpers.clipboardWrite,
+        documentationService: Helpers.documentationCatalog.records
       },
       meta: {
         breadCrumbs: [
@@ -85,45 +94,6 @@ export const intelligentDnsRoutes = {
           },
           {
             label: 'Edit Intelligent DNS'
-          }
-        ]
-      }
-    },
-    {
-      path: 'edit/:id/records/create',
-      name: 'intelligent-dns-records-create',
-      component: () => import('@views/IntelligentDNS/CreateRecordsView.vue'),
-      props: {
-        createRecordsService: IntelligentDNSRecordsService.createRecordsService
-      },
-      meta: {
-        breadCrumbs: [
-          {
-            label: 'Intelligent DNS',
-            to: '/intelligent-dns'
-          },
-          {
-            label: 'Create Records'
-          }
-        ]
-      }
-    },
-    {
-      path: 'edit/:intelligentDNSId/records/edit/:id',
-      name: 'intelligent-dns-records-edit',
-      component: () => import('@views/IntelligentDNS/EditRecordsView.vue'),
-      props: {
-        editRecordsService: IntelligentDNSRecordsService.editRecordsService,
-        loadRecordsService: IntelligentDNSRecordsService.loadRecordsService
-      },
-      meta: {
-        breadCrumbs: [
-          {
-            label: 'Intelligent DNS',
-            to: '/intelligent-dns'
-          },
-          {
-            label: 'Edit Record'
           }
         ]
       }

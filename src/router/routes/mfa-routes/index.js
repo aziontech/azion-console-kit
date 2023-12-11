@@ -1,5 +1,9 @@
 import * as MfaServices from '@/services/mfa-services'
 import * as AuthServices from '@/services/auth-services'
+import { listTypeAccountService } from '@/services/switch-account-services/list-type-account-service'
+import { switchAccountService } from '@/services/auth-services/switch-account-service'
+import { AccountHandler } from '@/helpers/account-handler'
+import * as Helpers from '@/helpers'
 
 /** @type {import('vue-router').RouteRecordRaw} */
 export const mfaRoutes = {
@@ -12,7 +16,14 @@ export const mfaRoutes = {
       component: () => import('@views/MultifactorAuthentication/QRCodeView.vue'),
       props: {
         generateQrCodeMfaService: MfaServices.generateQrCodeMfaService,
-        validateMfaCodeService: MfaServices.validateMfaCodeService
+        validateMfaCodeService: MfaServices.validateMfaCodeService,
+        verifyAuthenticationService: AuthServices.verifyAuthenticationService,
+        openGoogleAuthenticatorAppDocumentation: Helpers.openGoogleAuthenticatorAppDocumentation,
+        accountHandler: new AccountHandler(switchAccountService, listTypeAccountService)
+      },
+      meta: {
+        isPublic: true,
+        hideNavigation: true
       }
     },
     {
@@ -22,7 +33,11 @@ export const mfaRoutes = {
       props: {
         validateMfaCodeService: MfaServices.validateMfaCodeService,
         verifyAuthenticationService: AuthServices.verifyAuthenticationService,
-        switchAccountService: AuthServices.switchAccountService
+        accountHandler: new AccountHandler(switchAccountService, listTypeAccountService)
+      },
+      meta: {
+        isPublic: true,
+        hideNavigation: true
       }
     }
   ]

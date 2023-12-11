@@ -58,6 +58,7 @@ const adapt = async (httpResponse) => {
         lastModify: new Intl.DateTimeFormat('us', { dateStyle: 'full' }).format(
           new Date(edgeFirewall.last_modified)
         ),
+        lastModifyDate: edgeFirewall.last_modified,
         domainsList: domainsList.join('<br>'),
         active: edgeFirewall.is_active ? 'Yes' : 'No'
       }

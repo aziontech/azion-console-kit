@@ -23,6 +23,7 @@ const adapt = (payload) => {
 /**
  * @param {Object} httpResponse - The HTTP response object.
  * @param {Object} httpResponse.body - The response body.
+ * @param {Object} httpResponse.body.data - The data inside response body.
  * @param {String} httpResponse.statusCode - The HTTP status code.
  * @returns {string} The result message based on the status code.
  * @throws {Error} If there is an error with the response.
@@ -30,7 +31,10 @@ const adapt = (payload) => {
 const parseHttpResponse = (httpResponse) => {
   switch (httpResponse.statusCode) {
     case 201:
-      return 'Your Team Permission has been created'
+      return {
+        feedback: 'Your Team Permission has been created',
+        urlToEditView: `/teams-permission/edit/${httpResponse.body.data.id}`
+      }
     case 400:
       const key = Object.keys(httpResponse.body)[0]
       const msg = httpResponse.body[key][0]

@@ -1,13 +1,12 @@
 <template>
-  <div>
+  <div class="min-h-[calc(100vh-60px-56px)] sm:py-20 pt-4 pb-8 px-3">
     <SignInBlock
       v-if="!showForgotPasswordStep"
       @goToForgotPassword="(value) => (showForgotPasswordStep = value)"
       :authenticationLoginService="authenticationLoginService"
       :verifyLoginService="verifyLoginService"
       :refreshLoginService="refreshLoginService"
-      :switchAccountLoginService="switchAccountLoginService"
-      :listTypeAccountService="listTypeAccountService"
+      :accountHandler="accountHandler"
     />
 
     <ForgotPassword
@@ -39,17 +38,13 @@
         required: true,
         type: Function
       },
-      switchAccountLoginService: {
-        required: true,
-        type: Function
-      },
       sendResetPasswordEmailService: {
         required: true,
         type: Function
       },
-      listTypeAccountService: {
+      accountHandler: {
         required: true,
-        type: Function
+        type: Object
       }
     },
     data() {

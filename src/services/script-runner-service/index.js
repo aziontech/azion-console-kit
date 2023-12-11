@@ -1,3 +1,4 @@
-import { getLogs } from './get-logs-service'
+import { getScriptRunnerLogsService } from './get-script-runner-logs-service'
+import { getScriptRunnerResultsService } from './get-script-runner-results-service'
 
-export { getLogs }
+export { getScriptRunnerLogsService, getScriptRunnerResultsService }
