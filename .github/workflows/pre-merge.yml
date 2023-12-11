@@ -71,9 +71,11 @@ jobs:
   
           sudo apt-get update
           sudo apt-get install nodejs -y
-  
-      - name: Display Node.js version
-        run: node --version
+
+      - name: Use Node.js v16
+        run: |
+          sudo ln -s /usr/bin/nodejs /usr/local/bin/node
+          node --version
 
       - name: Download coverage reports
         uses: actions/download-artifact@v3
