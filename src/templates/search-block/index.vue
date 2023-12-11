@@ -83,16 +83,18 @@
     showSearch.value = true
   }
 
-  const listenerKeyDown = () => {
-    document.addEventListener('keydown', (event) => {
-      const isCommandKeyPressed = event.metaKey || event.ctrlKey
-      const isKKeyPressed = event.key === 'k' || event.key === 'K'
+  // const listenerKeyDown = (event) => {
+  //   const isCommandKeyPressed = event.metaKey || event.ctrlKey
+  //   const isKKeyPressed = event.key === 'k' || event.key === 'K'
 
-      if (isCommandKeyPressed && isKKeyPressed) {
-        showSearch.value = true
-      }
-    })
-  }
+  //   if (isCommandKeyPressed && isKKeyPressed) {
+  //     showSearch.value = true
+  //   }
+  // }
 
-  listenerKeyDown()
+  // document.addEventListener('keydown', listenerKeyDown)
+
+  // onUnmounted(() => {
+  //   document.removeEventListener('keydown', listenerKeyDown)
+  // })
 </script>

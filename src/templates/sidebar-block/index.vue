@@ -1,6 +1,6 @@
 <template>
   <PrimeButton
-    @click="openSideBar"
+    @click="sidebarToggle"
     size="small"
     class="text-white flex-none border-header w-8 h-8"
     icon="pi pi-bars"
@@ -69,16 +69,12 @@
 
   const showSidebar = ref(false)
 
-  const openSideBar = () => {
+  const sidebarToggle = () => {
     showSidebar.value = !showSidebar.value
   }
 
-  const closeSideBar = () => {
-    showSidebar.value = false
-  }
-
   const redirectToRoute = (route) => {
-    closeSideBar()
+    sidebarToggle()
     router.push(route)
   }
 

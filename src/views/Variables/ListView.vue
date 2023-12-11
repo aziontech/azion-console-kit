@@ -29,7 +29,6 @@
       </EmptyResultsBlock>
     </template>
   </ContentBlock>
-  <button @click="handleToast()">Chama toast</button>
 </template>
 
 <script>
@@ -112,53 +111,6 @@
     methods: {
       handleLoadData(event) {
         this.hasContentToList = event
-      },
-      handleToast() {
-        this.$toast.add({
-          closable: true,
-          severity: 'success',
-          summary: 'Example Toast'
-        })
-        this.$toast.add({
-          closable: true,
-          severity: 'success',
-          summary: 'Example Toast',
-          detail:
-            'Description. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam consectetur leo tortor (limited to 125 chracters)'
-        })
-        this.$toast.add({
-          closable: true,
-          severity: 'error',
-          summary: 'Example Toast',
-          detail:
-            'Description. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam consectetur leo tortor (limited to 125 chracters)'
-        })
-        this.$toast.add({
-          closable: true,
-          severity: 'warn',
-          summary: 'Example Toast',
-          detail:
-            'Description. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam consectetur leo tortor (limited to 125 chracters)',
-          secondary: {
-            label: 'Outlined',
-            callback: ''
-          },
-          primary: {
-            label: 'Primary',
-            callback: ''
-          }
-        })
-        this.$toast.add({
-          closable: true,
-          severity: 'info',
-          summary: 'Example Toast',
-          detail:
-            'Description. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam consectetur leo tortor (limited to 125 chracters)',
-          link: {
-            label: 'Primary',
-            callback: 'Link'
-          }
-        })
       }
     }
   }

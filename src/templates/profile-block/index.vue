@@ -259,9 +259,10 @@
   ]
   const currentWidth = inject('currentWidth')
   const openSwitchAccount = inject('openSwitchAccount')
+  const SCREEN_BREAKPOINT_MD = 768
 
   const toggleProfile = (event) => {
-    if (window.innerWidth <= 768) {
+    if (window.innerWidth <= SCREEN_BREAKPOINT_MD) {
       showProfile.value = !showProfile.value
     } else {
       profile.value.toggle(event)
@@ -310,9 +311,9 @@
   })
 
   watch(currentWidth, async (width) => {
-    if (width <= 768) {
+    if (width <= SCREEN_BREAKPOINT_MD) {
       closeDesktopMenu()
-    } else if (width > 768 && showProfile.value) {
+    } else if (width > SCREEN_BREAKPOINT_MD && showProfile.value) {
       closeMobileMenu()
     }
   })

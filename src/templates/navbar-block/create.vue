@@ -1,6 +1,6 @@
 <template>
   <PrimeButton
-    @click="openCreateModalStore()"
+    @click="openCreateModalToggle()"
     icon="pi pi-plus"
     :label="currentLabel"
     class="h-8 w-8 md:w-fit text-white border-header"
@@ -31,7 +31,6 @@
     :breakpoints="{ '641px': '90vw' }"
     @update:visible="closeCreateModalStore()"
   >
-    <!-- SLOT WIP -->
     <div>
       <CreateModalBlock @closeModal="createBoardManager.close()" />
     </div>
@@ -79,7 +78,7 @@
   const currentWidth = inject('currentWidth')
   const SCREEN_BREAKPOINT_MD = 768
 
-  const openCreateModalStore = () => {
+  const openCreateModalToggle = () => {
     createModalStore.toggle()
   }
 
