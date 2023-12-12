@@ -5,8 +5,8 @@ import * as Errors from '@/services/axios/errors'
 
 const fixtures = {
   mockPayload: {
-    resourcesID: 123,
-    edgeServiceID: 123,
+    id: 123,
+    edgeServiceId: 123,
     content: 'some content',
     contentType: 'some content type',
     trigger: 'some trigger',
@@ -37,10 +37,10 @@ describe('EdgeServiceResourcesServices', () => {
     const { sut } = makeSut()
 
     await sut(fixtures.mockPayload)
-    const { resourcesID, edgeServiceID } = fixtures.mockPayload
+    const { id, edgeServiceId } = fixtures.mockPayload
 
     expect(requestSpy).toHaveBeenCalledWith({
-      url: `edge_services/${edgeServiceID}/resources/${resourcesID}`,
+      url: `edge_services/${edgeServiceId}/resources/${id}`,
       method: 'PATCH',
       body: fixtures.mockResponse
     })

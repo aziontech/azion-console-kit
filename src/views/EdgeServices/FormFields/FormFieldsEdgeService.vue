@@ -5,6 +5,7 @@
   import { computed } from 'vue'
   import { useAccountStore } from '@/stores/account'
   import { useField } from 'vee-validate'
+  defineOptions({ name: 'form-fields-edge-service' })
 
   const { value: name, errorMessage: nameError } = useField('name')
   const { value: code, errorMessage: codeError } = useField('code')
@@ -39,14 +40,15 @@
           type="text"
           :class="{ 'p-invalid': nameError }"
         />
-        <small class="text-color-secondary text-sm font-normal leading-tight">
-          Give a unique and easy-to-remember name.
-        </small>
         <small
           v-if="nameError"
           class="p-error text-xs font-normal leading-tight"
-          >{{ nameError }}</small
         >
+          {{ nameError }}
+        </small>
+        <small class="text-color-secondary text-sm font-normal leading-tight">
+          Give a unique and easy-to-remember name.
+        </small>
       </div>
     </template>
   </FormHorizontal>
@@ -64,15 +66,15 @@
           :class="{ 'border-red-500 border': codeError }"
           :options="editorOptions"
         />
-        <small class="text-color-secondary text-sm font-normal leading-tight">
-          Enter the list of variables and values for the resource. Example:
-          <code>port = 3306</code>.
-        </small>
         <small
           v-if="codeError"
           class="p-error text-xs font-normal leading-tight"
         >
           {{ codeError }}
+        </small>
+        <small class="text-color-secondary text-sm font-normal leading-tight">
+          Enter the list of variables and values for the resource. Example:
+          <code>port=3306</code>.
         </small>
       </div>
     </template>

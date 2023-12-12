@@ -58,30 +58,30 @@
                       label="Manage"
                     />
                     <div class="md:ml-auto flex">
-                    <PrimeButton
-                      v-if="deployFailed"
-                      @click="retry"
-                      severity="secondary"
-                      :pt="{
-                        root: { class: 'justify-center' },
-                        label: { class: 'grow-0' }
-                      }"
-                      class="md:ml-auto w-full"
-                      label="Retry"
-                      icon="pi pi-sync"
-                      iconPos="left"
-                    />
-                  </div>
+                      <PrimeButton
+                        v-if="deployFailed"
+                        @click="retry"
+                        severity="secondary"
+                        :pt="{
+                          root: { class: 'justify-center' },
+                          label: { class: 'grow-0' }
+                        }"
+                        class="md:ml-auto w-full"
+                        label="Retry"
+                        icon="pi pi-sync"
+                        iconPos="left"
+                      />
+                    </div>
                   </div>
                 </div>
                 <span
-                class="text-sm font-normal text-color-secondary"
-                v-if="isUnfinished"
+                  class="text-sm font-normal text-color-secondary"
+                  v-if="isUnfinished"
                 >
-                Project started {{ seconds }}s ago
-              </span>
-            </div>
-            <ScriptRunnerBlock
+                  Project started {{ seconds }}s ago
+                </span>
+              </div>
+              <ScriptRunnerBlock
                 title="Deploy Log"
                 :getLogsService="props.getLogsService"
                 :executionId="executionId"
@@ -162,7 +162,8 @@
   const seconds = ref(0)
   const intervalRef = ref()
   const deployFailed = ref(false)
-  const failMessage = 'We encountered an issue while deploying your Edge Application. For more details, please refer to the deploy log.'
+  const failMessage =
+    'We encountered an issue while deploying your Edge Application. For more details, please refer to the deploy log.'
   const nextSteps = ref([
     {
       title: 'Customize Domain',
