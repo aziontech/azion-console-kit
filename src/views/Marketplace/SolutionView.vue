@@ -127,24 +127,25 @@
           </div>
         </div>
       </div>
+
+      <IntegrationInstall
+        v-if="solution"
+        v-model:visible="showIntegration"
+        :solution="solution"
+        :availableApps="availableApps"
+        :getTemplateService="props.getTemplateService"
+        :instantiateTemplateService="props.instantiateTemplateService"
+        :checkStatusScriptRunnerService="props.checkStatusScriptRunnerService"
+        :windowOpen="props.windowOpen"
+        :loadingEdges="loadingEdges"
+        v-model:showSidebarSecond="showCreateEdgeApp"
+        @success="handleIntegrationSuccess"
+        @fail="handleIntegrationFail"
+        @loading="handleLoading"
+      />
+      <CreateEdgeApplication v-model:visible="showCreateEdgeApp" />
     </template>
   </ContentBlock>
-  <IntegrationInstall
-    v-if="solution"
-    v-model:visible="showIntegration"
-    :solution="solution"
-    :availableApps="availableApps"
-    :getTemplateService="props.getTemplateService"
-    :instantiateTemplateService="props.instantiateTemplateService"
-    :checkStatusScriptRunnerService="props.checkStatusScriptRunnerService"
-    :windowOpen="props.windowOpen"
-    :loadingEdges="loadingEdges"
-    v-model:showSidebarSecond="showCreateEdgeApp"
-    @success="handleIntegrationSuccess"
-    @fail="handleIntegrationFail"
-    @loading="handleLoading"
-  />
-  <CreateEdgeApplication v-model:visible="showCreateEdgeApp" />
 </template>
 
 <script setup>
