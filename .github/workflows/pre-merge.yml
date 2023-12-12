@@ -1,9 +1,12 @@
+name: Pre-merge
+
 on:
   pull_request:
     types: [opened, synchronize, reopened, ready_for_review]
   push:
     branches:
       - dev
+
 env:
   HUSKY: 0
 
@@ -59,6 +62,7 @@ jobs:
         run: |
           sed -i 's:/__w/azion-platform-kit/azion-platform-kit/:/github/workspace/:' lcov.info
           sed -i 's:/__w/azion-platform-kit/azion-platform-kit/:/github/workspace/:' sonar-report.xml
+
       - name: SonarQube Scan
         uses: sonarsource/sonarqube-scan-action@master
         env:
