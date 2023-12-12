@@ -9,7 +9,6 @@
   import ProgressBar from 'primevue/progressbar'
   import { useField, useForm } from 'vee-validate'
   import * as yup from 'yup'
-  import { useLoadingStore } from '@/stores/loading'
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
   import TemplateEngineBlock from '@/templates/template-engine-block'
   import { InternalServerError } from '@/services/axios/errors'
@@ -90,7 +89,6 @@
   const freezeLoading = ref(true)
   const hiddenFields = ref([])
   const initialValues = { edgeApplication: '' }
-  const loadingStore = useLoadingStore()
 
   const validationSchema = yup.object({
     edgeApplication: yup.string().required()
@@ -159,13 +157,11 @@
 
   const handleLoading = () => {
     loading.value = true
-    loadingStore.startLoading()
     emit('loading')
   }
 
   const handleCancel = () => {
     resetForm()
-    loadingStore.finishLoading()
     toggleSidebar()
   }
 

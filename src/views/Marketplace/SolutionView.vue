@@ -178,7 +178,6 @@
   const router = useRouter()
   const toast = useToast()
   const breadcrumbs = useBreadcrumbs()
-  const loadingStore = useLoadingStore()
 
   const props = defineProps({
     loadSolutionService: {
@@ -296,7 +295,6 @@
     setTimeout(async () => {
       await loadSolution()
       loading.value = false
-      loadingStore.finishLoading()
       showFeedback(feedback)
     }, 150)
   }
