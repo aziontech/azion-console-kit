@@ -67,27 +67,27 @@
 </template>
 
 <script setup>
-import { ref, watchEffect } from 'vue'
-import { useMagicKeys } from '@vueuse/core'
+  import { ref, watchEffect } from 'vue'
+  import { useMagicKeys } from '@vueuse/core'
 
-import Tag from 'primevue/tag'
-import InputText from 'primevue/inputtext'
-import PrimeDialog from 'primevue/dialog'
-import PrimeButton from 'primevue/button'
+  import Tag from 'primevue/tag'
+  import InputText from 'primevue/inputtext'
+  import PrimeDialog from 'primevue/dialog'
+  import PrimeButton from 'primevue/button'
 
-const { meta, k, control } = useMagicKeys()
+  const { meta, k, control } = useMagicKeys()
 
-defineOptions({ name: 'search-block' })
+  defineOptions({ name: 'search-block' })
 
-const search = ref('')
-const showSearch = ref(false)
+  const search = ref('')
+  const showSearch = ref(false)
 
-const openSearch = () => {
-  showSearch.value = true
-}
+  const openSearch = () => {
+    showSearch.value = true
+  }
 
-watchEffect(() => {
-  if (control.value && k.value) openSearch()
-  if (meta.value && k.value) openSearch()
-})
+  watchEffect(() => {
+    if (control.value && k.value) openSearch()
+    if (meta.value && k.value) openSearch()
+  })
 </script>
