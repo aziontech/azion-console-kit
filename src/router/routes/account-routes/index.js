@@ -13,7 +13,12 @@ export const accountRoutes = {
         accountSettingsService: AccountSettingsServices.accountSettingsService
       },
       meta: {
-        isPublic: true
+        breadCrumbs: [
+          {
+            label: 'Account Settings',
+            to: '/account/settings'
+          }
+        ],
       }
     }
   ]
