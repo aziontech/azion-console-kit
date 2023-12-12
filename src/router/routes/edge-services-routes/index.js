@@ -49,12 +49,15 @@ export const edgeServicesRoutes = {
     {
       path: 'edit/:id/:resources?',
       name: 'edit-edge-services',
-      component: () => import('@views/EdgeServices/EditView.vue'),
+      component: () => import('@/views/EdgeServices/TabsView.vue'),
       props: {
         loadEdgeService: EdgeServiceServices.loadEdgeServiceServices,
         editEdgeService: EdgeServiceServices.editEdgeServiceServices,
         listResourcesServices: EdgeServiceResourcesServices.listResourcesServices,
         deleteResourcesServices: EdgeServiceResourcesServices.deleteResourcesServices,
+        editResourcesServices: EdgeServiceResourcesServices.editResourcesServices,
+        createResourcesServices: EdgeServiceResourcesServices.createResourcesServices,
+        loadResourcesServices: EdgeServiceResourcesServices.loadResourcesServices,
         documentationServiceResource: Helpers.documentationGuideProducts.edgeServicesResources,
         updatedRedirect: 'list-edge-services'
       },
