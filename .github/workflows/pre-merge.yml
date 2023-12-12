@@ -58,9 +58,6 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           name: coverage_unit_report
-        
-      - name: Print coverage report
-        run: cat ./coverage/sonar-report.xml
 
       - name: Fix code coverage paths - lcov.info
         run: |
