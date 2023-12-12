@@ -5,7 +5,7 @@ import { makeEdgeNodeBaseUrl } from '../edge-node-services/make-edge-node-base-u
 export const editServiceEdgeNodeService = async (payload) => {
   const bodyRequest = adapt(payload)
   let httpResponse = await AxiosHttpClientAdapter.request({
-    url: `${makeEdgeNodeBaseUrl()}/${payload.id}/services/${payload.serviceId}`,
+    url: `${makeEdgeNodeBaseUrl()}/${payload.edgeNodeId}/services/${payload.id}`,
     method: 'PATCH',
     body: bodyRequest
   })
@@ -25,10 +25,10 @@ const parseCodeToVariables = (code) => {
   return mapped
 }
 
-const adapt = ({ id, serviceId, name, variables }) => {
+const adapt = ({ edgeNodeId, id, name, variables }) => {
   return {
-    id,
-    service_id: serviceId,
+    id: edgeNodeId,
+    service_id: id,
     service_name: name,
     variables: parseCodeToVariables(variables)
   }
