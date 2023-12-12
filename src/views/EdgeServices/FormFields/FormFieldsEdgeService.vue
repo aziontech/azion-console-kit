@@ -5,6 +5,7 @@
   import { computed } from 'vue'
   import { useAccountStore } from '@/stores/account'
   import { useField } from 'vee-validate'
+  defineOptions({ name: 'form-fields-edge-service' })
 
   const { value: name, errorMessage: nameError } = useField('name')
   const { value: code, errorMessage: codeError } = useField('code')

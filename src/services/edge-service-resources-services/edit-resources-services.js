@@ -3,11 +3,11 @@ import { AxiosHttpClientAdapter } from '../axios/AxiosHttpClientAdapter'
 import { makeResourcesBaseUrl } from './make-resources-base-url'
 
 export const editResourcesServices = async (payload) => {
-  const { resourcesID, edgeServiceID } = payload
+  const { id, edgeServiceId } = payload
   const adaptPayload = adapt(payload)
 
   let httpResponse = await AxiosHttpClientAdapter.request({
-    url: `${makeResourcesBaseUrl()}/${edgeServiceID}/resources/${resourcesID}`,
+    url: `${makeResourcesBaseUrl()}/${edgeServiceId}/resources/${id}`,
     method: 'PATCH',
     body: adaptPayload
   })

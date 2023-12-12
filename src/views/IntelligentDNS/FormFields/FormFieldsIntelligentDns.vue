@@ -66,7 +66,8 @@
           :class="{ 'p-invalid': errorDomain }"
         />
         <small class="text-xs text-color-secondary font-normal leading-tight">
-          Add the name of the domain. Example: <code>mydomain</code> in <code>mydomain.com</code></small
+          Add the name of the domain. Example: <code>mydomain</code> in
+          <code>mydomain.com</code></small
         >
         <small
           v-if="errorDomain"
@@ -76,9 +77,7 @@
       </div>
     </template>
   </FormHorizontal>
-  <FormHorizontal
-    title="Status"
-  >
+  <FormHorizontal title="Status">
     <template #inputs>
       <div class="flex gap-3 items-center">
         <label for="">Active</label>
