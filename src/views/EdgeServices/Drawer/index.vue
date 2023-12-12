@@ -4,6 +4,8 @@
   import FormFieldsDrawerResource from '@/views/EdgeServices/FormFields/FormFieldsDrawerResource'
   import CreateDrawerBlock from '@templates/create-drawer-block'
   import EditDrawerBlock from '@templates/edit-drawer-block'
+  import { refDebounced } from '@vueuse/core'
+
   defineOptions({ name: 'drawer-service' })
 
   const emit = defineEmits(['onSuccess'])
@@ -29,9 +31,10 @@
   const showCreateResourceDrawer = ref(false)
   const selectedResourceToEdit = ref('')
   const defaultTrigger = 'Install'
+  const debouncedDrawerEdit = 300
   const contentTypeShellScript = 'Shell Script'
   const showEditResourceDrawer = ref(false)
-
+  const loadEditResourceDrawer = refDebounced(showEditResourceDrawer, debouncedDrawerEdit)
   const initialValues = {
     name: '',
     contentType: contentTypeShellScript,
@@ -108,7 +111,7 @@
     </template>
   </CreateDrawerBlock>
   <EditDrawerBlock
-    v-if="showEditResourceDrawer"
+    v-if="loadEditResourceDrawer"
     :id="selectedResourceToEdit"
     v-model:visible="showEditResourceDrawer"
     :loadService="loadService"

@@ -12,7 +12,7 @@
                 <div class="flex flex-col md:flex-row md:items-center gap-3 w-full">
                   <div class="flex gap-3">
                     <Tag
-                      v-if="!isUnfinished"
+                      v-if="isSuccessfullyFinished"
                       :icon="iconType"
                       :severity="severity"
                       :pt="{ icon: { class: 'mr-0' }, root: { class: 'w-8 h-8' } }"
@@ -53,10 +53,25 @@
                     />
                     <PrimeButton
                       v-if="isSuccessfullyFinished"
-                      outlined
+                      severity="secondary"
                       @click="goToEdgeApplicationEditView"
                       label="Manage"
                     />
+                    <div class="md:ml-auto flex">
+                      <PrimeButton
+                        v-if="deployFailed"
+                        @click="retry"
+                        severity="secondary"
+                        :pt="{
+                          root: { class: 'justify-center' },
+                          label: { class: 'grow-0' }
+                        }"
+                        class="md:ml-auto w-full"
+                        label="Retry"
+                        icon="pi pi-sync"
+                        iconPos="left"
+                      />
+                    </div>
                   </div>
                 </div>
                 <span
@@ -66,7 +81,7 @@
                   Project started {{ seconds }}s ago
                 </span>
               </div>
-              <ScriptRunnerBlcok
+              <ScriptRunnerBlock
                 title="Deploy Log"
                 :getLogsService="props.getLogsService"
                 :executionId="executionId"
@@ -120,7 +135,7 @@
   import { useRoute, useRouter } from 'vue-router'
   import PageHeadingBlock from '@/templates/page-heading-block'
   import PrimeButton from 'primevue/button'
-  import ScriptRunnerBlcok from '@/templates/script-runner-block'
+  import ScriptRunnerBlock from '@/templates/script-runner-block'
   import PrimeCard from 'primevue/card'
   import { useToast } from 'primevue/usetoast'
 
@@ -147,6 +162,8 @@
   const seconds = ref(0)
   const intervalRef = ref()
   const deployFailed = ref(false)
+  const failMessage =
+    'We encountered an issue while deploying your Edge Application. For more details, please refer to the deploy log.'
   const nextSteps = ref([
     {
       title: 'Customize Domain',
@@ -181,7 +198,7 @@
         closable: true,
         severity: 'error',
         summary: 'Deploy failed',
-        detail: error
+        detail: failMessage
       })
     }
   }
@@ -215,6 +232,10 @@
 
   const goToAnalytics = () => {
     //
+  }
+
+  const retry = () => {
+    router.go(-1)
   }
 
   const goToEdgeApplicationEditView = () => {
