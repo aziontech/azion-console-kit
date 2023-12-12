@@ -6,10 +6,6 @@
   import { useField } from 'vee-validate'
 
   const props = defineProps({
-    disabledFields: {
-      type: Boolean,
-      default: false
-    },
     listServices: {
       type: Array,
       required: true
@@ -50,11 +46,10 @@
             <Dropdown
               class="flex self-stretch"
               v-model="service"
-              :options="listServices"
-              :loading="listServices.length === 0"
+              :options="props.listServices"
+              :loading="props.listServices.length === 0"
               optionLabel="name"
               filter
-              :disabled="props.disabledFields"
               placeholder="Select"
             />
           </div>

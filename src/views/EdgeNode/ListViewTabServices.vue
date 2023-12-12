@@ -1,25 +1,25 @@
 <script setup>
-  import ListTableBlock from '@/templates/list-table-block'
+  import ListTableBlock from '@/templates/list-table-block/no-header.vue'
   import EmptyResultsBlock from '@/templates/empty-results-block'
   import Illustration from '@/assets/svg/illustration-layers.vue'
   import { computed, ref } from 'vue'
   import PrimeButton from 'primevue/button'
   import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
-  import CreateService from '@/views/EdgeNode/Drawer/CreateService'
-  import EditService from '@/views/EdgeNode/Drawer/EditService'
+  import DrawerService from '@/views/EdgeNode/Drawer'
 
   const props = defineProps({
     edgeNodeId: { type: String, required: true },
+    createServiceEdgeNodeService: { type: Function, required: true },
+    editServiceEdgeNodeService: { type: Function, required: true },
+    loadServiceEdgeNodeService: { type: Function, required: true },
     listServiceEdgeNodeService: { type: Function, required: true },
     deleteServiceEdgeNodeService: { type: Function, required: true },
     documentationServiceServices: { type: Function, required: true }
   })
 
   const hasContentToList = ref(true)
-  const visibleDrawerCreate = ref(false)
-  const visibleDrawerEdit = ref(false)
-  const listServiceEdgeNode = ref('')
-  const serviceIdEdgeNode = ref('')
+  const listServiceEdgeNodeRef = ref('')
+  const drawerServiceRef = ref('')
 
   const getColumns = computed(() => [
     {
@@ -51,16 +51,19 @@
   }
 
   const openCreateServiceDrawer = () => {
-    visibleDrawerCreate.value = true
+    drawerServiceRef.value.openDrawerCreate()
   }
 
   const openEditServiceDrawer = (item) => {
-    serviceIdEdgeNode.value = item.id
-    visibleDrawerEdit.value = true
+    drawerServiceRef.value.openDrawerEdit(item.id)
   }
 
   const listServicesWithDecorator = async (payload) => {
-    return await props.listServiceEdgeNodeService({ ...payload, id: props.edgeNodeId, bound: true })
+    return await props.listServiceEdgeNodeService({
+      ...payload,
+      edgeNodeId: props.edgeNodeId,
+      bound: true
+    })
   }
 
   const deleteServicesWithDecorator = async (payload) => {
@@ -70,34 +73,29 @@
     })
   }
 
-  const reloadList = () => {
-    listServiceEdgeNode.value.loadData({ page: 1 })
+  const reloadResourcesList = () => {
+    if (hasContentToList.value) {
+      listServiceEdgeNodeRef.value.reload()
+      return
+    }
+    hasContentToList.value = true
   }
 </script>
 
 <template>
   <div class="flex flex-col h-full">
-    <CreateService
-      v-if="visibleDrawerCreate"
-      v-model:visible="visibleDrawerCreate"
+    <DrawerService
+      ref="drawerServiceRef"
       :edgeNodeId="props.edgeNodeId"
-      @onSuccess="reloadList"
-      @onCancel="visibleDrawer = false"
+      :listServiceEdgeNodeService="props.listServiceEdgeNodeService"
+      :createServiceEdgeNodeService="props.createServiceEdgeNodeService"
+      :editServiceEdgeNodeService="props.editServiceEdgeNodeService"
+      :loadServiceEdgeNodeService="props.loadServiceEdgeNodeService"
+      @onSuccess="reloadResourcesList"
     />
-    <EditService
-      v-if="visibleDrawerEdit"
-      v-model:visible="visibleDrawerEdit"
-      :serviceIdEdgeNode="serviceIdEdgeNode"
-      :edgeNodeId="props.edgeNodeId"
-      @onSuccess="reloadList"
-      @onCancel="visibleDrawer = false"
-    />
-    <div
-      class="mt-4"
-      v-if="hasContentToList"
-    >
+    <div v-if="hasContentToList">
       <ListTableBlock
-        ref="listServiceEdgeNode"
+        ref="listServiceEdgeNodeRef"
         :listService="listServicesWithDecorator"
         :deleteService="deleteServicesWithDecorator"
         :columns="getColumns"

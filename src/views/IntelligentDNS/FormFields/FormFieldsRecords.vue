@@ -187,7 +187,8 @@
             class="w-full"
           />
           <small class="text-color-secondary text-sm font-normal leading-tight">
-            Choose <code>Simple</code> to use the standard DNS functionality or <code>Weighted</code> to specify the amount of traffic sent to each record.
+            Choose <code>Simple</code> to use the standard DNS functionality or
+            <code>Weighted</code> to specify the amount of traffic sent to each record.
           </small>
 
           <small

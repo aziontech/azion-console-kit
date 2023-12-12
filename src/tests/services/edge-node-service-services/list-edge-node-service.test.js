@@ -4,7 +4,7 @@ import { describe, expect, it, vi } from 'vitest'
 
 const fixtures = {
   payload: {
-    id: 123,
+    edgeNodeId: 123,
     bound: true,
     page: 1
   },
@@ -47,7 +47,7 @@ describe('EdgeNodeServices', () => {
     await sut(fixtures.payload)
 
     expect(requestSpy).toHaveBeenCalledWith({
-      url: `edge_node/${fixtures.payload.id}/services?page=1&page_size=1000000&is_bound=${fixtures.payload.bound}`,
+      url: `edge_node/${fixtures.payload.edgeNodeId}/services?page=1&page_size=1000000&is_bound=${fixtures.payload.bound}`,
       method: 'GET'
     })
   })

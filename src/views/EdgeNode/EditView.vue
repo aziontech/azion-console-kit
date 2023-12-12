@@ -25,7 +25,6 @@
     :loadService="props.loadEdgeNodeService"
     :updatedRedirect="props.updatedRedirect"
     :schema="validationSchema"
-    backURL="/edge-node"
   >
     <template #form>
       <FormFieldsEdgeNode :listGroupsService="props.listGroupsEdgeNodeService" />
