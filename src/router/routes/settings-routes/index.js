@@ -10,11 +10,10 @@ export const settingsRoutes = {
       name: 'settings',
       component: () => import('@views/Settings/EditView.vue'),
       props: {
-        loadAccountDetailsService: UsersService.loadAccountDetailsService,
         listCountriesPhoneService: UsersService.listCountriesPhoneService,
         listTimezonesService: UsersService.listTimezonesService,
-        createUsersService: UsersService.createUsersService,
-        listTeamsService: UsersService.listTeamsService
+        loadUserService: UsersService.loadUserService,
+        editUsersService: UsersService.editUsersService
       },
       meta: {
         breadCrumbs: [

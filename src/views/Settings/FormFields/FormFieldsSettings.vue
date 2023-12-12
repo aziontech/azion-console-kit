@@ -1,5 +1,5 @@
 <script setup>
-  import { ref, onMounted } from 'vue'
+  import { ref, onMounted, watch } from 'vue'
   import { useField } from 'vee-validate'
 
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
@@ -11,10 +11,6 @@
   import Card from 'primevue/card'
 
   const props = defineProps({
-    loadAccountDetailsService: {
-      type: Function,
-      required: true
-    },
     listTimezonesService: {
       type: Function,
       required: true
@@ -22,15 +18,10 @@
     listCountriesPhoneService: {
       type: Function,
       required: true
-    },
-    listTeamsService: {
-      type: Function,
-      required: true
     }
   })
 
   const optionsTimezone = ref([])
-  const optionsTeams = ref([])
   const isForceMFA = ref(false)
   const optionsCountriesMobile = ref([])
   const filteredCountriesMobile = ref([])
@@ -38,46 +29,41 @@
 
   const { value: firstName, errorMessage: errorFirstName } = useField('firstName')
   const { value: lastName, errorMessage: errorLastName } = useField('lastName')
-  const { value: selectedTimezone, errorMessage: errorSelectedTimezone } =
-    useField('selectedTimezone')
-  const { value: selectedLanguage, errorMessage: errorSelectedLanguage } =
-    useField('selectedLanguage')
+  const { value: timezone, errorMessage: errorTimezone } = useField('timezone')
+  const { value: language, errorMessage: errorLanguage } = useField('language')
   const { value: email, errorMessage: errorEmail } = useField('email')
-  const { value: selectedCountry, errorMessage: errorSelectedCountry } = useField('selectedCountry')
+  const { value: countryCallCode } = useField('countryCallCode')
+  const { value: selectedCountryCallCode, errorMessage: errorSelectedCountryCallCode } = useField('selectedCountryCallCode')
   const { value: mobile, errorMessage: errorMobile } = useField('mobile')
   const { value: twoFactorEnabled, errorMessage: errorTwoFactorEnabled } =
     useField('twoFactorEnabled')
 
   const { value: password, errorMessage: errorPassword } = useField('password')
   const { value: oldPassword, errorMessage: errorOldPassword } = useField('oldPassword')
+  const { value: confirmPassword, errorMessage: errorConfirmPassword } = useField('confirmPassword')
 
   const fetchCountries = async () => {
     const result = await props.listCountriesPhoneService()
     optionsCountriesMobile.value = result
     filteredCountriesMobile.value = [...optionsCountriesMobile.value]
-    selectedCountry.value = optionsCountriesMobile.value[0]
+    if (countryCallCode.value) {
+      selectedCountryCallCode.value = optionsCountriesMobile.value.find(
+        (item) => item.value === countryCallCode.value
+      )
+    }
+    if (!countryCallCode.value) {
+      selectedCountryCallCode.value = optionsCountriesMobile.value[0]
+    }
   }
 
   const fetchTimezone = async () => {
     const result = await props.listTimezonesService()
-    selectedTimezone.value = result.defaultSelected
     optionsTimezone.value = result.listTimeZones
-  }
-  const fetchDetailAccount = async () => {
-    const account = await props.loadAccountDetailsService()
-    isForceMFA.value = account?.is_enabled_mfa_to_all_users
-    twoFactorEnabled.value = isForceMFA.value
-  }
-  const fetchTeams = async () => {
-    const result = await props.listTeamsService()
-    optionsTeams.value = result
   }
 
   onMounted(async () => {
     await fetchCountries()
     await fetchTimezone()
-    await fetchTeams()
-    await fetchDetailAccount()
   })
 
   const passwordRequirementsList = ref([
@@ -98,6 +84,10 @@
     passwordRequirementsList.value[3].valid = hasSpecialChar
     return hasMinLength && hasUpperCase && hasLowerCase && hasSpecialChar
   }
+
+  watch(selectedCountryCallCode, async (newCountryCallCode) => {
+    countryCallCode.value = newCountryCallCode.value
+  })
 </script>
 
 <template>
@@ -142,35 +132,35 @@
       <div class="flex sm:flex-row w-full flex-col gap-6">
         <div class="flex flex-col w-full sm:max-w-xs gap-2">
           <label
-            for="selectedTimezone"
+            for="timezone"
             class="text-color text-base font-medium"
             >Timezone *</label
           >
           <Dropdown
-            id="selectedTimezone"
+            id="timezone"
             filter
             :options="optionsTimezone"
             optionLabel="label"
             optionValue="value"
             placeholder="Loading..."
-            :loading="!selectedTimezone"
-            :class="{ 'p-invalid': errorSelectedTimezone }"
-            v-model="selectedTimezone"
+            :loading="!timezone"
+            :class="{ 'p-invalid': errorTimezone }"
+            v-model="timezone"
           />
         </div>
         <div class="flex flex-col w-full sm:max-w-xs gap-2">
           <label
-            for="selectedLanguage"
+            for="language"
             class="text-color text-base font-medium"
             >Language</label
           >
           <Dropdown
-            id="selectedLanguage"
+            id="language"
             :options="optionsLanguage"
             optionLabel="label"
             optionValue="value"
-            :class="{ 'p-invalid': errorSelectedLanguage }"
-            v-model="selectedLanguage"
+            :class="{ 'p-invalid': errorLanguage }"
+            v-model="language"
             disabled
           >
             <template #dropdownicon>
@@ -193,6 +183,7 @@
           v-model="email"
           id="email"
           type="email"
+          autocomplete="off"
           placeholder="example@email.com"
           :class="{ 'p-invalid': errorEmail }"
         />
@@ -212,15 +203,15 @@
         <div class="flex gap-2">
           <div class="p-inputgroup">
             <Dropdown
-              id="selectedTimezone"
+              id="timezone"
               filter
               :options="filteredCountriesMobile"
               optionLabel="label"
               placeholder="Loading..."
               :loading="!filteredCountriesMobile.length"
-              :class="{ 'p-invalid': errorSelectedCountry }"
+              :class="{ 'p-invalid': errorSelectedCountryCallCode }"
               class="w-2/3 surface-border border-r-0"
-              v-model="selectedCountry"
+              v-model="selectedCountryCallCode"
             />
 
             <InputMask
@@ -228,7 +219,7 @@
               v-model="mobile"
               class="w-full"
               mask="?99999999999999999999"
-              :class="{ 'p-invalid': errorMobile || !selectedCountry }"
+              :class="{ 'p-invalid': errorMobile || !countryCallCode }"
             />
           </div>
         </div>
@@ -254,7 +245,7 @@
           v-model="oldPassword"
           id="oldPassword"
           class="w-full"
-          :class="{ 'p-invalid': errorOldPassword }"
+          autocomplete="off"
           :feedback="false"
         />
         <small
@@ -273,9 +264,10 @@
           toggleMask
           v-model="password"
           id="password"
+          autocomplete="off"
           class="w-full"
-          @input="validation()"
           :class="{ 'p-invalid': errorPassword }"
+          @input="validation()"
           :feedback="false"
         />
         <small class="p-error text-xs font-normal leading-tight">{{ errorPassword }}</small>
@@ -300,6 +292,27 @@
             <span>{{ requirement.label }}</span>
           </li>
         </ul>
+      </div>
+      <div class="flex flex-col sm:max-w-lg w-full gap-2">
+        <label
+          for="confirmPassword"
+          class="text-color text-base font-medium"
+          >Confirm password *</label
+        >
+        <InputPassword
+          toggleMask
+          v-model="confirmPassword"
+          id="confirmPassword"
+          class="w-full"
+          autocomplete="off"
+          :class="{ 'p-invalid': errorConfirmPassword }"
+          :feedback="false"
+        />
+        <small
+          id="name-help"
+          class="p-error"
+          >{{ errorConfirmPassword }}</small
+        >
       </div>
       <Card
         :pt="{

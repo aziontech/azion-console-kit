@@ -5,15 +5,15 @@
     </template>
     <template #content>
       <EditFormBlock
-        :editService="props.createUsersService"
+        :editService="props.editUsersService"
         :schema="validationSchema"
+        :loadService="loadUser"
+        :disableRedirect="true"
       >
         <template #form>
           <FormFieldsSettings
-            :loadAccountDetailsService="loadAccountDetailsService"
             :listTimezonesService="listTimezonesService"
             :listCountriesPhoneService="listCountriesPhoneService"
-            :listTeamsService="listTeamsService"
           />
         </template>
         <template #action-bar="{ onSubmit, formValid, onCancel, loading }">
@@ -36,14 +36,10 @@
   import FormFieldsSettings from './FormFields/FormFieldsSettings'
   import ActionBarBlockWithTeleport from '@templates/action-bar-block/action-bar-with-teleport'
   import * as yup from 'yup'
-  import { ref } from 'vue'
+  import { useAccountStore } from '@/stores/account'
 
   const props = defineProps({
-    loadAccountDetailsService: {
-      type: Function,
-      required: true
-    },
-    createUsersService: {
+    loadUserService: {
       type: Function,
       required: true
     },
@@ -55,41 +51,39 @@
       type: Function,
       required: true
     },
-    listTeamsService: {
+    editUsersService: {
       type: Function,
       required: true
     }
   })
 
-  const passwordRequirementsList = ref([
-    { label: '> 7 characters', valid: false },
-    { label: 'Uppercase letter', valid: false },
-    { label: 'Lowercase letter', valid: false },
-    { label: 'Special character (e.g. !?<>@#$%)', valid: false }
-  ])
+  async function loadUser() {
+    const { account } = useAccountStore()
+    const id = account.user_id
+    return await props.loadUserService({ id })
+  }
 
   const validationSchema = yup.object({
     firstName: yup.string().required('first name is a required field').max(30),
     lastName: yup.string().required('last name is a required field').max(30),
-    selectedTimezone: yup.string().required('timezone is a required field'),
-    selectedLanguage: yup.string(),
+    timezone: yup.string(),
+    language: yup.string(),
+    countryCallCode: yup.string(),
     email: yup.string().email().required('e-mail is a required field').max(254),
-    mobile: yup.string().required('mobile phone is a required field').max(20),
-    mfa: yup.boolean(),
-    password: yup
-      .string()
-      .test('max', 'Exceeded number of characters', (value) => value?.length <= 128)
-      .test('noSpaces', 'Spaces are not allowed', (value) => !value?.match(/\s/g))
-      .test('requirements', '', (value) => {
-        const hasUpperCase = value && /[A-Z]/.test(value)
-        const hasLowerCase = value && /[a-z]/.test(value)
-        const hasSpecialChar = value && /[!@#$%^&*(),.?":{}|<>]/.test(value)
-        const hasMinLength = value?.length > 7
-        passwordRequirementsList.value[0].valid = hasMinLength
-        passwordRequirementsList.value[1].valid = hasUpperCase
-        passwordRequirementsList.value[2].valid = hasLowerCase
-        passwordRequirementsList.value[3].valid = hasSpecialChar
-        return hasMinLength && hasUpperCase && hasLowerCase && hasSpecialChar
-      })
+    mobile: yup.string(),
+    twoFactorEnabled: yup.boolean(),
+    oldPassword: yup.string(),
+    password: yup.string().when('oldPassword', {
+      is: (val) => !!val, // Set the field as required when oldPassword has a value
+      then: () => yup.string().required('Password is required')
+    }),
+    confirmPassword: yup.string().when('password', {
+      is: (val) => !!val,
+      then: () =>
+        yup
+          .string()
+          .required('Confirm password is required')
+          .oneOf([yup.ref('password'), null], 'Passwords must match')
+    })
   })
 </script>
