@@ -2,6 +2,13 @@ import { AxiosHttpClientAdapter } from '@/services/axios/AxiosHttpClientAdapter'
 import { listServiceEdgeNodeService } from '@/services/edge-node-service-services'
 import { describe, expect, it, vi } from 'vitest'
 
+const localeMock = (locale = 'en') => {
+  const DateTimeFormat = Intl.DateTimeFormat
+  vi.spyOn(window.global.Intl, 'DateTimeFormat')
+    .mockImplementationOnce((_, options) => DateTimeFormat(locale, { ...options }))
+    .mockImplementationOnce((_, options) => DateTimeFormat(locale, { ...options }))
+}
+
 const fixtures = {
   payload: {
     id: 123,
@@ -53,6 +60,7 @@ describe('EdgeNodeServices', () => {
   })
 
   it('should parsed correctly all returned firewalls', async () => {
+    localeMock()
     vi.setSystemTime(new Date(2023, 10, 10, 10))
     vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
       statusCode: 200,

@@ -94,6 +94,9 @@
           const data = await this.getLogsService(this.executionId)
           const stopStatusList = ['succeeded', 'failed', 'pending finish']
           this.currentLogs = data.logs
+          if (this.currentLogs.length > 0) {
+            this.active = 0
+          }
           this.status = data.status
           if (stopStatusList.includes(this.status)) {
             clearInterval(this.polling)
@@ -101,6 +104,7 @@
             this.$emit('onFinish', this.status)
           }
         } catch (error) {
+          clearInterval(this.polling)
           this.$toast.add({
             closable: true,
             severity: 'error',
@@ -112,9 +116,10 @@
       async handlePoll() {
         await this.getlogs()
         this.isPolling = true
-        this.active = 0
         setTimeout(() => {
-          this.scrollScriptRunnerLogs()
+          if (this.currentLogs.length > 0) {
+            this.scrollScriptRunnerLogs()
+          }
         }, 100)
       },
 

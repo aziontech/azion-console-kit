@@ -25,7 +25,7 @@
 <template>
   <FormHorizontal
     title="General"
-    description="description"
+    description="Services define dependencies between resources."
   >
     <template #inputs>
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
@@ -39,6 +39,9 @@
           type="text"
           :class="{ 'p-invalid': nameError }"
         />
+        <small class="text-color-secondary text-sm font-normal leading-tight">
+          Give a unique and easy-to-remember name.
+        </small>
         <small
           v-if="nameError"
           class="p-error text-xs font-normal leading-tight"
@@ -49,7 +52,7 @@
   </FormHorizontal>
   <FormHorizontal
     title="Variables"
-    description="Variables are dynamic values that affect the Services' orchestration. They are reserved spaces for stored information within the system that passes on data to the orchestration scripts. For example: port=3306."
+    description="Variables are dynamic values that affect the edge services that will be orchestrated and run on Edge Nodes."
   >
     <template #inputs>
       <div class="flex flex-col h-full gap-2">
@@ -61,6 +64,10 @@
           :class="{ 'border-red-500 border': codeError }"
           :options="editorOptions"
         />
+        <small class="text-color-secondary text-sm font-normal leading-tight">
+          Enter the list of variables and values for the resource. Example:
+          <code>port = 3306</code>.
+        </small>
         <small
           v-if="codeError"
           class="p-error text-xs font-normal leading-tight"

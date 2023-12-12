@@ -1,7 +1,7 @@
 <script setup>
   import { ref, computed } from 'vue'
   import { useIntelligentDNSStore } from '@/stores/intelligent-dns'
-
+  import InputNumber from 'primevue/inputnumber'
   import InputText from 'primevue/inputtext'
   import Textarea from 'primevue/textarea'
   import Dropdown from 'primevue/dropdown'
@@ -53,18 +53,19 @@
   <FormHorizontal
     :isDrawer="true"
     title="Settings"
-    description="Description"
+    description="Add records to specify which IPs are associated with the domain and how Intelligent DNS should handle requests for the domain."
   >
     <template #inputs>
       <div class="flex flex-col w-full gap-2">
         <label
           for="name"
           class="text-color text-base font-medium"
-          >Record Name *</label
+          >Name *</label
         >
         <div class="p-inputgroup">
           <InputText
             v-model="name"
+            placeholder="My record"
             id="name"
             type="text"
             :class="{ 'p-invalid': errorName }"
@@ -72,8 +73,7 @@
           <span class="p-inputgroup-addon"> .{{ intelligentDNSStore.domain }} </span>
         </div>
         <small class="text-color-secondary text-sm font-normal leading-tight">
-          A record is used to find the IP address of a computer connected to the internet from a
-          name.
+          The accepted values format vary according to the chosen record type.
         </small>
 
         <small
@@ -100,8 +100,7 @@
             class="w-full"
           />
           <small class="text-color-secondary text-sm font-normal leading-tight">
-            Address Mapping record (A Record)— also known as a DNS host record, stores a hostname
-            and its corresponding IPv4 address.
+            Choose the type of record being added.
           </small>
 
           <small
@@ -118,19 +117,22 @@
           <label
             for="ttl"
             class="text-color text-base font-medium"
-            >TTL *</label
+            >TTL (seconds) *</label
           >
-          <InputText
+
+          <InputNumber
+            showButtons
             placeholder="TTL (seconds):"
             v-model="ttl"
             id="ttl"
-            type="number"
+            :min="0"
+            :max="3600"
+            step="1"
             :class="{ 'p-invalid': errorTtl }"
           />
+
           <small class="text-color-secondary text-sm font-normal leading-tight">
-            Time-to-live (TTL) is a value in an Internet Protocol (IP) packet that tells a network
-            router whether or not the packet has been in the network too long and should be
-            discarded.
+            Decide the time-to-live (TTL) value a response can be cached for on a resolver server.
           </small>
           <small
             v-if="errorTtl"
@@ -156,7 +158,7 @@
           :class="{ 'p-invalid': errorValue }"
         />
         <small class="text-color-secondary text-sm font-normal leading-tight">
-          Enter multiple values on separate lines. Only IPV4 formats.
+          The accepted values format vary according to the chosen record type.
         </small>
 
         <small
@@ -170,7 +172,7 @@
   <FormHorizontal
     :isDrawer="true"
     title="Policy"
-    description="Description"
+    description="Choose the policy type to specify how Intelligent DNS should deal with requests answered by this record."
   >
     <template #inputs>
       <div class="flex gap-6 flex-wrap">
@@ -186,12 +188,12 @@
             id="selectedPolicy"
             optionLabel="label"
             optionValue="value"
-            placeholder="Select a Policy"
             :class="{ 'p-invalid': errorSelectedPolicy }"
             class="w-full"
           />
           <small class="text-color-secondary text-sm font-normal leading-tight">
-            Choose this policy to specify the amount of traffic to send to each record.
+            Choose <code>Simple</code> to use the standard DNS functionality or
+            <code>Weighted</code> to specify the amount of traffic sent to each record.
           </small>
 
           <small
@@ -209,19 +211,18 @@
             class="text-color text-base font-medium"
             >Weight *</label
           >
-          <InputText
+          <InputNumber
+            showButtons
             placeholder="Weight"
             v-model="weight"
             id="weight"
-            type="number"
-            min="0"
-            max="255"
+            :min="0"
+            :max="255"
+            step="1"
             :class="{ 'p-invalid': errorWeight }"
-            v-if="isWeightedPolicy"
           />
           <small class="text-color-secondary text-sm font-normal leading-tight">
-            You can choose a number between 0 and 255 to specify the weight for each record. When
-            you choose 0, Intelligent DNS stops using this record.
+            Specify the weight for each record. Accepts integers between 0 and 255.
           </small>
 
           <small
@@ -241,16 +242,19 @@
           class="text-color text-base font-medium"
           >Description *</label
         >
-        <InputText
+        <Textarea
+          v-if="isWeightedPolicy"
+          rows="5"
+          cols="30"
           placeholder="add the description"
           v-model="description"
+          id="description"
           type="text"
           :class="{ 'p-invalid': errorDescription }"
-          v-if="isWeightedPolicy"
         />
         <small class="text-color-secondary text-sm font-normal leading-tight">
-          To differentiate records with the same name and type, add a description that identifies
-          each record.
+          Differentiate records with the same Name and Type by adding a description that identifies
+          each one. Accepts up to 45 characters.
         </small>
 
         <small

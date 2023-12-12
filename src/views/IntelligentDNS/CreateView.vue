@@ -3,14 +3,14 @@
     <template #heading>
       <PageHeadingBlock
         pageTitle="Create Intelligent DNS"
-        description="Copy the Nameservers values for change your domain's authoritative DNS servers to use Azion Intelligent DNS."
+        description="Set Azion Intelligent DNS as the authoritative DNS server for your domain by copying the nameservers values."
       >
         <template #default>
           <PrimeButton
             outlined
             icon="pi pi-copy"
             class="max-md:w-full"
-            label="Copy Nameservers"
+            label="Copy"
             @click="handleCopyNameServers"
           ></PrimeButton>
         </template>
@@ -84,7 +84,7 @@
     toast.add({
       closable: true,
       severity: 'success',
-      summary: 'Nameservers copied'
+      summary: 'Copied successfully!'
     })
   }
 </script>

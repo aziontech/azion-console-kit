@@ -9,7 +9,9 @@
     loading: Boolean,
     inDrawer: Boolean,
     cancelDisabled: Boolean,
-    submitDisabled: Boolean
+    submitDisabled: Boolean,
+    primaryActionLabel: { type: String, default: 'Save' },
+    secondaryActionLabel: { type: String, default: 'Cancel' }
   })
 
   const handleSubmit = () => {
@@ -41,15 +43,16 @@
     class="flex flex-col items-start w-full justify-center p-3 border-t surface-border sticky bottom-0 surface-section z-50 sm:flex-row sm:py-3 sm:px-8 sm:justify-between"
   >
     <div
+      class="flex w-full justify-content-end max-w-screen-2xl mx-auto"
       :class="{
-        '2xl:px-0': inDrawerStyles
+        '2xl:px-0': inDrawerStyles,
+        '2xl:px-8': !inDrawerStyles
       }"
-      class="flex w-full justify-content-end max-w-screen-2xl mx-auto 2xl:px-8"
     >
       <div class="flex gap-4 self-stretch items-center justify-end w-full">
         <PrimeButton
           severity="primary"
-          label="Cancel"
+          :label="props.secondaryActionLabel"
           outlined
           class="max-md:min-w-max"
           @click="handleCancel"
@@ -57,7 +60,7 @@
         />
         <PrimeButton
           severity="primary"
-          label="Save"
+          :label="props.primaryActionLabel"
           @click="handleSubmit"
           icon-pos="right"
           class="max-md:w-full"
