@@ -1,7 +1,7 @@
 import { AxiosHttpClientAdapter, parseHttpResponse } from '../axios/AxiosHttpClientAdapter'
 import { makeUsersBaseUrl } from './make-users-base-url'
 
-export const loadUserService = async ({id}) => {
+export const loadUserService = async ({ id }) => {
   const httpResponse = await AxiosHttpClientAdapter.request({
     url: `${makeUsersBaseUrl()}/${id}`,
     method: 'GET'
@@ -9,7 +9,6 @@ export const loadUserService = async ({id}) => {
 
   return parseHttpResponse(adapt(httpResponse))
 }
-
 
 const adapt = (httpResponse) => {
   /**
@@ -36,7 +35,6 @@ const adapt = (httpResponse) => {
     timezone: httpResponse.body.data.timezone,
     twoFactorEnabled: httpResponse.body.data.two_factor_enabled
   }
- 
 
   return {
     body: parsedUsers,

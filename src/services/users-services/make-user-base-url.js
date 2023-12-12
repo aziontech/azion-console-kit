@@ -1,4 +1,3 @@
 export const makeUserBaseUrl = () => {
-    return `iam/user`
-  }
-  
+  return `iam/user`
+}

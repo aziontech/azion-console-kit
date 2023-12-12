@@ -33,7 +33,8 @@
   const { value: language, errorMessage: errorLanguage } = useField('language')
   const { value: email, errorMessage: errorEmail } = useField('email')
   const { value: countryCallCode } = useField('countryCallCode')
-  const { value: selectedCountryCallCode, errorMessage: errorSelectedCountryCallCode } = useField('selectedCountryCallCode')
+  const { value: selectedCountryCallCode, errorMessage: errorSelectedCountryCallCode } =
+    useField('selectedCountryCallCode')
   const { value: mobile, errorMessage: errorMobile } = useField('mobile')
   const { value: twoFactorEnabled, errorMessage: errorTwoFactorEnabled } =
     useField('twoFactorEnabled')
