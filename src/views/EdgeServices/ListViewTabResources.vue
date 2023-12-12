@@ -114,7 +114,7 @@
         :listService="listResourcesServicesWithDecorator"
         :deleteService="deleteResourcesServicesWithDecorator"
         :columns="getColumns"
-        pageTitleDelete="Edge Service Resource"
+        pageTitleDelete="Resource"
         :editInDrawer="openEditServiceDrawer"
         @on-load-data="handleLoadData"
       >
@@ -129,9 +129,9 @@
     </div>
     <EmptyResultsBlock
       v-else
-      title="No Resource added"
-      description="Add the resource that your service needs to run."
-      createButtonLabel="Add Resource"
+      title="No resources have been created"
+      description="Click the button below to initiate the setup process and create a resource for the service to run."
+      createButtonLabel="Add"
       :documentationService="props.documentationServiceResource"
       :inTabs="true"
     >
@@ -139,7 +139,7 @@
         <PrimeButton
           severity="secondary"
           icon="pi pi-plus"
-          label="Add Resource"
+          label="Add"
           @click="openCreateServiceDrawer"
         />
       </template>

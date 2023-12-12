@@ -26,11 +26,11 @@
     }
   })
 
-  const showEditResourceDrawer = ref(false)
   const showCreateResourceDrawer = ref(false)
-  const selectedResourceToEdit = ref('0')
+  const selectedResourceToEdit = ref('')
   const defaultTrigger = 'Install'
   const contentTypeShellScript = 'Shell Script'
+  const showEditResourceDrawer = ref(false)
 
   const initialValues = {
     name: '',
@@ -48,7 +48,7 @@
         const isValid = /^(\/\.?[\w][\w.-]*)+$/.test(val)
         return isValid
       })
-      .label('Filepath'),
+      .label('Path'),
     contentType: yup.string().required(),
     trigger: yup.string().when('contentType', {
       is: contentTypeShellScript,
@@ -96,7 +96,6 @@
 
 <template>
   <CreateDrawerBlock
-    v-if="showCreateResourceDrawer"
     v-model:visible="showCreateResourceDrawer"
     :createService="createResourcesServices"
     :schema="validationSchema"
@@ -108,7 +107,6 @@
       <FormFieldsDrawerResource :disabledFields="disabledFields" />
     </template>
   </CreateDrawerBlock>
-
   <EditDrawerBlock
     v-if="showEditResourceDrawer"
     :id="selectedResourceToEdit"

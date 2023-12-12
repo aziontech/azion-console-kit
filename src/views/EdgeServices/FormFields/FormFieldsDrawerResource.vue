@@ -47,8 +47,8 @@
 <template>
   <form-horizontal
     :isDrawer="true"
-    title="Resource Settingn"
-    description="Description"
+    title="Resource"
+    description="Configure the resources needed to install, uninstall, and reload your services."
   >
     <template #inputs>
       <div class="flex flex-col w-full sm:max-w-3xl gap-2">
@@ -57,7 +57,7 @@
             <label
               for="name"
               class="text-color text-sm not-italic font-medium leading-5"
-              >Filepath *</label
+              >Path *</label
             >
             <InputText
               v-model="name"
@@ -70,6 +70,9 @@
               class="p-error text-xs font-normal leading-tight"
               >{{ nameError }}</small
             >
+            <small class="text-color-secondary text-sm font-normal leading-tight">
+              The absolute path of the resource.
+            </small>
           </div>
         </div>
       </div>
@@ -115,6 +118,9 @@
       >
         <div class="flex flex-col gap-2">
           <label class="text-color text-sm not-italic font-medium leading-5">Trigger Type *</label>
+          <small class="text-color-secondary text-xs not-italic font-normal leading-5">
+            Define the trigger for when the script is executed.
+          </small>
           <div class="flex flex-col gap-3">
             <div class="flex no-wrap gap-2 items-center">
               <RadioButton
@@ -159,11 +165,6 @@
               </label>
             </div>
           </div>
-          <small class="text-color-secondary text-xs not-italic font-normal leading-5">
-            Defines actions performed when the resource state changes in the Edge Node. For example,
-            a resource with an Install trigger is executed the first time it is copied to the Edge
-            Node.
-          </small>
         </div>
       </div>
       <div class="flex flex-col w-full sm:max-w-3xl gap-2">
@@ -190,9 +191,12 @@
                 {{ contentError }}
               </small>
               <small class="text-color-secondary text-xs not-italic font-normal leading-5">
-                The content of the resource, to be copied to the Edge Node. When the type is “Shell
-                Script”, it must be a valid POSIX shell script. If you want it to work with resource
-                content variables, you must add .
+                The content of the resource.<br />
+                You can add variables to the resource content by referencing the tag
+                <code>&#123;&#123; VARNAME &#125;&#125;</code><br />
+                <strong>Shell Script</strong> resources must carry a shebang in the content header.
+                In the absence of one, the POSIX-compliant shell on the device
+                (<code>/bin/sh</code>) will be used.
               </small>
             </div>
           </div>
