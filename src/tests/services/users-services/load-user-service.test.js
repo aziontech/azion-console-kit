@@ -4,23 +4,23 @@ import { describe, expect, it, vi } from 'vitest'
 
 const fixtures = {
   userMock: {
-    country_call_code: "BR - 55",
-    date_joined: "2023-09-19T19:53:33Z",
-    email: "paulo.ferreira+teste1@azion.com",
-    first_name: "Paulo",
+    country_call_code: 'BR - 55',
+    date_joined: '2023-09-19T19:53:33Z',
+    email: 'test.ferreira+teste1@azion.com',
+    first_name: 'test',
     id: 3652,
     is_account_owner: true,
     is_active: true,
     is_staff: true,
     is_trial: true,
-    language: "en",
-    last_login: "2023-12-12T17:52:07.700273Z",
-    last_name: "Sobrinho Ferreira",
-    mobile: "89994258779",
-    phone: "",
+    language: 'en',
+    last_login: '2023-12-12T17:52:07.700273Z',
+    last_name: 'test',
+    mobile: '89994258779',
+    phone: '',
     teams: [],
-    timezone: "GMT",
-    two_factor_enabled: true,
+    timezone: 'GMT',
+    two_factor_enabled: true
   }
 }
 
@@ -36,12 +36,12 @@ describe('UsersServices', () => {
   it('should call api with correct params', async () => {
     const requestSpy = vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
       statusCode: 200,
-      body: {data: fixtures.userMock}
+      body: { data: fixtures.userMock }
     })
 
     const { sut } = makeSut()
 
-    await sut({id : fixtures.userMock.id })
+    await sut({ id: fixtures.userMock.id })
 
     expect(requestSpy).toHaveBeenCalledWith({
       url: `users/${fixtures.userMock.id}`,
@@ -51,9 +51,9 @@ describe('UsersServices', () => {
 
   it('should parse correctly each returned item', async () => {
     vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
-        statusCode: 200,
-        body:  {data: fixtures.userMock}
-      })
+      statusCode: 200,
+      body: { data: fixtures.userMock }
+    })
     const { sut } = makeSut()
 
     const result = await sut({})
@@ -67,7 +67,7 @@ describe('UsersServices', () => {
       isAccountOwner: fixtures.userMock.is_account_owner,
       isActive: fixtures.userMock.is_active,
       isStaff: fixtures.userMock.is_staff,
-      isTrial:  fixtures.userMock.is_trial,
+      isTrial: fixtures.userMock.is_trial,
       language: fixtures.userMock.language,
       lastLogin: fixtures.userMock.last_login,
       lastName: fixtures.userMock.last_name,

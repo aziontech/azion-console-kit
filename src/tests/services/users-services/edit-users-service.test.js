@@ -5,14 +5,14 @@ import * as Errors from '@/services/axios/errors'
 
 const fixtures = {
   userMock: {
-    firstName: "test",
-    lastName: "test",
-    timezone:"GTM",
-    language: "en",
-    countryCallCode: "",
-    email: "testt@azion.com",
-    mobile: "",
-    twoFactorEnabled: false,
+    firstName: 'test',
+    lastName: 'test',
+    timezone: 'GTM',
+    language: 'en',
+    countryCallCode: '',
+    email: 'testt@azion.com',
+    mobile: '',
+    twoFactorEnabled: false
   }
 }
 
@@ -37,7 +37,7 @@ describe('UsersServices', () => {
       url: `iam/user`,
       method: 'PATCH',
       body: {
-        first_name:  fixtures.userMock.firstName,
+        first_name: fixtures.userMock.firstName,
         last_name: fixtures.userMock.lastName,
         email: fixtures.userMock.email,
         language: fixtures.userMock.language,
