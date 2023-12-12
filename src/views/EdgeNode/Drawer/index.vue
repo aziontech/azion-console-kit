@@ -4,6 +4,8 @@
   import FormFieldsDrawerService from '@/views/EdgeNode/FormFields/FormFieldsDrawerService'
   import CreateDrawerBlock from '@templates/create-drawer-block'
   import EditDrawerBlock from '@templates/edit-drawer-block'
+  import { refDebounced } from '@vueuse/core'
+
   defineOptions({ name: 'drawer-service' })
 
   const emit = defineEmits(['onSuccess'])
@@ -33,7 +35,9 @@
   const listService = ref([])
   const showEditServiceDrawer = ref(false)
   const showCreateServiceDrawer = ref(false)
+  const debouncedDrawerEdit = 300
   const selectedServiceToEdit = ref('0')
+  const loadEditServiceDrawer = refDebounced(showEditServiceDrawer, debouncedDrawerEdit)
 
   const initialValues = {
     service: {},
@@ -102,7 +106,6 @@
 
 <template>
   <CreateDrawerBlock
-    v-if="showCreateServiceDrawer"
     v-model:visible="showCreateServiceDrawer"
     :createService="createServiceEdgeNodeService"
     :schema="validationSchema"
@@ -116,7 +119,7 @@
   </CreateDrawerBlock>
 
   <EditDrawerBlock
-    v-if="showEditServiceDrawer"
+    v-if="loadEditServiceDrawer"
     :id="selectedServiceToEdit"
     v-model:visible="showEditServiceDrawer"
     :loadService="loadService"
