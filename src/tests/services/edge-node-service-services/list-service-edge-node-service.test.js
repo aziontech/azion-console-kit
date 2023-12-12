@@ -2,9 +2,16 @@ import { AxiosHttpClientAdapter } from '@/services/axios/AxiosHttpClientAdapter'
 import { listServiceEdgeNodeService } from '@/services/edge-node-service-services'
 import { describe, expect, it, vi } from 'vitest'
 
+const localeMock = (locale = 'en') => {
+  const DateTimeFormat = Intl.DateTimeFormat
+  vi.spyOn(window.global.Intl, 'DateTimeFormat')
+    .mockImplementationOnce((_, options) => DateTimeFormat(locale, { ...options }))
+    .mockImplementationOnce((_, options) => DateTimeFormat(locale, { ...options }))
+}
+
 const fixtures = {
   payload: {
-    id: 123,
+    edgeNodeId: 123,
     bound: true,
     page: 1
   },
@@ -47,12 +54,13 @@ describe('EdgeNodeServices', () => {
     await sut(fixtures.payload)
 
     expect(requestSpy).toHaveBeenCalledWith({
-      url: `edge_node/${fixtures.payload.id}/services?page=1&page_size=1000000&is_bound=${fixtures.payload.bound}`,
+      url: `edge_node/${fixtures.payload.edgeNodeId}/services?page=1&page_size=1000000&is_bound=${fixtures.payload.bound}`,
       method: 'GET'
     })
   })
 
   it('should parsed correctly all returned firewalls', async () => {
+    localeMock()
     vi.setSystemTime(new Date(2023, 10, 10, 10))
     vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
       statusCode: 200,

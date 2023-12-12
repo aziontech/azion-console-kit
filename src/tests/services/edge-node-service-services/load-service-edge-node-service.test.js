@@ -4,8 +4,8 @@ import { describe, expect, it, vi } from 'vitest'
 
 const fixtures = {
   mockIds: {
-    id: 76789,
-    serviceId: 1
+    edgeNodeId: 76789,
+    id: 1
   },
   mockResponse: {
     id: 17,
@@ -39,7 +39,7 @@ describe('EdgeNodeServices', () => {
     await sut(fixtures.mockIds)
 
     expect(requestSpy).toHaveBeenCalledWith({
-      url: `edge_node/${fixtures.mockIds.id}/services/${fixtures.mockIds.serviceId}`,
+      url: `edge_node/${fixtures.mockIds.edgeNodeId}/services/${fixtures.mockIds.id}`,
       method: 'GET'
     })
   })

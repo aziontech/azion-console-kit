@@ -1,15 +1,15 @@
 <script setup>
   import ListTableBlock from '@/templates/list-table-block'
   import EmptyResultsBlock from '@/templates/empty-results-block'
-  import Illustration from '@/assets/svg/illustration-layers.vue'
+  import Illustration from '@/assets/svg/illustration-layers'
   import ContentBlock from '@/templates/content-block'
   import PageHeadingBlock from '@/templates/page-heading-block'
   import EdgeServicesToggleStatus from '@/views/EdgeServices/Dialog/EdgeServicesToggleStatus'
   import { computed, ref } from 'vue'
   import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
+  defineOptions({ name: 'list-edge-service' })
 
   import { useRouter } from 'vue-router'
-  defineOptions({ name: 'edge-services-view' })
 
   const props = defineProps({
     listEdgeServiceServices: {
@@ -106,8 +106,8 @@
         :listService="props.listEdgeServiceServices"
         :deleteService="props.deleteEdgeServiceServices"
         :columns="getColumns"
-        pageTitleDelete="Edge Service"
-        addButtonLabel="Edge Services"
+        pageTitleDelete="Service"
+        addButtonLabel="Add"
         createPagePath="edge-services/create"
         editPagePath="edge-services/edit"
         @on-load-data="handleLoadData"
@@ -116,9 +116,9 @@
 
       <EmptyResultsBlock
         v-else
-        title="No edge services added"
-        description="Create your first edge service."
-        createButtonLabel="Edge Services"
+        title="No services have been created"
+        description="Click the button below to initiate the setup process and create your first service."
+        createButtonLabel="Add"
         createPagePath="edge-services/create"
         :documentationService="props.documentationService"
       >

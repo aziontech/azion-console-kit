@@ -9,7 +9,7 @@
     name: 'edit-drawer-block'
   })
 
-  const emit = defineEmits(['update:visible', 'onSuccess'])
+  const emit = defineEmits(['update:visible', 'onSuccess', 'onError'])
   const props = defineProps({
     id: {
       type: String,
@@ -45,7 +45,7 @@
   const loading = ref(false)
 
   const disableEdit = computed(() => {
-    return !meta.value.valid || loading.value
+    return !meta.value.valid || loading.value || isSubmitting.value
   })
 
   const isLoading = computed(() => {
@@ -82,6 +82,7 @@
       const initialValues = await props.loadService({ id: props.id })
       resetForm({ values: initialValues })
     } catch (error) {
+      emit('onError', error)
       showToast('error', error)
     } finally {
       loading.value = false
@@ -90,16 +91,14 @@
 
   const onSubmit = handleSubmit(async (values, formContext) => {
     try {
-      loading.value = true
       const feedback = await props.editService(values)
       emit('onSuccess', feedback)
       showToast('success', feedback)
       formContext.resetForm()
       toggleDrawerVisibility(false)
     } catch (error) {
+      emit('onError', error)
       showToast('error', error)
-    } finally {
-      loading.value = false
     }
   })
 
@@ -124,8 +123,14 @@
       <h2>{{ title }}</h2>
     </template>
     <div class="flex w-full md:p-8 pb-0">
-      <form class="w-full flex flex-col gap-8">
-        <slot name="formFields" />
+      <form
+        @submit.prevent="handleSubmit"
+        class="w-full flex flex-col gap-8"
+      >
+        <slot
+          name="formFields"
+          :disabledFields="isLoading"
+        />
       </form>
     </div>
     <div class="sticky bottom-0">

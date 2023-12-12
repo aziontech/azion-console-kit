@@ -1,42 +1,13 @@
-<template>
-  <ContentBlock>
-    <template #heading>
-      <PageHeadingBlock pageTitle="Edge Nodes"></PageHeadingBlock>
-    </template>
-    <template #content>
-      <Authorize :authorize="edgeNodeSelected" />
-      <ListTableBlock
-        v-if="hasContentToList"
-        :listService="props.listEdgeNodeService"
-        :deleteService="props.deleteEdgeNodeService"
-        :columns="getColumns"
-        pageTitleDelete="Edge Node"
-        addButtonLabel=""
-        createPagePath=""
-        editPagePath="edge-node/edit"
-        @on-load-data="handleLoadData"
-        :rowActions="actionsRow"
-      />
-      <EmptyEdgeNode
-        v-else
-        :documentationService="props.documentationService"
-      >
-        <template #illustration>
-          <Illustration />
-        </template>
-      </EmptyEdgeNode>
-    </template>
-  </ContentBlock>
-</template>
 <script setup>
   import ListTableBlock from '@/templates/list-table-block'
-  import EmptyEdgeNode from '@/templates/empty-results-block/empty-edge-node.vue'
-  import Illustration from '@/assets/svg/illustration-layers.vue'
+  import EmptyEdgeNode from '@/templates/empty-results-block/empty-edge-node'
+  import Illustration from '@/assets/svg/illustration-layers'
   import ContentBlock from '@/templates/content-block'
   import PageHeadingBlock from '@/templates/page-heading-block'
   import Authorize from '@/views/EdgeNode/Dialog/Authorize'
   import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
   import { computed, ref } from 'vue'
+  defineOptions({ name: 'list-edge-node' })
 
   const props = defineProps({
     listEdgeNodeService: {
@@ -103,3 +74,31 @@
     hasContentToList = event
   }
 </script>
+<template>
+  <ContentBlock>
+    <template #heading>
+      <PageHeadingBlock pageTitle="Edge Nodes"></PageHeadingBlock>
+    </template>
+    <template #content>
+      <Authorize :authorize="edgeNodeSelected" />
+      <ListTableBlock
+        v-if="hasContentToList"
+        :listService="props.listEdgeNodeService"
+        :deleteService="props.deleteEdgeNodeService"
+        :columns="getColumns"
+        pageTitleDelete="Edge Node"
+        editPagePath="edge-node/edit"
+        @on-load-data="handleLoadData"
+        :rowActions="actionsRow"
+      />
+      <EmptyEdgeNode
+        v-else
+        :documentationService="props.documentationService"
+      >
+        <template #illustration>
+          <Illustration />
+        </template>
+      </EmptyEdgeNode>
+    </template>
+  </ContentBlock>
+</template>

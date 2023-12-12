@@ -116,11 +116,6 @@ const getConfig = () => {
           target: `${URLStartPrefix}manager-origin.azion.com/api`,
           changeOrigin: true,
           rewrite: (path) => path.replace(/^\/api/, '')
-        },
-        '/api/storage-google': {
-          target: 'https://storage.googleapis.com',
-          changeOrigin: true,
-          rewrite: (path) => path.replace(/^\/storage/, '')
         }
       }
     }

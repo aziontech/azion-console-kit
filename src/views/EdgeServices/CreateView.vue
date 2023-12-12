@@ -3,8 +3,9 @@
   import ActionBarTemplate from '@/templates/action-bar-block/action-bar-with-teleport'
   import ContentBlock from '@/templates/content-block'
   import PageHeadingBlock from '@/templates/page-heading-block'
-  import FormCreateEdgeService from './FormFields/FormFieldsEdgeService.vue'
+  import FormCreateEdgeService from './FormFields/FormFieldsEdgeService'
   import * as yup from 'yup'
+  defineOptions({ name: 'create-edge-service' })
 
   const props = defineProps({
     createEdgeServiceServices: {

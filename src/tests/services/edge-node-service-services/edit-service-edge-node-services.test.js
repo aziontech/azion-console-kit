@@ -5,8 +5,8 @@ import * as Errors from '@/services/axios/errors'
 
 const fixtures = {
   mock: {
-    id: 13,
-    serviceId: 1987867,
+    edgeNodeId: 13,
+    id: 1987867,
     name: 'My Edge Service',
     variables: 'port=53'
   }
@@ -30,11 +30,11 @@ describe('EdgeNodeServices', () => {
     await sut(fixtures.mock)
 
     expect(requestSpy).toHaveBeenCalledWith({
-      url: `edge_node/${fixtures.mock.id}/services/${fixtures.mock.serviceId}`,
+      url: `edge_node/${fixtures.mock.edgeNodeId}/services/${fixtures.mock.id}`,
       method: 'PATCH',
       body: {
-        id: fixtures.mock.id,
-        service_id: fixtures.mock.serviceId,
+        id: fixtures.mock.edgeNodeId,
+        service_id: fixtures.mock.id,
         service_name: fixtures.mock.name,
         variables: [
           {
