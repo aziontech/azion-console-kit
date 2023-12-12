@@ -113,8 +113,11 @@
     @onSuccess="emit('onSuccess')"
     title="Create Service"
   >
-    <template #formFields>
-      <FormFieldsDrawerService :listServices="listService" />
+    <template #formFields="{ disabledFields }">
+      <FormFieldsDrawerService
+        :listServices="listService"
+        :disabledFields="disabledFields"
+      />
     </template>
   </CreateDrawerBlock>
 
@@ -128,8 +131,11 @@
     @onSuccess="emit('onSuccess')"
     title="Edit Service"
   >
-    <template #formFields>
-      <FormFieldsDrawerService :listServices="listService" />
+    <template #formFields="{ disabledFields }">
+      <FormFieldsDrawerService
+        :listServices="listService"
+        :disabledFields="disabledFields"
+      />
     </template>
   </EditDrawerBlock>
 </template>

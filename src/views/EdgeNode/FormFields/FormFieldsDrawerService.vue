@@ -10,17 +10,24 @@
     listServices: {
       type: Array,
       required: true
+    },
+    disabledFields: {
+      type: Boolean,
+      default: false
     }
   })
 
   const { value: service } = useField('service')
   const { value: variables, errorMessage: variablesError } = useField('variables')
 
-  const editorOptions = {
-    minimap: { enabled: false },
-    tabSize: 2,
-    formatOnPaste: true
-  }
+  const editorOptions = computed(() => {
+    return {
+      minimap: { enabled: false },
+      tabSize: 2,
+      formatOnPaste: true,
+      readOnly: props.disabledFields
+    }
+  })
 
   const store = useAccountStore()
   const theme = computed(() => {
@@ -48,6 +55,7 @@
               v-model="service"
               :options="props.listServices"
               :loading="props.listServices.length === 0"
+              :disabled="props.disabledFields"
               optionLabel="name"
               filter
               placeholder="Select"
