@@ -25,8 +25,7 @@
 <template>
   <FormHorizontal
     title="General"
-    description="Services define dependencies between resources and natively implements a set of functions
-    for Azion products."
+    description="Services define dependencies between resources."
   >
     <template #inputs>
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
@@ -53,8 +52,7 @@
   </FormHorizontal>
   <FormHorizontal
     title="Variables"
-    description="Variables are dynamic values that affect the Edge Services that will be orchestrated and run on Edge Nodes. 
-    You can orchestrate and run the same service on different devices with different values for the settings."
+    description="Variables are dynamic values that affect the edge services that will be orchestrated and run on Edge Nodes."
   >
     <template #inputs>
       <div class="flex flex-col h-full gap-2">
@@ -69,9 +67,6 @@
         <small class="text-color-secondary text-sm font-normal leading-tight">
           Enter the list of variables and values for the resource. Example:
           <code>port = 3306</code>.
-          <br />
-          You can add variables to the resource content by referencing the tag
-          <code>&#123;&#123; VARNAME &#125;&#125;</code>.
         </small>
         <small
           v-if="codeError"

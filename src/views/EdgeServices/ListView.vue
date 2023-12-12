@@ -107,7 +107,7 @@
         :deleteService="props.deleteEdgeServiceServices"
         :columns="getColumns"
         pageTitleDelete="Service"
-        addButtonLabel="Edge Services"
+        addButtonLabel="Add"
         createPagePath="edge-services/create"
         editPagePath="edge-services/edit"
         @on-load-data="handleLoadData"

@@ -200,7 +200,7 @@
         <form-horizontal
           :isDrawer="true"
           title="Resource"
-          description="To be able to orchestrate services on your device, you must configure
+          description="Configure
           the resources needed to install, uninstall, and reload your services."
         >
           <template #inputs>
@@ -274,9 +274,7 @@
                   >Trigger Type *</label
                 >
                 <small class="text-color-secondary text-xs not-italic font-normal leading-5">
-                  Action performed when the resource state changes in the edge node. For example, a
-                  resource with an install trigger is executed the first time it is copied to the
-                  edge node.
+                  Define the trigger for when the script is executed.
                 </small>
                 <div class="flex flex-col gap-3">
                   <div class="flex no-wrap gap-2 items-center">
@@ -349,8 +347,10 @@
                       {{ errors.content }}
                     </small>
                     <small class="text-color-secondary text-xs not-italic font-normal leading-5">
-                      The content of the resource to be copied to the edge node.
-                      <strong>Shell Script</strong> resources must carry a <code>sh-bang</code> in
+                      The content of the resource.<br>
+                      You can add variables to the resource content by referencing the tag
+                      <code>&#123;&#123; VARNAME &#125;&#125;</code><br>
+                      <strong>Shell Script</strong> resources must carry a shebang in
                       the content header. In the absence of one, the POSIX-compliant shell on the
                       device (<code>/bin/sh</code>) will be used.
                     </small>

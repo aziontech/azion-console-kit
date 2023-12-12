@@ -103,7 +103,7 @@
     <EmptyResultsBlock
       v-else
       title="No resources have been created"
-      description="Click the button below to initiate the setup process and create the first resource your service should run."
+      description="Click the button below to initiate the setup process and create a resource for the service to run."
       createButtonLabel="Add"
       createPagePath="edge-services/create"
       :documentationService="props.documentationServiceResource"
