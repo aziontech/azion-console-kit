@@ -59,7 +59,7 @@
                     />
                     <div class="md:ml-auto flex">
                     <PrimeButton
-                      v-if="!isSuccessfullyFinished"
+                      v-if="deployFailed"
                       @click="retry"
                       severity="secondary"
                       :pt="{
@@ -81,7 +81,7 @@
                 Project started {{ seconds }}s ago
               </span>
             </div>
-            <ScriptRunnerBlcok
+            <ScriptRunnerBlock
                 title="Deploy Log"
                 :getLogsService="props.getLogsService"
                 :executionId="executionId"
