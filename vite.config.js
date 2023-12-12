@@ -89,7 +89,7 @@ const getConfig = () => {
         '/api/purge': {
           target: 'https://stage-manager.azion.com/api/purge',
           changeOrigin: true,
-          rewrite: (path) => path.replace(/^\/api\/purge/, ''),
+          rewrite: (path) => path.replace(/^\/api\/purge/, '')
         },
         '/api/permissions': {
           target: `${URLStartPrefix}iam.azion.com/iam/api/permissions`,
@@ -116,11 +116,6 @@ const getConfig = () => {
           target: `${URLStartPrefix}manager-origin.azion.com/api`,
           changeOrigin: true,
           rewrite: (path) => path.replace(/^\/api/, '')
-        },
-         '/api/storage-google': {
-          target: 'https://storage.googleapis.com',
-          changeOrigin: true,
-          rewrite: (path) => path.replace(/^\/storage/, '')
         }
       }
     }

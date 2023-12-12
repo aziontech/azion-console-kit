@@ -135,7 +135,7 @@
   import { useRoute, useRouter } from 'vue-router'
   import PageHeadingBlock from '@/templates/page-heading-block'
   import PrimeButton from 'primevue/button'
-  import ScriptRunnerBlcok from '@/templates/script-runner-block'
+  import ScriptRunnerBlock from '@/templates/script-runner-block'
   import PrimeCard from 'primevue/card'
   import { useToast } from 'primevue/usetoast'
 
