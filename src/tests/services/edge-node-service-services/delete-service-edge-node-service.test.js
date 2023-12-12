@@ -1,10 +1,10 @@
 import { AxiosHttpClientAdapter } from '@/services/axios/AxiosHttpClientAdapter'
-import { deleteEdgeNodeService } from '@/services/edge-node-services'
+import { deleteServiceEdgeNodeService } from '@/services/edge-node-service-services'
 import { describe, expect, it, vi } from 'vitest'
 import * as Errors from '@/services/axios/errors'
 
 const makeSut = () => {
-  const sut = deleteEdgeNodeService
+  const sut = deleteServiceEdgeNodeService
 
   return {
     sut
@@ -16,14 +16,14 @@ describe('EdgeNodeServices', () => {
     const requestSpy = vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
       statusCode: 204
     })
-    const mockId = 12387555
+    const mockId = { edgeNodeId: 123, id: 123 }
     const { sut } = makeSut()
 
     await sut(mockId)
 
     expect(requestSpy).toHaveBeenCalledWith({
       method: 'DELETE',
-      url: `edge_node/${mockId}`
+      url: `edge_node/${mockId.edgeNodeId}/services/${mockId.id}`
     })
   })
 
@@ -37,7 +37,7 @@ describe('EdgeNodeServices', () => {
 
     const feedbackMessage = await sut(mockId)
 
-    expect(feedbackMessage).toBe('Edge Node successfully deleted')
+    expect(feedbackMessage).toBe('Service on Edge Node successfully deleted')
   })
 
   it.each([
@@ -72,7 +72,7 @@ describe('EdgeNodeServices', () => {
         statusCode
       })
       const { sut } = makeSut()
-      const mockId = { edgeNodeId: 123, serviceId: 123 }
+      const mockId = { edgeNodeId: 123, id: 123 }
 
       const response = sut(mockId)
 

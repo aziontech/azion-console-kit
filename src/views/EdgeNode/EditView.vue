@@ -1,12 +1,12 @@
 <script setup>
   import EditFormBlock from '@/templates/edit-form-block'
   import * as yup from 'yup'
-  import FormFieldsEdgeNode from '@/views/EdgeNode/FormFields/FormFieldsEdgeNode.vue'
+  import FormFieldsEdgeNode from '@/views/EdgeNode/FormFields/FormFieldsEdgeNode'
   import ActionBarTemplate from '@/templates/action-bar-block/action-bar-with-teleport'
+  defineOptions({ name: 'edit-edge-node' })
 
   const props = defineProps({
     hiddenActionBar: { type: Boolean, default: false },
-    edgeNodeId: { type: String, required: true },
     listGroupsEdgeNodeService: { type: Function, required: true },
     loadEdgeNodeService: { type: Function, required: true },
     editEdgeNodeService: { type: Function, required: true },
@@ -26,6 +26,7 @@
     :loadService="props.loadEdgeNodeService"
     :updatedRedirect="props.updatedRedirect"
     :schema="validationSchema"
+    :isTabs="true"
   >
     <template #form>
       <FormFieldsEdgeNode :listGroupsService="props.listGroupsEdgeNodeService" />

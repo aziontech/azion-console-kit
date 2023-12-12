@@ -47,6 +47,26 @@ describe('EdgeNodeServices', () => {
     })
   })
 
+  it('should call API with correct params but the variables parameter is empty', async () => {
+    const requestSpy = vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
+      statusCode: 201,
+      body: []
+    })
+
+    const { sut } = makeSut()
+
+    await sut({ ...fixtures.mock, variables: '' })
+
+    expect(requestSpy).toHaveBeenCalledWith({
+      method: 'POST',
+      url: `edge_node/${fixtures.mock.id}/services`,
+      body: {
+        service_id: '123',
+        variables: []
+      }
+    })
+  })
+
   it('should return a feedback message on successfully created', async () => {
     vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
       statusCode: 201,

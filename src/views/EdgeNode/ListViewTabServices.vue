@@ -1,11 +1,12 @@
 <script setup>
-  import ListTableBlock from '@/templates/list-table-block/no-header.vue'
+  import ListTableBlock from '@/templates/list-table-block/no-header'
   import EmptyResultsBlock from '@/templates/empty-results-block'
-  import Illustration from '@/assets/svg/illustration-layers.vue'
+  import Illustration from '@/assets/svg/illustration-layers'
   import { computed, ref } from 'vue'
   import PrimeButton from 'primevue/button'
   import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
   import DrawerService from '@/views/EdgeNode/Drawer'
+  defineOptions({ name: 'list-edge-node-resources-tab' })
 
   const props = defineProps({
     edgeNodeId: { type: String, required: true },
@@ -66,14 +67,14 @@
     })
   }
 
-  const deleteServicesWithDecorator = async (payload) => {
+  const deleteServicesWithDecorator = async (id) => {
     return await props.deleteServiceEdgeNodeService({
       edgeNodeId: props.edgeNodeId,
-      serviceId: payload
+      id
     })
   }
 
-  const reloadResourcesList = () => {
+  const reloadServicesList = () => {
     if (hasContentToList.value) {
       listServiceEdgeNodeRef.value.reload()
       return
@@ -91,7 +92,7 @@
       :createServiceEdgeNodeService="props.createServiceEdgeNodeService"
       :editServiceEdgeNodeService="props.editServiceEdgeNodeService"
       :loadServiceEdgeNodeService="props.loadServiceEdgeNodeService"
-      @onSuccess="reloadResourcesList"
+      @onSuccess="reloadServicesList"
     />
     <div v-if="hasContentToList">
       <ListTableBlock
@@ -99,8 +100,6 @@
         :listService="listServicesWithDecorator"
         :deleteService="deleteServicesWithDecorator"
         :columns="getColumns"
-        createPagePath=""
-        addButtonLabel=""
         pageTitleDelete="Edge Node Service"
         :editInDrawer="openEditServiceDrawer"
         @on-load-data="handleLoadData"

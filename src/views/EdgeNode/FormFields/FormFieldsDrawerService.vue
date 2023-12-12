@@ -4,6 +4,7 @@
   import { computed } from 'vue'
   import { useAccountStore } from '@/stores/account'
   import { useField } from 'vee-validate'
+  defineOptions({ name: 'form-fields-drawer-service' })
 
   const props = defineProps({
     listServices: {
@@ -36,7 +37,6 @@
     <template #inputs>
       <div class="flex flex-col w-full sm:max-w-3xl gap-2">
         <div class="flex flex-col gap-2">
-          <!-- <div class="flex flex-col sm:max-w-lg w-full gap-2"> -->
           <div class="flex w-80 sm:max-w-lg flex-col items-start gap-2">
             <label
               for="name"

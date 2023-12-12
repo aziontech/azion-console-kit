@@ -31,9 +31,10 @@
   })
 
   const listService = ref([])
-  const showEditRecordDrawer = ref(false)
-  const showCreateRecordDrawer = ref(false)
+  const showEditServiceDrawer = ref(false)
+  const showCreateServiceDrawer = ref(false)
   const selectedServiceToEdit = ref('0')
+
   const initialValues = {
     service: {},
     variables: '',
@@ -82,14 +83,14 @@
   const openDrawerCreate = () => {
     listService.value = []
     listServiceEdgeNode()
-    showCreateRecordDrawer.value = true
+    showCreateServiceDrawer.value = true
   }
 
   const openDrawerEdit = (id) => {
     if (id) {
       listService.value = []
       selectedServiceToEdit.value = id.toString()
-      showEditRecordDrawer.value = true
+      showEditServiceDrawer.value = true
     }
   }
 
@@ -101,8 +102,8 @@
 
 <template>
   <CreateDrawerBlock
-    v-if="showCreateRecordDrawer"
-    v-model:visible="showCreateRecordDrawer"
+    v-if="showCreateServiceDrawer"
+    v-model:visible="showCreateServiceDrawer"
     :createService="createServiceEdgeNodeService"
     :schema="validationSchema"
     :initialValues="initialValues"
@@ -115,9 +116,9 @@
   </CreateDrawerBlock>
 
   <EditDrawerBlock
-    v-if="showEditRecordDrawer"
+    v-if="showEditServiceDrawer"
     :id="selectedServiceToEdit"
-    v-model:visible="showEditRecordDrawer"
+    v-model:visible="showEditServiceDrawer"
     :loadService="loadService"
     :editService="editService"
     :schema="validationSchema"
