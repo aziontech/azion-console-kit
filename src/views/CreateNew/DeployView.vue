@@ -162,6 +162,7 @@
   const seconds = ref(0)
   const intervalRef = ref()
   const deployFailed = ref(false)
+  const failMessage = 'We encountered an issue while deploying your Edge Application. For more details, please refer to the deploy log.'
   const nextSteps = ref([
     {
       title: 'Customize Domain',
@@ -196,7 +197,7 @@
         closable: true,
         severity: 'error',
         summary: 'Deploy failed',
-        detail: error
+        detail: failMessage
       })
     }
   }
