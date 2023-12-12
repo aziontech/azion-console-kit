@@ -110,14 +110,13 @@
     :model="profileMenuItems"
     :popup="true"
     ref="profile"
-    class=""
     :pt="{
       root: { class: 'w-[280px] pb-2 pt-0 z-50 left-auto right-0 mr-9' },
       content: { class: 'text-sm' }
     }"
   >
     <template #start>
-      <div class="flex flex-column px-2.5 h-14 justify-center">
+      <div class="flex flex-column px-2.5 py-3 mt-2 h-14 justify-center">
         <div class="flex flex-column align gap-1">
           <span class="text-sm font-medium">{{ user.name }}</span>
           <div class="flex gap-2">
@@ -177,7 +176,7 @@
           </template>
         </Dropdown>
       </div>
-      <Divider class="surface-border p-1 m-0" />
+      <Divider class="-ml-2 w-[calc(100%+1rem)] mb-3 mt-2" />
       <PrimeButton
         class="w-full rounded-md flex content-start text-left"
         :pt="{
@@ -218,11 +217,11 @@
   const showProfile = ref(false)
   const profileMenuDefault = [
     {
-      label: 'Configurações da Conta',
+      label: 'Account Settings',
       to: '/account-settings'
     },
     {
-      label: 'Gerenciamento de Usuários',
+      label: 'Users Management',
       to: '/users'
     },
     {

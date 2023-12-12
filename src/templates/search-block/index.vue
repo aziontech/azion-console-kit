@@ -67,36 +67,27 @@
 </template>
 
 <script setup>
-  import { ref, onUnmounted } from 'vue'
+import { ref, watchEffect } from 'vue'
+import { useMagicKeys } from '@vueuse/core'
 
-  import Tag from 'primevue/tag'
-  import InputText from 'primevue/inputtext'
-  import PrimeDialog from 'primevue/dialog'
-  import PrimeButton from 'primevue/button'
+import Tag from 'primevue/tag'
+import InputText from 'primevue/inputtext'
+import PrimeDialog from 'primevue/dialog'
+import PrimeButton from 'primevue/button'
 
-  defineOptions({ name: 'search-block' })
+const { meta, k, control } = useMagicKeys()
 
-  const search = ref('')
-  const showSearch = ref(false)
+defineOptions({ name: 'search-block' })
 
-  const openSearch = () => {
-    showSearch.value = true
-  }
+const search = ref('')
+const showSearch = ref(false)
 
-  const listenerKeyDown = () => {
-    document.addEventListener('keydown', () => {
-      const isCommandKeyPressed = event.metaKey || event.ctrlKey
-      const isKKeyPressed = event.key === 'k' || event.key === 'K'
+const openSearch = () => {
+  showSearch.value = true
+}
 
-      if (isCommandKeyPressed && isKKeyPressed) {
-        showSearch.value = true
-      }
-    })
-  }
-
-  listenerKeyDown()
-
-  onUnmounted(() => {
-    document.removeEventListener('keydown', () => {})
-  })
+watchEffect(() => {
+  if (control.value && k.value) openSearch()
+  if (meta.value && k.value) openSearch()
+})
 </script>

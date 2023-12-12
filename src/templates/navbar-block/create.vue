@@ -21,14 +21,14 @@
     v-model:visible="createModalIsOpen"
     modal
     header="New"
+    class="w-full"
     :pt="{
-      root: { class: 'hidden sm:flex' },
-      content: { class: 'p-0' },
+      root: { class: 'hidden w-full lg:max-w-screen-lg 2xl:max-w-screen-xl h-[640px] sm:flex' },
+      content: { class: ' w-full  h-full p-0' },
       mask: { class: 'hidden sm:flex' }
     }"
     position="center"
     :dismissableMask="true"
-    :breakpoints="{ '641px': '90vw' }"
     @update:visible="closeCreateModalStore()"
   >
     <div>
