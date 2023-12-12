@@ -1,9 +1,10 @@
 <script setup>
-  defineOptions({ name: 'edge-services-toggle-status' })
   import { ref, watch, computed } from 'vue'
   import PrimeDialog from 'primevue/dialog'
   import PrimeButton from 'primevue/button'
   import { useToast } from 'primevue/usetoast'
+  defineOptions({ name: 'edge-services-toggle-status' })
+
   const emit = defineEmits(['update:visible', 'updateService'])
 
   const props = defineProps({
