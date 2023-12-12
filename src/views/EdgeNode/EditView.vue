@@ -5,6 +5,7 @@
   import ActionBarTemplate from '@/templates/action-bar-block/action-bar-with-teleport'
 
   const props = defineProps({
+    hiddenActionBar: { type: Boolean, default: false },
     edgeNodeId: { type: String, required: true },
     listGroupsEdgeNodeService: { type: Function, required: true },
     loadEdgeNodeService: { type: Function, required: true },
@@ -31,6 +32,7 @@
     </template>
     <template #action-bar="{ onSubmit, formValid, onCancel, loading }">
       <ActionBarTemplate
+        v-if="props.hiddenActionBar"
         @onSubmit="onSubmit"
         @onCancel="onCancel"
         :loading="loading"

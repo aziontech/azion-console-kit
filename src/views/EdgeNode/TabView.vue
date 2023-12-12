@@ -63,6 +63,7 @@
           <div class="mt-4">
             <EditView
               :edgeNodeId="edgeNodeId"
+              :hiddenActionBar="!activeTab"
               :listGroupsEdgeNodeService="props.listGroupsEdgeNodeService"
               :loadEdgeNodeService="props.loadEdgeNodeService"
               :editEdgeNodeService="props.editEdgeNodeService"
