@@ -11,7 +11,7 @@
         :disableRedirect="true"
       >
         <template #form>
-          <FormFieldsSettings
+          <FormFieldsYourSettings
             :listTimezonesService="listTimezonesService"
             :listCountriesPhoneService="listCountriesPhoneService"
           />
@@ -30,10 +30,12 @@
 </template>
 
 <script setup>
+  import { ref } from 'vue'
+
   import EditFormBlock from '@/templates/edit-form-block'
   import ContentBlock from '@/templates/content-block'
   import PageHeadingBlock from '@/templates/page-heading-block'
-  import FormFieldsSettings from './FormFields/FormFieldsSettings'
+  import FormFieldsYourSettings from './FormFields/FormFieldsYourSettings.vue'
   import ActionBarBlockWithTeleport from '@templates/action-bar-block/action-bar-with-teleport'
   import * as yup from 'yup'
   import { useAccountStore } from '@/stores/account'
@@ -63,6 +65,13 @@
     return await props.loadUserService({ id })
   }
 
+  const passwordRequirementsList = ref([
+    { label: '> 7 characters', valid: false },
+    { label: 'Uppercase letter', valid: false },
+    { label: 'Lowercase letter', valid: false },
+    { label: 'Special character (e.g. !?<>@#$%)', valid: false }
+  ])
+
   const validationSchema = yup.object({
     firstName: yup.string().required('first name is a required field').max(30),
     lastName: yup.string().required('last name is a required field').max(30),
@@ -75,7 +84,23 @@
     oldPassword: yup.string(),
     password: yup.string().when('oldPassword', {
       is: (val) => !!val, // Set the field as required when oldPassword has a value
-      then: () => yup.string().required('Password is required')
+      then: () =>
+        yup
+          .string()
+          .required('Password is required')
+          .test('max', 'Exceeded number of characters', (value) => value?.length <= 128)
+          .test('noSpaces', 'Spaces are not allowed', (value) => !value?.match(/\s/g))
+          .test('requirements', '', (value) => {
+            const hasUpperCase = value && /[A-Z]/.test(value)
+            const hasLowerCase = value && /[a-z]/.test(value)
+            const hasSpecialChar = value && /[!@#$%^&*(),.?":{}|<>]/.test(value)
+            const hasMinLength = value?.length > 7
+            passwordRequirementsList.value[0].valid = hasMinLength
+            passwordRequirementsList.value[1].valid = hasUpperCase
+            passwordRequirementsList.value[2].valid = hasLowerCase
+            passwordRequirementsList.value[3].valid = hasSpecialChar
+            return hasMinLength && hasUpperCase && hasLowerCase && hasSpecialChar
+          })
     }),
     confirmPassword: yup.string().when('password', {
       is: (val) => !!val,

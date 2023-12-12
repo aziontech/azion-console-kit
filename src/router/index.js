@@ -26,7 +26,7 @@ import { createNewRoutes } from '@routes/create-new-routes'
 import { mfaRoutes } from '@routes/mfa-routes'
 import { signupRoutes } from '@routes/signup-routes'
 import { marketplaceRoutes } from '@routes/marketplace-routes'
-import { settingsRoutes } from '@routes/settings-routes'
+import { settingsRoutes } from '@/router/routes/your-settings-routes'
 import beforeEachRoute from './hooks/beforeEachRoute'
 
 const router = createRouter({

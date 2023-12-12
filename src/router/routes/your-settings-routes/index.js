@@ -8,7 +8,7 @@ export const settingsRoutes = {
     {
       path: '',
       name: 'settings',
-      component: () => import('@views/Settings/EditView.vue'),
+      component: () => import('@views/YourSettings/EditView.vue'),
       props: {
         listCountriesPhoneService: UsersService.listCountriesPhoneService,
         listTimezonesService: UsersService.listTimezonesService,
