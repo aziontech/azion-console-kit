@@ -84,6 +84,10 @@
     }
   }
 
+  const closeDrawerEdit = () => {
+    showEditResourceDrawer.value = false
+  }
+
   defineExpose({
     openDrawerCreate,
     openDrawerEdit
@@ -100,8 +104,8 @@
     @onSuccess="emit('onSuccess')"
     title="Create Resource"
   >
-    <template #formFields>
-      <FormFieldsDrawerResource />
+    <template #formFields="{ disabledFields }">
+      <FormFieldsDrawerResource :disabledFields="disabledFields" />
     </template>
   </CreateDrawerBlock>
 
@@ -113,10 +117,11 @@
     :editService="editService"
     :schema="validationSchema"
     @onSuccess="emit('onSuccess')"
+    @onError="closeDrawerEdit"
     title="Edit Resource"
   >
-    <template #formFields>
-      <FormFieldsDrawerResource />
+    <template #formFields="{ disabledFields }">
+      <FormFieldsDrawerResource :disabledFields="disabledFields" />
     </template>
   </EditDrawerBlock>
 </template>

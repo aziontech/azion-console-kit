@@ -7,15 +7,25 @@
   import { useField } from 'vee-validate'
   defineOptions({ name: 'form-fields-drawer-resource' })
 
+  const props = defineProps({
+    disabledFields: {
+      type: Boolean,
+      default: false
+    }
+  })
+
   const store = useAccountStore()
   const defaultTrigger = 'Install'
   const contentTypeShellScript = 'Shell Script'
-  const editorOptions = {
-    minimap: { enabled: false },
-    tabSize: 2,
-    formatOnPaste: true
-  }
 
+  const editorOptions = computed(() => {
+    return {
+      minimap: { enabled: false },
+      tabSize: 2,
+      formatOnPaste: true,
+      readOnly: props.disabledFields
+    }
+  })
   const { value: name, errorMessage: nameError } = useField('name')
   const { value: contentType } = useField('contentType')
   const { value: trigger, setValue: setTrigger } = useField('trigger')
@@ -53,6 +63,7 @@
               v-model="name"
               type="text"
               :class="{ 'p-invalid': nameError }"
+              :disabled="props.disabledFields"
             />
             <small
               v-if="nameError"
@@ -72,6 +83,7 @@
                 inputId="shell-script"
                 name="shell-script"
                 value="Shell Script"
+                :disabled="props.disabledFields"
                 @change="handleShellScriptOption"
               />
               <label
@@ -85,6 +97,7 @@
                 v-model="contentType"
                 inputId="content-type-text"
                 name="content-type-text"
+                :disabled="props.disabledFields"
                 value="Text"
               />
               <label
@@ -106,6 +119,7 @@
             <div class="flex no-wrap gap-2 items-center">
               <RadioButton
                 v-model="trigger"
+                :disabled="props.disabledFields"
                 inputId="trigger-install"
                 name="trigger-install"
                 value="Install"
@@ -119,6 +133,7 @@
             <div class="flex no-wrap gap-2 items-center">
               <RadioButton
                 v-model="trigger"
+                :disabled="props.disabledFields"
                 inputId="trigger-reload"
                 name="trigger-reload"
                 value="Reload"
@@ -132,6 +147,7 @@
             <div class="flex no-wrap gap-2 items-center">
               <RadioButton
                 v-model="trigger"
+                :disabled="props.disabledFields"
                 inputId="trigger-uninstall"
                 name="trigger-uninstall"
                 value="Uninstall"
