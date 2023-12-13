@@ -27,14 +27,13 @@
         />
       </div>
 
-      <div class="ml-auto">
+      <div class="ml-auto hidden">
         <SearchBlock />
       </div>
 
       <div class="flex gap-2 items-center ml-2 md:ml-auto">
         <Create />
         <Help />
-        <Notification />
         <ProfileBlock />
       </div>
     </div>
@@ -58,7 +57,6 @@
   import SearchBlock from '@templates/search-block'
   import Create from './create'
   import Help from './help'
-  import Notification from './notification'
   import SwitchAccount from './switch-account'
   import ProfileBlock from '@templates/profile-block'
 
