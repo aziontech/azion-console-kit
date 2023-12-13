@@ -73,28 +73,26 @@ describe('EdgeApplicationServices', () => {
 
     expect(result).toEqual([
       {
-        active: 'active',
-        debugRules: 'active',
         id: fixtures.edgeApplicationsMock.id,
-        lastEditor: fixtures.edgeApplicationsMock.last_editor,
-        lastModify: 'Friday, November 10, 2023',
-        lastModifyDate: new Date('2023-11-10T00:00:00.000Z'),
         name: fixtures.edgeApplicationsMock.name,
         origins: `${fixtures.edgeApplicationsMock.origins.at(0).name},${
           fixtures.edgeApplicationsMock.origins.at(1).name
-        }`
+        }`,
+        status: { content: 'Active', severity: 'success' },
+        lastEditor: 'az editor',
+        lastModify: 'Friday, November 10, 2023',
+        lastModifyDate: new Date('2023-11-10T00:00:00.000Z'),
       },
       {
-        active: 'disabled',
-        debugRules: 'disabled',
         id: fixtures.disabledEdgeApplicationsMock.id,
-        lastEditor: fixtures.disabledEdgeApplicationsMock.last_editor,
-        lastModify: 'Sunday, December 10, 2023',
-        lastModifyDate: new Date('2023-12-10T00:00:00.000Z'),
         name: fixtures.disabledEdgeApplicationsMock.name,
         origins: `${fixtures.disabledEdgeApplicationsMock.origins.at(0).name},${
           fixtures.disabledEdgeApplicationsMock.origins.at(1).name
-        }`
+        }`,
+        status: { content: 'Inactive', severity: 'danger' },
+        lastEditor: 'az editor 2',
+        lastModify: 'Sunday, December 10, 2023',
+        lastModifyDate: new Date('2023-12-10T00:00:00.000Z'),
       }
     ])
   })
