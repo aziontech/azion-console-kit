@@ -55,7 +55,7 @@
       <EditFormBlock
         :editService="updateAccountSettingsService"
         :loadService="getAccountSettingsService"
-        updatedRedirect="home"
+        updatedRedirect="account-settings"
         :schema="validationSchema"
       >
         <template #form>
