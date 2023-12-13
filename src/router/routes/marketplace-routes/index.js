@@ -1,4 +1,6 @@
 import * as MarketplaceService from '@/services/marketplace-services'
+import * as TemplateEngineService from '@/services/template-engine-services'
+import * as ScriptRunnerService from '@/services/script-runner-service'
 import { windowOpen } from '@/helpers/window-open'
 
 /** @type {import('vue-router').RouteRecordRaw} */
@@ -22,7 +24,12 @@ export const marketplaceRoutes = {
       props: {
         loadSolutionService: MarketplaceService.loadSolutionService,
         launchSolutionService: MarketplaceService.launchSolutionService,
-        windowOpen
+        listEdgeApplicationsAvailablesService:
+          MarketplaceService.listEdgeApplicationsAvailablesService,
+        windowOpen,
+        getTemplateService: TemplateEngineService.getTemplate,
+        instantiateTemplateService: TemplateEngineService.instantiateTemplate,
+        checkStatusScriptRunnerService: ScriptRunnerService.checkStatusScriptRunnerService
       },
       meta: {
         breadCrumbs: [

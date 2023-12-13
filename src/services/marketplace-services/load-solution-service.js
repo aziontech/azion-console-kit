@@ -30,7 +30,9 @@ const adapt = (httpResponse) => {
     isLaunched: solution.is_launched,
     isUpdated: solution.is_updated,
     newLaunchFlow: solution.new_launch_flow,
-    slug: solution.slug
+    slug: solution.slug,
+    latestVersionInstallTemplate: solution.latest_version_install_template,
+    permission: solution.permission
   }
 
   return {
