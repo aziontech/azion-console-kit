@@ -36,11 +36,11 @@ const getConfig = () => {
           changeOrigin: true,
           rewrite: (path) => path.replace(/^\/edge_services/, '')
         },
-        '/api/variables': {
-          target: `${URLStartPrefix}manager.azion.com/variables/api/`,
-          changeOrigin: true,
-          rewrite: (path) => path.replace(/^\/api/, '')
-        },
+        // '/api/variables': {
+        //   target: `${URLStartPrefix}manager.azion.com/variables/api/`,
+        //   changeOrigin: true,
+        //   rewrite: (path) => path.replace(/^\/api/, '')
+        // },
         '/api/marketplace': {
           target: `${URLStartPrefix}manager.azion.com/marketplace/api/`,
           changeOrigin: true,
