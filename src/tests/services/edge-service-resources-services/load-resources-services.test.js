@@ -26,16 +26,16 @@ describe('EdgeServiceResourcesServices', () => {
       statusCode: 200,
       body: {}
     })
-    const resourcesID = 812783
-    const edgeServiceID = 7879123
+    const id = 812783
+    const edgeServiceId = 7879123
     const { sut } = makeSut()
 
     await sut({
-      resourcesID,
-      edgeServiceID
+      id,
+      edgeServiceId
     })
     expect(requestSpy).toHaveBeenCalledWith({
-      url: `edge_services/${edgeServiceID}/resources/${resourcesID}`,
+      url: `edge_services/${edgeServiceId}/resources/${id}`,
       method: 'GET'
     })
   })

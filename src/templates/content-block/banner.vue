@@ -7,7 +7,7 @@
           :closable="false"
           :pt="{
             root: { class: 'mx-3 mt-4 sm:mx-8' },
-            wrapper: { class: 'py-3 px-3 items-start sm:items-center sm:px-8' }
+            wrapper: { class: 'py-3 px-3 items-start sm:items-center' }
           }"
         >
           <template #messageicon>
@@ -19,7 +19,15 @@
           <p class="text-color-secondary">
             <b class="text-color">Ongoing Experiment.</b>
             Our platform is in its early release stage. Please bear with us as occasional
-            instability or bugs may occur during this time.
+            instability or bugs may occur during this time. If you encounter any issue,
+            <ButtonPrime
+              class="p-0"
+              label="let us know"
+              icon="pi pi-external-link"
+              iconPos="right"
+              link
+              @click="goToCreateIssue"
+            />
           </p>
         </Message>
       </div>
@@ -33,6 +41,13 @@
 </template>
 <script setup>
   defineOptions({ name: 'BannerContentBlock' })
+  import { windowOpen } from '@/helpers/window-open'
+
   import Message from 'primevue/message'
   import Avatar from 'primevue/avatar'
+  import ButtonPrime from 'primevue/button'
+
+  const goToCreateIssue = () => {
+    windowOpen('https://github.com/aziontech/azion-platform-kit/issues/new', '_blank')
+  }
 </script>

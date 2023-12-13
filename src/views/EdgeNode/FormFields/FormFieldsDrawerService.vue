@@ -4,26 +4,30 @@
   import { computed } from 'vue'
   import { useAccountStore } from '@/stores/account'
   import { useField } from 'vee-validate'
+  defineOptions({ name: 'form-fields-drawer-service' })
 
   const props = defineProps({
-    disabledFields: {
-      type: Boolean,
-      default: false
-    },
     listServices: {
       type: Array,
       required: true
+    },
+    disabledFields: {
+      type: Boolean,
+      default: false
     }
   })
 
   const { value: service } = useField('service')
   const { value: variables, errorMessage: variablesError } = useField('variables')
 
-  const editorOptions = {
-    minimap: { enabled: false },
-    tabSize: 2,
-    formatOnPaste: true
-  }
+  const editorOptions = computed(() => {
+    return {
+      minimap: { enabled: false },
+      tabSize: 2,
+      formatOnPaste: true,
+      readOnly: props.disabledFields
+    }
+  })
 
   const store = useAccountStore()
   const theme = computed(() => {
@@ -40,7 +44,6 @@
     <template #inputs>
       <div class="flex flex-col w-full sm:max-w-3xl gap-2">
         <div class="flex flex-col gap-2">
-          <!-- <div class="flex flex-col sm:max-w-lg w-full gap-2"> -->
           <div class="flex w-80 sm:max-w-lg flex-col items-start gap-2">
             <label
               for="name"
@@ -50,11 +53,11 @@
             <Dropdown
               class="flex self-stretch"
               v-model="service"
-              :options="listServices"
-              :loading="listServices.length === 0"
+              :options="props.listServices"
+              :loading="props.listServices.length === 0"
+              :disabled="props.disabledFields"
               optionLabel="name"
               filter
-              :disabled="props.disabledFields"
               placeholder="Select"
             />
           </div>

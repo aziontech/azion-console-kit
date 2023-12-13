@@ -1,47 +1,50 @@
 import { AxiosHttpClientAdapter } from '@/services/axios/AxiosHttpClientAdapter'
-import { editServiceEdgeNodeService } from '@/services/edge-node-service-services'
+import { editUsersService } from '@/services/users-services'
 import { describe, expect, it, vi } from 'vitest'
 import * as Errors from '@/services/axios/errors'
 
 const fixtures = {
-  mock: {
-    id: 13,
-    serviceId: 1987867,
-    name: 'My Edge Service',
-    variables: 'port=53'
+  userMock: {
+    firstName: 'test',
+    lastName: 'test',
+    timezone: 'GTM',
+    language: 'en',
+    countryCallCode: '',
+    email: 'testt@azion.com',
+    mobile: '',
+    twoFactorEnabled: false
   }
 }
 
 const makeSut = () => {
-  const sut = editServiceEdgeNodeService
+  const sut = editUsersService
 
   return {
     sut
   }
 }
 
-describe('EdgeNodeServices', () => {
+describe('UsersServices', () => {
   it('should call API with correct params', async () => {
     const requestSpy = vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
       statusCode: 200
     })
     const { sut } = makeSut()
 
-    await sut(fixtures.mock)
+    await sut(fixtures.userMock)
 
     expect(requestSpy).toHaveBeenCalledWith({
-      url: `edge_node/${fixtures.mock.id}/services/${fixtures.mock.serviceId}`,
+      url: `iam/user`,
       method: 'PATCH',
       body: {
-        id: fixtures.mock.id,
-        service_id: fixtures.mock.serviceId,
-        service_name: fixtures.mock.name,
-        variables: [
-          {
-            name: 'port',
-            value: '53'
-          }
-        ]
+        first_name: fixtures.userMock.firstName,
+        last_name: fixtures.userMock.lastName,
+        email: fixtures.userMock.email,
+        language: fixtures.userMock.language,
+        timezone: fixtures.userMock.timezone,
+        country_call_code: fixtures.userMock.countryCallCode,
+        mobile: fixtures.userMock.mobile?.toString(),
+        two_factor_enabled: fixtures.userMock.twoFactorEnabled
       }
     })
   })
@@ -52,16 +55,12 @@ describe('EdgeNodeServices', () => {
     })
     const { sut } = makeSut()
 
-    const feedbackMessage = await sut(fixtures.mock)
+    const data = await sut(fixtures.userMock)
 
-    expect(feedbackMessage).toBe('Your service on edge node has been updated')
+    expect(data).toBe('Your user has been updated')
   })
 
   it.each([
-    {
-      statusCode: 400,
-      expectedError: new Errors.NotFoundError().message
-    },
     {
       statusCode: 401,
       expectedError: new Errors.InvalidApiTokenError().message
@@ -90,7 +89,7 @@ describe('EdgeNodeServices', () => {
       })
       const { sut } = makeSut()
 
-      const response = sut(fixtures.mock)
+      const response = sut(fixtures.userMock)
 
       expect(response).rejects.toBe(expectedError)
     }

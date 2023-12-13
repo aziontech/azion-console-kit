@@ -225,7 +225,6 @@
       },
       createPagePath: {
         type: String,
-        required: true,
         default: () => '/'
       },
       editPagePath: {
@@ -237,7 +236,6 @@
       },
       addButtonLabel: {
         type: String,
-        required: true,
         default: () => ''
       },
       listService: {
