@@ -10,7 +10,10 @@ export const accountRoutes = {
       name: 'account-settings',
       component: () => import('@views/AccountSettings/AccountSettingsView.vue'),
       props: {
-        accountSettingsService: AccountSettingsServices.accountSettingsService
+        getAccountSettingsService: AccountSettingsServices.getAccountSettingsService,
+        listCountriesService: AccountSettingsServices.listCountriesService,
+        listRegionsService: AccountSettingsServices.listRegionsService,
+        listCitiesService: AccountSettingsServices.listCitiesService
       },
       meta: {
         breadCrumbs: [
