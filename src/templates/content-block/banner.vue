@@ -7,7 +7,7 @@
           :closable="false"
           :pt="{
             root: { class: 'mx-3 mt-4 sm:mx-8' },
-            wrapper: { class: 'py-3 px-3 items-start sm:items-center sm:px-8' }
+            wrapper: { class: 'py-3 px-3 items-start sm:items-center' }
           }"
         >
           <template #messageicon>
