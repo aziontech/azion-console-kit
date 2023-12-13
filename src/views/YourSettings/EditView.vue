@@ -73,13 +73,13 @@
   ])
 
   const validationSchema = yup.object({
-    firstName: yup.string().required('first name is a required field').max(30),
-    lastName: yup.string().required('last name is a required field').max(30),
+    firstName: yup.string().required().label('First name').max(30),
+    lastName: yup.string().required().label('Last name').max(30),
     timezone: yup.string(),
     language: yup.string(),
     countryCallCode: yup.string(),
-    email: yup.string().email().required('e-mail is a required field').max(254),
-    mobile: yup.string().required('mobile is a required field'),
+    email: yup.string().email().required().label('E-mail').max(254),
+    mobile: yup.string().required().label('Mobile'),
     twoFactorEnabled: yup.boolean(),
     oldPassword: yup.string(),
     password: yup.string().when('oldPassword', {
@@ -87,7 +87,8 @@
       then: () =>
         yup
           .string()
-          .required('Password is required')
+          .required()
+          .label('Password')
           .test('max', 'Exceeded number of characters', (value) => value?.length <= 128)
           .test('noSpaces', 'Spaces are not allowed', (value) => !value?.match(/\s/g))
           .test('requirements', '', (value) => {
@@ -107,7 +108,8 @@
       then: () =>
         yup
           .string()
-          .required('Confirm password is required')
+          .required()
+          .label('Confirm password')
           .oneOf([yup.ref('password'), null], 'Passwords must match')
     })
   })
