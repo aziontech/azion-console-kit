@@ -79,7 +79,7 @@
     language: yup.string(),
     countryCallCode: yup.string(),
     email: yup.string().email().required('e-mail is a required field').max(254),
-    mobile: yup.string(),
+    mobile: yup.string().required('mobile is a required field'),
     twoFactorEnabled: yup.boolean(),
     oldPassword: yup.string(),
     password: yup.string().when('oldPassword', {

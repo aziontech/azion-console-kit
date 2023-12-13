@@ -62,9 +62,9 @@
     optionsTimezone.value = result.listTimeZones
   }
 
-  onMounted(async () => {
-    await fetchCountries()
-    await fetchTimezone()
+  onMounted(() => {
+    fetchCountries()
+    fetchTimezone()
   })
 
   const passwordRequirementsList = ref([
