@@ -2,30 +2,29 @@ import { AxiosHttpClientAdapter } from '@/services/axios/AxiosHttpClientAdapter'
 import * as Errors from '@/services/axios/errors'
 import { makeAccountSettingsBaseUrl } from './make-account-settings-base-url'
 
-export const getAccountSettingsService = async (payload) => {
+export const updateAccountSettingsService = async (payload) => {
   let httpResponse = await AxiosHttpClientAdapter.request({
     url: makeAccountSettingsBaseUrl(),
-    method: 'GET',
-    body: payload
+    method: 'PATCH',
+    body: adapt(payload)
   })
   return parseHttpResponse(httpResponse)
 }
 
-const adapt = (response) => {
+const adapt = (payload) => {
   return {
-    accountName: response.name,
-    clientId: response.id,
-    companyName: response.company_name,
-    uniqueIdentifier: response.unique_identifier,
-    billingEmails: response.billing_emails,
-    postalCode: response.postal_code,
-    country: response.country,
-    region: response.region,
-    city: response.city,
-    address: response.address,
-    complement: response.complement,
-    isSocialLoginEnabled: response.is_social_login_enabled,
-    isEnabledMfaToAllUsers: response.is_enabled_mfa_to_all_users
+    name: payload.accountName,
+    company_name: payload.companyName,
+    unique_identifier: payload.uniqueIdentifier,
+    billing_emails: payload.billingEmails,
+    postal_code: payload.postalCode,
+    country: payload.country,
+    region: payload.region,
+    city: payload.city,
+    address: payload.address,
+    complement: payload.complement,
+    is_social_login_enabled: payload.isSocialLoginEnabled,
+    is_enabled_mfa_to_all_users: payload.isEnabledMfaToAllUsers
   }
 }
 
@@ -40,7 +39,7 @@ const adapt = (response) => {
 const parseHttpResponse = (httpResponse) => {
   switch (httpResponse.statusCode) {
     case 200:
-      return adapt(httpResponse.body.data)
+      return 'Your account settings have been updated'
     case 400:
       throw new Errors.InvalidApiRequestError().message
     case 403:

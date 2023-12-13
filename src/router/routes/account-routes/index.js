@@ -13,7 +13,8 @@ export const accountRoutes = {
         getAccountSettingsService: AccountSettingsServices.getAccountSettingsService,
         listCountriesService: AccountSettingsServices.listCountriesService,
         listRegionsService: AccountSettingsServices.listRegionsService,
-        listCitiesService: AccountSettingsServices.listCitiesService
+        listCitiesService: AccountSettingsServices.listCitiesService,
+        updateAccountSettingsService: AccountSettingsServices.updateAccountSettingsService
       },
       meta: {
         breadCrumbs: [
@@ -21,7 +22,7 @@ export const accountRoutes = {
             label: 'Account Settings',
             to: '/account/settings'
           }
-        ],
+        ]
       }
     }
   ]

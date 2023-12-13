@@ -22,6 +22,10 @@
     listCitiesService: {
       type: Function,
       required: true
+    },
+    updateAccountSettingsService: {
+      type: Function,
+      required: true
     }
   })
 
@@ -49,9 +53,9 @@
     </template>
     <template #content>
       <EditFormBlock
-        :editService="() => {}"
+        :editService="updateAccountSettingsService"
         :loadService="getAccountSettingsService"
-        :updatedRedirect="''"
+        updatedRedirect="account-settings"
         :schema="validationSchema"
       >
         <template #form>

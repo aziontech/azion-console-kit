@@ -209,7 +209,7 @@
     description="Description"
   >
     <template #inputs>
-      <div class="flex flex-col gap-8 md:flex-row md:gap-6">
+      <div class="flex flex-col gap-6 md:gap-8 md:flex-row">
         <div class="flex flex-col w-full gap-2 sm:max-w-lg">
           <label
             for="postalCode"
@@ -256,7 +256,7 @@
           </small>
         </div>
       </div>
-      <div class="flex flex-col gap-8 md:flex-row md:gap-6">
+      <div class="flex flex-col gap-6 md:gap-8 md:flex-row">
         <div class="flex flex-col w-full gap-2 sm:max-w-lg">
           <label
             for="region"
@@ -305,7 +305,7 @@
           </small>
         </div>
       </div>
-      <div class="flex flex-col gap-8 md:flex-row md:gap-6">
+      <div class="flex flex-col gap-6 md:gap-8 md:flex-row">
         <div class="flex flex-col w-full gap-2 sm:max-w-lg">
           <label
             for="address"

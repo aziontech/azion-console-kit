@@ -11,7 +11,7 @@
     cancelDisabled: Boolean,
     submitDisabled: Boolean,
     primaryActionLabel: { type: String, default: 'Save' },
-    secondaryActionLabel: { type: String, default: 'Cancel' },
+    secondaryActionLabel: { type: String, default: 'Cancel' }
   })
 
   const handleSubmit = () => {

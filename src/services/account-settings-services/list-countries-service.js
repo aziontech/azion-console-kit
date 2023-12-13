@@ -23,7 +23,6 @@ export const listCountriesService = async () => {
 const adapt = (httpResponse) => {
   const { body } = httpResponse
 
-
   return body.data.allCountries.map((countryItem) => {
     return {
       name: countryItem.name,
@@ -45,7 +44,7 @@ const parseHttpResponse = (httpResponse) => {
     case 200:
       return adapt(httpResponse)
     case 400: {
-      const {message: apiMessage} = httpResponse.body.errors[0]
+      const { message: apiMessage } = httpResponse.body.errors[0]
       throw new Error(apiMessage).message
     }
     case 401:
