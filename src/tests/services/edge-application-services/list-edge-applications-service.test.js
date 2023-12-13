@@ -81,7 +81,7 @@ describe('EdgeApplicationServices', () => {
         status: { content: 'Active', severity: 'success' },
         lastEditor: 'az editor',
         lastModify: 'Friday, November 10, 2023',
-        lastModifyDate: new Date('2023-11-10T00:00:00.000Z'),
+        lastModifyDate: new Date('2023-11-10T00:00:00.000Z')
       },
       {
         id: fixtures.disabledEdgeApplicationsMock.id,
@@ -92,7 +92,7 @@ describe('EdgeApplicationServices', () => {
         status: { content: 'Inactive', severity: 'danger' },
         lastEditor: 'az editor 2',
         lastModify: 'Sunday, December 10, 2023',
-        lastModifyDate: new Date('2023-12-10T00:00:00.000Z'),
+        lastModifyDate: new Date('2023-12-10T00:00:00.000Z')
       }
     ])
   })
