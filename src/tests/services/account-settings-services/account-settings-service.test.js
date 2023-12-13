@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from 'vitest'
 import { AxiosHttpClientAdapter } from '@/services/axios/AxiosHttpClientAdapter'
 import * as Errors from '@/services/axios/errors'
-import { accountSettingsService } from '@/services/account-settings-services/account-settings-service'
+import { accountSettingsService } from '@/services/account-settings-services/get-account-settings-service'
 
 const basePayloadMock = {
   key: 'value'

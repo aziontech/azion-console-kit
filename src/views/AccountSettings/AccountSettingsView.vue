@@ -7,9 +7,21 @@
   import FormFieldsAccountSettings from './FormFields/FormFieldsAccountSettings'
 
   defineProps({
-    accountSettingsService: {
+    getAccountSettingsService: {
       type: Function,
-      required: false
+      required: true
+    },
+    listCountriesService: {
+      type: Function,
+      required: true
+    },
+    listRegionsService: {
+      type: Function,
+      required: true
+    },
+    listCitiesService: {
+      type: Function,
+      required: true
     }
   })
 
@@ -24,7 +36,6 @@
     region: yup.string().required('State/Region is a required field.'),
     city: yup.string().required('City is a required field.'),
     address: yup.string().required('Address is a required field.'),
-    number: yup.string().required('Number is a required field.'),
     complement: yup.string(),
     isSocialLoginEnabled: yup.boolean(),
     isEnabledMfaToAllUsers: yup.boolean()
@@ -39,12 +50,16 @@
     <template #content>
       <EditFormBlock
         :editService="() => {}"
-        :loadService="() => {}"
+        :loadService="getAccountSettingsService"
         :updatedRedirect="''"
         :schema="validationSchema"
       >
         <template #form>
-          <FormFieldsAccountSettings />
+          <FormFieldsAccountSettings
+            :listCountriesService="listCountriesService"
+            :listRegionsService="listRegionsService"
+            :listCitiesService="listCitiesService"
+          />
         </template>
         <template #action-bar="{ onSubmit, formValid, onCancel, loading }">
           <ActionBarBlockWithTeleport
