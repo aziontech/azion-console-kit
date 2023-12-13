@@ -47,8 +47,6 @@ const parseHttpResponse = (httpResponse) => {
       const { message: apiMessage } = httpResponse.body.errors[0]
       throw new Error(apiMessage).message
     }
-    case 401:
-      throw new Errors.InvalidApiTokenError().message
     case 403:
       throw new Errors.PermissionError().message
     case 404:
