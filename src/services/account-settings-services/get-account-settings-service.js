@@ -2,11 +2,10 @@ import { AxiosHttpClientAdapter } from '@/services/axios/AxiosHttpClientAdapter'
 import * as Errors from '@/services/axios/errors'
 import { makeAccountSettingsBaseUrl } from './make-account-settings-base-url'
 
-export const getAccountSettingsService = async (payload) => {
+export const getAccountSettingsService = async () => {
   let httpResponse = await AxiosHttpClientAdapter.request({
     url: makeAccountSettingsBaseUrl(),
-    method: 'GET',
-    body: payload
+    method: 'GET'
   })
   return parseHttpResponse(httpResponse)
 }
