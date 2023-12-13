@@ -1,5 +1,5 @@
 <script setup>
-  import { ref, onMounted, watch } from 'vue'
+  import { ref, onMounted, watch, computed } from 'vue'
   import { useField } from 'vee-validate'
 
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
@@ -86,8 +86,12 @@
     return hasMinLength && hasUpperCase && hasLowerCase && hasSpecialChar
   }
 
-  watch(selectedCountryCallCode, async (newCountryCallCode) => {
+  watch(selectedCountryCallCode, (newCountryCallCode) => {
     countryCallCode.value = newCountryCallCode.value
+  })
+
+  const isLoadingCountry = computed(() => {
+    return !filteredCountriesMobile.value.length
   })
 </script>
 
@@ -209,7 +213,7 @@
               :options="filteredCountriesMobile"
               optionLabel="label"
               placeholder="Loading..."
-              :loading="!filteredCountriesMobile.length"
+              :loading="isLoadingCountry"
               :class="{ 'p-invalid': errorSelectedCountryCallCode }"
               class="w-2/3 surface-border border-r-0"
               v-model="selectedCountryCallCode"

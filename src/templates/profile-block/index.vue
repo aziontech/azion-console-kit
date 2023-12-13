@@ -244,7 +244,7 @@
   const profileMenuSettings = [
     {
       label: 'Your Settings',
-      to: '/list-your-settings'
+      to: '/settings'
     },
     {
       label: 'Personal Token',
