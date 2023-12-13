@@ -113,7 +113,8 @@ const getConfig = () => {
           cookieDomainRewrite: { '*': '' }
         },
         '/api': {
-          target: `${URLStartPrefix}manager-origin.azion.com/api`,
+          // target: `${URLStartPrefix}manager-origin.azion.com/api`,
+          target: `${URLStartPrefix}api.azion.com`,
           changeOrigin: true,
           rewrite: (path) => path.replace(/^\/api/, '')
         }
