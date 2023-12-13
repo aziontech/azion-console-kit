@@ -15,13 +15,9 @@ export const createRealTimePurgeService = async (payload) => {
 }
 
 const adapt = (payload) => {
-  const request = {
-    urls: payload.argumentsPurge.trim().split('\n'),
-    method: 'delete'
-  }
-
-  if (payload.purgeType === 'cachekey') {
-    request.layer = payload.layer
+  const request = { 
+    items: payload.argumentsPurge.trim().split('\n'),
+    layer: payload.layer
   }
 
   return request

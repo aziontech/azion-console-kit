@@ -87,9 +87,9 @@ const getConfig = () => {
           rewrite: (path) => path.replace(/^\/api\/teams/, '')
         },
         '/api/purge': {
-          target: 'https://stage-manager.azion.com/api/purge',
+          target: `${URLStartPrefix}api.azion.com/v4/edge/purge`,
           changeOrigin: true,
-          rewrite: (path) => path.replace(/^\/api\/purge/, '')
+          rewrite: (path) => path.replace(/^\/api\/purge/, ''),
         },
         '/api/permissions': {
           target: `${URLStartPrefix}iam.azion.com/iam/api/permissions`,
