@@ -15,7 +15,7 @@ export const createRealTimePurgeService = async (payload) => {
 }
 
 const adapt = (payload) => {
-  const request = { 
+  const request = {
     items: payload.argumentsPurge.trim().split('\n'),
     layer: payload.layer
   }
