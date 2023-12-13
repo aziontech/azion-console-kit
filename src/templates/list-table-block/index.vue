@@ -219,6 +219,11 @@
           }
         ]
       },
+      isGraphql: {
+        required: false,
+        type: Boolean,
+        default: false
+      },
       pageTitleDelete: {
         type: String,
         required: true
@@ -314,7 +319,13 @@
       async loadData({ page }) {
         try {
           this.isLoading = true
-          const data = await this.listService({ page })
+          let data = null
+          if (this.isGraphql) {
+            data = await this.listService()
+          }
+          if (!this.isGraphql) {
+            data = await this.listService({ page })
+          }
           this.data = data
         } catch (error) {
           this.data = []
