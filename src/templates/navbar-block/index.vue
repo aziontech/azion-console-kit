@@ -27,10 +27,6 @@
         />
       </div>
 
-      <div class="ml-auto hidden">
-        <SearchBlock />
-      </div>
-
       <div class="flex gap-2 items-center ml-2 md:ml-auto">
         <Create />
         <Help />
@@ -54,7 +50,6 @@
   import AzionLogo from '@assets/svg/logo'
   import AzionMobileLogo from '@assets/svg/mobile-logo'
   import SidebarBlock from '@templates/sidebar-block'
-  import SearchBlock from '@templates/search-block'
   import Create from './create'
   import Help from './help'
   import SwitchAccount from './switch-account'
