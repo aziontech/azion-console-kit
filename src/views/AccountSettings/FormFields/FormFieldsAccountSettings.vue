@@ -90,15 +90,20 @@
     }
   }
 
-  watch([country, region], () => {
-    if (country.value) {
-      setRegionsOptions(country.value)
-    }
+  watch(country, (value) => {
+    setRegionsOptions(value)
+  })
 
-    if (region.value) {
-      setCitiesOptions(region.value)
+  watch(region, (value) => {
+    if (value) {
+      setCitiesOptions(value)
     }
   })
+
+  const resetRegionAndCity = () => {
+    region.value = ''
+    city.value = ''
+  }
 </script>
 
 <template>
@@ -241,6 +246,7 @@
             v-model="country"
             :class="{ 'p-invalid': countryError }"
             :loading="!countriesOptions.done"
+            @change="resetRegionAndCity"
           />
           <small
             v-if="countryError"
