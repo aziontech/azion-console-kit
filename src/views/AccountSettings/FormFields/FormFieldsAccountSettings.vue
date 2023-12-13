@@ -6,6 +6,23 @@
   import InputSwitch from 'primevue/inputswitch'
   import Dropdown from 'primevue/dropdown'
   import Divider from 'primevue/divider'
+  import { onMounted, ref, watch } from 'vue'
+  import { useToast } from 'primevue/usetoast'
+
+  const props = defineProps({
+    listCountriesService: {
+      type: Function,
+      required: true
+    },
+    listRegionsService: {
+      type: Function,
+      required: true
+    },
+    listCitiesService: {
+      type: Function,
+      required: true
+    }
+  })
 
   const { value: accountName, errorMessage: accountNameError } = useField('accountName')
   const { value: clientId } = useField('clientId')
@@ -17,14 +34,71 @@
   const { value: region, errorMessage: regionError } = useField('region')
   const { value: city, errorMessage: cityError } = useField('city')
   const { value: address, errorMessage: addressError } = useField('address')
-  const { value: number, errorMessage: numberError } = useField('number')
   const { value: complement } = useField('complement')
   const { value: isSocialLoginEnabled } = useField('isSocialLoginEnabled')
   const { value: isEnabledMfaToAllUsers } = useField('isEnabledMfaToAllUsers')
 
-  const countriesOptions = [{ name: 'Brazil', code: 'BR' }]
-  const regionsOptions = [{ name: 'Sao Paulo', code: 'SP' }]
-  const citiesOptions = [{ name: 'Sao Paulo', code: 'SP' }]
+  const countriesOptions = ref({ options: [], done: true })
+  const regionsOptions = ref({ options: [], done: true })
+  const citiesOptions = ref({ options: [], done: true })
+
+  const toast = useToast()
+  const showToast = (summary, severity) => {
+    return toast.add({
+      severity,
+      summary,
+      closable: true
+    })
+  }
+  const setCountriesOptions = async () => {
+    countriesOptions.value.done = false
+    try {
+      const response = await props.listCountriesService()
+      countriesOptions.value.options = response
+    } catch (error) {
+      showToast(error, 'error')
+    } finally {
+      countriesOptions.value.done = true
+    }
+  }
+
+  onMounted(() => {
+    setCountriesOptions()
+  })
+
+  const setRegionsOptions = async (geonameId) => {
+    regionsOptions.value.done = false
+    try {
+      const response = await props.listRegionsService(geonameId)
+      regionsOptions.value.options = response
+    } catch (error) {
+      showToast(error, 'error')
+    } finally {
+      regionsOptions.value.done = true
+    }
+  }
+
+  const setCitiesOptions = async (geonameId) => {
+    citiesOptions.value.done = false
+    try {
+      const response = await props.listCitiesService(geonameId)
+      citiesOptions.value.options = response
+    } catch (error) {
+      showToast(error, 'error')
+    } finally {
+      citiesOptions.value.done = true
+    }
+  }
+
+  watch([country, region], () => {
+    if (country.value) {
+      setRegionsOptions(country.value)
+    }
+
+    if (region.value) {
+      setCitiesOptions(region.value)
+    }
+  })
 </script>
 
 <template>
@@ -37,8 +111,9 @@
         <label
           for="accountName"
           class="text-color text-base font-medium"
-          >Account name *</label
         >
+          Account name *
+        </label>
         <InputText
           v-model="accountName"
           id="accountName"
@@ -57,8 +132,9 @@
         <label
           for="clientId"
           class="text-color text-base font-medium"
-          >Client ID</label
         >
+          Client ID
+        </label>
         <span class="p-input-icon-right">
           <i class="pi pi-lock text-[var(--text-color-secondary)]" />
           <InputText
@@ -82,8 +158,9 @@
         <label
           for="companyName"
           class="text-color text-base font-medium"
-          >Company/Corporate name</label
         >
+          Company/Corporate name
+        </label>
         <InputText
           v-model="companyName"
           id="companyName"
@@ -94,8 +171,9 @@
         <label
           for="uniqueIdentifier"
           class="text-color text-base font-medium"
-          >Unique identifier</label
         >
+          Unique identifier
+        </label>
         <InputText
           v-model="uniqueIdentifier"
           id="uniqueIdentifier"
@@ -106,8 +184,9 @@
         <label
           for="billingEmails"
           class="text-color text-base font-medium"
-          >Billing emails</label
         >
+          Billing emails
+        </label>
         <TextArea
           id="billingEmails"
           v-model="billingEmails"
@@ -130,8 +209,9 @@
           <label
             for="postalCode"
             class="text-color text-base font-medium"
-            >Postal Code *</label
           >
+            Postal Code *
+          </label>
           <InputText
             v-model="postalCode"
             id="postalCode"
@@ -149,16 +229,18 @@
           <label
             for="country"
             class="text-color text-base font-medium"
-            >Country *</label
           >
+            Country *
+          </label>
           <Dropdown
             id="country"
             filter
-            optionValue="name"
+            optionValue="geonameId"
             optionLabel="name"
-            :options="countriesOptions"
+            :options="countriesOptions.options"
             v-model="country"
             :class="{ 'p-invalid': countryError }"
+            :loading="!countriesOptions.done"
           />
           <small
             v-if="countryError"
@@ -173,15 +255,17 @@
           <label
             for="region"
             class="text-color text-base font-medium"
-            >State/Region *</label
           >
+            State/Region *
+          </label>
           <Dropdown
             id="region"
             filter
-            optionValue="name"
+            optionValue="geonameId"
             optionLabel="name"
-            :options="regionsOptions"
+            :options="regionsOptions.options"
             v-model="region"
+            :loading="!regionsOptions.done"
           />
           <small
             v-if="regionError"
@@ -194,16 +278,18 @@
           <label
             for="city"
             class="text-color text-base font-medium"
-            >City *</label
           >
+            City *
+          </label>
           <Dropdown
             id="city"
             filter
-            optionValue="name"
+            optionValue="geonameId"
             optionLabel="name"
-            :options="citiesOptions"
+            :options="citiesOptions.options"
             v-model="city"
             :class="{ 'p-invalid': cityError }"
+            :loading="!citiesOptions.done"
           />
           <small
             v-if="cityError"
@@ -213,51 +299,34 @@
           </small>
         </div>
       </div>
-      <div class="flex flex-col w-full gap-2 sm:max-w-lg">
-        <label
-          for="address"
-          class="text-color text-base font-medium"
-          >Address *</label
-        >
-        <InputText
-          v-model="address"
-          id="address"
-          type="text"
-          :class="{ 'p-invalid': addressError }"
-        />
-        <small
-          v-if="addressError"
-          class="p-error text-xs font-normal leading-tight"
-        >
-          {{ addressError }}
-        </small>
-      </div>
       <div class="flex flex-col gap-8 md:flex-row md:gap-6">
         <div class="flex flex-col w-full gap-2 sm:max-w-lg">
           <label
-            for="number"
+            for="address"
             class="text-color text-base font-medium"
-            >Number *</label
           >
+            Address *
+          </label>
           <InputText
-            v-model="number"
-            id="number"
+            v-model="address"
+            id="address"
             type="text"
-            :class="{ 'p-invalid': numberError }"
+            :class="{ 'p-invalid': addressError }"
           />
           <small
-            v-if="numberError"
+            v-if="addressError"
             class="p-error text-xs font-normal leading-tight"
           >
-            {{ numberError }}
+            {{ addressError }}
           </small>
         </div>
         <div class="flex flex-col w-full gap-2 sm:max-w-lg">
           <label
             for="complement"
             class="text-color text-base font-medium"
-            >Complement</label
           >
+            Complement
+          </label>
           <InputText
             v-model="complement"
             id="complement"
@@ -282,8 +351,9 @@
             <label
               class="text-color text-sm font-normal leading-5"
               for="isSocialLoginEnabled"
-              >Social login</label
             >
+              Social login
+            </label>
           </div>
           <div class="flex-col gap-1 pl-10">
             <p class="text-color-secondary text-sm font-normal">
@@ -304,8 +374,9 @@
             <label
               class="text-color text-sm font-normal leading-5"
               for="isEnabledMfaToAllUsers"
-              >Enforce Multi-Factor Authentication</label
             >
+              Enforce Multi-Factor Authentication
+            </label>
           </div>
           <div class="flex-col gap-1 pl-10">
             <p class="text-color-secondary text-sm font-normal">
