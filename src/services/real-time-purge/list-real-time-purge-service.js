@@ -2,8 +2,9 @@ import { AxiosHttpClientAdapter, parseHttpResponse } from '../axios/AxiosHttpCli
 import { makeEventsListBaseUrl } from './make-events-list-service'
 import graphQLApi from '../axios/makeEventsApi'
 
-
-export const listRealTimePurgeService = async (  apiClient = graphQLApi(import.meta.env.VITE_PERSONAL_TOKEN)) => {
+export const listRealTimePurgeService = async (
+  apiClient = graphQLApi(import.meta.env.VITE_PERSONAL_TOKEN)
+) => {
   const offSetEnd = new Date()
   const offSetStart = new Date(
     Date.UTC(offSetEnd.getFullYear(), offSetEnd.getMonth(), offSetEnd.getDate() - 30)
@@ -21,11 +22,14 @@ export const listRealTimePurgeService = async (  apiClient = graphQLApi(import.m
       authorEmail
       accountId } } `
   }
-  let httpResponse = await AxiosHttpClientAdapter.request({
-    url: `${makeEventsListBaseUrl()}`,
-    method: 'POST',
-    body: payload
-  }, apiClient)
+  let httpResponse = await AxiosHttpClientAdapter.request(
+    {
+      url: `${makeEventsListBaseUrl()}`,
+      method: 'POST',
+      body: payload
+    },
+    apiClient
+  )
 
   httpResponse = adapt(httpResponse)
 
@@ -33,21 +37,19 @@ export const listRealTimePurgeService = async (  apiClient = graphQLApi(import.m
 }
 
 const adapt = (httpResponse) => {
-
-  const requestData = httpResponse.body.data.activityHistoryEvents.map(item => {
-    const [,type]=  item.resourceType.split(':')
+  const requestData = httpResponse.body.data.activityHistoryEvents.map((item) => {
+    const [, type] = item.resourceType.split(':')
     const { items, layer } = JSON.parse(JSON.parse(item.requestData))
     return {
       type,
       arguments: items,
       layer,
       user: item.authorEmail,
-      time:  new Intl.DateTimeFormat('us', {
+      time: new Intl.DateTimeFormat('us', {
         dateStyle: 'full',
         timeStyle: 'short'
       }).format(new Date(item.ts))
     }
-
   })
   return {
     body: requestData,
