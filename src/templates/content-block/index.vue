@@ -17,16 +17,15 @@
         </template>
         <p class="text-color-secondary">
           <b class="text-color">Ongoing Experiment.</b>
-          Our platform is in its early release stage. Please bear with us as occasional instability
-          or bugs may occur during this time. If you encounter any issue,
-          <ButtonPrime
-            class="p-0"
-            label="let us know"
-            icon="pi pi-external-link"
-            iconPos="right"
-            link
-            @click="goToCreateIssue"
-          />
+            Our platform is in its early release stage. Expect occasional instability or bugs during this time.
+            <ButtonPrime
+              class="p-0"
+              label="Report an issue"
+              icon="pi pi-external-link"
+              iconPos="right"
+              link
+              @click="goToCreateIssue"
+            />
         </p>
       </Message>
       <div
