@@ -32,8 +32,7 @@ describe('RealTimePurgeServices', () => {
       url: `purge/cachekey`,
       method: 'POST',
       body: {
-        urls: ['www.example.com', 'www.test.com.br'],
-        method: 'delete',
+        items: ['www.example.com', 'www.test.com.br'],
         layer: fixtures.realTimePurgeMock.layer
       }
     })

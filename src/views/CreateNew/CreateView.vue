@@ -300,8 +300,8 @@
       openDetails() {
         this.showDetails = true
       },
-      handleInstantiate(element) {
-        this.$router.push(`/create/deploy/${element.result.uuid}`)
+      handleInstantiate({ result }) {
+        this.$router.push(`/create/deploy/${result.uuid}`)
       }
     },
     watch: {
