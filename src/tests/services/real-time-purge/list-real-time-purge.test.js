@@ -3,6 +3,7 @@ import * as Errors from '@services/axios/errors'
 import { listRealTimePurgeService } from '@/services/real-time-purge'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import graphQLApi from '../../../services/axios/makeEventsApi'
+import { localeMock } from '@/tests/utils/localeMock'
 
 const purge = [
   {
@@ -84,6 +85,7 @@ describe('ListRealTimePurgeService', () => {
 
   it('should parse correctly each returned item', async () => {
     vi.setSystemTime(new Date(2023, 10, 10, 10))
+    localeMock()
     vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
       statusCode: 200,
       body: { data: { activityHistoryEvents: purge } }
