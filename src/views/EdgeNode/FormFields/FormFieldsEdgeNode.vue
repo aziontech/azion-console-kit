@@ -31,7 +31,7 @@
 <template>
   <FormHorizontal
     title="General"
-    description="Description"
+    description="Install and manage services and resources in real time."
   >
     <template #inputs>
       <div class="flex flex-col gap-5 mb-6">
@@ -42,7 +42,7 @@
             >Name *</label
           >
           <InputText
-            placeholder="Name"
+            placeholder="My edge node"
             v-model="name"
             type="text"
             :class="{ 'p-invalid': nameError }"
@@ -59,8 +59,8 @@
     </template>
   </FormHorizontal>
   <FormHorizontal
-    title="Runing Settings"
-    description="Each node needs to run the Azion Orchestration software. It enables the communication between your private node and Azion Real-Time Manager, where you can manage your Edge Applications, Edge Functions, and many other Azion services."
+    title="Running Settings"
+    description="Each node must run the Edge Orchestrator agent, who establishes a communication between your private node and Azion."
   >
     <template #inputs>
       <div class="flex flex-col gap-5 mb-6">
@@ -74,7 +74,7 @@
             <i class="pi pi-lock text-color-secondary" />
             <InputText
               class="w-full"
-              placeholder="HashID"
+              placeholder="Hash ID"
               v-model="hashId"
               id="hashId"
               type="text"
@@ -82,6 +82,9 @@
               :disabled="true"
             />
           </span>
+          <small class="text-color-secondary text-sm font-normal leading-tight">
+          The hash ID used to authenticate the edge node.
+        </small>
         </div>
         <div class="flex flex-col w-full sm:max-w-3xl gap-2">
           <label
@@ -100,8 +103,7 @@
             display="chip"
           />
           <small class="text-xs text-color-secondary font-normal leading-tight">
-            Use labels to group your Edge Nodes. Groups allow you to manage multiple Edge Nodes
-            easily in your Edge Maps for orchestration and routing.</small
+            Group multiple edge nodes in your edge maps for orchestration and routing.</small
           >
         </div>
       </div>
