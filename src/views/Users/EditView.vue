@@ -27,7 +27,7 @@
       type: Function,
       required: true
     },
-    editUsersService: {
+    editAnotherUserService: {
       type: Function,
       required: true
     },
@@ -58,7 +58,7 @@
     </template>
     <template #content>
       <EditFormBlock
-        :editService="props.editUsersService"
+        :editService="props.editAnotherUserService"
         :loadService="props.loadUserService"
         :updatedRedirect="props.updatedRedirect"
         :schema="validationSchema"

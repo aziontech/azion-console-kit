@@ -58,7 +58,7 @@ describe('usersService', () => {
   it('should parsed correctly the returned variable', async () => {
     vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
       statusCode: 200,
-      body: {data:fixtures.userMock}
+      body: { data: fixtures.userMock }
     })
     const { sut } = makeSut()
 
@@ -82,7 +82,7 @@ describe('usersService', () => {
       isTrial: fixtures.userMock.is_trial,
       lastLogin: fixtures.userMock.last_login,
       phone: fixtures.userMock.phone,
-      teams: fixtures.userMock.teams,
+      teams: fixtures.userMock.teams
     })
   })
 })

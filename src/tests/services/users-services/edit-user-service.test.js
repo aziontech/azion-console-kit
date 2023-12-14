@@ -1,5 +1,5 @@
 import { AxiosHttpClientAdapter } from '@/services/axios/AxiosHttpClientAdapter'
-import { editUsersService } from '@/services/users-services'
+import { editAnotherUserService } from '@/services/users-services'
 import * as Errors from '@/services/axios/errors'
 import { describe, expect, it, vi } from 'vitest'
 
@@ -24,7 +24,7 @@ const fixtures = {
 }
 
 const makeSut = () => {
-  const sut = editUsersService
+  const sut = editAnotherUserService
 
   return {
     sut

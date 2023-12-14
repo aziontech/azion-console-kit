@@ -31,7 +31,7 @@ const adapt = (httpResponse) => {
     isTrial: responseData.is_trial,
     lastLogin: responseData.last_login,
     phone: responseData.phone,
-    teams: responseData.teams,
+    teams: responseData.teams
   }
 
   return {
