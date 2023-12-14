@@ -13,7 +13,7 @@ const makeSut = () => {
 describe('UsersServices', () => {
   it('should call API with correct params', async () => {
     const requestSpy = vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
-      statusCode: 204
+      statusCode: 200
     })
     const userIdMock = 765678
     const { sut } = makeSut()
@@ -28,13 +28,13 @@ describe('UsersServices', () => {
 
   it('should return a feedback message on successfully deleted', async () => {
     vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
-      statusCode: 204
+      statusCode: 200
     })
     const userIdMock = 7816825367
     const { sut } = makeSut()
 
     const feedbackMessage = await sut(userIdMock)
 
-    expect(feedbackMessage).toBe('Resource successfully deleted')
+    expect(feedbackMessage).toBe('User successfully deleted')
   })
 })
