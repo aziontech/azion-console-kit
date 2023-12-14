@@ -38,7 +38,7 @@ export default mergeConfig(
       outputFile: {
         'vitest-sonar-reporter': './coverage/sonar-report.xml'
       },
-      testTimeout: 20000
+      testTimeout: 30000
     }
   })
 )

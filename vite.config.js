@@ -36,11 +36,6 @@ const getConfig = () => {
           changeOrigin: true,
           rewrite: (path) => path.replace(/^\/graphql\/cities/, '/graphql')
         },
-        '/api/purge': {
-          target: `${URLStartPrefix}api.azion.com/v4/edge/purge`,
-          changeOrigin: true,
-          rewrite: (path) => path.replace(/^\/api\/purge/, ''),
-        },
         '^/api/(account|user|token|switch-account|password|totp)|^/logout': {
           target: `${URLStartPrefix}sso.azion.com`,
           changeOrigin: true,

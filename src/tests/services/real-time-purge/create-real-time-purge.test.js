@@ -25,11 +25,11 @@ describe('RealTimePurgeServices', () => {
       statusCode: 201
     })
     const { sut } = makeSut()
-
+    const version = 'v4'
     await sut(fixtures.realTimePurgeMock)
 
     expect(requestSpy).toHaveBeenCalledWith({
-      url: `purge/cachekey`,
+      url: `${version}/edge/purge/cachekey`,
       method: 'POST',
       body: {
         items: ['www.example.com', 'www.test.com.br'],
