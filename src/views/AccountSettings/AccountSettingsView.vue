@@ -30,16 +30,16 @@
   })
 
   const validationSchema = yup.object({
-    accountName: yup.string().required('Account name is a required field.'),
+    accountName: yup.string().required().label('Account Name'),
     clientId: yup.string(),
     companyName: yup.string(),
     uniqueIdentifier: yup.string(),
     billingEmails: yup.string(),
-    postalCode: yup.string().required('Postal code is a required field.'),
-    country: yup.string().required('Country is a required field.'),
-    region: yup.string().required('State/Region is a required field.'),
-    city: yup.string().required('City is a required field.'),
-    address: yup.string().required('Address is a required field.'),
+    postalCode: yup.string().required().label('Postal Code'),
+    country: yup.string().required().label('Country'),
+    region: yup.string().required().label('State/Region'),
+    city: yup.string().required().label('City'),
+    address: yup.string().required().label('Address'),
     complement: yup.string(),
     isSocialLoginEnabled: yup.boolean(),
     isEnabledMfaToAllUsers: yup.boolean()
