@@ -54,7 +54,6 @@
   import SidebarBlock from '@templates/sidebar-block'
   import Create from './create'
   import Help from './help'
-  import Notification from './notification'
   import SwitchAccount from './switch-account'
   import ProfileBlock from '@templates/profile-block'
 
