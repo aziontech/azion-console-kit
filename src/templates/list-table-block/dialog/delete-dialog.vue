@@ -7,6 +7,7 @@
     :pt="{
       header: { class: 'p-5' }
     }"
+    @keyup.enter="removeItem()"
   >
     <div class="flex flex-col gap-5">
       <div>
