@@ -28,11 +28,11 @@ describe('PersonalTokensServices', () => {
       }
     })
     const { sut } = makeSut()
-
+    const version = 'v4'
     await sut(fixtures.personalTokenMock)
 
     expect(requestSpy).toHaveBeenCalledWith({
-      url: 'iam/personal_tokens',
+      url: `${version}/iam/personal_tokens`,
       method: 'POST',
       body: {
         name: fixtures.personalTokenMock.name,

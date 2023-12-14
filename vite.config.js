@@ -51,11 +51,11 @@ const getConfig = () => {
           changeOrigin: true,
           rewrite: (path) => path.replace(/^\/api\/script-runner/, '')
         },
-        '/events/graphql': {
-          target: `${URLStartPrefix}api.azion.com`,
-          changeOrigin: true
-          //rewrite: (path) => path.replace(/^\/events\/graphql\//, '')
-        },
+        // '/events/graphql': {
+        //   target: `${URLStartPrefix}api.azion.com`,
+        //   changeOrigin: true
+        //   rewrite: (path) => path.replace(/^\/events\/graphql\//, '')
+        // },
         // '/api/iam': {
         //   target: `${URLStartPrefix}manager.azion.com/iam/api`,
         //   changeOrigin: true,
