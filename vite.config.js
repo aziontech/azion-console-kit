@@ -66,11 +66,11 @@ const getConfig = () => {
           changeOrigin: true,
           rewrite: (path) => path.replace(/^\/api\/account-details/, '')
         },
-        '/api/teams': {
-          target: `${URLStartPrefix}iam.azion.com/iam/api/teams`,
-          changeOrigin: true,
-          rewrite: (path) => path.replace(/^\/api\/teams/, '')
-        },
+        // '/api/teams': {
+        //   target: `${URLStartPrefix}iam.azion.com/iam/api/teams`,
+        //   changeOrigin: true,
+        //   rewrite: (path) => path.replace(/^\/api\/teams/, '')
+        // },
         '/api/purge': {
           target: 'https://stage-manager.azion.com/api/purge',
           changeOrigin: true,
@@ -81,11 +81,6 @@ const getConfig = () => {
           changeOrigin: true,
           rewrite: (path) => path.replace(/^\/api\/permissions/, '')
         },
-        // '/api/users': {
-        //   target: `${URLStartPrefix}iam.azion.com/iam/api`,
-        //   changeOrigin: true,
-        //   rewrite: (path) => path.replace(/^\/api/, '')
-        // },
         '/api/credentials': {
           target: `${URLStartPrefix}manager.azion.com/credentials/api/v1/credentials`,
           changeOrigin: true,
