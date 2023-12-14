@@ -201,7 +201,7 @@
 
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
         <label
-          for="email"
+          for="mobile"
           class="text-color text-base font-medium"
           >Mobile *</label
         >
@@ -211,7 +211,7 @@
               id="timezone"
               filter
               :options="filteredCountriesMobile"
-              optionLabel="label"
+              optionLabel="labelFormat"
               placeholder="Loading..."
               :loading="isLoadingCountry"
               :class="{ 'p-invalid': errorSelectedCountryCallCode }"
