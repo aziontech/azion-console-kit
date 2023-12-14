@@ -51,10 +51,11 @@ describe('EdgeNodeServices', () => {
     })
 
     const { sut } = makeSut()
+    const version = 'v3'
     await sut(fixtures.payload)
 
     expect(requestSpy).toHaveBeenCalledWith({
-      url: `edge_node/${fixtures.payload.edgeNodeId}/services?page=1&page_size=1000000&is_bound=${fixtures.payload.bound}`,
+      url: `${version}/edge_nodes/${fixtures.payload.edgeNodeId}/services?page=1&page_size=1000000&is_bound=${fixtures.payload.bound}`,
       method: 'GET'
     })
   })
