@@ -25,12 +25,12 @@ describe('DataStreamingServices', () => {
     })
     const deleteIdMock = 12346654
     const { sut } = makeSut()
-
+    const version = 'v3'
     await sut(deleteIdMock)
 
     expect(httpClientSpy).toHaveBeenCalledWith({
       method: 'DELETE',
-      url: `data_streaming/streamings/${deleteIdMock}`
+      url: `${version}/data_streaming/streamings/${deleteIdMock}`
     })
   })
 

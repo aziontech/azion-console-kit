@@ -57,11 +57,11 @@ describe('EdgeFunctionsServices', () => {
       body: { results: [] }
     })
     const { sut } = makeSut()
-
+    const version = 'v3'
     await sut({})
 
     expect(requestSpy).toHaveBeenCalledWith({
-      url: `edge_functions?order_by=id&sort=asc&page=1&page_size=200`,
+      url: `${version}/edge_functions?order_by=id&sort=asc&page=1&page_size=200`,
       method: 'GET'
     })
   })

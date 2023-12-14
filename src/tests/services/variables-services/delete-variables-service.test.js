@@ -18,11 +18,11 @@ describe('VariablesServices', () => {
     })
     const environmentVariableIdMock = 765678
     const { sut } = makeSut()
-
+    const version = 'v3'
     await sut(environmentVariableIdMock)
 
     expect(requestSpy).toHaveBeenCalledWith({
-      url: `variables/${environmentVariableIdMock}`,
+      url: `${version}/variables/${environmentVariableIdMock}`,
       method: 'DELETE'
     })
   })

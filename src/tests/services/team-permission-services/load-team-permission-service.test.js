@@ -29,11 +29,11 @@ describe('TeamPermissionService', () => {
     })
     const teamPermissionMockId = 2
     const { sut } = makeSut()
-
+    const version = 'v4'
     await sut({ id: teamPermissionMockId })
 
     expect(requestSpy).toHaveBeenCalledWith({
-      url: `teams/${teamPermissionMockId}`,
+      url: `${version}/iam/teams/${teamPermissionMockId}`,
       method: 'GET'
     })
   })

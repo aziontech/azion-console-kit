@@ -26,11 +26,11 @@ describe('EdgeServiceServices', () => {
       statusCode: 200
     })
     const { sut } = makeSut()
-
+    const version = 'v3'
     await sut(fixtures.mock)
 
     expect(requestSpy).toHaveBeenCalledWith({
-      url: `edge_services/${fixtures.mock.id}`,
+      url: `${version}/edge_services/${fixtures.mock.id}`,
       method: 'PATCH',
       body: {
         active: fixtures.mock.active,
@@ -50,11 +50,11 @@ describe('EdgeServiceServices', () => {
       statusCode: 200
     })
     const { sut } = makeSut()
-
+    const version = 'v3'
     await sut({ ...fixtures.mock, code: '' })
 
     expect(requestSpy).toHaveBeenCalledWith({
-      url: `edge_services/${fixtures.mock.id}`,
+      url: `${version}/edge_services/${fixtures.mock.id}`,
       method: 'PATCH',
       body: {
         active: fixtures.mock.active,

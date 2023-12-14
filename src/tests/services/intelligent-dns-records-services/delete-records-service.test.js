@@ -19,12 +19,12 @@ describe('IntelligentDnsRecordsServices', () => {
     const recordIDMock = 12387555
     const intelligentDNSIDMock = 765789
     const { sut } = makeSut()
-
+    const version = 'v3'
     await sut({ recordID: recordIDMock, intelligentDNSID: intelligentDNSIDMock })
 
     expect(requestSpy).toHaveBeenCalledWith({
       method: 'DELETE',
-      url: `intelligent_dns/${intelligentDNSIDMock}/records/${recordIDMock}`
+      url: `${version}/intelligent_dns/${intelligentDNSIDMock}/records/${recordIDMock}`
     })
   })
 

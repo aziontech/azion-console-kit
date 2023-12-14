@@ -35,11 +35,11 @@ describe('IntelligentDnsRecordsServices', () => {
       }
     })
     const { sut } = makeSut()
-
+    const version = 'v3'
     await sut(fixtures.dnsRecordMock)
 
     expect(requestSpy).toHaveBeenCalledWith({
-      url: `intelligent_dns/${fixtures.dnsRecordMock.intelligentDNSID}/records`,
+      url: `${version}/intelligent_dns/${fixtures.dnsRecordMock.intelligentDNSID}/records`,
       method: 'POST',
       body: {
         record_type: fixtures.dnsRecordMock.selectedRecordType,

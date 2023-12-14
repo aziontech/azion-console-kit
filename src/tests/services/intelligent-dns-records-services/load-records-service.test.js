@@ -32,14 +32,14 @@ describe('IntelligentDnsRecordsServices', () => {
     const dnsRecordMockId = 812783
     const intelligentDNSMockId = 7879123
     const { sut } = makeSut()
-
+    const version = 'v3'
     await sut({
       id: dnsRecordMockId,
       intelligentDNSId: intelligentDNSMockId
     })
 
     expect(requestSpy).toHaveBeenCalledWith({
-      url: `intelligent_dns/${intelligentDNSMockId}/records?id=${dnsRecordMockId}`,
+      url: `${version}/intelligent_dns/${intelligentDNSMockId}/records?id=${dnsRecordMockId}`,
       method: 'GET'
     })
   })

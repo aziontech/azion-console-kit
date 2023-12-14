@@ -17,11 +17,11 @@ describe('UsersServices', () => {
     })
     const userIdMock = 765678
     const { sut } = makeSut()
-
+    const version = 'v4'
     await sut(userIdMock)
 
     expect(requestSpy).toHaveBeenCalledWith({
-      url: `users/${userIdMock}`,
+      url: `${version}/iam/users/${userIdMock}`,
       method: 'DELETE'
     })
   })

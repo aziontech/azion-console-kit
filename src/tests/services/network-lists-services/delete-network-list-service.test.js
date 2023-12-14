@@ -17,11 +17,11 @@ describe('NetworkListsServices', () => {
     })
     const { sut } = makeSut()
     const networkIdMock = 987678
-
+    const version = 'v3'
     await sut(networkIdMock)
 
     expect(requestSpy).toHaveBeenCalledWith({
-      url: `network_lists/${networkIdMock}`,
+      url: `${version}/network_lists/${networkIdMock}`,
       method: 'DELETE'
     })
   })

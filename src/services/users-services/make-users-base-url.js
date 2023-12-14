@@ -1,3 +1,4 @@
 export const makeUsersBaseUrl = () => {
-  return `users`
+  const version = 'v4'
+  return `${version}/iam/users`
 }

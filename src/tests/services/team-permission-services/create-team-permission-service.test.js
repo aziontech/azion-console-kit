@@ -33,11 +33,11 @@ describe('TeamPermissionServices', () => {
       }
     })
     const { sut } = makeSut()
-
+    const version = 'v4'
     await sut(fixtures.teamPermissionMock)
 
     expect(requestSpy).toHaveBeenCalledWith({
-      url: `teams`,
+      url: `${version}/iam/teams`,
       method: 'POST',
       body: {
         name: fixtures.teamPermissionMock.name,
