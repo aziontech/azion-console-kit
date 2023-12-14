@@ -64,6 +64,6 @@ const router = createRouter({
   ].concat(errorRoutes)
 })
 
-router.beforeResolve(beforeEachRoute)
+router.beforeEach(beforeEachRoute)
 
 export default router

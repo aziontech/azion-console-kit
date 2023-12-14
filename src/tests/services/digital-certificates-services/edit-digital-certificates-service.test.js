@@ -31,11 +31,11 @@ describe('DigitalCertificatesServices', () => {
       statusCode: 200
     })
     const { sut } = makeSut()
-
+    const version = 'v3'
     await sut(fixture.payloadMock)
 
     expect(requestSpy).toHaveBeenCalledWith({
-      url: `digital_certificates/${fixture.payloadMock.id}`,
+      url: `${version}/digital_certificates/${fixture.payloadMock.id}`,
       method: 'PATCH',
       body: {
         certificate: fixture.payloadMock.certificate,

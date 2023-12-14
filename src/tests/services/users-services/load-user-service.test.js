@@ -38,13 +38,13 @@ describe('UsersServices', () => {
       statusCode: 200,
       body: { data: fixtures.userMock }
     })
-    const userMockId = 4110
-    const { sut } = makeSut()
 
-    await sut({ id: userMockId })
+    const { sut } = makeSut()
+    const version = 'v4'
+    await sut({ id: fixtures.userMock.id })
 
     expect(requestSpy).toHaveBeenCalledWith({
-      url: `users/${userMockId}`,
+      url: `${version}/iam/users/${fixtures.userMock.id}`,
       method: 'GET'
     })
   })

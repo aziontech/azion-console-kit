@@ -52,12 +52,12 @@ describe('DigitalCertificatesServices', () => {
     })
 
     const { sut } = makeSut()
-
+    const version = 'v3'
     const result = await sut(fixture.payloadMock)
 
     expect(requestSpy).toHaveBeenCalledWith({
       method: 'POST',
-      url: 'digital_certificates',
+      url: `${version}/digital_certificates`,
       body: fixture.requestBodyMock
     })
 

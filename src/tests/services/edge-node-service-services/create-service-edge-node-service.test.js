@@ -29,12 +29,12 @@ describe('EdgeNodeServices', () => {
     })
 
     const { sut } = makeSut()
-
+    const version = 'v3'
     await sut(fixtures.mock)
 
     expect(requestSpy).toHaveBeenCalledWith({
       method: 'POST',
-      url: `edge_node/${fixtures.mock.id}/services`,
+      url: `${version}/edge_nodes/${fixtures.mock.id}/services`,
       body: {
         service_id: '123',
         variables: [
@@ -54,12 +54,12 @@ describe('EdgeNodeServices', () => {
     })
 
     const { sut } = makeSut()
-
+    const version = 'v3'
     await sut({ ...fixtures.mock, variables: '' })
 
     expect(requestSpy).toHaveBeenCalledWith({
       method: 'POST',
-      url: `edge_node/${fixtures.mock.id}/services`,
+      url: `${version}/edge_nodes/${fixtures.mock.id}/services`,
       body: {
         service_id: '123',
         variables: []

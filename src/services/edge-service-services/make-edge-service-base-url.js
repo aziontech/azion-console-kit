@@ -1,3 +1,4 @@
 export const makeEdgeServiceBaseUrl = () => {
-  return `edge_services`
+  const version = 'v3'
+  return `${version}/edge_services`
 }

@@ -54,11 +54,11 @@ describe('UsersServices', () => {
     })
 
     const { sut } = makeSut()
-
+    const version = 'v4'
     await sut({})
 
     expect(requestSpy).toHaveBeenCalledWith({
-      url: `users?order_by=id&sort=asc&page=1&page_size=200`,
+      url: `${version}/iam/users?order_by=id&sort=asc&page=1&page_size=200`,
       method: 'GET'
     })
   })
