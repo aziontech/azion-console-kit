@@ -40,11 +40,11 @@ describe('UsersServices', () => {
     })
 
     const { sut } = makeSut()
-
+    const version = 'v4'
     await sut({ id: fixtures.userMock.id })
 
     expect(requestSpy).toHaveBeenCalledWith({
-      url: `users/${fixtures.userMock.id}`,
+      url: `${version}/iam/users/${fixtures.userMock.id}`,
       method: 'GET'
     })
   })
