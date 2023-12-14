@@ -5,14 +5,14 @@
     v-else-if="!isLoading"
   >
     <FormHorizontal
-      v-if="schema.fields"
+      v-if="inputSchema.fields"
       title="General"
       :isDrawer="props.isDrawer"
     >
       <template #inputs>
         <div
           class="flex flex-col sm:max-w-lg w-full gap-2"
-          v-for="field in removeHiddenFields(schema.fields)"
+          v-for="field in removeHiddenFields(inputSchema.fields)"
           :key="field.name"
         >
           <label
@@ -25,7 +25,7 @@
             v-if="field.type === 'password'"
             toggleMask
             :key="`password${field.name}`"
-            :modelValue="field.value.value"
+            :modelValue="field.value.input"
             @input="(event) => inputPassword(field.name, event.target.value)"
             :id="field.name"
             class="w-full"
@@ -37,7 +37,7 @@
             :key="field.name"
             :id="field.name"
             type="text"
-            v-bind="field.value"
+            v-bind="field.input"
             :class="{ 'p-invalid': formTools.errors[field.name] }"
           />
           <small class="text-xs font-normal text-color-secondary">{{ field.description }}</small>
@@ -51,9 +51,9 @@
       </template>
     </FormHorizontal>
 
-    <div v-if="schema.groups">
+    <div v-if="inputSchema.groups">
       <FormHorizontal
-        v-for="group in schema.groups"
+        v-for="group in inputSchema.groups"
         :key="group.name"
         :title="group.label"
         :isDrawer="props.isDrawer"
@@ -74,7 +74,7 @@
               v-if="field.type === 'password'"
               toggleMask
               :key="`password${field.name}`"
-              :modelValue="field.value.value"
+              :modelValue="field.value.input"
               @input="(event) => inputPassword(field.name, event.target.value)"
               :id="field.name"
               class="w-full"
@@ -86,7 +86,7 @@
               :key="field.name"
               :id="field.name"
               type="text"
-              v-bind="field.value"
+              v-bind="field.input"
               :class="{ 'p-invalid': formTools.errors[field.name] }"
             />
             <small class="tet-xs font-normal text-color-secondary">{{ field.description }}</small>
@@ -122,7 +122,7 @@
   import ActionBarTemplate from '@templates/action-bar-block'
   import FormLoading from './FormLoading'
   import InputText from 'primevue/inputtext'
-  import { useForm } from 'vee-validate'
+  import { useForm, useSetFieldValue } from 'vee-validate'
   import * as yup from 'yup'
   import { useToast } from 'primevue/usetoast'
 
@@ -162,8 +162,7 @@
   })
 
   const toast = useToast()
-  const schema = ref({})
-  const validationSchema = ref()
+  const inputSchema = ref({})
   const formTools = ref({})
   const isLoading = ref(true)
   const submitLoading = ref(false)
@@ -172,7 +171,10 @@
   const loadTemplate = async (id) => {
     try {
       const initialData = await props.getTemplateService(id)
-      schemaLoaded(initialData.inputSchema)
+      inputSchema.value = initialData.inputSchema
+      const schemaObject = createSchemaObject()
+      const isValid = (await schemaObject).isValid()
+      createInputs(schemaObject, isValid)
     } catch (error) {
       toast.add({
         closable: true,
@@ -192,87 +194,110 @@
     }, 100)
   })
 
-  const { errors, meta, defineInputBinds, resetForm, values, setFieldValue, validate, setTouched } =
-    useForm({
+  const createSchemaObject = async () => {
+    const token = {}
+
+    if (inputSchema.value.fields) {
+      inputSchema.value.fields.forEach((element) => {
+        const schema = createSchemaString(element)
+        token[element.name] = schema
+      })
+    }
+
+    if (inputSchema.value.groups) {
+      inputSchema.value.groups.forEach((group) => {
+        group.fields.forEach((element) => {
+          const schema = createSchemaString(element)
+          token[element.name] = schema
+        })
+      })
+    }
+
+    const schameObject = yup.object(token)
+
+    return schameObject
+  }
+
+  const createSchemaString = (element) => {
+    let schema = yup.string()
+
+    if (element.hidden) return schema
+
+    if (element.attrs.required) {
+      schema = schema.required(`${element.label} is required`)
+    }
+
+    if (element.attrs.maxLength) {
+      schema = schema.max(
+        element.attrs.maxLength,
+        `This field cannot exceed ${element.attrs.maxLength} characters`
+      )
+    }
+
+    if (element.attrs.minLength) {
+      schema = schema.max(
+        element.attrs.minLength,
+        `This field must have at least ${element.attrs.minLength} characters`
+      )
+    }
+
+    if (element.validators) {
+      element.validators.forEach((validator) => {
+        schema = schema.test(`valid-${element.name}`, validator.errorMessage, function (value) {
+          const domainRegex = new RegExp(validator.regex)
+          return domainRegex.test(value)
+        })
+      })
+    }
+
+    if (element.value.length > 0) {
+      schema = schema.default(element.value)
+    }
+
+    return schema
+  }
+
+  const createInputs = async (validationSchema, isValid) => {
+    const {
+      errors,
+      meta,
+      setTouched,
+      defineInputBinds,
+      resetForm,
+      values,
+      validate,
+      setFieldValue
+    } = useForm({
       validationSchema
     })
 
-  const schemaLoaded = async (inputSchema) => {
-    schema.value = inputSchema
-    const auxValidator = {}
+    formTools.value = { errors, meta, resetForm, values }
 
-    const addField = (element) => {
-      auxValidator[element.name] = yup.string()
-      if (!element.hidden) {
-        if (element.attrs.required) {
-          auxValidator[element.name] = auxValidator[element.name].required(
-            `${element.label} is required`
-          )
-        }
-        if (element.attrs.maxLength) {
-          auxValidator[element.name] = auxValidator[element.name].max(
-            element.attrs.maxLength,
-            `This field cannot exceed ${element.attrs.maxLength} characters`
-          )
-        }
-        if (element.attrs.minLength) {
-          auxValidator[element.name] = auxValidator[element.name].max(
-            element.attrs.minLength,
-            `This field must have at least ${element.attrs.minLength} characters`
-          )
-        }
-        if (element.validators) {
-          element.validators.forEach((validator) => {
-            auxValidator[element.name] = auxValidator[element.name].test(
-              `valid-${element.name}`,
-              validator.errorMessage,
-              function (value) {
-                const domainRegex = new RegExp(validator.regex)
-                return domainRegex.test(value)
-              }
-            )
-          })
-        }
-        if (element.value.length > 0) {
+    if (inputSchema.value.fields) {
+      inputSchema.value.fields.forEach((element) => {
+        if (element.value) {
           setFieldValue(element.name, element.value)
         }
-      }
-    }
-
-    if (schema.value.fields) {
-      schema.value.fields.forEach((element) => {
-        addField(element)
+        element.input = defineInputBinds(element.name, { validateOnInput: true })
       })
     }
 
-    if (schema.value.groups) {
-      schema.value.groups.forEach((group) => {
+    if (inputSchema.value.groups) {
+      inputSchema.value.groups.forEach((group) => {
         group.fields.forEach((element) => {
-          addField(element)
+          if (element.value) {
+            setFieldValue(element.name, element.value)
+          }
+          element.input = defineInputBinds(element.name, { validateOnInput: true })
         })
       })
     }
 
-    validationSchema.value = yup.object(auxValidator)
-
-    formTools.value = { errors, meta, resetForm, values }
-    if (schema.value.fields) {
-      schema.value.fields.forEach((element) => {
-        element.value = defineInputBinds(element.name, { validateOnInput: true })
-      })
-    }
-    if (schema.value.groups) {
-      schema.value.groups.forEach((group) => {
-        group.fields.forEach((element) => {
-          element.value = defineInputBinds(element.name, { validateOnInput: true })
-        })
-      })
-    }
     isLoading.value = false
 
     // If all fields is valid on load, allow submit
-    const { valid } = await validate()
-    if (valid) {
+    if (isValid) {
+      await validate()
       setTouched(true)
     }
   }
@@ -282,6 +307,7 @@
   }
 
   const inputPassword = (inputName, text) => {
+    const setFieldValue = useSetFieldValue()
     setFieldValue(inputName, text)
   }
 
@@ -291,11 +317,11 @@
 
     try {
       const payload = []
-      if (schema.value.fields) {
-        payload.push(...schema.value.fields)
+      if (inputSchema.value.fields) {
+        payload.push(...inputSchema.value.fields)
       }
-      if (schema.value.groups) {
-        schema.value.groups.forEach((group) => {
+      if (inputSchema.value.groups) {
+        inputSchema.value.groups.forEach((group) => {
           payload.push(...group.fields)
         })
       }
@@ -304,7 +330,7 @@
         const sanitizedField = {
           field: payload[index].name,
           instantiation_data_path: payload[index].instantiation_data_path,
-          value: payload[index].value.value ? payload[index].value.value : ''
+          value: payload[index].input.value ? payload[index].input.value : ''
         }
 
         // Hidden field
