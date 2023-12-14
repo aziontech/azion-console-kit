@@ -1,16 +1,31 @@
-.p-divider-horizontal::before {
-  border-bottom-width: $dividerSize;
-  border-bottom-color: $dividerColor;
-}
+.p-divider {
+  .p-divider-content {
+      background-color: $panelContentBg;
+  }
 
-.p-divider-vertical::before {
-  border-right-width: $dividerSize;
-  border-right-color: $dividerColor;
-}
+  &.p-divider-horizontal {
+      margin: $dividerHorizontalMargin;
+      padding: $dividerHorizontalPadding;
 
-.p-divider-dashed::before {
-  border-style: dashed;
-}
-.p-divider-dotted::before {
-  border-style: dotted;
+      &:before {
+          border-top: $dividerSize $dividerColor;
+      }
+
+      .p-divider-content {
+          padding: 0 $inlineSpacing;
+      }
+  }
+
+  &.p-divider-vertical {
+      margin: $dividerVerticalMargin;
+      padding: $dividerVerticalPadding;
+
+      &:before {
+          border-left: $dividerSize $dividerColor;
+      }
+
+      .p-divider-content {
+          padding: $inlineSpacing 0;
+      }
+  }
 }
