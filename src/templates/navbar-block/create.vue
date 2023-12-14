@@ -59,7 +59,7 @@
         />
       </div>
     </template>
-    <CreateModalBlock />
+    <CreateModalBlock @closeModal="closeCreateModalStore()"/>
   </Sidebar>
 </template>
 

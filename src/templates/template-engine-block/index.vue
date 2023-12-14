@@ -200,45 +200,59 @@
   const schemaLoaded = async (inputSchema) => {
     schema.value = inputSchema
     const auxValidator = {}
+
+    const addField = (element) => {
+      auxValidator[element.name] = yup.string()
+      if (!element.hidden) {
+        if (element.attrs.required) {
+          auxValidator[element.name] = auxValidator[element.name].required(
+            `${element.label} is required`
+          )
+        }
+        if (element.attrs.maxLength) {
+          auxValidator[element.name] = auxValidator[element.name].max(
+            element.attrs.maxLength,
+            `This field cannot exceed ${element.attrs.maxLength} characters`
+          )
+        }
+        if (element.attrs.minLength) {
+          auxValidator[element.name] = auxValidator[element.name].max(
+            element.attrs.minLength,
+            `This field must have at least ${element.attrs.minLength} characters`
+          )
+        }
+        if (element.validators) {
+          element.validators.forEach((validator) => {
+            auxValidator[element.name] = auxValidator[element.name].test(
+              `valid-${element.name}`,
+              validator.errorMessage,
+              function (value) {
+                const domainRegex = new RegExp(validator.regex)
+                return domainRegex.test(value)
+              }
+            )
+          })
+        }
+        if (element.value.length > 0) {
+          setFieldValue(element.name, element.value)
+        }
+      }
+    }
+
     if (schema.value.fields) {
       schema.value.fields.forEach((element) => {
-        auxValidator[element.name] = yup.string()
-        if (!element.hidden) {
-          if (element.attrs.required) {
-            auxValidator[element.name] = auxValidator[element.name].required(
-              `${element.label} is required`
-            )
-          }
-          if (element.attrs.maxLength) {
-            auxValidator[element.name] = auxValidator[element.name].max(
-              element.attrs.maxLength,
-              `This field cannot exceed ${element.attrs.maxLength} characters`
-            )
-          }
-          if (element.attrs.minLength) {
-            auxValidator[element.name] = auxValidator[element.name].max(
-              element.attrs.minLength,
-              `This field must have at least ${element.attrs.minLength} characters`
-            )
-          }
-          if (element.validators) {
-            element.validators.forEach((validator) => {
-              auxValidator[element.name] = auxValidator[element.name].test(
-                `valid-${element.name}`,
-                validator.errorMessage,
-                function (value) {
-                  const domainRegex = new RegExp(validator.regex)
-                  return domainRegex.test(value)
-                }
-              )
-            })
-          }
-          if (element.value.length > 0) {
-            setFieldValue(element.name, element.value)
-          }
-        }
+        addField(element)
       })
     }
+
+    if (schema.value.groups) {
+      schema.value.groups.forEach((group) => {
+        group.fields.forEach((element) => {
+          addField(element)
+        })
+      })
+    }
+
     validationSchema.value = yup.object(auxValidator)
 
     formTools.value = { errors, meta, resetForm, values }

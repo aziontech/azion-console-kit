@@ -115,8 +115,8 @@
     </div>
     <EmptyResultsBlock
       v-else
-      title="No Services added."
-      description="Create your first Service."
+      title="No services have been provisioned."
+      description="Click the button below to initiate the setup process and provision your first edge service."
       :documentationService="props.documentationServiceServices"
       :inTabs="true"
     >
@@ -124,7 +124,7 @@
         <PrimeButton
           severity="secondary"
           icon="pi pi-plus"
-          label="Service"
+          label="Add"
           @click="openCreateServiceDrawer"
         />
       </template>

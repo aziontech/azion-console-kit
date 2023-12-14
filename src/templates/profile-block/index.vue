@@ -218,7 +218,7 @@
   const profileMenuDefault = [
     {
       label: 'Account Settings',
-      to: '/account-settings'
+      to: '/account/settings'
     },
     {
       label: 'Users Management',
