@@ -2,7 +2,7 @@ import { AxiosHttpClientAdapter } from '../axios/AxiosHttpClientAdapter'
 import { makeUsersBaseUrl } from './make-users-base-url'
 import * as Errors from '@/services/axios/errors'
 
-export const editUserService = async (payload) => {
+export const editUsersService = async (payload) => {
   const bodyRequest = adapt(payload)
   let httpResponse = await AxiosHttpClientAdapter.request({
     url: `${makeUsersBaseUrl()}/${payload.id}`,
@@ -14,7 +14,7 @@ export const editUserService = async (payload) => {
 }
 
 const adapt = (payload) => {
-  return {
+  const bodyRequest = {
     first_name: payload.firstName,
     last_name: payload.lastName,
     email: payload.email,
@@ -22,10 +22,15 @@ const adapt = (payload) => {
     timezone: payload.timezone,
     country_call_code: payload.countryCallCode.value,
     mobile: payload.mobile?.toString(),
-    is_account_owner: payload.userIsOwner,
+    is_account_owner: payload.isAccountOwner,
     teams_ids: payload.teamsIds,
     two_factor_enabled: payload.twoFactorEnabled
   }
+  if (payload.password) {
+    bodyRequest.old_password = payload.oldPassword
+    bodyRequest.password = payload.password
+  }
+  return bodyRequest
 }
 
 /**

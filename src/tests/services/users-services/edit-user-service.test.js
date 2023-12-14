@@ -1,5 +1,5 @@
 import { AxiosHttpClientAdapter } from '@/services/axios/AxiosHttpClientAdapter'
-import { editUserService } from '@/services/users-services'
+import { editUsersService } from '@/services/users-services'
 import * as Errors from '@/services/axios/errors'
 import { describe, expect, it, vi } from 'vitest'
 
@@ -17,14 +17,14 @@ const fixtures = {
       value: 'AL - 355'
     },
     mobile: 12312312,
-    userIsOwner: false,
+    isAccountOwner: false,
     teamsIds: [1580],
     twoFactorEnabled: false
   }
 }
 
 const makeSut = () => {
-  const sut = editUserService
+  const sut = editUsersService
 
   return {
     sut
@@ -51,7 +51,7 @@ describe('UsersService', () => {
         email: fixtures.userMock.email,
         country_call_code: fixtures.userMock.countryCallCode.value,
         mobile: fixtures.userMock.mobile.toString(),
-        is_account_owner: fixtures.userMock.userIsOwner,
+        is_account_owner: fixtures.userMock.isAccountOwner,
         teams_ids: fixtures.userMock.teamsIds,
         two_factor_enabled: fixtures.userMock.twoFactorEnabled
       }

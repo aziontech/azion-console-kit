@@ -22,9 +22,16 @@ const adapt = (httpResponse) => {
     timezone: responseData.timezone,
     countryCallCode: responseData.country_call_code,
     mobile: responseData.mobile,
-    userIsOwner: responseData.is_account_owner,
+    isAccountOwner: responseData.is_account_owner,
     teamsIds: responseData.teams.map((value) => value.id),
-    twoFactorEnabled: responseData.two_factor_enabled
+    twoFactorEnabled: responseData.two_factor_enabled,
+    dateJoined: responseData.date_joined,
+    isActive: responseData.is_active,
+    isStaff: responseData.is_staff,
+    isTrial: responseData.is_trial,
+    lastLogin: responseData.last_login,
+    phone: responseData.phone,
+    teams: responseData.teams,
   }
 
   return {

@@ -22,7 +22,7 @@ const adapt = (payload) => {
     timezone: payload.timezone,
     country_call_code: payload.countryCallCode.value,
     mobile: payload.mobile?.toString(),
-    is_account_owner: payload.userIsOwner,
+    is_account_owner: payload.isAccountOwner,
     teams_ids: payload.teamsIds,
     two_factor_enabled: payload.twoFactorEnabled
   }

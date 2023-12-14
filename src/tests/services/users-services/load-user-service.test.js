@@ -32,7 +32,7 @@ const makeSut = () => {
   }
 }
 
-describe('UsersService', () => {
+describe('usersService', () => {
   beforeEach(() => {
     vi.useFakeTimers()
   })
@@ -58,7 +58,7 @@ describe('UsersService', () => {
   it('should parsed correctly the returned variable', async () => {
     vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
       statusCode: 200,
-      body: { data: fixtures.userMock }
+      body: {data:fixtures.userMock}
     })
     const { sut } = makeSut()
 
@@ -74,8 +74,15 @@ describe('UsersService', () => {
       timezone: fixtures.userMock.timezone,
       language: fixtures.userMock.language,
       twoFactorEnabled: fixtures.userMock.two_factor_enabled,
-      userIsOwner: fixtures.userMock.is_account_owner,
-      teamsIds: [fixtures.userMock.teams[0].id]
+      isAccountOwner: fixtures.userMock.is_account_owner,
+      teamsIds: [fixtures.userMock.teams[0].id],
+      dateJoined: fixtures.userMock.date_joined,
+      isActive: fixtures.userMock.is_active,
+      isStaff: fixtures.userMock.is_staff,
+      isTrial: fixtures.userMock.is_trial,
+      lastLogin: fixtures.userMock.last_login,
+      phone: fixtures.userMock.phone,
+      teams: fixtures.userMock.teams,
     })
   })
 })

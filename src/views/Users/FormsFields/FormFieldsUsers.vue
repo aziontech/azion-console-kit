@@ -55,7 +55,7 @@
   const { value: email, errorMessage: errorEmail } = useField('email')
   const { value: countryCallCode, errorMessage: errorCountryCallCode } = useField('countryCallCode')
   const { value: mobile, errorMessage: errorMobile } = useField('mobile')
-  const { value: userIsOwner, errorMessage: errorUserIsOwner } = useField('userIsOwner')
+  const { value: isAccountOwner, errorMessage: errorisAccountOwner } = useField('isAccountOwner')
   const { value: teamsIds, errorMessage: errorTeamsIds } = useField('teamsIds')
   const { value: twoFactorEnabled, errorMessage: errorTwoFactorEnabled } =
     useField('twoFactorEnabled')
@@ -113,14 +113,14 @@
     await fetchDetailAccount()
   })
 
-  const handleUserIsOwner = () => {
-    if (!userIsOwner.value) {
+  const handleisAccountOwner = () => {
+    if (!isAccountOwner.value) {
       teamsIds.value = []
     }
   }
 
   accountIsOwner.value = account?.is_account_owner
-  userIsOwner.value = accountIsOwner.value
+  isAccountOwner.value = accountIsOwner.value
 
   watch(email, (value) => {
     if (!props.isEditForm) {
@@ -297,7 +297,7 @@
           display="chip"
           filter
           id="teams"
-          :disabled="userIsOwner"
+          :disabled="isAccountOwner"
           :loading="!optionsTeams.length"
           :options="optionsTeams"
           optionLabel="label"
@@ -322,11 +322,11 @@
         >
           <template #title>
             <InputSwitch
-              :class="{ 'p-invalid': errorUserIsOwner }"
+              :class="{ 'p-invalid': errorisAccountOwner }"
               :disabled="accountIsOwner"
               :readonly="accountIsOwner"
-              v-model="userIsOwner"
-              @click="handleUserIsOwner"
+              v-model="isAccountOwner"
+              @click="handleisAccountOwner"
               inputId="accountOwner"
             />
             <div class="flex-col gap-1">

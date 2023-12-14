@@ -12,7 +12,7 @@ const fixtures = {
     email: 'johndoe@example.com',
     countryCallCode: { value: 'AF +93' },
     mobile: '+1-123-456-7890',
-    userIsOwner: true,
+    isAccountOwner: true,
     teamsIds: 1,
     twoFactorEnabled: true
   }
@@ -46,7 +46,7 @@ describe('UsersServices', () => {
         country_call_code: fixtures.userMock.countryCallCode.value,
         email: fixtures.userMock.email,
         mobile: fixtures.userMock.mobile,
-        is_account_owner: fixtures.userMock.userIsOwner,
+        is_account_owner: fixtures.userMock.isAccountOwner,
         teams_ids: fixtures.userMock.teamsIds,
         two_factor_enabled: fixtures.userMock.twoFactorEnabled
       }

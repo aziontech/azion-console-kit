@@ -69,13 +69,13 @@
     email: yup.string().email().required('e-mail is a required field').max(254),
     countryCallCode: yup.object().required('country is a required field'),
     mobile: yup.string().required('mobile phone is a required field').max(20),
-    userIsOwner: yup.boolean(),
+    isAccountOwner: yup.boolean(),
     teamsIds: yup.array(),
     twoFactorEnabled: yup.boolean()
   })
 
   const initialValues = {
-    userIsOwner: false,
+    isAccountOwner: false,
     mobile: '',
     selectedTeam: [],
     twoFactorEnabled: false,

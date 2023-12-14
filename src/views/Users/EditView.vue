@@ -27,7 +27,7 @@
       type: Function,
       required: true
     },
-    editUserService: {
+    editUsersService: {
       type: Function,
       required: true
     },
@@ -45,7 +45,7 @@
     email: yup.string().email().required('e-mail is a required field').max(254),
     countryCallCode: yup.object().required('country is a required field'),
     mobile: yup.string().required('mobile phone is a required field').max(20),
-    userIsOwner: yup.boolean(),
+    isAccountOwner: yup.boolean(),
     teamsIds: yup.array(),
     twoFactorEnabled: yup.boolean()
   })
@@ -58,7 +58,7 @@
     </template>
     <template #content>
       <EditFormBlock
-        :editService="props.editUserService"
+        :editService="props.editUsersService"
         :loadService="props.loadUserService"
         :updatedRedirect="props.updatedRedirect"
         :schema="validationSchema"
