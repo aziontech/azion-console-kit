@@ -18,7 +18,7 @@
                       :pt="{ icon: { class: 'mr-0' }, root: { class: 'w-8 h-8' } }"
                     />
                     <span
-                      class="text-primary text-xl whitespace-nowrap  font-medium"
+                      class="text-primary text-xl whitespace-nowrap font-medium"
                       v-if="isUnfinished"
                     >
                       Project is being deployed
@@ -31,33 +31,33 @@
                       {{ results.edge_application.name }}
                     </span>
                     <span
-                      class="text-primary text-xl font-medium whitespace-nowrap "
+                      class="text-primary text-xl font-medium whitespace-nowrap"
                       v-else-if="deployFailed"
                     >
                       Deploy failed
                     </span>
                   </div>
-                    <div class="flex w-full justify-between flex-col-reverse gap-4 md:flex-row" >
-                        <PrimeButton
-                          v-if="isSuccessfullyFinished"
-                          link
-                          :pt="{
-                            root: { class: 'justify-center' },
-                            label: { class: 'grow-0' }
-                          }"
-                          class="px-0 py-1"
-                          :label="results.domain.url"
-                          @click="goToUrl"
-                          icon="pi pi-external-link"
-                          iconPos="right"
-                        />
-                        <PrimeButton
-                          v-if="isSuccessfullyFinished"
-                          outlined
-                          @click="goToEdgeApplicationEditView"
-                          label="Manage"
-                        />
-                    </div>
+                  <div class="flex w-full justify-between flex-col-reverse gap-4 md:flex-row">
+                    <PrimeButton
+                      v-if="isSuccessfullyFinished"
+                      link
+                      :pt="{
+                        root: { class: 'justify-center' },
+                        label: { class: 'grow-0' }
+                      }"
+                      class="px-0 py-1"
+                      :label="results.domain.url"
+                      @click="goToUrl"
+                      icon="pi pi-external-link"
+                      iconPos="right"
+                    />
+                    <PrimeButton
+                      v-if="isSuccessfullyFinished"
+                      outlined
+                      @click="goToEdgeApplicationEditView"
+                      label="Manage"
+                    />
+                  </div>
                 </div>
                 <span
                   class="text-sm font-normal text-color-secondary"
@@ -85,7 +85,7 @@
           >
             <b>Next Steps</b>
           </Divider>
-          <div class=" ml-0 mt-0  w-full max-w-screen-lg grid grid-cols-1 lg:grid-cols-3 gap-4">
+          <div class="ml-0 mt-0 w-full max-w-screen-lg grid grid-cols-1 lg:grid-cols-3 gap-4">
             <PrimeButton
               v-for="(step, index) in nextSteps"
               :key="index"

@@ -23,7 +23,7 @@ const adapt = (httpResponse) => {
     countryCallCode: responseData.country_call_code,
     mobile: responseData.mobile,
     userIsOwner: responseData.is_account_owner,
-    teamsIds: responseData.teams.map(value => value.id),
+    teamsIds: responseData.teams.map((value) => value.id),
     twoFactorEnabled: responseData.two_factor_enabled
   }
 

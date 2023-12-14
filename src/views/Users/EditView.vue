@@ -1,4 +1,3 @@
-
 <script setup>
   import * as yup from 'yup'
   import EditFormBlock from '@/templates/edit-form-block'
@@ -35,7 +34,7 @@
     loadUserService: {
       type: Function,
       required: true
-    },
+    }
   })
 
   const validationSchema = yup.object({
