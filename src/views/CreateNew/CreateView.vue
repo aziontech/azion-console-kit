@@ -301,7 +301,7 @@
         this.showDetails = true
       },
       handleInstantiate(element) {
-        this.$router.push(`/create/deploy/${element.uuid}`)
+        this.$router.push(`/create/deploy/${element.result.uuid}`)
       }
     },
     watch: {

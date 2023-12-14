@@ -25,30 +25,16 @@ const getConfig = () => {
     },
     server: {
       proxy: {
-        '/api/marketplace': {
-          target: `${URLStartPrefix}manager.azion.com/marketplace/api/`,
+        '^/api/(marketplace|script-runner|template-engine)': {
+          target: `${URLStartPrefix}manager.azion.com/`,
           changeOrigin: true,
-          rewrite: (path) => path.replace(/^\/api\/marketplace/, '')
-        },
-        '/api/template-engine': {
-          target: `${URLStartPrefix}manager.azion.com/template-engine/api/`,
-          changeOrigin: true,
-          rewrite: (path) => path.replace(/^\/api\/template-engine/, '')
+          rewrite: (path) =>
+            path.replace(/^\/api\/(marketplace|script-runner|template-engine)/, '/$1/api')
         },
         '/graphql/cities': {
-          target: `${URLStartPrefix}cities.azion.com/graphql`,
+          target: `${URLStartPrefix}cities.azion.com`,
           changeOrigin: true,
-          rewrite: (path) => path.replace(/^\/graphql\/cities/, '')
-        },
-        '/api/script-runner': {
-          target: `${URLStartPrefix}manager.azion.com/script-runner/api/`,
-          changeOrigin: true,
-          rewrite: (path) => path.replace(/^\/api\/script-runner/, '')
-        },
-        '/api/account-details': {
-          target: `${URLStartPrefix}iam.azion.com/iam/api/account`,
-          changeOrigin: true,
-          rewrite: (path) => path.replace(/^\/api\/account-details/, '')
+          rewrite: (path) => path.replace(/^\/graphql\/cities/, '/graphql')
         },
         '/api/purge': {
           target: 'https://stage-manager.azion.com/api/purge',
@@ -61,7 +47,6 @@ const getConfig = () => {
           cookieDomainRewrite: { '*': '' }
         },
         '/api': {
-          // target: `${URLStartPrefix}manager-origin.azion.com/api`,
           target: `${URLStartPrefix}api.azion.com`,
           changeOrigin: true,
           rewrite: (path) => path.replace(/^\/api/, '')
