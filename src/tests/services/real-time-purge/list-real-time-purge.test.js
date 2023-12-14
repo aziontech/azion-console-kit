@@ -6,26 +6,25 @@ import graphQLApi from '../../../services/axios/makeEventsApi'
 
 const purge = [
   {
-    resourceType: "Purge:url",
-    ts: "2023-12-13T18:02:49Z",
-    title: "Purge:url  was created",
-    comment: "-",
-    type: "created",
-    requestData: "\"{\\\"items\\\": [\\\"www.vicva.com\\\"], \\\"layer\\\": \\\"edge_caching\\\"}\"",
-    authorName: "Paulo Sobrinho Ferreira",
-    authorEmail: "paulo.ferreira+teste1@azion.com",
-    accountId: "2515"
-  },
-  
+    resourceType: 'Purge:url',
+    ts: '2023-12-13T18:02:49Z',
+    title: 'Purge:url  was created',
+    comment: '-',
+    type: 'created',
+    requestData: '"{\\"items\\": [\\"www.vicva.com\\"], \\"layer\\": \\"edge_caching\\"}"',
+    authorName: 'Paulo Sobrinho Ferreira',
+    authorEmail: 'paulo.ferreira+teste1@azion.com',
+    accountId: '2515'
+  }
 ]
 
 const fixtures = {
   realTimePurgeMock: {
     arguments: ['www.vicva.com'],
-    layer: "edge_caching",
-    time: "Wednesday, December 13, 2023 at 6:02 PM",
-    type: "url",
-    user: "paulo.ferreira+teste1@azion.com",
+    layer: 'edge_caching',
+    time: 'Wednesday, December 13, 2023 at 6:02 PM',
+    type: 'url',
+    user: 'paulo.ferreira+teste1@azion.com'
   }
 }
 
