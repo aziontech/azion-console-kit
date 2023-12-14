@@ -6,20 +6,28 @@
           severity="warn"
           :closable="false"
           :pt="{
-            root: { class: 'mx-3 sm:mx-8 mt-4' },
-            wrapper: { class: 'py-3 px-8' }
+            root: { class: 'mx-3 mt-4 sm:mx-8' },
+            wrapper: { class: 'py-3 px-3 items-start sm:items-center' }
           }"
         >
           <template #messageicon>
             <Avatar
               icon="pi pi-exclamation-triangle"
-              class="bg-yellow-600 bg-opacity-20 text-yellow-600 mr-2"
+              class="bg-yellow-600 bg-opacity-20 text-yellow-600 mr-2 min-w-[2rem]"
             />
           </template>
           <p class="text-color-secondary">
-            <b class="text-color">Experiment in progress.</b>
-            You're currently using Azion's Platform Kit. Avoid complex setups as this platform is
-            currently undergoing testing and fine-tuning.
+            <b class="text-color">Ongoing Experiment.</b>
+            Our platform is in its early release stage. Please bear with us as occasional
+            instability or bugs may occur during this time. If you encounter any issue,
+            <ButtonPrime
+              class="p-0"
+              label="let us know"
+              icon="pi pi-external-link"
+              iconPos="right"
+              link
+              @click="goToCreateIssue"
+            />
           </p>
         </Message>
       </div>
@@ -33,6 +41,13 @@
 </template>
 <script setup>
   defineOptions({ name: 'BannerContentBlock' })
+  import { windowOpen } from '@/helpers/window-open'
+
   import Message from 'primevue/message'
   import Avatar from 'primevue/avatar'
+  import ButtonPrime from 'primevue/button'
+
+  const goToCreateIssue = () => {
+    windowOpen('https://github.com/aziontech/azion-platform-kit/issues/new', '_blank')
+  }
 </script>

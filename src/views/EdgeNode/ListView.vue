@@ -1,22 +1,99 @@
+<script setup>
+  import ListTableBlock from '@/templates/list-table-block'
+  import EmptyEdgeNode from '@/templates/empty-results-block/empty-edge-node'
+  import Illustration from '@/assets/svg/illustration-layers'
+  import ContentBlock from '@/templates/content-block'
+  import PageHeadingBlock from '@/templates/page-heading-block'
+  import Authorize from '@/views/EdgeNode/Dialog/Authorize'
+  import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
+  import { computed, ref } from 'vue'
+  defineOptions({ name: 'list-edge-node' })
+
+  const props = defineProps({
+    listEdgeNodeService: {
+      type: Function,
+      required: true
+    },
+    deleteEdgeNodeService: {
+      type: Function,
+      required: true
+    },
+    documentationService: {
+      type: Function,
+      required: true
+    }
+  })
+
+  let hasContentToList = true
+
+  const getColumns = computed(() => [
+    {
+      field: 'name',
+      header: 'Name'
+    },
+    {
+      field: 'hashId',
+      header: 'Hash ID'
+    },
+    {
+      field: 'groups',
+      header: 'Group',
+      type: 'component',
+      component: (columnData) =>
+        columnBuilder({ data: columnData, columnAppearance: 'expand-column' })
+    },
+    {
+      field: 'status',
+      header: 'Status',
+      type: 'component',
+      component: (columnData) =>
+        columnBuilder({
+          data: columnData,
+          columnAppearance: 'tag'
+        })
+    }
+  ])
+
+  const edgeNodeSelected = ref({})
+
+  const actionsRow = ref([
+    {
+      label: 'Authorize',
+      icon: 'pi pi-fw pi-check-square',
+      command: (item) => {
+        edgeNodeSelected.value = {
+          edgeNodeID: item.id,
+          openDialog: true,
+          rerender: Math.random()
+        }
+      }
+    }
+  ])
+
+  const handleLoadData = (event) => {
+    hasContentToList = event
+  }
+</script>
 <template>
   <ContentBlock>
     <template #heading>
       <PageHeadingBlock pageTitle="Edge Nodes"></PageHeadingBlock>
     </template>
     <template #content>
+      <Authorize :authorize="edgeNodeSelected" />
       <ListTableBlock
         v-if="hasContentToList"
-        :listService="listEdgeNodeService"
+        :listService="props.listEdgeNodeService"
+        :deleteService="props.deleteEdgeNodeService"
         :columns="getColumns"
-        :deleteService="deleteEdgeNodeService"
         pageTitleDelete="Edge Node"
-        addButtonLabel=""
         editPagePath="edge-node/edit"
         @on-load-data="handleLoadData"
+        :rowActions="actionsRow"
       />
       <EmptyEdgeNode
         v-else
-        :documentationService="documentationService"
+        :documentationService="props.documentationService"
       >
         <template #illustration>
           <Illustration />
@@ -25,71 +102,3 @@
     </template>
   </ContentBlock>
 </template>
-<script>
-  import ListTableBlock from '@/templates/list-table-block/with-authorize'
-  import EmptyEdgeNode from '@/templates/empty-results-block/empty-edge-node.vue'
-  import Illustration from '@/assets/svg/illustration-layers.vue'
-  import ContentBlock from '@/templates/content-block'
-  import PageHeadingBlock from '@/templates/page-heading-block'
-
-  export default {
-    name: 'edge-node-view',
-    components: {
-      ListTableBlock,
-      EmptyEdgeNode,
-      Illustration,
-      ContentBlock,
-      PageHeadingBlock
-    },
-    props: {
-      listEdgeNodeService: {
-        required: true,
-        type: Function
-      },
-      deleteEdgeNodeService: {
-        required: true,
-        type: Function
-      },
-      documentationService: {
-        required: true,
-        type: Function
-      }
-    },
-    data() {
-      return {
-        authorize: {},
-        hasContentToList: true
-      }
-    },
-    computed: {
-      getColumns() {
-        return [
-          {
-            field: 'name',
-            header: 'Name'
-          },
-          {
-            field: 'hashId',
-            header: 'HashID'
-          },
-          {
-            field: 'groups',
-            header: 'Group'
-          },
-          {
-            field: 'status',
-            header: 'Status'
-          }
-        ]
-      },
-      getAuthorize() {
-        return this.authorize
-      }
-    },
-    methods: {
-      handleLoadData(event) {
-        this.hasContentToList = event
-      }
-    }
-  }
-</script>

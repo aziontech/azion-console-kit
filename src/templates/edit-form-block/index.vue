@@ -20,17 +20,12 @@
       type: Function,
       required: true
     },
-    backURL: {
-      type: String,
-      required: false
-    },
     disableRedirect: {
       type: Boolean,
       default: false
     },
     updatedRedirect: {
-      type: String,
-      required: true
+      type: String
     },
     schema: {
       type: Object,
@@ -63,11 +58,7 @@
   }
 
   const onCancel = () => {
-    if (props.backURL) {
-      router.push({ path: props.backURL })
-    } else {
-      goBackToList()
-    }
+    goBackToList()
   }
 
   const showToast = (severity, summary) => {

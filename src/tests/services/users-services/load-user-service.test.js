@@ -1,6 +1,6 @@
 import { AxiosHttpClientAdapter } from '@/services/axios/AxiosHttpClientAdapter'
 import { loadUserService } from '@/services/users-services'
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 
 const fixtures = {
   userMock: {
@@ -32,13 +32,7 @@ const makeSut = () => {
   }
 }
 
-describe('usersService', () => {
-  beforeEach(() => {
-    vi.useFakeTimers()
-  })
-  afterEach(() => {
-    vi.useRealTimers()
-  })
+describe('UsersServices', () => {
   it('should call api with correct params', async () => {
     const requestSpy = vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
       statusCode: 200,
@@ -55,7 +49,7 @@ describe('usersService', () => {
     })
   })
 
-  it('should parsed correctly the returned variable', async () => {
+  it('should parse correctly each returned item', async () => {
     vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
       statusCode: 200,
       body: { data: fixtures.userMock }
