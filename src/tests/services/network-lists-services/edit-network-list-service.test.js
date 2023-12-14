@@ -26,11 +26,11 @@ describe('NetworkListsServices', () => {
       statusCode: 202
     })
     const { sut } = makeSut()
-
+    const version = 'v3'
     await sut(fixtures.networkMock)
 
     expect(requestSpy).toHaveBeenCalledWith({
-      url: `network_lists/${fixtures.networkMock.id}`,
+      url: `${version}/network_lists/${fixtures.networkMock.id}`,
       method: 'PUT',
       body: {
         name: fixtures.networkMock.name,
