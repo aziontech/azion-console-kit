@@ -56,36 +56,26 @@ const getConfig = () => {
           changeOrigin: true,
           rewrite: (path) => path.replace(/^\/events\/graphql\//, '')
         },
-        '/api/iam': {
-          target: `${URLStartPrefix}manager.azion.com/iam/api`,
-          changeOrigin: true,
-          rewrite: (path) => path.replace(/^\/api\/iam/, '')
-        },
+        // '/api/iam': {
+        //   target: `${URLStartPrefix}manager.azion.com/iam/api`,
+        //   changeOrigin: true,
+        //   rewrite: (path) => path.replace(/^\/api\/iam/, '')
+        // },
         '/api/account-details': {
           target: `${URLStartPrefix}iam.azion.com/iam/api/account`,
           changeOrigin: true,
           rewrite: (path) => path.replace(/^\/api\/account-details/, '')
         },
-        // '/api/teams': {
-        //   target: `${URLStartPrefix}iam.azion.com/iam/api/teams`,
-        //   changeOrigin: true,
-        //   rewrite: (path) => path.replace(/^\/api\/teams/, '')
-        // },
         '/api/purge': {
           target: 'https://stage-manager.azion.com/api/purge',
           changeOrigin: true,
           rewrite: (path) => path.replace(/^\/api\/purge/, '')
         },
-        '/api/permissions': {
-          target: `${URLStartPrefix}iam.azion.com/iam/api/permissions`,
-          changeOrigin: true,
-          rewrite: (path) => path.replace(/^\/api\/permissions/, '')
-        },
-        '/api/credentials': {
-          target: `${URLStartPrefix}manager.azion.com/credentials/api/v1/credentials`,
-          changeOrigin: true,
-          rewrite: (path) => path.replace(/^\/api\/credentials/, '')
-        },
+        // '/api/credentials': {
+        //   target: `${URLStartPrefix}manager.azion.com/credentials/api/v1/credentials`,
+        //   changeOrigin: true,
+        //   rewrite: (path) => path.replace(/^\/api\/credentials/, '')
+        // },
         '^/api/(account|user|token|switch-account|password|totp)': {
           target: `${URLStartPrefix}sso.azion.com/api`,
           changeOrigin: true,
