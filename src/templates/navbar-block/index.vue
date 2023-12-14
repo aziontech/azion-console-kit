@@ -31,7 +31,7 @@
         <SearchBlock />
       </div>
 
-      <div class="flex gap-2 items-center ml-2 md:ml-auto">
+      <div class="flex gap-2 items-center ml-auto">
         <Create />
         <Help />
         <ProfileBlock />
