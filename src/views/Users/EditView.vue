@@ -1,38 +1,7 @@
-<template>
-  <ContentBlock>
-    <template #heading>
-      <PageHeadingBlock pageTitle="Create User"></PageHeadingBlock>
-    </template>
-    <template #content>
-      <CreateFormBlock
-        :createService="props.createUsersService"
-        :schema="validationSchema"
-        :initialValues="initialValues"
-      >
-        <template #form>
-          <FormFieldsUsers
-            :loadAccountDetailsService="loadAccountDetailsService"
-            :listTimezonesService="listTimezonesService"
-            :listCountriesPhoneService="listCountriesPhoneService"
-            :listTeamsService="listTeamsService"
-          ></FormFieldsUsers>
-        </template>
-        <template #action-bar="{ onSubmit, formValid, onCancel, loading }">
-          <ActionBarTemplate
-            @onSubmit="onSubmit"
-            @onCancel="onCancel"
-            :loading="loading"
-            :submitDisabled="!formValid"
-          />
-        </template>
-      </CreateFormBlock>
-    </template>
-  </ContentBlock>
-</template>
 
 <script setup>
   import * as yup from 'yup'
-  import CreateFormBlock from '@/templates/create-form-block'
+  import EditFormBlock from '@/templates/edit-form-block'
   import ContentBlock from '@/templates/content-block'
   import PageHeadingBlock from '@/templates/page-heading-block'
   import FormFieldsUsers from './FormsFields/FormFieldsUsers.vue'
@@ -58,7 +27,15 @@
     listTeamsService: {
       type: Function,
       required: true
-    }
+    },
+    editUserService: {
+      type: Function,
+      required: true
+    },
+    loadUserService: {
+      type: Function,
+      required: true
+    },
   })
 
   const validationSchema = yup.object({
@@ -73,12 +50,38 @@
     teamsIds: yup.array(),
     twoFactorEnabled: yup.boolean()
   })
-
-  const initialValues = {
-    userIsOwner: false,
-    mobile: '',
-    selectedTeam: [],
-    twoFactorEnabled: false,
-    selectedLanguage: 'en'
-  }
 </script>
+
+<template>
+  <ContentBlock>
+    <template #heading>
+      <PageHeadingBlock pageTitle="Edit User"></PageHeadingBlock>
+    </template>
+    <template #content>
+      <EditFormBlock
+        :editService="props.editUserService"
+        :loadService="props.loadUserService"
+        :updatedRedirect="props.updatedRedirect"
+        :schema="validationSchema"
+      >
+        <template #form>
+          <FormFieldsUsers
+            :loadAccountDetailsService="loadAccountDetailsService"
+            :listTimezonesService="listTimezonesService"
+            :listCountriesPhoneService="listCountriesPhoneService"
+            :listTeamsService="listTeamsService"
+            :isEditForm="true"
+          ></FormFieldsUsers>
+        </template>
+        <template #action-bar="{ onSubmit, formValid, onCancel, loading }">
+          <ActionBarTemplate
+            @onSubmit="onSubmit"
+            @onCancel="onCancel"
+            :loading="loading"
+            :submitDisabled="!formValid"
+          />
+        </template>
+      </EditFormBlock>
+    </template>
+  </ContentBlock>
+</template>

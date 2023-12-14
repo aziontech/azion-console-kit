@@ -47,6 +47,31 @@ export const usersListsRoutes = {
           }
         ]
       }
+    },
+    {
+      path: 'edit/:id',
+      name: 'edit-users',
+      component: () => import('@views/Users/EditView.vue'),
+      props: {
+        loadAccountDetailsService: UsersService.loadAccountDetailsService,
+        listCountriesPhoneService: UsersService.listCountriesPhoneService,
+        listTimezonesService: UsersService.listTimezonesService,
+        listTeamsService: UsersService.listTeamsService,
+        editUserService: UsersService.editUserService,
+        loadUserService: UsersService.loadUserService,
+        updatedRedirect: 'list-users'
+      },
+      meta: {
+        breadCrumbs: [
+          {
+            label: 'Users Lists',
+            to: '/users'
+          },
+          {
+            label: 'Edit User'
+          }
+        ]
+      }
     }
   ]
 }

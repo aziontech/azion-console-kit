@@ -6,6 +6,8 @@ import { loadAccountDetailsService } from './get-account-detail-service'
 import { listCountriesPhoneService } from './list-countries-phone-service'
 import { listTimezonesService } from './list-timezones-service'
 import { listTeamsService } from './list-teams-service'
+import { editUserService } from './edit-user-service'
+import { loadUserService } from './load-user-service'
 
 export {
   listUsersService,
@@ -15,5 +17,7 @@ export {
   loadAccountDetailsService,
   listCountriesPhoneService,
   listTimezonesService,
-  listTeamsService
+  listTeamsService,
+  loadUserService,
+  editUserService
 }

@@ -2,11 +2,11 @@ import { AxiosHttpClientAdapter } from '../axios/AxiosHttpClientAdapter'
 import { makeUsersBaseUrl } from './make-users-base-url'
 import * as Errors from '@/services/axios/errors'
 
-export const createUsersService = async (payload) => {
+export const editUserService = async (payload) => {
   const bodyRequest = adapt(payload)
   let httpResponse = await AxiosHttpClientAdapter.request({
-    url: `${makeUsersBaseUrl()}`,
-    method: 'POST',
+    url: `${makeUsersBaseUrl()}/${payload.id}`,
+    method: 'PATCH',
     body: bodyRequest
   })
 
@@ -37,11 +37,8 @@ const adapt = (payload) => {
  */
 const parseHttpResponse = (httpResponse) => {
   switch (httpResponse.statusCode) {
-    case 201:
-      return {
-        feedback: 'Your user has been created',
-        urlToEditView: '/users'
-      }
+    case 200:
+      return 'Your user has been updated'
     case 401:
       throw new Errors.InvalidApiTokenError().message
     case 400:

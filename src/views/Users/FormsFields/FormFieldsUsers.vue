@@ -1,6 +1,6 @@
 <!-- eslint-disable vue/no-mutating-props -->
 <script setup>
-  import { ref, onMounted } from 'vue'
+  import { ref, onMounted, watch } from 'vue'
   import { useField } from 'vee-validate'
   import { useAccountStore } from '@/stores/account'
   import { storeToRefs } from 'pinia'
@@ -30,10 +30,15 @@
     listTeamsService: {
       type: Function,
       required: true
+    },
+    isEditForm: {
+      type: Boolean,
+      default: false
     }
   })
 
   const store = useAccountStore()
+  const initialEmail = ref('')
   const accountIsOwner = ref(false)
   const optionsTimezone = ref([])
   const optionsTeams = ref([])
@@ -45,41 +50,62 @@
 
   const { value: firstName, errorMessage: errorFirstName } = useField('firstName')
   const { value: lastName, errorMessage: errorLastName } = useField('lastName')
-  const { value: selectedTimezone, errorMessage: errorSelectedTimezone } =
-    useField('selectedTimezone')
-  const { value: selectedLanguage, errorMessage: errorSelectedLanguage } =
-    useField('selectedLanguage')
+  const { value: timezone, errorMessage: errorTimezone } = useField('timezone')
+  const { value: language, errorMessage: errorLanguage } = useField('language')
   const { value: email, errorMessage: errorEmail } = useField('email')
-  const { value: selectedCountry, errorMessage: errorSelectedCountry } = useField('selectedCountry')
+  const { value: countryCallCode, errorMessage: errorCountryCallCode } = useField('countryCallCode')
   const { value: mobile, errorMessage: errorMobile } = useField('mobile')
   const { value: userIsOwner, errorMessage: errorUserIsOwner } = useField('userIsOwner')
-  const { value: selectedTeam, errorMessage: errorSelectedTeam } = useField('selectedTeam')
+  const { value: teamsIds, errorMessage: errorTeamsIds } = useField('teamsIds')
   const { value: twoFactorEnabled, errorMessage: errorTwoFactorEnabled } =
     useField('twoFactorEnabled')
 
   const fetchCountries = async () => {
-    const result = await props.listCountriesPhoneService()
-    optionsCountriesMobile.value = result
-    filteredCountriesMobile.value = [...optionsCountriesMobile.value]
-    selectedCountry.value = optionsCountriesMobile.value[0]
+    const countries = await props.listCountriesPhoneService()
+    setCountries(countries)
+    setCountryCallCodeBasedOnFormType()
+  }
+  const setCountries = (countries) => {
+    optionsCountriesMobile.value = countries
+    filteredCountriesMobile.value = [...countries]
+  }
+  const setCountryCallCodeBasedOnFormType = () => {
+    if (props.isEditForm) {
+      setCountryCallCodeForEditForm()
+    } else {
+      setCountryCallCodeForNewForm()
+    }
+  }
+  const setCountryCallCodeForNewForm = () => {
+    countryCallCode.value = optionsCountriesMobile.value[0]
+  }
+  const setCountryCallCodeForEditForm = () => {
+    countryCallCode.value = filteredCountriesMobile.value.find(
+      (country) => country.value === countryCallCode.value
+    )
   }
 
   const fetchTimezone = async () => {
     const result = await props.listTimezonesService()
-    selectedTimezone.value = result.defaultSelected
     optionsTimezone.value = result.listTimeZones
+
+    if (!props.isEditForm) {
+      timezone.value = result.defaultSelected
+    }
   }
   const fetchDetailAccount = async () => {
     const account = await props.loadAccountDetailsService()
     isForceMFA.value = account?.is_enabled_mfa_to_all_users
-    twoFactorEnabled.value = isForceMFA.value
+
+    if (!props.isEditForm) {
+      twoFactorEnabled.value = isForceMFA.value
+    }
   }
   const fetchTeams = async () => {
     const result = await props.listTeamsService()
     optionsTeams.value = result
-    selectedTeam.value = [result[0].value]
+    if (!props.isEditForm) teamsIds.value = [result[0].value]
   }
-
   onMounted(async () => {
     await fetchCountries()
     await fetchTimezone()
@@ -89,12 +115,34 @@
 
   const handleUserIsOwner = () => {
     if (!userIsOwner.value) {
-      selectedTeam.value = []
+      teamsIds.value = []
     }
   }
 
   accountIsOwner.value = account?.is_account_owner
   userIsOwner.value = accountIsOwner.value
+
+  watch(email, (value) => {
+    if (!props.isEditForm) {
+      return
+    }
+
+    if (initialEmail.value === '') {
+      initialEmail.value = value
+      return
+    }
+
+    const emailIsDifferent = initialEmail.value != value
+
+    if (emailIsDifferent) {
+      localStorage.setItem('emailHasChanged', true)
+      return
+    }
+
+    if (!emailIsDifferent) {
+      localStorage.removeItem('emailHasChanged')
+    }
+  })
 </script>
 <template>
   <FormHorizontal title="General">
@@ -138,35 +186,35 @@
       <div class="flex sm:flex-row w-full flex-col gap-6">
         <div class="flex flex-col w-full sm:max-w-xs gap-2">
           <label
-            for="selectedTimezone"
+            for="timezone"
             class="text-color text-base font-medium"
             >Timezone *</label
           >
           <Dropdown
-            id="selectedTimezone"
+            id="timezone"
             filter
             :options="optionsTimezone"
             optionLabel="label"
             optionValue="value"
             placeholder="Loading..."
-            :loading="!selectedTimezone"
-            :class="{ 'p-invalid': errorSelectedTimezone }"
-            v-model="selectedTimezone"
+            :loading="!timezone"
+            :class="{ 'p-invalid': errorTimezone }"
+            v-model="timezone"
           />
         </div>
         <div class="flex flex-col w-full sm:max-w-xs gap-2">
           <label
-            for="selectedLanguage"
+            for="language"
             class="text-color text-base font-medium"
             >Language</label
           >
           <Dropdown
-            id="selectedLanguage"
+            id="language"
             :options="optionsLanguage"
             optionLabel="label"
             optionValue="value"
-            :class="{ 'p-invalid': errorSelectedLanguage }"
-            v-model="selectedLanguage"
+            :class="{ 'p-invalid': errorLanguage }"
+            v-model="language"
             disabled
           >
             <template #dropdownicon>
@@ -209,23 +257,22 @@
         <div class="flex gap-2">
           <div class="p-inputgroup">
             <Dropdown
-              id="selectedTimezone"
+              id="timezone"
               filter
               :options="filteredCountriesMobile"
-              optionLabel="label"
+              optionLabel="labelFormat"
               placeholder="Loading..."
               :loading="!filteredCountriesMobile.length"
-              :class="{ 'p-invalid': errorSelectedCountry }"
-              class="w-2/3 surface-border border-r-0"
-              v-model="selectedCountry"
+              :class="{ 'p-invalid': errorCountryCallCode }"
+              class="surface-border border-r-0 w-1/4"
+              v-model="countryCallCode"
             />
-
             <InputMask
               date="phone"
               v-model="mobile"
               class="w-full"
               mask="?99999999999999999999"
-              :class="{ 'p-invalid': errorMobile || !selectedCountry }"
+              :class="{ 'p-invalid': errorMobile || !countryCallCode }"
             />
           </div>
         </div>
@@ -257,8 +304,8 @@
           optionValue="value"
           placeholder="Nothing selected"
           :maxSelectedLabels="5"
-          :class="{ 'p-invalid': errorSelectedTeam }"
-          v-model="selectedTeam"
+          :class="{ 'p-invalid': errorTeamsIds }"
+          v-model="teamsIds"
         />
       </div>
       <div>
@@ -327,7 +374,6 @@
               >
             </div>
           </template>
-
           <template #content>
             <small class="text-color-secondary text-sm">
               Multi-factor authentication adds an extra layer of security to your account. In
