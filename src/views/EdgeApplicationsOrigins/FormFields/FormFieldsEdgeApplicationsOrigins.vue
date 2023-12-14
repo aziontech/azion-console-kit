@@ -96,17 +96,17 @@
   // const { value: isOriginRedirectionEnabled } = useField('isOriginRedirectionEnabled')
   const { value: method } = useField('method')
   const { value: originPath } = useField('originPath')
+  // const { value: originPath, errorMessage: originPathError } = useField('originPath')
   const { value: connectionTimeout } = useField('connectionTimeout')
   const { value: timeoutBetweenBytes } = useField('timeoutBetweenBytes')
   const { value: hmacAuthentication } = useField('hmacAuthentication')
   const { value: hmacRegionName } = useField('hmacRegionName')
-  const { value: hmacAccessKey } = useField('hmacAccessKey')
-  const { value: hmacSecretKey } = useField('hmacSecretKey')
-
   // const { value: hmacRegionName, errorMessage: hmacRegionNameError } = useField('hmacRegionName')
+  const { value: hmacAccessKey } = useField('hmacAccessKey')
   // const { value: hmacAccessKey, errorMessage: hmacAccessKeyError } = useField('hmacAccessKey')
+  const { value: hmacSecretKey } = useField('hmacSecretKey')
   // const { value: hmacSecretKey, errorMessage: hmacSecretKeyError } = useField('hmacSecretKey')
-  // const { value: originPath, errorMessage: originPathError } = useField('originPath')
+  
 
   const isSingleOriginType = computed(() => originType.value === 'single_origin')
   const isLoadBalancerOriginType = computed(() => originType.value === 'load_balancer')
