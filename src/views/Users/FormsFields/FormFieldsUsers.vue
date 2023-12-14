@@ -1,6 +1,6 @@
 <!-- eslint-disable vue/no-mutating-props -->
 <script setup>
-  import { ref, onMounted, watch } from 'vue'
+  import { ref, onMounted } from 'vue'
   import { useField } from 'vee-validate'
   import { useAccountStore } from '@/stores/account'
   import { storeToRefs } from 'pinia'
@@ -38,7 +38,6 @@
   })
 
   const store = useAccountStore()
-  const initialEmail = ref('')
   const accountIsOwner = ref(false)
   const optionsTimezone = ref([])
   const optionsTeams = ref([])
@@ -121,28 +120,6 @@
 
   accountIsOwner.value = account?.is_account_owner
   isAccountOwner.value = accountIsOwner.value
-
-  watch(email, (value) => {
-    if (!props.isEditForm) {
-      return
-    }
-
-    if (initialEmail.value === '') {
-      initialEmail.value = value
-      return
-    }
-
-    const emailIsDifferent = initialEmail.value != value
-
-    if (emailIsDifferent) {
-      localStorage.setItem('emailHasChanged', true)
-      return
-    }
-
-    if (!emailIsDifferent) {
-      localStorage.removeItem('emailHasChanged')
-    }
-  })
 </script>
 <template>
   <FormHorizontal title="General">

@@ -37,7 +37,6 @@
   import Illustration from '@/assets/svg/illustration-layers.vue'
   import ContentBlock from '@/templates/content-block'
   import PageHeadingBlock from '@/templates/page-heading-block'
-  import { useToast } from 'primevue/usetoast'
 
   export default {
     name: 'users-view',
@@ -105,21 +104,5 @@
         this.hasContentToList = event
       }
     },
-    mounted() {
-      const emailHasChanged = localStorage.getItem('emailHasChanged')
-
-      if (emailHasChanged) {
-        const toast = useToast()
-        const toastConfig = {
-          closable: true,
-          severity: 'warn',
-          summary: 'Confirmation email',
-          detail: 'A confirmation email message has been sent to your email address.'
-        }
-        toast.add({ ...toastConfig })
-
-        localStorage.removeItem('emailHasChanged')
-      }
-    }
   }
 </script>
