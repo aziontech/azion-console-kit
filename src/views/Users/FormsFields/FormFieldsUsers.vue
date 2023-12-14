@@ -1,4 +1,3 @@
-<!-- eslint-disable vue/no-mutating-props -->
 <script setup>
   import { ref, onMounted } from 'vue'
   import { useField } from 'vee-validate'

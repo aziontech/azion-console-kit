@@ -103,6 +103,6 @@
       handleLoadData(event) {
         this.hasContentToList = event
       }
-    },
+    }
   }
 </script>
