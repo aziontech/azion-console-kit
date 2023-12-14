@@ -52,9 +52,9 @@ const getConfig = () => {
           rewrite: (path) => path.replace(/^\/api\/script-runner/, '')
         },
         '/events/graphql': {
-          target: `${URLStartPrefix}api.azion.net`,
-          changeOrigin: true,
-          rewrite: (path) => path.replace(/^\/events\/graphql\//, '')
+          target: `${URLStartPrefix}api.azion.com`,
+          changeOrigin: true
+          //rewrite: (path) => path.replace(/^\/events\/graphql\//, '')
         },
         // '/api/iam': {
         //   target: `${URLStartPrefix}manager.azion.com/iam/api`,
@@ -71,11 +71,6 @@ const getConfig = () => {
           changeOrigin: true,
           rewrite: (path) => path.replace(/^\/api\/purge/, '')
         },
-        // '/api/credentials': {
-        //   target: `${URLStartPrefix}manager.azion.com/credentials/api/v1/credentials`,
-        //   changeOrigin: true,
-        //   rewrite: (path) => path.replace(/^\/api\/credentials/, '')
-        // },
         '^/api/(account|user|token|switch-account|password|totp)': {
           target: `${URLStartPrefix}sso.azion.com/api`,
           changeOrigin: true,
