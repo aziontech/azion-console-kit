@@ -43,7 +43,6 @@
 
   const toast = useToast()
 
-
   const currentEmail = ref('')
 
   const props = defineProps({
@@ -76,7 +75,7 @@
   }
   const formSubmit = (onSubmit, values, setValues) => {
     onSubmit()
-    if(values.email !== currentEmail.value) {
+    if (values.email !== currentEmail.value) {
       const toastConfig = {
         closable: true,
         severity: 'warn',
@@ -84,7 +83,7 @@
         detail: 'A confirmation email message has been sent to your email address.'
       }
       toast.add({ ...toastConfig })
-      
+
       setValues({
         email: currentEmail.value
       })
