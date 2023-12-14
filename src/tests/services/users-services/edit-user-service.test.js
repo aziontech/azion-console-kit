@@ -103,24 +103,16 @@ describe('UsersService', () => {
       expect(response).rejects.toBe(expectedError)
     }
   )
-
-  it.each([
-    {
+  it('should throw first api error when request fails with status code 400', async () => {
+    const expectedError = 'user with this Email already exists.'
+    vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
       statusCode: 400,
-      expectedError: 'user with this Email already exists.'
-    }
-  ])(
-    'should throw first api error when request fails with status code 400',
-    async ({ statusCode, expectedError }) => {
-      vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
-        statusCode,
-        body: { email: ['user with this Email already exists.'] }
-      })
-      const { sut } = makeSut()
+      body: { email: [expectedError] }
+    })
+    const { sut } = makeSut()
 
-      const response = sut(fixtures.userMock)
+    const response = sut(fixtures.userMock)
 
-      expect(response).rejects.toBe(expectedError)
-    }
-  )
+    expect(response).rejects.toBe(expectedError)
+  })
 })
