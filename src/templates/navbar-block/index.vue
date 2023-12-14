@@ -1,6 +1,6 @@
 <template>
   <header
-    class="p-3 bg-header text-white border-b surface-border items-center flex md:px-8 md:py-3 w-full fixed top-0 z-10 h-14"
+    class="p-3 bg-header text-white border-b surface-border items-center flex md:px-8 md:py-3 w-full fixed top-0 z-10 h-14 justify-between"
     @keyup.esc="closeSideBar"
     ref="app"
   >
@@ -25,9 +25,6 @@
           :listTypeAccountService="listTypeAccountService"
           :accountHandler="accountHandler"
         />
-      </div>
-      <div class="ml-auto hidden">
-        <SearchBlock />
       </div>
       <div class="flex gap-2 items-center ml-auto">
         <Create />
