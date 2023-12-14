@@ -93,7 +93,7 @@
           </div>
         </template>
         <template #body="{ data: rowData }">
-          <div class="flex justify-end">
+          <div class="flex justify-end" v-if="showActions">
             <PrimeMenu
               :ref="`menu-${rowData.id}`"
               id="overlay_menu"
@@ -206,7 +206,8 @@
       data: [],
       selectedColumns: [],
       minimumOfItemsPerPage: 10,
-      informationForDeletion: {}
+      informationForDeletion: {},
+      showActions: true,
     }),
     props: {
       columns: {
@@ -313,6 +314,8 @@
             command: () => this.openDeleteDialog()
           })
         }
+
+        this.showActions = actionOptions.length > 0
 
         return actionOptions
       },
