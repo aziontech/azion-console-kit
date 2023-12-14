@@ -1,14 +1,28 @@
 import { AxiosHttpClientAdapter, parseHttpResponse } from '../axios/AxiosHttpClientAdapter'
 import { makeEdgeNodeBaseUrl } from '../edge-node-services/make-edge-node-base-url'
 
-export const listServiceEdgeNodeService = async ({ id, page, bound }) => {
+export const listServiceEdgeNodeService = async ({ edgeNodeId, page, bound }) => {
   const searchParams = makeSearchParams({ bound, page })
   let httpResponse = await AxiosHttpClientAdapter.request({
-    url: `${makeEdgeNodeBaseUrl()}/${id}/services?${searchParams.toString()}`,
+    url: `${makeEdgeNodeBaseUrl()}/${edgeNodeId}/services?${searchParams.toString()}`,
     method: 'GET'
   })
   httpResponse = adapt(httpResponse)
   return parseHttpResponse(httpResponse)
+}
+
+const parseStatusData = (status) => {
+  const parsedStatus = status
+    ? {
+        content: 'Active',
+        severity: 'success'
+      }
+    : {
+        content: 'Inactive',
+        severity: 'danger'
+      }
+
+  return parsedStatus
 }
 
 const adapt = (httpResponse) => {
@@ -24,7 +38,7 @@ const adapt = (httpResponse) => {
           lastModified: new Intl.DateTimeFormat('us', { dateStyle: 'full' }).format(
             new Date(element.updated_at)
           ),
-          status: element.is_active ? 'Enabled' : ''
+          status: parseStatusData(element.is_active)
         }))
       : []
 

@@ -5,8 +5,9 @@
       height: 38px !important;
       display: flex !important;
       gap: 12px !important;
-      align-items: center;
-      font-size: 0.875rem;
+      align-items: center !important;
+      font-size: 0.875rem !important;
+      font-weight: 500 !important;
     }
     &.p-focus {
       border-color: none !important;

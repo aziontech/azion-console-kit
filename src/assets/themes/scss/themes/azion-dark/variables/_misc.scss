@@ -96,7 +96,7 @@ $chipTextColor: $textColor;
 
 /// Border radius of a chip
 /// @group misc
-$chipBorderRadius: 16px;
+$chipBorderRadius: $borderRadius;
 
 /// Background of a chip in focus state
 /// @group misc

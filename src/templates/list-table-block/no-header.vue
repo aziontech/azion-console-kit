@@ -46,7 +46,12 @@
           :header="col.header"
         >
           <template #body="{ data: rowData }">
-            <div v-html="rowData[col.field]" />
+            <template v-if="col.type !== 'component'">
+              <div v-html="rowData[col.field]" />
+            </template>
+            <template v-else>
+              <component :is="col.component(rowData[col.field])"></component>
+            </template>
           </template>
         </Column>
         <Column
@@ -67,7 +72,7 @@
                 icon="pi pi-ellipsis-h"
                 text
                 @click="(event) => toggleActionsMenu(event, rowData.id)"
-                class="cursor-pointer"
+                class="cursor-pointer table-button"
               />
             </div>
           </template>
@@ -178,8 +183,7 @@
         default: () => '/'
       },
       editInDrawer: {
-        type: Function,
-        default: () => '/'
+        type: Function
       },
       editPagePath: {
         type: String,
@@ -247,6 +251,9 @@
         } finally {
           this.isLoading = false
         }
+      },
+      async reload() {
+        await this.loadData({ page: 1 })
       },
       navigateToAddPage() {
         this.$router.push(this.createPagePath)

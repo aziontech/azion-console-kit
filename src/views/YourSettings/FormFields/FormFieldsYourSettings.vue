@@ -1,0 +1,360 @@
+<script setup>
+  import { ref, onMounted, watch, computed } from 'vue'
+  import { useField } from 'vee-validate'
+
+  import FormHorizontal from '@/templates/create-form-block/form-horizontal'
+  import InputText from 'primevue/inputtext'
+  import Dropdown from 'primevue/dropdown'
+  import InputPassword from 'primevue/password'
+  import InputSwitch from 'primevue/inputswitch'
+  import InputMask from 'primevue/inputmask'
+  import Card from 'primevue/card'
+
+  const props = defineProps({
+    listTimezonesService: {
+      type: Function,
+      required: true
+    },
+    listCountriesPhoneService: {
+      type: Function,
+      required: true
+    }
+  })
+
+  const optionsTimezone = ref([])
+  const isForceMFA = ref(false)
+  const optionsCountriesMobile = ref([])
+  const filteredCountriesMobile = ref([])
+  const optionsLanguage = ref([{ label: 'English', value: 'en' }])
+
+  const { value: firstName, errorMessage: errorFirstName } = useField('firstName')
+  const { value: lastName, errorMessage: errorLastName } = useField('lastName')
+  const { value: timezone, errorMessage: errorTimezone } = useField('timezone')
+  const { value: language, errorMessage: errorLanguage } = useField('language')
+  const { value: email, errorMessage: errorEmail } = useField('email')
+  const { value: countryCallCode } = useField('countryCallCode')
+  const { value: selectedCountryCallCode, errorMessage: errorSelectedCountryCallCode } =
+    useField('selectedCountryCallCode')
+  const { value: mobile, errorMessage: errorMobile } = useField('mobile')
+  const { value: twoFactorEnabled, errorMessage: errorTwoFactorEnabled } =
+    useField('twoFactorEnabled')
+
+  const { value: password, errorMessage: errorPassword } = useField('password')
+  const { value: oldPassword, errorMessage: errorOldPassword } = useField('oldPassword')
+  const { value: confirmPassword, errorMessage: errorConfirmPassword } = useField('confirmPassword')
+
+  const fetchCountries = async () => {
+    const result = await props.listCountriesPhoneService()
+    optionsCountriesMobile.value = result
+    filteredCountriesMobile.value = [...optionsCountriesMobile.value]
+    if (countryCallCode.value) {
+      selectedCountryCallCode.value = optionsCountriesMobile.value.find(
+        (item) => item.value === countryCallCode.value
+      )
+    }
+    if (!countryCallCode.value) {
+      selectedCountryCallCode.value = optionsCountriesMobile.value[0]
+    }
+  }
+
+  const fetchTimezone = async () => {
+    const result = await props.listTimezonesService()
+    optionsTimezone.value = result.listTimeZones
+  }
+
+  onMounted(() => {
+    fetchCountries()
+    fetchTimezone()
+  })
+
+  const passwordRequirementsList = ref([
+    { label: '> 7 characters', valid: false },
+    { label: 'Uppercase letter', valid: false },
+    { label: 'Lowercase letter', valid: false },
+    { label: 'Special character (e.g. !?<>@#$%)', valid: false }
+  ])
+
+  const validation = () => {
+    const hasUpperCase = password.value && /[A-Z]/.test(password.value)
+    const hasLowerCase = password.value && /[a-z]/.test(password.value)
+    const hasSpecialChar = password.value && /[!@#$%^&*(),.?":{}|<>]/.test(password.value)
+    const hasMinLength = password.value?.length > 7
+    passwordRequirementsList.value[0].valid = hasMinLength
+    passwordRequirementsList.value[1].valid = hasUpperCase
+    passwordRequirementsList.value[2].valid = hasLowerCase
+    passwordRequirementsList.value[3].valid = hasSpecialChar
+    return hasMinLength && hasUpperCase && hasLowerCase && hasSpecialChar
+  }
+
+  watch(selectedCountryCallCode, (newCountryCallCode) => {
+    countryCallCode.value = newCountryCallCode.value
+  })
+
+  const isLoadingCountry = computed(() => {
+    return !filteredCountriesMobile.value.length
+  })
+</script>
+
+<template>
+  <FormHorizontal title="General">
+    <template #inputs>
+      <div class="flex flex-col sm:max-w-lg w-full gap-2">
+        <label
+          for="firstName"
+          class="text-color text-base font-medium"
+          >First name *</label
+        >
+        <InputText
+          v-model="firstName"
+          id="firstName"
+          type="text"
+          :class="{ 'p-invalid': errorFirstName }"
+        />
+        <small
+          id="name-help"
+          class="p-error"
+          >{{ errorFirstName }}</small
+        >
+      </div>
+      <div class="flex flex-col sm:max-w-lg w-full gap-2">
+        <label
+          for="lastName"
+          class="text-color text-base font-medium"
+          >Last name *</label
+        >
+        <InputText
+          v-model="lastName"
+          id="lastName"
+          type="text"
+          :class="{ 'p-invalid': errorLastName }"
+        />
+        <small
+          id="name-help"
+          class="p-error"
+          >{{ errorLastName }}</small
+        >
+      </div>
+      <div class="flex sm:flex-row w-full flex-col gap-6">
+        <div class="flex flex-col w-full sm:max-w-xs gap-2">
+          <label
+            for="timezone"
+            class="text-color text-base font-medium"
+            >Timezone *</label
+          >
+          <Dropdown
+            id="timezone"
+            filter
+            :options="optionsTimezone"
+            optionLabel="label"
+            optionValue="value"
+            placeholder="Loading..."
+            :loading="!timezone"
+            :class="{ 'p-invalid': errorTimezone }"
+            v-model="timezone"
+          />
+        </div>
+        <div class="flex flex-col w-full sm:max-w-xs gap-2">
+          <label
+            for="language"
+            class="text-color text-base font-medium"
+            >Language</label
+          >
+          <Dropdown
+            id="language"
+            :options="optionsLanguage"
+            optionLabel="label"
+            optionValue="value"
+            :class="{ 'p-invalid': errorLanguage }"
+            v-model="language"
+            disabled
+          >
+            <template #dropdownicon>
+              <span class="pi pi-lock text-color-secondary" />
+            </template>
+          </Dropdown>
+        </div>
+      </div>
+    </template>
+  </FormHorizontal>
+  <FormHorizontal title="Contact information">
+    <template #inputs>
+      <div class="flex flex-col sm:max-w-lg w-full gap-2">
+        <label
+          for="email"
+          class="text-color text-base font-medium"
+          >E-mail *</label
+        >
+        <InputText
+          v-model="email"
+          id="email"
+          type="email"
+          autocomplete="off"
+          placeholder="example@email.com"
+          :class="{ 'p-invalid': errorEmail }"
+        />
+        <small
+          id="name-help"
+          class="p-error"
+          >{{ errorEmail }}</small
+        >
+      </div>
+
+      <div class="flex flex-col sm:max-w-lg w-full gap-2">
+        <label
+          for="email"
+          class="text-color text-base font-medium"
+          >Mobile *</label
+        >
+        <div class="flex gap-2">
+          <div class="p-inputgroup">
+            <Dropdown
+              id="timezone"
+              filter
+              :options="filteredCountriesMobile"
+              optionLabel="label"
+              placeholder="Loading..."
+              :loading="isLoadingCountry"
+              :class="{ 'p-invalid': errorSelectedCountryCallCode }"
+              class="w-2/3 surface-border border-r-0"
+              v-model="selectedCountryCallCode"
+            />
+
+            <InputMask
+              date="phone"
+              v-model="mobile"
+              class="w-full"
+              mask="?99999999999999999999"
+              :class="{ 'p-invalid': errorMobile || !countryCallCode }"
+            />
+          </div>
+        </div>
+        <small
+          id="name-help"
+          class="p-error"
+          >{{ errorMobile }}</small
+        >
+      </div>
+    </template>
+  </FormHorizontal>
+
+  <FormHorizontal title="Security settings">
+    <template #inputs>
+      <div class="flex flex-col sm:max-w-lg w-full gap-2">
+        <label
+          for="oldPassword"
+          class="text-color text-base font-medium"
+          >Old password *</label
+        >
+        <InputPassword
+          toggleMask
+          v-model="oldPassword"
+          id="oldPassword"
+          class="w-full"
+          autocomplete="off"
+          :feedback="false"
+        />
+        <small
+          id="name-help"
+          class="p-error"
+          >{{ errorOldPassword }}</small
+        >
+      </div>
+      <div class="flex flex-col sm:max-w-lg gap-2">
+        <label
+          for="password"
+          class="font-semibold text-sm"
+          >New password *</label
+        >
+        <InputPassword
+          toggleMask
+          v-model="password"
+          id="password"
+          autocomplete="off"
+          class="w-full"
+          :class="{ 'p-invalid': errorPassword }"
+          @input="validation()"
+          :feedback="false"
+        />
+        <small class="p-error text-xs font-normal leading-tight">{{ errorPassword }}</small>
+
+        <label class="font-semibold text-sm my-2">Must have at least:</label>
+        <ul class="text-color-secondary list-inside space-y-3">
+          <li
+            class="flex gap-3 items-center text-color-secondary"
+            :key="i"
+            v-for="(requirement, i) in passwordRequirementsList"
+          >
+            <div class="w-3">
+              <span
+                class="pi pi-check text-sm text-success-check animate-fadeIn"
+                v-if="requirement.valid"
+              />
+              <div
+                class="w-2 h-2 bg-orange-bullet animate-fadeIn"
+                v-else
+              />
+            </div>
+            <span>{{ requirement.label }}</span>
+          </li>
+        </ul>
+      </div>
+      <div class="flex flex-col sm:max-w-lg w-full gap-2">
+        <label
+          for="confirmPassword"
+          class="text-color text-base font-medium"
+          >Confirm password *</label
+        >
+        <InputPassword
+          toggleMask
+          v-model="confirmPassword"
+          id="confirmPassword"
+          class="w-full"
+          autocomplete="off"
+          :class="{ 'p-invalid': errorConfirmPassword }"
+          :feedback="false"
+        />
+        <small
+          id="name-help"
+          class="p-error"
+          >{{ errorConfirmPassword }}</small
+        >
+      </div>
+      <Card
+        :pt="{
+          root: { class: 'shadow-none  rounded-none' },
+          body: { class: 'py-4 border-0' },
+          content: { class: 'ml-12' },
+          title: { class: 'flex items-center text-base m-0 gap-3 font-medium' },
+          subtitle: {
+            class: 'text-sm font-normal text-color-secondary m-0 pr-0 md:pr-[2.5rem]'
+          }
+        }"
+      >
+        <template #title>
+          <InputSwitch
+            :class="{ 'p-invalid': errorTwoFactorEnabled }"
+            :readonly="isForceMFA"
+            v-model="twoFactorEnabled"
+            inputId="twoFactor"
+          />
+          <div class="flex-col gap-1">
+            <label
+              for="twoFactor"
+              class="text-color text-sm font-normal"
+              >Multi-Factor Authentication</label
+            >
+          </div>
+        </template>
+
+        <template #content>
+          <small class="text-color-secondary text-sm">
+            Multi-factor authentication adds an extra layer of security to your account. In addition
+            to your username and password, you will need an application like Google Authenticator on
+            your phone to get verification codes when prompted. Enabling multi-factor
+            authentication, you MUST set up an account on Google Authenticator on your next login.
+          </small>
+        </template>
+      </Card>
+    </template>
+  </FormHorizontal>
+</template>

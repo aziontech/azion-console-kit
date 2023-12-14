@@ -12,13 +12,13 @@
                 <div class="flex flex-col md:flex-row md:items-center gap-3 w-full">
                   <div class="flex gap-3">
                     <Tag
-                      v-if="!isUnfinished"
+                      v-if="isSuccessfullyFinished"
                       :icon="iconType"
                       :severity="severity"
                       :pt="{ icon: { class: 'mr-0' }, root: { class: 'w-8 h-8' } }"
                     />
                     <span
-                      class="text-primary text-xl whitespace-nowrap  font-medium"
+                      class="text-primary text-xl whitespace-nowrap font-medium"
                       v-if="isUnfinished"
                     >
                       Project is being deployed
@@ -31,33 +31,48 @@
                       {{ results.edge_application.name }}
                     </span>
                     <span
-                      class="text-primary text-xl font-medium whitespace-nowrap "
+                      class="text-primary text-xl font-medium whitespace-nowrap"
                       v-else-if="deployFailed"
                     >
                       Deploy failed
                     </span>
                   </div>
-                    <div class="flex w-full justify-between flex-col-reverse gap-4 md:flex-row" >
-                        <PrimeButton
-                          v-if="isSuccessfullyFinished"
-                          link
-                          :pt="{
-                            root: { class: 'justify-center' },
-                            label: { class: 'grow-0' }
-                          }"
-                          class="px-0 py-1"
-                          :label="results.domain.url"
-                          @click="goToUrl"
-                          icon="pi pi-external-link"
-                          iconPos="right"
-                        />
-                        <PrimeButton
-                          v-if="isSuccessfullyFinished"
-                          outlined
-                          @click="goToEdgeApplicationEditView"
-                          label="Manage"
-                        />
+                  <div class="flex w-full justify-between flex-col-reverse gap-4 md:flex-row">
+                    <PrimeButton
+                      v-if="isSuccessfullyFinished"
+                      link
+                      :pt="{
+                        root: { class: 'justify-center' },
+                        label: { class: 'grow-0' }
+                      }"
+                      class="px-0 py-1"
+                      :label="results.domain.url"
+                      @click="goToUrl"
+                      icon="pi pi-external-link"
+                      iconPos="right"
+                    />
+                    <PrimeButton
+                      v-if="isSuccessfullyFinished"
+                      severity="secondary"
+                      @click="goToEdgeApplicationEditView"
+                      label="Manage"
+                    />
+                    <div class="md:ml-auto flex">
+                      <PrimeButton
+                        v-if="deployFailed"
+                        @click="retry"
+                        severity="secondary"
+                        :pt="{
+                          root: { class: 'justify-center' },
+                          label: { class: 'grow-0' }
+                        }"
+                        class="md:ml-auto w-full"
+                        label="Retry"
+                        icon="pi pi-sync"
+                        iconPos="left"
+                      />
                     </div>
+                  </div>
                 </div>
                 <span
                   class="text-sm font-normal text-color-secondary"
@@ -66,7 +81,7 @@
                   Project started {{ seconds }}s ago
                 </span>
               </div>
-              <ScriptRunnerBlcok
+              <ScriptRunnerBlock
                 title="Deploy Log"
                 :getLogsService="props.getLogsService"
                 :executionId="executionId"
@@ -85,7 +100,7 @@
           >
             <b>Next Steps</b>
           </Divider>
-          <div class=" ml-0 mt-0  w-full max-w-screen-lg grid grid-cols-1 lg:grid-cols-3 gap-4">
+          <div class="ml-0 mt-0 w-full max-w-screen-lg grid grid-cols-1 lg:grid-cols-3 gap-4">
             <PrimeButton
               v-for="(step, index) in nextSteps"
               :key="index"
@@ -120,7 +135,7 @@
   import { useRoute, useRouter } from 'vue-router'
   import PageHeadingBlock from '@/templates/page-heading-block'
   import PrimeButton from 'primevue/button'
-  import ScriptRunnerBlcok from '@/templates/script-runner-block'
+  import ScriptRunnerBlock from '@/templates/script-runner-block'
   import PrimeCard from 'primevue/card'
   import { useToast } from 'primevue/usetoast'
 
@@ -147,6 +162,8 @@
   const seconds = ref(0)
   const intervalRef = ref()
   const deployFailed = ref(false)
+  const failMessage =
+    'We encountered an issue while deploying your Edge Application. For more details, please refer to the deploy log.'
   const nextSteps = ref([
     {
       title: 'Customize Domain',
@@ -181,7 +198,7 @@
         closable: true,
         severity: 'error',
         summary: 'Deploy failed',
-        detail: error
+        detail: failMessage
       })
     }
   }
@@ -215,6 +232,10 @@
 
   const goToAnalytics = () => {
     //
+  }
+
+  const retry = () => {
+    router.go(-1)
   }
 
   const goToEdgeApplicationEditView = () => {
