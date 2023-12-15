@@ -49,7 +49,7 @@
   >
     <template #header>
       <div class="flex items-center justify-between">
-        <h2>Create something new</h2>
+        <h2>Create</h2>
         <PrimeButton
           icon="pi pi-times"
           @click="closeCreateModalStore()"
