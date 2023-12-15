@@ -2,7 +2,8 @@ import { AxiosHttpClientAdapter } from '@/services/axios/AxiosHttpClientAdapter'
 import { makeEdgeApplicationBaseUrl } from '../edge-application-services/make-edge-application-base-url'
 import * as Errors from '@/services/axios/errors'
 
-export const createOriginService = async (payload, id) => {
+export const createOriginService = async (payload) => {
+  const { id } = payload
   let httpResponse = await AxiosHttpClientAdapter.request({
     url: `${makeEdgeApplicationBaseUrl()}/${id}/origins`,
     method: 'POST',
@@ -15,14 +16,14 @@ export const createOriginService = async (payload, id) => {
 const adapt = (payload) => {
   return {
     name: payload.name,
+    origin_type: payload.originType,
     host_header: payload.hostHeader,
     method: payload.method,
     addresses: payload.addresses?.map((addressItem) => ({
       address: addressItem.address,
       weight: addressItem.weight,
       server_role: addressItem.serverRole,
-      is_active: addressItem.isActive,
-      name: addressItem.name
+      is_active: addressItem.isActive
     })),
     origin_path: payload.originPath,
     origin_protocol_policy: payload.originProtocolPolicy,
@@ -42,6 +43,11 @@ const adapt = (payload) => {
  */
 const extractErrorKey = (errorSchema, key) => {
   if (Array.isArray(errorSchema[key])) {
+    if (typeof errorSchema[key][0] === 'object') {
+      const newError = errorSchema[key][0]
+      const errorKey = Object.keys(errorSchema[key][0])
+      return newError[errorKey]?.[0]
+    }
     return errorSchema[key]?.[0]
   }
   return errorSchema[key]
@@ -70,6 +76,7 @@ const parseHttpResponse = (httpResponse, edgeApplicationId) => {
     case 201:
       return {
         feedback: 'Your Origin has been created',
+        originKey: httpResponse.body.results.origin_key,
         urlToEditView: `/edge-applications/edit/${edgeApplicationId}/origins/edit/${httpResponse.body.results.origin_key}`
       }
     case 400:
@@ -82,7 +89,8 @@ const parseHttpResponse = (httpResponse, edgeApplicationId) => {
     case 404:
       throw new Errors.NotFoundError().message
     case 500:
-      throw new Errors.InternalServerError().message
+      const apiError500 = extractApiError(httpResponse)
+      throw new Error(apiError500).message
     default:
       throw new Errors.UnexpectedError().message
   }

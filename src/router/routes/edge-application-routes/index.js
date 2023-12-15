@@ -46,71 +46,36 @@ export const edgeApplicationRoutes = {
       }
     },
     {
-      path: 'edit/:id',
-      children: [
-        {
-          path: '',
-          name: 'edit-edge-application',
-          component: () => import('@views/EdgeApplications/EditView.vue'),
-          props: {
-            listOriginsService: OriginsService.listOriginsService,
-            deleteOriginsService: OriginsService.deleteOriginsService,
-            editEdgeApplicationService: EdgeApplicationsService.editEdgeApplicationService
-          },
-          meta: {
-            breadCrumbs: [
-              {
-                label: 'Edge Applications',
-                to: '/edge-applications'
-              },
-              {
-                label: 'Edit Edge Application'
-              }
-            ]
-          }
+      path: 'edit/:id/:tab?',
+      name: 'edit-edge-application',
+      component: () => import('@views/EdgeApplications/TabsView.vue'),
+      props: {
+        edgeApplicationServices: {
+          editEdgeApplication: EdgeApplicationsService.editEdgeApplicationService,
+          loadEdgeApplication: EdgeApplicationsService.loadEdgeApplicationService,
+          updatedRedirect: 'list-edge-applications'
         },
-        {
-          path: 'origins/create',
-          name: 'create-origin',
-          component: () => import('@views/EdgeApplicationsOrigins/CreateView.vue'),
-          props: {
-            createOriginService: OriginsService.createOriginService
-          },
-          meta: {
-            breadCrumbs: [
-              {
-                label: 'Edge Applications',
-                to: '/edge-applications'
-              },
-              {
-                label: 'Edit Edge Application',
-                to: '/edge-applications/edit/:id'
-              },
-              {
-                label: 'Create Origins'
-              }
-            ]
-          }
+        originsServices: {
+          listOriginsService: OriginsService.listOriginsService,
+          deleteOriginsService: OriginsService.deleteOriginsService,
+          createOriginService: OriginsService.createOriginService,
+          editOriginService: OriginsService.editOriginService,
+          loadOriginService: OriginsService.loadOriginService,
+          documentationService: Helpers.documentationCatalog.edgeApplicationOrigins
         },
-        {
-          path: 'origins/edit/:originKey',
-          name: 'edit-origin',
-          component: () => import('@views/EdgeApplicationsOrigins/EditView.vue'),
-          props: {
-            editOriginService: OriginsService.editOriginService,
-            loadOriginService: OriginsService.loadOriginService,
-            updatedRedirect: 'list-edge-applications'
+        clipboardWrite: Helpers.clipboardWrite
+      },
+      meta: {
+        breadCrumbs: [
+          {
+            label: 'Edge Applications',
+            to: '/edge-applications'
           },
-          meta: {
-            breadCrumbs: [
-              {
-                label: 'Edge Applications',
-                to: '/edge-applications'
-              }
-            ]
+          {
+            label: 'Edit Edge Application'
           }
-        }
-      ]
+        ]
+      }
     }
   ]
 }
