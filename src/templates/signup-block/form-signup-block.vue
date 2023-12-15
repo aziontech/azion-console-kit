@@ -8,7 +8,7 @@
         <label
           for="email"
           class="font-semibold text-sm"
-          >E-mail</label
+          >Email</label
         >
         <InputText
           v-model="email"
@@ -27,7 +27,7 @@
         <label
           for="name"
           class="font-semibold text-sm"
-          >Full name</label
+          >Full Name</label
         >
         <InputText
           v-model="name"
@@ -88,7 +88,7 @@
     </form>
     <PrimeDivider />
     <PrimeButton
-      label="Other sign up methods"
+      label="Other Sign Up Methods"
       outlined
       @click="$emit('change-signup-method')"
     />
@@ -120,10 +120,10 @@
   })
 
   const passwordRequirementsList = ref([
-    { label: '> 7 characters', valid: false },
-    { label: 'Uppercase letter', valid: false },
-    { label: 'Lowercase letter', valid: false },
-    { label: 'Special character (e.g. !?<>@#$%)', valid: false }
+    { label: '7 characters', valid: false },
+    { label: '1 uppercase letter', valid: false },
+    { label: '1 lowercase letter', valid: false },
+    { label: '1 special character (Example: !?<>@#$%)', valid: false }
   ])
 
   const validationSchema = yup.object({
@@ -140,13 +140,13 @@
     email: yup
       .string()
       .max(254, 'Exceeded number of characters')
-      .email('Please enter a valid e-mail')
-      .required('E-mail is a required field'),
+      .email('Enter a valid email')
+      .required('Email is a required field'),
     password: yup
       .string()
       .required('Password is a required field')
       .test('max', 'Exceeded number of characters', (value) => value?.length <= 128)
-      .test('noSpaces', 'Spaces are not allowed', (value) => !value?.match(/\s/g))
+      .test('noSpaces', 'Spaces not allowed', (value) => !value?.match(/\s/g))
       .test('requirements', '', (value) => {
         const hasUpperCase = value && /[A-Z]/.test(value)
         const hasLowerCase = value && /[a-z]/.test(value)
