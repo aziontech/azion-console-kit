@@ -8,7 +8,8 @@
       <section class="w-full flex flex-col gap-3">
         <h2 class="text-start text-xl font-medium">Check your inbox</h2>
         <p class="text-start text-color-secondary">
-          We've sent you an email with instructions to verify your account. Check your inbox or spam folder and follow the instructions.
+          We've sent you an email with instructions to verify your account. Check your inbox or spam
+          folder and follow the instructions.
         </p>
       </section>
       <section class="w-full flex flex-wrap gap-2">
@@ -68,7 +69,12 @@
   const decodedEmail = decodeURIComponent(email)
   const isEmailValid = ref(validateEmail(decodedEmail))
   if (!isEmailValid.value) {
-    toast.add({ life: 5000, severity: 'error', detail: 'Use a valid email format.', summary: 'Error' })
+    toast.add({
+      life: 5000,
+      severity: 'error',
+      detail: 'Use a valid email format.',
+      summary: 'Error'
+    })
   }
 
   const resendEmail = async () => {
