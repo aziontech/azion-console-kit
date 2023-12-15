@@ -271,7 +271,7 @@
             @change="resetRegionAndCity"
           />
           <small class="text-color-secondary text-sm font-normal leading-tight">
-            Country of the account owner.
+            Account owner's country.
           </small>
           <small
             v-if="countryError"
@@ -299,7 +299,7 @@
             :loading="!regionsOptions.done"
           />
           <small class="text-color-secondary text-sm font-normal leading-tight">
-            State or region of the account owner.
+            Account owner's state or region.
           </small>
           <small
             v-if="regionError"
@@ -352,7 +352,7 @@
             placeholder="123 Example Ave."
           />
           <small class="text-color-secondary text-sm font-normal leading-tight">
-            Street address of the account owner.
+            Account owner's street address.
           </small>
           <small
             v-if="addressError"
