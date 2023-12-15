@@ -11,7 +11,6 @@ const fixtures = {
     totalPages: 5,
     statusCode: 200
   }
-
 }
 
 const makeSut = () => {

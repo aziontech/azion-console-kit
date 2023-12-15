@@ -1,8 +1,6 @@
 import { AxiosHttpClientAdapter, parseHttpResponse } from '../axios/AxiosHttpClientAdapter'
 import { makeDomainsBaseUrl } from './make-domains-base-url'
-export const searchDomainsMetricsService = async ({
-  domainLike
-}) => {
+export const searchDomainsMetricsService = async ({ domainLike }) => {
   const searchParams = makeSearchParams({ domainLike })
   let httpResponse = await AxiosHttpClientAdapter.request({
     url: `${makeDomainsBaseUrl()}?${searchParams.toString()}`,
@@ -24,7 +22,7 @@ const adapt = (httpResponse) => {
   }
 }
 
-const makeSearchParams = ({ domainLike, pageSize = 20}) => {
+const makeSearchParams = ({ domainLike, pageSize = 20 }) => {
   const searchParams = new URLSearchParams()
   searchParams.set('page_size', pageSize)
   searchParams.set('nameLike', domainLike)

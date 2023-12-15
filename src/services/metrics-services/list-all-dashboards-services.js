@@ -14,27 +14,27 @@ const groupDashboards = [
             id: 357548608166298191n,
             label: 'Data Transferred',
             url: 'data-transferred',
-            dataset: 'httpMetrics',
+            dataset: 'httpMetrics'
           },
           {
             id: 357548623571976783n,
             label: 'Requests',
             url: 'requests',
-            dataset: 'httpMetrics',
+            dataset: 'httpMetrics'
           },
           {
             id: 357548642810200653n,
             label: 'Status Codes',
             url: 'status-codes',
-            dataset: 'httpMetrics',
+            dataset: 'httpMetrics'
           },
           {
             id: 357549179454620239n,
             label: 'Bandwidth Saving',
             url: 'bandwidth-saving',
-            dataset: 'httpMetrics',
-          },
-        ],
+            dataset: 'httpMetrics'
+          }
+        ]
       },
       {
         id: 2,
@@ -46,9 +46,9 @@ const groupDashboards = [
             id: 357549371218199219n,
             label: 'caching-offload',
             url: 'caching-offload',
-            dataset: 'l2CacheMetrics',
-          },
-        ],
+            dataset: 'l2CacheMetrics'
+          }
+        ]
       },
       {
         id: 3,
@@ -60,9 +60,9 @@ const groupDashboards = [
             id: 357549319029523021n,
             label: 'Invocations',
             url: 'invocations',
-            dataset: 'edgeFunctionsMetrics',
-          },
-        ],
+            dataset: 'edgeFunctionsMetrics'
+          }
+        ]
       },
       {
         id: 4,
@@ -74,11 +74,11 @@ const groupDashboards = [
             id: 357549422933967445n,
             label: 'Requests',
             url: 'requests',
-            dataset: 'imagesProcessedMetrics',
-          },
-        ],
-      },
-    ],
+            dataset: 'imagesProcessedMetrics'
+          }
+        ]
+      }
+    ]
   },
   {
     label: 'Secure',
@@ -95,9 +95,9 @@ const groupDashboards = [
             id: 357548675837198933n,
             label: 'Threats',
             url: 'threats',
-            dataset: 'httpMetrics',
-          },
-        ],
+            dataset: 'httpMetrics'
+          }
+        ]
       },
       {
         id: 7,
@@ -109,11 +109,11 @@ const groupDashboards = [
             id: 357549371218199119n,
             label: 'Standard Queries',
             url: 'standard-queries',
-            dataset: 'idnsQueriesMetrics',
-          },
-        ],
-      },
-    ],
+            dataset: 'idnsQueriesMetrics'
+          }
+        ]
+      }
+    ]
   },
   {
     label: 'Observe',
@@ -130,20 +130,20 @@ const groupDashboards = [
             id: 352149476039721549n,
             label: 'Data Streamed',
             url: 'requests',
-            dataset: 'dataStreamedMetrics',
-          },
-        ],
-      },
-    ],
-  },
-];
+            dataset: 'dataStreamedMetrics'
+          }
+        ]
+      }
+    ]
+  }
+]
 
 function PageDashboardService() {
   return {
     async getPageDashboard() {
-      return Promise.resolve(groupDashboards);
-    },
-  };
+      return Promise.resolve(groupDashboards)
+    }
+  }
 }
 
-export default PageDashboardService;
+export default PageDashboardService

@@ -13,7 +13,6 @@ const fixtures = {
     body: [1, 2],
     statusCode: 200
   }
-
 }
 
 const makeSut = () => {
@@ -47,7 +46,7 @@ describe('MetricsServices', () => {
   it('should return correct query', async () => {
     vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
       statusCode: fixtures.resultMock.statusCode,
-      body: fixtures.resultMock.body,
+      body: fixtures.resultMock.body
     })
     const { sut } = makeSut()
 

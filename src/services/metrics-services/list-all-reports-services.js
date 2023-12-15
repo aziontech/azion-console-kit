@@ -1,13 +1,13 @@
 import {
   REGULAR_COLOR_SET,
-  INVERTED_COLOR_SET,
-} from '@/components/report-card/aggregation-data/tag-feedback/tag-feedback-colors';
+  INVERTED_COLOR_SET
+} from '@/components/report-card/aggregation-data/tag-feedback/tag-feedback-colors'
 
 const reports = [
   /**
    * BUILD
    * Edge Applications - Data Transferred
-  */
+   */
   {
     id: 356217848089018959n,
     label: 'Edge Caching',
@@ -24,7 +24,7 @@ const reports = [
     fields: ['dataTransferredTotal', 'dataTransferredOut', 'dataTransferredIn'],
     groupBy: [],
     orderDirection: 'ASC',
-    dashboardId: 357548608166298191n,
+    dashboardId: 357548608166298191n
   },
   {
     id: 356220228059791957n,
@@ -44,7 +44,7 @@ const reports = [
     orderDirection: 'ASC',
     dashboardId: 357548608166298191n,
     colorSet: REGULAR_COLOR_SET,
-    maxYAxis: 100,
+    maxYAxis: 100
   },
   {
     id: 356220625185931855n,
@@ -63,7 +63,7 @@ const reports = [
     groupBy: [],
     orderDirection: 'ASC',
     dashboardId: 357548608166298191n,
-    colorSet: REGULAR_COLOR_SET,
+    colorSet: REGULAR_COLOR_SET
   },
   {
     id: 356220671983878733n,
@@ -82,13 +82,12 @@ const reports = [
     groupBy: [],
     orderDirection: 'ASC',
     dashboardId: 357548608166298191n,
-    colorSet: INVERTED_COLOR_SET,
+    colorSet: INVERTED_COLOR_SET
   },
   {
     id: 357550842741523030n,
     label: 'Total Bandwidth Usage',
-    description:
-      'edge_applications.data_transferred.total_bandwidth_usage.description',
+    description: 'edge_applications.data_transferred.total_bandwidth_usage.description',
     aggregationType: 'avg',
     columns: 3,
     type: 'line',
@@ -102,13 +101,12 @@ const reports = [
     groupBy: [],
     orderDirection: 'ASC',
     dashboardId: 357548608166298191n,
-    colorSet: REGULAR_COLOR_SET,
+    colorSet: REGULAR_COLOR_SET
   },
   {
     id: 357550842741523029n,
     label: 'Bandwidth Offloaded',
-    description:
-      'edge_applications.data_transferred.bandwidth_offloaded.description',
+    description: 'edge_applications.data_transferred.bandwidth_offloaded.description',
     aggregationType: 'avg',
     columns: 3,
     type: 'line',
@@ -123,13 +121,12 @@ const reports = [
     orderDirection: 'ASC',
     dashboardId: 357548608166298191n,
     colorSet: REGULAR_COLOR_SET,
-    maxYAxis: 100,
+    maxYAxis: 100
   },
   {
     id: 357817189325079119n,
     label: 'Saved Bandwidth',
-    description:
-      'edge_applications.data_transferred.saved_bandwidth.description',
+    description: 'edge_applications.data_transferred.saved_bandwidth.description',
     aggregationType: 'avg',
     columns: 3,
     type: 'line',
@@ -143,13 +140,12 @@ const reports = [
     groupBy: [],
     orderDirection: 'ASC',
     dashboardId: 357548608166298191n,
-    colorSet: REGULAR_COLOR_SET,
+    colorSet: REGULAR_COLOR_SET
   },
   {
     id: 357817270971400783n,
     label: 'Missed Bandwidth',
-    description:
-      'edge_applications.data_transferred.missed_bandwidth.description',
+    description: 'edge_applications.data_transferred.missed_bandwidth.description',
     aggregationType: 'avg',
     columns: 3,
     type: 'line',
@@ -163,12 +159,12 @@ const reports = [
     groupBy: [],
     orderDirection: 'ASC',
     dashboardId: 357548608166298191n,
-    colorSet: INVERTED_COLOR_SET,
+    colorSet: INVERTED_COLOR_SET
   },
   /**
    * BUILD
    * Edge Applications - Requests
-  */
+   */
   {
     id: 357822254142194261n,
     label: 'Total Requests',
@@ -185,7 +181,7 @@ const reports = [
     fields: ['edgeRequestsTotal', 'httpsRequestsTotal', 'httpRequestsTotal'],
     groupBy: [],
     orderDirection: 'ASC',
-    dashboardId: 357548623571976783n,
+    dashboardId: 357548623571976783n
   },
   {
     id: 357822606596899407n,
@@ -205,7 +201,7 @@ const reports = [
     orderDirection: 'ASC',
     dashboardId: 357548623571976783n,
     colorSet: REGULAR_COLOR_SET,
-    maxYAxis: 100,
+    maxYAxis: 100
   },
   {
     id: 357823841952596559n,
@@ -224,7 +220,7 @@ const reports = [
     groupBy: [],
     orderDirection: 'ASC',
     dashboardId: 357548623571976783n,
-    colorSet: REGULAR_COLOR_SET,
+    colorSet: REGULAR_COLOR_SET
   },
   {
     id: 357823947031446101n,
@@ -243,13 +239,12 @@ const reports = [
     groupBy: [],
     orderDirection: 'ASC',
     dashboardId: 357548623571976783n,
-    colorSet: INVERTED_COLOR_SET,
+    colorSet: INVERTED_COLOR_SET
   },
   {
     id: 357824034956640847n,
     label: 'Total Requests per Second',
-    description:
-      'edge_applications.requests.total_requests_per_second.description',
+    description: 'edge_applications.requests.total_requests_per_second.description',
     aggregationType: 'avg',
     columns: 3,
     type: 'line',
@@ -263,13 +258,12 @@ const reports = [
     groupBy: [],
     orderDirection: 'ASC',
     dashboardId: 357548623571976783n,
-    colorSet: REGULAR_COLOR_SET,
+    colorSet: REGULAR_COLOR_SET
   },
   {
     id: 357824230790791757n,
     label: 'Requests per Second Offloaded',
-    description:
-      'edge_applications.requests.requests_per_second_offloaded.description',
+    description: 'edge_applications.requests.requests_per_second_offloaded.description',
     aggregationType: 'avg',
     columns: 3,
     type: 'line',
@@ -284,13 +278,12 @@ const reports = [
     orderDirection: 'ASC',
     dashboardId: 357548623571976783n,
     colorSet: REGULAR_COLOR_SET,
-    maxYAxis: 100,
+    maxYAxis: 100
   },
   {
     id: 357824321753711189n,
     label: 'Saved Requests per Second',
-    description:
-      'edge_applications.requests.saved_requests_per_second.description',
+    description: 'edge_applications.requests.saved_requests_per_second.description',
     aggregationType: 'avg',
     columns: 3,
     type: 'line',
@@ -304,13 +297,12 @@ const reports = [
     groupBy: [],
     orderDirection: 'ASC',
     dashboardId: 357548623571976783n,
-    colorSet: REGULAR_COLOR_SET,
+    colorSet: REGULAR_COLOR_SET
   },
   {
     id: 357824572487107151n,
     label: 'Missed Requests per Second',
-    description:
-      'edge_applications.requests.missed_requests_per_second.description',
+    description: 'edge_applications.requests.missed_requests_per_second.description',
     aggregationType: 'avg',
     columns: 3,
     type: 'line',
@@ -324,13 +316,12 @@ const reports = [
     groupBy: [],
     orderDirection: 'ASC',
     dashboardId: 357548623571976783n,
-    colorSet: INVERTED_COLOR_SET,
+    colorSet: INVERTED_COLOR_SET
   },
   {
     id: 357825388709151309n,
     label: 'Requests by Method',
-    description:
-      'edge_applications.http_methods.requests_by_method.description',
+    description: 'edge_applications.http_methods.requests_by_method.description',
     aggregationType: 'sum',
     columns: 3,
     type: 'line',
@@ -344,21 +335,20 @@ const reports = [
       'requestsHttpMethodGet',
       'requestsHttpMethodPost',
       'requestsHttpMethodHead',
-      'requestsHttpMethodOthers',
+      'requestsHttpMethodOthers'
     ],
     groupBy: [],
     orderDirection: 'ASC',
-    dashboardId: 357548623571976783n,
+    dashboardId: 357548623571976783n
   },
   /**
    * BUILD
    * Edge Applications - Status Codes
-  */
+   */
   {
     id: 357824919768138325n,
     label: 'HTTP Status Codes 2XX',
-    description:
-      'edge_applications.status_codes.http_status_codes_2xx.description',
+    description: 'edge_applications.status_codes.http_status_codes_2xx.description',
     aggregationType: 'sum',
     columns: 3,
     type: 'line',
@@ -372,17 +362,16 @@ const reports = [
       'requestsStatusCode200',
       'requestsStatusCode204',
       'requestsStatusCode206',
-      'requestsStatusCode2xx',
+      'requestsStatusCode2xx'
     ],
     groupBy: [],
     orderDirection: 'ASC',
-    dashboardId: 357548642810200653n,
+    dashboardId: 357548642810200653n
   },
   {
     id: 357825000731837013n,
     label: 'HTTP Status Codes 3XX',
-    description:
-      'edge_applications.status_codes.http_status_codes_3xx.description',
+    description: 'edge_applications.status_codes.http_status_codes_3xx.description',
     aggregationType: 'sum',
     columns: 3,
     type: 'line',
@@ -396,17 +385,16 @@ const reports = [
       'requestsStatusCode301',
       'requestsStatusCode302',
       'requestsStatusCode304',
-      'requestsStatusCode3xx',
+      'requestsStatusCode3xx'
     ],
     groupBy: [],
     orderDirection: 'ASC',
-    dashboardId: 357548642810200653n,
+    dashboardId: 357548642810200653n
   },
   {
     id: 357825058049098319n,
     label: 'HTTP Status Codes 4XX',
-    description:
-      'edge_applications.status_codes.http_status_codes_4xx.description',
+    description: 'edge_applications.status_codes.http_status_codes_4xx.description',
     aggregationType: 'sum',
     columns: 3,
     type: 'line',
@@ -420,17 +408,16 @@ const reports = [
       'requestsStatusCode400',
       'requestsStatusCode403',
       'requestsStatusCode404',
-      'requestsStatusCode4xx',
+      'requestsStatusCode4xx'
     ],
     groupBy: [],
     orderDirection: 'ASC',
-    dashboardId: 357548642810200653n,
+    dashboardId: 357548642810200653n
   },
   {
     id: 357825090550760015n,
     label: 'HTTP Status Codes 5XX',
-    description:
-      'edge_applications.status_codes.http_status_codes_5xx.description',
+    description: 'edge_applications.status_codes.http_status_codes_5xx.description',
     aggregationType: 'sum',
     columns: 3,
     type: 'line',
@@ -444,21 +431,20 @@ const reports = [
       'requestsStatusCode500',
       'requestsStatusCode502',
       'requestsStatusCode503',
-      'requestsStatusCode5xx',
+      'requestsStatusCode5xx'
     ],
     groupBy: [],
     orderDirection: 'ASC',
-    dashboardId: 357548642810200653n,
+    dashboardId: 357548642810200653n
   },
   /**
    * BUILD
    * Edge Applications - Bandwidth Saving
-  */
+   */
   {
     id: 357843490139275861n,
     label: 'Bandwidth Saving',
-    description:
-      'edge_applications.bandwidth_saving.bandwidth_saving.description',
+    description: 'edge_applications.bandwidth_saving.bandwidth_saving.description',
     aggregationType: 'sum',
     columns: 3,
     type: 'line',
@@ -472,12 +458,12 @@ const reports = [
     groupBy: [],
     orderDirection: 'ASC',
     dashboardId: 357549179454620239n,
-    colorSet: REGULAR_COLOR_SET,
+    colorSet: REGULAR_COLOR_SET
   },
   /**
    * BUILD
    * L2 Caching - Caching Offload
-  */
+   */
   {
     id: 357826217661956693n,
     label: 'L2 Caching',
@@ -494,7 +480,7 @@ const reports = [
     limit: 5000,
     fields: ['dataTransferredTotal', 'dataTransferredOut', 'dataTransferredIn'],
     orderDirection: 'ASC',
-    dashboardId: 357549371218199219n,
+    dashboardId: 357549371218199219n
   },
   {
     id: 357826288204907093n,
@@ -514,12 +500,12 @@ const reports = [
     orderDirection: 'ASC',
     dashboardId: 357549371218199219n,
     colorSet: REGULAR_COLOR_SET,
-    maxYAxis: 100,
+    maxYAxis: 100
   },
   /**
    * BUILD
    * Edge Functions - Invocations
-  */
+   */
   {
     id: 357843490139298763n,
     label: 'Total Invocations',
@@ -536,12 +522,12 @@ const reports = [
     fields: ['edgeApplicationInvocations', 'edgeFirewallInvocations'],
     groupBy: [],
     orderDirection: 'ASC',
-    dashboardId: 357549319029523021n,
+    dashboardId: 357549319029523021n
   },
   /**
    * BUILD
    * Image Processor - Requests
-  */
+   */
   {
     id: 357844490139298789n,
     label: 'Total Requests',
@@ -558,28 +544,27 @@ const reports = [
     aggregations: [
       {
         aggregation: 'sum',
-        variable: 'requests',
-      },
+        variable: 'requests'
+      }
     ],
     filters: {
       or: {
         status: 304,
         statusRange: {
           begin: 199,
-          end: 299,
-        },
-      },
+          end: 299
+        }
+      }
     },
     groupBy: [],
     orderDirection: 'ASC',
     dashboardId: 357549422933967445n,
-    colorSet: REGULAR_COLOR_SET,
+    colorSet: REGULAR_COLOR_SET
   },
   {
     id: 357843490195298789n,
     label: 'Total Requests per Second',
-    description:
-      'image_processor.requests.total_requests_per_second.description',
+    description: 'image_processor.requests.total_requests_per_second.description',
     aggregationType: 'sum',
     columns: 3,
     type: 'line',
@@ -594,25 +579,25 @@ const reports = [
         status: 304,
         statusRange: {
           begin: 200,
-          end: 299,
-        },
-      },
+          end: 299
+        }
+      }
     },
     aggregations: [
       {
         aggregation: 'rate',
-        variable: 'requests',
-      },
+        variable: 'requests'
+      }
     ],
     groupBy: [],
     orderDirection: 'ASC',
     dashboardId: 357549422933967445n,
-    colorSet: REGULAR_COLOR_SET,
+    colorSet: REGULAR_COLOR_SET
   },
   /**
    * SECURE
    * Overview - Request
-  */
+   */
   {
     id: 357842594513814093n,
     label: 'Total Attacks',
@@ -628,12 +613,12 @@ const reports = [
     groupBy: [],
     orderDirection: 'ASC',
     dashboardId: 357548675837199999n,
-    colorSet: INVERTED_COLOR_SET,
+    colorSet: INVERTED_COLOR_SET
   },
   /**
    * SECURE
    * WAF - threats
-  */
+   */
   {
     id: 357842594513814093n,
     label: 'Threats vs Requests',
@@ -650,13 +635,12 @@ const reports = [
     fields: ['wafRequestsAllowed', 'wafRequestsBlocked', 'wafRequestsThreat'],
     groupBy: [],
     orderDirection: 'ASC',
-    dashboardId: 357548675837198933n,
+    dashboardId: 357548675837198933n
   },
   {
     id: 357842775438262861n,
     label: 'Cross-Site scripting (XSS) Threats',
-    description:
-      'edge_applications.waf.cross_site_scripting_xss_threats.description',
+    description: 'edge_applications.waf.cross_site_scripting_xss_threats.description',
     aggregationType: 'sum',
     columns: 3,
     type: 'line',
@@ -670,13 +654,12 @@ const reports = [
     groupBy: [],
     orderDirection: 'ASC',
     dashboardId: 357548675837198933n,
-    colorSet: INVERTED_COLOR_SET,
+    colorSet: INVERTED_COLOR_SET
   },
   {
     id: 357842594513814012n,
     label: 'Remote File Inclusion (RFI) Threats',
-    description:
-      'edge_applications.waf.remote_file_inclusion_rfi_threats.description',
+    description: 'edge_applications.waf.remote_file_inclusion_rfi_threats.description',
     aggregationType: 'sum',
     columns: 3,
     type: 'line',
@@ -690,7 +673,7 @@ const reports = [
     groupBy: [],
     orderDirection: 'ASC',
     dashboardId: 357548675837198933n,
-    colorSet: INVERTED_COLOR_SET,
+    colorSet: INVERTED_COLOR_SET
   },
   {
     id: 357842833307075157n,
@@ -709,7 +692,7 @@ const reports = [
     groupBy: [],
     orderDirection: 'ASC',
     dashboardId: 357548675837198933n,
-    colorSet: INVERTED_COLOR_SET,
+    colorSet: INVERTED_COLOR_SET
   },
   {
     id: 357842851576414805n,
@@ -728,12 +711,12 @@ const reports = [
     groupBy: [],
     orderDirection: 'ASC',
     dashboardId: 357548675837198933n,
-    colorSet: INVERTED_COLOR_SET,
+    colorSet: INVERTED_COLOR_SET
   },
   /**
    * SECURE
    * Intelligent DNS - Standard Queries
-  */
+   */
   {
     id: 357843490139298789n,
     label: 'Total Queries',
@@ -750,18 +733,18 @@ const reports = [
     aggregations: [
       {
         aggregation: 'sum',
-        variable: 'requests',
-      },
+        variable: 'requests'
+      }
     ],
     groupBy: [],
     orderDirection: 'ASC',
     dashboardId: 357549371218199119n,
-    colorSet: REGULAR_COLOR_SET,
+    colorSet: REGULAR_COLOR_SET
   },
   /**
    * OBSERVE
    * Data Streaming - Data Streamed
-  */
+   */
   {
     id: 352149351588430415n,
     label: 'Total Data Streamed',
@@ -777,20 +760,19 @@ const reports = [
     aggregations: [
       {
         aggregation: 'sum',
-        variable: 'dataStreamed',
-      },
+        variable: 'dataStreamed'
+      }
     ],
     limit: 5000,
     groupBy: [],
     orderDirection: 'ASC',
     dashboardId: 352149476039721549n,
-    colorSet: REGULAR_COLOR_SET,
+    colorSet: REGULAR_COLOR_SET
   },
   {
     id: 352234687543902797n,
     label: 'Total Requests',
-    description:
-      'data_streaming.data_streaming_requests.total_requests.description',
+    description: 'data_streaming.data_streaming_requests.total_requests.description',
     aggregationType: 'sum',
     columns: 3,
     type: 'line',
@@ -802,23 +784,23 @@ const reports = [
     aggregations: [
       {
         aggregation: 'sum',
-        variable: 'streamedLines',
-      },
+        variable: 'streamedLines'
+      }
     ],
     limit: 5000,
     groupBy: [],
     orderDirection: 'ASC',
     dashboardId: 352149476039721549n,
-    colorSet: REGULAR_COLOR_SET,
-  },
-];
+    colorSet: REGULAR_COLOR_SET
+  }
+]
 
 function ReportsService() {
   return {
     async getReports() {
-      return Promise.resolve(reports);
-    },
-  };
+      return Promise.resolve(reports)
+    }
+  }
 }
 
-export default ReportsService;
+export default ReportsService

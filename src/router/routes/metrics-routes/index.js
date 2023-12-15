@@ -14,7 +14,7 @@ export const metricsRoutes = {
         fetchDataFromBeholderService: MetricsServices.fetchDataFromBeholderService,
         searchDomainsMetricsService: DomainsServices.searchDomainsMetricsService,
         tabsReportsMetricsService: MetricsServices.fakeReportServices,
-        dropdownReportsMetricsService: MetricsServices.fakeDropdownReportServices,
+        dropdownReportsMetricsService: MetricsServices.fakeDropdownReportServices
       },
       meta: {
         breadCrumbs: [
