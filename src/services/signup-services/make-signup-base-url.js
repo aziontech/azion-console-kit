@@ -1,3 +1,4 @@
 export const makeSignupBaseUrl = () => {
-  return 'signup'
+  const version = 'v3'
+  return `${version}/signup`
 }
