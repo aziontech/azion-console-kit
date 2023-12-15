@@ -326,7 +326,7 @@
             :loading="!citiesOptions.done"
           />
           <small class="text-color-secondary text-sm font-normal leading-tight">
-            City of the account owner.
+            Account owner's city.
           </small>
           <small
             v-if="cityError"
