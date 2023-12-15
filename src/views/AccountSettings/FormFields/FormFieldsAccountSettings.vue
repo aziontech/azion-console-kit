@@ -109,7 +109,7 @@
 <template>
   <FormHorizontal
     title="General"
-    description="Description"
+    description="Modify account name and check your ID."
   >
     <template #inputs>
       <div class="flex flex-col w-full gap-2 sm:max-w-lg">
@@ -117,14 +117,18 @@
           for="accountName"
           class="text-color text-base font-medium"
         >
-          Account name *
+          Account Name *
         </label>
         <InputText
           v-model="accountName"
           id="accountName"
           type="text"
           :class="{ 'p-invalid': accountNameError }"
+          placeholder="Company"
         />
+        <small class="text-color-secondary text-xs font-normal leading-tight">
+          The name of the account.
+        </small>
         <small
           v-if="accountNameError"
           class="p-error text-xs font-normal leading-tight"
@@ -150,13 +154,16 @@
             readonly
           />
         </span>
+        <small class="text-color-secondary text-xs font-normal leading-tight">
+          The ID of the associated account. Cannot be changed. Use this value to open support tickets for issues related to the account.
+        </small>
       </div>
     </template>
   </FormHorizontal>
 
   <FormHorizontal
     title="Company Information"
-    description="Description"
+    description="Add data on the company associated with the account."
   >
     <template #inputs>
       <div class="flex flex-col w-full gap-2 sm:max-w-lg">
@@ -164,49 +171,58 @@
           for="companyName"
           class="text-color text-base font-medium"
         >
-          Company/Corporate name
+          Company Name
         </label>
         <InputText
           v-model="companyName"
           id="companyName"
           type="text"
+          placeholder="Company S.A."
         />
+        <small class="text-color-secondary text-xs font-normal leading-tight">
+          The name of the company associated with the account.
+        </small>
       </div>
       <div class="flex flex-col w-full gap-2 sm:max-w-lg">
         <label
           for="uniqueIdentifier"
           class="text-color text-base font-medium"
         >
-          Unique identifier
+          Company ID
         </label>
         <InputText
           v-model="uniqueIdentifier"
           id="uniqueIdentifier"
           type="text"
+          placeholder="00.000.000/0001-00"
         />
+        <small class="text-color-secondary text-xs font-normal leading-tight">
+          Personal or company ID number to identify account ownership.
+        </small>
       </div>
       <div class="flex flex-col w-full gap-2 sm:max-w-lg">
         <label
           for="billingEmails"
           class="text-color text-base font-medium"
         >
-          Billing emails
+          Billing Emails
         </label>
         <TextArea
           id="billingEmails"
           v-model="billingEmails"
           rows="5"
           cols="30"
+          placeholder="example@email.com;holder@email.com"
         />
         <small class="text-color-secondary text-sm font-normal leading-tight">
-          E-mails address separated by semicolon(;) that will receive billing e-mails.
+          Billing information will be forwarded to all emails listed in this field. Separate each email address with a semicolon (<code>;</code>).
         </small>
       </div>
     </template>
   </FormHorizontal>
   <FormHorizontal
     title="Address Information"
-    description="Description"
+    description="Insert address information for the account."
   >
     <template #inputs>
       <div class="flex flex-col gap-6 md:gap-8 md:flex-row">
@@ -222,7 +238,11 @@
             id="postalCode"
             type="text"
             :class="{ 'p-invalid': postalCodeError }"
+            placeholder="00.000.000-00"
           />
+          <small class="text-color-secondary text-sm font-normal leading-tight">
+            Postal code of the account owner.
+          </small>
           <small
             v-if="postalCodeError"
             class="p-error text-xs font-normal leading-tight"
@@ -248,6 +268,9 @@
             :loading="!countriesOptions.done"
             @change="resetRegionAndCity"
           />
+          <small class="text-color-secondary text-sm font-normal leading-tight">
+            Country of the account owner.
+          </small>
           <small
             v-if="countryError"
             class="p-error text-xs font-normal leading-tight"
@@ -273,6 +296,9 @@
             v-model="region"
             :loading="!regionsOptions.done"
           />
+          <small class="text-color-secondary text-sm font-normal leading-tight">
+            State or region of the account owner.
+          </small>
           <small
             v-if="regionError"
             class="p-error text-xs font-normal leading-tight"
@@ -297,6 +323,9 @@
             :class="{ 'p-invalid': cityError }"
             :loading="!citiesOptions.done"
           />
+          <small class="text-color-secondary text-sm font-normal leading-tight">
+            City of the account owner.
+          </small>
           <small
             v-if="cityError"
             class="p-error text-xs font-normal leading-tight"
@@ -311,14 +340,18 @@
             for="address"
             class="text-color text-base font-medium"
           >
-            Address *
+            Address Line 1 *
           </label>
           <InputText
             v-model="address"
             id="address"
             type="text"
             :class="{ 'p-invalid': addressError }"
+            placeholder="123 Example Ave."
           />
+          <small class="text-color-secondary text-sm font-normal leading-tight">
+            Line 1 of the address of the account owner.
+          </small>
           <small
             v-if="addressError"
             class="p-error text-xs font-normal leading-tight"
@@ -331,20 +364,24 @@
             for="complement"
             class="text-color text-base font-medium"
           >
-            Complement
+            Address Line 2
           </label>
           <InputText
             v-model="complement"
             id="complement"
             type="text"
+            placeholder="1st floor"
           />
+          <small class="text-color-secondary text-sm font-normal leading-tight">
+            Line 2 of the address of the account owner.
+          </small>
         </div>
       </div>
     </template>
   </FormHorizontal>
   <FormHorizontal
-    title="Security Settings"
-    description="Description"
+    title="Login Settings"
+    description="Activate Social Login or Multi-Factor Authentication (MFA) to secure user verification for access to Real-Time Manager."
   >
     <template #inputs>
       <div class="w-full flex flex-col gap-2">
@@ -358,15 +395,13 @@
               class="text-color text-sm font-normal leading-5"
               for="isSocialLoginEnabled"
             >
-              Social login
+              Allow Social Login
             </label>
           </div>
           <div class="flex-col gap-1 pl-10">
             <p class="text-color-secondary text-sm font-normal">
-              As an Account Owner you can enable/disable the Social Login functionality. When it is
-              enabled, users linked to the account can authenticate to RTM using their social
-              networks. When it is disabled, users authenticate to RTM using their email and
-              password.
+              When enabled, users linked to the account can login to RTM using their social
+              network credentials.
             </p>
           </div>
         </div>
@@ -386,8 +421,7 @@
           </div>
           <div class="flex-col gap-1 pl-10">
             <p class="text-color-secondary text-sm font-normal">
-              As an Account Owner you can enable/disable the enforce MFA functionality. MFA will be
-              mandatory for all users of this account when enabling this item.
+              When enabled, MFA will be enforced upon login for all users linked to this account.
             </p>
           </div>
         </div>
