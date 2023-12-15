@@ -18,6 +18,8 @@ const adapt = (httpResponse) => {
     active: body.active,
     language: body.language,
     initiatorType: body.initiator_type,
+    lastEditor: body.last_editor,
+    referenceCount: body.reference_count,
     jsonArgs: JSON.stringify(body.json_args, null, 2),
     name: body.name,
     code: body.code
