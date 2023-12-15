@@ -23,11 +23,11 @@ describe('SignupServices', () => {
       statusCode: 201
     })
     const { sut } = makeSut()
-
+    const version = 'v3'
     await sut(userPayloadMock)
 
     expect(requestSpy).toHaveBeenCalledWith({
-      url: 'signup',
+      url: `${version}/signup`,
       method: 'POST',
       body: userPayloadMock
     })
