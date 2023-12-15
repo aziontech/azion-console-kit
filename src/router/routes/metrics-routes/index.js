@@ -12,7 +12,9 @@ export const metricsRoutes = {
       component: () => import('@views/metrics/MetricsView'),
       props: {
         fetchDataFromBeholderService: MetricsServices.fetchDataFromBeholderService,
-        searchDomainsMetricsService: DomainsServices.searchDomainsMetricsService
+        searchDomainsMetricsService: DomainsServices.searchDomainsMetricsService,
+        tabsReportsMetricsService: MetricsServices.fakeReportServices,
+        dropdownReportsMetricsService: MetricsServices.fakeDropdownReportServices,
       },
       meta: {
         breadCrumbs: [

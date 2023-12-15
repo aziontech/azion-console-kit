@@ -56,7 +56,7 @@ const router = createRouter({
     activityHistoryRoutes,
     realTimePurgeRoutes,
     teamsPermissionRoutes,
-    metricsRoutes
+    metricsRoutes,
     signupRoutes,
     marketplaceRoutes
   ].concat(errorRoutes)

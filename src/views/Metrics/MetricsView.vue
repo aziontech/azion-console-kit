@@ -1,12 +1,26 @@
 <template>
-  <div class="px-3 sm:px-8 pt-4 sm:pt-8 pb-14 flex flex-col gap-8 sm:gap-6 w-full">
-    <MetricsBlock
-      :fetchDataFromBeholderService="fetchDataFromBeholderService" />
-  </div>
+  <ContentBlock>
+    <template #heading>
+      <PageHeadingBlock pageTitle="Real-Time Metrics" />
+    </template>
+    <template #content>
+      <!-- <MetricsBlock
+      :fetchDataFromBeholderService="fetchDataFromBeholderService" /> -->
+      <ReportsPanel :tabsReportsMetricsService="tabsReportsMetricsService"
+        :dropdownReportsMetricsService="dropdownReportsMetricsService" />
+      <FilterPanel />
+      <DashboardPanel />
+    </template>
+  </ContentBlock>
 </template>
 
 <script setup>
-import MetricsBlock from '@/templates/metrics-block'
+import ContentBlock from '@/templates/content-block'
+import PageHeadingBlock from '@/templates/page-heading-block'
+import DashboardPanel from './Blocks/DashboardPanel.vue';
+import ReportsPanel from './Blocks/ReportsPanel.vue';
+import FilterPanel from './Blocks/FilterPanel.vue';
+// import MetricsBlock from '@/templates/metrics-block'
 
 const props = defineProps({
   fetchDataFromBeholderService: {
@@ -14,6 +28,14 @@ const props = defineProps({
     required: true
   },
   searchDomainsMetricsService: {
+    type: Function,
+    required: true
+  },
+  tabsReportsMetricsService: {
+    type: Function,
+    required: true
+  },
+  dropdownReportsMetricsService: {
     type: Function,
     required: true
   }

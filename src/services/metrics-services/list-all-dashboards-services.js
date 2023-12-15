@@ -138,9 +138,6 @@ const groupDashboards = [
   },
 ];
 
-// implementar
-return parseHttpResponse(httpResponse)
-
 function PageDashboardService() {
   return {
     async getPageDashboard() {
