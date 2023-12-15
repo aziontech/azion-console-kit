@@ -383,7 +383,7 @@
   </FormHorizontal>
   <FormHorizontal
     title="Login Settings"
-    description="Activate Social Login or Multi-Factor Authentication (MFA) to secure user verification for access to Real-Time Manager."
+    description="Activate Social Login or Multi-Factor Authentication (MFA) to secure user verification to access the account."
   >
     <template #inputs>
       <div class="w-full flex flex-col gap-2">
