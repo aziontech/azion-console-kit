@@ -25,11 +25,11 @@ describe('UsersServices', () => {
       statusCode: 201
     })
     const { sut } = makeSut()
-
+    const version = 'v4'
     await sut(fixtures.guest)
 
     expect(requestSpy).toHaveBeenCalledWith({
-      url: `users`,
+      url: `${version}/iam/users`,
       method: 'POST',
       body: {
         first_name: 'Jack',

@@ -16,9 +16,9 @@
             :listCountriesPhoneService="listCountriesPhoneService"
           />
         </template>
-        <template #action-bar="{ onSubmit, formValid, onCancel, loading }">
+        <template #action-bar="{ onSubmit, formValid, onCancel, loading, values, setValues }">
           <ActionBarBlockWithTeleport
-            @onSubmit="onSubmit"
+            @onSubmit="formSubmit(onSubmit, values, setValues)"
             @onCancel="onCancel"
             :loading="loading"
             :submitDisabled="!formValid"
@@ -39,6 +39,11 @@
   import ActionBarBlockWithTeleport from '@templates/action-bar-block/action-bar-with-teleport'
   import * as yup from 'yup'
   import { useAccountStore } from '@/stores/account'
+  import { useToast } from 'primevue/usetoast'
+
+  const toast = useToast()
+
+  const currentEmail = ref('')
 
   const props = defineProps({
     loadUserService: {
@@ -59,12 +64,31 @@
     }
   })
 
-  async function loadUser() {
+  const loadUser = async () => {
     const { account } = useAccountStore()
     const id = account.user_id
-    return await props.loadUserService({ id })
-  }
+    const userData = await props.loadUserService({ id })
 
+    currentEmail.value = userData.email
+
+    return userData
+  }
+  const formSubmit = (onSubmit, values, setValues) => {
+    onSubmit()
+    if (values.email !== currentEmail.value) {
+      const toastConfig = {
+        closable: true,
+        severity: 'warn',
+        summary: 'Confirmation email',
+        detail: 'A confirmation email message has been sent to your email address.'
+      }
+      toast.add({ ...toastConfig })
+
+      setValues({
+        email: currentEmail.value
+      })
+    }
+  }
   const passwordRequirementsList = ref([
     { label: '> 7 characters', valid: false },
     { label: 'Uppercase letter', valid: false },
@@ -73,12 +97,12 @@
   ])
 
   const validationSchema = yup.object({
-    firstName: yup.string().required().label('First name').max(30),
-    lastName: yup.string().required().label('Last name').max(30),
+    firstName: yup.string().required().max(30).label('First name'),
+    lastName: yup.string().required().max(30).label('Last name'),
     timezone: yup.string(),
     language: yup.string(),
     countryCallCode: yup.string(),
-    email: yup.string().email().required().label('E-mail').max(254),
+    email: yup.string().email().required().max(254).label('E-mail'),
     mobile: yup.string().required().label('Mobile'),
     twoFactorEnabled: yup.boolean(),
     oldPassword: yup.string(),
@@ -88,7 +112,6 @@
         yup
           .string()
           .required()
-          .label('Password')
           .test('max', 'Exceeded number of characters', (value) => value?.length <= 128)
           .test('noSpaces', 'Spaces are not allowed', (value) => !value?.match(/\s/g))
           .test('requirements', '', (value) => {
@@ -102,6 +125,7 @@
             passwordRequirementsList.value[3].valid = hasSpecialChar
             return hasMinLength && hasUpperCase && hasLowerCase && hasSpecialChar
           })
+          .label('Password')
     }),
     confirmPassword: yup.string().when('password', {
       is: (val) => !!val,
@@ -109,8 +133,8 @@
         yup
           .string()
           .required()
-          .label('Confirm password')
           .oneOf([yup.ref('password'), null], 'Passwords must match')
+          .label('Confirm password')
     })
   })
 </script>

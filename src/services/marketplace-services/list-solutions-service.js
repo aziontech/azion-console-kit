@@ -39,7 +39,10 @@ const adapt = (httpResponse) => {
           slug: element.slug,
           headline: element.headline,
           featured: element.featured,
-          released: element.new_release
+          released: element.new_release,
+          instanceType: {
+            isTemplate: element.instance_type.is_template
+          }
         }))
       : []
 

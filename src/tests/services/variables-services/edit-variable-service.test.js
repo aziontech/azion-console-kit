@@ -26,11 +26,11 @@ describe('VariablesServices', () => {
       statusCode: 200
     })
     const { sut } = makeSut()
-
+    const version = 'v3'
     await sut(fixtures.variableMock)
 
     expect(requestSpy).toHaveBeenCalledWith({
-      url: `variables/${fixtures.variableMock.id}`,
+      url: `${version}/variables/${fixtures.variableMock.id}`,
       method: 'PUT',
       body: {
         key: fixtures.variableMock.key,

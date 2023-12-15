@@ -1,3 +1,4 @@
 export const makePersonalTokensBaseUrl = () => {
-  return 'iam/personal_tokens'
+  const version = 'v4'
+  return `${version}/iam/personal_tokens`
 }

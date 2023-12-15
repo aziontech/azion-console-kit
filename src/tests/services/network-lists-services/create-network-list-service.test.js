@@ -30,11 +30,11 @@ describe('NetworkListsServices', () => {
       }
     })
     const { sut } = makeSut()
-
+    const version = 'v3'
     await sut(fixtures.networkMock)
 
     expect(requestSpy).toHaveBeenCalledWith({
-      url: `network_lists`,
+      url: `${version}/network_lists`,
       method: 'POST',
       body: {
         name: fixtures.networkMock.name,

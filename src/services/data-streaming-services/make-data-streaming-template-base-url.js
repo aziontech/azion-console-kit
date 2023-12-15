@@ -1,5 +1,6 @@
 const makeDataStreamingTemplateBaseUrl = () => {
-  return `data_streaming/templates`
+  const version = 'v3'
+  return `${version}/data_streaming/templates`
 }
 
 export { makeDataStreamingTemplateBaseUrl }

@@ -18,11 +18,11 @@ describe('DigitalCertificatesServices', () => {
     })
     const idMock = 123321
     const { sut } = makeSut(idMock)
-
+    const version = 'v3'
     await sut(idMock)
 
     expect(requestSpy).toHaveBeenCalledWith({
-      url: `digital_certificates/${idMock}`,
+      url: `${version}/digital_certificates/${idMock}`,
       method: 'DELETE'
     })
   })

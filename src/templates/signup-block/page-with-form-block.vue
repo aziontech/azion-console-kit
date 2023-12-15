@@ -21,7 +21,7 @@
         class="w-full flex flex-col justify-start items-center pt-4 sm:pt-10 pb-20 my-auto overflow-y-auto max-sm:min-h-[calc(100vh-120px)] max-h-[calc(100vh-60px-56px)]"
       >
         <div
-          class="card surface-border border rounded-md surface-section p-6 xl:p-10 flex flex-col gap-6 max-w-md"
+          class="card surface-border border rounded-md surface-section p-6 xl:p-8 flex flex-col gap-8 max-w-md"
         >
           <h2 class="text-start text-xl lg:text-2xl font-medium">
             {{ formTitle }}
@@ -44,7 +44,7 @@
             />
           </p>
         </div>
-        <div class="flex flex-wrap justify-center items-center gap-3 mt-6 max-w-md">
+        <div class="flex flex-wrap justify-center items-center gap-3 mt-8 max-w-md">
           <p class="text-sm font-normal">Already have an account?</p>
           <PrimeButton
             label="Sign in here"

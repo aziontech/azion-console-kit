@@ -83,8 +83,8 @@
             />
           </span>
           <small class="text-color-secondary text-sm font-normal leading-tight">
-          The hash ID used to authenticate the edge node.
-        </small>
+            The hash ID used to authenticate the edge node.
+          </small>
         </div>
         <div class="flex flex-col w-full sm:max-w-3xl gap-2">
           <label

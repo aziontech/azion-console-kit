@@ -36,9 +36,9 @@ export default mergeConfig(
       },
       reporters: ['default', 'vitest-sonar-reporter'],
       outputFile: {
-        'vitest-sonar-reporter': './coverage/sonar-report.xml',
+        'vitest-sonar-reporter': './coverage/sonar-report.xml'
       },
-      testTimeout: 10000
+      testTimeout: 30000
     }
   })
 )

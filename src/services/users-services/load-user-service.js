@@ -2,42 +2,40 @@ import { AxiosHttpClientAdapter, parseHttpResponse } from '../axios/AxiosHttpCli
 import { makeUsersBaseUrl } from './make-users-base-url'
 
 export const loadUserService = async ({ id }) => {
-  const httpResponse = await AxiosHttpClientAdapter.request({
+  let httpResponse = await AxiosHttpClientAdapter.request({
     url: `${makeUsersBaseUrl()}/${id}`,
     method: 'GET'
   })
+  httpResponse = adapt(httpResponse)
 
-  return parseHttpResponse(adapt(httpResponse))
+  return parseHttpResponse(httpResponse)
 }
 
 const adapt = (httpResponse) => {
-  /**
-   * Necessary until the API gets the common pattern
-   * of returning the array of data inside results property
-   * like other endpoints.
-   */
-  const parsedUsers = {
-    countryCallCode: httpResponse.body.data.country_call_code,
-    dateJoined: httpResponse.body.data.date_joined,
-    email: httpResponse.body.data.email,
-    firstName: httpResponse.body.data.first_name,
-    id: httpResponse.body.data.id,
-    isAccountOwner: httpResponse.body.data.is_account_owner,
-    isActive: httpResponse.body.data.is_active,
-    isStaff: httpResponse.body.data.is_staff,
-    isTrial: httpResponse.body.data.is_trial,
-    language: httpResponse.body.data.language,
-    lastLogin: httpResponse.body.data.last_login,
-    lastName: httpResponse.body.data.last_name,
-    mobile: httpResponse.body.data.mobile,
-    phone: httpResponse.body.data.phone,
-    teams: httpResponse.body.data.teams,
-    timezone: httpResponse.body.data.timezone,
-    twoFactorEnabled: httpResponse.body.data.two_factor_enabled
+  const responseData = httpResponse.body.data
+  const parsedUser = {
+    id: responseData.id,
+    firstName: responseData.first_name,
+    lastName: responseData.last_name,
+    email: responseData.email,
+    language: responseData.language,
+    timezone: responseData.timezone,
+    countryCallCode: responseData.country_call_code,
+    mobile: responseData.mobile,
+    isAccountOwner: responseData.is_account_owner,
+    teamsIds: responseData.teams.map((value) => value.id),
+    twoFactorEnabled: responseData.two_factor_enabled,
+    dateJoined: responseData.date_joined,
+    isActive: responseData.is_active,
+    isStaff: responseData.is_staff,
+    isTrial: responseData.is_trial,
+    lastLogin: responseData.last_login,
+    phone: responseData.phone,
+    teams: responseData.teams
   }
 
   return {
-    body: parsedUsers,
+    body: parsedUser,
     statusCode: httpResponse.statusCode
   }
 }

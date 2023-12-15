@@ -4,23 +4,23 @@ import { describe, expect, it, vi } from 'vitest'
 
 const fixtures = {
   userMock: {
-    country_call_code: 'BR - 55',
-    date_joined: '2023-09-19T19:53:33Z',
-    email: 'test.ferreira+teste1@azion.com',
-    first_name: 'test',
-    id: 3652,
-    is_account_owner: true,
-    is_active: true,
-    is_staff: true,
-    is_trial: true,
-    language: 'en',
-    last_login: '2023-12-12T17:52:07.700273Z',
-    last_name: 'test',
-    mobile: '89994258779',
-    phone: '',
-    teams: [],
+    id: 4462,
+    last_login: '2023-12-08T11:35:55.072822Z',
+    first_name: 'test name',
+    last_name: 'test last name',
+    email: 'test@azion.com',
+    is_staff: false,
+    is_active: false,
+    phone: null,
+    country_call_code: 'AL - 355',
+    mobile: '16993388829',
+    date_joined: '2023-12-08T11:35:55.072822Z',
     timezone: 'GMT',
-    two_factor_enabled: true
+    language: 'en',
+    is_trial: false,
+    two_factor_enabled: false,
+    is_account_owner: false,
+    teams: [{ id: 1580, name: 'Default Team', is_active: true }]
   }
 }
 
@@ -40,11 +40,11 @@ describe('UsersServices', () => {
     })
 
     const { sut } = makeSut()
-
+    const version = 'v4'
     await sut({ id: fixtures.userMock.id })
 
     expect(requestSpy).toHaveBeenCalledWith({
-      url: `users/${fixtures.userMock.id}`,
+      url: `${version}/iam/users/${fixtures.userMock.id}`,
       method: 'GET'
     })
   })
@@ -56,26 +56,27 @@ describe('UsersServices', () => {
     })
     const { sut } = makeSut()
 
-    const result = await sut({})
+    const result = await sut({ id: fixtures.userMock.id })
 
     expect(result).toEqual({
-      countryCallCode: fixtures.userMock.country_call_code,
-      dateJoined: fixtures.userMock.date_joined,
-      email: fixtures.userMock.email,
-      firstName: fixtures.userMock.first_name,
       id: fixtures.userMock.id,
+      firstName: fixtures.userMock.first_name,
+      lastName: fixtures.userMock.last_name,
+      email: fixtures.userMock.email,
+      countryCallCode: fixtures.userMock.country_call_code,
+      mobile: fixtures.userMock.mobile,
+      timezone: fixtures.userMock.timezone,
+      language: fixtures.userMock.language,
+      twoFactorEnabled: fixtures.userMock.two_factor_enabled,
       isAccountOwner: fixtures.userMock.is_account_owner,
+      teamsIds: [fixtures.userMock.teams[0].id],
+      dateJoined: fixtures.userMock.date_joined,
       isActive: fixtures.userMock.is_active,
       isStaff: fixtures.userMock.is_staff,
       isTrial: fixtures.userMock.is_trial,
-      language: fixtures.userMock.language,
       lastLogin: fixtures.userMock.last_login,
-      lastName: fixtures.userMock.last_name,
-      mobile: fixtures.userMock.mobile,
       phone: fixtures.userMock.phone,
-      teams: fixtures.userMock.teams,
-      timezone: fixtures.userMock.timezone,
-      twoFactorEnabled: fixtures.userMock.two_factor_enabled
+      teams: fixtures.userMock.teams
     })
   })
 })

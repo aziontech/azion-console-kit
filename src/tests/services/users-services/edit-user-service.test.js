@@ -1,51 +1,56 @@
 import { AxiosHttpClientAdapter } from '@/services/axios/AxiosHttpClientAdapter'
-import { createUsersService } from '@/services/users-services'
-import { describe, expect, it, vi } from 'vitest'
+import { editAnotherUserService } from '@/services/users-services'
 import * as Errors from '@/services/axios/errors'
+import { describe, expect, it, vi } from 'vitest'
 
 const fixtures = {
   userMock: {
-    firstName: 'John',
-    lastName: 'Doe',
-    timezone: 'America/New_York',
-    language: 'en_US',
-    email: 'johndoe@example.com',
-    countryCallCode: { value: 'AF +93' },
-    mobile: '+1-123-456-7890',
-    isAccountOwner: true,
-    teamsIds: 1,
-    twoFactorEnabled: true
+    id: 4462,
+    firstName: 'test name',
+    lastName: 'test last name',
+    timezone: 'GMT',
+    language: 'en',
+    email: 'test.test@azion.com',
+    countryCallCode: {
+      label: 'AL (Albania) +355',
+      labelFormat: 'AL +355',
+      value: 'AL - 355'
+    },
+    mobile: 12312312,
+    isAccountOwner: false,
+    teamsIds: [1580],
+    twoFactorEnabled: false
   }
 }
 
 const makeSut = () => {
-  const sut = createUsersService
+  const sut = editAnotherUserService
 
   return {
     sut
   }
 }
 
-describe('UsersServices', () => {
+describe('UsersService', () => {
   it('should call API with correct params', async () => {
     const requestSpy = vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
-      statusCode: 201
+      statusCode: 200
     })
     const { sut } = makeSut()
-    const version = 'v4'
+
     await sut(fixtures.userMock)
 
     expect(requestSpy).toHaveBeenCalledWith({
-      url: `${version}/iam/users`,
-      method: 'POST',
+      url: `v4/iam/users/${fixtures.userMock.id}`,
+      method: 'PATCH',
       body: {
         first_name: fixtures.userMock.firstName,
         last_name: fixtures.userMock.lastName,
         timezone: fixtures.userMock.timezone,
         language: fixtures.userMock.language,
-        country_call_code: fixtures.userMock.countryCallCode.value,
         email: fixtures.userMock.email,
-        mobile: fixtures.userMock.mobile,
+        country_call_code: fixtures.userMock.countryCallCode.value,
+        mobile: fixtures.userMock.mobile.toString(),
         is_account_owner: fixtures.userMock.isAccountOwner,
         teams_ids: fixtures.userMock.teamsIds,
         two_factor_enabled: fixtures.userMock.twoFactorEnabled
@@ -53,15 +58,15 @@ describe('UsersServices', () => {
     })
   })
 
-  it('should return a feedback message on successfully created', async () => {
+  it('should return a feedback message on successfully updated', async () => {
     vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
-      statusCode: 201
+      statusCode: 200
     })
     const { sut } = makeSut()
 
-    const data = await sut(fixtures.userMock)
+    const feedbackMessage = await sut(fixtures.userMock)
 
-    expect(data.feedback).toBe('Your user has been created')
+    expect(feedbackMessage).toBe('Your user has been updated')
   })
 
   it.each([
@@ -98,7 +103,6 @@ describe('UsersServices', () => {
       expect(response).rejects.toBe(expectedError)
     }
   )
-
   it('should throw first api error when request fails with status code 400', async () => {
     const expectedError = 'user with this Email already exists.'
     vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
