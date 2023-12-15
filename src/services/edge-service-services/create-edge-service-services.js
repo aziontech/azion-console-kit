@@ -20,7 +20,7 @@ export const createEdgeServiceServices = async (payload) => {
 }
 
 const parseCodeToVariables = (code) => {
-  if(!code) return []
+  if (!code) return []
   const lines = code.trim().split(/\r?\n/)
 
   const mapped = lines.map((line) => {
@@ -55,9 +55,6 @@ const parseHttpResponse = (httpResponse) => {
         feedback: 'Your Edge Service has been created',
         urlToEditView: `/edge-services/edit/${httpResponse.body.id}`
       }
-    case 422:
-      const apiError = extractApiError(httpResponse)
-      throw new Error(apiError).message
     case 400:
       throw new Errors.NotFoundError().message
     case 401:
@@ -66,6 +63,9 @@ const parseHttpResponse = (httpResponse) => {
       throw new Errors.PermissionError().message
     case 404:
       throw new Errors.NotFoundError().message
+    case 422:
+      const apiError = extractApiError(httpResponse)
+      throw new Error(apiError).message
     case 500:
       throw new Errors.InternalServerError().message
     default:

@@ -1,13 +1,13 @@
 <template>
   <ContentBlock>
     <template #heading>
-      <PageHeadingBlock pageTitle="Users"></PageHeadingBlock>
+      <PageHeadingBlock :pageTitle="pageTitle"></PageHeadingBlock>
     </template>
     <template #content>
       <ListTableBlock
         v-if="hasContentToList"
-        :listService="listUsersService"
-        :deleteService="deleteUsersService"
+        :listService="props.listUsersService"
+        :deleteService="props.deleteUsersService"
         :columns="getColumns"
         pageTitleDelete="User"
         addButtonLabel="Users"
@@ -21,7 +21,7 @@
         description="Create your first users."
         createButtonLabel="Users"
         createPagePath="users/create"
-        :documentationService="documentationService"
+        :documentationService="props.documentationService"
       >
         <template #illustration>
           <Illustration />
@@ -31,76 +31,63 @@
   </ContentBlock>
 </template>
 
-<script>
+<script setup>
+  import { ref, computed } from 'vue'
   import ListTableBlock from '@/templates/list-table-block'
   import EmptyResultsBlock from '@/templates/empty-results-block'
   import Illustration from '@/assets/svg/illustration-layers.vue'
   import ContentBlock from '@/templates/content-block'
   import PageHeadingBlock from '@/templates/page-heading-block'
-  export default {
-    name: 'variables-view',
-    components: {
-      ListTableBlock,
-      EmptyResultsBlock,
-      Illustration,
-      ContentBlock,
-      PageHeadingBlock
+
+  const hasContentToList = ref(true)
+  const pageTitle = 'Users'
+  const props = defineProps({
+    listUsersService: {
+      required: true,
+      type: Function
     },
-    props: {
-      listUsersService: {
-        required: true,
-        type: Function
-      },
-      deleteUsersService: {
-        required: true,
-        type: Function
-      },
-      documentationService: {
-        required: true,
-        type: Function
-      }
+    deleteUsersService: {
+      required: true,
+      type: Function
     },
-    data: () => ({
-      hasContentToList: true
-    }),
-    computed: {
-      getColumns() {
-        return [
-          {
-            field: 'firstName',
-            header: 'First Name'
-          },
-          {
-            field: 'lastName',
-            header: 'Last Name'
-          },
-          {
-            field: 'email',
-            header: 'Email Address'
-          },
-          {
-            field: 'teams',
-            header: 'Teams'
-          },
-          {
-            field: 'mfa',
-            header: 'MFA'
-          },
-          {
-            field: 'active',
-            header: 'Active'
-          },
-          {
-            field: 'owner',
-            header: 'Owner'
-          }
-        ]
-      }
-    },
-    methods: {
-      handleLoadData(event) {
-        this.hasContentToList = event
-      }
+    documentationService: {
+      required: true,
+      type: Function
     }
+  })
+
+  const getColumns = computed(() => [
+    {
+      field: 'firstName',
+      header: 'First Name'
+    },
+    {
+      field: 'lastName',
+      header: 'Last Name'
+    },
+    {
+      field: 'email',
+      header: 'Email Address'
+    },
+    {
+      field: 'teams',
+      header: 'Teams'
+    },
+    {
+      field: 'mfa',
+      header: 'MFA'
+    },
+    {
+      field: 'active',
+      header: 'Active'
+    },
+    {
+      field: 'owner',
+      header: 'Owner'
+    }
+  ])
+
+  const handleLoadData = (event) => {
+    hasContentToList.value = event
   }
 </script>

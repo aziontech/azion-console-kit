@@ -1,6 +1,6 @@
 <template>
   <form
-    class="w-full flex flex-col gap-6"
+    class="w-full flex flex-col gap-8"
     @submit.prevent="submitForm"
   >
     <div class="flex flex-col gap-2">
@@ -28,7 +28,7 @@
         </template>
       </div>
       <label class="font-semibold text-sm">What would you like to build with Azion?</label>
-      <div class="flex flex-wrap gap-3 mb-8">
+      <div class="flex flex-wrap gap-3">
         <template v-if="!jobFunctionList.length">
           <PrimeSkeleton
             class="w-full h-14"

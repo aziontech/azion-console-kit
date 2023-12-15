@@ -37,11 +37,11 @@ describe('VariablesService', () => {
     })
 
     const { sut } = makeSut()
-
+    const version = 'v3'
     await sut()
 
     expect(requestSpy).toHaveBeenCalledWith({
-      url: `variables`,
+      url: `${version}/variables`,
       method: 'GET'
     })
   })

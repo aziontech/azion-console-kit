@@ -71,10 +71,11 @@ describe('EdgeApplicationOriginsServices', () => {
     const edgeApplicationId = 123
 
     const { sut } = makeSut()
+    const version = 'v3'
     await sut({ id: edgeApplicationId })
 
     expect(requestSpy).toHaveBeenCalledWith({
-      url: `edge_applications/${edgeApplicationId}/origins?order_by=origin_id&sort=asc&page=1&page_size=200`,
+      url: `${version}/edge_applications/${edgeApplicationId}/origins?order_by=origin_id&sort=asc&page=1&page_size=200`,
       method: 'GET'
     })
   })
@@ -99,7 +100,7 @@ describe('EdgeApplicationOriginsServices', () => {
       originId: fixtures.originSingleType.origin_id,
       name: fixtures.originSingleType.name,
       originType: 'Single Origin',
-      addresses: 'httpbin.org',
+      addresses: ['httpbin.org'],
       originProtocolPolicy: fixtures.originSingleType.origin_protocol_policy,
       isOriginRedirectionEnabled: fixtures.originSingleType.is_origin_redirection_enabled,
       hostHeader: fixtures.originSingleType.host_header,
@@ -119,7 +120,7 @@ describe('EdgeApplicationOriginsServices', () => {
       originId: fixtures.originLoadBalancerType.origin_id,
       name: fixtures.originLoadBalancerType.name,
       originType: 'Load Balancer',
-      addresses: 'httpbin.org',
+      addresses: ['httpbin.org'],
       originProtocolPolicy: fixtures.originLoadBalancerType.origin_protocol_policy,
       isOriginRedirectionEnabled: fixtures.originLoadBalancerType.is_origin_redirection_enabled,
       hostHeader: fixtures.originLoadBalancerType.host_header,

@@ -1,3 +1,4 @@
 export const makeEdgeNodeBaseUrl = () => {
-  return `edge_node`
+  const version = 'v3'
+  return `${version}/edge_nodes`
 }

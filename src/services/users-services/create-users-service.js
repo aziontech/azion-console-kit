@@ -18,12 +18,12 @@ const adapt = (payload) => {
     first_name: payload.firstName,
     last_name: payload.lastName,
     email: payload.email,
-    language: payload.selectedLanguage,
-    timezone: payload.selectedTimezone,
-    country_call_code: payload.selectedCountry.value,
+    language: payload.language,
+    timezone: payload.timezone,
+    country_call_code: payload.countryCallCode.value,
     mobile: payload.mobile?.toString(),
-    is_account_owner: payload.userIsOwner,
-    teams_ids: payload.selectedTeam,
+    is_account_owner: payload.isAccountOwner,
+    teams_ids: payload.teamsIds,
     two_factor_enabled: payload.twoFactorEnabled
   }
 }

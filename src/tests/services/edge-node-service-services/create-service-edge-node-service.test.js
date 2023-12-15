@@ -29,12 +29,12 @@ describe('EdgeNodeServices', () => {
     })
 
     const { sut } = makeSut()
-
+    const version = 'v3'
     await sut(fixtures.mock)
 
     expect(requestSpy).toHaveBeenCalledWith({
       method: 'POST',
-      url: `edge_node/${fixtures.mock.id}/services`,
+      url: `${version}/edge_nodes/${fixtures.mock.id}/services`,
       body: {
         service_id: '123',
         variables: [
@@ -43,6 +43,26 @@ describe('EdgeNodeServices', () => {
             value: '8080'
           }
         ]
+      }
+    })
+  })
+
+  it('should call API with correct params but the variables parameter is empty', async () => {
+    const requestSpy = vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
+      statusCode: 201,
+      body: []
+    })
+
+    const { sut } = makeSut()
+    const version = 'v3'
+    await sut({ ...fixtures.mock, variables: '' })
+
+    expect(requestSpy).toHaveBeenCalledWith({
+      method: 'POST',
+      url: `${version}/edge_nodes/${fixtures.mock.id}/services`,
+      body: {
+        service_id: '123',
+        variables: []
       }
     })
   })

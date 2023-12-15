@@ -21,10 +21,11 @@ describe('EdgeApplicationOriginsServices', () => {
     })
 
     const { sut } = makeSut()
+    const version = 'v3'
     await sut(fixtures.originKey, fixtures.edgeApplicationId)
 
     expect(requestSpy).toHaveBeenCalledWith({
-      url: `edge_applications/${fixtures.edgeApplicationId}/origins/${fixtures.originKey}`,
+      url: `${version}/edge_applications/${fixtures.edgeApplicationId}/origins/${fixtures.originKey}`,
       method: 'DELETE'
     })
   })

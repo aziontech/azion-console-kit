@@ -27,11 +27,11 @@ describe('EdgeNodeServices', () => {
     })
     const dnsIdMock = 76789
     const { sut } = makeSut()
-
+    const version = 'v3'
     await sut({ id: dnsIdMock })
 
     expect(requestSpy).toHaveBeenCalledWith({
-      url: `edge_node/${dnsIdMock}`,
+      url: `${version}/edge_nodes/${dnsIdMock}`,
       method: 'GET'
     })
   })

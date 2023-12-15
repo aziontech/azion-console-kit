@@ -28,11 +28,11 @@ describe('CreateCredentialServices', () => {
       }
     })
     const { sut } = makeSut()
-
+    const version = 'v3'
     await sut(fixtures.basic)
 
     expect(requestSpy).toHaveBeenCalledWith({
-      url: `credentials`,
+      url: `${version}/credentials`,
       method: 'POST',
       body: {
         name: fixtures.basic.name,

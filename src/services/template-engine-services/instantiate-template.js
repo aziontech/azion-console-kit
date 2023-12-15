@@ -14,7 +14,10 @@ export const instantiateTemplate = async (templateId, body) => {
 const parseHttpResponse = (httpResponse) => {
   switch (httpResponse.statusCode) {
     case 201:
-      return httpResponse.body
+      return {
+        result: httpResponse.body,
+        feedback: 'Integration installation was successful'
+      }
     case 400:
       const apiError = httpResponse.body.error[0]
       throw new Error(apiError).message

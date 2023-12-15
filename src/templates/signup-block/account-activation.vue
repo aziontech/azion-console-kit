@@ -1,7 +1,9 @@
 <template>
-  <div class="align-items-center min-h-[calc(100vh-60px-56px)] w-full py-40 px-6">
+  <div
+    class="align-items-center min-h-[calc(100vh-60px-56px)] w-full pt-4 pb-8 px-3 md:py-20 md:px-6"
+  >
     <div
-      class="card surface-border border rounded-md surface-section p-10 flex flex-col gap-8 max-w-md"
+      class="card surface-border border rounded-md surface-section p-8 flex flex-col gap-8 max-w-md"
     >
       <section class="w-full flex flex-col gap-3">
         <h2 class="text-start text-xl font-medium">Check your e-mail to activate your account</h2>

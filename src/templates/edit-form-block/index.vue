@@ -20,16 +20,12 @@
       type: Function,
       required: true
     },
-    backURL: {
-      type: String,
-      required: false
-    },
     disableRedirect: {
       type: Boolean,
       default: false
     },
     updatedRedirect: {
-      type: String,
+      type: String
     },
     schema: {
       type: Object,
@@ -44,7 +40,7 @@
   const toast = useToast()
   const blockViewRedirection = ref(true)
 
-  const { meta, errors, handleSubmit, isSubmitting, resetForm, values } = useForm({
+  const { meta, errors, handleSubmit, isSubmitting, resetForm, values, setValues } = useForm({
     validationSchema: props.schema
   })
 
@@ -62,11 +58,7 @@
   }
 
   const onCancel = () => {
-    if (props.backURL) {
-      router.push({ path: props.backURL })
-    } else {
-      goBackToList()
-    }
+    goBackToList()
   }
 
   const showToast = (severity, summary) => {
@@ -129,5 +121,6 @@
     :errors="errors"
     :loading="isSubmitting"
     :values="values"
+    :setValues="setValues"
   />
 </template>

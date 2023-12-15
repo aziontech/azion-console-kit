@@ -1,3 +1,4 @@
 export const makeNetworkListBaseUrl = () => {
-  return `network_lists`
+  const version = 'v3'
+  return `${version}/network_lists`
 }

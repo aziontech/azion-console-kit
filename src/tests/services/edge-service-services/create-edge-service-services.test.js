@@ -26,12 +26,12 @@ describe('EdgeServiceServices', () => {
     })
 
     const { sut } = makeSut()
-
+    const version = 'v3'
     await sut(fixtures.edgeServiceMock)
 
     expect(requestSpy).toHaveBeenCalledWith({
       method: 'POST',
-      url: `edge_services`,
+      url: `${version}/edge_services`,
       body: {
         active: false,
         name: 'X Edge Service',
@@ -41,6 +41,27 @@ describe('EdgeServiceServices', () => {
             value: '8080'
           }
         ]
+      }
+    })
+  })
+
+  it('should call API with correct params but the code parameter is empty', async () => {
+    const requestSpy = vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
+      statusCode: 201,
+      body: { id: '123' }
+    })
+
+    const { sut } = makeSut()
+    const version = 'v3'
+    await sut({ ...fixtures.edgeServiceMock, code: '' })
+
+    expect(requestSpy).toHaveBeenCalledWith({
+      method: 'POST',
+      url: `${version}/edge_services`,
+      body: {
+        active: false,
+        name: 'X Edge Service',
+        variables: []
       }
     })
   })
@@ -74,6 +95,10 @@ describe('EdgeServiceServices', () => {
   })
 
   it.each([
+    {
+      statusCode: 400,
+      expectedError: new Errors.NotFoundError().message
+    },
     {
       statusCode: 401,
       expectedError: new Errors.InvalidApiTokenError().message

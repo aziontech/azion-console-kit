@@ -19,11 +19,11 @@ describe('DomainsServices', () => {
     const mockId = 123
 
     const { sut } = makeSut()
-
+    const version = 'v3'
     await sut(mockId)
 
     expect(requestSpy).toHaveBeenCalledWith({
-      url: `domains/${mockId}`,
+      url: `${version}/domains/${mockId}`,
       method: 'DELETE'
     })
   })

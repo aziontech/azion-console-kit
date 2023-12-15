@@ -138,7 +138,10 @@ describe('MarketplaceServices', () => {
         vendor: fixtures.solutionSample.vendor,
         slug: fixtures.solutionSample.slug,
         released: fixtures.solutionSample.new_release,
-        featured: fixtures.solutionSample.featured
+        featured: fixtures.solutionSample.featured,
+        instanceType: {
+          isTemplate: fixtures.solutionSample.instance_type.is_template
+        }
       }
     ])
   })

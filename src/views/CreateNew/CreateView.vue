@@ -161,7 +161,7 @@
       <Sidebar
         v-model:visible="showDetails"
         position="bottom"
-        headerContent="Create something new"
+        headerContent="Create"
         :show-close-icon="true"
         :pt="{
           root: { class: 'h-[80%] flex p-0 sm:hidden' },
@@ -300,8 +300,8 @@
       openDetails() {
         this.showDetails = true
       },
-      handleInstantiate(element) {
-        this.$router.push(`/create/deploy/${element.uuid}`)
+      handleInstantiate({ result }) {
+        this.$router.push(`/create/deploy/${result.uuid}`)
       }
     },
     watch: {

@@ -5,7 +5,7 @@ import * as Errors from '@/services/axios/errors'
 
 const fixtures = {
   mock: {
-    edgeServiceID: 1987867,
+    id: 1987867,
     name: 'Az-dns',
     code: 'port=123',
     active: true
@@ -26,11 +26,11 @@ describe('EdgeServiceServices', () => {
       statusCode: 200
     })
     const { sut } = makeSut()
-
+    const version = 'v3'
     await sut(fixtures.mock)
 
     expect(requestSpy).toHaveBeenCalledWith({
-      url: `edge_services/${fixtures.mock.edgeServiceID}`,
+      url: `${version}/edge_services/${fixtures.mock.id}`,
       method: 'PATCH',
       body: {
         active: fixtures.mock.active,
@@ -45,6 +45,25 @@ describe('EdgeServiceServices', () => {
     })
   })
 
+  it('should call API with correct params but the code parameter is empty', async () => {
+    const requestSpy = vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
+      statusCode: 200
+    })
+    const { sut } = makeSut()
+    const version = 'v3'
+    await sut({ ...fixtures.mock, code: '' })
+
+    expect(requestSpy).toHaveBeenCalledWith({
+      url: `${version}/edge_services/${fixtures.mock.id}`,
+      method: 'PATCH',
+      body: {
+        active: fixtures.mock.active,
+        name: fixtures.mock.name,
+        variables: []
+      }
+    })
+  })
+
   it('should return a feedback message on successfully updated', async () => {
     vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
       statusCode: 200
@@ -54,6 +73,21 @@ describe('EdgeServiceServices', () => {
     const feedbackMessage = await sut(fixtures.mock)
 
     expect(feedbackMessage).toBe('Your edge service has been updated')
+  })
+
+  it('Should return an API error to an invalid edge service name', async () => {
+    const apiErrorMock = 'name should not be empty'
+    vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
+      statusCode: 422,
+      body: {
+        errors: [apiErrorMock]
+      }
+    })
+    const { sut } = makeSut()
+
+    const feedbackMessage = sut(fixtures.mock)
+
+    expect(feedbackMessage).rejects.toThrow(apiErrorMock)
   })
 
   it.each([

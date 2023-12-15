@@ -48,11 +48,11 @@ describe('EdgeFirewallServices', () => {
       body: { results: [] }
     })
     const { sut } = makeSut()
-
+    const version = 'v3'
     await sut({})
 
     expect(requestSpy).toHaveBeenCalledWith({
-      url: `edge_firewall?order_by=name&sort=asc&page=1&page_size=200`,
+      url: `${version}/edge_firewall?order_by=name&sort=asc&page=1&page_size=200`,
       method: 'GET'
     })
   })

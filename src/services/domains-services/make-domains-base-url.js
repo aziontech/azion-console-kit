@@ -1,3 +1,4 @@
 export const makeDomainsBaseUrl = () => {
-  return `domains`
+  const version = 'v3'
+  return `${version}/domains`
 }
