@@ -62,7 +62,7 @@
           <label class="font-semibold text-sm gap-2 flex flex-col"
             >Company Name
             <PrimeInputText
-              placeholder="Company Name"
+              placeholder="My company"
               v-model="companyName"
               type="text"
             />
@@ -203,7 +203,7 @@
     }),
     companySize: yup.string().when('projectTypeSelection', {
       is: typeToEnableCompanyFields,
-      then: () => yup.string().required('Company size is a required field.')
+      then: () => yup.string().required('Company Size is a required field.')
     }),
     country: yup.string().when('projectTypeSelection', {
       is: typeToEnableCompanyFields,
