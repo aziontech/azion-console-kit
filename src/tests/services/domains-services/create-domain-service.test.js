@@ -36,11 +36,11 @@ describe('DomainsServices', () => {
       }
     })
     const { sut } = makeSut()
-
+    const version = 'v3'
     await sut(fixtures.domainMock)
 
     expect(requestSpy).toHaveBeenCalledWith({
-      url: `domains`,
+      url: `${version}/domains`,
       method: 'POST',
       body: {
         name: fixtures.domainMock.name,

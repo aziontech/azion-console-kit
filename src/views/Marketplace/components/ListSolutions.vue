@@ -1,9 +1,9 @@
 <template>
-  <div class="ml-0 w-full mt-0 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+  <div class="ml-0 w-full mt-0 grid md:grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4">
     <PrimeButton
       v-for="solution in props.solutions"
       :key="solution.id"
-      class="p-4 text-left border-solid border surface-border hover:border-primary transition-all"
+      class="p-6 text-left h-[180px] border-solid border surface-border hover:border-primary transition-all"
       link
       type="button"
       @click="goToSolution(solution)"
@@ -19,11 +19,11 @@
               alt=""
             />
           </div>
-          <div class="flex p-0.5 flex-col">
-            <span class="text-color text-sm font-medium">
+          <div class="flex flex-col">
+            <span class="line-clamp-1 h-5 text-color text-sm font-medium">
               {{ solution.name }}
             </span>
-            <span class="h-10 pb-4 text-sm text-color-secondary mt-1.5 line-clamp-2">
+            <span class="h-10 pb-4 text-sm font-normal text-color-secondary mt-1.5 line-clamp-2">
               {{ solution.headline }}
             </span>
           </div>

@@ -5,7 +5,7 @@ import { describe, expect, it, vi } from 'vitest'
 
 const fixtures = {
   mock: {
-    edgeServiceID: '123',
+    id: '123',
     name: 'X Edge Service',
     trigger: 'TEST',
     content: 'TEST',
@@ -24,7 +24,7 @@ describe('EdgeServiceResourcesServices', () => {
   it('should call API with correct params', async () => {
     const requestSpy = vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
       statusCode: 201,
-      body: { edgeServiceID: '123' }
+      body: { id: '123' }
     })
 
     const { sut } = makeSut()
@@ -33,7 +33,7 @@ describe('EdgeServiceResourcesServices', () => {
 
     expect(requestSpy).toHaveBeenCalledWith({
       method: 'POST',
-      url: `edge_services/${fixtures.mock.edgeServiceID}/resources`,
+      url: `edge_services/${fixtures.mock.id}/resources`,
       body: {
         name: 'X Edge Service',
         trigger: 'TEST',

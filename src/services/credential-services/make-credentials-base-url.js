@@ -1,3 +1,4 @@
 export const makeCredentialsBaseUrl = () => {
-  return `credentials`
+  const version = 'v3'
+  return `${version}/credentials`
 }

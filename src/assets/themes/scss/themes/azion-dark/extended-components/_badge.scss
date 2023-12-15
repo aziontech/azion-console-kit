@@ -4,9 +4,12 @@
   border-radius: $borderRadius;
   color: $badgeTextColor;
   font-size: 0.75rem !important;
-  font-weight: normal !important;
+  font-weight: 600 !important;
   min-width: $badgeMinWidth;
   height: $badgeHeight;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
 
   &.p-badge-secondary {
     background-color: $secondaryButtonBg;

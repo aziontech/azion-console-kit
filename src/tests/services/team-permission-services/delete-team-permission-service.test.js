@@ -18,11 +18,11 @@ describe('TeamPermissionServices', () => {
     })
     const environmentVariableIdMock = 765678
     const { sut } = makeSut()
-
+    const version = 'v4'
     await sut(environmentVariableIdMock)
 
     expect(requestSpy).toHaveBeenCalledWith({
-      url: `teams/${environmentVariableIdMock}`,
+      url: `${version}/iam/teams/${environmentVariableIdMock}`,
       method: 'DELETE'
     })
   })

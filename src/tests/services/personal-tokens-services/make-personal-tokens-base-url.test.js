@@ -12,7 +12,8 @@ const makeSut = () => {
 describe('PersonalTokensServices', () => {
   it('should return the API base url to personal tokens service', () => {
     const { sut } = makeSut()
-    const correctApiUrl = 'iam/personal_tokens'
+    const version = 'v4'
+    const correctApiUrl = `${version}/iam/personal_tokens`
 
     const baseUrl = sut()
 

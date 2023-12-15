@@ -43,11 +43,11 @@ describe('PersonalTokensServices', () => {
     })
 
     const { sut } = makeSut()
-
+    const version = 'v4'
     await sut({ pageSize: 400, search: 'search_text' })
 
     expect(requestSpy).toHaveBeenCalledWith({
-      url: `iam/personal_tokens?page_size=400&search=search_text`,
+      url: `${version}/iam/personal_tokens?page_size=400&search=search_text`,
       method: 'GET'
     })
   })

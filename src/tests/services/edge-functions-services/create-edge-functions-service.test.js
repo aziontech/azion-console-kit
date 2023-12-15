@@ -33,10 +33,11 @@ describe('EdgeFunctionsServices', () => {
       }
     })
     const { sut } = makeSut()
+    const version = 'v3'
     await sut(fixtures.basic)
 
     expect(requestSpy).toHaveBeenCalledWith({
-      url: `edge_functions`,
+      url: `${version}/edge_functions`,
       method: 'POST',
       body: {
         name: fixtures.basic.name,

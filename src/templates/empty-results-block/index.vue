@@ -30,11 +30,11 @@
         </div>
         <PrimeButton
           outlined
-          text
           class="w-fit"
           icon-pos="right"
           icon="pi pi-external-link"
           label="Learn more"
+          link
           @click="openDocumentation"
         />
       </div>

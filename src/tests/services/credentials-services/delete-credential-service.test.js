@@ -17,10 +17,11 @@ describe('DeleteCredentialsServices', () => {
     const idMock = 123
 
     const { sut } = makeSut(idMock)
+    const version = 'v3'
     await sut(idMock)
 
     expect(requestSpy).toHaveBeenCalledWith({
-      url: `credentials/${idMock}`,
+      url: `${version}/credentials/${idMock}`,
       method: 'DELETE'
     })
   })

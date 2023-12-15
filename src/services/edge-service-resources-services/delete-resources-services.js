@@ -3,9 +3,9 @@ import { AxiosHttpClientAdapter } from '../axios/AxiosHttpClientAdapter'
 import { makeResourcesBaseUrl } from './make-resources-base-url'
 
 export const deleteResourcesServices = async (payload) => {
-  const { resourceID, edgeServiceID } = payload
+  const { id, edgeServiceId } = payload
   let httpResponse = await AxiosHttpClientAdapter.request({
-    url: `${makeResourcesBaseUrl()}/${edgeServiceID}/resources/${resourceID}`,
+    url: `${makeResourcesBaseUrl()}/${edgeServiceId}/resources/${id}`,
     method: 'DELETE'
   })
 

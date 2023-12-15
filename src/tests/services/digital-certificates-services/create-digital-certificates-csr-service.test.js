@@ -58,12 +58,12 @@ describe('DigitalCertificatesServices', () => {
     })
 
     const { sut } = makeSut()
-
+    const version = 'v3'
     await sut(fixture.csrCertificateMock)
 
     expect(requestSpy).toHaveBeenCalledWith({
       method: 'POST',
-      url: 'digital_certificates/csr',
+      url: `${version}/digital_certificates/csr`,
       body: fixture.requestBodyMock
     })
   })

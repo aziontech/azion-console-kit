@@ -1,3 +1,4 @@
 export const makeDigitalCertificatesBaseUrl = () => {
-  return `digital_certificates`
+  const version = 'v3'
+  return `${version}/digital_certificates`
 }

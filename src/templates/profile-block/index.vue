@@ -218,7 +218,7 @@
   const profileMenuDefault = [
     {
       label: 'Account Settings',
-      to: '/account-settings'
+      to: '/account/settings'
     },
     {
       label: 'Users Management',
@@ -244,7 +244,7 @@
   const profileMenuSettings = [
     {
       label: 'Your Settings',
-      to: '/list-your-settings'
+      to: '/settings'
     },
     {
       label: 'Personal Token',

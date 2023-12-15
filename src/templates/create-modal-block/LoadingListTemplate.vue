@@ -10,9 +10,9 @@
       <div class="flex w-full flex-col justify-between gap-3.5 items-start">
         <div class="flex w-full gap-3.5 flex-col">
           <Skeleton class="w-10 h-10 rounded" />
-          <div class="flex p-0.5 flex-col gap-1.5">
+          <div class="flex flex-col w-full gap-1.5">
             <Skeleton class="w-52 h-5 rounded" />
-            <Skeleton class="w-64 h-5 rounded" />
+            <Skeleton class="max-w-[208px] h-5 rounded" />
             <Skeleton class="w-32 h-5 rounded" />
           </div>
         </div>

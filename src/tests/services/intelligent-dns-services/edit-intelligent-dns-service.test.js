@@ -26,11 +26,11 @@ describe('IntelligentDnsServices', () => {
       statusCode: 200
     })
     const { sut } = makeSut()
-
+    const version = 'v3'
     await sut(fixtures.dnsMock)
 
     expect(requestSpy).toHaveBeenCalledWith({
-      url: `intelligent_dns/${fixtures.dnsMock.id}`,
+      url: `${version}/intelligent_dns/${fixtures.dnsMock.id}`,
       method: 'PUT',
       body: {
         name: fixtures.dnsMock.name,

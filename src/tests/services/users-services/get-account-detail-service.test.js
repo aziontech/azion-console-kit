@@ -50,11 +50,11 @@ describe('UsersServices', () => {
     })
 
     const { sut } = makeSut()
-
+    const version = 'v4'
     await sut()
 
     expect(requestSpy).toHaveBeenCalledWith({
-      url: `account-details`,
+      url: `${version}/iam/account`,
       method: 'GET'
     })
   })

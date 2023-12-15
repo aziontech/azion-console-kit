@@ -32,7 +32,7 @@
     @update:visible="closeCreateModalStore()"
   >
     <div>
-      <CreateModalBlock @closeModal="createBoardManager.close()" />
+      <CreateModalBlock @closeModal="closeCreateModalStore()" />
     </div>
   </PrimeDialog>
 
@@ -59,7 +59,7 @@
         />
       </div>
     </template>
-    <CreateModalBlock />
+    <CreateModalBlock @closeModal="closeCreateModalStore()" />
   </Sidebar>
 </template>
 

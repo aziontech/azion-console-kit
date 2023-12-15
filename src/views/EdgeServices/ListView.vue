@@ -1,15 +1,15 @@
 <script setup>
   import ListTableBlock from '@/templates/list-table-block'
   import EmptyResultsBlock from '@/templates/empty-results-block'
-  import Illustration from '@/assets/svg/illustration-layers.vue'
+  import Illustration from '@/assets/svg/illustration-layers'
   import ContentBlock from '@/templates/content-block'
   import PageHeadingBlock from '@/templates/page-heading-block'
   import EdgeServicesToggleStatus from '@/views/EdgeServices/Dialog/EdgeServicesToggleStatus'
   import { computed, ref } from 'vue'
   import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
+  defineOptions({ name: 'list-edge-service' })
 
   import { useRouter } from 'vue-router'
-  defineOptions({ name: 'edge-services-view' })
 
   const props = defineProps({
     listEdgeServiceServices: {

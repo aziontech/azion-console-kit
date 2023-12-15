@@ -32,7 +32,7 @@ describe('DomainsServices', () => {
     await sut(fixtures.domainMock)
 
     expect(requestSpy).toHaveBeenCalledWith({
-      url: `domains?page_size=20&nameLike=${fixtures.domainMock.domainLike}`,
+      url: `v3/domains?page_size=20&nameLike=${fixtures.domainMock.domainLike}`,
       method: 'GET'
     })
   })

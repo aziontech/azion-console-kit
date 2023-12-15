@@ -12,7 +12,8 @@ const makeSut = () => {
 describe('VariablesService', () => {
   it('should return the API base url to variables service', () => {
     const { sut } = makeSut()
-    const correctApiUrl = 'variables'
+    const version = 'v3'
+    const correctApiUrl = `${version}/variables`
 
     const baseUrl = sut()
 

@@ -58,10 +58,6 @@
         type: Object,
         required: true
       },
-      backURL: {
-        type: String,
-        required: false
-      },
       formMeta: {
         type: Object,
         required: true
@@ -91,11 +87,7 @@
         this.$router.go(-1)
       },
       handleCancel() {
-        if (this.backURL) {
-          this.$router.push({ path: this.backURL })
-        } else {
-          this.goBackToList()
-        }
+        this.goBackToList()
       },
       async loadInitialData() {
         try {

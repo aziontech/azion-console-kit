@@ -7,13 +7,13 @@ const fixtures = {
   userMock: {
     firstName: 'John',
     lastName: 'Doe',
-    selectedTimezone: 'America/New_York',
-    selectedLanguage: 'en_US',
+    timezone: 'America/New_York',
+    language: 'en_US',
     email: 'johndoe@example.com',
-    selectedCountry: { value: 'AF +93' },
+    countryCallCode: { value: 'AF +93' },
     mobile: '+1-123-456-7890',
-    userIsOwner: true,
-    selectedTeam: 'Sales Team',
+    isAccountOwner: true,
+    teamsIds: 1,
     twoFactorEnabled: true
   }
 }
@@ -32,22 +32,22 @@ describe('UsersServices', () => {
       statusCode: 201
     })
     const { sut } = makeSut()
-
+    const version = 'v4'
     await sut(fixtures.userMock)
 
     expect(requestSpy).toHaveBeenCalledWith({
-      url: `users`,
+      url: `${version}/iam/users`,
       method: 'POST',
       body: {
         first_name: fixtures.userMock.firstName,
         last_name: fixtures.userMock.lastName,
-        timezone: fixtures.userMock.selectedTimezone,
-        language: fixtures.userMock.selectedLanguage,
-        country_call_code: fixtures.userMock.selectedCountry.value,
+        timezone: fixtures.userMock.timezone,
+        language: fixtures.userMock.language,
+        country_call_code: fixtures.userMock.countryCallCode.value,
         email: fixtures.userMock.email,
         mobile: fixtures.userMock.mobile,
-        is_account_owner: fixtures.userMock.userIsOwner,
-        teams_ids: fixtures.userMock.selectedTeam,
+        is_account_owner: fixtures.userMock.isAccountOwner,
+        teams_ids: fixtures.userMock.teamsIds,
         two_factor_enabled: fixtures.userMock.twoFactorEnabled
       }
     })
@@ -98,4 +98,17 @@ describe('UsersServices', () => {
       expect(response).rejects.toBe(expectedError)
     }
   )
+
+  it('should throw first api error when request fails with status code 400', async () => {
+    const expectedError = 'user with this Email already exists.'
+    vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
+      statusCode: 400,
+      body: { email: [expectedError] }
+    })
+    const { sut } = makeSut()
+
+    const response = sut(fixtures.userMock)
+
+    expect(response).rejects.toBe(expectedError)
+  })
 })

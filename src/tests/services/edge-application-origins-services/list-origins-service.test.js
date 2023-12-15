@@ -71,10 +71,11 @@ describe('EdgeApplicationOriginsServices', () => {
     const edgeApplicationId = 123
 
     const { sut } = makeSut()
+    const version = 'v3'
     await sut({ id: edgeApplicationId })
 
     expect(requestSpy).toHaveBeenCalledWith({
-      url: `edge_applications/${edgeApplicationId}/origins?order_by=origin_id&sort=asc&page=1&page_size=200`,
+      url: `${version}/edge_applications/${edgeApplicationId}/origins?order_by=origin_id&sort=asc&page=1&page_size=200`,
       method: 'GET'
     })
   })

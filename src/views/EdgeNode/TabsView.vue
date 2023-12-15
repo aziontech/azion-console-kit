@@ -6,7 +6,8 @@
   import TabView from 'primevue/tabview'
   import TabPanel from 'primevue/tabpanel'
   import EditView from '@/views/EdgeNode/EditView'
-  import ListViewServices from '@/views/EdgeNode/ListViewServices'
+  import ListViewServices from '@/views/EdgeNode/ListViewTabServices'
+  defineOptions({ name: 'tabs-edge-node' })
 
   const props = defineProps({
     loadEdgeNodeService: { type: Function, required: true },
@@ -14,6 +15,9 @@
     listGroupsEdgeNodeService: { type: Function, required: true },
     listServiceEdgeNodeService: { type: Function, required: true },
     deleteServiceEdgeNodeService: { type: Function, required: true },
+    createServiceEdgeNodeService: { type: Function, required: true },
+    loadServiceEdgeNodeService: { type: Function, required: true },
+    editServiceEdgeNodeService: { type: Function, required: true },
     documentationServiceServices: { type: Function, required: true },
     updatedRedirect: { type: String, required: true }
   })
@@ -57,21 +61,21 @@
         class="w-full h-full"
       >
         <TabPanel header="Main Settings">
-          <div class="mt-4">
-            <EditView
-              v-if="!activeTab"
-              :edgeNodeId="edgeNodeId"
-              :listGroupsEdgeNodeService="props.listGroupsEdgeNodeService"
-              :loadEdgeNodeService="props.loadEdgeNodeService"
-              :editEdgeNodeService="props.editEdgeNodeService"
-              :updatedRedirect="props.updatedRedirect"
-            />
-          </div>
+          <EditView
+            :hiddenActionBar="!activeTab"
+            :listGroupsEdgeNodeService="props.listGroupsEdgeNodeService"
+            :loadEdgeNodeService="props.loadEdgeNodeService"
+            :editEdgeNodeService="props.editEdgeNodeService"
+            :updatedRedirect="props.updatedRedirect"
+          />
         </TabPanel>
         <TabPanel header="Services">
           <ListViewServices
             v-if="activeTab"
             :edgeNodeId="edgeNodeId"
+            :createServiceEdgeNodeService="props.createServiceEdgeNodeService"
+            :editServiceEdgeNodeService="props.editServiceEdgeNodeService"
+            :loadServiceEdgeNodeService="props.loadServiceEdgeNodeService"
             :listServiceEdgeNodeService="props.listServiceEdgeNodeService"
             :deleteServiceEdgeNodeService="props.deleteServiceEdgeNodeService"
             :documentationServiceServices="props.documentationServiceServices"

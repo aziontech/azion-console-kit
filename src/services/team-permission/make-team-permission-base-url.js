@@ -1,3 +1,4 @@
 export const makeTeamPermissionBaseUrl = () => {
-  return `teams`
+  const version = 'v4'
+  return `${version}/iam/teams`
 }

@@ -26,11 +26,11 @@ describe('EdgeNodeServices', () => {
       body: []
     })
     const { sut } = makeSut()
-
+    const version = 'v3'
     await sut({})
 
     expect(requestSpy).toHaveBeenCalledWith({
-      url: `edge_node/groups`,
+      url: `${version}/edge_nodes/groups`,
       method: 'GET'
     })
   })

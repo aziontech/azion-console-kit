@@ -12,7 +12,8 @@ const makeSut = () => {
 describe('EdgeNodeServices', () => {
   it('should return the API base url to edge node service', () => {
     const { sut } = makeSut()
-    const correctApiUrl = 'edge_node'
+    const version = 'v3'
+    const correctApiUrl = `${version}/edge_nodes`
 
     const baseUrl = sut()
 

@@ -31,7 +31,7 @@
   const profileMenuDefault = [
     {
       label: 'Configurações da Conta',
-      to: '/account-settings'
+      to: '/account/settings'
     },
     {
       label: 'Gerenciamento de Usuários',

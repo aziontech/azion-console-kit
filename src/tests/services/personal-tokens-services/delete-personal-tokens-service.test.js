@@ -18,11 +18,11 @@ describe('PersonalTokensServices', () => {
     })
     const { sut } = makeSut()
     const personalTokenIdMock = 987678
-
+    const version = 'v4'
     await sut(personalTokenIdMock)
 
     expect(requestSpy).toHaveBeenCalledWith({
-      url: `iam/personal_tokens/${personalTokenIdMock}`,
+      url: `${version}/iam/personal_tokens/${personalTokenIdMock}`,
       method: 'DELETE'
     })
   })

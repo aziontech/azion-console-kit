@@ -38,11 +38,11 @@ describe('NetworkListsServices', () => {
     })
 
     const { sut } = makeSut()
-
+    const version = 'v3'
     await sut()
 
     expect(requestSpy).toHaveBeenCalledWith({
-      url: `network_lists`,
+      url: `${version}/network_lists`,
       method: 'GET'
     })
   })

@@ -28,7 +28,7 @@ export const edgeNodeRoutes = {
     {
       path: 'edit/:id/:services?',
       name: 'edit-edge-node',
-      component: () => import('@views/EdgeNode/TabView.vue'),
+      component: () => import('@/views/EdgeNode/TabsView.vue'),
       props: {
         loadEdgeNodeService: EdgeNodeService.loadEdgeNodeService,
         editEdgeNodeService: EdgeNodeService.editEdgeNodeService,

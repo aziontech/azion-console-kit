@@ -16,8 +16,9 @@ const convertVariablesToString = (variables) => {
 }
 
 const adapt = (httpResponse) => {
-  const { name, active, variables } = httpResponse.body
+  const { id, name, active, variables } = httpResponse.body
   const parsedBody = {
+    id,
     name,
     active,
     code: convertVariablesToString(variables)

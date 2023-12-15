@@ -46,7 +46,12 @@
           :header="col.header"
         >
           <template #body="{ data: rowData }">
-            <div v-html="rowData[col.field]" />
+            <template v-if="col.type !== 'component'">
+              <div v-html="rowData[col.field]" />
+            </template>
+            <template v-else>
+              <component :is="col.component(rowData[col.field])"></component>
+            </template>
           </template>
         </Column>
         <Column
@@ -67,7 +72,7 @@
                 icon="pi pi-ellipsis-h"
                 text
                 @click="(event) => toggleActionsMenu(event, rowData.id)"
-                class="cursor-pointer"
+                class="cursor-pointer table-button"
               />
             </div>
           </template>

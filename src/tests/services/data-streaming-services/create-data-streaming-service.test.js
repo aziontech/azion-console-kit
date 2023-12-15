@@ -46,11 +46,11 @@ describe('DataStreamingServices', () => {
       }
     })
     const { sut } = makeSut()
-
+    const version = 'v3'
     await sut(fixtures.dataStreamingMockWithSampling)
 
     expect(requestSpy).toHaveBeenCalledWith({
-      url: `data_streaming/streamings`,
+      url: `${version}/data_streaming/streamings`,
       method: 'POST',
       body: {
         name: fixtures.dataStreamingMockWithSampling.name,
@@ -87,11 +87,11 @@ describe('DataStreamingServices', () => {
       maxSize: '123321',
       headers: [{ value: 'PORT:1010' }, { value: 'invalid-header' }]
     }
-
+    const version = 'v3'
     await sut(dataStreamingMock)
 
     expect(requestSpy).toHaveBeenCalledWith({
-      url: `data_streaming/streamings`,
+      url: `${version}/data_streaming/streamings`,
       method: 'POST',
       body: {
         name: fixtures.dataStreamingMock.name,

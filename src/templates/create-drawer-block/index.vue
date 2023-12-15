@@ -1,5 +1,5 @@
 <script setup>
-  import { computed, ref } from 'vue'
+  import { computed } from 'vue'
   import { useForm } from 'vee-validate'
   import { useToast } from 'primevue/usetoast'
   import ActionBarBlock from '@/templates/action-bar-block'
@@ -9,7 +9,7 @@
     name: 'create-drawer-block'
   })
 
-  const emit = defineEmits(['update:visible', 'onSuccess'])
+  const emit = defineEmits(['update:visible', 'onSuccess', 'onError'])
   const props = defineProps({
     visible: {
       type: Boolean,
@@ -38,7 +38,6 @@
     validationSchema: props.schema,
     initialValues: props.initialValues
   })
-  const loading = ref(false)
 
   const visibleDrawer = computed({
     get: () => props.visible,
@@ -48,12 +47,8 @@
     }
   })
 
-  const isLoading = computed(() => {
-    return isSubmitting.value || loading.value
-  })
-
   const disableFields = computed(() => {
-    return !meta.value.valid || loading.value
+    return !meta.value.valid || isSubmitting.value
   })
 
   const toggleDrawerVisibility = (isVisible) => {
@@ -74,16 +69,14 @@
 
   const onSubmit = handleSubmit(async (values, formContext) => {
     try {
-      loading.value = true
       const response = await props.createService(values)
       emit('onSuccess', response)
       showToast('success', response.feedback)
       formContext.resetForm()
       toggleDrawerVisibility(false)
     } catch (error) {
+      emit('onError', error)
       showToast('error', error)
-    } finally {
-      loading.value = false
     }
   })
 </script>
@@ -104,8 +97,14 @@
       <h2>{{ title }}</h2>
     </template>
     <div class="flex w-full md:p-8 pb-0">
-      <form class="w-full flex flex-col gap-8">
-        <slot name="formFields" />
+      <form
+        @submit.prevent="handleSubmit"
+        class="w-full flex flex-col gap-8"
+      >
+        <slot
+          name="formFields"
+          :disabledFields="isSubmitting"
+        />
       </form>
     </div>
     <div class="sticky bottom-0">
@@ -113,7 +112,7 @@
         @onCancel="closeDrawer"
         @onSubmit="onSubmit"
         :inDrawer="true"
-        :loading="isLoading"
+        :loading="isSubmitting"
         :submitDisabled="disableFields"
       />
     </div>

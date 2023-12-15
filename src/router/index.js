@@ -27,6 +27,8 @@ import { mfaRoutes } from '@routes/mfa-routes'
 import { metricsRoutes } from '@routes/metrics-routes'
 import { signupRoutes } from '@routes/signup-routes'
 import { marketplaceRoutes } from '@routes/marketplace-routes'
+import { accountRoutes } from '@/router/routes/account-routes'
+import { settingsRoutes } from '@/router/routes/your-settings-routes'
 import beforeEachRoute from './hooks/beforeEachRoute'
 
 const router = createRouter({
@@ -58,10 +60,12 @@ const router = createRouter({
     teamsPermissionRoutes,
     metricsRoutes,
     signupRoutes,
-    marketplaceRoutes
+    marketplaceRoutes,
+    accountRoutes,
+    settingsRoutes
   ].concat(errorRoutes)
 })
 
-router.beforeResolve(beforeEachRoute)
+router.beforeEach(beforeEachRoute)
 
 export default router

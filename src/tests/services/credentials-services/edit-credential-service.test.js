@@ -26,11 +26,11 @@ describe('CredentialServices', () => {
       statusCode: 200
     })
     const { sut } = makeSut()
-
+    const version = 'v3'
     await sut(fixtures.basic)
 
     expect(requestSpy).toHaveBeenCalledWith({
-      url: `credentials/${fixtures.basic.id}`,
+      url: `${version}/credentials/${fixtures.basic.id}`,
       method: 'PATCH',
       body: {
         name: fixtures.basic.name,

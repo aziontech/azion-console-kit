@@ -5,8 +5,8 @@ import * as Errors from '@/services/axios/errors'
 
 const fixtures = {
   mock: {
-    resourceID: 123,
-    edgeServiceID: 123
+    id: 123,
+    edgeServiceId: 123
   }
 }
 
@@ -29,7 +29,7 @@ describe('EdgeServiceResourcesServices', () => {
 
     expect(requestSpy).toHaveBeenCalledWith({
       method: 'DELETE',
-      url: `edge_services/${fixtures.mock.edgeServiceID}/resources/${fixtures.mock.resourceID}`
+      url: `edge_services/${fixtures.mock.edgeServiceId}/resources/${fixtures.mock.id}`
     })
   })
 

@@ -15,14 +15,14 @@ export const listCategoriesService = async () => {
 const adapt = (httpResponse) => {
   const results = httpResponse.body || []
 
-  const parsedDomains = results.map((item) => ({
+  const parsed = results.map((item) => ({
     name: item.name,
     slug: item.slug,
     solutionsCount: item.solutions_count
   }))
 
   return {
-    body: parsedDomains,
+    body: parsed,
     statusCode: httpResponse.statusCode
   }
 }

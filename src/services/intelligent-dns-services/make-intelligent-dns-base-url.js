@@ -1,3 +1,4 @@
 export const makeIntelligentDNSBaseUrl = () => {
-  return `intelligent_dns`
+  const version = 'v3'
+  return `${version}/intelligent_dns`
 }

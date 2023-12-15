@@ -32,11 +32,11 @@ describe('IntelligentDnsServices', () => {
       }
     })
     const { sut } = makeSut()
-
+    const version = 'v3'
     await sut(fixtures.dnsMock)
 
     expect(requestSpy).toHaveBeenCalledWith({
-      url: `intelligent_dns`,
+      url: `${version}/intelligent_dns`,
       method: 'POST',
       body: {
         name: fixtures.dnsMock.name,

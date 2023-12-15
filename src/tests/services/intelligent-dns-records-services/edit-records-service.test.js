@@ -31,11 +31,11 @@ describe('IntelligentDnsRecordsServices', () => {
       statusCode: 200
     })
     const { sut } = makeSut()
-
+    const version = 'v3'
     await sut(fixtures.dnsRecordMock)
 
     expect(requestSpy).toHaveBeenCalledWith({
-      url: `intelligent_dns/${fixtures.dnsRecordMock.intelligentDNSId}/records/${fixtures.dnsRecordMock.id}`,
+      url: `${version}/intelligent_dns/${fixtures.dnsRecordMock.intelligentDNSId}/records/${fixtures.dnsRecordMock.id}`,
       method: 'PUT',
       body: {
         record_type: fixtures.dnsRecordMock.selectedRecordType,

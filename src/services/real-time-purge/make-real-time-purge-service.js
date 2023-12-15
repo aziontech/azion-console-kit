@@ -1,3 +1,4 @@
 export const makeRealTimePurgeBaseUrl = () => {
-  return `purge`
+  const version = 'v4'
+  return `${version}/edge/purge`
 }

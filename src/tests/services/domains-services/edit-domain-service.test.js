@@ -31,11 +31,11 @@ describe('DomainsServices', () => {
       statusCode: 200
     })
     const { sut } = makeSut()
-
+    const version = 'v3'
     await sut(fixtures.domainMock)
 
     expect(requestSpy).toHaveBeenCalledWith({
-      url: `domains/${fixtures.domainMock.id}`,
+      url: `${version}/domains/${fixtures.domainMock.id}`,
       method: 'PATCH',
       body: {
         name: fixtures.domainMock.name,

@@ -28,10 +28,11 @@ describe('EdgeFunctionsServices', () => {
       statusCode: 200
     })
     const { sut } = makeSut()
+    const version = 'v3'
     await sut(fixtures.basic)
 
     expect(requestSpy).toHaveBeenCalledWith({
-      url: `edge_functions/${fixtures.basic.id}`,
+      url: `${version}/edge_functions/${fixtures.basic.id}`,
       method: 'PATCH',
       body: {
         name: fixtures.basic.name,

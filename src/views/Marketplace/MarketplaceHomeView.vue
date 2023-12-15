@@ -18,7 +18,7 @@
       <div class="w-full flex flex-col md:flex-row gap-6 lg:gap-8">
         <!-- Sidebar -->
         <div
-          class="flex flex-col md:flex-shrink-0 gap-8 px-3 pt-8 pb-0 sm:px-8 w-full md:w-80 md:sticky md:top-14 self-start"
+          class="flex flex-col md:flex-shrink-0 gap-8 px-3 pt-8 pb-0 sm:px-8 w-full md:pr-0 md:w-80 md:sticky md:top-14 self-start"
         >
           <!-- Search -->
           <div class="flex flex-col w-full gap-3">
@@ -70,14 +70,14 @@
         </div>
 
         <!-- Solutions -->
-        <div class="flex flex-col p-3 sm:p-8 gap-6 w-full">
+        <div class="flex flex-col p-3 md:pl-0 sm:p-8 gap-6 w-full">
           <!-- Loading -->
           <template v-if="loading">
             <LoadingList />
           </template>
           <!-- Default View -->
           <template v-else-if="allSelected">
-            <div class="text-2xl font-medium">Featured</div>
+            <div class="md:text-base lg:text-2xl font-medium">Featured</div>
             <ListSolutions :solutions="featured" />
             <div class="text-base font-medium">New releases</div>
             <ListSolutions :solutions="released" />
@@ -107,7 +107,7 @@
           </template>
           <!-- Category -->
           <template v-else>
-            <div class="text-2xl font-medium">
+            <div class="md:text-base lg:text-2xl font-medium">
               {{ selectedCategory.name }}
             </div>
             <ListSolutions :solutions="solutions" />
@@ -125,9 +125,9 @@
   import Listbox from 'primevue/listbox'
   import Badge from 'primevue/badge'
   import PrimeButton from 'primevue/button'
-  import ListSolutions from './ListSolutions.vue'
-  import LoadingList from './LoadingList'
-  import LoadingEmptySearch from './LoadingEmptySearch'
+  import ListSolutions from './components/ListSolutions'
+  import LoadingList from './components/LoadingList'
+  import LoadingEmptySearch from './components/LoadingEmptySearch'
   import { useToast } from 'primevue/usetoast'
 
   const selectedCategory = ref({ name: 'All', code: 'all' })
@@ -221,7 +221,8 @@
       searching.value = !!search.value
       loading.value = true
       const payload = { type: PAGE_TYPE, search: search.value }
-      solutions.value = await loadSolutions(payload)
+      const items = await loadSolutions(payload)
+      solutions.value = items.filter((i) => !i.instanceType.isTemplate)
     } catch (error) {
       $toast.add({ ...ERROR_PROPS, summary: error })
     } finally {
@@ -258,11 +259,12 @@
   })
 
   const categoriesList = computed(() => {
-    const mapped = categories.value.map((i) => ({
+    let mapped = categories.value.map((i) => ({
       name: i.name,
       code: i.slug,
       total: i.solutionsCount
     }))
+    mapped = mapped.filter((i) => i.total > 0 && i.code !== 'build')
 
     return mapped.length ? [CATEGORY_ALL, ...mapped] : []
   })

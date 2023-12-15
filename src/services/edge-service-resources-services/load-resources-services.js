@@ -2,9 +2,9 @@ import { AxiosHttpClientAdapter, parseHttpResponse } from '../axios/AxiosHttpCli
 import { makeResourcesBaseUrl } from './make-resources-base-url'
 import { parseSnakeToCamel } from '@/helpers'
 
-export const loadResourcesServices = async ({ resourcesID, edgeServiceID }) => {
+export const loadResourcesServices = async ({ id, edgeServiceId }) => {
   let httpResponse = await AxiosHttpClientAdapter.request({
-    url: `${makeResourcesBaseUrl()}/${edgeServiceID}/resources/${resourcesID}`,
+    url: `${makeResourcesBaseUrl()}/${edgeServiceId}/resources/${id}`,
     method: 'GET'
   })
 

@@ -52,12 +52,13 @@ describe('DataStreamingServices', () => {
       }
     })
     const { sut } = makeSut()
+    const version = 'v3'
     await sut()
 
     expect(httpClientSpy).toHaveBeenCalledOnce()
     expect(httpClientSpy).toHaveBeenCalledWith({
       method: 'GET',
-      url: 'data_streaming/streamings'
+      url: `${version}/data_streaming/streamings`
     })
   })
 

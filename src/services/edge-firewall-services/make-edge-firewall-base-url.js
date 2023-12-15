@@ -1,3 +1,4 @@
 export const makeEdgeFirewallBaseUrl = () => {
-  return `edge_firewall`
+  const version = 'v3'
+  return `${version}/edge_firewall`
 }

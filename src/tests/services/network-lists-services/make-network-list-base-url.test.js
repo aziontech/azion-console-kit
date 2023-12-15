@@ -12,7 +12,8 @@ const makeSut = () => {
 describe('NetworkListsServices', () => {
   it('should return the API base url to network service', () => {
     const { sut } = makeSut()
-    const correctApiUrl = 'network_lists'
+    const version = 'v3'
+    const correctApiUrl = `${version}/network_lists`
 
     const baseUrl = sut()
 

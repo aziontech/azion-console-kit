@@ -12,7 +12,8 @@ const makeSut = () => {
 describe('IntelligentDnsServices', () => {
   it('should return the API base url to intelligent dns service', () => {
     const { sut } = makeSut()
-    const correctApiUrl = 'intelligent_dns'
+    const version = 'v3'
+    const correctApiUrl = `${version}/intelligent_dns`
 
     const baseUrl = sut()
 

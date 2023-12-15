@@ -3,10 +3,10 @@ import * as Errors from '@/services/axios/errors'
 import { makeResourcesBaseUrl } from './make-resources-base-url'
 
 export const createResourcesServices = async (payload) => {
-  const { edgeServiceID } = payload
+  const { id } = payload
   const adaptedPayload = adapt(payload)
   let httpResponse = await AxiosHttpClientAdapter.request({
-    url: `${makeResourcesBaseUrl()}/${edgeServiceID}/resources`,
+    url: `${makeResourcesBaseUrl()}/${id}/resources`,
     method: 'POST',
     body: adaptedPayload
   })

@@ -6,13 +6,13 @@
     <template #content>
       <ListTableBlock
         v-if="hasContentToList"
-        :listService="pros.listRealTimePurgeService"
+        :listService="props.listRealTimePurgeService"
         :columns="getColumns"
-        pageTitleDelete="Real-Time Purge"
         addButtonLabel="Real-Time Purge"
         createPagePath="real-time-purge/create"
-        editPagePath="real-time-purge/edit"
         @on-load-data="handleLoadData"
+        :isGraphql="true"
+        :enableEditClick="false"
       >
       </ListTableBlock>
       <EmptyResultsBlock
@@ -39,7 +39,7 @@
   import ContentBlock from '@/templates/content-block'
   import PageHeadingBlock from '@/templates/page-heading-block'
 
-  const pros = defineProps({
+  const props = defineProps({
     listRealTimePurgeService: { required: true, type: Function },
     documentationService: {
       required: true,
@@ -47,7 +47,7 @@
     }
   })
 
-  const hasContentToList = ref(false)
+  const hasContentToList = ref(true)
 
   const handleLoadData = (event) => {
     hasContentToList.value = event
@@ -56,7 +56,7 @@
   const getColumns = computed(() => {
     return [
       {
-        field: 'date',
+        field: 'time',
         header: 'Date'
       },
       {

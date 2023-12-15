@@ -33,11 +33,11 @@ describe('VariablesService', () => {
     })
     const variableMockId = 812783
     const { sut } = makeSut()
-
+    const version = 'v3'
     await sut({ id: variableMockId })
 
     expect(requestSpy).toHaveBeenCalledWith({
-      url: `variables/${variableMockId}`,
+      url: `${version}/variables/${variableMockId}`,
       method: 'GET'
     })
   })

@@ -1,3 +1,4 @@
 export const makePermissionBaseUrl = () => {
-  return `permissions`
+  const version = 'v4'
+  return `${version}/iam/permissions`
 }

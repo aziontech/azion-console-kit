@@ -1,7 +1,7 @@
 <template>
-  <div class="w-full flex flex-col gap-6 animate-fadeIn">
+  <div class="w-full flex flex-col gap-8 animate-fadeIn">
     <form
-      class="flex flex-col gap-6"
+      class="flex flex-col gap-8"
       @submit.prevent="signUp"
     >
       <div class="flex flex-col gap-2">

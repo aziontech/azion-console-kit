@@ -18,11 +18,11 @@ describe('IntelligentDnsServices', () => {
     })
     const dnsIdMock = 8721673
     const { sut } = makeSut()
-
+    const version = 'v3'
     await sut(dnsIdMock)
 
     expect(requestSpy).toHaveBeenCalledWith({
-      url: `intelligent_dns/${dnsIdMock}`,
+      url: `${version}/intelligent_dns/${dnsIdMock}`,
       method: 'DELETE'
     })
   })

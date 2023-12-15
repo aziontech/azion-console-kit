@@ -1,5 +1,6 @@
 const makeDataStreamingBaseUrl = () => {
-  return `data_streaming/streamings`
+  const version = 'v3'
+  return `${version}/data_streaming/streamings`
 }
 
 export { makeDataStreamingBaseUrl }

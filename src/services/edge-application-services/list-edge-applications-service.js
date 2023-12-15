@@ -23,16 +23,21 @@ const adapt = (httpResponse) => {
     const originNames = edgeApplication.origins?.map((origin) => origin.name)?.join(',')
 
     return {
-      active: edgeApplication.active ? 'active' : 'disabled',
-      debugRules: edgeApplication.debug_rules ? 'active' : 'disabled',
       id: edgeApplication.id,
-      lastEditor: edgeApplication.last_editor,
-      lastModify: new Intl.DateTimeFormat('us', { dateStyle: 'full' }).format(
-        new Date(edgeApplication.last_modified)
-      ),
-      lastModifyDate: edgeApplication.last_modified,
       name: edgeApplication.name,
-      origins: originNames
+      origins: originNames,
+      status: edgeApplication.active
+        ? {
+            content: 'Active',
+            severity: 'success'
+          }
+        : {
+            content: 'Inactive',
+            severity: 'danger'
+          },
+      lastEditor: edgeApplication.last_editor,
+      lastModify: dateFormat(edgeApplication.last_modified),
+      lastModifyDate: edgeApplication.last_modified
     }
   })
 
@@ -50,4 +55,8 @@ const makeSearchParams = ({ orderBy, sort, page, pageSize }) => {
   searchParams.set('page_size', pageSize)
 
   return searchParams
+}
+
+const dateFormat = (date) => {
+  return new Intl.DateTimeFormat('us', { dateStyle: 'full' }).format(new Date(date))
 }
