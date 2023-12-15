@@ -87,7 +87,7 @@ describe('EdgeApplicationOriginsServices', () => {
     expect(feedbackMessage).toBe('Your Origin has been edited')
   })
 
-  it('Should return an API error to an invalid edge application name', async () => {
+  it('Should return an API array error to an invalid edge application', async () => {
     const apiErrorMock = 'name should not be empty'
 
     vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
@@ -102,7 +102,7 @@ describe('EdgeApplicationOriginsServices', () => {
 
     expect(feedbackMessage).rejects.toThrow(apiErrorMock)
   })
-  it('Should return an API error to an invalid edge application not error in array ', async () => {
+  it('Should return an API error to an invalid edge application', async () => {
     const apiErrorMock = 'name should not be empty'
 
     vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({

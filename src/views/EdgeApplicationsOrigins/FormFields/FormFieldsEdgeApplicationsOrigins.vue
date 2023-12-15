@@ -8,7 +8,7 @@
   import Divider from 'primevue/divider'
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
   import { useField, useFieldArray } from 'vee-validate'
-  import { computed } from 'vue'
+  import { computed, watch } from 'vue'
   import InputValidate from '@/views/EdgeApplicationsOrigins/component/InputValidate'
 
   const props = defineProps({
@@ -23,6 +23,10 @@
     listOrigins: {
       required: true,
       type: Array
+    },
+    generatedOriginKey: {
+      type: String,
+      required: false
     }
   })
 
@@ -67,7 +71,7 @@
     }
   ]
 
-  const { value: originKey } = useField('originKey')
+  const { value: originKey, setValue: setOriginKey } = useField('originKey')
   const { value: name } = useField('name')
   const { value: hostHeader } = useField('hostHeader')
   const {
@@ -106,6 +110,13 @@
   const addAddress = () => {
     pushAddress({ ...defaultAddress })
   }
+
+  watch(
+    () => props.generatedOriginKey,
+    (value) => {
+      setOriginKey(value)
+    }
+  )
 </script>
 
 <template>
@@ -141,13 +152,13 @@
           <span class="p-input-icon-right w-full flex max-w-lg flex-col items-start gap-2">
             <i
               class="pi pi-lock text-color-secondary"
-              v-if="!originKey"
+              v-if="true"
             />
             <InputText
               class="w-full"
               v-model="originKey"
               type="text"
-              :disabled="!originKey || disabledFields"
+              :disabled="true"
             />
           </span>
         </div>

@@ -38,7 +38,7 @@ describe('EdgeApplicationOriginsServices', () => {
       statusCode: 201,
       body: {
         results: {
-          id: 1
+          origin_key: 1
         }
       }
     })
@@ -67,7 +67,7 @@ describe('EdgeApplicationOriginsServices', () => {
     })
   })
 
-  it('Should return an API error to an invalid edge application name', async () => {
+  it('Should return an API array error to an invalid edge application', async () => {
     const apiErrorMock = 'name should not be empty'
 
     vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
@@ -82,7 +82,8 @@ describe('EdgeApplicationOriginsServices', () => {
 
     expect(feedbackMessage).rejects.toThrow(apiErrorMock)
   })
-  it('Should return an API error to an invalid edge application not error in array ', async () => {
+
+  it('Should return an API error to an invalid edge application ', async () => {
     const apiErrorMock = 'name should not be empty'
 
     vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
@@ -98,7 +99,7 @@ describe('EdgeApplicationOriginsServices', () => {
     expect(feedbackMessage).rejects.toThrow(apiErrorMock)
   })
 
-  it('Should return an API error to an invalid edge application with error in array ', async () => {
+  it('Should return an API error with object to an invalid edge application', async () => {
     const apiErrorMock = 'name should not be empty'
     vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
       statusCode: 500,
@@ -118,15 +119,16 @@ describe('EdgeApplicationOriginsServices', () => {
       statusCode: 201,
       body: {
         results: {
-          id: 1
+          origin_key: 'test-origin-key'
         }
       }
     })
     const { sut } = makeSut()
 
-    const data = await sut(fixtures.originMock, fixtures.edgeApplicationId)
-
-    expect(data.feedback).toBe('Your Origin has been created')
+    const { feedback, originKey } = await sut(fixtures.originMock, fixtures.edgeApplicationId)
+    
+    expect(originKey).toBe('test-origin-key')
+    expect(feedback).toBe('Your Origin has been created')
   })
 
   it.each([

@@ -81,7 +81,8 @@
     hmacAccessKey: '',
     hmacSecretKey: ''
   })
-
+  
+  const originKey = ref('')
   const validationSchema = yup.object({
     name: yup.string().required().label('Name'),
     originType: yup.string().required().label('Origin Type'),
@@ -164,6 +165,11 @@
     })
   }
 
+  const handleCreateOrigin = (feedback) => {
+    originKey.value = feedback.originKey
+    emit('onSuccess')
+  }
+
   defineExpose({
     openDrawerCreate,
     openDrawerEdit
@@ -177,7 +183,7 @@
     :createService="props.createOriginService"
     :schema="validationSchema"
     :initialValues="initialValues"
-    @onSuccess="emit('onSuccess')"
+    @onSuccess="handleCreateOrigin"
     :showBarGoBack="true"
     title="Create Origin"
   >
@@ -186,6 +192,7 @@
         :disabledFields="disabledFields"
         :listOrigins="ORIGIN_TYPES_OPTIONS"
         :copyToClipboard="copyToKey"
+        :generatedOriginKey="originKey"
       />
     </template>
   </CreateDrawerBlock>
