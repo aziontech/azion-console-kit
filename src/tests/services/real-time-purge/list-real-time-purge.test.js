@@ -8,7 +8,6 @@ const localeMock = (locale = 'en') => {
   const DateTimeFormat = Intl.DateTimeFormat
   vi.spyOn(window.global.Intl, 'DateTimeFormat')
     .mockImplementation((_, options) => DateTimeFormat(locale, { ...options }))
-    .mockImplementation((_, options) => DateTimeFormat(locale, { ...options }))
 }
 
 const purge = [
