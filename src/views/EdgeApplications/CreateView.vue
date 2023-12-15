@@ -53,6 +53,7 @@
   const initialValues = ref({
     name: '',
     deliveryProtocol: 'http',
+    http3: false,
     httpPort: { label: '80 (Default)', value: '80' },
     httpsPort: { label: '443 (Default)', value: '443' },
     minimumTlsVersion: { label: 'None', value: '' },
@@ -65,6 +66,7 @@
     browserCacheSettings: 'honor',
     browserCacheSettingsMaximumTtl: '',
     cdnCacheSettings: 'honor',
-    cdnCacheSettingsMaximumTtl: 60
+    cdnCacheSettingsMaximumTtl: 60,
+    active: false,
   })
 </script>

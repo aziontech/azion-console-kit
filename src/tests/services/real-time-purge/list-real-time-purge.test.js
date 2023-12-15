@@ -4,6 +4,13 @@ import { listRealTimePurgeService } from '@/services/real-time-purge'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import graphQLApi from '../../../services/axios/makeEventsApi'
 
+const localeMock = (locale = 'en') => {
+  const DateTimeFormat = Intl.DateTimeFormat
+  vi.spyOn(window.global.Intl, 'DateTimeFormat')
+    .mockImplementationOnce((_, options) => DateTimeFormat(locale, { ...options }))
+    .mockImplementationOnce((_, options) => DateTimeFormat(locale, { ...options }))
+}
+
 const purge = [
   {
     resourceType: 'Purge:url',
@@ -83,6 +90,7 @@ describe('ListRealTimePurgeService', () => {
   })
 
   it('should parse correctly each returned item', async () => {
+    localeMock()
     vi.setSystemTime(new Date(2023, 10, 10, 10))
     vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
       statusCode: 200,
