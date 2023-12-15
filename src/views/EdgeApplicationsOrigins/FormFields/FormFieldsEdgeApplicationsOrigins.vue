@@ -9,24 +9,22 @@
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
   import { useField, useFieldArray } from 'vee-validate'
   import { computed } from 'vue'
+  import InputValidate from '@/views/EdgeApplicationsOrigins/component/InputValidate'
 
-  const ORIGIN_TYPES_OPTIONS = [
-    {
-      label: 'Single Origin',
-      value: 'single_origin',
-      disabled: false
+  const props = defineProps({
+    disabledFields: {
+      type: Boolean,
+      default: false
     },
-    {
-      label: 'Load Balancer',
-      value: 'load_balancer',
-      disabled: false
+    copyToClipboard: {
+      type: Function,
+      required: true
     },
-    {
-      label: 'Live Ingest',
-      value: 'live_ingest',
-      disabled: true
+    listOrigins: {
+      required: true,
+      type: Array
     }
-  ]
+  })
 
   const METHOD_TYPES_OPTIONS = [
     {
@@ -69,57 +67,44 @@
     }
   ]
 
-  //   {
-  //         "name": "New Origin",
-  //         "origin_type": "single_origin",
-  //         "addresses": [
-  //             {
-  //                 "address": "httpbin.org"
-  //             }
-  //         ],
-  //         "origin_protocol_policy": "http",
-  //         "host_header": "${host}",
-  //         "origin_path": "/requests",
-  //         "hmac_authentication": false,
-  //         "hmac_region_name": "",
-  //         "hmac_access_key": "",
-  //         "hmac_secret_key": ""
-  // }
-
   const { value: originKey } = useField('originKey')
-  const { value: name, errorMessage: nameError } = useField('name')
-  const { value: hostHeader, errorMessage: hostHeaderError } = useField('hostHeader')
-  const { push: pushAddress, remove: removeAddress, fields: addresses } = useFieldArray('addresses')
+  const { value: name } = useField('name')
+  const { value: hostHeader } = useField('hostHeader')
+  const {
+    push: pushAddress,
+    remove: removeAddress,
+    replace: resetAddresses,
+    fields: addresses
+  } = useFieldArray('addresses')
   const { value: originType } = useField('originType')
   const { value: originProtocolPolicy } = useField('originProtocolPolicy')
-  // is_origin_redirection_enabled
-  // const { value: isOriginRedirectionEnabled } = useField('isOriginRedirectionEnabled')
   const { value: method } = useField('method')
   const { value: originPath } = useField('originPath')
-  // const { value: originPath, errorMessage: originPathError } = useField('originPath')
   const { value: connectionTimeout } = useField('connectionTimeout')
   const { value: timeoutBetweenBytes } = useField('timeoutBetweenBytes')
   const { value: hmacAuthentication } = useField('hmacAuthentication')
   const { value: hmacRegionName } = useField('hmacRegionName')
-  // const { value: hmacRegionName, errorMessage: hmacRegionNameError } = useField('hmacRegionName')
   const { value: hmacAccessKey } = useField('hmacAccessKey')
-  // const { value: hmacAccessKey, errorMessage: hmacAccessKeyError } = useField('hmacAccessKey')
   const { value: hmacSecretKey } = useField('hmacSecretKey')
-  // const { value: hmacSecretKey, errorMessage: hmacSecretKeyError } = useField('hmacSecretKey')
-  
 
   const isSingleOriginType = computed(() => originType.value === 'single_origin')
   const isLoadBalancerOriginType = computed(() => originType.value === 'load_balancer')
   const isHmacAuthentication = computed(() => !!hmacAuthentication.value)
   const isIpHashMethod = computed(() => method.value === 'ip_hash')
 
+  const defaultAddress = {
+    address: '',
+    weight: 1,
+    serverRole: 'primary',
+    isActive: true
+  }
+
+  const resetAddressesFields = () => {
+    resetAddresses([{ ...defaultAddress }])
+  }
+
   const addAddress = () => {
-    pushAddress({
-      address: '',
-      weight: 1,
-      serverRole: 'primary',
-      isActive: true
-    })
+    pushAddress({ ...defaultAddress })
   }
 </script>
 
@@ -131,36 +116,12 @@
   >
     <template #inputs>
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
-        <label
-          for="name"
-          class="text-color text-sm font-medium leading-5"
-          >Name *</label
-        >
-        <InputText
+        <InputValidate
+          label="Name *"
           placeholder="Insert the Origin Name"
-          v-model="name"
-          type="text"
-          :class="{ 'p-invalid': nameError }"
-        />
-        <small
-          v-if="nameError"
-          class="p-error text-xs font-normal leading-tight"
-          >{{ nameError }}</small
-        >
-        <small class="text-xs text-color-secondary font-normal leading-5">
-          Give a unique and descriptive name to identify the origin.
-        </small>
-      </div>
-      <div class="flex flex-col sm:max-w-lg w-full gap-2">
-        <label
-          for="name"
-          class="text-color text-sm font-medium leading-5"
-          >Description
-        </label>
-        <InputText
-          placeholder="Insert the Origin Name"
-          v-model="description"
-          type="text"
+          name="name"
+          :value="name"
+          description="Give a unique and descriptive name to identify the origin."
         />
       </div>
     </template>
@@ -176,11 +137,7 @@
         class="flex w-full gap-6 items-end max-sm:flex-col max-sm:align-items-baseline flex-wrap max-sm:gap-3:flex-col"
       >
         <div class="flex flex-col sm:max-w-lg w-full gap-2">
-          <label
-            for="name"
-            class="text-color text-sm font-medium leading-5"
-            >Key</label
-          >
+          <label class="text-color text-sm font-medium leading-5">Key</label>
           <span class="p-input-icon-right w-full flex max-w-lg flex-col items-start gap-2">
             <i
               class="pi pi-lock text-color-secondary"
@@ -189,7 +146,6 @@
             <InputText
               class="w-full"
               v-model="originKey"
-              id="name"
               type="text"
               :disabled="!originKey || disabledFields"
             />
@@ -203,7 +159,7 @@
           aria-label="Copy Origin Key"
           label="Copy to Clipboard"
           :disabled="!originKey"
-          @click="$emit('copyOriginKey')"
+          @click="props.copyToClipboard(originKey)"
         />
       </div>
     </template>
@@ -217,136 +173,108 @@
     <template #inputs>
       <div class="flex w-80 flex-col gap-2 sm:max-w-lg max-sm:w-full">
         <label
-          for="name"
+          for="originType"
           class="text-color text-sm font-medium leading-5"
           >Type *</label
         >
         <Dropdown
+          @change="resetAddressesFields"
+          inputId="originType"
           v-model="originType"
-          :options="ORIGIN_TYPES_OPTIONS"
+          :options="props.listOrigins"
           optionLabel="label"
           option-value="value"
           :optionDisabled="(option) => option.disabled"
-          :class="{ 'p-invalid': originTypeError }"
         />
-        <small
-          v-if="originTypeError"
-          class="p-error text-xs font-normal leading-tight"
-          >{{ originTypeError }}</small
-        >
         <small class="text-xs text-color-secondary font-normal leading-5">
           Select an option to customize the origin.
         </small>
       </div>
-      <div class="flex flex-col sm:max-w-lg w-full gap-2">
+      <div
+        class="flex flex-col sm:max-w-lg w-full gap-2"
+        v-if="isLoadBalancerOriginType"
+      >
         <label
-          for="name"
+          for="method"
           class="text-color text-sm font-medium leading-5"
-          >Address *</label
+          >Method *</label
         >
-        <InputText
-          placeholder="example.com"
-          v-model="name"
-          type="text"
-          :class="{ 'p-invalid': nameError }"
+        <Dropdown
+          inputId="method"
+          v-model="method"
+          :options="METHOD_TYPES_OPTIONS"
+          optionLabel="label"
+          option-value="value"
         />
         <small class="text-xs text-color-secondary font-normal leading-5">
           Define an origin for the content, in FQDN format or an IPv4/IPv6 address.
         </small>
       </div>
-      <div class="flex flex-col sm:max-w-lg w-full gap-2">
-        <label
-          for="name"
-          class="text-color text-sm font-medium leading-5"
-          >Host Header *</label
-        >
-        <InputText
-          placeholder="${host_example}"
-          v-model="name"
-          type="text"
-          :class="{ 'p-invalid': nameError }"
+      <div
+        class="flex flex-col sm:max-w-lg w-full gap-2"
+        v-if="isSingleOriginType"
+      >
+        <InputValidate
+          label="Address *"
+          placeholder="example.com"
+          :name="`addresses[0].address`"
+          :value="addresses[0].value.address"
+          description="Define an origin for the content, in FQDN format or an IPv4/IPv6 address."
         />
-        <small class="text-xs text-color-secondary font-normal leading-5">
-          Allow the origin to identify the virtualhost and locate the content or application. If
-          this is blank, Azion will use the Address as the default.
-        </small>
       </div>
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
-        <label
-          for="name"
-          class="text-color text-sm font-medium leading-5"
-          >Path</label
-        >
-        <InputText
-          placeholder="/example.com/path/content.txt"
-          v-model="name"
-          type="text"
-          :class="{ 'p-invalid': nameError }"
+        <InputValidate
+          label="Host Header *"
+          placeholder="${host_example}"
+          name="hostHeader"
+          :value="hostHeader"
+          description="Allow the origin to identify the virtualhost and locate the content or application. If this is blank, Azion will use the Address as the default."
         />
-        <small class="text-xs text-color-secondary font-normal leading-5">
-          Specify a custom path from which edge nodes will request the origin content. If this is
-          blank, Azion will use the Address as the default.
-        </small>
+      </div>
+      <div class="flex flex-col sm:max-w-lg w-full gap-2">
+        <InputValidate
+          label="Path"
+          placeholder="/example.com/path/content.txt"
+          name="originPath"
+          :value="originPath"
+          description="Specify a custom path from which edge nodes will request the origin content. If this is
+          blank, Azion will use the Address as the default."
+        />
       </div>
       <div class="flex flex-col w-full sm:max-w-3xl gap-2">
-        <div class="flex flex-col gap-2">
-          <label class="text-color text-sm not-italic font-medium leading-5">Protocol Policy</label>
-          <div class="flex flex-col gap-4">
-            <div class="flex no-wrap gap-2 items-center">
-              <RadioButton
-                v-model="trigger"
-                inputId="trigger-install"
-                name="trigger-install"
-                value="Install"
-              />
-              <label
-                for="trigger-install"
-                class="text-color text-sm font-normal leading-tight"
-              >
-                Preserve HTTP/HTTPS
-              </label>
-            </div>
-            <div class="flex no-wrap gap-2 items-center">
-              <RadioButton
-                v-model="trigger"
-                inputId="trigger-reload"
-                name="trigger-reload"
-                value="Reload"
-              />
-              <label
-                for="trigger-reload"
-                class="text-color text-sm font-normal leading-tight"
-              >
-                Enforce HTTP
-              </label>
-            </div>
-            <div class="flex no-wrap gap-2 items-center">
-              <RadioButton
-                v-model="trigger"
-                inputId="trigger-uninstall"
-                name="trigger-uninstall"
-                value="Uninstall"
-              />
-              <label
-                for="trigger-uninstall"
-                class="text-color text-sm font-normal leading-tight"
-              >
-                Enforce HTTPS
-              </label>
-            </div>
+        <label class="text-color text-sm font-medium leading-5">Protocol Policy</label>
+        <div class="flex flex-col gap-4">
+          <div
+            class="flex no-wrap gap-2 items-center"
+            v-for="policy in ORIGIN_PROTOCOL_POLICIES"
+            :key="policy.value"
+          >
+            <RadioButton
+              v-model="originProtocolPolicy"
+              :inputId="policy.value"
+              name="originProtocolPolicy"
+              :value="policy.value"
+            />
+            <label
+              :for="policy.value"
+              class="text-color text-sm font-normal leading-tight"
+            >
+              {{ policy.label }}
+            </label>
           </div>
-          <small class="text-color-secondary text-xs not-italic font-normal leading-5">
-            Select the type of connection between the edge nodes and the origin.
-          </small>
         </div>
+        <small class="text-color-secondary text-xs font-normal leading-5">
+          Select the type of connection between the edge nodes and the origin.
+        </small>
       </div>
     </template>
   </FormHorizontal>
 
   <FormHorizontal
+    v-if="isLoadBalancerOriginType"
     :isDrawer="true"
     title="Origins"
-    description="Add one or more origns in your settings."
+    description="Add one or more origins in your settings."
   >
     <template #inputs>
       <div
@@ -356,10 +284,10 @@
       >
         <div class="flex flex-col w-full gap-2">
           <Divider
-            class="px-3"
+            class="px-3 z-0"
             align="left"
             type="dashed"
-            v-if="index === 0"
+            v-if="address.isFirst"
           >
             <b>Then</b>
           </Divider>
@@ -368,7 +296,7 @@
             class="flex gap-3"
           >
             <Divider
-              class="px-3"
+              class="px-3 z-0"
               align="left"
               type="dashed"
             >
@@ -384,77 +312,72 @@
             />
           </div>
         </div>
-
         <div class="flex flex-col sm:max-w-lg w-full gap-2">
-          <label
-            for="name"
-            class="text-color text-sm font-medium leading-5"
-            >Address *</label
-          >
-          <InputText
+          <InputValidate
+            label="Address *"
             placeholder="example.com"
-            v-model="name"
-            type="text"
-            :class="{ 'p-invalid': nameError }"
+            :name="`addresses[${index}].address`"
+            :value="addresses[index].value.address"
+            description="Define an origin for the content, in FQDN format or an IPv4/IPv6 address."
           />
-          <small
-            v-if="nameError"
-            class="p-error text-xs font-normal leading-tight"
-            >{{ nameError }}</small
-          >
-          <small class="text-xs text-color-secondary font-normal leading-5">
-            Define an origin for the content, in FQDN format or an IPv4/IPv6 address.
-          </small>
-        </div>
-        <div class="flex flex-col sm:max-w-lg w-full gap-2">
-          <label
-            for="name"
-            class="text-color text-sm font-medium leading-5"
-            >Access Key *</label
-          >
-          <InputText
-            v-model="name"
-            type="text"
-            :class="{ 'p-invalid': nameError }"
-          />
-          <small
-            v-if="nameError"
-            class="p-error text-xs font-normal leading-tight"
-            >{{ nameError }}</small
-          >
-          <small class="text-xs text-color-secondary font-normal leading-5">
-            Assigning Weights to the origins allows Load Balancer to determine how much traffic a
-            server can handle in comparison with each other.The default or empty value is 1.
-          </small>
         </div>
         <div class="flex w-80 flex-col gap-2 sm:max-w-lg max-sm:w-full">
           <label
-            for="name"
+            :for="`${address.key}-weight`"
             class="text-color text-sm font-medium leading-5"
             >Weights</label
           >
           <InputNumber
-            v-model="value2"
-            inputId="minmax-buttons"
+            v-model="address.value.weight"
+            :inputId="`${address.key}-weight`"
             mode="decimal"
             showButtons
             :min="0"
-            :max="100"
-            step="1"
+            :max="10"
           />
           <small class="text-xs text-color-secondary font-normal leading-5">
             Assigning to determine how much traffic a server can handle in comparison with each
             other.
           </small>
         </div>
+        <div
+          class="flex flex-col gap-2"
+          v-if="!isIpHashMethod"
+        >
+          <label class="text-color text-sm not-italic font-medium leading-5">Server Role</label>
+          <div class="flex flex-col gap-4">
+            <div
+              class="flex no-wrap gap-2 items-center"
+              v-for="role in SERVER_ROLES"
+              :key="role.value"
+            >
+              <RadioButton
+                v-model="address.value.serverRole"
+                :inputId="`${address.key}-${role.value}`"
+                name="serverRole"
+                :value="role.value"
+              />
+              <label
+                :for="`${address.key}-${role.value}`"
+                class="text-color text-sm font-normal leading-tight"
+              >
+                {{ role.label }}
+              </label>
+            </div>
+          </div>
+          <small class="text-color-secondary text-xs not-italic font-normal leading-5">
+            Marking an origin as a backup server to specify that it will receive HTTP requests only
+            if all primary servers are unavailable.
+          </small>
+        </div>
         <div class="flex w-full gap-2 items-start">
           <InputSwitch
-            v-model="active"
-            inputId="activeStatus"
+            v-model="address.value.isActive"
+            :inputId="`${address.key}-active`"
           />
 
           <label
-            for="activeStatus"
+            :for="`${address.key}-active`"
             class="flex flex-col items-start gap-1"
           >
             <span class="text-color text-sm font-normal leading-5"> Active </span>
@@ -481,6 +404,7 @@
 
   <FormHorizontal
     :isDrawer="true"
+    v-if="isSingleOriginType"
     title="HMAC authentication"
     description="Provide HMAC authentication credentials to deliver private content."
   >
@@ -491,61 +415,45 @@
         >
           <span class="p-input-icon-right w-full flex max-w-lg items-start gap-2 pb-3 pt-2">
             <InputSwitch
-              v-model="active"
-              inputId="activeStatus"
+              v-model="hmacAuthentication"
+              inputId="hmacAuthentication"
             />
             <label
-              for="activeStatus"
+              for="hmacAuthentication"
               class="text-color text-sm font-normal leading-5"
               >Active</label
             >
           </span>
         </div>
       </div>
-      <div class="flex flex-col sm:max-w-lg w-full gap-2">
-        <label
-          for="name"
-          class="text-color text-sm font-medium leading-5"
-          >Region name *</label
-        >
-        <InputText
-          v-model="name"
-          type="text"
-          :class="{ 'p-invalid': nameError }"
-        />
-        <small class="text-xs text-color-secondary font-normal leading-5">
-          Enter the Region supported by the object storage provider.
-        </small>
-      </div>
-      <div class="flex flex-col sm:max-w-lg w-full gap-2">
-        <label
-          for="name"
-          class="text-color text-sm font-medium leading-5"
-          >Access Key *</label
-        >
-        <InputText
-          v-model="name"
-          type="text"
-          :class="{ 'p-invalid': nameError }"
-        />
-        <small class="text-xs text-color-secondary font-normal leading-5">
-          Enter the Access Key provided by the object storage provider.
-        </small>
-      </div>
-      <div class="flex flex-col sm:max-w-lg w-full gap-2">
-        <label
-          for="name"
-          class="text-color text-sm font-medium leading-5"
-          >Secret Key *</label
-        >
-        <InputText
-          v-model="name"
-          type="text"
-          :class="{ 'p-invalid': nameError }"
-        />
-        <small class="text-xs text-color-secondary font-normal leading-5">
-          Enter the Secret Key provided by the object storage provider.
-        </small>
+      <div
+        class="max-w-3xl w-full flex flex-col gap-8 max-md:gap-6"
+        v-if="isHmacAuthentication"
+      >
+        <div class="flex flex-col sm:max-w-lg w-full gap-2">
+          <InputValidate
+            label="Region Name *"
+            name="hmacRegionName"
+            :value="hmacRegionName"
+            description="Enter the Region supported by the object storage provider."
+          />
+        </div>
+        <div class="flex flex-col sm:max-w-lg w-full gap-2">
+          <InputValidate
+            label="Access Key *"
+            name="hmacAccessKey"
+            :value="hmacAccessKey"
+            description="Enter the Access Key provided by the object storage provider."
+          />
+        </div>
+        <div class="flex flex-col sm:max-w-lg w-full gap-2">
+          <InputValidate
+            label="Secret Key *"
+            name="hmacSecretKey"
+            :value="hmacSecretKey"
+            description="Enter the Secret Key provided by the object storage provider."
+          />
+        </div>
       </div>
     </template>
   </FormHorizontal>
@@ -567,6 +475,7 @@
             <i class="pi pi-lock text-color-secondary" />
             <InputText
               class="w-full"
+              v-model="connectionTimeout"
               placeholder="60 seconds"
               type="text"
               disabled
@@ -588,6 +497,7 @@
             <i class="pi pi-lock text-color-secondary" />
             <InputText
               class="w-full"
+              v-model="timeoutBetweenBytes"
               placeholder="120 bytes"
               type="text"
               disabled

@@ -1,5 +1,6 @@
 <script setup>
   import { ref } from 'vue'
+  import { useToast } from 'primevue/usetoast'
   import * as yup from 'yup'
   import CreateDrawerBlock from '@templates/create-drawer-block'
   import FormFieldsDrawerOrigin from '@/views/EdgeApplicationsOrigins/FormFields/FormFieldsEdgeApplicationsOrigins'
@@ -8,37 +9,59 @@
   defineOptions({ name: 'drawer-origin' })
 
   const emit = defineEmits(['onSuccess'])
+
   const props = defineProps({
     edgeApplicationId: {
       type: String,
       required: true
     },
-    createResourcesServices: {
+    createOriginService: {
       type: Function,
       required: true
     },
-    editResourcesServices: {
+    editOriginService: {
       type: Function,
       required: true
     },
-    loadResourcesServices: {
+    loadOriginService: {
+      type: Function,
+      required: true
+    },
+    documentationService: {
+      type: Function,
+      required: true
+    },
+    clipboardWrite: {
       type: Function,
       required: true
     }
   })
 
-  const showCreateResourceDrawer = ref(false)
-  const showEditResourceDrawer = ref(false)
-  const debouncedDrawerEdit = 300
-  const loadEditResourceDrawer = refDebounced(showEditResourceDrawer, debouncedDrawerEdit)
+  const toast = useToast()
+  const showCreateOriginDrawer = ref(false)
+  const showEditOriginDrawer = ref(false)
+  const debouncedDrawerAnimate = 300
+  const loadCreateOriginDrawer = refDebounced(showCreateOriginDrawer, debouncedDrawerAnimate)
+  const loadEditOriginDrawer = refDebounced(showEditOriginDrawer, debouncedDrawerAnimate)
   const selectedOriginToEdit = ref('')
+  const ORIGIN_TYPES_OPTIONS = [
+    {
+      label: 'Single Origin',
+      value: 'single_origin',
+      disabled: false
+    },
+    {
+      label: 'Load Balancer',
+      value: 'load_balancer',
+      disabled: false
+    }
+  ]
 
   const initialValues = ref({
     id: props.edgeApplicationId,
+    originKey: '',
     name: '',
     hostHeader: '${host}',
-    method: 'ip_hash',
-    originPath: '',
     addresses: [
       {
         address: '',
@@ -47,36 +70,69 @@
         isActive: true
       }
     ],
+    originType: 'single_origin',
     originProtocolPolicy: 'preserve',
-    originType: 'load_balancer',
-    key: '',
+    method: 'ip_hash',
+    originPath: '',
+    connectionTimeout: 60,
+    timeoutBetweenBytes: 120,
     hmacAuthentication: false,
     hmacRegionName: '',
     hmacAccessKey: '',
-    hmacSecretKey: '',
-    connectionTimeout: 60,
-    timeoutBetweenBytes: 120
+    hmacSecretKey: ''
   })
 
   const validationSchema = yup.object({
-    name: yup.string().required(),
+    name: yup.string().required().label('Name'),
+    originType: yup.string().required().label('Origin Type'),
+    hostHeader: yup.string().required().label('Host Header'),
     addresses: yup.array().of(
       yup.object().shape({
-        address: yup.string().required(),
+        address: yup.string().required().label('Address'),
+        weight: yup.number().required().label('Weight'),
         isActive: yup.boolean()
       })
-    )
+    ),
+    originPath: yup
+      .string()
+      .test('valid', 'Use a valid origin path.', (value) => {
+        return /^(\/\.?[\w][\w.-]*)+$/.test(value) || !value
+      })
+      .label('Origin Path'),
+    hmacAuthentication: yup.boolean(),
+    hmacRegionName: yup
+      .string()
+      .when('hmacAuthentication', {
+        is: true,
+        then: (schema) => schema.required()
+      })
+      .label('Region Name'),
+    hmacAccessKey: yup
+      .string()
+      .when('hmacAuthentication', {
+        is: true,
+        then: (schema) => schema.required()
+      })
+      .label('Access Key'),
+    hmacSecretKey: yup
+      .string()
+      .when('hmacAuthentication', {
+        is: true,
+        then: (schema) => schema.required()
+      })
+      .label('Secret Key')
   })
 
   const editService = async (payload) => {
-    return await props.editResourcesServices({
+    payload.id = payload.originKey
+    return await props.editOriginService({
       ...payload,
       edgeApplicationId: props.edgeApplicationId
     })
   }
 
   const loadService = async (payload) => {
-    const edgeNode = await props.loadResourcesServices({
+    const edgeNode = await props.loadOriginService({
       ...payload,
       edgeApplicationId: props.edgeApplicationId
     })
@@ -84,40 +140,29 @@
   }
 
   const openDrawerCreate = () => {
-    showCreateResourceDrawer.value = true
+    showCreateOriginDrawer.value = true
   }
 
   const openDrawerEdit = (id) => {
     if (id) {
       selectedOriginToEdit.value = id.toString()
-      showEditResourceDrawer.value = true
+      showEditOriginDrawer.value = true
     }
   }
 
   const closeDrawerEdit = () => {
-    showEditResourceDrawer.value = false
+    showEditOriginDrawer.value = false
   }
 
-  // const props = defineProps({
-  //   createOriginService: {
-  //     type: Function,
-  //     required: true
-  //   }
-  // })
+  const copyToKey = async (originKey) => {
+    props.clipboardWrite(originKey)
 
-  // async function createOriginWithEdgeApplicationIdDecorator(formValues) {
-  //   const { id } = route.params
-  //   return await props.createOriginService(formValues, id)
-  // }
-
-  // async function editOriginWithEdgeApplicationIdDecorator(formValues) {
-  //   const { id } = route.params
-  //   return await props.editOriginService(formValues, id)
-  // }
-  // async function loadOrigin() {
-  //   const { id, originKey } = route.params
-  //   return await props.loadOriginService({ id, originKey })
-  // }
+    toast.add({
+      closable: true,
+      severity: 'success',
+      summary: 'Origin key copied to clipboard!'
+    })
+  }
 
   defineExpose({
     openDrawerCreate,
@@ -127,30 +172,41 @@
 
 <template>
   <CreateDrawerBlock
-    v-model:visible="showCreateResourceDrawer"
-    :createService="createResourcesServices"
+    v-if="loadCreateOriginDrawer"
+    v-model:visible="showCreateOriginDrawer"
+    :createService="props.createOriginService"
     :schema="validationSchema"
     :initialValues="initialValues"
     @onSuccess="emit('onSuccess')"
-    title="Create Resource"
+    :showBarGoBack="true"
+    title="Create Origin"
   >
     <template #formFields="{ disabledFields }">
-      <FormFieldsDrawerOrigin :disabledFields="disabledFields" />
+      <FormFieldsDrawerOrigin
+        :disabledFields="disabledFields"
+        :listOrigins="ORIGIN_TYPES_OPTIONS"
+        :copyToClipboard="copyToKey"
+      />
     </template>
   </CreateDrawerBlock>
   <EditDrawerBlock
-    v-if="loadEditResourceDrawer"
+    v-if="loadEditOriginDrawer"
     :id="selectedOriginToEdit"
-    v-model:visible="showEditResourceDrawer"
+    v-model:visible="showEditOriginDrawer"
     :loadService="loadService"
     :editService="editService"
     :schema="validationSchema"
     @onSuccess="emit('onSuccess')"
+    :showBarGoBack="true"
     @onError="closeDrawerEdit"
     title="Edit Resource"
   >
     <template #formFields="{ disabledFields }">
-      <FormFieldsDrawerOrigin :disabledFields="disabledFields" />
+      <FormFieldsDrawerOrigin
+        :disabledFields="disabledFields"
+        :listOrigins="ORIGIN_TYPES_OPTIONS"
+        :copyToClipboard="copyToKey"
+      />
     </template>
   </EditDrawerBlock>
 </template>

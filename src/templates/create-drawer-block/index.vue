@@ -1,8 +1,9 @@
 <script setup>
-  import { computed } from 'vue'
+  import { computed, ref } from 'vue'
   import { useForm } from 'vee-validate'
   import { useToast } from 'primevue/usetoast'
   import ActionBarBlock from '@/templates/action-bar-block'
+  import GoBack from '@/templates/action-bar-block/go-back'
   import Sidebar from 'primevue/sidebar'
 
   defineOptions({
@@ -30,10 +31,15 @@
     initialValues: {
       type: Object,
       required: true
+    },
+    showBarGoBack: {
+      type: Boolean,
+      default: false
     }
   })
 
   const toast = useToast()
+  const isGoBack = ref(false)
   const { meta, resetForm, isSubmitting, handleSubmit } = useForm({
     validationSchema: props.schema,
     initialValues: props.initialValues
@@ -72,6 +78,8 @@
       const response = await props.createService(values)
       emit('onSuccess', response)
       showToast('success', response.feedback)
+      isGoBack.value = props.showBarGoBack
+      if (isGoBack.value) return
       formContext.resetForm()
       toggleDrawerVisibility(false)
     } catch (error) {
@@ -79,6 +87,11 @@
       showToast('error', error)
     }
   })
+
+  const goBackDrawer = () => {
+    isGoBack.value = false
+    toggleDrawerVisibility(false)
+  }
 </script>
 
 <template>
@@ -108,7 +121,13 @@
       </form>
     </div>
     <div class="sticky bottom-0">
+      <GoBack
+        :goBack="goBackDrawer"
+        v-if="isGoBack"
+        :inDrawer="true"
+      />
       <ActionBarBlock
+        v-else
         @onCancel="closeDrawer"
         @onSubmit="onSubmit"
         :inDrawer="true"

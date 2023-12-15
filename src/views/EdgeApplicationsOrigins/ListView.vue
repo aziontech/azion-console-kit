@@ -5,6 +5,7 @@
   import Illustration from '@/assets/svg/illustration-layers'
   import { computed, ref } from 'vue'
   import DrawerOrigin from '@/views/EdgeApplicationsOrigins/Drawer'
+  import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
   defineOptions({ name: 'list-edge-service-resources-tab' })
 
   const props = defineProps({
@@ -35,6 +36,10 @@
     documentationService: {
       type: Function,
       required: true
+    },
+    clipboardWrite: {
+      type: Function,
+      required: true
     }
   })
 
@@ -55,6 +60,13 @@
       {
         field: 'hostHeader',
         header: 'Host Header'
+      },
+      {
+        field: 'addresses',
+        header: 'Origin Address',
+        type: 'component',
+        component: (columnData) =>
+          columnBuilder({ data: columnData, columnAppearance: 'expand-column' })
       },
       {
         field: 'addresses',
@@ -100,18 +112,20 @@
   <DrawerOrigin
     ref="drawerOriginsRef"
     :edgeApplicationId="props.edgeApplicationId"
-    :createResourcesServices="props.createResourcesServices"
-    :loadResourcesServices="props.loadResourcesServices"
-    :editResourcesServices="props.editResourcesServices"
+    :createOriginService="props.createOriginService"
+    :editOriginService="props.editOriginService"
+    :loadOriginService="props.loadOriginService"
+    :documentationService="props.documentationService"
+    :clipboardWrite="props.clipboardWrite"
     @onSuccess="reloadList"
   />
   <div v-if="hasContentToList">
     <ListTableBlock
       ref="listOriginsEdgeApplicationsRef"
-      pageTitleDelete="Origin"
       :listService="listOriginsWithDecorator"
       :deleteService="deleteOriginWithDecorator"
       :columns="getColumns"
+      pageTitleDelete="Origin"
       :editInDrawer="openEditOriginDrawer"
       @on-load-data="handleLoadData"
     >

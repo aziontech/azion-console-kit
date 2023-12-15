@@ -2,10 +2,10 @@ import { AxiosHttpClientAdapter } from '@/services/axios/AxiosHttpClientAdapter'
 import { makeEdgeApplicationBaseUrl } from '../edge-application-services/make-edge-application-base-url'
 import * as Errors from '@/services/axios/errors'
 
-export const editOriginService = async (payload, id) => {
+export const editOriginService = async (payload) => {
   const parsedPayload = adapt(payload)
   let httpResponse = await AxiosHttpClientAdapter.request({
-    url: `${makeEdgeApplicationBaseUrl()}/${id}/origins/${payload.originKey}`,
+    url: `${makeEdgeApplicationBaseUrl()}/${payload.edgeApplicationId}/origins/${payload.id}`,
     method: 'PATCH',
     body: parsedPayload
   })
@@ -21,8 +21,7 @@ const adapt = (payload) => {
       address: addressItem.address,
       weight: addressItem.weight,
       server_role: addressItem.serverRole,
-      is_active: addressItem.isActive,
-      name: addressItem.name
+      is_active: addressItem.isActive
     })),
     origin_path: payload.originPath,
     origin_protocol_policy: payload.originProtocolPolicy,
@@ -33,17 +32,6 @@ const adapt = (payload) => {
     connection_timeout: payload.connectionTimeout,
     timeout_between_bytes: payload.timeoutBetweenBytes
   }
-
-  if (payload.originType === 'load_balancer') {
-    Object.assign(paylodAdapted, { method: payload.method })
-  }
-
-  paylodAdapted.addresses = payload.addresses.map((address) => {
-    return {
-      ...address,
-      weight: address.weight === null ? 1 : address.weight
-    }
-  })
 
   return paylodAdapted
 }

@@ -62,7 +62,8 @@ export const edgeApplicationRoutes = {
           editOriginService: OriginsService.editOriginService,
           loadOriginService: OriginsService.loadOriginService,
           documentationService: Helpers.documentationCatalog.edgeApplicationOrigins
-        }
+        },
+        clipboardWrite: Helpers.clipboardWrite
       },
       meta: {
         breadCrumbs: [

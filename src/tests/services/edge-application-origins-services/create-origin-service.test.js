@@ -1,10 +1,11 @@
 import { createOriginService } from '@/services/edge-application-origins-services'
 import { describe, expect, it, vi } from 'vitest'
 import { AxiosHttpClientAdapter } from '@/services/axios/AxiosHttpClientAdapter'
+import * as Errors from '@/services/axios/errors'
 
 const fixtures = {
-  edgeApplicationId: 123,
   originMock: {
+    id: 123,
     name: 'New Origin',
     origin_type: 'single_origin',
     method: '',
@@ -44,10 +45,10 @@ describe('EdgeApplicationOriginsServices', () => {
 
     const { sut } = makeSut()
 
-    await sut(fixtures.originMock, fixtures.edgeApplicationId)
+    await sut(fixtures.originMock)
 
     expect(requestSpy).toHaveBeenCalledWith({
-      url: `edge_applications/${fixtures.edgeApplicationId}/origins`,
+      url: `edge_applications/${fixtures.originMock.id}/origins`,
       method: 'POST',
       body: {
         name: fixtures.originMock.name,
@@ -66,6 +67,52 @@ describe('EdgeApplicationOriginsServices', () => {
     })
   })
 
+  it('Should return an API error to an invalid edge application name', async () => {
+    const apiErrorMock = 'name should not be empty'
+
+    vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
+      statusCode: 400,
+      body: {
+        errors: [apiErrorMock]
+      }
+    })
+    const { sut } = makeSut()
+
+    const feedbackMessage = sut(fixtures.originMock)
+
+    expect(feedbackMessage).rejects.toThrow(apiErrorMock)
+  })
+  it('Should return an API error to an invalid edge application not error in array ', async () => {
+    const apiErrorMock = 'name should not be empty'
+
+    vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
+      statusCode: 400,
+      body: {
+        errors: apiErrorMock
+      }
+    })
+    const { sut } = makeSut()
+
+    const feedbackMessage = sut(fixtures.originMock)
+
+    expect(feedbackMessage).rejects.toThrow(apiErrorMock)
+  })
+
+  it('Should return an API error to an invalid edge application with error in array ', async () => {
+    const apiErrorMock = 'name should not be empty'
+    vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
+      statusCode: 500,
+      body: {
+        addresses: [{ address: [apiErrorMock] }]
+      }
+    })
+    const { sut } = makeSut()
+
+    const feedbackMessage = sut(fixtures.originMock)
+
+    expect(feedbackMessage).rejects.toThrow(apiErrorMock)
+  })
+
   it('should return a feedback message on successfully created', async () => {
     vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
       statusCode: 201,
@@ -81,4 +128,35 @@ describe('EdgeApplicationOriginsServices', () => {
 
     expect(data.feedback).toBe('Your Origin has been created')
   })
+
+  it.each([
+    {
+      statusCode: 401,
+      expectedError: new Errors.InvalidApiTokenError().message
+    },
+    {
+      statusCode: 403,
+      expectedError: new Errors.PermissionError().message
+    },
+    {
+      statusCode: 404,
+      expectedError: new Errors.NotFoundError().message
+    },
+    {
+      statusCode: 'unmappedStatusCode',
+      expectedError: new Errors.UnexpectedError().message
+    }
+  ])(
+    'should throw when request fails with status code $statusCode',
+    async ({ statusCode, expectedError }) => {
+      vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
+        statusCode
+      })
+      const { sut } = makeSut()
+
+      const response = sut(fixtures.originMock)
+
+      expect(response).rejects.toBe(expectedError)
+    }
+  )
 })

@@ -12,7 +12,8 @@
 
   const props = defineProps({
     serviceEdgeApplication: { type: Object, required: true },
-    serviceOrigins: { type: Object, required: true }
+    serviceOrigins: { type: Object, required: true },
+    clipboardWrite: { type: Function, required: true }
   })
 
   const mapTabs = {
@@ -76,6 +77,7 @@
           <EdgeApplicationsOriginsListView
             :edgeApplicationId="edgeApplicationId"
             v-bind="props.serviceOrigins"
+            :clipboardWrite="props.clipboardWrite"
           />
         </TabPanel>
 
