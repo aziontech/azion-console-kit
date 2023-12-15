@@ -9,7 +9,7 @@
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
   import { useField, useFieldArray } from 'vee-validate'
   import { computed, watch } from 'vue'
-  import InputValidate from '@/views/EdgeApplicationsOrigins/component/InputValidate'
+  import FieldText from '@/templates/form-fields-inputs/fieldText'
 
   const props = defineProps({
     disabledFields: {
@@ -127,7 +127,7 @@
   >
     <template #inputs>
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
-        <InputValidate
+        <FieldText
           label="Name *"
           placeholder="Insert the Origin Name"
           name="name"
@@ -225,7 +225,7 @@
         class="flex flex-col sm:max-w-lg w-full gap-2"
         v-if="isSingleOriginType"
       >
-        <InputValidate
+        <FieldText
           label="Address *"
           placeholder="example.com"
           :name="`addresses[0].address`"
@@ -234,7 +234,7 @@
         />
       </div>
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
-        <InputValidate
+        <FieldText
           label="Host Header *"
           placeholder="${host_example}"
           name="hostHeader"
@@ -243,7 +243,7 @@
         />
       </div>
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
-        <InputValidate
+        <FieldText
           label="Path"
           placeholder="/example.com/path/content.txt"
           name="originPath"
@@ -324,7 +324,7 @@
           </div>
         </div>
         <div class="flex flex-col sm:max-w-lg w-full gap-2">
-          <InputValidate
+          <FieldText
             label="Address *"
             placeholder="example.com"
             :name="`addresses[${index}].address`"
@@ -442,7 +442,7 @@
         v-if="isHmacAuthentication"
       >
         <div class="flex flex-col sm:max-w-lg w-full gap-2">
-          <InputValidate
+          <FieldText
             label="Region Name *"
             name="hmacRegionName"
             :value="hmacRegionName"
@@ -450,7 +450,7 @@
           />
         </div>
         <div class="flex flex-col sm:max-w-lg w-full gap-2">
-          <InputValidate
+          <FieldText
             label="Access Key *"
             name="hmacAccessKey"
             :value="hmacAccessKey"
@@ -458,7 +458,7 @@
           />
         </div>
         <div class="flex flex-col sm:max-w-lg w-full gap-2">
-          <InputValidate
+          <FieldText
             label="Secret Key *"
             name="hmacSecretKey"
             :value="hmacSecretKey"

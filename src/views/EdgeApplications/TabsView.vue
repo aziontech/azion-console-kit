@@ -6,13 +6,12 @@
   import { useRoute, useRouter } from 'vue-router'
   import { ref } from 'vue'
   import EdgeApplicationsOriginsListView from '@/views/EdgeApplicationsOrigins/ListView'
-  import EditView from '@/views/EdgeApplications/EditView'
 
   defineOptions({ name: 'tabs-edge-service' })
 
   const props = defineProps({
-    serviceEdgeApplication: { type: Object, required: true },
-    serviceOrigins: { type: Object, required: true },
+    edgeApplicationServices: { type: Object, required: true },
+    originsServices: { type: Object, required: true },
     clipboardWrite: { type: Function, required: true }
   })
 
@@ -70,13 +69,12 @@
         @tab-click="changeRouteByClickingOnTab"
         class="w-full h-full"
       >
-        <TabPanel header="Main Settings">
-          <EditView />
-        </TabPanel>
+        <TabPanel header="Main Settings"> </TabPanel>
         <TabPanel header="Origins">
           <EdgeApplicationsOriginsListView
+            v-if="activeTab === mapTabs.origins"
             :edgeApplicationId="edgeApplicationId"
-            v-bind="props.serviceOrigins"
+            v-bind="props.originsServices"
             :clipboardWrite="props.clipboardWrite"
           />
         </TabPanel>

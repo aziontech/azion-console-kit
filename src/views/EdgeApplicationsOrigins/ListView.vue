@@ -140,7 +140,7 @@
   </div>
   <EmptyResultsBlock
     v-else
-    title="No Origin have been created"
+    title="No Origin has been created"
     description="Create your first Origin."
     createButtonLabel="Add"
     :documentationService="props.documentationService"

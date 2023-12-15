@@ -4,12 +4,8 @@
   import InputText from 'primevue/inputtext'
 
   const props = defineProps({
-    type: {
-      type: String,
-      default: 'text'
-    },
     value: {
-      type: [String, Number],
+      type: String,
       default: ''
     },
     name: {
@@ -52,7 +48,7 @@
     :id="name"
     v-model="inputValue"
     :name="name"
-    :type="type"
+    type="text"
     :placeholder="props.placeholder"
     @input="handleChange"
     @blur="handleBlur"

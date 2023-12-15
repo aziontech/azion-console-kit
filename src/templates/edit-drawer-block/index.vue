@@ -52,7 +52,7 @@
     initialValues: props.initialValues
   })
   const loading = ref(false)
-  const isGoBack = ref(false)
+  const showGoBack = ref(false)
   const disableEdit = computed(() => {
     return !meta.value.valid || loading.value || isSubmitting.value
   })
@@ -103,8 +103,8 @@
       const feedback = await props.editService(values)
       emit('onSuccess', feedback)
       showToast('success', feedback)
-      isGoBack.value = props.showBarGoBack
-      if (isGoBack.value) return
+      showGoBack.value = props.showBarGoBack
+      if (showGoBack.value) return
       formContext.resetForm()
       toggleDrawerVisibility(false)
     } catch (error) {
@@ -113,8 +113,8 @@
     }
   })
 
-  const goBackDrawer = () => {
-    isGoBack.value = false
+  const handleGoBack = () => {
+    showGoBack.value = false
     toggleDrawerVisibility(false)
   }
 
@@ -151,8 +151,8 @@
     </div>
     <div class="sticky bottom-0">
       <GoBack
-        :goBack="goBackDrawer"
-        v-if="isGoBack"
+        :goBack="handleGoBack"
+        v-if="showGoBack"
         :inDrawer="true"
       />
       <ActionBarBlock

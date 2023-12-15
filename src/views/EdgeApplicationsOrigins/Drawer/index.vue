@@ -81,7 +81,7 @@
     hmacAccessKey: '',
     hmacSecretKey: ''
   })
-  
+
   const originKey = ref('')
   const validationSchema = yup.object({
     name: yup.string().required().label('Name'),

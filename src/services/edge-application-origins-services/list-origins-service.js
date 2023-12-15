@@ -26,7 +26,7 @@ const adapt = (httpResponse) => {
     live_ingest: 'live_ingest'
   }
   const parsedOrigin = httpResponse.body.results?.map((origin) => {
-    let formattedListOfAddresses = origin.addresses.map((val) => val.address)
+    let formattedListOfAddresses = origin.addresses?.map((address) => address.address)
 
     return {
       id: origin.origin_key,

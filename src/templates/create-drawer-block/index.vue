@@ -39,7 +39,7 @@
   })
 
   const toast = useToast()
-  const isGoBack = ref(false)
+  const showGoBack = ref(false)
   const { meta, resetForm, isSubmitting, handleSubmit } = useForm({
     validationSchema: props.schema,
     initialValues: props.initialValues
@@ -78,8 +78,8 @@
       const response = await props.createService(values)
       emit('onSuccess', response)
       showToast('success', response.feedback)
-      isGoBack.value = props.showBarGoBack
-      if (isGoBack.value) return
+      showGoBack.value = props.showBarGoBack
+      if (showGoBack.value) return
       formContext.resetForm()
       toggleDrawerVisibility(false)
     } catch (error) {
@@ -88,8 +88,8 @@
     }
   })
 
-  const goBackDrawer = () => {
-    isGoBack.value = false
+  const handleGoBack = () => {
+    showGoBack.value = false
     toggleDrawerVisibility(false)
   }
 </script>
@@ -122,8 +122,8 @@
     </div>
     <div class="sticky bottom-0">
       <GoBack
-        :goBack="goBackDrawer"
-        v-if="isGoBack"
+        :goBack="handleGoBack"
+        v-if="showGoBack"
         :inDrawer="true"
       />
       <ActionBarBlock

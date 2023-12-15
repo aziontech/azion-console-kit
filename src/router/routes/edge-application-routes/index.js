@@ -50,12 +50,12 @@ export const edgeApplicationRoutes = {
       name: 'edit-edge-application',
       component: () => import('@views/EdgeApplications/TabsView.vue'),
       props: {
-        serviceEdgeApplication: {
+        edgeApplicationServices: {
           editEdgeApplication: EdgeApplicationsService.editEdgeApplicationService,
           loadEdgeApplication: EdgeApplicationsService.loadEdgeApplicationService,
           updatedRedirect: 'list-edge-applications'
         },
-        serviceOrigins: {
+        originsServices: {
           listOriginsService: OriginsService.listOriginsService,
           deleteOriginsService: OriginsService.deleteOriginsService,
           createOriginService: OriginsService.createOriginService,
