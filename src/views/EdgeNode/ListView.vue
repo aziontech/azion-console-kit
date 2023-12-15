@@ -33,7 +33,7 @@
     },
     {
       field: 'hashId',
-      header: 'HashID'
+      header: 'Hash ID'
     },
     {
       field: 'groups',

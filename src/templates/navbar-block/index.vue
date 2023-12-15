@@ -1,6 +1,6 @@
 <template>
   <header
-    class="p-3 bg-header text-white border-b surface-border items-center flex md:px-8 md:py-3 w-full fixed top-0 z-10 h-14"
+    class="p-3 bg-header text-white border-b surface-border items-center flex md:px-8 md:py-3 w-full fixed top-0 z-10 h-14 justify-between"
     @keyup.esc="closeSideBar"
     ref="app"
   >
@@ -26,12 +26,7 @@
           :accountHandler="accountHandler"
         />
       </div>
-
-      <div class="ml-auto hidden">
-        <SearchBlock />
-      </div>
-
-      <div class="flex gap-2 items-center ml-2 md:ml-auto">
+      <div class="flex gap-2 items-center ml-auto">
         <Create />
         <Help />
         <ProfileBlock />
@@ -54,7 +49,6 @@
   import AzionLogo from '@assets/svg/logo'
   import AzionMobileLogo from '@assets/svg/mobile-logo'
   import SidebarBlock from '@templates/sidebar-block'
-  import SearchBlock from '@templates/search-block'
   import Create from './create'
   import Help from './help'
   import SwitchAccount from './switch-account'

@@ -53,11 +53,12 @@ describe('EdgeApplicationOriginsServices', () => {
     })
 
     const { sut } = makeSut()
+    const version = 'v3'
 
     await sut(fixtures.originMock)
 
     expect(requestSpy).toHaveBeenCalledWith({
-      url: `edge_applications/${fixtures.originMock.edgeApplicationId}/origins/${fixtures.originMock.id}`,
+      url: `${version}/edge_applications/${fixtures.originMock.edgeApplicationId}/origins/${fixtures.originMock.id}`,
       method: 'PATCH',
       body: {
         name: fixtures.originMock.name,

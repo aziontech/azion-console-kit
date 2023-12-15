@@ -18,12 +18,12 @@ describe('EdgeNodeServices', () => {
     })
     const mockId = { edgeNodeId: 123, id: 123 }
     const { sut } = makeSut()
-
+    const version = 'v3'
     await sut(mockId)
 
     expect(requestSpy).toHaveBeenCalledWith({
       method: 'DELETE',
-      url: `edge_node/${mockId.edgeNodeId}/services/${mockId.id}`
+      url: `${version}/edge_nodes/${mockId.edgeNodeId}/services/${mockId.id}`
     })
   })
 

@@ -221,7 +221,8 @@
       searching.value = !!search.value
       loading.value = true
       const payload = { type: PAGE_TYPE, search: search.value }
-      solutions.value = await loadSolutions(payload)
+      const items = await loadSolutions(payload)
+      solutions.value = items.filter((i) => !i.instanceType.isTemplate)
     } catch (error) {
       $toast.add({ ...ERROR_PROPS, summary: error })
     } finally {
@@ -263,7 +264,7 @@
       code: i.slug,
       total: i.solutionsCount
     }))
-    mapped = mapped.filter((i) => i.total > 0)
+    mapped = mapped.filter((i) => i.total > 0 && i.code !== 'build')
 
     return mapped.length ? [CATEGORY_ALL, ...mapped] : []
   })

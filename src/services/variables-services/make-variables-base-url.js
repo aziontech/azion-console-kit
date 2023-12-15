@@ -1,3 +1,4 @@
 export const makeVariablesBaseUrl = () => {
-  return `variables`
+  const version = 'v3'
+  return `${version}/variables`
 }

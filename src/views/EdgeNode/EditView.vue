@@ -15,7 +15,7 @@
 
   const validationSchema = yup.object({
     name: yup.string().required().label('Name'),
-    hashId: yup.string().required().label('HashID'),
+    hashId: yup.string().required().label('Hash ID'),
     groups: yup.array().label('Groups')
   })
 </script>

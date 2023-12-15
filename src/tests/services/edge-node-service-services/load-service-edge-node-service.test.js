@@ -35,11 +35,11 @@ describe('EdgeNodeServices', () => {
       body: {}
     })
     const { sut } = makeSut()
-
+    const version = 'v3'
     await sut(fixtures.mockIds)
 
     expect(requestSpy).toHaveBeenCalledWith({
-      url: `edge_node/${fixtures.mockIds.edgeNodeId}/services/${fixtures.mockIds.id}`,
+      url: `${version}/edge_nodes/${fixtures.mockIds.edgeNodeId}/services/${fixtures.mockIds.id}`,
       method: 'GET'
     })
   })

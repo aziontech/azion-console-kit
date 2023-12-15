@@ -7,7 +7,7 @@
           :closable="false"
           :pt="{
             root: { class: 'mx-3 mt-4 sm:mx-8' },
-            wrapper: { class: 'py-3 px-3 items-start sm:items-center sm:px-8' }
+            wrapper: { class: 'py-3 px-3 items-start sm:items-center' }
           }"
         >
           <template #messageicon>
@@ -18,11 +18,11 @@
           </template>
           <p class="text-color-secondary">
             <b class="text-color">Ongoing Experiment.</b>
-            Our platform is in its early release stage. Please bear with us as occasional
-            instability or bugs may occur during this time. If you encounter any issue,
+            Our platform is in its early release stage. Expect occasional instability or bugs during
+            this time.
             <ButtonPrime
               class="p-0"
-              label="let us know"
+              label="Report an issue"
               icon="pi pi-external-link"
               iconPos="right"
               link

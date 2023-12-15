@@ -1,3 +1,4 @@
 export const makeEdgeFunctionsBaseUrl = () => {
-  return `edge_functions`
+  const version = 'v3'
+  return `${version}/edge_functions`
 }

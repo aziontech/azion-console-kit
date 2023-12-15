@@ -12,7 +12,8 @@ const makeSut = () => {
 describe('DigitalCertificatesServices', () => {
   it('should return the API base url to digital certificates service', () => {
     const { sut } = makeSut()
-    const correctApiUrl = 'digital_certificates'
+    const version = 'v3'
+    const correctApiUrl = `${version}/digital_certificates`
 
     const baseUrl = sut()
 

@@ -12,7 +12,8 @@ const makeSut = () => {
 describe('DomainsServices', () => {
   it('should return the API base url to domains service', () => {
     const { sut } = makeSut()
-    const correctApiUrl = 'domains'
+    const version = 'v3'
+    const correctApiUrl = `${version}/domains`
 
     const baseUrl = sut()
 

@@ -36,11 +36,11 @@ describe('DomainsServices', () => {
       body: { results: [] }
     })
     const { sut } = makeSut()
-
+    const version = 'v3'
     await sut({})
 
     expect(requestSpy).toHaveBeenCalledWith({
-      url: `domains?order_by=name&sort=asc&page=1&page_size=200`,
+      url: `${version}/domains?order_by=name&sort=asc&page=1&page_size=200`,
       method: 'GET'
     })
   })
