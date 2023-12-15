@@ -61,5 +61,28 @@ export default {
   },
   plugins: [
     typography,
-  ]
-}
+    function ({ addUtilities }) {
+     
+      // Create a new plugin for modal-large-block
+      const modalLargeBlock = {}; 
+
+      // Defining styles for the modal-large-block
+      modalLargeBlock['.modal-large-block'] = {
+        margin: '0 12px', // Example: marginLeft: 'md:mx-8 mx-3',
+        maxWidth: '880px', // Example: maxWidth: 'max-w-[1280px]',
+        height: '640px' // Example: height: 'h-[640px]',
+      };
+        modalLargeBlock['@media (min-width: 768px)'] = {
+          '.modal-large-block': {
+            margin: '0 32px', // Example: marginLeft: 'md:mx-8 mx-3',
+            maxWidth: '1280px', // Example: maxWidth: 'max-w-[1280px]',
+          },
+      },
+
+      // Adding the new utilities for modal-large-block
+      addUtilities(modalLargeBlock, ['responsive']);
+
+    },
+  ],
+};
+
