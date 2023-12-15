@@ -124,7 +124,7 @@
                 <span
                   class="h-10 pb-4 text-sm font-normal text-color-secondary mt-1.5 line-clamp-2"
                 >
-                  A description lorem ipsum dolor sit amet, consectetur adipiscing elit
+                  Select this card to start creating a new resource.
                 </span>
               </div>
             </div>

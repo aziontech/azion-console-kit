@@ -21,7 +21,7 @@
                       class="text-primary text-xl whitespace-nowrap font-medium"
                       v-if="isUnfinished"
                     >
-                      Project is being deployed
+                      Project is being created
                     </span>
 
                     <span
@@ -34,7 +34,7 @@
                       class="text-primary text-xl font-medium whitespace-nowrap"
                       v-else-if="deployFailed"
                     >
-                      Deploy failed
+                      Creation failed
                     </span>
                   </div>
                   <div class="flex w-full justify-between flex-col-reverse gap-4 md:flex-row">
@@ -163,16 +163,16 @@
   const intervalRef = ref()
   const deployFailed = ref(false)
   const failMessage =
-    'We encountered an issue while deploying your Edge Application. For more details, please refer to the deploy log.'
+    'There was an issue while creating the edge application. Check the Deploy Log for more details.'
   const nextSteps = ref([
     {
       title: 'Customize Domain',
-      description: 'Manage your Domain settings.',
+      description: 'Associate a custom domain and subdomains to Azion to handle user access.',
       handle: () => goToDomainEditView()
     },
     {
       title: 'Point Traffic',
-      description: 'See Point Traffic docs.',
+      description: 'Redirect the traffic of a domain to Azion and take advantage of the distributed network.',
       handle: () => goToPointTraffic()
     },
     {
@@ -190,14 +190,14 @@
         closable: true,
         severity: 'success',
         summary: 'Created successfully',
-        detail: 'The project was deployed successfully'
+        detail: 'The edge application is being propagated through the edge nodes. This process will take a few minutes.'
       })
     } catch (error) {
       deployFailed.value = true
       toast.add({
         closable: true,
         severity: 'error',
-        summary: 'Deploy failed',
+        summary: 'Creation failed',
         detail: failMessage
       })
     }
