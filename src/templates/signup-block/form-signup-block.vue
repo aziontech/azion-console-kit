@@ -120,7 +120,7 @@
   })
 
   const passwordRequirementsList = ref([
-    { label: '7 characters', valid: false },
+    { label: '8 characters', valid: false },
     { label: '1 uppercase letter', valid: false },
     { label: '1 lowercase letter', valid: false },
     { label: '1 special character (Example: !?<>@#$%)', valid: false }
@@ -129,24 +129,24 @@
   const validationSchema = yup.object({
     name: yup
       .string()
-      .max(61, 'Exceeded number of characters')
-      .test('invalidChars', 'Name contains invalid characters', (value) => {
+      .max(61, 'Exceeded number of characters.')
+      .test('invalidChars', 'Full Name contains invalid characters.', (value) => {
         return !value?.match(/[><:/\\"&@]/g)
       })
-      .test('invalidContent', 'Name contains invalid content (URL)', (value) => {
+      .test('invalidContent', 'Full Name contains invalid content.', (value) => {
         return !value?.match(/[a-z\d_-]+\.[a-z\d_-]+/gi)
       })
-      .required('Full name is a required field'),
+      .required('Full name is a required field.'),
     email: yup
       .string()
-      .max(254, 'Exceeded number of characters')
-      .email('Enter a valid email')
-      .required('Email is a required field'),
+      .max(254, 'Exceeded number of characters.')
+      .email('Enter a valid email.')
+      .required('Email is a required field.'),
     password: yup
       .string()
-      .required('Password is a required field')
-      .test('max', 'Exceeded number of characters', (value) => value?.length <= 128)
-      .test('noSpaces', 'Spaces not allowed', (value) => !value?.match(/\s/g))
+      .required('Password is a required field.')
+      .test('max', 'Exceeded number of characters.', (value) => value?.length <= 128)
+      .test('noSpaces', 'Spaces not allowed.', (value) => !value?.match(/\s/g))
       .test('requirements', '', (value) => {
         const hasUpperCase = value && /[A-Z]/.test(value)
         const hasLowerCase = value && /[a-z]/.test(value)
