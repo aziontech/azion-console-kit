@@ -127,7 +127,7 @@
           placeholder="Company"
         />
         <small class="text-color-secondary text-xs font-normal leading-tight">
-          The name of the account.
+          Name of the account.
         </small>
         <small
           v-if="accountNameError"
@@ -155,8 +155,7 @@
           />
         </span>
         <small class="text-color-secondary text-xs font-normal leading-tight">
-          The ID of the associated account. Cannot be changed. Use this value to open support
-          tickets for issues related to the account.
+          ID of the associated account. Can't be changed. Use this value to open support tickets for issues related to the account.
         </small>
       </div>
     </template>
@@ -181,7 +180,7 @@
           placeholder="Company S.A."
         />
         <small class="text-color-secondary text-xs font-normal leading-tight">
-          The name of the company associated with the account.
+          Name of the company associated with the account.
         </small>
       </div>
       <div class="flex flex-col w-full gap-2 sm:max-w-lg">
@@ -216,8 +215,7 @@
           placeholder="example@email.com;holder@email.com"
         />
         <small class="text-color-secondary text-sm font-normal leading-tight">
-          Billing information will be forwarded to all emails listed in this field. Separate each
-          email address with a semicolon (<code>;</code>).
+          Billing information will be forwarded to all emails listed in this field. Separate each email address with a semicolon (<code>;</code>).
         </small>
       </div>
     </template>
@@ -342,7 +340,7 @@
             for="address"
             class="text-color text-base font-medium"
           >
-            Address *
+            Address Line 1 *
           </label>
           <InputText
             v-model="address"
@@ -352,7 +350,7 @@
             placeholder="123 Example Ave."
           />
           <small class="text-color-secondary text-sm font-normal leading-tight">
-            Street address of the account owner.
+            Line 1 of the address of the account owner.
           </small>
           <small
             v-if="addressError"
@@ -366,7 +364,7 @@
             for="complement"
             class="text-color text-base font-medium"
           >
-            Apartment, suite, etc.
+            Address Line 2
           </label>
           <InputText
             v-model="complement"
@@ -375,7 +373,7 @@
             placeholder="1st floor"
           />
           <small class="text-color-secondary text-sm font-normal leading-tight">
-            Additional address information.
+            Line 2 of the address of the account owner.
           </small>
         </div>
       </div>
@@ -402,8 +400,8 @@
           </div>
           <div class="flex-col gap-1 pl-10">
             <p class="text-color-secondary text-sm font-normal">
-              When enabled, users linked to the account can login to RTM using their social network
-              credentials.
+              When enabled, users linked to the account can login to RTM using their social
+              network credentials.
             </p>
           </div>
         </div>
