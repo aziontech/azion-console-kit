@@ -196,7 +196,10 @@
     companyName: yup.string().when('projectTypeSelection', {
       is: typeToEnableCompanyFields,
       then: () =>
-        yup.string().max(50, 'Exceeded number of characters').required('Company Name is a required field.')
+        yup
+          .string()
+          .max(50, 'Exceeded number of characters')
+          .required('Company Name is a required field.')
     }),
     companySize: yup.string().when('projectTypeSelection', {
       is: typeToEnableCompanyFields,
