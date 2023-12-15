@@ -172,7 +172,8 @@
     },
     {
       title: 'Point Traffic',
-      description: 'Redirect the traffic of a domain to Azion and take advantage of the distributed network.',
+      description:
+        'Redirect the traffic of a domain to Azion and take advantage of the distributed network.',
       handle: () => goToPointTraffic()
     },
     {
@@ -190,7 +191,8 @@
         closable: true,
         severity: 'success',
         summary: 'Created successfully',
-        detail: 'The edge application is being propagated through the edge nodes. This process will take a few minutes.'
+        detail:
+          'The edge application is being propagated through the edge nodes. This process will take a few minutes.'
       })
     } catch (error) {
       deployFailed.value = true
