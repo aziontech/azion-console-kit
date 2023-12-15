@@ -7,6 +7,7 @@ const fixtures = {
   edgeApplicationMock: {
     name: 'Edge Application',
     deliveryProtocol: 'http',
+    http3: false,
     httpPort: { value: { value: 80 } },
     httpsPort: { value: 443 },
     minimumTlsVersion: { value: 'TLS 1.2' },
@@ -41,11 +42,11 @@ describe('EdgeApplicationServices', () => {
       }
     })
     const { sut } = makeSut()
-  
+
     await sut(fixtures.edgeApplicationMock)
-  
+
     expect(requestSpy).toHaveBeenCalledWith({
-      url: `edge_applications`,
+      url: `v3/edge_applications`,
       method: 'POST',
       body: {
         name: fixtures.edgeApplicationMock.name,
@@ -59,7 +60,8 @@ describe('EdgeApplicationServices', () => {
         origin_protocol_policy: fixtures.edgeApplicationMock.originProtocolPolicy,
         host_header: fixtures.edgeApplicationMock.hostHeader,
         browser_cache_settings: fixtures.edgeApplicationMock.browserCacheSettings,
-        browser_cache_settings_maximum_ttl: fixtures.edgeApplicationMock.browserCacheSettingsMaximumTtl,
+        browser_cache_settings_maximum_ttl:
+          fixtures.edgeApplicationMock.browserCacheSettingsMaximumTtl,
         cdn_cache_settings: fixtures.edgeApplicationMock.cdnCacheSettings,
         cdn_cache_settings_maximum_ttl: fixtures.edgeApplicationMock.cdnCacheSettingsMaximumTtl,
         active: fixtures.edgeApplicationMock.active

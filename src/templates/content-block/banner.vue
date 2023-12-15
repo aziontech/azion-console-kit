@@ -18,7 +18,8 @@
           </template>
           <p class="text-color-secondary">
             <b class="text-color">Ongoing Experiment.</b>
-            Our platform is in its early release stage. Expect occasional instability or bugs during this time.
+            Our platform is in its early release stage. Expect occasional instability or bugs during
+            this time.
             <ButtonPrime
               class="p-0"
               label="Report an issue"

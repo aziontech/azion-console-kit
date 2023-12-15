@@ -67,6 +67,6 @@
     browserCacheSettingsMaximumTtl: '',
     cdnCacheSettings: 'honor',
     cdnCacheSettingsMaximumTtl: 60,
-    active: false,
+    active: false
   })
 </script>

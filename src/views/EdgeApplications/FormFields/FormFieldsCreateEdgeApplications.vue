@@ -1,78 +1,78 @@
 <script setup>
-import InputText from 'primevue/inputtext'
-import InputNumber from 'primevue/inputnumber'
-import RadioButton from 'primevue/radiobutton'
-import Dropdown from 'primevue/dropdown'
-import InputSwitch from 'primevue/inputswitch'
-import Card from 'primevue/card'
-import FormHorizontal from '@/templates/create-form-block/form-horizontal'
-import { computed } from 'vue'
-import { useField } from 'vee-validate'
+  import InputText from 'primevue/inputtext'
+  import InputNumber from 'primevue/inputnumber'
+  import RadioButton from 'primevue/radiobutton'
+  import Dropdown from 'primevue/dropdown'
+  import InputSwitch from 'primevue/inputswitch'
+  import Card from 'primevue/card'
+  import FormHorizontal from '@/templates/create-form-block/form-horizontal'
+  import { computed } from 'vue'
+  import { useField } from 'vee-validate'
 
-const HTTP_PORT_LIST_OPTIONS = [
-  { label: '80 (Default)', value: '80' },
-  { label: '8008', value: '8008' },
-  { label: '8080', value: '8080' }
-]
-const HTTPS_PORT_LIST_OPTIONS = [
-  { label: '443 (Default)', value: '443' },
-  { label: '8443', value: '8443' },
-  { label: '9440', value: '9440' },
-  { label: '9441', value: '9441' },
-  { label: '9442', value: '9442' },
-  { label: '9443', value: '9443' }
-]
-const TLS_VERSIONS_OPTIONS = [
-  { label: 'None', value: '' },
-  { label: 'TLS 1.0', value: 'tls_1_0' },
-  { label: 'TLS 1.1', value: 'tls_1_1' },
-  { label: 'TLS 1.2', value: 'tls_1_2' },
-  { label: 'TLS 1.3', value: 'tls_1_3' }
-]
-const SUPPORTED_LIST_OPTIONS = [
-  { label: 'All', value: 'all' },
-  { label: 'TLSv1.2_2018', value: '2018' },
-  { label: 'TLSv1.2_2019', value: '2019' },
-  { label: 'TLSv1.2_2021', value: '2021' },
-  { label: 'TLSv1.3_2022', value: '2022' }
-]
-const ORIGIN_TYPE_LIST_OPTIONS = [{ label: 'Single Origin', value: 'single_origin' }]
+  const HTTP_PORT_LIST_OPTIONS = [
+    { label: '80 (Default)', value: '80' },
+    { label: '8008', value: '8008' },
+    { label: '8080', value: '8080' }
+  ]
+  const HTTPS_PORT_LIST_OPTIONS = [
+    { label: '443 (Default)', value: '443' },
+    { label: '8443', value: '8443' },
+    { label: '9440', value: '9440' },
+    { label: '9441', value: '9441' },
+    { label: '9442', value: '9442' },
+    { label: '9443', value: '9443' }
+  ]
+  const TLS_VERSIONS_OPTIONS = [
+    { label: 'None', value: '' },
+    { label: 'TLS 1.0', value: 'tls_1_0' },
+    { label: 'TLS 1.1', value: 'tls_1_1' },
+    { label: 'TLS 1.2', value: 'tls_1_2' },
+    { label: 'TLS 1.3', value: 'tls_1_3' }
+  ]
+  const SUPPORTED_LIST_OPTIONS = [
+    { label: 'All', value: 'all' },
+    { label: 'TLSv1.2_2018', value: '2018' },
+    { label: 'TLSv1.2_2019', value: '2019' },
+    { label: 'TLSv1.2_2021', value: '2021' },
+    { label: 'TLSv1.3_2022', value: '2022' }
+  ]
+  const ORIGIN_TYPE_LIST_OPTIONS = [{ label: 'Single Origin', value: 'single_origin' }]
 
-const { value: deliveryProtocol } = useField('deliveryProtocol')
-const { value: http3 } = useField('http3')
-const { value: httpPort } = useField('httpPort')
-const { value: httpsPort } = useField('httpsPort')
-const { value: minimumTlsVersion } = useField('minimumTlsVersion')
-const { value: supportedVersion } = useField('supportedVersion')
-const { value: originType } = useField('originType')
-const { value: cdnCacheSettings } = useField('cdnCacheSettings')
-const { value: browserCacheSettings } = useField('browserCacheSettings')
-const { value: originProtocolPolicy } = useField('originProtocolPolicy')
-const { value: active } = useField('active')
+  const { value: deliveryProtocol } = useField('deliveryProtocol')
+  const { value: http3 } = useField('http3')
+  const { value: httpPort } = useField('httpPort')
+  const { value: httpsPort } = useField('httpsPort')
+  const { value: minimumTlsVersion } = useField('minimumTlsVersion')
+  const { value: supportedVersion } = useField('supportedVersion')
+  const { value: originType } = useField('originType')
+  const { value: cdnCacheSettings } = useField('cdnCacheSettings')
+  const { value: browserCacheSettings } = useField('browserCacheSettings')
+  const { value: originProtocolPolicy } = useField('originProtocolPolicy')
+  const { value: active } = useField('active')
 
-const { value: name, errorMessage: nameError } = useField('name')
-const { value: address, errorMessage: addressError } = useField('address')
-const { value: hostHeader, errorMessage: hostHeaderError } = useField('hostHeader')
-const { value: browserCacheSettingsMaximumTtl } = useField('browserCacheSettingsMaximumTtl')
-const { value: cdnCacheSettingsMaximumTtl } = useField('cdnCacheSettingsMaximumTtl')
+  const { value: name, errorMessage: nameError } = useField('name')
+  const { value: address, errorMessage: addressError } = useField('address')
+  const { value: hostHeader, errorMessage: hostHeaderError } = useField('hostHeader')
+  const { value: browserCacheSettingsMaximumTtl } = useField('browserCacheSettingsMaximumTtl')
+  const { value: cdnCacheSettingsMaximumTtl } = useField('cdnCacheSettingsMaximumTtl')
 
-const setDeliveryProtocol = (protocol, enableHttp3) => {
-  deliveryProtocol.value = protocol
-  http3.value = enableHttp3
-  setDefaultHttpAndHttpsPort(enableHttp3)
-}
-
-const setDefaultHttpAndHttpsPort = (enableHttp3) => {
-  if (enableHttp3) {
-    httpPort.value = { label: '80 (Default)', value: '80' }
-    httpsPort.value = { label: '443 (Default)', value: '443' }
+  const setDeliveryProtocol = (protocol, enableHttp3) => {
+    deliveryProtocol.value = protocol
+    http3.value = enableHttp3
+    setDefaultHttpAndHttpsPort(enableHttp3)
   }
-}
 
-const isHttpProtocol = computed(() => deliveryProtocol.value === 'http')
-const isHttpsProtocol = computed(() => deliveryProtocol.value === 'http,https' && !http3.value)
-const isHttp3Protocol = computed(() => deliveryProtocol.value === 'http,https' && http3.value)
-const isCacheTypeHonor = computed(() => browserCacheSettings.value === 'honor')
+  const setDefaultHttpAndHttpsPort = (enableHttp3) => {
+    if (enableHttp3) {
+      httpPort.value = { label: '80 (Default)', value: '80' }
+      httpsPort.value = { label: '443 (Default)', value: '443' }
+    }
+  }
+
+  const isHttpProtocol = computed(() => deliveryProtocol.value === 'http')
+  const isHttpsProtocol = computed(() => deliveryProtocol.value === 'http,https' && !http3.value)
+  const isHttp3Protocol = computed(() => deliveryProtocol.value === 'http,https' && http3.value)
+  const isCacheTypeHonor = computed(() => browserCacheSettings.value === 'honor')
 </script>
 
 <template>
@@ -246,7 +246,10 @@ const isCacheTypeHonor = computed(() => browserCacheSettings.value === 'honor')
         </div>
       </div>
 
-      <div class="flex gap-6" v-if="isHttpsProtocol || isHttp3Protocol">
+      <div
+        class="flex gap-6"
+        v-if="isHttpsProtocol || isHttp3Protocol"
+      >
         <div class="flex flex-col w-full sm:max-w-xs gap-2">
           <label
             for="tls-version"

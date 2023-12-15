@@ -3,7 +3,6 @@ import * as Errors from '@services/axios/errors'
 import { listRealTimePurgeService } from '@/services/real-time-purge'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import graphQLApi from '../../../services/axios/makeEventsApi'
-import { localeMock } from '@/tests/utils/localeMock'
 
 const localeMock = (locale = 'en') => {
   const DateTimeFormat = Intl.DateTimeFormat
