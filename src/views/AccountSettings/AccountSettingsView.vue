@@ -39,7 +39,7 @@
     country: yup.string().required().label('Country'),
     region: yup.string().required().label('State/Region'),
     city: yup.string().required().label('City'),
-    address: yup.string().required().label('Address Line 1'),
+    address: yup.string().required().label('Address'),
     complement: yup.string(),
     isSocialLoginEnabled: yup.boolean(),
     isEnabledMfaToAllUsers: yup.boolean()
