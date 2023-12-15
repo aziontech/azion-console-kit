@@ -6,15 +6,15 @@
       class="card surface-border border rounded-md surface-section p-8 flex flex-col gap-8 max-w-md"
     >
       <section class="w-full flex flex-col gap-3">
-        <h2 class="text-start text-xl font-medium">Check your e-mail to activate your account</h2>
+        <h2 class="text-start text-xl font-medium">Check your inbox</h2>
         <p class="text-start text-color-secondary">
-          Verify your account by clicking the link in the confirmation email we just sent you.
+          We've sent you an email with instructions to verify your account. Check your inbox or spam folder and follow the instructions.
         </p>
       </section>
       <section class="w-full flex flex-wrap gap-2">
         <p class="text-start">Didn't receive the email?</p>
         <PrimeButton
-          label="Resend email"
+          label="Resend Email"
           class="p-0"
           link
           @click="resendEmail"
@@ -27,7 +27,7 @@
         />
       </section>
       <PrimeButton
-        label="Return to our website"
+        label="Return to Sign Up"
         @click="goToLogin"
         severity="secondary"
       />
@@ -68,16 +68,16 @@
   const decodedEmail = decodeURIComponent(email)
   const isEmailValid = ref(validateEmail(decodedEmail))
   if (!isEmailValid.value) {
-    toast.add({ life: 5000, severity: 'error', detail: 'Invalid email format', summary: 'Error' })
+    toast.add({ life: 5000, severity: 'error', detail: 'Use a valid email format.', summary: 'Error' })
   }
 
   const resendEmail = async () => {
     disableSubmitByTimer(SUBMIT_TIMER)
     try {
       const res = await props.resendEmailService({ email: decodedEmail })
-      toast.add({ life: 5000, severity: 'success', detail: res, summary: 'Email sent' })
+      toast.add({ life: 5000, severity: 'success', detail: res, summary: 'Email sent!' })
     } catch (err) {
-      toast.add({ life: 5000, severity: 'error', detail: err, summary: 'Error' })
+      toast.add({ life: 5000, severity: 'error', detail: err, summary: 'Error sending the email' })
     }
   }
 
