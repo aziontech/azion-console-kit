@@ -127,7 +127,7 @@
           placeholder="Company"
         />
         <small class="text-color-secondary text-xs font-normal leading-tight">
-          The name of the account.
+          Name of the account.
         </small>
         <small
           v-if="accountNameError"
@@ -155,7 +155,7 @@
           />
         </span>
         <small class="text-color-secondary text-xs font-normal leading-tight">
-          The ID of the associated account. Cannot be changed. Use this value to open support tickets for issues related to the account.
+          ID of the associated account. Can't be changed. Use this value to open support tickets for issues related to the account.
         </small>
       </div>
     </template>
@@ -180,7 +180,7 @@
           placeholder="Company S.A."
         />
         <small class="text-color-secondary text-xs font-normal leading-tight">
-          The name of the company associated with the account.
+          Name of the company associated with the account.
         </small>
       </div>
       <div class="flex flex-col w-full gap-2 sm:max-w-lg">
