@@ -1,6 +1,7 @@
 import * as MarketplaceService from '@/services/marketplace-services'
 import * as TemplateEngineService from '@/services/template-engine-services'
 import * as ScriptRunnerService from '@/services/script-runner-service'
+import * as EdgeApplicationService from '@/services/edge-application-services'
 import { windowOpen } from '@/helpers/window-open'
 
 /** @type {import('vue-router').RouteRecordRaw} */
@@ -29,7 +30,8 @@ export const marketplaceRoutes = {
         windowOpen,
         getTemplateService: TemplateEngineService.getTemplate,
         instantiateTemplateService: TemplateEngineService.instantiateTemplate,
-        checkStatusScriptRunnerService: ScriptRunnerService.checkStatusScriptRunnerService
+        checkStatusScriptRunnerService: ScriptRunnerService.checkStatusScriptRunnerService,
+        createEdgeApplicationService: EdgeApplicationService.createEdgeApplicationService
       },
       meta: {
         breadCrumbs: [

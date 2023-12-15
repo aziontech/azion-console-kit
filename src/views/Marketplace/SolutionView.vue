@@ -143,7 +143,10 @@
         @fail="handleIntegrationFail"
         @loading="handleLoading"
       />
-      <CreateEdgeApplication v-model:visible="showCreateEdgeApp" />
+      <CreateEdgeApplication
+        v-model:visible="showCreateEdgeApp"
+        :createEdgeApplicationService="props.createEdgeApplicationService"
+      />
     </template>
   </ContentBlock>
 </template>
@@ -205,6 +208,10 @@
       required: true
     },
     checkStatusScriptRunnerService: {
+      type: Function,
+      required: true
+    },
+    createEdgeApplicationService: {
       type: Function,
       required: true
     }
