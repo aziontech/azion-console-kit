@@ -8,7 +8,7 @@
       @paste="handlePaste"
     >
       <div
-        class="surface-card surface-border border max-w-md w-full p-6 md:p-10 rounded-md flex-col gap-10 inline-flex"
+        class="surface-card surface-border border max-w-md w-full p-6 md:p-8 rounded-md flex-col gap-8 inline-flex"
       >
         <div class="flex flex-col gap-3">
           <div class="text-xl font-medium">Multi-Factor Authentication</div>

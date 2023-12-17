@@ -161,7 +161,7 @@
       <Sidebar
         v-model:visible="showDetails"
         position="bottom"
-        headerContent="Create something new"
+        headerContent="Create"
         :show-close-icon="true"
         :pt="{
           root: { class: 'h-[80%] flex p-0 sm:hidden' },

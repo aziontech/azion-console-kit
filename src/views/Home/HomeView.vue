@@ -136,7 +136,7 @@
             @click="closeInviteSession"
           />
           <div class="flex flex-col gap-2">
-            <div class="text-lg sm:text-xl font-medium">Invite the Team</div>
+            <div class="text-lg sm:text-xl font-medium">Invite your Team</div>
             <div class="text-xs sm:text-sm text-color-secondary">
               All Azion plans include unlimited team seats. Invite colleagues to start building
               together.

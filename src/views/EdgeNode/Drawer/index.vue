@@ -35,9 +35,10 @@
   const listService = ref([])
   const showEditServiceDrawer = ref(false)
   const showCreateServiceDrawer = ref(false)
-  const debouncedDrawerEdit = 300
+  const debouncedDrawerAnimate = 300
   const selectedServiceToEdit = ref('0')
-  const loadEditServiceDrawer = refDebounced(showEditServiceDrawer, debouncedDrawerEdit)
+  const loadCreateServiceDrawer = refDebounced(showCreateServiceDrawer, debouncedDrawerAnimate)
+  const loadEditServiceDrawer = refDebounced(showEditServiceDrawer, debouncedDrawerAnimate)
 
   const initialValues = {
     service: {},
@@ -106,6 +107,7 @@
 
 <template>
   <CreateDrawerBlock
+    v-if="loadCreateServiceDrawer"
     v-model:visible="showCreateServiceDrawer"
     :createService="createServiceEdgeNodeService"
     :schema="validationSchema"

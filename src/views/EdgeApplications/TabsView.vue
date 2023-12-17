@@ -7,14 +7,14 @@
   import { ref } from 'vue'
   import EdgeApplicationsOriginsListView from '@/views/EdgeApplicationsOrigins/ListView'
   import EdgeApplicationsDeviceGroupsListView from '@/views/EdgeApplicationsDeviceGroups/ListView.vue'
-  import EditView from '@/views/EdgeApplications/EditView'
 
   defineOptions({ name: 'tabs-edge-service' })
 
   const props = defineProps({
-    serviceEdgeApplication: { type: Object, required: true },
-    serviceOrigins: { type: Object, required: true },
-    serviceDeviceGroups: { type: Object, required: true }
+    edgeApplicationServices: { type: Object, required: true },
+    originsServices: { type: Object, required: true },
+    clipboardWrite: { type: Function, required: true },
+    deviceGroupsServices: { type: Object, required: true }
   })
 
   const mapTabs = {
@@ -71,20 +71,20 @@
         @tab-click="changeRouteByClickingOnTab"
         class="w-full h-full"
       >
-        <TabPanel header="Main Settings">
-          <EditView />
-        </TabPanel>
+        <TabPanel header="Main Settings"> </TabPanel>
         <TabPanel header="Origins">
           <EdgeApplicationsOriginsListView
+            v-if="activeTab === mapTabs.origins"
             :edgeApplicationId="edgeApplicationId"
-            v-bind="props.serviceOrigins"
+            v-bind="props.originsServices"
+            :clipboardWrite="props.clipboardWrite"
           />
         </TabPanel>
 
         <TabPanel header="Device Groups">
           <EdgeApplicationsDeviceGroupsListView
             :edgeApplicationId="edgeApplicationId"
-            v-bind="props.serviceDeviceGroups"
+            v-bind="props.deviceGroupsServices"
           >
           </EdgeApplicationsDeviceGroupsListView>
         </TabPanel>

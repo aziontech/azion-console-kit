@@ -1,6 +1,6 @@
 <template>
   <form
-    class="w-full flex flex-col gap-6"
+    class="w-full flex flex-col gap-8"
     @submit.prevent="submitForm"
   >
     <div class="flex flex-col gap-2">
@@ -28,7 +28,7 @@
         </template>
       </div>
       <label class="font-semibold text-sm">What would you like to build with Azion?</label>
-      <div class="flex flex-wrap gap-3 mb-8">
+      <div class="flex flex-wrap gap-3">
         <template v-if="!jobFunctionList.length">
           <PrimeSkeleton
             class="w-full h-14"
@@ -60,9 +60,9 @@
         />
         <div v-else>
           <label class="font-semibold text-sm gap-2 flex flex-col"
-            >Company name
+            >Company Name
             <PrimeInputText
-              placeholder="Company Name"
+              placeholder="My company"
               v-model="companyName"
               type="text"
             />
@@ -82,7 +82,7 @@
           class="animate-fadeIn"
         >
           <label class="font-semibold text-sm gap-2 flex flex-col"
-            >Company size
+            >Company Size
             <PrimeDropdown
               placeholder="Select an option"
               v-model="companySize"
@@ -196,15 +196,18 @@
     companyName: yup.string().when('projectTypeSelection', {
       is: typeToEnableCompanyFields,
       then: () =>
-        yup.string().max(50, 'Exceeded number of characters').required('Company name is required')
+        yup
+          .string()
+          .max(50, 'Exceeded number of characters')
+          .required('Company Name is a required field.')
     }),
     companySize: yup.string().when('projectTypeSelection', {
       is: typeToEnableCompanyFields,
-      then: () => yup.string().required('Company size is required')
+      then: () => yup.string().required('Company Size is a required field.')
     }),
     country: yup.string().when('projectTypeSelection', {
       is: typeToEnableCompanyFields,
-      then: () => yup.string().required('Country is required')
+      then: () => yup.string().required('Country is a required field.')
     })
   })
 

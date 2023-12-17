@@ -16,7 +16,7 @@ const adapt = (payload) => {
   return {
     name: payload.name,
     delivery_protocol: payload.deliveryProtocol,
-    http3: false,
+    http3: payload.http3,
     http_port: payload.httpPort.value.value,
     https_port: payload.httpsPort.value,
     minimum_tls_version: payload.minimumTlsVersion.value,
@@ -29,7 +29,8 @@ const adapt = (payload) => {
       ? payload.browserCacheSettingsMaximumTtl
       : 0,
     cdn_cache_settings: payload.cdnCacheSettings,
-    cdn_cache_settings_maximum_ttl: payload.cdnCacheSettingsMaximumTtl
+    cdn_cache_settings_maximum_ttl: payload.cdnCacheSettingsMaximumTtl,
+    active: payload.active
   }
 }
 

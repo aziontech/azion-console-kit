@@ -21,13 +21,13 @@
           class="text-base font-medium mt-5 mb-3"
           v-if="showResource"
         >
-          Choose a resource
+          Select a Resource
         </div>
         <div
           class="text-base font-medium mt-5 mb-3"
           v-else
         >
-          Choose a template
+          Select a Template
         </div>
       </div>
 
@@ -124,7 +124,7 @@
                 <span
                   class="h-10 pb-4 text-sm font-normal text-color-secondary mt-1.5 line-clamp-2"
                 >
-                  Brief description lorem ipsum dolor sit amet, consectetur adipiscing elit
+                  Select this card to start creating a new resource.
                 </span>
               </div>
             </div>
@@ -222,11 +222,11 @@
             value: 'recommended'
           },
           {
-            label: 'Browse Templates',
+            label: 'Templates',
             value: 'browse'
           },
           {
-            label: 'New Resource',
+            label: 'Resources',
             value: 'new_resource'
           }
         ]
