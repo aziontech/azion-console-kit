@@ -86,7 +86,6 @@
             :edgeApplicationId="edgeApplicationId"
             v-bind="props.serviceDeviceGroups"
           >
-
           </EdgeApplicationsDeviceGroupsListView>
         </TabPanel>
         <TabPanel header="Error Responses"> </TabPanel>

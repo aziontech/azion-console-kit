@@ -18,11 +18,10 @@
     deleteDeviceGroupsService: {
       required: true,
       type: Function
-    },
+    }
   })
 
   const hasContentToList = ref(true)
-
 
   const getColumns = computed(() => {
     return [
@@ -33,7 +32,7 @@
       {
         field: 'userAgent',
         header: 'User Agent'
-      },
+      }
     ]
   })
 
@@ -48,7 +47,6 @@
   const deleteDeviceGroupsWithDecorator = async (originKey) => {
     return await props.deleteDeviceGroupsService(originKey, props.edgeApplicationId)
   }
-
 </script>
 
 <template>

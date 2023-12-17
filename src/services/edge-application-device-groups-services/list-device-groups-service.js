@@ -19,7 +19,6 @@ export const listDeviceGroupsService = async ({
 }
 
 const adapt = (httpResponse) => {
-
   const parsedOrigin = httpResponse.body.results?.map((element) => {
     return {
       id: element.id,
@@ -33,8 +32,6 @@ const adapt = (httpResponse) => {
     statusCode: httpResponse.statusCode
   }
 }
-
-
 
 const makeSearchParams = ({ orderBy, sort, page, pageSize }) => {
   const searchParams = new URLSearchParams()

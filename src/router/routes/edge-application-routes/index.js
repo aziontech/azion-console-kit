@@ -66,7 +66,7 @@ export const edgeApplicationRoutes = {
         },
         serviceDeviceGroups: {
           listDeviceGroupsService: DeviceGroupsService.listDeviceGroupsService,
-          deleteDeviceGroupsService: DeviceGroupsService.deleteDeviceGroupsService  
+          deleteDeviceGroupsService: DeviceGroupsService.deleteDeviceGroupsService
         }
       },
       meta: {
