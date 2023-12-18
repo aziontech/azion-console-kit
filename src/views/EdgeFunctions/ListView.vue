@@ -1,7 +1,7 @@
 <template>
   <ContentBlock>
     <template #heading>
-      <PageHeadingBlock :pageTitle="props.pageTitle" />
+      <PageHeadingBlock pageTitle="Edge Functions" />
     </template>
     <template #content>
       <ListTableBlock

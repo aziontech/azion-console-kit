@@ -40,7 +40,7 @@ const adapt = (httpResponse) => {
       id: func.id,
       edgeFunctionId: func.edge_function_id,
       name: parseName(func),
-      args: func.args,
+      args: func.args
     }
   })
 

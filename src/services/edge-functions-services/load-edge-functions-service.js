@@ -24,10 +24,8 @@ const adapt = (httpResponse) => {
     name: body.name,
     code: body.code,
     version: body.version || '-',
-    modified: new Intl.DateTimeFormat('us', { dateStyle: 'full' }).format(
-      new Date(body.modified)
-    ),
-    status: body.active,
+    modified: new Intl.DateTimeFormat('us', { dateStyle: 'full' }).format(new Date(body.modified)),
+    status: body.active
   }
 
   return {
