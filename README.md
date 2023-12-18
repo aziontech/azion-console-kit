@@ -1,79 +1,96 @@
-# Azion Console Kit
+<h1 align="center">
+  Azion Console Kit 💻🚀🧡
+</h1>
+<p align="center">
 
-## Introduction
+## Introduction 📖
 
-The Azion Console Kit is a front-end development kit made in Vue/Vite with the PrimeVue and Tailwind framework that allows you to run customized Azion Realtime Manager.
+Azion Console Kit is a front-end development kit made in Vue/Vite with the PrimeVue and Tailwind framework that allows you to run a customized [Azion Console](https://console.azion.com/) UI.
 
-## Getting Started
+This project is part of Azion, an edge computing platform that allows you to build and run applications anywhere. You'll find our products and services on it. 🚀
 
-Let’s test drive it in under 5 minutes.
+## Getting Started 🔛
 
-We suggest using `yarn` and `node 18.*` via the instructions below, but if you don't like running things on your machine you can use docker for this.
+### Requirements
 
+Before you begin, ensure that you have the following:
+
+- [Node.js](https://nodejs.org/) version 18 or later
+- [Yarn](https://yarnpkg.com/) package manager
+
+### Setup
+
+1. Clone the repository and navigate to the root folder.
+
+```bash
+git clone git@github.com:aziontech/azion-console-kit.git
+cd azion-console-kit
 ```
-alias yarn="docker run -it --rm -p 5173:5173 -v $HOME:/root -v $PWD:/usr/src/app -w /usr/src/app node:18 yarn"
-```
 
-1. To start, clone the repository and navigate to the root folder.
+2. Install dependencies and start the project:
 
-```cmd
-git clone git@github.com:aziontech/azion-platform-kit.git
-cd azion-platform-kit
-```
-
-2. Start the project using:
-
-```cmd
+```bash
   $ yarn install
   $ yarn dev --host
 ```
 
-The webapp is now available on the following URL: http://localhost:5173
+The webapp becomes available at [http://localhost:5173](http://localhost:5173).
 
-PRO-TIP (OPTIONAL) - To save some time, you can create a personal token in [Real Time Manager](https://manager.azion.com/iam/personal-tokens) and save it into file `.env.development`
+### Using Docker
 
-```cmd
+If you prefer not to run things on your machine, you can use Docker:
+
+```bash
+alias yarn="docker run -it --rm -p 5173:5173 -v $HOME:/root -v $PWD:/usr/src/app -w /usr/src/app node:18 yarn"
+```
+
+## Configuration 💻
+
+### Personal token
+
+For a faster setup, create a personal token via [Azion Console](https://console.azion.com/) and save it in a `.env.development` file:
+
+```bash
 echo 'VITE_PERSONAL_TOKEN=PERSONALTOKEN' > .env.development
 ```
 
-## Pointing the API's
+### API configuration
 
-Currently the Console Kit uses the STAGE stack to connect with the Azion API's.
-But, if you want to point your application to PRODUCTION stack you just need to add the follow command in the `.env.development` file:
+By default, Azion Console Kit uses the STAGE stack to connect with Azion APIs. To point your application to the PRODUCTION stack, add the following command in the `.env.development` file:
 
-```
+```bash
 VITE_ENVIRONMENT='PRODUCTION'
 ```
 
-## Run on the Edge
+## Running on the Edge 🚀
 
-Azion Console Kit runs natively on Azion's edge thanks to Azion CLI (>= 0.70.0):
+Azion Console Kit can run natively on Azion's edge using Azion CLI (version >= 0.70.0). Follow these steps:
 
-1. Download and configure Azion-CLI with a [Personal Token](https://manager.azion.com/iam/personal-tokens)
+1. Download and configure Azion-CLI with a personal token:
 
-```cmd
+```bash
 curl https://downloads.azion.com/linux/x86_64/azioncli -o azioncli && chmod +x azioncli
 ./azioncli configure -t PERSONALTOKEN
 ```
 
 2. Build the bundler and copy the content from `dist` to `.edge/statics`
 
-```cmd
+```bash
 yarn build
 mkdir -p .edge/statics && cp -r ./dist/* .edge/statics
 ```
 
-3. Publish your edge application
+3. Publish the edge application:
 
-```cmd
+```bash
 azioncli edge_applications init --name azion-platform-kit --type vue --mode deliver
 
 azioncli edge_applications publish --debug
 ```
 
-After a few seconds, you can access your project on the Domain informed by the CLI. This is one example of CLI output
+After a few seconds, access your project on the domain provided by the CLI:
 
-```
+```bash
 $ azioncli edge_applications publish
 Uploading static files
 [##########] 100 .edge/statics/index.html Upload completed successfully!
@@ -87,20 +104,29 @@ Your Edge Application was published successfully
 To visualize your application access the domain: https://ajahphrqah.map.azionedge.net
 ```
 
-Note: We are launching a new version of AzionCLI. Stay tuned for a new way to publish your Console Kit at Edge.
+## Features ⛮
 
-## Features
+Azion Console Kit includes the following features:
 
-The top features include:
+- Multi-tenancy: build your Azion Console by consuming endpoints from the [Azion Public API](https://api.azion.com/).
+- Customizable UI: configure theme tokens or generate them automatically via the Builder, giving the UI the look and feel you need.
+- Simple Structure: layered separation of blocks, components, and services for easy route building.
 
-1. **Multi-tenancy:** Build your Azion Console according to your needs by consuming the endpoints from our Public API: [Azion Public API](https://api.azion.com)
-2. **Customizable UI:** configure theme tokens or generate them automatically via [Builder](https://designer.primevue.org/) in your project, giving the look and feel according to your needs.
-3. **Simple structure:** layered separation of blocks, components and services so that it is easy to build a new route in a very short time.
+## Contributions 🤝
 
-## Contributing
+Before beginning development or contributing to the project, familiarize yourself with the following resources:
 
-Before beginning development, please familiarize yourself with the following developer resources:
+- Contributor Guide ([CONTRIBUTING.md](CONTRIBUTING.md)): learn how to contribute to this project and the processes to do so.
+- Development Guide ([DEVELOPER.md](DEVELOPER.md)): learn how to set up your development environment.
+- Contributor Covenant Code of Conduct ([CODE_OF_CONDUCT](CODE_OF_CONDUCT.md)): understand how to maintain the quality and integrity of the project.
 
-- Contributor Guide ([CONTRIBUTING.md](CONTRIBUTING.md)) to learn about how to contribute to this project.
-- Development Guide ([DEVELOPER.md](DEVELOPER.md)): Setting up your development environment.
-- [CODE_OF_CONDUCT](CODE_OF_CONDUCT.md)
+## Community 💬 
+
+You can find us on:
+
+- [Discord](https://discord.com/invite/Yp9N7RMVZy)
+- [X](https://twitter.com/aziontech) 
+- [LinkedIn](https://www.linkedin.com/company/aziontech)
+- [YouTube](https://www.youtube.com/aziontech)
+
+Move to the Edge! 🌎➡️🧡
