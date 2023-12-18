@@ -3,8 +3,9 @@
   import EmptyResultsBlock from '@/templates/empty-results-block'
   import PrimeButton from 'primevue/button'
   import Illustration from '@/assets/svg/illustration-layers'
+  import DrawerDeviceGroups from '@/views/EdgeApplicationsDeviceGroups/Drawer'
   import { computed, ref } from 'vue'
-  defineOptions({ name: 'list-edge-service-resources-tab' })
+  defineOptions({ name: 'list-edge-applications-device-groups-tab' })
 
   const props = defineProps({
     edgeApplicationId: {
@@ -15,12 +16,21 @@
       required: true,
       type: Function
     },
+    createDeviceGroupsService: {
+      required: true,
+      type: Function
+    },
+    documentationService: {
+      required: true,
+      type: Function
+    },
     deleteDeviceGroupsService: {
       required: true,
       type: Function
     }
   })
 
+  const drawerDeviceGroups = ref('')
   const hasContentToList = ref(true)
 
   const getColumns = computed(() => {
@@ -36,6 +46,10 @@
     ]
   })
 
+  const openCreateDeviceGroupsDrawer = () => {
+    drawerDeviceGroups.value.openDrawerCreate()
+  }
+
   const handleLoadData = (event) => {
     hasContentToList.value = event
   }
@@ -50,6 +64,14 @@
 </script>
 
 <template>
+  oii
+  {{ props}}
+  <DrawerDeviceGroups 
+    ref="drawerDeviceGroups"
+    :edgeApplicationId="props.edgeApplicationId"
+    :createDeviceGroupsService="props.createDeviceGroupsService"
+    :documentationService="props.documentationService"
+  />
   <div v-if="hasContentToList">
     <ListTableBlock
       ref="listOriginsEdgeApplicationsRef"
@@ -61,8 +83,9 @@
     >
       <template #addButton>
         <PrimeButton
+          @click="openCreateDeviceGroupsDrawer"
           icon="pi pi-plus"
-          label="Origin"
+          label="Device Group"
         />
       </template>
     </ListTableBlock>
@@ -72,10 +95,12 @@
     title="No Device Group have been created"
     description="Create your first Device Group."
     createButtonLabel="Add"
+    :documentationService="props.documentationService"
     :inTabs="true"
   >
     <template #default>
       <PrimeButton
+        @click="openCreateDeviceGroupsDrawer"
         severity="secondary"
         icon="pi pi-plus"
         label="Add"

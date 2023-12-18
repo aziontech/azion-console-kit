@@ -66,7 +66,9 @@ export const edgeApplicationRoutes = {
         },
         deviceGroupsServices: {
           listDeviceGroupsService: DeviceGroupsService.listDeviceGroupsService,
-          deleteDeviceGroupsService: DeviceGroupsService.deleteDeviceGroupsService
+          deleteDeviceGroupsService: DeviceGroupsService.deleteDeviceGroupsService,
+          documentationService: Helpers.documentationCatalog.edgeApplicationDeviceGroups,
+          createDeviceGroupService: DeviceGroupsService.createDeviceGroupService,
         },
         clipboardWrite: Helpers.clipboardWrite
       },

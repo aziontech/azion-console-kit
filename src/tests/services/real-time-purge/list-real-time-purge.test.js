@@ -6,8 +6,9 @@ import graphQLApi from '@/services/axios/makeEventsApi'
 
 const localeMock = (locale = 'en') => {
   const DateTimeFormat = Intl.DateTimeFormat
-  vi.spyOn(window.global.Intl, 'DateTimeFormat')
-    .mockImplementation((_, options) => DateTimeFormat(locale, { ...options }))
+  vi.spyOn(window.global.Intl, 'DateTimeFormat').mockImplementation((_, options) =>
+    DateTimeFormat(locale, { ...options })
+  )
 }
 
 const purge = [

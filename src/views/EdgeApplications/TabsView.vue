@@ -61,6 +61,7 @@
 </script>
 
 <template>
+  {{ props }}
   <ContentBlock>
     <template #heading>
       <PageHeadingBlock pageTitle="Edit Edge Application" />

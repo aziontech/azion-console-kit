@@ -23,7 +23,7 @@ const adapt = (httpResponse) => {
     return {
       id: element.id,
       name: element.name,
-      userAgent: element.userAgent
+      userAgent: element.user_agent
     }
   })
 
