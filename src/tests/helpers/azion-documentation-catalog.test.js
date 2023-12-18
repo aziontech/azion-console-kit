@@ -223,4 +223,14 @@ describe('AzionDocumentationCatalog', () => {
       `https://www.azion.com/en/search-result/?q=records&filter=doc`
     )
   })
+  it('should edge application cache settings documentation with correct link', () => {
+    const openWindowSpy = vi.spyOn(window, 'open')
+    const { sut } = makeSut()
+
+    sut.edgeApplicationCacheSettings()
+
+    expect(openWindowSpy).toHaveBeenCalledWith(
+      `https://www.azion.com/en/search-result/?q=cache settings&filter=doc`
+    )
+  })
 })
