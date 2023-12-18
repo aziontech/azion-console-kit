@@ -1,13 +1,13 @@
 <template>
   <ContentBlock>
     <template #heading>
-      <PageHeadingBlock pageTitle="Edge Functions" />
+      <PageHeadingBlock :pageTitle="props.pageTitle" />
     </template>
     <template #content>
       <ListTableBlock
         v-if="hasContentToList"
-        :listService="listEdgeFunctionsService"
-        :deleteService="deleteEdgeFunctionsService"
+        :listService="props.listEdgeFunctionsService"
+        :deleteService="props.deleteEdgeFunctionsService"
         :columns="getColumns"
         pageTitleDelete="Edge Function"
         addButtonLabel="Edge Function"
@@ -21,7 +21,7 @@
         description="Create your first function here."
         createButtonLabel="Edge Function"
         createPagePath="edge-functions/create"
-        :documentationService="documentationService"
+        :documentationService="props.documentationService"
       >
         <template #illustration>
           <Illustration />
@@ -31,7 +31,8 @@
   </ContentBlock>
 </template>
 
-<script>
+<script setup>
+  import { ref, computed } from 'vue'
   import ListTableBlock from '@/templates/list-table-block'
   import EmptyResultsBlock from '@/templates/empty-results-block'
   import Illustration from '@/assets/svg/illustration-layers.vue'
@@ -39,96 +40,81 @@
   import PageHeadingBlock from '@/templates/page-heading-block'
   import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
 
-  export default {
-    name: 'edge-functions-view',
-    components: {
-      ListTableBlock,
-      EmptyResultsBlock,
-      Illustration,
-      ContentBlock,
-      PageHeadingBlock
+  const props = defineProps({
+    listEdgeFunctionsService: {
+      required: true,
+      type: Function
     },
-    props: {
-      listEdgeFunctionsService: {
-        required: true,
-        type: Function
-      },
-      deleteEdgeFunctionsService: {
-        required: true,
-        type: Function
-      },
-      documentationService: {
-        required: true,
-        type: Function
+    deleteEdgeFunctionsService: {
+      required: true,
+      type: Function
+    },
+    documentationService: {
+      required: true,
+      type: Function
+    }
+  })
+
+  let hasContentToList = ref(true)
+
+  const getColumns = computed(() => [
+    {
+      field: 'name',
+      header: 'Name',
+      type: 'component',
+      component: (columnData) => {
+        return columnBuilder({
+          data: columnData,
+          columnAppearance: 'text-with-tag'
+        })
       }
     },
-    data: () => ({
-      hasContentToList: true
-    }),
-    computed: {
-      getColumns() {
-        return [
-          {
-            field: 'name',
-            header: 'Name',
-            type: 'component',
-            component: (columnData) => {
-              return columnBuilder({
-                data: columnData,
-                columnAppearance: 'text-with-tag'
-              })
-            }
-          },
-          {
-            field: 'version',
-            header: 'Version'
-          },
-          {
-            field: 'referenceCount',
-            header: 'Ref. Count'
-          },
-          {
-            field: 'language',
-            header: 'Language',
-            type: 'component',
-            component: (columnData) => {
-              return columnBuilder({
-                data: columnData,
-                columnAppearance: 'language-icon-with-text'
-              })
-            }
-          },
-          {
-            field: 'initiatorType',
-            header: 'Initiator Type'
-          },
-          {
-            field: 'lastEditor',
-            header: 'Last Editor'
-          },
-          {
-            field: 'lastModified',
-            sortField: 'lastModifiedDate',
-            header: 'Last Modified'
-          },
-          {
-            field: 'status',
-            header: 'Status',
-            type: 'component',
-            component: (columnData) => {
-              return columnBuilder({
-                data: columnData,
-                columnAppearance: 'tag'
-              })
-            }
-          }
-        ]
+    {
+      field: 'version',
+      header: 'Version'
+    },
+    {
+      field: 'referenceCount',
+      header: 'Ref. Count'
+    },
+    {
+      field: 'language',
+      header: 'Language',
+      type: 'component',
+      component: (columnData) => {
+        return columnBuilder({
+          data: columnData,
+          columnAppearance: 'language-icon-with-text'
+        })
       }
     },
-    methods: {
-      handleLoadData(event) {
-        this.hasContentToList = event
+    {
+      field: 'initiatorType',
+      header: 'Initiator Type'
+    },
+    {
+      field: 'lastEditor',
+      header: 'Last Editor'
+    },
+    {
+      field: 'lastModified',
+      sortField: 'lastModifiedDate',
+      header: 'Last Modified'
+    },
+    {
+      field: 'status',
+      header: 'Status',
+      type: 'component',
+      component: (columnData) => {
+        return columnBuilder({
+          data: columnData,
+          columnAppearance: 'tag'
+        })
       }
     }
+  ])
+
+  function handleLoadData(event) {
+    hasContentToList.value = event
   }
 </script>

@@ -3,10 +3,34 @@
   import ListTableBlock from '@/templates/list-table-block/no-header'
   import EmptyResultsBlock from '@/templates/empty-results-block'
   import PrimeButton from 'primevue/button'
+  import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
+  import Illustration from '@/assets/svg/illustration-layers'
 
-  defineOptions({ name: 'list-edge-service-resources-tab' })
+  defineOptions({ name: 'list-edge-applications-functions-tab' })
 
   const hasContentToList = ref(true)
+
+  const LANGUAGE_AS_TAG = {
+    javascript: {
+      content: 'JavaScript',
+      icon: 'javascript'
+    },
+    lua: {
+      content: 'Lua',
+      icon: 'lua'
+    }
+  }
+
+  const STATUS_AS_TAG = {
+    true: {
+      content: 'Active',
+      severity: 'success'
+    },
+    false: {
+      content: 'Inactive',
+      severity: 'danger'
+    }
+  }
 
   const props = defineProps({
     edgeApplicationId: {
@@ -21,7 +45,7 @@
       required: true,
       type: Function
     },
-    deleteFunctionsService: {
+    deleteFunctionService: {
       required: true,
       type: Function
     },
@@ -35,47 +59,91 @@
     return [
       {
         field: 'name',
-        header: 'Name'
+        header: 'Name',
+        type: 'component',
+        component: (columnData) => {
+          return columnBuilder({
+            data: columnData,
+            columnAppearance: 'text-with-tag'
+          })
+        }
       },
       {
-        field: 'language',
-        header: 'Language'
+        field: 'version',
+        header: 'Version'
       },
       {
-        field: 'reference_count',
+        field: 'referenceCount',
         header: 'Ref Count'
       },
       {
-        field: 'initiator_type',
+        field: 'language',
+        header: 'Language',
+        type: 'component',
+        component: (columnData) => {
+          return columnBuilder({
+            data: LANGUAGE_AS_TAG[columnData],
+            columnAppearance: 'language-icon-with-text'
+          })
+        }
+      },
+      {
+        field: 'initiatorType',
         header: 'Initiator Type'
       },
       {
-        field: 'last_editor',
+        field: 'lastEditor',
         header: 'Last Editor'
       },
+      {
+        field: 'modified',
+        sortField: 'lastModifiedDate',
+        header: 'Last Modified'
+      },
+      {
+        field: 'status',
+        header: 'Status',
+        type: 'component',
+        component: (columnData) => {
+          return columnBuilder({
+            data: STATUS_AS_TAG[columnData],
+            columnAppearance: 'tag'
+          })
+        }
+      }
     ]
   })
 
   const listFunctionsInstances = async () => {
     const functionsInstances = await props.listFunctionsService({ id: props.edgeApplicationId })
 
-    const functionsList = await Promise.all(functionsInstances.map(async (func) => {
-      let functionData = await props.loadEdgeFunctionsService({id:func.edge_function_id})
+    const functionsList = await Promise.all(
+      functionsInstances.map(async (func) => {
+        let functionData = await props.loadEdgeFunctionsService({ id: func.edgeFunctionId })
 
-      return {
-        name : func.name,
-        language: functionData.language,
-        reference_count: functionData.referenceCount,
-        initiator_type: functionData.initiatorType,
-        last_editor: functionData.lastEditor,
-      }
-    }))
+        return {
+          id: func.id,
+          name: func.name,
+          language: functionData.language,
+          referenceCount: functionData.referenceCount,
+          initiatorType: functionData.initiatorType,
+          lastEditor: functionData.lastEditor,
+          modified: functionData.modified,
+          status: functionData.status,
+          version: functionData.version
+        }
+      })
+    )
 
     return await functionsList
   }
 
   const deleteFunctionsWithDecorator = async (functionId) => {
-    return await props.deleteFunctionsService(functionId, props.edgeApplicationId)
+    return await props.deleteFunctionService(functionId, props.edgeApplicationId)
+  }
+
+  const handleLoadData = (event) => {
+    hasContentToList.value = event
   }
 </script>
 <template>
@@ -91,7 +159,7 @@
       <template #addButton>
         <PrimeButton
           icon="pi pi-plus"
-          label="Origin"
+          label="Edge Function"
         />
       </template>
     </ListTableBlock>

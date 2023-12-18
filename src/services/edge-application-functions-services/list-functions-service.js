@@ -18,9 +18,31 @@ export const listFunctionsService = async ({
 
   return parseHttpResponse(httpResponse)
 }
+const parseName = (edgeFunctionData) => {
+  const nameProps = { text: edgeFunctionData.name, tagProps: {} }
 
+  if (edgeFunctionData?.version && edgeFunctionData?.vendor) {
+    nameProps.tagProps = {
+      icon: 'pi pi-cart-plus',
+      value: 'Integration',
+      outlined: true,
+      severity: 'info'
+    }
+  }
+
+  return nameProps
+}
 const adapt = (httpResponse) => {
-  const parsedFunctions = httpResponse.body.results
+  const bodyResults = httpResponse.body.results
+
+  const parsedFunctions = bodyResults?.map((func) => {
+    return {
+      id: func.id,
+      edgeFunctionId: func.edge_function_id,
+      name: parseName(func),
+      args: func.args,
+    }
+  })
 
   return {
     body: parsedFunctions,

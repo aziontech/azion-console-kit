@@ -22,7 +22,12 @@ const adapt = (httpResponse) => {
     referenceCount: body.reference_count,
     jsonArgs: JSON.stringify(body.json_args, null, 2),
     name: body.name,
-    code: body.code
+    code: body.code,
+    version: body.version || '-',
+    modified: new Intl.DateTimeFormat('us', { dateStyle: 'full' }).format(
+      new Date(body.modified)
+    ),
+    status: body.active,
   }
 
   return {
