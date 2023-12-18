@@ -402,7 +402,7 @@
           </div>
           <div class="flex-col gap-1 pl-10">
             <p class="text-color-secondary text-sm font-normal">
-              When enabled, users linked to the account can login to RTM using their social network
+              When enabled, users linked to the account can log in using their social network
               credentials.
             </p>
           </div>
