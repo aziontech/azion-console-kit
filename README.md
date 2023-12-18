@@ -1,8 +1,8 @@
-# Azion Platform Kit
+# Azion Console Kit
 
 ## Introduction
 
-The Azion Platform Kit is a front-end development kit made in Vue/Vite with the PrimeVue and Tailwind framework that allows you to run customized Azion Realtime Manager.
+The Azion Console Kit is a front-end development kit made in Vue/Vite with the PrimeVue and Tailwind framework that allows you to run customized Azion Realtime Manager.
 
 ## Getting Started
 
@@ -38,7 +38,7 @@ echo 'VITE_PERSONAL_TOKEN=PERSONALTOKEN' > .env.development
 
 ## Pointing the API's
 
-Currently the Platform Kit uses the STAGE stack to connect with the Azion API's.
+Currently the Console Kit uses the STAGE stack to connect with the Azion API's.
 But, if you want to point your application to PRODUCTION stack you just need to add the follow command in the `.env.development` file:
 
 ```
@@ -47,7 +47,7 @@ VITE_ENVIRONMENT='PRODUCTION'
 
 ## Run on the Edge
 
-Azion Platform Kit runs natively on Azion's edge thanks to Azion CLI (>= 0.70.0):
+Azion Console Kit runs natively on Azion's edge thanks to Azion CLI (>= 0.70.0):
 
 1. Download and configure Azion-CLI with a [Personal Token](https://manager.azion.com/iam/personal-tokens)
 
@@ -87,7 +87,7 @@ Your Edge Application was published successfully
 To visualize your application access the domain: https://ajahphrqah.map.azionedge.net
 ```
 
-Note: We are launching a new version of AzionCLI. Stay tuned for a new way to publish your platform kit at Edge.
+Note: We are launching a new version of AzionCLI. Stay tuned for a new way to publish your Console Kit at Edge.
 
 ## Features
 
