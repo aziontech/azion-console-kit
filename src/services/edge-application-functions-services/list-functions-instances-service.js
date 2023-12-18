@@ -1,7 +1,7 @@
 import { AxiosHttpClientAdapter, parseHttpResponse } from '@/services/axios/AxiosHttpClientAdapter'
 import { makeEdgeApplicationBaseUrl } from '../edge-application-services/make-edge-application-base-url'
 
-export const listFunctionsService = async ({
+export const listFunctionsInstanceService = async ({
   id,
   orderBy = 'id',
   sort = 'asc',

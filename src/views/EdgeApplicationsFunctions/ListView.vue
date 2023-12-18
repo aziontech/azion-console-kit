@@ -37,7 +37,7 @@
       required: true,
       type: String
     },
-    listFunctionsService: {
+    listFunctionsInstanceService: {
       required: true,
       type: Function
     },
@@ -45,7 +45,7 @@
       required: true,
       type: Function
     },
-    deleteFunctionService: {
+    deleteFunctionInstanceService: {
       required: true,
       type: Function
     },
@@ -115,7 +115,7 @@
   })
 
   const listFunctionsInstances = async () => {
-    const functionsInstances = await props.listFunctionsService({ id: props.edgeApplicationId })
+    const functionsInstances = await props.listFunctionsInstanceService({ id: props.edgeApplicationId })
 
     const functionsList = await Promise.all(
       functionsInstances.map(async (func) => {
@@ -139,7 +139,7 @@
   }
 
   const deleteFunctionsWithDecorator = async (functionId) => {
-    return await props.deleteFunctionService(functionId, props.edgeApplicationId)
+    return await props.deleteFunctionInstanceService(functionId, props.edgeApplicationId)
   }
 
   const handleLoadData = (event) => {

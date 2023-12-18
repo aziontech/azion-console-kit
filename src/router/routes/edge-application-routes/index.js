@@ -66,8 +66,8 @@ export const edgeApplicationRoutes = {
           documentationService: Helpers.documentationCatalog.edgeApplicationOrigins
         },
         functionsServices: {
-          deleteFunctionService: FunctionsService.deleteFunctionService,
-          listFunctionsService: FunctionsService.listFunctionsService,
+          deleteFunctionInstanceService: FunctionsService.deleteFunctionInstanceService,
+          listFunctionsInstanceService: FunctionsService.listFunctionsInstanceService,
           loadEdgeFunctionsService: EdgeFunctionsService.loadEdgeFunctionsService,
           documentationService: Helpers.documentationCatalog.edgeApplicationFunctions
         },

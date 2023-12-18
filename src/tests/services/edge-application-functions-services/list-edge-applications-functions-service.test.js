@@ -1,5 +1,5 @@
 import { AxiosHttpClientAdapter } from '@/services/axios/AxiosHttpClientAdapter'
-import { listFunctionsService } from '@/services/edge-application-functions-services'
+import { listFunctionsInstanceService } from '@/services/edge-application-functions-services'
 import { describe, expect, it, vi } from 'vitest'
 
 const fixtures = {
@@ -12,7 +12,7 @@ const fixtures = {
 }
 
 const makeSut = () => {
-  const sut = listFunctionsService
+  const sut = listFunctionsInstanceService
 
   return {
     sut

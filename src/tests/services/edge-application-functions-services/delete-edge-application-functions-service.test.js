@@ -1,9 +1,9 @@
 import { AxiosHttpClientAdapter } from '@/services/axios/AxiosHttpClientAdapter'
-import { deleteFunctionService } from '@/services/edge-application-functions-services'
+import { deleteFunctionInstanceService } from '@/services/edge-application-functions-services'
 import { describe, expect, it, vi } from 'vitest'
 
 const makeSut = () => {
-  const sut = deleteFunctionService
+  const sut = deleteFunctionInstanceService
 
   return {
     sut

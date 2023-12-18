@@ -1,4 +1,11 @@
-import { listFunctionsService } from './list-functions-service'
-import { deleteFunctionService } from './delete-function-service'
+import { listFunctionsInstanceService } from './list-functions-instances-service'
+import { deleteFunctionInstanceService } from './delete-function-instance-service'
+import { loadFunctionsInstanceService } from './load-function-instances-service'
+import { createFunctionInstanceService } from './create-function-instance-service'
 
-export { listFunctionsService, deleteFunctionService }
+export {
+  listFunctionsInstanceService,
+  deleteFunctionInstanceService,
+  loadFunctionsInstanceService,
+  createFunctionInstanceService
+}
