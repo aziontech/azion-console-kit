@@ -63,7 +63,7 @@ describe('EdgeApplicationDeviceGroupsServices', () => {
     })
     const { sut } = makeSut()
 
-    const feedbackMessage = sut(fixtures.originMock)
+    const feedbackMessage = sut(fixtures.deviceGroupPayload)
 
     expect(feedbackMessage).rejects.toThrow(apiErrorMock)
   })
@@ -78,7 +78,7 @@ describe('EdgeApplicationDeviceGroupsServices', () => {
     })
     const { sut } = makeSut()
 
-    const feedbackMessage = sut(fixtures.originMock)
+    const feedbackMessage = sut(fixtures.deviceGroupPayload)
 
     expect(feedbackMessage).rejects.toThrow(apiErrorMock)
   })
@@ -112,7 +112,7 @@ describe('EdgeApplicationDeviceGroupsServices', () => {
       })
       const { sut } = makeSut()
 
-      const response = sut(fixtures.originMock)
+      const response = sut(fixtures.deviceGroupPayload)
 
       expect(response).rejects.toBe(expectedError)
     }
