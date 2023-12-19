@@ -1,6 +1,7 @@
 <script setup>
   import { ref } from 'vue'
   import Sidebar from 'primevue/sidebar'
+  import ProgressBar from 'primevue/progressbar'
   import * as yup from 'yup'
   import FormFieldsCreateEdgeApplications from '@/views/EdgeApplications/FormFields/FormFieldsCreateEdgeApplications'
   import CreateFormBlock from '@/templates/create-form-block'
@@ -22,6 +23,8 @@
       required: true
     }
   })
+
+  const loading = ref(false)
 
   const validationSchema = yup.object({
     name: yup.string().required(),
@@ -49,7 +52,17 @@
   })
 
   const handleSuccess = () => {
-    // console.log(response)
+    toggleSidebar(false)
+    loading.value = false
+  }
+
+  const handleCancel = () => {
+    toggleSidebar(false)
+  }
+
+  const handleSubmit = (onSubmit) => {
+    onSubmit()
+    loading.value = true
   }
 
   const toggleSidebar = (value) => {
@@ -71,6 +84,16 @@
       <div>Create Edge Application</div>
     </template>
     <template #default>
+      <div
+        class="bg-black/20 z-10 mt-[3.5rem] h-[calc(100%-7rem)] cursor-progress fixed w-full top-0 left-0"
+        v-if="loading"
+      >
+        <ProgressBar
+          class="sticky"
+          mode="indeterminate"
+          style="height: 0.375rem"
+        ></ProgressBar>
+      </div>
       <div class="flex flex-col w-full md:p-8 pb-0">
         <CreateFormBlock
           :createService="props.createEdgeApplicationService"
@@ -83,11 +106,11 @@
             <FormFieldsCreateEdgeApplications />
           </template>
 
-          <template #action-bar="{ onSubmit, formValid, onCancel, loading }">
+          <template #action-bar="{ onSubmit, formValid, loading }">
             <ActionBarBlockWithTeleport
               id="#action-bar-create"
-              @onSubmit="onSubmit"
-              @onCancel="onCancel"
+              @onSubmit="() => handleSubmit(onSubmit)"
+              @onCancel="handleCancel"
               :loading="loading"
               :submitDisabled="!formValid"
             />
