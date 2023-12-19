@@ -15,7 +15,7 @@
       required: true,
       type: String
     },
-    listFunctionsService: {
+    listEdgeApplicationFunctionsService: {
       required: true,
       type: Function
     },
@@ -91,33 +91,9 @@
       }
     ]
   })
-
-  const listFunctionsInstances = async () => {
-    const functionsInstances = await props.listFunctionsService({ id: props.edgeApplicationId })
-
-    const functionsList = await Promise.all(
-      functionsInstances.map(async (edgeApplicationFunction) => {
-        let functionData = await props.loadEdgeFunctionsService({
-          id: edgeApplicationFunction.edgeFunctionId
-        })
-
-        return {
-          id: edgeApplicationFunction.id,
-          name: edgeApplicationFunction.name,
-          languageIcon: functionData.languageIcon,
-          referenceCount: functionData.referenceCount,
-          initiatorType: functionData.initiatorType,
-          lastEditor: functionData.lastEditor,
-          modified: functionData.modified,
-          statusTag: functionData.statusTag,
-          version: functionData.version
-        }
-      })
-    )
-
-    return await functionsList
+  const listFunctionsInstance = async () => {
+    return props.listEdgeApplicationFunctionsService(props.edgeApplicationId)
   }
-
   const deleteFunctionsWithDecorator = async (functionId) => {
     return await props.deleteFunctionService(functionId, props.edgeApplicationId)
   }
@@ -130,7 +106,7 @@
   <div v-if="hasContentToList">
     <ListTableBlock
       ref="listOriginsEdgeApplicationsRef"
-      :listService="listFunctionsInstances"
+      :listService="listFunctionsInstance"
       :deleteService="deleteFunctionsWithDecorator"
       :columns="getColumns"
       pageTitleDelete="Function"
