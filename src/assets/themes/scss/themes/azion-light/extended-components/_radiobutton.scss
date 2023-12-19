@@ -10,10 +10,9 @@
       @include focused-input();
     }
 
-    .p-radiobutton-icon {
-    }
 
     &.p-highlight {
+      border-color: #f3652b !important;
       background: #f3652b !important;
 
       &:not(.p-disabled):hover {

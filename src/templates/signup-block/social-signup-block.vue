@@ -19,7 +19,7 @@
     >
   </div>
   <PrimeButton
-    label="Sign Up with E-mail"
+    label="Sign Up with Email"
     outlined
     @click="$emit('change-signup-method')"
   />
