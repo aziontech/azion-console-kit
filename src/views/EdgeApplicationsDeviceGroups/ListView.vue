@@ -84,8 +84,8 @@
     return await props.listDeviceGroupsService({ id: props.edgeApplicationId })
   }
 
-  const deleteDeviceGroupsWithDecorator = async (originKey) => {
-    return await props.deleteDeviceGroupService(originKey, props.edgeApplicationId)
+  const deleteDeviceGroupsWithDecorator = async (id) => {
+    return await props.deleteDeviceGroupService(id, props.edgeApplicationId)
   }
 </script>
 

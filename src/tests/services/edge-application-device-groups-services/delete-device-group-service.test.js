@@ -75,7 +75,7 @@ describe('EdgeApplicationDeviceGroupsServices', () => {
 
       const { sut } = makeSut()
 
-      const response = sut(fixtures.originKey, fixtures.edgeApplicationId)
+      const response = sut(fixtures.deviceGroup, fixtures.edgeApplicationId)
 
       expect(response).rejects.toBe(expectedError)
     }
