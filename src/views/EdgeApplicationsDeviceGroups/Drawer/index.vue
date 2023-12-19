@@ -9,14 +9,14 @@
   defineOptions({ name: 'drawer-device-groups' })
 
   const emit = defineEmits(['onSuccess'])
-  const showCreateDeviceGroupDrawer = ref(false)
-  const showEditDeviceGroupDrawer = ref(false)
+  const showCreateDrawer = ref(false)
+  const showEditDrawer = ref(false)
   const debouncedDrawerAnimate = 300
-  const loadCreateDeviceGroupDrawer = refDebounced(
-    showCreateDeviceGroupDrawer,
+  const showCreateDeviceGroupDrawer = refDebounced(
+    showCreateDrawer,
     debouncedDrawerAnimate
   )
-  const loadEditDeviceGroupDrawer = refDebounced(showEditDeviceGroupDrawer, debouncedDrawerAnimate)
+  const showEditDeviceGroupDrawer = refDebounced(showEditDrawer, debouncedDrawerAnimate)
   const selectedDeviceGroupToEdit = ref()
 
   const props = defineProps({
@@ -64,8 +64,8 @@
   }
 
   const closeDrawer = () => {
-    showCreateDeviceGroupDrawer.value = false
-    showEditDeviceGroupDrawer.value = false
+    showCreateDrawer.value = false
+    showEditDrawer.value = false
   }
 
   const loadService = async (payload) => {
@@ -84,18 +84,16 @@
   }
 
   const openDrawerCreate = () => {
-    showCreateDeviceGroupDrawer.value = true
+    showCreateDrawer.value = true
   }
 
   const openDrawerEdit = (id) => {
-    if (id) {
-      selectedDeviceGroupToEdit.value = id.toString()
-      showEditDeviceGroupDrawer.value = true
-    }
+    selectedDeviceGroupToEdit.value = id.toString()
+    showEditDrawer.value = true
   }
 
   const closeDrawerEdit = () => {
-    showEditDeviceGroupDrawer.value = false
+    showEditDrawer.value = false
   }
 
   defineExpose({
@@ -107,8 +105,8 @@
 
 <template>
   <CreateDrawerBlock
-    v-if="loadCreateDeviceGroupDrawer"
-    v-model:visible="showCreateDeviceGroupDrawer"
+    v-if="showCreateDeviceGroupDrawer"
+    v-model:visible="showCreateDrawer"
     :createService="props.createDeviceGroupService"
     :schema="validationSchema"
     :initialValues="initialValues"
@@ -122,9 +120,9 @@
   </CreateDrawerBlock>
 
   <EditDrawerBlock
-    v-if="loadEditDeviceGroupDrawer"
+    v-if="showEditDeviceGroupDrawer"
     :id="selectedDeviceGroupToEdit"
-    v-model:visible="showEditDeviceGroupDrawer"
+    v-model:visible="showEditDrawer"
     :loadService="loadService"
     :editService="editService"
     :schema="validationSchema"
