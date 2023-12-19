@@ -22,7 +22,7 @@
       padding: $dividerVerticalPadding;
 
       &:before {
-          border-left: $dividerSize $dividerColor;
+          border-left: 1px solid var(--surface-border);
       }
 
       .p-divider-content {
