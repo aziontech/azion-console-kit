@@ -7,7 +7,7 @@
 
 **Azion Console Kit** is a front-end development kit made in Vue/Vite with the PrimeVue and Tailwind framework that allows you to run a customized [Azion Console](https://console.azion.com/) interface.
 
-This project is part of Azion, an edge computing platform that allows you to build and run applications anywhere. You'll find our products and services on it. 🚀
+This project was developed by Azion, an edge computing platform that allows you to build and run applications anywhere. You'll find our products and services on it. 🚀
 
 ## Getting Started 🔛
 
