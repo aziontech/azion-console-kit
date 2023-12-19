@@ -104,7 +104,7 @@ Your Edge Application was published successfully
 To visualize your application access the domain: https://ajahphrqah.map.azionedge.net
 ```
 
-## Features ⛮
+## Features 🧩
 
 Azion Console Kit includes the following features:
 
