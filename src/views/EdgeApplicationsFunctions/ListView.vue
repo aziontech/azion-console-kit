@@ -97,7 +97,9 @@
 
     const functionsList = await Promise.all(
       functionsInstances.map(async (edgeApplicationFunction) => {
-        let functionData = await props.loadEdgeFunctionsService({ id: edgeApplicationFunction.edgeFunctionId })
+        let functionData = await props.loadEdgeFunctionsService({
+          id: edgeApplicationFunction.edgeFunctionId
+        })
 
         return {
           id: edgeApplicationFunction.id,

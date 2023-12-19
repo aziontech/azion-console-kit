@@ -77,7 +77,7 @@ describe('EdgeApplicationFunctionsServices', () => {
         args: fixtures.functionsInstance.args,
         edgeFunctionId: fixtures.functionsInstance.edge_function_id,
         id: fixtures.functionsInstance.id
-      },
+      }
     ])
   })
 })

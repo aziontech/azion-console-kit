@@ -49,7 +49,7 @@ const adapt = (httpResponse) => {
     version: body.version || '-',
     modified: new Intl.DateTimeFormat('us', { dateStyle: 'full' }).format(new Date(body.modified)),
     statusTag: STATUS_AS_TAG[body.active],
-    languageIcon: LANGUAGE_WITH_ICON[body.language],
+    languageIcon: LANGUAGE_WITH_ICON[body.language]
   }
 
   return {

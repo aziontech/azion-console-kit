@@ -17,7 +17,7 @@ export const listUsersService = async ({
 
   return parseHttpResponse(httpResponse)
 }
-const activeAsTag = (status) =>{
+const activeAsTag = (status) => {
   const severity = status ? 'success' : 'danger'
   return {
     content: status ? 'Yes' : 'No',
