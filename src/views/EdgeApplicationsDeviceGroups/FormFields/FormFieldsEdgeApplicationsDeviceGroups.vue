@@ -34,7 +34,7 @@
     <template #inputs>
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
         <FieldTextArea
-          label="Refular Expression *"
+          label="Regular Expression *"
           placeholder="(Mobile|iP(hone|od)|BlackBerry|IEMobile)"
           name="userAgent"
           :value="userAgent"
