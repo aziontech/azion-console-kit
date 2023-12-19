@@ -8,6 +8,14 @@ const fixtures = {
     args: {},
     edge_function_id: 321,
     id: 123
+  },
+  functionInstanceWithVersion: {
+    version: 2,
+    vendor: 3,
+    name: 'function instance version',
+    args: {},
+    edge_function_id: 321,
+    id: 123
   }
 }
 
@@ -39,7 +47,7 @@ describe('EdgeApplicationFunctionsServices', () => {
   it('should parsed correctly all returned edge applications', async () => {
     vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
       statusCode: 200,
-      body: { results: [fixtures.functionsInstance] }
+      body: { results: [fixtures.functionsInstance, fixtures.functionInstanceWithVersion] }
     })
     const { sut } = makeSut()
 
@@ -55,7 +63,21 @@ describe('EdgeApplicationFunctionsServices', () => {
         args: fixtures.functionsInstance.args,
         edgeFunctionId: fixtures.functionsInstance.edge_function_id,
         id: fixtures.functionsInstance.id
-      }
+      },
+      {
+        name: {
+          tagProps: {
+            icon: 'pi pi-cart-plus',
+            value: 'Integration',
+            outlined: true,
+            severity: 'info'
+          },
+          text: 'function instance version'
+        },
+        args: fixtures.functionsInstance.args,
+        edgeFunctionId: fixtures.functionsInstance.edge_function_id,
+        id: fixtures.functionsInstance.id
+      },
     ])
   })
 })

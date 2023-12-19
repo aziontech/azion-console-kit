@@ -10,28 +10,6 @@
 
   const hasContentToList = ref(true)
 
-  const LANGUAGE_AS_TAG = {
-    javascript: {
-      content: 'JavaScript',
-      icon: 'javascript'
-    },
-    lua: {
-      content: 'Lua',
-      icon: 'lua'
-    }
-  }
-
-  const STATUS_AS_TAG = {
-    true: {
-      content: 'Active',
-      severity: 'success'
-    },
-    false: {
-      content: 'Inactive',
-      severity: 'danger'
-    }
-  }
-
   const props = defineProps({
     edgeApplicationId: {
       required: true,
@@ -77,12 +55,12 @@
         header: 'Ref Count'
       },
       {
-        field: 'language',
+        field: 'languageIcon',
         header: 'Language',
         type: 'component',
         component: (columnData) => {
           return columnBuilder({
-            data: LANGUAGE_AS_TAG[columnData],
+            data: columnData,
             columnAppearance: 'language-icon-with-text'
           })
         }
@@ -101,12 +79,12 @@
         header: 'Last Modified'
       },
       {
-        field: 'status',
+        field: 'statusTag',
         header: 'Status',
         type: 'component',
         component: (columnData) => {
           return columnBuilder({
-            data: STATUS_AS_TAG[columnData],
+            data: columnData,
             columnAppearance: 'tag'
           })
         }
@@ -118,18 +96,18 @@
     const functionsInstances = await props.listFunctionsService({ id: props.edgeApplicationId })
 
     const functionsList = await Promise.all(
-      functionsInstances.map(async (func) => {
-        let functionData = await props.loadEdgeFunctionsService({ id: func.edgeFunctionId })
+      functionsInstances.map(async (edgeApplicationFunction) => {
+        let functionData = await props.loadEdgeFunctionsService({ id: edgeApplicationFunction.edgeFunctionId })
 
         return {
-          id: func.id,
-          name: func.name,
-          language: functionData.language,
+          id: edgeApplicationFunction.id,
+          name: edgeApplicationFunction.name,
+          languageIcon: functionData.languageIcon,
           referenceCount: functionData.referenceCount,
           initiatorType: functionData.initiatorType,
           lastEditor: functionData.lastEditor,
           modified: functionData.modified,
-          status: functionData.status,
+          statusTag: functionData.statusTag,
           version: functionData.version
         }
       })

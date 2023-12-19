@@ -83,9 +83,8 @@
       header: 'Active',
       type: 'component',
       component: (columnData) => {
-        const severity = columnData === 'Yes' ? 'success' : 'danger'
         return columnBuilder({
-          data: { content: columnData, severity },
+          data: columnData,
           columnAppearance: 'tag'
         })
       }

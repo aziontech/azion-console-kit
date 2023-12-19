@@ -35,12 +35,12 @@ const parseName = (edgeFunctionData) => {
 const adapt = (httpResponse) => {
   const bodyResults = httpResponse.body.results
 
-  const parsedFunctions = bodyResults?.map((func) => {
+  const parsedFunctions = bodyResults?.map((edgeApplicationFunction) => {
     return {
-      id: func.id,
-      edgeFunctionId: func.edge_function_id,
-      name: parseName(func),
-      args: func.args
+      id: edgeApplicationFunction.id,
+      edgeFunctionId: edgeApplicationFunction.edge_function_id,
+      name: parseName(edgeApplicationFunction),
+      args: edgeApplicationFunction.args
     }
   })
 
