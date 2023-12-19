@@ -12,10 +12,7 @@
   const showCreateDrawer = ref(false)
   const showEditDrawer = ref(false)
   const debouncedDrawerAnimate = 300
-  const showCreateDeviceGroupDrawer = refDebounced(
-    showCreateDrawer,
-    debouncedDrawerAnimate
-  )
+  const showCreateDeviceGroupDrawer = refDebounced(showCreateDrawer, debouncedDrawerAnimate)
   const showEditDeviceGroupDrawer = refDebounced(showEditDrawer, debouncedDrawerAnimate)
   const selectedDeviceGroupToEdit = ref()
 
