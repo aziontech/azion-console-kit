@@ -23,7 +23,6 @@ export const listEdgeApplicationFunctionsService = async (edgeApplicationId) => 
         statusTag: functionData.statusTag,
         version: functionData.version
       }
-
     })
   )
 
