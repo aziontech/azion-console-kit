@@ -19,7 +19,7 @@ export const listDeviceGroupsService = async ({
 }
 
 const adapt = (httpResponse) => {
-  const parsedOrigin = httpResponse.body.results?.map((element) => {
+  const parsedDevicegGroups = httpResponse.body.results?.map((element) => {
     return {
       id: element.id,
       name: element.name,
@@ -28,7 +28,7 @@ const adapt = (httpResponse) => {
   })
 
   return {
-    body: parsedOrigin,
+    body: parsedDevicegGroups,
     statusCode: httpResponse.statusCode
   }
 }

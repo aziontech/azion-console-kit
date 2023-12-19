@@ -56,4 +56,19 @@ describe('EdgeApplicationDeviceGroupsServices', () => {
       }
     ])
   })
+
+  it('should return empty array when there is no device group', async () => {
+    vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
+      statusCode: 200,
+      body: {
+        results: []
+      }
+    })
+
+    const edgeApplicationId = 123
+
+    const { sut } = makeSut()
+    const result = await sut({ id: edgeApplicationId })
+    expect(result).toHaveLength(0)
+  })
 })

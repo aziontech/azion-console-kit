@@ -52,7 +52,7 @@ describe('EdgeApplicationDeviceGroupsServices', () => {
     expect(feedbackMessage).toBe('Your Device Group has been edited')
   })
 
-  it('Should return an API array error to an invalid edge application', async () => {
+  it('Should return an API array error to an invalid device group', async () => {
     const apiErrorMock = 'name should not be empty'
 
     vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
@@ -67,7 +67,7 @@ describe('EdgeApplicationDeviceGroupsServices', () => {
 
     expect(feedbackMessage).rejects.toThrow(apiErrorMock)
   })
-  it('Should return an API error to an invalid edge application', async () => {
+  it('Should return an API error to an invalid device group', async () => {
     const apiErrorMock = 'name should not be empty'
 
     vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
