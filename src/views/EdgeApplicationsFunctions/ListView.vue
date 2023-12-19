@@ -146,7 +146,7 @@
   </div>
   <EmptyResultsBlock
     v-else
-    title="No Functions added"
+    title="No Function added"
     description="Create your first Function."
     createButtonLabel="Add"
     :documentationService="props.documentationService"
