@@ -15,7 +15,7 @@ export const editDeviceGroupService = async (payload) => {
 const adapt = (payload) => {
   return {
     name: payload.name,
-    user_agent: payload.userAgent,
+    user_agent: payload.userAgent
   }
 }
 
@@ -58,18 +58,18 @@ const parseHttpResponse = (httpResponse) => {
   switch (httpResponse.statusCode) {
     case 200:
       return 'Your Device Group has been edited'
-      case 400:
-        const apiError = extractApiError(httpResponse)
-        throw new Error(apiError).message
-      case 401:
-        throw new Errors.InvalidApiTokenError().message
-      case 403:
-        throw new Errors.PermissionError().message
-      case 404:
-        throw new Errors.NotFoundError().message
-      case 500:
-        throw new Errors.InternalServerError().message
-      default:
-        throw new Errors.UnexpectedError().message
-    }
+    case 400:
+      const apiError = extractApiError(httpResponse)
+      throw new Error(apiError).message
+    case 401:
+      throw new Errors.InvalidApiTokenError().message
+    case 403:
+      throw new Errors.PermissionError().message
+    case 404:
+      throw new Errors.NotFoundError().message
+    case 500:
+      throw new Errors.InternalServerError().message
+    default:
+      throw new Errors.UnexpectedError().message
+  }
 }

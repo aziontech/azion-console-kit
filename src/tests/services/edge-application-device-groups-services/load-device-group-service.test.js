@@ -3,13 +3,13 @@ import { loadDeviceGroupService } from '@/services/edge-application-device-group
 import { describe, expect, it, vi } from 'vitest'
 
 const fixtures = {
-    edgeApplicationId: '1234',
-    deviceGroupSample: {
-      id: '123',
-      name: 'teste',
-      user_agent: '*'
-    }
+  edgeApplicationId: '1234',
+  deviceGroupSample: {
+    id: '123',
+    name: 'teste',
+    user_agent: '*'
   }
+}
 const makeSut = () => {
   const sut = loadDeviceGroupService
 
@@ -37,7 +37,7 @@ describe('EdgeApplicationDeviceGroupsServices', () => {
   it('should parse correctly each returned item', async () => {
     vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
       statusCode: 200,
-      body: { results: fixtures.deviceGroupSample}
+      body: { results: fixtures.deviceGroupSample }
     })
 
     const { sut } = makeSut()
@@ -46,7 +46,7 @@ describe('EdgeApplicationDeviceGroupsServices', () => {
     expect(result).toEqual({
       id: fixtures.deviceGroupSample.id,
       name: fixtures.deviceGroupSample.name,
-      userAgent: fixtures.deviceGroupSample.user_agent,
+      userAgent: fixtures.deviceGroupSample.user_agent
     })
   })
 })

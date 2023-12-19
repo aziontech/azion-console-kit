@@ -18,7 +18,7 @@ const adapt = (httpResponse) => {
     name: deviceGroup.name,
     userAgent: deviceGroup.user_agent
   }
-  
+
   return {
     body: parsedBody,
     statusCode: httpResponse.statusCode

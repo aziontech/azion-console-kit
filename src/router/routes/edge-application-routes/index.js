@@ -66,11 +66,11 @@ export const edgeApplicationRoutes = {
         },
         deviceGroupsServices: {
           listDeviceGroupsService: DeviceGroupsService.listDeviceGroupsService,
-          deleteDeviceGroupsService: DeviceGroupsService.deleteDeviceGroupsService,
+          deleteDeviceGroupService: DeviceGroupsService.deleteDeviceGroupService,
           documentationService: Helpers.documentationCatalog.edgeApplicationDeviceGroups,
-          createDeviceGroupsService: DeviceGroupsService.createDeviceGroupService,
-          editDeviceGroupsService: DeviceGroupsService.editDeviceGroupService,
-          loadDeviceGroupsService: DeviceGroupsService.loadDeviceGroupService,
+          createDeviceGroupService: DeviceGroupsService.createDeviceGroupService,
+          editDeviceGroupService: DeviceGroupsService.editDeviceGroupService,
+          loadDeviceGroupService: DeviceGroupsService.loadDeviceGroupService
         },
         clipboardWrite: Helpers.clipboardWrite
       },

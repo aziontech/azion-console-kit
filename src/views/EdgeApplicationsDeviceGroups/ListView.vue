@@ -16,15 +16,15 @@
       required: true,
       type: Function
     },
-    createDeviceGroupsService: {
+    createDeviceGroupService: {
       required: true,
       type: Function
     },
-    loadDeviceGroupsService: {
+    loadDeviceGroupService: {
       required: true,
       type: Function
     },
-    editDeviceGroupsService: {
+    editDeviceGroupService: {
       required: true,
       type: Function
     },
@@ -32,7 +32,7 @@
       required: true,
       type: Function
     },
-    deleteDeviceGroupsService: {
+    deleteDeviceGroupService: {
       required: true,
       type: Function
     }
@@ -85,18 +85,18 @@
   }
 
   const deleteDeviceGroupsWithDecorator = async (originKey) => {
-    return await props.deleteDeviceGroupsService(originKey, props.edgeApplicationId)
+    return await props.deleteDeviceGroupService(originKey, props.edgeApplicationId)
   }
 </script>
 
 <template>
-  <DrawerDeviceGroups 
+  <DrawerDeviceGroups
     ref="drawerDeviceGroups"
     @onSuccess="handleSuccess"
     :edgeApplicationId="props.edgeApplicationId"
-    :createDeviceGroupsService="props.createDeviceGroupsService"
-    :loadDeviceGroupsService="props.loadDeviceGroupsService"
-    :editDeviceGroupsService="props.editDeviceGroupsService"
+    :createDeviceGroupService="props.createDeviceGroupService"
+    :loadDeviceGroupService="props.loadDeviceGroupService"
+    :editDeviceGroupService="props.editDeviceGroupService"
     :documentationService="props.documentationService"
   />
   <div v-if="hasContentToList">

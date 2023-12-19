@@ -16,7 +16,7 @@ export const createDeviceGroupService = async (payload) => {
 const adapt = (payload) => {
   return {
     name: payload.name,
-    user_agent: payload.userAgent,
+    user_agent: payload.userAgent
   }
 }
 
@@ -59,7 +59,7 @@ const parseHttpResponse = (httpResponse) => {
   switch (httpResponse.statusCode) {
     case 201:
       return {
-        feedback: 'Your Device Group has been created',
+        feedback: 'Your Device Group has been created'
       }
     case 400:
       const apiError = extractApiError(httpResponse)

@@ -1,6 +1,6 @@
 import { AxiosHttpClientAdapter } from '@/services/axios/AxiosHttpClientAdapter'
 import * as Errors from '@/services/axios/errors'
-import { deleteDeviceGroupsService } from '@/services/edge-application-device-groups-services'
+import { deleteDeviceGroupService } from '@/services/edge-application-device-groups-services'
 import { describe, expect, it, vi } from 'vitest'
 
 const fixtures = {
@@ -9,7 +9,7 @@ const fixtures = {
 }
 
 const makeSut = () => {
-  const sut = deleteDeviceGroupsService
+  const sut = deleteDeviceGroupService
 
   return { sut }
 }

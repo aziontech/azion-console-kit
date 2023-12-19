@@ -2,7 +2,7 @@
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
   import { useField } from 'vee-validate'
   import FieldText from '@/templates/form-fields-inputs/fieldText'
-  import FieldTextArea from '@/templates/form-fields-inputs/fieldTextArea';
+  import FieldTextArea from '@/templates/form-fields-inputs/fieldTextArea'
 
   const { value: name } = useField('name')
   const { value: userAgent } = useField('userAgent')
@@ -32,16 +32,15 @@
     description="Specify a regular expression to compare with the contents of the User-Agent header."
   >
     <template #inputs>
-        <div class="flex flex-col sm:max-w-lg w-full gap-2">
-          <FieldTextArea 
-            label="Refular Expression *"
-            placeholder="(Mobile|iP(hone|od)|BlackBerry|IEMobile)"
-            name="userAgent"
-            :value="userAgent"
-            description="Add the regular expression you want to match to the content of the User-Agente header."
-          />
-        </div>
+      <div class="flex flex-col sm:max-w-lg w-full gap-2">
+        <FieldTextArea
+          label="Refular Expression *"
+          placeholder="(Mobile|iP(hone|od)|BlackBerry|IEMobile)"
+          name="userAgent"
+          :value="userAgent"
+          description="Add the regular expression you want to match to the content of the User-Agente header."
+        />
+      </div>
     </template>
   </FormHorizontal>
-
 </template>
