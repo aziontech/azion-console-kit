@@ -1,6 +1,7 @@
 import * as Helpers from '@/helpers'
 import * as EdgeApplicationsService from '@/services/edge-application-services'
 import * as OriginsService from '@/services/edge-application-origins-services'
+import * as DeviceGroupsService from '@/services/edge-application-device-groups-services'
 
 /** @type {import('vue-router').RouteRecordRaw} */
 export const edgeApplicationRoutes = {
@@ -62,6 +63,14 @@ export const edgeApplicationRoutes = {
           editOriginService: OriginsService.editOriginService,
           loadOriginService: OriginsService.loadOriginService,
           documentationService: Helpers.documentationCatalog.edgeApplicationOrigins
+        },
+        deviceGroupsServices: {
+          listDeviceGroupsService: DeviceGroupsService.listDeviceGroupsService,
+          deleteDeviceGroupService: DeviceGroupsService.deleteDeviceGroupService,
+          documentationService: Helpers.documentationCatalog.edgeApplicationDeviceGroups,
+          createDeviceGroupService: DeviceGroupsService.createDeviceGroupService,
+          editDeviceGroupService: DeviceGroupsService.editDeviceGroupService,
+          loadDeviceGroupService: DeviceGroupsService.loadDeviceGroupService
         },
         clipboardWrite: Helpers.clipboardWrite
       },

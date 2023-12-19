@@ -1,73 +1,46 @@
-import { createOriginService } from '@/services/edge-application-origins-services'
+import { createDeviceGroupService } from '@/services/edge-application-device-groups-services'
 import { describe, expect, it, vi } from 'vitest'
 import { AxiosHttpClientAdapter } from '@/services/axios/AxiosHttpClientAdapter'
 import * as Errors from '@/services/axios/errors'
 
 const fixtures = {
-  originMock: {
-    id: 123,
-    name: 'New Origin',
-    origin_type: 'single_origin',
-    method: '',
-    addresses: [
-      {
-        address: 'httpbin.org'
-      }
-    ],
-    origin_protocol_policy: 'http',
-    host_header: '${host}',
-    origin_path: '/requests',
-    hmac_authentication: false,
-    hmac_region_name: '',
-    hmac_access_key: '',
-    hmac_secret_key: '',
-    connection_timeout: 60,
-    timeout_between_bytes: 35
+  deviceGroupPayload: {
+    edgeApplicationId: '1234',
+    name: 'teste',
+    userAgent: '*'
   }
 }
 
 const makeSut = () => {
-  const sut = createOriginService
+  const sut = createDeviceGroupService
 
   return { sut }
 }
 
-describe('EdgeApplicationOriginsServices', () => {
+describe('EdgeApplicationDeviceGroupsServices', () => {
   it('should call API with correct params', async () => {
     const requestSpy = vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
       statusCode: 201,
       body: {
-        results: {
-          origin_key: 1
-        }
+        results: {}
       }
     })
 
     const { sut } = makeSut()
     const version = 'v3'
-    await sut(fixtures.originMock)
+    await sut(fixtures.deviceGroupPayload)
 
     expect(requestSpy).toHaveBeenCalledWith({
-      url: `${version}/edge_applications/${fixtures.originMock.id}/origins`,
+      url: `${version}/edge_applications/${fixtures.deviceGroupPayload.edgeApplicationId}/device_groups`,
       method: 'POST',
       body: {
-        name: fixtures.originMock.name,
-        host_header: fixtures.originMock.hostHeader,
-        method: fixtures.originMock.method,
-        addresses: fixtures.originMock.addresses,
-        origin_path: fixtures.originMock.originPath,
-        origin_protocol_policy: fixtures.originMock.originProtocolPolicy,
-        hmac_authentication: fixtures.originMock.hmacAuthentication,
-        hmac_region_name: fixtures.originMock.hmacRegionName,
-        hmac_access_key: fixtures.originMock.hmacAccessKey,
-        hmac_secret_key: fixtures.originMock.hmacSecretKey,
-        connection_timeout: fixtures.originMock.connectionTimeout,
-        timeout_between_bytes: fixtures.originMock.timeoutBetweenBytes
+        name: fixtures.deviceGroupPayload.name,
+        user_agent: fixtures.deviceGroupPayload.userAgent
       }
     })
   })
 
-  it('Should return an API array error to an invalid edge application', async () => {
+  it('Should return an API array error to an invalid device group', async () => {
     const apiErrorMock = 'name should not be empty'
 
     vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
@@ -78,12 +51,12 @@ describe('EdgeApplicationOriginsServices', () => {
     })
     const { sut } = makeSut()
 
-    const feedbackMessage = sut(fixtures.originMock)
+    const feedbackMessage = sut(fixtures.deviceGroupPayload)
 
     expect(feedbackMessage).rejects.toThrow(apiErrorMock)
   })
 
-  it('Should return an API error to an invalid edge application ', async () => {
+  it('Should return an API error to an invalid device group ', async () => {
     const apiErrorMock = 'name should not be empty'
 
     vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
@@ -94,12 +67,12 @@ describe('EdgeApplicationOriginsServices', () => {
     })
     const { sut } = makeSut()
 
-    const feedbackMessage = sut(fixtures.originMock)
+    const feedbackMessage = sut(fixtures.deviceGroupPayload)
 
     expect(feedbackMessage).rejects.toThrow(apiErrorMock)
   })
 
-  it('Should return an API error with object to an invalid edge application', async () => {
+  it('Should return an API error with object to an invalid device group', async () => {
     const apiErrorMock = 'name should not be empty'
     vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
       statusCode: 500,
@@ -109,7 +82,7 @@ describe('EdgeApplicationOriginsServices', () => {
     })
     const { sut } = makeSut()
 
-    const feedbackMessage = sut(fixtures.originMock)
+    const feedbackMessage = sut(fixtures.deviceGroupPayload)
 
     expect(feedbackMessage).rejects.toThrow(apiErrorMock)
   })
@@ -118,17 +91,14 @@ describe('EdgeApplicationOriginsServices', () => {
     vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
       statusCode: 201,
       body: {
-        results: {
-          origin_key: 'test-origin-key'
-        }
+        results: {}
       }
     })
     const { sut } = makeSut()
 
-    const { feedback, originKey } = await sut(fixtures.originMock, fixtures.edgeApplicationId)
+    const { feedback } = await sut(fixtures.deviceGroupPayload)
 
-    expect(originKey).toBe('test-origin-key')
-    expect(feedback).toBe('Your Origin has been created')
+    expect(feedback).toBe('Your Device Group has been created')
   })
 
   it.each([
@@ -156,7 +126,7 @@ describe('EdgeApplicationOriginsServices', () => {
       })
       const { sut } = makeSut()
 
-      const response = sut(fixtures.originMock)
+      const response = sut(fixtures.deviceGroupPayload)
 
       expect(response).rejects.toBe(expectedError)
     }

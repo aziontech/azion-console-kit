@@ -6,13 +6,15 @@
   import { useRoute, useRouter } from 'vue-router'
   import { ref } from 'vue'
   import EdgeApplicationsOriginsListView from '@/views/EdgeApplicationsOrigins/ListView'
+  import EdgeApplicationsDeviceGroupsListView from '@/views/EdgeApplicationsDeviceGroups/ListView.vue'
 
   defineOptions({ name: 'tabs-edge-service' })
 
   const props = defineProps({
     edgeApplicationServices: { type: Object, required: true },
     originsServices: { type: Object, required: true },
-    clipboardWrite: { type: Function, required: true }
+    clipboardWrite: { type: Function, required: true },
+    deviceGroupsServices: { type: Object, required: true }
   })
 
   const mapTabs = {
@@ -79,7 +81,13 @@
           />
         </TabPanel>
 
-        <TabPanel header="Device Groups"> </TabPanel>
+        <TabPanel header="Device Groups">
+          <EdgeApplicationsDeviceGroupsListView
+            :edgeApplicationId="edgeApplicationId"
+            v-bind="props.deviceGroupsServices"
+          >
+          </EdgeApplicationsDeviceGroupsListView>
+        </TabPanel>
         <TabPanel header="Error Responses"> </TabPanel>
         <TabPanel header="Cache Settings"> </TabPanel>
         <TabPanel
