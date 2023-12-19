@@ -5,7 +5,7 @@
 
 ## Introduction 📖
 
-Azion Console Kit is a front-end development kit made in Vue/Vite with the PrimeVue and Tailwind framework that allows you to run a customized [Azion Console](https://console.azion.com/) UI.
+**Azion Console Kit** is a front-end development kit made in Vue/Vite with the PrimeVue and Tailwind framework that allows you to run a customized [Azion Console](https://console.azion.com/) interface.
 
 This project is part of Azion, an edge computing platform that allows you to build and run applications anywhere. You'll find our products and services on it. 🚀
 
@@ -56,7 +56,7 @@ echo 'VITE_PERSONAL_TOKEN=PERSONALTOKEN' > .env.development
 
 ### API configuration
 
-By default, Azion Console Kit uses the STAGE stack to connect with Azion APIs. To point your application to the PRODUCTION stack, add the following command in the `.env.development` file:
+By default, Azion Console Kit uses the **STAGE** stack to connect with Azion APIs. To point your application to the **PRODUCTION** stack, add the following command in the `.env.development` file:
 
 ```bash
 VITE_ENVIRONMENT='PRODUCTION'
@@ -66,7 +66,7 @@ VITE_ENVIRONMENT='PRODUCTION'
 
 Azion Console Kit can run natively on Azion's edge using Azion CLI (version >= 0.70.0). Follow these steps:
 
-1. Download and configure Azion-CLI with a personal token:
+1. Download and configure Azion CLI with a personal token:
 
 ```bash
 curl https://downloads.azion.com/linux/x86_64/azioncli -o azioncli && chmod +x azioncli
@@ -110,7 +110,7 @@ Azion Console Kit includes the following features:
 
 - Multi-tenancy: build your Azion Console by consuming endpoints from the [Azion Public API](https://api.azion.com/).
 - Customizable UI: configure theme tokens or generate them automatically via the Builder, giving the UI the look and feel you need.
-- Simple Structure: layered separation of blocks, components, and services for easy route building.
+- Simple structure: layered separation of blocks, components, and services for easy route building.
 
 ## Contributions 🤝
 
