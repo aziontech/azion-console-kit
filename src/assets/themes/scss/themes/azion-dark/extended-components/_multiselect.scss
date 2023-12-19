@@ -1,6 +1,7 @@
 @use 'sass:math';
 
 .p-multiselect {
+    font-size: 0.875rem !important;
     background: $inputBg;
     border: $inputBorder;
     transition: $formElementTransition;
@@ -25,6 +26,7 @@
 
     &.p-multiselect-chip {
         .p-multiselect-token {
+            font-size: 0.875rem !important;
             padding: math.div(nth($inputPadding, 1), 2) nth($inputPadding, 2);
             margin-right: $inlineSpacing;
             background: $chipBg;
@@ -98,6 +100,7 @@
     }
 
     .p-multiselect-items {
+        font-size: 0.875rem !important;
         padding: $inputListPadding;
 
         .p-multiselect-item {
