@@ -20,6 +20,14 @@
       required: true,
       type: Function
     },
+    loadDeviceGroupsService: {
+      required: true,
+      type: Function
+    },
+    editDeviceGroupsService: {
+      required: true,
+      type: Function
+    },
     documentationService: {
       required: true,
       type: Function
@@ -31,7 +39,16 @@
   })
 
   const drawerDeviceGroups = ref('')
+  const listDeviceGroupsEdgeApplicationsRef = ref('')
   const hasContentToList = ref(true)
+
+  const reloadList = () => {
+    if (hasContentToList.value) {
+      listDeviceGroupsEdgeApplicationsRef.value.reload()
+      return
+    }
+    hasContentToList.value = true
+  }
 
   const getColumns = computed(() => {
     return [
@@ -46,8 +63,17 @@
     ]
   })
 
-  const openCreateDeviceGroupsDrawer = () => {
+  const handleSuccess = () => {
+    drawerDeviceGroups.value.closeDrawer()
+    reloadList()
+  }
+
+  const openCreateDeviceGroupDrawer = () => {
     drawerDeviceGroups.value.openDrawerCreate()
+  }
+
+  const openEditDeviceGroupDrawer = (item) => {
+    drawerDeviceGroups.value.openDrawerEdit(item.id)
   }
 
   const handleLoadData = (event) => {
@@ -64,26 +90,28 @@
 </script>
 
 <template>
-  oii
-  {{ props}}
   <DrawerDeviceGroups 
     ref="drawerDeviceGroups"
+    @onSuccess="handleSuccess"
     :edgeApplicationId="props.edgeApplicationId"
     :createDeviceGroupsService="props.createDeviceGroupsService"
+    :loadDeviceGroupsService="props.loadDeviceGroupsService"
+    :editDeviceGroupsService="props.editDeviceGroupsService"
     :documentationService="props.documentationService"
   />
   <div v-if="hasContentToList">
     <ListTableBlock
-      ref="listOriginsEdgeApplicationsRef"
+      ref="listDeviceGroupsEdgeApplicationsRef"
       pageTitleDelete="Device Groups"
       :listService="listDeviceGroupsWithDecorator"
       :deleteService="deleteDeviceGroupsWithDecorator"
+      :editInDrawer="openEditDeviceGroupDrawer"
       :columns="getColumns"
       @on-load-data="handleLoadData"
     >
       <template #addButton>
         <PrimeButton
-          @click="openCreateDeviceGroupsDrawer"
+          @click="openCreateDeviceGroupDrawer"
           icon="pi pi-plus"
           label="Device Group"
         />
@@ -100,7 +128,7 @@
   >
     <template #default>
       <PrimeButton
-        @click="openCreateDeviceGroupsDrawer"
+        @click="openCreateDeviceGroupDrawer"
         severity="secondary"
         icon="pi pi-plus"
         label="Add"

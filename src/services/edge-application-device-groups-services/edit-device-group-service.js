@@ -2,15 +2,14 @@ import { AxiosHttpClientAdapter } from '@/services/axios/AxiosHttpClientAdapter'
 import { makeEdgeApplicationBaseUrl } from '../edge-application-services/make-edge-application-base-url'
 import * as Errors from '@/services/axios/errors'
 
-export const createDeviceGroupService = async (payload) => {
-  const { edgeApplicationId } = payload
+export const editDeviceGroupService = async (payload) => {
   let httpResponse = await AxiosHttpClientAdapter.request({
-    url: `${makeEdgeApplicationBaseUrl()}/${edgeApplicationId}/device_groups`,
-    method: 'POST',
+    url: `${makeEdgeApplicationBaseUrl()}/${payload.edgeApplicationId}/device_groups/${payload.id}`,
+    method: 'PATCH',
     body: adapt(payload)
   })
 
-  return parseHttpResponse(httpResponse, edgeApplicationId)
+  return parseHttpResponse(httpResponse)
 }
 
 const adapt = (payload) => {
@@ -57,23 +56,20 @@ const extractApiError = (httpResponse) => {
  */
 const parseHttpResponse = (httpResponse) => {
   switch (httpResponse.statusCode) {
-    case 201:
-      return {
-        feedback: 'Your Device Group has been created',
-      }
-    case 400:
-      const apiError = extractApiError(httpResponse)
-      throw new Error(apiError).message
-    case 401:
-      throw new Errors.InvalidApiTokenError().message
-    case 403:
-      throw new Errors.PermissionError().message
-    case 404:
-      throw new Errors.NotFoundError().message
-    case 500:
-      const apiError500 = extractApiError(httpResponse)
-      throw new Error(apiError500).message
-    default:
-      throw new Errors.UnexpectedError().message
-  }
+    case 200:
+      return 'Your Device Group has been edited'
+      case 400:
+        const apiError = extractApiError(httpResponse)
+        throw new Error(apiError).message
+      case 401:
+        throw new Errors.InvalidApiTokenError().message
+      case 403:
+        throw new Errors.PermissionError().message
+      case 404:
+        throw new Errors.NotFoundError().message
+      case 500:
+        throw new Errors.InternalServerError().message
+      default:
+        throw new Errors.UnexpectedError().message
+    }
 }
