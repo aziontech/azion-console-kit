@@ -63,17 +63,18 @@
     address: '',
     originProtocolPolicy: 'preserve',
     hostHeader: '${host}',
-    browserCacheSettings: 'honor',
+    browserCacheSettings: 'override',
     browserCacheSettingsMaximumTtl: '',
-    cdnCacheSettings: 'honor',
+    cdnCacheSettings: 'override',
     cdnCacheSettingsMaximumTtl: 60,
+    cdnCacheSettingsDefaultTtl: 60,
     active: false
   })
 
   const handleBlocks = [
     'general',
     'delivery-settings',
-    'origins-settings',
+    'default-origins',
     'cache-expiration-policies',
     'debug-rules'
   ]

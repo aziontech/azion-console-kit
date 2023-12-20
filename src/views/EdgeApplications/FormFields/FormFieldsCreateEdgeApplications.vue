@@ -64,6 +64,7 @@
   const { value: hostHeader, errorMessage: hostHeaderError } = useField('hostHeader')
   const { value: browserCacheSettingsMaximumTtl } = useField('browserCacheSettingsMaximumTtl')
   const { value: cdnCacheSettingsMaximumTtl } = useField('cdnCacheSettingsMaximumTtl')
+  const { value: cdnCacheSettingsDefaultTtl } = useField('cdnCacheSettingsDefaultTtl')
 
   const { value: websocket } = useField('websocket')
   const { value: applicationAcceleration } = useField('applicationAcceleration')
@@ -99,9 +100,15 @@
   const isHttpProtocol = computed(() => deliveryProtocol.value === 'http')
   const isHttpsProtocol = computed(() => deliveryProtocol.value === 'http,https' && !http3.value)
   const isHttp3Protocol = computed(() => deliveryProtocol.value === 'http,https' && http3.value)
-  const isCacheTypeHonor = computed(() => browserCacheSettings.value === 'honor')
+  const isBrowserCacheTypeHonor = computed(() => browserCacheSettings.value === 'honor')
   const websocketIsEnabled = computed(() => websocket.value)
   const l2CachingIsEnable = computed(() => l2Caching.value)
+  const cdnCacheSettingsIsOverride = computed(() => {
+    if (cdnCacheSettings.value === 'override') {
+      return true
+    }
+    return false
+  })
 </script>
 
 <template>
@@ -232,7 +239,7 @@
           <label
             for="port-http"
             class="text-color text-base font-medium"
-            >HTTP Ports *</label
+            >HTTP Ports <span v-if="isHttpProtocol || isHttpsProtocol">*</span></label
           >
           <span class="p-input-icon-right">
             <i class="pi pi-lock text-[var(--text-color-secondary)]" />
@@ -256,7 +263,7 @@
           <label
             for="port-https"
             class="text-color text-base font-medium"
-            >HTTPS Ports</label
+            >HTTPS Ports <span v-if="isHttpsProtocol">*</span></label
           >
           <span class="p-input-icon-right">
             <i class="pi pi-lock text-[var(--text-color-secondary)]" />
@@ -325,9 +332,9 @@
   </FormHorizontal>
 
   <FormHorizontal
-    title="Origins Settings"
+    title="Default Origin"
     description="Customize settings related to origin servers and hosts."
-    v-if="handleBlock('origins-settings')"
+    v-if="handleBlock('default-origins')"
   >
     <template #inputs>
       <div class="flex flex-col w-full sm:max-w-xs gap-2">
@@ -352,9 +359,6 @@
             }"
           />
         </span>
-        <div class="text-color-secondary text-sm font-normal">
-          Select an option to customize the origin.
-        </div>
       </div>
 
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
@@ -445,6 +449,7 @@
             >
           </div>
         </div>
+        <div class="text-color-secondary text-sm font-normal">Select the type of connection between the edge nodes and the origin.</div>
       </div>
     </template>
   </FormHorizontal>
@@ -490,7 +495,7 @@
         </div>
       </div>
 
-      <div class="flex flex-col sm:max-w-lg w-full gap-2">
+      <div class="flex flex-col sm:max-w-lg w-full gap-2" v-if="!isBrowserCacheTypeHonor">
         <div class="flex flex-col w-full sm:max-w-xs gap-2">
           <label
             for="maximun-ttl-seconds"
@@ -501,7 +506,6 @@
           <InputNumber
             v-model="browserCacheSettingsMaximumTtl"
             showButtons
-            :disabled="isCacheTypeHonor"
           />
         </div>
       </div>
@@ -517,9 +521,9 @@
               value="override"
             />
             <label
-              for="override"
+              for="honor"
               class="text-color text-sm font-normal"
-              >Honor Origin Cache Settings</label
+              >Override Cache Settings</label
             >
           </div>
           <div class="flex gap-2 items-center">
@@ -530,9 +534,9 @@
               value="honor"
             />
             <label
-              for="honor"
+              for="override"
               class="text-color text-sm font-normal"
-              >Override Cache Settings</label
+              >Honor Origin Cache Settings</label
             >
           </div>
           <div class="text-color-secondary text-sm font-normal">
@@ -547,12 +551,19 @@
           <label
             for="cdn-maximun-ttl-seconds"
             class="text-color text-base font-medium"
-            >Maximum TTL (seconds)</label
+            >{{ cdnCacheSettingsIsOverride ? 'Maximum TTL (seconds)' : 'Default TTL' }}</label
           >
 
           <InputNumber
             v-model="cdnCacheSettingsMaximumTtl"
             showButtons
+            v-if="cdnCacheSettingsIsOverride"
+          />
+
+          <InputNumber
+            v-model="cdnCacheSettingsDefaultTtl"
+            showButtons
+            v-if="!cdnCacheSettingsIsOverride"
           />
 
           <div class="text-color-secondary text-sm font-normal">
@@ -756,18 +767,16 @@
           }"
         >
           <template #title>
-            <InputSwitch v-model="active" />
+            <InputSwitch v-model="active" class="w-14" />
             <div class="flex-col gap-1">
-              <div class="">
+              <div>
                 <div class="text-color text-sm font-normal">Active</div>
               </div>
+              <div class="self-stretch text-color-secondary text-sm font-normal">Rules that were successfully executed will be shown under the $traceback field in Data
+          Streaming and Real-Time Events or the $stacktrace variable in GraphQL.</div>
             </div>
           </template>
         </Card>
-        <div class="self-stretch text-color-secondary text-sm font-normal">
-          Rules that were successfully executed will be shown under the $traceback field in Data
-          Streaming and Real-Time Events or the $stacktrace variable in GraphQL.
-        </div>
       </div>
     </template>
   </FormHorizontal>
