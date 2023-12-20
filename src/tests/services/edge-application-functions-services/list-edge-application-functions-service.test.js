@@ -19,7 +19,7 @@ const fixtures = {
     id: 1,
     name: 'function instance',
     edgeFunctionId: 123,
-    edge_function_id: 123,
+    edge_function_id: 123
   },
   edgeFunctionMock: {
     active: true,
@@ -32,7 +32,7 @@ const fixtures = {
     name: 'AZ firewall',
     reference_count: '2',
     vendor: 'Azion'
-  },
+  }
 }
 
 const makeSut = () => {

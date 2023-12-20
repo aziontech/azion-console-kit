@@ -30,7 +30,6 @@ const createFunctionsList = async (functionsInstances) => {
         statusTag: functionData.statusTag,
         version: functionData.version
       }
-
     })
   )
 }
