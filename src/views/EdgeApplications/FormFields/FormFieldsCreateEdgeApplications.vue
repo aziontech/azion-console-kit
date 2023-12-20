@@ -449,7 +449,9 @@
             >
           </div>
         </div>
-        <div class="text-color-secondary text-sm font-normal">Select the type of connection between the edge nodes and the origin.</div>
+        <div class="text-color-secondary text-sm font-normal">
+          Select the type of connection between the edge nodes and the origin.
+        </div>
       </div>
     </template>
   </FormHorizontal>
@@ -495,7 +497,10 @@
         </div>
       </div>
 
-      <div class="flex flex-col sm:max-w-lg w-full gap-2" v-if="!isBrowserCacheTypeHonor">
+      <div
+        class="flex flex-col sm:max-w-lg w-full gap-2"
+        v-if="!isBrowserCacheTypeHonor"
+      >
         <div class="flex flex-col w-full sm:max-w-xs gap-2">
           <label
             for="maximun-ttl-seconds"
@@ -767,13 +772,18 @@
           }"
         >
           <template #title>
-            <InputSwitch v-model="active" class="w-14" />
+            <InputSwitch
+              v-model="active"
+              class="w-14"
+            />
             <div class="flex-col gap-1">
               <div>
                 <div class="text-color text-sm font-normal">Active</div>
               </div>
-              <div class="self-stretch text-color-secondary text-sm font-normal">Rules that were successfully executed will be shown under the $traceback field in Data
-          Streaming and Real-Time Events or the $stacktrace variable in GraphQL.</div>
+              <div class="self-stretch text-color-secondary text-sm font-normal">
+                Rules that were successfully executed will be shown under the $traceback field in
+                Data Streaming and Real-Time Events or the $stacktrace variable in GraphQL.
+              </div>
             </div>
           </template>
         </Card>
