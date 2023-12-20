@@ -44,7 +44,7 @@
       {
         field: 'lastModified',
         header: 'Last modified'
-      },
+      }
     ]
   })
 

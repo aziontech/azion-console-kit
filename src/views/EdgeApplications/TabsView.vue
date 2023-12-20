@@ -16,7 +16,7 @@
     originsServices: { type: Object, required: true },
     clipboardWrite: { type: Function, required: true },
     deviceGroupsServices: { type: Object, required: true },
-    rulesEngineServices: { type: Object, required: true },
+    rulesEngineServices: { type: Object, required: true }
   })
 
   const mapTabs = {
