@@ -118,14 +118,15 @@ Before beginning development or contributing to the project, familiarize yoursel
 
 - Contributor Guide ([CONTRIBUTING.md](CONTRIBUTING.md)): learn how to contribute to this project and the processes to do so.
 - Development Guide ([DEVELOPER.md](DEVELOPER.md)): learn how to set up your development environment.
+- Security Guide ([SECURITY.md](SECURITY.md)): learn about the secutiry validaton process.
 - Contributor Covenant Code of Conduct ([CODE_OF_CONDUCT](CODE_OF_CONDUCT.md)): understand how to maintain the quality and integrity of the project.
 
-## Community 💬 
+## Community 💬
 
 You can find us on:
 
 - [Discord](https://discord.com/invite/Yp9N7RMVZy)
-- [X](https://twitter.com/aziontech) 
+- [X](https://twitter.com/aziontech)
 - [LinkedIn](https://www.linkedin.com/company/aziontech)
 - [YouTube](https://www.youtube.com/aziontech)
 
