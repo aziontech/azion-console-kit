@@ -92,7 +92,7 @@
     ]
   })
   const listFunctionsInstance = async () => {
-    return props.listEdgeApplicationFunctionsService(props.edgeApplicationId)
+    return await props.listEdgeApplicationFunctionsService(props.edgeApplicationId)
   }
   const deleteFunctionsWithDecorator = async (functionId) => {
     return await props.deleteFunctionService(functionId, props.edgeApplicationId)

@@ -1,16 +1,23 @@
 import * as FunctionsInstanceService from '@/services/edge-application-functions-services'
 import * as EdgeFunctionsService from '@/services/edge-functions-services'
+import { parseHttpResponse } from '@/services/axios/AxiosHttpClientAdapter'
 
-export const listEdgeApplicationFunctionsService = async (edgeApplicationId) => {
-  const functionsInstances = await FunctionsInstanceService.listFunctionsService({
+const getFunctionInstances = async (edgeApplicationId) => {
+  return await FunctionsInstanceService.listFunctionsService({
     id: edgeApplicationId
   })
+}
 
-  const functionsList = await Promise.all(
-    functionsInstances.map(async (edgeApplicationFunction) => {
-      let functionData = await EdgeFunctionsService.loadEdgeFunctionsService({
-        id: edgeApplicationFunction.edgeFunctionId
-      })
+const getFunctionData = async (edgeApplicationFunction) => {
+  return await EdgeFunctionsService.loadEdgeFunctionsService({
+    id: edgeApplicationFunction.edgeFunctionId
+  })
+}
+
+const createFunctionsList = async (functionsInstances) => {
+  return await Promise.all(
+    functionsInstances?.map(async (edgeApplicationFunction) => {
+      let functionData = await getFunctionData(edgeApplicationFunction)
 
       return {
         id: edgeApplicationFunction.id,
@@ -25,6 +32,19 @@ export const listEdgeApplicationFunctionsService = async (edgeApplicationId) => 
       }
     })
   )
+}
 
-  return await functionsList
+const createHttpResponse = async (functionsList) => {
+  return {
+    body: await functionsList,
+    statusCode: 200
+  }
+}
+
+export const listEdgeApplicationFunctionsService = async (edgeApplicationId) => {
+  const functionsInstances = await getFunctionInstances(edgeApplicationId)
+  const functionsList = await createFunctionsList(functionsInstances)
+  const httpResponse = await createHttpResponse(functionsList)
+
+  return parseHttpResponse(httpResponse)
 }
