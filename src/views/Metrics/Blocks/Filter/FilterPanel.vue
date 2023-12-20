@@ -1,12 +1,12 @@
 <script setup>
-import Card from 'primevue/card'
-import IntervalFilter from './components/IntervalFilter'
-import ContentFilter from './components/ContentFilter'
-import { onMounted } from 'vue'
+  import Card from 'primevue/card'
+  import IntervalFilter from './components/IntervalFilter'
+  import ContentFilter from './components/ContentFilter'
+  import { onMounted } from 'vue'
 
-// const props = defineProps({})
+  // const props = defineProps({})
 
-onMounted(() => { })
+  onMounted(() => {})
 </script>
 
 <template>
