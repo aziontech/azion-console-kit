@@ -1,31 +1,31 @@
 .p-divider {
   .p-divider-content {
-      background-color: $panelContentBg;
+    background-color: $panelContentBg;
   }
 
   &.p-divider-horizontal {
-      margin: $dividerHorizontalMargin;
-      padding: $dividerHorizontalPadding;
+    margin: $dividerHorizontalMargin;
+    padding: $dividerHorizontalPadding;
 
-      &:before {
-          border-top: 1px solid var(--surface-border);
-      }
+    &:before {
+      border-top: 1px solid var(--surface-border);
+    }
 
-      .p-divider-content {
-          padding: 0 $inlineSpacing;
-      }
+    .p-divider-content {
+      padding: 0 $inlineSpacing;
+    }
   }
 
   &.p-divider-vertical {
-      margin: $dividerVerticalMargin;
-      padding: $dividerVerticalPadding;
+    margin: $dividerVerticalMargin;
+    padding: $dividerVerticalPadding;
 
-      &:before {
-          border-left: 1px solid var(--surface-border);
-      }
+    &:before {
+      border-left: 1px solid var(--surface-border);
+    }
 
-      .p-divider-content {
-          padding: $inlineSpacing 0;
-      }
+    .p-divider-content {
+      padding: $inlineSpacing 0;
+    }
   }
 }
