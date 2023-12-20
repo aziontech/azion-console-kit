@@ -7,6 +7,7 @@
   import { ref } from 'vue'
   import EdgeApplicationsOriginsListView from '@/views/EdgeApplicationsOrigins/ListView'
   import EdgeApplicationsDeviceGroupsListView from '@/views/EdgeApplicationsDeviceGroups/ListView.vue'
+  import EditView from './EditView.vue'
 
   defineOptions({ name: 'tabs-edge-service' })
 
@@ -71,7 +72,15 @@
         @tab-click="changeRouteByClickingOnTab"
         class="w-full h-full"
       >
-        <TabPanel header="Main Settings"> </TabPanel>
+        <TabPanel header="Main Settings">
+          <div class="mt-8">
+            <EditView
+              :editEdgeApplicationService="edgeApplicationServices.editEdgeApplication"
+              :loadEdgeApplicationService="edgeApplicationServices.loadEdgeApplication"
+              :updatedRedirect="edgeApplicationServices.updatedRedirect"
+            />
+          </div>
+        </TabPanel>
         <TabPanel header="Origins">
           <EdgeApplicationsOriginsListView
             v-if="activeTab === mapTabs.origins"

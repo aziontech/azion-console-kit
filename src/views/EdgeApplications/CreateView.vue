@@ -10,7 +10,7 @@
         :initialValues="initialValues"
       >
         <template #form>
-          <FormFieldsCreateEdgeApplications />
+          <FormFieldsCreateEdgeApplications :handleBlock="handleBlocks" />
         </template>
 
         <template #action-bar="{ onSubmit, formValid, onCancel, loading }">
@@ -63,10 +63,19 @@
     address: '',
     originProtocolPolicy: 'preserve',
     hostHeader: '${host}',
-    browserCacheSettings: 'honor',
+    browserCacheSettings: 'override',
     browserCacheSettingsMaximumTtl: '',
-    cdnCacheSettings: 'honor',
+    cdnCacheSettings: 'override',
     cdnCacheSettingsMaximumTtl: 60,
+    cdnCacheSettingsDefaultTtl: 60,
     active: false
   })
+
+  const handleBlocks = [
+    'general',
+    'delivery-settings',
+    'default-origins',
+    'cache-expiration-policies',
+    'debug-rules'
+  ]
 </script>
