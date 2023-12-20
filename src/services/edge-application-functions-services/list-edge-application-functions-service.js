@@ -34,9 +34,9 @@ const createFunctionsList = async (functionsInstances) => {
   )
 }
 
-const createHttpResponse = async (functionsList) => {
+const adapt = (functionsList) => {
   return {
-    body: await functionsList,
+    body: functionsList,
     statusCode: 200
   }
 }
@@ -44,7 +44,7 @@ const createHttpResponse = async (functionsList) => {
 export const listEdgeApplicationFunctionsService = async (edgeApplicationId) => {
   const functionsInstances = await getFunctionInstances(edgeApplicationId)
   const functionsList = await createFunctionsList(functionsInstances)
-  const httpResponse = await createHttpResponse(functionsList)
+  const httpResponse = adapt(functionsList)
 
   return parseHttpResponse(httpResponse)
 }
