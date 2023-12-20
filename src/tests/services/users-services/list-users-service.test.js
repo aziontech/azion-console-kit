@@ -82,7 +82,10 @@ describe('UsersServices', () => {
         email: fixtures.userMock.email,
         teams: fixtures.userMock.teams,
         mfa: 'Yes',
-        active: 'Yes',
+        active: {
+          content: 'Yes',
+          severity: 'success'
+        },
         owner: 'Yes'
       },
       {
@@ -92,7 +95,10 @@ describe('UsersServices', () => {
         email: fixtures.disabledUserMock.email,
         teams: 'Default Team, Azion Team',
         mfa: 'No',
-        active: 'No',
+        active: {
+          content: 'No',
+          severity: 'danger'
+        },
         owner: 'No'
       }
     ])

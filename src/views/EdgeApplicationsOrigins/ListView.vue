@@ -6,7 +6,7 @@
   import { computed, ref } from 'vue'
   import DrawerOrigin from '@/views/EdgeApplicationsOrigins/Drawer'
   import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
-  defineOptions({ name: 'list-edge-service-resources-tab' })
+  defineOptions({ name: 'list-edge-applications-origins-tab' })
 
   const props = defineProps({
     edgeApplicationId: {

@@ -6,6 +6,7 @@
   import { useRoute, useRouter } from 'vue-router'
   import { ref } from 'vue'
   import EdgeApplicationsOriginsListView from '@/views/EdgeApplicationsOrigins/ListView'
+  import EdgeApplicationsFunctionsListView from '@/views/EdgeApplicationsFunctions/ListView'
   import EdgeApplicationsDeviceGroupsListView from '@/views/EdgeApplicationsDeviceGroups/ListView.vue'
   import EditView from './EditView.vue'
 
@@ -14,6 +15,7 @@
   const props = defineProps({
     edgeApplicationServices: { type: Object, required: true },
     originsServices: { type: Object, required: true },
+    functionsServices: { type: Object, required: true },
     clipboardWrite: { type: Function, required: true },
     deviceGroupsServices: { type: Object, required: true }
   })
@@ -26,7 +28,7 @@
     functions: 5,
     rulesEngine: 6
   }
-  const activatedFunctions = false
+  const activatedFunctions = true
   const route = useRoute()
   const router = useRouter()
   const activeTab = ref(0)
@@ -103,6 +105,10 @@
           v-if="activatedFunctions"
           header="Functions"
         >
+          <EdgeApplicationsFunctionsListView
+            v-bind="props.functionsServices"
+            :edgeApplicationId="edgeApplicationId"
+          />
         </TabPanel>
         <TabPanel header="Rules Engine"> </TabPanel>
       </TabView>
