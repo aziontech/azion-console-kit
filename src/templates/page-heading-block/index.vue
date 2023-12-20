@@ -5,7 +5,7 @@
       :model="breadcrumbs.items"
       class="-ml-1.5 overflow-auto w-full"
     />
-    <div class="flex w-full py-4 items-center justify-between">
+    <div class="flex w-full py-4 items-center justify-between flex-wrap gap-3">
       <div
         class="flex flex-col gap-3 max-md:w-full"
         v-if="pageTitle || description"
