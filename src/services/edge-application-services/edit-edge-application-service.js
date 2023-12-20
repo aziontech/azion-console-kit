@@ -15,8 +15,24 @@ export const editEdgeApplicationService = async (payload) => {
 const adapt = (payload) => {
   return {
     name: payload.name,
-    certificate: payload.certificate,
-    private_key: payload.privateKey
+    delivery_protocol: payload.deliveryProtocol,
+    http3: payload.http3,
+    http_port: [payload.httpPort.value],
+    https_port: [payload.httpsPort.value],
+    minimum_tls_version: payload.minimumTlsVersion,
+    active: payload.active,
+    debug_rules: payload.debugRules,
+    supported_ciphers: payload.supportedCiphers,
+    application_acceleration: payload.applicationAcceleration,
+    device_detection: payload.deviceDetection,
+    edge_firewall: false,
+    edge_functions: payload.edgeFunctions,
+    image_optimization: payload.imageOptimization,
+    l2_caching: payload.l2Caching,
+    load_balancer: payload.loadBalancer,
+    websocket: payload.websocket,
+    raw_logs: payload.rawLogs,
+    web_application_firewall: payload.webApplicationFirewall
   }
 }
 
@@ -29,11 +45,8 @@ const adapt = (payload) => {
  */
 const parseHttpResponse = (httpResponse) => {
   switch (httpResponse.statusCode) {
-    case 201:
-      return {
-        feedback: 'Your edge application has been updated',
-        urlToEditView: `/edge-applications`
-      }
+    case 200:
+      return 'Your edge application has been updated'
     case 400:
       throw new Error(Object.keys(httpResponse.body)[0]).message
     case 409:
