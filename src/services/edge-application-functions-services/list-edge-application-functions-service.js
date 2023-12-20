@@ -3,19 +3,19 @@ import * as EdgeFunctionsService from '@/services/edge-functions-services'
 import { parseHttpResponse } from '@/services/axios/AxiosHttpClientAdapter'
 
 const getFunctionInstances = async (edgeApplicationId) => {
-  return await FunctionsInstanceService.listFunctionsService({
+  return FunctionsInstanceService.listFunctionsService({
     id: edgeApplicationId
   })
 }
 
 const getFunctionData = async (edgeApplicationFunction) => {
-  return await EdgeFunctionsService.loadEdgeFunctionsService({
+  return EdgeFunctionsService.loadEdgeFunctionsService({
     id: edgeApplicationFunction.edgeFunctionId
   })
 }
 
 const createFunctionsList = async (functionsInstances) => {
-  return await Promise.all(
+  return Promise.all(
     functionsInstances?.map(async (edgeApplicationFunction) => {
       let functionData = await getFunctionData(edgeApplicationFunction)
 
