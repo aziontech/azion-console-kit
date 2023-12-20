@@ -13,6 +13,9 @@
   import TemplateEngineBlock from '@/templates/template-engine-block'
   import { InternalServerError } from '@/services/axios/errors'
   import PermissionsFieldset from '../components/PermissionsFieldset'
+  import { useRouter } from 'vue-router'
+  
+  const router = useRouter()
 
   const emit = defineEmits([
     'update:visible',
@@ -152,7 +155,7 @@
   }
 
   const handleCreateNew = () => {
-    emit('update:showSidebarSecond', true)
+    router.push('/edge-applications/create')
   }
 
   const handleLoading = () => {
