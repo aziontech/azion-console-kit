@@ -43,7 +43,7 @@
     cacheByCookies: 'ignore',
     cookieNames: '',
     adaptiveDeliveryAction: 'ignore',
-    deviceGroup: [{ id: '' }]
+    deviceGroup: []
   })
   const validationSchema = yup.object({
     name: yup.string().required().label('Name'),
@@ -101,7 +101,7 @@
     adaptiveDeliveryAction: yup.string().label('Adaptive Delivery Action'),
     deviceGroup: yup.array().of(
       yup.object().shape({
-        id: yup.string().required().label('Device group id').nonNullable()
+        id: yup.string().required().label('Device group id')
       })
     )
   })

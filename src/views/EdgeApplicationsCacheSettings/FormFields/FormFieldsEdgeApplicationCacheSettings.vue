@@ -8,7 +8,7 @@
   import Divider from 'primevue/divider'
   import TextArea from 'primevue/textarea'
   import PrimeButton from 'primevue/button'
-  import { computed, ref } from 'vue'
+  import { computed, ref, watch } from 'vue'
   import { useField, useFieldArray } from 'vee-validate'
 
   const CACHE_SETTINGS_OPTIONS = ref([
@@ -96,6 +96,12 @@
   })
   const showDeviceGroupFields = computed(() => {
     return adaptiveDeliveryAction.value === 'whitelist'
+  })
+
+  watch(adaptiveDeliveryAction, (value) => {
+    if (value === 'whitelist' && deviceGroup.value.length === 0) {
+      addDeviceGroup()
+    }
   })
 </script>
 
