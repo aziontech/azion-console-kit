@@ -9,7 +9,7 @@
             The place to find, deploy, and manage third-party integrations
           </div>
           <div class="text-sm sm:text-xl text-color-secondary">
-            Marketplace lets you quickly deploy software on Azion Edge Computing Platform.
+            Take advantage of templates, libraries, and integrations to build and compose edge applications.
           </div>
         </div>
       </div>
