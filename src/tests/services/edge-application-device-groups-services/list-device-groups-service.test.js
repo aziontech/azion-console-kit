@@ -51,6 +51,9 @@ describe('EdgeApplicationDeviceGroupsServices', () => {
     expect(result).toEqual([
       {
         id: fixtures.deviceGroupSample.id,
+        deviceId: {
+          content: fixtures.deviceGroupSample.id
+        },
         name: fixtures.deviceGroupSample.name,
         userAgent: fixtures.deviceGroupSample.user_agent
       }

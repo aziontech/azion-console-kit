@@ -19,11 +19,14 @@ export const listDeviceGroupsService = async ({
 }
 
 const adapt = (httpResponse) => {
-  const parsedDevicegGroups = httpResponse.body.results?.map((element) => {
+  const parsedDevicegGroups = httpResponse.body.results?.map((deviceGroup) => {
     return {
-      id: element.id,
-      name: element.name,
-      userAgent: element.user_agent
+      id: deviceGroup.id,
+      deviceId: {
+        content: deviceGroup.id
+      },
+      name: deviceGroup.name,
+      userAgent: deviceGroup.user_agent
     }
   })
 

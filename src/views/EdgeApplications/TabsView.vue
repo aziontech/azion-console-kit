@@ -30,7 +30,6 @@
     functions: 5,
     rulesEngine: 6
   }
-  const activatedFunctions = true
   const route = useRoute()
   const router = useRouter()
   const activeTab = ref(0)
@@ -96,8 +95,10 @@
 
         <TabPanel header="Device Groups">
           <EdgeApplicationsDeviceGroupsListView
+            v-if="activeTab === mapTabs.deviceGroups"
             :edgeApplicationId="edgeApplicationId"
             v-bind="props.deviceGroupsServices"
+            :clipboardWrite="props.clipboardWrite"
           >
           </EdgeApplicationsDeviceGroupsListView>
         </TabPanel>
@@ -109,11 +110,9 @@
             v-bind="props.cacheSettingsServices"
           />
         </TabPanel>
-        <TabPanel
-          v-if="activatedFunctions"
-          header="Functions"
-        >
+        <TabPanel header="Functions">
           <EdgeApplicationsFunctionsListView
+            v-if="activeTab === mapTabs.functions"
             v-bind="props.functionsServices"
             :edgeApplicationId="edgeApplicationId"
           />
