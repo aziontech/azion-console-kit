@@ -9,6 +9,7 @@ env:
 
 jobs:
   deploy:
+    runs-on: ubuntu-latest
     container:
       image: node:18-alpine3.18
     steps:

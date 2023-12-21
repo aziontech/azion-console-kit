@@ -12,6 +12,7 @@ env:
 
 jobs:
   run-tests:
+    runs-on: ubuntu-latest
     container:
       image: node:18-alpine3.18
     steps:
