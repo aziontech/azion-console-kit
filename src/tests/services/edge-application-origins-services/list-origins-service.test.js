@@ -5,7 +5,9 @@ import { describe, expect, it, vi } from 'vitest'
 const fixtures = {
   originSingleType: {
     origin_id: 111111,
-    origin_key: '11111-0000-11111-111111-11111',
+    origin_key: {
+      content: '11111-0000-11111-111111-11111'
+    },
     name: 'Origin 2',
     origin_type: 'single_origin',
     addresses: [
@@ -30,7 +32,9 @@ const fixtures = {
   },
   originLoadBalancerType: {
     origin_id: 111111,
-    origin_key: '11111-0000-11111-111111-11111',
+    origin_key: {
+      content: '11111-0000-11111-111111-11111'
+    },
     name: 'Origin 2',
     origin_type: 'load_balancer',
     addresses: [

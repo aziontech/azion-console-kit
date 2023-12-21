@@ -7,6 +7,7 @@
   import Card from 'primevue/card'
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
   import PrimeButton from 'primevue/button'
+  import PrimeTag from 'primevue/tag'
   import { computed } from 'vue'
   import { useField } from 'vee-validate'
 
@@ -15,6 +16,10 @@
       type: Array,
       required: false,
       default: () => ['full']
+    },
+    contactSalesEdgeApplicationService: {
+      type: Function,
+      required: true
     }
   })
 
@@ -361,51 +366,6 @@
         </span>
       </div>
 
-      <div class="flex flex-col sm:max-w-lg w-full gap-2">
-        <label
-          for="address"
-          class="text-color text-base font-medium"
-          >Address *</label
-        >
-        <InputText
-          id="address"
-          v-model="address"
-          :class="{ 'p-invalid': addressError }"
-          aria-describedby="address-help"
-        />
-        <div class="text-color-secondary text-sm font-normal">
-          Define an origin for the content, in FQDN format or an IPv4/IPv6 address.
-        </div>
-        <small
-          v-if="addressError"
-          class="p-error text-xs font-normal leading-tight"
-          >{{ addressError }}</small
-        >
-      </div>
-
-      <div class="flex flex-col sm:max-w-lg w-full gap-2">
-        <label
-          for="host-header"
-          class="text-color text-base font-medium"
-          >Host Header *</label
-        >
-        <InputText
-          id="hostHeader"
-          v-model="hostHeader"
-          :class="{ 'p-invalid': hostHeaderError }"
-          aria-describedby="hostHeader-help"
-        />
-        <div class="text-color-secondary text-sm font-normal">
-          Allow the origin to identify the virtualhost and locate the content or application. If
-          this is blank, Azion will use the Address as the default.
-        </div>
-        <small
-          v-if="hostHeaderError"
-          class="p-error text-xs font-normal leading-tight"
-          >{{ hostHeaderError }}</small
-        >
-      </div>
-
       <div class="flex flex-col gap-2">
         <label class="text-color text-base font-medium">Protocol Policy</label>
         <div class="flex flex-col gap-4">
@@ -452,6 +412,51 @@
         <div class="text-color-secondary text-sm font-normal">
           Select the type of connection between the edge nodes and the origin.
         </div>
+      </div>
+
+      <div class="flex flex-col sm:max-w-lg w-full gap-2">
+        <label
+          for="address"
+          class="text-color text-base font-medium"
+          >Address *</label
+        >
+        <InputText
+          id="address"
+          v-model="address"
+          :class="{ 'p-invalid': addressError }"
+          aria-describedby="address-help"
+        />
+        <div class="text-color-secondary text-sm font-normal">
+          Define an origin for the content, in FQDN format or an IPv4/IPv6 address.
+        </div>
+        <small
+          v-if="addressError"
+          class="p-error text-xs font-normal leading-tight"
+          >{{ addressError }}</small
+        >
+      </div>
+
+      <div class="flex flex-col sm:max-w-lg w-full gap-2">
+        <label
+          for="host-header"
+          class="text-color text-base font-medium"
+          >Host Header *</label
+        >
+        <InputText
+          id="hostHeader"
+          v-model="hostHeader"
+          :class="{ 'p-invalid': hostHeaderError }"
+          aria-describedby="hostHeader-help"
+        />
+        <div class="text-color-secondary text-sm font-normal">
+          Allow the origin to identify the virtualhost and locate the content or application. If
+          this is blank, Azion will use the Address as the default.
+        </div>
+        <small
+          v-if="hostHeaderError"
+          class="p-error text-xs font-normal leading-tight"
+          >{{ hostHeaderError }}</small
+        >
       </div>
     </template>
   </FormHorizontal>
@@ -623,11 +628,11 @@
             </template>
             <template #subtitle>Customize advanced cache settings. Activated by default.</template>
             <template #footer>
-              <PrimeButton
+              <PrimeTag
+                value="Automatically enabled in all accounts."
                 icon="pi pi-lock"
-                outlined
-                :pt="{ root: { class: 'h-8 mt-3' } }"
-                label="Automatically enabled in all accounts."
+                severity="info"
+                class="mt-3"
               />
             </template>
           </Card>
@@ -751,6 +756,7 @@
           icon="pi pi-shopping-cart"
           class="max-w-[150px]"
           label="Contact sales"
+          @click="props.contactSalesEdgeApplicationService()"
         />
       </div>
     </template>
@@ -767,24 +773,31 @@
           :pt="{
             root: { class: 'shadow-none  rounded-none' },
             body: { class: 'py-4 border-0' },
+            content: { class: 'ml-12' },
             title: { class: 'flex items-center text-base m-0 gap-3 font-medium' },
-            subtitle: { class: 'text-sm font-normal text-color-secondary m-0 pr-0 md:pr-[2.5rem]' }
+            subtitle: {
+              class: 'text-sm font-normal text-color-secondary m-0 pr-0 md:pr-[2.5rem]'
+            }
           }"
         >
           <template #title>
             <InputSwitch
               v-model="active"
-              class="w-14"
+              inputId="active"
             />
             <div class="flex-col gap-1">
-              <div>
-                <div class="text-color text-sm font-normal">Active</div>
-              </div>
-              <div class="self-stretch text-color-secondary text-sm font-normal">
-                Rules that were successfully executed will be shown under the $traceback field in
-                Data Streaming and Real-Time Events or the $stacktrace variable in GraphQL.
-              </div>
+              <label
+                for="active"
+                class="text-color text-sm font-normal"
+                >Active</label
+              >
             </div>
+          </template>
+          <template #content>
+            <small class="text-color-secondary text-sm">
+              Rules that were successfully executed will be shown under the $traceback field in
+                Data Streaming and Real-Time Events or the $stacktrace variable in GraphQL.
+            </small>
           </template>
         </Card>
       </div>

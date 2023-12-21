@@ -30,7 +30,9 @@ const adapt = (httpResponse) => {
 
     return {
       id: origin.origin_key,
-      originKey: origin.origin_key,
+      originKey: {
+        content: origin.origin_key
+      },
       originId: origin.origin_id,
       name: origin.name,
       originType: originTypeFormat[origin.origin_type],

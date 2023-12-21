@@ -6,7 +6,7 @@
     :schema="validationSchema"
   >
     <template #form>
-      <FormFieldsCreateEdgeApplications :handleBlock="handleBlocks" />
+      <FormFieldsCreateEdgeApplications :handleBlock="handleBlocks" :contactSalesEdgeApplicationService="contactSalesEdgeApplicationService" />
     </template>
     <template #action-bar="{ onSubmit, formValid, onCancel, loading }">
       <ActionBarBlockWithTeleport
@@ -36,6 +36,10 @@
     },
     updatedRedirect: {
       type: String,
+      required: true
+    },
+    contactSalesEdgeApplicationService: {
+      type: Function,
       required: true
     }
   })
