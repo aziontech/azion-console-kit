@@ -13,6 +13,9 @@
   import TemplateEngineBlock from '@/templates/template-engine-block'
   import { InternalServerError } from '@/services/axios/errors'
   import PermissionsFieldset from '../components/PermissionsFieldset'
+  import { useRouter } from 'vue-router'
+
+  const router = useRouter()
 
   const emit = defineEmits([
     'update:visible',
@@ -152,7 +155,7 @@
   }
 
   const handleCreateNew = () => {
-    emit('update:showSidebarSecond', true)
+    router.push('/edge-applications/create')
   }
 
   const handleLoading = () => {
@@ -164,6 +167,10 @@
     resetForm()
     toggleSidebar()
   }
+
+  const warnToCreate = computed(() => {
+    return !props.loadingEdges && edgeApps.value.length === 0
+  })
 
   const warnUpdate = computed(() => {
     const app = edgeApps.value.find((i) => i.value === edgeApplication.value)
@@ -228,6 +235,7 @@
                   </label>
                   <Dropdown
                     id="edge_application"
+                    :disabled="warnToCreate"
                     :class="{ 'p-invalid': errors.edgeApplication }"
                     v-model="edgeApplication"
                     :options="edgeApps"
@@ -283,6 +291,22 @@
                   >Updating will create a new instance of the provided integration
                   function.</InlineMessage
                 >
+
+                <InlineMessage
+                  v-if="warnToCreate"
+                  severity="info"
+                  class="max-w-lg"
+                >
+                  No applications created yet. Go to
+                  <PrimeButton
+                    class="p-0"
+                    label="Edge Applications"
+                    link
+                    size="small"
+                    @click="handleCreateNew"
+                  />
+                  to create one.
+                </InlineMessage>
               </div>
             </template>
           </FormHorizontal>

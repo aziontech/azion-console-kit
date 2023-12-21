@@ -31,13 +31,13 @@
 
   const pageTitle = 'Welcome to the Edge'
   const benefitsList = [
-    'No credit-card required',
-    '$300 in service credits for 12 months',
+    'No credit card is required',
+    '$300 credit to use over 12 months',
     'Full access to all products and features',
-    'Deploy your first Edge Application in under 5 seconds',
+    'Deploy an edge application in a few clicks',
     'Free onboarding session'
   ]
-  const formTitle = 'Create your Azion account'
+  const formTitle = 'Create your Azion Account'
 
   const showEmailForm = ref(false)
 </script>

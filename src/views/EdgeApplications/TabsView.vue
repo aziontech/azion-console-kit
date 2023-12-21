@@ -7,6 +7,9 @@
   import { ref } from 'vue'
   import EdgeApplicationsOriginsListView from '@/views/EdgeApplicationsOrigins/ListView'
   import EdgeApplicationsCacheSettingsListView from '@/views/EdgeApplicationsCacheSettings/ListView'
+  import EdgeApplicationsFunctionsListView from '@/views/EdgeApplicationsFunctions/ListView'
+  import EdgeApplicationsDeviceGroupsListView from '@/views/EdgeApplicationsDeviceGroups/ListView.vue'
+  import EditView from './EditView.vue'
 
   defineOptions({ name: 'tabs-edge-service' })
 
@@ -14,7 +17,9 @@
     edgeApplicationServices: { type: Object, required: true },
     originsServices: { type: Object, required: true },
     cacheSettingsServices: { type: Object, required: true },
-    clipboardWrite: { type: Function, required: true }
+    clipboardWrite: { type: Function, required: true },
+    functionsServices: { type: Object, required: true },
+    deviceGroupsServices: { type: Object, required: true }
   })
 
   const mapTabs = {
@@ -25,7 +30,7 @@
     functions: 5,
     rulesEngine: 6
   }
-  const activatedFunctions = false
+  const activatedFunctions = true
   const route = useRoute()
   const router = useRouter()
   const activeTab = ref(0)
@@ -71,7 +76,15 @@
         @tab-click="changeRouteByClickingOnTab"
         class="w-full h-full"
       >
-        <TabPanel header="Main Settings"> </TabPanel>
+        <TabPanel header="Main Settings">
+          <div class="mt-8">
+            <EditView
+              :editEdgeApplicationService="edgeApplicationServices.editEdgeApplication"
+              :loadEdgeApplicationService="edgeApplicationServices.loadEdgeApplication"
+              :updatedRedirect="edgeApplicationServices.updatedRedirect"
+            />
+          </div>
+        </TabPanel>
         <TabPanel header="Origins">
           <EdgeApplicationsOriginsListView
             v-if="activeTab === mapTabs.origins"
@@ -81,7 +94,13 @@
           />
         </TabPanel>
 
-        <TabPanel header="Device Groups"> </TabPanel>
+        <TabPanel header="Device Groups">
+          <EdgeApplicationsDeviceGroupsListView
+            :edgeApplicationId="edgeApplicationId"
+            v-bind="props.deviceGroupsServices"
+          >
+          </EdgeApplicationsDeviceGroupsListView>
+        </TabPanel>
         <TabPanel header="Error Responses"> </TabPanel>
         <TabPanel header="Cache Settings">
           <EdgeApplicationsCacheSettingsListView
@@ -94,6 +113,10 @@
           v-if="activatedFunctions"
           header="Functions"
         >
+          <EdgeApplicationsFunctionsListView
+            v-bind="props.functionsServices"
+            :edgeApplicationId="edgeApplicationId"
+          />
         </TabPanel>
         <TabPanel header="Rules Engine"> </TabPanel>
       </TabView>

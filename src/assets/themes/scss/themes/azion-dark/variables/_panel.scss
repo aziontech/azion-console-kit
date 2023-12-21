@@ -320,7 +320,7 @@ $dividerSize: 1px;
 
 /// Color of the divider border
 /// @group panel
-$dividerColor: #3e3e3e;
+$dividerColor: var(--surface-border);
 
 /// Background of the splitter gutter
 /// @group panel

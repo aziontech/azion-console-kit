@@ -28,7 +28,7 @@
           </h2>
           <slot name="form" />
           <p class="text-sm font-normal text-center text-color-secondary">
-            By signing up you agree to the
+            By signing up, you agree to the
             <PrimeButton
               label="Terms of Service"
               link
@@ -47,7 +47,7 @@
         <div class="flex flex-wrap justify-center items-center gap-3 mt-8 max-w-md">
           <p class="text-sm font-normal">Already have an account?</p>
           <PrimeButton
-            label="Sign in here"
+            label="Sign In"
             severity="secondary"
             @click="goToLogin"
           />

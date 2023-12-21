@@ -10,7 +10,7 @@
         :initialValues="initialValues"
       >
         <template #form>
-          <FormFieldsCreateEdgeApplications />
+          <FormFieldsCreateEdgeApplications :handleBlock="handleBlocks" />
         </template>
 
         <template #action-bar="{ onSubmit, formValid, onCancel, loading }">
@@ -53,6 +53,7 @@
   const initialValues = ref({
     name: '',
     deliveryProtocol: 'http',
+    http3: false,
     httpPort: { label: '80 (Default)', value: '80' },
     httpsPort: { label: '443 (Default)', value: '443' },
     minimumTlsVersion: { label: 'None', value: '' },
@@ -62,9 +63,19 @@
     address: '',
     originProtocolPolicy: 'preserve',
     hostHeader: '${host}',
-    browserCacheSettings: 'honor',
+    browserCacheSettings: 'override',
     browserCacheSettingsMaximumTtl: '',
-    cdnCacheSettings: 'honor',
-    cdnCacheSettingsMaximumTtl: 60
+    cdnCacheSettings: 'override',
+    cdnCacheSettingsMaximumTtl: 60,
+    cdnCacheSettingsDefaultTtl: 60,
+    active: false
   })
+
+  const handleBlocks = [
+    'general',
+    'delivery-settings',
+    'default-origins',
+    'cache-expiration-policies',
+    'debug-rules'
+  ]
 </script>

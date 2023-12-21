@@ -38,6 +38,7 @@
   import Illustration from '@/assets/svg/illustration-layers.vue'
   import ContentBlock from '@/templates/content-block'
   import PageHeadingBlock from '@/templates/page-heading-block'
+  import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
 
   const hasContentToList = ref(true)
   const pageTitle = 'Users'
@@ -79,7 +80,14 @@
     },
     {
       field: 'active',
-      header: 'Active'
+      header: 'Active',
+      type: 'component',
+      component: (columnData) => {
+        return columnBuilder({
+          data: columnData,
+          columnAppearance: 'tag'
+        })
+      }
     },
     {
       field: 'owner',
