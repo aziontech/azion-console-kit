@@ -5,9 +5,8 @@ import * as Errors from '@/services/axios/errors'
 export const editRulesEngineService = async ({ id, payload, reorder = false }) => {
   const parsedPayload = adapt(payload, reorder)
 
-  const rulesPhase = payload.phase.content === 'Default'
-  ? 'request'
-  : payload.phase.content.toLowerCase()
+  const rulesPhase =
+    payload.phase.content === 'Default' ? 'request' : payload.phase.content?.toLowerCase()
 
   let httpResponse = await AxiosHttpClientAdapter.request({
     url: `${makeEdgeApplicationBaseUrl()}/${id}/rules_engine/${rulesPhase}/rules/${payload.id}`,
@@ -19,26 +18,25 @@ export const editRulesEngineService = async ({ id, payload, reorder = false }) =
 }
 
 const adapt = (payload, reorder) => {
-  let paylodAdapted
-  const { name, phase, behaviors, criteria, isActive, order, description } = payload
+  let parsedPaylod
 
   if (!reorder) {
-    paylodAdapted = {
+    const { name, phase, behaviors, criteria, isActive, description } = payload
+    parsedPaylod = {
       name,
       phase: phase.content,
       behaviors,
       criteria,
       is_active: isActive,
-      order,
       description
     }
   } else {
-    paylodAdapted = {
+    parsedPaylod = {
       order: parseInt(payload.order)
     }
   }
 
-  return paylodAdapted
+  return parsedPaylod
 }
 
 /**

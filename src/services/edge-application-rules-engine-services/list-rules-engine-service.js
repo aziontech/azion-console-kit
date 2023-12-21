@@ -31,7 +31,7 @@ const STATUS_AS_TAG = {
 }
 const phaseAsTag = (phase) => {
   return {
-    content:  phase.charAt(0).toUpperCase() + phase.slice(1),
+    content: phase.charAt(0).toUpperCase() + phase.slice(1),
     outlined: true,
     severity: 'info'
   }

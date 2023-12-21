@@ -328,7 +328,7 @@
             summary: error
           })
         }
-      },
+      }
     },
     watch: {
       data(currentState) {

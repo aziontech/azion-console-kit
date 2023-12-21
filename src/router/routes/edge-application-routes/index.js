@@ -76,7 +76,7 @@ export const edgeApplicationRoutes = {
         rulesEngineServices: {
           listRulesEngineService: RulesEngineService.listRulesEngineService,
           deleteRulesEngineService: RulesEngineService.deleteRulesEngineService,
-          reorderRulesEngine: RulesEngineService.reorderRulesEngine,
+          reorderRulesEngine: RulesEngineService.reorderRulesEngine
         },
         clipboardWrite: Helpers.clipboardWrite
       },
