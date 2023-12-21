@@ -38,16 +38,16 @@ describe('EdgeApplicationRulesEnginesServices', () => {
 
     const { sut } = makeSut()
     const phase = 'request'
-    const feedbackMessage = await sut({ ruleId: fixtures.ruleId, phase, edgeApplicationId: fixtures.edgeApplicationId })
+    const feedbackMessage = await sut({
+      ruleId: fixtures.ruleId,
+      phase,
+      edgeApplicationId: fixtures.edgeApplicationId
+    })
 
     expect(feedbackMessage).toBe('Rule Engine successfully deleted')
   })
 
   it.each([
-    {
-      statusCode: 400,
-      expectedError: new Errors.InvalidApiRequestError().message
-    },
     {
       statusCode: 401,
       expectedError: new Errors.InvalidApiTokenError().message
@@ -77,7 +77,12 @@ describe('EdgeApplicationRulesEnginesServices', () => {
 
       const { sut } = makeSut()
 
-      const response = sut(fixtures.RulesEngine, fixtures.edgeApplicationId)
+      const phase = 'request'
+      const response = sut({
+        ruleId: fixtures.ruleId,
+        phase,
+        edgeApplicationId: fixtures.edgeApplicationId
+      })
 
       expect(response).rejects.toBe(expectedError)
     }

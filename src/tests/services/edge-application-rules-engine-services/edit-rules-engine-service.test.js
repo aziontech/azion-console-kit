@@ -112,7 +112,8 @@ describe('EdgeApplicationRulesEngineServices', () => {
       })
       const { sut } = makeSut()
 
-      const response = sut(fixtures.deviceGroupPayload)
+      const edgeApplicationId = 123
+      const response = sut({ id: edgeApplicationId, payload: fixtures.rulePayload })
 
       expect(response).rejects.toBe(expectedError)
     }

@@ -1,5 +1,5 @@
 import { AxiosHttpClientAdapter } from '@/services/axios/AxiosHttpClientAdapter'
-import { reorderRulesEngine, editRulesEngineService } from '@/services/edge-application-rules-engine-services'
+import { reorderRulesEngine } from '@/services/edge-application-rules-engine-services'
 import { describe, expect, it, vi } from 'vitest'
 import * as Errors from '@/services/axios/errors'
 
@@ -109,5 +109,5 @@ describe('EdgeApplicationRulesEnginesServices', () => {
     const errorMessage = new Errors.CannotReorderDefaultRule().message
 
     expect(reorderService).rejects.toBe(errorMessage)
-  });
+  })
 })
