@@ -30,6 +30,9 @@ jobs:
       - name: Download Azion CLI
         run: curl https://downloads.azion.com/linux/x86_64/azioncli -o azioncli && chmod +x azioncli
 
+      - name: Create YML Azion CLI FILE
+        run: touch /github/home/.config/azioncli.yaml
+
       - name: Configure Azion CLI
         run: ./azioncli configure -t ${{ secrets.PLATFORM_KIT_TOKEN }}
 
