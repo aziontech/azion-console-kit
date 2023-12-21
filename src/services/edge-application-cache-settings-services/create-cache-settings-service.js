@@ -21,17 +21,23 @@ export const createCacheSettingsService = async ({ edgeApplicationId, ...payload
 /**
  * @param {Array<Object>} deviceGroup - The list of devices.
  * @param {string} deviceGroup.id - The device group id.
- * @returns {Array<number>}
+ * @returns {Array<string>} - devices to use cache settings
  */
 const parseDeviceGroup = (deviceGroup) => {
-  const result = deviceGroup?.map((deviceGroupItem) => Number(deviceGroupItem.id)) || []
+  const devices = deviceGroup?.map((deviceGroupItem) => deviceGroupItem.id) || []
 
-  return result
+  return devices
+}
+
+const parseTextContentToArrayByBreaklines = (textContent) => {
+  if (textContent === '') {
+    return []
+  }
+  return textContent.split('\n')?.map((queryString) => queryString)
 }
 
 const adapt = (payload) => {
   return {
-    // id: Number(payload.edgeApplicationId),
     name: payload.name,
     browser_cache_settings: payload.browserCacheSettings,
     browser_cache_settings_maximum_ttl: payload.browserCacheSettingsMaximumTtl,
@@ -40,13 +46,12 @@ const adapt = (payload) => {
     is_slice_configuration_enabled: payload.sliceConfigurationEnabled,
     slice_configuration_range: payload.sliceConfigurationRange,
     cache_by_query_string: payload.cacheByQueryString,
-    // query_string_fields: payload.queryStringFields,
+    query_string_fields: parseTextContentToArrayByBreaklines(payload.queryStringFields),
     enable_query_string_sort: payload.enableQueryStringSort,
     enable_caching_for_post: payload.enableCachingForPost,
     enable_caching_for_options: payload.enableCachingForOptions,
     enable_stale_cache: true,
-    // cache_by_cookie: payload.cacheByCookies,
-    // cookie_names: payload.cookieNames,
+    cookie_names: parseTextContentToArrayByBreaklines(payload.cookieNames),
     adaptive_delivery_action: payload.adaptiveDeliveryAction,
     device_group: parseDeviceGroup(payload.deviceGroup)
   }
@@ -70,7 +75,7 @@ const extractApiError = (httpResponse) => {
   const apiKeyError = Object.keys(httpResponse.body)[0]
   const apiValidationError = extractErrorKey(httpResponse.body, apiKeyError)
 
-  return apiValidationError
+  return `${apiKeyError}: ${apiValidationError}`
 }
 
 /**
@@ -82,17 +87,15 @@ const extractApiError = (httpResponse) => {
 const parseHttpResponse = (httpResponse) => {
   switch (httpResponse.statusCode) {
     case 201:
-      return 'Cache Settings successfully created'
+      return { feedback: 'Cache Settings successfully created' }
     case 400:
-      throw new Errors.NotFoundError().message
+      throw new Error(extractApiError(httpResponse)).message
     case 401:
       throw new Errors.InvalidApiTokenError().message
     case 403:
       throw new Errors.PermissionError().message
     case 404:
       throw new Errors.NotFoundError().message
-    case 409:
-      throw new Error(extractApiError(httpResponse)).message
     case 500:
       throw new Errors.InternalServerError().message
     default:
