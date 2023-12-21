@@ -52,7 +52,7 @@
 
   const handleOpenPermissionsDoc = () => {
     props.windowOpen(
-      'https://www.azion.com/en/documentation/products/guides/permissions-marketplace/',
+      'https://www.azion.com/en/documentation/products/marketplace/permissions-marketplace/',
       '_blank'
     )
   }

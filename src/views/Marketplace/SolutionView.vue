@@ -85,7 +85,7 @@
               :class="{ 'animate-fadeIn': !animateMessage.value }"
               severity="success"
               v-if="isLastVersion"
-              >Latest version installed</InlineMessage
+              >Latest version installed!</InlineMessage
             >
             <PrimeButton
               v-else
@@ -117,7 +117,7 @@
               <span class="text-sm text-color-secondary flex-shrink-0">Need help?</span>
               <PrimeButton
                 class="p-0 text-right"
-                label="Azion’s Sales Team "
+                label="Azion Sales Team "
                 size="small"
                 link
                 icon="pi pi-external-link"
@@ -325,7 +325,7 @@
 
   const sidebarTitle = computed(() => {
     if (isLastVersion.value) {
-      return 'Integration installed'
+      return 'Integration installed!'
     }
     if (solution.value.isBringYourOwnLicense) {
       return 'Bring Your Own License'
@@ -338,15 +338,15 @@
 
   const sidebarDescription = computed(() => {
     if (isLastVersion.value) {
-      return 'Set it up to work adequately and define settings for a customized experience.'
+      return 'Configure it for optimal performance and define settings for a customized experience.'
     }
     if (solution.value.isBringYourOwnLicense) {
-      return 'You can choose to bring your own license purchased before of this solution and run on Azion Edge.'
+      return 'Bring a previously purchased license and use it to run this integration on Azion Edge.'
     }
     if (solution.value.isPayAsYouGo) {
-      return 'Buy and launch this solution instantly. Total pricing per instance for services hosted on t2.small in US East (N. Virginia).'
+      return 'Buy and launch this integration instantly. Total pricing per instance for services is hosted on t2.small in US East (N. Virginia).'
     }
-    return 'You can choose to download this solution for free model.'
+    return 'Install this integration using the available free model.'
   })
 
   const sidebarButtonLabel = computed(() => {
