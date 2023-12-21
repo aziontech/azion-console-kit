@@ -351,7 +351,7 @@
 
   const sidebarButtonLabel = computed(() => {
     if (isOutdated.value) return 'Get New Version'
-    return 'Get it Now'
+    return 'Install'
   })
 
   const loadIcon = computed(() => {
