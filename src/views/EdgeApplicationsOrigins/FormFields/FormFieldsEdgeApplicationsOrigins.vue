@@ -197,7 +197,10 @@
           option-value="value"
           :optionDisabled="(option) => option.disabled"
         />
-        <small class="text-xs text-color-secondary font-normal leading-5" v-if="!isLoadBalancerOriginType">
+        <small
+          class="text-xs text-color-secondary font-normal leading-5"
+          v-if="!isLoadBalancerOriginType"
+        >
           Select an option to customize the origin.
         </small>
       </div>

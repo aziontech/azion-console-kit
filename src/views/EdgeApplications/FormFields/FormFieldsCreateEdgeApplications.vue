@@ -795,8 +795,8 @@
           </template>
           <template #content>
             <small class="text-color-secondary text-sm">
-              Rules that were successfully executed will be shown under the $traceback field in
-                Data Streaming and Real-Time Events or the $stacktrace variable in GraphQL.
+              Rules that were successfully executed will be shown under the $traceback field in Data
+              Streaming and Real-Time Events or the $stacktrace variable in GraphQL.
             </small>
           </template>
         </Card>

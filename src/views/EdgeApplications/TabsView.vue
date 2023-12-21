@@ -80,7 +80,9 @@
               :editEdgeApplicationService="edgeApplicationServices.editEdgeApplication"
               :loadEdgeApplicationService="edgeApplicationServices.loadEdgeApplication"
               :updatedRedirect="edgeApplicationServices.updatedRedirect"
-              :contactSalesEdgeApplicationService="edgeApplicationServices.contactSalesEdgeApplicationService"
+              :contactSalesEdgeApplicationService="
+                edgeApplicationServices.contactSalesEdgeApplicationService
+              "
             />
           </div>
         </TabPanel>

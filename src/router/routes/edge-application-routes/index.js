@@ -56,7 +56,8 @@ export const edgeApplicationRoutes = {
           editEdgeApplication: EdgeApplicationsService.editEdgeApplicationService,
           loadEdgeApplication: EdgeApplicationsService.loadEdgeApplicationService,
           updatedRedirect: 'list-edge-applications',
-          contactSalesEdgeApplicationService: EdgeApplicationsService.contactSalesEdgeApplicationService
+          contactSalesEdgeApplicationService:
+            EdgeApplicationsService.contactSalesEdgeApplicationService
         },
         originsServices: {
           listOriginsService: OriginsService.listOriginsService,

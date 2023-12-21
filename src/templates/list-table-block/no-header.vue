@@ -193,7 +193,7 @@
       data: [],
       minimumOfItemsPerPage: 10,
       informationForDeletion: {},
-      selectedColumns: [],
+      selectedColumns: []
     }),
     props: {
       columns: {
@@ -320,7 +320,7 @@
       },
       toggleColumnSelector(event) {
         this.$refs.columnSelectorPanel.toggle(event)
-      },
+      }
     },
     watch: {
       data(currentState) {

@@ -6,7 +6,10 @@
     :schema="validationSchema"
   >
     <template #form>
-      <FormFieldsCreateEdgeApplications :handleBlock="handleBlocks" :contactSalesEdgeApplicationService="contactSalesEdgeApplicationService" />
+      <FormFieldsCreateEdgeApplications
+        :handleBlock="handleBlocks"
+        :contactSalesEdgeApplicationService="contactSalesEdgeApplicationService"
+      />
     </template>
     <template #action-bar="{ onSubmit, formValid, onCancel, loading }">
       <ActionBarBlockWithTeleport
