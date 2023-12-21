@@ -100,7 +100,7 @@
 
   watch(adaptiveDeliveryAction, (value) => {
     if (value === 'whitelist' && deviceGroup.value.length === 0) {
-      addDeviceGroup()
+      addDeviceGroup({ id: '' })
     }
   })
 </script>
@@ -508,6 +508,7 @@
             <FieldInputGroup
               placeholder="Value"
               :name="`deviceGroup[${index}].id`"
+              :value="deviceGroup[index].value.id"
             >
               <template #button>
                 <PrimeButton
