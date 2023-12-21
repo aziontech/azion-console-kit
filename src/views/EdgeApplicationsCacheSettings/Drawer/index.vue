@@ -1,5 +1,6 @@
 <script setup>
   import CreateDrawerBlock from '@templates/create-drawer-block'
+  import EditDrawerBlock from '@templates/edit-drawer-block'
   import FormFieldsEdgeApplicationCacheSettings from '../FormFields/FormFieldsEdgeApplicationCacheSettings'
   import * as yup from 'yup'
   import { refDebounced } from '@vueuse/core'
@@ -18,15 +19,19 @@
   })
 
   const showCreateCacheSettingsDrawer = ref(false)
+  const showEditCacheSettingsDrawer = ref(false)
+  const selectedCacheSettingsToEdit = ref('')
   const debouncedDrawerAnimate = 300
 
   const showCreateDrawer = refDebounced(showCreateCacheSettingsDrawer, debouncedDrawerAnimate)
+  const showEditDrawer = refDebounced(showEditCacheSettingsDrawer, debouncedDrawerAnimate)
 
   const MAX_TTL_ONE_YEAR_IN_SECONDS = 31536000
   const LOCKED_SLICE_RANGE_IN_KBYTES = 1024
 
   const initialValues = ref({
-    id: props.edgeApplicationId,
+    edgeApplicationId: props.edgeApplicationId,
+    id: 0,
     name: '',
     browserCacheSettings: 'honor',
     browserCacheSettingsMaximumTtl: 0,
@@ -46,6 +51,8 @@
     deviceGroup: []
   })
   const validationSchema = yup.object({
+    edgeApplicationId: yup.string().required(),
+    id: yup.string().required(),
     name: yup.string().required().label('Name'),
     browserCacheSettings: yup.string().required().label('Browser cache settings'),
     browserCacheSettingsMaximumTtl: yup
@@ -112,14 +119,24 @@
   const openCreateDrawer = () => {
     showCreateCacheSettingsDrawer.value = true
   }
+  const openEditDrawer = (cacheSettingsId) => {
+    selectedCacheSettingsToEdit.value = `${cacheSettingsId}`
+    showEditCacheSettingsDrawer.value = true
+  }
 
   const handleCreateCacheSettings = () => {
     emit('onSuccess')
     closeCreateDrawer()
   }
 
+  const handleEditedCacheSettings = () => {
+    emit('onSuccess')
+    closeCreateDrawer()
+  }
+
   defineExpose({
-    openCreateDrawer
+    openCreateDrawer,
+    openEditDrawer
   })
 </script>
 
@@ -141,4 +158,32 @@
       <FormFieldsEdgeApplicationCacheSettings />
     </template>
   </CreateDrawerBlock>
+
+  <EditDrawerBlock
+    v-if="showEditDrawer"
+    :id="selectedCacheSettingsToEdit"
+    v-model:visible="showEditCacheSettingsDrawer"
+    :loadService="
+      () => ({
+        ...initialValues,
+        name: 'Teste',
+        adaptiveDeliveryAction: 'whitelist',
+        deviceGroup: [{ id: '1231231313' }, { id: '1253193089078967' }],
+        id: selectedCacheSettingsToEdit,
+        edgeApplicationId: props.edgeApplicationId
+      })
+    "
+    :editService="
+      () => ({
+        feedback: 'Editado  com sucesso'
+      })
+    "
+    :schema="validationSchema"
+    @onSuccess="handleEditedCacheSettings"
+    title="Edit Cache Settings"
+  >
+    <template #formFields>
+      <FormFieldsEdgeApplicationCacheSettings />
+    </template>
+  </EditDrawerBlock>
 </template>
