@@ -4,7 +4,8 @@
     :class="{ 'mt-4 pb-8': inTabs }"
   >
     <div
-      class="flex flex-col h-full border surface-border gap-7 justify-center items-center rounded-md"
+      class="flex flex-col h-full gap-7 justify-center items-center rounded-md"
+      :class="{ 'border surface-border': !noBorder }"
     >
       <slot name="illustration" />
       <div class="flex flex-col gap-2">
@@ -56,7 +57,8 @@
     documentationService: { type: Function, required: true },
     createPagePath: { type: String, required: false },
     createButtonLabel: { type: String, required: false },
-    inTabs: { type: Boolean, required: false }
+    inTabs: { type: Boolean, required: false },
+    noBorder: { type: Boolean, required: false, default: false }
   })
   function openDocumentation() {
     props.documentationService()

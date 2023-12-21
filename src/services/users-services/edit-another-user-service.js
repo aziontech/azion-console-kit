@@ -1,6 +1,7 @@
 import { AxiosHttpClientAdapter } from '../axios/AxiosHttpClientAdapter'
 import { makeUsersBaseUrl } from './make-users-base-url'
 import * as Errors from '@/services/axios/errors'
+import { getFirstApiError } from '@/helpers'
 
 export const editAnotherUserService = async (payload) => {
   const bodyRequest = adapt(payload)
@@ -53,13 +54,4 @@ const parseHttpResponse = (httpResponse) => {
     default:
       throw new Errors.UnexpectedError().message
   }
-}
-
-const getFirstApiError = (body) => {
-  for (let key in body) {
-    if (Array.isArray(body[key]) && body[key].length > 0) {
-      return body[key][0]
-    }
-  }
-  return null
 }

@@ -3,13 +3,13 @@ import { makeEdgeApplicationBaseUrl } from '../edge-application-services/make-ed
 
 export const listRulesEngineService = async ({
   id,
-  orderBy = 'id',
+  phase = 'request',
+  orderBy = 'order',
   sort = 'asc',
   page = 1,
   pageSize = 200
 }) => {
   const searchParams = makeSearchParams({ orderBy, sort, page, pageSize })
-  const phase = 'request'
   let httpResponse = await AxiosHttpClientAdapter.request({
     url: `${makeEdgeApplicationBaseUrl()}/${id}/rules_engine/${phase}/rules?${searchParams.toString()}`,
     method: 'GET'
@@ -19,18 +19,35 @@ export const listRulesEngineService = async ({
 
   return parseHttpResponse(httpResponse)
 }
+const STATUS_AS_TAG = {
+  true: {
+    content: 'Active',
+    severity: 'success'
+  },
+  false: {
+    content: 'Inactive',
+    severity: 'danger'
+  }
+}
+const phaseAsTag = (phase) => {
+  return {
+    content:  phase.charAt(0).toUpperCase() + phase.slice(1),
+    outlined: true,
+    severity: 'info'
+  }
+}
 
 const adapt = (httpResponse) => {
   const parsedRulesEgine = httpResponse.body.results?.map((rules) => {
     return {
       id: rules.id,
       name: rules.name,
-      phase: rules.phase,
+      phase: phaseAsTag(rules.phase),
       behaviors: rules.behaviors,
       criteria: rules.criteria,
-      isActive: rules.is_active,
+      status: STATUS_AS_TAG[rules.is_active],
       order: rules.order,
-      description: rules.description
+      description: rules.description || '-'
     }
   })
 

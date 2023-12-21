@@ -3,7 +3,10 @@
   import EmptyResultsBlock from '@/templates/empty-results-block'
   import PrimeButton from 'primevue/button'
   import Illustration from '@/assets/svg/illustration-layers'
-  import { computed, ref } from 'vue'
+  import { computed, ref, watch } from 'vue'
+  import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
+  import SelectButton from 'primevue/selectbutton'
+
   defineOptions({ name: 'list-edge-applications-device-groups-tab' })
 
   const props = defineProps({
@@ -15,7 +18,11 @@
       required: true,
       type: Function
     },
-    deleteRulesEngineervice: {
+    deleteRulesEngineService: {
+      required: true,
+      type: Function
+    },
+    reorderRulesEngine: {
       required: true,
       type: Function
     }
@@ -31,19 +38,30 @@
       },
       {
         field: 'phase',
-        header: 'Phase'
+        header: 'Phase',
+        type: 'component',
+
+        component: (columnData) => {
+          return columnBuilder({
+            data: columnData,
+            columnAppearance: 'tag'
+          })
+        }
       },
       {
         field: 'status',
-        header: 'Status'
+        header: 'Status',
+        type: 'component',
+        component: (columnData) => {
+          return columnBuilder({
+            data: columnData,
+            columnAppearance: 'tag'
+          })
+        }
       },
       {
         field: 'description',
         header: 'Description'
-      },
-      {
-        field: 'lastModified',
-        header: 'Last modified'
       }
     ]
   })
@@ -52,52 +70,89 @@
     hasContentToList.value = event
   }
 
+  const phaseOptions = ref(['Request phase', 'Response phase'])
+  const selectedPhase = ref('Request phase')
+  const parsePhase = {
+    'Request phase': 'request',
+    'Response phase': 'response'
+  }
   const listRulesEngineWithDecorator = async () => {
-    return await props.listRulesEngineService({ id: props.edgeApplicationId })
+    return await props.listRulesEngineService({
+      id: props.edgeApplicationId,
+      phase: parsePhase[selectedPhase.value]
+    })
   }
 
-  const deleteRulesEngineWithDecorator = async (id) => {
-    return await props.deleteRulesEngineervice(id, props.edgeApplicationId)
+  const deleteRulesEngineWithDecorator = async (ruleId, ruleData) => {
+    const phase =
+      ruleData.phase.content == 'Default' ? 'request' : ruleData.phase.content.toLowerCase()
+
+    return await props.deleteRulesEngineService({
+      edgeApplicationId: props.edgeApplicationId,
+      ruleId,
+      phase
+    })
   }
+
+  const reorderRulesEngineWithDecorator = async (tableData) => {
+    return await props.reorderRulesEngine(tableData, props.edgeApplicationId)
+  }
+
+  const listRulesEngine = ref(null)
+  watch(selectedPhase, () => {
+    listRulesEngine.value.loadData({ page: 1 })
+  })
 </script>
 
 <template>
-  <div v-if="hasContentToList">
-    <ListTableBlock
-      pageTitleDelete="Device Groups"
-      :listService="listRulesEngineWithDecorator"
-      :deleteService="deleteRulesEngineWithDecorator"
-      :editInDrawer="openEditDeviceGroupDrawer"
-      :columns="getColumns"
-      @on-load-data="handleLoadData"
-    >
-      <template #addButton>
-        <PrimeButton
-          @click="openCreateDeviceGroupDrawer"
-          icon="pi pi-plus"
-          label="Device Group"
-        />
-      </template>
-    </ListTableBlock>
-  </div>
-  <EmptyResultsBlock
-    v-else
-    title="No Device Group have been created"
-    description="Create your first Device Group."
-    createButtonLabel="Add"
-    :documentationService="props.documentationService"
-    :inTabs="true"
+  <ListTableBlock
+    ref="listRulesEngine"
+    :reorderableRows="true"
+    :onReorderService="reorderRulesEngineWithDecorator"
+    pageTitleDelete="Rules Engine"
+    :listService="listRulesEngineWithDecorator"
+    :deleteService="deleteRulesEngineWithDecorator"
+    :columns="getColumns"
+    @on-load-data="handleLoadData"
+    :pt="{
+      thead: { class: !hasContentToList && 'hidden' }
+    }"
   >
-    <template #default>
-      <PrimeButton
-        @click="openCreateDeviceGroupDrawer"
-        severity="secondary"
-        icon="pi pi-plus"
-        label="Add"
-      />
+    <template #addButton>
+      <div class="flex gap-4">
+        <SelectButton
+          v-model="selectedPhase"
+          :options="phaseOptions"
+          :unselectable="true"
+        />
+        <PrimeButton
+          icon="pi pi-plus"
+          label="Rules Engine"
+        />
+      </div>
     </template>
-    <template #illustration>
-      <Illustration />
+
+    <template #empty>
+      <EmptyResultsBlock
+        title="No Rules Engine added"
+        description="Create your first Rule Engine."
+        createButtonLabel="Add"
+        :documentationService="props.documentationService"
+        :inTabs="true"
+        :noBorder="true"
+      >
+        <template #default>
+          <PrimeButton
+            @click="openCreateDeviceGroupDrawer"
+            severity="secondary"
+            icon="pi pi-plus"
+            label="Add"
+          />
+        </template>
+        <template #illustration>
+          <Illustration />
+        </template>
+      </EmptyResultsBlock>
     </template>
-  </EmptyResultsBlock>
+  </ListTableBlock>
 </template>
