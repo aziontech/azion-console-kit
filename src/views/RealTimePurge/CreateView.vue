@@ -10,7 +10,9 @@
         :initialValues="initialValues"
       >
         <template #form>
-          <FormFieldsCreateRealTimePurge />
+          <FormFieldsCreateRealTimePurge
+            :contactSalesRealTimePurgeService="contactSalesRealTimePurgeService"
+          />
         </template>
         <template #action-bar="{ onSubmit, formValid, onCancel, loading }">
           <ActionBarBlockWithTeleport
@@ -36,6 +38,10 @@
 
   const props = defineProps({
     createRealTimePurgeService: {
+      type: Function,
+      required: true
+    },
+    contactSalesRealTimePurgeService: {
       type: Function,
       required: true
     }
