@@ -15,6 +15,10 @@
     edgeApplicationId: {
       type: String,
       required: true
+    },
+    createService: {
+      type: String,
+      required: true
     }
   })
 
@@ -44,7 +48,7 @@
     enableQueryStringSort: false,
     enableCachingForPost: false,
     enableCachingForOptions: false,
-    enableStaleCache: false,
+    enableStaleCache: true,
     cacheByCookies: 'ignore',
     cookieNames: '',
     adaptiveDeliveryAction: 'ignore',
@@ -124,6 +128,14 @@
     showEditCacheSettingsDrawer.value = true
   }
 
+  const createServiceWithEdgeApplicationIdDecorator = async (payload) => {
+    const result = await props.createService({
+      ...payload,
+      edgeApplicationId: props.edgeApplicationId
+    })
+    return result
+  }
+
   const handleCreateCacheSettings = () => {
     emit('onSuccess')
     closeCreateDrawer()
@@ -144,11 +156,7 @@
   <CreateDrawerBlock
     v-if="showCreateDrawer"
     v-model:visible="showCreateCacheSettingsDrawer"
-    :createService="
-      () => ({
-        feedback: 'Criado com sucesso'
-      })
-    "
+    :createService="createServiceWithEdgeApplicationIdDecorator"
     :schema="validationSchema"
     :initialValues="initialValues"
     @onSuccess="handleCreateCacheSettings"

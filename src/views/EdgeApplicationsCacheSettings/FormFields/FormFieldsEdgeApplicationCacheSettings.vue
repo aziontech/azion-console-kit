@@ -409,6 +409,7 @@
             <InputSwitch
               v-model="enableStaleCache"
               inputId="enableStaleCache"
+              disabled
             />
             <label
               for="enableStaleCache"

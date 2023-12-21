@@ -18,6 +18,10 @@
       type: Function,
       required: true
     },
+    createCacheSettingsService: {
+      type: Function,
+      required: true
+    },
     documentationService: {
       type: Function,
       required: true
@@ -80,6 +84,7 @@
   <Drawer
     ref="drawerRef"
     :edgeApplicationId="props.edgeApplicationId"
+    :createService="props.createCacheSettingsService"
     @onSuccess="reloadList"
   />
 
