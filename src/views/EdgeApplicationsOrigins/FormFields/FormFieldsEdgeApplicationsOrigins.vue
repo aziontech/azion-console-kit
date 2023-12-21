@@ -197,8 +197,37 @@
           option-value="value"
           :optionDisabled="(option) => option.disabled"
         />
-        <small class="text-xs text-color-secondary font-normal leading-5">
+        <small
+          class="text-xs text-color-secondary font-normal leading-5"
+          v-if="!isLoadBalancerOriginType"
+        >
           Select an option to customize the origin.
+        </small>
+      </div>
+      <div class="flex flex-col w-full sm:max-w-3xl gap-2">
+        <label class="text-color text-sm font-medium leading-5">Protocol Policy</label>
+        <div class="flex flex-col gap-4">
+          <div
+            class="flex no-wrap gap-2 items-center"
+            v-for="policy in ORIGIN_PROTOCOL_POLICIES"
+            :key="policy.value"
+          >
+            <RadioButton
+              v-model="originProtocolPolicy"
+              :inputId="policy.value"
+              name="originProtocolPolicy"
+              :value="policy.value"
+            />
+            <label
+              :for="policy.value"
+              class="text-color text-sm font-normal leading-tight"
+            >
+              {{ policy.label }}
+            </label>
+          </div>
+        </div>
+        <small class="text-color-secondary text-xs font-normal leading-5">
+          Select the type of connection between the edge nodes and the origin.
         </small>
       </div>
       <div
@@ -251,32 +280,6 @@
           description="Specify a custom path from which edge nodes will request the origin content. If this is
           blank, Azion will use the Address as the default."
         />
-      </div>
-      <div class="flex flex-col w-full sm:max-w-3xl gap-2">
-        <label class="text-color text-sm font-medium leading-5">Protocol Policy</label>
-        <div class="flex flex-col gap-4">
-          <div
-            class="flex no-wrap gap-2 items-center"
-            v-for="policy in ORIGIN_PROTOCOL_POLICIES"
-            :key="policy.value"
-          >
-            <RadioButton
-              v-model="originProtocolPolicy"
-              :inputId="policy.value"
-              name="originProtocolPolicy"
-              :value="policy.value"
-            />
-            <label
-              :for="policy.value"
-              class="text-color text-sm font-normal leading-tight"
-            >
-              {{ policy.label }}
-            </label>
-          </div>
-        </div>
-        <small class="text-color-secondary text-xs font-normal leading-5">
-          Select the type of connection between the edge nodes and the origin.
-        </small>
       </div>
     </template>
   </FormHorizontal>
@@ -397,7 +400,7 @@
         </div>
       </div>
       <div class="flex flex-col w-full gap-2">
-        <Divider />
+        <Divider type="dashed" />
       </div>
       <div>
         <PrimeButton

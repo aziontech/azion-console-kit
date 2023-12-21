@@ -51,30 +51,36 @@
     return [
       {
         field: 'name',
-        header: 'Origin Name'
+        header: 'Name'
       },
       {
         field: 'originType',
-        header: 'Origin Type'
+        header: 'Type'
       },
       {
         field: 'hostHeader',
-        header: 'Host Header'
+        header: 'Header'
       },
       {
         field: 'addresses',
-        header: 'Origin Address',
+        header: 'Address',
         type: 'component',
         component: (columnData) =>
           columnBuilder({ data: columnData, columnAppearance: 'expand-column' })
       },
       {
-        field: 'addresses',
-        header: 'Origin Address'
-      },
-      {
         field: 'originKey',
-        header: 'Origin Key'
+        header: 'Key',
+        type: 'component',
+        component: (columnData) => {
+          return columnBuilder({
+            data: columnData,
+            columnAppearance: 'text-with-clipboard',
+            dependencies: {
+              copyContentService: props.clipboardWrite
+            }
+          })
+        }
       }
     ]
   })
@@ -134,6 +140,7 @@
           icon="pi pi-plus"
           label="Origin"
           @click="openCreateOriginDrawer"
+          class="w-full sm:w-auto"
         />
       </template>
     </ListTableBlock>

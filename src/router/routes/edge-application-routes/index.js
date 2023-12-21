@@ -55,7 +55,9 @@ export const edgeApplicationRoutes = {
         edgeApplicationServices: {
           editEdgeApplication: EdgeApplicationsService.editEdgeApplicationService,
           loadEdgeApplication: EdgeApplicationsService.loadEdgeApplicationService,
-          updatedRedirect: 'list-edge-applications'
+          updatedRedirect: 'list-edge-applications',
+          contactSalesEdgeApplicationService:
+            EdgeApplicationsService.contactSalesEdgeApplicationService
         },
         originsServices: {
           listOriginsService: OriginsService.listOriginsService,
@@ -63,7 +65,8 @@ export const edgeApplicationRoutes = {
           createOriginService: OriginsService.createOriginService,
           editOriginService: OriginsService.editOriginService,
           loadOriginService: OriginsService.loadOriginService,
-          documentationService: Helpers.documentationCatalog.edgeApplicationOrigins
+          documentationService: Helpers.documentationCatalog.edgeApplicationOrigins,
+          clipboardWrite: Helpers.clipboardWrite
         },
         functionsServices: {
           deleteFunctionService: FunctionsService.deleteFunctionService,
