@@ -117,7 +117,7 @@
               <span class="text-sm text-color-secondary flex-shrink-0">Need help?</span>
               <PrimeButton
                 class="p-0 text-right"
-                label="Azion Sales Team "
+                label="Azion Sales Team"
                 size="small"
                 link
                 icon="pi pi-external-link"
@@ -325,7 +325,7 @@
 
   const sidebarTitle = computed(() => {
     if (isLastVersion.value) {
-      return 'Integration installed!'
+      return 'Successfully installed!'
     }
     if (solution.value.isBringYourOwnLicense) {
       return 'Bring Your Own License'
@@ -341,7 +341,7 @@
       return 'Configure it for optimal performance and define settings for a customized experience.'
     }
     if (solution.value.isBringYourOwnLicense) {
-      return 'Bring a previously purchased license and use it to run this integration on Azion Edge.'
+      return 'Bring a previously purchased license and use it to run this integration on Azion Edge Computing Platform.'
     }
     if (solution.value.isPayAsYouGo) {
       return 'Buy and launch this integration instantly. Total pricing per instance for services is hosted on t2.small in US East (N. Virginia).'
