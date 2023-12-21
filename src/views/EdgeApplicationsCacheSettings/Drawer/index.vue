@@ -17,7 +17,15 @@
       required: true
     },
     createService: {
-      type: String,
+      type: Function,
+      required: true
+    },
+    loadService: {
+      type: Function,
+      required: true
+    },
+    editService: {
+      type: Function,
       required: true
     }
   })
@@ -34,8 +42,6 @@
   const LOCKED_SLICE_RANGE_IN_KBYTES = 1024
 
   const initialValues = ref({
-    edgeApplicationId: props.edgeApplicationId,
-    id: 0,
     name: '',
     browserCacheSettings: 'honor',
     browserCacheSettingsMaximumTtl: 0,
@@ -55,8 +61,6 @@
     deviceGroup: []
   })
   const validationSchema = yup.object({
-    edgeApplicationId: yup.string().required(),
-    id: yup.string().required(),
     name: yup.string().required().label('Name'),
     browserCacheSettings: yup.string().required().label('Browser cache settings'),
     browserCacheSettingsMaximumTtl: yup
@@ -136,6 +140,19 @@
     return result
   }
 
+  const loadCacheSettingsServiceWithDecorator = async (payload) => {
+    return props.loadService({
+      edgeApplicationId: props.edgeApplicationId,
+      id: payload.id
+    })
+  }
+  const editCacheSettingsServiceWithDecorator = async (payload) => {
+    return props.editService({
+      edgeApplicationId: props.edgeApplicationId,
+      ...payload
+    })
+  }
+
   const handleCreateCacheSettings = () => {
     emit('onSuccess')
     closeCreateDrawer()
@@ -171,21 +188,8 @@
     v-if="showEditDrawer"
     :id="selectedCacheSettingsToEdit"
     v-model:visible="showEditCacheSettingsDrawer"
-    :loadService="
-      () => ({
-        ...initialValues,
-        name: 'Teste',
-        adaptiveDeliveryAction: 'whitelist',
-        deviceGroup: [{ id: '1231231313' }, { id: '1253193089078967' }],
-        id: selectedCacheSettingsToEdit,
-        edgeApplicationId: props.edgeApplicationId
-      })
-    "
-    :editService="
-      () => ({
-        feedback: 'Editado  com sucesso'
-      })
-    "
+    :loadService="loadCacheSettingsServiceWithDecorator"
+    :editService="editCacheSettingsServiceWithDecorator"
     :schema="validationSchema"
     @onSuccess="handleEditedCacheSettings"
     title="Edit Cache Settings"

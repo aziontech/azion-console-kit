@@ -7,11 +7,11 @@ import * as Errors from '@/services/axios/errors'
  * @param {string} payload.edgeApplicationId - The cache settings Edge Application id.
  * @returns {string} The result message based on the status code.
  */
-export const createCacheSettingsService = async ({ edgeApplicationId, ...payload }) => {
+export const editCacheSettingsService = async ({ edgeApplicationId, ...payload }) => {
   const parsedBody = adapt(payload)
   let httpResponse = await AxiosHttpClientAdapter.request({
-    url: `${makeEdgeApplicationBaseUrl()}/${edgeApplicationId}/cache_settings`,
-    method: 'POST',
+    url: `${makeEdgeApplicationBaseUrl()}/${edgeApplicationId}/cache_settings/${payload.id}`,
+    method: 'PUT',
     body: parsedBody
   })
 
@@ -87,8 +87,8 @@ const extractApiError = (httpResponse) => {
  */
 const parseHttpResponse = (httpResponse) => {
   switch (httpResponse.statusCode) {
-    case 201:
-      return { feedback: 'Cache Settings successfully created' }
+    case 200:
+      return 'Cache Settings successfully edited'
     case 400:
       throw new Error(extractApiError(httpResponse)).message
     case 401:

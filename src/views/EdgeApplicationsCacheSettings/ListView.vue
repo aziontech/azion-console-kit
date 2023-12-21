@@ -14,6 +14,14 @@
       type: Function,
       required: true
     },
+    loadCacheSettingsService: {
+      type: Function,
+      required: true
+    },
+    editCacheSettingsService: {
+      type: Function,
+      required: true
+    },
     deleteCacheSettingsService: {
       type: Function,
       required: true
@@ -85,6 +93,8 @@
     ref="drawerRef"
     :edgeApplicationId="props.edgeApplicationId"
     :createService="props.createCacheSettingsService"
+    :loadService="props.loadCacheSettingsService"
+    :editService="props.editCacheSettingsService"
     @onSuccess="reloadList"
   />
 
