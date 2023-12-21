@@ -36,11 +36,11 @@ describe('SignupServices', () => {
     })
 
     const { sut } = makeSut()
-
+    const version = 'v3'
     await sut()
 
     expect(requestSpy).toHaveBeenCalledWith({
-      url: 'iam/additional_data',
+      url: `${version}/iam/additional_data`,
       method: 'GET'
     })
   })

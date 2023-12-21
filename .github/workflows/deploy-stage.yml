@@ -1,4 +1,4 @@
-name: Deploy Platform Kit (STAGE)
+name: Deploy Console Kit (STAGE)
 
 on:
   push:

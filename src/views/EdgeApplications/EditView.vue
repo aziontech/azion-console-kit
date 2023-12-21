@@ -1,52 +1,48 @@
 <template>
-  <ContentBlock>
-    <template #heading>
-      <PageHeadingBlock pageTitle="Edge Application"></PageHeadingBlock>
+  <EditFormBlock
+    :editService="props.editEdgeApplicationService"
+    :loadService="props.loadEdgeApplicationService"
+    :updatedRedirect="props.updatedRedirect"
+    :schema="validationSchema"
+  >
+    <template #form>
+      <FormFieldsCreateEdgeApplications :handleBlock="handleBlocks" />
     </template>
-    <template #content>
-      <TabView
-        :active-index="0"
-        class="w-full"
-      >
-        <TabPanel header="Main Settings"> </TabPanel>
-        <TabPanel header="Origins">
-          <EdgeApplicationsOriginsListView
-            :listOriginsService="props.listOriginsService"
-            :deleteOriginsService="props.deleteOriginsService"
-          />
-        </TabPanel>
-
-        <TabPanel header="Device Groups"> </TabPanel>
-        <TabPanel header="Error Responses"> </TabPanel>
-        <TabPanel header="Cache Settings"> </TabPanel>
-        <TabPanel
-          v-if="activatedFunctions"
-          header="Functions"
-        >
-        </TabPanel>
-        <TabPanel header="Rules Engine"> </TabPanel>
-      </TabView>
+    <template #action-bar="{ onSubmit, formValid, onCancel, loading }">
+      <ActionBarBlockWithTeleport
+        @onSubmit="onSubmit"
+        @onCancel="onCancel"
+        :loading="loading"
+        :submitDisabled="!formValid"
+      />
     </template>
-  </ContentBlock>
+  </EditFormBlock>
 </template>
 
 <script setup>
-  import TabView from 'primevue/tabview'
-  import TabPanel from 'primevue/tabpanel'
-  import ContentBlock from '@/templates/content-block'
-  import PageHeadingBlock from '@/templates/page-heading-block'
-  import EdgeApplicationsOriginsListView from '../EdgeApplicationsOrigins/ListView.vue'
-
-  const activatedFunctions = false
+  import * as yup from 'yup'
+  import EditFormBlock from '@/templates/edit-form-block'
+  import FormFieldsCreateEdgeApplications from './FormFields/FormFieldsCreateEdgeApplications'
+  import ActionBarBlockWithTeleport from '@templates/action-bar-block/action-bar-with-teleport'
 
   const props = defineProps({
-    listOriginsService: {
+    loadEdgeApplicationService: {
       type: Function,
       required: true
     },
-    deleteOriginsService: {
+    editEdgeApplicationService: {
       type: Function,
       required: true
+    },
+    updatedRedirect: {
+      type: String,
+      required: true
     }
+  })
+
+  const handleBlocks = ['general', 'delivery-settings', 'edge-application-modules', 'debug-rules']
+
+  const validationSchema = yup.object({
+    name: yup.string().required()
   })
 </script>

@@ -31,10 +31,11 @@
   const showCreateResourceDrawer = ref(false)
   const selectedResourceToEdit = ref('')
   const defaultTrigger = 'Install'
-  const debouncedDrawerEdit = 300
+  const debouncedDrawerAnimate = 300
   const contentTypeShellScript = 'Shell Script'
   const showEditResourceDrawer = ref(false)
-  const loadEditResourceDrawer = refDebounced(showEditResourceDrawer, debouncedDrawerEdit)
+  const loadCreateResourceDrawer = refDebounced(showCreateResourceDrawer, debouncedDrawerAnimate)
+  const loadEditResourceDrawer = refDebounced(showEditResourceDrawer, debouncedDrawerAnimate)
   const initialValues = {
     name: '',
     contentType: contentTypeShellScript,
@@ -99,6 +100,7 @@
 
 <template>
   <CreateDrawerBlock
+    v-if="loadCreateResourceDrawer"
     v-model:visible="showCreateResourceDrawer"
     :createService="createResourcesServices"
     :schema="validationSchema"

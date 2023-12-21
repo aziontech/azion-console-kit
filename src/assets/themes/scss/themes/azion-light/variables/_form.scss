@@ -214,15 +214,15 @@ $radiobuttonBorder: 2px solid var(--surface-border);
 
 /// Font size of a radiobutton icon
 /// @group form
-$radiobuttonIconSize: 8px;
+$radiobuttonIconSize: 10px;
 
 /// Border color of a selected radiobutton
 /// @group form
-$radiobuttonActiveBorderColor: $primaryColor;
+$radiobuttonActiveBorderColor: #f3652b;
 
 /// Background of a selected radiobutton
 /// @group form
-$radiobuttonActiveBg: $primaryColor;
+$radiobuttonActiveBg: #f3652b;
 
 /// Icon color of a selected radiobutton
 /// @group form

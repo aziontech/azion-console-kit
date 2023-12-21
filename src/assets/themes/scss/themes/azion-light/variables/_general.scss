@@ -66,7 +66,7 @@ $primeIconFontSize: 1rem;
 
 /// Separator border
 /// @group general
-$divider: 1px solid #e7e7e7;
+$divider: 1px solid var(--surface-border);
 
 /// Space between two inline items
 /// @group general

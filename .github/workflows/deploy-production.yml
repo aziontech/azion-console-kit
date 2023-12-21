@@ -1,4 +1,4 @@
-name: Deploy Platform Kit (PRODUCTION)
+name: Deploy Console Kit (PRODUCTION)
 
 on:
   push:

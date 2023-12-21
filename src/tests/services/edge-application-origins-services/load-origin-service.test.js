@@ -11,7 +11,9 @@ const fixtures = {
     addresses: [
       {
         address: 'httpbin.org',
-        weight: 1
+        weight: 1,
+        server_role: 'primary',
+        is_active: true
       }
     ],
     origin_protocol_policy: 'http',
@@ -23,7 +25,15 @@ const fixtures = {
     hmac_secret_key: '',
     connection_timeout: 60,
     timeout_between_bytes: 35
-  }
+  },
+  addressesMock: [
+    {
+      address: 'httpbin.org',
+      weight: 1,
+      isActive: true,
+      serverRole: 'primary'
+    }
+  ]
 }
 
 const makeSut = () => {
@@ -43,8 +53,7 @@ describe('EdgeApplicationOriginsServices', () => {
 
     const { sut } = makeSut()
     const version = 'v3'
-    await sut({ id: fixtures.edgeApplicationId, originKey: fixtures.originMock.origin_key })
-
+    await sut({ edgeApplicationId: fixtures.edgeApplicationId, id: fixtures.originMock.origin_key })
     expect(requestSpy).toHaveBeenCalledWith({
       url: `${version}/edge_applications/${fixtures.edgeApplicationId}/origins/${fixtures.originMock.origin_key}`,
       method: 'GET'
@@ -64,7 +73,7 @@ describe('EdgeApplicationOriginsServices', () => {
       originKey: fixtures.originMock.origin_key,
       name: fixtures.originMock.name,
       originType: fixtures.originMock.origin_type,
-      addresses: fixtures.originMock.addresses,
+      addresses: fixtures.addressesMock,
       originProtocolPolicy: fixtures.originMock.origin_protocol_policy,
       hostHeader: fixtures.originMock.host_header,
       method: fixtures.originMock.method,
