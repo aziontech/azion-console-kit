@@ -58,10 +58,6 @@
                 <template #option="slotProps">
                   <div class="flex align-items-center justify-between">
                     <div class="mr-2">{{ slotProps.option.name }}</div>
-                    <Badge
-                      v-if="slotProps.option.code !== 'all'"
-                      :value="slotProps.option.total"
-                    />
                   </div>
                 </template>
               </Listbox>
@@ -123,7 +119,6 @@
   import BannerContentBlock from '@/templates/content-block/banner'
   import InputText from 'primevue/inputtext'
   import Listbox from 'primevue/listbox'
-  import Badge from 'primevue/badge'
   import PrimeButton from 'primevue/button'
   import ListSolutions from './components/ListSolutions'
   import LoadingList from './components/LoadingList'
