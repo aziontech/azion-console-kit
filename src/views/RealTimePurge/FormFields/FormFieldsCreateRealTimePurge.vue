@@ -1,29 +1,32 @@
 <script setup>
-import FormHorizontal from '@/templates/create-form-block/form-horizontal'
-import RadioButton from 'primevue/radiobutton'
-import Card from 'primevue/card'
-import PrimeButton from 'primevue/button'
-import PrimeTextarea from 'primevue/textarea'
-import { useField } from 'vee-validate'
-import { computed } from 'vue'
+  import FormHorizontal from '@/templates/create-form-block/form-horizontal'
+  import RadioButton from 'primevue/radiobutton'
+  import Card from 'primevue/card'
+  import PrimeButton from 'primevue/button'
+  import PrimeTextarea from 'primevue/textarea'
+  import { useField } from 'vee-validate'
+  import { computed } from 'vue'
 
-const { value: layer } = useField('layer')
-const { value: argumentsPurge, errorMessage: argumentsPurgeError } = useField('argumentsPurge')
-const { value: purgeType } = useField('purgeType')
+  const { value: layer } = useField('layer')
+  const { value: argumentsPurge, errorMessage: argumentsPurgeError } = useField('argumentsPurge')
+  const { value: purgeType } = useField('purgeType')
 
-const computedPurgeArgumentsPlaceHolder = computed(() => {
-  if (purgeType.value === 'cachekey') {
-    return 'https://www.example.com.br/index.html'
-  }
-  if (purgeType.value === 'wildcard') {
-    return 'www.example.com/*'
-  }
-  return 'www.example.com'
-})
-
-const contactSales = () => {
-  window.open('https://www.azion.com/en/contact-sales/', '_blank')
-}
+  const computedPurgeArgumentsPlaceHolder = computed(() => {
+    if (purgeType.value === 'cachekey') {
+      return 'https://www.example.com.br/index.html'
+    }
+    if (purgeType.value === 'wildcard') {
+      return 'www.example.com/*'
+    }
+    return 'www.example.com'
+  })
+  
+  const props = defineProps({
+    contactSalesRealTimePurgeService: {
+      type: Function,
+      required: true
+    }
+  })
 </script>
 
 <template>
@@ -93,7 +96,7 @@ const contactSales = () => {
               icon="pi pi-shopping-cart"
               class="max-w-[150px] mt-4"
               label="Contact sales"
-              @click="contactSales()"
+              @click="props.contactSalesRealTimePurgeService()"
             />
           </div>
         </div>
