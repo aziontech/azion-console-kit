@@ -6,10 +6,11 @@
           class="px-3 py-4 sm:px-8 sm:py-8 gap-4 flex lg:px-8 lg:py-16 flex-col max-w-screen-2xl mx-auto w-full"
         >
           <div class="text-2xl sm:text-3xl font-medium">
-            The place to find, deploy, and manage third-party integrations
+            Accelerate your workflow with Azion Marketplace
           </div>
           <div class="text-sm sm:text-xl text-color-secondary">
-            Take advantage of templates, libraries, and integrations to build and compose edge applications.
+            Take advantage of templates, libraries, and integrations to build and compose edge
+            applications.
           </div>
         </div>
       </div>

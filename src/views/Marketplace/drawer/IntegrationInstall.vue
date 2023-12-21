@@ -288,8 +288,7 @@
                   v-if="warnUpdate"
                   severity="warn"
                   class="max-w-lg"
-                  >Updating will create a new instance of the integration's
-                  function.</InlineMessage
+                  >Updating will create a new instance of the integration's function.</InlineMessage
                 >
 
                 <InlineMessage
