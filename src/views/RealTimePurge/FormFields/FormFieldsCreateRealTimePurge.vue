@@ -20,7 +20,7 @@
     }
     return 'www.example.com'
   })
-  
+
   const props = defineProps({
     contactSalesRealTimePurgeService: {
       type: Function,

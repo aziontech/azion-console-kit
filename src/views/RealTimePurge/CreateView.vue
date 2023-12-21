@@ -10,7 +10,9 @@
         :initialValues="initialValues"
       >
         <template #form>
-          <FormFieldsCreateRealTimePurge :contactSalesRealTimePurgeService="contactSalesRealTimePurgeService" />
+          <FormFieldsCreateRealTimePurge
+            :contactSalesRealTimePurgeService="contactSalesRealTimePurgeService"
+          />
         </template>
         <template #action-bar="{ onSubmit, formValid, onCancel, loading }">
           <ActionBarBlockWithTeleport
