@@ -126,7 +126,7 @@ describe('EdgeApplicationOriginsServices', () => {
     const { sut } = makeSut()
 
     const { feedback, originKey } = await sut(fixtures.originMock, fixtures.edgeApplicationId)
-    
+
     expect(originKey).toBe('test-origin-key')
     expect(feedback).toBe('Your Origin has been created')
   })

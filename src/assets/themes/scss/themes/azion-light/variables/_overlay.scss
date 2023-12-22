@@ -18,7 +18,7 @@ $dialogHeaderBg: #ffffff;
 
 /// Border of a dialog header
 /// @group overlay
-$dialogHeaderBorder: 1px solid #e7e7e7;
+$dialogHeaderBorder: 1px solid var(--surface-border);
 
 /// Text color of a dialog header
 /// @group overlay
@@ -34,19 +34,19 @@ $dialogHeaderFontSize: 1.125rem;
 
 /// Padding of a dialog header
 /// @group overlay
-$dialogHeaderPadding: 0.75rem 2rem;
+$dialogHeaderPadding: 0 2rem;
 
 /// Padding of a dialog content
 /// @group overlay
-$dialogContentPadding: 1.25rem;
+$dialogContentPadding: 1.25rem 2rem;
 
 /// Border of a dialog footer
 /// @group overlay
-$dialogFooterBorder: 1px solid #e7e7e7;
+$dialogFooterBorder: 1px solid var(--surface-border);
 
 /// Padding of a dialog footer
 /// @group overlay
-$dialogFooterPadding: 1.25rem;
+$dialogFooterPadding: 0 2rem;
 
 /// Padding of a confirmpopup content
 /// @group overlay

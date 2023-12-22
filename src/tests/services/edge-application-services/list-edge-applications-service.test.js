@@ -26,7 +26,7 @@ const fixtures = {
     last_editor: 'az editor 2',
     last_modified: new Date(2023, 11, 10),
     name: 'edge app AZ 2',
-    origins: [{ name: 'origin 3' }, { name: 'origin 4' }]
+    origins: []
   }
 }
 
@@ -75,9 +75,10 @@ describe('EdgeApplicationServices', () => {
       {
         id: fixtures.edgeApplicationsMock.id,
         name: fixtures.edgeApplicationsMock.name,
-        origins: `${fixtures.edgeApplicationsMock.origins.at(0).name},${
+        origins: [
+          fixtures.edgeApplicationsMock.origins.at(0).name,
           fixtures.edgeApplicationsMock.origins.at(1).name
-        }`,
+        ],
         status: { content: 'Active', severity: 'success' },
         lastEditor: 'az editor',
         lastModify: 'Friday, November 10, 2023',
@@ -86,9 +87,7 @@ describe('EdgeApplicationServices', () => {
       {
         id: fixtures.disabledEdgeApplicationsMock.id,
         name: fixtures.disabledEdgeApplicationsMock.name,
-        origins: `${fixtures.disabledEdgeApplicationsMock.origins.at(0).name},${
-          fixtures.disabledEdgeApplicationsMock.origins.at(1).name
-        }`,
+        origins: [],
         status: { content: 'Inactive', severity: 'danger' },
         lastEditor: 'az editor 2',
         lastModify: 'Sunday, December 10, 2023',

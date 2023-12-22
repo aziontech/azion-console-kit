@@ -13,6 +13,9 @@
   import TemplateEngineBlock from '@/templates/template-engine-block'
   import { InternalServerError } from '@/services/axios/errors'
   import PermissionsFieldset from '../components/PermissionsFieldset'
+  import { useRouter } from 'vue-router'
+
+  const router = useRouter()
 
   const emit = defineEmits([
     'update:visible',
@@ -152,7 +155,7 @@
   }
 
   const handleCreateNew = () => {
-    emit('update:showSidebarSecond', true)
+    router.push('/edge-applications/create')
   }
 
   const handleLoading = () => {
@@ -164,6 +167,10 @@
     resetForm()
     toggleSidebar()
   }
+
+  const warnToCreate = computed(() => {
+    return !props.loadingEdges && edgeApps.value.length === 0
+  })
 
   const warnUpdate = computed(() => {
     const app = edgeApps.value.find((i) => i.value === edgeApplication.value)
@@ -198,7 +205,7 @@
     }"
   >
     <template #header>
-      <div>Installing integration</div>
+      <div>Install an Integration</div>
     </template>
     <template #default>
       <div class="flex flex-col w-full md:p-8 pb-0 relative">
@@ -215,8 +222,8 @@
         <form class="w-full flex flex-col gap-8">
           <FormHorizontal
             :isDrawer="true"
-            title="Select a Edge Application to install"
-            description="Select in which Edge Application you want to install this solution."
+            title="Select an edge application"
+            description="Browse and select the desired edge application to install this integration."
           >
             <template #inputs>
               <div class="flex flex-col w-full sm:max-w-3xl gap-8">
@@ -228,6 +235,7 @@
                   </label>
                   <Dropdown
                     id="edge_application"
+                    :disabled="warnToCreate"
                     :class="{ 'p-invalid': errors.edgeApplication }"
                     v-model="edgeApplication"
                     :options="edgeApps"
@@ -237,7 +245,7 @@
                     placeholder="Select an edge application"
                     filter
                     filterIcon="pi pi-search"
-                    emptyMessage="No applications with integrations to install or update."
+                    emptyMessage="No edge application found with integrations to install or update."
                     :pt="{ emptyMessage: { class: 'text-sm' }, list: { class: 'pb-0' } }"
                     :loading="loadingEdges"
                   >
@@ -246,7 +254,7 @@
                         <div>{{ slotProps.option.label }}</div>
                         <Tag
                           v-if="slotProps.option.upgradeable"
-                          value="Update available"
+                          value="Update Available"
                           severity="info"
                         />
                       </div>
@@ -280,9 +288,24 @@
                   v-if="warnUpdate"
                   severity="warn"
                   class="max-w-lg"
-                  >Updating will create a new instance of the provided integration
-                  function.</InlineMessage
+                  >Updating will create a new instance of the integration's function.</InlineMessage
                 >
+
+                <InlineMessage
+                  v-if="warnToCreate"
+                  severity="info"
+                  class="max-w-lg"
+                >
+                  No edge application has been created. Go to
+                  <PrimeButton
+                    class="p-0"
+                    label="Edge Application"
+                    link
+                    size="small"
+                    @click="handleCreateNew"
+                  />
+                  to create a new one.
+                </InlineMessage>
               </div>
             </template>
           </FormHorizontal>

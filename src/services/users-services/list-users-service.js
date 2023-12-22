@@ -18,6 +18,28 @@ export const listUsersService = async ({
   return parseHttpResponse(httpResponse)
 }
 
+const ACTIVE_AS_TAG = {
+  true: {
+    content: 'Active',
+    severity: 'success'
+  },
+  false: {
+    content: 'Inactive',
+    severity: 'danger'
+  }
+}
+
+const OWNER_AS_TAG = {
+  true: {
+    content: 'Yes',
+    severity: 'success'
+  },
+  false: {
+    content: 'No',
+    severity: 'info'
+  }
+}
+
 const adapt = (httpResponse) => {
   /**
    * Necessary until the API gets the common pattern
@@ -36,9 +58,9 @@ const adapt = (httpResponse) => {
           user.teams.length > 1
             ? user.teams.map((t) => t.name).join(', ')
             : user.teams.map((t) => t.name),
-        mfa: user.two_factor_enabled ? 'Yes' : 'No',
-        active: user.is_active ? 'Yes' : 'No',
-        owner: user.is_account_owner ? 'Yes' : 'No'
+        mfa: ACTIVE_AS_TAG[user.two_factor_enabled],
+        status: ACTIVE_AS_TAG[user.is_active],
+        owner: OWNER_AS_TAG[user.is_account_owner]
       }))
     : []
 

@@ -45,9 +45,9 @@
     lastName: yup.string().max(30).required().label('Last name'),
     timezone: yup.string().required().label('Timezone'),
     language: yup.string(),
-    email: yup.string().email().max(254).required().label('E-mail'),
+    email: yup.string().email().max(254).required().label('Email'),
     countryCallCode: yup.object().required().label('Country'),
-    mobile: yup.string().max(20).required().label('Mobile phone'),
+    mobile: yup.string().max(20).required().label('Phone Number'),
     isAccountOwner: yup.boolean(),
     teamsIds: yup.array(),
     twoFactorEnabled: yup.boolean()
@@ -63,7 +63,7 @@
         closable: true,
         severity: 'warn',
         summary: 'Confirmation email',
-        detail: 'A confirmation email message has been sent to your email address.'
+        detail: 'We have sent you a confirmation email.'
       }
       toast.add({ ...toastConfig })
     }

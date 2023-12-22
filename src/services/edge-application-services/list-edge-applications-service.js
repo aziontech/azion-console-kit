@@ -20,7 +20,7 @@ export const listEdgeApplicationsService = async ({
 
 const adapt = (httpResponse) => {
   const parsedEdgeApplications = httpResponse.body.results?.map((edgeApplication) => {
-    const originNames = edgeApplication.origins?.map((origin) => origin.name)?.join(',')
+    const originNames = edgeApplication.origins?.map((origin) => origin.name) || []
 
     return {
       id: edgeApplication.id,

@@ -65,12 +65,12 @@ export const menus = [
         icon: 'pi pi-play'
       },
       {
-        label: 'Real Time Metrics',
+        label: 'Real-Time Metrics',
         to: '/real-time-metrics',
         icon: 'pi pi-chart-line'
       },
       {
-        label: 'Real Time Events',
+        label: 'Real-Time Events',
         to: '/real-time-events',
         icon: 'pi pi-server',
         tag: 'Preview'

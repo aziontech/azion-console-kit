@@ -96,7 +96,9 @@ describe('EdgeApplicationOriginsServices', () => {
 
     expect(singleType).toEqual({
       id: fixtures.originSingleType.origin_key,
-      originKey: fixtures.originSingleType.origin_key,
+      originKey: {
+        content: fixtures.originSingleType.origin_key
+      },
       originId: fixtures.originSingleType.origin_id,
       name: fixtures.originSingleType.name,
       originType: 'Single Origin',
@@ -116,7 +118,9 @@ describe('EdgeApplicationOriginsServices', () => {
 
     expect(loadBalancerType).toEqual({
       id: fixtures.originLoadBalancerType.origin_key,
-      originKey: fixtures.originLoadBalancerType.origin_key,
+      originKey: {
+        content: fixtures.originLoadBalancerType.origin_key
+      },
       originId: fixtures.originLoadBalancerType.origin_id,
       name: fixtures.originLoadBalancerType.name,
       originType: 'Load Balancer',

@@ -9,6 +9,7 @@ import { UserNotFoundError } from './user-not-found-error'
 import { ProccessRequestError } from './proccess-request-error'
 import { InvalidDataStructureError } from './invalid-data-structure-error'
 import { InvalidDataStreamingEndpointType } from './invalid-data-streaming-endpoint-type'
+import { CannotReorderDefaultRule } from './cannot-reorder-default-rule'
 
 export {
   InternalServerError,
@@ -21,5 +22,6 @@ export {
   UserNotFoundError,
   ProccessRequestError,
   InvalidDataStructureError,
-  InvalidDataStreamingEndpointType
+  InvalidDataStreamingEndpointType,
+  CannotReorderDefaultRule
 }

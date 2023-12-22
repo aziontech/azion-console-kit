@@ -4,7 +4,7 @@ import { useAccountStore } from '@/stores/account'
 
 export default async function beforeEachRoute(to, _, next) {
   const accountStore = useAccountStore()
-
+  const cliCallbackURLs = ['/cli-callback-fail', '/cli-callback-success']
   // TODO: remove the usage of localStorage when API returns the theme
   const theme = localStorage.getItem('theme')
 
@@ -14,6 +14,10 @@ export default async function beforeEachRoute(to, _, next) {
   if (to.path === '/logout') {
     await logoutService()
     accountStore.setAccountData({})
+    return next()
+  }
+
+  if (cliCallbackURLs.includes(to.path)) {
     return next()
   }
 

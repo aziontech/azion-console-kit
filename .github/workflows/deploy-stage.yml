@@ -1,4 +1,4 @@
-name: Deploy Platform Kit (STAGE)
+name: Deploy Console Kit (STAGE)
 
 on:
   push:
@@ -9,7 +9,7 @@ env:
 
 jobs:
   deploy:
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
     container:
       image: node:18-alpine3.18
     steps:
@@ -29,6 +29,9 @@ jobs:
 
       - name: Download Azion CLI
         run: curl https://downloads.azion.com/linux/x86_64/azioncli -o azioncli && chmod +x azioncli
+
+      - name: Create YML file to Azion CLI
+        run: mkdir ~/.config/ && touch ~/.config/azioncli.yaml
 
       - name: Configure Azion CLI
         run: ./azioncli configure -t ${{ secrets.PLATFORM_KIT_TOKEN }}
