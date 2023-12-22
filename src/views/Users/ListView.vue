@@ -9,17 +9,17 @@
         :listService="props.listUsersService"
         :deleteService="props.deleteUsersService"
         :columns="getColumns"
-        pageTitleDelete="User"
-        addButtonLabel="Users"
+        pageTitleDelete="Users"
+        addButtonLabel="Add"
         createPagePath="users/create"
         editPagePath="users/edit"
         @on-load-data="handleLoadData"
       />
       <EmptyResultsBlock
         v-else
-        title="No users added"
-        description="Create your first users."
-        createButtonLabel="Users"
+        title="No user has been created"
+        description=" Click the button below to initiate the setup process and create your first user."
+        createButtonLabel="Add"
         createPagePath="users/create"
         :documentationService="props.documentationService"
       >
@@ -76,11 +76,18 @@
     },
     {
       field: 'mfa',
-      header: 'MFA'
+      header: 'MFA',
+      type: 'component',
+      component: (columnData) => {
+        return columnBuilder({
+          data: columnData,
+          columnAppearance: 'tag'
+        })
+      }
     },
     {
-      field: 'active',
-      header: 'Active',
+      field: 'status',
+      header: 'Status',
       type: 'component',
       component: (columnData) => {
         return columnBuilder({
@@ -91,7 +98,14 @@
     },
     {
       field: 'owner',
-      header: 'Owner'
+      header: 'Account Owner',
+      type: 'component',
+      component: (columnData) => {
+        return columnBuilder({
+          data: columnData,
+          columnAppearance: 'tag'
+        })
+      }
     }
   ])
 

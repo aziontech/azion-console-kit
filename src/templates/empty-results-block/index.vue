@@ -29,7 +29,8 @@
     :class="{ 'mt-4 pb-8': inTabs }"
   >
     <div
-      class="flex flex-col h-full border surface-border gap-7 justify-center items-center rounded-md"
+      class="flex flex-col h-full gap-7 justify-center items-center rounded-md"
+      :class="{ 'border surface-border': !noBorder }"
     >
       <slot name="illustration">
         <Illustration />

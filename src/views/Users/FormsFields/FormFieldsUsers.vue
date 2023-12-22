@@ -127,7 +127,7 @@
         <label
           for="firstName"
           class="text-color text-base font-medium"
-          >First name *</label
+          >First Name *</label
         >
         <InputText
           v-model="firstName"
@@ -145,7 +145,7 @@
         <label
           for="lastName"
           class="text-color text-base font-medium"
-          >Last name *</label
+          >Last Name *</label
         >
         <InputText
           v-model="lastName"
@@ -208,7 +208,7 @@
         <label
           for="email"
           class="text-color text-base font-medium"
-          >E-mail *</label
+          >Email *</label
         >
         <InputText
           v-model="email"
@@ -228,12 +228,12 @@
         <label
           for="email"
           class="text-color text-base font-medium"
-          >Mobile *</label
+          >Phone Number *</label
         >
         <div class="flex gap-2">
           <div class="p-inputgroup">
             <Dropdown
-              id="timezone"
+              id="countryCallCode"
               filter
               :options="filteredCountriesMobile"
               optionLabel="labelFormat"
@@ -242,12 +242,17 @@
               :class="{ 'p-invalid': errorCountryCallCode }"
               class="surface-border border-r-0 w-1/4"
               v-model="countryCallCode"
-            />
+            >
+              <template #option="{ option }">
+                {{ option.label }}
+              </template>
+            </Dropdown>
             <InputMask
               date="phone"
               v-model="mobile"
               class="w-full"
               mask="?99999999999999999999"
+              placeholder="5500999999999"
               :class="{ 'p-invalid': errorMobile || !countryCallCode }"
             />
           </div>
@@ -261,7 +266,10 @@
     </template>
   </FormHorizontal>
 
-  <FormHorizontal title="Security settings">
+  <FormHorizontal
+    title="Security Settings"
+    description="Determine the level of access and permissions of the user and enable Multi-Factor Authentication upon sign-in."
+  >
     <template #inputs>
       <div class="flex flex-col w-full sm:max-w-3xl gap-2">
         <label
@@ -278,11 +286,14 @@
           :options="optionsTeams"
           optionLabel="label"
           optionValue="value"
-          placeholder="Nothing selected"
+          placeholder="No option selected"
           :maxSelectedLabels="5"
           :class="{ 'p-invalid': errorTeamsIds }"
           v-model="teamsIds"
         />
+        <small class="text-xs text-color-secondary font-normal leading-tight">
+          Select a team for the user. You can create teams using Teams Permissions.</small
+        >
       </div>
       <div>
         <Card
@@ -309,15 +320,14 @@
               <label
                 for="accountOwner"
                 class="text-color text-sm font-normal"
-                >Account owner</label
+                >Account Owner</label
               >
             </div>
           </template>
 
           <template #content>
             <small class="text-color-secondary text-sm">
-              Account owner: Full access to all features, including account and solution management.
-              Non-owner: Restricted access to solution management, based on Teams permissions.
+              Account owners can add all the users and have all permissions enabled.
             </small>
           </template>
         </Card>
@@ -352,11 +362,7 @@
           </template>
           <template #content>
             <small class="text-color-secondary text-sm">
-              Multi-factor authentication adds an extra layer of security to your account. In
-              addition to your username and password, you will need an application like Google
-              Authenticator on your phone to get verification codes when prompted. Enabling
-              multi-factor authentication, you MUST set up an account on Google Authenticator on
-              your next login.
+              Accounts with MFA enabled can enforce mobile client authentication upon login.
             </small>
           </template>
         </Card>

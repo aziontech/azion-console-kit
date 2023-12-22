@@ -6,10 +6,11 @@
           class="px-3 py-4 sm:px-8 sm:py-8 gap-4 flex lg:px-8 lg:py-16 flex-col max-w-screen-2xl mx-auto w-full"
         >
           <div class="text-2xl sm:text-3xl font-medium">
-            The place to find, deploy, and manage third-party solutions
+            Accelerate your workflow with Azion Marketplace
           </div>
           <div class="text-sm sm:text-xl text-color-secondary">
-            Marketplace lets you quickly deploy software on Azion Edge Platform.
+            Take advantage of templates, libraries, and integrations to build and compose edge
+            applications.
           </div>
         </div>
       </div>
@@ -32,7 +33,7 @@
               <InputText
                 class="w-full"
                 type="text"
-                placeholder="Search on Marketplace"
+                placeholder="Search"
                 @input="searchSolutions"
                 v-model="search"
               />
@@ -58,10 +59,6 @@
                 <template #option="slotProps">
                   <div class="flex align-items-center justify-between">
                     <div class="mr-2">{{ slotProps.option.name }}</div>
-                    <Badge
-                      v-if="slotProps.option.code !== 'all'"
-                      :value="slotProps.option.total"
-                    />
                   </div>
                 </template>
               </Listbox>
@@ -93,9 +90,9 @@
             </template>
             <template v-else>
               <div class="text-sm">
-                <span>No results found</span>
+                <span>No results found.</span>
                 <PrimeButton
-                  label="See full integrations list."
+                  label="Go to full integrations list."
                   link
                   class="ml-3 p-0"
                   size="small"
@@ -123,7 +120,6 @@
   import BannerContentBlock from '@/templates/content-block/banner'
   import InputText from 'primevue/inputtext'
   import Listbox from 'primevue/listbox'
-  import Badge from 'primevue/badge'
   import PrimeButton from 'primevue/button'
   import ListSolutions from './components/ListSolutions'
   import LoadingList from './components/LoadingList'

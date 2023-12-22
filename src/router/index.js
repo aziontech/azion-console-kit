@@ -28,11 +28,13 @@ import { signupRoutes } from '@routes/signup-routes'
 import { marketplaceRoutes } from '@routes/marketplace-routes'
 import { accountRoutes } from '@/router/routes/account-routes'
 import { settingsRoutes } from '@/router/routes/your-settings-routes'
+import { cliCallbackRoutes } from '@/router/routes/cli-callback-routes'
 import beforeEachRoute from './hooks/beforeEachRoute'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
+    cliCallbackRoutes,
     dataStreamingRoutes,
     digitalCertificatesRoutes,
     domainsRoutes,
