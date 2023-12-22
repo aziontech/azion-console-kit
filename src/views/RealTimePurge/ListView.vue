@@ -18,7 +18,7 @@
       <EmptyResultsBlock
         v-else
         title="No purge has been created"
-        description="Click the button below to initiate the setup process and create your page."
+        description="Click the button below to initiate the setup process and create your first purge."
         createButtonLabel="Add"
         createPagePath="real-time-purge/create"
         :documentationService="documentationService"
