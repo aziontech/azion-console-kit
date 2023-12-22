@@ -87,7 +87,8 @@
                   <span class="text-base">L2 Caching</span>
                 </template>
                 <template #subtitle>
-                  Purge content from Azion's second cache layer. Requires subscribing to this module.</template
+                  Purge content from Azion's second cache layer. Requires subscribing to this
+                  module.</template
                 >
               </Card>
             </div>
@@ -127,9 +128,7 @@
               />
               <span class="text-base">Cache Key</span>
             </template>
-            <template #subtitle
-              >Enter a list of content cache keys to be purged.</template
-            >
+            <template #subtitle>Enter a list of content cache keys to be purged.</template>
           </Card>
 
           <Card
@@ -151,7 +150,8 @@
               <span class="text-base">URL</span>
             </template>
             <template #subtitle
-              >Enter a list of content URLs to be purged. Asterisks (*) in URLs are considered characters.</template
+              >Enter a list of content URLs to be purged. Asterisks (*) in URLs are considered
+              characters.</template
             >
           </Card>
           <Card
@@ -173,7 +173,8 @@
               <span class="text-base">Wildcard</span>
             </template>
             <template #subtitle
-              >Enter a list of content URLs to be purged. Asterisks (*) are considered wildcard expressions.</template
+              >Enter a list of content URLs to be purged. Asterisks (*) are considered wildcard
+              expressions.</template
             >
           </Card>
         </div>
