@@ -15,6 +15,8 @@
         :loading="isLoading"
         selectionMode="single"
         @row-click="editItemSelected"
+        @rowReorder="onRowReorder"
+        :pt="pt"
       >
         <template #header>
           <div class="flex flex-wrap justify-between gap-2 w-full">
@@ -37,7 +39,11 @@
             </slot>
           </div>
         </template>
-
+        <Column
+          v-if="reorderableRows"
+          rowReorder
+          headerStyle="width: 3rem"
+        />
         <Column
           sortable
           v-for="col of selectedColumns"
@@ -98,23 +104,25 @@
                 size="small"
                 icon="pi pi-ellipsis-h"
                 text
-                @click="(event) => toggleActionsMenu(event, rowData.id)"
+                @click="(event) => toggleActionsMenu(event, rowData)"
                 class="cursor-pointer table-button"
               />
             </div>
           </template>
         </Column>
         <template #empty>
-          <div class="my-4 flex flex-col gap-3 justify-center items-center">
-            <p class="text-xl font-normal text-secondary">No registers found.</p>
-            <PrimeButton
-              v-if="!authorizeNode"
-              text
-              icon="pi pi-plus"
-              label="Add"
-              @click="navigateToAddPage"
-            />
-          </div>
+          <slot name="empty">
+            <div class="my-4 flex flex-col gap-3 justify-center items-center">
+              <p class="text-xl font-normal text-secondary">No registers found.</p>
+              <PrimeButton
+                v-if="!authorizeNode"
+                text
+                icon="pi pi-plus"
+                label="Add"
+                @click="navigateToAddPage"
+              />
+            </div>
+          </slot>
         </template>
       </DataTable>
 
@@ -166,6 +174,7 @@
   import PrimeButton from 'primevue/button'
   import { FilterMatchMode } from 'primevue/api'
   import DeleteDialog from './dialog/delete-dialog'
+  import { getArrayChangedIndices } from '@/helpers/get-array-changed-indices'
   import OverlayPanel from 'primevue/overlaypanel'
   import Listbox from 'primevue/listbox'
 
@@ -193,6 +202,7 @@
       data: [],
       minimumOfItemsPerPage: 10,
       informationForDeletion: {},
+      selectedItemData: null,
       selectedColumns: []
     }),
     props: {
@@ -237,6 +247,19 @@
       deleteService: {
         required: true,
         type: Function
+      },
+      onReorderService: {
+        required: true,
+        type: Function
+      },
+      reorderableRows: {
+        required: false,
+        type: Boolean,
+        default: false
+      },
+      pt: {
+        type: Object,
+        required: false
       }
     },
     async created() {
@@ -291,8 +314,9 @@
       navigateToAddPage() {
         this.$router.push(this.createPagePath)
       },
-      toggleActionsMenu(event, selectedId) {
-        this.selectedId = selectedId
+      toggleActionsMenu(event, selectedItemData) {
+        this.selectedItemData = selectedItemData
+        this.selectedId = selectedItemData.id
         this.$refs.menu.toggle(event)
       },
       editItemSelected({ data: item }) {
@@ -309,6 +333,7 @@
         this.informationForDeletion = {
           title: this.pageTitleDelete,
           selectedID: this.selectedId,
+          selectedItemData: this.selectedItemData,
           deleteService: this.deleteService,
           deleteDialogVisible: true,
           rerender: Math.random()
@@ -317,6 +342,25 @@
       updatedTable() {
         this.data = this.data.filter((item) => item.id !== this.selectedId)
         this.$forceUpdate()
+      },
+      async onRowReorder(event) {
+        try {
+          const tableData = getArrayChangedIndices(this.data, event.value)
+          await this.onReorderService(tableData)
+          this.data = event.value
+
+          this.$toast.add({
+            closable: true,
+            severity: 'success',
+            summary: 'Rules Engine order saved!'
+          })
+        } catch (error) {
+          this.$toast.add({
+            closable: true,
+            severity: 'error',
+            summary: error
+          })
+        }
       },
       toggleColumnSelector(event) {
         this.$refs.columnSelectorPanel.toggle(event)

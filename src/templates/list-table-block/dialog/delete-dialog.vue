@@ -134,7 +134,8 @@
 
         try {
           const feedback = await this.informationForDeletion.deleteService(
-            this.informationForDeletion.selectedID
+            this.informationForDeletion.selectedID,
+            this.informationForDeletion.selectedItemData
           )
           toastConfig.summary = feedback ?? 'Deleted successfully!'
           this.$emit('successfullyDeleted')

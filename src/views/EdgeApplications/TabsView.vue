@@ -7,6 +7,7 @@
   import { ref } from 'vue'
   import { useToast } from 'primevue/usetoast'
   import EdgeApplicationsOriginsListView from '@/views/EdgeApplicationsOrigins/ListView'
+  import EdgeApplicationsRulesEngineListView from '@/views/EdgeApplicationsRulesEngine/ListView'
   import EdgeApplicationsCacheSettingsListView from '@/views/EdgeApplicationsCacheSettings/ListView'
   import EdgeApplicationsFunctionsListView from '@/views/EdgeApplicationsFunctions/ListView'
   import EdgeApplicationsDeviceGroupsListView from '@/views/EdgeApplicationsDeviceGroups/ListView.vue'
@@ -19,8 +20,9 @@
     originsServices: { type: Object, required: true },
     cacheSettingsServices: { type: Object, required: true },
     clipboardWrite: { type: Function, required: true },
+    deviceGroupsServices: { type: Object, required: true },
+    rulesEngineServices: { type: Object, required: true },
     functionsServices: { type: Object, required: true },
-    deviceGroupsServices: { type: Object, required: true }
   })
 
   const mapTabs = {
@@ -123,8 +125,7 @@
             :edgeApplicationId="edgeApplicationId"
             v-bind="props.deviceGroupsServices"
             :clipboardWrite="props.clipboardWrite"
-          >
-          </EdgeApplicationsDeviceGroupsListView>
+          />
         </TabPanel>
         <TabPanel header="Error Responses"> </TabPanel>
         <TabPanel header="Cache Settings">
@@ -144,7 +145,12 @@
             :edgeApplicationId="edgeApplicationId"
           />
         </TabPanel>
-        <TabPanel header="Rules Engine"> </TabPanel>
+        <TabPanel header="Rules Engine">
+          <EdgeApplicationsRulesEngineListView
+            :edgeApplicationId="edgeApplicationId"
+            v-bind="props.rulesEngineServices"
+          />
+        </TabPanel>
       </TabView>
     </template>
   </ContentBlock>
