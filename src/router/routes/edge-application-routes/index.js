@@ -3,6 +3,7 @@ import * as EdgeApplicationsService from '@/services/edge-application-services'
 import * as OriginsService from '@/services/edge-application-origins-services'
 import * as FunctionsService from '@/services/edge-application-functions-services'
 import * as DeviceGroupsService from '@/services/edge-application-device-groups-services'
+import * as ErrorResponsesService from '@/services/edge-application-error-responses-services'
 
 /** @type {import('vue-router').RouteRecordRaw} */
 export const edgeApplicationRoutes = {
@@ -80,6 +81,10 @@ export const edgeApplicationRoutes = {
           createDeviceGroupService: DeviceGroupsService.createDeviceGroupService,
           editDeviceGroupService: DeviceGroupsService.editDeviceGroupService,
           loadDeviceGroupService: DeviceGroupsService.loadDeviceGroupService
+        },
+        errorResponsesServices: {
+          loadErrorResponsesService: ErrorResponsesService.listErrorResponsesService,
+          editErrorResponsesService: ErrorResponsesService.editErrorResponsesService
         },
         clipboardWrite: Helpers.clipboardWrite
       },

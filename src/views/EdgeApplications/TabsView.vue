@@ -7,6 +7,7 @@
   import { ref } from 'vue'
   import EdgeApplicationsOriginsListView from '@/views/EdgeApplicationsOrigins/ListView'
   import EdgeApplicationsFunctionsListView from '@/views/EdgeApplicationsFunctions/ListView'
+  import EdgeApplicationsErrorResponseCreateView from '@/views/EdgeApplicationsErrorResponses/CreateView'
   import EdgeApplicationsDeviceGroupsListView from '@/views/EdgeApplicationsDeviceGroups/ListView.vue'
   import EditView from './EditView.vue'
 
@@ -17,7 +18,8 @@
     originsServices: { type: Object, required: true },
     functionsServices: { type: Object, required: true },
     clipboardWrite: { type: Function, required: true },
-    deviceGroupsServices: { type: Object, required: true }
+    deviceGroupsServices: { type: Object, required: true },
+    errorResponsesServices: { type: Object, required: true}
   })
 
   const mapTabs = {
@@ -102,7 +104,15 @@
           >
           </EdgeApplicationsDeviceGroupsListView>
         </TabPanel>
-        <TabPanel header="Error Responses"> </TabPanel>
+        <TabPanel header="Error Responses"> 
+          <div class="mt-8">
+            <EdgeApplicationsErrorResponseCreateView
+              :edgeApplicationId="edgeApplicationId"
+              :listOriginsService="props.originsServices.listOriginsService"
+              v-bind="props.errorResponsesServices"
+            />
+          </div>
+        </TabPanel>
         <TabPanel header="Cache Settings"> </TabPanel>
         <TabPanel
           v-if="activatedFunctions"
