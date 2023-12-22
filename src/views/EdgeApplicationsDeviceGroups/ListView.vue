@@ -2,6 +2,7 @@
   import ListTableBlock from '@/templates/list-table-block/no-header'
   import EmptyResultsBlock from '@/templates/empty-results-block'
   import PrimeButton from 'primevue/button'
+  import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
   import Illustration from '@/assets/svg/illustration-layers'
   import DrawerDeviceGroups from '@/views/EdgeApplicationsDeviceGroups/Drawer'
   import { computed, ref } from 'vue'
@@ -32,6 +33,10 @@
       required: true,
       type: Function
     },
+    clipboardWrite: {
+      required: true,
+      type: Function
+    },
     deleteDeviceGroupService: {
       required: true,
       type: Function
@@ -52,6 +57,20 @@
 
   const getColumns = computed(() => {
     return [
+      {
+        field: 'deviceId',
+        header: 'Id',
+        type: 'component',
+        component: (columnData) => {
+          return columnBuilder({
+            data: columnData,
+            columnAppearance: 'text-with-clipboard',
+            dependencies: {
+              copyContentService: props.clipboardWrite
+            }
+          })
+        }
+      },
       {
         field: 'name',
         header: 'Name'

@@ -7,6 +7,7 @@
   import { ref } from 'vue'
   import EdgeApplicationsOriginsListView from '@/views/EdgeApplicationsOrigins/ListView'
   import EdgeApplicationsRulesEngineListView from '@/views/EdgeApplicationsRulesEngine/ListView'
+  import EdgeApplicationsCacheSettingsListView from '@/views/EdgeApplicationsCacheSettings/ListView'
   import EdgeApplicationsFunctionsListView from '@/views/EdgeApplicationsFunctions/ListView'
   import EdgeApplicationsDeviceGroupsListView from '@/views/EdgeApplicationsDeviceGroups/ListView.vue'
   import EditView from './EditView.vue'
@@ -16,10 +17,11 @@
   const props = defineProps({
     edgeApplicationServices: { type: Object, required: true },
     originsServices: { type: Object, required: true },
-    functionsServices: { type: Object, required: true },
+    cacheSettingsServices: { type: Object, required: true },
     clipboardWrite: { type: Function, required: true },
     deviceGroupsServices: { type: Object, required: true },
-    rulesEngineServices: { type: Object, required: true }
+    rulesEngineServices: { type: Object, required: true },
+    functionsServices: { type: Object, required: true },
   })
 
   const mapTabs = {
@@ -30,23 +32,15 @@
     functions: 5,
     rulesEngine: 6
   }
-  const activatedFunctions = true
   const route = useRoute()
   const router = useRouter()
   const activeTab = ref(0)
   const edgeApplicationId = ref(route.params.id)
 
-  const getTabValue = (tab) => {
-    return mapTabs[tab] || 0
-  }
-
-  const getTabFromValue = (value) => {
-    return Object.keys(mapTabs).find((key) => mapTabs[key] === value)
-  }
-
-  const renderTabCurrentRouter = () => {
-    const { tab } = route.params
-    activeTab.value = getTabValue(tab)
+  const getTabFromValue = (selectedTabIndex) => {
+    const tabNames = Object.keys(mapTabs)
+    const selectedTab = tabNames.find((tabName) => mapTabs[tabName] === selectedTabIndex)
+    return selectedTab
   }
 
   const changeRouteByClickingOnTab = (event) => {
@@ -60,6 +54,13 @@
       name: 'edit-edge-application',
       params
     })
+  }
+
+  const renderTabCurrentRouter = () => {
+    const { tab } = route.params
+    const defaultTabIndex = 0
+    const activeTabIndexByRoute = mapTabs[tab] || defaultTabIndex
+    activeTab.value = activeTabIndexByRoute
   }
 
   renderTabCurrentRouter()
@@ -99,17 +100,23 @@
 
         <TabPanel header="Device Groups">
           <EdgeApplicationsDeviceGroupsListView
+            v-if="activeTab === mapTabs.deviceGroups"
             :edgeApplicationId="edgeApplicationId"
             v-bind="props.deviceGroupsServices"
+            :clipboardWrite="props.clipboardWrite"
           />
         </TabPanel>
         <TabPanel header="Error Responses"> </TabPanel>
-        <TabPanel header="Cache Settings"> </TabPanel>
-        <TabPanel
-          v-if="activatedFunctions"
-          header="Functions"
-        >
+        <TabPanel header="Cache Settings">
+          <EdgeApplicationsCacheSettingsListView
+            v-if="activeTab === mapTabs.cacheSettings"
+            :edgeApplicationId="edgeApplicationId"
+            v-bind="props.cacheSettingsServices"
+          />
+        </TabPanel>
+        <TabPanel header="Functions">
           <EdgeApplicationsFunctionsListView
+            v-if="activeTab === mapTabs.functions"
             v-bind="props.functionsServices"
             :edgeApplicationId="edgeApplicationId"
           />

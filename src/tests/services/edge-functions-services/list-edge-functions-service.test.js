@@ -66,7 +66,7 @@ describe('EdgeFunctionsServices', () => {
     })
   })
 
-  it('should parsed correctly all returned firewalls', async () => {
+  it('should parsed correctly all returned edge function', async () => {
     localeMock()
     vi.setSystemTime(new Date(2023, 10, 10, 10))
     vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({

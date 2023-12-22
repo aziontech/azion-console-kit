@@ -18,6 +18,7 @@ export const documentationCatalog = {
   edgeFirewall: () => openSearchResult('edge firewall'),
   edgeApplication: () => openSearchResult('edge application'),
   edgeApplicationOrigins: () => openSearchResult('edge application origins'),
+  edgeApplicationCacheSettings: () => openSearchResult('cache settings'),
   edgeApplicationFunctions: () => openSearchResult('edge application functions instances'),
   edgeApplicationDeviceGroups: () => openSearchResult('edge application device groups'),
   users: () => openSearchResult('users'),

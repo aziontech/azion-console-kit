@@ -52,7 +52,7 @@
 
   const handleOpenPermissionsDoc = () => {
     props.windowOpen(
-      'https://www.azion.com/en/documentation/products/guides/permissions-marketplace/',
+      'https://www.azion.com/en/documentation/products/marketplace/permissions-marketplace/',
       '_blank'
     )
   }
@@ -75,9 +75,9 @@
           <span class="text-color-secondary">{{ permission.description }}</span>
         </div>
         <div class="text-sm text-color-secondary h-8 flex flex-row items-center">
-          <span class="">Learn more about</span>
+          <span class="">Read more about</span>
           <PrimeButton
-            label="Solutions Permissions"
+            label="Marketplace's Permissions"
             link
             icon-pos="right"
             icon="pi pi-external-link"

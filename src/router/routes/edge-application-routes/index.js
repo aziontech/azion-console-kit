@@ -1,6 +1,7 @@
 import * as Helpers from '@/helpers'
 import * as EdgeApplicationsService from '@/services/edge-application-services'
 import * as OriginsService from '@/services/edge-application-origins-services'
+import * as CacheSettingsServices from '@/services/edge-application-cache-settings-services'
 import * as FunctionsService from '@/services/edge-application-functions-services'
 import * as DeviceGroupsService from '@/services/edge-application-device-groups-services'
 import * as RulesEngineService from '@/services/edge-application-rules-engine-services'
@@ -68,6 +69,14 @@ export const edgeApplicationRoutes = {
           loadOriginService: OriginsService.loadOriginService,
           documentationService: Helpers.documentationCatalog.edgeApplicationOrigins,
           clipboardWrite: Helpers.clipboardWrite
+        },
+        cacheSettingsServices: {
+          listCacheSettingsService: CacheSettingsServices.listCacheSettingsService,
+          deleteCacheSettingsService: CacheSettingsServices.deleteCacheSettingsService,
+          createCacheSettingsService: CacheSettingsServices.createCacheSettingsService,
+          loadCacheSettingsService: CacheSettingsServices.loadCacheSettingsService,
+          editCacheSettingsService: CacheSettingsServices.editCacheSettingsService,
+          documentationService: Helpers.documentationCatalog.edgeApplicationCacheSettings
         },
         functionsServices: {
           deleteFunctionService: FunctionsService.deleteFunctionService,

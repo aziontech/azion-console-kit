@@ -39,7 +39,14 @@
       },
       {
         field: 'origins',
-        header: 'Origins'
+        header: 'Origins',
+        type: 'component',
+        component: (columnData) => {
+          return columnBuilder({
+            data: columnData,
+            columnAppearance: 'expand-column'
+          })
+        }
       },
       {
         field: 'status',

@@ -1,3 +1,28 @@
+<script setup>
+  import Illustration from '@/assets/svg/illustration-layers'
+  defineOptions({ name: 'empty-results-block' })
+  import PrimeButton from 'primevue/button'
+
+  import { useRouter } from 'vue-router'
+
+  const router = useRouter()
+
+  const props = defineProps({
+    title: { type: String, required: true },
+    description: { type: String, required: true },
+    documentationService: { type: Function, required: true },
+    createPagePath: { type: String, required: false },
+    createButtonLabel: { type: String, required: false },
+    inTabs: { type: Boolean, required: false }
+  })
+  function openDocumentation() {
+    props.documentationService()
+  }
+  function navigateToCreatePage() {
+    router.push(props.createPagePath)
+  }
+</script>
+
 <template>
   <div
     class="flex flex-col h-full"
@@ -7,7 +32,9 @@
       class="flex flex-col h-full gap-7 justify-center items-center rounded-md"
       :class="{ 'border surface-border': !noBorder }"
     >
-      <slot name="illustration" />
+      <slot name="illustration">
+        <Illustration />
+      </slot>
       <div class="flex flex-col gap-2">
         <p class="text-center text-color text-lg font-bold leading-7">
           {{ title }}
@@ -42,28 +69,3 @@
     </div>
   </div>
 </template>
-
-<script setup>
-  defineOptions({ name: 'empty-results-block' })
-  import PrimeButton from 'primevue/button'
-
-  import { useRouter } from 'vue-router'
-
-  const router = useRouter()
-
-  const props = defineProps({
-    title: { type: String, required: true },
-    description: { type: String, required: true },
-    documentationService: { type: Function, required: true },
-    createPagePath: { type: String, required: false },
-    createButtonLabel: { type: String, required: false },
-    inTabs: { type: Boolean, required: false },
-    noBorder: { type: Boolean, required: false, default: false }
-  })
-  function openDocumentation() {
-    props.documentationService()
-  }
-  function navigateToCreatePage() {
-    router.push(props.createPagePath)
-  }
-</script>
