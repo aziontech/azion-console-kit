@@ -147,6 +147,7 @@
         </TabPanel>
         <TabPanel header="Rules Engine">
           <EdgeApplicationsRulesEngineListView
+            v-if="activeTab === mapTabs.rulesEngine"
             :edgeApplicationId="edgeApplicationId"
             v-bind="props.rulesEngineServices"
           />
