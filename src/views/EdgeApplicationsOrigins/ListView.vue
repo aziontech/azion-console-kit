@@ -2,7 +2,6 @@
   import ListTableBlock from '@/templates/list-table-block/no-header'
   import EmptyResultsBlock from '@/templates/empty-results-block'
   import PrimeButton from 'primevue/button'
-  import Illustration from '@/assets/svg/illustration-layers'
   import { computed, ref } from 'vue'
   import DrawerOrigin from '@/views/EdgeApplicationsOrigins/Drawer'
   import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
@@ -160,9 +159,6 @@
         label="Add"
         @click="openCreateOriginDrawer"
       />
-    </template>
-    <template #illustration>
-      <Illustration />
     </template>
   </EmptyResultsBlock>
 </template>
