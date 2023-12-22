@@ -266,8 +266,10 @@
     </template>
   </FormHorizontal>
 
-  <FormHorizontal title="Security Settings"
-  description="Determine the level of access and permissions of the user and enable Multi-Factor Authentication upon sign-in.">
+  <FormHorizontal
+    title="Security Settings"
+    description="Determine the level of access and permissions of the user and enable Multi-Factor Authentication upon sign-in."
+  >
     <template #inputs>
       <div class="flex flex-col w-full sm:max-w-3xl gap-2">
         <label

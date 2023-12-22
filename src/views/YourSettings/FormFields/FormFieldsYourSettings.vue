@@ -96,8 +96,10 @@
 </script>
 
 <template>
-  <FormHorizontal title="Profile"
-  description="Fill in the required fields to add a new user to Azion Console.">
+  <FormHorizontal
+    title="Profile"
+    description="Fill in the required fields to add a new user to Azion Console."
+  >
     <template #inputs>
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
         <label
@@ -164,7 +166,7 @@
           >
           <small class="text-xs text-color-secondary font-normal leading-tight">
             Timezone of the user.</small
-        >
+          >
         </div>
         <div class="flex flex-col w-full sm:max-w-xs gap-2">
           <label
@@ -181,9 +183,9 @@
             v-model="language"
             disabled
           >
-          <small class="text-xs text-color-secondary font-normal leading-tight">
-            Sets the Azion Console language for the user.</small
-        >
+            <small class="text-xs text-color-secondary font-normal leading-tight">
+              Sets the Azion Console language for the user.</small
+            >
             <template #dropdownicon>
               <span class="pi pi-lock text-color-secondary" />
             </template>
@@ -243,7 +245,7 @@
             </Dropdown>
             <small class="text-xs text-color-secondary font-normal leading-tight">
               The phone number of the user. Include country and region code.</small
-        >
+            >
             <InputMask
               date="phone"
               v-model="mobile"
