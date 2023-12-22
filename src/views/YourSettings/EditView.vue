@@ -80,7 +80,7 @@
         closable: true,
         severity: 'warn',
         summary: 'Confirmation email',
-        detail: 'A confirmation email message has been sent to your email address.'
+        detail: 'We have sent you a confirmation email.'
       }
       toast.add({ ...toastConfig })
 
@@ -91,19 +91,19 @@
   }
   const passwordRequirementsList = ref([
     { label: '> 7 characters', valid: false },
-    { label: 'Uppercase letter', valid: false },
-    { label: 'Lowercase letter', valid: false },
-    { label: 'Special character (e.g. !?<>@#$%)', valid: false }
+    { label: '1 uppercase letter', valid: false },
+    { label: '1 lowercase letter', valid: false },
+    { label: '1 special character (example: !?<>@#$%)', valid: false }
   ])
 
   const validationSchema = yup.object({
-    firstName: yup.string().required().max(30).label('First name'),
-    lastName: yup.string().required().max(30).label('Last name'),
+    firstName: yup.string().required().max(30).label('First Name'),
+    lastName: yup.string().required().max(30).label('Last Name'),
     timezone: yup.string(),
     language: yup.string(),
     countryCallCode: yup.string(),
-    email: yup.string().email().required().max(254).label('E-mail'),
-    mobile: yup.string().required().label('Mobile'),
+    email: yup.string().email().required().max(254).label('Email'),
+    mobile: yup.string().required().label('Phone Number'),
     twoFactorEnabled: yup.boolean(),
     oldPassword: yup.string(),
     password: yup.string().when('oldPassword', {
@@ -112,8 +112,8 @@
         yup
           .string()
           .required()
-          .test('max', 'Exceeded number of characters', (value) => value?.length <= 128)
-          .test('noSpaces', 'Spaces are not allowed', (value) => !value?.match(/\s/g))
+          .test('max', 'Exceeded number of characters.', (value) => value?.length <= 128)
+          .test('noSpaces', 'Spaces not allowed.', (value) => !value?.match(/\s/g))
           .test('requirements', '', (value) => {
             const hasUpperCase = value && /[A-Z]/.test(value)
             const hasLowerCase = value && /[a-z]/.test(value)
@@ -134,7 +134,7 @@
           .string()
           .required()
           .oneOf([yup.ref('password'), null], 'Passwords must match')
-          .label('Confirm password')
+          .label('Confirm Password')
     })
   })
 </script>
