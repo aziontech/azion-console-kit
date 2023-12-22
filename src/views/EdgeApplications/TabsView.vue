@@ -5,6 +5,7 @@
   import ContentBlock from '@/templates/content-block'
   import { useRoute, useRouter } from 'vue-router'
   import { ref } from 'vue'
+  import { useToast } from 'primevue/usetoast'
   import EdgeApplicationsOriginsListView from '@/views/EdgeApplicationsOrigins/ListView'
   import EdgeApplicationsCacheSettingsListView from '@/views/EdgeApplicationsCacheSettings/ListView'
   import EdgeApplicationsFunctionsListView from '@/views/EdgeApplicationsFunctions/ListView'
@@ -30,6 +31,8 @@
     functions: 5,
     rulesEngine: 6
   }
+
+  const toast = useToast()
   const route = useRoute()
   const router = useRouter()
   const activeTab = ref(0)
@@ -37,8 +40,18 @@
   const isEnableEdgeFunction = ref(false)
 
   const loaderEdgeAplication = async () => {
-    const { edgeFunctions } = await props.edgeApplicationServices.loadEdgeApplication({ id: edgeApplicationId.value })
-    isEnableEdgeFunction.value = edgeFunctions
+    try {
+      const { edgeFunctions } = await props.edgeApplicationServices.loadEdgeApplication({
+        id: edgeApplicationId.value
+      })
+      isEnableEdgeFunction.value = edgeFunctions
+    } catch (error) {
+      toast.add({
+        closable: true,
+        severity: 'error',
+        summary: error
+      })
+    }
   }
 
   loaderEdgeAplication()
@@ -121,7 +134,10 @@
             v-bind="props.cacheSettingsServices"
           />
         </TabPanel>
-        <TabPanel header="Functions" v-if="isEnableEdgeFunction">
+        <TabPanel
+          header="Functions"
+          v-if="isEnableEdgeFunction"
+        >
           <EdgeApplicationsFunctionsListView
             v-if="activeTab === mapTabs.functions"
             v-bind="props.functionsServices"
