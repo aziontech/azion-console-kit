@@ -233,7 +233,7 @@
         <div class="flex gap-2">
           <div class="p-inputgroup">
             <Dropdown
-              id="timezone"
+              id="countryCallCode"
               filter
               :options="filteredCountriesMobile"
               optionLabel="labelFormat"
@@ -242,7 +242,11 @@
               :class="{ 'p-invalid': errorCountryCallCode }"
               class="surface-border border-r-0 w-1/4"
               v-model="countryCallCode"
-            />
+            >
+              <template #option="{ option }">
+                {{ option.label }}
+              </template>
+            </Dropdown>
             <InputMask
               date="phone"
               v-model="mobile"

@@ -76,11 +76,18 @@
     },
     {
       field: 'mfa',
-      header: 'MFA'
+      header: 'MFA',
+      type: 'component',
+      component: (columnData) => {
+        return columnBuilder({
+          data: columnData,
+          columnAppearance: 'tag'
+        })
+      }
     },
     {
-      field: 'active',
-      header: 'Active',
+      field: 'status',
+      header: 'Status',
       type: 'component',
       component: (columnData) => {
         return columnBuilder({
@@ -91,7 +98,14 @@
     },
     {
       field: 'owner',
-      header: 'Owner'
+      header: 'Owner',
+      type: 'component',
+      component: (columnData) => {
+        return columnBuilder({
+          data: columnData,
+          columnAppearance: 'tag'
+        })
+      }
     }
   ])
 
