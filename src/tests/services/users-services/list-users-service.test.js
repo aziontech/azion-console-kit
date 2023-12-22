@@ -81,12 +81,18 @@ describe('UsersServices', () => {
         lastName: fixtures.userMock.last_name,
         email: fixtures.userMock.email,
         teams: fixtures.userMock.teams,
-        mfa: 'Yes',
-        active: {
-          content: 'Yes',
+        mfa: {
+          content: 'Active',
           severity: 'success'
         },
-        owner: 'Yes'
+        status: {
+          content: 'Active',
+          severity: 'success'
+        },
+        owner: {
+          content: 'Yes',
+          severity: 'success'
+        }
       },
       {
         id: fixtures.disabledUserMock.id,
@@ -94,12 +100,18 @@ describe('UsersServices', () => {
         lastName: fixtures.disabledUserMock.last_name,
         email: fixtures.disabledUserMock.email,
         teams: 'Default Team, Azion Team',
-        mfa: 'No',
-        active: {
-          content: 'No',
+        mfa: {
+          content: 'Inactive',
           severity: 'danger'
         },
-        owner: 'No'
+        status: {
+          content: 'Inactive',
+          severity: 'danger'
+        },
+        owner: {
+          content: 'No',
+          severity: 'info'
+        }
       }
     ])
   })
