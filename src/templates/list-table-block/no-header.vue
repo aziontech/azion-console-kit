@@ -46,7 +46,7 @@
         />
         <Column
           sortable
-          v-for="col of columns"
+          v-for="col of selectedColumns"
           :key="col.field"
           :field="col.field"
           :header="col.header"
@@ -64,6 +64,33 @@
           :frozen="true"
           :alignFrozen="'right'"
         >
+          <template #header>
+            <div class="flex justify-end w-full">
+              <PrimeButton
+                outlined
+                icon="ai ai-column"
+                class="table-button"
+                @click="toggleColumnSelector"
+                v-tooltip.top="{ value: 'Hidden Columns', showDelay: 200 }"
+              >
+              </PrimeButton>
+              <OverlayPanel ref="columnSelectorPanel">
+                <Listbox
+                  v-model="selectedColumns"
+                  multiple
+                  :options="[{ label: 'Hidden Columns', items: this.columns }]"
+                  class="hidden-columns-panel"
+                  optionLabel="header"
+                  optionGroupLabel="label"
+                  optionGroupChildren="items"
+                >
+                  <template #optiongroup="slotProps">
+                    <p class="text-sm font-medium">{{ slotProps.option.label }}</p>
+                  </template>
+                </Listbox>
+              </OverlayPanel>
+            </div>
+          </template>
           <template #body="{ data: rowData }">
             <div class="flex justify-end">
               <PrimeMenu
@@ -148,6 +175,8 @@
   import { FilterMatchMode } from 'primevue/api'
   import DeleteDialog from './dialog/delete-dialog'
   import { getArrayChangedIndices } from '@/helpers/get-array-changed-indices'
+  import OverlayPanel from 'primevue/overlaypanel'
+  import Listbox from 'primevue/listbox'
 
   export default {
     name: 'list-table-block',
@@ -159,7 +188,9 @@
       PrimeButton,
       PrimeMenu,
       Skeleton,
-      DeleteDialog
+      DeleteDialog,
+      OverlayPanel,
+      Listbox
     },
     data: () => ({
       showActionsMenu: false,
@@ -171,7 +202,8 @@
       data: [],
       minimumOfItemsPerPage: 10,
       informationForDeletion: {},
-      selectedItemData: null
+      selectedItemData: null,
+      selectedColumns: []
     }),
     props: {
       columns: {
@@ -232,6 +264,7 @@
     },
     async created() {
       await this.loadData({ page: 1 })
+      this.selectedColumns = this.columns
     },
     computed: {
       filterBy() {
@@ -328,6 +361,9 @@
             summary: error
           })
         }
+      },
+      toggleColumnSelector(event) {
+        this.$refs.columnSelectorPanel.toggle(event)
       }
     },
     watch: {

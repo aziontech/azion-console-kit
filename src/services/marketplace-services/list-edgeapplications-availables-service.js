@@ -7,6 +7,7 @@ export const listEdgeApplicationsAvailablesService = async ({ vendor, solution }
     method: 'GET'
   })
   httpResponse = adapt(httpResponse)
+
   return parseHttpResponse(httpResponse)
 }
 

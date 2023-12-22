@@ -7,13 +7,16 @@
   import { ref } from 'vue'
   import EdgeApplicationsOriginsListView from '@/views/EdgeApplicationsOrigins/ListView'
   import EdgeApplicationsRulesEngineListView from '@/views/EdgeApplicationsRulesEngine/ListView'
+  import EdgeApplicationsFunctionsListView from '@/views/EdgeApplicationsFunctions/ListView'
   import EdgeApplicationsDeviceGroupsListView from '@/views/EdgeApplicationsDeviceGroups/ListView.vue'
+  import EditView from './EditView.vue'
 
   defineOptions({ name: 'tabs-edge-service' })
 
   const props = defineProps({
     edgeApplicationServices: { type: Object, required: true },
     originsServices: { type: Object, required: true },
+    functionsServices: { type: Object, required: true },
     clipboardWrite: { type: Function, required: true },
     deviceGroupsServices: { type: Object, required: true },
     rulesEngineServices: { type: Object, required: true }
@@ -27,7 +30,7 @@
     functions: 5,
     rulesEngine: 6
   }
-  const activatedFunctions = false
+  const activatedFunctions = true
   const route = useRoute()
   const router = useRouter()
   const activeTab = ref(0)
@@ -73,7 +76,18 @@
         @tab-click="changeRouteByClickingOnTab"
         class="w-full h-full"
       >
-        <TabPanel header="Main Settings"> </TabPanel>
+        <TabPanel header="Main Settings">
+          <div class="mt-8">
+            <EditView
+              :editEdgeApplicationService="edgeApplicationServices.editEdgeApplication"
+              :loadEdgeApplicationService="edgeApplicationServices.loadEdgeApplication"
+              :updatedRedirect="edgeApplicationServices.updatedRedirect"
+              :contactSalesEdgeApplicationService="
+                edgeApplicationServices.contactSalesEdgeApplicationService
+              "
+            />
+          </div>
+        </TabPanel>
         <TabPanel header="Origins">
           <EdgeApplicationsOriginsListView
             v-if="activeTab === mapTabs.origins"
@@ -95,6 +109,10 @@
           v-if="activatedFunctions"
           header="Functions"
         >
+          <EdgeApplicationsFunctionsListView
+            v-bind="props.functionsServices"
+            :edgeApplicationId="edgeApplicationId"
+          />
         </TabPanel>
         <TabPanel header="Rules Engine">
           <EdgeApplicationsRulesEngineListView

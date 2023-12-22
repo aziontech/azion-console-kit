@@ -6,8 +6,22 @@
   import InputSwitch from 'primevue/inputswitch'
   import Card from 'primevue/card'
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
+  import PrimeButton from 'primevue/button'
+  import PrimeTag from 'primevue/tag'
   import { computed } from 'vue'
   import { useField } from 'vee-validate'
+
+  const props = defineProps({
+    handleBlock: {
+      type: Array,
+      required: false,
+      default: () => ['full']
+    },
+    contactSalesEdgeApplicationService: {
+      type: Function,
+      required: true
+    }
+  })
 
   const HTTP_PORT_LIST_OPTIONS = [
     { label: '80 (Default)', value: '80' },
@@ -55,6 +69,16 @@
   const { value: hostHeader, errorMessage: hostHeaderError } = useField('hostHeader')
   const { value: browserCacheSettingsMaximumTtl } = useField('browserCacheSettingsMaximumTtl')
   const { value: cdnCacheSettingsMaximumTtl } = useField('cdnCacheSettingsMaximumTtl')
+  const { value: cdnCacheSettingsDefaultTtl } = useField('cdnCacheSettingsDefaultTtl')
+
+  const { value: websocket } = useField('websocket')
+  const { value: applicationAcceleration } = useField('applicationAcceleration')
+  const { value: caching } = useField('caching')
+  const { value: deviceDetection } = useField('deviceDetection')
+  const { value: edgeFunctions } = useField('edgeFunctions')
+  const { value: imageOptimization } = useField('imageOptimization')
+  const { value: l2Caching } = useField('l2Caching')
+  const { value: loadBalancer } = useField('loadBalancer')
 
   const setDeliveryProtocol = (protocol, enableHttp3) => {
     deliveryProtocol.value = protocol
@@ -69,16 +93,34 @@
     }
   }
 
+  const handleBlock = (block) => {
+    const handle =
+      props.handleBlock.filter((value) => {
+        return value === block
+      }).length > 0
+
+    return handle
+  }
+
   const isHttpProtocol = computed(() => deliveryProtocol.value === 'http')
   const isHttpsProtocol = computed(() => deliveryProtocol.value === 'http,https' && !http3.value)
   const isHttp3Protocol = computed(() => deliveryProtocol.value === 'http,https' && http3.value)
-  const isCacheTypeHonor = computed(() => browserCacheSettings.value === 'honor')
+  const isBrowserCacheTypeHonor = computed(() => browserCacheSettings.value === 'honor')
+  const websocketIsEnabled = computed(() => websocket.value)
+  const l2CachingIsEnable = computed(() => l2Caching.value)
+  const cdnCacheSettingsIsOverride = computed(() => {
+    if (cdnCacheSettings.value === 'override') {
+      return true
+    }
+    return false
+  })
 </script>
 
 <template>
   <FormHorizontal
     title="General"
     description="Edit the edge application title and description."
+    v-if="handleBlock('general')"
   >
     <template #inputs>
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
@@ -104,6 +146,7 @@
   <FormHorizontal
     title="Delivery Settings"
     description="Choose the delivery protocols for the application."
+    v-if="handleBlock('delivery-settings')"
   >
     <template #inputs>
       <div class="flex flex-col gap-2">
@@ -201,7 +244,7 @@
           <label
             for="port-http"
             class="text-color text-base font-medium"
-            >HTTP Ports *</label
+            >HTTP Ports <span v-if="isHttpProtocol || isHttpsProtocol">*</span></label
           >
           <span class="p-input-icon-right">
             <i class="pi pi-lock text-[var(--text-color-secondary)]" />
@@ -225,7 +268,7 @@
           <label
             for="port-https"
             class="text-color text-base font-medium"
-            >HTTPS Ports</label
+            >HTTPS Ports <span v-if="isHttpsProtocol">*</span></label
           >
           <span class="p-input-icon-right">
             <i class="pi pi-lock text-[var(--text-color-secondary)]" />
@@ -294,8 +337,9 @@
   </FormHorizontal>
 
   <FormHorizontal
-    title="Origins Settings"
+    title="Default Origin"
     description="Customize settings related to origin servers and hosts."
+    v-if="handleBlock('default-origins')"
   >
     <template #inputs>
       <div class="flex flex-col w-full sm:max-w-xs gap-2">
@@ -320,8 +364,53 @@
             }"
           />
         </span>
+      </div>
+
+      <div class="flex flex-col gap-2">
+        <label class="text-color text-base font-medium">Protocol Policy</label>
+        <div class="flex flex-col gap-4">
+          <div class="flex gap-2 items-center">
+            <RadioButton
+              v-model="originProtocolPolicy"
+              inputId="preserve"
+              name="preserve"
+              value="preserve"
+            />
+            <label
+              for="preserve"
+              class="text-color text-sm font-normal"
+              >Preserve HTTP/HTTPS</label
+            >
+          </div>
+          <div class="flex gap-2 items-center">
+            <RadioButton
+              v-model="originProtocolPolicy"
+              inputId="http"
+              name="http"
+              value="http"
+            />
+            <label
+              for="http"
+              class="text-color text-sm font-normal"
+              >Enforce HTTP</label
+            >
+          </div>
+          <div class="flex gap-2 items-center">
+            <RadioButton
+              v-model="originProtocolPolicy"
+              inputId="https"
+              name="https"
+              value="https"
+            />
+            <label
+              for="https"
+              class="text-color text-sm font-normal"
+              >Enforce HTTPS</label
+            >
+          </div>
+        </div>
         <div class="text-color-secondary text-sm font-normal">
-          Select an option to customize the origin.
+          Select the type of connection between the edge nodes and the origin.
         </div>
       </div>
 
@@ -369,57 +458,13 @@
           >{{ hostHeaderError }}</small
         >
       </div>
-
-      <div class="flex flex-col gap-2">
-        <label class="text-color text-base font-medium">Protocol Policy</label>
-        <div class="flex flex-col gap-4">
-          <div class="flex gap-2 items-center">
-            <RadioButton
-              v-model="originProtocolPolicy"
-              inputId="preserve"
-              name="preserve"
-              value="preserve"
-            />
-            <label
-              for="preserve"
-              class="text-color text-sm font-normal"
-              >Preserve HTTP/HTTPS</label
-            >
-          </div>
-          <div class="flex gap-2 items-center">
-            <RadioButton
-              v-model="originProtocolPolicy"
-              inputId="http"
-              name="http"
-              value="http"
-            />
-            <label
-              for="http"
-              class="text-color text-sm font-normal"
-              >Enforce HTTP</label
-            >
-          </div>
-          <div class="flex gap-2 items-center">
-            <RadioButton
-              v-model="originProtocolPolicy"
-              inputId="https"
-              name="https"
-              value="https"
-            />
-            <label
-              for="https"
-              class="text-color text-sm font-normal"
-              >Enforce HTTPS</label
-            >
-          </div>
-        </div>
-      </div>
     </template>
   </FormHorizontal>
 
   <FormHorizontal
     title="Cache Expiration Policies"
     description="Define how the edge should handle TTL values sent by the origin as well as how long your content should remain cached at the edge."
+    v-if="handleBlock('cache-expiration-policies')"
   >
     <template #inputs>
       <div class="flex flex-col gap-2">
@@ -457,7 +502,10 @@
         </div>
       </div>
 
-      <div class="flex flex-col sm:max-w-lg w-full gap-2">
+      <div
+        class="flex flex-col sm:max-w-lg w-full gap-2"
+        v-if="!isBrowserCacheTypeHonor"
+      >
         <div class="flex flex-col w-full sm:max-w-xs gap-2">
           <label
             for="maximun-ttl-seconds"
@@ -468,7 +516,6 @@
           <InputNumber
             v-model="browserCacheSettingsMaximumTtl"
             showButtons
-            :disabled="isCacheTypeHonor"
           />
         </div>
       </div>
@@ -484,9 +531,9 @@
               value="override"
             />
             <label
-              for="override"
+              for="honor"
               class="text-color text-sm font-normal"
-              >Honor Origin Cache Settings</label
+              >Override Cache Settings</label
             >
           </div>
           <div class="flex gap-2 items-center">
@@ -497,9 +544,9 @@
               value="honor"
             />
             <label
-              for="honor"
+              for="override"
               class="text-color text-sm font-normal"
-              >Override Cache Settings</label
+              >Honor Origin Cache Settings</label
             >
           </div>
           <div class="text-color-secondary text-sm font-normal">
@@ -514,12 +561,19 @@
           <label
             for="cdn-maximun-ttl-seconds"
             class="text-color text-base font-medium"
-            >Maximum TTL (seconds)</label
+            >{{ cdnCacheSettingsIsOverride ? 'Maximum TTL (seconds)' : 'Default TTL' }}</label
           >
 
           <InputNumber
             v-model="cdnCacheSettingsMaximumTtl"
             showButtons
+            v-if="cdnCacheSettingsIsOverride"
+          />
+
+          <InputNumber
+            v-model="cdnCacheSettingsDefaultTtl"
+            showButtons
+            v-if="!cdnCacheSettingsIsOverride"
           />
 
           <div class="text-color-secondary text-sm font-normal">
@@ -533,8 +587,185 @@
   </FormHorizontal>
 
   <FormHorizontal
+    title="Edge Application Modules"
+    description="Activate Edge Application modules to extend the configuration possibilities of the application. Some modules require subscription."
+    v-if="handleBlock('edge-application-modules')"
+  >
+    <template #inputs>
+      <div class="flex flex-col gap-2">
+        <label class="text-color text-base font-medium">Your Modules</label>
+        <div class="flex flex-col gap-3">
+          <Card
+            :pt="{
+              body: { class: 'p-4' },
+              title: { class: 'flex justify-between items-center text-base font-medium m-0' },
+              subtitle: {
+                class: 'text-sm font-normal text-color-secondary m-0 pr-0 md:pr-[2.5rem]'
+              }
+            }"
+          >
+            <template #title>
+              <span class="text-base">Application Acceleration</span>
+              <InputSwitch v-model="applicationAcceleration" />
+            </template>
+            <template #subtitle>Optimize protocols and manage dynamic content delivery.</template>
+          </Card>
+          <Card
+            :pt="{
+              body: { class: 'p-4 border border-orange-500 rounded-md' },
+              title: { class: 'flex justify-between items-center text-base font-medium m-0' },
+              subtitle: {
+                class: 'text-sm font-normal text-color-secondary m-0 pr-0 md:pr-[2.5rem]'
+              }
+            }"
+          >
+            <template #title>
+              <span class="text-base">Edge Caching</span>
+              <InputSwitch
+                v-model="caching"
+                disabled
+              />
+            </template>
+            <template #subtitle>Customize advanced cache settings. Activated by default.</template>
+            <template #footer>
+              <PrimeTag
+                value="Automatically enabled in all accounts."
+                icon="pi pi-lock"
+                severity="info"
+                class="mt-3"
+              />
+            </template>
+          </Card>
+          <Card
+            :pt="{
+              body: { class: 'p-4' },
+              title: { class: 'flex justify-between items-center text-base font-medium m-0' },
+              subtitle: {
+                class: 'text-sm font-normal text-color-secondary m-0 pr-0 md:pr-[2.5rem]'
+              }
+            }"
+          >
+            <template #title>
+              <span class="text-base">Device Detection</span>
+              <InputSwitch v-model="deviceDetection" />
+            </template>
+            <template #subtitle
+              >Activate DeviceAtlas variables to configure responsive rules.</template
+            >
+          </Card>
+          <Card
+            :pt="{
+              body: { class: 'p-4' },
+              title: { class: 'flex justify-between items-center text-base font-medium m-0' },
+              subtitle: {
+                class: 'text-sm font-normal text-color-secondary m-0 pr-0 md:pr-[2.5rem]'
+              }
+            }"
+          >
+            <template #title>
+              <span class="text-base">Edge Functions</span>
+              <InputSwitch v-model="edgeFunctions" />
+            </template>
+            <template #subtitle>Build ultra-low latency functions that run on the edge.</template>
+          </Card>
+          <Card
+            :pt="{
+              body: { class: 'p-4' },
+              title: { class: 'flex justify-between items-center text-base font-medium m-0' },
+              subtitle: {
+                class: 'text-sm font-normal text-color-secondary m-0 pr-0 md:pr-[2.5rem]'
+              }
+            }"
+          >
+            <template #title>
+              <span class="text-base">Image Processor</span>
+              <InputSwitch v-model="imageOptimization" />
+            </template>
+            <template #subtitle>Enable dynamic image editing options.</template>
+          </Card>
+          <Card
+            :pt="{
+              body: { class: 'p-4' },
+              title: { class: 'flex justify-between items-center text-base font-medium m-0' },
+              subtitle: {
+                class: 'text-sm font-normal text-color-secondary m-0 pr-0 md:pr-[2.5rem]'
+              }
+            }"
+          >
+            <template #title>
+              <span class="text-base">Load Balancer</span>
+              <InputSwitch v-model="loadBalancer" />
+            </template>
+            <template #subtitle
+              >Balance traffic to your origins assuring best-in-class reliability and network
+              congestion control.</template
+            >
+          </Card>
+        </div>
+      </div>
+      <div class="flex flex-col gap-2">
+        <label class="text-color text-base font-medium">Other modules that you can subscribe</label>
+        <div class="flex flex-col gap-3">
+          <Card
+            :pt="{
+              body: { class: 'p-4' },
+              title: { class: 'flex justify-between items-center text-base font-medium m-0' },
+              subtitle: {
+                class: 'text-sm font-normal text-color-secondary m-0 pr-0 md:pr-[2.5rem]'
+              }
+            }"
+            :class="!l2CachingIsEnable ? 'opacity-50' : ''"
+          >
+            <template #title>
+              <span class="text-base">L2 Caching</span>
+              <InputSwitch
+                v-model="l2Caching"
+                :disabled="!l2CachingIsEnable"
+              />
+            </template>
+            <template #subtitle
+              >Enable an additional cache layer at the edge. Contact sales to enable this
+              module.</template
+            >
+          </Card>
+          <Card
+            :pt="{
+              body: { class: 'p-4' },
+              title: { class: 'flex justify-between items-center text-base font-medium m-0' },
+              subtitle: {
+                class: 'text-sm font-normal text-color-secondary m-0 pr-0 md:pr-[2.5rem]'
+              }
+            }"
+            :class="!websocketIsEnabled ? 'opacity-50' : ''"
+          >
+            <template #title>
+              <span class="text-base">WebSocket Proxy</span>
+              <InputSwitch
+                v-model="websocket"
+                :disabled="!websocketIsEnabled"
+              />
+            </template>
+            <template #subtitle
+              >Enhance real-time data exchange, enabling seamless communication between your edge
+              application and backend services using the WebSocket protocol</template
+            >
+          </Card>
+        </div>
+        <PrimeButton
+          outlined
+          icon="pi pi-shopping-cart"
+          class="max-w-[150px]"
+          label="Contact sales"
+          @click="props.contactSalesEdgeApplicationService()"
+        />
+      </div>
+    </template>
+  </FormHorizontal>
+
+  <FormHorizontal
     title="Debug Rules"
     description="Create a log of executed rules. Logs can be accessed through Data Streaming, Real-Time Events or Real-Time Events GraphQL API."
+    v-if="handleBlock('debug-rules')"
   >
     <template #inputs>
       <div class="flex flex-col gap-2">
@@ -542,23 +773,33 @@
           :pt="{
             root: { class: 'shadow-none  rounded-none' },
             body: { class: 'py-4 border-0' },
+            content: { class: 'ml-12' },
             title: { class: 'flex items-center text-base m-0 gap-3 font-medium' },
-            subtitle: { class: 'text-sm font-normal text-color-secondary m-0 pr-0 md:pr-[2.5rem]' }
+            subtitle: {
+              class: 'text-sm font-normal text-color-secondary m-0 pr-0 md:pr-[2.5rem]'
+            }
           }"
         >
           <template #title>
-            <InputSwitch v-model="active" />
+            <InputSwitch
+              v-model="active"
+              inputId="active"
+            />
             <div class="flex-col gap-1">
-              <div class="">
-                <div class="text-color text-sm font-normal">Active</div>
-              </div>
+              <label
+                for="active"
+                class="text-color text-sm font-normal"
+                >Active</label
+              >
             </div>
           </template>
+          <template #content>
+            <small class="text-color-secondary text-sm">
+              Rules that were successfully executed will be shown under the $traceback field in Data
+              Streaming and Real-Time Events or the $stacktrace variable in GraphQL.
+            </small>
+          </template>
         </Card>
-        <div class="self-stretch text-color-secondary text-sm font-normal">
-          Rules that were successfully executed will be shown under the $traceback field in Data
-          Streaming and Real-Time Events or the $stacktrace variable in GraphQL.
-        </div>
       </div>
     </template>
   </FormHorizontal>
