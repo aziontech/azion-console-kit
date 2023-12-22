@@ -33,7 +33,7 @@
   <div class="flex flex-col gap-8">
     <FormHorizontal
       title="Layer Settings"
-      description="Description"
+      description="Select where the purge should be made."
     >
       <template #inputs>
         <div class="flex flex-col gap-8">
@@ -59,7 +59,7 @@
                   />
                   <span class="text-base">Edge Caching</span>
                 </template>
-                <template #subtitle>Purge web content delivered at the Edge</template>
+                <template #subtitle>Purge content from Azion's edge network.</template>
               </Card>
             </div>
           </div>
@@ -87,7 +87,8 @@
                   <span class="text-base">L2 Caching</span>
                 </template>
                 <template #subtitle>
-                  Purge web content in the layer nearest to your origin.</template
+                  Purge content from Azion's second cache layer. Requires subscribing to this
+                  module.</template
                 >
               </Card>
             </div>
@@ -95,7 +96,7 @@
               outlined
               icon="pi pi-shopping-cart"
               class="max-w-[150px] mt-4"
-              label="Contact sales"
+              label="Contact Sales"
               @click="props.contactSalesRealTimePurgeService()"
             />
           </div>
@@ -105,7 +106,7 @@
 
     <FormHorizontal
       title="Purge Type"
-      description="You can instantly delete your content cache in Azion, by using a Cache Key List, a URL List or a Wildcard expression that represents the objects you want to purge."
+      description="Select how the content should be identified."
     >
       <template #inputs>
         <div class="flex flex-col gap-3">
@@ -127,10 +128,7 @@
               />
               <span class="text-base">Cache Key</span>
             </template>
-            <template #subtitle
-              >Is the most accurate way to purge your content cache by passing a cache key list of
-              up to 50 objects per request.</template
-            >
+            <template #subtitle>Enter a list of content cache keys to be purged.</template>
           </Card>
 
           <Card
@@ -152,9 +150,8 @@
               <span class="text-base">URL</span>
             </template>
             <template #subtitle
-              >Is the simplest way to purge your content cache by passing a URL list of up to 50
-              objects per request. You cannot purge content cache variations with this
-              method.</template
+              >Enter a list of content URLs to be purged. Asterisks (*) in URLs are considered
+              characters.</template
             >
           </Card>
           <Card
@@ -176,8 +173,8 @@
               <span class="text-base">Wildcard</span>
             </template>
             <template #subtitle
-              >is a powerful way to purge a list of objects by passing a Wildcard expression. You
-              can use the wildcard character (*) in path or query string arguments.</template
+              >Enter a list of content URLs to be purged. Asterisks (*) are considered wildcard
+              expressions.</template
             >
           </Card>
         </div>
@@ -186,7 +183,7 @@
 
     <FormHorizontal
       title="Arguments"
-      description="Description"
+      description="Insert values related to cache key, URL, or wildcard expression."
     >
       <template #inputs>
         <div class="flex flex-col sm:max-w-lg w-full gap-2">
@@ -210,7 +207,7 @@
           >
 
           <div class="text-color-secondary text-sm font-normal">
-            Separate arguments using new line.
+            Separate each argument using a new line.
           </div>
         </div>
       </template>
