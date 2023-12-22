@@ -34,6 +34,14 @@
   const router = useRouter()
   const activeTab = ref(0)
   const edgeApplicationId = ref(route.params.id)
+  const isEnableEdgeFunction = ref(false)
+
+  const loaderEdgeAplication = async () => {
+    const { edgeFunctions } = await props.edgeApplicationServices.loadEdgeApplication({ id: edgeApplicationId.value })
+    isEnableEdgeFunction.value = edgeFunctions
+  }
+
+  loaderEdgeAplication()
 
   const getTabFromValue = (selectedTabIndex) => {
     const tabNames = Object.keys(mapTabs)
@@ -113,7 +121,7 @@
             v-bind="props.cacheSettingsServices"
           />
         </TabPanel>
-        <TabPanel header="Functions">
+        <TabPanel header="Functions" v-if="isEnableEdgeFunction">
           <EdgeApplicationsFunctionsListView
             v-if="activeTab === mapTabs.functions"
             v-bind="props.functionsServices"
