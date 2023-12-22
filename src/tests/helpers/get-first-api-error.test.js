@@ -13,28 +13,14 @@ describe('getFirstApiError', () => {
   it('should return the first api error key', () => {
     const { sut } = makeSut()
 
-    const environment = sut([
-      [
-        { error: 'sample error 1' }
-      ],
-      [
-        { errorTwo: 'sample error 2' }
-      ]
-    ])
+    const environment = sut([[{ error: 'sample error 1' }], [{ errorTwo: 'sample error 2' }]])
 
     expect(environment).toStrictEqual({ error: 'sample error 1' })
   })
   it('should not return another api error', () => {
     const { sut } = makeSut()
 
-    const environment = sut([
-      [
-        { error: 'sample error 1' }
-      ],
-      [
-        { errorTwo: 'sample error 2' }
-      ]
-    ])
+    const environment = sut([[{ error: 'sample error 1' }], [{ errorTwo: 'sample error 2' }]])
 
     expect(environment).not.toStrictEqual({ error: 'sample error 2' })
   })

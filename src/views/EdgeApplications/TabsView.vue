@@ -22,7 +22,7 @@
     clipboardWrite: { type: Function, required: true },
     deviceGroupsServices: { type: Object, required: true },
     rulesEngineServices: { type: Object, required: true },
-    functionsServices: { type: Object, required: true },
+    functionsServices: { type: Object, required: true }
   })
 
   const mapTabs = {
