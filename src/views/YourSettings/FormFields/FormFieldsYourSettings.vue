@@ -68,10 +68,10 @@
   })
 
   const passwordRequirementsList = ref([
-    { label: '> 7 characters', valid: false },
-    { label: 'Uppercase letter', valid: false },
-    { label: 'Lowercase letter', valid: false },
-    { label: 'Special character (e.g. !?<>@#$%)', valid: false }
+    { label: '8 characters', valid: false },
+    { label: '1 uppercase letter', valid: false },
+    { label: '1 lowercase letter', valid: false },
+    { label: '1 special character (example: !?<>@#$%)', valid: false }
   ])
 
   const validation = () => {
@@ -96,20 +96,25 @@
 </script>
 
 <template>
-  <FormHorizontal title="General">
+  <FormHorizontal title="Profile"
+  description="Fill in the required fields to add a new user to Azion Console.">
     <template #inputs>
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
         <label
           for="firstName"
           class="text-color text-base font-medium"
-          >First name *</label
+          >First Name *</label
         >
         <InputText
+          placeholder="John"
           v-model="firstName"
           id="firstName"
           type="text"
           :class="{ 'p-invalid': errorFirstName }"
         />
+        <small class="text-xs text-color-secondary font-normal leading-tight">
+          The first name of the user. Maximum of 30 characters.</small
+        >
         <small
           id="name-help"
           class="p-error"
@@ -120,14 +125,18 @@
         <label
           for="lastName"
           class="text-color text-base font-medium"
-          >Last name *</label
+          >Last Name *</label
         >
         <InputText
+          placeholder="Smith"
           v-model="lastName"
           id="lastName"
           type="text"
           :class="{ 'p-invalid': errorLastName }"
         />
+        <small class="text-xs text-color-secondary font-normal leading-tight">
+          The last name of the user. Maximum of 30 characters.</small
+        >
         <small
           id="name-help"
           class="p-error"
@@ -152,6 +161,10 @@
             :class="{ 'p-invalid': errorTimezone }"
             v-model="timezone"
           />
+          >
+          <small class="text-xs text-color-secondary font-normal leading-tight">
+            Timezone of the user.</small
+        >
         </div>
         <div class="flex flex-col w-full sm:max-w-xs gap-2">
           <label
@@ -168,6 +181,9 @@
             v-model="language"
             disabled
           >
+          <small class="text-xs text-color-secondary font-normal leading-tight">
+            Sets the Azion Console language for the user.</small
+        >
             <template #dropdownicon>
               <span class="pi pi-lock text-color-secondary" />
             </template>
@@ -176,13 +192,13 @@
       </div>
     </template>
   </FormHorizontal>
-  <FormHorizontal title="Contact information">
+  <FormHorizontal title="Contact Information">
     <template #inputs>
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
         <label
           for="email"
           class="text-color text-base font-medium"
-          >E-mail *</label
+          >Email *</label
         >
         <InputText
           v-model="email"
@@ -192,6 +208,9 @@
           placeholder="example@email.com"
           :class="{ 'p-invalid': errorEmail }"
         />
+        <small class="text-xs text-color-secondary font-normal leading-tight">
+          Email of the user. A confirmation email will be sent to this address.</small
+        >
         <small
           id="name-help"
           class="p-error"
@@ -203,7 +222,7 @@
         <label
           for="mobile"
           class="text-color text-base font-medium"
-          >Mobile *</label
+          >Phone Number *</label
         >
         <div class="flex gap-2">
           <div class="p-inputgroup">
@@ -222,12 +241,15 @@
                 {{ option.label }}
               </template>
             </Dropdown>
-
+            <small class="text-xs text-color-secondary font-normal leading-tight">
+              The phone number of the user. Include country and region code.</small
+        >
             <InputMask
               date="phone"
               v-model="mobile"
               class="w-full"
               mask="?99999999999999999999"
+              placeholder="5500999999999"
               :class="{ 'p-invalid': errorMobile || !countryCallCode }"
             />
           </div>
@@ -247,7 +269,7 @@
         <label
           for="oldPassword"
           class="text-color text-base font-medium"
-          >Old password *</label
+          >Old Password *</label
         >
         <InputPassword
           toggleMask
@@ -267,7 +289,7 @@
         <label
           for="password"
           class="font-semibold text-sm"
-          >New password *</label
+          >New Password *</label
         >
         <InputPassword
           toggleMask
@@ -306,7 +328,7 @@
         <label
           for="confirmPassword"
           class="text-color text-base font-medium"
-          >Confirm password *</label
+          >Confirm Password *</label
         >
         <InputPassword
           toggleMask
@@ -352,10 +374,7 @@
 
         <template #content>
           <small class="text-color-secondary text-sm">
-            Multi-factor authentication adds an extra layer of security to your account. In addition
-            to your username and password, you will need an application like Google Authenticator on
-            your phone to get verification codes when prompted. Enabling multi-factor
-            authentication, you MUST set up an account on Google Authenticator on your next login.
+            Accounts with MFA enabled can enforce mobile client authentication upon login.
           </small>
         </template>
       </Card>
