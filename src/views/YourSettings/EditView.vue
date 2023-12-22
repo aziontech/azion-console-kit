@@ -90,7 +90,7 @@
     }
   }
   const passwordRequirementsList = ref([
-    { label: '> 7 characters', valid: false },
+    { label: '8 characters', valid: false },
     { label: '1 uppercase letter', valid: false },
     { label: '1 lowercase letter', valid: false },
     { label: '1 special character (example: !?<>@#$%)', valid: false }

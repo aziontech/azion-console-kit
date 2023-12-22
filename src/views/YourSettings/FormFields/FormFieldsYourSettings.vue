@@ -68,7 +68,7 @@
   })
 
   const passwordRequirementsList = ref([
-    { label: '> 7 characters', valid: false },
+    { label: '8 characters', valid: false },
     { label: '1 uppercase letter', valid: false },
     { label: '1 lowercase letter', valid: false },
     { label: '1 special character (example: !?<>@#$%)', valid: false }
@@ -242,14 +242,14 @@
               </template>
             </Dropdown>
             <small class="text-xs text-color-secondary font-normal leading-tight">
-              The phone number of the user. Insert country and region code as well.</small
+              The phone number of the user. Include country and region code.</small
         >
             <InputMask
               date="phone"
               v-model="mobile"
               class="w-full"
               mask="?99999999999999999999"
-              placeholder="999999999999"
+              placeholder="5500999999999"
               :class="{ 'p-invalid': errorMobile || !countryCallCode }"
             />
           </div>
@@ -374,7 +374,7 @@
 
         <template #content>
           <small class="text-color-secondary text-sm">
-            Accounts that have MFA enabled can enforce mobile client authentication upon login.
+            Accounts with MFA enabled can enforce mobile client authentication upon login.
           </small>
         </template>
       </Card>

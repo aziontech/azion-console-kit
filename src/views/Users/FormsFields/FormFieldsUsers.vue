@@ -252,7 +252,7 @@
               v-model="mobile"
               class="w-full"
               mask="?99999999999999999999"
-              placeholder="999999999999"
+              placeholder="5500999999999"
               :class="{ 'p-invalid': errorMobile || !countryCallCode }"
             />
           </div>
@@ -267,7 +267,7 @@
   </FormHorizontal>
 
   <FormHorizontal title="Security Settings"
-  description="Determine the level of access and permissions of the user or enable Multi-Factor Authentication upon sign-in.">
+  description="Determine the level of access and permissions of the user and enable Multi-Factor Authentication upon sign-in.">
     <template #inputs>
       <div class="flex flex-col w-full sm:max-w-3xl gap-2">
         <label
@@ -360,7 +360,7 @@
           </template>
           <template #content>
             <small class="text-color-secondary text-sm">
-              Accounts that have MFA enabled can enforce mobile client authentication upon login.
+              Accounts with MFA enabled can enforce mobile client authentication upon login.
             </small>
           </template>
         </Card>

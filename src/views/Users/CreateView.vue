@@ -62,13 +62,13 @@
   })
 
   const validationSchema = yup.object({
-    firstName: yup.string().required('First Name is a required field').max(30),
-    lastName: yup.string().required('Last Name is a required field').max(30),
-    timezone: yup.string().required('Timezone is a required field'),
+    firstName: yup.string().required('First Name is a required field.').max(30),
+    lastName: yup.string().required('Last Name is a required field.').max(30),
+    timezone: yup.string().required('Timezone is a required field.'),
     language: yup.string(),
-    email: yup.string().email().required('Email is a required field').max(254),
-    countryCallCode: yup.object().required('Country is a required field'),
-    mobile: yup.string().required('Phone Number is a required field').max(20),
+    email: yup.string().email().required('Email is a required field.').max(254),
+    countryCallCode: yup.object().required('Country is a required field.'),
+    mobile: yup.string().required('Phone Number is a required field.').max(20),
     isAccountOwner: yup.boolean(),
     teamsIds: yup.array(),
     twoFactorEnabled: yup.boolean()
