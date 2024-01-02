@@ -23,6 +23,14 @@
     description: {
       type: String,
       default: ''
+    },
+    rows: {
+      type: Number,
+      default: 5
+    },
+    cols: {
+      type: Number,
+      default: 30
     }
   })
 
@@ -49,6 +57,8 @@
     v-model="inputValue"
     :name="name"
     type="text"
+    :rows="props.rows"
+    :cols="props.cols"
     :placeholder="props.placeholder"
     @input="handleChange"
     @blur="handleBlur"
