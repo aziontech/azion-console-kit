@@ -28,4 +28,10 @@
       padding: $inlineSpacing 0;
     }
   }
+
+  &.p-divider-dashed {
+    &.p-divider-horizontal:before {
+      border-style: dashed;
+    }
+  }
 }
