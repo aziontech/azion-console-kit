@@ -246,9 +246,6 @@
           optionLabel="label"
           option-value="value"
         />
-        <small class="text-xs text-color-secondary font-normal leading-5">
-          Define an origin for the content, in FQDN format or an IPv4/IPv6 address.
-        </small>
       </div>
       <div
         class="flex flex-col sm:max-w-lg w-full gap-2"
