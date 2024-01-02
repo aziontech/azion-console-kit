@@ -1,6 +1,7 @@
 <template>
   <PrimeButton
     @click="sidebarToggle"
+    v-if="isAccountTypeClient"
     size="small"
     class="text-white flex-none border-header w-8 h-8"
     icon="pi pi-bars"
@@ -57,6 +58,7 @@
 <script setup>
   import { ref, computed } from 'vue'
   import { useRouter } from 'vue-router'
+  import { useAccountStore } from '@/stores/account'
 
   import PrimeButton from 'primevue/button'
   import PrimeMenu from 'primevue/menu'
@@ -64,6 +66,10 @@
   import { listSidebarMenusService } from '@services/sidebar-menus-services'
 
   defineOptions({ name: 'sidebar-block' })
+
+  const accountStore = useAccountStore()
+  const TYPE_CLIENT = 'client'
+  const isAccountTypeClient = computed(() => accountStore.account.kind === TYPE_CLIENT)
 
   const router = useRouter()
 
