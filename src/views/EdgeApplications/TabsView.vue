@@ -26,6 +26,7 @@
   })
 
   const mapTabs = {
+    mainSettings: 0,
     origins: 1,
     deviceGroups: 2,
     errorResponses: 3,
@@ -41,7 +42,7 @@
   const edgeApplicationId = ref(route.params.id)
   const isEnableEdgeFunction = ref(false)
 
-  const loaderEdgeAplication = async () => {
+  const loaderEdgeApplication = async () => {
     try {
       const { edgeFunctions } = await props.edgeApplicationServices.loadEdgeApplication({
         id: edgeApplicationId.value
@@ -56,7 +57,7 @@
     }
   }
 
-  loaderEdgeAplication()
+  loaderEdgeApplication()
 
   const getTabFromValue = (selectedTabIndex) => {
     const tabNames = Object.keys(mapTabs)
@@ -107,6 +108,7 @@
               :contactSalesEdgeApplicationService="
                 edgeApplicationServices.contactSalesEdgeApplicationService
               "
+              :showActionBar="activeTab === mapTabs.mainSettings"
             />
           </div>
         </TabPanel>
