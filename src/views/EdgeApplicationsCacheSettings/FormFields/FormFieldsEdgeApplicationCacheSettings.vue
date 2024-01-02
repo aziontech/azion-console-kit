@@ -138,12 +138,12 @@
           >
             <RadioButton
               v-model="browserCacheSettings"
-              :inputId="browserCacheSettingsOption.value"
+              :inputId="`browserOption-${browserCacheSettingsOption.value}`"
               name="browserCacheSettings"
               :value="browserCacheSettingsOption.value"
             />
             <label
-              :for="browserCacheSettingsOption.value"
+              :for="`browserOption-${browserCacheSettingsOption.value}`"
               class="text-color text-sm font-normal leading-tight"
             >
               {{ browserCacheSettingsOption.label }}
@@ -161,7 +161,7 @@
       >
         <label
           for="browserCacheSettingsMaximumTtl"
-          class="text-color text-base font-medium"
+          class="text-color text-sm font-medium"
           >Maximum TTL (seconds) *</label
         >
 
@@ -191,12 +191,12 @@
           >
             <RadioButton
               v-model="cdnCacheSettings"
-              :inputId="cdnCacheSettingsOption.value"
+              :inputId="`cdnOption-${cdnCacheSettingsOption.value}`"
               name="cdnCacheSettings"
               :value="cdnCacheSettingsOption.value"
             />
             <label
-              :for="cdnCacheSettingsOption.value"
+              :for="`cdnOption-${cdnCacheSettingsOption.value}`"
               class="text-color text-sm font-normal leading-tight"
             >
               {{ cdnCacheSettingsOption.label }}
@@ -214,7 +214,7 @@
       >
         <label
           for="cdnCacheSettingsMaximumTtl"
-          class="text-color text-base font-medium"
+          class="text-color text-sm font-medium"
           >Maximum TTL (seconds) *</label
         >
         <InputNumber
@@ -269,7 +269,7 @@
       >
         <label
           for="sliceConfigurationRange"
-          class="text-color text-base font-medium"
+          class="text-color text-sm font-medium"
           >Slice Range (KB)</label
         >
         <span class="p-input-icon-right w-full flex max-w-lg flex-col items-start gap-2">
@@ -330,7 +330,7 @@
       >
         <label
           for="queryStringFields"
-          class="text-color text-base font-medium"
+          class="text-color text-sm font-medium"
           >Query String fields *</label
         >
         <TextArea
@@ -453,7 +453,7 @@
       >
         <label
           for="cookieNames"
-          class="text-color text-base font-medium"
+          class="text-color text-sm font-medium"
           >Cookie Names *</label
         >
         <TextArea
@@ -515,6 +515,8 @@
                 <PrimeButton
                   v-if="!deviceGroupItem.isFirst"
                   icon="pi pi-trash"
+                  size="small"
+                  outlined
                   @click="removeDeviceGroup(index)"
                 />
               </template>
