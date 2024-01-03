@@ -300,7 +300,7 @@
             type="dashed"
             v-if="address.isFirst"
           >
-            <b>Then</b>
+            Then
           </Divider>
           <div
             v-else
@@ -311,7 +311,7 @@
               align="left"
               type="dashed"
             >
-              <b>And</b>
+              And
             </Divider>
             <PrimeButton
               class="h-8 max-sm:w-full position-absolute right-0 top-0"
