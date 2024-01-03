@@ -1,8 +1,9 @@
 .p-divider {
   .p-divider-content {
     background-color: $panelContentBg;
+    font-weight: 500 !important;
   }
-
+  
   &.p-divider-horizontal {
     margin: $dividerHorizontalMargin;
     padding: $dividerHorizontalPadding;
@@ -34,4 +35,5 @@
       border-style: dashed;
     }
   }
+  
 }
