@@ -174,7 +174,7 @@
   import PrimeButton from 'primevue/button'
   import { FilterMatchMode } from 'primevue/api'
   import DeleteDialog from './dialog/delete-dialog'
-  import { getArrayChangedIndices } from '@/helpers/get-array-changed-indices'
+  import { getArrayChangedIndexes } from '@/helpers/get-array-changed-indexes'
   import OverlayPanel from 'primevue/overlaypanel'
   import Listbox from 'primevue/listbox'
 
@@ -345,7 +345,7 @@
       },
       async onRowReorder(event) {
         try {
-          const tableData = getArrayChangedIndices(this.data, event.value)
+          const tableData = getArrayChangedIndexes(this.data, event.value)
           await this.onReorderService(tableData)
           this.data = event.value
 
@@ -374,3 +374,4 @@
     }
   }
 </script>
+@/helpers/get-array-changed-indexes

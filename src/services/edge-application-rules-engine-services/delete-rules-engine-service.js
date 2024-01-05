@@ -21,7 +21,7 @@ const extractErrorKey = (errorSchema, key) => {
 
 /**
  * @param {Object} httpResponse - The HTTP response object.
- * @param {Object} httpResponse.body - The response body.
+ * @param {Array} httpResponse.body - The response body.
  * @returns {string} The result message based on the status code.
  */
 const extractApiError = (httpResponse) => {
