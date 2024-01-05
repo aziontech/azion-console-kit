@@ -1,5 +1,5 @@
 <template>
-  <div class="w-full h-full flex flex-col sm:flex-row p-0 sm:pl-5 sm:pr-8 gap-4 pb-4">
+  <div class="overflow-auto w-full h-full flex flex-col sm:flex-row p-0 sm:pl-5 sm:pr-8 gap-4 pb-4">
     <div class="sm:min-w-[240px] mt-4">
       <Listbox
         @change="onMenuChange"
@@ -15,7 +15,7 @@
       />
     </div>
 
-    <div class="w-full flex flex-col">
+    <div class="overflow-auto w-full flex flex-col">
       <div v-if="!isLoading">
         <div
           class="text-base font-medium mt-5 mb-3"
