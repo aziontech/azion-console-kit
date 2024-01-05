@@ -51,7 +51,7 @@ const getChangedItems = (array, originalIndexMap, updatedIndexMap) => {
  * @param {Array} updatedArray - The updated array.
  * @returns {Array} The changed items with old and new indices.
  */
-export const getArrayChangedIndices = (originalArray, updatedArray) => {
+export const getArrayChangedIndexes = (originalArray, updatedArray) => {
   const originalIndexMap = createIndexMap(originalArray)
   const updatedIndexMap = createIndexMap(updatedArray)
 

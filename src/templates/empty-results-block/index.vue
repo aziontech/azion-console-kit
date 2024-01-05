@@ -13,7 +13,8 @@
     documentationService: { type: Function, required: true },
     createPagePath: { type: String, required: false },
     createButtonLabel: { type: String, required: false },
-    inTabs: { type: Boolean, required: false }
+    inTabs: { type: Boolean, required: false },
+    noBorder: { type: Boolean, required: false }
   })
   function openDocumentation() {
     props.documentationService()
