@@ -13,6 +13,7 @@
     </template>
     <template #action-bar="{ onSubmit, formValid, onCancel, loading }">
       <ActionBarBlockWithTeleport
+        v-if="showActionBar"
         @onSubmit="onSubmit"
         @onCancel="onCancel"
         :loading="loading"
@@ -44,6 +45,10 @@
     contactSalesEdgeApplicationService: {
       type: Function,
       required: true
+    },
+    showActionBar: {
+      type: Boolean,
+      default: true
     }
   })
 

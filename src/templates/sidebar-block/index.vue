@@ -1,6 +1,7 @@
 <template>
   <PrimeButton
     @click="sidebarToggle"
+    v-if="isAccountTypeClient"
     size="small"
     class="text-white flex-none border-header w-8 h-8"
     icon="pi pi-bars"
@@ -43,7 +44,7 @@
         >
           <span v-bind="props.icon" />
           <span v-bind="props.label">{{ label }}</span>
-          <Tag
+          <PrimeTag
             v-if="item.tag"
             :value="item.tag"
             class="ml-2"
@@ -57,13 +58,18 @@
 <script setup>
   import { ref, computed } from 'vue'
   import { useRouter } from 'vue-router'
-
+  import PrimeTag from 'primevue/tag'
+  import { useAccountStore } from '@/stores/account'
   import PrimeButton from 'primevue/button'
   import PrimeMenu from 'primevue/menu'
   import Sidebar from 'primevue/sidebar'
   import { listSidebarMenusService } from '@services/sidebar-menus-services'
 
   defineOptions({ name: 'sidebar-block' })
+
+  const accountStore = useAccountStore()
+  const TYPE_CLIENT = 'client'
+  const isAccountTypeClient = computed(() => accountStore.account.kind === TYPE_CLIENT)
 
   const router = useRouter()
 

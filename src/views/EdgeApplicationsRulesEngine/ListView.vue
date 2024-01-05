@@ -77,7 +77,7 @@
     'Response phase': 'response'
   }
   const listRulesEngineWithDecorator = async () => {
-    return await props.listRulesEngineService({
+    return props.listRulesEngineService({
       id: props.edgeApplicationId,
       phase: parsePhase[selectedPhase.value]
     })
@@ -95,7 +95,7 @@
   }
 
   const reorderRulesEngineWithDecorator = async (tableData) => {
-    return await props.reorderRulesEngine(tableData, props.edgeApplicationId)
+    return props.reorderRulesEngine(tableData, props.edgeApplicationId)
   }
 
   const listRulesEngine = ref(null)
