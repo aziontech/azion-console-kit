@@ -249,7 +249,6 @@
         type: Function
       },
       onReorderService: {
-        required: true,
         type: Function
       },
       reorderableRows: {
