@@ -44,7 +44,7 @@
         >
           <span v-bind="props.icon" />
           <span v-bind="props.label">{{ label }}</span>
-          <Tag
+          <PrimeTag
             v-if="item.tag"
             :value="item.tag"
             class="ml-2"
@@ -58,8 +58,8 @@
 <script setup>
   import { ref, computed } from 'vue'
   import { useRouter } from 'vue-router'
+  import PrimeTag from 'primevue/tag'
   import { useAccountStore } from '@/stores/account'
-
   import PrimeButton from 'primevue/button'
   import PrimeMenu from 'primevue/menu'
   import Sidebar from 'primevue/sidebar'
