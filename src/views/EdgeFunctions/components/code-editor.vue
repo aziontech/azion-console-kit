@@ -4,7 +4,7 @@
     :language="language"
     :theme="theme"
     class="!w-[99%] h-full surface-border border-r"
-    :class="{ 'border-red-500 border rounded-md h-[calc(100%-1.5rem)]': errors }"
+    :class="{ 'border-red-500 border rounded-md h-[calc(100%-1.5rem)]': errors, 'cursor-not-allowed': readOnly}"
     :options="EDITOR_OPTIONS"
     @change="emit('update:modelValue', $event)"
   />
