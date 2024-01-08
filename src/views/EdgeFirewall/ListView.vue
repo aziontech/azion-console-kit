@@ -4,6 +4,7 @@
   import Illustration from '@/assets/svg/illustration-layers.vue'
   import ContentBlock from '@/templates/content-block'
   import PageHeadingBlock from '@/templates/page-heading-block'
+  import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
   export default {
     name: 'edge-firewall-view',
     components: {
@@ -38,6 +39,24 @@
             header: 'Name'
           },
           {
+            field: 'domainsList',
+            header: 'Domains',
+            type: 'component',
+            component: (columnData) =>
+              columnBuilder({ data: columnData, columnAppearance: 'expand-column' })
+          },
+          {
+            field: 'status',
+            header: 'Status',
+            type: 'component',
+            component: (columnData) => {
+              return columnBuilder({
+                data: columnData,
+                columnAppearance: 'tag'
+              })
+            }
+          },
+          {
             field: 'lastEditor',
             header: 'Last Editor'
           },
@@ -45,14 +64,6 @@
             field: 'lastModify',
             sortField: 'lastModifyDate',
             header: 'Last Modified'
-          },
-          {
-            field: 'domainsList',
-            header: 'Domains'
-          },
-          {
-            field: 'active',
-            header: 'Active'
           }
         ]
       }
@@ -74,7 +85,7 @@
       <ListTableBlock
         v-if="hasContentToList"
         pageTitleDelete="Edge Firewal"
-        addButtonLabel="Edge Firewall"
+        addButtonLabel="Rule Set"
         createPagePath="/edge-firewall/create"
         editPagePath="/edge-firewall/edit"
         :listService="listEdgeFirewallService"
@@ -84,9 +95,9 @@
       />
       <EmptyResultsBlock
         v-else
-        title="No edge firewall added"
-        description="Create your first edge firewall."
-        createButtonLabel="Edge Firewall"
+        title="No Rule Set added."
+        description="Create your first Rule Set."
+        createButtonLabel="Rule Set"
         createPagePath="/edge-firewall/create"
         :documentationService="documentationService"
       >
