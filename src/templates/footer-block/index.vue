@@ -49,13 +49,12 @@
             @click="openDiscord"
           />
           <PrimeButton
-            icon="ai ai-twitter"
+            icon="ai ai-x"
             text
             size="small"
-            v-tooltip.top="{ value: 'Twitter', showDelay: 200 }"
+            v-tooltip.top="{ value: 'X', showDelay: 200 }"
             @click="openX"
           />
-          <!--Change Twitter icon to X-->
         </div>
       </div>
       <div class="flex gap-2 items-center">
@@ -154,7 +153,7 @@
         window.open('https://github.com/aziontech/azion-platform-kit', '_blank')
       },
       openX() {
-        window.open('https://twitter.com/aziontech', '_blank')
+        window.open('https://x.com/aziontech', '_blank')
       }
     }
   }

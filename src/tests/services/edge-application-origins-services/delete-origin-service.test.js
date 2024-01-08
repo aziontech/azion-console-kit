@@ -38,13 +38,27 @@ describe('EdgeApplicationOriginsServices', () => {
     const { sut } = makeSut()
     const feedbackMessage = await sut(fixtures.originKey, fixtures.edgeApplicationId)
 
-    expect(feedbackMessage).toBe('Resource successfully deleted')
+    expect(feedbackMessage).toBe('Origins successfully deleted')
+  })
+
+  it('Should return an API error to an invalid origins', async () => {
+    const apiErrorMock = 'Origin can not be deleted because it is being used on Rules Engine.'
+
+    vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
+      statusCode: 409,
+      body: apiErrorMock
+    })
+    const { sut } = makeSut()
+
+    const feedbackMessage = sut(fixtures.deviceGroupPayload)
+
+    expect(feedbackMessage).rejects.toThrow(apiErrorMock)
   })
 
   it.each([
     {
       statusCode: 400,
-      expectedError: new Errors.InvalidApiRequestError().message
+      expectedError: new Errors.NotFoundError().message
     },
     {
       statusCode: 401,

@@ -246,9 +246,6 @@
           optionLabel="label"
           option-value="value"
         />
-        <small class="text-xs text-color-secondary font-normal leading-5">
-          Define an origin for the content, in FQDN format or an IPv4/IPv6 address.
-        </small>
       </div>
       <div
         class="flex flex-col sm:max-w-lg w-full gap-2"
@@ -303,7 +300,7 @@
             type="dashed"
             v-if="address.isFirst"
           >
-            <b>Then</b>
+            Then
           </Divider>
           <div
             v-else
@@ -314,7 +311,7 @@
               align="left"
               type="dashed"
             >
-              <b>And</b>
+              And
             </Divider>
             <PrimeButton
               class="h-8 max-sm:w-full position-absolute right-0 top-0"
