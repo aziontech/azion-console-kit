@@ -30,7 +30,6 @@
   const { value: language } = useField('language')
   const { value: active } = useField('active')
 
-
   let initialCodeValue = ''
   let initialJsonArgsValue = ARGS_INITIAL_STATE
   const unwatch = watch(name, () => {
