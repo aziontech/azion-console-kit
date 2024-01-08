@@ -24,10 +24,12 @@
   const showPreview = ref(true)
 
   const { value: name, errorMessage: nameError } = useField('name')
+  const { value: isProprietaryCode } = useField('isProprietaryCode')
   const { value: jsonArgs, errorMessage: jsonArgsError } = useField('jsonArgs')
   const { value: code, errorMessage: codeError } = useField('code')
   const { value: language } = useField('language')
   const { value: active } = useField('active')
+
 
   let initialCodeValue = ''
   let initialJsonArgsValue = ARGS_INITIAL_STATE
@@ -166,6 +168,7 @@
             :initialValue="initialCodeValue"
             language="javascript"
             :errors="hasCodeError"
+            :readOnly="isProprietaryCode"
           />
           <small
             v-if="codeError"
