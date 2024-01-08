@@ -1,0 +1,110 @@
+<template>
+  <div
+    class="flex-col gap-6 sm:gap-8 flex"
+    v-if="showSocialIdps"
+  >
+    <Divider
+      align="center"
+      v-if="direction === 'top-to-bottom'"
+    >
+      <p>or</p>
+    </Divider>
+    <div class="flex flex-col gap-4 animate-fadeIn">
+      <template v-if="showSkeleton">
+        <Skeleton
+          v-for="item in 3"
+          :key="item"
+          class="w-full h-9"
+        />
+      </template>
+      <template
+        v-else
+        v-for="idp in idps"
+        :key="idp.slug"
+      >
+        <PrimeButton
+          v-if="idp.isActive"
+          :label="formatName(idp.name)"
+          :icon="getIcon(idp.slug)"
+          @click="authenticate(idp.loginUrl)"
+          outlined
+        />
+      </template>
+    </div>
+    <Divider
+      align="center"
+      v-if="direction === 'bottom-to-top'"
+    >
+      <p>or</p>
+    </Divider>
+  </div>
+</template>
+
+<script setup>
+  import { computed, onMounted, ref } from 'vue'
+  import PrimeButton from 'primevue/button'
+  import Skeleton from 'primevue/skeleton'
+  import Divider from 'primevue/divider'
+  import { useToast } from 'primevue/usetoast'
+
+  defineOptions({ name: 'social-idps-block' })
+
+  const props = defineProps({
+    socialIdpsService: {
+      type: Function,
+      required: true
+    },
+    direction: {
+      type: String,
+      required: true,
+      validator: (value) => {
+        return ['top-to-bottom', 'bottom-to-top'].includes(value)
+      }
+    }
+  })
+
+  const idps = ref([])
+  const showSocialIdps = ref(true)
+
+  const showSkeleton = computed(() => idps.value.length === 0)
+
+  onMounted(() => {
+    loadSocialIdps()
+  })
+
+  const toast = useToast()
+
+  const loadSocialIdps = async () => {
+    try {
+      idps.value = await props.socialIdpsService()
+    } catch (error) {
+      toast.add({
+        closable: true,
+        severity: 'error',
+        summary: error
+      })
+    } finally {
+      if (idps.value.length === 0) {
+        showSocialIdps.value = false
+      }
+    }
+  }
+
+  const formatName = (name) => {
+    return `Continue with ${name}`
+  }
+
+  const getIcon = (slug) => {
+    const icons = {
+      google: 'pi pi-google',
+      github: 'pi pi-github',
+      azure: 'pi pi-microsoft'
+    }
+
+    return icons[slug]
+  }
+
+  const authenticate = (url) => {
+    window.location.href = url
+  }
+</script>
