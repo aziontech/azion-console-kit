@@ -40,7 +40,10 @@
           },
           {
             field: 'domainsList',
-            header: 'Domains'
+            header: 'Domains',
+            type: 'component',
+            component: (columnData) =>
+              columnBuilder({ data: columnData, columnAppearance: 'expand-column' })
           },
           {
             field: 'status',
