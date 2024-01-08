@@ -76,7 +76,10 @@ describe('EdgeFirewallServices', () => {
         lastModify: 'Friday, November 10, 2023',
         lastModifyDate: new Date('2023-11-10T00:00:00.000Z'),
         domainsList: '',
-        active: 'Yes'
+        status: {
+          content: 'Active',
+          severity: 'success'
+        }
       }
     ])
   })
@@ -109,7 +112,10 @@ describe('EdgeFirewallServices', () => {
         lastModify: 'Friday, November 10, 2023',
         lastModifyDate: new Date('2023-11-10T00:00:00.000Z'),
         domainsList: `Domain 1<br>Domain 2`,
-        active: 'No'
+        status: {
+          content: 'Inactive',
+          severity: 'danger'
+        }
       }
     ])
   })

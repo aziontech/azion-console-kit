@@ -60,7 +60,15 @@ const adapt = async (httpResponse) => {
         ),
         lastModifyDate: edgeFirewall.last_modified,
         domainsList: domainsList.join('<br>'),
-        active: edgeFirewall.is_active ? 'Yes' : 'No'
+        status: edgeFirewall.is_active
+          ? {
+              content: 'Active',
+              severity: 'success'
+            }
+          : {
+              content: 'Inactive',
+              severity: 'danger'
+            }
       }
     })
   )
