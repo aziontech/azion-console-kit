@@ -473,12 +473,12 @@
           <div class="flex gap-2 items-center">
             <RadioButton
               v-model="browserCacheSettings"
-              inputId="override"
+              inputId="browserCacheSettings-override"
               name="override"
               value="override"
             />
             <label
-              for="override"
+              for="browserCacheSettings-override"
               class="text-color text-sm font-normal"
               >Override Cache Settings</label
             >
@@ -486,12 +486,12 @@
           <div class="flex gap-2 items-center">
             <RadioButton
               v-model="browserCacheSettings"
-              inputId="honor"
+              inputId="browserCacheSettings-honor"
               name="honor"
               value="honor"
             />
             <label
-              for="honor"
+              for="browserCacheSettings-honor"
               class="text-color text-sm font-normal"
               >Honor Origin Cache Headers</label
             >
@@ -526,12 +526,12 @@
           <div class="flex gap-2 items-center">
             <RadioButton
               v-model="cdnCacheSettings"
-              inputId="override"
+              inputId="cdnCacheSettings-override"
               name="override"
               value="override"
             />
             <label
-              for="honor"
+              for="cdnCacheSettings-override"
               class="text-color text-sm font-normal"
               >Override Cache Settings</label
             >
@@ -539,12 +539,12 @@
           <div class="flex gap-2 items-center">
             <RadioButton
               v-model="cdnCacheSettings"
-              inputId="honor"
+              inputId="cdnCacheSettings-honor"
               name="honor"
               value="honor"
             />
             <label
-              for="override"
+              for="cdnCacheSettings-honor"
               class="text-color text-sm font-normal"
               >Honor Origin Cache Settings</label
             >
