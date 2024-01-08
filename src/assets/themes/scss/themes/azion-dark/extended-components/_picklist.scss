@@ -1,0 +1,21 @@
+// Custom PickList
+.p-picklist {
+  .p-picklist-buttons {
+      .p-button {
+          background-color: $inputBg;
+          transition: all 150ms;
+          border: 1px solid var(--surface-border);
+      }
+      .p-button:hover {
+          background-color: var(--surface-hover);
+    }
+  }
+  .p-picklist-list {
+    .p-picklist-item {
+      min-height: 2.375rem;
+      border-radius: $borderRadius;
+      display: flex;
+      align-items: center;
+    }
+  }
+}
