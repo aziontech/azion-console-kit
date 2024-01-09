@@ -24,7 +24,7 @@
       <div class="flex p-5 flex-col gap-3.5">
         <div>
           <InlineMessage severity="error">
-            After close do you can't see or copy your Personal Token.
+            If you close this dialog, you'll no longer be able to access your personal token.
           </InlineMessage>
         </div>
 
@@ -50,10 +50,10 @@
               disabled
             />
 
-            <small class="text-color-secondary"
-              >In case you need the Personal Token code after that, you must create a new
-              one.</small
-            >
+            <small class="text-color-secondary">
+              Copy the personal token now. The token won't be retrievable once this dialog is
+              closed.
+            </small>
           </span>
         </div>
         <div>
@@ -72,7 +72,7 @@
       <template #footer>
         <PrimeButton
           severity="secondary"
-          label="I agree"
+          label="Confirm"
           @click="iAgreeSubmit"
         />
       </template>

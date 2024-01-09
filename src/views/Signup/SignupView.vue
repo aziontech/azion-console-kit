@@ -8,6 +8,7 @@
     <template #form>
       <SocialSignupBlock
         v-if="!showEmailForm"
+        :listSocialIdpsService="listSocialIdpsService"
         @change-signup-method="showEmailForm = true"
       />
       <FormSignupBlock
@@ -26,7 +27,8 @@
   import { ref } from 'vue'
 
   defineProps({
-    signupService: { required: true, type: Function }
+    signupService: { required: true, type: Function },
+    listSocialIdpsService: { required: true, type: Function }
   })
 
   const pageTitle = 'Welcome to the Edge'
