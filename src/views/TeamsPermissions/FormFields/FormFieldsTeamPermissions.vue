@@ -104,8 +104,8 @@
           <template #sourceheader>Available Permissions</template>
           <template #targetheader>Chosen Permissions</template>
           <template #item="slotProps">
-            <div class="">
-              <div class="">
+            <div>
+              <div>
                 <span class="font-normal">{{ slotProps.item.name }}</span>
               </div>
             </div>
