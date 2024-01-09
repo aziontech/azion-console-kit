@@ -146,15 +146,15 @@
 </template>
 
 <script setup>
-  import InputText from 'primevue/inputtext'
+  import { ProccessRequestError, UserNotFoundError } from '@/services/axios/errors'
   import PrimeButton from 'primevue/button'
+  import InputText from 'primevue/inputtext'
   import Password from 'primevue/password'
   import SocialIdpsBlock from '@/templates/social-idps-block'
-  import * as yup from 'yup'
   import { useField, useForm } from 'vee-validate'
   import { ref } from 'vue'
   import { useRouter } from 'vue-router'
-  import { UserNotFoundError, ProccessRequestError } from '@/services/axios/errors'
+  import * as yup from 'yup'
 
   defineOptions({ name: 'signInBlock' })
 
@@ -235,7 +235,6 @@
       await switchClientAccount(userInfo.props)
     } catch {
       hasRequestErrorMessage.value = new UserNotFoundError().message
-    } finally {
       isButtonLoading.value = false
     }
   }
@@ -254,6 +253,7 @@
       router.push(redirect)
     } catch {
       hasRequestErrorMessage.value = new ProccessRequestError().message
+      isButtonLoading.value = false
     }
   }
 
