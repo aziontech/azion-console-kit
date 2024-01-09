@@ -24,7 +24,8 @@ export const documentationCatalog = {
   users: () => openSearchResult('users'),
   activityHistory: () => openSearchResult('activity history'),
   edgeNodes: () => openSearchResult('edge nodes'),
-  records: () => openSearchResult('records')
+  records: () => openSearchResult('records'),
+  waf: () =>  openSearchResult('waf')
 }
 
 export const documentationGuideProducts = {

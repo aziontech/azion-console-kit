@@ -29,6 +29,7 @@ import { marketplaceRoutes } from '@routes/marketplace-routes'
 import { accountRoutes } from '@/router/routes/account-routes'
 import { settingsRoutes } from '@/router/routes/your-settings-routes'
 import { cliCallbackRoutes } from '@/router/routes/cli-callback-routes'
+import { wafRulesRoutes } from '@routes/waf-rules-routes'
 import beforeEachRoute from './hooks/beforeEachRoute'
 
 const router = createRouter({
@@ -62,7 +63,8 @@ const router = createRouter({
     signupRoutes,
     marketplaceRoutes,
     accountRoutes,
-    settingsRoutes
+    settingsRoutes,
+    wafRulesRoutes
   ].concat(errorRoutes)
 })
 
