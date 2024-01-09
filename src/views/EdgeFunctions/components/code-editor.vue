@@ -6,7 +6,7 @@
     class="!w-[99%] h-full surface-border border-r"
     :class="{
       'border-red-500 border rounded-md h-[calc(100%-1.5rem)]': errors,
-      'cursor-not-allowed': readOnly
+      'cursor-not-allowed': EDITOR_OPTIONS.readOnly
     }"
     :options="EDITOR_OPTIONS"
     @change="emit('update:modelValue', $event)"
@@ -46,12 +46,14 @@
     formatOnPaste: true,
     readOnly: props.readOnly
   })
+  
   watch(
     () => props.modelValue,
     (modelValue) => (code.value = modelValue)
   )
+
   watch(
     () => props.readOnly,
-    (modelValue) => (EDITOR_OPTIONS.value.readOnly = modelValue)
+    (value) => (EDITOR_OPTIONS.value.readOnly = value)
   )
 </script>
