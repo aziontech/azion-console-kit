@@ -7,24 +7,24 @@ const fixtures = {
     active: true,
     bypass_addresses: [],
     cross_site_scripting: false,
-    cross_site_scripting_sensitivity: "medium",
+    cross_site_scripting_sensitivity: 'medium',
     directory_traversal: false,
-    directory_traversal_sensitivity: "medium",
+    directory_traversal_sensitivity: 'medium',
     evading_tricks: false,
-    evading_tricks_sensitivity: "medium",
+    evading_tricks_sensitivity: 'medium',
     file_upload: true,
-    file_upload_sensitivity: "medium",
+    file_upload_sensitivity: 'medium',
     id: 4044,
     identified_attack: false,
-    identified_attack_sensitivity: "medium",
-    mode: "counting",
-    name: "test",
+    identified_attack_sensitivity: 'medium',
+    mode: 'counting',
+    name: 'test',
     remote_file_inclusion: false,
-    remote_file_inclusion_sensitivity: "medium",
+    remote_file_inclusion_sensitivity: 'medium',
     sql_injection: false,
-    sql_injection_sensitivity: "medium",
+    sql_injection_sensitivity: 'medium',
     unwanted_access: false,
-    unwanted_access_sensitivity: "medium",
+    unwanted_access_sensitivity: 'medium'
   }
 }
 
@@ -63,7 +63,7 @@ describe('WafRulesService', () => {
   it('should parsed correctly each waf rules', async () => {
     vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
       statusCode: 200,
-      body: {results: [fixtures.wafRulesMock]}
+      body: { results: [fixtures.wafRulesMock] }
     })
     const { sut } = makeSut()
 
@@ -72,10 +72,10 @@ describe('WafRulesService', () => {
     expect(result).toEqual([
       {
         id: fixtures.wafRulesMock.id,
-        active:  {
-            content: 'Active',
-            severity: 'success'
-          },
+        active: {
+          content: 'Active',
+          severity: 'success'
+        },
         bypassAddresses: fixtures.wafRulesMock.bypass_addresses,
         crossSiteScriptingSensitivity: fixtures.wafRulesMock.cross_site_scripting_sensitivity,
         directoryTraversalSensitivity: fixtures.wafRulesMock.directory_traversal_sensitivity,

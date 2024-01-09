@@ -44,34 +44,36 @@ const adapt = (httpResponse) => {
 
   const isArray = Array.isArray(httpResponse.body.results)
 
-  const parsedWafRules = isArray ? httpResponse.body.results.map((waf) => {
-    const threatTypesArray = []
-    for (const key in threatTypes) {
-      if (Object.hasOwnProperty.call(threatTypes, key)) {
-        const threat = threatTypes[key]
-        if (waf[key]) {
-          threatTypesArray.push(threat)
+  const parsedWafRules = isArray
+    ? httpResponse.body.results.map((waf) => {
+        const threatTypesArray = []
+        for (const key in threatTypes) {
+          if (Object.hasOwnProperty.call(threatTypes, key)) {
+            const threat = threatTypes[key]
+            if (waf[key]) {
+              threatTypesArray.push(threat)
+            }
+          }
         }
-      }
-    }
-    const parser = {
-      active: parseStatusData(waf.active),
-      bypassAddresses: waf.bypass_addresses,
-      crossSiteScriptingSensitivity: waf.cross_site_scripting_sensitivity,
-      directoryTraversalSensitivity: waf.directory_traversal_sensitivity,
-      evadingTricksSensitivity: waf.evading_tricks_sensitivity,
-      fileUploadSensitivity: waf.file_upload_sensitivity,
-      id: waf.id,
-      identifiedAttackSensitivity: waf.identified_attack_sensitivity,
-      mode: waf.mode,
-      name: waf.name,
-      remoteFileInclusionSensitivity: waf.remote_file_inclusion_sensitivity,
-      sqlInjectionSensitivity: waf.sql_injection_sensitivity,
-      unwantedAccessSensitivity: waf.unwanted_access_sensitivity,
-      threatTypes: threatTypesArray
-    } 
-    return parser
-  }) : []
+        const parser = {
+          active: parseStatusData(waf.active),
+          bypassAddresses: waf.bypass_addresses,
+          crossSiteScriptingSensitivity: waf.cross_site_scripting_sensitivity,
+          directoryTraversalSensitivity: waf.directory_traversal_sensitivity,
+          evadingTricksSensitivity: waf.evading_tricks_sensitivity,
+          fileUploadSensitivity: waf.file_upload_sensitivity,
+          id: waf.id,
+          identifiedAttackSensitivity: waf.identified_attack_sensitivity,
+          mode: waf.mode,
+          name: waf.name,
+          remoteFileInclusionSensitivity: waf.remote_file_inclusion_sensitivity,
+          sqlInjectionSensitivity: waf.sql_injection_sensitivity,
+          unwantedAccessSensitivity: waf.unwanted_access_sensitivity,
+          threatTypes: threatTypesArray
+        }
+        return parser
+      })
+    : []
 
   return {
     body: parsedWafRules,
