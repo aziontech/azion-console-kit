@@ -5,7 +5,7 @@ import * as Errors from '@/services/axios/errors'
 /**
  * @param {Object} payload - The form data to be send to API.
  * @param {string} payload.edgeApplicationId - The cache settings Edge Application id.
- * @returns {string} The result message based on the status code.
+ * @returns {Promise<string>} The result message based on the status code.
  */
 export const editCacheSettingsService = async ({ edgeApplicationId, ...payload }) => {
   const parsedBody = adapt(payload)
