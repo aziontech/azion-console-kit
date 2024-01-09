@@ -1,4 +1,5 @@
 import * as AuthServices from '@/services/auth-services'
+import { listSocialIdpsService } from '@/services/social-idps-services'
 import { listTypeAccountService } from '@/services/switch-account-services/list-type-account-service'
 import { switchAccountService } from '@/services/auth-services/switch-account-service'
 import { AccountHandler } from '@/helpers/account-handler'
@@ -13,6 +14,7 @@ export const loginRoutes = {
     verifyLoginService: AuthServices.verifyAuthenticationService,
     refreshLoginService: AuthServices.refreshAuthenticationService,
     sendResetPasswordEmailService: AuthServices.sendResetPasswordEmailService,
+    listSocialIdpsService: listSocialIdpsService,
     accountHandler: new AccountHandler(switchAccountService, listTypeAccountService)
   },
   meta: {

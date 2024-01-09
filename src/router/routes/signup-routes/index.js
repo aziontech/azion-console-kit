@@ -1,4 +1,5 @@
 import * as SignupService from '@/services/signup-services'
+import { listSocialIdpsService } from '@/services/social-idps-services'
 import { useAccountStore } from '@/stores/account'
 
 /** @type {import('vue-router').RouteRecordRaw} */
@@ -11,7 +12,8 @@ export const signupRoutes = {
       name: 'signup',
       component: () => import('@views/Signup/SignupView.vue'),
       props: {
-        signupService: SignupService.signupService
+        signupService: SignupService.signupService,
+        listSocialIdpsService: listSocialIdpsService
       },
       meta: {
         hideNavigation: true,
