@@ -1,11 +1,12 @@
 import { AxiosHttpClientAdapter } from '@/services/axios/AxiosHttpClientAdapter'
 import * as Errors from '@/services/axios/errors'
-import { createCacheSettingsService } from '@/services/edge-application-cache-settings-services'
+import { editCacheSettingsService } from '@/services/edge-application-cache-settings-services'
 import { describe, expect, it, vi } from 'vitest'
 
 const fixtures = {
   cacheSettingsMock: {
     edgeApplicationId: 3456789876,
+    id: 817236,
     name: 'mockName',
     browserCacheSettings: 'mockBrowserCacheSettings',
     browserCacheSettingsMaximumTtl: 'mockBrowserCacheSettingsMaximumTtl',
@@ -24,24 +25,25 @@ const fixtures = {
     deviceGroup: [{ id: '123' }, { id: 456 }]
   }
 }
+
 const makeSut = () => {
-  const sut = createCacheSettingsService
+  const sut = editCacheSettingsService
 
   return { sut }
 }
 
 describe('EdgeApplicationCacheSettingsServices', () => {
-  it('should be able to call Api with correct params', async () => {
+  it('should call api with correct params', async () => {
     const requestSpy = vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
-      statusCode: 201
+      statusCode: 200
     })
-    const { sut } = makeSut()
 
+    const { sut } = makeSut()
     await sut(fixtures.cacheSettingsMock)
 
     expect(requestSpy).toHaveBeenCalledWith({
-      url: `v3/edge_applications/${fixtures.cacheSettingsMock.edgeApplicationId}/cache_settings`,
-      method: 'POST',
+      url: `v3/edge_applications/${fixtures.cacheSettingsMock.edgeApplicationId}/cache_settings/${fixtures.cacheSettingsMock.id}`,
+      method: 'PUT',
       body: {
         name: fixtures.cacheSettingsMock.name,
         browser_cache_settings: fixtures.cacheSettingsMock.browserCacheSettings,
@@ -65,23 +67,22 @@ describe('EdgeApplicationCacheSettingsServices', () => {
     })
   })
 
-  it('should return a feedback when successfully create an cache settings', async () => {
+  it('should return a feedback when successfully edit a cache settings', async () => {
     vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
-      statusCode: 201
+      statusCode: 200
     })
+
     const { sut } = makeSut()
 
     const result = await sut(fixtures.cacheSettingsMock)
 
-    expect(result).toEqual({
-      feedback: 'Cache Settings successfully created'
-    })
+    expect(result).toBe('Cache Settings successfully edited')
   })
 
   it('should parse each query string use to control content at a cache settings', async () => {
     const cacheSettingsMock = { ...fixtures.cacheSettingsMock, queryStringFields: '' }
     const requestSpy = vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
-      statusCode: 201
+      statusCode: 200
     })
     const { sut } = makeSut()
 
@@ -93,7 +94,7 @@ describe('EdgeApplicationCacheSettingsServices', () => {
 
   it('should parse each cookie name used to control content at a cache settings', async () => {
     const requestSpy = vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
-      statusCode: 201
+      statusCode: 200
     })
     const { sut } = makeSut()
 
@@ -105,7 +106,7 @@ describe('EdgeApplicationCacheSettingsServices', () => {
 
   it('should parse correctly empty device group list', async () => {
     const requestSpy = vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
-      statusCode: 201
+      statusCode: 200
     })
     const { sut } = makeSut()
 
