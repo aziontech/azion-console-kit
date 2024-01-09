@@ -1,5 +1,4 @@
 export const makeWafRulesBaseUrl = () => {
-    const version = 'v3'
-    return `${version}/waf`
-  }
-  
+  const version = 'v3'
+  return `${version}/waf`
+}

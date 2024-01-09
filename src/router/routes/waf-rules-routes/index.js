@@ -13,7 +13,7 @@ export const wafRulesRoutes = {
       props: {
         listWafRulesService: WafRulesService.listWafRulesService,
         deleteWafRulesService: WafRulesService.deleteWafRulesService,
-        documentationService: Helpers.documentationCatalog.waf,
+        documentationService: Helpers.documentationCatalog.waf
       },
       meta: {
         breadCrumbs: [
@@ -23,6 +23,6 @@ export const wafRulesRoutes = {
           }
         ]
       }
-    },
+    }
   ]
 }

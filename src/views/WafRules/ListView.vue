@@ -41,7 +41,6 @@
   import PageHeadingBlock from '@/templates/page-heading-block'
   import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
 
-
   const props = defineProps({
     listWafRulesService: {
       required: true,
