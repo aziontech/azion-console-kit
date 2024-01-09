@@ -1,5 +1,4 @@
 import { AxiosHttpClientAdapter } from '@/services/axios/AxiosHttpClientAdapter'
-import * as Errors from '@/services/axios/errors'
 import { listCacheSettingsService } from '@/services/edge-application-cache-settings-services'
 import { describe, expect, it, vi } from 'vitest'
 
