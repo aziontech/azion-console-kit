@@ -34,6 +34,10 @@
     clipboardWrite: {
       type: Function,
       required: true
+    },
+    isLoadBalancer: {
+      type: Boolean,
+      required: true
     }
   })
 
@@ -53,7 +57,7 @@
     {
       label: 'Load Balancer',
       value: 'load_balancer',
-      disabled: false
+      disabled: !props.isLoadBalancer
     }
   ]
 
@@ -90,8 +94,8 @@
     addresses: yup.array().of(
       yup.object().shape({
         address: yup.string().required().label('Address'),
-        weight: yup.number().required().label('Weight'),
-        isActive: yup.boolean()
+        weight: yup.number().nullable().label('Weight'),
+        isActive: yup.boolean().default(true).label('Active')
       })
     ),
     originPath: yup

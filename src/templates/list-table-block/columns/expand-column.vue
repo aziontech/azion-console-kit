@@ -30,9 +30,9 @@
   const showAllItems = ref(false)
 
   const SLICE_VALUE = 2
-  const formatValue = props.value.slice(0, SLICE_VALUE)
-  const totalItems = props.value.length - SLICE_VALUE
-  const displayShowMore = props.value.length > SLICE_VALUE
+  const formatValue = props.value?.slice(0, SLICE_VALUE) ?? []
+  const totalItems = props.value?.length - SLICE_VALUE
+  const displayShowMore = props.value?.length > SLICE_VALUE
 
   const splitValue = computed(() => {
     return showAllItems.value ? props.value : formatValue

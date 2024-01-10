@@ -103,7 +103,10 @@
     isActive: true
   }
 
-  const resetAddressesFields = () => {
+  const resetAddressesFields = (option) => {
+    if (option.value === 'load_balancer') {
+      method.value = 'ip_hash'
+    }
     resetAddresses([{ ...defaultAddress }])
   }
 

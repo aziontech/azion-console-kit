@@ -39,14 +39,17 @@
   const route = useRoute()
   const router = useRouter()
   const activeTab = ref(0)
+  const isLoadBalancer = ref(false)
   const edgeApplicationId = ref(route.params.id)
   const isEnableEdgeFunction = ref(false)
 
   const loaderEdgeApplication = async () => {
     try {
-      const { edgeFunctions } = await props.edgeApplicationServices.loadEdgeApplication({
-        id: edgeApplicationId.value
-      })
+      const { edgeFunctions, loadBalancer } =
+        await props.edgeApplicationServices.loadEdgeApplication({
+          id: edgeApplicationId.value
+        })
+      isLoadBalancer.value = loadBalancer
       isEnableEdgeFunction.value = edgeFunctions
     } catch (error) {
       toast.add({
@@ -56,8 +59,6 @@
       })
     }
   }
-
-  loaderEdgeApplication()
 
   const getTabFromValue = (selectedTabIndex) => {
     const tabNames = Object.keys(mapTabs)
@@ -78,7 +79,8 @@
     })
   }
 
-  const renderTabCurrentRouter = () => {
+  const renderTabCurrentRouter = async () => {
+    await loaderEdgeApplication()
     const { tab } = route.params
     const defaultTabIndex = 0
     const activeTabIndexByRoute = mapTabs[tab] || defaultTabIndex
@@ -116,6 +118,7 @@
           <EdgeApplicationsOriginsListView
             v-if="activeTab === mapTabs.origins"
             :edgeApplicationId="edgeApplicationId"
+            :isLoadBalancer="isLoadBalancer"
             v-bind="props.originsServices"
             :clipboardWrite="props.clipboardWrite"
           />

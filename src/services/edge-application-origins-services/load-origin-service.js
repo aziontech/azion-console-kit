@@ -12,7 +12,7 @@ export const loadOriginService = async ({ edgeApplicationId, id }) => {
 }
 
 const adapt = (httpResponse) => {
-  const origin = httpResponse.body.results
+  const origin = httpResponse.body.results  
   const parsedBody = {
     originId: origin.origin_id,
     originKey: origin.origin_key,
