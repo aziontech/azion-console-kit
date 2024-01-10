@@ -22,8 +22,7 @@
     modelValue: String,
     initialValue: String,
     readOnly: {
-      type: Boolean,
-      default: false
+      type: Boolean
     },
     language: {
       type: String,
