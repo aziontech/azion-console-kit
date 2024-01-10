@@ -1,23 +1,8 @@
 <template>
-  <div class="flex flex-col gap-4 animate-fadeIn">
-    <PrimeButton
-      label="Continue with Google"
-      icon="pi pi-google"
-      outlined
-    />
-    <PrimeButton
-      label="Continue with Github"
-      icon="pi pi-github"
-      outlined
-    />
-  </div>
-  <div class="w-full">
-    <Divider
-      layout="horizontal"
-      align="center"
-      >or</Divider
-    >
-  </div>
+  <SocialIdpsBlock
+    :socialIdpsService="listSocialIdpsService"
+    direction="bottom-to-top"
+  />
   <PrimeButton
     label="Sign Up with Email"
     outlined
@@ -27,7 +12,14 @@
 
 <script setup>
   import PrimeButton from 'primevue/button'
-  import Divider from 'primevue/divider'
+  import SocialIdpsBlock from '@/templates/social-idps-block'
 
   defineEmits(['change-signup-method'])
+
+  defineProps({
+    listSocialIdpsService: {
+      type: Function,
+      required: true
+    }
+  })
 </script>

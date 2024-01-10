@@ -35,7 +35,6 @@ const LANGUAGE_WITH_ICON = {
 
 const adapt = (httpResponse) => {
   const body = httpResponse.body.results
-
   const parsedVariable = {
     id: body.id,
     active: body.active,
@@ -49,9 +48,9 @@ const adapt = (httpResponse) => {
     version: body.version || '-',
     modified: new Intl.DateTimeFormat('us', { dateStyle: 'full' }).format(new Date(body.modified)),
     statusTag: STATUS_AS_TAG[body.active],
-    languageIcon: LANGUAGE_WITH_ICON[body.language]
+    languageIcon: LANGUAGE_WITH_ICON[body.language],
+    isProprietaryCode: body.is_proprietary_code || false
   }
-
   return {
     body: parsedVariable,
     statusCode: httpResponse.statusCode

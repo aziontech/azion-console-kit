@@ -14,6 +14,7 @@
         createPagePath="teams-permission/create"
         editPagePath="teams-permission/edit"
         @on-load-data="handleLoadData"
+        emptyListMessage="No Team Permission found."
       >
       </ListTableBlock>
       <EmptyResultsBlock
@@ -33,13 +34,13 @@
 </template>
 
 <script setup>
-  import { computed, ref } from 'vue'
-  import ListTableBlock from '@/templates/list-table-block'
-  import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
-  import EmptyResultsBlock from '@/templates/empty-results-block'
   import Illustration from '@/assets/svg/illustration-layers.vue'
   import ContentBlock from '@/templates/content-block'
+  import EmptyResultsBlock from '@/templates/empty-results-block'
+  import ListTableBlock from '@/templates/list-table-block'
+  import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
   import PageHeadingBlock from '@/templates/page-heading-block'
+  import { computed, ref } from 'vue'
 
   const pros = defineProps({
     listTeamPermissionService: { required: true, type: Function },

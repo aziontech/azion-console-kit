@@ -3,7 +3,6 @@
   import EmptyResultsBlock from '@/templates/empty-results-block'
   import Illustration from '@/assets/svg/illustration-layers'
   import ContentBlock from '@/templates/content-block'
-  import PageHeadingBlock from '@/templates/page-heading-block'
   import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
   import { computed, ref } from 'vue'
   defineOptions({ name: 'edge-firewall-view' })
@@ -80,6 +79,7 @@
         :deleteService="props.deleteEdgeFirewallService"
         :columns="getColumns"
         @on-load-data="handleLoadData"
+        emptyListMessage="No Rule Set found."
       />
       <EmptyResultsBlock
         v-else

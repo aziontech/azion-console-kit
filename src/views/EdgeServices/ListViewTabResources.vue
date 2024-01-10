@@ -1,10 +1,10 @@
 <script setup>
-  import ListTableBlock from '@/templates/list-table-block/no-header'
-  import EmptyResultsBlock from '@/templates/empty-results-block'
   import Illustration from '@/assets/svg/illustration-layers'
-  import { computed, ref } from 'vue'
-  import PrimeButton from 'primevue/button'
+  import EmptyResultsBlock from '@/templates/empty-results-block'
+  import ListTableBlock from '@/templates/list-table-block/no-header'
   import DrawerResource from '@/views/EdgeServices/Drawer'
+  import PrimeButton from 'primevue/button'
+  import { computed, ref } from 'vue'
 
   defineOptions({ name: 'list-edge-service-resources-tab' })
 
@@ -117,6 +117,7 @@
         pageTitleDelete="Resource"
         :editInDrawer="openEditServiceDrawer"
         @on-load-data="handleLoadData"
+        emptyListMessage="No Resource found."
       >
         <template #addButton>
           <PrimeButton
