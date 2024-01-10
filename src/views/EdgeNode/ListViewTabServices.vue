@@ -1,11 +1,11 @@
 <script setup>
-  import ListTableBlock from '@/templates/list-table-block/no-header'
-  import EmptyResultsBlock from '@/templates/empty-results-block'
   import Illustration from '@/assets/svg/illustration-layers'
-  import { computed, ref } from 'vue'
-  import PrimeButton from 'primevue/button'
+  import EmptyResultsBlock from '@/templates/empty-results-block'
   import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
+  import ListTableBlock from '@/templates/list-table-block/no-header'
   import DrawerService from '@/views/EdgeNode/Drawer'
+  import PrimeButton from 'primevue/button'
+  import { computed, ref } from 'vue'
   defineOptions({ name: 'list-edge-node-resources-tab' })
 
   const props = defineProps({
@@ -103,6 +103,7 @@
         pageTitleDelete="Edge Node Service"
         :editInDrawer="openEditServiceDrawer"
         @on-load-data="handleLoadData"
+        emptyListMessage="No Service found."
       >
         <template #addButton>
           <PrimeButton

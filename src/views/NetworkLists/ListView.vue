@@ -14,6 +14,7 @@
         createPagePath="network-lists/create"
         editPagePath="network-lists/edit"
         @on-load-data="handleLoadData"
+        emptyListMessage="No Network List found."
       />
       <EmptyResultsBlock
         v-else
@@ -32,10 +33,10 @@
 </template>
 
 <script>
-  import ListTableBlock from '@/templates/list-table-block'
-  import EmptyResultsBlock from '@/templates/empty-results-block'
   import Illustration from '@/assets/svg/illustration-layers.vue'
   import ContentBlock from '@/templates/content-block'
+  import EmptyResultsBlock from '@/templates/empty-results-block'
+  import ListTableBlock from '@/templates/list-table-block'
   import PageHeadingBlock from '@/templates/page-heading-block'
 
   export default {
