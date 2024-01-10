@@ -36,7 +36,7 @@ const makeSut = () => {
   }
 }
 
-describe('WafRulesService', () => {
+describe('WafRulesServices', () => {
   beforeEach(() => {
     vi.useFakeTimers()
   })
@@ -51,11 +51,10 @@ describe('WafRulesService', () => {
     })
 
     const { sut } = makeSut()
-    const version = 'v3'
     await sut()
 
     expect(requestSpy).toHaveBeenCalledWith({
-      url: `${version}/waf/?page=1&page_size=100`,
+      url: 'v3/waf/?page=1&page_size=100',
       method: 'GET'
     })
   })

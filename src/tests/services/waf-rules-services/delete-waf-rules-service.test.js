@@ -18,11 +18,10 @@ describe('WafRulesServices', () => {
     })
     const wafRuleIdMock = 765678
     const { sut } = makeSut()
-    const version = 'v3'
     await sut(wafRuleIdMock)
 
     expect(requestSpy).toHaveBeenCalledWith({
-      url: `${version}/waf/rulesets/${wafRuleIdMock}`,
+      url: `v3/waf/rulesets/${wafRuleIdMock}`,
       method: 'DELETE'
     })
   })

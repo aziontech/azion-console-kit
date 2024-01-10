@@ -24,12 +24,8 @@ const parseStatusData = (status) => {
 
   return parsedStatus
 }
-const adapt = (httpResponse) => {
-  /**
-   * Necessary until the API gets the common pattern
-   * of returning the array of data inside results property
-   * like other andpoints.
-   */
+
+const parseThreatTypes = (waf) => {
 
   const threatTypes = {
     file_upload: 'File upload',
@@ -42,19 +38,32 @@ const adapt = (httpResponse) => {
     sql_injection: 'SQL Injection'
   }
 
+
+  const threatTypesArray = []
+  for (const key in threatTypes) {
+    const threat = threatTypes[key]
+    if (waf[key]) {
+      threatTypesArray.push(threat)
+    }
+  }
+
+  return threatTypesArray
+
+}
+
+const adapt = (httpResponse) => {
+  /**
+   * Necessary until the API gets the common pattern
+   * of returning the array of data inside results property
+   * like other andpoints.
+   */
+
+ 
   const isArray = Array.isArray(httpResponse.body.results)
 
   const parsedWafRules = isArray
     ? httpResponse.body.results.map((waf) => {
-        const threatTypesArray = []
-        for (const key in threatTypes) {
-          if (Object.hasOwnProperty.call(threatTypes, key)) {
-            const threat = threatTypes[key]
-            if (waf[key]) {
-              threatTypesArray.push(threat)
-            }
-          }
-        }
+        const threatTypes = parseThreatTypes(waf)
         const parser = {
           active: parseStatusData(waf.active),
           bypassAddresses: waf.bypass_addresses,
@@ -69,7 +78,7 @@ const adapt = (httpResponse) => {
           remoteFileInclusionSensitivity: waf.remote_file_inclusion_sensitivity,
           sqlInjectionSensitivity: waf.sql_injection_sensitivity,
           unwantedAccessSensitivity: waf.unwanted_access_sensitivity,
-          threatTypes: threatTypesArray
+          threatTypes: threatTypes
         }
         return parser
       })

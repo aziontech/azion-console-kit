@@ -9,11 +9,10 @@ const makeSut = () => {
   }
 }
 
-describe('WafRulesService', () => {
+describe('WafRulesServices', () => {
   it('should return the API base url to waf rules service', () => {
     const { sut } = makeSut()
-    const version = 'v3'
-    const correctApiUrl = `${version}/waf`
+    const correctApiUrl = `v3/waf`
 
     const baseUrl = sut()
 
