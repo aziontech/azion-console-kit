@@ -118,7 +118,7 @@ export const menus = [
       {
         label: 'WAF Rules',
         to: '/waf',
-        icon: 'pi pi-globe'
+        icon: 'pi pi-sliders-h'
       }
     ]
   }
