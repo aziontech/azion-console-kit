@@ -114,7 +114,7 @@
   <div>
     <PrimeButton
       v-if="visibleButton"
-      class="font-semibold h-8 w-auto border-header hidden md:flex gap-2 items-center bg-header hover:bg-header-button-hover"
+      class="font-semibold h-8 w-auto truncate max-w-[180px] border-header hidden md:flex gap-2 items-center bg-header hover:bg-header-button-hover"
       size="small"
       :loading="isLoadingAccount"
       :pt="{
@@ -128,7 +128,7 @@
         class="text-white"
         :class="account.accountTypeIcon"
       />
-      <span class="text-white"> {{ account.name }}</span>
+      <span class="truncate text-white"> {{ account.name }}</span>
     </PrimeButton>
 
     <PrimeDialog
