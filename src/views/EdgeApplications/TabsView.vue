@@ -19,7 +19,7 @@
     functionsServices: { type: Object, required: true },
     clipboardWrite: { type: Function, required: true },
     deviceGroupsServices: { type: Object, required: true },
-    errorResponsesServices: { type: Object, required: true}
+    errorResponsesServices: { type: Object, required: true }
   })
 
   const mapTabs = {
@@ -104,7 +104,7 @@
           >
           </EdgeApplicationsDeviceGroupsListView>
         </TabPanel>
-        <TabPanel header="Error Responses"> 
+        <TabPanel header="Error Responses">
           <div class="mt-8">
             <EdgeApplicationsErrorResponseCreateView
               :edgeApplicationId="edgeApplicationId"

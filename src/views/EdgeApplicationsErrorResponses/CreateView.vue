@@ -29,7 +29,6 @@
     })
   }
 
-  
   const loadService = async (payload) => {
     return await props.loadErrorResponsesService({
       ...payload,
@@ -44,24 +43,23 @@
         code: yup.string().required().label('Code'),
         timeout: yup.number().required().label('Time Out'),
         uri: yup.string().required().label('Uri'),
-        customStatusCode: yup.string().required().label('Custom Status Code'),
+        customStatusCode: yup.string().required().label('Custom Status Code')
       })
-    ),
+    )
   })
 </script>
 
 <template>
-
-    <EditFormBlock
-      :editService="editService"
-      :loadService="loadService"
-      :schema="validationSchema"
-    > 
-      <template #form>
-        <FormFieldsErrorResponses
-          :edgeApplicationId="edgeApplicationId"
-          :listOriginsService="props.listOriginsService"
-        />
-      </template>
-    </EditFormBlock>
+  <EditFormBlock
+    :editService="editService"
+    :loadService="loadService"
+    :schema="validationSchema"
+  >
+    <template #form>
+      <FormFieldsErrorResponses
+        :edgeApplicationId="edgeApplicationId"
+        :listOriginsService="props.listOriginsService"
+      />
+    </template>
+  </EditFormBlock>
 </template>

@@ -1,8 +1,7 @@
 import { AxiosHttpClientAdapter, parseHttpResponse } from '@/services/axios/AxiosHttpClientAdapter'
 import { makeEdgeApplicationV4BaseUrl } from '../edge-application-services/ make-edge-application-v4-base-url'
 
-export const listErrorResponsesService = async ({edgeApplicationId}) => {
-
+export const listErrorResponsesService = async ({ edgeApplicationId }) => {
   let httpResponse = await AxiosHttpClientAdapter.request({
     url: `${makeEdgeApplicationV4BaseUrl()}/${edgeApplicationId}/error_responses`,
     method: 'GET'
@@ -13,7 +12,7 @@ export const listErrorResponsesService = async ({edgeApplicationId}) => {
 }
 
 const adapt = (httpResponse) => {
-  const response =  httpResponse.body.results[0]
+  const response = httpResponse.body.results[0]
   const parsedErrorResponses = {
     id: response.id,
     name: response.name,
@@ -23,13 +22,12 @@ const adapt = (httpResponse) => {
         code: element.code,
         timeout: element.timeout,
         uri: element.uri,
-        customStatusCode: element.custom_status_code,
+        customStatusCode: element.custom_status_code
       }
     })
   }
   return {
     statusCode: httpResponse.statusCode,
-    body: parsedErrorResponses,
+    body: parsedErrorResponses
   }
 }
-

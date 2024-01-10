@@ -4,7 +4,9 @@ import * as Errors from '@/services/axios/errors'
 
 export const editErrorResponsesService = async (payload) => {
   let httpResponse = await AxiosHttpClientAdapter.request({
-    url: `${makeEdgeApplicationV4BaseUrl()}/${payload.edgeApplicationId}/error_responses/${payload.id}`,
+    url: `${makeEdgeApplicationV4BaseUrl()}/${payload.edgeApplicationId}/error_responses/${
+      payload.id
+    }`,
     method: 'PATCH',
     body: adapt(payload)
   })
