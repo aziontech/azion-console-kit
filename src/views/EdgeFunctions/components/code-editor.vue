@@ -45,7 +45,7 @@
     formatOnPaste: true,
     readOnly: props.readOnly
   })
-  
+
   watch(
     () => props.modelValue,
     (modelValue) => (code.value = modelValue)

@@ -63,15 +63,15 @@ describe('EdgeFunctionsServices', () => {
       jsonArgs: '{}',
       name: fixtures.edgeFunctionsMock.name,
       code: fixtures.edgeFunctionsMock.code,
-      version: "-",
-      modified: "Tuesday, October 17, 2023",
+      version: '-',
+      modified: 'Tuesday, October 17, 2023',
       statusTag: {
-        content: "Active",
-        severity: "success",
+        content: 'Active',
+        severity: 'success'
       },
       languageIcon: {
-        content: "Lua",
-        icon: "lua",
+        content: 'Lua',
+        icon: 'lua'
       },
       isProprietaryCode: fixtures.edgeFunctionsMock.is_proprietary_code
     })
