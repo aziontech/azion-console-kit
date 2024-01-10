@@ -99,28 +99,6 @@
   >
     <template #inputs>
       <div class="flex flex-col w-full gap-3">
-
-        <Card
-          :pt="{
-            body: { class: 'p-4' },
-            title: { class: 'flex justify-between  text-base m-0 font-medium' },
-            subtitle: {
-              class: 'text-sm font-normal text-color-secondary m-0 pr-0 md:pr-[2.5rem]'
-            }
-          }"
-        >
-          <template #title>
-            <span class="text-base"> Request a certificate </span>
-            <RadioButton
-              v-model="certificateType"
-              inputId="certificateType1"
-              name="certificateType"
-              :value="certificateTypes.EDGE_CERTIFICATE_CSR"
-            />
-          </template>
-          <template #subtitle> Generate a Certificate Singing Request (CSR) to obtain a digital certificate. </template>
-        </Card>
-
         <Card
           :pt="{
             body: { class: 'p-4' },
@@ -152,6 +130,29 @@
           }"
         >
           <template #title>
+            <span class="text-base"> Request a certificate </span>
+            <RadioButton
+              v-model="certificateType"
+              inputId="certificateType1"
+              name="certificateType"
+              :value="certificateTypes.EDGE_CERTIFICATE_CSR"
+            />
+          </template>
+          <template #subtitle>
+            Generate a Certificate Singing Request (CSR) to obtain a digital certificate.
+          </template>
+        </Card>
+
+        <Card
+          :pt="{
+            body: { class: 'p-4' },
+            title: { class: 'flex justify-between  text-base m-0 font-medium' },
+            subtitle: {
+              class: 'text-sm font-normal text-color-secondary m-0 pr-0 md:pr-[2.5rem]'
+            }
+          }"
+        >
+          <template #title>
             <span class="text-base"> Import a Trusted CA certificate </span>
             <RadioButton
               v-model="certificateType"
@@ -160,7 +161,9 @@
               :value="certificateTypes.TRUSTED"
             />
           </template>
-          <template #subtitle> Upload a PEM certificate for mutual Transport Layer Security (mTLS). </template>
+          <template #subtitle>
+            Upload a PEM certificate for mutual Transport Layer Security (mTLS).
+          </template>
         </Card>
       </div>
     </template>
@@ -340,7 +343,8 @@
           cols="30"
         />
         <small class="text-color-secondary text-xs font-normal leading-tight"
-          >Use line breaks to separate each SAN. Duplicate entries will be automatically removed.</small
+          >Use line breaks to separate each SAN. Duplicate entries will be automatically
+          removed.</small
         >
         <small
           v-if="subjectAlternativeNamesError"
