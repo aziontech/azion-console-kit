@@ -26,8 +26,9 @@ import { realTimePurgeRoutes } from '@routes/real-time-purge'
 import { signupRoutes } from '@routes/signup-routes'
 import { teamsPermissionRoutes } from '@routes/team-permission'
 import { usersListsRoutes } from '@routes/users-routes'
+import { settingsRoutes } from '@/router/routes/your-settings-routes'
+import { wafRulesRoutes } from '@routes/waf-rules-routes'
 import { variablesRoutes } from '@routes/variables-routes'
-import { settingsRoutes } from '@routes/your-settings-routes'
 import { createRouter, createWebHistory } from 'vue-router'
 
 import afterEachRoute from './hooks/afterEachRoute'
@@ -64,7 +65,8 @@ const router = createRouter({
     signupRoutes,
     marketplaceRoutes,
     accountRoutes,
-    settingsRoutes
+    settingsRoutes,
+    wafRulesRoutes
   ].concat(errorRoutes)
 })
 
