@@ -41,11 +41,11 @@
 </template>
 
 <script setup>
-  import { computed, onMounted, ref } from 'vue'
   import PrimeButton from 'primevue/button'
-  import Skeleton from 'primevue/skeleton'
   import Divider from 'primevue/divider'
+  import Skeleton from 'primevue/skeleton'
   import { useToast } from 'primevue/usetoast'
+  import { computed, onMounted, ref } from 'vue'
 
   defineOptions({ name: 'social-idps-block' })
 
@@ -105,6 +105,6 @@
   }
 
   const authenticate = (url) => {
-    window.location.href = url
+    window.location.href = url + '?console=true'
   }
 </script>
