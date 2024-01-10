@@ -105,6 +105,6 @@
   }
 
   const authenticate = (url) => {
-    window.location.href = url + '?console=true'
+    window.location.href = url
   }
 </script>
