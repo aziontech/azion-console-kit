@@ -2,7 +2,10 @@
   import FormHorizontal from '@/templates/create-form-block/form-horizontal.vue'
   import Divider from 'primevue/divider'
   import Dropdown from 'primevue/dropdown'
+  import { STATUS_CODE_OPTIONS } from './StatusCodeOptions'
   import InputNumber from 'primevue/inputnumber'
+  import PrimeButton from 'primevue/button'
+  import FieldText from '@/templates/form-fields-inputs/fieldText'
   import { onMounted, ref } from 'vue'
   import InputText from 'primevue/inputtext'
   import { useField, useFieldArray } from 'vee-validate'
@@ -25,6 +28,17 @@
     fields: errorResponses
   } = useFieldArray('errorResponses')
 
+  const defaultErrorResponse = {
+    code: '',
+    timeout: 0,
+    uri: null,
+    customStatusCode: ''
+  }  
+
+  const addErrorResponse = () => {
+    pushErrorResponse({ ...defaultErrorResponse })
+  }
+
   const originOptions = ref('')
 
   const getOrigins = async () => {
@@ -42,8 +56,7 @@
     title="Error Responses List"
     description="Time to cache error responses before retry request to your origin."
   >
-    <template #inputs>
-      {{ errorResponses }}
+    <template #inputs v-if="errorResponses.length > 0">
         <Divider
           align="left"
           type="dashed"
@@ -73,9 +86,79 @@
               Error Caching TTL*
             </label>
             <InputNumber
+              v-model="errorResponses[0].value.timeout"
               showButtons
             />
           </div>
+        </div>
+
+        <div v-for="(errorResponse, index) in errorResponses" :key="index" :class="index === 0? 'hidden':''">
+          <div class="flex flex-col gap-6">         
+            <div class="flex">
+              <Divider
+                align="left"
+                type="dashed"
+              >
+                <b>And</b> 
+              </Divider>
+              <PrimeButton 
+                @click="removeErrorResponse(index)"
+                outlined
+                icon="pi pi-trash"
+              />
+            </div>   
+
+            <div class="flex flex-wrap gap-6">
+              <div class="flex flex-col w-full sm:max-w-xs gap-2">
+                <label class="text-color text-sm font-medium leading-5">Status Code *</label>
+                <Dropdown
+                  v-model="errorResponse.value.code"
+                  :options="STATUS_CODE_OPTIONS"
+                  optionLabel="name"
+                  option-value="code"
+                />
+              </div>
+              <div class="flex flex-col w-full sm:max-w-xs gap-2">
+                <label
+                  for="maximun-ttl-seconds"
+                  class="text-color text-base font-medium"
+                >
+                  Error Caching TTL*
+                </label>
+                <InputNumber
+                  v-model="errorResponse.value.timeout"
+                  showButtons
+                />
+              </div>
+            </div>
+            <div class="flex flex-col sm:max-w-lg w-full gap-2">
+              <FieldText
+                label="URL path"
+                placeholder="/example.com/path/error-page.txt"
+                :name="`errorResponses[${index}].uri`"
+                :value="errorResponse.value.uri"
+                description="Add a path to an error page created in the source."
+              />
+            </div>
+            <div class="flex flex-col sm:max-w-lg w-full gap-2">
+              <FieldText
+                label="Custom status code"
+                :name="`errorResponses[${index}].customStatusCode`"
+                :value="errorResponse.value.customStatusCode"
+                description="Customize the HTTP status that will be received by the user."
+              />
+            </div>
+            
+          </div>
+        </div>
+        <div class="flex flex-col gap-8 items-start" >
+          <Divider />
+          <PrimeButton 
+            @click="addErrorResponse"
+            label="New Error Response"
+            outlined
+            icon="pi pi-plus-circle"
+          />
         </div>
     </template>
   </FormHorizontal>

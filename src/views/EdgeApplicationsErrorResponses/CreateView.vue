@@ -38,7 +38,15 @@
   }
 
   const validationSchema = yup.object({
-    originId: yup.string().required()
+    originId: yup.string().required(),
+    addresses: yup.array().of(
+      yup.object().shape({
+        code: yup.string().required().label('Code'),
+        timeout: yup.number().required().label('Time Out'),
+        uri: yup.string().required().label('Uri'),
+        customStatusCode: yup.string().required().label('Custom Status Code'),
+      })
+    ),
   })
 </script>
 

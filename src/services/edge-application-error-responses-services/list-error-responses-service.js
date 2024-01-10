@@ -13,12 +13,23 @@ export const listErrorResponsesService = async ({edgeApplicationId}) => {
 }
 
 const adapt = (httpResponse) => {
-  const errorResponses =  httpResponse.body.results[0]
+  const response =  httpResponse.body.results[0]
+  const parsedErrorResponses = {
+    id: response.id,
+    name: response.name,
+    originId: response.origin_id,
+    errorResponses: response.error_responses.map((element) => {
+      return {
+        code: element.code,
+        timeout: element.timeout,
+        uri: element.uri,
+        customStatusCode: element.custom_status_code,
+      }
+    })
+  }
   return {
-    id: errorResponses.id,
-    name: errorResponses.name,
-    originId: errorResponses.origin_id,
-    errorResponses: errorResponses.error_responses,
+    statusCode: httpResponse.statusCode,
+    body: parsedErrorResponses,
   }
 }
 
