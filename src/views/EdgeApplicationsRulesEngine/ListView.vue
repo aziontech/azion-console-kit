@@ -1,11 +1,11 @@
 <script setup>
-  import ListTableBlock from '@/templates/list-table-block/no-header'
-  import EmptyResultsBlock from '@/templates/empty-results-block'
-  import PrimeButton from 'primevue/button'
   import Illustration from '@/assets/svg/illustration-layers'
-  import { computed, ref, watch } from 'vue'
+  import EmptyResultsBlock from '@/templates/empty-results-block'
   import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
+  import ListTableBlock from '@/templates/list-table-block/no-header'
+  import PrimeButton from 'primevue/button'
   import SelectButton from 'primevue/selectbutton'
+  import { computed, ref, watch } from 'vue'
 
   defineOptions({ name: 'list-edge-applications-device-groups-tab' })
 
@@ -117,6 +117,7 @@
     :pt="{
       thead: { class: !hasContentToList && 'hidden' }
     }"
+    emptyListMessage="No Rules Engine found."
   >
     <template #addButton>
       <div class="flex gap-4">

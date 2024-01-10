@@ -1,7 +1,7 @@
-import { describe, expect, it, vi } from 'vitest'
 import { AxiosHttpClientAdapter } from '@/services/axios/AxiosHttpClientAdapter'
 import * as Errors from '@/services/axios/errors'
 import { listSocialIdpsService } from '@/services/social-idps-services'
+import { describe, expect, it, vi } from 'vitest'
 
 const mockPayload = {
   data: [
@@ -20,7 +20,7 @@ const mockPayload = {
       name: 'Google',
       isActive: true,
       protocol: 'Social',
-      loginUrl: '/some-url',
+      loginUrl: '/some-url?console=true',
       slug: 'google'
     }
   ]
@@ -38,7 +38,7 @@ describe('SocialIdpsServices', () => {
   it('should call API with correct params', async () => {
     const requestSpy = vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
       statusCode: 200,
-      body: mockPayload.data
+      body: []
     })
 
     const { sut } = makeSut()
