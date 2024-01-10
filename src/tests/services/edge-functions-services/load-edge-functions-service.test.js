@@ -57,7 +57,7 @@ describe('EdgeFunctionsServices', () => {
     })
   })
 
-  it('should parsed correctly the returned', async () => {
+  it('should parsed correctly the returned edge function', async () => {
     vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
       statusCode: 200,
       body: { results: fixtures.edgeFunctionsMock }
@@ -90,7 +90,7 @@ describe('EdgeFunctionsServices', () => {
     })
   })
 
-  it('should parsed correctly the returned with javascript language and inactive', async () => {
+  it('should parsed correctly the returned with edge function language and status', async () => {
     vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
       statusCode: 200,
       body: { results: fixtures.edgeFunctionsMockJsAndInactive }
