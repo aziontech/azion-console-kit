@@ -36,6 +36,7 @@ const adapt = (httpResponse) => {
         content: domain.domain_name
       },
       cnames: cnames,
+      edgeFirewallId: domain.edge_firewall_id,
       edgeApplicationName: domain.name,
       digitalCertificateId: domain.digital_certificate_id
     }

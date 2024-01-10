@@ -1,78 +1,66 @@
-<script>
+<script setup>
   import ListTableBlock from '@/templates/list-table-block'
   import EmptyResultsBlock from '@/templates/empty-results-block'
-  import Illustration from '@/assets/svg/illustration-layers.vue'
+  import Illustration from '@/assets/svg/illustration-layers'
   import ContentBlock from '@/templates/content-block'
   import PageHeadingBlock from '@/templates/page-heading-block'
   import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
-  export default {
-    name: 'edge-firewall-view',
-    components: {
-      ListTableBlock,
-      EmptyResultsBlock,
-      Illustration,
-      ContentBlock,
-      PageHeadingBlock
+  import { computed, ref } from 'vue'
+  defineOptions({ name: 'edge-firewall-view' })
+
+  const props = defineProps({
+    listEdgeFirewallService: {
+      required: true,
+      type: Function
     },
-    props: {
-      listEdgeFirewallService: {
-        required: true,
-        type: Function
-      },
-      deleteEdgeFirewallService: {
-        required: true,
-        type: Function
-      },
-      documentationService: {
-        required: true,
-        type: Function
-      }
+    deleteEdgeFirewallService: {
+      required: true,
+      type: Function
     },
-    data: () => ({
-      hasContentToList: true
-    }),
-    computed: {
-      getColumns() {
-        return [
-          {
-            field: 'name',
-            header: 'Name'
-          },
-          {
-            field: 'domainsList',
-            header: 'Domains',
-            type: 'component',
-            component: (columnData) =>
-              columnBuilder({ data: columnData, columnAppearance: 'expand-column' })
-          },
-          {
-            field: 'status',
-            header: 'Status',
-            type: 'component',
-            component: (columnData) => {
-              return columnBuilder({
-                data: columnData,
-                columnAppearance: 'tag'
-              })
-            }
-          },
-          {
-            field: 'lastEditor',
-            header: 'Last Editor'
-          },
-          {
-            field: 'lastModify',
-            sortField: 'lastModifyDate',
-            header: 'Last Modified'
-          }
-        ]
-      }
-    },
-    methods: {
-      handleLoadData(event) {
-        this.hasContentToList = event
-      }
+    documentationService: {
+      required: true,
+      type: Function
     }
+  })
+
+  const hasContentToList = ref(true)
+
+  const getColumns = computed(() => [
+    {
+      field: 'name',
+      header: 'Name'
+    },
+    {
+      field: 'domainsList',
+      header: 'Domains',
+      type: 'component',
+      component: (columnData) =>
+        columnBuilder({ data: columnData, columnAppearance: 'expand-column' })
+    },
+    {
+      field: 'status',
+      header: 'Status',
+      type: 'component',
+      component: (columnData) => {
+        return columnBuilder({
+          data: columnData,
+          columnAppearance: 'tag'
+        })
+      }
+    },
+    {
+      field: 'lastEditor',
+      header: 'Last Editor'
+    },
+    {
+      field: 'lastModify',
+      sortField: 'lastModifyDate',
+      header: 'Last Modified'
+    }
+  ])
+
+  const handleLoadData = (event) => {
+    hasContentToList.value = event
   }
 </script>
 
@@ -88,8 +76,8 @@
         addButtonLabel="Rule Set"
         createPagePath="/edge-firewall/create"
         editPagePath="/edge-firewall/edit"
-        :listService="listEdgeFirewallService"
-        :deleteService="deleteEdgeFirewallService"
+        :listService="props.listEdgeFirewallService"
+        :deleteService="props.deleteEdgeFirewallService"
         :columns="getColumns"
         @on-load-data="handleLoadData"
       />
@@ -99,7 +87,7 @@
         description="Create your first Rule Set."
         createButtonLabel="Rule Set"
         createPagePath="/edge-firewall/create"
-        :documentationService="documentationService"
+        :documentationService="props.documentationService"
       >
         <template #illustration>
           <Illustration />
