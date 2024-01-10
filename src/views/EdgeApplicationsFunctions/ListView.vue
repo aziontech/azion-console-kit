@@ -1,10 +1,10 @@
 <script setup>
-  import { ref, computed } from 'vue'
-  import ListTableBlock from '@/templates/list-table-block/no-header'
-  import EmptyResultsBlock from '@/templates/empty-results-block'
-  import PrimeButton from 'primevue/button'
-  import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
   import Illustration from '@/assets/svg/illustration-layers'
+  import EmptyResultsBlock from '@/templates/empty-results-block'
+  import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
+  import ListTableBlock from '@/templates/list-table-block/no-header'
+  import PrimeButton from 'primevue/button'
+  import { computed, ref } from 'vue'
 
   defineOptions({ name: 'list-edge-applications-functions-tab' })
 
@@ -111,6 +111,7 @@
       :columns="getColumns"
       pageTitleDelete="Function"
       @on-load-data="handleLoadData"
+      emptyListMessage="No Function found."
     >
       <template #addButton>
         <PrimeButton

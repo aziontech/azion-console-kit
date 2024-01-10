@@ -14,6 +14,7 @@
         addButtonLabel="Digital Certificates"
         createPagePath="digital-certificates/create"
         @on-load-data="handleLoadData"
+        emptyListMessage="No Digital Certificate found."
       />
 
       <EmptyResultsBlock
@@ -33,11 +34,11 @@
 </template>
 
 <script>
-  import ListTableBlock from '@/templates/list-table-block'
-  import EmptyResultsBlock from '@/templates/empty-results-block'
   import Illustration from '@/assets/svg/illustration-layers.vue'
-  import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
   import ContentBlock from '@/templates/content-block'
+  import EmptyResultsBlock from '@/templates/empty-results-block'
+  import ListTableBlock from '@/templates/list-table-block'
+  import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
   import PageHeadingBlock from '@/templates/page-heading-block'
 
   export default {

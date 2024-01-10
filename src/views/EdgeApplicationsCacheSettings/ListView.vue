@@ -2,8 +2,8 @@
   import EmptyResultsBlock from '@/templates/empty-results-block'
   import ListTableBlock from '@/templates/list-table-block/no-header'
   import PrimeButton from 'primevue/button'
-  import Drawer from './Drawer'
   import { computed, ref } from 'vue'
+  import Drawer from './Drawer'
 
   const props = defineProps({
     edgeApplicationId: {
@@ -107,6 +107,7 @@
     pageTitleDelete="Cache Setting"
     :editInDrawer="openEditDrawer"
     @on-load-data="handleLoadData"
+    emptyListMessage="No Cache Setting found."
   >
     <template #addButton>
       <PrimeButton

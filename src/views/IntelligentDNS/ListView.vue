@@ -27,6 +27,7 @@
         createPagePath="intelligent-dns/create"
         editPagePath="intelligent-dns/edit"
         @on-load-data="handleLoadData"
+        emptyListMessage="No Zone found."
       />
       <EmptyResultsBlock
         v-else
@@ -45,13 +46,13 @@
 </template>
 
 <script>
-  import ListTableBlock from '@/templates/list-table-block'
-  import EmptyResultsBlock from '@/templates/empty-results-block'
   import Illustration from '@/assets/svg/illustration-layers.vue'
   import ContentBlock from '@/templates/content-block'
-  import PrimeButton from 'primevue/button'
-  import PageHeadingBlock from '@/templates/page-heading-block'
+  import EmptyResultsBlock from '@/templates/empty-results-block'
+  import ListTableBlock from '@/templates/list-table-block'
   import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
+  import PageHeadingBlock from '@/templates/page-heading-block'
+  import PrimeButton from 'primevue/button'
 
   export default {
     name: 'intelligent-dns-view',
