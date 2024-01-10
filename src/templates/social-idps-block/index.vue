@@ -29,6 +29,7 @@
           @click="authenticate(idp)"
           outlined
           :loading="submittedIdp === idp.uuid"
+          :disabled="submittedIdp"
         />
       </template>
     </div>
