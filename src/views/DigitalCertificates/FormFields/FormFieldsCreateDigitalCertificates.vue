@@ -94,8 +94,8 @@
   </FormHorizontal>
 
   <FormHorizontal
-    title="Certificate Type"
-    description="Select the type of certificate to associate with the account."
+    title="Options"
+    description="Choose between importing a certificate into your account or creating a request for a certificate."
   >
     <template #inputs>
       <div class="flex flex-col w-full gap-3">
