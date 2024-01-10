@@ -5,14 +5,14 @@ import { describe, expect, it, vi } from 'vitest'
 
 const fixtures = {
   wafRulesMock: {
-    crossSiteScriptingSensitivity: "medium",
-    directoryTraversalSensitivity: "medium",
-    evadingTricksSensitivity: "medium",
-    fileUploadSensitivity: "medium",
-    identifiedAttackSensitivity: "medium",
-    remoteFileInclusionSensitivity: "medium",
-    sqlInjectionSensitivity: "medium",
-    unwantedAccessSensitivity: "medium",
+    crossSiteScriptingSensitivity: 'medium',
+    directoryTraversalSensitivity: 'medium',
+    evadingTricksSensitivity: 'medium',
+    fileUploadSensitivity: 'medium',
+    identifiedAttackSensitivity: 'medium',
+    remoteFileInclusionSensitivity: 'medium',
+    sqlInjectionSensitivity: 'medium',
+    unwantedAccessSensitivity: 'medium',
     fileUpload: true,
     evadingTricks: true,
     unwantedAccess: true,
@@ -22,7 +22,7 @@ const fixtures = {
     remoteFileInclusion: true,
     sqlInjection: true,
     active: false,
-    name: "test"
+    name: 'test'
   }
 }
 
@@ -66,7 +66,7 @@ describe('WafRulesServices', () => {
         directory_traversal: fixtures.wafRulesMock.directoryTraversal,
         remote_file_inclusion: fixtures.wafRulesMock.remoteFileInclusion,
         sql_injection: fixtures.wafRulesMock.sqlInjection,
-        active: fixtures.wafRulesMock.active,
+        active: fixtures.wafRulesMock.active
       }
     })
   })

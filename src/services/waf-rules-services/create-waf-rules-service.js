@@ -34,7 +34,7 @@ const adapt = (payload) => {
     directory_traversal: payload.directoryTraversal,
     remote_file_inclusion: payload.remoteFileInclusion,
     sql_injection: payload.sqlInjection,
-    active: payload.active,
+    active: payload.active
   }
 }
 

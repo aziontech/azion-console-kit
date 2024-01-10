@@ -26,7 +26,6 @@ const parseStatusData = (status) => {
 }
 
 const parseThreatTypes = (waf) => {
-
   const threatTypes = {
     file_upload: 'File upload',
     evading_tricks: 'Evading Tricks',
@@ -38,7 +37,6 @@ const parseThreatTypes = (waf) => {
     sql_injection: 'SQL Injection'
   }
 
-
   const threatTypesArray = []
   for (const key in threatTypes) {
     const threat = threatTypes[key]
@@ -48,7 +46,6 @@ const parseThreatTypes = (waf) => {
   }
 
   return threatTypesArray
-
 }
 
 const adapt = (httpResponse) => {
@@ -58,7 +55,6 @@ const adapt = (httpResponse) => {
    * like other andpoints.
    */
 
- 
   const isArray = Array.isArray(httpResponse.body.results)
 
   const parsedWafRules = isArray

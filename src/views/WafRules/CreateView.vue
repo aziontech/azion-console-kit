@@ -57,9 +57,8 @@
     crossSiteScripting: yup.boolean(),
     directoryTraversal: yup.boolean(),
     remoteFileInclusion: yup.boolean(),
-    sqlInjection: yup.boolean(),
+    sqlInjection: yup.boolean()
   })
-
 
   const initialValues = {
     crossSiteScriptingSensitivity: 'medium',
@@ -78,6 +77,6 @@
     directoryTraversal: true,
     remoteFileInclusion: true,
     sqlInjection: true,
-    active: true,
+    active: true
   }
 </script>
