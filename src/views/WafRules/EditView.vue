@@ -203,8 +203,8 @@
     return activeTab.value === 0
   })
 
-  const submitEditWafRules = async (payload) => {    
-    return await props.editWafRulesService(payload,  parseInt(wafRuleId.value) )
+  const submitEditWafRules = async (payload) => {
+    return await props.editWafRulesService(payload, parseInt(wafRuleId.value))
   }
 
   watch(route, () => {

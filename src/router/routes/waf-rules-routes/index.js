@@ -50,7 +50,7 @@ export const wafRulesRoutes = {
       component: () => import('@views/WafRules/EditView.vue'),
       props: {
         editWafRulesService: WafRulesService.editWafRulesService,
-        loadWafRulesService: WafRulesService.loadWafRulesService,
+        loadWafRulesService: WafRulesService.loadWafRulesService
       },
       meta: {
         breadCrumbs: [
@@ -70,7 +70,7 @@ export const wafRulesRoutes = {
       component: () => import('@views/WafRules/EditView.vue'),
       props: {
         editWafRulesService: WafRulesService.editWafRulesService,
-        loadWafRulesService: WafRulesService.loadWafRulesService,
+        loadWafRulesService: WafRulesService.loadWafRulesService
       },
       meta: {
         breadCrumbs: [
@@ -90,7 +90,7 @@ export const wafRulesRoutes = {
       component: () => import('@views/WafRules/EditView.vue'),
       props: {
         editWafRulesService: WafRulesService.editWafRulesService,
-        loadWafRulesService: WafRulesService.loadWafRulesService,
+        loadWafRulesService: WafRulesService.loadWafRulesService
       },
       meta: {
         breadCrumbs: [
@@ -103,6 +103,6 @@ export const wafRulesRoutes = {
           }
         ]
       }
-    },
+    }
   ]
 }

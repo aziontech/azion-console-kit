@@ -47,7 +47,7 @@ const adapt = (payload) => {
 const parseHttpResponse = (httpResponse) => {
   switch (httpResponse.statusCode) {
     case 200:
-      return  'Your waf rule has been updated'
+      return 'Your waf rule has been updated'
     case 400:
       const apiError = extractApiError(httpResponse)
       throw new Error(apiError).message
@@ -76,8 +76,8 @@ const parseHttpResponse = (httpResponse) => {
  * @returns {string} The result message based on the status code.
  */
 const extractApiError = (httpResponse) => {
-  const [key] =  Object.keys(httpResponse.body);
-  const errorMessage = httpResponse.body[key][0];
+  const [key] = Object.keys(httpResponse.body)
+  const errorMessage = httpResponse.body[key][0]
 
   return errorMessage
 }

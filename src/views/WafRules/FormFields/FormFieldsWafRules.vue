@@ -8,7 +8,7 @@
 
   import { useField } from 'vee-validate'
   defineOptions({ name: 'form-fields-waf-rules' })
-  
+
   const props = defineProps({
     disabledActive: {
       type: Boolean,

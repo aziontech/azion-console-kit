@@ -33,7 +33,7 @@ const adapt = (httpResponse) => {
     crossSiteScripting: httpResponse.body.results.cross_site_scripting,
     directoryTraversal: httpResponse.body.results.directory_traversal,
     remoteFileInclusion: httpResponse.body.results.remote_file_inclusion,
-    sqlInjection: httpResponse.body.results.sql_injection,
+    sqlInjection: httpResponse.body.results.sql_injection
   }
 
   return {
