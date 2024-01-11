@@ -1,5 +1,6 @@
 <script setup>
   import FormFieldsErrorResponses from '@/views/EdgeApplicationsErrorResponses/FormFields/FormFieldsErrorResponses'
+  import ActionBarBlockWithTeleport from '@templates/action-bar-block/action-bar-with-teleport'
   import EditFormBlock from '@/templates/edit-form-block'
   import * as yup from 'yup'
 
@@ -59,6 +60,14 @@
       <FormFieldsErrorResponses
         :edgeApplicationId="edgeApplicationId"
         :listOriginsService="props.listOriginsService"
+      />
+    </template>
+    <template #action-bar="{ onSubmit, formValid, onCancel, loading }">
+      <ActionBarBlockWithTeleport
+        @onSubmit="onSubmit"
+        @onCancel="onCancel"
+        :loading="loading"
+        :submitDisabled="!formValid"
       />
     </template>
   </EditFormBlock>
