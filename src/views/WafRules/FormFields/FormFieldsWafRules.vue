@@ -50,7 +50,7 @@
           >Name *
         </label>
         <InputText
-          placeholder=""
+          
           v-model="name"
           type="text"
           id="name"
@@ -93,13 +93,11 @@
         <template #content>
           <div class="flex flex-col w-full sm:max-w-xs gap-2 mt-3">
             <Dropdown
-              id=""
               v-model="sqlInjectionSensitivity"
               :options="sensitivity"
               optionLabel="name"
               optionValue="value"
               class="w-full"
-              placeholder=""
             />
           </div>
         </template>
@@ -127,13 +125,11 @@
         <template #content>
           <div class="flex flex-col w-full sm:max-w-xs gap-2 mt-3">
             <Dropdown
-              id=""
               v-model="remoteFileInclusionSensitivity"
               :options="sensitivity"
               optionLabel="name"
               optionValue="value"
               class="w-full"
-              placeholder=""
             />
           </div>
         </template>
@@ -163,13 +159,11 @@
         <template #content>
           <div class="flex flex-col w-full sm:max-w-xs gap-2 mt-3">
             <Dropdown
-              id=""
               v-model="directoryTraversalSensitivity"
               :options="sensitivity"
               optionLabel="name"
               optionValue="value"
               class="w-full"
-              placeholder=""
             />
           </div>
         </template>
@@ -197,13 +191,11 @@
         <template #content>
           <div class="flex flex-col w-full sm:max-w-xs gap-2 mt-3">
             <Dropdown
-              id=""
               v-model="crossSiteScriptingSensitivity"
               :options="sensitivity"
               optionLabel="name"
               optionValue="value"
               class="w-full"
-              placeholder=""
             />
           </div>
         </template>
@@ -228,13 +220,11 @@
         <template #content>
           <div class="flex flex-col w-full sm:max-w-xs gap-2 mt-3">
             <Dropdown
-              id=""
               v-model="fileUploadSensitivity"
               :options="sensitivity"
               optionLabel="name"
               optionValue="value"
               class="w-full"
-              placeholder=""
             />
           </div>
         </template>
@@ -260,13 +250,11 @@
         <template #content>
           <div class="flex flex-col w-full sm:max-w-xs gap-2 mt-3">
             <Dropdown
-              id=""
               v-model="evadingTricksSensitivity"
               :options="sensitivity"
               optionLabel="name"
               optionValue="value"
               class="w-full"
-              placeholder=""
             />
           </div>
         </template>
@@ -294,13 +282,11 @@
         <template #content>
           <div class="flex flex-col w-full sm:max-w-xs gap-2 mt-3">
             <Dropdown
-              id=""
               v-model="unwantedAccessSensitivity"
               :options="sensitivity"
               optionLabel="name"
               optionValue="value"
               class="w-full"
-              placeholder=""
             />
           </div>
         </template>
@@ -327,13 +313,11 @@
         <template #content>
           <div class="flex flex-col w-full sm:max-w-xs gap-2 mt-3">
             <Dropdown
-              id=""
               v-model="identifiedAttackSensitivity"
               :options="sensitivity"
               optionLabel="name"
               optionValue="value"
               class="w-full"
-              placeholder=""
             />
           </div>
         </template>
