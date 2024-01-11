@@ -23,6 +23,26 @@ export const wafRulesRoutes = {
           }
         ]
       }
+    },
+    {
+      path: 'create',
+      name: 'create-waf-rules',
+      component: () => import('@views/WafRules/CreateView.vue'),
+      props: {
+        createWafRulesService: WafRulesService.createWafRulesService
+      },
+      meta: {
+        breadCrumbs: [
+          {
+            label: 'Waf Rules',
+            to: '/waf'
+          },
+          {
+            label: 'New WAF Rules',
+            to: '/waf/create'
+          }
+        ]
+      }
     }
   ]
 }
