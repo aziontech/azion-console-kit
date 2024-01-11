@@ -109,7 +109,7 @@
           }"
         >
           <template #title>
-            <span class="text-base"> Import a certificate</span>
+            <span class="text-base">Import a certificate</span>
             <RadioButton
               v-model="certificateType"
               inputId="certificateType2"
@@ -117,7 +117,7 @@
               :value="certificateTypes.EDGE_CERTIFICATE_UPLOAD"
             />
           </template>
-          <template #subtitle> Upload a PEM certificate and private key. </template>
+          <template #subtitle>Upload a PEM certificate and private key. </template>
         </Card>
 
         <Card
@@ -130,7 +130,7 @@
           }"
         >
           <template #title>
-            <span class="text-base"> Request a certificate </span>
+            <span class="text-base">Request a certificate</span>
             <RadioButton
               v-model="certificateType"
               inputId="certificateType1"
@@ -153,7 +153,7 @@
           }"
         >
           <template #title>
-            <span class="text-base"> Import a Trusted CA certificate </span>
+            <span class="text-base">Import a Trusted CA certificate</span>
             <RadioButton
               v-model="certificateType"
               inputId="certificateType3"
@@ -213,7 +213,7 @@
 
   <FormHorizontal
     title="Request a Certificate"
-    description="Generate a CSR and private key and submit to a certificate authority to generate a digital certificate."
+    description="Generate a CSR and submit it to a certificate authority to generate a digital certificate."
     v-if="isEdgeCSRCertificate"
   >
     <template #inputs>

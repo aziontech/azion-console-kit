@@ -43,7 +43,7 @@
 <template>
   <FormHorizontal
     v-if="csr"
-    title=" Update CSR "
+    title="Update CSR"
     description="Submit the CSR to a certificate authority. Once the certificate is signed,
         paste the PEM-encoded certificate in the respective field."
   >
