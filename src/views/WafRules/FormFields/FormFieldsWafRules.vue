@@ -1,15 +1,15 @@
 <script setup>
   import { ref } from 'vue'
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
-  import InputText from 'primevue/inputtext'
   import InputSwitch from 'primevue/inputswitch'
   import Card from 'primevue/card'
   import Dropdown from 'primevue/dropdown'
+  import FieldText from '@/templates/form-fields-inputs/fieldText'
+
 
   import { useField } from 'vee-validate'
   defineOptions({ name: 'form-fields-variables' })
 
-  const { value: name, errorMessage: nameError } = useField('name')
   const { value: active } = useField('active')
   const { value: crossSiteScriptingSensitivity } = useField('crossSiteScriptingSensitivity')
   const { value: directoryTraversalSensitivity } = useField('directoryTraversalSensitivity')
@@ -27,6 +27,7 @@
   const { value: directoryTraversal } = useField('directoryTraversal')
   const { value: remoteFileInclusion } = useField('remoteFileInclusion')
   const { value: sqlInjection } = useField('sqlInjection')
+  
 
   const sensitivity = ref([
     { name: 'Sensitivity Highest', value: 'highest' },
@@ -44,24 +45,11 @@
   >
     <template #inputs>
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
-        <label
-          for="name"
-          class="text-color text-base font-medium"
-          >Name *
-        </label>
-        <InputText
-          
-          v-model="name"
-          type="text"
-          id="name"
-          :class="{ 'p-invalid': nameError }"
+        <FieldText
+          label="Name *"
+          name="name"
+          :value="name"
         />
-        <small
-          v-if="nameError"
-          class="p-error text-xs font-normal leading-tight"
-        >
-          {{ nameError }}
-        </small>
       </div>
     </template>
   </FormHorizontal>
