@@ -13,7 +13,7 @@
           <InlineMessage
             class="w-fit"
             severity="info"
-            >After a purge is created, the results may take some time to propagate to all edge
+            >After a purge is added, the results may take some time to propagate to all edge
             nodes.
           </InlineMessage>
           <FormFieldsCreateRealTimePurge
