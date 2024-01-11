@@ -20,6 +20,10 @@
     loadErrorResponsesService: {
       type: Function,
       required: true
+    },
+    showActionBar: {
+      type: Boolean,
+      default: true
     }
   })
 
@@ -39,12 +43,12 @@
 
   const validationSchema = yup.object({
     originId: yup.string().required(),
-    addresses: yup.array().of(
+    errorResponses: yup.array().of(
       yup.object().shape({
-        code: yup.string().required().label('Code'),
-        timeout: yup.number().required().label('Time Out'),
-        uri: yup.string().required().label('Uri'),
-        customStatusCode: yup.string().required().label('Custom Status Code')
+        code: yup.string().required(),
+        timeout: yup.number().required(),
+        uri: yup.string().nullable(true),
+        customStatusCode: yup.string().nullable(true)
       })
     )
   })
@@ -62,8 +66,10 @@
         :listOriginsService="props.listOriginsService"
       />
     </template>
+    {{ formValid }}
     <template #action-bar="{ onSubmit, formValid, onCancel, loading }">
       <ActionBarBlockWithTeleport
+        v-if="props.showActionBar"
         @onSubmit="onSubmit"
         @onCancel="onCancel"
         :loading="loading"

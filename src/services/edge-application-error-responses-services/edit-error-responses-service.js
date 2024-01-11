@@ -15,9 +15,19 @@ export const editErrorResponsesService = async (payload) => {
 }
 
 const adapt = (payload) => {
+  payload.errorResponses.map((element) => {
+    element.custom_status_code = element.customStatusCode
+    delete element.customStatusCode
+    if (element.custom_status_code === "") {
+      element.custom_status_code = null
+    }
+    if (element.uri === "") {
+      element.uri = null
+    }
+  })
   return {
     origin_id: payload.originId,
-    error_responses: payload.errorResponses
+    error_responses: payload.errorResponses,
   }
 }
 
@@ -58,7 +68,7 @@ const extractApiError = (httpResponse) => {
  */
 const parseHttpResponse = (httpResponse) => {
   switch (httpResponse.statusCode) {
-    case 200:
+    case 202:
       return 'Your Error Responses has been edited'
     case 400:
       const apiError = extractApiError(httpResponse)

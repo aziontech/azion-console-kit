@@ -19,7 +19,7 @@ const adapt = (httpResponse) => {
     originId: response.origin_id,
     errorResponses: response.error_responses.map((element) => {
       return {
-        code: element.code,
+        code: element.code.toString(),
         timeout: element.timeout,
         uri: element.uri,
         customStatusCode: element.custom_status_code

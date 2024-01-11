@@ -124,7 +124,7 @@
   const defaultErrorResponse = {
     code: '',
     timeout: 0,
-    uri: null,
+    uri: '',
     customStatusCode: ''
   }
 
@@ -144,7 +144,6 @@
 </script>
 
 <template>
-  {{ errorResponses }}
   <FormHorizontal
     title="Error Responses List"
     description="Time to cache error responses before retry request to your origin."
