@@ -7,14 +7,16 @@
         removableSort
         :value="data"
         dataKey="id"
-        v-model:filters="this.filters"
+        v-model:filters="filters"
         :paginator="showPagination"
         :rowsPerPageOptions="[10, 20, 50, 100]"
-        :rows="minimumOfItemsPerPage"
+        :rows="MINIMUN_OF_ITEMS_PER_PAGE"
         :globalFilterFields="filterBy"
         :loading="isLoading"
         selectionMode="single"
         @row-click="editItemSelected"
+        @rowReorder="onRowReorder"
+        :pt="pt"
       >
         <template #header>
           <div class="flex flex-wrap justify-between gap-2 w-full">
@@ -22,7 +24,7 @@
               <i class="pi pi-search" />
               <InputText
                 class="w-full"
-                v-model.trim="this.filters.global.value"
+                v-model.trim="filters.global.value"
                 placeholder="Search"
               />
             </span>
@@ -37,7 +39,11 @@
             </slot>
           </div>
         </template>
-
+        <Column
+          v-if="reorderableRows"
+          rowReorder
+          headerStyle="width: 3rem"
+        />
         <Column
           sortable
           v-for="col of selectedColumns"
@@ -50,13 +56,13 @@
               <div v-html="rowData[col.field]" />
             </template>
             <template v-else>
-              <component :is="col.component(rowData[col.field])"></component>
+              <component :is="col.component(rowData[col.field])" />
             </template>
           </template>
         </Column>
         <Column
           :frozen="true"
-          :alignFrozen="'right'"
+          alignFrozen="right"
         >
           <template #header>
             <div class="flex justify-end w-full">
@@ -72,7 +78,7 @@
                 <Listbox
                   v-model="selectedColumns"
                   multiple
-                  :options="[{ label: 'Hidden Columns', items: this.columns }]"
+                  :options="[{ label: 'Hidden Columns', items: columns }]"
                   class="hidden-columns-panel"
                   optionLabel="header"
                   optionGroupLabel="label"
@@ -88,7 +94,7 @@
           <template #body="{ data: rowData }">
             <div class="flex justify-end">
               <PrimeMenu
-                :ref="'menu'"
+                ref="menu"
                 id="overlay_menu"
                 v-bind:model="actionOptions(rowData?.status)"
                 :popup="true"
@@ -98,22 +104,15 @@
                 size="small"
                 icon="pi pi-ellipsis-h"
                 text
-                @click="(event) => toggleActionsMenu(event, rowData.id)"
+                @click="(event) => toggleActionsMenu(event, rowData)"
                 class="cursor-pointer table-button"
               />
             </div>
           </template>
         </Column>
         <template #empty>
-          <div class="my-4 flex flex-col gap-3 justify-center items-center">
-            <p class="text-xl font-normal text-secondary">No registers found.</p>
-            <PrimeButton
-              v-if="!authorizeNode"
-              text
-              icon="pi pi-plus"
-              label="Add"
-              @click="navigateToAddPage"
-            />
+          <div class="my-4 flex flex-col gap-3 justify-center items-start">
+            <p class="text-md font-normal text-secondary">{{ emptyListMessage }}</p>
           </div>
         </template>
       </DataTable>
@@ -131,7 +130,7 @@
               <i class="pi pi-search" />
               <InputText
                 class="w-full"
-                v-model="this.filters.global.value"
+                v-model="filters.global.value"
                 placeholder="Search"
               />
             </span>
@@ -145,7 +144,7 @@
           :header="col.header"
         >
           <template #body>
-            <Skeleton></Skeleton>
+            <Skeleton />
           </template>
         </Column>
       </DataTable>
@@ -157,176 +156,210 @@
   </div>
 </template>
 
-<script>
-  import DataTable from 'primevue/datatable'
-  import Column from 'primevue/column'
-  import InputText from 'primevue/inputtext'
-  import PrimeMenu from 'primevue/menu'
-  import Skeleton from 'primevue/skeleton'
-  import PrimeButton from 'primevue/button'
+<script setup>
+  import { getArrayChangedIndexes } from '@/helpers/get-array-changed-indexes'
   import { FilterMatchMode } from 'primevue/api'
-  import DeleteDialog from './dialog/delete-dialog'
-  import OverlayPanel from 'primevue/overlaypanel'
+  import PrimeButton from 'primevue/button'
+  import Column from 'primevue/column'
+  import DataTable from 'primevue/datatable'
+  import InputText from 'primevue/inputtext'
   import Listbox from 'primevue/listbox'
+  import PrimeMenu from 'primevue/menu'
+  import OverlayPanel from 'primevue/overlaypanel'
+  import Skeleton from 'primevue/skeleton'
+  import { useToast } from 'primevue/usetoast'
+  import { computed, getCurrentInstance, onMounted, ref, watch } from 'vue'
+  import { useRouter } from 'vue-router'
+  import DeleteDialog from './dialog/delete-dialog'
 
-  export default {
-    name: 'list-table-block',
-    emits: ['on-load-data'],
-    components: {
-      DataTable,
-      Column,
-      InputText,
-      PrimeButton,
-      PrimeMenu,
-      Skeleton,
-      DeleteDialog,
-      OverlayPanel,
-      Listbox
+  defineOptions({ name: 'list-table-block' })
+
+  const emit = defineEmits(['on-load-data', 'authorize'])
+  const props = defineProps({
+    columns: {
+      type: Array,
+      default: () => [{ field: 'name', header: 'Name' }]
     },
-    data: () => ({
-      showActionsMenu: false,
-      selectedId: null,
-      filters: {
-        global: { value: '', matchMode: FilterMatchMode.CONTAINS }
-      },
-      isLoading: false,
-      data: [],
-      minimumOfItemsPerPage: 10,
-      informationForDeletion: {},
-      selectedColumns: []
-    }),
-    props: {
-      columns: {
-        type: Array,
-        required: true,
-        default: () => [
-          {
-            field: 'name',
-            header: 'Name'
-          }
-        ]
-      },
-      pageTitleDelete: {
-        type: String,
-        required: true
-      },
-      createPagePath: {
-        type: String,
-        default: () => '/'
-      },
-      editInDrawer: {
-        type: Function
-      },
-      editPagePath: {
-        type: String,
-        default: () => '/'
-      },
-      addButtonLabel: {
-        type: String,
-        default: () => ''
-      },
-      authorizeNode: {
-        type: Boolean,
-        required: false,
-        default: false
-      },
-      listService: {
-        required: true,
-        type: Function
-      },
-      deleteService: {
-        required: true,
-        type: Function
+    pageTitleDelete: {
+      type: String,
+      required: true
+    },
+    createPagePath: {
+      type: String,
+      default: () => '/'
+    },
+    editInDrawer: {
+      type: Function
+    },
+    editPagePath: {
+      type: String,
+      default: () => '/'
+    },
+    addButtonLabel: {
+      type: String,
+      default: () => ''
+    },
+    authorizeNode: {
+      type: Boolean
+    },
+    listService: {
+      required: true,
+      type: Function
+    },
+    deleteService: {
+      required: true,
+      type: Function
+    },
+    onReorderService: {
+      type: Function
+    },
+    reorderableRows: {
+      type: Boolean
+    },
+    pt: {
+      type: Object,
+      required: false
+    },
+    emptyListMessage: {
+      type: String,
+      default: () => 'No registers found.'
+    }
+  })
+
+  const MINIMUN_OF_ITEMS_PER_PAGE = 10
+
+  const selectedId = ref(null)
+  const filters = ref({ global: { value: '', matchMode: FilterMatchMode.CONTAINS } })
+  const isLoading = ref(false)
+  const data = ref([])
+  const informationForDeletion = ref({})
+  const selectedItemData = ref(null)
+  const selectedColumns = ref([])
+
+  onMounted(() => {
+    loadData({ page: 1 })
+    selectedColumns.value = props.columns
+  })
+
+  const filterBy = computed(() => {
+    return props.columns.map((item) => item.field)
+  })
+
+  const showPagination = computed(() => {
+    return data.value.length > MINIMUN_OF_ITEMS_PER_PAGE
+  })
+
+  const actionOptions = (showAuthorize) => {
+    const actionOptions = [
+      {
+        label: 'Delete',
+        icon: 'pi pi-fw pi-trash',
+        command: () => openDeleteDialog()
       }
-    },
-    async created() {
-      await this.loadData({ page: 1 })
-      this.selectedColumns = this.columns
-    },
-    computed: {
-      filterBy() {
-        return this.columns.map((item) => item.field)
-      },
-      showPagination() {
-        return this.data.length > this.minimumOfItemsPerPage
-      }
-    },
-    methods: {
-      actionOptions(showAuthorize) {
-        const actionOptions = [
-          {
-            label: 'Delete',
-            icon: 'pi pi-fw pi-trash',
-            command: () => this.openDeleteDialog()
-          }
-        ]
-        if (this.authorizeNode && showAuthorize !== 'Authorized') {
-          actionOptions.push({
-            label: 'Authorize',
-            icon: 'pi pi-lock-open',
-            command: () => this.authorizeEdgeNode()
-          })
-        }
-        return actionOptions
-      },
-      async loadData({ page }) {
-        try {
-          this.isLoading = true
-          const data = await this.listService({ page })
-          this.data = data
-        } catch (error) {
-          this.data = []
-          this.$toast.add({
-            closable: true,
-            severity: 'error',
-            summary: error
-          })
-        } finally {
-          this.isLoading = false
-        }
-      },
-      async reload() {
-        await this.loadData({ page: 1 })
-      },
-      navigateToAddPage() {
-        this.$router.push(this.createPagePath)
-      },
-      toggleActionsMenu(event, selectedId) {
-        this.selectedId = selectedId
-        this.$refs.menu.toggle(event)
-      },
-      editItemSelected({ data: item }) {
-        if (this.editInDrawer) {
-          this.editInDrawer(item)
-          return
-        }
-        this.$router.push({ path: `${this.editPagePath}/${item.id}` })
-      },
-      authorizeEdgeNode() {
-        this.$emit('authorize', this.selectedId)
-      },
-      openDeleteDialog() {
-        this.informationForDeletion = {
-          title: this.pageTitleDelete,
-          selectedID: this.selectedId,
-          deleteService: this.deleteService,
-          deleteDialogVisible: true,
-          rerender: Math.random()
-        }
-      },
-      updatedTable() {
-        this.data = this.data.filter((item) => item.id !== this.selectedId)
-        this.$forceUpdate()
-      },
-      toggleColumnSelector(event) {
-        this.$refs.columnSelectorPanel.toggle(event)
-      }
-    },
-    watch: {
-      data(currentState) {
-        const hasData = currentState.length > 0
-        this.$emit('on-load-data', hasData)
-      }
+    ]
+    if (props.authorizeNode && showAuthorize !== 'Authorized') {
+      actionOptions.push({
+        label: 'Authorize',
+        icon: 'pi pi-lock-open',
+        command: () => authorizeEdgeNode()
+      })
+    }
+    return actionOptions
+  }
+
+  const toast = useToast()
+
+  const loadData = async ({ page }) => {
+    try {
+      isLoading.value = true
+      const response = await props.listService({ page })
+      data.value = response
+    } catch (error) {
+      data.value = []
+      toast.add({
+        closable: true,
+        severity: 'error',
+        summary: error
+      })
+    } finally {
+      isLoading.value = false
     }
   }
+
+  const reload = async () => {
+    await loadData({ page: 1 })
+  }
+  defineExpose({ reload })
+
+  const router = useRouter()
+
+  const navigateToAddPage = () => {
+    router.push(props.createPagePath)
+  }
+
+  const menu = ref(null)
+  const toggleActionsMenu = (event, selectedItem) => {
+    selectedItemData.value = selectedItem
+    selectedId.value = selectedItem.id
+    menu.value.toggle(event)
+  }
+
+  const editItemSelected = ({ data: item }) => {
+    if (props.editInDrawer) {
+      props.editInDrawer(item)
+      return
+    }
+    router.push({ path: `${props.editPagePath}/${item.id}` })
+  }
+
+  const authorizeEdgeNode = () => {
+    emit('authorize', selectedId.value)
+  }
+
+  const openDeleteDialog = () => {
+    informationForDeletion.value = {
+      title: props.pageTitleDelete,
+      selectedID: selectedId.value,
+      selectedItemData: selectedItemData.value,
+      deleteService: props.deleteService,
+      deleteDialogVisible: true,
+      rerender: Math.random()
+    }
+  }
+
+  const instance = getCurrentInstance()
+  const updatedTable = () => {
+    data.value = data.value.filter((item) => item.id !== selectedId.value)
+    instance.proxy?.$forceUpdate()
+  }
+
+  const onRowReorder = async (event) => {
+    try {
+      const tableData = getArrayChangedIndexes(data, event.value)
+      await props.onReorderService(tableData)
+      data.value = event.value
+
+      toast.add({
+        closable: true,
+        severity: 'success',
+        summary: 'Rules Engine order saved!'
+      })
+    } catch (error) {
+      toast.add({
+        closable: true,
+        severity: 'error',
+        summary: error
+      })
+    }
+  }
+
+  const columnSelectorPanel = ref(null)
+  const toggleColumnSelector = (event) => {
+    columnSelectorPanel.value.toggle(event)
+  }
+
+  watch(data, (currentState) => {
+    const hasData = currentState.length > 0
+    emit('on-load-data', hasData)
+  })
 </script>

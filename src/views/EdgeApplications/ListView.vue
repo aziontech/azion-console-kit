@@ -1,12 +1,12 @@
 <script setup>
-  import { ref, computed } from 'vue'
+  import { computed, ref } from 'vue'
 
-  import ListTableBlock from '@/templates/list-table-block'
-  import EmptyResultsBlock from '@/templates/empty-results-block'
   import Illustration from '@/assets/svg/illustration-layers.vue'
   import ContentBlock from '@/templates/content-block'
-  import PageHeadingBlock from '@/templates/page-heading-block'
+  import EmptyResultsBlock from '@/templates/empty-results-block'
+  import ListTableBlock from '@/templates/list-table-block'
   import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
+  import PageHeadingBlock from '@/templates/page-heading-block'
 
   defineOptions({ name: 'list-edge-applications' })
 
@@ -39,7 +39,14 @@
       },
       {
         field: 'origins',
-        header: 'Origins'
+        header: 'Origins',
+        type: 'component',
+        component: (columnData) => {
+          return columnBuilder({
+            data: columnData,
+            columnAppearance: 'expand-column'
+          })
+        }
       },
       {
         field: 'status',
@@ -81,6 +88,7 @@
         :deleteService="props.deleteEdgeApplicationService"
         :columns="getColumns"
         @on-load-data="handleLoadData"
+        emptyResultsMessage="No Edge Application found."
       />
       <EmptyResultsBlock
         v-else

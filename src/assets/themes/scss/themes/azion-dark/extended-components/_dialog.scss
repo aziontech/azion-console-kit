@@ -1,9 +1,15 @@
 // Custom Dialog
 .p-dialog {
+  margin-inline: 2rem !important;
   .p-dialog-header {
     height: 3.5rem !important;
   }
   .p-dialog-footer {
+    height: 3.5rem !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: flex-end !important;
+    gap: 0.75rem !important;
     button {
       margin: 0 !important;
     }

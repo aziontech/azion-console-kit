@@ -1,9 +1,11 @@
 import * as Helpers from '@/helpers'
 import * as EdgeApplicationsService from '@/services/edge-application-services'
 import * as OriginsService from '@/services/edge-application-origins-services'
+import * as CacheSettingsServices from '@/services/edge-application-cache-settings-services'
 import * as FunctionsService from '@/services/edge-application-functions-services'
 import * as DeviceGroupsService from '@/services/edge-application-device-groups-services'
 import * as ErrorResponsesService from '@/services/edge-application-error-responses-services'
+import * as RulesEngineService from '@/services/edge-application-rules-engine-services'
 
 /** @type {import('vue-router').RouteRecordRaw} */
 export const edgeApplicationRoutes = {
@@ -69,6 +71,14 @@ export const edgeApplicationRoutes = {
           documentationService: Helpers.documentationCatalog.edgeApplicationOrigins,
           clipboardWrite: Helpers.clipboardWrite
         },
+        cacheSettingsServices: {
+          listCacheSettingsService: CacheSettingsServices.listCacheSettingsService,
+          deleteCacheSettingsService: CacheSettingsServices.deleteCacheSettingsService,
+          createCacheSettingsService: CacheSettingsServices.createCacheSettingsService,
+          loadCacheSettingsService: CacheSettingsServices.loadCacheSettingsService,
+          editCacheSettingsService: CacheSettingsServices.editCacheSettingsService,
+          documentationService: Helpers.documentationCatalog.edgeApplicationCacheSettings
+        },
         functionsServices: {
           deleteFunctionService: FunctionsService.deleteFunctionService,
           listEdgeApplicationFunctionsService: FunctionsService.listEdgeApplicationFunctionsService,
@@ -85,6 +95,11 @@ export const edgeApplicationRoutes = {
         errorResponsesServices: {
           loadErrorResponsesService: ErrorResponsesService.listErrorResponsesService,
           editErrorResponsesService: ErrorResponsesService.editErrorResponsesService
+        },
+        rulesEngineServices: {
+          listRulesEngineService: RulesEngineService.listRulesEngineService,
+          deleteRulesEngineService: RulesEngineService.deleteRulesEngineService,
+          reorderRulesEngine: RulesEngineService.reorderRulesEngine
         },
         clipboardWrite: Helpers.clipboardWrite
       },

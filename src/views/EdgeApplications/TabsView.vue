@@ -5,7 +5,10 @@
   import ContentBlock from '@/templates/content-block'
   import { useRoute, useRouter } from 'vue-router'
   import { ref } from 'vue'
+  import { useToast } from 'primevue/usetoast'
   import EdgeApplicationsOriginsListView from '@/views/EdgeApplicationsOrigins/ListView'
+  import EdgeApplicationsRulesEngineListView from '@/views/EdgeApplicationsRulesEngine/ListView'
+  import EdgeApplicationsCacheSettingsListView from '@/views/EdgeApplicationsCacheSettings/ListView'
   import EdgeApplicationsFunctionsListView from '@/views/EdgeApplicationsFunctions/ListView'
   import EdgeApplicationsErrorResponseCreateView from '@/views/EdgeApplicationsErrorResponses/CreateView'
   import EdgeApplicationsDeviceGroupsListView from '@/views/EdgeApplicationsDeviceGroups/ListView.vue'
@@ -16,13 +19,16 @@
   const props = defineProps({
     edgeApplicationServices: { type: Object, required: true },
     originsServices: { type: Object, required: true },
-    functionsServices: { type: Object, required: true },
+    cacheSettingsServices: { type: Object, required: true },
     clipboardWrite: { type: Function, required: true },
     deviceGroupsServices: { type: Object, required: true },
-    errorResponsesServices: { type: Object, required: true }
+    errorResponsesServices: { type: Object, required: true },
+    rulesEngineServices: { type: Object, required: true },
+    functionsServices: { type: Object, required: true }
   })
 
   const mapTabs = {
+    mainSettings: 0,
     origins: 1,
     deviceGroups: 2,
     errorResponses: 3,
@@ -30,23 +36,35 @@
     functions: 5,
     rulesEngine: 6
   }
-  const activatedFunctions = true
+
+  const toast = useToast()
   const route = useRoute()
   const router = useRouter()
   const activeTab = ref(0)
   const edgeApplicationId = ref(route.params.id)
+  const isEnableEdgeFunction = ref(false)
 
-  const getTabValue = (tab) => {
-    return mapTabs[tab] || 0
+  const loaderEdgeApplication = async () => {
+    try {
+      const { edgeFunctions } = await props.edgeApplicationServices.loadEdgeApplication({
+        id: edgeApplicationId.value
+      })
+      isEnableEdgeFunction.value = edgeFunctions
+    } catch (error) {
+      toast.add({
+        closable: true,
+        severity: 'error',
+        summary: error
+      })
+    }
   }
 
-  const getTabFromValue = (value) => {
-    return Object.keys(mapTabs).find((key) => mapTabs[key] === value)
-  }
+  loaderEdgeApplication()
 
-  const renderTabCurrentRouter = () => {
-    const { tab } = route.params
-    activeTab.value = getTabValue(tab)
+  const getTabFromValue = (selectedTabIndex) => {
+    const tabNames = Object.keys(mapTabs)
+    const selectedTab = tabNames.find((tabName) => mapTabs[tabName] === selectedTabIndex)
+    return selectedTab
   }
 
   const changeRouteByClickingOnTab = (event) => {
@@ -60,6 +78,13 @@
       name: 'edit-edge-application',
       params
     })
+  }
+
+  const renderTabCurrentRouter = () => {
+    const { tab } = route.params
+    const defaultTabIndex = 0
+    const activeTabIndexByRoute = mapTabs[tab] || defaultTabIndex
+    activeTab.value = activeTabIndexByRoute
   }
 
   renderTabCurrentRouter()
@@ -85,6 +110,7 @@
               :contactSalesEdgeApplicationService="
                 edgeApplicationServices.contactSalesEdgeApplicationService
               "
+              :showActionBar="activeTab === mapTabs.mainSettings"
             />
           </div>
         </TabPanel>
@@ -99,10 +125,11 @@
 
         <TabPanel header="Device Groups">
           <EdgeApplicationsDeviceGroupsListView
+            v-if="activeTab === mapTabs.deviceGroups"
             :edgeApplicationId="edgeApplicationId"
             v-bind="props.deviceGroupsServices"
-          >
-          </EdgeApplicationsDeviceGroupsListView>
+            :clipboardWrite="props.clipboardWrite"
+          />
         </TabPanel>
         <TabPanel header="Error Responses">
           <div class="mt-8">
@@ -113,17 +140,30 @@
             />
           </div>
         </TabPanel>
-        <TabPanel header="Cache Settings"> </TabPanel>
+        <TabPanel header="Cache Settings">
+          <EdgeApplicationsCacheSettingsListView
+            v-if="activeTab === mapTabs.cacheSettings"
+            :edgeApplicationId="edgeApplicationId"
+            v-bind="props.cacheSettingsServices"
+          />
+        </TabPanel>
         <TabPanel
-          v-if="activatedFunctions"
           header="Functions"
+          v-if="isEnableEdgeFunction"
         >
           <EdgeApplicationsFunctionsListView
+            v-if="activeTab === mapTabs.functions"
             v-bind="props.functionsServices"
             :edgeApplicationId="edgeApplicationId"
           />
         </TabPanel>
-        <TabPanel header="Rules Engine"> </TabPanel>
+        <TabPanel header="Rules Engine">
+          <EdgeApplicationsRulesEngineListView
+            v-if="activeTab === mapTabs.rulesEngine"
+            :edgeApplicationId="edgeApplicationId"
+            v-bind="props.rulesEngineServices"
+          />
+        </TabPanel>
       </TabView>
     </template>
   </ContentBlock>

@@ -65,12 +65,12 @@ export const menus = [
         icon: 'pi pi-play'
       },
       {
-        label: 'Real Time Metrics',
+        label: 'Real-Time Metrics',
         to: '/real-time-metrics',
         icon: 'pi pi-chart-line'
       },
       {
-        label: 'Real Time Events',
+        label: 'Real-Time Events',
         to: '/real-time-events',
         icon: 'pi pi-server',
         tag: 'Preview'
@@ -114,6 +114,11 @@ export const menus = [
         label: 'Network Lists',
         to: '/network-lists',
         icon: 'pi pi-globe'
+      },
+      {
+        label: 'WAF Rules',
+        to: '/waf',
+        icon: 'pi pi-sliders-h'
       }
     ]
   }

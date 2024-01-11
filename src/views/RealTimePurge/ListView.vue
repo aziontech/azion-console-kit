@@ -8,18 +8,19 @@
         v-if="hasContentToList"
         :listService="props.listRealTimePurgeService"
         :columns="getColumns"
-        addButtonLabel="Real-Time Purge"
+        addButtonLabel="Add"
         createPagePath="real-time-purge/create"
         @on-load-data="handleLoadData"
         :isGraphql="true"
         :enableEditClick="false"
+        emptyListMessage="No Purge found."
       >
       </ListTableBlock>
       <EmptyResultsBlock
         v-else
-        title="No purge added"
-        description="Create your first Real-Time Purge."
-        createButtonLabel="Real-Time Purge"
+        title="No purge has been created"
+        description="Click the button below to initiate the setup process and create your first purge."
+        createButtonLabel="Add"
         createPagePath="real-time-purge/create"
         :documentationService="documentationService"
       >
@@ -32,12 +33,12 @@
 </template>
 
 <script setup>
-  import { computed, ref } from 'vue'
-  import ListTableBlock from '@/templates/list-table-block'
-  import EmptyResultsBlock from '@/templates/empty-results-block'
   import Illustration from '@/assets/svg/illustration-layers.vue'
   import ContentBlock from '@/templates/content-block'
+  import EmptyResultsBlock from '@/templates/empty-results-block'
+  import ListTableBlock from '@/templates/list-table-block'
   import PageHeadingBlock from '@/templates/page-heading-block'
+  import { computed, ref } from 'vue'
 
   const props = defineProps({
     listRealTimePurgeService: { required: true, type: Function },

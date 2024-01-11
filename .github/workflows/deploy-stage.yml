@@ -30,7 +30,7 @@ jobs:
       - name: Download Azion CLI
         run: curl https://downloads.azion.com/linux/x86_64/azioncli -o azioncli && chmod +x azioncli
 
-      - name: Create YML Azion CLI FILE
+      - name: Create YML file to Azion CLI
         run: mkdir ~/.config/ && touch ~/.config/azioncli.yaml
 
       - name: Configure Azion CLI

@@ -13,7 +13,8 @@
         addButtonLabel="Personal Token"
         createPagePath="personal-tokens/create"
         @on-load-data="handleLoadData"
-        :enableEditClick="false" />
+        :enableEditClick="false"
+        emptyListMessage="No Personal Token found." />
       <EmptyResultsBlock
         v-else
         title="No personal tokens found"
@@ -30,13 +31,13 @@
 </template>
 
 <script setup>
-  import { ref } from 'vue'
-  import ListTableBlock from '@/templates/list-table-block'
-  import ContentBlock from '@/templates/content-block'
-  import PageHeadingBlock from '@/templates/page-heading-block'
-  import EmptyResultsBlock from '@/templates/empty-results-block'
   import Illustration from '@/assets/svg/illustration-layers.vue'
+  import ContentBlock from '@/templates/content-block'
+  import EmptyResultsBlock from '@/templates/empty-results-block'
+  import ListTableBlock from '@/templates/list-table-block'
   import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
+  import PageHeadingBlock from '@/templates/page-heading-block'
+  import { ref } from 'vue'
 
   defineProps({
     listPersonalTokensService: {

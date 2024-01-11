@@ -1,19 +1,19 @@
 <script setup>
-  import { computed, ref, watch } from 'vue'
+  import { InternalServerError } from '@/services/axios/errors'
+  import FormHorizontal from '@/templates/create-form-block/form-horizontal'
+  import PageLoadingBlock from '@/templates/loading-block'
+  import TemplateEngineBlock from '@/templates/template-engine-block'
+  import PrimeButton from 'primevue/button'
+  import Divider from 'primevue/divider'
+  import Dropdown from 'primevue/dropdown'
+  import InlineMessage from 'primevue/inlinemessage'
   import Sidebar from 'primevue/sidebar'
   import Tag from 'primevue/tag'
-  import PrimeButton from 'primevue/button'
-  import Dropdown from 'primevue/dropdown'
-  import Divider from 'primevue/divider'
-  import InlineMessage from 'primevue/inlinemessage'
-  import ProgressBar from 'primevue/progressbar'
   import { useField, useForm } from 'vee-validate'
-  import * as yup from 'yup'
-  import FormHorizontal from '@/templates/create-form-block/form-horizontal'
-  import TemplateEngineBlock from '@/templates/template-engine-block'
-  import { InternalServerError } from '@/services/axios/errors'
-  import PermissionsFieldset from '../components/PermissionsFieldset'
+  import { computed, ref, watch } from 'vue'
   import { useRouter } from 'vue-router'
+  import * as yup from 'yup'
+  import PermissionsFieldset from '../components/PermissionsFieldset'
 
   const router = useRouter()
 
@@ -205,25 +205,20 @@
     }"
   >
     <template #header>
-      <div>Installing integration</div>
+      <div>Install an Integration</div>
     </template>
     <template #default>
       <div class="flex flex-col w-full md:p-8 pb-0 relative">
-        <div
-          class="bg-black/20 z-10 mt-[3.5rem] h-[calc(100%-7rem)] cursor-progress fixed w-full top-0 left-0"
-          v-if="loading"
-        >
-          <ProgressBar
-            class="sticky"
-            mode="indeterminate"
-            style="height: 0.375rem"
-          ></ProgressBar>
-        </div>
+        <PageLoadingBlock
+          :showLoading="loading"
+          customClasses="top-0 left-0 z-10 mt-[3.5rem] h-[calc(100%-7rem)]"
+        />
+
         <form class="w-full flex flex-col gap-8">
           <FormHorizontal
             :isDrawer="true"
-            title="Select a Edge Application to install"
-            description="Select in which Edge Application you want to install this solution."
+            title="Select an edge application"
+            description="Browse and select the desired edge application to install this integration."
           >
             <template #inputs>
               <div class="flex flex-col w-full sm:max-w-3xl gap-8">
@@ -245,7 +240,7 @@
                     placeholder="Select an edge application"
                     filter
                     filterIcon="pi pi-search"
-                    emptyMessage="No applications with integrations to install or update."
+                    emptyMessage="No edge application found with integrations to install or update."
                     :pt="{ emptyMessage: { class: 'text-sm' }, list: { class: 'pb-0' } }"
                     :loading="loadingEdges"
                   >
@@ -254,7 +249,7 @@
                         <div>{{ slotProps.option.label }}</div>
                         <Tag
                           v-if="slotProps.option.upgradeable"
-                          value="Update available"
+                          value="Update Available"
                           severity="info"
                         />
                       </div>
@@ -288,8 +283,7 @@
                   v-if="warnUpdate"
                   severity="warn"
                   class="max-w-lg"
-                  >Updating will create a new instance of the provided integration
-                  function.</InlineMessage
+                  >Updating will create a new instance of the integration's function.</InlineMessage
                 >
 
                 <InlineMessage
@@ -297,15 +291,15 @@
                   severity="info"
                   class="max-w-lg"
                 >
-                  No applications created yet. Go to
+                  No edge application has been created. Go to
                   <PrimeButton
                     class="p-0"
-                    label="Edge Applications"
+                    label="Edge Application"
                     link
                     size="small"
                     @click="handleCreateNew"
                   />
-                  to create one.
+                  to create a new one.
                 </InlineMessage>
               </div>
             </template>

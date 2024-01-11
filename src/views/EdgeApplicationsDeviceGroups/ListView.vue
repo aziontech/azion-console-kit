@@ -1,9 +1,10 @@
 <script setup>
-  import ListTableBlock from '@/templates/list-table-block/no-header'
-  import EmptyResultsBlock from '@/templates/empty-results-block'
-  import PrimeButton from 'primevue/button'
   import Illustration from '@/assets/svg/illustration-layers'
+  import EmptyResultsBlock from '@/templates/empty-results-block'
+  import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
+  import ListTableBlock from '@/templates/list-table-block/no-header'
   import DrawerDeviceGroups from '@/views/EdgeApplicationsDeviceGroups/Drawer'
+  import PrimeButton from 'primevue/button'
   import { computed, ref } from 'vue'
   defineOptions({ name: 'list-edge-applications-device-groups-tab' })
 
@@ -32,6 +33,10 @@
       required: true,
       type: Function
     },
+    clipboardWrite: {
+      required: true,
+      type: Function
+    },
     deleteDeviceGroupService: {
       required: true,
       type: Function
@@ -52,6 +57,20 @@
 
   const getColumns = computed(() => {
     return [
+      {
+        field: 'deviceId',
+        header: 'Id',
+        type: 'component',
+        component: (columnData) => {
+          return columnBuilder({
+            data: columnData,
+            columnAppearance: 'text-with-clipboard',
+            dependencies: {
+              copyContentService: props.clipboardWrite
+            }
+          })
+        }
+      },
       {
         field: 'name',
         header: 'Name'
@@ -108,6 +127,7 @@
       :editInDrawer="openEditDeviceGroupDrawer"
       :columns="getColumns"
       @on-load-data="handleLoadData"
+      emptyListMessage="No Device Group found."
     >
       <template #addButton>
         <PrimeButton

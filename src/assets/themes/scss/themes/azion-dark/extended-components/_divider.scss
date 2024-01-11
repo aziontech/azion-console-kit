@@ -1,6 +1,7 @@
 .p-divider {
   .p-divider-content {
     background-color: $panelContentBg;
+    font-weight: 500 !important;
   }
 
   &.p-divider-horizontal {
@@ -26,6 +27,12 @@
 
     .p-divider-content {
       padding: $inlineSpacing 0;
+    }
+  }
+
+  &.p-divider-dashed {
+    &.p-divider-horizontal:before {
+      border-style: dashed;
     }
   }
 }

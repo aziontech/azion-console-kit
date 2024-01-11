@@ -7,6 +7,7 @@
       :verifyLoginService="verifyLoginService"
       :refreshLoginService="refreshLoginService"
       :accountHandler="accountHandler"
+      :listSocialIdpsService="listSocialIdpsService"
     />
 
     <ForgotPassword
@@ -45,6 +46,10 @@
       accountHandler: {
         required: true,
         type: Object
+      },
+      listSocialIdpsService: {
+        required: true,
+        type: Function
       }
     },
     data() {

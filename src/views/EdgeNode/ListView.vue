@@ -1,11 +1,11 @@
 <script setup>
-  import ListTableBlock from '@/templates/list-table-block'
-  import EmptyEdgeNode from '@/templates/empty-results-block/empty-edge-node'
   import Illustration from '@/assets/svg/illustration-layers'
   import ContentBlock from '@/templates/content-block'
+  import EmptyEdgeNode from '@/templates/empty-results-block/empty-edge-node'
+  import ListTableBlock from '@/templates/list-table-block'
+  import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
   import PageHeadingBlock from '@/templates/page-heading-block'
   import Authorize from '@/views/EdgeNode/Dialog/Authorize'
-  import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
   import { computed, ref } from 'vue'
   defineOptions({ name: 'list-edge-node' })
 
@@ -90,6 +90,7 @@
         editPagePath="edge-node/edit"
         @on-load-data="handleLoadData"
         :rowActions="actionsRow"
+        emptyListMessage="No Edge Node found."
       />
       <EmptyEdgeNode
         v-else
