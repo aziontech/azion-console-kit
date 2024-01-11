@@ -12,9 +12,9 @@ const fixtures = {
         timeout: 2,
         uri: '/teste/',
         custom_status_code: '503'
-      },
+      }
     ]
-  },
+  }
 }
 
 const makeSut = () => {
@@ -27,10 +27,8 @@ describe('EdgeApplicationDeviceGroupsServices', () => {
   it('should call api with correct params', async () => {
     const requestSpy = vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
       statusCode: 200,
-      body: { 
-        results: [
-          fixtures.errorResponseSample
-        ]
+      body: {
+        results: [fixtures.errorResponseSample]
       }
     })
 
@@ -59,19 +57,17 @@ describe('EdgeApplicationDeviceGroupsServices', () => {
     const { sut } = makeSut()
     const result = await sut({ edgeApplicationId: edgeApplicationId })
 
-    expect(result).toEqual(
-      {
-        id: fixtures.errorResponseSample.id,
-        originId: fixtures.errorResponseSample.origin_id,
-        errorResponses: [
-          {
-            code: fixtures.errorResponseSample.error_responses[0].code.toString(),
-            customStatusCode: fixtures.errorResponseSample.error_responses[0].custom_status_code,
-            timeout: fixtures.errorResponseSample.error_responses[0].timeout,
-            uri: fixtures.errorResponseSample.error_responses[0].uri
-          }
-        ]
-      }
-    )
+    expect(result).toEqual({
+      id: fixtures.errorResponseSample.id,
+      originId: fixtures.errorResponseSample.origin_id,
+      errorResponses: [
+        {
+          code: fixtures.errorResponseSample.error_responses[0].code.toString(),
+          customStatusCode: fixtures.errorResponseSample.error_responses[0].custom_status_code,
+          timeout: fixtures.errorResponseSample.error_responses[0].timeout,
+          uri: fixtures.errorResponseSample.error_responses[0].uri
+        }
+      ]
+    })
   })
 })

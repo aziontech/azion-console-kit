@@ -13,10 +13,10 @@ const fixtures = {
         code: '500',
         timeout: 2,
         customStatusCode: '503',
-        uri: '/teste/',
-      },
+        uri: '/teste/'
+      }
     ]
-  },
+  }
 }
 
 const makeSut = () => {
@@ -50,7 +50,7 @@ describe('EdgeApplicationDeviceGroupsServices', () => {
             uri: fixtures.errorResponsePayload.errorResponses[0].uri
           }
         ],
-        origin_id: fixtures.errorResponsePayload.originId,
+        origin_id: fixtures.errorResponsePayload.originId
       }
     })
   })

@@ -18,16 +18,16 @@ const adapt = (payload) => {
   payload.errorResponses.map((element) => {
     element.custom_status_code = element.customStatusCode
     delete element.customStatusCode
-    if (element.custom_status_code === "") {
+    if (element.custom_status_code === '') {
       element.custom_status_code = null
     }
-    if (element.uri === "") {
+    if (element.uri === '') {
       element.uri = null
     }
   })
   return {
     origin_id: payload.originId,
-    error_responses: payload.errorResponses,
+    error_responses: payload.errorResponses
   }
 }
 

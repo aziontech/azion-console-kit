@@ -280,4 +280,3 @@
     </template>
   </FormHorizontal>
 </template>
- 
