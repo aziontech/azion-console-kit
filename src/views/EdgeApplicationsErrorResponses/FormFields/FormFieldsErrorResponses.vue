@@ -132,7 +132,7 @@
     pushErrorResponse({ ...defaultErrorResponse })
   }
 
-  const originOptions = ref('')
+  const originOptions = ref([])
 
   const getOrigins = async () => {
     originOptions.value = await props.listOriginsService({ id: props.edgeApplicationId })
