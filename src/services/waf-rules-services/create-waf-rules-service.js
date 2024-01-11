@@ -13,7 +13,6 @@ export const createWafRulesService = async (payload) => {
 }
 
 const adapt = (payload) => {
-  // eslint-disable-next-line no-console
   return {
     bypass_addresses: payload.bypassAddresses,
     cross_site_scripting_sensitivity: payload.crossSiteScriptingSensitivity,

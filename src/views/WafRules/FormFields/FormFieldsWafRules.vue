@@ -43,7 +43,6 @@
     description=""
   >
     <template #inputs>
-      {{ active }}
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
         <label
           for="name"
