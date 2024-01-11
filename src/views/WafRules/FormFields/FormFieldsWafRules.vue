@@ -8,6 +8,13 @@
 
   import { useField } from 'vee-validate'
   defineOptions({ name: 'form-fields-waf-rules' })
+  
+  const props = defineProps({
+    disabledActive: {
+      type: Boolean,
+      default: true
+    }
+  })
 
   const { value: active } = useField('active')
   const { value: crossSiteScriptingSensitivity } = useField('crossSiteScriptingSensitivity')
@@ -316,7 +323,7 @@
         <InputSwitch
           id="active"
           v-model="active"
-          :disabled="true"
+          :disabled="props.disabledActive"
         />
         <label
           for="active"

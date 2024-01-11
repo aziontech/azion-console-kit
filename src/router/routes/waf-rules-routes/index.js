@@ -43,6 +43,66 @@ export const wafRulesRoutes = {
           }
         ]
       }
-    }
+    },
+    {
+      path: 'edit/:id',
+      name: 'edit-waf-rules',
+      component: () => import('@views/WafRules/EditView.vue'),
+      props: {
+        editWafRulesService: WafRulesService.editWafRulesService,
+        loadWafRulesService: WafRulesService.loadWafRulesService,
+      },
+      meta: {
+        breadCrumbs: [
+          {
+            label: 'Waf Rules',
+            to: '/waf'
+          },
+          {
+            label: 'Edit Waf Rules'
+          }
+        ]
+      }
+    },
+    {
+      path: 'edit/:id/tuning',
+      name: 'edit-waf-rules-tuning',
+      component: () => import('@views/WafRules/EditView.vue'),
+      props: {
+        editWafRulesService: WafRulesService.editWafRulesService,
+        loadWafRulesService: WafRulesService.loadWafRulesService,
+      },
+      meta: {
+        breadCrumbs: [
+          {
+            label: 'Waf Rules',
+            to: '/waf'
+          },
+          {
+            label: 'Edit Waf Rules'
+          }
+        ]
+      }
+    },
+    {
+      path: 'edit/:id/allowed',
+      name: 'edit-waf-rules-allowed',
+      component: () => import('@views/WafRules/EditView.vue'),
+      props: {
+        editWafRulesService: WafRulesService.editWafRulesService,
+        loadWafRulesService: WafRulesService.loadWafRulesService,
+      },
+      meta: {
+        breadCrumbs: [
+          {
+            label: 'Waf Rules',
+            to: '/waf'
+          },
+          {
+            label: 'Edit Waf Rules'
+          }
+        ]
+      }
+    },
   ]
 }
