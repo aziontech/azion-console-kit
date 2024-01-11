@@ -346,6 +346,7 @@
         <InputSwitch
           id="active"
           v-model="active"
+          :disabled="true"
         />
         <label
           for="active"
