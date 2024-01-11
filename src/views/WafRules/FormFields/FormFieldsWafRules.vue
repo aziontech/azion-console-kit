@@ -6,9 +6,8 @@
   import Dropdown from 'primevue/dropdown'
   import FieldText from '@/templates/form-fields-inputs/fieldText'
 
-
   import { useField } from 'vee-validate'
-  defineOptions({ name: 'form-fields-variables' })
+  defineOptions({ name: 'form-fields-waf-rules' })
 
   const { value: active } = useField('active')
   const { value: crossSiteScriptingSensitivity } = useField('crossSiteScriptingSensitivity')
@@ -27,7 +26,6 @@
   const { value: directoryTraversal } = useField('directoryTraversal')
   const { value: remoteFileInclusion } = useField('remoteFileInclusion')
   const { value: sqlInjection } = useField('sqlInjection')
-  
 
   const sensitivity = ref([
     { name: 'Sensitivity Highest', value: 'highest' },
