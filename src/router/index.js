@@ -17,6 +17,7 @@ import { homeRoutes } from '@routes/home-routes'
 import { intelligentDnsRoutes } from '@routes/intelligent-dns-routes'
 import { loginRoutes } from '@routes/login-routes'
 import { marketplaceRoutes } from '@routes/marketplace-routes'
+import { metricsRoutes } from '@routes/metrics-routes'
 import { mfaRoutes } from '@routes/mfa-routes'
 import { networkListsRoutes } from '@routes/network-lists-routes'
 import { passwordRoutes } from '@routes/password-routes'
@@ -26,9 +27,10 @@ import { realTimePurgeRoutes } from '@routes/real-time-purge'
 import { signupRoutes } from '@routes/signup-routes'
 import { teamsPermissionRoutes } from '@routes/team-permission'
 import { usersListsRoutes } from '@routes/users-routes'
-import { settingsRoutes } from '@/router/routes/your-settings-routes'
-import { wafRulesRoutes } from '@routes/waf-rules-routes'
 import { variablesRoutes } from '@routes/variables-routes'
+import { wafRulesRoutes } from '@routes/waf-rules-routes'
+import { settingsRoutes } from '@routes/your-settings-routes'
+
 import { createRouter, createWebHistory } from 'vue-router'
 
 import afterEachRoute from './hooks/afterEachRoute'
@@ -66,7 +68,8 @@ const router = createRouter({
     marketplaceRoutes,
     accountRoutes,
     settingsRoutes,
-    wafRulesRoutes
+    wafRulesRoutes,
+    metricsRoutes
   ].concat(errorRoutes)
 })
 
