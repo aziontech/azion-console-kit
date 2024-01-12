@@ -45,7 +45,7 @@ describe('EdgeApplicationErrorResponsesServices', () => {
         error_responses: [
           {
             code: fixtures.errorResponsePayload.errorResponses[0].code,
-            custom_status_code: fixtures.errorResponsePayload.errorResponses[0].custom_status_code,
+            custom_status_code: fixtures.errorResponsePayload.errorResponses[0].customStatusCode,
             timeout: fixtures.errorResponsePayload.errorResponses[0].timeout,
             uri: fixtures.errorResponsePayload.errorResponses[0].uri
           }

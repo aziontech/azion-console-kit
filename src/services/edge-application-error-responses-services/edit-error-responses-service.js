@@ -15,14 +15,17 @@ export const editErrorResponsesService = async (payload) => {
 }
 
 const adapt = (payload) => {
-  payload.errorResponses.map((element) => {
-    element.custom_status_code = element.customStatusCode || null
-    delete element.customStatusCode
-    element.uri = element.uri || null
-  })
+  const errorResponses = payload.errorResponses.map((element) => {
+    return {
+      custom_status_code: element?.customStatusCode,
+      uri: element?.uri,
+      timeout: element.timeout,
+      code: element.code
+    }
+    })
   return {
     origin_id: payload.originId,
-    error_responses: payload.errorResponses
+    error_responses: errorResponses
   }
 }
 
