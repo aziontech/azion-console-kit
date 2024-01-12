@@ -37,7 +37,7 @@ const parseHttpResponse = (httpResponse) => {
   switch (httpResponse.statusCode) {
     case 201:
       return {
-        feedback: 'Your waf rule allowed has been created',
+        feedback: 'Your waf rule allowed has been created'
       }
     case 400:
       const apiError = extractApiError(httpResponse)

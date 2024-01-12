@@ -86,8 +86,7 @@
             @onSuccess="reloadWafRulesAllowedList"
             title="Create New"
           >
-            <template #formFields>
-            </template>
+            <template #formFields> </template>
           </CreateDrawerBlock>
 
           <!-- <EditDrawerBlock
@@ -169,7 +168,7 @@
     reason: yup.string(),
     ruleId: yup.string(),
     status: yup.boolean(),
-    useRegex:yup.boolean()
+    useRegex: yup.boolean()
   })
 
   const initialValues = {
@@ -181,7 +180,7 @@
     reason: '',
     ruleId: '',
     status: false,
-    useRegex:false
+    useRegex: false
   }
 
   const validationSchema = yup.object({

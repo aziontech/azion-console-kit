@@ -33,7 +33,6 @@ const replaceString = (str, value) => {
 }
 
 const parseMatchZone = (waf) => {
-
   const arrayMatchZone = []
 
   const zones = {
@@ -52,12 +51,13 @@ const parseMatchZone = (waf) => {
   for (const matchZone of waf) {
     value = zones[matchZone.zone]
     if (matchZone.zone_input) {
-      if(matchZone.matches_on === 'value') value = replaceString(value, `:${matchZone.zone_input} :${matchZone.zone_input} (Value)`)
-      if(matchZone.matches_on === 'name') value = replaceString(value, `:${matchZone.zone_input} :${matchZone.zone_input} (Name)`)
-    }
-    else if (matchZone.matches_on) {
-      if(matchZone.matches_on === 'value') value = replaceString(value, ' (Value)')
-      if(matchZone.matches_on === 'name') value = replaceString(value, ' (Name)')
+      if (matchZone.matches_on === 'value')
+        value = replaceString(value, `:${matchZone.zone_input} :${matchZone.zone_input} (Value)`)
+      if (matchZone.matches_on === 'name')
+        value = replaceString(value, `:${matchZone.zone_input} :${matchZone.zone_input} (Name)`)
+    } else if (matchZone.matches_on) {
+      if (matchZone.matches_on === 'value') value = replaceString(value, ' (Value)')
+      if (matchZone.matches_on === 'name') value = replaceString(value, ' (Name)')
     }
 
     arrayMatchZone.push(value)
