@@ -50,7 +50,10 @@ export const wafRulesRoutes = {
       component: () => import('@views/WafRules/EditView.vue'),
       props: {
         editWafRulesService: WafRulesService.editWafRulesService,
-        loadWafRulesService: WafRulesService.loadWafRulesService
+        loadWafRulesService: WafRulesService.loadWafRulesService,
+        listWafRulesAllowedService: WafRulesService.listWafRulesAllowedService,
+        deleteWafRulesAllowedService: WafRulesService.deleteWafRulesAllowedService,
+        createWafRulesAllowedService: WafRulesService.createWafRulesAllowedService
       },
       meta: {
         breadCrumbs: [
@@ -70,7 +73,10 @@ export const wafRulesRoutes = {
       component: () => import('@views/WafRules/EditView.vue'),
       props: {
         editWafRulesService: WafRulesService.editWafRulesService,
-        loadWafRulesService: WafRulesService.loadWafRulesService
+        loadWafRulesService: WafRulesService.loadWafRulesService,
+        listWafRulesAllowedService: WafRulesService.listWafRulesAllowedService,
+        deleteWafRulesAllowedService: WafRulesService.deleteWafRulesAllowedService,
+        createWafRulesAllowedService: WafRulesService.createWafRulesAllowedService
       },
       meta: {
         breadCrumbs: [
@@ -90,7 +96,10 @@ export const wafRulesRoutes = {
       component: () => import('@views/WafRules/EditView.vue'),
       props: {
         editWafRulesService: WafRulesService.editWafRulesService,
-        loadWafRulesService: WafRulesService.loadWafRulesService
+        loadWafRulesService: WafRulesService.loadWafRulesService,
+        listWafRulesAllowedService: WafRulesService.listWafRulesAllowedService,
+        deleteWafRulesAllowedService: WafRulesService.deleteWafRulesAllowedService,
+        createWafRulesAllowedService: WafRulesService.createWafRulesAllowedService
       },
       meta: {
         breadCrumbs: [
