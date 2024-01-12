@@ -43,9 +43,9 @@
 <template>
   <FormHorizontal
     v-if="csr"
-    title="Generate CSR and Private Key with Azion"
-    description="The Certificate Signing Request with Azion was generated. Copy the certificate and submit it to a certificate authority.
-        Paste the certificate in the respective field and click Save."
+    title="Update CSR"
+    description="Submit the CSR to a certificate authority. Once the certificate is signed,
+        paste the PEM-encoded certificate in the respective field."
   >
     <template #inputs>
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
@@ -106,10 +106,9 @@
   </FormHorizontal>
   <FormHorizontal
     v-if="!csr && certificateType === certificateTypes.EDGE_CERTIFICATE"
-    title="Upload Certificate and Private Key"
-    description="To update a digital certificate, copy and paste the certificate and private key codes in the respective fields,
-        including the begin and end tags."
-  >
+    title="Update a Certificate"
+    description="Paste the PEM-encoded certificate and private key in the respective fields to update the certificate. The current certificate and private key are hidden to protect sensitive information."
+    >
     <template #inputs>
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
         <label>Name *</label>
@@ -130,7 +129,7 @@
         <PrimeTextarea
           v-model="certificate"
           :class="{ 'p-invalid': certificateError }"
-          placeholder="For security reasons, the certificate can't be shown.&#10;To replace a digital certificate, paste the new certificate here."
+          placeholder="-----BEGIN CERTIFICATE-----&#10;-----END CERTIFICATE-----"
           rows="5"
           cols="30"
         />
@@ -145,7 +144,7 @@
         <PrimeTextarea
           v-model="privateKey"
           :class="{ 'p-invalid': privateKeyError }"
-          placeholder="For security reasons, the certificate can't be shown.&#10;To replace a digital certificate, paste the new private key here."
+          placeholder="-----BEGIN PRIVATE KEY-----&#10;-----END PRIVATE KEY-----"
           rows="5"
           cols="30"
         />
@@ -161,8 +160,8 @@
   <!-- Trusted case -->
   <FormHorizontal
     v-if="certificateType === certificateTypes.TRUSTED"
-    title="General"
-    description="description"
+    title="Update Trusted CA Certificate"
+    description="Paste the PEM-encoded Trusted CA certificate in the respective field to update the certificate. The current certificate is hidden to protect sensitive information."
   >
     <template #inputs>
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
@@ -178,20 +177,12 @@
           >{{ nameError }}</small
         >
       </div>
-    </template>
-  </FormHorizontal>
-  <FormHorizontal
-    v-if="certificateType === certificateTypes.TRUSTED"
-    title="Upload Trusted CA Certificate"
-    description="A Trusted Certificate Authority (CA) certificate can be used for Mutual Transport Layer Security (mTLS) configuration. To update a Trusted CA Certificate to Azion, paste the certificate code in the respective field."
-  >
-    <template #inputs>
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
         <label>Certificate </label>
         <PrimeTextarea
           v-model="certificate"
           :class="{ 'p-invalid': certificateError }"
-          placeholder="For security reasons, the certificate can't be shown.&#10;Paste a new certificate in this field to update it."
+          placeholder="-----BEGIN CERTIFICATE----&#10;-----END CERTIFICATE-----"
           rows="5"
           cols="30"
         />

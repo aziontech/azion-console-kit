@@ -68,7 +68,7 @@
 <template>
   <FormHorizontal
     title="General"
-    description="Description"
+    description="Create a digital certificate entry to secure HTTPS edge applications."
   >
     <template #inputs>
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
@@ -81,6 +81,7 @@
           v-model="digitalCertificateName"
           type="text"
           id="name"
+          placeholder="My digital certificate"
           :class="{ 'p-invalid': digitalCertificateNameError }"
         />
         <small
@@ -93,10 +94,8 @@
   </FormHorizontal>
 
   <FormHorizontal
-    title="Certificate Type"
-    description="Bring a TLS X.509 digital certificate and private key obtained
-        from a certificate authority or a Trusted CA for mTLS authentication.
-        As an alternative, generate a Certificate Signing Request (CSR) with Azion and submit it to a certificate authority."
+    title="Options"
+    description="Choose between importing a certificate into your account or creating a request for a certificate."
   >
     <template #inputs>
       <div class="flex flex-col w-full gap-3">
@@ -110,7 +109,7 @@
           }"
         >
           <template #title>
-            <span class="text-base">Edge Certificate - Upload</span>
+            <span class="text-base">Import a certificate</span>
             <RadioButton
               v-model="certificateType"
               inputId="certificateType2"
@@ -118,7 +117,7 @@
               :value="certificateTypes.EDGE_CERTIFICATE_UPLOAD"
             />
           </template>
-          <template #subtitle> Upload your certificate and private key. </template>
+          <template #subtitle>Upload a PEM certificate and private key. </template>
         </Card>
 
         <Card
@@ -131,7 +130,7 @@
           }"
         >
           <template #title>
-            <span class="text-base">Edge Certificate - Generate</span>
+            <span class="text-base">Request a certificate</span>
             <RadioButton
               v-model="certificateType"
               inputId="certificateType1"
@@ -139,7 +138,9 @@
               :value="certificateTypes.EDGE_CERTIFICATE_CSR"
             />
           </template>
-          <template #subtitle> Generate CSR and private key with Azion. </template>
+          <template #subtitle>
+            Generate a Certificate Singing Request (CSR) to obtain a digital certificate.
+          </template>
         </Card>
 
         <Card
@@ -152,7 +153,7 @@
           }"
         >
           <template #title>
-            <span class="text-base">Trusted CA Certificate</span>
+            <span class="text-base">Import a Trusted CA certificate</span>
             <RadioButton
               v-model="certificateType"
               inputId="certificateType3"
@@ -160,7 +161,9 @@
               :value="certificateTypes.TRUSTED"
             />
           </template>
-          <template #subtitle> Upload your Trusted CA Certificate to Azion servers. </template>
+          <template #subtitle>
+            Upload a PEM certificate for mutual Transport Layer Security (mTLS).
+          </template>
         </Card>
       </div>
     </template>
@@ -168,8 +171,8 @@
 
   <FormHorizontal
     v-if="isUploadCertificate"
-    title="Upload Certificate and Private Key"
-    description="To upload a digital certificate, copy and paste the certificate and private key codes in the respective fields, including the begin and end tags."
+    title="Import a Certificate"
+    description="Paste the PEM-encoded certificate and private key in the respective fields."
   >
     <template #inputs>
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
@@ -209,9 +212,8 @@
   </FormHorizontal>
 
   <FormHorizontal
-    title="Generate CSR and Private Key with Azion"
-    description="To apply for a digital certificate issued by a certificate authority, a Certificate Signing Request is required.
-        Azion can generate a certificate code to submit to a certificate authority."
+    title="Request a Certificate"
+    description="Generate a CSR and submit it to a certificate authority to generate a digital certificate."
     v-if="isEdgeCSRCertificate"
   >
     <template #inputs>
@@ -341,7 +343,8 @@
           cols="30"
         />
         <small class="text-color-secondary text-xs font-normal leading-tight"
-          >Separate SAN using a new line. Duplicate entries will be automatically removed.</small
+          >Use line breaks to separate each SAN. Duplicate entries will be automatically
+          removed.</small
         >
         <small
           v-if="subjectAlternativeNamesError"
@@ -353,8 +356,8 @@
   </FormHorizontal>
 
   <FormHorizontal
-    title="Upload Trusted CA certificate"
-    description="A Trusted Certificate Authority (CA) certificate can be used for Mutual Transport Layer Security (mTLS) configuration. To upload a Trusted CA Certificate to Azion, paste the certificate code in the respective field."
+    title="Import a Trusted CA certificate"
+    description="Paste the PEM-encoded Trusted CA certificate for mTLS in the respective field."
     v-if="isTrustedCertificate"
   >
     <template #inputs>
@@ -363,7 +366,7 @@
         <PrimeTextarea
           v-model="certificate"
           :class="{ 'p-invalid': certificateError }"
-          placeholder="---BEGIN CERTIFICATE---"
+          placeholder="-----BEGIN CERTIFICATE----&#10;-----END CERTIFICATE-----"
           rows="5"
           cols="30"
         />
