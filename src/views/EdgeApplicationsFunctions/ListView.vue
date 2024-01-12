@@ -56,6 +56,7 @@
   import PrimeButton from 'primevue/button'
   import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
   import ListTableBlock from '@/templates/list-table-block/no-header'
+  import DrawerFunction from './Drawer'
   import { computed, ref } from 'vue'
 
   defineOptions({ name: 'list-edge-applications-functions-tab' })
@@ -187,43 +188,3 @@
     hasContentToList.value = true
   }
 </script>
-
-<template>
-  <div v-if="hasContentToList">
-    <ListTableBlock
-      ref="listOriginsEdgeApplicationsRef"
-      :listService="listFunctionsInstance"
-      :deleteService="deleteFunctionsWithDecorator"
-      :columns="getColumns"
-      pageTitleDelete="Function"
-      @on-load-data="handleLoadData"
-      emptyListMessage="No Function found."
-    >
-      <template #addButton>
-        <PrimeButton
-          icon="pi pi-plus"
-          label="Edge Function"
-        />
-      </template>
-    </ListTableBlock>
-  </div>
-  <EmptyResultsBlock
-    v-else
-    title="No Function added"
-    description="Create your first Function."
-    createButtonLabel="Add"
-    :documentationService="props.documentationService"
-    :inTabs="true"
-  >
-    <template #default>
-      <PrimeButton
-        severity="secondary"
-        icon="pi pi-plus"
-        label="Function"
-      />
-    </template>
-    <template #illustration>
-      <Illustration />
-    </template>
-  </EmptyResultsBlock>
-</template>

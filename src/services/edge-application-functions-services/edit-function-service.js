@@ -16,7 +16,7 @@ const adapt = (payload) => {
   return {
     name: payload.name,
     edge_function_id: payload.edgeFunctionID,
-    args: payload.args
+    args: JSON.parse(payload.args)
   }
 }
 
