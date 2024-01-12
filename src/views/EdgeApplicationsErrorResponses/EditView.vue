@@ -59,6 +59,7 @@
     :editService="editService"
     :loadService="loadService"
     :schema="validationSchema"
+    :isTabs="true"
   >
     <template #form>
       <FormFieldsErrorResponses

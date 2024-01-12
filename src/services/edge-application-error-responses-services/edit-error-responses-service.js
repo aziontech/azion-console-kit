@@ -1,5 +1,5 @@
 import { AxiosHttpClientAdapter } from '@/services/axios/AxiosHttpClientAdapter'
-import { makeEdgeApplicationV4BaseUrl } from '../edge-application-services/ make-edge-application-v4-base-url'
+import { makeEdgeApplicationV4BaseUrl } from './make-edge-application-v4-base-url'
 import * as Errors from '@/services/axios/errors'
 
 export const editErrorResponsesService = async (payload) => {
@@ -22,7 +22,7 @@ const adapt = (payload) => {
       timeout: element.timeout,
       code: element.code
     }
-    })
+  })
   return {
     origin_id: payload.originId,
     error_responses: errorResponses

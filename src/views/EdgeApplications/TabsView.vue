@@ -138,14 +138,12 @@
           />
         </TabPanel>
         <TabPanel header="Error Responses">
-          <div class="mt-8">
             <EdgeApplicationsErrorResponseEditView
               :edgeApplicationId="edgeApplicationId"
               :listOriginsService="props.originsServices.listOriginsService"
               :showActionBar="showErrorResponsesActionBar"
               v-bind="props.errorResponsesServices"
             />
-          </div>
         </TabPanel>
         <TabPanel header="Cache Settings">
           <EdgeApplicationsCacheSettingsListView
