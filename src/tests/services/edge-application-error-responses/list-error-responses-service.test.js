@@ -23,7 +23,7 @@ const makeSut = () => {
   return { sut }
 }
 
-describe('EdgeApplicationDeviceGroupsServices', () => {
+describe('EdgeApplicationErrorResponsesServices', () => {
   it('should call api with correct params', async () => {
     const requestSpy = vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
       statusCode: 200,
