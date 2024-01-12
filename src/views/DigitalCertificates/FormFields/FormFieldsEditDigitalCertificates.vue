@@ -108,7 +108,7 @@
     v-if="!csr && certificateType === certificateTypes.EDGE_CERTIFICATE"
     title="Update a Certificate"
     description="Paste the PEM-encoded certificate and private key in the respective fields to update the certificate. The current certificate and private key are hidden to protect sensitive information."
-    >
+  >
     <template #inputs>
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
         <label>Name *</label>

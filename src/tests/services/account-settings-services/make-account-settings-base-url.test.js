@@ -12,7 +12,7 @@ const makeSut = () => {
 describe.concurrent('AccountSettingsServices', () => {
   it('should return the API base url', () => {
     const { sut } = makeSut()
-    const correctApiUrl = 'iam/account'
+    const correctApiUrl = 'v4/iam/account'
 
     const baseUrl = sut()
 

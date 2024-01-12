@@ -38,7 +38,7 @@ describe('AccountSettingsServices', () => {
     await sut(fixtures.accountSettingsMock)
 
     expect(requestSpy).toHaveBeenCalledWith({
-      url: 'iam/account',
+      url: 'v4/iam/account',
       method: 'PATCH',
       body: {
         name: fixtures.accountSettingsMock.accountName,

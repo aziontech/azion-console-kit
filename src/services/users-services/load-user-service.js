@@ -1,9 +1,9 @@
 import { AxiosHttpClientAdapter, parseHttpResponse } from '../axios/AxiosHttpClientAdapter'
-import { makeUsersBaseUrl } from './make-users-base-url'
+import { makeUserBaseUrl } from './make-user-base-url'
 
-export const loadUserService = async ({ id }) => {
+export const loadUserService = async () => {
   let httpResponse = await AxiosHttpClientAdapter.request({
-    url: `${makeUsersBaseUrl()}/${id}`,
+    url: `${makeUserBaseUrl()}`,
     method: 'GET'
   })
   httpResponse = adapt(httpResponse)
