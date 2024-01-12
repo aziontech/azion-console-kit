@@ -22,7 +22,7 @@ const parseHttpResponse = (httpResponse) => {
     case 204:
       return 'Function successfully deleted'
     case 400:
-      throw new Errors.NotFoundError().message
+      throw new Errors.InvalidApiRequestError().message
     case 401:
       throw new Errors.InvalidApiTokenError().message
     case 403:

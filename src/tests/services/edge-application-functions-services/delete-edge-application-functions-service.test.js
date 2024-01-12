@@ -1,43 +1,80 @@
 import { AxiosHttpClientAdapter } from '@/services/axios/AxiosHttpClientAdapter'
+import * as Errors from '@/services/axios/errors'
 import { deleteFunctionService } from '@/services/edge-application-functions-services'
 import { describe, expect, it, vi } from 'vitest'
 
+const mocks = {
+    functionID: 123,
+    edgeApplicationID: 12221
+}
 const makeSut = () => {
-  const sut = deleteFunctionService
+    const sut = deleteFunctionService
 
-  return {
-    sut
-  }
+    return {
+        sut
+    }
 }
 
 describe('EdgeApplicationFunctionsServices', () => {
-  it('should call Api with correct params', async () => {
-    const requestSpy = vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
-      statusCode: 204
+    it('should return the API base url to data streaming service', async () => {
+        const requestSpy = vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
+            statusCode: 204
+        })
+
+        const { sut } = makeSut()
+        sut(mocks.functionID, mocks.edgeApplicationID)
+
+        expect(requestSpy).toHaveBeenCalledWith({
+            url: `v3/edge_applications/${mocks.edgeApplicationID}/functions_instances/${mocks.functionID}`,
+            method: 'DELETE'
+        })
     })
-    const edgeApplicationId = 321
-    const functionId = 123
-    const { sut } = makeSut()
-    const version = 'v3'
-    await sut(functionId, edgeApplicationId)
 
-    expect(requestSpy).toHaveBeenCalledWith({
-      method: 'DELETE',
-      url: `${version}/edge_applications/${edgeApplicationId}/functions_instances/${functionId}`
-    })
-  })
+      it('should return a feedback message on successfully deleted', async () => {
+        vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
+          statusCode: 204
+        })
 
-  it('should return a feedback message on successfully deleted', async () => {
-    vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
-      statusCode: 204
-    })
-    const edgeApplicationId = 123
-    const functionId = 321
+        const { sut } = makeSut()
 
-    const { sut } = makeSut()
+        const feedbackMessage = await sut(mocks.functionID, mocks.edgeApplicationID)
 
-    const feedbackMessage = await sut(functionId, edgeApplicationId)
+        expect(feedbackMessage).toBe('Function successfully deleted')
+      })
 
-    expect(feedbackMessage).toBe('Resource successfully deleted')
-  })
+    it.each([
+        {
+            statusCode: 401,
+            expectedError: new Errors.InvalidApiTokenError().message
+        },
+        {
+            statusCode: 403,
+            expectedError: new Errors.PermissionError().message
+        },
+        {
+            statusCode: 404,
+            expectedError: new Errors.NotFoundError().message
+        },
+        {
+            statusCode: 500,
+            expectedError: new Errors.InternalServerError().message
+        },
+        {
+            statusCode: 'unmappedStatusCode',
+            expectedError: new Errors.UnexpectedError().message
+        }
+    ])(
+        'should throw when request fails with status code $statusCode',
+        async ({ statusCode, expectedError }) => {
+            vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
+                statusCode
+            })
+
+            const { sut } = makeSut()
+
+            const response = sut(mocks.functionID, mocks.edgeApplicationID)
+
+            expect(response).rejects.toBe(expectedError)
+        }
+    )
 })
