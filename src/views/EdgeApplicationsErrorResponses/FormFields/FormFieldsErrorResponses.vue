@@ -188,7 +188,7 @@
       <div
         v-for="(errorResponse, index) in errorResponses"
         :key="index"
-        :class="index === 0 ? 'hidden' : ''"
+        :class="{ hidden: index === 0 }"
       >
         <div class="flex flex-col gap-6">
           <div class="flex">
