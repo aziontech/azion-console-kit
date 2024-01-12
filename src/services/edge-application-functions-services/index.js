@@ -6,4 +6,12 @@ import { listEdgeFunctionsService } from './list-edge-functions-service'
 import { loadFunctionService } from './loader-function-service'
 import { editFunctionService } from './edit-function-service'
 
-export { listFunctionsService, listEdgeApplicationFunctionsService, deleteFunctionService, createFunctionService, listEdgeFunctionsService, loadFunctionService, editFunctionService }
+export {
+  listFunctionsService,
+  listEdgeApplicationFunctionsService,
+  deleteFunctionService,
+  createFunctionService,
+  listEdgeFunctionsService,
+  loadFunctionService,
+  editFunctionService
+}

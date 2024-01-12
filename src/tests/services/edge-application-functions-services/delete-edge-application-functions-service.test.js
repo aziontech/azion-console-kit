@@ -4,77 +4,77 @@ import { deleteFunctionService } from '@/services/edge-application-functions-ser
 import { describe, expect, it, vi } from 'vitest'
 
 const mocks = {
-    functionID: 123,
-    edgeApplicationID: 12221
+  functionID: 123,
+  edgeApplicationID: 12221
 }
 const makeSut = () => {
-    const sut = deleteFunctionService
+  const sut = deleteFunctionService
 
-    return {
-        sut
-    }
+  return {
+    sut
+  }
 }
 
 describe('EdgeApplicationFunctionsServices', () => {
-    it('should return the API base url to data streaming service', async () => {
-        const requestSpy = vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
-            statusCode: 204
-        })
-
-        const { sut } = makeSut()
-        sut(mocks.functionID, mocks.edgeApplicationID)
-
-        expect(requestSpy).toHaveBeenCalledWith({
-            url: `v3/edge_applications/${mocks.edgeApplicationID}/functions_instances/${mocks.functionID}`,
-            method: 'DELETE'
-        })
+  it('should return the API base url to data streaming service', async () => {
+    const requestSpy = vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
+      statusCode: 204
     })
 
-      it('should return a feedback message on successfully deleted', async () => {
-        vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
-          statusCode: 204
-        })
+    const { sut } = makeSut()
+    sut(mocks.functionID, mocks.edgeApplicationID)
 
-        const { sut } = makeSut()
+    expect(requestSpy).toHaveBeenCalledWith({
+      url: `v3/edge_applications/${mocks.edgeApplicationID}/functions_instances/${mocks.functionID}`,
+      method: 'DELETE'
+    })
+  })
 
-        const feedbackMessage = await sut(mocks.functionID, mocks.edgeApplicationID)
+  it('should return a feedback message on successfully deleted', async () => {
+    vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
+      statusCode: 204
+    })
 
-        expect(feedbackMessage).toBe('Function successfully deleted')
+    const { sut } = makeSut()
+
+    const feedbackMessage = await sut(mocks.functionID, mocks.edgeApplicationID)
+
+    expect(feedbackMessage).toBe('Function successfully deleted')
+  })
+
+  it.each([
+    {
+      statusCode: 401,
+      expectedError: new Errors.InvalidApiTokenError().message
+    },
+    {
+      statusCode: 403,
+      expectedError: new Errors.PermissionError().message
+    },
+    {
+      statusCode: 404,
+      expectedError: new Errors.NotFoundError().message
+    },
+    {
+      statusCode: 500,
+      expectedError: new Errors.InternalServerError().message
+    },
+    {
+      statusCode: 'unmappedStatusCode',
+      expectedError: new Errors.UnexpectedError().message
+    }
+  ])(
+    'should throw when request fails with status code $statusCode',
+    async ({ statusCode, expectedError }) => {
+      vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
+        statusCode
       })
 
-    it.each([
-        {
-            statusCode: 401,
-            expectedError: new Errors.InvalidApiTokenError().message
-        },
-        {
-            statusCode: 403,
-            expectedError: new Errors.PermissionError().message
-        },
-        {
-            statusCode: 404,
-            expectedError: new Errors.NotFoundError().message
-        },
-        {
-            statusCode: 500,
-            expectedError: new Errors.InternalServerError().message
-        },
-        {
-            statusCode: 'unmappedStatusCode',
-            expectedError: new Errors.UnexpectedError().message
-        }
-    ])(
-        'should throw when request fails with status code $statusCode',
-        async ({ statusCode, expectedError }) => {
-            vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
-                statusCode
-            })
+      const { sut } = makeSut()
 
-            const { sut } = makeSut()
+      const response = sut(mocks.functionID, mocks.edgeApplicationID)
 
-            const response = sut(mocks.functionID, mocks.edgeApplicationID)
-
-            expect(response).rejects.toBe(expectedError)
-        }
-    )
+      expect(response).rejects.toBe(expectedError)
+    }
+  )
 })

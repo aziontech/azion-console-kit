@@ -21,8 +21,8 @@ const makeSut = () => {
 }
 
 beforeEach(() => {
-  vi.restoreAllMocks();
-});
+  vi.restoreAllMocks()
+})
 
 describe('LoaderFunctionService', () => {
   it('should call API with correct URL when loading a function instance', async () => {
@@ -62,6 +62,8 @@ describe('LoaderFunctionService', () => {
     vi.spyOn(AxiosHttpClientAdapter, 'request').mockRejectedValueOnce(error)
     const { sut } = makeSut()
 
-    await expect(sut({ edgeApplicationID: EDGE_APPLICATION_ID, functionID: FUNCTION_ID })).rejects.toThrow('Network error')
+    await expect(
+      sut({ edgeApplicationID: EDGE_APPLICATION_ID, functionID: FUNCTION_ID })
+    ).rejects.toThrow('Network error')
   })
 })

@@ -95,7 +95,7 @@
     deleteFunctionService: {
       required: true,
       type: Function
-    },
+    }
   })
 
   const drawerFunctionRef = ref('')
@@ -175,7 +175,7 @@
   const openCreateFunctionDrawer = () => {
     drawerFunctionRef.value.openDrawerCreate()
   }
-  
+
   const openEditFunctionDrawer = (data) => {
     drawerFunctionRef.value.openDrawerEdit(data.id)
   }

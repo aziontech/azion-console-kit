@@ -3,24 +3,24 @@ import { listFunctionsService } from '@/services/edge-application-functions-serv
 import { describe, expect, it, vi, beforeEach } from 'vitest'
 
 // Constantes para reutilização
-const API_VERSION = 'v3';
+const API_VERSION = 'v3'
 const EDGE_APPLICATION_ID = 123
 
 const fixtures = {
-    functionsInstance: {
-        name: 'function instance name',
-        args: {},
-        edge_function_id: 321,
-        id: 123
-    },
-    functionInstanceWithVersion: {
-        version: 2,
-        vendor: 3,
-        name: 'function instance version',
-        args: {},
-        edge_function_id: 321,
-        id: 123
-    }
+  functionsInstance: {
+    name: 'function instance name',
+    args: {},
+    edge_function_id: 321,
+    id: 123
+  },
+  functionInstanceWithVersion: {
+    version: 2,
+    vendor: 3,
+    name: 'function instance version',
+    args: {},
+    edge_function_id: 321,
+    id: 123
+  }
 }
 
 const makeSut = () => {
@@ -29,8 +29,8 @@ const makeSut = () => {
 }
 
 beforeEach(() => {
-  vi.restoreAllMocks();
-});
+  vi.restoreAllMocks()
+})
 
 describe('EdgeApplicationFunctionsServices', () => {
   it('should call API with default pagination and order when listing function instances', async () => {

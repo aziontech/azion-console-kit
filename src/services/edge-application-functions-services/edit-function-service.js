@@ -4,7 +4,9 @@ import { makeEdgeApplicationBaseUrl } from '../edge-application-services/make-ed
 
 export const editFunctionService = async (payload) => {
   let httpResponse = await AxiosHttpClientAdapter.request({
-    url: `${makeEdgeApplicationBaseUrl()}/${payload.edgeApplicationID}/functions_instances/${payload.id}`,
+    url: `${makeEdgeApplicationBaseUrl()}/${payload.edgeApplicationID}/functions_instances/${
+      payload.id
+    }`,
     method: 'PATCH',
     body: adapt(payload)
   })

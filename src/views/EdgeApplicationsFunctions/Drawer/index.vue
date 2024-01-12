@@ -103,7 +103,10 @@
   }
 
   const loadService = async () => {
-    const functions = await props.loadFunctionService({ edgeApplicationID: props.edgeApplicationId, functionID: selectedFunctionToEdit.value })
+    const functions = await props.loadFunctionService({
+      edgeApplicationID: props.edgeApplicationId,
+      functionID: selectedFunctionToEdit.value
+    })
     return functions
   }
 

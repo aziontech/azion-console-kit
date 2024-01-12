@@ -26,7 +26,7 @@
   const { value: name } = useField('name')
   const { value: edgeFunctionID } = useField('edgeFunctionID')
   const { value: args } = useField('args')
-  
+
   const theme = computed(() => {
     return store.currentTheme === 'light' ? 'vs' : 'vs-dark'
   })
