@@ -1,12 +1,12 @@
 <script setup>
   import PrimeButton from 'primevue/button'
-  import { onMounted, ref } from 'vue'
-  // const props = defineProps({})
-  onMounted(() => {})
-  const value2 = ref(null)
-  function OpenGraphQLPlayground() {
-    window.open('https://azion.com', '_blank')
-  }
+
+  const props = defineProps({
+    playgroundOpener: {
+      type: Function,
+      required: true
+    }
+  })
 </script>
 <template>
   <div class="flex w-full items-center flex-row">
@@ -16,13 +16,11 @@
         icon-pos="left"
         icon="pi pi-plus"
         label="Filter"
-        :badge="null"
+        :disabled="true"
       />
       <div class="p-inputgroup-addon justify-start flex grow p-2.5">
-        <p
-          class="text-[color:var(--global-text-secondary-color,#666)] text-sm not-italic font-normal leading-[normal]"
-        >
-          Enter property name
+        <p class="text-secondary text-sm not-italic font-normal leading-[normal]">
+          !!!Under development!!!
         </p>
       </div>
     </div>
@@ -30,7 +28,7 @@
       <PrimeButton
         class="h-8"
         label="Search"
-        :disabled="!value2?.trim().length"
+        :disabled="true"
       />
     </div>
     <PrimeButton
@@ -39,7 +37,8 @@
       icon-pos="right"
       icon="pi pi-external-link"
       label="Open in GraphQL Playground"
-      @click="OpenGraphQLPlayground"
+      @click="props.playgroundOpener()"
+      :disabled="true"
     />
   </div>
 </template>
