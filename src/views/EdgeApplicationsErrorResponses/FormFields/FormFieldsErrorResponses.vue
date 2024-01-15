@@ -114,7 +114,7 @@
       name: '505: HTTP Version Not Supported'
     }
   ]
-  const showErrorResponsesInputs =  computed(() => errorResponses.value.length > 0)
+  const showErrorResponsesInputs = computed(() => errorResponses.value.length > 0)
   const { value: originId } = useField('originId')
   const {
     push: pushErrorResponse,
@@ -145,7 +145,6 @@
 </script>
 
 <template>
-  {{ showErrorResponsesInputs }}
   <FormHorizontal
     title="Error Responses List"
     description="Time to cache error responses before retry request to your origin."

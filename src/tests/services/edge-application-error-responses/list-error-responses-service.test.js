@@ -14,7 +14,8 @@ const fixtures = {
         custom_status_code: '503'
       }
     ]
-  }
+  },
+  parsedCode: '500'
 }
 
 const makeSut = () => {
@@ -35,11 +36,10 @@ describe('EdgeApplicationErrorResponsesServices', () => {
     const edgeApplicationId = 123
 
     const { sut } = makeSut()
-    const version = 'v4'
     await sut({ edgeApplicationId: edgeApplicationId })
 
     expect(requestSpy).toHaveBeenCalledWith({
-      url: `${version}/edge/applications/${edgeApplicationId}/error_responses`,
+      url: `v4/edge/applications/${edgeApplicationId}/error_responses`,
       method: 'GET'
     })
   })
@@ -56,16 +56,16 @@ describe('EdgeApplicationErrorResponsesServices', () => {
 
     const { sut } = makeSut()
     const result = await sut({ edgeApplicationId: edgeApplicationId })
-
+    const [ errorResponse ] = fixtures.errorResponseSample.error_responses
     expect(result).toEqual({
       id: fixtures.errorResponseSample.id,
       originId: fixtures.errorResponseSample.origin_id,
       errorResponses: [
         {
-          code: fixtures.errorResponseSample.error_responses[0].code.toString(),
-          customStatusCode: fixtures.errorResponseSample.error_responses[0].custom_status_code,
-          timeout: fixtures.errorResponseSample.error_responses[0].timeout,
-          uri: fixtures.errorResponseSample.error_responses[0].uri
+          code: fixtures.parsedCode,
+          customStatusCode: errorResponse.custom_status_code,
+          timeout: errorResponse.timeout,
+          uri: errorResponse.uri
         }
       ]
     })

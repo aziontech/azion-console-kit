@@ -4,9 +4,9 @@ import * as Errors from '@/services/axios/errors'
 
 export const editErrorResponsesService = async (payload) => {
   let httpResponse = await AxiosHttpClientAdapter.request({
-    url: `${makeEdgeApplicationErrorResponsesBaseUrl()}/${payload.edgeApplicationId}/error_responses/${
-      payload.id
-    }`,
+    url: `${makeEdgeApplicationErrorResponsesBaseUrl()}/${
+      payload.edgeApplicationId
+    }/error_responses/${payload.id}`,
     method: 'PATCH',
     body: adapt(payload)
   })
@@ -36,15 +36,17 @@ const adapt = (payload) => {
  */
 const extractApiError = (httpResponse) => {
   let parsedError
-  httpResponse.body.error_responses?.forEach((error)=> {
-    if(Object.keys(error).length > 0) {
-      const errorKey = Object.keys(error)[0]
-      parsedError = `${errorKey}: ${error[errorKey][0]}`
-      return
-    }
-  });
-  if(httpResponse.body.code) {
-    parsedError = `code: ${httpResponse.body.code}`
+  if(Object.keys(httpResponse.body)[0] === 'error_responses') {
+    httpResponse.body.error_responses?.forEach((error) => {
+      if (Object.keys(error).length > 0) {
+        const errorKey = Object.keys(error)[0]
+        parsedError = `${errorKey}: ${error[errorKey][0]}`
+        return
+      }
+    })
+  } else {
+    const errorKey = Object.keys(httpResponse.body)[0]
+    parsedError = `${errorKey}: ${httpResponse.body[errorKey]}`
   }
   return parsedError
 }
