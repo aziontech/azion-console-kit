@@ -1,7 +1,7 @@
 const GROUP_DASHBOARDS = [
   {
     label: 'Build',
-    value: 'Build',
+    value: 'build',
     id: 1,
     pagesDashboards: [
       {
@@ -82,7 +82,7 @@ const GROUP_DASHBOARDS = [
   },
   {
     label: 'Secure',
-    value: 'Secure',
+    value: 'secure',
     id: 2,
     pagesDashboards: [
       {
@@ -117,7 +117,7 @@ const GROUP_DASHBOARDS = [
   },
   {
     label: 'Observe',
-    value: 'Observe',
+    value: 'observe',
     id: 3,
     pagesDashboards: [
       {
