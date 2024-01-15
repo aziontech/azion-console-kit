@@ -1,23 +1,19 @@
 <script setup>
-  import PageHeadingBlock from '@/templates/page-heading-block'
-  import TabView from 'primevue/tabview'
-  import TabPanel from 'primevue/tabpanel'
   import ContentBlock from '@/templates/content-block'
-  import { useRoute, useRouter } from 'vue-router'
-  import { ref } from 'vue'
+  import PageHeadingBlock from '@/templates/page-heading-block'
+  import EditView from '@/views/EdgeFirewall/EditView'
+  import TabPanel from 'primevue/tabpanel'
+  import TabView from 'primevue/tabview'
   import { useToast } from 'primevue/usetoast'
-  
-  import EdgeApplicationsRulesEngineListView from '@/views/EdgeApplicationsRulesEngine/ListView'
-  import EdgeApplicationsFunctionsListView from '@/views/EdgeApplicationsFunctions/ListView'
-  import EditView from './EditView.vue'
 
-  defineOptions({ name: 'tabs-edge-service' })
+  import { ref } from 'vue'
+  import { useRoute, useRouter } from 'vue-router'
+
+  defineOptions({ name: 'tabs-edge-firewall' })
 
   const props = defineProps({
     edgeFirewallServices: { type: Object, required: true },
-    listDomainsService: { type: Function, required: true },
-    rulesEngineServices: { type: Object, required: true },
-    functionsServices: { type: Object, required: true }
+    listDomainsService: { type: Function, required: true }
   })
 
   const mapTabs = {
@@ -30,24 +26,31 @@
   const route = useRoute()
   const router = useRouter()
   const activeTab = ref(0)
-  const edgeApplicationId = ref(route.params.id)
+  const edgeFirewallId = ref(route.params.id)
   const isEnableFunction = ref(false)
+  const responseEdgeFirewall = ref(false)
+  const title = ref('Name Rule Set')
 
-  // const loaderEdgeApplication = async () => {
-  //   try {
-  //     const { edgeFunctions, loadBalancer } =
-  //       await props.edgeApplicationServices.loadEdgeApplication({
-  //         id: edgeApplicationId.value
-  //       })
-  //     isEnableEdgeFunction.value = edgeFunctions
-  //   } catch (error) {
-  //     toast.add({
-  //       closable: true,
-  //       severity: 'error',
-  //       summary: error
-  //     })
-  //   }
-  // }
+  const loaderEdgeFirewall = async () => {
+    try {
+      if (responseEdgeFirewall.value) return responseEdgeFirewall.value
+
+      const response = await props.edgeFirewallServices.loadEdgeFirewallService({
+        id: edgeFirewallId.value
+      })
+
+      const { edgeFunctionsEnabled, name } = response
+      isEnableFunction.value = edgeFunctionsEnabled
+      title.value = name
+      responseEdgeFirewall.value = response
+    } catch (error) {
+      toast.add({
+        closable: true,
+        severity: 'error',
+        summary: error
+      })
+    }
+  }
 
   const getTabFromValue = (selectedTabIndex) => {
     const tabNames = Object.keys(mapTabs)
@@ -59,7 +62,7 @@
     const tab = getTabFromValue(event.index)
     activeTab.value = event.index
     const params = {
-      id: edgeApplicationId.value,
+      id: edgeFirewallId.value,
       tab
     }
     router.push({
@@ -69,7 +72,7 @@
   }
 
   const renderTabCurrentRouter = async () => {
-    // await loaderEdgeApplication()
+    await loaderEdgeFirewall()
     const { tab } = route.params
     const defaultTabIndex = 0
     const activeTabIndexByRoute = mapTabs[tab] || defaultTabIndex
@@ -82,41 +85,29 @@
 <template>
   <ContentBlock>
     <template #heading>
-      <PageHeadingBlock pageTitle="Name Rule Set" />
+      <PageHeadingBlock :pageTitle="title" />
     </template>
     <template #content>
       <TabView
         :activeIndex="activeTab"
         @tab-click="changeRouteByClickingOnTab"
         class="w-full h-full"
+        v-if="responseEdgeFirewall"
       >
         <TabPanel header="Main Settings">
-          <div class="mt-8">
-            <EditView
-              :editEdgeFirewallService="edgeFirewallServices.editEdgeApplication"
-              :loadEdgeEdgeFirewallService="edgeFirewallServices.loadEdgeApplication"
-              :updatedRedirect="edgeFirewallServices.updatedRedirect"
-              :showActionBar="activeTab === mapTabs.mainSettings"
-            />
-          </div>
+          <EditView
+            :editEdgeFirewallService="edgeFirewallServices.editEdgeFirewallService"
+            :loadEdgeFirewallService="loaderEdgeFirewall"
+            :loadDomains="props.listDomainsService"
+            :updatedRedirect="edgeFirewallServices.updatedRedirect"
+            :showActionBar="activeTab === mapTabs.mainSettings"
+          />
         </TabPanel>
         <TabPanel
           header="Functions"
-          v-if="isEnableEdgeFunction"
-        >
-          <EdgeApplicationsFunctionsListView
-            v-if="activeTab === mapTabs.functions"
-            v-bind="props.functionsServices"
-            :edgeApplicationId="edgeApplicationId"
-          />
-        </TabPanel>
-        <TabPanel header="Rules Engine">
-          <EdgeApplicationsRulesEngineListView
-            v-if="activeTab === mapTabs.rulesEngine"
-            :edgeApplicationId="edgeApplicationId"
-            v-bind="props.rulesEngineServices"
-          />
-        </TabPanel>
+          v-if="isEnableFunction"
+        ></TabPanel>
+        <TabPanel header="Rules Engine"></TabPanel>
       </TabView>
     </template>
   </ContentBlock>

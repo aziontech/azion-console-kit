@@ -1,41 +1,14 @@
-<template>
-  <ContentBlock>
-    <template #heading>
-      <PageHeadingBlock pageTitle="New Rule Set"></PageHeadingBlock>
-    </template>
-    <template #content>
-      <CreateFormBlock
-        :createService="props.createEdgeFirewallServices"
-        :schema="validationSchema"
-        :initialValues="initialValues"
-      >
-        <template #form>
-          <FormCreateEdgeFirewall :domainsService="props.listDomainsService" />
-        </template>
-        <template #action-bar="{ onSubmit, formValid, onCancel, loading }">
-          <ActionBarTemplate
-            @onSubmit="onSubmit"
-            @onCancel="onCancel"
-            :loading="loading"
-            :submitDisabled="!formValid"
-          />
-        </template>
-      </CreateFormBlock>
-    </template>
-  </ContentBlock>
-</template>
-
 <script setup>
-  import CreateFormBlock from '@/templates/create-form-block'
   import ActionBarTemplate from '@/templates/action-bar-block/action-bar-with-teleport'
   import ContentBlock from '@/templates/content-block'
+  import CreateFormBlock from '@/templates/create-form-block'
   import PageHeadingBlock from '@/templates/page-heading-block'
-  import FormCreateEdgeFirewall from './FormFields/FormFieldsEdgeFirewall'
   import * as yup from 'yup'
+  import FormCreateEdgeFirewall from './FormFields/FormFieldsEdgeFirewall'
   defineOptions({ name: 'create-edge-firewall' })
 
   const props = defineProps({
-    createEdgeFirewallServices: {
+    createEdgeFirewallService: {
       type: Function,
       required: true
     },
@@ -54,14 +27,40 @@
     wafEnabled: yup.boolean().label('WAF Enabled')
   })
 
-  
-
   const initialValues = {
     name: '',
-    domains: domainsaa,
+    domains: [],
     isActive: true,
+    debugRules: false,
     edgeFunctionsEnabled: false,
     networkProtectionEnabled: false,
     wafEnabled: false
   }
 </script>
+
+<template>
+  <ContentBlock>
+    <template #heading>
+      <PageHeadingBlock pageTitle="New Rule Set"></PageHeadingBlock>
+    </template>
+    <template #content>
+      <CreateFormBlock
+        :createService="props.createEdgeFirewallService"
+        :schema="validationSchema"
+        :initialValues="initialValues"
+      >
+        <template #form>
+          <FormCreateEdgeFirewall :domainsService="props.listDomainsService" />
+        </template>
+        <template #action-bar="{ onSubmit, formValid, onCancel, loading }">
+          <ActionBarTemplate
+            @onSubmit="onSubmit"
+            @onCancel="onCancel"
+            :loading="loading"
+            :submitDisabled="!formValid"
+          />
+        </template>
+      </CreateFormBlock>
+    </template>
+  </ContentBlock>
+</template>
