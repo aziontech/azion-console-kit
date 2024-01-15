@@ -45,12 +45,34 @@
   const edgeApplicationId = ref(route.params.id)
   const isEnableEdgeFunction = ref(false)
   const responseEdgeApplication = ref(false)
-  const title = ref('Edit Edge Application')
-  const showMainSettingsActionBar = computed(() => {
+  const title = ref('')
+
+  const showMainSettings = computed(() => {
     return activeTab.value === mapTabs.mainSettings
   })
-  const showErrorResponsesActionBar = computed(() => {
+
+  const showErrorResponses = computed(() => {
     return activeTab.value === mapTabs.errorResponses
+  })
+
+  const showFunctions = computed(() => {
+    return activeTab.value === mapTabs.functions
+  })
+
+  const showRulesEngine = computed(() => {
+    return activeTab.value === mapTabs.rulesEngine
+  })
+
+  const showCacheSettings = computed(() => {
+    return activeTab.value === mapTabs.cacheSettings
+  })
+
+  const showDeviceGroups = computed(() => {
+    return activeTab.value === mapTabs.deviceGroups
+  })
+
+  const showOrigins = computed(() => {
+    return activeTab.value === mapTabs.origins
   })
 
   const loaderEdgeApplication = async () => {
@@ -118,29 +140,27 @@
       >
         <TabPanel header="Main Settings">
           <EditView
-            v-if="showMainSettingsActionBar"
+            v-if="showMainSettings"
             :editEdgeApplicationService="edgeApplicationServices.editEdgeApplication"
             :loadEdgeApplicationService="loaderEdgeApplication"
             :updatedRedirect="edgeApplicationServices.updatedRedirect"
             :contactSalesEdgeApplicationService="
               edgeApplicationServices.contactSalesEdgeApplicationService
             "
-            :showActionBar="showMainSettingsActionBar"
           />
         </TabPanel>
         <TabPanel header="Origins">
           <EdgeApplicationsOriginsListView
-            v-if="activeTab === mapTabs.origins"
+            v-if="showOrigins"
             :edgeApplicationId="edgeApplicationId"
             :isLoadBalancer="isLoadBalancer"
             v-bind="props.originsServices"
             :clipboardWrite="props.clipboardWrite"
           />
         </TabPanel>
-
         <TabPanel header="Device Groups">
           <EdgeApplicationsDeviceGroupsListView
-            v-if="activeTab === mapTabs.deviceGroups"
+            v-if="showDeviceGroups"
             :edgeApplicationId="edgeApplicationId"
             v-bind="props.deviceGroupsServices"
             :clipboardWrite="props.clipboardWrite"
@@ -148,15 +168,15 @@
         </TabPanel>
         <TabPanel header="Error Responses">
           <EdgeApplicationsErrorResponseEditView
+            v-if="showErrorResponses"
             :edgeApplicationId="edgeApplicationId"
             :listOriginsService="props.originsServices.listOriginsService"
-            :showActionBar="showErrorResponsesActionBar"
             v-bind="props.errorResponsesServices"
           />
         </TabPanel>
         <TabPanel header="Cache Settings">
           <EdgeApplicationsCacheSettingsListView
-            v-if="activeTab === mapTabs.cacheSettings"
+            v-if="showCacheSettings"
             :edgeApplicationId="edgeApplicationId"
             v-bind="props.cacheSettingsServices"
           />
@@ -166,14 +186,14 @@
           v-if="isEnableEdgeFunction"
         >
           <EdgeApplicationsFunctionsListView
-            v-if="activeTab === mapTabs.functions"
+            v-if="showFunctions"
             v-bind="props.functionsServices"
             :edgeApplicationId="edgeApplicationId"
           />
         </TabPanel>
         <TabPanel header="Rules Engine">
           <EdgeApplicationsRulesEngineListView
-            v-if="activeTab === mapTabs.rulesEngine"
+            v-if="showRulesEngine"
             :edgeApplicationId="edgeApplicationId"
             v-bind="props.rulesEngineServices"
           />

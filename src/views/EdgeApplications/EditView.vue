@@ -14,7 +14,6 @@
     </template>
     <template #action-bar="{ onSubmit, formValid, onCancel, loading }">
       <ActionBarBlockWithTeleport
-        v-if="showActionBar"
         @onSubmit="onSubmit"
         @onCancel="onCancel"
         :loading="loading"
@@ -25,10 +24,10 @@
 </template>
 
 <script setup>
-  import * as yup from 'yup'
   import EditFormBlock from '@/templates/edit-form-block'
-  import FormFieldsCreateEdgeApplications from './FormFields/FormFieldsCreateEdgeApplications'
   import ActionBarBlockWithTeleport from '@templates/action-bar-block/action-bar-with-teleport'
+  import * as yup from 'yup'
+  import FormFieldsCreateEdgeApplications from './FormFields/FormFieldsCreateEdgeApplications'
 
   const props = defineProps({
     loadEdgeApplicationService: {
@@ -46,10 +45,6 @@
     contactSalesEdgeApplicationService: {
       type: Function,
       required: true
-    },
-    showActionBar: {
-      type: Boolean,
-      default: true
     }
   })
 
