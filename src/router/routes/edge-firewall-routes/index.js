@@ -1,6 +1,5 @@
 import * as Helpers from '@/helpers'
 import * as DomainServices from '@/services/domains-services'
-
 import * as EdgeFirewall from '@/services/edge-firewall-services'
 
 /** @type {import('vue-router').RouteRecordRaw} */
@@ -32,7 +31,7 @@ export const edgeFirewallRoutes = {
       component: () => import('@views/EdgeFirewall/CreateView.vue'),
       props: {
         listDomainsService: DomainServices.listDomainsService,
-        createEdgeFirewallServices: EdgeFirewall.createEdgeFirewallService
+        createEdgeFirewallService: EdgeFirewall.createEdgeFirewallService
       },
       meta: {
         breadCrumbs: [
@@ -48,19 +47,18 @@ export const edgeFirewallRoutes = {
       }
     },
     {
-      path: 'edit/:id/:resources?',
+      path: 'edit/:id/:tab?',
       name: 'edit-edge-firewall',
       component: () => import('@/views/EdgeFirewall/TabsView.vue'),
       props: {
-        // loadEdgeService: EdgeServiceServices.loadEdgeServiceServices,
-        // editEdgeService: EdgeServiceServices.editEdgeServiceServices,
-        // listResourcesServices: EdgeServiceResourcesServices.listResourcesServices,
-        // deleteResourcesServices: EdgeServiceResourcesServices.deleteResourcesServices,
-        // editResourcesServices: EdgeServiceResourcesServices.editResourcesServices,
-        // createResourcesServices: EdgeServiceResourcesServices.createResourcesServices,
-        // loadResourcesServices: EdgeServiceResourcesServices.loadResourcesServices,
-        // documentationServiceResource: Helpers.documentationGuideProducts.edgeServicesResources,
-        // updatedRedirect: 'list-edge-services'
+        edgeFirewallServices: {
+          createEdgeFirewallService: EdgeFirewall.createEdgeFirewallService,
+          loadEdgeFirewallService: EdgeFirewall.loadEdgeFirewallService,
+          editEdgeFirewallService: EdgeFirewall.editEdgeFirewallService,
+          documentationService: Helpers.documentationCatalog.edgeFirewall,
+          updatedRedirect: 'list-edge-firewall'
+        },
+        listDomainsService: DomainServices.listDomainsService
       },
       meta: {
         breadCrumbs: [
