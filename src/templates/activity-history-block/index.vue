@@ -103,12 +103,14 @@
   const iconsMap = ref({
     created: 'pi pi-plus-circle text-xs',
     deleted: 'pi pi-trash text-xs',
-    changed: 'pi pi-pencil text-xs'
+    changed: 'pi pi-pencil text-xs',
+    edited: 'pi pi-pencil text-xs'
   })
   const severityByType = ref({
     created: 'success',
     deleted: 'danger',
-    changed: 'info'
+    changed: 'info',
+    edited: 'info'
   })
 
   const props = defineProps({
