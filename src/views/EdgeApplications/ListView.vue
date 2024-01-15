@@ -88,7 +88,7 @@
         :deleteService="props.deleteEdgeApplicationService"
         :columns="getColumns"
         @on-load-data="handleLoadData"
-        emptyResultsMessage="No Edge Application found."
+        emptyListMessage="No Edge Application found."
       />
       <EmptyResultsBlock
         v-else

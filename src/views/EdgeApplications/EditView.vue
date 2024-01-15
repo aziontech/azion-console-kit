@@ -4,6 +4,7 @@
     :loadService="props.loadEdgeApplicationService"
     :updatedRedirect="props.updatedRedirect"
     :schema="validationSchema"
+    :isTabs="true"
   >
     <template #form>
       <FormFieldsCreateEdgeApplications

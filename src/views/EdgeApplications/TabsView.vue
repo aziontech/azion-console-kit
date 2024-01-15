@@ -1,16 +1,16 @@
 <script setup>
-  import PageHeadingBlock from '@/templates/page-heading-block'
-  import TabView from 'primevue/tabview'
-  import TabPanel from 'primevue/tabpanel'
   import ContentBlock from '@/templates/content-block'
-  import { useRoute, useRouter } from 'vue-router'
-  import { ref } from 'vue'
-  import { useToast } from 'primevue/usetoast'
+  import PageHeadingBlock from '@/templates/page-heading-block'
+  import EdgeApplicationsCacheSettingsListView from '@/views/EdgeApplicationsCacheSettings/ListView'
+  import EdgeApplicationsDeviceGroupsListView from '@/views/EdgeApplicationsDeviceGroups/ListView.vue'
+  import EdgeApplicationsFunctionsListView from '@/views/EdgeApplicationsFunctions/ListView'
   import EdgeApplicationsOriginsListView from '@/views/EdgeApplicationsOrigins/ListView'
   import EdgeApplicationsRulesEngineListView from '@/views/EdgeApplicationsRulesEngine/ListView'
-  import EdgeApplicationsCacheSettingsListView from '@/views/EdgeApplicationsCacheSettings/ListView'
-  import EdgeApplicationsFunctionsListView from '@/views/EdgeApplicationsFunctions/ListView'
-  import EdgeApplicationsDeviceGroupsListView from '@/views/EdgeApplicationsDeviceGroups/ListView.vue'
+  import TabPanel from 'primevue/tabpanel'
+  import TabView from 'primevue/tabview'
+  import { useToast } from 'primevue/usetoast'
+  import { ref } from 'vue'
+  import { useRoute, useRouter } from 'vue-router'
   import EditView from './EditView.vue'
 
   defineOptions({ name: 'tabs-edge-service' })
@@ -42,15 +42,21 @@
   const isLoadBalancer = ref(false)
   const edgeApplicationId = ref(route.params.id)
   const isEnableEdgeFunction = ref(false)
+  const responseEdgeApplication = ref(false)
+  const title = ref('Edit Edge Application')
 
   const loaderEdgeApplication = async () => {
     try {
-      const { edgeFunctions, loadBalancer } =
-        await props.edgeApplicationServices.loadEdgeApplication({
-          id: edgeApplicationId.value
-        })
+      if (responseEdgeApplication.value) return responseEdgeApplication.value
+
+      const response = await props.edgeApplicationServices.loadEdgeApplication({
+        id: edgeApplicationId.value
+      })
+      const { edgeFunctions, loadBalancer, name } = response
+      title.value = name
       isLoadBalancer.value = loadBalancer
       isEnableEdgeFunction.value = edgeFunctions
+      responseEdgeApplication.value = response
     } catch (error) {
       toast.add({
         closable: true,
@@ -93,26 +99,26 @@
 <template>
   <ContentBlock>
     <template #heading>
-      <PageHeadingBlock pageTitle="Edit Edge Application" />
+      <PageHeadingBlock :pageTitle="title" />
     </template>
     <template #content>
       <TabView
         :activeIndex="activeTab"
         @tab-click="changeRouteByClickingOnTab"
         class="w-full h-full"
+        v-if="responseEdgeApplication"
       >
         <TabPanel header="Main Settings">
-          <div class="mt-8">
-            <EditView
-              :editEdgeApplicationService="edgeApplicationServices.editEdgeApplication"
-              :loadEdgeApplicationService="edgeApplicationServices.loadEdgeApplication"
-              :updatedRedirect="edgeApplicationServices.updatedRedirect"
-              :contactSalesEdgeApplicationService="
-                edgeApplicationServices.contactSalesEdgeApplicationService
-              "
-              :showActionBar="activeTab === mapTabs.mainSettings"
-            />
-          </div>
+          <EditView
+            v-if="activeTab === mapTabs.mainSettings"
+            :editEdgeApplicationService="edgeApplicationServices.editEdgeApplication"
+            :loadEdgeApplicationService="loaderEdgeApplication"
+            :updatedRedirect="edgeApplicationServices.updatedRedirect"
+            :contactSalesEdgeApplicationService="
+              edgeApplicationServices.contactSalesEdgeApplicationService
+            "
+            :showActionBar="activeTab === mapTabs.mainSettings"
+          />
         </TabPanel>
         <TabPanel header="Origins">
           <EdgeApplicationsOriginsListView
