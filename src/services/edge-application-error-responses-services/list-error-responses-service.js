@@ -22,7 +22,9 @@ const adapt = (httpResponse) => {
         code: element.code.toString(),
         timeout: element.timeout,
         uri: element.uri,
-        customStatusCode: element.custom_status_code? Number(element.custom_status_code): element.custom_status_code,
+        customStatusCode: element.custom_status_code
+          ? Number(element.custom_status_code)
+          : element.custom_status_code
       }
     })
   }
