@@ -17,7 +17,7 @@
   const { value: path } = useField('path')
   const { value: reason } = useField('reason')
   const { value: status } = useField('status')
-  //   const { value: useRegex } = useField('useRegex')
+  const { value: useRegex } = useField('useRegex')
   const { value: ruleId } = useField('ruleId')
 
   const matchZonesOptions = ref([
@@ -91,6 +91,7 @@
           optionLabel="name"
           optionValue="value"
           class="w-full"
+          :disabled="true"
         />
       </div>
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
@@ -117,7 +118,7 @@ File Name (Multipart Body) to put the unparsed (raw) request body into the Allow
     <template #inputs>
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
         <FieldText
-          label="Path"
+          label="Path *"
           name="path"
           :value="path"
           description="Path is only used to restrict the scope of a matchzone. Leave it in blank if you do not want to restrict matchzone scope."
@@ -265,6 +266,26 @@ File Name (Multipart Body) to put the unparsed (raw) request body into the Allow
         class="sm:w-1/3"
         @click="addMatchZones"
       />
+    </template>
+  </FormHorizontal>
+  <FormHorizontal
+    title="Regex"
+    :isDrawer="true"
+  >
+    <template #inputs>
+      <div class="flex gap-2 items-top">
+        <InputSwitch
+          id="regex"
+          class="flex-shrink-0 flex-grow"
+          v-model="useRegex"
+        />
+        <div class="flex flex-col gap-1">
+          <label class="text-sm font-normal leading-tight" for="regex">Active </label>
+          <small class="text-color-secondary text-sm font-normal leading-tight">
+            Check this option to treat conditional fields as regular expressions in all Match Zone Set. Otherwise, conditional fields should be treated as strings.
+          </small>
+        </div>
+      </div>
     </template>
   </FormHorizontal>
   <FormHorizontal

@@ -184,7 +184,7 @@
     matchZones: [{ matches_on: 'value', zone: 'path', zone_input: null }],
     path: '',
     reason: '',
-    ruleId: '',
+    ruleId: 0,
     status: false,
     useRegex: false
   }

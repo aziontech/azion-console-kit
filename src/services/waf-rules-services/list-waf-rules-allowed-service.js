@@ -52,9 +52,9 @@ const parseMatchZone = (waf) => {
     value = zones[matchZone.zone]
     if (matchZone.zone_input) {
       if (matchZone.matches_on === 'value')
-        value = replaceString(value, `:${matchZone.zone_input} :${matchZone.zone_input} (Value)`)
+        value = replaceString(value, `: ${matchZone.zone_input} (Value)`)
       if (matchZone.matches_on === 'name')
-        value = replaceString(value, `:${matchZone.zone_input} :${matchZone.zone_input} (Name)`)
+        value = replaceString(value, `: ${matchZone.zone_input} (Name)`)
     } else if (matchZone.matches_on) {
       if (matchZone.matches_on === 'value') value = replaceString(value, ' (Value)')
       if (matchZone.matches_on === 'name') value = replaceString(value, ' (Name)')
@@ -89,7 +89,7 @@ const adapt = (httpResponse) => {
           zoneInput: waf.zone_input,
           path: waf.path,
           reason: waf.reason,
-          ruleId: waf.rule_id,
+          ruleId: waf.rule_id === 0 ? '0 - All Rules' : waf.rule_id,
           status: parseStatusData(waf.status),
           useRegex: waf.use_regex
         }
