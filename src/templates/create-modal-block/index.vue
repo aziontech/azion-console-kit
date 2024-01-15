@@ -1,3 +1,162 @@
+<script setup>
+  import PrimeButton from 'primevue/button'
+  import * as MarketplaceService from '@/services/marketplace-services'
+  import LoadingListTemplate from './LoadingListTemplate'
+  import Listbox from 'primevue/listbox'
+  import { computed, onBeforeMount, ref } from 'vue'
+  import { useRouter } from 'vue-router'
+  import { useToast } from 'primevue/usetoast'
+  defineOptions({
+    name: 'create-modal-block'
+  })
+
+  const emit = defineEmits('closeModal')
+
+  onBeforeMount(async () => {
+    await loadRecommendedSolutions()
+  })
+
+  const router = useRouter()
+  const toast = useToast()
+
+  const isLoading = ref(false)
+  const templates = ref([])
+  const browseTemplates = ref([])
+  const selectedTabControl = ref('recommended')
+  const selectedTab = ref('recommended')
+  const browseHeader = ref('browse-templates')
+  const recommendedHeader = ref('recommended-for-you')
+  const items = ref([
+    {
+      label: 'Recommended',
+      value: 'recommended'
+    },
+    {
+      label: 'Templates',
+      value: 'browse'
+    },
+    {
+      label: 'Resources',
+      value: 'new_resource'
+    }
+  ])
+  const resources = ref([
+    {
+      label: 'Domains',
+      to: '/domains/create'
+    },
+    {
+      label: 'Edge Application',
+      to: '/edge-applications/create'
+    },
+    {
+      label: 'Variables',
+      to: '/variables/create'
+    },
+    {
+      label: 'Intelligent DNS',
+      to: '/intelligent-dns/create'
+    },
+    {
+      label: 'Edge Firewall',
+      to: '/edge-firewall/create'
+    },
+    {
+      label: 'Edge Nodes',
+      to: '/edge-node/create'
+    },
+    {
+      label: 'Data Streaming',
+      to: '/data-streaming/create'
+    },
+    {
+      label: 'Edge Functions',
+      to: '/edge-functions/create'
+    },
+    {
+      label: 'Edge Services',
+      to: '/edge-services/create'
+    },
+    {
+      label: 'Digital Certificates',
+      to: '/digital-certificates/create'
+    },
+    {
+      label: 'Network Lists',
+      to: '/network-lists/create'
+    }
+  ])
+
+  const showRecommended = computed(() => {
+    return selectedTab.value === 'recommended'
+  })
+  const showBrowse = computed(() => {
+    return selectedTab.value === 'browse'
+  })
+  const showResource = computed(() => {
+    return selectedTab.value === 'new_resource'
+  })
+
+  const redirectToSolution = (template) => {
+    const params = {
+      vendor: template.vendor.slug,
+      solution: template.slug
+    }
+    router.push({ name: 'create-something-new', params })
+    emit('closeModal')
+  }
+
+  const redirect = (toLink) => {
+    router.push(toLink)
+    emit('closeModal')
+  }
+
+  const loadRecommendedSolutions = async () => {
+    try {
+      isLoading.value = true
+      const payload = { type: recommendedHeader.value }
+      templates.value = await MarketplaceService.listSolutionsService(payload)
+    } catch (error) {
+      toast.add({
+        closable: true,
+        severity: 'error',
+        summary: error
+      })
+    } finally {
+      isLoading.value = false
+    }
+  }
+
+  const loadBrowse = async () => {
+    try {
+      isLoading.value = true
+      const payload = { type: browseHeader.value }
+      browseTemplates.value = await MarketplaceService.listSolutionsService(payload)
+    } catch (error) {
+      toast.add({
+        closable: true,
+        severity: 'error',
+        summary: error
+      })
+    } finally {
+      isLoading.value = false
+    }
+  }
+
+  const onMenuChange = async (target) => {
+    if (target.value === null) {
+      selectedTabControl.value = selectedTab.value
+    } else {
+      selectedTab.value = target.value
+    }
+    if (target.value === 'browse') {
+      if (browseTemplates.value.length === 0) {
+        await loadBrowse()
+      }
+    }
+  }
+</script>
+
 <template>
   <div class="overflow-auto w-full h-full flex flex-col sm:flex-row p-0 sm:pl-5 sm:pr-8 gap-4 pb-4">
     <div class="sm:min-w-[240px] mt-4">
@@ -134,161 +293,3 @@
     </div>
   </div>
 </template>
-<script>
-  import PrimeButton from 'primevue/button'
-  import * as MarketplaceService from '@/services/marketplace-services'
-  import LoadingListTemplate from './LoadingListTemplate'
-  import Listbox from 'primevue/listbox'
-
-  export default {
-    name: 'create-modal-block',
-    components: {
-      PrimeButton,
-      Listbox,
-      LoadingListTemplate
-    },
-    async created() {
-      await this.loadData()
-    },
-    data: () => ({
-      isLoading: false,
-      templates: [],
-      browseTemplates: [],
-      selectedTabControl: 'recommended',
-      selectedTab: 'recommended',
-      browHeader: 'browse-templates',
-      recommendedHeader: 'recommended-for-you',
-      resources: [
-        {
-          label: 'Domains',
-          to: '/domains/create'
-        },
-        {
-          label: 'Edge Application',
-          to: '/edge-applications/create'
-        },
-        {
-          label: 'Variables',
-          to: '/variables/create'
-        },
-        {
-          label: 'Intelligent DNS',
-          to: '/intelligent-dns/create'
-        },
-        {
-          label: 'Edge Firewall',
-          to: '/edge-firewall/create'
-        },
-        {
-          label: 'Edge Nodes',
-          to: '/edge-node/create'
-        },
-        {
-          label: 'Data Streaming',
-          to: '/data-streaming/create'
-        },
-        {
-          label: 'Edge Functions',
-          to: '/edge-functions/create'
-        },
-        {
-          label: 'Edge Services',
-          to: '/edge-services/create'
-        },
-        {
-          label: 'Digital Certificates',
-          to: '/digital-certificates/create'
-        },
-        {
-          label: 'Network Lists',
-          to: '/network-lists/create'
-        }
-      ]
-    }),
-    computed: {
-      showRecommended() {
-        return this.selectedTab === 'recommended'
-      },
-      showBrowse() {
-        return this.selectedTab === 'browse'
-      },
-      showResource() {
-        return this.selectedTab === 'new_resource'
-      },
-      items() {
-        return [
-          {
-            label: 'Recommended',
-            value: 'recommended'
-          },
-          {
-            label: 'Templates',
-            value: 'browse'
-          },
-          {
-            label: 'Resources',
-            value: 'new_resource'
-          }
-        ]
-      }
-    },
-    methods: {
-      redirectToSolution(template) {
-        this.showSidebar = false
-        const params = {
-          vendor: template.vendor.slug,
-          solution: template.slug
-        }
-        this.$router.push({ name: 'create-something-new', params })
-        this.$emit('closeModal')
-      },
-      onMenuChange(target) {
-        if (target.value === null) {
-          this.selectedTabControl = this.selectedTab
-        } else {
-          this.selectedTab = target.value
-        }
-        if (target.value === 'browse') {
-          if (this.browseTemplates.length === 0) {
-            this.loadBrowse()
-          }
-        }
-      },
-
-      redirect(toLink) {
-        this.$router.push(toLink)
-        this.$emit('closeModal')
-      },
-      async loadData() {
-        try {
-          this.isLoading = true
-          const payload = { type: this.recommendedHeader }
-          this.templates = await MarketplaceService.listSolutionsService(payload)
-        } catch (error) {
-          this.$toast.add({
-            closable: true,
-            severity: 'error',
-            summary: error
-          })
-        } finally {
-          this.isLoading = false
-        }
-      },
-      async loadBrowse() {
-        try {
-          this.isLoading = true
-          const payload = { type: this.browseHeader }
-          this.browseTemplates = await MarketplaceService.listSolutionsService(payload)
-        } catch (error) {
-          this.$toast.add({
-            closable: true,
-            severity: 'error',
-            summary: error
-          })
-        } finally {
-          this.isLoading = false
-        }
-      }
-    }
-  }
-</script>
