@@ -1,6 +1,6 @@
 import { AxiosHttpClientAdapter } from '@/services/axios/AxiosHttpClientAdapter'
 import { listFunctionsService } from '@/services/edge-application-functions-services'
-import { describe, expect, it, vi, beforeEach } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 
 // Constantes para reutilização
 const API_VERSION = 'v3'
@@ -28,12 +28,10 @@ const makeSut = () => {
   return { sut }
 }
 
-beforeEach(() => {
-  vi.restoreAllMocks()
-})
-
 describe('EdgeApplicationFunctionsServices', () => {
-  it('should call API with default pagination and order when listing function instances', async () => {
+   vi.restoreAllMocks()
+
+  it('should call API with correct params', async () => {
     const requestSpy = vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
       statusCode: 200,
       body: { results: [] }

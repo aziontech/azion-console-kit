@@ -16,7 +16,7 @@ const makeSut = () => {
 }
 
 describe('EdgeApplicationFunctionsServices', () => {
-  it('should return the API base url to data streaming service', async () => {
+  it('should call API with correct params', async () => {
     const requestSpy = vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
       statusCode: 204
     })

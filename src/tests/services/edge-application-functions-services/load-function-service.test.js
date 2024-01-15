@@ -1,6 +1,6 @@
 import { AxiosHttpClientAdapter } from '@/services/axios/AxiosHttpClientAdapter'
 import { loadFunctionService } from '@/services/edge-application-functions-services/loader-function-service'
-import { describe, expect, it, vi, beforeEach } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 
 // Constantes para reutilização
 const EDGE_APPLICATION_ID = '123'
@@ -20,11 +20,9 @@ const makeSut = () => {
   return { sut }
 }
 
-beforeEach(() => {
-  vi.restoreAllMocks()
-})
-
 describe('LoaderFunctionService', () => {
+  vi.restoreAllMocks()
+
   it('should call API with correct URL when loading a function instance', async () => {
     const requestSpy = vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
       statusCode: 200,

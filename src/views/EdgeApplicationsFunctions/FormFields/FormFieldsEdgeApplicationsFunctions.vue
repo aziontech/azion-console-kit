@@ -1,5 +1,5 @@
 <script setup>
-  import InputText from 'primevue/inputtext'
+  import FieldText from '@/templates/form-fields-inputs/fieldText'
   import Dropdown from 'primevue/dropdown'
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
   import { useField } from 'vee-validate'
@@ -40,7 +40,7 @@
   >
     <template #inputs>
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
-        <InputText
+        <FieldText
           label="Name *"
           name="name"
           v-model="name"
