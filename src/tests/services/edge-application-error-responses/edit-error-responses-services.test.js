@@ -34,20 +34,20 @@ describe('EdgeApplicationErrorResponsesServices', () => {
     })
 
     const { sut } = makeSut()
-    const version = 'v4'
 
     await sut(fixtures.errorResponsePayload)
+    const errorResponse = fixtures.errorResponsePayload.errorResponses[0]
 
     expect(requestSpy).toHaveBeenCalledWith({
-      url: `${version}/edge/applications/${fixtures.errorResponsePayload.edgeApplicationId}/error_responses/${fixtures.errorResponsePayload.id}`,
+      url: `v4/edge/applications/${fixtures.errorResponsePayload.edgeApplicationId}/error_responses/${fixtures.errorResponsePayload.id}`,
       method: 'PATCH',
       body: {
         error_responses: [
           {
-            code: fixtures.errorResponsePayload.errorResponses[0].code,
-            custom_status_code: fixtures.errorResponsePayload.errorResponses[0].customStatusCode,
-            timeout: fixtures.errorResponsePayload.errorResponses[0].timeout,
-            uri: fixtures.errorResponsePayload.errorResponses[0].uri
+            code: errorResponse.code,
+            custom_status_code: errorResponse.customStatusCode,
+            timeout: errorResponse.timeout,
+            uri: errorResponse.uri
           }
         ],
         origin_id: fixtures.errorResponsePayload.originId
@@ -66,13 +66,17 @@ describe('EdgeApplicationErrorResponsesServices', () => {
     expect(feedbackMessage).toBe('Your Error Responses has been edited')
   })
 
-  it('Should return an API array error to an invalid error response', async () => {
-    const apiErrorMock = 'name should not be empty'
+  it('Should return an API error array to an invalid error response', async () => {
+    const apiErrorMock = 'uri: should not be empty'
 
     vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
       statusCode: 400,
       body: {
-        errors: [apiErrorMock]
+        error_responses: [
+          {
+            uri: ['should not be empty']
+          }
+        ]
       }
     })
     const { sut } = makeSut()
@@ -81,13 +85,13 @@ describe('EdgeApplicationErrorResponsesServices', () => {
 
     expect(feedbackMessage).rejects.toThrow(apiErrorMock)
   })
-  it('Should return an API error to an invalid error response', async () => {
-    const apiErrorMock = 'name should not be empty'
+  it('Should return an API error to invalid payloads', async () => {
+    const apiErrorMock = 'code: You cant use duplicated values for status code'
 
     vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
       statusCode: 400,
       body: {
-        errors: apiErrorMock
+        code: ['You cant use duplicated values for status code']
       }
     })
     const { sut } = makeSut()

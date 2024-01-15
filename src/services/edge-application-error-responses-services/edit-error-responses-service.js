@@ -1,12 +1,12 @@
 import { AxiosHttpClientAdapter } from '@/services/axios/AxiosHttpClientAdapter'
-import { makeEdgeApplicationV4BaseUrl } from './make-edge-application-v4-base-url'
+import { makeEdgeApplicationErrorResponsesBaseUrl } from './make-edge-application-error-responses-base-url'
 import * as Errors from '@/services/axios/errors'
 
 export const editErrorResponsesService = async (payload) => {
   let httpResponse = await AxiosHttpClientAdapter.request({
-    url: `${makeEdgeApplicationV4BaseUrl()}/${payload.edgeApplicationId}/error_responses/${
-      payload.id
-    }`,
+    url: `${makeEdgeApplicationErrorResponsesBaseUrl()}/${
+      payload.edgeApplicationId
+    }/error_responses/${payload.id}`,
     method: 'PATCH',
     body: adapt(payload)
   })
@@ -17,8 +17,8 @@ export const editErrorResponsesService = async (payload) => {
 const adapt = (payload) => {
   const errorResponses = payload.errorResponses.map((element) => {
     return {
-      custom_status_code: element?.customStatusCode,
-      uri: element?.uri,
+      custom_status_code: element.customStatusCode?.toString() || null,
+      uri: element.uri || null,
       timeout: element.timeout,
       code: element.code
     }
@@ -30,31 +30,25 @@ const adapt = (payload) => {
 }
 
 /**
- * @param {Object} errorSchema - The error schema.
- * @param {string} key - The error key of error schema.
- * @returns {string|undefined} The result message based on the status code.
- */
-const extractErrorKey = (errorSchema, key) => {
-  if (Array.isArray(errorSchema[key])) {
-    if (typeof errorSchema[key][0] === 'object') {
-      const newError = errorSchema[key][0]
-      const errorKey = Object.keys(errorSchema[key][0])
-      return newError[errorKey]?.[0]
-    }
-    return errorSchema[key]?.[0]
-  }
-  return errorSchema[key]
-}
-
-/**
  * @param {Object} httpResponse - The HTTP response object.
  * @param {Object} httpResponse.body - The response body.
  * @returns {string} The result message based on the status code.
  */
 const extractApiError = (httpResponse) => {
-  const errorKey = Object.keys(httpResponse.body)[0]
-  const apiError = extractErrorKey(httpResponse.body, errorKey)
-  return `${errorKey}: ${apiError}`
+  let parsedError
+  if (Object.keys(httpResponse.body)[0] === 'error_responses') {
+    httpResponse.body.error_responses?.forEach((error) => {
+      if (Object.keys(error).length > 0) {
+        const errorKey = Object.keys(error)[0]
+        parsedError = `${errorKey}: ${error[errorKey][0]}`
+        return
+      }
+    })
+  } else {
+    const errorKey = Object.keys(httpResponse.body)[0]
+    parsedError = `${errorKey}: ${httpResponse.body[errorKey]}`
+  }
+  return parsedError
 }
 
 /**

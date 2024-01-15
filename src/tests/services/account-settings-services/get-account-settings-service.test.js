@@ -58,7 +58,7 @@ describe('getAccountSettingsService', () => {
     await sut()
 
     expect(requestSpy).toHaveBeenCalledWith({
-      url: 'iam/account',
+      url: 'v4/iam/account',
       method: 'GET'
     })
   })

@@ -38,7 +38,6 @@
   import FormFieldsYourSettings from './FormFields/FormFieldsYourSettings.vue'
   import ActionBarBlockWithTeleport from '@templates/action-bar-block/action-bar-with-teleport'
   import * as yup from 'yup'
-  import { useAccountStore } from '@/stores/account'
   import { useToast } from 'primevue/usetoast'
 
   const toast = useToast()
@@ -65,9 +64,7 @@
   })
 
   const loadUser = async () => {
-    const { account } = useAccountStore()
-    const id = account.user_id
-    const userData = await props.loadUserService({ id })
+    const userData = await props.loadUserService()
 
     currentEmail.value = userData.email
 

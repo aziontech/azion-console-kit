@@ -5,7 +5,7 @@
   import InputNumber from 'primevue/inputnumber'
   import PrimeButton from 'primevue/button'
   import FieldText from '@/templates/form-fields-inputs/fieldText'
-  import { onMounted, ref } from 'vue'
+  import { onMounted, ref, computed } from 'vue'
   import InputText from 'primevue/inputtext'
   import { useField, useFieldArray } from 'vee-validate'
 
@@ -114,6 +114,7 @@
       name: '505: HTTP Version Not Supported'
     }
   ]
+  const showErrorResponsesInputs = computed(() => errorResponses.value.length > 0)
   const { value: originId } = useField('originId')
   const {
     push: pushErrorResponse,
@@ -129,7 +130,7 @@
   }
 
   const addErrorResponse = () => {
-    pushErrorResponse({ ...defaultErrorResponse })
+    pushErrorResponse(defaultErrorResponse)
   }
 
   const originOptions = ref([])
@@ -150,7 +151,7 @@
   >
     <template
       #inputs
-      v-if="errorResponses.length > 0"
+      v-if="showErrorResponsesInputs"
     >
       <Divider
         align="left"
@@ -179,6 +180,8 @@
             Error Caching TTL*
           </label>
           <InputNumber
+            :min="0"
+            :max="31536000"
             v-model="errorResponses[0].value.timeout"
             showButtons
           />
@@ -223,6 +226,8 @@
                 Error Caching TTL*
               </label>
               <InputNumber
+                :min="0"
+                :max="31536000"
                 v-model="errorResponse.value.timeout"
                 showButtons
               />
@@ -238,11 +243,17 @@
             />
           </div>
           <div class="flex flex-col sm:max-w-lg w-full gap-2">
-            <FieldText
-              label="Custom status code"
-              :name="`errorResponses[${index}].customStatusCode`"
-              :value="errorResponse.value.customStatusCode"
-              description="Customize the HTTP status that will be received by the user."
+            <label
+              for="maximun-ttl-seconds"
+              class="text-color text-base font-medium"
+            >
+              Custom status code
+            </label>
+            <InputNumber
+              :min="100"
+              :max="599"
+              v-model="errorResponse.value.customStatusCode"
+              showButtons
             />
           </div>
         </div>

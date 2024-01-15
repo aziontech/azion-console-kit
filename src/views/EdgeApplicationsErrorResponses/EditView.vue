@@ -63,7 +63,6 @@
         :listOriginsService="props.listOriginsService"
       />
     </template>
-    {{ formValid }}
     <template #action-bar="{ onSubmit, formValid, onCancel, loading }">
       <ActionBarBlockWithTeleport
         @onSubmit="onSubmit"
