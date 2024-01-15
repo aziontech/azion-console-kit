@@ -1,9 +1,7 @@
 import { AxiosHttpClientAdapter, parseHttpResponse } from '../axios/AxiosHttpClientAdapter'
 import { makeWafRulesAllowedBaseUrl } from './make-waf-rules-allowed-base-url'
 
-export const listWafRulesAllowedService = async ({ payload, id }) => {
-  // eslint-disable-next-line no-console
-  console.log(payload)
+export const listWafRulesAllowedService = async ({ id }) => {
   let httpResponse = await AxiosHttpClientAdapter.request({
     url: `${makeWafRulesAllowedBaseUrl()}/${id}/allowed_rules?page=1&page_size=100`,
     method: 'GET'
