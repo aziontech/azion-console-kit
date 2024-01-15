@@ -16,7 +16,7 @@
             <img
               class="rounded"
               :src="solution.vendor.icon"
-              alt=""
+              :alt="solution.vendor.name"
             />
           </div>
           <div class="flex flex-col">
