@@ -163,7 +163,6 @@
             :class="{ 'p-invalid': errorTimezone }"
             v-model="timezone"
           />
-          >
           <small class="text-xs text-color-secondary font-normal leading-tight">
             Timezone of the user.</small
           >
@@ -243,9 +242,7 @@
                 {{ option.label }}
               </template>
             </Dropdown>
-            <small class="text-xs text-color-secondary font-normal leading-tight">
-              The phone number of the user. Include country and region code.</small
-            >
+
             <InputMask
               date="phone"
               v-model="mobile"
@@ -256,6 +253,9 @@
             />
           </div>
         </div>
+        <small class="text-xs text-color-secondary font-normal leading-tight">
+          The phone number of the user. Include country and region code.</small
+        >
         <small
           id="name-help"
           class="p-error"
