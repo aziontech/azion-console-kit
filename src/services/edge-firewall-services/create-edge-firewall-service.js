@@ -1,5 +1,5 @@
-import { AxiosHttpClientAdapter } from '../axios/AxiosHttpClientAdapter'
 import * as Errors from '@/services/axios/errors'
+import { AxiosHttpClientAdapter } from '../axios/AxiosHttpClientAdapter'
 import { makeEdgeFirewallBaseUrl } from './make-edge-firewall-base-url'
 
 /**
@@ -9,13 +9,28 @@ import { makeEdgeFirewallBaseUrl } from './make-edge-firewall-base-url'
  * @throws {Error} If there is an error with the response.
  */
 export const createEdgeFirewallService = async (payload) => {
+  const newPayload = adapt(payload)
   let httpResponse = await AxiosHttpClientAdapter.request({
     url: `${makeEdgeFirewallBaseUrl()}`,
     method: 'POST',
-    body: payload
+    body: newPayload
   })
 
   return parseHttpResponse(httpResponse)
+}
+
+const adapt = (payload) => {
+  const domains = payload.domains?.map((domain) => domain.id)
+
+  return {
+    name: payload.name,
+    is_active: payload.isActive,
+    edge_functions_enabled: payload.edgeFunctionsEnabled,
+    network_protection_enabled: payload.networkProtectionEnabled,
+    waf_enabled: payload.wafEnabled,
+    debug_rules: payload.debugRules,
+    domains
+  }
 }
 
 /**
@@ -30,7 +45,7 @@ const parseHttpResponse = (httpResponse) => {
     case 201:
       return {
         feedback: 'Your Edge Firewall has been created',
-        urlToEditView: `/edge-firewall/edit/${httpResponse.body.id}`
+        urlToEditView: `/edge-firewall/edit/${httpResponse.body.results.id}`
       }
     case 400:
       throw new Errors.NotFoundError().message
