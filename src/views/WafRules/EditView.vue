@@ -80,13 +80,15 @@
           <CreateDrawerBlock
             v-if="showCreateWafRulesAllowedDrawer"
             v-model:visible="showCreateWafRulesAllowedDrawer"
-            :createService="props.createWafRulesAllowedService"
+            :createService="handleCreateWafRulesAllowedService"
             :schema="validationSchemaAllowed"
             :initialValues="initialValues"
             @onSuccess="reloadWafRulesAllowedList"
             title="Create New"
           >
-            <template #formFields> </template>
+            <template #formFields>
+              <FormFieldsAllowed></FormFieldsAllowed>
+            </template>
           </CreateDrawerBlock>
 
           <!-- <EditDrawerBlock
@@ -127,6 +129,8 @@
   import { useRoute, useRouter } from 'vue-router'
   import * as yup from 'yup'
   import FormFieldsWafRules from './FormFields/FormFieldsWafRules.vue'
+  import FormFieldsAllowed from './FormFields/FormFieldsAllowed.vue'
+
   const route = useRoute()
   const router = useRouter()
   const activeTab = ref(0)
@@ -161,21 +165,15 @@
 
   const validationSchemaAllowed = yup.object({
     matchZones: yup.array(),
-    matchesOn: yup.string(),
-    zone: yup.string(),
-    zoneInput: yup.string(),
-    path: yup.string(),
-    reason: yup.string(),
-    ruleId: yup.string(),
+    path: yup.string().required(),
+    reason: yup.string().required(),
+    ruleId: yup.string().required(),
     status: yup.boolean(),
     useRegex: yup.boolean()
   })
 
   const initialValues = {
-    matchZones: [],
-    matchesOn: '',
-    zone: '',
-    zoneInput: '',
+    matchZones: [{ matches_on: 'value', zone: 'path', zone_input: null }],
     path: '',
     reason: '',
     ruleId: '',
@@ -298,6 +296,10 @@
       wafId: wafRuleId.value,
       allowedId: id
     })
+  }
+
+  const handleCreateWafRulesAllowedService = async (payload) => {
+    return await props.createWafRulesAllowedService({ payload, id: wafRuleId.value })
   }
 
   const openEditDrawerWafRulesAllowed = (event) => {

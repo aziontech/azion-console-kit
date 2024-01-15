@@ -13,11 +13,16 @@ export const createWafRulesAllowedService = async ({ payload, id }) => {
 }
 
 const adapt = (payload) => {
+  
   return {
-    match_zones: payload.matchZones,
-    matches_on: payload.matchesOn,
-    zone: payload.zone,
-    zone_input: payload.zoneInput,
+    match_zones: payload.matchZones.map( (zone) => {
+      const zoneWithoutMatchoZone = ['path', 'file_name', 'raw_body']
+      if(zoneWithoutMatchoZone.includes(zone.zone)) {
+        zone.matches_on = null
+      }
+
+      return zone
+    }),
     path: payload.path,
     reason: payload.reason,
     rule_id: payload.ruleId,
@@ -61,7 +66,8 @@ const parseHttpResponse = (httpResponse) => {
  * @returns {string|undefined} The result message based on the status code.
  */
 const extractErrorKey = (errorSchema, key) => {
-  return errorSchema[key]?.[0]
+  const [keyError] = Object.keys(errorSchema[key]?.[0])
+  return errorSchema[key]?.[0][keyError][0]
 }
 
 /**
@@ -70,7 +76,8 @@ const extractErrorKey = (errorSchema, key) => {
  * @returns {string} The result message based on the status code.
  */
 const extractApiError = (httpResponse) => {
-  const errorMessage = extractErrorKey(httpResponse.body, 'detail')
+  const [firstKey] = Object.keys(httpResponse.body)
+  const errorMessage = extractErrorKey(httpResponse.body, firstKey)
 
   return errorMessage
 }

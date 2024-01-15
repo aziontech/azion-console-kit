@@ -6,9 +6,6 @@ import { describe, expect, it, vi } from 'vitest'
 const fixtures = {
   wafRulesMock: {
     matchZones: [],
-    matchesOn: '',
-    zone: '',
-    zoneInput: '',
     path: '',
     reason: '',
     ruleId: '',
@@ -71,7 +68,7 @@ describe('WafRulesServices', () => {
     vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
       statusCode: 400,
       body: {
-        [errorKey]: [apiErrorMock]
+        [errorKey]: [ { 'error': [apiErrorMock] } ]
       }
     })
     const { sut } = makeSut()
