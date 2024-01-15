@@ -15,7 +15,8 @@ const fixtures = {
       }
     ]
   },
-  parsedCode: '500'
+  parsedCode: '500',
+  parsedCustomCode: 503
 }
 
 const makeSut = () => {
@@ -56,14 +57,14 @@ describe('EdgeApplicationErrorResponsesServices', () => {
 
     const { sut } = makeSut()
     const result = await sut({ edgeApplicationId: edgeApplicationId })
-    const [ errorResponse ] = fixtures.errorResponseSample.error_responses
+    const [errorResponse] = fixtures.errorResponseSample.error_responses
     expect(result).toEqual({
       id: fixtures.errorResponseSample.id,
       originId: fixtures.errorResponseSample.origin_id,
       errorResponses: [
         {
           code: fixtures.parsedCode,
-          customStatusCode: errorResponse.custom_status_code,
+          customStatusCode: fixtures.parsedCustomCode,
           timeout: errorResponse.timeout,
           uri: errorResponse.uri
         }

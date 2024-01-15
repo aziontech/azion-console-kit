@@ -17,7 +17,7 @@ export const editErrorResponsesService = async (payload) => {
 const adapt = (payload) => {
   const errorResponses = payload.errorResponses.map((element) => {
     return {
-      custom_status_code: element.customStatusCode || null,
+      custom_status_code: element.customStatusCode?.toString() || null,
       uri: element.uri || null,
       timeout: element.timeout,
       code: element.code
@@ -36,7 +36,7 @@ const adapt = (payload) => {
  */
 const extractApiError = (httpResponse) => {
   let parsedError
-  if(Object.keys(httpResponse.body)[0] === 'error_responses') {
+  if (Object.keys(httpResponse.body)[0] === 'error_responses') {
     httpResponse.body.error_responses?.forEach((error) => {
       if (Object.keys(error).length > 0) {
         const errorKey = Object.keys(error)[0]
