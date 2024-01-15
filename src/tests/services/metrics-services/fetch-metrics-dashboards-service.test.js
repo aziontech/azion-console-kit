@@ -42,7 +42,6 @@ const fixtures = {
     {
       id: 357549422933967445n,
       label: 'Requests',
-      url: 'requests',
       dataset: 'imagesProcessedMetrics'
     }
   ],
@@ -50,7 +49,6 @@ const fixtures = {
     {
       id: 357548675837198933n,
       label: 'Threats',
-      url: 'threats',
       dataset: 'httpMetrics'
     }
   ],
