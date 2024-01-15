@@ -83,7 +83,7 @@ describe('EdgeFirewallService', () => {
       expectedError: 'name is required'
     }
   ])(
-    'should throw an error if the API returns a $key in status code 400',
+    'should throw an error if the API returns a $error in status code 400',
     async ({ error, key, expectedError }) => {
       vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
         statusCode: 400,

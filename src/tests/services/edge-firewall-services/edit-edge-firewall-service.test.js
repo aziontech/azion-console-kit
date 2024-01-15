@@ -58,20 +58,41 @@ describe('EdgeFirewallServices', () => {
     expect(feedbackMessage).toBe('Your edge firewall has been updated')
   })
 
-  it('Should return an API error to an invalid edge service name', async () => {
-    const apiErrorMock = 'name should not be empty'
-    vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
-      statusCode: 400,
-      body: {
-        errors: [apiErrorMock]
-      }
-    })
-    const { sut } = makeSut()
+  it.each([
+    {
+      error: 'duplicated_edge_firewall_name',
+      key: 'results',
+      expectedError: 'Edge Firewall cannot be created because it already exists'
+    },
+    {
+      error: 'no_modules_enabled',
+      key: 'results',
+      expectedError: 'Edge Firewall cannot be created because no modules are enabled'
+    },
+    {
+      error: 'unmappedError',
+      key: 'results',
+      expectedError: new Errors.UnexpectedError().message
+    },
+    {
+      error: 'name is required',
+      key: 'name',
+      expectedError: 'name is required'
+    }
+  ])(
+    'should throw an error if the API returns a $error in status code 400',
+    async ({ error, key, expectedError }) => {
+      vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
+        statusCode: 400,
+        body: { [key]: [error] }
+      })
 
-    const feedbackMessage = sut(fixtures.mock)
+      const { sut } = makeSut()
+      const feedbackMessage = sut(fixtures.mock)
 
-    expect(feedbackMessage).rejects.toThrow(apiErrorMock)
-  })
+      expect(feedbackMessage).rejects.toThrow(expectedError)
+    }
+  )
 
   it.each([
     {

@@ -28,15 +28,28 @@ const adapt = (payload) => {
   }
 }
 
+const mapErrorToMessage = (error) => {
+  switch (error) {
+    case 'duplicated_edge_firewall_name':
+      return 'Edge Firewall cannot be created because it already exists'
+    case 'no_modules_enabled':
+      return 'Edge Firewall cannot be created because no modules are enabled'
+    default:
+      return new Errors.UnexpectedError().message
+  }
+}
+
 /**
  * @param {Object} httpResponse - The HTTP response object.
- * @param {Object} httpResponse.body - The response body.
+ * @param {Array} httpResponse.body - The response body.
  * @returns {string} The result message based on the status code.
  */
 const extractApiError = (httpResponse) => {
   const apiKeyError = Object.keys(httpResponse.body)[0]
-  const apiValidationError = `${httpResponse.body[apiKeyError][0]}`
-  return apiValidationError
+  if (apiKeyError === 'results') {
+    return mapErrorToMessage(httpResponse.body[apiKeyError][0])
+  }
+  return `${httpResponse.body[apiKeyError]}`
 }
 
 /**
@@ -52,7 +65,7 @@ const parseHttpResponse = (httpResponse) => {
       return 'Your edge firewall has been updated'
     case 400:
       const apiError400 = extractApiError(httpResponse)
-      throw new Error(apiError400)
+      throw new Error(apiError400).message
     case 401:
       throw new Errors.InvalidApiTokenError().message
     case 403:
