@@ -11,7 +11,8 @@ export const metricsRoutes = {
     fetchDataFromBeholderService: MetricsServices.fetchDataFromBeholderService,
     searchDomainsMetricsService: MetricsServices.searchDomainsMetricsService,
     fetchMetricsGroupsService: MetricsServices.fetchMetricsGroupsService,
-    fetchMetricsProductsService: MetricsServices.fetchMetricsProductsService
+    fetchMetricsProductsService: MetricsServices.fetchMetricsProductsService,
+    fetchMetricsDashboardsService: MetricsServices.fetchMetricsDashboardsService
   },
   meta: {
     breadCrumbs: [
