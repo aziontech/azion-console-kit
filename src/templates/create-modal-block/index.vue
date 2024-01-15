@@ -229,7 +229,7 @@
       </div>
       <div
         class="mx-0 w-full mt-0 grid grid-cols-1 lg:grid-cols-2 2xl:grid-cols-3 gap-4"
-        v-else-if="showBrowse"
+        v-if="showBrowse"
       >
         <PrimeButton
           v-for="template in browseTemplates"
@@ -265,7 +265,7 @@
       </div>
       <div
         class="mx-0 w-full mt-0 grid grid-cols-1 lg:grid-cols-2 2xl:grid-cols-3 gap-4"
-        v-else-if="showResource"
+        v-if="showResource"
       >
         <PrimeButton
           v-for="resource in resources"
