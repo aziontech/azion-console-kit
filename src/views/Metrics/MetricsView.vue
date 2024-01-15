@@ -9,6 +9,10 @@
         :metricsGroupsService="fetchMetricsGroupsService"
         :params="routeParams"
       />
+      <div class="card surface-border border rounded-md surface-section p-3.5 flex flex-col gap-4">
+        <IntervalFilterBlock />
+        <ContentFilterBlock :playgroundOpener="playgroundOpener" />
+      </div>
     </template>
   </ContentBlock>
 </template>
@@ -18,6 +22,8 @@
   import PageHeadingBlock from '@/templates/page-heading-block'
   import { onMounted, ref } from 'vue'
   import { useRoute } from 'vue-router'
+  import ContentFilterBlock from './blocks/content-filter-block.vue'
+  import IntervalFilterBlock from './blocks/interval-filter-block.vue'
   import TabsPageBlock from './blocks/tabs-page-block'
 
   defineProps({
@@ -26,6 +32,10 @@
       required: true
     },
     fetchMetricsProductsService: {
+      type: Function,
+      required: true
+    },
+    playgroundOpener: {
       type: Function,
       required: true
     }
