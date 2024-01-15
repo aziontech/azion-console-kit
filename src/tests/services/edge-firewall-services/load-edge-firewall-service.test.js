@@ -33,9 +33,8 @@ describe('EdgeFirewallServices', () => {
 
     await sut({ id: fixtures.mock.id })
 
-    const version = 'v3'
     expect(requestSpy).toHaveBeenCalledWith({
-      url: `${version}/edge_firewall/${fixtures.mock.id}`,
+      url: `v3/edge_firewall/${fixtures.mock.id}`,
       method: 'GET'
     })
   })

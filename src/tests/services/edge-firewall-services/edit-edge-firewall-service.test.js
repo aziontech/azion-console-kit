@@ -30,11 +30,10 @@ describe('EdgeFirewallServices', () => {
       statusCode: 200
     })
     const { sut } = makeSut()
-    const version = 'v3'
     await sut(fixtures.mock)
 
     expect(requestSpy).toHaveBeenCalledWith({
-      url: `${version}/edge_firewall/${fixtures.mock.id}`,
+      url: `v3/edge_firewall/${fixtures.mock.id}`,
       method: 'PATCH',
       body: {
         name: fixtures.mock.name,

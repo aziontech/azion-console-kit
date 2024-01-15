@@ -75,13 +75,13 @@
 <script setup>
   import PrimeButton from 'primevue/button'
   import PrimeDialog from 'primevue/dialog'
-  import Message from 'primevue/message'
-  import InputText from 'primevue/inputtext'
   import Divider from 'primevue/divider'
-  import { useField, useForm } from 'vee-validate'
-  import * as yup from 'yup'
-  import { computed, ref, watch } from 'vue'
+  import InputText from 'primevue/inputtext'
+  import Message from 'primevue/message'
   import { useToast } from 'primevue/usetoast'
+  import { useField, useForm } from 'vee-validate'
+  import { computed, ref, watch } from 'vue'
+  import * as yup from 'yup'
 
   const toast = useToast()
 
@@ -130,7 +130,8 @@
       toastConfig = {
         closable: true,
         severity: 'error',
-        summary: error
+        summary: 'Error',
+        detail: error
       }
     } finally {
       deleteDialogVisible.value = false

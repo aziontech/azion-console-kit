@@ -30,12 +30,12 @@ describe('EdgeFirewallService', () => {
     })
 
     const { sut } = makeSut()
-    const version = 'v3'
+
     await sut(fixtures.edgeFirewallMock)
 
     expect(requestSpy).toHaveBeenCalledWith({
       method: 'POST',
-      url: `${version}/edge_firewall`,
+      url: 'v3/edge_firewall',
       body: {
         name: fixtures.edgeFirewallMock.name,
         is_active: fixtures.edgeFirewallMock.isActive,
@@ -61,26 +61,43 @@ describe('EdgeFirewallService', () => {
     expect(feedback).toBe('Your Edge Firewall has been created')
   })
 
-  it('Should return an API error to an invalid edge service name', async () => {
-    const apiErrorMock = 'name should not be empty'
-    vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
-      statusCode: 422,
-      body: {
-        errors: [apiErrorMock]
-      }
-    })
-    const { sut } = makeSut()
-
-    const feedbackMessage = sut(fixtures.edgeFirewallMock)
-
-    expect(feedbackMessage).rejects.toThrow(apiErrorMock)
-  })
-
   it.each([
     {
-      statusCode: 400,
-      expectedError: new Errors.NotFoundError().message
+      error: 'duplicated_edge_firewall_name',
+      key: 'results',
+      expectedError: 'Edge Firewall cannot be created because it already exists'
     },
+    {
+      error: 'no_modules_enabled',
+      key: 'results',
+      expectedError: 'Edge Firewall cannot be created because no modules are enabled'
+    },
+    {
+      error: 'unmappedError',
+      key: 'results',
+      expectedError: new Errors.UnexpectedError().message
+    },
+    {
+      error: 'name is required',
+      key: 'name',
+      expectedError: 'name is required'
+    }
+  ])(
+    'should throw an error if the API returns a $key in status code 400',
+    async ({ error, key, expectedError }) => {
+      vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
+        statusCode: 400,
+        body: { [key]: [error] }
+      })
+      const { sut } = makeSut()
+
+      const feedbackMessage = sut(fixtures.edgeFirewallMock)
+
+      expect(feedbackMessage).rejects.toThrow(expectedError)
+    }
+  )
+
+  it.each([
     {
       statusCode: 401,
       expectedError: new Errors.InvalidApiTokenError().message
@@ -92,6 +109,10 @@ describe('EdgeFirewallService', () => {
     {
       statusCode: 404,
       expectedError: new Errors.NotFoundError().message
+    },
+    {
+      statusCode: 422,
+      expectedError: new Errors.InvalidApiRequestError().message
     },
     {
       statusCode: 500,

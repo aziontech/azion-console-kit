@@ -33,6 +33,30 @@ const adapt = (payload) => {
   }
 }
 
+const mapErrorToMessage = (error) => {
+  switch (error) {
+    case 'duplicated_edge_firewall_name':
+      return 'Edge Firewall cannot be created because it already exists'
+    case 'no_modules_enabled':
+      return 'Edge Firewall cannot be created because no modules are enabled'
+    default:
+      return new Errors.UnexpectedError().message
+  }
+}
+
+/**
+ * @param {Object} httpResponse - The HTTP response object.
+ * @param {Array} httpResponse.body - The response body.
+ * @returns {string} The result message based on the status code.
+ */
+const extractApiError = (httpResponse) => {
+  const apiKeyError = Object.keys(httpResponse.body)[0]
+  if (apiKeyError === 'results') {
+    return mapErrorToMessage(httpResponse.body[apiKeyError][0])
+  }
+  return `${httpResponse.body[apiKeyError]}`
+}
+
 /**
  * @param {Object} httpResponse - The HTTP response object.
  * @param {Object} httpResponse.body - The response body.
@@ -48,7 +72,8 @@ const parseHttpResponse = (httpResponse) => {
         urlToEditView: `/edge-firewall/edit/${httpResponse.body.results.id}`
       }
     case 400:
-      throw new Errors.NotFoundError().message
+      const apiError400 = extractApiError(httpResponse)
+      throw new Error(apiError400).message
     case 401:
       throw new Errors.InvalidApiTokenError().message
     case 403:
@@ -56,33 +81,10 @@ const parseHttpResponse = (httpResponse) => {
     case 404:
       throw new Errors.NotFoundError().message
     case 422:
-      const apiError = extractApiError(httpResponse)
-      throw new Error(apiError).message
+      throw new Errors.InvalidApiRequestError().message
     case 500:
       throw new Errors.InternalServerError().message
     default:
       throw new Errors.UnexpectedError().message
   }
-}
-
-/**
- * @param {Object} errorSchema - The error schema.
- * @param {string} key - The error key of error schema.
- * @returns {string|undefined} The result message based on the status code.
- */
-const extractErrorKey = (errorSchema, key) => {
-  return errorSchema[key]?.[0]
-}
-
-/**
- * @param {Object} httpResponse - The HTTP response object.
- * @param {Object} httpResponse.body - The response body.
- * @returns {string} The result message based on the status code.
- */
-const extractApiError = (httpResponse) => {
-  const nameCantBeEmptyError = extractErrorKey(httpResponse.body, 'errors')
-
-  const errorMessages = [nameCantBeEmptyError]
-  const errorMessage = errorMessages.find((error) => !!error)
-  return errorMessage
 }
