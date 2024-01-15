@@ -2,10 +2,10 @@ import { AxiosHttpClientAdapter } from '../axios/AxiosHttpClientAdapter'
 import * as Errors from '@/services/axios/errors'
 import { makeWafRulesAllowedBaseUrl } from './make-waf-rules-allowed-base-url'
 
-export const createWafRulesAllowedService = async ({ payload, id }) => {
+export const editWafRulesAllowedService = async ({ payload, id, allowedId}) => {
   let httpResponse = await AxiosHttpClientAdapter.request({
-    url: `${makeWafRulesAllowedBaseUrl()}/${id}/allowed_rules`,
-    method: 'POST',
+    url: `${makeWafRulesAllowedBaseUrl()}/${id}/allowed_rules/${allowedId}`,
+    method: 'PUT',
     body: adapt(payload)
   })
 
@@ -39,10 +39,8 @@ const adapt = (payload) => {
  */
 const parseHttpResponse = (httpResponse) => {
   switch (httpResponse.statusCode) {
-    case 201:
-      return {
-        feedback: 'Your waf rule allowed has been created'
-      }
+    case 200:
+      return 'Your waf rule allowed has been updated'
     case 400:
       const apiError = extractApiError(httpResponse)
       throw new Error(apiError).message
@@ -64,9 +62,19 @@ const parseHttpResponse = (httpResponse) => {
  * @param {string} key - The error key of error schema.
  * @returns {string|undefined} The result message based on the status code.
  */
+
+/**
+ * @param {Object} httpResponse - The HTTP response object.
+ * @param {Object} httpResponse.body - The response body.
+ * @returns {string} The result message based on the status code.
+ */
 const extractErrorKey = (errorSchema, key) => {
   const [keyError] = Object.keys(errorSchema[key]?.[0])
-  return errorSchema[key]?.[0][keyError][0]
+  if (errorSchema[key]?.[0][keyError] instanceof Object) {
+    return errorSchema[key]?.[0][keyError][0]
+  }
+
+  return errorSchema[key]?.[0]
 }
 
 /**

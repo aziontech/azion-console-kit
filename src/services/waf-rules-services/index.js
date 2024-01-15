@@ -6,6 +6,8 @@ import { editWafRulesService } from './edit-waf-rules-service'
 import { listWafRulesAllowedService } from './list-waf-rules-allowed-service'
 import { deleteWafRulesAllowedService } from './delete-waf-rules-allowed-service'
 import { createWafRulesAllowedService } from './create-waf-rules-allowed-service'
+import { loadWafRulesAllowedService } from './load-waf-rules-allowed-service'
+import { editWafRulesAllowedService } from './edit-waf-rules-allowed-service'
 
 export {
   listWafRulesService,
@@ -15,5 +17,7 @@ export {
   editWafRulesService,
   listWafRulesAllowedService,
   deleteWafRulesAllowedService,
-  createWafRulesAllowedService
+  createWafRulesAllowedService,
+  loadWafRulesAllowedService,
+  editWafRulesAllowedService
 }

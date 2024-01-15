@@ -91,20 +91,20 @@
             </template>
           </CreateDrawerBlock>
 
-          <!-- <EditDrawerBlock
+          <EditDrawerBlock
             v-if="showEditWafRulesAllowedDrawer"
-            :id="selectedIdnsRecordToEdit"
-            v-model:visible="showEditRecordDrawer"
-            :loadService="loadRecordServiceWithIDNSIdDecorator"
-            :editService="editRecordServiceWithIDNSIdDecorator"
-            :schema="validationSchemaIDNSRecords"
+            :id="selectedWafRulesAllowedToEdit"
+            v-model:visible="showEditWafRulesAllowedDrawer"
+            :loadService="handleLoadWafRulesAllowedService"
+            :editService="handleEditWafRulesAllowedService"
+            :schema="validationSchemaAllowed"
             @onSuccess="reloadWafRulesAllowedList"
-            title="Edit Intelligent DNS Record"
+            title="Edit Waf Rules Allowed"
           >
             <template #formFields>
-              <FormFieldsRecords />
+              <FormFieldsAllowed />
             </template>
-          </EditDrawerBlock> -->
+          </EditDrawerBlock>
         </TabPanel>
       </TabView>
       <router-view></router-view>
@@ -118,7 +118,7 @@
   import EmptyResultsBlock from '@/templates/empty-results-block'
   import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
   import CreateDrawerBlock from '@templates/create-drawer-block'
-  // import EditDrawerBlock from '@templates/edit-drawer-block'
+  import EditDrawerBlock from '@templates/edit-drawer-block'
   import EditFormBlock from '@templates/edit-form-block'
   import ListTableNoHeaderBlock from '@templates/list-table-block/no-header'
   import PageHeadingBlock from '@templates/page-heading-block'
@@ -158,6 +158,14 @@
       required: true
     },
     createWafRulesAllowedService: {
+      type: Function,
+      required: true
+    },
+    loadWafRulesAllowedService: {
+      type: Function,
+      required: true
+    },
+    editWafRulesAllowedService: {
       type: Function,
       required: true
     }
@@ -300,6 +308,14 @@
 
   const handleCreateWafRulesAllowedService = async (payload) => {
     return await props.createWafRulesAllowedService({ payload, id: wafRuleId.value })
+  }
+
+  const handleLoadWafRulesAllowedService = async (allowedId) => {
+    return await props.loadWafRulesAllowedService({ id: wafRuleId.value, allowedId })
+  }
+
+  const handleEditWafRulesAllowedService = async (payload) => {
+    return await props.editWafRulesAllowedService({ payload, id: wafRuleId.value, allowedId: selectedWafRulesAllowedToEdit.value})
   }
 
   const openEditDrawerWafRulesAllowed = (event) => {

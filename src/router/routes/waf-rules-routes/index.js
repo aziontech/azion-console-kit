@@ -53,7 +53,9 @@ export const wafRulesRoutes = {
         loadWafRulesService: WafRulesService.loadWafRulesService,
         listWafRulesAllowedService: WafRulesService.listWafRulesAllowedService,
         deleteWafRulesAllowedService: WafRulesService.deleteWafRulesAllowedService,
-        createWafRulesAllowedService: WafRulesService.createWafRulesAllowedService
+        createWafRulesAllowedService: WafRulesService.createWafRulesAllowedService,
+        loadWafRulesAllowedService: WafRulesService.loadWafRulesAllowedService,
+        editWafRulesAllowedService: WafRulesService.editWafRulesAllowedService
       },
       meta: {
         breadCrumbs: [
@@ -76,7 +78,9 @@ export const wafRulesRoutes = {
         loadWafRulesService: WafRulesService.loadWafRulesService,
         listWafRulesAllowedService: WafRulesService.listWafRulesAllowedService,
         deleteWafRulesAllowedService: WafRulesService.deleteWafRulesAllowedService,
-        createWafRulesAllowedService: WafRulesService.createWafRulesAllowedService
+        createWafRulesAllowedService: WafRulesService.createWafRulesAllowedService,
+        loadWafRulesAllowedService: WafRulesService.loadWafRulesAllowedService,
+        editWafRulesAllowedService: WafRulesService.editWafRulesAllowedService
       },
       meta: {
         breadCrumbs: [
@@ -99,7 +103,9 @@ export const wafRulesRoutes = {
         loadWafRulesService: WafRulesService.loadWafRulesService,
         listWafRulesAllowedService: WafRulesService.listWafRulesAllowedService,
         deleteWafRulesAllowedService: WafRulesService.deleteWafRulesAllowedService,
-        createWafRulesAllowedService: WafRulesService.createWafRulesAllowedService
+        createWafRulesAllowedService: WafRulesService.createWafRulesAllowedService,
+        loadWafRulesAllowedService: WafRulesService.loadWafRulesAllowedService,
+        editWafRulesAllowedService: WafRulesService.editWafRulesAllowedService
       },
       meta: {
         breadCrumbs: [
