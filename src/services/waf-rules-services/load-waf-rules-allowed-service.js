@@ -16,9 +16,9 @@ const adapt = (httpResponse) => {
     matchZones: httpResponse.body.data.match_zones,
     path: httpResponse.body.data.path,
     reason: httpResponse.body.data.reason,
-    ruleId:   httpResponse.body.data.rule_id,
+    ruleId: httpResponse.body.data.rule_id,
     status: httpResponse.body.data.status,
-    useRegex:  httpResponse.body.data.use_regex,
+    useRegex: httpResponse.body.data.use_regex
   }
 
   return {

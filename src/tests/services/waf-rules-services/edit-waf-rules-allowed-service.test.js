@@ -67,7 +67,7 @@ describe('WafRulesServices', () => {
     })
     const { sut } = makeSut()
 
-    const feedbackMessage = sut({payload: fixtures.wafRulesMock, id: 4040, allowedId: 10 })
+    const feedbackMessage = sut({ payload: fixtures.wafRulesMock, id: 4040, allowedId: 10 })
 
     expect(feedbackMessage).rejects.toThrow(apiErrorMock)
   })
@@ -101,7 +101,7 @@ describe('WafRulesServices', () => {
       })
       const { sut } = makeSut()
 
-      const response = sut({payload: fixtures.wafRulesMock, id: 4040, allowedId: 10 })
+      const response = sut({ payload: fixtures.wafRulesMock, id: 4040, allowedId: 10 })
 
       expect(response).rejects.toBe(expectedError)
     }

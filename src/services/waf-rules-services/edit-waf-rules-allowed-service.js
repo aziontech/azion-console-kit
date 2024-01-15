@@ -2,7 +2,7 @@ import { AxiosHttpClientAdapter } from '../axios/AxiosHttpClientAdapter'
 import * as Errors from '@/services/axios/errors'
 import { makeWafRulesAllowedBaseUrl } from './make-waf-rules-allowed-base-url'
 
-export const editWafRulesAllowedService = async ({ payload, id, allowedId}) => {
+export const editWafRulesAllowedService = async ({ payload, id, allowedId }) => {
   let httpResponse = await AxiosHttpClientAdapter.request({
     url: `${makeWafRulesAllowedBaseUrl()}/${id}/allowed_rules/${allowedId}`,
     method: 'PUT',

@@ -55,9 +55,9 @@ describe('WafRulesService', () => {
       matchZones: fixtures.wafRulesMock.match_zones,
       path: fixtures.wafRulesMock.path,
       reason: fixtures.wafRulesMock.reason,
-      ruleId:   fixtures.wafRulesMock.rule_id,
+      ruleId: fixtures.wafRulesMock.rule_id,
       status: fixtures.wafRulesMock.status,
-      useRegex:  fixtures.wafRulesMock.use_regex,
+      useRegex: fixtures.wafRulesMock.use_regex
     })
   })
 })

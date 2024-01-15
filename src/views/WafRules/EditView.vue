@@ -315,7 +315,11 @@
   }
 
   const handleEditWafRulesAllowedService = async (payload) => {
-    return await props.editWafRulesAllowedService({ payload, id: wafRuleId.value, allowedId: selectedWafRulesAllowedToEdit.value})
+    return await props.editWafRulesAllowedService({
+      payload,
+      id: wafRuleId.value,
+      allowedId: selectedWafRulesAllowedToEdit.value
+    })
   }
 
   const openEditDrawerWafRulesAllowed = (event) => {
