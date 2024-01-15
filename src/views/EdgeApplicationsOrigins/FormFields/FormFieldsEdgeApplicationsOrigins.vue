@@ -1,15 +1,15 @@
 <script setup>
-  import InputText from 'primevue/inputtext'
+  import FormHorizontal from '@/templates/create-form-block/form-horizontal'
+  import FieldText from '@/templates/form-fields-inputs/fieldText'
+  import PrimeButton from 'primevue/button'
+  import Divider from 'primevue/divider'
+  import Dropdown from 'primevue/dropdown'
   import InputNumber from 'primevue/inputnumber'
   import InputSwitch from 'primevue/inputswitch'
+  import InputText from 'primevue/inputtext'
   import RadioButton from 'primevue/radiobutton'
-  import PrimeButton from 'primevue/button'
-  import Dropdown from 'primevue/dropdown'
-  import Divider from 'primevue/divider'
-  import FormHorizontal from '@/templates/create-form-block/form-horizontal'
   import { useField, useFieldArray } from 'vee-validate'
-  import { computed, watch } from 'vue'
-  import FieldText from '@/templates/form-fields-inputs/fieldText'
+  import { computed, ref, watch } from 'vue'
 
   const props = defineProps({
     disabledFields: {
@@ -70,6 +70,7 @@
       value: 'backup'
     }
   ]
+  const originKeyInput = ref('')
 
   const { value: originKey, setValue: setOriginKey } = useField('originKey')
   const { value: name } = useField('name')
@@ -104,14 +105,26 @@
   }
 
   const resetAddressesFields = (option) => {
+    resetAddresses([{ ...defaultAddress }])
     if (option.value === 'load_balancer') {
       method.value = 'ip_hash'
+      pushAddress({ ...defaultAddress })
     }
-    resetAddresses([{ ...defaultAddress }])
+  }
+
+  const removeCurrentAddress = (index) => {
+    removeAddress(index)
+    if (addresses.value.length === 1) {
+      pushAddress({ ...defaultAddress })
+    }
   }
 
   const addAddress = () => {
     pushAddress({ ...defaultAddress })
+  }
+
+  const scrollOriginKey = () => {
+    originKeyInput.value.$el.scrollIntoView({ behavior: 'smooth', block: 'center' })
   }
 
   watch(
@@ -120,6 +133,10 @@
       setOriginKey(value)
     }
   )
+
+  defineExpose({
+    scrollOriginKey
+  })
 </script>
 
 <template>
@@ -160,6 +177,7 @@
             <InputText
               class="w-full"
               v-model="originKey"
+              ref="originKeyInput"
               type="text"
               :disabled="true"
             />
@@ -322,7 +340,7 @@
               outlined
               type="button"
               aria-label="Remove Origin"
-              @click="removeAddress(index)"
+              @click="removeCurrentAddress(index)"
             />
           </div>
         </div>
