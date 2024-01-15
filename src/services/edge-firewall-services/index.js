@@ -5,10 +5,9 @@ import { listEdgeFirewallService } from './list-edge-firewall-service'
 import { loadEdgeFirewallService } from './load-edge-firewall-service'
 
 export {
-    createEdgeFirewallService,
-    deleteEdgeFirewallService,
-    editEdgeFirewallService,
-    listEdgeFirewallService,
-    loadEdgeFirewallService
+  createEdgeFirewallService,
+  deleteEdgeFirewallService,
+  editEdgeFirewallService,
+  listEdgeFirewallService,
+  loadEdgeFirewallService
 }
-

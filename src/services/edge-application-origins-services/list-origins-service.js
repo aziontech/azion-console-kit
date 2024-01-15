@@ -28,7 +28,7 @@ const adapt = (httpResponse) => {
   }
   const parsedOrigin = httpResponse.body.results?.map((origin) => {
     let formattedListOfAddresses = origin.addresses?.map((address) => address.address) || []
-    
+
     return {
       id: origin.origin_key,
       originKey: {
