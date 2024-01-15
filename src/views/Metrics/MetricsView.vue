@@ -13,6 +13,10 @@
         <IntervalFilterBlock />
         <ContentFilterBlock :playgroundOpener="playgroundOpener" />
       </div>
+      <DashboardPanelBlock
+        :metricsDashboardsService="fetchMetricsDashboardsService"
+        :params="routeParams"
+      />
     </template>
   </ContentBlock>
 </template>
@@ -20,9 +24,10 @@
 <script setup>
   import ContentBlock from '@/templates/content-block'
   import PageHeadingBlock from '@/templates/page-heading-block'
-  import { onMounted, ref } from 'vue'
+  import { ref, watch } from 'vue'
   import { useRoute } from 'vue-router'
   import ContentFilterBlock from './blocks/content-filter-block.vue'
+  import DashboardPanelBlock from './blocks/dashboard-panel-block.vue'
   import IntervalFilterBlock from './blocks/interval-filter-block.vue'
   import TabsPageBlock from './blocks/tabs-page-block'
 
@@ -35,6 +40,10 @@
       type: Function,
       required: true
     },
+    fetchMetricsDashboardsService: {
+      type: Function,
+      required: true
+    },
     playgroundOpener: {
       type: Function,
       required: true
@@ -44,8 +53,12 @@
   const route = useRoute()
   const routeParams = ref({})
 
-  onMounted(() => {
-    const { pageId, dashboardId } = route.params
-    routeParams.value = { pageId: pageId || '1', dashboardId: dashboardId || '1' }
-  })
+  watch(
+    route,
+    () => {
+      const { pageId, dashboardId } = route.params
+      routeParams.value = { pageId: pageId || '1', dashboardId: dashboardId || '1' }
+    },
+    { immediate: true }
+  )
 </script>
