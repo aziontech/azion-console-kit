@@ -235,7 +235,11 @@
     methods: {
       redirectToSolution(template) {
         this.showSidebar = false
-        this.$router.push(`/create/${template.vendor.slug}/${template.slug}`)
+        const params = {
+          vendor: template.vendor.slug,
+          solution: template.slug
+        }
+        this.$router.push({ name: 'create-something-new', params })
         this.$emit('closeModal')
       },
       onMenuChange(target) {
