@@ -2,6 +2,10 @@ import { AxiosHttpClientAdapter } from '@/services/axios/AxiosHttpClientAdapter'
 import { listFunctionsService } from '@/services/edge-application-functions-services'
 import { describe, expect, it, vi } from 'vitest'
 
+// Constantes para reutilização
+const API_VERSION = 'v3'
+const EDGE_APPLICATION_ID = 123
+
 const fixtures = {
   functionsInstance: {
     name: 'function instance name',
@@ -21,38 +25,35 @@ const fixtures = {
 
 const makeSut = () => {
   const sut = listFunctionsService
-
-  return {
-    sut
-  }
+  return { sut }
 }
 
 describe('EdgeApplicationFunctionsServices', () => {
-  it('should call api with correct params', async () => {
+   vi.restoreAllMocks()
+
+  it('should call API with correct params', async () => {
     const requestSpy = vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
       statusCode: 200,
       body: { results: [] }
     })
     const { sut } = makeSut()
-    const version = 'v3'
-    const edgeApplicationId = 123
-    await sut({ id: edgeApplicationId })
+
+    await sut({ id: EDGE_APPLICATION_ID })
 
     expect(requestSpy).toHaveBeenCalledWith({
-      url: `${version}/edge_applications/${edgeApplicationId}/functions_instances?order_by=id&sort=asc&page=1&page_size=200`,
+      url: `${API_VERSION}/edge_applications/${EDGE_APPLICATION_ID}/functions_instances?order_by=id&sort=asc&page=1&page_size=200`,
       method: 'GET'
     })
   })
 
-  it('should parsed correctly all returned edge applications', async () => {
+  it('should correctly parse all returned edge application function instances', async () => {
     vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
       statusCode: 200,
       body: { results: [fixtures.functionsInstance, fixtures.functionInstanceWithVersion] }
     })
     const { sut } = makeSut()
 
-    const edgeApplicationId = 123
-    const result = await sut({ id: edgeApplicationId })
+    const result = await sut({ id: EDGE_APPLICATION_ID })
 
     expect(result).toEqual([
       {
@@ -74,9 +75,9 @@ describe('EdgeApplicationFunctionsServices', () => {
           },
           text: 'function instance version'
         },
-        args: fixtures.functionsInstance.args,
-        edgeFunctionId: fixtures.functionsInstance.edge_function_id,
-        id: fixtures.functionsInstance.id
+        args: fixtures.functionInstanceWithVersion.args,
+        edgeFunctionId: fixtures.functionInstanceWithVersion.edge_function_id,
+        id: fixtures.functionInstanceWithVersion.id
       }
     ])
   })

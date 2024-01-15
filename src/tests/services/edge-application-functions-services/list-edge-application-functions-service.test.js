@@ -54,10 +54,12 @@ describe('EdgeApplicationFunctionsServices', () => {
   it('should correctly parse all returned edge applications functions', async () => {
     localeMock()
     const spy = vi.spyOn(AxiosHttpClientAdapter, 'request')
+
     spy.mockResolvedValueOnce({
       statusCode: 200,
       body: { results: [fixtures.functionsInstance] }
     })
+
     spy.mockResolvedValueOnce({
       statusCode: 200,
       body: { results: fixtures.edgeFunctionMock }
