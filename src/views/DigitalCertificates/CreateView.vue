@@ -13,7 +13,7 @@
           <InlineMessage
             class="w-fit"
             severity="info"
-            >Now you can easily create a Let's Encrypt™ digital certificate directly from
+            >Create a Let's Encrypt™ digital certificate directly from
             <PrimeButton
               link
               size="small"

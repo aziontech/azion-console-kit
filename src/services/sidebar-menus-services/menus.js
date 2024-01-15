@@ -114,6 +114,11 @@ export const menus = [
         label: 'Network Lists',
         to: '/network-lists',
         icon: 'pi pi-globe'
+      },
+      {
+        label: 'WAF Rules',
+        to: '/waf',
+        icon: 'pi pi-sliders-h'
       }
     ]
   }

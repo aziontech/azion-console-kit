@@ -4,6 +4,7 @@ import * as OriginsService from '@/services/edge-application-origins-services'
 import * as CacheSettingsServices from '@/services/edge-application-cache-settings-services'
 import * as FunctionsService from '@/services/edge-application-functions-services'
 import * as DeviceGroupsService from '@/services/edge-application-device-groups-services'
+import * as ErrorResponsesService from '@/services/edge-application-error-responses-services'
 import * as RulesEngineService from '@/services/edge-application-rules-engine-services'
 
 /** @type {import('vue-router').RouteRecordRaw} */
@@ -90,6 +91,10 @@ export const edgeApplicationRoutes = {
           createDeviceGroupService: DeviceGroupsService.createDeviceGroupService,
           editDeviceGroupService: DeviceGroupsService.editDeviceGroupService,
           loadDeviceGroupService: DeviceGroupsService.loadDeviceGroupService
+        },
+        errorResponsesServices: {
+          loadErrorResponsesService: ErrorResponsesService.listErrorResponsesService,
+          editErrorResponsesService: ErrorResponsesService.editErrorResponsesService
         },
         rulesEngineServices: {
           listRulesEngineService: RulesEngineService.listRulesEngineService,
