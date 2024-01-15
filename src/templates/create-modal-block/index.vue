@@ -175,7 +175,8 @@
     </div>
 
     <div class="overflow-auto w-full flex flex-col">
-      <div v-if="!isLoading">
+      <LoadingListTemplate v-if="isLoading" />
+      <div v-else>
         <div
           class="text-base font-medium mt-5 mb-3"
           v-if="showResource"
@@ -190,7 +191,6 @@
         </div>
       </div>
 
-      <LoadingListTemplate v-if="isLoading" />
       <div
         class="mx-0 w-full mt-0 grid grid-cols-1 lg:grid-cols-2 2xl:grid-cols-3 gap-4"
         v-if="showRecommended"
