@@ -66,13 +66,17 @@ describe('EdgeApplicationErrorResponsesServices', () => {
     expect(feedbackMessage).toBe('Your Error Responses has been edited')
   })
 
-  it('Should return an API array error to an invalid error response', async () => {
-    const apiErrorMock = 'name should not be empty'
+  it('Should return an API error to an invalid error response', async () => {
+    const apiErrorMock = 'uri: should not be empty'
 
     vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
       statusCode: 400,
       body: {
-        errors: [apiErrorMock]
+        error_responses: [
+          {
+            uri: ['should not be empty']
+          }
+        ]
       }
     })
     const { sut } = makeSut()
@@ -81,13 +85,13 @@ describe('EdgeApplicationErrorResponsesServices', () => {
 
     expect(feedbackMessage).rejects.toThrow(apiErrorMock)
   })
-  it('Should return an API error to an invalid error response', async () => {
-    const apiErrorMock = 'name should not be empty'
+  it('Should return an API error to duplicated status code', async () => {
+    const apiErrorMock = 'code: You cant use duplicated values for status code'
 
     vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
       statusCode: 400,
       body: {
-        errors: apiErrorMock
+        code: ['You cant use duplicated values for status code']
       }
     })
     const { sut } = makeSut()

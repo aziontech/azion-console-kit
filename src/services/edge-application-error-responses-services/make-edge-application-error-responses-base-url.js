@@ -1,4 +1,4 @@
-export const makeEdgeApplicationV4BaseUrl = () => {
+export const makeEdgeApplicationErrorResponsesBaseUrl = () => {
   const version = 'v4'
   return `${version}/edge/applications`
 }
