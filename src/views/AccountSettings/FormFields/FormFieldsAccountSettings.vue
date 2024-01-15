@@ -66,10 +66,13 @@
     setCountriesOptions()
   })
 
-  const setRegionsOptions = async (geonameId) => {
+  const setRegionsOptions = async (countryId) => {
     regionsOptions.value.done = false
+    if (!countryId) {
+      return
+    }
     try {
-      const response = await props.listRegionsService(geonameId)
+      const response = await props.listRegionsService(countryId)
       regionsOptions.value.options = response
     } catch (error) {
       showToast(error, 'error')
@@ -78,10 +81,13 @@
     }
   }
 
-  const setCitiesOptions = async (geonameId) => {
+  const setCitiesOptions = async (regionId) => {
     citiesOptions.value.done = false
+    if (!regionId) {
+      return
+    }
     try {
-      const response = await props.listCitiesService(geonameId)
+      const response = await props.listCitiesService(regionId)
       citiesOptions.value.options = response
     } catch (error) {
       showToast(error, 'error')
