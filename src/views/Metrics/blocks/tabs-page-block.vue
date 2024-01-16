@@ -87,6 +87,7 @@
       v-model:activeIndex="productIdx"
       :model="metricsProducts"
       :key="productIdx"
+      :pt="{ action: { class: 'w-max' } }"
     />
   </div>
 </template>
