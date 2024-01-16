@@ -25,7 +25,7 @@ export class AccountHandler {
         pageSize: 1
       })
 
-      if (firstResult && firstResult.accountId) {
+      if (firstResult?.accountId) {
         return firstResult.accountId
       }
     }
@@ -58,5 +58,34 @@ export class AccountHandler {
     }
 
     window.location.replace('/')
+  }
+
+  static async refresh(refreshService) {
+    try {
+      await refreshService()
+    } catch {
+      throw new Error()
+    }
+  }
+
+  async switchAccountFromSocialIdp(verifyService, refreshService) {
+    try {
+      const { twoFactor, trustedDevice, user_tracking_info: userInfo } = await verifyService()
+
+      if (!userInfo) {
+        return '/login'
+      }
+
+      if (twoFactor) {
+        const mfaRoute = trustedDevice ? 'authentication' : 'setup'
+        return `/mfa/${mfaRoute}`
+      }
+
+      const { account_id: accountId } = userInfo.props
+
+      return this.switchAndReturnAccountPage(accountId)
+    } catch {
+      await this.refresh(refreshService)
+    }
   }
 }
