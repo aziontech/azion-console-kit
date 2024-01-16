@@ -22,7 +22,8 @@ const fixtures = {
     remoteFileInclusion: true,
     sqlInjection: true,
     active: false,
-    name: 'test'
+    name: 'test',
+    id: 100
   }
 }
 
@@ -82,7 +83,7 @@ describe('WafRulesServices', () => {
 
     expect(data).toStrictEqual({
       feedback: 'Your waf rule has been created',
-      urlToEditView: '/waf'
+      urlToEditView: '/waf/edit/100'
     })
   })
 

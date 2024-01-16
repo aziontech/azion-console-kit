@@ -49,7 +49,7 @@ const parseHttpResponse = (httpResponse) => {
     case 201:
       return {
         feedback: 'Your waf rule has been created',
-        urlToEditView: `/waf`
+        urlToEditView: `/waf/edit/${httpResponse.body.id}`
       }
     case 400:
       const apiError = extractApiError(httpResponse)
