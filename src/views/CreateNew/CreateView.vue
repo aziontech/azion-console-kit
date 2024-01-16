@@ -79,6 +79,7 @@
       <FormLoading v-if="isLoading" />
       <TemplateEngineBlock
         v-else
+        @cancel="handleCancel"
         @instantiate="handleInstantiate"
         :getTemplateService="getTemplateService"
         :instantiateTemplateService="instantiateTemplateService"
@@ -293,6 +294,9 @@
         } finally {
           this.isLoading = false
         }
+      },
+      handleCancel() {
+        this.$router.push('/')
       },
       goToVendorPage() {
         this.windowOpen(this.solution.vendor.url, '_blank')

@@ -1,7 +1,7 @@
 <template>
   <ContentBlock>
     <template #heading>
-      <PageHeadingBlock pageTitle="Create" />
+      <PageHeadingBlock pageTitle="Deploy" />
     </template>
     <template #content>
       <div class="flex flex-col w-full gap-8">

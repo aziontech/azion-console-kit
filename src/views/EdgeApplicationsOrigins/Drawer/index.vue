@@ -1,11 +1,11 @@
 <script setup>
-  import { ref } from 'vue'
-  import { useToast } from 'primevue/usetoast'
-  import * as yup from 'yup'
-  import CreateDrawerBlock from '@templates/create-drawer-block'
   import FormFieldsDrawerOrigin from '@/views/EdgeApplicationsOrigins/FormFields/FormFieldsEdgeApplicationsOrigins'
+  import CreateDrawerBlock from '@templates/create-drawer-block'
   import EditDrawerBlock from '@templates/edit-drawer-block'
   import { refDebounced } from '@vueuse/core'
+  import { useToast } from 'primevue/usetoast'
+  import { ref } from 'vue'
+  import * as yup from 'yup'
   defineOptions({ name: 'drawer-origin' })
 
   const emit = defineEmits(['onSuccess'])
@@ -34,6 +34,10 @@
     clipboardWrite: {
       type: Function,
       required: true
+    },
+    isLoadBalancer: {
+      type: Boolean,
+      required: true
     }
   })
 
@@ -53,7 +57,7 @@
     {
       label: 'Load Balancer',
       value: 'load_balancer',
-      disabled: false
+      disabled: !props.isLoadBalancer
     }
   ]
 
@@ -82,6 +86,7 @@
     hmacSecretKey: ''
   })
 
+  const createFormDrawer = ref('')
   const originKey = ref('')
   const validationSchema = yup.object({
     name: yup.string().required().label('Name'),
@@ -90,8 +95,8 @@
     addresses: yup.array().of(
       yup.object().shape({
         address: yup.string().required().label('Address'),
-        weight: yup.number().required().label('Weight'),
-        isActive: yup.boolean()
+        weight: yup.number().nullable().label('Weight'),
+        isActive: yup.boolean().default(true).label('Active')
       })
     ),
     originPath: yup
@@ -166,6 +171,7 @@
   }
 
   const handleCreateOrigin = (feedback) => {
+    createFormDrawer.value.scrollOriginKey()
     originKey.value = feedback.originKey
     emit('onSuccess')
   }
@@ -189,6 +195,7 @@
   >
     <template #formFields="{ disabledFields }">
       <FormFieldsDrawerOrigin
+        ref="createFormDrawer"
         :disabledFields="disabledFields"
         :listOrigins="ORIGIN_TYPES_OPTIONS"
         :copyToClipboard="copyToKey"

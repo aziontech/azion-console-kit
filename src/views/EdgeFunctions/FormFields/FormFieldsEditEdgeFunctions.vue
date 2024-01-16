@@ -122,10 +122,10 @@
                 class="w-full text-[var(--text-color-secondary)]"
                 readonly
               />
-              <small class="text-xs text-color-secondary font-normal leading-tight">
-                Language isn't an editable field.</small
-              >
             </span>
+            <small class="text-xs text-color-secondary font-normal leading-tight">
+              Language isn't an editable field.</small
+            >
           </div>
         </template>
       </FormHorizontal>

@@ -1,6 +1,7 @@
 import { AxiosHttpClientAdapter } from '@/services/axios/AxiosHttpClientAdapter'
 import { loadEdgeFunctionsService } from '@/services/edge-functions-services'
 import { describe, expect, it, vi } from 'vitest'
+import { localeMock } from '@/tests/utils/localeMock'
 
 const fixtures = {
   edgeFunctionsMock: {
@@ -13,7 +14,7 @@ const fixtures = {
     json_args: {},
     language: 'lua',
     last_editor: 'Azion',
-    modified: '2023-10-17T18:26:23.047240Z',
+    modified: new Date(2023, 10, 17),
     name: 'baggio',
     reference_count: 0
   },
@@ -27,7 +28,7 @@ const fixtures = {
     json_args: {},
     language: 'javascript',
     last_editor: 'Azion',
-    modified: '2023-10-17T18:26:23.047240Z',
+    modified: new Date(2023, 10, 17),
     name: 'baggio',
     reference_count: 0
   }
@@ -58,6 +59,7 @@ describe('EdgeFunctionsServices', () => {
   })
 
   it('should parsed correctly the returned edge function', async () => {
+    localeMock()
     vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
       statusCode: 200,
       body: { results: fixtures.edgeFunctionsMock }
@@ -77,7 +79,7 @@ describe('EdgeFunctionsServices', () => {
       name: fixtures.edgeFunctionsMock.name,
       code: fixtures.edgeFunctionsMock.code,
       version: '-',
-      modified: 'Tuesday, October 17, 2023',
+      modified: 'Friday, November 17, 2023',
       statusTag: {
         content: 'Active',
         severity: 'success'
@@ -91,6 +93,7 @@ describe('EdgeFunctionsServices', () => {
   })
 
   it('should parsed correctly the returned with edge function language and status', async () => {
+    localeMock()
     vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
       statusCode: 200,
       body: { results: fixtures.edgeFunctionsMockJsAndInactive }
@@ -110,7 +113,7 @@ describe('EdgeFunctionsServices', () => {
       name: fixtures.edgeFunctionsMockJsAndInactive.name,
       code: fixtures.edgeFunctionsMockJsAndInactive.code,
       version: '-',
-      modified: 'Tuesday, October 17, 2023',
+      modified: 'Friday, November 17, 2023',
       statusTag: {
         content: 'Inactive',
         severity: 'danger'
