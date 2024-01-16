@@ -3,6 +3,7 @@
     :pageTitle="pageTitle"
     :benefitsList="benefitsList"
     :formTitle="formTitle"
+    :showSignupBtn="false"
   >
     <template #form>
       <AdditionalDataFormBlock
@@ -15,8 +16,8 @@
 </template>
 
 <script setup>
-  import PageWithFormBlock from '@/templates/signup-block/page-with-form-block'
   import AdditionalDataFormBlock from '@/templates/signup-block/additional-data-form-block'
+  import PageWithFormBlock from '@/templates/signup-block/page-with-form-block'
 
   defineProps({
     listAdditionalDataInfoService: {
