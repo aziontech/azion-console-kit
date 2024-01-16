@@ -15,12 +15,22 @@ export const editErrorResponsesService = async (payload) => {
 }
 
 const adapt = (payload) => {
-  const errorResponses = payload.errorResponses.map((element) => {
-    return {
-      custom_status_code: element.customStatusCode?.toString() || null,
-      uri: element.uri || null,
-      timeout: element.timeout,
-      code: element.code
+  const errorResponses = []
+  payload.errorResponses.forEach((element) => {
+    if (element.code === 'any') {
+      errorResponses.unshift({
+        custom_status_code: element.customStatusCode?.toString() || null,
+        uri: element.uri || null,
+        timeout: element.timeout,
+        code: element.code
+      })
+    }else {
+      errorResponses.push({
+        custom_status_code: element.customStatusCode?.toString() || null,
+        uri: element.uri || null,
+        timeout: element.timeout,
+        code: element.code
+      })
     }
   })
   return {

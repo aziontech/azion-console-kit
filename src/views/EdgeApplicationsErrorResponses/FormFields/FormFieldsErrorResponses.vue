@@ -115,6 +115,7 @@
     }
   ]
   const showErrorResponsesInputs = computed(() => errorResponses.value.length > 0)
+  const statusAnyErrorResponse = computed(() => errorResponses.value.filter((element => element.value.code === 'any'))[0])
   const { value: originId } = useField('originId')
   const {
     push: pushErrorResponse,
@@ -182,7 +183,7 @@
           <InputNumber
             :min="0"
             :max="31536000"
-            v-model="errorResponses[0].value.timeout"
+            v-model="statusAnyErrorResponse.value.timeout"
             showButtons
           />
         </div>
@@ -191,7 +192,7 @@
       <div
         v-for="(errorResponse, index) in errorResponses"
         :key="index"
-        :class="{ hidden: index === 0 }"
+        :class="{ hidden: errorResponse.value.code === 'any' }"
       >
         <div class="flex flex-col gap-6">
           <div class="flex">
