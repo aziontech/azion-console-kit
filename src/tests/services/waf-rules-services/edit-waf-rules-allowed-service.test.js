@@ -57,7 +57,7 @@ describe('WafRulesServices', () => {
     expect(data).toStrictEqual('Your waf rule allowed has been updated')
   })
 
-  it.only('Should return an API error for an 400 response status', async () => {
+  it('Should return an API error for an 400 response status', async () => {
     const apiErrorMock = 'This field is required.'
     vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
       statusCode: 400,
