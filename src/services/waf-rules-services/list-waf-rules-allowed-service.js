@@ -1,9 +1,9 @@
 import { AxiosHttpClientAdapter, parseHttpResponse } from '../axios/AxiosHttpClientAdapter'
 import { makeWafRulesAllowedBaseUrl } from './make-waf-rules-allowed-base-url'
 
-export const listWafRulesAllowedService = async ({ id }) => {
+export const listWafRulesAllowedService = async ({ wafId }) => {
   let httpResponse = await AxiosHttpClientAdapter.request({
-    url: `${makeWafRulesAllowedBaseUrl()}/${id}/allowed_rules?page=1&page_size=100`,
+    url: `${makeWafRulesAllowedBaseUrl()}/${wafId}/allowed_rules?page=1&page_size=100`,
     method: 'GET'
   })
 
@@ -82,9 +82,6 @@ const adapt = (httpResponse) => {
             new Date(waf.last_modified)
           ),
           matchZones: parseMatchZone(waf.match_zones),
-          matchesOn: waf.matches_on,
-          zone: waf.zone,
-          zoneInput: waf.zone_input,
           path: waf.path,
           reason: waf.reason,
           ruleId: waf.rule_id === 0 ? '0 - All Rules' : waf.rule_id,

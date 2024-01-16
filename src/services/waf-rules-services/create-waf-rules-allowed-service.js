@@ -19,7 +19,6 @@ const adapt = (payload) => {
       if (zoneWithoutMatchoZone.includes(zone.zone)) {
         zone.matches_on = null
       }
-
       return zone
     }),
     path: payload.path,
@@ -39,7 +38,7 @@ const adapt = (payload) => {
  */
 const parseHttpResponse = (httpResponse) => {
   switch (httpResponse.statusCode) {
-    case 201:
+    case 202:
       return {
         feedback: 'Your waf rule allowed has been created'
       }

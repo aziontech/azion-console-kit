@@ -308,7 +308,7 @@
   }
 
   const handleListWafRulesAllowedService = async () => {
-    return await props.listWafRulesAllowedService({ id: wafRuleId.value })
+    return await props.listWafRulesAllowedService({ wafId: wafRuleId.value })
   }
 
   const handleDeleteWafRulesAllowedService = async (id) => {
@@ -329,7 +329,7 @@
   const handleEditWafRulesAllowedService = async (payload) => {
     return await props.editWafRulesAllowedService({
       payload,
-      id: wafRuleId.value,
+      wafId: wafRuleId.value,
       allowedId: selectedWafRulesAllowedToEdit.value
     })
   }

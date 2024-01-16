@@ -29,7 +29,7 @@ describe('WafRulesServices', () => {
       body: fixtures.wafRulesMock
     })
     const { sut } = makeSut()
-    await sut({ payload: fixtures.wafRulesMock, id: 4040, allowedId: 10 })
+    await sut({ payload: fixtures.wafRulesMock, wafId: 4040, allowedId: 10 })
 
     expect(requestSpy).toHaveBeenCalledWith({
       url: 'v4/edge/waf/4040/allowed_rules/10',
@@ -52,7 +52,7 @@ describe('WafRulesServices', () => {
     })
     const { sut } = makeSut()
 
-    const data = await sut({ payload: fixtures.wafRulesMock, id: 4040, allowedId: 10 })
+    const data = await sut({ payload: fixtures.wafRulesMock, wafId: 4040, allowedId: 10 })
 
     expect(data).toStrictEqual('Your waf rule allowed has been updated')
   })
@@ -67,7 +67,7 @@ describe('WafRulesServices', () => {
     })
     const { sut } = makeSut()
 
-    const feedbackMessage = sut({ payload: fixtures.wafRulesMock, id: 4040, allowedId: 10 })
+    const feedbackMessage = sut({ payload: fixtures.wafRulesMock, wafId: 4040, allowedId: 10 })
 
     expect(feedbackMessage).rejects.toThrow(apiErrorMock)
   })
@@ -101,7 +101,7 @@ describe('WafRulesServices', () => {
       })
       const { sut } = makeSut()
 
-      const response = sut({ payload: fixtures.wafRulesMock, id: 4040, allowedId: 10 })
+      const response = sut({ payload: fixtures.wafRulesMock, wafId: 4040, allowedId: 10 })
 
       expect(response).rejects.toBe(expectedError)
     }
