@@ -9,7 +9,7 @@
   })
 </script>
 <template>
-  <div class="flex w-full items-center flex-row">
+  <div class="flex w-full items-center flex-column gap-4 md:gap-2 md:flex-row">
     <div class="p-inputgroup flex flex-row grow">
       <PrimeButton
         outlined
@@ -24,15 +24,13 @@
         </p>
       </div>
     </div>
-    <div class="mx-2">
-      <PrimeButton
-        class="h-8"
-        label="Search"
-        :disabled="true"
-      />
-    </div>
     <PrimeButton
-      class="h-8 w-full max-w-fit"
+      class="h-8 w-full md:max-w-max"
+      label="Search"
+      :disabled="true"
+    />
+    <PrimeButton
+      class="h-8 w-full md:max-w-fit"
       outlined
       icon-pos="right"
       icon="pi pi-external-link"
