@@ -2,7 +2,7 @@
   <FormLoading v-if="isLoading" />
   <div
     class="w-full flex flex-col gap-8 max-md:gap-6"
-    v-else-if="!isLoading"
+    v-else
   >
     <FormHorizontal
       v-if="inputSchema.fields"
@@ -172,9 +172,9 @@
     try {
       const initialData = await props.getTemplateService(id)
       inputSchema.value = initialData.inputSchema
-      const schemaObject = createSchemaObject()
-      const isValid = (await schemaObject).isValid()
-      createInputs(schemaObject, isValid)
+      const schemaObject = await createSchemaObject()
+      const isValid = await schemaObject.isValid()
+      await createInputs(schemaObject, isValid)
     } catch (error) {
       toast.add({
         closable: true,
@@ -195,27 +195,23 @@
   })
 
   const createSchemaObject = async () => {
-    const token = {}
+    const templateSchema = {}
 
-    if (inputSchema.value.fields) {
-      inputSchema.value.fields.forEach((element) => {
-        const schema = createSchemaString(element)
-        token[element.name] = schema
+    inputSchema.value.fields?.forEach((field) => {
+      const schema = createSchemaString(field)
+      templateSchema[field.name] = schema
+    })
+
+    inputSchema.value.groups?.forEach((group) => {
+      group.fields.forEach((field) => {
+        const schema = createSchemaString(field)
+        templateSchema[field.name] = schema
       })
-    }
+    })
 
-    if (inputSchema.value.groups) {
-      inputSchema.value.groups.forEach((group) => {
-        group.fields.forEach((element) => {
-          const schema = createSchemaString(element)
-          token[element.name] = schema
-        })
-      })
-    }
+    const resultSchema = yup.object(templateSchema)
 
-    const schameObject = yup.object(token)
-
-    return schameObject
+    return resultSchema
   }
 
   const createSchemaString = (element) => {
@@ -273,25 +269,21 @@
 
     formTools.value = { errors, meta, resetForm, values }
 
-    if (inputSchema.value.fields) {
-      inputSchema.value.fields.forEach((element) => {
-        if (element.value) {
-          setFieldValue(element.name, element.value)
-        }
-        element.input = defineInputBinds(element.name, { validateOnInput: true })
-      })
-    }
+    inputSchema.value.fields?.forEach((field) => {
+      if (field.value) {
+        setFieldValue(field.name, field.value)
+      }
+      field.input = defineInputBinds(field.name, { validateOnInput: true })
+    })
 
-    if (inputSchema.value.groups) {
-      inputSchema.value.groups.forEach((group) => {
-        group.fields.forEach((element) => {
-          if (element.value) {
-            setFieldValue(element.name, element.value)
-          }
-          element.input = defineInputBinds(element.name, { validateOnInput: true })
-        })
+    inputSchema.value.groups?.forEach((group) => {
+      group.fields.forEach((field) => {
+        if (field.value) {
+          setFieldValue(field.name, field.value)
+        }
+        field.input = defineInputBinds(field.name, { validateOnInput: true })
       })
-    }
+    })
 
     isLoading.value = false
 
@@ -307,8 +299,8 @@
   }
 
   const inputPassword = (inputName, text) => {
-    const setFieldValue = useSetFieldValue()
-    setFieldValue(inputName, text)
+    const setFieldValue = useSetFieldValue(inputName)
+    setFieldValue(text)
   }
 
   const validateAndSubmit = async () => {
