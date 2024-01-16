@@ -17,7 +17,7 @@ export const listDigitalCertificatesService = async ({
   return parseHttpResponse(httpResponse)
 }
 
-export const EDGE_CERTIFICATE = 'Edge Certificate'
+export const EDGE_CERTIFICATE = 'TLS Certificate'
 export const TRUSTED_CA_CERTIFICATE = 'Trusted CA Certificate'
 
 const parseStatusData = (status) => {
