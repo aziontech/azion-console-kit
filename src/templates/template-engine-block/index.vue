@@ -24,9 +24,9 @@
           <Password
             v-if="field.type === 'password'"
             toggleMask
-            :key="`password${field.name}`"
-            :modelValue="field.value.input"
-            @input="(event) => inputPassword(field.name, event.target.value)"
+            :key="`password-field-${field.name}`"
+            v-bind="field.input"
+            v-model="field.input.value"
             :id="field.name"
             class="w-full"
             :class="{ 'p-invalid': formTools.errors[field.name] }"
@@ -73,9 +73,9 @@
             <Password
               v-if="field.type === 'password'"
               toggleMask
-              :key="`password${field.name}`"
-              :modelValue="field.value.input"
-              @input="(event) => inputPassword(field.name, event.target.value)"
+              :key="`password-field-${field.name}`"
+              v-bind="field.input"
+              v-model="field.input.value"
               :id="field.name"
               class="w-full"
               :class="{ 'p-invalid': formTools.errors[field.name] }"
@@ -298,11 +298,6 @@
     return fields.filter((field) => !field.hidden)
   }
 
-  const inputPassword = (inputName, text) => {
-    const setFieldValue = useSetFieldValue(inputName)
-    setFieldValue(text)
-  }
-
   const validateAndSubmit = async () => {
     submitLoading.value = true
     emit('loading')
@@ -335,10 +330,8 @@
       })
 
       const response = await props.instantiateTemplateService(props.templateId, payload)
-      emit('instantiate', response)
-
-      // Let submit loading for others operations
       submitLoading.value = props.freezeLoading
+      emit('instantiate', response)
     } catch (error) {
       toast.add({
         closable: true,
