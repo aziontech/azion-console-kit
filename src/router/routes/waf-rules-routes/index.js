@@ -55,7 +55,9 @@ export const wafRulesRoutes = {
         deleteWafRulesAllowedService: WafRulesService.deleteWafRulesAllowedService,
         createWafRulesAllowedService: WafRulesService.createWafRulesAllowedService,
         loadWafRulesAllowedService: WafRulesService.loadWafRulesAllowedService,
-        editWafRulesAllowedService: WafRulesService.editWafRulesAllowedService
+        editWafRulesAllowedService: WafRulesService.editWafRulesAllowedService,
+        documentationServiceAllowed: Helpers.documentationCatalog.wafAllowed,
+        documentationServiceTuning: Helpers.documentationCatalog.wafTuning
       },
       meta: {
         breadCrumbs: [
@@ -80,7 +82,9 @@ export const wafRulesRoutes = {
         deleteWafRulesAllowedService: WafRulesService.deleteWafRulesAllowedService,
         createWafRulesAllowedService: WafRulesService.createWafRulesAllowedService,
         loadWafRulesAllowedService: WafRulesService.loadWafRulesAllowedService,
-        editWafRulesAllowedService: WafRulesService.editWafRulesAllowedService
+        editWafRulesAllowedService: WafRulesService.editWafRulesAllowedService,
+        documentationServiceAllowed: Helpers.documentationCatalog.wafAllowed,
+        documentationServiceTuning: Helpers.documentationCatalog.wafTuning
       },
       meta: {
         breadCrumbs: [
@@ -105,7 +109,9 @@ export const wafRulesRoutes = {
         deleteWafRulesAllowedService: WafRulesService.deleteWafRulesAllowedService,
         createWafRulesAllowedService: WafRulesService.createWafRulesAllowedService,
         loadWafRulesAllowedService: WafRulesService.loadWafRulesAllowedService,
-        editWafRulesAllowedService: WafRulesService.editWafRulesAllowedService
+        editWafRulesAllowedService: WafRulesService.editWafRulesAllowedService,
+        documentationServiceAllowed: Helpers.documentationCatalog.wafAllowed,
+        documentationServiceTuning: Helpers.documentationCatalog.wafTuning
       },
       meta: {
         breadCrumbs: [

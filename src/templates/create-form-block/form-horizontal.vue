@@ -6,7 +6,10 @@
     <!-- title and description -->
     <div class="flex flex-col gap-2 flex-1 w-full md:min-w-[20rem]">
       <div class="text-color text-xl font-medium">{{ props.title }}</div>
-      <div class="text-color-secondary text-sm font-normal " style="white-space: pre-line">
+      <div
+        class="text-color-secondary text-sm font-normal"
+        style="white-space: pre-line"
+      >
         {{ props.description }}
       </div>
     </div>

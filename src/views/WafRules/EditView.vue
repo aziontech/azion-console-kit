@@ -31,9 +31,7 @@
             </template>
           </EditFormBlock>
         </TabPanel>
-        <TabPanel header="Tuning">
-          <h1>Tuning</h1>
-        </TabPanel>
+        <TabPanel header="Tuning"> </TabPanel>
         <TabPanel header="Allowed Rules">
           <ListTableNoHeaderBlock
             ref="listAllowedRef"
@@ -51,25 +49,30 @@
               <PrimeButton
                 icon="pi pi-plus"
                 label="Allowed Rule"
-                @click="openCreateDrawerIDNSResource"
+                @click="openCreateDrawerWafAllowed"
               />
             </template>
           </ListTableNoHeaderBlock>
 
           <EmptyResultsBlock
             v-else
-            title="No Waf Rules Allowed has been created"
-            description=" Click the button below to initiate the setup process and create your first waf rules allowed."
+            title="No Allowed Rules added."
+            description="Allowed Rules are specific WAF rules customized for your web application."
             createButtonLabel="Allowed Rule"
-            :documentationService="documentationService"
+            :documentationService="documentationServiceAllowed"
             :inTabs="true"
           >
             <template #default>
               <PrimeButton
                 severity="secondary"
+                label="Create from Tuning"
+              >
+              </PrimeButton>
+              <PrimeButton
+                severity="secondary"
                 icon="pi pi-plus"
-                label="Add"
-                @click="openCreateDrawerIDNSResource"
+                label="Allowed Rule"
+                @click="openCreateDrawerWafAllowed"
               />
             </template>
             <template #illustration>
@@ -125,6 +128,7 @@
   import PrimeButton from 'primevue/button'
   import TabPanel from 'primevue/tabpanel'
   import TabView from 'primevue/tabview'
+
   import { computed, onBeforeMount, ref, watch } from 'vue'
   import { useRoute, useRouter } from 'vue-router'
   import * as yup from 'yup'
@@ -168,6 +172,14 @@
     editWafRulesAllowedService: {
       type: Function,
       required: true
+    },
+    documentationServiceAllowed: {
+      required: true,
+      type: Function
+    },
+    documentationServiceTuning: {
+      required: true,
+      type: Function
     }
   })
 
@@ -327,7 +339,7 @@
     showEditWafRulesAllowedDrawer.value = true
   }
 
-  const openCreateDrawerIDNSResource = () => {
+  const openCreateDrawerWafAllowed = () => {
     showCreateWafRulesAllowedDrawer.value = true
   }
 
