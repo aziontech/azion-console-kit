@@ -39,7 +39,7 @@
     matchZones.value = [...newArray, { matches_on: 'value', zone: 'path', zone_input: null }]
   }
 
-  const text = ref(
+  const descriptionAllowedFormField = ref(
     'Choose match zones to put into the Allowed Rule:\n Path to put the path itself or one named path into the Allowed Rule. \n Query String or Conditional Query String to put all GET arguments or one named argument into the Allowed Rule. For example, the "search" argument. \n Request Header or Conditional Request Header to put all HTTP request headers or one named header into the Allowed Rule. For example, the Cookie header. \nRequest Body or Conditional Request Body to put all POST arguments or one named argument into the Allowed Rule. For example, the "search" argument.\n Raw Body to put the unparsed (raw) request body into the whitelist.\n File Name (Multipart Body) to put the unparsed (raw) request body into the Allowed Rule.'
   )
 
@@ -111,7 +111,7 @@
   <FormHorizontal
     :isDrawer="true"
     title="Match Zone Set"
-    :description="text"
+    :description="descriptionAllowedFormField"
   >
     <template #inputs>
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
@@ -136,7 +136,7 @@
         >
           <div
             class="flex"
-            v-if="index > 0"
+            v-if="index"
           >
             <Divider
               align="left"
