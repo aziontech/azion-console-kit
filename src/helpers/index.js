@@ -13,7 +13,6 @@ import { getEnvironmentFromUrl } from './get-environment-from-url'
 import { getFirstApiError } from './get-first-api-error'
 import InviteSession from './invite-session'
 import { parseCamelToSnake, parseSnakeToCamel } from './parse-api-body'
-import { switchAccountFromSocialIdp } from './switch-account-from-social-idp'
 import { themeSelect } from './theme-select'
 
 export {
@@ -32,6 +31,5 @@ export {
   openSearchResult,
   parseCamelToSnake,
   parseSnakeToCamel,
-  switchAccountFromSocialIdp,
   themeSelect
 }
