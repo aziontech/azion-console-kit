@@ -1,7 +1,7 @@
 <script setup>
+  import EditFormBlock from '@/templates/edit-form-block'
   import FormFieldsErrorResponses from '@/views/EdgeApplicationsErrorResponses/FormFields/FormFieldsErrorResponses'
   import ActionBarBlockWithTeleport from '@templates/action-bar-block/action-bar-with-teleport'
-  import EditFormBlock from '@/templates/edit-form-block'
   import * as yup from 'yup'
 
   const props = defineProps({
@@ -20,10 +20,6 @@
     loadErrorResponsesService: {
       type: Function,
       required: true
-    },
-    showActionBar: {
-      type: Boolean,
-      default: true
     }
   })
 
@@ -69,7 +65,6 @@
     </template>
     <template #action-bar="{ onSubmit, formValid, onCancel, loading }">
       <ActionBarBlockWithTeleport
-        v-if="props.showActionBar"
         @onSubmit="onSubmit"
         @onCancel="onCancel"
         :loading="loading"
