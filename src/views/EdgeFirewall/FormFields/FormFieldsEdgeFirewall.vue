@@ -62,7 +62,6 @@
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
         <FieldText
           label="Name *"
-          placeholder="Insert the Origin Name"
           name="name"
           :value="name"
           description="Give a unique and easy-to-remember name."

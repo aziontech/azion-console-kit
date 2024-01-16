@@ -24,7 +24,7 @@ const adapt = (payload) => {
         timeout: element.timeout,
         code: element.code
       })
-    }else {
+    } else {
       errorResponses.push({
         custom_status_code: element.customStatusCode?.toString() || null,
         uri: element.uri || null,

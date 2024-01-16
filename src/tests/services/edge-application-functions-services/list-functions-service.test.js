@@ -29,7 +29,7 @@ const makeSut = () => {
 }
 
 describe('EdgeApplicationFunctionsServices', () => {
-   vi.restoreAllMocks()
+  vi.restoreAllMocks()
 
   it('should call API with correct params', async () => {
     const requestSpy = vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({

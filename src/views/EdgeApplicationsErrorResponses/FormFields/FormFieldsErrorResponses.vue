@@ -115,7 +115,9 @@
     }
   ]
   const showErrorResponsesInputs = computed(() => errorResponses.value.length > 0)
-  const statusAnyErrorResponse = computed(() => errorResponses.value.filter((element => element.value.code === 'any'))[0])
+  const statusAnyErrorResponse = computed(
+    () => errorResponses.value.filter((element) => element.value.code === 'any')[0]
+  )
   const { value: originId } = useField('originId')
   const {
     push: pushErrorResponse,
