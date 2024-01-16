@@ -122,7 +122,7 @@
   import ActionBarTemplate from '@templates/action-bar-block'
   import FormLoading from './FormLoading'
   import InputText from 'primevue/inputtext'
-  import { useForm, useSetFieldValue } from 'vee-validate'
+  import { useForm } from 'vee-validate'
   import * as yup from 'yup'
   import { useToast } from 'primevue/usetoast'
 
