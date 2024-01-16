@@ -1,3 +1,4 @@
+import { ProccessRequestError } from '@/services/axios/errors'
 import { AccountNotFoundError } from '@/services/axios/errors/account-not-found-error'
 
 export class AccountHandler {
@@ -60,14 +61,28 @@ export class AccountHandler {
     window.location.replace('/')
   }
 
+  /**
+   * Refreshes the given refresh service.
+   *
+   * @param {Function} refreshService - The service to refreshed token.
+   * @return {Promise} - A promise that resolves when the refresh is complete.
+   * @throws {ProccessRequestError} - Throws an error if the refresh fails.
+   */
   static async refresh(refreshService) {
     try {
       await refreshService()
     } catch {
-      throw new Error()
+      throw new ProccessRequestError().message
     }
   }
 
+  /**
+   * Asynchronously switches the account from a social IDP.
+   *
+   * @param {function} verifyService - The function that verifies the service.
+   * @param {function} refreshService - The function that refreshes the service.
+   * @return {string | object} The URL string or object to redirect to.
+   */
   async switchAccountFromSocialIdp(verifyService, refreshService) {
     try {
       const { twoFactor, trustedDevice, user_tracking_info: userInfo } = await verifyService()
@@ -85,7 +100,7 @@ export class AccountHandler {
 
       return this.switchAndReturnAccountPage(accountId)
     } catch {
-      await this.refresh(refreshService)
+      await AccountHandler.refresh(refreshService)
     }
   }
 }
