@@ -179,7 +179,7 @@
         </div>
         <div class="flex flex-col w-full sm:max-w-xs gap-2">
           <label
-            for="maximun-ttl-seconds"
+            for="default-maximun-ttl-seconds"
             class="text-color text-sm font-medium leading-5"
           >
             Error Caching TTL*
