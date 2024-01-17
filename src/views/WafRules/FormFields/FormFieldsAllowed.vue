@@ -49,10 +49,7 @@
       'conditional_query_body',
       'conditional_query_header'
     ]
-    if (conditionalInputs.includes(value)) {
-      return true
-    }
-    return false
+    return (conditionalInputs.includes(value))
   }
 
   const showMatchOnInputs = (value) => {
@@ -64,10 +61,7 @@
       'request_body',
       'request_header'
     ]
-    if (conditionalInputs.includes(value)) {
-      return true
-    }
-    return false
+    return (conditionalInputs.includes(value)) 
   }
 
   const deleteMatchZone = (index) => {

@@ -57,9 +57,7 @@ describe('WafRulesServices', () => {
 
     const data = await sut({ payload: fixtures.wafRulesMock, id: 10 })
 
-    expect(data).toStrictEqual({
-      feedback: 'Your waf rule allowed has been created'
-    })
+    expect(data).toStrictEqual('Your waf rule allowed has been created')
   })
 
   it('Should return an API error for an 400 response status', async () => {
