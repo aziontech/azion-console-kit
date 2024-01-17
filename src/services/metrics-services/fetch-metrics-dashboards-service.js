@@ -1,13 +1,13 @@
 import GROUP_DASHBOARDS from './constants/dashboards'
 
-export const fetchMetricsDashboardsService = async (groupId, productId) => {
-  if (!productId || !groupId) {
+export const fetchMetricsDashboardsService = async (groupPath, productPath) => {
+  if (!productPath || !groupPath) {
     return Promise.resolve([])
   }
 
-  const { pagesDashboards } = GROUP_DASHBOARDS.find((group) => group.id == groupId)
+  const { pagesDashboards } = GROUP_DASHBOARDS.find((group) => group.value == groupPath)
 
-  const products = pagesDashboards.filter((product) => product.id == productId)
+  const products = pagesDashboards.filter((product) => product.path == productPath)
 
   if (!products.length) {
     return Promise.resolve([])
@@ -17,7 +17,8 @@ export const fetchMetricsDashboardsService = async (groupId, productId) => {
     return {
       id: dashboard.id,
       label: dashboard.label,
-      dataset: dashboard.dataset
+      dataset: dashboard.dataset,
+      path: dashboard.url
     }
   })
 
