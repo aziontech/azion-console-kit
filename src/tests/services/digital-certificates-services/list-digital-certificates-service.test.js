@@ -86,7 +86,7 @@ describe('DigitalCertificatesServices', () => {
       id: fixtures.certificateMock.id,
       name: fixtures.certificateMock.name,
       issuer: fixtures.certificateMock.issuer,
-      type: 'Edge Certificate',
+      type: 'TLS Certificate',
       subjectName: 'Subject 1,Subject 2',
       validity: 'Nov 10, 2023, 12:00 AM',
       status: {
@@ -128,7 +128,7 @@ describe('DigitalCertificatesServices', () => {
         id: fixtures.certificateMock.id,
         name: fixtures.certificateMock.name,
         issuer: fixtures.certificateMock.issuer,
-        type: 'Edge Certificate',
+        type: 'TLS Certificate',
         subjectName: 'Subject 1,Subject 2',
         validity: 'Nov 10, 2023, 12:00 AM',
         status: {

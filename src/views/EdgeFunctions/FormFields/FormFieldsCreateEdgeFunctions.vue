@@ -104,10 +104,10 @@
                 class="w-full"
                 readonly
               />
-              <small class="text-xs text-color-secondary font-normal leading-tight">
-                Currently, only JavaScript is supported.</small
-              >
             </span>
+            <small class="text-xs text-color-secondary font-normal leading-tight">
+              Currently, only JavaScript is supported.</small
+            >
           </div>
         </template>
       </FormHorizontal>

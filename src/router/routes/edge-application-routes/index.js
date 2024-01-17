@@ -80,8 +80,12 @@ export const edgeApplicationRoutes = {
           documentationService: Helpers.documentationCatalog.edgeApplicationCacheSettings
         },
         functionsServices: {
+          createFunctionService: FunctionsService.createFunctionService,
           deleteFunctionService: FunctionsService.deleteFunctionService,
           listEdgeApplicationFunctionsService: FunctionsService.listEdgeApplicationFunctionsService,
+          listEdgeFunctionsService: FunctionsService.listEdgeFunctionsService,
+          loadFunctionService: FunctionsService.loadFunctionService,
+          editFunctionService: FunctionsService.editFunctionService,
           documentationService: Helpers.documentationCatalog.edgeApplicationFunctions
         },
         deviceGroupsServices: {

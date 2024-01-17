@@ -1,7 +1,7 @@
 import { AxiosHttpClientAdapter } from '@/services/axios/AxiosHttpClientAdapter'
+import * as Errors from '@/services/axios/errors'
 import { editOriginService } from '@/services/edge-application-origins-services'
 import { describe, expect, it, vi } from 'vitest'
-import * as Errors from '@/services/axios/errors'
 
 const fixtures = {
   originMock: {
@@ -18,6 +18,8 @@ const fixtures = {
         serverRole: 'primary'
       }
     ],
+    method: 'GET',
+    isOriginRedirectionEnabled: false,
     originProtocolPolicy: 'http',
     hostHeader: '${host}',
     originPath: '/requests',
@@ -61,6 +63,9 @@ describe('EdgeApplicationOriginsServices', () => {
       url: `${version}/edge_applications/${fixtures.originMock.edgeApplicationId}/origins/${fixtures.originMock.id}`,
       method: 'PATCH',
       body: {
+        origin_type: fixtures.originMock.originType,
+        is_origin_redirection_enabled: fixtures.originMock.isOriginRedirectionEnabled,
+        method: fixtures.originMock.method,
         name: fixtures.originMock.name,
         host_header: fixtures.originMock.hostHeader,
         addresses: fixtures.addressesMock,

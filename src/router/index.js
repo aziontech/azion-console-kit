@@ -25,6 +25,7 @@ import { personalTokensRoutes } from '@routes/personal-tokens-routes'
 import { playgroundRoutes } from '@routes/playground-routes'
 import { realTimePurgeRoutes } from '@routes/real-time-purge'
 import { signupRoutes } from '@routes/signup-routes'
+import { switchAccountRoutes } from '@routes/switch-account-routes'
 import { teamsPermissionRoutes } from '@routes/team-permission'
 import { usersListsRoutes } from '@routes/users-routes'
 import { variablesRoutes } from '@routes/variables-routes'
@@ -65,6 +66,7 @@ const router = createRouter({
     realTimePurgeRoutes,
     teamsPermissionRoutes,
     signupRoutes,
+    switchAccountRoutes,
     marketplaceRoutes,
     accountRoutes,
     settingsRoutes,

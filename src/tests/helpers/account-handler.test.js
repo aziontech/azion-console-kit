@@ -1,6 +1,7 @@
 import { AccountHandler } from '@/helpers/account-handler'
+import { ProccessRequestError } from '@/services/axios/errors'
 import { AccountNotFoundError } from '@/services/axios/errors/account-not-found-error'
-import { describe, expect, it, vi, afterAll } from 'vitest'
+import { afterAll, describe, expect, it, vi } from 'vitest'
 
 vi.stubGlobal('window', {
   location: {
@@ -75,5 +76,78 @@ describe('AccountHandler', () => {
     await sut.switchAccountAndRedirect('1')
 
     expect(window.location).toEqual('/signup/additional-data')
+  })
+
+  it('should return login url when user info is not found', async () => {
+    const verifyService = vi.fn().mockResolvedValue({ user_tracking_info: null })
+    const refreshService = vi.fn()
+    const { sut } = makeSut({ accountId: '1', firstLogin: false })
+
+    const result = await sut.switchAccountFromSocialIdp(verifyService, refreshService)
+    expect(result).toEqual('/login')
+  })
+
+  it('should return mfa/setup url if twoFactor is true and trustedDevice is false', async () => {
+    const verifyService = vi.fn().mockResolvedValue({
+      user_tracking_info: { props: { account_id: '1' } },
+      twoFactor: true,
+      trustedDevice: false
+    })
+    const refreshService = vi.fn()
+    const { sut } = makeSut({ accountId: '1', firstLogin: false })
+
+    const result = await sut.switchAccountFromSocialIdp(verifyService, refreshService)
+    expect(result).toEqual('/mfa/setup')
+  })
+
+  it('should return mfa/authentication if twoFactor is true and trustedDevice is true', async () => {
+    const verifyService = vi.fn().mockResolvedValue({
+      user_tracking_info: { props: { account_id: '1' } },
+      twoFactor: true,
+      trustedDevice: true
+    })
+    const refreshService = vi.fn()
+    const { sut } = makeSut({ accountId: '1', firstLogin: false })
+
+    const result = await sut.switchAccountFromSocialIdp(verifyService, refreshService)
+    expect(result).toEqual('/mfa/authentication')
+  })
+
+  it('should return the object to redirect to home if twoFactor and firstLogin is false', async () => {
+    const verifyService = vi.fn().mockResolvedValue({
+      user_tracking_info: { props: { account_id: '1' } },
+      twoFactor: false,
+      trustedDevice: false
+    })
+    const refreshService = vi.fn()
+    const { sut } = makeSut({ accountId: '1', firstLogin: false })
+
+    const result = await sut.switchAccountFromSocialIdp(verifyService, refreshService)
+    expect(result).toEqual({ name: 'home' })
+  })
+
+  it('should return the object to redirect to additional-data if twoFactor and firstLogin is true', async () => {
+    const verifyService = vi.fn().mockResolvedValue({
+      user_tracking_info: { props: { account_id: '1' } },
+      twoFactor: false,
+      trustedDevice: false
+    })
+    const refreshService = vi.fn()
+    const { sut } = makeSut({ accountId: '1', firstLogin: true })
+
+    const result = await sut.switchAccountFromSocialIdp(verifyService, refreshService)
+    expect(result).toEqual({ name: 'additional-data' })
+  })
+
+  it('should call the refresh service when verifyService throws', async () => {
+    const verifyService = vi.fn().mockRejectedValueOnce(new Error())
+    const refreshService = vi.fn().mockRejectedValueOnce(new Error())
+
+    const { sut } = makeSut({ accountId: '1', firstLogin: true })
+
+    await expect(sut.switchAccountFromSocialIdp(verifyService, refreshService)).rejects.toThrow(
+      new ProccessRequestError().message
+    )
+    expect(refreshService).toHaveBeenCalled()
   })
 })

@@ -2,9 +2,9 @@ import * as FunctionsInstanceService from '@/services/edge-application-functions
 import * as EdgeFunctionsService from '@/services/edge-functions-services'
 import { parseHttpResponse } from '@/services/axios/AxiosHttpClientAdapter'
 
-const getFunctionInstances = async (edgeApplicationId) => {
+const listFunctionInstances = async (edgeApplicationID) => {
   return FunctionsInstanceService.listFunctionsService({
-    id: edgeApplicationId
+    id: edgeApplicationID
   })
 }
 
@@ -14,37 +14,40 @@ const getFunctionData = async (edgeApplicationFunction) => {
   })
 }
 
-const createFunctionsList = async (functionsInstances) => {
+const listFunctionInstancesAndFunctionData = async (functionsInstances) => {
   return Promise.all(
     functionsInstances?.map(async (edgeApplicationFunction) => {
       let functionData = await getFunctionData(edgeApplicationFunction)
-
-      return {
-        id: edgeApplicationFunction.id,
-        name: edgeApplicationFunction.name,
-        languageIcon: functionData.languageIcon,
-        referenceCount: functionData.referenceCount,
-        initiatorType: functionData.initiatorType,
-        lastEditor: functionData.lastEditor,
-        modified: functionData.modified,
-        statusTag: functionData.statusTag,
-        version: functionData.version
-      }
+      return mapFunctionData(edgeApplicationFunction, functionData)
     })
   )
 }
 
-const adapt = (functionsList) => {
+export const listEdgeApplicationFunctionsService = async (edgeApplicationID) => {
+  const functionsInstances = await listFunctionInstances(edgeApplicationID)
+  const functions = await listFunctionInstancesAndFunctionData(functionsInstances)
+  const httpResponse = adapt(functions)
+
+  return parseHttpResponse(httpResponse)
+}
+
+const mapFunctionData = (edgeApplicationFunction, functionData) => {
   return {
-    body: functionsList,
-    statusCode: 200
+    id: edgeApplicationFunction.id,
+    name: edgeApplicationFunction.name,
+    languageIcon: functionData.languageIcon,
+    referenceCount: functionData.referenceCount,
+    initiatorType: functionData.initiatorType,
+    lastEditor: functionData.lastEditor,
+    modified: functionData.modified,
+    statusTag: functionData.statusTag,
+    version: functionData.version
   }
 }
 
-export const listEdgeApplicationFunctionsService = async (edgeApplicationId) => {
-  const functionsInstances = await getFunctionInstances(edgeApplicationId)
-  const functionsList = await createFunctionsList(functionsInstances)
-  const httpResponse = adapt(functionsList)
-
-  return parseHttpResponse(httpResponse)
+const adapt = (functions) => {
+  return {
+    body: functions,
+    statusCode: 200
+  }
 }
