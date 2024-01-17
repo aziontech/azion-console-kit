@@ -115,6 +115,7 @@
     }
   ]
   const showErrorResponsesInputs = computed(() => errorResponses.value.length > 0)
+  const disableOriginKey = computed(() => errorResponses.value.length < 2)
   const statusAnyErrorResponse = computed(
     () => errorResponses.value.filter((element) => element.value.code === 'any')[0]
   )
@@ -148,6 +149,7 @@
 </script>
 
 <template>
+  {{ originId }}
   <FormHorizontal
     title="Error Responses List"
     description="Time to cache error responses before retry request to your origin."
@@ -178,7 +180,7 @@
         <div class="flex flex-col w-full sm:max-w-xs gap-2">
           <label
             for="maximun-ttl-seconds"
-            class="text-color text-base font-medium"
+            class="text-color text-sm font-medium leading-5"
           >
             Error Caching TTL*
           </label>
@@ -224,7 +226,7 @@
             <div class="flex flex-col w-full sm:max-w-xs gap-2">
               <label
                 for="maximun-ttl-seconds"
-                class="text-color text-base font-medium"
+                class="text-color text-sm font-medium leading-5"
               >
                 Error Caching TTL*
               </label>
@@ -248,7 +250,7 @@
           <div class="flex flex-col sm:max-w-lg w-full gap-2">
             <label
               for="maximun-ttl-seconds"
-              class="text-color text-base font-medium"
+              class="text-color text-sm font-medium leading-5"
             >
               Custom status code
             </label>
@@ -286,6 +288,7 @@
         <Dropdown
           inputId="originId"
           v-model="originId"
+          :disabled="disableOriginKey"
           :options="originOptions"
           optionLabel="name"
           option-value="originId"
