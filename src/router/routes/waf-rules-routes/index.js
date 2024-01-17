@@ -43,6 +43,39 @@ export const wafRulesRoutes = {
           }
         ]
       }
+    },
+    {
+      path: 'edit/:id/:tab?',
+      name: 'edit-waf-rules',
+      component: () => import('@views/WafRules/TabsView.vue'),
+      props: {
+        wafRulesAllowed: {
+          deleteWafRulesAllowedService: WafRulesService.deleteWafRulesAllowedService,
+          createWafRulesAllowedService: WafRulesService.createWafRulesAllowedService,
+          loadWafRulesAllowedService: WafRulesService.loadWafRulesAllowedService,
+          editWafRulesAllowedService: WafRulesService.editWafRulesAllowedService,
+          documentationServiceAllowed: Helpers.documentationCatalog.wafAllowed,
+          listWafRulesAllowedService: WafRulesService.listWafRulesAllowedService
+        },
+        wafServices: {
+          editWafRulesService: WafRulesService.editWafRulesService,
+          loadWafRulesService: WafRulesService.loadWafRulesService
+        },
+        wafTuning: {
+          documentationServiceTuning: Helpers.documentationCatalog.wafTuning
+        }
+      },
+      meta: {
+        breadCrumbs: [
+          {
+            label: 'Waf Rules',
+            to: '/waf'
+          },
+          {
+            label: 'Edit Waf Rules'
+          }
+        ]
+      }
     }
   ]
 }

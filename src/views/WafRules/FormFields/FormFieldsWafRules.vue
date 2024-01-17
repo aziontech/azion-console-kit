@@ -9,6 +9,13 @@
   import { useField } from 'vee-validate'
   defineOptions({ name: 'form-fields-waf-rules' })
 
+  const props = defineProps({
+    disabledActive: {
+      type: Boolean,
+      default: true
+    }
+  })
+
   const { value: active } = useField('active')
   const { value: crossSiteScriptingSensitivity } = useField('crossSiteScriptingSensitivity')
   const { value: directoryTraversalSensitivity } = useField('directoryTraversalSensitivity')
@@ -26,6 +33,7 @@
   const { value: directoryTraversal } = useField('directoryTraversal')
   const { value: remoteFileInclusion } = useField('remoteFileInclusion')
   const { value: sqlInjection } = useField('sqlInjection')
+  const { value: name } = useField('name')
 
   const sensitivity = ref([
     { name: 'Sensitivity Highest', value: 'highest' },
@@ -316,7 +324,7 @@
         <InputSwitch
           id="active"
           v-model="active"
-          :disabled="true"
+          :disabled="props.disabledActive"
         />
         <label
           for="active"

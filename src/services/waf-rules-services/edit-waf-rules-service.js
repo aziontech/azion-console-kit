@@ -2,10 +2,10 @@ import { AxiosHttpClientAdapter } from '../axios/AxiosHttpClientAdapter'
 import * as Errors from '@/services/axios/errors'
 import { makeWafRulesBaseUrl } from './make-waf-rules-base-url'
 
-export const createWafRulesService = async (payload) => {
+export const editWafRulesService = async (payload, id) => {
   let httpResponse = await AxiosHttpClientAdapter.request({
-    url: `${makeWafRulesBaseUrl()}/rulesets`,
-    method: 'POST',
+    url: `${makeWafRulesBaseUrl()}/rulesets/${id}`,
+    method: 'PATCH',
     body: adapt(payload)
   })
 
@@ -19,7 +19,7 @@ const adapt = (payload) => {
     directory_traversal_sensitivity: payload.directoryTraversalSensitivity,
     evading_tricks_sensitivity: payload.evadingTricksSensitivity,
     file_upload_sensitivity: payload.fileUploadSensitivity,
-    id: payload.id,
+    account_id: payload.id,
     identified_attack_sensitivity: payload.identifiedAttackSensitivity,
     name: payload.name,
     remote_file_inclusion_sensitivity: payload.remoteFileInclusionSensitivity,
@@ -46,11 +46,8 @@ const adapt = (payload) => {
  */
 const parseHttpResponse = (httpResponse) => {
   switch (httpResponse.statusCode) {
-    case 201:
-      return {
-        feedback: 'Your waf rule has been created',
-        urlToEditView: `/waf/edit/${httpResponse.body.id}`
-      }
+    case 200:
+      return 'Your waf rule has been updated'
     case 400:
       const apiError = extractApiError(httpResponse)
       throw new Error(apiError).message
@@ -72,9 +69,6 @@ const parseHttpResponse = (httpResponse) => {
  * @param {string} key - The error key of error schema.
  * @returns {string|undefined} The result message based on the status code.
  */
-const extractErrorKey = (errorSchema, key) => {
-  return errorSchema[key]?.[0]
-}
 
 /**
  * @param {Object} httpResponse - The HTTP response object.
@@ -82,7 +76,8 @@ const extractErrorKey = (errorSchema, key) => {
  * @returns {string} The result message based on the status code.
  */
 const extractApiError = (httpResponse) => {
-  const errorMessage = extractErrorKey(httpResponse.body, 'detail')
+  const [key] = Object.keys(httpResponse.body)
+  const errorMessage = httpResponse.body[key][0]
 
   return errorMessage
 }

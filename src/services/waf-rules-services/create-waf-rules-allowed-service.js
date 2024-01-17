@@ -1,10 +1,10 @@
 import { AxiosHttpClientAdapter } from '../axios/AxiosHttpClientAdapter'
 import * as Errors from '@/services/axios/errors'
-import { makeWafRulesBaseUrl } from './make-waf-rules-base-url'
+import { makeWafRulesAllowedBaseUrl } from './make-waf-rules-allowed-base-url'
 
-export const createWafRulesService = async (payload) => {
+export const createWafRulesAllowedService = async ({ payload, id }) => {
   let httpResponse = await AxiosHttpClientAdapter.request({
-    url: `${makeWafRulesBaseUrl()}/rulesets`,
+    url: `${makeWafRulesAllowedBaseUrl()}/${id}/allowed_rules`,
     method: 'POST',
     body: adapt(payload)
   })
@@ -13,27 +13,19 @@ export const createWafRulesService = async (payload) => {
 }
 
 const adapt = (payload) => {
+  const matchValidationValues = payload.matchZones.map((zone) => {
+    if (['path', 'file_name', 'raw_body'].includes(zone.zone)) {
+      zone.matches_on = null
+    }
+    return zone
+  })
   return {
-    bypass_addresses: payload.bypassAddresses,
-    cross_site_scripting_sensitivity: payload.crossSiteScriptingSensitivity,
-    directory_traversal_sensitivity: payload.directoryTraversalSensitivity,
-    evading_tricks_sensitivity: payload.evadingTricksSensitivity,
-    file_upload_sensitivity: payload.fileUploadSensitivity,
-    id: payload.id,
-    identified_attack_sensitivity: payload.identifiedAttackSensitivity,
-    name: payload.name,
-    remote_file_inclusion_sensitivity: payload.remoteFileInclusionSensitivity,
-    sql_injection_sensitivity: payload.sqlInjectionSensitivity,
-    unwanted_access_sensitivity: payload.unwantedAccessSensitivity,
-    file_upload: payload.fileUpload,
-    evading_tricks: payload.evadingTricks,
-    unwanted_access: payload.unwantedAccess,
-    identified_attack: payload.identifiedAttack,
-    cross_site_scripting: payload.crossSiteScripting,
-    directory_traversal: payload.directoryTraversal,
-    remote_file_inclusion: payload.remoteFileInclusion,
-    sql_injection: payload.sqlInjection,
-    active: payload.active
+    match_zones: matchValidationValues,
+    path: payload.path,
+    reason: payload.reason,
+    rule_id: payload.ruleId,
+    status: payload.status,
+    use_regex: payload.useRegex
   }
 }
 
@@ -46,11 +38,8 @@ const adapt = (payload) => {
  */
 const parseHttpResponse = (httpResponse) => {
   switch (httpResponse.statusCode) {
-    case 201:
-      return {
-        feedback: 'Your waf rule has been created',
-        urlToEditView: `/waf/edit/${httpResponse.body.id}`
-      }
+    case 202:
+      return 'Your waf rule allowed has been created'
     case 400:
       const apiError = extractApiError(httpResponse)
       throw new Error(apiError).message
@@ -73,7 +62,8 @@ const parseHttpResponse = (httpResponse) => {
  * @returns {string|undefined} The result message based on the status code.
  */
 const extractErrorKey = (errorSchema, key) => {
-  return errorSchema[key]?.[0]
+  const [keyError] = Object.keys(errorSchema[key]?.[0])
+  return errorSchema[key]?.[0][keyError][0]
 }
 
 /**
@@ -82,7 +72,8 @@ const extractErrorKey = (errorSchema, key) => {
  * @returns {string} The result message based on the status code.
  */
 const extractApiError = (httpResponse) => {
-  const errorMessage = extractErrorKey(httpResponse.body, 'detail')
+  const [firstKey] = Object.keys(httpResponse.body)
+  const errorMessage = extractErrorKey(httpResponse.body, firstKey)
 
   return errorMessage
 }
