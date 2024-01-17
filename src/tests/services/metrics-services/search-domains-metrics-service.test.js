@@ -3,24 +3,6 @@ import { searchDomainsMetricsService } from '@/services/metrics-services'
 import * as Errors from '@services/axios/errors'
 import { describe, expect, it, vi } from 'vitest'
 
-// const fixtures = {
-//   domainMock: {
-//     id: '1234',
-//     name: 'Edge App X',
-//     domain_name: 'domain A',
-//     cnames: ['CName 1', 'CName 2'],
-//     is_active: true,
-//     digital_certificate_id: '862026'
-//   },
-//   disabledDomainMock: {
-//     id: '4132123',
-//     name: 'Edge App Y',
-//     domain_name: 'domain B',
-//     cnames: ['CName 3', 'CName 4'],
-//     is_active: false,
-//     digital_certificate_id: '69870'
-//   }
-// }
 
 const makeSut = () => {
   const sut = searchDomainsMetricsService
