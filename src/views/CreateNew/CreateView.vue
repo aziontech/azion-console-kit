@@ -274,11 +274,11 @@
     async created() {
       const store = useLoadingStore()
       store.startLoading()
-      await this.loadSolution()
+      await this.loadSolutionByVendor()
       store.finishLoading()
     },
     methods: {
-      async loadSolution() {
+      async loadSolutionByVendor() {
         try {
           this.isLoading = true
           this.solution = await this.loadSolutionService({
@@ -310,7 +310,10 @@
     },
     watch: {
       $route() {
-        this.loadSolution()
+        if (!this.$route.params.vendor || !this.$route.params.solution) {
+          return
+        }
+        this.loadSolutionByVendor()
       }
     }
   }

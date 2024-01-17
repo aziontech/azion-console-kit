@@ -104,8 +104,10 @@
   const { value: edgeApplication } = useField('edgeApplication')
 
   const edgeApps = computed(() => {
-    const apps = props.availableApps.filter((i) => i.elegibleForInstall)
-    return apps.map((app) => ({
+    const eligibleEdgeApplicationsToInstall = props.availableApps.filter(
+      (edgeApplication) => edgeApplication.elegibleForInstall
+    )
+    return eligibleEdgeApplicationsToInstall.map((app) => ({
       label: app.name,
       value: app.id,
       upgradeable: app.upgradeable
