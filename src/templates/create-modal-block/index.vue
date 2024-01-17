@@ -120,7 +120,8 @@
       toast.add({
         closable: true,
         severity: 'error',
-        summary: error
+        detail: error,
+        summary: 'Error'
       })
     } finally {
       isLoading.value = false
@@ -136,7 +137,8 @@
       toast.add({
         closable: true,
         severity: 'error',
-        summary: error
+        detail: error,
+        summary: 'Error'
       })
     } finally {
       isLoading.value = false
