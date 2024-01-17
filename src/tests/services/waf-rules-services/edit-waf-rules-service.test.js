@@ -1,6 +1,6 @@
 import { AxiosHttpClientAdapter } from '@/services/axios/AxiosHttpClientAdapter'
 import * as Errors from '@/services/axios/errors'
-import { createWafRulesService } from '@/services/waf-rules-services'
+import { editWafRulesService } from '@/services/waf-rules-services'
 import { describe, expect, it, vi } from 'vitest'
 
 const fixtures = {
@@ -22,13 +22,12 @@ const fixtures = {
     remoteFileInclusion: true,
     sqlInjection: true,
     active: false,
-    name: 'test',
-    id: 100
+    name: 'test'
   }
 }
 
 const makeSut = () => {
-  const sut = createWafRulesService
+  const sut = editWafRulesService
 
   return {
     sut
@@ -38,15 +37,15 @@ const makeSut = () => {
 describe('WafRulesServices', () => {
   it('should call API with correct params', async () => {
     const requestSpy = vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
-      statusCode: 201,
+      statusCode: 200,
       body: fixtures.wafRulesMock
     })
     const { sut } = makeSut()
-    await sut(fixtures.wafRulesMock)
+    await sut(fixtures.wafRulesMock, 4040)
 
     expect(requestSpy).toHaveBeenCalledWith({
-      url: 'v3/waf/rulesets',
-      method: 'POST',
+      url: 'v3/waf/rulesets/4040',
+      method: 'PATCH',
       body: {
         bypass_addresses: fixtures.wafRulesMock.bypassAddresses,
         cross_site_scripting_sensitivity: fixtures.wafRulesMock.crossSiteScriptingSensitivity,
@@ -72,19 +71,16 @@ describe('WafRulesServices', () => {
     })
   })
 
-  it('should return a feedback message on successfully created', async () => {
+  it('should return a feedback message on successfully updated', async () => {
     vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
-      statusCode: 201,
+      statusCode: 200,
       body: fixtures.wafRulesMock
     })
     const { sut } = makeSut()
 
     const data = await sut(fixtures.wafRulesMock)
 
-    expect(data).toStrictEqual({
-      feedback: 'Your waf rule has been created',
-      urlToEditView: '/waf/edit/100'
-    })
+    expect(data).toStrictEqual('Your waf rule has been updated')
   })
 
   it('Should return an API error for an 400 response status', async () => {

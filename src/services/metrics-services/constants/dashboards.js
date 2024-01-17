@@ -40,7 +40,7 @@ const PAGES_DASHBOARDS = {
       dashboards: [
         {
           id: 357549371218199219n,
-          label: 'caching-offload',
+          label: 'Caching Offload',
           url: 'caching-offload',
           dataset: 'l2CacheMetrics'
         }

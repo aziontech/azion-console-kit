@@ -3,8 +3,8 @@ import * as MetricsServices from '@/services/metrics-services'
 
 /** @type {import('vue-router').RouteRecordRaw} */
 export const metricsRoutes = {
-  path: '/metrics/:pageId?/:dashboardId?',
-  name: 'metrics',
+  path: '/real-time-metrics/:group?/:product?',
+  name: 'real-time-metrics',
   component: () => import('@views/Metrics/MetricsView.vue'),
   props: {
     playgroundOpener: metricsPlaygroundOpener,

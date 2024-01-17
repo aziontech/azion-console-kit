@@ -25,7 +25,9 @@ export const documentationCatalog = {
   activityHistory: () => openSearchResult('activity history'),
   edgeNodes: () => openSearchResult('edge nodes'),
   records: () => openSearchResult('records'),
-  waf: () => openSearchResult('waf')
+  waf: () => openSearchResult('waf'),
+  wafAllowed: () => openSearchResult('Allowed Rules'),
+  wafTuning: () => openSearchResult('Tuning')
 }
 
 export const documentationGuideProducts = {
