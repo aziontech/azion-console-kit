@@ -145,16 +145,10 @@
     }
   }
 
-  const onMenuChange = async (target) => {
-    if (target.value === null) {
-      selectedTabControl.value = selectedTab.value
-    } else {
-      selectedTab.value = target.value
-    }
-    if (target.value === 'browse') {
-      if (browseTemplates.value.length === 0) {
-        await loadBrowse()
-      }
+  const onTabChange = async (target) => {
+    selectedTab.value = target.value || selectedTab.value
+    if (target.value === 'browse' && browseTemplates.value.length === 0) {
+      await loadBrowse()
     }
   }
 </script>
@@ -163,7 +157,7 @@
   <div class="overflow-auto w-full h-full flex flex-col sm:flex-row p-0 sm:pl-5 sm:pr-8 gap-4 pb-4">
     <div class="sm:min-w-[240px] mt-4">
       <Listbox
-        @change="onMenuChange"
+        @change="onTabChange"
         v-model="selectedTabControl"
         :options="items"
         optionLabel="label"
