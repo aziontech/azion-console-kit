@@ -7,7 +7,7 @@ export const fetchMetricsDashboardsService = async (groupPath, productPath) => {
 
   const { pagesDashboards } = GROUP_DASHBOARDS.find((group) => group.value == groupPath)
 
-  const products = pagesDashboards.filter((product) => product.path == productPath)
+  const products = pagesDashboards.filter((product) => product.url == productPath)
 
   if (!products.length) {
     return Promise.resolve([])
