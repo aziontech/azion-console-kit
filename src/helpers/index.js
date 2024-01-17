@@ -12,6 +12,7 @@ import { clipboardWrite } from './clipboard'
 import { getEnvironmentFromUrl } from './get-environment-from-url'
 import { getFirstApiError } from './get-first-api-error'
 import InviteSession from './invite-session'
+import { metricsPlaygroundOpener } from './metrics-playground-opener'
 import { parseCamelToSnake, parseSnakeToCamel } from './parse-api-body'
 import { themeSelect } from './theme-select'
 
@@ -24,6 +25,7 @@ export {
   documentationGuideProducts,
   getEnvironmentFromUrl,
   getFirstApiError,
+  metricsPlaygroundOpener,
   openAPIDocumentation,
   openContactSupport,
   openDocumentation,
