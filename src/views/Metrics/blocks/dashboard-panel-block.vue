@@ -22,8 +22,8 @@
   const selectedDashboard = ref(null)
 
   const fetchDashboards = async () => {
-    const { pageId, dashboardId } = props.params
-    dashboards.value = await props.metricsDashboardsService(pageId, dashboardId)
+    const { group, product } = props.params
+    dashboards.value = await props.metricsDashboardsService(group, product)
 
     // TODO: revisit the selected dashboard when the filter is implemented
     selectedDashboard.value = dashboards.value[0]
