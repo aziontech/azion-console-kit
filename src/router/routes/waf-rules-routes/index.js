@@ -55,11 +55,11 @@ export const wafRulesRoutes = {
           loadWafRulesAllowedService: WafRulesService.loadWafRulesAllowedService,
           editWafRulesAllowedService: WafRulesService.editWafRulesAllowedService,
           documentationServiceAllowed: Helpers.documentationCatalog.wafAllowed,
-          listWafRulesAllowedService: WafRulesService.listWafRulesAllowedService,
+          listWafRulesAllowedService: WafRulesService.listWafRulesAllowedService
         },
         wafServices: {
           editWafRulesService: WafRulesService.editWafRulesService,
-          loadWafRulesService: WafRulesService.loadWafRulesService,
+          loadWafRulesService: WafRulesService.loadWafRulesService
         },
         wafTuning: {
           documentationServiceTuning: Helpers.documentationCatalog.wafTuning
@@ -76,6 +76,6 @@ export const wafRulesRoutes = {
           }
         ]
       }
-    },
+    }
   ]
 }

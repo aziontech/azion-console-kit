@@ -64,9 +64,7 @@
 
   const wafRuleId = ref(route.params.id)
 
-
   const submitEditWafRules = async (payload) => {
     return await props.editWafRulesService(payload, parseInt(wafRuleId.value))
   }
-
 </script>
