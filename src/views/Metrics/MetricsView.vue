@@ -51,13 +51,19 @@
   })
 
   const route = useRoute()
-  const routeParams = ref({})
+  const routeParams = ref({
+    group: 'build',
+    product: 'edge-applications'
+  })
 
   watch(
     route,
     () => {
-      const { pageId, dashboardId } = route.params
-      routeParams.value = { pageId: pageId || '1', dashboardId: dashboardId || '1' }
+      const { group, product } = route.params
+
+      if (group && product) {
+        routeParams.value = { group, product }
+      }
     },
     { immediate: true }
   )
