@@ -149,6 +149,7 @@
 </script>
 
 <template>
+  {{ originId }}
   <FormHorizontal
     title="Error Responses List"
     description="Time to cache error responses before retry request to your origin."
