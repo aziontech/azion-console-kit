@@ -30,11 +30,11 @@
   const openSwitchAccount = inject('openSwitchAccount')
   const profileMenuDefault = [
     {
-      label: 'Configurações da Conta',
+      label: 'Account Settings',
       to: '/account/settings'
     },
     {
-      label: 'Gerenciamento de Usuários',
+      label: 'Users Management',
       to: '/users'
     },
     {
