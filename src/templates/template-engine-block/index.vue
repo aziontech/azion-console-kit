@@ -312,7 +312,7 @@
           payload.push(...group.fields)
         })
       }
-      payload.forEach((_, index) => {
+      payload.forEach((__, index) => {
         payload[index] = JSON.parse(JSON.stringify(payload[index]))
         const sanitizedField = {
           field: payload[index].name,
@@ -321,7 +321,7 @@
         }
 
         // Hidden field
-        const hiddenField = props.hiddenFields.find((i) => i.name === payload[index].name)
+        const hiddenField = props.hiddenFields.find((field) => field.name === payload[index].name)
         if (hiddenField) {
           sanitizedField.value = hiddenField.value
         }

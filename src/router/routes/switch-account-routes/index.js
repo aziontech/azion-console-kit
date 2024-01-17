@@ -9,7 +9,7 @@ export const switchAccountRoutes = {
   meta: {
     isPublic: true
   },
-  beforeEnter: async (_, __, next) => {
+  beforeEnter: async (__, ___, next) => {
     const accountHandler = new AccountHandler(
       AuthServices.switchAccountService,
       listTypeAccountService
