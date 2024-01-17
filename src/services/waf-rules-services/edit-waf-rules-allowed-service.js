@@ -13,15 +13,14 @@ export const editWafRulesAllowedService = async ({ payload, wafId, allowedId }) 
 }
 
 const adapt = (payload) => {
+  const matchValidationValues = payload.matchZones.map((zone) => {
+    if (['path', 'file_name', 'raw_body'].includes(zone.zone)) {
+      zone.matches_on = null
+    }
+    return zone
+  })
   return {
-    match_zones: payload.matchZones.map((zone) => {
-      const zoneWithoutMatchoZone = ['path', 'file_name', 'raw_body']
-      if (zoneWithoutMatchoZone.includes(zone.zone)) {
-        zone.matches_on = null
-      }
-
-      return zone
-    }),
+    match_zones: matchValidationValues,
     path: payload.path,
     reason: payload.reason,
     rule_id: payload.ruleId,

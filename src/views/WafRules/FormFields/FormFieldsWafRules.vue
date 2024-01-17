@@ -33,6 +33,7 @@
   const { value: directoryTraversal } = useField('directoryTraversal')
   const { value: remoteFileInclusion } = useField('remoteFileInclusion')
   const { value: sqlInjection } = useField('sqlInjection')
+  const { value: name } = useField('name')
 
   const sensitivity = ref([
     { name: 'Sensitivity Highest', value: 'highest' },

@@ -45,19 +45,25 @@ export const wafRulesRoutes = {
       }
     },
     {
-      path: 'edit/:id',
+      path: 'edit/:id/:tab?',
       name: 'edit-waf-rules',
-      component: () => import('@views/WafRules/EditView.vue'),
+      component: () => import('@views/WafRules/TabsView.vue'),
       props: {
-        editWafRulesService: WafRulesService.editWafRulesService,
-        loadWafRulesService: WafRulesService.loadWafRulesService,
-        listWafRulesAllowedService: WafRulesService.listWafRulesAllowedService,
-        deleteWafRulesAllowedService: WafRulesService.deleteWafRulesAllowedService,
-        createWafRulesAllowedService: WafRulesService.createWafRulesAllowedService,
-        loadWafRulesAllowedService: WafRulesService.loadWafRulesAllowedService,
-        editWafRulesAllowedService: WafRulesService.editWafRulesAllowedService,
-        documentationServiceAllowed: Helpers.documentationCatalog.wafAllowed,
-        documentationServiceTuning: Helpers.documentationCatalog.wafTuning
+        wafRulesAllowed: {
+          deleteWafRulesAllowedService: WafRulesService.deleteWafRulesAllowedService,
+          createWafRulesAllowedService: WafRulesService.createWafRulesAllowedService,
+          loadWafRulesAllowedService: WafRulesService.loadWafRulesAllowedService,
+          editWafRulesAllowedService: WafRulesService.editWafRulesAllowedService,
+          documentationServiceAllowed: Helpers.documentationCatalog.wafAllowed,
+          listWafRulesAllowedService: WafRulesService.listWafRulesAllowedService,
+        },
+        wafServices: {
+          editWafRulesService: WafRulesService.editWafRulesService,
+          loadWafRulesService: WafRulesService.loadWafRulesService,
+        },
+        wafTuning: {
+          documentationServiceTuning: Helpers.documentationCatalog.wafTuning
+        }
       },
       meta: {
         breadCrumbs: [
@@ -71,59 +77,5 @@ export const wafRulesRoutes = {
         ]
       }
     },
-    {
-      path: 'edit/:id/tuning',
-      name: 'edit-waf-rules-tuning',
-      component: () => import('@views/WafRules/EditView.vue'),
-      props: {
-        editWafRulesService: WafRulesService.editWafRulesService,
-        loadWafRulesService: WafRulesService.loadWafRulesService,
-        listWafRulesAllowedService: WafRulesService.listWafRulesAllowedService,
-        deleteWafRulesAllowedService: WafRulesService.deleteWafRulesAllowedService,
-        createWafRulesAllowedService: WafRulesService.createWafRulesAllowedService,
-        loadWafRulesAllowedService: WafRulesService.loadWafRulesAllowedService,
-        editWafRulesAllowedService: WafRulesService.editWafRulesAllowedService,
-        documentationServiceAllowed: Helpers.documentationCatalog.wafAllowed,
-        documentationServiceTuning: Helpers.documentationCatalog.wafTuning
-      },
-      meta: {
-        breadCrumbs: [
-          {
-            label: 'Waf Rules',
-            to: '/waf'
-          },
-          {
-            label: 'Edit Waf Rules'
-          }
-        ]
-      }
-    },
-    {
-      path: 'edit/:id/allowed',
-      name: 'edit-waf-rules-allowed',
-      component: () => import('@views/WafRules/EditView.vue'),
-      props: {
-        editWafRulesService: WafRulesService.editWafRulesService,
-        loadWafRulesService: WafRulesService.loadWafRulesService,
-        listWafRulesAllowedService: WafRulesService.listWafRulesAllowedService,
-        deleteWafRulesAllowedService: WafRulesService.deleteWafRulesAllowedService,
-        createWafRulesAllowedService: WafRulesService.createWafRulesAllowedService,
-        loadWafRulesAllowedService: WafRulesService.loadWafRulesAllowedService,
-        editWafRulesAllowedService: WafRulesService.editWafRulesAllowedService,
-        documentationServiceAllowed: Helpers.documentationCatalog.wafAllowed,
-        documentationServiceTuning: Helpers.documentationCatalog.wafTuning
-      },
-      meta: {
-        breadCrumbs: [
-          {
-            label: 'Waf Rules',
-            to: '/waf'
-          },
-          {
-            label: 'Edit Waf Rules'
-          }
-        ]
-      }
-    }
   ]
 }
