@@ -175,7 +175,7 @@
   })
 
   const warnUpdate = computed(() => {
-    const app = edgeApps.value.find((i) => i.value === edgeApplication.value)
+    const app = edgeApps.value.find((edgeApp) => edgeApp.value === edgeApplication.value)
     return app?.upgradeable
   })
 

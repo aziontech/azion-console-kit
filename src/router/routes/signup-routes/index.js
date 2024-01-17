@@ -45,7 +45,7 @@ export const signupRoutes = {
       meta: {
         hideNavigation: true
       },
-      beforeEnter: (_, __, next) => {
+      beforeEnter: (__, ___, next) => {
         const accountStore = useAccountStore()
         if (accountStore.isFirstLogin) {
           next()
