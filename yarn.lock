@@ -20,6 +20,11 @@
     "@jridgewell/gen-mapping" "^0.3.0"
     "@jridgewell/trace-mapping" "^0.3.9"
 
+"@aziontech/azion-theme@^0.0.2":
+  version "0.0.2"
+  resolved "https://npm.pkg.github.com/download/@aziontech/azion-theme/0.0.2/dd546813d00c2b2d25981c209087225271fa1eae#dd546813d00c2b2d25981c209087225271fa1eae"
+  integrity sha512-Tx23YmDJ86xZC5wqHl6nGpBP2Th7F+dUPw6hOJmRz3wDQ7JLm6XBBDbqnXyCKksf90GfL0qVzzONgAtyubNp0g==
+
 "@babel/code-frame@^7.0.0", "@babel/code-frame@^7.22.13":
   version "7.22.13"
   resolved "https://registry.npmjs.org/@babel/code-frame/-/code-frame-7.22.13.tgz"
@@ -3937,10 +3942,6 @@ primeicons@^6.0.1:
   version "6.0.1"
   resolved "https://registry.npmjs.org/primeicons/-/primeicons-6.0.1.tgz"
   integrity sha512-KDeO94CbWI4pKsPnYpA1FPjo79EsY9I+M8ywoPBSf9XMXoe/0crjbUK7jcQEDHuc0ZMRIZsxH3TYLv4TUtHmAA==
-
-"primevue-sass-theme@git+https://github.com/primefaces/primevue-sass-theme.git#3.39.0":
-  version "3.39.0"
-  resolved "git+https://github.com/primefaces/primevue-sass-theme.git#f30329513d57d5cbe93927c437ed4caeb6ca8d20"
 
 primevue@^3.35.0:
   version "3.35.0"
