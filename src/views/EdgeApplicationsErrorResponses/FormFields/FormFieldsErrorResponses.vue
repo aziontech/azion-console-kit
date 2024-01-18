@@ -161,7 +161,7 @@
         align="left"
         type="dashed"
       >
-        <b>Then</b>
+        Then
       </Divider>
       <div class="flex flex-wrap gap-6">
         <div class="flex flex-col w-full sm:max-w-xs gap-2">
@@ -203,7 +203,7 @@
               align="left"
               type="dashed"
             >
-              <b>And</b>
+              And
             </Divider>
             <PrimeButton
               @click="removeErrorResponse(index)"
