@@ -88,6 +88,8 @@
       blockViewRedirection.value = false
       emit('on-edit-success', feedback)
       if (props.disableRedirect) {
+        resetForm({ values })
+        blockViewRedirection.value = true
         return
       }
       goBackToList()

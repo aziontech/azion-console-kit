@@ -6,7 +6,7 @@
   import TabView from 'primevue/tabview'
   import { useToast } from 'primevue/usetoast'
 
-  import { ref } from 'vue'
+  import { computed, ref } from 'vue'
   import { useRoute, useRouter } from 'vue-router'
 
   defineOptions({ name: 'tabs-edge-firewall' })
@@ -16,51 +16,47 @@
     listDomainsService: { type: Function, required: true }
   })
 
-  const mapTabs = {
-    mainSettings: 0,
+  const defaultTabs = {
+    main_settings: 0,
     functions: 1,
-    rulesEngine: 2
+    rules_engine: 2
   }
+
+  const mapTabs = ref({ ...defaultTabs })
 
   const toast = useToast()
   const route = useRoute()
   const router = useRouter()
   const activeTab = ref(0)
   const edgeFirewallId = ref(route.params.id)
-  const isEnableFunction = ref(false)
-  const responseEdgeFirewall = ref(false)
-  const title = ref('Name Rule Set')
+  const edgeFirewall = ref()
 
   const loaderEdgeFirewall = async () => {
     try {
-      if (responseEdgeFirewall.value) return responseEdgeFirewall.value
-
-      const response = await props.edgeFirewallServices.loadEdgeFirewallService({
+      return await props.edgeFirewallServices.loadEdgeFirewallService({
         id: edgeFirewallId.value
       })
-
-      const { edgeFunctionsEnabled, name } = response
-      isEnableFunction.value = edgeFunctionsEnabled
-      title.value = name
-      responseEdgeFirewall.value = response
     } catch (error) {
       toast.add({
         closable: true,
         severity: 'error',
         summary: error
       })
+
+      return router.push({ name: props.edgeFirewallServices.updatedRedirect })
     }
   }
 
   const getTabFromValue = (selectedTabIndex) => {
-    const tabNames = Object.keys(mapTabs)
-    const selectedTab = tabNames.find((tabName) => mapTabs[tabName] === selectedTabIndex)
+    const tabNames = Object.keys(mapTabs.value)
+    const selectedTab = tabNames.find((tabName) => mapTabs.value[tabName] === selectedTabIndex)
     return selectedTab
   }
 
-  const changeRouteByClickingOnTab = (event) => {
-    const tab = getTabFromValue(event.index)
-    activeTab.value = event.index
+  const changeRouteByClickingOnTab = ({ index = 0 }) => {
+    verifyTab(edgeFirewall.value)
+    const tab = getTabFromValue(index)
+    activeTab.value = index
     const params = {
       id: edgeFirewallId.value,
       tab
@@ -71,12 +67,37 @@
     })
   }
 
+  const verifyTab = ({ edgeFunctionsEnabled }) => {
+    if (!edgeFunctionsEnabled) {
+      delete mapTabs.value.functions
+      mapTabs.value = Object.entries(mapTabs.value).reduce((acc, [key], index) => {
+        acc[key] = index
+        return acc
+      }, {})
+      return
+    }
+    mapTabs.value = { ...defaultTabs }
+  }
+
   const renderTabCurrentRouter = async () => {
-    await loaderEdgeFirewall()
-    const { tab } = route.params
-    const defaultTabIndex = 0
-    const activeTabIndexByRoute = mapTabs[tab] || defaultTabIndex
-    activeTab.value = activeTabIndexByRoute
+    const { tab = 0 } = route.params
+    edgeFirewall.value = await loaderEdgeFirewall()
+    verifyTab(edgeFirewall.value)
+    const activeTabIndexByRoute = mapTabs.value[tab]
+    changeRouteByClickingOnTab({ index: activeTabIndexByRoute })
+  }
+
+  const title = computed(() => {
+    return edgeFirewall.value?.name || ''
+  })
+
+  const isEnableFunction = computed(() => {
+    return edgeFirewall.value?.edgeFunctionsEnabled
+  })
+
+  const updatedFirewall = (firewall) => {
+    edgeFirewall.value = { ...firewall }
+    verifyTab(edgeFirewall.value)
   }
 
   renderTabCurrentRouter()
@@ -92,15 +113,16 @@
         :activeIndex="activeTab"
         @tab-click="changeRouteByClickingOnTab"
         class="w-full h-full"
-        v-if="responseEdgeFirewall"
+        v-if="edgeFirewall"
       >
         <TabPanel header="Main Settings">
           <EditView
+            v-if="mapTabs.main_settings === activeTab"
             :editEdgeFirewallService="edgeFirewallServices.editEdgeFirewallService"
-            :loadEdgeFirewallService="loaderEdgeFirewall"
+            :edgeFirewall="edgeFirewall"
             :loadDomains="props.listDomainsService"
             :updatedRedirect="edgeFirewallServices.updatedRedirect"
-            :showActionBar="activeTab === mapTabs.mainSettings"
+            @updateFirewall="updatedFirewall"
           />
         </TabPanel>
         <TabPanel

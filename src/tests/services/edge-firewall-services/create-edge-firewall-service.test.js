@@ -73,6 +73,11 @@ describe('EdgeFirewallService', () => {
       expectedError: 'Edge Firewall cannot be created because no modules are enabled'
     },
     {
+      error: 'domains_already_in_use',
+      key: 'results',
+      expectedError: 'Edge Firewall cannot be created because the domains are already in use'
+    },
+    {
       error: 'unmappedError',
       key: 'results',
       expectedError: new Errors.UnexpectedError().message

@@ -2,16 +2,20 @@
   import ActionBarTemplate from '@/templates/action-bar-block/action-bar-with-teleport'
   import EditFormBlock from '@/templates/edit-form-block'
   import FormFieldsEdgeFirewall from '@/views/EdgeFirewall/FormFields/FormFieldsEdgeFirewall'
+  import { ref } from 'vue'
   import * as yup from 'yup'
+
   defineOptions({ name: 'edit-edge-firewall' })
+  const emit = defineEmits(['updateFirewall'])
 
   const props = defineProps({
     editEdgeFirewallService: { type: Function, required: true },
-    loadEdgeFirewallService: { type: Function, required: true },
+    edgeFirewall: { type: Object },
     loadDomains: { type: Function, required: true },
-    updatedRedirect: { type: String, required: true },
-    showActionBar: { type: Boolean, default: false }
+    updatedRedirect: { type: String, required: true }
   })
+
+  const loadingServices = ref(false)
 
   const validationSchema = yup.object({
     name: yup.string().required().label('Name'),
@@ -22,27 +26,39 @@
     networkProtectionEnabled: yup.boolean().label('Network Protection Enabled'),
     wafEnabled: yup.boolean().label('WAF Enabled')
   })
+
+  const loadEdgeFirewall = async () => {
+    return props.edgeFirewall
+  }
+
+  const formSubmit = async (onSubmit, values) => {
+    await onSubmit()
+    emit('updateFirewall', values)
+  }
 </script>
 
 <template>
   <div>
     <EditFormBlock
       :editService="props.editEdgeFirewallService"
-      :loadService="props.loadEdgeFirewallService"
-      :updatedRedirect="updatedRedirect"
+      :loadService="loadEdgeFirewall"
       :schema="validationSchema"
+      :updatedRedirect="updatedRedirect"
+      disableRedirect
       :isTabs="true"
     >
       <template #form>
-        <FormFieldsEdgeFirewall :domainsService="loadDomains" />
+        <FormFieldsEdgeFirewall
+          :domainsService="loadDomains"
+          v-model:loadingDomains="loadingServices"
+        />
       </template>
-      <template #action-bar="{ onSubmit, formValid, onCancel, loading }">
+      <template #action-bar="{ onSubmit, formValid, onCancel, loading, values }">
         <ActionBarTemplate
-          v-if="props.showActionBar"
-          @onSubmit="onSubmit"
+          @onSubmit="formSubmit(onSubmit, values)"
           @onCancel="onCancel"
           :loading="loading"
-          :submitDisabled="!formValid"
+          :submitDisabled="!formValid || loadingServices"
         />
       </template>
     </EditFormBlock>
