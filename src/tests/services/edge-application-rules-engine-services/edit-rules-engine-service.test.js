@@ -25,20 +25,18 @@ const makeSut = () => {
 }
 
 describe('EdgeApplicationRulesEngineServices', () => {
-  it('should call API with correct params to rule engine update', async () => {
+  it('should call API with correct params when updating the rule engine data', async () => {
+    const edgeApplicationIdMock = 123
+    const phaseRulesMock = fixtures.rulePayload.phase.content
     const requestSpy = vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
       statusCode: 200
     })
-
     const { sut } = makeSut()
-    const version = 'v3'
 
-    const edgeApplicationId = 123
-    const phaseRules = fixtures.rulePayload.phase.content
-    await sut({ id: edgeApplicationId, payload: fixtures.rulePayload, reorder: false })
+    await sut({ id: edgeApplicationIdMock, payload: fixtures.rulePayload, reorder: false })
 
     expect(requestSpy).toHaveBeenCalledWith({
-      url: `${version}/edge_applications/${edgeApplicationId}/rules_engine/${phaseRules}/rules/${fixtures.rulePayload.id}`,
+      url: `v3/edge_applications/${edgeApplicationIdMock}/rules_engine/${phaseRulesMock}/rules/${fixtures.rulePayload.id}`,
       method: 'PATCH',
       body: {
         behaviors: '',
@@ -50,37 +48,65 @@ describe('EdgeApplicationRulesEngineServices', () => {
       }
     })
   })
-  it('should call API with correct params to rule engine order update', async () => {
+
+  it('should call API with correct params update the rule engine order', async () => {
+    const edgeApplicationIdMock = 123
+    const phaseRulesMock = fixtures.rulePayload.phase.content
+
     const requestSpy = vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
       statusCode: 200
     })
 
     const { sut } = makeSut()
-    const version = 'v3'
 
-    const edgeApplicationId = 123
-    const phaseRules = fixtures.rulePayload.phase.content
-    await sut({ id: edgeApplicationId, payload: fixtures.rulePayload, reorder: true })
+    await sut({
+      id: edgeApplicationIdMock,
+      payload: fixtures.rulePayload,
+      reorder: true
+    })
 
     expect(requestSpy).toHaveBeenCalledWith({
-      url: `${version}/edge_applications/${edgeApplicationId}/rules_engine/${phaseRules}/rules/${fixtures.rulePayload.id}`,
+      url: `v3/edge_applications/${edgeApplicationIdMock}/rules_engine/${phaseRulesMock}/rules/${fixtures.rulePayload.id}`,
       method: 'PATCH',
       body: {
-        order: 3
+        order: fixtures.rulePayload.order
       }
     })
   })
 
   it('should return a feedback message on successfully updated', async () => {
+    const edgeApplicationIdMock = 8172367
     vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
       statusCode: 200
     })
     const { sut } = makeSut()
 
-    const edgeApplicationId = 123
-    const feedbackMessage = await sut({ id: edgeApplicationId, payload: fixtures.rulePayload })
+    const feedbackMessage = await sut({ id: edgeApplicationIdMock, payload: fixtures.rulePayload })
 
     expect(feedbackMessage).toBe('Your Rules Engine has been edited')
+  })
+
+  it('should calculate correct default rule phase', async () => {
+    const edgeApplicationIdMock = 112365
+    const ruleWithDefaultPhaseMock = {
+      ...fixtures.rulePayload,
+      phase: {
+        content: 'Default'
+      }
+    }
+    const requestSpy = vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
+      statusCode: 200
+    })
+    const { sut } = makeSut()
+
+    await sut({
+      id: edgeApplicationIdMock,
+      payload: ruleWithDefaultPhaseMock
+    })
+
+    expect(requestSpy.mock.lastCall[0].url).toBe(
+      `v3/edge_applications/${edgeApplicationIdMock}/rules_engine/request/rules/${ruleWithDefaultPhaseMock.id}`
+    )
   })
 
   it.each([
