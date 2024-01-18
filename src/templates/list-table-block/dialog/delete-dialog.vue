@@ -27,7 +27,9 @@
         </p>
       </div>
 
-      <Divider class="-ml-4 w-[calc(100%+2rem)] md:-ml-8 w-[calc(100%+4rem) md:w-[calc(100%+4rem)]"/>
+      <Divider
+        class="-ml-4 w-[calc(100%+2rem)] md:-ml-8 w-[calc(100%+4rem) md:w-[calc(100%+4rem)]"
+      />
 
       <div>
         <div class="flex flex-col w-full gap-2">
@@ -53,7 +55,7 @@
     </div>
 
     <template #footer>
-      <div class=" justify-end w-full flex gap-4">
+      <div class="justify-end w-full flex gap-4">
         <PrimeButton
           severity="primary"
           outlined

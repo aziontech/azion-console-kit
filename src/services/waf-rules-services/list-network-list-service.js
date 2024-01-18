@@ -17,7 +17,7 @@ const adapt = (httpResponse) => {
   const networkList = isArray
     ? httpResponse.body.results.map((networkList) => ({
         id: networkList.id,
-        name: networkList.name,
+        name: networkList.name
       }))
     : []
 

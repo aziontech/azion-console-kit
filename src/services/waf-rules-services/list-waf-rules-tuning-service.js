@@ -25,8 +25,6 @@ export const listWafRulesTuningService = async ({ wafId }) => {
 //   return parsedStatus
 // }
 
-
-
 const adapt = (httpResponse) => {
   /**
    * Necessary until the API gets the common pattern
@@ -35,7 +33,7 @@ const adapt = (httpResponse) => {
    */
 
   // eslint-disable-next-line no-console
-  console.log(httpResponse.body);
+  console.log(httpResponse.body)
 
   return {
     body: httpResponse.body,

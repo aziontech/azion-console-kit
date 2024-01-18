@@ -3,7 +3,6 @@ import { searchDomainsMetricsService } from '@/services/metrics-services'
 import * as Errors from '@services/axios/errors'
 import { describe, expect, it, vi } from 'vitest'
 
-
 const makeSut = () => {
   const sut = searchDomainsMetricsService
 

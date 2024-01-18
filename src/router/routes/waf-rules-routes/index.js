@@ -2,7 +2,6 @@ import * as Helpers from '@/helpers'
 import * as WafRulesService from '@/services/waf-rules-services'
 import { listCountriesService } from '@/services/network-lists-services'
 
-
 /** @type {import('vue-router').RouteRecordRaw} */
 export const wafRulesRoutes = {
   path: '/waf',

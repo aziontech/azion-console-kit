@@ -5,10 +5,10 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 const fixtures = {
   wafRulesDomainMock: {
     cnames: [],
-    domain: "erwc1eveo1.map.azionedge.net",
+    domain: 'erwc1eveo1.map.azionedge.net',
     id: 1705587704,
-    name: "atack"
-  },
+    name: 'atack'
+  }
 }
 
 const makeSut = () => {
@@ -55,8 +55,8 @@ describe('WafRulesServices', () => {
       {
         domain: fixtures.wafRulesDomainMock.domain,
         id: fixtures.wafRulesDomainMock.id,
-        name: fixtures.wafRulesDomainMock.name,
-      },
+        name: fixtures.wafRulesDomainMock.name
+      }
     ])
   })
 })

@@ -5,7 +5,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 const fixtures = {
   networkMock: {
     id: 123123123,
-    name: 'Network AZ',
+    name: 'Network AZ'
   }
 }
 
@@ -56,7 +56,7 @@ describe('WafRulesServices', () => {
     expect(result).toEqual([
       {
         id: fixtures.networkMock.id,
-        name: fixtures.networkMock.name,
+        name: fixtures.networkMock.name
       }
     ])
   })

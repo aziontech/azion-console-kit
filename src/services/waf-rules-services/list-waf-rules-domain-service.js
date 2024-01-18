@@ -12,8 +12,6 @@ export const listWafRulesDomainsService = async ({ wafId }) => {
   return parseHttpResponse(httpResponse)
 }
 
-
-
 const adapt = (httpResponse) => {
   /**
    * Necessary until the API gets the common pattern
@@ -24,13 +22,13 @@ const adapt = (httpResponse) => {
   // eslint-disable-next-line no-console
   const isArray = Array.isArray(httpResponse.body.results)
 
-
   const parsedWafRulesDomain = isArray
     ? httpResponse.body.results.map((domain) => ({
-      domain: domain.domain,
-      id: domain.id,
-      name: domain.name,
-    })) : []
+        domain: domain.domain,
+        id: domain.id,
+        name: domain.name
+      }))
+    : []
 
   return {
     body: parsedWafRulesDomain,
