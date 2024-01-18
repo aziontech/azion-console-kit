@@ -4,7 +4,6 @@
     :edgeApplicationId="props.edgeApplicationId"
     :createFunctionService="props.createFunctionService"
     :listEdgeFunctionsService="props.listEdgeFunctionsService"
-    :loadEdgeFunctionsService="props.loadEdgeFunctionsService"
     :loadFunctionService="props.loadFunctionService"
     :editFunctionService="props.editFunctionService"
     @onSuccess="reloadList"
@@ -53,11 +52,11 @@
 <script setup>
   import Illustration from '@/assets/svg/illustration-layers'
   import EmptyResultsBlock from '@/templates/empty-results-block'
-  import PrimeButton from 'primevue/button'
   import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
   import ListTableBlock from '@/templates/list-table-block/no-header'
-  import DrawerFunction from './Drawer'
+  import PrimeButton from 'primevue/button'
   import { computed, ref } from 'vue'
+  import DrawerFunction from './Drawer'
 
   defineOptions({ name: 'list-edge-applications-functions-tab' })
 
@@ -72,7 +71,7 @@
       required: true,
       type: Function
     },
-    loadEdgeFunctionsService: {
+    documentationService: {
       required: true,
       type: Function
     },
