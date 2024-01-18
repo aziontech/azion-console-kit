@@ -33,7 +33,7 @@ const adapt = (httpResponse) => {
       originKey: {
         content: origin.origin_key
       },
-      originId: origin.origin_id,
+      originId: origin.origin_id.toString(),
       name: origin.name,
       originType: originTypeFormat[origin.origin_type],
       addresses: formattedListOfAddresses,

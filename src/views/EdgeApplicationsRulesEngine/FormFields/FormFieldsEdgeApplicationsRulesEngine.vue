@@ -9,6 +9,7 @@
   import InputSwitch from 'primevue/inputswitch'
   import Divider from 'primevue/divider'
   import { computed, ref, onMounted } from 'vue'
+  import { useToast } from 'primevue/usetoast'
 
   const props = defineProps({
     isEnableApplicationAcceleration: {
@@ -30,9 +31,15 @@
     edgeApplicationId: {
       type: String,
       required: true
+    },
+    selectedRulesEngineToEdit: {
+      type: Object,
+      required: false,
+      default: () => {}
     }
   })
 
+  const toast = useToast()
   const criteriaOperatorOptions = ref([
     { label: 'is equal', value: 'is_equal' },
     { label: 'is not equal', value: 'is_not_equal' },
@@ -120,6 +127,7 @@
   const {
     push: pushBehavior,
     remove: removeBehavior,
+    update: updateBehavior,
     fields: behaviors
   } = useFieldArray('behaviors')
   const { value: phase } = useField('phase')
@@ -153,36 +161,59 @@
     variable: '${uri}',
     operator: 'is_equal',
     conditional: 'if',
-    input_value: '/page'
+    input_value: ''
   }
   const DEFAULT_BEHAVIOR = {
     name: `deliver`,
     target: {}
   }
 
+  /**
+   * Adds a conditional AND operator to the criteria at the specified index.
+   * @param {number} index - The index of the criteria to add the operator to.
+   */
   const addConditionalAnd = (index) => {
     criteria.value[index].value.push(DEFAULT_AND_OPERATOR)
   }
+
+  /**
+   * Adds a conditional OR operator to the criteria at the specified index.
+   * @param {number} index - The index of the criteria to add the operator to.
+   */
   const addConditionalOr = (index) => {
     criteria.value[index].value.push(DEFAULT_OR_OPERATOR)
   }
+
+  /**
+   * Adds a new criteria with a default IF operator.
+   */
   const addNewCriteria = () => {
     pushCriteria([DEFAULT_IF_OPERATOR])
   }
-  const addNewBehavior = () => {
-    pushBehavior({ ...DEFAULT_BEHAVIOR })
+
+  /**
+   * Sets the default behavior options for the last behavior in the behaviors array.
+   */
+  const setDefaultBehaviorOptions = () => {
+    const lastIndex = behaviors.value.length - 1
+    changeBehaviorType(DEFAULT_BEHAVIOR.name, lastIndex)
   }
 
-  const showCriteriaValueField = ref(true)
-  const isShowCriteriaValueField = (operator) => {
-    const isOperatorExistsOrDoesNotExist = operator !== 'exists' && operator !== 'does_not_exist'
-    showCriteriaValueField.value = isOperatorExistsOrDoesNotExist
+  /**
+   * Adds a new behavior with the default behavior to the behaviors array and sets its options.
+   */
+  const addNewBehavior = () => {
+    pushBehavior({ ...DEFAULT_BEHAVIOR })
+    setDefaultBehaviorOptions()
   }
 
   const behaviorsOptions = computed(() =>
     phase.value === 'request' ? behaviorsRequestOptions.value : behaviorsResponseOptions.value
   )
 
+  /**
+   * Updates the 'requires' property of all behavior options to false.
+   */
   const updateBehaviorsOptionsRequires = () => {
     behaviorsRequestOptions.value = behaviorsRequestOptions.value.map((option) => ({
       ...option,
@@ -197,6 +228,10 @@
 
   const functionsInstanceOptions = ref(null)
   const loadingFunctionsInstance = ref(false)
+
+  /**
+   * Fetches the list of function instance options and updates the 'functionsInstanceOptions' ref.
+   */
   const listFunctionsInstanceOptions = async () => {
     try {
       loadingFunctionsInstance.value = true
@@ -210,6 +245,10 @@
 
   const originsOptions = ref(null)
   const loadingOrigins = ref(false)
+
+  /**
+   * Fetches the list of origin options and updates the 'originsOptions' ref.
+   */
   const listOriginsOptions = async () => {
     try {
       loadingOrigins.value = true
@@ -221,6 +260,10 @@
 
   const cacheSettingsOptions = ref(null)
   const loadingCacheSettings = ref(false)
+
+  /**
+   * Fetches the list of cache settings options and updates the 'cacheSettingsOptions' ref.
+   */
   const listCacheSettingsOptions = async () => {
     try {
       loadingCacheSettings.value = true
@@ -233,15 +276,28 @@
   }
 
   const showNewBehaviorButton = ref(true)
-  const setBehaviorTargetValue = (newTargetValue, index) => {
-    behaviors.value[index].value.target = newTargetValue
-  }
+
+  /**
+   * Updates the 'showNewBehaviorButton' ref.
+   * @param {boolean} isShow - Whether to show the new behavior button.
+   */
   const setShowNewBehaviorButton = (isShow) => {
     showNewBehaviorButton.value = isShow
   }
+
+  /**
+   * Updates the 'showTargetField' property of the behavior at the specified index.
+   * @param {boolean} isShow - Whether to show the target field.
+   * @param {number} index - The index of the behavior to update.
+   */
   const setShowBehaviorTargetField = (isShow, index) => {
     behaviors.value[index].showTargetField = isShow
   }
+
+  /**
+   * Removes behaviors from the behaviors array starting from the specified index.
+   * @param {number} startIndex - The index to start removing behaviors from.
+   */
   const removeBehaviorsFromIndex = (startIndex) => {
     const endIndex = behaviors.value.length - 1
     for (let index = endIndex; index > startIndex; index--) {
@@ -249,6 +305,11 @@
     }
   }
 
+  /**
+   * Changes the type of the behavior at the specified index and updates related properties.
+   * @param {string} behaviorName - The new type of the behavior.
+   * @param {number} index - The index of the behavior to change.
+   */
   const changeBehaviorType = (behaviorName, index) => {
     const disableTargetOptions = [
       'deliver',
@@ -267,8 +328,11 @@
       'deny',
       'no_content'
     ]
-    behaviors.value[index].value.name = behaviorName
-    setBehaviorTargetValue('', index)
+
+    let targetValue = behaviors.value[index].value.target
+    if (!props.selectedRulesEngineToEdit) targetValue = ''
+
+    updateBehavior(index, { name: behaviorName, target: targetValue })
     setShowNewBehaviorButton(true)
 
     switch (behaviorName) {
@@ -282,8 +346,10 @@
         listOriginsOptions()
         break
       case 'capture_match_groups':
-        const defaultMatchGroupsFields = { captured_array: '', subject: '', regex: '' }
-        setBehaviorTargetValue(defaultMatchGroupsFields, index)
+        let matchGroupsFields = { captured_array: '', subject: '', regex: '' }
+        if (props.selectedRulesEngineToEdit) matchGroupsFields = behaviors.value[index].value.target
+
+        updateBehavior(index, { name: behaviorName, target: matchGroupsFields })
         break
       default:
         const isBehaviorTargetFieldEnabled = !disableTargetOptions.includes(behaviorName)
@@ -298,6 +364,72 @@
     }
   }
 
+  /**
+   * Calls the appropriate services to fetch options for the behaviors of the selected rules engine to edit.
+   */
+  const callOptionsServicesAtEdit = async () => {
+    if (props.selectedRulesEngineToEdit) {
+      const behaviorsLength = props.selectedRulesEngineToEdit.behaviors.length
+
+      for (let index = 0; index < behaviorsLength; index++) {
+        const behavior = props.selectedRulesEngineToEdit.behaviors[index]
+        try {
+          await handleBehaviorOptions(behavior, index)
+        } catch (error) {
+          toast.add({
+            closable: true,
+            severity: 'error',
+            summary: `Error in ${behavior.name} load.`
+          })
+        }
+      }
+    }
+  }
+
+  /**
+   * Handles fetching options for a behavior based on its type.
+   * @param {Object} behavior - The behavior to handle.
+   * @param {number} index - The index of the behavior in the behaviors array.
+   */
+  const handleBehaviorOptions = async (behavior, index) => {
+    switch (behavior.name) {
+      case 'run_function':
+        await listFunctionsInstanceOptions()
+        break
+      case 'set_origin':
+        await listOriginsOptions()
+        break
+      case 'set_cache_policy':
+        await listCacheSettingsOptions()
+        break
+    }
+    updateBehavior(index, { name: behavior.name, target: behavior.target })
+  }
+
+  /**
+   * Processes the behaviors of the selected rules engine to edit.
+   */
+  const processBehaviorsAtEdit = async () => {
+    const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms))
+
+    const areBehaviorsReady = (index) => behaviors && behaviors.value[index]
+
+    const processBehavior = (behavior, index) => {
+      changeBehaviorType(behavior.name, index)
+    }
+
+    if (props.selectedRulesEngineToEdit) {
+      let index = 0
+
+      while (!areBehaviorsReady(index)) {
+        await delay(100)
+      }
+      props.selectedRulesEngineToEdit.behaviors.forEach((behavior, index) => {
+        processBehavior(behavior, index)
+      })
+    }
+  }
+
   onMounted(() => {
     if (props.isEnableApplicationAcceleration) {
       updateBehaviorsOptionsRequires()
@@ -305,6 +437,9 @@
     if (behaviors.value[0]) {
       changeBehaviorType(behaviors.value[0].value.name, 0)
     }
+
+    callOptionsServicesAtEdit()
+    processBehaviorsAtEdit()
   })
 </script>
 
@@ -341,22 +476,26 @@
   >
     <template #inputs>
       <div class="flex flex-col gap-2">
-        <div
+        <template
           v-for="item in phasesList"
           :key="item.value"
-          class="w-full border-1 rounded-md surface-border flex align-items-center justify-between p-4 gap-2"
-          :class="{ 'border-radio-card-active': phase === item.value }"
         >
-          <label class="font-medium">
-            {{ item.label }}
-            <div class="text-color-secondary text-sm font-normal">Description</div>
-          </label>
+          <div
+            v-if="!props.selectedRulesEngineToEdit || phase === item.value"
+            class="w-full border-1 rounded-md surface-border flex align-items-center justify-between p-4 gap-2"
+            :class="{ 'border-radio-card-active': phase === item.value }"
+          >
+            <label class="font-medium">
+              {{ item.label }}
+              <div class="text-color-secondary text-sm font-normal">Description</div>
+            </label>
 
-          <PrimeRadio
-            v-model="phase"
-            :value="item.value"
-          />
-        </div>
+            <PrimeRadio
+              v-model="phase"
+              :value="item.value"
+            />
+          </div>
+        </template>
       </div>
     </template>
   </FormHorizontal>
@@ -386,7 +525,7 @@
           <div class="flex gap-2 mt-6 mb-8">
             <FieldInputGroup
               :name="`criteria[${index}][${itemIndex}].variable`"
-              :value="item.variable"
+              :value="criteria[index].value[itemIndex].variable"
               :readonly="!props.isEnableApplicationAcceleration"
               placeholder="{uri}"
               inputClass="w-full"
@@ -397,19 +536,17 @@
             </FieldInputGroup>
 
             <FieldDropdown
-              :name="`criteria[${index}][${itemIndex}].operator`"
               :options="criteriaOperatorOptions"
               optionLabel="label"
               optionValue="value"
               inputClass="w-full"
-              :value="item.operator"
-              @onChange="(newValue) => isShowCriteriaValueField(newValue)"
+              :name="`criteria[${index}][${itemIndex}].operator`"
+              :value="criteria[index].value[itemIndex].operator"
             />
-
             <FieldText
-              v-if="showCriteriaValueField"
+              v-if="item.operator !== 'exists' && item.operator !== 'does_not_exist'"
               :name="`criteria[${index}][${itemIndex}].input_value`"
-              :value="item.input_value"
+              :value="criteria[index].value[itemIndex].input_value"
               inputClass="w-full"
             />
           </div>
@@ -457,9 +594,6 @@
     description="Set the behaviors you want your rule to perform if the conditions defined in the criteria are met. Select a behavior and all required information. Some actions can't be used together or in some conditions."
   >
     <template #inputs>
-      <pre>
-        {{ behaviors }}
-      </pre>
       <div
         class="flex flex-col gap-2"
         v-for="(behaviorItem, index) in behaviors"
@@ -473,7 +607,7 @@
         </Divider>
 
         <div class="flex gap-2 mt-6 mb-8">
-          <div class="w-full">
+          <div class="w-1/2">
             <FieldDropdown
               :key="behaviorItem.key"
               :name="`behaviors[${index}].name`"
@@ -487,75 +621,77 @@
             />
           </div>
 
-          <template v-if="behaviorItem.value.name === 'run_function'">
-            <FieldDropdown
-              :loading="loadingFunctionsInstance"
-              :name="`behaviors[${index}].target`"
-              :options="functionsInstanceOptions"
-              optionLabel="name.text"
-              optionValue="id"
-              inputClass="w-full"
-              :key="behaviorItem.key"
-              :value="behaviors[index].value.target"
-            />
-          </template>
-          <template v-else-if="behaviorItem.value.name === 'set_origin'">
-            <FieldDropdown
-              :loading="loadingOrigins"
-              :name="`behaviors[${index}].target`"
-              :options="originsOptions"
-              optionLabel="name"
-              optionValue="id"
-              inputClass="w-full"
-              :key="behaviorItem.key"
-              :value="behaviors[index].value.target"
-            />
-          </template>
-          <template v-else-if="behaviorItem.value.name === 'set_cache_policy'">
-            <FieldDropdown
-              :loading="loadingCacheSettings"
-              :name="`behaviors[${index}].target`"
-              :options="cacheSettingsOptions"
-              optionLabel="name"
-              optionValue="id"
-              inputClass="w-full"
-              :key="behaviorItem.key"
-              :value="behaviors[index].value.target"
-            />
-          </template>
-          <template v-else-if="behaviorItem.value.name === 'capture_match_groups'">
-            <div class="flex flex-col w-full">
-              <FieldText
-                placeholder="Captured Array"
-                inputClass="w-full mb-3"
-                :name="`behaviors[${index}].target.captured_array`"
-                :key="behaviorItem.key"
-                :value="behaviors[index].value.target.captured_array"
-              />
-              <FieldText
-                placeholder="Subject"
-                inputClass="w-full mb-3"
-                :name="`behaviors[${index}].target.subject`"
-                :key="behaviorItem.key"
-                :value="behaviors[index].value.target.subject"
-              />
-              <FieldText
-                placeholder="Regex"
+          <div class="w-1/2">
+            <template v-if="behaviorItem.value.name === 'run_function'">
+              <FieldDropdown
+                :loading="loadingFunctionsInstance"
+                :name="`behaviors[${index}].target`"
+                :options="functionsInstanceOptions"
+                optionLabel="name.text"
+                optionValue="id"
                 inputClass="w-full"
-                :name="`behaviors[${index}].target.regex`"
                 :key="behaviorItem.key"
-                :value="behaviors[index].value.target.regex"
+                :value="behaviors[index].value.target"
               />
-            </div>
-          </template>
-          <template v-else-if="behaviors[index]?.showTargetField">
-            <FieldText
-              inputClass="w-full"
-              :name="`behaviors[${index}].target`"
-              :key="behaviorItem.key"
-              :value="behaviors[index].value.target"
-            />
-          </template>
+            </template>
+            <template v-else-if="behaviorItem.value.name === 'set_origin'">
+              <FieldDropdown
+                :loading="loadingOrigins"
+                :name="`behaviors[${index}].target`"
+                :options="originsOptions"
+                optionLabel="name"
+                optionValue="originId"
+                inputClass="w-full"
+                :key="behaviorItem.key"
+                :value="behaviors[index].value.target"
+              />
+            </template>
+            <template v-else-if="behaviorItem.value.name === 'set_cache_policy'">
+              <FieldDropdown
+                :loading="loadingCacheSettings"
+                :name="`behaviors[${index}].target`"
+                :options="cacheSettingsOptions"
+                optionLabel="name"
+                optionValue="id"
+                inputClass="w-full"
+                :key="behaviorItem.key"
+                :value="behaviors[index].value.target"
+              />
+            </template>
+            <template v-else-if="behaviorItem.value.name === 'capture_match_groups'">
+              <div class="flex flex-col w-full">
+                <FieldText
+                  placeholder="Captured Array"
+                  inputClass="w-full mb-3"
+                  :name="`behaviors[${index}].target.captured_array`"
+                  :key="behaviorItem.key"
+                  :value="behaviors[index].value.target.captured_array"
+                />
+                <FieldText
+                  placeholder="Subject"
+                  inputClass="w-full mb-3"
+                  :name="`behaviors[${index}].target.subject`"
+                  :key="behaviorItem.key"
+                  :value="behaviors[index].value.target.subject"
+                />
+                <FieldText
+                  placeholder="Regex"
+                  inputClass="w-full"
+                  :name="`behaviors[${index}].target.regex`"
+                  :key="behaviorItem.key"
+                  :value="behaviors[index].value.target.regex"
+                />
+              </div>
+            </template>
+            <template v-else-if="behaviors[index]?.showTargetField">
+              <FieldText
+                inputClass="w-full"
+                :name="`behaviors[${index}].target`"
+                :key="behaviorItem.key"
+                :value="behaviors[index].value.target"
+              />
+            </template>
+          </div>
         </div>
       </div>
 

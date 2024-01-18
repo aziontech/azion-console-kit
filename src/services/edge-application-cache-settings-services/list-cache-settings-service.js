@@ -18,7 +18,7 @@ export const listCacheSettingsService = async ({ id }) => {
 
 const adapt = (httpResponse) => {
   const parseHttpResponse = httpResponse.body.results.map((cacheSettings) => ({
-    id: cacheSettings.id,
+    id: cacheSettings.id.toString(),
     name: cacheSettings.name,
     browserCache: cacheSettings.browser_cache_settings,
     cdnCache: cacheSettings.cdn_cache_settings

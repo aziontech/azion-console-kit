@@ -16,6 +16,7 @@ export const loadRulesEngineService = async ({ edgeApplicationId, id, phase }) =
 const adapt = (httpResponse) => {
   const ruleEngine = httpResponse.body.results
   const parsedBody = {
+    id: ruleEngine.id,
     name: ruleEngine.name,
     phase: ruleEngine.phase,
     criteria: ruleEngine.criteria,
