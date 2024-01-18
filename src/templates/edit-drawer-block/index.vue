@@ -13,7 +13,7 @@
   const emit = defineEmits(['update:visible', 'onSuccess', 'onError'])
   const props = defineProps({
     id: {
-      type: [ String, Number ],
+      type: [String, Number],
       required: true
     },
     visible: {

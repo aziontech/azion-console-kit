@@ -39,6 +39,8 @@ const mapErrorToMessage = (error) => {
       return 'Edge Firewall cannot be created because it already exists'
     case 'no_modules_enabled':
       return 'Edge Firewall cannot be created because no modules are enabled'
+    case 'domains_already_in_use':
+      return 'Edge Firewall cannot be created because the domains are already in use'
     default:
       return new Errors.UnexpectedError().message
   }
