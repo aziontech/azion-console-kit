@@ -262,7 +262,7 @@
           </div>
         </div>
       </div>
-      <div class="flex flex-col gap-8 items-start">
+      <div class="flex flex-col gap-8 sm:items-start">
         <Divider />
         <PrimeButton
           @click="addErrorResponse"
