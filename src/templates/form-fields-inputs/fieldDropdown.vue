@@ -47,17 +47,14 @@
     loading: {
       type: Boolean,
       default: false
-    },
+    }
   })
 
   const emit = defineEmits(['onBlur', 'onChange'])
 
   const name = toRef(props, 'name')
 
-  const {
-    value: inputValue,
-    errorMessage,
-  } = useField(name, undefined, {
+  const { value: inputValue, errorMessage } = useField(name, undefined, {
     initialValue: props.value
   })
 

@@ -20,7 +20,7 @@ const adapt = (payload) => {
     criteria: payload.criteria,
     behaviors: payload.behaviors,
     is_active: payload.isActive,
-    description: payload.description,
+    description: payload.description
   }
 }
 

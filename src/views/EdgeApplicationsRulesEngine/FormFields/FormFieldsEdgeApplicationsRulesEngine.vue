@@ -292,7 +292,7 @@
         setShowBehaviorTargetField(isBehaviorTargetFieldEnabled, index)
         setShowNewBehaviorButton(isAddBehaviorButtonEnabled)
 
-        if(!isAddBehaviorButtonEnabled) {
+        if (!isAddBehaviorButtonEnabled) {
           removeBehaviorsFromIndex(index)
         }
     }

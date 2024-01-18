@@ -45,9 +45,10 @@
 
   const loaderEdgeApplication = async () => {
     try {
-      const { edgeFunctions, applicationAcceleration } = await props.edgeApplicationServices.loadEdgeApplication({
-        id: edgeApplicationId.value
-      })
+      const { edgeFunctions, applicationAcceleration } =
+        await props.edgeApplicationServices.loadEdgeApplication({
+          id: edgeApplicationId.value
+        })
       isEnableEdgeFunction.value = edgeFunctions
       isEnableApplicationAcceleration.value = applicationAcceleration
     } catch (error) {

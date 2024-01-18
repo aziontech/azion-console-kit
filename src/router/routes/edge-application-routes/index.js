@@ -101,7 +101,7 @@ export const edgeApplicationRoutes = {
           documentationService: Helpers.documentationCatalog.edgeApplicationRulesEngine,
           listOriginsService: OriginsService.listOriginsService,
           listCacheSettingsService: CacheSettingsServices.listCacheSettingsService,
-          listEdgeApplicationFunctionsService: FunctionsService.listEdgeApplicationFunctionsService,
+          listEdgeApplicationFunctionsService: FunctionsService.listEdgeApplicationFunctionsService
         },
         clipboardWrite: Helpers.clipboardWrite
       },

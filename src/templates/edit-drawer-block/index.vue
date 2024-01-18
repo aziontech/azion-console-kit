@@ -47,7 +47,7 @@
     itemToEdit: {
       type: Object,
       required: false
-    },
+    }
   })
 
   const toast = useToast()

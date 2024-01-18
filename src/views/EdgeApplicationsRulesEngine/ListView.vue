@@ -58,7 +58,7 @@
     listOriginsService: {
       required: true,
       type: Function
-    },
+    }
   })
 
   const hasContentToList = ref(true)
