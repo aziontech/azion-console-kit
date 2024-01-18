@@ -246,7 +246,7 @@
               description="Add a path to an error page created in the source."
             />
           </div>
-          <div class="flex flex-col sm:max-w-lg w-full gap-2">
+          <div class="flex flex-col w-full sm:max-w-xs gap-2">
             <label
               for="maximun-ttl-seconds"
               class="text-color text-sm font-medium leading-5"
