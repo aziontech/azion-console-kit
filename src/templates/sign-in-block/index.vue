@@ -54,26 +54,10 @@
             @click="showPasswordStep"
           />
         </div>
-        <Divider align="center">
-          <p>or</p>
-        </Divider>
-
-        <div class="flex flex-col gap-4">
-          <PrimeButton
-            class="w-full"
-            label="Continue with Google"
-            severity="primary"
-            icon="pi pi-google"
-            outlined
-          />
-          <PrimeButton
-            class="w-full"
-            label="Continue with GitHub"
-            severity="primary"
-            icon="pi pi-github"
-            outlined
-          />
-        </div>
+        <SocialIdpsBlock
+          :socialIdpsService="listSocialIdpsService"
+          direction="top-to-bottom"
+        />
       </div>
 
       <div class="flex flex-wrap justify-center items-center pt-6 gap-3">
@@ -162,15 +146,15 @@
 </template>
 
 <script setup>
-  import InputText from 'primevue/inputtext'
+  import { ProccessRequestError, UserNotFoundError } from '@/services/axios/errors'
   import PrimeButton from 'primevue/button'
-  import Divider from 'primevue/divider'
+  import InputText from 'primevue/inputtext'
   import Password from 'primevue/password'
-  import * as yup from 'yup'
+  import SocialIdpsBlock from '@/templates/social-idps-block'
   import { useField, useForm } from 'vee-validate'
   import { ref } from 'vue'
   import { useRouter } from 'vue-router'
-  import { UserNotFoundError, ProccessRequestError } from '@/services/axios/errors'
+  import * as yup from 'yup'
 
   defineOptions({ name: 'signInBlock' })
 
@@ -196,6 +180,10 @@
     },
     accountHandler: {
       type: Object,
+      required: true
+    },
+    listSocialIdpsService: {
+      type: Function,
       required: true
     }
   })
@@ -247,7 +235,6 @@
       await switchClientAccount(userInfo.props)
     } catch {
       hasRequestErrorMessage.value = new UserNotFoundError().message
-    } finally {
       isButtonLoading.value = false
     }
   }
@@ -266,6 +253,7 @@
       router.push(redirect)
     } catch {
       hasRequestErrorMessage.value = new ProccessRequestError().message
+      isButtonLoading.value = false
     }
   }
 

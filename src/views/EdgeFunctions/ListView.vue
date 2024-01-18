@@ -14,6 +14,7 @@
         createPagePath="edge-functions/create"
         editPagePath="edge-functions/edit"
         @on-load-data="handleLoadData"
+        emptyListMessage="No Function found."
       />
       <EmptyResultsBlock
         v-else
@@ -32,13 +33,13 @@
 </template>
 
 <script setup>
-  import { ref, computed } from 'vue'
-  import ListTableBlock from '@/templates/list-table-block'
-  import EmptyResultsBlock from '@/templates/empty-results-block'
   import Illustration from '@/assets/svg/illustration-layers.vue'
   import ContentBlock from '@/templates/content-block'
-  import PageHeadingBlock from '@/templates/page-heading-block'
+  import EmptyResultsBlock from '@/templates/empty-results-block'
+  import ListTableBlock from '@/templates/list-table-block'
   import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
+  import PageHeadingBlock from '@/templates/page-heading-block'
+  import { computed, ref } from 'vue'
 
   const props = defineProps({
     listEdgeFunctionsService: {

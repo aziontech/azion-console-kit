@@ -1,67 +1,66 @@
-<script>
-  import ListTableBlock from '@/templates/list-table-block'
-  import EmptyResultsBlock from '@/templates/empty-results-block'
-  import Illustration from '@/assets/svg/illustration-layers.vue'
+<script setup>
+  import Illustration from '@/assets/svg/illustration-layers'
   import ContentBlock from '@/templates/content-block'
+  import EmptyResultsBlock from '@/templates/empty-results-block'
+  import ListTableBlock from '@/templates/list-table-block'
+  import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
   import PageHeadingBlock from '@/templates/page-heading-block'
-  export default {
-    name: 'edge-firewall-view',
-    components: {
-      ListTableBlock,
-      EmptyResultsBlock,
-      Illustration,
-      ContentBlock,
-      PageHeadingBlock
+  import { computed, ref } from 'vue'
+  defineOptions({ name: 'edge-firewall-view' })
+
+  const props = defineProps({
+    listEdgeFirewallService: {
+      required: true,
+      type: Function
     },
-    props: {
-      listEdgeFirewallService: {
-        required: true,
-        type: Function
-      },
-      deleteEdgeFirewallService: {
-        required: true,
-        type: Function
-      },
-      documentationService: {
-        required: true,
-        type: Function
-      }
+    deleteEdgeFirewallService: {
+      required: true,
+      type: Function
     },
-    data: () => ({
-      hasContentToList: true
-    }),
-    computed: {
-      getColumns() {
-        return [
-          {
-            field: 'name',
-            header: 'Name'
-          },
-          {
-            field: 'lastEditor',
-            header: 'Last Editor'
-          },
-          {
-            field: 'lastModify',
-            sortField: 'lastModifyDate',
-            header: 'Last Modified'
-          },
-          {
-            field: 'domainsList',
-            header: 'Domains'
-          },
-          {
-            field: 'active',
-            header: 'Active'
-          }
-        ]
-      }
-    },
-    methods: {
-      handleLoadData(event) {
-        this.hasContentToList = event
-      }
+    documentationService: {
+      required: true,
+      type: Function
     }
+  })
+
+  const hasContentToList = ref(true)
+
+  const getColumns = computed(() => [
+    {
+      field: 'name',
+      header: 'Name'
+    },
+    {
+      field: 'domainsList',
+      header: 'Domains',
+      type: 'component',
+      component: (columnData) =>
+        columnBuilder({ data: columnData, columnAppearance: 'expand-column' })
+    },
+    {
+      field: 'status',
+      header: 'Status',
+      type: 'component',
+      component: (columnData) => {
+        return columnBuilder({
+          data: columnData,
+          columnAppearance: 'tag'
+        })
+      }
+    },
+    {
+      field: 'lastEditor',
+      header: 'Last Editor'
+    },
+    {
+      field: 'lastModify',
+      sortField: 'lastModifyDate',
+      header: 'Last Modified'
+    }
+  ])
+
+  const handleLoadData = (event) => {
+    hasContentToList.value = event
   }
 </script>
 
@@ -74,21 +73,22 @@
       <ListTableBlock
         v-if="hasContentToList"
         pageTitleDelete="Edge Firewal"
-        addButtonLabel="Edge Firewall"
+        addButtonLabel="Rule Set"
         createPagePath="/edge-firewall/create"
         editPagePath="/edge-firewall/edit"
-        :listService="listEdgeFirewallService"
-        :deleteService="deleteEdgeFirewallService"
+        :listService="props.listEdgeFirewallService"
+        :deleteService="props.deleteEdgeFirewallService"
         :columns="getColumns"
         @on-load-data="handleLoadData"
+        emptyListMessage="No Rule Set found."
       />
       <EmptyResultsBlock
         v-else
-        title="No edge firewall added"
-        description="Create your first edge firewall."
-        createButtonLabel="Edge Firewall"
+        title="No Rule Set added."
+        description="Create your first Rule Set."
+        createButtonLabel="Rule Set"
         createPagePath="/edge-firewall/create"
-        :documentationService="documentationService"
+        :documentationService="props.documentationService"
       >
         <template #illustration>
           <Illustration />

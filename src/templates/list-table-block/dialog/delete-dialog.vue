@@ -3,9 +3,12 @@
     v-model:visible="deleteDialogVisible"
     modal
     :header="`Delete ${informationForDeletion.title}`"
-    class="w-[95vw] md:w-[40vw]"
+    :draggable="false"
+    class="md:max-w-[680px]"
     :pt="{
-      header: { class: 'p-5' }
+      content: { class: 'p-4 md:p-8' },
+      header: { class: 'p-4 md:p-8' },
+      footer: { class: 'p-4 md:p-8 flex' }
     }"
     @keyup.enter="removeItem()"
   >
@@ -24,7 +27,9 @@
         </p>
       </div>
 
-      <Divider class="-ml-5 w-[calc(100%_+_40px)]" />
+      <Divider
+        class="-ml-4 w-[calc(100%+2rem)] md:-ml-8 w-[calc(100%+4rem) md:w-[calc(100%+4rem)]"
+      />
 
       <div>
         <div class="flex flex-col w-full gap-2">
@@ -50,16 +55,16 @@
     </div>
 
     <template #footer>
-      <div class="flex gap-2 flex-col-reverse lg:flex-row justify-end">
+      <div class="justify-end w-full flex gap-4">
         <PrimeButton
           severity="primary"
           outlined
+          class="flex-none md:flex"
           label="Cancel"
-          class="m-0"
           @click="cancelDialog()"
         ></PrimeButton>
         <PrimeButton
-          class="w-full lg:w-auto mr-0"
+          class="w-full md:w-auto"
           severity="danger"
           label="Delete"
           icon-pos="right"
@@ -75,13 +80,13 @@
 <script setup>
   import PrimeButton from 'primevue/button'
   import PrimeDialog from 'primevue/dialog'
-  import Message from 'primevue/message'
-  import InputText from 'primevue/inputtext'
   import Divider from 'primevue/divider'
-  import { useField, useForm } from 'vee-validate'
-  import * as yup from 'yup'
-  import { computed, ref, watch } from 'vue'
+  import InputText from 'primevue/inputtext'
+  import Message from 'primevue/message'
   import { useToast } from 'primevue/usetoast'
+  import { useField, useForm } from 'vee-validate'
+  import { computed, ref, watch } from 'vue'
+  import * as yup from 'yup'
 
   const toast = useToast()
 
@@ -130,7 +135,8 @@
       toastConfig = {
         closable: true,
         severity: 'error',
-        summary: error
+        summary: 'Error',
+        detail: error
       }
     } finally {
       deleteDialogVisible.value = false

@@ -24,6 +24,7 @@
   const showPreview = ref(true)
 
   const { value: name, errorMessage: nameError } = useField('name')
+  const { value: isProprietaryCode } = useField('isProprietaryCode')
   const { value: jsonArgs, errorMessage: jsonArgsError } = useField('jsonArgs')
   const { value: code, errorMessage: codeError } = useField('code')
   const { value: language } = useField('language')
@@ -121,10 +122,10 @@
                 class="w-full text-[var(--text-color-secondary)]"
                 readonly
               />
-              <small class="text-xs text-color-secondary font-normal leading-tight">
-                Language isn't an editable field.</small
-              >
             </span>
+            <small class="text-xs text-color-secondary font-normal leading-tight">
+              Language isn't an editable field.</small
+            >
           </div>
         </template>
       </FormHorizontal>
@@ -166,6 +167,7 @@
             :initialValue="initialCodeValue"
             language="javascript"
             :errors="hasCodeError"
+            :readOnly="isProprietaryCode"
           />
           <small
             v-if="codeError"

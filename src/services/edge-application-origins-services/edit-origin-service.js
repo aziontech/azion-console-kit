@@ -14,9 +14,12 @@ export const editOriginService = async (payload) => {
 }
 
 const adapt = (payload) => {
-  const paylodAdapted = {
+  const payloadAdapted = {
     name: payload.name,
     host_header: payload.hostHeader,
+    origin_type: payload.originType,
+    method: payload.method,
+    is_origin_redirection_enabled: payload.isOriginRedirectionEnabled,
     addresses: payload.addresses?.map((addressItem) => ({
       address: addressItem.address,
       weight: addressItem.weight,
@@ -33,7 +36,7 @@ const adapt = (payload) => {
     timeout_between_bytes: payload.timeoutBetweenBytes
   }
 
-  return paylodAdapted
+  return payloadAdapted
 }
 
 /**

@@ -1,9 +1,9 @@
 <script setup>
   import DialogUnsavedBlock from '@/templates/dialog-unsaved-block'
+  import { useToast } from 'primevue/usetoast'
   import { useForm, useIsFormDirty } from 'vee-validate'
   import { computed, ref } from 'vue'
   import { useRouter } from 'vue-router'
-  import { useToast } from 'primevue/usetoast'
 
   defineOptions({ name: 'create-form-block' })
 
@@ -50,12 +50,13 @@
     router.go(-1)
   }
 
-  const showToast = (severity, summary) => {
-    if (!summary) return
+  const showToast = (severity, detail) => {
+    if (!detail) return
     toast.add({
       closable: true,
-      severity: severity,
-      summary: summary
+      severity,
+      summary: severity,
+      detail
     })
   }
 

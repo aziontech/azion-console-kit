@@ -1,4 +1,5 @@
 .p-divider {
+  padding-inline: 12px !important;
   .p-divider-content {
     background-color: $panelContentBg;
     font-weight: 500 !important;
@@ -9,11 +10,11 @@
     padding: $dividerHorizontalPadding;
 
     &:before {
-      border-top: 1px solid var(--surface-border);
+      border: 1px solid var(--surface-border);
     }
 
     .p-divider-content {
-      padding: 0 $inlineSpacing;
+      padding: $inlineSpacing;
     }
   }
 

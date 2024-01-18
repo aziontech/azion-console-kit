@@ -1,15 +1,16 @@
 <script setup>
-  import InputText from 'primevue/inputtext'
-  import InputNumber from 'primevue/inputnumber'
-  import RadioButton from 'primevue/radiobutton'
-  import Dropdown from 'primevue/dropdown'
-  import InputSwitch from 'primevue/inputswitch'
-  import Card from 'primevue/card'
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
+  import FieldText from '@/templates/form-fields-inputs/fieldText'
   import PrimeButton from 'primevue/button'
+  import Card from 'primevue/card'
+  import Dropdown from 'primevue/dropdown'
+  import InputNumber from 'primevue/inputnumber'
+  import InputSwitch from 'primevue/inputswitch'
+  import InputText from 'primevue/inputtext'
+  import RadioButton from 'primevue/radiobutton'
   import PrimeTag from 'primevue/tag'
-  import { computed } from 'vue'
   import { useField } from 'vee-validate'
+  import { computed } from 'vue'
 
   const props = defineProps({
     handleBlock: {
@@ -18,8 +19,7 @@
       default: () => ['full']
     },
     contactSalesEdgeApplicationService: {
-      type: Function,
-      required: true
+      type: Function
     }
   })
 
@@ -64,12 +64,11 @@
   const { value: originProtocolPolicy } = useField('originProtocolPolicy')
   const { value: active } = useField('active')
 
-  const { value: name, errorMessage: nameError } = useField('name')
+  const { value: name } = useField('name')
   const { value: address, errorMessage: addressError } = useField('address')
   const { value: hostHeader, errorMessage: hostHeaderError } = useField('hostHeader')
   const { value: browserCacheSettingsMaximumTtl } = useField('browserCacheSettingsMaximumTtl')
   const { value: cdnCacheSettingsMaximumTtl } = useField('cdnCacheSettingsMaximumTtl')
-  const { value: cdnCacheSettingsDefaultTtl } = useField('cdnCacheSettingsDefaultTtl')
 
   const { value: websocket } = useField('websocket')
   const { value: applicationAcceleration } = useField('applicationAcceleration')
@@ -108,12 +107,7 @@
   const isBrowserCacheTypeHonor = computed(() => browserCacheSettings.value === 'honor')
   const websocketIsEnabled = computed(() => websocket.value)
   const l2CachingIsEnable = computed(() => l2Caching.value)
-  const cdnCacheSettingsIsOverride = computed(() => {
-    if (cdnCacheSettings.value === 'override') {
-      return true
-    }
-    return false
-  })
+  const cdnCacheSettingsIsOverride = computed(() => cdnCacheSettings.value === 'override')
 </script>
 
 <template>
@@ -124,21 +118,11 @@
   >
     <template #inputs>
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
-        <label
-          for="name"
-          class="text-color text-base font-medium"
-          >Name *</label
-        >
-        <InputText
-          v-model="name"
-          type="text"
-          :class="{ 'p-invalid': nameError }"
+        <FieldText
+          label="Name *"
+          name="name"
+          :value="name"
         />
-        <small
-          v-if="nameError"
-          class="p-error text-xs font-normal leading-tight"
-          >{{ nameError }}</small
-        >
       </div>
     </template>
   </FormHorizontal>
@@ -168,15 +152,14 @@
           >
             <template #title>
               <InputSwitch
+                class="pl-10"
                 v-model="isHttpProtocol"
                 name="http"
                 value="http"
                 @click="setDeliveryProtocol('http', false)"
               />
               <div class="flex-col gap-1">
-                <div class="">
-                  <div class="text-color text-sm font-normal">HTTP support</div>
-                </div>
+                <div class="text-color text-sm font-normal">HTTP support</div>
               </div>
             </template>
           </Card>
@@ -193,15 +176,14 @@
           >
             <template #title>
               <InputSwitch
+                class="pl-10"
                 v-model="isHttpsProtocol"
                 @click="setDeliveryProtocol('http,https', false)"
                 name="http,https"
                 value="http,https"
               />
               <div class="flex-col gap-1">
-                <div class="">
-                  <div class="text-color text-sm font-normal">HTTP and HTTPS support</div>
-                </div>
+                <div class="text-color text-sm font-normal">HTTP and HTTPS support</div>
                 <div class="self-stretch text-color-secondary text-sm font-normal">
                   Enables the HTTPS protocol for the application.
                 </div>
@@ -221,15 +203,14 @@
           >
             <template #title>
               <InputSwitch
+                class="pl-10"
                 v-model="isHttp3Protocol"
                 @click="setDeliveryProtocol('http,https', true)"
                 name="http,https"
                 value="http,https"
               />
               <div class="flex-col gap-1">
-                <div class="">
-                  <div class="text-color text-sm font-normal">HTTP, HTTPS and HTTP/3 support</div>
-                </div>
+                <div class="text-color text-sm font-normal">HTTP, HTTPS and HTTP/3 support</div>
                 <div class="self-stretch text-color-secondary text-sm font-normal">
                   Enables the HTTPS protocol for the application and requests in HTTP/3.
                 </div>
@@ -239,7 +220,7 @@
         </div>
       </div>
 
-      <div class="flex gap-6">
+      <div class="flex gap-6 max-sm:flex-col">
         <div class="flex flex-col w-full sm:max-w-xs gap-2">
           <label
             for="port-http"
@@ -290,7 +271,7 @@
       </div>
 
       <div
-        class="flex gap-6"
+        class="flex gap-6 max-sm:flex-col"
         v-if="isHttpsProtocol || isHttp3Protocol"
       >
         <div class="flex flex-col w-full sm:max-w-xs gap-2">
@@ -473,12 +454,12 @@
           <div class="flex gap-2 items-center">
             <RadioButton
               v-model="browserCacheSettings"
-              inputId="override"
+              inputId="browserCacheSettings-override"
               name="override"
               value="override"
             />
             <label
-              for="override"
+              for="browserCacheSettings-override"
               class="text-color text-sm font-normal"
               >Override Cache Settings</label
             >
@@ -486,12 +467,12 @@
           <div class="flex gap-2 items-center">
             <RadioButton
               v-model="browserCacheSettings"
-              inputId="honor"
+              inputId="browserCacheSettings-honor"
               name="honor"
               value="honor"
             />
             <label
-              for="honor"
+              for="browserCacheSettings-honor"
               class="text-color text-sm font-normal"
               >Honor Origin Cache Headers</label
             >
@@ -526,12 +507,12 @@
           <div class="flex gap-2 items-center">
             <RadioButton
               v-model="cdnCacheSettings"
-              inputId="override"
+              inputId="cdnCacheSettings-override"
               name="override"
               value="override"
             />
             <label
-              for="honor"
+              for="cdnCacheSettings-override"
               class="text-color text-sm font-normal"
               >Override Cache Settings</label
             >
@@ -539,12 +520,12 @@
           <div class="flex gap-2 items-center">
             <RadioButton
               v-model="cdnCacheSettings"
-              inputId="honor"
+              inputId="cdnCacheSettings-honor"
               name="honor"
               value="honor"
             />
             <label
-              for="override"
+              for="cdnCacheSettings-honor"
               class="text-color text-sm font-normal"
               >Honor Origin Cache Settings</label
             >
@@ -567,13 +548,6 @@
           <InputNumber
             v-model="cdnCacheSettingsMaximumTtl"
             showButtons
-            v-if="cdnCacheSettingsIsOverride"
-          />
-
-          <InputNumber
-            v-model="cdnCacheSettingsDefaultTtl"
-            showButtons
-            v-if="!cdnCacheSettingsIsOverride"
           />
 
           <div class="text-color-secondary text-sm font-normal">
@@ -597,7 +571,11 @@
         <div class="flex flex-col gap-3">
           <Card
             :pt="{
-              body: { class: 'p-4' },
+              body: {
+                class: `p-4 border rounded-md ${
+                  applicationAcceleration ? 'border-orange-500' : 'border-transparent'
+                }`
+              },
               title: { class: 'flex justify-between items-center text-base font-medium m-0' },
               subtitle: {
                 class: 'text-sm font-normal text-color-secondary m-0 pr-0 md:pr-[2.5rem]'
@@ -638,7 +616,11 @@
           </Card>
           <Card
             :pt="{
-              body: { class: 'p-4' },
+              body: {
+                class: `p-4 border rounded-md ${
+                  deviceDetection ? 'border-orange-500' : 'border-transparent'
+                }`
+              },
               title: { class: 'flex justify-between items-center text-base font-medium m-0' },
               subtitle: {
                 class: 'text-sm font-normal text-color-secondary m-0 pr-0 md:pr-[2.5rem]'
@@ -655,7 +637,11 @@
           </Card>
           <Card
             :pt="{
-              body: { class: 'p-4' },
+              body: {
+                class: `p-4 border rounded-md ${
+                  edgeFunctions ? 'border-orange-500' : 'border-transparent'
+                }`
+              },
               title: { class: 'flex justify-between items-center text-base font-medium m-0' },
               subtitle: {
                 class: 'text-sm font-normal text-color-secondary m-0 pr-0 md:pr-[2.5rem]'
@@ -670,7 +656,11 @@
           </Card>
           <Card
             :pt="{
-              body: { class: 'p-4' },
+              body: {
+                class: `p-4 border rounded-md ${
+                  imageOptimization ? 'border-orange-500' : 'border-transparent'
+                }`
+              },
               title: { class: 'flex justify-between items-center text-base font-medium m-0' },
               subtitle: {
                 class: 'text-sm font-normal text-color-secondary m-0 pr-0 md:pr-[2.5rem]'
@@ -685,7 +675,11 @@
           </Card>
           <Card
             :pt="{
-              body: { class: 'p-4' },
+              body: {
+                class: `p-4 border rounded-md ${
+                  loadBalancer ? 'border-orange-500' : 'border-transparent'
+                }`
+              },
               title: { class: 'flex justify-between items-center text-base font-medium m-0' },
               subtitle: {
                 class: 'text-sm font-normal text-color-secondary m-0 pr-0 md:pr-[2.5rem]'
@@ -708,7 +702,11 @@
         <div class="flex flex-col gap-3">
           <Card
             :pt="{
-              body: { class: 'p-4' },
+              body: {
+                class: `p-4 border rounded-md ${
+                  l2Caching ? 'border-orange-500' : 'border-transparent'
+                }`
+              },
               title: { class: 'flex justify-between items-center text-base font-medium m-0' },
               subtitle: {
                 class: 'text-sm font-normal text-color-secondary m-0 pr-0 md:pr-[2.5rem]'
@@ -730,7 +728,11 @@
           </Card>
           <Card
             :pt="{
-              body: { class: 'p-4' },
+              body: {
+                class: `p-4 border rounded-md ${
+                  websocket ? 'border-orange-500' : 'border-transparent'
+                }`
+              },
               title: { class: 'flex justify-between items-center text-base font-medium m-0' },
               subtitle: {
                 class: 'text-sm font-normal text-color-secondary m-0 pr-0 md:pr-[2.5rem]'

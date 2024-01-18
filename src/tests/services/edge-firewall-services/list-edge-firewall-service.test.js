@@ -48,11 +48,10 @@ describe('EdgeFirewallServices', () => {
       body: { results: [] }
     })
     const { sut } = makeSut()
-    const version = 'v3'
     await sut({})
 
     expect(requestSpy).toHaveBeenCalledWith({
-      url: `${version}/edge_firewall?order_by=name&sort=asc&page=1&page_size=200`,
+      url: 'v3/edge_firewall?order_by=name&sort=asc&page=1&page_size=200',
       method: 'GET'
     })
   })
@@ -75,8 +74,11 @@ describe('EdgeFirewallServices', () => {
         lastEditor: fixtures.edgeFirewallMock.last_editor,
         lastModify: 'Friday, November 10, 2023',
         lastModifyDate: new Date('2023-11-10T00:00:00.000Z'),
-        domainsList: '',
-        active: 'Yes'
+        domainsList: [],
+        status: {
+          content: 'Active',
+          severity: 'success'
+        }
       }
     ])
   })
@@ -108,8 +110,11 @@ describe('EdgeFirewallServices', () => {
         lastEditor: fixtures.edgeFirewallWithDomainsMock.last_editor,
         lastModify: 'Friday, November 10, 2023',
         lastModifyDate: new Date('2023-11-10T00:00:00.000Z'),
-        domainsList: `Domain 1<br>Domain 2`,
-        active: 'No'
+        domainsList: ['Domain 1', 'Domain 2'],
+        status: {
+          content: 'Inactive',
+          severity: 'danger'
+        }
       }
     ])
   })

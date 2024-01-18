@@ -6,7 +6,7 @@
   >
     <div
       class="flex w-full"
-      v-if="props.userIsLogged"
+      v-if="props.showNavItems"
     >
       <div class="flex items-center gap-3">
         <SidebarBlock />
@@ -65,9 +65,8 @@
   provide('openSwitchAccount', openSwitchAccount)
 
   const props = defineProps({
-    userIsLogged: {
-      type: Boolean,
-      required: true
+    showNavItems: {
+      type: Boolean
     },
     listTypeAccountService: {
       type: Function,

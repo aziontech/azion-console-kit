@@ -27,8 +27,8 @@
 </template>
 
 <script>
-  import DialogUnsavedBlock from '@/templates/dialog-unsaved-block'
   import ActionBarTemplate from '@/templates/action-bar-block/action-bar-with-teleport'
+  import DialogUnsavedBlock from '@/templates/dialog-unsaved-block'
 
   export default {
     name: 'edit-form-block-no-header',
@@ -99,7 +99,8 @@
           this.$toast.add({
             closable: true,
             severity: 'error',
-            summary: error
+            summary: 'error',
+            detail: error
           })
         } finally {
           this.isLoading = false
@@ -112,7 +113,8 @@
           this.$toast.add({
             closable: true,
             severity: 'success',
-            summary: 'edited successfully'
+            summary: 'success',
+            detail: 'edited successfully'
           })
           this.blockViewRedirection = false
           this.goBackToList()
@@ -121,7 +123,8 @@
           this.$toast.add({
             closable: true,
             severity: 'error',
-            summary: error
+            summary: 'error',
+            detail: error
           })
         } finally {
           setTimeout(() => {

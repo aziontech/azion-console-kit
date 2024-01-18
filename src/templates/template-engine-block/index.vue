@@ -2,7 +2,7 @@
   <FormLoading v-if="isLoading" />
   <div
     class="w-full flex flex-col gap-8 max-md:gap-6"
-    v-else-if="!isLoading"
+    v-else
   >
     <FormHorizontal
       v-if="inputSchema.fields"
@@ -24,9 +24,9 @@
           <Password
             v-if="field.type === 'password'"
             toggleMask
-            :key="`password${field.name}`"
-            :modelValue="field.value.input"
-            @input="(event) => inputPassword(field.name, event.target.value)"
+            :key="`password-field-${field.name}`"
+            v-bind="field.input"
+            v-model="field.input.value"
             :id="field.name"
             class="w-full"
             :class="{ 'p-invalid': formTools.errors[field.name] }"
@@ -73,9 +73,9 @@
             <Password
               v-if="field.type === 'password'"
               toggleMask
-              :key="`password${field.name}`"
-              :modelValue="field.value.input"
-              @input="(event) => inputPassword(field.name, event.target.value)"
+              :key="`password-field-${field.name}`"
+              v-bind="field.input"
+              v-model="field.input.value"
               :id="field.name"
               class="w-full"
               :class="{ 'p-invalid': formTools.errors[field.name] }"
@@ -122,7 +122,7 @@
   import ActionBarTemplate from '@templates/action-bar-block'
   import FormLoading from './FormLoading'
   import InputText from 'primevue/inputtext'
-  import { useForm, useSetFieldValue } from 'vee-validate'
+  import { useForm } from 'vee-validate'
   import * as yup from 'yup'
   import { useToast } from 'primevue/usetoast'
 
@@ -172,9 +172,9 @@
     try {
       const initialData = await props.getTemplateService(id)
       inputSchema.value = initialData.inputSchema
-      const schemaObject = createSchemaObject()
-      const isValid = (await schemaObject).isValid()
-      createInputs(schemaObject, isValid)
+      const schemaObject = await createSchemaObject()
+      const isValid = await schemaObject.isValid()
+      await createInputs(schemaObject, isValid)
     } catch (error) {
       toast.add({
         closable: true,
@@ -195,27 +195,23 @@
   })
 
   const createSchemaObject = async () => {
-    const token = {}
+    const templateSchema = {}
 
-    if (inputSchema.value.fields) {
-      inputSchema.value.fields.forEach((element) => {
-        const schema = createSchemaString(element)
-        token[element.name] = schema
+    inputSchema.value.fields?.forEach((field) => {
+      const schema = createSchemaString(field)
+      templateSchema[field.name] = schema
+    })
+
+    inputSchema.value.groups?.forEach((group) => {
+      group.fields.forEach((field) => {
+        const schema = createSchemaString(field)
+        templateSchema[field.name] = schema
       })
-    }
+    })
 
-    if (inputSchema.value.groups) {
-      inputSchema.value.groups.forEach((group) => {
-        group.fields.forEach((element) => {
-          const schema = createSchemaString(element)
-          token[element.name] = schema
-        })
-      })
-    }
+    const resultSchema = yup.object(templateSchema)
 
-    const schameObject = yup.object(token)
-
-    return schameObject
+    return resultSchema
   }
 
   const createSchemaString = (element) => {
@@ -273,25 +269,21 @@
 
     formTools.value = { errors, meta, resetForm, values }
 
-    if (inputSchema.value.fields) {
-      inputSchema.value.fields.forEach((element) => {
-        if (element.value) {
-          setFieldValue(element.name, element.value)
-        }
-        element.input = defineInputBinds(element.name, { validateOnInput: true })
-      })
-    }
+    inputSchema.value.fields?.forEach((field) => {
+      if (field.value) {
+        setFieldValue(field.name, field.value)
+      }
+      field.input = defineInputBinds(field.name, { validateOnInput: true })
+    })
 
-    if (inputSchema.value.groups) {
-      inputSchema.value.groups.forEach((group) => {
-        group.fields.forEach((element) => {
-          if (element.value) {
-            setFieldValue(element.name, element.value)
-          }
-          element.input = defineInputBinds(element.name, { validateOnInput: true })
-        })
+    inputSchema.value.groups?.forEach((group) => {
+      group.fields.forEach((field) => {
+        if (field.value) {
+          setFieldValue(field.name, field.value)
+        }
+        field.input = defineInputBinds(field.name, { validateOnInput: true })
       })
-    }
+    })
 
     isLoading.value = false
 
@@ -304,11 +296,6 @@
 
   const removeHiddenFields = (fields) => {
     return fields.filter((field) => !field.hidden)
-  }
-
-  const inputPassword = (inputName, text) => {
-    const setFieldValue = useSetFieldValue()
-    setFieldValue(inputName, text)
   }
 
   const validateAndSubmit = async () => {
@@ -325,7 +312,7 @@
           payload.push(...group.fields)
         })
       }
-      payload.forEach((_, index) => {
+      payload.forEach((__, index) => {
         payload[index] = JSON.parse(JSON.stringify(payload[index]))
         const sanitizedField = {
           field: payload[index].name,
@@ -334,7 +321,7 @@
         }
 
         // Hidden field
-        const hiddenField = props.hiddenFields.find((i) => i.name === payload[index].name)
+        const hiddenField = props.hiddenFields.find((field) => field.name === payload[index].name)
         if (hiddenField) {
           sanitizedField.value = hiddenField.value
         }
@@ -343,10 +330,8 @@
       })
 
       const response = await props.instantiateTemplateService(props.templateId, payload)
-      emit('instantiate', response)
-
-      // Let submit loading for others operations
       submitLoading.value = props.freezeLoading
+      emit('instantiate', response)
     } catch (error) {
       toast.add({
         closable: true,

@@ -44,7 +44,10 @@
             />
           </p>
         </div>
-        <div class="flex flex-wrap justify-center items-center gap-3 mt-8 max-w-md">
+        <div
+          v-if="showSignupBtn"
+          class="flex flex-wrap justify-center items-center gap-3 mt-8 max-w-md"
+        >
           <p class="text-sm font-normal">Already have an account?</p>
           <PrimeButton
             label="Sign In"
@@ -58,8 +61,8 @@
 </template>
 
 <script setup>
-  import PrimeButton from 'primevue/button'
   import { azionPrivacyPolicyWindowOpener, azionTermsAndServicesWindowOpener } from '@/helpers'
+  import PrimeButton from 'primevue/button'
   import { useRouter } from 'vue-router'
 
   defineOptions({
@@ -78,6 +81,10 @@
     formTitle: {
       type: String,
       required: true
+    },
+    showSignupBtn: {
+      type: Boolean,
+      default: true
     }
   })
 

@@ -1,15 +1,15 @@
 <script setup>
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
-  import FieldText from '@/templates/form-fields-inputs/fieldText'
   import FieldInputGroup from '@/templates/form-fields-inputs/fieldInputGroup'
-  import RadioButton from 'primevue/radiobutton'
+  import FieldText from '@/templates/form-fields-inputs/fieldText'
+  import PrimeButton from 'primevue/button'
+  import Divider from 'primevue/divider'
   import InputNumber from 'primevue/inputnumber'
   import InputSwitch from 'primevue/inputswitch'
-  import Divider from 'primevue/divider'
+  import RadioButton from 'primevue/radiobutton'
   import TextArea from 'primevue/textarea'
-  import PrimeButton from 'primevue/button'
-  import { computed, ref, watch } from 'vue'
   import { useField, useFieldArray } from 'vee-validate'
+  import { computed, ref, watch } from 'vue'
 
   const CACHE_SETTINGS_OPTIONS = ref([
     {
@@ -79,12 +79,8 @@
     remove: removeDeviceGroup
   } = useFieldArray('deviceGroup')
 
-  const showMaxTtl = computed(() => {
-    return browserCacheSettings.value === 'override'
-  })
-  const showCdnMaxTtl = computed(() => {
-    return cdnCacheSettings.value === 'override'
-  })
+  const showMaxTtl = computed(() => browserCacheSettings.value === 'override')
+  const showCdnMaxTtl = computed(() => cdnCacheSettings.value === 'override')
   const showSliceConfigurationRange = computed(() => {
     return !!sliceConfigurationEnabled.value
   })
@@ -138,12 +134,12 @@
           >
             <RadioButton
               v-model="browserCacheSettings"
-              :inputId="browserCacheSettingsOption.value"
+              :inputId="`browserOption-${browserCacheSettingsOption.value}`"
               name="browserCacheSettings"
               :value="browserCacheSettingsOption.value"
             />
             <label
-              :for="browserCacheSettingsOption.value"
+              :for="`browserOption-${browserCacheSettingsOption.value}`"
               class="text-color text-sm font-normal leading-tight"
             >
               {{ browserCacheSettingsOption.label }}
@@ -161,7 +157,7 @@
       >
         <label
           for="browserCacheSettingsMaximumTtl"
-          class="text-color text-base font-medium"
+          class="text-color text-sm font-medium"
           >Maximum TTL (seconds) *</label
         >
 
@@ -191,12 +187,12 @@
           >
             <RadioButton
               v-model="cdnCacheSettings"
-              :inputId="cdnCacheSettingsOption.value"
+              :inputId="`cdnOption-${cdnCacheSettingsOption.value}`"
               name="cdnCacheSettings"
               :value="cdnCacheSettingsOption.value"
             />
             <label
-              :for="cdnCacheSettingsOption.value"
+              :for="`cdnOption-${cdnCacheSettingsOption.value}`"
               class="text-color text-sm font-normal leading-tight"
             >
               {{ cdnCacheSettingsOption.label }}
@@ -208,15 +204,13 @@
           TTL isn't received from the origin, cache will be maintained at a default TTL.
         </small>
       </div>
-      <div
-        v-if="showCdnMaxTtl"
-        class="flex flex-col sm:max-w-xs w-full gap-2"
-      >
+      <div class="flex flex-col sm:max-w-xs w-full gap-2">
         <label
           for="cdnCacheSettingsMaximumTtl"
-          class="text-color text-base font-medium"
-          >Maximum TTL (seconds) *</label
+          class="text-color text-sm font-medium"
         >
+          {{ showCdnMaxTtl ? 'Maximum TTL (seconds)' : 'Default TTL' }}
+        </label>
         <InputNumber
           showButtons
           v-model="cdnCacheSettingsMaximumTtl"
@@ -269,7 +263,7 @@
       >
         <label
           for="sliceConfigurationRange"
-          class="text-color text-base font-medium"
+          class="text-color text-sm font-medium"
           >Slice Range (KB)</label
         >
         <span class="p-input-icon-right w-full flex max-w-lg flex-col items-start gap-2">
@@ -330,7 +324,7 @@
       >
         <label
           for="queryStringFields"
-          class="text-color text-base font-medium"
+          class="text-color text-sm font-medium"
           >Query String fields *</label
         >
         <TextArea
@@ -453,7 +447,7 @@
       >
         <label
           for="cookieNames"
-          class="text-color text-base font-medium"
+          class="text-color text-sm font-medium"
           >Cookie Names *</label
         >
         <TextArea
@@ -515,6 +509,8 @@
                 <PrimeButton
                   v-if="!deviceGroupItem.isFirst"
                   icon="pi pi-trash"
+                  size="small"
+                  outlined
                   @click="removeDeviceGroup(index)"
                 />
               </template>

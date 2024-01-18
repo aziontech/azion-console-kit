@@ -1,10 +1,63 @@
+<template>
+  <DrawerFunction
+    ref="drawerFunctionRef"
+    :edgeApplicationId="props.edgeApplicationId"
+    :createFunctionService="props.createFunctionService"
+    :listEdgeFunctionsService="props.listEdgeFunctionsService"
+    :loadEdgeFunctionsService="props.loadEdgeFunctionsService"
+    :loadFunctionService="props.loadFunctionService"
+    :editFunctionService="props.editFunctionService"
+    @onSuccess="reloadList"
+  />
+  <div v-if="hasContentToList">
+    <ListTableBlock
+      ref="listFunctionsEdgeApplicationsRef"
+      :listService="listFunctionsInstance"
+      :deleteService="deleteFunctionsWithDecorator"
+      :columns="getColumns"
+      :editInDrawer="openEditFunctionDrawer"
+      pageTitleDelete="Function"
+      @on-load-data="handleLoadData"
+    >
+      <template #addButton>
+        <PrimeButton
+          icon="pi pi-plus"
+          label="Edge Function"
+          @click="openCreateFunctionDrawer"
+        />
+      </template>
+    </ListTableBlock>
+  </div>
+  <EmptyResultsBlock
+    v-else
+    title="No Function added"
+    description="Create your first Function."
+    createButtonLabel="Add"
+    :documentationService="props.documentationService"
+    :inTabs="true"
+  >
+    <template #default>
+      <PrimeButton
+        severity="secondary"
+        icon="pi pi-plus"
+        label="Function"
+        @click="openCreateFunctionDrawer"
+      />
+    </template>
+    <template #illustration>
+      <Illustration />
+    </template>
+  </EmptyResultsBlock>
+</template>
+
 <script setup>
-  import { ref, computed } from 'vue'
-  import ListTableBlock from '@/templates/list-table-block/no-header'
+  import Illustration from '@/assets/svg/illustration-layers'
   import EmptyResultsBlock from '@/templates/empty-results-block'
   import PrimeButton from 'primevue/button'
   import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
-  import Illustration from '@/assets/svg/illustration-layers'
+  import ListTableBlock from '@/templates/list-table-block/no-header'
+  import DrawerFunction from './Drawer'
+  import { computed, ref } from 'vue'
 
   defineOptions({ name: 'list-edge-applications-functions-tab' })
 
@@ -23,15 +76,30 @@
       required: true,
       type: Function
     },
-    deleteFunctionService: {
+    listEdgeFunctionsService: {
       required: true,
       type: Function
     },
-    documentationService: {
-      type: Function,
-      required: true
+    loadFunctionService: {
+      required: true,
+      type: Function
+    },
+    createFunctionService: {
+      required: true,
+      type: Function
+    },
+    editFunctionService: {
+      required: true,
+      type: Function
+    },
+    deleteFunctionService: {
+      required: true,
+      type: Function
     }
   })
+
+  const drawerFunctionRef = ref('')
+  const listFunctionsEdgeApplicationsRef = ref('')
 
   const getColumns = computed(() => {
     return [
@@ -91,9 +159,11 @@
       }
     ]
   })
+
   const listFunctionsInstance = async () => {
     return await props.listEdgeApplicationFunctionsService(props.edgeApplicationId)
   }
+
   const deleteFunctionsWithDecorator = async (functionId) => {
     return await props.deleteFunctionService(functionId, props.edgeApplicationId)
   }
@@ -101,42 +171,20 @@
   const handleLoadData = (event) => {
     hasContentToList.value = event
   }
+
+  const openCreateFunctionDrawer = () => {
+    drawerFunctionRef.value.openDrawerCreate()
+  }
+
+  const openEditFunctionDrawer = (data) => {
+    drawerFunctionRef.value.openDrawerEdit(data.id)
+  }
+
+  const reloadList = () => {
+    if (hasContentToList.value) {
+      listFunctionsEdgeApplicationsRef.value.reload()
+      return
+    }
+    hasContentToList.value = true
+  }
 </script>
-<template>
-  <div v-if="hasContentToList">
-    <ListTableBlock
-      ref="listOriginsEdgeApplicationsRef"
-      :listService="listFunctionsInstance"
-      :deleteService="deleteFunctionsWithDecorator"
-      :columns="getColumns"
-      pageTitleDelete="Function"
-      @on-load-data="handleLoadData"
-    >
-      <template #addButton>
-        <PrimeButton
-          icon="pi pi-plus"
-          label="Edge Function"
-        />
-      </template>
-    </ListTableBlock>
-  </div>
-  <EmptyResultsBlock
-    v-else
-    title="No Function added"
-    description="Create your first Function."
-    createButtonLabel="Add"
-    :documentationService="props.documentationService"
-    :inTabs="true"
-  >
-    <template #default>
-      <PrimeButton
-        severity="secondary"
-        icon="pi pi-plus"
-        label="Function"
-      />
-    </template>
-    <template #illustration>
-      <Illustration />
-    </template>
-  </EmptyResultsBlock>
-</template>

@@ -217,8 +217,8 @@
       searching.value = !!search.value
       loading.value = true
       const payload = { type: PAGE_TYPE, search: search.value }
-      const items = await loadSolutions(payload)
-      solutions.value = items.filter((i) => !i.instanceType.isTemplate)
+      const loadedSolutions = await loadSolutions(payload)
+      solutions.value = loadedSolutions.filter((solution) => !solution.instanceType.isTemplate)
     } catch (error) {
       $toast.add({ ...ERROR_PROPS, summary: error })
     } finally {
@@ -243,11 +243,11 @@
   }
 
   const featured = computed(() => {
-    return solutions.value.filter((i) => i.featured)
+    return solutions.value.filter((solution) => solution.featured)
   })
 
   const released = computed(() => {
-    return solutions.value.filter((i) => i.released)
+    return solutions.value.filter((solution) => solution.released)
   })
 
   const allSelected = computed(() => {
@@ -255,13 +255,15 @@
   })
 
   const categoriesList = computed(() => {
-    let mapped = categories.value.map((i) => ({
-      name: i.name,
-      code: i.slug,
-      total: i.solutionsCount
+    let mappedCategories = categories.value.map((category) => ({
+      name: category.name,
+      code: category.slug,
+      total: category.solutionsCount
     }))
-    mapped = mapped.filter((i) => i.total > 0 && i.code !== 'build')
+    mappedCategories = mappedCategories.filter(
+      (category) => category.total > 0 && category.code !== 'build'
+    )
 
-    return mapped.length ? [CATEGORY_ALL, ...mapped] : []
+    return mappedCategories.length ? [CATEGORY_ALL, ...mappedCategories] : []
   })
 </script>

@@ -1,5 +1,7 @@
 import * as SignupService from '@/services/signup-services'
+import { listSocialIdpsService } from '@/services/social-idps-services'
 import { useAccountStore } from '@/stores/account'
+import SignupView from '@/views/Signup/SignupView.vue'
 
 /** @type {import('vue-router').RouteRecordRaw} */
 export const signupRoutes = {
@@ -9,9 +11,10 @@ export const signupRoutes = {
     {
       path: '',
       name: 'signup',
-      component: () => import('@views/Signup/SignupView.vue'),
+      component: SignupView,
       props: {
-        signupService: SignupService.signupService
+        signupService: SignupService.signupService,
+        listSocialIdpsService: listSocialIdpsService
       },
       meta: {
         hideNavigation: true,
@@ -42,7 +45,7 @@ export const signupRoutes = {
       meta: {
         hideNavigation: true
       },
-      beforeEnter: (_, __, next) => {
+      beforeEnter: (__, ___, next) => {
         const accountStore = useAccountStore()
         if (accountStore.isFirstLogin) {
           next()
