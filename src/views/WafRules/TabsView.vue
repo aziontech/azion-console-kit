@@ -2,7 +2,8 @@
   import ContentBlock from '@/templates/content-block'
   import PageHeadingBlock from '@/templates/page-heading-block'
   import EditView from '@/views/WafRules/EditView.vue'
-  import ListViewWafRulesAllowed from '@/views/WafRules/ListWafRulesAllowed.vue'
+  import ListWafRulesAllowed from '@/views/WafRules/ListWafRulesAllowed.vue'
+  import ListWafRulesTuning from '@/views/WafRules/ListWafRulesTuning.vue'
   import TabPanel from 'primevue/tabpanel'
   import TabView from 'primevue/tabview'
 
@@ -13,7 +14,8 @@
 
   const props = defineProps({
     wafServices: { type: Object, required: true },
-    wafRulesAllowed: { type: Object, required: true }
+    wafRulesAllowed: { type: Object, required: true },
+    wafTuning: { type: Object, required: true }
   })
 
   const mapTabs = {
@@ -71,20 +73,28 @@
           <EditView
             :editWafRulesService="props.wafServices.editWafRulesService"
             :loadWafRulesService="props.wafServices.loadWafRulesService"
-          ></EditView>
+            :showActionBar="activeTab === mapTabs.mainSettings"
+          />
         </TabPanel>
         <TabPanel header="Tuning">
-          <h1>Tuning</h1>
+          <ListWafRulesTuning
+            :documentationServiceTuning="props.wafTuning.documentationServiceTuning"
+            :listWafRulesTuningService="props.wafTuning.listWafRulesTuningService"
+            :listCountriesService="props.wafTuning.listCountriesService"
+            :listNetworkListService="props.wafTuning.listNetworkListService"
+            :listWafRulesDomainsService="props.wafTuning.listWafRulesDomainsService"
+            :showActionBar="activeTab === mapTabs.tuning"
+          />
         </TabPanel>
         <TabPanel header="Allowed Rules">
-          <ListViewWafRulesAllowed
+          <ListWafRulesAllowed
             :listWafRulesAllowedService="props.wafRulesAllowed.listWafRulesAllowedService"
             :deleteWafRulesAllowedService="props.wafRulesAllowed.deleteWafRulesAllowedService"
             :createWafRulesAllowedService="props.wafRulesAllowed.createWafRulesAllowedService"
             :loadWafRulesAllowedService="props.wafRulesAllowed.loadWafRulesAllowedService"
             :editWafRulesAllowedService="props.wafRulesAllowed.editWafRulesAllowedService"
             :documentationServiceAllowed="props.wafRulesAllowed.documentationServiceAllowed"
-          ></ListViewWafRulesAllowed>
+          />
         </TabPanel>
       </TabView>
     </template>

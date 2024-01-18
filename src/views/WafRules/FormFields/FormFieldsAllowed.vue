@@ -120,7 +120,7 @@
         align="left"
         type="dashed"
       >
-        <b>Then</b>
+        Then
       </Divider>
       <div class="flex flex-col gap-8">
         <div
@@ -129,7 +129,7 @@
           class="flex flex-col gap-6"
         >
           <div
-            class="flex"
+            class="flex gap-3"
             v-if="index"
           >
             <Divider
@@ -137,9 +137,10 @@
               type="dashed"
               :key="index"
             >
-              <b>And</b>
+              And
             </Divider>
             <PrimeButton
+              outlined
               severity="secondary"
               icon="pi pi-trash"
               aria-label="Trash"
