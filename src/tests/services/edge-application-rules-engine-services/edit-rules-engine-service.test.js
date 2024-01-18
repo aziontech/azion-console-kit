@@ -109,6 +109,44 @@ describe('EdgeApplicationRulesEngineServices', () => {
     )
   })
 
+  it('should parse correctly the API error validation', async () => {
+    vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
+      statusCode: 400,
+      body: {
+        error: 'invalid rule engine error message'
+      }
+    })
+
+    const { sut } = makeSut()
+
+    const result = sut({
+      id: 762356,
+      payload: fixtures.rulePayload,
+      reorder: false
+    })
+
+    expect(result).rejects.toBe('error: invalid rule engine error message')
+  })
+
+  it('should parse correctly the API validation with multiple error messages', async () => {
+    vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
+      statusCode: 400,
+      body: {
+        errors: ['first error message', 'second error message']
+      }
+    })
+
+    const { sut } = makeSut()
+
+    const result = sut({
+      id: 762356,
+      payload: fixtures.rulePayload,
+      reorder: false
+    })
+
+    expect(result).rejects.toBe('errors: first error message')
+  })
+
   it.each([
     {
       statusCode: 401,
