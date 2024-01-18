@@ -29,7 +29,7 @@ const errorMessagesMap = {
   blank_parameter: `The '{value}' field is empty.`,
   incompatible_behaviors: `The behavior '{value}' is incompatible with the others.`,
   invalid_behaviors: `The behavior '{value}' is invalid.`,
-  invalid_behaviors_target: `The behavior '{value}' has a invalid target.`,
+  invalid_behaviors_target: `The behavior '{value}' has a invalid target.`
 }
 
 /**
