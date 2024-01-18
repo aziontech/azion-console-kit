@@ -1,6 +1,7 @@
 import * as Helpers from '@/helpers'
 import * as DomainServices from '@/services/domains-services'
 import * as EdgeFirewall from '@/services/edge-firewall-services'
+import * as EdgeFirewallFunctions from '@/services/edge-firewall-functions-services'
 
 /** @type {import('vue-router').RouteRecordRaw} */
 export const edgeFirewallRoutes = {
@@ -55,6 +56,13 @@ export const edgeFirewallRoutes = {
           createEdgeFirewallService: EdgeFirewall.createEdgeFirewallService,
           loadEdgeFirewallService: EdgeFirewall.loadEdgeFirewallService,
           editEdgeFirewallService: EdgeFirewall.editEdgeFirewallService,
+
+          listEdgeFunctionsService: EdgeFirewallFunctions.listEdgeFunctionsService,
+          listEdgeFirewallFunctionService: EdgeFirewallFunctions.listEdgeFirewallFunctionsService,
+          createFunctionService: EdgeFirewallFunctions.createFunctionService,
+          editFunctionService: EdgeFirewallFunctions.editFunctionService,
+          deleteFunctionService: EdgeFirewallFunctions.deleteFunctionService,
+          loadFunctionService: EdgeFirewallFunctions.loadFunctionService,
           documentationService: Helpers.documentationCatalog.edgeFirewall,
           updatedRedirect: 'list-edge-firewall'
         },
