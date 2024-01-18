@@ -122,7 +122,7 @@
             :edgeFirewall="edgeFirewall"
             :loadDomains="props.listDomainsService"
             :updatedRedirect="edgeFirewallServices.updatedRedirect"
-            @updateFirewall="updatedFirewall"
+            @updatedFirewall="updatedFirewall"
           />
         </TabPanel>
         <TabPanel

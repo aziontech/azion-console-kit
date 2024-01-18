@@ -60,10 +60,6 @@
       type: Function,
       required: true
     },
-    loadEdgeFunctionsService: {
-      type: Function,
-      required: true
-    },
     loadFunctionService: {
       type: Function,
       required: true
