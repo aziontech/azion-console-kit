@@ -41,13 +41,15 @@
   const activeTab = ref(0)
   const edgeApplicationId = ref(route.params.id)
   const isEnableEdgeFunction = ref(false)
+  const isEnableApplicationAcceleration = ref(false)
 
   const loaderEdgeApplication = async () => {
     try {
-      const { edgeFunctions } = await props.edgeApplicationServices.loadEdgeApplication({
+      const { edgeFunctions, applicationAcceleration } = await props.edgeApplicationServices.loadEdgeApplication({
         id: edgeApplicationId.value
       })
       isEnableEdgeFunction.value = edgeFunctions
+      isEnableApplicationAcceleration.value = applicationAcceleration
     } catch (error) {
       toast.add({
         closable: true,
@@ -151,6 +153,7 @@
           <EdgeApplicationsRulesEngineListView
             v-if="activeTab === mapTabs.rulesEngine"
             :edgeApplicationId="edgeApplicationId"
+            :isEnableApplicationAcceleration="isEnableApplicationAcceleration"
             v-bind="props.rulesEngineServices"
           />
         </TabPanel>

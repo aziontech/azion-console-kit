@@ -43,7 +43,11 @@
     showBarGoBack: {
       type: Boolean,
       default: false
-    }
+    },
+    itemToEdit: {
+      type: Object,
+      required: false
+    },
   })
 
   const toast = useToast()
@@ -88,7 +92,8 @@
   const loadInitialData = async () => {
     try {
       loading.value = true
-      const initialValues = await props.loadService({ id: props.id })
+      const itemToEdit = props.itemToEdit || {}
+      const initialValues = await props.loadService({ id: props.id, ...itemToEdit })
       resetForm({ values: initialValues })
     } catch (error) {
       emit('onError', error)
