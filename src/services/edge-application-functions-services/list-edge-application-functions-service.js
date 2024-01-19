@@ -35,12 +35,9 @@ const mapFunctionData = (edgeApplicationFunction, functionData) => {
   return {
     id: edgeApplicationFunction.id,
     name: edgeApplicationFunction.name,
-    languageIcon: functionData.languageIcon,
-    referenceCount: functionData.referenceCount,
-    initiatorType: functionData.initiatorType,
+    functionInstanced: functionData.name,
     lastEditor: functionData.lastEditor,
     modified: functionData.modified,
-    statusTag: functionData.statusTag,
     version: functionData.version
   }
 }

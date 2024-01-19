@@ -68,6 +68,7 @@
           optionLabel="label"
           option-value="value"
           :optionDisabled="(option) => option.disabled"
+          filter
         />
       </div>
 
