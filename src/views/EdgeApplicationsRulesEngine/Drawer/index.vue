@@ -87,17 +87,7 @@
     description: yup.string().required().label('Description'),
     phase: yup.string(),
     criteria: yup.array(),
-    // .of(
-    //   yup.object().shape({
-    //     inputValue: yup.string().required().label('Criteria value')
-    //   })
-    // )
     behaviors: yup.array()
-    // .of(
-    //   yup.object().shape({
-    //     target: yup.string().required().label('Target')
-    //   })
-    // )
   })
 
   const createService = async (payload) => {
