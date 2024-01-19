@@ -25,7 +25,7 @@ describe('EdgeFirewallFunctionsServices', () => {
     sut(mocks.functionID, mocks.edgeApplicationID)
 
     expect(requestSpy).toHaveBeenCalledWith({
-      url: `v3/edge_applications/${mocks.edgeApplicationID}/functions_instances/${mocks.functionID}`,
+      url: `v3/edge_firewall/${mocks.edgeApplicationID}/functions_instances/${mocks.functionID}`,
       method: 'DELETE'
     })
   })
