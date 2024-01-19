@@ -126,12 +126,12 @@
   }
 
   const handleCreateFunction = () => {
+    closeDrawerCreate()
     emit('onSuccess')
   }
 
   defineExpose({
     openDrawerCreate,
-    closeDrawerCreate,
     openDrawerEdit
   })
 </script>

@@ -89,6 +89,10 @@
     deleteFunctionService: {
       required: true,
       type: Function
+    },
+    documentationService: {
+      required: true,
+      type: Function
     }
   })
 
@@ -144,7 +148,6 @@
   const reloadList = () => {
     if (hasContentToList.value) {
       listFunctionsEdgeFirewallRef.value.reload()
-      drawerFunctionRef.value.closeDrawerCreate()
       return
     }
     hasContentToList.value = true

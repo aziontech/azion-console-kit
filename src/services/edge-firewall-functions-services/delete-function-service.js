@@ -1,10 +1,10 @@
 import { AxiosHttpClientAdapter } from '../axios/AxiosHttpClientAdapter'
-import { makeEdgeApplicationBaseUrl } from '../edge-application-services/make-edge-application-base-url'
+import { makeEdgeFirewallBaseUrl } from './make-edge-firewall-base-url'
 import * as Errors from '@/services/axios/errors'
 
 export const deleteFunctionService = async (functionId, edgeFirewallID) => {
   let httpResponse = await AxiosHttpClientAdapter.request({
-    url: `${makeEdgeApplicationBaseUrl()}/${edgeFirewallID}/functions_instances/${functionId}`,
+    url: `${makeEdgeFirewallBaseUrl()}/${edgeFirewallID}/functions_instances/${functionId}`,
     method: 'DELETE'
   })
 
