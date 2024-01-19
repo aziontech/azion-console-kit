@@ -47,7 +47,7 @@ const pushToSeries = (countValues, series, item, additionalSerie) => {
 }
 
 /**
- * Fills the series with empty results for the cycles that did not have data records
+ * Fills the series with empty results for the cycles that do not have data records
  * @param {Object} series - The series to be filled with zeroes.
  * @param {number} countValues - The count of values to fill the series with.
  */
@@ -106,7 +106,7 @@ const shouldAddExtraPointsToAxis = (isTopX, lastXAxis, item, xAxis) => {
  * @returns {boolean} Whether series data should be handled.
  */
 const shouldHandleSeriesData = (variable, groupBy) => {
-  return variable !== null || (groupBy !== null && groupBy.length > 0)
+  return variable !== null || groupBy?.length
 }
 
 /**
