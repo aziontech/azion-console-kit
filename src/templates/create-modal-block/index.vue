@@ -144,7 +144,7 @@
   }
 
   const onTabChange = async (target) => {
-    if(!isLoading.value) {
+    if (!isLoading.value) {
       selectedTab.value = target.value || selectedTab.value
       if (target.value === 'browse' && browseTemplates.value.length === 0) {
         await loadBrowse()
@@ -154,22 +154,24 @@
 </script>
 
 <template>
-  
   <div class="overflow-auto w-full h-full flex flex-col sm:flex-row p-0 sm:pl-5 sm:pr-8 gap-4 pb-4">
     <div class="sm:min-w-[240px] mt-4">
-       <ul class="flex flex-col gap-1">
-          <li v-for="(menuitem, index) in items" :key="index"> 
-            <PrimeButton 
-              :class="{ 'p-selectbutton': menuitem.value === selectedTab, 'p-disabled': isLoading }"
-              class= "w-full p-button p-button-text p-button-primary p-button-sm whitespace-nowrap h-[38px] flex"
-              :pt="{
-                label: { class: 'w-full text-left' },
-              }"
-              @click="onTabChange(menuitem)"
-              :label="menuitem.label"
-            />
-          </li>
-        </ul>
+      <ul class="flex flex-col gap-1">
+        <li
+          v-for="(menuitem, index) in items"
+          :key="index"
+        >
+          <PrimeButton
+            :class="{ 'p-selectbutton': menuitem.value === selectedTab, 'p-disabled': isLoading }"
+            class="w-full p-button p-button-text p-button-primary p-button-sm whitespace-nowrap h-[38px] flex"
+            :pt="{
+              label: { class: 'w-full text-left' }
+            }"
+            @click="onTabChange(menuitem)"
+            :label="menuitem.label"
+          />
+        </li>
+      </ul>
     </div>
 
     <div class="overflow-auto w-full flex flex-col">

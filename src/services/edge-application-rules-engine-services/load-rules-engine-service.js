@@ -2,7 +2,7 @@ import { AxiosHttpClientAdapter, parseHttpResponse } from '@/services/axios/Axio
 import { makeEdgeApplicationBaseUrl } from '../edge-application-services/make-edge-application-base-url'
 
 export const loadRulesEngineService = async ({ edgeApplicationId, id, phase }) => {
-  const rulesPhase = phase.content === 'Default' ? 'request' : phase.content?.toLowerCase()
+  const rulesPhase = generateRulePhase(phase)
 
   let httpResponse = await AxiosHttpClientAdapter.request({
     url: `${makeEdgeApplicationBaseUrl()}/${edgeApplicationId}/rules_engine/${rulesPhase}/rules/${id}`,
@@ -11,6 +11,17 @@ export const loadRulesEngineService = async ({ edgeApplicationId, id, phase }) =
   httpResponse = adapt(httpResponse)
 
   return parseHttpResponse(httpResponse)
+}
+
+/**
+ *
+ * @param {Object} phase
+ * @param {string | undefined} phase.content
+ * @returns {string}
+ */
+const generateRulePhase = (phase) => {
+  const DEFAULT_RULE_PHASE = 'Default'
+  return phase.content === DEFAULT_RULE_PHASE ? 'request' : phase.content?.toLowerCase()
 }
 
 const adapt = (httpResponse) => {

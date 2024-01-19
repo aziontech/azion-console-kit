@@ -16,17 +16,20 @@ const makeSut = () => {
 
 describe('EdgeApplicationRulesEnginesServices', () => {
   it('should call API with correct params', async () => {
+    const phaseMock = 'request'
     const requestSpy = vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
       statusCode: 204
     })
-
     const { sut } = makeSut()
-    const version = 'v3'
-    const phase = 'request'
-    await sut({ ruleId: fixtures.ruleId, phase, edgeApplicationId: fixtures.edgeApplicationId })
+
+    await sut({
+      ruleId: fixtures.ruleId,
+      phase: phaseMock,
+      edgeApplicationId: fixtures.edgeApplicationId
+    })
 
     expect(requestSpy).toHaveBeenCalledWith({
-      url: `${version}/edge_applications/${fixtures.edgeApplicationId}/rules_engine/${phase}/rules/${fixtures.ruleId}`,
+      url: `v3/edge_applications/${fixtures.edgeApplicationId}/rules_engine/${phaseMock}/rules/${fixtures.ruleId}`,
       method: 'DELETE'
     })
   })
@@ -45,6 +48,27 @@ describe('EdgeApplicationRulesEnginesServices', () => {
     })
 
     expect(feedbackMessage).toBe('Rule Engine successfully deleted')
+  })
+
+  it('should return the api error message when payload contains invalid data', async () => {
+    const firstErrorMessageMock = 'Invalid rule engine error message'
+    vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
+      statusCode: 400,
+      body: {
+        invalidRuleErrorKey: firstErrorMessageMock,
+        anotherInvalidKeyError: 'Another invalid rule engine message'
+      }
+    })
+
+    const { sut } = makeSut()
+
+    const result = sut({
+      edgeApplicationId: fixtures.edgeApplicationId,
+      phase: 'request',
+      ruleId: fixtures.ruleId
+    })
+
+    expect(result).rejects.toBe(firstErrorMessageMock)
   })
 
   it.each([

@@ -59,12 +59,12 @@ describe('EdgeFirewallFunctionsServices', () => {
       {
         label: 'function instance name',
         value: fixtures.functionsInstance.id,
-        args: fixtures.functionsInstance.args,
+        args: fixtures.functionsInstance.args
       },
       {
-        label:  'function instance version',
+        label: 'function instance version',
         value: fixtures.functionInstanceWithVersion.id,
-        args: fixtures.functionInstanceWithVersion.args,
+        args: fixtures.functionInstanceWithVersion.args
       }
     ])
   })
