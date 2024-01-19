@@ -11,7 +11,7 @@ import { editWafRulesAllowedService } from './edit-waf-rules-allowed-service'
 import { listWafRulesTuningService } from './list-waf-rules-tuning-service'
 import { listNetworkListService } from './list-network-list-service'
 import { listWafRulesDomainsService } from './list-waf-rules-domain-service'
-
+import { createWafRulesAllowedTuningService } from './create-waf-rules-allowed-tuning-service'
 export {
   listWafRulesService,
   deleteWafRulesService,
@@ -25,5 +25,6 @@ export {
   editWafRulesAllowedService,
   listWafRulesTuningService,
   listNetworkListService,
-  listWafRulesDomainsService
+  listWafRulesDomainsService,
+  createWafRulesAllowedTuningService
 }

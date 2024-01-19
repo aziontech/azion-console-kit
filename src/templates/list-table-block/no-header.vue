@@ -1,4 +1,6 @@
+
 <template>
+  <!-- @row-click="editItemSelected" -->
   <div>
     <div class="max-w-full mt-4">
       <DataTable
@@ -13,9 +15,9 @@
         :rows="MINIMUN_OF_ITEMS_PER_PAGE"
         :globalFilterFields="filterBy"
         :loading="isLoading"
-        selectionMode="single"
-        @row-click="editItemSelected"
+        v-model:selection="selectedProduct"
         @rowReorder="onRowReorder"
+        @row-click="editItemSelected"
         :pt="pt"
       >
         <template #header>
@@ -44,6 +46,8 @@
           rowReorder
           headerStyle="width: 3rem"
         />
+        <Column selectionMode="multiple"  headerStyle="width: 3rem"></Column>
+
         <Column
           sortable
           v-for="col of selectedColumns"
@@ -91,7 +95,7 @@
               </OverlayPanel>
             </div>
           </template>
-          <template #body="{ data: rowData }">
+          <template #body="{ data: rowData } ">
             <div class="flex justify-end">
               <PrimeMenu
                 ref="menu"
@@ -223,6 +227,14 @@
     emptyListMessage: {
       type: String,
       default: () => 'No registers found.'
+    },
+    dataFilted: {
+      type: Array,
+      default: () => []
+    },
+    hasListService: {
+      type: Boolean,
+      default: false
     }
   })
 
@@ -235,6 +247,7 @@
   const informationForDeletion = ref({})
   const selectedItemData = ref(null)
   const selectedColumns = ref([])
+  const selectedProduct = ref();
 
   onMounted(() => {
     loadData({ page: 1 })
@@ -271,9 +284,11 @@
 
   const loadData = async ({ page }) => {
     try {
+      if (props.hasListService) return
       isLoading.value = true
       const response = await props.listService({ page })
       data.value = response
+
     } catch (error) {
       data.value = []
       toast.add({
@@ -362,4 +377,14 @@
     const hasData = currentState.length > 0
     emit('on-load-data', hasData)
   })
+
+  watch(selectedProduct, (selectedData) => {
+    // eslint-disable-next-line no-console
+    emit('on-select-data', selectedData)
+  })
+
+
+  watch(
+    () => props.dataFilted,
+    (newValue) => data.value = newValue)
 </script>

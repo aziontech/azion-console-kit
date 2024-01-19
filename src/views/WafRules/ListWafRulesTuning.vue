@@ -5,6 +5,7 @@
       optionLabel="name"
       :options="timeOptions"
       v-model="time"
+      @change="filterTuning"
       class="w-full sm:w-1/5"
     />
     <MultiSelect
@@ -15,23 +16,20 @@
       :options="domainsOptions.options"
       v-model="selectedDomain"
       :loading="!domainsOptions.done"
+      @change="filterTuning"
       class="w-full sm:w-1/5"
     />
   </div>
   <ListTableNoHeaderBlock
-    v-if="true"
+    v-if="selectedDomain.length"
     pageTitleDelete="Waf Rules Tuning"
     :columns="wafRulesAllowedColumns"
-    :listService="handleListWafRulesTuningService"
-    @on-load-data="handleLoadData"
+    :hasListService="true"
+    :dataFilted="dataFiltedComputed"
+    @on-select-data="selectedItems"
     emptyListMessage="No Waf Rules Tuning found."
   >
-    <template #addButton>
-      <PrimeButton
-        label="search"
-        @click="filterTuning"
-      />
-    </template>
+    <template #addButton> </template>
   </ListTableNoHeaderBlock>
 
   <EmptyResultsBlock
@@ -54,17 +52,24 @@
   </EmptyResultsBlock>
   <ActionBarTemplate
     v-if="showActionBar"
-    @onSubmit="onSubmit"
-    @onCancel="onCancel"
-    :loading="loading"
-    :submitDisabled="!formValid"
+    @onSubmit="openDialog"
+    @onCancel="closeDialog"
+    :submitDisabled="!selectedEvents.length"
     primaryActionLabel="Allow Rules"
   />
+
+  <DialogAllowRule
+    v-model:visible="showDialogAllowRule"
+    @closeDialog="closeDialog"
+    @reason="handleAllowRules"
+  >
+  </DialogAllowRule>
 </template>
 <script setup>
   import Illustration from '@/assets/svg/illustration-layers.vue'
   import EmptyResultsBlock from '@/templates/empty-results-block'
   import ActionBarTemplate from '@/templates/action-bar-block/action-bar-with-teleport'
+  import DialogAllowRule from './Dialog'
 
   import ListTableNoHeaderBlock from '@templates/list-table-block/no-header'
   import PrimeButton from 'primevue/button'
@@ -72,43 +77,46 @@
 
   import MultiSelect from 'primevue/multiselect'
 
-  import { ref, onMounted } from 'vue'
+  import { ref, onMounted, computed } from 'vue'
   import { useRoute } from 'vue-router'
   import { useToast } from 'primevue/usetoast'
 
   const route = useRoute()
-  const hasContentToList = ref(false)
   const selectedDomain = ref([])
-  // const country = ref([])
-  const time = ref('60')
+  const dataFilted = ref([])
+  const selectedEvents = ref([])
+  const showDialogAllowRule = ref(false)
+
+  const dataFiltedComputed = computed(() => dataFilted.value)
+  const time = ref('1')
   const timeOptions = ref([
     {
       name: 'Last 1 hour',
-      value: '60'
-    },
-    {
-      name: 'Last 3 hours',
-      value: '180'
-    },
-    {
-      name: 'Last 6 hours',
-      value: '360'
-    },
-    {
-      name: 'Last 12 hours',
-      value: '720'
-    },
-    {
-      name: 'Last day',
       value: '1'
     },
     {
+      name: 'Last 3 hours',
+      value: '3'
+    },
+    {
+      name: 'Last 6 hours',
+      value: '6'
+    },
+    {
+      name: 'Last 12 hours',
+      value: '12'
+    },
+    {
+      name: 'Last day',
+      value: '24'
+    },
+    {
       name: 'Last 2 days',
-      value: '2'
+      value: '48'
     },
     {
       name: 'Last 3 days',
-      value: '3'
+      value: '72'
     }
   ])
 
@@ -136,6 +144,10 @@
     showActionBar: {
       type: Boolean,
       required: true
+    },
+    createWafRulesAllowedTuningService: {
+      type: Function,
+      required: true
     }
   })
 
@@ -153,25 +165,76 @@
 
   const wafRulesAllowedColumns = ref([
     {
-      field: 'ruleId',
+      field: 'ruleIdDescription',
       header: 'Rule ID'
     },
     {
-      field: 'reason',
-      header: 'Description'
+      field: 'hitCount',
+      header: 'Hits'
     },
     {
-      field: 'path',
-      header: 'URI'
+      field: 'pathCount',
+      header: 'Paths'
+    },
+    {
+      field: 'ipCount',
+      header: 'IPs'
+    },
+    {
+      field: 'countryCount',
+      header: 'Countries'
+    },
+    {
+      field: 'topIps',
+      header: 'Top 10 IPs Adress'
+    },
+    {
+      field: 'topCountries',
+      header: 'Top 10 Countries'
     }
   ])
 
-  const handleListWafRulesTuningService = async () => {
-    return await props.listWafRulesTuningService({ wafId: wafRuleId.value })
+  const selectedItems = (events) => {
+    selectedEvents.value = events
   }
 
-  const handleLoadData = (event) => {
-    hasContentToList.value = event
+  const openDialog = () => {
+    showDialogAllowRule.value = true
+  }
+
+  const closeDialog = () => {
+    showDialogAllowRule.value = false
+  }
+
+  const handleAllowRules = async (reason) => {
+    const allowedRules = []
+    for (const allowed of selectedEvents.value) {
+      allowedRules.push({
+        match_zone: allowed.matchZone,
+        matches_on: allowed.matchesOn,
+        rule_id: allowed.ruleId
+      })
+    }
+
+    const payload = {
+      reason,
+      allowedRules
+    }
+
+    try {
+      await props.createWafRulesAllowedTuningService({ payload, wafId: wafRuleId.value })
+    } catch (error) {
+      showToast(error, 'error')
+    }
+  }
+
+  const filterTuning = async () => {
+    if (!selectedDomain.value.length) return
+    const query = `?hour_range=${time.value}&domains_ids=${encodeURIComponent(
+      selectedDomain.value
+    )}`
+    const response = await props.listWafRulesTuningService({ wafId: wafRuleId.value, query })
+    dataFilted.value = response
   }
 
   const countriesOptions = ref({ options: [], done: true })

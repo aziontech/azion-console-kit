@@ -2,9 +2,9 @@ import { AxiosHttpClientAdapter } from '../axios/AxiosHttpClientAdapter'
 import * as Errors from '@/services/axios/errors'
 import { makeWafRulesAllowedBaseUrl } from './make-waf-rules-allowed-base-url'
 
-export const createWafRulesAllowedService = async ({ payload, id }) => {
+export const createWafRulesAllowedTuningService = async ({ payload, wafId }) => {
   let httpResponse = await AxiosHttpClientAdapter.request({
-    url: `${makeWafRulesAllowedBaseUrl()}/${id}/allowed_rules`,
+    url: `${makeWafRulesAllowedBaseUrl()}/${wafId}/allowed_rules`,
     method: 'POST',
     body: adapt(payload)
   })
@@ -13,19 +13,9 @@ export const createWafRulesAllowedService = async ({ payload, id }) => {
 }
 
 const adapt = (payload) => {
-  const matchValidationValues = payload.matchZones.map((zone) => {
-    if (['path', 'file_name', 'raw_body'].includes(zone.zone)) {
-      zone.matches_on = null
-    }
-    return zone
-  })
   return {
-    match_zones: matchValidationValues,
-    path: payload.path,
+    allowed_rules: payload.allowedRules,
     reason: payload.reason,
-    rule_id: payload.ruleId,
-    status: payload.status,
-    use_regex: payload.useRegex
   }
 }
 
