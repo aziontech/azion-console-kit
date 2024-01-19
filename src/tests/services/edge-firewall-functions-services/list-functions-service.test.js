@@ -28,7 +28,7 @@ const makeSut = () => {
   return { sut }
 }
 
-describe('EdgeApplicationFunctionsServices', () => {
+describe('EdgeFirewallFunctionsServices', () => {
   vi.restoreAllMocks()
 
   it('should call API with correct params', async () => {
@@ -46,7 +46,7 @@ describe('EdgeApplicationFunctionsServices', () => {
     })
   })
 
-  it('should correctly parse all returned edge application function instances', async () => {
+  it('should correctly parse all returned edge firewall function instances', async () => {
     vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
       statusCode: 200,
       body: { results: [fixtures.functionsInstance, fixtures.functionInstanceWithVersion] }

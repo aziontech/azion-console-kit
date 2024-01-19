@@ -20,7 +20,7 @@ const makeSut = () => {
   return { sut }
 }
 
-describe('LoaderFunctionService', () => {
+describe('EdgeFirewallFunctionsServices', () => {
   vi.restoreAllMocks()
 
   it('should call API with correct URL when loading a function instance', async () => {
@@ -38,7 +38,7 @@ describe('LoaderFunctionService', () => {
     })
   })
 
-  it('should correctly parse the returned edge application function instance', async () => {
+  it('should correctly parse the returned edge firewall function instance', async () => {
     vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
       statusCode: 200,
       body: { results: fixture.functionInstance }
