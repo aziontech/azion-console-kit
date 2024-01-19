@@ -1,3 +1,4 @@
 export const makeAccountSettingsBaseUrl = () => {
-  return 'iam/account'
+  const version = 'v4'
+  return `${version}/iam/account`
 }

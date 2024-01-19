@@ -72,7 +72,7 @@
               <div v-html="rowData[col.field]" />
             </template>
             <template v-else>
-              <component :is="col.component({ ...rowData[col.field], value: rowData })"></component>
+              <component :is="col.component({ ...rowData[col.field], value: rowData })" />
             </template>
           </template>
         </Column>
@@ -108,8 +108,8 @@
           </template>
         </Column>
         <template #empty>
-          <div class="my-4 flex flex-col gap-3 justify-center items-center">
-            <p class="text-xl font-normal text-secondary">No registers found.</p>
+          <div class="my-4 flex flex-col gap-3 justify-center items-start">
+            <p class="text-md font-normal text-secondary">{{ emptyListMessage }}</p>
           </div>
         </template>
       </DataTable>
@@ -138,7 +138,7 @@
           :header="col.header"
         >
           <template #body>
-            <Skeleton></Skeleton>
+            <Skeleton />
           </template>
         </Column>
       </DataTable>
@@ -147,14 +147,14 @@
 </template>
 
 <script setup>
-  import { ref, onMounted } from 'vue'
-  import DataTable from 'primevue/datatable'
-  import Column from 'primevue/column'
-  import Listbox from 'primevue/listbox'
-  import Skeleton from 'primevue/skeleton'
-  import OverlayPanel from 'primevue/overlaypanel'
   import PrimeButton from 'primevue/button'
+  import Column from 'primevue/column'
+  import DataTable from 'primevue/datatable'
   import InlineMessage from 'primevue/inlinemessage'
+  import Listbox from 'primevue/listbox'
+  import OverlayPanel from 'primevue/overlaypanel'
+  import Skeleton from 'primevue/skeleton'
+  import { onMounted, ref } from 'vue'
 
   const emit = defineEmits(['onSelectedRow'])
   const props = defineProps({
@@ -199,6 +199,10 @@
       required: false,
       type: Object,
       default: () => ({})
+    },
+    emptyListMessage: {
+      type: String,
+      default: () => 'No registers found.'
     }
   })
 

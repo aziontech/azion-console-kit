@@ -1,9 +1,9 @@
-import process from 'process'
 import { fileURLToPath, URL } from 'node:url'
+import process from 'process'
 
-import { defineConfig, loadEnv } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import vueJsx from '@vitejs/plugin-vue-jsx'
+import { defineConfig, loadEnv } from 'vite'
 
 const getConfig = () => {
   const env = loadEnv('development', process.cwd())
@@ -35,6 +35,11 @@ const getConfig = () => {
           target: `${URLStartPrefix}cities.azion.com`,
           changeOrigin: true,
           rewrite: (path) => path.replace(/^\/graphql\/cities/, '/graphql')
+        },
+        '/metrics/graphql': {
+          target: `${URLStartPrefix}stage-manager.azion.com/metrics/graphql`,
+          changeOrigin: true,
+          rewrite: (path) => path.replace(/^\/metrics\/graphql/, '')
         },
         '^/api/(account|user|token|switch-account|password|totp)|^/logout': {
           target: `${URLStartPrefix}sso.azion.com`,

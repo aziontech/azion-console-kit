@@ -93,8 +93,8 @@
     event.preventDefault()
     const pastedData = event.clipboardData.getData('text')
 
-    for (let i = 0; i < pastedData.length; i++) {
-      digitsMfa[i].value.value = pastedData[i]
+    for (let mfaDigitIndex = 0; mfaDigitIndex < pastedData.length; mfaDigitIndex++) {
+      digitsMfa[mfaDigitIndex].value.value = pastedData[mfaDigitIndex]
     }
   }
 

@@ -23,17 +23,18 @@ const adapt = (httpResponse) => {
   const originTypeFormat = {
     single_origin: 'Single Origin',
     load_balancer: 'Load Balancer',
-    live_ingest: 'live_ingest'
+    live_ingest: 'Live Ingest',
+    object_storage: 'Object Storage'
   }
   const parsedOrigin = httpResponse.body.results?.map((origin) => {
-    let formattedListOfAddresses = origin.addresses?.map((address) => address.address)
+    let formattedListOfAddresses = origin.addresses?.map((address) => address.address) || []
 
     return {
       id: origin.origin_key,
       originKey: {
         content: origin.origin_key
       },
-      originId: origin.origin_id,
+      originId: origin.origin_id.toString(),
       name: origin.name,
       originType: originTypeFormat[origin.origin_type],
       addresses: formattedListOfAddresses,

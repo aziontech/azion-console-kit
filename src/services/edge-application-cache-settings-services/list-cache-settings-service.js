@@ -4,7 +4,7 @@ import { makeEdgeApplicationBaseUrl } from '../edge-application-services/make-ed
 /**
  * @param {Object} payload - The error schema.
  * @param {string } payload.id - The id of edge application.
- * @returns {string|undefined} The result message based on the status code.
+ * @returns {Promise<string|undefined>} The result message based on the status code.
  */
 export const listCacheSettingsService = async ({ id }) => {
   let httpResponse = await AxiosHttpClientAdapter.request({
@@ -18,7 +18,7 @@ export const listCacheSettingsService = async ({ id }) => {
 
 const adapt = (httpResponse) => {
   const parseHttpResponse = httpResponse.body.results.map((cacheSettings) => ({
-    id: cacheSettings.id,
+    id: cacheSettings.id.toString(),
     name: cacheSettings.name,
     browserCache: cacheSettings.browser_cache_settings,
     cdnCache: cacheSettings.cdn_cache_settings

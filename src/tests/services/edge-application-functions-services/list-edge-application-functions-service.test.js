@@ -54,10 +54,12 @@ describe('EdgeApplicationFunctionsServices', () => {
   it('should correctly parse all returned edge applications functions', async () => {
     localeMock()
     const spy = vi.spyOn(AxiosHttpClientAdapter, 'request')
+
     spy.mockResolvedValueOnce({
       statusCode: 200,
       body: { results: [fixtures.functionsInstance] }
     })
+
     spy.mockResolvedValueOnce({
       statusCode: 200,
       body: { results: fixtures.edgeFunctionMock }
@@ -69,7 +71,7 @@ describe('EdgeApplicationFunctionsServices', () => {
 
     expect(result).toEqual([
       {
-        id: 1,
+        id: '1',
         name: { text: 'function instance', tagProps: {} },
         languageIcon: { content: 'JavaScript', icon: 'javascript' },
         referenceCount: '2',

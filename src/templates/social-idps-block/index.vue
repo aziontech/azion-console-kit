@@ -26,8 +26,10 @@
           v-if="idp.isActive"
           :label="formatName(idp.name)"
           :icon="getIcon(idp.slug)"
-          @click="authenticate(idp.loginUrl)"
+          @click="authenticate(idp)"
           outlined
+          :loading="submittedIdp === idp.uuid"
+          :disabled="submittedIdp"
         />
       </template>
     </div>
@@ -41,11 +43,12 @@
 </template>
 
 <script setup>
-  import { computed, onMounted, ref } from 'vue'
+  import { useLoadingStore } from '@/stores/loading'
   import PrimeButton from 'primevue/button'
-  import Skeleton from 'primevue/skeleton'
   import Divider from 'primevue/divider'
+  import Skeleton from 'primevue/skeleton'
   import { useToast } from 'primevue/usetoast'
+  import { computed, onMounted, ref } from 'vue'
 
   defineOptions({ name: 'social-idps-block' })
 
@@ -65,6 +68,7 @@
 
   const idps = ref([])
   const showSocialIdps = ref(true)
+  const submittedIdp = ref(null)
 
   const showSkeleton = computed(() => idps.value.length === 0)
 
@@ -104,7 +108,13 @@
     return icons[slug]
   }
 
-  const authenticate = (url) => {
-    window.location.href = url
+  const loadingStore = useLoadingStore()
+
+  const authenticate = (idp) => {
+    submittedIdp.value = idp.uuid
+
+    loadingStore.startLoading()
+
+    window.location.href = idp.loginUrl
   }
 </script>

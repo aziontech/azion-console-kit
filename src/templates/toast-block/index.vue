@@ -90,7 +90,7 @@
     },
     methods: {
       getValue({ id }) {
-        return this.progress.find((i) => i.id === id)?.value || 0
+        return this.progress.find((toastProgress) => toastProgress.id === id)?.value || 0
       },
       getProgressBarStyle({ severity }) {
         let color = 'black'

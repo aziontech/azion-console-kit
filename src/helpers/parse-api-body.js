@@ -1,5 +1,5 @@
 const snakeToCamelCase = (str) => {
-  return str.replace(/_([a-z])/g, function (_, letter) {
+  return str.replace(/_([a-z])/g, function (__, letter) {
     return letter.toUpperCase()
   })
 }

@@ -18,26 +18,13 @@ export const listFunctionsService = async ({
 
   return parseHttpResponse(httpResponse)
 }
-const parseName = (edgeFunctionData) => {
-  const nameProps = { text: edgeFunctionData.name, tagProps: {} }
 
-  if (edgeFunctionData?.version && edgeFunctionData?.vendor) {
-    nameProps.tagProps = {
-      icon: 'pi pi-cart-plus',
-      value: 'Integration',
-      outlined: true,
-      severity: 'info'
-    }
-  }
-
-  return nameProps
-}
 const adapt = (httpResponse) => {
   const bodyResults = httpResponse.body.results
 
   const parsedFunctions = bodyResults?.map((edgeApplicationFunction) => {
     return {
-      id: edgeApplicationFunction.id,
+      id: edgeApplicationFunction.id.toString(),
       edgeFunctionId: edgeApplicationFunction.edge_function_id,
       name: parseName(edgeApplicationFunction),
       args: edgeApplicationFunction.args
@@ -58,4 +45,19 @@ const makeSearchParams = ({ orderBy, sort, page, pageSize }) => {
   searchParams.set('page_size', pageSize)
 
   return searchParams
+}
+
+const parseName = (edgeFunctionData) => {
+  const nameProps = { text: edgeFunctionData.name, tagProps: {} }
+
+  if (edgeFunctionData?.version && edgeFunctionData?.vendor) {
+    nameProps.tagProps = {
+      icon: 'pi pi-cart-plus',
+      value: 'Integration',
+      outlined: true,
+      severity: 'info'
+    }
+  }
+
+  return nameProps
 }

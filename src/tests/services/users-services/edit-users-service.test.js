@@ -34,7 +34,7 @@ describe('UsersServices', () => {
     await sut(fixtures.userMock)
 
     expect(requestSpy).toHaveBeenCalledWith({
-      url: `iam/user`,
+      url: `v4/iam/user`,
       method: 'PATCH',
       body: {
         first_name: fixtures.userMock.firstName,

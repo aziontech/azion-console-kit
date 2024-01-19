@@ -1,4 +1,5 @@
 .p-divider {
+  padding-inline: 12px !important;
   .p-divider-content {
     background-color: $panelContentBg;
     font-weight: 500 !important;
@@ -14,6 +15,7 @@
 
     .p-divider-content {
       padding: 0 $inlineSpacing;
+      z-index: 0;
     }
   }
 
@@ -27,12 +29,14 @@
 
     .p-divider-content {
       padding: $inlineSpacing 0;
+      background-color: transparent;
     }
   }
 
   &.p-divider-dashed {
     &.p-divider-horizontal:before {
       border-style: dashed;
+      background-color: transparent;
     }
   }
 }

@@ -87,17 +87,7 @@
     description: yup.string().required().label('Description'),
     phase: yup.string(),
     criteria: yup.array(),
-    // .of(
-    //   yup.object().shape({
-    //     inputValue: yup.string().required().label('Criteria value')
-    //   })
-    // )
     behaviors: yup.array()
-    // .of(
-    //   yup.object().shape({
-    //     target: yup.string().required().label('Target')
-    //   })
-    // )
   })
 
   const createService = async (payload) => {
@@ -109,8 +99,8 @@
 
   const editService = async (payload) => {
     return await props.editRulesEngineService({
-      ...payload,
-      edgeApplicationId: props.edgeApplicationId
+      payload,
+      id: props.edgeApplicationId
     })
   }
 
@@ -179,10 +169,11 @@
     @onSuccess="emit('onSuccess')"
     :showBarGoBack="true"
     @onError="closeDrawerEdit"
-    title="Edit Resource"
+    title="Edit Rules Engine"
   >
     <template #formFields>
       <FormFieldsDrawerRulesEngine
+        :selectedRulesEngineToEdit="selectedRulesEngineToEdit"
         :edgeApplicationId="props.edgeApplicationId"
         :isEnableApplicationAcceleration="props.isEnableApplicationAcceleration"
         :listEdgeApplicationFunctionsService="props.listEdgeApplicationFunctionsService"
