@@ -62,17 +62,32 @@ describe('EdgeApplicationRulesEnginesServices', () => {
     vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
       statusCode: 400,
       body: {
-        error: {
-          incompatible_behaviors: 'Incompatible behavior message',
-          other_error: 'Other error'
-        }
+        incompatible_behaviors: [
+          "(u'set_cache_policy', ['deny', 'redirect_to_301', 'redirect_to_302'])"
+        ]
       }
     })
     const { sut } = makeSut()
 
     const result = sut(fixtures.ruleEngineMock)
 
-    expect(result).rejects.toBe('Incompatible behavior message')
+    expect(result).rejects.toBe(`The behavior 'set cache policy' is incompatible with the others.`)
+  })
+
+  it('should return the first error message when multiple error messages are returned', async () => {
+    vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
+      statusCode: 400,
+      body: {
+        error: ["(u'set_cache_policy', ['deny', 'redirect_to_301', 'redirect_to_302'])"]
+      }
+    })
+    const { sut } = makeSut()
+
+    const result = sut(fixtures.ruleEngineMock)
+
+    expect(result).rejects.toBe(
+      `error: (u'set_cache_policy', ['deny', 'redirect_to_301', 'redirect_to_302'])`
+    )
   })
 
   it.each([
