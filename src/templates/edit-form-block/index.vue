@@ -1,9 +1,9 @@
 <script setup>
   import DialogUnsavedBlock from '@/templates/dialog-unsaved-block'
+  import { useToast } from 'primevue/usetoast'
   import { useForm, useIsFormDirty } from 'vee-validate'
   import { computed, ref } from 'vue'
-  import { useRouter, useRoute } from 'vue-router'
-  import { useToast } from 'primevue/usetoast'
+  import { useRoute, useRouter } from 'vue-router'
 
   defineOptions({ name: 'edit-form-block' })
 
@@ -61,12 +61,13 @@
     goBackToList()
   }
 
-  const showToast = (severity, summary) => {
-    if (!summary) return
+  const showToast = (severity, detail) => {
+    if (!detail) return
     toast.add({
       closable: true,
-      severity: severity,
-      summary: summary
+      severity,
+      summary: severity,
+      detail
     })
   }
 
@@ -87,6 +88,8 @@
       blockViewRedirection.value = false
       emit('on-edit-success', feedback)
       if (props.disableRedirect) {
+        resetForm({ values })
+        blockViewRedirection.value = true
         return
       }
       goBackToList()

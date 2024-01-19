@@ -1,22 +1,22 @@
 <script setup>
-  import EditFormBlock from '@templates/edit-form-block'
-  import EditDrawerBlock from '@templates/edit-drawer-block'
-  import PageHeadingBlock from '@templates/page-heading-block'
-  import ListTableNoHeaderBlock from '@templates/list-table-block/no-header'
-  import FormFieldsRecords from './FormFields/FormFieldsRecords'
-  import CreateDrawerBlock from '@templates/create-drawer-block'
-  import ContentBlock from '@/templates/content-block'
-  import TabView from 'primevue/tabview'
-  import TabPanel from 'primevue/tabpanel'
-  import PrimeButton from 'primevue/button'
-  import EmptyResultsBlock from '@/templates/empty-results-block'
   import Illustration from '@/assets/svg/illustration-layers.vue'
-  import FormFieldsIntelligentDnsCreate from './FormFields/FormFieldsIntelligentDns.vue'
   import ActionBarTemplate from '@/templates/action-bar-block/action-bar-with-teleport'
-  import * as yup from 'yup'
-  import { useRoute, useRouter } from 'vue-router'
-  import { computed, onBeforeMount, ref, watch } from 'vue'
+  import ContentBlock from '@/templates/content-block'
+  import EmptyResultsBlock from '@/templates/empty-results-block'
+  import CreateDrawerBlock from '@templates/create-drawer-block'
+  import EditDrawerBlock from '@templates/edit-drawer-block'
+  import EditFormBlock from '@templates/edit-form-block'
+  import ListTableNoHeaderBlock from '@templates/list-table-block/no-header'
+  import PageHeadingBlock from '@templates/page-heading-block'
+  import PrimeButton from 'primevue/button'
+  import TabPanel from 'primevue/tabpanel'
+  import TabView from 'primevue/tabview'
   import { useToast } from 'primevue/usetoast'
+  import { computed, onBeforeMount, ref, watch } from 'vue'
+  import { useRoute, useRouter } from 'vue-router'
+  import * as yup from 'yup'
+  import FormFieldsIntelligentDnsCreate from './FormFields/FormFieldsIntelligentDns.vue'
+  import FormFieldsRecords from './FormFields/FormFieldsRecords'
 
   const props = defineProps({
     loadIntelligentDNSService: { type: Function, required: true },
@@ -164,8 +164,8 @@
     }
   }
 
-  const changeRouteByClickingOnTab = (e) => {
-    if (e.index === 0) {
+  const changeRouteByClickingOnTab = (tabEvent) => {
+    if (tabEvent.index === 0) {
       router.push({ name: 'edit-intelligent-dns', params: { id: intelligentDNSID.value } })
     } else {
       router.push({
@@ -270,6 +270,7 @@
             :listService="listRecordsServiceIntelligentDNSDecorator"
             :deleteService="deleteRecordsServiceIntelligentDNSDecorator"
             @on-load-data="handleLoadData"
+            emptyListMessage="No Record found."
           >
             <template #addButton>
               <PrimeButton

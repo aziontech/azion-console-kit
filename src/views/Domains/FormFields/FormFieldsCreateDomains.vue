@@ -218,7 +218,7 @@
         <label
           for="edge_application"
           class="text-color text-base font-medium"
-          >Edge Certificate</label
+          >Digital Certificate</label
         >
         <Dropdown
           v-model="edgeCertificate"

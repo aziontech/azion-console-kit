@@ -1,7 +1,7 @@
+import { parseSnakeToCamel } from '@/helpers'
 import { AxiosHttpClientAdapter } from '@/services/axios/AxiosHttpClientAdapter'
 import * as Errors from '@/services/axios/errors'
 import { makeListSocialIdpsBaseUrl } from './make-list-social-idps-base-url'
-import { parseSnakeToCamel } from '@/helpers'
 
 export const listSocialIdpsService = async (payload) => {
   let httpResponse = await AxiosHttpClientAdapter.request({
@@ -15,6 +15,7 @@ export const listSocialIdpsService = async (payload) => {
 const adapt = (httpResponse) => {
   const { body } = httpResponse
   return body.map((socialIdp) => {
+    socialIdp.login_url = socialIdp.login_url + '?console=true'
     return parseSnakeToCamel(socialIdp)
   })
 }

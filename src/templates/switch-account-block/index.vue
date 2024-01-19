@@ -1,15 +1,15 @@
 <script setup>
-  import { ref, watch, computed } from 'vue'
-  import PrimeDialog from 'primevue/dialog'
-  import PrimeTag from 'primevue/tag'
-  import PrimeButton from 'primevue/button'
-  import Menu from 'primevue/menu'
-  import InputText from 'primevue/inputtext'
-  import Dropdown from 'primevue/dropdown'
-  import Divider from 'primevue/divider'
-  import PrimeCard from 'primevue/card'
-  import ListTableBlock from '@/templates/list-table-block/with-lazy-and-dropdown-filter.vue'
   import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
+  import ListTableBlock from '@/templates/list-table-block/with-lazy-and-dropdown-filter.vue'
+  import PrimeButton from 'primevue/button'
+  import PrimeCard from 'primevue/card'
+  import PrimeDialog from 'primevue/dialog'
+  import Divider from 'primevue/divider'
+  import Dropdown from 'primevue/dropdown'
+  import InputText from 'primevue/inputtext'
+  import Menu from 'primevue/menu'
+  import PrimeTag from 'primevue/tag'
+  import { computed, ref, watch } from 'vue'
 
   defineOptions({ name: 'SwitchAccountBlock' })
   const emit = defineEmits(['update:showSwitchAccount'])
@@ -114,7 +114,7 @@
   <div>
     <PrimeButton
       v-if="visibleButton"
-      class="font-semibold h-8 w-auto border-header hidden md:flex gap-2 items-center bg-header hover:bg-header-button-hover"
+      class="font-semibold h-8 w-auto truncate max-w-[180px] border-header hidden md:flex gap-2 items-center bg-header hover:bg-header-button-hover"
       size="small"
       :loading="isLoadingAccount"
       :pt="{
@@ -128,7 +128,7 @@
         class="text-white"
         :class="account.accountTypeIcon"
       />
-      <span class="text-white"> {{ account.name }}</span>
+      <span class="truncate text-white"> {{ account.name }}</span>
     </PrimeButton>
 
     <PrimeDialog
@@ -234,6 +234,7 @@
           :headerFilter="filterSwitch"
           @onSelectedRow="onSelectedAccount"
           description="Type the account name to filter results."
+          emptyListMessage="No Account found."
         >
           <template #headerFilters="{ filter, applyFilter }">
             <div class="flex flex-wrap justify-between gap-2 w-full rounded">

@@ -1,5 +1,5 @@
 <template>
-  <NavBarBlock :userIsLogged="props.isLogged" />
+  <NavBarBlock :showNavItems="showNavItems" />
 </template>
 
 <script setup>
@@ -7,10 +7,5 @@
 
   defineOptions({ name: 'main-menu-block' })
 
-  const props = defineProps({
-    isLogged: {
-      type: Boolean,
-      required: true
-    }
-  })
+  defineProps({ showNavItems: Boolean })
 </script>

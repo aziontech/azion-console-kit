@@ -1,15 +1,15 @@
 <script setup>
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
-  import FieldText from '@/templates/form-fields-inputs/fieldText'
   import FieldInputGroup from '@/templates/form-fields-inputs/fieldInputGroup'
-  import RadioButton from 'primevue/radiobutton'
+  import FieldText from '@/templates/form-fields-inputs/fieldText'
+  import PrimeButton from 'primevue/button'
+  import Divider from 'primevue/divider'
   import InputNumber from 'primevue/inputnumber'
   import InputSwitch from 'primevue/inputswitch'
-  import Divider from 'primevue/divider'
+  import RadioButton from 'primevue/radiobutton'
   import TextArea from 'primevue/textarea'
-  import PrimeButton from 'primevue/button'
-  import { computed, ref, watch } from 'vue'
   import { useField, useFieldArray } from 'vee-validate'
+  import { computed, ref, watch } from 'vue'
 
   const CACHE_SETTINGS_OPTIONS = ref([
     {
@@ -79,12 +79,8 @@
     remove: removeDeviceGroup
   } = useFieldArray('deviceGroup')
 
-  const showMaxTtl = computed(() => {
-    return browserCacheSettings.value === 'override'
-  })
-  const showCdnMaxTtl = computed(() => {
-    return cdnCacheSettings.value === 'override'
-  })
+  const showMaxTtl = computed(() => browserCacheSettings.value === 'override')
+  const showCdnMaxTtl = computed(() => cdnCacheSettings.value === 'override')
   const showSliceConfigurationRange = computed(() => {
     return !!sliceConfigurationEnabled.value
   })
@@ -208,15 +204,13 @@
           TTL isn't received from the origin, cache will be maintained at a default TTL.
         </small>
       </div>
-      <div
-        v-if="showCdnMaxTtl"
-        class="flex flex-col sm:max-w-xs w-full gap-2"
-      >
+      <div class="flex flex-col sm:max-w-xs w-full gap-2">
         <label
           for="cdnCacheSettingsMaximumTtl"
           class="text-color text-sm font-medium"
-          >Maximum TTL (seconds) *</label
         >
+          {{ showCdnMaxTtl ? 'Maximum TTL (seconds)' : 'Default TTL' }}
+        </label>
         <InputNumber
           showButtons
           v-model="cdnCacheSettingsMaximumTtl"

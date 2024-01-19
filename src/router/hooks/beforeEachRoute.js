@@ -1,10 +1,12 @@
-import { getUserInfoService, getAccountInfoService } from '@/services/account-services'
+import { getAccountInfoService, getUserInfoService } from '@/services/account-services'
 import { logoutService } from '@/services/auth-services'
 import { useAccountStore } from '@/stores/account'
+import { useLoadingStore } from '@/stores/loading'
 
-export default async function beforeEachRoute(to, _, next) {
+export default async function beforeEachRoute(to, __, next) {
   const accountStore = useAccountStore()
-  const cliCallbackURLs = ['/cli-callback-fail', '/cli-callback-success']
+  const loadingStore = useLoadingStore()
+
   // TODO: remove the usage of localStorage when API returns the theme
   const theme = localStorage.getItem('theme')
 
@@ -17,8 +19,10 @@ export default async function beforeEachRoute(to, _, next) {
     return next()
   }
 
-  if (cliCallbackURLs.includes(to.path)) {
-    return next()
+  loadingStore.startLoading()
+
+  if (to.meta?.hideLoading) {
+    loadingStore.finishLoading()
   }
 
   if (!accountStore.hasActiveUserId && !to.meta.isPublic) {

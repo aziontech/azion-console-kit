@@ -65,23 +65,24 @@
     return value.toISOString().slice(0, -5)
   }
 
-  const convertOffset = (offset) => {
-    const [sign, H, h, M, m] = offset
-    const hours = `${H}${h}`
-    const minutes = `${M}${m}`
+  const convertOffsetToDecimal = (offset) => {
+    const [offsetSign, hourTens, hourUnits, minuteTens, minuteUnits] = offset
+    const hours = `${hourTens}${hourUnits}`
+    const minutes = `${minuteTens}${minuteUnits}`
 
-    const convert = {
+    const minuteToDecimalConversion = {
       15: 25,
       30: 50,
       45: 75
     }
-    const convertedMinutes = minutes > 0 ? convert[minutes] : minutes
 
-    return `${sign}${hours}.${convertedMinutes}`
+    const decimalMinutes = minutes > 0 ? minuteToDecimalConversion[minutes] : minutes
+
+    return `${offsetSign}${hours}.${decimalMinutes}`
   }
 
   const expiresDate = (expirationDate) => {
-    const userOffset = convertOffset(account.value.utc_offset)
+    const userOffset = convertOffsetToDecimal(account.value.utc_offset)
     const timeZoneOffsetMinutesToMilli = expirationDate.getTimezoneOffset() * 60000
     const toUTC = expirationDate.getTime() + timeZoneOffsetMinutesToMilli
     const offsetHoursToMilli = userOffset * 3600000

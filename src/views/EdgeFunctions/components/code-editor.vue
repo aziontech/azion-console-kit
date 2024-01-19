@@ -4,7 +4,10 @@
     :language="language"
     :theme="theme"
     class="!w-[99%] h-full surface-border border-r"
-    :class="{ 'border-red-500 border rounded-md h-[calc(100%-1.5rem)]': errors }"
+    :class="{
+      'border-red-500 border rounded-md h-[calc(100%-1.5rem)]': errors,
+      'cursor-not-allowed': EDITOR_OPTIONS.readOnly
+    }"
     :options="EDITOR_OPTIONS"
     @change="emit('update:modelValue', $event)"
   />
@@ -14,15 +17,13 @@
   import { watch, computed, ref } from 'vue'
   import { useAccountStore } from '@/stores/account'
 
-  const EDITOR_OPTIONS = {
-    tabSize: 2,
-    formatOnPaste: true
-  }
-
   const emit = defineEmits(['update:modelValue'])
   const props = defineProps({
     modelValue: String,
     initialValue: String,
+    readOnly: {
+      type: Boolean
+    },
     language: {
       type: String,
       default: 'javascript',
@@ -39,9 +40,19 @@
   })
 
   const code = ref(props.initialValue)
+  const EDITOR_OPTIONS = ref({
+    tabSize: 2,
+    formatOnPaste: true,
+    readOnly: props.readOnly
+  })
 
   watch(
     () => props.modelValue,
     (modelValue) => (code.value = modelValue)
+  )
+
+  watch(
+    () => props.readOnly,
+    (value) => (EDITOR_OPTIONS.value.readOnly = value)
   )
 </script>

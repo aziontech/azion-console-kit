@@ -1,10 +1,10 @@
 <script setup>
-  import ListTableBlock from '@/templates/list-table-block/no-header'
   import EmptyResultsBlock from '@/templates/empty-results-block'
+  import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
+  import ListTableBlock from '@/templates/list-table-block/no-header'
+  import DrawerOrigin from '@/views/EdgeApplicationsOrigins/Drawer'
   import PrimeButton from 'primevue/button'
   import { computed, ref } from 'vue'
-  import DrawerOrigin from '@/views/EdgeApplicationsOrigins/Drawer'
-  import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
   defineOptions({ name: 'list-edge-applications-origins-tab' })
 
   const props = defineProps({
@@ -38,6 +38,10 @@
     },
     clipboardWrite: {
       type: Function,
+      required: true
+    },
+    isLoadBalancer: {
+      type: Boolean,
       required: true
     }
   })
@@ -122,6 +126,7 @@
     :loadOriginService="props.loadOriginService"
     :documentationService="props.documentationService"
     :clipboardWrite="props.clipboardWrite"
+    :isLoadBalancer="props.isLoadBalancer"
     @onSuccess="reloadList"
   />
   <div v-if="hasContentToList">
@@ -133,6 +138,7 @@
       pageTitleDelete="Origin"
       :editInDrawer="openEditOriginDrawer"
       @on-load-data="handleLoadData"
+      emptyListMessage="No Origin found."
     >
       <template #addButton>
         <PrimeButton

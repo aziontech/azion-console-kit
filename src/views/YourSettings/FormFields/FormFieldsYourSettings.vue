@@ -1,14 +1,14 @@
 <script setup>
-  import { ref, onMounted, watch, computed } from 'vue'
   import { useField } from 'vee-validate'
+  import { computed, onMounted, ref, watch } from 'vue'
 
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
-  import InputText from 'primevue/inputtext'
-  import Dropdown from 'primevue/dropdown'
-  import InputPassword from 'primevue/password'
-  import InputSwitch from 'primevue/inputswitch'
-  import InputMask from 'primevue/inputmask'
   import Card from 'primevue/card'
+  import Dropdown from 'primevue/dropdown'
+  import InputMask from 'primevue/inputmask'
+  import InputSwitch from 'primevue/inputswitch'
+  import InputText from 'primevue/inputtext'
+  import InputPassword from 'primevue/password'
 
   const props = defineProps({
     listTimezonesService: {
@@ -163,7 +163,6 @@
             :class="{ 'p-invalid': errorTimezone }"
             v-model="timezone"
           />
-          >
           <small class="text-xs text-color-secondary font-normal leading-tight">
             Timezone of the user.</small
           >
@@ -243,9 +242,7 @@
                 {{ option.label }}
               </template>
             </Dropdown>
-            <small class="text-xs text-color-secondary font-normal leading-tight">
-              The phone number of the user. Include country and region code.</small
-            >
+
             <InputMask
               date="phone"
               v-model="mobile"
@@ -256,6 +253,9 @@
             />
           </div>
         </div>
+        <small class="text-xs text-color-secondary font-normal leading-tight">
+          The phone number of the user. Include country and region code.</small
+        >
         <small
           id="name-help"
           class="p-error"
@@ -309,8 +309,8 @@
         <ul class="text-color-secondary list-inside space-y-3">
           <li
             class="flex gap-3 items-center text-color-secondary"
-            :key="i"
-            v-for="(requirement, i) in passwordRequirementsList"
+            v-for="(requirement, index) in passwordRequirementsList"
+            :key="index"
           >
             <div class="w-3">
               <span

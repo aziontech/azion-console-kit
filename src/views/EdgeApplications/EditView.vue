@@ -1,9 +1,11 @@
 <template>
   <EditFormBlock
     :editService="props.editEdgeApplicationService"
-    :loadService="props.loadEdgeApplicationService"
+    :loadService="loadEdgeApplication"
     :updatedRedirect="props.updatedRedirect"
     :schema="validationSchema"
+    disableRedirect
+    :isTabs="true"
   >
     <template #form>
       <FormFieldsCreateEdgeApplications
@@ -11,10 +13,9 @@
         :contactSalesEdgeApplicationService="contactSalesEdgeApplicationService"
       />
     </template>
-    <template #action-bar="{ onSubmit, formValid, onCancel, loading }">
+    <template #action-bar="{ onSubmit, formValid, onCancel, loading, values }">
       <ActionBarBlockWithTeleport
-        v-if="showActionBar"
-        @onSubmit="onSubmit"
+        @onSubmit="formSubmit(onSubmit, values)"
         @onCancel="onCancel"
         :loading="loading"
         :submitDisabled="!formValid"
@@ -24,16 +25,15 @@
 </template>
 
 <script setup>
-  import * as yup from 'yup'
   import EditFormBlock from '@/templates/edit-form-block'
-  import FormFieldsCreateEdgeApplications from './FormFields/FormFieldsCreateEdgeApplications'
   import ActionBarBlockWithTeleport from '@templates/action-bar-block/action-bar-with-teleport'
+  import * as yup from 'yup'
+  import FormFieldsCreateEdgeApplications from './FormFields/FormFieldsCreateEdgeApplications'
+
+  defineOptions({ name: 'edit-edge-application' })
+  const emit = defineEmits(['updatedApplication'])
 
   const props = defineProps({
-    loadEdgeApplicationService: {
-      type: Function,
-      required: true
-    },
     editEdgeApplicationService: {
       type: Function,
       required: true
@@ -42,13 +42,10 @@
       type: String,
       required: true
     },
+    edgeApplication: { type: Object },
     contactSalesEdgeApplicationService: {
       type: Function,
       required: true
-    },
-    showActionBar: {
-      type: Boolean,
-      default: true
     }
   })
 
@@ -57,4 +54,13 @@
   const validationSchema = yup.object({
     name: yup.string().required()
   })
+
+  const loadEdgeApplication = async () => {
+    return props.edgeApplication
+  }
+
+  const formSubmit = async (onSubmit, values) => {
+    await onSubmit()
+    emit('updatedApplication', values)
+  }
 </script>

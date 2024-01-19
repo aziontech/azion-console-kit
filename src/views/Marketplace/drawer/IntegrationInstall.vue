@@ -1,19 +1,19 @@
 <script setup>
-  import { computed, ref, watch } from 'vue'
+  import { InternalServerError } from '@/services/axios/errors'
+  import FormHorizontal from '@/templates/create-form-block/form-horizontal'
+  import PageLoadingBlock from '@/templates/loading-block'
+  import TemplateEngineBlock from '@/templates/template-engine-block'
+  import PrimeButton from 'primevue/button'
+  import Divider from 'primevue/divider'
+  import Dropdown from 'primevue/dropdown'
+  import InlineMessage from 'primevue/inlinemessage'
   import Sidebar from 'primevue/sidebar'
   import Tag from 'primevue/tag'
-  import PrimeButton from 'primevue/button'
-  import Dropdown from 'primevue/dropdown'
-  import Divider from 'primevue/divider'
-  import InlineMessage from 'primevue/inlinemessage'
-  import ProgressBar from 'primevue/progressbar'
   import { useField, useForm } from 'vee-validate'
-  import * as yup from 'yup'
-  import FormHorizontal from '@/templates/create-form-block/form-horizontal'
-  import TemplateEngineBlock from '@/templates/template-engine-block'
-  import { InternalServerError } from '@/services/axios/errors'
-  import PermissionsFieldset from '../components/PermissionsFieldset'
+  import { computed, ref, watch } from 'vue'
   import { useRouter } from 'vue-router'
+  import * as yup from 'yup'
+  import PermissionsFieldset from '../components/PermissionsFieldset'
 
   const router = useRouter()
 
@@ -104,8 +104,10 @@
   const { value: edgeApplication } = useField('edgeApplication')
 
   const edgeApps = computed(() => {
-    const apps = props.availableApps.filter((i) => i.elegibleForInstall)
-    return apps.map((app) => ({
+    const eligibleEdgeApplicationsToInstall = props.availableApps.filter(
+      (edgeApplication) => edgeApplication.elegibleForInstall
+    )
+    return eligibleEdgeApplicationsToInstall.map((app) => ({
       label: app.name,
       value: app.id,
       upgradeable: app.upgradeable
@@ -173,7 +175,7 @@
   })
 
   const warnUpdate = computed(() => {
-    const app = edgeApps.value.find((i) => i.value === edgeApplication.value)
+    const app = edgeApps.value.find((edgeApp) => edgeApp.value === edgeApplication.value)
     return app?.upgradeable
   })
 
@@ -209,16 +211,11 @@
     </template>
     <template #default>
       <div class="flex flex-col w-full md:p-8 pb-0 relative">
-        <div
-          class="bg-black/20 z-10 mt-[3.5rem] h-[calc(100%-7rem)] cursor-progress fixed w-full top-0 left-0"
-          v-if="loading"
-        >
-          <ProgressBar
-            class="sticky"
-            mode="indeterminate"
-            style="height: 0.375rem"
-          ></ProgressBar>
-        </div>
+        <PageLoadingBlock
+          :showLoading="loading"
+          customClasses="top-0 left-0 z-10 mt-[3.5rem] h-[calc(100%-7rem)]"
+        />
+
         <form class="w-full flex flex-col gap-8">
           <FormHorizontal
             :isDrawer="true"

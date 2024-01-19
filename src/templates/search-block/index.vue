@@ -75,7 +75,7 @@
   import PrimeDialog from 'primevue/dialog'
   import PrimeButton from 'primevue/button'
 
-  const { meta, k, control } = useMagicKeys()
+  const { meta, k: keyboardKeyK, control } = useMagicKeys()
 
   defineOptions({ name: 'search-block' })
 
@@ -87,7 +87,7 @@
   }
 
   watchEffect(() => {
-    if (control.value && k.value) openSearch()
-    if (meta.value && k.value) openSearch()
+    if (control.value && keyboardKeyK.value) openSearch()
+    if (meta.value && keyboardKeyK.value) openSearch()
   })
 </script>

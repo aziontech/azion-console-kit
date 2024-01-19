@@ -28,10 +28,10 @@ export default mergeConfig(
       coverage: {
         enabled: true,
         include: ['src/services/**', 'src/views/**', 'src/helpers/**'],
-        statements: 90,
-        branches: 90,
-        functions: 89,
-        lines: 90,
+        statements: 91,
+        branches: 91,
+        functions: 91,
+        lines: 91,
         reporter: ['text', 'lcov', 'html']
       },
       reporters: ['default', 'vitest-sonar-reporter'],

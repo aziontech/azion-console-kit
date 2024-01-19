@@ -28,10 +28,10 @@
 
 <script setup>
   import CreateFormBlock from '@/templates/create-form-block'
-  import FormFieldsCreateEdgeApplications from './FormFields/FormFieldsCreateEdgeApplications'
   import ActionBarBlockWithTeleport from '@templates/action-bar-block/action-bar-with-teleport'
   import { ref } from 'vue'
   import * as yup from 'yup'
+  import FormFieldsCreateEdgeApplications from './FormFields/FormFieldsCreateEdgeApplications'
 
   import ContentBlock from '@/templates/content-block'
   import PageHeadingBlock from '@/templates/page-heading-block'
@@ -64,10 +64,9 @@
     originProtocolPolicy: 'preserve',
     hostHeader: '${host}',
     browserCacheSettings: 'override',
-    browserCacheSettingsMaximumTtl: '',
+    browserCacheSettingsMaximumTtl: 0,
     cdnCacheSettings: 'override',
     cdnCacheSettingsMaximumTtl: 60,
-    cdnCacheSettingsDefaultTtl: 60,
     active: false
   })
 
