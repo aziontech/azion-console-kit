@@ -107,7 +107,7 @@
       },
       {
         field: 'functionInstanced',
-        header: 'Function Instanced',
+        header: 'Function Instanced'
       },
       {
         field: 'version',

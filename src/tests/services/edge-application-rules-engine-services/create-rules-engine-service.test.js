@@ -55,21 +55,7 @@ describe('EdgeApplicationRulesEnginesServices', () => {
 
     const result = sut(fixtures.ruleEngineMock)
 
-    expect(result).rejects.toBe('error: this is an validation error message from API')
-  })
-
-  it('should parse API error correctly when internal server errors occur ', async () => {
-    vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
-      statusCode: 500,
-      body: {
-        error: 'this is an internal API server error message'
-      }
-    })
-    const { sut } = makeSut()
-
-    const result = sut(fixtures.ruleEngineMock)
-
-    expect(result).rejects.toBe('error: this is an internal API server error message')
+    expect(result).rejects.toBe('this is an validation error message from API')
   })
 
   it.each([
@@ -84,6 +70,10 @@ describe('EdgeApplicationRulesEnginesServices', () => {
     {
       statusCode: 404,
       expectedError: new Errors.NotFoundError().message
+    },
+    {
+      statusCode: 500,
+      expectedError: new Errors.InternalServerError().message
     },
     {
       statusCode: 'unmappedStatusCode',

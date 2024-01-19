@@ -128,7 +128,8 @@
         </TabPanel>
         <TabPanel
           header="Functions"
-          v-if="isEnableFunction">
+          v-if="isEnableFunction"
+        >
           <EdgeFirewallFunctionsListView
             v-bind="props.edgeFirewallServices"
             :edgeFirewallID="edgeFirewallId"
