@@ -137,6 +137,10 @@
     return edgeApplication.value?.edgeFunctions
   })
 
+  const isEnableApplicationAcceleration = computed(() => {
+    return edgeApplication.value?.applicationAcceleration
+  })
+
   const isLoadBalancer = computed(() => {
     return edgeApplication.value?.loadBalancer
   })
@@ -219,6 +223,7 @@
           <EdgeApplicationsRulesEngineListView
             v-if="showRulesEngine"
             :edgeApplicationId="edgeApplicationId"
+            :isEnableApplicationAcceleration="isEnableApplicationAcceleration"
             v-bind="props.rulesEngineServices"
           />
         </TabPanel>

@@ -1,6 +1,7 @@
 import { AxiosHttpClientAdapter } from '@/services/axios/AxiosHttpClientAdapter'
 import { listWafRulesAllowedService } from '@/services/waf-rules-services'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { localeMock } from '@/tests/utils/localeMock'
 
 const fixtures = {
   wafRulesMock: {
@@ -59,6 +60,7 @@ describe('WafRulesServices', () => {
   })
 
   it('should parsed correctly each waf rules allowed', async () => {
+    localeMock()
     vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
       statusCode: 200,
       body: { results: [fixtures.wafRulesMock, fixtures.wafRulesMockWithFalseStatus] }

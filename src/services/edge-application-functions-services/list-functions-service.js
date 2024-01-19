@@ -24,7 +24,7 @@ const adapt = (httpResponse) => {
 
   const parsedFunctions = bodyResults?.map((edgeApplicationFunction) => {
     return {
-      id: edgeApplicationFunction.id,
+      id: edgeApplicationFunction.id.toString(),
       edgeFunctionId: edgeApplicationFunction.edge_function_id,
       name: parseName(edgeApplicationFunction),
       args: edgeApplicationFunction.args

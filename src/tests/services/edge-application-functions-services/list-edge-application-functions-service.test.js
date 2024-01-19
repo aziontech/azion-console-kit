@@ -71,7 +71,7 @@ describe('EdgeApplicationFunctionsServices', () => {
 
     expect(result).toEqual([
       {
-        id: 1,
+        id: '1',
         name: { text: 'function instance', tagProps: {} },
         languageIcon: { content: 'JavaScript', icon: 'javascript' },
         referenceCount: '2',

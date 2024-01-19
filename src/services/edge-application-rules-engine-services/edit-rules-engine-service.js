@@ -9,7 +9,9 @@ export const editRulesEngineService = async ({ id, payload, reorder = false }) =
     payload.phase.content === 'Default' ? 'request' : payload.phase.content?.toLowerCase()
 
   let httpResponse = await AxiosHttpClientAdapter.request({
-    url: `${makeEdgeApplicationBaseUrl()}/${id}/rules_engine/${rulesPhase}/rules/${payload.id}`,
+    url: `${makeEdgeApplicationBaseUrl()}/${id}/rules_engine/${rulesPhase || payload.phase}/rules/${
+      payload.id
+    }`,
     method: 'PATCH',
     body: parsedPayload
   })
@@ -24,7 +26,7 @@ const adapt = (payload, reorder) => {
     const { name, phase, behaviors, criteria, isActive, description } = payload
     parsedPaylod = {
       name,
-      phase: phase.content,
+      phase: phase.content || phase,
       behaviors,
       criteria,
       is_active: isActive,
