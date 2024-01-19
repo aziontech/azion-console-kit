@@ -4,6 +4,7 @@
   import EditView from '@/views/EdgeFirewall/EditView'
   import TabPanel from 'primevue/tabpanel'
   import TabView from 'primevue/tabview'
+  import EdgeFirewallFunctionsListView from '@/views/EdgeFirewallFunctions/ListView'
   import { useToast } from 'primevue/usetoast'
 
   import { computed, ref } from 'vue'
@@ -127,8 +128,12 @@
         </TabPanel>
         <TabPanel
           header="Functions"
-          v-if="isEnableFunction"
-        ></TabPanel>
+          v-if="isEnableFunction">
+          <EdgeFirewallFunctionsListView
+            v-bind="props.edgeFirewallServices"
+            :edgeFirewallID="edgeFirewallId"
+          />
+        </TabPanel>
         <TabPanel header="Rules Engine"></TabPanel>
       </TabView>
     </template>
