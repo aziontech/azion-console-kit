@@ -1,4 +1,3 @@
-
 <template>
   <!-- @row-click="editItemSelected" -->
   <div>
@@ -46,7 +45,10 @@
           rowReorder
           headerStyle="width: 3rem"
         />
-        <Column selectionMode="multiple"  headerStyle="width: 3rem"></Column>
+        <Column
+          selectionMode="multiple"
+          headerStyle="width: 3rem"
+        ></Column>
 
         <Column
           sortable
@@ -95,7 +97,7 @@
               </OverlayPanel>
             </div>
           </template>
-          <template #body="{ data: rowData } ">
+          <template #body="{ data: rowData }">
             <div class="flex justify-end">
               <PrimeMenu
                 ref="menu"
@@ -247,7 +249,7 @@
   const informationForDeletion = ref({})
   const selectedItemData = ref(null)
   const selectedColumns = ref([])
-  const selectedProduct = ref();
+  const selectedProduct = ref()
 
   onMounted(() => {
     loadData({ page: 1 })
@@ -288,7 +290,6 @@
       isLoading.value = true
       const response = await props.listService({ page })
       data.value = response
-
     } catch (error) {
       data.value = []
       toast.add({
@@ -383,8 +384,8 @@
     emit('on-select-data', selectedData)
   })
 
-
   watch(
     () => props.dataFilted,
-    (newValue) => data.value = newValue)
+    (newValue) => (data.value = newValue)
+  )
 </script>

@@ -55,8 +55,8 @@ describe('WafRulesService', () => {
 
     const result = await sut({ wafId: 4044, query: '?hour_range=48&domains_ids=1705587704' })
 
-    expect(result).toEqual(
-        [{
+    expect(result).toEqual([
+      {
         hitCount: fixtures.wafRulesMock.hit_count,
         topIps: fixtures.wafRulesMock.top_10_ips,
         id: 0,
@@ -69,7 +69,7 @@ describe('WafRulesService', () => {
         matchesOn: fixtures.wafRulesMock.matches_on,
         ruleDescription: fixtures.wafRulesMock.rule_description,
         countryCount: fixtures.wafRulesMock.country_count
-      }]
-    )
+      }
+    ])
   })
 })

@@ -22,27 +22,26 @@ const adapt = (httpResponse) => {
   // eslint-disable-next-line no-console
   const isArray = Array.isArray(httpResponse.body.results)
 
-
   const parsedWafRulesTuning = isArray
-  ? httpResponse.body.results.map((event, index) => {
-      const values = {
-        hitCount: event.hit_count,
-        topIps: event.top_10_ips,
-        id: index,
-        ruleId: event.rule_id,
-        ruleIdDescription: `${event.rule_id} - ${event.rule_description}`,
-        ipCount: event.ip_count,
-        matchZone: event.match_zone,
-        pathCount: event.path_count,
-        topCountries: event.top_10_countries,
-        matchesOn: event.matches_on,
-        ruleDescription: event.rule_description,
-        countryCount: event.country_count
-      }
+    ? httpResponse.body.results.map((event, index) => {
+        const values = {
+          hitCount: event.hit_count,
+          topIps: event.top_10_ips,
+          id: index,
+          ruleId: event.rule_id,
+          ruleIdDescription: `${event.rule_id} - ${event.rule_description}`,
+          ipCount: event.ip_count,
+          matchZone: event.match_zone,
+          pathCount: event.path_count,
+          topCountries: event.top_10_countries,
+          matchesOn: event.matches_on,
+          ruleDescription: event.rule_description,
+          countryCount: event.country_count
+        }
 
-      return values
-    })
-  : []
+        return values
+      })
+    : []
 
   return {
     body: parsedWafRulesTuning,

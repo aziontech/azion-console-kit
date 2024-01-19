@@ -5,11 +5,13 @@ import { describe, expect, it, vi } from 'vitest'
 
 const fixtures = {
   wafRulesMock: {
-    allowedRules: [{
+    allowedRules: [
+      {
         match_on: '',
         match_zones: '',
         rule_id: ''
-    }],
+      }
+    ],
     reason: ''
   }
 }
@@ -36,7 +38,7 @@ describe('WafRulesServices', () => {
       method: 'POST',
       body: {
         allowed_rules: fixtures.wafRulesMock.allowedRules,
-        reason: fixtures.wafRulesMock.reason,
+        reason: fixtures.wafRulesMock.reason
       }
     })
   })

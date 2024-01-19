@@ -15,7 +15,7 @@ export const createWafRulesAllowedTuningService = async ({ payload, wafId }) => 
 const adapt = (payload) => {
   return {
     allowed_rules: payload.allowedRules,
-    reason: payload.reason,
+    reason: payload.reason
   }
 }
 
@@ -55,15 +55,15 @@ const extractErrorKey = (errorSchema, key) => {
   if (typeof errorSchema[key][0] === 'string') {
     return `${key}: ${errorSchema[key][0]}`
   }
-  const keyValuePair = [];
-  errorSchema[key].forEach(obj => {
+  const keyValuePair = []
+  errorSchema[key].forEach((obj) => {
     for (let key in obj) {
       // eslint-disable-next-line no-prototype-builtins
       if (obj.hasOwnProperty(key)) {
-        keyValuePair.push({ key, value: obj[key][0] });
+        keyValuePair.push({ key, value: obj[key][0] })
       }
     }
-  });
+  })
   return `${keyValuePair[0].key}: ${keyValuePair[0].value}`
 }
 
