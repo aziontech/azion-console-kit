@@ -114,27 +114,12 @@
         }
       },
       {
+        field: 'functionInstanced',
+        header: 'Function Instanced'
+      },
+      {
         field: 'version',
         header: 'Version'
-      },
-      {
-        field: 'referenceCount',
-        header: 'Ref Count'
-      },
-      {
-        field: 'languageIcon',
-        header: 'Language',
-        type: 'component',
-        component: (columnData) => {
-          return columnBuilder({
-            data: columnData,
-            columnAppearance: 'language-icon-with-text'
-          })
-        }
-      },
-      {
-        field: 'initiatorType',
-        header: 'Initiator Type'
       },
       {
         field: 'lastEditor',
@@ -144,17 +129,6 @@
         field: 'modified',
         sortField: 'lastModifiedDate',
         header: 'Last Modified'
-      },
-      {
-        field: 'statusTag',
-        header: 'Status',
-        type: 'component',
-        component: (columnData) => {
-          return columnBuilder({
-            data: columnData,
-            columnAppearance: 'tag'
-          })
-        }
       }
     ]
   })

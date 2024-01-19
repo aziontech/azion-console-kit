@@ -7,7 +7,7 @@
     :initialValues="initialValues"
     @onSuccess="handleCreateFunction"
     :showBarGoBack="true"
-    title="Create Function"
+    title="Instance New"
   >
     <template #formFields>
       <FormFieldsDrawerFunction :edgeFunctionsList="edgeFunctionsList" />
@@ -23,7 +23,7 @@
     @onSuccess="emit('onSuccess')"
     :showBarGoBack="true"
     @onError="closeDrawerEdit"
-    title="Edit Function"
+    title="Edit Instance"
   >
     <template #formFields>
       <FormFieldsDrawerFunction :edgeFunctionsList="edgeFunctionsList" />
@@ -110,6 +110,10 @@
     showCreateFunctionDrawer.value = true
   }
 
+  const closeDrawerCreate = () => {
+    showCreateFunctionDrawer.value = false
+  }
+
   const openDrawerEdit = (functionID) => {
     if (functionID) {
       showEditFunctionDrawer.value = true
@@ -122,6 +126,7 @@
   }
 
   const handleCreateFunction = () => {
+    closeDrawerCreate()
     emit('onSuccess')
   }
 
