@@ -58,6 +58,23 @@ describe('EdgeApplicationRulesEnginesServices', () => {
     expect(result).rejects.toBe('this is an validation error message from API')
   })
 
+  it('should return the first error message when multiple error messages are returned', async () => {
+    vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
+      statusCode: 400,
+      body: {
+        error: {
+          incompatible_behaviors: 'Incompatible behavior message',
+          other_error: 'Other error'
+        }
+      }
+    })
+    const { sut } = makeSut()
+
+    const result = sut(fixtures.ruleEngineMock)
+
+    expect(result).rejects.toBe('Incompatible behavior message')
+  })
+
   it.each([
     {
       statusCode: 401,
