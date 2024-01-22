@@ -258,13 +258,13 @@
     }
   }
 
-  const checkLoginMethod = async() => {
+  const checkLoginMethod = async () => {
     if (errors.value.email || !email.value) return
     try {
       const res = await verifyLoginMethodService(email.value)
       if (res.loginMethod === 'federated') {
-        const encodedEmail = encodeURIComponent(email.value);
-        window.location.replace(`${res.loginUrl}?email=${encodedEmail}?console=true`);
+        const encodedEmail = encodeURIComponent(email.value)
+        window.location.replace(`${res.loginUrl}?email=${encodedEmail}&console=true`)
       } else {
         showPasswordStep()
       }

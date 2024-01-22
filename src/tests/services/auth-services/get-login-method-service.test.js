@@ -15,7 +15,6 @@ const fixtures = {
 }
 
 describe('AuthServices', () => {
-
   it('should call login method service with correct params', async () => {
     const requestSpy = vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
       statusCode: 200
@@ -27,7 +26,7 @@ describe('AuthServices', () => {
 
     expect(requestSpy).toHaveBeenCalledWith({
       method: 'GET',
-      url:  `auth/login_method?email=${fixtures.encodedEmail}`
+      url: `auth/login_method?email=${fixtures.encodedEmail}`
     })
   })
 })
