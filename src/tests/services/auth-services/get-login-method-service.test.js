@@ -9,11 +9,12 @@ const makeSut = () => {
   }
 }
 
+const fixtures = {
+  email: 'azion-test@test.com',
+  encodedEmail: 'azion-test%40test.com'
+}
+
 describe('AuthServices', () => {
-  const loginPayloadMock = {
-    email: 'azion-test@test.com',
-    encodedEmail: '',
-  }
 
   it('should call login method service with correct params', async () => {
     const requestSpy = vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
@@ -22,27 +23,11 @@ describe('AuthServices', () => {
 
     const { sut } = makeSut()
 
-    await sut(loginPayloadMock)
+    await sut(fixtures.email)
 
     expect(requestSpy).toHaveBeenCalledWith({
-      body: loginPayloadMock,
       method: 'GET',
-      url: 'token'
-    })
-  })
-  it('should return authentication token on success login', async () => {
-    vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValue({
-      body: {
-        token: 'R4nd0mT0k4n123#$'
-      },
-      statusCode: 200
-    })
-    const { sut } = makeSut()
-
-    const response = await sut(loginPayloadMock)
-
-    expect(response).toEqual({
-      token: 'R4nd0mT0k4n123#$'
+      url:  `auth/login_method?email=${fixtures.encodedEmail}`
     })
   })
 })
