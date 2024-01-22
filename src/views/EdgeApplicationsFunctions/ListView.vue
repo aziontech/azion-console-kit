@@ -29,8 +29,8 @@
   </div>
   <EmptyResultsBlock
     v-else
-    title="No Function added"
-    description="Create your first Function."
+    title="No functions have been instantiated"
+    description="Click the button below to initiate the setup process and instantiate your first edge function."
     createButtonLabel="Add"
     :documentationService="props.documentationService"
     :inTabs="true"

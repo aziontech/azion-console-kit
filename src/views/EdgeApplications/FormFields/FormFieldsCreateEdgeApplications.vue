@@ -113,7 +113,7 @@
 <template>
   <FormHorizontal
     title="General"
-    description="Edit the edge application title and description."
+    description="Give a unique and easy-to-remember name."
     v-if="handleBlock('general')"
   >
     <template #inputs>
@@ -121,6 +121,7 @@
         <FieldText
           label="Name *"
           name="name"
+          placeholder="My edge application"
           :value="name"
         />
       </div>
@@ -160,6 +161,9 @@
               />
               <div class="flex-col gap-1">
                 <div class="text-color text-sm font-normal">HTTP support</div>
+                <div class="self-stretch text-color-secondary text-sm font-normal">
+                  Use the HTTP protocol between the edge and the users.
+                </div>
               </div>
             </template>
           </Card>
@@ -185,7 +189,7 @@
               <div class="flex-col gap-1">
                 <div class="text-color text-sm font-normal">HTTP and HTTPS support</div>
                 <div class="self-stretch text-color-secondary text-sm font-normal">
-                  Enables the HTTPS protocol for the application.
+                  Use both the HTTP and HTTPS protocols between the edge and the users.
                 </div>
               </div>
             </template>
@@ -212,7 +216,8 @@
               <div class="flex-col gap-1">
                 <div class="text-color text-sm font-normal">HTTP, HTTPS and HTTP/3 support</div>
                 <div class="self-stretch text-color-secondary text-sm font-normal">
-                  Enables the HTTPS protocol for the application and requests in HTTP/3.
+                  Use both the HTTP and HTTPS protocols between the edge and the users and enable
+                  HTTP/3 support.
                 </div>
               </div>
             </template>
@@ -233,7 +238,7 @@
               :options="HTTP_PORT_LIST_OPTIONS"
               v-model="httpPort"
               optionLabel="label"
-              placeholder="Select a port HTTP"
+              placeholder="Select an HTTP port"
               class="w-full"
               :disabled="isHttp3Protocol"
               :pt="{
@@ -257,7 +262,7 @@
               :options="HTTPS_PORT_LIST_OPTIONS"
               v-model="httpsPort"
               optionLabel="label"
-              placeholder="Select a port HTTPS"
+              placeholder="Select an HTTPS port"
               class="w-full"
               :disabled="isHttpProtocol || isHttp3Protocol"
               :pt="{
@@ -290,7 +295,7 @@
 
           <div class="text-color-secondary text-sm font-normal">
             Choose which TLS version the application supports. To configure the minimum TLS version,
-            you must enable HTTP and HTTPS protocols.
+            you must enable only HTTP and HTTPS protocols.
           </div>
         </div>
 
@@ -304,7 +309,7 @@
             :options="SUPPORTED_LIST_OPTIONS"
             v-model="supportedVersion"
             optionLabel="label"
-            placeholder="Select a Supported Ciphers list"
+            placeholder="Select the supported cipher suite"
             :disabled="isHttpProtocol"
           />
 
@@ -335,7 +340,7 @@
             :options="ORIGIN_TYPE_LIST_OPTIONS"
             v-model="originType"
             optionLabel="label"
-            placeholder="Select a Origin Type"
+            placeholder="Select an origin type"
             disabled
             class="w-full"
             :pt="{
@@ -391,7 +396,7 @@
           </div>
         </div>
         <div class="text-color-secondary text-sm font-normal">
-          Select the type of connection between the edge nodes and the origin.
+          Select the protocol usage between the edge nodes and the origin.
         </div>
       </div>
 
@@ -406,9 +411,10 @@
           v-model="address"
           :class="{ 'p-invalid': addressError }"
           aria-describedby="address-help"
+          placeholder="myorigin.com"
         />
         <div class="text-color-secondary text-sm font-normal">
-          Define an origin for the content, in FQDN format or an IPv4/IPv6 address.
+          Define an origin for the content in FQDN format or an IPv4/IPv6 address.
         </div>
         <small
           v-if="addressError"
@@ -428,10 +434,10 @@
           v-model="hostHeader"
           :class="{ 'p-invalid': hostHeaderError }"
           aria-describedby="hostHeader-help"
+          placeholder="${host}"
         />
         <div class="text-color-secondary text-sm font-normal">
-          Allow the origin to identify the virtualhost and locate the content or application. If
-          this is blank, Azion will use the Address as the default.
+          Allow the origin to identify the virtualhost and locate the content or application.
         </div>
         <small
           v-if="hostHeaderError"
@@ -551,9 +557,8 @@
           />
 
           <div class="text-color-secondary text-sm font-normal">
-            TTL for CDN cache should be equal to or greater than 60 seconds. To use a lower value,
-            you need to enable Application Acceleration on the Main Settings tab. To enable L2
-            Caching, the TTL for CDN cache should be equal to or greater than 3 seconds.
+            Enable Application Acceleration on the Main Settings tab to use values lower than 60
+            seconds. L2 Caching requres cache TTL to be equal to or greater than 3 seconds.
           </div>
         </div>
       </div>
@@ -567,7 +572,6 @@
   >
     <template #inputs>
       <div class="flex flex-col gap-2">
-        <label class="text-color text-base font-medium">Your Modules</label>
         <div class="flex flex-col gap-3">
           <Card
             :pt="{
@@ -604,7 +608,7 @@
                 disabled
               />
             </template>
-            <template #subtitle>Customize advanced cache settings. Activated by default.</template>
+            <template #subtitle>Customize advanced cache settings.</template>
             <template #footer>
               <PrimeTag
                 value="Automatically enabled in all accounts."
@@ -691,14 +695,14 @@
               <InputSwitch v-model="loadBalancer" />
             </template>
             <template #subtitle
-              >Balance traffic to your origins assuring best-in-class reliability and network
-              congestion control.</template
+              >Balance traffic to your origins ensuring reliability and network congestion
+              control.</template
             >
           </Card>
         </div>
       </div>
       <div class="flex flex-col gap-2">
-        <label class="text-color text-base font-medium">Other modules that you can subscribe</label>
+        <label class="text-color text-base font-medium">Subscription modules</label>
         <div class="flex flex-col gap-3">
           <Card
             :pt="{
@@ -721,10 +725,7 @@
                 :disabled="!l2CachingIsEnable"
               />
             </template>
-            <template #subtitle
-              >Enable an additional cache layer at the edge. Contact sales to enable this
-              module.</template
-            >
+            <template #subtitle>Enable an additional cache layer at the edge. </template>
           </Card>
           <Card
             :pt="{
@@ -748,8 +749,8 @@
               />
             </template>
             <template #subtitle
-              >Enhance real-time data exchange, enabling seamless communication between your edge
-              application and backend services using the WebSocket protocol</template
+              >Enhance real-time data exchange between your edge application and backend services
+              using the WebSocket protocol.</template
             >
           </Card>
         </div>
@@ -766,7 +767,7 @@
 
   <FormHorizontal
     title="Debug Rules"
-    description="Create a log of executed rules. Logs can be accessed through Data Streaming, Real-Time Events or Real-Time Events GraphQL API."
+    description="Create a log of executed rules created in Rules Engine. Logs can be accessed through Data Streaming, Real-Time Events or Real-Time Events GraphQL API."
     v-if="handleBlock('debug-rules')"
   >
     <template #inputs>
@@ -794,12 +795,6 @@
                 >Active</label
               >
             </div>
-          </template>
-          <template #content>
-            <small class="text-color-secondary text-sm">
-              Rules that were successfully executed will be shown under the $traceback field in Data
-              Streaming and Real-Time Events or the $stacktrace variable in GraphQL.
-            </small>
           </template>
         </Card>
       </div>

@@ -120,8 +120,8 @@
 
   <EmptyResultsBlock
     v-else
-    title="No Cache Settings added"
-    description="Create your first Cache Settings."
+    title="No cache settings have been created"
+    description="Click the button below to initiate the setup process and create your first cache setting."
     createButtonLabel="Cache Setting"
     :documentationService="documentationService"
     :inTabs="true"

@@ -200,8 +200,8 @@
 
     <template #empty>
       <EmptyResultsBlock
-        title="No Rules Engine added"
-        description="Create your first Rule Engine."
+        title="No rules have been created"
+        description="Click the button below to initiate the setup process and create your first rule."
         createButtonLabel="Add"
         :documentationService="props.documentationService"
         :inTabs="true"
