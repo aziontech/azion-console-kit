@@ -59,7 +59,7 @@
     return [
       {
         field: 'deviceId',
-        header: 'Id',
+        header: 'ID',
         type: 'component',
         component: (columnData) => {
           return columnBuilder({

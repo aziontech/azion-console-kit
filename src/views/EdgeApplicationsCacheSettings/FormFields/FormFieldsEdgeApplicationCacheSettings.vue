@@ -459,7 +459,7 @@
       </div>
 
       <div class="flex flex-col w-full sm:max-w-3xl gap-2">
-        <label class="text-color text-sm font-medium leading-5">Add device group</label>
+        <label class="text-color text-sm font-medium leading-5">Adapt Content Delivery for Devices</label>
         <div class="flex flex-col gap-4">
           <div
             class="flex no-wrap gap-2 items-center"
@@ -485,14 +485,14 @@
         v-if="showDeviceGroupFields"
         class="flex flex-col w-full sm:max-w-3xl gap-2"
       >
-        <label class="text-color text-sm font-medium leading-5">Add device group</label>
+        <label class="text-color text-sm font-medium leading-5">Device group ID</label>
         <div class="flex flex-col gap-2 max-w-lg">
           <div
             v-for="(deviceGroupItem, index) in deviceGroup"
             :key="deviceGroupItem.key"
           >
             <FieldInputGroup
-              placeholder="Value"
+              placeholder="ID"
               :name="`deviceGroup[${index}].id`"
               :value="deviceGroup[index].value.id"
             >

@@ -20,7 +20,7 @@
           label="Name *"
           name="name"
           :value="name"
-          description="Give a unique and descriptive name to identify the Device Groups."
+          description="Give a unique and descriptive name to identify the device group."
         />
       </div>
     </template>
@@ -28,7 +28,7 @@
 
   <FormHorizontal
     :isDrawer="true"
-    title="User Agent"
+    title="Match to User-Agent"
     description="Specify a regular expression to compare with the contents of the User-Agent header."
   >
     <template #inputs>
