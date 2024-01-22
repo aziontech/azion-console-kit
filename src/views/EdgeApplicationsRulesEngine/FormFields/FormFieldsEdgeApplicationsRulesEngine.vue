@@ -173,7 +173,6 @@
   const conditionalMenuRef = ref({})
   const criteriaMenuRef = ref({})
 
-
   /**
    * Remove a specific conditional from the criteria array.
    * @param {number} criteriaIndex - The index of the criteria from which the conditional will be removed.
@@ -546,9 +545,11 @@
   ])
 
   const variableItems = ref([])
+
   /**
    * Filters the variable autocomplete options based on the user's query.
    * @param {Object} event - The event object containing the user's query.
+   * @param {string} event.query - The user's query.
    */
   const searchVariableOption = (event) => {
     variableItems.value = variableAutocompleteOptions.value.filter((item) =>
@@ -558,7 +559,7 @@
 
   /**
    * Capitalizes the first letter of a string.
-   * @param {string} string - The string to capitalize.
+   * @param {string | undefined} string - The string to capitalize.
    * @returns {string} The capitalized string.
    */
   const capitalizeConditional = (string) => {
@@ -566,6 +567,26 @@
       return string.charAt(0).toUpperCase() + string.slice(1)
     }
     return ''
+  }
+
+  /**
+   * Gets the label for the behavior item.
+   * @param {Object} behaviorItem - The behavior item.
+   * @param {Boolean} behaviorItem.isFirst - The behavior boolean isFirst.
+   * @returns {string} The label for the behavior item.
+   */
+  const getBehaviorLabel = (behaviorItem) => {
+    return behaviorItem.isFirst ? 'Then' : 'And'
+  }
+
+  /**
+  /**
+   * Checks if a criterion can be deleted.
+   * @param {number} index - The index of the criterion.
+   * @returns {boolean} True if the criterion can be deleted, false otherwise.
+   */
+  const isNotFirstCriteria = (index) => {
+    return criteria.length > 1 && index < criteria.length - 1
   }
 
   onMounted(() => {
@@ -740,7 +761,7 @@
           <Divider type="solid" />
 
           <PrimeButton
-            v-if="criteria.length > 1 && index < criteria.length - 1"
+            v-if="isNotFirstCriteria(index)"
             icon="pi pi-ellipsis-h"
             size="small"
             outlined
@@ -782,7 +803,7 @@
             align="left"
             type="dashed"
           >
-            {{ behaviorItem.isFirst ? 'Then' : 'And' }}
+            {{ getBehaviorLabel(behaviorItem) }}
           </Divider>
 
           <PrimeButton
