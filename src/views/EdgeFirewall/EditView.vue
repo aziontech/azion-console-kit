@@ -6,7 +6,7 @@
   import * as yup from 'yup'
 
   defineOptions({ name: 'edit-edge-firewall' })
-  const emit = defineEmits(['updateFirewall'])
+  const emit = defineEmits(['updatedFirewall'])
 
   const props = defineProps({
     editEdgeFirewallService: { type: Function, required: true },
@@ -33,7 +33,7 @@
 
   const formSubmit = async (onSubmit, values) => {
     await onSubmit()
-    emit('updateFirewall', values)
+    emit('updatedFirewall', values)
   }
 </script>
 

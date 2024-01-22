@@ -2,7 +2,6 @@
   import PrimeButton from 'primevue/button'
   import * as MarketplaceService from '@/services/marketplace-services'
   import LoadingListTemplate from './LoadingListTemplate'
-  import Listbox from 'primevue/listbox'
   import { computed, onBeforeMount, ref } from 'vue'
   import { useRouter } from 'vue-router'
   import { useToast } from 'primevue/usetoast'
@@ -22,7 +21,6 @@
   const isLoading = ref(false)
   const templates = ref([])
   const browseTemplates = ref([])
-  const selectedTabControl = ref('recommended')
   const selectedTab = ref('recommended')
   const browseHeader = ref('browse-templates')
   const recommendedHeader = ref('recommended-for-you')
@@ -146,9 +144,11 @@
   }
 
   const onTabChange = async (target) => {
-    selectedTab.value = target.value || selectedTab.value
-    if (target.value === 'browse' && browseTemplates.value.length === 0) {
-      await loadBrowse()
+    if (!isLoading.value) {
+      selectedTab.value = target.value || selectedTab.value
+      if (target.value === 'browse' && browseTemplates.value.length === 0) {
+        await loadBrowse()
+      }
     }
   }
 </script>
@@ -156,18 +156,22 @@
 <template>
   <div class="overflow-auto w-full h-full flex flex-col sm:flex-row p-0 sm:pl-5 sm:pr-8 gap-4 pb-4">
     <div class="sm:min-w-[240px] mt-4">
-      <Listbox
-        @change="onTabChange"
-        v-model="selectedTabControl"
-        :options="items"
-        optionLabel="label"
-        :disabled="isLoading"
-        optionValue="value"
-        :pt="{
-          list: { class: 'p-0' }
-        }"
-        class="bg-transparent border-none sm:min-w-[240px] p-0 md:fixed"
-      />
+      <ul class="flex flex-col gap-1">
+        <li
+          v-for="(menuitem, index) in items"
+          :key="index"
+        >
+          <PrimeButton
+            :class="{ 'p-selectbutton': menuitem.value === selectedTab, 'p-disabled': isLoading }"
+            class="w-full p-button p-button-text p-button-primary p-button-sm whitespace-nowrap h-[38px] flex"
+            :pt="{
+              label: { class: 'w-full text-left' }
+            }"
+            @click="onTabChange(menuitem)"
+            :label="menuitem.label"
+          />
+        </li>
+      </ul>
     </div>
 
     <div class="overflow-auto w-full flex flex-col">

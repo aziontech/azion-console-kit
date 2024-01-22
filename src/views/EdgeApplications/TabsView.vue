@@ -27,7 +27,7 @@
     functionsServices: { type: Object, required: true }
   })
 
-  const mapTabs = {
+  const defaultTabs = {
     mainSettings: 0,
     origins: 1,
     deviceGroups: 2,
@@ -37,74 +37,68 @@
     rulesEngine: 6
   }
 
+  const mapTabs = ref({ ...defaultTabs })
+
   const toast = useToast()
   const route = useRoute()
   const router = useRouter()
   const activeTab = ref(0)
-  const isLoadBalancer = ref(false)
   const edgeApplicationId = ref(route.params.id)
-  const isEnableEdgeFunction = ref(false)
-  const responseEdgeApplication = ref(false)
-  const title = ref('')
+  const edgeApplication = ref()
 
   const showMainSettings = computed(() => {
-    return activeTab.value === mapTabs.mainSettings
+    return activeTab.value === mapTabs.value?.mainSettings
   })
 
   const showErrorResponses = computed(() => {
-    return activeTab.value === mapTabs.errorResponses
+    return activeTab.value === mapTabs.value?.errorResponses
   })
 
   const showFunctions = computed(() => {
-    return activeTab.value === mapTabs.functions
+    return activeTab.value === mapTabs.value?.functions
   })
 
   const showRulesEngine = computed(() => {
-    return activeTab.value === mapTabs.rulesEngine
+    return activeTab.value === mapTabs.value?.rulesEngine
   })
 
   const showCacheSettings = computed(() => {
-    return activeTab.value === mapTabs.cacheSettings
+    return activeTab.value === mapTabs.value?.cacheSettings
   })
 
   const showDeviceGroups = computed(() => {
-    return activeTab.value === mapTabs.deviceGroups
+    return activeTab.value === mapTabs.value?.deviceGroups
   })
 
   const showOrigins = computed(() => {
-    return activeTab.value === mapTabs.origins
+    return activeTab.value === mapTabs.value?.origins
   })
 
   const loaderEdgeApplication = async () => {
     try {
-      if (responseEdgeApplication.value) return responseEdgeApplication.value
-
-      const response = await props.edgeApplicationServices.loadEdgeApplication({
+      return await props.edgeApplicationServices.loadEdgeApplication({
         id: edgeApplicationId.value
       })
-      const { edgeFunctions, loadBalancer, name } = response
-      title.value = name
-      isLoadBalancer.value = loadBalancer
-      isEnableEdgeFunction.value = edgeFunctions
-      responseEdgeApplication.value = response
     } catch (error) {
       toast.add({
         closable: true,
         severity: 'error',
         summary: error
       })
+      router.push({ name: props.edgeApplicationServices.updatedRedirect })
     }
   }
 
   const getTabFromValue = (selectedTabIndex) => {
-    const tabNames = Object.keys(mapTabs)
-    const selectedTab = tabNames.find((tabName) => mapTabs[tabName] === selectedTabIndex)
+    const tabNames = Object.keys(mapTabs.value)
+    const selectedTab = tabNames.find((tabName) => mapTabs.value[tabName] === selectedTabIndex)
     return selectedTab
   }
 
-  const changeRouteByClickingOnTab = (event) => {
-    const tab = getTabFromValue(event.index)
-    activeTab.value = event.index
+  const changeRouteByClickingOnTab = ({ index = 0 }) => {
+    verifyTab(edgeApplication.value)
+    const tab = getTabFromValue(index)
+    activeTab.value = index
     const params = {
       id: edgeApplicationId.value,
       tab
@@ -115,12 +109,45 @@
     })
   }
 
+  const verifyTab = ({ edgeFunctions }) => {
+    if (!edgeFunctions) {
+      delete mapTabs.value.functions
+      mapTabs.value = Object.entries(mapTabs.value).reduce((acc, [key], index) => {
+        acc[key] = index
+        return acc
+      }, {})
+      return
+    }
+    mapTabs.value = { ...defaultTabs }
+  }
+
   const renderTabCurrentRouter = async () => {
-    await loaderEdgeApplication()
-    const { tab } = route.params
-    const defaultTabIndex = 0
-    const activeTabIndexByRoute = mapTabs[tab] || defaultTabIndex
-    activeTab.value = activeTabIndexByRoute
+    const { tab = 0 } = route.params
+    edgeApplication.value = await loaderEdgeApplication()
+    verifyTab(edgeApplication.value)
+    const activeTabIndexByRoute = mapTabs.value[tab]
+    changeRouteByClickingOnTab({ index: activeTabIndexByRoute })
+  }
+
+  const title = computed(() => {
+    return edgeApplication.value?.name || ''
+  })
+
+  const isEnableEdgeFunction = computed(() => {
+    return edgeApplication.value?.edgeFunctions
+  })
+
+  const isEnableApplicationAcceleration = computed(() => {
+    return edgeApplication.value?.applicationAcceleration
+  })
+
+  const isLoadBalancer = computed(() => {
+    return edgeApplication.value?.loadBalancer
+  })
+
+  const updatedApplication = (application) => {
+    edgeApplication.value = { ...application }
+    verifyTab(edgeApplication.value)
   }
 
   renderTabCurrentRouter()
@@ -136,14 +163,15 @@
         :activeIndex="activeTab"
         @tab-click="changeRouteByClickingOnTab"
         class="w-full h-full"
-        v-if="responseEdgeApplication"
+        v-if="edgeApplication"
       >
         <TabPanel header="Main Settings">
           <EditView
             v-if="showMainSettings"
             :editEdgeApplicationService="edgeApplicationServices.editEdgeApplication"
-            :loadEdgeApplicationService="loaderEdgeApplication"
+            :edgeApplication="edgeApplication"
             :updatedRedirect="edgeApplicationServices.updatedRedirect"
+            @updatedApplication="updatedApplication"
             :contactSalesEdgeApplicationService="
               edgeApplicationServices.contactSalesEdgeApplicationService
             "
@@ -195,6 +223,7 @@
           <EdgeApplicationsRulesEngineListView
             v-if="showRulesEngine"
             :edgeApplicationId="edgeApplicationId"
+            :isEnableApplicationAcceleration="isEnableApplicationAcceleration"
             v-bind="props.rulesEngineServices"
           />
         </TabPanel>

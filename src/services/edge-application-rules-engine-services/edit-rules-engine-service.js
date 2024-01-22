@@ -5,11 +5,10 @@ import * as Errors from '@/services/axios/errors'
 export const editRulesEngineService = async ({ id, payload, reorder = false }) => {
   const parsedPayload = adapt(payload, reorder)
 
-  const rulesPhase =
-    payload.phase.content === 'Default' ? 'request' : payload.phase.content?.toLowerCase()
+  const rulePhase = generateRulePhase(payload) || payload.phase
 
   let httpResponse = await AxiosHttpClientAdapter.request({
-    url: `${makeEdgeApplicationBaseUrl()}/${id}/rules_engine/${rulesPhase}/rules/${payload.id}`,
+    url: `${makeEdgeApplicationBaseUrl()}/${id}/rules_engine/${rulePhase}/rules/${payload.id}`,
     method: 'PATCH',
     body: parsedPayload
   })
@@ -17,26 +16,40 @@ export const editRulesEngineService = async ({ id, payload, reorder = false }) =
   return parseHttpResponse(httpResponse)
 }
 
-const adapt = (payload, reorder) => {
-  let parsedPaylod
+/**
+ *
+ * @param {Object} payload
+ * @param {Object} payload.phase
+ * @param {string | undefined} payload.phase.content
+ * @returns {string}
+ */
+const generateRulePhase = (payload) => {
+  const DEFAULT_RULE_PHASE = 'Default'
+  return payload.phase.content === DEFAULT_RULE_PHASE
+    ? 'request'
+    : payload.phase.content?.toLowerCase()
+}
 
-  if (!reorder) {
+const adapt = (payload, reorder) => {
+  let parsedPayload
+
+  if (reorder) {
+    parsedPayload = {
+      order: parseInt(payload.order)
+    }
+  } else {
     const { name, phase, behaviors, criteria, isActive, description } = payload
-    parsedPaylod = {
+    parsedPayload = {
       name,
-      phase: phase.content,
+      phase: phase.content || phase,
       behaviors,
       criteria,
       is_active: isActive,
       description
     }
-  } else {
-    parsedPaylod = {
-      order: parseInt(payload.order)
-    }
   }
 
-  return parsedPaylod
+  return parsedPayload
 }
 
 /**

@@ -21,6 +21,7 @@ export const documentationCatalog = {
   edgeApplicationCacheSettings: () => openSearchResult('cache settings'),
   edgeApplicationFunctions: () => openSearchResult('edge application functions instances'),
   edgeApplicationDeviceGroups: () => openSearchResult('edge application device groups'),
+  edgeApplicationRulesEngine: () => openSearchResult('edge application rules engine'),
   users: () => openSearchResult('users'),
   activityHistory: () => openSearchResult('activity history'),
   edgeNodes: () => openSearchResult('edge nodes'),

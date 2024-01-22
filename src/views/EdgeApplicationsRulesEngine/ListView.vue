@@ -2,6 +2,7 @@
   import Illustration from '@/assets/svg/illustration-layers'
   import EmptyResultsBlock from '@/templates/empty-results-block'
   import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
+  import DrawerRulesEngine from '@/views/EdgeApplicationsRulesEngine/Drawer'
   import ListTableBlock from '@/templates/list-table-block/no-header'
   import PrimeButton from 'primevue/button'
   import SelectButton from 'primevue/selectbutton'
@@ -23,6 +24,38 @@
       type: Function
     },
     reorderRulesEngine: {
+      required: true,
+      type: Function
+    },
+    loadRulesEngineService: {
+      required: true,
+      type: Function
+    },
+    editRulesEngineService: {
+      required: true,
+      type: Function
+    },
+    createRulesEngineService: {
+      required: true,
+      type: Function
+    },
+    documentationService: {
+      required: true,
+      type: Function
+    },
+    isEnableApplicationAcceleration: {
+      required: true,
+      type: Boolean
+    },
+    listEdgeApplicationFunctionsService: {
+      required: true,
+      type: Function
+    },
+    listCacheSettingsService: {
+      required: true,
+      type: Function
+    },
+    listOriginsService: {
       required: true,
       type: Function
     }
@@ -98,21 +131,52 @@
     return props.reorderRulesEngine(tableData, props.edgeApplicationId)
   }
 
-  const listRulesEngine = ref(null)
+  const listRulesEngineRef = ref(null)
   watch(selectedPhase, () => {
-    listRulesEngine.value.loadData({ page: 1 })
+    listRulesEngineRef.value.loadData({ page: 1 })
   })
+
+  const reloadList = () => {
+    if (hasContentToList.value) {
+      listRulesEngineRef.value.reload()
+      return
+    }
+    hasContentToList.value = true
+  }
+
+  const drawerRulesEngineRef = ref('')
+  const openCreateRulesEngineDrawer = () => {
+    drawerRulesEngineRef.value.openDrawerCreate()
+  }
+
+  const openEditRulesEngineDrawer = (item) => {
+    drawerRulesEngineRef.value.openDrawerEdit(item)
+  }
 </script>
 
 <template>
+  <DrawerRulesEngine
+    ref="drawerRulesEngineRef"
+    :isEnableApplicationAcceleration="props.isEnableApplicationAcceleration"
+    :listEdgeApplicationFunctionsService="props.listEdgeApplicationFunctionsService"
+    :listOriginsService="props.listOriginsService"
+    :listCacheSettingsService="props.listCacheSettingsService"
+    :edgeApplicationId="props.edgeApplicationId"
+    :createRulesEngineService="props.createRulesEngineService"
+    :editRulesEngineService="props.editRulesEngineService"
+    :loadRulesEngineService="props.loadRulesEngineService"
+    :documentationService="props.documentationService"
+    @onSuccess="reloadList"
+  />
   <ListTableBlock
-    ref="listRulesEngine"
-    :reorderableRows="true"
-    :onReorderService="reorderRulesEngineWithDecorator"
+    ref="listRulesEngineRef"
     pageTitleDelete="Rules Engine"
+    :reorderableRows="true"
+    :columns="getColumns"
+    :onReorderService="reorderRulesEngineWithDecorator"
+    :editInDrawer="openEditRulesEngineDrawer"
     :listService="listRulesEngineWithDecorator"
     :deleteService="deleteRulesEngineWithDecorator"
-    :columns="getColumns"
     @on-load-data="handleLoadData"
     :pt="{
       thead: { class: !hasContentToList && 'hidden' }
@@ -129,6 +193,7 @@
         <PrimeButton
           icon="pi pi-plus"
           label="Rules Engine"
+          @click="openCreateRulesEngineDrawer"
         />
       </div>
     </template>
