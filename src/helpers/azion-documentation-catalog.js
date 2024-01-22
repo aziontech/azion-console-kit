@@ -16,6 +16,7 @@ export const documentationCatalog = {
   dataStreaming: () => openSearchResult('data streaming'),
   edgeFunctions: () => openSearchResult('edge functions'),
   edgeFirewall: () => openSearchResult('edge firewall'),
+  edgeFirewallRulesEngine: () => openSearchResult('edge firewall rules engine'),
   edgeApplication: () => openSearchResult('edge application'),
   edgeApplicationOrigins: () => openSearchResult('edge application origins'),
   edgeApplicationCacheSettings: () => openSearchResult('cache settings'),
