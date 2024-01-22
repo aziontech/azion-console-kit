@@ -411,7 +411,7 @@
           v-model="address"
           :class="{ 'p-invalid': addressError }"
           aria-describedby="address-help"
-          placeholder="myorigin.com"
+          placeholder="example.com"
         />
         <div class="text-color-secondary text-sm font-normal">
           Define an origin for the content in FQDN format or an IPv4/IPv6 address.
@@ -437,7 +437,7 @@
           placeholder="${host}"
         />
         <div class="text-color-secondary text-sm font-normal">
-          Allow the origin to identify the virtualhost and locate the content or application.
+          Identify a virtualhost sent in the Host header to the origin.
         </div>
         <small
           v-if="hostHeaderError"
