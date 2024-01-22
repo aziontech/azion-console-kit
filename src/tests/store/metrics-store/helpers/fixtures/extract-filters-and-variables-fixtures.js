@@ -1,4 +1,4 @@
-export const FIXTURE = {
+const FIXTURE = {
   SCENARIO_EXTRACT_TIME_SERIES: {
     filters: {
       tsRange: {
@@ -113,3 +113,5 @@ export const FIXTURE = {
     }
   }
 }
+
+export default FIXTURE

@@ -1,6 +1,6 @@
 import extractFilters from '@/stores/metrics-store/helpers/extract-filters-and-variables'
 import { describe, expect, it } from 'vitest'
-import { FIXTURE } from './fixtures/extract-filters-and-variables-fixtures'
+import FIXTURE from './fixtures/extract-filters-and-variables-fixtures'
 
 const makeSut = () => {
   const sut = extractFilters
