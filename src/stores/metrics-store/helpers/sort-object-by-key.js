@@ -1,3 +1,8 @@
+/**
+ * Sorts an object by its keys in ascending order.
+ * @param {Object} unsortedObj - The unsorted object to be sorted.
+ * @returns {Object} - The sorted object.
+ */
 export default function SortObjectByKey(unsortedObj) {
   const res = Object.keys(unsortedObj)
     .sort((prev, next) => prev.localeCompare(next))
