@@ -52,6 +52,7 @@ export const edgeFirewallRoutes = {
       name: 'edit-edge-firewall',
       component: () => import('@/views/EdgeFirewall/TabsView.vue'),
       props: {
+        listDomainsService: DomainServices.listDomainsService,
         edgeFirewallServices: {
           createEdgeFirewallService: EdgeFirewall.createEdgeFirewallService,
           loadEdgeFirewallService: EdgeFirewall.loadEdgeFirewallService,
@@ -66,7 +67,9 @@ export const edgeFirewallRoutes = {
           documentationService: Helpers.documentationCatalog.edgeFirewall,
           updatedRedirect: 'list-edge-firewall'
         },
-        listDomainsService: DomainServices.listDomainsService
+        rulesEngineServices: {
+          documentationService: Helpers.documentationCatalog.edgeFirewallRulesEngine
+        }
       },
       meta: {
         breadCrumbs: [
