@@ -32,7 +32,7 @@
               placeholder="example@email.com"
               type="email"
               autofocus
-              @keydown.enter="showPasswordStep"
+              @keydown.enter="checkLoginMethod"
               class="w-full"
               :class="{ 'p-invalid': errors.email }"
             />
@@ -51,7 +51,7 @@
             label="Next"
             :loading="isProccedButtonLoading"
             :disabled="!email"
-            @click="showPasswordStep"
+            @click="checkLoginMethod"
           />
         </div>
         <SocialIdpsBlock
@@ -146,7 +146,8 @@
 </template>
 
 <script setup>
-  import { ProccessRequestError, UserNotFoundError } from '@/services/axios/errors'
+  import { ProccessRequestError, UnexpectedError, UserNotFoundError } from '@/services/axios/errors'
+  import { verifyLoginMethodService } from '@/services/auth-services/get-login-method-service'
   import PrimeButton from 'primevue/button'
   import InputText from 'primevue/inputtext'
   import Password from 'primevue/password'
@@ -257,9 +258,22 @@
     }
   }
 
-  const showPasswordStep = () => {
+  const checkLoginMethod = async() => {
     if (errors.value.email || !email.value) return
+    try {
+      const res = await verifyLoginMethodService(email.value)
+      if (res.loginMethod === 'federated') {
+        const encodedEmail = encodeURIComponent(email);
+        window.location.replace(`${res.loginUrl}?email=${encodedEmail}`);
+      } else {
+        showPasswordStep()
+      }
+    } catch {
+      hasRequestErrorMessage.value = new UnexpectedError().message
+    }
+  }
 
+  const showPasswordStep = () => {
     isProccedButtonLoading.value = true
     setTimeout(() => {
       isProccedButtonLoading.value = false
