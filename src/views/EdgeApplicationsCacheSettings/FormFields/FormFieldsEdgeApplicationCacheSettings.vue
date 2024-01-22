@@ -460,7 +460,7 @@
 
       <div class="flex flex-col w-full sm:max-w-3xl gap-2">
         <label class="text-color text-sm font-medium leading-5"
-          >Adapt Content Delivery for Devices</label
+          >Adaptive Delivery</label
         >
         <div class="flex flex-col gap-4">
           <div
