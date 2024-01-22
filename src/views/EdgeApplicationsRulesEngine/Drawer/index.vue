@@ -62,7 +62,7 @@
     id: props.edgeApplicationId,
     name: '',
     description: '',
-    phase: 'response',
+    phase: 'request',
     criteria: [
       [
         {
@@ -79,7 +79,7 @@
         target: {}
       }
     ],
-    isActive: false
+    isActive: true
   })
 
   const validationSchema = yup.object({
