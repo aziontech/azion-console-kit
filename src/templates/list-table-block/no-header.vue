@@ -335,7 +335,7 @@
 
   const onRowReorder = async (event) => {
     try {
-      const tableData = getArrayChangedIndexes(data, event.value)
+      const tableData = getArrayChangedIndexes(data.value, event.value)
       await props.onReorderService(tableData)
       data.value = event.value
 
