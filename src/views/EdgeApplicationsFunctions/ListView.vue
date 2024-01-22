@@ -39,7 +39,7 @@
       <PrimeButton
         severity="secondary"
         icon="pi pi-plus"
-        label="Function"
+        label="Create"
         @click="openCreateFunctionDrawer"
       />
     </template>
