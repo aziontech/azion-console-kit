@@ -161,9 +161,9 @@ export default (pFilters) => {
   const variables = {}
 
   const tsRangeFilter = extractTimeSeries(pFilters)
-  Object.assign(filters, tsRangeFilter.filter)
-  params.push(...tsRangeFilter.params)
-  Object.assign(variables, tsRangeFilter.variables)
+  Object.assign(filters, tsRangeFilter?.filter)
+  if (tsRangeFilter?.params) params.push(...tsRangeFilter.params)
+  Object.assign(variables, tsRangeFilter?.variables)
 
   const datasetFilter = extractDatasets(pFilters)
   for (const dataset of datasetFilter) {
