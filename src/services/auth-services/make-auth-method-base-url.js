@@ -1,4 +1,3 @@
 export const makeAuthMethodBaseUrl = () => {
-    return 'auth'
-  }
-  
+  return 'auth'
+}
