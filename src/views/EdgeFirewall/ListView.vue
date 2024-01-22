@@ -1,5 +1,4 @@
 <script setup>
-  import Illustration from '@/assets/svg/illustration-layers'
   import ContentBlock from '@/templates/content-block'
   import EmptyResultsBlock from '@/templates/empty-results-block'
   import ListTableBlock from '@/templates/list-table-block'
@@ -90,9 +89,6 @@
         createPagePath="/edge-firewall/create"
         :documentationService="props.documentationService"
       >
-        <template #illustration>
-          <Illustration />
-        </template>
       </EmptyResultsBlock>
     </template>
   </ContentBlock>
