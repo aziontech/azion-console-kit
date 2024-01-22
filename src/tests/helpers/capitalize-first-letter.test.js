@@ -12,7 +12,7 @@ const mockScenarios = [
   },
   {
     input: 'tEST STRING',
-    expected: 'tEST STRING'
+    expected: 'TEST STRING'
   },
   {
     input: 'testString',
