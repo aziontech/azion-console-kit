@@ -1,10 +1,10 @@
 import '@/helpers/convert-date'
-import convertBeholderToChart from '@stores/metrics-store/helpers/convert-beholder-to-chart'
+import ConvertBeholderToChart from '@stores/metrics-store/helpers/convert-beholder-to-chart'
 import { describe, expect, it } from 'vitest'
 import FIXTURES from './fixtures/convert-beholder-to-chart-fixture'
 
 const makeSut = () => {
-  const sut = convertBeholderToChart
+  const sut = ConvertBeholderToChart
 
   return { sut }
 }
