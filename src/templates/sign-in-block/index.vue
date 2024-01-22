@@ -263,7 +263,7 @@
     try {
       const res = await verifyLoginMethodService(email.value)
       if (res.loginMethod === 'federated') {
-        const encodedEmail = encodeURIComponent(email);
+        const encodedEmail = encodeURIComponent(email.value);
         window.location.replace(`${res.loginUrl}?email=${encodedEmail}`);
       } else {
         showPasswordStep()
