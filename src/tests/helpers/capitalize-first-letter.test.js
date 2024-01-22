@@ -25,7 +25,7 @@ describe('CapitalizeFirstLetter', () => {
     'should correctly capitalize the first letter of a string',
     ({ input, expected }) => {
       const result = capitalizeFirstLetter(input)
-      expect(result).toEqual(expected)
+      expect(result).toStrictEqual(expected)
     }
   )
 })
