@@ -23,30 +23,30 @@
   ])
   const DEVICE_GROUP_CACHE_OPTIONS = ref([
     {
-      label: 'Content does not vary by Query String (Improves Caching)',
+      label: 'Content does not vary by query string (Improves caching)',
       value: 'ignore'
     },
     {
-      label: 'Content varies by some Query String fields (Whitelist)',
+      label: 'Content varies by some query string fields (Allowlist)',
       value: 'whitelist'
     }
   ])
 
   const QUERY_STRING_OPTIONS = ref([
     {
-      label: 'Content does not vary by Query String (Improves Caching)',
+      label: 'Content does not vary by query string (Improves caching)',
       value: 'ignore'
     },
     {
-      label: 'Content varies by some Query String fields (Whitelist)',
+      label: 'Content varies by some query string fields (Allowlist)',
       value: 'whitelist'
     },
     {
-      label: 'Content varies by Query String, except for some fields (Blacklist)',
+      label: 'Content varies by query string, except for some fields (Blocklist)',
       value: 'blacklist'
     },
     {
-      label: 'Content varies by all Query String fields',
+      label: 'Content varies by all query string fields',
       value: 'all'
     }
   ])
@@ -104,7 +104,7 @@
 <template>
   <FormHorizontal
     title="General"
-    description="Edit the cache setting title and description."
+    description="Edit the cache setting name."
     :isDrawer="true"
   >
     <template #inputs>
@@ -112,7 +112,8 @@
         <FieldText
           name="name"
           label="Name *"
-          description="Give a unique and descriptive name to identify the origin."
+          placeholder="My cache setting"
+          description="Give a unique and descriptive name to identify the setting."
         />
       </div>
     </template>
@@ -221,9 +222,8 @@
           :class="{ 'p-invalid': cdnCacheSettingsMaximumTtlError }"
         />
         <small class="text-color-secondary text-sm font-normal leading-tight">
-          TTL for CDN cache should be equal to or greater than 60 seconds. To use a lower value, you
-          need to enable Application Acceleration on the Main Settings tab. To enable L2 Caching,
-          the TTL for CDN cache should be equal to or greater than 3 seconds.
+          Enable Application Acceleration on the Main Settings tab to use values lower than 60
+          seconds. L2 Caching requres cache TTL to be equal to or greater than 3 seconds.
         </small>
         <small
           v-if="cdnCacheSettingsMaximumTtlError"
@@ -236,7 +236,7 @@
 
   <FormHorizontal
     title="File Slicing"
-    description="Slice Configuration is a feature that enables the use of byte-range requests. When you apply the Slice Configuration on your upstream, instead of download a large content file, use it to split your file in pieces and cache the content on-demand."
+    description="Enable file slicing to break large files into smaller packets that can be cached at the edge."
     :isDrawer="true"
   >
     <template #inputs>
@@ -250,10 +250,6 @@
           class="flex flex-col items-start gap-1"
         >
           <span class="text-color text-sm font-normal leading-5">Active </span>
-          <span class="text-sm text-color-secondary font-normal leading-5">
-            Enable file slicing to break large files into smaller fragments that can be cached at
-            the edge.
-          </span>
         </label>
       </div>
 
@@ -325,7 +321,7 @@
         <label
           for="queryStringFields"
           class="text-color text-sm font-medium"
-          >Query String fields *</label
+          >Query string fields *</label
         >
         <TextArea
           id="queryStringFields"
@@ -335,7 +331,7 @@
           cols="30"
         />
         <small class="text-color-secondary text-sm font-normal leading-tight">
-          Separate fields by adding new lines.
+          Separate fields using line breaks.
         </small>
         <small class="p-error">{{ queryStringFieldsError }}</small>
       </div>
@@ -372,8 +368,7 @@
             >
               <span class="text-color text-sm font-normal leading-5">Enable Caching for POST </span>
               <span class="text-sm text-color-secondary font-normal leading-5">
-                Allow POST requests to generate cache. The POST method will be included in the cache
-                key.
+                Allow POST requests to be cached. The POST method will be included in the cache key.
               </span>
             </label>
           </div>
@@ -392,7 +387,7 @@
                 >Enable Caching for OPTIONS
               </span>
               <span class="text-sm text-color-secondary font-normal leading-5">
-                Allow OPTIONS requests to generate cache. The OPTIONS method will be included in the
+                Allow OPTIONS requests to be cached. The OPTIONS method will be included in the
                 cache key.
               </span>
             </label>
@@ -411,7 +406,7 @@
             >
               <span class="text-color text-sm font-normal leading-5">Enable Stale Cache </span>
               <span class="text-sm text-color-secondary font-normal leading-5">
-                Serve stale content from the cache if the origin servers are unavailable.
+                Serve stale content from the cache if origin servers are unavailable.
               </span>
             </label>
           </div>
@@ -448,7 +443,7 @@
         <label
           for="cookieNames"
           class="text-color text-sm font-medium"
-          >Cookie Names *</label
+          >Cookie names *</label
         >
         <TextArea
           id="cookieNames"
@@ -458,15 +453,13 @@
           cols="30"
         />
         <small class="text-color-secondary text-sm font-normal leading-tight">
-          Separate fields by adding new lines.
+          Separate fields using line breaks.
         </small>
         <small class="p-error">{{ cookieNamesError }}</small>
       </div>
 
       <div class="flex flex-col w-full sm:max-w-3xl gap-2">
-        <label class="text-color text-sm font-medium leading-5"
-          >Add Device Groups to your Cache Settings</label
-        >
+        <label class="text-color text-sm font-medium leading-5">Add device group</label>
         <div class="flex flex-col gap-4">
           <div
             class="flex no-wrap gap-2 items-center"
@@ -492,9 +485,7 @@
         v-if="showDeviceGroupFields"
         class="flex flex-col w-full sm:max-w-3xl gap-2"
       >
-        <label class="text-color text-sm font-medium leading-5"
-          >Add Device Groups to your Cache Settings</label
-        >
+        <label class="text-color text-sm font-medium leading-5">Add device group</label>
         <div class="flex flex-col gap-2 max-w-lg">
           <div
             v-for="(deviceGroupItem, index) in deviceGroup"
@@ -519,7 +510,7 @@
 
           <PrimeButton
             outlined
-            label="Add Device"
+            label="Add Device Group"
             icon="pi pi-plus-circle"
             class="w-fit"
             @click="addDeviceGroup({ id: '' })"

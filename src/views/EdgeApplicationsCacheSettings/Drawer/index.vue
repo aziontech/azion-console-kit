@@ -177,7 +177,7 @@
     :schema="validationSchema"
     :initialValues="initialValues"
     @onSuccess="handleCreateCacheSettings"
-    title="Create Cache Settings"
+    title="Create Cache Setting"
   >
     <template #formFields>
       <FormFieldsEdgeApplicationCacheSettings />
@@ -192,7 +192,7 @@
     :editService="editCacheSettingsServiceWithDecorator"
     :schema="validationSchema"
     @onSuccess="handleEditedCacheSettings"
-    title="Edit Cache Settings"
+    title="Edit Cache Setting"
   >
     <template #formFields>
       <FormFieldsEdgeApplicationCacheSettings />
