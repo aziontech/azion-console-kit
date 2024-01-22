@@ -586,7 +586,7 @@
    * @returns {boolean} True if the criterion can be deleted, false otherwise.
    */
   const isNotFirstCriteria = (index) => {
-    return criteria.length > 1 && index < criteria.length - 1
+    return criteria.value.length > 1 && index < criteria.value.length - 1
   }
 
   onMounted(() => {
