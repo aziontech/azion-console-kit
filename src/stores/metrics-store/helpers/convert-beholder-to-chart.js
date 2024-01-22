@@ -133,7 +133,7 @@ const isSeriesBeyondLimits = (series) => {
  *
  * @returns {Array} List of data transformed to a column structure.
  */
-function convertBeholderToChart({
+function ConvertBeholderToChart({
   data,
   dataset,
   variable,
@@ -218,4 +218,4 @@ function convertBeholderToChart({
   return [xAxisData, ...seriesArray]
 }
 
-export default convertBeholderToChart
+export default ConvertBeholderToChart
