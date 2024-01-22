@@ -11,7 +11,8 @@ const fixtures = {
     name: 'function instance name',
     json_args: {},
     edge_function_id: 321,
-    id: 123
+    id: 123,
+    initiator_type: 'teste'
   },
   functionInstanceWithVersion: {
     version: 2,
@@ -19,7 +20,8 @@ const fixtures = {
     name: 'function instance version',
     json_args: {},
     edge_function_id: 321,
-    id: 123
+    id: 123,
+    initiator_type: 'teste'
   }
 }
 
@@ -59,12 +61,14 @@ describe('EdgeFirewallFunctionsServices', () => {
       {
         label: 'function instance name',
         value: fixtures.functionsInstance.id,
-        args: fixtures.functionsInstance.args
+        args: fixtures.functionsInstance.args,
+        initiatorType: fixtures.functionsInstance.initiator_type,
       },
       {
         label: 'function instance version',
         value: fixtures.functionInstanceWithVersion.id,
-        args: fixtures.functionInstanceWithVersion.args
+        args: fixtures.functionInstanceWithVersion.args,
+        initiatorType: fixtures.functionInstanceWithVersion.initiator_type,
       }
     ])
   })
