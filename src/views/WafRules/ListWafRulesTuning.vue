@@ -284,7 +284,7 @@
     }
 
     try {
-      const [ response, ] = await Promise.allSettled(requestsAllowedRules)
+      const [response] = await Promise.allSettled(requestsAllowedRules)
       showToast(response, 'success')
       filterTuning()
       closeDialog()

@@ -54,7 +54,11 @@ describe('WafRulesService', () => {
     })
     const { sut } = makeSut()
 
-    const result = await sut({ wafId: 4044, query: '?hour_range=48&domains_ids=1705587704', tuningId: 100 })
+    const result = await sut({
+      wafId: 4044,
+      query: '?hour_range=48&domains_ids=1705587704',
+      tuningId: 100
+    })
 
     expect(result).toEqual([
       {

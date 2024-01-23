@@ -388,7 +388,6 @@
     emit('on-load-data', hasData)
   })
 
-
   // to make a filter
 
   watch(selectedItems, (selectedData) => {

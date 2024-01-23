@@ -14,7 +14,7 @@ export const createWafRulesAllowedTuningService = async ({ payload, wafId }) => 
 
 const adapt = (payload) => {
   return {
-	  rule_id: payload.ruleId,
+    rule_id: payload.ruleId,
     match_zones: payload.matchZone,
     reason: payload.reason
   }

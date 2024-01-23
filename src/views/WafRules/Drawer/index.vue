@@ -8,7 +8,6 @@
   import Sidebar from 'primevue/sidebar'
   import Skeleton from 'primevue/skeleton'
 
-
   defineOptions({
     name: 'more-details'
   })
@@ -45,7 +44,6 @@
   const showGoBack = ref(false)
   const possibleAttacks = ref([])
   const selectedAttack = ref(null)
-
 
   const showToast = (severity, summary) => {
     toast.add({
