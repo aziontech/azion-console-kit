@@ -111,7 +111,9 @@
     })
   }
 
-  const openDrawerCreate = () => {
+  const initialPhase = ref('request')
+  const openDrawerCreate = (selectedPhase = 'request') => {
+    initialPhase.value = selectedPhase
     showCreateRulesEngineDrawer.value = true
   }
 
@@ -150,6 +152,7 @@
   >
     <template #formFields>
       <FormFieldsDrawerRulesEngine
+        :initialPhase="initialPhase"
         :edgeApplicationId="props.edgeApplicationId"
         :isEnableApplicationAcceleration="props.isEnableApplicationAcceleration"
         :listEdgeApplicationFunctionsService="props.listEdgeApplicationFunctionsService"

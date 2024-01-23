@@ -25,7 +25,7 @@
       default: ''
     },
     rows: {
-      type: Number,
+      type: [Number, String],
       default: 5
     },
     cols: {

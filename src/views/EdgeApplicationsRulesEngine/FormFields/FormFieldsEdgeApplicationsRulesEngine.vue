@@ -34,6 +34,9 @@
       type: String,
       required: true
     },
+    initialPhase: {
+      type: String,
+    },
     selectedRulesEngineToEdit: {
       type: Object,
       required: false,
@@ -596,6 +599,9 @@
     }
     if (behaviors.value[0]) {
       changeBehaviorType(behaviors.value[0].value.name, 0)
+    }
+    if (props.initialPhase) {
+      phase.value = props.initialPhase
     }
 
     callOptionsServicesAtEdit()
