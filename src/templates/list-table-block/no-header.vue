@@ -111,9 +111,11 @@
           </template>
         </Column>
         <template #empty>
-          <div class="my-4 flex flex-col gap-3 justify-center items-start">
-            <p class="text-md font-normal text-secondary">{{ emptyListMessage }}</p>
-          </div>
+          <slot name="empty">
+            <div class="my-4 flex flex-col gap-3 justify-center items-start">
+              <p class="text-md font-normal text-secondary">{{ emptyListMessage }}</p>
+            </div>
+          </slot>
         </template>
       </DataTable>
 
