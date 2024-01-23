@@ -296,7 +296,7 @@
 
           <div class="text-color-secondary text-sm font-normal">
             Choose which TLS version the application supports. To configure the minimum TLS version,
-            you must enable only HTTP and HTTPS protocols.
+            you must enable HTTP and HTTPS protocols.
           </div>
         </div>
 
