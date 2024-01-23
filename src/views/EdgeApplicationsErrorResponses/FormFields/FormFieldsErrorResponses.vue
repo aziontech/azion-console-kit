@@ -150,8 +150,8 @@
 
 <template>
   <FormHorizontal
-    title="Error Responses List"
-    description="Time to cache error responses before retry request to your origin."
+    title="Error Responses"
+    description="Customize error pages and cache TTL based on the HTTP status code received from the origin."
   >
     <template
       #inputs
@@ -161,7 +161,7 @@
         align="left"
         type="dashed"
       >
-        Then
+        Default Error Response
       </Divider>
       <div class="flex flex-wrap gap-6">
         <div class="flex flex-col w-full sm:max-w-xs gap-2">
@@ -170,7 +170,7 @@
             <i class="pi pi-lock text-color-secondary" />
             <InputText
               class="w-full"
-              value="Any (Default)"
+              value="All"
               type="text"
               :disabled="true"
             />
@@ -181,7 +181,7 @@
             for="default-maximun-ttl-seconds"
             class="text-color text-sm font-medium leading-5"
           >
-            Error Caching TTL*
+            Default Response TTL *
           </label>
           <InputNumber
             :min="0"
@@ -189,6 +189,9 @@
             v-model="statusAnyErrorResponse.value.timeout"
             showButtons
           />
+          <div class="text-color-secondary text-sm font-normal">
+            Set a TTL for all status codes in cache.
+          </div>
         </div>
       </div>
 
@@ -203,7 +206,7 @@
               align="left"
               type="dashed"
             >
-              And
+              Custom Error Response
             </Divider>
             <PrimeButton
               @click="removeErrorResponse(index)"
@@ -221,13 +224,16 @@
                 optionLabel="name"
                 option-value="code"
               />
+              <div class="text-color-secondary text-sm font-normal">
+                Select the HTTP status code to be customized.
+              </div>
             </div>
             <div class="flex flex-col w-full sm:max-w-xs gap-2">
               <label
                 for="maximun-ttl-seconds"
                 class="text-color text-sm font-medium leading-5"
               >
-                Error Caching TTL*
+                Custom Response TTL *
               </label>
               <InputNumber
                 :min="0"
@@ -235,15 +241,18 @@
                 v-model="errorResponse.value.timeout"
                 showButtons
               />
+              <div class="text-color-secondary text-sm font-normal">
+                Set a TTL for the custom response.
+              </div>
             </div>
           </div>
           <div class="flex flex-col sm:max-w-lg w-full gap-2">
             <FieldText
-              label="URL path"
-              placeholder="/example.com/path/error-page.txt"
+              label="Page Path"
+              placeholder="/path/error_page.html"
               :name="`errorResponses[${index}].uri`"
               :value="errorResponse.value.uri"
-              description="Add a path to an error page created in the source."
+              description="Select an origin to append the path to a custom error page."
             />
           </div>
           <div class="flex flex-col w-full sm:max-w-xs gap-2">
@@ -251,7 +260,7 @@
               for="maximun-ttl-seconds"
               class="text-color text-sm font-medium leading-5"
             >
-              Custom status code
+              Response Status Code
             </label>
             <InputNumber
               :min="100"
@@ -259,6 +268,9 @@
               v-model="errorResponse.value.customStatusCode"
               showButtons
             />
+            <div class="text-color-secondary text-sm font-normal">
+              Change the status code sent in the response.
+            </div>
           </div>
         </div>
       </div>
@@ -266,7 +278,7 @@
         <Divider />
         <PrimeButton
           @click="addErrorResponse"
-          label="New Error Response"
+          label="Add Error Response"
           outlined
           icon="pi pi-plus-circle"
         />
@@ -275,7 +287,7 @@
   </FormHorizontal>
   <FormHorizontal
     title="Set Origin"
-    description="Select the origin from which Azion should fetch the error pages."
+    description="Select the origin from which Azion should fetch error pages."
   >
     <template #inputs>
       <div class="flex flex-col w-full sm:max-w-xs gap-2">
