@@ -113,7 +113,7 @@
 <template>
   <FormHorizontal
     title="General"
-    description="Give a unique and easy-to-remember name."
+    description="Give a unique and descriptive name to identify the edge application."
     v-if="handleBlock('general')"
   >
     <template #inputs>
