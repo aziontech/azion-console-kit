@@ -23,11 +23,11 @@
   ])
   const DEVICE_GROUP_CACHE_OPTIONS = ref([
     {
-      label: 'Content does not vary by Query String (Improves Caching)',
+      label: 'Content does not vary by Device Groups (Improves Caching)',
       value: 'ignore'
     },
     {
-      label: 'Content varies by some Query String fields (Whitelist)',
+      label: 'Content varies by some Device Groups fields (Whitelist)',
       value: 'whitelist'
     }
   ])
@@ -47,6 +47,25 @@
     },
     {
       label: 'Content varies by all Query String fields',
+      value: 'all'
+    }
+  ])
+
+  const COOKIES_OPTIONS = ref([
+    {
+      label: 'Content does not vary by Cookies (Improves Caching)',
+      value: 'ignore'
+    },
+    {
+      label: 'Content varies by some Cookies (Whitelist)',
+      value: 'whitelist'
+    },
+    {
+      label: 'Content varies by Cookies, with the exception of a few (Blacklist)',
+      value: 'blacklist'
+    },
+    {
+      label: 'Content varies by all Cookies',
       value: 'all'
     }
   ])
@@ -423,20 +442,20 @@
         <div class="flex flex-col gap-4">
           <div
             class="flex no-wrap gap-2 items-center"
-            v-for="queryStringOption in QUERY_STRING_OPTIONS"
-            :key="queryStringOption.value"
+            v-for="cookiesOption in COOKIES_OPTIONS"
+            :key="cookiesOption.value"
           >
             <RadioButton
               v-model="cacheByCookies"
-              :inputId="queryStringOption.value"
+              :inputId="cookiesOption.value"
               name="cacheByCookies"
-              :value="queryStringOption.value"
+              :value="cookiesOption.value"
             />
             <label
-              :for="queryStringOption.value"
+              :for="cookiesOption.value"
               class="text-color text-sm font-normal leading-tight"
             >
-              {{ queryStringOption.label }}
+              {{ cookiesOption.label }}
             </label>
           </div>
         </div>
