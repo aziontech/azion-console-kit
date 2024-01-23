@@ -459,9 +459,7 @@
       </div>
 
       <div class="flex flex-col w-full sm:max-w-3xl gap-2">
-        <label class="text-color text-sm font-medium leading-5"
-          >Adaptive Delivery</label
-        >
+        <label class="text-color text-sm font-medium leading-5">Adaptive Delivery</label>
         <div class="flex flex-col gap-4">
           <div
             class="flex no-wrap gap-2 items-center"
