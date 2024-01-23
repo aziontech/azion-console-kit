@@ -133,7 +133,7 @@
 
   const listRulesEngineRef = ref(null)
   watch(selectedPhase, () => {
-    listRulesEngineRef.value.loadData({ page: 1 })
+    listRulesEngineRef.value.reload()
   })
 
   const reloadList = () => {
