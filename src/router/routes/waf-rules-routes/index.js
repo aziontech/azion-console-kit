@@ -68,7 +68,8 @@ export const wafRulesRoutes = {
           listNetworkListService: WafRulesService.listNetworkListService,
           listCountriesService: listCountriesService,
           listWafRulesDomainsService: WafRulesService.listWafRulesDomainsService,
-          createWafRulesAllowedTuningService: WafRulesService.createWafRulesAllowedTuningService
+          createWafRulesAllowedTuningService: WafRulesService.createWafRulesAllowedTuningService,
+          listWafRulesTuningAttacksService: WafRulesService.listWafRulesTuningAttacksService
         }
       },
       meta: {

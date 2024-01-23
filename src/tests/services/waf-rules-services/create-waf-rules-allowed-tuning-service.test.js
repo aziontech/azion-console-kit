@@ -5,14 +5,15 @@ import { describe, expect, it, vi } from 'vitest'
 
 const fixtures = {
   wafRulesMock: {
-    allowedRules: [
+    reason: 'Allowed Rules created to allow the attack',
+    matchZone: [
       {
-        match_on: '',
-        match_zones: '',
-        rule_id: ''
+        zone: 'conditional_query_string',
+        zone_input: 'arg',
+        matches_on: 'value'
       }
     ],
-    reason: ''
+    ruleId: '1000'
   }
 }
 
@@ -37,7 +38,8 @@ describe('WafRulesServices', () => {
       url: 'v4/edge/waf/10/allowed_rules',
       method: 'POST',
       body: {
-        allowed_rules: fixtures.wafRulesMock.allowedRules,
+        rule_id: fixtures.wafRulesMock.ruleId,
+        match_zones: fixtures.wafRulesMock.matchZone,
         reason: fixtures.wafRulesMock.reason
       }
     })

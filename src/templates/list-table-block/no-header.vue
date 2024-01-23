@@ -12,11 +12,11 @@
         :paginator="showPagination"
         :rowsPerPageOptions="[10, 20, 50, 100]"
         :rows="MINIMUN_OF_ITEMS_PER_PAGE"
+        @row-click="editItemSelected"
         :globalFilterFields="filterBy"
         :loading="isLoading"
-        v-model:selection="selectedProduct"
+        v-model:selection="selectedItems"
         @rowReorder="onRowReorder"
-        @row-click="editItemSelected"
         :pt="pt"
       >
         <template #header>
@@ -46,6 +46,7 @@
           headerStyle="width: 3rem"
         />
         <Column
+          v-if="showselectionMode"
           selectionMode="multiple"
           headerStyle="width: 3rem"
         ></Column>
@@ -237,6 +238,14 @@
     hasListService: {
       type: Boolean,
       default: false
+    },
+    showselectionMode: {
+      type: Boolean,
+      default: false
+    },
+    cleanSelectData: {
+      type: Boolean,
+      default: false
     }
   })
 
@@ -249,7 +258,7 @@
   const informationForDeletion = ref({})
   const selectedItemData = ref(null)
   const selectedColumns = ref([])
-  const selectedProduct = ref()
+  const selectedItems = ref()
 
   onMounted(() => {
     loadData({ page: 1 })
@@ -379,13 +388,24 @@
     emit('on-load-data', hasData)
   })
 
-  watch(selectedProduct, (selectedData) => {
-    // eslint-disable-next-line no-console
+
+  // to make a filter
+
+  watch(selectedItems, (selectedData) => {
     emit('on-select-data', selectedData)
   })
 
   watch(
     () => props.dataFilted,
     (newValue) => (data.value = newValue)
+  )
+
+  watch(
+    () => props.cleanSelectData,
+    (value) => {
+      if (value) {
+        selectedItems.value = []
+      }
+    }
   )
 </script>

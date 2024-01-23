@@ -13,23 +13,40 @@
     visible: {
       type: Boolean,
       default: false
+    },
+    isLoading: {
+      type: Boolean,
+      default: false
     }
   })
 
   const showDialog = ref(false)
+  const loading = ref(false)
 
   const closeDialog = () => {
     emit('closeDialog')
   }
 
   const handleAllowRule = () => {
+    if (!reason.value) return
     emit('reason', reason.value)
+    loading.value = true
   }
 
   watch(
     () => props.visible,
     (value) => {
       showDialog.value = value
+    }
+  )
+  
+  watch(
+    () => props.isLoading,
+    (value) => {
+      if (value === false) {
+        reason.value = ''
+      }
+      loading.value = value
     }
   )
 </script>
@@ -42,7 +59,7 @@
       modal
       :closable="false"
       :pt="{
-        root: { class: 'p-0 w-[676px]' },
+        root: { class: 'p-0 w-[37.5rem]' },
         header: { class: 'flex p-5 items-center self-stretch border-b border-solid' },
         content: { class: 'p-0 h-full' },
         footer: {
@@ -64,6 +81,7 @@
           the box below:
         </div>
         <TextArea
+          required
           v-model="reason"
           type="text"
           rows="5"
@@ -80,6 +98,7 @@
         <PrimeButton
           severity="secondary"
           label="Allow Rules"
+          :loading="loading"
           @click="handleAllowRule"
         />
       </template>

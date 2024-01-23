@@ -85,6 +85,7 @@
             :listWafRulesDomainsService="props.wafTuning.listWafRulesDomainsService"
             :showActionBar="activeTab === mapTabs.tuning"
             :createWafRulesAllowedTuningService="props.wafTuning.createWafRulesAllowedTuningService"
+            :listWafRulesTuningAttacksService="props.wafTuning.listWafRulesTuningAttacksService"
           />
         </TabPanel>
         <TabPanel header="Allowed Rules">
