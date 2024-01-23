@@ -1,5 +1,5 @@
 import { AxiosHttpClientAdapter } from '@/services/axios/AxiosHttpClientAdapter'
-import { listEdgeFunctionsService } from '@/services/edge-firewall-functions-services'
+import { listEdgeFunctionsService } from '@/services/edge-application-functions-services'
 import { describe, expect, it, vi } from 'vitest'
 
 // Constantes para reutilização

@@ -10,7 +10,7 @@
     title="Instance New"
   >
     <template #formFields>
-      <FormFieldsDrawerFunction :edgeFunctionsList="edgeFunctionsList" />
+      <FormFieldsDrawerFunction :edgeFunctionsList="filteredEdgeFunctions" />
     </template>
   </CreateDrawerBlock>
   <EditDrawerBlock
@@ -26,13 +26,13 @@
     title="Edit Instance"
   >
     <template #formFields>
-      <FormFieldsDrawerFunction :edgeFunctionsList="edgeFunctionsList" />
+      <FormFieldsDrawerFunction :edgeFunctionsList="filteredEdgeFunctions" />
     </template>
   </EditDrawerBlock>
 </template>
 
 <script setup>
-  import { ref, onMounted } from 'vue'
+  import { ref, onMounted, computed } from 'vue'
   import * as yup from 'yup'
   import CreateDrawerBlock from '@templates/create-drawer-block'
   import FormFieldsDrawerFunction from '@/views/EdgeApplicationsFunctions/FormFields/FormFieldsEdgeApplicationsFunctions'
@@ -73,6 +73,7 @@
   const loadEditFunctionDrawer = refDebounced(showEditFunctionDrawer, debouncedDrawerAnimate)
   const selectedFunctionToEdit = ref('')
   const edgeFunctionsList = ref([])
+  const filteredEdgeFunctions = computed(() => edgeFunctionsList.value.filter((element) => element.initiatorType === 'edge_firewall'))
 
   const initialValues = ref({
     id: props.edgeFirewallID,
