@@ -27,7 +27,7 @@
       value: 'ignore'
     },
     {
-      label: 'Content varies by some Device Groups fields (Whitelist)',
+      label: 'Content varies by some Device Groups fields (Allowlist)',
       value: 'whitelist'
     }
   ])
@@ -38,11 +38,11 @@
       value: 'ignore'
     },
     {
-      label: 'Content varies by some Query String fields (Whitelist)',
+      label: 'Content varies by some Query String fields (Allowlist)',
       value: 'whitelist'
     },
     {
-      label: 'Content varies by Query String, except for some fields (Blacklist)',
+      label: 'Content varies by Query String, except for some fields (Blocklist)',
       value: 'blacklist'
     },
     {
@@ -57,11 +57,11 @@
       value: 'ignore'
     },
     {
-      label: 'Content varies by some Cookies (Whitelist)',
+      label: 'Content varies by some Cookies (Allowlist)',
       value: 'whitelist'
     },
     {
-      label: 'Content varies by Cookies, with the exception of a few (Blacklist)',
+      label: 'Content varies by Cookies, with the exception of a few (Blocklist)',
       value: 'blacklist'
     },
     {
@@ -123,7 +123,7 @@
 <template>
   <FormHorizontal
     title="General"
-    description="Edit the cache setting name."
+    description="Create a set of cache configurations to apply to the edge application. Use Rules Engine to activate cache settings."
     :isDrawer="true"
   >
     <template #inputs>

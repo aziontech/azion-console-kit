@@ -615,7 +615,7 @@
   <FormHorizontal
     :isDrawer="true"
     title="General"
-    description="Create a rule set to handle the conditional execution of behaviors through logical operators. Rules are executed in the order they appear."
+    description="Create a rule set to handle the conditional execution of behaviors through logical operators."
   >
     <template #inputs>
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
@@ -674,7 +674,7 @@
   <FormHorizontal
     :isDrawer="true"
     title="Criteria"
-    description="Set the conditions to execute the rule. Select a variable from the list, the operator and, if prompted, enter the comparison string."
+    description="Set the conditions to execute the rule. Add a variable, the comparison operator and, if prompted, an argument."
   >
     <template #inputs>
       <div
@@ -757,7 +757,7 @@
           />
           <PrimeButton
             icon="pi pi-plus-circle"
-            label="OR"
+            label="Or"
             size="small"
             outlined
             @click="addConditionalOr(index)"

@@ -113,7 +113,7 @@
 <template>
   <FormHorizontal
     title="General"
-    description="Give a unique and descriptive name to identify the edge application."
+    description="Create an edge application to deliver your content from the edge."
     v-if="handleBlock('general')"
   >
     <template #inputs>
@@ -123,6 +123,7 @@
           name="name"
           placeholder="My edge application"
           :value="name"
+          description="Give a unique and descriptive name to identify the edge application."
         />
       </div>
     </template>
@@ -767,7 +768,7 @@
 
   <FormHorizontal
     title="Debug Rules"
-    description="Create a log of executed rules created in Rules Engine. Logs can be accessed through Data Streaming, Real-Time Events or Real-Time Events GraphQL API."
+    description="Log executed rules created in Rules Engine. Access logs using Data Streaming, Real-Time Events or Real-Time Events GraphQL API."
     v-if="handleBlock('debug-rules')"
   >
     <template #inputs>

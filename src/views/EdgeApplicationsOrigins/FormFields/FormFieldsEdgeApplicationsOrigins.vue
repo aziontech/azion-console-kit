@@ -143,7 +143,7 @@
   <FormHorizontal
     :isDrawer="true"
     title="General"
-    description="Give a unique and descriptive name to identify the origin."
+    description="Create a origin server configuration for the edge application. Use Rules Engine to activate origins."
   >
     <template #inputs>
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
@@ -152,6 +152,7 @@
           placeholder="My origin"
           name="name"
           :value="name"
+          description="Give a unique and descriptive name to identify the origin."
         />
       </div>
     </template>
