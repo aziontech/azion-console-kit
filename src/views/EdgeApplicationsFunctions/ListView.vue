@@ -21,7 +21,7 @@
       <template #addButton>
         <PrimeButton
           icon="pi pi-plus"
-          label="Edge Function"
+          label="Instance"
           @click="openCreateFunctionDrawer"
         />
       </template>
@@ -39,7 +39,7 @@
       <PrimeButton
         severity="secondary"
         icon="pi pi-plus"
-        label="Function"
+        label="Instance"
         @click="openCreateFunctionDrawer"
       />
     </template>
