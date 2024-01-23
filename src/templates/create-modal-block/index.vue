@@ -162,10 +162,10 @@
           :key="index"
         >
           <PrimeButton
-            :class="{ 'p-selectbutton': menuitem.value === selectedTab, 'p-disabled': isLoading }"
-            class="w-full p-button p-button-text p-button-primary p-button-sm whitespace-nowrap h-[38px] flex"
+            class="w-full whitespace-nowrap h-[38px] flex"
+            text
+            size="small"
             :pt="{
-              root: {class: 'px-3'},
               label: { class: 'w-full text-left' }
             }"
             @click="onTabChange(menuitem)"
