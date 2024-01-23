@@ -206,7 +206,7 @@
       </div>
     </template>
 
-    <template #empty>
+    <template #noRecordsFound>
       <EmptyResultsBlock
         :title="titleEmptyState"
         :description="descriptionEmptyState"

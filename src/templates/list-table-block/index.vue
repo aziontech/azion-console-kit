@@ -115,7 +115,7 @@
         </template>
       </Column>
       <template #empty>
-        <slot name="empty">
+        <slot name="noRecordsFound">
           <div class="my-4 flex flex-col gap-3 justify-center items-start">
             <p class="text-md font-normal text-secondary">{{ emptyListMessage }}</p>
           </div>
