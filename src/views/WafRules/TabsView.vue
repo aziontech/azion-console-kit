@@ -90,12 +90,14 @@
         </TabPanel>
         <TabPanel header="Allowed Rules">
           <ListWafRulesAllowed
+            v-if="activeTab === mapTabs.allowed"
             :listWafRulesAllowedService="props.wafRulesAllowed.listWafRulesAllowedService"
             :deleteWafRulesAllowedService="props.wafRulesAllowed.deleteWafRulesAllowedService"
             :createWafRulesAllowedService="props.wafRulesAllowed.createWafRulesAllowedService"
             :loadWafRulesAllowedService="props.wafRulesAllowed.loadWafRulesAllowedService"
             :editWafRulesAllowedService="props.wafRulesAllowed.editWafRulesAllowedService"
             :documentationServiceAllowed="props.wafRulesAllowed.documentationServiceAllowed"
+            :optionsRuleIds="props.wafRulesAllowed.optionsRuleIds"
           />
         </TabPanel>
       </TabView>

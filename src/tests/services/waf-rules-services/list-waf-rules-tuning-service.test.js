@@ -5,12 +5,12 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 const fixtures = {
   wafRulesMock: {
     hit_count: 10,
-    top_10_ips: ['', '100.100.10'],
+    top_10_ips: [['', '100.100.10']],
     rule_id: 1000,
     ip_count: 8,
     match_zone: 'value',
     path_count: 10,
-    top_10_countries: ['', 'Brazil'],
+    top_10_countries: [['', 'Brazil']],
     matches_on: 'query_string',
     rule_description: 'Possible SQL Injection attack: SQL keywords found in Query String',
     country_count: 10
@@ -59,8 +59,7 @@ describe('WafRulesService', () => {
       {
         hitCount: fixtures.wafRulesMock.hit_count,
         topIps: '100.100.10',
-        id: 0,
-        ruleId: fixtures.wafRulesMock.rule_id,
+        id: fixtures.wafRulesMock.rule_id,
         ruleIdDescription: `${fixtures.wafRulesMock.rule_id} - ${fixtures.wafRulesMock.rule_description}`,
         ipCount: fixtures.wafRulesMock.ip_count,
         matchZone: fixtures.wafRulesMock.match_zone,

@@ -270,7 +270,7 @@
       }
 
       const payload = {
-        ruleId: event.ruleId,
+        ruleId: event.id,
         matchZone: [matchZones],
         reason
       }
@@ -284,13 +284,14 @@
     }
 
     try {
-      const [response] = await Promise.allSettled(requestsAllowedRules)
-      showToast(response, 'success')
+      const [{ value }] = await Promise.allSettled(requestsAllowedRules)
+      showToast(value, 'success')
       filterTuning()
       closeDialog()
       selectedEvents.value = []
       allowedByAttacks.value = []
       cleanSelectData.value = true
+      showDetailsOfAttack.value = false
     } catch (error) {
       showToast(error, 'error')
     } finally {
@@ -300,7 +301,7 @@
 
   const createAllowedByAttack = (value) => {
     openDialog()
-    allowedByAttacks.value = [value]
+    allowedByAttacks.value = value
   }
 
   const filterTuning = async () => {
@@ -321,7 +322,7 @@
 
     return await props.listWafRulesTuningAttacksService({
       wafId: wafRuleId.value,
-      tuningId: tuningSelected.value.ruleId,
+      tuningId: tuningSelected.value.id,
       query
     })
   }

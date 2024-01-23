@@ -56,7 +56,7 @@
     title="Create New"
   >
     <template #formFields>
-      <FormFieldsAllowed></FormFieldsAllowed>
+      <FormFieldsAllowed :optionsRuleIds="props.optionsRuleIds"></FormFieldsAllowed>
     </template>
   </CreateDrawerBlock>
 
@@ -71,7 +71,10 @@
     title="Edit Waf Rules Allowed"
   >
     <template #formFields>
-      <FormFieldsAllowed />
+      <FormFieldsAllowed
+        :disabledRuleId="true"
+        :optionsRuleIds="props.optionsRuleIds"
+      />
     </template>
   </EditDrawerBlock>
 </template>
@@ -119,6 +122,11 @@
     documentationServiceAllowed: {
       required: true,
       type: Function
+    },
+    optionsRuleIds: {
+      required: true,
+      type: Array,
+      default: () => []
     }
   })
 

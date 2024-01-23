@@ -1,5 +1,5 @@
 <script setup>
-  import { ref } from 'vue'
+  import { ref, watch } from 'vue'
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
   import InputSwitch from 'primevue/inputswitch'
   import Dropdown from 'primevue/dropdown'
@@ -13,6 +13,17 @@
   import { useField } from 'vee-validate'
   defineOptions({ name: 'form-fields-waf-rules-allowed' })
 
+  const props = defineProps({
+    optionsRuleIds: {
+      type: Array,
+      required: true,
+      default: () => []
+    },
+    disabledRuleId: {
+      type: Boolean,
+      default: false
+    }
+  })
   const { value: matchZones } = useField('matchZones')
   const { value: path } = useField('path')
   const { value: reason } = useField('reason')
@@ -32,7 +43,9 @@
     { name: 'Request Header', value: 'request_header' }
   ])
 
-  const ruleIdOption = ref([{ name: '0 - All Rules', value: 0 }])
+  const ruleIdOption = ref([])
+
+  ruleIdOption.value = props.optionsRuleIds
 
   const addMatchZones = () => {
     const newArray = matchZones.value
@@ -67,6 +80,10 @@
   const deleteMatchZone = (index) => {
     matchZones.value.splice(index, 1)
   }
+
+  watch(props.getRuleIdOptions, (value) => {
+    ruleIdOption.value = value
+  })
 </script>
 
 <template>
@@ -86,15 +103,15 @@
           id="ruleid"
           v-model="ruleId"
           :options="ruleIdOption"
-          optionLabel="name"
+          optionLabel="text"
           optionValue="value"
           class="w-full"
-          :disabled="true"
+          :disabled="props.disabledRuleId"
         />
       </div>
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
         <FieldText
-          label="Reason *"
+          label="Description *"
           name="reason"
           :value="reason"
           description="Set a suggestive description for this rule."

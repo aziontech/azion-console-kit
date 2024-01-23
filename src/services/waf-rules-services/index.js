@@ -13,6 +13,7 @@ import { listNetworkListService } from './list-network-list-service'
 import { listWafRulesDomainsService } from './list-waf-rules-domain-service'
 import { createWafRulesAllowedTuningService } from './create-waf-rules-allowed-tuning-service'
 import { listWafRulesTuningAttacksService } from './list-waf-rules-tuning-attacks-service'
+import { optionsRuleIds } from './ruleIdOptions'
 export {
   listWafRulesService,
   deleteWafRulesService,
@@ -28,5 +29,6 @@ export {
   listNetworkListService,
   listWafRulesDomainsService,
   createWafRulesAllowedTuningService,
-  listWafRulesTuningAttacksService
+  listWafRulesTuningAttacksService,
+  optionsRuleIds
 }

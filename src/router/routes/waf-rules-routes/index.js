@@ -56,7 +56,8 @@ export const wafRulesRoutes = {
           loadWafRulesAllowedService: WafRulesService.loadWafRulesAllowedService,
           editWafRulesAllowedService: WafRulesService.editWafRulesAllowedService,
           documentationServiceAllowed: Helpers.documentationCatalog.wafAllowed,
-          listWafRulesAllowedService: WafRulesService.listWafRulesAllowedService
+          listWafRulesAllowedService: WafRulesService.listWafRulesAllowedService,
+          optionsRuleIds: WafRulesService.optionsRuleIds
         },
         wafServices: {
           editWafRulesService: WafRulesService.editWafRulesService,

@@ -1,7 +1,7 @@
 <script setup>
   import { computed, onBeforeMount, ref } from 'vue'
   import { useToast } from 'primevue/usetoast'
-  import RadioButton from 'primevue/radiobutton'
+  import CheckboxPrime from 'primevue/checkbox'
   import ActionBarBlock from '@/templates/action-bar-block'
   import Divider from 'primevue/divider'
   import GoBack from '@/templates/action-bar-block/go-back'
@@ -43,7 +43,7 @@
   const loading = ref(false)
   const showGoBack = ref(false)
   const possibleAttacks = ref([])
-  const selectedAttack = ref(null)
+  const selectedAttack = ref([])
 
   const showToast = (severity, summary) => {
     toast.add({
@@ -87,7 +87,7 @@
 
   const checkActiveBorder = (attack) => {
     if (!selectedAttack.value) return false
-    return selectedAttack.value.id === attack.id
+    return selectedAttack.value.find((item) => item.id === attack.id)
   }
   const createAllowed = () => {
     emit('attack-on', selectedAttack.value)
@@ -175,11 +175,10 @@
               :class="{ 'border-orange-500': checkActiveBorder(attack) }"
             >
               <div class="flex w-full gap-2 items-start">
-                <RadioButton
-                  inputId="value"
-                  name="attack"
-                  :value="attack"
+                <CheckboxPrime
                   v-model="selectedAttack"
+                  name="attack.ruleID"
+                  :value="attack"
                 />
                 <div class="flex-col gap-1 w-full">
                   <div
@@ -188,7 +187,7 @@
                   >
                     {{ attack.matchValue }}
                   </div>
-                  <div class="text-color-secondary font-normal mb-3">description</div>
+                  <div class="text-color-secondary font-normal mb-3">Field Description</div>
                   <div class="flex flex-col gap-3">
                     <div class="flex w-full gap-8">
                       <div class="w-1/2 flex justify-between">
@@ -264,10 +263,8 @@
         @onSubmit="createAllowed"
         :inDrawer="true"
         primaryActionLabel="Allow Rules"
-        :submitDisabled="!selectedAttack"
+        :submitDisabled="!selectedAttack.length"
       />
     </div>
   </Sidebar>
 </template>
-<!--         :submitDisabled="disable"
- -->

@@ -1,6 +1,6 @@
 import { AxiosHttpClientAdapter, parseHttpResponse } from '../axios/AxiosHttpClientAdapter'
 import { makeWafRulesAllowedBaseUrl } from './make-waf-rules-allowed-base-url'
-
+import { optionsRuleIds } from './ruleIdOptions'
 export const listWafRulesAllowedService = async ({ wafId }) => {
   let httpResponse = await AxiosHttpClientAdapter.request({
     url: `${makeWafRulesAllowedBaseUrl()}/${wafId}/allowed_rules?page=1&page_size=100`,
@@ -71,10 +71,13 @@ const adapt = (httpResponse) => {
    * like other andpoints.
    */
 
+  
   const isArray = Array.isArray(httpResponse.body.results)
 
   const parsedWafRulesAllowed = isArray
     ? httpResponse.body.results.map((waf) => {
+
+      const ruleId = optionsRuleIds.find(rule => rule.value === waf.rule_id).text
         const parsedAllowed = {
           id: waf.id,
           lastEditor: waf.last_editor,
@@ -84,7 +87,7 @@ const adapt = (httpResponse) => {
           matchZones: parseMatchZone(waf.match_zones),
           path: waf.path,
           reason: waf.reason,
-          ruleId: waf.rule_id === 0 ? '0 - All Rules' : waf.rule_id,
+          ruleId,
           status: parseStatusData(waf.status),
           useRegex: waf.use_regex
         }
