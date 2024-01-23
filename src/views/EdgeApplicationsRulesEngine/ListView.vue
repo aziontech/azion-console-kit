@@ -149,9 +149,17 @@
     drawerRulesEngineRef.value.openDrawerCreate()
   }
 
+  const openCreateRulesEngineDrawerByPhase = () => {
+    parsePhase[selectedPhase.value]
+    drawerRulesEngineRef.value.openDrawerCreate(parsePhase[selectedPhase.value])
+  }
+
   const openEditRulesEngineDrawer = (item) => {
     drawerRulesEngineRef.value.openDrawerEdit(item)
   }
+
+  const titleEmptyState = computed(() => `No ${selectedPhase.value} added`)
+  const descriptionEmptyState = computed(() => `Create your first ${selectedPhase.value}.`)
 </script>
 
 <template>
@@ -198,21 +206,21 @@
       </div>
     </template>
 
-    <template #empty>
+    <template #noRecordsFound>
       <EmptyResultsBlock
-        title="No rules have been created"
-        description="Click the button below to initiate the setup process and create your first rule."
-        createButtonLabel="Add"
+        :title="titleEmptyState"
+        :description="descriptionEmptyState"
+        :createButtonLabel="selectedPhase"
         :documentationService="props.documentationService"
         :inTabs="true"
         :noBorder="true"
       >
         <template #default>
           <PrimeButton
-            @click="openCreateDeviceGroupDrawer"
+            @click="openCreateRulesEngineDrawerByPhase"
             severity="secondary"
             icon="pi pi-plus"
-            label="Add"
+            :label="selectedPhase"
           />
         </template>
         <template #illustration>

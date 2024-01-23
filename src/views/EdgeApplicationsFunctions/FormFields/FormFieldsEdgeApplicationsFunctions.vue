@@ -6,7 +6,7 @@
   import { computed } from 'vue'
   import { useAccountStore } from '@/stores/account'
 
-  defineProps({
+  const props = defineProps({
     edgeFunctionsList: {
       required: true,
       type: Array
@@ -14,6 +14,14 @@
   })
 
   const store = useAccountStore()
+
+  const changeArgs = (target) => {
+    props.edgeFunctionsList.forEach((element) => {
+      if (element.value === target.value) {
+        args.value = element.args
+      }
+    })
+  }
 
   const editorOptions = computed(() => {
     return {
@@ -67,6 +75,7 @@
           :options="edgeFunctionsList"
           optionLabel="label"
           option-value="value"
+          @change="changeArgs"
           :optionDisabled="(option) => option.disabled"
           filter
         />
