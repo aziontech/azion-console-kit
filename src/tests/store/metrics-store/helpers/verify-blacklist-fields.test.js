@@ -30,7 +30,7 @@ describe('VerifyBlackListField', () => {
     expect(!isBlacklisted).toBeTruthy()
   })
 
-  it.each(mockNotBlacklisted)('should validate key is not blacklisted: %s', (key) => {
+  it.each(mockNotBlacklisted)('should validate when key is not blacklisted: %s', (key) => {
     const { sut } = makeSut()
 
     const isNotBlacklisted = sut({ name: key })
