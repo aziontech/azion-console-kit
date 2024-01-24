@@ -44,7 +44,7 @@
       .string()
       .required()
       .label('Name')
-      .test('validName', 'Name should be alphanumeric', function (value) {
+      .test('validName', 'Name must be alphanumeric', function (value) {
         return /^[a-zA-Z0-9]+$/.test(value)
       }),
     userAgent: yup.string().required().label('User Agent')
@@ -126,7 +126,7 @@
     @onSuccess="handleSuccess"
     :showBarGoBack="true"
     @onError="closeDrawerEdit"
-    title="Edit Resource"
+    title="Edit Device Group"
   >
     <template #formFields>
       <FormFieldsDrawerDeviceGroup />

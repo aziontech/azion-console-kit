@@ -1,7 +1,7 @@
 // Custom SelectButton
 .p-selectbutton {
   background: var(--surface-300) !important;
-  padding-inline: 0.75rem !important;
+  padding: 0.3rem;
   border-radius: $borderRadius !important;
 
   .p-button {
@@ -19,7 +19,6 @@
     }
 
     &.p-highlight {
-      padding-inline: 0.75rem !important;
       background: var(--surface-0) !important;
       border-color: none !important;
       font-weight: 600 !important;

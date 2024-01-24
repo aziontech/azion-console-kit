@@ -7,7 +7,7 @@
     :initialValues="initialValues"
     @onSuccess="handleCreateFunction"
     :showBarGoBack="true"
-    title="Instance New"
+    title="Create Instance"
   >
     <template #formFields>
       <FormFieldsDrawerFunction :edgeFunctionsList="filteredEdgeFunctions" />
