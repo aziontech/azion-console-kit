@@ -318,7 +318,7 @@
         <label
           for="status"
           class="text-base"
-          >Status</label
+          >Active</label
         >
       </div>
     </template>
