@@ -275,6 +275,7 @@
         icon="pi pi-plus"
         label="New Match Zone"
         class="sm:w-1/3"
+        outlined
         @click="addMatchZones"
       />
     </template>

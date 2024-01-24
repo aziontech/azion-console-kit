@@ -6,6 +6,7 @@
   import ListWafRulesTuning from '@/views/WafRules/ListWafRulesTuning.vue'
   import TabPanel from 'primevue/tabpanel'
   import TabView from 'primevue/tabview'
+  import { useToast } from 'primevue/usetoast'
 
   import { ref } from 'vue'
   import { useRoute, useRouter } from 'vue-router'
@@ -25,10 +26,24 @@
   }
 
   const route = useRoute()
+  const toast = useToast()
   const router = useRouter()
   const activeTab = ref(0)
   const wafRuleId = ref(route.params.id)
+  const wafName = ref('')
 
+  const getWafDat = async () => {
+    try {
+      const response = await props.wafServices.loadWafRulesService({ id: wafRuleId.value })
+      wafName.value = response.name
+    } catch (error) {
+      toast.add({
+        closable: true,
+        severity: 'error',
+        summary: error
+      })
+    }
+  }
   const getTabFromValue = (selectedTabIndex) => {
     const tabNames = Object.keys(mapTabs)
     const selectedTab = tabNames.find((tabName) => mapTabs[tabName] === selectedTabIndex)
@@ -49,6 +64,7 @@
   }
 
   const renderTabCurrentRouter = async () => {
+    getWafDat()
     const { tab } = route.params
     const defaultTabIndex = 0
     const activeTabIndexByRoute = mapTabs[tab] || defaultTabIndex
@@ -61,7 +77,7 @@
 <template>
   <ContentBlock>
     <template #heading>
-      <PageHeadingBlock pageTitle="Edit WAF Rules" />
+      <PageHeadingBlock :pageTitle="wafName" />
     </template>
     <template #content>
       <TabView
@@ -98,6 +114,7 @@
             :editWafRulesAllowedService="props.wafRulesAllowed.editWafRulesAllowedService"
             :documentationServiceAllowed="props.wafRulesAllowed.documentationServiceAllowed"
             :optionsRuleIds="props.wafRulesAllowed.optionsRuleIds"
+            @handle-go-to-tuning="changeRouteByClickingOnTab"
           />
         </TabPanel>
       </TabView>

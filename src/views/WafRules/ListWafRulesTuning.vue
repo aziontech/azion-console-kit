@@ -47,6 +47,7 @@
         severity="secondary"
         icon="pi pi-plus"
         label="Domain"
+        @click="goToDomain"
       />
     </template>
     <template #illustration>
@@ -94,7 +95,7 @@
   import MultiSelect from 'primevue/multiselect'
 
   import { ref, onMounted, computed } from 'vue'
-  import { useRoute } from 'vue-router'
+  import { useRoute, useRouter } from 'vue-router'
   import { useToast } from 'primevue/usetoast'
 
   const props = defineProps({
@@ -133,6 +134,7 @@
   })
 
   const route = useRoute()
+  const router = useRouter()
   const toast = useToast()
   const selectedDomain = ref([])
   const dataFilted = ref([])
@@ -247,6 +249,10 @@
     getDomainNames()
     tuningSelected.value = tuning
     showDetailsOfAttack.value = true
+  }
+  
+  const goToDomain = () => {
+    router.push({ name: 'list-domains' })
   }
 
   const handleSubmitAllowRules = async (reason) => {

@@ -107,7 +107,7 @@
       root: { class: 'max-w-4xl w-full p-0' },
       header: { class: 'flex justify-between text-xl font-medium px-8' },
       closeButton: { class: 'border surface-border' },
-      content: { class: '[&::-webkit-scrollbar]:hidden p-0 flex flex-col justify-between' }
+      content: { class: '[&::-webkit-scrollbar]:hidden p-0 flex flex-col justify-between overfol' }
     }"
   >
     <template #header>
@@ -176,6 +176,7 @@
               v-if="loading"
               width="100%"
               height="10rem"
+              class="z-0"
             ></Skeleton>
             <div
               class="flex w-full surface-section rounded-md border surface-border p-4 flex-wrap"
@@ -212,7 +213,7 @@
                         </div>
                       </div>
                       <div class="flex justify-between">
-                        <div class="flex flex-col text-color w-1/2 ">
+                        <div class="flex flex-col text-color w-1/2">
                           <span>Top 10 Paths</span>
                         </div>
                         <div class="flex w-1/2 flex-col text-color-secondary">

@@ -32,6 +32,7 @@
       <PrimeButton
         severity="secondary"
         label="Create from Tuning"
+        @click="goToWafRulesTuning"
       >
       </PrimeButton>
       <PrimeButton
@@ -98,6 +99,8 @@
   const showCreateWafRulesAllowedDrawer = ref(false)
   const listAllowedRef = ref('')
 
+  const emit = defineEmits(['update:visible', 'attack-on'])
+
   const props = defineProps({
     listWafRulesAllowedService: {
       type: Function,
@@ -144,7 +147,7 @@
     path: '',
     reason: '',
     ruleId: 0,
-    status: false,
+    status: true,
     useRegex: false
   }
 
@@ -198,6 +201,9 @@
     hasContentToList.value = event
   }
 
+  const goToWafRulesTuning = () => {
+    emit('handle-go-to-tuning', { index: 1 })
+  }
   const handleListWafRulesAllowedService = async () => {
     return await props.listWafRulesAllowedService({ wafId: wafRuleId.value })
   }
