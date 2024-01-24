@@ -192,7 +192,7 @@
     :pt="{
       thead: { class: !hasContentToList && 'hidden' }
     }"
-    emptyListMessage="No rules have been."
+    emptyListMessage="No rules have been found."
   >
     <template #addButton>
       <div class="flex gap-4">
