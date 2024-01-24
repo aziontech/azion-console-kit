@@ -127,26 +127,35 @@
         </div>
         <Divider></Divider>
         <div class="flex w-full gap-8">
-          <div class="w-1/2 flex justify-between">
-            <div class="flex flex-col text-color">
-              <span>Domain</span>
-              <span>Path</span>
-              <span>IP Address</span>
+          <div class="w-1/2 flex flex-col gap-3">
+            <div class="flex justify-between w-full">
+              <span class="w-1/2 text-color">Domain</span>
+              <div class="flex flex-col w-1/2">
+                <span
+                  class="w-full text-color-secondary"
+                  v-for="(domain, index) in props.domains"
+                  :key="index"
+                  >{{ domain }}
+                </span>
+              </div>
             </div>
-            <div class="flex flex-col text-color-secondary">
-              <span>{{ props.domains }}</span>
-              <span></span>
-              <span></span>
+            <div class="flex justify-between w-full">
+              <span class="w-1/2 text-color">Path</span>
+              <span class="w-1/2 text-color-secondary"></span>
+            </div>
+            <div class="flex justify-between w-full">
+              <span class="w-1/2 text-color">IP Address</span>
+              <span class="w-1/2 text-color-secondary"></span>
             </div>
           </div>
-          <div class="w-1/2 flex justify-between">
-            <div class="flex flex-col text-color">
-              <span>Network List</span>
-              <span>Country</span>
+          <div class="w-1/2 flex flex-col gap-3">
+            <div class="flex justify-between w-full">
+              <span class="w-1/2 text-color">Network List</span>
+              <span class="w-1/2 text-color-secondary"></span>
             </div>
-            <div class="flex flex-col text-color-secondary">
-              <span></span>
-              <span></span>
+            <div class="flex justify-between w-full">
+              <span class="w-1/2 text-color">Country</span>
+              <span class="w-1/2 text-color-secondary"></span>
             </div>
           </div>
         </div>
@@ -188,13 +197,13 @@
                     {{ attack.matchValue }}
                   </div>
                   <div class="text-color-secondary font-normal mb-3">Field Description</div>
-                  <div class="flex flex-col gap-3">
-                    <div class="flex w-full gap-8">
-                      <div class="w-1/2 flex justify-between">
-                        <div class="flex flex-col text-color">
+                  <div class="flex gap-8">
+                    <div class="flex w-1/2 flex-col gap-3">
+                      <div class="w-full flex justify-between">
+                        <div class="w-1/2 flex flex-col text-color">
                           <span>Top 10 IPs Address</span>
                         </div>
-                        <div class="flex flex-col text-color-secondary">
+                        <div class="flex w-1/2 flex-col text-color-secondary">
                           <span
                             v-for="(ip, index) in attack.topIps"
                             :key="index"
@@ -202,25 +211,11 @@
                           >
                         </div>
                       </div>
-                      <div class="w-1/2 flex justify-between">
-                        <div class="flex flex-col text-color">
-                          <span>Top 10 Countries</span>
-                        </div>
-                        <div class="flex flex-col text-color-secondary">
-                          <span
-                            v-for="(country, index) in attack.topCountries"
-                            :key="index"
-                            >{{ country }}</span
-                          >
-                        </div>
-                      </div>
-                    </div>
-                    <div class="flex w-full gap-8">
-                      <div class="w-1/2 flex justify-between">
-                        <div class="flex flex-col text-color">
+                      <div class="flex justify-between">
+                        <div class="flex flex-col text-color w-1/2 ">
                           <span>Top 10 Paths</span>
                         </div>
-                        <div class="flex flex-col text-color-secondary">
+                        <div class="flex w-1/2 flex-col text-color-secondary">
                           <span
                             v-for="(path, index) in attack.topPaths"
                             :key="index"
@@ -228,13 +223,27 @@
                           >
                         </div>
                       </div>
-                      <div class="w-1/2 flex justify-between">
-                        <div class="flex flex-col text-color">
+                    </div>
+                    <div class="flex w-1/2 flex-col gap-3">
+                      <div class="w-full flex justify-between">
+                        <div class="flex w-1/2 flex-col text-color">
+                          <span>Top 10 Countries</span>
+                        </div>
+                        <div class="flex w-1/2 flex-col text-color-secondary">
+                          <span
+                            v-for="(country, index) in attack.topCountries"
+                            :key="index"
+                            >{{ country }}</span
+                          >
+                        </div>
+                      </div>
+                      <div class="w-full flex justify-between">
+                        <div class="flex w-1/2 gap-3 flex-col text-color">
                           <span>Hits</span>
                           <span>IPs</span>
                           <span>Countries</span>
                         </div>
-                        <div class="flex flex-col text-color-secondary">
+                        <div class="flex w-1/2 gap-3 flex-col text-color-secondary">
                           <span>{{ attack.hitCount }}</span>
                           <span>{{ attack.ipCount }}</span>
                           <span>{{ attack.countryCount }}</span>

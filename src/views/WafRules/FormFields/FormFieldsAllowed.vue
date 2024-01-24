@@ -107,6 +107,7 @@
           optionValue="value"
           class="w-full"
           :disabled="props.disabledRuleId"
+          :pt="{ panel: { class: '!w-[300px]' } }"
         />
       </div>
       <div class="flex flex-col sm:max-w-lg w-full gap-2">

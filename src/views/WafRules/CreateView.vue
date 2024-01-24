@@ -61,6 +61,7 @@
   })
 
   const initialValues = {
+    name: '',
     crossSiteScriptingSensitivity: 'medium',
     directoryTraversalSensitivity: 'medium',
     evadingTricksSensitivity: 'medium',

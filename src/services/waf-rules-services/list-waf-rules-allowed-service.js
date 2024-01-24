@@ -71,13 +71,11 @@ const adapt = (httpResponse) => {
    * like other andpoints.
    */
 
-  
   const isArray = Array.isArray(httpResponse.body.results)
 
   const parsedWafRulesAllowed = isArray
     ? httpResponse.body.results.map((waf) => {
-
-      const ruleId = optionsRuleIds.find(rule => rule.value === waf.rule_id).text
+        const ruleId = optionsRuleIds.find((rule) => rule.value === waf.rule_id).text
         const parsedAllowed = {
           id: waf.id,
           lastEditor: waf.last_editor,

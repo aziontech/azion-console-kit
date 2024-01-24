@@ -39,11 +39,10 @@ const adapt = (httpResponse) => {
           matchValue: event.match_value
         }
 
-
         return values
       })
     : []
-    
+
   return {
     body: parsedWafRulesTuning,
     statusCode: httpResponse.statusCode

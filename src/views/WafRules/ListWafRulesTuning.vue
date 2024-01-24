@@ -227,7 +227,6 @@
     domainNames.value = domainsOptions.value.options
       .filter((domain) => selectedDomain.value.includes(domain.id))
       .map((domain) => domain.name)
-      .join(',')
   }
 
   const selectedItems = (events) => {
