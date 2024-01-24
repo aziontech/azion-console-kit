@@ -107,7 +107,10 @@
           optionValue="value"
           class="w-full"
           :disabled="props.disabledRuleId"
-          :pt="{ panel: { class: 'sm:!w-[500px]'  }, item: { class: 'whitespace-pre-line my-5 sm:my-3' } }"
+          :pt="{
+            panel: { class: 'sm:!w-[500px]' },
+            item: { class: 'whitespace-pre-line my-5 sm:my-3' }
+          }"
         />
       </div>
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
