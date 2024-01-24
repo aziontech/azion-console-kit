@@ -11,7 +11,7 @@ const fixtures = {
     name: 'function instance name',
     args: {},
     edge_function_id: 321,
-    id: 123
+    id: '123'
   },
   functionInstanceWithVersion: {
     version: 2,
@@ -19,7 +19,7 @@ const fixtures = {
     name: 'function instance version',
     args: {},
     edge_function_id: 321,
-    id: 123
+    id: '123'
   }
 }
 

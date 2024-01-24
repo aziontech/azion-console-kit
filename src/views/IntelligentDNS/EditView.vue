@@ -164,8 +164,8 @@
     }
   }
 
-  const changeRouteByClickingOnTab = (e) => {
-    if (e.index === 0) {
+  const changeRouteByClickingOnTab = (tabEvent) => {
+    if (tabEvent.index === 0) {
       router.push({ name: 'edit-intelligent-dns', params: { id: intelligentDNSID.value } })
     } else {
       router.push({

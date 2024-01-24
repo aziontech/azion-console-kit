@@ -4,17 +4,6 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { localeMock } from '@/tests/utils/localeMock'
 
 const fixtures = {
-  edgeApplicationFunction: {
-    id: 1,
-    name: 'function instance',
-    languageIcon: {},
-    referenceCount: 1,
-    initiatorType: 'edge_functions',
-    lastEditor: 'teste@azion.com',
-    modified: 'data',
-    statusTag: 'teste',
-    version: 2
-  },
   functionsInstance: {
     id: 1,
     name: 'function instance',
@@ -71,14 +60,11 @@ describe('EdgeApplicationFunctionsServices', () => {
 
     expect(result).toEqual([
       {
-        id: 1,
+        id: '1',
         name: { text: 'function instance', tagProps: {} },
-        languageIcon: { content: 'JavaScript', icon: 'javascript' },
-        referenceCount: '2',
-        initiatorType: 'Initiator',
+        functionInstanced: 'AZ firewall',
         lastEditor: 'az editor',
         modified: 'Friday, November 10, 2023',
-        statusTag: { content: 'Active', severity: 'success' },
         version: '1.0.0'
       }
     ])

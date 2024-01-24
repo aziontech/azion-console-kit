@@ -4,7 +4,6 @@
     :edgeApplicationId="props.edgeApplicationId"
     :createFunctionService="props.createFunctionService"
     :listEdgeFunctionsService="props.listEdgeFunctionsService"
-    :loadEdgeFunctionsService="props.loadEdgeFunctionsService"
     :loadFunctionService="props.loadFunctionService"
     :editFunctionService="props.editFunctionService"
     @onSuccess="reloadList"
@@ -22,7 +21,7 @@
       <template #addButton>
         <PrimeButton
           icon="pi pi-plus"
-          label="Edge Function"
+          label="Instance"
           @click="openCreateFunctionDrawer"
         />
       </template>
@@ -40,7 +39,7 @@
       <PrimeButton
         severity="secondary"
         icon="pi pi-plus"
-        label="Function"
+        label="Instance"
         @click="openCreateFunctionDrawer"
       />
     </template>
@@ -53,11 +52,11 @@
 <script setup>
   import Illustration from '@/assets/svg/illustration-layers'
   import EmptyResultsBlock from '@/templates/empty-results-block'
-  import PrimeButton from 'primevue/button'
   import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
   import ListTableBlock from '@/templates/list-table-block/no-header'
-  import DrawerFunction from './Drawer'
+  import PrimeButton from 'primevue/button'
   import { computed, ref } from 'vue'
+  import DrawerFunction from './Drawer'
 
   defineOptions({ name: 'list-edge-applications-functions-tab' })
 
@@ -72,7 +71,7 @@
       required: true,
       type: Function
     },
-    loadEdgeFunctionsService: {
+    documentationService: {
       required: true,
       type: Function
     },
@@ -115,27 +114,12 @@
         }
       },
       {
+        field: 'functionInstanced',
+        header: 'Function Instanced'
+      },
+      {
         field: 'version',
         header: 'Version'
-      },
-      {
-        field: 'referenceCount',
-        header: 'Ref Count'
-      },
-      {
-        field: 'languageIcon',
-        header: 'Language',
-        type: 'component',
-        component: (columnData) => {
-          return columnBuilder({
-            data: columnData,
-            columnAppearance: 'language-icon-with-text'
-          })
-        }
-      },
-      {
-        field: 'initiatorType',
-        header: 'Initiator Type'
       },
       {
         field: 'lastEditor',
@@ -145,17 +129,6 @@
         field: 'modified',
         sortField: 'lastModifiedDate',
         header: 'Last Modified'
-      },
-      {
-        field: 'statusTag',
-        header: 'Status',
-        type: 'component',
-        component: (columnData) => {
-          return columnBuilder({
-            data: columnData,
-            columnAppearance: 'tag'
-          })
-        }
       }
     ]
   })

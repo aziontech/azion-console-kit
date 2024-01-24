@@ -10,11 +10,16 @@
   import { computed, ref, watch } from 'vue'
 
   defineOptions({ name: 'form-fields-edge-firewall' })
+  const emit = defineEmits(['update:loadingDomains'])
 
   const props = defineProps({
     domainsService: {
       type: Function,
       required: true
+    },
+    loadingDomains: {
+      type: Boolean,
+      default: false
     }
   })
 
@@ -23,17 +28,26 @@
   const DDosProtectionUnmetered = true
 
   const { value: name } = useField('name')
-  const { value: domains } = useField('domains')
+  const { value: domains, resetField } = useField('domains')
   const { value: isActive } = useField('isActive')
   const { value: debugRules } = useField('debugRules')
+
   const { value: edgeFunctionsEnabled } = useField('edgeFunctionsEnabled')
   const { value: networkProtectionEnabled } = useField('networkProtectionEnabled')
   const { value: wafEnabled } = useField('wafEnabled')
   const domainsList = ref([PICK_LIST_SKELETON, PICK_LIST_SKELETON])
-  const loading = ref(false)
-  const classLoading = computed(() => (!loading.value ? 'pointer-events-none' : ''))
+
+  const loading = computed({
+    get: () => props.loadingDomains,
+    set: (value) => {
+      emit('update:loadingDomains', value)
+    }
+  })
+
+  const classLoading = computed(() => (loading.value ? 'pointer-events-none' : ''))
 
   const fetchDomains = async () => {
+    loading.value = true
     const responseDomains = await props.domainsService({ pageSize: 1000 })
     const alreadySelectedDomainsIds = domains.value?.map((domain) => domain) || []
 
@@ -43,12 +57,16 @@
     const notSelectedDomains = responseDomains.filter((domain) => !domain.edgeFirewallId) || []
 
     domainsList.value = [notSelectedDomains, alreadySelectedDomains]
-    loading.value = true
-  }
+    loading.value = false
 
-  watch(domainsList, (newValue) => {
-    domains.value = newValue[1]
-  })
+    resetField({
+      value: alreadySelectedDomains
+    })
+
+    watch(domainsList, (newValue) => {
+      domains.value = newValue[1]
+    })
+  }
 
   fetchDomains()
 </script>
@@ -90,7 +108,7 @@
           <template #item="slotProps">
             <div
               class="flex flex-wrap p-2 align-items-center gap-3"
-              v-if="loading"
+              v-if="!loading"
             >
               <div class="flex-1 flex flex-column gap-2">
                 <span class="font-normal">{{ slotProps.item.name }}</span>

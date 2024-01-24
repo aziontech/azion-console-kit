@@ -31,7 +31,7 @@
 
   const selectedGroup = ref(null)
   const setCurrentGroup = () => {
-    selectedGroup.value = metricsGroups.value.find((group) => group.id == props.params?.pageId)
+    selectedGroup.value = metricsGroups.value.find((group) => group.value == props.params.group)
   }
 
   watch(
@@ -58,15 +58,15 @@
   }
 
   const getCurrentProductIdx = () => {
-    const idx = metricsProducts.value.findIndex((product) => product.id == props.params.dashboardId)
+    const idx = metricsProducts.value.findIndex((product) => product.path == props.params.product)
 
     return idx < 0 ? 0 : idx
   }
 
   const setNewParams = () => {
     router.replace({
-      name: 'metrics',
-      params: { pageId: selectedGroup.value.id, dashboardId: selectedProduct.value.id }
+      name: 'real-time-metrics',
+      params: { group: selectedGroup.value.value, product: selectedProduct.value.path }
     })
   }
 

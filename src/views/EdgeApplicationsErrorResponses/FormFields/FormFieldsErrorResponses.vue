@@ -161,7 +161,7 @@
         align="left"
         type="dashed"
       >
-        <b>Then</b>
+        Then
       </Divider>
       <div class="flex flex-wrap gap-6">
         <div class="flex flex-col w-full sm:max-w-xs gap-2">
@@ -203,7 +203,7 @@
               align="left"
               type="dashed"
             >
-              <b>And</b>
+              And
             </Divider>
             <PrimeButton
               @click="removeErrorResponse(index)"
@@ -246,7 +246,7 @@
               description="Add a path to an error page created in the source."
             />
           </div>
-          <div class="flex flex-col sm:max-w-lg w-full gap-2">
+          <div class="flex flex-col w-full sm:max-w-xs gap-2">
             <label
               for="maximun-ttl-seconds"
               class="text-color text-sm font-medium leading-5"
@@ -262,7 +262,7 @@
           </div>
         </div>
       </div>
-      <div class="flex flex-col gap-8 items-start">
+      <div class="flex flex-col gap-8 sm:items-start">
         <Divider />
         <PrimeButton
           @click="addErrorResponse"

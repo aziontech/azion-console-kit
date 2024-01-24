@@ -56,8 +56,8 @@ const adapt = (httpResponse) => {
         email: user.email,
         teams:
           user.teams.length > 1
-            ? user.teams.map((t) => t.name).join(', ')
-            : user.teams.map((t) => t.name),
+            ? user.teams.map((team) => team.name).join(', ')
+            : user.teams.map((team) => team.name),
         mfa: ACTIVE_AS_TAG[user.two_factor_enabled],
         status: ACTIVE_AS_TAG[user.is_active],
         owner: OWNER_AS_TAG[user.is_account_owner]

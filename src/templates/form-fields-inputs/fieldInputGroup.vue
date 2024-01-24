@@ -16,11 +16,23 @@
       type: String,
       default: ''
     },
+    disabled: {
+      type: Boolean,
+      default: false
+    },
+    readonly: {
+      type: Boolean,
+      default: false
+    },
     placeholder: {
       type: String,
       default: ''
     },
     description: {
+      type: String,
+      default: ''
+    },
+    inputClass: {
       type: String,
       default: ''
     }
@@ -45,10 +57,17 @@
     >{{ props.label }}</label
   >
   <div class="p-inputgroup">
+    <div class="p-inputgroup-addon">
+      <slot name="icon"></slot>
+    </div>
+
     <InputText
       :id="name"
       v-model="inputValue"
       :name="name"
+      :readonly="readonly"
+      :disabled="disabled"
+      :class="inputClass"
       type="text"
       :placeholder="props.placeholder"
       @input="handleChange"

@@ -10,7 +10,8 @@ export const fetchMetricsProductsService = async (groupValue) => {
     return {
       id: dashboard.id,
       label: dashboard.label,
-      groupId: dashboard.groupId
+      groupId: dashboard.groupId,
+      path: dashboard.url
     }
   })
 

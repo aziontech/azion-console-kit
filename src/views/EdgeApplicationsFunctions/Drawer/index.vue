@@ -7,10 +7,10 @@
     :initialValues="initialValues"
     @onSuccess="handleCreateFunction"
     :showBarGoBack="true"
-    title="Create Function"
+    title="Instance New"
   >
     <template #formFields>
-      <FormFieldsDrawerFunction :edgeFunctionsList="edgeFunctionsList" />
+      <FormFieldsDrawerFunction :edgeFunctionsList="filteredEdgeFunctions" />
     </template>
   </CreateDrawerBlock>
   <EditDrawerBlock
@@ -23,16 +23,16 @@
     @onSuccess="emit('onSuccess')"
     :showBarGoBack="true"
     @onError="closeDrawerEdit"
-    title="Edit Function"
+    title="Edit Instance"
   >
     <template #formFields>
-      <FormFieldsDrawerFunction :edgeFunctionsList="edgeFunctionsList" />
+      <FormFieldsDrawerFunction :edgeFunctionsList="filteredEdgeFunctions" />
     </template>
   </EditDrawerBlock>
 </template>
 
 <script setup>
-  import { ref, onMounted } from 'vue'
+  import { ref, onMounted, computed } from 'vue'
   import * as yup from 'yup'
   import CreateDrawerBlock from '@templates/create-drawer-block'
   import FormFieldsDrawerFunction from '@/views/EdgeApplicationsFunctions/FormFields/FormFieldsEdgeApplicationsFunctions'
@@ -60,10 +60,6 @@
       type: Function,
       required: true
     },
-    loadEdgeFunctionsService: {
-      type: Function,
-      required: true
-    },
     loadFunctionService: {
       type: Function,
       required: true
@@ -77,6 +73,7 @@
   const loadEditFunctionDrawer = refDebounced(showEditFunctionDrawer, debouncedDrawerAnimate)
   const selectedFunctionToEdit = ref('')
   const edgeFunctionsList = ref([])
+  const filteredEdgeFunctions = computed(() => edgeFunctionsList.value.filter((element) => element.initiatorType === 'edge_application'))
 
   const initialValues = ref({
     id: props.edgeApplicationId,
@@ -114,6 +111,10 @@
     showCreateFunctionDrawer.value = true
   }
 
+  const closeDrawerCreate = () => {
+    showCreateFunctionDrawer.value = false
+  }
+
   const openDrawerEdit = (functionID) => {
     if (functionID) {
       showEditFunctionDrawer.value = true
@@ -126,6 +127,7 @@
   }
 
   const handleCreateFunction = () => {
+    closeDrawerCreate()
     emit('onSuccess')
   }
 

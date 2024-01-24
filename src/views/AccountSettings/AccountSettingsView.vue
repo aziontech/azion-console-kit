@@ -1,9 +1,9 @@
 <script setup>
-  import * as yup from 'yup'
-  import EditFormBlock from '@/templates/edit-form-block'
-  import ContentBlock from '@/templates/content-block'
-  import PageHeadingBlock from '@/templates/page-heading-block'
   import ActionBarBlockWithTeleport from '@/templates/action-bar-block/action-bar-with-teleport'
+  import ContentBlock from '@/templates/content-block'
+  import EditFormBlock from '@/templates/edit-form-block'
+  import PageHeadingBlock from '@/templates/page-heading-block'
+  import * as yup from 'yup'
   import FormFieldsAccountSettings from './FormFields/FormFieldsAccountSettings'
 
   defineProps({
@@ -55,7 +55,7 @@
       <EditFormBlock
         :editService="updateAccountSettingsService"
         :loadService="getAccountSettingsService"
-        updatedRedirect="account-settings"
+        updatedRedirect="home"
         :schema="validationSchema"
       >
         <template #form>

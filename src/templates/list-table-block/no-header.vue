@@ -118,9 +118,11 @@
           </template>
         </Column>
         <template #empty>
-          <div class="my-4 flex flex-col gap-3 justify-center items-start">
-            <p class="text-md font-normal text-secondary">{{ emptyListMessage }}</p>
-          </div>
+          <slot name="noRecordsFound">
+            <div class="my-4 flex flex-col gap-3 justify-center items-start">
+              <p class="text-md font-normal text-secondary">{{ emptyListMessage }}</p>
+            </div>
+          </slot>
         </template>
       </DataTable>
 
@@ -360,7 +362,7 @@
 
   const onRowReorder = async (event) => {
     try {
-      const tableData = getArrayChangedIndexes(data, event.value)
+      const tableData = getArrayChangedIndexes(data.value, event.value)
       await props.onReorderService(tableData)
       data.value = event.value
 

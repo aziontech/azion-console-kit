@@ -309,8 +309,8 @@
         <ul class="text-color-secondary list-inside space-y-3">
           <li
             class="flex gap-3 items-center text-color-secondary"
-            :key="i"
-            v-for="(requirement, i) in passwordRequirementsList"
+            v-for="(requirement, index) in passwordRequirementsList"
+            :key="index"
           >
             <div class="w-3">
               <span

@@ -41,7 +41,7 @@ const getConfig = () => {
           changeOrigin: true,
           rewrite: (path) => path.replace(/^\/metrics\/graphql/, '')
         },
-        '^/api/(account|user|token|switch-account|password|totp)|^/logout': {
+        '^/api/(account|user|token|switch-account|auth|password|totp)|^/logout': {
           target: `${URLStartPrefix}sso.azion.com`,
           changeOrigin: true,
           cookieDomainRewrite: { '*': '' }

@@ -23,6 +23,18 @@
     description: {
       type: String,
       default: ''
+    },
+    disabled: {
+      type: Boolean,
+      default: false
+    },
+    readonly: {
+      type: Boolean,
+      default: false
+    },
+    inputClass: {
+      type: String,
+      default: ''
     }
   })
 
@@ -48,10 +60,13 @@
     :id="name"
     v-model="inputValue"
     :name="name"
+    :readonly="readonly"
+    :disabled="disabled"
     type="text"
     :placeholder="props.placeholder"
     @input="handleChange"
     @blur="handleBlur"
+    :class="inputClass"
   />
   <small
     v-if="errorMessage"

@@ -3,7 +3,7 @@ import { logoutService } from '@/services/auth-services'
 import { useAccountStore } from '@/stores/account'
 import { useLoadingStore } from '@/stores/loading'
 
-export default async function beforeEachRoute(to, _, next) {
+export default async function beforeEachRoute(to, __, next) {
   const accountStore = useAccountStore()
   const loadingStore = useLoadingStore()
 
