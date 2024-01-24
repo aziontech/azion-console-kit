@@ -75,7 +75,11 @@
               v-tooltip.top="{ value: 'Hidden Columns', showDelay: 200 }"
             >
             </PrimeButton>
-            <OverlayPanel ref="columnSelectorPanel">
+            <OverlayPanel ref="columnSelectorPanel"
+              :pt="{
+                content: {class: 'p-0'}
+              }"
+            >
               <Listbox
                 v-model="selectedColumns"
                 multiple
@@ -115,9 +119,11 @@
         </template>
       </Column>
       <template #empty>
-        <div class="my-4 flex flex-col gap-3 justify-center items-start">
-          <p class="text-md font-normal text-secondary">{{ emptyListMessage }}</p>
-        </div>
+        <slot name="noRecordsFound">
+          <div class="my-4 flex flex-col gap-3 justify-center items-start">
+            <p class="text-md font-normal text-secondary">{{ emptyListMessage }}</p>
+          </div>
+        </slot>
       </template>
     </DataTable>
 

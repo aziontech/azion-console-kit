@@ -213,7 +213,7 @@
     @onSuccess="emit('onSuccess')"
     :showBarGoBack="true"
     @onError="closeDrawerEdit"
-    title="Edit Resource"
+    title="Edit Origin"
   >
     <template #formFields="{ disabledFields }">
       <FormFieldsDrawerOrigin

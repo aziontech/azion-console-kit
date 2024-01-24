@@ -1,0 +1,178 @@
+<svg
+xmlns="http://www.w3.org/2000/svg"
+class="svg"
+width="193"
+height="120"
+viewBox="0 0 193 120"
+>
+<!-- Filtro de ruído -->
+<filter
+    id="noise"
+    x="0"
+    y="0"
+    width="100%"
+    height="100%"
+>
+    <feTurbulence
+    type="fractalNoise"
+    baseFrequency="10"
+    result="noisy"
+    />
+    <feComponentTransfer
+    in="noisy"
+    result="alphaAdjusted"
+    >
+    <feFuncA
+        type="table"
+        tableValues="0 0 0 .75 .75 0"
+    />
+    </feComponentTransfer>
+    <feBlend
+    in="SourceGraphic"
+    in2="alphaAdjusted"
+    mode="overlay"
+    />
+</filter>
+
+<!-- Máscara para o efeito -->
+<mask id="maskRect">
+    <rect
+    width="45.981"
+    height="45.93"
+    x="73.633"
+    y="37.19"
+    fill="white"
+    rx="8"
+    />
+</mask>
+
+<path
+    fill="url(#a)"
+    d="M152.434 0h40v120h-40z"
+/>
+<path
+    fill="url(#b)"
+    d="M40.813 4.407h111.62v111.496H40.813z"
+/>
+<rect
+    width="45.981"
+    height="45.93"
+    x="73.633"
+    y="37.19"
+    fill="url(#c)"
+    rx="8"
+/>
+<path
+    fill="url(#d)"
+    d="M0 0h40v120H0z"
+    transform="matrix(-1 0 0 1 40.813 0)"
+/>
+
+<!-- Estilos dos vetores -->
+<defs>
+    <radialGradient
+    id="a"
+    cx="0"
+    cy="0"
+    r="1"
+    gradientTransform="matrix(20 0 0 60.1337 152.434 60)"
+    gradientUnits="userSpaceOnUse"
+    >
+    <stop
+        stop-color="#F3652B"
+        stop-opacity=".1"
+    />
+    <stop
+        offset="1"
+        stop-color="#F3652B"
+        stop-opacity="0"
+    />
+    </radialGradient>
+    <radialGradient
+    id="b"
+    cx="0"
+    cy="0"
+    r="1"
+    gradientTransform="matrix(0 55.7478 -55.8098 0 96.622 60.155)"
+    gradientUnits="userSpaceOnUse"
+    >
+    <stop
+        stop-color="#F3652B"
+        stop-opacity=".5"
+    />
+    <stop
+        offset=".28"
+        stop-color="#F3652B"
+        stop-opacity=".25"
+    />
+    <stop
+        offset="1"
+        stop-color="#F3652B"
+        stop-opacity="0"
+    />
+    </radialGradient>
+    <radialGradient
+    id="d"
+    cx="0"
+    cy="0"
+    r="1"
+    gradientTransform="matrix(20 0 0 60.1337 0 60)"
+    gradientUnits="userSpaceOnUse"
+    >
+    <stop
+        stop-color="#F3652B"
+        stop-opacity=".1"
+    />
+    <stop
+        offset="1"
+        stop-color="#F3652B"
+        stop-opacity="0"
+    />
+    </radialGradient>
+    <linearGradient
+    id="c"
+    x1="73.633"
+    x2="119.563"
+    y1="37.19"
+    y2="83.171"
+    gradientUnits="userSpaceOnUse"
+    >
+    <stop stop-color="#F7A380" />
+    <stop
+        offset=".28"
+        stop-color="#F68D5F"
+    />
+    <stop
+        offset=".5"
+        stop-color="#F57339"
+    />
+    <stop
+        offset=".5"
+        stop-color="#F57339"
+    />
+    <stop
+        offset=".72"
+        stop-color="#F68D5F"
+    />
+    <stop
+        offset="1"
+        stop-color="#F7A380"
+    />
+    </linearGradient>
+</defs>
+
+<!-- Aplicando o filtro de ruído no grupo <g> usando a máscara -->
+<g
+    filter="url(#noise)"
+    mask="url(#maskRect)"
+>
+    <rect
+    width="45.981"
+    height="45.93"
+    x="73.633"
+    y="37.19"
+    fill="url(#c)"
+    rx="8"
+    />
+</g>
+</svg>

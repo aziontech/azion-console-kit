@@ -62,7 +62,7 @@
     id: props.edgeApplicationId,
     name: '',
     description: '',
-    phase: 'response',
+    phase: 'request',
     criteria: [
       [
         {
@@ -79,7 +79,7 @@
         target: {}
       }
     ],
-    isActive: false
+    isActive: true
   })
 
   const validationSchema = yup.object({
@@ -111,7 +111,9 @@
     })
   }
 
-  const openDrawerCreate = () => {
+  const initialPhase = ref('request')
+  const openDrawerCreate = (selectedPhase = 'request') => {
+    initialPhase.value = selectedPhase
     showCreateRulesEngineDrawer.value = true
   }
 
@@ -146,10 +148,11 @@
     :initialValues="initialValues"
     @onSuccess="handleCreateRulesEngine"
     :showBarGoBack="true"
-    title="Create Rules Engine"
+    title="Create Rule"
   >
     <template #formFields>
       <FormFieldsDrawerRulesEngine
+        :initialPhase="initialPhase"
         :edgeApplicationId="props.edgeApplicationId"
         :isEnableApplicationAcceleration="props.isEnableApplicationAcceleration"
         :listEdgeApplicationFunctionsService="props.listEdgeApplicationFunctionsService"
@@ -169,7 +172,7 @@
     @onSuccess="emit('onSuccess')"
     :showBarGoBack="true"
     @onError="closeDrawerEdit"
-    title="Edit Rules Engine"
+    title="Edit Rule"
   >
     <template #formFields>
       <FormFieldsDrawerRulesEngine

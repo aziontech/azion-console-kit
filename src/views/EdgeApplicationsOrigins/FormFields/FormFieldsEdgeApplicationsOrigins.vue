@@ -143,13 +143,13 @@
   <FormHorizontal
     :isDrawer="true"
     title="General"
-    description="Edit the origin main settings."
+    description="Create a origin server configuration for the edge application. Use Rules Engine to activate origins."
   >
     <template #inputs>
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
         <FieldText
           label="Name *"
-          placeholder="Insert the Origin Name"
+          placeholder="My origin"
           name="name"
           :value="name"
           description="Give a unique and descriptive name to identify the origin."
@@ -161,7 +161,7 @@
   <FormHorizontal
     :isDrawer="true"
     title="Origin Key"
-    description="Save the origin to visualize the Key attributed by Azion to this configuration."
+    description="Save the origin to visualize the key attributed by Azion to this configuration."
   >
     <template #inputs>
       <div
@@ -248,7 +248,7 @@
           </div>
         </div>
         <small class="text-color-secondary text-xs font-normal leading-5">
-          Select the type of connection between the edge nodes and the origin.
+          Select the protocol usage between the edge nodes and the origin.
         </small>
       </div>
       <div
@@ -277,16 +277,16 @@
           placeholder="example.com"
           :name="`addresses[0].address`"
           :value="addresses[0].value.address"
-          description="Define an origin for the content, in FQDN format or an IPv4/IPv6 address."
+          description="Define an origin for the content in FQDN format or an IPv4/IPv6 address."
         />
       </div>
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
         <FieldText
           label="Host Header *"
-          placeholder="${host_example}"
+          placeholder="${host}"
           name="hostHeader"
           :value="hostHeader"
-          description="Allow the origin to identify the virtualhost and locate the content or application. If this is blank, Azion will use the Address as the default."
+          description="Identify a virtualhost sent in the Host header to the origin."
         />
       </div>
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
@@ -493,7 +493,7 @@
   <FormHorizontal
     :isDrawer="true"
     title="Timeouts"
-    description="The timeout settings are pre-defined by Azion and can’t be customized."
+    description="Timeout settings are pre-defined by Azion and can’t be customized."
   >
     <template #inputs>
       <div class="w-full flex max-sm:flex-col gap-8 max-md:gap-6">

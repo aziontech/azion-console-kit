@@ -22,7 +22,8 @@ const adapt = (httpResponse) => {
     return {
       value: edgeFunction.id,
       label: edgeFunction.name,
-      args: edgeFunction.code
+      args: edgeFunction.json_args,
+      initiatorType: edgeFunction.initiator_type,
     }
   })
 

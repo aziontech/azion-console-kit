@@ -1,8 +1,7 @@
 <template>
   <img
-    width="292"
-    height="164"
-    src="../illustration-min.png"
+    src="./empty.svg"
+    class="mb-5"
   />
 </template>
 
