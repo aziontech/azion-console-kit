@@ -156,7 +156,7 @@
 <template>
   <div class="overflow-auto w-full h-full flex flex-col sm:flex-row p-0 sm:pl-5 sm:pr-8 gap-4 pb-4">
     <div class="sm:min-w-[240px] mt-4">
-      <ul class="flex flex-col gap-1 md:fixed md:w-[216px]">
+      <ul class="flex flex-col gap-1 md:fixed md:w-60">
         <li
           v-for="(menuitem, index) in items"
           :key="index"
