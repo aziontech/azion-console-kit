@@ -27,7 +27,7 @@
       value: 'ignore'
     },
     {
-      label: 'Content varies by some Device Groups fields (Allowlist)',
+      label: 'Content varies by some Device Groups (Allowlist)',
       value: 'whitelist'
     }
   ])
