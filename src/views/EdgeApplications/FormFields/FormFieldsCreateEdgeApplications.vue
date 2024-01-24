@@ -215,7 +215,7 @@
                 value="http,https"
               />
               <div class="flex-col gap-1">
-                <div class="text-color text-sm font-normal">HTTP, HTTPS and HTTP/3 support</div>
+                <div class="text-color text-sm font-normal">HTTP, HTTPS, and HTTP/3 support</div>
                 <div class="self-stretch text-color-secondary text-sm font-normal">
                   Use both the HTTP and HTTPS protocols between the edge and users and enable HTTP/3
                   support.

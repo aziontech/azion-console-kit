@@ -20,6 +20,7 @@
           label="Name *"
           name="name"
           :value="name"
+          placeholder="My device group"
           description="Give a unique and descriptive name to identify the device group."
         />
       </div>

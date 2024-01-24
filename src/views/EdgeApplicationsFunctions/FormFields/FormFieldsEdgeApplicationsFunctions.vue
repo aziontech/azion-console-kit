@@ -53,6 +53,7 @@
           name="name"
           v-model="name"
           description="Give a unique and descriptive name to the function you want to instantiate."
+          placeholder="My function instance"
         />
       </div>
     </template>

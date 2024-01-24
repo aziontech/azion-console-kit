@@ -340,7 +340,7 @@
         <label
           for="queryStringFields"
           class="text-color text-sm font-medium"
-          >Query string fields *</label
+          >Query String Fields *</label
         >
         <TextArea
           id="queryStringFields"
@@ -462,7 +462,7 @@
         <label
           for="cookieNames"
           class="text-color text-sm font-medium"
-          >Cookie names *</label
+          >Cookie Names *</label
         >
         <TextArea
           id="cookieNames"
@@ -504,7 +504,7 @@
         v-if="showDeviceGroupFields"
         class="flex flex-col w-full sm:max-w-3xl gap-2"
       >
-        <label class="text-color text-sm font-medium leading-5">Device group ID</label>
+        <label class="text-color text-sm font-medium leading-5">Device Group ID</label>
         <div class="flex flex-col gap-2 max-w-lg">
           <div
             v-for="(deviceGroupItem, index) in deviceGroup"
