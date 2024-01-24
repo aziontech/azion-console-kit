@@ -133,7 +133,7 @@
 
   const listRulesEngineRef = ref(null)
   watch(selectedPhase, () => {
-    listRulesEngineRef.value.loadData({ page: 1 })
+    listRulesEngineRef.value.reload()
   })
 
   const reloadList = () => {
@@ -149,9 +149,20 @@
     drawerRulesEngineRef.value.openDrawerCreate()
   }
 
+  const openCreateRulesEngineDrawerByPhase = () => {
+    parsePhase[selectedPhase.value]
+    drawerRulesEngineRef.value.openDrawerCreate(parsePhase[selectedPhase.value])
+  }
+
   const openEditRulesEngineDrawer = (item) => {
     drawerRulesEngineRef.value.openDrawerEdit(item)
   }
+
+  const titleEmptyState = computed(() => `No rule in the ${selectedPhase.value} has been created`)
+  const descriptionEmptyState = computed(
+    () =>
+      `Click the button below to initiate the setup process and create your first ${selectedPhase.value} rule.`
+  )
 </script>
 
 <template>
@@ -181,7 +192,7 @@
     :pt="{
       thead: { class: !hasContentToList && 'hidden' }
     }"
-    emptyListMessage="No Rules Engine found."
+    emptyListMessage="No rules have been created."
   >
     <template #addButton>
       <div class="flex gap-4">
@@ -198,21 +209,21 @@
       </div>
     </template>
 
-    <template #empty>
+    <template #noRecordsFound>
       <EmptyResultsBlock
-        title="No Rules Engine added"
-        description="Create your first Rule Engine."
-        createButtonLabel="Add"
+        :title="titleEmptyState"
+        :description="descriptionEmptyState"
+        :createButtonLabel="selectedPhase"
         :documentationService="props.documentationService"
         :inTabs="true"
         :noBorder="true"
       >
         <template #default>
           <PrimeButton
-            @click="openCreateDeviceGroupDrawer"
+            @click="openCreateRulesEngineDrawerByPhase"
             severity="secondary"
             icon="pi pi-plus"
-            label="Add"
+            label="Add Rule"
           />
         </template>
         <template #illustration>

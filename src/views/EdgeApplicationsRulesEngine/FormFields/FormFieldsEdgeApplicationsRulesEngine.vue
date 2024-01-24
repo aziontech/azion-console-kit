@@ -2,12 +2,14 @@
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
   import { useField, useFieldArray } from 'vee-validate'
   import FieldText from '@/templates/form-fields-inputs/fieldText'
-  import FieldInputGroup from '@/templates/form-fields-inputs/fieldInputGroup'
+  import FieldTextArea from '@/templates/form-fields-inputs/fieldTextArea'
   import FieldDropdown from '@/templates/form-fields-inputs/fieldDropdown'
   import PrimeRadio from 'primevue/radiobutton'
   import PrimeButton from 'primevue/button'
+  import PrimeMenu from 'primevue/menu'
   import InputSwitch from 'primevue/inputswitch'
   import Divider from 'primevue/divider'
+  import AutoComplete from 'primevue/autocomplete'
   import { computed, ref, onMounted } from 'vue'
   import { useToast } from 'primevue/usetoast'
 
@@ -31,6 +33,9 @@
     edgeApplicationId: {
       type: String,
       required: true
+    },
+    initialPhase: {
+      type: String
     },
     selectedRulesEngineToEdit: {
       type: Object,
@@ -123,7 +128,7 @@
   ])
 
   const { value: name } = useField('name')
-  const { push: pushCriteria, fields: criteria } = useFieldArray('criteria')
+  const { push: pushCriteria, remove: removeCriteria, fields: criteria } = useFieldArray('criteria')
   const {
     push: pushBehavior,
     remove: removeBehavior,
@@ -136,12 +141,14 @@
 
   const phasesList = [
     {
-      label: 'Response Phase',
-      value: 'response'
+      label: 'Request Phase',
+      value: 'request',
+      description: 'Configure the requests made to the edge.'
     },
     {
-      label: 'Request Phase',
-      value: 'request'
+      label: 'Response Phase',
+      value: 'response',
+      description: 'Configure the responses delivered to end-users.'
     }
   ]
 
@@ -168,6 +175,88 @@
     target: {}
   }
 
+  const conditionalMenuRef = ref({})
+  const criteriaMenuRef = ref({})
+
+  /**
+   * Remove a specific conditional from the criteria array.
+   * @param {number} criteriaIndex - The index of the criteria from which the conditional will be removed.
+   * @param {number} conditionalIndex - The index of the conditional to be removed.
+   */
+  const removeConditional = (criteriaIndex, conditionalIndex) => {
+    criteria.value[criteriaIndex].value.splice(conditionalIndex, 1)
+  }
+
+  /**
+   * Toggle the visibility of the conditional menu.
+   * @param {Event} event - The event that triggered the function.
+   * @param {number} index - The index of the criteria.
+   * @param {number} conditionalIndex - The index of the conditional.
+   */
+  const toggleConditionalMenu = (event, index, conditionalIndex) => {
+    conditionalMenuRef.value[`${index}${conditionalIndex}`].toggle(event)
+  }
+
+  /**
+   * Toggle the visibility of the criteria menu.
+   * @param {Event} event - The event that triggered the function.
+   * @param {number} index - The index of the criteria.
+   */
+  const toggleCriteriaMenu = (event, index) => {
+    criteriaMenuRef.value[index].toggle(event)
+  }
+
+  /**
+   * Generate the options for the criteria menu.
+   * @param {number} criteriaIndex - The index of the criteria.
+   * @param {number} [conditionalIndex=null] - The index of the conditional.
+   * @returns {Array} An array of options for the criteria menu.
+   */
+  const criteriaMenuOptions = (criteriaIndex, conditionalIndex = null) => {
+    return [
+      {
+        label: 'Delete',
+        icon: 'pi pi-fw pi-trash',
+        severity: 'error',
+        command: () => {
+          if (conditionalIndex === null) {
+            removeCriteria(criteriaIndex)
+          } else {
+            removeConditional(criteriaIndex, conditionalIndex)
+          }
+        }
+      }
+    ]
+  }
+
+  const behaviorsMenuRef = ref({})
+
+  /**
+   * Toggle the visibility of the behavior menu.
+   * @param {Event} event - The event that triggered the function.
+   * @param {number} index - The index of the behavior.
+   */
+  const toggleBehaviorMenu = (event, index) => {
+    behaviorsMenuRef.value[index].toggle(event)
+  }
+
+  /**
+   * Generate the options for the behavior menu.
+   * @param {number} index - The index of the behavior.
+   * @returns {Array} An array of options for the behavior menu.
+   */
+  const behaviorMenuOptions = (index) => {
+    return [
+      {
+        label: 'Delete',
+        icon: 'pi pi-fw pi-trash',
+        severity: 'error',
+        command: () => {
+          removeBehavior(index)
+        }
+      }
+    ]
+  }
   /**
    * Adds a conditional AND operator to the criteria at the specified index.
    * @param {number} index - The index of the criteria to add the operator to.
@@ -430,12 +519,91 @@
     }
   }
 
+  const variableAutocompleteOptions = ref([
+    '${arg_}',
+    '${args}',
+    '${cookie_}',
+    '${da_}',
+    '${device_group}',
+    '${domain}',
+    '${geoip_city_continent_code}',
+    '${geoip_city_country_code}',
+    '${geoip_city_country_name}',
+    '${geoip_city}',
+    '${geoip_continent_code}',
+    '${geoip_country_code}',
+    '${geoip_country_name}',
+    '${geoip_region_name}',
+    '${geoip_region}',
+    '${host}',
+    '${http_}',
+    '${remote_addr}',
+    '${remote_port}',
+    '${remote_user}',
+    '${request_body}',
+    '${request_method}',
+    '${request_uri}',
+    '${request}',
+    '${scheme}',
+    '${server_port}',
+    '${uri}'
+  ])
+
+  const variableItems = ref([])
+
+  /**
+   * Filters the variable autocomplete options based on the user's query.
+   * @param {Object} event - The event object containing the user's query.
+   * @param {string} event.query - The user's query.
+   */
+  const searchVariableOption = (event) => {
+    variableItems.value = variableAutocompleteOptions.value.filter((item) =>
+      item.includes(event.query)
+    )
+  }
+
+  /**
+   * Capitalizes the first letter of a string.
+   * @param {string | undefined} string - The string to capitalize.
+   * @returns {string} The capitalized string.
+   */
+  const capitalizeConditional = (string) => {
+    if (string) {
+      return string.charAt(0).toUpperCase() + string.slice(1)
+    }
+    return ''
+  }
+
+  /**
+   * Gets the label for the behavior item.
+   * @param {Object} behaviorItem - The behavior item.
+   * @param {Boolean} behaviorItem.isFirst - The behavior boolean isFirst.
+   * @returns {string} The label for the behavior item.
+   */
+  const getBehaviorLabel = (behaviorItem) => {
+    return behaviorItem.isFirst ? 'Then' : 'And'
+  }
+
+  /**
+  /**
+   * Checks if a criterion can be deleted.
+   * @param {number} index - The index of the criterion.
+   * @returns {boolean} True if the criterion can be deleted, false otherwise.
+   */
+  const isNotFirstCriteria = (index) => {
+    return criteria.value.length > 1 && index < criteria.value.length - 1
+  }
+
   onMounted(() => {
     if (props.isEnableApplicationAcceleration) {
       updateBehaviorsOptionsRequires()
+      criteria.value[0].value[0].variable = ''
     }
     if (behaviors.value[0]) {
       changeBehaviorType(behaviors.value[0].value.name, 0)
+    }
+    if (props.initialPhase) {
+      phase.value = props.initialPhase
     }
 
     callOptionsServicesAtEdit()
@@ -454,16 +622,19 @@
         <FieldText
           label="Name *"
           name="name"
+          placeholder="My rule"
           :value="name"
           description="Give a unique and descriptive name to identify the rule."
         />
       </div>
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
-        <FieldText
+        <FieldTextArea
           label="Description *"
+          :autoResize="true"
+          rows="1"
           name="description"
           :value="description"
-          description="Add a short text that describes the rule to remember what it's used for or write another type of comment."
+          description="Add a short description or comment to the rule."
         />
       </div>
     </template>
@@ -471,8 +642,8 @@
 
   <FormHorizontal
     :isDrawer="true"
-    title="Rule Type"
-    description="Description"
+    title="Phase"
+    description="Select the phase of the execution of the rule."
   >
     <template #inputs>
       <div class="flex flex-col gap-2">
@@ -487,7 +658,7 @@
           >
             <label class="font-medium">
               {{ item.label }}
-              <div class="text-color-secondary text-sm font-normal">Description</div>
+              <div class="text-color-secondary text-sm font-normal">{{ item.description }}</div>
             </label>
 
             <PrimeRadio
@@ -503,11 +674,11 @@
   <FormHorizontal
     :isDrawer="true"
     title="Criteria"
-    description="Set the conditions to execute the rule. Select a variable from the list, the operator and, if prompted, enter the comparison string."
+    description="Set the conditions to execute the rule. Add a variable, the comparison operator and, if prompted, an argument."
   >
     <template #inputs>
       <div
-        class="flex flex-col gap-2"
+        class="flex flex-col"
         v-for="(criteriaItem, index) in criteria"
         :key="index"
       >
@@ -515,25 +686,46 @@
           v-for="(item, itemIndex) in criteriaItem.value"
           :key="itemIndex"
         >
-          <Divider
-            align="left"
-            type="dashed"
-          >
-            <b>{{ item.conditional }}</b>
-          </Divider>
+          <div class="flex items-center gap-2">
+            <Divider
+              align="left"
+              type="dashed"
+            >
+              {{ capitalizeConditional(item.conditional) }}
+            </Divider>
+
+            <PrimeButton
+              v-if="itemIndex !== 0"
+              icon="pi pi-ellipsis-h"
+              size="small"
+              outlined
+              @click="(event) => toggleConditionalMenu(event, index, itemIndex)"
+            />
+            <PrimeMenu
+              :ref="(el) => (conditionalMenuRef[`${index}${itemIndex}`] = el)"
+              id="drawer_overlay_menu"
+              :model="criteriaMenuOptions(index, itemIndex)"
+              :popup="true"
+            />
+          </div>
 
           <div class="flex gap-2 mt-6 mb-8">
-            <FieldInputGroup
-              :name="`criteria[${index}][${itemIndex}].variable`"
-              :value="criteria[index].value[itemIndex].variable"
-              :readonly="!props.isEnableApplicationAcceleration"
-              placeholder="{uri}"
-              inputClass="w-full"
-            >
-              <template #icon>
-                <i class="pi pi-user"></i>
-              </template>
-            </FieldInputGroup>
+            <div class="p-inputgroup">
+              <div
+                class="p-inputgroup-addon"
+                :class="{ 'opacity-20': !props.isEnableApplicationAcceleration }"
+              >
+                <i class="pi pi-dollar"></i>
+              </div>
+              <AutoComplete
+                :id="`criteria[${index}][${itemIndex}].variable`"
+                v-model="criteria[index].value[itemIndex].variable"
+                :suggestions="variableItems"
+                @complete="searchVariableOption"
+                :disabled="!props.isEnableApplicationAcceleration"
+                :completeOnFocus="true"
+              />
+            </div>
 
             <FieldDropdown
               :options="criteriaOperatorOptions"
@@ -565,21 +757,38 @@
           />
           <PrimeButton
             icon="pi pi-plus-circle"
-            label="OR"
+            label="Or"
             size="small"
             outlined
             @click="addConditionalOr(index)"
           />
         </div>
-        <Divider
-          type="solid"
+
+        <div
           v-if="props.isEnableApplicationAcceleration"
-        />
+          class="flex items-center gap-2"
+        >
+          <Divider type="solid" />
+
+          <PrimeButton
+            v-if="isNotFirstCriteria(index)"
+            icon="pi pi-ellipsis-h"
+            size="small"
+            outlined
+            @click="(event) => toggleCriteriaMenu(event, index + 1)"
+          />
+          <PrimeMenu
+            :ref="(el) => (criteriaMenuRef[index + 1] = el)"
+            id="drawer_overlay_menu"
+            :model="criteriaMenuOptions(index + 1)"
+            :popup="true"
+          />
+        </div>
       </div>
       <div v-if="props.isEnableApplicationAcceleration">
         <PrimeButton
           icon="pi pi-plus-circle"
-          label="New Criteria"
+          label="Add Criteria"
           size="small"
           outlined
           @click="addNewCriteria"
@@ -591,7 +800,7 @@
   <FormHorizontal
     :isDrawer="true"
     title="Behaviors"
-    description="Set the behaviors you want your rule to perform if the conditions defined in the criteria are met. Select a behavior and all required information. Some actions can't be used together or in some conditions."
+    description="Set the behaviors you want your rule to perform if the conditions defined in the criteria are met. Select a behavior and fill in all required information. Some behaviors can't be added together or in some conditions."
   >
     <template #inputs>
       <div
@@ -599,12 +808,29 @@
         v-for="(behaviorItem, index) in behaviors"
         :key="behaviorItem.key"
       >
-        <Divider
-          align="left"
-          type="dashed"
-        >
-          {{ behaviorItem.isFirst ? 'Then' : 'And' }}
-        </Divider>
+        <div class="flex items-center gap-2">
+          <Divider
+            align="left"
+            type="dashed"
+          >
+            {{ getBehaviorLabel(behaviorItem) }}
+          </Divider>
+
+          <PrimeButton
+            v-if="index !== 0"
+            icon="pi pi-ellipsis-h"
+            size="small"
+            outlined
+            @click="(event) => toggleBehaviorMenu(event, index)"
+          />
+
+          <PrimeMenu
+            :ref="(el) => (behaviorsMenuRef[index] = el)"
+            id="drawer_behavior_overlay_menu"
+            :model="behaviorMenuOptions(index)"
+            :popup="true"
+          />
+        </div>
 
         <div class="flex gap-2 mt-6 mb-8">
           <div class="w-1/2">
@@ -700,7 +926,7 @@
         <div>
           <PrimeButton
             icon="pi pi-plus-circle"
-            label="New Behaviors"
+            label="Add Behavior"
             size="small"
             outlined
             @click="addNewBehavior"

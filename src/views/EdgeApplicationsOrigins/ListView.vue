@@ -152,8 +152,8 @@
   </div>
   <EmptyResultsBlock
     v-else
-    title="No Origin has been created"
-    description="Create your first Origin."
+    title="No origins have been created"
+    description="Click the button below to initiate the setup process and create your first origin."
     createButtonLabel="Add"
     :documentationService="props.documentationService"
     :inTabs="true"
