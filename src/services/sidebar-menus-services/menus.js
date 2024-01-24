@@ -16,17 +16,16 @@ export const menus = [
   },
   {
     label: 'Build',
-    icon: 'pi pi-code',
     items: [
       {
         label: 'Edge Application',
-        icon: 'pi pi-box',
+        icon: 'pi pi-th-large',
         to: '/edge-applications'
       },
       {
         label: 'Variables',
         to: '/variables',
-        icon: 'pi pi-sliders-h'
+        icon: 'pi pi-box'
       }
     ]
   },
@@ -35,14 +34,14 @@ export const menus = [
     icon: 'pi pi-lock',
     items: [
       {
-        label: 'Intelligent DNS',
-        to: '/intelligent-dns',
-        icon: 'pi pi-share-alt'
-      },
-      {
         label: 'Edge Firewall',
         to: '/edge-firewall',
-        icon: 'pi pi-lock'
+        icon: 'pi pi-shield'
+      },
+      {
+        label: 'Intelligent DNS',
+        to: '/intelligent-dns',
+        icon: 'pi pi-sitemap'
       }
     ]
   },
@@ -65,6 +64,11 @@ export const menus = [
         icon: 'pi pi-play'
       },
       {
+        label: 'Edge Pulse',
+        to: '/edge-pulse',
+        icon: 'pi pi-wifi'
+      },
+      {
         label: 'Real-Time Metrics',
         to: '/real-time-metrics',
         icon: 'pi pi-chart-line'
@@ -72,13 +76,8 @@ export const menus = [
       {
         label: 'Real-Time Events',
         to: '/real-time-events',
-        icon: 'pi pi-server',
+        icon: 'pi pi-chart-bar',
         tag: 'Preview'
-      },
-      {
-        label: 'Edge Pulse',
-        to: '/edge-pulse',
-        icon: 'pi pi-chart-line'
       }
     ]
   },
@@ -88,7 +87,7 @@ export const menus = [
       {
         label: 'Real-Time Purge',
         to: '/real-time-purge',
-        icon: 'pi pi-refresh'
+        icon: 'pi pi-sync'
       }
     ]
   },
@@ -103,17 +102,17 @@ export const menus = [
       {
         label: 'Edge Services',
         to: '/edge-services',
-        icon: 'pi pi-bookmark'
+        icon: 'pi pi-server'
       },
       {
         label: 'Digital Certificates',
         to: '/digital-certificates',
-        icon: 'pi pi-verified'
+        icon: 'pi pi-check-circle'
       },
       {
         label: 'Network Lists',
         to: '/network-lists',
-        icon: 'pi pi-globe'
+        icon: 'pi pi-list'
       },
       {
         label: 'WAF Rules',

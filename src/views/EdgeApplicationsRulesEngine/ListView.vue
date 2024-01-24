@@ -158,8 +158,11 @@
     drawerRulesEngineRef.value.openDrawerEdit(item)
   }
 
-  const titleEmptyState = computed(() => `No ${selectedPhase.value} added`)
-  const descriptionEmptyState = computed(() => `Create your first ${selectedPhase.value}.`)
+  const titleEmptyState = computed(() => `No rule in the ${selectedPhase.value} has been created`)
+  const descriptionEmptyState = computed(
+    () =>
+      `Click the button below to initiate the setup process and create your first ${selectedPhase.value} rule.`
+  )
 </script>
 
 <template>
@@ -189,7 +192,7 @@
     :pt="{
       thead: { class: !hasContentToList && 'hidden' }
     }"
-    emptyListMessage="No Rules Engine found."
+    emptyListMessage="No rules have been created."
   >
     <template #addButton>
       <div class="flex gap-4">
@@ -220,7 +223,7 @@
             @click="openCreateRulesEngineDrawerByPhase"
             severity="secondary"
             icon="pi pi-plus"
-            :label="selectedPhase"
+            label="Add Rule"
           />
         </template>
         <template #illustration>

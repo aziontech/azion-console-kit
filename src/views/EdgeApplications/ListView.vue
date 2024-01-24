@@ -92,8 +92,8 @@
       />
       <EmptyResultsBlock
         v-else
-        title="No edge application added"
-        description="Create your first edge application."
+        title="No edge applications have been created"
+        description="Click the button below to initiate the setup process and create your first edge application."
         createButtonLabel="Edge Application"
         createPagePath="/edge-applications/create"
         :documentationService="props.documentationService"

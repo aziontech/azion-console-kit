@@ -35,7 +35,7 @@
       required: true
     },
     initialPhase: {
-      type: String,
+      type: String
     },
     selectedRulesEngineToEdit: {
       type: Object,
@@ -142,11 +142,13 @@
   const phasesList = [
     {
       label: 'Request Phase',
-      value: 'request'
+      value: 'request',
+      description: 'Configure the requests made to the edge.'
     },
     {
       label: 'Response Phase',
-      value: 'response'
+      value: 'response',
+      description: 'Configure the responses delivered to end-users.'
     }
   ]
 
@@ -620,6 +622,7 @@
         <FieldText
           label="Name *"
           name="name"
+          placeholder="My rule"
           :value="name"
           description="Give a unique and descriptive name to identify the rule."
         />
@@ -631,7 +634,7 @@
           rows="1"
           name="description"
           :value="description"
-          description="Add a short text that describes the rule to remember what it's used for or write another type of comment."
+          description="Add a short description or comment to the rule."
         />
       </div>
     </template>
@@ -639,8 +642,8 @@
 
   <FormHorizontal
     :isDrawer="true"
-    title="Rule Type"
-    description="Description"
+    title="Phase"
+    description="Select the phase of the execution of the rule."
   >
     <template #inputs>
       <div class="flex flex-col gap-2">
@@ -655,7 +658,7 @@
           >
             <label class="font-medium">
               {{ item.label }}
-              <div class="text-color-secondary text-sm font-normal">Description</div>
+              <div class="text-color-secondary text-sm font-normal">{{ item.description }}</div>
             </label>
 
             <PrimeRadio
@@ -671,7 +674,7 @@
   <FormHorizontal
     :isDrawer="true"
     title="Criteria"
-    description="Set the conditions to execute the rule. Select a variable from the list, the operator and, if prompted, enter the comparison string."
+    description="Set the conditions to execute the rule. Add a variable, the comparison operator and, if prompted, an argument."
   >
     <template #inputs>
       <div
@@ -754,7 +757,7 @@
           />
           <PrimeButton
             icon="pi pi-plus-circle"
-            label="OR"
+            label="Or"
             size="small"
             outlined
             @click="addConditionalOr(index)"
@@ -785,7 +788,7 @@
       <div v-if="props.isEnableApplicationAcceleration">
         <PrimeButton
           icon="pi pi-plus-circle"
-          label="New Criteria"
+          label="Add Criteria"
           size="small"
           outlined
           @click="addNewCriteria"
@@ -797,7 +800,7 @@
   <FormHorizontal
     :isDrawer="true"
     title="Behaviors"
-    description="Set the behaviors you want your rule to perform if the conditions defined in the criteria are met. Select a behavior and all required information. Some actions can't be used together or in some conditions."
+    description="Set the behaviors you want your rule to perform if the conditions defined in the criteria are met. Select a behavior and fill in all required information. Some behaviors can't be added together or in some conditions."
   >
     <template #inputs>
       <div
@@ -923,7 +926,7 @@
         <div>
           <PrimeButton
             icon="pi pi-plus-circle"
-            label="New Behaviors"
+            label="Add Behavior"
             size="small"
             outlined
             @click="addNewBehavior"

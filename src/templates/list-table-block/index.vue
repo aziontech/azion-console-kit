@@ -75,7 +75,11 @@
               v-tooltip.top="{ value: 'Hidden Columns', showDelay: 200 }"
             >
             </PrimeButton>
-            <OverlayPanel ref="columnSelectorPanel">
+            <OverlayPanel ref="columnSelectorPanel"
+              :pt="{
+                content: {class: 'p-0'}
+              }"
+            >
               <Listbox
                 v-model="selectedColumns"
                 multiple

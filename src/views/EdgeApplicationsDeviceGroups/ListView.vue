@@ -59,7 +59,7 @@
     return [
       {
         field: 'deviceId',
-        header: 'Id',
+        header: 'ID',
         type: 'component',
         component: (columnData) => {
           return columnBuilder({
@@ -140,8 +140,8 @@
   </div>
   <EmptyResultsBlock
     v-else
-    title="No Device Group have been created"
-    description="Create your first Device Group."
+    title="No device groups have been created"
+    description="Click the button below to initiate the setup process and create your first device group."
     createButtonLabel="Add"
     :documentationService="props.documentationService"
     :inTabs="true"
