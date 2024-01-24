@@ -250,7 +250,7 @@
     tuningSelected.value = tuning
     showDetailsOfAttack.value = true
   }
-  
+
   const goToDomain = () => {
     router.push({ name: 'list-domains' })
   }

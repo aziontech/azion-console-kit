@@ -35,7 +35,7 @@
       required: true
     },
     initialPhase: {
-      type: String,
+      type: String
     },
     selectedRulesEngineToEdit: {
       type: Object,

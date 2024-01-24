@@ -73,7 +73,9 @@
   const loadEditFunctionDrawer = refDebounced(showEditFunctionDrawer, debouncedDrawerAnimate)
   const selectedFunctionToEdit = ref('')
   const edgeFunctionsList = ref([])
-  const filteredEdgeFunctions = computed(() => edgeFunctionsList.value.filter((element) => element.initiatorType === 'edge_application'))
+  const filteredEdgeFunctions = computed(() =>
+    edgeFunctionsList.value.filter((element) => element.initiatorType === 'edge_application')
+  )
 
   const initialValues = ref({
     id: props.edgeApplicationId,
