@@ -495,9 +495,6 @@
     updateBehavior(index, { name: behavior.name, target: behavior.target })
   }
 
-  /**
-   * Processes the behaviors of the selected rules engine to edit.
-   */
   const processBehaviorsAtEdit = async () => {
     const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms))
 
