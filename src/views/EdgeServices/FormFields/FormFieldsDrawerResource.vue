@@ -72,7 +72,7 @@
               >{{ nameError }}</small
             >
             <small class="text-color-secondary text-sm font-normal leading-tight">
-              The path where the resource will be saved on the Edge Node.
+              The path where the resource will be saved on the edge node.
             </small>
           </div>
         </div>
