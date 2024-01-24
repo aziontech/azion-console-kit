@@ -242,7 +242,7 @@
         />
         <small class="text-color-secondary text-sm font-normal leading-tight">
           Enable Application Acceleration on the Main Settings tab to use values lower than 60
-          seconds. L2 Caching requres cache TTL to be equal to or greater than 3 seconds.
+          seconds. L2 Caching requires cache TTL to be equal to or greater than 3 seconds.
         </small>
         <small
           v-if="cdnCacheSettingsMaximumTtlError"
