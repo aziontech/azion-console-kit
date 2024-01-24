@@ -44,7 +44,7 @@
   <FormHorizontal
     :isDrawer="true"
     title="General"
-    description="Instantiate functions created in Edge Functions for the edge application. Use Rules Engine to activate functions."
+    description="Instantiate an edge function within your edge application."
   >
     <template #inputs>
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
@@ -52,8 +52,6 @@
           label="Name *"
           name="name"
           v-model="name"
-          description="Give a unique and descriptive name to the function you want to instantiate."
-          placeholder="My function instance"
         />
       </div>
     </template>
@@ -61,8 +59,8 @@
 
   <FormHorizontal
     :isDrawer="true"
-    title="Function Instance"
-    description="Select the function and customize the arguments."
+    title="Function Instanced"
+    description="Description. Informar que para criar novas functions para serem instanciadas, o usuário precisa ir em Edge Functions."
   >
     <template #inputs>
       <div class="flex w-80 flex-col gap-2 sm:max-w-lg max-sm:w-full">
