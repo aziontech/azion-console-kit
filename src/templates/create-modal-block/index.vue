@@ -162,6 +162,7 @@
           :key="index"
         >
           <PrimeButton
+            :class="{ 'surface-200': menuitem.value === selectedTab, 'p-disabled': isLoading }"
             class="w-full whitespace-nowrap h-[38px] flex"
             text
             size="small"
