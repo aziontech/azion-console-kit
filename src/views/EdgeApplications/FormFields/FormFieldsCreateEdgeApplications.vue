@@ -163,7 +163,7 @@
               <div class="flex-col gap-1">
                 <div class="text-color text-sm font-normal">HTTP support</div>
                 <div class="self-stretch text-color-secondary text-sm font-normal">
-                  Use the HTTP protocol between the edge and the users.
+                  Use the HTTP protocol between the edge and users.
                 </div>
               </div>
             </template>
@@ -190,7 +190,7 @@
               <div class="flex-col gap-1">
                 <div class="text-color text-sm font-normal">HTTP and HTTPS support</div>
                 <div class="self-stretch text-color-secondary text-sm font-normal">
-                  Use both the HTTP and HTTPS protocols between the edge and the users.
+                  Use both the HTTP and HTTPS protocols between the edge and users.
                 </div>
               </div>
             </template>
@@ -217,7 +217,7 @@
               <div class="flex-col gap-1">
                 <div class="text-color text-sm font-normal">HTTP, HTTPS and HTTP/3 support</div>
                 <div class="self-stretch text-color-secondary text-sm font-normal">
-                  Use both the HTTP and HTTPS protocols between the edge and the users and enable
+                  Use both the HTTP and HTTPS protocols between the edge and users and enable
                   HTTP/3 support.
                 </div>
               </div>
@@ -559,7 +559,7 @@
 
           <div class="text-color-secondary text-sm font-normal">
             Enable Application Acceleration on the Main Settings tab to use values lower than 60
-            seconds. L2 Caching requres cache TTL to be equal to or greater than 3 seconds.
+            seconds. L2 Caching requires cache TTL to be equal to or greater than 3 seconds.
           </div>
         </div>
       </div>
@@ -768,7 +768,7 @@
 
   <FormHorizontal
     title="Debug Rules"
-    description="Log executed rules created in Rules Engine. Access logs using Data Streaming, Real-Time Events or Real-Time Events GraphQL API."
+    description="Log executed rules created in Rules Engine. Query logs using Data Streaming, Real-Time Events, or Real-Time Events GraphQL API."
     v-if="handleBlock('debug-rules')"
   >
     <template #inputs>
