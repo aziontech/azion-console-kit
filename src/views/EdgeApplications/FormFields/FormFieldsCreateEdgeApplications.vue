@@ -217,8 +217,8 @@
               <div class="flex-col gap-1">
                 <div class="text-color text-sm font-normal">HTTP, HTTPS and HTTP/3 support</div>
                 <div class="self-stretch text-color-secondary text-sm font-normal">
-                  Use both the HTTP and HTTPS protocols between the edge and users and enable
-                  HTTP/3 support.
+                  Use both the HTTP and HTTPS protocols between the edge and users and enable HTTP/3
+                  support.
                 </div>
               </div>
             </template>
@@ -295,7 +295,8 @@
           />
 
           <div class="text-color-secondary text-sm font-normal">
-            Enable HTTP and HTTPS protocols to configure the minimum TLS version the application supports.
+            Enable HTTP and HTTPS protocols to configure the minimum TLS version the application
+            supports.
           </div>
         </div>
 
@@ -566,8 +567,8 @@
   </FormHorizontal>
 
   <FormHorizontal
-    title="Edge Application Modules"
-    description="Activate Edge Application modules to extend the configuration possibilities of the application. Some modules require subscription."
+    title="Modules"
+    description="Activate modules to extend the configuration possibilities of the application. Some modules require subscription."
     v-if="handleBlock('edge-application-modules')"
   >
     <template #inputs>
