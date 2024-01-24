@@ -148,7 +148,7 @@
     :initialValues="initialValues"
     @onSuccess="handleCreateRulesEngine"
     :showBarGoBack="true"
-    title="Create Rules Engine"
+    title="Create Rule"
   >
     <template #formFields>
       <FormFieldsDrawerRulesEngine
@@ -172,7 +172,7 @@
     @onSuccess="emit('onSuccess')"
     :showBarGoBack="true"
     @onError="closeDrawerEdit"
-    title="Edit Rules Engine"
+    title="Edit Rule"
   >
     <template #formFields>
       <FormFieldsDrawerRulesEngine

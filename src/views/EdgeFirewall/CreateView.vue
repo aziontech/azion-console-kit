@@ -33,7 +33,7 @@
     isActive: true,
     debugRules: false,
     edgeFunctionsEnabled: false,
-    networkProtectionEnabled: false,
+    networkProtectionEnabled: true,
     wafEnabled: false
   }
 </script>

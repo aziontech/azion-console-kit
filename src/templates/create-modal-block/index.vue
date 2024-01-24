@@ -156,16 +156,17 @@
 <template>
   <div class="overflow-auto w-full h-full flex flex-col sm:flex-row p-0 sm:pl-5 sm:pr-8 gap-4 pb-4">
     <div class="sm:min-w-[240px] mt-4">
-      <ul class="flex flex-col gap-1">
+      <ul class="flex flex-col gap-1 md:fixed md:w-60">
         <li
           v-for="(menuitem, index) in items"
           :key="index"
         >
           <PrimeButton
-            :class="{ 'p-selectbutton': menuitem.value === selectedTab, 'p-disabled': isLoading }"
-            class="w-full p-button p-button-text p-button-primary p-button-sm whitespace-nowrap h-[38px] flex"
+            :class="{ 'surface-200': menuitem.value === selectedTab, 'p-disabled': isLoading }"
+            class="w-full whitespace-nowrap h-[38px] flex"
+            text
+            size="small"
             :pt="{
-              root: { class: 'px-3' },
               label: { class: 'w-full text-left' }
             }"
             @click="onTabChange(menuitem)"

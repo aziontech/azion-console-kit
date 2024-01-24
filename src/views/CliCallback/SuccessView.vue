@@ -9,7 +9,7 @@
         style="color: var(--green-500); font-size: 2rem"
       ></i>
     </div>
-    <h1 class="mx-8 text-3xl lg:text-4xl text-medium">Azion CLI Authentication Successfull</h1>
+    <h1 class="mx-8 text-3xl lg:text-4xl text-medium">Azion CLI Authentication Successful</h1>
     <p class="mx-8 text-lg text-color-secondary">
       You've successfully authenticated the Azion CLI.
     </p>

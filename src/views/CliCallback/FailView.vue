@@ -16,7 +16,7 @@
     </p>
 
     <p class="mx-8 text-lg text-color-secondary">
-      For assistance, you can refer to the documentation or contact Azion support.
+      For assistance, you can refer to the documentation, contact Azion Support, or check the Azion Community.
     </p>
   </div>
 </template>

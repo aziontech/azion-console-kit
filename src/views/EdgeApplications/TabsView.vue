@@ -210,7 +210,7 @@
           />
         </TabPanel>
         <TabPanel
-          header="Functions"
+          header="Functions Instances"
           v-if="isEnableEdgeFunction"
         >
           <EdgeApplicationsFunctionsListView

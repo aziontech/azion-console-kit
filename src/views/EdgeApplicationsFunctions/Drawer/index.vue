@@ -7,7 +7,7 @@
     :initialValues="initialValues"
     @onSuccess="handleCreateFunction"
     :showBarGoBack="true"
-    title="Instance New"
+    title="Create Instance"
   >
     <template #formFields>
       <FormFieldsDrawerFunction :edgeFunctionsList="filteredEdgeFunctions" />
@@ -73,7 +73,9 @@
   const loadEditFunctionDrawer = refDebounced(showEditFunctionDrawer, debouncedDrawerAnimate)
   const selectedFunctionToEdit = ref('')
   const edgeFunctionsList = ref([])
-  const filteredEdgeFunctions = computed(() => edgeFunctionsList.value.filter((element) => element.initiatorType === 'edge_application'))
+  const filteredEdgeFunctions = computed(() =>
+    edgeFunctionsList.value.filter((element) => element.initiatorType === 'edge_application')
+  )
 
   const initialValues = ref({
     id: props.edgeApplicationId,
