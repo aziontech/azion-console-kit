@@ -8,7 +8,7 @@
   import EdgeFirewallRulesEngineListView from '@/views/EdgeFirewallRulesEngine/ListView'
   import { useToast } from 'primevue/usetoast'
 
-  import { computed, ref } from 'vue'
+  import { computed, onMounted, ref } from 'vue'
   import { useRoute, useRouter } from 'vue-router'
 
   defineOptions({ name: 'tabs-edge-firewall' })
@@ -110,7 +110,9 @@
     verifyTab(edgeFirewall.value)
   }
 
-  renderTabCurrentRouter()
+  onMounted(() => {
+    renderTabCurrentRouter()
+  })
 </script>
 
 <template>
