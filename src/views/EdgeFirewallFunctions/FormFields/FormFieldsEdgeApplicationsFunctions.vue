@@ -14,7 +14,7 @@
   })
 
   const store = useAccountStore()
-  
+
   const changeArgs = (target) => {
     props.edgeFunctionsList.forEach((element) => {
       if (element.value === target.value) {
