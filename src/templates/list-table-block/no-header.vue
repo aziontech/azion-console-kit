@@ -183,7 +183,7 @@
 
   defineOptions({ name: 'list-table-block' })
 
-  const emit = defineEmits(['on-load-data', 'authorize'])
+  const emit = defineEmits(['on-load-data', 'authorize', 'on-select-data'])
   const props = defineProps({
     columns: {
       type: Array,

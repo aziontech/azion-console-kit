@@ -57,7 +57,7 @@
   <ActionBarTemplate
     v-if="showActionBar"
     @onSubmit="openDialog"
-    @onCancel="closeDialog"
+    @onCancel="cancelAllowed"
     :submitDisabled="!selectedEvents.length"
     primaryActionLabel="Allow Rules"
   />
@@ -141,7 +141,7 @@
   const selectedEvents = ref([])
   const isLoadingAllowed = ref(null)
   const showDialogAllowRule = ref(false)
-  const cleanSelectData = ref(false)
+  const cleanSelectData = ref(null)
   const showDetailsOfAttack = ref(false)
   const wafRuleId = ref(route.params.id)
   const countriesOptions = ref({ options: [], done: true })
@@ -233,16 +233,21 @@
 
   const selectedItems = (events) => {
     selectedEvents.value = events
+    cleanSelectData.value = null
   }
 
   const openDialog = () => {
     showDialogAllowRule.value = true
   }
 
+  const cancelAllowed = () => {
+    cleanSelectData.value = true
+    selectedEvents.value = []
+  }
+
   const closeDialog = () => {
     isLoadingAllowed.value = null
     showDialogAllowRule.value = false
-    selectedEvents.value = []
     allowedByAttacks.value = []
   }
   const openMoreDetails = (tuning) => {
