@@ -252,7 +252,7 @@
               placeholder="/path/error_page.html"
               :name="`errorResponses[${index}].uri`"
               :value="errorResponse.value.uri"
-              description="Select an origin to append the path to a custom error page."
+              description="Select an origin to customize the error page path."
             />
           </div>
           <div class="flex flex-col w-full sm:max-w-xs gap-2">
