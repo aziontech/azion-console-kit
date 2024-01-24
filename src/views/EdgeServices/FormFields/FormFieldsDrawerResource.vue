@@ -64,6 +64,7 @@
               type="text"
               :class="{ 'p-invalid': nameError }"
               :disabled="props.disabledFields"
+              placeholder="/tmp/myresource"
             />
             <small
               v-if="nameError"
@@ -71,7 +72,7 @@
               >{{ nameError }}</small
             >
             <small class="text-color-secondary text-sm font-normal leading-tight">
-              The absolute path of the resource.
+              The path where the resource will be saved on the Edge Node.
             </small>
           </div>
         </div>
