@@ -97,6 +97,9 @@
   const showFunctionsTab = computed(() => {
     return edgeFirewall.value?.edgeFunctionsEnabled
   })
+  const showRulesEngine = computed(() => {
+    return activeTab.value === mapTabs.value.rulesEngine
+  })
 
   const showMainSettingsTab = computed(() => {
     return mapTabs.value.mainSettings === activeTab.value
@@ -137,12 +140,14 @@
           v-if="showFunctionsTab"
         >
           <EdgeFirewallFunctionsListView
+            v-if="showFunctionsTab"
             v-bind="props.edgeFirewallServices"
             :edgeFirewallID="edgeFirewallId"
           />
         </TabPanel>
         <TabPanel header="Rules Engine">
           <EdgeFirewallRulesEngineListView
+            v-if="showRulesEngine"
             :edgeFirewallId="edgeFirewallId"
             v-bind="props.rulesEngineServices"
           />
