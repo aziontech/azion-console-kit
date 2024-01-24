@@ -5,6 +5,7 @@
   import TabPanel from 'primevue/tabpanel'
   import TabView from 'primevue/tabview'
   import EdgeFirewallFunctionsListView from '@/views/EdgeFirewallFunctions/ListView'
+  import EdgeFirewallRulesEngineListView from '@/views/EdgeFirewallRulesEngine/ListView'
   import { useToast } from 'primevue/usetoast'
 
   import { computed, ref } from 'vue'
@@ -14,13 +15,14 @@
 
   const props = defineProps({
     edgeFirewallServices: { type: Object, required: true },
-    listDomainsService: { type: Function, required: true }
+    listDomainsService: { type: Function, required: true },
+    rulesEngineServices: { type: Function, required: true }
   })
 
   const defaultTabs = {
-    main_settings: 0,
+    mainSettings: 0,
     functions: 1,
-    rules_engine: 2
+    rulesEngine: 2
   }
 
   const mapTabs = ref({ ...defaultTabs })
@@ -92,8 +94,12 @@
     return edgeFirewall.value?.name || ''
   })
 
-  const isEnableFunction = computed(() => {
+  const showFunctionsTab = computed(() => {
     return edgeFirewall.value?.edgeFunctionsEnabled
+  })
+
+  const showMainSettingsTab = computed(() => {
+    return mapTabs.value.mainSettings === activeTab.value
   })
 
   const updatedFirewall = (firewall) => {
@@ -118,7 +124,7 @@
       >
         <TabPanel header="Main Settings">
           <EditView
-            v-if="mapTabs.main_settings === activeTab"
+            v-if="showMainSettingsTab"
             :editEdgeFirewallService="edgeFirewallServices.editEdgeFirewallService"
             :edgeFirewall="edgeFirewall"
             :loadDomains="props.listDomainsService"
@@ -128,14 +134,19 @@
         </TabPanel>
         <TabPanel
           header="Functions"
-          v-if="isEnableFunction"
+          v-if="showFunctionsTab"
         >
           <EdgeFirewallFunctionsListView
             v-bind="props.edgeFirewallServices"
             :edgeFirewallID="edgeFirewallId"
           />
         </TabPanel>
-        <TabPanel header="Rules Engine"></TabPanel>
+        <TabPanel header="Rules Engine">
+          <EdgeFirewallRulesEngineListView
+            :edgeFirewallId="edgeFirewallId"
+            v-bind="props.rulesEngineServices"
+          />
+        </TabPanel>
       </TabView>
     </template>
   </ContentBlock>
