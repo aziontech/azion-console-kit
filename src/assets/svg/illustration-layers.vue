@@ -6,7 +6,7 @@
 </template>
 
 <script>
-export default {
-  name: 'illustration-layers'
-}
+  export default {
+    name: 'illustration-layers'
+  }
 </script>

@@ -25,12 +25,16 @@
       default: ''
     },
     rows: {
-      type: Number,
+      type: [Number, String],
       default: 5
     },
     cols: {
       type: Number,
       default: 30
+    },
+    autoResize: {
+      type: Boolean,
+      default: false
     }
   })
 
@@ -57,6 +61,7 @@
     v-model="inputValue"
     :name="name"
     type="text"
+    :autoResize="props.autoResize"
     :rows="props.rows"
     :cols="props.cols"
     :placeholder="props.placeholder"
