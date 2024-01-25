@@ -28,8 +28,8 @@ export const useMetricsStore = defineStore('metrics', {
     datasetAvailableAggregations: [] // All available aggregation by dataset
   }),
   getters: {
-    dateTimeFilterOptions: (state) => state.dateTimeFilterOptions,
-    isLoadingFilters: (state) => state.isLoadingFilters,
+    getDateTimeFilterOptions: (state) => state.dateTimeFilterOptions,
+    getIsLoadingFilters: (state) => state.isLoadingFilters,
     getKeysToFilters: (state) => [
       ...(state.filters.and
         ? Object.keys(state.filters.and).filter((item) => item !== 'meta')
@@ -38,7 +38,7 @@ export const useMetricsStore = defineStore('metrics', {
         ? state.filters.datasets.map((dataset) => `${dataset.fieldAlias}In`)
         : [])
     ],
-    getDatasetAvailableUnused: (state) => {
+    getDatasetAvailableUnused(state) {
       const keysToRemove = this.getKeysToFilters
       if (keysToRemove) {
         return state.datasetAvailableFilters.filter((field) => !keysToRemove.includes(field.label))
@@ -95,7 +95,7 @@ export const useMetricsStore = defineStore('metrics', {
       }
       return currentIds
     },
-    currentReportsData: (state) => state.currentReportsData,
+    getCurrentReportsData: (state) => state.currentReportsData,
     currentFilters: (state) => state.filters,
     currentSelectedFilters: (state) => {
       const filters = {}
@@ -134,13 +134,105 @@ export const useMetricsStore = defineStore('metrics', {
     }
   },
   actions: {
-    async setDatasetAvailableAggregations(dataset) {
-      const aggregationList = await LoadDatasetAvailableAggregations(dataset)
-      this.datasetAvailableAggregations = aggregationList
+    setFilterSelect(filter) {
+      this.selectFilter = filter
     },
     async setDatasetAvailableFilters() {
       const availableFilters = await LoadDatasetAvailableFilters(this.currentDashboard.dataset)
       this.datasetAvailableFilters = availableFilters
+    },
+    async setInfoAvailableFilters() {
+      const availableFilters = await LoadInfoAvailableFilters()
+      this.infoAvailableFilters = availableFilters
+    },
+    async setDatasetAvailableAggregations(dataset) {
+      const aggregationList = await LoadDatasetAvailableAggregations(dataset)
+      this.datasetAvailableAggregations = aggregationList
+    },
+    async setGroupPage() {
+      const pagesDashboards = await LoadPagesDashboards()
+      this.listGroupPage = pagesDashboards
+    },
+    setCurrentGroupPage(groupPage) {
+      this.currentGroupPage = groupPage
+    },
+    setCurrentPage(page) {
+      this.currentPage = page
+    },
+    setCurrentDashboard(dashboard) {
+      this.currentDashboard = dashboard
+    },
+    async setReports() {
+      const reports = await LoadReports()
+      this.reports = reports
+    },
+    setInitialPageAndDashboardCurrent() {
+      if (this.listGroupPage.length) {
+        ;[this.currentGroupPage] = this.listGroupPage
+        ;[this.currentPage] = this.currentGroupPage.pagesDashboards
+        ;[this.currentDashboard] = this.currentPage.dashboards
+        this.currentDashboard.active = true
+      }
+    },
+    setInitialCurrentsByIds({ pageId, dashboardId }) {
+      if (!this.listGroupPage.length) {
+        return
+      }
+
+      this.currentGroupPage = this.listGroupPage.find((groupPage) => {
+        this.currentPage = groupPage.pagesDashboards.find(({ url }) => `${url}` === pageId)
+        return this.currentPage
+      })
+
+      const newListDashboards = this.currentPage.dashboards.map((dashboard) => {
+        const updateDashboard = {
+          ...dashboard,
+          active: `${dashboard.url}` === dashboardId
+        }
+        return updateDashboard
+      })
+
+      this.currentPage.dashboards = newListDashboards
+      this.currentDashboard = newListDashboards.find(({ url }) => `${url}` === dashboardId)
+    },
+    setCurrentGroupPageByLabels(labelGroup) {
+      if (!this.listGroupPage.length) {
+        return
+      }
+
+      this.currentGroupPage = this.listGroupPage.find(({ label }) => label === labelGroup)
+
+      const page = this.currentGroupPage?.pagesDashboards[0]
+      this.currentPage = { ...page }
+      const { dashboards } = page
+
+      dashboards.forEach((dash) => {
+        dash.active = false
+      })
+
+      dashboards[0].active = true
+      ;[this.currentDashboard] = dashboards
+    },
+    setCurrentsByLabels({ labelPage, labelDashboard }) {
+      if (!this.listGroupPage.length) {
+        return
+      }
+
+      const selectPage = this.currentGroupPage.pagesDashboards.find(
+        ({ label }) => label === labelPage
+      )
+
+      const newDashboard = selectPage.dashboards.map((dashboard) => ({
+        ...dashboard,
+        active: dashboard.label === labelDashboard
+      }))
+      const selectDashboard = newDashboard.find(({ active }) => active)
+      if (!selectDashboard) {
+        newDashboard[0].active = true
+      }
+      selectPage.dashboards = newDashboard
+      this.currentPage = selectPage
+      this.currentDashboard = selectDashboard || newDashboard[0]
     },
     setFilters(filters) {
       this.filters = filters
@@ -152,18 +244,6 @@ export const useMetricsStore = defineStore('metrics', {
     async setDecodedFilters(filters) {
       const decodedFilter = await LoadFilters(this.datasetAvailableFilters, filters)
       this.setFilters(decodedFilter)
-    },
-    async setInfoAvailableFilters() {
-      const availableFilters = await LoadInfoAvailableFilters()
-      this.infoAvailableFilters = availableFilters
-    },
-    async setPagesDashboards() {
-      const pagesDashboards = await LoadPagesDashboards()
-      this.listGroupPage = pagesDashboards
-    },
-    async setReports() {
-      const reports = await LoadReports()
-      this.reports = reports
     },
     async loadCurrentReports() {
       await LoadReportsDataBySelectedDashboard(this.filters, this.reports)
@@ -179,6 +259,93 @@ export const useMetricsStore = defineStore('metrics', {
       this.currentReportsData[reportIdx].resultQuery = reportData
       this.currentReportsData[reportIdx].reportQuery = reportQuery
       this.currentReportsData[reportIdx].error = error
+    },
+    setTimeRange({ tsRangeBegin, tsRangeEnd, meta }) {
+      if (!this.filters.tsRange) this.filters.tsRange = {}
+
+      this.filters.tsRange.meta = meta
+      this.filters.tsRange.begin = tsRangeBegin
+      this.filters.tsRange.end = tsRangeEnd
+    },
+    removeAndFilter({ filterKey }) {
+      delete this.filters.and[filterKey]
+      if (Object.keys(this.filters.and).length === 1) {
+        delete this.filters.and
+      }
+    },
+    removeDatasetFilter({ filterIndex, filterKey }) {
+      this.filters.datasets[filterIndex].in.splice(filterKey, 1)
+      if (!this.filters.datasets[filterIndex].in.length) {
+        this.filters.datasets.splice(filterIndex, 1)
+      }
+      if (!this.filters.datasets.length) {
+        delete this.filters.datasets
+      }
+    },
+    removeDatasetByFieldName(fieldName) {
+      if (!this.filters.datasets) return
+      const updatedDataset = this.filters.datasets.filter(
+        (dataset) => dataset.fieldName !== fieldName
+      )
+      this.filters.datasets = updatedDataset
+
+      if (!this.filters.datasets.length) {
+        delete this.filters.datasets
+      }
+    },
+    filterDatasetUpdate(filterIn) {
+      const { fieldName } = filterIn
+      if (!this.filters.datasets) {
+        this.filters.datasets = []
+      }
+      const filterIndex = this.filters.datasets.findIndex(
+        (dataset) => dataset.fieldName === fieldName
+      )
+      if (filterIndex === -1) {
+        this.filters.datasets.push(filterIn)
+      } else {
+        this.filters.datasets[filterIndex] = filterIn
+      }
+    },
+    createAndFilter(valueAnd) {
+      this.filters.and = {
+        ...this.filters.and,
+        ...valueAnd,
+        meta: { fieldPrefix: 'and_' }
+      }
+    },
+    editAndFilter({ filterKey }) {
+      const { value, begin, end } = this.filters.and[filterKey]
+      let valueElement = value
+
+      if (!!begin || !!end) {
+        valueElement = {
+          begin,
+          end
+        }
+      }
+
+      const filterSelect = this.datasetAvailableFilters.find((filter) => filter.label === filterKey)
+
+      this.selectFilter = {
+        ...filterSelect,
+        valueElement,
+        edit: true
+      }
+    },
+    editDatasetFilter({ datasetIdx }) {
+      const datasetField = this.filters.datasets[datasetIdx]
+
+      const filterSelect = this.datasetAvailableFilters.find(
+        (filter) => filter.label === datasetField.fieldName
+      )
+      const valueElement = datasetField.in
+
+      this.selectFilter = {
+        ...filterSelect,
+        valueElement,
+        edit: true
+      }
     }
   }
 })
