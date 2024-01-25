@@ -1,28 +1,56 @@
 <script setup>
+  import { useMetricsStore } from '@/stores/metrics'
+  import { storeToRefs } from 'pinia'
   import Dropdown from 'primevue/dropdown'
   import TabMenu from 'primevue/tabmenu'
-  import { ref } from 'vue'
+  import { computed } from 'vue'
 
-  const selectedGroup = ref(null)
+  const metricsStore = useMetricsStore()
+  const { getGroupPages, groupPageCurrent, getPages, pageCurrent } = storeToRefs(metricsStore)
+  const { setCurrentGroupPageByLabels, resetFilters, setCurrentPage } = metricsStore
 
-  const metricsProducts = ref([])
-  const productIdx = ref(null)
-  const metricsGroups = ref([])
+  const metricsGroups = computed(() => {
+    return getGroupPages.value
+  })
+
+  const selectedGroup = computed(() => {
+    return groupPageCurrent.value
+  })
+
+  const changeGroup = (evt) => {
+    resetFilters()
+    setCurrentGroupPageByLabels(evt.value.label)
+  }
+
+  const groupPages = computed(() => {
+    return getPages.value
+  })
+
+  const selectedPage = computed(() => {
+    return groupPages.value?.findIndex((dashboard) => dashboard.id === pageCurrent.value?.id)
+  })
+
+  const changePage = (evt) => {
+    const selectedPage = groupPages.value[evt.index]
+    setCurrentPage(selectedPage)
+  }
 </script>
 <template>
   <div class="flex w-full items-end gap-3 mb-4">
     <Dropdown
-      v-model="selectedGroup"
+      :modelValue="selectedGroup"
       :options="metricsGroups"
       :loading="!metricsGroups.length"
       optionLabel="label"
       class="flex self-start"
+      @change="changeGroup"
     />
     <TabMenu
-      v-model:activeIndex="productIdx"
-      :model="metricsProducts"
-      :key="productIdx"
+      :activeIndex="selectedPage"
+      :model="groupPages"
+      :key="selectedPage"
       :pt="{ action: { class: 'w-max' } }"
+      @tab-change="changePage"
     />
   </div>
 </template>
