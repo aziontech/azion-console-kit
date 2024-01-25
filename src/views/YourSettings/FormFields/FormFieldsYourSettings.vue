@@ -60,7 +60,7 @@
     optionsTimezone.value = result.listTimeZones
   }
 
-  onMounted(async() => {
+  onMounted(async () => {
     await fetchCountries()
     await fetchTimezone()
   })

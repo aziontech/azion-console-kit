@@ -8,7 +8,7 @@
         :createService="props.createUsersService"
         :schema="validationSchema"
       >
-        <template #form="{resetForm}">
+        <template #form="{ resetForm }">
           <FormFieldsUsers
             :resetForm="resetForm"
             :loadAccountDetailsService="loadAccountDetailsService"
