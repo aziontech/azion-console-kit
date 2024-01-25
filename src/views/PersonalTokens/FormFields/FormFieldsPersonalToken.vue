@@ -211,6 +211,7 @@
               @date-select="updateExpiration"
               v-model="customExpiration"
               placeholder="Select date from calendar"
+              dateFormat="dd/mm/yy"
               :minDate="minExpirationDate"
               :class="{ 'p-invalid': errorCustom }"
               showIcon
