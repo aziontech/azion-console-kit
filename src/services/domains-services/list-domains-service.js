@@ -36,7 +36,7 @@ const adapt = async (httpResponse) => {
             content: 'Inactive',
             severity: 'danger'
           },
-        activeSort: domain.is_active,
+      activeSort: domain.is_active,
       domainName: {
         content: domain.domain_name
       },
