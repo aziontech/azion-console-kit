@@ -7,6 +7,7 @@
         scrollable
         removableSort
         :value="data"
+        selectionMode="multiple"
         dataKey="id"
         v-model:filters="filters"
         :paginator="showPagination"
