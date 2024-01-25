@@ -1,21 +1,24 @@
 import { AxiosHttpClientAdapter } from '@/services/axios/AxiosHttpClientAdapter'
 import * as Errors from '@/services/axios/errors'
-import { editWafRulesAllowedService } from '@/services/waf-rules-services'
+import { createWafRulesAllowedTuningService } from '@/services/waf-rules-services'
 import { describe, expect, it, vi } from 'vitest'
 
 const fixtures = {
   wafRulesMock: {
-    matchZones: [{ matches_on: null, zone: 'path', zone_input: null }],
-    path: '/tmp',
-    ruleId: 0,
-    reason: 'test',
-    status: false,
-    useRegex: false
+    reason: 'Allowed Rules created to allow the attack',
+    matchZone: [
+      {
+        zone: 'conditional_query_string',
+        zone_input: 'arg',
+        matches_on: 'value'
+      }
+    ],
+    ruleId: '1000'
   }
 }
 
 const makeSut = () => {
-  const sut = editWafRulesAllowedService
+  const sut = createWafRulesAllowedTuningService
 
   return {
     sut
@@ -29,45 +32,43 @@ describe('WafRulesServices', () => {
       body: fixtures.wafRulesMock
     })
     const { sut } = makeSut()
-    await sut({ payload: fixtures.wafRulesMock, wafId: 4040, allowedId: 10 })
+    await sut({ payload: fixtures.wafRulesMock, wafId: 10 })
 
     expect(requestSpy).toHaveBeenCalledWith({
-      url: 'v4/edge/waf/4040/allowed_rules/10',
-      method: 'PUT',
+      url: 'v4/edge/waf/10/allowed_rules',
+      method: 'POST',
       body: {
-        match_zones: fixtures.wafRulesMock.matchZones,
-        path: fixtures.wafRulesMock.path,
-        reason: fixtures.wafRulesMock.reason,
         rule_id: fixtures.wafRulesMock.ruleId,
-        status: fixtures.wafRulesMock.status,
-        use_regex: fixtures.wafRulesMock.useRegex
+        match_zones: fixtures.wafRulesMock.matchZone,
+        reason: fixtures.wafRulesMock.reason
       }
     })
   })
 
-  it('should return a feedback message on successfully updated', async () => {
+  it('should return a feedback message on successfully created', async () => {
     vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
       statusCode: 202,
       body: fixtures.wafRulesMock
     })
     const { sut } = makeSut()
 
-    const data = await sut({ payload: fixtures.wafRulesMock, wafId: 4040, allowedId: 10 })
+    const data = await sut({ payload: fixtures.wafRulesMock, wafId: 10 })
 
-    expect(data).toStrictEqual('Your waf rule allowed has been updated')
+    expect(data).toStrictEqual('Your waf rule allowed has been created')
   })
 
   it('Should return an API error for an 400 response status', async () => {
+    const errorKey = 'detail'
     const apiErrorMock = 'This field is required.'
     vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
       statusCode: 400,
       body: {
-        detail: [apiErrorMock]
+        [errorKey]: [{ error: [apiErrorMock] }]
       }
     })
     const { sut } = makeSut()
 
-    const feedbackMessage = sut({ payload: fixtures.wafRulesMock, wafId: 4040, allowedId: 10 })
+    const feedbackMessage = sut({ payload: fixtures.wafRulesMock, wafId: 10 })
 
     expect(feedbackMessage).rejects.toThrow(apiErrorMock)
   })
@@ -101,7 +102,7 @@ describe('WafRulesServices', () => {
       })
       const { sut } = makeSut()
 
-      const response = sut({ payload: fixtures.wafRulesMock, wafId: 4040, allowedId: 10 })
+      const response = sut({ payload: fixtures.wafRulesMock, id: 10 })
 
       expect(response).rejects.toBe(expectedError)
     }

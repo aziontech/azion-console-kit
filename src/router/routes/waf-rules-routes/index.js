@@ -1,5 +1,6 @@
 import * as Helpers from '@/helpers'
 import * as WafRulesService from '@/services/waf-rules-services'
+import { listCountriesService } from '@/services/network-lists-services'
 
 /** @type {import('vue-router').RouteRecordRaw} */
 export const wafRulesRoutes = {
@@ -55,14 +56,21 @@ export const wafRulesRoutes = {
           loadWafRulesAllowedService: WafRulesService.loadWafRulesAllowedService,
           editWafRulesAllowedService: WafRulesService.editWafRulesAllowedService,
           documentationServiceAllowed: Helpers.documentationCatalog.wafAllowed,
-          listWafRulesAllowedService: WafRulesService.listWafRulesAllowedService
+          listWafRulesAllowedService: WafRulesService.listWafRulesAllowedService,
+          optionsRuleIds: WafRulesService.optionsRuleIds
         },
         wafServices: {
           editWafRulesService: WafRulesService.editWafRulesService,
           loadWafRulesService: WafRulesService.loadWafRulesService
         },
         wafTuning: {
-          documentationServiceTuning: Helpers.documentationCatalog.wafTuning
+          documentationServiceTuning: Helpers.documentationCatalog.wafTuning,
+          listWafRulesTuningService: WafRulesService.listWafRulesTuningService,
+          listNetworkListService: WafRulesService.listNetworkListService,
+          listCountriesService: listCountriesService,
+          listWafRulesDomainsService: WafRulesService.listWafRulesDomainsService,
+          createWafRulesAllowedTuningService: WafRulesService.createWafRulesAllowedTuningService,
+          listWafRulesTuningAttacksService: WafRulesService.listWafRulesTuningAttacksService
         }
       },
       meta: {

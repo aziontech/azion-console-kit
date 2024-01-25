@@ -1,5 +1,5 @@
 <script setup>
-  import { ref } from 'vue'
+  import { ref, watch } from 'vue'
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
   import InputSwitch from 'primevue/inputswitch'
   import Dropdown from 'primevue/dropdown'
@@ -13,6 +13,17 @@
   import { useField } from 'vee-validate'
   defineOptions({ name: 'form-fields-waf-rules-allowed' })
 
+  const props = defineProps({
+    optionsRuleIds: {
+      type: Array,
+      required: true,
+      default: () => []
+    },
+    disabledRuleId: {
+      type: Boolean,
+      default: false
+    }
+  })
   const { value: matchZones } = useField('matchZones')
   const { value: path } = useField('path')
   const { value: reason } = useField('reason')
@@ -32,7 +43,9 @@
     { name: 'Request Header', value: 'request_header' }
   ])
 
-  const ruleIdOption = ref([{ name: '0 - All Rules', value: 0 }])
+  const ruleIdOption = ref([])
+
+  ruleIdOption.value = props.optionsRuleIds
 
   const addMatchZones = () => {
     const newArray = matchZones.value
@@ -67,6 +80,10 @@
   const deleteMatchZone = (index) => {
     matchZones.value.splice(index, 1)
   }
+
+  watch(props.getRuleIdOptions, (value) => {
+    ruleIdOption.value = value
+  })
 </script>
 
 <template>
@@ -79,22 +96,26 @@
       <div class="flex flex-col w-full sm:max-w-xs gap-2">
         <label
           for="ruleid"
-          class="text-color text-base font-medium"
+          class="text-color text-sm font-medium"
           >Rule ID *</label
         >
         <Dropdown
           id="ruleid"
           v-model="ruleId"
           :options="ruleIdOption"
-          optionLabel="name"
+          optionLabel="text"
           optionValue="value"
           class="w-full"
-          :disabled="true"
+          :disabled="props.disabledRuleId"
+          :pt="{
+            panel: { class: 'sm:!w-[500px]' },
+            item: { class: 'whitespace-pre-line my-5 sm:my-3' }
+          }"
         />
       </div>
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
         <FieldText
-          label="Reason *"
+          label="Description *"
           name="reason"
           :value="reason"
           description="Set a suggestive description for this rule."
@@ -120,7 +141,7 @@
         align="left"
         type="dashed"
       >
-        <b>Then</b>
+        Then
       </Divider>
       <div class="flex flex-col gap-8">
         <div
@@ -129,7 +150,7 @@
           class="flex flex-col gap-6"
         >
           <div
-            class="flex"
+            class="flex gap-3"
             v-if="index"
           >
             <Divider
@@ -137,12 +158,14 @@
               type="dashed"
               :key="index"
             >
-              <b>And</b>
+              And
             </Divider>
             <PrimeButton
+              outlined
               severity="secondary"
               icon="pi pi-trash"
               aria-label="Trash"
+              v-tooltip.bottom="{ value: 'Delete', showDelay: 200 }"
               @click="deleteMatchZone(index)"
             />
           </div>
@@ -150,7 +173,7 @@
           <div class="flex flex-col w-full sm:max-w-xs gap-2">
             <label
               for="ruleid"
-              class="text-color text-base font-medium"
+              class="text-color text-sm font-medium"
               >Match Zones *</label
             >
             <Dropdown
@@ -167,7 +190,7 @@
             v-if="showConditionalInputs(matchZones[index].zone)"
           >
             <div class="flex flex-col sm:max-w-lg w-full gap-2">
-              <label class="text-color text-base font-medium">Field </label>
+              <label class="text-color text-sm font-medium">Field </label>
               <InputText
                 v-model="matchZones[index].zone_input"
                 type="text"
@@ -178,7 +201,7 @@
             class="flex flex-col gap-2"
             v-if="showMatchOnInputs(matchZones[index].zone)"
           >
-            <label class="text-color text-base font-medium">Matches On *</label>
+            <label class="text-color text-sm font-medium">Matches On *</label>
             <div class="flex flex-col gap-3">
               <Card
                 :pt="{
@@ -251,13 +274,16 @@
       </div>
 
       <Divider type="solid"></Divider>
-      <PrimeButton
-        severity="secondary"
-        icon="pi pi-plus"
-        label="New Match Zone"
-        class="sm:w-1/3"
-        @click="addMatchZones"
-      />
+      <div>
+        <PrimeButton
+          severity="secondary"
+          icon="pi pi-plus"
+          label="New Match Zone"
+          class="sm:w-auto"
+          outlined
+          @click="addMatchZones"
+        />
+      </div>
     </template>
   </FormHorizontal>
   <FormHorizontal
@@ -298,7 +324,7 @@
         <label
           for="status"
           class="text-base"
-          >Status</label
+          >Active</label
         >
       </div>
     </template>
