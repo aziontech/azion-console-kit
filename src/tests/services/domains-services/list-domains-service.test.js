@@ -39,13 +39,16 @@ const makeSut = () => {
 
 describe('DomainsServices', () => {
   it('should call api with correct params', async () => {
-    const requestSpy = vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
-      statusCode: 200,
-      body: { results: [] }
-    }).mockResolvedValueOnce({
-      statusCode: 200,
-      body: { results: fixtures.edgeApplicationsMock }
-    })
+    const requestSpy = vi
+      .spyOn(AxiosHttpClientAdapter, 'request')
+      .mockResolvedValueOnce({
+        statusCode: 200,
+        body: { results: [] }
+      })
+      .mockResolvedValueOnce({
+        statusCode: 200,
+        body: { results: fixtures.edgeApplicationsMock }
+      })
 
     const { sut } = makeSut()
     const version = 'v3'
@@ -58,13 +61,15 @@ describe('DomainsServices', () => {
   })
 
   it('should parsed correctly all returned domains', async () => {
-    vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
-      statusCode: 200,
-      body: { results: [fixtures.domainMock, fixtures.disabledDomainMock] }
-    }).mockResolvedValueOnce({
-      statusCode: 200,
-      body: { results: fixtures.edgeApplicationsMock }
-    })
+    vi.spyOn(AxiosHttpClientAdapter, 'request')
+      .mockResolvedValueOnce({
+        statusCode: 200,
+        body: { results: [fixtures.domainMock, fixtures.disabledDomainMock] }
+      })
+      .mockResolvedValueOnce({
+        statusCode: 200,
+        body: { results: fixtures.edgeApplicationsMock }
+      })
 
     const { sut } = makeSut()
 
