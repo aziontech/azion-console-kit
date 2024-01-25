@@ -38,13 +38,6 @@ export const useMetricsStore = defineStore('metrics', {
         ? state.filters.datasets.map((dataset) => `${dataset.fieldAlias}In`)
         : [])
     ],
-    getDatasetAvailableUnused(state) {
-      const keysToRemove = this.getKeysToFilters
-      if (keysToRemove) {
-        return state.datasetAvailableFilters.filter((field) => !keysToRemove.includes(field.label))
-      }
-      return state.datasetAvailableFilters
-    },
     getFilterSelect: (state) => state.selectFilter,
     getGroupPages: (state) => state.listGroupPage,
     getCurrentInfo: (state) => ({
@@ -52,8 +45,8 @@ export const useMetricsStore = defineStore('metrics', {
       Dashboard: state.currentDashboard.label,
       Group: state.currentGroupPage.label
     }),
-    pages: (state) =>
-      state.currentGroupPage.pagesDashboards?.map((item, idx) => ({
+    getPages: (state) =>
+      state.currentGroupPage?.pagesDashboards?.map((item, idx) => ({
         idx: idx,
         id: item.id,
         label: item.label
@@ -64,7 +57,7 @@ export const useMetricsStore = defineStore('metrics', {
     infoAvailableFiltersCurrent: (state) => state.infoAvailableFilters,
     dashboardCurrent: (state) => state.currentDashboard,
     dashboardBySelectedPage: (state) => {
-      if (!state.currentGroupPage.pagesDashboards) {
+      if (!state.currentGroupPage?.pagesDashboards) {
         return []
       }
 
@@ -83,8 +76,8 @@ export const useMetricsStore = defineStore('metrics', {
     },
     currentIdPageAndDashboard: (state) => {
       const currentIds = {
-        pageId: state.currentPage.url,
-        dashboardId: state.currentDashboard.url
+        pageId: state.currentPage.path,
+        dashboardId: state.currentDashboard.path
       }
       return currentIds
     },
@@ -131,6 +124,21 @@ export const useMetricsStore = defineStore('metrics', {
 
       const filtersSelectedName = [].concat(andFiltersKey, datasetKey)
       return filtersSelectedName
+    },
+    getDatasetAvailableFilters: (state) => {
+      return state.datasetAvailableFilters
+    },
+    getFilteredDatasetAvailableFilters: (state) => {
+      return (keysToRemove) => {
+        return state.datasetAvailableFilters.filter((field) => !keysToRemove.includes(field.label))
+      }
+    },
+    getDatasetAvailableUnused() {
+      const keysToRemove = this.getKeysToFilters
+
+      return keysToRemove
+        ? this.getFilteredDatasetAvailableFilters(keysToRemove)
+        : this.datasetAvailableFilters
     }
   },
   actions: {
