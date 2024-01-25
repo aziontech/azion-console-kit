@@ -1,50 +1,15 @@
 <script setup>
   import GraphsCardBlock from '@/templates/graphs-card-block'
   import SelectButton from 'primevue/selectbutton'
-  import { computed, onMounted, ref, watch } from 'vue'
-
-  const props = defineProps({
-    metricsDashboardsService: {
-      type: Function,
-      required: true
-    },
-    params: {
-      type: Object,
-      required: true
-    }
-  })
-
-  onMounted(() => {
-    fetchDashboards()
-  })
+  import { ref } from 'vue'
 
   const dashboards = ref([])
   const selectedDashboard = ref(null)
-
-  const fetchDashboards = async () => {
-    const { group, product } = props.params
-    dashboards.value = await props.metricsDashboardsService(group, product)
-
-    // TODO: revisit the selected dashboard when the filter is implemented
-    selectedDashboard.value = dashboards.value[0]
-  }
-
-  const showDashboardTabs = computed(() => {
-    return dashboards.value.length > 1
-  })
-
-  watch(
-    () => props.params,
-    () => {
-      fetchDashboards()
-    }
-  )
 </script>
 
 <template>
   <div class="flex flex-column mt-8 gap-4">
     <SelectButton
-      v-if="showDashboardTabs"
       class="w-fit"
       v-model="selectedDashboard"
       :options="dashboards"
