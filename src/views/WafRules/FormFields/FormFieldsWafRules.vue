@@ -69,7 +69,11 @@
         <div class="flex flex-col gap-3">
           <Card
             :pt="{
-              body: { class: `p-4 border rounded-md ${sqlInjection ? 'border-orange-500' : 'border-transparent'}` },
+              body: {
+                class: `p-4 border rounded-md ${
+                  sqlInjection ? 'border-orange-500' : 'border-transparent'
+                }`
+              },
               title: { class: 'flex justify-between  text-base m-0 font-medium' },
               subtitle: {
                 class: 'text-sm font-normal text-color-secondary m-0 pr-0 md:pr-[2.5rem]'
@@ -102,7 +106,11 @@
 
           <Card
             :pt="{
-              body: { class: `p-4 border rounded-md ${remoteFileInclusion ? 'border-orange-500' : 'border-transparent'} ` },
+              body: {
+                class: `p-4 border rounded-md ${
+                  remoteFileInclusion ? 'border-orange-500' : 'border-transparent'
+                } `
+              },
               title: { class: 'flex justify-between  text-base m-0 font-medium' },
               subtitle: {
                 class: 'text-sm font-normal text-color-secondary m-0 pr-0 md:pr-[2.5rem]'
@@ -134,7 +142,11 @@
 
           <Card
             :pt="{
-              body: { class: `p-4 border rounded-md ${directoryTraversal ? 'border-orange-500' : 'border-transparent'}` },
+              body: {
+                class: `p-4 border rounded-md ${
+                  directoryTraversal ? 'border-orange-500' : 'border-transparent'
+                }`
+              },
               title: { class: 'flex justify-between  text-base m-0 font-medium' },
               subtitle: {
                 class: 'text-sm font-normal text-color-secondary m-0 pr-0 md:pr-[2.5rem]'
@@ -168,7 +180,11 @@
 
           <Card
             :pt="{
-              body: { class: `p-4 border rounded-md ${crossSiteScripting ? 'border-orange-500' : 'border-transparent'}` },
+              body: {
+                class: `p-4 border rounded-md ${
+                  crossSiteScripting ? 'border-orange-500' : 'border-transparent'
+                }`
+              },
               title: { class: 'flex justify-between  text-base m-0 font-medium' },
               subtitle: {
                 class: 'text-sm font-normal text-color-secondary m-0 pr-0 md:pr-[2.5rem]'
@@ -199,7 +215,11 @@
           </Card>
           <Card
             :pt="{
-              body: { class: `p-4 border rounded-md ${fileUpload ? 'border-orange-500' : 'border-transparent'}` },
+              body: {
+                class: `p-4 border rounded-md ${
+                  fileUpload ? 'border-orange-500' : 'border-transparent'
+                }`
+              },
               title: { class: 'flex justify-between  text-base m-0 font-medium' },
               subtitle: {
                 class: 'text-sm font-normal text-color-secondary m-0 pr-0 md:pr-[2.5rem]'
@@ -229,7 +249,11 @@
 
           <Card
             :pt="{
-              body: { class: `p-4 border rounded-md ${evadingTricks ? 'border-orange-500' : 'border-transparent'}` },
+              body: {
+                class: `p-4 border rounded-md ${
+                  evadingTricks ? 'border-orange-500' : 'border-transparent'
+                }`
+              },
               title: { class: 'flex justify-between  text-base m-0 font-medium' },
               subtitle: {
                 class: 'text-sm font-normal text-color-secondary m-0 pr-0 md:pr-[2.5rem]'
@@ -258,7 +282,11 @@
           </Card>
           <Card
             :pt="{
-              body: { class: `p-4 border rounded-md ${unwantedAccess ? 'border-orange-500' : 'border-transparent'}` },
+              body: {
+                class: `p-4 border rounded-md ${
+                  unwantedAccess ? 'border-orange-500' : 'border-transparent'
+                }`
+              },
               title: { class: 'flex justify-between  text-base m-0 font-medium' },
               subtitle: {
                 class: 'text-sm font-normal text-color-secondary m-0 pr-0 md:pr-[2.5rem]'
@@ -290,7 +318,11 @@
           </Card>
           <Card
             :pt="{
-              body: { class: `p-4 border rounded-md ${identifiedAttack ? 'border-orange-500' : 'border-transparent'}` },
+              body: {
+                class: `p-4 border rounded-md ${
+                  identifiedAttack ? 'border-orange-500' : 'border-transparent'
+                }`
+              },
               title: { class: 'flex justify-between  text-base m-0 font-medium' },
               subtitle: {
                 class: 'text-sm font-normal text-color-secondary m-0 pr-0 md:pr-[2.5rem]'
