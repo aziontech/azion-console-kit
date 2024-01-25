@@ -11,6 +11,7 @@
     </template>
     <template #action-bar="{ onSubmit, formValid, onCancel, loading }">
       <ActionBarTemplate
+        v-if="showActionBar"
         @onSubmit="onSubmit"
         @onCancel="onCancel"
         :loading="loading"
@@ -37,6 +38,10 @@
     },
     loadWafRulesService: {
       type: Function,
+      required: true
+    },
+    showActionBar: {
+      type: Boolean,
       required: true
     }
   })

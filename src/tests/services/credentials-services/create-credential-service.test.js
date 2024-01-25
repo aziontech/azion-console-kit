@@ -7,7 +7,8 @@ const fixtures = {
   basic: {
     name: 'Cred A',
     description: 'Some description',
-    token: 'test-token'
+    token: 'test-token',
+    status: true
   }
 }
 

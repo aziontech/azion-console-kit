@@ -2,9 +2,9 @@ import { AxiosHttpClientAdapter } from '../axios/AxiosHttpClientAdapter'
 import * as Errors from '@/services/axios/errors'
 import { makeWafRulesAllowedBaseUrl } from './make-waf-rules-allowed-base-url'
 
-export const createWafRulesAllowedService = async ({ payload, id }) => {
+export const createWafRulesAllowedTuningService = async ({ payload, wafId }) => {
   let httpResponse = await AxiosHttpClientAdapter.request({
-    url: `${makeWafRulesAllowedBaseUrl()}/${id}/allowed_rules`,
+    url: `${makeWafRulesAllowedBaseUrl()}/${wafId}/allowed_rules`,
     method: 'POST',
     body: adapt(payload)
   })
@@ -13,19 +13,10 @@ export const createWafRulesAllowedService = async ({ payload, id }) => {
 }
 
 const adapt = (payload) => {
-  const matchValidationValues = payload.matchZones.map((zone) => {
-    if (['path', 'file_name', 'raw_body'].includes(zone.zone)) {
-      zone.matches_on = null
-    }
-    return zone
-  })
   return {
-    match_zones: matchValidationValues,
-    path: payload.path,
-    reason: payload.reason,
     rule_id: payload.ruleId,
-    status: payload.status,
-    use_regex: payload.useRegex
+    match_zones: payload.matchZone,
+    reason: payload.reason
   }
 }
 
@@ -39,10 +30,7 @@ const adapt = (payload) => {
 const parseHttpResponse = (httpResponse) => {
   switch (httpResponse.statusCode) {
     case 202:
-      return {
-        feedback: 'Your waf rule allowed has been created'
-      }
-
+      return 'Your waf rule allowed has been created'
     case 400:
       const apiError = extractApiError(httpResponse)
       throw new Error(apiError).message

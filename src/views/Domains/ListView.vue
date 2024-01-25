@@ -92,6 +92,7 @@
       },
       {
         field: 'active',
+        sortField: 'activeSort',
         header: 'Status',
         type: 'component',
         component: (columnData) =>

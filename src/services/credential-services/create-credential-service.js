@@ -69,6 +69,6 @@ const adapt = (payload) => {
   return {
     name: payload.name,
     description: payload.description,
-    status: true
+    status: payload.status
   }
 }
