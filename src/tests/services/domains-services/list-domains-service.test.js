@@ -9,6 +9,7 @@ const fixtures = {
     domain_name: 'domain A',
     cnames: ['CName 1', 'CName 2'],
     is_active: true,
+    activeSort: true,
     digital_certificate_id: '862026',
     edge_application_id: 'ea1234'
   },
@@ -18,6 +19,7 @@ const fixtures = {
     domain_name: 'domain B',
     cnames: ['CName 3', 'CName 4'],
     is_active: false,
+    activeSort: false,
     digital_certificate_id: '69870',
     edge_application_id: 'ea5678'
   },
@@ -80,6 +82,7 @@ describe('DomainsServices', () => {
           content: 'Active',
           severity: 'success'
         },
+        activeSort: true,
         edgeApplicationName: fixtures.edgeApplicationsMock[0].name,
         digitalCertificateId: fixtures.domainMock.digital_certificate_id
       },
@@ -94,6 +97,7 @@ describe('DomainsServices', () => {
           content: 'Inactive',
           severity: 'danger'
         },
+        activeSort: false,
         edgeApplicationName: fixtures.edgeApplicationsMock[1].name,
         digitalCertificateId: fixtures.disabledDomainMock.digital_certificate_id
       }
