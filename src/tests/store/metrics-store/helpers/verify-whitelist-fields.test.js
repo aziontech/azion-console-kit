@@ -1,8 +1,8 @@
-import VerifyWhiteListField from '@/stores/metrics-store/helpers/verify-whitelist-fields.js'
+import VerifyWhitelistField from '@/stores/metrics-store/helpers/verify-whitelist-fields.js'
 import { describe, expect, it } from 'vitest'
 
 const makeSut = () => {
-  const sut = VerifyWhiteListField
+  const sut = VerifyWhitelistField
   return { sut }
 }
 
@@ -19,7 +19,7 @@ const mockWhitelistedFields = [
 
 const mockNotWhitelistedFields = ['clientId', 'clientIdNe', 'clientIdLike', 'clientIdEq']
 
-describe('VerifyWhiteListField', () => {
+describe('VerifyWhitelistField', () => {
   it.each(mockWhitelistedFields)('should validate whitelisted key: %s', (key) => {
     const { sut } = makeSut()
 

@@ -5,7 +5,7 @@ import FiltersToGraphQLString from './filter-to-graphql-string'
 import FormatDatasetFilterToGql from './format-dataset-filter-to-gql'
 import FormatDatasetVariables from './format-dataset-variables'
 import MountFilterTypes from './mount-filter-types'
-import ParseObjectField from './parser-object-field'
+import ParserObjectField from './parser-object-field'
 import SortObjectByKey from './sort-object-by-key'
 import ValidateFilters from './validate-filters'
 import VerifyBlacklistFields from './verify-blacklist-fields'
@@ -19,7 +19,7 @@ export {
   FormatDatasetVariables,
   GqlRules,
   MountFilterTypes,
-  ParseObjectField,
+  ParserObjectField,
   SortObjectByKey,
   ValidateFilters,
   VerifyBlacklistFields,

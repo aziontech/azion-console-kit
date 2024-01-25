@@ -53,14 +53,14 @@ const aliasFieldLabel = (name) => {
 }
 
 /**
- * ParseObjectField function to parse object field.
+ * ParserObjectField function to parse object field.
  *
  * @param {Object} name - The name of the object field.
  * @param {string} description - The description of the object field.
  * @param {Object} type - The type object containing name property.
  * @return {Object} An object containing parsed fields.
  */
-export default function ParseObjectField({ name, description, type: { name: typeName } }) {
+export default function ParserObjectField({ name, description, type: { name: typeName } }) {
   const operator = getOperatorLabelFromFieldName(name)
   const value = aliasFieldLabel(name)
   const formattedLabel = formatFieldName(value)

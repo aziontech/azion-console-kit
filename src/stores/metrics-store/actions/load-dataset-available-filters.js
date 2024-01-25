@@ -1,7 +1,7 @@
 import BeholderService from '@services/metrics-services/fetch-metrics-data-from-beholder'
 import Axios from 'axios'
 import { InputListByDatasetQuery } from '../gql'
-import { ParserObjectField, VerifyBlacklistFields, VerifyWhiteListFields } from '../helpers'
+import { ParserObjectField, VerifyBlacklistFields, VerifyWhitelistFields } from '../helpers'
 
 let cancelRequest = null
 
@@ -28,7 +28,7 @@ export default async (dataset) => {
   }
 
   const availableFilters = data.inputFields
-    .filter(VerifyWhiteListFields)
+    .filter(VerifyWhitelistFields)
     .filter(VerifyBlacklistFields)
     .filter(({ description }) => !description.includes('DEPRECATED'))
     .map(ParserObjectField)
