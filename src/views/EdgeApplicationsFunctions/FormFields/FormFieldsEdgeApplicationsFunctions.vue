@@ -60,7 +60,7 @@
   <FormHorizontal
     :isDrawer="true"
     title="Edge Function"
-    description="Select the edge function and pass the required arguments. The function can't be modified at this stage."
+    description="Select an existing edge function and customize the arguments. You can only instantiate edge functions previously created in the Edge Functions module."
   >
     <template #inputs>
       <div class="flex w-80 flex-col gap-2 sm:max-w-lg max-sm:w-full">
