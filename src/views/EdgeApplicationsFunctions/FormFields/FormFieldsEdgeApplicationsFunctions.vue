@@ -30,7 +30,6 @@
       formatOnPaste: true
     }
   })
-
   const { value: name } = useField('name')
   const { value: edgeFunctionID } = useField('edgeFunctionID')
   const { value: args } = useField('args')
@@ -44,7 +43,7 @@
   <FormHorizontal
     :isDrawer="true"
     title="General"
-    description="Instantiate an edge function within your edge application."
+    description="Instantiate a serverless function created with Edge Functions within the edge application. Use Rules Engine to activate the function."
   >
     <template #inputs>
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
@@ -52,6 +51,7 @@
           label="Name *"
           name="name"
           v-model="name"
+          description="Give a unique and descriptive name to identify the function instance."
         />
       </div>
     </template>
@@ -59,8 +59,8 @@
 
   <FormHorizontal
     :isDrawer="true"
-    title="Function Instanced"
-    description="Description. Informar que para criar novas functions para serem instanciadas, o usuário precisa ir em Edge Functions."
+    title="Edge Function"
+    description="Select an existing edge function and customize the arguments. You can only instantiate edge functions previously created in the Edge Functions module."
   >
     <template #inputs>
       <div class="flex w-80 flex-col gap-2 sm:max-w-lg max-sm:w-full">
@@ -94,6 +94,9 @@
           :options="editorOptions"
           class="min-h-[200px] overflow-clip surface-border border rounded-md"
         />
+        <small class="text-color-secondary text-sm">
+          Customize the arguments in JSON format. Once set, they can be called in code using <code>event.args("arg_name")</code>.
+        </small>
       </div>
     </template>
   </FormHorizontal>
