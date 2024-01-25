@@ -10,7 +10,6 @@ const fixtures = {
     cnames: ['CName 1', 'CName 2'],
     is_active: true,
     digital_certificate_id: '862026',
-    edge_firewall_id: 'ef1234',
     edge_application_id: 'ea1234'
   },
   disabledDomainMock: {
@@ -20,12 +19,11 @@ const fixtures = {
     cnames: ['CName 3', 'CName 4'],
     is_active: false,
     digital_certificate_id: '69870',
-    edge_firewall_id: 'ef5678',
     edge_application_id: 'ea5678'
   },
   edgeApplicationsMock: [
-    { id: 'ea1234', name: 'Edge App X' },
-    { id: 'ea5678', name: 'Edge App Y' }
+    { id: 'ea1234', name: 'Edge App X', last_modified: new Date() },
+    { id: 'ea5678', name: 'Edge App Y', last_modified: new Date() }
   ]
 }
 
