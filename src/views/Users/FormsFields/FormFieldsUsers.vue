@@ -1,5 +1,5 @@
 <script setup>
-  import { ref, onMounted } from 'vue'
+  import { ref } from 'vue'
   import { useField } from 'vee-validate'
   import { useAccountStore } from '@/stores/account'
   import { storeToRefs } from 'pinia'
@@ -30,6 +30,9 @@
       type: Function,
       required: true
     },
+    resetForm: {
+      type: Function
+    },
     isEditForm: {
       type: Boolean,
       default: false
@@ -58,29 +61,30 @@
   const { value: twoFactorEnabled, errorMessage: errorTwoFactorEnabled } =
     useField('twoFactorEnabled')
 
-  const fetchCountries = async () => {
-    const countries = await props.listCountriesPhoneService()
-    setCountries(countries)
-    setCountryCallCodeBasedOnFormType()
-  }
-  const setCountries = (countries) => {
+  const setCountriesOptions = (countries) => {
     optionsCountriesMobile.value = countries
     filteredCountriesMobile.value = [...countries]
   }
-  const setCountryCallCodeBasedOnFormType = () => {
+
+  const fetchCountries = async () => {
+    const countries = await props.listCountriesPhoneService()
+    setCountriesOptions(countries)
+
     if (props.isEditForm) {
       setCountryCallCodeForEditForm()
     } else {
-      setCountryCallCodeForNewForm()
+      const firstCountry = optionsCountriesMobile.value[0].value
+      return firstCountry
     }
+
+    return
   }
-  const setCountryCallCodeForNewForm = () => {
-    countryCallCode.value = optionsCountriesMobile.value[0]
-  }
+
   const setCountryCallCodeForEditForm = () => {
-    countryCallCode.value = filteredCountriesMobile.value.find(
+    const loadedCountryCallCode = filteredCountriesMobile.value.find(
       (country) => country.value === countryCallCode.value
     )
+    countryCallCode.value = loadedCountryCallCode.value
   }
 
   const fetchTimezone = async () => {
@@ -88,28 +92,54 @@
     optionsTimezone.value = result.listTimeZones
 
     if (!props.isEditForm) {
-      timezone.value = result.defaultSelected
+      return result.defaultSelected
     }
+    return
   }
   const fetchDetailAccount = async () => {
     const account = await props.loadAccountDetailsService()
     isForceMFA.value = account?.is_enabled_mfa_to_all_users
 
     if (!props.isEditForm) {
-      twoFactorEnabled.value = isForceMFA.value
+      return !!isForceMFA.value
     }
+    return
   }
   const fetchTeams = async () => {
     const result = await props.listTeamsService()
     optionsTeams.value = result
-    if (!props.isEditForm) teamsIds.value = [result[0].value]
+
+    if (!props.isEditForm) {
+      const firstTeamId = result[0].value
+      return firstTeamId
+    }
+
+    return
   }
-  onMounted(async () => {
-    await fetchCountries()
-    await fetchTimezone()
-    await fetchTeams()
-    await fetchDetailAccount()
-  })
+  const initializeFormValues = async () => {
+    const defaultTeamId = await fetchTeams()
+    const initialCountry = await fetchCountries()
+    const initialTimezone = await fetchTimezone()
+    const forceMfaEnabled = await fetchDetailAccount()
+
+    if (!props.isEditForm) {
+      const initialValues = {
+        firstName: '',
+        lastName: '',
+        timezone: initialTimezone,
+        language: '',
+        email: '',
+        countryCallCode: initialCountry,
+        mobile: '',
+        isAccountOwner: false,
+        teamsIds: [defaultTeamId],
+        twoFactorEnabled: forceMfaEnabled,
+        selectedLanguage: 'en'
+      }
+
+      props.resetForm({ values: initialValues })
+    }
+  }
 
   const handleisAccountOwner = () => {
     if (!isAccountOwner.value) {
@@ -119,7 +149,10 @@
 
   accountIsOwner.value = account?.is_account_owner
   isAccountOwner.value = accountIsOwner.value
+
+  initializeFormValues()
 </script>
+
 <template>
   <FormHorizontal title="General">
     <template #inputs>
@@ -238,6 +271,7 @@
               :options="filteredCountriesMobile"
               optionLabel="labelFormat"
               placeholder="Loading..."
+              optionValue="value"
               :loading="!filteredCountriesMobile.length"
               :class="{ 'p-invalid': errorCountryCallCode }"
               class="surface-border border-r-0 w-1/4"

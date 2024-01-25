@@ -41,7 +41,7 @@
     return blockViewRedirection.value && isDirty.value
   })
 
-  const { meta, errors, handleSubmit, isSubmitting, values } = useForm({
+  const { meta, errors, handleSubmit, isSubmitting, values, resetForm } = useForm({
     validationSchema: props.schema,
     initialValues: props.initialValues
   })
@@ -90,7 +90,7 @@
 <template>
   <div class="flex flex-col min-h-[calc(100vh-300px)]">
     <form class="w-full grow flex flex-col gap-8 max-md:gap-6">
-      <slot name="form" />
+      <slot name="form" :resetForm="resetForm" />
       <slot name="raw-form" />
     </form>
     <DialogUnsavedBlock :blockRedirectUnsaved="formHasChanges" />

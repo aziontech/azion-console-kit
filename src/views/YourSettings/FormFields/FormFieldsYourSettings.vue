@@ -26,19 +26,17 @@
   const optionsCountriesMobile = ref([])
   const filteredCountriesMobile = ref([])
   const optionsLanguage = ref([{ label: 'English', value: 'en' }])
+  const selectedCountryCallCode = ref(null)
 
   const { value: firstName, errorMessage: errorFirstName } = useField('firstName')
   const { value: lastName, errorMessage: errorLastName } = useField('lastName')
   const { value: timezone, errorMessage: errorTimezone } = useField('timezone')
   const { value: language, errorMessage: errorLanguage } = useField('language')
   const { value: email, errorMessage: errorEmail } = useField('email')
-  const { value: countryCallCode } = useField('countryCallCode')
-  const { value: selectedCountryCallCode, errorMessage: errorSelectedCountryCallCode } =
-    useField('selectedCountryCallCode')
+  const { value: countryCallCode, errorMessage: errorCountryCallCode } = useField('countryCallCode')
   const { value: mobile, errorMessage: errorMobile } = useField('mobile')
   const { value: twoFactorEnabled, errorMessage: errorTwoFactorEnabled } =
     useField('twoFactorEnabled')
-
   const { value: password, errorMessage: errorPassword } = useField('password')
   const { value: oldPassword, errorMessage: errorOldPassword } = useField('oldPassword')
   const { value: confirmPassword, errorMessage: errorConfirmPassword } = useField('confirmPassword')
@@ -62,9 +60,9 @@
     optionsTimezone.value = result.listTimeZones
   }
 
-  onMounted(() => {
-    fetchCountries()
-    fetchTimezone()
+  onMounted(async() => {
+    await fetchCountries()
+    await fetchTimezone()
   })
 
   const passwordRequirementsList = ref([
@@ -234,7 +232,7 @@
               optionLabel="labelFormat"
               placeholder="Loading..."
               :loading="isLoadingCountry"
-              :class="{ 'p-invalid': errorSelectedCountryCallCode }"
+              :class="{ 'p-invalid': errorCountryCallCode }"
               class="w-2/3 surface-border border-r-0"
               v-model="selectedCountryCallCode"
             >
@@ -278,7 +276,8 @@
           v-model="oldPassword"
           id="oldPassword"
           class="w-full"
-          autocomplete="off"
+          autocomplete="new-password"
+          :inputProps="{ autocomplete: 'new-password' }"
           :feedback="false"
         />
         <small
@@ -297,7 +296,7 @@
           toggleMask
           v-model="password"
           id="password"
-          autocomplete="off"
+          autocomplete="new-password"
           class="w-full"
           :class="{ 'p-invalid': errorPassword }"
           @input="validation()"
