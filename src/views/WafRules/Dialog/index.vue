@@ -76,7 +76,7 @@
         <div class="text-secondary-color text-sm mb-5">
           For each URI, this action will create a separate rule for each possible attack.
         </div>
-        <div class="text-color font-semibold text-sm">
+        <div class="text-color font-semibold text-sm mb-2">
           To confirm, enter the reason for allowing these rules or provide additional information in
           the box below:
         </div>

@@ -96,7 +96,7 @@
       <div class="flex flex-col w-full sm:max-w-xs gap-2">
         <label
           for="ruleid"
-          class="text-color text-base font-medium"
+          class="text-color text-sm font-medium"
           >Rule ID *</label
         >
         <Dropdown
@@ -165,6 +165,7 @@
               severity="secondary"
               icon="pi pi-trash"
               aria-label="Trash"
+              v-tooltip.bottom="{ value: 'Delete', showDelay: 200 }"
               @click="deleteMatchZone(index)"
             />
           </div>
@@ -172,7 +173,7 @@
           <div class="flex flex-col w-full sm:max-w-xs gap-2">
             <label
               for="ruleid"
-              class="text-color text-base font-medium"
+              class="text-color text-sm font-medium"
               >Match Zones *</label
             >
             <Dropdown
@@ -189,7 +190,7 @@
             v-if="showConditionalInputs(matchZones[index].zone)"
           >
             <div class="flex flex-col sm:max-w-lg w-full gap-2">
-              <label class="text-color text-base font-medium">Field </label>
+              <label class="text-color text-sm font-medium">Field </label>
               <InputText
                 v-model="matchZones[index].zone_input"
                 type="text"
@@ -200,7 +201,7 @@
             class="flex flex-col gap-2"
             v-if="showMatchOnInputs(matchZones[index].zone)"
           >
-            <label class="text-color text-base font-medium">Matches On *</label>
+            <label class="text-color text-sm font-medium">Matches On *</label>
             <div class="flex flex-col gap-3">
               <Card
                 :pt="{
@@ -273,14 +274,16 @@
       </div>
 
       <Divider type="solid"></Divider>
-      <PrimeButton
-        severity="secondary"
-        icon="pi pi-plus"
-        label="New Match Zone"
-        class="sm:w-1/3"
-        outlined
-        @click="addMatchZones"
-      />
+      <div>
+        <PrimeButton
+          severity="secondary"
+          icon="pi pi-plus"
+          label="New Match Zone"
+          class="sm:w-auto"
+          outlined
+          @click="addMatchZones"
+        />
+      </div>
     </template>
   </FormHorizontal>
   <FormHorizontal

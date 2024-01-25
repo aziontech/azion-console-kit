@@ -115,45 +115,45 @@
     </template>
     <div class="flex flex-col p-8 gap-8">
       <div
-        class="flex max-w-screen-2xl mx-auto gap-8 w-full surface-section rounded-md border surface-border px-8 py-8 flex-wrap min-w-[2rem]"
+        class="flex max-w-screen-2xl mx-auto gap-4 w-full surface-section rounded-md border surface-border px-8 py-8 flex-wrap min-w-[2rem]"
       >
         <div class="flex-col justify-center items-start gap-3 flex">
           <div class="text-color text-xl font-medium">
             {{ tuningObject.ruleIdDescription }}
           </div>
-          <div class="justify-start items-center gap-1 inline-flex">
+          <div class="justify-start items-center gap-1 inline-flex text-color-secondary">
             <i class="pi pi-calendar"></i> {{ time }}
           </div>
         </div>
         <Divider></Divider>
         <div class="flex w-full gap-8">
           <div class="w-1/2 flex flex-col gap-3">
-            <div class="flex justify-between w-full">
+            <div class="flex justify-between w-full gap-3">
               <span class="w-1/2 text-color">Domain</span>
               <div class="flex flex-col w-1/2">
                 <span
-                  class="w-full text-color-secondary"
+                  class="w-full text-color-secondary whitespace-pre-line"
                   v-for="(domain, index) in props.domains"
                   :key="index"
                   >{{ domain }}
                 </span>
               </div>
             </div>
-            <div class="flex justify-between w-full">
+            <div class="flex justify-between w-full gap-3 ">
               <span class="w-1/2 text-color">Path</span>
-              <span class="w-1/2 text-color-secondary"></span>
+              <span class="h-auto w-1/2 text-color-secondary"></span>
             </div>
-            <div class="flex justify-between w-full">
+            <div class="flex justify-between w-full gap-3">
               <span class="w-1/2 text-color">IP Address</span>
               <span class="w-1/2 text-color-secondary"></span>
             </div>
           </div>
           <div class="w-1/2 flex flex-col gap-3">
-            <div class="flex justify-between w-full">
+            <div class="flex justify-between w-full gap-3">
               <span class="w-1/2 text-color">Network List</span>
               <span class="w-1/2 text-color-secondary"></span>
             </div>
-            <div class="flex justify-between w-full">
+            <div class="flex justify-between w-full gap-3">
               <span class="w-1/2 text-color">Country</span>
               <span class="w-1/2 text-color-secondary"></span>
             </div>
@@ -184,7 +184,7 @@
               :key="index"
               :class="{ 'border-orange-500': checkActiveBorder(attack) }"
             >
-              <div class="flex w-full gap-2 items-start">
+              <div class="flex w-full gap-3 items-start">
                 <CheckboxPrime
                   v-model="selectedAttack"
                   name="attack.ruleID"

@@ -1,5 +1,5 @@
 <template>
-  <div class="flex gap-6 mt-4">
+  <div class="flex gap-6 mt-4 flex-col sm:flex-row">
     <Dropdown
       optionValue="value"
       optionLabel="name"
