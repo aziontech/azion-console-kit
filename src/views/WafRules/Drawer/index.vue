@@ -139,7 +139,7 @@
                 </span>
               </div>
             </div>
-            <div class="flex justify-between w-full gap-3 ">
+            <div class="flex justify-between w-full gap-3">
               <span class="w-1/2 text-color">Path</span>
               <span class="h-auto w-1/2 text-color-secondary"></span>
             </div>

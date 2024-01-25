@@ -19,7 +19,7 @@
         v-else
         title="No waf rules added"
         description="Create your first waf rules."
-        createButtonLabel="WAF Rule"
+        createButtonLabel="WAF Rules"
         createPagePath="waf/create"
         :documentationService="props.documentationService"
       >

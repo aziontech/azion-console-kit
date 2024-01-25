@@ -1,5 +1,5 @@
 <script setup>
-  import { ref, watch } from 'vue'
+  import { ref } from 'vue'
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
   import InputSwitch from 'primevue/inputswitch'
   import Dropdown from 'primevue/dropdown'
@@ -43,9 +43,7 @@
     { name: 'Request Header', value: 'request_header' }
   ])
 
-  const ruleIdOption = ref([])
-
-  ruleIdOption.value = props.optionsRuleIds
+  const ruleIdOption = ref(props.optionsRuleIds)
 
   const addMatchZones = () => {
     const newArray = matchZones.value
@@ -80,10 +78,6 @@
   const deleteMatchZone = (index) => {
     matchZones.value.splice(index, 1)
   }
-
-  watch(props.getRuleIdOptions, (value) => {
-    ruleIdOption.value = value
-  })
 </script>
 
 <template>
