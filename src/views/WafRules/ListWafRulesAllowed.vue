@@ -99,7 +99,7 @@
   const showCreateWafRulesAllowedDrawer = ref(false)
   const listAllowedRef = ref('')
 
-  const emit = defineEmits(['update:visible', 'attack-on'])
+  const emit = defineEmits(['update:visible', 'attack-on', 'handle-go-to-tuning'])
 
   const props = defineProps({
     listWafRulesAllowedService: {
