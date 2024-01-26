@@ -95,7 +95,8 @@
           class="min-h-[200px] overflow-clip surface-border border rounded-md"
         />
         <small class="text-color-secondary text-sm">
-          Customize the arguments in JSON format. Once set, they can be called in code using <code>event.args("arg_name")</code>.
+          Customize the arguments in JSON format. Once set, they can be called in code using
+          <code>event.args("arg_name")</code>.
         </small>
       </div>
     </template>
