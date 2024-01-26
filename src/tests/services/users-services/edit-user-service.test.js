@@ -11,11 +11,7 @@ const fixtures = {
     timezone: 'GMT',
     language: 'en',
     email: 'test.test@azion.com',
-    countryCallCode: {
-      label: 'AL (Albania) +355',
-      labelFormat: 'AL +355',
-      value: 'AL - 355'
-    },
+    countryCallCode: 'AL - 355',
     mobile: 12312312,
     isAccountOwner: false,
     teamsIds: [1580],
@@ -49,7 +45,7 @@ describe('UsersService', () => {
         timezone: fixtures.userMock.timezone,
         language: fixtures.userMock.language,
         email: fixtures.userMock.email,
-        country_call_code: fixtures.userMock.countryCallCode.value,
+        country_call_code: fixtures.userMock.countryCallCode,
         mobile: fixtures.userMock.mobile.toString(),
         is_account_owner: fixtures.userMock.isAccountOwner,
         teams_ids: fixtures.userMock.teamsIds,
