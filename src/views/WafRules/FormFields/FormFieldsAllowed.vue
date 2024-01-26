@@ -188,8 +188,16 @@
             v-if="showConditionalInputs(matchZones[index].zone)"
           >
             <div class="flex flex-col sm:max-w-lg w-full gap-2">
-              <label v-if="showInputNameHeader(matchZones[index].zone)" class="text-color text-sm font-medium">Header</label>
-              <label v-else class="text-color text-sm font-medium">Field </label>
+              <label
+                v-if="showInputNameHeader(matchZones[index].zone)"
+                class="text-color text-sm font-medium"
+                >Header</label
+              >
+              <label
+                v-else
+                class="text-color text-sm font-medium"
+                >Field
+              </label>
               <InputText
                 v-model="matchZones[index].zone_input"
                 type="text"
@@ -279,7 +287,7 @@
           icon="pi pi-plus"
           label="New Match Zone"
           class="sm:w-auto"
-          :disabled="matchZones?.length >= 9 "
+          :disabled="matchZones?.length >= 9"
           outlined
           @click="addMatchZones"
         />

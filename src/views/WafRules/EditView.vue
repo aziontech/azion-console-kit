@@ -75,7 +75,7 @@
     return await props.editWafRulesService(payload, parseInt(wafRuleId.value))
   }
 
-  const formSubmit  = async (onSubmit, values) => {
+  const formSubmit = async (onSubmit, values) => {
     await onSubmit()
     emit('handleWafRulesUpdated', values)
   }
