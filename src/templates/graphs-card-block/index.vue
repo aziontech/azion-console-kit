@@ -38,12 +38,12 @@
 </template>
 
 <script setup>
-  import { computed } from 'vue'
-  import PrimeButton from 'primevue/button'
-  import ChartOwner from './components/chart-owner.vue'
-  import AggregationInfo from './components/aggregation-info.vue'
-  import MoreOptionsMenu from './components/more-options-menu.vue'
   import { useHelpCenterStore } from '@/stores/help-center'
+  import PrimeButton from 'primevue/button'
+  import { computed } from 'vue'
+  import AggregationInfo from './components/aggregation-info.vue'
+  import ChartOwner from './components/chart-owner.vue'
+  import MoreOptionsMenu from './components/more-options-menu.vue'
 
   defineOptions({ name: 'GraphsCardBlock' })
 
@@ -72,9 +72,9 @@
     },
     aggregationType: {
       type: String,
-      default: 'Sum',
+      default: 'sum',
       validator(value) {
-        return ['Sum', 'Average'].includes(value)
+        return ['sum', 'avg'].includes(value)
       }
     },
     displayTag: {
