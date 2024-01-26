@@ -2,7 +2,7 @@
   <div class="flex gap-2">
     <PrimeTag
       icon="pi pi-calculator"
-      :value="aggregationType"
+      :value="aggregationTypeLabel"
     />
     <PrimeTag
       :class="tagProps?.class"
@@ -19,15 +19,24 @@
 </template>
 
 <script setup>
-  import { computed } from 'vue'
-  import PrimeTag from 'primevue/tag'
   import PrimeSkeleton from 'primevue/skeleton'
+  import PrimeTag from 'primevue/tag'
+  import { computed } from 'vue'
 
   const props = defineProps({
     aggregationType: { type: String, required: true },
     displayTag: Boolean,
     variationType: { type: String, required: true },
     variationValue: { type: String, required: true }
+  })
+
+  const aggregationTypeLabel = computed(() => {
+    const labels = {
+      sum: 'Sum',
+      avg: 'Average'
+    }
+
+    return labels[props.aggregationType]
   })
 
   const tagProps = computed(() => {
