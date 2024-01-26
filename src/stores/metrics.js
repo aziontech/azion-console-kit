@@ -49,7 +49,9 @@ export const useMetricsStore = defineStore('metrics', {
       state.currentGroupPage?.pagesDashboards?.map((item, idx) => ({
         idx: idx,
         id: item.id,
-        label: item.label
+        label: item.label,
+        path: item.path,
+        dashboards: item.dashboards
       })),
     pageCurrent: (state) => state.currentPage,
     groupPageCurrent: (state) => state.currentGroupPage,
@@ -166,6 +168,8 @@ export const useMetricsStore = defineStore('metrics', {
     },
     setCurrentPage(page) {
       this.currentPage = page
+      ;[this.currentDashboard] = this.currentPage.dashboards
+      this.currentDashboard.active = true
     },
     setCurrentDashboard(dashboard) {
       this.currentDashboard = dashboard
@@ -188,20 +192,20 @@ export const useMetricsStore = defineStore('metrics', {
       }
 
       this.currentGroupPage = this.listGroupPage.find((groupPage) => {
-        this.currentPage = groupPage.pagesDashboards.find(({ url }) => `${url}` === pageId)
+        this.currentPage = groupPage.pagesDashboards.find(({ path }) => `${path}` === pageId)
         return this.currentPage
       })
 
       const newListDashboards = this.currentPage.dashboards.map((dashboard) => {
         const updateDashboard = {
           ...dashboard,
-          active: `${dashboard.url}` === dashboardId
+          active: `${dashboard.path}` === dashboardId
         }
         return updateDashboard
       })
 
       this.currentPage.dashboards = newListDashboards
-      this.currentDashboard = newListDashboards.find(({ url }) => `${url}` === dashboardId)
+      this.currentDashboard = newListDashboards.find(({ path }) => `${path}` === dashboardId)
     },
     setCurrentGroupPageByLabels(labelGroup) {
       if (!this.listGroupPage.length) {
