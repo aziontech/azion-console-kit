@@ -9,7 +9,8 @@
     id: { type: String, default: '#action-bar' },
     loading: Boolean,
     cancelDisabled: Boolean,
-    submitDisabled: Boolean
+    submitDisabled: Boolean,
+    primaryActionLabel: String
   })
 
   const handleSubmit = () => {
@@ -37,6 +38,7 @@
       :cancelDisabled="props.cancelDisabled"
       :submitDisabled="props.submitDisabled"
       :inDrawer="false"
+      :primaryActionLabel="props.primaryActionLabel"
       @onSubmit="handleSubmit"
       @onCancel="handleCancel"
     />
