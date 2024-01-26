@@ -156,12 +156,19 @@
   const wafRulesAllowedColumns = ref([
     {
       field: 'ruleId',
-      header: 'Rule ID'
+      header: 'Rule ID',
+      type: 'component',
+      component: (columnData) =>
+        columnBuilder({ data: columnData, columnAppearance: 'expand-text-column' })
     },
     {
       field: 'reason',
-      header: 'Description'
+      header: 'Description',
+      type: 'component',
+      component: (columnData) =>
+        columnBuilder({ data: columnData, columnAppearance: 'expand-text-column' })
     },
+
     {
       field: 'path',
       header: 'URI'
