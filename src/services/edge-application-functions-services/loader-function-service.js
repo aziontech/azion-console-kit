@@ -17,7 +17,7 @@ const adapt = (httpResponse) => {
     id: httpResponse.body.results.id,
     edgeFunctionID: httpResponse.body.results.edge_function_id,
     name: httpResponse.body.results.name,
-    args: JSON.stringify(httpResponse.body.results.args)
+    args: JSON.stringify(httpResponse.body.results.args, null, '\t')
   }
 
   return {

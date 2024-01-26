@@ -51,7 +51,7 @@ describe('LoaderFunctionService', () => {
       id: fixture.functionInstance.id,
       edgeFunctionID: fixture.functionInstance.edge_function_id,
       name: fixture.functionInstance.name,
-      args: JSON.stringify(fixture.functionInstance.args)
+      args: JSON.stringify(fixture.functionInstance.args, null, '\t')
     })
   })
 

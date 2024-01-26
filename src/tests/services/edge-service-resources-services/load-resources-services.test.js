@@ -29,13 +29,14 @@ describe('EdgeServiceResourcesServices', () => {
     const id = 812783
     const edgeServiceId = 7879123
     const { sut } = makeSut()
+    const version = 'v3'
 
     await sut({
       id,
       edgeServiceId
     })
     expect(requestSpy).toHaveBeenCalledWith({
-      url: `edge_services/${edgeServiceId}/resources/${id}`,
+      url: `${version}/edge_services/${edgeServiceId}/resources/${id}`,
       method: 'GET'
     })
   })

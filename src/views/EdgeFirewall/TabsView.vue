@@ -127,7 +127,7 @@
           />
         </TabPanel>
         <TabPanel
-          header="Functions"
+          header="Functions Instances"
           v-if="isEnableFunction"
         >
           <EdgeFirewallFunctionsListView

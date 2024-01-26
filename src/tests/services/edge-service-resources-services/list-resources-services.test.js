@@ -53,13 +53,13 @@ describe('EdgeServiceResourcesServices', () => {
     })
     const edgeServiceIdMock = 1
     const { sut } = makeSut()
-
+    const version = 'v3'
     await sut({
       id: edgeServiceIdMock
     })
 
     expect(requestSpy).toHaveBeenCalledWith({
-      url: `edge_services/${edgeServiceIdMock}/resources?filter=&order_by=name&sort=asc&page=1&page_size=200`,
+      url: `${version}/edge_services/${edgeServiceIdMock}/resources?filter=&order_by=name&sort=asc&page=1&page_size=200`,
       method: 'GET'
     })
   })
