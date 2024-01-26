@@ -19,7 +19,7 @@
   import ContentBlock from '@/templates/content-block'
   import PageHeadingBlock from '@/templates/page-heading-block'
   import { storeToRefs } from 'pinia'
-  import { computed, onMounted } from 'vue'
+  import { computed, onMounted, watch } from 'vue'
   import { useRoute, useRouter } from 'vue-router'
   import ContentFilterBlock from './blocks/content-filter-block.vue'
   import DashboardPanelBlock from './blocks/dashboard-panel-block.vue'
@@ -45,7 +45,7 @@
     setInitialCurrentsByIds
   } = metricsStore
 
-  const { currentIdPageAndDashboard } = storeToRefs(metricsStore)
+  const { currentIdPageAndDashboard, getCurrentInfo } = storeToRefs(metricsStore)
 
   const getCurrentIds = computed(() => {
     return currentIdPageAndDashboard.value
@@ -78,4 +78,8 @@
       params: getCurrentIds.value
     })
   }
+
+  watch(getCurrentInfo, () => {
+    updateRouter()
+  })
 </script>
