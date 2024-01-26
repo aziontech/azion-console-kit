@@ -2,6 +2,7 @@
   import { useMetricsStore } from '@/stores/metrics'
   import { storeToRefs } from 'pinia'
   import Dropdown from 'primevue/dropdown'
+  import Skeleton from 'primevue/skeleton'
   import TabMenu from 'primevue/tabmenu'
   import { computed } from 'vue'
 
@@ -45,7 +46,12 @@
       class="flex self-start"
       @change="changeGroup"
     />
+    <Skeleton
+      class="w-96 h-8"
+      v-if="!groupPages?.length"
+    />
     <TabMenu
+      v-else
       :activeIndex="selectedPage"
       :model="groupPages"
       :key="selectedPage"
