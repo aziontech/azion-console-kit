@@ -63,6 +63,10 @@
     })
   }
 
+  const updateWafRulesValue = (wafRulesUpdated) => {
+    wafName.value = wafRulesUpdated.name
+  }
+
   const renderTabCurrentRouter = async () => {
     getWafDat()
     const { tab } = route.params
@@ -90,6 +94,7 @@
             :editWafRulesService="props.wafServices.editWafRulesService"
             :loadWafRulesService="props.wafServices.loadWafRulesService"
             :showActionBar="activeTab === mapTabs.mainSettings"
+            @handleWafRulesUpdated="updateWafRulesValue"
           />
         </TabPanel>
         <TabPanel header="Tuning">

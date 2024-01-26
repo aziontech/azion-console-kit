@@ -54,6 +54,10 @@
     'Choose match zones to put into the Allowed Rule:\n Path to put the path itself or one named path into the Allowed Rule. \n Query String or Conditional Query String to put all GET arguments or one named argument into the Allowed Rule. For example, the "search" argument. \n Request Header or Conditional Request Header to put all HTTP request headers or one named header into the Allowed Rule. For example, the Cookie header. \nRequest Body or Conditional Request Body to put all POST arguments or one named argument into the Allowed Rule. For example, the "search" argument.\n Raw Body to put the unparsed (raw) request body into the whitelist.\n File Name (Multipart Body) to put the unparsed (raw) request body into the Allowed Rule.'
   )
 
+  const showInputNameHeader = (value) => {
+    return value === 'conditional_query_header'
+  }
+
   const showConditionalInputs = (value) => {
     const conditionalInputs = [
       'conditional_query_string',
@@ -103,7 +107,7 @@
           :disabled="props.disabledRuleId"
           :pt="{
             panel: { class: 'sm:!w-[500px]' },
-            item: { class: 'whitespace-pre-line my-5 sm:my-3' }
+            item: { class: 'whitespace-pre-line' }
           }"
         />
       </div>
@@ -184,7 +188,8 @@
             v-if="showConditionalInputs(matchZones[index].zone)"
           >
             <div class="flex flex-col sm:max-w-lg w-full gap-2">
-              <label class="text-color text-sm font-medium">Field </label>
+              <label v-if="showInputNameHeader(matchZones[index].zone)" class="text-color text-sm font-medium">Header</label>
+              <label v-else class="text-color text-sm font-medium">Field </label>
               <InputText
                 v-model="matchZones[index].zone_input"
                 type="text"
@@ -274,6 +279,7 @@
           icon="pi pi-plus"
           label="New Match Zone"
           class="sm:w-auto"
+          :disabled="matchZones?.length >= 9 "
           outlined
           @click="addMatchZones"
         />
