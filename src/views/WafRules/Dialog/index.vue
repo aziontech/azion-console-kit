@@ -6,7 +6,7 @@
 
   defineOptions({ name: 'dialog-allow-rule' })
 
-  const emit = defineEmits(['update:visible'])
+  const emit = defineEmits(['update:visible', 'closeDialog'])
   const reason = ref('')
 
   const props = defineProps({
@@ -57,13 +57,13 @@
       :blockScroll="true"
       v-model:visible="showDialog"
       modal
-      :closable="false"
+      @hide="closeDialog"
       :pt="{
         root: { class: 'p-0 w-[37.5rem]' },
-        header: { class: 'flex p-5 items-center self-stretch border-b border-solid' },
+        header: { class: 'flex py-5 px-8 items-center self-stretch border-b border-solid' },
         content: { class: 'p-0 h-full' },
         footer: {
-          class: 'flex p-5 justify-end items-end border-t border-solid'
+          class: 'flex py-5 px-8 justify-end items-end border-t border-solid'
         }
       }"
     >
@@ -72,8 +72,8 @@
           Allow all rules from a list of possible attacks
         </h5>
       </template>
-      <div class="p-5 flex justify-center flex-col">
-        <div class="text-secondary-color text-sm mb-5">
+      <div class="py-5 px-8 flex justify-center flex-col">
+        <div class="text-secondary-color text-sm mb-3.5">
           For each URI, this action will create a separate rule for each possible attack.
         </div>
         <div class="text-color font-semibold text-sm mb-2">
@@ -100,6 +100,7 @@
           label="Allow Rules"
           :loading="loading"
           @click="handleAllowRule"
+          iconPos="right"
         />
       </template>
     </PrimeDialog>

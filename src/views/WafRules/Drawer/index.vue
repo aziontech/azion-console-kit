@@ -121,8 +121,8 @@
           <div class="text-color text-xl font-medium">
             {{ tuningObject.ruleIdDescription }}
           </div>
-          <div class="justify-start items-center gap-1 inline-flex text-color-secondary">
-            <i class="pi pi-calendar"></i> {{ time }}
+          <div class="justify-start items-center gap-1 inline-flex ">
+            <i class="pi pi-calendar text-color"></i> <span class="text-color-secondary">{{ time }}</span> 
           </div>
         </div>
         <Divider></Divider>
@@ -171,7 +171,7 @@
             </div>
           </div>
           <div class="flex flex-col gap-2 w-full">
-            <span class="text-color">Fields List</span>
+            <span class="text-color text-sm font-medium">Fields List</span>
             <Skeleton
               v-if="loading"
               width="100%"
