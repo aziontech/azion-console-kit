@@ -4,67 +4,82 @@
       <PageHeadingBlock pageTitle="Real-Time Metrics" />
     </template>
     <template #content>
-      <TabsPageBlock
-        :metricsProductsService="fetchMetricsProductsService"
-        :metricsGroupsService="fetchMetricsGroupsService"
-        :params="routeParams"
-      />
+      <TabsPageBlock />
       <div class="card surface-border border rounded-md surface-section p-3.5 flex flex-col gap-4">
         <IntervalFilterBlock />
         <ContentFilterBlock :playgroundOpener="playgroundOpener" />
       </div>
-      <DashboardPanelBlock
-        :metricsDashboardsService="fetchMetricsDashboardsService"
-        :params="routeParams"
-      />
+      <DashboardPanelBlock />
     </template>
   </ContentBlock>
 </template>
 
 <script setup>
+  import { useMetricsStore } from '@/stores/metrics'
   import ContentBlock from '@/templates/content-block'
   import PageHeadingBlock from '@/templates/page-heading-block'
-  import { ref, watch } from 'vue'
-  import { useRoute } from 'vue-router'
+  import { storeToRefs } from 'pinia'
+  import { computed, onMounted, watch } from 'vue'
+  import { useRoute, useRouter } from 'vue-router'
   import ContentFilterBlock from './blocks/content-filter-block.vue'
   import DashboardPanelBlock from './blocks/dashboard-panel-block.vue'
   import IntervalFilterBlock from './blocks/interval-filter-block.vue'
   import TabsPageBlock from './blocks/tabs-page-block'
 
   defineProps({
-    fetchMetricsGroupsService: {
-      type: Function,
-      required: true
-    },
-    fetchMetricsProductsService: {
-      type: Function,
-      required: true
-    },
-    fetchMetricsDashboardsService: {
-      type: Function,
-      required: true
-    },
     playgroundOpener: {
       type: Function,
       required: true
     }
   })
 
-  const route = useRoute()
-  const routeParams = ref({
-    group: 'build',
-    product: 'edge-applications'
+  onMounted(() => {
+    loadPageInfo()
   })
 
-  watch(
-    route,
-    () => {
-      const { group, product } = route.params
+  const metricsStore = useMetricsStore()
+  const {
+    setInfoAvailableFilters,
+    setGroupPage,
+    setInitialPageAndDashboardCurrent,
+    setInitialCurrentsByIds
+  } = metricsStore
 
-      if (group && product) {
-        routeParams.value = { group, product }
-      }
-    },
-    { immediate: true }
-  )
+  const { currentIdPageAndDashboard, getCurrentInfo } = storeToRefs(metricsStore)
+
+  const getCurrentIds = computed(() => {
+    return currentIdPageAndDashboard.value
+  })
+
+  const loadPageInfo = async () => {
+    await setInfoAvailableFilters()
+    await setGroupPage()
+    setCurrentPageAndDashboard()
+    updateRouter()
+  }
+
+  const route = useRoute()
+
+  const setCurrentPageAndDashboard = () => {
+    const { pageId, dashboardId } = route.params
+
+    if (!pageId || !dashboardId) {
+      return setInitialPageAndDashboardCurrent()
+    }
+
+    return setInitialCurrentsByIds({ pageId, dashboardId })
+  }
+
+  const router = useRouter()
+
+  const updateRouter = () => {
+    router.push({
+      name: 'real-time-metrics',
+      params: getCurrentIds.value
+    })
+  }
+
+  watch(getCurrentInfo, () => {
+    updateRouter()
+  })
 </script>

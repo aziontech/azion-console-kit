@@ -1,93 +1,62 @@
 <script setup>
+  import { useMetricsStore } from '@/stores/metrics'
+  import { storeToRefs } from 'pinia'
   import Dropdown from 'primevue/dropdown'
+  import Skeleton from 'primevue/skeleton'
   import TabMenu from 'primevue/tabmenu'
-  import { computed, onMounted, ref, watch } from 'vue'
-  import { useRouter } from 'vue-router'
+  import { computed } from 'vue'
 
-  const props = defineProps({
-    params: {
-      type: Object,
-      required: true
-    },
-    metricsProductsService: {
-      type: Function,
-      required: true
-    },
-    metricsGroupsService: {
-      type: Function,
-      required: true
-    }
+  const metricsStore = useMetricsStore()
+  const { getGroupPages, groupPageCurrent, getPages, pageCurrent } = storeToRefs(metricsStore)
+  const { setCurrentGroupPageByLabels, resetFilters, setCurrentPage } = metricsStore
+
+  const metricsGroups = computed(() => {
+    return getGroupPages.value
   })
 
-  onMounted(() => {
-    fetchGroups()
+  const selectedGroup = computed(() => {
+    return groupPageCurrent.value
   })
 
-  const metricsGroups = ref([])
-  const fetchGroups = async () => {
-    metricsGroups.value = await props.metricsGroupsService()
-    setCurrentGroup()
+  const changeGroup = (evt) => {
+    resetFilters()
+    setCurrentGroupPageByLabels(evt.value.label)
   }
 
-  const selectedGroup = ref(null)
-  const setCurrentGroup = () => {
-    selectedGroup.value = metricsGroups.value.find((group) => group.value == props.params.group)
-  }
-
-  watch(
-    selectedGroup,
-    (current) => {
-      if (current) {
-        setCurrentProduct(current.value)
-      }
-    },
-    { immediate: true }
-  )
-
-  const router = useRouter()
-
-  const metricsProducts = ref([])
-  const productIdx = ref(null)
-  const selectedProduct = computed(() => metricsProducts.value[productIdx.value])
-
-  const setCurrentProduct = async (groupName) => {
-    metricsProducts.value = await props.metricsProductsService(groupName)
-    productIdx.value = getCurrentProductIdx()
-
-    setNewParams()
-  }
-
-  const getCurrentProductIdx = () => {
-    const idx = metricsProducts.value.findIndex((product) => product.path == props.params.product)
-
-    return idx < 0 ? 0 : idx
-  }
-
-  const setNewParams = () => {
-    router.replace({
-      name: 'real-time-metrics',
-      params: { group: selectedGroup.value.value, product: selectedProduct.value.path }
-    })
-  }
-
-  watch(selectedProduct, () => {
-    setNewParams()
+  const groupPages = computed(() => {
+    return getPages.value
   })
+
+  const selectedPage = computed(() => {
+    return groupPages.value?.findIndex((dashboard) => dashboard.id === pageCurrent.value?.id)
+  })
+
+  const changePage = (evt) => {
+    const selectedPage = groupPages.value[evt.index]
+    setCurrentPage(selectedPage)
+  }
 </script>
 <template>
   <div class="flex w-full items-end gap-3 mb-4">
     <Dropdown
-      v-model="selectedGroup"
+      :modelValue="selectedGroup"
       :options="metricsGroups"
       :loading="!metricsGroups.length"
       optionLabel="label"
       class="flex self-start"
+      @change="changeGroup"
+    />
+    <Skeleton
+      class="w-96 h-8"
+      v-if="!groupPages?.length"
     />
     <TabMenu
-      v-model:activeIndex="productIdx"
-      :model="metricsProducts"
-      :key="productIdx"
+      v-else
+      :activeIndex="selectedPage"
+      :model="groupPages"
+      :key="selectedPage"
       :pt="{ action: { class: 'w-max' } }"
+      @tab-change="changePage"
     />
   </div>
 </template>

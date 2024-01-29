@@ -1,56 +1,41 @@
 <script setup>
+  import { useMetricsStore } from '@/stores/metrics'
   import GraphsCardBlock from '@/templates/graphs-card-block'
+  import { storeToRefs } from 'pinia'
   import SelectButton from 'primevue/selectbutton'
-  import { computed, onMounted, ref, watch } from 'vue'
+  import { computed } from 'vue'
 
-  const props = defineProps({
-    metricsDashboardsService: {
-      type: Function,
-      required: true
-    },
-    params: {
-      type: Object,
-      required: true
-    }
+  const metricsStore = useMetricsStore()
+  const { dashboardBySelectedPage, dashboardCurrent } = storeToRefs(metricsStore)
+  const { setCurrentDashboard } = metricsStore
+
+  const dashboards = computed(() => {
+    return dashboardBySelectedPage.value
   })
 
-  onMounted(() => {
-    fetchDashboards()
+  const selectedDashboard = computed(() => {
+    return dashboardCurrent.value
   })
 
-  const dashboards = ref([])
-  const selectedDashboard = ref(null)
-
-  const fetchDashboards = async () => {
-    const { group, product } = props.params
-    dashboards.value = await props.metricsDashboardsService(group, product)
-
-    // TODO: revisit the selected dashboard when the filter is implemented
-    selectedDashboard.value = dashboards.value[0]
+  const changeDashboard = (evt) => {
+    setCurrentDashboard(evt.value)
   }
 
-  const showDashboardTabs = computed(() => {
-    return dashboards.value.length > 1
+  const showTabs = computed(() => {
+    return dashboards.value?.length > 1
   })
-
-  watch(
-    () => props.params,
-    () => {
-      fetchDashboards()
-    }
-  )
 </script>
 
 <template>
   <div class="flex flex-column mt-8 gap-4">
     <SelectButton
-      v-if="showDashboardTabs"
       class="w-fit"
-      v-model="selectedDashboard"
+      :modelValue="selectedDashboard"
       :options="dashboards"
       optionLabel="label"
-      dataKey="id"
       aria-labelledby="basic"
+      @change="changeDashboard"
+      v-if="showTabs"
     />
     <div class="grid grid-cols-12 gap-4 m-0">
       <template
