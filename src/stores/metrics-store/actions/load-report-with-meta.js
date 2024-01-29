@@ -91,7 +91,7 @@ export default async (filters, report) => {
   const groupBy = report.groupBy.filter((item) => item !== report.xAxis)
 
   const accountStore = useAccountStore()
-  const userUTC = accountStore.accountUTCOffset
+  const userUTC = accountStore.accountUtcOffset
 
   const resultChart = ConvertBeholderToChart(
     resultQuery,
