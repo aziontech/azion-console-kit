@@ -42,7 +42,23 @@
   const initialValues = ref({
     name: '',
     description: '',
-    active: true
+    active: true,
+    criteria: [
+      [
+        {
+          variable: 'header_accept',
+          operator: 'matches',
+          conditional: 'if',
+          input_value: ''
+        }
+      ]
+    ],
+    behaviors: [
+      {
+        name: '',
+        target: {}
+      }
+    ]
   })
 
   const validationSchema = yup.object({
@@ -51,7 +67,30 @@
       .string()
       .max(1000, 'Description should not exceed 1000 characters')
       .label('Description'),
-    active: yup.bool()
+    active: yup.bool(),
+    criteria: yup.array().of(
+      yup
+        .array()
+        .of(
+          yup.object().shape({
+            variable: yup.string().required().label('variable'),
+            operator: yup.string().required().label('operator'),
+            conditional: yup.string().required().label('conditional'),
+            input_value: yup.string().when('operator', {
+              is: (operator) => operator !== 'exists' && operator !== 'does_not_exist',
+              then: (schema) => schema.required().label('conditional value'),
+              otherwise: (schema) => schema.notRequired()
+            })
+          })
+        )
+        .required()
+    ),
+    behaviors: yup.array().of(
+      yup.object({
+        name: yup.string().required().label('behavior'),
+        target: yup.object()
+      })
+    )
   })
 
   const closeCreateDrawer = () => {

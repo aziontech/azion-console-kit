@@ -209,7 +209,7 @@
   /**
    * Generate the options for the criteria menu.
    * @param {number} criteriaIndex - The index of the criteria.
-   * @param {number} [conditionalIndex=null] - The index of the conditional.
+   * @param {number} [conditionalIndex] - The index of the conditional.
    * @returns {Array} An array of options for the criteria menu.
    */
   const criteriaMenuOptions = (criteriaIndex, conditionalIndex = null) => {
@@ -560,18 +560,6 @@
   }
 
   /**
-   * Capitalizes the first letter of a string.
-   * @param {string | undefined} string - The string to capitalize.
-   * @returns {string} The capitalized string.
-   */
-  const capitalizeConditional = (string) => {
-    if (string) {
-      return string.charAt(0).toUpperCase() + string.slice(1)
-    }
-    return ''
-  }
-
-  /**
    * Gets the label for the behavior item.
    * @param {Object} behaviorItem - The behavior item.
    * @param {Boolean} behaviorItem.isFirst - The behavior boolean isFirst.
@@ -687,8 +675,9 @@
             <Divider
               align="left"
               type="dashed"
+              class="capitalize"
             >
-              {{ capitalizeConditional(item.conditional) }}
+              {{ item.conditional }}
             </Divider>
 
             <PrimeButton
@@ -733,7 +722,10 @@
               :value="criteria[index].value[itemIndex].operator"
             />
             <FieldText
-              v-if="item.operator !== 'exists' && item.operator !== 'does_not_exist'"
+              v-if="
+                criteria[index].value[itemIndex].operator !== 'exists' &&
+                criteria[index].value[itemIndex].operator !== 'does_not_exist'
+              "
               :name="`criteria[${index}][${itemIndex}].input_value`"
               :value="criteria[index].value[itemIndex].input_value"
               inputClass="w-full"
