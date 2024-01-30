@@ -94,7 +94,7 @@
   </FormHorizontal>
 
   <FormHorizontal
-    title="Import or request certificates"
+    title="Import or Request Certificate"
     description="Choose between importing a certificate into your account or creating a request for a certificate."
   >
     <template #inputs>
