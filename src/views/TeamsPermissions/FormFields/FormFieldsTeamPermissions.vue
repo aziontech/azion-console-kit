@@ -14,7 +14,7 @@
       required: true
     }
   })
-
+  
   const permissionsList = ref([])
 
   const { value: name, errorMessage: errorName } = useField('name')
@@ -24,6 +24,8 @@
   const isAlreadySelected = ({ alreadySelectedPermissionsIds, id }) => {
     return alreadySelectedPermissionsIds.includes(id)
   }
+
+  const formAlredyInitialized = ref(false)
 
   const fetchPermissions = async () => {
     const teamPermissions = await props.listPermissionService()
@@ -41,11 +43,15 @@
   }
 
   watch(permissionsList, (newPermissions) => {
-    permissions.value = newPermissions[1]
+    if (formAlredyInitialized.value){
+      const selectedPermissions = newPermissions[1]
+      permissions.value = selectedPermissions
+    }
   })
 
   onMounted(async () => {
     await fetchPermissions()
+    formAlredyInitialized.value = true
   })
 </script>
 <template>

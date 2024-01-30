@@ -208,78 +208,6 @@
     })
   })
 
-  const initialValues = ref({
-    name: '',
-    dataSource: 'http',
-    template: '',
-    dataSet: '',
-    domainOption: '1',
-    domains: [],
-    endpoint: 'standard',
-    status: true,
-    hasSampling: false,
-    samplingPercentage: 0,
-
-    // standard
-    endpointUrl: '',
-    headers: [{ value: '', deleted: false }],
-    maxSize: 1000000,
-    lineSeparator: '\\n',
-    payloadFormat: '$dataset',
-
-    // Kafka
-    bootstrapServers: '',
-    kafkaTopic: '',
-    tlsOption: false,
-
-    // s3
-    host: '',
-    bucket: '',
-    region: '',
-    accessKey: '',
-    secretKey: '',
-    objectKey: '',
-    contentType: 'plain/text',
-
-    // google big query
-    projectID: '',
-    datasetID: '',
-    tableID: '',
-    serviceAccountKey: '',
-
-    // elasticsearch
-    elasticsearchUrl: '',
-    apiKey: '',
-
-    // splunk
-    splunkUrl: '',
-    splunkApiKey: '',
-
-    // aws_kinesis_firehose
-    streamName: '',
-    awsRegion: '',
-    awsAccessKey: '',
-    awsSecretKey: '',
-
-    // datadog
-    datadogUrl: '',
-    datadogApiKey: '',
-
-    // QRadar
-    QRadarUrl: '',
-
-    // azure_monitor
-    logType: '',
-    sharedKey: '',
-    generatedField: '',
-    workspaceID: '',
-
-    // azure_blob_storage
-    storageAccount: '',
-    containerName: '',
-    blobToken: ''
-  })
-
   const displaySamplingDialog = ref(false)
   const formSubmit = (onSubmit, values) => {
     if (!values.hasSampling) {
@@ -298,11 +226,11 @@
     <template #content>
       <CreateFormBlock
         :createService="props.createDataStreamingService"
-        :initialValues="initialValues"
         :schema="validationSchema"
       >
-        <template #form>
+        <template #form="{ resetForm }">
           <FormFieldsDataStreaming
+            :resetForm="resetForm"
             :listDataStreamingTemplateService="props.listDataStreamingTemplateService"
             :listDataStreamingDomainsService="props.listDataStreamingDomainsService"
           />

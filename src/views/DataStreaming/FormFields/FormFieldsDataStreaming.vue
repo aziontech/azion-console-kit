@@ -1211,6 +1211,10 @@
     listDataStreamingDomainsService: {
       type: Function,
       required: true
+    },
+    resetForm: {
+      type: Function,
+      required: false
     }
   })
 
@@ -1316,22 +1320,21 @@
   const listTemplates = ref([])
   const dataSet = ref('')
 
-  onMounted(async () => {
-    await loaderDataStreamTemplates()
-    await loaderDataStreamDomains()
-  })
-
   const loaderDataStreamTemplates = async () => {
     const templates = await props.listDataStreamingTemplateService()
     listTemplates.value = templates
-    if (listTemplates?.value[0]?.value) {
-      template.value = listTemplates.value[0].value
+
+    const hasFirstTemplates = listTemplates?.value[0]?.value
+    if (hasFirstTemplates) {
+      const firstTemplateValue = listTemplates.value[0].value
+      return firstTemplateValue
     }
+    return ''
   }
 
   const loaderDataStreamDomains = async () => {
-    const response = await props.listDataStreamingDomainsService()
-    domains.value = [response, []]
+    const domainResponse = await props.listDataStreamingDomainsService()
+    return [domainResponse, []]
   }
 
   const addHeader = () => {
@@ -1381,4 +1384,89 @@
       }
     }
   )
+
+  const initializeFormValues = async () => {
+    const template = await loaderDataStreamTemplates()
+    const domains = await loaderDataStreamDomains()
+
+    if (props.resetForm) {
+      const initialValues = {
+        name: '',
+        dataSource: 'http',
+        template: template,
+        dataSet: '',
+        domainOption: '1',
+        domains: domains,
+        endpoint: 'standard',
+        status: true,
+        hasSampling: false,
+        samplingPercentage: 0,
+
+        // standard
+        endpointUrl: '',
+        headers: [{ value: '', deleted: false }],
+        maxSize: 1000000,
+        lineSeparator: '\\n',
+        payloadFormat: '$dataset',
+
+        // Kafka
+        bootstrapServers: '',
+        kafkaTopic: '',
+        tlsOption: false,
+
+        // s3
+        host: '',
+        bucket: '',
+        region: '',
+        accessKey: '',
+        secretKey: '',
+        objectKey: '',
+        contentType: 'plain/text',
+
+        // google big query
+        projectID: '',
+        datasetID: '',
+        tableID: '',
+        serviceAccountKey: '',
+
+        // elasticsearch
+        elasticsearchUrl: '',
+        apiKey: '',
+
+        // splunk
+        splunkUrl: '',
+        splunkApiKey: '',
+
+        // aws_kinesis_firehose
+        streamName: '',
+        awsRegion: '',
+        awsAccessKey: '',
+        awsSecretKey: '',
+
+        // datadog
+        datadogUrl: '',
+        datadogApiKey: '',
+
+        // QRadar
+        QRadarUrl: '',
+
+        // azure_monitor
+        logType: '',
+        sharedKey: '',
+        generatedField: '',
+        workspaceID: '',
+
+        // azure_blob_storage
+        storageAccount: '',
+        containerName: '',
+        blobToken: ''
+      }
+
+      props.resetForm({ values: initialValues })
+    }
+  }
+
+  onMounted(() => {
+    initializeFormValues()
+  })
 </script>

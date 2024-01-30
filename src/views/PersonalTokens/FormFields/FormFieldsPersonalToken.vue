@@ -8,8 +8,7 @@
   import Calendar from 'primevue/calendar'
   import PrimeButton from 'primevue/button'
   import { computed } from 'vue'
-  import { useAccountStore } from '@/stores/account'
-  import { storeToRefs } from 'pinia'
+  import { convertDateToLocalTimezone } from '@/helpers'
   defineOptions({ name: 'form-fields-personal-token' })
 
   const props = defineProps({
@@ -20,7 +19,11 @@
     copyPersonalToken: {
       type: Function,
       required: true
-    }
+    },
+    userUtcOffset: {
+      type: String,
+      default: ''
+    },
   })
 
   const personalToken = computed({
@@ -46,9 +49,6 @@
     { label: 'Custom Date', value: 'custom' }
   ]
 
-  const store = useAccountStore()
-  const { account } = storeToRefs(store)
-
   const isCustomDateSelected = computed(() => {
     return selectedExpiration.value === 'custom'
   })
@@ -60,54 +60,38 @@
     return !!props.personalTokenKey
   })
 
-  const formatToIsoDate = (value) => {
-    value.setUTCHours(23, 59, 59, 999)
-    return value.toISOString().slice(0, -5)
-  }
-
-  const convertOffsetToDecimal = (offset) => {
-    const [offsetSign, hourTens, hourUnits, minuteTens, minuteUnits] = offset
-    const hours = `${hourTens}${hourUnits}`
-    const minutes = `${minuteTens}${minuteUnits}`
-
-    const minuteToDecimalConversion = {
-      15: 25,
-      30: 50,
-      45: 75
-    }
-
-    const decimalMinutes = minutes > 0 ? minuteToDecimalConversion[minutes] : minutes
-
-    return `${offsetSign}${hours}.${decimalMinutes}`
-  }
-
-  const expiresDate = (expirationDate) => {
-    const userOffset = convertOffsetToDecimal(account.value.utc_offset)
-    const timeZoneOffsetMinutesToMilli = expirationDate.getTimezoneOffset() * 60000
-    const toUTC = expirationDate.getTime() + timeZoneOffsetMinutesToMilli
-    const offsetHoursToMilli = userOffset * 3600000
-
-    const userRealDate = new Date(toUTC + offsetHoursToMilli)
-    return formatToIsoDate(userRealDate)
-  }
-
-  const updateSelectedExpiration = ({ value }) => {
-    if (value === 'custom') {
+  /**
+   * Updates the selected expiration date.
+   * If the selected value is 'custom', it sets the expiration date to tomorrow.
+   * Otherwise, it sets the expiration date to the selected number of days from today.
+   *
+   * @param {Object} selectedOption - The selected option from the dropdown.
+   * @param {string} selectedOption.value - The value of the selected option.
+   */
+   const updateSelectedExpiration = ({ value: selectedValue }) => {
+    if (selectedValue === 'custom') {
       customExpiration.value = tomorrow
-      setExpiration(expiresDate(customExpiration.value))
+      const customExpirationInUserTimezone = convertDateToLocalTimezone(props.userUtcOffset, customExpiration.value)
+      setExpiration(customExpirationInUserTimezone)
       return
     }
 
-    const newDateExpiration = new Date()
-    newDateExpiration.setDate(newDateExpiration.getDate() + parseInt(selectedExpiration.value))
-    setExpiration(expiresDate(newDateExpiration))
+    const newExpirationDate = new Date()
+    const daysToAdd = parseInt(selectedExpiration.value)
+    newExpirationDate.setDate(newExpirationDate.getDate() + daysToAdd)
+    const newExpirationInUserTimezone = convertDateToLocalTimezone(props.userUtcOffset, newExpirationDate)
+    setExpiration(newExpirationInUserTimezone)
   }
 
-  const updateExpiration = (value) => {
-    setExpiration(expiresDate(value))
+  /**
+   * Updates the expiration date.
+   *
+   * @param {Date} newExpirationDate - The new expiration date.
+   */
+  const updateExpiration = (newExpirationDate) => {
+    const newExpirationInUserTimezone = convertDateToLocalTimezone(props.userUtcOffset, newExpirationDate)
+    setExpiration(newExpirationInUserTimezone)
   }
-
-  setExpiration(expiresDate(tomorrow))
 </script>
 
 <template>

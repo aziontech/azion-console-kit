@@ -8,6 +8,9 @@
   import PageHeadingBlock from '@/templates/page-heading-block'
   import FormFieldsPersonalToken from '@/views/PersonalTokens/FormFields/FormFieldsPersonalToken'
   import CopyTokenDialog from '@/views/PersonalTokens/Dialog/CopyTokenDialog'
+  import { convertDateToLocalTimezone } from '@/helpers'
+  import { useAccountStore } from '@/stores/account'
+  import { storeToRefs } from 'pinia'
   import * as yup from 'yup'
   defineOptions({ name: 'create-personal-token' })
 
@@ -37,11 +40,25 @@
     })
   })
 
+  const store = useAccountStore()
+  const { account } = storeToRefs(store)
+
+  const getTomorrowInUserTimezone = () => {
+    const today = new Date()
+    const tomorrowDateValue = today.getDate() + 1
+    today.setDate(tomorrowDateValue)
+    const tomorrow = new Date(today)
+    const userUtcOffset = account.value.utc_offset
+
+    return convertDateToLocalTimezone(userUtcOffset, tomorrow)
+  }
+
   const initialValues = {
     name: '',
     customExpiration: null,
     description: '',
-    selectedExpiration: '1'
+    selectedExpiration: '1',
+    expiresAt: getTomorrowInUserTimezone()
   }
 
   const toast = useToast()
@@ -90,6 +107,7 @@
           <FormFieldsPersonalToken
             :personalTokenKey="personalTokenKey"
             :copyPersonalToken="copyPersonalToken"
+            :userUtcOffset="account?.utc_offset"
           />
           <CopyTokenDialog
             v-model:visible="showCopyTokenDialog"
