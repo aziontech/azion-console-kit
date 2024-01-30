@@ -74,8 +74,6 @@
   }
 
   const updateDisabledField = () => {
-    if (!displayFilter.value.length) return
-
     defaultFields.value.map((itemField, indexField) => {
       itemField.operator.map((operator, indexOperator) => {
         fields.value[indexField].operator[indexOperator].disabled = operator.disabled
@@ -84,6 +82,8 @@
         (operator) => operator.disabled
       )
     })
+
+    if (!displayFilter.value.length) return
 
     displayFilter.value?.map((itemInList) => {
       fields.value.map((itemField, indexField) => {
@@ -103,6 +103,7 @@
 
   const clickFilter = (item, event) => {
     event.stopPropagation()
+    updateDisabledField()
     refDialogFilter.value.show(item)
   }
 
@@ -232,6 +233,7 @@
         </ul>
       </div>
     </div>
+
     <slot
       name="applyButton"
       :filter="displayFilter"
