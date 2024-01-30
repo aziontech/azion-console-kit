@@ -51,7 +51,7 @@ describe('EdgeFirewallFunctionsServices', () => {
       id: fixture.functionInstance.id,
       edgeFunctionID: fixture.functionInstance.edge_function,
       name: fixture.functionInstance.name,
-      args: JSON.stringify(fixture.functionInstance.json_args)
+      args: JSON.stringify(fixture.functionInstance.json_args, null, '\t')
     })
   })
 

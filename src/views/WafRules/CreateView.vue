@@ -61,6 +61,7 @@
   })
 
   const initialValues = {
+    name: '',
     crossSiteScriptingSensitivity: 'medium',
     directoryTraversalSensitivity: 'medium',
     evadingTricksSensitivity: 'medium',
@@ -69,14 +70,14 @@
     remoteFileInclusionSensitivity: 'medium',
     sqlInjectionSensitivity: 'medium',
     unwantedAccessSensitivity: 'medium',
-    fileUpload: true,
-    evadingTricks: true,
-    unwantedAccess: true,
-    identifiedAttack: true,
-    crossSiteScripting: true,
-    directoryTraversal: true,
-    remoteFileInclusion: true,
-    sqlInjection: true,
+    fileUpload: false,
+    evadingTricks: false,
+    unwantedAccess: false,
+    identifiedAttack: false,
+    crossSiteScripting: false,
+    directoryTraversal: false,
+    remoteFileInclusion: false,
+    sqlInjection: false,
     active: true
   }
 </script>

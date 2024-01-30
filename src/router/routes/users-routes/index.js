@@ -58,7 +58,7 @@ export const usersListsRoutes = {
         listTimezonesService: UsersService.listTimezonesService,
         listTeamsService: UsersService.listTeamsService,
         editAnotherUserService: UsersService.editAnotherUserService,
-        loadUserService: UsersService.loadUserService,
+        loadAnotherUserService: UsersService.loadAnotherUserService,
         updatedRedirect: 'list-users'
       },
       meta: {

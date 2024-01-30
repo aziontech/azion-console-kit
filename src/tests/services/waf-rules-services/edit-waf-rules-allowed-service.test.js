@@ -25,7 +25,7 @@ const makeSut = () => {
 describe('WafRulesServices', () => {
   it('should call API with correct params', async () => {
     const requestSpy = vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
-      statusCode: 200,
+      statusCode: 202,
       body: fixtures.wafRulesMock
     })
     const { sut } = makeSut()
@@ -47,7 +47,7 @@ describe('WafRulesServices', () => {
 
   it('should return a feedback message on successfully updated', async () => {
     vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
-      statusCode: 200,
+      statusCode: 202,
       body: fixtures.wafRulesMock
     })
     const { sut } = makeSut()

@@ -32,6 +32,7 @@
       <PrimeButton
         severity="secondary"
         label="Create from Tuning"
+        @click="goToWafRulesTuning"
       >
       </PrimeButton>
       <PrimeButton
@@ -56,7 +57,7 @@
     title="Create New"
   >
     <template #formFields>
-      <FormFieldsAllowed></FormFieldsAllowed>
+      <FormFieldsAllowed :optionsRuleIds="props.optionsRuleIds"></FormFieldsAllowed>
     </template>
   </CreateDrawerBlock>
 
@@ -71,7 +72,10 @@
     title="Edit Waf Rules Allowed"
   >
     <template #formFields>
-      <FormFieldsAllowed />
+      <FormFieldsAllowed
+        :disabledRuleId="true"
+        :optionsRuleIds="props.optionsRuleIds"
+      />
     </template>
   </EditDrawerBlock>
 </template>
@@ -94,6 +98,8 @@
   const showEditWafRulesAllowedDrawer = ref(false)
   const showCreateWafRulesAllowedDrawer = ref(false)
   const listAllowedRef = ref('')
+
+  const emit = defineEmits(['update:visible', 'attack-on', 'handle-go-to-tuning'])
 
   const props = defineProps({
     listWafRulesAllowedService: {
@@ -119,6 +125,11 @@
     documentationServiceAllowed: {
       required: true,
       type: Function
+    },
+    optionsRuleIds: {
+      required: true,
+      type: Array,
+      default: () => []
     }
   })
 
@@ -136,7 +147,7 @@
     path: '',
     reason: '',
     ruleId: 0,
-    status: false,
+    status: true,
     useRegex: false
   }
 
@@ -145,12 +156,19 @@
   const wafRulesAllowedColumns = ref([
     {
       field: 'ruleId',
-      header: 'Rule ID'
+      header: 'Rule ID',
+      type: 'component',
+      component: (columnData) =>
+        columnBuilder({ data: columnData, columnAppearance: 'expand-text-column' })
     },
     {
       field: 'reason',
-      header: 'Description'
+      header: 'Description',
+      type: 'component',
+      component: (columnData) =>
+        columnBuilder({ data: columnData, columnAppearance: 'expand-text-column' })
     },
+
     {
       field: 'path',
       header: 'URI'
@@ -190,6 +208,9 @@
     hasContentToList.value = event
   }
 
+  const goToWafRulesTuning = () => {
+    emit('handle-go-to-tuning', { index: 1 })
+  }
   const handleListWafRulesAllowedService = async () => {
     return await props.listWafRulesAllowedService({ wafId: wafRuleId.value })
   }

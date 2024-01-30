@@ -34,13 +34,14 @@ describe('EdgeServiceResourcesServices', () => {
       statusCode: 200,
       body: fixtures.mockResponse
     })
+    const version = 'v3'
     const { sut } = makeSut()
 
     await sut(fixtures.mockPayload)
     const { id, edgeServiceId } = fixtures.mockPayload
 
     expect(requestSpy).toHaveBeenCalledWith({
-      url: `edge_services/${edgeServiceId}/resources/${id}`,
+      url: `${version}/edge_services/${edgeServiceId}/resources/${id}`,
       method: 'PATCH',
       body: fixtures.mockResponse
     })

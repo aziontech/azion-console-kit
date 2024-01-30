@@ -8,6 +8,7 @@ import {
 } from './azion-documentation-window-opener'
 import { azionPrivacyPolicyWindowOpener } from './azion-privacy-policy-opener'
 import { azionTermsAndServicesWindowOpener } from './azion-terms-and-services-opener'
+import { capitalizeFirstLetter } from './capitalize-first-letter'
 import { clipboardWrite } from './clipboard'
 import { getEnvironmentFromUrl } from './get-environment-from-url'
 import { getFirstApiError } from './get-first-api-error'
@@ -20,6 +21,7 @@ export {
   InviteSession,
   azionPrivacyPolicyWindowOpener,
   azionTermsAndServicesWindowOpener,
+  capitalizeFirstLetter,
   clipboardWrite,
   documentationCatalog,
   documentationGuideProducts,

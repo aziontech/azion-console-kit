@@ -78,7 +78,7 @@ describe('WafRulesServices', () => {
     await sut()
 
     expect(requestSpy).toHaveBeenCalledWith({
-      url: 'v3/waf/?page=1&page_size=100',
+      url: 'v3/waf/?page=1&page_size=200',
       method: 'GET'
     })
   })

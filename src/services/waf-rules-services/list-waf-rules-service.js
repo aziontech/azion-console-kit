@@ -3,7 +3,7 @@ import { makeWafRulesBaseUrl } from './make-waf-rules-base-url'
 
 export const listWafRulesService = async () => {
   let httpResponse = await AxiosHttpClientAdapter.request({
-    url: `${makeWafRulesBaseUrl()}/?page=1&page_size=100`,
+    url: `${makeWafRulesBaseUrl()}/?page=1&page_size=200`,
     method: 'GET'
   })
 

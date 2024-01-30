@@ -1,68 +1,61 @@
 <script setup>
+  import { useMetricsStore } from '@/stores/metrics'
   import GraphsCardBlock from '@/templates/graphs-card-block'
+  import { storeToRefs } from 'pinia'
   import SelectButton from 'primevue/selectbutton'
-  import { computed, onMounted, ref, watch } from 'vue'
+  import { computed } from 'vue'
 
-  const props = defineProps({
-    metricsDashboardsService: {
-      type: Function,
-      required: true
-    },
-    params: {
-      type: Object,
-      required: true
-    }
+  const metricsStore = useMetricsStore()
+  const { dashboardBySelectedPage, dashboardCurrent, reportsBySelectedDashboard } =
+    storeToRefs(metricsStore)
+  const { setCurrentDashboard } = metricsStore
+
+  const dashboards = computed(() => {
+    return dashboardBySelectedPage.value
   })
 
-  onMounted(() => {
-    fetchDashboards()
+  const selectedDashboard = computed(() => {
+    return dashboardCurrent.value
   })
 
-  const dashboards = ref([])
-  const selectedDashboard = ref(null)
-
-  const fetchDashboards = async () => {
-    const { group, product } = props.params
-    dashboards.value = await props.metricsDashboardsService(group, product)
-
-    // TODO: revisit the selected dashboard when the filter is implemented
-    selectedDashboard.value = dashboards.value[0]
+  const changeDashboard = (evt) => {
+    setCurrentDashboard(evt.value)
   }
 
-  const showDashboardTabs = computed(() => {
-    return dashboards.value.length > 1
+  const showTabs = computed(() => {
+    return dashboards.value?.length > 1
   })
 
-  watch(
-    () => props.params,
-    () => {
-      fetchDashboards()
-    }
-  )
+  const reportsData = computed(() => {
+    return reportsBySelectedDashboard.value
+  })
 </script>
 
 <template>
   <div class="flex flex-column mt-8 gap-4">
     <SelectButton
-      v-if="showDashboardTabs"
       class="w-fit"
-      v-model="selectedDashboard"
+      :modelValue="selectedDashboard"
       :options="dashboards"
       optionLabel="label"
-      dataKey="id"
       aria-labelledby="basic"
+      @change="changeDashboard"
+      v-if="showTabs"
     />
-    <div class="grid grid-cols-12 gap-4 m-0">
+    <div
+      class="grid grid-cols-12 gap-4 m-0"
+      v-if="reportsData?.length"
+    >
       <template
-        v-for="i of 6"
-        :key="i"
+        v-for="report of reportsData"
+        :key="report.id"
       >
         <GraphsCardBlock
           chartOwner="azion"
-          title="Four Columns Card"
-          description="This card is 4 columns wide, sets the aggregation type to 'Average', the variation type to 'positive', and the variation value to '10.2%'."
-          :cols="4"
-          aggregationType="Average"
+          :title="report.label"
+          :description="report.description"
+          :cols="report.columns"
+          :aggregationType="report.aggregationType"
           variationType="positive"
           variationValue="10.2%"
         >

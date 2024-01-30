@@ -1,4 +1,5 @@
 <template>
+  <!-- @row-click="editItemSelected" -->
   <div>
     <div class="max-w-full mt-4">
       <DataTable
@@ -6,15 +7,16 @@
         scrollable
         removableSort
         :value="data"
+        selectionMode="multiple"
         dataKey="id"
         v-model:filters="filters"
         :paginator="showPagination"
         :rowsPerPageOptions="[10, 20, 50, 100]"
         :rows="MINIMUN_OF_ITEMS_PER_PAGE"
+        @row-click="editItemSelected"
         :globalFilterFields="filterBy"
         :loading="isLoading"
-        selectionMode="single"
-        @row-click="editItemSelected"
+        v-model:selection="selectedItems"
         @rowReorder="onRowReorder"
         :pt="pt"
       >
@@ -44,6 +46,12 @@
           rowReorder
           headerStyle="width: 3rem"
         />
+        <Column
+          v-if="showselectionMode"
+          selectionMode="multiple"
+          headerStyle="width: 3rem"
+        ></Column>
+
         <Column
           sortable
           v-for="col of selectedColumns"
@@ -170,13 +178,13 @@
   import OverlayPanel from 'primevue/overlaypanel'
   import Skeleton from 'primevue/skeleton'
   import { useToast } from 'primevue/usetoast'
-  import { computed, getCurrentInstance, onMounted, ref, watch } from 'vue'
+  import { computed, onMounted, ref, watch } from 'vue'
   import { useRouter } from 'vue-router'
   import DeleteDialog from './dialog/delete-dialog'
 
   defineOptions({ name: 'list-table-block' })
 
-  const emit = defineEmits(['on-load-data', 'authorize'])
+  const emit = defineEmits(['on-load-data', 'authorize', 'on-select-data'])
   const props = defineProps({
     columns: {
       type: Array,
@@ -225,6 +233,22 @@
     emptyListMessage: {
       type: String,
       default: () => 'No registers found.'
+    },
+    dataFilted: {
+      type: Array,
+      default: () => []
+    },
+    hasListService: {
+      type: Boolean,
+      default: false
+    },
+    showselectionMode: {
+      type: Boolean,
+      default: false
+    },
+    cleanSelectData: {
+      type: Boolean,
+      default: false
     }
   })
 
@@ -237,6 +261,7 @@
   const informationForDeletion = ref({})
   const selectedItemData = ref(null)
   const selectedColumns = ref([])
+  const selectedItems = ref()
 
   onMounted(() => {
     loadData({ page: 1 })
@@ -273,6 +298,7 @@
 
   const loadData = async ({ page }) => {
     try {
+      if (props.hasListService) return
       isLoading.value = true
       const response = await props.listService({ page })
       data.value = response
@@ -329,10 +355,8 @@
     }
   }
 
-  const instance = getCurrentInstance()
   const updatedTable = () => {
-    data.value = data.value.filter((item) => item.id !== selectedId.value)
-    instance.proxy?.$forceUpdate()
+    loadData({ page: 1 })
   }
 
   const onRowReorder = async (event) => {
@@ -364,4 +388,24 @@
     const hasData = currentState.length > 0
     emit('on-load-data', hasData)
   })
+
+  // to make a filter
+
+  watch(selectedItems, (selectedData) => {
+    emit('on-select-data', selectedData)
+  })
+
+  watch(
+    () => props.dataFilted,
+    (newValue) => (data.value = newValue)
+  )
+
+  watch(
+    () => props.cleanSelectData,
+    (value) => {
+      if (value) {
+        selectedItems.value = []
+      }
+    }
+  )
 </script>
