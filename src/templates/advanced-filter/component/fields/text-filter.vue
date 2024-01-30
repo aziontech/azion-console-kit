@@ -9,8 +9,7 @@
       type: String
     },
     placeholder: {
-      type: String,
-      default: 'Select'
+      type: String
     },
     disabled: {
       type: Boolean

@@ -6,6 +6,9 @@
 
   const props = defineProps({
     value: {
+      type: Object
+    },
+    placeholder: {
       type: String
     },
     disabled: {
@@ -18,7 +21,7 @@
     errorMessage,
     handleBlur,
     handleChange
-  } = useField('selectedValue', yup.number().required(), {
+  } = useField('selectedValue', yup.object().required(), {
     initialValue: props.value
   })
 </script>

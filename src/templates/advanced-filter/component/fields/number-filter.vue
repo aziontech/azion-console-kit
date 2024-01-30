@@ -10,7 +10,6 @@
     },
     placeholder: {
       type: String,
-      default: 'Select'
     },
     disabled: {
       type: Boolean
