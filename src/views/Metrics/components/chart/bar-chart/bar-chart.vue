@@ -4,18 +4,9 @@
   import { onMounted } from 'vue'
 
   const props = defineProps({
-    chartData: {
-      type: Object,
-      default: () => {}
-    },
-    resultChart: {
-      type: Array,
-      default: () => []
-    },
-    hasMeanLine: {
-      type: Boolean,
-      default: () => false
-    }
+    chartData: Object,
+    resultChart: Array,
+    hasMeanLine: Boolean
   })
 
   onMounted(() => {
@@ -29,21 +20,17 @@
       hasMeanLine: props.hasMeanLine
     })
 
-    try {
-      c3.generate({
-        bindto: `#bar-chart-${props.chartData.id}`,
-        ...c3Props
-      })
-    } catch (error) {
-      console.error(error)
-    }
+    c3.generate({
+      bindto: `#bar-chart-${props.chartData?.id}`,
+      ...c3Props
+    })
   }
 </script>
 
 <template>
   <div
     class="bar-chart"
-    :id="`bar-chart-${props.chartData.id}`"
+    :id="`bar-chart-${props.chartData?.id}`"
     data-testid="barChart"
   ></div>
 </template>

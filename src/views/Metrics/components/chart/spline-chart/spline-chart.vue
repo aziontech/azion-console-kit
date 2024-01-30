@@ -4,18 +4,9 @@
   import { onMounted } from 'vue'
 
   const props = defineProps({
-    chartData: {
-      type: Object,
-      default: () => {}
-    },
-    resultChart: {
-      type: Array,
-      default: () => []
-    },
-    hasMeanLine: {
-      type: Boolean,
-      default: () => false
-    }
+    chartData: Object,
+    resultChart: Array,
+    hasMeanLine: Boolean
   })
 
   onMounted(() => {
@@ -30,7 +21,7 @@
     })
 
     c3.generate({
-      bindto: `#spline-chart-${props.chartData.id}`,
+      bindto: `#spline-chart-${props.chartData?.id}`,
       ...c3Props
     })
   }
@@ -39,7 +30,7 @@
 <template>
   <div
     class="spline-chart"
-    :id="`spline-chart-${props.chartData.id}`"
+    :id="`spline-chart-${props.chartData?.id}`"
     data-testid="splineChart"
   ></div>
 </template>

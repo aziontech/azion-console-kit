@@ -1,8 +1,3 @@
-import Translation from '@/plugins/I18n'
-
-// eslint-disable-next-line id-length
-const { t } = Translation.global
-
 export const RESET_COUNT = 0
 
 export const MIN_COUNT = 4
@@ -17,7 +12,7 @@ export const SCREEN_SMALL_BREAKPOINT = 1024
 
 export const SCREEN_XSMALL_BREAKPOINT = 540
 
-export const MEAN_LINE_LABEL = t('chartContent.meanLineLabel')
+export const MEAN_LINE_LABEL = 'Mean Line'
 
 export const DATA_VOLUME = {
   tera: 1e12,

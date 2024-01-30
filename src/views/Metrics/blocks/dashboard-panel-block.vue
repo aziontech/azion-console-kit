@@ -5,23 +5,16 @@
   import SelectButton from 'primevue/selectbutton'
   import { computed, defineAsyncComponent } from 'vue'
 
-  const BarChart = defineAsyncComponent(() => import('../components/chart/bar-chart/bar-chart'))
-  const LineChart = defineAsyncComponent(() => import('../components/chart/line-chart/line-chart'))
-  const SplineChart = defineAsyncComponent(() =>
-    import('../components/chart/spline-chart/spline-chart')
-  )
-
   const propToComponent = {
-    'bar-chart': BarChart,
-    'line-chart': LineChart,
-    'spline-chart': SplineChart
+    'bar-chart': defineAsyncComponent(() => import('../components/chart/bar-chart/bar-chart')),
+    'line-chart': defineAsyncComponent(() => import('../components/chart/line-chart/line-chart')),
+    'spline-chart': defineAsyncComponent(() =>
+      import('../components/chart/spline-chart/spline-chart')
+    )
   }
 
   const props = defineProps({
-    reportData: {
-      type: Object,
-      default: () => {}
-    }
+    reportData: Object
   })
 
   const metricsStore = useMetricsStore()

@@ -15,17 +15,33 @@ import {
 } from '../constants/chart-data'
 import { LINE_PATTERNS, MEAN_LINE_PATTERN } from '../constants/color-patterns'
 
+/**
+ * Verifica se o valor é uma data
+ * @param {string} date - O valor a ser verificado
+ * @returns {boolean} - Retorna true se for uma data válida, senão retorna false
+ */
 function isDate(date) {
   const series = date
   // eslint-disable-next-line eqeqeq
   return new Date(series) != 'Invalid Date'
 }
 
+/**
+ * Verifica se o valor é numérico
+ * @param {Array} resultChart - O gráfico de resultados
+ * @returns {boolean} - Retorna true se for numérico, senão retorna false
+ */
 function isNumeric(resultChart) {
   const series = resultChart[0][1]
   return typeof series === 'number'
 }
 
+/**
+ * Formata os dados para a propriedade do gráfico C3
+ * @param {Object} chartData - Os dados do gráfico
+ * @param {Array} resultChart - O gráfico de resultados
+ * @returns {Object} - Retorna os dados formatados para a propriedade do gráfico C3
+ */
 function formatC3DataProp(chartData, resultChart) {
   const data = {
     x: chartData.xAxis,
@@ -40,6 +56,12 @@ function formatC3DataProp(chartData, resultChart) {
   return data
 }
 
+/**
+ * Formata o eixo X do gráfico C3
+ * @param {Object} chartData - Os dados do gráfico
+ * @param {Array} resultChart - O gráfico de resultados
+ * @returns {Object} - Retorna o objeto do eixo X formatado para o gráfico C3
+ */
 function formatC3XAxis(chartData, resultChart) {
   const isSeriesDate = isDate(resultChart[0][1])
   const isSeriesNumeric = isNumeric(resultChart)
@@ -68,6 +90,11 @@ function formatC3XAxis(chartData, resultChart) {
   return xAxis
 }
 
+/**
+ * Formata os dados para exibição de porcentagem
+ * @param {number} data - Os dados a serem formatados
+ * @returns {string} - Retorna os dados formatados para exibição de porcentagem
+ */
 export function formatPercentageDataUnit(data) {
   return Intl.NumberFormat('en', {
     style: 'percent',
@@ -76,6 +103,12 @@ export function formatPercentageDataUnit(data) {
   }).format(data / 100)
 }
 
+/**
+ * Formata os dados para exibição de bytes
+ * @param {number} data - Os dados a serem formatados
+ * @param {Object} chartData - Os dados do gráfico
+ * @returns {string} - Retorna os dados formatados para exibição de bytes
+ */
 export function formatBytesDataUnit(data, chartData) {
   let value = data
   let unit = 'byte'
@@ -98,6 +131,9 @@ export function formatBytesDataUnit(data, chartData) {
     unit = `kilo${unit}`
   }
 
+  /**
+   * Formatter para exibição de bytes
+   */
   const byteValueNumberFormatter = Intl.NumberFormat('en', {
     notation: 'compact',
     style: 'unit',
@@ -109,11 +145,22 @@ export function formatBytesDataUnit(data, chartData) {
   return byteValueNumberFormatter.format(value)
 }
 
+/**
+ * Formata os dados para exibição de unidade genérica
+ * @param {number} data - Os dados a serem formatados
+ * @returns {string} - Retorna os dados formatados para exibição de unidade genérica
+ */
 function formatDataUnit(data) {
   const formatter = Intl.NumberFormat('en', { notation: 'compact' })
   return `${formatter.format(data)}`
 }
 
+/**
+ * Formata os rótulos do eixo Y do gráfico C3
+ * @param {number} data - Os dados a serem formatados
+ * @param {Object} chartData - Os dados do gráfico
+ * @returns {string} - Retorna os rótulos formatados para o eixo Y do gráfico C3
+ */
 export function formatYAxisLabels(data, chartData) {
   if (chartData.dataUnit === 'bytes' || chartData.dataUnit === 'bitsPerSecond') {
     return formatBytesDataUnit(data, chartData)
@@ -130,9 +177,17 @@ export function formatYAxisLabels(data, chartData) {
   return value
 }
 
+/**
+ * Formata o eixo Y do gráfico C3
+ * @param {Object} chartData - Os dados do gráfico
+ * @returns {Object} - Retorna o objeto do eixo Y formatado para o gráfico C3
+ */
 export function formatC3YAxis(chartData) {
   const isRotated = chartData.rotated
   const yAxis = {
+    /**
+     * Configuração do tick do eixo Y
+     */
     tick: {
       count: MAX_COUNT,
       format: (d) => formatYAxisLabels(d, chartData)
@@ -148,6 +203,12 @@ export function formatC3YAxis(chartData) {
   return yAxis
 }
 
+/**
+ * Define a posição da legenda do gráfico
+ * @param {Object} chartData - Os dados do gráfico
+ * @param {Array} resultChart - O resultado do gráfico
+ * @returns {string} - Retorna a posição da legenda do gráfico
+ */
 function setLegendPosition(chartData, resultChart) {
   if (window.innerWidth < SCREEN_SMALL_BREAKPOINT) {
     return 'bottom'
@@ -159,6 +220,12 @@ function setLegendPosition(chartData, resultChart) {
   return seriesGreaterThanFive && columnsGreaterThanTwo ? 'right' : 'bottom'
 }
 
+/**
+ * Gera os valores da linha média
+ * @param {Array} resultChart - O resultado do gráfico
+ * @param {number} mean - O valor médio
+ * @returns {Array} - Retorna os valores da linha média
+ */
 function generateMeanLineValues(resultChart, mean) {
   const withoutTsSeries = resultChart.slice(1)
   const numberOfSeries = withoutTsSeries[0]?.slice(1).length
@@ -167,11 +234,23 @@ function generateMeanLineValues(resultChart, mean) {
   return [MEAN_LINE_LABEL, ...meanValues]
 }
 
+/**
+ * Converte uma string no formato camelCase para título
+ * @param {string} text - A string no formato camelCase
+ * @returns {string} - A string convertida para título
+ */
 function camelToTitle(text) {
   const title = text.replace(/([A-Z])/g, ' $1')
   return title.charAt(0).toUpperCase() + title.slice(1)
 }
 
+/**
+ * Define os valores da série da média
+ * @param {Array} serie - A série de dados
+ * @param {number} seriesTotal - O total da série
+ * @param {Object} chartData - Os dados do gráfico
+ * @returns {Object} - Retorna os valores da série da média
+ */
 function setMeanSeriesValues(serie, seriesTotal, chartData) {
   const serieCount = serie.length - 1
   const serieAvg = seriesTotal / serieCount
@@ -187,6 +266,14 @@ function setMeanSeriesValues(serie, seriesTotal, chartData) {
   return { serieMeanLineLegend, serieMeanLineValues }
 }
 
+/**
+ * Obtém as informações das séries do gráfico
+ * @param {Array} resultChart - O resultado do gráfico
+ * @param {Object} chartData - Os dados do gráfico
+ * @param {boolean} hasMeanLineSeries - Indica se o gráfico possui linha média
+ * @param {boolean} hasMeanLineTotal - Indica se o gráfico possui linha média total
+ * @returns {Object} - Retorna as informações das séries do gráfico
+ */
 function getSeriesInfos(resultChart, chartData, hasMeanLineSeries, hasMeanLineTotal) {
   const sliced = resultChart.slice(1)
 
@@ -235,6 +322,11 @@ function getSeriesInfos(resultChart, chartData, hasMeanLineSeries, hasMeanLineTo
   return { seriesNames, meanLineTotal, meanLineSeries }
 }
 
+/**
+ * Reseta o rótulo da dica de ferramenta
+ * @param {Array} tooltipData - Os dados da dica de ferramenta a serem resetados
+ * @returns {Array} - Retorna os dados da dica de ferramenta com os rótulos resetados
+ */
 function resetTooltipLabel(tooltipData) {
   return tooltipData.map((item) => ({
     ...item,
@@ -242,10 +334,24 @@ function resetTooltipLabel(tooltipData) {
   }))
 }
 
+/**
+ * Função para definir o preenchimento da legenda
+ * @param {string} legendPosition - A posição da legenda
+ * @returns {Object|null} - Retorna o preenchimento da legenda ou null
+ */
 function setLegendPadding(legendPosition) {
   return legendPosition === 'bottom' ? BOTTOM_LEGEND_PADDING : null
 }
 
+/**
+ * Formata as propriedades do gráfico C3
+ * @param {Object} options - As opções do gráfico
+ * @param {Object} options.chartData - Os dados do gráfico
+ * @param {Array} options.resultChart - O resultado do gráfico
+ * @param {boolean} options.hasMeanLineSeries - Indica se o gráfico possui série de linha média
+ * @param {boolean} options.hasMeanLineTotal - Indica se o gráfico possui linha média total
+ * @returns {Object} - Retorna as propriedades formatadas do gráfico C3
+ */
 export default function FormatC3GraphProps({
   chartData,
   resultChart,

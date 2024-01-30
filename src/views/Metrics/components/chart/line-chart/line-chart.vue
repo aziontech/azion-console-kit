@@ -4,22 +4,10 @@
   import { onMounted } from 'vue'
 
   const props = defineProps({
-    chartData: {
-      type: Object,
-      default: () => {}
-    },
-    resultChart: {
-      type: Array,
-      default: () => []
-    },
-    hasMeanLineTotal: {
-      type: Boolean,
-      default: () => false
-    },
-    hasMeanLineSeries: {
-      type: Boolean,
-      default: () => false
-    }
+    chartData: Object,
+    resultChart: Array,
+    hasMeanLineTotal: Boolean,
+    hasMeanLineSeries: Boolean
   })
 
   onMounted(() => {
@@ -35,7 +23,7 @@
     })
 
     c3.generate({
-      bindto: `#line-chart-${props.chartData.id}`,
+      bindto: `#line-chart-${props.chartData?.id}`,
       ...c3Props
     })
   }
@@ -44,7 +32,7 @@
 <template>
   <div
     class="line-chart"
-    :id="`line-chart-${props.chartData.id}`"
+    :id="`line-chart-${props.chartData?.id}`"
     data-testid="lineChart"
   ></div>
 </template>
