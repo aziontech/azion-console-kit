@@ -13,7 +13,7 @@
   const { getDateTimeFilterOptions, currentFilters } = storeToRefs(metricsStore)
   const { setTimeRange } = metricsStore
 
-  const dates = ref()
+  const dates = ref([])
   const interval = ref(null)
 
   const intervalOptions = computed(() => {
@@ -64,13 +64,8 @@
 
     dates.value = [dateBegin, dateEnd]
 
-    if (initialTsRange.meta.option === 'custom') {
-      interval.value = intervalOptions?.value[5]
-      return
-    }
-
     interval.value = intervalOptions?.value.find(
-      (element) => Number(element.code) === Number(initialTsRange.meta.option)
+      (element) => element.code === initialTsRange.meta.option
     )
   }
 
