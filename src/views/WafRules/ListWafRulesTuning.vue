@@ -10,18 +10,31 @@
     />
     <MultiSelect
       placeholder="Sample Domain"
+      resetFilterOnHide
+      autoFilterFocus
       optionValue="id"
       optionLabel="name"
       filter
       :options="domainsOptions.options"
       v-model="selectedDomain"
-      :loading="!domainsOptions.done"
+      :loading="domainsOptions.done"
+      @change="filterTuning"
+      class="w-full sm:max-w-xs"
+    />
+    <Dropdown
+      optionValue="id"
+      optionLabel="name"
+      placeholder="Sample Network List"
+      filter
+      :options="netWorkListOptions.options"
+      v-model="selectedNetworkList"
+      :loading="netWorkListOptions.done"
       @change="filterTuning"
       class="w-full sm:max-w-xs"
     />
   </div>
   <ListTableNoHeaderBlock
-    v-if="selectedDomain.length"
+    v-if="showListTable"
     pageTitleDelete="Waf Rules Tuning"
     :columns="wafRulesAllowedColumns"
     :hasListService="true"
@@ -32,7 +45,12 @@
     :editInDrawer="openMoreDetails"
     emptyListMessage="No Waf Rules Tuning found."
   >
-    <template #addButton> </template>
+    <template #header>
+      <advancedFilter
+        :fieldsInFilter="listFields"
+        @applyFilter="console.log"
+      />
+    </template>
   </ListTableNoHeaderBlock>
 
   <EmptyResultsBlock
@@ -93,7 +111,7 @@
   import Dropdown from 'primevue/dropdown'
 
   import MultiSelect from 'primevue/multiselect'
-
+  import advancedFilter from '@/templates/advanced-filter'
   import { ref, onMounted, computed } from 'vue'
   import { useRoute, useRouter } from 'vue-router'
   import { useToast } from 'primevue/usetoast'
@@ -137,6 +155,7 @@
   const router = useRouter()
   const toast = useToast()
   const selectedDomain = ref([])
+  const selectedNetworkList = ref()
   const dataFilted = ref([])
   const selectedEvents = ref([])
   const isLoadingAllowed = ref(null)
@@ -144,7 +163,6 @@
   const cleanSelectData = ref(null)
   const showDetailsOfAttack = ref(false)
   const wafRuleId = ref(route.params.id)
-  const countriesOptions = ref({ options: [], done: true })
   const netWorkListOptions = ref({ options: [], done: true })
   const domainsOptions = ref({ options: [], done: true })
   const tuningSelected = ref(null)
@@ -154,6 +172,37 @@
   const dataFiltedComputed = computed(() => dataFilted.value)
   const timeName = computed(() => timeOptions.value.find((item) => item.value === time.value).name)
   const time = ref('1')
+
+  const listFields = ref([
+    {
+      label: 'Country',
+      value: 'country',
+      description:
+        'Name Field3: Description orem ipsum dolor sit amet, consectetur adipiscing elit. Duis quis velit venenatis, efficitur urna id, egestas mi.',
+      operator: [
+        {
+          value: 'In',
+          type: 'ArrayObject',
+          props: {
+            placeholder: 'Select Country',
+            selectionLimit: 4,
+            services: props.listCountriesService,
+            payload: { label: 'name', value: 'value' }
+          }
+        }
+      ]
+    },
+    {
+      label: 'IP Address',
+      value: 'ip_address',
+      description:
+        'Name Field1: Description orem ipsum dolor sit amet, consectetur adipiscing elit. Duis quis velit venenatis, efficitur urna id, egestas mi.',
+      operator: [
+        { value: 'Eq', type: 'String', props: { placeholder: 'Select IP Address' } },
+        { value: 'In', type: 'ArrayString', props: { placeholder: 'Enter with IP Address' } }
+      ]
+    }
+  ])
 
   const timeOptions = ref([
     {
@@ -217,6 +266,10 @@
     }
   ])
 
+  const showListTable = computed(() => {
+    return selectedDomain.value.length && selectedNetworkList.value
+  })
+
   const showToast = (summary, severity) => {
     return toast.add({
       severity,
@@ -250,6 +303,7 @@
     showDialogAllowRule.value = false
     allowedByAttacks.value = []
   }
+
   const openMoreDetails = (tuning) => {
     getDomainNames()
     tuningSelected.value = tuning
@@ -315,11 +369,10 @@
   }
 
   const filterTuning = async () => {
-    //check if the domain is selected
     if (!selectedDomain.value.length) return
     const query = `?hour_range=${time.value}&domains_ids=${encodeURIComponent(
       selectedDomain.value
-    )}`
+    )}&network_list_ids=${encodeURIComponent(selectedNetworkList.value)}`
     const response = await props.listWafRulesTuningService({ wafId: wafRuleId.value, query })
     dataFilted.value = response
   }
@@ -337,44 +390,29 @@
     })
   }
 
-  const setCountriesOptions = async () => {
-    countriesOptions.value.done = false
-    try {
-      const response = await props.listCountriesService()
-      countriesOptions.value.options = response
-    } catch (error) {
-      showToast(error, 'error')
-    } finally {
-      countriesOptions.value.done = true
-    }
-  }
-
   const setNetWorkListOptions = async () => {
-    netWorkListOptions.value.done = false
     try {
       const response = await props.listNetworkListService()
       netWorkListOptions.value.options = response
     } catch (error) {
       showToast(error, 'error')
     } finally {
-      netWorkListOptions.value.done = true
+      netWorkListOptions.value.done = false
     }
   }
 
   const setDomainsOptions = async () => {
-    domainsOptions.value.done = false
     try {
       const response = await props.listWafRulesDomainsService({ wafId: wafRuleId.value })
       domainsOptions.value.options = response
     } catch (error) {
       showToast(error, 'error')
     } finally {
-      domainsOptions.value.done = true
+      domainsOptions.value.done = false
     }
   }
 
   onMounted(async () => {
-    await setCountriesOptions()
     await setNetWorkListOptions()
     await setDomainsOptions()
   })
