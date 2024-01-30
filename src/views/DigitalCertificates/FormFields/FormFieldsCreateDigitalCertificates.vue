@@ -171,8 +171,8 @@
 
   <FormHorizontal
     v-if="isUploadCertificate"
-    title="Import a Certificate"
-    description="Paste the PEM-encoded certificate and private key in the respective fields."
+    title="Import a Server Certificate"
+    description="Paste the PEM-encoded TLS X.509 certificate and private key in the respective fields."
   >
     <template #inputs>
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
