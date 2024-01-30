@@ -23,13 +23,13 @@ describe('EdgeServiceResourcesServices', () => {
     const requestSpy = vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
       statusCode: 204
     })
+    const version = 'v3'
     const { sut } = makeSut()
-
     await sut(fixtures.mock)
 
     expect(requestSpy).toHaveBeenCalledWith({
       method: 'DELETE',
-      url: `edge_services/${fixtures.mock.edgeServiceId}/resources/${fixtures.mock.id}`
+      url: `${version}/edge_services/${fixtures.mock.edgeServiceId}/resources/${fixtures.mock.id}`
     })
   })
 

@@ -9,10 +9,10 @@
     <template #form>
       <FormFieldsWafRules :disabledActive="false"></FormFieldsWafRules>
     </template>
-    <template #action-bar="{ onSubmit, formValid, onCancel, loading }">
+    <template #action-bar="{ onSubmit, formValid, onCancel, loading, values }">
       <ActionBarTemplate
         v-if="showActionBar"
-        @onSubmit="onSubmit"
+        @onSubmit="formSubmit(onSubmit, values)"
         @onCancel="onCancel"
         :loading="loading"
         :submitDisabled="!formValid"
@@ -28,6 +28,8 @@
   import { useRoute } from 'vue-router'
   import * as yup from 'yup'
   import FormFieldsWafRules from './FormFields/FormFieldsWafRules.vue'
+
+  const emit = defineEmits(['handleWafRulesUpdated'])
 
   const route = useRoute()
 
@@ -71,5 +73,10 @@
 
   const submitEditWafRules = async (payload) => {
     return await props.editWafRulesService(payload, parseInt(wafRuleId.value))
+  }
+
+  const formSubmit = async (onSubmit, values) => {
+    await onSubmit()
+    emit('handleWafRulesUpdated', values)
   }
 </script>

@@ -6,7 +6,7 @@
       :options="timeOptions"
       v-model="time"
       @change="filterTuning"
-      class="w-full sm:w-1/5"
+      class="w-full sm:max-w-xs"
     />
     <MultiSelect
       placeholder="Sample Domain"
@@ -17,7 +17,7 @@
       v-model="selectedDomain"
       :loading="!domainsOptions.done"
       @change="filterTuning"
-      class="w-full sm:w-1/5"
+      class="w-full sm:max-w-xs"
     />
   </div>
   <ListTableNoHeaderBlock

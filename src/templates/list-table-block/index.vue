@@ -184,7 +184,7 @@
   import OverlayPanel from 'primevue/overlaypanel'
   import Skeleton from 'primevue/skeleton'
   import { useToast } from 'primevue/usetoast'
-  import { computed, getCurrentInstance, onMounted, ref, watch } from 'vue'
+  import { computed, onMounted, ref, watch } from 'vue'
   import { useRouter } from 'vue-router'
   import DeleteDialog from './dialog/delete-dialog'
 
@@ -358,10 +358,8 @@
     }
   }
 
-  const instance = getCurrentInstance()
   const updatedTable = () => {
-    data.value = data.value.filter((item) => item.id !== selectedId.value)
-    instance.proxy?.$forceUpdate()
+    loadData({ page: 1 })
   }
 
   watch(data, (currentState) => {

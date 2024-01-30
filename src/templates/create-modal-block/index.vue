@@ -41,47 +41,58 @@
   const resources = ref([
     {
       label: 'Domains',
-      to: '/domains/create'
+      to: '/domains/create',
+      description: 'Select this card to start creating a new resource.'
     },
     {
       label: 'Edge Application',
-      to: '/edge-applications/create'
+      to: '/edge-applications/create',
+      description: 'Select this card to start creating a new resource.'
     },
     {
       label: 'Variables',
-      to: '/variables/create'
+      to: '/variables/create',
+      description: 'Select this card to start creating a new resource.'
     },
     {
       label: 'Intelligent DNS',
-      to: '/intelligent-dns/create'
+      to: '/intelligent-dns/create',
+      description: 'Select this card to start creating a new resource.'
     },
     {
       label: 'Edge Firewall',
-      to: '/edge-firewall/create'
+      to: '/edge-firewall/create',
+      description: 'Select this card to start creating a new resource.'
     },
     {
       label: 'Edge Nodes',
-      to: '/edge-node/create'
+      to: '/edge-node/create',
+      description: 'Select this card to start creating a new resource.'
     },
     {
       label: 'Data Streaming',
-      to: '/data-streaming/create'
+      to: '/data-streaming/create',
+      description: 'Select this card to start creating a new resource.'
     },
     {
       label: 'Edge Functions',
-      to: '/edge-functions/create'
+      to: '/edge-functions/create',
+      description: 'Select this card to start creating a new resource.'
     },
     {
       label: 'Edge Services',
-      to: '/edge-services/create'
+      to: '/edge-services/create',
+      description: 'Select this card to start creating a new resource.'
     },
     {
       label: 'Digital Certificates',
-      to: '/digital-certificates/create'
+      to: '/digital-certificates/create',
+      description: 'Select this card to start creating a new resource.'
     },
     {
       label: 'Network Lists',
-      to: '/network-lists/create'
+      to: '/network-lists/create',
+      description: 'Select this card to start creating a new resource.'
     }
   ])
 
@@ -285,7 +296,7 @@
                 <span
                   class="h-10 pb-4 text-sm font-normal text-color-secondary mt-1.5 line-clamp-2"
                 >
-                  Select this card to start creating a new resource.
+                  {{ resource.description }}
                 </span>
               </div>
             </div>

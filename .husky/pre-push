@@ -3,3 +3,4 @@
 
 yarn build
 rm -rf dist
+rm -rf coverage

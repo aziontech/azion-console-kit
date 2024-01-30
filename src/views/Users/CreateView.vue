@@ -7,10 +7,10 @@
       <CreateFormBlock
         :createService="props.createUsersService"
         :schema="validationSchema"
-        :initialValues="initialValues"
       >
-        <template #form>
+        <template #form="{ resetForm }">
           <FormFieldsUsers
+            :resetForm="resetForm"
             :loadAccountDetailsService="loadAccountDetailsService"
             :listTimezonesService="listTimezonesService"
             :listCountriesPhoneService="listCountriesPhoneService"
@@ -67,18 +67,10 @@
     timezone: yup.string().required('Timezone is a required field.'),
     language: yup.string(),
     email: yup.string().email().required('Email is a required field.').max(254),
-    countryCallCode: yup.object().required('Country is a required field.'),
+    countryCallCode: yup.string().required('Country is a required field.'),
     mobile: yup.string().required('Phone Number is a required field.').max(20),
     isAccountOwner: yup.boolean(),
     teamsIds: yup.array(),
     twoFactorEnabled: yup.boolean()
   })
-
-  const initialValues = {
-    isAccountOwner: false,
-    mobile: '',
-    selectedTeam: [],
-    twoFactorEnabled: false,
-    selectedLanguage: 'en'
-  }
 </script>

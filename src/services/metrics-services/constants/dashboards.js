@@ -3,31 +3,31 @@ const PAGES_DASHBOARDS = {
     {
       id: 1,
       label: 'Edge Applications',
-      url: 'edge-applications',
+      path: 'edge-applications',
       groupId: 1,
       dashboards: [
         {
           id: 357548608166298191n,
           label: 'Data Transferred',
-          url: 'data-transferred',
+          path: 'data-transferred',
           dataset: 'httpMetrics'
         },
         {
           id: 357548623571976783n,
           label: 'Requests',
-          url: 'requests',
+          path: 'requests',
           dataset: 'httpMetrics'
         },
         {
           id: 357548642810200653n,
           label: 'Status Codes',
-          url: 'status-codes',
+          path: 'status-codes',
           dataset: 'httpMetrics'
         },
         {
           id: 357549179454620239n,
           label: 'Bandwidth Saving',
-          url: 'bandwidth-saving',
+          path: 'bandwidth-saving',
           dataset: 'httpMetrics'
         }
       ]
@@ -35,13 +35,13 @@ const PAGES_DASHBOARDS = {
     {
       id: 2,
       label: 'L2 Caching',
-      url: 'l2-caching',
+      path: 'l2-caching',
       groupId: 1,
       dashboards: [
         {
           id: 357549371218199219n,
           label: 'Caching Offload',
-          url: 'caching-offload',
+          path: 'caching-offload',
           dataset: 'l2CacheMetrics'
         }
       ]
@@ -49,13 +49,13 @@ const PAGES_DASHBOARDS = {
     {
       id: 3,
       label: 'Edge Functions',
-      url: 'edge-functions',
+      path: 'edge-functions',
       groupId: 1,
       dashboards: [
         {
           id: 357549319029523021n,
           label: 'Invocations',
-          url: 'invocations',
+          path: 'invocations',
           dataset: 'edgeFunctionsMetrics'
         }
       ]
@@ -63,13 +63,13 @@ const PAGES_DASHBOARDS = {
     {
       id: 4,
       label: 'Image Processor',
-      url: 'image-processor',
+      path: 'image-processor',
       groupId: 1,
       dashboards: [
         {
           id: 357549422933967445n,
           label: 'Requests',
-          url: 'requests',
+          path: 'requests',
           dataset: 'imagesProcessedMetrics'
         }
       ]
@@ -79,13 +79,13 @@ const PAGES_DASHBOARDS = {
     {
       id: 6,
       label: 'WAF',
-      url: 'waf',
+      path: 'waf',
       groupId: 2,
       dashboards: [
         {
           id: 357548675837198933n,
           label: 'Threats',
-          url: 'threats',
+          path: 'threats',
           dataset: 'httpMetrics'
         }
       ]
@@ -93,13 +93,13 @@ const PAGES_DASHBOARDS = {
     {
       id: 7,
       label: 'Intelligent DNS',
-      url: 'intelligent-dns',
+      path: 'intelligent-dns',
       groupId: 2,
       dashboards: [
         {
           id: 357549371218199119n,
           label: 'Standard Queries',
-          url: 'standard-queries',
+          path: 'standard-queries',
           dataset: 'idnsQueriesMetrics'
         }
       ]
@@ -109,13 +109,13 @@ const PAGES_DASHBOARDS = {
     {
       id: 8,
       label: 'Data Streaming',
-      url: 'data-streaming',
+      path: 'data-streaming',
       groupId: 3,
       dashboards: [
         {
           id: 352149476039721549n,
           label: 'Data Streamed',
-          url: 'requests',
+          path: 'requests',
           dataset: 'dataStreamedMetrics'
         }
       ]
