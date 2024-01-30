@@ -213,7 +213,7 @@
 
   <FormHorizontal
     title="Request a Certificate"
-    description="Generate a CSR and submit the it to a certificate authority to generate a digital certificate."
+    description="Generate a CSR and submit it to a certificate authority to generate a digital certificate."
     v-if="isEdgeCSRCertificate"
   >
     <template #inputs>
