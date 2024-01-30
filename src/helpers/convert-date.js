@@ -17,17 +17,6 @@ export function removeSelectedAmountOfHours(pOffset, pDate) {
 }
 
 /**
- * Set the current date to UTC0 and remove Timezone tag
- *
- * @returns {string} Date without timezone
- */
-Date.prototype.removeZone = function removeZone() {
-  const dateWithUserTimezone = this.toISOString()
-  const dateWithoutZone = dateWithUserTimezone.replace(/(\..+)/, '')
-  return dateWithoutZone
-}
-
-/**
  * Convert current date to the UTC informed
  *
  * @param {number} userUTC - The UTC offset to convert the date to
@@ -37,7 +26,7 @@ Date.prototype.toUTC = function toUTC(userUTC = 0) {
   const tz = Number(userUTC)
   const tzTimeStamp = (tz / 100) * HOURS_TO_MSEC
   const dateWithUserTimezone = new Date(this.getTime() + tzTimeStamp)
-  const dateWithoutZone = dateWithUserTimezone.removeZone()
+  const dateWithoutZone = dateWithUserTimezone.toBeholderFormat()
   return new Date(dateWithoutZone)
 }
 

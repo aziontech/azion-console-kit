@@ -18,7 +18,7 @@ export const useAccountStore = defineStore({
     isFirstLogin(state) {
       return state.account?.first_login
     },
-    accountUTCOffset(state) {
+    accountUtcOffset(state) {
       return state.account?.utc_offset || '+0000'
     }
   },
