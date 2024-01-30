@@ -21,7 +21,10 @@
         :pt="pt"
       >
         <template #header>
-          <div class="flex flex-wrap justify-between gap-2 w-full">
+          <slot
+            name="header"
+            class="flex flex-wrap justify-between gap-2 w-full"
+          >
             <span class="p-input-icon-left max-sm:w-full">
               <i class="pi pi-search" />
               <InputText
@@ -39,7 +42,7 @@
                 v-if="addButtonLabel"
               />
             </slot>
-          </div>
+          </slot>
         </template>
         <Column
           v-if="reorderableRows"
