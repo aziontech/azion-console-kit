@@ -14,7 +14,7 @@
       required: true
     }
   })
-  
+
   const permissionsList = ref([])
 
   const { value: name, errorMessage: errorName } = useField('name')
@@ -43,7 +43,7 @@
   }
 
   watch(permissionsList, (newPermissions) => {
-    if (formAlredyInitialized.value){
+    if (formAlredyInitialized.value) {
       const selectedPermissions = newPermissions[1]
       permissions.value = selectedPermissions
     }

@@ -23,7 +23,7 @@
     userUtcOffset: {
       type: String,
       default: ''
-    },
+    }
   })
 
   const personalToken = computed({
@@ -68,10 +68,13 @@
    * @param {Object} selectedOption - The selected option from the dropdown.
    * @param {string} selectedOption.value - The value of the selected option.
    */
-   const updateSelectedExpiration = ({ value: selectedValue }) => {
+  const updateSelectedExpiration = ({ value: selectedValue }) => {
     if (selectedValue === 'custom') {
       customExpiration.value = tomorrow
-      const customExpirationInUserTimezone = convertDateToLocalTimezone(props.userUtcOffset, customExpiration.value)
+      const customExpirationInUserTimezone = convertDateToLocalTimezone(
+        props.userUtcOffset,
+        customExpiration.value
+      )
       setExpiration(customExpirationInUserTimezone)
       return
     }
@@ -79,7 +82,10 @@
     const newExpirationDate = new Date()
     const daysToAdd = parseInt(selectedExpiration.value)
     newExpirationDate.setDate(newExpirationDate.getDate() + daysToAdd)
-    const newExpirationInUserTimezone = convertDateToLocalTimezone(props.userUtcOffset, newExpirationDate)
+    const newExpirationInUserTimezone = convertDateToLocalTimezone(
+      props.userUtcOffset,
+      newExpirationDate
+    )
     setExpiration(newExpirationInUserTimezone)
   }
 
@@ -89,7 +95,10 @@
    * @param {Date} newExpirationDate - The new expiration date.
    */
   const updateExpiration = (newExpirationDate) => {
-    const newExpirationInUserTimezone = convertDateToLocalTimezone(props.userUtcOffset, newExpirationDate)
+    const newExpirationInUserTimezone = convertDateToLocalTimezone(
+      props.userUtcOffset,
+      newExpirationDate
+    )
     setExpiration(newExpirationInUserTimezone)
   }
 </script>

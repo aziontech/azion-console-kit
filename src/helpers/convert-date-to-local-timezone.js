@@ -8,7 +8,7 @@
  */
 export const convertDateToLocalTimezone = (utcOffset, date) => {
   if (!(date instanceof Date)) {
-    throw new Error('date must be an instance of Date');
+    throw new Error('date must be an instance of Date')
   }
 
   const userOffset = convertOffsetToDecimal(utcOffset)
