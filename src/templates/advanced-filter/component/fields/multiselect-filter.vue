@@ -3,6 +3,8 @@
   import MultiSelect from 'primevue/multiselect'
   import * as yup from 'yup'
   import { useField } from 'vee-validate'
+  import { useToast } from 'primevue/usetoast'
+
   defineOptions({ name: 'multiSelectFilter' })
 
   const props = defineProps({
@@ -38,6 +40,7 @@
 
   const valueOptions = ref([])
   const loading = ref(false)
+  const toast = useToast()
 
   const { value: selectedValue, errorMessage } = useField(
     'selectedValue',
@@ -64,7 +67,12 @@
         [props.payload.value]: item
       }))
     } catch (error) {
-      throw new Error(error)
+      toast.add({
+        detail: error,
+        closable: true,
+        severity: 'error',
+        summary: 'Error'
+      })
     } finally {
       loading.value = false
     }

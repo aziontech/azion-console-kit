@@ -4,24 +4,58 @@
   import dialogFilter from './dialog-filter.vue'
   import Chip from 'primevue/chip'
   import PrimeButton from 'primevue/button'
+  import { useRoute, useRouter } from 'vue-router'
+  import { useToast } from 'primevue/usetoast'
+  import { OPERATOR_MAPPING } from './component'
 
+  const route = useRoute()
+  const toast = useToast()
+  const router = useRouter()
   const emit = defineEmits(['applyFilter'])
 
   const props = defineProps({
-    listField: {
-      type: Object,
+    fieldsInFilter: {
+      type: Array,
       required: true
     }
   })
 
-  const fields = ref(props.listField)
+  const defaultFields = ref(JSON.parse(JSON.stringify(props.fieldsInFilter)))
+  const fields = ref(props.fieldsInFilter)
   const displayFilter = ref([])
   const refDialogFilter = ref()
   const FORMAT_IN = 'In'
   const FORMAT_RANGE = 'Range'
   const DEFAULT_FORMAT = [FORMAT_IN, FORMAT_RANGE]
 
-  const updateFilter = (value) => {
+  const adapterApply = () => {
+    return displayFilter.value?.map(({ valueField, operator, value }) => {
+      return { valueField, operator, value }
+    })
+  }
+
+  const encodeFilter = (value) => {
+    const stringifiedFilters = JSON.stringify(value)
+    return btoa(stringifiedFilters)
+  }
+
+  const decodeFilter = (filters) => {
+    if (!filters) return []
+    try {
+      const decodedFilter = JSON.parse(atob(filters))
+      return decodedFilter
+    } catch (error) {
+      toast.add({
+        closable: true,
+        severity: 'error',
+        summary: 'Error',
+        detail: error
+      })
+      return null
+    }
+  }
+
+  const setFilter = (value) => {
     if (value.edit) {
       displayFilter.value.forEach((item, index) => {
         if (item.field === value.field && item.operator === value.operator) {
@@ -32,27 +66,36 @@
       return
     }
     displayFilter.value.push({ ...value })
+  }
+
+  const updateFilter = (value) => {
+    setFilter(value)
     updateDisabledField()
   }
 
   const updateDisabledField = () => {
-    fields.value.forEach((field) => {
-      field.disabled = false
-      field.operator.forEach((operator) => {
-        operator.disabled = false
-      })
-    })
     if (!displayFilter.value.length) return
-    displayFilter.value?.forEach((itemInList) => {
-      fields.value.forEach((field) => {
-        if (field.value === itemInList.valueField) {
-          field.operator.forEach((operator) => {
-            if (operator.value === itemInList.operator) {
-              operator.disabled = true
-              return
+
+    defaultFields.value.map((itemField, indexField) => {
+      itemField.operator.map((operator, indexOperator) => {
+        fields.value[indexField].operator[indexOperator].disabled = operator.disabled
+      })
+      fields.value[indexField].disabled = fields.value[indexField].operator.every(
+        (operator) => operator.disabled
+      )
+    })
+
+    displayFilter.value?.map((itemInList) => {
+      fields.value.map((itemField, indexField) => {
+        if (itemInList.valueField === itemField.value) {
+          itemField.operator.map((operator, indexOperator) => {
+            if (itemInList.operator === operator.value) {
+              fields.value[indexField].operator[indexOperator].disabled = true
             }
           })
-          field.disabled = field.operator.every((operator) => operator.disabled)
+          fields.value[indexField].disabled = fields.value[indexField].operator.every(
+            (operator) => operator.disabled
+          )
         }
       })
     })
@@ -63,13 +106,13 @@
     refDialogFilter.value.show(item)
   }
 
-  const removeFilter = (item, index, event) => {
+  const removeItemFilter = (item, index, event) => {
     refDialogFilter.value.hide(event)
     displayFilter.value.splice(index, 1)
     updateDisabledField()
   }
 
-  const removeFilterItem = (item, index, idx, event) => {
+  const removeValueItemFilter = (item, index, idx, event) => {
     refDialogFilter.value.hide(event)
     item.value.splice(idx, 1)
     if (!item.value.length) {
@@ -77,9 +120,43 @@
     }
     updateDisabledField()
   }
+
+  const searchFilter = () => {
+    const adaptFilter = adapterApply()
+    const query = {
+      filters: encodeFilter(adaptFilter)
+    }
+    const { params } = route
+    router.push({ params, query })
+    emit('applyFilter', adaptFilter)
+  }
+
+  const loadFilter = () => {
+    const currentParamValue = route.query?.filters
+    if (!currentParamValue) return
+    const filter = decodeFilter(currentParamValue)
+
+    filter.forEach((item) => {
+      const { label, disabled, operator } = defaultFields.value.find(
+        ({ value }) => value === item.valueField
+      )
+      const disabledOp = operator.find(({ value }) => value === item.operator)?.disabled
+
+      const newItem = {
+        ...item,
+        field: label,
+        format: OPERATOR_MAPPING[item.operator].format
+      }
+      if (disabled || disabledOp) return
+      setFilter(newItem)
+    })
+    updateDisabledField()
+  }
+
+  loadFilter()
 </script>
 <template>
-  <div class="flex gap-2 w-full">
+  <div class="flex gap-2 w-full align-items-center">
     <div class="p-inputgroup flex flex-row w-full align-items-stretch">
       <dialogFilter
         ref="refDialogFilter"
@@ -98,7 +175,7 @@
                 class="text-sm px-2 cursor-pointer"
                 removable
                 @click="clickFilter(itemFilter, $event)"
-                @remove="removeFilter(itemFilter, index, $event)"
+                @remove="removeItemFilter(itemFilter, index, $event)"
               >
                 <span class="p-chip-text"> {{ itemFilter.field }}</span>
                 <span class="font-bold p-chip-text leading-5 pl-1">
@@ -111,7 +188,7 @@
                 class="text-sm px-2 cursor-pointer"
                 removable
                 @click="clickFilter(itemFilter, $event)"
-                @remove="removeFilter(itemFilter, index, $event)"
+                @remove="removeItemFilter(itemFilter, index, $event)"
               >
                 <span class="font-bold p-chip-text leading-5 pl-1">
                   {{ `${itemFilter.value.begin} ${itemFilter.format}` }}</span
@@ -139,10 +216,12 @@
                 <Chip
                   class="text-sm px-2 cursor-pointer"
                   @click="clickFilter(itemFilter, $event)"
-                  @remove="removeFilterItem(itemFilter, index, idx, $event)"
+                  @remove="removeValueItemFilter(itemFilter, index, idx, $event)"
                   removable
                 >
-                  <span class="p-chip-text"> {{ item.name ? item.name : item }}</span>
+                  <span class="font-bold p-chip-text leading-5">
+                    {{ item.name ? item.name : item }}</span
+                  >
                 </Chip>
                 <span v-if="itemFilter.value.length > idx + 1"> or </span>
                 <span v-if="itemFilter.value.length === idx + 1"> ) </span>
@@ -158,8 +237,9 @@
       :filter="displayFilter"
     >
       <PrimeButton
-        class="max-sm:w-full"
-        @click="emit('applyFilter', displayFilter)"
+        class="max-sm:w-full min-w-max"
+        size="small"
+        @click="searchFilter"
         label="Search"
       />
     </slot>

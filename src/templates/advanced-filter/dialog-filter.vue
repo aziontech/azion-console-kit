@@ -14,7 +14,7 @@
   const emit = defineEmits(['applyFilter'])
   const props = defineProps({
     listField: {
-      type: Object,
+      type: Array,
       required: true
     },
     counter: {
@@ -115,7 +115,7 @@
     buttonOverPanel.value.$el.click()
     inputFilterDisabled.value = true
     editFilter.value = true
-    const field = filtersOptions.value.find(({ value }) => value.label === item.field)
+    const field = filtersOptions.value.find(({ value }) => value.value === item.valueField)
     filterSelected.value = field.value
     changeFilter()
     const operator = filterSelected.value.operator.find(
