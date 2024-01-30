@@ -3,7 +3,26 @@
   import GraphsCardBlock from '@/templates/graphs-card-block'
   import { storeToRefs } from 'pinia'
   import SelectButton from 'primevue/selectbutton'
-  import { computed } from 'vue'
+  import { computed, defineAsyncComponent } from 'vue'
+
+  const BarChart = defineAsyncComponent(() => import('../components/chart/bar-chart/bar-chart'))
+  const LineChart = defineAsyncComponent(() => import('../components/chart/line-chart/line-chart'))
+  const SplineChart = defineAsyncComponent(() =>
+    import('../components/chart/spline-chart/spline-chart')
+  )
+
+  const propToComponent = {
+    'bar-chart': BarChart,
+    'line-chart': LineChart,
+    'spline-chart': SplineChart
+  }
+
+  const props = defineProps({
+    reportData: {
+      type: Object,
+      default: () => {}
+    }
+  })
 
   const metricsStore = useMetricsStore()
   const { dashboardBySelectedPage, dashboardCurrent, reportsBySelectedDashboard } =
@@ -60,9 +79,7 @@
           variationValue="10.2%"
         >
           <template #chart>
-            <div class="surface-border border border-dashed flex items-center h-full">
-              <p class="text-color-secondary text-center w-full">Slot</p>
-            </div>
+            <component :is="propToComponent[`${props.reportData?.type}-chart`]" />
           </template>
         </GraphsCardBlock>
       </template>
