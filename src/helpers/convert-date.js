@@ -17,8 +17,6 @@ export function removeSelectedAmountOfHours(pOffset, pDate) {
 }
 
 /**
- * Convert current date to the UTC informed
- *
  * @param {number} userUTC - The UTC offset to convert the date to
  * @returns {Date} The new date converted to the specified UTC
  */
