@@ -1,28 +1,33 @@
 <script setup>
+  import { removeSelectedAmountOfHours } from '@/helpers/convert-date'
+  import { useAccountStore } from '@/stores/account'
+  import { useMetricsStore } from '@/stores/metrics'
+  import { storeToRefs } from 'pinia'
   import Calendar from 'primevue/calendar'
   import Dropdown from 'primevue/dropdown'
-  import { computed, ref, onBeforeMount, watchEffect } from 'vue'
-  import DATE_TIME_INTEVALS from '../constants/date-time-interval'
-  import { useAccountStore } from '@/stores/account'
-  import { removeSelectedAmountOfHours } from '@/helpers/convert-date'
-  const emit = defineEmits(['updateInterval'])
+  import { computed, onBeforeMount, ref, watchEffect } from 'vue'
 
   const accountStore = useAccountStore()
+  const metricsStore = useMetricsStore()
+
+  const { getDateTimeFilterOptions, currentFilters } = storeToRefs(metricsStore)
+  const { setTimeRange } = metricsStore
 
   const dates = ref()
-  const interval = ref()
-  const intervalOptions = ref(DATE_TIME_INTEVALS)
+  const interval = ref(null)
 
-  const errorMessageMissingDate = 'Select the second date.'
+  const intervalOptions = computed(() => {
+    return getDateTimeFilterOptions.value
+  })
 
   const userUTC = accountStore.accountUtcOffset
 
   const isCustomDate = computed(() => {
-    return interval?.value?.code === 'custom'
+    return interval.value?.code === 'custom'
   })
 
   const hasSecondDate = computed(() => {
-    return dates?.value?.[1] === null
+    return dates.value?.[1] === null
   })
 
   const isInvalid = computed(() => {
@@ -40,13 +45,12 @@
   })
 
   const setInitialValues = () => {
-    // TODO: Change the initialization of the varible below for the filters store equivalent on pinia
-    const stateTsRange = null
+    const stateTsRange = currentFilters.value?.tsRange
 
     if (stateTsRange) {
       setInitialTimeRange(stateTsRange)
     } else {
-      interval.value = DATE_TIME_INTEVALS[0]
+      interval.value = intervalOptions?.value[0]
     }
   }
 
@@ -60,9 +64,12 @@
 
     dates.value = [dateBegin, dateEnd]
 
-    if (initialTsRange.meta.option === 'custom') return (interval.value = DATE_TIME_INTEVALS[5])
+    if (initialTsRange.meta.option === 'custom') {
+      interval.value = intervalOptions?.value[5]
+      return
+    }
 
-    interval.value = DATE_TIME_INTEVALS.find(
+    interval.value = intervalOptions?.value.find(
       (element) => Number(element.code) === Number(initialTsRange.meta.option)
     )
   }
@@ -70,7 +77,7 @@
   const handleSelect = (offset) => {
     const result = removeAmountOfHours(offset)
 
-    handleEmit(...result)
+    setDateTimeFilters(...result)
   }
 
   const handlePicker = async () => {
@@ -82,16 +89,18 @@
 
     if (hasSecondDate.value) return
 
-    handleEmit(...dates.value)
+    setDateTimeFilters(...dates.value)
   }
 
-  const handleEmit = (begin, end) => {
+  const setDateTimeFilters = (begin, end) => {
+    if (!begin || !end) return
     const tsRange = {
+      meta: { option: interval.value?.code },
       tsRangeBegin: begin.resetUTC(userUTC).toBeholderFormat(),
       tsRangeEnd: end.resetUTC(userUTC).toBeholderFormat()
     }
 
-    emit('updateInterval', tsRange)
+    setTimeRange({ ...tsRange })
   }
 
   const removeAmountOfHours = (offset) => {
@@ -103,11 +112,13 @@
   }
 
   const dropdownChange = () => {
-    return (dates.value = null)
+    dates.value = null
   }
 
   watchEffect(() => {
-    if (interval.value && !isCustomDate.value) return handleSelect(interval.value.code)
+    if (interval.value && !isCustomDate.value) {
+      handleSelect(interval.value.code)
+    }
 
     handlePicker()
   })
@@ -122,11 +133,14 @@
         :options="intervalOptions"
         optionLabel="name"
         @change="dropdownChange"
+        :loading="!intervalOptions?.length"
       />
     </div>
-    <div class="w-full md:max-w-xs max-w-full">
+    <div
+      class="w-full md:max-w-xs max-w-full"
+      v-if="isCustomDate"
+    >
       <Calendar
-        v-if="isCustomDate"
         placeholder="Select date from calendar"
         class="w-full"
         v-model="dates"
@@ -144,7 +158,7 @@
         v-if="hasSecondDate"
         class="p-error text-xs font-normal leading-tight"
       >
-        {{ errorMessageMissingDate }}
+        Select the second date.
       </small>
     </div>
   </div>
