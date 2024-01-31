@@ -29,6 +29,11 @@
       default: () => [],
       required: true
     },
+    netWorkList: {
+      type: String,
+      default: '',
+      required: true
+    },
     time: {
       type: String,
       default: '',
@@ -156,7 +161,7 @@
           <div class="w-1/2 flex flex-col gap-3">
             <div class="flex justify-between w-full gap-3">
               <span class="w-1/2 text-color">Network List</span>
-              <span class="w-1/2 text-color-secondary"></span>
+              <span class="w-1/2 text-color-secondary">{{ netWorkList }}</span>
             </div>
             <div class="flex justify-between w-full gap-3">
               <span class="w-1/2 text-color">Country</span>
@@ -274,6 +279,12 @@
                   </div>
                 </div>
               </div>
+            </div>
+            <div
+              v-if="!possibleAttacks.length"
+              class="text-md font-normal text-secondary"
+            >
+              No fields list found
             </div>
           </div>
         </div>

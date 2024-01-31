@@ -88,6 +88,7 @@
     :listService="handleListWafRulesTuningAttacksService"
     :tuningObject="tuningSelected"
     :domains="domainNames"
+    :netWorkList="netWorkListName"
     :time="timeName"
     @attack-on="createAllowedByAttack"
   >
@@ -174,6 +175,14 @@
 
   const dataFiltedComputed = computed(() => dataFilted.value)
   const timeName = computed(() => timeOptions.value.find((item) => item.value === time.value).name)
+  const netWorkListName = computed(() => {
+    if (selectedNetworkList.value?.id) {
+      return netWorkListOptions.value.options.find(
+        (item) => item.value.id === selectedNetworkList.value.id
+      ).name
+    }
+    return ''
+  })
   const time = ref('1')
 
   const listFields = ref([
@@ -374,8 +383,6 @@
     filterSearch([])
   }
 
- 
-
   const filterSearch = async (filter) => {
     if (!selectedDomain.value.length) return
     const { disabledIP, disabledCountries } = selectedNetworkList.value || {}
@@ -399,7 +406,7 @@
     const domainsId = encodeURIComponent(selectedDomain.value)
     const matchesOn = `matches_on=${tuningSelected.value.matchesOn}`
     const matchesZone = `match_zone=${tuningSelected.value.matchZone}`
-    const pathsList= path ? `&paths_list=${path}` : ''
+    const pathsList = path ? `&paths_list=${path}` : ''
 
     const query = `?hour_range=${time.value}&domains_ids=${domainsId}&${matchesOn}&${matchesZone}${pathsList}`
 
