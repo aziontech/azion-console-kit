@@ -1,5 +1,4 @@
 import BeholderService from '@services/metrics-services/fetch-metrics-data-from-beholder'
-import Axios from 'axios'
 import { DatasetListQuery } from '../gql'
 
 let cancelRequest = null
@@ -15,10 +14,6 @@ const isAlias = (name) => {
 const capitalizeFirstLetter = (string) => string.charAt(0).toUpperCase() + string.slice(1)
 
 export default async () => {
-  if (cancelRequest) cancelRequest.cancel()
-  const ReportsRequestToken = Axios.CancelToken
-  cancelRequest = ReportsRequestToken.source()
-
   const graphqlQuery = { query: DatasetListQuery }
 
   const beholderService = new BeholderService({ cancelRequest })
@@ -52,6 +47,8 @@ export default async () => {
       }
     })
   })
+
+  cancelRequest = true
 
   return newAvailableFilters
 }
