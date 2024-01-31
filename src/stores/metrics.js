@@ -258,7 +258,7 @@ export const useMetricsStore = defineStore('metrics', {
       this.setFilters(decodedFilter)
     },
     async loadCurrentReports() {
-      await LoadReportsDataBySelectedDashboard(this.filters, this.reports)
+      await LoadReportsDataBySelectedDashboard(this.filters, this.reports, this.currentDashboard)
     },
     setCurrentReports(availableReports) {
       this.currentReportsData = availableReports

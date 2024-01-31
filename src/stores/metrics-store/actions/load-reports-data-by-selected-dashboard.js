@@ -31,13 +31,13 @@ async function resolveReport(report, filters) {
   metricsStore.setCurrentReportValue({ ...reportInfo })
 }
 
-export default async (filters, reports) => {
+export default async (filters, reports, currentDashboard) => {
   if (ReportsRequestTokenSource) ReportsRequestTokenSource.cancel()
 
   const ReportsRequestToken = Axios.CancelToken
   ReportsRequestTokenSource = ReportsRequestToken.source()
 
-  const availableReports = reportsBySelectedDashboard(reports)
+  const availableReports = reportsBySelectedDashboard(reports, currentDashboard)
 
   const metricsStore = useMetricsStore()
 

@@ -93,17 +93,17 @@ export default async (filters, report) => {
   const accountStore = useAccountStore()
   const userUTC = accountStore.accountUtcOffset
 
-  const resultChart = ConvertBeholderToChart(
-    resultQuery,
-    report.dataset,
+  const resultChart = ConvertBeholderToChart({
+    data: resultQuery,
+    dataset: report.dataset,
     variable,
     aggregation,
     groupBy,
-    report.isTopX,
-    report.xAxis,
-    report.fields || [],
+    isTopX: report.isTopX,
+    xAxis: report.xAxis,
+    additionalSeries: report.fields || [],
     userUTC
-  )
+  })
 
   return {
     reportId: report.id,
