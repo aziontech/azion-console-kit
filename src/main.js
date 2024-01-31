@@ -1,24 +1,25 @@
 /**
  * ==== styles block ====
  */
-import 'primeicons/primeicons.css'
-import 'primeflex/primeflex.css'
-import './assets/main.css'
-import '@assets/themes/scss/themes/azion-light/theme.scss'
-import '@assets/themes/scss/themes/azion-dark/theme.scss'
+import '@assets/c3.scss'
 import '@assets/icons/azionicons.scss'
+import '@assets/themes/scss/themes/azion-dark/theme.scss'
+import '@assets/themes/scss/themes/azion-light/theme.scss'
+import 'primeflex/primeflex.css'
+import 'primeicons/primeicons.css'
+import './assets/main.css'
 /**
  * ==== End of styles block ====
  */
 
-import { createApp } from 'vue'
+import * as HelpCenterServices from '@/services/help-center-services'
+import { install as VueMonacoEditorPlugin } from '@guolao/vue-monaco-editor'
 import { createPinia } from 'pinia'
 import piniaPluginPersistedstate from 'pinia-plugin-persistedstate'
 import PrimeVue from 'primevue/config'
-import Tooltip from 'primevue/tooltip'
 import ToastService from 'primevue/toastservice'
-import { install as VueMonacoEditorPlugin } from '@guolao/vue-monaco-editor'
-import * as HelpCenterServices from '@/services/help-center-services'
+import Tooltip from 'primevue/tooltip'
+import { createApp } from 'vue'
 
 import App from './App.vue'
 import router from './router'

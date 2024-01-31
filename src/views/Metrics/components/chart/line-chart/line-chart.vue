@@ -1,7 +1,7 @@
 <script setup>
   import c3 from 'c3'
-  import FormatC3GraphProps from '../../../helpers/c3-charts'
   import { onMounted } from 'vue'
+  import FormatC3GraphProps from '../../../helpers/c3-charts'
 
   const props = defineProps({
     chartData: Object,
@@ -31,17 +31,7 @@
 
 <template>
   <div
-    class="line-chart"
+    class="[&>svg]:w-auto [&>svg]:flex"
     :id="`line-chart-${props.chartData?.id}`"
-    data-testid="lineChart"
-  ></div>
+  />
 </template>
-
-<style lang="scss">
-  .line-chart {
-    & > svg {
-      display: flex;
-      width: auto;
-    }
-  }
-</style>
