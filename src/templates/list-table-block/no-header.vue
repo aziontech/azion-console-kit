@@ -21,25 +21,27 @@
         :pt="pt"
       >
         <template #header>
-          <div class="flex flex-wrap justify-between gap-2 w-full">
-            <span class="p-input-icon-left max-sm:w-full">
-              <i class="pi pi-search" />
-              <InputText
-                class="w-full"
-                v-model.trim="filters.global.value"
-                placeholder="Search"
-              />
-            </span>
-            <slot name="addButton">
-              <PrimeButton
-                class="max-sm:w-full"
-                @click="navigateToAddPage"
-                icon="pi pi-plus"
-                :label="addButtonLabel"
-                v-if="addButtonLabel"
-              />
-            </slot>
-          </div>
+          <slot name="header">
+            <div class="flex flex-wrap justify-between gap-2 w-full">
+              <span class="p-input-icon-left max-sm:w-full">
+                <i class="pi pi-search" />
+                <InputText
+                  class="w-full"
+                  v-model.trim="filters.global.value"
+                  placeholder="Search"
+                />
+              </span>
+              <slot name="addButton">
+                <PrimeButton
+                  class="max-sm:w-full"
+                  @click="navigateToAddPage"
+                  icon="pi pi-plus"
+                  :label="addButtonLabel"
+                  v-if="addButtonLabel"
+                />
+              </slot>
+            </div>
+          </slot>
         </template>
         <Column
           v-if="reorderableRows"
@@ -178,7 +180,7 @@
   import OverlayPanel from 'primevue/overlaypanel'
   import Skeleton from 'primevue/skeleton'
   import { useToast } from 'primevue/usetoast'
-  import { computed, getCurrentInstance, onMounted, ref, watch } from 'vue'
+  import { computed, onMounted, ref, watch } from 'vue'
   import { useRouter } from 'vue-router'
   import DeleteDialog from './dialog/delete-dialog'
 
@@ -213,11 +215,9 @@
       type: Boolean
     },
     listService: {
-      required: true,
       type: Function
     },
     deleteService: {
-      required: true,
       type: Function
     },
     onReorderService: {
@@ -355,10 +355,8 @@
     }
   }
 
-  const instance = getCurrentInstance()
   const updatedTable = () => {
-    data.value = data.value.filter((item) => item.id !== selectedId.value)
-    instance.proxy?.$forceUpdate()
+    loadData({ page: 1 })
   }
 
   const onRowReorder = async (event) => {

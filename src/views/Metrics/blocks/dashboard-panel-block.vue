@@ -3,11 +3,24 @@
   import GraphsCardBlock from '@/templates/graphs-card-block'
   import { storeToRefs } from 'pinia'
   import SelectButton from 'primevue/selectbutton'
-  import { computed } from 'vue'
+  import { computed, defineAsyncComponent } from 'vue'
+
+  const propToComponent = {
+    'bar-chart': defineAsyncComponent(() => import('../components/chart/bar-chart/bar-chart')),
+    'line-chart': defineAsyncComponent(() => import('../components/chart/line-chart/line-chart')),
+    'spline-chart': defineAsyncComponent(() =>
+      import('../components/chart/spline-chart/spline-chart')
+    )
+  }
+
+  const props = defineProps({
+    reportData: Object
+  })
 
   const metricsStore = useMetricsStore()
-  const { dashboardBySelectedPage, dashboardCurrent } = storeToRefs(metricsStore)
-  const { setCurrentDashboard } = metricsStore
+  const { dashboardBySelectedPage, dashboardCurrent, reportsBySelectedDashboard } =
+    storeToRefs(metricsStore)
+  const { setCurrentDashboard, loadCurrentReports, setDatasetAvailableFilters } = metricsStore
 
   const dashboards = computed(() => {
     return dashboardBySelectedPage.value
@@ -17,12 +30,18 @@
     return dashboardCurrent.value
   })
 
-  const changeDashboard = (evt) => {
+  const changeDashboard = async (evt) => {
     setCurrentDashboard(evt.value)
+    await setDatasetAvailableFilters()
+    await loadCurrentReports()
   }
 
   const showTabs = computed(() => {
     return dashboards.value?.length > 1
+  })
+
+  const reportsData = computed(() => {
+    return reportsBySelectedDashboard.value
   })
 </script>
 
@@ -37,24 +56,25 @@
       @change="changeDashboard"
       v-if="showTabs"
     />
-    <div class="grid grid-cols-12 gap-4 m-0">
+    <div
+      class="grid grid-cols-12 gap-4 m-0"
+      v-if="reportsData?.length"
+    >
       <template
-        v-for="i of 6"
-        :key="i"
+        v-for="report of reportsData"
+        :key="report.id"
       >
         <GraphsCardBlock
           chartOwner="azion"
-          title="Four Columns Card"
-          description="This card is 4 columns wide, sets the aggregation type to 'Average', the variation type to 'positive', and the variation value to '10.2%'."
-          :cols="4"
-          aggregationType="Average"
+          :title="report.label"
+          :description="report.description"
+          :cols="report.columns"
+          :aggregationType="report.aggregationType"
           variationType="positive"
           variationValue="10.2%"
         >
           <template #chart>
-            <div class="surface-border border border-dashed flex items-center h-full">
-              <p class="text-color-secondary text-center w-full">Slot</p>
-            </div>
+            <component :is="propToComponent[`${props.reportData?.type}-chart`]" />
           </template>
         </GraphsCardBlock>
       </template>

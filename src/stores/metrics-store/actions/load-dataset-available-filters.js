@@ -23,8 +23,8 @@ export default async (dataset) => {
   try {
     const type = await beholderService.gql(graphqlQuery)
     data = type.__type
-  } catch (error) {
-    return false
+  } catch {
+    return []
   }
 
   const availableFilters = data.inputFields

@@ -1,15 +1,43 @@
 import { AxiosHttpClientAdapter, parseHttpResponse } from '../axios/AxiosHttpClientAdapter'
 import { makeWafRulesBaseUrl } from './make-waf-rules-base-url'
 
-export const listWafRulesTuningService = async ({ wafId, query }) => {
+export const listWafRulesTuningService = async ({ wafId, domains, network, hourRange, filter }) => {
+  const { countries, ipsList } = middleware(filter)
+  const searchParams = makeSearchParams({ domains, network, countries, ipsList, hourRange })
   let httpResponse = await AxiosHttpClientAdapter.request({
-    url: `${makeWafRulesBaseUrl()}/${wafId}/waf_events${query}`,
+    url: `${makeWafRulesBaseUrl()}/${wafId}/waf_events?${searchParams}`,
     method: 'GET'
   })
 
   httpResponse = adapt(httpResponse)
 
   return parseHttpResponse(httpResponse)
+}
+
+const middleware = (filter) => {
+  if (!filter?.length) return { countries: null, ipsList: null }
+
+  const countries = filter
+    .find((item) => item.valueField === 'country')
+    ?.value.map((item) => item.name)
+
+  const ipsListIn =
+    filter.find((item) => item.valueField === 'ip_address' && item.operator === 'In')?.value || []
+
+  const ipsListEquals = filter.find(
+    (item) => item.valueField === 'ip_address' && item.operator === 'Eq'
+  )?.value
+
+  const ipsList = [...ipsListIn]
+
+  if (ipsListEquals) {
+    ipsList.push(ipsListEquals)
+  }
+
+  return {
+    countries,
+    ipsList
+  }
 }
 
 const adapt = (httpResponse) => {
@@ -46,4 +74,15 @@ const adapt = (httpResponse) => {
     body: parsedWafRulesTuning,
     statusCode: httpResponse.statusCode
   }
+}
+
+const makeSearchParams = ({ domains, network, countries, ipsList, hourRange }) => {
+  const searchParams = new URLSearchParams()
+  domains && searchParams.set('domains_ids', domains)
+  network && searchParams.set('network_list_id', network)
+  ipsList && searchParams.set('ips_list', ipsList)
+  countries && searchParams.set('countries_list', countries)
+  hourRange && searchParams.set('hour_range', hourRange)
+
+  return searchParams
 }

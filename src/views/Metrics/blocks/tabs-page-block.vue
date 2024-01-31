@@ -8,7 +8,13 @@
 
   const metricsStore = useMetricsStore()
   const { getGroupPages, groupPageCurrent, getPages, pageCurrent } = storeToRefs(metricsStore)
-  const { setCurrentGroupPageByLabels, resetFilters, setCurrentPage } = metricsStore
+  const {
+    setCurrentGroupPageByLabels,
+    resetFilters,
+    setCurrentPage,
+    setDatasetAvailableFilters,
+    loadCurrentReports
+  } = metricsStore
 
   const metricsGroups = computed(() => {
     return getGroupPages.value
@@ -18,9 +24,11 @@
     return groupPageCurrent.value
   })
 
-  const changeGroup = (evt) => {
+  const changeGroup = async (evt) => {
     resetFilters()
     setCurrentGroupPageByLabels(evt.value.label)
+    await setDatasetAvailableFilters()
+    await loadCurrentReports()
   }
 
   const groupPages = computed(() => {
@@ -31,9 +39,12 @@
     return groupPages.value?.findIndex((dashboard) => dashboard.id === pageCurrent.value?.id)
   })
 
-  const changePage = (evt) => {
+  const changePage = async (evt) => {
+    resetFilters()
     const selectedPage = groupPages.value[evt.index]
     setCurrentPage(selectedPage)
+    await setDatasetAvailableFilters()
+    await loadCurrentReports()
   }
 </script>
 <template>

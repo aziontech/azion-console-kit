@@ -72,7 +72,7 @@ Date.prototype.toUTC = function (userUTC = 0) {
   const tz = Number(userUTC)
   const tzTimeStamp = (tz / 100) * HOURS_TO_MSEC
   const dateWithUserTimezone = new Date(this.getTime() + tzTimeStamp)
-  const dateWithoutZone = dateWithUserTimezone.removeZone()
+  const dateWithoutZone = dateWithUserTimezone.toBeholderFormat()
   return new Date(dateWithoutZone)
 }
 

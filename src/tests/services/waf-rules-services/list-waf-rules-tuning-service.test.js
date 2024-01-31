@@ -14,6 +14,12 @@ const fixtures = {
     matches_on: 'query_string',
     rule_description: 'Possible SQL Injection attack: SQL keywords found in Query String',
     country_count: 10
+  },
+  payload: {
+    wafId: 44,
+    domains: 1705587704,
+    network: 123,
+    hourRange: 48
   }
 }
 
@@ -38,10 +44,10 @@ describe('WafRulesService', () => {
       body: { results: [fixtures.wafRulesMock] }
     })
     const { sut } = makeSut()
-    await sut({ wafId: 4044, query: '?hour_range=48&domains_ids=1705587704' })
+    await sut(fixtures.payload)
 
     expect(requestSpy).toHaveBeenCalledWith({
-      url: 'v3/waf/4044/waf_events?hour_range=48&domains_ids=1705587704',
+      url: 'v3/waf/44/waf_events?domains_ids=1705587704&network_list_id=123&hour_range=48',
       method: 'GET'
     })
   })
@@ -53,7 +59,7 @@ describe('WafRulesService', () => {
     })
     const { sut } = makeSut()
 
-    const result = await sut({ wafId: 4044, query: '?hour_range=48&domains_ids=1705587704' })
+    const result = await sut(fixtures.payload)
 
     expect(result).toEqual([
       {

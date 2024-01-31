@@ -1,11 +1,13 @@
 <template>
   <PrimeTag
     icon="pi pi-user"
+    severity="info"
     :pt="{ icon: { class: 'mr-0' } }"
     v-if="chartOwner === 'user'"
   />
   <PrimeTag
     icon="pi pi-users"
+    severity="info"
     :pt="{ icon: { class: 'mr-0' } }"
     v-if="chartOwner === 'account'"
   />
@@ -18,8 +20,8 @@
 </template>
 
 <script setup>
-  import PrimeTag from 'primevue/tag'
   import MobileLogo from '@assets/svg/mobile-logo'
+  import PrimeTag from 'primevue/tag'
 
   defineProps({ chartOwner: String })
 </script>
