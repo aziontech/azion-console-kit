@@ -9,7 +9,7 @@
       type: String
     },
     placeholder: {
-      type: String,
+      type: String
     },
     disabled: {
       type: Boolean

@@ -1,18 +1,17 @@
-
 .p-overlaypanel .p-overlaypanel-close:enabled:hover {
-    background: none !important;
-    color: transparent;
+  background: none !important;
+  color: transparent;
 }
 .p-overlaypanel:after,
 .p-overlaypanel:before {
-    content: none;    
+  content: none;
 }
 .p-overlaypanel.p-overlaypanel-flipped:after {
-    border-top-color: none !important;
+  border-top-color: none !important;
 }
 .p-overlaypanel.p-overlaypanel-flipped:before {
-    border-top-color: none !important;
+  border-top-color: none !important;
 }
 .p-overlaypanel {
-    margin-top: 0;
+  margin-top: 0;
 }

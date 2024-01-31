@@ -172,7 +172,7 @@
     aria-haspopup="true"
     aria-controls="overlay_panel"
     :pt="{
-      root: { class: 'p-0 w-[576px]' },
+      root: { class: 'p-0 md:w-[576px] max-sm:w-full' },
       content: { class: 'p-0' }
     }"
   >
@@ -194,10 +194,10 @@
           Each combination of operator can only be used once.
         </span>
         <div
-          class="flex"
-          :class="filterSelected?.description ? 'gap-6' : 'pr-6'"
+          class="flex sm:w-full max-sm:flex-col"
+          :class="filterSelected?.description ? 'gap-6' : 'md:pr-6'"
         >
-          <div class="flex flex-col w-1/2 gap-2">
+          <div class="flex flex-col md:w-1/2 gap-2 sm:max-w-xs w-full">
             <label
               for="filter-field"
               class="text-sm font-medium leading-5 text-color"
@@ -226,7 +226,7 @@
           </div>
 
           <div
-            class="flex flex-col w-1/2 gap-2"
+            class="flex flex-col w-1/2 gap-2 max-sm:w-full"
             v-if="filterSelected"
           >
             <label
@@ -290,11 +290,13 @@
         type="button"
         label="Cancel"
         @click="toggle"
+        class="max-md:min-w-max"
         severity="primary"
         outlined
       />
       <ButtonPrime
         type="button"
+        class="max-md:w-full"
         label="Apply"
         severity="secondary"
         @click="onSubmit"

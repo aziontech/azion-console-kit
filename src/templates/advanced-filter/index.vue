@@ -1,6 +1,6 @@
 <script setup>
   defineOptions({ name: 'advanced-filter' })
-  import { ref } from 'vue'
+  import { ref, watch } from 'vue'
   import dialogFilter from './dialog-filter.vue'
   import Chip from 'primevue/chip'
   import PrimeButton from 'primevue/button'
@@ -17,6 +17,9 @@
     fieldsInFilter: {
       type: Array,
       required: true
+    },
+    hashDisabled: {
+      type: Boolean
     }
   })
 
@@ -107,33 +110,43 @@
     refDialogFilter.value.show(item)
   }
 
-  const removeItemFilter = (item, index, event) => {
+  const removeItemFilter = (index, event) => {
     refDialogFilter.value.hide(event)
     displayFilter.value.splice(index, 1)
     updateDisabledField()
   }
 
-  const removeValueItemFilter = (item, index, idx, event) => {
+  const removeValueItemFilter = (index, idx, event) => {
     refDialogFilter.value.hide(event)
-    item.value.splice(idx, 1)
-    if (!item.value.length) {
+
+    displayFilter.value[index].value.splice(idx, 1)
+    if (!displayFilter.value[index].value.length) {
       displayFilter.value.splice(index, 1)
     }
     updateDisabledField()
   }
 
+  const updateHash = (filter) => {
+    const { params } = route
+    const query = {
+      filters: encodeFilter(filter)
+    }
+    router.push({ params, query })
+  }
+
   const searchFilter = () => {
     const adaptFilter = adapterApply()
-    const query = {
-      filters: encodeFilter(adaptFilter)
-    }
-    const { params } = route
-    router.push({ params, query })
     emit('applyFilter', adaptFilter)
+
+    if (!props.hashDisabled) {
+      updateHash(adaptFilter)
+    }
   }
 
   const loadFilter = () => {
+    if (props.hashDisabled) return
     const currentParamValue = route.query?.filters
+
     if (!currentParamValue) return
     const filter = decodeFilter(currentParamValue)
 
@@ -151,14 +164,19 @@
       if (disabled || disabledOp) return
       setFilter(newItem)
     })
+
     updateDisabledField()
   }
 
   loadFilter()
+
+  watch(props.fieldsInFilter, (value) => {
+    defaultFields.value = JSON.parse(JSON.stringify(value))
+  })
 </script>
 <template>
-  <div class="flex gap-2 w-full align-items-center">
-    <div class="p-inputgroup flex flex-row w-full align-items-stretch">
+  <div class="flex max-sm:gap-2 w-full max-sm:align-items-center max-sm:flex-col">
+    <div class="p-inputgroup flex flex-row w-full align-items-stretch md:contents">
       <dialogFilter
         ref="refDialogFilter"
         :listField="fields"
@@ -176,7 +194,7 @@
                 class="text-sm px-2 cursor-pointer"
                 removable
                 @click="clickFilter(itemFilter, $event)"
-                @remove="removeItemFilter(itemFilter, index, $event)"
+                @remove="removeItemFilter(index, $event)"
               >
                 <span class="p-chip-text"> {{ itemFilter.field }}</span>
                 <span class="font-bold p-chip-text leading-5 pl-1">
@@ -189,7 +207,7 @@
                 class="text-sm px-2 cursor-pointer"
                 removable
                 @click="clickFilter(itemFilter, $event)"
-                @remove="removeItemFilter(itemFilter, index, $event)"
+                @remove="removeItemFilter(index, $event)"
               >
                 <span class="font-bold p-chip-text leading-5 pl-1">
                   {{ `${itemFilter.value.begin} ${itemFilter.format}` }}</span
@@ -217,12 +235,12 @@
                 <Chip
                   class="text-sm px-2 cursor-pointer"
                   @click="clickFilter(itemFilter, $event)"
-                  @remove="removeValueItemFilter(itemFilter, index, idx, $event)"
+                  @remove="removeValueItemFilter(index, idx, $event)"
                   removable
                 >
                   <span class="font-bold p-chip-text leading-5">
-                    {{ item.name ? item.name : item }}</span
-                  >
+                    {{ item.name ? item.name : item }}
+                  </span>
                 </Chip>
                 <span v-if="itemFilter.value.length > idx + 1"> or </span>
                 <span v-if="itemFilter.value.length === idx + 1"> ) </span>
@@ -239,7 +257,7 @@
       :filter="displayFilter"
     >
       <PrimeButton
-        class="max-sm:w-full min-w-max"
+        class="max-sm:w-full min-w-max max-sm:flex-col md:ml-3 md:align-self-center"
         size="small"
         @click="searchFilter"
         label="Search"

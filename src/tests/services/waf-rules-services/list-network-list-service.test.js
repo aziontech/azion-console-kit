@@ -55,8 +55,12 @@ describe('WafRulesServices', () => {
 
     expect(result).toEqual([
       {
-        id: fixtures.networkMock.id,
-        name: fixtures.networkMock.name
+        name: fixtures.networkMock.name,
+        value: {
+          id: fixtures.networkMock.id,
+          disabledCountries: false,
+          disabledIP: false
+        }
       }
     ])
   })

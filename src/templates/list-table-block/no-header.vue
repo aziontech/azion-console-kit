@@ -21,27 +21,26 @@
         :pt="pt"
       >
         <template #header>
-          <slot
-            name="header"
-            class="flex flex-wrap justify-between gap-2 w-full"
-          >
-            <span class="p-input-icon-left max-sm:w-full">
-              <i class="pi pi-search" />
-              <InputText
-                class="w-full"
-                v-model.trim="filters.global.value"
-                placeholder="Search"
-              />
-            </span>
-            <slot name="addButton">
-              <PrimeButton
-                class="max-sm:w-full"
-                @click="navigateToAddPage"
-                icon="pi pi-plus"
-                :label="addButtonLabel"
-                v-if="addButtonLabel"
-              />
-            </slot>
+          <slot name="header">
+            <div class="flex flex-wrap justify-between gap-2 w-full">
+              <span class="p-input-icon-left max-sm:w-full">
+                <i class="pi pi-search" />
+                <InputText
+                  class="w-full"
+                  v-model.trim="filters.global.value"
+                  placeholder="Search"
+                />
+              </span>
+              <slot name="addButton">
+                <PrimeButton
+                  class="max-sm:w-full"
+                  @click="navigateToAddPage"
+                  icon="pi pi-plus"
+                  :label="addButtonLabel"
+                  v-if="addButtonLabel"
+                />
+              </slot>
+            </div>
           </slot>
         </template>
         <Column
@@ -216,11 +215,9 @@
       type: Boolean
     },
     listService: {
-      required: true,
       type: Function
     },
     deleteService: {
-      required: true,
       type: Function
     },
     onReorderService: {

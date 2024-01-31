@@ -9,7 +9,7 @@
       class="w-full sm:max-w-xs"
     />
     <MultiSelect
-      placeholder="Sample Domain"
+      placeholder="Select Domain"
       resetFilterOnHide
       autoFilterFocus
       optionValue="id"
@@ -22,10 +22,11 @@
       class="w-full sm:max-w-xs"
     />
     <Dropdown
-      optionValue="id"
+      optionValue="value"
       optionLabel="name"
-      placeholder="Sample Network List"
+      placeholder="Select Network List"
       filter
+      showClear
       :options="netWorkListOptions.options"
       v-model="selectedNetworkList"
       :loading="netWorkListOptions.done"
@@ -48,7 +49,8 @@
     <template #header>
       <advancedFilter
         :fieldsInFilter="listFields"
-        @applyFilter="console.log"
+        hashDisabled
+        @applyFilter="filterSearch"
       />
     </template>
   </ListTableNoHeaderBlock>
@@ -154,6 +156,7 @@
   const route = useRoute()
   const router = useRouter()
   const toast = useToast()
+
   const selectedDomain = ref([])
   const selectedNetworkList = ref()
   const dataFilted = ref([])
@@ -185,7 +188,6 @@
           type: 'ArrayObject',
           props: {
             placeholder: 'Select Country',
-            selectionLimit: 4,
             services: props.listCountriesService,
             payload: { label: 'name', value: 'value' }
           }
@@ -267,7 +269,7 @@
   ])
 
   const showListTable = computed(() => {
-    return selectedDomain.value.length && selectedNetworkList.value
+    return selectedDomain.value.length
   })
 
   const showToast = (summary, severity) => {
@@ -350,7 +352,7 @@
     try {
       const [{ value }] = await Promise.allSettled(requestsAllowedRules)
       showToast(value, 'success')
-      filterTuning()
+      filterSearch()
       closeDialog()
       selectedEvents.value = []
       allowedByAttacks.value = []
@@ -369,11 +371,25 @@
   }
 
   const filterTuning = async () => {
+    filterSearch([])
+  }
+
+  const filterSearch = async (filter) => {
     if (!selectedDomain.value.length) return
-    const query = `?hour_range=${time.value}&domains_ids=${encodeURIComponent(
-      selectedDomain.value
-    )}&network_list_ids=${encodeURIComponent(selectedNetworkList.value)}`
-    const response = await props.listWafRulesTuningService({ wafId: wafRuleId.value, query })
+    const { disabledIP, disabledCountries } = selectedNetworkList.value || {}
+
+    listFields.value.find((item) => item.value === 'ip_address').disabled = disabledIP
+    listFields.value.find((item) => item.value === 'country').disabled = disabledCountries
+
+    const queryFields = {
+      wafId: wafRuleId.value,
+      domains: encodeURIComponent(selectedDomain.value),
+      hourRange: time.value,
+      network: selectedNetworkList.value?.id,
+      filter
+    }
+
+    const response = await props.listWafRulesTuningService({ ...queryFields })
     dataFilted.value = response
   }
 

@@ -33,8 +33,12 @@
       <div class="card p-fluid">
         <chips
           inputId="in_field_chips"
-          class="w-full"
+          class="w-full m-0 gap-1"
           v-model="selectedValue"
+          :pt="{
+            container: { class: 'gap-1' },
+            token: { class: 'm-0' }
+          }"
           :placeholder="props.placeholder"
           :disabled="props.disabled"
         />

@@ -15,10 +15,19 @@ const adapt = (httpResponse) => {
   const isArray = Array.isArray(httpResponse.body.results)
 
   const networkList = isArray
-    ? httpResponse.body.results.map((networkList) => ({
-        id: networkList.id,
-        name: networkList.name
-      }))
+    ? httpResponse.body.results.map((networkList) => {
+        const disabledIP = networkList.list_type === 'ip_cidr'
+        const disabledCountries = networkList.list_type === 'countries'
+        return {
+          value: {
+            id: networkList.id,
+            value: networkList.value,
+            disabledIP,
+            disabledCountries
+          },
+          name: networkList.name
+        }
+      })
     : []
 
   return {
