@@ -260,7 +260,10 @@
   })
 
   const filterBy = computed(() => {
-    return props.columns.map((item) => item.field)
+    const filtersPath = props.columns.filter((el) => el.filterPath).map((el) => el.filterPath)
+    const filters = props.columns.map((item) => item.field)
+
+    return [...filters, ...filtersPath]
   })
 
   const showPagination = computed(() => {
