@@ -374,6 +374,8 @@
     filterSearch([])
   }
 
+ 
+
   const filterSearch = async (filter) => {
     if (!selectedDomain.value.length) return
     const { disabledIP, disabledCountries } = selectedNetworkList.value || {}
@@ -393,11 +395,13 @@
     dataFilted.value = response
   }
 
-  const handleListWafRulesTuningAttacksService = async () => {
+  const handleListWafRulesTuningAttacksService = async (path = '') => {
     const domainsId = encodeURIComponent(selectedDomain.value)
     const matchesOn = `matches_on=${tuningSelected.value.matchesOn}`
     const matchesZone = `match_zone=${tuningSelected.value.matchZone}`
-    const query = `?hour_range=${time.value}&domains_ids=${domainsId}&${matchesOn}&${matchesZone}`
+    const pathsList= path ? `&paths_list=${path}` : ''
+
+    const query = `?hour_range=${time.value}&domains_ids=${domainsId}&${matchesOn}&${matchesZone}${pathsList}`
 
     return await props.listWafRulesTuningAttacksService({
       wafId: wafRuleId.value,

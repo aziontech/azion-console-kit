@@ -7,6 +7,7 @@
   import GoBack from '@/templates/action-bar-block/go-back'
   import Sidebar from 'primevue/sidebar'
   import Skeleton from 'primevue/skeleton'
+  import InputText from 'primevue/inputtext'
 
   defineOptions({
     name: 'more-details'
@@ -24,8 +25,8 @@
       required: true
     },
     domains: {
-      type: String,
-      default: '',
+      type: Array,
+      default: () => [],
       required: true
     },
     time: {
@@ -44,6 +45,8 @@
   const showGoBack = ref(false)
   const possibleAttacks = ref([])
   const selectedAttack = ref([])
+  const searchByPath = ref('')
+  const pathSearched = ref('')
 
   const showToast = (severity, summary) => {
     toast.add({
@@ -60,16 +63,21 @@
     }
   })
 
-  const loadInitialData = async () => {
+  const loadInitialData = async (namePath = '') => {
     try {
       loading.value = true
-      const response = await props.listService()
+      const response = await props.listService(namePath)
       possibleAttacks.value = response
     } catch (error) {
       showToast('error', error)
     } finally {
       loading.value = false
     }
+  }
+
+  const filterAttackByPath = async () => {
+    await loadInitialData(searchByPath.value)
+    pathSearched.value = searchByPath.value
   }
 
   const toggleDrawerVisibility = (isVisible) => {
@@ -141,10 +149,6 @@
               </div>
             </div>
             <div class="flex justify-between w-full gap-3">
-              <span class="w-1/2 text-color">Path</span>
-              <span class="h-auto w-1/2 text-color-secondary"></span>
-            </div>
-            <div class="flex justify-between w-full gap-3">
               <span class="w-1/2 text-color">IP Address</span>
               <span class="w-1/2 text-color-secondary"></span>
             </div>
@@ -170,6 +174,17 @@
             <div class="text-color-secondary items-center gap-1 inline-flex">
               Select specific fields to allow rules
             </div>
+          </div>
+          <div class="w-full sm:max-w-xs">
+            <span class="p-input-icon-left flex">
+              <i class="pi pi-search" />
+              <InputText
+                class="w-full"
+                placeholder="Search by path"
+                v-model="searchByPath"
+                @keyup.enter="filterAttackByPath"
+              />
+            </span>
           </div>
           <div class="flex flex-col gap-2 w-full">
             <span class="text-color text-sm font-medium">Fields List</span>
@@ -217,10 +232,14 @@
                         <div class="flex flex-col text-color w-1/2">
                           <span>Top 10 Paths</span>
                         </div>
-                        <div class="flex w-1/2 flex-col text-color-secondary">
+                        <div class="flex w-1/2 flex-col">
                           <span
                             v-for="(path, index) in attack.topPaths"
                             :key="index"
+                            :class="{
+                              'text-color-secondary': pathSearched !== path,
+                              'text-orange-500': pathSearched === path
+                            }"
                             >{{ path }}</span
                           >
                         </div>
@@ -241,9 +260,9 @@
                       </div>
                       <div class="w-full flex justify-between">
                         <div class="flex w-1/2 gap-3 flex-col text-color">
-                          <span>Hits</span>
-                          <span>IPs</span>
-                          <span>Countries</span>
+                          <span>Total Hits</span>
+                          <span>Total IPs</span>
+                          <span>Total Countries</span>
                         </div>
                         <div class="flex w-1/2 gap-3 flex-col text-color-secondary">
                           <span>{{ attack.hitCount }}</span>
