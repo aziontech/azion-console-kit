@@ -207,7 +207,7 @@ export function formatC3YAxis(chartData) {
  * Sets the legend position based on the window width and chart data
  * @param {Object} chartData - The chart data
  * @param {Array} resultChart - The result of the chart
- @returns {string} - Returns the legend position based on the conditions
+ * @returns {string} - Returns the legend position based on the conditions
  */
 function setLegendPosition(chartData, resultChart) {
   if (window.innerWidth < SCREEN_SMALL_BREAKPOINT) {
@@ -270,9 +270,9 @@ function setMeanSeriesValues(serie, seriesTotal, chartData) {
  * Get series information for the C3 chart
  * @param {Array} resultChart - The result of the chart
  * @param {Object} chartData - The chart data
- @param {boolean} hasMeanLineSeries - Indicates if the chart has mean line series
- @param {boolean} hasMeanLineTotal - Indicates if the chart has mean line total
- @returns {Object} - Returns the series names, mean line total, and mean line series for the C3 chart
+ * @param {boolean} hasMeanLineSeries - Indicates if the chart has mean line series
+ * @param {boolean} hasMeanLineTotal - Indicates if the chart has mean line total
+ * @returns {Object} - Returns the series names, mean line total, and mean line series for the C3 chart
  */
 function getSeriesInfos(resultChart, chartData, hasMeanLineSeries, hasMeanLineTotal) {
   const sliced = resultChart.slice(1)
