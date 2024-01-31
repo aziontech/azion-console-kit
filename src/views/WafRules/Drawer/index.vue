@@ -81,6 +81,7 @@
   }
 
   const filterAttackByPath = async () => {
+    possibleAttacks.value = []
     await loadInitialData(searchByPath.value)
     pathSearched.value = searchByPath.value
   }
@@ -281,7 +282,7 @@
               </div>
             </div>
             <div
-              v-if="!possibleAttacks.length"
+              v-if="!possibleAttacks.length && !loading"
               class="text-md font-normal text-secondary"
             >
               No fields list found
