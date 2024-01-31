@@ -2,29 +2,28 @@ import axios from 'axios'
 const baseURL = '/metrics/graphql'
 
 axios.defaults.headers.common['Content-Type'] = 'application/json; version=3'
-const abortController = new AbortController()
 
-class BeholderService {
-  constructor(cancelRequest = null) {
-    this.api = axios.create({ baseURL })
-    this.cancelRequest = cancelRequest
-  }
+function BeholderService({ cancelRequest } = { cancelRequest: false }) {
+  const api = axios.create({ baseURL })
 
-  async gql(query) {
-    try {
-      const config = {}
+  return {
+    gql: async (query) => {
+      try {
+        const config = {}
 
-      if (this.cancelRequest) {
-        config.signal = abortController.signal
-        abortController.abort()
+        if (cancelRequest) {
+          config.cancelToken = new axios.CancelToken((cancel) => {
+            cancelRequest = cancel
+          })
+        }
+
+        const reqQuery = JSON.stringify(query)
+        const { data } = await api.post('', reqQuery, config)
+
+        return data.data
+      } catch (error) {
+        return Promise.reject(error)
       }
-
-      const reqQuery = JSON.stringify(query)
-      const { data } = await this.api.post('', reqQuery, config)
-
-      return data.data
-    } catch (error) {
-      return Promise.reject(error)
     }
   }
 }
