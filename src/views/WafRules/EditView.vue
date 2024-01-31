@@ -1,10 +1,10 @@
 <template>
   <EditFormBlock
     :editService="submitEditWafRules"
-    :loadService="props.loadWafRulesService"
+    :loadService="loadWaf"
     :schema="validationSchema"
     :isTabs="true"
-    :disableRedirect="true"
+    disableRedirect
   >
     <template #form>
       <FormFieldsWafRules :disabledActive="false"></FormFieldsWafRules>
@@ -38,10 +38,7 @@
       type: Function,
       required: true
     },
-    loadWafRulesService: {
-      type: Function,
-      required: true
-    },
+    waf: { type: Object },
     showActionBar: {
       type: Boolean,
       required: true
@@ -70,6 +67,10 @@
   })
 
   const wafRuleId = ref(route.params.id)
+
+  const loadWaf = async () => {
+    return props.waf
+  }
 
   const submitEditWafRules = async (payload) => {
     return await props.editWafRulesService(payload, parseInt(wafRuleId.value))
