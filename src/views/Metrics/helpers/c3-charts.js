@@ -15,7 +15,6 @@ import {
 } from '../constants/chart-data'
 import { LINE_PATTERNS, MEAN_LINE_PATTERN } from '../constants/color-patterns'
 
-
 /**
  * Check if the input is a valid date
  * @param {any} date - The input to be checked
