@@ -113,6 +113,7 @@
   watchEffect(() => {
     if (interval.value && !isCustomDate.value) {
       handleSelect(interval.value.code)
+      return
     }
 
     handlePicker()

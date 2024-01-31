@@ -12,9 +12,7 @@ function BeholderService({ cancelRequest } = { cancelRequest: false }) {
         const config = {}
 
         if (cancelRequest) {
-          config.cancelToken = new axios.CancelToken((cancel) => {
-            cancelRequest = cancel
-          })
+          config.cancelToken = cancelRequest.token
         }
 
         const reqQuery = JSON.stringify(query)

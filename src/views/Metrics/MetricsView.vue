@@ -44,7 +44,8 @@
     setInitialPageAndDashboardCurrent,
     setInitialCurrentsByIds,
     setDatasetAvailableFilters,
-    setReports
+    setReports,
+    loadCurrentReports
   } = metricsStore
 
   const { currentIdPageAndDashboard, getCurrentInfo } = storeToRefs(metricsStore)
@@ -59,6 +60,7 @@
     setCurrentPageAndDashboard()
     await setDatasetAvailableFilters()
     await setReports()
+    await loadCurrentReports()
     updateRouter()
   }
 
