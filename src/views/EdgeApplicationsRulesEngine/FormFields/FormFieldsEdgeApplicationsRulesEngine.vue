@@ -629,7 +629,7 @@
       </div>
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
         <FieldTextArea
-          label="Description *"
+          label="Description"
           :autoResize="true"
           rows="1"
           name="description"
