@@ -20,7 +20,7 @@
   const metricsStore = useMetricsStore()
   const { dashboardBySelectedPage, dashboardCurrent, reportsBySelectedDashboard } =
     storeToRefs(metricsStore)
-  const { setCurrentDashboard } = metricsStore
+  const { setCurrentDashboard, loadCurrentReports, setDatasetAvailableFilters } = metricsStore
 
   const dashboards = computed(() => {
     return dashboardBySelectedPage.value
@@ -30,8 +30,10 @@
     return dashboardCurrent.value
   })
 
-  const changeDashboard = (evt) => {
+  const changeDashboard = async (evt) => {
     setCurrentDashboard(evt.value)
+    await setDatasetAvailableFilters()
+    await loadCurrentReports()
   }
 
   const showTabs = computed(() => {
