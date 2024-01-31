@@ -84,7 +84,7 @@
 
   const validationSchema = yup.object({
     name: yup.string().required().label('Name'),
-    description: yup.string().required().label('Description'),
+    description: yup.string(),
     phase: yup.string(),
     criteria: yup.array(),
     behaviors: yup.array()
