@@ -8,7 +8,6 @@
   import Calendar from 'primevue/calendar'
   import PrimeButton from 'primevue/button'
   import { computed } from 'vue'
-  import { convertDateToLocalTimezone } from '@/helpers'
   defineOptions({ name: 'form-fields-personal-token' })
 
   const props = defineProps({
@@ -71,9 +70,8 @@
   const updateSelectedExpiration = ({ value: selectedValue }) => {
     if (selectedValue === 'custom') {
       customExpiration.value = tomorrow
-      const customExpirationInUserTimezone = convertDateToLocalTimezone(
-        props.userUtcOffset,
-        customExpiration.value
+      const customExpirationInUserTimezone = customExpiration.value.convertDateToLocalTimezone(
+        props.userUtcOffset
       )
       setExpiration(customExpirationInUserTimezone)
       return
@@ -82,9 +80,8 @@
     const newExpirationDate = new Date()
     const daysToAdd = parseInt(selectedExpiration.value)
     newExpirationDate.setDate(newExpirationDate.getDate() + daysToAdd)
-    const newExpirationInUserTimezone = convertDateToLocalTimezone(
-      props.userUtcOffset,
-      newExpirationDate
+    const newExpirationInUserTimezone = newExpirationDate.convertDateToLocalTimezone(
+      props.userUtcOffset
     )
     setExpiration(newExpirationInUserTimezone)
   }
@@ -95,9 +92,8 @@
    * @param {Date} newExpirationDate - The new expiration date.
    */
   const updateExpiration = (newExpirationDate) => {
-    const newExpirationInUserTimezone = convertDateToLocalTimezone(
-      props.userUtcOffset,
-      newExpirationDate
+    const newExpirationInUserTimezone = newExpirationDate.convertDateToLocalTimezone(
+      props.userUtcOffset
     )
     setExpiration(newExpirationInUserTimezone)
   }

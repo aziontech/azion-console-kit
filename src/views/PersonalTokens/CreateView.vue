@@ -8,7 +8,7 @@
   import PageHeadingBlock from '@/templates/page-heading-block'
   import FormFieldsPersonalToken from '@/views/PersonalTokens/FormFields/FormFieldsPersonalToken'
   import CopyTokenDialog from '@/views/PersonalTokens/Dialog/CopyTokenDialog'
-  import { convertDateToLocalTimezone } from '@/helpers'
+  import '@/helpers/convert-date'
   import { useAccountStore } from '@/stores/account'
   import { storeToRefs } from 'pinia'
   import * as yup from 'yup'
@@ -50,7 +50,7 @@
     const tomorrow = new Date(today)
     const userUtcOffset = account.value.utc_offset
 
-    return convertDateToLocalTimezone(userUtcOffset, tomorrow)
+    return tomorrow.convertDateToLocalTimezone(userUtcOffset)
   }
 
   const initialValues = {
