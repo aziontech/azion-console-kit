@@ -47,21 +47,10 @@
   const listEdgeFirewallRulesEngineServiceWithDecorator = async () => {
     return await props.listEdgeFirewallRulesEngineService({ edgeFirewallId: props.edgeFirewallId })
   }
-  const createEdgeFirewallRulesEngineServiceWithDecorator = async (payload) => {
-    return await props.createEdgeFirewallRulesEngineService({
-      edgeFirewallId: props.edgeFirewallId,
-      payload
-    })
-  }
   const deleteEdgeFirewallRulesEngineServiceWithDecorator = async (ruleEngineId) => {
     return await props.deleteEdgeFirewallRulesEngineService({
       edgeFirewallId: props.edgeFirewallId,
       ruleEngineId
-    })
-  }
-  const listFunctionsServiceWithDecorator = async () => {
-    return await props.listFunctionsService({
-      edgeFirewallID: props.edgeFirewallId
     })
   }
 
@@ -116,8 +105,8 @@
   <Drawer
     ref="drawerRef"
     :edgeFirewallId="props.edgeFirewallId"
-    :createService="createEdgeFirewallRulesEngineServiceWithDecorator"
-    :listFunctionsService="listFunctionsServiceWithDecorator"
+    :createService="props.createEdgeFirewallRulesEngineService"
+    :listFunctionsService="props.listFunctionsService"
     :listWafRulesService="props.listWafRulesService"
     :loadService="() => {}"
     :editService="() => {}"

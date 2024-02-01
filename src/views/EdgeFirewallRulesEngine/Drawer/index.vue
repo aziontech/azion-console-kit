@@ -129,9 +129,15 @@
     closeEditDrawer()
   }
 
+  const listFunctionsServiceWithDecorator = async () => {
+    return await props.listFunctionsService({
+      edgeFirewallID: props.edgeFirewallId
+    })
+  }
+
   const listEdgeFirewallFunctionsOptions = async () => {
     try {
-      const result = await props.listFunctionsService()
+      const result = await listFunctionsServiceWithDecorator()
       edgeFirewallFunctionsOptions.value = result
     } catch (error) {
       toast.add({
@@ -154,6 +160,13 @@
     }
   }
 
+  const createEdgeFirewallRulesEngineServiceWithDecorator = async (payload) => {
+    return await props.createService({
+      edgeFirewallId: props.edgeFirewallId,
+      payload
+    })
+  }
+
   onMounted(async () => {
     await Promise.all([listEdgeFirewallFunctionsOptions(), listWafRulesOptions()])
   })
@@ -168,7 +181,7 @@
   <CreateDrawerBlock
     v-if="showCreateDrawer"
     v-model:visible="showCreateRulesEngineDrawer"
-    :createService="props.createService"
+    :createService="createEdgeFirewallRulesEngineServiceWithDecorator"
     :schema="validationSchema"
     :initialValues="initialValues"
     @onSuccess="handleCreateWithSuccess"
