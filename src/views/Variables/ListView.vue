@@ -83,6 +83,7 @@
             field: 'value',
             header: 'Value',
             type: 'component',
+            filterPath: 'value.content',
             component: (columnData) => {
               if (columnData.isSecret) {
                 return h('span', `${columnData.content}`)

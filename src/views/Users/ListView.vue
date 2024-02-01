@@ -89,6 +89,7 @@
     {
       field: 'status',
       header: 'Status',
+      filterPath: 'status.content',
       type: 'component',
       component: (columnData) => {
         return columnBuilder({
@@ -100,6 +101,7 @@
     {
       field: 'owner',
       header: 'Account Owner',
+      filterPath: 'owner.content',
       type: 'component',
       component: (columnData) => {
         return columnBuilder({
