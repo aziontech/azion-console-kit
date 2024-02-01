@@ -1,6 +1,6 @@
 <script setup>
   defineOptions({ name: 'advanced-filter' })
-  import { ref, watch } from 'vue'
+  import { computed, ref, watch } from 'vue'
   import dialogFilter from './dialog-filter.vue'
   import Chip from 'primevue/chip'
   import PrimeButton from 'primevue/button'
@@ -11,28 +11,80 @@
   const route = useRoute()
   const toast = useToast()
   const router = useRouter()
-  const emit = defineEmits(['applyFilter'])
+  const emit = defineEmits(['applyFilter', 'update:externalFilter'])
 
   const props = defineProps({
     fieldsInFilter: {
       type: Array,
       required: true
     },
-    hashDisabled: {
-      type: Boolean
+    externalFilter: {
+      type: Object,
+      required: false
     }
   })
 
-  const defaultFields = ref(JSON.parse(JSON.stringify(props.fieldsInFilter)))
-  const fields = ref(props.fieldsInFilter)
-  const displayFilter = ref([])
-  const refDialogFilter = ref()
   const FORMAT_IN = 'In'
   const FORMAT_RANGE = 'Range'
   const DEFAULT_FORMAT = [FORMAT_IN, FORMAT_RANGE]
+  const displayFilter = ref([])
+  const refDialogFilter = ref()
 
-  const adapterApply = () => {
-    return displayFilter.value?.map(({ valueField, operator, value }) => {
+  const listField = computed(() => {
+    return props.fieldsInFilter.map((itemField) => {
+      const itemDisplay = displayFilter.value.filter((itemFieldDisplay) => {
+        return itemField.value === itemFieldDisplay.valueField
+      })
+
+      const operator = itemField.operator.map((operator) => {
+        const itemOperator = itemDisplay.find((dOperator) => operator.value === dOperator.operator)
+
+        const disabledOperator = operator.disabled || itemOperator?.operator === operator.value
+        return { ...operator, disabled: disabledOperator }
+      })
+
+      const disabledAllOperator = operator.every((operator) => operator.disabled)
+      const disabledField = itemField.disabled || disabledAllOperator
+
+      return {
+        ...itemField,
+        disabled: disabledField,
+        operator
+      }
+    })
+  })
+
+  const clickFilter = (item, event) => {
+    event.stopPropagation()
+    refDialogFilter.value.show(item)
+  }
+
+  const removeItemFilter = (index, event) => {
+    refDialogFilter.value.hide(event)
+    displayFilter.value.splice(index, 1)
+  }
+
+  const removeValueItemFilter = (index, idx, event) => {
+    refDialogFilter.value.hide(event)
+
+    displayFilter.value[index].value.splice(idx, 1)
+    if (!displayFilter.value[index].value.length) {
+      displayFilter.value.splice(index, 1)
+    }
+  }
+
+  const searchFilter = () => {
+    const adaptFilter = adapterApply(displayFilter.value)
+    emit('applyFilter', adaptFilter)
+    updateHash(adaptFilter)
+  }
+
+  const updateFilter = (value) => {
+    setFilter(value)
+  }
+
+  const adapterApply = (displayFilter) => {
+    return displayFilter?.map(({ valueField, operator, value }) => {
       return { valueField, operator, value }
     })
   }
@@ -43,7 +95,7 @@
   }
 
   const decodeFilter = (filters) => {
-    if (!filters) return []
+    if (!filters) return {}
     try {
       const decodedFilter = JSON.parse(atob(filters))
       return decodedFilter
@@ -58,120 +110,75 @@
     }
   }
 
-  const setFilter = (value) => {
-    if (value.edit) {
-      displayFilter.value.forEach((item, index) => {
-        if (item.field === value.field && item.operator === value.operator) {
-          displayFilter.value[index] = { ...value }
-          return
-        }
-      })
-      return
-    }
-    displayFilter.value.push({ ...value })
-  }
-
-  const updateFilter = (value) => {
-    setFilter(value)
-    updateDisabledField()
-  }
-
-  const updateDisabledField = () => {
-    defaultFields.value.map((itemField, indexField) => {
-      itemField.operator.map((operator, indexOperator) => {
-        fields.value[indexField].operator[indexOperator].disabled = operator.disabled
-      })
-      fields.value[indexField].disabled = fields.value[indexField].operator.every(
-        (operator) => operator.disabled
-      )
-    })
-
-    if (!displayFilter.value.length) return
-
-    displayFilter.value?.map((itemInList) => {
-      fields.value.map((itemField, indexField) => {
-        if (itemInList.valueField === itemField.value) {
-          itemField.operator.map((operator, indexOperator) => {
-            if (itemInList.operator === operator.value) {
-              fields.value[indexField].operator[indexOperator].disabled = true
-            }
-          })
-          fields.value[indexField].disabled = fields.value[indexField].operator.every(
-            (operator) => operator.disabled
-          )
-        }
-      })
-    })
-  }
-
-  const clickFilter = (item, event) => {
-    event.stopPropagation()
-    updateDisabledField()
-    refDialogFilter.value.show(item)
-  }
-
-  const removeItemFilter = (index, event) => {
-    refDialogFilter.value.hide(event)
-    displayFilter.value.splice(index, 1)
-    updateDisabledField()
-  }
-
-  const removeValueItemFilter = (index, idx, event) => {
-    refDialogFilter.value.hide(event)
-
-    displayFilter.value[index].value.splice(idx, 1)
-    if (!displayFilter.value[index].value.length) {
-      displayFilter.value.splice(index, 1)
-    }
-    updateDisabledField()
+  const getFilterInHash = () => {
+    const { filters } = route.query
+    const decodedFilter = decodeFilter(filters)
+    return decodedFilter
   }
 
   const updateHash = (filter) => {
     const { params } = route
     const query = {
-      filters: encodeFilter(filter)
+      filters: encodeFilter({
+        external: props.externalFilter,
+        filter
+      })
     }
     router.push({ params, query })
   }
 
-  const searchFilter = () => {
-    const adaptFilter = adapterApply()
-    emit('applyFilter', adaptFilter)
-
-    if (!props.hashDisabled) {
-      updateHash(adaptFilter)
+  const setFilter = (value) => {
+    if (value.edit) {
+      const index = displayFilter.value.findIndex(
+        (item) => item.field === value.field && item.operator === value.operator
+      )
+      displayFilter.value[index] = { ...value }
+      return
     }
+
+    displayFilter.value.push({ ...value })
   }
 
-  const loadFilter = () => {
-    if (props.hashDisabled) return
-    const currentParamValue = route.query?.filters
+  const updateDisplayFilter = (filterDisplay) => {
+    if (!filterDisplay?.length) return
 
-    if (!currentParamValue) return
-    const filter = decodeFilter(currentParamValue)
-
-    filter.forEach((item) => {
-      const { label, disabled, operator } = defaultFields.value.find(
+    const newDisplay = filterDisplay.map((item) => {
+      const { label, disabled, operator } = props.fieldsInFilter.find(
         ({ value }) => value === item.valueField
       )
+
       const disabledOp = operator.find(({ value }) => value === item.operator)?.disabled
 
-      const newItem = {
+      if (disabled || disabledOp) return
+
+      return {
         ...item,
         field: label,
         format: OPERATOR_MAPPING[item.operator].format
       }
-      if (disabled || disabledOp) return
-      setFilter(newItem)
     })
 
-    updateDisabledField()
+    displayFilter.value = newDisplay.filter((item) => item)
+  }
+
+  const loadFilter = () => {
+    const { external = {}, filter = [] } = getFilterInHash()
+
+    if (Object.keys(external).length) {
+      emit('update:externalFilter', external)
+    }
+
+    if (!filter.length) return
+
+    updateDisplayFilter(filter)
+
+    updateHash(displayFilter.value)
   }
 
   loadFilter()
 
-  watch(props.fieldsInFilter, (value) => {
-    defaultFields.value = JSON.parse(JSON.stringify(value))
+  watch(props.fieldsInFilter, () => {
+    updateDisplayFilter(displayFilter.value)
   })
 </script>
 <template>
@@ -179,11 +186,13 @@
     <div class="p-inputgroup flex flex-row w-full align-items-stretch md:contents">
       <dialogFilter
         ref="refDialogFilter"
-        :listField="fields"
+        :filtersOptions="listField"
         :counter="displayFilter.length"
         @applyFilter="updateFilter"
       />
-      <div class="p-inputgroup-addon flex justify-start w-full gap-2 overflow-auto">
+      <div
+        class="p-inputgroup-addon p-inputnumber-button flex justify-start w-full gap-2 overflow-auto"
+      >
         <ul class="flex gap-3 align-items-center">
           <template
             v-for="(itemFilter, index) in displayFilter"

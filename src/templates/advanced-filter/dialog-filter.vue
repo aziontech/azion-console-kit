@@ -13,7 +13,7 @@
   defineOptions({ name: 'dialog-filter' })
   const emit = defineEmits(['applyFilter'])
   const props = defineProps({
-    listField: {
+    filtersOptions: {
       type: Array,
       required: true
     },
@@ -39,7 +39,7 @@
   const filterOverPanel = ref(null)
   const buttonOverPanel = ref(null)
   const filtersOptions = computed(() => {
-    return props.listField.map(({ label, value, description, operator, disabled }) => {
+    return props.filtersOptions.map(({ label, value, description, operator, disabled }) => {
       return {
         label,
         value: {

@@ -1,5 +1,6 @@
 <script setup>
   import PrimeButton from 'primevue/button'
+  import advancedFilter from '@/templates/advanced-filter'
 
   const props = defineProps({
     playgroundOpener: {
@@ -10,24 +11,9 @@
 </script>
 <template>
   <div class="flex w-full items-center flex-column gap-4 md:gap-2 md:flex-row">
-    <div class="p-inputgroup flex flex-row grow">
-      <PrimeButton
-        outlined
-        icon-pos="left"
-        icon="pi pi-plus"
-        label="Filter"
-        :disabled="true"
-      />
-      <div class="p-inputgroup-addon justify-start flex grow p-2.5">
-        <p class="text-secondary text-sm not-italic font-normal leading-[normal]">
-          !!!Under development!!!
-        </p>
-      </div>
-    </div>
-    <PrimeButton
-      class="h-8 w-full md:max-w-max"
-      label="Search"
-      :disabled="true"
+    <advancedFilter
+      :fieldsInFilter="[]"
+      @applyFilter="console.log"
     />
     <PrimeButton
       class="h-8 w-full md:max-w-fit"
