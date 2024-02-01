@@ -71,6 +71,14 @@
   const reports = computed(() => {
     return getCurrentReportsData.value
   })
+
+  const hasMeanLine = (resultQuery = []) => {
+    return resultQuery.length > 1
+  }
+
+  const hasMeanLinePerSeries = (resultQuery = []) => {
+    return resultQuery.length > 2
+  }
 </script>
 
 <template>
@@ -98,6 +106,8 @@
           :description="report.description"
           :cols="report.columns"
           :aggregationType="report.aggregationType"
+          :hasMeanLine="hasMeanLine(report.resultQuery)"
+          :hasMeanLinePerSeries="hasMeanLinePerSeries(report.resultQuery)"
           variationType="positive"
           variationValue="10.2%"
         >

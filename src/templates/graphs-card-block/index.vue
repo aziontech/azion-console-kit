@@ -10,7 +10,10 @@
         <ChartOwner :chartOwner="chartOwner" />
         <span class="font-medium overflow-ellipsis break-all line-clamp-1">{{ title }}</span>
       </span>
-      <MoreOptionsMenu />
+      <MoreOptionsMenu
+        :hasMeanLine="hasMeanLine"
+        :hasMeanLinePerSeries="hasMeanLinePerSeries"
+      />
     </header>
     <div class="flex h-full flex-col gap-6 flex-auto">
       <div class="flex flex-col">
@@ -87,7 +90,9 @@
         ].includes(value)
       }
     },
-    variationValue: { type: String, default: '' }
+    variationValue: { type: String, default: '' },
+    hasMeanLine: Boolean,
+    hasMeanLinePerSeries: Boolean
   })
 
   const cardColumns = computed(() => {
