@@ -117,6 +117,9 @@
     return
   }
   const initializeFormValues = async () => {
+    accountIsOwner.value = account?.is_account_owner
+    isAccountOwner.value = accountIsOwner.value
+
     const defaultTeamId = await fetchTeams()
     const initialCountry = await fetchCountries()
     const initialTimezone = await fetchTimezone()
@@ -124,17 +127,16 @@
 
     if (!props.isEditForm) {
       const initialValues = {
-        firstName: '',
-        lastName: '',
+        firstName: firstName.value,
+        lastName: lastName.value,
         timezone: initialTimezone,
-        language: '',
-        email: '',
+        language: language.value || 'en',
+        email: email.value,
         countryCallCode: initialCountry,
-        mobile: '',
-        isAccountOwner: false,
+        mobile: mobile.value,
+        isAccountOwner: accountIsOwner.value,
         teamsIds: [defaultTeamId],
-        twoFactorEnabled: forceMfaEnabled,
-        selectedLanguage: 'en'
+        twoFactorEnabled: forceMfaEnabled
       }
 
       props.resetForm({ values: initialValues })
@@ -146,9 +148,6 @@
       teamsIds.value = []
     }
   }
-
-  accountIsOwner.value = account?.is_account_owner
-  isAccountOwner.value = accountIsOwner.value
 
   initializeFormValues()
 </script>
