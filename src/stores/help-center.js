@@ -12,5 +12,8 @@ export const useHelpCenterStore = defineStore({
     close() {
       this.isOpen = false
     }
+  },
+  getters: {
+    getStatus: (state) => state.isOpen
   }
 })

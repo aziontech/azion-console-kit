@@ -8,7 +8,7 @@
   import TabView from 'primevue/tabview'
   import { useToast } from 'primevue/usetoast'
 
-  import { ref } from 'vue'
+  import { computed, ref } from 'vue'
   import { useRoute, useRouter } from 'vue-router'
 
   defineOptions({ name: 'tabs-waf-rules' })
@@ -19,23 +19,22 @@
     wafTuning: { type: Object, required: true }
   })
 
-  const mapTabs = {
+  const mapTabs = ref({
     mainSettings: 0,
     tuning: 1,
     allowed: 2
-  }
+  })
 
   const route = useRoute()
   const toast = useToast()
   const router = useRouter()
   const activeTab = ref(0)
   const wafRuleId = ref(route.params.id)
-  const wafName = ref('')
+  const waf = ref()
 
   const getWafDat = async () => {
     try {
-      const response = await props.wafServices.loadWafRulesService({ id: wafRuleId.value })
-      wafName.value = response.name
+      return await props.wafServices.loadWafRulesService({ id: wafRuleId.value })
     } catch (error) {
       toast.add({
         closable: true,
@@ -44,32 +43,42 @@
       })
     }
   }
+
   const getTabFromValue = (selectedTabIndex) => {
-    const tabNames = Object.keys(mapTabs)
-    const selectedTab = tabNames.find((tabName) => mapTabs[tabName] === selectedTabIndex)
+    const tabNames = Object.keys(mapTabs.value)
+    const selectedTab = tabNames.find((tabName) => mapTabs.value[tabName] === selectedTabIndex)
     return selectedTab
   }
 
-  const changeRouteByClickingOnTab = (event) => {
-    const tab = getTabFromValue(event.index)
-    activeTab.value = event.index
+  const changeRouteByClickingOnTab = ({ index = 0 }) => {
+    const tab = getTabFromValue(index)
+    activeTab.value = index
     const params = {
       id: wafRuleId.value,
       tab
     }
+    const { query } = route
     router.push({
       name: 'edit-waf-rules',
-      params
+      params,
+      query
     })
   }
 
-  const renderTabCurrentRouter = async () => {
-    getWafDat()
-    const { tab } = route.params
-    const defaultTabIndex = 0
-    const activeTabIndexByRoute = mapTabs[tab] || defaultTabIndex
-    activeTab.value = activeTabIndexByRoute
+  const updateWafRulesValue = (waf) => {
+    waf.value = { ...waf }
   }
+
+  const renderTabCurrentRouter = async () => {
+    const { tab = 0 } = route.params
+    waf.value = await getWafDat()
+    const activeTabIndexByRoute = mapTabs.value[tab]
+    changeRouteByClickingOnTab({ index: activeTabIndexByRoute })
+  }
+
+  const title = computed(() => {
+    return waf.value?.name || ''
+  })
 
   renderTabCurrentRouter()
 </script>
@@ -77,19 +86,22 @@
 <template>
   <ContentBlock>
     <template #heading>
-      <PageHeadingBlock :pageTitle="wafName" />
+      <PageHeadingBlock :pageTitle="title" />
     </template>
     <template #content>
       <TabView
         :activeIndex="activeTab"
         @tab-click="changeRouteByClickingOnTab"
         class="w-full h-full"
+        v-if="waf"
       >
         <TabPanel header="Main Settings">
           <EditView
+            v-if="activeTab === mapTabs.mainSettings"
             :editWafRulesService="props.wafServices.editWafRulesService"
-            :loadWafRulesService="props.wafServices.loadWafRulesService"
+            :waf="waf"
             :showActionBar="activeTab === mapTabs.mainSettings"
+            @handleWafRulesUpdated="updateWafRulesValue"
           />
         </TabPanel>
         <TabPanel header="Tuning">

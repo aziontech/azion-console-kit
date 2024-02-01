@@ -4,24 +4,38 @@
       optionValue="value"
       optionLabel="name"
       :options="timeOptions"
-      v-model="time"
+      v-model="selectedFilter.hourRange"
       @change="filterTuning"
-      class="w-full sm:w-1/5"
+      class="w-full sm:max-w-xs"
     />
     <MultiSelect
-      placeholder="Sample Domain"
+      placeholder="Select Domain"
+      resetFilterOnHide
+      autoFilterFocus
       optionValue="id"
       optionLabel="name"
       filter
       :options="domainsOptions.options"
-      v-model="selectedDomain"
-      :loading="!domainsOptions.done"
+      v-model="valueDomains"
+      :loading="domainsOptions.done"
       @change="filterTuning"
-      class="w-full sm:w-1/5"
+      class="w-full sm:max-w-xs"
+    />
+    <Dropdown
+      optionValue="value"
+      optionLabel="name"
+      placeholder="Select Network List"
+      filter
+      showClear
+      :options="netWorkListOptions.options"
+      v-model="valueNetwork"
+      :loading="netWorkListOptions.done"
+      @change="filterTuning"
+      class="w-full sm:max-w-xs"
     />
   </div>
   <ListTableNoHeaderBlock
-    v-if="selectedDomain.length"
+    v-show="showListTable"
     pageTitleDelete="Waf Rules Tuning"
     :columns="wafRulesAllowedColumns"
     :hasListService="true"
@@ -32,11 +46,18 @@
     :editInDrawer="openMoreDetails"
     emptyListMessage="No Waf Rules Tuning found."
   >
-    <template #addButton> </template>
+    <template #header>
+      <advancedFilter
+        v-model:externalFilter="selectedFilter"
+        v-model:filterAdvanced="selectedFilterAdvanced"
+        :fieldsInFilter="listFields"
+        @applyFilter="filterSearch"
+      />
+    </template>
   </ListTableNoHeaderBlock>
 
   <EmptyResultsBlock
-    v-else
+    v-if="!showListTable"
     title="Select a domain and filter possible attacks"
     description="Select at least one domain to get insights into your WAF Rule Set."
     :documentationService="props.documentationServiceTuning"
@@ -68,6 +89,7 @@
     :listService="handleListWafRulesTuningAttacksService"
     :tuningObject="tuningSelected"
     :domains="domainNames"
+    :netWorkList="netWorkListName"
     :time="timeName"
     @attack-on="createAllowedByAttack"
   >
@@ -93,7 +115,7 @@
   import Dropdown from 'primevue/dropdown'
 
   import MultiSelect from 'primevue/multiselect'
-
+  import advancedFilter from '@/templates/advanced-filter'
   import { ref, onMounted, computed } from 'vue'
   import { useRoute, useRouter } from 'vue-router'
   import { useToast } from 'primevue/usetoast'
@@ -136,24 +158,89 @@
   const route = useRoute()
   const router = useRouter()
   const toast = useToast()
-  const selectedDomain = ref([])
   const dataFilted = ref([])
+  const selectedFilter = ref({
+    domains: [],
+    network: {},
+    hourRange: '1'
+  })
   const selectedEvents = ref([])
   const isLoadingAllowed = ref(null)
   const showDialogAllowRule = ref(false)
   const cleanSelectData = ref(null)
   const showDetailsOfAttack = ref(false)
   const wafRuleId = ref(route.params.id)
-  const countriesOptions = ref({ options: [], done: true })
   const netWorkListOptions = ref({ options: [], done: true })
   const domainsOptions = ref({ options: [], done: true })
   const tuningSelected = ref(null)
   const domainNames = ref('')
   const allowedByAttacks = ref([])
+  const selectedFilterAdvanced = ref([])
+  const valueDomains = computed({
+    get: () => {
+      if (domainsOptions.value.done) return []
+      return selectedFilter.value.domains
+    },
+    set: (value) => {
+      selectedFilter.value.domains = value
+    }
+  })
+
+  const valueNetwork = computed({
+    get: () => {
+      if (netWorkListOptions.value.done || !selectedFilter.value.network?.id) return null
+      return netWorkListOptions.value.options.find(
+        (item) => item.value.id === selectedFilter.value.network?.id
+      ).value
+    },
+    set: (value) => {
+      selectedFilter.value.network = value
+    }
+  })
 
   const dataFiltedComputed = computed(() => dataFilted.value)
-  const timeName = computed(() => timeOptions.value.find((item) => item.value === time.value).name)
-  const time = ref('1')
+  const timeName = computed(
+    () => timeOptions.value.find((item) => item.value === selectedFilter.value.hourRange).name
+  )
+
+  const netWorkListName = computed(() => {
+    if (selectedFilter.value.network?.id) {
+      return netWorkListOptions.value.options.find(
+        (network) => network.value.id === selectedFilter.value.network?.id
+      ).name
+    }
+    return ''
+  })
+
+  const listFields = ref([
+    {
+      label: 'Country',
+      value: 'country',
+      description:
+        'Name Field3: Description orem ipsum dolor sit amet, consectetur adipiscing elit. Duis quis velit venenatis, efficitur urna id, egestas mi.',
+      operator: [
+        {
+          value: 'In',
+          type: 'ArrayObject',
+          props: {
+            placeholder: 'Select Country',
+            services: props.listCountriesService,
+            payload: { label: 'name', value: 'value' }
+          }
+        }
+      ]
+    },
+    {
+      label: 'IP Address',
+      value: 'ip_address',
+      description:
+        'Name Field1: Description orem ipsum dolor sit amet, consectetur adipiscing elit. Duis quis velit venenatis, efficitur urna id, egestas mi.',
+      operator: [
+        { value: 'Eq', type: 'String', props: { placeholder: 'Select IP Address' } },
+        { value: 'In', type: 'ArrayString', props: { placeholder: 'Enter with IP Address' } }
+      ]
+    }
+  ])
 
   const timeOptions = ref([
     {
@@ -217,6 +304,10 @@
     }
   ])
 
+  const showListTable = computed(() => {
+    return selectedFilter.value.domains?.length
+  })
+
   const showToast = (summary, severity) => {
     return toast.add({
       severity,
@@ -227,7 +318,7 @@
 
   const getDomainNames = () => {
     domainNames.value = domainsOptions.value.options
-      .filter((domain) => selectedDomain.value.includes(domain.id))
+      .filter((domain) => selectedFilter.value.domains.includes(domain.id))
       .map((domain) => domain.name)
   }
 
@@ -250,6 +341,7 @@
     showDialogAllowRule.value = false
     allowedByAttacks.value = []
   }
+
   const openMoreDetails = (tuning) => {
     getDomainNames()
     tuningSelected.value = tuning
@@ -296,7 +388,7 @@
     try {
       const [{ value }] = await Promise.allSettled(requestsAllowedRules)
       showToast(value, 'success')
-      filterTuning()
+      filterSearch()
       closeDialog()
       selectedEvents.value = []
       allowedByAttacks.value = []
@@ -315,20 +407,35 @@
   }
 
   const filterTuning = async () => {
-    //check if the domain is selected
-    if (!selectedDomain.value.length) return
-    const query = `?hour_range=${time.value}&domains_ids=${encodeURIComponent(
-      selectedDomain.value
-    )}`
-    const response = await props.listWafRulesTuningService({ wafId: wafRuleId.value, query })
+    filterSearch(selectedFilterAdvanced.value)
+  }
+
+  const filterSearch = async (filter) => {
+    if (!selectedFilter.value.domains.length) return
+    const { disabledIP, disabledCountries } = selectedFilter.value.network || {}
+
+    listFields.value.find((item) => item.value === 'ip_address').disabled = disabledIP
+    listFields.value.find((item) => item.value === 'country').disabled = disabledCountries
+
+    const queryFields = {
+      wafId: wafRuleId.value,
+      domains: selectedFilter.value.domains,
+      hourRange: selectedFilter.value.hourRange,
+      network: selectedFilter.value.network?.id,
+      filter
+    }
+
+    const response = await props.listWafRulesTuningService({ ...queryFields })
     dataFilted.value = response
   }
 
-  const handleListWafRulesTuningAttacksService = async () => {
-    const domainsId = encodeURIComponent(selectedDomain.value)
+  const handleListWafRulesTuningAttacksService = async (path = '') => {
+    const domainsId = encodeURIComponent(selectedFilter.value.domains)
     const matchesOn = `matches_on=${tuningSelected.value.matchesOn}`
     const matchesZone = `match_zone=${tuningSelected.value.matchZone}`
-    const query = `?hour_range=${time.value}&domains_ids=${domainsId}&${matchesOn}&${matchesZone}`
+    const pathsList = path ? `&paths_list=${path}` : ''
+
+    const query = `?hour_range=${selectedFilter.value.hourRange}&domains_ids=${domainsId}&${matchesOn}&${matchesZone}${pathsList}`
 
     return await props.listWafRulesTuningAttacksService({
       wafId: wafRuleId.value,
@@ -337,44 +444,29 @@
     })
   }
 
-  const setCountriesOptions = async () => {
-    countriesOptions.value.done = false
-    try {
-      const response = await props.listCountriesService()
-      countriesOptions.value.options = response
-    } catch (error) {
-      showToast(error, 'error')
-    } finally {
-      countriesOptions.value.done = true
-    }
-  }
-
   const setNetWorkListOptions = async () => {
-    netWorkListOptions.value.done = false
     try {
       const response = await props.listNetworkListService()
       netWorkListOptions.value.options = response
     } catch (error) {
       showToast(error, 'error')
     } finally {
-      netWorkListOptions.value.done = true
+      netWorkListOptions.value.done = false
     }
   }
 
   const setDomainsOptions = async () => {
-    domainsOptions.value.done = false
     try {
       const response = await props.listWafRulesDomainsService({ wafId: wafRuleId.value })
       domainsOptions.value.options = response
     } catch (error) {
       showToast(error, 'error')
     } finally {
-      domainsOptions.value.done = true
+      domainsOptions.value.done = false
     }
   }
 
   onMounted(async () => {
-    await setCountriesOptions()
     await setNetWorkListOptions()
     await setDomainsOptions()
   })

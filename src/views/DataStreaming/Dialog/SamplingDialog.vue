@@ -20,11 +20,11 @@
 
     <div class="flex flex-col gap-3.5">
       <InlineMessage severity="warn">
-        After activating and saving these settings, all other data streamings will become inactive.
+        After activating and saving these settings, all other streams will become inactive.
       </InlineMessage>
       <p class="text-color-secondary text-sm font-normal leading-tight">
         This option reduces costs of data collection and analysis but, once it's enabled, only this
-        data streaming can be active in your account.
+        stream can be active in your account.
       </p>
     </div>
 

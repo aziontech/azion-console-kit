@@ -1,18 +1,18 @@
 <template>
   <EditFormBlock
     :editService="submitEditWafRules"
-    :loadService="props.loadWafRulesService"
+    :loadService="loadWaf"
     :schema="validationSchema"
     :isTabs="true"
-    :disableRedirect="true"
+    disableRedirect
   >
     <template #form>
       <FormFieldsWafRules :disabledActive="false"></FormFieldsWafRules>
     </template>
-    <template #action-bar="{ onSubmit, formValid, onCancel, loading }">
+    <template #action-bar="{ onSubmit, formValid, onCancel, loading, values }">
       <ActionBarTemplate
         v-if="showActionBar"
-        @onSubmit="onSubmit"
+        @onSubmit="formSubmit(onSubmit, values)"
         @onCancel="onCancel"
         :loading="loading"
         :submitDisabled="!formValid"
@@ -29,6 +29,8 @@
   import * as yup from 'yup'
   import FormFieldsWafRules from './FormFields/FormFieldsWafRules.vue'
 
+  const emit = defineEmits(['handleWafRulesUpdated'])
+
   const route = useRoute()
 
   const props = defineProps({
@@ -36,10 +38,7 @@
       type: Function,
       required: true
     },
-    loadWafRulesService: {
-      type: Function,
-      required: true
-    },
+    waf: { type: Object },
     showActionBar: {
       type: Boolean,
       required: true
@@ -69,7 +68,16 @@
 
   const wafRuleId = ref(route.params.id)
 
+  const loadWaf = async () => {
+    return props.waf
+  }
+
   const submitEditWafRules = async (payload) => {
     return await props.editWafRulesService(payload, parseInt(wafRuleId.value))
+  }
+
+  const formSubmit = async (onSubmit, values) => {
+    await onSubmit()
+    emit('handleWafRulesUpdated', values)
   }
 </script>

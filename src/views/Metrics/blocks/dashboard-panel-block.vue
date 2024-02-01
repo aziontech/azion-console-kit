@@ -1,75 +1,118 @@
 <script setup>
+  import { useHelpCenterStore } from '@/stores/help-center'
+  import { useMetricsStore } from '@/stores/metrics'
   import GraphsCardBlock from '@/templates/graphs-card-block'
+  import { storeToRefs } from 'pinia'
   import SelectButton from 'primevue/selectbutton'
-  import { computed, onMounted, ref, watch } from 'vue'
+  import Skeleton from 'primevue/skeleton'
+  import { computed, defineAsyncComponent, onMounted, onUnmounted, ref, watch } from 'vue'
 
-  const props = defineProps({
-    metricsDashboardsService: {
-      type: Function,
-      required: true
-    },
-    params: {
-      type: Object,
-      required: true
-    }
-  })
-
-  onMounted(() => {
-    fetchDashboards()
-  })
-
-  const dashboards = ref([])
-  const selectedDashboard = ref(null)
-
-  const fetchDashboards = async () => {
-    const { group, product } = props.params
-    dashboards.value = await props.metricsDashboardsService(group, product)
-
-    // TODO: revisit the selected dashboard when the filter is implemented
-    selectedDashboard.value = dashboards.value[0]
+  const propToComponent = {
+    'bar-chart': defineAsyncComponent(() => import('../components/chart/bar-chart/bar-chart')),
+    'line-chart': defineAsyncComponent(() => import('../components/chart/line-chart/line-chart')),
+    'spline-chart': defineAsyncComponent(() =>
+      import('../components/chart/spline-chart/spline-chart')
+    )
   }
 
-  const showDashboardTabs = computed(() => {
-    return dashboards.value.length > 1
+  const metricsStore = useMetricsStore()
+  const { dashboardBySelectedPage, dashboardCurrent, getCurrentReportsData } =
+    storeToRefs(metricsStore)
+
+  const { setCurrentDashboard, loadCurrentReports, setDatasetAvailableFilters } = metricsStore
+
+  const { getStatus } = storeToRefs(useHelpCenterStore())
+
+  const showChart = ref(true)
+
+  const reRenderChart = () => {
+    /*
+     * This approach was used to re-render the chart after screen resize and help center toggling.
+     * The nextTick was not sufficient to resolve the latter.
+     * HelpCenter takes 300ms to animate. To garantee the proper re-render, 350ms was used.
+     */
+    const timeout = 350
+
+    showChart.value = false
+    setTimeout(() => {
+      showChart.value = true
+    }, timeout)
+  }
+
+  onMounted(() => {
+    window.addEventListener('resize', reRenderChart)
   })
 
-  watch(
-    () => props.params,
-    () => {
-      fetchDashboards()
-    }
-  )
+  onUnmounted(() => {
+    window.removeEventListener('resize', reRenderChart)
+  })
+
+  watch(getStatus, () => {
+    reRenderChart()
+  })
+
+  const dashboards = computed(() => {
+    return dashboardBySelectedPage.value
+  })
+
+  const selectedDashboard = computed(() => {
+    return dashboardCurrent.value
+  })
+
+  const changeDashboard = async (evt) => {
+    setCurrentDashboard(evt.value)
+    await setDatasetAvailableFilters()
+    await loadCurrentReports()
+  }
+
+  const showTabs = computed(() => {
+    return dashboards.value?.length > 1
+  })
+
+  const reports = computed(() => {
+    return getCurrentReportsData.value
+  })
 </script>
 
 <template>
   <div class="flex flex-column mt-8 gap-4">
     <SelectButton
-      v-if="showDashboardTabs"
       class="w-fit"
-      v-model="selectedDashboard"
+      :modelValue="selectedDashboard"
       :options="dashboards"
       optionLabel="label"
-      dataKey="id"
       aria-labelledby="basic"
+      @change="changeDashboard"
+      v-if="showTabs"
     />
-    <div class="grid grid-cols-12 gap-4 m-0">
+    <div
+      class="grid grid-cols-12 gap-4 m-0"
+      v-if="reports?.length"
+    >
       <template
-        v-for="i of 6"
-        :key="i"
+        v-for="report of reports"
+        :key="report.id"
       >
         <GraphsCardBlock
           chartOwner="azion"
-          title="Four Columns Card"
-          description="This card is 4 columns wide, sets the aggregation type to 'Average', the variation type to 'positive', and the variation value to '10.2%'."
-          :cols="4"
-          aggregationType="Average"
+          :title="report.label"
+          :description="report.description"
+          :cols="report.columns"
+          :aggregationType="report.aggregationType"
           variationType="positive"
           variationValue="10.2%"
         >
           <template #chart>
-            <div class="surface-border border border-dashed flex items-center h-full">
-              <p class="text-color-secondary text-center w-full">Slot</p>
-            </div>
+            <component
+              v-if="report.resultQuery?.length && showChart"
+              :is="propToComponent[`${report.type}-chart`]"
+              :chartData="report"
+              :resultChart="report.resultQuery"
+            />
+            <Skeleton
+              v-else
+              class="w-full h-full"
+            />
           </template>
         </GraphsCardBlock>
       </template>

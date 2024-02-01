@@ -563,18 +563,6 @@
   }
 
   /**
-   * Capitalizes the first letter of a string.
-   * @param {string | undefined} string - The string to capitalize.
-   * @returns {string} The capitalized string.
-   */
-  const capitalizeConditional = (string) => {
-    if (string) {
-      return string.charAt(0).toUpperCase() + string.slice(1)
-    }
-    return ''
-  }
-
-  /**
    * Gets the label for the behavior item.
    * @param {Object} behaviorItem - The behavior item.
    * @param {Boolean} behaviorItem.isFirst - The behavior boolean isFirst.
@@ -629,7 +617,7 @@
       </div>
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
         <FieldTextArea
-          label="Description *"
+          label="Description"
           :autoResize="true"
           rows="1"
           name="description"
@@ -690,8 +678,9 @@
             <Divider
               align="left"
               type="dashed"
+              class="capitalize"
             >
-              {{ capitalizeConditional(item.conditional) }}
+              {{ item.conditional }}
             </Divider>
 
             <PrimeButton

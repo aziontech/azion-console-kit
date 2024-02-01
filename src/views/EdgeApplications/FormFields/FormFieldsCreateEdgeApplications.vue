@@ -573,6 +573,7 @@
   >
     <template #inputs>
       <div class="flex flex-col gap-2">
+        <label class="text-color text-base font-medium">Default Modules</label>
         <div class="flex flex-col gap-3">
           <Card
             :pt="{
