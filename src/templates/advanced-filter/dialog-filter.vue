@@ -226,6 +226,7 @@
               optionValue="value"
               class="w-full"
               placeholder="Select a field"
+              filterIcon="pi pi-search"
             >
               <template
                 #dropdownicon
