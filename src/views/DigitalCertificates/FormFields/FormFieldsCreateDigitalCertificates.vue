@@ -117,7 +117,9 @@
               :value="certificateTypes.EDGE_CERTIFICATE_UPLOAD"
             />
           </template>
-          <template #subtitle>Upload a TLS X.509 certificate and private key in PEM format. </template>
+          <template #subtitle
+            >Upload a TLS X.509 certificate and private key in PEM format.
+          </template>
         </Card>
 
         <Card
@@ -139,7 +141,8 @@
             />
           </template>
           <template #subtitle>
-            Generate a Certificate Singing Request (CSR) to purchase a TLS digital certificate from a CA.
+            Generate a Certificate Singing Request (CSR) to purchase a TLS digital certificate from
+            a CA.
           </template>
         </Card>
 
@@ -162,7 +165,8 @@
             />
           </template>
           <template #subtitle>
-            Upload a certificate in PEM format that can be used for mutual Transport Layer Security (mTLS).
+            Upload a certificate in PEM format that can be used for mutual Transport Layer Security
+            (mTLS).
           </template>
         </Card>
       </div>

@@ -1,6 +1,6 @@
 <template>
   <section class="w-full min-h-[calc(100vh-120px)] relative">
-    <section class="w-full h-full flex flex-col max-w-screen-2xl mx-auto">
+    <section class="w-full h-full flex flex-col max-w-screen-2xl-test mx-auto">
       <Message
         severity="warn"
         :closable="false"

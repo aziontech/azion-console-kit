@@ -10,7 +10,8 @@ C3 dependency omits its styling for some reason. Thus it was needed to add this 
   -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
 }
 
-.c3 path, .c3 line {
+.c3 path,
+.c3 line {
   fill: none;
   stroke: #000;
 }
@@ -53,7 +54,8 @@ C3 dependency omits its styling for some reason. Thus it was needed to add this 
   fill: #aaa;
 }
 
-.c3-xgrid, .c3-ygrid {
+.c3-xgrid,
+.c3-ygrid {
   stroke-dasharray: 2 2;
 }
 .c3-ygrids line {
@@ -101,7 +103,8 @@ C3 dependency omits its styling for some reason. Thus it was needed to add this 
   opacity: 1;
 }
 
-.c3-target.c3-focused path.c3-line, .c3-target.c3-focused path.c3-step {
+.c3-target.c3-focused path.c3-line,
+.c3-target.c3-focused path.c3-step {
   stroke-width: 2px;
 }
 
@@ -157,7 +160,6 @@ C3 dependency omits its styling for some reason. Thus it was needed to add this 
   width: max-content;
 }
 
-
 .c3-tooltip {
   border-collapse: collapse;
   border-spacing: 0;
@@ -168,7 +170,6 @@ C3 dependency omits its styling for some reason. Thus it was needed to add this 
   display: flex;
   height: 40px;
 }
-
 
 .c3-tooltip th {
   font-size: 14px;
@@ -190,11 +191,19 @@ C3 dependency omits its styling for some reason. Thus it was needed to add this 
   height: 2px;
   width: 75px;
 }
-.c3-tooltip tr[class^="c3-tooltip-name--Mean-Line---"] td.name > span {
-  background-image: linear-gradient(90deg, rgba(255, 0, 0, 0) 27.78%, #ffffff 27.78%, #ffffff 50%, rgba(255, 0, 0, 0) 50%, rgba(255, 0, 0, 0) 77.78%, #ffffff 77.78%, #ffffff 100%);
-  background-size: 18.00px 18.00px;
+.c3-tooltip tr[class^='c3-tooltip-name--Mean-Line---'] td.name > span {
+  background-image: linear-gradient(
+    90deg,
+    rgba(255, 0, 0, 0) 27.78%,
+    #ffffff 27.78%,
+    #ffffff 50%,
+    rgba(255, 0, 0, 0) 50%,
+    rgba(255, 0, 0, 0) 77.78%,
+    #ffffff 77.78%,
+    #ffffff 100%
+  );
+  background-size: 18px 18px;
 }
-
 
 .c3-tooltip td > span {
   display: inline-block;
@@ -225,7 +234,7 @@ C3 dependency omits its styling for some reason. Thus it was needed to add this 
 
 .c3-chart-arcs .c3-chart-arcs-background {
   fill: #e0e0e0;
-  stroke: #FFF;
+  stroke: #fff;
 }
 
 .c3-chart-arcs .c3-chart-arcs-gauge-unit {
@@ -252,10 +261,10 @@ C3 dependency omits its styling for some reason. Thus it was needed to add this 
 .c3-chart-arc.c3-target.c3-focused g path {
   opacity: 1;
 }
-.c3-shapes > path[class*="c3-line-Mean"]:not(.c3-line-Mean-Line) {
+.c3-shapes > path[class*='c3-line-Mean']:not(.c3-line-Mean-Line) {
   stroke-dasharray: 5 !important;
 }
-g[class*="c3-legend-item-Mean-Line"]:not(.c3-legend-item-Mean-Line) {
+g[class*='c3-legend-item-Mean-Line']:not(.c3-legend-item-Mean-Line) {
   stroke-dasharray: 2 !important;
 }
 
