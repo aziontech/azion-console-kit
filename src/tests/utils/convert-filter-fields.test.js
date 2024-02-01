@@ -9,14 +9,6 @@ const makeSut = () => {
 }
 
 describe('ConvertFields', () => {
-  it('#getOperatorLabelFromFieldName should sanitize to get the field name', () => {
-    const { sut } = makeSut()
-
-    const result = sut.getOperatorLabelFromFieldName(FIXTURES.sanitizeOperator.fieldName)
-
-    expect(result).toEqual(FIXTURES.sanitizeOperator.expected)
-  })
-
   it.each(FIXTURES.operatorsName)(
     '#getOperatorFromOperatorName should get the operator %s from library',
     (operator) => {

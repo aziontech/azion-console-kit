@@ -6,15 +6,11 @@ const FIXTURE = {
       type: { name: 'configurationIdIn' }
     },
     expected: {
-      label: 'configurationIdIn',
-      description: 'Filter for configuration IDs',
-      value: 'domainIn',
-      formattedLabel: 'Domain',
+      value: 'configurationId',
+      group: 'configurationId',
+      label: 'Domain',
       operator: 'In',
-      type: 'domains-filter',
-      inputType: 'String',
-      nameField: 'domain',
-      valueElement: undefined
+      type: 'ArrayObject'
     }
   },
   SCENARIO_FIELD_TYPE_RANGE: {
@@ -24,15 +20,11 @@ const FIXTURE = {
       type: { name: 'FloatRange' }
     },
     expected: {
-      label: 'priceRange',
-      description: 'Filter for price range',
-      value: 'priceRange',
-      formattedLabel: 'Price',
+      group: 'price',
+      label: 'Price',
+      value: 'price',
       operator: 'Range',
-      type: 'range-filter',
-      inputType: 'FloatRange',
-      nameField: 'price',
-      valueElement: undefined
+      type: 'Range'
     }
   }
 }

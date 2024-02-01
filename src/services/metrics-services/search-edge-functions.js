@@ -1,21 +1,17 @@
 import * as Errors from '@/services/axios/errors'
 import axios from 'axios'
 import { AxiosHttpClientAdapter } from '../axios/AxiosHttpClientAdapter'
-import { makeDomainsBaseUrl } from './make-domains-base-url'
+import { makeEdgeFunctionsBaseUrl } from './make-edge-functions-base-url'
 
 const cancelRequest = axios.CancelToken
 const source = cancelRequest.source()
 
-export const searchDomainsService = async ({
-  orderBy = 'name',
-  sort = 'asc',
-  page = 1,
-  pageSize = 200
-} = {}) => {
+export const searchEdgeFunctionsService = async ({ domainLike }) => {
   source.cancel()
-  const searchParams = makeSearchParams({ orderBy, sort, page, pageSize })
+
+  const searchParams = makeSearchParams({ domainLike })
   let httpResponse = await AxiosHttpClientAdapter.request({
-    url: `${makeDomainsBaseUrl()}?${searchParams.toString()}`,
+    url: `${makeEdgeFunctionsBaseUrl()}?${searchParams.toString()}`,
     method: 'GET',
     cancelToken: source.token
   })
@@ -26,25 +22,19 @@ export const searchDomainsService = async ({
 }
 
 const adapt = (httpResponse) => {
-  const parsedDomains = httpResponse.body.results?.map((domain) => {
-    return {
-      value: domain.id,
-      name: domain.name
-    }
-  })
-
   return {
-    body: parsedDomains,
+    body: {
+      results: httpResponse.results,
+      totalPages: httpResponse.total_pages
+    },
     statusCode: httpResponse.statusCode
   }
 }
 
-const makeSearchParams = ({ orderBy, sort, page, pageSize }) => {
+const makeSearchParams = ({ search, pageSize = 200 }) => {
   const searchParams = new URLSearchParams()
-  orderBy && searchParams.set('order_by', orderBy)
-  sort && searchParams.set('sort', sort)
-  page && searchParams.set('page', page)
-  pageSize && searchParams.set('page_size', pageSize)
+  searchParams.set('page_size', pageSize)
+  searchParams.set('search', search)
 
   return searchParams
 }

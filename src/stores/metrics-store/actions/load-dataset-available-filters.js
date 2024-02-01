@@ -32,6 +32,20 @@ export default async (dataset) => {
     .filter(VerifyBlacklistFields)
     .filter(({ description }) => !description.includes('DEPRECATED'))
     .map(ParserObjectField)
+    .reduce(
+      (acc, item) => ({
+        ...acc,
+        [item.group]: [...(acc[item.group] ?? []), item]
+      }),
+      {}
+    )
 
-  return availableFilters
+  return Object.keys(availableFilters).map((key) => {
+    const fields = availableFilters[key]
+    return {
+      label: fields[0].label,
+      value: fields[0].value,
+      operator: fields.map((field) => ({ value: field.operator, type: field.type }))
+    }
+  })
 }

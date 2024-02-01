@@ -117,8 +117,8 @@
               :value="certificateTypes.EDGE_CERTIFICATE_UPLOAD"
             />
           </template>
-          <template #subtitle
-            >Upload a TLS X.509 certificate and private key in PEM format.
+          <template #subtitle>
+            Upload a TLS X.509 certificate and private key in PEM format.
           </template>
         </Card>
 

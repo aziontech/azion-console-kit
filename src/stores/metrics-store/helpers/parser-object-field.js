@@ -1,12 +1,11 @@
-import {
-  formatFieldName,
-  getOperatorLabelFromFieldName
-} from '@views/Metrics/utils/convert-metrics-fields'
+const likeType = {
+  configurationIdIn: 'ArrayObject',
+  zoneIdIn: 'ArrayObject',
+  edgeFunctionIdIn: 'ArrayObject'
+}
 
-const likeElement = {
-  configurationIdIn: 'domains-filter',
-  zoneIdIn: 'idns-filter',
-  edgeFunctionIdIn: 'edge-functions-filter'
+const likeAlias = {
+  configurationId: 'Domain'
 }
 
 /**
@@ -14,42 +13,43 @@ const likeElement = {
  *
  * @param {string} name - The name of the field.
  * @param {string} typeName - The type of the field.
- * @return {object} An object containing the field type and whether the field is part of an element.
+ * @return {String} The field type.
  */
 const getTypeField = (name, typeName) => {
-  const fieldsMapping = {
-    Int: 'number-filter',
-    Float: 'number-filter',
-    String: 'text-filter'
-  }
+  if (typeName?.includes('Range')) return 'Range'
 
-  if (typeName?.includes('Range')) {
-    return {
-      fieldType: 'range-filter',
-      isFieldInElement: false
-    }
-  }
+  return likeType[name] || typeName || 'String'
+}
 
-  const isFieldMapped = fieldsMapping[typeName]
-  const isFieldInElement = likeElement[name]
-
+/**
+ * Formats a field name by capitalizing the first letter of each word.
+ *
+ * @param {string} text - the text to format
+ * @return {Object} the formatted field name and value
+ */
+export const formatFieldName = (text) => {
+  const words = text.split(/(?=[A-Z])/)
+  if (words.length > 1) words.pop()
+  const name = words.join('')
+  const group = name
+  const formattedWords = words.map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+  const label = likeAlias[name] || formattedWords.join(' ')
   return {
-    fieldType: isFieldMapped || isFieldInElement,
-    isFieldInElement: !!isFieldInElement
+    label,
+    group,
+    value: name
   }
 }
 
 /**
- * Returns the alias label for the given field name.
+ * Retrieves the operator label from the given field name.
  *
- * @param {string} name - The field name to retrieve the alias label for.
- * @return {string} The alias label for the given field name.
+ * @param {string} fieldName - The field name to extract the operator label from.
+ * @return {string} The extracted operator label.
  */
-const aliasFieldLabel = (name) => {
-  const aliasMapping = {
-    configurationIdIn: 'domainIn'
-  }
-  return aliasMapping[name] || name
+export const getOperatorLabelFromFieldName = (fieldName) => {
+  const words = fieldName.split(/(?=[A-Z])/)
+  return words.pop()
 }
 
 /**
@@ -60,23 +60,16 @@ const aliasFieldLabel = (name) => {
  * @param {Object} type - The type object containing name property.
  * @return {Object} An object containing parsed fields.
  */
-export default function ParserObjectField({ name, description, type: { name: typeName } }) {
+export default function ParserObjectField({ name, type: { name: typeName } }) {
+  const { label, group, value } = formatFieldName(name)
   const operator = getOperatorLabelFromFieldName(name)
-  const value = aliasFieldLabel(name)
-  const formattedLabel = formatFieldName(value)
-  const typeField = getTypeField(name, typeName)
-  const type = typeField.fieldType
-  const inputType = typeField.isFieldInElement ? 'String' : typeName
-  const nameField = value.slice(0, -operator.length)
+  const fieldType = getTypeField(name, typeName)
+
   return {
-    label: name,
-    description,
+    label,
+    group,
     value,
-    formattedLabel,
     operator,
-    type,
-    inputType,
-    nameField,
-    valueElement: undefined
+    type: fieldType
   }
 }

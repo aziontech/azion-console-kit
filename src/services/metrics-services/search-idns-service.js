@@ -31,7 +31,7 @@ const adapt = (httpResponse) => {
   }
 }
 
-const makeSearchParams = ({ name, pageSize = 20 }) => {
+const makeSearchParams = ({ name, pageSize = 200 }) => {
   const searchParams = new URLSearchParams()
   searchParams.set('page_size', pageSize)
   searchParams.set('name', name)

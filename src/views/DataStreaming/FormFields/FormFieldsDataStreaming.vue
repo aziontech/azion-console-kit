@@ -17,8 +17,8 @@
           :class="{ 'p-invalid': nameError }"
         />
         <small class="text-xs text-color-secondary font-normal leading-tight">
-                Give a unique and easy-to-remember name.</small
-                >
+          Give a unique and easy-to-remember name.</small
+        >
         <small
           id="name-help"
           class="p-error"
@@ -68,7 +68,8 @@
             class="w-full"
           />
           <small class="text-color-secondary text-xs font-normal leading-tight">
-            Represents a preset of variables for specific sources or an open template to choose variables.
+            Represents a preset of variables for specific sources or an open template to choose
+            variables.
           </small>
         </div>
       </div>
@@ -87,7 +88,8 @@
           class="min-h-[100px] surface-border border rounded-sm overflow-hidden"
         />
         <small class="text-color-secondary text-xs font-normal leading-tight">
-          Exhibits or allows writing the variables that'll be sent to the connector in a JSON format.
+          Exhibits or allows writing the variables that'll be sent to the connector in a JSON
+          format.
         </small>
       </div>
     </template>
@@ -121,7 +123,8 @@
             <label class="text-color text-sm font-normal leading-tight">Filter Domains </label>
           </div>
           <small class="text-color-secondary text-xs font-normal leading-tight"
-            >By selecting the All Current and Future option, you can activate the Sampling option.</small
+            >By selecting the All Current and Future option, you can activate the Sampling
+            option.</small
           >
         </div>
       </div>
@@ -158,7 +161,8 @@
         </PickList>
 
         <small class="text-color-secondary text-sm font-normal leading-tight">
-          Select an item from the list and then use the arrows to move it between the available and selected domains boxes. Use the double-line arrows to move all items.
+          Select an item from the list and then use the arrows to move it between the available and
+          selected domains boxes. Use the double-line arrows to move all items.
         </small>
       </div>
     </template>
@@ -187,8 +191,8 @@
             </div>
             <div class="flex-col gap-1 pl-10">
               <p class="text-color-secondary text-sm font-normal">
-                Once enabled, you can only have one active stream in your account. If it's
-                later disabled, the Add option will become available again on the creation page.
+                Once enabled, you can only have one active stream in your account. If it's later
+                disabled, the Add option will become available again on the creation page.
               </p>
             </div>
           </span>
@@ -223,15 +227,16 @@
           severity="warn"
           v-if="hasSampling"
         >
-          After activating and saving these settings, all other streams will become
-          inactive.
+          After activating and saving these settings, all other streams will become inactive.
         </InlineMessage>
       </div>
     </template>
   </FormHorizontal>
 
-  <FormHorizontal title="Destination"
-            description="Define to which data platform your collected data will be sent to. All fields must be filled in with information provided by the third-party platform.">
+  <FormHorizontal
+    title="Destination"
+    description="Define to which data platform your collected data will be sent to. All fields must be filled in with information provided by the third-party platform."
+  >
     <template #inputs>
       <div class="flex flex-col w-full sm:max-w-xs gap-2">
         <label
@@ -248,8 +253,8 @@
           class="w-full"
         />
         <small class="text-color-secondary text-sm font-normal leading-tight">
-                  Each option represents a different platform and requires different values.
-                </small>
+          Each option represents a different platform and requires different values.
+        </small>
       </div>
 
       <!-- Specific Sections for Different Endpoints -->
@@ -384,7 +389,8 @@
               >Enable Transport Layer Security (TLS)</label
             >
             <small class="text-color-secondary text-sm font-normal leading-tight">
-              Send encrypted data to secure communication. Make sure the receiving connector uses a trusted CA certificate.
+              Send encrypted data to secure communication. Make sure the receiving connector uses a
+              trusted CA certificate.
             </small>
           </div>
         </div>
@@ -408,7 +414,8 @@
             :class="{ 'p-invalid': hostError }"
           />
           <small class="text-color-secondary text-sm font-normal leading-tight">
-            Specific URL that'll receive the collected data. Accepts all providers that work with an S3 protocol.
+            Specific URL that'll receive the collected data. Accepts all providers that work with an
+            S3 protocol.
           </small>
           <small
             id="host-help"
@@ -530,7 +537,8 @@
             toggleMask
           />
           <small class="text-color-secondary text-sm font-normal leading-tight">
-            Prefix added to the name of the uploaded object to appear on the files that'll be sent. Composed of Prefix + Timestamp + UUID.
+            Prefix added to the name of the uploaded object to appear on the files that'll be sent.
+            Composed of Prefix + Timestamp + UUID.
           </small>
           <small
             id="object-key-help"
@@ -728,7 +736,8 @@
             :class="{ 'p-invalid': splunkUrlError }"
           />
           <small class="text-color-secondary text-sm font-normal leading-tight">
-            URL that'll receive the collected data. If you have an alternative index to point, add it at the end of the URL.
+            URL that'll receive the collected data. If you have an alternative index to point, add
+            it at the end of the URL.
           </small>
           <small
             id="splunk-url-help"
@@ -962,7 +971,8 @@
             :class="{ 'p-invalid': logTypeError }"
           />
           <small class="text-color-secondary text-sm font-normal leading-tight">
-            Record type of the data that's being submitted. Accepts only letters, numbers, and the underscore (_) character, and it can't exceed 100 characters.
+            Record type of the data that's being submitted. Accepts only letters, numbers, and the
+            underscore (_) character, and it can't exceed 100 characters.
           </small>
           <small
             id="log-type-help"
@@ -1010,7 +1020,8 @@
             type="text"
           />
           <small class="text-color-secondary text-sm font-normal leading-tight">
-            Specifies how long it’ll take for the log to be available after collection. Uses ingestion time if not specified.
+            Specifies how long it’ll take for the log to be available after collection. Uses
+            ingestion time if not specified.
           </small>
         </div>
 
@@ -1103,7 +1114,8 @@
             :class="{ 'p-invalid': blobTokenError }"
           />
           <small class="text-color-secondary text-sm font-normal leading-tight">
-            Token generated by Blob Storage. It should have create, read, write, and list accesses granted.
+            Token generated by Blob Storage. It should have create, read, write, and list accesses
+            granted.
           </small>
           <small
             id="blob-token-help"
@@ -1133,7 +1145,8 @@
           :class="{ 'p-invalid': payloadFormatError }"
         />
         <small class="text-color-secondary text-xs font-normal leading-tight">
-          Character that'll be used at the end of each log line. The "\n" escape sequence breaks values into different lines in NDJSON format.
+          Character that'll be used at the end of each log line. The "\n" escape sequence breaks
+          values into different lines in NDJSON format.
         </small>
         <small
           id="data-set-help"
@@ -1176,8 +1189,7 @@
           :useGrouping="false"
         />
         <small class="text-color-secondary text-xs font-normal leading-tight">
-          Customizable maximum size of data packets in bytes. Accepts values starting from
-          1000000.
+          Customizable maximum size of data packets in bytes. Accepts values starting from 1000000.
         </small>
       </div>
     </template>

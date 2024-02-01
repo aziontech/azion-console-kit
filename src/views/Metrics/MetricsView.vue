@@ -79,9 +79,12 @@
   const router = useRouter()
 
   const updateRouter = () => {
+    const { query } = route
+
     router.push({
       name: 'real-time-metrics',
-      params: getCurrentIds.value
+      params: getCurrentIds.value,
+      query
     })
   }
 
