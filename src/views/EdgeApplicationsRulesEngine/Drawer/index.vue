@@ -56,7 +56,7 @@
     debouncedDrawerAnimate
   )
   const loadEditRulesEngineDrawer = refDebounced(showEditRulesEngineDrawer, debouncedDrawerAnimate)
-  const selectedRulesEngineToEdit = ref('')
+  const selectedRulesEngineToEdit = ref({})
 
   const initialValues = ref({
     id: props.edgeApplicationId,
@@ -104,9 +104,9 @@
     })
   }
 
-  const loadService = async (payload) => {
+  const loadService = async () => {
     return await props.loadRulesEngineService({
-      ...payload,
+      ...selectedRulesEngineToEdit.value,
       edgeApplicationId: props.edgeApplicationId
     })
   }
@@ -164,7 +164,6 @@
   <EditDrawerBlock
     v-if="loadEditRulesEngineDrawer"
     :id="selectedRulesEngineToEdit.id.toString()"
-    :itemToEdit="selectedRulesEngineToEdit"
     v-model:visible="showEditRulesEngineDrawer"
     :loadService="loadService"
     :editService="editService"

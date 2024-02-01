@@ -44,6 +44,8 @@
     }
   })
 
+  const isEditDrawer = computed(() => !!props.selectedRulesEngineToEdit)
+
   const toast = useToast()
   const criteriaOperatorOptions = ref([
     { label: 'is equal', value: 'is_equal' },
@@ -419,7 +421,7 @@
     ]
 
     let targetValue = behaviors.value[index].value.target
-    if (!props.selectedRulesEngineToEdit) targetValue = ''
+    if (!isEditDrawer.value) targetValue = ''
 
     updateBehavior(index, { name: behaviorName, target: targetValue })
     setShowNewBehaviorButton(true)
@@ -436,7 +438,7 @@
         break
       case 'capture_match_groups':
         let matchGroupsFields = { captured_array: '', subject: '', regex: '' }
-        if (props.selectedRulesEngineToEdit) matchGroupsFields = behaviors.value[index].value.target
+        if (isEditDrawer.value) matchGroupsFields = behaviors.value[index].value.target
 
         updateBehavior(index, { name: behaviorName, target: matchGroupsFields })
         break
@@ -457,7 +459,7 @@
    * Calls the appropriate services to fetch options for the behaviors of the selected rules engine to edit.
    */
   const callOptionsServicesAtEdit = async () => {
-    if (props.selectedRulesEngineToEdit) {
+    if (isEditDrawer.value) {
       const behaviorsLength = props.selectedRulesEngineToEdit.behaviors.length
 
       for (let index = 0; index < behaviorsLength; index++) {
@@ -507,7 +509,7 @@
       changeBehaviorType(behavior.name, index)
     }
 
-    if (props.selectedRulesEngineToEdit) {
+    if (isEditDrawer.value) {
       let index = 0
 
       while (!areBehaviorsReady(index)) {
@@ -585,7 +587,10 @@
   onMounted(() => {
     if (props.isEnableApplicationAcceleration) {
       updateBehaviorsOptionsRequires()
-      criteria.value[0].value[0].variable = ''
+
+      if (criteria.value[0] && !isEditDrawer.value) {
+        criteria.value[0].value[0].variable = ''
+      }
     }
     if (behaviors.value[0]) {
       changeBehaviorType(behaviors.value[0].value.name, 0)
@@ -640,7 +645,7 @@
           :key="item.value"
         >
           <div
-            v-if="!props.selectedRulesEngineToEdit || phase === item.value"
+            v-if="!isEditDrawer.value || phase === item.value"
             class="w-full border-1 rounded-md surface-border flex align-items-center justify-between p-4 gap-2"
             :class="{ 'border-radio-card-active': phase === item.value }"
           >
