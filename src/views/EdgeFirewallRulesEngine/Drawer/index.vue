@@ -1,7 +1,7 @@
 <script setup>
   import CreateDrawerBlock from '@templates/create-drawer-block'
   import EditDrawerBlock from '@templates/edit-drawer-block'
-  import CreateFormFields from '../FormFields/CreateFormFields.vue'
+  import FormFieldsEdgeFirewallRulesEngine from '../FormFields/FormFieldsEdgeFirewallRulesEngine.vue'
   import { refDebounced } from '@vueuse/core'
   import * as yup from 'yup'
   import { onMounted, ref } from 'vue'
@@ -167,6 +167,19 @@
     })
   }
 
+  const loadEdgeFirewallRulesEngineServiceWithDecorator = async (payload) => {
+    return await props.loadService({
+      edgeFirewallId: props.edgeFirewallId,
+      id: payload.id
+    })
+  }
+  const editEdgeFirewallRulesEngineServiceWithDecorator = async (payload) => {
+    return await props.editService({
+      edgeFirewallId: props.edgeFirewallId,
+      payload
+    })
+  }
+
   onMounted(async () => {
     await Promise.all([listEdgeFirewallFunctionsOptions(), listWafRulesOptions()])
   })
@@ -188,7 +201,7 @@
     title="Create Cache Settings"
   >
     <template #formFields>
-      <CreateFormFields
+      <FormFieldsEdgeFirewallRulesEngine
         :edgeFirewallFunctionsOptions="edgeFirewallFunctionsOptions"
         :wafRulesOptions="wafRulesOptions"
       />
@@ -199,14 +212,17 @@
     v-if="showEditDrawer"
     :id="selectedRulesEngineToEdit"
     v-model:visible="showEditRulesEngineDrawer"
-    :loadService="() => {}"
-    :editService="() => {}"
-    :schema="{}"
+    :loadService="loadEdgeFirewallRulesEngineServiceWithDecorator"
+    :editService="editEdgeFirewallRulesEngineServiceWithDecorator"
+    :schema="validationSchema"
     @onSuccess="handleEditWithSuccess"
     title="Edit Rules Engine"
   >
     <template #formFields>
-      <p>edit form fields, criar EditFormFields</p>
+      <FormFieldsEdgeFirewallRulesEngine
+        :edgeFirewallFunctionsOptions="edgeFirewallFunctionsOptions"
+        :wafRulesOptions="wafRulesOptions"
+      />
     </template>
   </EditDrawerBlock>
 </template>

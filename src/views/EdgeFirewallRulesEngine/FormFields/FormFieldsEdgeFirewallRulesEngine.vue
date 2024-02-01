@@ -12,7 +12,7 @@
   import { computed, ref } from 'vue'
 
   defineOptions({
-    name: 'edge-firewall-rules-engine-create-form-fields'
+    name: 'edge-firewall-rules-engine-form-fields'
   })
 
   const props = defineProps({
@@ -258,7 +258,6 @@
       { value: 'set_custom_response', label: 'Set Custom Response', disabled: false }
     ]
   })
-  const disableAddBehaviorButton = ref(true)
   const behaviorsMenuRef = ref({})
 
   const toggleBehaviorMenu = (event, behaviorItemIndex) => {
@@ -285,7 +284,6 @@
   const handleAddBehavior = () => {
     const EMPTY_DEFAULT_BEHAVIOR = { name: '' }
     pushBehavior(EMPTY_DEFAULT_BEHAVIOR)
-    disableAddBehaviorButton.value = true
   }
 
   const removeBehaviorsFromIndex = (startIndex) => {
@@ -301,23 +299,31 @@
       case 'drop':
       case 'set_rate_limit':
       case 'set_custom_response':
-        // limpar behaviors posteriores ao seu index
-        // desabilitar botão de adicionar behavior
-        disableAddBehaviorButton.value = true
+      case 'tag_event':
         removeBehaviorsFromIndex(behaviorItemIndex)
-        // desabilita sua seleção , evitando behavior igual
-        break
-      case 'run_function':
-      case 'set_waf_ruleset_and_waf_mode':
-        // habilita botão de adicionar mais behavior
-        // desabilita sua seleção , evitando behavior igual
-        disableAddBehaviorButton.value = false
         break
       default:
-        disableAddBehaviorButton.value = true
         break
     }
   }
+
+  const disableAddBehaviorButtonComputed = computed(() => {
+    const behaviorHasNotBeenLoaded = !behaviors || !behaviors.value
+    if (behaviorHasNotBeenLoaded) {
+      return true
+    }
+    if (behaviors.value.length === 0) {
+      return true
+    }
+
+    const lastBehavior = behaviors.value[behaviors.value.length - 1]
+    if (!lastBehavior.value.name) {
+      return true
+    }
+    const optionsThatEnableAddBehaviors = ['run_function', 'set_waf_ruleset_and_waf_mode']
+
+    return !optionsThatEnableAddBehaviors.includes(lastBehavior.value.name)
+  })
 </script>
 <template>
   <FormHorizontal
@@ -626,6 +632,7 @@
                 :key="`${behaviorItem.key}-averageRateLimit`"
                 placeholder="Average Rate limit"
                 inputClass="w-full mb-3"
+                :value="behaviors[behaviorItemIndex].value.average_rate_limit"
                 :name="`behaviors[${behaviorItemIndex}].average_rate_limit`"
                 :min="0"
                 :max="YEAR_IN_SECONDS"
@@ -653,6 +660,7 @@
                   :key="`${behaviorItem.key}-maximumBurstSize`"
                   placeholder="Maximum Burst Size"
                   inputClass="w-full mb-3"
+                  :value="behaviors[behaviorItemIndex].value.maximum_burst_size"
                   :name="`behaviors[${behaviorItemIndex}].maximum_burst_size`"
                   :min="0"
                   :step="1"
@@ -666,6 +674,7 @@
                 :key="`${behaviorItem.key}-status_code`"
                 placeholder="Status code"
                 inputClass="w-full mb-3"
+                :value="behaviors[behaviorItemIndex].value.status_code"
                 :name="`behaviors[${behaviorItemIndex}].status_code`"
                 :min="200"
                 :max="499"
@@ -676,6 +685,7 @@
                 :key="`${behaviorItem.key}-content_type`"
                 placeholder="Content Type"
                 inputClass="w-full mb-3"
+                :value="behaviors[behaviorItemIndex].value.content_type"
                 :name="`behaviors[${behaviorItemIndex}].content_type`"
               />
               <FieldText
@@ -683,6 +693,7 @@
                 :key="`${behaviorItem.key}-content_body`"
                 placeholder="Content Body"
                 inputClass="w-full mb-3"
+                :value="behaviors[behaviorItemIndex].value.content_body"
                 :name="`behaviors[${behaviorItemIndex}].content_body`"
               />
             </template>
@@ -692,7 +703,7 @@
       <Divider type="solid" />
       <div>
         <PrimeButton
-          :disabled="disableAddBehaviorButton"
+          :disabled="disableAddBehaviorButtonComputed"
           icon="pi pi-plus-circle"
           label="Add Behavior"
           size="small"

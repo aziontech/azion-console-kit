@@ -19,11 +19,19 @@
       type: Function,
       required: true
     },
+    editEdgeFirewallRulesEngineService: {
+      type: Function,
+      required: true
+    },
     listEdgeFirewallRulesEngineService: {
       type: Function,
       required: true
     },
     deleteEdgeFirewallRulesEngineService: {
+      type: Function,
+      required: true
+    },
+    loadEdgeFirewallRulesEngineService: {
       type: Function,
       required: true
     },
@@ -108,8 +116,8 @@
     :createService="props.createEdgeFirewallRulesEngineService"
     :listFunctionsService="props.listFunctionsService"
     :listWafRulesService="props.listWafRulesService"
-    :loadService="() => {}"
-    :editService="() => {}"
+    :loadService="props.loadEdgeFirewallRulesEngineService"
+    :editService="props.editEdgeFirewallRulesEngineService"
     @onSuccess="reloadList"
   />
 
