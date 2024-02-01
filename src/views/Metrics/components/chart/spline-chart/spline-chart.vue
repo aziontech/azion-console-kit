@@ -1,7 +1,7 @@
 <script setup>
   import c3 from 'c3'
-  import FormatC3GraphProps from '../../../helpers/c3-charts'
   import { onMounted } from 'vue'
+  import FormatC3GraphProps from '../../../helpers/c3-charts'
 
   const props = defineProps({
     chartData: Object,
@@ -29,15 +29,7 @@
 
 <template>
   <div
-    class="spline-chart"
+    class="[&>svg]:w-auto [&>svg]:flex"
     :id="`spline-chart-${props.chartData?.id}`"
-    data-testid="splineChart"
-  ></div>
+  />
 </template>
-
-<style lang="scss">
-  .spline-chart > svg {
-    display: flex;
-    width: auto;
-  }
-</style>

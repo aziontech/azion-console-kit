@@ -3,7 +3,8 @@
   import GraphsCardBlock from '@/templates/graphs-card-block'
   import { storeToRefs } from 'pinia'
   import SelectButton from 'primevue/selectbutton'
-  import { computed, defineAsyncComponent } from 'vue'
+  import Skeleton from 'primevue/skeleton'
+  import { computed, defineAsyncComponent, nextTick, onMounted, onUnmounted, ref } from 'vue'
 
   const propToComponent = {
     'bar-chart': defineAsyncComponent(() => import('../components/chart/bar-chart/bar-chart')),
@@ -13,14 +14,27 @@
     )
   }
 
-  const props = defineProps({
-    reportData: Object
-  })
-
   const metricsStore = useMetricsStore()
-  const { dashboardBySelectedPage, dashboardCurrent, reportsBySelectedDashboard } =
+  const { dashboardBySelectedPage, dashboardCurrent, getCurrentReportsData } =
     storeToRefs(metricsStore)
   const { setCurrentDashboard, loadCurrentReports, setDatasetAvailableFilters } = metricsStore
+
+  const showChart = ref(true)
+
+  const reRenderChart = () => {
+    showChart.value = false
+    nextTick(() => {
+      showChart.value = true
+    })
+  }
+
+  onMounted(() => {
+    window.addEventListener('resize', reRenderChart)
+  })
+
+  onUnmounted(() => {
+    window.removeEventListener('resize', reRenderChart)
+  })
 
   const dashboards = computed(() => {
     return dashboardBySelectedPage.value
@@ -40,8 +54,8 @@
     return dashboards.value?.length > 1
   })
 
-  const reportsData = computed(() => {
-    return reportsBySelectedDashboard.value
+  const reports = computed(() => {
+    return getCurrentReportsData.value
   })
 </script>
 
@@ -58,10 +72,10 @@
     />
     <div
       class="grid grid-cols-12 gap-4 m-0"
-      v-if="reportsData?.length"
+      v-if="reports?.length"
     >
       <template
-        v-for="report of reportsData"
+        v-for="report of reports"
         :key="report.id"
       >
         <GraphsCardBlock
@@ -74,7 +88,16 @@
           variationValue="10.2%"
         >
           <template #chart>
-            <component :is="propToComponent[`${props.reportData?.type}-chart`]" />
+            <component
+              v-if="report.resultQuery?.length && showChart"
+              :is="propToComponent[`${report.type}-chart`]"
+              :chartData="report"
+              :resultChart="report.resultQuery"
+            />
+            <Skeleton
+              v-else
+              class="w-full h-full"
+            />
           </template>
         </GraphsCardBlock>
       </template>
