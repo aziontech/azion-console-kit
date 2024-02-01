@@ -17,6 +17,7 @@
   const metricsStore = useMetricsStore()
   const { dashboardBySelectedPage, dashboardCurrent, getCurrentReportsData } =
     storeToRefs(metricsStore)
+
   const { setCurrentDashboard, loadCurrentReports, setDatasetAvailableFilters } = metricsStore
 
   const showChart = ref(true)

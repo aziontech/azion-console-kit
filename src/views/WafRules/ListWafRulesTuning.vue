@@ -49,6 +49,7 @@
     <template #header>
       <advancedFilter
         v-model:externalFilter="selectedFilter"
+        v-model:filterAdvanced="selectedFilterAdvanced"
         :fieldsInFilter="listFields"
         @applyFilter="filterSearch"
       />
@@ -157,7 +158,6 @@
   const router = useRouter()
   const toast = useToast()
   const dataFilted = ref([])
-
   const selectedFilter = ref({
     domains: [],
     network: {},
@@ -174,7 +174,7 @@
   const tuningSelected = ref(null)
   const domainNames = ref('')
   const allowedByAttacks = ref([])
-
+  const selectedFilterAdvanced = ref([])
   const valueDomains = computed({
     get: () => {
       if (domainsOptions.value.done) return []
@@ -397,7 +397,7 @@
   }
 
   const filterTuning = async () => {
-    filterSearch([])
+    filterSearch(selectedFilterAdvanced.value)
   }
 
   const filterSearch = async (filter) => {

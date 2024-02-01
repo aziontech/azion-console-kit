@@ -17,6 +17,9 @@
       type: Array,
       required: true
     },
+    disabled: {
+      type: Boolean
+    },
     counter: {
       type: Number
     }
@@ -38,34 +41,38 @@
 
   const filterOverPanel = ref(null)
   const buttonOverPanel = ref(null)
-  const filtersOptions = computed(() => {
-    return props.filtersOptions.map(({ label, value, description, operator, disabled }) => {
-      return {
-        label,
-        value: {
-          disabled,
-          description,
-          value,
+
+  const options = computed(() => {
+    return props.filtersOptions.map(
+      ({ label, value, description, operator, disabled, mostRelevant = 0 }) => {
+        return {
           label,
-          operator: operator.map(
-            ({ props, placeholder, type, value: valueOp, disabled: disabledOp }) => {
-              const { value: valueLabel, label: labelOp, format } = OPERATOR_MAPPING[valueOp]
-              return {
-                label: labelOp,
-                value: {
-                  disabled: disabledOp,
-                  placeholder,
-                  value: valueLabel,
-                  props,
-                  format,
-                  type
+          mostRelevant,
+          value: {
+            disabled,
+            description,
+            value,
+            label,
+            operator: operator.map(
+              ({ props, placeholder, type, value: valueOp, disabled: disabledOp }) => {
+                const { value: valueLabel, label: labelOp, format } = OPERATOR_MAPPING[valueOp]
+                return {
+                  label: labelOp,
+                  value: {
+                    disabled: disabledOp,
+                    placeholder,
+                    value: valueLabel,
+                    props,
+                    format,
+                    type
+                  }
                 }
               }
-            }
-          )
+            )
+          }
         }
       }
-    })
+    )
   })
 
   const disabledSubmit = computed(() => {
@@ -115,7 +122,7 @@
     buttonOverPanel.value.$el.click()
     inputFilterDisabled.value = true
     editFilter.value = true
-    const field = filtersOptions.value.find(({ value }) => value.value === item.valueField)
+    const field = options.value.find(({ value }) => value.value === item.valueField)
     filterSelected.value = field.value
     changeFilter()
     const operator = filterSelected.value.operator.find(
@@ -161,6 +168,7 @@
     class="overflow-visible"
     severity="secondary"
     badgeClass="!text-xl"
+    :disabled="disabled"
     outlined
     v-bind="counterFilter"
     @click="toggle"
@@ -208,7 +216,10 @@
               id="filter-field"
               @change="changeFilter"
               v-model="filterSelected"
-              :options="filtersOptions"
+              :options="options"
+              resetFilterOnHide
+              filter
+              autoFilterFocus
               :disabled="inputFilterDisabled"
               :optionDisabled="({ value }) => value.disabled && !editFilter"
               optionLabel="label"
@@ -257,10 +268,10 @@
           </div>
         </div>
       </div>
-      <Divider v-if="filterSelected?.description" />
+      <Divider v-if="filterSelected?.label" />
       <div
         class="px-8 py-5 flex flex-col"
-        v-if="filterSelected?.description"
+        v-if="filterSelected?.label"
       >
         <div
           class="flex flex-col"

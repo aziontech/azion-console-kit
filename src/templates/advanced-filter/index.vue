@@ -11,12 +11,19 @@
   const route = useRoute()
   const toast = useToast()
   const router = useRouter()
-  const emit = defineEmits(['applyFilter', 'update:externalFilter'])
+  const emit = defineEmits(['applyFilter', 'update:externalFilter', 'update:filterAdvanced'])
 
   const props = defineProps({
     fieldsInFilter: {
       type: Array,
       required: true
+    },
+    disabled: {
+      type: Boolean
+    },
+    filterAdvanced: {
+      type: Object,
+      required: false
     },
     externalFilter: {
       type: Object,
@@ -28,6 +35,7 @@
   const FORMAT_RANGE = 'Range'
   const DEFAULT_FORMAT = [FORMAT_IN, FORMAT_RANGE]
   const displayFilter = ref([])
+
   const refDialogFilter = ref()
 
   const listField = computed(() => {
@@ -76,7 +84,8 @@
   const searchFilter = () => {
     const adaptFilter = adapterApply(displayFilter.value)
     emit('applyFilter', adaptFilter)
-    updateHash(adaptFilter)
+    emit('update:filterAdvanced', adaptFilter)
+    updateHash(adaptFilter, props.externalFilter)
   }
 
   const updateFilter = (value) => {
@@ -116,11 +125,11 @@
     return decodedFilter
   }
 
-  const updateHash = (filter) => {
+  const updateHash = (filter, external) => {
     const { params } = route
     const query = {
       filters: encodeFilter({
-        external: props.externalFilter,
+        external,
         filter
       })
     }
@@ -162,6 +171,7 @@
   }
 
   const loadFilter = () => {
+    if (props.disabled) return
     const { external = {}, filter = [] } = getFilterInHash()
 
     if (Object.keys(external).length) {
@@ -171,20 +181,31 @@
     if (!filter.length) return
 
     updateDisplayFilter(filter)
-
-    updateHash(displayFilter.value)
+    searchFilter()
+    updateHash(displayFilter.value, external)
   }
 
   loadFilter()
+
+  const unwatch = watch(
+    () => props.disabled,
+    (value) => {
+      if (!value) {
+        loadFilter()
+        unwatch()
+      }
+    }
+  )
 
   watch(props.fieldsInFilter, () => {
     updateDisplayFilter(displayFilter.value)
   })
 </script>
 <template>
-  <div class="flex max-sm:gap-2 w-full max-sm:align-items-center max-sm:flex-col">
+  <div class="flex max-sm:gap-2 w-full max-sm:align-items-center max-sm:flex-col h-11">
     <div class="p-inputgroup flex flex-row w-full align-items-stretch md:contents">
       <dialogFilter
+        :disabled="props.disabled"
         ref="refDialogFilter"
         :filtersOptions="listField"
         :counter="displayFilter.length"
@@ -266,8 +287,9 @@
       :filter="displayFilter"
     >
       <PrimeButton
-        class="max-sm:w-full min-w-max max-sm:flex-col md:ml-3 md:align-self-center"
+        class="max-sm:w-full min-w-max max-sm:flex-col md:ml-3"
         size="small"
+        :disabled="props.disabled || !displayFilter.length"
         @click="searchFilter"
         label="Search"
       />

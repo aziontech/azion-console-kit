@@ -55,30 +55,6 @@ const MostRelevantFields = {
 }
 
 /**
- * Retrieves the operator label from the given field name.
- *
- * @param {string} fieldName - The field name to extract the operator label from.
- * @return {string} The extracted operator label.
- */
-export const getOperatorLabelFromFieldName = (fieldName) => {
-  const words = fieldName.split(/(?=[A-Z])/)
-  return words.pop()
-}
-
-/**
- * Formats a field name by capitalizing the first letter of each word.
- *
- * @param {string} text - the text to format
- * @return {string} the formatted field name
- */
-export const formatFieldName = (text) => {
-  const words = text.split(/(?=[A-Z])/)
-  if (words.length > 1) words.pop()
-  const formattedWords = words.map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-  return formattedWords.join(' ')
-}
-
-/**
  * Retrieves the operator from the given operator name.
  *
  * @param {string} operator - The operator name to retrieve the operator from.
