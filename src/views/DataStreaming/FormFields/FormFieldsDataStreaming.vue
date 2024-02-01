@@ -1423,7 +1423,7 @@
 
     if (props.resetForm) {
       const initialValues = {
-        name: '',
+        name: name.value,
         dataSource: 'http',
         template: template,
         dataSet: '',
