@@ -30,7 +30,7 @@
 
   <FormHorizontal
     title="Data Settings"
-    description="Decide the source and the variables from which data should be collected."
+    description="Define the source and the variables from which data should be collected."
   >
     <template #inputs>
       <div class="flex flex-wrap gap-6">
@@ -49,7 +49,7 @@
             class="w-full"
           />
           <small class="text-color-secondary text-xs font-normal leading-tight">
-            Represents the data source your data will be collected from.
+            Represents the data source the data will be collected from.
           </small>
         </div>
 
@@ -87,14 +87,14 @@
           class="min-h-[100px] surface-border border rounded-sm overflow-hidden"
         />
         <small class="text-color-secondary text-xs font-normal leading-tight">
-          Exhibits or allows you to write the variables that'll be sent to your connector in a JSON format.
+          Exhibits or allows writing the variables that'll be sent to the connector in a JSON format.
         </small>
       </div>
     </template>
   </FormHorizontal>
   <FormHorizontal
     title="Domains"
-    description="Exhibits or allows you to write the variables that'll be sent to your connector in a JSON format."
+    description="Associate domains with this stream to define the addresses from which the data will be collected."
   >
     <template #inputs>
       <div class="flex flex-col gap-2">
@@ -121,7 +121,7 @@
             <label class="text-color text-sm font-normal leading-tight">Filter Domains </label>
           </div>
           <small class="text-color-secondary text-xs font-normal leading-tight"
-            >In case you select the All Current and Future option, you can activate the Sampling option.</small
+            >By selecting the All Current and Future option, you can activate the Sampling option.</small
           >
         </div>
       </div>
@@ -231,7 +231,7 @@
   </FormHorizontal>
 
   <FormHorizontal title="Destination"
-            description="Decide to which data platform your collected data will be sent to. All fields must be filled in with information provided by the third-party platform.">
+            description="Define to which data platform your collected data will be sent to. All fields must be filled in with information provided by the third-party platform.">
     <template #inputs>
       <div class="flex flex-col w-full sm:max-w-xs gap-2">
         <label
@@ -478,7 +478,7 @@
             placeholder="ORIA5ZEH9MW4NL5OITY4"
           />
           <small class="text-color-secondary text-sm font-normal leading-tight">
-            Public key to access your bucket.
+            Public key to access the bucket.
           </small>
           <small
             id="access-key-help"
@@ -504,7 +504,7 @@
             toggleMask
           />
           <small class="text-color-secondary text-sm font-normal leading-tight">
-            Secret key to access your bucket.
+            Secret key to access the bucket.
           </small>
           <small
             id="secret-key-help"
@@ -530,7 +530,7 @@
             toggleMask
           />
           <small class="text-color-secondary text-sm font-normal leading-tight">
-            Prefix added to the name of the uploaded object to appear on the files that will be sent. Composed of Prefix + Timestamp + UUID.
+            Prefix added to the name of the uploaded object to appear on the files that'll be sent. Composed of Prefix + Timestamp + UUID.
           </small>
           <small
             id="object-key-help"
@@ -801,7 +801,7 @@
             :class="{ 'p-invalid': awsRegionError }"
           />
           <small class="text-color-secondary text-sm font-normal leading-tight">
-            Region where your Amazon Kinesis instance is running.
+            Region where the Amazon Kinesis instance is running.
           </small>
           <small
             id="aws-region-help"
@@ -1116,7 +1116,7 @@
   </FormHorizontal>
   <FormHorizontal
     title="Payload"
-    description="Customize the essential information that will be sent in your data."
+    description="Customize the essential information that'll be sent in the data."
     v-if="endpoint === 'standard'"
   >
     <template #inputs>
@@ -1133,7 +1133,7 @@
           :class="{ 'p-invalid': payloadFormatError }"
         />
         <small class="text-color-secondary text-xs font-normal leading-tight">
-          Character that will be used at the end of each log line. The "\n" escape sequence breaks values into different lines in NDJSON format.
+          Character that'll be used at the end of each log line. The "\n" escape sequence breaks values into different lines in NDJSON format.
         </small>
         <small
           id="data-set-help"
