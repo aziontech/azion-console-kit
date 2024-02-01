@@ -4,7 +4,8 @@
   import CreateFormFields from '../FormFields/CreateFormFields.vue'
   import { refDebounced } from '@vueuse/core'
   import * as yup from 'yup'
-  import { ref } from 'vue'
+  import { onMounted, ref } from 'vue'
+  import { useToast } from 'primevue/usetoast'
 
   defineOptions({
     name: 'edge-application-cache-settings-drawer'
@@ -25,16 +26,28 @@
       type: Function,
       required: true
     },
+    listFunctionsService: {
+      type: Function,
+      required: true
+    },
+    listWafRulesService: {
+      type: Function,
+      required: true
+    },
     editService: {
       type: Function,
       required: true
     }
   })
 
+  const toast = useToast()
+
   const showCreateRulesEngineDrawer = ref(false)
   const showEditRulesEngineDrawer = ref(false)
   const DEBOUNCE_TIME_IN_MS = 300
   const selectedRulesEngineToEdit = ref('')
+  const edgeFirewallFunctionsOptions = ref([])
+  const wafRulesOptions = ref([])
 
   const showCreateDrawer = refDebounced(showCreateRulesEngineDrawer, DEBOUNCE_TIME_IN_MS)
   const showEditDrawer = refDebounced(showEditRulesEngineDrawer, DEBOUNCE_TIME_IN_MS)
@@ -49,14 +62,13 @@
           variable: 'header_accept',
           operator: 'matches',
           conditional: 'if',
-          input_value: ''
+          argument: ''
         }
       ]
     ],
     behaviors: [
       {
-        name: '',
-        target: {}
+        name: ''
       }
     ]
   })
@@ -76,9 +88,9 @@
             variable: yup.string().required().label('variable'),
             operator: yup.string().required().label('operator'),
             conditional: yup.string().required().label('conditional'),
-            input_value: yup.string().when('operator', {
+            argument: yup.string().when('operator', {
               is: (operator) => operator !== 'exists' && operator !== 'does_not_exist',
-              then: (schema) => schema.required().label('conditional value'),
+              then: (schema) => schema.required().label('criteria argument'),
               otherwise: (schema) => schema.notRequired()
             })
           })
@@ -87,8 +99,7 @@
     ),
     behaviors: yup.array().of(
       yup.object({
-        name: yup.string().required().label('behavior'),
-        target: yup.object()
+        name: yup.string().required().label('behavior')
       })
     )
   })
@@ -96,12 +107,16 @@
   const closeCreateDrawer = () => {
     showCreateRulesEngineDrawer.value = false
   }
+
   const openCreateDrawer = () => {
     showCreateRulesEngineDrawer.value = true
   }
   const openEditDrawer = (rulesEngineId) => {
     selectedRulesEngineToEdit.value = `${rulesEngineId}`
     showEditRulesEngineDrawer.value = true
+  }
+  const closeEditDrawer = () => {
+    showEditRulesEngineDrawer.value = false
   }
 
   const handleCreateWithSuccess = () => {
@@ -111,8 +126,37 @@
 
   const handleEditWithSuccess = () => {
     emit('onSuccess')
-    closeCreateDrawer()
+    closeEditDrawer()
   }
+
+  const listEdgeFirewallFunctionsOptions = async () => {
+    try {
+      const result = await props.listFunctionsService()
+      edgeFirewallFunctionsOptions.value = result
+    } catch (error) {
+      toast.add({
+        closable: true,
+        severity: 'error',
+        summary: error
+      })
+    }
+  }
+  const listWafRulesOptions = async () => {
+    try {
+      const result = await props.listWafRulesService()
+      wafRulesOptions.value = result
+    } catch (error) {
+      toast.add({
+        closable: true,
+        severity: 'error',
+        summary: error
+      })
+    }
+  }
+
+  onMounted(async () => {
+    await Promise.all([listEdgeFirewallFunctionsOptions(), listWafRulesOptions()])
+  })
 
   defineExpose({
     openCreateDrawer,
@@ -131,7 +175,10 @@
     title="Create Cache Settings"
   >
     <template #formFields>
-      <CreateFormFields />
+      <CreateFormFields
+        :edgeFirewallFunctionsOptions="edgeFirewallFunctionsOptions"
+        :wafRulesOptions="wafRulesOptions"
+      />
     </template>
   </CreateDrawerBlock>
 

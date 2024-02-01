@@ -3,6 +3,7 @@ import * as DomainServices from '@/services/domains-services'
 import * as EdgeFirewallServices from '@/services/edge-firewall-services'
 import * as EdgeFirewallFunctionsServices from '@/services/edge-firewall-functions-services'
 import * as EdgeFirewallRulesEngineServices from '@/services/edge-firewall-rules-engine-services'
+import * as WafRulesServices from '@/services/waf-rules-services'
 
 /** @type {import('vue-router').RouteRecordRaw} */
 export const edgeFirewallRoutes = {
@@ -74,6 +75,10 @@ export const edgeFirewallRoutes = {
             EdgeFirewallRulesEngineServices.listEdgeFirewallRulesEngineService,
           deleteEdgeFirewallRulesEngineService:
             EdgeFirewallRulesEngineServices.deleteEdgeFirewallRulesEngineService,
+          listFunctionsService: EdgeFirewallFunctionsServices.listFunctionsService,
+          createEdgeFirewallRulesEngineService:
+            EdgeFirewallRulesEngineServices.createEdgeFirewallRulesEngineService,
+          listWafRulesService: WafRulesServices.listWafRulesService,
           documentationService: Helpers.documentationCatalog.edgeFirewallRulesEngine
         }
       },

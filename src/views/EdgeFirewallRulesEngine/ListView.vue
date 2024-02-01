@@ -15,11 +15,23 @@
       type: Function,
       required: true
     },
+    createEdgeFirewallRulesEngineService: {
+      type: Function,
+      required: true
+    },
     listEdgeFirewallRulesEngineService: {
       type: Function,
       required: true
     },
     deleteEdgeFirewallRulesEngineService: {
+      type: Function,
+      required: true
+    },
+    listFunctionsService: {
+      type: Function,
+      required: true
+    },
+    listWafRulesService: {
       type: Function,
       required: true
     },
@@ -36,16 +48,20 @@
     return await props.listEdgeFirewallRulesEngineService({ edgeFirewallId: props.edgeFirewallId })
   }
   const createEdgeFirewallRulesEngineServiceWithDecorator = async (payload) => {
-    // eslint-disable-next-line no-console
-    console.log(payload)
-    return {
-      feedback: 'Criado com sucesso'
-    }
+    return await props.createEdgeFirewallRulesEngineService({
+      edgeFirewallId: props.edgeFirewallId,
+      payload
+    })
   }
   const deleteEdgeFirewallRulesEngineServiceWithDecorator = async (ruleEngineId) => {
     return await props.deleteEdgeFirewallRulesEngineService({
       edgeFirewallId: props.edgeFirewallId,
       ruleEngineId
+    })
+  }
+  const listFunctionsServiceWithDecorator = async () => {
+    return await props.listFunctionsService({
+      edgeFirewallID: props.edgeFirewallId
     })
   }
 
@@ -101,6 +117,8 @@
     ref="drawerRef"
     :edgeFirewallId="props.edgeFirewallId"
     :createService="createEdgeFirewallRulesEngineServiceWithDecorator"
+    :listFunctionsService="listFunctionsServiceWithDecorator"
+    :listWafRulesService="props.listWafRulesService"
     :loadService="() => {}"
     :editService="() => {}"
     @onSuccess="reloadList"

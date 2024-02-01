@@ -111,10 +111,10 @@
   >
     <template
       v-if="enableCustomLabel"
-      #value="slot"
+      #value="slotProps"
     >
       <span>
-        {{ getLabelBySelectedValue(slot.value) }}
+        {{ getLabelBySelectedValue(slotProps.value) }}
       </span>
     </template>
   </Dropdown>

@@ -1,6 +1,7 @@
 <script setup>
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
-  import FieldText from '@/templates/form-fields-inputs/fieldText'
+  import FieldText from '@/templates/form-fields-inputs/fieldText.vue'
+  import FieldNumber from '@/templates/form-fields-inputs/fieldNumber.vue'
   import FieldSwitch from '@/templates/form-fields-inputs/fieldSwitch'
   import FieldDropdown from '@/templates/form-fields-inputs/fieldDropdown.vue'
   import Divider from 'primevue/divider'
@@ -14,17 +15,30 @@
     name: 'edge-firewall-rules-engine-create-form-fields'
   })
 
+  const props = defineProps({
+    edgeFirewallFunctionsOptions: {
+      type: Array,
+      required: true
+    },
+    wafRulesOptions: {
+      type: Array,
+      required: true
+    }
+  })
+
+  const YEAR_IN_SECONDS = 31536000
   const DEFAULT_CRITERIA_OPTION = {
     variable: 'header_accept',
     operator: 'matches',
     conditional: 'if',
-    input_value: ''
+    argument: ''
   }
-
-  const { push: pushCriteria, remove: removeCriteria, fields: criteria } = useFieldArray('criteria')
-  const conditionalMenuRef = ref({})
-  const criteriaMenuRef = ref({})
-  const criteriaVariableAutoCompleteFieldOptions = ref([
+  const SSL_VERIFICATION_STATUS_OPTIONS = [
+    { label: 'Success', value: 'SUCCESS' },
+    { label: 'Certificate Verification Error', value: 'CERTIFICATE_VERIFICATION_ERROR' },
+    { label: 'Missing Client Certificate', value: 'MISSING_CLIENT_CERTIFICATE' }
+  ]
+  const CRITERIA_OPTIONS = [
     'header_accept',
     'header_accept_encoding',
     'header_accept_language',
@@ -34,9 +48,19 @@
     'header_user_agent',
     'host',
     'network',
-    'request_args'
-  ])
-  const variableItems = ref([])
+    'request_args',
+    'request_uri',
+    'request_method',
+    'scheme',
+    'ssl_verification_status',
+    'client_certificate_validation'
+  ]
+  const conditionalMenuRef = ref({})
+  const criteriaMenuRef = ref({})
+  const criteriaVariableAutoCompleteFieldOptions = ref(CRITERIA_OPTIONS)
+  const criteriaSuggestions = ref([])
+
+  const { push: pushCriteria, remove: removeCriteria, fields: criteria } = useFieldArray('criteria')
 
   const getOperatorsOptionsByCriteriaVariable = ({ criteriaIndex, criteriaInnerRowIndex }) => {
     const criteriaVariable = criteria.value[criteriaIndex].value[criteriaInnerRowIndex].variable
@@ -54,6 +78,14 @@
           { label: 'matches', value: 'matches' },
           { label: 'does not match', value: 'does_not_match' }
         ]
+      case 'request_method':
+      case 'scheme':
+      case 'ssl_verification_status':
+      case 'client_certificate_validation':
+        return [
+          { label: 'is equal', value: 'is_equal' },
+          { label: 'is not equal', value: 'is_not_equal' }
+        ]
       case 'host':
         return [
           { label: 'is equal', value: 'is_equal' },
@@ -62,6 +94,7 @@
           { label: 'does not match', value: 'does_not_match' }
         ]
       case 'request_args':
+      case 'request_uri':
         return [
           { label: 'is equal', value: 'is_equal' },
           { label: 'is not equal', value: 'is_not_equal' },
@@ -73,17 +106,6 @@
       default:
         break
     }
-
-    ;[
-      { label: 'is equal', value: 'is_equal' },
-      { label: 'is not equal', value: 'is_not_equal' },
-      { label: 'starts with', value: 'starts_with' },
-      { label: 'does not start with', value: 'does_not_start_with' },
-      { label: 'matches', value: 'matches' },
-      { label: 'does not match', value: 'does_not_match' },
-      { label: 'exists', value: 'exists' },
-      { label: 'does not exist', value: 'does_not_exist' }
-    ]
   }
 
   /**
@@ -117,20 +139,23 @@
    * @param {number} positions.conditionalIndex - The index of the conditional to be removed.
    * @returns {boolean}
    */
-  const showInputValueBySelectedOperator = ({ criteriaIndex, criteriaInnerRowIndex }) => {
-    const operator = criteria.value[criteriaIndex].value[criteriaInnerRowIndex].operator
+  const showArgumentBySelectedOperator = ({ criteriaIndex, criteriaInnerRowIndex }) => {
+    const criteriaRow = criteria.value[criteriaIndex].value[criteriaInnerRowIndex]
+    return (
+      criteriaRow.operator !== 'exists' &&
+      criteriaRow.operator !== 'does_not_exist' &&
+      criteriaRow.variable !== 'ssl_verification_status'
+    )
+  }
+  const showSSLStatusDropdownField = ({ criteriaIndex, criteriaInnerRowIndex }) => {
+    const criteriaVariable = criteria.value[criteriaIndex].value[criteriaInnerRowIndex].variable
 
-    return operator !== 'exists' && operator !== 'does_not_exist'
+    return criteriaVariable === 'ssl_verification_status'
   }
 
-  /**
-   * filter the variable autocomplete options based on the user's query.
-   * @param {Object} event - The event object containing the user's query.
-   * @param {string} event.query - The user's query.
-   */
-  const searchVariableOption = (event) => {
-    variableItems.value = criteriaVariableAutoCompleteFieldOptions.value.filter((item) =>
-      item.includes(event.query)
+  const generateCriteriaVariableSuggestions = (event) => {
+    criteriaSuggestions.value = criteriaVariableAutoCompleteFieldOptions.value.filter((option) =>
+      option.includes(event.query)
     )
   }
 
@@ -212,7 +237,7 @@
 
   const behaviorsOptions = computed(() => {
     const currentBehaviors = behaviors.value.map((item) => item.value.name)
-    const wafBehaviorIsAlreadySelected = currentBehaviors.includes('set_waf_ruleset')
+    const wafBehaviorIsAlreadySelected = currentBehaviors.includes('set_waf_ruleset_and_waf_mode')
     const runFunctionBehaviorIsAlreadySelected = currentBehaviors.includes('run_function')
 
     return [
@@ -220,7 +245,7 @@
       { value: 'drop', label: 'Drop (Close Without Response)', disabled: false },
       { value: 'set_rate_limit', label: 'Set Rate Limit', disabled: false },
       {
-        value: 'set_waf_ruleset',
+        value: 'set_waf_ruleset_and_waf_mode',
         label: 'Set WAF Rule Set',
         disabled: wafBehaviorIsAlreadySelected
       },
@@ -258,7 +283,7 @@
   }
 
   const handleAddBehavior = () => {
-    const EMPTY_DEFAULT_BEHAVIOR = { name: '', target: {} }
+    const EMPTY_DEFAULT_BEHAVIOR = { name: '' }
     pushBehavior(EMPTY_DEFAULT_BEHAVIOR)
     disableAddBehaviorButton.value = true
   }
@@ -283,7 +308,7 @@
         // desabilita sua seleção , evitando behavior igual
         break
       case 'run_function':
-      case 'set_waf_ruleset':
+      case 'set_waf_ruleset_and_waf_mode':
         // habilita botão de adicionar mais behavior
         // desabilita sua seleção , evitando behavior igual
         disableAddBehaviorButton.value = false
@@ -293,22 +318,6 @@
         break
     }
   }
-
-  // watch(
-  //   behaviors.value.length,
-  //   (newValue) => {
-  //     const selectedItems = newValue.map((item) => item.value.name)
-
-  //     const wafBehaviorIsSelected = selectedItems.includes('set_waf_ruleset')
-  //     const runFunctionBehaviorIsSelected = selectedItems.includes('run_function')
-
-  //     behaviorsOptions.value.at(3).disabled = wafBehaviorIsSelected
-  //     behaviorsOptions.value.at(4).disabled = runFunctionBehaviorIsSelected
-  //   },
-  //   {
-  //     deep: true
-  //   }
-  // )
 </script>
 <template>
   <FormHorizontal
@@ -384,8 +393,8 @@
                 <AutoComplete
                   :id="`criteria[${criteriaIndex}][${criteriaInnerRowIndex}].variable`"
                   v-model="criteria[criteriaIndex].value[criteriaInnerRowIndex].variable"
-                  :suggestions="variableItems"
-                  @complete="searchVariableOption"
+                  :suggestions="criteriaSuggestions"
+                  @complete="generateCriteriaVariableSuggestions"
                   :completeOnFocus="true"
                 />
               </div>
@@ -409,9 +418,19 @@
 
             <div class="flex flex-col sm:max-w-lg w-full gap-2">
               <FieldText
-                v-if="showInputValueBySelectedOperator({ criteriaIndex, criteriaInnerRowIndex })"
-                :name="`criteria[${criteriaIndex}][${criteriaInnerRowIndex}].input_value`"
-                :value="criteria[criteriaIndex].value[criteriaInnerRowIndex].input_value"
+                v-if="showArgumentBySelectedOperator({ criteriaIndex, criteriaInnerRowIndex })"
+                :name="`criteria[${criteriaIndex}][${criteriaInnerRowIndex}].argument`"
+                :value="criteria[criteriaIndex].value[criteriaInnerRowIndex].argument"
+                inputClass="w-full"
+              />
+              <FieldDropdown
+                v-if="showSSLStatusDropdownField({ criteriaIndex, criteriaInnerRowIndex })"
+                :name="`criteria[${criteriaIndex}][${criteriaInnerRowIndex}].argument`"
+                :options="SSL_VERIFICATION_STATUS_OPTIONS"
+                placeholder="Select an SSL Status"
+                optionLabel="label"
+                optionValue="value"
+                v-bind:value="criteria[criteriaIndex].value[criteriaInnerRowIndex].argument"
                 inputClass="w-full"
               />
             </div>
@@ -516,13 +535,14 @@
           />
         </div>
 
-        <div class="flex gap-2 mt-6 mb-8">
-          <div class="w-1/2">
+        <div class="flex gap-3 mt-6 mb-8 max-sm:flex-wrap">
+          <div class="w-1/2 max-sm:w-full">
             <FieldDropdown
               :enableWorkaroundLabelToDisabledOptions="true"
-              :key="behaviorItem.key"
+              :key="`${behaviorItem.key}-name`"
               :name="`behaviors[${behaviorItemIndex}].name`"
               :options="behaviorsOptions"
+              placeholder="Select a behavior"
               optionLabel="label"
               optionValue="value"
               optionDisabled="disabled"
@@ -536,6 +556,136 @@
                   })
               "
             />
+          </div>
+          <div class="w-1/2 max-sm:w-full">
+            <template v-if="behaviors[behaviorItemIndex].value.name === 'run_function'">
+              <FieldDropdown
+                :key="`${behaviorItem.key}-run-function`"
+                :name="`behaviors[${behaviorItemIndex}].functionId`"
+                :options="props.edgeFirewallFunctionsOptions"
+                placeholder="Select an function"
+                optionLabel="name"
+                optionValue="id"
+                v-bind:value="behaviors[behaviorItemIndex].value.functionId"
+                inputClass="w-full mb-3"
+              />
+            </template>
+
+            <template
+              v-if="behaviors[behaviorItemIndex].value.name === 'set_waf_ruleset_and_waf_mode'"
+            >
+              <FieldDropdown
+                :key="`${behaviorItem.key}-waf_id`"
+                :name="`behaviors[${behaviorItemIndex}].waf_id`"
+                :options="wafRulesOptions"
+                placeholder="Select a waf rule"
+                optionLabel="name"
+                optionValue="id"
+                v-bind:value="behaviors[behaviorItemIndex].value.waf_id"
+                inputClass="w-full mb-3"
+              />
+              <FieldDropdown
+                :key="`${behaviorItem.key}-mode`"
+                :name="`behaviors[${behaviorItemIndex}].mode`"
+                :options="[
+                  {
+                    label: 'Learning',
+                    value: 'learning'
+                  },
+                  {
+                    label: 'Blocking',
+                    value: 'blocking'
+                  }
+                ]"
+                placeholder="Select a waf mode"
+                optionLabel="label"
+                optionValue="value"
+                v-bind:value="behaviors[behaviorItemIndex].value.mode"
+                inputClass="w-full"
+              />
+            </template>
+
+            <template v-if="behaviors[behaviorItemIndex].value.name === 'set_rate_limit'">
+              <FieldDropdown
+                :key="`${behaviorItem.key}-type`"
+                placeholder="Select rate limit type"
+                :name="`behaviors[${behaviorItemIndex}].type`"
+                :options="[
+                  { label: 'Req/s', value: 'second' },
+                  { label: 'Req/min', value: 'minute' }
+                ]"
+                optionLabel="label"
+                optionValue="value"
+                optionDisabled="disabled"
+                v-bind:value="behaviors[behaviorItemIndex].value.type"
+                inputClass="w-full mb-3"
+              />
+
+              <FieldNumber
+                id="`behaviors[${behaviorItemIndex}].average_rate_limit`"
+                :key="`${behaviorItem.key}-averageRateLimit`"
+                placeholder="Average Rate limit"
+                inputClass="w-full mb-3"
+                :name="`behaviors[${behaviorItemIndex}].average_rate_limit`"
+                :min="0"
+                :max="YEAR_IN_SECONDS"
+                :step="1"
+              />
+
+              <FieldDropdown
+                :key="`${behaviorItem.key}-limitBy`"
+                placeholder="Select limit by"
+                :name="`behaviors[${behaviorItemIndex}].limit_by`"
+                :options="[
+                  { label: 'Client IP address', value: 'client_ip' },
+                  { label: 'Global', value: 'global' }
+                ]"
+                optionLabel="label"
+                optionValue="value"
+                optionDisabled="disabled"
+                v-bind:value="behaviors[behaviorItemIndex].value.limit_by"
+                inputClass="w-full mb-3"
+              />
+
+              <template v-if="behaviors[behaviorItemIndex].value.type === 'second'">
+                <FieldNumber
+                  id="`behaviors[${behaviorItemIndex}].maximum_burst_size`"
+                  :key="`${behaviorItem.key}-maximumBurstSize`"
+                  placeholder="Maximum Burst Size"
+                  inputClass="w-full mb-3"
+                  :name="`behaviors[${behaviorItemIndex}].maximum_burst_size`"
+                  :min="0"
+                  :step="1"
+                />
+              </template>
+            </template>
+
+            <template v-if="behaviors[behaviorItemIndex].value.name === 'set_custom_response'">
+              <FieldNumber
+                id="`behaviors[${behaviorItemIndex}].status_code`"
+                :key="`${behaviorItem.key}-status_code`"
+                placeholder="Status code"
+                inputClass="w-full mb-3"
+                :name="`behaviors[${behaviorItemIndex}].status_code`"
+                :min="200"
+                :max="499"
+              />
+
+              <FieldText
+                id="`behaviors[${behaviorItemIndex}].content_type`"
+                :key="`${behaviorItem.key}-content_type`"
+                placeholder="Content Type"
+                inputClass="w-full mb-3"
+                :name="`behaviors[${behaviorItemIndex}].content_type`"
+              />
+              <FieldText
+                id="`behaviors[${behaviorItemIndex}].content_body`"
+                :key="`${behaviorItem.key}-content_body`"
+                placeholder="Content Body"
+                inputClass="w-full mb-3"
+                :name="`behaviors[${behaviorItemIndex}].content_body`"
+              />
+            </template>
           </div>
         </div>
       </div>
