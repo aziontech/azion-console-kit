@@ -57,7 +57,7 @@
     {
       label: 'Intelligent DNS',
       to: '/intelligent-dns/create',
-      description: 'Add an authoritative DNS server for a domain by copying nameservers values.'
+      description: 'Use an authoritative DNS server to host a domain.'
     },
     {
       label: 'Edge Firewall',
