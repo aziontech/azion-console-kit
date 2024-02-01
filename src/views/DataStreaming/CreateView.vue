@@ -64,7 +64,7 @@
     }),
     payloadFormat: yup.string().when('endpoint', {
       is: 'standard',
-      then: (schema) => schema.required('Format is a required field')
+      then: (schema) => schema.required('Payload Format is a required field')
     }),
 
     // Kafka
