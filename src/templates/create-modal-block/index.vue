@@ -92,7 +92,8 @@
     {
       label: 'Network Lists',
       to: '/network-lists/create',
-      description: 'Add  allowlists, blocklists, and greylists to use with rule sets on Rules Engine.'
+      description:
+        'Add  allowlists, blocklists, and greylists to use with rule sets on Rules Engine.'
     }
   ])
 
