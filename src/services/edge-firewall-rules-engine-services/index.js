@@ -3,8 +3,14 @@ import { deleteEdgeFirewallRulesEngineService } from './delete-edge-firewall-rul
 
 import { createEdgeFirewallRulesEngineService } from './create-edge-firewall-rules-engine-service'
 
+import { loadEdgeFirewallRulesEngineService } from './load-edge-firewall-rules-engine-service'
+
+import { editEdgeFirewallRulesEngineService } from './edit-edge-firewall-rules-engine-service'
+
 export {
   listEdgeFirewallRulesEngineService,
   deleteEdgeFirewallRulesEngineService,
-  createEdgeFirewallRulesEngineService
+  createEdgeFirewallRulesEngineService,
+  loadEdgeFirewallRulesEngineService,
+  editEdgeFirewallRulesEngineService
 }
