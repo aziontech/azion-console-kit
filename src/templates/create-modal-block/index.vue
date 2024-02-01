@@ -42,57 +42,57 @@
     {
       label: 'Domains',
       to: '/domains/create',
-      description: 'Select this card to start creating a new resource.'
+      description: 'Launch an edge application and set up security with digital certificates.'
     },
     {
       label: 'Edge Application',
       to: '/edge-applications/create',
-      description: 'Select this card to start creating a new resource.'
+      description: 'Deploy an edge application to deliver content from the edge.'
     },
     {
       label: 'Variables',
       to: '/variables/create',
-      description: 'Select this card to start creating a new resource.'
+      description: 'Create environment variables or secrets to use with configured edge functions.'
     },
     {
       label: 'Intelligent DNS',
       to: '/intelligent-dns/create',
-      description: 'Select this card to start creating a new resource.'
+      description: 'Add an authoritative DNS server for a domain by copying nameservers values.'
     },
     {
       label: 'Edge Firewall',
       to: '/edge-firewall/create',
-      description: 'Select this card to start creating a new resource.'
+      description: 'Create security settings to protect applications against threats and attacks.'
     },
     {
       label: 'Edge Nodes',
       to: '/edge-node/create',
-      description: 'Select this card to start creating a new resource.'
+      description: 'Create edge infrastructure, installing services and resources in real time.'
     },
     {
       label: 'Data Streaming',
       to: '/data-streaming/create',
-      description: 'Select this card to start creating a new resource.'
+      description: 'Feed streamimg, SIEM, and big data platforms with the event logs from Azion.'
     },
     {
       label: 'Edge Functions',
       to: '/edge-functions/create',
-      description: 'Select this card to start creating a new resource.'
+      description: 'Create edge functions to use with Edge Application or Edge Firewall.'
     },
     {
       label: 'Edge Services',
       to: '/edge-services/create',
-      description: 'Select this card to start creating a new resource.'
+      description: 'Create new services to define dependencies between edge resources.'
     },
     {
       label: 'Digital Certificates',
       to: '/digital-certificates/create',
-      description: 'Select this card to start creating a new resource.'
+      description: 'Add a digital certificate entry to secure HTTPS edge applications.'
     },
     {
       label: 'Network Lists',
       to: '/network-lists/create',
-      description: 'Select this card to start creating a new resource.'
+      description: 'Add  allowlists, blocklists, and greylists to use with rule sets on Rules Engine.'
     }
   ])
 
