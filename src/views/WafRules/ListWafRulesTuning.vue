@@ -202,7 +202,7 @@
   const timeName = computed(
     () => timeOptions.value.find((item) => item.value === selectedFilter.value.hourRange).name
   )
-  
+
   const netWorkListName = computed(() => {
     if (selectedFilter.value.network?.id) {
       return netWorkListOptions.value.options.find(
@@ -211,7 +211,6 @@
     }
     return ''
   })
-  
 
   const listFields = ref([
     {
