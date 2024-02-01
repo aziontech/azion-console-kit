@@ -75,6 +75,7 @@
       {
         field: 'domainName',
         header: 'Domain Name',
+        filterPath: 'domainName.content',
         type: 'component',
         component: (columnData) => {
           return columnBuilder({
@@ -94,6 +95,7 @@
         field: 'active',
         sortField: 'activeSort',
         header: 'Status',
+        filterPath: 'active.content',
         type: 'component',
         component: (columnData) =>
           columnBuilder({

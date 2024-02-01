@@ -97,6 +97,7 @@
             field: 'domain',
             header: 'Domain',
             type: 'component',
+            filterPath: 'domain.content',
             component: (columnData) => {
               return columnBuilder({
                 data: columnData,
@@ -111,6 +112,7 @@
             field: 'status',
             header: 'Status',
             type: 'component',
+            filterPath: 'status.content',
             component: (columnData) =>
               columnBuilder({
                 data: columnData,

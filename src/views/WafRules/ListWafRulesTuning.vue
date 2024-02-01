@@ -89,6 +89,7 @@
     :listService="handleListWafRulesTuningAttacksService"
     :tuningObject="tuningSelected"
     :domains="domainNames"
+    :netWorkList="netWorkListName"
     :time="timeName"
     @attack-on="createAllowedByAttack"
   >
@@ -201,6 +202,16 @@
   const timeName = computed(
     () => timeOptions.value.find((item) => item.value === selectedFilter.value.hourRange).name
   )
+  
+  const netWorkListName = computed(() => {
+    if (selectedFilter.value.network?.id) {
+      return netWorkListOptions.value.options.find(
+        (network) => network.value.id === selectedFilter.value.network?.id
+      ).name
+    }
+    return ''
+  })
+  
 
   const listFields = ref([
     {
@@ -419,11 +430,13 @@
     dataFilted.value = response
   }
 
-  const handleListWafRulesTuningAttacksService = async () => {
+  const handleListWafRulesTuningAttacksService = async (path = '') => {
     const domainsId = encodeURIComponent(selectedFilter.value.domains)
     const matchesOn = `matches_on=${tuningSelected.value.matchesOn}`
     const matchesZone = `match_zone=${tuningSelected.value.matchZone}`
-    const query = `?hour_range=${selectedFilter.value.hourRange}&domains_ids=${domainsId}&${matchesOn}&${matchesZone}`
+    const pathsList = path ? `&paths_list=${path}` : ''
+
+    const query = `?hour_range=${selectedFilter.value.hourRange}&domains_ids=${domainsId}&${matchesOn}&${matchesZone}${pathsList}`
 
     return await props.listWafRulesTuningAttacksService({
       wafId: wafRuleId.value,

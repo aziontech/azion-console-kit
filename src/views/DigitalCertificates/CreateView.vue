@@ -95,7 +95,8 @@
     organizationUnity: '',
     email: '',
     privateKeyType: 'RSA (2048)',
-    subjectAlternativeNames: ''
+    subjectAlternativeNames: '',
+    certificateType: 'edge_certificate'
   })
 
   const certificateRequiredField = (certificateType) => {

@@ -92,8 +92,8 @@
       ></ListTableBlock>
       <EmptyResultsBlock
         v-else
-        title="No data streaming has been created"
-        description="Click the button below to initiate the setup process and create your first data streaming."
+        title="No stream has been created"
+        description="Click the button below to initiate the setup process and create your first stream."
         createButtonLabel="Add"
         createPagePath="data-streaming/create"
         :documentationService="documentationService"

@@ -1,7 +1,7 @@
 <template>
   <FormHorizontal
     title="General"
-    description="description"
+    description="Create a data streaming to feed your data platforms with logs from your applications."
   >
     <template #inputs>
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
@@ -13,8 +13,12 @@
         <InputText
           v-model="name"
           type="text"
+          placeholder="My stream"
           :class="{ 'p-invalid': nameError }"
         />
+        <small class="text-xs text-color-secondary font-normal leading-tight">
+                Give a unique and easy-to-remember name.</small
+                >
         <small
           id="name-help"
           class="p-error"
@@ -26,7 +30,7 @@
 
   <FormHorizontal
     title="Data Settings"
-    description="Description"
+    description="Define the source and the variables from which data should be collected."
   >
     <template #inputs>
       <div class="flex flex-wrap gap-6">
@@ -34,7 +38,7 @@
           <label
             for="dataSource"
             class="text-color text-base font-medium"
-            >Data Source *</label
+            >Source *</label
           >
           <Dropdown
             :class="{ 'p-invalid': dataSourceError }"
@@ -45,8 +49,7 @@
             class="w-full"
           />
           <small class="text-color-secondary text-xs font-normal leading-tight">
-            Data Source is the Azion Platform that generates the events from where you want to
-            collect data.
+            Represents the data source the data will be collected from.
           </small>
         </div>
 
@@ -65,8 +68,7 @@
             class="w-full"
           />
           <small class="text-color-secondary text-xs font-normal leading-tight">
-            You can use a preset of data, or you can customize the format by choosing the Custom
-            Template.
+            Represents a preset of variables for specific sources or an open template to choose variables.
           </small>
         </div>
       </div>
@@ -85,15 +87,14 @@
           class="min-h-[100px] surface-border border rounded-sm overflow-hidden"
         />
         <small class="text-color-secondary text-xs font-normal leading-tight">
-          Data Set is a format chosen to send the data to your endpoint. It must be a valid JSON
-          format. The requests are separated from each other by \n character.
+          Exhibits or allows writing the variables that'll be sent to the connector in a JSON format.
         </small>
       </div>
     </template>
   </FormHorizontal>
   <FormHorizontal
     title="Domains"
-    description="Description"
+    description="Associate domains with this stream to define the addresses from which the data will be collected."
   >
     <template #inputs>
       <div class="flex flex-col gap-2">
@@ -107,7 +108,7 @@
               value="1"
             />
             <label class="text-color text-sm font-normal leading-tight"
-              >All domains and upcoming</label
+              >All Current and Future Domains</label
             >
           </div>
           <div class="flex no-wrap gap-2 items-center">
@@ -120,7 +121,7 @@
             <label class="text-color text-sm font-normal leading-tight">Filter Domains </label>
           </div>
           <small class="text-color-secondary text-xs font-normal leading-tight"
-            >In case you select the All Domains option, you can activate the Sampling option</small
+            >By selecting the All Current and Future option, you can activate the Sampling option.</small
           >
         </div>
       </div>
@@ -132,7 +133,7 @@
         <label
           for="domains"
           class="text-color text-base font-medium"
-          >Domains</label
+          >Domains *</label
         >
         <PickList
           v-model="domains"
@@ -157,7 +158,7 @@
         </PickList>
 
         <small class="text-color-secondary text-sm font-normal leading-tight">
-          Hold <code>command</code> or <code>ctrl</code> to select multiple items.
+          Select an item from the list and then use the arrows to move it between the available and selected domains boxes. Use the double-line arrows to move all items.
         </small>
       </div>
     </template>
@@ -165,7 +166,7 @@
   <FormHorizontal
     v-if="domainOption === '1'"
     title="Sampling"
-    description="Enable this option to reduce costs of data collection and analysis"
+    description="Enable this option to reduce costs of data collection and analysis."
   >
     <template #inputs>
       <div class="flex flex-col w-full gap-8">
@@ -186,7 +187,7 @@
             </div>
             <div class="flex-col gap-1 pl-10">
               <p class="text-color-secondary text-sm font-normal">
-                Once enabled, you can only have one active data streaming in your account. If it's
+                Once enabled, you can only have one active stream in your account. If it's
                 later disabled, the Add option will become available again on the creation page.
               </p>
             </div>
@@ -199,7 +200,7 @@
           <label
             for="samplingPercentage"
             class="text-color text-base font-medium"
-            >Sampling Percentage(%)</label
+            >Sampling Percentage (%)</label
           >
           <InputNumber
             v-model="samplingPercentage"
@@ -222,20 +223,21 @@
           severity="warn"
           v-if="hasSampling"
         >
-          After activating and saving these settings, all other data streamings will become
+          After activating and saving these settings, all other streams will become
           inactive.
         </InlineMessage>
       </div>
     </template>
   </FormHorizontal>
 
-  <FormHorizontal title="Destination">
+  <FormHorizontal title="Destination"
+            description="Define to which data platform your collected data will be sent to. All fields must be filled in with information provided by the third-party platform.">
     <template #inputs>
       <div class="flex flex-col w-full sm:max-w-xs gap-2">
         <label
           for="id"
           class="text-color text-base font-medium"
-          >Endpoint Type *</label
+          >Connector *</label
         >
         <Dropdown
           :class="{ 'p-invalid': templateError }"
@@ -245,6 +247,9 @@
           optionValue="value"
           class="w-full"
         />
+        <small class="text-color-secondary text-sm font-normal leading-tight">
+                  Each option represents a different platform and requires different values.
+                </small>
       </div>
 
       <!-- Specific Sections for Different Endpoints -->
@@ -257,7 +262,7 @@
           <label
             for="endpointURL"
             class="text-color text-base font-medium"
-            >Endpoint URL *</label
+            >URL *</label
           >
           <InputText
             v-model="endpointUrl"
@@ -267,7 +272,7 @@
             :class="{ 'p-invalid': endpointUrlError }"
           />
           <small class="text-color-secondary text-xs font-normal leading-tight">
-            The URL to receive the collected data from Data Streaming.
+            Specific URL that'll receive the collected data.
           </small>
           <small
             id="endpoint-url-help"
@@ -291,7 +296,7 @@
               v-model="header.value"
               type="text"
               id="header-value"
-              placeholder="Value"
+              placeholder="header-name:value"
             />
             <ButtonPrimer
               icon="pi pi-trash"
@@ -333,7 +338,7 @@
             cols="30"
           />
           <small class="text-color-secondary text-xs font-normal leading-tight">
-            The list of host and port (comma-separated) from Kafka brokers.
+            List of hosts and ports in a Kafka cluster. Separate items by comma and no space.
           </small>
           <small
             id="bootstrap-servers-help"
@@ -351,11 +356,12 @@
           <InputText
             v-model="kafkaTopic"
             id="kafkaTopic"
+            placeholder="analytics.fct.pageviews.0"
             type="text"
             :class="{ 'p-invalid': kafkaTopicError }"
           />
           <small class="text-color-secondary text-xs font-normal leading-tight">
-            The topic name from Kafka brokers.
+            Name of the topic in a Kafka cluster.
           </small>
           <small
             id="kafka-topic-help"
@@ -375,11 +381,10 @@
             <label
               for="tlsOption"
               class="text-sm font-normal leading-tight"
-              >Use Transport Layer Security (TLS)</label
+              >Enable Transport Layer Security (TLS)</label
             >
             <small class="text-color-secondary text-sm font-normal leading-tight">
-              If you need secure logging, use Transport Layer Security (TLS). Make sure your server
-              uses a trusted CA certificate.
+              Send encrypted data to secure communication. Make sure the receiving connector uses a trusted CA certificate.
             </small>
           </div>
         </div>
@@ -394,16 +399,16 @@
           <label
             for="hostURL"
             class="text-color text-base font-medium"
-            >Host URL *</label
+            >URL *</label
           >
           <InputText
             v-model="host"
             type="text"
+            placeholder="https://myownhost.s3.us-east-1.myprovider.com"
             :class="{ 'p-invalid': hostError }"
           />
           <small class="text-color-secondary text-sm font-normal leading-tight">
-            The URL of your S3 host. You may connect with every provider that works with S3
-            protocol, for example: AWS, Google Cloud Plataform, Azion, etc..
+            Specific URL that'll receive the collected data. Accepts all providers that work with an S3 protocol.
           </small>
           <small
             id="host-help"
@@ -421,10 +426,11 @@
           <InputText
             v-model="bucket"
             type="text"
+            placeholder="mys3bucket"
             :class="{ 'p-invalid': bucketError }"
           />
           <small class="text-color-secondary text-sm font-normal leading-tight">
-            The name of your S3 bucket.
+            Name of the bucket to which the object will be sent.
           </small>
           <small
             id="bucket-help"
@@ -442,10 +448,11 @@
           <InputText
             v-model="region"
             type="text"
+            placeholder="us-east-1"
             :class="{ 'p-invalid': regionError }"
           />
           <small class="text-color-secondary text-sm font-normal leading-tight">
-            The region of your S3 bucket.
+            Region in which your bucket is hosted.
           </small>
           <small
             id="region-help"
@@ -468,9 +475,10 @@
             :class="{ 'p-invalid': accessKeyError }"
             :feedback="false"
             toggleMask
+            placeholder="ORIA5ZEH9MW4NL5OITY4"
           />
           <small class="text-color-secondary text-sm font-normal leading-tight">
-            The access key of your S3 bucket.
+            Public key to access the bucket.
           </small>
           <small
             id="access-key-help"
@@ -489,13 +497,14 @@
             id="secretKey"
             v-model="secretKey"
             type="text"
+            placeholder="+PLjkUWJyOLth3anuWXcLLVrMLeiiiThIokaPEiw"
             class="flex flex-col w-full"
             :class="{ 'p-invalid': secretKeyError }"
             :feedback="false"
             toggleMask
           />
           <small class="text-color-secondary text-sm font-normal leading-tight">
-            The secret key of your S3 bucket.
+            Secret key to access the bucket.
           </small>
           <small
             id="secret-key-help"
@@ -514,13 +523,14 @@
             id="objectKey"
             v-model="objectKey"
             type="text"
+            placeholder="waf_logs_1622575860091_37d66e78-c308-4006-9d4d-1c013ed89276"
             class="flex flex-col w-full"
             :class="{ 'p-invalid': objectKeyError }"
             :feedback="false"
             toggleMask
           />
           <small class="text-color-secondary text-sm font-normal leading-tight">
-            The format of the object that will be created in your S3 bucket.
+            Prefix added to the name of the uploaded object to appear on the files that'll be sent. Composed of Prefix + Timestamp + UUID.
           </small>
           <small
             id="object-key-help"
@@ -530,7 +540,7 @@
         </div>
 
         <div class="flex flex-col gap-2">
-          <label class="text-color text-sm font-medium leading-tight">Content Type</label>
+          <label class="text-color text-sm font-medium leading-tight">Content Type *</label>
           <div class="flex flex-col gap-3">
             <div
               class="flex no-wrap gap-2 items-center"
@@ -566,10 +576,11 @@
           <InputText
             v-model="projectID"
             type="text"
+            placeholder="mycustomGBQproject01"
             :class="{ 'p-invalid': projectIDError }"
           />
           <small class="text-color-secondary text-sm font-normal leading-tight">
-            The ID of your project in Google Cloud.
+            ID of the project in Google Cloud.
           </small>
 
           <small
@@ -588,10 +599,11 @@
           <InputText
             v-model="datasetID"
             type="text"
+            placeholder="myGBQdataset"
             :class="{ 'p-invalid': datasetIDError }"
           />
           <small class="text-color-secondary text-sm font-normal leading-tight">
-            The ID of your dataset created on Google BigQuery.
+            Name of the dataset created on Google BigQuery. Case sensitive field.
           </small>
           <small
             id="dataset-id-help"
@@ -609,10 +621,11 @@
           <InputText
             v-model="tableID"
             type="text"
+            placeholder="mypagaviewtable01"
             :class="{ 'p-invalid': tableIDError }"
           />
           <small class="text-color-secondary text-sm font-normal leading-tight">
-            The ID of your table that will receive the streamed data.
+            Name of the table on Google BigQuery.
           </small>
           <small
             id="table-id-help"
@@ -635,7 +648,7 @@
             class="min-h-[100px] surface-border border rounded-md overflow-hidden"
           />
           <small class="text-color-secondary text-sm font-normal leading-tight">
-            The JSON file with the key that will be used to authenticate with Google services.
+            JSON file provided by Google Cloud used to authenticate with Google services.
           </small>
           <small
             id="service-account-key-help"
@@ -654,17 +667,16 @@
           <label
             for="elasticSearchURL"
             class="text-color text-base font-medium"
-            >Elasticsearch URL *</label
+            >URL *</label
           >
           <InputText
             v-model="elasticsearchUrl"
             type="text"
-            placeholder="https://elasticsearch-domain.com/index"
+            placeholder="https://elasticsearch-domain.com/myindex"
             :class="{ 'p-invalid': elasticsearchUrlError }"
           />
           <small class="text-color-secondary text-sm font-normal leading-tight">
-            The URL plus the index of the Elasticsearch to receive the collected data from Data
-            Streaming.
+            URL address plus the Elasticsearch index that'll receive the collected data.
           </small>
           <small
             id="elastic-search-url-help"
@@ -682,12 +694,13 @@
           <TextArea
             id="apiKey"
             v-model="apiKey"
+            placeholder="VuaCfGcBCdbkQm-e5aOx:ui2lp2axTNmsyakw9tvNnw"
             :class="{ 'p-invalid': apiKeyError }"
             rows="5"
             cols="30"
           />
           <small class="text-color-secondary text-sm font-normal leading-tight">
-            The API Key in base64 used for Elasticsearch authorization.
+            API key used for Elasticsearch authorization in base64 encode format.
           </small>
           <small
             id="api-key-help"
@@ -706,7 +719,7 @@
           <label
             for="splunkURL"
             class="text-color text-base font-medium"
-            >Splunk URL *</label
+            >URL *</label
           >
           <InputText
             v-model="splunkUrl"
@@ -715,8 +728,7 @@
             :class="{ 'p-invalid': splunkUrlError }"
           />
           <small class="text-color-secondary text-sm font-normal leading-tight">
-            The URL that will receive the collected data from Data Streaming, if you have an
-            alternative index to point, you can do at the end of the URL.
+            URL that'll receive the collected data. If you have an alternative index to point, add it at the end of the URL.
           </small>
           <small
             id="splunk-url-help"
@@ -733,12 +745,13 @@
           >
           <TextArea
             v-model="splunkApiKey"
+            placeholder="crfe25d2-23j8-48gf-a9ks-6b75w3ska674"
             :class="{ 'p-invalid': splunkApiKeyError }"
             rows="5"
             cols="30"
           />
           <small class="text-color-secondary text-sm font-normal leading-tight">
-            The HTTP Event Collector Token, provided by your Splunk installation.
+            HTTP Event Collector Token provided during the Splunk installation.
           </small>
           <small
             id="splunk-api-key-help"
@@ -762,10 +775,11 @@
           <InputText
             v-model="streamName"
             type="text"
+            placeholder="MyKDFConnector"
             :class="{ 'p-invalid': streamNameError }"
           />
           <small class="text-color-secondary text-sm font-normal leading-tight">
-            The name of your delivery Kinesis Firehose stream.
+            Delivery stream name.
           </small>
           <small
             id="stream-name-help"
@@ -778,15 +792,16 @@
           <label
             for="region"
             class="text-color text-base font-medium"
-            >Country / Region *</label
+            >Region *</label
           >
           <InputText
             v-model="awsRegion"
             type="text"
+            placeholder="us-east-1"
             :class="{ 'p-invalid': awsRegionError }"
           />
           <small class="text-color-secondary text-sm font-normal leading-tight">
-            The region of your S3 bucket.
+            Region where the Amazon Kinesis instance is running.
           </small>
           <small
             id="aws-region-help"
@@ -805,13 +820,14 @@
             id="awsAccessKey"
             v-model="awsAccessKey"
             type="text"
+            placeholder="ORIA5ZEH9MW4NL5OITY4"
             class="flex flex-col w-full"
             :class="{ 'p-invalid': awsAccessKeyError }"
             :feedback="false"
             toggleMask
           />
           <small class="text-color-secondary text-sm font-normal leading-tight">
-            The access key of your Kinesis Firehose stream.
+            Public key to access the Data Firehose given by AWS.
           </small>
           <small
             id="aws-access-key-help"
@@ -830,13 +846,14 @@
             id="awsSecretKey"
             v-model="awsSecretKey"
             type="text"
+            placeholder="+PLjkUWJyOLth3anuWXcLLVrMLeiiiThIokaPEiw"
             class="flex flex-col w-full"
             :class="{ 'p-invalid': awsSecretKeyError }"
             :feedback="false"
             toggleMask
           />
           <small class="text-color-secondary text-sm font-normal leading-tight">
-            The secret key of your Kinesis Firehose stream.
+            Secret key to access the Data Firehose given by AWS.
           </small>
           <small
             id="aws-secret-key-help"
@@ -855,7 +872,7 @@
           <label
             for="datadogURL"
             class="text-color text-base font-medium"
-            >Datadog URL *</label
+            >URL *</label
           >
           <InputText
             v-model="datadogUrl"
@@ -864,7 +881,7 @@
             :class="{ 'p-invalid': datadogUrlError }"
           />
           <small class="text-color-secondary text-sm font-normal leading-tight">
-            The URI that will receive the collected data from Data Streaming.
+            URL or URI of the Datadog endpoint.
           </small>
           <small
             id="datadog-url-help"
@@ -882,14 +899,13 @@
           <TextArea
             id="datadogApiKey"
             v-model="datadogApiKey"
+            placeholder="ij9076f1ujik17a81f938yhru5g713422"
             :class="{ 'p-invalid': datadogApiKeyError }"
             rows="5"
             cols="30"
           />
           <small class="text-color-secondary text-sm font-normal leading-tight">
-            API Keys are generated through the Datadog panel and they're unique to your
-            organization. An API Key is required by the Datadog agent to submit metrics and events
-            to Datadog.
+            API key generated through the Datadog dashboard.
           </small>
           <small
             id="datadog-api-key-help"
@@ -908,16 +924,16 @@
           <label
             for="QRadarURL"
             class="text-color text-base font-medium"
-            >QRadar URL *</label
+            >URL *</label
           >
           <InputText
             v-model="QRadarUrl"
             type="text"
-            placeholder="https://qradar-trial-abcdef.qradar.ibmcloud.com:123456"
+            placeholder="http://137.15.824.10:14440"
             :class="{ 'p-invalid': QRadarUrlError }"
           />
           <small class="text-color-secondary text-sm font-normal leading-tight">
-            The URL that will receive the collected data from Data Streaming.
+            Specific URL that'll receive the collected data.
           </small>
           <small
             id="qradar-url-help"
@@ -942,11 +958,11 @@
             id="logType"
             v-model="logType"
             type="text"
+            placeholder="AzureMonitorTest"
             :class="{ 'p-invalid': logTypeError }"
           />
           <small class="text-color-secondary text-sm font-normal leading-tight">
-            Specify the record type of the data that's being submitted. It can contain only letters,
-            numbers, and the underscore (_) character, and it can't exceed 100 characters.
+            Record type of the data that's being submitted. Accepts only letters, numbers, and the underscore (_) character, and it can't exceed 100 characters.
           </small>
           <small
             id="log-type-help"
@@ -965,13 +981,14 @@
             id="sharedKey"
             v-model="sharedKey"
             type="text"
+            placeholder="OiA9AdGr4As5Iujg5FAHsTWfawxOD4"
             class="flex flex-col w-full"
             :class="{ 'p-invalid': sharedKeyError }"
             :feedback="false"
             toggleMask
           />
           <small class="text-color-secondary text-sm font-normal leading-tight">
-            The Shared Key of the Workspace.
+            Shared Key of the Workspace.
           </small>
           <small
             id="shared-key-help"
@@ -989,11 +1006,11 @@
           <InputText
             id="timeGeneratedField"
             v-model="generatedField"
+            placeholder="myCustomTimeField"
             type="text"
           />
           <small class="text-color-secondary text-sm font-normal leading-tight">
-            The field that will be used for the TimeGenerated field. When not specified, It'll use
-            the ingestion time.
+            Specifies how long it’ll take for the log to be available after collection. Uses ingestion time if not specified.
           </small>
         </div>
 
@@ -1007,10 +1024,11 @@
             id="workspaceID"
             v-model="workspaceID"
             type="text"
+            placeholder="kik73154-0426-464c-aij3-eg6d24u87c50"
             :class="{ 'p-invalid': workspaceIDError }"
           />
           <small class="text-color-secondary text-sm font-normal leading-tight">
-            The ID of your Workspace.
+            ID of the Workspace.
           </small>
           <small
             id="workspace-id-help"
@@ -1035,10 +1053,11 @@
             id="storageAccount"
             v-model="storageAccount"
             type="text"
+            placeholder="mystorageaccount"
             :class="{ 'p-invalid': storageAccountError }"
           />
           <small class="text-color-secondary text-sm font-normal leading-tight">
-            The storage account of your Azure Blob Storage.
+            Name of the storage account.
           </small>
           <small
             id="storage-account-help"
@@ -1057,10 +1076,11 @@
             id="containerName"
             v-model="containerName"
             type="text"
+            placeholder="mycontainer"
             :class="{ 'p-invalid': containerNameError }"
           />
           <small class="text-color-secondary text-sm font-normal leading-tight">
-            The name of your Azure Blob Storage container.
+            Name of the container.
           </small>
           <small
             id="container-name-help"
@@ -1079,10 +1099,11 @@
             id="blobToken"
             v-model="blobToken"
             type="text"
+            placeholder="sp=oiuwdl&st=2022-04-14T18:05:08Z&se=2026-03-02T02:05:08Z&sv=2020-08-04&sr=c&sig=YUi0TBEt7XTlxXex4Jui%2Fc88h6qAgMmCY4XIXeMvxa0%3F"
             :class="{ 'p-invalid': blobTokenError }"
           />
           <small class="text-color-secondary text-sm font-normal leading-tight">
-            The blob SAS token of your Azure Blob Storage.
+            Token generated by Blob Storage. It should have create, read, write, and list accesses granted.
           </small>
           <small
             id="blob-token-help"
@@ -1095,7 +1116,7 @@
   </FormHorizontal>
   <FormHorizontal
     title="Payload"
-    description="Description"
+    description="Customize the essential information that'll be sent in the data."
     v-if="endpoint === 'standard'"
   >
     <template #inputs>
@@ -1103,7 +1124,7 @@
         <label
           for="payloadFormat"
           class="text-color text-base font-medium"
-          >Format *</label
+          >Payload Format *</label
         >
         <InputText
           v-model="payloadFormat"
@@ -1112,8 +1133,7 @@
           :class="{ 'p-invalid': payloadFormatError }"
         />
         <small class="text-color-secondary text-xs font-normal leading-tight">
-          The format that payload will be sent. The $dataset variable will be replaced by all logs
-          already with the log line separator applied.
+          Character that'll be used at the end of each log line. The "\n" escape sequence breaks values into different lines in NDJSON format.
         </small>
         <small
           id="data-set-help"
@@ -1126,7 +1146,7 @@
         <label
           for="lineSeparator"
           class="text-color text-base font-medium"
-          >Log Line Separator *</label
+          >Payload Log Line Separator *</label
         >
         <InputText
           v-model="lineSeparator"
@@ -1148,7 +1168,7 @@
         <label
           for="maxSize"
           class="text-color text-base font-medium"
-          >Max Size</label
+          >Payload Max Size</label
         >
         <InputNumber
           v-model="maxSize"
@@ -1156,7 +1176,7 @@
           :useGrouping="false"
         />
         <small class="text-color-secondary text-xs font-normal leading-tight">
-          You can define the maximum size of data packets in bytes. Use a value starting from
+          Customizable maximum size of data packets in bytes. Accepts values starting from
           1000000.
         </small>
       </div>
@@ -1211,6 +1231,10 @@
     listDataStreamingDomainsService: {
       type: Function,
       required: true
+    },
+    resetForm: {
+      type: Function,
+      required: false
     }
   })
 
@@ -1235,8 +1259,8 @@
     { label: 'Azure Blob Storage', value: 'azure_blob_storage' }
   ])
   const listContentType = ref([
-    { label: 'Plain/text', value: 'plain/text' },
-    { label: 'Application/gzip', value: 'application/gzip' }
+    { label: 'plain/text', value: 'plain/text' },
+    { label: 'application/gzip', value: 'application/gzip' }
   ])
 
   // Campos do formulário
@@ -1316,22 +1340,21 @@
   const listTemplates = ref([])
   const dataSet = ref('')
 
-  onMounted(async () => {
-    await loaderDataStreamTemplates()
-    await loaderDataStreamDomains()
-  })
-
   const loaderDataStreamTemplates = async () => {
     const templates = await props.listDataStreamingTemplateService()
     listTemplates.value = templates
-    if (listTemplates?.value[0]?.value) {
-      template.value = listTemplates.value[0].value
+
+    const hasFirstTemplates = listTemplates?.value[0]?.value
+    if (hasFirstTemplates) {
+      const firstTemplateValue = listTemplates.value[0].value
+      return firstTemplateValue
     }
+    return ''
   }
 
   const loaderDataStreamDomains = async () => {
-    const response = await props.listDataStreamingDomainsService()
-    domains.value = [response, []]
+    const domainResponse = await props.listDataStreamingDomainsService()
+    return [domainResponse, []]
   }
 
   const addHeader = () => {
@@ -1381,4 +1404,89 @@
       }
     }
   )
+
+  const initializeFormValues = async () => {
+    const template = await loaderDataStreamTemplates()
+    const domains = await loaderDataStreamDomains()
+
+    if (props.resetForm) {
+      const initialValues = {
+        name: '',
+        dataSource: 'http',
+        template: template,
+        dataSet: '',
+        domainOption: '1',
+        domains: domains,
+        endpoint: 'standard',
+        status: true,
+        hasSampling: false,
+        samplingPercentage: 0,
+
+        // standard
+        endpointUrl: '',
+        headers: [{ value: '', deleted: false }],
+        maxSize: 1000000,
+        lineSeparator: '\\n',
+        payloadFormat: '$dataset',
+
+        // Kafka
+        bootstrapServers: '',
+        kafkaTopic: '',
+        tlsOption: false,
+
+        // s3
+        host: '',
+        bucket: '',
+        region: '',
+        accessKey: '',
+        secretKey: '',
+        objectKey: '',
+        contentType: 'plain/text',
+
+        // google big query
+        projectID: '',
+        datasetID: '',
+        tableID: '',
+        serviceAccountKey: '',
+
+        // elasticsearch
+        elasticsearchUrl: '',
+        apiKey: '',
+
+        // splunk
+        splunkUrl: '',
+        splunkApiKey: '',
+
+        // aws_kinesis_firehose
+        streamName: '',
+        awsRegion: '',
+        awsAccessKey: '',
+        awsSecretKey: '',
+
+        // datadog
+        datadogUrl: '',
+        datadogApiKey: '',
+
+        // QRadar
+        QRadarUrl: '',
+
+        // azure_monitor
+        logType: '',
+        sharedKey: '',
+        generatedField: '',
+        workspaceID: '',
+
+        // azure_blob_storage
+        storageAccount: '',
+        containerName: '',
+        blobToken: ''
+      }
+
+      props.resetForm({ values: initialValues })
+    }
+  }
+
+  onMounted(() => {
+    initializeFormValues()
+  })
 </script>

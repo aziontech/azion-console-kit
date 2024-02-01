@@ -106,6 +106,7 @@
         field: 'name',
         header: 'Name',
         type: 'component',
+        filterPath: 'name.text',
         component: (columnData) => {
           return columnBuilder({
             data: columnData,
