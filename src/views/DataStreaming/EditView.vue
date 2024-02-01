@@ -55,7 +55,7 @@
     // standard
     endpointUrl: yup.string().when('endpoint', {
       is: 'standard',
-      then: (schema) => schema.required('Endpoint URL is a required field')
+      then: (schema) => schema.required('URL is a required field')
     }),
     headers: yup.array().of(
       yup.object().shape({
@@ -67,7 +67,7 @@
     ),
     lineSeparator: yup.string().when('endpoint', {
       is: 'standard',
-      then: (schema) => schema.required('Log Line Separator is a required field')
+      then: (schema) => schema.required('Payload Log Line Separator is a required field')
     }),
     payloadFormat: yup.string().when('endpoint', {
       is: 'standard',
@@ -87,7 +87,7 @@
     // s3
     host: yup.string().when('endpoint', {
       is: 's3',
-      then: (schema) => schema.max(200).required('Host URL is a required field')
+      then: (schema) => schema.max(200).required('URL is a required field')
     }),
     bucket: yup.string().when('endpoint', {
       is: 's3',
@@ -135,7 +135,7 @@
     // elasticsearch
     elasticsearchUrl: yup.string().when('endpoint', {
       is: 'elasticsearch',
-      then: (schema) => schema.required('Elasticsearch URL is a required field')
+      then: (schema) => schema.required('URL is a required field')
     }),
     apiKey: yup.string().when('endpoint', {
       is: 'elasticsearch',
@@ -145,7 +145,7 @@
     // splunk
     splunkUrl: yup.string().when('endpoint', {
       is: 'splunk',
-      then: (schema) => schema.required('Splunk URL is a required field')
+      then: (schema) => schema.required('URL is a required field')
     }),
     splunkApiKey: yup.string().when('endpoint', {
       is: 'splunk',
