@@ -290,28 +290,28 @@
           <label
             for="customHeaders"
             class="text-color text-base font-medium"
-            >Custom Headers</label
+            >Custom Headers *</label
           >
           <div
-            class="flex p-inputgroup"
             v-for="(header, index) in headers"
-            :key="index"
+            :key="header.key"
           >
-            <InputText
-              v-model="header.value"
-              type="text"
-              id="header-value"
-              placeholder="header-name:value"
-            />
-            <ButtonPrimer
-              icon="pi pi-trash"
-              size="small"
-              outlined
-              v-if="header.deleted"
-              @click="removeHeader(index)"
-            />
+            <FieldInputGroup
+              placeholder="header-name: value"
+              :name="`headers[${index}].value`"
+              :value="headers[index].value.value"
+            >
+              <template #button>
+                <ButtonPrimer
+                  icon="pi pi-trash"
+                  size="small"
+                  outlined
+                  v-if="headers[index].value.deleted"
+                  @click="removeHeader(index)"
+                />
+              </template>
+            </FieldInputGroup>
           </div>
-
           <ButtonPrimer
             outlined
             icon="pi pi-plus-circle"
@@ -1229,9 +1229,10 @@
   import ButtonPrimer from 'primevue/button'
   import InputNumber from 'primevue/inputnumber'
   import InlineMessage from 'primevue/inlinemessage'
+  import FieldInputGroup from '@/templates/form-fields-inputs/fieldInputGroup'
   import TextArea from 'primevue/textarea'
   import { onMounted, ref, computed, watch } from 'vue'
-  import { useField } from 'vee-validate'
+  import { useField, useFieldArray } from 'vee-validate'
 
   import { useAccountStore } from '@/stores/account'
 
@@ -1289,7 +1290,19 @@
 
   // standard
   const { value: endpointUrl, errorMessage: endpointUrlError } = useField('endpointUrl')
-  const { value: headers } = useField('headers')
+  const { 
+    fields: headers,
+    push: pushHeader,
+    remove: removeHeader
+  } = useFieldArray('headers')
+
+  const defaultHeader = {
+    value: '', deleted: true
+  }
+
+  const addHeader = () => {
+    pushHeader(defaultHeader)
+  }
   const { value: maxSize } = useField('maxSize')
   const { value: lineSeparator, errorMessage: lineSeparatorError } = useField('lineSeparator')
   const { value: payloadFormat, errorMessage: payloadFormatError } = useField('payloadFormat')
@@ -1367,14 +1380,6 @@
   const loaderDataStreamDomains = async () => {
     const domainResponse = await props.listDataStreamingDomainsService()
     return [domainResponse, []]
-  }
-
-  const addHeader = () => {
-    headers.value.push({ value: '', deleted: true })
-  }
-
-  const removeHeader = (index) => {
-    headers.value.splice(index, 1)
   }
 
   const insertDataSet = (templateID) => {
