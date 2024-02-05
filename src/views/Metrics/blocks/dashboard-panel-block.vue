@@ -101,6 +101,7 @@
         :key="report.id"
       >
         <GraphsCardBlock
+          :reportId="`${report.id}`"
           chartOwner="azion"
           :title="report.label"
           :description="report.description"

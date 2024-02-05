@@ -13,6 +13,7 @@
       <MoreOptionsMenu
         :hasMeanLine="hasMeanLine"
         :hasMeanLinePerSeries="hasMeanLinePerSeries"
+        :reportId="reportId"
       />
     </header>
     <div class="flex h-full flex-col gap-6 flex-auto">
@@ -92,7 +93,8 @@
     },
     variationValue: { type: String, default: '' },
     hasMeanLine: Boolean,
-    hasMeanLinePerSeries: Boolean
+    hasMeanLinePerSeries: Boolean,
+    reportId: String
   })
 
   const cardColumns = computed(() => {
