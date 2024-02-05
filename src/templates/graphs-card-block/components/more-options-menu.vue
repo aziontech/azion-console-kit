@@ -21,13 +21,18 @@
 </template>
 
 <script setup>
+  import { useMetricsStore } from '@/stores/metrics'
+  import { storeToRefs } from 'pinia'
   import PrimeButton from 'primevue/button'
   import PrimeMenu from 'primevue/menu'
   import { computed, ref } from 'vue'
 
+  const { getCurrentReportsDataById } = storeToRefs(useMetricsStore())
+
   const props = defineProps({
     hasMeanLine: Boolean,
-    hasMeanLinePerSeries: Boolean
+    hasMeanLinePerSeries: Boolean,
+    reportId: String
   })
 
   const showMeanLine = ref(true)
@@ -52,7 +57,7 @@
       exportCsv: {
         label: 'Export CSV',
         icon: 'pi pi-download',
-        command: () => exportCsv(),
+        command: () => exportCSV(),
         show: true
       },
       showMeanLine: {
@@ -76,6 +81,10 @@
     optionsMenu.value.toggle(evt)
   }
 
+  const reportData = computed(() => {
+    return getCurrentReportsDataById.value(props.reportId)
+  })
+
   const openPlayground = () => {
     return null
   }
@@ -84,8 +93,41 @@
     return null
   }
 
-  const exportCsv = () => {
-    return null
+  const exportCSV = () => {
+    const csvFormattedSheet = generateCSV()
+    if (!csvFormattedSheet) return false
+
+    const blobCSVFormat = new Blob([csvFormattedSheet], { type: 'text/csv' })
+    const urlStringified = window.URL.createObjectURL(blobCSVFormat)
+    const elementAnchor = document.createElement('a')
+    elementAnchor.setAttribute('href', urlStringified)
+    elementAnchor.setAttribute('download', `${reportData.value.label}.csv`)
+    elementAnchor.click()
+    return true
+  }
+
+  const generateCSV = () => {
+    const sheet = []
+    reportData.value.resultQuery[0].forEach((__, rowIdx) => {
+      const rotatedValues = reportData.value.resultQuery.reduce((prev, curr) => {
+        let rowValue = curr[rowIdx]
+        const isDate = rowValue instanceof Date && !Number.isNaN(rowValue.valueOf())
+        if (isDate) {
+          rowValue = rowValue.toLocaleString('en-US', {
+            year: 'numeric',
+            month: '2-digit',
+            day: '2-digit',
+            hour: '2-digit',
+            minute: '2-digit',
+            second: '2-digit'
+          })
+        }
+        return [...prev, rowValue]
+      }, [])
+      sheet.push(rotatedValues.join(';'))
+    })
+    const csvFormattedSheet = sheet.join('\n')
+    return csvFormattedSheet
   }
 
   const toggleMeanLine = () => {
