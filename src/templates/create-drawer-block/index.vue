@@ -69,7 +69,8 @@
     toast.add({
       closable: true,
       severity: severity,
-      summary: summary
+      summary: severity,
+      detail: summary    
     })
   }
 

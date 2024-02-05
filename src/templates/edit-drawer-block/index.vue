@@ -77,11 +77,13 @@
     toggleDrawerVisibility(false)
   }
 
-  const showToast = (severity, summary) => {
+  const showToast = (severity, detail) => {
+    if (!detail) return
     toast.add({
       closable: true,
-      severity: severity,
-      summary: summary
+      severity,
+      summary: severity,
+      detail
     })
   }
 
