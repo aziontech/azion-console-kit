@@ -141,6 +141,9 @@ export const useMetricsStore = defineStore('metrics', {
       return keysToRemove
         ? this.getFilteredDatasetAvailableFilters(keysToRemove)
         : this.datasetAvailableFilters
+    },
+    getCurrentReportsDataById: (state) => {
+      return (id) => state.currentReportsData.find((report) => report.id.toString() === id)
     }
   },
   actions: {
