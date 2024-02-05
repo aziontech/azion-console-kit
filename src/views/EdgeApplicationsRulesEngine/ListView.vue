@@ -47,6 +47,10 @@
       required: true,
       type: Boolean
     },
+    isDeliveryProtocolHttps: {
+      required: true,
+      type: Boolean
+    },
     listEdgeApplicationFunctionsService: {
       required: true,
       type: Function
@@ -170,6 +174,7 @@
   <DrawerRulesEngine
     ref="drawerRulesEngineRef"
     :isEnableApplicationAcceleration="props.isEnableApplicationAcceleration"
+    :isDeliveryProtocolHttps="props.isDeliveryProtocolHttps"
     :listEdgeApplicationFunctionsService="props.listEdgeApplicationFunctionsService"
     :listOriginsService="props.listOriginsService"
     :listCacheSettingsService="props.listCacheSettingsService"

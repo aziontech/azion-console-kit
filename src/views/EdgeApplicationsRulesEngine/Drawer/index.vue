@@ -34,6 +34,10 @@
       type: Boolean,
       required: true
     },
+    isDeliveryProtocolHttps: {
+      type: Boolean,
+      required: true
+    },
     listEdgeApplicationFunctionsService: {
       type: Function,
       required: true
@@ -155,6 +159,7 @@
         :initialPhase="initialPhase"
         :edgeApplicationId="props.edgeApplicationId"
         :isEnableApplicationAcceleration="props.isEnableApplicationAcceleration"
+        :isDeliveryProtocolHttps="props.isDeliveryProtocolHttps"
         :listEdgeApplicationFunctionsService="props.listEdgeApplicationFunctionsService"
         :listOriginsService="props.listOriginsService"
         :listCacheSettingsService="props.listCacheSettingsService"
@@ -178,6 +183,7 @@
         :selectedRulesEngineToEdit="selectedRulesEngineToEdit"
         :edgeApplicationId="props.edgeApplicationId"
         :isEnableApplicationAcceleration="props.isEnableApplicationAcceleration"
+        :isDeliveryProtocolHttps="props.isDeliveryProtocolHttps"
         :listEdgeApplicationFunctionsService="props.listEdgeApplicationFunctionsService"
         :listOriginsService="props.listOriginsService"
         :listCacheSettingsService="props.listCacheSettingsService"

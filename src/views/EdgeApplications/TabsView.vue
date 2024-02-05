@@ -145,6 +145,10 @@
     return edgeApplication.value?.loadBalancer
   })
 
+  const isDeliveryProtocolHttps = computed(() => {
+    return edgeApplication.value?.deliveryProtocol.includes('https');
+  })
+
   const updatedApplication = (application) => {
     edgeApplication.value = { ...application }
     verifyTab(edgeApplication.value)
@@ -224,6 +228,7 @@
             v-if="showRulesEngine"
             :edgeApplicationId="edgeApplicationId"
             :isEnableApplicationAcceleration="isEnableApplicationAcceleration"
+            :isDeliveryProtocolHttps="isDeliveryProtocolHttps"
             v-bind="props.rulesEngineServices"
           />
         </TabPanel>
