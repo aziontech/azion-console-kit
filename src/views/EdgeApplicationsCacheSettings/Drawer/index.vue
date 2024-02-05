@@ -45,7 +45,7 @@
     name: '',
     browserCacheSettings: 'honor',
     browserCacheSettingsMaximumTtl: 0,
-    cdnCacheSettings: 'override',
+    cdnCacheSettings: 'honor',
     cdnCacheSettingsMaximumTtl: 60,
     sliceConfigurationEnabled: false,
     sliceConfigurationRange: LOCKED_SLICE_RANGE_IN_KBYTES,
