@@ -9,7 +9,7 @@
         <IntervalFilterBlock />
         <ContentFilterBlock :playgroundOpener="playgroundOpener" />
       </div>
-      <DashboardPanelBlock />
+      <DashboardPanelBlock :clipboardWrite="clipboardWrite" />
     </template>
   </ContentBlock>
 </template>
@@ -28,6 +28,10 @@
 
   defineProps({
     playgroundOpener: {
+      type: Function,
+      required: true
+    },
+    clipboardWrite: {
       type: Function,
       required: true
     }

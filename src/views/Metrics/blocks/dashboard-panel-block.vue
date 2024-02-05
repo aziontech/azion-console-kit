@@ -7,6 +7,13 @@
   import Skeleton from 'primevue/skeleton'
   import { computed, defineAsyncComponent, onMounted, onUnmounted, ref, watch } from 'vue'
 
+  defineProps({
+    clipboardWrite: {
+      type: Function,
+      required: true
+    }
+  })
+
   const propToComponent = {
     'bar-chart': defineAsyncComponent(() => import('../components/chart/bar-chart/bar-chart')),
     'line-chart': defineAsyncComponent(() => import('../components/chart/line-chart/line-chart')),
@@ -111,6 +118,7 @@
           :hasMeanLinePerSeries="hasMeanLinePerSeries(report.resultQuery)"
           variationType="positive"
           variationValue="10.2%"
+          :clipboardWrite="clipboardWrite"
         >
           <template #chart>
             <component

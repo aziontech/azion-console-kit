@@ -14,6 +14,7 @@
         :hasMeanLine="hasMeanLine"
         :hasMeanLinePerSeries="hasMeanLinePerSeries"
         :reportId="reportId"
+        :clipboardWrite="clipboardWrite"
       />
     </header>
     <div class="flex h-full flex-col gap-6 flex-auto">
@@ -94,7 +95,8 @@
     variationValue: { type: String, default: '' },
     hasMeanLine: Boolean,
     hasMeanLinePerSeries: Boolean,
-    reportId: String
+    reportId: String,
+    clipboardWrite: Function
   })
 
   const cardColumns = computed(() => {
