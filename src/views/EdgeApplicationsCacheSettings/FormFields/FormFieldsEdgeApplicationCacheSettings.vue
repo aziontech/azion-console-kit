@@ -13,12 +13,12 @@
 
   const CACHE_SETTINGS_OPTIONS = ref([
     {
-      label: 'Override Cache Settings',
-      value: 'override'
-    },
-    {
       label: 'Honor Origin Cache Headers',
       value: 'honor'
+    },
+    {
+      label: 'Override Cache Settings',
+      value: 'override'
     }
   ])
   const DEVICE_GROUP_CACHE_OPTIONS = ref([
