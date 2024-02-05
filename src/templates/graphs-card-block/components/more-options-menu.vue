@@ -32,7 +32,8 @@
   const props = defineProps({
     hasMeanLine: Boolean,
     hasMeanLinePerSeries: Boolean,
-    reportId: String
+    reportId: String,
+    clipboardWrite: Function
   })
 
   const showMeanLine = ref(true)
@@ -89,10 +90,6 @@
     return null
   }
 
-  const copyQuery = () => {
-    return null
-  }
-
   const exportCSV = () => {
     const csvFormattedSheet = generateCSV()
     if (!csvFormattedSheet) return false
@@ -128,6 +125,40 @@
     })
     const csvFormattedSheet = sheet.join('\n')
     return csvFormattedSheet
+  }
+
+  const copyQuery = async () => {
+    const { query, variables } = reportData.value.reportQuery
+    const clipboardQuery = formatGQL(query, variables)
+    await props.clipboardWrite(clipboardQuery)
+  }
+
+  const formatGQL = (gql, variables) => {
+    const removeSpaces = gql.replaceAll('  ', '')
+    const lines = removeSpaces.split('\n')
+    const filterEmptySpaces = lines.filter((ln) => ln.trim().length)
+    let spaceAcc = 0
+    const spaces = 2
+    const arrMapIdents = filterEmptySpaces.map((ln) => {
+      let identedLine = ln
+      const openClojure = ['{', '(']
+      const closeClojure = ['}', ')']
+      const lastChar = ln.substr(ln.length - 1, 1)
+      const firstChar = ln.trim().substr(0, 1)
+      if (closeClojure.includes(lastChar) || closeClojure.includes(firstChar)) {
+        spaceAcc -= spaces
+      }
+      if (spaceAcc < 0) spaceAcc = 0
+      identedLine = ' '.repeat(spaceAcc) + identedLine
+      if (openClojure.includes(lastChar)) {
+        spaceAcc += spaces
+      }
+      return identedLine
+    })
+    const gqlIdented = arrMapIdents.join('\n')
+    const gqlVariables = JSON.stringify(variables, null, 2)
+
+    return `# QUERY\n\n${gqlIdented}\n\n\n# VARIABLES\n${gqlVariables}`
   }
 
   const toggleMeanLine = () => {
