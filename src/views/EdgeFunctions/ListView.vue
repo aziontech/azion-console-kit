@@ -62,6 +62,7 @@
     {
       field: 'name',
       header: 'Name',
+      filterPath: 'name.text',
       type: 'component',
       component: (columnData) => {
         return columnBuilder({
@@ -81,6 +82,7 @@
     {
       field: 'language',
       header: 'Language',
+      filterPath: 'language.content',
       type: 'component',
       component: (columnData) => {
         return columnBuilder({
@@ -105,6 +107,7 @@
     {
       field: 'status',
       header: 'Status',
+      filterPath: 'status.content',
       type: 'component',
       component: (columnData) => {
         return columnBuilder({

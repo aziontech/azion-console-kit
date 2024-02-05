@@ -41,47 +41,59 @@
   const resources = ref([
     {
       label: 'Domains',
-      to: '/domains/create'
+      to: '/domains/create',
+      description: 'Launch an edge application and set up security with digital certificates.'
     },
     {
       label: 'Edge Application',
-      to: '/edge-applications/create'
+      to: '/edge-applications/create',
+      description: 'Deploy an edge application to deliver content from the edge.'
     },
     {
       label: 'Variables',
-      to: '/variables/create'
+      to: '/variables/create',
+      description: 'Create environment variables or secrets to use with configured edge functions.'
     },
     {
       label: 'Intelligent DNS',
-      to: '/intelligent-dns/create'
+      to: '/intelligent-dns/create',
+      description: 'Use an authoritative DNS server to host a domain.'
     },
     {
       label: 'Edge Firewall',
-      to: '/edge-firewall/create'
+      to: '/edge-firewall/create',
+      description: 'Create security settings to protect applications against threats and attacks.'
     },
     {
       label: 'Edge Nodes',
-      to: '/edge-node/create'
+      to: '/edge-node/create',
+      description: 'Create edge infrastructure, installing services and resources in real time.'
     },
     {
       label: 'Data Streaming',
-      to: '/data-streaming/create'
+      to: '/data-streaming/create',
+      description: 'Feed streamimg, SIEM, and big data platforms with the event logs from Azion.'
     },
     {
       label: 'Edge Functions',
-      to: '/edge-functions/create'
+      to: '/edge-functions/create',
+      description: 'Create edge functions to use with Edge Application or Edge Firewall.'
     },
     {
       label: 'Edge Services',
-      to: '/edge-services/create'
+      to: '/edge-services/create',
+      description: 'Create new services to define dependencies between edge resources.'
     },
     {
       label: 'Digital Certificates',
-      to: '/digital-certificates/create'
+      to: '/digital-certificates/create',
+      description: 'Add a digital certificate entry to secure HTTPS edge applications.'
     },
     {
       label: 'Network Lists',
-      to: '/network-lists/create'
+      to: '/network-lists/create',
+      description:
+        'Add allowlists, blocklists, and greylists to use with rule sets on Rules Engine.'
     }
   ])
 
@@ -285,7 +297,7 @@
                 <span
                   class="h-10 pb-4 text-sm font-normal text-color-secondary mt-1.5 line-clamp-2"
                 >
-                  Select this card to start creating a new resource.
+                  {{ resource.description }}
                 </span>
               </div>
             </div>

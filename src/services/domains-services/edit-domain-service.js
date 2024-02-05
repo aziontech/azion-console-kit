@@ -25,6 +25,28 @@ const adapt = (payload) => {
     mtls_trusted_ca_certificate_id: payload.mtlsTrustedCertificate
   }
 }
+/**
+ * @param {Object} errorSchema - The error schema.
+ * @param {string} key - The error key of error schema.
+ * @returns {string|undefined} The result message based on the status code.
+ */
+const extractErrorKey = (errorSchema, key) => {
+  if (Array.isArray(errorSchema[key])) {
+    return errorSchema[key]?.[0]
+  }
+  return errorSchema[key]
+}
+
+/**
+ * @param {Object} httpResponse - The HTTP response object.
+ * @param {Array} httpResponse.body - The response body.
+ * @returns {string} The result message based on the status code.
+ */
+const extractApiError = (httpResponse) => {
+  const errorKey = Object.keys(httpResponse.body)[0]
+  const apiError = extractErrorKey(httpResponse.body, errorKey)
+  return `${errorKey}: ${apiError}`
+}
 
 /**
  * @param {Object} httpResponse - The HTTP response object.
@@ -38,7 +60,8 @@ const parseHttpResponse = (httpResponse) => {
     case 200:
       return 'Your domain has been edited'
     case 400:
-      throw new Error(Object.keys(httpResponse.body)[0]).message
+      const message = extractApiError(httpResponse)
+      throw new Error(message).message
     case 409:
       throw new Error(Object.keys(httpResponse.body)[0]).message
     case 401:

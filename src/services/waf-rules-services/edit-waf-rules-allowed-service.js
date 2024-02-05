@@ -38,7 +38,7 @@ const adapt = (payload) => {
  */
 const parseHttpResponse = (httpResponse) => {
   switch (httpResponse.statusCode) {
-    case 200:
+    case 202:
       return 'Your waf rule allowed has been updated'
     case 400:
       const apiError = extractApiError(httpResponse)

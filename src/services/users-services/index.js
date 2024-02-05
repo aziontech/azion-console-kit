@@ -9,6 +9,7 @@ import { listTeamsService } from './list-teams-service'
 import { editAnotherUserService } from './edit-another-user-service'
 import { loadUserService } from './load-user-service'
 import { editUsersService } from './edit-users-service'
+import { loadAnotherUserService } from './load-another-user-service'
 
 export {
   listUsersService,
@@ -21,5 +22,6 @@ export {
   listTeamsService,
   loadUserService,
   editAnotherUserService,
-  editUsersService
+  editUsersService,
+  loadAnotherUserService
 }

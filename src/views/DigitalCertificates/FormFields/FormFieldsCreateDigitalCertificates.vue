@@ -94,7 +94,7 @@
   </FormHorizontal>
 
   <FormHorizontal
-    title="Options"
+    title="Import or Request Certificate"
     description="Choose between importing a certificate into your account or creating a request for a certificate."
   >
     <template #inputs>
@@ -109,7 +109,7 @@
           }"
         >
           <template #title>
-            <span class="text-base">Import a certificate</span>
+            <span class="text-base">Import a server certificate</span>
             <RadioButton
               v-model="certificateType"
               inputId="certificateType2"
@@ -117,7 +117,9 @@
               :value="certificateTypes.EDGE_CERTIFICATE_UPLOAD"
             />
           </template>
-          <template #subtitle>Upload a PEM certificate and private key. </template>
+          <template #subtitle>
+            Upload a TLS X.509 certificate and private key in PEM format.
+          </template>
         </Card>
 
         <Card
@@ -139,7 +141,8 @@
             />
           </template>
           <template #subtitle>
-            Generate a Certificate Singing Request (CSR) to obtain a digital certificate.
+            Generate a Certificate Singing Request (CSR) to purchase a TLS digital certificate from
+            a CA.
           </template>
         </Card>
 
@@ -162,7 +165,8 @@
             />
           </template>
           <template #subtitle>
-            Upload a PEM certificate for mutual Transport Layer Security (mTLS).
+            Upload a certificate in PEM format that can be used for mutual Transport Layer Security
+            (mTLS).
           </template>
         </Card>
       </div>
@@ -171,8 +175,8 @@
 
   <FormHorizontal
     v-if="isUploadCertificate"
-    title="Import a Certificate"
-    description="Paste the PEM-encoded certificate and private key in the respective fields."
+    title="Import a Server Certificate"
+    description="Paste the PEM-encoded TLS X.509 certificate and private key in the respective fields."
   >
     <template #inputs>
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
@@ -194,7 +198,7 @@
         >
       </div>
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
-        <label>Private key</label>
+        <label>Private Key</label>
         <PrimeTextarea
           v-model="privateKey"
           :class="{ 'p-invalid': privateKeyError }"
@@ -357,12 +361,12 @@
 
   <FormHorizontal
     title="Import a Trusted CA certificate"
-    description="Paste the PEM-encoded Trusted CA certificate for mTLS in the respective field."
+    description="Paste the PEM-encoded public Trusted CA certificate in the respective field."
     v-if="isTrustedCertificate"
   >
     <template #inputs>
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
-        <label>Certificate *</label>
+        <label>Private Certificate *</label>
         <PrimeTextarea
           v-model="certificate"
           :class="{ 'p-invalid': certificateError }"

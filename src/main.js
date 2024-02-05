@@ -7,6 +7,7 @@ import './assets/main.css'
 import '@assets/themes/scss/themes/azion-light/theme.scss'
 import '@assets/themes/scss/themes/azion-dark/theme.scss'
 import '@assets/icons/azionicons.scss'
+import '@assets/c3.scss'
 /**
  * ==== End of styles block ====
  */

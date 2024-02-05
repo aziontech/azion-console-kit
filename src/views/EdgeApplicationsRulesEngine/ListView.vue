@@ -73,7 +73,7 @@
         field: 'phase',
         header: 'Phase',
         type: 'component',
-
+        filterPath: 'phase.content',
         component: (columnData) => {
           return columnBuilder({
             data: columnData,
@@ -85,6 +85,7 @@
         field: 'status',
         header: 'Status',
         type: 'component',
+        filterPath: 'status.content',
         component: (columnData) => {
           return columnBuilder({
             data: columnData,

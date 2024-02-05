@@ -18,8 +18,9 @@
           class="w-100"
           severity="warn"
           :closable="false"
-          >Once confirmed, this action can't be reversed.</Message
         >
+          Once confirmed, this action can't be reversed.
+        </Message>
 
         <p class="pt-3.5 text-color-secondary">
           This {{ informationForDeletion.title }} will be deleted along with any associated settings
@@ -112,10 +113,13 @@
   })
 
   const loading = ref(false)
+  const canDelete = ref(false)
   const deleteDialogVisible = ref(false)
 
   const removeItem = async () => {
+    if (canDelete.value === false) return
     if (!meta.value.valid) return
+
     loading.value = true
     let toastConfig = {
       closable: true,
@@ -162,8 +166,18 @@
     () => props.informationForDeletion,
     (value) => {
       if (value) {
+        canDelete.value = false
         resetForm()
         deleteDialogVisible.value = props.informationForDeletion.deleteDialogVisible
+      }
+    },
+    { deep: true }
+  )
+  watch(
+    () => confirmation.value,
+    (value) => {
+      if (value) {
+        canDelete.value = true
       }
     },
     { deep: true }

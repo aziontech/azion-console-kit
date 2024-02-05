@@ -75,6 +75,7 @@
         field: 'originKey',
         header: 'Key',
         type: 'component',
+        filterPath: 'originKey.content',
         component: (columnData) => {
           return columnBuilder({
             data: columnData,

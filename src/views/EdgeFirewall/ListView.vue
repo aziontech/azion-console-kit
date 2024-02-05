@@ -32,6 +32,7 @@
     {
       field: 'domainsList',
       header: 'Domains',
+      filterPath: 'status.text',
       type: 'component',
       component: (columnData) =>
         columnBuilder({ data: columnData, columnAppearance: 'expand-column' })
@@ -39,6 +40,7 @@
     {
       field: 'status',
       header: 'Status',
+      filterPath: 'status.content',
       type: 'component',
       component: (columnData) => {
         return columnBuilder({

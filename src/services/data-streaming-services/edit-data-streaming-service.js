@@ -125,10 +125,15 @@ const getDomains = (domains) => {
 
 const getHeaders = (listHeaders) => {
   const headers = {}
-  listHeaders.forEach((element) => {
-    const header = element.value.split(':')
-    headers[header[0]] = header[1]?.trim() ?? header[0]
-  })
+  if (listHeaders.length > 0) {
+    listHeaders.forEach((element) => {
+      const [key, ...rest] = element.value.includes(':')
+        ? element.value.split(':')
+        : [element.value]
+      const headerKey = key.trim()
+      headers[headerKey] = rest.length > 0 ? rest.join(':').trim() : headerKey
+    })
+  }
   return headers
 }
 

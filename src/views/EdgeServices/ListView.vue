@@ -63,6 +63,7 @@
     {
       field: 'labelActive',
       header: 'Status',
+      filterPath: 'labelActive.content',
       type: 'component',
       component: (columnData) =>
         columnBuilder({

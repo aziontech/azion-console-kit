@@ -25,9 +25,7 @@
 <template>
   <FormHorizontal
     title="Pre-loading Tag"
-    description="If you're using Content Security Policy settings preventing the use of inline JavaScript
-            then place this tag just before the enclosing BODY tag. This script executes before the
-            load event has fired."
+    description="The script executes before the load event is fired. Recommended when using Content Security Policy settings that prevent the use of inline JavaScript."
   >
     <template #inputs>
       <vue-monaco-editor
@@ -40,7 +38,7 @@
       <div>
         <PrimeButton
           icon="pi pi-copy"
-          label="Copy to Clipboard"
+          label="Copy"
           class="max-md:w-full"
           outlined
           @click="$emit('handleCopy', { code: preLoadingTagCode })"

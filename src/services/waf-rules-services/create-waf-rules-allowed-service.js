@@ -39,7 +39,10 @@ const adapt = (payload) => {
 const parseHttpResponse = (httpResponse) => {
   switch (httpResponse.statusCode) {
     case 202:
-      return 'Your waf rule allowed has been created'
+      return {
+        feedback: 'Your waf rule allowed has been created'
+      }
+
     case 400:
       const apiError = extractApiError(httpResponse)
       throw new Error(apiError).message
@@ -62,8 +65,19 @@ const parseHttpResponse = (httpResponse) => {
  * @returns {string|undefined} The result message based on the status code.
  */
 const extractErrorKey = (errorSchema, key) => {
-  const [keyError] = Object.keys(errorSchema[key]?.[0])
-  return errorSchema[key]?.[0][keyError][0]
+  if (typeof errorSchema[key][0] === 'string') {
+    return `${key}: ${errorSchema[key][0]}`
+  }
+  const keyValuePair = []
+  errorSchema[key].forEach((obj) => {
+    for (let key in obj) {
+      // eslint-disable-next-line no-prototype-builtins
+      if (obj.hasOwnProperty(key)) {
+        keyValuePair.push({ key, value: obj[key][0] })
+      }
+    }
+  })
+  return `${keyValuePair[0].key}: ${keyValuePair[0].value}`
 }
 
 /**

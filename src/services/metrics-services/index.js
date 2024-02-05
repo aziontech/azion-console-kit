@@ -1,13 +1,15 @@
-import { fetchDataFromBeholderService } from './fetch-data-from-beholder-service'
 import { fetchMetricsDashboardsService } from './fetch-metrics-dashboards-service'
-import { fetchMetricsGroupsService } from './fetch-metrics-groups-service'
-import { fetchMetricsProductsService } from './fetch-metrics-products-service'
-import { searchDomainsMetricsService } from './search-domains-metrics-service'
+import BeholderService from './fetch-metrics-data-from-beholder'
+import { fetchMetricsReportsService } from './fetch-metrics-reports-service'
+import { searchDomainsService } from './search-domains-service'
+import { searchIdnsService } from './search-idns-service'
+import { searchEdgeFunctionsService } from './search-edge-functions'
 
 export {
-  fetchDataFromBeholderService,
+  BeholderService,
   fetchMetricsDashboardsService,
-  fetchMetricsGroupsService,
-  fetchMetricsProductsService,
-  searchDomainsMetricsService
+  fetchMetricsReportsService,
+  searchDomainsService,
+  searchIdnsService,
+  searchEdgeFunctionsService
 }

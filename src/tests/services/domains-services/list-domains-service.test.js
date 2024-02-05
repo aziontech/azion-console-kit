@@ -9,7 +9,9 @@ const fixtures = {
     domain_name: 'domain A',
     cnames: ['CName 1', 'CName 2'],
     is_active: true,
-    digital_certificate_id: '862026'
+    activeSort: true,
+    digital_certificate_id: '862026',
+    edge_application_id: 'ea1234'
   },
   disabledDomainMock: {
     id: '4132123',
@@ -17,8 +19,14 @@ const fixtures = {
     domain_name: 'domain B',
     cnames: ['CName 3', 'CName 4'],
     is_active: false,
-    digital_certificate_id: '69870'
-  }
+    activeSort: false,
+    digital_certificate_id: '69870',
+    edge_application_id: 'ea5678'
+  },
+  edgeApplicationsMock: [
+    { id: 'ea1234', name: 'Edge App X', last_modified: new Date() },
+    { id: 'ea5678', name: 'Edge App Y', last_modified: new Date() }
+  ]
 }
 
 const makeSut = () => {
@@ -31,10 +39,17 @@ const makeSut = () => {
 
 describe('DomainsServices', () => {
   it('should call api with correct params', async () => {
-    const requestSpy = vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
-      statusCode: 200,
-      body: { results: [] }
-    })
+    const requestSpy = vi
+      .spyOn(AxiosHttpClientAdapter, 'request')
+      .mockResolvedValueOnce({
+        statusCode: 200,
+        body: { results: [] }
+      })
+      .mockResolvedValueOnce({
+        statusCode: 200,
+        body: { results: fixtures.edgeApplicationsMock }
+      })
+
     const { sut } = makeSut()
     const version = 'v3'
     await sut({})
@@ -46,10 +61,16 @@ describe('DomainsServices', () => {
   })
 
   it('should parsed correctly all returned domains', async () => {
-    vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
-      statusCode: 200,
-      body: { results: [fixtures.domainMock, fixtures.disabledDomainMock] }
-    })
+    vi.spyOn(AxiosHttpClientAdapter, 'request')
+      .mockResolvedValueOnce({
+        statusCode: 200,
+        body: { results: [fixtures.domainMock, fixtures.disabledDomainMock] }
+      })
+      .mockResolvedValueOnce({
+        statusCode: 200,
+        body: { results: fixtures.edgeApplicationsMock }
+      })
+
     const { sut } = makeSut()
 
     const result = await sut({})
@@ -66,7 +87,8 @@ describe('DomainsServices', () => {
           content: 'Active',
           severity: 'success'
         },
-        edgeApplicationName: fixtures.domainMock.name,
+        activeSort: true,
+        edgeApplicationName: fixtures.edgeApplicationsMock[0].name,
         digitalCertificateId: fixtures.domainMock.digital_certificate_id
       },
       {
@@ -80,7 +102,8 @@ describe('DomainsServices', () => {
           content: 'Inactive',
           severity: 'danger'
         },
-        edgeApplicationName: fixtures.disabledDomainMock.name,
+        activeSort: false,
+        edgeApplicationName: fixtures.edgeApplicationsMock[1].name,
         digitalCertificateId: fixtures.disabledDomainMock.digital_certificate_id
       }
     ])

@@ -34,7 +34,7 @@
       type: Function,
       required: true
     },
-    loadUserService: {
+    loadAnotherUserService: {
       type: Function,
       required: true
     }
@@ -46,7 +46,7 @@
     timezone: yup.string().required().label('Timezone'),
     language: yup.string(),
     email: yup.string().email().max(254).required().label('Email'),
-    countryCallCode: yup.object().required().label('Country'),
+    countryCallCode: yup.string().required().label('Country'),
     mobile: yup.string().max(20).required().label('Phone Number'),
     isAccountOwner: yup.boolean(),
     teamsIds: yup.array(),
@@ -72,7 +72,7 @@
   const route = useRoute()
   const loadUser = async () => {
     const id = route.params.id
-    const userData = await props.loadUserService({ id })
+    const userData = await props.loadAnotherUserService({ id })
 
     currentEmail.value = userData.email
 

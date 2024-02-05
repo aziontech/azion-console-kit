@@ -1,28 +1,22 @@
 <template>
   <div
-    :class="[cardColumns, 'flex flex-col rounded-md h-[552px] border surface-border col-span-12']"
+    :class="[
+      cardColumns,
+      'flex flex-col rounded-md h-[552px] border surface-border col-span-12 p-6'
+    ]"
   >
-    <header
-      class="flex w-full items-center justify-between gap-2 py-3 px-6 border-b surface-border"
-    >
+    <header class="flex w-full items-center justify-between gap-2">
       <span class="w-full gap-2 flex">
         <ChartOwner :chartOwner="chartOwner" />
         <span class="font-medium overflow-ellipsis break-all line-clamp-1">{{ title }}</span>
       </span>
-      <span class="flex gap-4">
-        <PrimeButton
-          icon="pi pi-question-circle"
-          text
-          aria-label="Get help"
-          size="small"
-          @click="helpCenterStore.toggle()"
-        />
-        <MoreOptionsMenu />
-      </span>
+      <MoreOptionsMenu />
     </header>
-    <div class="flex h-full flex-col gap-6 flex-auto p-6">
-      <div class="flex flex-col gap-2">
-        <span class="break-words font-normal line-height-1">{{ description }}</span>
+    <div class="flex h-full flex-col gap-6 flex-auto">
+      <div class="flex flex-col">
+        <span class="break-words text-sm text-color-secondary font-normal line-height-1 py-3.5">
+          {{ description }}
+        </span>
         <AggregationInfo
           :aggregationType="aggregationType"
           :variationType="variationType"
@@ -39,11 +33,9 @@
 
 <script setup>
   import { computed } from 'vue'
-  import PrimeButton from 'primevue/button'
-  import ChartOwner from './components/chart-owner.vue'
   import AggregationInfo from './components/aggregation-info.vue'
+  import ChartOwner from './components/chart-owner.vue'
   import MoreOptionsMenu from './components/more-options-menu.vue'
-  import { useHelpCenterStore } from '@/stores/help-center'
 
   defineOptions({ name: 'GraphsCardBlock' })
 
@@ -72,9 +64,9 @@
     },
     aggregationType: {
       type: String,
-      default: 'Sum',
+      default: 'sum',
       validator(value) {
-        return ['Sum', 'Average'].includes(value)
+        return ['sum', 'avg'].includes(value)
       }
     },
     displayTag: {
@@ -85,9 +77,14 @@
       type: String,
       default: 'none',
       validator(value) {
-        return ['none', 'positive', 'negative', 'positive-inverse', 'negative-inverse'].includes(
-          value
-        )
+        return [
+          'none',
+          'positive',
+          'negative',
+          'positive-inverse',
+          'negative-inverse',
+          'not-compare'
+        ].includes(value)
       }
     },
     variationValue: { type: String, default: '' }
@@ -106,6 +103,4 @@
         return 'lg:col-span-6'
     }
   })
-
-  const helpCenterStore = useHelpCenterStore()
 </script>
