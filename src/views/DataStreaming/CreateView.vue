@@ -50,14 +50,14 @@
       is: 'standard',
       then: (schema) => schema.required('Endpoint URL is a required field')
     }),
-    headers: yup.array().of(
-      yup.object().shape({
-        value: yup.string().when('endpoint', {
-          is: 'standard',
-          then: (schema) => schema.required('Header value is required')
+    headers: yup.array().when('endpoint', {
+      is: 'standard',
+      then: (schema) => schema.of(
+        yup.object().shape({
+          value: yup.string().required('Header value is a required field')
         })
-      })
-    ),
+      )
+    }),
     lineSeparator: yup.string().when('endpoint', {
       is: 'standard',
       then: (schema) => schema.required('Log Line Separator is a required field')
