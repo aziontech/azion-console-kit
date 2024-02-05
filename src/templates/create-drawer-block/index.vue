@@ -70,7 +70,7 @@
       closable: true,
       severity: severity,
       summary: severity,
-      detail: summary    
+      detail: summary
     })
   }
 
