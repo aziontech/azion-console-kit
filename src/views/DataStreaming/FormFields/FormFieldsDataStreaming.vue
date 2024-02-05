@@ -288,7 +288,7 @@
 
         <div class="flex flex-col sm:max-w-lg w-full gap-2">
           <label
-            for="endpointURL"
+            for="customHeaders"
             class="text-color text-base font-medium"
             >Custom Headers *</label
           >
