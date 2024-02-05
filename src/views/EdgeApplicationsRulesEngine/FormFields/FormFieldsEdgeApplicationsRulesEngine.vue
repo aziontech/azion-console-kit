@@ -46,6 +46,8 @@
 
   const isEditDrawer = computed(() => !!props.selectedRulesEngineToEdit)
 
+  const checkPhaseIsDefaultValue = computed(() => phase.value !== 'default')
+
   const toast = useToast()
   const criteriaOperatorOptions = ref([
     { label: 'is equal', value: 'is_equal' },
@@ -637,7 +639,7 @@
     :isDrawer="true"
     title="Phase"
     description="Select the phase of the execution of the rule."
-    v-if="phase !== 'default'"
+    v-if="checkPhaseIsDefaultValue"
   >
     <template #inputs>
       <div class="flex flex-col gap-2">
