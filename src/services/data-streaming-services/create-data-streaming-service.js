@@ -127,7 +127,6 @@ const getHeaders = (listHeaders) => {
   const headers = {}
   if (listHeaders.length > 0) {
     listHeaders.forEach((element) => {
-      console.log(element)
       if( element.value.trim().length > 0) {
         const [key, ...rest] = element.value.includes(':')
           ? element.value.split(':')
