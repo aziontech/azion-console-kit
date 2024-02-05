@@ -93,7 +93,7 @@ const extractApiError = (httpResponse) => {
   const apiKeyError = Object.keys(httpResponse.body)[0]
   const apiValidationError = extractFirstError(httpResponse.body, apiKeyError)
 
-  return `${apiValidationError} value is invalid. Please modify it and try again.`
+  return `${apiKeyError}:${apiValidationError} is an invalid value. Please modify it and try again.`
 }
 
 /**

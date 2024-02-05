@@ -81,7 +81,7 @@ const adapt = (payload) => {
 const extractFirstError = (errorSchema, key) => {
   const [firstErrorKey] = Object.keys(errorSchema[key])
   const firstInvalidValue = errorSchema[key][firstErrorKey]
-  return `${firstInvalidValue}`
+  return `${firstErrorKey}:${firstInvalidValue}`
 }
 
 /**
@@ -93,7 +93,7 @@ const extractApiError = (httpResponse) => {
   const apiKeyError = Object.keys(httpResponse.body)[0]
   const apiValidationError = extractFirstError(httpResponse.body, apiKeyError)
 
-  return `${apiValidationError} value is invalid. Please modify it and try again.`
+  return `${apiValidationError} is an invalid value. Please modify it and try again.`
 }
 
 /**
