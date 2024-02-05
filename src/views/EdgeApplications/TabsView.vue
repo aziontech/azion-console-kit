@@ -146,7 +146,7 @@
   })
 
   const isDeliveryProtocolHttps = computed(() => {
-    return edgeApplication.value?.deliveryProtocol.includes('https');
+    return edgeApplication.value?.deliveryProtocol.includes('https')
   })
 
   const updatedApplication = (application) => {

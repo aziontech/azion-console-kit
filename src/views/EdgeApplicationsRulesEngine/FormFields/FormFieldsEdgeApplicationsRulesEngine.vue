@@ -310,37 +310,38 @@
     phase.value === 'request' ? behaviorsRequestOptions.value : behaviorsResponseOptions.value
   )
 
-/**
- * Updates the 'requires' property of behavior options based on component props.
- * This function checks if the behavior option is 'redirect_http_to_https' and sets the 'requires'
- * property based on the 'isDeliveryProtocolHttps' prop. For other options that have 'requires' as true,
- * it sets the 'requires' property based on the 'isEnableApplicationAcceleration' prop.
- * @param {Array} options - The behavior options to update.
- * @returns {Array} The updated array of behavior options with the 'requires' property set accordingly.
- */
- const updateOptionRequires = (options) => {
-  return options.map((option) => {
-    if (option.requires) {
-      return {
-        ...option,
-        requires: option.value === 'redirect_http_to_https'
-          ? !props.isDeliveryProtocolHttps
-          : !props.isEnableApplicationAcceleration
-      };
-    }
-    return option;
-  });
-}
+  /**
+   * Updates the 'requires' property of behavior options based on component props.
+   * This function checks if the behavior option is 'redirect_http_to_https' and sets the 'requires'
+   * property based on the 'isDeliveryProtocolHttps' prop. For other options that have 'requires' as true,
+   * it sets the 'requires' property based on the 'isEnableApplicationAcceleration' prop.
+   * @param {Array} options - The behavior options to update.
+   * @returns {Array} The updated array of behavior options with the 'requires' property set accordingly.
+   */
+  const updateOptionRequires = (options) => {
+    return options.map((option) => {
+      if (option.requires) {
+        return {
+          ...option,
+          requires:
+            option.value === 'redirect_http_to_https'
+              ? !props.isDeliveryProtocolHttps
+              : !props.isEnableApplicationAcceleration
+        }
+      }
+      return option
+    })
+  }
 
-/**
- * Updates the 'requires' property of all behavior options that have 'requires' as true by default,
- * based on the component props.
- * It applies the 'updateOptionRequires' function to both request and response behavior options.
- */
-const updateBehaviorsOptionsRequires = () => {
-  behaviorsRequestOptions.value = updateOptionRequires(behaviorsRequestOptions.value);
-  behaviorsResponseOptions.value = updateOptionRequires(behaviorsResponseOptions.value);
-}
+  /**
+   * Updates the 'requires' property of all behavior options that have 'requires' as true by default,
+   * based on the component props.
+   * It applies the 'updateOptionRequires' function to both request and response behavior options.
+   */
+  const updateBehaviorsOptionsRequires = () => {
+    behaviorsRequestOptions.value = updateOptionRequires(behaviorsRequestOptions.value)
+    behaviorsResponseOptions.value = updateOptionRequires(behaviorsResponseOptions.value)
+  }
   const functionsInstanceOptions = ref(null)
   const loadingFunctionsInstance = ref(false)
 
