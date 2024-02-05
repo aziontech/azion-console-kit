@@ -652,7 +652,6 @@
           >
             <label class="font-medium">
               {{ item.label }}
-              {{ phase }}
               <div class="text-color-secondary text-sm font-normal">{{ item.description }}</div>
             </label>
 
