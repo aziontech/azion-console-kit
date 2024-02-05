@@ -637,6 +637,7 @@
     :isDrawer="true"
     title="Phase"
     description="Select the phase of the execution of the rule."
+    v-if="phase !== 'default'"
   >
     <template #inputs>
       <div class="flex flex-col gap-2">
@@ -651,6 +652,7 @@
           >
             <label class="font-medium">
               {{ item.label }}
+              {{ phase }}
               <div class="text-color-secondary text-sm font-normal">{{ item.description }}</div>
             </label>
 
