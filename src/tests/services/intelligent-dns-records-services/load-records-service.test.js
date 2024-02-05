@@ -62,7 +62,7 @@ describe('IntelligentDnsRecordsServices', () => {
       id: fixtures.dnsRecordMock.record_id,
       name: fixtures.dnsRecordMock.entry,
       recordType: fixtures.dnsRecordMock.record_type,
-      value: `${fixtures.dnsRecordMock.answers_list[0]} \n ${fixtures.dnsRecordMock.answers_list.at(
+      value: `${fixtures.dnsRecordMock.answers_list[0]}\n${fixtures.dnsRecordMock.answers_list.at(
         1
       )}`,
       ttl: fixtures.dnsRecordMock.ttl,
