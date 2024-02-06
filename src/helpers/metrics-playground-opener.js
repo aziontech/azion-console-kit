@@ -6,7 +6,7 @@ export const metricsPlaygroundOpener = ({ query = null, variables = null } = {})
 
   const searchParams = new URLSearchParams()
   if (query) searchParams.set('query', query)
-  if (variables) searchParams.set('variables', variables)
+  if (query && variables) searchParams.set('variables', variables)
 
   window.open(`https://${subdomain}.azion.com/metrics/graphql?${searchParams}`, '_blank')
 }
