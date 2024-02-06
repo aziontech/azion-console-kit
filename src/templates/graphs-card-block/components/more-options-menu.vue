@@ -27,17 +27,18 @@
   import PrimeMenu from 'primevue/menu'
   import { computed, ref } from 'vue'
 
-  const { getCurrentReportsDataById } = storeToRefs(useMetricsStore())
+  const metricsStore = useMetricsStore()
+  const { getCurrentReportsDataById } = storeToRefs(metricsStore)
+  const { toggleReportMeanLineStatus, toggleReportMeanLinePerSeriesStatus } = metricsStore
 
   const props = defineProps({
-    hasMeanLine: Boolean,
-    hasMeanLinePerSeries: Boolean,
     reportId: String,
     clipboardWrite: Function
   })
 
-  const showMeanLine = ref(true)
-  const showMeanLinePerSeries = ref(true)
+  const reportData = computed(() => {
+    return getCurrentReportsDataById.value(props.reportId)
+  })
 
   const optionsMenu = ref()
 
@@ -56,16 +57,16 @@
         show: true
       },
       showMeanLine: {
-        label: `${showMeanLine.value ? 'Show' : 'Hide'} Mean Line`,
-        icon: showMeanLine.value ? 'pi pi-eye-slash' : 'pi pi-eye',
+        label: `${reportData.value.showMeanLine ? 'Hide' : 'Show'} Mean Line`,
+        icon: reportData.value.showMeanLine ? 'pi pi-eye' : 'pi pi-eye-slash',
         command: () => toggleMeanLine(),
-        show: props.hasMeanLine
+        show: reportData.value.hasMeanLine
       },
       showMeanLinePerSeries: {
-        label: `${showMeanLinePerSeries.value ? 'Show' : 'Hide'} Mean Line per series`,
-        icon: showMeanLinePerSeries.value ? 'pi pi-eye-slash' : 'pi pi-eye',
+        label: `${reportData.value.showMeanLinePerSeries ? 'Hide' : 'Show'} Mean Line per series`,
+        icon: reportData.value.showMeanLinePerSeries ? 'pi pi-eye' : 'pi pi-eye-slash',
         command: () => toggleMeanLinePerSeries(),
-        show: props.hasMeanLinePerSeries
+        show: reportData.value.hasMeanLinePerSeries
       }
     }
 
@@ -75,10 +76,6 @@
   const toggleMenu = (evt) => {
     optionsMenu.value.toggle(evt)
   }
-
-  const reportData = computed(() => {
-    return getCurrentReportsDataById.value(props.reportId)
-  })
 
   const exportCSV = () => {
     const csvFormattedSheet = generateCSV()
@@ -152,12 +149,10 @@
   }
 
   const toggleMeanLine = () => {
-    showMeanLine.value = !showMeanLine.value
-    return null
+    toggleReportMeanLineStatus(props.reportId)
   }
 
   const toggleMeanLinePerSeries = () => {
-    showMeanLinePerSeries.value = !showMeanLinePerSeries.value
-    return null
+    toggleReportMeanLinePerSeriesStatus(props.reportId)
   }
 </script>
