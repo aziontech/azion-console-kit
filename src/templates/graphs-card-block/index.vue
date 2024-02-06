@@ -11,8 +11,6 @@
         <span class="font-medium overflow-ellipsis break-all line-clamp-1">{{ title }}</span>
       </span>
       <MoreOptionsMenu
-        :hasMeanLine="hasMeanLine"
-        :hasMeanLinePerSeries="hasMeanLinePerSeries"
         :reportId="reportId"
         :clipboardWrite="clipboardWrite"
       />
@@ -93,8 +91,6 @@
       }
     },
     variationValue: { type: String, default: '' },
-    hasMeanLine: Boolean,
-    hasMeanLinePerSeries: Boolean,
     reportId: String,
     clipboardWrite: Function
   })
