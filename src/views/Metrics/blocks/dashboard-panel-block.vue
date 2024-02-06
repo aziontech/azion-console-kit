@@ -11,6 +11,10 @@
     clipboardWrite: {
       type: Function,
       required: true
+    },
+    playgroundOpener: {
+      type: Function,
+      required: true
     }
   })
 
@@ -119,6 +123,7 @@
           variationType="positive"
           variationValue="10.2%"
           :clipboardWrite="clipboardWrite"
+          :playgroundOpener="playgroundOpener"
         >
           <template #chart>
             <component
