@@ -33,7 +33,8 @@
     hasMeanLine: Boolean,
     hasMeanLinePerSeries: Boolean,
     reportId: String,
-    clipboardWrite: Function
+    clipboardWrite: Function,
+    playgroundOpener: Function
   })
 
   const showMeanLine = ref(true)
@@ -87,7 +88,12 @@
   })
 
   const openPlayground = () => {
-    return null
+    const { query, variables } = reportData.value.reportQuery
+
+    const formattedQuery = query.replaceAll(' ', '')
+    const formattedVariables = JSON.stringify(variables, null, 0)
+
+    props.playgroundOpener({ query: formattedQuery, variables: formattedVariables })
   }
 
   const exportCSV = () => {
