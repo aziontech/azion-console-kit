@@ -33,3 +33,4 @@
     :id="`bar-chart-${props.chartData?.id}`"
   />
 </template>
+../../../helpers/c3-charts

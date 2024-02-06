@@ -1,4 +1,4 @@
-import DATE_TIME_INTERVALS from '@views/Metrics/constants/date-time-interval'
+import DATE_TIME_INTERVALS from '@/stores/metrics-store/constants/date-time-interval'
 import { defineStore } from 'pinia'
 import {
   LoadDatasetAvailableAggregations,
