@@ -127,9 +127,9 @@
     <template #header>
       <h2>More Details</h2>
     </template>
-    <div class="flex flex-col p-8 gap-8">
+    <div class="flex flex-col p-0 gap-6 sm:gap-8 sm:p-8">
       <div
-        class="flex max-w-screen-2xl mx-auto gap-4 w-full surface-section rounded-md border surface-border px-8 py-8 flex-wrap min-w-[2rem]"
+        class="flex max-w-screen-2xl mx-auto gap-4 w-full surface-section rounded-md border surface-border p-3 sm:p-8 flex-wrap min-w-[2rem]"
       >
         <div class="flex-col justify-center items-start gap-3 flex">
           <div class="text-color text-xl font-medium">
@@ -141,8 +141,8 @@
           </div>
         </div>
         <Divider></Divider>
-        <div class="flex w-full gap-8">
-          <div class="w-1/2 flex flex-col gap-3">
+        <div class="flex flex-col sm:flex-row w-full gap-3 sm:gap-8">
+          <div class="w-full sm:w-1/2 flex flex-col gap-3">
             <div class="flex justify-between w-full gap-3">
               <span class="w-1/2 text-color">Domain</span>
               <div class="flex flex-col w-1/2">
@@ -159,7 +159,7 @@
               <span class="w-1/2 text-color-secondary"></span>
             </div>
           </div>
-          <div class="w-1/2 flex flex-col gap-3">
+          <div class="w-full sm:w-1/2 flex flex-col gap-3">
             <div class="flex justify-between w-full gap-3">
               <span class="w-1/2 text-color">Network List</span>
               <span class="w-1/2 text-color-secondary">{{ netWorkList }}</span>
@@ -172,7 +172,7 @@
         </div>
       </div>
       <div
-        class="flex max-w-screen-2xl mx-auto gap-8 w-full surface-section rounded-md border surface-border px-8 py-8 flex-wrap min-w-[2rem]"
+        class="flex max-w-screen-2xl mx-auto gap-8 w-full surface-section rounded-md border surface-border p-3 sm:p-8 flex-wrap min-w-[2rem]"
       >
         <div class="flex-col gap-8 flex w-full">
           <div class="gap-2 flex flex-col">
@@ -206,7 +206,7 @@
               :key="index"
               :class="{ 'border-orange-500': checkActiveBorder(attack) }"
             >
-              <div class="flex w-full gap-3 items-start">
+              <div class="flex  w-full gap-3 items-start">
                 <CheckboxPrime
                   v-model="selectedAttack"
                   name="attack.ruleID"
@@ -220,8 +220,8 @@
                     {{ attack.matchValue }}
                   </div>
                   <div class="text-color-secondary font-normal mb-3">Field Description</div>
-                  <div class="flex gap-8">
-                    <div class="flex w-1/2 flex-col gap-3">
+                  <div class="flex flex-col sm:flex-row gap-3 sm:gap-8">
+                    <div class="flex w-full sm:w-1/2 flex-col gap-3">
                       <div class="w-full flex justify-between">
                         <div class="w-1/2 flex flex-col text-color">
                           <span>Top 10 IPs Address</span>
@@ -251,7 +251,7 @@
                         </div>
                       </div>
                     </div>
-                    <div class="flex w-1/2 flex-col gap-3">
+                    <div class="flex w-full sm:w-1/2 flex-col gap-3">
                       <div class="w-full flex justify-between">
                         <div class="flex w-1/2 flex-col text-color">
                           <span>Top 10 Countries</span>
