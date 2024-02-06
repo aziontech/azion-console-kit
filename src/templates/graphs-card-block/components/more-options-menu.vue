@@ -33,8 +33,7 @@
     hasMeanLine: Boolean,
     hasMeanLinePerSeries: Boolean,
     reportId: String,
-    clipboardWrite: Function,
-    playgroundOpener: Function
+    clipboardWrite: Function
   })
 
   const showMeanLine = ref(true)
@@ -44,12 +43,6 @@
 
   const items = computed(() => {
     const options = {
-      playground: {
-        label: 'GraphQL Playground',
-        icon: 'pi pi-external-link',
-        command: () => openPlayground(),
-        show: true
-      },
       copyQuery: {
         label: 'Copy query',
         icon: 'pi pi-copy',
@@ -86,15 +79,6 @@
   const reportData = computed(() => {
     return getCurrentReportsDataById.value(props.reportId)
   })
-
-  const openPlayground = () => {
-    const { query, variables } = reportData.value.reportQuery
-
-    const formattedQuery = query.replaceAll(' ', '')
-    const formattedVariables = JSON.stringify(variables, null, 0)
-
-    props.playgroundOpener({ query: formattedQuery, variables: formattedVariables })
-  }
 
   const exportCSV = () => {
     const csvFormattedSheet = generateCSV()

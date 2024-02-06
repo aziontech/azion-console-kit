@@ -15,7 +15,6 @@
         :hasMeanLinePerSeries="hasMeanLinePerSeries"
         :reportId="reportId"
         :clipboardWrite="clipboardWrite"
-        :playgroundOpener="playgroundOpener"
       />
     </header>
     <div class="flex h-full flex-col gap-6 flex-auto">
@@ -97,8 +96,7 @@
     hasMeanLine: Boolean,
     hasMeanLinePerSeries: Boolean,
     reportId: String,
-    clipboardWrite: Function,
-    playgroundOpener: Function
+    clipboardWrite: Function
   })
 
   const cardColumns = computed(() => {

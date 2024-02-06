@@ -9,10 +9,7 @@
         <IntervalFilterBlock />
         <ContentFilterBlock :playgroundOpener="playgroundOpener" />
       </div>
-      <DashboardPanelBlock
-        :clipboardWrite="clipboardWrite"
-        :playgroundOpener="playgroundOpener"
-      />
+      <DashboardPanelBlock :clipboardWrite="clipboardWrite" />
     </template>
   </ContentBlock>
 </template>
