@@ -84,11 +84,12 @@
                 v-tooltip.top="{ value: 'Hidden Columns', showDelay: 200 }"
               >
               </PrimeButton>
-              <OverlayPanel ref="columnSelectorPanel"
+              <OverlayPanel
+                ref="columnSelectorPanel"
                 :pt="{
                   content: { class: 'p-0' }
                 }"
-                >
+              >
                 <Listbox
                   v-model="selectedColumns"
                   multiple
@@ -99,7 +100,7 @@
                   optionGroupChildren="items"
                 >
                   <template #optiongroup="slotProps">
-                    <p class=" p-0 text-sm font-medium">{{ slotProps.option.label }}</p>
+                    <p class="p-0 text-sm font-medium">{{ slotProps.option.label }}</p>
                   </template>
                 </Listbox>
               </OverlayPanel>
