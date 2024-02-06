@@ -266,7 +266,7 @@ export const useMetricsStore = defineStore('metrics', {
     setCurrentReports(availableReports) {
       this.currentReportsData = availableReports
     },
-    async setCurrentReportValue({ reportId, reportData, reportQuery, error }) {
+    setCurrentReportValue({ reportId, reportData = [], reportQuery, error }) {
       const reportIdx = this.currentReportsData.findIndex(
         (reportItem) => reportItem.id === reportId
       )
@@ -274,7 +274,30 @@ export const useMetricsStore = defineStore('metrics', {
       this.currentReportsData[reportIdx].resultQuery = reportData
       this.currentReportsData[reportIdx].reportQuery = reportQuery
       this.currentReportsData[reportIdx].error = error
+      this.currentReportsData[reportIdx].hasMeanLine = reportData.length > 1
+      this.currentReportsData[reportIdx].hasMeanLinePerSeries = reportData.length > 2
+      this.currentReportsData[reportIdx].showMeanLine = false
+      this.currentReportsData[reportIdx].showMeanLinePerSeries = false
     },
+
+    toggleReportMeanLineStatus(reportId) {
+      const reportIdx = this.currentReportsData.findIndex(
+        (reportItem) => reportItem.id.toString() === reportId.toString()
+      )
+      if (reportIdx < 0) return
+      this.currentReportsData[reportIdx].showMeanLine =
+        !this.currentReportsData[reportIdx].showMeanLine
+    },
+
+    toggleReportMeanLinePerSeriesStatus(reportId) {
+      const reportIdx = this.currentReportsData.findIndex(
+        (reportItem) => reportItem.id.toString() === reportId.toString()
+      )
+      if (reportIdx < 0) return
+      this.currentReportsData[reportIdx].showMeanLinePerSeries =
+        !this.currentReportsData[reportIdx].showMeanLinePerSeries
+    },
+
     setTimeRange({ tsRangeBegin, tsRangeEnd, meta }) {
       if (!this.filters.tsRange) this.filters.tsRange = {}
 
