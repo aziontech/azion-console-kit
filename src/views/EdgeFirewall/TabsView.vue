@@ -110,6 +110,14 @@
     verifyTab(edgeFirewall.value)
   }
 
+  const edgeFirewallModules = computed(() => {
+    return {
+      webApplicationFirewall: edgeFirewall.value.wafEnabled,
+      debugRules: edgeFirewall.value.debugRules,
+      networkProtectionLayer: edgeFirewall.value.networkProtectionEnabled
+    }
+  })
+
   onMounted(() => {
     renderTabCurrentRouter()
   })
@@ -150,6 +158,7 @@
         <TabPanel header="Rules Engine">
           <EdgeFirewallRulesEngineListView
             v-if="showRulesEngine"
+            :edgeFirewallModules="edgeFirewallModules"
             :edgeFirewallId="edgeFirewallId"
             v-bind="props.rulesEngineServices"
           />

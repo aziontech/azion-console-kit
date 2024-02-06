@@ -7,7 +7,6 @@
   import Divider from 'primevue/divider'
   import PrimeMenu from 'primevue/menu'
   import PrimeButton from 'primevue/button'
-  import AutoComplete from 'primevue/autocomplete'
   import { useFieldArray } from 'vee-validate'
   import { computed, ref } from 'vue'
 
@@ -23,13 +22,17 @@
     wafRulesOptions: {
       type: Array,
       required: true
+    },
+    enabledModules: {
+      type: Object,
+      required: true
     }
   })
 
   const YEAR_IN_SECONDS = 31536000
   const DEFAULT_CRITERIA_OPTION = {
-    variable: 'header_accept',
-    operator: 'matches',
+    variable: '',
+    operator: '',
     conditional: 'if',
     argument: ''
   }
@@ -38,28 +41,9 @@
     { label: 'Certificate Verification Error', value: 'CERTIFICATE_VERIFICATION_ERROR' },
     { label: 'Missing Client Certificate', value: 'MISSING_CLIENT_CERTIFICATE' }
   ]
-  const CRITERIA_OPTIONS = [
-    'header_accept',
-    'header_accept_encoding',
-    'header_accept_language',
-    'header_cookie',
-    'header_origin',
-    'header_referer',
-    'header_user_agent',
-    'host',
-    'network',
-    'request_args',
-    'request_uri',
-    'request_method',
-    'scheme',
-    'ssl_verification_status',
-    'client_certificate_validation'
-  ]
+
   const conditionalMenuRef = ref({})
   const criteriaMenuRef = ref({})
-  const criteriaVariableAutoCompleteFieldOptions = ref(CRITERIA_OPTIONS)
-  const criteriaSuggestions = ref([])
-
   const { push: pushCriteria, remove: removeCriteria, fields: criteria } = useFieldArray('criteria')
 
   const getOperatorsOptionsByCriteriaVariable = ({ criteriaIndex, criteriaInnerRowIndex }) => {
@@ -153,10 +137,106 @@
     return criteriaVariable === 'ssl_verification_status'
   }
 
-  const generateCriteriaVariableSuggestions = (event) => {
-    criteriaSuggestions.value = criteriaVariableAutoCompleteFieldOptions.value.filter((option) =>
-      option.includes(event.query)
-    )
+  const generateCriteriaVariableOptions = () => {
+    const edgeFirewallModules = props.enabledModules
+    const hasNetworkProtectionLayerModuleEnabled = edgeFirewallModules.networkProtectionLayer
+    const hasWebApplicationFirewallModuleEnabled = edgeFirewallModules.webApplicationFirewall
+
+    const criteriaVariableOptions = [
+      {
+        label: `${
+          hasWebApplicationFirewallModuleEnabled ? 'Header Accept' : 'Header Accept - requires WAF'
+        }`,
+        value: 'header_accept',
+        disabled: !hasWebApplicationFirewallModuleEnabled
+      },
+      {
+        label: `${
+          hasWebApplicationFirewallModuleEnabled
+            ? 'Header Accept Encoding'
+            : 'Header Accept Encoding - requires WAF'
+        }`,
+        value: 'header_accept_encoding',
+        disabled: !hasWebApplicationFirewallModuleEnabled
+      },
+      {
+        label: `${
+          hasWebApplicationFirewallModuleEnabled
+            ? 'Header Accept Language'
+            : 'Header Accept Language - requires WAF'
+        }`,
+        value: 'header_accept_language',
+        disabled: !hasWebApplicationFirewallModuleEnabled
+      },
+      {
+        label: `${
+          hasWebApplicationFirewallModuleEnabled ? 'Header Cookie' : 'Header Cookie - requires WAF'
+        }`,
+        value: 'header_cookie',
+        disabled: !hasWebApplicationFirewallModuleEnabled
+      },
+      {
+        label: `${
+          hasWebApplicationFirewallModuleEnabled ? 'Header Origin' : 'Header Origin - requires WAF'
+        }`,
+        value: 'header_origin',
+        disabled: !hasWebApplicationFirewallModuleEnabled
+      },
+      {
+        label: `${
+          hasWebApplicationFirewallModuleEnabled
+            ? 'Header Referer'
+            : 'Header Referer - requires WAF'
+        }`,
+        value: 'header_referer',
+        disabled: !hasWebApplicationFirewallModuleEnabled
+      },
+      {
+        label: `${
+          hasWebApplicationFirewallModuleEnabled
+            ? 'Header User Agent'
+            : 'Header User Agent - requires WAF'
+        }`,
+        value: 'header_user_agent',
+        disabled: !hasWebApplicationFirewallModuleEnabled
+      },
+      { label: 'Host', value: 'host', disabled: false },
+      {
+        label: `${
+          hasNetworkProtectionLayerModuleEnabled
+            ? 'Network'
+            : 'Network - required Network Layer Protection'
+        }`,
+        value: 'network',
+        disabled: !hasNetworkProtectionLayerModuleEnabled
+      },
+      {
+        label: `${
+          hasWebApplicationFirewallModuleEnabled ? 'Request Args' : 'Request Args - required WAF'
+        }`,
+        value: 'request_args',
+        disabled: !hasWebApplicationFirewallModuleEnabled
+      },
+      { label: 'Request Uri', value: 'request_uri', disabled: false },
+      {
+        label: `${
+          hasWebApplicationFirewallModuleEnabled
+            ? 'Request Method'
+            : 'Request Method - required WAF'
+        }`,
+        value: 'request_method',
+        disabled: !hasWebApplicationFirewallModuleEnabled
+      },
+      { label: 'Scheme', value: 'scheme', disabled: false },
+      { label: 'Ssl Verification Status', value: 'ssl_verification_status', disabled: false },
+      {
+        label: 'Client Certificate Validation',
+        value: 'client_certificate_validation',
+        disabled: false
+      }
+    ]
+
+    return criteriaVariableOptions
   }
 
   /**
@@ -414,12 +494,15 @@
                 <div class="p-inputgroup-addon">
                   <i class="pi pi-dollar"></i>
                 </div>
-                <AutoComplete
+                <FieldDropdown
                   :id="`criteria[${criteriaIndex}][${criteriaInnerRowIndex}].variable`"
-                  v-model="criteria[criteriaIndex].value[criteriaInnerRowIndex].variable"
-                  :suggestions="criteriaSuggestions"
-                  @complete="generateCriteriaVariableSuggestions"
-                  :completeOnFocus="true"
+                  :options="generateCriteriaVariableOptions()"
+                  optionLabel="label"
+                  optionValue="value"
+                  optionDisabled="disabled"
+                  inputClass="w-full"
+                  :name="`criteria[${criteriaIndex}][${criteriaInnerRowIndex}].variable`"
+                  :value="criteria[criteriaIndex].value[criteriaInnerRowIndex].variable"
                 />
               </div>
             </div>

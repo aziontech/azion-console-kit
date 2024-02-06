@@ -37,6 +37,10 @@
     editService: {
       type: Function,
       required: true
+    },
+    edgeFirewallModules: {
+      type: Object,
+      required: true
     }
   })
 
@@ -59,8 +63,8 @@
     criteria: [
       [
         {
-          variable: 'header_accept',
-          operator: 'matches',
+          variable: '',
+          operator: '',
           conditional: 'if',
           argument: ''
         }
@@ -179,7 +183,6 @@
       payload
     })
   }
-
   onMounted(async () => {
     await Promise.all([listEdgeFirewallFunctionsOptions(), listWafRulesOptions()])
   })
@@ -202,6 +205,7 @@
   >
     <template #formFields>
       <FormFieldsEdgeFirewallRulesEngine
+        :enabledModules="edgeFirewallModules"
         :edgeFirewallFunctionsOptions="edgeFirewallFunctionsOptions"
         :wafRulesOptions="wafRulesOptions"
       />
@@ -220,6 +224,7 @@
   >
     <template #formFields>
       <FormFieldsEdgeFirewallRulesEngine
+        :enabledModules="edgeFirewallModules"
         :edgeFirewallFunctionsOptions="edgeFirewallFunctionsOptions"
         :wafRulesOptions="wafRulesOptions"
       />

@@ -46,6 +46,10 @@
     edgeFirewallId: {
       type: Number || String,
       required: true
+    },
+    edgeFirewallModules: {
+      type: Object,
+      required: true
     }
   })
   const hasContentToList = ref(true)
@@ -119,6 +123,7 @@
   <Drawer
     ref="drawerRef"
     :edgeFirewallId="props.edgeFirewallId"
+    :edgeFirewallModules="props.edgeFirewallModules"
     :createService="props.createEdgeFirewallRulesEngineService"
     :listFunctionsService="props.listFunctionsService"
     :listWafRulesService="props.listWafRulesService"
