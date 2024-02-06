@@ -98,7 +98,7 @@
         .required()
     ),
     behaviors: yup.array().of(
-      yup.object({
+      yup.object().shape({
         name: yup.string().required().label('behavior')
       })
     )
@@ -198,7 +198,7 @@
     :schema="validationSchema"
     :initialValues="initialValues"
     @onSuccess="handleCreateWithSuccess"
-    title="Create Cache Settings"
+    title="Create Rule Set"
   >
     <template #formFields>
       <FormFieldsEdgeFirewallRulesEngine

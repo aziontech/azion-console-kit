@@ -307,6 +307,24 @@
     }
   }
 
+  const isRunFunctionBehavior = (behaviorItemIndex) => {
+    return behaviors.value[behaviorItemIndex].value.name === 'run_function'
+  }
+
+  const isWafBehavior = (behaviorItemIndex) => {
+    return behaviors.value[behaviorItemIndex].value.name === 'set_waf_ruleset_and_waf_mode'
+  }
+  const isRateLimitBehavior = (behaviorItemIndex) => {
+    return behaviors.value[behaviorItemIndex].value.name === 'set_rate_limit'
+  }
+  const isCustomResponseBehavior = (behaviorItemIndex) => {
+    return behaviors.value[behaviorItemIndex].value.name === 'set_custom_response'
+  }
+
+  const isRateLimitBySeconds = (behaviorItemIndex) => {
+    return behaviors.value[behaviorItemIndex].value.type === 'second'
+  }
+
   const disableAddBehaviorButtonComputed = computed(() => {
     const behaviorHasNotBeenLoaded = !behaviors || !behaviors.value
     if (behaviorHasNotBeenLoaded) {
@@ -564,7 +582,7 @@
             />
           </div>
           <div class="w-1/2 max-sm:w-full">
-            <template v-if="behaviors[behaviorItemIndex].value.name === 'run_function'">
+            <template v-if="isRunFunctionBehavior(behaviorItemIndex)">
               <FieldDropdown
                 :key="`${behaviorItem.key}-run-function`"
                 :name="`behaviors[${behaviorItemIndex}].functionId`"
@@ -577,9 +595,7 @@
               />
             </template>
 
-            <template
-              v-if="behaviors[behaviorItemIndex].value.name === 'set_waf_ruleset_and_waf_mode'"
-            >
+            <template v-if="isWafBehavior(behaviorItemIndex)">
               <FieldDropdown
                 :key="`${behaviorItem.key}-waf_id`"
                 :name="`behaviors[${behaviorItemIndex}].waf_id`"
@@ -611,7 +627,7 @@
               />
             </template>
 
-            <template v-if="behaviors[behaviorItemIndex].value.name === 'set_rate_limit'">
+            <template v-if="isRateLimitBehavior(behaviorItemIndex)">
               <FieldDropdown
                 :key="`${behaviorItem.key}-type`"
                 placeholder="Select rate limit type"
@@ -654,7 +670,7 @@
                 inputClass="w-full mb-3"
               />
 
-              <template v-if="behaviors[behaviorItemIndex].value.type === 'second'">
+              <template v-if="isRateLimitBySeconds(behaviorItemIndex)">
                 <FieldNumber
                   id="`behaviors[${behaviorItemIndex}].maximum_burst_size`"
                   :key="`${behaviorItem.key}-maximumBurstSize`"
@@ -668,7 +684,7 @@
               </template>
             </template>
 
-            <template v-if="behaviors[behaviorItemIndex].value.name === 'set_custom_response'">
+            <template v-if="isCustomResponseBehavior(behaviorItemIndex)">
               <FieldNumber
                 id="`behaviors[${behaviorItemIndex}].status_code`"
                 :key="`${behaviorItem.key}-status_code`"

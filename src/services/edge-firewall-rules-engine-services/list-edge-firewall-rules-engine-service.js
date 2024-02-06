@@ -37,6 +37,7 @@ const adapt = (httpResponse) => {
       name: ruleEngine.name,
       description: ruleEngine.description || '',
       lastModified: formatExhibitionDate(ruleEngine.last_modified),
+      lastEditor: ruleEngine.last_editor,
       status: parseStatus(ruleEngine.is_active)
     }
   })

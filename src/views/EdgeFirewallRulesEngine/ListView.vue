@@ -88,6 +88,7 @@
     {
       field: 'status',
       header: 'Status',
+      filterPath: 'status.content',
       type: 'component',
       component: (columnData) => {
         return columnBuilder({
@@ -99,6 +100,7 @@
     {
       field: 'description',
       header: 'Description',
+      filterPath: 'description.value',
       type: 'component',
       component: (columnData) =>
         columnBuilder({ data: columnData, columnAppearance: 'expand-text-column' })
@@ -106,6 +108,10 @@
     {
       field: 'lastModified',
       header: 'Last Modified'
+    },
+    {
+      field: 'lastEditor',
+      header: 'Last Editor'
     }
   ])
 </script>
