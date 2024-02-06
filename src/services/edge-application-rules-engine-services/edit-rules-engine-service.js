@@ -24,10 +24,15 @@ export const editRulesEngineService = async ({ id, payload, reorder = false }) =
  * @returns {string}
  */
 const generateRulePhase = (payload) => {
-  const DEFAULT_RULE_PHASE = 'Default'
-  return payload.phase.content === DEFAULT_RULE_PHASE
+  let rulePhase = payload.phase
+  if (payload.phase?.content) {
+    rulePhase = payload.phase?.content
+  }
+
+  const DEFAULT_RULE_PHASE = 'default'
+  return rulePhase === DEFAULT_RULE_PHASE
     ? 'request'
-    : payload.phase.content?.toLowerCase()
+    : rulePhase.toLowerCase()
 }
 
 const adapt = (payload, reorder) => {

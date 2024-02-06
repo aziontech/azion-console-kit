@@ -50,7 +50,7 @@
 
   const isEditDrawer = computed(() => !!props.selectedRulesEngineToEdit)
 
-  const checkPhaseIsDefaultValue = computed(() => phase.value !== 'default')
+  const checkPhaseIsDefaultValue = computed(() => phase.value === 'default')
 
   const toast = useToast()
   const criteriaOperatorOptions = ref([
@@ -137,6 +137,15 @@
     { label: 'Redirect To (301 Moved Permanently)', value: 'redirect_to_301', requires: false },
     { label: 'Redirect To (302 Found)', value: 'redirect_to_302', requires: false },
     { label: 'Run Function', value: 'run_function', requires: false }
+  ])
+
+  const behaviorsDefaultOptions = ref([
+    { label: 'Deny (403 Forbidden)', value: 'deny', requires: false },
+    { label: 'Redirect To (301 Moved Permanently)', value: 'redirect_to_301', requires: false },
+    { label: 'Redirect To (302 Found)', value: 'redirect_to_302', requires: false },
+    { label: 'Set Origin', value: 'set_origin', requires: false },
+    { label: 'Run Function', value: 'run_function', requires: false },
+    { label: 'No Content (204)', value: 'no_content', requires: false }
   ])
 
   const { value: name } = useField('name')
@@ -308,9 +317,18 @@
     setDefaultBehaviorOptions()
   }
 
-  const behaviorsOptions = computed(() =>
-    phase.value === 'request' ? behaviorsRequestOptions.value : behaviorsResponseOptions.value
-  )
+  const behaviorsOptionsMap = {
+    request: () => behaviorsRequestOptions.value,
+    default: () => {
+      if (behaviors.value.length === 1) {
+        return behaviorsDefaultOptions.value
+      }
+      return behaviorsRequestOptions.value
+    },
+    response: () => behaviorsResponseOptions.value
+  }
+
+  const behaviorsOptions = computed(() => behaviorsOptionsMap[phase.value]() || [])
 
   /**
    * Updates the 'requires' property of behavior options based on component props.
@@ -642,6 +660,8 @@
         <FieldText
           label="Name *"
           name="name"
+          :readonly="checkPhaseIsDefaultValue"
+          :disabled="checkPhaseIsDefaultValue"
           placeholder="My rule"
           :value="name"
           description="Give a unique and descriptive name to identify the rule."
@@ -664,7 +684,7 @@
     :isDrawer="true"
     title="Phase"
     description="Select the phase of the execution of the rule."
-    v-if="checkPhaseIsDefaultValue"
+    v-if="!checkPhaseIsDefaultValue"
   >
     <template #inputs>
       <div class="flex flex-col gap-2">
