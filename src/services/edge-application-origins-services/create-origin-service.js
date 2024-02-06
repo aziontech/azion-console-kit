@@ -39,18 +39,17 @@ const adapt = (payload) => {
 /**
  * @param {Object} errorSchema - The error schema.
  * @param {string} key - The error key of error schema.
- * @returns {string|undefined} The result message based on the status code.
+ * @returns {Object} An object containing the most specific error key and its message.
  */
 const extractErrorKey = (errorSchema, key) => {
-  if (Array.isArray(errorSchema[key])) {
-    if (typeof errorSchema[key][0] === 'object') {
-      const newError = errorSchema[key][0]
-      const errorKey = Object.keys(errorSchema[key][0])
-      return newError[errorKey]?.[0]
+  const errorValue = errorSchema[key]
+  if (Array.isArray(errorValue)) {
+    if (errorValue.length > 0 && typeof errorValue[0] === 'object') {
+      return extractErrorKey(errorValue[0], Object.keys(errorValue[0])[0])
     }
-    return errorSchema[key]?.[0]
+    return { key, message: errorValue[0] }
   }
-  return errorSchema[key]
+  return { key, message: errorValue }
 }
 
 /**
@@ -59,9 +58,12 @@ const extractErrorKey = (errorSchema, key) => {
  * @returns {string} The result message based on the status code.
  */
 const extractApiError = (httpResponse) => {
-  const errorKey = Object.keys(httpResponse.body)[0]
-  const apiError = extractErrorKey(httpResponse.body, errorKey)
-  return `${errorKey}: ${apiError}`
+  for (const key of Object.keys(httpResponse.body)) {
+    const { key: innerKey, message } = extractErrorKey(httpResponse.body, key)
+    if (message) {
+      return `${innerKey}: ${message}`
+    }
+  }
 }
 
 /**

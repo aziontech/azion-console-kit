@@ -26,15 +26,6 @@ const adapt = (httpResponse) => {
       id: edgeApplication.id,
       name: edgeApplication.name,
       origins: originNames,
-      status: edgeApplication.active
-        ? {
-            content: 'Active',
-            severity: 'success'
-          }
-        : {
-            content: 'Inactive',
-            severity: 'danger'
-          },
       lastEditor: edgeApplication.last_editor,
       lastModify: dateFormat(edgeApplication.last_modified),
       lastModifyDate: edgeApplication.last_modified

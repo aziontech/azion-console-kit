@@ -30,7 +30,7 @@ const adapt = (payload) => {
       : 0,
     cdn_cache_settings: payload.cdnCacheSettings,
     cdn_cache_settings_maximum_ttl: payload.cdnCacheSettingsMaximumTtl,
-    active: payload.active
+    debug_rules: payload.debugRules
   }
 }
 

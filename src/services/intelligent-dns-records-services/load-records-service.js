@@ -17,11 +17,12 @@ const adapt = (httpResponse, recordId) => {
   const record = httpResponse.body.results.records.find(
     (record) => record.record_id === Number(recordId)
   )
+
   const parsedRecord = {
     id: record.record_id,
     name: record.entry,
     selectedRecordType: record.record_type,
-    value: record.answers_list.join(','),
+    value: record.answers_list.join('\n'),
     ttl: record.ttl,
     selectedPolicy: record.policy,
     weight: record.weight,

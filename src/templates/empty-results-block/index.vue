@@ -30,17 +30,17 @@
     :class="{ 'mt-4 pb-8': inTabs }"
   >
     <div
-      class="flex flex-col h-full gap-7 justify-center items-center rounded-md"
+      class="flex flex-col p-8 h-full gap-7 justify-center items-center rounded-md"
       :class="{ 'border surface-border': !noBorder }"
     >
       <slot name="illustration">
         <Illustration />
       </slot>
       <div class="flex flex-col gap-2">
-        <p class="text-center text-color text-lg font-bold leading-7">
+        <p class="text-center text-color text-lg font-medium leading-7">
           {{ title }}
         </p>
-        <p class="text-center text-color-secondary text-sm font-normal leading-tight">
+        <p class="text-center text-color-secondary text-base font-normal leading-tight">
           {{ description }}
         </p>
       </div>
@@ -58,7 +58,6 @@
           <slot name="extraActionsRight"></slot>
         </div>
         <PrimeButton
-          outlined
           class="w-fit"
           icon-pos="right"
           icon="pi pi-external-link"

@@ -18,6 +18,10 @@
       type: Boolean,
       required: true
     },
+    isDeliveryProtocolHttps: {
+      type: Boolean,
+      required: true
+    },
     listEdgeApplicationFunctionsService: {
       type: Function,
       required: true
@@ -45,6 +49,8 @@
   })
 
   const isEditDrawer = computed(() => !!props.selectedRulesEngineToEdit)
+
+  const checkPhaseIsDefaultValue = computed(() => phase.value !== 'default')
 
   const toast = useToast()
   const criteriaOperatorOptions = ref([
@@ -91,7 +97,11 @@
     },
     { label: 'No Content (204)', value: 'no_content', requires: false },
     { label: 'Optimize Images', value: 'optimize_images', requires: false },
-    { label: 'Redirect HTTP to HTTPS', value: 'redirect_http_to_https', requires: false },
+    {
+      label: 'Redirect HTTP to HTTPS - requires Delivery Protocol with HTTPS',
+      value: 'redirect_http_to_https',
+      requires: true
+    },
     { label: 'Redirect To (301 Moved Permanently)', value: 'redirect_to_301', requires: false },
     { label: 'Redirect To (302 Found)', value: 'redirect_to_302', requires: false },
     {
@@ -303,20 +313,37 @@
   )
 
   /**
-   * Updates the 'requires' property of all behavior options to false.
+   * Updates the 'requires' property of behavior options based on component props.
+   * This function checks if the behavior option is 'redirect_http_to_https' and sets the 'requires'
+   * property based on the 'isDeliveryProtocolHttps' prop. For other options that have 'requires' as true,
+   * it sets the 'requires' property based on the 'isEnableApplicationAcceleration' prop.
+   * @param {Array} options - The behavior options to update.
+   * @returns {Array} The updated array of behavior options with the 'requires' property set accordingly.
    */
-  const updateBehaviorsOptionsRequires = () => {
-    behaviorsRequestOptions.value = behaviorsRequestOptions.value.map((option) => ({
-      ...option,
-      requires: false
-    }))
-
-    behaviorsResponseOptions.value = behaviorsResponseOptions.value.map((option) => ({
-      ...option,
-      requires: false
-    }))
+  const updateOptionRequires = (options) => {
+    return options.map((option) => {
+      if (option.requires) {
+        return {
+          ...option,
+          requires:
+            option.value === 'redirect_http_to_https'
+              ? !props.isDeliveryProtocolHttps
+              : !props.isEnableApplicationAcceleration
+        }
+      }
+      return option
+    })
   }
 
+  /**
+   * Updates the 'requires' property of all behavior options that have 'requires' as true by default,
+   * based on the component props.
+   * It applies the 'updateOptionRequires' function to both request and response behavior options.
+   */
+  const updateBehaviorsOptionsRequires = () => {
+    behaviorsRequestOptions.value = updateOptionRequires(behaviorsRequestOptions.value)
+    behaviorsResponseOptions.value = updateOptionRequires(behaviorsResponseOptions.value)
+  }
   const functionsInstanceOptions = ref(null)
   const loadingFunctionsInstance = ref(false)
 
@@ -582,9 +609,9 @@
   }
 
   onMounted(() => {
-    if (props.isEnableApplicationAcceleration) {
-      updateBehaviorsOptionsRequires()
+    updateBehaviorsOptionsRequires()
 
+    if (props.isEnableApplicationAcceleration) {
       if (criteria.value[0] && !isEditDrawer.value) {
         criteria.value[0].value[0].variable = ''
       }
@@ -634,6 +661,7 @@
     :isDrawer="true"
     title="Phase"
     description="Select the phase of the execution of the rule."
+    v-if="checkPhaseIsDefaultValue"
   >
     <template #inputs>
       <div class="flex flex-col gap-2">
