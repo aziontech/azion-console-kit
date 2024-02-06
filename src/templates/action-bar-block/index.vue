@@ -43,10 +43,10 @@
     class="flex flex-col items-start w-full justify-center p-3 border-t surface-border sticky bottom-0 surface-section z-50 sm:flex-row sm:py-3 sm:px-8 sm:justify-between"
   >
     <div
-      class="flex w-full justify-content-end max-w-screen-2xl mx-auto"
+      class="flex w-full justify-content-end max-w-full 3xl:mx-auto"
       :class="{
         '2xl:px-0': inDrawerStyles,
-        '2xl:px-8': !inDrawerStyles
+        '2xl:px-0': !inDrawerStyles
       }"
     >
       <div class="flex gap-4 self-stretch items-center justify-end w-full">
