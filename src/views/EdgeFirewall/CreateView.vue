@@ -5,6 +5,8 @@
   import PageHeadingBlock from '@/templates/page-heading-block'
   import * as yup from 'yup'
   import FormCreateEdgeFirewall from './FormFields/FormFieldsEdgeFirewall'
+  import { ref } from 'vue'
+
   defineOptions({ name: 'create-edge-firewall' })
 
   const props = defineProps({
@@ -17,6 +19,8 @@
       required: true
     }
   })
+
+  const loadingServices = ref(false)
 
   const validationSchema = yup.object({
     name: yup.string().required().label('Name'),
@@ -50,7 +54,10 @@
         :initialValues="initialValues"
       >
         <template #form>
-          <FormCreateEdgeFirewall :domainsService="props.listDomainsService" />
+          <FormCreateEdgeFirewall
+            :domainsService="props.listDomainsService"
+            v-model:loadingDomains="loadingServices"
+          />
         </template>
         <template #action-bar="{ onSubmit, formValid, onCancel, loading }">
           <ActionBarTemplate
