@@ -206,7 +206,7 @@
               :key="index"
               :class="{ 'border-orange-500': checkActiveBorder(attack) }"
             >
-              <div class="flex  w-full gap-3 items-start">
+              <div class="flex w-full gap-3 items-start">
                 <CheckboxPrime
                   v-model="selectedAttack"
                   name="attack.ruleID"

@@ -61,7 +61,7 @@ describe('EdgeApplicationServices', () => {
         host_header: fixtures.edgeApplicationMock.hostHeader,
         browser_cache_settings: fixtures.edgeApplicationMock.browserCacheSettings,
         browser_cache_settings_maximum_ttl:
-        fixtures.edgeApplicationMock.browserCacheSettingsMaximumTtl,
+          fixtures.edgeApplicationMock.browserCacheSettingsMaximumTtl,
         cdn_cache_settings: fixtures.edgeApplicationMock.cdnCacheSettings,
         cdn_cache_settings_maximum_ttl: fixtures.edgeApplicationMock.cdnCacheSettingsMaximumTtl,
         debug_rules: fixtures.edgeApplicationMock.debugRules
