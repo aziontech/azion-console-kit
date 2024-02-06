@@ -217,7 +217,6 @@
         value: 'request_args',
         disabled: !hasWebApplicationFirewallModuleEnabled
       },
-      { label: 'Request Uri', value: 'request_uri', disabled: false },
       {
         label: `${
           hasWebApplicationFirewallModuleEnabled
@@ -227,6 +226,7 @@
         value: 'request_method',
         disabled: !hasWebApplicationFirewallModuleEnabled
       },
+      { label: 'Request Uri', value: 'request_uri', disabled: false },
       { label: 'Scheme', value: 'scheme', disabled: false },
       { label: 'Ssl Verification Status', value: 'ssl_verification_status', disabled: false },
       {
@@ -314,8 +314,12 @@
     remove: removeBehavior,
     fields: behaviors
   } = useFieldArray('behaviors')
+  const behaviorsMenuRef = ref({})
 
   const behaviorsOptions = computed(() => {
+    const edgeFirewallModules = props.enabledModules
+    const hasEdgeFunctionsModuleEnabled = edgeFirewallModules.edgeFunctions
+    const hasWebApplicationFirewallModuleEnabled = edgeFirewallModules.webApplicationFirewall
     const currentBehaviors = behaviors.value.map((item) => item.value.name)
     const wafBehaviorIsAlreadySelected = currentBehaviors.includes('set_waf_ruleset_and_waf_mode')
     const runFunctionBehaviorIsAlreadySelected = currentBehaviors.includes('run_function')
@@ -326,19 +330,24 @@
       { value: 'set_rate_limit', label: 'Set Rate Limit', disabled: false },
       {
         value: 'set_waf_ruleset_and_waf_mode',
-        label: 'Set WAF Rule Set',
-        disabled: wafBehaviorIsAlreadySelected
+        label: `${
+          hasWebApplicationFirewallModuleEnabled
+            ? 'Set WAF Rule Set'
+            : 'Set WAF Rule Set - requires WAF'
+        }`,
+        disabled: wafBehaviorIsAlreadySelected || !hasWebApplicationFirewallModuleEnabled
       },
       {
         value: 'run_function',
-        label: 'Run Function',
-        disabled: runFunctionBehaviorIsAlreadySelected
+        label: `${
+          hasEdgeFunctionsModuleEnabled ? 'Run Function' : 'Run Function - required Edge Functions '
+        }`,
+        disabled: runFunctionBehaviorIsAlreadySelected || !hasEdgeFunctionsModuleEnabled
       },
       { value: 'tag_event', label: 'Tag Event', disabled: false },
       { value: 'set_custom_response', label: 'Set Custom Response', disabled: false }
     ]
   })
-  const behaviorsMenuRef = ref({})
 
   const toggleBehaviorMenu = (event, behaviorItemIndex) => {
     behaviorsMenuRef.value[behaviorItemIndex].toggle(event)

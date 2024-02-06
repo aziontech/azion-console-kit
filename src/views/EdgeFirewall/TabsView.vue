@@ -114,7 +114,8 @@
     return {
       webApplicationFirewall: edgeFirewall.value.wafEnabled,
       debugRules: edgeFirewall.value.debugRules,
-      networkProtectionLayer: edgeFirewall.value.networkProtectionEnabled
+      networkProtectionLayer: edgeFirewall.value.networkProtectionEnabled,
+      edgeFunctions: edgeFirewall.value.edgeFunctionsEnabled
     }
   })
 
