@@ -3,12 +3,12 @@ import { AxiosHttpClientAdapter } from '../axios/AxiosHttpClientAdapter'
 import { makeEdgeFirewallBaseUrl } from './make-edge-firewall-base-url'
 
 export const editEdgeFirewallService = async (payload) => {
-  const newPayload = adapt(payload)
+  const parsedPayload = adapt(payload)
 
   let httpResponse = await AxiosHttpClientAdapter.request({
     url: `${makeEdgeFirewallBaseUrl()}/${payload.id}`,
     method: 'PATCH',
-    body: newPayload
+    body: parsedPayload
   })
 
   return parseHttpResponse(httpResponse)
@@ -31,11 +31,15 @@ const adapt = (payload) => {
 const mapErrorToMessage = (error) => {
   switch (error) {
     case 'duplicated_edge_firewall_name':
-      return 'Edge Firewall cannot be created because it already exists'
+      return 'Edge Firewall cannot be edited because it already exists'
     case 'no_modules_enabled':
-      return 'Edge Firewall cannot be created because no modules are enabled'
+      return 'Edge Firewall cannot be edited because no modules are enabled'
     case 'domains_already_in_use':
-      return 'Edge Firewall cannot be created because the domains are already in use'
+      return 'Edge Firewall cannot be edited because the domains are already in use'
+    case 'has_functions_instances':
+      return 'Cannot disable Edge Functions because Edge Firewall is using at least one function.'
+    case 'solution_in_use':
+      return 'It was not possible to perform this operation. To disable "Web Application Firewall", you must first remove all settings on this RuleSet that require it.'
     default:
       return new Errors.UnexpectedError().message
   }

@@ -62,17 +62,29 @@ describe('EdgeFirewallServices', () => {
     {
       error: 'duplicated_edge_firewall_name',
       key: 'results',
-      expectedError: 'Edge Firewall cannot be created because it already exists'
+      expectedError: 'Edge Firewall cannot be edited because it already exists'
     },
     {
       error: 'no_modules_enabled',
       key: 'results',
-      expectedError: 'Edge Firewall cannot be created because no modules are enabled'
+      expectedError: 'Edge Firewall cannot be edited because no modules are enabled'
     },
     {
       error: 'domains_already_in_use',
       key: 'results',
-      expectedError: 'Edge Firewall cannot be created because the domains are already in use'
+      expectedError: 'Edge Firewall cannot be edited because the domains are already in use'
+    },
+    {
+      error: 'has_functions_instances',
+      key: 'results',
+      expectedError:
+        'Cannot disable Edge Functions because Edge Firewall is using at least one function.'
+    },
+    {
+      error: 'solution_in_use',
+      key: 'results',
+      expectedError:
+        'It was not possible to perform this operation. To disable "Web Application Firewall", you must first remove all settings on this RuleSet that require it.'
     },
     {
       error: 'unmappedError',
