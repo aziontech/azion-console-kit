@@ -90,12 +90,13 @@
                 v-tooltip.left="'Hidden columns'"
               >
               </PrimeButton>
-              <OverlayPanel ref="columnSelectorPanel"
+              <OverlayPanel
+                ref="columnSelectorPanel"
                 :pt="{
-                    root: { class: 'shadow-none'},
-                    content: { class: 'p-0' }
+                  root: { class: 'shadow-none' },
+                  content: { class: 'p-0' }
                 }"
-                >
+              >
                 <Listbox
                   v-model="selectedColumns"
                   multiple

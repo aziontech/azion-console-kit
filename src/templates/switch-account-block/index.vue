@@ -218,8 +218,8 @@
               @click="toggle"
             />
             <Menu
-            :pt="{
-                content: { class: 'p-0' },
+              :pt="{
+                content: { class: 'p-0' }
               }"
               ref="menu"
               id="overlay_menu"
