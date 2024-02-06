@@ -30,9 +30,7 @@ const generateRulePhase = (payload) => {
   }
 
   const DEFAULT_RULE_PHASE = 'default'
-  return rulePhase === DEFAULT_RULE_PHASE
-    ? 'request'
-    : rulePhase.toLowerCase()
+  return rulePhase === DEFAULT_RULE_PHASE ? 'request' : rulePhase.toLowerCase()
 }
 
 const adapt = (payload, reorder) => {
