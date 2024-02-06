@@ -67,7 +67,7 @@
     browserCacheSettingsMaximumTtl: 0,
     cdnCacheSettings: 'override',
     cdnCacheSettingsMaximumTtl: 60,
-    active: false
+    debugRules: false
   })
 
   const handleBlocks = [

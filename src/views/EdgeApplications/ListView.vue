@@ -49,18 +49,6 @@
         }
       },
       {
-        field: 'status',
-        header: 'Status',
-        type: 'component',
-        filterPath: 'status.content',
-        component: (columnData) => {
-          return columnBuilder({
-            data: columnData,
-            columnAppearance: 'tag'
-          })
-        }
-      },
-      {
         field: 'lastEditor',
         header: 'Last Editor'
       },
