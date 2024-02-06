@@ -19,10 +19,10 @@
     >
       <template #header>
         <div class="flex flex-wrap justify-between gap-2 w-full">
-          <span class="p-input-icon-left max-sm:w-full">
+          <span class="flex flex-row p-input-icon-left items-center max-sm:w-full">
             <i class="pi pi-search" />
             <InputText
-              class="w-full"
+              class="h-8 w-full md:min-w-[320px]"
               v-model.trim="filters.global.value"
               placeholder="Search"
             />
@@ -137,10 +137,10 @@
     >
       <template #header>
         <div class="flex flex-wrap justify-between gap-2 w-full">
-          <span class="p-input-icon-left max-sm:w-full">
+          <span class="flex flex-row h-8 p-input-icon-left max-sm:w-full">
             <i class="pi pi-search" />
             <InputText
-              class="w-full"
+              class="w-full h-8 md:min-w-[320px]"
               v-model="filters.global.value"
               placeholder="Search"
             />

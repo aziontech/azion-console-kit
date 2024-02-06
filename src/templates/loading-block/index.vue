@@ -7,7 +7,7 @@
     <ProgressBar
       class="sticky"
       mode="indeterminate"
-      style="height: 0.375rem"
+      style="height: 0.375rem; border-radius: 0px"
     />
   </div>
 </template>
