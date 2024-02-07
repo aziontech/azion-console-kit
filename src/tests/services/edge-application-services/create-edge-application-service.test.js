@@ -19,7 +19,7 @@ const fixtures = {
     browserCacheSettingsMaximumTtl: 3600,
     cdnCacheSettings: 'cdn-cache',
     cdnCacheSettingsMaximumTtl: 3600,
-    active: true
+    debugRules: true
   }
 }
 
@@ -64,7 +64,7 @@ describe('EdgeApplicationServices', () => {
           fixtures.edgeApplicationMock.browserCacheSettingsMaximumTtl,
         cdn_cache_settings: fixtures.edgeApplicationMock.cdnCacheSettings,
         cdn_cache_settings_maximum_ttl: fixtures.edgeApplicationMock.cdnCacheSettingsMaximumTtl,
-        active: fixtures.edgeApplicationMock.active
+        debug_rules: fixtures.edgeApplicationMock.debugRules
       }
     })
   })

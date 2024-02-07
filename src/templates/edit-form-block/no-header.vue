@@ -74,6 +74,15 @@
       this.teleportLoad = true
     },
     methods: {
+      showToast(severity, detail) {
+        if (!detail) return
+        this.$toast.add({
+          closable: true,
+          severity,
+          summary: severity,
+          detail
+        })
+      },
       leavePage(dialogUnsaved) {
         dialogUnsaved = false
         this.handleCancel()
@@ -96,12 +105,7 @@
           const initialData = await this.loadService({ id })
           this.initialDataSetter(initialData)
         } catch (error) {
-          this.$toast.add({
-            closable: true,
-            severity: 'error',
-            summary: 'error',
-            detail: error
-          })
+          this.showToast('error', error)
         } finally {
           this.isLoading = false
         }
@@ -110,22 +114,12 @@
         try {
           this.isLoading = true
           await this.editService(this.formData)
-          this.$toast.add({
-            closable: true,
-            severity: 'success',
-            summary: 'success',
-            detail: 'edited successfully'
-          })
+          this.showToast('success', 'edited successfully')
           this.blockViewRedirection = false
           this.goBackToList()
         } catch (error) {
           this.blockViewRedirection = true
-          this.$toast.add({
-            closable: true,
-            severity: 'error',
-            summary: 'error',
-            detail: error
-          })
+          this.showToast('error', error)
         } finally {
           setTimeout(() => {
             this.isLoading = false

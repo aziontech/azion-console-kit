@@ -1,10 +1,11 @@
 <script setup>
+  import { useHelpCenterStore } from '@/stores/help-center'
   import { useMetricsStore } from '@/stores/metrics'
   import GraphsCardBlock from '@/templates/graphs-card-block'
   import { storeToRefs } from 'pinia'
   import SelectButton from 'primevue/selectbutton'
   import Skeleton from 'primevue/skeleton'
-  import { computed, defineAsyncComponent, nextTick, onMounted, onUnmounted, ref } from 'vue'
+  import { computed, defineAsyncComponent, onMounted, onUnmounted, ref, watch } from 'vue'
 
   const propToComponent = {
     'bar-chart': defineAsyncComponent(() => import('../components/chart/bar-chart/bar-chart')),
@@ -20,13 +21,22 @@
 
   const { setCurrentDashboard, loadCurrentReports, setDatasetAvailableFilters } = metricsStore
 
+  const { getStatus } = storeToRefs(useHelpCenterStore())
+
   const showChart = ref(true)
 
   const reRenderChart = () => {
+    /*
+     * This approach was used to re-render the chart after screen resize and help center toggling.
+     * The nextTick was not sufficient to resolve the latter.
+     * HelpCenter takes 300ms to animate. To garantee the proper re-render, 350ms was used.
+     */
+    const timeout = 350
+
     showChart.value = false
-    nextTick(() => {
+    setTimeout(() => {
       showChart.value = true
-    })
+    }, timeout)
   }
 
   onMounted(() => {
@@ -35,6 +45,10 @@
 
   onUnmounted(() => {
     window.removeEventListener('resize', reRenderChart)
+  })
+
+  watch(getStatus, () => {
+    reRenderChart()
   })
 
   const dashboards = computed(() => {

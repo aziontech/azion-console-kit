@@ -46,28 +46,36 @@
 
   const classLoading = computed(() => (loading.value ? 'pointer-events-none' : ''))
 
-  const fetchDomains = async () => {
-    loading.value = true
-    const responseDomains = await props.domainsService({ pageSize: 1000 })
-    const alreadySelectedDomainsIds = domains.value?.map((domain) => domain) || []
-
-    const alreadySelectedDomains =
-      responseDomains.filter((domain) => alreadySelectedDomainsIds.includes(domain.id)) || []
-
-    const notSelectedDomains = responseDomains.filter((domain) => !domain.edgeFirewallId) || []
-
-    domainsList.value = [notSelectedDomains, alreadySelectedDomains]
-    loading.value = false
-
-    resetField({
-      value: alreadySelectedDomains
-    })
-
-    watch(domainsList, (newValue) => {
-      domains.value = newValue[1]
-    })
+  const isAlreadySelected = ({ alreadySelectedDomainsIds, id }) => {
+    return alreadySelectedDomainsIds.includes(id)
   }
 
+  const fetchDomains = async () => {
+    try {
+      loading.value = true
+      const responseDomains = await props.domainsService({ pageSize: 1000 })
+      const alreadySelectedDomainsIds = domains.value?.map((domain) => domain) || []
+
+      const alreadySelectedDomains =
+        responseDomains.filter((domain) => alreadySelectedDomainsIds.includes(domain.id)) || []
+
+      const notSelectedDomains = responseDomains.filter(
+        (domain) => !isAlreadySelected({ alreadySelectedDomainsIds, id: domain.id })
+      )
+
+      domainsList.value = [notSelectedDomains, alreadySelectedDomains]
+
+      resetField({
+        value: alreadySelectedDomains
+      })
+
+      watch(domainsList, (newValue) => {
+        domains.value = newValue[1]
+      })
+    } finally {
+      loading.value = false
+    }
+  }
   fetchDomains()
 </script>
 

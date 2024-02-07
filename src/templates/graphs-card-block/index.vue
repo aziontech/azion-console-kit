@@ -14,7 +14,9 @@
     </header>
     <div class="flex h-full flex-col gap-6 flex-auto">
       <div class="flex flex-col">
-        <span class="break-words font-normal line-height-1 py-3.5">{{ description }}</span>
+        <span class="break-words text-sm text-color-secondary font-normal line-height-1 py-3.5">
+          {{ description }}
+        </span>
         <AggregationInfo
           :aggregationType="aggregationType"
           :variationType="variationType"

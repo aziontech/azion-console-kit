@@ -43,10 +43,6 @@
     showBarGoBack: {
       type: Boolean,
       default: false
-    },
-    itemToEdit: {
-      type: Object,
-      required: false
     }
   })
 
@@ -81,19 +77,20 @@
     toggleDrawerVisibility(false)
   }
 
-  const showToast = (severity, summary) => {
+  const showToast = (severity, detail) => {
+    if (!detail) return
     toast.add({
       closable: true,
-      severity: severity,
-      summary: summary
+      severity,
+      summary: severity,
+      detail
     })
   }
 
   const loadInitialData = async () => {
     try {
       loading.value = true
-      const itemToEdit = props.itemToEdit || {}
-      const initialValues = await props.loadService({ id: props.id, ...itemToEdit })
+      const initialValues = await props.loadService({ id: props.id })
       resetForm({ values: initialValues })
     } catch (error) {
       emit('onError', error)
