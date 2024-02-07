@@ -47,7 +47,7 @@
 <template>
   <FormHorizontal
     title="General"
-    description="Create a WAF rule set to protect your servers and edge applications against threat families. You must configure a behavior on Rules Engine for Edge Firewall to apply and run this rule set."
+    description="Create a WAF rule set to protect servers and edge applications against threat families. Configure a behavior on Rules Engine for Edge Firewall to apply and run this rule set."
   >
     <template #inputs>
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
@@ -200,7 +200,7 @@
               />
             </template>
             <template #subtitle>
-              Prevents the injection of client-side scripts into pages viewed by your visitors.
+              Prevents the injection of client-side scripts into pages viewed by visitors.
             </template>
             <template #content>
               <div class="flex flex-col w-full sm:max-w-xs gap-2 mt-3">
@@ -269,7 +269,7 @@
               />
             </template>
             <template #subtitle>
-              Prevent the use of encoding tricks to evade protection mechanisms
+              Prevent the use of encoding tricks to evade protection mechanisms.
             </template>
             <template #content>
               <div class="flex flex-col w-full sm:max-w-xs gap-2 mt-3">
