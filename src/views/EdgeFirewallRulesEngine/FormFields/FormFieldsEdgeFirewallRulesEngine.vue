@@ -619,7 +619,7 @@
 
   <FormHorizontal
     title="Behaviors"
-    description="Set the behaviors you want your rule to perform if the conditions defined in the criteria are met. Select a behavior and fill in all required information. Some behaviors can't be added together or in some conditions."
+    description="Set the behaviors the rule should perform if the conditions defined in the criteria are met. Select a behavior and fill in all required information. Some behaviors can't be added together or in some conditions."
     :isDrawer="true"
   >
     <template #inputs>

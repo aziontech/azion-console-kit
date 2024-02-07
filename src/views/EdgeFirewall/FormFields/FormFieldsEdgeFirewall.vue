@@ -84,7 +84,7 @@
 <template>
   <FormHorizontal
     title="General"
-    description="Create a rule set to configure security logics and protect your servers and applications."
+    description="Create a rule set to configure security logics and protect servers and applications."
   >
     <template #inputs>
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
