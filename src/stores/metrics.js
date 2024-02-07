@@ -1,4 +1,4 @@
-import DATE_TIME_INTERVALS from '@views/Metrics/constants/date-time-interval'
+import DATE_TIME_INTERVALS from '@/stores/metrics-store/constants/date-time-interval'
 import { defineStore } from 'pinia'
 import {
   LoadDatasetAvailableAggregations,
@@ -145,6 +145,9 @@ export const useMetricsStore = defineStore('metrics', {
       return keysToRemove
         ? this.getFilteredDatasetAvailableFilters(keysToRemove)
         : this.datasetAvailableFilters
+    },
+    getCurrentReportsDataById: (state) => {
+      return (id) => state.currentReportsData.find((report) => report.id.toString() === id)
     }
   },
   actions: {
@@ -267,7 +270,7 @@ export const useMetricsStore = defineStore('metrics', {
     setCurrentReports(availableReports) {
       this.currentReportsData = availableReports
     },
-    async setCurrentReportValue({ reportId, reportData, reportQuery, error }) {
+    setCurrentReportValue({ reportId, reportData = [], reportQuery, error }) {
       const reportIdx = this.currentReportsData.findIndex(
         (reportItem) => reportItem.id === reportId
       )
@@ -275,7 +278,30 @@ export const useMetricsStore = defineStore('metrics', {
       this.currentReportsData[reportIdx].resultQuery = reportData
       this.currentReportsData[reportIdx].reportQuery = reportQuery
       this.currentReportsData[reportIdx].error = error
+      this.currentReportsData[reportIdx].hasMeanLine = reportData.length > 1
+      this.currentReportsData[reportIdx].hasMeanLinePerSeries = reportData.length > 2
+      this.currentReportsData[reportIdx].showMeanLine = false
+      this.currentReportsData[reportIdx].showMeanLinePerSeries = false
     },
+
+    toggleReportMeanLineStatus(reportId) {
+      const reportIdx = this.currentReportsData.findIndex(
+        (reportItem) => reportItem.id.toString() === reportId.toString()
+      )
+      if (reportIdx < 0) return
+      this.currentReportsData[reportIdx].showMeanLine =
+        !this.currentReportsData[reportIdx].showMeanLine
+    },
+
+    toggleReportMeanLinePerSeriesStatus(reportId) {
+      const reportIdx = this.currentReportsData.findIndex(
+        (reportItem) => reportItem.id.toString() === reportId.toString()
+      )
+      if (reportIdx < 0) return
+      this.currentReportsData[reportIdx].showMeanLinePerSeries =
+        !this.currentReportsData[reportIdx].showMeanLinePerSeries
+    },
+
     setTimeRange({ tsRangeBegin, tsRangeEnd, meta }) {
       if (!this.filters.tsRange) this.filters.tsRange = {}
 

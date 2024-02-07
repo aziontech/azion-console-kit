@@ -1,10 +1,6 @@
 import { metricsPlaygroundOpener } from '@/helpers'
 import { afterAll, describe, expect, it, vi } from 'vitest'
 
-vi.stubGlobal('window', {
-  open: (url) => url
-})
-
 const makeSut = () => {
   const sut = metricsPlaygroundOpener
 
@@ -13,16 +9,37 @@ const makeSut = () => {
   }
 }
 
+const scenarios = [
+  {
+    label: 'should open a new window to metrics playground in prod env',
+    href: 'https://azion.com',
+    expected: 'https://manager.azion.com/metrics/graphql'
+  },
+  {
+    label: 'should open a new window to metrics playground in stage env',
+    href: 'http://localhost',
+    expected: 'https://stage-manager.azion.com/metrics/graphql'
+  }
+]
+
 describe('metricsPlaygroundOpener', () => {
   afterAll(() => {
     vi.unstubAllGlobals()
   })
-  it('should open a new window to metrics playground', () => {
+
+  it.each(scenarios)('$label', ({ href, expected }) => () => {
+    vi.stubGlobal('window', {
+      open: (url) => url,
+      location: {
+        href
+      }
+    })
+
     const openWindowSpy = vi.spyOn(window, 'open')
     const { sut } = makeSut()
 
     sut()
 
-    expect(openWindowSpy).toHaveBeenCalledWith('https://azion.com', '_blank')
+    expect(openWindowSpy).toHaveBeenCalledWith(expected, '_blank')
   })
 })

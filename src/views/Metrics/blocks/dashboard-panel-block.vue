@@ -1,55 +1,22 @@
 <script setup>
-  import { useHelpCenterStore } from '@/stores/help-center'
   import { useMetricsStore } from '@/stores/metrics'
   import GraphsCardBlock from '@/templates/graphs-card-block'
   import { storeToRefs } from 'pinia'
   import SelectButton from 'primevue/selectbutton'
-  import Skeleton from 'primevue/skeleton'
-  import { computed, defineAsyncComponent, onMounted, onUnmounted, ref, watch } from 'vue'
+  import { computed } from 'vue'
 
-  const propToComponent = {
-    'bar-chart': defineAsyncComponent(() => import('../components/chart/bar-chart/bar-chart')),
-    'line-chart': defineAsyncComponent(() => import('../components/chart/line-chart/line-chart')),
-    'spline-chart': defineAsyncComponent(() =>
-      import('../components/chart/spline-chart/spline-chart')
-    )
-  }
+  defineProps({
+    clipboardWrite: {
+      type: Function,
+      required: true
+    }
+  })
 
   const metricsStore = useMetricsStore()
   const { dashboardBySelectedPage, dashboardCurrent, getCurrentReportsData } =
     storeToRefs(metricsStore)
 
   const { setCurrentDashboard, loadCurrentReports, setDatasetAvailableFilters } = metricsStore
-
-  const { getStatus } = storeToRefs(useHelpCenterStore())
-
-  const showChart = ref(true)
-
-  const reRenderChart = () => {
-    /*
-     * This approach was used to re-render the chart after screen resize and help center toggling.
-     * The nextTick was not sufficient to resolve the latter.
-     * HelpCenter takes 300ms to animate. To garantee the proper re-render, 350ms was used.
-     */
-    const timeout = 350
-
-    showChart.value = false
-    setTimeout(() => {
-      showChart.value = true
-    }, timeout)
-  }
-
-  onMounted(() => {
-    window.addEventListener('resize', reRenderChart)
-  })
-
-  onUnmounted(() => {
-    window.removeEventListener('resize', reRenderChart)
-  })
-
-  watch(getStatus, () => {
-    reRenderChart()
-  })
 
   const dashboards = computed(() => {
     return dashboardBySelectedPage.value
@@ -94,27 +61,9 @@
         :key="report.id"
       >
         <GraphsCardBlock
-          chartOwner="azion"
-          :title="report.label"
-          :description="report.description"
-          :cols="report.columns"
-          :aggregationType="report.aggregationType"
-          variationType="positive"
-          variationValue="10.2%"
-        >
-          <template #chart>
-            <component
-              v-if="report.resultQuery?.length && showChart"
-              :is="propToComponent[`${report.type}-chart`]"
-              :chartData="report"
-              :resultChart="report.resultQuery"
-            />
-            <Skeleton
-              v-else
-              class="w-full h-full"
-            />
-          </template>
-        </GraphsCardBlock>
+          :report="report"
+          :clipboardWrite="clipboardWrite"
+        />
       </template>
     </div>
   </div>
