@@ -8,7 +8,7 @@
   import TabView from 'primevue/tabview'
   import { useToast } from 'primevue/usetoast'
 
-  import { computed, ref } from 'vue'
+  import { ref } from 'vue'
   import { useRoute, useRouter } from 'vue-router'
 
   defineOptions({ name: 'tabs-waf-rules' })
@@ -39,7 +39,8 @@
       toast.add({
         closable: true,
         severity: 'error',
-        summary: error
+        summary: 'error',
+        detail: error
       })
     }
   }
@@ -65,20 +66,19 @@
     })
   }
 
+  const title = ref('')
+
   const updateWafRulesValue = (waf) => {
-    waf.value = { ...waf }
+    title.value = waf.name
   }
 
   const renderTabCurrentRouter = async () => {
     const { tab = 0 } = route.params
     waf.value = await getWafDat()
+    title.value = waf.value.name
     const activeTabIndexByRoute = mapTabs.value[tab]
     changeRouteByClickingOnTab({ index: activeTabIndexByRoute })
   }
-
-  const title = computed(() => {
-    return waf.value?.name || ''
-  })
 
   renderTabCurrentRouter()
 </script>
