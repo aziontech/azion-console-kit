@@ -6,10 +6,15 @@ import { makeEdgeFunctionsBaseUrl } from './make-edge-functions-base-url'
 const cancelRequest = axios.CancelToken
 const source = cancelRequest.source()
 
-export const searchEdgeFunctionsService = async ({ domainLike }) => {
+export const searchEdgeFunctionsService = async ({
+  orderBy = 'name',
+  sort = 'asc',
+  page = 1,
+  pageSize = 200
+} = {}) => {
   source.cancel()
 
-  const searchParams = makeSearchParams({ domainLike })
+  const searchParams = makeSearchParams({ orderBy, sort, page, pageSize })
   let httpResponse = await AxiosHttpClientAdapter.request({
     url: `${makeEdgeFunctionsBaseUrl()}?${searchParams.toString()}`,
     method: 'GET',
@@ -22,19 +27,23 @@ export const searchEdgeFunctionsService = async ({ domainLike }) => {
 }
 
 const adapt = (httpResponse) => {
+  const parsedEdgeFunction = httpResponse.body.results?.map((edgeFunction) => ({
+    value: edgeFunction.id,
+    label: edgeFunction.name
+  }))
+
   return {
-    body: {
-      results: httpResponse.results,
-      totalPages: httpResponse.total_pages
-    },
+    body: parsedEdgeFunction,
     statusCode: httpResponse.statusCode
   }
 }
 
-const makeSearchParams = ({ search, pageSize = 200 }) => {
+const makeSearchParams = ({ orderBy, sort, page, pageSize }) => {
   const searchParams = new URLSearchParams()
-  searchParams.set('page_size', pageSize)
-  searchParams.set('search', search)
+  orderBy && searchParams.set('order_by', orderBy)
+  sort && searchParams.set('sort', sort)
+  page && searchParams.set('page', page)
+  pageSize && searchParams.set('page_size', pageSize)
 
   return searchParams
 }

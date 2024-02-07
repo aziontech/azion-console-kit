@@ -145,17 +145,20 @@
     visible.value = value
   }
 
-  const onSubmit = handleSubmit(async ({ filterSelected, operatorSelected, selectedValue }) => {
-    emit('applyFilter', {
-      field: filterSelected.label,
-      valueField: filterSelected.value,
-      operator: operatorSelected.value,
-      value: selectedValue,
-      format: operatorSelected.format,
-      edit: editFilter.value
-    })
-    toggle()
-  })
+  const onSubmit = handleSubmit(
+    async ({ filterSelected, operatorSelected, selectedValue, begin, end }) => {
+      emit('applyFilter', {
+        field: filterSelected.label,
+        valueField: filterSelected.value,
+        operator: operatorSelected.value,
+        value: selectedValue || { begin, end },
+        format: operatorSelected.format,
+        edit: editFilter.value,
+        type: operatorSelected.type
+      })
+      toggle()
+    }
+  )
 
   defineExpose({ show, hide })
 </script>
@@ -165,7 +168,7 @@
     icon="pi pi-plus"
     label="Filter"
     type="button"
-    class="overflow-visible"
+    class="flex h-full justify-center items-center rounded-[6px_0px_0px_6px] min-w-max"
     severity="secondary"
     badgeClass="!text-xl"
     :disabled="disabled"

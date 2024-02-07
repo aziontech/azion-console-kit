@@ -6,10 +6,15 @@ import { makeIntelligentDNSBaseUrl } from './make-intelligent-dns-base-url'
 const cancelRequest = axios.CancelToken
 const source = cancelRequest.source()
 
-export const searchIdnsService = async ({ name }) => {
+export const searchIdnsService = async ({
+  orderBy = 'name',
+  sort = 'asc',
+  page = 1,
+  pageSize = 200
+} = {}) => {
   source.cancel()
 
-  const searchParams = makeSearchParams({ name })
+  const searchParams = makeSearchParams({ orderBy, sort, page, pageSize })
   let httpResponse = await AxiosHttpClientAdapter.request({
     url: `${makeIntelligentDNSBaseUrl()}?${searchParams.toString()}`,
     method: 'GET',
@@ -22,19 +27,23 @@ export const searchIdnsService = async ({ name }) => {
 }
 
 const adapt = (httpResponse) => {
+  const parsedDomains = httpResponse.body.results?.map((idns) => ({
+    value: idns.id,
+    label: idns.name
+  }))
+
   return {
-    body: {
-      results: httpResponse.results,
-      totalPages: httpResponse.total_pages
-    },
+    body: parsedDomains,
     statusCode: httpResponse.statusCode
   }
 }
 
-const makeSearchParams = ({ name, pageSize = 200 }) => {
+const makeSearchParams = ({ orderBy, sort, page, pageSize }) => {
   const searchParams = new URLSearchParams()
-  searchParams.set('page_size', pageSize)
-  searchParams.set('name', name)
+  orderBy && searchParams.set('order_by', orderBy)
+  sort && searchParams.set('sort', sort)
+  page && searchParams.set('page', page)
+  pageSize && searchParams.set('page_size', pageSize)
 
   return searchParams
 }

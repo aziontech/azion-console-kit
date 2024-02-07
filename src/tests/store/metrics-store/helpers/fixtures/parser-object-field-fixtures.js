@@ -7,10 +7,11 @@ const FIXTURE = {
     },
     expected: {
       value: 'configurationId',
-      group: 'configurationId',
+      group: 'Domain',
       label: 'Domain',
       operator: 'In',
-      type: 'ArrayObject'
+      type: 'ArrayObject',
+      typeName: 'configurationIdIn'
     }
   },
   SCENARIO_FIELD_TYPE_RANGE: {
@@ -24,7 +25,8 @@ const FIXTURE = {
       label: 'Price',
       value: 'price',
       operator: 'Range',
-      type: 'Range'
+      type: 'FloatRange',
+      typeName: 'FloatRange'
     }
   }
 }

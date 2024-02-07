@@ -21,8 +21,8 @@
     errorMessage,
     handleBlur,
     handleChange
-  } = useField('selectedValue', yup.string().required(), {
-    initialValue: props.value
+  } = useField('selectedValue', yup.string().default(''), {
+    initialValue: props.value || ''
   })
 </script>
 <template>

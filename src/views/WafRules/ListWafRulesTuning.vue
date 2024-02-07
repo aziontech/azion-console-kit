@@ -176,6 +176,7 @@
   const domainNames = ref('')
   const allowedByAttacks = ref([])
   const selectedFilterAdvanced = ref([])
+
   const valueDomains = computed({
     get: () => {
       if (domainsOptions.value.done) return []

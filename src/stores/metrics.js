@@ -29,7 +29,11 @@ export const useMetricsStore = defineStore('metrics', {
   }),
   getters: {
     getDateTimeFilterOptions: (state) => state.dateTimeFilterOptions,
-    getIsLoadingFilters: (state) => state.isLoadingFilters,
+    getIsLoadingFilters: (state) => {
+      return (
+        !state.datasetAvailableFilters.length || !Object.keys(state.infoAvailableFilters).length
+      )
+    },
     getKeysToFilters: (state) => [
       ...(state.filters.and
         ? Object.keys(state.filters.and).filter((item) => item !== 'meta')

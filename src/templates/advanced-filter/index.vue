@@ -1,6 +1,6 @@
 <script setup>
   defineOptions({ name: 'advanced-filter' })
-  import { computed, ref, watch } from 'vue'
+  import { computed, onMounted, ref, watch } from 'vue'
   import dialogFilter from './dialog-filter.vue'
   import Chip from 'primevue/chip'
   import PrimeButton from 'primevue/button'
@@ -21,6 +21,9 @@
     disabled: {
       type: Boolean
     },
+    hashLess: {
+      type: Boolean
+    },
     filterAdvanced: {
       type: Object,
       required: false
@@ -35,8 +38,13 @@
   const FORMAT_RANGE = 'Range'
   const DEFAULT_FORMAT = [FORMAT_IN, FORMAT_RANGE]
   const displayFilter = ref([])
+  const lastFilter = ref(true)
 
   const refDialogFilter = ref()
+
+  const disabledSearch = computed(() => {
+    return props.disabled || (lastFilter.value && !displayFilter.value.length)
+  })
 
   const listField = computed(() => {
     return props.fieldsInFilter.map((itemField) => {
@@ -83,6 +91,7 @@
 
   const searchFilter = () => {
     const adaptFilter = adapterApply(displayFilter.value)
+    lastFilter.value = !displayFilter.value.length
     emit('applyFilter', adaptFilter)
     emit('update:filterAdvanced', adaptFilter)
     updateHash(adaptFilter, props.externalFilter)
@@ -93,8 +102,8 @@
   }
 
   const adapterApply = (displayFilter) => {
-    return displayFilter?.map(({ valueField, operator, value }) => {
-      return { valueField, operator, value }
+    return displayFilter?.map(({ valueField, operator, value, type }) => {
+      return { valueField, operator, value, type }
     })
   }
 
@@ -170,6 +179,13 @@
     displayFilter.value = newDisplay.filter((item) => item)
   }
 
+  const clearDisplayFilter = () => {
+    if (!displayFilter.value.length) return
+    displayFilter.value = []
+    emit('update:filterAdvanced', [])
+    updateHash([], props.externalFilter)
+  }
+
   const loadFilter = () => {
     if (props.disabled) return
     const { external = {}, filter = [] } = getFilterInHash()
@@ -178,14 +194,12 @@
       emit('update:externalFilter', external)
     }
 
-    if (!filter.length) return
+    if (!filter.length && !props.hashLess) return
 
     updateDisplayFilter(filter)
-    searchFilter()
-    updateHash(displayFilter.value, external)
-  }
 
-  loadFilter()
+    searchFilter()
+  }
 
   const unwatch = watch(
     () => props.disabled,
@@ -200,10 +214,27 @@
   watch(props.fieldsInFilter, () => {
     updateDisplayFilter(displayFilter.value)
   })
+
+  watch(
+    props.externalFilter,
+    (value) => {
+      const adaptFilter = adapterApply(displayFilter.value)
+      updateHash(adaptFilter, value)
+    },
+    { immediate: false }
+  )
+
+  onMounted(() => {
+    loadFilter()
+  })
+
+  defineExpose({
+    clearDisplayFilter
+  })
 </script>
 <template>
-  <div class="flex max-sm:gap-2 w-full max-sm:align-items-center max-sm:flex-col h-11">
-    <div class="p-inputgroup flex flex-row w-full align-items-stretch md:contents">
+  <div class="flex w-full gap-4 md:gap-2 max-sm:flex-col">
+    <div class="flex items-center w-full h-11">
       <dialogFilter
         :disabled="props.disabled"
         ref="refDialogFilter"
@@ -211,8 +242,9 @@
         :counter="displayFilter.length"
         @applyFilter="updateFilter"
       />
+
       <div
-        class="p-inputgroup-addon p-inputnumber-button flex justify-start w-full gap-2 overflow-auto"
+        class="border-b border-left-none border-r border-solid border-t flex h-full items-center p-inputtext rounded-[0px_6px_6px_0px] w-full"
       >
         <ul class="flex gap-3 align-items-center">
           <template
@@ -221,7 +253,7 @@
           >
             <li v-if="!DEFAULT_FORMAT.includes(itemFilter.operator)">
               <Chip
-                class="text-sm px-2 cursor-pointer"
+                class="text-sm px-2 cursor-pointer w-max"
                 removable
                 @click="clickFilter(itemFilter, $event)"
                 @remove="removeItemFilter(index, $event)"
@@ -234,17 +266,17 @@
             </li>
             <li v-if="itemFilter.operator === FORMAT_RANGE">
               <Chip
-                class="text-sm px-2 cursor-pointer"
+                class="text-sm px-2 cursor-pointer w-max"
                 removable
                 @click="clickFilter(itemFilter, $event)"
                 @remove="removeItemFilter(index, $event)"
               >
-                <span class="font-bold p-chip-text leading-5 pl-1">
-                  {{ `${itemFilter.value.begin} ${itemFilter.format}` }}</span
+                <span class="font-bold p-chip-text leading-5 pr-1">
+                  {{ `${itemFilter.value.begin} ${itemFilter.format} ` }}</span
                 >
                 <span class="p-chip-text"> {{ itemFilter.field }}</span>
                 <span class="font-bold p-chip-text leading-5 pl-1">
-                  {{ `${itemFilter.value.end} ${itemFilter.format}` }}</span
+                  {{ `${itemFilter.format} ${itemFilter.value.end}` }}</span
                 >
               </Chip>
             </li>
@@ -253,7 +285,7 @@
               class="flex gap-3 align-items-center"
             >
               <Chip
-                class="text-sm px-2"
+                class="text-sm px-2 w-max"
                 :label="itemFilter.field"
               />
               <span> in </span>
@@ -263,13 +295,13 @@
                 :key="item"
               >
                 <Chip
-                  class="text-sm px-2 cursor-pointer"
+                  class="text-sm px-2 cursor-pointer w-max"
                   @click="clickFilter(itemFilter, $event)"
                   @remove="removeValueItemFilter(index, idx, $event)"
                   removable
                 >
                   <span class="font-bold p-chip-text leading-5">
-                    {{ item.name ? item.name : item }}
+                    {{ item.name || item.label || item }}
                   </span>
                 </Chip>
                 <span v-if="itemFilter.value.length > idx + 1"> or </span>
@@ -287,9 +319,9 @@
       :filter="displayFilter"
     >
       <PrimeButton
-        class="max-sm:w-full min-w-max max-sm:flex-col md:ml-3"
+        class="max-sm:w-full min-w-max max-sm:flex-col"
         size="small"
-        :disabled="props.disabled || !displayFilter.length"
+        :disabled="disabledSearch"
         @click="searchFilter"
         label="Search"
       />

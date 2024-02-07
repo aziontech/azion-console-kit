@@ -5,20 +5,28 @@
   import { storeToRefs } from 'pinia'
   import Calendar from 'primevue/calendar'
   import Dropdown from 'primevue/dropdown'
-  import { computed, onBeforeMount, ref, watchEffect } from 'vue'
+  import { computed, onBeforeMount, ref, watch } from 'vue'
 
   const accountStore = useAccountStore()
   const metricsStore = useMetricsStore()
 
-  const { getDateTimeFilterOptions, currentFilters } = storeToRefs(metricsStore)
+  const {
+    getDateTimeFilterOptions: intervalOptions,
+    currentFilters,
+    getIsLoadingFilters
+  } = storeToRefs(metricsStore)
   const { setTimeRange } = metricsStore
 
-  const dates = ref([])
-  const interval = ref(null)
+  const emit = defineEmits(['applyTSRange'])
 
-  const intervalOptions = computed(() => {
-    return getDateTimeFilterOptions.value
+  const disabledFilter = computed(() => {
+    return getIsLoadingFilters.value
   })
+
+  const dates = ref([])
+  const lastFilteredDate = ref({})
+  const interval = ref(null)
+  const isVisibleCalendar = ref(false)
 
   const userUTC = accountStore.accountUtcOffset
 
@@ -26,12 +34,13 @@
     return interval.value?.code === 'custom'
   })
 
-  const hasSecondDate = computed(() => {
-    return dates.value?.[1] === null
+  const hasError = computed(() => {
+    const NUMBER_OF_DATES = 2
+    return dates.value?.filter((date) => date)?.length != NUMBER_OF_DATES
   })
 
-  const isInvalid = computed(() => {
-    return hasSecondDate.value ? 'p-invalid' : ''
+  const classError = computed(() => {
+    return hasError.value ? 'p-invalid' : ''
   })
 
   const maxDate = computed(() => {
@@ -40,51 +49,42 @@
     return max.toUTC(userUTC)
   })
 
-  onBeforeMount(() => {
-    setInitialValues()
-  })
-
   const setInitialValues = () => {
-    const stateTsRange = currentFilters.value?.tsRange
-
-    if (stateTsRange) {
-      setInitialTimeRange(stateTsRange)
-    } else {
-      interval.value = intervalOptions?.value[0]
-    }
+    interval.value = intervalOptions?.value[0]
+    const [begin, end] = removeAmountOfHours(interval.value?.code)
+    dates.value = [begin, end]
+    lastFilteredDate.value = { begin, end }
   }
 
-  const setInitialTimeRange = (initialTsRange) => {
+  const updatedTimeRange = ({ begin, end, meta }) => {
     const GMT0 = '.000Z'
 
-    const gmt0Begin = `${initialTsRange.begin}${GMT0}`
-    const gmt0End = `${initialTsRange.end}${GMT0}`
+    const gmt0Begin = `${begin}${GMT0}`
+    const gmt0End = `${end}${GMT0}`
     const dateBegin = new Date(gmt0Begin).toUTC(userUTC)
     const dateEnd = new Date(gmt0End).toUTC(userUTC)
 
     dates.value = [dateBegin, dateEnd]
-
-    interval.value = intervalOptions?.value.find(
-      (element) => element.code === initialTsRange.meta.option
-    )
+    lastFilteredDate.value = { begin: dateBegin, end: dateEnd }
+    interval.value = intervalOptions?.value.find((element) => element.code === meta.option)
   }
 
   const handleSelect = (offset) => {
-    const result = removeAmountOfHours(offset)
+    const [begin, end] = removeAmountOfHours(offset)
 
-    setDateTimeFilters(...result)
+    if (checkIfDatesAreEqual(begin, end)) return true
+
+    setDateTimeFilters(begin, end)
   }
 
-  const handlePicker = async () => {
-    if (!dates.value) {
-      const result = removeAmountOfHours(1)
+  const checkIfDatesAreEqual = (begin, end) => {
+    var isoBegin = begin.toISOString().slice(0, 13)
+    var isoEnd = end.toISOString().slice(0, 13)
 
-      dates.value = [...result]
-    }
+    var isoLastBegin = lastFilteredDate.value.begin.toISOString().slice(0, 13)
+    var isoLastEnd = lastFilteredDate.value.end.toISOString().slice(0, 13)
 
-    if (hasSecondDate.value) return
-
-    setDateTimeFilters(...dates.value)
+    return isoBegin === isoLastBegin && isoEnd === isoLastEnd
   }
 
   const setDateTimeFilters = (begin, end) => {
@@ -95,6 +95,9 @@
       tsRangeEnd: end.resetUTC(userUTC).toBeholderFormat()
     }
 
+    if (checkIfDatesAreEqual(begin, end)) return
+
+    lastFilteredDate.value = { begin, end }
     setTimeRange({ ...tsRange })
   }
 
@@ -106,17 +109,36 @@
     return [begin.toUTC(userUTC), end.toUTC(userUTC)]
   }
 
-  const dropdownChange = () => {
-    dates.value = null
+  const dropdownChange = ({ value }) => {
+    if (value && !isCustomDate.value) {
+      if (handleSelect(value.code)) return
+      emit('applyTSRange')
+    }
   }
 
-  watchEffect(() => {
-    if (interval.value && !isCustomDate.value) {
-      handleSelect(interval.value.code)
-      return
-    }
+  const handleCalendar = () => {
+    isVisibleCalendar.value = true
+    if (hasError.value) return
+    setDateTimeFilters(...dates.value)
+    emit('applyTSRange')
+  }
 
-    handlePicker()
+  const showCalendar = () => {
+    isVisibleCalendar.value = false
+  }
+
+  watch(
+    () => currentFilters.value?.tsRange,
+    (value) => {
+      if (value) {
+        updatedTimeRange(value)
+      }
+    },
+    { deep: true }
+  )
+
+  onBeforeMount(() => {
+    setInitialValues()
   })
 </script>
 
@@ -129,7 +151,8 @@
         :options="intervalOptions"
         optionLabel="name"
         @change="dropdownChange"
-        :loading="!intervalOptions?.length"
+        :loading="disabledFilter"
+        :disabled="disabledFilter"
       />
     </div>
     <div
@@ -144,14 +167,16 @@
         showTime
         hourFormat="24"
         selectionMode="range"
+        @hide="handleCalendar"
+        @show="showCalendar"
         :manualInput="false"
         showIcon
         iconDisplay="input"
         :maxDate="maxDate"
-        :class="isInvalid"
+        :class="classError"
       />
       <small
-        v-if="hasSecondDate"
+        v-if="hasError && isVisibleCalendar"
         class="p-error text-xs font-normal leading-tight"
       >
         Select the second date.
