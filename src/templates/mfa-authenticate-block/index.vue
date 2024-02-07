@@ -154,7 +154,7 @@
       await switchClientAccount(userInfo.props.account_id)
     } catch (error) {
       hasRequestErrorMessage.value = error
-      digitsMfa.forEach(item => item.value.value = '')
+      digitsMfa.forEach((item) => (item.value.value = ''))
     } finally {
       isButtonLoading.value = false
     }
