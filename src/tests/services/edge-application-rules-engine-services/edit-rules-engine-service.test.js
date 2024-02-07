@@ -90,9 +90,7 @@ describe('EdgeApplicationRulesEngineServices', () => {
     const edgeApplicationIdMock = 112365
     const ruleWithDefaultPhaseMock = {
       ...fixtures.rulePayload,
-      phase: {
-        content: 'Default'
-      }
+      phase: 'default'
     }
     const requestSpy = vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
       statusCode: 200

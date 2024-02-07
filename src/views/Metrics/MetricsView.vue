@@ -6,10 +6,10 @@
     <template #content>
       <TabsPageBlock />
       <div class="card surface-border border rounded-md surface-section p-3.5 flex flex-col gap-4">
-        <IntervalFilterBlock />
+        <IntervalFilterBlock @applyTSRange="load" />
         <ContentFilterBlock :playgroundOpener="playgroundOpener" />
       </div>
-      <DashboardPanelBlock />
+      <DashboardPanelBlock :clipboardWrite="clipboardWrite" />
     </template>
   </ContentBlock>
 </template>
@@ -28,6 +28,10 @@
 
   defineProps({
     playgroundOpener: {
+      type: Function,
+      required: true
+    },
+    clipboardWrite: {
       type: Function,
       required: true
     }
@@ -60,8 +64,11 @@
     setCurrentPageAndDashboard()
     await setDatasetAvailableFilters()
     await setReports()
-    await loadCurrentReports()
     updateRouter()
+  }
+
+  const load = async () => {
+    await loadCurrentReports()
   }
 
   const route = useRoute()

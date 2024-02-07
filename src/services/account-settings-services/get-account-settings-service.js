@@ -13,7 +13,7 @@ export const getAccountSettingsService = async () => {
 const adapt = (response) => {
   return {
     accountName: response.name,
-    clientId: response.id,
+    clientId: response.client_id,
     companyName: response.company_name,
     uniqueIdentifier: response.unique_identifier,
     billingEmails: response.billing_emails,

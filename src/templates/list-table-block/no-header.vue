@@ -23,10 +23,10 @@
         <template #header>
           <slot name="header">
             <div class="flex flex-wrap justify-between gap-2 w-full">
-              <span class="p-input-icon-left max-sm:w-full">
+              <span class="flex flex-row p-input-icon-left max-sm:w-full">
                 <i class="pi pi-search" />
                 <InputText
-                  class="w-full"
+                  class="w-full md:min-w-[320px]"
                   v-model.trim="filters.global.value"
                   placeholder="Search"
                 />
@@ -84,7 +84,12 @@
                 v-tooltip.top="{ value: 'Hidden Columns', showDelay: 200 }"
               >
               </PrimeButton>
-              <OverlayPanel ref="columnSelectorPanel">
+              <OverlayPanel
+                ref="columnSelectorPanel"
+                :pt="{
+                  content: { class: 'p-0' }
+                }"
+              >
                 <Listbox
                   v-model="selectedColumns"
                   multiple
@@ -95,7 +100,7 @@
                   optionGroupChildren="items"
                 >
                   <template #optiongroup="slotProps">
-                    <p class="text-sm font-medium">{{ slotProps.option.label }}</p>
+                    <p class="p-0 text-sm font-medium">{{ slotProps.option.label }}</p>
                   </template>
                 </Listbox>
               </OverlayPanel>
@@ -138,10 +143,10 @@
       >
         <template #header>
           <div class="flex self-start">
-            <span class="p-input-icon-left">
+            <span class="flex flex-row p-input-icon-left">
               <i class="pi pi-search" />
               <InputText
-                class="w-full"
+                class="h-8 w-full md:min-w-[320px]"
                 v-model="filters.global.value"
                 placeholder="Search"
               />

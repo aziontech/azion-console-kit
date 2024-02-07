@@ -26,12 +26,10 @@ export const searchDomainsService = async ({
 }
 
 const adapt = (httpResponse) => {
-  const parsedDomains = httpResponse.body.results?.map((domain) => {
-    return {
-      value: domain.id,
-      name: domain.name
-    }
-  })
+  const parsedDomains = httpResponse.body.results?.map((domain) => ({
+    value: domain.id,
+    label: domain.name
+  }))
 
   return {
     body: parsedDomains,

@@ -18,6 +18,10 @@
       type: Boolean,
       required: true
     },
+    isDeliveryProtocolHttps: {
+      type: Boolean,
+      required: true
+    },
     listEdgeApplicationFunctionsService: {
       type: Function,
       required: true
@@ -43,6 +47,10 @@
       default: () => {}
     }
   })
+
+  const isEditDrawer = computed(() => !!props.selectedRulesEngineToEdit)
+
+  const checkPhaseIsDefaultValue = computed(() => phase.value === 'default')
 
   const toast = useToast()
   const criteriaOperatorOptions = ref([
@@ -89,7 +97,11 @@
     },
     { label: 'No Content (204)', value: 'no_content', requires: false },
     { label: 'Optimize Images', value: 'optimize_images', requires: false },
-    { label: 'Redirect HTTP to HTTPS', value: 'redirect_http_to_https', requires: false },
+    {
+      label: 'Redirect HTTP to HTTPS - requires Delivery Protocol with HTTPS',
+      value: 'redirect_http_to_https',
+      requires: true
+    },
     { label: 'Redirect To (301 Moved Permanently)', value: 'redirect_to_301', requires: false },
     { label: 'Redirect To (302 Found)', value: 'redirect_to_302', requires: false },
     {
@@ -125,6 +137,15 @@
     { label: 'Redirect To (301 Moved Permanently)', value: 'redirect_to_301', requires: false },
     { label: 'Redirect To (302 Found)', value: 'redirect_to_302', requires: false },
     { label: 'Run Function', value: 'run_function', requires: false }
+  ])
+
+  const behaviorsDefaultOptions = ref([
+    { label: 'Deny (403 Forbidden)', value: 'deny', requires: false },
+    { label: 'Redirect To (301 Moved Permanently)', value: 'redirect_to_301', requires: false },
+    { label: 'Redirect To (302 Found)', value: 'redirect_to_302', requires: false },
+    { label: 'Set Origin', value: 'set_origin', requires: false },
+    { label: 'Run Function', value: 'run_function', requires: false },
+    { label: 'No Content (204)', value: 'no_content', requires: false }
   ])
 
   const { value: name } = useField('name')
@@ -209,7 +230,7 @@
   /**
    * Generate the options for the criteria menu.
    * @param {number} criteriaIndex - The index of the criteria.
-   * @param {number} [conditionalIndex=null] - The index of the conditional.
+   * @param {number} [conditionalIndex] - The index of the conditional.
    * @returns {Array} An array of options for the criteria menu.
    */
   const criteriaMenuOptions = (criteriaIndex, conditionalIndex = null) => {
@@ -296,25 +317,51 @@
     setDefaultBehaviorOptions()
   }
 
-  const behaviorsOptions = computed(() =>
-    phase.value === 'request' ? behaviorsRequestOptions.value : behaviorsResponseOptions.value
-  )
-
-  /**
-   * Updates the 'requires' property of all behavior options to false.
-   */
-  const updateBehaviorsOptionsRequires = () => {
-    behaviorsRequestOptions.value = behaviorsRequestOptions.value.map((option) => ({
-      ...option,
-      requires: false
-    }))
-
-    behaviorsResponseOptions.value = behaviorsResponseOptions.value.map((option) => ({
-      ...option,
-      requires: false
-    }))
+  const behaviorsOptionsMap = {
+    request: () => behaviorsRequestOptions.value,
+    default: () => {
+      if (behaviors.value.length === 1) {
+        return behaviorsDefaultOptions.value
+      }
+      return behaviorsRequestOptions.value
+    },
+    response: () => behaviorsResponseOptions.value
   }
 
+  const behaviorsOptions = computed(() => behaviorsOptionsMap[phase.value]() || [])
+
+  /**
+   * Updates the 'requires' property of behavior options based on component props.
+   * This function checks if the behavior option is 'redirect_http_to_https' and sets the 'requires'
+   * property based on the 'isDeliveryProtocolHttps' prop. For other options that have 'requires' as true,
+   * it sets the 'requires' property based on the 'isEnableApplicationAcceleration' prop.
+   * @param {Array} options - The behavior options to update.
+   * @returns {Array} The updated array of behavior options with the 'requires' property set accordingly.
+   */
+  const updateOptionRequires = (options) => {
+    return options.map((option) => {
+      if (option.requires) {
+        return {
+          ...option,
+          requires:
+            option.value === 'redirect_http_to_https'
+              ? !props.isDeliveryProtocolHttps
+              : !props.isEnableApplicationAcceleration
+        }
+      }
+      return option
+    })
+  }
+
+  /**
+   * Updates the 'requires' property of all behavior options that have 'requires' as true by default,
+   * based on the component props.
+   * It applies the 'updateOptionRequires' function to both request and response behavior options.
+   */
+  const updateBehaviorsOptionsRequires = () => {
+    behaviorsRequestOptions.value = updateOptionRequires(behaviorsRequestOptions.value)
+    behaviorsResponseOptions.value = updateOptionRequires(behaviorsResponseOptions.value)
+  }
   const functionsInstanceOptions = ref(null)
   const loadingFunctionsInstance = ref(false)
 
@@ -419,7 +466,7 @@
     ]
 
     let targetValue = behaviors.value[index].value.target
-    if (!props.selectedRulesEngineToEdit) targetValue = ''
+    if (!isEditDrawer.value) targetValue = ''
 
     updateBehavior(index, { name: behaviorName, target: targetValue })
     setShowNewBehaviorButton(true)
@@ -436,7 +483,7 @@
         break
       case 'capture_match_groups':
         let matchGroupsFields = { captured_array: '', subject: '', regex: '' }
-        if (props.selectedRulesEngineToEdit) matchGroupsFields = behaviors.value[index].value.target
+        if (isEditDrawer.value) matchGroupsFields = behaviors.value[index].value.target
 
         updateBehavior(index, { name: behaviorName, target: matchGroupsFields })
         break
@@ -457,7 +504,7 @@
    * Calls the appropriate services to fetch options for the behaviors of the selected rules engine to edit.
    */
   const callOptionsServicesAtEdit = async () => {
-    if (props.selectedRulesEngineToEdit) {
+    if (isEditDrawer.value) {
       const behaviorsLength = props.selectedRulesEngineToEdit.behaviors.length
 
       for (let index = 0; index < behaviorsLength; index++) {
@@ -495,9 +542,6 @@
     updateBehavior(index, { name: behavior.name, target: behavior.target })
   }
 
-  /**
-   * Processes the behaviors of the selected rules engine to edit.
-   */
   const processBehaviorsAtEdit = async () => {
     const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms))
 
@@ -507,7 +551,7 @@
       changeBehaviorType(behavior.name, index)
     }
 
-    if (props.selectedRulesEngineToEdit) {
+    if (isEditDrawer.value) {
       let index = 0
 
       while (!areBehaviorsReady(index)) {
@@ -583,9 +627,12 @@
   }
 
   onMounted(() => {
+    updateBehaviorsOptionsRequires()
+
     if (props.isEnableApplicationAcceleration) {
-      updateBehaviorsOptionsRequires()
-      criteria.value[0].value[0].variable = ''
+      if (criteria.value[0] && !isEditDrawer.value) {
+        criteria.value[0].value[0].variable = ''
+      }
     }
     if (behaviors.value[0]) {
       changeBehaviorType(behaviors.value[0].value.name, 0)
@@ -610,6 +657,8 @@
         <FieldText
           label="Name *"
           name="name"
+          :readonly="checkPhaseIsDefaultValue"
+          :disabled="checkPhaseIsDefaultValue"
           placeholder="My rule"
           :value="name"
           description="Give a unique and descriptive name to identify the rule."
@@ -632,6 +681,7 @@
     :isDrawer="true"
     title="Phase"
     description="Select the phase of the execution of the rule."
+    v-if="!checkPhaseIsDefaultValue"
   >
     <template #inputs>
       <div class="flex flex-col gap-2">
@@ -640,7 +690,7 @@
           :key="item.value"
         >
           <div
-            v-if="!props.selectedRulesEngineToEdit || phase === item.value"
+            v-if="!isEditDrawer.value || phase === item.value"
             class="w-full border-1 rounded-md surface-border flex align-items-center justify-between p-4 gap-2"
             :class="{ 'border-radio-card-active': phase === item.value }"
           >
@@ -725,7 +775,10 @@
               :value="criteria[index].value[itemIndex].operator"
             />
             <FieldText
-              v-if="item.operator !== 'exists' && item.operator !== 'does_not_exist'"
+              v-if="
+                criteria[index].value[itemIndex].operator !== 'exists' &&
+                criteria[index].value[itemIndex].operator !== 'does_not_exist'
+              "
               :name="`criteria[${index}][${itemIndex}].input_value`"
               :value="criteria[index].value[itemIndex].input_value"
               inputClass="w-full"

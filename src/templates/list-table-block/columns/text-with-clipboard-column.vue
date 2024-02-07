@@ -1,6 +1,6 @@
 <template>
   <div class="gap-2 flex items-center">
-    <p>{{ content }}</p>
+    <expand-text-column :value="content"></expand-text-column>
     <PrimeButton
       text
       icon="pi pi-copy"
@@ -12,11 +12,13 @@
 
 <script>
   import PrimeButton from 'primevue/button'
+  import ExpandTextColumn from './expand-text-column.vue'
 
   export default {
     name: 'avatar-with-text-column',
     components: {
-      PrimeButton
+      PrimeButton,
+      ExpandTextColumn
     },
     props: {
       content: {

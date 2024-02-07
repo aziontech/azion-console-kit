@@ -36,7 +36,7 @@
   </div>
   <ListTableNoHeaderBlock
     v-show="showListTable"
-    pageTitleDelete="Waf Rules Tuning"
+    pageTitleDelete="WAF Rules Tuning"
     :columns="wafRulesAllowedColumns"
     :hasListService="true"
     :dataFilted="dataFiltedComputed"
@@ -44,7 +44,7 @@
     :cleanSelectData="cleanSelectData"
     :showselectionMode="true"
     :editInDrawer="openMoreDetails"
-    emptyListMessage="No Waf Rules Tuning found."
+    emptyListMessage="No WAF Rules Tuning found."
   >
     <template #header>
       <advancedFilter
@@ -58,8 +58,8 @@
 
   <EmptyResultsBlock
     v-if="!showListTable"
-    title="Select a domain and filter possible attacks"
-    description="Select at least one domain to get insights into your WAF Rule Set."
+    title="Select a domain to query data"
+    description="To use this feature, a domain must be associated with the Edge Firewall rule set that has a behavior running this WAF rule."
     :documentationService="props.documentationServiceTuning"
     :inTabs="true"
   >
@@ -176,6 +176,7 @@
   const domainNames = ref('')
   const allowedByAttacks = ref([])
   const selectedFilterAdvanced = ref([])
+
   const valueDomains = computed({
     get: () => {
       if (domainsOptions.value.done) return []
@@ -216,8 +217,7 @@
     {
       label: 'Country',
       value: 'country',
-      description:
-        'Name Field3: Description orem ipsum dolor sit amet, consectetur adipiscing elit. Duis quis velit venenatis, efficitur urna id, egestas mi.',
+      description: '',
       operator: [
         {
           value: 'In',
@@ -233,11 +233,10 @@
     {
       label: 'IP Address',
       value: 'ip_address',
-      description:
-        'Name Field1: Description orem ipsum dolor sit amet, consectetur adipiscing elit. Duis quis velit venenatis, efficitur urna id, egestas mi.',
+      description: '',
       operator: [
         { value: 'Eq', type: 'String', props: { placeholder: 'Select IP Address' } },
-        { value: 'In', type: 'ArrayString', props: { placeholder: 'Enter with IP Address' } }
+        { value: 'In', type: 'ArrayString', props: { placeholder: 'Enter IP Address' } }
       ]
     }
   ])
@@ -296,7 +295,7 @@
     },
     {
       field: 'topIps',
-      header: 'Top 10 IPs Adress'
+      header: 'Top 10 IP Addresses'
     },
     {
       field: 'topCountries',

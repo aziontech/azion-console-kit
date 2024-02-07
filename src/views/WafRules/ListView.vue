@@ -17,9 +17,9 @@
       />
       <EmptyResultsBlock
         v-else
-        title="No waf rules added"
-        description="Create your first waf rules."
-        createButtonLabel="WAF Rules"
+        title="No WAF rules have been added"
+        description="Click the button below to initiate the setup process and create your first WAF rule."
+        createButtonLabel="WAF Rule"
         createPagePath="waf/create"
         :documentationService="props.documentationService"
       >

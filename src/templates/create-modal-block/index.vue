@@ -107,6 +107,16 @@
     return selectedTab.value === 'new_resource'
   })
 
+  const showToast = (severity, detail) => {
+    if (!detail) return
+    toast.add({
+      closable: true,
+      severity,
+      summary: severity,
+      detail
+    })
+  }
+
   const redirectToSolution = (template) => {
     const params = {
       vendor: template.vendor.slug,
@@ -127,12 +137,7 @@
       const payload = { type: recommendedHeader.value }
       templates.value = await MarketplaceService.listSolutionsService(payload)
     } catch (error) {
-      toast.add({
-        closable: true,
-        severity: 'error',
-        detail: error,
-        summary: 'Error'
-      })
+      showToast('error', error)
     } finally {
       isLoading.value = false
     }
@@ -144,12 +149,7 @@
       const payload = { type: browseHeader.value }
       browseTemplates.value = await MarketplaceService.listSolutionsService(payload)
     } catch (error) {
-      toast.add({
-        closable: true,
-        severity: 'error',
-        detail: error,
-        summary: 'Error'
-      })
+      showToast('error', error)
     } finally {
       isLoading.value = false
     }

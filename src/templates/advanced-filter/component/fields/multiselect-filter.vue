@@ -63,7 +63,7 @@
       loading.value = true
       const resultOptions = props.options ? props.options : await props.services()
       valueOptions.value = resultOptions.map((item) => ({
-        name: item[props.payload.label],
+        [props.payload.label]: item[props.payload.label],
         value: item
       }))
     } catch (error) {

@@ -7,7 +7,7 @@
   import Skeleton from 'primevue/skeleton'
   import PrimeTag from 'primevue/tag'
   import { useField } from 'vee-validate'
-  import { computed, ref, watch } from 'vue'
+  import { computed, onMounted, ref, watch } from 'vue'
 
   defineOptions({ name: 'form-fields-edge-firewall' })
   const emit = defineEmits(['update:loadingDomains'])
@@ -47,28 +47,38 @@
   const classLoading = computed(() => (loading.value ? 'pointer-events-none' : ''))
 
   const fetchDomains = async () => {
-    loading.value = true
-    const responseDomains = await props.domainsService({ pageSize: 1000 })
-    const alreadySelectedDomainsIds = domains.value?.map((domain) => domain) || []
+    try {
+      loading.value = true
+      const responseDomains = await props.domainsService({ pageSize: 1000 })
+      const alreadySelectedDomainsIds = domains.value?.map((domain) => domain) || []
 
-    const alreadySelectedDomains =
-      responseDomains.filter((domain) => alreadySelectedDomainsIds.includes(domain.id)) || []
+      const alreadySelectedDomains =
+        responseDomains.filter((domain) => alreadySelectedDomainsIds.includes(domain.id)) || []
 
-    const notSelectedDomains = responseDomains.filter((domain) => !domain.edgeFirewallId) || []
+      const notSelectedDomains =
+        responseDomains.filter((domain) => {
+          if (!domain.edgeFirewallId && !alreadySelectedDomainsIds.includes(domain.id)) {
+            return domain
+          }
+        }) || []
 
-    domainsList.value = [notSelectedDomains, alreadySelectedDomains]
-    loading.value = false
+      domainsList.value = [notSelectedDomains, alreadySelectedDomains]
 
-    resetField({
-      value: alreadySelectedDomains
-    })
+      resetField({
+        value: alreadySelectedDomains
+      })
 
-    watch(domainsList, (newValue) => {
-      domains.value = newValue[1]
-    })
+      watch(domainsList, (newValue) => {
+        domains.value = newValue[1]
+      })
+    } finally {
+      loading.value = false
+    }
   }
 
-  fetchDomains()
+  onMounted(async () => {
+    await fetchDomains()
+  })
 </script>
 
 <template>

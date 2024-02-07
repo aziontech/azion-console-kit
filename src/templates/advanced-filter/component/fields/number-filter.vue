@@ -6,7 +6,7 @@
 
   const props = defineProps({
     value: {
-      type: String
+      type: Number
     },
     placeholder: {
       type: String
@@ -19,11 +19,14 @@
   const {
     value: selectedValue,
     errorMessage,
-    handleBlur,
-    handleChange
+    handleChange: handleChangeNumber
   } = useField('selectedValue', yup.number().required(), {
     initialValue: props.value
   })
+
+  const handleChange = ({ value }) => {
+    handleChangeNumber(value)
+  }
 </script>
 <template>
   <div class="w-1/2 pr-6">
@@ -35,13 +38,13 @@
         Value *
       </label>
       <InputNumber
-        @input="handleChange"
         :placeholder="props.placeholder"
-        @blur="handleBlur"
         v-model="selectedValue"
         inputId="number_field"
-        :minFractionDigits="2"
-        :maxFractionDigits="5"
+        @input="handleChange"
+        mode="decimal"
+        showButtons
+        :min="0"
       />
       <small
         v-if="errorMessage"

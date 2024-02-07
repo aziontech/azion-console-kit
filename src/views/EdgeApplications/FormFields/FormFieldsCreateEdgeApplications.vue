@@ -62,7 +62,7 @@
   const { value: cdnCacheSettings } = useField('cdnCacheSettings')
   const { value: browserCacheSettings } = useField('browserCacheSettings')
   const { value: originProtocolPolicy } = useField('originProtocolPolicy')
-  const { value: active } = useField('active')
+  const { value: debugRules } = useField('debugRules')
 
   const { value: name } = useField('name')
   const { value: address, errorMessage: addressError } = useField('address')
@@ -787,12 +787,12 @@
         >
           <template #title>
             <InputSwitch
-              v-model="active"
-              inputId="active"
+              v-model="debugRules"
+              inputId="debugRules"
             />
             <div class="flex-col gap-1">
               <label
-                for="active"
+                for="debugRules"
                 class="text-color text-sm font-normal"
                 >Active</label
               >

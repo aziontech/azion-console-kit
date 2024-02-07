@@ -233,4 +233,14 @@ describe('AzionDocumentationCatalog', () => {
       `https://www.azion.com/en/search-result/?q=cache settings&filter=doc`
     )
   })
+  it('should edge firewall rules engine documentation with correct link', () => {
+    const openWindowSpy = vi.spyOn(window, 'open')
+    const { sut } = makeSut()
+
+    sut.edgeFirewallRulesEngine()
+
+    expect(openWindowSpy).toHaveBeenCalledWith(
+      `https://www.azion.com/en/search-result/?q=edge firewall rules engine&filter=doc`
+    )
+  })
 })

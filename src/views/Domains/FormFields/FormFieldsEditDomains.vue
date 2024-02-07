@@ -44,7 +44,7 @@
     useField('mtlsTrustedCertificate')
 
   const CNAMELabel = computed(() => {
-    return cnameAccessOnly ? 'CNAME *' : 'CNAME'
+    return cnameAccessOnly.value ? 'CNAME *' : 'CNAME'
   })
 
   const edgeCertificates = computed(() => {

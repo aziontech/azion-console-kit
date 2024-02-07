@@ -5,7 +5,7 @@ const likeType = {
 }
 
 const likeAlias = {
-  configurationId: 'Domain'
+  configurationIdIn: 'Domain'
 }
 
 /**
@@ -16,8 +16,6 @@ const likeAlias = {
  * @return {String} The field type.
  */
 const getTypeField = (name, typeName) => {
-  if (typeName?.includes('Range')) return 'Range'
-
   return likeType[name] || typeName || 'String'
 }
 
@@ -31,9 +29,10 @@ export const formatFieldName = (text) => {
   const words = text.split(/(?=[A-Z])/)
   if (words.length > 1) words.pop()
   const name = words.join('')
-  const group = name
   const formattedWords = words.map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-  const label = likeAlias[name] || formattedWords.join(' ')
+  const label = likeAlias[text] || formattedWords.join(' ')
+  const group = likeAlias[text] || name
+
   return {
     label,
     group,
@@ -70,6 +69,7 @@ export default function ParserObjectField({ name, type: { name: typeName } }) {
     group,
     value,
     operator,
-    type: fieldType
+    type: fieldType,
+    typeName
   }
 }

@@ -34,6 +34,10 @@
       type: Boolean,
       required: true
     },
+    isDeliveryProtocolHttps: {
+      type: Boolean,
+      required: true
+    },
     listEdgeApplicationFunctionsService: {
       type: Function,
       required: true
@@ -56,7 +60,7 @@
     debouncedDrawerAnimate
   )
   const loadEditRulesEngineDrawer = refDebounced(showEditRulesEngineDrawer, debouncedDrawerAnimate)
-  const selectedRulesEngineToEdit = ref('')
+  const selectedRulesEngineToEdit = ref({})
 
   const initialValues = ref({
     id: props.edgeApplicationId,
@@ -104,9 +108,9 @@
     })
   }
 
-  const loadService = async (payload) => {
+  const loadService = async () => {
     return await props.loadRulesEngineService({
-      ...payload,
+      ...selectedRulesEngineToEdit.value,
       edgeApplicationId: props.edgeApplicationId
     })
   }
@@ -155,6 +159,7 @@
         :initialPhase="initialPhase"
         :edgeApplicationId="props.edgeApplicationId"
         :isEnableApplicationAcceleration="props.isEnableApplicationAcceleration"
+        :isDeliveryProtocolHttps="props.isDeliveryProtocolHttps"
         :listEdgeApplicationFunctionsService="props.listEdgeApplicationFunctionsService"
         :listOriginsService="props.listOriginsService"
         :listCacheSettingsService="props.listCacheSettingsService"
@@ -164,7 +169,6 @@
   <EditDrawerBlock
     v-if="loadEditRulesEngineDrawer"
     :id="selectedRulesEngineToEdit.id.toString()"
-    :itemToEdit="selectedRulesEngineToEdit"
     v-model:visible="showEditRulesEngineDrawer"
     :loadService="loadService"
     :editService="editService"
@@ -179,6 +183,7 @@
         :selectedRulesEngineToEdit="selectedRulesEngineToEdit"
         :edgeApplicationId="props.edgeApplicationId"
         :isEnableApplicationAcceleration="props.isEnableApplicationAcceleration"
+        :isDeliveryProtocolHttps="props.isDeliveryProtocolHttps"
         :listEdgeApplicationFunctionsService="props.listEdgeApplicationFunctionsService"
         :listOriginsService="props.listOriginsService"
         :listCacheSettingsService="props.listCacheSettingsService"

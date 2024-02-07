@@ -14,18 +14,22 @@ export const editOriginService = async (payload) => {
 }
 
 const adapt = (payload) => {
-  const payloadAdapted = {
+  let payloadAdapted = {
     name: payload.name,
     host_header: payload.hostHeader,
     origin_type: payload.originType,
-    method: payload.method,
     is_origin_redirection_enabled: payload.isOriginRedirectionEnabled,
-    addresses: payload.addresses?.map((addressItem) => ({
-      address: addressItem.address,
-      weight: addressItem.weight,
-      server_role: addressItem.serverRole,
-      is_active: addressItem.isActive
-    })),
+    addresses: payload.addresses?.map((addressItem) => {
+      const address = {
+        address: addressItem.address,
+        server_role: addressItem.serverRole,
+        is_active: addressItem.isActive
+      }
+      if (addressItem.weight) {
+        address.weight = addressItem.weight
+      }
+      return address
+    }),
     origin_path: payload.originPath,
     origin_protocol_policy: payload.originProtocolPolicy,
     hmac_authentication: payload.hmacAuthentication,
@@ -36,19 +40,27 @@ const adapt = (payload) => {
     timeout_between_bytes: payload.timeoutBetweenBytes
   }
 
+  if (payload.method) {
+    payloadAdapted.method = payload.method
+  }
+
   return payloadAdapted
 }
 
 /**
  * @param {Object} errorSchema - The error schema.
  * @param {string} key - The error key of error schema.
- * @returns {string|undefined} The result message based on the status code.
+ * @returns {Object} An object containing the most specific error key and its message.
  */
 const extractErrorKey = (errorSchema, key) => {
-  if (Array.isArray(errorSchema[key])) {
-    return errorSchema[key]?.[0]
+  const errorValue = errorSchema[key]
+  if (Array.isArray(errorValue)) {
+    if (errorValue.length > 0 && typeof errorValue[0] === 'object') {
+      return extractErrorKey(errorValue[0], Object.keys(errorValue[0])[0])
+    }
+    return { key, message: errorValue[0] }
   }
-  return errorSchema[key]
+  return { key, message: errorValue }
 }
 
 /**
@@ -57,9 +69,12 @@ const extractErrorKey = (errorSchema, key) => {
  * @returns {string} The result message based on the status code.
  */
 const extractApiError = (httpResponse) => {
-  const errorKey = Object.keys(httpResponse.body)[0]
-  const apiError = extractErrorKey(httpResponse.body, errorKey)
-  return `${errorKey}: ${apiError}`
+  for (const key of Object.keys(httpResponse.body)) {
+    const { key: innerKey, message } = extractErrorKey(httpResponse.body, key)
+    if (message) {
+      return `${innerKey}: ${message}`
+    }
+  }
 }
 
 /**
