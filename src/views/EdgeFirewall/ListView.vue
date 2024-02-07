@@ -73,7 +73,7 @@
     <template #content>
       <ListTableBlock
         v-if="hasContentToList"
-        pageTitleDelete="Edge Firewal"
+        pageTitleDelete="Edge Firewall"
         addButtonLabel="Rule Set"
         createPagePath="/edge-firewall/create"
         editPagePath="/edge-firewall/edit"
@@ -81,12 +81,12 @@
         :deleteService="props.deleteEdgeFirewallService"
         :columns="getColumns"
         @on-load-data="handleLoadData"
-        emptyListMessage="No Rule Set found."
+        emptyListMessage="No rule set found."
       />
       <EmptyResultsBlock
         v-else
-        title="No Rule Set added."
-        description="Create your first Rule Set."
+        title="No rule set has been created."
+        description="Click the button below to initiate the setup process and create your first rule set."
         createButtonLabel="Rule Set"
         createPagePath="/edge-firewall/create"
         :documentationService="props.documentationService"

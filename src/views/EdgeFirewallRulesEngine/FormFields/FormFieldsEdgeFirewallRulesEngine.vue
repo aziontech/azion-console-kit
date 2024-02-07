@@ -435,7 +435,7 @@
 <template>
   <FormHorizontal
     title="General"
-    description="Create a rule set to handle the conditional execution of behaviors through logical operators."
+    description="Create a rule to handle the conditional execution of behaviors through logical operators."
     :isDrawer="true"
   >
     <template #inputs>
@@ -444,6 +444,7 @@
           label="Name *"
           name="name"
           :value="name"
+          placeholder="My rule"
           description="Give a unique and descriptive name to identify the rule."
         />
       </div>
@@ -452,8 +453,8 @@
           label="Description"
           name="description"
           :value="description"
-          description="Add a short text that describes the rule to remember what it's used for or write another type of comment."
-        />
+          description="Add a short description or comment to the rule."
+          />
       </div>
     </template>
   </FormHorizontal>
@@ -461,7 +462,7 @@
   <FormHorizontal
     :isDrawer="true"
     title="Criteria"
-    description="Set the conditions to execute the rule. Select a variable from the list, the operator and, if prompted, enter the comparison string."
+    description="Set the conditions to execute the rule. Add a variable, the comparison operator and, if prompted, an argument."
   >
     <template #inputs>
       <div
@@ -618,7 +619,7 @@
 
   <FormHorizontal
     title="Behaviors"
-    description="Set the behaviors you want your rule to perform if the conditions defined in the criteria are met. Select a behavior and all required information. Some actions can't be used together or in some conditions."
+    description="Set the behaviors you want your rule to perform if the conditions defined in the criteria are met. Select a behavior and fill in all required information. Some behaviors can't be added together or in some conditions."
     :isDrawer="true"
   >
     <template #inputs>

@@ -650,7 +650,7 @@
   <FormHorizontal
     :isDrawer="true"
     title="General"
-    description="Create a rule set to handle the conditional execution of behaviors through logical operators."
+    description="Create a rule to handle the conditional execution of behaviors through logical operators."
   >
     <template #inputs>
       <div class="flex flex-col sm:max-w-lg w-full gap-2">

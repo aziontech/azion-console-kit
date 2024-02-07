@@ -51,6 +51,7 @@
           label="Name *"
           name="name"
           v-model="name"
+          placeholder="My edge application function instance"
           description="Give a unique and descriptive name to identify the function instance."
         />
       </div>

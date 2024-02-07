@@ -139,23 +139,23 @@
     :deleteService="deleteEdgeFirewallRulesEngineServiceWithDecorator"
     :columns="getColumns"
     :editInDrawer="openEditDrawer"
-    pageTitleDelete="Edge Firewall"
+    pageTitleDelete="Rule"
     @on-load-data="handleLoadData"
-    emptyListMessage="No Rules Engine found."
+    emptyListMessage="No rule found."
   >
     <template #addButton>
       <PrimeButton
         icon="pi pi-plus"
-        label="Rule Engine"
+        label="Rules Engine"
         @click="openCreateDrawer"
       />
     </template>
   </ListTableBlock>
   <EmptyResultsBlock
     v-else
-    title="No Rules Engine added."
-    description="Create your first Rule Engine."
-    createButtonLabel="Rule Engine"
+    title="No rule has been created."
+    description="Click the button below to initiate the setup process and create your first rule."
+    createButtonLabel="Rules Engine"
     :documentationService="props.documentationService"
     :inTabs="true"
   >
@@ -163,7 +163,7 @@
       <PrimeButton
         severity="secondary"
         icon="pi pi-plus"
-        label="Rule Engine"
+        label="Rules Engine"
         @click="openCreateDrawer"
       />
     </template>
