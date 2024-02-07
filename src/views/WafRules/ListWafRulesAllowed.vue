@@ -22,8 +22,8 @@
 
   <EmptyResultsBlock
     v-else
-    title="No Allowed Rules added."
-    description="Allowed Rules are specific WAF rules customized for your web application."
+    title="No allowed rule has been created."
+    description="Click one of the buttons below to either create an allowed rule after analyzing requests with Tuning or create your first allowed rule."
     createButtonLabel="Allowed Rule"
     :documentationService="documentationServiceAllowed"
     :inTabs="true"
@@ -54,7 +54,7 @@
     :schema="validationSchemaAllowed"
     :initialValues="initialValues"
     @onSuccess="reloadWafRulesAllowedList"
-    title="Create New"
+    title="Create Allowed Rule"
   >
     <template #formFields>
       <FormFieldsAllowed :optionsRuleIds="props.optionsRuleIds"></FormFieldsAllowed>
@@ -69,7 +69,7 @@
     :editService="handleEditWafRulesAllowedService"
     :schema="validationSchemaAllowed"
     @onSuccess="reloadWafRulesAllowedList"
-    title="Edit Waf Rules Allowed"
+    title="Edit Allowed Rule"
   >
     <template #formFields>
       <FormFieldsAllowed
@@ -175,7 +175,7 @@
     },
     {
       field: 'matchZones',
-      header: 'Match Zone Set',
+      header: 'Match Zones',
       type: 'component',
       component: (columnData) =>
         columnBuilder({ data: columnData, columnAppearance: 'expand-column' })

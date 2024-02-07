@@ -1,7 +1,7 @@
 <template>
   <ContentBlock>
     <template #heading>
-      <PageHeadingBlock pageTitle="Create WAF Rules" />
+      <PageHeadingBlock pageTitle="Create WAF Rule" />
     </template>
     <template #content>
       <CreateFormBlock

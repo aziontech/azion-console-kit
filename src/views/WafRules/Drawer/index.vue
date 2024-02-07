@@ -178,7 +178,7 @@
           <div class="gap-2 flex flex-col">
             <div class="text-color text-xl font-medium">Possible Attacks List</div>
             <div class="text-color-secondary items-center gap-1 inline-flex">
-              Select specific fields to allow rules
+              Select fields to create allowed rules in your WAF.
             </div>
           </div>
           <div class="w-full sm:max-w-xs">

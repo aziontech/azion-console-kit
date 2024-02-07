@@ -51,7 +51,7 @@
   }
 
   const descriptionAllowedFormField = ref(
-    'Choose match zones to put into the Allowed Rule:\n Path to put the path itself or one named path into the Allowed Rule. \n Query String or Conditional Query String to put all GET arguments or one named argument into the Allowed Rule. For example, the "search" argument. \n Request Header or Conditional Request Header to put all HTTP request headers or one named header into the Allowed Rule. For example, the Cookie header. \nRequest Body or Conditional Request Body to put all POST arguments or one named argument into the Allowed Rule. For example, the "search" argument.\n Raw Body to put the unparsed (raw) request body into the whitelist.\n File Name (Multipart Body) to put the unparsed (raw) request body into the Allowed Rule.'
+    'Configure the behavior that should be used to allow a rule.'
   )
 
   const showInputNameHeader = (value) => {
@@ -88,7 +88,7 @@
   <FormHorizontal
     :isDrawer="true"
     title="General"
-    description="Create a match zone for wich this Rule should be in the Allowed Rule."
+    description="Create a match zone to allow specific rules to amplify the security levels of your application and prevent false positives."
   >
     <template #inputs>
       <div class="flex flex-col w-full sm:max-w-xs gap-2">
@@ -110,13 +110,17 @@
             item: { class: 'whitespace-pre-line' }
           }"
         />
+        <small class="text-color-secondary font-normal leading-tight">
+          Select the rule that matches the request you want to allow.
+        </small>
       </div>
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
         <FieldText
           label="Description *"
           name="reason"
+          placeholder="This rule was allowed because the path is being used in internal tests."
+          description="Add a short description or comment to explain the reason this rule was allowed."
           :value="reason"
-          description="Set a suggestive description for this rule."
         />
       </div>
     </template>
@@ -132,7 +136,8 @@
           label="Path *"
           name="path"
           :value="path"
-          description="Path is only used to restrict the scope of a matchzone. Leave it in blank if you do not want to restrict matchzone scope."
+          placeholder="/"
+          description="Add a path to restrict the scope of a match zone."
         />
       </div>
       <Divider
@@ -202,6 +207,9 @@
                 v-model="matchZones[index].zone_input"
                 type="text"
               />
+              <small class="text-color-secondary leading-tight">
+                Add a specific value that represents the match option or leave it blank to consider empty values.
+              </small>
             </div>
           </div>
           <div
@@ -237,7 +245,7 @@
                       </div>
                     </div>
                     <div class="self-stretch text-color-secondary text-sm font-normal">
-                      To put the value into the allowed rule or.
+                      Adds the value into the allowed rule.
                     </div>
                   </div>
                 </template>
@@ -270,7 +278,7 @@
                       </div>
                     </div>
                     <div class="self-stretch text-color-secondary text-sm font-normal">
-                      To put the key name into the allowed rule.
+                      Adds the key name into the allowed rule.
                     </div>
                   </div>
                 </template>
@@ -296,25 +304,22 @@
   </FormHorizontal>
   <FormHorizontal
     title="Regex"
+    description="Activate this option to treat conditional fields as regular expressions in all match zones."
     :isDrawer="true"
   >
     <template #inputs>
-      <div class="flex gap-2 items-top">
+      <div class="flex gap-3 items-center">
         <InputSwitch
           id="regex"
-          class="flex-shrink-0 flex-grow"
+          class="flex-shrink-0"
           v-model="useRegex"
         />
         <div class="flex flex-col gap-1">
           <label
-            class="text-sm font-normal leading-tight"
+            class="text-base font-normal leading-tight"
             for="regex"
             >Active
           </label>
-          <small class="text-color-secondary text-sm font-normal leading-tight">
-            Check this option to treat conditional fields as regular expressions in all Match Zone
-            Set. Otherwise, conditional fields should be treated as strings.
-          </small>
         </div>
       </div>
     </template>
@@ -327,6 +332,7 @@
       <div class="flex gap-3 items-center">
         <InputSwitch
           id="status"
+          class="flex-shrink-0"
           v-model="status"
         />
         <label

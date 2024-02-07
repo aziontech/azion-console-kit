@@ -47,21 +47,22 @@
 <template>
   <FormHorizontal
     title="General"
-    description=""
+    description="Create a WAF rule set to protect your servers and edge applications against threat families. You must configure a behavior on Rules Engine for Edge Firewall to apply and run this rule set."
   >
     <template #inputs>
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
         <FieldText
           label="Name *"
-          name="name"
+          name="Give a unique and descriptive name to identify the WAF rule."
           :value="name"
+          placeholder="My rule set"
         />
       </div>
     </template>
   </FormHorizontal>
   <FormHorizontal
     title="WAF Rule Set"
-    description='Create a new WAF Rule Set to use on your Edge Firewall rules. To apply a WAF Rule Set, you need to add it into a Rule using the behavior "Set WAF Rule Set" in your Edge Firewall > Rules Engine.'
+    description="Configure the threat types and sensitivity levels WAF should block."
   >
     <template #inputs>
       <div class="flex flex-col gap-2">
@@ -199,7 +200,7 @@
               />
             </template>
             <template #subtitle>
-              Detect attempts to inject client-side scripts into web pages viewed by your visitors.
+              Prevents the injection of client-side scripts into pages viewed by your visitors.
             </template>
             <template #content>
               <div class="flex flex-col w-full sm:max-w-xs gap-2 mt-3">
@@ -233,7 +234,9 @@
                 v-model="fileUpload"
               />
             </template>
-            <template #subtitle> Detect attempts to upload files. </template>
+            <template #subtitle>
+              Detect attempts to upload files.
+            </template>
             <template #content>
               <div class="flex flex-col w-full sm:max-w-xs gap-2 mt-3">
                 <Dropdown
@@ -267,7 +270,9 @@
                 v-model="evadingTricks"
               />
             </template>
-            <template #subtitle> Prevent the use of encoding tricks to evade protection. </template>
+            <template #subtitle>
+              Prevent the use of encoding tricks to evade protection mechanisms
+            </template>
             <template #content>
               <div class="flex flex-col w-full sm:max-w-xs gap-2 mt-3">
                 <Dropdown
