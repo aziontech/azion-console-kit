@@ -6,7 +6,7 @@ import { getAccountSettingsService } from '@/services/account-settings-services/
 const fixtures = {
   response: {
     name: 'account name',
-    id: '1234',
+   client_id: '1234',
     company_name: 'company name',
     unique_identifier: 'unique identifier',
     billing_emails: 'billing emails',
