@@ -5,9 +5,9 @@
     v-if="showLoading"
   >
     <ProgressBar
-      class="sticky"
+      class="sticky rounded-none"
       mode="indeterminate"
-      style="height: 0.375rem; border-radius: 0px"
+      style="height: 0.375rem"
     />
   </div>
 </template>
