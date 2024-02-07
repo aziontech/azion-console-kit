@@ -110,6 +110,13 @@
       }
     }
 
+    const moveFocusToPreviusInput = () => {
+      const nextInput = inputRefs.value[index - 1]
+      if (nextInput) {
+        nextInput.$el.focus()
+      }
+    }
+
     const isInvalidCode = (digitCode) => isNaN(digitCode) || digitCode.length > 1
     if (isInvalidCode(digitCode)) {
       clearDigitValue(index)
@@ -119,6 +126,11 @@
     const shouldMoveFocus = (digitCode, index) => digitCode !== '' && index < MFA_CODE_LENGTH - 1
     if (shouldMoveFocus(digitCode, index)) {
       moveFocusToNextInput(index)
+    }
+
+    const shouldBackFocus = (digitCode) => digitCode === ''
+    if (shouldBackFocus(digitCode, index)) {
+      moveFocusToPreviusInput(index)
     }
 
     const allDigitsFilled = () => joinDigitsMfa().length === 6
@@ -142,6 +154,7 @@
       await switchClientAccount(userInfo.props.account_id)
     } catch (error) {
       hasRequestErrorMessage.value = error
+      digitsMfa.forEach(item => item.value.value = '')
     } finally {
       isButtonLoading.value = false
     }
