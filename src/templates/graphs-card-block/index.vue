@@ -87,7 +87,8 @@
 
   const reRenderChart = () => {
     /*
-     * This approach was used to re-render the chart after screen resize and help center toggling.
+     * This approach was used to re-render the chart after 3 main changes:
+     * window resize, mean line and helpcenter toggling
      * The nextTick was not sufficient to resolve the latter.
      * HelpCenter takes 300ms to animate. To garantee the proper re-render, 350ms was used.
      */
