@@ -234,9 +234,7 @@
                 v-model="fileUpload"
               />
             </template>
-            <template #subtitle>
-              Detect attempts to upload files.
-            </template>
+            <template #subtitle> Detect attempts to upload files. </template>
             <template #content>
               <div class="flex flex-col w-full sm:max-w-xs gap-2 mt-3">
                 <Dropdown

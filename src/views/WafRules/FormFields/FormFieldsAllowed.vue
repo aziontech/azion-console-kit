@@ -208,7 +208,8 @@
                 type="text"
               />
               <small class="text-color-secondary leading-tight">
-                Add a specific value that represents the match option or leave it blank to consider empty values.
+                Add a specific value that represents the match option or leave it blank to consider
+                empty values.
               </small>
             </div>
           </div>

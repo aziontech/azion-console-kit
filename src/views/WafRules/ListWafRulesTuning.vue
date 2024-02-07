@@ -216,8 +216,7 @@
     {
       label: 'Country',
       value: 'country',
-      description:
-        '',
+      description: '',
       operator: [
         {
           value: 'In',
@@ -233,8 +232,7 @@
     {
       label: 'IP Address',
       value: 'ip_address',
-      description:
-        '',
+      description: '',
       operator: [
         { value: 'Eq', type: 'String', props: { placeholder: 'Select IP Address' } },
         { value: 'In', type: 'ArrayString', props: { placeholder: 'Enter IP Address' } }
