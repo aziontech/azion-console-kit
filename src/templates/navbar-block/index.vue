@@ -79,7 +79,12 @@
   })
 
   const redirectToRoute = (name) => {
-    router.push({ name })
+    const currentRoute = router.currentRoute.value
+    if (currentRoute.name === name) {
+      router.go(0)
+    } else {
+      router.push({ name })
+    }
   }
 
   watch(
