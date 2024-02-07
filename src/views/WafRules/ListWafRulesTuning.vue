@@ -36,7 +36,7 @@
   </div>
   <ListTableNoHeaderBlock
     v-show="showListTable"
-    pageTitleDelete="Waf Rules Tuning"
+    pageTitleDelete="WAF Rules Tuning"
     :columns="wafRulesAllowedColumns"
     :hasListService="true"
     :dataFilted="dataFiltedComputed"
@@ -44,7 +44,7 @@
     :cleanSelectData="cleanSelectData"
     :showselectionMode="true"
     :editInDrawer="openMoreDetails"
-    emptyListMessage="No Waf Rules Tuning found."
+    emptyListMessage="No WAF Rules Tuning found."
   >
     <template #header>
       <advancedFilter
