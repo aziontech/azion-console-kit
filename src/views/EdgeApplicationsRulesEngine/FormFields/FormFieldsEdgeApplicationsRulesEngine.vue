@@ -221,7 +221,7 @@
   /**
    * Generate the options for the criteria menu.
    * @param {number} criteriaIndex - The index of the criteria.
-   * @param {number} [conditionalIndex=null] - The index of the conditional.
+   * @param {number} [conditionalIndex] - The index of the conditional.
    * @returns {Array} An array of options for the criteria menu.
    */
   const criteriaMenuOptions = (criteriaIndex, conditionalIndex = null) => {
@@ -524,9 +524,6 @@
     updateBehavior(index, { name: behavior.name, target: behavior.target })
   }
 
-  /**
-   * Processes the behaviors of the selected rules engine to edit.
-   */
   const processBehaviorsAtEdit = async () => {
     const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms))
 
@@ -758,7 +755,10 @@
               :value="criteria[index].value[itemIndex].operator"
             />
             <FieldText
-              v-if="item.operator !== 'exists' && item.operator !== 'does_not_exist'"
+              v-if="
+                criteria[index].value[itemIndex].operator !== 'exists' &&
+                criteria[index].value[itemIndex].operator !== 'does_not_exist'
+              "
               :name="`criteria[${index}][${itemIndex}].input_value`"
               :value="criteria[index].value[itemIndex].input_value"
               inputClass="w-full"

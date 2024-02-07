@@ -1,7 +1,7 @@
 <template>
   <ul class="flex flex-col gap-1">
-    <li>
-      {{ splitValue }}
+    <li class="whitespace-pre">
+      {{ textToShow }}
     </li>
     <li
       v-if="displayShowMore"
@@ -31,7 +31,7 @@
   const formatValue = textColumn.value?.slice(0, SLICE_VALUE)
   const newValue = `${formatValue}${displayShowMore ? '...' : ''}`
 
-  const splitValue = computed(() => {
+  const textToShow = computed(() => {
     return showAllItems.value ? textColumn.value : newValue
   })
 

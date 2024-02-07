@@ -7,7 +7,7 @@
   import Skeleton from 'primevue/skeleton'
   import PrimeTag from 'primevue/tag'
   import { useField } from 'vee-validate'
-  import { computed, ref, watch } from 'vue'
+  import { computed, onMounted, ref, watch } from 'vue'
 
   defineOptions({ name: 'form-fields-edge-firewall' })
   const emit = defineEmits(['update:loadingDomains'])
@@ -46,10 +46,6 @@
 
   const classLoading = computed(() => (loading.value ? 'pointer-events-none' : ''))
 
-  const isAlreadySelected = ({ alreadySelectedDomainsIds, id }) => {
-    return alreadySelectedDomainsIds.includes(id)
-  }
-
   const fetchDomains = async () => {
     try {
       loading.value = true
@@ -59,9 +55,12 @@
       const alreadySelectedDomains =
         responseDomains.filter((domain) => alreadySelectedDomainsIds.includes(domain.id)) || []
 
-      const notSelectedDomains = responseDomains.filter(
-        (domain) => !isAlreadySelected({ alreadySelectedDomainsIds, id: domain.id })
-      )
+      const notSelectedDomains =
+        responseDomains.filter((domain) => {
+          if (!domain.edgeFirewallId && !alreadySelectedDomainsIds.includes(domain.id)) {
+            return domain
+          }
+        }) || []
 
       domainsList.value = [notSelectedDomains, alreadySelectedDomains]
 
@@ -76,7 +75,10 @@
       loading.value = false
     }
   }
-  fetchDomains()
+
+  onMounted(async () => {
+    await fetchDomains()
+  })
 </script>
 
 <template>
