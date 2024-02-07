@@ -88,7 +88,7 @@
   <FormHorizontal
     :isDrawer="true"
     title="General"
-    description="Create a match zone to allow specific rules to amplify the security levels of your application and prevent false positives."
+    description="Create a match zone to allow specific rules to amplify the security levels of the application and prevent false positives."
   >
     <template #inputs>
       <div class="flex flex-col w-full sm:max-w-xs gap-2">
@@ -111,7 +111,7 @@
           }"
         />
         <small class="text-color-secondary font-normal leading-tight">
-          Select the rule that matches the request you want to allow.
+          Select the rule that matches the request to be allowed.
         </small>
       </div>
       <div class="flex flex-col sm:max-w-lg w-full gap-2">

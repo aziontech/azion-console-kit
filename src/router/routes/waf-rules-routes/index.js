@@ -80,7 +80,7 @@ export const wafRulesRoutes = {
             to: '/waf'
           },
           {
-            label: 'Edit Waf Rule'
+            label: 'Edit WAF Rule'
           }
         ]
       }
