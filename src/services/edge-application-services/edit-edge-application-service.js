@@ -73,9 +73,16 @@ const adapt = (payload) => {
  * @returns {string} The result message based on the status code.
  */
 const extractApiError = (httpResponse) => {
-  const [key] = Object.keys(httpResponse.body)
+  const errorKeys = Object.keys(httpResponse.body)
+  const noProductErrorFound = errorKeys.includes('user_has_no_product')
 
-  const errorMessage = httpResponse.body[key]
+  if (noProductErrorFound) {
+    const noProductErrorMessage =
+      'In order to perform this action, you must first have access to the product Tiered Cache'
+    return noProductErrorMessage
+  }
+  const [firstError] = errorKeys
+  const errorMessage = httpResponse.body[firstError]
 
   return errorMessage
 }
