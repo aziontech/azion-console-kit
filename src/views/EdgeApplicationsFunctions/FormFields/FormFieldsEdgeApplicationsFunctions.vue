@@ -62,7 +62,7 @@
     :isDrawer="true"
     title="Edge Function"
     description="Select an existing edge function and customize the arguments. Only edge functions previously created in the Edge Functions module can be instantiated."
-    >
+  >
     <template #inputs>
       <div class="flex w-80 flex-col gap-2 sm:max-w-lg max-sm:w-full">
         <label
