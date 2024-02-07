@@ -18,7 +18,7 @@
   const {
     value: begin,
     errorMessage: errorBegin,
-    setValue: setBegin
+    handleChange: handleChangeBegin
   } = useField(
     'begin',
     yup
@@ -39,7 +39,7 @@
   const {
     value: end,
     errorMessage: errorEnd,
-    setValue: setEnd
+    handleChange: handleChangeEnd
   } = useField(
     'end',
     yup
@@ -57,9 +57,11 @@
     }
   )
 
-  const handleChange = () => {
-    setBegin(begin.value)
-    setEnd(end.value)
+  const setBegin = ({ value }) => {
+    handleChangeBegin(value)
+  }
+  const setEnd = ({ value }) => {
+    handleChangeEnd(value)
   }
 </script>
 <template>
@@ -74,8 +76,7 @@
       <InputNumber
         :placeholder="props.placeholder"
         v-model="begin"
-        @update:modelValue="handleChange"
-        @blur="handleChange"
+        @input="setBegin"
         inputId="number_field_begin"
         showButtons
         :minFractionDigits="2"
@@ -98,8 +99,7 @@
       <InputNumber
         :placeholder="props.placeholder"
         v-model="end"
-        @update:modelValue="handleChange"
-        @blur="handleChange"
+        @input="setEnd"
         inputId="number_field_end"
         showButtons
         :minFractionDigits="2"

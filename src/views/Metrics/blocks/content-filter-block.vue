@@ -16,8 +16,14 @@
     currentFilters
   } = storeToRefs(metricsStore)
 
-  const { setTimeRange, filterDatasetUpdate, createAndFilter, setReports, loadCurrentReports } =
-    metricsStore
+  const {
+    setTimeRange,
+    filterDatasetUpdate,
+    createAndFilter,
+    setReports,
+    loadCurrentReports,
+    resetFilters
+  } = metricsStore
 
   const props = defineProps({
     playgroundOpener: {
@@ -139,6 +145,10 @@
       })
     })
 
+    if (!filter.length) {
+      resetFilters()
+    }
+
     await setReports()
     await loadCurrentReports()
   }
@@ -168,7 +178,6 @@
       icon="pi pi-external-link"
       label="Open in GraphQL Playground"
       @click="props.playgroundOpener()"
-      :disabled="true"
     />
   </div>
 </template>

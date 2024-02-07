@@ -53,7 +53,7 @@
     interval.value = intervalOptions?.value[0]
     const [begin, end] = removeAmountOfHours(interval.value?.code)
     dates.value = [begin, end]
-    lastFilteredDate.value = { begin, end }
+    setDateTimeFilters(begin, end)
   }
 
   const updatedTimeRange = ({ begin, end, meta }) => {
@@ -95,7 +95,7 @@
       tsRangeEnd: end.resetUTC(userUTC).toBeholderFormat()
     }
 
-    if (checkIfDatesAreEqual(begin, end)) return
+    if (lastFilteredDate.value?.begin && checkIfDatesAreEqual(begin, end)) return
 
     lastFilteredDate.value = { begin, end }
     setTimeRange({ ...tsRange })

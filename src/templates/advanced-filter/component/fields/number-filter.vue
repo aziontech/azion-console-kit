@@ -16,13 +16,17 @@
     }
   })
 
-  const { value: selectedValue, errorMessage } = useField(
-    'selectedValue',
-    yup.number().required(),
-    {
-      initialValue: props.value
-    }
-  )
+  const {
+    value: selectedValue,
+    errorMessage,
+    handleChange: handleChangeNumber
+  } = useField('selectedValue', yup.number().required(), {
+    initialValue: props.value
+  })
+
+  const handleChange = ({ value }) => {
+    handleChangeNumber(value)
+  }
 </script>
 <template>
   <div class="w-1/2 pr-6">
@@ -37,6 +41,7 @@
         :placeholder="props.placeholder"
         v-model="selectedValue"
         inputId="number_field"
+        @input="handleChange"
         mode="decimal"
         showButtons
         :min="0"

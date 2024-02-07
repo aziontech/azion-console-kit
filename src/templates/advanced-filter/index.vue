@@ -2,11 +2,13 @@
   defineOptions({ name: 'advanced-filter' })
   import { computed, onMounted, ref, watch } from 'vue'
   import dialogFilter from './dialog-filter.vue'
-  import Chip from 'primevue/chip'
   import PrimeButton from 'primevue/button'
   import { useRoute, useRouter } from 'vue-router'
   import { useToast } from 'primevue/usetoast'
   import { OPERATOR_MAPPING } from './component'
+  import chipsDefaultDisplay from './component/display/chips-default-display.vue'
+  import chipsRangeDisplay from './component/display/chips-range-display.vue'
+  import chipsInDisplay from './component/display/chips-in-display.vue'
 
   const route = useRoute()
   const toast = useToast()
@@ -233,98 +235,61 @@
   })
 </script>
 <template>
-  <div class="flex w-full gap-4 md:gap-2 max-sm:flex-col">
-    <div class="flex items-center w-full h-11">
-      <dialogFilter
-        :disabled="props.disabled"
-        ref="refDialogFilter"
-        :filtersOptions="listField"
-        :counter="displayFilter.length"
-        @applyFilter="updateFilter"
-      />
+  <div class="flex w-full min-w-0 flex-column gap-4 md:gap-2 md:flex-row">
+    <dialogFilter
+      :disabled="props.disabled"
+      ref="refDialogFilter"
+      :filtersOptions="listField"
+      :counter="displayFilter.length"
+      @applyFilter="updateFilter"
+    />
 
-      <div
-        class="border-b border-left-none border-r border-solid border-t flex h-full items-center p-inputtext rounded-[0px_6px_6px_0px] w-full"
-      >
-        <ul class="flex gap-3 align-items-center">
-          <template
-            v-for="(itemFilter, index) in displayFilter"
-            :key="itemFilter"
+    <div
+      class="md:-ml-2 md:border-b md:border-left-none md:border-r border-solid border-t flex items-center p-inputtext md:rounded-[0px_6px_6px_0px] w-full overflow-x-auto overflow-y-hidden h-12"
+    >
+      <ul class="flex gap-3 align-items-center">
+        <template
+          v-for="(itemFilter, index) in displayFilter"
+          :key="itemFilter"
+        >
+          <li v-if="!DEFAULT_FORMAT.includes(itemFilter.operator)">
+            <chipsDefaultDisplay
+              :itemFilter="itemFilter"
+              :position="index"
+              :clickFilter="clickFilter"
+              :removeItemFilter="removeItemFilter"
+            />
+          </li>
+          <li v-if="itemFilter.operator === FORMAT_RANGE">
+            <chipsRangeDisplay
+              :itemFilter="itemFilter"
+              :position="index"
+              :clickFilter="clickFilter"
+              :removeItemFilter="removeItemFilter"
+            />
+          </li>
+          <li
+            v-if="itemFilter.operator === FORMAT_IN"
+            class="flex gap-3 align-items-center"
           >
-            <li v-if="!DEFAULT_FORMAT.includes(itemFilter.operator)">
-              <Chip
-                class="text-sm px-2 cursor-pointer w-max"
-                removable
-                @click="clickFilter(itemFilter, $event)"
-                @remove="removeItemFilter(index, $event)"
-              >
-                <span class="p-chip-text"> {{ itemFilter.field }}</span>
-                <span class="font-bold p-chip-text leading-5 pl-1">
-                  {{ `${itemFilter.format} ${itemFilter.value}` }}</span
-                >
-              </Chip>
-            </li>
-            <li v-if="itemFilter.operator === FORMAT_RANGE">
-              <Chip
-                class="text-sm px-2 cursor-pointer w-max"
-                removable
-                @click="clickFilter(itemFilter, $event)"
-                @remove="removeItemFilter(index, $event)"
-              >
-                <span class="font-bold p-chip-text leading-5 pr-1">
-                  {{ `${itemFilter.value.begin} ${itemFilter.format} ` }}</span
-                >
-                <span class="p-chip-text"> {{ itemFilter.field }}</span>
-                <span class="font-bold p-chip-text leading-5 pl-1">
-                  {{ `${itemFilter.format} ${itemFilter.value.end}` }}</span
-                >
-              </Chip>
-            </li>
-            <li
-              v-if="itemFilter.operator === FORMAT_IN"
-              class="flex gap-3 align-items-center"
-            >
-              <Chip
-                class="text-sm px-2 w-max"
-                :label="itemFilter.field"
-              />
-              <span> in </span>
-              <span> ( </span>
-              <template
-                v-for="(item, idx) in itemFilter.value"
-                :key="item"
-              >
-                <Chip
-                  class="text-sm px-2 cursor-pointer w-max"
-                  @click="clickFilter(itemFilter, $event)"
-                  @remove="removeValueItemFilter(index, idx, $event)"
-                  removable
-                >
-                  <span class="font-bold p-chip-text leading-5">
-                    {{ item.name || item.label || item }}
-                  </span>
-                </Chip>
-                <span v-if="itemFilter.value.length > idx + 1"> or </span>
-                <span v-if="itemFilter.value.length === idx + 1"> ) </span>
-              </template>
-            </li>
-            <li v-if="displayFilter.length > index + 1">and</li>
-          </template>
-        </ul>
-      </div>
+            <chipsInDisplay
+              :itemFilter="itemFilter"
+              :position="index"
+              :clickFilter="clickFilter"
+              :removeValueItemFilter="removeValueItemFilter"
+            />
+          </li>
+          <li v-if="displayFilter.length > index + 1">and</li>
+        </template>
+      </ul>
     </div>
 
-    <slot
-      name="applyButton"
-      :filter="displayFilter"
-    >
-      <PrimeButton
-        class="max-sm:w-full min-w-max max-sm:flex-col"
-        size="small"
-        :disabled="disabledSearch"
-        @click="searchFilter"
-        label="Search"
-      />
-    </slot>
+    <PrimeButton
+      class="h-auto min-w-max max-sm:bg-red h-12"
+      size="small"
+      :disabled="disabledSearch"
+      @click="searchFilter"
+      label="Search"
+    />
   </div>
 </template>
