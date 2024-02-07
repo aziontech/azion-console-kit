@@ -7,7 +7,7 @@
   >
     <header class="flex w-full items-center justify-between gap-2">
       <span class="w-full gap-2 flex">
-        <ChartOwner :chartOwner="chartOwner" />
+        <ChartOwner :chartOwner="report.chartOwner" />
         <span class="font-medium overflow-ellipsis break-all line-clamp-1">{{ report.label }}</span>
       </span>
       <MoreOptionsMenu
@@ -57,18 +57,11 @@
   defineOptions({ name: 'GraphsCardBlock' })
 
   const props = defineProps({
-    chartOwner: {
-      type: String,
-      default: 'azion',
-      validator(value) {
-        return ['azion', 'account', 'user'].includes(value)
-      }
-    },
+    clipboardWrite: Function,
     report: {
       type: Object,
       required: true
-    },
-    clipboardWrite: Function
+    }
   })
 
   const cardColumns = computed(() => {

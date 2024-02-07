@@ -60,7 +60,6 @@
         :key="report.id"
       >
         <GraphsCardBlock
-          chartOwner="azion"
           :report="report"
           :clipboardWrite="clipboardWrite"
         />

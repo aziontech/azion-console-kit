@@ -32,8 +32,8 @@
   const { toggleReportMeanLineStatus, toggleReportMeanLinePerSeriesStatus } = metricsStore
 
   const props = defineProps({
-    reportId: String,
-    clipboardWrite: Function
+    reportId: { type: String, required: true },
+    clipboardWrite: { type: Function, required: true }
   })
 
   const reportData = computed(() => {
