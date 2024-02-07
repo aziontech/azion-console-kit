@@ -21,12 +21,14 @@
 </template>
 
 <script setup>
+  import { useHelpCenterStore } from '@/stores/help-center'
   import { useMetricsStore } from '@/stores/metrics'
   import { storeToRefs } from 'pinia'
   import PrimeButton from 'primevue/button'
   import PrimeMenu from 'primevue/menu'
   import { computed, ref } from 'vue'
 
+  const helpCenterStore = useHelpCenterStore()
   const metricsStore = useMetricsStore()
   const { getCurrentReportsDataById } = storeToRefs(metricsStore)
   const { toggleReportMeanLineStatus, toggleReportMeanLinePerSeriesStatus } = metricsStore
@@ -44,6 +46,12 @@
 
   const items = computed(() => {
     const options = {
+      openHelpCenter: {
+        label: 'Open Help Center',
+        icon: 'pi pi-question-circle',
+        command: () => openHelpCenter(),
+        show: true
+      },
       copyQuery: {
         label: 'Copy query',
         icon: 'pi pi-copy',
@@ -75,6 +83,10 @@
 
   const toggleMenu = (evt) => {
     optionsMenu.value.toggle(evt)
+  }
+
+  const openHelpCenter = () => {
+    helpCenterStore.toggle()
   }
 
   const exportCSV = () => {
