@@ -454,7 +454,7 @@
           name="description"
           :value="description"
           description="Add a short description or comment to the rule."
-          />
+        />
       </div>
     </template>
   </FormHorizontal>

@@ -133,7 +133,8 @@
           </template>
         </PickList>
         <small class="text-color-secondary text-sm font-normal leading-tight">
-          Select an item from the list and then use the arrows to move it between the available and selected domains boxes. Use the double-line arrows to move all items.
+          Select an item from the list and then use the arrows to move it between the available and
+          selected domains boxes. Use the double-line arrows to move all items.
         </small>
       </div>
     </template>
@@ -190,9 +191,7 @@
               <span class="text-base">Edge Functions</span>
               <InputSwitch v-model="edgeFunctionsEnabled" />
             </template>
-            <template #subtitle>
-              Build ultra-low latency functions that run on the edge.
-            </template>
+            <template #subtitle> Build ultra-low latency functions that run on the edge. </template>
           </Card>
           <Card
             :pt="{
@@ -211,7 +210,10 @@
               <span class="text-base">Network Layer Protection</span>
               <InputSwitch v-model="networkProtectionEnabled" />
             </template>
-            <template #subtitle>Create lists to configure a programmable security perimeter for inbound and outbound traffic at the edge.</template>
+            <template #subtitle
+              >Create lists to configure a programmable security perimeter for inbound and outbound
+              traffic at the edge.</template
+            >
           </Card>
           <Card
             :pt="{
