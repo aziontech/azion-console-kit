@@ -30,7 +30,7 @@
       <section class="flex-auto">
         <component
           v-if="report.resultQuery?.length && showChart"
-          :is="propToComponent[`${report.type}-chart`]"
+          :is="chartType[report.type]"
           :chartData="report"
           :resultChart="report.resultQuery"
           :hasMeanLineTotal="report.showMeanLine"
@@ -72,25 +72,20 @@
   })
 
   const cardColumns = computed(() => {
-    // For some reason, template strings do not work here
-    switch (props.report.columns) {
-      case 4:
-        return 'lg:col-span-4'
-      case 8:
-        return 'lg:col-span-8'
-      case 12:
-        return 'lg:col-span-12'
-      default:
-        return 'lg:col-span-6'
+    const defaultColumns = 'lg:col-span-6'
+    const columns = {
+      4: 'lg:col-span-4',
+      8: 'lg:col-span-8',
+      12: 'lg:col-span-12'
     }
+
+    return columns[props.report.columns] || defaultColumns
   })
 
-  const propToComponent = {
-    'bar-chart': defineAsyncComponent(() => import('./components/chart/bar-chart/bar-chart')),
-    'line-chart': defineAsyncComponent(() => import('./components/chart/line-chart/line-chart')),
-    'spline-chart': defineAsyncComponent(() =>
-      import('./components/chart/spline-chart/spline-chart')
-    )
+  const chartType = {
+    bar: defineAsyncComponent(() => import('./components/chart/bar-chart/bar-chart')),
+    line: defineAsyncComponent(() => import('./components/chart/line-chart/line-chart')),
+    spline: defineAsyncComponent(() => import('./components/chart/spline-chart/spline-chart'))
   }
 
   const { getStatus } = storeToRefs(useHelpCenterStore())
@@ -119,7 +114,7 @@
     window.removeEventListener('resize', reRenderChart)
   })
 
-  watch(getStatus, () => {
+  watch([getStatus, props.report], () => {
     reRenderChart()
   })
 </script>
