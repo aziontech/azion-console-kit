@@ -21,8 +21,8 @@
     errorMessage,
     handleBlur,
     handleChange
-  } = useField('selectedValue', yup.string().required(), {
-    initialValue: props.value
+  } = useField('selectedValue', yup.string().default(''), {
+    initialValue: props.value || ''
   })
 </script>
 <template>
@@ -45,8 +45,9 @@
       <small
         v-if="errorMessage"
         class="p-error text-xs font-normal leading-tight"
-        >{{ errorMessage }}</small
       >
+        {{ errorMessage }}
+      </small>
     </div>
   </div>
 </template>

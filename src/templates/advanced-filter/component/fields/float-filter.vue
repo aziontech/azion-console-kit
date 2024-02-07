@@ -2,7 +2,7 @@
   import InputNumber from 'primevue/inputnumber'
   import * as yup from 'yup'
   import { useField } from 'vee-validate'
-  defineOptions({ name: 'numberFilter' })
+  defineOptions({ name: 'floatFilter' })
 
   const props = defineProps({
     value: {
@@ -42,10 +42,11 @@
         v-model="selectedValue"
         inputId="number_field"
         @input="handleChange"
-        mode="decimal"
         showButtons
-        :min="0"
+        :minFractionDigits="2"
+        :maxFractionDigits="5"
       />
+
       <small
         v-if="errorMessage"
         class="p-error text-xs font-normal leading-tight"
