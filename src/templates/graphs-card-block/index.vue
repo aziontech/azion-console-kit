@@ -11,7 +11,7 @@
         <span class="font-medium overflow-ellipsis break-all line-clamp-1">{{ report.label }}</span>
       </span>
       <MoreOptionsMenu
-        :reportId="`${report.id}`"
+        :reportId="report.id"
         :clipboardWrite="clipboardWrite"
       />
     </header>
@@ -20,12 +20,7 @@
         <span class="break-words text-sm text-color-secondary font-normal line-height-1 py-3.5">
           {{ report.description }}
         </span>
-        <AggregationInfo
-          :aggregationType="report.aggregationType"
-          variationType="positive"
-          variationValue="10.2%"
-          :displayTag="true"
-        />
+        <AggregationInfo :reportId="report.id" />
       </div>
       <section class="flex-auto">
         <component
