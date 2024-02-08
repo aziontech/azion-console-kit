@@ -30,9 +30,7 @@
     reportId: { type: String, required: true }
   })
 
-  const metricsStore = useMetricsStore()
-
-  const { getCurrentReportsDataById } = storeToRefs(metricsStore)
+  const { getCurrentReportsDataById } = storeToRefs(useMetricsStore())
 
   const report = computed(() => {
     return getCurrentReportsDataById.value(props.reportId)
