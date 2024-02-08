@@ -5,14 +5,18 @@ import { LoadReportWithMeta } from '.'
  *
  * @param {object} filters - The filters to apply to the report aggregation.
  * @param {string} report - The name of the report to retrieve the aggregation for.
- * @return {object} The current aggregation result for the specified report.
+ * @return {object | null} The current aggregation result for the specified report.
  */
 async function getCurrentReportAggregation({ filters, report }) {
-  const currentReportResults = await LoadReportWithMeta(filters, report)
+  try {
+    const currentReportResults = await LoadReportWithMeta(filters, report)
 
-  const currentAggregation = currentReportResults.resultQuery[report.dataset][0]
+    const currentAggregation = currentReportResults.resultQuery[report.dataset][0]
 
-  return currentAggregation
+    return currentAggregation
+  } catch {
+    return null
+  }
 }
 
 /**
@@ -39,20 +43,22 @@ function getTimeRangeDifference(timeRange) {
  *
  * @param {Object} filters - The filters to be applied to the report.
  * @param {Object} report - The report object containing the reportQuery and dataset.
- * @return {Object} The previous aggregation result.
+ * @return {Object | null} The previous aggregation result.
  */
 async function getPreviousReportAggregation({ filters, report }) {
-  const previousReportFilter = getTimeRangeDifference(report.reportQuery.variables)
-  const currentFilters = {
-    ...filters,
-    tsRange: previousReportFilter
+  try {
+    const previousReportFilter = getTimeRangeDifference(report.reportQuery.variables)
+
+    const newFilters = { ...filters, tsRange: { ...filters.tsRange, ...previousReportFilter } }
+
+    const previousReportResults = await LoadReportWithMeta(newFilters, report)
+
+    const previousAggregation = previousReportResults.resultQuery[report.dataset][0]
+
+    return previousAggregation
+  } catch {
+    return null
   }
-
-  const previousReportResults = await LoadReportWithMeta(currentFilters, report)
-
-  const previousAggregation = previousReportResults.resultQuery[report.dataset][0]
-
-  return previousAggregation
 }
 
 /**
@@ -63,6 +69,10 @@ async function getPreviousReportAggregation({ filters, report }) {
  * @return {number} the percentage difference between the current and previous aggregation values
  */
 function getFeedbackDifference(currentAggregation, previousAggregation) {
+  if (!currentAggregation || !previousAggregation) {
+    return 0
+  }
+
   const currentValue = Object.values(currentAggregation)[0]
   const previousValue = Object.values(previousAggregation)[0]
 
@@ -77,7 +87,7 @@ function getFeedbackDifference(currentAggregation, previousAggregation) {
  *
  * @param {Object} filters - the filters to apply
  * @param {Object} report - the report data
- * @return {type} the difference in feedback between current and previous aggregations
+ * @return {number} the difference in feedback between current and previous aggregations
  */
 export default async function LoadReportVariation({ filters, report }) {
   const currentAggregation = await getCurrentReportAggregation({

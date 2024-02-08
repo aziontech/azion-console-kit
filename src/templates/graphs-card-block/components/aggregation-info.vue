@@ -102,7 +102,7 @@
 
     return {
       ...getTagPropsByVariation(`${variationSatate}-${variationType}`),
-      value: variationValue.toFixed(precision)
+      value: `${variationValue.toFixed(precision)}%`
     }
   }
 </script>
