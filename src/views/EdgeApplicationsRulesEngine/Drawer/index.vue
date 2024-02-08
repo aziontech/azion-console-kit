@@ -88,10 +88,33 @@
 
   const validationSchema = yup.object({
     name: yup.string().required().label('Name'),
-    description: yup.string(),
-    phase: yup.string(),
-    criteria: yup.array(),
-    behaviors: yup.array()
+    description: yup
+      .string()
+      .max(1000, 'Description should not exceed 1000 characters')
+      .label('Description'),
+    active: yup.bool(),
+    criteria: yup.array().of(
+      yup
+        .array()
+        .of(
+          yup.object().shape({
+            variable: yup.string().required().label('variable'),
+            operator: yup.string().required().label('operator'),
+            conditional: yup.string().required().label('conditional'),
+            input_value: yup.string().when('operator', {
+              is: (operator) => operator !== 'exists' && operator !== 'does_not_exist',
+              then: (schema) => schema.required().label('criteria argument'),
+              otherwise: (schema) => schema.notRequired()
+            })
+          })
+        )
+        .required()
+    ),
+    behaviors: yup.array().of(
+      yup.object().shape({
+        name: yup.string().required().label('behavior')
+      })
+    )
   })
 
   const createService = async (payload) => {
@@ -131,9 +154,17 @@
   const closeDrawerEdit = () => {
     showEditRulesEngineDrawer.value = false
   }
+  const closeDrawerCreate = () => {
+    showCreateRulesEngineDrawer.value = false
+  }
 
   const handleCreateRulesEngine = () => {
     emit('onSuccess')
+    closeDrawerCreate()
+  }
+  const handleEditRulesEngine = () => {
+    emit('onSuccess')
+    closeDrawerEdit()
   }
 
   defineExpose({
@@ -173,7 +204,7 @@
     :loadService="loadService"
     :editService="editService"
     :schema="validationSchema"
-    @onSuccess="emit('onSuccess')"
+    @onSuccess="handleEditRulesEngine"
     :showBarGoBack="true"
     @onError="closeDrawerEdit"
     title="Edit Rule"
