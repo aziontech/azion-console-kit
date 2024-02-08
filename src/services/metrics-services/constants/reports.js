@@ -6,7 +6,7 @@ const REPORTS = [
    * Edge Applications - Data Transferred
    */
   {
-    id: 356217848089018959n,
+    id: '356217848089018959',
     chartOwner: 'azion',
     label: 'Edge Caching',
     description: DASHBOARDS_TEXTS.edge_applications.data_transferred.edge_caching.description,
@@ -22,10 +22,10 @@ const REPORTS = [
     fields: ['dataTransferredTotal', 'dataTransferredOut', 'dataTransferredIn'],
     groupBy: [],
     orderDirection: 'ASC',
-    dashboardId: 357548608166298191n
+    dashboardId: '357548608166298191'
   },
   {
-    id: 356220228059791957n,
+    id: '356220228059791957',
     chartOwner: 'azion',
     label: 'Edge Offload',
     description: DASHBOARDS_TEXTS.edge_applications.data_transferred.edge_offload.description,
@@ -41,12 +41,12 @@ const REPORTS = [
     fields: ['offload'],
     groupBy: [],
     orderDirection: 'ASC',
-    dashboardId: 357548608166298191n,
-    colorSet: 'REGULAR_COLOR_SET',
+    dashboardId: '357548608166298191',
+    variationType: 'regular',
     maxYAxis: 100
   },
   {
-    id: 356220625185931855n,
+    id: '356220625185931855',
     chartOwner: 'azion',
     label: 'Saved Data',
     description: DASHBOARDS_TEXTS.edge_applications.data_transferred.saved_data.description,
@@ -62,11 +62,11 @@ const REPORTS = [
     fields: ['savedData'],
     groupBy: [],
     orderDirection: 'ASC',
-    dashboardId: 357548608166298191n,
-    colorSet: 'REGULAR_COLOR_SET'
+    dashboardId: '357548608166298191',
+    variationType: 'regular'
   },
   {
-    id: 356220671983878733n,
+    id: '356220671983878733',
     chartOwner: 'azion',
     label: 'Missed Data',
     description: DASHBOARDS_TEXTS.edge_applications.data_transferred.missed_data.description,
@@ -82,11 +82,11 @@ const REPORTS = [
     fields: ['missedData'],
     groupBy: [],
     orderDirection: 'ASC',
-    dashboardId: 357548608166298191n,
-    colorSet: 'INVERTED_COLOR_SET'
+    dashboardId: '357548608166298191',
+    variationType: 'inverse'
   },
   {
-    id: 357550842741523030n,
+    id: '357550842741523030',
     chartOwner: 'azion',
     label: 'Total Bandwidth Usage',
     description:
@@ -103,11 +103,11 @@ const REPORTS = [
     fields: ['bandwidthTotal'],
     groupBy: [],
     orderDirection: 'ASC',
-    dashboardId: 357548608166298191n,
-    colorSet: 'REGULAR_COLOR_SET'
+    dashboardId: '357548608166298191',
+    variationType: 'regular'
   },
   {
-    id: 357550842741523029n,
+    id: '357550842741523029',
     chartOwner: 'azion',
     label: 'Bandwidth Offloaded',
     description:
@@ -124,12 +124,12 @@ const REPORTS = [
     fields: ['bandwidthOffload'],
     groupBy: [],
     orderDirection: 'ASC',
-    dashboardId: 357548608166298191n,
-    colorSet: 'REGULAR_COLOR_SET',
+    dashboardId: '357548608166298191',
+    variationType: 'regular',
     maxYAxis: 100
   },
   {
-    id: 357817189325079119n,
+    id: '357817189325079119',
     chartOwner: 'azion',
     label: 'Saved Bandwidth',
     description: DASHBOARDS_TEXTS.edge_applications.data_transferred.saved_bandwidth.description,
@@ -145,11 +145,11 @@ const REPORTS = [
     fields: ['bandwidthSavedData'],
     groupBy: [],
     orderDirection: 'ASC',
-    dashboardId: 357548608166298191n,
-    colorSet: 'REGULAR_COLOR_SET'
+    dashboardId: '357548608166298191',
+    variationType: 'regular'
   },
   {
-    id: 357817270971400783n,
+    id: '357817270971400783',
     chartOwner: 'azion',
     label: 'Missed Bandwidth',
     description: DASHBOARDS_TEXTS.edge_applications.data_transferred.missed_bandwidth.description,
@@ -165,15 +165,15 @@ const REPORTS = [
     fields: ['bandwidthMissedData'],
     groupBy: [],
     orderDirection: 'ASC',
-    dashboardId: 357548608166298191n,
-    colorSet: 'INVERTED_COLOR_SET'
+    dashboardId: '357548608166298191',
+    variationType: 'inverse'
   },
   /**
    * BUILD
    * Edge Applications - Requests
    */
   {
-    id: 357822254142194261n,
+    id: '357822254142194261',
     chartOwner: 'azion',
     label: 'Total Requests',
     description: DASHBOARDS_TEXTS.edge_applications.requests.total_requests.description,
@@ -189,10 +189,10 @@ const REPORTS = [
     fields: ['edgeRequestsTotal', 'httpsRequestsTotal', 'httpRequestsTotal'],
     groupBy: [],
     orderDirection: 'ASC',
-    dashboardId: 357548623571976783n
+    dashboardId: '357548623571976783'
   },
   {
-    id: 357822606596899407n,
+    id: '357822606596899407',
     chartOwner: 'azion',
     label: 'Requests Offloaded',
     description: DASHBOARDS_TEXTS.edge_applications.requests.requests_offloaded.description,
@@ -208,12 +208,12 @@ const REPORTS = [
     fields: ['requestsOffloaded'],
     groupBy: [],
     orderDirection: 'ASC',
-    dashboardId: 357548623571976783n,
-    colorSet: 'REGULAR_COLOR_SET',
+    dashboardId: '357548623571976783',
+    variationType: 'regular',
     maxYAxis: 100
   },
   {
-    id: 357823841952596559n,
+    id: '357823841952596559',
     chartOwner: 'azion',
     label: 'Saved Requests',
     description: DASHBOARDS_TEXTS.edge_applications.requests.saved_requests.description,
@@ -229,11 +229,11 @@ const REPORTS = [
     fields: ['savedRequests'],
     groupBy: [],
     orderDirection: 'ASC',
-    dashboardId: 357548623571976783n,
-    colorSet: 'REGULAR_COLOR_SET'
+    dashboardId: '357548623571976783',
+    variationType: 'regular'
   },
   {
-    id: 357823947031446101n,
+    id: '357823947031446101',
     chartOwner: 'azion',
     label: 'Missed Requests',
     description: DASHBOARDS_TEXTS.edge_applications.requests.missed_requests.description,
@@ -249,11 +249,11 @@ const REPORTS = [
     fields: ['missedRequests'],
     groupBy: [],
     orderDirection: 'ASC',
-    dashboardId: 357548623571976783n,
-    colorSet: 'INVERTED_COLOR_SET'
+    dashboardId: '357548623571976783',
+    variationType: 'inverse'
   },
   {
-    id: 357824034956640847n,
+    id: '357824034956640847',
     chartOwner: 'azion',
     label: 'Total Requests per Second',
     description: DASHBOARDS_TEXTS.edge_applications.requests.total_requests_per_second.description,
@@ -269,11 +269,11 @@ const REPORTS = [
     fields: ['edgeRequestsTotalPerSecond'],
     groupBy: [],
     orderDirection: 'ASC',
-    dashboardId: 357548623571976783n,
-    colorSet: 'REGULAR_COLOR_SET'
+    dashboardId: '357548623571976783',
+    variationType: 'regular'
   },
   {
-    id: 357824230790791757n,
+    id: '357824230790791757',
     chartOwner: 'azion',
     label: 'Requests per Second Offloaded',
     description:
@@ -290,12 +290,12 @@ const REPORTS = [
     fields: ['requestsPerSecondOffloaded'],
     groupBy: [],
     orderDirection: 'ASC',
-    dashboardId: 357548623571976783n,
-    colorSet: 'REGULAR_COLOR_SET',
+    dashboardId: '357548623571976783',
+    variationType: 'regular',
     maxYAxis: 100
   },
   {
-    id: 357824321753711189n,
+    id: '357824321753711189',
     chartOwner: 'azion',
     label: 'Saved Requests per Second',
     description: DASHBOARDS_TEXTS.edge_applications.requests.saved_requests_per_second.description,
@@ -311,11 +311,11 @@ const REPORTS = [
     fields: ['savedRequestsPerSecond'],
     groupBy: [],
     orderDirection: 'ASC',
-    dashboardId: 357548623571976783n,
-    colorSet: 'REGULAR_COLOR_SET'
+    dashboardId: '357548623571976783',
+    variationType: 'regular'
   },
   {
-    id: 357824572487107151n,
+    id: '357824572487107151',
     chartOwner: 'azion',
     label: 'Missed Requests per Second',
     description: DASHBOARDS_TEXTS.edge_applications.requests.missed_requests_per_second.description,
@@ -331,11 +331,11 @@ const REPORTS = [
     fields: ['missedRequestsPerSecond'],
     groupBy: [],
     orderDirection: 'ASC',
-    dashboardId: 357548623571976783n,
-    colorSet: 'INVERTED_COLOR_SET'
+    dashboardId: '357548623571976783',
+    variationType: 'inverse'
   },
   {
-    id: 357825388709151309n,
+    id: '357825388709151309',
     chartOwner: 'azion',
     label: 'Requests by Method',
     description: DASHBOARDS_TEXTS.edge_applications.http_methods.requests_by_method.description,
@@ -356,14 +356,14 @@ const REPORTS = [
     ],
     groupBy: [],
     orderDirection: 'ASC',
-    dashboardId: 357548623571976783n
+    dashboardId: '357548623571976783'
   },
   /**
    * BUILD
    * Edge Applications - Status Codes
    */
   {
-    id: 357824919768138325n,
+    id: '357824919768138325',
     chartOwner: 'azion',
     label: 'HTTP Status Codes 2XX',
     description: DASHBOARDS_TEXTS.edge_applications.status_codes.http_status_codes_2xx.description,
@@ -384,10 +384,10 @@ const REPORTS = [
     ],
     groupBy: [],
     orderDirection: 'ASC',
-    dashboardId: 357548642810200653n
+    dashboardId: '357548642810200653'
   },
   {
-    id: 357825000731837013n,
+    id: '357825000731837013',
     chartOwner: 'azion',
     label: 'HTTP Status Codes 3XX',
     description: DASHBOARDS_TEXTS.edge_applications.status_codes.http_status_codes_3xx.description,
@@ -408,10 +408,10 @@ const REPORTS = [
     ],
     groupBy: [],
     orderDirection: 'ASC',
-    dashboardId: 357548642810200653n
+    dashboardId: '357548642810200653'
   },
   {
-    id: 357825058049098319n,
+    id: '357825058049098319',
     chartOwner: 'azion',
     label: 'HTTP Status Codes 4XX',
     description: DASHBOARDS_TEXTS.edge_applications.status_codes.http_status_codes_4xx.description,
@@ -432,10 +432,10 @@ const REPORTS = [
     ],
     groupBy: [],
     orderDirection: 'ASC',
-    dashboardId: 357548642810200653n
+    dashboardId: '357548642810200653'
   },
   {
-    id: 357825090550760015n,
+    id: '357825090550760015',
     chartOwner: 'azion',
     label: 'HTTP Status Codes 5XX',
     description: DASHBOARDS_TEXTS.edge_applications.status_codes.http_status_codes_5xx.description,
@@ -456,14 +456,14 @@ const REPORTS = [
     ],
     groupBy: [],
     orderDirection: 'ASC',
-    dashboardId: 357548642810200653n
+    dashboardId: '357548642810200653'
   },
   /**
    * BUILD
    * Edge Applications - Bandwidth Saving
    */
   {
-    id: 357843490139275861n,
+    id: '357843490139275861',
     chartOwner: 'azion',
     label: 'Bandwidth Saving',
     description: DASHBOARDS_TEXTS.edge_applications.bandwidth_saving.bandwidth_saving.description,
@@ -479,15 +479,15 @@ const REPORTS = [
     fields: ['bandwidthImagesProcessedSavedData'],
     groupBy: [],
     orderDirection: 'ASC',
-    dashboardId: 357549179454620239n,
-    colorSet: 'REGULAR_COLOR_SET'
+    dashboardId: '357549179454620239',
+    variationType: 'regular'
   },
   /**
    * BUILD
    * L2 Caching - Caching Offload
    */
   {
-    id: 357826217661956693n,
+    id: '357826217661956693',
     chartOwner: 'azion',
     label: 'L2 Caching',
     description: DASHBOARDS_TEXTS.l2_caching.caching_offload.l2_caching.description,
@@ -503,10 +503,10 @@ const REPORTS = [
     limit: 5000,
     fields: ['dataTransferredTotal', 'dataTransferredOut', 'dataTransferredIn'],
     orderDirection: 'ASC',
-    dashboardId: 357549371218199219n
+    dashboardId: '357549371218199219'
   },
   {
-    id: 357826288204907093n,
+    id: '357826288204907093',
     chartOwner: 'azion',
     label: 'L2 Offload',
     description: DASHBOARDS_TEXTS.l2_caching.caching_offload.l2_offload.description,
@@ -522,8 +522,8 @@ const REPORTS = [
     limit: 5000,
     fields: ['offload'],
     orderDirection: 'ASC',
-    dashboardId: 357549371218199219n,
-    colorSet: 'REGULAR_COLOR_SET',
+    dashboardId: '357549371218199219',
+    variationType: 'regular',
     maxYAxis: 100
   },
   /**
@@ -531,7 +531,7 @@ const REPORTS = [
    * Edge Functions - Invocations
    */
   {
-    id: 357843490139298763n,
+    id: '357843490139298763',
     chartOwner: 'azion',
     label: 'Total Invocations',
     description: DASHBOARDS_TEXTS.edge_functions.invocations.total_invocations.description,
@@ -547,14 +547,14 @@ const REPORTS = [
     fields: ['edgeApplicationInvocations', 'edgeFirewallInvocations'],
     groupBy: [],
     orderDirection: 'ASC',
-    dashboardId: 357549319029523021n
+    dashboardId: '357549319029523021'
   },
   /**
    * BUILD
    * Image Processor - Requests
    */
   {
-    id: 357844490139298789n,
+    id: '357844490139298789',
     chartOwner: 'azion',
     label: 'Total Requests',
     description: DASHBOARDS_TEXTS.image_processor.requests.total_requests.description,
@@ -584,11 +584,11 @@ const REPORTS = [
     },
     groupBy: [],
     orderDirection: 'ASC',
-    dashboardId: 357549422933967445n,
-    colorSet: 'REGULAR_COLOR_SET'
+    dashboardId: '357549422933967445',
+    variationType: 'regular'
   },
   {
-    id: 357843490195298789n,
+    id: '357843490195298789',
     chartOwner: 'azion',
     label: 'Total Requests per Second',
     description: DASHBOARDS_TEXTS.image_processor.requests.total_requests_per_second.description,
@@ -618,15 +618,15 @@ const REPORTS = [
     ],
     groupBy: [],
     orderDirection: 'ASC',
-    dashboardId: 357549422933967445n,
-    colorSet: 'REGULAR_COLOR_SET'
+    dashboardId: '357549422933967445',
+    variationType: 'regular'
   },
   /**
    * SECURE
    * Overview - Request
    */
   {
-    id: 357842594513814093n,
+    id: '357842594513814093',
     chartOwner: 'azion',
     label: 'Total Attacks',
     description: '',
@@ -640,15 +640,15 @@ const REPORTS = [
     limit: 5000,
     groupBy: [],
     orderDirection: 'ASC',
-    dashboardId: 357548675837199999n,
-    colorSet: 'INVERTED_COLOR_SET'
+    dashboardId: '357548675837199999',
+    variationType: 'inverse'
   },
   /**
    * SECURE
    * WAF - threats
    */
   {
-    id: 357842594513814093n,
+    id: '357842594513814093',
     chartOwner: 'azion',
     label: 'Threats vs Requests',
     description: DASHBOARDS_TEXTS.edge_applications.waf.threats_vs_requests.description,
@@ -664,10 +664,10 @@ const REPORTS = [
     fields: ['wafRequestsAllowed', 'wafRequestsBlocked', 'wafRequestsThreat'],
     groupBy: [],
     orderDirection: 'ASC',
-    dashboardId: 357548675837198933n
+    dashboardId: '357548675837198933'
   },
   {
-    id: 357842775438262861n,
+    id: '357842775438262861',
     chartOwner: 'azion',
     label: 'Cross-Site scripting (XSS) Threats',
     description:
@@ -684,11 +684,11 @@ const REPORTS = [
     fields: ['wafRequestsXssAttacks'],
     groupBy: [],
     orderDirection: 'ASC',
-    dashboardId: 357548675837198933n,
-    colorSet: 'INVERTED_COLOR_SET'
+    dashboardId: '357548675837198933',
+    variationType: 'inverse'
   },
   {
-    id: 357842594513814012n,
+    id: '357842594513814012',
     chartOwner: 'azion',
     label: 'Remote File Inclusion (RFI) Threats',
     description:
@@ -705,11 +705,11 @@ const REPORTS = [
     fields: ['wafRequestsRfiAttacks'],
     groupBy: [],
     orderDirection: 'ASC',
-    dashboardId: 357548675837198933n,
-    colorSet: 'INVERTED_COLOR_SET'
+    dashboardId: '357548675837198933',
+    variationType: 'inverse'
   },
   {
-    id: 357842833307075157n,
+    id: '357842833307075157',
     chartOwner: 'azion',
     label: 'SQL Injection Threats',
     description: DASHBOARDS_TEXTS.edge_applications.waf.sql_injection_threats.description,
@@ -725,11 +725,11 @@ const REPORTS = [
     fields: ['wafRequestsSqlAttacks'],
     groupBy: [],
     orderDirection: 'ASC',
-    dashboardId: 357548675837198933n,
-    colorSet: 'INVERTED_COLOR_SET'
+    dashboardId: '357548675837198933',
+    variationType: 'inverse'
   },
   {
-    id: 357842851576414805n,
+    id: '357842851576414805',
     chartOwner: 'azion',
     label: 'Other Threats',
     description: DASHBOARDS_TEXTS.edge_applications.waf.other_threats.description,
@@ -745,15 +745,15 @@ const REPORTS = [
     fields: ['wafRequestsOthersAttacks'],
     groupBy: [],
     orderDirection: 'ASC',
-    dashboardId: 357548675837198933n,
-    colorSet: 'INVERTED_COLOR_SET'
+    dashboardId: '357548675837198933',
+    variationType: 'inverse'
   },
   /**
    * SECURE
    * Intelligent DNS - Standard Queries
    */
   {
-    id: 357843490139298789n,
+    id: '357843490139298789',
     chartOwner: 'azion',
     label: 'Total Queries',
     description: DASHBOARDS_TEXTS.intelligent_dns.standard_queries.total_queries.description,
@@ -774,15 +774,15 @@ const REPORTS = [
     ],
     groupBy: [],
     orderDirection: 'ASC',
-    dashboardId: 357549371218199119n,
-    colorSet: 'REGULAR_COLOR_SET'
+    dashboardId: '357549371218199119',
+    variationType: 'regular'
   },
   /**
    * OBSERVE
    * Data Streaming - Data Streamed
    */
   {
-    id: 352149351588430415n,
+    id: '352149351588430415',
     chartOwner: 'azion',
     label: 'Total Data Streamed',
     description: DASHBOARDS_TEXTS.data_streaming.data_streamed.total_data.description,
@@ -803,11 +803,11 @@ const REPORTS = [
     limit: 5000,
     groupBy: [],
     orderDirection: 'ASC',
-    dashboardId: 352149476039721549n,
-    colorSet: 'REGULAR_COLOR_SET'
+    dashboardId: '352149476039721549',
+    variationType: 'regular'
   },
   {
-    id: 352234687543902797n,
+    id: '352234687543902797',
     chartOwner: 'azion',
     label: 'Total Requests',
     description: DASHBOARDS_TEXTS.data_streaming.data_streaming_requests.total_requests.description,
@@ -828,8 +828,8 @@ const REPORTS = [
     limit: 5000,
     groupBy: [],
     orderDirection: 'ASC',
-    dashboardId: 352149476039721549n,
-    colorSet: 'REGULAR_COLOR_SET'
+    dashboardId: '352149476039721549',
+    variationType: 'regular'
   }
 ]
 
