@@ -4,7 +4,7 @@
   import InputSwitch from 'primevue/inputswitch'
   import Card from 'primevue/card'
   import Dropdown from 'primevue/dropdown'
-  import InputText from 'primevue/inputtext'
+  import FieldText from '@/templates/form-fields-inputs/fieldText'
 
   import { useField } from 'vee-validate'
   defineOptions({ name: 'form-fields-waf-rules' })
@@ -33,7 +33,7 @@
   const { value: directoryTraversal } = useField('directoryTraversal')
   const { value: remoteFileInclusion } = useField('remoteFileInclusion')
   const { value: sqlInjection } = useField('sqlInjection')
-  const { value: name, errorMessage: errorName } = useField('name')
+  const { value: name } = useField('name')
 
   const sensitivity = ref([
     { name: 'Sensitivity Highest', value: 'highest' },
@@ -51,24 +51,13 @@
   >
     <template #inputs>
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
-        <label
-          for="name"
-          class="text-color text-base font-medium"
-          >Name *
-        </label>
-        <InputText
+        <FieldText
+          label="Name *"
+          description="Give a unique and descriptive name to identify the WAF rule."
+          name="name"
+          :value="name"
           placeholder="My rule set"
-          v-model="name"
-          type="text"
-          id="name"
-          :class="{ 'p-invalid': errorName }"
         />
-        <small
-          v-if="errorName"
-          class="p-error text-xs font-normal leading-tight"
-        >
-          {{ errorName }}
-        </small>
       </div>
     </template>
   </FormHorizontal>
