@@ -4,41 +4,66 @@
   import RealTimeEventsHTTPRequestsListView from '@/views/RealTimeEventsHTTPRequests/ListView.vue'
   import TabPanel from 'primevue/tabpanel'
   import TabView from 'primevue/tabview'
-  import { useToast } from 'primevue/usetoast'
-  import { computed, ref } from 'vue'
+  import { ref } from 'vue'
   import { useRoute, useRouter } from 'vue-router'
 
   defineOptions({ name: 'tabs-edge-service' })
 
   const props = defineProps({
-    edgeApplicationServices: { type: Object, required: true },
-    originsServices: { type: Object, required: true },
-    cacheSettingsServices: { type: Object, required: true },
-    clipboardWrite: { type: Function, required: true },
-    deviceGroupsServices: { type: Object, required: true },
-    errorResponsesServices: { type: Object, required: true },
-    rulesEngineServices: { type: Object, required: true },
-    functionsServices: { type: Object, required: true }
+    httpRequests: {
+      type: Object,
+      required: true
+    },
+    edgeFunctions: {
+      type: Object,
+      required: true
+    },
+    edgeFunctionsConsole: {
+      type: Object,
+      required: true
+    },
+    imageProcessor: {
+      type: Object,
+      required: true
+    },
+    l2Cache: {
+      type: Object,
+      required: true
+    },
+    intelligentDNS: {
+      type: Object,
+      required: true
+    },
+    dataStreaming: {
+      type: Object,
+      required: true
+    },
+    activityHistory: {
+      type: Object,
+      required: true
+    },
+    clipboardWrite: {
+      type: Function,
+      required: true
+    }
   })
 
   const defaultTabs = {
-    mainSettings: 0,
-    origins: 1,
-    deviceGroups: 2,
-    errorResponses: 3,
-    cacheSettings: 4,
-    functions: 5,
-    rulesEngine: 6
+    httpRequests: 0,
+    edgeFunctions: 1,
+    edgeFunctionsConsole: 2,
+    imageProcessor: 3,
+    l2Cache: 4,
+    intelligentDNS: 5,
+    dataStreaming: 6,
+    activityHistory: 7
   }
 
   const mapTabs = ref({ ...defaultTabs })
 
-  const toast = useToast()
   const route = useRoute()
   const router = useRouter()
   const activeTab = ref(0)
-  const edgeApplicationId = ref(route.params.id)
-  const edgeApplication = ref()
 
   const getTabFromValue = (selectedTabIndex) => {
     const tabNames = Object.keys(mapTabs.value)
@@ -47,62 +72,21 @@
   }
 
   const changeRouteByClickingOnTab = ({ index = 0 }) => {
-    verifyTab(edgeApplication.value)
     const tab = getTabFromValue(index)
     activeTab.value = index
     const params = {
-      id: edgeApplicationId.value,
       tab
     }
     router.push({
-      name: 'edit-edge-application',
+      name: 'real-time-events',
       params
     })
   }
 
-  const verifyTab = ({ edgeFunctions }) => {
-    if (!edgeFunctions) {
-      delete mapTabs.value.functions
-      mapTabs.value = Object.entries(mapTabs.value).reduce((acc, [key], index) => {
-        acc[key] = index
-        return acc
-      }, {})
-      return
-    }
-    mapTabs.value = { ...defaultTabs }
-  }
-
   const renderTabCurrentRouter = async () => {
     const { tab = 0 } = route.params
-    edgeApplication.value = await loaderEdgeApplication()
-    verifyTab(edgeApplication.value)
     const activeTabIndexByRoute = mapTabs.value[tab]
     changeRouteByClickingOnTab({ index: activeTabIndexByRoute })
-  }
-
-  const title = computed(() => {
-    return edgeApplication.value?.name || ''
-  })
-
-  const isEnableEdgeFunction = computed(() => {
-    return edgeApplication.value?.edgeFunctions
-  })
-
-  const isEnableApplicationAcceleration = computed(() => {
-    return edgeApplication.value?.applicationAcceleration
-  })
-
-  const isLoadBalancer = computed(() => {
-    return edgeApplication.value?.loadBalancer
-  })
-
-  const isDeliveryProtocolHttps = computed(() => {
-    return edgeApplication.value?.deliveryProtocol.includes('https')
-  })
-
-  const updatedApplication = (application) => {
-    edgeApplication.value = { ...application }
-    verifyTab(edgeApplication.value)
   }
 
   renderTabCurrentRouter()
@@ -120,7 +104,7 @@
         class="w-full h-full"
       >
         <TabPanel header="HTTP Requests">
-          <RealTimeEventsHTTPRequestsListView />
+          <RealTimeEventsHTTPRequestsListView v-bind="props.httpRequests" />
         </TabPanel>
         <TabPanel header="Edge Functions"> </TabPanel>
         <TabPanel header="Edge Functions Console"> </TabPanel>
