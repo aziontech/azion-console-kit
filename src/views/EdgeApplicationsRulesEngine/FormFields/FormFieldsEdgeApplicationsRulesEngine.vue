@@ -650,7 +650,7 @@
   <FormHorizontal
     :isDrawer="true"
     title="General"
-    description="Create a rule set to handle the conditional execution of behaviors through logical operators."
+    description="Create a rule to handle the conditional execution of behaviors through logical operators."
   >
     <template #inputs>
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
@@ -842,7 +842,7 @@
   <FormHorizontal
     :isDrawer="true"
     title="Behaviors"
-    description="Set the behaviors you want your rule to perform if the conditions defined in the criteria are met. Select a behavior and fill in all required information. Some behaviors can't be added together or in some conditions."
+    description="Set the behaviors the rule should perform if the conditions defined in the criteria are met. Select a behavior and fill in all required information. Some behaviors can't be added together or in some conditions."
   >
     <template #inputs>
       <div

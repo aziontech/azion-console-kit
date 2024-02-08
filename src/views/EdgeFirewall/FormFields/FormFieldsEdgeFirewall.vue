@@ -84,7 +84,7 @@
 <template>
   <FormHorizontal
     title="General"
-    description="Services define dependencies between resources."
+    description="Create a rule set to configure security logics and protect servers and applications."
   >
     <template #inputs>
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
@@ -92,14 +92,15 @@
           label="Name *"
           name="name"
           :value="name"
-          description="Give a unique and easy-to-remember name."
+          placeholder="My rule set"
+          description="Give a unique and descriptive name to identify the rule set."
         />
       </div>
     </template>
   </FormHorizontal>
   <FormHorizontal
     title="Domains"
-    description="Select the domains that you want to protect with this Rule Set."
+    description="Define the addresses to which the rule set should apply rules by associating registered domains."
   >
     <template #inputs>
       <div class="flex flex-col sm:max-w-3xl w-full gap-2">
@@ -132,18 +133,18 @@
           </template>
         </PickList>
         <small class="text-color-secondary text-sm font-normal leading-tight">
-          Hold command or ctrl to select multiple items.
+          Select an item from the list and then use the arrows to move it between the available and
+          selected domains boxes. Use the double-line arrows to move all items.
         </small>
       </div>
     </template>
   </FormHorizontal>
   <FormHorizontal
-    title="Edge Firewall Modules"
-    description="Activate Edge Firewall modules to extend the configuration possibilities of the application. Some modules require subscription."
+    title="Modules"
+    description="Activate modules to extend configuration possibilities. Some modules require subscription."
   >
     <template #inputs>
       <div class="flex flex-col gap-2">
-        <label class="text-color text-base font-medium">Modules *</label>
         <div class="flex flex-col gap-3">
           <Card
             :pt="{
@@ -162,7 +163,7 @@
               />
             </template>
             <template #subtitle>
-              Mitigate the largest and most complex network and application-layer DDoS attacks.
+              Mitigate large and complex network and transport-layer DDoS attacks.
             </template>
             <template #footer>
               <PrimeTag
@@ -190,9 +191,7 @@
               <span class="text-base">Edge Functions</span>
               <InputSwitch v-model="edgeFunctionsEnabled" />
             </template>
-            <template #subtitle>
-              Run security-oriented functions at the edge of the network, closer to your users.
-            </template>
+            <template #subtitle> Build ultra-low latency functions that run on the edge. </template>
           </Card>
           <Card
             :pt="{
@@ -211,7 +210,10 @@
               <span class="text-base">Network Layer Protection</span>
               <InputSwitch v-model="networkProtectionEnabled" />
             </template>
-            <template #subtitle>Description</template>
+            <template #subtitle
+              >Create lists to configure a programmable security perimeter for inbound and outbound
+              traffic at the edge.</template
+            >
           </Card>
           <Card
             :pt="{
@@ -230,7 +232,7 @@
               <span class="text-base">Web Application Firewall</span>
               <InputSwitch v-model="wafEnabled" />
             </template>
-            <template #subtitle>Description</template>
+            <template #subtitle>Protect edge applications against threats and attacks.</template>
           </Card>
         </div>
       </div>
@@ -238,7 +240,7 @@
   </FormHorizontal>
   <FormHorizontal
     title="Debug Rules"
-    description="Create a log of executed rules. Logs can be accessed through Data Streaming, Real-Time Events or Real-Time Events GraphQL API."
+    description="Log executed rules created in Rules Engine. Query logs using Data Streaming, Real-Time Events, or Real-Time Events GraphQL API."
   >
     <template #inputs>
       <div class="flex flex-col gap-2">
@@ -265,12 +267,6 @@
                 >Active</label
               >
             </div>
-          </template>
-          <template #content>
-            <small class="text-color-secondary text-sm">
-              Rules that were successfully executed will be shown under the $traceback field in Data
-              Streaming and Real-Time Events or the $stacktrace variable in GraphQL.
-            </small>
           </template>
         </Card>
       </div>
