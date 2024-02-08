@@ -1,6 +1,6 @@
 import { useMetricsStore } from '@/stores/metrics'
 import Axios from 'axios'
-import { LoadReportWithMeta } from '.'
+import { LoadReportVariation, LoadReportWithMeta } from '.'
 
 let ReportsRequestTokenSource = null
 
@@ -15,20 +15,45 @@ function reportsBySelectedDashboard(reports, currentDashboard) {
 }
 
 async function resolveReport(report, filters) {
+  const maxSeriesToDisplayTag = 2
+  const minSeriesToShowMeanLine = 1
+  const minSeriesToShowMeanLinePerSeries = 2
+
   const reportWithCancelation = {
     ...report,
     ReportsRequestTokenSource
   }
   const reportData = await LoadReportWithMeta(filters, reportWithCancelation)
+
+  const hasAggregation = reportData.resultChart.length <= maxSeriesToDisplayTag
+
   const reportInfo = {
     reportId: report.id,
-    reportData: reportData.resultChart,
+    resultQuery: reportData.resultChart,
     reportQuery: reportData.gqlQuery,
-    error: reportData.error
+    error: reportData.error,
+    hasMeanLine: reportData.resultChart > minSeriesToShowMeanLine,
+    hasMeanLinePerSeries: reportData.resultChart > minSeriesToShowMeanLinePerSeries,
+    hasFeedbackTag: hasAggregation,
+    showMeanLine: false,
+    showMeanLinePerSeries: false
+  }
+
+  if (hasAggregation) {
+    const clonedReport = {
+      ...JSON.parse(JSON.stringify(report)),
+      reportQuery: reportData.gqlQuery,
+      xAxis: '',
+      groupBy: [],
+      noResample: true,
+      ReportsRequestTokenSource
+    }
+
+    reportInfo.variationValue = await LoadReportVariation({ filters, report: clonedReport })
   }
 
   const metricsStore = useMetricsStore()
-  metricsStore.setCurrentReportValue({ ...reportInfo })
+  metricsStore.setCurrentReportValue(reportInfo)
 }
 
 export default async (filters, reports, currentDashboard) => {
