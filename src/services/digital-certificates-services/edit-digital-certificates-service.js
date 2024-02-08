@@ -1,6 +1,7 @@
 import { AxiosHttpClientAdapter } from '../axios/AxiosHttpClientAdapter'
 import { makeDigitalCertificatesBaseUrl } from './make-digital-certificates-base-url'
 import * as Errors from '@/services/axios/errors'
+import { errorMsg } from './msg-error'
 
 export const editDigitalCertificateService = async (payload) => {
   const parsedPayload = adapt(payload)
@@ -18,8 +19,7 @@ const parseHttpResponse = (httpResponse) => {
     case 200:
       return 'Your digital certificate has been updated!'
     case 400:
-      const apiError = httpResponse.body.error[0]
-      throw new Error(apiError).message
+      throw new Error(errorMsg(httpResponse.body))
     case 401:
       throw new Errors.InvalidApiTokenError().message
     case 403:
