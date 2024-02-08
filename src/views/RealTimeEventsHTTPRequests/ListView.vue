@@ -109,13 +109,6 @@
     @on-load-data="handleLoadData"
     emptyListMessage="No events found"
   >
-    <template #addButton>
-      <PrimeButton
-        icon="pi pi-plus"
-        label="Cache Setting"
-        @click="openCreateDrawer"
-      />
-    </template>
   </ListTableBlock>
 
   <EmptyResultsBlock
