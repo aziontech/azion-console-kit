@@ -386,7 +386,7 @@
       toast.add({
         closable: true,
         severity: 'success',
-        summary: 'Rules Engine order saved!'
+        summary: 'Reorder saved'
       })
     } catch (error) {
       toast.add({
