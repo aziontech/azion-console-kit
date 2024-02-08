@@ -5,81 +5,109 @@
   import { computed, ref } from 'vue'
   // import Drawer from './Drawer'
 
-  const props = defineProps({    
+  defineProps({
+    documentationService: {
+      type: Function,
+      required: true
+    }
   })
 
   const hasContentToList = ref(true)
   const listTableBlockRef = ref('')
-  const drawerRef = ref('')
 
-  const listCacheSettingsServiceWithDecorator = async () => {
-    return await props.listCacheSettingsService({ id: props.edgeApplicationId })
+  // const drawerRef = ref('')
+
+  const listServiceMock = async () => {
+    return [
+      {
+        id: 1,
+        bytesSent: 191,
+        configurationId: '1595368520',
+        debugLog: `{"edge_firewall":["Global - Set WAF"]}`,
+        asn: 'AS52580 Azion Technologies Ltda.',
+        country: 'United States',
+        region: 'California'
+      },
+      {
+        id: 2,
+        bytesSent: 192,
+        configurationId: '1595368521',
+        debugLog: `{"edge_firewall":["Global - Set WAF"]}`,
+        asn: 'AS52580 Azion Technologies Ltda.',
+        country: 'Germany',
+        region: 'Berlim'
+      },
+      {
+        id: 3,
+        bytesSent: 193,
+        configurationId: '1595368522',
+        debugLog: `{"edge_firewall":["Global - Set WAF"]}`,
+        asn: 'AS52580 Azion Technologies Ltda.',
+        country: 'Brazil',
+        region: 'Porto Alegre'
+      }
+    ]
+    // return await props.listRealTimeEventsHttpRequestsService({time:15})
   }
 
-  const deleteCacheSettingsServiceWithDecorator = async (cacheSettingsId) => {
-    return await props.deleteCacheSettingsService({
-      edgeApplicationId: props.edgeApplicationId,
-      id: cacheSettingsId
-    })
-  }
-
-  const openCreateDrawer = () => {
-    drawerRef.value.openCreateDrawer()
-  }
-  const openEditDrawer = (item) => {
-    drawerRef.value.openEditDrawer(item.id)
-  }
+  // const openCreateDrawer = () => {
+  //   drawerRef.value.openCreateDrawer()
+  // }
+  // const openEditDrawer = (item) => {
+  //   drawerRef.value.openEditDrawer(item.id)
+  // }
 
   const handleLoadData = (event) => {
     hasContentToList.value = event
   }
 
-  const reloadList = () => {
-    if (hasContentToList.value) {
-      listTableBlockRef.value.reload()
-      return
-    }
-    hasContentToList.value = true
-  }
+  // const reloadList = () => {
+  //   if (hasContentToList.value) {
+  //     listTableBlockRef.value.reload()
+  //     return
+  //   }
+  //   hasContentToList.value = true
+  // }
 
   const getColumns = computed(() => {
     return [
       {
-        field: 'name',
-        header: 'Origin Name'
+        field: 'bytesSent',
+        header: 'Bytes Sent'
       },
       {
-        field: 'browserCache',
-        header: 'Browser Cache'
+        field: 'configurationId',
+        header: 'Configuration ID'
       },
       {
-        field: 'cdnCache',
-        header: 'Edge Cache'
+        field: 'debugLog',
+        header: 'Debug log'
+      },
+      {
+        field: 'asn',
+        header: 'Geoloc ASN'
+      },
+      {
+        field: 'country',
+        header: 'Geloc Country Name'
+      },
+      {
+        field: 'region',
+        header: 'Geoloc Region Name'
       }
     ]
   })
 </script>
 
 <template>
-  <Drawer
-    ref="drawerRef"
-    :edgeApplicationId="props.edgeApplicationId"
-    :createService="props.createCacheSettingsService"
-    :loadService="props.loadCacheSettingsService"
-    :editService="props.editCacheSettingsService"
-    @onSuccess="reloadList"
-  />
-
   <ListTableBlock
     v-if="hasContentToList"
     ref="listTableBlockRef"
-    :listService="listCacheSettingsServiceWithDecorator"
-    :deleteService="deleteCacheSettingsServiceWithDecorator"
+    :listService="listServiceMock"
     :columns="getColumns"
-    pageTitleDelete="Cache Setting"
     :editInDrawer="openEditDrawer"
     @on-load-data="handleLoadData"
-    emptyListMessage="No Cache Setting found."
+    emptyListMessage="No events found"
   >
     <template #addButton>
       <PrimeButton
@@ -92,17 +120,36 @@
 
   <EmptyResultsBlock
     v-else
-    title="No cache settings have been created"
-    description="Click the button below to initiate the setup process and create your first cache setting."
-    createButtonLabel="Cache Setting"
+    title="No events found in this period."
+    description="Change the time range to search other logs or create new Edge Applications or configure WAFs. They are displayed when there are requests and traffic received in the period selected."
+    createButtonLabel="create button label"
     :documentationService="documentationService"
     :inTabs="true"
   >
+    <template #extraActionsLeft>
+      <PrimeButton
+        severity="primary"
+        outlined
+        icon="pi pi-shopping-cart"
+        label="Browser Template"
+        @click="
+          () => {
+            console.log('ir para templates')
+          }
+        "
+      />
+    </template>
     <template #default>
       <PrimeButton
         severity="secondary"
         icon="pi pi-plus"
-        label="Cache Setting"
+        label="Edge Application"
+        @click="openCreateDrawer"
+      />
+      <PrimeButton
+        severity="secondary"
+        icon="pi pi-plus"
+        label="WAF"
         @click="openCreateDrawer"
       />
     </template>

@@ -4,13 +4,12 @@
   import RealTimeEventsHTTPRequestsListView from '@/views/RealTimeEventsHTTPRequests/ListView.vue'
   import TabPanel from 'primevue/tabpanel'
   import TabView from 'primevue/tabview'
-  import { useToast } from 'primevue/usetoast'
-  import { computed, ref } from 'vue'
+  import { ref } from 'vue'
   import { useRoute, useRouter } from 'vue-router'
 
   defineOptions({ name: 'tabs-edge-service' })
 
-  const props = defineProps({
+  defineProps({
     edgeApplicationServices: { type: Object, required: true },
     originsServices: { type: Object, required: true },
     cacheSettingsServices: { type: Object, required: true },
@@ -33,12 +32,9 @@
 
   const mapTabs = ref({ ...defaultTabs })
 
-  const toast = useToast()
   const route = useRoute()
   const router = useRouter()
   const activeTab = ref(0)
-  const edgeApplicationId = ref(route.params.id)
-  const edgeApplication = ref()
 
   const getTabFromValue = (selectedTabIndex) => {
     const tabNames = Object.keys(mapTabs.value)
@@ -47,62 +43,22 @@
   }
 
   const changeRouteByClickingOnTab = ({ index = 0 }) => {
-    verifyTab(edgeApplication.value)
     const tab = getTabFromValue(index)
     activeTab.value = index
     const params = {
-      id: edgeApplicationId.value,
+      id: 0,
       tab
     }
     router.push({
-      name: 'edit-edge-application',
+      name: '',
       params
     })
   }
 
-  const verifyTab = ({ edgeFunctions }) => {
-    if (!edgeFunctions) {
-      delete mapTabs.value.functions
-      mapTabs.value = Object.entries(mapTabs.value).reduce((acc, [key], index) => {
-        acc[key] = index
-        return acc
-      }, {})
-      return
-    }
-    mapTabs.value = { ...defaultTabs }
-  }
-
   const renderTabCurrentRouter = async () => {
     const { tab = 0 } = route.params
-    edgeApplication.value = await loaderEdgeApplication()
-    verifyTab(edgeApplication.value)
     const activeTabIndexByRoute = mapTabs.value[tab]
     changeRouteByClickingOnTab({ index: activeTabIndexByRoute })
-  }
-
-  const title = computed(() => {
-    return edgeApplication.value?.name || ''
-  })
-
-  const isEnableEdgeFunction = computed(() => {
-    return edgeApplication.value?.edgeFunctions
-  })
-
-  const isEnableApplicationAcceleration = computed(() => {
-    return edgeApplication.value?.applicationAcceleration
-  })
-
-  const isLoadBalancer = computed(() => {
-    return edgeApplication.value?.loadBalancer
-  })
-
-  const isDeliveryProtocolHttps = computed(() => {
-    return edgeApplication.value?.deliveryProtocol.includes('https')
-  })
-
-  const updatedApplication = (application) => {
-    edgeApplication.value = { ...application }
-    verifyTab(edgeApplication.value)
   }
 
   renderTabCurrentRouter()

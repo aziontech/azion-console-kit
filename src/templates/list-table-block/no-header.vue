@@ -1,5 +1,4 @@
 <template>
-  <!-- @row-click="editItemSelected" -->
   <div>
     <div class="max-w-full mt-4">
       <DataTable
