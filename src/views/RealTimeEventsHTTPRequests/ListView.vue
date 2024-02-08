@@ -107,7 +107,7 @@
     :columns="getColumns"
     :editInDrawer="openEditDrawer"
     @on-load-data="handleLoadData"
-    emptyListMessage="No events found"
+    emptyListMessage="No events found in this search."
   >
   </ListTableBlock>
 
