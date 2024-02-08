@@ -146,7 +146,7 @@
           disabled
           :class="{ 'p-invalid': itemsValuesError }"
           v-model="itemsValues"
-          rows="2"
+          rows="16"
           id="ipCidr"
           cols="30"
           placeholder="192.168.0.1&#10;192.168.0.2/32&#10;10.1.1.10/16"
