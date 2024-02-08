@@ -2,7 +2,7 @@ import { useMetricsStore } from '@/stores/metrics'
 import Axios from 'axios'
 import { LoadReportVariation, LoadReportWithMeta } from '.'
 
-let ReportsRequestTokenSource = null
+let tokenSource = null
 
 function reportsBySelectedDashboard(reports, currentDashboard) {
   const reportsList = reports
@@ -21,7 +21,7 @@ async function resolveReport(report, filters) {
 
   const reportWithCancelation = {
     ...report,
-    ReportsRequestTokenSource
+    tokenSource
   }
   const reportData = await LoadReportWithMeta(filters, reportWithCancelation)
 
@@ -46,7 +46,7 @@ async function resolveReport(report, filters) {
       xAxis: '',
       groupBy: [],
       noResample: true,
-      ReportsRequestTokenSource
+      ReportsRequestTokenSource: tokenSource
     }
 
     reportInfo.variationValue = await LoadReportVariation({ filters, report: clonedReport })
@@ -57,10 +57,10 @@ async function resolveReport(report, filters) {
 }
 
 export default async (filters, reports, currentDashboard) => {
-  if (ReportsRequestTokenSource) ReportsRequestTokenSource.cancel()
+  if (tokenSource) tokenSource.cancel()
 
-  const ReportsRequestToken = Axios.CancelToken
-  ReportsRequestTokenSource = ReportsRequestToken.source()
+  const cancelToken = Axios.CancelToken
+  tokenSource = cancelToken.source()
 
   const availableReports = reportsBySelectedDashboard(reports, currentDashboard)
 
