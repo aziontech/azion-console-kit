@@ -131,10 +131,7 @@
       .string()
       .when('certificateType', CSRConditionalValidations)
       .label('private key type'),
-    subjectAlternativeNames: yup
-      .string()
-      .when('certificateType', CSRConditionalValidations)
-      .label('subject alternative names (SAN)'),
+    subjectAlternativeNames: yup.string(),
     country: yup.string().when('certificateType', {
       is: certificateTypes.value.EDGE_CERTIFICATE_CSR,
       then: (schema) =>

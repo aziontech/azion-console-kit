@@ -80,6 +80,7 @@
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
         <label>Certificate Signing Request (CSR) </label>
         <PrimeTextarea
+          disabled
           v-model="csr"
           :class="{ 'p-invalid': csrError }"
           placeholder="-----BEGIN CERTIFICATE REQUEST-----&#10;-----END CERTIFICATE REQUEST-----"

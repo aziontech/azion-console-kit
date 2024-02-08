@@ -201,7 +201,7 @@
     :schema="validationSchema"
     :initialValues="initialValues"
     @onSuccess="handleCreateWithSuccess"
-    title="Create Rule Set"
+    title="Create Rule"
   >
     <template #formFields>
       <FormFieldsEdgeFirewallRulesEngine
@@ -220,7 +220,7 @@
     :editService="editEdgeFirewallRulesEngineServiceWithDecorator"
     :schema="validationSchema"
     @onSuccess="handleEditWithSuccess"
-    title="Edit Rules Engine"
+    title="Edit Rule"
   >
     <template #formFields>
       <FormFieldsEdgeFirewallRulesEngine

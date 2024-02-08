@@ -135,7 +135,7 @@
 
   const validationSchemaAllowed = yup.object({
     matchZones: yup.array(),
-    path: yup.string().required(),
+    path: yup.string(),
     reason: yup.string().required(),
     ruleId: yup.string().required().label('rule id'),
     status: yup.boolean(),

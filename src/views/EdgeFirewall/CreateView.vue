@@ -45,7 +45,7 @@
 <template>
   <ContentBlock>
     <template #heading>
-      <PageHeadingBlock pageTitle="New Rule Set"></PageHeadingBlock>
+      <PageHeadingBlock pageTitle="Create Rule Set"></PageHeadingBlock>
     </template>
     <template #content>
       <CreateFormBlock

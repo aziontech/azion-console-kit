@@ -106,7 +106,6 @@
   const isHttp3Protocol = computed(() => deliveryProtocol.value === 'http,https' && http3.value)
   const isBrowserCacheTypeHonor = computed(() => browserCacheSettings.value === 'honor')
   const websocketIsEnabled = computed(() => websocket.value)
-  const l2CachingIsEnable = computed(() => l2Caching.value)
   const cdnCacheSettingsIsOverride = computed(() => cdnCacheSettings.value === 'override')
 </script>
 
@@ -718,14 +717,10 @@
                 class: 'text-sm font-normal text-color-secondary m-0 pr-0 md:pr-[2.5rem]'
               }
             }"
-            :class="!l2CachingIsEnable ? 'opacity-50' : ''"
           >
             <template #title>
-              <span class="text-base">L2 Caching</span>
-              <InputSwitch
-                v-model="l2Caching"
-                :disabled="!l2CachingIsEnable"
-              />
+              <span class="text-base">Tiered Cache</span>
+              <InputSwitch v-model="l2Caching" />
             </template>
             <template #subtitle>Enable an additional cache layer at the edge. </template>
           </Card>

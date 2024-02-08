@@ -133,7 +133,7 @@
     <template #inputs>
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
         <FieldText
-          label="Path *"
+          label="Path"
           name="path"
           :value="path"
           placeholder="/"
