@@ -26,12 +26,13 @@ async function resolveReport(report, filters) {
   const reportData = await LoadReportWithMeta(filters, reportWithCancelation)
 
   const hasAggregation = reportData.resultChart.length <= maxSeriesToDisplayTag
+  const hasResults = reportData.resultChart.length
 
   const reportInfo = {
     reportId: report.id,
     resultQuery: reportData.resultChart,
     reportQuery: reportData.gqlQuery,
-    error: reportData.error,
+    error: reportData.error || !hasResults,
     hasMeanLine: reportData.resultChart > minSeriesToShowMeanLine,
     hasMeanLinePerSeries: reportData.resultChart > minSeriesToShowMeanLinePerSeries,
     hasFeedbackTag: hasAggregation,
@@ -39,7 +40,7 @@ async function resolveReport(report, filters) {
     showMeanLinePerSeries: false
   }
 
-  if (hasAggregation) {
+  if (hasAggregation && hasResults) {
     const clonedReport = {
       ...JSON.parse(JSON.stringify(report)),
       reportQuery: reportData.gqlQuery,
