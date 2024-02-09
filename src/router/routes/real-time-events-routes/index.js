@@ -1,4 +1,4 @@
-import { metricsPlaygroundOpener } from '@/helpers'
+import * as Helpers from '@/helpers'
 
 /** @type {import('vue-router').RouteRecordRaw} */
 export const realTimeEventsRoutes = {
@@ -6,9 +6,9 @@ export const realTimeEventsRoutes = {
   name: 'real-time-events',
   component: () => import('@views/RealTimeEvents/TabsView.vue'),
   props: {
-    playgroundOpener: metricsPlaygroundOpener,
+    playgroundOpener: Helpers.metricsPlaygroundOpener,
     httpRequests: {
-      documentationService: 'Helpers.documentationCatalog.edgeApplicationHTTPRequests'
+      documentationService: Helpers.documentationGuideProducts.realTimeEvents
     },
     edgeFunctions: {
       documentationService: 'Helpers.documentationCatalog.edgeApplicationHTTPRequests'
@@ -37,7 +37,7 @@ export const realTimeEventsRoutes = {
     breadCrumbs: [
       {
         label: 'Events',
-        to: '/events'
+        to: '/real-time-events'
       }
     ]
   }
