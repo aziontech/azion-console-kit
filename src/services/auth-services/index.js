@@ -5,6 +5,7 @@ import { refreshAuthenticationService } from './refresh-authentication-service'
 import { logoutService } from './logout-service'
 import { sendResetPasswordEmailService } from './send-reset-password-email-service'
 import { resetPasswordService } from './reset-password-service'
+import { passwordSettingService } from './password-setting-service'
 
 export {
   loginService,
@@ -13,5 +14,6 @@ export {
   switchAccountService,
   logoutService,
   sendResetPasswordEmailService,
-  resetPasswordService
+  resetPasswordService,
+	passwordSettingService
 }
