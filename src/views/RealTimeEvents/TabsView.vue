@@ -9,25 +9,54 @@
 
   defineOptions({ name: 'tabs-edge-service' })
 
-  defineProps({
-    edgeApplicationServices: { type: Object, required: true },
-    originsServices: { type: Object, required: true },
-    cacheSettingsServices: { type: Object, required: true },
-    clipboardWrite: { type: Function, required: true },
-    deviceGroupsServices: { type: Object, required: true },
-    errorResponsesServices: { type: Object, required: true },
-    rulesEngineServices: { type: Object, required: true },
-    functionsServices: { type: Object, required: true }
+  const props = defineProps({
+    httpRequests: {
+      type: Object,
+      required: true
+    },
+    edgeFunctions: {
+      type: Object,
+      required: true
+    },
+    edgeFunctionsConsole: {
+      type: Object,
+      required: true
+    },
+    imageProcessor: {
+      type: Object,
+      required: true
+    },
+    l2Cache: {
+      type: Object,
+      required: true
+    },
+    intelligentDNS: {
+      type: Object,
+      required: true
+    },
+    dataStreaming: {
+      type: Object,
+      required: true
+    },
+    activityHistory: {
+      type: Object,
+      required: true
+    },
+    clipboardWrite: {
+      type: Function,
+      required: true
+    }
   })
 
   const defaultTabs = {
-    mainSettings: 0,
-    origins: 1,
-    deviceGroups: 2,
-    errorResponses: 3,
-    cacheSettings: 4,
-    functions: 5,
-    rulesEngine: 6
+    httpRequests: 0,
+    edgeFunctions: 1,
+    edgeFunctionsConsole: 2,
+    imageProcessor: 3,
+    l2Cache: 4,
+    intelligentDNS: 5,
+    dataStreaming: 6,
+    activityHistory: 7
   }
 
   const mapTabs = ref({ ...defaultTabs })
@@ -46,11 +75,10 @@
     const tab = getTabFromValue(index)
     activeTab.value = index
     const params = {
-      id: 0,
       tab
     }
     router.push({
-      name: '',
+      name: 'real-time-events',
       params
     })
   }
@@ -76,7 +104,7 @@
         class="w-full h-full"
       >
         <TabPanel header="HTTP Requests">
-          <RealTimeEventsHTTPRequestsListView />
+          <RealTimeEventsHTTPRequestsListView v-bind="props.httpRequests" />
         </TabPanel>
         <TabPanel header="Edge Functions"> </TabPanel>
         <TabPanel header="Edge Functions Console"> </TabPanel>
