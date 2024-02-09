@@ -114,9 +114,7 @@
       if (index) {
         nextInput.$el.focus()
       }
-      if (index === MFA_CODE_LENGTH - 1) {
-        digitsMfa[index].value.value = ''
-      }
+      digitsMfa[index].value.value = ''
     } else {
       //check code value
       const isInvalidCode = (digitCode) => isNaN(parseFloat(digitCode))
@@ -129,8 +127,7 @@
         //get the next input
         const nextInput = inputRefs.value[index + 1]
         digitsMfa[index].value.value = parseInt(event.key)
-        digitsMfa[index + 1].value.value = ' '
-        nextInput.$el.focus()
+        setTimeout(() => nextInput.$el.focus(), 100)        
       }
 
       if (index === MFA_CODE_LENGTH - 1) {
