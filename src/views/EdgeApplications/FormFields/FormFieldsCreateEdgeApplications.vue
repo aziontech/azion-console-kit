@@ -1,5 +1,6 @@
 <script setup>
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
+  import MultiSelect from 'primevue/multiselect'
   import FieldText from '@/templates/form-fields-inputs/fieldText'
   import PrimeButton from 'primevue/button'
   import Card from 'primevue/card'
@@ -24,17 +25,17 @@
   })
 
   const HTTP_PORT_LIST_OPTIONS = [
-    { label: '80 (Default)', value: '80' },
-    { label: '8008', value: '8008' },
-    { label: '8080', value: '8080' }
+    { name: '80 (Default)', value: '80' },
+    { name: '8008', value: '8008' },
+    { name: '8080', value: '8080' }
   ]
   const HTTPS_PORT_LIST_OPTIONS = [
-    { label: '443 (Default)', value: '443' },
-    { label: '8443', value: '8443' },
-    { label: '9440', value: '9440' },
-    { label: '9441', value: '9441' },
-    { label: '9442', value: '9442' },
-    { label: '9443', value: '9443' }
+    { name: '443 (Default)', value: '443' },
+    { name: '8443', value: '8443' },
+    { name: '9440', value: '9440' },
+    { name: '9441', value: '9441' },
+    { name: '9442', value: '9442' },
+    { name: '9443', value: '9443' }
   ]
   const TLS_VERSIONS_OPTIONS = [
     { label: 'None', value: '' },
@@ -87,8 +88,8 @@
 
   const setDefaultHttpAndHttpsPort = (enableHttp3) => {
     if (enableHttp3) {
-      httpPort.value = { label: '80 (Default)', value: '80' }
-      httpsPort.value = { label: '443 (Default)', value: '443' }
+      httpPort.value = [HTTP_PORT_LIST_OPTIONS[0]]
+      httpsPort.value = [HTTPS_PORT_LIST_OPTIONS[0]]
     }
   }
 
@@ -234,13 +235,15 @@
             >HTTP Ports <span v-if="isHttpProtocol || isHttpsProtocol">*</span></label
           >
           <span class="p-input-icon-right">
-            <i class="pi pi-lock text-[var(--text-color-secondary)]" />
-            <Dropdown
+            <i class="pi pi-lock text-[var(--text-color-secondary)]" v-if="isHttp3Protocol"/>
+            <MultiSelect
               :options="HTTP_PORT_LIST_OPTIONS"
               v-model="httpPort"
-              optionLabel="label"
+              filter
+              optionLabel="name"
               placeholder="Select an HTTP port"
               class="w-full"
+              display="chip"
               :disabled="isHttp3Protocol"
               :pt="{
                 trigger: {
@@ -258,11 +261,12 @@
             >HTTPS Ports <span v-if="isHttpsProtocol">*</span></label
           >
           <span class="p-input-icon-right">
-            <i class="pi pi-lock text-[var(--text-color-secondary)]" />
-            <Dropdown
+            <i class="pi pi-lock text-[var(--text-color-secondary)]" v-if="!isHttpsProtocol"/>
+            <MultiSelect
               :options="HTTPS_PORT_LIST_OPTIONS"
               v-model="httpsPort"
-              optionLabel="label"
+              optionLabel="name"
+              display="chip"
               placeholder="Select an HTTPS port"
               class="w-full"
               :disabled="isHttpProtocol || isHttp3Protocol"
