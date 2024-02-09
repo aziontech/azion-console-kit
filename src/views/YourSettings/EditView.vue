@@ -32,13 +32,13 @@
 <script setup>
   import { ref } from 'vue'
 
-  import EditFormBlock from '@/templates/edit-form-block'
   import ContentBlock from '@/templates/content-block'
+  import EditFormBlock from '@/templates/edit-form-block'
   import PageHeadingBlock from '@/templates/page-heading-block'
-  import FormFieldsYourSettings from './FormFields/FormFieldsYourSettings.vue'
   import ActionBarBlockWithTeleport from '@templates/action-bar-block/action-bar-with-teleport'
-  import * as yup from 'yup'
   import { useToast } from 'primevue/usetoast'
+  import * as yup from 'yup'
+  import FormFieldsYourSettings from './FormFields/FormFieldsYourSettings.vue'
 
   const toast = useToast()
 
@@ -70,8 +70,7 @@
 
     return userData
   }
-  const formSubmit = (onSubmit, values, setValues) => {
-    onSubmit()
+  const formSubmit = (onSubmit, values) => {
     if (values.email !== currentEmail.value) {
       const toastConfig = {
         closable: true,
@@ -80,11 +79,8 @@
         detail: 'We have sent you a confirmation email.'
       }
       toast.add({ ...toastConfig })
-
-      setValues({
-        email: currentEmail.value
-      })
     }
+    onSubmit()
   }
   const passwordRequirementsList = ref([
     { label: '8 characters', valid: false },

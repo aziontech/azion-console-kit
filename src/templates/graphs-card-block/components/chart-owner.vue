@@ -23,5 +23,13 @@
   import MobileLogo from '@assets/svg/mobile-logo'
   import PrimeTag from 'primevue/tag'
 
-  defineProps({ chartOwner: String })
+  defineProps({
+    chartOwner: {
+      type: String,
+      default: 'azion',
+      validator(value) {
+        return ['azion', 'account', 'user'].includes(value)
+      }
+    }
+  })
 </script>

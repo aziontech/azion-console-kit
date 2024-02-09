@@ -1,8 +1,8 @@
 import { useMetricsStore } from '@/stores/metrics'
 import Axios from 'axios'
-import { LoadReportWithMeta } from '.'
+import { LoadReportVariation, LoadReportWithMeta } from '.'
 
-let ReportsRequestTokenSource = null
+let tokenSource = null
 
 function reportsBySelectedDashboard(reports, currentDashboard) {
   const reportsList = reports
@@ -15,27 +15,53 @@ function reportsBySelectedDashboard(reports, currentDashboard) {
 }
 
 async function resolveReport(report, filters) {
+  const maxSeriesToDisplayTag = 2
+  const minSeriesToShowMeanLine = 1
+  const minSeriesToShowMeanLinePerSeries = 2
+
   const reportWithCancelation = {
     ...report,
-    ReportsRequestTokenSource
+    tokenSource
   }
   const reportData = await LoadReportWithMeta(filters, reportWithCancelation)
+
+  const hasAggregation = reportData.resultChart.length <= maxSeriesToDisplayTag
+  const hasResults = reportData.resultChart.length
+
   const reportInfo = {
     reportId: report.id,
-    reportData: reportData.resultChart,
+    resultQuery: reportData.resultChart,
     reportQuery: reportData.gqlQuery,
-    error: reportData.error
+    error: reportData.error,
+    hasMeanLine: reportData.resultChart > minSeriesToShowMeanLine,
+    hasMeanLinePerSeries: reportData.resultChart > minSeriesToShowMeanLinePerSeries,
+    hasFeedbackTag: hasAggregation,
+    showMeanLine: false,
+    showMeanLinePerSeries: false
+  }
+
+  if (hasAggregation && hasResults) {
+    const clonedReport = {
+      ...JSON.parse(JSON.stringify(report)),
+      reportQuery: reportData.gqlQuery,
+      xAxis: '',
+      groupBy: [],
+      noResample: true,
+      ReportsRequestTokenSource: tokenSource
+    }
+
+    reportInfo.variationValue = await LoadReportVariation({ filters, report: clonedReport })
   }
 
   const metricsStore = useMetricsStore()
-  metricsStore.setCurrentReportValue({ ...reportInfo })
+  metricsStore.setCurrentReportValue(reportInfo)
 }
 
 export default async (filters, reports, currentDashboard) => {
-  if (ReportsRequestTokenSource) ReportsRequestTokenSource.cancel()
+  if (tokenSource) tokenSource.cancel()
 
-  const ReportsRequestToken = Axios.CancelToken
-  ReportsRequestTokenSource = ReportsRequestToken.source()
+  const cancelToken = Axios.CancelToken
+  tokenSource = cancelToken.source()
 
   const availableReports = reportsBySelectedDashboard(reports, currentDashboard)
 

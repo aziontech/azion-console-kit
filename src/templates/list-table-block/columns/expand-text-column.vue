@@ -28,7 +28,7 @@
   const SLICE_VALUE = 15
   const displayShowMore = textColumn.value?.length > SLICE_VALUE
   const totalItems = textColumn.value?.length - SLICE_VALUE
-  const formatValue = textColumn.value?.slice(0, SLICE_VALUE)
+  const formatValue = textColumn.value?.toString().slice(0, SLICE_VALUE)
   const newValue = `${formatValue}${displayShowMore ? '...' : ''}`
 
   const textToShow = computed(() => {

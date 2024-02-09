@@ -53,9 +53,10 @@
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
         <FieldText
           label="Name *"
-          name="Give a unique and descriptive name to identify the WAF rule."
+          description="Give a unique and descriptive name to identify the WAF rule set."
+          name="name"
           :value="name"
-          placeholder="My rule set"
+          placeholder="My WAF rule set"
         />
       </div>
     </template>

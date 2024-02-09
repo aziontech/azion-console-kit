@@ -173,24 +173,13 @@
     }
   ]
 
-  const DEFAULT_AND_OPERATOR = {
-    variable: '${uri}',
-    operator: 'is_equal',
-    conditional: 'and',
-    input_value: ''
-  }
-  const DEFAULT_OR_OPERATOR = {
-    variable: '${uri}',
-    operator: 'is_equal',
-    conditional: 'or',
-    input_value: ''
-  }
-  const DEFAULT_IF_OPERATOR = {
+  const DEFAULT_OPERATOR = {
     variable: '${uri}',
     operator: 'is_equal',
     conditional: 'if',
     input_value: ''
   }
+
   const DEFAULT_BEHAVIOR = {
     name: `deliver`,
     target: {}
@@ -278,27 +267,21 @@
       }
     ]
   }
-  /**
-   * Adds a conditional AND operator to the criteria at the specified index.
-   * @param {number} index - The index of the criteria to add the operator to.
-   */
-  const addConditionalAnd = (index) => {
-    criteria.value[index].value.push(DEFAULT_AND_OPERATOR)
-  }
 
   /**
-   * Adds a conditional OR operator to the criteria at the specified index.
+   * Adds a conditional AND/OR operator to the criteria at the specified index.
    * @param {number} index - The index of the criteria to add the operator to.
+   * @param {("and"|"or")} operator - The operator to add to the criteria at the specified index.
    */
-  const addConditionalOr = (index) => {
-    criteria.value[index].value.push(DEFAULT_OR_OPERATOR)
+  const addNewConditional = ({ index, operator }) => {
+    criteria.value[index].value.push({ ...DEFAULT_OPERATOR, conditional: operator })
   }
 
   /**
    * Adds a new criteria with a default IF operator.
    */
   const addNewCriteria = () => {
-    pushCriteria([DEFAULT_IF_OPERATOR])
+    pushCriteria([DEFAULT_OPERATOR])
   }
 
   /**
@@ -626,6 +609,16 @@
     return criteria.value.length > 1 && index < criteria.value.length - 1
   }
 
+  const maximumConditionalsByCriteriaReached = (criteriaIndex) => {
+    const MAXIMUM_ALLOWED = 10
+    return criteria.value[criteriaIndex].value.length >= MAXIMUM_ALLOWED
+  }
+
+  const maximumCriteriaReached = computed(() => {
+    const MAXIMUM_ALLOWED = 5
+    return criteria.value.length >= MAXIMUM_ALLOWED
+  })
+
   onMounted(() => {
     updateBehaviorsOptionsRequires()
 
@@ -650,7 +643,7 @@
   <FormHorizontal
     :isDrawer="true"
     title="General"
-    description="Create a rule set to handle the conditional execution of behaviors through logical operators."
+    description="Create a rule to handle the conditional execution of behaviors through logical operators."
   >
     <template #inputs>
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
@@ -717,12 +710,12 @@
     <template #inputs>
       <div
         class="flex flex-col"
-        v-for="(criteriaItem, index) in criteria"
-        :key="index"
+        v-for="(criteriaItem, criteriaIndex) in criteria"
+        :key="criteriaIndex"
       >
         <div
-          v-for="(item, itemIndex) in criteriaItem.value"
-          :key="itemIndex"
+          v-for="(item, conditionalIndex) in criteriaItem.value"
+          :key="conditionalIndex"
         >
           <div class="flex items-center gap-2">
             <Divider
@@ -734,16 +727,16 @@
             </Divider>
 
             <PrimeButton
-              v-if="itemIndex !== 0"
+              v-if="conditionalIndex !== 0"
               icon="pi pi-ellipsis-h"
               size="small"
               outlined
-              @click="(event) => toggleConditionalMenu(event, index, itemIndex)"
+              @click="(event) => toggleConditionalMenu(event, criteriaIndex, conditionalIndex)"
             />
             <PrimeMenu
-              :ref="(el) => (conditionalMenuRef[`${index}${itemIndex}`] = el)"
+              :ref="(el) => (conditionalMenuRef[`${criteriaIndex}${conditionalIndex}`] = el)"
               id="drawer_overlay_menu"
-              :model="criteriaMenuOptions(index, itemIndex)"
+              :model="criteriaMenuOptions(criteriaIndex, conditionalIndex)"
               :popup="true"
             />
           </div>
@@ -757,8 +750,8 @@
                 <i class="pi pi-dollar"></i>
               </div>
               <AutoComplete
-                :id="`criteria[${index}][${itemIndex}].variable`"
-                v-model="criteria[index].value[itemIndex].variable"
+                :id="`criteria[${criteriaIndex}][${conditionalIndex}].variable`"
+                v-model="criteria[criteriaIndex].value[conditionalIndex].variable"
                 :suggestions="variableItems"
                 @complete="searchVariableOption"
                 :disabled="!props.isEnableApplicationAcceleration"
@@ -771,16 +764,16 @@
               optionLabel="label"
               optionValue="value"
               inputClass="w-full"
-              :name="`criteria[${index}][${itemIndex}].operator`"
-              :value="criteria[index].value[itemIndex].operator"
+              :name="`criteria[${criteriaIndex}][${conditionalIndex}].operator`"
+              :value="criteria[criteriaIndex].value[conditionalIndex].operator"
             />
             <FieldText
               v-if="
-                criteria[index].value[itemIndex].operator !== 'exists' &&
-                criteria[index].value[itemIndex].operator !== 'does_not_exist'
+                criteria[criteriaIndex].value[conditionalIndex].operator !== 'exists' &&
+                criteria[criteriaIndex].value[conditionalIndex].operator !== 'does_not_exist'
               "
-              :name="`criteria[${index}][${itemIndex}].input_value`"
-              :value="criteria[index].value[itemIndex].input_value"
+              :name="`criteria[${criteriaIndex}][${conditionalIndex}].input_value`"
+              :value="criteria[criteriaIndex].value[conditionalIndex].input_value"
               inputClass="w-full"
             />
           </div>
@@ -794,15 +787,17 @@
             icon="pi pi-plus-circle"
             label="And"
             size="small"
+            :disabled="maximumConditionalsByCriteriaReached(criteriaIndex)"
             outlined
-            @click="addConditionalAnd(index)"
+            @click="addNewConditional({ index: criteriaIndex, operator: 'and' })"
           />
           <PrimeButton
             icon="pi pi-plus-circle"
             label="Or"
             size="small"
+            :disabled="maximumConditionalsByCriteriaReached(criteriaIndex)"
             outlined
-            @click="addConditionalOr(index)"
+            @click="addNewConditional({ index: criteriaIndex, operator: 'or' })"
           />
         </div>
 
@@ -813,16 +808,16 @@
           <Divider type="solid" />
 
           <PrimeButton
-            v-if="isNotFirstCriteria(index)"
+            v-if="isNotFirstCriteria(criteriaIndex)"
             icon="pi pi-ellipsis-h"
             size="small"
             outlined
-            @click="(event) => toggleCriteriaMenu(event, index + 1)"
+            @click="(event) => toggleCriteriaMenu(event, criteriaIndex + 1)"
           />
           <PrimeMenu
-            :ref="(el) => (criteriaMenuRef[index + 1] = el)"
+            :ref="(el) => (criteriaMenuRef[criteriaIndex + 1] = el)"
             id="drawer_overlay_menu"
-            :model="criteriaMenuOptions(index + 1)"
+            :model="criteriaMenuOptions(criteriaIndex + 1)"
             :popup="true"
           />
         </div>
@@ -833,6 +828,7 @@
           label="Add Criteria"
           size="small"
           outlined
+          :disabled="maximumCriteriaReached"
           @click="addNewCriteria"
         />
       </div>
@@ -842,12 +838,12 @@
   <FormHorizontal
     :isDrawer="true"
     title="Behaviors"
-    description="Set the behaviors you want your rule to perform if the conditions defined in the criteria are met. Select a behavior and fill in all required information. Some behaviors can't be added together or in some conditions."
+    description="Set the behaviors the rule should perform if the conditions defined in the criteria are met. Select a behavior and fill in all required information. Some behaviors can't be added together or in some conditions."
   >
     <template #inputs>
       <div
         class="flex flex-col gap-2"
-        v-for="(behaviorItem, index) in behaviors"
+        v-for="(behaviorItem, behaviorIndex) in behaviors"
         :key="behaviorItem.key"
       >
         <div class="flex items-center gap-2">
@@ -859,17 +855,17 @@
           </Divider>
 
           <PrimeButton
-            v-if="index !== 0"
+            v-if="behaviorIndex !== 0"
             icon="pi pi-ellipsis-h"
             size="small"
             outlined
-            @click="(event) => toggleBehaviorMenu(event, index)"
+            @click="(event) => toggleBehaviorMenu(event, behaviorIndex)"
           />
 
           <PrimeMenu
-            :ref="(el) => (behaviorsMenuRef[index] = el)"
+            :ref="(el) => (behaviorsMenuRef[behaviorIndex] = el)"
             id="drawer_behavior_overlay_menu"
-            :model="behaviorMenuOptions(index)"
+            :model="behaviorMenuOptions(behaviorIndex)"
             :popup="true"
           />
         </div>
@@ -878,14 +874,14 @@
           <div class="w-1/2">
             <FieldDropdown
               :key="behaviorItem.key"
-              :name="`behaviors[${index}].name`"
+              :name="`behaviors[${behaviorIndex}].name`"
               :options="behaviorsOptions"
               optionLabel="label"
               optionValue="value"
               optionDisabled="requires"
-              :value="behaviors[index].value.name"
+              :value="behaviors[behaviorIndex].value.name"
               inputClass="w-full"
-              @onChange="(newValue) => changeBehaviorType(newValue, index)"
+              @onChange="(newValue) => changeBehaviorType(newValue, behaviorIndex)"
             />
           </div>
 
@@ -893,37 +889,37 @@
             <template v-if="behaviorItem.value.name === 'run_function'">
               <FieldDropdown
                 :loading="loadingFunctionsInstance"
-                :name="`behaviors[${index}].target`"
+                :name="`behaviors[${behaviorIndex}].target`"
                 :options="functionsInstanceOptions"
                 optionLabel="name.text"
                 optionValue="id"
                 inputClass="w-full"
                 :key="behaviorItem.key"
-                :value="behaviors[index].value.target"
+                :value="behaviors[behaviorIndex].value.target"
               />
             </template>
             <template v-else-if="behaviorItem.value.name === 'set_origin'">
               <FieldDropdown
                 :loading="loadingOrigins"
-                :name="`behaviors[${index}].target`"
+                :name="`behaviors[${behaviorIndex}].target`"
                 :options="originsOptions"
                 optionLabel="name"
                 optionValue="originId"
                 inputClass="w-full"
                 :key="behaviorItem.key"
-                :value="behaviors[index].value.target"
+                :value="behaviors[behaviorIndex].value.target"
               />
             </template>
             <template v-else-if="behaviorItem.value.name === 'set_cache_policy'">
               <FieldDropdown
                 :loading="loadingCacheSettings"
-                :name="`behaviors[${index}].target`"
+                :name="`behaviors[${behaviorIndex}].target`"
                 :options="cacheSettingsOptions"
                 optionLabel="name"
                 optionValue="id"
                 inputClass="w-full"
                 :key="behaviorItem.key"
-                :value="behaviors[index].value.target"
+                :value="behaviors[behaviorIndex].value.target"
               />
             </template>
             <template v-else-if="behaviorItem.value.name === 'capture_match_groups'">
@@ -931,32 +927,32 @@
                 <FieldText
                   placeholder="Captured Array"
                   inputClass="w-full mb-3"
-                  :name="`behaviors[${index}].target.captured_array`"
+                  :name="`behaviors[${behaviorIndex}].target.captured_array`"
                   :key="behaviorItem.key"
-                  :value="behaviors[index].value.target.captured_array"
+                  :value="behaviors[behaviorIndex].value.target.captured_array"
                 />
                 <FieldText
                   placeholder="Subject"
                   inputClass="w-full mb-3"
-                  :name="`behaviors[${index}].target.subject`"
+                  :name="`behaviors[${behaviorIndex}].target.subject`"
                   :key="behaviorItem.key"
-                  :value="behaviors[index].value.target.subject"
+                  :value="behaviors[behaviorIndex].value.target.subject"
                 />
                 <FieldText
                   placeholder="Regex"
                   inputClass="w-full"
-                  :name="`behaviors[${index}].target.regex`"
+                  :name="`behaviors[${behaviorIndex}].target.regex`"
                   :key="behaviorItem.key"
-                  :value="behaviors[index].value.target.regex"
+                  :value="behaviors[behaviorIndex].value.target.regex"
                 />
               </div>
             </template>
-            <template v-else-if="behaviors[index]?.showTargetField">
+            <template v-else-if="behaviors[behaviorIndex]?.showTargetField">
               <FieldText
                 inputClass="w-full"
-                :name="`behaviors[${index}].target`"
+                :name="`behaviors[${behaviorIndex}].target`"
                 :key="behaviorItem.key"
-                :value="behaviors[index].value.target"
+                :value="behaviors[behaviorIndex].value.target"
               />
             </template>
           </div>

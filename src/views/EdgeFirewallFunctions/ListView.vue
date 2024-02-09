@@ -29,9 +29,9 @@
   </div>
   <EmptyResultsBlock
     v-else
-    title="No Functions instanced."
-    description="Create your first instance."
-    createButtonLabel="Instance"
+    title="No functions have been instantiated"
+    description="Click the button below to initiate the setup process and instantiate your first edge function."
+    createButtonLabel="Add"
     :documentationService="props.documentationService"
     :inTabs="true"
   >
@@ -39,7 +39,7 @@
       <PrimeButton
         severity="secondary"
         icon="pi pi-plus"
-        label="Instance"
+        label="Add"
         @click="openCreateFunctionDrawer"
       />
     </template>
