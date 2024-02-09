@@ -489,7 +489,7 @@ const REPORTS = [
   {
     id: '357826217661956693',
     chartOwner: 'azion',
-    label: 'L2 Caching',
+    label: 'Tiered Cache',
     description: DASHBOARDS_TEXTS.l2_caching.caching_offload.l2_caching.description,
     aggregationType: 'sum',
     columns: 4,
@@ -508,7 +508,7 @@ const REPORTS = [
   {
     id: '357826288204907093',
     chartOwner: 'azion',
-    label: 'L2 Offload',
+    label: 'Tiered Cache Offload',
     description: DASHBOARDS_TEXTS.l2_caching.caching_offload.l2_offload.description,
     aggregationType: 'avg',
     columns: 4,
