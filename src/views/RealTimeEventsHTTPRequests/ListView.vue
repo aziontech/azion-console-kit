@@ -24,27 +24,33 @@
         bytesSent: 191,
         configurationId: '1595368520',
         debugLog: `{"edge_firewall":["Global - Set WAF"]}`,
-        asn: 'AS52580 Azion Technologies Ltda.',
-        country: 'United States',
-        region: 'California'
+        geolocAsn: 'AS52580 Azion Technologies Ltda.',
+        geolocCountryName: 'United States',
+        geolocRegionName: 'Texas',
+        host: '980001a.ha.azioncdn.net',
+        ts: '2023-10-17T00:51:22Z'
       },
       {
         id: 2,
         bytesSent: 192,
         configurationId: '1595368521',
         debugLog: `{"edge_firewall":["Global - Set WAF"]}`,
-        asn: 'AS52580 Azion Technologies Ltda.',
-        country: 'Germany',
-        region: 'Berlim'
+        geolocAsn: 'AS52580 Azion Technologies Ltda.',
+        geolocCountryName: 'Germany',
+        geolocRegionName: 'Berlim',
+        host: '980001a.ha.azioncdn.net',
+        ts: '2023-10-17T00:51:22Z'
       },
       {
         id: 3,
         bytesSent: 193,
         configurationId: '1595368522',
         debugLog: `{"edge_firewall":["Global - Set WAF"]}`,
-        asn: 'AS52580 Azion Technologies Ltda.',
-        country: 'Brazil',
-        region: 'Porto Alegre'
+        geolocAsn: 'AS52580 Azion Technologies Ltda.',
+        geolocCountryName: 'Brazil',
+        geolocRegionName: 'Porto Alegre',
+        host: '980001a.ha.azioncdn.net',
+        ts: '2023-10-17T00:51:22Z'
       }
     ]
     // return await props.listRealTimeEventsHttpRequestsService({time:15})
@@ -84,15 +90,15 @@
         header: 'Debug log'
       },
       {
-        field: 'asn',
+        field: 'geolocAsn',
         header: 'Geoloc ASN'
       },
       {
-        field: 'country',
+        field: 'geolocCountryName',
         header: 'Geloc Country Name'
       },
       {
-        field: 'region',
+        field: 'geolocRegionName',
         header: 'Geoloc Region Name'
       }
     ]
@@ -125,11 +131,7 @@
         outlined
         icon="pi pi-shopping-cart"
         label="Browser Template"
-        @click="
-          () => {
-            console.log('ir para templates')
-          }
-        "
+        @click="() => {}"
       />
     </template>
     <template #default>
@@ -139,11 +141,13 @@
         label="Edge Application"
         @click="openCreateDrawer"
       />
+    </template>
+    <template #extraActionsRight>
       <PrimeButton
         severity="secondary"
         icon="pi pi-plus"
         label="WAF"
-        @click="openCreateDrawer"
+        @click="() => {}"
       />
     </template>
   </EmptyResultsBlock>
