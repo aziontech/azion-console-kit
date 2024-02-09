@@ -20,11 +20,20 @@
         <span class="break-words text-sm text-color-secondary font-normal line-height-1 py-3.5">
           {{ report.description }}
         </span>
-        <AggregationInfo :reportId="report.id" />
+        <AggregationInfo
+          :reportId="report.id"
+          v-if="showAggregation"
+        />
+        <InlineMessage
+          v-else
+          severity="error"
+        >
+          The chart can't be plotted. There was an issue loading the data.
+        </InlineMessage>
       </div>
       <section class="flex-auto">
         <component
-          v-if="report.resultQuery?.length && showChart"
+          v-if="showChart"
           :is="chartType[report.type]"
           :chartData="report"
           :resultChart="report.resultQuery"
@@ -32,7 +41,7 @@
           :hasMeanLineSeries="report.showMeanLinePerSeries"
         />
         <Skeleton
-          v-else
+          v-if="showSkeleton"
           class="w-full h-full"
         />
       </section>
@@ -43,6 +52,7 @@
 <script setup>
   import { useHelpCenterStore } from '@/stores/help-center'
   import { storeToRefs } from 'pinia'
+  import InlineMessage from 'primevue/inlinemessage'
   import Skeleton from 'primevue/skeleton'
   import { computed, defineAsyncComponent, onMounted, onUnmounted, ref, watch } from 'vue'
   import AggregationInfo from './components/aggregation-info.vue'
@@ -78,7 +88,19 @@
 
   const { getStatus } = storeToRefs(useHelpCenterStore())
 
-  const showChart = ref(true)
+  const shouldRenderChart = ref(true)
+
+  const showChart = computed(() => {
+    return props.report.resultQuery?.length && shouldRenderChart.value
+  })
+
+  const showAggregation = computed(() => {
+    return !props.report.error
+  })
+
+  const showSkeleton = computed(() => {
+    return !showChart.value && showAggregation.value
+  })
 
   const reRenderChart = () => {
     /*
@@ -89,9 +111,9 @@
      */
     const timeout = 350
 
-    showChart.value = false
+    shouldRenderChart.value = false
     setTimeout(() => {
-      showChart.value = true
+      shouldRenderChart.value = true
     }, timeout)
   }
 
