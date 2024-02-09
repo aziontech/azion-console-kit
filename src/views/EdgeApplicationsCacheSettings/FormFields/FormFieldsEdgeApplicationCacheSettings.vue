@@ -240,7 +240,7 @@
           :step="1"
           :class="{ 'p-invalid': cdnCacheSettingsMaximumTtlError }"
         />
-        <small class="text-color-secondary text-sm font-normal leading-tight">
+        <small class="text-color-secondary text-xs font-normal leading-tight">
           Enable Application Acceleration on the Main Settings tab to use values lower than 60
           seconds. L2 Caching requires cache TTL to be equal to or greater than 3 seconds.
         </small>
@@ -254,8 +254,8 @@
   </FormHorizontal>
 
   <FormHorizontal
-    title="File Slicing"
-    description="Enable file slicing to break large files into smaller packets that can be cached at the edge."
+    title="Large File Optimization"
+    description="Enable file segmentation to break down large files into small fragments that can be cached at the edge."
     :isDrawer="true"
   >
     <template #inputs>
@@ -279,7 +279,7 @@
         <label
           for="sliceConfigurationRange"
           class="text-color text-sm font-medium"
-          >Slice Range (KB)</label
+          >Fragment Size (KB)</label
         >
         <span class="p-input-icon-right w-full flex max-w-lg flex-col items-start gap-2">
           <i class="pi pi-lock text-color-secondary" />
@@ -296,9 +296,8 @@
           />
         </span>
 
-        <small class="text-color-secondary text-sm font-normal leading-tight">
-          Slice range is used to define a range in Bytes to slice a big file in small pieces
-          (byte-ranges)
+        <small class="text-color-secondary text-xs font-normal leading-tight">
+          Define the range of segmentation of large files.
         </small>
       </div>
     </template>

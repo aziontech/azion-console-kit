@@ -7,25 +7,25 @@ const PAGES_DASHBOARDS = {
       groupId: 1,
       dashboards: [
         {
-          id: 357548608166298191n,
+          id: '357548608166298191',
           label: 'Data Transferred',
           path: 'data-transferred',
           dataset: 'httpMetrics'
         },
         {
-          id: 357548623571976783n,
+          id: '357548623571976783',
           label: 'Requests',
           path: 'requests',
           dataset: 'httpMetrics'
         },
         {
-          id: 357548642810200653n,
+          id: '357548642810200653',
           label: 'Status Codes',
           path: 'status-codes',
           dataset: 'httpMetrics'
         },
         {
-          id: 357549179454620239n,
+          id: '357549179454620239',
           label: 'Bandwidth Saving',
           path: 'bandwidth-saving',
           dataset: 'httpMetrics'
@@ -34,12 +34,12 @@ const PAGES_DASHBOARDS = {
     },
     {
       id: 2,
-      label: 'L2 Caching',
+      label: 'Tiered Cache',
       path: 'l2-caching',
       groupId: 1,
       dashboards: [
         {
-          id: 357549371218199219n,
+          id: '357549371218199219',
           label: 'Caching Offload',
           path: 'caching-offload',
           dataset: 'l2CacheMetrics'
@@ -53,7 +53,7 @@ const PAGES_DASHBOARDS = {
       groupId: 1,
       dashboards: [
         {
-          id: 357549319029523021n,
+          id: '357549319029523021',
           label: 'Invocations',
           path: 'invocations',
           dataset: 'edgeFunctionsMetrics'
@@ -67,7 +67,7 @@ const PAGES_DASHBOARDS = {
       groupId: 1,
       dashboards: [
         {
-          id: 357549422933967445n,
+          id: '357549422933967445',
           label: 'Requests',
           path: 'requests',
           dataset: 'imagesProcessedMetrics'
@@ -83,7 +83,7 @@ const PAGES_DASHBOARDS = {
       groupId: 2,
       dashboards: [
         {
-          id: 357548675837198933n,
+          id: '357548675837198933',
           label: 'Threats',
           path: 'threats',
           dataset: 'httpMetrics'
@@ -97,7 +97,7 @@ const PAGES_DASHBOARDS = {
       groupId: 2,
       dashboards: [
         {
-          id: 357549371218199119n,
+          id: '357549371218199119',
           label: 'Standard Queries',
           path: 'standard-queries',
           dataset: 'idnsQueriesMetrics'
@@ -113,7 +113,7 @@ const PAGES_DASHBOARDS = {
       groupId: 3,
       dashboards: [
         {
-          id: 352149476039721549n,
+          id: '352149476039721549',
           label: 'Data Streamed',
           path: 'requests',
           dataset: 'dataStreamedMetrics'
