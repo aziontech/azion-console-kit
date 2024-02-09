@@ -23,10 +23,11 @@
             <InputText
               v-for="(digits, i) in digitsMfa"
               :key="i"
+              maxlength="1"
               :disabled="isButtonLoading"
               class="grow w-7 sm:w-11 h-[2.6rem] text-lg text-center"
               v-model="digits.value.value"
-              @input="moveFocus(i)"
+              @keydown="(event) => moveFocus(i, event)"
               :ref="(el) => (inputRefs[i] = el)"
             />
           </div>
@@ -61,6 +62,7 @@
   import PrimeButton from 'primevue/button'
   import InputText from 'primevue/inputtext'
   import InlineMessage from 'primevue/inlinemessage'
+  // import InputNumber from 'primevue/inputnumber';
 
   import { ref } from 'vue'
   import { useRouter } from 'vue-router'
@@ -96,47 +98,59 @@
     for (let mfaDigitIndex = 0; mfaDigitIndex < pastedData.length; mfaDigitIndex++) {
       digitsMfa[mfaDigitIndex].value.value = pastedData[mfaDigitIndex]
     }
-  }
 
-  const moveFocus = (index) => {
-    const { value: digitCode } = digitsMfa[index].value
-
-    const clearDigitValue = (index) => (digitsMfa[index].value.value = '')
-
-    const moveFocusToNextInput = (index) => {
-      const nextInput = inputRefs.value[index + 1]
-      if (nextInput) {
-        nextInput.$el.focus()
-      }
-    }
-
-    const moveFocusToPreviusInput = () => {
-      const nextInput = inputRefs.value[index - 1]
-      if (nextInput) {
-        nextInput.$el.focus()
-      }
-    }
-
-    const isInvalidCode = (digitCode) => isNaN(digitCode) || digitCode.length > 1
-    if (isInvalidCode(digitCode)) {
-      clearDigitValue(index)
-      return
-    }
-
-    const shouldMoveFocus = (digitCode, index) => digitCode !== '' && index < MFA_CODE_LENGTH - 1
-    if (shouldMoveFocus(digitCode, index)) {
-      moveFocusToNextInput(index)
-    }
-
-    const shouldBackFocus = (digitCode) => digitCode === ''
-    if (shouldBackFocus(digitCode, index)) {
-      moveFocusToPreviusInput(index)
-    }
-
-    const allDigitsFilled = () => joinDigitsMfa().length === 6
+    const allDigitsFilled = () => validateCodeLength() === 6
     if (allDigitsFilled()) {
       validateCode()
     }
+  }
+
+  const moveFocus = (index, event) => {
+    //clear the invalide input
+    const clearDigitValue = (index) => (digitsMfa[index].value.value = '')
+
+    //check delete code
+    if (event.key === 'Backspace' || event.keyCode === 8) {
+      const nextInput = inputRefs.value[index - 1]
+      if (index) {
+        nextInput.$el.focus()
+      }
+      if (index === MFA_CODE_LENGTH - 1) {
+        digitsMfa[index].value.value = ''
+      }
+    } else {
+      //check code value
+      const isInvalidCode = (digitCode) => isNaN(parseFloat(digitCode))
+      if (isInvalidCode(event.key)) {
+        clearDigitValue(index)
+        return
+      }
+
+      if (index < MFA_CODE_LENGTH - 1) {
+        //get the next input
+        const nextInput = inputRefs.value[index + 1]
+        digitsMfa[index].value.value = parseInt(event.key)
+        digitsMfa[index + 1].value.value = ' '
+        nextInput.$el.focus()
+      }
+
+      if (index === MFA_CODE_LENGTH - 1) {
+        //set the last value
+        digitsMfa[index].value.value = parseInt(event.key)
+      }
+
+      const allDigitsFilled = () => validateCodeLength() === 6
+      if (allDigitsFilled()) {
+        //validate code
+        validateCode()
+      }
+    }
+  }
+
+  const validateCodeLength = () => {
+    const code = digitsMfa.map((digit) => digit.value.value).join('')
+
+    return code.trim().length
   }
 
   const joinDigitsMfa = () => {
