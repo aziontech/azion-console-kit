@@ -75,8 +75,8 @@ export const useMetricsStore = defineStore('metrics', {
     },
     reportsBySelectedDashboard: (state) => {
       const reports = state.reports.filter((report) => {
-        const dashboardId = state.currentDashboard?.id?.toString()
-        return report.dashboardId.toString() === dashboardId
+        const dashboardId = state.currentDashboard?.id
+        return report.dashboardId === dashboardId
       })
       return reports
     },
@@ -147,7 +147,7 @@ export const useMetricsStore = defineStore('metrics', {
         : this.datasetAvailableFilters
     },
     getCurrentReportsDataById: (state) => {
-      return (id) => state.currentReportsData.find((report) => report.id.toString() === id)
+      return (id) => state.currentReportsData.find((report) => report.id === id)
     }
   },
   actions: {
@@ -270,23 +270,21 @@ export const useMetricsStore = defineStore('metrics', {
     setCurrentReports(availableReports) {
       this.currentReportsData = availableReports
     },
-    setCurrentReportValue({ reportId, reportData = [], reportQuery, error }) {
+    setCurrentReportValue(reportInfo) {
       const reportIdx = this.currentReportsData.findIndex(
-        (reportItem) => reportItem.id === reportId
+        (reportItem) => reportItem.id === reportInfo.reportId
       )
+
       if (reportIdx < 0) return
-      this.currentReportsData[reportIdx].resultQuery = reportData
-      this.currentReportsData[reportIdx].reportQuery = reportQuery
-      this.currentReportsData[reportIdx].error = error
-      this.currentReportsData[reportIdx].hasMeanLine = reportData.length > 1
-      this.currentReportsData[reportIdx].hasMeanLinePerSeries = reportData.length > 2
-      this.currentReportsData[reportIdx].showMeanLine = false
-      this.currentReportsData[reportIdx].showMeanLinePerSeries = false
+      this.currentReportsData[reportIdx] = {
+        ...this.currentReportsData[reportIdx],
+        ...reportInfo
+      }
     },
 
     toggleReportMeanLineStatus(reportId) {
       const reportIdx = this.currentReportsData.findIndex(
-        (reportItem) => reportItem.id.toString() === reportId.toString()
+        (reportItem) => reportItem.id === reportId
       )
       if (reportIdx < 0) return
       this.currentReportsData[reportIdx].showMeanLine =
@@ -295,7 +293,7 @@ export const useMetricsStore = defineStore('metrics', {
 
     toggleReportMeanLinePerSeriesStatus(reportId) {
       const reportIdx = this.currentReportsData.findIndex(
-        (reportItem) => reportItem.id.toString() === reportId.toString()
+        (reportItem) => reportItem.id === reportId
       )
       if (reportIdx < 0) return
       this.currentReportsData[reportIdx].showMeanLinePerSeries =
