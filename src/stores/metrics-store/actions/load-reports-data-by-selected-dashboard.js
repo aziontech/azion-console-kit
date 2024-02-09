@@ -32,7 +32,7 @@ async function resolveReport(report, filters) {
     reportId: report.id,
     resultQuery: reportData.resultChart,
     reportQuery: reportData.gqlQuery,
-    error: reportData.error || !hasResults,
+    error: reportData.error,
     hasMeanLine: reportData.resultChart > minSeriesToShowMeanLine,
     hasMeanLinePerSeries: reportData.resultChart > minSeriesToShowMeanLinePerSeries,
     hasFeedbackTag: hasAggregation,
