@@ -234,7 +234,10 @@
             >HTTP Ports <span v-if="isHttpProtocol || isHttpsProtocol">*</span></label
           >
           <span class="p-input-icon-right">
-            <i class="pi pi-lock text-[var(--text-color-secondary)]" v-if="isHttp3Protocol"/>
+            <i
+              class="pi pi-lock text-[var(--text-color-secondary)]"
+              v-if="isHttp3Protocol"
+            />
             <MultiSelect
               :options="HTTP_PORT_LIST_OPTIONS"
               v-model="httpPort"
@@ -260,7 +263,10 @@
             >HTTPS Ports <span v-if="isHttpsProtocol">*</span></label
           >
           <span class="p-input-icon-right">
-            <i class="pi pi-lock text-[var(--text-color-secondary)]" v-if="!isHttpsProtocol"/>
+            <i
+              class="pi pi-lock text-[var(--text-color-secondary)]"
+              v-if="!isHttpsProtocol"
+            />
             <MultiSelect
               :options="HTTPS_PORT_LIST_OPTIONS"
               v-model="httpsPort"

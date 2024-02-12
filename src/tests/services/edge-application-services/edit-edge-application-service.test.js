@@ -9,7 +9,7 @@ const fixtures = {
     name: 'example',
     deliveryProtocol: 'https',
     http3: true,
-    httpPort: [{ name: '80 (Default)', value: '80' },],
+    httpPort: [{ name: '80 (Default)', value: '80' }],
     httpsPort: [{ name: '8008', value: '8008' }],
     minimumTlsVersion: 'TLSv1.2',
     active: true,
