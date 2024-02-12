@@ -273,7 +273,9 @@
           window.open('https://manager.azion.com/billing-subscriptions/payment-methods', '_blank')
         }
       },
-      navigateToRealTimeMetrics() {},
+      navigateToRealTimeMetrics() {
+        this.$router.push({ name: 'real-time-metrics' })
+      },
       openDocsEdgeApplication() {
         this.windowManager.documentationGuideProducts.edgeApplication()
       },
