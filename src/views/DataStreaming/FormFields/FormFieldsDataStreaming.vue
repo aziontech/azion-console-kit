@@ -1379,7 +1379,12 @@
 
   const insertDataSet = (templateID) => {
     const index = listTemplates.value.map((el) => el.value).indexOf(templateID)
-    dataSet.value = listTemplates.value[index].template
+    try {
+      const dataSetJSON = JSON.parse(listTemplates.value[index].template)
+      dataSet.value = JSON.stringify(dataSetJSON, null, '\t')
+    } catch (exception) {
+      dataSet.value = listTemplates.value[index].template
+    }
   }
 
   // Using the store
@@ -1391,6 +1396,8 @@
 
   const optionsMonacoEditor = computed(() => {
     return {
+      minimap: { enabled: false },
+      wordWrap: 'on',
       tabSize: 2,
       formatOnPaste: true
     }
