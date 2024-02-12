@@ -57,10 +57,11 @@
             <InputText
               v-for="(digits, i) in digitsMfa"
               :key="i"
+              maxlength="1"
               class="grow w-7 sm:w-11 h-[2.6rem] text-lg text-center"
               v-model="digits.value.value"
               :disabled="isButtonLoading"
-              @input="moveFocus(i)"
+              @keydown="(event) => moveFocus(i, event)"
               :ref="(el) => (inputRefs[i] = el)"
             />
           </div>
@@ -127,33 +128,63 @@
   const hasRequestErrorMessage = ref('')
   const isButtonLoading = ref(false)
 
-  const moveFocus = (index) => {
-    const { value: digitCode } = digitsMfa[index].value
+  const handlePaste = (event) => {
+    event.preventDefault()
+    const pastedData = event.clipboardData.getData('text')
 
-    const clearDigitValue = (index) => (digitsMfa[index].value.value = '')
-
-    const moveFocusToNextInput = (index) => {
-      const nextInput = inputRefs.value[index + 1]
-      if (nextInput) {
-        nextInput.$el.focus()
-      }
+    for (let mfaDigitIndex = 0; mfaDigitIndex < pastedData.length; mfaDigitIndex++) {
+      digitsMfa[mfaDigitIndex].value.value = pastedData[mfaDigitIndex]
     }
 
-    const isInvalidCode = (digitCode) => isNaN(digitCode) || digitCode.length > 1
-    if (isInvalidCode(digitCode)) {
-      clearDigitValue(index)
-      return
-    }
-
-    const shouldMoveFocus = (digitCode, index) => digitCode !== '' && index < MFA_CODE_LENGTH - 1
-    if (shouldMoveFocus(digitCode, index)) {
-      moveFocusToNextInput(index)
-    }
-
-    const allDigitsFilled = () => joinDigitsMfa().length === 6
+    const allDigitsFilled = () => validateCodeLength() === 6
     if (allDigitsFilled()) {
       authorizeDevice()
     }
+  }
+
+  const moveFocus = (index, event) => {
+    //clear the invalide input
+    const clearDigitValue = (index) => (digitsMfa[index].value.value = '')
+
+    //check delete code
+    if (event.key === 'Backspace' || event.keyCode === 8) {
+      const nextInput = inputRefs.value[index - 1]
+      if (index) {
+        nextInput.$el.focus()
+      }
+      digitsMfa[index].value.value = ''
+    } else {
+      //check code value
+      const isInvalidCode = (digitCode) => isNaN(parseFloat(digitCode))
+      if (isInvalidCode(event.key)) {
+        clearDigitValue(index)
+        return
+      }
+
+      if (index < MFA_CODE_LENGTH - 1) {
+        //get the next input
+        const nextInput = inputRefs.value[index + 1]
+        digitsMfa[index].value.value = parseInt(event.key)
+        setTimeout(() => nextInput.$el.focus(), 100)
+      }
+
+      if (index === MFA_CODE_LENGTH - 1) {
+        //set the last value
+        digitsMfa[index].value.value = parseInt(event.key)
+      }
+
+      const allDigitsFilled = () => validateCodeLength() === 6
+      if (allDigitsFilled()) {
+        //validate code
+        authorizeDevice()
+      }
+    }
+  }
+
+  const validateCodeLength = () => {
+    const code = digitsMfa.map((digit) => digit.value.value).join('')
+
+    return code.trim().length
   }
 
   const getQrCodeSetupUrl = async () => {
@@ -166,15 +197,6 @@
   onMounted(async () => {
     getQrCodeSetupUrl()
   })
-
-  const handlePaste = (event) => {
-    event.preventDefault()
-    const pastedData = event.clipboardData.getData('text')
-
-    for (let mfaDigitIndex = 0; mfaDigitIndex < pastedData.length; mfaDigitIndex++) {
-      digitsMfa[mfaDigitIndex].value.value = pastedData[mfaDigitIndex]
-    }
-  }
 
   const joinDigitsMfa = () => {
     return digitsMfa.map((digit) => digit.value.value).join('')
@@ -200,6 +222,7 @@
       router.push(redirect)
     } catch (error) {
       hasRequestErrorMessage.value = error
+      digitsMfa.forEach((item) => (item.value.value = ''))
     } finally {
       isButtonLoading.value = false
     }
