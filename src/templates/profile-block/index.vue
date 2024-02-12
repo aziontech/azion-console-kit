@@ -226,7 +226,14 @@
     },
     {
       label: 'Billing & Subscriptions',
-      to: '/billing-subscriptions'
+      command: () => {
+        if (import.meta.env.DEV) {
+          window.open('https://stage-manager.azion.com/billing-subscriptions/bills', '_blank')
+        }
+        if (import.meta.env.PROD) {
+          window.open('https://manager.azion.com/billing-subscriptions/payment-methods', '_blank')
+        }
+      }
     },
     {
       label: 'Credentials',
