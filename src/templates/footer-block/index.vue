@@ -4,7 +4,7 @@
   <footer
     class="z-10 flex px-3 py-6 flex-wrap flex-col justify-center items-center gap-3 lg:gap-4 surface-ground border-t surface-border lg:flex-row pr-3 lg:py-3 lg:px-8 lg:justify-center"
   >
-    <span class="text-sm text-normal text-color">Copyright © 2024 Azion</span>
+    <span class="text-sm text-normal text-color">© Azion Technologies, Inc or its affiliates. All rights reserved.</span>
 
     <div
       class="flex flex-col gap-3 lg:gap-4 items-center lg:flex lg:flex-row flex-none md-auto md:flex-1"
