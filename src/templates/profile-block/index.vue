@@ -227,12 +227,11 @@
     {
       label: 'Billing & Subscriptions',
       command: () => {
+        let billingLink = 'https://manager.azion.com/billing-subscriptions/payment-methods'
         if (import.meta.env.DEV) {
-          window.open('https://stage-manager.azion.com/billing-subscriptions/bills', '_blank')
+          billingLink = 'https://stage-manager.azion.com/billing-subscriptions/bills'
         }
-        if (import.meta.env.PROD) {
-          window.open('https://manager.azion.com/billing-subscriptions/payment-methods', '_blank')
-        }
+        window.open(billingLink, '_blank')
       }
     },
     {
