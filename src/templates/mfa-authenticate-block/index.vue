@@ -127,7 +127,7 @@
         //get the next input
         const nextInput = inputRefs.value[index + 1]
         digitsMfa[index].value.value = parseInt(event.key)
-        setTimeout(() => nextInput.$el.focus(), 100)        
+        setTimeout(() => nextInput.$el.focus(), 100)
       }
 
       if (index === MFA_CODE_LENGTH - 1) {

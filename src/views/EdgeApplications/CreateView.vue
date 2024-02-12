@@ -54,7 +54,7 @@
     name: '',
     deliveryProtocol: 'http',
     http3: false,
-    httpPort: [{ name: '80 (Default)', value: '80' },],
+    httpPort: [{ name: '80 (Default)', value: '80' }],
     httpsPort: [{ name: '8008', value: '8008' }],
     minimumTlsVersion: { label: 'None', value: '' },
     supportedVersion: { label: 'All', value: 'all' },

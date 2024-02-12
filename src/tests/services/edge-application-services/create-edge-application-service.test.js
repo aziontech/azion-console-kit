@@ -8,7 +8,7 @@ const fixtures = {
     name: 'Edge Application',
     deliveryProtocol: 'http',
     http3: false,
-    httpPort: [{ name: '80 (Default)', value: '80' },],
+    httpPort: [{ name: '80 (Default)', value: '80' }],
     httpsPort: [{ name: '8008', value: '8008' }],
     minimumTlsVersion: { value: 'TLS 1.2' },
     originType: { value: 'origin' },
