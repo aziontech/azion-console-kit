@@ -209,6 +209,8 @@
   import { useCreateModalStore } from '@/stores/create-modal'
   import { mapState } from 'pinia'
   import { useAccountStore } from '@/stores/account'
+  import { getEnvironmentFromUrl } from '@/helpers'
+
 
   export default {
     name: 'home-view',
@@ -266,8 +268,9 @@
         this.$router.push({ name: 'list-edge-applications' })
       },
       navigateToPayment() {
+        const environment = getEnvironmentFromUrl(window.location.href)
         let billingLink = 'https://manager.azion.com/billing-subscriptions/bills'
-        if (import.meta.env.MODE === 'development') {
+        if (environment === 'stage') {
           billingLink = 'https://stage-manager.azion.com/billing-subscriptions/bills'
         }
         window.open(billingLink, '_blank')

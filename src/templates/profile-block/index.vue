@@ -199,6 +199,7 @@
 <script setup>
   import { ref, computed, inject, watch } from 'vue'
   import { useAccountStore } from '@/stores/account'
+  import { getEnvironmentFromUrl } from '@/helpers'
 
   import Sidebar from 'primevue/sidebar'
   import Avatar from 'primevue/avatar'
@@ -227,8 +228,9 @@
     {
       label: 'Billing & Subscriptions',
       command: () => {
+        const environment = getEnvironmentFromUrl(window.location.href)
         let billingLink = 'https://manager.azion.com/billing-subscriptions/bills'
-        if (import.meta.env.MODE === 'development') {
+        if (environment === 'stage') {
           billingLink = 'https://stage-manager.azion.com/billing-subscriptions/bills'
         }
         window.open(billingLink, '_blank')
