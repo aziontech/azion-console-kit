@@ -266,8 +266,8 @@
         this.$router.push({ name: 'list-edge-applications' })
       },
       navigateToPayment() {
-        let billingLink = 'https://manager.azion.com/billing-subscriptions/payment-methods'
-        if (import.meta.env.DEV) {
+        let billingLink = 'https://manager.azion.com/billing-subscriptions/bills'
+        if (import.meta.env.MODE === 'development') {
           billingLink = 'https://stage-manager.azion.com/billing-subscriptions/bills'
         }
         window.open(billingLink, '_blank')
