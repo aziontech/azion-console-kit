@@ -8,7 +8,8 @@ const fixtures = {
     password: 'SomeTest123@',
     token: 'uuid123-testuuid123'
   },
-  tokenInvalidMessage: 'Your token is expired. Please, request a new one.'
+  tokenInvalidMessage: 'Your token is expired. Please, request a new one.',
+  tokenNotFoundMessage: 'Token not found.'
 }
 
 const makeSut = () => {
@@ -48,14 +49,22 @@ describe('AuthServices', () => {
     expect(request).rejects.toBe(fixtures.tokenInvalidMessage)
   })
 
+  it('should throw when token is not found', async () => {
+    vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
+      statusCode: 404,
+      body: { detail: [fixtures.tokenNotFoundMessage] }
+    })
+    const { sut } = makeSut()
+
+    const request = sut()
+
+    expect(request).rejects.toBe(fixtures.tokenNotFoundMessage)
+  })
+
   it.each([
     {
       statusCode: 403,
       expectedError: new Errors.PermissionError().message
-    },
-    {
-      statusCode: 404,
-      expectedError: new Errors.NotFoundError().message
     },
     {
       statusCode: 500,

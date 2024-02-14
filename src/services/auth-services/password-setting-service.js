@@ -24,11 +24,11 @@ const parseHttpResponse = (httpResponse) => {
     case 200:
       return httpResponse.body
     case 400:
-      throw new Error(extractApiError(httpResponse)).message
+      throw new Error(extractApiError(httpResponse.body, 'non_field_errors')).message
     case 403:
       throw new Errors.PermissionError().message
     case 404:
-      throw new Errors.NotFoundError().message
+      throw new Error(extractApiError(httpResponse.body, 'detail')).message
     case 500:
       throw new Errors.InternalServerError().message
     default:
@@ -39,21 +39,14 @@ const parseHttpResponse = (httpResponse) => {
 /**
  * @param {Object} errorSchema - The error schema.
  * @param {string} key - The error key of error schema.
- * @returns {string|undefined} The result message based on the status code.
- */
-const extractErrorKey = (errorSchema, key) => {
-  return errorSchema[key]?.[0]
-}
-
-/**
- * @param {Object} httpResponse - The HTTP response object.
- * @param {Object} httpResponse.body - The response body.
  * @returns {string} The result message based on the status code.
  */
-const extractApiError = (httpResponse) => {
-  const tokenExpiredError = extractErrorKey(httpResponse.body, 'non_field_errors')
+const extractApiError = (errorSchema, key) => {
+  const errorMessage = errorSchema[key] || 'Unexpected error.'
 
-  const errorMessages = [tokenExpiredError]
-  const errorMessage = errorMessages.find((error) => !!error)
+  if (errorMessage === 'Not found.') {
+    return 'Token not found.'
+  }
+
   return errorMessage
 }
