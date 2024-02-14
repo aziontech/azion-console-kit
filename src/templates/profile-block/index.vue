@@ -226,7 +226,13 @@
     },
     {
       label: 'Billing & Subscriptions',
-      to: '/billing-subscriptions'
+      command: () => {
+        let billingLink = 'https://manager.azion.com/billing-subscriptions/payment-methods'
+        if (import.meta.env.DEV) {
+          billingLink = 'https://stage-manager.azion.com/billing-subscriptions/bills'
+        }
+        window.open(billingLink, '_blank')
+      }
     },
     {
       label: 'Credentials',

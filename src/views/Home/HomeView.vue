@@ -266,9 +266,15 @@
         this.$router.push({ name: 'list-edge-applications' })
       },
       navigateToPayment() {
-        this.$router.push({ path: '/billing-subscriptions/payment-methods/add' })
+        let billingLink = 'https://manager.azion.com/billing-subscriptions/payment-methods'
+        if (import.meta.env.DEV) {
+          billingLink = 'https://stage-manager.azion.com/billing-subscriptions/bills'
+        }
+        window.open(billingLink, '_blank')
       },
-      navigateToRealTimeMetrics() {},
+      navigateToRealTimeMetrics() {
+        this.$router.push({ name: 'real-time-metrics' })
+      },
       openDocsEdgeApplication() {
         this.windowManager.documentationGuideProducts.edgeApplication()
       },
