@@ -24,7 +24,7 @@ const parseHttpResponse = (httpResponse) => {
     case 200:
       return httpResponse.body
     case 400:
-      throw new Errors.InvalidApiRequestError().message
+      throw new Error(extractApiError(httpResponse)).message
     case 403:
       throw new Errors.PermissionError().message
     case 404:
@@ -34,4 +34,26 @@ const parseHttpResponse = (httpResponse) => {
     default:
       throw new Errors.UnexpectedError().message
   }
+}
+
+/**
+ * @param {Object} errorSchema - The error schema.
+ * @param {string} key - The error key of error schema.
+ * @returns {string|undefined} The result message based on the status code.
+ */
+const extractErrorKey = (errorSchema, key) => {
+  return errorSchema[key]?.[0]
+}
+
+/**
+ * @param {Object} httpResponse - The HTTP response object.
+ * @param {Object} httpResponse.body - The response body.
+ * @returns {string} The result message based on the status code.
+ */
+const extractApiError = (httpResponse) => {
+  const tokenExpiredError = extractErrorKey(httpResponse.body, 'non_field_errors')
+
+  const errorMessages = [tokenExpiredError]
+  const errorMessage = errorMessages.find((error) => !!error)
+  return errorMessage
 }

@@ -15,5 +15,5 @@ export {
   logoutService,
   sendResetPasswordEmailService,
   resetPasswordService,
-	passwordSettingService
+  passwordSettingService
 }
