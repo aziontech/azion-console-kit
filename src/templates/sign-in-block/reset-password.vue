@@ -121,13 +121,13 @@
 </template>
 
 <script setup>
-  import Password from 'primevue/password'
   import PrimeButton from 'primevue/button'
   import InlineMessage from 'primevue/inlinemessage'
-  import * as yup from 'yup'
+  import Password from 'primevue/password'
+  import { useField, useForm } from 'vee-validate'
   import { computed, ref } from 'vue'
   import { useRoute, useRouter } from 'vue-router'
-  import { useField, useForm } from 'vee-validate'
+  import * as yup from 'yup'
 
   const MATCH_ERROR_MESSAGE = 'The passwords do not match'
   const isMatchError = computed(() => {
@@ -148,7 +148,8 @@
   ])
 
   const props = defineProps({
-    resetPasswordService: { type: Function, required: true }
+    resetPasswordService: { type: Function, required: true },
+    passwordSettingService: { type: Function, required: true }
   })
 
   const validationSchema = yup.object({
@@ -185,11 +186,19 @@
       const { uidb64, token } = route.params
 
       const payload = {
-        password: values.password,
-        uidb64,
-        token
+        password: values.password
       }
-      await props.resetPasswordService(payload)
+
+      if (!token) {
+        payload.token = uidb64
+
+        await props.passwordSettingService(payload)
+      } else {
+        payload.uidb64 = uidb64
+        payload.token = token
+
+        await props.resetPasswordService(payload)
+      }
 
       isPasswordReseted.value = true
     } catch (err) {
