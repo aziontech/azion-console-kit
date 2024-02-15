@@ -44,7 +44,11 @@
     validationSchema: props.schema
   })
 
-  const { formHasUpdated, visibleOnSaved } = inject('unsaved')
+  let formHasUpdated, visibleOnSaved
+
+  if (props.isTabs) {
+    ({ formHasUpdated, visibleOnSaved } = inject('unsaved'))
+  }
 
   const isDirty = useIsFormDirty()
 
