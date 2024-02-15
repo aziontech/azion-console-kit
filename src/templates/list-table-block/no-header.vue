@@ -1,5 +1,4 @@
 <template>
-  <!-- @row-click="editItemSelected" -->
   <div>
     <div class="max-w-full mt-4">
       <DataTable
@@ -115,6 +114,7 @@
                 :popup="true"
               />
               <PrimeButton
+                v-if="hasActions"
                 v-tooltip.top="{ value: 'Actions', showDelay: 200 }"
                 size="small"
                 icon="pi pi-ellipsis-h"
@@ -267,6 +267,7 @@
   const selectedItemData = ref(null)
   const selectedColumns = ref([])
   const selectedItems = ref()
+  const menuActionsCounter = ref(0)
 
   onMounted(() => {
     loadData({ page: 1 })
@@ -285,13 +286,16 @@
   })
 
   const actionOptions = (showAuthorize) => {
-    const actionOptions = [
-      {
+    const actionOptions = []
+
+    if (props.deleteService) {
+      actionOptions.push({
         label: 'Delete',
         icon: 'pi pi-fw pi-trash',
         command: () => openDeleteDialog()
-      }
-    ]
+      })
+    }
+
     if (props.authorizeNode && showAuthorize !== 'Authorized') {
       actionOptions.push({
         label: 'Authorize',
@@ -299,8 +303,14 @@
         command: () => authorizeEdgeNode()
       })
     }
+    menuActionsCounter.value = actionOptions.length
+
     return actionOptions
   }
+
+  const hasActions = computed(() => {
+    return menuActionsCounter.value > 0
+  })
 
   const toast = useToast()
 
@@ -376,7 +386,7 @@
       toast.add({
         closable: true,
         severity: 'success',
-        summary: 'Rules Engine order saved!'
+        summary: 'Reorder saved'
       })
     } catch (error) {
       toast.add({

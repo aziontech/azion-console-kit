@@ -1,4 +1,4 @@
-import { metricsPlaygroundOpener } from '@/helpers'
+import * as Helpers from '@/helpers'
 import BeholderEventsGQL from '@/services/real-time-events-service/beholder-events'
 
 /** @type {import('vue-router').RouteRecordRaw} */
@@ -7,10 +7,10 @@ export const realTimeEventsRoutes = {
   name: 'real-time-events',
   component: () => import('@views/RealTimeEvents/EventsView.vue'),
   props: {
-    playgroundOpener: metricsPlaygroundOpener,
+    playgroundOpener: Helpers.metricsPlaygroundOpener,
     BeholderEventsGQL,
     httpRequests: {
-      documentationService: 'Helpers.documentationCatalog.edgeApplicationHTTPRequests'
+      documentationService: Helpers.documentationGuideProducts.realTimeEvents
     },
     edgeFunctions: {
       documentationService: 'Helpers.documentationCatalog.edgeApplicationHTTPRequests'
@@ -39,7 +39,7 @@ export const realTimeEventsRoutes = {
     breadCrumbs: [
       {
         label: 'Events',
-        to: '/events'
+        to: '/real-time-events'
       }
     ]
   }
