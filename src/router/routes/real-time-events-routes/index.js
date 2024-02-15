@@ -1,12 +1,14 @@
 import { metricsPlaygroundOpener } from '@/helpers'
+import BeholderEventsGQL from '@/services/real-time-events-service/beholder-events'
 
 /** @type {import('vue-router').RouteRecordRaw} */
 export const realTimeEventsRoutes = {
   path: '/real-time-events/:tab?',
   name: 'real-time-events',
-  component: () => import('@views/RealTimeEvents/TabsView.vue'),
+  component: () => import('@views/RealTimeEvents/EventsView.vue'),
   props: {
     playgroundOpener: metricsPlaygroundOpener,
+    BeholderEventsGQL,
     httpRequests: {
       documentationService: 'Helpers.documentationCatalog.edgeApplicationHTTPRequests'
     },
