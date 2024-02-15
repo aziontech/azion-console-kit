@@ -10,7 +10,7 @@
   import InfoDrawerBlock from '@/templates/info-drawer-block'
   defineOptions({ name: 'drawer-events-http-requests' })
 
-  const props = defineProps({
+  defineProps({
     loadDetails: Function
   })
 
@@ -83,10 +83,6 @@
     }
 
     return mockValues
-  }
-
-  const toggleDrawer = (isOpen) => {
-    showDrawer.value = isOpen
   }
 
   const details = ref({})

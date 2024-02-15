@@ -5,8 +5,7 @@
   import { computed, ref } from 'vue'
   // import Drawer from './Drawer'
 
-  const props = defineProps({    
-  })
+  const props = defineProps({})
 
   const hasContentToList = ref(true)
   const listTableBlockRef = ref('')
