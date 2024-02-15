@@ -8,7 +8,7 @@
   import EdgeFirewallRulesEngineListView from '@/views/EdgeFirewallRulesEngine/ListView'
   import { useToast } from 'primevue/usetoast'
 
-  import { computed, onMounted, ref } from 'vue'
+  import { computed, ref, watch, provide, reactive, onMounted } from 'vue'
   import { useRoute, useRouter } from 'vue-router'
 
   defineOptions({ name: 'tabs-edge-firewall' })
@@ -34,6 +34,9 @@
   const edgeFirewallId = ref(route.params.id)
   const edgeFirewall = ref()
 
+  const tabHasUpdate = reactive({ oldTab: null, nextTab: 0, updated: true })
+  const formHasUpdated = ref(false)
+
   const loaderEdgeFirewall = async () => {
     try {
       return await props.edgeFirewallServices.loadEdgeFirewallService({
@@ -57,17 +60,7 @@
   }
 
   const changeRouteByClickingOnTab = ({ index = 0 }) => {
-    verifyTab(edgeFirewall.value)
-    const tab = getTabFromValue(index)
-    activeTab.value = index
-    const params = {
-      id: edgeFirewallId.value,
-      tab
-    }
-    router.push({
-      name: 'edit-edge-firewall',
-      params
-    })
+    changeTab(index)
   }
 
   const verifyTab = ({ edgeFunctionsEnabled }) => {
@@ -122,6 +115,39 @@
   onMounted(() => {
     renderTabCurrentRouter()
   })
+
+  const changeTab = (index) => {
+    verifyTab(edgeFirewall.value)
+    const tab = getTabFromValue(index)
+    activeTab.value = index
+    const params = {
+      id: edgeFirewallId.value,
+      tab
+    }
+    router.push({
+      name: 'edit-edge-firewall',
+      params
+    })
+  }
+
+  const visibleOnSaved = ref(false)
+
+  provide('unsaved', {
+    changeTab,
+    tabHasUpdate,
+    formHasUpdated,
+    visibleOnSaved
+  })
+
+  watch(activeTab, (newValue, oldValue) => {
+    if (visibleOnSaved.value) {
+      return
+    } else {
+      tabHasUpdate.oldTab = oldValue
+      tabHasUpdate.nextTab = newValue
+      tabHasUpdate.updated = Math.random()
+    }
+  })
 </script>
 
 <template>
@@ -143,6 +169,7 @@
             :edgeFirewall="edgeFirewall"
             :loadDomains="props.listDomainsService"
             :updatedRedirect="edgeFirewallServices.updatedRedirect"
+            :isTab="true"
             @updatedFirewall="updatedFirewall"
           />
         </TabPanel>
