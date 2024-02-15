@@ -2,7 +2,7 @@
   import DialogUnsavedBlock from '@/templates/dialog-unsaved-block'
   import { useToast } from 'primevue/usetoast'
   import { useForm, useIsFormDirty } from 'vee-validate'
-  import { computed, ref } from 'vue'
+  import { computed, ref, watch, inject } from 'vue'
   import { useRoute, useRouter } from 'vue-router'
 
   defineOptions({ name: 'edit-form-block' })
@@ -44,9 +44,21 @@
     validationSchema: props.schema
   })
 
+  let formHasUpdated, visibleOnSaved
+
+  if (props.isTabs) {
+    ({ formHasUpdated, visibleOnSaved } = inject('unsaved'))
+  }
+
+  const isDirty = useIsFormDirty()
+
   const formHasChanges = computed(() => {
-    const isDirty = useIsFormDirty()
     return blockViewRedirection.value && isDirty.value
+  })
+
+  watch(formHasChanges, () => {
+    formHasUpdated.value = formHasChanges
+    visibleOnSaved.value = false
   })
 
   const goBackToList = () => {
@@ -115,7 +127,7 @@
     </form>
   </div>
 
-  <DialogUnsavedBlock :blockRedirectUnsaved="formHasChanges" />
+  <DialogUnsavedBlock :blockRedirectUnsaved="formHasChanges" :isTabs="isTabs" />
   <slot
     name="action-bar"
     :onSubmit="onSubmit"
