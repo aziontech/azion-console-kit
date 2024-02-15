@@ -16,7 +16,7 @@
           />
         </template>
         <p class="text-color-secondary">
-          <b class="text-color">Preview stage.</b>
+          <b class="text-color">Experimental stage.</b>
           This platform is under development. Expect occasional instability or bugs during this
           time.
           <ButtonPrime

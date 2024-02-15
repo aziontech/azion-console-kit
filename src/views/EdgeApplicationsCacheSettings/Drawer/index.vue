@@ -85,7 +85,7 @@
     sliceConfigurationEnabled: yup.boolean().required(),
     sliceConfigurationRange: yup
       .number()
-      .label('Slice Configuration Range')
+      .label('Large File Optimization Fragment Size')
       .transform((value) => (Number.isNaN(value) ? null : value))
       .when('sliceConfigurationEnabled', {
         is: false,
