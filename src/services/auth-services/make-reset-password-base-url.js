@@ -1,3 +1,3 @@
 export const makeResetPasswordBaseUrl = () => {
-  return 'password'
+  return 'v4/iam/user/password'
 }
