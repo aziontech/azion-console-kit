@@ -211,7 +211,6 @@
   import { useAccountStore } from '@/stores/account'
   import { getEnvironmentFromUrl } from '@/helpers'
 
-
   export default {
     name: 'home-view',
     components: {

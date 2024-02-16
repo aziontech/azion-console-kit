@@ -1,12 +1,12 @@
 <script setup>
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
-  import FieldText from '@/templates/form-fields-inputs/fieldText.vue'
+  import FieldDropdown from '@/templates/form-fields-inputs/fieldDropdown.vue'
   import FieldNumber from '@/templates/form-fields-inputs/fieldNumber.vue'
   import FieldSwitch from '@/templates/form-fields-inputs/fieldSwitch'
-  import FieldDropdown from '@/templates/form-fields-inputs/fieldDropdown.vue'
+  import FieldText from '@/templates/form-fields-inputs/fieldText.vue'
+  import PrimeButton from 'primevue/button'
   import Divider from 'primevue/divider'
   import PrimeMenu from 'primevue/menu'
-  import PrimeButton from 'primevue/button'
   import { useFieldArray } from 'vee-validate'
   import { computed, ref } from 'vue'
 
@@ -78,7 +78,6 @@
           { label: 'does not match', value: 'does_not_match' }
         ]
       case 'request_args':
-      case 'request_uri':
         return [
           { label: 'is equal', value: 'is_equal' },
           { label: 'is not equal', value: 'is_not_equal' },
@@ -86,6 +85,15 @@
           { label: 'does not match', value: 'does_not_match' },
           { label: 'exists', value: 'exists' },
           { label: 'does not exist', value: 'does_not_exist' }
+        ]
+      case 'request_uri':
+        return [
+          { label: 'is equal', value: 'is_equal' },
+          { label: 'is not equal', value: 'is_not_equal' },
+          { label: 'starts with', value: 'starts_with' },
+          { label: 'does not start with', value: 'does_not_starts_with' },
+          { label: 'matches', value: 'matches' },
+          { label: 'does not match', value: 'does_not_match' }
         ]
       default:
         break
