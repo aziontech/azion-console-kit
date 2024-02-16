@@ -107,7 +107,7 @@
             </div>
           </template>
           <template #body="{ data: rowData }">
-            <div class="flex justify-end">
+            <div class="flex justify-end" v-if="showActions">
               <PrimeMenu
                 ref="menu"
                 id="overlay_menu"
@@ -259,6 +259,7 @@
 
   const MINIMUN_OF_ITEMS_PER_PAGE = 10
 
+  const showActions = ref(true)
   const selectedId = ref(null)
   const filters = ref({ global: { value: '', matchMode: FilterMatchMode.CONTAINS } })
   const isLoading = ref(false)
@@ -285,13 +286,13 @@
   })
 
   const actionOptions = (showAuthorize) => {
-    const actionOptions = [
+    const actionOptions = props.deleteService? [
       {
         label: 'Delete',
         icon: 'pi pi-fw pi-trash',
         command: () => openDeleteDialog()
       }
-    ]
+    ] : []
     if (props.authorizeNode && showAuthorize !== 'Authorized') {
       actionOptions.push({
         label: 'Authorize',
@@ -299,6 +300,7 @@
         command: () => authorizeEdgeNode()
       })
     }
+    showActions.value = actionOptions.length > 0
     return actionOptions
   }
 

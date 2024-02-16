@@ -13,12 +13,20 @@ export const loadEdgeApplicationService = async ({ id }) => {
 
 const adapt = (httpResponse) => {
   const body = httpResponse.body.results
+  const httpPorts = []
+  const httpsPorts = []
+  body.http_port.forEach((port) => {
+    httpPorts.push(HTTP_PORT_LIST_OPTIONS.find((el) => el.value == port))
+  })
+  body.https_port.forEach((port) => {
+    httpsPorts.push(HTTPS_PORT_LIST_OPTIONS.find((el) => el.value == port))
+  })
   const parsedBody = {
     id: body.id,
     name: body.name,
     deliveryProtocol: body.delivery_protocol,
-    httpPort: HTTP_PORT_LIST_OPTIONS.find((el) => el.value == body.http_port[0]),
-    httpsPort: HTTPS_PORT_LIST_OPTIONS.find((el) => el.value == body.https_port[0]),
+    httpPort: httpPorts,
+    httpsPort: httpsPorts,
     minimumTlsVersion: body.minimum_tls_version,
     active: body.active,
     debugRules: body.debug_rules,
@@ -44,15 +52,15 @@ const adapt = (httpResponse) => {
 }
 
 const HTTP_PORT_LIST_OPTIONS = [
-  { label: '80 (Default)', value: '80' },
-  { label: '8008', value: '8008' },
-  { label: '8080', value: '8080' }
+  { name: '80 (Default)', value: '80' },
+  { name: '8008', value: '8008' },
+  { name: '8080', value: '8080' }
 ]
 const HTTPS_PORT_LIST_OPTIONS = [
-  { label: '443 (Default)', value: '443' },
-  { label: '8443', value: '8443' },
-  { label: '9440', value: '9440' },
-  { label: '9441', value: '9441' },
-  { label: '9442', value: '9442' },
-  { label: '9443', value: '9443' }
+  { name: '443 (Default)', value: '443' },
+  { name: '8443', value: '8443' },
+  { name: '9440', value: '9440' },
+  { name: '9441', value: '9441' },
+  { name: '9442', value: '9442' },
+  { name: '9443', value: '9443' }
 ]

@@ -6,29 +6,34 @@
       severity="info"
     />
     <PrimeTag
-      :class="tagProps?.class"
-      v-if="displayTag && variationValue"
-      :value="variationValue"
-      :icon="tagProps?.icon"
-      :severity="tagProps?.severity"
+      v-if="displayTag"
+      :class="variationProps?.class"
+      :value="variationProps.value"
+      :icon="variationProps?.icon"
+      :severity="variationProps.severity"
     />
     <PrimeSkeleton
       class="w-10 h-[26px] rounded-md"
-      v-if="displayTag && !variationValue"
+      v-if="displaySkeleton"
     />
   </div>
 </template>
 
 <script setup>
+  import { useMetricsStore } from '@/stores/metrics'
+  import { storeToRefs } from 'pinia'
   import PrimeSkeleton from 'primevue/skeleton'
   import PrimeTag from 'primevue/tag'
   import { computed } from 'vue'
 
   const props = defineProps({
-    aggregationType: { type: String, required: true },
-    displayTag: Boolean,
-    variationType: { type: String, required: true },
-    variationValue: { type: String, required: true }
+    reportId: { type: String, required: true }
+  })
+
+  const { getCurrentReportsDataById } = storeToRefs(useMetricsStore())
+
+  const report = computed(() => {
+    return getCurrentReportsDataById.value(props.reportId)
   })
 
   const aggregationTypeLabel = computed(() => {
@@ -36,42 +41,68 @@
       sum: 'Sum',
       avg: 'Average'
     }
-    return labels[props.aggregationType]
+    return labels[report.value.aggregationType]
   })
 
-  const tagProps = computed(() => {
-    const { variationType } = props
+  const displayTag = computed(() => {
+    return report.value.hasFeedbackTag && typeof Number(report.value.aggregationValue)
+  })
 
-    switch (variationType) {
-      case 'positive':
-        return {
-          severity: 'success',
-          icon: 'pi pi-arrow-up-right'
-        }
-      case 'negative':
-        return {
-          severity: 'danger',
-          icon: 'pi pi-arrow-down-left'
-        }
-      case 'positive-inverse':
-        return {
-          severity: 'danger',
-          icon: 'pi pi-arrow-up-right'
-        }
-      case 'negative-inverse':
-        return {
-          severity: 'success',
-          icon: 'pi pi-arrow-down-left'
-        }
-      case 'not-compare':
-        return {
-          severity: 'warning',
-          icon: 'pi pi-exclamation-triangle'
-        }
-      default:
-        return {
-          severity: 'info'
-        }
+  const displaySkeleton = computed(() => {
+    return report.value.hasFeedbackTag && !typeof Number(report.value.aggregationValue)
+  })
+
+  const getTagPropsByVariation = (variation) => {
+    const variations = {
+      'positive-regular': {
+        severity: 'success',
+        icon: 'pi pi-arrow-up-right'
+      },
+      'negative-regular': {
+        severity: 'danger',
+        icon: 'pi pi-arrow-down-left'
+      },
+      'positive-inverse': {
+        severity: 'danger',
+        icon: 'pi pi-arrow-up-right'
+      },
+      'negative-inverse': {
+        severity: 'success',
+        icon: 'pi pi-arrow-down-left'
+      },
+      'not-compare': {
+        severity: 'warning',
+        icon: 'pi pi-exclamation-triangle'
+      },
+      'no-variation': {
+        severity: 'info'
+      }
     }
+    return variations[variation]
+  }
+
+  const variationProps = computed(() => {
+    return tagProps(report.value)
   })
+
+  const tagProps = (report) => {
+    const { variationValue, variationType } = report
+    const upperLimit = 0.01
+    const lowerLimit = -0.01
+    const precision = 2
+
+    if (variationValue > lowerLimit && variationValue < upperLimit) {
+      return {
+        ...getTagPropsByVariation('not-compare'),
+        value: "Can't compare"
+      }
+    }
+
+    const variationSatate = variationValue > upperLimit ? 'positive' : 'negative'
+
+    return {
+      ...getTagPropsByVariation(`${variationSatate}-${variationType}`),
+      value: `${variationValue.toFixed(precision)}%`
+    }
+  }
 </script>

@@ -1,5 +1,5 @@
 <script setup>
-  import { computed, ref } from 'vue'
+  import { computed, ref, watch, inject } from 'vue'
   import PrimeDialog from 'primevue/dialog'
   import PrimeButton from 'primevue/button'
   import { onBeforeRouteLeave, useRouter } from 'vue-router'
@@ -14,13 +14,24 @@
     },
     blockRedirectUnsaved: {
       type: Boolean
+    },
+    isTabs: {
+      type: Boolean,
+      default: false
     }
   })
 
   const router = useRouter()
+  const currentRouter = router.currentRoute.value.name
   const showDialog = ref(props.visible)
-  const redirectToUnsaved = ref('home')
+  const redirectToUnsaved = ref(currentRouter)
   const unsavedDisabled = ref(false)
+
+  let changeTab, tabHasUpdate, formHasUpdated, visibleOnSaved
+
+  if (props.isTabs) {
+    ({ changeTab, tabHasUpdate, formHasUpdated, visibleOnSaved } = inject('unsaved'))
+  }
 
   const visibleDialog = computed({
     get: () => showDialog.value,
@@ -35,18 +46,25 @@
   }
 
   const onLeavePage = () => {
-    unsavedDisabled.value = true
-    openDialogUnsaved(false)
-    if (!redirectToUnsaved.value) {
-      router.go(-1)
-      return
+    if (props.isTabs && (redirectToUnsaved.value === currentRouter)) {
+      visibleOnSaved.value = true
+      changeTab(tabHasUpdate.nextTab)
+      openDialogUnsaved(false)
+    } else {
+      unsavedDisabled.value = true
+      openDialogUnsaved(false)
+      if (!redirectToUnsaved.value) {
+        router.go(-1)
+        return
+      }
+  
+      router.push({ name: redirectToUnsaved.value })
     }
-
-    router.push({ name: redirectToUnsaved.value })
   }
 
   const onKeepEditing = () => {
     openDialogUnsaved(false)
+    visibleOnSaved.value = false
   }
 
   onBeforeRouteLeave((to, from, next) => {
@@ -56,6 +74,14 @@
       return next(false)
     }
     return next()
+  })
+
+  watch(tabHasUpdate, () => {
+    if (formHasUpdated.value) {
+      visibleOnSaved.value = true
+      openDialogUnsaved(true)
+      changeTab(tabHasUpdate.oldTab)
+    }
   })
 </script>
 

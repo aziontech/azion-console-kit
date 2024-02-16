@@ -6,11 +6,12 @@ export const passwordRoutes = {
   name: 'new-password',
   children: [
     {
-      path: 'new/:uidb64/:token',
+      path: 'new/:uidb64/:token?',
       name: 'reset-password',
       component: () => import('@views/NewPassword/NewPasswordView.vue'),
       props: {
-        resetPasswordService: AuthServices.resetPasswordService
+        resetPasswordService: AuthServices.resetPasswordService,
+        passwordSettingService: AuthServices.passwordSettingService
       },
       meta: {
         isPublic: true,
