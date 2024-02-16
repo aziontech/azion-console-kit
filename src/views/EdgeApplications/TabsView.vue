@@ -10,7 +10,7 @@
   import TabPanel from 'primevue/tabpanel'
   import TabView from 'primevue/tabview'
   import { useToast } from 'primevue/usetoast'
-  import { computed, ref } from 'vue'
+  import { computed, ref, reactive, provide, watch } from 'vue'
   import { useRoute, useRouter } from 'vue-router'
   import EditView from './EditView.vue'
 
@@ -45,6 +45,9 @@
   const activeTab = ref(0)
   const edgeApplicationId = ref(route.params.id)
   const edgeApplication = ref()
+
+  const tabHasUpdate = reactive({ oldTab: null, nextTab: 0, updated: true })
+  const formHasUpdated = ref(false)
 
   const showMainSettings = computed(() => {
     return activeTab.value === mapTabs.value?.mainSettings
@@ -95,20 +98,6 @@
     return selectedTab
   }
 
-  const changeRouteByClickingOnTab = ({ index = 0 }) => {
-    verifyTab(edgeApplication.value)
-    const tab = getTabFromValue(index)
-    activeTab.value = index
-    const params = {
-      id: edgeApplicationId.value,
-      tab
-    }
-    router.push({
-      name: 'edit-edge-application',
-      params
-    })
-  }
-
   const verifyTab = ({ edgeFunctions }) => {
     if (!edgeFunctions) {
       delete mapTabs.value.functions
@@ -154,6 +143,43 @@
     verifyTab(edgeApplication.value)
   }
 
+  const changeRouteByClickingOnTab = ({ index = 0 }) => {
+    changeTab(index)
+  }
+
+  const changeTab = (index) => {
+    verifyTab(edgeApplication.value)
+    const tab = getTabFromValue(index)
+    activeTab.value = index
+    const params = {
+      id: edgeApplicationId.value,
+      tab
+    }
+    router.push({
+      name: 'edit-edge-application',
+      params
+    })
+  }
+
+  const visibleOnSaved = ref(false)
+
+  provide('unsaved', {
+    changeTab,
+    tabHasUpdate,
+    formHasUpdated,
+    visibleOnSaved
+  })
+
+  watch(activeTab, (newValue, oldValue) => {
+    if (visibleOnSaved.value) {
+      return
+    } else {
+      tabHasUpdate.oldTab = oldValue
+      tabHasUpdate.nextTab = newValue
+      tabHasUpdate.updated = Math.random()
+    }
+  })
+
   renderTabCurrentRouter()
 </script>
 
@@ -175,6 +201,7 @@
             :editEdgeApplicationService="edgeApplicationServices.editEdgeApplication"
             :edgeApplication="edgeApplication"
             :updatedRedirect="edgeApplicationServices.updatedRedirect"
+            :isTab="true"
             @updatedApplication="updatedApplication"
             :contactSalesEdgeApplicationService="
               edgeApplicationServices.contactSalesEdgeApplicationService

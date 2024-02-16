@@ -55,7 +55,7 @@
     deliveryProtocol: 'http',
     http3: false,
     httpPort: [{ name: '80 (Default)', value: '80' }],
-    httpsPort: [{ name: '8008', value: '8008' }],
+    httpsPort: [{ name: '443 (Default)', value: '443' }],
     minimumTlsVersion: { label: 'None', value: '' },
     supportedVersion: { label: 'All', value: 'all' },
     originType: { label: 'Single Origin', value: 'single_origin' },
