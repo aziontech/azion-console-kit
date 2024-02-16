@@ -28,7 +28,7 @@
   />
   <label
     :for="inputName"
-    class="flex flex-col items-start gap-1"
+    class="flex flex-col text-sm items-start gap-1"
   >
     <span class="text-color text-sm font-normal leading-5">{{ props.label }} </span>
     <span
