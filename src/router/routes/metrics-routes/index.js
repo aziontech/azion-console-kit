@@ -13,7 +13,7 @@ export const metricsRoutes = {
     breadCrumbs: [
       {
         label: 'Metrics',
-        to: '/metrics'
+        to: '/real-time-metrics'
       }
     ]
   }
