@@ -1,10 +1,10 @@
-import { AxiosHttpClientAdapter } from '../axios/AxiosHttpClientAdapter'
-import { makeResetPasswordBaseUrl } from './make-reset-password-base-url'
 import * as Errors from '@/services/axios/errors'
+import { AxiosHttpClientAdapter } from '../axios/AxiosHttpClientAdapter'
+import { makePasswordSettingServiceBaseUrl } from './make-password-setting-service-base-url'
 
 export const sendResetPasswordEmailService = async (payload) => {
   let httpResponse = await AxiosHttpClientAdapter.request({
-    url: `${makeResetPasswordBaseUrl()}/request`,
+    url: `${makePasswordSettingServiceBaseUrl()}/request`,
     method: 'POST',
     body: payload
   })
@@ -20,7 +20,7 @@ export const sendResetPasswordEmailService = async (payload) => {
  */
 const parseHttpResponse = (httpResponse) => {
   switch (httpResponse.statusCode) {
-    case 201:
+    case 200:
       return 'Email sent successfully'
     case 400:
       return 'Error sending email'
