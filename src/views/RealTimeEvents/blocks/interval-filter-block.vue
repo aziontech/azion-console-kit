@@ -4,6 +4,7 @@
   import Calendar from 'primevue/calendar'
   import Dropdown from 'primevue/dropdown'
   import { computed, onMounted, ref } from 'vue'
+  import DATE_TIME_INTERVALS from '@/stores/metrics-store/constants/date-time-interval'
 
   const accountStore = useAccountStore()
 
@@ -16,12 +17,10 @@
     filterDate: {
       type: Object,
       required: true
-    },
-    intervalOptions: {
-      type: Object,
-      required: true
     }
   })
+
+  const intervalOptions = DATE_TIME_INTERVALS
 
   const setTimeRange = computed({
     get: () => props.filterDate.value,
@@ -55,7 +54,7 @@
   })
 
   const setInitialValues = () => {
-    interval.value = props.intervalOptions[0]
+    interval.value = intervalOptions[0]
     const [begin, end] = removeAmountOfHours(interval.value?.code)
     dates.value = [begin, end]
     setDateTimeFilters(begin, end)

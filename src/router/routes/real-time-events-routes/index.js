@@ -1,37 +1,52 @@
 import * as Helpers from '@/helpers'
-import BeholderEventsGQL from '@/services/real-time-events-service/beholder-events'
+import * as RealTimeEventsService from '@/services/real-time-events-service'
 
 /** @type {import('vue-router').RouteRecordRaw} */
 export const realTimeEventsRoutes = {
   path: '/real-time-events/:tab?',
   name: 'real-time-events',
-  component: () => import('@views/RealTimeEvents/EventsView.vue'),
+  component: () => import('@/views/RealTimeEvents/TabsView.vue'),
   props: {
     playgroundOpener: Helpers.metricsPlaygroundOpener,
-    BeholderEventsGQL,
     httpRequests: {
+      listHttpRequest: RealTimeEventsService.listHttpRequest,
+      loadHttpRequest: RealTimeEventsService.loadHttpRequest,
       documentationService: Helpers.documentationGuideProducts.realTimeEvents
     },
     edgeFunctions: {
-      documentationService: 'Helpers.documentationCatalog.edgeApplicationHTTPRequests'
+      listEdgeFunction: RealTimeEventsService.listEdgeFunction,
+      loadEdgeFunction: RealTimeEventsService.loadEdgeFunction,
+      documentationService: Helpers.documentationGuideProducts.realTimeEvents
     },
     edgeFunctionsConsole: {
-      documentationService: 'Helpers.documentationCatalog.edgeApplicationHTTPRequests'
+      listEdgeFunction: RealTimeEventsService.listEdgeFunction,
+      loadEdgeFunction: RealTimeEventsService.loadEdgeFunction,
+      documentationService: Helpers.documentationGuideProducts.realTimeEvents
     },
     imageProcessor: {
-      documentationService: 'Helpers.documentationCatalog.edgeApplicationHTTPRequests'
+      listImageProcessor: RealTimeEventsService.listImageProcessor,
+      loadImageProcessor: RealTimeEventsService.loadImageProcessor,
+      documentationService: Helpers.documentationGuideProducts.realTimeEvents
     },
     l2Cache: {
-      documentationService: 'Helpers.documentationCatalog.edgeApplicationHTTPRequests'
+      listL2Cache: RealTimeEventsService.listL2Cache,
+      loadL2Cache: RealTimeEventsService.loadL2Cache,
+      documentationService: Helpers.documentationGuideProducts.realTimeEvents
     },
     intelligentDNS: {
-      documentationService: 'Helpers.documentationCatalog.edgeApplicationHTTPRequests'
+      listIntelligentDns: RealTimeEventsService.listIntelligentDns,
+      loadIntelligentDns: RealTimeEventsService.loadIntelligentDns,
+      documentationService: Helpers.documentationGuideProducts.realTimeEvents
     },
     dataStreaming: {
-      documentationService: 'Helpers.documentationCatalog.edgeApplicationHTTPRequests'
+      listDataStreamed: RealTimeEventsService.listDataStreamed,
+      loadDataStreamed: RealTimeEventsService.loadDataStreamed,
+      documentationService: Helpers.documentationGuideProducts.realTimeEvents
     },
     activityHistory: {
-      documentationService: 'Helpers.documentationCatalog.edgeApplicationHTTPRequests'
+      listActivityHistory: RealTimeEventsService.listActivityHistory,
+      loadActivityHistory: RealTimeEventsService.loadActivityHistory,
+      documentationService: Helpers.documentationGuideProducts.realTimeEvents
     },
     clipboardWrite: 'Helpers.clipboardWrite'
   },

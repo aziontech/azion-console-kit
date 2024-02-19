@@ -1,97 +1,30 @@
 <script setup>
-  import { ref, onMounted } from 'vue'
-
+  import { ref } from 'vue'
   import InfoSection from '@/templates/info-drawer-block/info-section'
   import TextInfo from '@/templates/info-drawer-block/info-labels/text-info.vue'
   import BigNumber from '@/templates/info-drawer-block/info-labels/big-number.vue'
-
   import PrimeButton from 'primevue/button'
   import Divider from 'primevue/divider'
   import InfoDrawerBlock from '@/templates/info-drawer-block'
   defineOptions({ name: 'drawer-events-http-requests' })
 
+  const details = ref({})
   const props = defineProps({
-    loadDetails: Function
+    loadService: {
+      type: Function,
+      required: true
+    }
   })
 
-  const getCurrentDate = () => {
-    const date = new Date()
-    const options = {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit',
-      hour12: true
-    }
-    return date.toLocaleString('en-US', options)
+  const showDrawer = ref(false)
+
+  const openDetailDrawer = async (item) => {
+    showDrawer.value = true
+    details.value = await props.loadService(item)
   }
 
-  const showDrawer = ref(true)
-
-  const loadMockedDetails = () => {
-    const mockValues = {
-      path: 'http://example.com.br',
-      date: getCurrentDate(),
-      wafScore: 'Traversal',
-      scheme: 'HTTP',
-      upstreamCacheStatus: 'Revalidated',
-      httpUserAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)',
-      host: 'g1sdetynmxe0ao.map.azionedge.net',
-      virtualHostId: '2410001a',
-      remoteAddress: '127.0.0.1',
-      remotePort: '8080',
-      configurationId: '1595368520',
-      source: 'edg-fln-ggn001p',
-      requestTime: '1.19',
-      requestLength: '72052',
-      tcpInfoRtt: '72052',
-      bytesSent: '199',
-      sentHttpXOriginalImageSize: '987390',
-      sentHttpContentType: 'text/html; charset=UTF-8',
-      sslCipher: 'TLS_AES_256_GCM_SHA384',
-      sslServerName: 'a-static.mlcdn.com.br',
-      sslProtocol: 'TLS v1.2',
-      sslSessionReused: 'r',
-      requestId: '5f222ae5938482c32a822dbf15e19f0f',
-      requestMethod: 'GET',
-      requestUri: '/v1?v=bo%20dim',
-      proxyStatus: '520',
-      statusCode: '200',
-      wafTotalProcessed: '5',
-      wafTotalBlocked: '3',
-      wafBlock: '0',
-      wafLearning: '4',
-      debugLog: '{"edge_firewall":["Global - Set WAF"]}',
-      sessionId: 'f41eabd4-c172-43e4-ac21-d9f5fc427128',
-      stackTrace:
-        '{"edge_application_request":["Default Rule","Set Cache - Manifest m3u8"],"edge_application_response":["CORs","Version","Filter Http","Remove Header Server"]}',
-      wfMatch: '0:1402:HEADERS:cookie',
-      geolocAsn: 'AS52580 Azion Technologies Ltda.',
-      geolocCountryName: 'United States',
-      geolocRegionName: 'California',
-      streamName: 'gaucha_rbs.sdp',
-      serverAddr: '192.158.1.38',
-      serverPort: '443',
-      upstreamConnectTime: '0.123',
-      upstreamBytesSent: '1234',
-      upstreamHeaderTime: '0.444',
-      upstreamResponseTime: '0.321',
-      upstreamBytesReceived: '2374',
-      upstreamAddr: '192.168.1.10',
-      upstreamStatus: '200'
-    }
-
-    return mockValues
-  }
-
-  const toggleDrawer = (isOpen) => {
-    showDrawer.value = isOpen
-  }
-
-  const details = ref({})
-  onMounted(() => {
-    details.value = loadMockedDetails()
+  defineExpose({
+    openDetailDrawer
   })
 </script>
 

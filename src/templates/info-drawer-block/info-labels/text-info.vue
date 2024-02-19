@@ -4,7 +4,7 @@
     label: {
       type: String,
       required: true
-    },
+    }
   })
 
   defineExpose({ props })

@@ -27,11 +27,12 @@
   const drawerRef = ref('')
 
   const openDetailDrawer = ({ configurationId, ts }) => {
-    drawerRef.value.openDetailDrawer({
+    const filterDrawer = {
       tsRange: filterDate.value,
       configurationId,
       ts
-    })
+    }
+    drawerRef.value.openDetailDrawer(filterDrawer)
   }
 
   const handleLoadData = (event) => {
