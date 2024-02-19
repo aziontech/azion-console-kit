@@ -256,7 +256,7 @@
       },
       ...mapState(useAccountStore, { user: 'accountData', currentTheme: 'currentTheme' }),
       disclaimer() {
-        return this.user.disclaimer.replace(/\s<a[^>]+>[^<]+<\/a>./g, '.')
+        return this.user.disclaimer.replace(/\s<a[^>]+>[^<]+<\/a>/g, '')
       },
       showExperimental() {
         return this.user.disclaimer
