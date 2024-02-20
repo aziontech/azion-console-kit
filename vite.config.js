@@ -25,7 +25,7 @@ const getConfig = () => {
     },
     server: {
       proxy: {
-        '^/api/(marketplace|script-runner|template-engine)': {
+        '^/api/(marketplace|script-runner|template-engine|contract)': {
           target: `${URLStartPrefix}manager.azion.com/`,
           changeOrigin: true,
           rewrite: (path) =>
