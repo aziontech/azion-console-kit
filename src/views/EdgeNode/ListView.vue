@@ -93,7 +93,7 @@
         emptyListMessage="No Edge Node found."
       />
       <EmptyEdgeNode
-        v-if="!hasContentToList"
+        v-else
         :documentationService="props.documentationService"
       >
         <template #illustration>
