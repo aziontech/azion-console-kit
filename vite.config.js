@@ -29,7 +29,7 @@ const getConfig = () => {
           target: `${URLStartPrefix}manager.azion.com/`,
           changeOrigin: true,
           rewrite: (path) =>
-            path.replace(/^\/api\/(marketplace|script-runner|template-engine)/, '/$1/api')
+            path.replace(/^\/api\/(marketplace|script-runner|template-engine|contract)/, '/$1/api')
         },
         '/graphql/cities': {
           target: `${URLStartPrefix}cities.azion.com`,

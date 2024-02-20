@@ -36,7 +36,6 @@ import { createRouter, createWebHistory } from 'vue-router'
 
 import afterEachRoute from './hooks/afterEachRoute'
 import beforeEachRoute from './hooks/beforeEachRoute'
-import redirectToManager from './hooks/redirectToManager'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -77,7 +76,6 @@ const router = createRouter({
 })
 
 router.beforeEach(beforeEachRoute)
-router.beforeEach(redirectToManager)
 router.afterEach(afterEachRoute)
 
 export default router
