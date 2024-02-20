@@ -44,7 +44,7 @@ const adaptResponse = (response) => {
     configurationId: edgeFunctionsEvents.configurationId,
     edgeFunctionsInstanceIdList: edgeFunctionsEvents.edgeFunctionsInstanceIdList,
     edgeFunctionsInitiatorTypeList: edgeFunctionsEvents.edgeFunctionsInitiatorTypeList,
-    edgeFunctionsList: edgeFunctionsEvents.edgeFunctionsList,
+    edgeFunctionsList: edgeFunctionsEvents.edgeFunctionsList.split(';'),
     edgeFunctionsSolutionId: edgeFunctionsEvents.edgeFunctionsSolutionId,
     edgeFunctionsTime: edgeFunctionsEvents.edgeFunctionsTime,
     functionLanguage: edgeFunctionsEvents.functionLanguage,
