@@ -201,15 +201,15 @@
 </template>
 
 <script>
+  import { getEnvironmentFromUrl } from '@/helpers'
+  import { useAccountStore } from '@/stores/account'
+  import { useCreateModalStore } from '@/stores/create-modal'
+  import ContentBlock from '@/templates/content-block'
+  import { mapState } from 'pinia'
   import PrimeButton from 'primevue/button'
   import { useForm } from 'vee-validate'
   import * as yup from 'yup'
-  import ContentBlock from '@/templates/content-block'
   import FormFieldsHome from './FormFields/FormFieldsHome.vue'
-  import { useCreateModalStore } from '@/stores/create-modal'
-  import { mapState } from 'pinia'
-  import { useAccountStore } from '@/stores/account'
-  import { getEnvironmentFromUrl } from '@/helpers'
 
   export default {
     name: 'home-view',
@@ -256,7 +256,7 @@
       },
       ...mapState(useAccountStore, { user: 'accountData', currentTheme: 'currentTheme' }),
       disclaimer() {
-        return this.user.disclaimer.replace(/<a[^>]+>[^<]+<\/a>/g, '')
+        return this.user.disclaimer.replace(/\s<a[^>]+>[^<]+<\/a>/g, '')
       },
       showExperimental() {
         return this.user.disclaimer

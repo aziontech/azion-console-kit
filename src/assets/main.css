@@ -16,6 +16,12 @@ body.p-overflow-hidden {
   --scrollbar-width: 0px !important;
 }
 
+/* https://aziontech.atlassian.net/browse/UXE-1798 */
+/* child scroll behaviour is affecting the parent scroll behaviour */
+* {
+  overscroll-behavior: contain !important;
+}
+
 #app {
   font-family: var(--font-family);
   text-rendering: optimizeLegibility;
