@@ -13,16 +13,16 @@
           <RealTimeEventsHTTPRequestsListView v-bind="props.httpRequests" />
         </TabPanel>
         <TabPanel :header="mapTabs.EdgeFunctions.label">
-          <RealTimeEventEdgeFunctionsListView
-            v-bind="props.edgeFunctions"
-          ></RealTimeEventEdgeFunctionsListView>
+          <RealTimeEventEdgeFunctionsListView v-bind="props.edgeFunctions" />
         </TabPanel>
         <TabPanel :header="mapTabs.EdgeFunctionsConsole.label"> </TabPanel>
         <TabPanel :header="mapTabs.ImageProcessor.label"> </TabPanel>
         <TabPanel :header="mapTabs.L2Cache.label"> </TabPanel>
         <TabPanel :header="mapTabs.IntelligentDNS.label"> </TabPanel>
         <TabPanel :header="mapTabs.DataStreaming.label"> </TabPanel>
-        <TabPanel :header="mapTabs.ActivityHistory.label"> </TabPanel>
+        <TabPanel :header="mapTabs.ActivityHistory.label">
+          <RealTimeEventsActivityHistoryListView v-bind="props.activityHistory" />
+        </TabPanel>
       </TabView>
     </template>
   </ContentBlock>
@@ -37,6 +37,7 @@
   import TabView from 'primevue/tabview'
   import RealTimeEventsHTTPRequestsListView from '@/views/RealTimeEventsHTTPRequests/ListView'
   import RealTimeEventEdgeFunctionsListView from '@/views/RealTimeEventsEdgeFunctions/ListView'
+  import RealTimeEventsActivityHistoryListView from '@/views/RealTimeEventsActivityHistory/ListView'
   defineOptions({ name: 'RealTimeEventsTabsView' })
 
   const props = defineProps({
@@ -45,6 +46,10 @@
       required: true
     },
     edgeFunctions: {
+      type: Object,
+      required: true
+    },
+    activityHistory: {
       type: Object,
       required: true
     }
