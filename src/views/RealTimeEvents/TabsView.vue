@@ -15,7 +15,9 @@
         <TabPanel :header="mapTabs.EdgeFunctions.label">
           <RealTimeEventEdgeFunctionsListView v-bind="props.edgeFunctions" />
         </TabPanel>
-        <TabPanel :header="mapTabs.EdgeFunctionsConsole.label"> </TabPanel>
+        <TabPanel :header="mapTabs.EdgeFunctionsConsole.label">
+          <RealTimeEventEdgeFunctionsConsoleListView v-bind="props.edgeFunctionsConsole" />
+        </TabPanel>
         <TabPanel :header="mapTabs.ImageProcessor.label"> </TabPanel>
         <TabPanel :header="mapTabs.L2Cache.label"> </TabPanel>
         <TabPanel :header="mapTabs.IntelligentDNS.label">
@@ -41,6 +43,7 @@
   import TabView from 'primevue/tabview'
   import RealTimeEventsHTTPRequestsListView from '@/views/RealTimeEventsHTTPRequests/ListView'
   import RealTimeEventEdgeFunctionsListView from '@/views/RealTimeEventsEdgeFunctions/ListView'
+  import RealTimeEventEdgeFunctionsConsoleListView from '@/views/RealTimeEventsEdgeFunctionsConsole/ListView'
   import RealTimeEventsDataStreamingListView from '@/views/RealTimeEventsDataStreaming/ListView'
   import RealTimeEventsActivityHistoryListView from '@/views/RealTimeEventsActivityHistory/ListView'
   import RealTimeEventsIntelligentDNSListView from '@/views/RealTimeEventsIntelligentDNS/ListView'

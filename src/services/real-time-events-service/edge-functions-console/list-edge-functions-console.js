@@ -38,6 +38,44 @@ const adapt = (filter) => {
   return convertGQL(filter, table)
 }
 
+const checkLevel = (level) => {
+  if (level === 'DEBUG') {
+    return {
+      content: 'Debug',
+      severity: 'success',
+      icon: 'pi pi-check-circle'
+    }
+  }
+  if (level === 'ERROR') {
+    return {
+      content: 'Error',
+      severity: 'danger',
+      icon: 'pi pi-times-circle'
+    }
+  }
+  if (level === 'WARN') {
+    return {
+      content: 'Warning',
+      severity: 'warning',
+      icon: 'pi pi-exclamation-triangle'
+    }
+  }
+
+  if (level === 'INFO') {
+    return {
+      content: 'Info',
+      severity: 'secondary',
+      icon: 'pi pi-info-circle'
+    }
+  }
+
+  return {
+    content: level,
+    severity: 'secondary',
+    icon: 'pi pi-code'
+  }
+}
+
 const adaptResponse = (response) => {
   const { body } = response
 
@@ -45,9 +83,12 @@ const adaptResponse = (response) => {
     configurationId: cellsConsoleEvents.configurationId,
     functionId: cellsConsoleEvents.functionId,
     id: cellsConsoleEvents.id,
-    level: cellsConsoleEvents.level,
+    level: checkLevel(cellsConsoleEvents.level),
     line: cellsConsoleEvents.line,
-    lineSource: cellsConsoleEvents.lineSource,
+    lineSource: {
+      content: cellsConsoleEvents.lineSource,
+      severity: 'secondary'
+    },
     solutionId: cellsConsoleEvents.solutionId,
     source: cellsConsoleEvents.source,
     ts: cellsConsoleEvents.ts

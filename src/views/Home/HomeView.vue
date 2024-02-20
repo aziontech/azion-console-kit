@@ -211,7 +211,6 @@
   import * as yup from 'yup'
   import FormFieldsHome from './FormFields/FormFieldsHome.vue'
 
-
   export default {
     name: 'home-view',
     components: {
