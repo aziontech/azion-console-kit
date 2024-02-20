@@ -1,10 +1,11 @@
 <script setup>
-  import { computed, onBeforeMount, ref } from 'vue'
-  import { useForm } from 'vee-validate'
+  import { computed, onBeforeMount, ref, provide } from 'vue'
+  import { useForm, useIsFormDirty } from 'vee-validate'
   import { useToast } from 'primevue/usetoast'
   import ActionBarBlock from '@/templates/action-bar-block'
   import GoBack from '@/templates/action-bar-block/go-back'
   import Sidebar from 'primevue/sidebar'
+  import DialogUnsavedBlock from '@/templates/dialog-unsaved-block'
 
   defineOptions({
     name: 'edit-drawer-block'
@@ -46,13 +47,17 @@
     }
   })
 
-  const toast = useToast()
   const { meta, resetForm, isSubmitting, handleSubmit } = useForm({
     validationSchema: props.schema,
     initialValues: props.initialValues
   })
+
+  const toast = useToast()
+  const blockViewRedirection = ref(true)
+  const formDrawerHasUpdated = ref(null)
   const loading = ref(false)
   const showGoBack = ref(false)
+
   const disableEdit = computed(() => {
     return !meta.value.valid || loading.value || isSubmitting.value
   })
@@ -64,10 +69,24 @@
   const visibleDrawer = computed({
     get: () => props.visible,
     set: (value) => {
-      resetForm()
-      emit('update:visible', value)
+      if (formHasChanges.value) {
+        formDrawerHasUpdated.value = Math.random()
+        changeVisisbleDrawer(!value, false)
+        return
+      }
+      changeVisisbleDrawer(value, true)
     }
   })
+
+  const formHasChanges = computed(() => {
+    const isDirty = useIsFormDirty()
+    return blockViewRedirection.value && isDirty.value
+  })
+
+  const changeVisisbleDrawer = (isVisible, isResetForm) => {
+    emit('update:visible', isVisible)
+    if (isResetForm) resetForm()
+  }
 
   const toggleDrawerVisibility = (isVisible) => {
     visibleDrawer.value = isVisible
@@ -103,13 +122,18 @@
   const onSubmit = handleSubmit(async (values, formContext) => {
     try {
       const feedback = await props.editService(values)
+      blockViewRedirection.value = false
       emit('onSuccess', feedback)
       showToast('success', feedback)
       showGoBack.value = props.showBarGoBack
-      if (showGoBack.value) return
+      if (showGoBack.value) {
+        blockViewRedirection.value = false
+        return
+      }
       formContext.resetForm()
       toggleDrawerVisibility(false)
     } catch (error) {
+      blockViewRedirection.value = true
       emit('onError', error)
       showToast('error', error)
     }
@@ -122,6 +146,11 @@
 
   onBeforeMount(async () => {
     await loadInitialData()
+  })
+
+  provide('drawerUnsaved', {
+    changeVisisbleDrawer,
+    formDrawerHasUpdated
   })
 </script>
 
@@ -167,4 +196,5 @@
       />
     </div>
   </Sidebar>
+  <DialogUnsavedBlock :blockRedirectUnsaved="formHasChanges" :isDrawer="true" />
 </template>

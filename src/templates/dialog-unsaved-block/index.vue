@@ -18,6 +18,10 @@
     isTabs: {
       type: Boolean,
       default: false
+    },
+    isDrawer: {
+      type: Boolean,
+      default: false
     }
   })
 
@@ -38,6 +42,15 @@
     visibleOnSaved = unsavedStatus.visibleOnSaved
   }
 
+  let changeVisisbleDrawer, formDrawerHasUpdated
+
+  if (props.isDrawer) {
+    const unsavedStatus = inject('drawerUnsaved')
+
+    changeVisisbleDrawer = unsavedStatus.changeVisisbleDrawer
+    formDrawerHasUpdated = unsavedStatus.formDrawerHasUpdated
+  }
+
   const visibleDialog = computed({
     get: () => showDialog.value,
     set: (value) => {
@@ -55,6 +68,11 @@
       visibleOnSaved.value = true
       changeTab(tabHasUpdate.nextTab)
       openDialogUnsaved(false)
+    } else if (props.isDrawer) {
+      const toKeepDisplayingDrawer = false
+      const resetForm = true
+      changeVisisbleDrawer(toKeepDisplayingDrawer, resetForm)
+      openDialogUnsaved(false)
     } else {
       unsavedDisabled.value = true
       openDialogUnsaved(false)
@@ -69,7 +87,7 @@
 
   const onKeepEditing = () => {
     openDialogUnsaved(false)
-    visibleOnSaved.value = false
+    if (props.isTabs) visibleOnSaved.value = false
   }
 
   onBeforeRouteLeave((to, from, next) => {
@@ -87,6 +105,10 @@
       openDialogUnsaved(true)
       changeTab(tabHasUpdate.oldTab)
     }
+  })
+
+  watch(formDrawerHasUpdated, () => {
+    openDialogUnsaved(true)
   })
 </script>
 
