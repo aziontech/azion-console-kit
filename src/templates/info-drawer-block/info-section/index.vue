@@ -33,7 +33,7 @@
     class="flex max-w-screen-2xl mx-auto gap-4 w-full surface-section rounded-md border surface-border p-3 sm:p-8 flex-wrap min-w-[2rem]"
   >
     <div class="whitespace-nowrap flex-col justify-center items-start gap-3 flex">
-      <h2 class="text-color text-xl font-medium flex gap-2">
+      <h2 class="text-color text-xl font-medium flex flex-wrap gap-2">
         {{ props.title }}
         <Tag
           v-if="props.tagText"
