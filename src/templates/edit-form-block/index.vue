@@ -47,7 +47,9 @@
   let formHasUpdated, visibleOnSaved
 
   if (props.isTabs) {
-    ({ formHasUpdated, visibleOnSaved } = inject('unsaved'))
+    const unsavedStatus = inject('unsaved')
+    formHasUpdated = unsavedStatus.formHasUpdated
+    visibleOnSaved = unsavedStatus.visibleOnSaved
   }
 
   const isDirty = useIsFormDirty()
@@ -127,7 +129,10 @@
     </form>
   </div>
 
-  <DialogUnsavedBlock :blockRedirectUnsaved="formHasChanges" :isTabs="isTabs" />
+  <DialogUnsavedBlock
+    :blockRedirectUnsaved="formHasChanges"
+    :isTabs="isTabs"
+  />
   <slot
     name="action-bar"
     :onSubmit="onSubmit"

@@ -107,7 +107,10 @@
             </div>
           </template>
           <template #body="{ data: rowData }">
-            <div class="flex justify-end" v-if="showActions">
+            <div
+              class="flex justify-end"
+              v-if="showActions"
+            >
               <PrimeMenu
                 ref="menu"
                 id="overlay_menu"
@@ -286,13 +289,15 @@
   })
 
   const actionOptions = (showAuthorize) => {
-    const actionOptions = props.deleteService? [
-      {
-        label: 'Delete',
-        icon: 'pi pi-fw pi-trash',
-        command: () => openDeleteDialog()
-      }
-    ] : []
+    const actionOptions = props.deleteService
+      ? [
+          {
+            label: 'Delete',
+            icon: 'pi pi-fw pi-trash',
+            command: () => openDeleteDialog()
+          }
+        ]
+      : []
     if (props.authorizeNode && showAuthorize !== 'Authorized') {
       actionOptions.push({
         label: 'Authorize',
