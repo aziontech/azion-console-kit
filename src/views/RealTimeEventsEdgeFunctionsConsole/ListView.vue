@@ -76,7 +76,7 @@
         type: 'component',
         component: (columnData) =>
           columnBuilder({ data: columnData, columnAppearance: 'expand-text-column' })
-        },
+      },
       {
         field: 'lineSource',
         header: 'Line Source',

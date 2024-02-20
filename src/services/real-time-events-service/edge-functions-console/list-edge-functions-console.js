@@ -39,21 +39,21 @@ const adapt = (filter) => {
 }
 
 const checkLevel = (level) => {
-  if(level === 'DEBUG') {
+  if (level === 'DEBUG') {
     return {
       content: 'Debug',
       severity: 'success',
       icon: 'pi pi-check-circle'
     }
   }
-  if(level === 'ERROR') {
+  if (level === 'ERROR') {
     return {
-        content: 'Error',
-        severity: 'danger',
-        icon: 'pi pi-times-circle'
-      }
+      content: 'Error',
+      severity: 'danger',
+      icon: 'pi pi-times-circle'
+    }
   }
-  if(level === 'WARN') {
+  if (level === 'WARN') {
     return {
       content: 'Warning',
       severity: 'warning',
@@ -61,9 +61,9 @@ const checkLevel = (level) => {
     }
   }
 
-  if(level === 'INFO') {
+  if (level === 'INFO') {
     return {
-      content: 'Info', 
+      content: 'Info',
       severity: 'secondary',
       icon: 'pi pi-info-circle'
     }
@@ -87,7 +87,7 @@ const adaptResponse = (response) => {
     line: cellsConsoleEvents.line,
     lineSource: {
       content: cellsConsoleEvents.lineSource,
-      severity: 'secondary' 
+      severity: 'secondary'
     },
     solutionId: cellsConsoleEvents.solutionId,
     source: cellsConsoleEvents.source,
