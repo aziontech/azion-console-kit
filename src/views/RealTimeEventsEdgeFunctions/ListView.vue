@@ -75,7 +75,7 @@
       {
         field: 'functionLanguage',
         header: 'Function Language'
-      },
+      }
     ]
   })
 </script>

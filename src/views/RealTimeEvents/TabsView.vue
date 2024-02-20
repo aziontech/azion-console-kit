@@ -13,7 +13,9 @@
           <RealTimeEventsHTTPRequestsListView v-bind="props.httpRequests" />
         </TabPanel>
         <TabPanel :header="mapTabs.EdgeFunctions.label">
-          <RealTimeEventEdgeFunctionsListView v-bind="props.edgeFunctions"></RealTimeEventEdgeFunctionsListView>
+          <RealTimeEventEdgeFunctionsListView
+            v-bind="props.edgeFunctions"
+          ></RealTimeEventEdgeFunctionsListView>
         </TabPanel>
         <TabPanel :header="mapTabs.EdgeFunctionsConsole.label"> </TabPanel>
         <TabPanel :header="mapTabs.ImageProcessor.label"> </TabPanel>
