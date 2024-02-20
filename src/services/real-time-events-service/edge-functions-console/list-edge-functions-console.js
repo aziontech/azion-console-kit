@@ -38,39 +38,34 @@ const adapt = (filter) => {
   return convertGQL(filter, table)
 }
 
-const checkLevel = (level) => {
-  if (level === 'DEBUG') {
-    return {
-      content: 'Debug',
-      severity: 'success',
-      icon: 'pi pi-check-circle'
-    }
-  }
-  if (level === 'ERROR') {
-    return {
-      content: 'Error',
-      severity: 'danger',
-      icon: 'pi pi-times-circle'
-    }
-  }
-  if (level === 'WARN') {
-    return {
-      content: 'Warning',
-      severity: 'warning',
-      icon: 'pi pi-exclamation-triangle'
-    }
-  }
-
-  if (level === 'INFO') {
-    return {
-      content: 'Info',
-      severity: 'secondary',
-      icon: 'pi pi-info-circle'
-    }
-  }
-
-  return {
-    content: level,
+const levelMap = {
+  DEBUG: {
+    content: 'Debug',
+    severity: 'success',
+    icon: 'pi pi-check-circle'
+  },
+  ERROR: {
+    content: 'Error',
+    severity: 'danger',
+    icon: 'pi pi-times-circle'
+  },
+  WARN: {
+    content: 'Warning',
+    severity: 'warning',
+    icon: 'pi pi-exclamation-triangle'
+  },
+  INFO: {
+    content: 'Info',
+    severity: 'secondary',
+    icon: 'pi pi-info-circle'
+  },
+  LOG: {
+    content: 'Log',
+    severity: 'secondary',
+    icon: 'pi pi-code'
+  },
+  MDN: {
+    content: 'MDN',
     severity: 'secondary',
     icon: 'pi pi-code'
   }
@@ -83,7 +78,7 @@ const adaptResponse = (response) => {
     configurationId: cellsConsoleEvents.configurationId,
     functionId: cellsConsoleEvents.functionId,
     id: cellsConsoleEvents.id,
-    level: checkLevel(cellsConsoleEvents.level),
+    level: levelMap[cellsConsoleEvents.level],
     line: cellsConsoleEvents.line,
     lineSource: {
       content: cellsConsoleEvents.lineSource,
