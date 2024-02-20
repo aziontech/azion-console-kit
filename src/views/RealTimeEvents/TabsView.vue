@@ -19,7 +19,9 @@
         <TabPanel :header="mapTabs.ImageProcessor.label"> </TabPanel>
         <TabPanel :header="mapTabs.L2Cache.label"> </TabPanel>
         <TabPanel :header="mapTabs.IntelligentDNS.label"> </TabPanel>
-        <TabPanel :header="mapTabs.DataStreaming.label"> </TabPanel>
+        <TabPanel :header="mapTabs.DataStreaming.label">
+          <RealTimeEventsDataStreamingListView v-bind="props.dataStreaming" />
+        </TabPanel>
         <TabPanel :header="mapTabs.ActivityHistory.label">
           <RealTimeEventsActivityHistoryListView v-bind="props.activityHistory" />
         </TabPanel>
@@ -38,6 +40,7 @@
   import RealTimeEventsHTTPRequestsListView from '@/views/RealTimeEventsHTTPRequests/ListView'
   import RealTimeEventEdgeFunctionsListView from '@/views/RealTimeEventsEdgeFunctions/ListView'
   import RealTimeEventsActivityHistoryListView from '@/views/RealTimeEventsActivityHistory/ListView'
+  import RealTimeEventsDataStreamingListView from '@/views/RealTimeEventsDataStreaming/ListView'
   defineOptions({ name: 'RealTimeEventsTabsView' })
 
   const props = defineProps({
@@ -50,6 +53,10 @@
       required: true
     },
     activityHistory: {
+      type: Object,
+      required: true
+    },
+    dataStreaming: {
       type: Object,
       required: true
     }

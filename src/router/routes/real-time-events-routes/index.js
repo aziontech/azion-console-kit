@@ -39,8 +39,8 @@ export const realTimeEventsRoutes = {
       documentationService: Helpers.documentationGuideProducts.realTimeEvents
     },
     dataStreaming: {
-      listDataStreamed: RealTimeEventsService.listDataStreamed,
-      loadDataStreamed: RealTimeEventsService.loadDataStreamed,
+      listDataStreaming: RealTimeEventsService.listDataStreaming,
+      loadDataStreaming: RealTimeEventsService.loadDataStreaming,
       documentationService: Helpers.documentationGuideProducts.realTimeEvents
     },
     activityHistory: {
