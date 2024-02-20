@@ -18,7 +18,9 @@
         <TabPanel :header="mapTabs.EdgeFunctionsConsole.label"> </TabPanel>
         <TabPanel :header="mapTabs.ImageProcessor.label"> </TabPanel>
         <TabPanel :header="mapTabs.L2Cache.label"> </TabPanel>
-        <TabPanel :header="mapTabs.IntelligentDNS.label"> </TabPanel>
+        <TabPanel :header="mapTabs.IntelligentDNS.label">
+          <RealTimeEventsIntelligentDNSListView v-bind="props.intelligentDns" />
+        </TabPanel>
         <TabPanel :header="mapTabs.DataStreaming.label">
           <RealTimeEventsDataStreamingListView v-bind="props.dataStreaming" />
         </TabPanel>
@@ -39,8 +41,9 @@
   import TabView from 'primevue/tabview'
   import RealTimeEventsHTTPRequestsListView from '@/views/RealTimeEventsHTTPRequests/ListView'
   import RealTimeEventEdgeFunctionsListView from '@/views/RealTimeEventsEdgeFunctions/ListView'
-  import RealTimeEventsActivityHistoryListView from '@/views/RealTimeEventsActivityHistory/ListView'
   import RealTimeEventsDataStreamingListView from '@/views/RealTimeEventsDataStreaming/ListView'
+  import RealTimeEventsActivityHistoryListView from '@/views/RealTimeEventsActivityHistory/ListView'
+  import RealTimeEventsIntelligentDNSListView from '@/views/RealTimeEventsIntelligentDNS/ListView'
   defineOptions({ name: 'RealTimeEventsTabsView' })
 
   const props = defineProps({
@@ -52,11 +55,19 @@
       type: Object,
       required: true
     },
+    edgeFunctionsConsole: {
+      type: Object,
+      required: true
+    },
     activityHistory: {
       type: Object,
       required: true
     },
     dataStreaming: {
+      type: Object,
+      required: true
+    },
+    intelligentDns: {
       type: Object,
       required: true
     }

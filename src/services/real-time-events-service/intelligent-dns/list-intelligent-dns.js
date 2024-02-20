@@ -39,6 +39,6 @@ const adaptResponse = (response) => {
     solutionId: idnsQueriesEvents.solutionId,
     ts: idnsQueriesEvents.ts,
     uuid: idnsQueriesEvents.uuid,
-    zoneID: idnsQueriesEvents.zoneID
+    zoneId: idnsQueriesEvents.zoneId
   }))
 }
