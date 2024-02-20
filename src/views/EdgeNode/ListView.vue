@@ -24,7 +24,7 @@
     }
   })
 
-  let hasContentToList = true
+  let hasContentToList = false
 
   const getColumns = computed(() => [
     {
@@ -93,7 +93,7 @@
         emptyListMessage="No Edge Node found."
       />
       <EmptyEdgeNode
-        v-else
+        v-if="!hasContentToList"
         :documentationService="props.documentationService"
       >
         <template #illustration>
