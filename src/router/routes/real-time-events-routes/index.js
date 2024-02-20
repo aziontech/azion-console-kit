@@ -14,8 +14,8 @@ export const realTimeEventsRoutes = {
       documentationService: Helpers.documentationGuideProducts.realTimeEvents
     },
     edgeFunctions: {
-      listEdgeFunction: RealTimeEventsService.listEdgeFunction,
-      loadEdgeFunction: RealTimeEventsService.loadEdgeFunction,
+      listEdgeFunction: RealTimeEventsService.listEdgeFunctions,
+      loadEdgeFunction: RealTimeEventsService.loadEdgeFunctions,
       documentationService: Helpers.documentationGuideProducts.realTimeEvents
     },
     edgeFunctionsConsole: {

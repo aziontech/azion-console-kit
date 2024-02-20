@@ -12,7 +12,9 @@
         <TabPanel :header="mapTabs.httpRequests.label">
           <RealTimeEventsHTTPRequestsListView v-bind="props.httpRequests" />
         </TabPanel>
-        <TabPanel :header="mapTabs.EdgeFunctions.label"> </TabPanel>
+        <TabPanel :header="mapTabs.EdgeFunctions.label">
+          <RealTimeEventEdgeFunctionsListView v-bind="props.edgeFunctions"></RealTimeEventEdgeFunctionsListView>
+        </TabPanel>
         <TabPanel :header="mapTabs.EdgeFunctionsConsole.label"> </TabPanel>
         <TabPanel :header="mapTabs.ImageProcessor.label"> </TabPanel>
         <TabPanel :header="mapTabs.L2Cache.label"> </TabPanel>
@@ -32,10 +34,15 @@
   import TabPanel from 'primevue/tabpanel'
   import TabView from 'primevue/tabview'
   import RealTimeEventsHTTPRequestsListView from '@/views/RealTimeEventsHTTPRequests/ListView'
+  import RealTimeEventEdgeFunctionsListView from '@/views/RealTimeEventsEdgeFunctions/ListView'
   defineOptions({ name: 'RealTimeEventsTabsView' })
 
   const props = defineProps({
     httpRequests: {
+      type: Object,
+      required: true
+    },
+    edgeFunctions: {
       type: Object,
       required: true
     }
