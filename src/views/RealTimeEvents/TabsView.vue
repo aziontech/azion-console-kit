@@ -17,7 +17,11 @@
             v-bind="props.edgeFunctions"
           ></RealTimeEventEdgeFunctionsListView>
         </TabPanel>
-        <TabPanel :header="mapTabs.EdgeFunctionsConsole.label"> </TabPanel>
+        <TabPanel :header="mapTabs.EdgeFunctionsConsole.label">
+          <RealTimeEventEdgeFunctionsConsoleListView
+            v-bind="props.edgeFunctionsConsole"
+          ></RealTimeEventEdgeFunctionsConsoleListView>
+        </TabPanel>
         <TabPanel :header="mapTabs.ImageProcessor.label"> </TabPanel>
         <TabPanel :header="mapTabs.L2Cache.label"> </TabPanel>
         <TabPanel :header="mapTabs.IntelligentDNS.label"> </TabPanel>
@@ -37,6 +41,8 @@
   import TabView from 'primevue/tabview'
   import RealTimeEventsHTTPRequestsListView from '@/views/RealTimeEventsHTTPRequests/ListView'
   import RealTimeEventEdgeFunctionsListView from '@/views/RealTimeEventsEdgeFunctions/ListView'
+  import RealTimeEventEdgeFunctionsConsoleListView from '@/views/RealTimeEventsEdgeFunctionsConsole/ListView'
+
   defineOptions({ name: 'RealTimeEventsTabsView' })
 
   const props = defineProps({
@@ -45,6 +51,10 @@
       required: true
     },
     edgeFunctions: {
+      type: Object,
+      required: true
+    },
+    edgeFunctionsConsole: {
       type: Object,
       required: true
     }
