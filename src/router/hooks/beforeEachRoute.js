@@ -3,6 +3,7 @@ import { logoutService } from '@/services/auth-services'
 import { useAccountStore } from '@/stores/account'
 import { useLoadingStore } from '@/stores/loading'
 
+/** @type {import('vue-router').NavigationGuardWithThis} */
 export default async function beforeEachRoute(to, __, next) {
   const accountStore = useAccountStore()
   const loadingStore = useLoadingStore()
@@ -39,7 +40,6 @@ export default async function beforeEachRoute(to, __, next) {
       accountInfo.permissions = userInfo.results.permissions
       accountInfo.email = userInfo.results.email
       accountInfo.user_id = userInfo.results.id
-
       accountInfo.colorTheme = theme || fallbackTheme
 
       accountStore.setAccountData(accountInfo)

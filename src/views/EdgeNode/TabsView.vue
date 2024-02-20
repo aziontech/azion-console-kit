@@ -106,7 +106,7 @@
         </TabPanel>
         <TabPanel header="Services">
           <ListViewServices
-          v-if="mapTabs.services === activeTab"
+            v-if="mapTabs.services === activeTab"
             :edgeNodeId="edgeNodeId"
             :createServiceEdgeNodeService="props.createServiceEdgeNodeService"
             :editServiceEdgeNodeService="props.editServiceEdgeNodeService"
