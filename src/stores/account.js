@@ -12,6 +12,9 @@ export const useAccountStore = defineStore({
     hasActiveUserId(state) {
       return !!state.account?.id
     },
+    shouldAvoidCalculateServicePlan(state) {
+      return !!state.account?.isDeveloperSupportPlan
+    },
     currentTheme(state) {
       return state.account?.colorTheme
     },
@@ -25,6 +28,9 @@ export const useAccountStore = defineStore({
   actions: {
     setAccountData(account) {
       this.account = { ...this.account, ...account }
+    },
+    resetAccount() {
+      this.account = {}
     },
     setTheme(theme) {
       this.account.colorTheme = theme
