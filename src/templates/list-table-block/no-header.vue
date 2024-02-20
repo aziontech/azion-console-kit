@@ -6,7 +6,6 @@
         scrollable
         removableSort
         :value="data"
-        selectionMode="multiple"
         dataKey="id"
         v-model:filters="filters"
         :paginator="showPagination"
@@ -106,7 +105,10 @@
             </div>
           </template>
           <template #body="{ data: rowData }">
-            <div class="flex justify-end">
+            <div
+              class="flex justify-end"
+              v-if="showActions"
+            >
               <PrimeMenu
                 ref="menu"
                 id="overlay_menu"
@@ -259,6 +261,7 @@
 
   const MINIMUN_OF_ITEMS_PER_PAGE = 10
 
+  const showActions = ref(true)
   const selectedId = ref(null)
   const filters = ref({ global: { value: '', matchMode: FilterMatchMode.CONTAINS } })
   const isLoading = ref(false)
@@ -286,16 +289,15 @@
   })
 
   const actionOptions = (showAuthorize) => {
-    const actionOptions = []
-
-    if (props.deleteService) {
-      actionOptions.push({
-        label: 'Delete',
-        icon: 'pi pi-fw pi-trash',
-        command: () => openDeleteDialog()
-      })
-    }
-
+    const actionOptions = props.deleteService
+      ? [
+          {
+            label: 'Delete',
+            icon: 'pi pi-fw pi-trash',
+            command: () => openDeleteDialog()
+          }
+        ]
+      : []
     if (props.authorizeNode && showAuthorize !== 'Authorized') {
       actionOptions.push({
         label: 'Authorize',
@@ -303,8 +305,7 @@
         command: () => authorizeEdgeNode()
       })
     }
-    menuActionsCounter.value = actionOptions.length
-
+    showActions.value = actionOptions.length > 0
     return actionOptions
   }
 
@@ -350,8 +351,12 @@
     menu.value.toggle(event)
   }
 
-  const editItemSelected = ({ data: item }) => {
+  const editItemSelected = ({ data: item, originalEvent }) => {
+    const clickIsCheckbox = originalEvent.srcElement.className?.animVal?.includes('p-checkbox-icon')
     if (props.editInDrawer) {
+      if (clickIsCheckbox) {
+        return
+      }
       props.editInDrawer(item)
       return
     }

@@ -8,7 +8,7 @@
   import TabView from 'primevue/tabview'
   import { useToast } from 'primevue/usetoast'
 
-  import { ref } from 'vue'
+  import { ref, provide, reactive, watch } from 'vue'
   import { useRoute, useRouter } from 'vue-router'
 
   defineOptions({ name: 'tabs-waf-rules' })
@@ -32,6 +32,9 @@
   const wafRuleId = ref(route.params.id)
   const waf = ref()
 
+  const tabHasUpdate = reactive({ oldTab: null, nextTab: 0, updated: true })
+  const formHasUpdated = ref(false)
+
   const getWafDat = async () => {
     try {
       return await props.wafServices.loadWafRulesService({ id: wafRuleId.value })
@@ -52,6 +55,10 @@
   }
 
   const changeRouteByClickingOnTab = ({ index = 0 }) => {
+    changeTab(index)
+  }
+
+  const changeTab = (index) => {
     const tab = getTabFromValue(index)
     activeTab.value = index
     const params = {
@@ -80,6 +87,25 @@
     changeRouteByClickingOnTab({ index: activeTabIndexByRoute })
   }
 
+  const visibleOnSaved = ref(false)
+
+  provide('unsaved', {
+    changeTab,
+    tabHasUpdate,
+    formHasUpdated,
+    visibleOnSaved
+  })
+
+  watch(activeTab, (newValue, oldValue) => {
+    if (visibleOnSaved.value) {
+      return
+    } else {
+      tabHasUpdate.oldTab = oldValue
+      tabHasUpdate.nextTab = newValue
+      tabHasUpdate.updated = Math.random()
+    }
+  })
+
   renderTabCurrentRouter()
 </script>
 
@@ -102,6 +128,7 @@
             :waf="waf"
             :showActionBar="activeTab === mapTabs.mainSettings"
             @handleWafRulesUpdated="updateWafRulesValue"
+            :isTab="true"
           />
         </TabPanel>
         <TabPanel header="Tuning">

@@ -44,7 +44,7 @@
   <FormHorizontal
     :isDrawer="true"
     title="General"
-    description="Instantiate an edge function within your rule set."
+    description="Instantiate an edge function within your rule set. Use Rules Engine to activate the function."
   >
     <template #inputs>
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
