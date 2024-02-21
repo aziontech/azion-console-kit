@@ -20,8 +20,10 @@
         </TabPanel>
         <TabPanel :header="mapTabs.ImageProcessor.label">
           <RealTimeEventsImageProcessor v-bind="props.imageProcessor" />
-         </TabPanel>
-        <TabPanel :header="mapTabs.L2Cache.label"> </TabPanel>
+        </TabPanel>
+        <TabPanel :header="mapTabs.L2Cache.label">
+          <RealTimeEventsL2Cache v-bind="props.l2Cache"/>
+        </TabPanel>
         <TabPanel :header="mapTabs.IntelligentDNS.label">
           <RealTimeEventsIntelligentDNSListView v-bind="props.intelligentDns" />
         </TabPanel>
@@ -50,6 +52,7 @@
   import RealTimeEventsActivityHistoryListView from '@/views/RealTimeEventsActivityHistory/ListView'
   import RealTimeEventsIntelligentDNSListView from '@/views/RealTimeEventsIntelligentDNS/ListView'
   import RealTimeEventsImageProcessor from '@/views/RealTimeEventsImageProcessor/ListView'
+  import RealTimeEventsL2Cache from '@/views/RealTimeEventsL2Cache/ListView'
   defineOptions({ name: 'RealTimeEventsTabsView' })
 
   const props = defineProps({
@@ -80,6 +83,10 @@
     imageProcessor: {
       type: Object,
       required: true
+    }, 
+    l2Cache: {
+      type: Object,
+      required: true 
     }
   })
 

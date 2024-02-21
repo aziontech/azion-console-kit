@@ -42,10 +42,12 @@ const adaptResponse = (response) => {
 
   return body.data.l2CacheEvents?.map((l2CacheEvents) => ({
     bytesSent: l2CacheEvents.bytesSent,
-    cacheKey: l2CacheEvents.cacheKey,
+    cacheKey: {
+      content: l2CacheEvents.cacheKey
+    },
     cacheTtl: l2CacheEvents.cacheTtl,
     clientId: l2CacheEvents.clientId,
-    configurationId: l2CacheEvents.configurationId,
+    id: l2CacheEvents.configurationId,
     host: l2CacheEvents.host,
     proxyHost: l2CacheEvents.proxyHost,
     ts: l2CacheEvents.ts

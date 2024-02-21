@@ -31,7 +31,8 @@ export const realTimeEventsRoutes = {
     l2Cache: {
       listL2Cache: RealTimeEventsService.listL2Cache,
       loadL2Cache: RealTimeEventsService.loadL2Cache,
-      documentationService: Helpers.documentationGuideProducts.realTimeEvents
+      documentationService: Helpers.documentationGuideProducts.realTimeEvents,
+      clipboardWrite: Helpers.clipboardWrite
     },
     intelligentDNS: {
       listIntelligentDns: RealTimeEventsService.listIntelligentDns,
