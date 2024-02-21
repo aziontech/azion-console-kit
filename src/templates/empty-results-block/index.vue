@@ -26,11 +26,11 @@
 
 <template>
   <div
-    class="flex flex-col "
+    class="flex flex-col"
     :class="{ 'mt-4 pb-8': inTabs }"
   >
     <div
-      class="flex flex-col p-8  gap-7 justify-center items-center rounded-md"
+      class="flex flex-col p-8 gap-7 justify-center items-center rounded-md"
       :class="{ 'border surface-border': !noBorder }"
     >
       <slot name="illustration">
