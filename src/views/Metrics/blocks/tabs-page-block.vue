@@ -50,6 +50,7 @@
 <template>
   <div class="flex w-full items-end gap-3 mb-4">
     <Dropdown
+      appendTo="self"
       :modelValue="selectedGroup"
       :options="metricsGroups"
       :loading="!metricsGroups.length"

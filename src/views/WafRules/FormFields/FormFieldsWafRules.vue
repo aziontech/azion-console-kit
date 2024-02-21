@@ -1,10 +1,10 @@
 <script setup>
-  import { ref } from 'vue'
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
-  import InputSwitch from 'primevue/inputswitch'
+  import FieldText from '@/templates/form-fields-inputs/fieldText'
   import Card from 'primevue/card'
   import Dropdown from 'primevue/dropdown'
-  import FieldText from '@/templates/form-fields-inputs/fieldText'
+  import InputSwitch from 'primevue/inputswitch'
+  import { ref } from 'vue'
 
   import { useField } from 'vee-validate'
   defineOptions({ name: 'form-fields-waf-rules' })
@@ -96,6 +96,7 @@
             <template #content>
               <div class="flex flex-col w-full sm:max-w-xs gap-2 mt-3">
                 <Dropdown
+                  appendTo="self"
                   v-model="sqlInjectionSensitivity"
                   :options="sensitivity"
                   optionLabel="name"
@@ -132,6 +133,7 @@
             <template #content>
               <div class="flex flex-col w-full sm:max-w-xs gap-2 mt-3">
                 <Dropdown
+                  appendTo="self"
                   v-model="remoteFileInclusionSensitivity"
                   :options="sensitivity"
                   optionLabel="name"
@@ -170,6 +172,7 @@
             <template #content>
               <div class="flex flex-col w-full sm:max-w-xs gap-2 mt-3">
                 <Dropdown
+                  appendTo="self"
                   v-model="directoryTraversalSensitivity"
                   :options="sensitivity"
                   optionLabel="name"
@@ -206,6 +209,7 @@
             <template #content>
               <div class="flex flex-col w-full sm:max-w-xs gap-2 mt-3">
                 <Dropdown
+                  appendTo="self"
                   v-model="crossSiteScriptingSensitivity"
                   :options="sensitivity"
                   optionLabel="name"
@@ -239,6 +243,7 @@
             <template #content>
               <div class="flex flex-col w-full sm:max-w-xs gap-2 mt-3">
                 <Dropdown
+                  appendTo="self"
                   v-model="fileUploadSensitivity"
                   :options="sensitivity"
                   optionLabel="name"
@@ -275,6 +280,7 @@
             <template #content>
               <div class="flex flex-col w-full sm:max-w-xs gap-2 mt-3">
                 <Dropdown
+                  appendTo="self"
                   v-model="evadingTricksSensitivity"
                   :options="sensitivity"
                   optionLabel="name"
@@ -311,6 +317,7 @@
             <template #content>
               <div class="flex flex-col w-full sm:max-w-xs gap-2 mt-3">
                 <Dropdown
+                  appendTo="self"
                   v-model="unwantedAccessSensitivity"
                   :options="sensitivity"
                   optionLabel="name"
@@ -346,6 +353,7 @@
             <template #content>
               <div class="flex flex-col w-full sm:max-w-xs gap-2 mt-3">
                 <Dropdown
+                  appendTo="self"
                   v-model="identifiedAttackSensitivity"
                   :options="sensitivity"
                   optionLabel="name"
