@@ -1,11 +1,11 @@
 <script setup>
-  import TextareaComponent from 'primevue/textarea'
+  import FormHorizontal from '@/templates/create-form-block/form-horizontal'
   import Dropdown from 'primevue/dropdown'
   import InputText from 'primevue/inputtext'
   import MultiSelect from 'primevue/multiselect'
-  import FormHorizontal from '@/templates/create-form-block/form-horizontal'
-  import { computed, onMounted, ref, watch } from 'vue'
+  import TextareaComponent from 'primevue/textarea'
   import { useField } from 'vee-validate'
+  import { computed, onMounted, ref, watch } from 'vue'
 
   const props = defineProps({
     listCountriesService: {
@@ -113,6 +113,7 @@
           >Type *</label
         >
         <Dropdown
+          appendTo="self"
           :class="{ 'p-invalid': networkListTypeError }"
           v-model="networkListType"
           :options="options"

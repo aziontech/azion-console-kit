@@ -1,9 +1,9 @@
 <script setup>
+  import { useAccountStore } from '@/stores/account'
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
   import Dropdown from 'primevue/dropdown'
-  import { computed } from 'vue'
-  import { useAccountStore } from '@/stores/account'
   import { useField } from 'vee-validate'
+  import { computed } from 'vue'
   defineOptions({ name: 'form-fields-drawer-service' })
 
   const props = defineProps({
@@ -51,6 +51,7 @@
               >Service *</label
             >
             <Dropdown
+              appendTo="self"
               class="flex self-stretch"
               v-model="service"
               :options="props.listServices"

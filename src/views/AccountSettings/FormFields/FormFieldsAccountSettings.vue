@@ -1,13 +1,13 @@
 <script setup>
-  import { useField } from 'vee-validate'
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
+  import Divider from 'primevue/divider'
+  import Dropdown from 'primevue/dropdown'
+  import InputSwitch from 'primevue/inputswitch'
   import InputText from 'primevue/inputtext'
   import TextArea from 'primevue/textarea'
-  import InputSwitch from 'primevue/inputswitch'
-  import Dropdown from 'primevue/dropdown'
-  import Divider from 'primevue/divider'
-  import { onMounted, ref, watch } from 'vue'
   import { useToast } from 'primevue/usetoast'
+  import { useField } from 'vee-validate'
+  import { onMounted, ref, watch } from 'vue'
 
   const props = defineProps({
     listCountriesService: {
@@ -266,6 +266,7 @@
             Country *
           </label>
           <Dropdown
+            appendTo="self"
             id="country"
             filter
             optionValue="geonameId"
@@ -296,6 +297,7 @@
             State/Region *
           </label>
           <Dropdown
+            appendTo="self"
             id="region"
             filter
             optionValue="geonameId"
@@ -322,6 +324,7 @@
             City *
           </label>
           <Dropdown
+            appendTo="self"
             id="city"
             filter
             optionValue="geonameId"

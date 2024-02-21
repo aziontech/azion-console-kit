@@ -1,12 +1,12 @@
 <script setup>
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
-  import InputText from 'primevue/inputtext'
-  import { useField } from 'vee-validate'
+  import PrimeButton from 'primevue/button'
+  import Calendar from 'primevue/calendar'
   import Dropdown from 'primevue/dropdown'
+  import InputText from 'primevue/inputtext'
   import PrimePassword from 'primevue/password'
   import PrimeTextarea from 'primevue/textarea'
-  import Calendar from 'primevue/calendar'
-  import PrimeButton from 'primevue/button'
+  import { useField } from 'vee-validate'
   import { computed } from 'vue'
   defineOptions({ name: 'form-fields-personal-token' })
 
@@ -176,6 +176,7 @@
         <div class="flex sm:flex-row w-full flex-col gap-6">
           <div class="w-full sm:max-w-xs">
             <Dropdown
+              appendTo="self"
               class="w-full"
               id="selectedExpiration"
               :options="options"

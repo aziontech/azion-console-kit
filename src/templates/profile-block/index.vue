@@ -57,6 +57,7 @@
         <div class="flex flex-row justify-between items-center align-middle px-2 py-1.5">
           <span>Theme</span>
           <Dropdown
+            appendTo="self"
             :modelValue="selectedTheme"
             @update:modelValue="setSelectedTheme"
             optionValue="value"
@@ -147,6 +148,7 @@
       <div class="flex flex-row justify-between items-center align-middle px-2 py-1.5">
         <span>Theme</span>
         <Dropdown
+          appendTo="self"
           :modelValue="selectedTheme"
           @update:modelValue="setSelectedTheme"
           optionValue="value"
@@ -197,21 +199,22 @@
 </template>
 
 <script setup>
-  import { ref, computed, inject, watch } from 'vue'
-  import { useAccountStore } from '@/stores/account'
   import { getEnvironmentFromUrl } from '@/helpers'
+  import { useAccountStore } from '@/stores/account'
+  import { computed, inject, ref, watch } from 'vue'
 
-  import Sidebar from 'primevue/sidebar'
+  import { storeToRefs } from 'pinia'
   import Avatar from 'primevue/avatar'
-  import PrimeMenu from 'primevue/menu'
-  import Dropdown from 'primevue/dropdown'
-  import Divider from 'primevue/divider'
   import PrimeButton from 'primevue/button'
+  import Divider from 'primevue/divider'
+  import Dropdown from 'primevue/dropdown'
+  import PrimeMenu from 'primevue/menu'
+  import Sidebar from 'primevue/sidebar'
 
   defineOptions({ name: 'profile-block' })
 
   const user = useAccountStore().accountData
-  const currentTheme = useAccountStore().currentTheme
+  const { currentTheme } = storeToRefs(useAccountStore())
   const setTheme = useAccountStore().setTheme
 
   const profile = ref(null)
@@ -297,7 +300,7 @@
   }
 
   const selectedTheme = computed(() => {
-    return themeOptions.find((option) => option.value === currentTheme)
+    return themeOptions.find((option) => option.value === currentTheme.value)
   })
 
   const profileMenuItems = computed(() => {

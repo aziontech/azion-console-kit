@@ -1,18 +1,18 @@
 <script setup>
-  import FormHorizontal from '@/templates/create-form-block/form-horizontal'
-  import InputText from 'primevue/inputtext'
-  import PrimeButton from 'primevue/button'
-  import Dropdown from 'primevue/dropdown'
-  import PrimeTextarea from 'primevue/textarea'
-  import InputSwitch from 'primevue/inputswitch'
-  import RadioButton from 'primevue/radiobutton'
-  import Card from 'primevue/card'
-  import { useField } from 'vee-validate'
-  import { computed, watch, ref } from 'vue'
   import {
     EDGE_CERTIFICATE,
     TRUSTED_CA_CERTIFICATE
   } from '@/services/digital-certificates-services'
+  import FormHorizontal from '@/templates/create-form-block/form-horizontal'
+  import PrimeButton from 'primevue/button'
+  import Card from 'primevue/card'
+  import Dropdown from 'primevue/dropdown'
+  import InputSwitch from 'primevue/inputswitch'
+  import InputText from 'primevue/inputtext'
+  import RadioButton from 'primevue/radiobutton'
+  import PrimeTextarea from 'primevue/textarea'
+  import { useField } from 'vee-validate'
+  import { computed, ref, watch } from 'vue'
 
   const props = defineProps({
     digitalCertificates: {
@@ -160,6 +160,7 @@
           >Edge Application *</label
         >
         <Dropdown
+          appendTo="self"
           id="edge_application"
           :class="{ 'p-invalid': errorEdgeApplication }"
           v-model="edgeApplication"
@@ -221,6 +222,7 @@
           >Digital Certificate</label
         >
         <Dropdown
+          appendTo="self"
           v-model="edgeCertificate"
           :options="edgeCertificatesOptions"
           optionLabel="name"
@@ -314,6 +316,7 @@
       >
         <label class="text-color text-base font-medium">Trusted CA Certificate</label>
         <Dropdown
+          appendTo="self"
           :class="{ 'p-invalid': errorMtlsTrustedCertificate }"
           v-model="mtlsTrustedCertificate"
           :options="trustedCACertificatesOptions"

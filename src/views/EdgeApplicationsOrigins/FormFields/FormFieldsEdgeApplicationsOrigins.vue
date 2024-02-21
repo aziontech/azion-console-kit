@@ -210,6 +210,7 @@
           >Type *</label
         >
         <Dropdown
+          appendTo="self"
           @change="resetAddressesFields"
           inputId="originType"
           v-model="originType"
@@ -261,6 +262,7 @@
           >Method *</label
         >
         <Dropdown
+          appendTo="self"
           inputId="method"
           v-model="method"
           :options="METHOD_TYPES_OPTIONS"

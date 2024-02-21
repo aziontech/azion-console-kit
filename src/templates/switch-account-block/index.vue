@@ -252,6 +252,7 @@
               </span>
 
               <Dropdown
+                appendTo="self"
                 @change="applyFilter"
                 :options="filterType"
                 class="md:w-14rem max-sm:w-full"

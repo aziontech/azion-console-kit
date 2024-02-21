@@ -41,6 +41,7 @@
             >Source *</label
           >
           <Dropdown
+            appendTo="self"
             :class="{ 'p-invalid': dataSourceError }"
             v-model="dataSource"
             :options="listDataSources"
@@ -60,6 +61,7 @@
             >Template *</label
           >
           <Dropdown
+            appendTo="self"
             :class="{ 'p-invalid': templateError }"
             v-model="template"
             :options="listTemplates"
@@ -245,6 +247,7 @@
           >Connector *</label
         >
         <Dropdown
+          appendTo="self"
           :class="{ 'p-invalid': templateError }"
           v-model="endpoint"
           :options="listEndpoint"
@@ -1220,18 +1223,18 @@
 <script setup>
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
 
+  import ButtonPrimer from 'primevue/button'
   import Dropdown from 'primevue/dropdown'
-  import RadioButton from 'primevue/radiobutton'
+  import InlineMessage from 'primevue/inlinemessage'
+  import InputNumber from 'primevue/inputnumber'
+  import InputSwitch from 'primevue/inputswitch'
+  import InputText from 'primevue/inputtext'
   import PrimePassword from 'primevue/password'
   import PickList from 'primevue/picklist'
-  import InputText from 'primevue/inputtext'
-  import InputSwitch from 'primevue/inputswitch'
-  import ButtonPrimer from 'primevue/button'
-  import InputNumber from 'primevue/inputnumber'
-  import InlineMessage from 'primevue/inlinemessage'
+  import RadioButton from 'primevue/radiobutton'
   import TextArea from 'primevue/textarea'
-  import { onMounted, ref, computed, watch } from 'vue'
   import { useField } from 'vee-validate'
+  import { computed, onMounted, ref, watch } from 'vue'
 
   import { useAccountStore } from '@/stores/account'
 
