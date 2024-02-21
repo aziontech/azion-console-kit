@@ -203,6 +203,7 @@
   import { useAccountStore } from '@/stores/account'
   import { computed, inject, ref, watch } from 'vue'
 
+  import { storeToRefs } from 'pinia'
   import Avatar from 'primevue/avatar'
   import PrimeButton from 'primevue/button'
   import Divider from 'primevue/divider'
@@ -213,7 +214,7 @@
   defineOptions({ name: 'profile-block' })
 
   const user = useAccountStore().accountData
-  const currentTheme = useAccountStore().currentTheme
+  const { currentTheme } = storeToRefs(useAccountStore())
   const setTheme = useAccountStore().setTheme
 
   const profile = ref(null)
@@ -299,7 +300,7 @@
   }
 
   const selectedTheme = computed(() => {
-    return themeOptions.find((option) => option.value === currentTheme)
+    return themeOptions.find((option) => option.value === currentTheme.value)
   })
 
   const profileMenuItems = computed(() => {
