@@ -1,6 +1,5 @@
 <script setup>
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
-  import MultiSelect from 'primevue/multiselect'
   import FieldText from '@/templates/form-fields-inputs/fieldText'
   import PrimeButton from 'primevue/button'
   import Card from 'primevue/card'
@@ -8,6 +7,7 @@
   import InputNumber from 'primevue/inputnumber'
   import InputSwitch from 'primevue/inputswitch'
   import InputText from 'primevue/inputtext'
+  import MultiSelect from 'primevue/multiselect'
   import RadioButton from 'primevue/radiobutton'
   import PrimeTag from 'primevue/tag'
   import { useField } from 'vee-validate'
@@ -296,6 +296,7 @@
             >Minimum TLS version</label
           >
           <Dropdown
+            appendTo="self"
             :options="TLS_VERSIONS_OPTIONS"
             v-model="minimumTlsVersion"
             optionLabel="label"
@@ -316,6 +317,7 @@
             >Cipher suite</label
           >
           <Dropdown
+            appendTo="self"
             :options="SUPPORTED_LIST_OPTIONS"
             v-model="supportedVersion"
             optionLabel="label"
@@ -347,6 +349,7 @@
         <span class="p-input-icon-right">
           <i class="pi pi-lock text-[var(--text-color-secondary)]" />
           <Dropdown
+            appendTo="self"
             :options="ORIGIN_TYPE_LIST_OPTIONS"
             v-model="originType"
             optionLabel="label"

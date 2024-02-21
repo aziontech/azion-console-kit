@@ -64,6 +64,7 @@
         <SystemStatusBarBlock v-tooltip.top="{ value: 'System status', showDelay: 200 }" />
         <div v-tooltip.top="{ value: 'Theme mode', showDelay: 200 }">
           <Dropdown
+            appendTo="self"
             :modelValue="selectedTheme"
             @update:modelValue="selectTheme"
             optionValue="value"
@@ -103,11 +104,11 @@
 </template>
 
 <script>
-  import Dropdown from 'primevue/dropdown'
-  import PrimeButton from 'primevue/button'
-  import SystemStatusBarBlock from '@templates/system-status-bar-block'
   import { useAccountStore } from '@/stores/account'
+  import SystemStatusBarBlock from '@templates/system-status-bar-block'
   import { mapActions, mapState } from 'pinia'
+  import PrimeButton from 'primevue/button'
+  import Dropdown from 'primevue/dropdown'
 
   export default {
     name: 'FooterTemplate',

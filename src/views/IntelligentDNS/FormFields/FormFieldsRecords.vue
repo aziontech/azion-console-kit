@@ -1,12 +1,12 @@
 <script setup>
-  import { ref, computed } from 'vue'
   import { useIntelligentDNSStore } from '@/stores/intelligent-dns'
+  import FormHorizontal from '@/templates/create-form-block/form-horizontal'
+  import Dropdown from 'primevue/dropdown'
   import InputNumber from 'primevue/inputnumber'
   import InputText from 'primevue/inputtext'
   import Textarea from 'primevue/textarea'
-  import Dropdown from 'primevue/dropdown'
   import { useField } from 'vee-validate'
-  import FormHorizontal from '@/templates/create-form-block/form-horizontal'
+  import { computed, ref } from 'vue'
 
   const { value: name, errorMessage: errorName } = useField('name')
   const { value: selectedPolicy, errorMessage: errorSelectedPolicy } = useField('selectedPolicy')
@@ -90,6 +90,7 @@
             >Record Type *</label
           >
           <Dropdown
+            appendTo="self"
             v-model="selectedRecordType"
             :options="recordsTypes"
             optionLabel="label"
@@ -183,6 +184,7 @@
             >Policy Type *</label
           >
           <Dropdown
+            appendTo="self"
             v-model="selectedPolicy"
             :options="policyList"
             id="selectedPolicy"

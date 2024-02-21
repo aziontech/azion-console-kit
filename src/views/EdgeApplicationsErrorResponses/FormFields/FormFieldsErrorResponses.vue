@@ -1,13 +1,13 @@
 <script setup>
   import FormHorizontal from '@/templates/create-form-block/form-horizontal.vue'
+  import FieldText from '@/templates/form-fields-inputs/fieldText'
+  import PrimeButton from 'primevue/button'
   import Divider from 'primevue/divider'
   import Dropdown from 'primevue/dropdown'
   import InputNumber from 'primevue/inputnumber'
-  import PrimeButton from 'primevue/button'
-  import FieldText from '@/templates/form-fields-inputs/fieldText'
-  import { onMounted, ref, computed } from 'vue'
   import InputText from 'primevue/inputtext'
   import { useField, useFieldArray } from 'vee-validate'
+  import { computed, onMounted, ref } from 'vue'
 
   const props = defineProps({
     listOriginsService: {
@@ -219,6 +219,7 @@
             <div class="flex flex-col w-full sm:max-w-xs gap-2">
               <label class="text-color text-sm font-medium leading-5">Status Code *</label>
               <Dropdown
+                appendTo="self"
                 v-model="errorResponse.value.code"
                 :options="STATUS_CODE_OPTIONS"
                 optionLabel="name"
@@ -297,6 +298,7 @@
           >Origin *</label
         >
         <Dropdown
+          appendTo="self"
           inputId="originId"
           v-model="originId"
           :disabled="disableOriginKey"

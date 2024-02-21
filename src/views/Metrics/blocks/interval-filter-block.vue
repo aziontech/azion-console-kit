@@ -146,6 +146,7 @@
   <div class="flex flex-column gap-6 md:flex-row md:gap-6">
     <div class="w-full md:max-w-xs max-w-full">
       <Dropdown
+        appendTo="self"
         class="w-full"
         v-model="interval"
         :options="intervalOptions"

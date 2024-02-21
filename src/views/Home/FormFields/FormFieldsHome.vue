@@ -1,7 +1,7 @@
 <script setup>
-  import { useField } from 'vee-validate'
-  import InputText from 'primevue/inputtext'
   import Dropdown from 'primevue/dropdown'
+  import InputText from 'primevue/inputtext'
+  import { useField } from 'vee-validate'
 
   const props = defineProps({
     teams: {
@@ -65,6 +65,7 @@
       >Team</label
     >
     <Dropdown
+      appendTo="self"
       id="team"
       :class="{ 'p-invalid': errorTeam }"
       v-model="team"
