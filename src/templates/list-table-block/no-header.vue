@@ -345,7 +345,7 @@
     menu.value.toggle(event)
   }
 
-  const editItemSelected = ({ data: item, originalEvent  }) => {
+  const editItemSelected = ({ data: item, originalEvent }) => {
     const clickIsCheckbox = originalEvent.srcElement.className?.animVal?.includes('p-checkbox-icon')
     if (props.editInDrawer) {
       if (clickIsCheckbox) {
