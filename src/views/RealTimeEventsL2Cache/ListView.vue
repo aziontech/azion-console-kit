@@ -82,7 +82,7 @@
       {
         field: 'host',
         header: 'Host'
-      }, 
+      },
       {
         field: 'proxyHost',
         header: 'Proxy Host'

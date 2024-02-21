@@ -22,7 +22,7 @@
           <RealTimeEventsImageProcessor v-bind="props.imageProcessor" />
         </TabPanel>
         <TabPanel :header="mapTabs.L2Cache.label">
-          <RealTimeEventsL2Cache v-bind="props.l2Cache"/>
+          <RealTimeEventsL2Cache v-bind="props.l2Cache" />
         </TabPanel>
         <TabPanel :header="mapTabs.IntelligentDNS.label">
           <RealTimeEventsIntelligentDNSListView v-bind="props.intelligentDns" />
@@ -83,10 +83,10 @@
     imageProcessor: {
       type: Object,
       required: true
-    }, 
+    },
     l2Cache: {
       type: Object,
-      required: true 
+      required: true
     }
   })
 
