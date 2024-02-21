@@ -8,30 +8,45 @@ export default async function redirectToManager(to, __, next) {
   const isPrivateRoute = !to.meta.isPublic
   const accountData = accountStore.accountData
 
-  try {
-    if (accountStore.shouldAvoidCalculateServicePlan) {
-      return next()
-    }
+  if (accountStore.shouldAvoidCalculateServicePlan) {
+    return next()
+  }
 
+  try {
     if (accountStore.hasActiveUserId && isPrivateRoute) {
+      const isNotClientKind = !accountData.client_id
+
+      if (isNotClientKind) {
+        const isAzionBrand =
+          accountData.kind === 'brand' && accountData.email.includes('@azion.com')
+
+        if (isAzionBrand) {
+          return next()
+        } else {
+          permanentRedirectToManager()
+        }
+      }
+
       const { isDeveloperSupportPlan } = await loadContractServicePlan({
         clientId: accountData.client_id
       })
       accountStore.setAccountData({ isDeveloperSupportPlan: isDeveloperSupportPlan })
-      const isAzionBrand = accountData.kind === 'brand' && accountData.email.includes('@azion.com')
-      const allowedToConsoleKit = isDeveloperSupportPlan || isAzionBrand
 
-      if (!allowedToConsoleKit) {
-        const environment = getEnvironmentFromUrl(window.location.href)
-        let managerLink = 'https://manager.azion.com'
-        if (environment === 'stage') {
-          managerLink = 'https://stage-manager.azion.com'
-        }
-        window.location.replace(managerLink)
+      if (!isDeveloperSupportPlan) {
+        permanentRedirectToManager()
       }
     }
   } catch {
-    return next('/login')
+    return next()
   }
   return next()
+}
+
+function permanentRedirectToManager() {
+  const environment = getEnvironmentFromUrl(window.location.href)
+  let managerLink = 'https://manager.azion.com'
+  if (environment === 'stage') {
+    managerLink = 'https://stage-manager.azion.com'
+  }
+  window.location.replace(managerLink)
 }
