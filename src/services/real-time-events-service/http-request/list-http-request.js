@@ -42,6 +42,7 @@ const adaptResponse = (httpResponse) => {
   const { body } = httpResponse
 
   return body.data.httpEvents?.map((httpEventItem) => ({
+    id: httpEventItem.ts + httpEventItem.configurationId + httpEventItem.requestId,
     bytesSent: httpEventItem.bytesSent,
     configurationId: httpEventItem.configurationId,
     debugLog: httpEventItem.debugLog,

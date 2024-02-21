@@ -1,5 +1,5 @@
 <script setup>
-  import { ref } from 'vue'
+  import { ref, watch } from 'vue'
 
   import InfoSection from '@/templates/info-drawer-block/info-section'
   import TextInfo from '@/templates/info-drawer-block/info-labels/text-info.vue'
@@ -22,6 +22,15 @@
     showDrawer.value = true
     details.value = await props.loadService(item)
   }
+
+  watch(
+    () => showDrawer.value,
+    (value) => {
+      if (!value) {
+        details.value = {}
+      }
+    }
+  )
 
   defineExpose({
     openDetailDrawer

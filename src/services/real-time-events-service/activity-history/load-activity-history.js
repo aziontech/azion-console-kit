@@ -34,8 +34,9 @@ const adapt = (filter) => {
 
 const adaptResponse = (response) => {
   const { body } = response
+  const [activityHistoryEvents = {}] = body.data.activityHistoryEvents
 
-  return body.data.activityHistoryEvents?.map((activityHistoryEvents) => ({
+  return {
     title: activityHistoryEvents.title,
     type: activityHistoryEvents.type,
     ts: activityHistoryEvents.ts,
@@ -44,5 +45,5 @@ const adaptResponse = (response) => {
     userId: activityHistoryEvents.userId,
     authorEmail: activityHistoryEvents.authorEmail,
     comment: activityHistoryEvents.comment
-  }))
+  }
 }

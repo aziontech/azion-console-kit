@@ -1,5 +1,5 @@
 <script setup>
-  import { ref, onMounted } from 'vue'
+  import { ref, watch } from 'vue'
   import Divider from 'primevue/divider'
   import InfoSection from '@/templates/info-drawer-block/info-section'
   import TextInfo from '@/templates/info-drawer-block/info-labels/text-info.vue'
@@ -7,55 +7,31 @@
   import InfoDrawerBlock from '@/templates/info-drawer-block'
   defineOptions({ name: 'drawer-events-image-processor' })
 
-  defineProps({
-    loadDetails: Function
+  const props = defineProps({
+    loadService: {
+      type: Function,
+      required: true
+    }
   })
-
-  const getCurrentDate = () => {
-    const date = new Date()
-    const options = {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit',
-      hour12: true
-    }
-    return date.toLocaleString('en-US', options)
-  }
-
-  const showDrawer = ref(true)
-
-  const loadMockedDetails = () => {
-    const mockValues = {
-      path: 'http://example.com.br',
-      upstreamCacheStatus: 'Revalidated',
-      scheme: 'HTTP',
-      date: getCurrentDate(),
-      httpUserAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)',
-      remoteAddr: '127.0.0.1',
-      remotePort: '8080',
-      host: 'g1sdetynmxe0ao.map.azionedge.net',
-      remoteAddressClass: '44.192.0.0/11',
-      solution: '1321',
-      configurationId: '1595368520',
-      source: 'edg-fln-ggn001p',
-      referenceError: '#AECFE66100000000C947B9B3B3BFBE46FFFFFFFF9401',
-      requestMethod: 'GET',
-      requestUri: '/v1?v=bo%20dim',
-      sslCipher: 'TLS_AES_256_GCM_SHA384',
-      statusCode: '401',
-      sslProtocol: 'TLS v1.2',
-      sslSessionReused: 'r',
-      upstreamStatus: '200'
-    }
-
-    return mockValues
-  }
-
   const details = ref({})
-  onMounted(() => {
-    details.value = loadMockedDetails()
+  const showDrawer = ref(false)
+
+  const openDetailDrawer = async (item) => {
+    showDrawer.value = true
+    details.value = await props.loadService(item)
+  }
+
+  watch(
+    () => showDrawer.value,
+    (value) => {
+      if (!value) {
+        details.value = {}
+      }
+    }
+  )
+
+  defineExpose({
+    openDetailDrawer
   })
 </script>
 
@@ -95,7 +71,7 @@
           tagSeverity="danger"
         >
           <template #body>
-            <div class="flex flex-wrap gap-y-4 ">
+            <div class="flex flex-wrap gap-y-4">
               <BigNumber
                 label="Request Time"
                 sufix="ms"
