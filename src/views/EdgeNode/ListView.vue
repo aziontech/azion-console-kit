@@ -24,7 +24,7 @@
     }
   })
 
-  let hasContentToList = true
+  let hasContentToList = ref(false)
 
   const getColumns = computed(() => [
     {
@@ -71,7 +71,7 @@
   ])
 
   const handleLoadData = (event) => {
-    hasContentToList = event
+    hasContentToList.value = event
   }
 </script>
 <template>
