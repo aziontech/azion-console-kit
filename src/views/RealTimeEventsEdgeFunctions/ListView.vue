@@ -5,17 +5,18 @@
   import { computed, ref } from 'vue'
   import IntervalFilterBlock from '@/views/RealTimeEvents/blocks/interval-filter-block'
   import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
+  import Drawer from './Drawer'
 
   const props = defineProps({
     documentationService: {
       type: Function,
       required: true
     },
-    listEdgeFunction: {
+    listEdgeFunctions: {
       type: Function,
       required: true
     },
-    loadEdgeFunction: {
+    loadEdgeFunctions: {
       type: Function,
       required: true
     }
@@ -24,8 +25,16 @@
   const filterDate = ref({})
   const hasContentToList = ref(true)
   const listTableBlockRef = ref('')
+  const drawerRef = ref('')
 
-  const openDetailDrawer = () => {}
+  const openDetailDrawer = ({ configurationId, ts, requestId }) => {
+    drawerRef.value.openDetailDrawer({
+      tsRange: filterDate.value,
+      configurationId,
+      requestId,
+      ts
+    })
+  }
 
   const handleLoadData = (event) => {
     hasContentToList.value = event
@@ -40,7 +49,7 @@
   }
 
   const listProvider = async () => {
-    return await props.listEdgeFunction({ tsRange: filterDate.value })
+    return await props.listEdgeFunctions({ tsRange: filterDate.value })
   }
 
   const getColumns = computed(() => {
@@ -83,7 +92,7 @@
 <template>
   <Drawer
     ref="drawerRef"
-    :loadService="props.loadEdgeFunction"
+    :loadService="props.loadEdgeFunctions"
   />
   <div class="flex flex-col gap-8 my-4">
     <div class="flex gap-1">

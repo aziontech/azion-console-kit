@@ -14,13 +14,13 @@ export const realTimeEventsRoutes = {
       documentationService: Helpers.documentationGuideProducts.realTimeEvents
     },
     edgeFunctions: {
-      listEdgeFunction: RealTimeEventsService.listEdgeFunctions,
-      loadEdgeFunction: RealTimeEventsService.loadEdgeFunctions,
+      listEdgeFunctions: RealTimeEventsService.listEdgeFunctions,
+      loadEdgeFunctions: RealTimeEventsService.loadEdgeFunctions,
       documentationService: Helpers.documentationGuideProducts.realTimeEvents
     },
     edgeFunctionsConsole: {
-      listEdgeFunctionConsole: RealTimeEventsService.listEdgeFunctionsConsole,
-      loadEdgeFunctionConsole: RealTimeEventsService.loadEdgeFunctionsConsole,
+      listEdgeFunctionsConsole: RealTimeEventsService.listEdgeFunctionsConsole,
+      loadEdgeFunctionsConsole: RealTimeEventsService.loadEdgeFunctionsConsole,
       documentationService: Helpers.documentationGuideProducts.realTimeEvents
     },
     imageProcessor: {

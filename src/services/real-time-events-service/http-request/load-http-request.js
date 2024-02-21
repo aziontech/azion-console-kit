@@ -79,7 +79,7 @@ const adaptResponse = (httpResponse) => {
   return {
     id: httpEventItem.ts + httpEventItem.configurationId + httpEventItem.requestId,
     httpReferer: httpEventItem.httpReferer,
-    scheme: httpEventItem.scheme,
+    scheme: httpEventItem.scheme?.toUpperCase(),
     ts: convertValueToDate(httpEventItem.ts),
     httpUserAgent: httpEventItem.httpUserAgent,
     remoteAddress: httpEventItem.remoteAddress,

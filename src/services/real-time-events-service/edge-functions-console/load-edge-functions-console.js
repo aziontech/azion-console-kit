@@ -1,5 +1,6 @@
 import convertGQL from '@/helpers/convert-gql'
 import { AxiosHttpClientSignalDecorator } from '../../axios/AxiosHttpClientSignalDecorator'
+import { convertValueToDate } from '@/helpers/convert-date'
 
 export const loadEdgeFunctionsConsole = async (filter) => {
   const payload = adapt(filter)
@@ -42,18 +43,52 @@ const adapt = (filter) => {
   return convertGQL(formatFilter, table)
 }
 
+const levelMap = {
+  DEBUG: {
+    content: 'Debug',
+    severity: 'success',
+    icon: 'pi pi-check-circle'
+  },
+  ERROR: {
+    content: 'Error',
+    severity: 'danger',
+    icon: 'pi pi-times-circle'
+  },
+  WARN: {
+    content: 'Warning',
+    severity: 'warning',
+    icon: 'pi pi-exclamation-triangle'
+  },
+  INFO: {
+    content: 'Info',
+    severity: 'info',
+    icon: 'pi pi-info-circle'
+  },
+  LOG: {
+    content: 'Log',
+    severity: 'info',
+    icon: 'pi pi-code'
+  },
+  MDN: {
+    content: 'MDN',
+    severity: 'info',
+    icon: 'pi pi-code'
+  }
+}
+
 const adaptResponse = (response) => {
   const { body } = response
+  const [cellsConsoleEvents = {}] = body.data.cellsConsoleEvents
 
-  return body.data.cellsConsoleEvents?.map((cellsConsoleEvents) => ({
+  return {
     lineSource: cellsConsoleEvents.lineSource,
-    level: cellsConsoleEvents.level,
-    ts: cellsConsoleEvents.ts,
+    level: levelMap[cellsConsoleEvents.level],
+    ts: convertValueToDate(cellsConsoleEvents.ts),
     line: cellsConsoleEvents.line,
     id: cellsConsoleEvents.id,
     solutionId: cellsConsoleEvents.solutionId,
     functionId: cellsConsoleEvents.functionId,
     configurationId: cellsConsoleEvents.configurationId,
     source: cellsConsoleEvents.source
-  }))
+  }
 }

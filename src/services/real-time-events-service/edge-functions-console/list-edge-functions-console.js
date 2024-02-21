@@ -56,17 +56,17 @@ const levelMap = {
   },
   INFO: {
     content: 'Info',
-    severity: 'secondary',
+    severity: 'info',
     icon: 'pi pi-info-circle'
   },
   LOG: {
     content: 'Log',
-    severity: 'secondary',
+    severity: 'info',
     icon: 'pi pi-code'
   },
   MDN: {
     content: 'MDN',
-    severity: 'secondary',
+    severity: 'info',
     icon: 'pi pi-code'
   }
 }
@@ -82,7 +82,7 @@ const adaptResponse = (response) => {
     line: cellsConsoleEvents.line,
     lineSource: {
       content: cellsConsoleEvents.lineSource,
-      severity: 'secondary'
+      severity: 'info',
     },
     solutionId: cellsConsoleEvents.solutionId,
     source: cellsConsoleEvents.source,

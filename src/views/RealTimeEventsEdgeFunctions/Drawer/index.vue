@@ -1,5 +1,5 @@
 <script setup>
-  import { ref, onMounted } from 'vue'
+  import { ref } from 'vue'
 
   import InfoSection from '@/templates/info-drawer-block/info-section'
   import TextInfo from '@/templates/info-drawer-block/info-labels/text-info.vue'
@@ -9,45 +9,22 @@
   import InfoDrawerBlock from '@/templates/info-drawer-block'
   defineOptions({ name: 'drawer-events-functions' })
 
-  defineProps({
-    loadDetails: Function
+  const props = defineProps({
+    loadService: {
+      type: Function,
+      required: true
+    }
   })
-
-  const getCurrentDate = () => {
-    const date = new Date()
-    const options = {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit',
-      hour12: true
-    }
-    return date.toLocaleString('en-US', options)
-  }
-
-  const showDrawer = ref(true)
-
-  const loadMockedDetails = () => {
-    const mockValues = {
-      drawerTitle: 'Function Language',
-      date: getCurrentDate(),
-      edgeFunctionsTypeList: ['3324 - Name Edge Function;', '43 - Name Edge Function'],
-      edgeFunctionTime: '0.021',
-      edgeFunctionsTypeListFirst: '1 - Edge Application',
-      edgeFunctionsIdList: '10728',
-      edgeFunctionsSolutionId: '10728',
-      virtualHostId: '24100000a',
-      configurationId: '15953987123',
-      source: 'edg-fln-ggn001p'
-    }
-
-    return mockValues
-  }
-
   const details = ref({})
-  onMounted(() => {
-    details.value = loadMockedDetails()
+  const showDrawer = ref(false)
+
+  const openDetailDrawer = async (item) => {
+    showDrawer.value = true
+    details.value = await props.loadService(item)
+  }
+
+  defineExpose({
+    openDetailDrawer
   })
 </script>
 
@@ -59,9 +36,10 @@
     <template #body>
       <div class="flex flex-col gap-3 md:m-3">
         <InfoSection
-          :title="details.drawerTitle"
-          :date="details.date"
-          :tagText="`<> Javascript`"
+          title="Function Language"
+          :date="details.ts"
+          tagIcon="pi pi-code"
+          :tagText="details.functionLanguage"
         >
           <template #body>
             <div class="gap-8 flex flex-col sm:flex-row">
@@ -69,7 +47,7 @@
                 <ul>
                   <li
                     :key="index"
-                    v-for="(functionType, index) in details.edgeFunctionsTypeList"
+                    v-for="(functionType, index) in details.edgeFunctionsList"
                   >
                     {{ functionType }}
                   </li>
@@ -78,7 +56,7 @@
               <BigNumber
                 label="Edge Function Time"
                 sufix="ms"
-                >{{ details.edgeFunctionTime }}</BigNumber
+                >{{ details.edgeFunctionsTime }}</BigNumber
               >
             </div>
 
@@ -87,10 +65,10 @@
             <div class="flex flex-col sm:flex-row sm:gap-8 gap-3">
               <div class="flex flex-col gap-3">
                 <TextInfo label="Edge Functions Type List">
-                  {{ details.edgeFunctionsTypeListFirst }}
+                  {{ details.edgeFunctionsInitiatorTypeList }}
                 </TextInfo>
-                <TextInfo label="Edge Functions ID List">
-                  {{ details.edgeFunctionsIdList }}
+                <TextInfo label="Edge Functions Instance ID List">
+                  {{ details.edgeFunctionsInstanceIdList }}
                 </TextInfo>
                 <TextInfo label="Edge Functions Solution ID">
                   {{ details.edgeFunctionsSolutionId }}

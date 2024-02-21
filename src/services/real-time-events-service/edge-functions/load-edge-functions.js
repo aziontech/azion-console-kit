@@ -1,4 +1,6 @@
 import convertGQL from '@/helpers/convert-gql'
+import { convertValueToDate } from '@/helpers/convert-date'
+
 import { AxiosHttpClientSignalDecorator } from '../../axios/AxiosHttpClientSignalDecorator'
 
 export const loadEdgeFunctions = async (filter) => {
@@ -28,7 +30,7 @@ const adapt = (filter) => {
       'edgeFunctionsInstanceIdList',
       'edgeFunctionsSolutionId',
       'source',
-      'virtualHostId',
+      'virtualhostid',
       'configurationId'
     ],
     orderBy: 'ts_ASC'
@@ -45,17 +47,19 @@ const adapt = (filter) => {
 
 const adaptResponse = (response) => {
   const { body } = response
+  const [edgeFunctionsEvents = {}] = body.data.edgeFunctionsEvents
 
-  return body.data.edgeFunctionsEvents?.map((edgeFunctionsEvents) => ({
+  return {
+    id: edgeFunctionsEvents.ts + edgeFunctionsEvents.configurationId,
     functionLanguage: edgeFunctionsEvents.functionLanguage,
-    ts: edgeFunctionsEvents.ts,
-    edgeFunctionsList: edgeFunctionsEvents.edgeFunctionsList,
+    ts: convertValueToDate(edgeFunctionsEvents.ts),
+    edgeFunctionsList: edgeFunctionsEvents.edgeFunctionsList.split(';'),
     edgeFunctionsTime: edgeFunctionsEvents.edgeFunctionsTime,
     edgeFunctionsInitiatorTypeList: edgeFunctionsEvents.edgeFunctionsInitiatorTypeList,
     edgeFunctionsInstanceIdList: edgeFunctionsEvents.edgeFunctionsInstanceIdList,
     edgeFunctionsSolutionId: edgeFunctionsEvents.edgeFunctionsSolutionId,
     source: edgeFunctionsEvents.source,
-    virtualHostId: edgeFunctionsEvents.virtualHostId,
+    virtualHostId: edgeFunctionsEvents.virtualhostid,
     configurationId: edgeFunctionsEvents.configurationId
-  }))
+  }
 }

@@ -14,6 +14,9 @@
     tagText: {
       type: String
     },
+    tagIcon: {
+      type: String
+    },
     tagSeverity: {
       type: String,
       default: 'info'
@@ -34,6 +37,7 @@
           v-if="props.tagText"
           :severity="props.tagSeverity"
           class="not-italic border surface-border text-color-secondary surface-100"
+          :icon="props.tagIcon"
           :value="props.tagText"
         />
       </h2>

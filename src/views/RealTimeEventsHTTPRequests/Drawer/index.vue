@@ -8,14 +8,13 @@
   import InfoDrawerBlock from '@/templates/info-drawer-block'
   defineOptions({ name: 'drawer-events-http-requests' })
 
-  const details = ref({})
   const props = defineProps({
     loadService: {
       type: Function,
       required: true
     }
   })
-
+  const details = ref({})
   const showDrawer = ref(false)
 
   const openDetailDrawer = async (item) => {

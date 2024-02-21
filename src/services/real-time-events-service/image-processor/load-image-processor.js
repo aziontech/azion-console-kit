@@ -1,5 +1,6 @@
 import convertGQL from '@/helpers/convert-gql'
 import { AxiosHttpClientSignalDecorator } from '../../axios/AxiosHttpClientSignalDecorator'
+import { convertValueToDate } from '@/helpers/convert-date'
 
 export const loadImageProcessor = async (filter) => {
   const payload = adapt(filter)
@@ -60,8 +61,8 @@ const adapt = (filter) => {
 
 const adaptResponse = (response) => {
   const { body } = response
-
-  return body.data.imagesProcessedEvents?.map((imagesProcessedEvents) => ({
+  const [imagesProcessedEvents = {}] = body.data.imagesProcessedEvents
+  return {
     bytesSent: imagesProcessedEvents.bytesSent,
     configurationId: imagesProcessedEvents.configurationId,
     host: imagesProcessedEvents.host,
@@ -74,18 +75,18 @@ const adaptResponse = (response) => {
     requestMethod: imagesProcessedEvents.requestMethod,
     requestTime: imagesProcessedEvents.requestTime,
     requestUri: imagesProcessedEvents.requestUri,
-    scheme: imagesProcessedEvents.scheme,
+    scheme: imagesProcessedEvents.scheme?.toUpperCase(),
     solution: imagesProcessedEvents.solution,
     sslCipher: imagesProcessedEvents.sslCipher,
     sslProtocol: imagesProcessedEvents.sslProtocol,
     sslSessionReused: imagesProcessedEvents.sslSessionReused,
     status: imagesProcessedEvents.status,
     tcpInfoRtt: imagesProcessedEvents.tcpInfoRtt,
-    ts: imagesProcessedEvents.ts,
+    ts: convertValueToDate(imagesProcessedEvents.ts),
     upstreamCacheStatus: imagesProcessedEvents.upstreamCacheStatus,
     upstreamResponseTime: imagesProcessedEvents.upstreamResponseTime,
     upstreamResponseTimeStr: imagesProcessedEvents.upstreamResponseTimeStr,
     upstreamStatus: imagesProcessedEvents.upstreamStatus,
     upstreamStatusStr: imagesProcessedEvents.upstreamStatusStr
-  }))
+  }
 }

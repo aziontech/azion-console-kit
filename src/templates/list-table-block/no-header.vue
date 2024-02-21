@@ -200,8 +200,7 @@
       default: () => [{ field: 'name', header: 'Name' }]
     },
     pageTitleDelete: {
-      type: String,
-      required: true
+      type: String
     },
     createPagePath: {
       type: String,
