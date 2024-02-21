@@ -21,8 +21,8 @@
   })
 
   const tagIconMap = {
-    'warn': 'pi pi-exclamation-triangle',
-    'danger': 'pi pi-times-circle',
+    warn: 'pi pi-exclamation-triangle',
+    danger: 'pi pi-times-circle'
   }
 
   defineExpose({ props })

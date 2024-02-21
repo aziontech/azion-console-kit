@@ -95,7 +95,7 @@
           tagSeverity="danger"
         >
           <template #body>
-            <div class="flex flex-wrap gap-y-4 ">
+            <div class="flex flex-wrap gap-y-4">
               <BigNumber
                 label="Request Time"
                 sufix="ms"
