@@ -21,7 +21,7 @@
         <TabPanel :header="mapTabs.ImageProcessor.label"> </TabPanel>
         <TabPanel :header="mapTabs.L2Cache.label"> </TabPanel>
         <TabPanel :header="mapTabs.IntelligentDNS.label">
-          <RealTimeEventsIntelligentDNSListView v-bind="props.intelligentDns" />
+          <RealTimeEventsIntelligentDNSListView v-bind="props.intelligentDNS" />
         </TabPanel>
         <TabPanel :header="mapTabs.DataStreaming.label">
           <RealTimeEventsDataStreamingListView v-bind="props.dataStreaming" />
@@ -70,7 +70,7 @@
       type: Object,
       required: true
     },
-    intelligentDns: {
+    intelligentDNS: {
       type: Object,
       required: true
     }

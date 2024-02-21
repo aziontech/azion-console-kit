@@ -11,11 +11,11 @@
       type: Function,
       required: true
     },
-    loadIntelligentDns: {
+    loadIntelligentDNS: {
       type: Function,
       required: true
     },
-    listIntelligentDns: {
+    listIntelligentDNS: {
       type: Function,
       required: true
     }
@@ -47,7 +47,7 @@
   }
 
   const listProvider = async () => {
-    return await props.listIntelligentDns({ tsRange: filterDate.value })
+    return await props.listIntelligentDNS({ tsRange: filterDate.value })
   }
 
   const getColumns = computed(() => {
@@ -92,7 +92,7 @@
 <template>
   <Drawer
     ref="drawerRef"
-    :loadService="props.loadIntelligentDns"
+    :loadService="props.loadIntelligentDNS"
   />
   <div class="flex flex-col gap-8 my-4">
     <div class="flex gap-1">

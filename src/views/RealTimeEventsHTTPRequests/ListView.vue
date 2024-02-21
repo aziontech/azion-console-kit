@@ -26,10 +26,11 @@
   const listTableBlockRef = ref('')
   const drawerRef = ref('')
 
-  const openDetailDrawer = ({ configurationId, ts }) => {
+  const openDetailDrawer = ({ configurationId, ts, requestId }) => {
     drawerRef.value.openDetailDrawer({
       tsRange: filterDate.value,
       configurationId,
+      requestId,
       ts
     })
   }

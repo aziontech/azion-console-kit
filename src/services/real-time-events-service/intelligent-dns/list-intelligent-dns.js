@@ -22,7 +22,7 @@ const adapt = (filter) => {
   const table = {
     dataset: 'idnsQueriesEvents',
     limit: 10000,
-    fields: ['level', 'qtype', 'resolutionType', 'source', 'solutionId', 'ts', 'uuid', 'zoneID'],
+    fields: ['level', 'qtype', 'resolutionType', 'source', 'solutionId', 'ts', 'uuid', 'zoneId'],
     orderBy: 'ts_ASC'
   }
   return convertGQL(filter, table)

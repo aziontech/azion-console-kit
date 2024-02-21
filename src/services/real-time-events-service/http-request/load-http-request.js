@@ -1,4 +1,5 @@
 import convertGQL from '@/helpers/convert-gql'
+import { convertValueToDate } from '@/helpers/convert-date'
 import { AxiosHttpClientSignalDecorator } from '../../axios/AxiosHttpClientSignalDecorator'
 
 export const loadHttpRequest = async (filter) => {
@@ -20,22 +21,53 @@ const adapt = (filter) => {
     dataset: 'httpEvents',
     limit: 10000,
     fields: [
-      'bytesSent',
-      'configurationId',
-      'debugLog',
-      'geolocAsn',
-      'geolocCountryName',
-      'geolocRegionName',
+      'httpReferer',
+      'scheme',
+      'ts',
+      'httpUserAgent',
+      'remoteAddress',
       'host',
-      'ts'
+      'remotePort',
+      'virtualhostId',
+      'configurationId',
+      'source',
+      'requestTime',
+      'tcpinfoRtt',
+      'requestLength',
+      'bytesSent',
+      'sentHttpXOriginalImageSize',
+      'sentHttpContentType',
+      'requestId',
+      'sslCipher',
+      'requestMethod',
+      'sslServerName',
+      'requestUri',
+      'sslProtocol',
+      'proxyStatus',
+      'sslSessionReused',
+      'status',
+      'wafScore',
+      'wafTotalProcessed',
+      'wafTotalBlocked',
+      'wafEvheaders',
+      'wafLearning',
+      'wafBlock',
+      'debugLog',
+      'wafMatch',
+      'sessionid',
+      'geolocAsn',
+      // 'stacktrace',
+      'geolocCountryName'
     ],
     orderBy: 'ts_ASC'
   }
+
   const formatFilter = {
     tsRange: filter.tsRange,
     and: {
       configurationIdEq: filter.configurationId,
-      tsEq: filter.ts
+      tsEq: filter.ts,
+      requestIdEq: filter.requestId
     }
   }
   return convertGQL(formatFilter, table)
@@ -43,17 +75,45 @@ const adapt = (filter) => {
 
 const adaptResponse = (httpResponse) => {
   const { body } = httpResponse
-
-  return body.data.httpEvents?.map((httpEventItem) => {
-    return {
-      bytesSent: httpEventItem.bytesSent,
-      configurationId: httpEventItem.configurationId,
-      debugLog: httpEventItem.debugLog,
-      geolocAsn: httpEventItem.geolocAsn,
-      geolocCountryName: httpEventItem.geolocCountryName,
-      geolocRegionName: httpEventItem.geolocRegionName,
-      host: httpEventItem.host,
-      ts: httpEventItem.ts
-    }
-  })
+  const [httpEventItem = {}] = body.data.httpEvents
+  return {
+    id: httpEventItem.ts + httpEventItem.configurationId + httpEventItem.requestId,
+    httpReferer: httpEventItem.httpReferer,
+    scheme: httpEventItem.scheme,
+    ts: convertValueToDate(httpEventItem.ts),
+    httpUserAgent: httpEventItem.httpUserAgent,
+    remoteAddress: httpEventItem.remoteAddress,
+    host: httpEventItem.host,
+    remotePort: httpEventItem.remotePort,
+    virtualhostId: httpEventItem.virtualhostId,
+    configurationId: httpEventItem.configurationId,
+    source: httpEventItem.source,
+    requestTime: httpEventItem.requestTime,
+    tcpinfoRtt: httpEventItem.tcpinfoRtt,
+    requestLength: httpEventItem.requestLength,
+    bytesSent: httpEventItem.bytesSent,
+    sentHttpXOriginalImageSize: httpEventItem.sentHttpXOriginalImageSize,
+    sentHttpContentType: httpEventItem.sentHttpContentType,
+    requestId: httpEventItem.requestId,
+    sslCipher: httpEventItem.sslCipher,
+    requestMethod: httpEventItem.requestMethod,
+    sslServerName: httpEventItem.sslServerName,
+    requestUri: httpEventItem.requestUri,
+    sslProtocol: httpEventItem.sslProtocol,
+    proxyStatus: httpEventItem.proxyStatus,
+    sslSessionReused: httpEventItem.sslSessionReused,
+    status: httpEventItem.status,
+    wafScore: httpEventItem.wafScore,
+    wafTotalProcessed: httpEventItem.wafTotalProcessed,
+    wafTotalBlocked: httpEventItem.wafTotalBlocked,
+    wafEvheaders: httpEventItem.wafEvheaders,
+    wafLearning: httpEventItem.wafLearning,
+    wafBlock: httpEventItem.wafBlock,
+    debugLog: httpEventItem.debugLog,
+    wafMatch: httpEventItem.wafMatch,
+    sessionid: httpEventItem.sessionid,
+    geolocAsn: httpEventItem.geolocAsn,
+    // stacktrace: httpEventItem.stacktrace,
+    geolocCountryName: httpEventItem.geolocCountryName
+  }
 }

@@ -34,8 +34,8 @@ export const realTimeEventsRoutes = {
       documentationService: Helpers.documentationGuideProducts.realTimeEvents
     },
     intelligentDNS: {
-      listIntelligentDns: RealTimeEventsService.listIntelligentDns,
-      loadIntelligentDns: RealTimeEventsService.loadIntelligentDns,
+      listIntelligentDNS: RealTimeEventsService.listIntelligentDNS,
+      loadIntelligentDNS: RealTimeEventsService.loadIntelligentDNS,
       documentationService: Helpers.documentationGuideProducts.realTimeEvents
     },
     dataStreaming: {

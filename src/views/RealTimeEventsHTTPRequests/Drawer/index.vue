@@ -36,8 +36,8 @@
     <template #body>
       <div class="flex flex-col gap-3 md:m-3">
         <InfoSection
-          :title="details.path"
-          :date="details.date"
+          :title="details.httpReferer"
+          :date="details.ts"
           :tagText="`Scheme: ${details.scheme}`"
         >
           <template #body>
@@ -50,7 +50,7 @@
                 >
                 <TextInfo label="HTTP User Agent">{{ details.httpUserAgent }}</TextInfo>
                 <TextInfo label="Host">{{ details.host }}</TextInfo>
-                <TextInfo label="Virtual Host ID">{{ details.virtualHostId }}</TextInfo>
+                <TextInfo label="Virtual Host ID">{{ details.virtualhostId }}</TextInfo>
               </div>
               <div class="flex flex-col gap-3">
                 <TextInfo label="Remote Address">{{ details.remoteAddress }}</TextInfo>
@@ -73,7 +73,7 @@
               <BigNumber
                 label="TCP Info RTT"
                 sufix="ms"
-                >{{ details.tcpInfoRtt }}</BigNumber
+                >{{ details.tcpinfoRtt }}</BigNumber
               >
 
               <BigNumber
@@ -111,7 +111,7 @@
                 <TextInfo label="Request Method">{{ details.requestMethod }}</TextInfo>
                 <TextInfo label="Request Uri">{{ details.requestUri }}</TextInfo>
                 <TextInfo label="Proxy Status">{{ details.proxyStatus }}</TextInfo>
-                <TextInfo label="Status Code">{{ details.statusCode }}</TextInfo>
+                <TextInfo label="Status Code">{{ details.status }}</TextInfo>
               </div>
             </div>
           </template>
@@ -145,11 +145,11 @@
             <div class="w-full sm:flex-row flex flex-col gap-8">
               <div class="flex flex-col gap-3">
                 <TextInfo label="Debug Log">{{ details.debugLog }}</TextInfo>
-                <TextInfo label="Session ID">{{ details.sessionId }}</TextInfo>
+                <TextInfo label="Session ID">{{ details.sessionid }}</TextInfo>
                 <TextInfo label="Stack Trace">{{ details.stackTrace }}</TextInfo>
               </div>
               <div class="flex flex-col gap-3">
-                <TextInfo label="WF Match">{{ details.wfMatch }}</TextInfo>
+                <TextInfo label="WF Match">{{ details.wafMatch }}</TextInfo>
                 <TextInfo label="Geoloc ASN">{{ details.geolocAsn }}</TextInfo>
                 <TextInfo label="Geoloc Country Name">{{ details.geolocCountryName }}</TextInfo>
                 <TextInfo label="Geoloc Region Name">{{ details.geolocRegionName }}</TextInfo>

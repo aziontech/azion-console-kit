@@ -30,6 +30,7 @@ const adapt = (filter) => {
       'geolocCountryName',
       'geolocRegionName',
       'host',
+      'requestId',
       'ts'
     ],
     orderBy: 'ts_ASC'
@@ -40,17 +41,15 @@ const adapt = (filter) => {
 const adaptResponse = (httpResponse) => {
   const { body } = httpResponse
 
-  return body.data.httpEvents?.map((httpEventItem) => {
-    return {
-      id: httpEventItem.ts + httpEventItem.configurationId,
-      bytesSent: httpEventItem.bytesSent,
-      configurationId: httpEventItem.configurationId,
-      debugLog: httpEventItem.debugLog,
-      geolocAsn: httpEventItem.geolocAsn,
-      geolocCountryName: httpEventItem.geolocCountryName,
-      geolocRegionName: httpEventItem.geolocRegionName,
-      host: httpEventItem.host,
-      ts: httpEventItem.ts
-    }
-  })
+  return body.data.httpEvents?.map((httpEventItem) => ({
+    bytesSent: httpEventItem.bytesSent,
+    configurationId: httpEventItem.configurationId,
+    debugLog: httpEventItem.debugLog,
+    geolocAsn: httpEventItem.geolocAsn,
+    geolocCountryName: httpEventItem.geolocCountryName,
+    geolocRegionName: httpEventItem.geolocRegionName,
+    host: httpEventItem.host,
+    requestId: httpEventItem.requestId,
+    ts: httpEventItem.ts
+  }))
 }
