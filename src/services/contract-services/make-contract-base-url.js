@@ -1,3 +1,3 @@
 export const makeContractBaseUrl = () => {
-  return `contract`
+  return `v3/contract`
 }

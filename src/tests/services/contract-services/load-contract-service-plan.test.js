@@ -42,7 +42,7 @@ describe.concurrent('ContractServices', () => {
 
     expect(requestSpy).toHaveBeenCalledWith({
       method: 'GET',
-      url: `contract/${fixture.clientId}/products`
+      url: `v3/contract/${fixture.clientId}/products`
     })
   })
 
