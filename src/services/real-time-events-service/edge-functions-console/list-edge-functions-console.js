@@ -82,7 +82,7 @@ const adaptResponse = (response) => {
     line: cellsConsoleEvents.line,
     lineSource: {
       content: cellsConsoleEvents.lineSource,
-      severity: 'info',
+      severity: 'info'
     },
     solutionId: cellsConsoleEvents.solutionId,
     source: cellsConsoleEvents.source,

@@ -143,7 +143,9 @@
                 <TextInfo label="Request Uri">{{ details.requestUri }}</TextInfo>
               </div>
               <div class="flex flex-col gap-3">
-                <TextInfo label="Sent HTTP Content Type">{{ details.sentHttpContentType }}</TextInfo>
+                <TextInfo label="Sent HTTP Content Type">{{
+                  details.sentHttpContentType
+                }}</TextInfo>
                 <TextInfo label="Proxy Upstream">{{ details.proxyUpstream }}</TextInfo>
                 <TextInfo label="Proxy Status">{{ details.proxyStatus }}</TextInfo>
                 <TextInfo label="Status">{{ details.status }}</TextInfo>
