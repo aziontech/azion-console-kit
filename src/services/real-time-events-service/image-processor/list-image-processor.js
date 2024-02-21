@@ -41,7 +41,7 @@ const adaptResponse = (response) => {
 
   return body.data.imagesProcessedEvents?.map((imagesProcessedEvents) => ({
     bytesSent: imagesProcessedEvents.bytesSent,
-    id: imagesProcessedEvents.configurationId,
+    configurationId: imagesProcessedEvents.configurationId,
     host: imagesProcessedEvents.host,
     httpReferer: imagesProcessedEvents.httpReferer,
     httpUserAgent: imagesProcessedEvents.httpUserAgent,

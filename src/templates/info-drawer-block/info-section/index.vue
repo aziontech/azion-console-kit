@@ -23,11 +23,6 @@
     }
   })
 
-  const tagIconMap = {
-    'warn': 'pi pi-exclamation-triangle',
-    'danger': 'pi pi-times-circle',
-  }
-
   defineExpose({ props })
 </script>
 
@@ -41,7 +36,6 @@
         <Tag
           v-if="props.tagText"
           :severity="props.tagSeverity"
-          :icon="tagIconMap[props.tagSeverity]"
           class="not-italic border surface-border text-color-secondary surface-100"
           :icon="props.tagIcon"
           :value="props.tagText"

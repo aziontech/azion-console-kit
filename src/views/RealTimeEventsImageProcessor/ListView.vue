@@ -24,7 +24,15 @@
   const hasContentToList = ref(true)
   const listTableBlockRef = ref('')
 
-  const openDetailDrawer = () => {}
+  const drawerRef = ref('')
+
+  const openDetailDrawer = ({ configurationId, ts }) => {
+    drawerRef.value.openDetailDrawer({
+      tsRange: filterDate.value,
+      configurationId,
+      ts
+    })
+  }
 
   const handleLoadData = (event) => {
     hasContentToList.value = event
@@ -49,7 +57,7 @@
         header: 'Bytes Sent'
       },
       {
-        field: 'id',
+        field: 'configurationId',
         header: 'Configuration ID'
       },
       {

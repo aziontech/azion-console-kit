@@ -10,28 +10,52 @@
         @tab-click="changePage"
       >
         <TabPanel :header="mapTabs.httpRequests.label">
-          <RealTimeEventsHTTPRequestsListView v-bind="props.httpRequests" />
+          <RealTimeEventsHTTPRequestsListView
+            v-bind="props.httpRequests"
+            v-if="mapTabs.httpRequests.index === tabSelectIndex"
+          />
         </TabPanel>
         <TabPanel :header="mapTabs.EdgeFunctions.label">
-          <RealTimeEventEdgeFunctionsListView v-bind="props.edgeFunctions" />
+          <RealTimeEventEdgeFunctionsListView
+            v-bind="props.edgeFunctions"
+            v-if="mapTabs.EdgeFunctions.index === tabSelectIndex"
+          />
         </TabPanel>
         <TabPanel :header="mapTabs.EdgeFunctionsConsole.label">
-          <RealTimeEventEdgeFunctionsConsoleListView v-bind="props.edgeFunctionsConsole" />
+          <RealTimeEventEdgeFunctionsConsoleListView
+            v-bind="props.edgeFunctionsConsole"
+            v-if="mapTabs.EdgeFunctionsConsole.index === tabSelectIndex"
+          />
         </TabPanel>
         <TabPanel :header="mapTabs.ImageProcessor.label">
-          <RealTimeEventsImageProcessor v-bind="props.imageProcessor" />
+          <RealTimeEventsImageProcessor
+            v-bind="props.imageProcessor"
+            v-if="mapTabs.ImageProcessor.index === tabSelectIndex"
+          />
         </TabPanel>
         <TabPanel :header="mapTabs.L2Cache.label">
-          <RealTimeEventsL2Cache v-bind="props.l2Cache" />
+          <RealTimeEventsL2Cache
+            v-bind="props.l2Cache"
+            v-if="mapTabs.L2Cache.index === tabSelectIndex"
+          />
         </TabPanel>
         <TabPanel :header="mapTabs.IntelligentDNS.label">
-          <RealTimeEventsIntelligentDNSListView v-bind="props.intelligentDNS" />
+          <RealTimeEventsIntelligentDNSListView
+            v-bind="props.intelligentDNS"
+            v-if="mapTabs.IntelligentDNS.index === tabSelectIndex"
+          />
         </TabPanel>
         <TabPanel :header="mapTabs.DataStreaming.label">
-          <RealTimeEventsDataStreamingListView v-bind="props.dataStreaming" />
+          <RealTimeEventsDataStreamingListView
+            v-bind="props.dataStreaming"
+            v-if="mapTabs.DataStreaming.index === tabSelectIndex"
+          />
         </TabPanel>
         <TabPanel :header="mapTabs.ActivityHistory.label">
-          <RealTimeEventsActivityHistoryListView v-bind="props.activityHistory" />
+          <RealTimeEventsActivityHistoryListView
+            v-bind="props.activityHistory"
+            v-if="mapTabs.ActivityHistory.index === tabSelectIndex"
+          />
         </TabPanel>
       </TabView>
     </template>
