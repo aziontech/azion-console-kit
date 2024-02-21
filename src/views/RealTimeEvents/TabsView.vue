@@ -18,8 +18,12 @@
         <TabPanel :header="mapTabs.EdgeFunctionsConsole.label">
           <RealTimeEventEdgeFunctionsConsoleListView v-bind="props.edgeFunctionsConsole" />
         </TabPanel>
-        <TabPanel :header="mapTabs.ImageProcessor.label"> </TabPanel>
-        <TabPanel :header="mapTabs.L2Cache.label"> </TabPanel>
+        <TabPanel :header="mapTabs.ImageProcessor.label">
+          <RealTimeEventsImageProcessor v-bind="props.imageProcessor" />
+        </TabPanel>
+        <TabPanel :header="mapTabs.L2Cache.label">
+          <RealTimeEventsL2Cache v-bind="props.l2Cache" />
+        </TabPanel>
         <TabPanel :header="mapTabs.IntelligentDNS.label">
           <RealTimeEventsIntelligentDNSListView v-bind="props.intelligentDNS" />
         </TabPanel>
@@ -47,6 +51,8 @@
   import RealTimeEventsDataStreamingListView from '@/views/RealTimeEventsDataStreaming/ListView'
   import RealTimeEventsActivityHistoryListView from '@/views/RealTimeEventsActivityHistory/ListView'
   import RealTimeEventsIntelligentDNSListView from '@/views/RealTimeEventsIntelligentDNS/ListView'
+  import RealTimeEventsImageProcessor from '@/views/RealTimeEventsImageProcessor/ListView'
+  import RealTimeEventsL2Cache from '@/views/RealTimeEventsL2Cache/ListView'
   defineOptions({ name: 'RealTimeEventsTabsView' })
 
   const props = defineProps({
@@ -71,6 +77,14 @@
       required: true
     },
     intelligentDNS: {
+      type: Object,
+      required: true
+    },
+    imageProcessor: {
+      type: Object,
+      required: true
+    },
+    l2Cache: {
       type: Object,
       required: true
     }
