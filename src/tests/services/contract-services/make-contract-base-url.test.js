@@ -12,7 +12,7 @@ const makeSut = () => {
 describe('ContractServices', () => {
   it('should return the API base url to contract service', () => {
     const { sut } = makeSut()
-    const correctApiUrl = 'contract'
+    const correctApiUrl = 'v3/contract'
 
     const baseUrl = sut()
 
