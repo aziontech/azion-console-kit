@@ -3,9 +3,8 @@
   import InfoSection from '@/templates/info-drawer-block/info-section'
   import TextInfo from '@/templates/info-drawer-block/info-labels/text-info.vue'
   import BigNumber from '@/templates/info-drawer-block/info-labels/big-number.vue'
-  import PrimeButton from 'primevue/button'
   import Divider from 'primevue/divider'
-  import { useToast } from 'primevue/usetoast'
+
   import InfoDrawerBlock from '@/templates/info-drawer-block'
   defineOptions({ name: 'drawer-events-http-requests' })
 
@@ -13,15 +12,10 @@
     loadService: {
       type: Function,
       required: true
-    },
-    clipboardWrite: {
-      type: Function,
-      required: true
     }
   })
   const details = ref({})
-  const showDrawer = ref(false)
-  const toast = useToast()
+  const showDrawer = ref(true)
 
   const openDetailDrawer = async (item) => {
     showDrawer.value = true
@@ -70,15 +64,6 @@
     return []
   })
 
-  const copyWafHeaders = (headers) => {
-    props.clipboardWrite(headers)
-    toast.add({
-      closable: true,
-      severity: 'success',
-      summary: 'WAF Headers copied!'
-    })
-  }
-
   defineExpose({
     openDetailDrawer
   })
@@ -99,44 +84,23 @@
           <template #body>
             <div class="w-full flex flex-col md:flex-row md:gap-8 gap-3">
               <div class="flex flex-col gap-3">
-                <TextInfo
-                  class="md:hidden"
-                  label="Scheme"
-                  >{{ details.scheme }}</TextInfo
-                >
-                <TextInfo label="HTTP User Agent">{{ details.httpUserAgent }}</TextInfo>
-                <TextInfo label="HTTP Referer">{{ details.httpReferer }}</TextInfo>
-                <TextInfo label="Virtual Host ID">{{ details.virtualhostId }}</TextInfo>
+                <TextInfo label="Request ID">{{ details.requestId }}</TextInfo>
               </div>
               <div class="flex flex-col gap-3">
                 <TextInfo label="Remote Address">{{ details.remoteAddress }}</TextInfo>
                 <TextInfo label="Remote Port">{{ details.remotePort }}</TextInfo>
-                <TextInfo label="Configuration ID">{{ details.configurationId }}</TextInfo>
               </div>
             </div>
           </template>
         </InfoSection>
 
-        <InfoSection title="Request Data">
+        <InfoSection title="Request and Response Data">
           <template #body>
-            <div
-              class="flex sm:flex-row sm:flex-wrap flex-wrap gap-y-4 gap-x-2 sm:gap-x-4 sm:gap-y-8"
-            >
+            <div class="flex flex-wrap gap-4 sm:gap-8">
               <BigNumber
                 label="Request Time"
                 sufix="ms"
                 >{{ details.requestTime }}</BigNumber
-              >
-              <BigNumber
-                label="TCP Info RTT"
-                sufix="ms"
-                >{{ details.tcpinfoRtt }}</BigNumber
-              >
-
-              <BigNumber
-                label="Request Length"
-                sufix="lines"
-                >{{ details.requestLength }}</BigNumber
               >
 
               <BigNumber
@@ -145,30 +109,73 @@
                 >{{ details.bytesSent }}</BigNumber
               >
               <BigNumber
-                label="Sent HTTP X Original Image Size"
-                sufix="bytes"
-                >{{ details.sentHttpXOriginalImageSize }}</BigNumber
+                label="Request Length"
+                sufix="lines"
+                >{{ details.requestLength }}</BigNumber
               >
             </div>
 
             <Divider />
 
-            <div class="w-full flex sm:flex-row flex-col gap-8">
+            <div class="w-full flex sm:flex-row flex-col gap-3 sm:gap-8">
               <div class="flex flex-col gap-3">
+                <TextInfo label="Status">{{ details.status }}</TextInfo>
+                <TextInfo label="Request Method">{{ details.requestMethod }}</TextInfo>
+                <TextInfo label="Request Uri">{{ details.requestUri }}</TextInfo>
+              </div>
+              <div class="flex flex-col gap-3">
+                <TextInfo label="HTTP User Agent">{{ details.httpUserAgent }}</TextInfo>
+
                 <TextInfo label="Sent HTTP Content Type">{{
                   details.sentHttpContentType
                 }}</TextInfo>
-                <TextInfo label="SSL Cipher">{{ details.sslCipher }}</TextInfo>
-                <TextInfo label="SSL Server Name">{{ details.sslServerName }}</TextInfo>
-                <TextInfo label="SSL Protocol">{{ details.sslProtocol }}</TextInfo>
-                <TextInfo label="SSL Session Reused">{{ details.sslSessionReused }}</TextInfo>
+                <TextInfo label="HTTP Referer">{{ details.httpReferer }}</TextInfo>
+              </div>
+            </div>
+          </template>
+        </InfoSection>
+
+        <InfoSection
+          title="Origin Data"
+          :tags="upstreamTag"
+        >
+          <template #body>
+            <div class="flex flex-col sm:flex-row gap-8">
+              <BigNumber
+                label="Upstream Bytes Received"
+                sufix="bytes"
+                >{{ details.upstreamBytesReceived }}</BigNumber
+              >
+              <BigNumber
+                label="Upstream Response Time"
+                sufix="ms"
+                >{{ details.upstreamResponseTime }}</BigNumber
+              >
+              <BigNumber
+                label="Upstream Bytes Sent"
+                sufix="bytes"
+                >{{ details.upstreamBytesSent }}</BigNumber
+              >
+            </div>
+
+            <Divider />
+
+            <div class="w-full flex sm:flex-row flex-col gap-3">
+              <TextInfo label="Upstream Addr">{{ details.upstreamAddr }}</TextInfo>
+              <TextInfo label="Upstream Status">{{ details.upstreamStatus }}</TextInfo>
+            </div>
+          </template>
+        </InfoSection>
+
+        <InfoSection title="Geo-location Data">
+          <template #body>
+            <div class="w-full flex flex-col md:flex-row md:gap-8 gap-3">
+              <div class="flex flex-col gap-3">
+                <TextInfo label="Geoloc ASN">{{ details.geolocAsn }}</TextInfo>
               </div>
               <div class="flex flex-col gap-3">
-                <TextInfo label="Request ID">{{ details.requestId }}</TextInfo>
-                <TextInfo label="Request Method">{{ details.requestMethod }}</TextInfo>
-                <TextInfo label="Request Uri">{{ details.requestUri }}</TextInfo>
-                <TextInfo label="Proxy Status">{{ details.proxyStatus }}</TextInfo>
-                <TextInfo label="Status Code">{{ details.status }}</TextInfo>
+                <TextInfo label="Geoloc Country Name">{{ details.geolocCountryName }}</TextInfo>
+                <TextInfo label="Geoloc Region Name">{{ details.geolocRegionName }}</TextInfo>
               </div>
             </div>
           </template>
@@ -179,84 +186,36 @@
           :tags="secureTag"
         >
           <template #body>
-            <div class="flex gap-4">
-              <BigNumber label="WAF Total Processed">{{ details.wafTotalProcessed }}</BigNumber>
-              <BigNumber label="WAF Total Blocked">{{ details.wafTotalBlocked }}</BigNumber>
-            </div>
-            <div class="flex gap-4 justify-between">
+            <div class="flex flex-wrap gap-x-4 gap-y-8">
               <BigNumber label="WAF Block">{{ details.wafBlock }}</BigNumber>
+              <BigNumber label="WAF Total Blocked">{{ details.wafTotalBlocked }}</BigNumber>
               <BigNumber label="WAF Learning">{{ details.wafLearning }}</BigNumber>
-            </div>
-
-            <div class="flex gap-2 items-center w-full">
-              <label class="text-sm">WAF EV Headers</label>
-              <PrimeButton
-                label="Copy"
-                icon="pi pi-copy"
-                @click="copyWafHeaders"
-                outlined
-              />
+              <BigNumber label="WAF Total Processed">{{ details.wafTotalProcessed }}</BigNumber>
             </div>
 
             <Divider />
 
-            <div class="w-full sm:flex-row flex flex-col gap-8">
+            <div class="w-full sm:flex-row flex flex-col gap-3 sm:gap-8">
               <div class="flex flex-col gap-3">
-                <TextInfo label="Debug Log">{{ details.debugLog }}</TextInfo>
-                <TextInfo label="Session ID">{{ details.sessionid }}</TextInfo>
-                <TextInfo label="Stack Trace">{{ details.stackTrace }}</TextInfo>
+                <TextInfo label="SSL Cipher">{{ details.sslCipher }}</TextInfo>
+                <TextInfo label="SSL Protocol">{{ details.sslProtocol }}</TextInfo>
               </div>
               <div class="flex flex-col gap-3">
                 <TextInfo label="WF Match">{{ details.wafMatch }}</TextInfo>
-                <TextInfo label="Geoloc ASN">{{ details.geolocAsn }}</TextInfo>
-                <TextInfo label="Geoloc Country Name">{{ details.geolocCountryName }}</TextInfo>
-                <TextInfo label="Geoloc Region Name">{{ details.geolocRegionName }}</TextInfo>
-                <TextInfo label="Stream Name">{{ details.streamName }}</TextInfo>
-                <TextInfo label="Server Addr">{{ details.serverAddr }}</TextInfo>
-                <TextInfo label="Server Port">{{ details.serverPort }}</TextInfo>
               </div>
             </div>
           </template>
         </InfoSection>
 
-        <InfoSection
-          title="Upstream Data"
-          :tags="upstreamTag"
-        >
+        <InfoSection title="Debug Data">
           <template #body>
-            <div class="flex sm:flex-row sm:flex-wrap sm:w-3/4 flex-col gap-y-4 gap-x-8">
-              <BigNumber
-                label="Upstream Connect Time"
-                sufix="ms"
-                >{{ details.upstreamConnectTime }}</BigNumber
-              >
-              <BigNumber
-                label="Upstream Bytes Sent"
-                sufix="bytes"
-                >{{ details.upstreamBytesSent }}</BigNumber
-              >
-              <BigNumber
-                label="Upstream Header Time"
-                sufix="ms"
-                >{{ details.upstreamHeaderTime }}</BigNumber
-              >
-              <BigNumber
-                label="Upstream Response Time"
-                sufix="ms"
-                >{{ details.upstreamResponseTime }}</BigNumber
-              >
-              <BigNumber
-                label="Upstream Bytes Received"
-                sufix="bytes"
-                >{{ details.upstreamBytesReceived }}</BigNumber
-              >
-            </div>
-
-            <Divider />
-
-            <div class="w-full flex sm:flex-row flex-col gap-3">
-              <TextInfo label="Upstream Addr">{{ details.upstreamAddr }}</TextInfo>
-              <TextInfo label="Upstream Status">{{ details.upstreamStatus }}</TextInfo>
+            <div class="w-full flex flex-col md:flex-row md:gap-8 gap-3">
+              <div class="flex flex-col gap-3">
+                <TextInfo label="Debug Log">{{ details.debugLog }}</TextInfo>
+              </div>
+              <div class="flex flex-col gap-3">
+                <TextInfo label="Stack Trace">{{ details.stackTrace }}</TextInfo>
+              </div>
             </div>
           </template>
         </InfoSection>

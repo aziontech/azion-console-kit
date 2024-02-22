@@ -56,8 +56,9 @@ const adapt = (filter) => {
       'wafMatch',
       'sessionid',
       'geolocAsn',
-      // 'stacktrace',
-      'geolocCountryName'
+      'stacktrace',
+      'geolocCountryName',
+      'geolocRegionName'
     ],
     orderBy: 'ts_ASC'
   }
@@ -113,7 +114,7 @@ const adaptResponse = (httpResponse) => {
     wafMatch: httpEventItem.wafMatch,
     sessionid: httpEventItem.sessionid,
     geolocAsn: httpEventItem.geolocAsn,
-    // stacktrace: httpEventItem.stacktrace,
+    stacktrace: httpEventItem.stacktrace,
     geolocCountryName: httpEventItem.geolocCountryName
   }
 }
