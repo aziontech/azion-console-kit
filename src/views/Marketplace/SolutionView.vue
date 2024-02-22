@@ -211,8 +211,8 @@
   })
 
   const removeStyleAttributes = (html) => {
-    html = html.replace(/style="[^"]*"/g, '');
-    return html;
+    html = html.replace(/style="[^"]*"/g, '')
+    return html
   }
 
   onBeforeMount(async () => {
