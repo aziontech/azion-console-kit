@@ -136,6 +136,8 @@
       v-model:visible="visible"
       @update:visible="visibleDialog"
       modal
+      :draggable="false"
+      header="Switch Account"
       :breakpoints="{ '460px': '95vw' }"
       :pt="{
         root: { class: 'p-0 w-[880px] h-[632px] mx-3 sm:mx-8 md:mx-8' },
@@ -143,9 +145,6 @@
         content: { class: 'p-0 h-full' }
       }"
     >
-      <template #header>
-        <h4 class="w-full text-xl not-italic font-medium leading-7">Switch Account</h4>
-      </template>
       <div class="p-8 flex flex-col gap-8 max-sm:gap-6">
         <PrimeCard
           class="w-fit"
