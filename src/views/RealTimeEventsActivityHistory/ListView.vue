@@ -1,7 +1,6 @@
 <script setup>
   import EmptyResultsBlock from '@/templates/empty-results-block'
   import ListTableBlock from '@/templates/list-table-block/no-header'
-  import PrimeButton from 'primevue/button'
   import { computed, ref } from 'vue'
   import Drawer from './Drawer'
   import IntervalFilterBlock from '@/views/RealTimeEvents/blocks/interval-filter-block'
@@ -110,25 +109,7 @@
     title="No events found in this period."
     description="Change the time range to search other logs or start using services and products to view your account's activity.
 They are displayed when there are requests and traffic received in the period selected."
-    createButtonLabel="create button label"
     :documentationService="documentationService"
     :inTabs="true"
-  >
-    <template #extraActionsLeft>
-      <PrimeButton
-        severity="primary"
-        outlined
-        icon="pi pi-shopping-cart"
-        label="Browser Template"
-        @click="() => {}"
-      />
-    </template>
-    <template #default>
-      <PrimeButton
-        severity="secondary"
-        label="Quick start"
-        @click="console.log"
-      />
-    </template>
-  </EmptyResultsBlock>
+  />
 </template>

@@ -1,7 +1,6 @@
 <script setup>
   import EmptyResultsBlock from '@/templates/empty-results-block'
   import ListTableBlock from '@/templates/list-table-block/no-header'
-  import PrimeButton from 'primevue/button'
   import { computed, ref } from 'vue'
   import IntervalFilterBlock from '@/views/RealTimeEvents/blocks/interval-filter-block'
   import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
@@ -135,23 +134,5 @@
     createButtonLabel="create button label"
     :documentationService="documentationService"
     :inTabs="true"
-  >
-    <template #extraActionsLeft>
-      <PrimeButton
-        severity="primary"
-        outlined
-        icon="pi pi-shopping-cart"
-        label="Browser Template"
-        @click="() => {}"
-      />
-    </template>
-    <template #default>
-      <PrimeButton
-        severity="secondary"
-        icon="pi pi-plus"
-        label="Quick Start"
-        @click="() => {}"
-      />
-    </template>
-  </EmptyResultsBlock>
+  />
 </template>

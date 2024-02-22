@@ -5,6 +5,7 @@
   import { computed, ref } from 'vue'
   import IntervalFilterBlock from '@/views/RealTimeEvents/blocks/interval-filter-block'
   import Drawer from './Drawer'
+  import { useRouter } from 'vue-router'
 
   const props = defineProps({
     documentationService: {
@@ -24,7 +25,7 @@
   const filterDate = ref({})
   const hasContentToList = ref(true)
   const listTableBlockRef = ref('')
-
+  const router = useRouter()
   const drawerRef = ref('')
 
   const openDetailDrawer = ({ configurationId, ts }) => {
@@ -79,6 +80,10 @@
       }
     ]
   })
+
+  const goToEdgeApplication = () => {
+    router.push({ name: 'list-edge-applications' })
+  }
 </script>
 
 <template>
@@ -110,25 +115,14 @@
     v-else
     title="No events found in this period."
     description="Change the time range to search other logs or create new Edge Function. They are displayed when there are requests and traffic received in the period selected."
-    createButtonLabel="create button label"
     :documentationService="documentationService"
     :inTabs="true"
   >
-    <template #extraActionsLeft>
-      <PrimeButton
-        severity="primary"
-        outlined
-        icon="pi pi-shopping-cart"
-        label="Browser Template"
-        @click="() => {}"
-      />
-    </template>
     <template #default>
       <PrimeButton
         severity="secondary"
-        icon="pi pi-plus"
         label="Edge Application"
-        @click="() => {}"
+        @click="goToEdgeApplication"
       />
     </template>
   </EmptyResultsBlock>

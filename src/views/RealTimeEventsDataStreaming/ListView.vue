@@ -136,19 +136,9 @@
     title="No events found in this period."
     description="Change the time range to search other logs or create new Data Streaming.
 They are displayed when there are requests and traffic received in the period selected."
-    createButtonLabel="create button label"
     :documentationService="documentationService"
     :inTabs="true"
   >
-    <template #extraActionsLeft>
-      <PrimeButton
-        severity="primary"
-        outlined
-        icon="pi pi-shopping-cart"
-        label="Browser Template"
-        @click="() => {}"
-      />
-    </template>
     <template #default>
       <PrimeButton
         severity="secondary"

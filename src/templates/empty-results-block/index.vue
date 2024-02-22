@@ -49,6 +49,7 @@
           <slot name="extraActionsLeft"></slot>
           <slot name="default">
             <PrimeButton
+              v-if="props.createButtonLabel"
               severity="secondary"
               icon="pi pi-plus"
               :label="createButtonLabel"

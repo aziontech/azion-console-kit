@@ -51,6 +51,7 @@
             <div class="flex flex-col sm:flex-row sm:gap-8 gap-3 w-full">
               <div class="flex flex-col gap-3">
                 <TextInfo label="UUID">{{ details.uuid }}</TextInfo>
+                <TextInfo label="Q Type Description">{{ details.qTypeDescription }}</TextInfo>
               </div>
               <div class="flex flex-col gap-3">
                 <TextInfo label="Zone ID">{{ details.zoneId }}</TextInfo>
