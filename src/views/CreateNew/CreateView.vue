@@ -279,8 +279,7 @@
     },
     methods: {
       removeStyleAttributes(html) {
-        html = html.replace(/style="[^"]*"/g, '')
-        return html
+        return html.replace(/style="[^"]*"/g, '')
       },
       async loadSolutionByVendor() {
         try {
