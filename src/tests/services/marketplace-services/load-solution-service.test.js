@@ -29,12 +29,15 @@ const fixtures = {
         slug: 'networking'
       }
     ],
-    usage: '<p style="text-align:justify"><span style="font-size:11pt"><span style="font-family:Arial,sans-serif"><span style="color:#000000">Azion effectively provides support...</p>',
+    usage:
+      '<p style="text-align:justify"><span style="font-size:11pt"><span style="font-family:Arial,sans-serif"><span style="color:#000000">Azion effectively provides support...</p>',
     new_release: true,
-    overview: '<p style="text-align:justify"><span style="font-size:11pt"><span style="font-family:Arial,sans-serif"><span style="color:#000000">Azion effectively provides support...</p>',
+    overview:
+      '<p style="text-align:justify"><span style="font-size:11pt"><span style="font-family:Arial,sans-serif"><span style="color:#000000">Azion effectively provides support...</p>',
     solution_reference_id: '123',
     featured: false,
-    support: '<p style="text-align:justify"><span style="font-size:11pt"><span style="font-family:Arial,sans-serif"><span style="color:#000000">Azion effectively provides support...</p>',
+    support:
+      '<p style="text-align:justify"><span style="font-size:11pt"><span style="font-family:Arial,sans-serif"><span style="color:#000000">Azion effectively provides support...</p>',
     updated_at: '12/11/20, 13:40PM',
     is_launched: true,
     dependencies_by_client: [],
@@ -66,7 +69,7 @@ describe('MarketplaceServices', () => {
 
     await sut({
       vendor: solution.vendor.slug,
-      solution: solution.slug,
+      solution: solution.slug
     })
 
     expect(requestSpy).toHaveBeenCalledWith({
