@@ -42,7 +42,7 @@
   const toast = useToast()
   const showGoBack = ref(false)
   const blockViewRedirection = ref(true)
-  const formDrawerHasUpdated = ref(null)
+  const formDrawerHasUpdated = ref(false)
 
   const { meta, resetForm, isSubmitting, handleSubmit } = useForm({
     validationSchema: props.schema,
@@ -53,7 +53,7 @@
     get: () => props.visible,
     set: (value) => {
       if (formHasChanges.value) {
-        formDrawerHasUpdated.value = Math.random()
+        formDrawerHasUpdated.value = !formDrawerHasUpdated.value
         changeVisisbleDrawer(!value, false)
         return
       }

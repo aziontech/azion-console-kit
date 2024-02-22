@@ -105,7 +105,7 @@
       openDialogUnsaved(true)
       changeTab(tabHasUpdate.oldTab)
     }
-  })
+  }, { deep: true })
 
   watch(formDrawerHasUpdated, () => {
     openDialogUnsaved(true)
