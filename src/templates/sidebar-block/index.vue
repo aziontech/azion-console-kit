@@ -64,6 +64,9 @@
   import PrimeMenu from 'primevue/menu'
   import Sidebar from 'primevue/sidebar'
   import { listSidebarMenusService } from '@services/sidebar-menus-services'
+  import { useMagicKeys } from '@vueuse/core'
+
+  const { meta, control } = useMagicKeys()
 
   defineOptions({ name: 'sidebar-block' })
 
@@ -81,6 +84,10 @@
 
   const redirectToRoute = (route) => {
     sidebarToggle()
+    if (meta.value || control.value) {
+      window.open(`${window.location.origin}${route}`, '_blank')
+      return
+    }
     router.push(route)
   }
 
