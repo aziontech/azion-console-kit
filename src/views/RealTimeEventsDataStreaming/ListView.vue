@@ -1,6 +1,7 @@
 <script setup>
   import EmptyResultsBlock from '@/templates/empty-results-block'
   import ListTableBlock from '@/templates/list-table-block/no-header'
+  import Drawer from './Drawer'
   import PrimeButton from 'primevue/button'
   import { computed, ref } from 'vue'
 

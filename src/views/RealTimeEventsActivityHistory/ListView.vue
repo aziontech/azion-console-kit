@@ -3,6 +3,7 @@
   import ListTableBlock from '@/templates/list-table-block/no-header'
   import PrimeButton from 'primevue/button'
   import { computed, ref } from 'vue'
+  import Drawer from './Drawer'
   import IntervalFilterBlock from '@/views/RealTimeEvents/blocks/interval-filter-block'
 
   const props = defineProps({
@@ -80,6 +81,10 @@
 </script>
 
 <template>
+  <Drawer
+    ref="drawerRef"
+    :loadService="props.loadActivityHistory"
+  />
   <div class="flex flex-col gap-8 my-4">
     <div class="flex gap-1">
       <p class="text-xs font-medium leading-4">Specification</p>

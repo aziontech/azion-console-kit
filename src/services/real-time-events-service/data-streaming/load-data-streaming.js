@@ -44,8 +44,9 @@ const adapt = (filter) => {
 
 const adaptResponse = (response) => {
   const { body } = response
+  const [dataStreamedEvents = {}] = body.data.dataStreamedEvents
 
-  return body.data.dataStreamedEvents?.map((dataStreamedEvents) => ({
+  return {
     url: dataStreamedEvents.url,
     jobName: dataStreamedEvents.jobName,
     ts: dataStreamedEvents.ts,
@@ -55,5 +56,5 @@ const adaptResponse = (response) => {
     source: dataStreamedEvents.source,
     endpointType: dataStreamedEvents.endpointType,
     statusCode: dataStreamedEvents.statusCode
-  }))
+  }
 }

@@ -15,7 +15,7 @@
     }
   })
   const details = ref({})
-  const showDrawer = ref(false)
+  const showDrawer = ref(true)
 
   const openDetailDrawer = async (item) => {
     showDrawer.value = true
@@ -72,7 +72,9 @@
 
         <InfoSection title="Request Data">
           <template #body>
-            <div class="flex sm:flex-row sm:flex-wrap sm:w-3/4 flex-wrap gap-y-4 gap-x-2">
+            <div
+              class="flex sm:flex-row sm:flex-wrap flex-wrap gap-y-4 gap-x-2 sm:gap-x-4 sm:gap-y-8"
+            >
               <BigNumber
                 label="Request Time"
                 sufix="ms"
