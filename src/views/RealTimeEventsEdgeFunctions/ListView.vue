@@ -6,6 +6,7 @@
   import IntervalFilterBlock from '@/views/RealTimeEvents/blocks/interval-filter-block'
   import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
   import Drawer from './Drawer'
+  import { useRouter } from 'vue-router'
 
   const props = defineProps({
     documentationService: {
@@ -26,6 +27,7 @@
   const hasContentToList = ref(true)
   const listTableBlockRef = ref('')
   const drawerRef = ref('')
+  const router = useRouter()
 
   const openDetailDrawer = ({ configurationId, ts, requestId }) => {
     drawerRef.value.openDetailDrawer({
@@ -87,6 +89,10 @@
       }
     ]
   })
+
+  const goToCreateEdgeFunction = () => {
+    router.push({ name: 'create-edge-functions' })
+  }
 </script>
 
 <template>
@@ -136,7 +142,7 @@
         severity="secondary"
         icon="pi pi-plus"
         label="Edge Function"
-        @click="() => {}"
+        @click="goToCreateEdgeFunction"
       />
     </template>
   </EmptyResultsBlock>
