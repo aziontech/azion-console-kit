@@ -1,5 +1,5 @@
 <script setup>
-  import { ref, watch } from 'vue'
+  import { ref, watch, computed } from 'vue'
 
   import InfoSection from '@/templates/info-drawer-block/info-section'
   import TextInfo from '@/templates/info-drawer-block/info-labels/text-info.vue'
@@ -29,6 +29,19 @@
     }
   )
 
+  const tags = computed(() => {
+    if (details.value.level) {
+      return [
+        {
+          text: details.value.level.content,
+          severity: details.value.level.severity,
+          icon: details.value.level.icon
+        }
+      ]
+    }
+    return []
+  })
+
   defineExpose({
     openDetailDrawer
   })
@@ -40,13 +53,11 @@
     title="More Details"
   >
     <template #body>
-      <div class="flex flex-col gap-3 md:m-3">
+      <div class="flex flex-col gap-6 sm:gap-8 md:m-3">
         <InfoSection
           :title="`Line Source - ${details.lineSource}`"
           :date="details.ts"
-          :tagText="details.level?.content"
-          :tagSeverity="details.level?.severity"
-          :tagIcon="details.level?.icon"
+          :tags="tags"
         >
           <template #body>
             <div class="flex flex-col sm:flex-row sm:gap-8 gap-3">

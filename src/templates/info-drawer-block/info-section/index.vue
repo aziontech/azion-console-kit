@@ -11,6 +11,13 @@
       type: String,
       required: true
     },
+    tags: {
+      type: Array,
+      default: () => [],
+      validator: (tags) => {
+        return tags.every((tag) => typeof tag === 'object' && tag !== null)
+      }
+    },
     tagText: {
       type: String
     },
@@ -34,11 +41,12 @@
       <h2 class="text-color text-xl font-medium flex flex-wrap gap-2">
         {{ props.title }}
         <Tag
-          v-if="props.tagText"
-          :severity="props.tagSeverity"
+          v-for="(tags, i) in props.tags"
+          :key="i"
+          :severity="tags?.severity ?? 'info'"
           class="not-italic border surface-border text-color-secondary surface-100"
-          :icon="props.tagIcon"
-          :value="props.tagText"
+          :icon="tags?.icon"
+          :value="tags.text"
         />
       </h2>
       <div

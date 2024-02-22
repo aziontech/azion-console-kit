@@ -1,10 +1,11 @@
 <script setup>
-  import { ref, watch } from 'vue'
+  import { ref, watch, computed } from 'vue'
   import InfoSection from '@/templates/info-drawer-block/info-section'
   import TextInfo from '@/templates/info-drawer-block/info-labels/text-info.vue'
   import BigNumber from '@/templates/info-drawer-block/info-labels/big-number.vue'
   import PrimeButton from 'primevue/button'
   import Divider from 'primevue/divider'
+  import { useToast } from 'primevue/usetoast'
   import InfoDrawerBlock from '@/templates/info-drawer-block'
   defineOptions({ name: 'drawer-events-http-requests' })
 
@@ -12,10 +13,15 @@
     loadService: {
       type: Function,
       required: true
+    },
+    clipboardWrite: {
+      type: Function,
+      required: true
     }
   })
   const details = ref({})
   const showDrawer = ref(false)
+  const toast = useToast()
 
   const openDetailDrawer = async (item) => {
     showDrawer.value = true
@@ -31,6 +37,48 @@
     }
   )
 
+  const hostTag = computed(() => {
+    if (details.value.scheme) {
+      return [
+        {
+          text: `Scheme: ${details.value.scheme}`
+        }
+      ]
+    }
+    return []
+  })
+
+  const secureTag = computed(() => {
+    if (details.value.wafScore !== undefined) {
+      return [
+        {
+          text: `WAF Score: ${details.value.wafScore}`
+        }
+      ]
+    }
+    return []
+  })
+
+  const upstreamTag = computed(() => {
+    if (details.value.upstreamCacheStatus) {
+      return [
+        {
+          text: `Upstream Cache Status: ${details.value.upstreamCacheStatus}`
+        }
+      ]
+    }
+    return []
+  })
+
+  const copyWafHeaders = (headers) => {
+    props.clipboardWrite(headers)
+    toast.add({
+      closable: true,
+      severity: 'success',
+      summary: 'WAF Headers copied!'
+    })
+  }
+
   defineExpose({
     openDetailDrawer
   })
@@ -42,11 +90,11 @@
     title="More Details"
   >
     <template #body>
-      <div class="flex flex-col gap-3 md:m-3">
+      <div class="flex flex-col gap-6 sm:gap-8 md:m-3">
         <InfoSection
           :title="details.host"
           :date="details.ts"
-          :tagText="`Scheme: ${details.scheme}`"
+          :tags="hostTag"
         >
           <template #body>
             <div class="w-full flex flex-col md:flex-row md:gap-8 gap-3">
@@ -128,7 +176,7 @@
 
         <InfoSection
           title="Secure Data"
-          :tagText="`WAF Score: ${details.wafScore}`"
+          :tags="secureTag"
         >
           <template #body>
             <div class="flex gap-4">
@@ -145,6 +193,7 @@
               <PrimeButton
                 label="Copy"
                 icon="pi pi-copy"
+                @click="copyWafHeaders"
                 outlined
               />
             </div>
@@ -172,7 +221,7 @@
 
         <InfoSection
           title="Upstream Data"
-          :tagText="`Upstream Cache Status: ${details.upstreamCacheStatus}`"
+          :tags="upstreamTag"
         >
           <template #body>
             <div class="flex sm:flex-row sm:flex-wrap sm:w-3/4 flex-col gap-y-4 gap-x-8">

@@ -1,25 +1,40 @@
 <script setup>
-  import { ref, watch } from 'vue'
+  import { ref, watch, computed } from 'vue'
   import Divider from 'primevue/divider'
   import PrimeButton from 'primevue/button'
   import InfoSection from '@/templates/info-drawer-block/info-section'
   import TextInfo from '@/templates/info-drawer-block/info-labels/text-info.vue'
   import BigNumber from '@/templates/info-drawer-block/info-labels/big-number.vue'
   import InfoDrawerBlock from '@/templates/info-drawer-block'
+  import { useToast } from 'primevue/usetoast'
   defineOptions({ name: 'drawer-events-l2-cache' })
 
   const props = defineProps({
     loadService: {
       type: Function,
       required: true
+    },
+    clipboardWrite: {
+      type: Function,
+      required: true
     }
   })
   const details = ref({})
-  const showDrawer = ref(false)
+  const showDrawer = ref(true)
+  const toast = useToast()
 
   const openDetailDrawer = async (item) => {
     showDrawer.value = true
     details.value = await props.loadService(item)
+  }
+
+  const copyCacheKey = () => {
+    props.clipboardWrite(details.value.cacheKey)
+    toast.add({
+      closable: true,
+      severity: 'success',
+      summary: 'Cache Key copied!'
+    })
   }
 
   watch(
@@ -30,6 +45,28 @@
       }
     }
   )
+
+  const referenceErrorTag = computed(() => {
+    return [{ text: `Reference Error`, severity: 'danger' }]
+  })
+
+  const upstreamCacheStatusTag = computed(() => {
+    if (details.value.upstreamCacheStatus) {
+      return [{ text: `Upstream Cache Status: ${details.value.upstreamCacheStatus}` }]
+    }
+    return []
+  })
+
+  const proxyTag = computed(() => {
+    let tags = []
+    if (details.value.scheme) {
+      tags.push({ text: `Scheme: ${details.value.scheme}` })
+    }
+    if (details.value.serverProtocol) {
+      tags.push({ text: `Server Protocol: ${details.value.serverProtocol}` })
+    }
+    return tags
+  })
 
   defineExpose({
     openDetailDrawer
@@ -42,11 +79,11 @@
     title="More Details"
   >
     <template #body>
-      <div class="flex flex-col gap-3 md:m-3">
+      <div class="flex flex-col gap-6 sm:gap-8 md:m-3">
         <InfoSection
           :title="details.proxyHost"
           :date="details.ts"
-          :tagText="`Scheme: ${details.scheme} | Server Protocol: ${details.serverProtocol}`"
+          :tags="proxyTag"
         >
           <template #body>
             <div class="flex gap-2 items-center w-full">
@@ -54,6 +91,7 @@
               <PrimeButton
                 label="Copy"
                 icon="pi pi-copy"
+                @click="copyCacheKey"
                 outlined
               />
             </div>
@@ -79,8 +117,7 @@
 
         <InfoSection
           title="Request Data"
-          :tagText="`Reference Error`"
-          tagSeverity="danger"
+          :tags="referenceErrorTag"
         >
           <template #body>
             <div class="flex flex-wrap gap-y-4">
@@ -136,7 +173,7 @@
 
         <InfoSection
           title="Upstream Data"
-          :tagText="`Upstream Cache Status: ${details.upstreamCacheStatus}`"
+          :tags="upstreamCacheStatusTag"
         >
           <template #body>
             <div class="flex sm:flex-row sm:flex-wrap sm:w-3/4 flex-col gap-y-4 gap-x-8">

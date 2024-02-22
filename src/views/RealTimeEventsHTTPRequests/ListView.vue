@@ -19,6 +19,10 @@
     listHttpRequest: {
       type: Function,
       required: true
+    },
+    clipboardWrite: {
+      type: Function,
+      required: true
     }
   })
 
@@ -94,6 +98,7 @@
   <Drawer
     ref="drawerRef"
     :loadService="props.loadHttpRequest"
+    :clipboardWrite="props.clipboardWrite"
   />
   <div class="flex flex-col gap-8 my-4">
     <div class="flex gap-1">

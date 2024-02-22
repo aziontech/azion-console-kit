@@ -1,5 +1,5 @@
 <script setup>
-  import { ref, watch } from 'vue'
+  import { ref, watch, computed } from 'vue'
   import InfoSection from '@/templates/info-drawer-block/info-section'
   import Divider from 'primevue/divider'
   import TextInfo from '@/templates/info-drawer-block/info-labels/text-info.vue'
@@ -30,6 +30,18 @@
     }
   )
 
+  const tags = computed(() => {
+    if (details.value.jobName?.content) {
+      return [
+        {
+          text: details.value.jobName.content,
+          severity: details.value.jobName.severity
+        }
+      ]
+    }
+    return []
+  })
+
   defineExpose({
     openDetailDrawer
   })
@@ -41,12 +53,11 @@
     title="More Details"
   >
     <template #body>
-      <div class="flex flex-col gap-3 md:m-3">
+      <div class="flex flex-col gap-6 sm:gap-8 md:m-3">
         <InfoSection
           :title="details.url"
           :date="details.ts"
-          :tagText="details.jobName?.content"
-          :tagSeverity="details.jobName?.severity"
+          :tags="tags"
         >
           <template #body>
             <div class="flex gap-4 sm:gap-8 flex-wrap">
