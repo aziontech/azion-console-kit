@@ -29,9 +29,12 @@ const fixtures = {
         slug: 'networking'
       }
     ],
+    usage: '<p style="text-align:justify"><span style="font-size:11pt"><span style="font-family:Arial,sans-serif"><span style="color:#000000">Azion effectively provides support...</p>',
     new_release: true,
+    overview: '<p style="text-align:justify"><span style="font-size:11pt"><span style="font-family:Arial,sans-serif"><span style="color:#000000">Azion effectively provides support...</p>',
     solution_reference_id: '123',
     featured: false,
+    support: '<p style="text-align:justify"><span style="font-size:11pt"><span style="font-family:Arial,sans-serif"><span style="color:#000000">Azion effectively provides support...</p>',
     updated_at: '12/11/20, 13:40PM',
     is_launched: true,
     dependencies_by_client: [],
@@ -56,14 +59,14 @@ describe('MarketplaceServices', () => {
     const solution = fixtures.solutionSample
     const requestSpy = vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
       statusCode: 200,
-      body: []
+      body: solution
     })
 
     const { sut } = makeSut()
 
     await sut({
       vendor: solution.vendor.slug,
-      solution: solution.slug
+      solution: solution.slug,
     })
 
     expect(requestSpy).toHaveBeenCalledWith({
@@ -95,9 +98,9 @@ describe('MarketplaceServices', () => {
       latestVersion: solution.latest_version,
       latestVersionChangelog: solution.latest_version_changelog,
       lastUpdate: solution.updated_at,
-      usage: solution.usage,
-      overview: solution.overview,
-      support: solution.support,
+      usage: '<p ><span ><span ><span >Azion effectively provides support...</p>',
+      overview: '<p ><span ><span ><span >Azion effectively provides support...</p>',
+      support: '<p ><span ><span ><span >Azion effectively provides support...</p>',
       isPayAsYouGo: solution.is_pay_as_you_go,
       isLaunched: solution.is_launched,
       isUpdated: solution.is_updated,
@@ -137,7 +140,7 @@ describe('MarketplaceServices', () => {
       const solution = fixtures.solutionSample
       vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
         statusCode,
-        body: null
+        body: solution
       })
       const { sut } = makeSut()
 

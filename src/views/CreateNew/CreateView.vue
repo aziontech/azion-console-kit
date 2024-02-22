@@ -278,9 +278,6 @@
       store.finishLoading()
     },
     methods: {
-      removeStyleAttributes(html) {
-        return html.replace(/style="[^"]*"/g, '')
-      },
       async loadSolutionByVendor() {
         try {
           this.isLoading = true
@@ -288,9 +285,6 @@
             vendor: this.$route.params.vendor,
             solution: this.$route.params.solution
           })
-          this.solution.overview = this.removeStyleAttributes(this.solution.overview)
-          this.solution.usage = this.removeStyleAttributes(this.solution.usage)
-          this.solution.support = this.removeStyleAttributes(this.solution.support)
         } catch (error) {
           this.$toast.add({
             closable: true,

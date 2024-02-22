@@ -210,10 +210,6 @@
     }
   })
 
-  const removeStyleAttributes = (html) => {
-    return html.replace(/style="[^"]*"/g, '')
-  }
-
   onBeforeMount(async () => {
     const stores = useLoadingStore()
     stores.startLoading()
@@ -235,9 +231,6 @@
         vendor: route.params.vendor,
         solution: route.params.solution
       })
-      solution.value.overview = removeStyleAttributes(solution.value.overview)
-      solution.value.usage = removeStyleAttributes(solution.value.usage)
-      solution.value.support = removeStyleAttributes(solution.value.support)
     } catch (error) {
       toast.add({ ...ERROR_PROPS, summary: error })
     }
