@@ -199,7 +199,7 @@
 </template>
 
 <script setup>
-  import { getEnvironment } from '@/helpers'
+  import { getStaticUrlsByEnvironment } from '@/helpers'
   import { useAccountStore } from '@/stores/account'
   import { computed, inject, ref, watch } from 'vue'
 
@@ -231,9 +231,7 @@
     {
       label: 'Billing & Subscriptions',
       command: () => {
-        const environment = getEnvironment()
-        const subdomain = environment === 'production' ? 'manager' : 'stage-manager'
-        const billingUrl = `https://${subdomain}.azion.com/billing-subscriptions/bills`
+        const billingUrl = getStaticUrlsByEnvironment('billing')
         window.open(billingUrl, '_blank')
       }
     },

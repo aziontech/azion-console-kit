@@ -221,7 +221,7 @@
 </template>
 
 <script>
-  import { getEnvironment, openSearchResult } from '@/helpers'
+  import { getStaticUrlsByEnvironment, openSearchResult } from '@/helpers'
   import { useHelpCenterStore } from '@/stores/help-center'
   import PrimeButton from 'primevue/button'
   import InputText from 'primevue/inputtext'
@@ -292,10 +292,7 @@
         this.mainContent = mainDocumentation
       },
       makeContactSupportUrl() {
-        const environment = getEnvironment()
-        const subdomain = environment === 'production' ? 'manager' : 'stage-manager'
-
-        return `https://${subdomain}.azion.com`
+        return getStaticUrlsByEnvironment('manager')
       },
       async getHtmlArticle(filename) {
         const currentPath = this.getCurrentPath()

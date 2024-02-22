@@ -201,7 +201,7 @@
 </template>
 
 <script>
-  import { getEnvironment } from '@/helpers'
+  import { getStaticUrlsByEnvironment } from '@/helpers'
   import { useAccountStore } from '@/stores/account'
   import { useCreateModalStore } from '@/stores/create-modal'
   import ContentBlock from '@/templates/content-block'
@@ -267,9 +267,7 @@
         this.$router.push({ name: 'list-edge-applications' })
       },
       navigateToPayment() {
-        const environment = getEnvironment()
-        const subdomain = environment === 'production' ? 'manager' : 'stage-manager'
-        const billingUrl = `https://${subdomain}.azion.com/billing-subscriptions/bills`
+        const billingUrl = getStaticUrlsByEnvironment('billing')
         window.open(billingUrl, '_blank')
       },
       navigateToRealTimeMetrics() {

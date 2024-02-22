@@ -1,8 +1,6 @@
-import { getEnvironment } from '@/helpers'
+import { getStaticUrlsByEnvironment } from './get-static-urls-by-environment'
 
 export const metricsPlaygroundOpener = () => {
-  const environment = getEnvironment()
-  const subdomain = environment === 'production' ? 'manager' : 'stage-manager'
-
-  window.open(`https://${subdomain}.azion.com/metrics/graphql`, '_blank')
+  const playgroundUrl = getStaticUrlsByEnvironment('playground')
+  window.open(playgroundUrl, '_blank')
 }
