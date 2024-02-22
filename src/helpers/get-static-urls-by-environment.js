@@ -1,0 +1,32 @@
+import { getEnvironment } from './get-environment'
+
+const urls = {
+  manager: {
+    stage: 'https://stage-manager.azion.com',
+    production: 'https://manager.azion.com'
+  },
+  billing: {
+    stage: 'https://stage-manager.azion.com/billing-subscriptions/bills',
+    production: 'https://manager.azion.com/billing-subscriptions/bills'
+  },
+  playground: {
+    stage: 'https://stage-manager.azion.com/metrics/graphql',
+    production: 'https://manager.azion.com/metrics/graphql'
+  },
+  helpCenter: {
+    stage: 'https://storage.googleapis.com/gcs-docs-help-center-stage/console/',
+    production: 'https://storage.googleapis.com/gcs-docs-help-center/console/'
+  }
+}
+
+/**
+ * Retrieves static URLs based on the current environment.
+ *
+ * @param {string} section - The section for which to retrieve the static URLs.
+ * Valid values are 'manager', 'billing', 'playground', 'helpCenter'.
+ * @return {string} The static URL for the given section in the current environment.
+ */
+export const getStaticUrlsByEnvironment = (section) => {
+  const environment = getEnvironment()
+  return urls[section][environment] || urls[section].stage
+}
