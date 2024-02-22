@@ -97,18 +97,18 @@
       v-model:visible="visibleDialog"
       @update:visible="openDialogUnsaved"
       modal
+      header="Unsaved changes"
       :closable="false"
       :draggable="false"
       :pt="{
-        root: { class: 'p-0 w-[576px]' },
+        root: { class: 'w-[576px]' },
+        header: { class: 'p-3 md:p-8' },
+        content: { class: 'p-3 md:px-8 md:py-5' },
+        footer: { class: 'p-3 md:p-8' },
       }"
     >
-      <template #header>
-        <h5 class="">Unsaved changes</h5>
-      </template>
-      <div class="">
-        There are unsaved changes. Do you want to leave without finishing?
-      </div>
+      <p class="text-color-secondary">There are unsaved changes. Do you want to leave without finishing?</p>
+
       <template #footer>
         <PrimeButton
           severity="primary"
