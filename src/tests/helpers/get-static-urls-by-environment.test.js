@@ -91,8 +91,6 @@ describe('getStaticUrlsByEnvironment', () => {
   )
 
   it('should not return a static URL when section does not exist', () => {
-    vi.stubEnv('MODE', 'stage')
-
     const { sut } = makeSut()
 
     const url = sut('fake-section')
