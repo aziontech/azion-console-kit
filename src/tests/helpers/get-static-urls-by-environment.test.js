@@ -1,11 +1,19 @@
 import { getStaticUrlsByEnvironment } from '@/helpers'
-import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { afterEach, describe, expect, it, vi } from 'vitest'
+
+const makeSut = () => {
+  const sut = getStaticUrlsByEnvironment
+
+  return {
+    sut
+  }
+}
 
 const scenarios = [
   {
     section: 'manager',
     env: 'development',
-    expected: 'https://stage-manag.azion.co'
+    expected: 'https://stage-manager.azion.com'
   },
   {
     section: 'manager',
@@ -64,29 +72,31 @@ const scenarios = [
   }
 ]
 
-const makeSut = () => {
-  const sut = getStaticUrlsByEnvironment
-
-  return {
-    sut
-  }
-}
+afterEach(() => {
+  vi.unstubAllEnvs()
+})
 
 describe('getStaticUrlsByEnvironment', () => {
-  beforeEach(() => {
-    vi.unstubAllEnvs()
-  })
   it.each(scenarios)(
-    'should return the static URL for $section in $env environment',
-    ({ section, env, expected }) =>
-      () => {
-        vi.stubEnv('MODE', env)
+    'should return the static URL for the $section in the $env environment',
+    ({ section, env, expected }) => {
+      vi.stubEnv('MODE', env)
 
-        const { sut } = makeSut()
+      const { sut } = makeSut()
 
-        const result = sut(section)
+      const url = sut(section)
 
-        expect(result).toBe(expected)
-      }
+      expect(url).toBe(expected)
+    }
   )
+
+  it('should not return a static URL when section does not exist', () => {
+    vi.stubEnv('MODE', 'stage')
+
+    const { sut } = makeSut()
+
+    const url = sut('fake-section')
+
+    expect(url).toBeUndefined()
+  })
 })

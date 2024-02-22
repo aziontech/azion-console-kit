@@ -20,7 +20,6 @@ describe('getEnvironment', () => {
       vi.stubEnv('MODE', env)
 
       const { sut } = makeSut()
-
       const mode = sut()
 
       expect(mode).toBe(env)

@@ -24,9 +24,13 @@ const urls = {
  *
  * @param {string} section - The section for which to retrieve the static URLs.
  * Valid values are 'manager', 'billing', 'playground', 'helpCenter'.
- * @return {string} The static URL for the given section in the current environment.
+ * @return {string | undefined} The static URL for the given section in the current environment.
  */
 export const getStaticUrlsByEnvironment = (section) => {
+  if (!urls[section]) {
+    return
+  }
+
   const environment = getEnvironment()
   return urls[section][environment] || urls[section].stage
 }
