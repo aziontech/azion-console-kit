@@ -3,8 +3,9 @@
   import ListTableBlock from '@/templates/list-table-block/no-header'
   import PrimeButton from 'primevue/button'
   import { computed, ref } from 'vue'
-
   import IntervalFilterBlock from '@/views/RealTimeEvents/blocks/interval-filter-block'
+  import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
+  import Drawer from './Drawer'
 
   const props = defineProps({
     documentationService: {
@@ -26,10 +27,11 @@
   const listTableBlockRef = ref('')
   const drawerRef = ref('')
 
-  const openDetailDrawer = ({ uuid, ts }) => {
+  const openDetailDrawer = ({ uuid, ts, source }) => {
     drawerRef.value.openDetailDrawer({
       tsRange: filterDate.value,
       uuid,
+      source,
       ts
     })
   }
@@ -54,7 +56,13 @@
     return [
       {
         field: 'level',
-        header: 'Level'
+        header: 'Level',
+        type: 'component',
+        component: (columnData) =>
+          columnBuilder({
+            data: columnData,
+            columnAppearance: 'tag'
+          })
       },
       {
         field: 'qtype',

@@ -18,6 +18,34 @@ export const listIntelligentDNS = async (filter) => {
   return adaptResponse(response)
 }
 
+const levelMap = {
+  ERROR: {
+    content: 'Error',
+    severity: 'danger',
+    icon: 'pi pi-times-circle'
+  },
+  WARN: {
+    content: 'Warning',
+    severity: 'warning',
+    icon: 'pi pi-exclamation-triangle'
+  },
+  INFO: {
+    content: 'Info',
+    severity: 'info',
+    icon: 'pi pi-info-circle'
+  },
+  DEBUG: {
+    content: 'Debug',
+    severity: 'success',
+    icon: 'pi pi-check-circle'
+  },
+  TRACE: {
+    content: 'Trace',
+    severity: 'info',
+    icon: 'pi pi-code'
+  }
+}
+
 const adapt = (filter) => {
   const table = {
     dataset: 'idnsQueriesEvents',
@@ -32,7 +60,7 @@ const adaptResponse = (response) => {
   const { body } = response
 
   return body.data.idnsQueriesEvents?.map((idnsQueriesEvents) => ({
-    level: idnsQueriesEvents.level,
+    level: levelMap[idnsQueriesEvents.level],
     qtype: idnsQueriesEvents.qtype,
     resolutionType: idnsQueriesEvents.resolutionType,
     source: idnsQueriesEvents.source,

@@ -44,7 +44,7 @@
     <template #body>
       <div class="flex flex-col gap-3 md:m-3">
         <InfoSection
-          :title="details.httpReferer"
+          :title="details.host"
           :date="details.ts"
           :tagText="`Scheme: ${details.scheme}`"
         >
@@ -57,14 +57,13 @@
                   >{{ details.scheme }}</TextInfo
                 >
                 <TextInfo label="HTTP User Agent">{{ details.httpUserAgent }}</TextInfo>
-                <TextInfo label="Host">{{ details.host }}</TextInfo>
+                <TextInfo label="HTTP Referer">{{ details.httpReferer }}</TextInfo>
                 <TextInfo label="Virtual Host ID">{{ details.virtualhostId }}</TextInfo>
               </div>
               <div class="flex flex-col gap-3">
                 <TextInfo label="Remote Address">{{ details.remoteAddress }}</TextInfo>
                 <TextInfo label="Remote Port">{{ details.remotePort }}</TextInfo>
                 <TextInfo label="Configuration ID">{{ details.configurationId }}</TextInfo>
-                <TextInfo label="Source">{{ details.source }}</TextInfo>
               </div>
             </div>
           </template>

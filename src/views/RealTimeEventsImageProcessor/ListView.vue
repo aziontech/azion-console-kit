@@ -4,6 +4,7 @@
   import PrimeButton from 'primevue/button'
   import { computed, ref } from 'vue'
   import IntervalFilterBlock from '@/views/RealTimeEvents/blocks/interval-filter-block'
+  import Drawer from './Drawer'
 
   const props = defineProps({
     documentationService: {

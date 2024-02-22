@@ -3,8 +3,9 @@
   import ListTableBlock from '@/templates/list-table-block/no-header'
   import PrimeButton from 'primevue/button'
   import { computed, ref } from 'vue'
-
   import IntervalFilterBlock from '@/views/RealTimeEvents/blocks/interval-filter-block'
+  import Drawer from './Drawer'
+  import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
 
   const props = defineProps({
     documentationService: {
@@ -62,11 +63,23 @@
       },
       {
         field: 'endpointType',
-        header: 'Endpoint Type'
+        header: 'Endpoint Type',
+        type: 'component',
+        component: (columnData) =>
+          columnBuilder({
+            data: columnData,
+            columnAppearance: 'tag'
+          })
       },
       {
         field: 'jobName',
-        header: 'Job Name'
+        header: 'Job Name',
+        type: 'component',
+        component: (columnData) =>
+          columnBuilder({
+            data: columnData,
+            columnAppearance: 'tag'
+          })
       },
       {
         field: 'source',
@@ -81,7 +94,7 @@
         header: 'Streamed Lines'
       },
       {
-        field: 'ts',
+        field: 'tsFormat',
         header: 'TS'
       }
     ]

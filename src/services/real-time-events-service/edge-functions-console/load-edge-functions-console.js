@@ -37,6 +37,7 @@ const adapt = (filter) => {
     tsRange: filter.tsRange,
     and: {
       configurationIdEq: filter.configurationId,
+      sourceEq: filter.source,
       tsEq: filter.ts
     }
   }

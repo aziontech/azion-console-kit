@@ -5,6 +5,7 @@
   import { computed, ref } from 'vue'
   import IntervalFilterBlock from '@/views/RealTimeEvents/blocks/interval-filter-block'
   import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
+  import Drawer from './Drawer'
 
   const props = defineProps({
     documentationService: {
@@ -29,7 +30,18 @@
   const hasContentToList = ref(true)
   const listTableBlockRef = ref('')
 
-  const openDetailDrawer = () => {}
+  const drawerRef = ref('')
+
+  const openDetailDrawer = ({ configurationId, ts, host, source, proxyHost }) => {
+    drawerRef.value.openDetailDrawer({
+      tsRange: filterDate.value,
+      configurationId,
+      ts,
+      host,
+      source,
+      proxyHost
+    })
+  }
 
   const handleLoadData = (event) => {
     hasContentToList.value = event
@@ -76,7 +88,7 @@
         header: 'Client ID'
       },
       {
-        field: 'id',
+        field: 'configurationId',
         header: 'Configuration ID'
       },
       {
