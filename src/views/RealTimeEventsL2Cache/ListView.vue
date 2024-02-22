@@ -107,6 +107,7 @@
   <Drawer
     ref="drawerRef"
     :loadService="props.loadL2Cache"
+    :clipboardWrite="props.clipboardWrite"
   />
   <div class="flex flex-col gap-8 my-4">
     <div class="flex gap-1">

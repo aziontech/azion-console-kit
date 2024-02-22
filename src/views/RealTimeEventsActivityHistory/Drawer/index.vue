@@ -1,5 +1,5 @@
 <script setup>
-  import { ref, watch } from 'vue'
+  import { ref, watch, computed } from 'vue'
   import InfoSection from '@/templates/info-drawer-block/info-section'
   import TextInfo from '@/templates/info-drawer-block/info-labels/text-info.vue'
   import InfoDrawerBlock from '@/templates/info-drawer-block'
@@ -29,6 +29,18 @@
     }
   )
 
+  const tags = computed(() => {
+    if (details.value.type) {
+      return [
+        {
+          icon: 'pi pi-code',
+          text: details.value.type
+        }
+      ]
+    }
+    return []
+  })
+
   defineExpose({
     openDetailDrawer
   })
@@ -40,11 +52,11 @@
     title="More Details"
   >
     <template #body>
-      <div class="flex flex-col gap-3 md:m-3">
+      <div class="flex flex-col gap-6 sm:gap-8 md:m-3">
         <InfoSection
           :title="details.title"
           :date="details.ts"
-          :tagText="details.type"
+          :tags="tags"
         >
           <template #body>
             <div class="flex flex-col sm:flex-row sm:gap-8 gap-3 w-full">

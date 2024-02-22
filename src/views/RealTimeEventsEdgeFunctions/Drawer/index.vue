@@ -1,5 +1,5 @@
 <script setup>
-  import { ref, watch } from 'vue'
+  import { ref, watch, computed } from 'vue'
 
   import InfoSection from '@/templates/info-drawer-block/info-section'
   import TextInfo from '@/templates/info-drawer-block/info-labels/text-info.vue'
@@ -32,6 +32,18 @@
     }
   )
 
+  const tags = computed(() => {
+    if (details.value.functionLanguage) {
+      return [
+        {
+          icon: 'pi pi-code',
+          text: details.value.functionLanguage
+        }
+      ]
+    }
+    return []
+  })
+
   defineExpose({
     openDetailDrawer
   })
@@ -43,12 +55,11 @@
     title="More Details"
   >
     <template #body>
-      <div class="flex flex-col gap-3 md:m-3">
+      <div class="flex flex-col gap-6 sm:gap-8 md:m-3">
         <InfoSection
           title="Function Language"
           :date="details.ts"
-          tagIcon="pi pi-code"
-          :tagText="details.functionLanguage"
+          :tags="tags"
         >
           <template #body>
             <div class="gap-8 flex flex-col sm:flex-row">

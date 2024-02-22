@@ -1,5 +1,5 @@
 <script setup>
-  import { ref, watch } from 'vue'
+  import { ref, watch, computed } from 'vue'
   import Divider from 'primevue/divider'
   import InfoSection from '@/templates/info-drawer-block/info-section'
   import TextInfo from '@/templates/info-drawer-block/info-labels/text-info.vue'
@@ -30,6 +30,24 @@
     }
   )
 
+  const schemeTag = computed(() => {
+    if (details.value.scheme) {
+      return [{ text: `Scheme: ${details.value.scheme}` }]
+    }
+    return []
+  })
+
+  const upstreamCacheStatusTag = computed(() => {
+    if (details.value.upstreamCacheStatus) {
+      return [{ text: `Upstream Cache Status: ${details.value.upstreamCacheStatus}` }]
+    }
+    return []
+  })
+
+  const referenceErrorTag = computed(() => {
+    return [{ text: `Reference Error`, severity: 'danger' }]
+  })
+
   defineExpose({
     openDetailDrawer
   })
@@ -41,11 +59,11 @@
     title="More Details"
   >
     <template #body>
-      <div class="flex flex-col gap-3 md:m-3">
+      <div class="flex flex-col gap-6 sm:gap-8 md:m-3">
         <InfoSection
           :title="details.host"
           :date="details.ts"
-          :tagText="`Scheme: ${details.scheme}`"
+          :tags="schemeTag"
         >
           <template #body>
             <div class="flex flex-col sm:flex-row sm:gap-8 gap-3 w-full">
@@ -65,8 +83,7 @@
 
         <InfoSection
           title="Request Data"
-          :tagText="`Reference Error`"
-          tagSeverity="danger"
+          :tags="referenceErrorTag"
         >
           <template #body>
             <div class="flex flex-wrap gap-y-4">
@@ -108,7 +125,7 @@
 
         <InfoSection
           title="Upstream Data"
-          :tagText="`Upstream Cache Status: ${details.upstreamCacheStatus}`"
+          :tags="upstreamCacheStatusTag"
         >
           <template #body>
             <div class="flex flex-col sm:flex-row gap-4">
