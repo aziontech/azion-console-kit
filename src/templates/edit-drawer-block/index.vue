@@ -54,7 +54,7 @@
 
   const toast = useToast()
   const blockViewRedirection = ref(true)
-  const formDrawerHasUpdated = ref(null)
+  const formDrawerHasUpdated = ref(false)
   const loading = ref(false)
   const showGoBack = ref(false)
 
@@ -70,7 +70,7 @@
     get: () => props.visible,
     set: (value) => {
       if (formHasChanges.value) {
-        formDrawerHasUpdated.value = Math.random()
+        formDrawerHasUpdated.value = !formDrawerHasUpdated.value
         changeVisisbleDrawer(!value, false)
         return
       }
