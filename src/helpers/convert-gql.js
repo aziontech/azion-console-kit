@@ -9,6 +9,11 @@ const getGraphQLType = (value) => {
   } else if (value instanceof Date) {
     return 'DateTime'
   } else if (typeof value === 'string') {
+    const isNumberString = !isNaN(Number(value))
+    if (isNumberString) {
+      return 'String'
+    }
+
     if (!isNaN(Date.parse(value))) {
       return 'DateTime'
     }

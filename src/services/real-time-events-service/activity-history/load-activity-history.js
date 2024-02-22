@@ -1,5 +1,6 @@
 import convertGQL from '@/helpers/convert-gql'
 import { AxiosHttpClientSignalDecorator } from '../../axios/AxiosHttpClientSignalDecorator'
+import { convertValueToDate } from '@/helpers/convert-date'
 
 export const loadActivityHistory = async (filter) => {
   const payload = adapt(filter)
@@ -39,7 +40,7 @@ const adaptResponse = (response) => {
   return {
     title: activityHistoryEvents.title,
     type: activityHistoryEvents.type,
-    ts: activityHistoryEvents.ts,
+    ts: convertValueToDate(activityHistoryEvents.ts),
     authorName: activityHistoryEvents.authorName,
     accountId: activityHistoryEvents.accountId,
     userId: activityHistoryEvents.userId,

@@ -45,6 +45,7 @@
           :title="details.title"
           :date="details.ts"
           :tagText="details.type"
+          tagIcon="pi pi-replay"
         >
           <template #body>
             <div class="flex flex-col sm:flex-row sm:gap-8 gap-3 w-full">
