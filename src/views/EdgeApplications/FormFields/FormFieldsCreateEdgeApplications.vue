@@ -138,7 +138,7 @@
       <div class="flex flex-col gap-2">
         <label
           for="city"
-          class="text-color text-base font-medium"
+          class="text-color text-sm font-medium leading-5"
           >Delivery Protocols HTTP</label
         >
         <div class="flex flex-col gap-3">
@@ -230,7 +230,7 @@
         <div class="flex flex-col w-full sm:max-w-xs gap-2">
           <label
             for="port-http"
-            class="text-color text-base font-medium"
+            class="text-color text-sm font-medium leading-5"
             >HTTP Ports <span v-if="isHttpProtocol || isHttpsProtocol">*</span></label
           >
           <span class="p-input-icon-right">
@@ -259,7 +259,7 @@
         <div class="flex flex-col w-full sm:max-w-xs gap-2">
           <label
             for="port-https"
-            class="text-color text-base font-medium"
+            class="text-color text-sm font-medium leading-5"
             >HTTPS Ports <span v-if="isHttpsProtocol">*</span></label
           >
           <span class="p-input-icon-right">
@@ -292,7 +292,7 @@
         <div class="flex flex-col w-full sm:max-w-xs gap-2">
           <label
             for="tls-version"
-            class="text-color text-base font-medium"
+            class="text-color text-sm font-medium leading-5"
             >Minimum TLS version</label
           >
           <Dropdown
@@ -313,7 +313,7 @@
         <div class="flex flex-col w-full sm:max-w-xs gap-2">
           <label
             for="ciphers-list"
-            class="text-color text-base font-medium"
+            class="text-color text-sm font-medium leading-5"
             >Cipher suite</label
           >
           <Dropdown
@@ -343,7 +343,7 @@
       <div class="flex flex-col w-full sm:max-w-xs gap-2">
         <label
           for="origin-type"
-          class="text-color text-base font-medium"
+          class="text-color text-sm font-medium leading-5"
           >Type *</label
         >
         <span class="p-input-icon-right">
@@ -366,7 +366,7 @@
       </div>
 
       <div class="flex flex-col gap-2">
-        <label class="text-color text-base font-medium">Protocol Policy</label>
+        <label class="text-color text-sm font-medium leading-5">Protocol Policy</label>
         <div class="flex flex-col gap-4">
           <div class="flex gap-2 items-center">
             <RadioButton
@@ -416,7 +416,7 @@
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
         <label
           for="address"
-          class="text-color text-base font-medium"
+          class="text-color text-sm font-medium leading-5"
           >Address *</label
         >
         <InputText
@@ -439,7 +439,7 @@
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
         <label
           for="host-header"
-          class="text-color text-base font-medium"
+          class="text-color text-sm font-medium leading-5"
           >Host Header *</label
         >
         <InputText
@@ -468,7 +468,7 @@
   >
     <template #inputs>
       <div class="flex flex-col gap-2">
-        <label class="text-color text-base font-medium">Browser Cache Settings</label>
+        <label class="text-color text-sm font-medium leading-5">Browser Cache Settings</label>
         <div class="flex flex-col gap-4">
           <div class="flex gap-2 items-center">
             <RadioButton
@@ -509,7 +509,7 @@
         <div class="flex flex-col w-full sm:max-w-xs gap-2">
           <label
             for="maximun-ttl-seconds"
-            class="text-color text-base font-medium"
+            class="text-color text-sm font-medium leading-5"
             >Maximum TTL (seconds)</label
           >
 
@@ -521,7 +521,7 @@
       </div>
 
       <div class="flex flex-col gap-2">
-        <label class="text-color text-base font-medium">Edge Cache Settings</label>
+        <label class="text-color text-sm font-medium leading-5">Edge Cache Settings</label>
         <div class="flex flex-col gap-4">
           <div class="flex gap-2 items-center">
             <RadioButton
@@ -560,7 +560,7 @@
         <div class="flex flex-col w-full sm:max-w-xs gap-2">
           <label
             for="cdn-maximun-ttl-seconds"
-            class="text-color text-base font-medium"
+            class="text-color text-sm font-medium leading-5"
             >{{ cdnCacheSettingsIsOverride ? 'Maximum TTL (seconds)' : 'Default TTL' }}</label
           >
 
@@ -585,7 +585,7 @@
   >
     <template #inputs>
       <div class="flex flex-col gap-2">
-        <label class="text-color text-base font-medium">Default Modules</label>
+        <label class="text-color text-sm font-medium leading-5">Default Modules</label>
         <div class="flex flex-col gap-3">
           <Card
             :pt="{
@@ -716,7 +716,7 @@
         </div>
       </div>
       <div class="flex flex-col gap-2">
-        <label class="text-color text-base font-medium">Subscription modules</label>
+        <label class="text-color text-sm font-medium leading-5">Subscription modules</label>
         <div class="flex flex-col gap-3">
           <Card
             :pt="{
