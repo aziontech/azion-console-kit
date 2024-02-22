@@ -221,12 +221,12 @@
 </template>
 
 <script>
+  import { getStaticUrlsByEnvironment, openSearchResult } from '@/helpers'
+  import { useHelpCenterStore } from '@/stores/help-center'
   import PrimeButton from 'primevue/button'
   import InputText from 'primevue/inputtext'
   import Sidebar from 'primevue/sidebar'
-  import { useHelpCenterStore } from '@/stores/help-center'
   import BannerDiscord from './banner-discord.vue'
-  import { getEnvironmentFromUrl, openSearchResult } from '@/helpers'
 
   import PrimeMenu from 'primevue/menu'
 
@@ -292,12 +292,7 @@
         this.mainContent = mainDocumentation
       },
       makeContactSupportUrl() {
-        const environment = getEnvironmentFromUrl(window.location.href)
-        if (environment === 'stage') {
-          return 'https://stage-manager.azion.com'
-        }
-
-        return 'https://manager.azion.com'
+        return getStaticUrlsByEnvironment('manager')
       },
       async getHtmlArticle(filename) {
         const currentPath = this.getCurrentPath()

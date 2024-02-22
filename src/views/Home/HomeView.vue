@@ -201,7 +201,7 @@
 </template>
 
 <script>
-  import { getEnvironmentFromUrl } from '@/helpers'
+  import { getStaticUrlsByEnvironment } from '@/helpers'
   import { useAccountStore } from '@/stores/account'
   import { useCreateModalStore } from '@/stores/create-modal'
   import ContentBlock from '@/templates/content-block'
@@ -267,12 +267,8 @@
         this.$router.push({ name: 'list-edge-applications' })
       },
       navigateToPayment() {
-        const environment = getEnvironmentFromUrl(window.location.href)
-        let billingLink = 'https://manager.azion.com/billing-subscriptions/bills'
-        if (environment === 'stage') {
-          billingLink = 'https://stage-manager.azion.com/billing-subscriptions/bills'
-        }
-        window.open(billingLink, '_blank')
+        const billingUrl = getStaticUrlsByEnvironment('billing')
+        window.open(billingUrl, '_blank')
       },
       navigateToRealTimeMetrics() {
         this.$router.push({ name: 'real-time-metrics' })

@@ -23,7 +23,7 @@ jobs:
         run: yarn install
 
       - name: Build
-        run: yarn build
+        run: yarn build --mode production
         env:
           VITE_RECAPTCHA_SITE_KEY: ${{ secrets.PROD_RECAPTCHA_SITE_KEY }}
 
