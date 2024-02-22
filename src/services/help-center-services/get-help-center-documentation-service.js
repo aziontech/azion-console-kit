@@ -1,14 +1,14 @@
+import { getEnvironment } from '@/helpers'
 import { AxiosHttpClientAdapter, parseHttpResponse } from '../axios/AxiosHttpClientAdapter'
-import { makeDocumentationBaseUrl } from './make-documentation-base-url'
 import { makeGoogleStorageApi } from '../axios/makeGoogleStorageApi'
+import { makeDocumentationBaseUrl } from './make-documentation-base-url'
 import { markdownToHtml } from './markdown-to-html'
-import { getEnvironmentFromUrl } from '../../helpers/get-environment-from-url'
 
 const DEFAULT_DOCUMENT = 'index.md'
 const WELCOME_PATH = '/welcome'
 
 const getHelpCenterDocumentationService = async ({ url, filename }) => {
-  const environment = getEnvironmentFromUrl(window.location.href)
+  const environment = getEnvironment()
   const baseUrl = makeDocumentationBaseUrl(environment)
   const documentUrl = url === '/' ? WELCOME_PATH : getFirstPathSegment(url)
   const documentFilename = filename || DEFAULT_DOCUMENT

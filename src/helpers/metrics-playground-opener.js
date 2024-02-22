@@ -1,8 +1,8 @@
-import { getEnvironmentFromUrl } from './get-environment-from-url'
+import { getEnvironment } from '@/helpers'
 
 export const metricsPlaygroundOpener = () => {
-  const environment = getEnvironmentFromUrl(window.location.href)
-  const subdomain = environment === 'prod' ? 'manager' : 'stage-manager'
+  const environment = getEnvironment()
+  const subdomain = environment === 'production' ? 'manager' : 'stage-manager'
 
   window.open(`https://${subdomain}.azion.com/metrics/graphql`, '_blank')
 }

@@ -199,7 +199,7 @@
 </template>
 
 <script setup>
-  import { getEnvironmentFromUrl } from '@/helpers'
+  import { getEnvironment } from '@/helpers'
   import { useAccountStore } from '@/stores/account'
   import { computed, inject, ref, watch } from 'vue'
 
@@ -231,12 +231,10 @@
     {
       label: 'Billing & Subscriptions',
       command: () => {
-        const environment = getEnvironmentFromUrl(window.location.href)
-        let billingLink = 'https://manager.azion.com/billing-subscriptions/bills'
-        if (environment === 'stage') {
-          billingLink = 'https://stage-manager.azion.com/billing-subscriptions/bills'
-        }
-        window.open(billingLink, '_blank')
+        const environment = getEnvironment()
+        const subdomain = environment === 'production' ? 'manager' : 'stage-manager'
+        const billingUrl = `https://${subdomain}.azion.com/billing-subscriptions/bills`
+        window.open(billingUrl, '_blank')
       }
     },
     {
