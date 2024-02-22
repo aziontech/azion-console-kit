@@ -129,7 +129,7 @@ const getHeaders = (payload) => {
 
 const getDomainsOnDataStreaming = async (dataStreamingID) => {
   let httpResponse = await AxiosHttpClientAdapter.request({
-    url: `${makeDataStreamingDomainsBaseUrl()}?streaming_id=${dataStreamingID}`,
+    url: `${makeDataStreamingDomainsBaseUrl()}?streaming_id=${dataStreamingID}&page_size=2000`,
     method: 'GET'
   })
 
