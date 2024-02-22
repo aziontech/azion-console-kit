@@ -1,4 +1,4 @@
-import { getEnvironmentFromUrl } from '@/helpers'
+import { getEnvironment } from '@/helpers'
 import { loadContractServicePlan } from '@/services/contract-services'
 import { useAccountStore } from '@/stores/account'
 
@@ -43,10 +43,10 @@ export default async function redirectToManager(to, __, next) {
 }
 
 function permanentRedirectToManager() {
-  const environment = getEnvironmentFromUrl(window.location.href)
-  let managerLink = 'https://manager.azion.com'
-  if (environment === 'stage') {
-    managerLink = 'https://stage-manager.azion.com'
+  const environment = getEnvironment()
+  if (environment !== 'development') {
+    const subdomain = environment === 'production' ? 'manager' : 'stage-manager'
+
+    window.location.replace(`https://${subdomain}.azion.com`)
   }
-  window.location.replace(managerLink)
 }
