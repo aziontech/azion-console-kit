@@ -1,5 +1,6 @@
 import convertGQL from '@/helpers/convert-gql'
 import { AxiosHttpClientSignalDecorator } from '../../axios/AxiosHttpClientSignalDecorator'
+import { convertValueToDate } from '@/helpers/convert-date'
 
 export const listDataStreaming = async (filter) => {
   const payload = adapt(filter)
@@ -43,11 +44,18 @@ const adaptResponse = (response) => {
   return body.data.dataStreamedEvents?.map((dataStreamedEvents) => ({
     configurationId: dataStreamedEvents.configurationId,
     dataStreamed: dataStreamedEvents.dataStreamed,
-    endpointType: dataStreamedEvents.endpointType,
-    jobName: dataStreamedEvents.jobName,
+    endpointType: {
+      content: dataStreamedEvents.endpointType,
+      severity: 'info'
+    },
+    jobName: {
+      content: dataStreamedEvents.jobName,
+      severity: 'info'
+    },
     source: dataStreamedEvents.source,
     statusCode: dataStreamedEvents.statusCode,
     streamedLines: dataStreamedEvents.streamedLines,
-    ts: dataStreamedEvents.ts
+    ts: dataStreamedEvents.ts,
+    tsFormat: convertValueToDate(dataStreamedEvents.ts)
   }))
 }

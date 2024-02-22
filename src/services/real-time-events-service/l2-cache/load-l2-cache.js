@@ -1,5 +1,6 @@
 import convertGQL from '@/helpers/convert-gql'
 import { AxiosHttpClientSignalDecorator } from '../../axios/AxiosHttpClientSignalDecorator'
+import { convertValueToDate } from '@/helpers/convert-date'
 
 export const loadL2Cache = async (filter) => {
   const payload = adapt(filter)
@@ -48,7 +49,9 @@ const adapt = (filter) => {
       'upstreamConnectTime',
       'upstreamHeaderTime',
       'upstreamResponseTime',
-      'upstreamStatus'
+      'upstreamStatus',
+      'clientId',
+      'source'
     ],
     orderBy: 'ts_ASC'
   }
@@ -56,7 +59,10 @@ const adapt = (filter) => {
     tsRange: filter.tsRange,
     and: {
       configurationIdEq: filter.configurationId,
-      tsEq: filter.ts
+      tsEq: filter.ts,
+      sourceEq: filter.source,
+      hostEq: filter.host,
+      proxyHostEq: filter.proxyHost
     }
   }
   return convertGQL(formatFilter, table)
@@ -64,13 +70,15 @@ const adapt = (filter) => {
 
 const adaptResponse = (response) => {
   const { body } = response
+  const [l2CacheEvents = {}] = body.data.l2CacheEvents
 
-  return body.data.l2CacheEvents?.map((l2CacheEvents) => ({
+  return {
     bytesSent: l2CacheEvents.bytesSent,
     cacheKey: l2CacheEvents.cacheKey,
     cacheTtl: l2CacheEvents.cacheTtl,
     configurationId: l2CacheEvents.configurationId,
     host: l2CacheEvents.host,
+    clientId: l2CacheEvents.clientId,
     proxyHost: l2CacheEvents.proxyHost,
     proxyStatus: l2CacheEvents.proxyStatus,
     proxyUpstream: l2CacheEvents.proxyUpstream,
@@ -81,19 +89,20 @@ const adaptResponse = (response) => {
     requestMethod: l2CacheEvents.requestMethod,
     requestTime: l2CacheEvents.requestTime,
     requestUri: l2CacheEvents.requestUri,
-    scheme: l2CacheEvents.scheme,
+    scheme: l2CacheEvents.scheme?.toUpperCase(),
     sentHttpContentType: l2CacheEvents.sentHttpContentType,
-    serverProtocol: l2CacheEvents.serverProtocol,
+    serverProtocol: l2CacheEvents.serverProtocol?.toUpperCase(),
     solution: l2CacheEvents.solution,
     status: l2CacheEvents.status,
     tcpinfoRtt: l2CacheEvents.tcpinfoRtt,
-    ts: l2CacheEvents.ts,
+    ts: convertValueToDate(l2CacheEvents.ts),
     upstreamBytesReceived: l2CacheEvents.upstreamBytesReceived,
     upstreamBytesReceivedStr: l2CacheEvents.upstreamBytesReceivedStr,
     upstreamCacheStatus: l2CacheEvents.upstreamCacheStatus,
     upstreamConnectTime: l2CacheEvents.upstreamConnectTime,
     upstreamHeaderTime: l2CacheEvents.upstreamHeaderTime,
     upstreamResponseTime: l2CacheEvents.upstreamResponseTime,
-    upstreamStatus: l2CacheEvents.upstreamStatus
-  }))
+    upstreamStatus: l2CacheEvents.upstreamStatus,
+    source: l2CacheEvents.source
+  }
 }

@@ -1,5 +1,5 @@
 <script setup>
-  import { ref, onMounted } from 'vue'
+  import { ref, watch } from 'vue'
   import Divider from 'primevue/divider'
   import PrimeButton from 'primevue/button'
   import InfoSection from '@/templates/info-drawer-block/info-section'
@@ -8,56 +8,31 @@
   import InfoDrawerBlock from '@/templates/info-drawer-block'
   defineOptions({ name: 'drawer-events-l2-cache' })
 
-  defineProps({
-    loadDetails: Function
+  const props = defineProps({
+    loadService: {
+      type: Function,
+      required: true
+    }
   })
-
-  const getCurrentDate = () => {
-    const date = new Date()
-    const options = {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit',
-      hour12: true
-    }
-    return date.toLocaleString('en-US', options)
-  }
-
-  const showDrawer = ref(true)
-
-  const loadMockedDetails = () => {
-    const mockValues = {
-      path: 'storage.googleapis.com:443',
-      upstreamCacheStatus: 'Revalidated',
-      scheme: 'HTTP',
-      date: getCurrentDate(),
-      host: 'g1sdetynmxe0ao.map.azionedge.net',
-      proxyHost: 'storage.googleapis.com:443',
-      remoteAddr: '127.0.0.1',
-      remotePort: '8080',
-      clientId: '8437r',
-      solution: '1321',
-      configurationId: '1595368520',
-      source: 'edg-fln-ggn001p',
-      referenceError: '#AECFE66100000000C947B9B3B3BFBE46FFFFFFFF9401',
-      requestMethod: 'GET',
-      requestUri: '/v1?v=bo%20dim',
-      sentHttpContentType: 'text/html; charset=UTF-8',
-      proxyUpstream: 'ims_http',
-      proxyStatus: '520',
-      status: '401',
-      upstreamAddr: '192.168.1.10',
-      upstreamStatus: '200'
-    }
-
-    return mockValues
-  }
-
   const details = ref({})
-  onMounted(() => {
-    details.value = loadMockedDetails()
+  const showDrawer = ref(false)
+
+  const openDetailDrawer = async (item) => {
+    showDrawer.value = true
+    details.value = await props.loadService(item)
+  }
+
+  watch(
+    () => showDrawer.value,
+    (value) => {
+      if (!value) {
+        details.value = {}
+      }
+    }
+  )
+
+  defineExpose({
+    openDetailDrawer
   })
 </script>
 
@@ -69,9 +44,9 @@
     <template #body>
       <div class="flex flex-col gap-3 md:m-3">
         <InfoSection
-          :title="details.path"
-          :date="details.date"
-          :tagText="`Scheme: ${details.scheme} | Server Protocol: HTTP/1.1`"
+          :title="details.proxyHost"
+          :date="details.ts"
+          :tagText="`Scheme: ${details.scheme} | Server Protocol: ${details.serverProtocol}`"
         >
           <template #body>
             <div class="flex gap-2 items-center w-full">
@@ -112,28 +87,33 @@
               <BigNumber
                 label="Request Time"
                 sufix="ms"
-                >1.19</BigNumber
               >
+                {{ details.requestTime }}
+              </BigNumber>
               <BigNumber
                 label="TCP Info RTT"
                 sufix="ms"
-                >7219</BigNumber
               >
+                {{ details.tcpinfoRtt }}
+              </BigNumber>
               <BigNumber
                 label="Request Length"
                 sufix="lines"
-                >167</BigNumber
               >
+                {{ details.requestLength }}
+              </BigNumber>
               <BigNumber
                 label="Bytes Sent"
                 sufix="ms"
-                >191</BigNumber
               >
+                {{ details.bytesSent }}
+              </BigNumber>
               <BigNumber
                 label="Cache TTL"
                 sufix="s"
-                >1312319</BigNumber
               >
+                {{ details.cacheTtl }}
+              </BigNumber>
             </div>
             <Divider />
             <div class="flex flex-col sm:flex-row sm:gap-8 gap-3 w-full">
@@ -163,29 +143,33 @@
               <BigNumber
                 label="Upstream Connect Time"
                 sufix="ms"
-                >031</BigNumber
               >
+                {{ details.upstreamConnectTime }}
+              </BigNumber>
               <BigNumber
                 label="Upstream Header Time"
                 sufix="ms"
-                >12.3</BigNumber
               >
+                {{ details.upstreamHeaderTime }}
+              </BigNumber>
               <BigNumber
                 label="Upstream Response Time"
                 sufix="ms"
-                >0.847</BigNumber
               >
+                {{ details.upstreamResponseTime }}
+              </BigNumber>
               <BigNumber
                 label="Upstream Bytes Received"
                 sufix="ms"
-                >0.847</BigNumber
               >
+                {{ details.upstreamBytesReceived }}
+              </BigNumber>
             </div>
 
             <Divider />
 
             <div class="w-full flex sm:flex-row flex-col gap-3">
-              <TextInfo label="Upstream Addr">{{ details.upstreamAddr }}</TextInfo>
+              <TextInfo label="Upstream Addr">{{ details.remoteAddr }}</TextInfo>
               <TextInfo label="Upstream Status">{{ details.upstreamStatus }}</TextInfo>
             </div>
           </template>

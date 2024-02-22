@@ -30,6 +30,7 @@ const adapt = (filter) => {
       'configurationId',
       'host',
       'proxyHost',
+      'source',
       'ts'
     ],
     orderBy: 'ts_ASC'
@@ -41,14 +42,16 @@ const adaptResponse = (response) => {
   const { body } = response
 
   return body.data.l2CacheEvents?.map((l2CacheEvents) => ({
+    id: l2CacheEvents.ts + l2CacheEvents.configurationId,
     bytesSent: l2CacheEvents.bytesSent,
     cacheKey: {
       content: l2CacheEvents.cacheKey
     },
     cacheTtl: l2CacheEvents.cacheTtl,
     clientId: l2CacheEvents.clientId,
-    id: l2CacheEvents.configurationId,
+    configurationId: l2CacheEvents.configurationId,
     host: l2CacheEvents.host,
+    source: l2CacheEvents.source,
     proxyHost: l2CacheEvents.proxyHost,
     ts: l2CacheEvents.ts
   }))

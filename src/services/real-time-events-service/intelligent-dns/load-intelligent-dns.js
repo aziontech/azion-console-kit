@@ -36,24 +36,53 @@ const adapt = (filter) => {
     tsRange: filter.tsRange,
     and: {
       uuidEq: filter.uuid,
+      sourceEq: filter.source,
       tsEq: filter.ts
     }
   }
   return convertGQL(formatFilter, table)
 }
 
+const levelMap = {
+  ERROR: {
+    content: 'Error',
+    severity: 'danger',
+    icon: 'pi pi-times-circle'
+  },
+  WARN: {
+    content: 'Warning',
+    severity: 'warning',
+    icon: 'pi pi-exclamation-triangle'
+  },
+  INFO: {
+    content: 'Info',
+    severity: 'info',
+    icon: 'pi pi-info-circle'
+  },
+  DEBUG: {
+    content: 'Debug',
+    severity: 'success',
+    icon: 'pi pi-check-circle'
+  },
+  TRACE: {
+    content: 'Trace',
+    severity: 'info',
+    icon: 'pi pi-code'
+  }
+}
+
 const adaptResponse = (response) => {
   const { body } = response
+  const [idnsQueriesEvents = {}] = body.data.idnsQueriesEvents
 
-  return body.data.idnsQueriesEvents?.map((idnsQueriesEvents) => ({
-    level: idnsQueriesEvents.level,
+  return {
+    level: levelMap[idnsQueriesEvents.level],
     ts: idnsQueriesEvents.ts,
     qtype: idnsQueriesEvents.qtype,
     uuid: idnsQueriesEvents.uuid,
     zoneId: idnsQueriesEvents.zoneId,
     statusCode: idnsQueriesEvents.statusCode,
     resolutionType: idnsQueriesEvents.resolutionType,
-    solutionId: idnsQueriesEvents.solutionId,
-    source: idnsQueriesEvents.source
-  }))
+    solutionId: idnsQueriesEvents.solutionId
+  }
 }

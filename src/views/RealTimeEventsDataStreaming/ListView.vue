@@ -4,8 +4,10 @@
   import Drawer from './Drawer'
   import PrimeButton from 'primevue/button'
   import { computed, ref } from 'vue'
-
   import IntervalFilterBlock from '@/views/RealTimeEvents/blocks/interval-filter-block'
+  import Drawer from './Drawer'
+  import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
+  import { useRouter } from 'vue-router'
 
   const props = defineProps({
     documentationService: {
@@ -26,7 +28,7 @@
   const hasContentToList = ref(true)
   const listTableBlockRef = ref('')
   const drawerRef = ref('')
-
+  const router = useRouter()
   const openDetailDrawer = ({ configurationId, ts }) => {
     drawerRef.value.openDetailDrawer({
       tsRange: filterDate.value,
@@ -63,11 +65,23 @@
       },
       {
         field: 'endpointType',
-        header: 'Endpoint Type'
+        header: 'Endpoint Type',
+        type: 'component',
+        component: (columnData) =>
+          columnBuilder({
+            data: columnData,
+            columnAppearance: 'tag'
+          })
       },
       {
         field: 'jobName',
-        header: 'Job Name'
+        header: 'Job Name',
+        type: 'component',
+        component: (columnData) =>
+          columnBuilder({
+            data: columnData,
+            columnAppearance: 'tag'
+          })
       },
       {
         field: 'source',
@@ -82,11 +96,15 @@
         header: 'Streamed Lines'
       },
       {
-        field: 'ts',
+        field: 'tsFormat',
         header: 'TS'
       }
     ]
   })
+
+  const goToCreateDataStreaming = () => {
+    router.push({ name: 'create-data-streaming' })
+  }
 </script>
 
 <template>
@@ -137,7 +155,7 @@ They are displayed when there are requests and traffic received in the period se
         severity="secondary"
         icon="pi pi-plus"
         label="Data Streaming"
-        @click="console.log"
+        @click="goToCreateDataStreaming"
       />
     </template>
   </EmptyResultsBlock>

@@ -8,9 +8,11 @@
   defineOptions({ name: 'drawer-events-image-processor' })
 
   const props = defineProps({
-    loadService: Function
+    loadService: {
+      type: Function,
+      required: true
+    }
   })
-
   const details = ref({})
   const showDrawer = ref(false)
 
@@ -43,20 +45,23 @@
         <InfoSection
           :title="details.url"
           :date="details.ts"
-          tagText="Data Streaming WAF"
+          :tagText="details.jobName?.content"
+          :tagSeverity="details.jobName?.severity"
         >
           <template #body>
             <div class="flex gap-4 sm:gap-8 flex-wrap">
               <BigNumber
                 label="Streamed Lines"
                 sufix="lines"
-                >{{ details.streamedLines }}</BigNumber
               >
+                {{ details.streamedLines }}
+              </BigNumber>
               <BigNumber
                 label="Data Streamed"
                 sufix="bytes"
-                >{{ details.dataStreamed }}</BigNumber
               >
+                {{ details.dataStreamed }}
+              </BigNumber>
             </div>
 
             <Divider />
@@ -67,7 +72,6 @@
               </div>
               <div class="flex flex-col gap-3">
                 <TextInfo label="Endpoint Type">{{ details.endpointType }}</TextInfo>
-                <TextInfo label="Source">{{ details.source }}</TextInfo>
               </div>
             </div>
           </template>

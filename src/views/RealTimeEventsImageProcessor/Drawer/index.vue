@@ -43,23 +43,21 @@
     <template #body>
       <div class="flex flex-col gap-3 md:m-3">
         <InfoSection
-          :title="details.path"
-          :date="details.date"
+          :title="details.host"
+          :date="details.ts"
           :tagText="`Scheme: ${details.scheme}`"
         >
           <template #body>
             <div class="flex flex-col sm:flex-row sm:gap-8 gap-3 w-full">
               <div class="flex flex-col gap-3">
                 <TextInfo label="HTTP User Agent">{{ details.httpUserAgent }}</TextInfo>
-                <TextInfo label="Host">{{ details.host }}</TextInfo>
+                <TextInfo label="HTTP Referer">{{ details.httpReferer }}</TextInfo>
                 <TextInfo label="Solution">{{ details.solution }}</TextInfo>
               </div>
               <div class="flex flex-col gap-3">
                 <TextInfo label="Remote Addr">{{ details.remoteAddr }}</TextInfo>
                 <TextInfo label="Remote Port">{{ details.remotePort }}</TextInfo>
-                <TextInfo label="Remote Address Class">{{ details.remoteAddressClass }}</TextInfo>
                 <TextInfo label="Configuration ID">{{ details.configurationId }}</TextInfo>
-                <TextInfo label="Source">{{ details.source }}</TextInfo>
               </div>
             </div>
           </template>
@@ -75,18 +73,21 @@
               <BigNumber
                 label="Request Time"
                 sufix="ms"
-                >1.19</BigNumber
               >
+                {{ details.requestTime }}
+              </BigNumber>
               <BigNumber
                 label="TCP Info RTT"
                 sufix="ms"
-                >7219</BigNumber
               >
+                {{ details.tcpinfoRtt }}
+              </BigNumber>
               <BigNumber
                 label="Bytes Sent"
                 sufix="ms"
-                >191</BigNumber
               >
+                {{ details.bytesSent }}
+              </BigNumber>
             </div>
             <Divider />
             <div class="flex flex-col sm:flex-row sm:gap-8 gap-3 w-full">
@@ -99,7 +100,7 @@
               <div class="flex flex-col gap-3">
                 <TextInfo label="Request Method">{{ details.requestMethod }}</TextInfo>
                 <TextInfo label="Request Uri">{{ details.requestUri }}</TextInfo>
-                <TextInfo label="Status Code">{{ details.statusCode }}</TextInfo>
+                <TextInfo label="Status Code">{{ details.status }}</TextInfo>
               </div>
             </div>
           </template>
@@ -114,8 +115,9 @@
               <BigNumber
                 label="Upstream Response Time"
                 sufix="ms"
-                >0.847</BigNumber
               >
+                {{ details.upstreamResponseTime }}
+              </BigNumber>
               <TextInfo label="Upstream Status">{{ details.upstreamStatus }}</TextInfo>
             </div>
           </template>

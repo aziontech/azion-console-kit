@@ -3,8 +3,10 @@
   import ListTableBlock from '@/templates/list-table-block/no-header'
   import PrimeButton from 'primevue/button'
   import { computed, ref } from 'vue'
-
   import IntervalFilterBlock from '@/views/RealTimeEvents/blocks/interval-filter-block'
+  import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
+  import Drawer from './Drawer'
+  import { useRouter } from 'vue-router'
 
   const props = defineProps({
     documentationService: {
@@ -25,11 +27,13 @@
   const hasContentToList = ref(true)
   const listTableBlockRef = ref('')
   const drawerRef = ref('')
+  const router = useRouter()
 
-  const openDetailDrawer = ({ uuid, ts }) => {
+  const openDetailDrawer = ({ uuid, ts, source }) => {
     drawerRef.value.openDetailDrawer({
       tsRange: filterDate.value,
       uuid,
+      source,
       ts
     })
   }
@@ -54,7 +58,13 @@
     return [
       {
         field: 'level',
-        header: 'Level'
+        header: 'Level',
+        type: 'component',
+        component: (columnData) =>
+          columnBuilder({
+            data: columnData,
+            columnAppearance: 'tag'
+          })
       },
       {
         field: 'qtype',
@@ -87,6 +97,10 @@
       }
     ]
   })
+
+  const goToCreateIntelligentDNS = () => {
+    router.push({ name: 'create-intelligent-dns' })
+  }
 </script>
 
 <template>
@@ -137,7 +151,7 @@ They are displayed when there are requests and traffic received in the period se
         severity="secondary"
         icon="pi pi-plus"
         label="Intelligent DNS"
-        @click="console.log"
+        @click="goToCreateIntelligentDNS"
       />
     </template>
   </EmptyResultsBlock>

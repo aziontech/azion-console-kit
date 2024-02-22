@@ -6,7 +6,10 @@
   defineOptions({ name: 'drawer-events-image-processor' })
 
   const props = defineProps({
-    loadService: Function
+    loadService: {
+      type: Function,
+      required: true
+    }
   })
 
   const showDrawer = ref(false)
