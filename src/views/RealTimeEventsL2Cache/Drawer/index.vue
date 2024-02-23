@@ -20,7 +20,7 @@
     }
   })
   const details = ref({})
-  const showDrawer = ref(true)
+  const showDrawer = ref(false)
   const toast = useToast()
 
   const openDetailDrawer = async (item) => {
@@ -47,7 +47,15 @@
   )
 
   const referenceErrorTag = computed(() => {
-    return [{ text: `Reference Error`, severity: 'danger' }]
+    const statusCode = details.value.status
+
+    const isClientError = statusCode >= 400 && statusCode < 500
+    const isServerError = statusCode >= 500 && statusCode < 600
+
+    if (isServerError || isClientError) {
+      return [{ text: 'Reference Error', severity: 'danger', icon: 'pi pi-times-circle' }]
+    }
+    return []
   })
 
   const upstreamCacheStatusTag = computed(() => {

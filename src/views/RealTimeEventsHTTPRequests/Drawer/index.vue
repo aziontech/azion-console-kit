@@ -15,7 +15,7 @@
     }
   })
   const details = ref({})
-  const showDrawer = ref(true)
+  const showDrawer = ref(false)
 
   const openDetailDrawer = async (item) => {
     showDrawer.value = true
