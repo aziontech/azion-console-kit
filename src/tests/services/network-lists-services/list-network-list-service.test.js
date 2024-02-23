@@ -39,10 +39,10 @@ describe('NetworkListsServices', () => {
 
     const { sut } = makeSut()
     const version = 'v3'
-    await sut()
+    await sut({})
 
     expect(requestSpy).toHaveBeenCalledWith({
-      url: `${version}/network_lists`,
+      url: `${version}/network_lists?page=1&page_size=200`,
       method: 'GET'
     })
   })
@@ -58,7 +58,7 @@ describe('NetworkListsServices', () => {
     })
     const { sut } = makeSut()
 
-    const result = await sut()
+    const result = await sut({})
 
     expect(result).toEqual([
       {
