@@ -14,19 +14,20 @@ export default async function redirectToManager(to, __, next) {
 
   try {
     if (accountStore.hasActiveUserId && isPrivateRoute) {
+      const isAzion = accountData.email.includes('@azion.com')
+      // Azion internal access to console.
+      if (isAzion) {
+        return next()
+      }
       const isNotClientKind = !accountData.client_id
-
-      if (isNotClientKind) {
-        const isAzionBrand =
-          accountData.kind === 'brand' && accountData.email.includes('@azion.com')
-
-        if (isAzionBrand) {
-          return next()
-        } else {
-          permanentRedirectToManager()
-        }
+      // [Brand,Reseller,Group] are the kins without client id.
+      if (isNotClientKind && !isAzion) {
+        permanentRedirectToManager()
+        //ensure that in development env, without redirect, you continue to next route.
+        return next()
       }
 
+      // account that are kind client, can access with developer service plan
       const { isDeveloperSupportPlan } = await loadContractServicePlan({
         clientId: accountData.client_id
       })
