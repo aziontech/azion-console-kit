@@ -10,6 +10,7 @@
 
   import { computed, ref, watch, provide, reactive, onMounted } from 'vue'
   import { useRoute, useRouter } from 'vue-router'
+  import { generateCurrentTimestamp } from '@/helpers/generate-timestamp'
 
   defineOptions({ name: 'tabs-edge-firewall' })
 
@@ -145,10 +146,7 @@
     } else {
       tabHasUpdate.oldTab = oldValue
       tabHasUpdate.nextTab = newValue
-      /**
-       * Generates a timestamp with the current date and time to mark the update
-      */
-      tabHasUpdate.updated = new Date().getTime()
+      tabHasUpdate.updated = generateCurrentTimestamp()
     }
   })
 </script>

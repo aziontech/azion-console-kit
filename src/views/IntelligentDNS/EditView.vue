@@ -17,6 +17,7 @@
   import * as yup from 'yup'
   import FormFieldsIntelligentDnsCreate from './FormFields/FormFieldsIntelligentDns.vue'
   import FormFieldsRecords from './FormFields/FormFieldsRecords'
+  import { generateCurrentTimestamp } from '@/helpers/generate-timestamp'
 
   const props = defineProps({
     loadIntelligentDNSService: { type: Function, required: true },
@@ -245,10 +246,7 @@
     } else {
       tabHasUpdate.oldTab = oldValue
       tabHasUpdate.nextTab = newValue
-      /**
-       * Generates a timestamp with the current date and time to mark the update
-      */
-      tabHasUpdate.updated = new Date().getTime()
+      tabHasUpdate.updated = generateCurrentTimestamp()
     }
   })
 </script>

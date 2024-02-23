@@ -7,6 +7,8 @@
   import { useRoute, useRouter } from 'vue-router'
   import { ref, watch, provide, reactive } from 'vue'
   import ListViewTabResources from '@/views/EdgeServices/ListViewTabResources'
+  import { generateCurrentTimestamp } from '@/helpers/generate-timestamp'
+
   defineOptions({ name: 'tabs-edge-service' })
 
   const props = defineProps({
@@ -74,10 +76,7 @@
     } else {
       tabHasUpdate.oldTab = oldValue
       tabHasUpdate.nextTab = newValue
-      /**
-       * Generates a timestamp with the current date and time to mark the update
-      */
-      tabHasUpdate.updated = new Date().getTime()
+      tabHasUpdate.updated = generateCurrentTimestamp()
     }
   })
 

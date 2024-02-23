@@ -10,6 +10,7 @@
 
   import { ref, provide, reactive, watch } from 'vue'
   import { useRoute, useRouter } from 'vue-router'
+  import { generateCurrentTimestamp } from '@/helpers/generate-timestamp'
 
   defineOptions({ name: 'tabs-waf-rules' })
 
@@ -102,10 +103,7 @@
     } else {
       tabHasUpdate.oldTab = oldValue
       tabHasUpdate.nextTab = newValue
-      /**
-       * Generates a timestamp with the current date and time to mark the update
-      */
-      tabHasUpdate.updated = new Date().getTime()
+      tabHasUpdate.updated = generateCurrentTimestamp()
     }
   })
 

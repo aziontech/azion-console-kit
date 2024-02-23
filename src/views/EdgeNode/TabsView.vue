@@ -7,6 +7,8 @@
   import TabPanel from 'primevue/tabpanel'
   import EditView from '@/views/EdgeNode/EditView'
   import ListViewServices from '@/views/EdgeNode/ListViewTabServices'
+  import { generateCurrentTimestamp } from '@/helpers/generate-timestamp'
+
   defineOptions({ name: 'tabs-edge-node' })
 
   const props = defineProps({
@@ -75,10 +77,7 @@
     } else {
       tabHasUpdate.oldTab = oldValue
       tabHasUpdate.nextTab = newValue
-      /**
-       * Generates a timestamp with the current date and time to mark the update
-      */
-      tabHasUpdate.updated = new Date().getTime()
+      tabHasUpdate.updated = generateCurrentTimestamp()
     }
   })
 
