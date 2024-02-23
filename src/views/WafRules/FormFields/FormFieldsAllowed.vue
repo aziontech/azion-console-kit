@@ -1,14 +1,14 @@
 <script setup>
-  import { ref } from 'vue'
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
-  import InputSwitch from 'primevue/inputswitch'
-  import Dropdown from 'primevue/dropdown'
   import FieldText from '@/templates/form-fields-inputs/fieldText'
-  import Divider from 'primevue/divider'
   import PrimeButton from 'primevue/button'
-  import RadioButton from 'primevue/radiobutton'
-  import InputText from 'primevue/inputtext'
   import Card from 'primevue/card'
+  import Divider from 'primevue/divider'
+  import Dropdown from 'primevue/dropdown'
+  import InputSwitch from 'primevue/inputswitch'
+  import InputText from 'primevue/inputtext'
+  import RadioButton from 'primevue/radiobutton'
+  import { ref } from 'vue'
 
   import { useField } from 'vee-validate'
   defineOptions({ name: 'form-fields-waf-rules-allowed' })
@@ -98,6 +98,7 @@
           >Rule ID *</label
         >
         <Dropdown
+          appendTo="self"
           id="ruleid"
           v-model="ruleId"
           :options="ruleIdOption"
@@ -180,6 +181,7 @@
               >Match Zones *</label
             >
             <Dropdown
+              appendTo="self"
               id="ruleid"
               v-model="matchZones[index].zone"
               :options="matchZonesOptions"

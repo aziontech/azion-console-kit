@@ -1,17 +1,17 @@
 <script setup>
-  import { ref } from 'vue'
-  import { useField } from 'vee-validate'
   import { useAccountStore } from '@/stores/account'
   import { storeToRefs } from 'pinia'
+  import { useField } from 'vee-validate'
+  import { ref } from 'vue'
 
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
-  import InputText from 'primevue/inputtext'
-  import Dropdown from 'primevue/dropdown'
-  import Divider from 'primevue/divider'
-  import InputSwitch from 'primevue/inputswitch'
-  import MultiSelect from 'primevue/multiselect'
-  import InputMask from 'primevue/inputmask'
   import Card from 'primevue/card'
+  import Divider from 'primevue/divider'
+  import Dropdown from 'primevue/dropdown'
+  import InputMask from 'primevue/inputmask'
+  import InputSwitch from 'primevue/inputswitch'
+  import InputText from 'primevue/inputtext'
+  import MultiSelect from 'primevue/multiselect'
 
   const props = defineProps({
     loadAccountDetailsService: {
@@ -199,6 +199,7 @@
             >Timezone *</label
           >
           <Dropdown
+            appendTo="self"
             id="timezone"
             filter
             :options="optionsTimezone"
@@ -217,6 +218,7 @@
             >Language</label
           >
           <Dropdown
+            appendTo="self"
             id="language"
             :options="optionsLanguage"
             optionLabel="label"
@@ -265,6 +267,7 @@
         <div class="flex gap-2">
           <div class="p-inputgroup">
             <Dropdown
+              appendTo="self"
               id="countryCallCode"
               filter
               :options="filteredCountriesMobile"

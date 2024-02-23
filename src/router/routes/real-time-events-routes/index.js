@@ -11,7 +11,7 @@ export const realTimeEventsRoutes = {
     httpRequests: {
       listHttpRequest: RealTimeEventsService.listHttpRequest,
       loadHttpRequest: RealTimeEventsService.loadHttpRequest,
-      documentationService: Helpers.documentationGuideProducts.realTimeEvents,
+      documentationService: Helpers.documentationGuideProducts.realTimeEvents
     },
     edgeFunctions: {
       listEdgeFunctions: RealTimeEventsService.listEdgeFunctions,
@@ -48,7 +48,7 @@ export const realTimeEventsRoutes = {
       listActivityHistory: RealTimeEventsService.listActivityHistory,
       loadActivityHistory: RealTimeEventsService.loadActivityHistory,
       documentationService: Helpers.documentationGuideProducts.realTimeEvents
-    },
+    }
   },
   meta: {
     breadCrumbs: [

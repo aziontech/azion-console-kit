@@ -9,6 +9,9 @@ export const loadSolutionService = async ({ vendor, solution }) => {
   httpResponse = adapt(httpResponse)
   return parseHttpResponse(httpResponse)
 }
+const removeStyleAttributes = (html) => {
+  return html.replace(/style="[^"]*"/g, '')
+}
 
 const adapt = (httpResponse) => {
   const solution = httpResponse.body || {}
@@ -23,9 +26,9 @@ const adapt = (httpResponse) => {
     latestVersion: solution.latest_version,
     latestVersionChangelog: solution.latest_version_changelog,
     lastUpdate: solution.updated_at,
-    usage: solution.usage,
-    overview: solution.overview,
-    support: solution.support,
+    usage: removeStyleAttributes(solution.usage),
+    overview: removeStyleAttributes(solution.overview),
+    support: removeStyleAttributes(solution.support),
     isPayAsYouGo: solution.is_pay_as_you_go,
     isLaunched: solution.is_launched,
     isUpdated: solution.is_updated,

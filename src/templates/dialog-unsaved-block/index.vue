@@ -30,7 +30,12 @@
   let changeTab, tabHasUpdate, formHasUpdated, visibleOnSaved
 
   if (props.isTabs) {
-    ;({ changeTab, tabHasUpdate, formHasUpdated, visibleOnSaved } = inject('unsaved'))
+    const unsavedStatus = inject('unsaved')
+
+    changeTab = unsavedStatus.changeTab
+    tabHasUpdate = unsavedStatus.tabHasUpdate
+    formHasUpdated = unsavedStatus.formHasUpdated
+    visibleOnSaved = unsavedStatus.visibleOnSaved
   }
 
   const visibleDialog = computed({
