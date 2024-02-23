@@ -111,7 +111,7 @@ describe('MarketplaceServices', () => {
 
     const { sut } = makeSut()
 
-    await sut({ })
+    await sut({})
 
     expect(requestSpy).toHaveBeenCalledWith({
       url: `marketplace/solution/?`,

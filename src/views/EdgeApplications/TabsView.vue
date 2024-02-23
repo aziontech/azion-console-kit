@@ -178,7 +178,7 @@
       tabHasUpdate.nextTab = newValue
       /**
        * Generates a timestamp with the current date and time to mark the update
-      */
+       */
       tabHasUpdate.updated = new Date().getTime()
     }
   })
