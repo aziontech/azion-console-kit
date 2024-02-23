@@ -41,6 +41,11 @@ const getConfig = () => {
           changeOrigin: true,
           rewrite: (path) => path.replace(/^\/metrics\/graphql/, '')
         },
+        '/events/graphql': {
+          target: `${URLStartPrefix}manager.azion.com/events/graphql`,
+          changeOrigin: true,
+          rewrite: (path) => path.replace(/^\/events\/graphql/, '')
+        },
         '^/api/(account|user|token|switch-account|auth|password|totp)|^/logout': {
           target: `${URLStartPrefix}sso.azion.com`,
           changeOrigin: true,

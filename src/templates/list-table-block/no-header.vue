@@ -116,6 +116,7 @@
                 :popup="true"
               />
               <PrimeButton
+                v-if="hasActions"
                 v-tooltip.top="{ value: 'Actions', showDelay: 200 }"
                 size="small"
                 icon="pi pi-ellipsis-h"
@@ -199,8 +200,7 @@
       default: () => [{ field: 'name', header: 'Name' }]
     },
     pageTitleDelete: {
-      type: String,
-      required: true
+      type: String
     },
     createPagePath: {
       type: String,
@@ -269,6 +269,7 @@
   const selectedItemData = ref(null)
   const selectedColumns = ref([])
   const selectedItems = ref()
+  const menuActionsCounter = ref(0)
 
   onMounted(() => {
     loadData({ page: 1 })
@@ -306,6 +307,10 @@
     showActions.value = actionOptions.length > 0
     return actionOptions
   }
+
+  const hasActions = computed(() => {
+    return menuActionsCounter.value > 0
+  })
 
   const toast = useToast()
 
@@ -385,7 +390,7 @@
       toast.add({
         closable: true,
         severity: 'success',
-        summary: 'Rules Engine order saved!'
+        summary: 'Reorder saved'
       })
     } catch (error) {
       toast.add({

@@ -1,0 +1,143 @@
+<script setup>
+  import EmptyResultsBlock from '@/templates/empty-results-block'
+  import ListTableBlock from '@/templates/list-table-block/no-header'
+  import PrimeButton from 'primevue/button'
+  import { computed, ref } from 'vue'
+  import IntervalFilterBlock from '@/views/RealTimeEvents/blocks/interval-filter-block'
+  import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
+  import Drawer from './Drawer'
+  import { useRouter } from 'vue-router'
+
+  const props = defineProps({
+    documentationService: {
+      type: Function,
+      required: true
+    },
+    loadIntelligentDNS: {
+      type: Function,
+      required: true
+    },
+    listIntelligentDNS: {
+      type: Function,
+      required: true
+    }
+  })
+
+  const filterDate = ref({})
+  const hasContentToList = ref(true)
+  const listTableBlockRef = ref('')
+  const drawerRef = ref('')
+  const router = useRouter()
+
+  const openDetailDrawer = ({ uuid, ts, source }) => {
+    drawerRef.value.openDetailDrawer({
+      tsRange: filterDate.value,
+      uuid,
+      source,
+      ts
+    })
+  }
+
+  const handleLoadData = (event) => {
+    hasContentToList.value = event
+  }
+
+  const reloadList = () => {
+    if (hasContentToList.value) {
+      listTableBlockRef.value.reload()
+      return
+    }
+    hasContentToList.value = true
+  }
+
+  const listProvider = async () => {
+    return await props.listIntelligentDNS({ tsRange: filterDate.value })
+  }
+
+  const getColumns = computed(() => {
+    return [
+      {
+        field: 'level',
+        header: 'Level',
+        type: 'component',
+        component: (columnData) =>
+          columnBuilder({
+            data: columnData,
+            columnAppearance: 'tag'
+          })
+      },
+      {
+        field: 'qtype',
+        header: 'Q Type'
+      },
+      {
+        field: 'resolutionType',
+        header: 'Resolution Type'
+      },
+      {
+        field: 'solutionId',
+        header: 'Solution ID'
+      },
+      {
+        field: 'ts',
+        header: 'TS'
+      },
+      {
+        field: 'uuid',
+        header: 'UUID'
+      },
+      {
+        field: 'zoneId',
+        header: 'Zone ID'
+      }
+    ]
+  })
+
+  const goToCreateIntelligentDNS = () => {
+    router.push({ name: 'create-intelligent-dns' })
+  }
+</script>
+
+<template>
+  <Drawer
+    ref="drawerRef"
+    :loadService="props.loadIntelligentDNS"
+  />
+  <div class="flex flex-col gap-8 my-4">
+    <div class="flex gap-1">
+      <p class="text-xs font-medium leading-4">Specification</p>
+      <p class="text-xs font-normal leading-4">description here in english about this view</p>
+    </div>
+    <IntervalFilterBlock
+      v-model:filterDate="filterDate"
+      @applyTSRange="reloadList"
+    />
+  </div>
+  <ListTableBlock
+    v-if="hasContentToList"
+    ref="listTableBlockRef"
+    :listService="listProvider"
+    :columns="getColumns"
+    :editInDrawer="openDetailDrawer"
+    @on-load-data="handleLoadData"
+    emptyListMessage="No events found in this search."
+  />
+
+  <EmptyResultsBlock
+    v-else
+    title="No events found in this period."
+    description="Change the time range to search other logs or configure new Intelligent DNS zones.
+They are displayed when there are requests and traffic received in the period selected."
+    :documentationService="documentationService"
+    :inTabs="true"
+  >
+    <template #default>
+      <PrimeButton
+        severity="secondary"
+        icon="pi pi-plus"
+        label="Intelligent DNS"
+        @click="goToCreateIntelligentDNS"
+      />
+    </template>
+  </EmptyResultsBlock>
+</template>

@@ -26,11 +26,11 @@
 
 <template>
   <div
-    class="flex flex-col h-full"
+    class="flex flex-col"
     :class="{ 'mt-4 pb-8': inTabs }"
   >
     <div
-      class="flex flex-col p-8 h-full gap-7 justify-center items-center rounded-md"
+      class="flex flex-col p-8 gap-7 justify-center items-center rounded-md"
       :class="{ 'border surface-border': !noBorder }"
     >
       <slot name="illustration">
@@ -49,6 +49,7 @@
           <slot name="extraActionsLeft"></slot>
           <slot name="default">
             <PrimeButton
+              v-if="props.createButtonLabel"
               severity="secondary"
               icon="pi pi-plus"
               :label="createButtonLabel"

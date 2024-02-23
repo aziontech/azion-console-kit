@@ -1,0 +1,139 @@
+<script setup>
+  import EmptyResultsBlock from '@/templates/empty-results-block'
+  import ListTableBlock from '@/templates/list-table-block/no-header'
+  import PrimeButton from 'primevue/button'
+  import { computed, ref } from 'vue'
+  import IntervalFilterBlock from '@/views/RealTimeEvents/blocks/interval-filter-block'
+  import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
+  import Drawer from './Drawer'
+  import { useRouter } from 'vue-router'
+
+  const props = defineProps({
+    documentationService: {
+      type: Function,
+      required: true
+    },
+    listEdgeFunctions: {
+      type: Function,
+      required: true
+    },
+    loadEdgeFunctions: {
+      type: Function,
+      required: true
+    }
+  })
+
+  const filterDate = ref({})
+  const hasContentToList = ref(true)
+  const listTableBlockRef = ref('')
+  const drawerRef = ref('')
+  const router = useRouter()
+
+  const openDetailDrawer = ({ configurationId, ts, requestId }) => {
+    drawerRef.value.openDetailDrawer({
+      tsRange: filterDate.value,
+      configurationId,
+      requestId,
+      ts
+    })
+  }
+
+  const handleLoadData = (event) => {
+    hasContentToList.value = event
+  }
+
+  const reloadList = () => {
+    if (hasContentToList.value) {
+      listTableBlockRef.value.reload()
+      return
+    }
+    hasContentToList.value = true
+  }
+
+  const listProvider = async () => {
+    return await props.listEdgeFunctions({ tsRange: filterDate.value })
+  }
+
+  const getColumns = computed(() => {
+    return [
+      {
+        field: 'configurationId',
+        header: 'Configuration ID'
+      },
+      {
+        field: 'edgeFunctionsInstanceIdList',
+        header: 'Edge Functions Instance ID List'
+      },
+      {
+        field: 'edgeFunctionsInitiatorTypeList',
+        header: 'Edge Functions Type List'
+      },
+      {
+        field: 'edgeFunctionsList',
+        header: 'Edge Functions List',
+        type: 'component',
+        component: (columnData) =>
+          columnBuilder({ data: columnData, columnAppearance: 'expand-column' })
+      },
+      {
+        field: 'edgeFunctionsSolutionId',
+        header: 'Edge Functions Solution ID'
+      },
+      {
+        field: 'edgeFunctionsTime',
+        header: 'Edge Functions Time'
+      },
+      {
+        field: 'functionLanguage',
+        header: 'Function Language'
+      }
+    ]
+  })
+
+  const goToCreateEdgeFunction = () => {
+    router.push({ name: 'create-edge-functions' })
+  }
+</script>
+
+<template>
+  <Drawer
+    ref="drawerRef"
+    :loadService="props.loadEdgeFunctions"
+  />
+  <div class="flex flex-col gap-8 my-4">
+    <div class="flex gap-1">
+      <p class="text-xs font-medium leading-4">Specification</p>
+      <p class="text-xs font-normal leading-4">description here in english about this view</p>
+    </div>
+    <IntervalFilterBlock
+      v-model:filterDate="filterDate"
+      @applyTSRange="reloadList"
+    />
+  </div>
+  <ListTableBlock
+    v-if="hasContentToList"
+    ref="listTableBlockRef"
+    :listService="listProvider"
+    :columns="getColumns"
+    :editInDrawer="openDetailDrawer"
+    @on-load-data="handleLoadData"
+    emptyListMessage="No events found in this search."
+  />
+
+  <EmptyResultsBlock
+    v-else
+    title="No events found in this period."
+    description="Change the time range to search other logs or create new Edge Function. They are displayed when there are requests and traffic received in the period selected."
+    :documentationService="documentationService"
+    :inTabs="true"
+  >
+    <template #default>
+      <PrimeButton
+        severity="secondary"
+        icon="pi pi-plus"
+        label="Edge Function"
+        @click="goToCreateEdgeFunction"
+      />
+    </template>
+  </EmptyResultsBlock>
+</template>
