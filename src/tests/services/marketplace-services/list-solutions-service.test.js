@@ -111,11 +111,11 @@ describe('MarketplaceServices', () => {
 
     const { sut } = makeSut()
 
-    await sut({ type: 'marketplace' })
+    await sut({ })
 
     expect(requestSpy).toHaveBeenCalledWith({
       url: `marketplace/solution/?`,
-      headers: { 'Mktp-Api-Context': 'marketplace' },
+      headers: { 'Mktp-Api-Context': 'onboarding' },
       method: 'GET'
     })
   })
