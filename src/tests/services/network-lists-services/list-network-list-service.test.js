@@ -10,7 +10,9 @@ const fixtures = {
     last_editor: 'John A',
     list_type: 'ip_cidr',
     last_modified: new Date(2023, 10, 10)
-  }
+  },
+  page: 2,
+  pageSize: 10,
 }
 
 const makeSut = () => {
@@ -39,10 +41,10 @@ describe('NetworkListsServices', () => {
 
     const { sut } = makeSut()
     const version = 'v3'
-    await sut({})
+    await sut({page: 2, pageSize: 10})
 
     expect(requestSpy).toHaveBeenCalledWith({
-      url: `${version}/network_lists?page=1&page_size=200`,
+      url: `${version}/network_lists?page=${fixtures.page}&page_size=${fixtures.pageSize}`,
       method: 'GET'
     })
   })
