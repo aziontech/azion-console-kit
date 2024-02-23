@@ -27,7 +27,7 @@
   const activeTab = ref(0)
   const edgeNodeId = ref(route.params.id)
 
-  const tabHasUpdate = reactive({ oldTab: null, nextTab: 0, updated: true })
+  const tabHasUpdate = reactive({ oldTab: null, nextTab: 0, updated: 0 })
   const formHasUpdated = ref(false)
 
   const defaultTabs = {
@@ -75,7 +75,10 @@
     } else {
       tabHasUpdate.oldTab = oldValue
       tabHasUpdate.nextTab = newValue
-      tabHasUpdate.updated = Math.random()
+      /**
+       * Generates a timestamp with the current date and time to mark the update
+      */
+      tabHasUpdate.updated = new Date().getTime()
     }
   })
 
