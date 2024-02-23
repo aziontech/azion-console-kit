@@ -10,6 +10,7 @@
 
   import { computed, ref, watch, provide, reactive, onMounted } from 'vue'
   import { useRoute, useRouter } from 'vue-router'
+  import { generateCurrentTimestamp } from '@/helpers/generate-timestamp'
 
   defineOptions({ name: 'tabs-edge-firewall' })
 
@@ -34,7 +35,7 @@
   const edgeFirewallId = ref(route.params.id)
   const edgeFirewall = ref()
 
-  const tabHasUpdate = reactive({ oldTab: null, nextTab: 0, updated: true })
+  const tabHasUpdate = reactive({ oldTab: null, nextTab: 0, updated: 0 })
   const formHasUpdated = ref(false)
 
   const loaderEdgeFirewall = async () => {
@@ -145,7 +146,7 @@
     } else {
       tabHasUpdate.oldTab = oldValue
       tabHasUpdate.nextTab = newValue
-      tabHasUpdate.updated = Math.random()
+      tabHasUpdate.updated = generateCurrentTimestamp()
     }
   })
 </script>

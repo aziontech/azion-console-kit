@@ -59,6 +59,7 @@
   })
 
   watch(formHasChanges, () => {
+    if (!props.isTabs) return
     formHasUpdated.value = formHasChanges
     visibleOnSaved.value = false
   })

@@ -7,6 +7,8 @@
   import { useRoute, useRouter } from 'vue-router'
   import { ref, watch, provide, reactive } from 'vue'
   import ListViewTabResources from '@/views/EdgeServices/ListViewTabResources'
+  import { generateCurrentTimestamp } from '@/helpers/generate-timestamp'
+
   defineOptions({ name: 'tabs-edge-service' })
 
   const props = defineProps({
@@ -26,7 +28,7 @@
   const activeTab = ref(0)
   const edgeServiceId = ref(route.params.id)
 
-  const tabHasUpdate = reactive({ oldTab: null, nextTab: 0, updated: true })
+  const tabHasUpdate = reactive({ oldTab: null, nextTab: 0, updated: 0 })
   const formHasUpdated = ref(false)
 
   const defaultTabs = {
@@ -74,7 +76,7 @@
     } else {
       tabHasUpdate.oldTab = oldValue
       tabHasUpdate.nextTab = newValue
-      tabHasUpdate.updated = Math.random()
+      tabHasUpdate.updated = generateCurrentTimestamp()
     }
   })
 
