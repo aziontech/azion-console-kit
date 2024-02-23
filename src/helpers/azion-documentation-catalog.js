@@ -35,6 +35,7 @@ export const documentationCatalog = {
 export const documentationGuideProducts = {
   edgeApplication: () => openDocumentationProducts('guides/build/build-an-application/'),
   realTimeMetrics: () => openDocumentationProducts('guides/use-real-time-metrics/'),
+  realTimeEvents: () => openDocumentationProducts('real-time-events/'),
   edgeServicesResources: () =>
     openDocumentationProducts('edge-orchestrator/edge-services/#resources')
 }

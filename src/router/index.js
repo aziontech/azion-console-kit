@@ -18,6 +18,7 @@ import { intelligentDnsRoutes } from '@routes/intelligent-dns-routes'
 import { loginRoutes } from '@routes/login-routes'
 import { marketplaceRoutes } from '@routes/marketplace-routes'
 import { metricsRoutes } from '@routes/metrics-routes'
+import { realTimeEventsRoutes } from '@/router/routes/real-time-events-routes'
 import { mfaRoutes } from '@routes/mfa-routes'
 import { networkListsRoutes } from '@routes/network-lists-routes'
 import { passwordRoutes } from '@routes/password-routes'
@@ -72,7 +73,8 @@ const router = createRouter({
     accountRoutes,
     settingsRoutes,
     wafRulesRoutes,
-    metricsRoutes
+    metricsRoutes,
+    realTimeEventsRoutes
   ].concat(errorRoutes)
 })
 
