@@ -52,7 +52,7 @@ const adapt = (filter) => {
       'debugLog',
       'wafMatch',
       'geolocAsn',
-      // 'stacktrace',
+      'stacktrace',
       'geolocCountryName',
       'geolocRegionName'
     ],
@@ -108,7 +108,7 @@ const adaptResponse = (httpResponse) => {
     debugLog: httpEventItem.debugLog,
     wafMatch: httpEventItem.wafMatch,
     geolocAsn: httpEventItem.geolocAsn,
-    // stacktrace: httpEventItem.stacktrace,
+    stacktrace: httpEventItem.stacktrace,
     geolocCountryName: httpEventItem.geolocCountryName,
     geolocRegionName: httpEventItem.geolocRegionName
   }
