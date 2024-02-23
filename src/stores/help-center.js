@@ -23,6 +23,7 @@ export const useHelpCenterStore = defineStore({
     },
     async setArticleContent({ url, filename = 'index.html' }) {
       this.articleContent = await this.getHelpCenterArticle(url, filename)
+      this.open()
     },
     async getHelpCenterArticle(url, filename) {
       return await getHelpCenterDocumentationService({ url, filename })
