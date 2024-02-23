@@ -55,7 +55,7 @@
           </template>
         </PrimeMenu>
         <div class="flex flex-row justify-between items-center align-middle px-2 py-1.5">
-          <span>Theme</span>
+          <span class="text-sm">Theme</span>
           <Dropdown
             appendTo="self"
             :modelValue="selectedTheme"
@@ -146,7 +146,7 @@
         </template>
       </PrimeMenu>
       <div class="flex flex-row justify-between items-center align-middle px-2 py-1.5">
-        <span>Theme</span>
+        <span class="text-sm">Theme</span>
         <Dropdown
           appendTo="self"
           :modelValue="selectedTheme"
