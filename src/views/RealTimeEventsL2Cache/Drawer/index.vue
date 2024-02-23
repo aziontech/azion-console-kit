@@ -117,7 +117,6 @@
                 <TextInfo label="Client ID">{{ details.clientId }}</TextInfo>
                 <TextInfo label="Solution">{{ details.solution }}</TextInfo>
                 <TextInfo label="Configuration ID">{{ details.configurationId }}</TextInfo>
-                <TextInfo label="Source">{{ details.source }}</TextInfo>
               </div>
             </div>
           </template>

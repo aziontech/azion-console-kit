@@ -69,7 +69,6 @@
                 <TextInfo label="Solution ID">{{ details.solutionId }}</TextInfo>
                 <TextInfo label="Function ID">{{ details.functionId }}</TextInfo>
                 <TextInfo label="Configuration ID">{{ details.configurationId }}</TextInfo>
-                <TextInfo label="Source">{{ details.source }}</TextInfo>
               </div>
             </div>
           </template>

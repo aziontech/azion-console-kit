@@ -97,7 +97,6 @@
               <div class="flex flex-col gap-3">
                 <TextInfo label="Virtual Host ID">{{ details.virtualHostId }}</TextInfo>
                 <TextInfo label="Configuration ID">{{ details.configurationId }}</TextInfo>
-                <TextInfo label="Source">{{ details.source }}</TextInfo>
               </div>
             </div>
           </template>
