@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div class="max-w-full mt-4">
+    <div class="max-w-full cursor-pointer mt-4">
       <DataTable
         v-if="!isLoading"
         scrollable
