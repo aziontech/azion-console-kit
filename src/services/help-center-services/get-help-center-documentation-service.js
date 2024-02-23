@@ -8,7 +8,7 @@ const WELCOME_PATH = '/welcome'
 
 const getHelpCenterDocumentationService = async ({ url, filename }) => {
   const helpCenterBaseUrl = getStaticUrlsByEnvironment('helpCenter')
-  const documentUrl = url === '/' ? WELCOME_PATH : getFirstPathSegment(url)
+  const documentUrl = url === '/' ? WELCOME_PATH : url
   const documentFilename = filename || DEFAULT_DOCUMENT
 
   let responseDocument = await fetchAndParseDocument(
@@ -41,13 +41,6 @@ const fetchAndParseDocument = async (documentUrl, documentFilename, baseUrl) => 
 
 const isMarkdown = (filename) => {
   return filename.endsWith('.md')
-}
-
-const getFirstPathSegment = (url) => {
-  const pathParts = url.split('/')
-  const firstPartOfPath = '/' + pathParts[1]
-
-  return firstPartOfPath
 }
 
 const fetchDocument = async (url, baseUrl) => {
