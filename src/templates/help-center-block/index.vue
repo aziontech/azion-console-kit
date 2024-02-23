@@ -15,8 +15,8 @@
     </div>
 
     <!-- Content body -->
-    <div class="h-full overflow-y-auto justify-between flex flex-col">
-      <div>
+    <div class="h-full flex justify-between flex-col">
+      <div class="sticky top-12">
         <div class="pr-7">
           <!-- Input Search  -->
           <div class="pl-6 mt-6">
@@ -36,7 +36,7 @@
           </div>
 
           <!-- List items -->
-          <template v-if="!articleContent">
+          <template v-if="!currentArticleContent">
             <p class="pl-6 mb-2 mt-5 text-sm font-semibold">Recommended articles</p>
             <PrimeMenu
               :model="mainContent"
@@ -56,8 +56,8 @@
 
           <!-- Article Content -->
           <div
-            v-if="articleContent"
-            class="pl-6 pt-6"
+            v-if="currentArticleContent"
+            class="pl-6 pt-6 mb-24"
           >
             <PrimeButton
               outlined
@@ -69,7 +69,7 @@
 
             <article
               class="pt-4 prose dark:prose-invert"
-              v-html="articleContent"
+              v-html="currentArticleContent"
             ></article>
           </div>
         </div>
@@ -77,7 +77,7 @@
         <!-- Menu -->
         <div
           class="border-t surface-border"
-          v-if="!articleContent"
+          v-if="!currentArticleContent"
         >
           <PrimeMenu
             :model="menuItems"
@@ -104,7 +104,7 @@
       </div>
 
       <div class="ml-6 mr-8 mb-20">
-        <BannerDiscord v-if="!articleContent" />
+        <BannerDiscord v-if="!currentArticleContent" />
       </div>
     </div>
 
@@ -151,7 +151,7 @@
             </div>
 
             <!-- List items -->
-            <template v-if="!articleContent">
+            <template v-if="!currentArticleContent">
               <div class="mb-2 pl-2 text-sm font-semibold">Recommended articles</div>
               <PrimeMenu
                 :model="mainContent"
@@ -170,7 +170,7 @@
             </template>
 
             <!-- Article Content -->
-            <div v-if="articleContent">
+            <div v-if="currentArticleContent">
               <PrimeButton
                 outlined
                 icon="pi pi-chevron-left"
@@ -180,14 +180,14 @@
 
               <article
                 class="pt-4 prose dark:prose-invert"
-                v-html="articleContent"
+                v-html="currentArticleContent"
               ></article>
             </div>
           </div>
 
           <div class="border-t surface-border -ml-[0.75rem] w-[calc(100%_+_24px)]"></div>
           <!-- Menu -->
-          <template v-if="!articleContent">
+          <template v-if="!currentArticleContent">
             <PrimeMenu
               :model="menuItems"
               class="w-full border-0 p-0 m-0 text-sm pb-3 pt-2 bg-transparent"
@@ -213,130 +213,121 @@
         </div>
 
         <div class="mb-20">
-          <BannerDiscord v-if="!articleContent" />
+          <BannerDiscord v-if="!currentArticleContent" />
         </div>
       </div>
     </Sidebar>
   </div>
 </template>
 
-<script>
+<script setup>
   import { getStaticUrlsByEnvironment, openSearchResult } from '@/helpers'
+  import { getHelpCenterDocumentationService } from '@/services/help-center-services'
   import { useHelpCenterStore } from '@/stores/help-center'
+  import { storeToRefs } from 'pinia'
   import PrimeButton from 'primevue/button'
   import InputText from 'primevue/inputtext'
+  import PrimeMenu from 'primevue/menu'
   import Sidebar from 'primevue/sidebar'
+  import { computed, ref, watch } from 'vue'
+  import { useRoute } from 'vue-router'
   import BannerDiscord from './banner-discord.vue'
 
-  import PrimeMenu from 'primevue/menu'
+  defineOptions({ name: 'SlideIn' })
 
-  export default {
-    name: 'SlideIn',
-    components: {
-      PrimeButton,
-      InputText,
-      PrimeMenu,
-      BannerDiscord,
-      Sidebar
+  const helpCenterStore = useHelpCenterStore()
+  const route = useRoute()
+
+  const { getArticleContent } = storeToRefs(helpCenterStore)
+  const articleContent = ref(null)
+
+  const currentArticleContent = computed(() => {
+    return getArticleContent.value || articleContent.value
+  })
+
+  const mainContent = ref([])
+  const search = ref('')
+  const menuItems = computed(() => [
+    {
+      label: 'Documentation',
+      link: 'https://www.azion.com/en/documentation',
+      isLinkExternal: true
     },
-    data() {
-      return {
-        mainContent: [],
-        articleContent: '',
-        search: '',
-        menuItems: [
-          {
-            label: 'Documentation',
-            link: 'https://www.azion.com/en/documentation',
-            isLinkExternal: true
-          },
-          { label: 'API', link: 'https://api.azion.com', isLinkExternal: true },
-          {
-            label: 'Changelog',
-            link: 'https://www.azion.com/en/documentation/products/changelog',
-            isLinkExternal: true
-          },
-          {
-            label: 'Contact Support',
-            link: `${this.makeContactSupportUrl()}/tickets/`,
-            isLinkExternal: true
-          },
-          {
-            label: 'Send Feedback',
-            link: 'mailto:feedback@azion.com',
-            isLinkExternal: false
-          }
-        ],
-        items: [
-          {
-            label: 'New',
-            icon: 'pi pi-plus',
-            shortcut: '⌘+N'
-          },
-          {
-            label: 'Search',
-            icon: 'pi pi-search',
-            shortcut: '⌘+S'
-          }
-        ]
-      }
+    { label: 'API', link: 'https://api.azion.com', isLinkExternal: true },
+    {
+      label: 'Changelog',
+      link: 'https://www.azion.com/en/documentation/products/changelog',
+      isLinkExternal: true
     },
-    methods: {
-      async getMainContent() {
-        const currentPath = this.getCurrentPath()
-
-        const mainDocumentation = await this.HelpCenterServices.getHelpCenterDocumentationService({
-          url: currentPath
-        })
-
-        this.mainContent = mainDocumentation
-      },
-      makeContactSupportUrl() {
-        return getStaticUrlsByEnvironment('manager')
-      },
-      async getHtmlArticle(filename) {
-        const currentPath = this.getCurrentPath()
-        const parsedFilename = this.parseFilename(filename)
-
-        this.articleContent = await this.fetchArticleContent(currentPath, parsedFilename)
-      },
-      getCurrentPath() {
-        return this.$route.path
-      },
-      parseFilename(filename) {
-        const article = filename.replaceAll(' ', '-').toLowerCase()
-        const [articleNameParsed] = article.split('#')
-
-        return articleNameParsed.concat('/index.html')
-      },
-      async fetchArticleContent(currentPath, filename) {
-        return await this.HelpCenterServices.getHelpCenterDocumentationService({
-          url: currentPath,
-          filename: filename
-        })
-      },
-      onRouteChange() {
-        this.getMainContent()
-      },
-      backToMenu() {
-        this.articleContent = null
-      },
-      goToMenuLink(link) {
-        window.open(link)
-      },
-      searchDocumentation() {
-        openSearchResult(this.search)
-      }
+    {
+      label: 'Contact Support',
+      link: `${makeContactSupportUrl()}/tickets/`,
+      isLinkExternal: true
     },
-    watch: {
-      $route: 'onRouteChange'
-    },
-    setup() {
-      const helpCenterStore = useHelpCenterStore()
-
-      return {
-        helpCenterStore
-      }
+    {
+      label: 'Send Feedback',
+      link: 'mailto:feedback@azion.com',
+      isLinkExternal: false
     }
+  ])
+
+  const getMainContent = async () => {
+    const currentPath = getCurrentPath()
+
+    const mainDocumentation = await getHelpCenterDocumentationService({
+      url: currentPath
+    })
+
+    mainContent.value = mainDocumentation
   }
+
+  const makeContactSupportUrl = () => {
+    return getStaticUrlsByEnvironment('manager')
+  }
+
+  const getHtmlArticle = async (filename) => {
+    const currentPath = getCurrentPath()
+    const parsedFilename = parseFilename(filename)
+
+    articleContent.value = await fetchArticleContent(currentPath, parsedFilename)
+  }
+
+  const getCurrentPath = () => {
+    return route.path
+  }
+
+  const parseFilename = (filename) => {
+    const article = filename.replaceAll(' ', '-').toLowerCase()
+    const [articleNameParsed] = article.split('#')
+
+    return articleNameParsed.concat('/index.html')
+  }
+
+  const fetchArticleContent = async (currentPath, filename) => {
+    return await getHelpCenterDocumentationService({
+      url: currentPath,
+      filename: filename
+    })
+  }
+
+  const onRouteChange = () => {
+    getMainContent()
+  }
+
+  const backToMenu = () => {
+    articleContent.value = null
+    helpCenterStore.clearArticleContent()
+  }
+
+  const goToMenuLink = (link) => {
+    window.open(link)
+  }
+
+  const searchDocumentation = () => {
+    openSearchResult(search.value)
+  }
+
+  watch(route, () => {
+    onRouteChange()
+  })
 </script>
