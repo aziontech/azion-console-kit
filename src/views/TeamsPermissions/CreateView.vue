@@ -1,7 +1,7 @@
 <template>
   <ContentBlock>
     <template #heading>
-      <PageHeadingBlock pageTitle="Create Teams Permissions"></PageHeadingBlock>
+      <PageHeadingBlock pageTitle="Create Team"></PageHeadingBlock>
     </template>
     <template #content>
       <CreateFormBlock
