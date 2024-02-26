@@ -23,7 +23,6 @@ const adapt = async (httpResponse) => {
   const edgeApplications = await listEdgeApplications()
 
   const parsedDomains = httpResponse.body.results?.map((domain) => {
-    const cnames = domain.cnames.map((cname) => cname)?.join(',')
     return {
       id: domain.id,
       name: domain.name,
@@ -40,7 +39,7 @@ const adapt = async (httpResponse) => {
       domainName: {
         content: domain.domain_name
       },
-      cnames: cnames,
+      cnames: domain.cnames,
       edgeFirewallId: domain.edge_firewall_id,
       edgeApplicationName: getEdgeApplication(edgeApplications, domain.edge_application_id),
       digitalCertificateId: domain.digital_certificate_id

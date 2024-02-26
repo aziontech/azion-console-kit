@@ -82,7 +82,7 @@ describe('DomainsServices', () => {
         domainName: {
           content: fixtures.domainMock.domain_name
         },
-        cnames: 'CName 1,CName 2',
+        cnames: fixtures.domainMock.cnames,
         active: {
           content: 'Active',
           severity: 'success'
@@ -97,7 +97,7 @@ describe('DomainsServices', () => {
         domainName: {
           content: fixtures.disabledDomainMock.domain_name
         },
-        cnames: 'CName 3,CName 4',
+        cnames: fixtures.disabledDomainMock.cnames,
         active: {
           content: 'Inactive',
           severity: 'danger'
