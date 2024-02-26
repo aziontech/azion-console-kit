@@ -10,7 +10,7 @@ const HELP_CENTER_URLS = {
       bandwidthSaving: '/real-time-metrics/edge-applications/bandwidth-saving/bandwidth-saving'
     },
     dataTransferred: {
-      bandwitdthOffloaded:
+      bandwidthOffloaded:
         '/real-time-metrics/edge-applications/data-transferred/bandwidth-offloaded',
       edgeCaching: '/real-time-metrics/edge-applications/data-transferred/edge-caching',
       edgeOffload: '/real-time-metrics/edge-applications/data-transferred/edge-offload',
@@ -45,7 +45,7 @@ const HELP_CENTER_URLS = {
   },
   edgeFunctions: {
     invocations: {
-      totalInvocations: '/real-time-metrics/edge-functions/total-invocations'
+      totalInvocations: '/real-time-metrics/edge-functions/invocations/total-invocations'
     }
   },
   imageProcessor: {
