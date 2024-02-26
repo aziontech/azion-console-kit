@@ -12,7 +12,7 @@ const fixtures = {
     last_modified: new Date(2023, 10, 10)
   },
   page: 2,
-  pageSize: 10,
+  pageSize: 10
 }
 
 const makeSut = () => {
@@ -41,7 +41,7 @@ describe('NetworkListsServices', () => {
 
     const { sut } = makeSut()
     const version = 'v3'
-    await sut({page: 2, pageSize: 10})
+    await sut({ page: 2, pageSize: 10 })
 
     expect(requestSpy).toHaveBeenCalledWith({
       url: `${version}/network_lists?page=${fixtures.page}&page_size=${fixtures.pageSize}`,
