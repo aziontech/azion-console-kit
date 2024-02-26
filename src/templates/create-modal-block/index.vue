@@ -22,7 +22,6 @@
   const templates = ref([])
   const browseTemplates = ref([])
   const selectedTab = ref('recommended')
-  const browseHeader = ref('browse-templates')
   const recommendedHeader = ref('recommended-for-you')
   const items = ref([
     {
@@ -146,8 +145,7 @@
   const loadBrowse = async () => {
     try {
       isLoading.value = true
-      const payload = { type: browseHeader.value }
-      browseTemplates.value = await MarketplaceService.listSolutionsService(payload)
+      browseTemplates.value = await MarketplaceService.listSolutionsService({})
     } catch (error) {
       showToast('error', error)
     } finally {

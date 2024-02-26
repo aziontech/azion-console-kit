@@ -165,5 +165,8 @@
       />
     </div>
   </Sidebar>
-  <DialogUnsavedBlock :blockRedirectUnsaved="formHasChanges" :isDrawer="true" />
+  <DialogUnsavedBlock
+    :blockRedirectUnsaved="formHasChanges"
+    :isDrawer="true"
+  />
 </template>
