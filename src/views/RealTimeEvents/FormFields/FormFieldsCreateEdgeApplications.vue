@@ -216,7 +216,8 @@
               <div class="flex-col gap-1">
                 <div class="text-color text-sm font-normal">HTTP/3 support</div>
                 <div class="self-stretch text-color-secondary text-sm font-normal">
-                  Use both HTTP and HTTPS protocols and enable HTTP/3 support. Only available for HTTP port 80 and HTTPS port 443.
+                  Use both HTTP and HTTPS protocols and enable HTTP/3 support. Only available for
+                  HTTP port 80 and HTTPS port 443.
                 </div>
               </div>
             </template>
