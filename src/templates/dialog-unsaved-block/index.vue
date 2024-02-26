@@ -99,13 +99,17 @@
     return next()
   })
 
-  watch(tabHasUpdate, () => {
-    if (formHasUpdated.value) {
-      visibleOnSaved.value = true
-      openDialogUnsaved(true)
-      changeTab(tabHasUpdate.oldTab)
-    }
-  }, { deep: true })
+  watch(
+    tabHasUpdate,
+    () => {
+      if (formHasUpdated.value) {
+        visibleOnSaved.value = true
+        openDialogUnsaved(true)
+        changeTab(tabHasUpdate.oldTab)
+      }
+    },
+    { deep: true }
+  )
 
   watch(formDrawerHasUpdated, () => {
     openDialogUnsaved(true)
