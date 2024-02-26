@@ -33,7 +33,7 @@
       return props.dateTime
     },
     set: (value) => {
-     emit('update:dateTime', value)
+      emit('update:dateTime', value)
     }
   })
 
@@ -127,7 +127,7 @@
     />
   </div>
   <ListTableBlock
-    v-if="hasContentToList  && filterDate.tsRangeBegin"
+    v-if="hasContentToList && filterDate.tsRangeBegin"
     ref="listTableBlockRef"
     :listService="listProvider"
     :columns="getColumns"

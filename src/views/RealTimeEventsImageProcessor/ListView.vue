@@ -8,7 +8,6 @@
   import { useRouter } from 'vue-router'
   const emit = defineEmits(['update:dateTime'])
 
-
   const props = defineProps({
     documentationService: {
       type: Function,
@@ -33,7 +32,7 @@
       return props.dateTime
     },
     set: (value) => {
-     emit('update:dateTime', value)
+      emit('update:dateTime', value)
     }
   })
   const hasContentToList = ref(true)

@@ -65,7 +65,7 @@
   }
 
   const setInitialValues = () => {
-    if(props.filterDate.tsRangeBegin) {
+    if (props.filterDate.tsRangeBegin) {
       updatedTimeRange(props.filterDate)
       return
     }

@@ -33,7 +33,7 @@
       return props.dateTime
     },
     set: (value) => {
-     emit('update:dateTime', value)
+      emit('update:dateTime', value)
     }
   })
   const hasContentToList = ref(true)
@@ -133,7 +133,7 @@
       <p class="text-xs font-normal leading-4">description here in english about this view</p>
     </div>
     <IntervalFilterBlock
-      v-model:filterDate="filterDate "
+      v-model:filterDate="filterDate"
       @applyTSRange="reloadList"
     />
   </div>
