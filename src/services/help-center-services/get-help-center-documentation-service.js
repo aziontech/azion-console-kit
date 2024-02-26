@@ -6,17 +6,12 @@ import { markdownToHtml } from './markdown-to-html'
 const DEFAULT_DOCUMENT = 'index.md'
 const WELCOME_PATH = '/welcome'
 
-const getHelpCenterDocumentationService = async ({ url, filename }) => {
+const getHelpCenterDocumentationService = async ({ url = '/', filename = DEFAULT_DOCUMENT }) => {
   const helpCenterBaseUrl = getStaticUrlsByEnvironment('helpCenter')
   const documentUrl = url === '/' ? WELCOME_PATH : url
-  const documentFilename = filename || DEFAULT_DOCUMENT
 
-  let responseDocument = await fetchAndParseDocument(
-    documentUrl,
-    documentFilename,
-    helpCenterBaseUrl
-  )
-  if (isMarkdown(documentFilename)) {
+  let responseDocument = await fetchAndParseDocument(documentUrl, filename, helpCenterBaseUrl)
+  if (isMarkdown(filename)) {
     responseDocument.data = markdownToHtml(responseDocument.data)
   }
 
