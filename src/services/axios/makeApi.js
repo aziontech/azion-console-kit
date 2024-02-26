@@ -5,6 +5,7 @@ const api = (personalToken) => {
   const baseURL = '/api'
 
   axios.defaults.headers.common['Accept'] = 'application/json; version=3'
+  axios.defaults.headers.common['Content-Type'] = 'application/json; version=3'
   axios.defaults.withCredentials = true
 
   if (personalToken) {
