@@ -13,6 +13,7 @@
   import { computed, ref, reactive, provide, watch } from 'vue'
   import { useRoute, useRouter } from 'vue-router'
   import EditView from './EditView.vue'
+  import { generateCurrentTimestamp } from '@/helpers/generate-timestamp'
 
   defineOptions({ name: 'tabs-edge-service' })
 
@@ -176,10 +177,7 @@
     } else {
       tabHasUpdate.oldTab = oldValue
       tabHasUpdate.nextTab = newValue
-      /**
-       * Generates a timestamp with the current date and time to mark the update
-       */
-      tabHasUpdate.updated = new Date().getTime()
+      tabHasUpdate.updated = generateCurrentTimestamp()
     }
   })
 

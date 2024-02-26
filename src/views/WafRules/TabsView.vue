@@ -10,6 +10,7 @@
 
   import { ref, provide, reactive, watch } from 'vue'
   import { useRoute, useRouter } from 'vue-router'
+  import { generateCurrentTimestamp } from '@/helpers/generate-timestamp'
 
   defineOptions({ name: 'tabs-waf-rules' })
 
@@ -32,7 +33,7 @@
   const wafRuleId = ref(route.params.id)
   const waf = ref()
 
-  const tabHasUpdate = reactive({ oldTab: null, nextTab: 0, updated: true })
+  const tabHasUpdate = reactive({ oldTab: null, nextTab: 0, updated: 0 })
   const formHasUpdated = ref(false)
 
   const getWafDat = async () => {
@@ -102,7 +103,7 @@
     } else {
       tabHasUpdate.oldTab = oldValue
       tabHasUpdate.nextTab = newValue
-      tabHasUpdate.updated = Math.random()
+      tabHasUpdate.updated = generateCurrentTimestamp()
     }
   })
 

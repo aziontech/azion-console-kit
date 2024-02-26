@@ -7,6 +7,8 @@
   import TabPanel from 'primevue/tabpanel'
   import EditView from '@/views/EdgeNode/EditView'
   import ListViewServices from '@/views/EdgeNode/ListViewTabServices'
+  import { generateCurrentTimestamp } from '@/helpers/generate-timestamp'
+
   defineOptions({ name: 'tabs-edge-node' })
 
   const props = defineProps({
@@ -27,7 +29,7 @@
   const activeTab = ref(0)
   const edgeNodeId = ref(route.params.id)
 
-  const tabHasUpdate = reactive({ oldTab: null, nextTab: 0, updated: true })
+  const tabHasUpdate = reactive({ oldTab: null, nextTab: 0, updated: 0 })
   const formHasUpdated = ref(false)
 
   const defaultTabs = {
@@ -75,7 +77,7 @@
     } else {
       tabHasUpdate.oldTab = oldValue
       tabHasUpdate.nextTab = newValue
-      tabHasUpdate.updated = Math.random()
+      tabHasUpdate.updated = generateCurrentTimestamp()
     }
   })
 
