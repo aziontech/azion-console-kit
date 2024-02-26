@@ -1,6 +1,7 @@
 import convertGQL from '@/helpers/convert-gql'
 import { AxiosHttpClientSignalDecorator } from '../../axios/AxiosHttpClientSignalDecorator'
 import { convertValueToDate } from '@/helpers/convert-date'
+import { makeRealTimeEventsBaseUrl } from '../make-real-time-events-service'
 
 export const loadImageProcessor = async (filter) => {
   const payload = adapt(filter)
@@ -8,7 +9,7 @@ export const loadImageProcessor = async (filter) => {
   const decorator = new AxiosHttpClientSignalDecorator()
 
   const response = await decorator.request({
-    url: '/events/graphql',
+    url: makeRealTimeEventsBaseUrl(),
     method: 'POST',
     body: payload
   })

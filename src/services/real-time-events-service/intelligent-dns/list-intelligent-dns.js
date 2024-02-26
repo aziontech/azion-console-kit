@@ -1,5 +1,6 @@
 import convertGQL from '@/helpers/convert-gql'
 import { AxiosHttpClientSignalDecorator } from '../../axios/AxiosHttpClientSignalDecorator'
+import { makeRealTimeEventsBaseUrl } from '../make-real-time-events-service'
 
 export const listIntelligentDNS = async (filter) => {
   const payload = adapt(filter)
@@ -7,12 +8,9 @@ export const listIntelligentDNS = async (filter) => {
   const decorator = new AxiosHttpClientSignalDecorator()
 
   const response = await decorator.request({
-    url: '/events/graphql',
+    url: makeRealTimeEventsBaseUrl(),
     method: 'POST',
-    body: payload,
-    headers: {
-      'Content-Type': 'application/json; version=3'
-    }
+    body: payload
   })
 
   return adaptResponse(response)
