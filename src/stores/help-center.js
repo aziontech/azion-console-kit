@@ -10,6 +10,7 @@ export const useHelpCenterStore = defineStore({
   actions: {
     toggle() {
       this.isOpen = !this.isOpen
+      this.clearArticleContent()
     },
     close() {
       this.isOpen = false
