@@ -176,12 +176,12 @@
                 icon="pi pi-chevron-left"
                 label="Back"
                 @click="backToMenu()"
-              ></PrimeButton>
+              />
 
               <article
-                class="pt-4 prose dark:prose-invert"
+                class="py-4 prose dark:prose-invert"
                 v-html="currentArticleContent"
-              ></article>
+              />
             </div>
           </div>
 
