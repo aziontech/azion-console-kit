@@ -107,7 +107,7 @@
             outlined
             type="button"
             aria-label="Copy Token"
-            label="Copy to Clipboard"
+            label="Copy"
             :disabled="!props.generatedToken"
             @click="$emit('copyToken')"
           />

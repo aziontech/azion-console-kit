@@ -137,7 +137,7 @@
         <h5 class="text-lg not-italic font-bold leading-5">Unsaved changes</h5>
       </template>
       <div class="flex p-5 items-center flex-1 text-secondary-color text-sm font-normal leading-5">
-        There are unsaved changes. Do you want to leave without finishing?
+        Your changes will be discarded if you leave the page without saving them. Do you want to leave?
       </div>
       <template #footer>
         <PrimeButton

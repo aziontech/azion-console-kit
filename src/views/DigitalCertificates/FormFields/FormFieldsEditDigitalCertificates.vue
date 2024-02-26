@@ -98,7 +98,7 @@
           class="max-sm:w-full"
           type="button"
           severity="secondary"
-          :label="'Copy to Clipboard'"
+          :label="'Copy'"
           @click="copyCSRToclipboard"
         />
         <small v-if="csrCopied">Copied successfully!</small>
