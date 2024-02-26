@@ -274,11 +274,11 @@
   const getMainContent = async () => {
     const currentPath = getCurrentPath()
 
-    const mainDocumentation = await getHelpCenterDocumentationService({
+    const { data } = await getHelpCenterDocumentationService({
       url: currentPath
     })
 
-    mainContent.value = mainDocumentation
+    mainContent.value = data
   }
 
   const makeContactSupportUrl = () => {
@@ -304,10 +304,12 @@
   }
 
   const fetchArticleContent = async (currentPath, filename) => {
-    return await getHelpCenterDocumentationService({
+    const { data } = await getHelpCenterDocumentationService({
       url: currentPath,
       filename: filename
     })
+
+    return data
   }
 
   const onRouteChange = () => {

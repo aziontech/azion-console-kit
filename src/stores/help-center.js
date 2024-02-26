@@ -26,7 +26,9 @@ export const useHelpCenterStore = defineStore({
       this.open()
     },
     async getHelpCenterArticle(url, filename) {
-      return await getHelpCenterDocumentationService({ url, filename })
+      const { data, success } = await getHelpCenterDocumentationService({ url, filename })
+
+      return success ? data : null
     }
   },
   getters: {

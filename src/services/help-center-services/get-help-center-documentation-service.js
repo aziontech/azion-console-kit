@@ -17,7 +17,7 @@ const getHelpCenterDocumentationService = async ({ url, filename }) => {
     helpCenterBaseUrl
   )
   if (isMarkdown(documentFilename)) {
-    responseDocument = markdownToHtml(responseDocument)
+    responseDocument.data = markdownToHtml(responseDocument.data)
   }
 
   return responseDocument
@@ -29,11 +29,11 @@ const fetchAndParseDocument = async (documentUrl, documentFilename, baseUrl) => 
 
   try {
     httpResponse = await fetchDocument(fullRequestPath, baseUrl)
-    responseDocument = parseHttpResponse(httpResponse)
-  } catch (error) {
+    responseDocument = { data: parseHttpResponse(httpResponse), success: true }
+  } catch {
     fullRequestPath = `${WELCOME_PATH}/${documentFilename}`
     httpResponse = await fetchDocument(fullRequestPath, baseUrl)
-    responseDocument = parseHttpResponse(httpResponse)
+    responseDocument = { data: parseHttpResponse(httpResponse), success: false }
   }
 
   return responseDocument
