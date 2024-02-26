@@ -387,7 +387,11 @@
     }
 
     try {
-      const [{ value }] = await Promise.allSettled(requestsAllowedRules)
+      const [{ status, reason, value }] = await Promise.allSettled(requestsAllowedRules)
+      if (status === 'rejected') {
+        showToast(reason.message, 'error')
+        return
+      }
       showToast(value, 'success')
       filterSearch()
       closeDialog()
