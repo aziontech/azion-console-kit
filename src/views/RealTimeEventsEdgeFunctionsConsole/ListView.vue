@@ -7,6 +7,7 @@
   import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
   import Drawer from './Drawer'
   import { useRouter } from 'vue-router'
+  const emit = defineEmits(['update:dateTime'])
 
   const props = defineProps({
     documentationService: {
@@ -20,10 +21,21 @@
     loadEdgeFunctionsConsole: {
       type: Function,
       required: true
+    },
+    dateTime: {
+      type: Object,
+      default: () => ({})
     }
   })
 
-  const filterDate = ref({})
+  const filterDate = computed({
+    get: () => {
+      return props.dateTime
+    },
+    set: (value) => {
+     emit('update:dateTime', value)
+    }
+  })
   const hasContentToList = ref(true)
   const listTableBlockRef = ref('')
   const router = useRouter()
@@ -121,12 +133,12 @@
       <p class="text-xs font-normal leading-4">description here in english about this view</p>
     </div>
     <IntervalFilterBlock
-      v-model:filterDate="filterDate"
+      v-model:filterDate="filterDate "
       @applyTSRange="reloadList"
     />
   </div>
   <ListTableBlock
-    v-if="hasContentToList"
+    v-if="hasContentToList && filterDate.tsRangeBegin"
     ref="listTableBlockRef"
     :listService="listProvider"
     :columns="getColumns"

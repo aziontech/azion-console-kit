@@ -53,7 +53,22 @@
     return max.toUTC(userUTC)
   })
 
+  const updatedTimeRange = ({ tsRangeBegin, tsRangeEnd, meta }) => {
+    const GMT0 = '.000Z'
+    const gmt0Begin = `${tsRangeBegin}${GMT0}`
+    const gmt0End = `${tsRangeEnd}${GMT0}`
+    const dateBegin = new Date(gmt0Begin).toUTC(userUTC)
+    const dateEnd = new Date(gmt0End).toUTC(userUTC)
+    dates.value = [dateBegin, dateEnd]
+    lastFilteredDate.value = { begin: dateBegin, end: dateEnd }
+    interval.value = intervalOptions.find((element) => element.code === meta.option)
+  }
+
   const setInitialValues = () => {
+    if(props.filterDate.tsRangeBegin) {
+      updatedTimeRange(props.filterDate)
+      return
+    }
     interval.value = intervalOptions[0]
     const [begin, end] = removeAmountOfHours(interval.value?.code)
     dates.value = [begin, end]
