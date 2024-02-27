@@ -53,7 +53,7 @@
     title="More Details"
   >
     <template #body>
-      <div class="flex flex-col gap-6 sm:gap-8 md:m-3">
+      <div class="w-full flex flex-col gap-8">
         <InfoSection
           :title="details.url"
           :date="details.ts"
