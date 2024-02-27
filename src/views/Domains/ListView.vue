@@ -93,7 +93,7 @@
         filterPath: 'description.value',
         type: 'component',
         component: (columnData) =>
-          columnBuilder({ data: columnData, columnAppearance: 'expand-column' })  
+          columnBuilder({ data: columnData, columnAppearance: 'expand-column' })
       },
       {
         field: 'active',
