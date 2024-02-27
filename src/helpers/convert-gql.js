@@ -22,6 +22,33 @@ const getGraphQLType = (value) => {
 }
 
 /**
+ * Builds a GraphQL query based on the provided parameters.
+ *
+ * @param {object} options - The options object containing filterParameter, dataset, limit, orderBy, filterQuery, and fields.
+ * @return {string} The constructed GraphQL query string.
+ */
+function buildGraphQLQuery({ filterParameter, dataset, limit, orderBy, filterQuery, fields }) {
+  const indentedFields = fields
+    .split('\n')
+    .map((field) => `    ${field}`)
+    .join('\n')
+
+  return [
+    `query (${filterParameter}) {`,
+    `  ${dataset} (`,
+    `    limit: ${limit}`,
+    `    orderBy: [${orderBy}]`,
+    `    filter: {`,
+    `      ${filterQuery}`,
+    `    }`,
+    `  ) {`,
+    indentedFields,
+    `  }`,
+    `}`
+  ].join('\n')
+}
+
+/**
  * Convert filter and table to gql body
  *
  * @param {Object} Filter - Object with the filter to apply
@@ -29,9 +56,12 @@ const getGraphQLType = (value) => {
  * @returns {String} Returns the body of the gql query with variables
  */
 const convertGQL = (filter, table) => {
+  if (!table) {
+    throw new Error('Table parameter is required');
+  }
+
   let filterQuery = ''
   let variables = {}
-  const fieldsFormat = table.fields.join('\n')
 
   if (filter) {
     if (filter.tsRange && filter.tsRange.tsRangeBegin && filter.tsRange.tsRangeEnd) {
@@ -59,23 +89,22 @@ const convertGQL = (filter, table) => {
     }
   }
 
+  const fieldsFormat = table.fields.join('\n')
+
   const filterParameter = Object.keys(variables)
     .map((key) => `$${key}: ${getGraphQLType(variables[key])}!`)
     .join(', ')
 
-  const query = `
-    query (${filterParameter}) {
-      ${table.dataset} (
-        limit: ${table.limit}
-        orderBy: [${table.orderBy}]
-        filter: {
-          ${filterQuery}
-        }
-      ) {
-        ${fieldsFormat}
-      }
-    }
-  `
+  const queryConfig = {
+    filterParameter,
+    dataset: table.dataset,
+    limit: table.limit,
+    orderBy: table.orderBy,
+    filterQuery,
+    fields: fieldsFormat
+  }
+
+  const query = buildGraphQLQuery(queryConfig)
 
   const bodyGQL = {
     query,
