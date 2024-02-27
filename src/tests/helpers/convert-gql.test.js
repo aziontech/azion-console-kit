@@ -1,7 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import convertGQL from '@/helpers/convert-gql'
 
-
 const makeSut = () => {
   const sut = convertGQL
 
@@ -78,12 +77,12 @@ describe('convertGQL', () => {
   })
 
   it('should convert filter and table to gql body when no filter and no table are provided', async () => {
-    const filter = null;
-    const table = null;
+    const filter = null
+    const table = null
 
-    const { sut } = makeSut();
+    const { sut } = makeSut()
 
-    expect(() => sut(filter, table)).toThrow('Table parameter is required');
+    expect(() => sut(filter, table)).toThrow('Table parameter is required')
   })
 
   it('should convert filter and table to gql body with complex filter and table configurations', () => {

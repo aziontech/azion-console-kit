@@ -74,12 +74,13 @@ describe('ImageProcessorServices', () => {
       },
       qtype: fixtures.intelligentDns.qtype,
       resolutionType: fixtures.intelligentDns.resolutionType,
-      qTypeDescription: 'Address Mapping record (A Record), also known as a DNS host record, stores a hostname and its corresponding IPv4 address.',
+      qTypeDescription:
+        'Address Mapping record (A Record), also known as a DNS host record, stores a hostname and its corresponding IPv4 address.',
       solutionId: fixtures.intelligentDns.solutionId,
       ts: fixtures.intelligentDns.ts,
       uuid: fixtures.intelligentDns.uuid,
       zoneId: fixtures.intelligentDns.zoneId,
-      statusCode: fixtures.intelligentDns.statusCode,
+      statusCode: fixtures.intelligentDns.statusCode
     })
   })
 })

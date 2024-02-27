@@ -57,7 +57,7 @@ function buildGraphQLQuery({ filterParameter, dataset, limit, orderBy, filterQue
  */
 const convertGQL = (filter, table) => {
   if (!table) {
-    throw new Error('Table parameter is required');
+    throw new Error('Table parameter is required')
   }
 
   let filterQuery = ''

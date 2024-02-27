@@ -18,7 +18,7 @@ const fixtures = {
     solutionId: 'sol-123',
     ts: new Date('2024-02-23T18:07:25Z').toISOString(),
     uuid: 'uuid-12345',
-    zoneId: 'zone-67890',
+    zoneId: 'zone-67890'
   }
 }
 

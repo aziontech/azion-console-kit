@@ -2,7 +2,6 @@ import { AxiosHttpClientAdapter } from '@/services/axios/AxiosHttpClientAdapter'
 import { listImageProcessor } from '@/services/real-time-events-service/image-processor'
 import { describe, expect, it, vi } from 'vitest'
 
-
 const fixtures = {
   filter: {
     tsRange: {
@@ -17,7 +16,8 @@ const fixtures = {
     debugLog: true,
     host: 'example.com',
     httpReferer: 'https://example.com',
-    httpUserAgent: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/38.0.101.76 Safari/537.36',
+    httpUserAgent:
+      'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/38.0.101.76 Safari/537.36',
     referenceError: 'error',
     ts: new Date('2024-02-23T18:07:25Z').toISOString()
   }
@@ -72,8 +72,8 @@ describe('ImageProcessorServices', () => {
           tsRange_end: '2024-02-23T19:07:25'
         }
       },
-      headers: undefined,
-    } )
+      headers: undefined
+    })
   })
 
   it('should parsed correctly each event', async () => {

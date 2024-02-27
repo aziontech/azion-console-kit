@@ -46,7 +46,7 @@ describe('ActivityHistoryServices', () => {
       method: 'POST',
       signal: undefined,
       body: {
-      query: expect.any(String),
+        query: expect.any(String),
         variables: {
           tsRange_begin: '2024-02-23T18:07:25',
           tsRange_end: '2024-02-23T19:07:25'
@@ -66,18 +66,15 @@ describe('ActivityHistoryServices', () => {
     const { sut } = makeSut()
     const response = await sut(fixtures.filter)
 
-    expect(response).toEqual(
-      {
-        accountId: fixtures.activityHistory.accountId,
-        authorEmail: fixtures.activityHistory.authorEmail,
-        type: fixtures.activityHistory.type,
-        authorName: fixtures.activityHistory.authorName,
-        userId: fixtures.activityHistory.userId,
-        title: fixtures.activityHistory.title,
-        comment: fixtures.activityHistory.comment,
-        ts: 'February 23, 2024 at 06:07 PM'
-      }
-    )
+    expect(response).toEqual({
+      accountId: fixtures.activityHistory.accountId,
+      authorEmail: fixtures.activityHistory.authorEmail,
+      type: fixtures.activityHistory.type,
+      authorName: fixtures.activityHistory.authorName,
+      userId: fixtures.activityHistory.userId,
+      title: fixtures.activityHistory.title,
+      comment: fixtures.activityHistory.comment,
+      ts: 'February 23, 2024 at 06:07 PM'
+    })
   })
 })
-
