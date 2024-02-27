@@ -85,19 +85,19 @@ const DASHBOARDS_TEXTS = {
     status_codes: {
       http_status_codes_2xx: {
         description:
-          'Indicates user requests that were received, understood, accepted, and processed by the server. Displays Requests Status Code200, Requests Status Code204, Requests Status Code206, and Requests Status Code2xx.'
+          'Indicates user requests that were received, understood, accepted, and processed by the server. Displays Requests Status Code 200, Requests Status Code 204, Requests Status Code 206, and Requests Status Code 2xx.'
       },
       http_status_codes_3xx: {
         description:
-          'Indicates user requests that were redirected and had to go through another stage to be delivered. Displays Requests Status Code301, Requests Status Code302, Requests Status Code304, and Requests Status Code3xx.'
+          'Indicates user requests that were redirected and had to go through another stage to be delivered. Displays Requests Status Code 301, Requests Status Code 302, Requests Status Code 304, and Requests Status Code 3xx.'
       },
       http_status_codes_4xx: {
         description:
-          "Indicates errors that have occurred with user's requests. Displays Requests Status Code400, Requests Status Code403, Requests Status Code404, and Requests Status Code4xx."
+          "Indicates errors that have occurred with user's requests. Displays Requests Status Code 400, Requests Status Code 403, Requests Status Code 404, and Requests Status Code 4xx."
       },
       http_status_codes_5xx: {
         description:
-          'Indicates the server failed to deliver an apparently valid request. Displays Requests Status Code500, Requests Status Code502, Requests Status Code503, and Requests Status Code5xx.'
+          'Indicates the server failed to deliver an apparently valid request. Displays Requests Status Code 500, Requests Status Code 502, Requests Status Code 503, and Requests Status Code 5xx.'
       }
     },
     waf: {
