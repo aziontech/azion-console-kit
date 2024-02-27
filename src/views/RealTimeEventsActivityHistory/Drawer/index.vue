@@ -63,7 +63,7 @@
               <div class="flex flex-col gap-3">
                 <TextInfo label="Account">{{ details.authorName }}</TextInfo>
                 <TextInfo label="ID">{{ details.accountId }}</TextInfo>
-                <TextInfo label="Client ID">{{ details.userId }}</TextInfo>
+                <TextInfo label="User ID">{{ details.userId }}</TextInfo>
               </div>
               <div class="flex flex-col gap-3">
                 <TextInfo label="User Name">{{ details.authorEmail }}</TextInfo>
