@@ -750,7 +750,9 @@
             <div class="p-inputgroup">
               <div
                 class="p-inputgroup-addon"
-                :class="{ 'opacity-20': !props.isEnableApplicationAcceleration || checkPhaseIsDefaultValue }"
+                :class="{
+                  'opacity-20': !props.isEnableApplicationAcceleration || checkPhaseIsDefaultValue
+                }"
               >
                 <i class="pi pi-dollar"></i>
               </div>
@@ -761,7 +763,7 @@
                 @complete="searchVariableOption"
                 :disabled="!props.isEnableApplicationAcceleration || checkPhaseIsDefaultValue"
                 :completeOnFocus="true"
-                />
+              />
             </div>
 
             <FieldDropdown
