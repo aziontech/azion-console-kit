@@ -16,95 +16,101 @@
 
     <!-- Content body -->
     <div class="h-full flex justify-between flex-col">
-      <div class="sticky top-12">
-        <div class="pr-7">
-          <!-- Input Search  -->
-          <div class="pl-6 mt-6">
-            <span class="p-input-icon-left w-full">
-              <i class="pi pi-search" />
-              <InputText
-                class="w-full"
-                placeholder="Search articles..."
-                v-model="search"
-                @keyup.enter="searchDocumentation()"
-              />
-            </span>
-            <small v-if="search">
-              Search "<span class="font-semibold">{{ search }}</span
-              >" on Documentation
-            </small>
+      <div
+        class="overflow-y-auto sticky top-12 min-h-[calc(100vh-5rem)] flex flex-col justify-between"
+      >
+        <div class="mb-5">
+          <div class="pr-7">
+            <!-- Input Search  -->
+            <div class="pl-6 mt-6">
+              <span class="p-input-icon-left w-full">
+                <i class="pi pi-search" />
+                <InputText
+                  class="w-full"
+                  placeholder="Search articles..."
+                  v-model="search"
+                  @keyup.enter="searchDocumentation()"
+                />
+              </span>
+              <small v-if="search">
+                Search "<span class="font-semibold">{{ search }}</span
+                >" on Documentation
+              </small>
+            </div>
+
+            <!-- List items -->
+            <template v-if="!currentArticleContent">
+              <p class="pl-6 mb-2 mt-5 text-sm font-semibold">Recommended articles</p>
+              <PrimeMenu
+                :model="mainContent"
+                class="w-full border-0 p-0 m-0 text-sm pl-4 pb-3 pt-2 bg-transparent"
+              >
+                <template #item="{ item }">
+                  <a
+                    class="flex items-center h-[35px] cursor-pointer px-2"
+                    @click="getHtmlArticle(item)"
+                  >
+                    <span>{{ item }}</span>
+                    <i class="pi pi-chevron-right text-sm ml-auto"></i>
+                  </a>
+                </template>
+              </PrimeMenu>
+            </template>
+
+            <!-- Article Content -->
+            <div
+              v-if="currentArticleContent"
+              class="pl-6 pt-6 mb-24"
+            >
+              <PrimeButton
+                outlined
+                icon="pi pi-chevron-left"
+                label="Back"
+                size="small"
+                @click="backToMenu()"
+              ></PrimeButton>
+
+              <article
+                class="pt-4 prose dark:prose-invert"
+                v-html="currentArticleContent"
+              ></article>
+            </div>
           </div>
 
-          <!-- List items -->
-          <template v-if="!currentArticleContent">
-            <p class="pl-6 mb-2 mt-5 text-sm font-semibold">Recommended articles</p>
+          <!-- Menu -->
+          <div
+            class="border-t surface-border"
+            v-if="!currentArticleContent"
+          >
             <PrimeMenu
-              :model="mainContent"
-              class="w-full border-0 p-0 m-0 text-sm pl-4 pb-3 pt-2 bg-transparent"
+              :model="menuItems"
+              class="w-full border-0 p-0 m-0 text-sm pl-4 pb-3 pr-7 pt-2 bg-transparent"
             >
               <template #item="{ item }">
                 <a
                   class="flex items-center h-[35px] cursor-pointer px-2"
-                  @click="getHtmlArticle(item)"
+                  @click="goToMenuLink(item.link)"
                 >
-                  <span>{{ item }}</span>
-                  <i class="pi pi-chevron-right text-sm ml-auto"></i>
+                  <i
+                    v-if="!item.isLinkExternal"
+                    class="pi pi-send text-sm mr-2"
+                  ></i>
+                  <span>{{ item.label }}</span>
+                  <i
+                    v-if="item.isLinkExternal"
+                    class="pi text-sm ml-auto pi-external-link"
+                  ></i>
                 </a>
               </template>
             </PrimeMenu>
-          </template>
-
-          <!-- Article Content -->
-          <div
-            v-if="currentArticleContent"
-            class="pl-6 pt-6 mb-24"
-          >
-            <PrimeButton
-              outlined
-              icon="pi pi-chevron-left"
-              label="Back"
-              size="small"
-              @click="backToMenu()"
-            ></PrimeButton>
-
-            <article
-              class="pt-4 prose dark:prose-invert"
-              v-html="currentArticleContent"
-            ></article>
           </div>
         </div>
-
-        <!-- Menu -->
         <div
-          class="border-t surface-border"
+          class="ml-6 mr-8 mb-20"
           v-if="!currentArticleContent"
         >
-          <PrimeMenu
-            :model="menuItems"
-            class="w-full border-0 p-0 m-0 text-sm pl-4 pb-3 pr-7 pt-2 bg-transparent"
-          >
-            <template #item="{ item }">
-              <a
-                class="flex items-center h-[35px] cursor-pointer px-2"
-                @click="goToMenuLink(item.link)"
-              >
-                <i
-                  v-if="!item.isLinkExternal"
-                  class="pi pi-send text-sm mr-2"
-                ></i>
-                <span>{{ item.label }}</span>
-                <i
-                  v-if="item.isLinkExternal"
-                  class="pi text-sm ml-auto pi-external-link"
-                ></i>
-              </a>
-            </template>
-          </PrimeMenu>
+          <BannerDiscord />
         </div>
-      </div>
-
-      <div class="ml-6 mr-8 mb-20">
-        <BannerDiscord v-if="!currentArticleContent" />
       </div>
     </div>
 
@@ -212,8 +218,11 @@
           </template>
         </div>
 
-        <div class="mb-20">
-          <BannerDiscord v-if="!currentArticleContent" />
+        <div
+          class="mb-20"
+          v-if="!currentArticleContent"
+        >
+          <BannerDiscord />
         </div>
       </div>
     </Sidebar>
