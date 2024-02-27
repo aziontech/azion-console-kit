@@ -13,8 +13,8 @@
 <template>
   <div>
     <div class="flex w-full gap-3">
-      <span class="w-[144px] text-color text-sm">{{ props.label }}</span>
-      <span class="w-[212px] text-color-secondary break-all text-sm">
+      <span class="w-[9rem] text-color text-sm font-medium">{{ props.label }}</span>
+      <span class="w-[13.25rem] text-color-secondary break-all text-sm">
         <slot></slot>
       </span>
     </div>
