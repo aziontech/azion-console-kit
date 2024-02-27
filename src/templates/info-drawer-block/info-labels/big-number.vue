@@ -15,7 +15,7 @@
 </script>
 
 <template>
-  <div class="flex flex-col sm:w-[14.625rem] w-[10.75rem] whitespace-nowrap">
+  <div class="flex flex-col sm:w-60	 w-44	 whitespace-nowrap">
     <label class="flex text-sm gap-1 items-center font-medium">
       {{ props.label }}
       <span class="pi pi-question-circle text-color-secondary" />
