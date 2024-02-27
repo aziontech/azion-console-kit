@@ -601,10 +601,10 @@
 
   /**
 /**
- * Checks if a criterion can be deleted.
- * @param {number} index - The index of the criterion.
- * @returns {boolean} True if the criterion can be deleted, false otherwise.
- */
+* Checks if a criterion can be deleted.
+* @param {number} index - The index of the criterion.
+* @returns {boolean} True if the criterion can be deleted, false otherwise.
+*/
   const isNotFirstCriteria = (index) => {
     return criteria.value.length > 1 && index < criteria.value.length - 1
   }
@@ -615,7 +615,7 @@
   }
 
   const maximumCriteriaReached = computed(() => {
-    const MAXIMUM_ALLOWED = 10
+    const MAXIMUM_ALLOWED = 5
     return criteria.value.length >= MAXIMUM_ALLOWED
   })
 
