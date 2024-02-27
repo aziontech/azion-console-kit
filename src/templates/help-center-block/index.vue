@@ -281,7 +281,6 @@
   ])
 
   const isOpen = computed(() => {
-    backToMenu()
     return helpCenterStore.isOpen
   })
 
@@ -345,5 +344,11 @@
 
   watch(route, () => {
     onRouteChange()
+  })
+
+  watch(isOpen, () => {
+    if (!isOpen.value) {
+      articleContent.value = null
+    }
   })
 </script>
