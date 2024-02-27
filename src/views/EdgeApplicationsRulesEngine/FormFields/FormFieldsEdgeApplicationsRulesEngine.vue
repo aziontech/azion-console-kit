@@ -745,7 +745,7 @@
             <div class="p-inputgroup">
               <div
                 class="p-inputgroup-addon"
-                :class="{ 'opacity-20': !props.isEnableApplicationAcceleration }"
+                :class="{ 'opacity-20': !props.isEnableApplicationAcceleration || checkPhaseIsDefaultValue }"
               >
                 <i class="pi pi-dollar"></i>
               </div>
@@ -754,9 +754,9 @@
                 v-model="criteria[criteriaIndex].value[conditionalIndex].variable"
                 :suggestions="variableItems"
                 @complete="searchVariableOption"
-                :disabled="!props.isEnableApplicationAcceleration"
+                :disabled="!props.isEnableApplicationAcceleration || checkPhaseIsDefaultValue"
                 :completeOnFocus="true"
-              />
+                />
             </div>
 
             <FieldDropdown
@@ -766,6 +766,7 @@
               inputClass="w-full"
               :name="`criteria[${criteriaIndex}][${conditionalIndex}].operator`"
               :value="criteria[criteriaIndex].value[conditionalIndex].operator"
+              :disabled="checkPhaseIsDefaultValue"
             />
             <FieldText
               v-if="
@@ -775,13 +776,14 @@
               :name="`criteria[${criteriaIndex}][${conditionalIndex}].input_value`"
               :value="criteria[criteriaIndex].value[conditionalIndex].input_value"
               inputClass="w-full"
+              :disabled="checkPhaseIsDefaultValue"
             />
           </div>
         </div>
 
         <div
           class="flex gap-2 mb-8"
-          v-if="props.isEnableApplicationAcceleration"
+          v-if="props.isEnableApplicationAcceleration && !checkPhaseIsDefaultValue"
         >
           <PrimeButton
             icon="pi pi-plus-circle"
@@ -802,7 +804,7 @@
         </div>
 
         <div
-          v-if="props.isEnableApplicationAcceleration"
+          v-if="props.isEnableApplicationAcceleration && !checkPhaseIsDefaultValue"
           class="flex items-center gap-2"
         >
           <Divider type="solid" />
@@ -822,7 +824,7 @@
           />
         </div>
       </div>
-      <div v-if="props.isEnableApplicationAcceleration">
+      <div v-if="props.isEnableApplicationAcceleration && !checkPhaseIsDefaultValue">
         <PrimeButton
           icon="pi pi-plus-circle"
           label="Add Criteria"
@@ -882,6 +884,7 @@
               :value="behaviors[behaviorIndex].value.name"
               inputClass="w-full"
               @onChange="(newValue) => changeBehaviorType(newValue, behaviorIndex)"
+              :disabled="checkPhaseIsDefaultValue && behaviorItem.key === 0"
             />
           </div>
 

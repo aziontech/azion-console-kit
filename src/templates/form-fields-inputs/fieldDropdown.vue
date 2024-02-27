@@ -51,6 +51,10 @@
     enableWorkaroundLabelToDisabledOptions: {
       type: Boolean,
       default: false
+    },
+    disabled: {
+      type: Boolean,
+      default: false
     }
   })
 
@@ -109,6 +113,7 @@
     @change="emitChange"
     @blur="emitBlur"
     :class="inputClass"
+    :disabled="disabled"
   >
     <template
       v-if="enableCustomLabel"
