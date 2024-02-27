@@ -116,7 +116,7 @@
 
     <!-- help mobile sidebar -->
     <Sidebar
-      :visible="helpCenterStore.isOpen"
+      :visible="isOpen"
       position="bottom"
       headerContent="Help"
       :show-close-icon="false"
@@ -279,6 +279,11 @@
       isLinkExternal: false
     }
   ])
+
+  const isOpen = computed(() => {
+    backToMenu()
+    return helpCenterStore.isOpen
+  })
 
   const getMainContent = async () => {
     const currentPath = getCurrentPath()
