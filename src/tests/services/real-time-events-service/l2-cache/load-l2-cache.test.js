@@ -34,7 +34,7 @@ const fixtures = {
     solution: 'caching',
     status: 200,
     tcpinfoRtt: 50,
-    ts:  '2024-02-23T18:07:25.000Z',
+    ts: '2024-02-23T18:07:25.000Z',
     upstreamBytesReceived: 2048,
     upstreamBytesReceivedStr: '2KB',
     upstreamCacheStatus: 'MISS',

@@ -18,7 +18,7 @@ const fixtures = {
     edgeFunctionsSolutionId: 'solution-abc',
     edgeFunctionsTime: new Date().toISOString(),
     functionLanguage: 'JavaScript',
-    ts:  '2024-02-23T18:07:25.000Z'
+    ts: '2024-02-23T18:07:25.000Z'
   }
 }
 

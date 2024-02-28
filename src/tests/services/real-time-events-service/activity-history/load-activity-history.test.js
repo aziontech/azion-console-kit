@@ -19,7 +19,7 @@ const fixtures = {
     userId: 'userId',
     title: 'title',
     comment: 'comment',
-    ts:  '2024-02-23T18:07:25.000Z'
+    ts: '2024-02-23T18:07:25.000Z'
   }
 }
 

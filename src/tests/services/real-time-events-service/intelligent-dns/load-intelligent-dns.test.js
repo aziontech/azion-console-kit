@@ -17,7 +17,7 @@ const fixtures = {
     resolutionType: 'RESOLVED',
     source: 'internal',
     solutionId: 'sol-123',
-    ts:  '2024-02-23T18:07:25.000Z',
+    ts: '2024-02-23T18:07:25.000Z',
     uuid: 'uuid-12345',
     zoneId: 'zone-67890',
     statusCode: 200
