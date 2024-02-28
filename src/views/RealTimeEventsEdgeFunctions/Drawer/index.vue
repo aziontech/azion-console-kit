@@ -62,8 +62,11 @@
           :tags="tags"
         >
           <template #body>
-            <div class="gap-8 flex flex-col sm:flex-row">
-              <TextInfo label="Edge Functions Type List">
+            <div class="gap-8 flex flex-col sm:flex-row w-full">
+              <TextInfo
+                label="Edge Functions Type List"
+                class="flex-1"
+              >
                 <ul>
                   <li
                     :key="index"
@@ -82,8 +85,8 @@
 
             <Divider />
 
-            <div class="flex flex-col sm:flex-row sm:gap-8 gap-3">
-              <div class="flex flex-col gap-3">
+            <div class="flex flex-col sm:flex-row sm:gap-8 gap-3 w-full">
+              <div class="flex flex-col gap-3 flex-1">
                 <TextInfo label="Edge Functions Type List">
                   {{ details.edgeFunctionsInitiatorTypeList }}
                 </TextInfo>
@@ -94,7 +97,7 @@
                   {{ details.edgeFunctionsSolutionId }}
                 </TextInfo>
               </div>
-              <div class="flex flex-col gap-3">
+              <div class="flex flex-col gap-3 flex-1">
                 <TextInfo label="Virtual Host ID">{{ details.virtualHostId }}</TextInfo>
                 <TextInfo label="Configuration ID">{{ details.configurationId }}</TextInfo>
               </div>

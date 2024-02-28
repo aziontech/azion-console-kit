@@ -60,16 +60,18 @@
           :tags="tags"
         >
           <template #body>
-            <div class="flex gap-4 sm:gap-8 flex-wrap">
+            <div class="flex gap-4 sm:gap-8 flex-wrap w-1/2">
               <BigNumber
                 label="Streamed Lines"
                 sufix="lines"
+                class="flex-1"
               >
                 {{ details.streamedLines }}
               </BigNumber>
               <BigNumber
                 label="Data Streamed"
                 sufix="bytes"
+                class="flex-1"
               >
                 {{ details.dataStreamed }}
               </BigNumber>
@@ -78,10 +80,10 @@
             <Divider />
 
             <div class="flex flex-col sm:flex-row sm:gap-8 gap-3 w-full">
-              <div class="flex flex-col gap-3">
+              <div class="flex flex-col gap-3 flex-1">
                 <TextInfo label="Configuration ID">{{ details.configurationId }}</TextInfo>
               </div>
-              <div class="flex flex-col gap-3">
+              <div class="flex flex-col gap-3 flex-1">
                 <TextInfo label="Endpoint Type">{{ details.endpointType }}</TextInfo>
               </div>
             </div>
