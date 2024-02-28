@@ -1,7 +1,7 @@
 <template>
   <ContentBlock>
     <template #heading>
-      <PageHeadingBlock pageTitle="Create Edge Applications"></PageHeadingBlock>
+      <PageHeadingBlock pageTitle="Create Edge Application"></PageHeadingBlock>
     </template>
     <template #content>
       <CreateFormBlock

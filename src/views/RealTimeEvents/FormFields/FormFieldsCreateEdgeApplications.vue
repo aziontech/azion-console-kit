@@ -130,7 +130,7 @@
 
   <FormHorizontal
     title="Delivery Settings"
-    description="Choose the delivery protocols for the application."
+    description="Choose the protocols used between the edge application and users."
     v-if="handleBlock('delivery-settings')"
   >
     <template #inputs>
@@ -138,7 +138,7 @@
         <label
           for="city"
           class="text-color text-base font-medium"
-          >Delivery Protocols HTTP</label
+          >Protocol Usage</label
         >
         <div class="flex flex-col gap-3">
           <Card
@@ -162,7 +162,7 @@
               <div class="flex-col gap-1">
                 <div class="text-color text-sm font-normal">HTTP support</div>
                 <div class="self-stretch text-color-secondary text-sm font-normal">
-                  Use the HTTP protocol between the edge and users.
+                  Use only the HTTP protocol. Choose from the available HTTP ports.
                 </div>
               </div>
             </template>
@@ -189,7 +189,7 @@
               <div class="flex-col gap-1">
                 <div class="text-color text-sm font-normal">HTTP and HTTPS support</div>
                 <div class="self-stretch text-color-secondary text-sm font-normal">
-                  Use both the HTTP and HTTPS protocols between the edge and users.
+                  Use both HTTP and HTTPS protocols. Choose from the available HTTP and HTTPS ports.
                 </div>
               </div>
             </template>
@@ -214,10 +214,10 @@
                 value="http,https"
               />
               <div class="flex-col gap-1">
-                <div class="text-color text-sm font-normal">HTTP, HTTPS, and HTTP/3 support</div>
+                <div class="text-color text-sm font-normal">HTTP/3 support</div>
                 <div class="self-stretch text-color-secondary text-sm font-normal">
-                  Use both the HTTP and HTTPS protocols between the edge and users and enable HTTP/3
-                  support.
+                  Use both HTTP and HTTPS protocols and enable HTTP/3 support. Only available for
+                  HTTP port 80 and HTTPS port 443.
                 </div>
               </div>
             </template>
