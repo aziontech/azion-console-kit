@@ -19,7 +19,7 @@ const fixtures = {
     geolocRegionName: 'California',
     host: 'example.com',
     requestId: 'req-1234567890',
-    ts: new Date('2024-02-23T18:07:25Z').toISOString()
+    ts:  '2024-02-23T18:07:25.000Z'
   }
 }
 

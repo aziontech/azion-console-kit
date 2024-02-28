@@ -19,7 +19,7 @@ const fixtures = {
     host: 'example.com',
     proxyHost: 'proxy.example.com',
     source: 'CDN',
-    ts: new Date('2024-02-23T18:07:25Z').toISOString()
+    ts:  '2024-02-23T18:07:25.000Z'
   }
 }
 

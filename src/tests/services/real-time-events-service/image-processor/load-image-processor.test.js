@@ -32,7 +32,7 @@ const fixtures = {
     sslSessionReused: 'No',
     status: 200,
     tcpinfoRtt: 100,
-    ts: new Date('2024-02-23T18:07:25Z').toISOString(),
+    ts:  '2024-02-23T18:07:25.000Z',
     upstreamCacheStatus: 'MISS',
     upstreamResponseTime: 0.123,
     upstreamResponseTimeStr: '0.123',

@@ -14,7 +14,7 @@ const fixtures = {
   httpRequest: {
     httpReferer: 'https://example.com',
     scheme: 'HTTPS',
-    ts: new Date('2024-02-23T18:07:25Z').toISOString(),
+    ts:  '2024-02-23T18:07:25.000Z',
     httpUserAgent: 'Mozilla/5.0 (compatible; ExampleBot/1.0; +http://example.com/bot)',
     remoteAddress: '192.0.2.1',
     host: 'example.com',

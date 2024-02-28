@@ -1,6 +1,15 @@
 import { describe, expect, it } from 'vitest'
 import convertGQL from '@/helpers/convert-gql'
 
+const fixtures = {
+  table: {
+    fields: ['field1', 'field2', 'field3'],
+    dataset: 'myDataset',
+    limit: 10,
+    orderBy: 'field1'
+  }
+}
+
 const makeSut = () => {
   const sut = convertGQL
 
@@ -16,16 +25,10 @@ describe('convertGQL', () => {
       and: { field1: 'value1', field2: 'value2' },
       in: { field3: ['value3', 'value4'] }
     }
-    const table = {
-      fields: ['field1', 'field2', 'field3'],
-      dataset: 'myDataset',
-      limit: 10,
-      orderBy: 'field1'
-    }
 
     const { sut } = makeSut()
 
-    expect(sut(filter, table)).toEqual({
+    expect(sut(filter, fixtures.table)).toEqual({
       query: expect.any(String),
       variables: {
         tsRange_begin: '2022-01-01',
@@ -41,16 +44,10 @@ describe('convertGQL', () => {
     const filter = {
       tsRange: { tsRangeBegin: '2022-01-01', tsRangeEnd: '2022-01-31' }
     }
-    const table = {
-      fields: ['field1', 'field2', 'field3'],
-      dataset: 'myDataset',
-      limit: 10,
-      orderBy: 'field1'
-    }
 
     const { sut } = makeSut()
 
-    expect(sut(filter, table)).toEqual({
+    expect(sut(filter, fixtures.table)).toEqual({
       query: expect.any(String),
       variables: {
         tsRange_begin: '2022-01-01',
@@ -61,16 +58,10 @@ describe('convertGQL', () => {
 
   it('should convert filter and table to gql body when only table is provided', () => {
     const filter = null
-    const table = {
-      fields: ['field1', 'field2', 'field3'],
-      dataset: 'myDataset',
-      limit: 10,
-      orderBy: 'field1'
-    }
 
     const { sut } = makeSut()
 
-    expect(sut(filter, table)).toEqual({
+    expect(sut(filter, fixtures.table)).toEqual({
       query: expect.any(String),
       variables: {}
     })
@@ -91,16 +82,10 @@ describe('convertGQL', () => {
       and: { field1: 'value1', field2: 'value2' },
       in: { field3: ['value3', 'value4'] }
     }
-    const table = {
-      fields: ['field1', 'field2', 'field3'],
-      dataset: 'myDataset',
-      limit: 10,
-      orderBy: 'field1'
-    }
 
     const { sut } = makeSut()
 
-    expect(sut(filter, table)).toEqual({
+    expect(sut(filter, fixtures.table)).toEqual({
       query: expect.any(String),
       variables: {
         tsRange_begin: '2022-01-01',

@@ -19,7 +19,7 @@ const fixtures = {
     httpUserAgent:
       'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/38.0.101.76 Safari/537.36',
     referenceError: 'error',
-    ts: new Date('2024-02-23T18:07:25Z').toISOString()
+    ts:  '2024-02-23T18:07:25.000Z'
   }
 }
 

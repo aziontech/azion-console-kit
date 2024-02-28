@@ -19,7 +19,7 @@ const fixtures = {
     lineSource: 'test linesource',
     solutionId: '444',
     source: 'edge-functions-console.js',
-    ts: new Date('2024-02-23T18:07:25Z').toISOString()
+    ts:  '2024-02-23T18:07:25.000Z'
   }
 }
 

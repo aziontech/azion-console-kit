@@ -17,7 +17,7 @@ const fixtures = {
     userId: 'userId',
     title: 'title',
     comment: 'comment',
-    ts: new Date('2024-02-23T18:07:25Z').toISOString()
+    ts:  '2024-02-23T18:07:25.000Z'
   }
 }
 
