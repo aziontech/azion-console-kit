@@ -5,10 +5,7 @@
   import { useAccountStore } from '@/stores/account'
   import { storeToRefs } from 'pinia'
   import { themeSelect } from '@/helpers'
-  // eslint-disable-next-line no-unused-vars
-  import { AnalyticsTrackerAdapter } from '@/plugins/adapters/AnalyticsTrackerAdapter'
-
-  /** @type {AnalyticsTrackerAdapter} */
+  /** @type {import('@/plugins/adapters/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
 
   const accountStore = useAccountStore()
