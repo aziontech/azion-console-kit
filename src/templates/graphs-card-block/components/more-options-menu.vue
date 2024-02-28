@@ -85,8 +85,8 @@
     optionsMenu.value.toggle(evt)
   }
 
-  const openHelpCenter = () => {
-    helpCenterStore.toggle()
+  const openHelpCenter = async () => {
+    await helpCenterStore.setArticleContent({ url: reportData.value.helpCenterPath })
   }
 
   const exportCSV = () => {

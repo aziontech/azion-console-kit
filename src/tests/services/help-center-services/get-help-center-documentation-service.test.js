@@ -1,19 +1,54 @@
 import { AxiosHttpClientAdapter } from '@/services/axios/AxiosHttpClientAdapter'
 import { getHelpCenterDocumentationService } from '@/services/help-center-services'
 import { describe, expect, it, vi } from 'vitest'
-import * as markdownModule from '@/services/help-center-services/markdown-to-html'
 
 const fixtures = {
-  markdownDocument: {
-    url: '/variables',
-    filename: 'index.md'
-  },
-  htmlDocument: {
-    url: '/variables',
-    filename: 'index.html'
-  },
-  documentDefaultPath: { url: '/' }
+  htmlResponse: '<p>HTML Response</p>',
+  markdownResponse: "---\n\ndocs: [\n'Get to know Real-Time Manager',\n'Get started'\n]\n\n---",
+  convertedMarkdownResponse: ['Get to know Real-Time Manager', 'Get started'],
+  convertedHTMLResponse:
+    "<hr />\n<p>docs: [\n'Get to know Real-Time Manager',\n'Get started'\n]</p>\n<hr />"
 }
+
+const scenarios = [
+  {
+    label: 'should return success on "/" url and "index.md" filename',
+    response: { statusCode: 200, body: fixtures.markdownResponse },
+    params: { url: '/', filename: 'index.md', fullPath: '/welcome/index.md' },
+    expected: { data: fixtures.convertedMarkdownResponse, success: true }
+  },
+  {
+    label: 'should return success on "/" url and "index.html" filename',
+    response: { statusCode: 200, body: fixtures.htmlResponse },
+    params: { url: '/', filename: 'index.html', fullPath: '/welcome/index.html' },
+    expected: { data: fixtures.htmlResponse, success: true }
+  },
+  {
+    label: 'should return success on "/some-url" url and "doc.md" filename',
+    response: { statusCode: 200, body: fixtures.markdownResponse },
+    params: { url: '/some-url', filename: 'doc.md', fullPath: '/some-url/doc.md' },
+    expected: { data: fixtures.convertedMarkdownResponse, success: true }
+  },
+  {
+    label: 'should return success on "/some-url" url and "doc.html" filename',
+    response: { statusCode: 200, body: fixtures.htmlResponse },
+    params: { url: '/some-url', filename: 'doc.html', fullPath: '/some-url/doc.html' },
+    expected: { data: fixtures.htmlResponse, success: true }
+  },
+  {
+    label: 'should return default markdown document on error',
+    response: { statusCode: 400, body: fixtures.markdownResponse },
+    params: { url: '/', filename: 'index.md', fullPath: '/welcome/index.md' },
+    expected: { data: fixtures.convertedMarkdownResponse, success: false }
+  },
+  {
+    label: 'should return default html document on error',
+    response: { statusCode: 400, body: fixtures.htmlResponse },
+    params: { url: '/', filename: 'index.html', fullPath: '/welcome/index.html' },
+    expected: { data: fixtures.convertedHTMLResponse, success: false }
+  }
+]
+
 const makeSut = () => {
   const sut = getHelpCenterDocumentationService
 
@@ -25,29 +60,11 @@ const makeSut = () => {
 describe('HelpCenterServices', () => {
   it('should call API with correct params', async () => {
     const requestSpy = vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
-      statusCode: 201
+      statusCode: 200
     })
     const { sut } = makeSut()
 
-    await sut(fixtures.markdownDocument)
-
-    expect(requestSpy).toHaveBeenCalledWith(
-      {
-        method: 'GET',
-        headers: { Accept: 'text/html' },
-        url: `/variables/index.md`
-      },
-      expect.any(Function)
-    )
-  })
-
-  it('should call API and return default document with no parameters', async () => {
-    const requestSpy = vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
-      statusCode: 201
-    })
-    const { sut } = makeSut()
-
-    await sut(fixtures.documentDefaultPath)
+    await sut({})
 
     expect(requestSpy).toHaveBeenCalledWith(
       {
@@ -59,78 +76,24 @@ describe('HelpCenterServices', () => {
     )
   })
 
-  it('should transform markdown to html correctly', async () => {
-    vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
-      statusCode: 404
-    })
-    const markdownToHtmlSpy = vi.spyOn(markdownModule, 'markdownToHtml')
-
-    const { sut } = makeSut()
-
-    await sut(fixtures.markdownDocument)
-    const document = `---
-      docs: [
-      'Get to know Azion Console',
-      'Get started'
-      ]
-    ---
-    `
-    markdownModule.markdownToHtml(document)
-
-    expect(markdownToHtmlSpy).toHaveReturnedWith(['Get to know Real-Time Manager', 'Get started'])
-  })
-
-  it('should get first path segment of url', async () => {
+  it.each(scenarios)('$label', async ({ params, response, expected }) => {
     const requestSpy = vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
-      statusCode: 200
+      ...response
     })
 
     const { sut } = makeSut()
 
-    await sut({ url: '/firstPath/secondPath' })
+    const result = await sut(params)
 
     expect(requestSpy).toHaveBeenCalledWith(
       expect.objectContaining({
-        url: `/firstPath/index.md`
+        method: expect.any(String),
+        headers: expect.any(Object),
+        url: params.fullPath
       }),
       expect.any(Function)
     )
-  })
 
-  it('should not convert when already is html', async () => {
-    vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
-      statusCode: 200
-    })
-    const markdownToHtmlSpy = vi.spyOn(markdownModule, 'markdownToHtml')
-
-    const { sut } = makeSut()
-
-    await sut(fixtures.htmlDocument)
-
-    expect(markdownToHtmlSpy).not.toHaveBeenCalled()
-  })
-
-  it.each([
-    { statusCode: 401 },
-    { statusCode: 403 },
-    { statusCode: 404 },
-    { statusCode: 500 },
-    { statusCode: 'unmappedStatusCode' }
-  ])('should call API for default document on error $statusCode', async ({ statusCode }) => {
-    const requestSpy = vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
-      statusCode
-    })
-    const { sut } = makeSut()
-
-    await sut(fixtures.markdownDocument)
-
-    expect(requestSpy).toHaveBeenCalledWith(
-      {
-        method: 'GET',
-        headers: { Accept: 'text/html' },
-        url: `/welcome/index.md`
-      },
-      expect.any(Function)
-    )
+    expect(result).toEqual(expected)
   })
 })

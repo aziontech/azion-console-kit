@@ -125,7 +125,15 @@
     window.removeEventListener('resize', reRenderChart)
   })
 
-  watch([getStatus, props.report], () => {
+  watch(getStatus, () => {
     reRenderChart()
   })
+
+  watch(
+    () => props.report,
+    () => {
+      reRenderChart()
+    },
+    { deep: true }
+  )
 </script>
