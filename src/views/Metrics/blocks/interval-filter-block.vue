@@ -78,11 +78,11 @@
   }
 
   const checkIfDatesAreEqual = (begin, end) => {
-    var isoBegin = begin.toISOString().slice(0, 13)
-    var isoEnd = end.toISOString().slice(0, 13)
+    const isoBegin = begin.toISOString().slice(0, 13)
+    const isoEnd = end.toISOString().slice(0, 13)
 
-    var isoLastBegin = lastFilteredDate.value.begin.toISOString().slice(0, 13)
-    var isoLastEnd = lastFilteredDate.value.end.toISOString().slice(0, 13)
+    const isoLastBegin = lastFilteredDate.value.begin.toISOString().slice(0, 13)
+    const isoLastEnd = lastFilteredDate.value.end.toISOString().slice(0, 13)
 
     return isoBegin === isoLastBegin && isoEnd === isoLastEnd
   }
