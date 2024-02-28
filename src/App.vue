@@ -48,4 +48,3 @@
     </ShellBlock>
   </div>
 </template>
-@/plugins/AnalyticsTrackerAdapter @/plugins/adapter/AnalyticsTrackerAdapter
