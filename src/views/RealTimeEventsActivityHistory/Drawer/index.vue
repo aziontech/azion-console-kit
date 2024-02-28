@@ -52,7 +52,7 @@
     title="More Details"
   >
     <template #body>
-      <div class="flex flex-col gap-6 sm:gap-8 md:m-3">
+      <div class="w-full flex flex-col gap-8">
         <InfoSection
           :title="details.title"
           :date="details.ts"
@@ -63,7 +63,7 @@
               <div class="flex flex-col gap-3">
                 <TextInfo label="Account">{{ details.authorName }}</TextInfo>
                 <TextInfo label="ID">{{ details.accountId }}</TextInfo>
-                <TextInfo label="Client ID">{{ details.userId }}</TextInfo>
+                <TextInfo label="User ID">{{ details.userId }}</TextInfo>
               </div>
               <div class="flex flex-col gap-3">
                 <TextInfo label="User Name">{{ details.authorEmail }}</TextInfo>

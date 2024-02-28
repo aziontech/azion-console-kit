@@ -15,102 +15,106 @@
     </div>
 
     <!-- Content body -->
-    <div class="h-full overflow-y-auto justify-between flex flex-col">
-      <div>
-        <div class="pr-7">
-          <!-- Input Search  -->
-          <div class="pl-6 mt-6">
-            <span class="p-input-icon-left w-full">
-              <i class="pi pi-search" />
-              <InputText
-                class="w-full"
-                placeholder="Search articles..."
-                v-model="search"
-                @keyup.enter="searchDocumentation()"
-              />
-            </span>
-            <small v-if="search">
-              Search "<span class="font-semibold">{{ search }}</span
-              >" on Documentation
-            </small>
+    <div class="h-full flex justify-between flex-col">
+      <div class="overflow-y-auto sticky top-12 h-[calc(100vh-5rem)] flex flex-col justify-between">
+        <div class="mb-5">
+          <div class="pr-7">
+            <!-- Input Search  -->
+            <div class="pl-6 mt-6">
+              <span class="p-input-icon-left w-full">
+                <i class="pi pi-search" />
+                <InputText
+                  class="w-full"
+                  placeholder="Search articles..."
+                  v-model="search"
+                  @keyup.enter="searchDocumentation()"
+                />
+              </span>
+              <small v-if="search">
+                Search "<span class="font-semibold">{{ search }}</span
+                >" on Documentation
+              </small>
+            </div>
+
+            <!-- List items -->
+            <template v-if="!currentArticleContent">
+              <p class="pl-6 mb-2 mt-5 text-sm font-semibold">Recommended articles</p>
+              <PrimeMenu
+                :model="mainContent"
+                class="w-full border-0 p-0 m-0 text-sm pl-4 pb-3 pt-2 bg-transparent"
+              >
+                <template #item="{ item }">
+                  <a
+                    class="flex items-center h-[35px] cursor-pointer px-2"
+                    @click="getHtmlArticle(item)"
+                  >
+                    <span>{{ item }}</span>
+                    <i class="pi pi-chevron-right text-sm ml-auto"></i>
+                  </a>
+                </template>
+              </PrimeMenu>
+            </template>
+
+            <!-- Article Content -->
+            <div
+              v-if="currentArticleContent"
+              class="pl-6 pt-6 mb-24"
+            >
+              <PrimeButton
+                outlined
+                icon="pi pi-chevron-left"
+                label="Back"
+                size="small"
+                @click="backToMenu()"
+              ></PrimeButton>
+
+              <article
+                class="pt-4 prose dark:prose-invert"
+                v-html="currentArticleContent"
+              ></article>
+            </div>
           </div>
 
-          <!-- List items -->
-          <template v-if="!articleContent">
-            <p class="pl-6 mb-2 mt-5 text-sm font-semibold">Recommended articles</p>
+          <!-- Menu -->
+          <div
+            class="border-t surface-border"
+            v-if="!currentArticleContent"
+          >
             <PrimeMenu
-              :model="mainContent"
-              class="w-full border-0 p-0 m-0 text-sm pl-4 pb-3 pt-2 bg-transparent"
+              :model="menuItems"
+              class="w-full border-0 p-0 m-0 text-sm pl-4 pb-3 pr-7 pt-2 bg-transparent"
             >
               <template #item="{ item }">
                 <a
                   class="flex items-center h-[35px] cursor-pointer px-2"
-                  @click="getHtmlArticle(item)"
+                  @click="goToMenuLink(item.link)"
                 >
-                  <span>{{ item }}</span>
-                  <i class="pi pi-chevron-right text-sm ml-auto"></i>
+                  <i
+                    v-if="!item.isLinkExternal"
+                    class="pi pi-send text-sm mr-2"
+                  ></i>
+                  <span>{{ item.label }}</span>
+                  <i
+                    v-if="item.isLinkExternal"
+                    class="pi text-sm ml-auto pi-external-link"
+                  ></i>
                 </a>
               </template>
             </PrimeMenu>
-          </template>
-
-          <!-- Article Content -->
-          <div
-            v-if="articleContent"
-            class="pl-6 pt-6"
-          >
-            <PrimeButton
-              outlined
-              icon="pi pi-chevron-left"
-              label="Back"
-              size="small"
-              @click="backToMenu()"
-            ></PrimeButton>
-
-            <article
-              class="pt-4 prose dark:prose-invert"
-              v-html="articleContent"
-            ></article>
           </div>
         </div>
-
-        <!-- Menu -->
         <div
-          class="border-t surface-border"
-          v-if="!articleContent"
+          class="ml-6 mr-8 mb-20"
+          v-if="!currentArticleContent"
         >
-          <PrimeMenu
-            :model="menuItems"
-            class="w-full border-0 p-0 m-0 text-sm pl-4 pb-3 pr-7 pt-2 bg-transparent"
-          >
-            <template #item="{ item }">
-              <a
-                class="flex items-center h-[35px] cursor-pointer px-2"
-                @click="goToMenuLink(item.link)"
-              >
-                <i
-                  v-if="!item.isLinkExternal"
-                  class="pi pi-send text-sm mr-2"
-                ></i>
-                <span>{{ item.label }}</span>
-                <i
-                  v-if="item.isLinkExternal"
-                  class="pi text-sm ml-auto pi-external-link"
-                ></i>
-              </a>
-            </template>
-          </PrimeMenu>
+          <BannerDiscord />
         </div>
-      </div>
-
-      <div class="ml-6 mr-8 mb-20">
-        <BannerDiscord v-if="!articleContent" />
       </div>
     </div>
 
     <!-- help mobile sidebar -->
     <Sidebar
-      :visible="helpCenterStore.isOpen"
+      :visible="isOpen"
       position="bottom"
       headerContent="Help"
       :show-close-icon="false"
@@ -151,7 +155,7 @@
             </div>
 
             <!-- List items -->
-            <template v-if="!articleContent">
+            <template v-if="!currentArticleContent">
               <div class="mb-2 pl-2 text-sm font-semibold">Recommended articles</div>
               <PrimeMenu
                 :model="mainContent"
@@ -170,24 +174,24 @@
             </template>
 
             <!-- Article Content -->
-            <div v-if="articleContent">
+            <div v-if="currentArticleContent">
               <PrimeButton
                 outlined
                 icon="pi pi-chevron-left"
                 label="Back"
                 @click="backToMenu()"
-              ></PrimeButton>
+              />
 
               <article
-                class="pt-4 prose dark:prose-invert"
-                v-html="articleContent"
-              ></article>
+                class="py-4 prose dark:prose-invert"
+                v-html="currentArticleContent"
+              />
             </div>
           </div>
 
           <div class="border-t surface-border -ml-[0.75rem] w-[calc(100%_+_24px)]"></div>
           <!-- Menu -->
-          <template v-if="!articleContent">
+          <template v-if="!currentArticleContent">
             <PrimeMenu
               :model="menuItems"
               class="w-full border-0 p-0 m-0 text-sm pb-3 pt-2 bg-transparent"
@@ -212,131 +216,137 @@
           </template>
         </div>
 
-        <div class="mb-20">
-          <BannerDiscord v-if="!articleContent" />
+        <div
+          class="mb-20"
+          v-if="!currentArticleContent"
+        >
+          <BannerDiscord />
         </div>
       </div>
     </Sidebar>
   </div>
 </template>
 
-<script>
+<script setup>
   import { getStaticUrlsByEnvironment, openSearchResult } from '@/helpers'
+  import { getHelpCenterDocumentationService } from '@/services/help-center-services'
   import { useHelpCenterStore } from '@/stores/help-center'
+  import { storeToRefs } from 'pinia'
   import PrimeButton from 'primevue/button'
   import InputText from 'primevue/inputtext'
+  import PrimeMenu from 'primevue/menu'
   import Sidebar from 'primevue/sidebar'
+  import { computed, ref, watch } from 'vue'
+  import { useRoute } from 'vue-router'
   import BannerDiscord from './banner-discord.vue'
 
-  import PrimeMenu from 'primevue/menu'
+  defineOptions({ name: 'SlideIn' })
 
-  export default {
-    name: 'SlideIn',
-    components: {
-      PrimeButton,
-      InputText,
-      PrimeMenu,
-      BannerDiscord,
-      Sidebar
+  const helpCenterStore = useHelpCenterStore()
+  const route = useRoute()
+
+  const { getArticleContent } = storeToRefs(helpCenterStore)
+  const articleContent = ref(null)
+
+  const currentArticleContent = computed(() => {
+    return getArticleContent.value || articleContent.value
+  })
+
+  const mainContent = ref([])
+  const search = ref('')
+  const menuItems = computed(() => [
+    {
+      label: 'Documentation',
+      link: 'https://www.azion.com/en/documentation',
+      isLinkExternal: true
     },
-    data() {
-      return {
-        mainContent: [],
-        articleContent: '',
-        search: '',
-        menuItems: [
-          {
-            label: 'Documentation',
-            link: 'https://www.azion.com/en/documentation',
-            isLinkExternal: true
-          },
-          { label: 'API', link: 'https://api.azion.com', isLinkExternal: true },
-          {
-            label: 'Changelog',
-            link: 'https://www.azion.com/en/documentation/products/changelog',
-            isLinkExternal: true
-          },
-          {
-            label: 'Contact Support',
-            link: `${this.makeContactSupportUrl()}/tickets/`,
-            isLinkExternal: true
-          },
-          {
-            label: 'Send Feedback',
-            link: 'mailto:feedback@azion.com',
-            isLinkExternal: false
-          }
-        ],
-        items: [
-          {
-            label: 'New',
-            icon: 'pi pi-plus',
-            shortcut: '⌘+N'
-          },
-          {
-            label: 'Search',
-            icon: 'pi pi-search',
-            shortcut: '⌘+S'
-          }
-        ]
-      }
+    { label: 'API', link: 'https://api.azion.com', isLinkExternal: true },
+    {
+      label: 'Changelog',
+      link: 'https://www.azion.com/en/documentation/products/changelog',
+      isLinkExternal: true
     },
-    methods: {
-      async getMainContent() {
-        const currentPath = this.getCurrentPath()
-
-        const mainDocumentation = await this.HelpCenterServices.getHelpCenterDocumentationService({
-          url: currentPath
-        })
-
-        this.mainContent = mainDocumentation
-      },
-      makeContactSupportUrl() {
-        return getStaticUrlsByEnvironment('manager')
-      },
-      async getHtmlArticle(filename) {
-        const currentPath = this.getCurrentPath()
-        const parsedFilename = this.parseFilename(filename)
-
-        this.articleContent = await this.fetchArticleContent(currentPath, parsedFilename)
-      },
-      getCurrentPath() {
-        return this.$route.path
-      },
-      parseFilename(filename) {
-        const article = filename.replaceAll(' ', '-').toLowerCase()
-        const [articleNameParsed] = article.split('#')
-
-        return articleNameParsed.concat('/index.html')
-      },
-      async fetchArticleContent(currentPath, filename) {
-        return await this.HelpCenterServices.getHelpCenterDocumentationService({
-          url: currentPath,
-          filename: filename
-        })
-      },
-      onRouteChange() {
-        this.getMainContent()
-      },
-      backToMenu() {
-        this.articleContent = null
-      },
-      goToMenuLink(link) {
-        window.open(link)
-      },
-      searchDocumentation() {
-        openSearchResult(this.search)
-      }
+    {
+      label: 'Contact Support',
+      link: `${makeContactSupportUrl()}/tickets/`,
+      isLinkExternal: true
     },
-    watch: {
-      $route: 'onRouteChange'
-    },
-    setup() {
-      const helpCenterStore = useHelpCenterStore()
-
-      return {
-        helpCenterStore
-      }
+    {
+      label: 'Send Feedback',
+      link: 'mailto:feedback@azion.com',
+      isLinkExternal: false
     }
+  ])
+
+  const isOpen = computed(() => {
+    return helpCenterStore.isOpen
+  })
+
+  const getMainContent = async () => {
+    const currentPath = getCurrentPath()
+
+    const { data } = await getHelpCenterDocumentationService({
+      url: currentPath
+    })
+
+    mainContent.value = data
   }
+
+  const makeContactSupportUrl = () => {
+    return getStaticUrlsByEnvironment('manager')
+  }
+
+  const getHtmlArticle = async (filename) => {
+    const currentPath = getCurrentPath()
+    const parsedFilename = parseFilename(filename)
+
+    articleContent.value = await fetchArticleContent(currentPath, parsedFilename)
+  }
+
+  const getCurrentPath = () => {
+    return route.path
+  }
+
+  const parseFilename = (filename) => {
+    const article = filename.replaceAll(' ', '-').toLowerCase()
+    const [articleNameParsed] = article.split('#')
+
+    return articleNameParsed.concat('/index.html')
+  }
+
+  const fetchArticleContent = async (currentPath, filename) => {
+    const { data } = await getHelpCenterDocumentationService({
+      url: currentPath,
+      filename: filename
+    })
+
+    return data
+  }
+
+  const onRouteChange = () => {
+    getMainContent()
+  }
+
+  const backToMenu = () => {
+    articleContent.value = null
+    helpCenterStore.clearArticleContent()
+  }
+
+  const goToMenuLink = (link) => {
+    window.open(link)
+  }
+
+  const searchDocumentation = () => {
+    openSearchResult(search.value)
+  }
+
+  watch(route, () => {
+    onRouteChange()
+  })
+
+  watch(isOpen, () => {
+    if (!isOpen.value) {
+      articleContent.value = null
+    }
+  })
 </script>
