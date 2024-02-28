@@ -13,7 +13,7 @@ const fixtures = {
   },
   activityHistory: {
     accountId: '1',
-    type: 'type',
+    type: 'Type',
     authorEmail: 'email',
     authorName: 'name',
     userId: 'userId',
