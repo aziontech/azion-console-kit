@@ -6,7 +6,7 @@
   import { storeToRefs } from 'pinia'
   import { themeSelect } from '@/helpers'
   // eslint-disable-next-line no-unused-vars
-  import { AnalyticsTrackerAdapter } from '@/plugins/AnalyticsTrackerAdapter'
+  import { AnalyticsTrackerAdapter } from '@/plugins/adapters/AnalyticsTrackerAdapter'
 
   /** @type {AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
@@ -51,4 +51,4 @@
     </ShellBlock>
   </div>
 </template>
-@/plugins/AnalyticsTrackerAdapter
+@/plugins/AnalyticsTrackerAdapter @/plugins/adapter/AnalyticsTrackerAdapter

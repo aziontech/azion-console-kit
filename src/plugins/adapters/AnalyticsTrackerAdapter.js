@@ -1,6 +1,3 @@
-import { getEnvironment } from '@/helpers'
-import { makeAnalyticsClient } from './tracking/analytics-tracking-factory'
-
 /**
  * @typedef {Object} TrackerEvent
  * @property {string} eventName - The name of the event.
@@ -18,17 +15,15 @@ import { makeAnalyticsClient } from './tracking/analytics-tracking-factory'
 export class AnalyticsTrackerAdapter {
   /** @type {TrackerEvent[]} */
   #events = []
-  #environment = ''
   /** @type {import('analytics').AnalyticsInstance} */
   #analyticsClient = null
   #traits = {}
 
   /**
    * Creates an instance of AnalyticsTrackerAdapter.
-   * @param {string} environment - The environment for tracking.
+   * @param {import('analytics').AnalyticsInstance} analyticsClient - The client for tracking.
    */
-  constructor(environment, analyticsClient) {
-    this.#environment = environment
+  constructor(analyticsClient) {
     this.#analyticsClient = analyticsClient
   }
 
@@ -88,21 +83,5 @@ export class AnalyticsTrackerAdapter {
       await this.#analyticsClient.track(eventName, propsWithTraits)
     })
     this.#events = []
-  }
-}
-
-/**@type {import('vue').Plugin} */
-export default {
-  // eslint-disable-next-line no-unused-vars
-  install: (Vue, options) => {
-    const environment = getEnvironment()
-
-    const analyticsClient = makeAnalyticsClient(environment)
-
-    const app = Vue
-    const trackerInstance = new AnalyticsTrackerAdapter(environment, analyticsClient)
-    app.config.globalProperties.$tracker = trackerInstance
-
-    app.provide('tracker', trackerInstance)
   }
 }

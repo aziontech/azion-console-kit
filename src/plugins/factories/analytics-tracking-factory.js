@@ -13,8 +13,7 @@ const environment = {
 }
 
 function getSegmentToken(env) {
-  if (environment[env]) return environment[env].segmentToken
-  return undefined
+  return environment[env].segmentToken
 }
 
 /**

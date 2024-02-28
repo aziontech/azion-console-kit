@@ -21,7 +21,7 @@ import ToastService from 'primevue/toastservice'
 import { install as VueMonacoEditorPlugin } from '@guolao/vue-monaco-editor'
 import * as HelpCenterServices from '@/services/help-center-services'
 
-import TrackerPlugin from '@/plugins/AnalyticsTrackerAdapter'
+import TrackerPlugin from '@/plugins/AnalyticsTrackerAdapterPlugin'
 
 import App from './App.vue'
 import router from './router'
