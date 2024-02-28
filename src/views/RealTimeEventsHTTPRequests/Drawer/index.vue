@@ -83,10 +83,10 @@
         >
           <template #body>
             <div class="w-full flex flex-col md:flex-row md:gap-8 gap-3">
-              <div class="flex flex-col gap-3 w-full sm:w-[45%]  flex-1">
+              <div class="flex flex-col gap-3 w-full sm:w-[45%] flex-1">
                 <TextInfo label="Request ID">{{ details.requestId }}</TextInfo>
               </div>
-              <div class="flex flex-col gap-3 w-full sm:w-[45%]  flex-1">
+              <div class="flex flex-col gap-3 w-full sm:w-[45%] flex-1">
                 <TextInfo label="Remote Address">{{ details.remoteAddress }}</TextInfo>
                 <TextInfo label="Remote Port">{{ details.remotePort }}</TextInfo>
               </div>
@@ -218,10 +218,10 @@
         <InfoSection title="Debug Data">
           <template #body>
             <div class="w-full flex flex-col md:flex-row md:gap-8 gap-3">
-              <div class="flex flex-col gap-3 w-full sm:w-[45%]  flex-1">
+              <div class="flex flex-col gap-3 w-full sm:w-[45%] flex-1">
                 <TextInfo label="Debug Log">{{ details.debugLog }}</TextInfo>
               </div>
-              <div class="flex flex-col gap-3 w-full sm:w-[45%]  flex-1">
+              <div class="flex flex-col gap-3 w-full sm:w-[45%] flex-1">
                 <TextInfo label="Stack Trace">{{ details.stackTrace }}</TextInfo>
               </div>
             </div>

@@ -95,7 +95,7 @@
         >
           <template #body>
             <div class="flex gap-2 items-center w-full">
-              <label class="text-sm">Cache Key</label>
+              <label class="text-sm font-medium">Cache Key</label>
               <PrimeButton
                 label="Copy"
                 icon="pi pi-copy"
