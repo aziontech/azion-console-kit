@@ -63,7 +63,10 @@
         >
           <template #body>
             <div class="gap-8 flex flex-col sm:flex-row w-full">
-              <TextInfo label="Edge Functions Type List" class="flex-1">
+              <TextInfo
+                label="Edge Functions Type List"
+                class="flex-1"
+              >
                 <ul>
                   <li
                     :key="index"

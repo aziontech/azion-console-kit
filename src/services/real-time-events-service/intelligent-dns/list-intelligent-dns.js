@@ -45,8 +45,8 @@ const levelMap = {
 }
 
 const getLevelDNS = (level) => {
-  let words = level.trim().split(/\s+/);
-  let firstWord = words[0];
+  let words = level.trim().split(/\s+/)
+  let firstWord = words[0]
 
   return levelMap[firstWord.toUpperCase()]
 }

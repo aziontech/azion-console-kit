@@ -160,9 +160,17 @@
 
             <Divider />
 
-            <div class="w-full flex sm:flex-row flex-col gap-3 ">
-              <TextInfo label="Upstream Addr" class="flex-1">{{ details.upstreamAddr }}</TextInfo>
-              <TextInfo label="Upstream Status" class="flex-1">{{ details.upstreamStatus }}</TextInfo>
+            <div class="w-full flex sm:flex-row flex-col gap-3">
+              <TextInfo
+                label="Upstream Addr"
+                class="flex-1"
+                >{{ details.upstreamAddr }}</TextInfo
+              >
+              <TextInfo
+                label="Upstream Status"
+                class="flex-1"
+                >{{ details.upstreamStatus }}</TextInfo
+              >
             </div>
           </template>
         </InfoSection>

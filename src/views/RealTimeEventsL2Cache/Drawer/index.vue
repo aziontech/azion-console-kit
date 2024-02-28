@@ -137,28 +137,24 @@
               <BigNumber
                 label="TCP Info RTT"
                 sufix="ms"
-                
               >
                 {{ details.tcpinfoRtt }}
               </BigNumber>
               <BigNumber
                 label="Request Length"
                 sufix="lines"
-                
               >
                 {{ details.requestLength }}
               </BigNumber>
               <BigNumber
                 label="Bytes Sent"
                 sufix="ms"
-                
               >
                 {{ details.bytesSent }}
               </BigNumber>
               <BigNumber
                 label="Cache TTL"
                 sufix="s"
-                
               >
                 {{ details.cacheTtl }}
               </BigNumber>
@@ -187,7 +183,9 @@
           :tags="upstreamCacheStatusTag"
         >
           <template #body>
-            <div class="flex sm:flex-row sm:flex-wrap sm:w-1/2 flex-col gap-y-4 gap-x-8 justify-between">
+            <div
+              class="flex sm:flex-row sm:flex-wrap sm:w-1/2 flex-col gap-y-4 gap-x-8 justify-between"
+            >
               <BigNumber
                 label="Upstream Connect Time"
                 sufix="ms"
@@ -221,8 +219,16 @@
             <Divider />
 
             <div class="w-full flex sm:flex-row flex-col gap-3">
-              <TextInfo class="flex-1" label="Upstream Addr">{{ details.remoteAddr }}</TextInfo>
-              <TextInfo class="flex-1" label="Upstream Status">{{ details.upstreamStatus }}</TextInfo>
+              <TextInfo
+                class="flex-1"
+                label="Upstream Addr"
+                >{{ details.remoteAddr }}</TextInfo
+              >
+              <TextInfo
+                class="flex-1"
+                label="Upstream Status"
+                >{{ details.upstreamStatus }}</TextInfo
+              >
             </div>
           </template>
         </InfoSection>
