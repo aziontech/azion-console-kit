@@ -60,12 +60,12 @@
         >
           <template #body>
             <div class="flex flex-col sm:flex-row sm:gap-8 gap-3 w-full">
-              <div class="flex flex-col gap-3 flex-1">
+              <div class="flex flex-col gap-3 w-full sm:w-[45%] flex-1">
                 <TextInfo label="Account">{{ details.authorName }}</TextInfo>
                 <TextInfo label="ID">{{ details.accountId }}</TextInfo>
                 <TextInfo label="Client ID">{{ details.userId }}</TextInfo>
               </div>
-              <div class="flex flex-col gap-3 flex-1">
+              <div class="flex flex-col gap-3 w-full sm:w-[45%] flex-1">
                 <TextInfo label="User Name">{{ details.authorEmail }}</TextInfo>
                 <TextInfo label="Comment">{{ details.comment }}</TextInfo>
               </div>
