@@ -35,7 +35,7 @@
               label="Create"
               type="button"
               size="small"
-              @click="createModalStore.toggle()"
+              @click="openModalCreate"
             />
           </div>
         </div>
@@ -206,10 +206,13 @@
   import { useCreateModalStore } from '@/stores/create-modal'
   import ContentBlock from '@/templates/content-block'
   import { mapState } from 'pinia'
+  import { inject } from 'vue'
   import PrimeButton from 'primevue/button'
   import { useForm } from 'vee-validate'
   import * as yup from 'yup'
   import FormFieldsHome from './FormFields/FormFieldsHome.vue'
+  /**@type {import('@/plugins/adapters/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
+  const tracker = inject('tracker')
 
   export default {
     name: 'home-view',
@@ -265,6 +268,10 @@
     methods: {
       navigateToEdgeApplications() {
         this.$router.push({ name: 'list-edge-applications' })
+      },
+      openModalCreate() {
+        tracker.clickedToCreate({ url: '/', location: 'home' }).track()
+        this.createModalStore.toggle()
       },
       navigateToPayment() {
         const billingUrl = getStaticUrlsByEnvironment('billing')

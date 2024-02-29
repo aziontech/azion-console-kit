@@ -139,4 +139,19 @@ describe('AnalyticsTrackerAdapter', () => {
 
     expect(analyticsClientSpy.track).toHaveBeenCalledWith('User Failed to Sign In', {})
   })
+
+  it('should call clickedToCreate when valid identification is provided with correct params', () => {
+    const { sut, analyticsClientSpy } = makeSut()
+    const mockUrl = 'test-url-ABC/q-2/t'
+    const mockLocation = 'home'
+
+    sut.clickedToCreate({
+      url: mockUrl,
+      location: mockLocation
+    })
+
+    sut.track()
+
+    expect(analyticsClientSpy.track).toHaveBeenCalledWith('Clicked to Create', { url: mockUrl, location: mockLocation })
+  })
 })

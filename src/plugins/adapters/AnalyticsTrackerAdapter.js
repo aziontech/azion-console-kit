@@ -104,6 +104,24 @@ export class AnalyticsTrackerAdapter {
     return this
   }
 
+
+  /**
+   * @param {Object} payload
+   * @param {string} payload.url
+   * @param {string} payload.location
+   * @returns {AnalyticsTrackerAdapter}
+   */
+  clickedToCreate(payload) {
+    this.#events.push({
+      eventName: 'Clicked to Create',
+      props: {
+        url: payload.url,
+        location: payload.location
+      }
+    })
+    return this
+  }
+
   /**
    * call this method to run each stored tracker event
    */
