@@ -115,4 +115,14 @@ describe('AnalyticsTrackerAdapter', () => {
 
     expect(analyticsClientSpy.track).toHaveBeenCalledWith('User Signed In', {})
   })
+
+  it('should call userFailedSignIn when valid identification is provided', () => {
+    const { sut, analyticsClientSpy } = makeSut()
+
+    sut.userFailedSignIn()
+
+    sut.track()
+
+    expect(analyticsClientSpy.track).toHaveBeenCalledWith('User Failed to Sign In', {})
+  })
 })
