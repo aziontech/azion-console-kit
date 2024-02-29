@@ -106,4 +106,22 @@ describe('AnalyticsTrackerAdapter', () => {
       {}
     )
   })
+
+  it('should track the user sign-up event with the correct parameters', () => {
+    const { sut, analyticsClientSpy } = makeSut()
+    const signUpMethodMock = 'email'
+
+    sut.userSignedUp({
+      method: signUpMethodMock
+    })
+
+    sut.track()
+
+    expect(analyticsClientSpy.track).toHaveBeenCalledWith(
+      'User Signed Up',
+      {
+        method: signUpMethodMock
+      }
+    )
+  })
 })
