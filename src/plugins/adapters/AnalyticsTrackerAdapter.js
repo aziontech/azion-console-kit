@@ -5,6 +5,10 @@
  */
 
 /**
+ * @typedef {'Edge Application'|'Origins'|'Domains'} AzionProductsNames
+ */
+
+/**
  * @typedef {Object} AnalyticsAdapter
  * @property {Function} identify - Identifies a user.
  * @property {Function} assignGroupTraits - Assigns traits to a user group.
@@ -61,14 +65,14 @@ export class AnalyticsTrackerAdapter {
   }
 
   /**
-   * @param {string} eventName
-   * @param {Object} props
+   * @param {Object} payload
+   * @param {AzionProductsNames} payload.productName
    * @returns {AnalyticsTrackerAdapter}
    */
-  click(eventName, props) {
+  clickToCreate(payload) {
     this.#events.push({
-      eventName: eventName,
-      props: { ...props }
+      eventName: `Clicked to Create ${payload.productName}`,
+      props: {}
     })
     return this
   }
