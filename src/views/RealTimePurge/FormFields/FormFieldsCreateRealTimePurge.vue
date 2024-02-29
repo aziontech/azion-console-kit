@@ -88,7 +88,8 @@
                 </template>
                 <template #subtitle>
                   Purge content from Azion's tiered cache layer. Requires subscribing to this
-                  module.</template>
+                  module.</template
+                >
               </Card>
             </div>
             <PrimeButton
