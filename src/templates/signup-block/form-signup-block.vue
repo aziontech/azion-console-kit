@@ -96,7 +96,7 @@
 </template>
 
 <script setup>
-  import { onMounted, onUnmounted, ref, inject } from 'vue'
+  import { onMounted, onUnmounted, ref } from 'vue'
   import * as yup from 'yup'
   import { useForm, useField } from 'vee-validate'
   import { load, getInstance } from 'recaptcha-v3'
@@ -106,8 +106,6 @@
   import InputPassword from 'primevue/password'
   import PrimeButton from 'primevue/button'
   import PrimeDivider from 'primevue/divider'
-  /** @type {import('@/plugins/adapters/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
-  const tracker = inject('tracker')
 
   defineEmits(['change-signup-method'])
 
@@ -176,22 +174,16 @@
     return encodeURIComponent(email)
   }
 
-  const isSuccessSignedUp = ref(false)
   const signUp = async () => {
     loading.value = true
     try {
       const captcha = await recaptcha.execute('signup')
       await props.signupService({ ...values, captcha })
-      isSuccessSignedUp.value = true
+
+      router.push({ name: 'activation', query: { email: encodeEmail(values.email) } })
     } catch (err) {
       loading.value = false
-      isSuccessSignedUp.value = false
       toast.add({ life: 5000, severity: 'error', detail: err, summary: 'Error' })
-    } finally {
-      if (isSuccessSignedUp.value) {
-        tracker.userSignedUp()
-        router.push({ name: 'activation', query: { email: encodeEmail(values.email) } })
-      }
     }
   }
 
