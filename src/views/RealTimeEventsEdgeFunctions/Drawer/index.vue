@@ -65,7 +65,7 @@
             <div class="gap-8 flex flex-col sm:flex-row w-full">
               <TextInfo
                 label="Edge Functions List"
-                class="flex-1"
+                class="w-full sm:w-5/12 flex-1"
               >
                 <ul>
                   <li
@@ -77,6 +77,7 @@
                 </ul>
               </TextInfo>
               <BigNumber
+                class="flex-1"
                 label="Edge Function Time"
                 sufix="ms"
                 >{{ details.edgeFunctionsTime }}</BigNumber
@@ -97,7 +98,7 @@
                   {{ details.edgeFunctionsSolutionId }}
                 </TextInfo>
               </div>
-              <div class="flex flex-col gap-3 flex-1">
+              <div class="flex flex-col gap-3 w-full sm:w-5/12 flex-1">
                 <TextInfo label="Virtual Host ID">{{ details.virtualHostId }}</TextInfo>
                 <TextInfo label="Configuration ID">{{ details.configurationId }}</TextInfo>
               </div>

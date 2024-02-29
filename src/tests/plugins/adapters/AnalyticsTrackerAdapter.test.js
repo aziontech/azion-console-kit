@@ -32,24 +32,25 @@ describe('AnalyticsTrackerAdapter', () => {
     expect(analyticsClientSpy.identify).not.toHaveBeenCalled()
   })
 
-  it('should be able to store multiple events and track them all', async () => {
+  it('should be able to store multiple events and track them all', () => {
     const { sut, analyticsClientSpy } = makeSut()
     sut.pageLoad({ url: 'test-url-1' }).pageLoad({ url: 'test-url-2' })
     sut.pageLoad({ url: 'test-url-3' })
 
-    await sut.track()
+    sut.track()
 
     expect(analyticsClientSpy.track).toHaveBeenCalledTimes(3)
   })
 
-  it('should be able to track page load event with correct params', async () => {
+  it('should be able to track page load event with correct params', () => {
     const { sut, analyticsClientSpy } = makeSut()
     const mockUrl = 'test-url-ABC/q-2/t'
     sut.pageLoad({
       url: mockUrl
     })
 
-    await sut.track()
+    sut.track()
+
     expect(analyticsClientSpy.track).toHaveBeenCalledWith('Page Loaded', { url: mockUrl })
   })
 
@@ -88,5 +89,21 @@ describe('AnalyticsTrackerAdapter', () => {
       id: mockId,
       email: emailMock
     })
+  })
+
+  it('should be able to track click to create event with correct params', () => {
+    const { sut, analyticsClientSpy } = makeSut()
+    const productNameMock = 'Azion Product Name'
+
+    sut.clickToCreate({
+      productName: productNameMock
+    })
+
+    sut.track()
+
+    expect(analyticsClientSpy.track).toHaveBeenCalledWith(
+      'Clicked to Create Azion Product Name',
+      {}
+    )
   })
 })
