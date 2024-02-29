@@ -234,7 +234,7 @@
         router.push(`/mfa/${mfaRoute}`)
         return
       }
-      
+
       await switchClientAccount(userInfo.props)
     } catch {
       hasRequestErrorMessage.value = new UserNotFoundError().message
