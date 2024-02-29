@@ -82,7 +82,7 @@ export class AnalyticsTrackerAdapter {
    */
   userSigned() {
     this.#events.push({
-      eventName: "User Signed In",
+      eventName: 'User Signed In',
       props: {}
     })
     return this

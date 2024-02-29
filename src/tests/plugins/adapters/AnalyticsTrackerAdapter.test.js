@@ -4,7 +4,7 @@ import { describe, expect, it, vi } from 'vitest'
 const makeSut = () => {
   const analyticsClientSpy = {
     track: vi.fn(),
-    identify: vi.fn(),
+    identify: vi.fn()
   }
 
   const sut = new AnalyticsTrackerAdapter(analyticsClientSpy)
