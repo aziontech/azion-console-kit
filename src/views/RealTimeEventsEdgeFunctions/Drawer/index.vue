@@ -64,7 +64,7 @@
           <template #body>
             <div class="gap-8 flex flex-col sm:flex-row w-full">
               <TextInfo
-                label="Edge Functions Type List"
+                label="Edge Functions List"
                 class="flex-1"
               >
                 <ul>
@@ -87,7 +87,7 @@
 
             <div class="flex flex-col sm:flex-row sm:gap-8 gap-3 w-full">
               <div class="flex flex-col gap-3 flex-1">
-                <TextInfo label="Edge Functions Type List">
+                <TextInfo label="Edge Functions Initiator Type List">
                   {{ details.edgeFunctionsInitiatorTypeList }}
                 </TextInfo>
                 <TextInfo label="Edge Functions Instance ID List">

@@ -78,7 +78,7 @@
       },
       {
         field: 'edgeFunctionsInitiatorTypeList',
-        header: 'Edge Functions Type List'
+        header: 'Edge Functions Initiator Type List'
       },
       {
         field: 'edgeFunctionsList',
