@@ -127,7 +127,7 @@
           :tags="referenceErrorTag"
         >
           <template #body>
-            <div class="grid grid-cols-3 w-full gap-4 ml-0 mt-0">
+            <div class="flex w-full lg:gap-8">
               <BigNumber
                 label="Request Time"
                 sufix="ms"

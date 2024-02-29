@@ -86,7 +86,7 @@
           :tags="referenceErrorTag"
         >
           <template #body>
-            <div class="flex flex-wrap gap-y-4">
+            <div class="flex w-full lg:gap-8">
               <BigNumber
                 label="Request Time"
                 sufix="ms"
