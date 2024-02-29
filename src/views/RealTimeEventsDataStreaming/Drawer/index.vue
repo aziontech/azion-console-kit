@@ -60,7 +60,7 @@
           :tags="tags"
         >
           <template #body>
-            <div class="flex gap-4 sm:gap-8 flex-wrap w-1/2">
+            <div class="flex w-full lg:gap-8">
               <BigNumber
                 label="Streamed Lines"
                 sufix="lines"
