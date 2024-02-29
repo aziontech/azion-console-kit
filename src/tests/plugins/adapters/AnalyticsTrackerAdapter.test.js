@@ -106,4 +106,13 @@ describe('AnalyticsTrackerAdapter', () => {
       {}
     )
   })
+  it('should call userSigned when valid identification is provided', () => {
+    const { sut, analyticsClientSpy } = makeSut()
+
+    sut.userSigned()
+
+    sut.track()
+
+    expect(analyticsClientSpy.track).toHaveBeenCalledWith('User Signed In', {})
+  })
 })
