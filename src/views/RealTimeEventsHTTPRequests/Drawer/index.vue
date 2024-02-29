@@ -96,7 +96,7 @@
 
         <InfoSection title="Request and Response Data">
           <template #body>
-            <div class="flex flex-wrap gap-4 sm:gap-8">
+            <div class="flex w-full lg:gap-8">
               <BigNumber
                 label="Request Time"
                 sufix="ms"

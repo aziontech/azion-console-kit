@@ -70,6 +70,28 @@ export class AnalyticsTrackerAdapter {
   }
 
   /**
+   * @returns {AnalyticsTrackerAdapter}
+   */
+  userSigned() {
+    this.#events.push({
+      eventName: 'User Signed In',
+      props: {}
+    })
+    return this
+  }
+
+  /**
+   * @returns {AnalyticsTrackerAdapter}
+   */
+  userFailedSignIn() {
+    this.#events.push({
+      eventName: 'User Failed to Sign In',
+      props: {}
+    })
+    return this
+  }
+
+  /**
    * @param {Object} payload
    * @param {AzionProductsNames} payload.productName
    * @returns {AnalyticsTrackerAdapter}
@@ -81,6 +103,7 @@ export class AnalyticsTrackerAdapter {
     })
     return this
   }
+
   /**
    * call this method to run each stored tracker event
    */
