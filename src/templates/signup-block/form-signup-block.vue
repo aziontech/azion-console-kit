@@ -189,7 +189,7 @@
       toast.add({ life: 5000, severity: 'error', detail: err, summary: 'Error' })
     } finally {
       if (isSuccessSignedUp.value) {
-        tracker.userSignedUp({ method: 'email' }).track()
+        tracker.userSignedUp()
         router.push({ name: 'activation', query: { email: encodeEmail(values.email) } })
       }
     }

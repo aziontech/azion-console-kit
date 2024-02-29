@@ -80,16 +80,12 @@ export class AnalyticsTrackerAdapter {
   /**
    * Adds a user-signed-up event to the events array.
    *
-   * @param {Object} payload - The payload containing the sign-up details.
-   * @param {string} payload.method - The method of sign-up, such as (email | gitHub | google).
    * @returns {AnalyticsTrackerAdapter} - The instance of the class for method chaining.
    */
-  userSignedUp(payload) {
+  userSignedUp() {
     this.#events.push({
       eventName: 'User Signed Up',
-      props: {
-        method: payload.method
-      }
+      props: {}
     })
     return this
   }
