@@ -106,4 +106,37 @@ describe('AnalyticsTrackerAdapter', () => {
       {}
     )
   })
+
+  it('should be able to track a product created successfully', () => {
+    const { sut, analyticsClientSpy } = makeSut()
+    const productNameMock = 'Azion Product Name Mock'
+
+    sut
+      .productCreated({
+        productName: productNameMock
+      })
+      .track()
+
+    expect(analyticsClientSpy.track).toHaveBeenCalledWith('Created Azion Product Name Mock', {})
+  })
+
+  it('should call userSigned when valid identification is provided', () => {
+    const { sut, analyticsClientSpy } = makeSut()
+
+    sut.userSigned()
+
+    sut.track()
+
+    expect(analyticsClientSpy.track).toHaveBeenCalledWith('User Signed In', {})
+  })
+
+  it('should call userFailedSignIn when valid identification is provided', () => {
+    const { sut, analyticsClientSpy } = makeSut()
+
+    sut.userFailedSignIn()
+
+    sut.track()
+
+    expect(analyticsClientSpy.track).toHaveBeenCalledWith('User Failed to Sign In', {})
+  })
 })

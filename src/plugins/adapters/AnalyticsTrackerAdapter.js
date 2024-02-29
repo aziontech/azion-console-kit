@@ -8,14 +8,6 @@
  * @typedef {'Edge Application'|'Origins'|'Domains'} AzionProductsNames
  */
 
-/**
- * @typedef {Object} AnalyticsAdapter
- * @property {Function} identify - Identifies a user.
- * @property {Function} assignGroupTraits - Assigns traits to a user group.
- * @property {Function} pageLoad - Tracks a page load event.
- * @property {Function} click - Tracks a click event.
- * @property {Function} track - Tracks all queued events.
- */
 export class AnalyticsTrackerAdapter {
   /** @type {TrackerEvent[]} */
   #events = []
@@ -72,6 +64,41 @@ export class AnalyticsTrackerAdapter {
   clickToCreate(payload) {
     this.#events.push({
       eventName: `Clicked to Create ${payload.productName}`,
+      props: {}
+    })
+    return this
+  }
+
+  /**
+   * @returns {AnalyticsTrackerAdapter}
+   */
+  userSigned() {
+    this.#events.push({
+      eventName: 'User Signed In',
+      props: {}
+    })
+    return this
+  }
+
+  /**
+   * @returns {AnalyticsTrackerAdapter}
+   */
+  userFailedSignIn() {
+    this.#events.push({
+      eventName: 'User Failed to Sign In',
+      props: {}
+    })
+    return this
+  }
+
+  /**
+   * @param {Object} payload
+   * @param {AzionProductsNames} payload.productName
+   * @returns {AnalyticsTrackerAdapter}
+   */
+  productCreated(payload) {
+    this.#events.push({
+      eventName: `Created ${payload.productName}`,
       props: {}
     })
     return this
