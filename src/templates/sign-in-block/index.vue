@@ -237,6 +237,7 @@
 
       await switchClientAccount(userInfo.props)
     } catch {
+      tracker.userFailedSignIn().track()
       hasRequestErrorMessage.value = new UserNotFoundError().message
       isButtonLoading.value = false
     }
