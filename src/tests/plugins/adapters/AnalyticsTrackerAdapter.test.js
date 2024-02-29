@@ -152,6 +152,9 @@ describe('AnalyticsTrackerAdapter', () => {
 
     sut.track()
 
-    expect(analyticsClientSpy.track).toHaveBeenCalledWith('Clicked to Create', { url: mockUrl, location: mockLocation })
+    expect(analyticsClientSpy.track).toHaveBeenCalledWith('Clicked to Create', {
+      url: mockUrl,
+      location: mockLocation
+    })
   })
 })

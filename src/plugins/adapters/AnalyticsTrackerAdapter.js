@@ -104,7 +104,6 @@ export class AnalyticsTrackerAdapter {
     return this
   }
 
-
   /**
    * @param {Object} payload
    * @param {string} payload.url
