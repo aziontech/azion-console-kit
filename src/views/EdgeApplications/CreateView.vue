@@ -5,6 +5,7 @@
     </template>
     <template #content>
       <CreateFormBlock
+        @on-response="handleTrackCreation"
         :createService="props.createEdgeApplicationService"
         :schema="validationSchema"
         :initialValues="initialValues"
@@ -29,12 +30,14 @@
 <script setup>
   import CreateFormBlock from '@/templates/create-form-block'
   import ActionBarBlockWithTeleport from '@templates/action-bar-block/action-bar-with-teleport'
-  import { ref } from 'vue'
+  import { inject, ref } from 'vue'
   import * as yup from 'yup'
   import FormFieldsCreateEdgeApplications from './FormFields/FormFieldsCreateEdgeApplications'
 
   import ContentBlock from '@/templates/content-block'
   import PageHeadingBlock from '@/templates/page-heading-block'
+  /**@type {import('@/plugins/adapters/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
+  const tracker = inject('tracker')
 
   const props = defineProps({
     createEdgeApplicationService: {
@@ -77,4 +80,10 @@
     'cache-expiration-policies',
     'debug-rules'
   ]
+
+  const handleTrackCreation = () => {
+    tracker.productCreated({
+      productName: 'Edge Application'
+    })
+  }
 </script>
