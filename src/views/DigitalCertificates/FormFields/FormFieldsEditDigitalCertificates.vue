@@ -45,7 +45,7 @@
     v-if="csr"
     title="Update CSR"
     description="Submit the CSR to a certificate authority. Once the certificate is signed,
-        paste the PEM-encoded certificate in the respective field."
+        paste the PEM-encoded certificate in the respective field. The current certificate and CSR are hidden to protect sensitive information."
   >
     <template #inputs>
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
@@ -67,7 +67,7 @@
         <PrimeTextarea
           v-model="certificate"
           :class="{ 'p-invalid': certificateError }"
-          placeholder="-----BEGIN CERTIFICATE-----&#10;-----END CERTIFICATE-----"
+          placeholder="For security purposes, the current certificate isn't exhibited, but it was correctly registered. Paste a new certificate in this field to update it."
           rows="5"
           cols="30"
         />
@@ -83,7 +83,7 @@
           disabled
           v-model="csr"
           :class="{ 'p-invalid': csrError }"
-          placeholder="-----BEGIN CERTIFICATE REQUEST-----&#10;-----END CERTIFICATE REQUEST-----"
+          placeholder="For security purposes, the current CSR isn't exhibited, but it was correctly registered. Paste a new CSR in this field to update it."
           rows="5"
           cols="30"
         />
@@ -130,7 +130,7 @@
         <PrimeTextarea
           v-model="certificate"
           :class="{ 'p-invalid': certificateError }"
-          placeholder="-----BEGIN CERTIFICATE-----&#10;-----END CERTIFICATE-----"
+          placeholder="For security purposes, the current certificate isn't exhibited, but it was correctly registered. Paste a new certificate in this field to update it."
           rows="5"
           cols="30"
         />
@@ -145,7 +145,7 @@
         <PrimeTextarea
           v-model="privateKey"
           :class="{ 'p-invalid': privateKeyError }"
-          placeholder="-----BEGIN PRIVATE KEY-----&#10;-----END PRIVATE KEY-----"
+          placeholder="For security purposes, the current private key isn't exhibited, but it was correctly registered. Paste a new private key in this field to update it."
           rows="5"
           cols="30"
         />
@@ -183,7 +183,7 @@
         <PrimeTextarea
           v-model="certificate"
           :class="{ 'p-invalid': certificateError }"
-          placeholder="-----BEGIN CERTIFICATE----&#10;-----END CERTIFICATE-----"
+          placeholder="For security purposes, the current certificate isn't exhibited, but it was correctly registered. Paste a new certificate in this field to update it."
           rows="5"
           cols="30"
         />
