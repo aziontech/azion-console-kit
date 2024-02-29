@@ -16,9 +16,7 @@
 
     <!-- Content body -->
     <div class="h-full flex justify-between flex-col">
-      <div
-        class="overflow-y-auto sticky top-12 min-h-[calc(100vh-5rem)] flex flex-col justify-between"
-      >
+      <div class="overflow-y-auto sticky top-12 h-[calc(100vh-5rem)] flex flex-col justify-between">
         <div class="mb-5">
           <div class="pr-7">
             <!-- Input Search  -->

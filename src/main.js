@@ -21,6 +21,8 @@ import ToastService from 'primevue/toastservice'
 import { install as VueMonacoEditorPlugin } from '@guolao/vue-monaco-editor'
 import * as HelpCenterServices from '@/services/help-center-services'
 
+import TrackerPlugin from '@/plugins/AnalyticsTrackerAdapterPlugin'
+
 import App from './App.vue'
 import router from './router'
 
@@ -34,6 +36,7 @@ app.directive('tooltip', Tooltip)
 app.use(ToastService)
 app.use(pinia)
 app.use(router)
+app.use(TrackerPlugin)
 app.use(VueMonacoEditorPlugin, {
   paths: {
     vs: 'https://cdn.jsdelivr.net/npm/monaco-editor@0.38.0/min/vs'

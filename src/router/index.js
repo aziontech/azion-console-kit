@@ -35,7 +35,7 @@ import { settingsRoutes } from '@routes/your-settings-routes'
 
 import { createRouter, createWebHistory } from 'vue-router'
 
-import afterEachRoute from './hooks/afterEachRoute'
+import afterEachRouteGuard from './hooks/afterEachRoute'
 import beforeEachRoute from './hooks/beforeEachRoute'
 import redirectToManager from './hooks/redirectToManager'
 
@@ -80,6 +80,6 @@ const router = createRouter({
 
 router.beforeEach(beforeEachRoute)
 router.beforeEach(redirectToManager)
-router.afterEach(afterEachRoute)
+router.afterEach(afterEachRouteGuard)
 
 export default router
