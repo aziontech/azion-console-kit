@@ -44,8 +44,7 @@
   <FormHorizontal
     v-if="csr"
     title="Update CSR"
-    description="Submit the CSR to a certificate authority. Once the certificate is signed,
-        paste the PEM-encoded certificate in the respective field. The current certificate and CSR are hidden to protect sensitive information."
+    description="Submit the CSR to a certificate authority. Once the certificate is signed, paste the PEM-encoded certificate in the respective field. The current certificate is hidden to protect sensitive information."
   >
     <template #inputs>
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
@@ -83,7 +82,6 @@
           disabled
           v-model="csr"
           :class="{ 'p-invalid': csrError }"
-          placeholder="For security purposes, the current CSR isn't exhibited, but it was correctly registered. Paste a new CSR in this field to update it."
           rows="5"
           cols="30"
         />
@@ -141,7 +139,7 @@
         >
       </div>
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
-        <label>Private key </label>
+        <label>Private Key </label>
         <PrimeTextarea
           v-model="privateKey"
           :class="{ 'p-invalid': privateKeyError }"
