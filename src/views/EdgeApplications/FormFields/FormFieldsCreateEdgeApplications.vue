@@ -94,10 +94,9 @@
   }
 
   const handleBlock = (block) => {
-    const handle =
-      props.handleBlock.filter((value) => {
-        return value === block
-      }).length > 0
+    const handle = props.handleBlock.some((value) => {
+      return value === block
+    })
 
     return handle
   }
