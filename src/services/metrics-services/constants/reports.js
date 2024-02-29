@@ -9,7 +9,7 @@ const REPORTS = [
   {
     id: '356217848089018959',
     chartOwner: 'azion',
-    label: 'Edge Caching',
+    label: 'Edge Cache',
     description: DASHBOARDS_TEXTS.edge_applications.data_transferred.edge_caching.description,
     aggregationType: 'sum',
     columns: 6,

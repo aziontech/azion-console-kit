@@ -557,8 +557,8 @@
           />
 
           <div class="text-color-secondary text-sm font-normal">
-            Enable Application Acceleration on the Main Settings tab to use values lower than 60
-            seconds. L2 Caching requires cache TTL to be equal to or greater than 3 seconds.
+            Enable <b>Application Acceleration</b> in the Main Settings tab to use values lower than 60
+            seconds. <b>Tiered Cache</b> requires cache TTL to be equal to or greater than 3 seconds.
           </div>
         </div>
       </div>
@@ -603,7 +603,7 @@
             }"
           >
             <template #title>
-              <span class="text-base">Edge Caching</span>
+              <span class="text-base">Edge Cache</span>
               <InputSwitch
                 v-model="caching"
                 disabled
