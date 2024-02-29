@@ -83,10 +83,10 @@
         >
           <template #body>
             <div class="w-full flex flex-col md:flex-row md:gap-8 gap-3">
-              <div class="flex flex-col gap-3 flex-1">
+              <div class="flex flex-col gap-3 w-full sm:w-5/12 flex-1">
                 <TextInfo label="Request ID">{{ details.requestId }}</TextInfo>
               </div>
-              <div class="flex flex-col gap-3 flex-1">
+              <div class="flex flex-col gap-3 w-full sm:w-5/12 flex-1">
                 <TextInfo label="Remote Address">{{ details.remoteAddress }}</TextInfo>
                 <TextInfo label="Remote Port">{{ details.remotePort }}</TextInfo>
               </div>
@@ -118,12 +118,12 @@
             <Divider />
 
             <div class="w-full flex sm:flex-row flex-col gap-3 sm:gap-8">
-              <div class="flex flex-col gap-3 flex-1">
+              <div class="flex flex-col gap-3 w-full sm:w-5/12 flex-1">
                 <TextInfo label="Status">{{ details.status }}</TextInfo>
                 <TextInfo label="Request Method">{{ details.requestMethod }}</TextInfo>
                 <TextInfo label="Request Uri">{{ details.requestUri }}</TextInfo>
               </div>
-              <div class="flex flex-col gap-3 flex-1">
+              <div class="flex flex-col gap-3 w-full sm:w-5/12 flex-1">
                 <TextInfo label="HTTP User Agent">{{ details.httpUserAgent }}</TextInfo>
 
                 <TextInfo label="Sent HTTP Content Type">{{
@@ -163,12 +163,12 @@
             <div class="w-full flex sm:flex-row flex-col gap-3">
               <TextInfo
                 label="Upstream Addr"
-                class="flex-1"
+                class="w-full sm:w-5/12 flex-1"
                 >{{ details.upstreamAddr }}</TextInfo
               >
               <TextInfo
                 label="Upstream Status"
-                class="flex-1"
+                class="w-full sm:w-5/12 flex-1"
                 >{{ details.upstreamStatus }}</TextInfo
               >
             </div>
@@ -178,10 +178,10 @@
         <InfoSection title="Geo-location Data">
           <template #body>
             <div class="w-full flex flex-col md:flex-row md:gap-8 gap-3">
-              <div class="flex flex-col gap-3 flex-1">
+              <div class="flex flex-col gap-3 w-full sm:w-5/12 flex-1">
                 <TextInfo label="Geoloc ASN">{{ details.geolocAsn }}</TextInfo>
               </div>
-              <div class="flex flex-col gap-3 flex-1">
+              <div class="flex flex-col gap-3 w-full sm:w-5/12 flex-1">
                 <TextInfo label="Geoloc Country Name">{{ details.geolocCountryName }}</TextInfo>
                 <TextInfo label="Geoloc Region Name">{{ details.geolocRegionName }}</TextInfo>
               </div>
@@ -204,11 +204,11 @@
             <Divider />
 
             <div class="w-full sm:flex-row flex flex-col gap-3 sm:gap-8">
-              <div class="flex flex-col gap-3 flex-1">
+              <div class="flex flex-col gap-3 w-full sm:w-5/12 flex-1">
                 <TextInfo label="SSL Cipher">{{ details.sslCipher }}</TextInfo>
                 <TextInfo label="SSL Protocol">{{ details.sslProtocol }}</TextInfo>
               </div>
-              <div class="flex flex-col gap-3 flex-1">
+              <div class="flex flex-col gap-3 w-full sm:w-5/12 flex-1">
                 <TextInfo label="WF Match">{{ details.wafMatch }}</TextInfo>
               </div>
             </div>
@@ -218,10 +218,10 @@
         <InfoSection title="Debug Data">
           <template #body>
             <div class="w-full flex flex-col md:flex-row md:gap-8 gap-3">
-              <div class="flex flex-col gap-3 flex-1">
+              <div class="flex flex-col gap-3 w-full sm:w-5/12 flex-1">
                 <TextInfo label="Debug Log">{{ details.debugLog }}</TextInfo>
               </div>
-              <div class="flex flex-col gap-3 flex-1">
+              <div class="flex flex-col gap-3 w-full sm:w-5/12 flex-1">
                 <TextInfo label="Stack Trace">{{ details.stackTrace }}</TextInfo>
               </div>
             </div>

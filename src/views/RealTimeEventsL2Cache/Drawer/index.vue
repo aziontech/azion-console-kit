@@ -95,7 +95,7 @@
         >
           <template #body>
             <div class="flex gap-2 items-center w-full">
-              <label class="text-sm">Cache Key</label>
+              <label class="text-sm font-medium">Cache Key</label>
               <PrimeButton
                 label="Copy"
                 icon="pi pi-copy"
@@ -107,13 +107,13 @@
             <Divider />
 
             <div class="flex flex-col sm:flex-row sm:gap-8 gap-3 w-full">
-              <div class="flex flex-col gap-3 flex-1">
+              <div class="flex flex-col gap-3 w-full sm:w-5/12 flex-1">
                 <TextInfo label="Host">{{ details.host }}</TextInfo>
                 <TextInfo label="Proxy Host">{{ details.proxyHost }}</TextInfo>
                 <TextInfo label="Remote Addr">{{ details.remoteAddr }}</TextInfo>
                 <TextInfo label="Remote Port">{{ details.remotePort }}</TextInfo>
               </div>
-              <div class="flex flex-col gap-3 flex-1">
+              <div class="flex flex-col gap-3 w-full sm:w-5/12 flex-1">
                 <TextInfo label="Client ID">{{ details.clientId }}</TextInfo>
                 <TextInfo label="Solution">{{ details.solution }}</TextInfo>
                 <TextInfo label="Configuration ID">{{ details.configurationId }}</TextInfo>
@@ -161,12 +161,12 @@
             </div>
             <Divider />
             <div class="flex flex-col sm:flex-row sm:gap-8 gap-3 w-full">
-              <div class="flex flex-col gap-3 flex-1">
+              <div class="flex flex-col gap-3 w-full sm:w-5/12 flex-1">
                 <TextInfo label="Reference Error">{{ details.referenceError }}</TextInfo>
                 <TextInfo label="Request Method">{{ details.requestMethod }}</TextInfo>
                 <TextInfo label="Request Uri">{{ details.requestUri }}</TextInfo>
               </div>
-              <div class="flex flex-col gap-3 flex-1">
+              <div class="flex flex-col gap-3 w-full sm:w-5/12 flex-1">
                 <TextInfo label="Sent HTTP Content Type">{{
                   details.sentHttpContentType
                 }}</TextInfo>
@@ -220,12 +220,12 @@
 
             <div class="w-full flex sm:flex-row flex-col gap-3">
               <TextInfo
-                class="flex-1"
+                class="w-full sm:w-5/12 flex-1"
                 label="Upstream Addr"
                 >{{ details.remoteAddr }}</TextInfo
               >
               <TextInfo
-                class="flex-1"
+                class="w-full sm:w-5/12 flex-1"
                 label="Upstream Status"
                 >{{ details.upstreamStatus }}</TextInfo
               >
