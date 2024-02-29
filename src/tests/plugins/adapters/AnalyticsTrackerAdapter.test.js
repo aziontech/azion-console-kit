@@ -4,7 +4,7 @@ import { describe, expect, it, vi } from 'vitest'
 const makeSut = () => {
   const analyticsClientSpy = {
     track: vi.fn(),
-    identify: vi.fn()
+    identify: vi.fn(),
   }
 
   const sut = new AnalyticsTrackerAdapter(analyticsClientSpy)
@@ -105,5 +105,14 @@ describe('AnalyticsTrackerAdapter', () => {
       'Clicked to Create Azion Product Name',
       {}
     )
+  })
+  it('should call userSigned when valid identification is provided', () => {
+    const { sut, analyticsClientSpy } = makeSut()
+
+    sut.userSigned()
+
+    sut.track()
+
+    expect(analyticsClientSpy.track).toHaveBeenCalledWith('User Signed In', {})
   })
 })
