@@ -53,7 +53,9 @@ const adapt = (filter) => {
     tsRange: filter.tsRange,
     and: {
       configurationIdEq: filter.configurationId,
-      tsEq: filter.ts
+      tsEq: filter.ts,
+      httpUserAgentEq: filter.httpUserAgent,
+      httpRefererEq: filter.httpReferer
     }
   }
   return convertGQL(formatFilter, table)

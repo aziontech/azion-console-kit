@@ -40,6 +40,7 @@ const adaptResponse = (response) => {
   const { body } = response
 
   return body.data.dataStreamedEvents?.map((dataStreamedEvents) => ({
+    id: new Date().getTime(),
     configurationId: dataStreamedEvents.configurationId,
     dataStreamed: dataStreamedEvents.dataStreamed,
     endpointType: {

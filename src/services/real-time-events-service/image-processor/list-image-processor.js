@@ -38,6 +38,7 @@ const adaptResponse = (response) => {
   const { body } = response
 
   return body.data.imagesProcessedEvents?.map((imagesProcessedEvents) => ({
+    id: new Date().getTime(),
     bytesSent: imagesProcessedEvents.bytesSent,
     configurationId: imagesProcessedEvents.configurationId,
     host: imagesProcessedEvents.host,

@@ -75,7 +75,8 @@ const adaptResponse = (response) => {
   return body.data.cellsConsoleEvents?.map((cellsConsoleEvents) => ({
     configurationId: cellsConsoleEvents.configurationId,
     functionId: cellsConsoleEvents.functionId,
-    id: cellsConsoleEvents.id,
+    id: new Date().getTime(),
+    originalId: cellsConsoleEvents.id,
     level: levelMap[cellsConsoleEvents.level],
     line: cellsConsoleEvents.line,
     lineSource: {

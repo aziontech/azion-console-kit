@@ -41,10 +41,12 @@
   const router = useRouter()
   const drawerRef = ref('')
 
-  const openDetailDrawer = ({ configurationId, ts }) => {
+  const openDetailDrawer = ({ configurationId, ts, httpUserAgent, httpReferer }) => {
     drawerRef.value.openDetailDrawer({
       tsRange: filterDate.value,
       configurationId,
+      httpReferer,
+      httpUserAgent,
       ts
     })
   }
@@ -83,6 +85,7 @@
         field: 'httpReferer',
         header: 'HTTP Referrer',
         type: 'component',
+        filterPath: 'httpReferer',
         component: (columnData) =>
           columnBuilder({ data: columnData, columnAppearance: 'expand-text-column' })
       },
@@ -90,6 +93,7 @@
         field: 'httpUserAgent',
         header: 'HTTP Agent',
         type: 'component',
+        filterPath: 'httpUserAgent',
         component: (columnData) =>
           columnBuilder({ data: columnData, columnAppearance: 'expand-text-column' })
       },

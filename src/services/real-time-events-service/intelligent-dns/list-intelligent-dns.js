@@ -65,6 +65,7 @@ const adaptResponse = (response) => {
   const { body } = response
 
   return body.data.idnsQueriesEvents?.map((idnsQueriesEvents) => ({
+    id: new Date().getTime(),
     level: getLevelDNS(idnsQueriesEvents.level),
     qtype: idnsQueriesEvents.qtype,
     resolutionType: idnsQueriesEvents.resolutionType,

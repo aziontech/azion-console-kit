@@ -83,6 +83,7 @@
       {
         field: 'edgeFunctionsList',
         header: 'Edge Functions List',
+        filterPath: 'edgeFunctionsList',
         type: 'component',
         component: (columnData) =>
           columnBuilder({ data: columnData, columnAppearance: 'expand-column' })

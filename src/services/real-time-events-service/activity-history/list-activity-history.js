@@ -31,6 +31,7 @@ const adaptResponse = (response) => {
   const { body } = response
 
   return body.data.activityHistoryEvents?.map((activityHistoryEvents) => ({
+    id: new Date().getTime(),
     accountId: activityHistoryEvents.accountId,
     authorEmail: activityHistoryEvents.authorEmail,
     authorName: activityHistoryEvents.authorName,

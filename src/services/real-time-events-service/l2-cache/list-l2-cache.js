@@ -40,7 +40,7 @@ const adaptResponse = (response) => {
   const { body } = response
 
   return body.data.l2CacheEvents?.map((l2CacheEvents) => ({
-    id: l2CacheEvents.ts + l2CacheEvents.configurationId,
+    id: new Date().getTime(),
     bytesSent: l2CacheEvents.bytesSent,
     cacheKey: {
       content: l2CacheEvents.cacheKey

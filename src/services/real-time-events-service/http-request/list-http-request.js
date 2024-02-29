@@ -40,7 +40,7 @@ const adaptResponse = (httpResponse) => {
   const { body } = httpResponse
 
   return body.data.httpEvents?.map((httpEventItem) => ({
-    id: httpEventItem.ts + httpEventItem.configurationId + httpEventItem.requestId,
+    id: new Date().getTime(),
     bytesSent: httpEventItem.bytesSent,
     configurationId: httpEventItem.configurationId,
     debugLog: httpEventItem.debugLog,

@@ -39,6 +39,7 @@ const adaptResponse = (response) => {
   const { body } = response
 
   return body.data.edgeFunctionsEvents?.map((edgeFunctionsEvents) => ({
+    id: new Date().getTime(),
     configurationId: edgeFunctionsEvents.configurationId,
     edgeFunctionsInstanceIdList: edgeFunctionsEvents.edgeFunctionsInstanceIdList,
     edgeFunctionsInitiatorTypeList: edgeFunctionsEvents.edgeFunctionsInitiatorTypeList,
