@@ -53,6 +53,13 @@
     return max.toUTC(userUTC)
   })
 
+  const minDate = computed(() => {
+    const sevenDaysInHours = 7 * 24
+    const date = new Date()
+    const min = removeSelectedAmountOfHours(sevenDaysInHours, date)
+    return min.toUTC(userUTC)
+  })
+
   const updatedTimeRange = ({ tsRangeBegin, tsRangeEnd, meta }) => {
     const GMT0 = '.000Z'
     const gmt0Begin = `${tsRangeBegin}${GMT0}`
@@ -169,6 +176,7 @@
         showIcon
         iconDisplay="input"
         :maxDate="maxDate"
+        :minDate="minDate"
         :class="classError"
       />
       <small
