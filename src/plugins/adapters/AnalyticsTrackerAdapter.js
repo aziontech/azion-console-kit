@@ -156,6 +156,17 @@ export class AnalyticsTrackerAdapter {
   }
 
   /**
+   * @returns {AnalyticsTrackerAdapter}
+   */
+  userFailedSignUp() {
+    this.#events.push({
+      eventName: 'User Failed to Sign Up',
+      props: {}
+    })
+    return this
+  }
+
+  /**
    * call this method to run each stored tracker event
    */
   async track() {
