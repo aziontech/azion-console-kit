@@ -145,6 +145,19 @@ export class AnalyticsTrackerAdapter {
 
   /**
    * @param {Object} payload
+   * @param {AzionProductsNames} payload.productName
+   * @returns {AnalyticsTrackerAdapter}
+   */
+  failedToEdit(payload) {
+    this.#events.push({
+      eventName: `Failed to Edit ${payload.productName}`,
+      props: {}
+    })
+    return this
+  }
+
+  /**
+   * @param {Object} payload
    * @param {string} payload.url
    * @param {string} payload.location
    * @returns {AnalyticsTrackerAdapter}
