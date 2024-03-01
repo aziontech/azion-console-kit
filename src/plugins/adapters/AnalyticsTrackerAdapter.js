@@ -70,6 +70,19 @@ export class AnalyticsTrackerAdapter {
   }
 
   /**
+   * @param {Object} payload
+   * @param {AzionProductsNames} payload.productName
+   * @returns {AnalyticsTrackerAdapter}
+   */
+  clickToEdit(payload) {
+    this.#events.push({
+      eventName: `Clicked to Edit ${payload.productName}`,
+      props: {}
+    })
+    return this
+  }
+
+  /**
    * @returns {AnalyticsTrackerAdapter}
    */
   userSigned() {
@@ -130,7 +143,7 @@ export class AnalyticsTrackerAdapter {
     return this
   }
 
-  /*
+  /**
    * @param {string} payload.url
    * @param {string} payload.location
    * @returns {AnalyticsTrackerAdapter}

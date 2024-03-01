@@ -89,8 +89,10 @@
   }
 
   const handleTrackFailedCreation = () => {
-    tracker.failedToCreate({
-      productName: 'Edge Application'
-    })
+    tracker
+      .failedToCreate({
+        productName: 'Edge Application'
+      })
+      .track()
   }
 </script>
