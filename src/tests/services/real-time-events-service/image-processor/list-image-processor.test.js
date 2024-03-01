@@ -1,4 +1,4 @@
-import { AxiosHttpClientAdapter } from '@/services/axios/AxiosHttpClientAdapter'
+ import { AxiosHttpClientAdapter } from '@/services/axios/AxiosHttpClientAdapter'
 import { listImageProcessor } from '@/services/real-time-events-service/image-processor'
 import { describe, expect, it, vi } from 'vitest'
 
@@ -77,6 +77,9 @@ describe('ImageProcessorServices', () => {
   })
 
   it('should parsed correctly each event', async () => {
+    vi.mock('@/helpers/generate-timestamp', () => ({
+      generateCurrentTimestamp: () => 'mocked-timestamp'
+    }))
     vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
       statusCode: 200,
       body: { data: { imagesProcessedEvents: [fixtures.imageProcessor] } }
@@ -87,6 +90,7 @@ describe('ImageProcessorServices', () => {
 
     expect(response).toEqual([
       {
+        id: 'mocked-timestamp',
         bytesSent: fixtures.imageProcessor.bytesSent,
         configurationId: fixtures.imageProcessor.configurationId,
         host: fixtures.imageProcessor.host,

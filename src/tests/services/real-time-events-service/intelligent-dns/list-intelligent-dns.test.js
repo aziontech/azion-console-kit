@@ -1,4 +1,4 @@
-import { AxiosHttpClientAdapter } from '@/services/axios/AxiosHttpClientAdapter'
+ import { AxiosHttpClientAdapter } from '@/services/axios/AxiosHttpClientAdapter'
 import { listIntelligentDNS } from '@/services/real-time-events-service/intelligent-dns'
 import { describe, expect, it, vi } from 'vitest'
 
@@ -77,6 +77,9 @@ describe('IntelligentDnsServices', () => {
   })
 
   it('should parsed correctly each event', async () => {
+    vi.mock('@/helpers/generate-timestamp', () => ({
+      generateCurrentTimestamp: () => 'mocked-timestamp'
+    }))
     vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
       statusCode: 200,
       body: { data: { idnsQueriesEvents: [fixtures.intelligentDns] } }
@@ -87,6 +90,7 @@ describe('IntelligentDnsServices', () => {
 
     expect(response).toEqual([
       {
+        id: 'mocked-timestamp',
         level: {
           content: 'Error',
           icon: 'pi pi-times-circle',

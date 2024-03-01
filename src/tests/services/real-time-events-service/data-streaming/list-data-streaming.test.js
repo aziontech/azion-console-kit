@@ -81,6 +81,10 @@ describe('DataStreamingServices', () => {
 
   it('should parsed correctly each event', async () => {
     localeMock()
+    vi.mock('@/helpers/generate-timestamp', () => ({
+      generateCurrentTimestamp: () => 'mocked-timestamp'
+    }))
+
     vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
       statusCode: 200,
       body: { data: { dataStreamedEvents: [fixtures.dataStreaming] } }
@@ -91,6 +95,7 @@ describe('DataStreamingServices', () => {
 
     expect(response).toEqual([
       {
+        id: 'mocked-timestamp',
         configurationId: fixtures.dataStreaming.configurationId,
         dataStreamed: fixtures.dataStreaming.dataStreamed,
         endpointType: { content: fixtures.dataStreaming.endpointType, severity: 'info' },

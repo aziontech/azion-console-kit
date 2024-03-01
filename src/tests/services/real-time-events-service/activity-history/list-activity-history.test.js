@@ -76,6 +76,9 @@ describe('ActivityHistoryServices', () => {
   })
 
   it('should parsed correctly each event', async () => {
+    vi.mock('@/helpers/generate-timestamp', () => ({
+      generateCurrentTimestamp: () => 'mocked-timestamp'
+    }))
     vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
       statusCode: 200,
       body: { data: { activityHistoryEvents: [fixtures.activityHistory] } }
@@ -86,6 +89,7 @@ describe('ActivityHistoryServices', () => {
 
     expect(response).toEqual([
       {
+        id: 'mocked-timestamp',
         accountId: fixtures.activityHistory.accountId,
         authorEmail: fixtures.activityHistory.authorEmail,
         authorName: fixtures.activityHistory.authorName,

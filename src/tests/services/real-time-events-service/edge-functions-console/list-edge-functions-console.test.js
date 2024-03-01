@@ -1,4 +1,4 @@
-import { AxiosHttpClientAdapter } from '@/services/axios/AxiosHttpClientAdapter'
+ import { AxiosHttpClientAdapter } from '@/services/axios/AxiosHttpClientAdapter'
 import { listEdgeFunctionsConsole } from '@/services/real-time-events-service/edge-functions-console'
 import { describe, expect, it, vi } from 'vitest'
 
@@ -13,7 +13,6 @@ const fixtures = {
   edgeFunctionConsole: {
     configurationId: '123',
     functionId: '1423',
-    id: '1234',
     level: 'INFO',
     line: 42,
     lineSource: 'test linesource',
@@ -79,6 +78,9 @@ describe('EdgeFunctionsConsoleServices', () => {
   })
 
   it('should parsed correctly each event', async () => {
+    vi.mock('@/helpers/generate-timestamp', () => ({
+      generateCurrentTimestamp: () => 'mocked-timestamp'
+    }))
     vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
       statusCode: 200,
       body: { data: { cellsConsoleEvents: [fixtures.edgeFunctionConsole] } }
@@ -91,7 +93,7 @@ describe('EdgeFunctionsConsoleServices', () => {
       {
         configurationId: fixtures.edgeFunctionConsole.configurationId,
         functionId: fixtures.edgeFunctionConsole.functionId,
-        id: fixtures.edgeFunctionConsole.id,
+        id: 'mocked-timestamp',
         level: {
           content: 'Info',
           severity: 'info',

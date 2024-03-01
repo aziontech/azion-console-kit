@@ -79,6 +79,9 @@ describe('L2CacheServices', () => {
   })
 
   it('should parsed correctly each event', async () => {
+    vi.mock('@/helpers/generate-timestamp', () => ({
+      generateCurrentTimestamp: () => 'mocked-timestamp'
+    }))
     vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
       statusCode: 200,
       body: { data: { l2CacheEvents: [fixtures.l2Cache] } }
@@ -89,7 +92,7 @@ describe('L2CacheServices', () => {
 
     expect(response).toEqual([
       {
-        id: '2024-02-23T18:07:25.000Zconfig-001',
+        id: 'mocked-timestamp',
         bytesSent: fixtures.l2Cache.bytesSent,
         cacheKey: {
           content: fixtures.l2Cache.cacheKey

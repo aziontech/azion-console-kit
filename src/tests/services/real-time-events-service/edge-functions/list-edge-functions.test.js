@@ -77,6 +77,9 @@ describe('EdgeFunctionsServices', () => {
   })
 
   it('should parsed correctly each event', async () => {
+    vi.mock('@/helpers/generate-timestamp', () => ({
+      generateCurrentTimestamp: () => 'mocked-timestamp'
+    }))
     vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
       statusCode: 200,
       body: { data: { edgeFunctionsEvents: [fixtures.edgeFunction] } }
@@ -87,6 +90,7 @@ describe('EdgeFunctionsServices', () => {
 
     expect(response).toEqual([
       {
+        id: 'mocked-timestamp',
         configurationId: fixtures.edgeFunction.configurationId,
         edgeFunctionsInstanceIdList: fixtures.edgeFunction.edgeFunctionsInstanceIdList,
         edgeFunctionsInitiatorTypeList: fixtures.edgeFunction.edgeFunctionsInitiatorTypeList,

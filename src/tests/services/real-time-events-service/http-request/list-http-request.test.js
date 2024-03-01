@@ -1,4 +1,4 @@
-import { AxiosHttpClientAdapter } from '@/services/axios/AxiosHttpClientAdapter'
+ import { AxiosHttpClientAdapter } from '@/services/axios/AxiosHttpClientAdapter'
 import { listHttpRequest } from '@/services/real-time-events-service/http-request'
 import { describe, expect, it, vi } from 'vitest'
 
@@ -79,6 +79,9 @@ describe('HttpRequestServices', () => {
   })
 
   it('should parsed correctly each event', async () => {
+    vi.mock('@/helpers/generate-timestamp', () => ({
+      generateCurrentTimestamp: () => 'mocked-timestamp'
+    }))
     vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
       statusCode: 200,
       body: { data: { httpEvents: [fixtures.httpRequest] } }
@@ -89,7 +92,7 @@ describe('HttpRequestServices', () => {
 
     expect(response).toEqual([
       {
-        id: '2024-02-23T18:07:25.000Zconfig-001req-1234567890',
+        id: 'mocked-timestamp',
         bytesSent: fixtures.httpRequest.bytesSent,
         configurationId: fixtures.httpRequest.configurationId,
         debugLog: fixtures.httpRequest.debugLog,
