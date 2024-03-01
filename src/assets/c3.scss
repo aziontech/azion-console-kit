@@ -5,21 +5,44 @@ C3 dependency omits its styling for some reason. Thus it was needed to add this 
 > css source : https://raw.githubusercontent.com/c3js/c3/master/c3.css
 --*/
 
+:root.azion-dark {
+  --series-one-color: #FBA86F;
+  --series-two-color: #76DB9B;
+  --series-three-color: #85B2F9;
+  --series-four-color: #F2D066;
+  --series-five-color: #FF8780;
+  --series-six-color: #C996FA;
+  --series-seven-color: #65D2E4;
+  --series-eight-color: #F38EC0;
+}
+
+:root.azion-light {
+  --series-one-color: #AE510F;
+  --series-two-color: #188A42;
+  --series-three-color: #295BAC;
+  --series-four-color: #A47D06;
+  --series-five-color: #B32B23;
+  --series-six-color: #763CAD;
+  --series-seven-color: #047F94;
+  --series-eight-color: #A5326B;
+}
+
 .c3 svg {
   font: 10px sans-serif;
-  -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+  -webkit-tap-highlight-color: var(--primary-color);
 }
 
 .c3 path,
 .c3 line {
   fill: none;
-  stroke: #000;
+  stroke: var(--surface-border);
 }
 
 .c3 text {
   -webkit-user-select: none;
   -moz-user-select: none;
   user-select: none;
+  fill: var(--text-color-secondary);
 }
 
 .c3-legend-item-tile,
@@ -31,16 +54,16 @@ C3 dependency omits its styling for some reason. Thus it was needed to add this 
 }
 
 .c3-chart-arc path {
-  stroke: #fff;
+  stroke: var(--primary-color-text);
 }
 
 .c3-chart-arc rect {
-  stroke: white;
+  stroke: var(--primary-color-text);
   stroke-width: 1;
 }
 
 .c3-chart-arc text {
-  fill: #fff;
+  fill: var(--primary-color-text);
   font-size: 13px;
 }
 
@@ -80,11 +103,11 @@ C3 dependency omits its styling for some reason. Thus it was needed to add this 
 
 .c3-circle._expanded_ {
   stroke-width: 1px;
-  stroke: white;
+  stroke: var(--primary-color-text);
 }
 
 .c3-selected-circle {
-  fill: white;
+  fill: var(--primary-color-text);
   stroke-width: 2px;
 }
 
@@ -132,13 +155,17 @@ C3 dependency omits its styling for some reason. Thus it was needed to add this 
   font-size: 12px;
 }
 
+.c3-legend-item text {
+  fill: var(--text-color);
+}
+
 .c3-legend-item-hidden {
   opacity: 0.15;
 }
 
 .c3-legend-background {
   opacity: 0.75;
-  fill: white;
+  fill: var(--primary-color-text);
   stroke: lightgray;
   stroke-width: 1;
 }
@@ -153,9 +180,9 @@ C3 dependency omits its styling for some reason. Thus it was needed to add this 
   z-index: 10;
   padding: 16px;
   padding-bottom: 0;
-  background-color: #fff;
+  background-color: var(--surface-card);
   border-radius: 4px;
-  border: 1px solid lightgray;
+  border: 1px solid var(--surface-border);
   box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
   width: max-content;
 }
@@ -174,14 +201,14 @@ C3 dependency omits its styling for some reason. Thus it was needed to add this 
 .c3-tooltip th {
   font-size: 14px;
   text-align: left;
-  color: #000;
+  color: var(--text-color-secondary);
   font-weight: 400;
 }
 
 .c3-tooltip td {
   position: relative;
   font-size: 12px;
-  border-top: 1px solid lightgray;
+  border-top: 1px solid var(--surface-border);
   padding: 10px 0 20px 0;
 }
 .c3-tooltip td.name > span {
@@ -195,12 +222,12 @@ C3 dependency omits its styling for some reason. Thus it was needed to add this 
   background-image: linear-gradient(
     90deg,
     rgba(255, 0, 0, 0) 27.78%,
-    #ffffff 27.78%,
-    #ffffff 50%,
+    var(--surface-border) 27.78%,
+    var(--surface-border) 50%,
     rgba(255, 0, 0, 0) 50%,
     rgba(255, 0, 0, 0) 77.78%,
-    #ffffff 77.78%,
-    #ffffff 100%
+    var(--surface-border) 77.78%,
+    var(--surface-border) 100%
   );
   background-size: 18px 18px;
 }
@@ -234,7 +261,7 @@ C3 dependency omits its styling for some reason. Thus it was needed to add this 
 
 .c3-chart-arcs .c3-chart-arcs-background {
   fill: #e0e0e0;
-  stroke: #fff;
+  stroke: var(--primary-color-text);
 }
 
 .c3-chart-arcs .c3-chart-arcs-gauge-unit {
