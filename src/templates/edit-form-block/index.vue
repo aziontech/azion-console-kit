@@ -33,7 +33,7 @@
     }
   })
 
-  const emit = defineEmits(['on-edit-success'])
+  const emit = defineEmits(['on-edit-success', 'on-edit-fail'])
 
   const router = useRouter()
   const route = useRoute()
@@ -109,6 +109,7 @@
       }
       goBackToList()
     } catch (error) {
+      emit('on-edit-fail')
       blockViewRedirection.value = true
       showToast('error', error)
     }

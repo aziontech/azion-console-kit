@@ -4,7 +4,8 @@
     :loadService="loadEdgeApplication"
     :updatedRedirect="props.updatedRedirect"
     :schema="validationSchema"
-    @on-edit-success="handleTrackEditWithSuccess"
+    @on-edit-success="handleTrackSuccessEdit"
+    @on-edit-fail="handleTrackFailEdit"
     disableRedirect
     :isTabs="true"
   >
@@ -64,9 +65,16 @@
     return props.edgeApplication
   }
 
-  const handleTrackEditWithSuccess = () => {
+  const handleTrackSuccessEdit = () => {
     tracker
       .productEdited({
+        productName: 'Edge Application'
+      })
+      .track()
+  }
+  const handleTrackFailEdit = () => {
+    tracker
+      .failedToEdit({
         productName: 'Edge Application'
       })
       .track()
