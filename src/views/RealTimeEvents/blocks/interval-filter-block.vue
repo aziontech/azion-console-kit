@@ -4,8 +4,7 @@
   import Calendar from 'primevue/calendar'
   import Dropdown from 'primevue/dropdown'
   import { computed, onMounted, ref } from 'vue'
-  // import DATE_TIME_INTERVALS from './constants/date-time-interval'
-  import DATE_TIME_INTERVALS from '@/stores/metrics-store/constants/date-time-interval'
+  import DATE_TIME_INTERVALS from './constants/date-time-interval'
 
   const accountStore = useAccountStore()
 
