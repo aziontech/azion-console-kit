@@ -557,9 +557,8 @@
           />
 
           <div class="text-color-secondary text-sm font-normal">
-            Enable Application Acceleration in the Main Settings tab to use values lower than
-            60 seconds. Tiered Cache requires cache TTL to be equal to or greater than 3
-            seconds.
+            Enable Application Acceleration in the Main Settings tab to use values lower than 60
+            seconds. Tiered Cache requires cache TTL to be equal to or greater than 3 seconds.
           </div>
         </div>
       </div>

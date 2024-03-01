@@ -181,4 +181,12 @@ describe('AnalyticsTrackerAdapter', () => {
 
     expect(analyticsClientSpy.track).toHaveBeenCalledWith('User Failed to Sign Up', {})
   })
+
+  it('should track the failed additional data submit event with the correct parameters', () => {
+    const { sut, analyticsClientSpy } = makeSut()
+
+    sut.failedSubmitAdditionalData().track()
+
+    expect(analyticsClientSpy.track).toHaveBeenCalledWith('Failed to Submit Additional Data', {})
+  })
 })
