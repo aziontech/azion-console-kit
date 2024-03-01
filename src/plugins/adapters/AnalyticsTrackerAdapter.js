@@ -231,6 +231,17 @@ export class AnalyticsTrackerAdapter {
     })
     return this
   }
+  
+  /**
+   * @returns {AnalyticsTrackerAdapter}
+   */
+  userActivatedAccount() {
+    this.#events.push({
+      eventName: 'User Activated Account',
+      props: {}
+    })
+    return this
+  }
 
   /**
    * @returns {AnalyticsTrackerAdapter}
