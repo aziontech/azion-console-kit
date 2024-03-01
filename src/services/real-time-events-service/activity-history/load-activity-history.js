@@ -1,6 +1,7 @@
 import convertGQL from '@/helpers/convert-gql'
 import { AxiosHttpClientSignalDecorator } from '../../axios/AxiosHttpClientSignalDecorator'
 import { convertValueToDate } from '@/helpers/convert-date'
+import { capitalizeFirstLetter } from '@/helpers'
 import { makeRealTimeEventsBaseUrl } from '../make-real-time-events-service'
 
 export const loadActivityHistory = async (filter) => {
@@ -40,7 +41,7 @@ const adaptResponse = (response) => {
 
   return {
     title: activityHistoryEvents.title,
-    type: activityHistoryEvents.type.charAt(0).toUpperCase() + activityHistoryEvents.type.slice(1),
+    type: captalizeFirstLetter(activityHistoryEvents.type),
     ts: convertValueToDate(activityHistoryEvents.ts),
     authorName: activityHistoryEvents.authorName,
     accountId: activityHistoryEvents.accountId,
