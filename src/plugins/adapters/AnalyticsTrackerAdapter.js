@@ -222,6 +222,17 @@ export class AnalyticsTrackerAdapter {
   }
 
   /**
+   * @returns {AnalyticsTrackerAdapter}
+   */
+  clickMoreDetailsOnTemplate() {
+    this.#events.push({
+      eventName: 'Clicked to View More Details on Template',
+      props: {}
+    })
+    return this
+  }
+
+  /**
    * call this method to run each stored tracker event
    */
   async track() {
