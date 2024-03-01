@@ -278,4 +278,22 @@ describe('AnalyticsTrackerAdapter', () => {
       {}
     )
   })
+
+  it('should use the deployed event with correct parameters', () => {
+    const { sut, analyticsClientSpy } = makeSut()
+
+    sut.eventDeployed({})
+
+    sut.track()
+
+    expect(analyticsClientSpy.track).toHaveBeenCalledWith('Deployed', {})
+  })
+
+  it('should track the account activation event with the correct parameters', () => {
+    const { sut, analyticsClientSpy } = makeSut()
+
+    sut.userActivatedAccount().track()
+
+    expect(analyticsClientSpy.track).toHaveBeenCalledWith('User Activated Account', {})
+  })
 })

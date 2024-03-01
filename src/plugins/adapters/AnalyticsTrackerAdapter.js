@@ -246,6 +246,28 @@ export class AnalyticsTrackerAdapter {
   }
 
   /**
+   * @returns {AnalyticsTrackerAdapter}
+   */
+  userActivatedAccount() {
+    this.#events.push({
+      eventName: 'User Activated Account',
+      props: {}
+    })
+    return this
+  }
+
+  /**
+   * @returns {AnalyticsTrackerAdapter}
+   */
+  eventDeployed() {
+    this.#events.push({
+      eventName: 'Deployed',
+      props: {}
+    })
+    return this
+  }
+
+  /**
    * call this method to run each stored tracker event
    */
   async track() {
