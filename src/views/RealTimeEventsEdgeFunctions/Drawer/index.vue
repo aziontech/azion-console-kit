@@ -76,6 +76,7 @@
                   </li>
                 </ul>
               </TextInfo>
+              teste
               <BigNumber
                 class="flex-1"
                 label="Edge Function Time"
