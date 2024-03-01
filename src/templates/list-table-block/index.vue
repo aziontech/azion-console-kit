@@ -174,200 +174,200 @@
 </template>
 
 <script setup>
-import { FilterMatchMode } from 'primevue/api'
-import PrimeButton from 'primevue/button'
-import Column from 'primevue/column'
-import DataTable from 'primevue/datatable'
-import InputText from 'primevue/inputtext'
-import Listbox from 'primevue/listbox'
-import PrimeMenu from 'primevue/menu'
-import OverlayPanel from 'primevue/overlaypanel'
-import Skeleton from 'primevue/skeleton'
-import { useToast } from 'primevue/usetoast'
-import { computed, onMounted, ref, watch } from 'vue'
-import { useRouter } from 'vue-router'
-import DeleteDialog from './dialog/delete-dialog'
+  import { FilterMatchMode } from 'primevue/api'
+  import PrimeButton from 'primevue/button'
+  import Column from 'primevue/column'
+  import DataTable from 'primevue/datatable'
+  import InputText from 'primevue/inputtext'
+  import Listbox from 'primevue/listbox'
+  import PrimeMenu from 'primevue/menu'
+  import OverlayPanel from 'primevue/overlaypanel'
+  import Skeleton from 'primevue/skeleton'
+  import { useToast } from 'primevue/usetoast'
+  import { computed, onMounted, ref, watch } from 'vue'
+  import { useRouter } from 'vue-router'
+  import DeleteDialog from './dialog/delete-dialog'
 
-defineOptions({ name: 'list-table-block' })
-const emit = defineEmits(['on-load-data', 'on-before-go-to-add-page'])
+  defineOptions({ name: 'list-table-block' })
+  const emit = defineEmits(['on-load-data', 'on-before-go-to-add-page'])
 
-const props = defineProps({
-  columns: {
-    type: Array,
-    default: () => [{ field: 'name', header: 'Name' }]
-  },
-  isGraphql: {
-    type: Boolean
-  },
-  pageTitleDelete: {
-    type: String,
-    required: true
-  },
-  createPagePath: {
-    type: String,
-    default: () => '/'
-  },
-  editPagePath: {
-    type: String,
-    default: () => '/'
-  },
-  editInDrawer: {
-    type: Function
-  },
-  addButtonLabel: {
-    type: String,
-    default: () => ''
-  },
-  listService: {
-    required: true,
-    type: Function
-  },
-  deleteService: {
-    type: Function
-  },
-  enableEditClick: {
-    type: Boolean,
-    default: true
-  },
-  reorderableRows: {
-    type: Boolean
-  },
-  rowActions: {
-    type: Array,
-    default: () => []
-  },
-  emptyListMessage: {
-    type: String,
-    default: () => 'No registers found.'
+  const props = defineProps({
+    columns: {
+      type: Array,
+      default: () => [{ field: 'name', header: 'Name' }]
+    },
+    isGraphql: {
+      type: Boolean
+    },
+    pageTitleDelete: {
+      type: String,
+      required: true
+    },
+    createPagePath: {
+      type: String,
+      default: () => '/'
+    },
+    editPagePath: {
+      type: String,
+      default: () => '/'
+    },
+    editInDrawer: {
+      type: Function
+    },
+    addButtonLabel: {
+      type: String,
+      default: () => ''
+    },
+    listService: {
+      required: true,
+      type: Function
+    },
+    deleteService: {
+      type: Function
+    },
+    enableEditClick: {
+      type: Boolean,
+      default: true
+    },
+    reorderableRows: {
+      type: Boolean
+    },
+    rowActions: {
+      type: Array,
+      default: () => []
+    },
+    emptyListMessage: {
+      type: String,
+      default: () => 'No registers found.'
+    }
+  })
+
+  const MINIMUN_OF_ITEMS_PER_PAGE = 10
+
+  const selectedId = ref(null)
+  const filters = ref({
+    global: { value: '', matchMode: FilterMatchMode.CONTAINS }
+  })
+  const isLoading = ref(false)
+  const data = ref([])
+  const selectedColumns = ref([])
+  const informationForDeletion = ref({})
+  const showActions = ref(true)
+
+  onMounted(() => {
+    loadData({ page: 1 })
+    selectedColumns.value = props.columns
+  })
+
+  const filterBy = computed(() => {
+    const filtersPath = props.columns.filter((el) => el.filterPath).map((el) => el.filterPath)
+    const filters = props.columns.map((item) => item.field)
+
+    return [...filters, ...filtersPath]
+  })
+
+  const showPagination = computed(() => {
+    return data.value.length > MINIMUN_OF_ITEMS_PER_PAGE
+  })
+
+  const columnSelectorPanel = ref(null)
+  const toggleColumnSelector = (event) => {
+    columnSelectorPanel.value.toggle(event)
   }
-})
 
-const MINIMUN_OF_ITEMS_PER_PAGE = 10
+  const onRowReorder = (event) => {
+    data.value = event.value
+  }
 
-const selectedId = ref(null)
-const filters = ref({
-  global: { value: '', matchMode: FilterMatchMode.CONTAINS }
-})
-const isLoading = ref(false)
-const data = ref([])
-const selectedColumns = ref([])
-const informationForDeletion = ref({})
-const showActions = ref(true)
+  const actionOptions = (rowData) => {
+    const actionOptions = []
 
-onMounted(() => {
-  loadData({ page: 1 })
-  selectedColumns.value = props.columns
-})
+    if (props.rowActions && props.rowActions.length > 0) {
+      props.rowActions.forEach((action) => {
+        if (action.visibleAction?.(rowData)) return
 
-const filterBy = computed(() => {
-  const filtersPath = props.columns.filter((el) => el.filterPath).map((el) => el.filterPath)
-  const filters = props.columns.map((item) => item.field)
-
-  return [...filters, ...filtersPath]
-})
-
-const showPagination = computed(() => {
-  return data.value.length > MINIMUN_OF_ITEMS_PER_PAGE
-})
-
-const columnSelectorPanel = ref(null)
-const toggleColumnSelector = (event) => {
-  columnSelectorPanel.value.toggle(event)
-}
-
-const onRowReorder = (event) => {
-  data.value = event.value
-}
-
-const actionOptions = (rowData) => {
-  const actionOptions = []
-
-  if (props.rowActions && props.rowActions.length > 0) {
-    props.rowActions.forEach((action) => {
-      if (action.visibleAction?.(rowData)) return
-
-      actionOptions.push({
-        ...action,
-        command: () => action.command(rowData)
+        actionOptions.push({
+          ...action,
+          command: () => action.command(rowData)
+        })
       })
-    })
-  }
-
-  if (props.deleteService) {
-    actionOptions.push({
-      label: 'Delete',
-      icon: 'pi pi-fw pi-trash',
-      severity: 'error',
-      command: () => openDeleteDialog()
-    })
-  }
-
-  showActions.value = actionOptions.length > 0
-
-  return actionOptions
-}
-const toast = useToast()
-
-const loadData = async ({ page }) => {
-  try {
-    isLoading.value = true
-    let response = null
-    if (props.isGraphql) {
-      response = await props.listService()
     }
-    if (!props.isGraphql) {
-      response = await props.listService({ page })
+
+    if (props.deleteService) {
+      actionOptions.push({
+        label: 'Delete',
+        icon: 'pi pi-fw pi-trash',
+        severity: 'error',
+        command: () => openDeleteDialog()
+      })
     }
-    data.value = response
-  } catch (error) {
-    data.value = []
-    toast.add({
-      closable: true,
-      severity: 'error',
-      summary: error
-    })
-  } finally {
-    isLoading.value = false
+
+    showActions.value = actionOptions.length > 0
+
+    return actionOptions
   }
-}
+  const toast = useToast()
 
-const router = useRouter()
-
-const navigateToAddPage = () => {
-  emit('on-before-go-to-add-page')
-  router.push(props.createPagePath)
-}
-
-const menuRef = ref({})
-const toggleActionsMenu = (event, selectedID) => {
-  selectedId.value = selectedID
-  menuRef.value.toggle(event)
-}
-const editItemSelected = ({ data: item }) => {
-  if (props.editInDrawer) {
-    props.editInDrawer(item)
-    return
+  const loadData = async ({ page }) => {
+    try {
+      isLoading.value = true
+      let response = null
+      if (props.isGraphql) {
+        response = await props.listService()
+      }
+      if (!props.isGraphql) {
+        response = await props.listService({ page })
+      }
+      data.value = response
+    } catch (error) {
+      data.value = []
+      toast.add({
+        closable: true,
+        severity: 'error',
+        summary: error
+      })
+    } finally {
+      isLoading.value = false
+    }
   }
-  if (props.enableEditClick) {
-    router.push({ path: `${props.editPagePath}/${item.id}` })
-  }
-}
-const openDeleteDialog = () => {
-  informationForDeletion.value = {
-    title: props.pageTitleDelete,
-    selectedID: selectedId.value,
-    deleteService: props.deleteService,
-    deleteDialogVisible: true,
-    rerender: Math.random()
-  }
-}
 
-const updatedTable = () => {
-  loadData({ page: 1 })
-}
+  const router = useRouter()
 
-watch(data, (currentState) => {
-  const hasData = currentState.length > 0
-  emit('on-load-data', hasData)
-})
+  const navigateToAddPage = () => {
+    emit('on-before-go-to-add-page')
+    router.push(props.createPagePath)
+  }
+
+  const menuRef = ref({})
+  const toggleActionsMenu = (event, selectedID) => {
+    selectedId.value = selectedID
+    menuRef.value.toggle(event)
+  }
+  const editItemSelected = ({ data: item }) => {
+    if (props.editInDrawer) {
+      props.editInDrawer(item)
+      return
+    }
+    if (props.enableEditClick) {
+      router.push({ path: `${props.editPagePath}/${item.id}` })
+    }
+  }
+  const openDeleteDialog = () => {
+    informationForDeletion.value = {
+      title: props.pageTitleDelete,
+      selectedID: selectedId.value,
+      deleteService: props.deleteService,
+      deleteDialogVisible: true,
+      rerender: Math.random()
+    }
+  }
+
+  const updatedTable = () => {
+    loadData({ page: 1 })
+  }
+
+  watch(data, (currentState) => {
+    const hasData = currentState.length > 0
+    emit('on-load-data', hasData)
+  })
 </script>
