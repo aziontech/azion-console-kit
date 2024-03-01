@@ -1,5 +1,6 @@
 import { AxiosHttpClientAdapter, parseHttpResponse } from '../axios/AxiosHttpClientAdapter'
 import { makeDigitalCertificatesBaseUrl } from './make-digital-certificates-base-url'
+import { capitalizeFirstLetter } from '@/helpers'
 export const listDigitalCertificatesService = async ({
   orderBy = 'name',
   sort = 'asc',
@@ -22,14 +23,13 @@ export const TRUSTED_CA_CERTIFICATE = 'Trusted CA Certificate'
 
 const parseStatusData = (status) => {
   const isActive = status.toUpperCase() === 'ACTIVE'
-
   const parsedStatus = isActive
     ? {
         content: 'Active',
         severity: 'success'
       }
     : {
-        content: 'Inactive',
+        content: capitalizeFirstLetter(status),
         severity: 'danger'
       }
 
