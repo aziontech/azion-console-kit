@@ -29,7 +29,7 @@ C3 dependency omits its styling for some reason. Thus it was needed to add this 
 
 .c3 svg {
   font: 10px sans-serif;
-  -webkit-tap-highlight-color: var(--primary-color);
+  -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
 }
 
 .c3 path,
