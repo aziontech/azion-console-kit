@@ -81,8 +81,8 @@
         v-else
         @cancel="handleCancel"
         @instantiate="handleInstantiate"
-        :getTemplateService="getTemplateService"
-        :instantiateTemplateService="instantiateTemplateService"
+        :getTemplateService="props.getTemplateService"
+        :instantiateTemplateService="props.instantiateTemplateService"
         :templateId="solution.referenceId"
       />
       <PrimeDialog
@@ -225,7 +225,8 @@
     </template>
   </ContentBlock>
 </template>
-<script>
+<script setup>
+  import { ref, onMounted, watchEffect, inject } from 'vue'
   import TemplateEngineBlock from '@/templates/template-engine-block'
   import PrimeButton from 'primevue/button'
   import PrimeDialog from 'primevue/dialog'
@@ -235,86 +236,85 @@
   import FormLoading from '@/templates/template-engine-block/FormLoading'
   import PageHeadingBlock from '@/templates/page-heading-block'
   import { useLoadingStore } from '@/stores/loading'
+  import { useRouter, useRoute } from 'vue-router'
+  import { useToast } from 'primevue/usetoast'
+  /**@type {import('@/plugins/adapters/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
+  const tracker = inject('tracker')
 
-  export default {
-    components: {
-      TemplateEngineBlock,
-      ContentBlock,
-      PageHeadingBlock,
-      PrimeButton,
-      PrimeDialog,
-      Sidebar,
-      Skeleton,
-      FormLoading
-    },
-    data: () => ({
-      isLoading: false,
-      showDetails: false,
-      solution: {}
-    }),
-    props: {
-      getTemplateService: {
-        type: Function,
-        required: true
-      },
-      instantiateTemplateService: {
-        type: Function,
-        required: true
-      },
-      loadSolutionService: {
-        type: Function,
-        required: true
-      },
-      windowOpen: {
-        type: Function,
-        required: true
-      }
-    },
 
-    async created() {
-      const store = useLoadingStore()
-      store.startLoading()
-      await this.loadSolutionByVendor()
-      store.finishLoading()
+  const isLoading = ref(false)
+  const showDetails = ref(false)
+  const solution = ref({})
+  const router = useRouter()
+  const route = useRoute()
+  const toast = useToast()
+
+  const store = useLoadingStore()
+
+  const props = defineProps({
+    getTemplateService: {
+      type: Function,
+      required: true
     },
-    methods: {
-      async loadSolutionByVendor() {
-        try {
-          this.isLoading = true
-          this.solution = await this.loadSolutionService({
-            vendor: this.$route.params.vendor,
-            solution: this.$route.params.solution
-          })
-        } catch (error) {
-          this.$toast.add({
-            closable: true,
-            severity: 'error',
-            summary: error
-          })
-        } finally {
-          this.isLoading = false
-        }
-      },
-      handleCancel() {
-        this.$router.push('/')
-      },
-      goToVendorPage() {
-        this.windowOpen(this.solution.vendor.url, '_blank')
-      },
-      openDetails() {
-        this.showDetails = true
-      },
-      handleInstantiate({ result }) {
-        this.$router.push(`/create/deploy/${result.uuid}`)
-      }
+    instantiateTemplateService: {
+      type: Function,
+      required: true
     },
-    watch: {
-      $route() {
-        if (!this.$route.params.vendor || !this.$route.params.solution) {
-          return
-        }
-        this.loadSolutionByVendor()
-      }
+    loadSolutionService: {
+      type: Function,
+      required: true
+    },
+    windowOpen: {
+      type: Function,
+      required: true
+    }
+  })
+
+  const loadSolutionByVendor = async () => {
+    try {
+      isLoading.value = true
+      solution.value = await props.loadSolutionService({
+        vendor: route.params.vendor,
+        solution: route.params.solution
+      })
+    } catch (error) {
+      toast.add({
+        closable: true,
+        severity: 'error',
+        summary: error
+      })
+    } finally {
+      isLoading.value = false
     }
   }
+
+  const handleCancel = () => {
+    router.push('/')
+  }
+
+  const goToVendorPage = () => {
+    props.windowOpen(solution.value.vendor.url, '_blank')
+  }
+
+  const openDetails = () => {
+    tracker.clickMoreDetailsOnTemplate().track()
+    showDetails.value = true
+  }
+
+  const handleInstantiate = ({ result }) => {
+    router.push(`/create/deploy/${result.uuid}`)
+  }
+
+  onMounted(async () => {
+    store.startLoading()
+    await loadSolutionByVendor()
+    store.finishLoading()
+  })
+
+  watchEffect(() => {
+    if (!route.params.vendor || !route.params.solution) {
+      return
+    }
+    loadSolutionByVendor()
+  })
 </script>
