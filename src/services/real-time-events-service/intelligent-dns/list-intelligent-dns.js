@@ -1,6 +1,7 @@
 import convertGQL from '@/helpers/convert-gql'
 import { AxiosHttpClientSignalDecorator } from '../../axios/AxiosHttpClientSignalDecorator'
 import { makeRealTimeEventsBaseUrl } from '../make-real-time-events-service'
+import { generateCurrentTimestamp } from '@/helpers/generate-timestamp'
 
 export const listIntelligentDNS = async (filter) => {
   const payload = adapt(filter)
@@ -65,6 +66,7 @@ const adaptResponse = (response) => {
   const { body } = response
 
   return body.data.idnsQueriesEvents?.map((idnsQueriesEvents) => ({
+    id: generateCurrentTimestamp(),
     level: getLevelDNS(idnsQueriesEvents.level),
     qtype: idnsQueriesEvents.qtype,
     resolutionType: idnsQueriesEvents.resolutionType,

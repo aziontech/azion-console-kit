@@ -1,6 +1,7 @@
 import convertGQL from '@/helpers/convert-gql'
 import { AxiosHttpClientSignalDecorator } from '../../axios/AxiosHttpClientSignalDecorator'
 import { makeRealTimeEventsBaseUrl } from '../make-real-time-events-service'
+import { generateCurrentTimestamp } from '@/helpers/generate-timestamp'
 
 export const listEdgeFunctions = async (filter) => {
   const payload = adapt(filter)
@@ -39,6 +40,7 @@ const adaptResponse = (response) => {
   const { body } = response
 
   return body.data.edgeFunctionsEvents?.map((edgeFunctionsEvents) => ({
+    id: generateCurrentTimestamp(),
     configurationId: edgeFunctionsEvents.configurationId,
     edgeFunctionsInstanceIdList: edgeFunctionsEvents.edgeFunctionsInstanceIdList,
     edgeFunctionsInitiatorTypeList: edgeFunctionsEvents.edgeFunctionsInitiatorTypeList,

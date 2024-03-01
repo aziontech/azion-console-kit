@@ -79,6 +79,7 @@
         field: 'endpointType',
         header: 'Endpoint Type',
         type: 'component',
+        filterPath: 'endpointType.content',
         component: (columnData) =>
           columnBuilder({
             data: columnData,
@@ -89,6 +90,7 @@
         field: 'jobName',
         header: 'Job Name',
         type: 'component',
+        filterPath: 'jobName.content',
         component: (columnData) =>
           columnBuilder({
             data: columnData,
