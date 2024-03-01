@@ -140,7 +140,7 @@ describe('AnalyticsTrackerAdapter', () => {
     expect(analyticsClientSpy.track).toHaveBeenCalledWith('User Failed to Sign In', {})
   })
 
-  it('should that the correct tracker is being used by verifying that the URL and location parameters are passed correctly.', () => {
+  it('should use the create event with correct parameters', () => {
     const { sut, analyticsClientSpy } = makeSut()
     const mockUrl = 'test-url-ABC/q-2/t'
     const mockLocation = 'home'
