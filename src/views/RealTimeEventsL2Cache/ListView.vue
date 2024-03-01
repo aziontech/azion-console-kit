@@ -81,6 +81,7 @@
         field: 'cacheKey',
         header: 'Cache Key',
         type: 'component',
+        filterPath: 'cacheKey.content',
         component: (columnData) => {
           return columnBuilder({
             data: columnData,
