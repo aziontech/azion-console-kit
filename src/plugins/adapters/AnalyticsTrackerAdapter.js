@@ -145,6 +145,17 @@ export class AnalyticsTrackerAdapter {
   /**
    * @returns {AnalyticsTrackerAdapter}
    */
+  userFailedSignUp() {
+    this.#events.push({
+      eventName: 'User Failed to Sign Up',
+      props: {}
+    })
+    return this
+  }
+
+  /**
+   * @returns {AnalyticsTrackerAdapter}
+   */
   failedSubmitAdditionalData() {
     this.#events.push({
       eventName: 'Failed to Submit Additional Data',
