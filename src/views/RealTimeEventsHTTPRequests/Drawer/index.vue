@@ -32,47 +32,46 @@
   )
 
   const hostTag = computed(() => {
+    const tagHost = []
     if (details.value.scheme) {
-      return [
-        {
-          text: `Scheme: ${details.value.scheme}`
-        }
-      ]
+      tagHost.push({
+        text: `Scheme: ${details.value.scheme}`
+      })
     }
-    return []
+
+    return tagHost
   })
 
   const secureTag = computed(() => {
-    if (details.value.wafScore !== undefined) {
-      return [
-        {
-          text: `WAF Score: ${details.value.wafScore}`
-        }
-      ]
+    const tagSecure = []
+    if (details.value.wafScore) {
+      tagSecure.push({
+        text: `WAF Score: ${details.value.wafScore}`
+      })
     }
-    return []
+    return tagSecure
   })
 
   const upstreamTag = computed(() => {
+    const tagUpstream = []
     if (details.value.upstreamCacheStatus) {
-      return [
-        {
-          text: `Upstream Cache Status: ${details.value.upstreamCacheStatus}`
-        }
-      ]
+      tagUpstream.push({
+        text: `Upstream Cache Status: ${details.value.upstreamCacheStatus}`
+      })
     }
-    return []
+
+    return tagUpstream
   })
 
   const serverProtocolTag = computed(() => {
+    const tagProtocol = []
     if (details.value.serverProtocol) {
-      return [
-        {
-          text: `Server Protocol: ${details.value.serverProtocol}`
-        }
-      ]
+      tagProtocol.push({
+        text: `Server Protocol: ${details.value.serverProtocol}`
+      })
     }
-    return []
+
+    return tagProtocol
   })
 
   defineExpose({
