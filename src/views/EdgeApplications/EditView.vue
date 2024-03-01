@@ -4,6 +4,7 @@
     :loadService="loadEdgeApplication"
     :updatedRedirect="props.updatedRedirect"
     :schema="validationSchema"
+    @on-edit-success="handleTrackEditWithSuccess"
     disableRedirect
     :isTabs="true"
   >
@@ -29,9 +30,13 @@
   import ActionBarBlockWithTeleport from '@templates/action-bar-block/action-bar-with-teleport'
   import * as yup from 'yup'
   import FormFieldsCreateEdgeApplications from './FormFields/FormFieldsCreateEdgeApplications'
+  import { inject } from 'vue'
 
   defineOptions({ name: 'edit-edge-application' })
   const emit = defineEmits(['updatedApplication'])
+
+  /**@type {import('@/plugins/adapters/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
+  const tracker = inject('tracker')
 
   const props = defineProps({
     editEdgeApplicationService: {
@@ -57,6 +62,14 @@
 
   const loadEdgeApplication = async () => {
     return props.edgeApplication
+  }
+
+  const handleTrackEditWithSuccess = () => {
+    tracker
+      .productEdited({
+        productName: 'Edge Application'
+      })
+      .track()
   }
 
   const formSubmit = async (onSubmit, values) => {
