@@ -117,6 +117,22 @@ export class AnalyticsTrackerAdapter {
     return this
   }
 
+  /*
+   * @param {string} payload.url
+   * @param {string} payload.location
+   * @returns {AnalyticsTrackerAdapter}
+   */
+  createEventInHomeAndHeader(payload) {
+    this.#events.push({
+      eventName: 'Clicked to Create',
+      props: {
+        url: payload.url,
+        location: payload.location
+      }
+    })
+    return this
+  }
+
   /**
    * @returns {AnalyticsTrackerAdapter}
    */
