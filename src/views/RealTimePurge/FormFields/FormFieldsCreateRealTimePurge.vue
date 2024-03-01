@@ -57,9 +57,9 @@
                     :disabled="true"
                     v-model="layer"
                   />
-                  <span class="text-base">Edge Caching</span>
+                  <span class="text-base">Edge Cache</span>
                 </template>
-                <template #subtitle>Purge content from Azion's edge network.</template>
+                <template #subtitle>Purge content from Azion's edge cache layer.</template>
               </Card>
             </div>
           </div>
@@ -84,10 +84,10 @@
                     value="l2_caching"
                     v-model="layer"
                   />
-                  <span class="text-base">L2 Caching</span>
+                  <span class="text-base">Tiered Cache</span>
                 </template>
                 <template #subtitle>
-                  Purge content from Azion's second cache layer. Requires subscribing to this
+                  Purge content from Azion's tiered cache layer. Requires subscribing to this
                   module.</template
                 >
               </Card>

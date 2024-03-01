@@ -71,10 +71,6 @@
         header: 'Bytes Sent'
       },
       {
-        field: 'configurationId',
-        header: 'Configuration ID'
-      },
-      {
         field: 'debugLog',
         header: 'Debug log'
       },

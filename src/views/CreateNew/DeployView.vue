@@ -55,7 +55,7 @@
                       v-if="isSuccessfullyFinished"
                       severity="secondary"
                       @click="goToEdgeApplicationEditView"
-                      label="Manage"
+                      label="Manage Edge Application"
                     />
                     <div class="md:ml-auto flex">
                       <PrimeButton
