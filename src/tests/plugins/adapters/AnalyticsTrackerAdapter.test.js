@@ -205,4 +205,22 @@ describe('AnalyticsTrackerAdapter', () => {
 
     expect(analyticsClientSpy.track).toHaveBeenCalledWith('Failed to Submit Additional Data', {})
   })
+
+  it('should use the select create event with correct parameters', () => {
+    const { sut, analyticsClientSpy } = makeSut()
+    const selectionMock = 'cardTitle'
+    const sectionMock = 'recommended'
+    
+    sut.selectedOnCreate({
+      selection: selectionMock,
+      section: sectionMock
+    })
+
+    sut.track()
+
+    expect(analyticsClientSpy.track).toHaveBeenCalledWith('Selected on Create', {
+      selection: selectionMock,
+      section: sectionMock
+    })
+  })
 })
