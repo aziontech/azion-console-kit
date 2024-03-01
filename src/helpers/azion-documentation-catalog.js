@@ -35,7 +35,18 @@ export const documentationCatalog = {
 export const documentationGuideProducts = {
   edgeApplication: () => openDocumentationProducts('guides/build/build-an-application/'),
   realTimeMetrics: () => openDocumentationProducts('guides/use-real-time-metrics/'),
-  realTimeEvents: () => openDocumentationProducts('real-time-events/'),
+  realTimeEventsHttpRequest: () => openDocumentationProducts('real-time-events/#http-requests'),
+  realTimeEventsEdgeFunctions: () => openDocumentationProducts('real-time-events/#edge-functions'),
+  realTimeEventsEdgeFunctionsConsole: () =>
+    openDocumentationProducts('real-time-events/#edge-functions-console'),
+  realTimeEventsImageProcessor: () =>
+    openDocumentationProducts('real-time-events/#image-processor'),
+  realTimeEventsL2Cache: () => openDocumentationProducts('real-time-events/#tiered-cache'),
+  realTimeEventsIntelligentDNS: () =>
+    openDocumentationProducts('real-time-events/#intelligent-dns'),
+  realTimeEventsDataStreaming: () => openDocumentationProducts('real-time-events/#data-streaming'),
+  realTimeEventsActivityHistory: () =>
+    openDocumentationProducts('real-time-events/#activity-history'),
   edgeServicesResources: () =>
     openDocumentationProducts('edge-orchestrator/edge-services/#resources')
 }

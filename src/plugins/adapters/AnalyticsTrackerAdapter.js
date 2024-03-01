@@ -70,6 +70,19 @@ export class AnalyticsTrackerAdapter {
   }
 
   /**
+   * @param {Object} payload
+   * @param {AzionProductsNames} payload.productName
+   * @returns {AnalyticsTrackerAdapter}
+   */
+  clickToEdit(payload) {
+    this.#events.push({
+      eventName: `Clicked to Edit ${payload.productName}`,
+      props: {}
+    })
+    return this
+  }
+
+  /**
    * @returns {AnalyticsTrackerAdapter}
    */
   userSigned() {
@@ -106,6 +119,32 @@ export class AnalyticsTrackerAdapter {
 
   /**
    * @param {Object} payload
+   * @param {AzionProductsNames} payload.productName
+   * @returns {AnalyticsTrackerAdapter}
+   */
+  productEdited(payload) {
+    this.#events.push({
+      eventName: `Edited ${payload.productName}`,
+      props: {}
+    })
+    return this
+  }
+
+  /**
+   * @param {Object} payload
+   * @param {AzionProductsNames} payload.productName
+   * @returns {AnalyticsTrackerAdapter}
+   */
+  failedToCreate(payload) {
+    this.#events.push({
+      eventName: `Failed to Create ${payload.productName}`,
+      props: {}
+    })
+    return this
+  }
+
+  /**
+   * @param {Object} payload
    * @param {string} payload.url
    * @param {string} payload.location
    * @returns {AnalyticsTrackerAdapter}
@@ -120,6 +159,7 @@ export class AnalyticsTrackerAdapter {
     })
     return this
   }
+
   /**
    * @returns {AnalyticsTrackerAdapter}
    */
@@ -160,6 +200,23 @@ export class AnalyticsTrackerAdapter {
     this.#events.push({
       eventName: 'Failed to Submit Additional Data',
       props: {}
+    })
+    return this
+  }
+
+  /**
+   * @param {Object} payload
+   * @param {string} payload.section
+   * @param {string} payload.selection
+   * @returns {AnalyticsTrackerAdapter}
+   */
+  selectedOnCreate(payload) {
+    this.#events.push({
+      eventName: 'Selected on Create',
+      props: {
+        section: payload.section,
+        selection: payload.selection
+      }
     })
     return this
   }

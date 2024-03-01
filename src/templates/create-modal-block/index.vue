@@ -2,9 +2,11 @@
   import PrimeButton from 'primevue/button'
   import * as MarketplaceService from '@/services/marketplace-services'
   import LoadingListTemplate from './LoadingListTemplate'
-  import { computed, onBeforeMount, ref } from 'vue'
+  import { computed, onBeforeMount, ref, inject } from 'vue'
   import { useRouter } from 'vue-router'
   import { useToast } from 'primevue/usetoast'
+  /**@type {import('@/plugins/adapters/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
+  const tracker = inject('tracker')
   defineOptions({
     name: 'create-modal-block'
   })
@@ -116,7 +118,11 @@
     })
   }
 
-  const redirectToSolution = (template) => {
+  const redirectToSolution = (template, section) => {
+    tracker.selectedOnCreate({
+      section,
+      selection: template.name
+    })
     const params = {
       vendor: template.vendor.slug,
       solution: template.slug
@@ -125,7 +131,11 @@
     emit('closeModal')
   }
 
-  const redirect = (toLink) => {
+  const redirect = (toLink, selection) => {
+    tracker.selectedOnCreate({
+      section: 'resources',
+      selection
+    })
     router.push(toLink)
     emit('closeModal')
   }
@@ -210,7 +220,7 @@
         <PrimeButton
           v-for="template in templates"
           :key="template.id"
-          @click="redirectToSolution(template)"
+          @click="redirectToSolution(template, 'recommended')"
           class="p-6 text-left border-solid border surface-border hover:border-primary transition-all"
           link
         >
@@ -246,7 +256,7 @@
         <PrimeButton
           v-for="template in browseTemplates"
           :key="template.id"
-          @click="redirectToSolution(template)"
+          @click="redirectToSolution(template, 'templates')"
           class="p-6 text-left border-solid border surface-border hover:border-primary transition-all"
           link
         >
@@ -282,7 +292,7 @@
         <PrimeButton
           v-for="resource in resources"
           :key="resource.to"
-          @click="redirect(resource.to)"
+          @click="redirect(resource.to, resource.label)"
           class="p-6 text-left border-solid border surface-border hover:border-primary transition-all"
           link
         >

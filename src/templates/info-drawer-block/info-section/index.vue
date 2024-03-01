@@ -45,8 +45,8 @@
         v-if="props.date"
         class="justify-start items-center gap-1 inline-flex"
       >
-        <i class="pi pi-calendar text-color"></i>
-        <span class="text-color-secondary">{{ props.date }}</span>
+        <i class="pi pi-calendar text-color text-sm"></i>
+        <span class="text-color-secondary text-sm">{{ props.date }}</span>
       </div>
     </div>
 

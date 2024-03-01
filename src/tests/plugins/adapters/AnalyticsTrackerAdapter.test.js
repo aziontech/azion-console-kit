@@ -107,6 +107,19 @@ describe('AnalyticsTrackerAdapter', () => {
     )
   })
 
+  it('should be able to track click to edit event with correct params', () => {
+    const { sut, analyticsClientSpy } = makeSut()
+    const productNameMock = 'Azion Product Name'
+
+    sut.clickToEdit({
+      productName: productNameMock
+    })
+
+    sut.track()
+
+    expect(analyticsClientSpy.track).toHaveBeenCalledWith('Clicked to Edit Azion Product Name', {})
+  })
+
   it('should be able to track a product created successfully', () => {
     const { sut, analyticsClientSpy } = makeSut()
     const productNameMock = 'Azion Product Name Mock'
@@ -118,6 +131,35 @@ describe('AnalyticsTrackerAdapter', () => {
       .track()
 
     expect(analyticsClientSpy.track).toHaveBeenCalledWith('Created Azion Product Name Mock', {})
+  })
+
+  it('should be able to track a product edited successfully', () => {
+    const { sut, analyticsClientSpy } = makeSut()
+    const productNameMock = 'Azion Product Name Mock'
+
+    sut
+      .productEdited({
+        productName: productNameMock
+      })
+      .track()
+
+    expect(analyticsClientSpy.track).toHaveBeenCalledWith('Edited Azion Product Name Mock', {})
+  })
+
+  it('should be able to track a failed event related to a product creation', () => {
+    const { sut, analyticsClientSpy } = makeSut()
+    const productNameMock = 'Azion Product Name Mock'
+
+    sut
+      .failedToCreate({
+        productName: productNameMock
+      })
+      .track()
+
+    expect(analyticsClientSpy.track).toHaveBeenCalledWith(
+      'Failed to Create Azion Product Name Mock',
+      {}
+    )
   })
 
   it('should call userSigned when valid identification is provided', () => {
@@ -188,6 +230,24 @@ describe('AnalyticsTrackerAdapter', () => {
     sut.failedSubmitAdditionalData().track()
 
     expect(analyticsClientSpy.track).toHaveBeenCalledWith('Failed to Submit Additional Data', {})
+  })
+
+  it('should use the select create event with correct parameters', () => {
+    const { sut, analyticsClientSpy } = makeSut()
+    const selectionMock = 'cardTitle'
+    const sectionMock = 'recommended'
+
+    sut.selectedOnCreate({
+      selection: selectionMock,
+      section: sectionMock
+    })
+
+    sut.track()
+
+    expect(analyticsClientSpy.track).toHaveBeenCalledWith('Selected on Create', {
+      selection: selectionMock,
+      section: sectionMock
+    })
   })
 
   it('should track the account activation event with the correct parameters', () => {
