@@ -224,6 +224,17 @@ export class AnalyticsTrackerAdapter {
   /**
    * @returns {AnalyticsTrackerAdapter}
    */
+  clickMoreDetailsOnTemplate() {
+    this.#events.push({
+      eventName: 'Clicked to View More Details on Template',
+      props: {}
+    })
+    return this
+  }
+  
+  /**
+   * @returns {AnalyticsTrackerAdapter}
+   */
   userActivatedAccount() {
     this.#events.push({
       eventName: 'User Activated Account',

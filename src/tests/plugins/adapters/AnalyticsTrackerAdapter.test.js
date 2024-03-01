@@ -250,6 +250,19 @@ describe('AnalyticsTrackerAdapter', () => {
     })
   })
 
+  it('should use the View More Details on Template event with correct parameters', () => {
+    const { sut, analyticsClientSpy } = makeSut()
+
+    sut.clickMoreDetailsOnTemplate({})
+
+    sut.track()
+
+    expect(analyticsClientSpy.track).toHaveBeenCalledWith(
+      'Clicked to View More Details on Template',
+      {}
+    )
+  })
+
   it('should track the account activation event with the correct parameters', () => {
     const { sut, analyticsClientSpy } = makeSut()
 
