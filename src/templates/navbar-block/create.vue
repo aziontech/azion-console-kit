@@ -66,19 +66,24 @@
 <script setup>
   import { computed, inject } from 'vue'
   import { useCreateModalStore } from '@/stores/create-modal'
+  import { useRoute } from 'vue-router'
 
   import PrimeButton from 'primevue/button'
   import PrimeDialog from 'primevue/dialog'
   import Sidebar from 'primevue/sidebar'
   import CreateModalBlock from '@/templates/create-modal-block'
+  /**@type {import('@/plugins/adapters/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
+  const tracker = inject('tracker')
 
   defineOptions({ name: 'navbar-create-block' })
 
+  const route = useRoute()
   const createModalStore = useCreateModalStore()
   const currentWidth = inject('currentWidth')
   const SCREEN_BREAKPOINT_MD = 768
 
   const openCreateModalToggle = () => {
+    tracker.createEventInHomeAndHeader({ url: route.path, location: 'header' }).track()
     createModalStore.toggle()
   }
 

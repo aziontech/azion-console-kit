@@ -140,6 +140,40 @@ describe('AnalyticsTrackerAdapter', () => {
     expect(analyticsClientSpy.track).toHaveBeenCalledWith('User Failed to Sign In', {})
   })
 
+  it('should use the create event with correct parameters', () => {
+    const { sut, analyticsClientSpy } = makeSut()
+    const mockUrl = 'test-url-ABC/q-2/t'
+    const mockLocation = 'home'
+
+    sut.createEventInHomeAndHeader({
+      url: mockUrl,
+      location: mockLocation
+    })
+
+    sut.track()
+
+    expect(analyticsClientSpy.track).toHaveBeenCalledWith('Clicked to Create', {
+      url: mockUrl,
+      location: mockLocation
+    })
+  })
+
+  it('should track the user sign-up event with the correct parameters', () => {
+    const { sut, analyticsClientSpy } = makeSut()
+
+    sut.userSignedUp().track()
+
+    expect(analyticsClientSpy.track).toHaveBeenCalledWith('User Signed Up', {})
+  })
+
+  it('should track the additional data submit event with the correct parameters', () => {
+    const { sut, analyticsClientSpy } = makeSut()
+
+    sut.submittedAdditionalData().track()
+
+    expect(analyticsClientSpy.track).toHaveBeenCalledWith('Submitted Additional Data', {})
+  })
+
   it('should track the user failed to sign-up event with the correct parameters', () => {
     const { sut, analyticsClientSpy } = makeSut()
 

@@ -33,7 +33,7 @@ const DASHBOARDS_TEXTS = {
       },
       total_bandwidth_usage: {
         description:
-          'Percentage of bandwidth used while the edge delivers your content. Displays the total amount of bandwidth used.'
+          'Average of bandwidth used while the edge delivers your content. Displays the total amount of bandwidth used.'
       },
       bandwidth_offloaded: {
         description:
@@ -41,11 +41,11 @@ const DASHBOARDS_TEXTS = {
       },
       saved_bandwidth: {
         description:
-          'Percentage of bandwidth delivered by the edge without searching for the content on the origin server. Displays the average of bandwidth saved.'
+          'Average of bandwidth delivered by the edge without searching for the content on the origin server. Displays the average of bandwidth saved.'
       },
       missed_bandwidth: {
         description:
-          'Percentage of bandwidth used by the origin server to search for content. Displays the average of bandwidth used.'
+          'Average of bandwidth used by the origin server to search for content. Displays the average of bandwidth used.'
       }
     },
     requests: {

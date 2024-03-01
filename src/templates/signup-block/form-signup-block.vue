@@ -181,6 +181,7 @@
     try {
       const captcha = await recaptcha.execute('signup')
       await props.signupService({ ...values, captcha })
+
       router.push({ name: 'activation', query: { email: encodeEmail(values.email) } })
     } catch (err) {
       tracker.userFailedSignUp().track()
