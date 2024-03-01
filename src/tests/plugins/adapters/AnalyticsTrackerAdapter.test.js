@@ -239,12 +239,14 @@ describe('AnalyticsTrackerAdapter', () => {
 
   it('should use the View More Details on Template event with correct parameters', () => {
     const { sut, analyticsClientSpy } = makeSut()
-    
+
     sut.clickMoreDetailsOnTemplate({})
 
     sut.track()
 
-    expect(analyticsClientSpy.track).toHaveBeenCalledWith('Clicked to View More Details on Template', {})
+    expect(analyticsClientSpy.track).toHaveBeenCalledWith(
+      'Clicked to View More Details on Template',
+      {}
+    )
   })
-
 })

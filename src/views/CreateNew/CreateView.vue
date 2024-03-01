@@ -241,7 +241,6 @@
   /**@type {import('@/plugins/adapters/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
 
-
   const isLoading = ref(false)
   const showDetails = ref(false)
   const solution = ref({})

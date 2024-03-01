@@ -214,7 +214,7 @@ export class AnalyticsTrackerAdapter {
   clickMoreDetailsOnTemplate() {
     this.#events.push({
       eventName: 'Clicked to View More Details on Template',
-      props: { }
+      props: {}
     })
     return this
   }
