@@ -6,6 +6,7 @@
     <template #content>
       <CreateFormBlock
         @on-response="handleTrackCreation"
+        @on-response-fail="handleTrackFailedCreation"
         :createService="props.createEdgeApplicationService"
         :schema="validationSchema"
         :initialValues="initialValues"
@@ -83,6 +84,12 @@
 
   const handleTrackCreation = () => {
     tracker.productCreated({
+      productName: 'Edge Application'
+    })
+  }
+
+  const handleTrackFailedCreation = () => {
+    tracker.failedToCreate({
       productName: 'Edge Application'
     })
   }
