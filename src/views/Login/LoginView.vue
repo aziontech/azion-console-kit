@@ -25,6 +25,9 @@
   /**@type {import('@/plugins/adapters/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
 
+  const route = useRoute()
+  const router = useRouter()
+
   const props = defineProps({
     authenticationLoginService: {
       required: true,
@@ -55,13 +58,11 @@
   const showForgotPasswordStep = ref(false)
 
   onMounted(() => {
-    const route = useRoute()
-    const router = useRouter()
     const { email, activated } = route.query
     const isActivatedEmail = !!email && !activated
 
     if (isActivatedEmail) {
-      tracker.userActivatedAccount().track()
+      tracker.userActivatedAccount()
 
       const newQuery = { ...route.query, activated: 'true' }
       router.replace({ query: newQuery })
