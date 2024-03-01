@@ -268,7 +268,7 @@
       navigateToEdgeApplications() {
         this.$router.push({ name: 'list-edge-applications' })
       },
-      
+
       navigateToPayment() {
         const billingUrl = getStaticUrlsByEnvironment('billing')
         window.open(billingUrl, '_blank')
@@ -323,7 +323,7 @@
 
       const createModalStore = useCreateModalStore()
 
-      const openModalCreate = ()  => {
+      const openModalCreate = () => {
         tracker.createEventInHomeAndHeader({ url: '/', location: 'home' }).track()
         createModalStore.toggle()
       }

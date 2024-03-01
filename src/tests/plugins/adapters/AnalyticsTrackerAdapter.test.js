@@ -210,7 +210,7 @@ describe('AnalyticsTrackerAdapter', () => {
     const { sut, analyticsClientSpy } = makeSut()
     const selectionMock = 'cardTitle'
     const sectionMock = 'recommended'
-    
+
     sut.selectedOnCreate({
       selection: selectionMock,
       section: sectionMock

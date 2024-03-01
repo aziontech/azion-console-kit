@@ -1,12 +1,12 @@
 <script setup>
-import PrimeButton from 'primevue/button'
-import * as MarketplaceService from '@/services/marketplace-services'
-import LoadingListTemplate from './LoadingListTemplate'
-import { computed, onBeforeMount, ref, inject} from 'vue'
-import { useRouter } from 'vue-router'
-import { useToast } from 'primevue/usetoast'
-/**@type {import('@/plugins/adapters/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
-const tracker = inject('tracker')
+  import PrimeButton from 'primevue/button'
+  import * as MarketplaceService from '@/services/marketplace-services'
+  import LoadingListTemplate from './LoadingListTemplate'
+  import { computed, onBeforeMount, ref, inject } from 'vue'
+  import { useRouter } from 'vue-router'
+  import { useToast } from 'primevue/usetoast'
+  /**@type {import('@/plugins/adapters/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
+  const tracker = inject('tracker')
   defineOptions({
     name: 'create-modal-block'
   })

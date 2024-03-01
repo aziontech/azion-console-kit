@@ -117,7 +117,7 @@ export class AnalyticsTrackerAdapter {
     return this
   }
 
-  /** 
+  /**
    * @param {Object} payload
    * @param {string} payload.url
    * @param {string} payload.location
@@ -178,7 +178,7 @@ export class AnalyticsTrackerAdapter {
     return this
   }
 
-  /** 
+  /**
    * @param {Object} payload
    * @param {string} payload.section
    * @param {string} payload.selection
