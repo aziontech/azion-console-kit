@@ -143,6 +143,17 @@ export class AnalyticsTrackerAdapter {
   }
 
   /**
+   * @returns {AnalyticsTrackerAdapter}
+   */
+  failedSubmitAdditionalData() {
+    this.#events.push({
+      eventName: 'Failed to Submit Additional Data',
+      props: {}
+    })
+    return this
+  }
+
+  /**
    * call this method to run each stored tracker event
    */
   async track() {

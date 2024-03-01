@@ -243,13 +243,14 @@
         delete form.companySize
         delete form.country
       }
-
+      
       await props.putAdditionalDataService(form)
       tracker.userSignedUp().submittedAdditionalData()
 
       router.push({ name: 'home' })
     } catch (err) {
       toast.add({ life: 5000, severity: 'error', detail: err, summary: 'Error' })
+      tracker.failedSubmitAdditionalData().track()
     } finally {
       loading.value = false
     }
