@@ -132,9 +132,6 @@
           :class="{ 'p-invalid': accountNameError }"
           placeholder="Company"
         />
-        <small class="text-color-secondary text-xs font-normal leading-tight">
-          Name of the account.
-        </small>
         <small
           v-if="accountNameError"
           class="p-error text-xs font-normal leading-tight"
