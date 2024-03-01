@@ -110,7 +110,7 @@ export class AnalyticsTrackerAdapter {
    * @param {string} payload.location
    * @returns {AnalyticsTrackerAdapter}
    */
-  clickedToCreate(payload) {
+  createEventInHomeAndHeader(payload) {
     this.#events.push({
       eventName: 'Clicked to Create',
       props: {

@@ -270,7 +270,7 @@
         this.$router.push({ name: 'list-edge-applications' })
       },
       openModalCreate() {
-        tracker.clickedToCreate({ url: '/', location: 'home' }).track()
+        tracker.createEventInHomeAndHeader({ url: '/', location: 'home' }).track()
         this.createModalStore.toggle()
       },
       navigateToPayment() {
