@@ -44,6 +44,13 @@ const levelMap = {
   }
 }
 
+const getLevelDNS = (level) => {
+  let words = level.trim().split(/\s+/)
+  let firstWord = words[0]
+
+  return levelMap[firstWord.toUpperCase()]
+}
+
 const adapt = (filter) => {
   const table = {
     dataset: 'idnsQueriesEvents',
@@ -58,7 +65,7 @@ const adaptResponse = (response) => {
   const { body } = response
 
   return body.data.idnsQueriesEvents?.map((idnsQueriesEvents) => ({
-    level: levelMap[idnsQueriesEvents.level],
+    level: getLevelDNS(idnsQueriesEvents.level),
     qtype: idnsQueriesEvents.qtype,
     resolutionType: idnsQueriesEvents.resolutionType,
     source: idnsQueriesEvents.source,

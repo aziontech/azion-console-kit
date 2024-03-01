@@ -33,7 +33,7 @@ const DASHBOARDS_TEXTS = {
       },
       total_bandwidth_usage: {
         description:
-          'Quantity of bandwidth used while the edge delivers your content. Displays the total amount of bandwidth used.'
+          'Percentage of bandwidth used while the edge delivers your content. Displays the total amount of bandwidth used.'
       },
       bandwidth_offloaded: {
         description:
@@ -41,11 +41,11 @@ const DASHBOARDS_TEXTS = {
       },
       saved_bandwidth: {
         description:
-          'Quantity of bandwidth delivered by the edge without searching for the content on the origin server. Displays the average of bandwidth saved.'
+          'Percentage of bandwidth delivered by the edge without searching for the content on the origin server. Displays the average of bandwidth saved.'
       },
       missed_bandwidth: {
         description:
-          'Quantity of bandwidth used by the origin server to search for content. Displays the average of bandwidth used.'
+          'Percentage of bandwidth used by the origin server to search for content. Displays the average of bandwidth used.'
       }
     },
     requests: {
@@ -67,7 +67,7 @@ const DASHBOARDS_TEXTS = {
       },
       total_requests_per_second: {
         description:
-          'Quantity of requests per second made from customers to your domain. Displays the average number of requests per second.'
+          'Average of requests per second made from customers to your domain. Displays the average number of requests per second.'
       },
       requests_per_second_offloaded: {
         description:
@@ -75,11 +75,11 @@ const DASHBOARDS_TEXTS = {
       },
       saved_requests_per_second: {
         description:
-          'Quantity of requests per second delivered by the edge without searching for the content on the origin server. Displays the average number of saved requests delivered.'
+          'Average of requests per second delivered by the edge without searching for the content on the origin server. Displays the average number of saved requests delivered.'
       },
       missed_requests_per_second: {
         description:
-          'Amount of requests per second delivered by the edge after searching for the content on the origin server. Displays the average number of missed requests per second.'
+          'Average of requests per second delivered by the edge after searching for the content on the origin server. Displays the average number of missed requests per second.'
       }
     },
     status_codes: {
@@ -158,7 +158,7 @@ const DASHBOARDS_TEXTS = {
       },
       total_requests_per_second: {
         description:
-          'Amount of requests per second made to your content images being processed. Displays the average number of requests per second.'
+          'Requests per second made to your content images being processed. Displays the average number of requests per second.'
       }
     }
   },

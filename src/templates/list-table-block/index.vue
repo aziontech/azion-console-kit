@@ -189,7 +189,7 @@
   import DeleteDialog from './dialog/delete-dialog'
 
   defineOptions({ name: 'list-table-block' })
-  const emit = defineEmits(['on-load-data'])
+  const emit = defineEmits(['on-load-data', 'on-before-go-to-add-page'])
 
   const props = defineProps({
     columns: {
@@ -334,6 +334,7 @@
   const router = useRouter()
 
   const navigateToAddPage = () => {
+    emit('on-before-go-to-add-page')
     router.push(props.createPagePath)
   }
 

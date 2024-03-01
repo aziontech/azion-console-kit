@@ -60,12 +60,12 @@
           :tags="tags"
         >
           <template #body>
-            <div class="flex flex-col sm:flex-row sm:gap-8 gap-3">
-              <div class="flex flex-col gap-3">
+            <div class="flex flex-col sm:flex-row sm:gap-8 gap-3 w-full">
+              <div class="flex flex-col gap-3 w-full sm:w-5/12 flex-1">
                 <TextInfo label="Line">{{ details.line }}</TextInfo>
                 <TextInfo label="ID">{{ details.id }}</TextInfo>
               </div>
-              <div class="flex flex-col gap-3">
+              <div class="flex flex-col gap-3 w-full sm:w-5/12 flex-1">
                 <TextInfo label="Solution ID">{{ details.solutionId }}</TextInfo>
                 <TextInfo label="Function ID">{{ details.functionId }}</TextInfo>
                 <TextInfo label="Configuration ID">{{ details.configurationId }}</TextInfo>

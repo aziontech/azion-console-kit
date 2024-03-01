@@ -29,6 +29,7 @@ const adapt = (httpResponse) => {
     usage: removeStyleAttributes(solution.usage),
     overview: removeStyleAttributes(solution.overview),
     support: removeStyleAttributes(solution.support),
+    isBringYourOwnLicense: solution.is_bring_your_own_license,
     isPayAsYouGo: solution.is_pay_as_you_go,
     isLaunched: solution.is_launched,
     isUpdated: solution.is_updated,
