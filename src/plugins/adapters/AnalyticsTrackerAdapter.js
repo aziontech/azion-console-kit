@@ -268,6 +268,17 @@ export class AnalyticsTrackerAdapter {
   }
 
   /**
+   * @returns {AnalyticsTrackerAdapter}
+   */
+  eventFailedDeployed() {
+    this.#events.push({
+      eventName: 'Failed to Deploy',
+      props: {}
+    })
+    return this
+  }
+
+  /**
    * call this method to run each stored tracker event
    */
   async track() {

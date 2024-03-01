@@ -296,4 +296,14 @@ describe('AnalyticsTrackerAdapter', () => {
 
     expect(analyticsClientSpy.track).toHaveBeenCalledWith('User Activated Account', {})
   })
+
+  it('should use the failed deployed event with correct parameters', () => {
+    const { sut, analyticsClientSpy } = makeSut()
+
+    sut.eventFailedDeployed({})
+
+    sut.track()
+
+    expect(analyticsClientSpy.track).toHaveBeenCalledWith('Failed to Deploy', {})
+  })
 })
