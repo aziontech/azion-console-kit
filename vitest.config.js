@@ -27,7 +27,7 @@ export default mergeConfig(
       },
       coverage: {
         enabled: true,
-        include: ['src/services/**', 'src/views/**', 'src/helpers/**'],
+        include: ['src/services/**', 'src/views/**', 'src/helpers/**', 'src/plugins/**'],
         statements: 91,
         branches: 91,
         functions: 91,

@@ -29,7 +29,6 @@ const adapt = (filter) => {
       'httpUserAgent',
       'referenceError',
       'remoteAddr',
-      'remoteAddressClass',
       'remotePort',
       'requestMethod',
       'requestTime',
@@ -54,7 +53,9 @@ const adapt = (filter) => {
     tsRange: filter.tsRange,
     and: {
       configurationIdEq: filter.configurationId,
-      tsEq: filter.ts
+      tsEq: filter.ts,
+      httpUserAgentEq: filter.httpUserAgent,
+      httpRefererEq: filter.httpReferer
     }
   }
   return convertGQL(formatFilter, table)
@@ -71,7 +72,6 @@ const adaptResponse = (response) => {
     httpUserAgent: imagesProcessedEvents.httpUserAgent,
     referenceError: imagesProcessedEvents.referenceError,
     remoteAddr: imagesProcessedEvents.remoteAddr,
-    remoteAddressClass: imagesProcessedEvents.remoteAddressClass,
     remotePort: imagesProcessedEvents.remotePort,
     requestMethod: imagesProcessedEvents.requestMethod,
     requestTime: imagesProcessedEvents.requestTime,

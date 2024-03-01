@@ -10,7 +10,7 @@
     inDrawer: Boolean,
     cancelDisabled: Boolean,
     submitDisabled: Boolean,
-    primaryActionLabel: { type: String, default: 'Save' },
+    primaryActionLabel: { type: String, default: 'Next' },
     secondaryActionLabel: { type: String, default: 'Cancel' }
   })
 

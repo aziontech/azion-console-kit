@@ -94,10 +94,9 @@
   }
 
   const handleBlock = (block) => {
-    const handle =
-      props.handleBlock.filter((value) => {
-        return value === block
-      }).length > 0
+    const handle = props.handleBlock.some((value) => {
+      return value === block
+    })
 
     return handle
   }
@@ -570,8 +569,9 @@
           />
 
           <div class="text-color-secondary text-sm font-normal">
-            Enable Application Acceleration on the Main Settings tab to use values lower than 60
-            seconds. L2 Caching requires cache TTL to be equal to or greater than 3 seconds.
+            Enable Application Acceleration in the Main Settings tab to use values lower than
+            60 seconds. Tiered Cache requires cache TTL to be equal to or greater than 3
+            seconds.
           </div>
         </div>
       </div>
@@ -616,7 +616,7 @@
             }"
           >
             <template #title>
-              <span class="text-base">Edge Caching</span>
+              <span class="text-base">Edge Cache</span>
               <InputSwitch
                 v-model="caching"
                 disabled

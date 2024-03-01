@@ -4,6 +4,7 @@
   import { computed, ref } from 'vue'
   import Drawer from './Drawer'
   import IntervalFilterBlock from '@/views/RealTimeEvents/blocks/interval-filter-block'
+  import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
   const emit = defineEmits(['update:dateTime'])
 
   const props = defineProps({
@@ -81,7 +82,11 @@
       },
       {
         field: 'title',
-        header: 'Title'
+        header: 'Title',
+        type: 'component',
+        filterPath: 'title',
+        component: (columnData) =>
+          columnBuilder({ data: columnData, columnAppearance: 'expand-text-column' })
       },
       {
         field: 'comment',

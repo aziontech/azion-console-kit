@@ -28,7 +28,7 @@
         />
       </section>
       <PrimeButton
-        label="Return to Sign Up"
+        label="Return to Sign In"
         @click="goToLogin"
         severity="secondary"
       />
