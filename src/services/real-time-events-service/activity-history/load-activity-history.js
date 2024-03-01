@@ -41,7 +41,7 @@ const adaptResponse = (response) => {
 
   return {
     title: activityHistoryEvents.title,
-    type: captalizeFirstLetter(activityHistoryEvents.type),
+    type: capitalizeFirstLetter(activityHistoryEvents.type),
     ts: convertValueToDate(activityHistoryEvents.ts),
     authorName: activityHistoryEvents.authorName,
     accountId: activityHistoryEvents.accountId,
