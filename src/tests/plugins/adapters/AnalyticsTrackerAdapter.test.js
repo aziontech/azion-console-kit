@@ -147,4 +147,12 @@ describe('AnalyticsTrackerAdapter', () => {
 
     expect(analyticsClientSpy.track).toHaveBeenCalledWith('User Signed Up', {})
   })
+
+  it('should track the additional data submit event with the correct parameters', () => {
+    const { sut, analyticsClientSpy } = makeSut()
+
+    sut.submittedAdditionalData().track()
+
+    expect(analyticsClientSpy.track).toHaveBeenCalledWith('Submitted Additional Data', {})
+  })
 })
