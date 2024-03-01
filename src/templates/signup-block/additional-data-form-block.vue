@@ -243,7 +243,7 @@
         delete form.companySize
         delete form.country
       }
-      
+
       await props.putAdditionalDataService(form)
       tracker.userSignedUp().submittedAdditionalData()
 
