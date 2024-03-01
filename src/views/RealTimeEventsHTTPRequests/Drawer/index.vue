@@ -64,6 +64,17 @@
     return []
   })
 
+  const serverProtocolTag = computed(() => {
+    if (details.value.serverProtocol) {
+      return [
+        {
+          text: `Server Protocol: ${details.value.serverProtocol}`
+        }
+      ]
+    }
+    return []
+  })
+
   defineExpose({
     openDetailDrawer
   })
@@ -94,7 +105,10 @@
           </template>
         </InfoSection>
 
-        <InfoSection title="Request and Response Data">
+        <InfoSection
+          title="Request and Response Data"
+          :tags="serverProtocolTag"
+        >
           <template #body>
             <div class="flex w-full lg:gap-8">
               <BigNumber
