@@ -231,7 +231,7 @@ export class AnalyticsTrackerAdapter {
     })
     return this
   }
-  
+
   /**
    * @returns {AnalyticsTrackerAdapter}
    */

@@ -332,8 +332,8 @@
 
       const response = await props.instantiateTemplateService(props.templateId, payload)
       submitLoading.value = props.freezeLoading
+      tracker.eventDeployed()
       emit('instantiate', response)
-      tracker.eventDeployed().track()
     } catch (error) {
       toast.add({
         closable: true,
