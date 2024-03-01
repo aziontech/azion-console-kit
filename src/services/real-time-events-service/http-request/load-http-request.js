@@ -53,7 +53,7 @@ const adapt = (filter) => {
       'debugLog',
       'wafMatch',
       'geolocAsn',
-      'stacktrace',
+      // 'stacktrace',
       'geolocCountryName',
       'geolocRegionName'
     ],
