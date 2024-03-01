@@ -107,6 +107,19 @@ describe('AnalyticsTrackerAdapter', () => {
     )
   })
 
+  it('should be able to track click to edit event with correct params', () => {
+    const { sut, analyticsClientSpy } = makeSut()
+    const productNameMock = 'Azion Product Name'
+
+    sut.clickToEdit({
+      productName: productNameMock
+    })
+
+    sut.track()
+
+    expect(analyticsClientSpy.track).toHaveBeenCalledWith('Clicked to Edit Azion Product Name', {})
+  })
+
   it('should be able to track a product created successfully', () => {
     const { sut, analyticsClientSpy } = makeSut()
     const productNameMock = 'Azion Product Name Mock'
