@@ -125,8 +125,8 @@
   import { useForm } from 'vee-validate'
   import * as yup from 'yup'
   import { useToast } from 'primevue/usetoast'
-   /**@type {import('@/plugins/adapters/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
-   const tracker = inject('tracker')
+  /**@type {import('@/plugins/adapters/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
+  const tracker = inject('tracker')
 
   defineOptions({ name: 'templateEngineBlock' })
 
