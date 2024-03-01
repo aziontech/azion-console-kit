@@ -122,6 +122,19 @@ export class AnalyticsTrackerAdapter {
    * @param {AzionProductsNames} payload.productName
    * @returns {AnalyticsTrackerAdapter}
    */
+  productEdited(payload) {
+    this.#events.push({
+      eventName: `Edited ${payload.productName}`,
+      props: {}
+    })
+    return this
+  }
+
+  /**
+   * @param {Object} payload
+   * @param {AzionProductsNames} payload.productName
+   * @returns {AnalyticsTrackerAdapter}
+   */
   failedToCreate(payload) {
     this.#events.push({
       eventName: `Failed to Create ${payload.productName}`,
