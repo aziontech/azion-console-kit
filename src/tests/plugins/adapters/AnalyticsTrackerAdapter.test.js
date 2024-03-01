@@ -120,6 +120,22 @@ describe('AnalyticsTrackerAdapter', () => {
     expect(analyticsClientSpy.track).toHaveBeenCalledWith('Created Azion Product Name Mock', {})
   })
 
+  it('should be able to track a failed event related to a product creation', () => {
+    const { sut, analyticsClientSpy } = makeSut()
+    const productNameMock = 'Azion Product Name Mock'
+
+    sut
+      .failedToCreate({
+        productName: productNameMock
+      })
+      .track()
+
+    expect(analyticsClientSpy.track).toHaveBeenCalledWith(
+      'Failed to Create Azion Product Name Mock',
+      {}
+    )
+  })
+
   it('should call userSigned when valid identification is provided', () => {
     const { sut, analyticsClientSpy } = makeSut()
 

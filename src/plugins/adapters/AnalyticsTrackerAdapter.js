@@ -106,6 +106,18 @@ export class AnalyticsTrackerAdapter {
 
   /**
    * @param {Object} payload
+   * @param {AzionProductsNames} payload.productName
+   * @returns {AnalyticsTrackerAdapter}
+   */
+  failedToCreate(payload) {
+    this.#events.push({
+      eventName: `Failed to Create ${payload.productName}`,
+      props: {}
+    })
+    return this
+  }
+
+  /*
    * @param {string} payload.url
    * @param {string} payload.location
    * @returns {AnalyticsTrackerAdapter}
@@ -120,6 +132,7 @@ export class AnalyticsTrackerAdapter {
     })
     return this
   }
+
   /**
    * @returns {AnalyticsTrackerAdapter}
    */
