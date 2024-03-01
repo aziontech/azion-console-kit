@@ -116,11 +116,11 @@ export class AnalyticsTrackerAdapter {
       props: {
         url: payload.url,
         location: payload.location
-      } 
+      }
     })
     return this
   }
-  /** 
+  /**
    * @returns {AnalyticsTrackerAdapter}
    */
   userSignedUp() {
@@ -131,17 +131,16 @@ export class AnalyticsTrackerAdapter {
     return this
   }
 
-
-    /**
+  /**
    * @returns {AnalyticsTrackerAdapter}
    */
-    submittedAdditionalData() {
-      this.#events.push({
-        eventName: 'Submitted Additional Data',
-        props: {}
-      })
-      return this
-    }
+  submittedAdditionalData() {
+    this.#events.push({
+      eventName: 'Submitted Additional Data',
+      props: {}
+    })
+    return this
+  }
 
   /**
    * call this method to run each stored tracker event

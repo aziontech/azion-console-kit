@@ -173,5 +173,4 @@ describe('AnalyticsTrackerAdapter', () => {
 
     expect(analyticsClientSpy.track).toHaveBeenCalledWith('Submitted Additional Data', {})
   })
-
 })
