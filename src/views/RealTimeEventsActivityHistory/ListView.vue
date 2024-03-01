@@ -84,6 +84,7 @@
         field: 'title',
         header: 'Title',
         type: 'component',
+        filterPath: 'title',
         component: (columnData) =>
           columnBuilder({ data: columnData, columnAppearance: 'expand-text-column' })
       },

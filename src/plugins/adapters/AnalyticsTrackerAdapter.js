@@ -104,13 +104,13 @@ export class AnalyticsTrackerAdapter {
     return this
   }
 
- /**
-  * @returns {AnalyticsTrackerAdapter}
-  */
- userSignedUp() {
-   this.#events.push({
-     eventName: 'User Signed Up',
-     props: {}
+  /**
+   * @returns {AnalyticsTrackerAdapter}
+   */
+  userSignedUp() {
+    this.#events.push({
+      eventName: 'User Signed Up',
+      props: {}
     })
     return this
   }

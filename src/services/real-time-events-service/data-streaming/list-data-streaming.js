@@ -2,6 +2,7 @@ import convertGQL from '@/helpers/convert-gql'
 import { AxiosHttpClientSignalDecorator } from '../../axios/AxiosHttpClientSignalDecorator'
 import { convertValueToDate } from '@/helpers/convert-date'
 import { makeRealTimeEventsBaseUrl } from '../make-real-time-events-service'
+import { generateCurrentTimestamp } from '@/helpers/generate-timestamp'
 
 export const listDataStreaming = async (filter) => {
   const payload = adapt(filter)
@@ -40,6 +41,7 @@ const adaptResponse = (response) => {
   const { body } = response
 
   return body.data.dataStreamedEvents?.map((dataStreamedEvents) => ({
+    id: generateCurrentTimestamp(),
     configurationId: dataStreamedEvents.configurationId,
     dataStreamed: dataStreamedEvents.dataStreamed,
     endpointType: {

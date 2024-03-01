@@ -73,6 +73,7 @@
         field: 'level',
         header: 'Level',
         type: 'component',
+        filterPath: 'level.content',
         component: (columnData) =>
           columnBuilder({
             data: columnData,
