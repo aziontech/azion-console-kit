@@ -96,7 +96,9 @@
           <template #body>
             <div class="flex w-full gap-3 items-center">
               <span class="w-36 text-color text-sm font-medium">Cache Key</span>
-              <span class="w-full text-color-secondary break-all text-sm gap-3 flex flex-wrap items-center">
+              <span
+                class="w-full text-color-secondary break-all text-sm gap-3 flex flex-wrap items-center"
+              >
                 <label>{{ details.cacheKey }}</label>
                 <PrimeButton
                   class="whitespace-nowrap"
