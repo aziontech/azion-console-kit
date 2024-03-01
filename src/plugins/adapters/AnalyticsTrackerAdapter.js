@@ -131,6 +131,7 @@ export class AnalyticsTrackerAdapter {
   }
 
   /**
+   * @param {Object} payload
    * @param {string} payload.url
    * @param {string} payload.location
    * @returns {AnalyticsTrackerAdapter}
@@ -186,6 +187,23 @@ export class AnalyticsTrackerAdapter {
     this.#events.push({
       eventName: 'Failed to Submit Additional Data',
       props: {}
+    })
+    return this
+  }
+
+  /**
+   * @param {Object} payload
+   * @param {string} payload.section
+   * @param {string} payload.selection
+   * @returns {AnalyticsTrackerAdapter}
+   */
+  selectedOnCreate(payload) {
+    this.#events.push({
+      eventName: 'Selected on Create',
+      props: {
+        section: payload.section,
+        selection: payload.selection
+      }
     })
     return this
   }
