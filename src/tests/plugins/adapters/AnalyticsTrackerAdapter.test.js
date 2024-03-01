@@ -189,4 +189,12 @@ describe('AnalyticsTrackerAdapter', () => {
 
     expect(analyticsClientSpy.track).toHaveBeenCalledWith('Failed to Submit Additional Data', {})
   })
+
+  it('should track the account activation event with the correct parameters', () => {
+    const { sut, analyticsClientSpy } = makeSut()
+
+    sut.userActivatedAccount().track()
+
+    expect(analyticsClientSpy.track).toHaveBeenCalledWith('User Activated Account', {})
+  })
 })
