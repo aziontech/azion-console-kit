@@ -151,7 +151,7 @@
     L2Cache: {
       index: 4,
       tabName: 'l2-cache',
-      label: 'L2 Cache'
+      label: 'Tiered Cache'
     },
     IntelligentDNS: {
       index: 5,
