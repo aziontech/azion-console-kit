@@ -1,4 +1,4 @@
- import { AxiosHttpClientAdapter } from '@/services/axios/AxiosHttpClientAdapter'
+import { AxiosHttpClientAdapter } from '@/services/axios/AxiosHttpClientAdapter'
 import { listIntelligentDNS } from '@/services/real-time-events-service/intelligent-dns'
 import { describe, expect, it, vi } from 'vitest'
 

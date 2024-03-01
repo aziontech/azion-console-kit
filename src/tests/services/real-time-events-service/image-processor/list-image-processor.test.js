@@ -1,4 +1,4 @@
- import { AxiosHttpClientAdapter } from '@/services/axios/AxiosHttpClientAdapter'
+import { AxiosHttpClientAdapter } from '@/services/axios/AxiosHttpClientAdapter'
 import { listImageProcessor } from '@/services/real-time-events-service/image-processor'
 import { describe, expect, it, vi } from 'vitest'
 

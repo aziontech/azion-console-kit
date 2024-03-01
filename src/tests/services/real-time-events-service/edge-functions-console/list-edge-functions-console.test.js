@@ -1,4 +1,4 @@
- import { AxiosHttpClientAdapter } from '@/services/axios/AxiosHttpClientAdapter'
+import { AxiosHttpClientAdapter } from '@/services/axios/AxiosHttpClientAdapter'
 import { listEdgeFunctionsConsole } from '@/services/real-time-events-service/edge-functions-console'
 import { describe, expect, it, vi } from 'vitest'
 
