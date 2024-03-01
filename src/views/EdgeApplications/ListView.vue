@@ -37,6 +37,11 @@
       productName: 'Edge Application'
     })
   }
+  const handleTrackEditEvent = () => {
+    tracker.clickToEdit({
+      productName: 'Edge Application'
+    })
+  }
 
   const getColumns = computed(() => {
     return [
@@ -85,6 +90,7 @@
         :columns="getColumns"
         @on-load-data="handleLoadData"
         @on-before-go-to-add-page="handleTrackEvent"
+        @on-before-go-to-edit="handleTrackEditEvent"
         emptyListMessage="No Edge Application found."
       />
       <EmptyResultsBlock

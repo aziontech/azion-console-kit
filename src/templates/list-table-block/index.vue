@@ -189,7 +189,7 @@
   import DeleteDialog from './dialog/delete-dialog'
 
   defineOptions({ name: 'list-table-block' })
-  const emit = defineEmits(['on-load-data', 'on-before-go-to-add-page'])
+  const emit = defineEmits(['on-load-data', 'on-before-go-to-add-page', 'on-before-go-to-edit'])
 
   const props = defineProps({
     columns: {
@@ -344,6 +344,7 @@
     menuRef.value[selectedID].toggle(event)
   }
   const editItemSelected = ({ data: item }) => {
+    emit('on-before-go-to-edit')
     if (props.editInDrawer) {
       props.editInDrawer(item)
       return
