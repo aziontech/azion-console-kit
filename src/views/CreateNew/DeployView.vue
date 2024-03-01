@@ -128,7 +128,7 @@
 </template>
 
 <script setup>
-  import { computed, onMounted, onUnmounted, ref } from 'vue'
+  import { computed, onMounted, onUnmounted, ref, inject } from 'vue'
   import Tag from 'primevue/tag'
   import Divider from 'primevue/divider'
   import ContentBlock from '@/templates/content-block'
@@ -138,6 +138,8 @@
   import ScriptRunnerBlock from '@/templates/script-runner-block'
   import PrimeCard from 'primevue/card'
   import { useToast } from 'primevue/usetoast'
+  /**@type {import('@/plugins/adapters/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
+  const tracker = inject('tracker')
 
   const props = defineProps({
     getLogsService: {
@@ -194,6 +196,7 @@
         detail:
           'The edge application is being propagated through the edge nodes. This process will take a few minutes.'
       })
+      tracker.eventDeployed().track()
     } catch (error) {
       deployFailed.value = true
       toast.add({
@@ -202,6 +205,7 @@
         summary: 'Creation failed',
         detail: failMessage
       })
+      tracker.eventFailedDeployed().track()
     }
   }
 

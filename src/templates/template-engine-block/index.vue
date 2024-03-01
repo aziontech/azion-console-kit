@@ -117,7 +117,7 @@
 
 <script setup>
   import Password from 'primevue/password'
-  import { ref, onBeforeMount, defineOptions, watch, onMounted, inject } from 'vue'
+  import { ref, onBeforeMount, defineOptions, watch, onMounted } from 'vue'
   import FormHorizontal from '@templates/create-form-block/form-horizontal'
   import ActionBarTemplate from '@templates/action-bar-block'
   import FormLoading from './FormLoading'
@@ -125,8 +125,6 @@
   import { useForm } from 'vee-validate'
   import * as yup from 'yup'
   import { useToast } from 'primevue/usetoast'
-  /**@type {import('@/plugins/adapters/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
-  const tracker = inject('tracker')
 
   defineOptions({ name: 'templateEngineBlock' })
 
@@ -332,7 +330,6 @@
 
       const response = await props.instantiateTemplateService(props.templateId, payload)
       submitLoading.value = props.freezeLoading
-      tracker.eventDeployed()
       emit('instantiate', response)
     } catch (error) {
       toast.add({
