@@ -104,6 +104,17 @@ export class AnalyticsTrackerAdapter {
     return this
   }
 
+ /**
+  * @returns {AnalyticsTrackerAdapter}
+  */
+ userSignedUp() {
+   this.#events.push({
+     eventName: 'User Signed Up',
+     props: {}
+    })
+    return this
+  }
+
   /**
    * call this method to run each stored tracker event
    */

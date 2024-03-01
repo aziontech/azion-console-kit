@@ -139,4 +139,12 @@ describe('AnalyticsTrackerAdapter', () => {
 
     expect(analyticsClientSpy.track).toHaveBeenCalledWith('User Failed to Sign In', {})
   })
+
+  it('should track the user sign-up event with the correct parameters', () => {
+    const { sut, analyticsClientSpy } = makeSut()
+
+    sut.userSignedUp().track()
+
+    expect(analyticsClientSpy.track).toHaveBeenCalledWith('User Signed Up', {})
+  })
 })
