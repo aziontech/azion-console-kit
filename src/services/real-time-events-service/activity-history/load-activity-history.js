@@ -40,8 +40,8 @@ const adaptResponse = (response) => {
 
   return {
     title: activityHistoryEvents.title,
-    type: activityHistoryEvents.type?.charAt(0).toUpperCase()
-    + activityHistoryEvents.type?.slice(1),
+    type:
+      activityHistoryEvents.type?.charAt(0).toUpperCase() + activityHistoryEvents.type?.slice(1),
     ts: convertValueToDate(activityHistoryEvents.ts),
     authorName: activityHistoryEvents.authorName,
     accountId: activityHistoryEvents.accountId,
