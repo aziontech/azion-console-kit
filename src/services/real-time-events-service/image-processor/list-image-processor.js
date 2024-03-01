@@ -1,6 +1,7 @@
 import convertGQL from '@/helpers/convert-gql'
 import { AxiosHttpClientSignalDecorator } from '../../axios/AxiosHttpClientSignalDecorator'
 import { makeRealTimeEventsBaseUrl } from '../make-real-time-events-service'
+import { generateCurrentTimestamp } from '@/helpers/generate-timestamp'
 
 export const listImageProcessor = async (filter) => {
   const payload = adapt(filter)
@@ -38,7 +39,7 @@ const adaptResponse = (response) => {
   const { body } = response
 
   return body.data.imagesProcessedEvents?.map((imagesProcessedEvents) => ({
-    id: new Date().getTime(),
+    id: generateCurrentTimestamp(),
     bytesSent: imagesProcessedEvents.bytesSent,
     configurationId: imagesProcessedEvents.configurationId,
     host: imagesProcessedEvents.host,

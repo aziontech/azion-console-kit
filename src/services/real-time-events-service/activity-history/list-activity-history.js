@@ -1,6 +1,7 @@
 import convertGQL from '@/helpers/convert-gql'
 import { AxiosHttpClientSignalDecorator } from '../../axios/AxiosHttpClientSignalDecorator'
 import { makeRealTimeEventsBaseUrl } from '../make-real-time-events-service'
+import { generateCurrentTimestamp } from '@/helpers/generate-timestamp'
 
 export const listActivityHistory = async (filter) => {
   const payload = adapt(filter)
@@ -31,7 +32,7 @@ const adaptResponse = (response) => {
   const { body } = response
 
   return body.data.activityHistoryEvents?.map((activityHistoryEvents) => ({
-    id: new Date().getTime(),
+    id: generateCurrentTimestamp(),
     accountId: activityHistoryEvents.accountId,
     authorEmail: activityHistoryEvents.authorEmail,
     authorName: activityHistoryEvents.authorName,
