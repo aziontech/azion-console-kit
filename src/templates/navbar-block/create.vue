@@ -83,9 +83,7 @@
   const SCREEN_BREAKPOINT_MD = 768
 
   const openCreateModalToggle = () => {
-    tracker.create
-      .createEventInHomeAndHeader({ url: route.path, location: 'header' })
-      .track()
+    tracker.create.createEventInHomeAndHeader({ url: route.path, location: 'header' }).track()
     createModalStore.toggle()
   }
 
