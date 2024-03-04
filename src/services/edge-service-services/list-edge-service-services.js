@@ -1,14 +1,15 @@
-import { AxiosHttpClientAdapter, parseHttpResponse } from '../axios/AxiosHttpClientAdapter'
+import { parseHttpResponse } from '../axios/AxiosHttpClientAdapter'
+import { AxiosHttpClientAdapterAdapter } from '../axios/azion-listing-adapters/AxiosHttpClientAdapterAdapter'
 import { makeEdgeServiceBaseUrl } from './make-edge-service-base-url'
 
 export const listEdgeServiceServices = async ({
   orderBy = 'id',
   sort = 'asc',
   page = 1,
-  pageSize = 200
+  pageSize = 50
 }) => {
   const searchParams = makeSearchParams({ orderBy, sort, page, pageSize })
-  let httpResponse = await AxiosHttpClientAdapter.request({
+  let httpResponse = await AxiosHttpClientAdapterAdapter.request({
     url: `${makeEdgeServiceBaseUrl()}?${searchParams.toString()}`,
     method: 'GET'
   })
@@ -32,7 +33,7 @@ const parseStatusData = (status) => {
 }
 
 const adapt = (httpResponse) => {
-  const parsedEdgeServices = httpResponse.body.services?.map((edgeService) => {
+  const parsedEdgeServices = httpResponse.body.results?.map((edgeService) => {
     return {
       id: edgeService.id,
       name: edgeService.name,
