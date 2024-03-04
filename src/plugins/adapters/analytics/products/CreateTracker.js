@@ -1,8 +1,13 @@
 export class CreateTracker {
-  #adapter
+  /** @typedef TrackerAdapter - instance of AnalyticsTrackerAdapter */
+  #trackerAdapter
 
+  /**
+   * Receives an instance of AnalyticsTrackerAdapter.
+   * @param {import('analytics').AnalyticsInstance} adapter
+   */
   constructor(adapter) {
-    this.#adapter = adapter
+    this.#trackerAdapter = adapter
   }
 
   /**
@@ -12,14 +17,14 @@ export class CreateTracker {
    * @returns {AnalyticsTrackerAdapter}
    */
   createEventInHomeAndHeader(payload) {
-    this.#adapter.addEvent({
+    this.#trackerAdapter.addEvent({
       eventName: 'Clicked to Create',
       props: {
         url: payload.url,
         location: payload.location
       }
     })
-    return this.#adapter
+    return this.#trackerAdapter
   }
 
   /**
@@ -29,46 +34,46 @@ export class CreateTracker {
    * @returns {AnalyticsTrackerAdapter}
    */
   selectedOnCreate(payload) {
-    this.#adapter.addEvent({
+    this.#trackerAdapter.addEvent({
       eventName: 'Selected on Create',
       props: {
         section: payload.section,
         selection: payload.selection
       }
     })
-    return this.#adapter
+    return this.#trackerAdapter
   }
 
   /**
    * @returns {AnalyticsTrackerAdapter}
    */
   clickMoreDetailsOnTemplate() {
-    this.#adapter.addEvent({
+    this.#trackerAdapter.addEvent({
       eventName: 'Clicked to View More Details on Template',
       props: {}
     })
-    return this.#adapter
+    return this.#trackerAdapter
   }
 
   /**
    * @returns {AnalyticsTrackerAdapter}
    */
   eventDeployed() {
-    this.#adapter.addEvent({
+    this.#trackerAdapter.addEvent({
       eventName: 'Deployed',
       props: {}
     })
-    return this.#adapter
+    return this.#trackerAdapter
   }
 
   /**
    * @returns {AnalyticsTrackerAdapter}
    */
   eventFailedDeployed() {
-    this.#adapter.addEvent({
+    this.#trackerAdapter.addEvent({
       eventName: 'Failed to Deploy',
       props: {}
     })
-    return this.#adapter
+    return this.#trackerAdapter
   }
 }

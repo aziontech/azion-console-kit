@@ -18,8 +18,12 @@ export class AnalyticsTrackerAdapter {
   /** @type {import('analytics').AnalyticsInstance} */
   #analyticsClient = null
   #traits = {}
+
+  /** @type {SignUpTracker} - events related to signup product */
   #signUpTracker = null
+  /** @type {SignInTracker} - events related to signin product */
   #signInTracker = null
+  /** @type {CreateTracker} - events related to create entity */
   #createTracker = null
 
   /**
@@ -50,14 +54,29 @@ export class AnalyticsTrackerAdapter {
     this.#events = []
   }
 
+  /**
+   * Getter for the signUp property.
+   *
+   * @return {SignUpTracker} SignUpTracker instance
+   */
   get signUp() {
     return this.#signUpTracker
   }
 
+  /**
+   * Getter for the signIn property.
+   *
+   * @return {SignInTracker} SignInTracker instance
+   */
   get signIn() {
     return this.#signInTracker
   }
 
+  /**
+   * Get for the CreateTracker property.
+   *
+   * @return {CreateTracker} CreateTracker instance
+   */
   get create() {
     return this.#createTracker
   }

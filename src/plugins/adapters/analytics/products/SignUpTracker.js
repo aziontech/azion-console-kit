@@ -1,62 +1,67 @@
 export class SignUpTracker {
-  #adapter
+  /** @typedef TrackerAdapter - instance of AnalyticsTrackerAdapter */
+  #trackerAdapter
 
+  /**
+   * Receives an instance of AnalyticsTrackerAdapter.
+   * @param {import('analytics').AnalyticsInstance} adapter
+   */
   constructor(adapter) {
-    this.#adapter = adapter
+    this.#trackerAdapter = adapter
   }
 
   /**
    * @returns {AnalyticsTrackerAdapter}
    */
   userSignedUp() {
-    this.#adapter.addEvent({
+    this.#trackerAdapter.addEvent({
       eventName: 'User Signed Up',
       props: {}
     })
-    return this.#adapter
+    return this.#trackerAdapter
   }
 
   /**
    * @returns {AnalyticsTrackerAdapter}
    */
   userFailedSignUp() {
-    this.#adapter.addEvent({
+    this.#trackerAdapter.addEvent({
       eventName: 'User Failed to Sign Up',
       props: {}
     })
-    return this.#adapter
+    return this.#trackerAdapter
   }
 
   /**
    * @returns {AnalyticsTrackerAdapter}
    */
   submittedAdditionalData() {
-    this.#adapter.addEvent({
+    this.#trackerAdapter.addEvent({
       eventName: 'Submitted Additional Data',
       props: {}
     })
-    return this.#adapter
+    return this.#trackerAdapter
   }
 
   /**
    * @returns {AnalyticsTrackerAdapter}
    */
   failedSubmitAdditionalData() {
-    this.#adapter.addEvent({
+    this.#trackerAdapter.addEvent({
       eventName: 'Failed to Submit Additional Data',
       props: {}
     })
-    return this.#adapter
+    return this.#trackerAdapter
   }
 
   /**
    * @returns {AnalyticsTrackerAdapter}
    */
   userActivatedAccount() {
-    this.#adapter.addEvent({
+    this.#trackerAdapter.addEvent({
       eventName: 'User Activated Account',
       props: {}
     })
-    return this.#adapter
+    return this.#trackerAdapter
   }
 }
