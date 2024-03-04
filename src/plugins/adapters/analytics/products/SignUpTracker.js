@@ -1,9 +1,8 @@
-
 export class SignUpTracker {
-  #adapter;
+  #adapter
 
   constructor(adapter) {
-    this.#adapter = adapter;
+    this.#adapter = adapter
   }
 
   /**
