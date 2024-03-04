@@ -1,5 +1,6 @@
 import { AxiosHttpClientAdapter, parseHttpResponse } from '@/services/axios/AxiosHttpClientAdapter'
 import { makeEdgeApplicationBaseUrl } from '../edge-application-services/make-edge-application-base-url'
+import { capitalizeFirstLetter } from '@/helpers'
 
 export const listRulesEngineService = async ({
   id,
@@ -31,7 +32,7 @@ const STATUS_AS_TAG = {
 }
 const phaseAsTag = (phase) => {
   return {
-    content: phase.charAt(0).toUpperCase() + phase.slice(1),
+    content: capitalizeFirstLetter(phase),
     outlined: true,
     severity: 'info'
   }

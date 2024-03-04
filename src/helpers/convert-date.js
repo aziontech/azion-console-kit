@@ -1,6 +1,25 @@
 const HOURS_TO_MSEC = 3_600_000
 
 /**
+ * Converts a given value to a date string in a specific format.
+ *
+ * @param {number|string|Date} value - The value to be converted to a date string.
+ * @returns {string} The date string in 'en-US' locale and in a specific format.
+ */
+const convertValueToDate = (value) => {
+  const date = new Date(value)
+  const options = {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: true
+  }
+  return date.toLocaleString('en-US', options)
+}
+
+/**
  * Remove the specified amount of hours from the given date
  *
  * @param {number} pOffset - The number of hours to remove
@@ -49,7 +68,12 @@ const convertOffsetToDecimal = (offset) => {
   return `${offsetSign}${hours}.${decimalMinutes}`
 }
 
-export { removeSelectedAmountOfHours, formatToEndOfDayIsoDate, convertOffsetToDecimal }
+export {
+  removeSelectedAmountOfHours,
+  formatToEndOfDayIsoDate,
+  convertOffsetToDecimal,
+  convertValueToDate
+}
 
 /**
  * Set the current date to UTC0 and remove Timezone tag

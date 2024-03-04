@@ -1,13 +1,11 @@
 <template>
-  <!-- @row-click="editItemSelected" -->
   <div>
-    <div class="max-w-full mt-4">
+    <div class="max-w-full cursor-pointer mt-4">
       <DataTable
         v-if="!isLoading"
         scrollable
         removableSort
         :value="data"
-        selectionMode="multiple"
         dataKey="id"
         v-model:filters="filters"
         :paginator="showPagination"
@@ -107,7 +105,10 @@
             </div>
           </template>
           <template #body="{ data: rowData }">
-            <div class="flex justify-end" v-if="showActions">
+            <div
+              class="flex justify-end"
+              v-if="showActions"
+            >
               <PrimeMenu
                 ref="menu"
                 id="overlay_menu"
@@ -115,6 +116,7 @@
                 :popup="true"
               />
               <PrimeButton
+                v-if="hasActions"
                 v-tooltip.top="{ value: 'Actions', showDelay: 200 }"
                 size="small"
                 icon="pi pi-ellipsis-h"
@@ -198,8 +200,7 @@
       default: () => [{ field: 'name', header: 'Name' }]
     },
     pageTitleDelete: {
-      type: String,
-      required: true
+      type: String
     },
     createPagePath: {
       type: String,
@@ -268,6 +269,7 @@
   const selectedItemData = ref(null)
   const selectedColumns = ref([])
   const selectedItems = ref()
+  const menuActionsCounter = ref(0)
 
   onMounted(() => {
     loadData({ page: 1 })
@@ -286,13 +288,15 @@
   })
 
   const actionOptions = (showAuthorize) => {
-    const actionOptions = props.deleteService? [
-      {
-        label: 'Delete',
-        icon: 'pi pi-fw pi-trash',
-        command: () => openDeleteDialog()
-      }
-    ] : []
+    const actionOptions = props.deleteService
+      ? [
+          {
+            label: 'Delete',
+            icon: 'pi pi-fw pi-trash',
+            command: () => openDeleteDialog()
+          }
+        ]
+      : []
     if (props.authorizeNode && showAuthorize !== 'Authorized') {
       actionOptions.push({
         label: 'Authorize',
@@ -303,6 +307,10 @@
     showActions.value = actionOptions.length > 0
     return actionOptions
   }
+
+  const hasActions = computed(() => {
+    return menuActionsCounter.value > 0
+  })
 
   const toast = useToast()
 
@@ -342,8 +350,12 @@
     menu.value.toggle(event)
   }
 
-  const editItemSelected = ({ data: item }) => {
+  const editItemSelected = ({ data: item, originalEvent }) => {
+    const clickIsCheckbox = originalEvent.srcElement.className?.animVal?.includes('p-checkbox-icon')
     if (props.editInDrawer) {
+      if (clickIsCheckbox) {
+        return
+      }
       props.editInDrawer(item)
       return
     }
@@ -378,7 +390,7 @@
       toast.add({
         closable: true,
         severity: 'success',
-        summary: 'Rules Engine order saved!'
+        summary: 'Reorder saved'
       })
     } catch (error) {
       toast.add({

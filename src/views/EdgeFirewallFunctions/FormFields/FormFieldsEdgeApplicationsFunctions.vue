@@ -1,10 +1,10 @@
 <script setup>
+  import { useAccountStore } from '@/stores/account'
+  import FormHorizontal from '@/templates/create-form-block/form-horizontal'
   import FieldText from '@/templates/form-fields-inputs/fieldText'
   import Dropdown from 'primevue/dropdown'
-  import FormHorizontal from '@/templates/create-form-block/form-horizontal'
   import { useField } from 'vee-validate'
   import { computed } from 'vue'
-  import { useAccountStore } from '@/stores/account'
 
   const props = defineProps({
     edgeFunctionsList: {
@@ -44,7 +44,7 @@
   <FormHorizontal
     :isDrawer="true"
     title="General"
-    description="Instantiate an edge function within your rule set."
+    description="Instantiate an edge function within your rule set. Use Rules Engine to activate the function."
   >
     <template #inputs>
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
@@ -72,6 +72,7 @@
           >Edge Function *</label
         >
         <Dropdown
+          appendTo="self"
           inputId="edgeFunctionID"
           v-model="edgeFunctionID"
           :options="edgeFunctionsList"

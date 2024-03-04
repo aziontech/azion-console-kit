@@ -103,7 +103,7 @@
             v-if="showActions"
           >
             <PrimeMenu
-              :ref="(el) => (menuRef[rowData.id] = el)"
+              ref="menuRef"
               id="overlay_menu"
               v-bind:model="actionOptions(rowData)"
               :popup="true"
@@ -189,7 +189,7 @@
   import DeleteDialog from './dialog/delete-dialog'
 
   defineOptions({ name: 'list-table-block' })
-  const emit = defineEmits(['on-load-data'])
+  const emit = defineEmits(['on-load-data', 'on-before-go-to-add-page', 'on-before-go-to-edit'])
 
   const props = defineProps({
     columns: {
@@ -334,15 +334,17 @@
   const router = useRouter()
 
   const navigateToAddPage = () => {
+    emit('on-before-go-to-add-page')
     router.push(props.createPagePath)
   }
 
   const menuRef = ref({})
   const toggleActionsMenu = (event, selectedID) => {
     selectedId.value = selectedID
-    menuRef.value[selectedID].toggle(event)
+    menuRef.value.toggle(event)
   }
   const editItemSelected = ({ data: item }) => {
+    emit('on-before-go-to-edit')
     if (props.editInDrawer) {
       props.editInDrawer(item)
       return

@@ -33,7 +33,7 @@
     }
   })
 
-  const emit = defineEmits(['on-edit-success'])
+  const emit = defineEmits(['on-edit-success', 'on-edit-fail'])
 
   const router = useRouter()
   const route = useRoute()
@@ -47,7 +47,9 @@
   let formHasUpdated, visibleOnSaved
 
   if (props.isTabs) {
-    ({ formHasUpdated, visibleOnSaved } = inject('unsaved'))
+    const unsavedStatus = inject('unsaved')
+    formHasUpdated = unsavedStatus.formHasUpdated
+    visibleOnSaved = unsavedStatus.visibleOnSaved
   }
 
   const isDirty = useIsFormDirty()
@@ -57,6 +59,7 @@
   })
 
   watch(formHasChanges, () => {
+    if (!props.isTabs) return
     formHasUpdated.value = formHasChanges
     visibleOnSaved.value = false
   })
@@ -106,6 +109,7 @@
       }
       goBackToList()
     } catch (error) {
+      emit('on-edit-fail')
       blockViewRedirection.value = true
       showToast('error', error)
     }
@@ -127,7 +131,10 @@
     </form>
   </div>
 
-  <DialogUnsavedBlock :blockRedirectUnsaved="formHasChanges" :isTabs="isTabs" />
+  <DialogUnsavedBlock
+    :blockRedirectUnsaved="formHasChanges"
+    :isTabs="isTabs"
+  />
   <slot
     name="action-bar"
     :onSubmit="onSubmit"

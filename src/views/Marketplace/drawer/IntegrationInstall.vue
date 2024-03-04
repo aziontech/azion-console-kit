@@ -231,6 +231,7 @@
                     >Edge Application *
                   </label>
                   <Dropdown
+                    appendTo="self"
                     id="edge_application"
                     :disabled="warnToCreate"
                     :class="{ 'p-invalid': errors.edgeApplication }"

@@ -10,8 +10,9 @@ import { azionPrivacyPolicyWindowOpener } from './azion-privacy-policy-opener'
 import { azionTermsAndServicesWindowOpener } from './azion-terms-and-services-opener'
 import { capitalizeFirstLetter } from './capitalize-first-letter'
 import { clipboardWrite } from './clipboard'
-import { getEnvironmentFromUrl } from './get-environment-from-url'
+import { getEnvironment } from './get-environment'
 import { getFirstApiError } from './get-first-api-error'
+import { getStaticUrlsByEnvironment } from './get-static-urls-by-environment'
 import InviteSession from './invite-session'
 import { metricsPlaygroundOpener } from './metrics-playground-opener'
 import { parseCamelToSnake, parseSnakeToCamel } from './parse-api-body'
@@ -25,8 +26,9 @@ export {
   clipboardWrite,
   documentationCatalog,
   documentationGuideProducts,
-  getEnvironmentFromUrl,
+  getEnvironment,
   getFirstApiError,
+  getStaticUrlsByEnvironment,
   metricsPlaygroundOpener,
   openAPIDocumentation,
   openContactSupport,

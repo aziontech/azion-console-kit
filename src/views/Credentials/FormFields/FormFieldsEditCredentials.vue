@@ -89,7 +89,7 @@
             outlined
             type="button"
             aria-label="Copy Token"
-            label="Copy to Clipboard"
+            label="Copy"
             @click="$emit('copyToken', { token })"
           />
         </div>

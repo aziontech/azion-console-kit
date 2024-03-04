@@ -1,14 +1,14 @@
 '
 <script setup>
   import ButtonPrime from 'primevue/button'
-  import Dropdown from 'primevue/dropdown'
   import Divider from 'primevue/divider'
+  import Dropdown from 'primevue/dropdown'
   import InlineMessage from 'primevue/inlinemessage'
   import OverlayPanel from 'primevue/overlaypanel'
-  import { computed, ref } from 'vue'
-  import { OPERATOR_MAPPING, FIELDS_MAPPING } from './component'
   import { useField, useForm } from 'vee-validate'
+  import { computed, ref } from 'vue'
   import * as yup from 'yup'
+  import { FIELDS_MAPPING, OPERATOR_MAPPING } from './component'
 
   defineOptions({ name: 'dialog-filter' })
   const emit = defineEmits(['applyFilter'])
@@ -216,6 +216,7 @@
               Filter
             </label>
             <Dropdown
+              appendTo="self"
               id="filter-field"
               @change="changeFilter"
               v-model="filterSelected"
@@ -251,6 +252,7 @@
               Operator
             </label>
             <Dropdown
+              appendTo="self"
               id="filter-operator"
               @change="changeOperator"
               v-model="operatorSelected"

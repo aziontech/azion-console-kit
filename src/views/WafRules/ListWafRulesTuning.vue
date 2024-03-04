@@ -1,6 +1,7 @@
 <template>
   <div class="flex gap-6 mt-4 flex-col sm:flex-row">
     <Dropdown
+      appendTo="self"
       optionValue="value"
       optionLabel="name"
       :options="timeOptions"
@@ -22,6 +23,7 @@
       class="w-full sm:max-w-xs"
     />
     <Dropdown
+      appendTo="self"
       optionValue="value"
       optionLabel="name"
       placeholder="Select Network List"
@@ -105,8 +107,8 @@
 </template>
 <script setup>
   import Illustration from '@/assets/svg/illustration-layers.vue'
-  import EmptyResultsBlock from '@/templates/empty-results-block'
   import ActionBarTemplate from '@/templates/action-bar-block/action-bar-with-teleport'
+  import EmptyResultsBlock from '@/templates/empty-results-block'
   import DialogAllowRule from './Dialog'
   import MoreDetailsDrawer from './Drawer'
 
@@ -114,11 +116,11 @@
   import PrimeButton from 'primevue/button'
   import Dropdown from 'primevue/dropdown'
 
-  import MultiSelect from 'primevue/multiselect'
   import advancedFilter from '@/templates/advanced-filter'
-  import { ref, onMounted, computed } from 'vue'
-  import { useRoute, useRouter } from 'vue-router'
+  import MultiSelect from 'primevue/multiselect'
   import { useToast } from 'primevue/usetoast'
+  import { computed, onMounted, ref } from 'vue'
+  import { useRoute, useRouter } from 'vue-router'
 
   const props = defineProps({
     listWafRulesTuningService: {
@@ -385,7 +387,11 @@
     }
 
     try {
-      const [{ value }] = await Promise.allSettled(requestsAllowedRules)
+      const [{ status, reason, value }] = await Promise.allSettled(requestsAllowedRules)
+      if (status === 'rejected') {
+        showToast(reason.message, 'error')
+        return
+      }
       showToast(value, 'success')
       filterSearch()
       closeDialog()

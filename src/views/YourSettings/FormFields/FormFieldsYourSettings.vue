@@ -151,6 +151,7 @@
             >Timezone *</label
           >
           <Dropdown
+            appendTo="self"
             id="timezone"
             filter
             :options="optionsTimezone"
@@ -172,6 +173,7 @@
             >Language</label
           >
           <Dropdown
+            appendTo="self"
             id="language"
             :options="optionsLanguage"
             optionLabel="label"
@@ -226,6 +228,7 @@
         <div class="flex gap-2">
           <div class="p-inputgroup">
             <Dropdown
+              appendTo="self"
               id="countryCallCode"
               filter
               :options="filteredCountriesMobile"

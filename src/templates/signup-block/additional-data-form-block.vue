@@ -84,6 +84,7 @@
           <label class="font-semibold text-sm gap-2 flex flex-col"
             >Company Size
             <PrimeDropdown
+              appendTo="self"
               placeholder="Select an option"
               v-model="companySize"
               :options="companySizeList"
@@ -105,6 +106,7 @@
           <label class="font-semibold text-sm gap-2 flex flex-col"
             >Country
             <PrimeDropdown
+              appendTo="self"
               placeholder="Select an option"
               v-model="country"
               :options="countriesList"
@@ -131,16 +133,18 @@
 </template>
 
 <script setup>
-  import PrimeRadio from 'primevue/radiobutton'
   import PrimeButton from 'primevue/button'
-  import PrimeInputText from 'primevue/inputtext'
   import PrimeDropdown from 'primevue/dropdown'
+  import PrimeInputText from 'primevue/inputtext'
+  import PrimeRadio from 'primevue/radiobutton'
   import PrimeSkeleton from 'primevue/skeleton'
-  import { useForm, useField } from 'vee-validate'
-  import * as yup from 'yup'
-  import { ref, onMounted, computed } from 'vue'
-  import { useRouter } from 'vue-router'
   import { useToast } from 'primevue/usetoast'
+  import { useField, useForm } from 'vee-validate'
+  import { computed, onMounted, ref, inject } from 'vue'
+  import { useRouter } from 'vue-router'
+  import * as yup from 'yup'
+  /** @type {import('@/plugins/adapters/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
+  const tracker = inject('tracker')
 
   defineOptions({
     name: 'additional-data-form-block'
@@ -233,6 +237,7 @@
 
     try {
       const form = { ...values }
+
       if (!isInternal.value) {
         delete form.companyName
         delete form.companySize
@@ -240,9 +245,12 @@
       }
 
       await props.putAdditionalDataService(form)
+      tracker.userSignedUp().submittedAdditionalData()
+
       router.push({ name: 'home' })
     } catch (err) {
       toast.add({ life: 5000, severity: 'error', detail: err, summary: 'Error' })
+      tracker.failedSubmitAdditionalData().track()
     } finally {
       loading.value = false
     }

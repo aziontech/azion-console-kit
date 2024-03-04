@@ -1,21 +1,18 @@
+import { getStaticUrlsByEnvironment } from '@/helpers'
 import { AxiosHttpClientAdapter, parseHttpResponse } from '../axios/AxiosHttpClientAdapter'
-import { makeDocumentationBaseUrl } from './make-documentation-base-url'
 import { makeGoogleStorageApi } from '../axios/makeGoogleStorageApi'
 import { markdownToHtml } from './markdown-to-html'
-import { getEnvironmentFromUrl } from '../../helpers/get-environment-from-url'
 
 const DEFAULT_DOCUMENT = 'index.md'
 const WELCOME_PATH = '/welcome'
 
-const getHelpCenterDocumentationService = async ({ url, filename }) => {
-  const environment = getEnvironmentFromUrl(window.location.href)
-  const baseUrl = makeDocumentationBaseUrl(environment)
-  const documentUrl = url === '/' ? WELCOME_PATH : getFirstPathSegment(url)
-  const documentFilename = filename || DEFAULT_DOCUMENT
+const getHelpCenterDocumentationService = async ({ url = '/', filename = DEFAULT_DOCUMENT }) => {
+  const helpCenterBaseUrl = getStaticUrlsByEnvironment('helpCenter')
+  const documentUrl = url === '/' ? WELCOME_PATH : url
 
-  let responseDocument = await fetchAndParseDocument(documentUrl, documentFilename, baseUrl)
-  if (isMarkdown(documentFilename)) {
-    responseDocument = markdownToHtml(responseDocument)
+  let responseDocument = await fetchAndParseDocument(documentUrl, filename, helpCenterBaseUrl)
+  if (isMarkdown(filename)) {
+    responseDocument.data = markdownToHtml(responseDocument.data)
   }
 
   return responseDocument
@@ -27,11 +24,11 @@ const fetchAndParseDocument = async (documentUrl, documentFilename, baseUrl) => 
 
   try {
     httpResponse = await fetchDocument(fullRequestPath, baseUrl)
-    responseDocument = parseHttpResponse(httpResponse)
-  } catch (error) {
+    responseDocument = { data: parseHttpResponse(httpResponse), success: true }
+  } catch {
     fullRequestPath = `${WELCOME_PATH}/${documentFilename}`
     httpResponse = await fetchDocument(fullRequestPath, baseUrl)
-    responseDocument = parseHttpResponse(httpResponse)
+    responseDocument = { data: parseHttpResponse(httpResponse), success: false }
   }
 
   return responseDocument
@@ -39,13 +36,6 @@ const fetchAndParseDocument = async (documentUrl, documentFilename, baseUrl) => 
 
 const isMarkdown = (filename) => {
   return filename.endsWith('.md')
-}
-
-const getFirstPathSegment = (url) => {
-  const pathParts = url.split('/')
-  const firstPartOfPath = '/' + pathParts[1]
-
-  return firstPartOfPath
 }
 
 const fetchDocument = async (url, baseUrl) => {

@@ -1,22 +1,20 @@
 export const LINE_PATTERNS = [
-  '#D1480B',
-  '#0A5FB7',
-  '#288900',
-  '#DB1193',
-  '#6006A7',
-  '#028480',
-  '#994000',
-  '#003C92',
-  '#195400',
-  '#A8036D',
-  '#440477',
-  '#0C605E',
-  '#64241C',
-  '#050F61',
-  '#556300',
-  '#660059',
-  '#3A1C51',
-  '#00403A'
+  'var(--series-one-color)',
+  'var(--series-two-color)',
+  'var(--series-three-color)',
+  'var(--series-four-color)',
+  'var(--series-five-color)',
+  'var(--series-six-color)',
+  'var(--series-seven-color)',
+  'var(--series-eight-color)',
+  'var(--series-one-color)',
+  'var(--series-two-color)',
+  'var(--series-three-color)',
+  'var(--series-four-color)',
+  'var(--series-five-color)',
+  'var(--series-six-color)',
+  'var(--series-seven-color)',
+  'var(--series-eight-color)'
 ]
 
-export const MEAN_LINE_PATTERN = '#2B1208'
+export const MEAN_LINE_PATTERN = 'var(--text-color)'

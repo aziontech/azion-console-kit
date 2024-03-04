@@ -35,7 +35,7 @@
               label="Create"
               type="button"
               size="small"
-              @click="createModalStore.toggle()"
+              @click="openModalCreate"
             />
           </div>
         </div>
@@ -201,15 +201,17 @@
 </template>
 
 <script>
+  import { getStaticUrlsByEnvironment } from '@/helpers'
+  import { useAccountStore } from '@/stores/account'
+  import { useCreateModalStore } from '@/stores/create-modal'
+  import ContentBlock from '@/templates/content-block'
+  import { mapState } from 'pinia'
+  import { inject } from 'vue'
   import PrimeButton from 'primevue/button'
   import { useForm } from 'vee-validate'
   import * as yup from 'yup'
-  import ContentBlock from '@/templates/content-block'
   import FormFieldsHome from './FormFields/FormFieldsHome.vue'
-  import { useCreateModalStore } from '@/stores/create-modal'
-  import { mapState } from 'pinia'
-  import { useAccountStore } from '@/stores/account'
-  import { getEnvironmentFromUrl } from '@/helpers'
+  /**@type {import('@/plugins/adapters/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
 
   export default {
     name: 'home-view',
@@ -256,7 +258,7 @@
       },
       ...mapState(useAccountStore, { user: 'accountData', currentTheme: 'currentTheme' }),
       disclaimer() {
-        return this.user.disclaimer.replace(/<a[^>]+>[^<]+<\/a>/g, '')
+        return this.user.disclaimer.replace(/\s<a[^>]+>[^<]+<\/a>/g, '')
       },
       showExperimental() {
         return this.user.disclaimer
@@ -266,13 +268,10 @@
       navigateToEdgeApplications() {
         this.$router.push({ name: 'list-edge-applications' })
       },
+
       navigateToPayment() {
-        const environment = getEnvironmentFromUrl(window.location.href)
-        let billingLink = 'https://manager.azion.com/billing-subscriptions/bills'
-        if (environment === 'stage') {
-          billingLink = 'https://stage-manager.azion.com/billing-subscriptions/bills'
-        }
-        window.open(billingLink, '_blank')
+        const billingUrl = getStaticUrlsByEnvironment('billing')
+        window.open(billingUrl, '_blank')
       },
       navigateToRealTimeMetrics() {
         this.$router.push({ name: 'real-time-metrics' })
@@ -320,7 +319,14 @@
       }
     },
     setup() {
+      const tracker = inject('tracker')
+
       const createModalStore = useCreateModalStore()
+
+      const openModalCreate = () => {
+        tracker.createEventInHomeAndHeader({ url: '/', location: 'home' }).track()
+        createModalStore.toggle()
+      }
 
       const validationSchema = yup.object({
         name: yup.string().required('Name is a required field'),
@@ -338,7 +344,8 @@
         meta,
         resetForm,
         values,
-        createModalStore
+        createModalStore,
+        openModalCreate
       }
     }
   }

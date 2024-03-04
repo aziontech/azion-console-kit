@@ -1,7 +1,7 @@
 <script setup>
-  import { computed, toRef } from 'vue'
-  import { useField } from 'vee-validate'
   import Dropdown from 'primevue/dropdown'
+  import { useField } from 'vee-validate'
+  import { computed, toRef } from 'vue'
 
   const props = defineProps({
     value: {
@@ -51,6 +51,10 @@
     enableWorkaroundLabelToDisabledOptions: {
       type: Boolean,
       default: false
+    },
+    disabled: {
+      type: Boolean,
+      default: false
     }
   })
 
@@ -97,6 +101,7 @@
     >{{ props.label }}</label
   >
   <Dropdown
+    appendTo="self"
     :id="name"
     :loading="loading"
     v-model="inputValue"
@@ -108,6 +113,7 @@
     @change="emitChange"
     @blur="emitBlur"
     :class="inputClass"
+    :disabled="disabled"
   >
     <template
       v-if="enableCustomLabel"

@@ -35,16 +35,18 @@ export const parseHttpResponse = (httpResponse) => {
 
 export class AxiosHttpClientAdapter {
   static async request(
-    { url, method, headers, body },
+    { url, method, headers, body, signal },
     axios = defaultApi(import.meta.env.VITE_PERSONAL_TOKEN)
   ) {
     let axiosResponse
+
     try {
       axiosResponse = await axios.request({
         url: url,
         method: method,
         headers: headers,
-        data: body
+        data: body,
+        signal
       })
     } catch (error) {
       const axiosError = error

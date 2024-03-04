@@ -18,7 +18,7 @@ export const usersListsRoutes = {
       meta: {
         breadCrumbs: [
           {
-            label: 'Users Lists',
+            label: 'Users List',
             to: '/users'
           }
         ]
@@ -38,7 +38,7 @@ export const usersListsRoutes = {
       meta: {
         breadCrumbs: [
           {
-            label: 'Users Lists',
+            label: 'Users List',
             to: '/users'
           },
           {
@@ -64,7 +64,7 @@ export const usersListsRoutes = {
       meta: {
         breadCrumbs: [
           {
-            label: 'Users Lists',
+            label: 'Users List',
             to: '/users'
           },
           {

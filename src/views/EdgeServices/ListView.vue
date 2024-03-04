@@ -36,7 +36,7 @@
   const visibleDialog = ref(false)
   const actionsRow = ref([
     {
-      label: 'Inactivate',
+      label: 'Deactivate',
       icon: 'pi pi-minus-circle',
       visibleAction: (item) => !item.active,
       command: (item) => {
@@ -45,7 +45,7 @@
       }
     },
     {
-      label: 'Active',
+      label: 'Activate',
       icon: 'pi pi-plus-circle',
       visibleAction: (item) => item.active,
       command: (item) => {

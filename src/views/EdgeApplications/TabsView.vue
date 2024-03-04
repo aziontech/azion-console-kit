@@ -13,6 +13,7 @@
   import { computed, ref, reactive, provide, watch } from 'vue'
   import { useRoute, useRouter } from 'vue-router'
   import EditView from './EditView.vue'
+  import { generateCurrentTimestamp } from '@/helpers/generate-timestamp'
 
   defineOptions({ name: 'tabs-edge-service' })
 
@@ -46,7 +47,7 @@
   const edgeApplicationId = ref(route.params.id)
   const edgeApplication = ref()
 
-  const tabHasUpdate = reactive({ oldTab: null, nextTab: 0, updated: true })
+  const tabHasUpdate = reactive({ oldTab: null, nextTab: 0, updated: 0 })
   const formHasUpdated = ref(false)
 
   const showMainSettings = computed(() => {
@@ -176,7 +177,7 @@
     } else {
       tabHasUpdate.oldTab = oldValue
       tabHasUpdate.nextTab = newValue
-      tabHasUpdate.updated = Math.random()
+      tabHasUpdate.updated = generateCurrentTimestamp()
     }
   })
 

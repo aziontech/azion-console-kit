@@ -240,7 +240,7 @@ function generateMeanLineValues(resultChart, mean) {
  * @returns {string} - The title case string
  */
 function camelToTitle(text) {
-  const title = text.replace(/([A-Z])/g, ' $1')
+  const title = text.replace(/([A-Z])/g, ' $1').replace(/([a-zA-Z])(\d+)/g, '$1 $2')
   return title.charAt(0).toUpperCase() + title.slice(1)
 }
 

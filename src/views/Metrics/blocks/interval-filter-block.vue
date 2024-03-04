@@ -78,11 +78,11 @@
   }
 
   const checkIfDatesAreEqual = (begin, end) => {
-    var isoBegin = begin.toISOString().slice(0, 13)
-    var isoEnd = end.toISOString().slice(0, 13)
+    const isoBegin = begin.toISOString().slice(0, 13)
+    const isoEnd = end.toISOString().slice(0, 13)
 
-    var isoLastBegin = lastFilteredDate.value.begin.toISOString().slice(0, 13)
-    var isoLastEnd = lastFilteredDate.value.end.toISOString().slice(0, 13)
+    const isoLastBegin = lastFilteredDate.value.begin.toISOString().slice(0, 13)
+    const isoLastEnd = lastFilteredDate.value.end.toISOString().slice(0, 13)
 
     return isoBegin === isoLastBegin && isoEnd === isoLastEnd
   }
@@ -146,6 +146,7 @@
   <div class="flex flex-column gap-6 md:flex-row md:gap-6">
     <div class="w-full md:max-w-xs max-w-full">
       <Dropdown
+        appendTo="self"
         class="w-full"
         v-model="interval"
         :options="intervalOptions"

@@ -18,6 +18,10 @@
     isTabs: {
       type: Boolean,
       default: false
+    },
+    isDrawer: {
+      type: Boolean,
+      default: false
     }
   })
 
@@ -30,7 +34,21 @@
   let changeTab, tabHasUpdate, formHasUpdated, visibleOnSaved
 
   if (props.isTabs) {
-    ({ changeTab, tabHasUpdate, formHasUpdated, visibleOnSaved } = inject('unsaved'))
+    const unsavedStatus = inject('unsaved')
+
+    changeTab = unsavedStatus.changeTab
+    tabHasUpdate = unsavedStatus.tabHasUpdate
+    formHasUpdated = unsavedStatus.formHasUpdated
+    visibleOnSaved = unsavedStatus.visibleOnSaved
+  }
+
+  let changeVisisbleDrawer, formDrawerHasUpdated
+
+  if (props.isDrawer) {
+    const unsavedStatus = inject('drawerUnsaved')
+
+    changeVisisbleDrawer = unsavedStatus.changeVisisbleDrawer
+    formDrawerHasUpdated = unsavedStatus.formDrawerHasUpdated
   }
 
   const visibleDialog = computed({
@@ -46,9 +64,14 @@
   }
 
   const onLeavePage = () => {
-    if (props.isTabs && (redirectToUnsaved.value === currentRouter)) {
+    if (props.isTabs && redirectToUnsaved.value === currentRouter) {
       visibleOnSaved.value = true
       changeTab(tabHasUpdate.nextTab)
+      openDialogUnsaved(false)
+    } else if (props.isDrawer) {
+      const toKeepDisplayingDrawer = false
+      const resetForm = true
+      changeVisisbleDrawer(toKeepDisplayingDrawer, resetForm)
       openDialogUnsaved(false)
     } else {
       unsavedDisabled.value = true
@@ -57,14 +80,14 @@
         router.go(-1)
         return
       }
-  
+
       router.push({ name: redirectToUnsaved.value })
     }
   }
 
   const onKeepEditing = () => {
     openDialogUnsaved(false)
-    visibleOnSaved.value = false
+    if (props.isTabs) visibleOnSaved.value = false
   }
 
   onBeforeRouteLeave((to, from, next) => {
@@ -76,12 +99,20 @@
     return next()
   })
 
-  watch(tabHasUpdate, () => {
-    if (formHasUpdated.value) {
-      visibleOnSaved.value = true
-      openDialogUnsaved(true)
-      changeTab(tabHasUpdate.oldTab)
-    }
+  watch(
+    tabHasUpdate,
+    () => {
+      if (formHasUpdated.value) {
+        visibleOnSaved.value = true
+        openDialogUnsaved(true)
+        changeTab(tabHasUpdate.oldTab)
+      }
+    },
+    { deep: true }
+  )
+
+  watch(formDrawerHasUpdated, () => {
+    openDialogUnsaved(true)
   })
 </script>
 
@@ -106,7 +137,8 @@
         <h5 class="text-lg not-italic font-bold leading-5">Unsaved changes</h5>
       </template>
       <div class="flex p-5 items-center flex-1 text-secondary-color text-sm font-normal leading-5">
-        There are unsaved changes. Do you want to leave without finishing?
+        Your changes will be discarded if you leave the page without saving them. Do you want to
+        leave?
       </div>
       <template #footer>
         <PrimeButton

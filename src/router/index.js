@@ -18,6 +18,7 @@ import { intelligentDnsRoutes } from '@routes/intelligent-dns-routes'
 import { loginRoutes } from '@routes/login-routes'
 import { marketplaceRoutes } from '@routes/marketplace-routes'
 import { metricsRoutes } from '@routes/metrics-routes'
+import { realTimeEventsRoutes } from '@/router/routes/real-time-events-routes'
 import { mfaRoutes } from '@routes/mfa-routes'
 import { networkListsRoutes } from '@routes/network-lists-routes'
 import { passwordRoutes } from '@routes/password-routes'
@@ -34,8 +35,9 @@ import { settingsRoutes } from '@routes/your-settings-routes'
 
 import { createRouter, createWebHistory } from 'vue-router'
 
-import afterEachRoute from './hooks/afterEachRoute'
+import afterEachRouteGuard from './hooks/afterEachRoute'
 import beforeEachRoute from './hooks/beforeEachRoute'
+import redirectToManager from './hooks/redirectToManager'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -71,11 +73,13 @@ const router = createRouter({
     accountRoutes,
     settingsRoutes,
     wafRulesRoutes,
-    metricsRoutes
+    metricsRoutes,
+    realTimeEventsRoutes
   ].concat(errorRoutes)
 })
 
 router.beforeEach(beforeEachRoute)
-router.afterEach(afterEachRoute)
+router.beforeEach(redirectToManager)
+router.afterEach(afterEachRouteGuard)
 
 export default router

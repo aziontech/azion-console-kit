@@ -33,7 +33,7 @@ const DASHBOARDS_TEXTS = {
       },
       total_bandwidth_usage: {
         description:
-          'Quantity of bandwidth used while the edge delivers your content. Displays the total amount of bandwidth used.'
+          'Average of bandwidth used while the edge delivers your content. Displays the total amount of bandwidth used.'
       },
       bandwidth_offloaded: {
         description:
@@ -41,11 +41,11 @@ const DASHBOARDS_TEXTS = {
       },
       saved_bandwidth: {
         description:
-          'Quantity of bandwidth delivered by the edge without searching for the content on the origin server. Displays the average of bandwidth saved.'
+          'Average of bandwidth delivered by the edge without searching for the content on the origin server. Displays the average of bandwidth saved.'
       },
       missed_bandwidth: {
         description:
-          'Quantity of bandwidth used by the origin server to search for content. Displays the average of bandwidth used.'
+          'Average of bandwidth used by the origin server to search for content. Displays the average of bandwidth used.'
       }
     },
     requests: {
@@ -67,7 +67,7 @@ const DASHBOARDS_TEXTS = {
       },
       total_requests_per_second: {
         description:
-          'Quantity of requests per second made from customers to your domain. Displays the average number of requests per second.'
+          'Average of requests per second made from customers to your domain. Displays the average number of requests per second.'
       },
       requests_per_second_offloaded: {
         description:
@@ -75,29 +75,29 @@ const DASHBOARDS_TEXTS = {
       },
       saved_requests_per_second: {
         description:
-          'Quantity of requests per second delivered by the edge without searching for the content on the origin server. Displays the average number of saved requests delivered.'
+          'Average of requests per second delivered by the edge without searching for the content on the origin server. Displays the average number of saved requests delivered.'
       },
       missed_requests_per_second: {
         description:
-          'Amount of requests per second delivered by the edge after searching for the content on the origin server. Displays the average number of missed requests per second.'
+          'Average of requests per second delivered by the edge after searching for the content on the origin server. Displays the average number of missed requests per second.'
       }
     },
     status_codes: {
       http_status_codes_2xx: {
         description:
-          'Indicates user requests that were received, understood, accepted, and processed by the server. Displays Requests Status Code200, Requests Status Code204, Requests Status Code206, and Requests Status Code2xx.'
+          'Indicates user requests that were received, understood, accepted, and processed by the server. Displays Requests Status Code 200, Requests Status Code 204, Requests Status Code 206, and Requests Status Code 2xx.'
       },
       http_status_codes_3xx: {
         description:
-          'Indicates user requests that were redirected and had to go through another stage to be delivered. Displays Requests Status Code301, Requests Status Code302, Requests Status Code304, and Requests Status Code3xx.'
+          'Indicates user requests that were redirected and had to go through another stage to be delivered. Displays Requests Status Code 301, Requests Status Code 302, Requests Status Code 304, and Requests Status Code 3xx.'
       },
       http_status_codes_4xx: {
         description:
-          "Indicates errors that have occurred with user's requests. Displays Requests Status Code400, Requests Status Code403, Requests Status Code404, and Requests Status Code4xx."
+          "Indicates errors that have occurred with user's requests. Displays Requests Status Code 400, Requests Status Code 403, Requests Status Code 404, and Requests Status Code 4xx."
       },
       http_status_codes_5xx: {
         description:
-          'Indicates the server failed to deliver an apparently valid request. Displays Requests Status Code500, Requests Status Code502, Requests Status Code503, and Requests Status Code5xx.'
+          'Indicates the server failed to deliver an apparently valid request. Displays Requests Status Code 500, Requests Status Code 502, Requests Status Code 503, and Requests Status Code 5xx.'
       }
     },
     waf: {
@@ -158,7 +158,7 @@ const DASHBOARDS_TEXTS = {
       },
       total_requests_per_second: {
         description:
-          'Amount of requests per second made to your content images being processed. Displays the average number of requests per second.'
+          'Requests per second made to your content images being processed. Displays the average number of requests per second.'
       }
     }
   },

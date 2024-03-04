@@ -12,11 +12,12 @@
   import TabPanel from 'primevue/tabpanel'
   import TabView from 'primevue/tabview'
   import { useToast } from 'primevue/usetoast'
-  import { computed, onBeforeMount, ref, watch } from 'vue'
+  import { computed, onBeforeMount, ref, watch, reactive, provide } from 'vue'
   import { useRoute, useRouter } from 'vue-router'
   import * as yup from 'yup'
   import FormFieldsIntelligentDnsCreate from './FormFields/FormFieldsIntelligentDns.vue'
   import FormFieldsRecords from './FormFields/FormFieldsRecords'
+  import { generateCurrentTimestamp } from '@/helpers/generate-timestamp'
 
   const props = defineProps({
     loadIntelligentDNSService: { type: Function, required: true },
@@ -77,6 +78,17 @@
     }
   ])
   const RECORD_TYPE_WITHOUT_TTL = 'ANAME'
+
+  const tabHasUpdate = reactive({ oldTab: null, nextTab: 0, updated: 0 })
+  const formHasUpdated = ref(false)
+  const visibleOnSaved = ref(false)
+
+  const defaultTabs = {
+    mainSettings: 0,
+    records: 1
+  }
+
+  const mapTabs = ref({ ...defaultTabs })
 
   const validationSchemaEditIDNS = yup.object({
     name: yup.string().required(),
@@ -165,14 +177,7 @@
   }
 
   const changeRouteByClickingOnTab = (tabEvent) => {
-    if (tabEvent.index === 0) {
-      router.push({ name: 'edit-intelligent-dns', params: { id: intelligentDNSID.value } })
-    } else {
-      router.push({
-        name: 'intelligent-dns-records',
-        params: { id: intelligentDNSID.value }
-      })
-    }
+    changeTab(tabEvent.index)
   }
 
   const handleCopyNameServers = () => {
@@ -190,6 +195,10 @@
 
   const showEditFormWithActionTab = computed(() => {
     return activeTab.value === 0
+  })
+
+  const showRecords = computed(() => {
+    return activeTab.value === mapTabs.value?.records
   })
 
   const loadRecordServiceWithIDNSIdDecorator = async (payload) => {
@@ -210,6 +219,35 @@
   onBeforeMount(() => {
     intelligentDNSID.value = route.params.id
     renderTabByRouterPath()
+  })
+
+  const changeTab = (index) => {
+    activeTab.value = index
+    if (index === 0) {
+      router.push({ name: 'edit-intelligent-dns', params: { id: intelligentDNSID.value } })
+    } else {
+      router.push({
+        name: 'intelligent-dns-records',
+        params: { id: intelligentDNSID.value }
+      })
+    }
+  }
+
+  provide('unsaved', {
+    changeTab,
+    tabHasUpdate,
+    formHasUpdated,
+    visibleOnSaved
+  })
+
+  watch(activeTab, (newValue, oldValue) => {
+    if (visibleOnSaved.value) {
+      return
+    } else {
+      tabHasUpdate.oldTab = oldValue
+      tabHasUpdate.nextTab = newValue
+      tabHasUpdate.updated = generateCurrentTimestamp()
+    }
   })
 </script>
 
@@ -233,7 +271,7 @@
     </template>
     <template #content>
       <TabView
-        v-model:activeIndex="activeTab"
+        :activeIndex="activeTab"
         @tab-click="changeRouteByClickingOnTab"
         class="w-full"
       >
@@ -260,77 +298,79 @@
           </EditFormBlock>
         </TabPanel>
         <TabPanel header="Records">
-          <ListTableNoHeaderBlock
-            ref="listIDNSResourcesRef"
-            v-if="hasContentToList"
-            pageTitleDelete="Record"
-            addButtonLabel="Add"
-            :editInDrawer="openEditDrawerIDNSResource"
-            :columns="recordListColumns"
-            :listService="listRecordsServiceIntelligentDNSDecorator"
-            :deleteService="deleteRecordsServiceIntelligentDNSDecorator"
-            @on-load-data="handleLoadData"
-            emptyListMessage="No Record found."
-          >
-            <template #addButton>
-              <PrimeButton
-                icon="pi pi-plus"
-                label="Add"
-                @click="openCreateDrawerIDNSResource"
-              />
-            </template>
-          </ListTableNoHeaderBlock>
+          <div v-if="showRecords">
+            <ListTableNoHeaderBlock
+              ref="listIDNSResourcesRef"
+              v-if="hasContentToList"
+              pageTitleDelete="Record"
+              addButtonLabel="Add"
+              :editInDrawer="openEditDrawerIDNSResource"
+              :columns="recordListColumns"
+              :listService="listRecordsServiceIntelligentDNSDecorator"
+              :deleteService="deleteRecordsServiceIntelligentDNSDecorator"
+              @on-load-data="handleLoadData"
+              emptyListMessage="No Record found."
+            >
+              <template #addButton>
+                <PrimeButton
+                  icon="pi pi-plus"
+                  label="Add"
+                  @click="openCreateDrawerIDNSResource"
+                />
+              </template>
+            </ListTableNoHeaderBlock>
 
-          <EmptyResultsBlock
-            v-else
-            title="No record has been created"
-            description=" Click the button below to initiate the setup process and create your first record."
-            createButtonLabel="Add"
-            createPagePath="records/create"
-            :documentationService="documentationService"
-            :inTabs="true"
-          >
-            <template #default>
-              <PrimeButton
-                severity="secondary"
-                icon="pi pi-plus"
-                label="Add"
-                @click="openCreateDrawerIDNSResource"
-              />
-            </template>
-            <template #illustration>
-              <Illustration />
-            </template>
-          </EmptyResultsBlock>
+            <EmptyResultsBlock
+              v-else
+              title="No record has been created"
+              description=" Click the button below to initiate the setup process and create your first record."
+              createButtonLabel="Add"
+              createPagePath="records/create"
+              :documentationService="documentationService"
+              :inTabs="true"
+            >
+              <template #default>
+                <PrimeButton
+                  severity="secondary"
+                  icon="pi pi-plus"
+                  label="Add"
+                  @click="openCreateDrawerIDNSResource"
+                />
+              </template>
+              <template #illustration>
+                <Illustration />
+              </template>
+            </EmptyResultsBlock>
 
-          <CreateDrawerBlock
-            v-if="showCreateRecordDrawer"
-            v-model:visible="showCreateRecordDrawer"
-            :createService="createRecordsService"
-            :schema="validationSchemaIDNSRecords"
-            :initialValues="initialValuesCreateRecords"
-            @onSuccess="reloadResourcesList"
-            title="Create Intelligent DNS Record"
-          >
-            <template #formFields>
-              <FormFieldsRecords />
-            </template>
-          </CreateDrawerBlock>
+            <CreateDrawerBlock
+              v-if="showCreateRecordDrawer"
+              v-model:visible="showCreateRecordDrawer"
+              :createService="createRecordsService"
+              :schema="validationSchemaIDNSRecords"
+              :initialValues="initialValuesCreateRecords"
+              @onSuccess="reloadResourcesList"
+              title="Create Intelligent DNS Record"
+            >
+              <template #formFields>
+                <FormFieldsRecords />
+              </template>
+            </CreateDrawerBlock>
 
-          <EditDrawerBlock
-            v-if="showEditRecordDrawer"
-            :id="selectedIdnsRecordToEdit"
-            v-model:visible="showEditRecordDrawer"
-            :loadService="loadRecordServiceWithIDNSIdDecorator"
-            :editService="editRecordServiceWithIDNSIdDecorator"
-            :schema="validationSchemaIDNSRecords"
-            @onSuccess="reloadResourcesList"
-            title="Edit Intelligent DNS Record"
-          >
-            <template #formFields>
-              <FormFieldsRecords />
-            </template>
-          </EditDrawerBlock>
+            <EditDrawerBlock
+              v-if="showEditRecordDrawer"
+              :id="selectedIdnsRecordToEdit"
+              v-model:visible="showEditRecordDrawer"
+              :loadService="loadRecordServiceWithIDNSIdDecorator"
+              :editService="editRecordServiceWithIDNSIdDecorator"
+              :schema="validationSchemaIDNSRecords"
+              @onSuccess="reloadResourcesList"
+              title="Edit Intelligent DNS Record"
+            >
+              <template #formFields>
+                <FormFieldsRecords />
+              </template>
+            </EditDrawerBlock>
+          </div>
         </TabPanel>
       </TabView>
       <router-view></router-view>
