@@ -143,7 +143,7 @@
   import { computed, onMounted, ref, inject } from 'vue'
   import { useRouter } from 'vue-router'
   import * as yup from 'yup'
-  /** @type {import('@/plugins/adapters/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
+  /** @type {import('@/plugins/adapters/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
 
   defineOptions({
@@ -245,12 +245,12 @@
       }
 
       await props.putAdditionalDataService(form)
-      tracker.userSignedUp().submittedAdditionalData()
+      tracker.signUp.userSignedUp().submittedAdditionalData()
 
       router.push({ name: 'home' })
     } catch (err) {
       toast.add({ life: 5000, severity: 'error', detail: err, summary: 'Error' })
-      tracker.failedSubmitAdditionalData().track()
+      tracker.signUp.failedSubmitAdditionalData().track()
     } finally {
       loading.value = false
     }

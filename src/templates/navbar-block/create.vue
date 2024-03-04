@@ -72,7 +72,7 @@
   import PrimeDialog from 'primevue/dialog'
   import Sidebar from 'primevue/sidebar'
   import CreateModalBlock from '@/templates/create-modal-block'
-  /**@type {import('@/plugins/adapters/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
+  /**@type {import('@/plugins/adapters/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
 
   defineOptions({ name: 'navbar-create-block' })
@@ -83,7 +83,7 @@
   const SCREEN_BREAKPOINT_MD = 768
 
   const openCreateModalToggle = () => {
-    tracker.createEventInHomeAndHeader({ url: route.path, location: 'header' }).track()
+    tracker.create.create.createEventInHomeAndHeader({ url: route.path, location: 'header' }).track()
     createModalStore.toggle()
   }
 

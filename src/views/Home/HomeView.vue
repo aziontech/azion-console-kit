@@ -211,7 +211,7 @@
   import { useForm } from 'vee-validate'
   import * as yup from 'yup'
   import FormFieldsHome from './FormFields/FormFieldsHome.vue'
-  /**@type {import('@/plugins/adapters/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
+  /**@type {import('@/plugins/adapters/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
 
   export default {
     name: 'home-view',
@@ -324,7 +324,7 @@
       const createModalStore = useCreateModalStore()
 
       const openModalCreate = () => {
-        tracker.createEventInHomeAndHeader({ url: '/', location: 'home' }).track()
+        tracker.create.createEventInHomeAndHeader({ url: '/', location: 'home' }).track()
         createModalStore.toggle()
       }
 

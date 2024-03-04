@@ -1,4 +1,4 @@
-import { AnalyticsTrackerAdapter } from '@/plugins/adapters/AnalyticsTrackerAdapter'
+import { AnalyticsTrackerAdapter } from '@/plugins/adapters/analytics/AnalyticsTrackerAdapter'
 import { describe, expect, it, vi } from 'vitest'
 
 const makeSut = () => {
@@ -181,7 +181,7 @@ describe('AnalyticsTrackerAdapter', () => {
   it('should call userSigned when valid identification is provided', () => {
     const { sut, analyticsClientSpy } = makeSut()
 
-    sut.userSigned()
+    sut.signIn.userSignedIn()
 
     sut.track()
 
@@ -191,7 +191,7 @@ describe('AnalyticsTrackerAdapter', () => {
   it('should call userFailedSignIn when valid identification is provided', () => {
     const { sut, analyticsClientSpy } = makeSut()
 
-    sut.userFailedSignIn()
+    sut.signIn.userFailedSignIn()
 
     sut.track()
 
@@ -203,7 +203,7 @@ describe('AnalyticsTrackerAdapter', () => {
     const mockUrl = 'test-url-ABC/q-2/t'
     const mockLocation = 'home'
 
-    sut.createEventInHomeAndHeader({
+    sut.create.createEventInHomeAndHeader({
       url: mockUrl,
       location: mockLocation
     })
@@ -219,7 +219,7 @@ describe('AnalyticsTrackerAdapter', () => {
   it('should track the user sign-up event with the correct parameters', () => {
     const { sut, analyticsClientSpy } = makeSut()
 
-    sut.userSignedUp().track()
+    sut.signUp.userSignedUp().track()
 
     expect(analyticsClientSpy.track).toHaveBeenCalledWith('User Signed Up', {})
   })
@@ -227,7 +227,7 @@ describe('AnalyticsTrackerAdapter', () => {
   it('should track the additional data submit event with the correct parameters', () => {
     const { sut, analyticsClientSpy } = makeSut()
 
-    sut.submittedAdditionalData().track()
+    sut.signUp.submittedAdditionalData().track()
 
     expect(analyticsClientSpy.track).toHaveBeenCalledWith('Submitted Additional Data', {})
   })
@@ -235,7 +235,7 @@ describe('AnalyticsTrackerAdapter', () => {
   it('should track the user failed to sign-up event with the correct parameters', () => {
     const { sut, analyticsClientSpy } = makeSut()
 
-    sut.userFailedSignUp().track()
+    sut.signUp.userFailedSignUp().track()
 
     expect(analyticsClientSpy.track).toHaveBeenCalledWith('User Failed to Sign Up', {})
   })
@@ -243,7 +243,7 @@ describe('AnalyticsTrackerAdapter', () => {
   it('should track the failed additional data submit event with the correct parameters', () => {
     const { sut, analyticsClientSpy } = makeSut()
 
-    sut.failedSubmitAdditionalData().track()
+    sut.signUp.failedSubmitAdditionalData().track()
 
     expect(analyticsClientSpy.track).toHaveBeenCalledWith('Failed to Submit Additional Data', {})
   })
@@ -253,7 +253,7 @@ describe('AnalyticsTrackerAdapter', () => {
     const selectionMock = 'cardTitle'
     const sectionMock = 'recommended'
 
-    sut.selectedOnCreate({
+    sut.create.selectedOnCreate({
       selection: selectionMock,
       section: sectionMock
     })
@@ -269,7 +269,7 @@ describe('AnalyticsTrackerAdapter', () => {
   it('should use the View More Details on Template event with correct parameters', () => {
     const { sut, analyticsClientSpy } = makeSut()
 
-    sut.clickMoreDetailsOnTemplate({})
+    sut.create.clickMoreDetailsOnTemplate({})
 
     sut.track()
 
@@ -282,7 +282,7 @@ describe('AnalyticsTrackerAdapter', () => {
   it('should use the deployed event with correct parameters', () => {
     const { sut, analyticsClientSpy } = makeSut()
 
-    sut.eventDeployed({})
+    sut.create.eventDeployed()
 
     sut.track()
 
@@ -292,7 +292,7 @@ describe('AnalyticsTrackerAdapter', () => {
   it('should track the account activation event with the correct parameters', () => {
     const { sut, analyticsClientSpy } = makeSut()
 
-    sut.userActivatedAccount().track()
+    sut.signUp.userActivatedAccount().track()
 
     expect(analyticsClientSpy.track).toHaveBeenCalledWith('User Activated Account', {})
   })
@@ -300,7 +300,7 @@ describe('AnalyticsTrackerAdapter', () => {
   it('should use the failed deployed event with correct parameters', () => {
     const { sut, analyticsClientSpy } = makeSut()
 
-    sut.eventFailedDeployed({})
+    sut.create.eventFailedDeployed()
 
     sut.track()
 

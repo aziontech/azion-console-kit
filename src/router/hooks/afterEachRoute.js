@@ -6,7 +6,7 @@ import { inject } from 'vue'
 export default function afterEachRoute(to, from, failure) {
   const loadingStore = useLoadingStore()
   loadingStore.finishLoading()
-  /** @type {import('@/plugins/adapters/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
+  /** @type {import('@/plugins/adapters/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
   tracker
     .pageLoad({

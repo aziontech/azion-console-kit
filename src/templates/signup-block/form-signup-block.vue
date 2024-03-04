@@ -106,7 +106,7 @@
   import InputPassword from 'primevue/password'
   import PrimeButton from 'primevue/button'
   import PrimeDivider from 'primevue/divider'
-  /** @type {import('@/plugins/adapters/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
+  /** @type {import('@/plugins/adapters/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
 
   defineEmits(['change-signup-method'])
@@ -184,7 +184,7 @@
 
       router.push({ name: 'activation', query: { email: encodeEmail(values.email) } })
     } catch (err) {
-      tracker.userFailedSignUp().track()
+      tracker.signUp.userFailedSignUp().track()
       loading.value = false
       toast.add({ life: 5000, severity: 'error', detail: err, summary: 'Error' })
     }

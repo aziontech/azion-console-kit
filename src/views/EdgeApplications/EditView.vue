@@ -35,8 +35,7 @@
 
   defineOptions({ name: 'edit-edge-application' })
   const emit = defineEmits(['updatedApplication'])
-
-  /**@type {import('@/plugins/adapters/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
+  /**@type {import('@/plugins/adapters/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
 
   const props = defineProps({

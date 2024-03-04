@@ -156,7 +156,7 @@
   import { ref, inject } from 'vue'
   import { useRouter } from 'vue-router'
   import * as yup from 'yup'
-  /**@type {import('@/plugins/adapters/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
+  /**@type {import('@/plugins/adapters/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
 
   defineOptions({ name: 'signInBlock' })
@@ -228,7 +228,7 @@
 
       await props.authenticationLoginService(loginData)
       const { twoFactor, trustedDevice, user_tracking_info: userInfo } = await verify()
-      tracker.userSigned()
+      tracker.signIn.userSignedIn()
       if (twoFactor) {
         const mfaRoute = trustedDevice ? 'authentication' : 'setup'
         router.push(`/mfa/${mfaRoute}`)
@@ -237,7 +237,7 @@
 
       await switchClientAccount(userInfo.props)
     } catch {
-      tracker.userFailedSignIn().track()
+      tracker.signIn.userFailedSignIn().track()
       hasRequestErrorMessage.value = new UserNotFoundError().message
       isButtonLoading.value = false
     }

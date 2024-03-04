@@ -9,7 +9,7 @@
   import PageHeadingBlock from '@/templates/page-heading-block'
 
   defineOptions({ name: 'list-edge-applications' })
-  /**@type {import('@/plugins/adapters/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
+  /**@type {import('@/plugins/adapters/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
 
   const props = defineProps({

@@ -1,6 +1,6 @@
 import { getEnvironment } from '@/helpers'
 import { makeAnalyticsClient } from './factories/analytics-tracking-factory'
-import { AnalyticsTrackerAdapter } from './adapters/AnalyticsTrackerAdapter'
+import { AnalyticsTrackerAdapter } from './adapters/analytics/AnalyticsTrackerAdapter'
 
 /**@type {import('vue').Plugin} */
 export default {

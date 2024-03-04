@@ -138,7 +138,7 @@
   import ScriptRunnerBlock from '@/templates/script-runner-block'
   import PrimeCard from 'primevue/card'
   import { useToast } from 'primevue/usetoast'
-  /**@type {import('@/plugins/adapters/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
+  /**@type {import('@/plugins/adapters/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
 
   const props = defineProps({
@@ -196,7 +196,7 @@
         detail:
           'The edge application is being propagated through the edge nodes. This process will take a few minutes.'
       })
-      tracker.eventDeployed().track()
+      tracker.create.eventDeployed().track()
     } catch (error) {
       deployFailed.value = true
       toast.add({
@@ -205,7 +205,7 @@
         summary: 'Creation failed',
         detail: failMessage
       })
-      tracker.eventFailedDeployed().track()
+      tracker.create.eventFailedDeployed().track()
     }
   }
 

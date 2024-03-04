@@ -238,7 +238,7 @@
   import { useLoadingStore } from '@/stores/loading'
   import { useRouter, useRoute } from 'vue-router'
   import { useToast } from 'primevue/usetoast'
-  /**@type {import('@/plugins/adapters/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
+  /**@type {import('@/plugins/adapters/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
 
   const isLoading = ref(false)
@@ -296,7 +296,7 @@
   }
 
   const openDetails = () => {
-    tracker.clickMoreDetailsOnTemplate().track()
+    tracker.create.clickMoreDetailsOnTemplate().track()
     showDetails.value = true
   }
 

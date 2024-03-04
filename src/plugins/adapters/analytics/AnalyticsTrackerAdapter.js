@@ -1,3 +1,7 @@
+import { SignUpTracker } from './products/SignUpTracker'
+import { SignInTracker } from './products/SignInTracker'
+import { CreateTracker } from './products/CreateTracker'
+
 /**
  * @typedef {Object} TrackerEvent
  * @property {string} eventName - The name of the event.
@@ -14,6 +18,9 @@ export class AnalyticsTrackerAdapter {
   /** @type {import('analytics').AnalyticsInstance} */
   #analyticsClient = null
   #traits = {}
+  #signUpTracker = null
+  #signInTracker = null
+  #createTracker = null
 
   /**
    * Creates an instance of AnalyticsTrackerAdapter.
@@ -21,6 +28,38 @@ export class AnalyticsTrackerAdapter {
    */
   constructor(analyticsClient) {
     this.#analyticsClient = analyticsClient
+
+    this.#signUpTracker = new SignUpTracker(this)
+    this.#signInTracker = new SignInTracker(this)
+    this.#createTracker = new CreateTracker(this)
+  }
+
+  addEvent(event) {
+    this.#events.push(event)
+  }
+
+  /**
+   * call this method to run each stored tracker event
+   */
+  async track() {
+    this.#events.forEach(async (action) => {
+      const { eventName, props } = action
+      const propsWithTraits = { ...props, ...this.#traits }
+      await this.#analyticsClient.track(eventName, propsWithTraits)
+    })
+    this.#events = []
+  }
+
+  get signUp() {
+    return this.#signUpTracker
+  }
+
+  get signIn() {
+    return this.#signInTracker
+  }
+
+  get create() {
+    return this.#createTracker
   }
 
   async identify(id) {
@@ -83,28 +122,6 @@ export class AnalyticsTrackerAdapter {
   }
 
   /**
-   * @returns {AnalyticsTrackerAdapter}
-   */
-  userSigned() {
-    this.#events.push({
-      eventName: 'User Signed In',
-      props: {}
-    })
-    return this
-  }
-
-  /**
-   * @returns {AnalyticsTrackerAdapter}
-   */
-  userFailedSignIn() {
-    this.#events.push({
-      eventName: 'User Failed to Sign In',
-      props: {}
-    })
-    return this
-  }
-
-  /**
    * @param {Object} payload
    * @param {AzionProductsNames} payload.productName
    * @returns {AnalyticsTrackerAdapter}
@@ -154,139 +171,5 @@ export class AnalyticsTrackerAdapter {
       props: {}
     })
     return this
-  }
-
-  /**
-   * @param {Object} payload
-   * @param {string} payload.url
-   * @param {string} payload.location
-   * @returns {AnalyticsTrackerAdapter}
-   */
-  createEventInHomeAndHeader(payload) {
-    this.#events.push({
-      eventName: 'Clicked to Create',
-      props: {
-        url: payload.url,
-        location: payload.location
-      }
-    })
-    return this
-  }
-
-  /**
-   * @returns {AnalyticsTrackerAdapter}
-   */
-  userSignedUp() {
-    this.#events.push({
-      eventName: 'User Signed Up',
-      props: {}
-    })
-    return this
-  }
-
-  /**
-   * @returns {AnalyticsTrackerAdapter}
-   */
-  submittedAdditionalData() {
-    this.#events.push({
-      eventName: 'Submitted Additional Data',
-      props: {}
-    })
-    return this
-  }
-
-  /**
-   * @returns {AnalyticsTrackerAdapter}
-   */
-  userFailedSignUp() {
-    this.#events.push({
-      eventName: 'User Failed to Sign Up',
-      props: {}
-    })
-    return this
-  }
-
-  /**
-   * @returns {AnalyticsTrackerAdapter}
-   */
-  failedSubmitAdditionalData() {
-    this.#events.push({
-      eventName: 'Failed to Submit Additional Data',
-      props: {}
-    })
-    return this
-  }
-
-  /**
-   * @param {Object} payload
-   * @param {string} payload.section
-   * @param {string} payload.selection
-   * @returns {AnalyticsTrackerAdapter}
-   */
-  selectedOnCreate(payload) {
-    this.#events.push({
-      eventName: 'Selected on Create',
-      props: {
-        section: payload.section,
-        selection: payload.selection
-      }
-    })
-    return this
-  }
-
-  /**
-   * @returns {AnalyticsTrackerAdapter}
-   */
-  clickMoreDetailsOnTemplate() {
-    this.#events.push({
-      eventName: 'Clicked to View More Details on Template',
-      props: {}
-    })
-    return this
-  }
-
-  /**
-   * @returns {AnalyticsTrackerAdapter}
-   */
-  userActivatedAccount() {
-    this.#events.push({
-      eventName: 'User Activated Account',
-      props: {}
-    })
-    return this
-  }
-
-  /**
-   * @returns {AnalyticsTrackerAdapter}
-   */
-  eventDeployed() {
-    this.#events.push({
-      eventName: 'Deployed',
-      props: {}
-    })
-    return this
-  }
-
-  /**
-   * @returns {AnalyticsTrackerAdapter}
-   */
-  eventFailedDeployed() {
-    this.#events.push({
-      eventName: 'Failed to Deploy',
-      props: {}
-    })
-    return this
-  }
-
-  /**
-   * call this method to run each stored tracker event
-   */
-  async track() {
-    this.#events.forEach(async (action) => {
-      const { eventName, props } = action
-      const propsWithTraits = { ...props, ...this.#traits }
-      await this.#analyticsClient.track(eventName, propsWithTraits)
-    })
-    this.#events = []
   }
 }
