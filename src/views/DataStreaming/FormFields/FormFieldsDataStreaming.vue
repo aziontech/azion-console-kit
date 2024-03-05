@@ -125,7 +125,7 @@
             <label class="text-color text-sm font-normal leading-tight">Filter Domains </label>
           </div>
           <small class="text-color-secondary text-xs font-normal leading-tight"
-            >By selecting the All Current and Future option, you can activate the Sampling
+            >By selecting the All Current and Future Domains option, you can activate the Sampling
             option.</small
           >
         </div>
