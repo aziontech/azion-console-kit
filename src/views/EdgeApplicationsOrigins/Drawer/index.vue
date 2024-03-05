@@ -164,7 +164,7 @@
 
   const handleTrackCreation = () => {
     tracker
-      .clickToCreate({
+      .productCreated({
         productName: 'Origin'
       })
       .track()

@@ -302,7 +302,7 @@
         solutionId: solution.value.id,
         version: solution.value.version,
         versionId: solution.value.latestVersionInstallTemplate,
-        isv: solution.value.vendor
+        isv: solution.value.vendor.name
       })
       .track()
     showDetails.value = true
