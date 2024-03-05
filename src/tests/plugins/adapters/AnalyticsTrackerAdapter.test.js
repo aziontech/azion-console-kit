@@ -331,7 +331,7 @@ describe('AnalyticsTrackerAdapter', () => {
   it('should be able to track click to create event with correct params', () => {
     const { sut, analyticsClientSpy } = makeSut()
     const productNameMock = 'Origin'
-    
+
     sut.clickToCreate({
       productName: productNameMock
     })
