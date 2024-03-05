@@ -103,7 +103,10 @@
   />
   <div class="flex flex-col gap-8 my-4">
     <div class="flex gap-1">
-      <p class="text-xs font-medium leading-4">Logs of events from an account on Azion regarding activities registered on Activity History. Use the Real-Time Events GraphQL API to query up to 2 years of logs.</p>
+      <p class="text-xs font-medium leading-4">
+        Logs of events from an account on Azion regarding activities registered on Activity History.
+        Use the Real-Time Events GraphQL API to query up to 2 years of logs.
+      </p>
     </div>
     <IntervalFilterBlock
       v-model:filterDate="filterDate"

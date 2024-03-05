@@ -135,7 +135,9 @@
   />
   <div class="flex flex-col gap-8 my-4">
     <div class="flex gap-1">
-      <p class="text-xs font-medium leading-4">Logs of events from edge applications using Edge Runtime returned by Cells Console.</p>
+      <p class="text-xs font-medium leading-4">
+        Logs of events from edge applications using Edge Runtime returned by Cells Console.
+      </p>
     </div>
     <IntervalFilterBlock
       v-model:filterDate="filterDate"
