@@ -147,7 +147,7 @@
     v-else
     title="No logs have been found for this period."
     description="Use the filter to change time range and variables, or create a new edge application with Tiered Cache configurations. Logs are displayed once there are incoming requests and traffic."
-    createButtonLabel="create button label"
+    createButtonLabel="Edge Application"
     :documentationService="documentationService"
     :inTabs="true"
   />

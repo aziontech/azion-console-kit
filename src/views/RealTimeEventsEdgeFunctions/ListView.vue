@@ -145,7 +145,7 @@
       <PrimeButton
         severity="secondary"
         icon="pi pi-plus"
-        label="Edge Function"
+        label="Edge Functions"
         @click="goToCreateEdgeFunction"
       />
     </template>
