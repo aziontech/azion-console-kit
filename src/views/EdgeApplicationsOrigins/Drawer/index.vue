@@ -163,7 +163,9 @@
   }
 
   const handleTrackCreation = () => {
-    tracker.clickedToCreateOrigin().track()
+    tracker.clickToCreate({
+      productName: 'Origin'
+    }).track()
   }
 
   const copyToKey = async (originKey) => {
