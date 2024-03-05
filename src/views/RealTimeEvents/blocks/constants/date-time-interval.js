@@ -1,46 +1,46 @@
 const DATE_TIME_INTERVALS = [
   {
-    name: 'Last 15 minutes',
+    name: 'Last 15 Minutes',
     code: '0.25'
   },
   {
-    name: 'Last 1 hour',
+    name: 'Last Hour',
     code: '1'
   },
   {
-    name: 'Last 3 hours',
+    name: 'Last 3 Hours',
     code: '3'
   },
   {
-    name: 'Last 6 hours',
+    name: 'Last 6 Hours',
     code: '6'
   },
   {
-    name: 'Last 12 hours',
+    name: 'Last 12 Hours',
     code: '12'
   },
   {
-    name: 'Last day',
+    name: 'LastDday',
     code: '24'
   },
   {
-    name: 'Last 2 days',
+    name: 'Last 2 Days',
     code: '48'
   },
   {
-    name: 'Last 3 days',
+    name: 'Last 3 Days',
     code: '72'
   },
   {
-    name: 'Last 5 days',
+    name: 'Last 5 Days',
     code: '120'
   },
   {
-    name: 'Last 7 days',
+    name: 'Last 7 Days',
     code: '168'
   },
   {
-    name: 'Custom time range',
+    name: 'Custom Time Range',
     code: 'custom'
   }
 ]
