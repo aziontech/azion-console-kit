@@ -116,7 +116,10 @@
   />
   <div class="flex flex-col gap-8 my-4">
     <div class="flex gap-1">
-      <p class="text-xs font-medium leading-4">Logs of events from requests made to edge applications that processed images with Image Processor.</p>
+      <p class="text-xs font-medium leading-4">
+        Logs of events from requests made to edge applications that processed images with Image
+        Processor.
+      </p>
     </div>
     <IntervalFilterBlock
       v-model:filterDate="filterDate"
