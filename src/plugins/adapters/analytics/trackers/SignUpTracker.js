@@ -1,5 +1,9 @@
 export class SignUpTracker {
-  /** @typedef TrackerAdapter - instance of AnalyticsTrackerAdapter */
+  /**
+ * Interface for TrackerAdapter.
+ * @typedef {Object} TrackerAdapter
+ * @property {function(...args: any[]): void} addEvent - Method to add an event.
+ */
   #trackerAdapter
 
   /**

@@ -1,6 +1,6 @@
-import { SignUpTracker } from './products/SignUpTracker'
-import { SignInTracker } from './products/SignInTracker'
-import { CreateTracker } from './products/CreateTracker'
+import { SignUpTracker } from './trackers/SignUpTracker'
+import { SignInTracker } from './trackers/SignInTracker'
+import { CreateTracker } from './trackers/CreateTracker'
 
 /**
  * @typedef {Object} TrackerEvent
