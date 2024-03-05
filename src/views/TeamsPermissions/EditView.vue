@@ -1,7 +1,7 @@
 <template>
   <ContentBlock>
     <template #heading>
-      <PageHeadingBlock pageTitle="Edit Teams Permissions"></PageHeadingBlock>
+      <PageHeadingBlock pageTitle="Edit Team"></PageHeadingBlock>
     </template>
     <template #content>
       <EditFormBlock

@@ -301,7 +301,6 @@
   const validateAndSubmit = async () => {
     submitLoading.value = true
     emit('loading')
-
     try {
       const payload = []
       if (inputSchema.value.fields) {

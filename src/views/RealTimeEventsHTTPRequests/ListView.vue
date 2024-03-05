@@ -6,7 +6,7 @@
   import Drawer from './Drawer'
   import IntervalFilterBlock from '@/views/RealTimeEvents/blocks/interval-filter-block'
   import { useRouter } from 'vue-router'
-
+  const emit = defineEmits(['update:dateTime'])
   const props = defineProps({
     documentationService: {
       type: Function,
@@ -19,10 +19,22 @@
     listHttpRequest: {
       type: Function,
       required: true
+    },
+    dateTime: {
+      type: Object,
+      default: () => ({})
     }
   })
 
-  const filterDate = ref({})
+  const filterDate = computed({
+    get: () => {
+      return props.dateTime
+    },
+    set: (value) => {
+      emit('update:dateTime', value)
+    }
+  })
+
   const hasContentToList = ref(true)
   const listTableBlockRef = ref('')
   const drawerRef = ref('')
@@ -57,10 +69,6 @@
       {
         field: 'bytesSent',
         header: 'Bytes Sent'
-      },
-      {
-        field: 'configurationId',
-        header: 'Configuration ID'
       },
       {
         field: 'debugLog',
@@ -106,7 +114,7 @@
     />
   </div>
   <ListTableBlock
-    v-if="hasContentToList"
+    v-if="hasContentToList && filterDate.tsRangeBegin"
     ref="listTableBlockRef"
     :listService="listProvider"
     :columns="getColumns"

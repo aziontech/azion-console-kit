@@ -1,5 +1,7 @@
 import convertGQL from '@/helpers/convert-gql'
 import { AxiosHttpClientSignalDecorator } from '../../axios/AxiosHttpClientSignalDecorator'
+import { makeRealTimeEventsBaseUrl } from '../make-real-time-events-service'
+import { generateCurrentTimestamp } from '@/helpers/generate-timestamp'
 
 export const listActivityHistory = async (filter) => {
   const payload = adapt(filter)
@@ -7,12 +9,9 @@ export const listActivityHistory = async (filter) => {
   const decorator = new AxiosHttpClientSignalDecorator()
 
   const response = await decorator.request({
-    url: '/events/graphql',
+    url: makeRealTimeEventsBaseUrl(),
     method: 'POST',
-    body: payload,
-    headers: {
-      'Content-Type': 'application/json; version=3'
-    }
+    body: payload
   })
 
   return adaptResponse(response)
@@ -33,6 +32,7 @@ const adaptResponse = (response) => {
   const { body } = response
 
   return body.data.activityHistoryEvents?.map((activityHistoryEvents) => ({
+    id: generateCurrentTimestamp(),
     accountId: activityHistoryEvents.accountId,
     authorEmail: activityHistoryEvents.authorEmail,
     authorName: activityHistoryEvents.authorName,

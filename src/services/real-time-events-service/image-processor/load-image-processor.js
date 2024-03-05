@@ -1,6 +1,7 @@
 import convertGQL from '@/helpers/convert-gql'
 import { AxiosHttpClientSignalDecorator } from '../../axios/AxiosHttpClientSignalDecorator'
 import { convertValueToDate } from '@/helpers/convert-date'
+import { makeRealTimeEventsBaseUrl } from '../make-real-time-events-service'
 
 export const loadImageProcessor = async (filter) => {
   const payload = adapt(filter)
@@ -8,7 +9,7 @@ export const loadImageProcessor = async (filter) => {
   const decorator = new AxiosHttpClientSignalDecorator()
 
   const response = await decorator.request({
-    url: '/events/graphql',
+    url: makeRealTimeEventsBaseUrl(),
     method: 'POST',
     body: payload
   })
@@ -28,7 +29,6 @@ const adapt = (filter) => {
       'httpUserAgent',
       'referenceError',
       'remoteAddr',
-      'remoteAddressClass',
       'remotePort',
       'requestMethod',
       'requestTime',
@@ -53,7 +53,9 @@ const adapt = (filter) => {
     tsRange: filter.tsRange,
     and: {
       configurationIdEq: filter.configurationId,
-      tsEq: filter.ts
+      tsEq: filter.ts,
+      httpUserAgentEq: filter.httpUserAgent,
+      httpRefererEq: filter.httpReferer
     }
   }
   return convertGQL(formatFilter, table)
@@ -70,7 +72,6 @@ const adaptResponse = (response) => {
     httpUserAgent: imagesProcessedEvents.httpUserAgent,
     referenceError: imagesProcessedEvents.referenceError,
     remoteAddr: imagesProcessedEvents.remoteAddr,
-    remoteAddressClass: imagesProcessedEvents.remoteAddressClass,
     remotePort: imagesProcessedEvents.remotePort,
     requestMethod: imagesProcessedEvents.requestMethod,
     requestTime: imagesProcessedEvents.requestTime,

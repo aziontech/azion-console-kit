@@ -7,6 +7,7 @@
   import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
   import Drawer from './Drawer'
   import { useRouter } from 'vue-router'
+  const emit = defineEmits(['update:dateTime'])
 
   const props = defineProps({
     documentationService: {
@@ -20,21 +21,34 @@
     loadEdgeFunctionsConsole: {
       type: Function,
       required: true
+    },
+    dateTime: {
+      type: Object,
+      default: () => ({})
     }
   })
 
-  const filterDate = ref({})
+  const filterDate = computed({
+    get: () => {
+      return props.dateTime
+    },
+    set: (value) => {
+      emit('update:dateTime', value)
+    }
+  })
   const hasContentToList = ref(true)
   const listTableBlockRef = ref('')
   const router = useRouter()
   const drawerRef = ref('')
 
-  const openDetailDrawer = ({ configurationId, ts, source }) => {
+  const openDetailDrawer = ({ configurationId, ts, source, line, originalId }) => {
     drawerRef.value.openDetailDrawer({
       tsRange: filterDate.value,
       configurationId,
       source,
-      ts
+      id: originalId,
+      ts,
+      line
     })
   }
 
@@ -65,9 +79,10 @@
         header: 'Function Id'
       },
       {
-        field: 'id',
+        field: 'originalId',
         header: 'ID',
         type: 'component',
+        filterPath: 'originalId',
         component: (columnData) =>
           columnBuilder({ data: columnData, columnAppearance: 'expand-text-column' })
       },
@@ -75,6 +90,7 @@
         field: 'level',
         header: 'Level',
         type: 'component',
+        filterPath: 'level.content',
         component: (columnData) =>
           columnBuilder({
             data: columnData,
@@ -85,12 +101,14 @@
         field: 'line',
         header: 'Line',
         type: 'component',
+        filterPath: 'line',
         component: (columnData) =>
           columnBuilder({ data: columnData, columnAppearance: 'expand-text-column' })
       },
       {
         field: 'lineSource',
         header: 'Line Source',
+        filterPath: 'lineSource.content',
         type: 'component',
         component: (columnData) =>
           columnBuilder({
@@ -126,7 +144,7 @@
     />
   </div>
   <ListTableBlock
-    v-if="hasContentToList"
+    v-if="hasContentToList && filterDate.tsRangeBegin"
     ref="listTableBlockRef"
     :listService="listProvider"
     :columns="getColumns"

@@ -1,4 +1,5 @@
 import DASHBOARDS_TEXTS from './dashboards-texts'
+import HELP_CENTER_URLS from './help-center-urls'
 
 const REPORTS = [
   /**
@@ -8,7 +9,7 @@ const REPORTS = [
   {
     id: '356217848089018959',
     chartOwner: 'azion',
-    label: 'Edge Caching',
+    label: 'Edge Cache',
     description: DASHBOARDS_TEXTS.edge_applications.data_transferred.edge_caching.description,
     aggregationType: 'sum',
     columns: 6,
@@ -22,7 +23,8 @@ const REPORTS = [
     fields: ['dataTransferredTotal', 'dataTransferredOut', 'dataTransferredIn'],
     groupBy: [],
     orderDirection: 'ASC',
-    dashboardId: '357548608166298191'
+    dashboardId: '357548608166298191',
+    helpCenterPath: HELP_CENTER_URLS.edgeApplications.dataTransferred.edgeCaching
   },
   {
     id: '356220228059791957',
@@ -43,7 +45,8 @@ const REPORTS = [
     orderDirection: 'ASC',
     dashboardId: '357548608166298191',
     variationType: 'regular',
-    maxYAxis: 100
+    maxYAxis: 100,
+    helpCenterPath: HELP_CENTER_URLS.edgeApplications.dataTransferred.edgeOffload
   },
   {
     id: '356220625185931855',
@@ -63,7 +66,8 @@ const REPORTS = [
     groupBy: [],
     orderDirection: 'ASC',
     dashboardId: '357548608166298191',
-    variationType: 'regular'
+    variationType: 'regular',
+    helpCenterPath: HELP_CENTER_URLS.edgeApplications.dataTransferred.savedData
   },
   {
     id: '356220671983878733',
@@ -83,7 +87,8 @@ const REPORTS = [
     groupBy: [],
     orderDirection: 'ASC',
     dashboardId: '357548608166298191',
-    variationType: 'inverse'
+    variationType: 'inverse',
+    helpCenterPath: HELP_CENTER_URLS.edgeApplications.dataTransferred.missedData
   },
   {
     id: '357550842741523030',
@@ -104,7 +109,8 @@ const REPORTS = [
     groupBy: [],
     orderDirection: 'ASC',
     dashboardId: '357548608166298191',
-    variationType: 'regular'
+    variationType: 'regular',
+    helpCenterPath: HELP_CENTER_URLS.edgeApplications.dataTransferred.totalBandwidthUsage
   },
   {
     id: '357550842741523029',
@@ -126,7 +132,8 @@ const REPORTS = [
     orderDirection: 'ASC',
     dashboardId: '357548608166298191',
     variationType: 'regular',
-    maxYAxis: 100
+    maxYAxis: 100,
+    helpCenterPath: HELP_CENTER_URLS.edgeApplications.dataTransferred.bandwidthOffloaded
   },
   {
     id: '357817189325079119',
@@ -146,7 +153,8 @@ const REPORTS = [
     groupBy: [],
     orderDirection: 'ASC',
     dashboardId: '357548608166298191',
-    variationType: 'regular'
+    variationType: 'regular',
+    helpCenterPath: HELP_CENTER_URLS.edgeApplications.dataTransferred.savedBandwidth
   },
   {
     id: '357817270971400783',
@@ -166,7 +174,8 @@ const REPORTS = [
     groupBy: [],
     orderDirection: 'ASC',
     dashboardId: '357548608166298191',
-    variationType: 'inverse'
+    variationType: 'inverse',
+    helpCenterPath: HELP_CENTER_URLS.edgeApplications.dataTransferred.missedBandwidth
   },
   /**
    * BUILD
@@ -189,7 +198,8 @@ const REPORTS = [
     fields: ['edgeRequestsTotal', 'httpsRequestsTotal', 'httpRequestsTotal'],
     groupBy: [],
     orderDirection: 'ASC',
-    dashboardId: '357548623571976783'
+    dashboardId: '357548623571976783',
+    helpCenterPath: HELP_CENTER_URLS.edgeApplications.requests.totalRequests
   },
   {
     id: '357822606596899407',
@@ -210,7 +220,8 @@ const REPORTS = [
     orderDirection: 'ASC',
     dashboardId: '357548623571976783',
     variationType: 'regular',
-    maxYAxis: 100
+    maxYAxis: 100,
+    helpCenterPath: HELP_CENTER_URLS.edgeApplications.requests.requestsOffloaded
   },
   {
     id: '357823841952596559',
@@ -230,7 +241,8 @@ const REPORTS = [
     groupBy: [],
     orderDirection: 'ASC',
     dashboardId: '357548623571976783',
-    variationType: 'regular'
+    variationType: 'regular',
+    helpCenterPath: HELP_CENTER_URLS.edgeApplications.requests.savedRequests
   },
   {
     id: '357823947031446101',
@@ -250,7 +262,8 @@ const REPORTS = [
     groupBy: [],
     orderDirection: 'ASC',
     dashboardId: '357548623571976783',
-    variationType: 'inverse'
+    variationType: 'inverse',
+    helpCenterPath: HELP_CENTER_URLS.edgeApplications.requests.missedRequests
   },
   {
     id: '357824034956640847',
@@ -270,7 +283,8 @@ const REPORTS = [
     groupBy: [],
     orderDirection: 'ASC',
     dashboardId: '357548623571976783',
-    variationType: 'regular'
+    variationType: 'regular',
+    helpCenterPath: HELP_CENTER_URLS.edgeApplications.requests.totalRequestsPerSecond
   },
   {
     id: '357824230790791757',
@@ -292,7 +306,8 @@ const REPORTS = [
     orderDirection: 'ASC',
     dashboardId: '357548623571976783',
     variationType: 'regular',
-    maxYAxis: 100
+    maxYAxis: 100,
+    helpCenterPath: HELP_CENTER_URLS.edgeApplications.requests.requestsPerSecondOffloaded
   },
   {
     id: '357824321753711189',
@@ -312,7 +327,8 @@ const REPORTS = [
     groupBy: [],
     orderDirection: 'ASC',
     dashboardId: '357548623571976783',
-    variationType: 'regular'
+    variationType: 'regular',
+    helpCenterPath: HELP_CENTER_URLS.edgeApplications.requests.savedRequestsPerSecond
   },
   {
     id: '357824572487107151',
@@ -332,7 +348,8 @@ const REPORTS = [
     groupBy: [],
     orderDirection: 'ASC',
     dashboardId: '357548623571976783',
-    variationType: 'inverse'
+    variationType: 'inverse',
+    helpCenterPath: HELP_CENTER_URLS.edgeApplications.requests.missedRequestsPerSecond
   },
   {
     id: '357825388709151309',
@@ -356,7 +373,8 @@ const REPORTS = [
     ],
     groupBy: [],
     orderDirection: 'ASC',
-    dashboardId: '357548623571976783'
+    dashboardId: '357548623571976783',
+    helpCenterPath: HELP_CENTER_URLS.edgeApplications.requests.requestsByMethod
   },
   /**
    * BUILD
@@ -384,7 +402,8 @@ const REPORTS = [
     ],
     groupBy: [],
     orderDirection: 'ASC',
-    dashboardId: '357548642810200653'
+    dashboardId: '357548642810200653',
+    helpCenterPath: HELP_CENTER_URLS.edgeApplications.statusCodes.httpStatusCodes2xx
   },
   {
     id: '357825000731837013',
@@ -408,7 +427,8 @@ const REPORTS = [
     ],
     groupBy: [],
     orderDirection: 'ASC',
-    dashboardId: '357548642810200653'
+    dashboardId: '357548642810200653',
+    helpCenterPath: HELP_CENTER_URLS.edgeApplications.statusCodes.httpStatusCodes3xx
   },
   {
     id: '357825058049098319',
@@ -432,7 +452,8 @@ const REPORTS = [
     ],
     groupBy: [],
     orderDirection: 'ASC',
-    dashboardId: '357548642810200653'
+    dashboardId: '357548642810200653',
+    helpCenterPath: HELP_CENTER_URLS.edgeApplications.statusCodes.httpStatusCodes4xx
   },
   {
     id: '357825090550760015',
@@ -456,7 +477,8 @@ const REPORTS = [
     ],
     groupBy: [],
     orderDirection: 'ASC',
-    dashboardId: '357548642810200653'
+    dashboardId: '357548642810200653',
+    helpCenterPath: HELP_CENTER_URLS.edgeApplications.statusCodes.httpStatusCodes5xx
   },
   /**
    * BUILD
@@ -480,7 +502,8 @@ const REPORTS = [
     groupBy: [],
     orderDirection: 'ASC',
     dashboardId: '357549179454620239',
-    variationType: 'regular'
+    variationType: 'regular',
+    helpCenterPath: HELP_CENTER_URLS.edgeApplications.bandwidthSaving.bandwidthSaving
   },
   /**
    * BUILD
@@ -503,7 +526,8 @@ const REPORTS = [
     limit: 5000,
     fields: ['dataTransferredTotal', 'dataTransferredOut', 'dataTransferredIn'],
     orderDirection: 'ASC',
-    dashboardId: '357549371218199219'
+    dashboardId: '357549371218199219',
+    helpCenterPath: HELP_CENTER_URLS.l2Caching.cachingOffload.l2Caching
   },
   {
     id: '357826288204907093',
@@ -524,7 +548,8 @@ const REPORTS = [
     orderDirection: 'ASC',
     dashboardId: '357549371218199219',
     variationType: 'regular',
-    maxYAxis: 100
+    maxYAxis: 100,
+    helpCenterPath: HELP_CENTER_URLS.l2Caching.cachingOffload.l2Offload
   },
   /**
    * BUILD
@@ -547,7 +572,8 @@ const REPORTS = [
     fields: ['edgeApplicationInvocations', 'edgeFirewallInvocations'],
     groupBy: [],
     orderDirection: 'ASC',
-    dashboardId: '357549319029523021'
+    dashboardId: '357549319029523021',
+    helpCenterPath: HELP_CENTER_URLS.edgeFunctions.invocations.totalInvocations
   },
   /**
    * BUILD
@@ -585,7 +611,8 @@ const REPORTS = [
     groupBy: [],
     orderDirection: 'ASC',
     dashboardId: '357549422933967445',
-    variationType: 'regular'
+    variationType: 'regular',
+    helpCenterPath: HELP_CENTER_URLS.imageProcessor.requests.totalRequests
   },
   {
     id: '357843490195298789',
@@ -619,7 +646,8 @@ const REPORTS = [
     groupBy: [],
     orderDirection: 'ASC',
     dashboardId: '357549422933967445',
-    variationType: 'regular'
+    variationType: 'regular',
+    helpCenterPath: HELP_CENTER_URLS.imageProcessor.requests.totalRequestsPerSecond
   },
   /**
    * SECURE
@@ -641,7 +669,8 @@ const REPORTS = [
     groupBy: [],
     orderDirection: 'ASC',
     dashboardId: '357548675837199999',
-    variationType: 'inverse'
+    variationType: 'inverse',
+    helpCenterPath: ''
   },
   /**
    * SECURE
@@ -664,7 +693,8 @@ const REPORTS = [
     fields: ['wafRequestsAllowed', 'wafRequestsBlocked', 'wafRequestsThreat'],
     groupBy: [],
     orderDirection: 'ASC',
-    dashboardId: '357548675837198933'
+    dashboardId: '357548675837198933',
+    helpCenterPath: HELP_CENTER_URLS.waf.threats.threatsVsRequests
   },
   {
     id: '357842775438262861',
@@ -685,7 +715,8 @@ const REPORTS = [
     groupBy: [],
     orderDirection: 'ASC',
     dashboardId: '357548675837198933',
-    variationType: 'inverse'
+    variationType: 'inverse',
+    helpCenterPath: HELP_CENTER_URLS.waf.threats.crossSiteScriptingXssThreats
   },
   {
     id: '357842594513814012',
@@ -706,7 +737,8 @@ const REPORTS = [
     groupBy: [],
     orderDirection: 'ASC',
     dashboardId: '357548675837198933',
-    variationType: 'inverse'
+    variationType: 'inverse',
+    helpCenterPath: HELP_CENTER_URLS.waf.threats.remoteFileInclusionRfiThreats
   },
   {
     id: '357842833307075157',
@@ -726,7 +758,8 @@ const REPORTS = [
     groupBy: [],
     orderDirection: 'ASC',
     dashboardId: '357548675837198933',
-    variationType: 'inverse'
+    variationType: 'inverse',
+    helpCenterPath: HELP_CENTER_URLS.waf.threats.sqlInjectionThreats
   },
   {
     id: '357842851576414805',
@@ -746,7 +779,8 @@ const REPORTS = [
     groupBy: [],
     orderDirection: 'ASC',
     dashboardId: '357548675837198933',
-    variationType: 'inverse'
+    variationType: 'inverse',
+    helpCenterPath: HELP_CENTER_URLS.waf.threats.otherThreats
   },
   /**
    * SECURE
@@ -775,7 +809,8 @@ const REPORTS = [
     groupBy: [],
     orderDirection: 'ASC',
     dashboardId: '357549371218199119',
-    variationType: 'regular'
+    variationType: 'regular',
+    helpCenterPath: HELP_CENTER_URLS.intelligentDns.standardQueries.totalQueries
   },
   /**
    * OBSERVE
@@ -804,7 +839,8 @@ const REPORTS = [
     groupBy: [],
     orderDirection: 'ASC',
     dashboardId: '352149476039721549',
-    variationType: 'regular'
+    variationType: 'regular',
+    helpCenterPath: HELP_CENTER_URLS.dataStreaming.requests.totalDataStreamed
   },
   {
     id: '352234687543902797',
@@ -829,7 +865,8 @@ const REPORTS = [
     groupBy: [],
     orderDirection: 'ASC',
     dashboardId: '352149476039721549',
-    variationType: 'regular'
+    variationType: 'regular',
+    helpCenterPath: HELP_CENTER_URLS.dataStreaming.requests.totalRequests
   }
 ]
 

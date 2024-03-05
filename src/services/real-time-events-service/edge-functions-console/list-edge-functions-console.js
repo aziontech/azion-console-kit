@@ -1,5 +1,7 @@
 import convertGQL from '@/helpers/convert-gql'
 import { AxiosHttpClientSignalDecorator } from '../../axios/AxiosHttpClientSignalDecorator'
+import { makeRealTimeEventsBaseUrl } from '../make-real-time-events-service'
+import { generateCurrentTimestamp } from '@/helpers/generate-timestamp'
 
 export const listEdgeFunctionsConsole = async (filter) => {
   const payload = adapt(filter)
@@ -7,12 +9,9 @@ export const listEdgeFunctionsConsole = async (filter) => {
   const decorator = new AxiosHttpClientSignalDecorator()
 
   const response = await decorator.request({
-    url: '/events/graphql',
+    url: makeRealTimeEventsBaseUrl(),
     method: 'POST',
-    body: payload,
-    headers: {
-      'Content-Type': 'application/json; version=3'
-    }
+    body: payload
   })
 
   return adaptResponse(response)
@@ -77,7 +76,8 @@ const adaptResponse = (response) => {
   return body.data.cellsConsoleEvents?.map((cellsConsoleEvents) => ({
     configurationId: cellsConsoleEvents.configurationId,
     functionId: cellsConsoleEvents.functionId,
-    id: cellsConsoleEvents.id,
+    id: generateCurrentTimestamp(),
+    originalId: cellsConsoleEvents.id,
     level: levelMap[cellsConsoleEvents.level],
     line: cellsConsoleEvents.line,
     lineSource: {

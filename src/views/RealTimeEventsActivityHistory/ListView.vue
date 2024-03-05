@@ -4,6 +4,8 @@
   import { computed, ref } from 'vue'
   import Drawer from './Drawer'
   import IntervalFilterBlock from '@/views/RealTimeEvents/blocks/interval-filter-block'
+  import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
+  const emit = defineEmits(['update:dateTime'])
 
   const props = defineProps({
     documentationService: {
@@ -17,10 +19,21 @@
     listActivityHistory: {
       type: Function,
       required: true
+    },
+    dateTime: {
+      type: Object,
+      default: () => ({})
     }
   })
 
-  const filterDate = ref({})
+  const filterDate = computed({
+    get: () => {
+      return props.dateTime
+    },
+    set: (value) => {
+      emit('update:dateTime', value)
+    }
+  })
   const hasContentToList = ref(true)
   const listTableBlockRef = ref('')
   const drawerRef = ref('')
@@ -69,7 +82,11 @@
       },
       {
         field: 'title',
-        header: 'Title'
+        header: 'Title',
+        type: 'component',
+        filterPath: 'title',
+        component: (columnData) =>
+          columnBuilder({ data: columnData, columnAppearance: 'expand-text-column' })
       },
       {
         field: 'comment',
@@ -95,7 +112,7 @@
     />
   </div>
   <ListTableBlock
-    v-if="hasContentToList"
+    v-if="hasContentToList && filterDate.tsRangeBegin"
     ref="listTableBlockRef"
     :listService="listProvider"
     :columns="getColumns"

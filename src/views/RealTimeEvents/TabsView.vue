@@ -12,48 +12,56 @@
         <TabPanel :header="mapTabs.httpRequests.label">
           <RealTimeEventsHTTPRequestsListView
             v-bind="props.httpRequests"
+            v-model:dateTime="timeFilter"
             v-if="mapTabs.httpRequests.index === tabSelectIndex"
           />
         </TabPanel>
         <TabPanel :header="mapTabs.EdgeFunctions.label">
           <RealTimeEventEdgeFunctionsListView
             v-bind="props.edgeFunctions"
+            v-model:dateTime="timeFilter"
             v-if="mapTabs.EdgeFunctions.index === tabSelectIndex"
           />
         </TabPanel>
         <TabPanel :header="mapTabs.EdgeFunctionsConsole.label">
           <RealTimeEventEdgeFunctionsConsoleListView
             v-bind="props.edgeFunctionsConsole"
+            v-model:dateTime="timeFilter"
             v-if="mapTabs.EdgeFunctionsConsole.index === tabSelectIndex"
           />
         </TabPanel>
         <TabPanel :header="mapTabs.ImageProcessor.label">
           <RealTimeEventsImageProcessor
             v-bind="props.imageProcessor"
+            v-model:dateTime="timeFilter"
             v-if="mapTabs.ImageProcessor.index === tabSelectIndex"
           />
         </TabPanel>
         <TabPanel :header="mapTabs.L2Cache.label">
           <RealTimeEventsL2Cache
             v-bind="props.l2Cache"
+            v-model:dateTime="timeFilter"
             v-if="mapTabs.L2Cache.index === tabSelectIndex"
           />
         </TabPanel>
         <TabPanel :header="mapTabs.IntelligentDNS.label">
           <RealTimeEventsIntelligentDNSListView
             v-bind="props.intelligentDNS"
+            v-model:dateTime="timeFilter"
             v-if="mapTabs.IntelligentDNS.index === tabSelectIndex"
           />
         </TabPanel>
         <TabPanel :header="mapTabs.DataStreaming.label">
           <RealTimeEventsDataStreamingListView
             v-bind="props.dataStreaming"
+            v-model:dateTime="timeFilter"
             v-if="mapTabs.DataStreaming.index === tabSelectIndex"
           />
         </TabPanel>
         <TabPanel :header="mapTabs.ActivityHistory.label">
           <RealTimeEventsActivityHistoryListView
             v-bind="props.activityHistory"
+            v-model:dateTime="timeFilter"
             v-if="mapTabs.ActivityHistory.index === tabSelectIndex"
           />
         </TabPanel>
@@ -117,6 +125,7 @@
   const route = useRoute()
   const router = useRouter()
   const tabSelectIndex = ref(0)
+  const timeFilter = ref({})
 
   const mapTabs = ref({
     httpRequests: {
@@ -142,7 +151,7 @@
     L2Cache: {
       index: 4,
       tabName: 'l2-cache',
-      label: 'L2 Cache'
+      label: 'Tiered Cache'
     },
     IntelligentDNS: {
       index: 5,

@@ -139,7 +139,7 @@
             outlined
             type="button"
             aria-label="Copy Domain Name"
-            label="Copy to Clipboard"
+            label="Copy"
             :disabled="!props.hasDomainName"
             @click="$emit('copyDomainName', { name: domainName })"
           />

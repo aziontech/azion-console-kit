@@ -15,16 +15,16 @@
 </script>
 
 <template>
-  <div class="flex flex-col sm:w-[234px] w-[172px] whitespace-nowrap">
+  <div class="flex flex-col w-full">
     <label class="flex text-sm gap-1 items-center">
       {{ props.label }}
-      <span class="pi pi-question-circle text-color-secondary" />
+      <span class="pi pi-question-circle text-color-primary" />
     </label>
     <div class="flex gap-1 items-center">
-      <span class="text-2xl font-semibold">
+      <span class="text-2xl font-bold">
         <slot></slot>
       </span>
-      <span class="text-color-secondary">{{ props.sufix }}</span>
+      <span class="text-sm text-color">{{ props.sufix }}</span>
     </div>
   </div>
 </template>

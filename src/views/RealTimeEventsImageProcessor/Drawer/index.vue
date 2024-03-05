@@ -59,7 +59,7 @@
     title="More Details"
   >
     <template #body>
-      <div class="flex flex-col gap-6 sm:gap-8 md:m-3">
+      <div class="w-full flex flex-col gap-8">
         <InfoSection
           :title="details.host"
           :date="details.ts"
@@ -67,12 +67,12 @@
         >
           <template #body>
             <div class="flex flex-col sm:flex-row sm:gap-8 gap-3 w-full">
-              <div class="flex flex-col gap-3">
+              <div class="flex flex-col w-full sm:w-5/12 gap-3 flex-1">
                 <TextInfo label="HTTP User Agent">{{ details.httpUserAgent }}</TextInfo>
                 <TextInfo label="HTTP Referer">{{ details.httpReferer }}</TextInfo>
                 <TextInfo label="Solution">{{ details.solution }}</TextInfo>
               </div>
-              <div class="flex flex-col gap-3">
+              <div class="flex flex-col w-full sm:w-5/12 gap-3 flex-1">
                 <TextInfo label="Remote Addr">{{ details.remoteAddr }}</TextInfo>
                 <TextInfo label="Remote Port">{{ details.remotePort }}</TextInfo>
                 <TextInfo label="Configuration ID">{{ details.configurationId }}</TextInfo>
@@ -86,7 +86,7 @@
           :tags="referenceErrorTag"
         >
           <template #body>
-            <div class="flex flex-wrap gap-y-4">
+            <div class="grid grid-cols-3 w-full ml-[1px] gap-4 lg:gap-8">
               <BigNumber
                 label="Request Time"
                 sufix="ms"
@@ -108,13 +108,13 @@
             </div>
             <Divider />
             <div class="flex flex-col sm:flex-row sm:gap-8 gap-3 w-full">
-              <div class="flex flex-col gap-3">
+              <div class="flex flex-col w-full sm:w-5/12 flex-1 gap-3">
                 <TextInfo label="Reference Error">{{ details.referenceError }}</TextInfo>
                 <TextInfo label="SSL Cipher">{{ details.sslCipher }}</TextInfo>
                 <TextInfo label="SSL Protocol">{{ details.sslProtocol }}</TextInfo>
                 <TextInfo label="SSL Session Reused">{{ details.sslSessionReused }}</TextInfo>
               </div>
-              <div class="flex flex-col gap-3">
+              <div class="flex flex-col w-full sm:w-5/12 flex-1 gap-3">
                 <TextInfo label="Request Method">{{ details.requestMethod }}</TextInfo>
                 <TextInfo label="Request Uri">{{ details.requestUri }}</TextInfo>
                 <TextInfo label="Status Code">{{ details.status }}</TextInfo>

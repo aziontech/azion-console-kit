@@ -140,9 +140,11 @@
   import PrimeSkeleton from 'primevue/skeleton'
   import { useToast } from 'primevue/usetoast'
   import { useField, useForm } from 'vee-validate'
-  import { computed, onMounted, ref } from 'vue'
+  import { computed, onMounted, ref, inject } from 'vue'
   import { useRouter } from 'vue-router'
   import * as yup from 'yup'
+  /** @type {import('@/plugins/adapters/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
+  const tracker = inject('tracker')
 
   defineOptions({
     name: 'additional-data-form-block'
@@ -235,6 +237,7 @@
 
     try {
       const form = { ...values }
+
       if (!isInternal.value) {
         delete form.companyName
         delete form.companySize
@@ -242,9 +245,12 @@
       }
 
       await props.putAdditionalDataService(form)
+      tracker.userSignedUp().submittedAdditionalData()
+
       router.push({ name: 'home' })
     } catch (err) {
       toast.add({ life: 5000, severity: 'error', detail: err, summary: 'Error' })
+      tracker.failedSubmitAdditionalData().track()
     } finally {
       loading.value = false
     }

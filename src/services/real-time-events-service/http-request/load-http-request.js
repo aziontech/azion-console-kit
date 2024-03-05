@@ -1,6 +1,7 @@
 import convertGQL from '@/helpers/convert-gql'
 import { convertValueToDate } from '@/helpers/convert-date'
 import { AxiosHttpClientSignalDecorator } from '../../axios/AxiosHttpClientSignalDecorator'
+import { makeRealTimeEventsBaseUrl } from '../make-real-time-events-service'
 
 export const loadHttpRequest = async (filter) => {
   const payload = adapt(filter)
@@ -8,7 +9,7 @@ export const loadHttpRequest = async (filter) => {
   const decorator = new AxiosHttpClientSignalDecorator()
 
   const httpResponse = await decorator.request({
-    url: '/events/graphql',
+    url: makeRealTimeEventsBaseUrl(),
     method: 'POST',
     body: payload
   })
@@ -54,7 +55,9 @@ const adapt = (filter) => {
       'geolocAsn',
       'stacktrace',
       'geolocCountryName',
-      'geolocRegionName'
+      'geolocRegionName',
+      'upstreamCacheStatus',
+      'serverProtocol'
     ],
     orderBy: 'ts_ASC'
   }
@@ -74,7 +77,6 @@ const adaptResponse = (httpResponse) => {
   const { body } = httpResponse
   const [httpEventItem = {}] = body.data.httpEvents
   return {
-    id: httpEventItem.ts + httpEventItem.configurationId + httpEventItem.requestId,
     httpReferer: httpEventItem.httpReferer,
     scheme: httpEventItem.scheme?.toUpperCase(),
     ts: convertValueToDate(httpEventItem.ts),
@@ -110,6 +112,8 @@ const adaptResponse = (httpResponse) => {
     geolocAsn: httpEventItem.geolocAsn,
     stacktrace: httpEventItem.stacktrace,
     geolocCountryName: httpEventItem.geolocCountryName,
-    geolocRegionName: httpEventItem.geolocRegionName
+    geolocRegionName: httpEventItem.geolocRegionName,
+    upstreamCacheStatus: httpEventItem.upstreamCacheStatus,
+    serverProtocol: httpEventItem.serverProtocol
   }
 }

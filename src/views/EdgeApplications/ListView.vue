@@ -1,5 +1,5 @@
 <script setup>
-  import { computed, ref } from 'vue'
+  import { computed, inject, ref } from 'vue'
 
   import Illustration from '@/assets/svg/illustration-layers.vue'
   import ContentBlock from '@/templates/content-block'
@@ -9,6 +9,8 @@
   import PageHeadingBlock from '@/templates/page-heading-block'
 
   defineOptions({ name: 'list-edge-applications' })
+  /**@type {import('@/plugins/adapters/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
+  const tracker = inject('tracker')
 
   const props = defineProps({
     listEdgeApplicationsService: {
@@ -29,6 +31,16 @@
 
   const handleLoadData = (event) => {
     hasContentToList.value = event
+  }
+  const handleTrackEvent = () => {
+    tracker.clickToCreate({
+      productName: 'Edge Application'
+    })
+  }
+  const handleTrackEditEvent = () => {
+    tracker.clickToEdit({
+      productName: 'Edge Application'
+    })
   }
 
   const getColumns = computed(() => {
@@ -77,6 +89,8 @@
         :deleteService="props.deleteEdgeApplicationService"
         :columns="getColumns"
         @on-load-data="handleLoadData"
+        @on-before-go-to-add-page="handleTrackEvent"
+        @on-before-go-to-edit="handleTrackEditEvent"
         emptyListMessage="No Edge Application found."
       />
       <EmptyResultsBlock

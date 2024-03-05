@@ -4,7 +4,7 @@
   import Calendar from 'primevue/calendar'
   import Dropdown from 'primevue/dropdown'
   import { computed, onMounted, ref } from 'vue'
-  import DATE_TIME_INTERVALS from '@/stores/metrics-store/constants/date-time-interval'
+  import DATE_TIME_INTERVALS from './constants/date-time-interval'
 
   const accountStore = useAccountStore()
 
@@ -53,7 +53,29 @@
     return max.toUTC(userUTC)
   })
 
+  const minDate = computed(() => {
+    const sevenDaysInHours = 7 * 24
+    const date = new Date()
+    const min = removeSelectedAmountOfHours(sevenDaysInHours, date)
+    return min.toUTC(userUTC)
+  })
+
+  const updatedTimeRange = ({ tsRangeBegin, tsRangeEnd, meta }) => {
+    const GMT0 = '.000Z'
+    const gmt0Begin = `${tsRangeBegin}${GMT0}`
+    const gmt0End = `${tsRangeEnd}${GMT0}`
+    const dateBegin = new Date(gmt0Begin).toUTC(userUTC)
+    const dateEnd = new Date(gmt0End).toUTC(userUTC)
+    dates.value = [dateBegin, dateEnd]
+    lastFilteredDate.value = { begin: dateBegin, end: dateEnd }
+    interval.value = intervalOptions.find((element) => element.code === meta.option)
+  }
+
   const setInitialValues = () => {
+    if (props.filterDate.tsRangeBegin) {
+      updatedTimeRange(props.filterDate)
+      return
+    }
     interval.value = intervalOptions[0]
     const [begin, end] = removeAmountOfHours(interval.value?.code)
     dates.value = [begin, end]
@@ -69,11 +91,11 @@
   }
 
   const checkIfDatesAreEqual = (begin, end) => {
-    var isoBegin = begin.toISOString().slice(0, 13)
-    var isoEnd = end.toISOString().slice(0, 13)
+    const isoBegin = begin.toISOString().slice(0, 13)
+    const isoEnd = end.toISOString().slice(0, 13)
 
-    var isoLastBegin = lastFilteredDate.value.begin.toISOString().slice(0, 13)
-    var isoLastEnd = lastFilteredDate.value.end.toISOString().slice(0, 13)
+    const isoLastBegin = lastFilteredDate.value.begin.toISOString().slice(0, 13)
+    const isoLastEnd = lastFilteredDate.value.end.toISOString().slice(0, 13)
 
     return isoBegin === isoLastBegin && isoEnd === isoLastEnd
   }
@@ -154,6 +176,7 @@
         showIcon
         iconDisplay="input"
         :maxDate="maxDate"
+        :minDate="minDate"
         :class="classError"
       />
       <small

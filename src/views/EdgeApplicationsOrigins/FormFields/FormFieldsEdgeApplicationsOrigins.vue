@@ -189,7 +189,7 @@
           outlined
           type="button"
           aria-label="Copy Origin Key"
-          label="Copy to Clipboard"
+          label="Copy"
           :disabled="!originKey"
           @click="props.copyToClipboard(originKey)"
         />
@@ -294,7 +294,7 @@
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
         <FieldText
           label="Path"
-          placeholder="/example.com/path/content.txt"
+          placeholder="/path"
           name="originPath"
           :value="originPath"
           description="Specify a custom path from which edge nodes will request the origin content. If this is

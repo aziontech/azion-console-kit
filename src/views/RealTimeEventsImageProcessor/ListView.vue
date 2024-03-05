@@ -6,6 +6,8 @@
   import IntervalFilterBlock from '@/views/RealTimeEvents/blocks/interval-filter-block'
   import Drawer from './Drawer'
   import { useRouter } from 'vue-router'
+  import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
+  const emit = defineEmits(['update:dateTime'])
 
   const props = defineProps({
     documentationService: {
@@ -19,19 +21,32 @@
     loadImageProcessor: {
       type: Function,
       required: true
+    },
+    dateTime: {
+      type: Object,
+      default: () => ({})
     }
   })
 
-  const filterDate = ref({})
+  const filterDate = computed({
+    get: () => {
+      return props.dateTime
+    },
+    set: (value) => {
+      emit('update:dateTime', value)
+    }
+  })
   const hasContentToList = ref(true)
   const listTableBlockRef = ref('')
   const router = useRouter()
   const drawerRef = ref('')
 
-  const openDetailDrawer = ({ configurationId, ts }) => {
+  const openDetailDrawer = ({ configurationId, ts, httpUserAgent, httpReferer }) => {
     drawerRef.value.openDetailDrawer({
       tsRange: filterDate.value,
       configurationId,
+      httpReferer,
+      httpUserAgent,
       ts
     })
   }
@@ -68,11 +83,19 @@
       },
       {
         field: 'httpReferer',
-        header: 'HTTP Referrer'
+        header: 'HTTP Referrer',
+        type: 'component',
+        filterPath: 'httpReferer',
+        component: (columnData) =>
+          columnBuilder({ data: columnData, columnAppearance: 'expand-text-column' })
       },
       {
         field: 'httpUserAgent',
-        header: 'HTTP Agent'
+        header: 'HTTP Agent',
+        type: 'component',
+        filterPath: 'httpUserAgent',
+        component: (columnData) =>
+          columnBuilder({ data: columnData, columnAppearance: 'expand-text-column' })
       },
       {
         field: 'referenceError',
@@ -102,7 +125,7 @@
     />
   </div>
   <ListTableBlock
-    v-if="hasContentToList"
+    v-if="hasContentToList && filterDate.tsRangeBegin"
     ref="listTableBlockRef"
     :listService="listProvider"
     :columns="getColumns"

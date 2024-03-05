@@ -52,7 +52,7 @@
     title="More Details"
   >
     <template #body>
-      <div class="flex flex-col gap-6 sm:gap-8 md:m-3">
+      <div class="w-full flex flex-col gap-8">
         <InfoSection
           :title="`Q Type - ${details.qtype}`"
           :date="details.ts"
@@ -60,11 +60,11 @@
         >
           <template #body>
             <div class="flex flex-col sm:flex-row sm:gap-8 gap-3 w-full">
-              <div class="flex flex-col gap-3">
+              <div class="flex flex-col gap-3 w-full sm:w-5/12 flex-1">
                 <TextInfo label="UUID">{{ details.uuid }}</TextInfo>
                 <TextInfo label="Q Type Description">{{ details.qTypeDescription }}</TextInfo>
               </div>
-              <div class="flex flex-col gap-3">
+              <div class="flex flex-col gap-3 w-full sm:w-5/12 flex-1">
                 <TextInfo label="Zone ID">{{ details.zoneId }}</TextInfo>
                 <TextInfo label="Status Code">{{ details.statusCode }}</TextInfo>
                 <TextInfo label="Resolution Type">{{ details.resolutionType }}</TextInfo>

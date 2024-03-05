@@ -27,7 +27,7 @@
   const textColumn = ref(props.value)
   const SLICE_VALUE = 15
   const displayShowMore = textColumn.value?.length > SLICE_VALUE
-  const totalItems = textColumn.value?.length - SLICE_VALUE
+
   const formatValue = textColumn.value?.toString().slice(0, SLICE_VALUE)
   const newValue = `${formatValue}${displayShowMore ? '...' : ''}`
 
@@ -36,7 +36,7 @@
   })
 
   const displayRemainingItems = computed(() => {
-    return showAllItems.value ? 'Show less' : `Show more (${totalItems})`
+    return showAllItems.value ? 'Show less' : 'Show more'
   })
 
   const showAll = () => {

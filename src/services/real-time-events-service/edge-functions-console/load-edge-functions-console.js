@@ -1,6 +1,7 @@
 import convertGQL from '@/helpers/convert-gql'
 import { AxiosHttpClientSignalDecorator } from '../../axios/AxiosHttpClientSignalDecorator'
 import { convertValueToDate } from '@/helpers/convert-date'
+import { makeRealTimeEventsBaseUrl } from '../make-real-time-events-service'
 
 export const loadEdgeFunctionsConsole = async (filter) => {
   const payload = adapt(filter)
@@ -8,7 +9,7 @@ export const loadEdgeFunctionsConsole = async (filter) => {
   const decorator = new AxiosHttpClientSignalDecorator()
 
   const response = await decorator.request({
-    url: '/events/graphql',
+    url: makeRealTimeEventsBaseUrl(),
     method: 'POST',
     body: payload
   })
@@ -38,6 +39,8 @@ const adapt = (filter) => {
     and: {
       configurationIdEq: filter.configurationId,
       sourceEq: filter.source,
+      lineEq: filter.line,
+      idEq: filter.id,
       tsEq: filter.ts
     }
   }

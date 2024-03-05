@@ -6,18 +6,13 @@ import { markdownToHtml } from './markdown-to-html'
 const DEFAULT_DOCUMENT = 'index.md'
 const WELCOME_PATH = '/welcome'
 
-const getHelpCenterDocumentationService = async ({ url, filename }) => {
+const getHelpCenterDocumentationService = async ({ url = '/', filename = DEFAULT_DOCUMENT }) => {
   const helpCenterBaseUrl = getStaticUrlsByEnvironment('helpCenter')
-  const documentUrl = url === '/' ? WELCOME_PATH : getFirstPathSegment(url)
-  const documentFilename = filename || DEFAULT_DOCUMENT
+  const documentUrl = url === '/' ? WELCOME_PATH : url
 
-  let responseDocument = await fetchAndParseDocument(
-    documentUrl,
-    documentFilename,
-    helpCenterBaseUrl
-  )
-  if (isMarkdown(documentFilename)) {
-    responseDocument = markdownToHtml(responseDocument)
+  let responseDocument = await fetchAndParseDocument(documentUrl, filename, helpCenterBaseUrl)
+  if (isMarkdown(filename)) {
+    responseDocument.data = markdownToHtml(responseDocument.data)
   }
 
   return responseDocument
@@ -29,11 +24,11 @@ const fetchAndParseDocument = async (documentUrl, documentFilename, baseUrl) => 
 
   try {
     httpResponse = await fetchDocument(fullRequestPath, baseUrl)
-    responseDocument = parseHttpResponse(httpResponse)
-  } catch (error) {
+    responseDocument = { data: parseHttpResponse(httpResponse), success: true }
+  } catch {
     fullRequestPath = `${WELCOME_PATH}/${documentFilename}`
     httpResponse = await fetchDocument(fullRequestPath, baseUrl)
-    responseDocument = parseHttpResponse(httpResponse)
+    responseDocument = { data: parseHttpResponse(httpResponse), success: false }
   }
 
   return responseDocument
@@ -41,13 +36,6 @@ const fetchAndParseDocument = async (documentUrl, documentFilename, baseUrl) => 
 
 const isMarkdown = (filename) => {
   return filename.endsWith('.md')
-}
-
-const getFirstPathSegment = (url) => {
-  const pathParts = url.split('/')
-  const firstPartOfPath = '/' + pathParts[1]
-
-  return firstPartOfPath
 }
 
 const fetchDocument = async (url, baseUrl) => {

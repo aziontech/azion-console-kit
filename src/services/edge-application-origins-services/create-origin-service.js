@@ -77,7 +77,7 @@ const parseHttpResponse = (httpResponse, edgeApplicationId) => {
   switch (httpResponse.statusCode) {
     case 201:
       return {
-        feedback: 'Your Origin has been created',
+        feedback: 'Your origin has been created',
         originKey: httpResponse.body.results.origin_key,
         urlToEditView: `/edge-applications/edit/${edgeApplicationId}/origins/edit/${httpResponse.body.results.origin_key}`
       }

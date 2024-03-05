@@ -600,11 +600,11 @@
   }
 
   /**
-  /**
-   * Checks if a criterion can be deleted.
-   * @param {number} index - The index of the criterion.
-   * @returns {boolean} True if the criterion can be deleted, false otherwise.
-   */
+/**
+* Checks if a criterion can be deleted.
+* @param {number} index - The index of the criterion.
+* @returns {boolean} True if the criterion can be deleted, false otherwise.
+*/
   const isNotFirstCriteria = (index) => {
     return criteria.value.length > 1 && index < criteria.value.length - 1
   }
@@ -617,6 +617,11 @@
   const maximumCriteriaReached = computed(() => {
     const MAXIMUM_ALLOWED = 5
     return criteria.value.length >= MAXIMUM_ALLOWED
+  })
+
+  const MaximumBehaviorsAllowed = computed(() => {
+    const MAXIMUM_NUMBER = 10
+    return behaviors.value.length >= MAXIMUM_NUMBER
   })
 
   onMounted(() => {
@@ -745,7 +750,9 @@
             <div class="p-inputgroup">
               <div
                 class="p-inputgroup-addon"
-                :class="{ 'opacity-20': !props.isEnableApplicationAcceleration }"
+                :class="{
+                  'opacity-20': !props.isEnableApplicationAcceleration || checkPhaseIsDefaultValue
+                }"
               >
                 <i class="pi pi-dollar"></i>
               </div>
@@ -754,7 +761,7 @@
                 v-model="criteria[criteriaIndex].value[conditionalIndex].variable"
                 :suggestions="variableItems"
                 @complete="searchVariableOption"
-                :disabled="!props.isEnableApplicationAcceleration"
+                :disabled="!props.isEnableApplicationAcceleration || checkPhaseIsDefaultValue"
                 :completeOnFocus="true"
               />
             </div>
@@ -766,6 +773,7 @@
               inputClass="w-full"
               :name="`criteria[${criteriaIndex}][${conditionalIndex}].operator`"
               :value="criteria[criteriaIndex].value[conditionalIndex].operator"
+              :disabled="checkPhaseIsDefaultValue"
             />
             <FieldText
               v-if="
@@ -775,13 +783,14 @@
               :name="`criteria[${criteriaIndex}][${conditionalIndex}].input_value`"
               :value="criteria[criteriaIndex].value[conditionalIndex].input_value"
               inputClass="w-full"
+              :disabled="checkPhaseIsDefaultValue"
             />
           </div>
         </div>
 
         <div
           class="flex gap-2 mb-8"
-          v-if="props.isEnableApplicationAcceleration"
+          v-if="props.isEnableApplicationAcceleration && !checkPhaseIsDefaultValue"
         >
           <PrimeButton
             icon="pi pi-plus-circle"
@@ -802,7 +811,7 @@
         </div>
 
         <div
-          v-if="props.isEnableApplicationAcceleration"
+          v-if="props.isEnableApplicationAcceleration && !checkPhaseIsDefaultValue"
           class="flex items-center gap-2"
         >
           <Divider type="solid" />
@@ -822,7 +831,7 @@
           />
         </div>
       </div>
-      <div v-if="props.isEnableApplicationAcceleration">
+      <div v-if="props.isEnableApplicationAcceleration && !checkPhaseIsDefaultValue">
         <PrimeButton
           icon="pi pi-plus-circle"
           label="Add Criteria"
@@ -882,6 +891,7 @@
               :value="behaviors[behaviorIndex].value.name"
               inputClass="w-full"
               @onChange="(newValue) => changeBehaviorType(newValue, behaviorIndex)"
+              :disabled="checkPhaseIsDefaultValue && behaviorItem.key === 0"
             />
           </div>
 
@@ -967,6 +977,7 @@
             label="Add Behavior"
             size="small"
             outlined
+            :disabled="MaximumBehaviorsAllowed"
             @click="addNewBehavior"
           />
         </div>

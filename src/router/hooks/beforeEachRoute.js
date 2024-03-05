@@ -1,12 +1,16 @@
 import { getAccountInfoService, getUserInfoService } from '@/services/account-services'
 import { logoutService } from '@/services/auth-services'
 import { useAccountStore } from '@/stores/account'
+import { useHelpCenterStore } from '@/stores/help-center'
 import { useLoadingStore } from '@/stores/loading'
 
 /** @type {import('vue-router').NavigationGuardWithThis} */
 export default async function beforeEachRoute(to, __, next) {
   const accountStore = useAccountStore()
   const loadingStore = useLoadingStore()
+  const helpCenterStore = useHelpCenterStore()
+
+  helpCenterStore.close()
 
   // TODO: remove the usage of localStorage when API returns the theme
   const theme = localStorage.getItem('theme')

@@ -1,6 +1,8 @@
 import convertGQL from '@/helpers/convert-gql'
 import { AxiosHttpClientSignalDecorator } from '../../axios/AxiosHttpClientSignalDecorator'
 import { convertValueToDate } from '@/helpers/convert-date'
+import { capitalizeFirstLetter } from '@/helpers'
+import { makeRealTimeEventsBaseUrl } from '../make-real-time-events-service'
 
 export const loadActivityHistory = async (filter) => {
   const payload = adapt(filter)
@@ -8,7 +10,7 @@ export const loadActivityHistory = async (filter) => {
   const decorator = new AxiosHttpClientSignalDecorator()
 
   const response = await decorator.request({
-    url: '/events/graphql',
+    url: makeRealTimeEventsBaseUrl(),
     method: 'POST',
     body: payload
   })
@@ -39,7 +41,7 @@ const adaptResponse = (response) => {
 
   return {
     title: activityHistoryEvents.title,
-    type: activityHistoryEvents.type,
+    type: capitalizeFirstLetter(activityHistoryEvents.type),
     ts: convertValueToDate(activityHistoryEvents.ts),
     authorName: activityHistoryEvents.authorName,
     accountId: activityHistoryEvents.accountId,

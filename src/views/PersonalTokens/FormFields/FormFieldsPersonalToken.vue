@@ -241,7 +241,7 @@
             outlined
             type="button"
             aria-label="Copy Personal Token"
-            label="Copy to Clipboard"
+            label="Copy"
             :disabled="!disabledFields"
             @click="copyPersonalToken"
           />

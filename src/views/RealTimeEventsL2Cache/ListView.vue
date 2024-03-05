@@ -5,6 +5,7 @@
   import IntervalFilterBlock from '@/views/RealTimeEvents/blocks/interval-filter-block'
   import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
   import Drawer from './Drawer'
+  const emit = defineEmits(['update:dateTime'])
 
   const props = defineProps({
     documentationService: {
@@ -22,10 +23,22 @@
     clipboardWrite: {
       type: Function,
       required: true
+    },
+    dateTime: {
+      type: Object,
+      default: () => ({})
     }
   })
 
-  const filterDate = ref({})
+  const filterDate = computed({
+    get: () => {
+      return props.dateTime
+    },
+    set: (value) => {
+      emit('update:dateTime', value)
+    }
+  })
+
   const hasContentToList = ref(true)
   const listTableBlockRef = ref('')
 
@@ -68,6 +81,7 @@
         field: 'cacheKey',
         header: 'Cache Key',
         type: 'component',
+        filterPath: 'cacheKey.content',
         component: (columnData) => {
           return columnBuilder({
             data: columnData,
@@ -119,7 +133,7 @@
     />
   </div>
   <ListTableBlock
-    v-if="hasContentToList"
+    v-if="hasContentToList && filterDate.tsRangeBegin"
     ref="listTableBlockRef"
     :listService="listProvider"
     :columns="getColumns"
