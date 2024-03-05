@@ -37,7 +37,8 @@ export default class GqlRules {
     isTopX = false,
     xAxis = 'ts',
     orderDirection = 'ASC',
-    noResample = false
+    noResample = false,
+    aggregationType = 'sum'
   }) {
     this.dataset = dataset
     this.aggregations = aggregations
@@ -50,6 +51,7 @@ export default class GqlRules {
     this.xAxis = xAxis
     this.orderDirection = orderDirection
     this.noResample = noResample
+    this.aggregationType = aggregationType
   }
 
   /**
@@ -134,8 +136,9 @@ export default class GqlRules {
     if (this.groupBy !== null) fields.push(...this.groupBy)
 
     const params = this.filterDetails.map((param) => `${param.name}:${param.type}`)
+    const resampleFunction = { sum: 'sum', avg: 'mean' }[this.aggregationType]
     const resampleField = `resample: {
-          function: mean
+          function: ${resampleFunction}
           points: 200
         }`
     const resampleQuery = this.noResample ? '' : resampleField
