@@ -6,8 +6,8 @@
   import { useToast } from 'primevue/usetoast'
   import { ref, inject } from 'vue'
   import * as yup from 'yup'
-    /**@type {import('@/plugins/adapters/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
-    const tracker = inject('tracker')
+  /**@type {import('@/plugins/adapters/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
+  const tracker = inject('tracker')
   defineOptions({ name: 'drawer-origin' })
 
   const emit = defineEmits(['onSuccess'])
