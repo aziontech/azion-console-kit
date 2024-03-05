@@ -1,9 +1,9 @@
 export class CreateTracker {
   /**
- * Interface for TrackerAdapter.
- * @typedef {Object} TrackerAdapter
- * @property {function(...args: any[]): void} addEvent - Method to add an event.
- */
+   * Interface for TrackerAdapter.
+   * @typedef {Object} TrackerAdapter
+   * @property {function(...args: any[]): void} addEvent - Method to add an event.
+   */
   #trackerAdapter
 
   /**
