@@ -234,10 +234,15 @@ describe('AnalyticsTrackerAdapter', () => {
 
   it('should track the user failed to sign-up event with the correct parameters', () => {
     const { sut, analyticsClientSpy } = makeSut()
+    const propsMock = {
+      errorType: 'api',
+      fieldName: 'email',
+      errorMessage: 'Invalid email'
+    }
 
-    sut.userFailedSignUp().track()
+    sut.userFailedSignUp({ ...propsMock }).track()
 
-    expect(analyticsClientSpy.track).toHaveBeenCalledWith('User Failed to Sign Up', {})
+    expect(analyticsClientSpy.track).toHaveBeenCalledWith('User Failed to Sign Up', propsMock)
   })
 
   it('should track the failed additional data submit event with the correct parameters', () => {
