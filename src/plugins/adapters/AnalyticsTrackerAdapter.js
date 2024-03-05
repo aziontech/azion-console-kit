@@ -209,7 +209,7 @@ export class AnalyticsTrackerAdapter {
       props: {
         errorType: payload.errorType,
         fieldName: payload.fieldName,
-        errorMessage: payload.errorMessage,
+        errorMessage: payload.errorMessage
       }
     })
     return this
