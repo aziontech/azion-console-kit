@@ -83,12 +83,12 @@
         addButtonLabel="Add"
         createPagePath="/data-streaming/create"
         editPagePath="/data-streaming/edit"
-        pageTitleDelete="Delete Data Streaming"
+        pageTitleDelete="stream"
         :listService="listDataStreamingService"
         :deleteService="deleteDataStreamingService"
         :columns="getColumns"
         @on-load-data="handleLoadData"
-        emptyListMessage="No Data Streaming found."
+        emptyListMessage="No stream has been created."
       ></ListTableBlock>
       <EmptyResultsBlock
         v-else
