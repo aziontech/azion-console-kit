@@ -105,7 +105,8 @@ const FIXTURES = {
       isTopX: false,
       rotated: false,
       dataset: 'httpMetrics',
-      orderDirection: 'ASC'
+      orderDirection: 'ASC',
+      aggregationType: 'avg'
     },
     queryResult:
       'query ($tsRange_begin:DateTime!, $tsRange_end:DateTime!) {\n' +
@@ -171,7 +172,7 @@ const FIXTURES = {
       '      httpMetrics (\n' +
       '        limit: 1000\n' +
       '        resample: {\n' +
-      '          function: mean\n' +
+      '          function: sum\n' +
       '          points: 200\n' +
       '        }\n' +
       '        aggregate: {sum: dataStreamed \n' +
@@ -222,7 +223,7 @@ const FIXTURES = {
       '      httpMetrics (\n' +
       '        limit: 1000\n' +
       '        resample: {\n' +
-      '          function: mean\n' +
+      '          function: sum\n' +
       '          points: 200\n' +
       '        }\n' +
       '        aggregate: {sum: dataStreamed \n' +
