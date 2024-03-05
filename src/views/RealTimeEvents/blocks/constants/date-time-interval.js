@@ -20,7 +20,7 @@ const DATE_TIME_INTERVALS = [
     code: '12'
   },
   {
-    name: 'LastDday',
+    name: 'Last Day',
     code: '24'
   },
   {
