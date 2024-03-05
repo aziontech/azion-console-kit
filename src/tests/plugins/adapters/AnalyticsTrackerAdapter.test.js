@@ -269,13 +269,34 @@ describe('AnalyticsTrackerAdapter', () => {
   it('should use the View More Details on Template event with correct parameters', () => {
     const { sut, analyticsClientSpy } = makeSut()
 
-    sut.clickMoreDetailsOnTemplate({})
+    const templateNameMock = 'string'
+    const solutionIdMock = 'solutionId'
+    const versionMock = 'version'
+    const versionIdMock = 'versionID'
+    const isvMock = 'isv'
+    const isvIdMock = 'isvId'
+
+    sut.clickMoreDetailsOnTemplate({
+      templateName: templateNameMock,
+      solutionId: solutionIdMock,
+      version: versionMock,
+      versionId: versionIdMock,
+      isv: isvMock,
+      isvId: isvIdMock
+    })
 
     sut.track()
 
     expect(analyticsClientSpy.track).toHaveBeenCalledWith(
       'Clicked to View More Details on Template',
-      {}
+      {
+        templateName: templateNameMock,
+        solutionId: solutionIdMock,
+        version: versionMock,
+        versionId: versionIdMock,
+        isv: isvMock,
+        isvId: isvIdMock
+      }
     )
   })
 
