@@ -4,6 +4,7 @@
   import TextInfo from '@/templates/info-drawer-block/info-labels/text-info.vue'
   import BigNumber from '@/templates/info-drawer-block/info-labels/big-number.vue'
   import Divider from 'primevue/divider'
+  import PrimeButton from 'primevue/button'
 
   import InfoDrawerBlock from '@/templates/info-drawer-block'
   defineOptions({ name: 'drawer-events-http-requests' })
@@ -96,23 +97,28 @@
 
         <InfoSection title="Request and Response Data">
           <template #body>
-            <div class="flex flex-wrap gap-4 sm:gap-8">
-              <BigNumber
+            <div class="flex flex-wrap gap-7 sm:gap-16">
+              <PrimeButton
+                outlined
+                type="button"
                 label="Request Time"
-                sufix="ms"
-                >{{ details.requestTime }}</BigNumber
-              >
-
-              <BigNumber
+                badge="ms"
+                v-tooltip="details.requestTime"
+              />
+              <PrimeButton
+                outlined
+                type="button"
                 label="Bytes Sent"
-                sufix="bytes"
-                >{{ details.bytesSent }}</BigNumber
-              >
-              <BigNumber
+                badge="bytes"
+                v-tooltip="details.bytesSent"
+              />
+              <PrimeButton
+                outlined
+                type="button"
                 label="Request Length"
-                sufix="lines"
-                >{{ details.requestLength }}</BigNumber
-              >
+                badge="lines"
+                v-tooltip="details.requestLength"
+              />
             </div>
 
             <Divider />

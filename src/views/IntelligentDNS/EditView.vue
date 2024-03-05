@@ -282,7 +282,7 @@
             :schema="validationSchemaEditIDNS"
             :updatedRedirect="updatedRedirect"
             :isTabs="true"
-            >
+          >
             <template #form>
               <FormFieldsIntelligentDnsCreate></FormFieldsIntelligentDnsCreate>
             </template>
@@ -319,7 +319,7 @@
                 />
               </template>
             </ListTableNoHeaderBlock>
-  
+
             <EmptyResultsBlock
               v-else
               title="No record has been created"
@@ -341,7 +341,7 @@
                 <Illustration />
               </template>
             </EmptyResultsBlock>
-  
+
             <CreateDrawerBlock
               v-if="showCreateRecordDrawer"
               v-model:visible="showCreateRecordDrawer"
@@ -355,7 +355,7 @@
                 <FormFieldsRecords />
               </template>
             </CreateDrawerBlock>
-  
+
             <EditDrawerBlock
               v-if="showEditRecordDrawer"
               :id="selectedIdnsRecordToEdit"
