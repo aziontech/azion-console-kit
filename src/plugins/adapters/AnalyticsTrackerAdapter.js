@@ -293,6 +293,17 @@ export class AnalyticsTrackerAdapter {
   }
 
   /**
+   * @returns {AnalyticsTrackerAdapter}
+   */
+  clickedToCreateOrigin() {
+    this.#events.push({
+      eventName: 'Clicked to Create Origin',
+      props: {}
+    })
+    return this
+  }
+
+  /**
    * call this method to run each stored tracker event
    */
   async track() {

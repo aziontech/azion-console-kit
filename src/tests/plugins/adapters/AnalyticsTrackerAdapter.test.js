@@ -327,4 +327,14 @@ describe('AnalyticsTrackerAdapter', () => {
 
     expect(analyticsClientSpy.track).toHaveBeenCalledWith('Failed to Deploy', {})
   })
+
+  it('should use the clickedToCreateOrigin event', () => {
+    const { sut, analyticsClientSpy } = makeSut()
+
+    sut.clickedToCreateOrigin({})
+
+    sut.track()
+
+    expect(analyticsClientSpy.track).toHaveBeenCalledWith('Clicked to Create Origin', {})
+  })
 })
