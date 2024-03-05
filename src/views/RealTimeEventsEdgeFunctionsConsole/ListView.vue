@@ -164,7 +164,7 @@
     <template #default>
       <PrimeButton
         severity="secondary"
-        label="Edge Function"
+        label="Edge Functions"
         @click="goToEdgeFunction"
       />
     </template>
