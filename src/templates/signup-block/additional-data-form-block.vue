@@ -250,6 +250,7 @@
       router.push({ name: 'home' })
     } catch (err) {
       toast.add({ life: 5000, severity: 'error', detail: err, summary: 'Error' })
+      tracker.failedSubmitAdditionalData().track()
     } finally {
       loading.value = false
     }

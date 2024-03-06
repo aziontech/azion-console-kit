@@ -55,7 +55,9 @@ const adapt = (filter) => {
       'geolocAsn',
       'stacktrace',
       'geolocCountryName',
-      'geolocRegionName'
+      'geolocRegionName',
+      'upstreamCacheStatus',
+      'serverProtocol'
     ],
     orderBy: 'ts_ASC'
   }
@@ -75,7 +77,6 @@ const adaptResponse = (httpResponse) => {
   const { body } = httpResponse
   const [httpEventItem = {}] = body.data.httpEvents
   return {
-    id: httpEventItem.ts + httpEventItem.configurationId + httpEventItem.requestId,
     httpReferer: httpEventItem.httpReferer,
     scheme: httpEventItem.scheme?.toUpperCase(),
     ts: convertValueToDate(httpEventItem.ts),
@@ -111,6 +112,8 @@ const adaptResponse = (httpResponse) => {
     geolocAsn: httpEventItem.geolocAsn,
     stacktrace: httpEventItem.stacktrace,
     geolocCountryName: httpEventItem.geolocCountryName,
-    geolocRegionName: httpEventItem.geolocRegionName
+    geolocRegionName: httpEventItem.geolocRegionName,
+    upstreamCacheStatus: httpEventItem.upstreamCacheStatus,
+    serverProtocol: httpEventItem.serverProtocol
   }
 }

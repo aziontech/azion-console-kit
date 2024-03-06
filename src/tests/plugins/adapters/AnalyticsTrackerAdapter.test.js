@@ -107,6 +107,19 @@ describe('AnalyticsTrackerAdapter', () => {
     )
   })
 
+  it('should be able to track click to edit event with correct params', () => {
+    const { sut, analyticsClientSpy } = makeSut()
+    const productNameMock = 'Azion Product Name'
+
+    sut.clickToEdit({
+      productName: productNameMock
+    })
+
+    sut.track()
+
+    expect(analyticsClientSpy.track).toHaveBeenCalledWith('Clicked to Edit Azion Product Name', {})
+  })
+
   it('should be able to track a product created successfully', () => {
     const { sut, analyticsClientSpy } = makeSut()
     const productNameMock = 'Azion Product Name Mock'
@@ -118,6 +131,51 @@ describe('AnalyticsTrackerAdapter', () => {
       .track()
 
     expect(analyticsClientSpy.track).toHaveBeenCalledWith('Created Azion Product Name Mock', {})
+  })
+
+  it('should be able to track a product edited successfully', () => {
+    const { sut, analyticsClientSpy } = makeSut()
+    const productNameMock = 'Azion Product Name Mock'
+
+    sut
+      .productEdited({
+        productName: productNameMock
+      })
+      .track()
+
+    expect(analyticsClientSpy.track).toHaveBeenCalledWith('Edited Azion Product Name Mock', {})
+  })
+
+  it('should be able to track a failed event related to a product creation', () => {
+    const { sut, analyticsClientSpy } = makeSut()
+    const productNameMock = 'Azion Product Name Mock'
+
+    sut
+      .failedToCreate({
+        productName: productNameMock
+      })
+      .track()
+
+    expect(analyticsClientSpy.track).toHaveBeenCalledWith(
+      'Failed to Create Azion Product Name Mock',
+      {}
+    )
+  })
+
+  it('should be able to track a failed event related to edit a product', () => {
+    const { sut, analyticsClientSpy } = makeSut()
+    const productNameMock = 'Azion Product Name Mock'
+
+    sut
+      .failedToEdit({
+        productName: productNameMock
+      })
+      .track()
+
+    expect(analyticsClientSpy.track).toHaveBeenCalledWith(
+      'Failed to Edit Azion Product Name Mock',
+      {}
+    )
   })
 
   it('should call userSigned when valid identification is provided', () => {
@@ -140,6 +198,24 @@ describe('AnalyticsTrackerAdapter', () => {
     expect(analyticsClientSpy.track).toHaveBeenCalledWith('User Failed to Sign In', {})
   })
 
+  it('should use the create event with correct parameters', () => {
+    const { sut, analyticsClientSpy } = makeSut()
+    const mockUrl = 'test-url-ABC/q-2/t'
+    const mockLocation = 'home'
+
+    sut.createEventInHomeAndHeader({
+      url: mockUrl,
+      location: mockLocation
+    })
+
+    sut.track()
+
+    expect(analyticsClientSpy.track).toHaveBeenCalledWith('Clicked to Create', {
+      url: mockUrl,
+      location: mockLocation
+    })
+  })
+
   it('should track the user sign-up event with the correct parameters', () => {
     const { sut, analyticsClientSpy } = makeSut()
 
@@ -154,5 +230,132 @@ describe('AnalyticsTrackerAdapter', () => {
     sut.submittedAdditionalData().track()
 
     expect(analyticsClientSpy.track).toHaveBeenCalledWith('Submitted Additional Data', {})
+  })
+
+  it('should track the user failed to sign-up event with the correct parameters', () => {
+    const { sut, analyticsClientSpy } = makeSut()
+    const propsMock = {
+      errorType: 'api',
+      fieldName: 'email',
+      errorMessage: 'Invalid email'
+    }
+
+    sut.userFailedSignUp({ ...propsMock }).track()
+
+    expect(analyticsClientSpy.track).toHaveBeenCalledWith('User Failed to Sign Up', propsMock)
+  })
+
+  it('should track the failed additional data submit event with the correct parameters', () => {
+    const { sut, analyticsClientSpy } = makeSut()
+
+    sut.failedSubmitAdditionalData().track()
+
+    expect(analyticsClientSpy.track).toHaveBeenCalledWith('Failed to Submit Additional Data', {})
+  })
+
+  it('should use the select create event with correct parameters', () => {
+    const { sut, analyticsClientSpy } = makeSut()
+    const selectionMock = 'cardTitle'
+    const sectionMock = 'recommended'
+
+    sut.selectedOnCreate({
+      selection: selectionMock,
+      section: sectionMock
+    })
+
+    sut.track()
+
+    expect(analyticsClientSpy.track).toHaveBeenCalledWith('Selected on Create', {
+      selection: selectionMock,
+      section: sectionMock
+    })
+  })
+
+  it('should use the View More Details on Template event with correct parameters', () => {
+    const { sut, analyticsClientSpy } = makeSut()
+
+    const templateNameMock = 'string'
+    const solutionIdMock = 'solutionId'
+    const versionMock = 'version'
+    const versionIdMock = 'versionID'
+    const isvMock = 'isv'
+    const isvIdMock = 'isvId'
+
+    sut.clickMoreDetailsOnTemplate({
+      templateName: templateNameMock,
+      solutionId: solutionIdMock,
+      version: versionMock,
+      versionId: versionIdMock,
+      isv: isvMock,
+      isvId: isvIdMock
+    })
+
+    sut.track()
+
+    expect(analyticsClientSpy.track).toHaveBeenCalledWith(
+      'Clicked to View More Details on Template',
+      {
+        templateName: templateNameMock,
+        solutionId: solutionIdMock,
+        version: versionMock,
+        versionId: versionIdMock,
+        isv: isvMock,
+        isvId: isvIdMock
+      }
+    )
+  })
+
+  it('should use the deployed event with correct parameters', () => {
+    const { sut, analyticsClientSpy } = makeSut()
+
+    sut.eventDeployed({})
+
+    sut.track()
+
+    expect(analyticsClientSpy.track).toHaveBeenCalledWith('Deployed', {})
+  })
+
+  it('should track the account activation event with the correct parameters', () => {
+    const { sut, analyticsClientSpy } = makeSut()
+
+    sut.userActivatedAccount().track()
+
+    expect(analyticsClientSpy.track).toHaveBeenCalledWith('User Activated Account', {})
+  })
+
+  it('should use the failed deployed event with correct parameters', () => {
+    const { sut, analyticsClientSpy } = makeSut()
+
+    sut.eventFailedDeployed({})
+
+    sut.track()
+
+    expect(analyticsClientSpy.track).toHaveBeenCalledWith('Failed to Deploy', {})
+  })
+
+  it('should be able to track click to create event with correct params', () => {
+    const { sut, analyticsClientSpy } = makeSut()
+    const productNameMock = 'Origin'
+
+    sut.clickToCreate({
+      productName: productNameMock
+    })
+
+    sut.track()
+
+    expect(analyticsClientSpy.track).toHaveBeenCalledWith('Clicked to Create Origin', {})
+  })
+
+  it('should be able to track created event with correct params', () => {
+    const { sut, analyticsClientSpy } = makeSut()
+    const productNameMock = 'Origin'
+
+    sut.productCreated({
+      productName: productNameMock
+    })
+
+    sut.track()
+
+    expect(analyticsClientSpy.track).toHaveBeenCalledWith('Created Origin', {})
   })
 })

@@ -30,7 +30,7 @@
     }
   })
 
-  const emit = defineEmits(['on-response'])
+  const emit = defineEmits(['on-response', 'on-response-fail'])
 
   const router = useRouter()
   const toast = useToast()
@@ -82,6 +82,7 @@
       blockViewRedirection.value = false
     } catch (error) {
       showToast('error', error)
+      emit('on-response-fail')
       blockViewRedirection.value = true
     }
   })

@@ -25,7 +25,8 @@ const parseHttpResponse = (httpResponse) => {
       return null
     case 400:
       const apiError = Object.values(httpResponse.body)[0][0]
-      throw new Error(apiError).message
+      const fieldName = Object.keys(httpResponse.body)[0]
+      throw new Error(JSON.stringify({ message: apiError, fieldName })).message
     case 404:
       throw new Errors.NotFoundError().message
     case 500:

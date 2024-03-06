@@ -37,7 +37,7 @@ export const teamsPermissionRoutes = {
             to: '/teams-permission'
           },
           {
-            label: 'Create Teams Permissions',
+            label: 'Create Team',
             to: '/teams-permission/create'
           }
         ]
@@ -60,7 +60,7 @@ export const teamsPermissionRoutes = {
             to: '/teams-permission'
           },
           {
-            label: 'Edit Teams Permissions'
+            label: 'Edit Team'
           }
         ]
       }

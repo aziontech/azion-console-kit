@@ -60,7 +60,7 @@
   })
 
   const initialValues = ref({
-    layer: 'edge_caching',
+    layer: 'edge_cache',
     purgeType: 'cachekey',
     argumentsPurge: ''
   })

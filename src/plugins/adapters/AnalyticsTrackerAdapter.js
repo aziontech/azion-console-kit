@@ -70,6 +70,19 @@ export class AnalyticsTrackerAdapter {
   }
 
   /**
+   * @param {Object} payload
+   * @param {AzionProductsNames} payload.productName
+   * @returns {AnalyticsTrackerAdapter}
+   */
+  clickToEdit(payload) {
+    this.#events.push({
+      eventName: `Clicked to Edit ${payload.productName}`,
+      props: {}
+    })
+    return this
+  }
+
+  /**
    * @returns {AnalyticsTrackerAdapter}
    */
   userSigned() {
@@ -105,6 +118,62 @@ export class AnalyticsTrackerAdapter {
   }
 
   /**
+   * @param {Object} payload
+   * @param {AzionProductsNames} payload.productName
+   * @returns {AnalyticsTrackerAdapter}
+   */
+  productEdited(payload) {
+    this.#events.push({
+      eventName: `Edited ${payload.productName}`,
+      props: {}
+    })
+    return this
+  }
+
+  /**
+   * @param {Object} payload
+   * @param {AzionProductsNames} payload.productName
+   * @returns {AnalyticsTrackerAdapter}
+   */
+  failedToCreate(payload) {
+    this.#events.push({
+      eventName: `Failed to Create ${payload.productName}`,
+      props: {}
+    })
+    return this
+  }
+
+  /**
+   * @param {Object} payload
+   * @param {AzionProductsNames} payload.productName
+   * @returns {AnalyticsTrackerAdapter}
+   */
+  failedToEdit(payload) {
+    this.#events.push({
+      eventName: `Failed to Edit ${payload.productName}`,
+      props: {}
+    })
+    return this
+  }
+
+  /**
+   * @param {Object} payload
+   * @param {string} payload.url
+   * @param {string} payload.location
+   * @returns {AnalyticsTrackerAdapter}
+   */
+  createEventInHomeAndHeader(payload) {
+    this.#events.push({
+      eventName: 'Clicked to Create',
+      props: {
+        url: payload.url,
+        location: payload.location
+      }
+    })
+    return this
+  }
+
+  /**
    * @returns {AnalyticsTrackerAdapter}
    */
   userSignedUp() {
@@ -121,6 +190,112 @@ export class AnalyticsTrackerAdapter {
   submittedAdditionalData() {
     this.#events.push({
       eventName: 'Submitted Additional Data',
+      props: {}
+    })
+    return this
+  }
+
+  /**
+   * @param {Object} payload
+   * @param {'api'|'field'} payload.errorType
+   * @param {string} payload.fieldName
+   * @param {string} payload.errorMessage
+   *
+   * @returns {AnalyticsTrackerAdapter}
+   */
+  userFailedSignUp(payload) {
+    this.#events.push({
+      eventName: 'User Failed to Sign Up',
+      props: {
+        errorType: payload.errorType,
+        fieldName: payload.fieldName,
+        errorMessage: payload.errorMessage
+      }
+    })
+    return this
+  }
+
+  /**
+   * @returns {AnalyticsTrackerAdapter}
+   */
+  failedSubmitAdditionalData() {
+    this.#events.push({
+      eventName: 'Failed to Submit Additional Data',
+      props: {}
+    })
+    return this
+  }
+
+  /**
+   * @param {Object} payload
+   * @param {string} payload.section
+   * @param {string} payload.selection
+   * @returns {AnalyticsTrackerAdapter}
+   */
+  selectedOnCreate(payload) {
+    this.#events.push({
+      eventName: 'Selected on Create',
+      props: {
+        section: payload.section,
+        selection: payload.selection
+      }
+    })
+    return this
+  }
+
+  /**
+   * @param {Object} payload
+   * @param {string} payload.templateName
+   * @param {string} payload.solutionId
+   * @param {string} payload.version
+   * @param {string} payload.versionId
+   * @param {string} payload.isv
+   * @param {string} payload.isvId
+   * @returns {AnalyticsTrackerAdapter}
+   */
+  clickMoreDetailsOnTemplate(payload) {
+    this.#events.push({
+      eventName: 'Clicked to View More Details on Template',
+      props: {
+        templateName: payload.templateName,
+        solutionId: payload.solutionId,
+        version: payload.version,
+        versionId: payload.versionId,
+        isv: payload.isv,
+        isvId: payload.isvId
+      }
+    })
+    return this
+  }
+
+  /**
+   * @returns {AnalyticsTrackerAdapter}
+   */
+  userActivatedAccount() {
+    this.#events.push({
+      eventName: 'User Activated Account',
+      props: {}
+    })
+    return this
+  }
+
+  /**
+   * @returns {AnalyticsTrackerAdapter}
+   */
+  eventDeployed() {
+    this.#events.push({
+      eventName: 'Deployed',
+      props: {}
+    })
+    return this
+  }
+
+  /**
+   * @returns {AnalyticsTrackerAdapter}
+   */
+  eventFailedDeployed() {
+    this.#events.push({
+      eventName: 'Failed to Deploy',
       props: {}
     })
     return this

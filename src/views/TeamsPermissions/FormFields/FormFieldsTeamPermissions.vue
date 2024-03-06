@@ -85,8 +85,8 @@
     </template>
   </FormHorizontal>
   <FormHorizontal
-    title="Teams Permissions"
-    description="Determine the level of access of the clients and assign permissions according to their team. Teams can be created based on the role and tasks of assigned clients.
+    title="Permissions"
+    description="Determine the access level of accounts and assign permissions according to their team. Teams can be based on the role and tasks of account users.
 "
   >
     <template #inputs>
