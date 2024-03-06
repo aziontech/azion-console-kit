@@ -56,7 +56,7 @@
       description: 'Create environment variables or secrets to use with configured edge functions.'
     },
     {
-      label: 'Intelligent DNS',
+      label: 'Edge DNS',
       to: '/intelligent-dns/create',
       description: 'Use an authoritative DNS server to host a domain.'
     },
@@ -71,7 +71,7 @@
       description: 'Create edge infrastructure, installing services and resources in real time.'
     },
     {
-      label: 'Data Streaming',
+      label: 'Data Stream',
       to: '/data-streaming/create',
       description: 'Feed streamimg, SIEM, and big data platforms with the event logs from Azion.'
     },
