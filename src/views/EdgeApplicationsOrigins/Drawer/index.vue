@@ -168,6 +168,15 @@
     emit('onSuccess')
   }
 
+  const checkError = (error) => {
+    const [fieldName, ...restOfStringArr] = error.split(':')
+    const message = restOfStringArr.join(':').trim()
+
+    return { fieldName, message}
+  }
+
+
+
   const closeDrawerEdit = () => {
     showEditOriginDrawer.value = false
   }
@@ -189,10 +198,21 @@
       summary: 'Origin key copied to clipboard!'
     })
   }
+  
+  const handleFailedEditOrigin = (error) => {
+    const { fieldName, message } = checkError(error)
+    tracker.failedToEdit({
+      productName: 'Origin',
+      errorMessage: message,
+      fieldName: fieldName,
+      errorType: 'API'
+    }).track()
 
-  const handleFailedOrigin = (error) => {
-    const [fieldName, ...restOfStringArr] = error.split(':')
-    const message = restOfStringArr.join(':').trim()
+    closeDrawerEdit()
+  }
+
+  const handleFailedCreateOrigin = (error) => {
+    const { fieldName, message } = checkError(error)
     tracker
       .failedToCreate({
         productName: 'Origin',
@@ -224,7 +244,7 @@
     :schema="validationSchema"
     :initialValues="initialValues"
     @onSuccess="handleCreateOrigin"
-    @onError="handleFailedOrigin"
+    @onError="handleFailedCreateOrigin"
     :showBarGoBack="true"
     title="Create Origin"
   >
@@ -247,7 +267,7 @@
     :schema="validationSchema"
     @onSuccess="handleTrackEdit"
     :showBarGoBack="true"
-    @onError="closeDrawerEdit"
+    @onError="handleFailedEditOrigin"
     title="Edit Origin"
   >
     <template #formFields="{ disabledFields }">
