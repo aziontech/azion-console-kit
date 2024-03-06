@@ -507,7 +507,7 @@ const REPORTS = [
   },
   /**
    * BUILD
-   * L2 Cache - Caching Offload
+   * Tiered Cache - Caching Offload
    */
   {
     id: '357826217661956693',
