@@ -116,7 +116,7 @@
               </div>
               <div class="flex flex-col w-full sm:w-5/12 flex-1 gap-3">
                 <TextInfo label="Request Method">{{ details.requestMethod }}</TextInfo>
-                <TextInfo label="Request Uri">{{ details.requestUri }}</TextInfo>
+                <TextInfo label="Request URI">{{ details.requestUri }}</TextInfo>
                 <TextInfo label="Status Code">{{ details.status }}</TextInfo>
               </div>
             </div>

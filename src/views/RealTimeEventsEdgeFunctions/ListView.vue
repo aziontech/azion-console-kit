@@ -115,8 +115,9 @@
   />
   <div class="flex flex-col gap-8 my-4">
     <div class="flex gap-1">
-      <p class="text-xs font-medium leading-4">Specification</p>
-      <p class="text-xs font-normal leading-4">description here in english about this view</p>
+      <p class="text-xs font-medium leading-4">
+        Logs of events from requests made to your edge functions.
+      </p>
     </div>
     <IntervalFilterBlock
       v-model:filterDate="filterDate"
@@ -130,13 +131,13 @@
     :columns="getColumns"
     :editInDrawer="openDetailDrawer"
     @on-load-data="handleLoadData"
-    emptyListMessage="No events found in this search."
+    emptyListMessage="No logs have been found for this period."
   />
 
   <EmptyResultsBlock
     v-else
-    title="No events found in this period."
-    description="Change the time range to search other logs or create new Edge Function. They are displayed when there are requests and traffic received in the period selected."
+    title="No logs have been found for this period."
+    description="Use the filter to change time range and variables, or create a new edge function. Logs are displayed once there are incoming requests and traffic."
     :documentationService="documentationService"
     :inTabs="true"
   >
@@ -144,7 +145,7 @@
       <PrimeButton
         severity="secondary"
         icon="pi pi-plus"
-        label="Edge Function"
+        label="Edge Functions"
         @click="goToCreateEdgeFunction"
       />
     </template>
