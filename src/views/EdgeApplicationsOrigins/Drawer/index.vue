@@ -181,14 +181,16 @@
   }
 
   const handleFailedOrigin = (error) => {
-    const [fieldName, ...restOfStringArr] = error.split(':');
-    const message = restOfStringArr.join(':').trim();
-    tracker.failedToCreate({
-      productName: 'Origin',
-      errorType: 'API',
-      fieldName: fieldName.trim(),
-      errorMessage: message
-    }).track()
+    const [fieldName, ...restOfStringArr] = error.split(':')
+    const message = restOfStringArr.join(':').trim()
+    tracker
+      .failedToCreate({
+        productName: 'Origin',
+        errorType: 'API',
+        fieldName: fieldName.trim(),
+        errorMessage: message
+      })
+      .track()
   }
 
   const handleCreateOrigin = (feedback) => {
