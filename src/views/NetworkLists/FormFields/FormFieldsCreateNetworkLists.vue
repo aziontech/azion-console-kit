@@ -172,7 +172,7 @@
           rows="16"
           id="ipCidr"
           cols="30"
-          placeholder="185.241.208.232&#10;194.26.192.64&#10;171.25.193.25&#10;80.67.167.81&#10;192.42.116.187&#10;198.98.51.189&#10;89.58.26.216&#10;109.70.100.4&#10;149.56.22.133&#10;5.45.102.93&#10;178.17.174.14&#10;192.42.116.196&#10;185.220.101.4&#10;45.141.215.62&#10;94.102.51.15&#10;192.42.116.213"
+          placeholder="185.241.208.232&#10;194.26.192.64&#10;171.25.193.25 #comment"
         />
 
         <small
@@ -181,7 +181,7 @@
           >{{ ipCidrError }}</small
         >
         <small class="text-xs text-color-secondary font-normal leading-tight">
-          Separate each address value by using a new line. Duplicated entries are automatically
+          Separate each address value by using a new line and, optionally, use <code>#</code> to add a comment and <code>--LT</code> to add a date. Duplicated entries are automatically
           removed.
         </small>
       </div>
