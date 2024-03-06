@@ -358,4 +358,27 @@ describe('AnalyticsTrackerAdapter', () => {
 
     expect(analyticsClientSpy.track).toHaveBeenCalledWith('Created Origin', {})
   })
+
+  it('should be able to track failed created event with correct params', () => {
+    const { sut, analyticsClientSpy } = makeSut()
+    const productNameMock = 'Origin'
+    const errorMessageMock = 'message'
+    const errorTypeMock = 'API'
+    const fieldName = 'detail'
+
+    sut.failedToCreate({
+      productName: productNameMock,
+      errorMessage: errorMessageMock,
+      errorType: errorTypeMock,
+      fieldName: fieldName
+    })
+
+    sut.track()
+
+    expect(analyticsClientSpy.track).toHaveBeenCalledWith('Failed to Create Origin', {
+      errorMessage: errorMessageMock,
+      errorType: errorTypeMock,
+      fieldName: fieldName
+    })
+  })
 })

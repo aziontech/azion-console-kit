@@ -180,6 +180,17 @@
     })
   }
 
+  const handleFailedOrigin = (error) => {
+    const [fieldName, ...restOfStringArr] = error.split(':');
+    const message = restOfStringArr.join(':').trim();
+    tracker.failedToCreate({
+      productName: 'Origin',
+      errorType: 'API',
+      fieldName: fieldName.trim(),
+      errorMessage: message
+    }).track()
+  }
+
   const handleCreateOrigin = (feedback) => {
     handleTrackCreation()
     createFormDrawer.value.scrollOriginKey()
@@ -201,6 +212,7 @@
     :schema="validationSchema"
     :initialValues="initialValues"
     @onSuccess="handleCreateOrigin"
+    @onError="handleFailedOrigin"
     :showBarGoBack="true"
     title="Create Origin"
   >
