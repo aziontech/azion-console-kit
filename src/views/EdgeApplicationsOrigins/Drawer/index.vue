@@ -158,6 +158,16 @@
     }
   }
 
+  const handleTrackEdit = () => {
+    tracker
+      .productEdited({
+        productName: 'Origin'
+      })
+      .track()
+
+    emit('onSuccess')
+  }
+
   const closeDrawerEdit = () => {
     showEditOriginDrawer.value = false
   }
@@ -235,7 +245,7 @@
     :loadService="loadService"
     :editService="editService"
     :schema="validationSchema"
-    @onSuccess="emit('onSuccess')"
+    @onSuccess="handleTrackEdit"
     :showBarGoBack="true"
     @onError="closeDrawerEdit"
     title="Edit Origin"
