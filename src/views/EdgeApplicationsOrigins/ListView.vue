@@ -113,6 +113,10 @@
   }
 
   const openEditOriginDrawer = (item) => {
+    tracker.clickToEdit({
+      productName: 'Origin'
+    }).track()
+    
     drawerOriginsRef.value.openDrawerEdit(item.id)
   }
 
