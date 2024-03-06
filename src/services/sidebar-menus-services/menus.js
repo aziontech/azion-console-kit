@@ -39,7 +39,7 @@ export const menus = [
         icon: 'pi pi-shield'
       },
       {
-        label: 'Intelligent DNS',
+        label: 'Edge DNS',
         to: '/intelligent-dns',
         icon: 'pi pi-sitemap'
       }
@@ -59,7 +59,7 @@ export const menus = [
     label: 'Observe',
     items: [
       {
-        label: 'Data Streaming',
+        label: 'Data Stream',
         to: '/data-streaming',
         icon: 'pi pi-play'
       },
