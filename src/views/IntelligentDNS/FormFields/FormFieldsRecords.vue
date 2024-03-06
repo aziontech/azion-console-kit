@@ -53,7 +53,7 @@
   <FormHorizontal
     :isDrawer="true"
     title="Settings"
-    description="Add records to specify which IPs are associated with the domain and how Intelligent DNS should handle requests for the domain."
+    description="Add records to specify which IPs are associated with the domain and how Edge DNS should handle requests for the domain."
   >
     <template #inputs>
       <div class="flex flex-col w-full gap-2">
@@ -173,7 +173,7 @@
   <FormHorizontal
     :isDrawer="true"
     title="Policy"
-    description="Choose the policy type to specify how Intelligent DNS should deal with requests answered by this record."
+    description="Choose the policy type to specify how Edge DNS should deal with requests answered by this record."
   >
     <template #inputs>
       <div class="flex gap-6 flex-wrap">

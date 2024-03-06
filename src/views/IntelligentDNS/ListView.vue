@@ -2,8 +2,8 @@
   <ContentBlock>
     <template #heading>
       <PageHeadingBlock
-        pageTitle="Intelligent DNS"
-        description="Set Azion Intelligent DNS as the authoritative DNS server for your domain by copying the nameservers values."
+        pageTitle="Edge DNS"
+        description="Set Azion Edge DNS as the authoritative DNS server for your domain by copying the nameservers values."
       >
         <template #default>
           <PrimeButton
@@ -22,7 +22,7 @@
         :listService="listIntelligentDNSService"
         :deleteService="deleteIntelligentDNSService"
         :columns="getColumns"
-        pageTitleDelete="Intelligent DNS"
+        pageTitleDelete="Edge DNS"
         addButtonLabel="Add"
         createPagePath="intelligent-dns/create"
         editPagePath="intelligent-dns/edit"

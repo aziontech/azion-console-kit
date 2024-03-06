@@ -255,8 +255,8 @@
   <ContentBlock>
     <template #heading>
       <PageHeadingBlock
-        pageTitle="Edit Intelligent DNS"
-        description="Set Azion Intelligent DNS as the authoritative DNS server for your domain by copying the nameservers values."
+        pageTitle="Edit Edge DNS"
+        description="Set Azion Edge DNS as the authoritative DNS server for your domain by copying the nameservers values."
       >
         <template #default>
           <PrimeButton
@@ -349,7 +349,7 @@
               :schema="validationSchemaIDNSRecords"
               :initialValues="initialValuesCreateRecords"
               @onSuccess="reloadResourcesList"
-              title="Create Intelligent DNS Record"
+              title="Create Edge DNS Record"
             >
               <template #formFields>
                 <FormFieldsRecords />
@@ -364,7 +364,7 @@
               :editService="editRecordServiceWithIDNSIdDecorator"
               :schema="validationSchemaIDNSRecords"
               @onSuccess="reloadResourcesList"
-              title="Edit Intelligent DNS Record"
+              title="Edit Edge DNS Record"
             >
               <template #formFields>
                 <FormFieldsRecords />

@@ -128,7 +128,7 @@
   />
   <div class="flex flex-col gap-8 my-4">
     <div class="flex gap-1">
-      <p class="text-xs font-medium leading-4">Logs of data sent to endpoints by Data Streaming.</p>
+      <p class="text-xs font-medium leading-4">Logs of data sent to endpoints by Data Stream.</p>
     </div>
     <IntervalFilterBlock
       v-model:filterDate="filterDate"
@@ -148,7 +148,7 @@
   <EmptyResultsBlock
     v-else
     title="No logs have been found for this period."
-    description="Use the filter to change time range and variables, or create a new stream with Data Streaming. Logs are displayed once there are incoming requests and traffic."
+    description="Use the filter to change time range and variables, or create a new stream with Data Stream. Logs are displayed once there are incoming requests and traffic."
     :documentationService="documentationService"
     :inTabs="true"
   >
@@ -156,7 +156,7 @@
       <PrimeButton
         severity="secondary"
         icon="pi pi-plus"
-        label="Data Streaming"
+        label="Data Stream"
         @click="goToCreateDataStreaming"
       />
     </template>

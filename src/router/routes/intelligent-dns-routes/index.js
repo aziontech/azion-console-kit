@@ -20,7 +20,7 @@ export const intelligentDnsRoutes = {
       meta: {
         breadCrumbs: [
           {
-            label: 'Intelligent DNS',
+            label: 'Edge DNS',
             to: '/intelligent-dns'
           }
         ]
@@ -37,11 +37,11 @@ export const intelligentDnsRoutes = {
       meta: {
         breadCrumbs: [
           {
-            label: 'Intelligent DNS',
+            label: 'Edge DNS',
             to: '/intelligent-dns'
           },
           {
-            label: 'Create Intelligent DNS',
+            label: 'Create Edge DNS',
             to: '/intelligent-dns/create'
           }
         ]
@@ -62,11 +62,11 @@ export const intelligentDnsRoutes = {
       meta: {
         breadCrumbs: [
           {
-            label: 'Intelligent DNS',
+            label: 'Edge DNS',
             to: '/intelligent-dns'
           },
           {
-            label: 'Edit Intelligent DNS'
+            label: 'Edit Edge DNS'
           }
         ]
       }
@@ -89,11 +89,11 @@ export const intelligentDnsRoutes = {
       meta: {
         breadCrumbs: [
           {
-            label: 'Intelligent DNS',
+            label: 'Edge DNS',
             to: '/intelligent-dns'
           },
           {
-            label: 'Edit Intelligent DNS'
+            label: 'Edit Edge DNS'
           }
         ]
       }

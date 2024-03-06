@@ -507,7 +507,7 @@ const REPORTS = [
   },
   /**
    * BUILD
-   * L2 Caching - Caching Offload
+   * Tiered Cache - Caching Offload
    */
   {
     id: '357826217661956693',
@@ -784,7 +784,7 @@ const REPORTS = [
   },
   /**
    * SECURE
-   * Intelligent DNS - Standard Queries
+   * Edge DNS - Standard Queries
    */
   {
     id: '357843490139298789',
@@ -814,7 +814,7 @@ const REPORTS = [
   },
   /**
    * OBSERVE
-   * Data Streaming - Data Streamed
+   * Data Stream - Data Streamed
    */
   {
     id: '352149351588430415',
