@@ -109,7 +109,7 @@
           :tags="serverProtocolTag"
         >
           <template #body>
-            <div class="grid grid-cols-3 w-full ml-[1px] gap-4 lg:gap-8">
+            <div class="flex w-full lg:gap-8">
               <BigNumber
                 label="Request Time"
                 sufix="ms"
