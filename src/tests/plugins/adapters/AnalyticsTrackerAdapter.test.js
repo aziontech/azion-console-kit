@@ -355,4 +355,27 @@ describe('AnalyticsTrackerAdapter', () => {
       fieldName: fieldName
     })
   })
+
+  it('should be able to track failed edited event with correct params', () => {
+    const { sut, analyticsClientSpy } = makeSut()
+    const productNameMock = 'Origin'
+    const errorMessageMock = 'message'
+    const errorTypeMock = 'API'
+    const fieldName = 'detail'
+
+    sut.failedToEdit({
+      productName: productNameMock,
+      errorMessage: errorMessageMock,
+      errorType: errorTypeMock,
+      fieldName: fieldName
+    })
+
+    sut.track()
+
+    expect(analyticsClientSpy.track).toHaveBeenCalledWith('Failed to Edit Origin', {
+      errorMessage: errorMessageMock,
+      errorType: errorTypeMock,
+      fieldName: fieldName
+    })
+  })
 })
