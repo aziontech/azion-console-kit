@@ -60,7 +60,7 @@
             <label class="text-color text-base font-medium">Subscription Layer</label>
             <div class="flex flex-col gap-3">
               <Card
-                :class="layer === 'tired_cache' ? 'border border-orange-500' : ''"
+                :class="layer === 'tiered_cache' ? 'border border-orange-500' : ''"
                 :pt="{
                   body: { class: 'p-4' },
                   title: { class: 'flex items-center gap-3 text-base m-0 font-medium' },
@@ -73,7 +73,7 @@
                   <RadioButton
                     inputId="inputId1"
                     name="layer"
-                    value="tired_cache"
+                    value="tiered_cache"
                     v-model="layer"
                   />
                   <span class="text-base">Tiered Cache</span>
