@@ -133,12 +133,19 @@ export class AnalyticsTrackerAdapter {
   /**
    * @param {Object} payload
    * @param {AzionProductsNames} payload.productName
+   * @param {String} payload.errorType
+   * @param {String} payload.fieldName
+   * @param {String} payload.errorMessage
    * @returns {AnalyticsTrackerAdapter}
    */
   failedToCreate(payload) {
     this.#events.push({
       eventName: `Failed to Create ${payload.productName}`,
-      props: {}
+      props: {
+        errorType: payload.errorType,
+        fieldName: payload.fieldName,
+        errorMessage: payload.errorMessage
+      }
     })
     return this
   }
