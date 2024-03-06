@@ -170,10 +170,8 @@
     const [fieldName, ...restOfStringArr] = error.split(':')
     const message = restOfStringArr.join(':').trim()
 
-    return { fieldName, message}
+    return { fieldName, message }
   }
-
-
 
   const closeDrawerEdit = () => {
     showEditOriginDrawer.value = false
@@ -188,15 +186,17 @@
       summary: 'Origin key copied to clipboard!'
     })
   }
-  
+
   const handleFailedEditOrigin = (error) => {
     const { fieldName, message } = checkError(error)
-    tracker.failedToEdit({
-      productName: 'Origin',
-      errorMessage: message,
-      fieldName: fieldName,
-      errorType: 'API'
-    }).track()
+    tracker
+      .failedToEdit({
+        productName: 'Origin',
+        errorMessage: message,
+        fieldName: fieldName,
+        errorType: 'API'
+      })
+      .track()
 
     closeDrawerEdit()
   }
