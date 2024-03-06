@@ -159,9 +159,11 @@
   }
 
   const handleTrackEdit = () => {
-    tracker.productEdited({
-      productName: 'Origin'
-    }).track()
+    tracker
+      .productEdited({
+        productName: 'Origin'
+      })
+      .track()
 
     emit('onSuccess')
   }
