@@ -23,6 +23,12 @@ export class AnalyticsTrackerAdapter {
     this.#analyticsClient = analyticsClient
   }
 
+  /**
+   * A method to identify a user.
+   *
+   * @param {type} id - The identifier of the user
+   * @return {Promise<void>}
+   */
   async identify(id) {
     if (!id) {
       return
