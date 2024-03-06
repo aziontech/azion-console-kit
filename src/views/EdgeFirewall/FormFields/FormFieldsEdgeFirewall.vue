@@ -240,7 +240,7 @@
   </FormHorizontal>
   <FormHorizontal
     title="Debug Rules"
-    description="Log executed rules created in Rules Engine. Query logs using Data Streaming, Real-Time Events, or Real-Time Events GraphQL API."
+    description="Log executed rules created in Rules Engine. Query logs using Data Stream, Real-Time Events, or Real-Time Events GraphQL API."
   >
     <template #inputs>
       <div class="flex flex-col gap-2">

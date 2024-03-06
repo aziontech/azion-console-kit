@@ -156,12 +156,12 @@
     IntelligentDNS: {
       index: 5,
       tabName: 'intelligent-dns',
-      label: 'Intelligent DNS'
+      label: 'Edge DNS'
     },
     DataStreaming: {
       index: 6,
       tabName: 'data-streaming',
-      label: 'Data Streaming'
+      label: 'Data Stream'
     },
     ActivityHistory: {
       index: 7,

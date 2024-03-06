@@ -1,7 +1,7 @@
 <template>
   <FormHorizontal
     title="General"
-    description="Create a data streaming to feed your data platforms with logs from your applications."
+    description="Create a stream to feed your data platforms with logs from your applications."
   >
     <template #inputs>
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
