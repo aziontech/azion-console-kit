@@ -120,7 +120,7 @@
   <div class="flex flex-col gap-8 my-4">
     <div class="flex gap-1">
       <p class="text-xs font-medium leading-4">
-        Logs of events from queries made to Intelligent DNS.
+        Logs of events from queries made to Edge DNS.
       </p>
     </div>
     <IntervalFilterBlock
@@ -149,7 +149,7 @@
       <PrimeButton
         severity="secondary"
         icon="pi pi-plus"
-        label="Intelligent DNS"
+        label="Edge DNS"
         @click="goToCreateIntelligentDNS"
       />
     </template>

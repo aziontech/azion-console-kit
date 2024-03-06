@@ -75,7 +75,7 @@
 <template>
   <ContentBlock>
     <template #heading>
-      <PageHeadingBlock pageTitle="Data Streaming" />
+      <PageHeadingBlock pageTitle="Data Stream" />
     </template>
     <template #content>
       <ListTableBlock
