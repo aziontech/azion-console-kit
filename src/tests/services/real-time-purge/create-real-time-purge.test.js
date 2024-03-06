@@ -6,7 +6,7 @@ import { describe, expect, it, vi } from 'vitest'
 const fixtures = {
   realTimePurgeMock: {
     argumentsPurge: `www.example.com\nwww.test.com.br `,
-    layer: 'edge_caching',
+    layer: 'edge_cache',
     purgeType: 'cachekey'
   }
 }

@@ -4,8 +4,10 @@
   import EditDrawerBlock from '@templates/edit-drawer-block'
   import { refDebounced } from '@vueuse/core'
   import { useToast } from 'primevue/usetoast'
-  import { ref } from 'vue'
+  import { ref, inject } from 'vue'
   import * as yup from 'yup'
+  /**@type {import('@/plugins/adapters/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
+  const tracker = inject('tracker')
   defineOptions({ name: 'drawer-origin' })
 
   const emit = defineEmits(['onSuccess'])
@@ -160,6 +162,14 @@
     showEditOriginDrawer.value = false
   }
 
+  const handleTrackCreation = () => {
+    tracker
+      .productCreated({
+        productName: 'Origin'
+      })
+      .track()
+  }
+
   const copyToKey = async (originKey) => {
     props.clipboardWrite(originKey)
 
@@ -170,7 +180,21 @@
     })
   }
 
+  const handleFailedOrigin = (error) => {
+    const [fieldName, ...restOfStringArr] = error.split(':')
+    const message = restOfStringArr.join(':').trim()
+    tracker
+      .failedToCreate({
+        productName: 'Origin',
+        errorType: 'API',
+        fieldName: fieldName.trim(),
+        errorMessage: message
+      })
+      .track()
+  }
+
   const handleCreateOrigin = (feedback) => {
+    handleTrackCreation()
     createFormDrawer.value.scrollOriginKey()
     originKey.value = feedback.originKey
     emit('onSuccess')
@@ -190,6 +214,7 @@
     :schema="validationSchema"
     :initialValues="initialValues"
     @onSuccess="handleCreateOrigin"
+    @onError="handleFailedOrigin"
     :showBarGoBack="true"
     title="Create Origin"
   >

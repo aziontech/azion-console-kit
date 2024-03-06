@@ -234,10 +234,15 @@ describe('AnalyticsTrackerAdapter', () => {
 
   it('should track the user failed to sign-up event with the correct parameters', () => {
     const { sut, analyticsClientSpy } = makeSut()
+    const propsMock = {
+      errorType: 'api',
+      fieldName: 'email',
+      errorMessage: 'Invalid email'
+    }
 
-    sut.userFailedSignUp().track()
+    sut.userFailedSignUp({ ...propsMock }).track()
 
-    expect(analyticsClientSpy.track).toHaveBeenCalledWith('User Failed to Sign Up', {})
+    expect(analyticsClientSpy.track).toHaveBeenCalledWith('User Failed to Sign Up', propsMock)
   })
 
   it('should track the failed additional data submit event with the correct parameters', () => {
@@ -326,5 +331,54 @@ describe('AnalyticsTrackerAdapter', () => {
     sut.track()
 
     expect(analyticsClientSpy.track).toHaveBeenCalledWith('Failed to Deploy', {})
+  })
+
+  it('should be able to track click to create event with correct params', () => {
+    const { sut, analyticsClientSpy } = makeSut()
+    const productNameMock = 'Origin'
+
+    sut.clickToCreate({
+      productName: productNameMock
+    })
+
+    sut.track()
+
+    expect(analyticsClientSpy.track).toHaveBeenCalledWith('Clicked to Create Origin', {})
+  })
+
+  it('should be able to track created event with correct params', () => {
+    const { sut, analyticsClientSpy } = makeSut()
+    const productNameMock = 'Origin'
+
+    sut.productCreated({
+      productName: productNameMock
+    })
+
+    sut.track()
+
+    expect(analyticsClientSpy.track).toHaveBeenCalledWith('Created Origin', {})
+  })
+
+  it('should be able to track failed created event with correct params', () => {
+    const { sut, analyticsClientSpy } = makeSut()
+    const productNameMock = 'Origin'
+    const errorMessageMock = 'message'
+    const errorTypeMock = 'API'
+    const fieldName = 'detail'
+
+    sut.failedToCreate({
+      productName: productNameMock,
+      errorMessage: errorMessageMock,
+      errorType: errorTypeMock,
+      fieldName: fieldName
+    })
+
+    sut.track()
+
+    expect(analyticsClientSpy.track).toHaveBeenCalledWith('Failed to Create Origin', {
+      errorMessage: errorMessageMock,
+      errorType: errorTypeMock,
+      fieldName: fieldName
+    })
   })
 })

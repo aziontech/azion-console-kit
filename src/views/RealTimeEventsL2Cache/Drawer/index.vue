@@ -33,7 +33,7 @@
     toast.add({
       closable: true,
       severity: 'success',
-      summary: 'Cache Key copied!'
+      summary: 'Successfully copied!'
     })
   }
 
@@ -170,7 +170,7 @@
               <div class="flex flex-col gap-3 w-full sm:w-5/12 flex-1">
                 <TextInfo label="Reference Error">{{ details.referenceError }}</TextInfo>
                 <TextInfo label="Request Method">{{ details.requestMethod }}</TextInfo>
-                <TextInfo label="Request Uri">{{ details.requestUri }}</TextInfo>
+                <TextInfo label="Request URI">{{ details.requestUri }}</TextInfo>
               </div>
               <div class="flex flex-col gap-3 w-full sm:w-5/12 flex-1">
                 <TextInfo label="Sent HTTP Content Type">{{
