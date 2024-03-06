@@ -181,7 +181,8 @@
           >{{ ipCidrError }}</small
         >
         <small class="text-xs text-color-secondary font-normal leading-tight">
-          Separate each address value by using a new line and, optionally, use <code>#</code> to add a comment and <code>--LT</code> to add a date. Duplicated entries are automatically
+          Separate each address value by using a new line and, optionally, use <code>#</code> to add
+          a comment and <code>--LT</code> to add a date. Duplicated entries are automatically
           removed.
         </small>
       </div>
