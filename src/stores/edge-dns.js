@@ -1,14 +1,14 @@
 import { defineStore } from 'pinia'
 
-export const useIntelligentDNSStore = defineStore({
-  id: 'intelligentDNS',
+export const useEdgeDNSStore = defineStore({
+  id: 'edgeDNS',
   state: () => ({
     domain: null
   }),
   persist: true,
   getters: {
     getDomain() {
-      return this.domain.value
+      return this.domain
     }
   },
   actions: {

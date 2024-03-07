@@ -1,19 +1,19 @@
 <script setup>
-  import InputText from 'primevue/inputtext'
-  import InputSwitch from 'primevue/inputswitch'
-  import { useIntelligentDNSStore } from '@/stores/intelligent-dns'
-  import { useField } from 'vee-validate'
+  import { useEdgeDNSStore } from '@/stores/edge-dns'
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
+  import InputSwitch from 'primevue/inputswitch'
+  import InputText from 'primevue/inputtext'
+  import { useField } from 'vee-validate'
   import { watch } from 'vue'
 
-  const intelligentDNSStore = useIntelligentDNSStore()
+  const edgeDNSStore = useEdgeDNSStore()
 
   const { value: name, errorMessage: errorName } = useField('name')
   const { value: domain, errorMessage: errorDomain } = useField('domain')
   const { value: isActive } = useField('isActive')
 
   watch(domain, () => {
-    intelligentDNSStore.addDomain(domain.value)
+    edgeDNSStore.addDomain(domain.value)
   })
 </script>
 
