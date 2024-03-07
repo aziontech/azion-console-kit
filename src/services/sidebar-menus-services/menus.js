@@ -40,7 +40,7 @@ export const menus = [
       },
       {
         label: 'Edge DNS',
-        to: '/intelligent-dns',
+        to: '/edge-dns',
         icon: 'pi pi-sitemap'
       }
     ]

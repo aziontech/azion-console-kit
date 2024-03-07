@@ -108,7 +108,7 @@
   })
 
   const goToCreateIntelligentDNS = () => {
-    router.push({ name: 'create-intelligent-dns' })
+    router.push({ name: 'create-edge-dns' })
   }
 </script>
 
