@@ -224,10 +224,10 @@
   const changeTab = (index) => {
     activeTab.value = index
     if (index === 0) {
-      router.push({ name: 'edit-intelligent-dns', params: { id: intelligentDNSID.value } })
+      router.push({ name: 'edit-edge-dns', params: { id: intelligentDNSID.value } })
     } else {
       router.push({
-        name: 'intelligent-dns-records',
+        name: 'edge-dns-records',
         params: { id: intelligentDNSID.value }
       })
     }
