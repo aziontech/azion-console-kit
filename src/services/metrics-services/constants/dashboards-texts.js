@@ -162,13 +162,13 @@ const DASHBOARDS_TEXTS = {
       }
     }
   },
-  l2_caching: {
+  tiered_caching: {
     caching_offload: {
-      l2_caching: {
+      tiered_caching: {
         description:
           'Sum of data transferred through Tiered Cache. Displays the data in bytes divided by Data Transferred Total, Data Transferred In, and Data Transferred Out.'
       },
-      l2_offload: {
+      tiered_offload: {
         description:
           'Percentage of data successfully delivered by Tiered Cache to the edge without searching for the content on the origin server. Displays the average number of data in percentages.'
       }
