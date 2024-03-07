@@ -24,8 +24,8 @@
         :columns="getColumns"
         pageTitleDelete="Edge DNS"
         addButtonLabel="Add"
-        createPagePath="intelligent-dns/create"
-        editPagePath="intelligent-dns/edit"
+        createPagePath="edge-dns/create"
+        editPagePath="edge-dns/edit"
         @on-load-data="handleLoadData"
         emptyListMessage="No Zone found."
       />
@@ -34,7 +34,7 @@
         title="No zone has been created"
         description="Click the button below to initiate the setup process and create your first zone."
         createButtonLabel="Add"
-        createPagePath="intelligent-dns/create"
+        createPagePath="edge-dns/create"
         :documentationService="documentationService"
       >
         <template #illustration>

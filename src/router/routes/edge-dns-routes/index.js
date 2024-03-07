@@ -3,13 +3,13 @@ import * as IntelligentDNSRecordsService from '@/services/intelligent-dns-record
 import * as Helpers from '@/helpers'
 
 /** @type {import('vue-router').RouteRecordRaw} */
-export const intelligentDnsRoutes = {
-  path: '/intelligent-dns',
-  name: 'intelligent-dns',
+export const edgeDnsRoutes = {
+  path: '/edge-dns',
+  name: 'edge-dns',
   children: [
     {
       path: '',
-      name: 'list-intelligent-dns',
+      name: 'list-edge-dns',
       component: () => import('@views/IntelligentDNS/ListView.vue'),
       props: {
         listIntelligentDNSService: IntelligentDNSService.listIntelligentDNSService,
@@ -21,14 +21,14 @@ export const intelligentDnsRoutes = {
         breadCrumbs: [
           {
             label: 'Edge DNS',
-            to: '/intelligent-dns'
+            to: '/edge-dns'
           }
         ]
       }
     },
     {
       path: 'create',
-      name: 'create-intelligent-dns',
+      name: 'create-edge-dns',
       component: () => import('@views/IntelligentDNS/CreateView.vue'),
       props: {
         createIntelligentDNSService: IntelligentDNSService.createIntelligentDNSService,
@@ -38,18 +38,18 @@ export const intelligentDnsRoutes = {
         breadCrumbs: [
           {
             label: 'Edge DNS',
-            to: '/intelligent-dns'
+            to: '/edge-dns'
           },
           {
             label: 'Create Edge DNS',
-            to: '/intelligent-dns/create'
+            to: '/edge-dns/create'
           }
         ]
       }
     },
     {
       path: 'edit/:id',
-      name: 'edit-intelligent-dns',
+      name: 'edit-edge-dns',
       component: () => import('@views/IntelligentDNS/EditView.vue'),
       props: {
         editIntelligentDNSService: IntelligentDNSService.editIntelligentDNSService,
@@ -57,13 +57,13 @@ export const intelligentDnsRoutes = {
         listRecordsService: IntelligentDNSRecordsService.listRecordsService,
         deleteRecordsService: IntelligentDNSRecordsService.deleteRecordsService,
         clipboardWrite: Helpers.clipboardWrite,
-        updatedRedirect: 'list-intelligent-dns'
+        updatedRedirect: 'list-edge-dns'
       },
       meta: {
         breadCrumbs: [
           {
             label: 'Edge DNS',
-            to: '/intelligent-dns'
+            to: '/edge-dns'
           },
           {
             label: 'Edit Edge DNS'
@@ -73,7 +73,7 @@ export const intelligentDnsRoutes = {
     },
     {
       path: 'edit/:id/records',
-      name: 'intelligent-dns-records',
+      name: 'edge-dns-records',
       component: () => import('@views/IntelligentDNS/EditView.vue'),
       props: {
         editIntelligentDNSService: IntelligentDNSService.editIntelligentDNSService,
@@ -90,7 +90,7 @@ export const intelligentDnsRoutes = {
         breadCrumbs: [
           {
             label: 'Edge DNS',
-            to: '/intelligent-dns'
+            to: '/edge-dns'
           },
           {
             label: 'Edit Edge DNS'
