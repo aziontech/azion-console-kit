@@ -34,7 +34,9 @@ const adapt = (httpResponse) => {
     hmacAuthentication: origin.hmac_authentication,
     hmacRegionName: origin.hmac_region_name,
     hmacAccessKey: origin.hmac_access_key,
-    hmacSecretKey: origin.hmac_secret_key
+    hmacSecretKey: origin.hmac_secret_key,
+    bucketName: origin.bucket,
+    prefix: origin.prefix
   }
 
   return {

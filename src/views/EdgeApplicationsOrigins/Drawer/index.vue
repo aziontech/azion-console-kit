@@ -60,7 +60,12 @@
       label: 'Load Balancer',
       value: 'load_balancer',
       disabled: !props.isLoadBalancer
-    }
+    },
+    {
+      label: 'Object Storage',
+      value: 'object_storage',
+      disabled: false
+    },
   ]
 
   const initialValues = ref({
@@ -85,18 +90,25 @@
     hmacAuthentication: false,
     hmacRegionName: '',
     hmacAccessKey: '',
-    hmacSecretKey: ''
+    hmacSecretKey: '',
+    bucketName: '',
+    prefix: ''
   })
 
   const createFormDrawer = ref('')
   const originKey = ref('')
+
   const validationSchema = yup.object({
     name: yup.string().required().label('Name'),
     originType: yup.string().required().label('Origin Type'),
     hostHeader: yup.string().required().label('Host Header'),
     addresses: yup.array().of(
       yup.object().shape({
-        address: yup.string().required().label('Address'),
+        address: yup.string().label('Address').when('originType', {
+          is: (originType) => originType !== 'object_storage',
+          then: (schema) => schema.required(),
+          otherwise: (schema) => schema.notRequired()
+        }),
         weight: yup.number().nullable().label('Weight'),
         isActive: yup.boolean().default(true).label('Active')
       })
@@ -128,7 +140,11 @@
         is: true,
         then: (schema) => schema.required()
       })
-      .label('Secret Key')
+      .label('Secret Key'),
+    bucketName: yup.string().label('Bucket Name').when('originType', {
+      is: 'object_storage',
+      then: (schema) => schema.required()
+    }),
   })
 
   const editService = async (payload) => {
