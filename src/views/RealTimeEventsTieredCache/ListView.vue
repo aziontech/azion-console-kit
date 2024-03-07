@@ -12,11 +12,11 @@
       type: Function,
       required: true
     },
-    listL2Cache: {
+    listTieredCache: {
       type: Function,
       required: true
     },
-    loadL2Cache: {
+    loadTieredCache: {
       type: Function,
       required: true
     },
@@ -68,7 +68,7 @@
   }
 
   const listProvider = async () => {
-    return await props.listL2Cache({ tsRange: filterDate.value })
+    return await props.listTieredCache({ tsRange: filterDate.value })
   }
 
   const getColumns = computed(() => {
@@ -119,7 +119,7 @@
 <template>
   <Drawer
     ref="drawerRef"
-    :loadService="props.loadL2Cache"
+    :loadService="props.loadTieredCache"
     :clipboardWrite="props.clipboardWrite"
   />
   <div class="flex flex-col gap-8 my-4">
