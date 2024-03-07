@@ -268,4 +268,3 @@
     </template>
   </FormHorizontal>
 </template>
-@/stores/edge-dns
