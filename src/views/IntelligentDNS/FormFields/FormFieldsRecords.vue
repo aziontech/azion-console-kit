@@ -1,5 +1,5 @@
 <script setup>
-  import { useIntelligentDNSStore } from '@/stores/intelligent-dns'
+  import { useEdgeDNSStore } from '@/stores/edge-dns'
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
   import Dropdown from 'primevue/dropdown'
   import InputNumber from 'primevue/inputnumber'
@@ -12,12 +12,12 @@
   const { value: selectedPolicy, errorMessage: errorSelectedPolicy } = useField('selectedPolicy')
   const { value: selectedRecordType, errorMessage: errorSelectedRecordType } =
     useField('selectedRecordType')
-  const { value: value, errorMessage: errorValue } = useField('value')
+  const { value, errorMessage: errorValue } = useField('value')
   const { value: ttl, errorMessage: errorTtl } = useField('ttl')
   const { value: weight, errorMessage: errorWeight } = useField('weight')
   const { value: description, errorMessage: errorDescription } = useField('description')
 
-  const intelligentDNSStore = useIntelligentDNSStore()
+  const edgeDNSStore = useEdgeDNSStore()
 
   const RECORD_TYPE_WITHOUT_TTL = 'ANAME'
 
@@ -70,7 +70,7 @@
             type="text"
             :class="{ 'p-invalid': errorName }"
           />
-          <span class="p-inputgroup-addon"> .{{ intelligentDNSStore.domain }} </span>
+          <span class="p-inputgroup-addon"> .{{ edgeDNSStore.domain }} </span>
         </div>
         <small class="text-color-secondary text-sm font-normal leading-tight">
           The accepted values format vary according to the chosen record type.
@@ -268,3 +268,4 @@
     </template>
   </FormHorizontal>
 </template>
+@/stores/edge-dns
