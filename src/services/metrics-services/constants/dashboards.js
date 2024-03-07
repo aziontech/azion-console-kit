@@ -92,7 +92,7 @@ const PAGES_DASHBOARDS = {
     },
     {
       id: 7,
-      label: 'Intelligent DNS',
+      label: 'Edge DNS',
       path: 'intelligent-dns',
       groupId: 2,
       dashboards: [
@@ -108,7 +108,7 @@ const PAGES_DASHBOARDS = {
   observe: [
     {
       id: 8,
-      label: 'Data Streaming',
+      label: 'Data Stream',
       path: 'data-streaming',
       groupId: 3,
       dashboards: [

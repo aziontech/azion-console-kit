@@ -2,8 +2,8 @@
   <ContentBlock>
     <template #heading>
       <PageHeadingBlock
-        pageTitle="Create Intelligent DNS"
-        description="Set Azion Intelligent DNS as the authoritative DNS server for your domain by copying the nameservers values."
+        pageTitle="Create Edge DNS"
+        description="Set Azion Edge DNS as the authoritative DNS server for your domain by copying the nameservers values."
       >
         <template #default>
           <PrimeButton

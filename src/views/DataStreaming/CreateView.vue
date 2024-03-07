@@ -221,7 +221,7 @@
 <template>
   <ContentBlock>
     <template #heading>
-      <PageHeadingBlock pageTitle="Create Data Streaming" />
+      <PageHeadingBlock pageTitle="Create Data Stream" />
     </template>
     <template #content>
       <CreateFormBlock
