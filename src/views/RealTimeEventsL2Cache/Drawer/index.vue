@@ -94,20 +94,20 @@
           :tags="proxyTag"
         >
           <template #body>
-            <div class="flex w-full gap-3 items-center">
-              <span class="w-36 text-color text-sm font-medium">Cache Key</span>
-              <span
-                class="w-full text-color-secondary break-all text-sm gap-3 flex flex-wrap items-center"
+            <div class="w-full flex sm:flex-row flex-col gap-2">
+              <TextInfo
+                class="w-full sm:w-1/2 flex-1"
+                label="Cache Key"
+                >{{ details.cacheKey }}</TextInfo
               >
-                <label>{{ details.cacheKey }}</label>
+              <div class="ml-28 sm:ml-0 w-full sm:w-1/2 flex-1 flex justify-start">
                 <PrimeButton
-                  class="whitespace-nowrap"
                   label="Copy"
                   icon="pi pi-copy"
                   @click="copyCacheKey"
                   outlined
                 />
-              </span>
+              </div>
             </div>
 
             <Divider />
