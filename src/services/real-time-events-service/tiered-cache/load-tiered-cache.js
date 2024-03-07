@@ -3,7 +3,7 @@ import { AxiosHttpClientSignalDecorator } from '../../axios/AxiosHttpClientSigna
 import { convertValueToDate } from '@/helpers/convert-date'
 import { makeRealTimeEventsBaseUrl } from '../make-real-time-events-service'
 
-export const loadL2Cache = async (filter) => {
+export const loadTieredCache = async (filter) => {
   const payload = adapt(filter)
 
   const decorator = new AxiosHttpClientSignalDecorator()
