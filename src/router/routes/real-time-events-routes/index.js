@@ -39,10 +39,10 @@ export const realTimeEventsRoutes = {
       loadIntelligentDNS: RealTimeEventsService.loadIntelligentDNS,
       documentationService: Helpers.documentationGuideProducts.realTimeEventsIntelligentDNS
     },
-    dataStreaming: {
-      listDataStreaming: RealTimeEventsService.listDataStreaming,
-      loadDataStreaming: RealTimeEventsService.loadDataStreaming,
-      documentationService: Helpers.documentationGuideProducts.realTimeEventsDataStreaming
+    dataStream: {
+      listDataStream: RealTimeEventsService.listDataStream,
+      loadDataStream: RealTimeEventsService.loadDataStream,
+      documentationService: Helpers.documentationGuideProducts.realTimeEventsDataStream
     },
     activityHistory: {
       listActivityHistory: RealTimeEventsService.listActivityHistory,
