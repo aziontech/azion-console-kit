@@ -1,13 +1,13 @@
 <script setup>
   import CreateDrawerBlock from '@templates/create-drawer-block'
   import EditDrawerBlock from '@templates/edit-drawer-block'
-  import FormFieldsEdgeApplicationCacheSettings from '../FormFields/FormFieldsEdgeApplicationCacheSettings'
+  import FormFieldsEdgeApplicationEdgeCache from '../FormFields/FormFieldsEdgeApplicationEdgeCache'
   import * as yup from 'yup'
   import { refDebounced } from '@vueuse/core'
   import { ref } from 'vue'
 
   defineOptions({
-    name: 'edge-application-cache-settings-drawer'
+    name: 'edge-application-edge-cache-drawer'
   })
   const emit = defineEmits(['onSuccess'])
 
@@ -30,13 +30,13 @@
     }
   })
 
-  const showCreateCacheSettingsDrawer = ref(false)
-  const showEditCacheSettingsDrawer = ref(false)
-  const selectedCacheSettingsToEdit = ref('')
+  const showCreateEdgeCacheDrawer = ref(false)
+  const showEditEdgeCacheDrawer = ref(false)
+  const selectedEdgeCacheToEdit = ref('')
   const debouncedDrawerAnimate = 300
 
-  const showCreateDrawer = refDebounced(showCreateCacheSettingsDrawer, debouncedDrawerAnimate)
-  const showEditDrawer = refDebounced(showEditCacheSettingsDrawer, debouncedDrawerAnimate)
+  const showCreateDrawer = refDebounced(showCreateEdgeCacheDrawer, debouncedDrawerAnimate)
+  const showEditDrawer = refDebounced(showEditEdgeCacheDrawer, debouncedDrawerAnimate)
 
   const MAX_TTL_ONE_YEAR_IN_SECONDS = 31536000
   const LOCKED_SLICE_RANGE_IN_KBYTES = 1024
@@ -62,7 +62,7 @@
   })
   const validationSchema = yup.object({
     name: yup.string().required().label('Name'),
-    browserEdgeCache: yup.string().required().label('Browser cache settings'),
+    browserEdgeCache: yup.string().required().label('Browser edge cache'),
     browserEdgeCacheMaximumTtl: yup
       .number()
       .label('Maximum TTL')
@@ -72,7 +72,7 @@
         then: (schema) => schema.notRequired(),
         otherwise: (schema) => schema.min(0).max(MAX_TTL_ONE_YEAR_IN_SECONDS).required()
       }),
-    cdnEdgeCache: yup.string().required().label('Edge cache settings'),
+    cdnEdgeCache: yup.string().required().label('Edge cache'),
     cdnEdgeCacheMaximumTtl: yup
       .number()
       .label('Edge Maximum TTL')
@@ -122,14 +122,14 @@
   })
 
   const closeCreateDrawer = () => {
-    showCreateCacheSettingsDrawer.value = false
+    showCreateEdgeCacheDrawer.value = false
   }
   const openCreateDrawer = () => {
-    showCreateCacheSettingsDrawer.value = true
+    showCreateEdgeCacheDrawer.value = true
   }
-  const openEditDrawer = (cacheSettingsId) => {
-    selectedCacheSettingsToEdit.value = `${cacheSettingsId}`
-    showEditCacheSettingsDrawer.value = true
+  const openEditDrawer = (edgeCacheId) => {
+    selectedEdgeCacheToEdit.value = `${edgeCacheId}`
+    showEditEdgeCacheDrawer.value = true
   }
 
   const createServiceWithEdgeApplicationIdDecorator = async (payload) => {
@@ -140,25 +140,25 @@
     return result
   }
 
-  const loadCacheSettingsServiceWithDecorator = async (payload) => {
+  const loadEdgeCacheServiceWithDecorator = async (payload) => {
     return props.loadService({
       edgeApplicationId: props.edgeApplicationId,
       id: payload.id
     })
   }
-  const editCacheSettingsServiceWithDecorator = async (payload) => {
+  const editEdgeCacheServiceWithDecorator = async (payload) => {
     return props.editService({
       edgeApplicationId: props.edgeApplicationId,
       ...payload
     })
   }
 
-  const handleCreateCacheSettings = () => {
+  const handleCreateEdgeCache = () => {
     emit('onSuccess')
     closeCreateDrawer()
   }
 
-  const handleEditedCacheSettings = () => {
+  const handleEditedEdgeCache = () => {
     emit('onSuccess')
     closeCreateDrawer()
   }
@@ -172,30 +172,30 @@
 <template>
   <CreateDrawerBlock
     v-if="showCreateDrawer"
-    v-model:visible="showCreateCacheSettingsDrawer"
+    v-model:visible="showCreateEdgeCacheDrawer"
     :createService="createServiceWithEdgeApplicationIdDecorator"
     :schema="validationSchema"
     :initialValues="initialValues"
-    @onSuccess="handleCreateCacheSettings"
-    title="Create Cache Settings"
+    @onSuccess="handleCreateEdgeCache"
+    title="Create Edge Cache"
   >
     <template #formFields>
-      <FormFieldsEdgeApplicationCacheSettings />
+      <FormFieldsEdgeApplicationEdgeCache />
     </template>
   </CreateDrawerBlock>
 
   <EditDrawerBlock
     v-if="showEditDrawer"
-    :id="selectedCacheSettingsToEdit"
-    v-model:visible="showEditCacheSettingsDrawer"
-    :loadService="loadCacheSettingsServiceWithDecorator"
-    :editService="editCacheSettingsServiceWithDecorator"
+    :id="selectedEdgeCacheToEdit"
+    v-model:visible="showEditEdgeCacheDrawer"
+    :loadService="loadEdgeCacheServiceWithDecorator"
+    :editService="editEdgeCacheServiceWithDecorator"
     :schema="validationSchema"
-    @onSuccess="handleEditedCacheSettings"
-    title="Edit Cache Settings"
+    @onSuccess="handleEditedEdgeCache"
+    title="Edit Edge Cache"
   >
     <template #formFields>
-      <FormFieldsEdgeApplicationCacheSettings />
+      <FormFieldsEdgeApplicationEdgeCache />
     </template>
   </EditDrawerBlock>
 </template>
