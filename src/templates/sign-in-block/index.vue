@@ -156,7 +156,7 @@
   import { ref, inject } from 'vue'
   import { useRouter } from 'vue-router'
   import * as yup from 'yup'
-  /**@type {import('@/plugins/adapters/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
+  /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
 
   defineOptions({ name: 'signInBlock' })
@@ -291,4 +291,3 @@
     resetField()
   }
 </script>
-@/plugins/analytics/AnalyticsTrackerAdapter

@@ -211,7 +211,7 @@
   import { useForm } from 'vee-validate'
   import * as yup from 'yup'
   import FormFieldsHome from './FormFields/FormFieldsHome.vue'
-  /**@type {import('@/plugins/adapters/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
+  /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
 
   export default {
     name: 'home-view',
@@ -350,4 +350,3 @@
     }
   }
 </script>
-@/plugins/analytics/AnalyticsTrackerAdapter

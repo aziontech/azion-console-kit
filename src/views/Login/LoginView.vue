@@ -22,7 +22,7 @@
   import SignInBlock from '@/templates/sign-in-block'
   import ForgotPassword from '@/templates/sign-in-block/forgot-password.vue'
   import { useRoute, useRouter } from 'vue-router'
-  /**@type {import('@/plugins/adapters/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
+  /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
 
   const route = useRoute()
@@ -69,4 +69,3 @@
     }
   })
 </script>
-@/plugins/analytics/AnalyticsTrackerAdapter

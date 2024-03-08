@@ -238,7 +238,7 @@
   import { useLoadingStore } from '@/stores/loading'
   import { useRouter, useRoute } from 'vue-router'
   import { useToast } from 'primevue/usetoast'
-  /**@type {import('@/plugins/adapters/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
+  /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
 
   const isLoading = ref(false)
@@ -324,4 +324,4 @@
     }
     loadSolutionByVendor()
   })
-</script>@/plugins/analytics/AnalyticsTrackerAdapter
+</script>

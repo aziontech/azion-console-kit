@@ -315,4 +315,3 @@
     </div>
   </div>
 </template>
-@/plugins/analytics/AnalyticsTrackerAdapter

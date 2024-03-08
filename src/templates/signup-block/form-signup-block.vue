@@ -106,7 +106,7 @@
   import InputPassword from 'primevue/password'
   import PrimeButton from 'primevue/button'
   import PrimeDivider from 'primevue/divider'
-  /** @type {import('@/plugins/adapters/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
+  /** @type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
 
   defineEmits(['change-signup-method'])
@@ -200,4 +200,4 @@
   onUnmounted(() => {
     getInstance()?.hideBadge()
   })
-</script>@/plugins/analytics/AnalyticsTrackerAdapter
+</script>

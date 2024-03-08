@@ -138,7 +138,7 @@
   import ScriptRunnerBlock from '@/templates/script-runner-block'
   import PrimeCard from 'primevue/card'
   import { useToast } from 'primevue/usetoast'
-  /**@type {import('@/plugins/adapters/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
+  /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
 
   const props = defineProps({
@@ -263,4 +263,3 @@
     clearInterval(intervalRef.value)
   })
 </script>
-@/plugins/analytics/AnalyticsTrackerAdapter

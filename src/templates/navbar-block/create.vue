@@ -72,7 +72,7 @@
   import PrimeDialog from 'primevue/dialog'
   import Sidebar from 'primevue/sidebar'
   import CreateModalBlock from '@/templates/create-modal-block'
-  /**@type {import('@/plugins/adapters/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
+  /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
 
   defineOptions({ name: 'navbar-create-block' })
@@ -102,4 +102,3 @@
     return createModalStore.isOpen
   })
 </script>
-@/plugins/analytics/AnalyticsTrackerAdapter
