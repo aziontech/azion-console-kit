@@ -8,7 +8,7 @@ import { UserIsNotClientError } from './user-is-no-client-error'
 import { UserNotFoundError } from './user-not-found-error'
 import { ProccessRequestError } from './proccess-request-error'
 import { InvalidDataStructureError } from './invalid-data-structure-error'
-import { InvalidDataStreamingEndpointType } from './invalid-data-streaming-endpoint-type'
+import { InvalidDataStreamEndpointType } from './invalid-data-stream-endpoint-type'
 import { CannotReorderDefaultRule } from './cannot-reorder-default-rule'
 
 export {
@@ -22,6 +22,6 @@ export {
   UserNotFoundError,
   ProccessRequestError,
   InvalidDataStructureError,
-  InvalidDataStreamingEndpointType,
+  InvalidDataStreamEndpointType,
   CannotReorderDefaultRule
 }
