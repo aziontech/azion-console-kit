@@ -44,7 +44,7 @@ export const documentationGuideProducts = {
   realTimeEventsL2Cache: () => openDocumentationProducts('real-time-events/#tiered-cache'),
   realTimeEventsIntelligentDNS: () =>
     openDocumentationProducts('real-time-events/#intelligent-dns'),
-  realTimeEventsDataStream: () => openDocumentationProducts('real-time-events/#data-stream'),
+  realTimeEventsDataStream: () => openDocumentationProducts('real-time-events/#data-streaming'),
   realTimeEventsActivityHistory: () =>
     openDocumentationProducts('real-time-events/#activity-history'),
   edgeServicesResources: () =>
