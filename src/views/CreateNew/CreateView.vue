@@ -244,6 +244,7 @@
   const isLoading = ref(false)
   const showDetails = ref(false)
   const solution = ref({})
+  const solutionTrackerData = ref({})
   const router = useRouter()
   const route = useRoute()
   const toast = useToast()
@@ -276,6 +277,13 @@
         vendor: route.params.vendor,
         solution: route.params.solution
       })
+      solutionTrackerData.value = {
+        templateName: solution.value.name,
+        solutionId: solution.value.id,
+        version: solution.value.version,
+        versionId: solution.value.latestVersionInstallTemplate,
+        isv: solution.value.vendor.name
+      }
     } catch (error) {
       toast.add({
         closable: true,
@@ -296,20 +304,15 @@
   }
 
   const openDetails = () => {
-    tracker
-      .clickMoreDetailsOnTemplate({
-        templateName: solution.value.name,
-        solutionId: solution.value.id,
-        version: solution.value.version,
-        versionId: solution.value.latestVersionInstallTemplate,
-        isv: solution.value.vendor.name
-      })
-      .track()
+    tracker.clickMoreDetailsOnTemplate(solutionTrackerData.value).track()
     showDetails.value = true
   }
 
   const handleInstantiate = ({ result }) => {
-    router.push(`/create/deploy/${result.uuid}`)
+    router.push({
+      path: `/create/deploy/${result.uuid}`,
+      query: { solution: JSON.stringify(solutionTrackerData.value) }
+    })
   }
 
   onMounted(async () => {

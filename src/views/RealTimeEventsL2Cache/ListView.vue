@@ -148,6 +148,7 @@
     title="No logs have been found for this period."
     description="Use the filter to change time range and variables, or create a new edge application with Tiered Cache configurations. Logs are displayed once there are incoming requests and traffic."
     createButtonLabel="Edge Application"
+    createPagePath="/edge-applications/create/realTimeEvents"
     :documentationService="documentationService"
     :inTabs="true"
   />

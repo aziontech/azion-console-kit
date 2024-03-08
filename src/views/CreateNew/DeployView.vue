@@ -197,6 +197,9 @@
           'The edge application is being propagated through the edge nodes. This process will take a few minutes.'
       })
       tracker.eventDeployed().track()
+      if ('edge_application' in results.value) {
+        handleTrackCreation()
+      }
     } catch (error) {
       deployFailed.value = true
       toast.add({
@@ -238,6 +241,17 @@
 
   const goToAnalytics = () => {
     //
+  }
+
+  const handleTrackCreation = () => {
+    const solution = JSON.parse(route.query.solution)
+    const trackerData = {
+      productName: 'Edge Application',
+      from: 'marketplace',
+      createdFrom: 'template',
+      ...solution
+    }
+    tracker.productCreated(trackerData).track()
   }
 
   const retry = () => {

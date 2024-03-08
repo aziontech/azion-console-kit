@@ -110,15 +110,35 @@ export class AnalyticsTrackerAdapter {
     return this
   }
 
+  //templateName = nome do template
+  //Created Edge Application
+
   /**
    * @param {Object} payload
    * @param {AzionProductsNames} payload.productName
+   * @param {String} payload.createdFrom
+   * @param {String} payload.from
+   * @param {String} payload.templateName
+   * @param {String} payload.solutionId
+   * @param {String} payload.version
+   * @param {String} payload.versionId
+   * @param {String} payload.isv
+   * @param {String} payload.isvId
    * @returns {AnalyticsTrackerAdapter}
    */
   productCreated(payload) {
     this.#events.push({
       eventName: `Created ${payload.productName}`,
-      props: {}
+      props: {
+        createdFrom: payload.createdFrom,
+        from: payload.from,
+        templateName: payload.templateName,
+        solutionId: payload.solutionId,
+        version: payload.version,
+        versionId: payload.versionId,
+        isv: payload.isv,
+        isvId: payload.isvId
+      }
     })
     return this
   }
