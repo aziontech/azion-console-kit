@@ -1,14 +1,13 @@
 export class CreateTracker {
   /**
    * Interface for TrackerAdapter.
-   * @typedef {Object} TrackerAdapter
-   * @property {function(...args: any[]): void} addEvent - Method to add an event.
+   * @typedef {Object} trackerAdapter
+   * @property {function({eventName: string, props: Object}): void} addEvent - Method to add an event.
    */
   #trackerAdapter
 
   /**
-   * Receives an instance of AnalyticsTrackerAdapter.
-   * @param {import('analytics').AnalyticsInstance} adapter
+   * @param {trackerAdapter} trackerAdapter
    */
   constructor(adapter) {
     this.#trackerAdapter = adapter
@@ -49,12 +48,26 @@ export class CreateTracker {
   }
 
   /**
+   * @param {Object} payload
+   * @param {string} payload.templateName
+   * @param {string} payload.solutionId
+   * @param {string} payload.version
+   * @param {string} payload.versionId
+   * @param {string} payload.isv
+   * @param {string} payload.isvId
    * @returns {AnalyticsTrackerAdapter}
    */
-  clickMoreDetailsOnTemplate() {
+  clickMoreDetailsOnTemplate(payload) {
     this.#trackerAdapter.addEvent({
       eventName: 'Clicked to View More Details on Template',
-      props: {}
+      props: {
+        templateName: payload.templateName,
+        solutionId: payload.solutionId,
+        version: payload.version,
+        versionId: payload.versionId,
+        isv: payload.isv,
+        isvId: payload.isvId
+      }
     })
     return this.#trackerAdapter
   }

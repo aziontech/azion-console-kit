@@ -1,14 +1,13 @@
 export class SignInTracker {
   /**
    * Interface for TrackerAdapter.
-   * @typedef {Object} TrackerAdapter
+   * @typedef {Object} trackerAdapter
    * @property {function({eventName: string, props: Object}): void} addEvent - Method to add an event.
    */
   #trackerAdapter
 
   /**
-   * Receives an instance of AnalyticsTrackerAdapter.
-   * @param {import('analytics').AnalyticsInstance} adapter
+   * @param {trackerAdapter} trackerAdapter
    */
   constructor(adapter) {
     this.#trackerAdapter = adapter

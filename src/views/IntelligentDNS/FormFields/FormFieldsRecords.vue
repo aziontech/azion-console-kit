@@ -1,5 +1,5 @@
 <script setup>
-  import { useIntelligentDNSStore } from '@/stores/intelligent-dns'
+  import { useEdgeDNSStore } from '@/stores/edge-dns'
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
   import Dropdown from 'primevue/dropdown'
   import InputNumber from 'primevue/inputnumber'
@@ -12,12 +12,12 @@
   const { value: selectedPolicy, errorMessage: errorSelectedPolicy } = useField('selectedPolicy')
   const { value: selectedRecordType, errorMessage: errorSelectedRecordType } =
     useField('selectedRecordType')
-  const { value: value, errorMessage: errorValue } = useField('value')
+  const { value, errorMessage: errorValue } = useField('value')
   const { value: ttl, errorMessage: errorTtl } = useField('ttl')
   const { value: weight, errorMessage: errorWeight } = useField('weight')
   const { value: description, errorMessage: errorDescription } = useField('description')
 
-  const intelligentDNSStore = useIntelligentDNSStore()
+  const edgeDNSStore = useEdgeDNSStore()
 
   const RECORD_TYPE_WITHOUT_TTL = 'ANAME'
 
@@ -53,7 +53,7 @@
   <FormHorizontal
     :isDrawer="true"
     title="Settings"
-    description="Add records to specify which IPs are associated with the domain and how Intelligent DNS should handle requests for the domain."
+    description="Add records to specify which IPs are associated with the domain and how Edge DNS should handle requests for the domain."
   >
     <template #inputs>
       <div class="flex flex-col w-full gap-2">
@@ -70,7 +70,7 @@
             type="text"
             :class="{ 'p-invalid': errorName }"
           />
-          <span class="p-inputgroup-addon"> .{{ intelligentDNSStore.domain }} </span>
+          <span class="p-inputgroup-addon"> .{{ edgeDNSStore.domain }} </span>
         </div>
         <small class="text-color-secondary text-sm font-normal leading-tight">
           The accepted values format vary according to the chosen record type.
@@ -173,7 +173,7 @@
   <FormHorizontal
     :isDrawer="true"
     title="Policy"
-    description="Choose the policy type to specify how Intelligent DNS should deal with requests answered by this record."
+    description="Choose the policy type to specify how Edge DNS should deal with requests answered by this record."
   >
     <template #inputs>
       <div class="flex gap-6 flex-wrap">

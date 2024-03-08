@@ -18,7 +18,7 @@ export const dataStreamingRoutes = {
       meta: {
         breadCrumbs: [
           {
-            label: 'Data Streaming',
+            label: 'Data Stream',
             to: '/data-streaming'
           }
         ]
@@ -36,11 +36,11 @@ export const dataStreamingRoutes = {
       meta: {
         breadCrumbs: [
           {
-            label: 'Data Streaming',
+            label: 'Data Stream',
             to: '/data-streaming'
           },
           {
-            label: 'Create Data Streaming',
+            label: 'Create Data Stream',
             to: '/data-streaming/create'
           }
         ]
@@ -60,11 +60,11 @@ export const dataStreamingRoutes = {
       meta: {
         breadCrumbs: [
           {
-            label: 'Data Streaming',
+            label: 'Data Stream',
             to: '/data-streaming'
           },
           {
-            label: 'Edit Data Streaming'
+            label: 'Edit Data Stream'
           }
         ]
       }

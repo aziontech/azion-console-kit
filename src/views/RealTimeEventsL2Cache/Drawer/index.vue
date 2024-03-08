@@ -33,7 +33,7 @@
     toast.add({
       closable: true,
       severity: 'success',
-      summary: 'Cache Key copied!'
+      summary: 'Successfully copied!'
     })
   }
 
@@ -94,20 +94,20 @@
           :tags="proxyTag"
         >
           <template #body>
-            <div class="flex w-full gap-3 items-center">
-              <span class="w-36 text-color text-sm font-medium">Cache Key</span>
-              <span
-                class="w-full text-color-secondary break-all text-sm gap-3 flex flex-wrap items-center"
+            <div class="w-full flex sm:flex-row flex-col gap-2">
+              <TextInfo
+                class="w-full sm:w-1/2 flex-1"
+                label="Cache Key"
+                >{{ details.cacheKey }}</TextInfo
               >
-                <label>{{ details.cacheKey }}</label>
+              <div class="ml-28 sm:ml-0 w-full sm:w-1/2 flex-1 flex justify-start">
                 <PrimeButton
-                  class="whitespace-nowrap"
                   label="Copy"
                   icon="pi pi-copy"
                   @click="copyCacheKey"
                   outlined
                 />
-              </span>
+              </div>
             </div>
 
             <Divider />
@@ -133,7 +133,7 @@
           :tags="referenceErrorTag"
         >
           <template #body>
-            <div class="flex w-full lg:gap-8">
+            <div class="grid grid-cols-3 w-full ml-[1px] gap-4 lg:gap-8">
               <BigNumber
                 label="Request Time"
                 sufix="ms"
@@ -170,7 +170,7 @@
               <div class="flex flex-col gap-3 w-full sm:w-5/12 flex-1">
                 <TextInfo label="Reference Error">{{ details.referenceError }}</TextInfo>
                 <TextInfo label="Request Method">{{ details.requestMethod }}</TextInfo>
-                <TextInfo label="Request Uri">{{ details.requestUri }}</TextInfo>
+                <TextInfo label="Request URI">{{ details.requestUri }}</TextInfo>
               </div>
               <div class="flex flex-col gap-3 w-full sm:w-5/12 flex-1">
                 <TextInfo label="Sent HTTP Content Type">{{

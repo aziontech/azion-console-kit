@@ -1,14 +1,13 @@
 export class SignUpTracker {
   /**
    * Interface for TrackerAdapter.
-   * @typedef {Object} TrackerAdapter
-   * @property {function(...args: any[]): void} addEvent - Method to add an event.
+   * @typedef {Object} trackerAdapter
+   * @property {function({eventName: string, props: Object}): void} addEvent - Method to add an event.
    */
   #trackerAdapter
 
   /**
-   * Receives an instance of AnalyticsTrackerAdapter.
-   * @param {import('analytics').AnalyticsInstance} adapter
+   * @param {trackerAdapter} trackerAdapter
    */
   constructor(adapter) {
     this.#trackerAdapter = adapter
@@ -26,12 +25,21 @@ export class SignUpTracker {
   }
 
   /**
+   * @param {Object} payload
+   * @param {'api'|'field'} payload.errorType
+   * @param {string} payload.fieldName
+   * @param {string} payload.errorMessage
+   *
    * @returns {AnalyticsTrackerAdapter}
    */
-  userFailedSignUp() {
+  userFailedSignUp(payload) {
     this.#trackerAdapter.addEvent({
       eventName: 'User Failed to Sign Up',
-      props: {}
+      props: {
+        errorType: payload.errorType,
+        fieldName: payload.fieldName,
+        errorMessage: payload.errorMessage
+      }
     })
     return this.#trackerAdapter
   }

@@ -263,3 +263,4 @@
     clearInterval(intervalRef.value)
   })
 </script>
+@/plugins/analytics/AnalyticsTrackerAdapter

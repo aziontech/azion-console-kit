@@ -108,3 +108,4 @@
     </template>
   </ContentBlock>
 </template>
+@/plugins/analytics/AnalyticsTrackerAdapter

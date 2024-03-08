@@ -96,3 +96,4 @@
       .track()
   }
 </script>
+@/plugins/analytics/AnalyticsTrackerAdapter

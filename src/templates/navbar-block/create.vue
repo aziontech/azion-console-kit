@@ -102,3 +102,4 @@
     return createModalStore.isOpen
   })
 </script>
+@/plugins/analytics/AnalyticsTrackerAdapter

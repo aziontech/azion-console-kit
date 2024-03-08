@@ -291,3 +291,4 @@
     resetField()
   }
 </script>
+@/plugins/analytics/AnalyticsTrackerAdapter

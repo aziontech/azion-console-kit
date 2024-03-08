@@ -3,7 +3,7 @@ const DASHBOARDS_TEXTS = {
     data_streamed: {
       total_data: {
         description:
-          'Quantity of data streamed to your configured connectors in bytes. Displays the total data sent to your data streaming.'
+          'Quantity of data streamed to the configured connectors in bytes. Displays the total data sent to the stream.'
       }
     },
     data_streaming_requests: {
@@ -17,7 +17,7 @@ const DASHBOARDS_TEXTS = {
     data_transferred: {
       edge_caching: {
         description:
-          'Sum of data transferred through Edge Caching. Displays the data in bytes divided by Data Transferred, Data Transferred In, and Data Transferred Out.'
+          'Sum of data transferred through Edge Cache. Displays the data in bytes divided by Data Transferred, Data Transferred In, and Data Transferred Out.'
       },
       edge_offload: {
         description:

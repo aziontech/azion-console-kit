@@ -256,3 +256,4 @@
     }
   }
 </script>
+@/plugins/analytics/AnalyticsTrackerAdapter

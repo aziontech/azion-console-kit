@@ -69,3 +69,4 @@
     }
   })
 </script>
+@/plugins/analytics/AnalyticsTrackerAdapter

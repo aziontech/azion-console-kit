@@ -1,4 +1,4 @@
-import { AnalyticsTrackerAdapter } from '@/plugins/adapters/analytics/AnalyticsTrackerAdapter'
+import { AnalyticsTrackerAdapter } from '@/plugins/analytics/AnalyticsTrackerAdapter'
 import { describe, expect, it, vi } from 'vitest'
 
 const makeSut = () => {
@@ -234,10 +234,15 @@ describe('AnalyticsTrackerAdapter', () => {
 
   it('should track the user failed to sign-up event with the correct parameters', () => {
     const { sut, analyticsClientSpy } = makeSut()
+    const propsMock = {
+      errorType: 'api',
+      fieldName: 'email',
+      errorMessage: 'Invalid email'
+    }
 
-    sut.signUp.userFailedSignUp().track()
+    sut.signUp.userFailedSignUp({ ...propsMock }).track()
 
-    expect(analyticsClientSpy.track).toHaveBeenCalledWith('User Failed to Sign Up', {})
+    expect(analyticsClientSpy.track).toHaveBeenCalledWith('User Failed to Sign Up', propsMock)
   })
 
   it('should track the failed additional data submit event with the correct parameters', () => {
@@ -269,13 +274,34 @@ describe('AnalyticsTrackerAdapter', () => {
   it('should use the View More Details on Template event with correct parameters', () => {
     const { sut, analyticsClientSpy } = makeSut()
 
-    sut.create.clickMoreDetailsOnTemplate({})
+    const templateNameMock = 'string'
+    const solutionIdMock = 'solutionId'
+    const versionMock = 'version'
+    const versionIdMock = 'versionID'
+    const isvMock = 'isv'
+    const isvIdMock = 'isvId'
+
+    sut.create.clickMoreDetailsOnTemplate({
+      templateName: templateNameMock,
+      solutionId: solutionIdMock,
+      version: versionMock,
+      versionId: versionIdMock,
+      isv: isvMock,
+      isvId: isvIdMock
+    })
 
     sut.track()
 
     expect(analyticsClientSpy.track).toHaveBeenCalledWith(
       'Clicked to View More Details on Template',
-      {}
+      {
+        templateName: templateNameMock,
+        solutionId: solutionIdMock,
+        version: versionMock,
+        versionId: versionIdMock,
+        isv: isvMock,
+        isvId: isvIdMock
+      }
     )
   })
 
@@ -305,5 +331,77 @@ describe('AnalyticsTrackerAdapter', () => {
     sut.track()
 
     expect(analyticsClientSpy.track).toHaveBeenCalledWith('Failed to Deploy', {})
+  })
+
+  it('should be able to track click to create event with correct params', () => {
+    const { sut, analyticsClientSpy } = makeSut()
+    const productNameMock = 'Origin'
+
+    sut.clickToCreate({
+      productName: productNameMock
+    })
+
+    sut.track()
+
+    expect(analyticsClientSpy.track).toHaveBeenCalledWith('Clicked to Create Origin', {})
+  })
+
+  it('should be able to track created event with correct params', () => {
+    const { sut, analyticsClientSpy } = makeSut()
+    const productNameMock = 'Origin'
+
+    sut.productCreated({
+      productName: productNameMock
+    })
+
+    sut.track()
+
+    expect(analyticsClientSpy.track).toHaveBeenCalledWith('Created Origin', {})
+  })
+
+  it('should be able to track failed created event with correct params', () => {
+    const { sut, analyticsClientSpy } = makeSut()
+    const productNameMock = 'Origin'
+    const errorMessageMock = 'message'
+    const errorTypeMock = 'API'
+    const fieldName = 'detail'
+
+    sut.failedToCreate({
+      productName: productNameMock,
+      errorMessage: errorMessageMock,
+      errorType: errorTypeMock,
+      fieldName: fieldName
+    })
+
+    sut.track()
+
+    expect(analyticsClientSpy.track).toHaveBeenCalledWith('Failed to Create Origin', {
+      errorMessage: errorMessageMock,
+      errorType: errorTypeMock,
+      fieldName: fieldName
+    })
+  })
+
+  it('should be able to track failed edited event with correct params', () => {
+    const { sut, analyticsClientSpy } = makeSut()
+    const productNameMock = 'Origin'
+    const errorMessageMock = 'message'
+    const errorTypeMock = 'API'
+    const fieldName = 'detail'
+
+    sut.failedToEdit({
+      productName: productNameMock,
+      errorMessage: errorMessageMock,
+      errorType: errorTypeMock,
+      fieldName: fieldName
+    })
+
+    sut.track()
+
+    expect(analyticsClientSpy.track).toHaveBeenCalledWith('Failed to Edit Origin', {
+      errorMessage: errorMessageMock,
+      errorType: errorTypeMock,
+      fieldName: fieldName
+    })
   })
 })

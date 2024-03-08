@@ -296,7 +296,15 @@
   }
 
   const openDetails = () => {
-    tracker.create.clickMoreDetailsOnTemplate().track()
+    tracker.create
+      .clickMoreDetailsOnTemplate({
+        templateName: solution.value.name,
+        solutionId: solution.value.id,
+        version: solution.value.version,
+        versionId: solution.value.latestVersionInstallTemplate,
+        isv: solution.value.vendor.name
+      })
+      .track()
     showDetails.value = true
   }
 
@@ -316,4 +324,4 @@
     }
     loadSolutionByVendor()
   })
-</script>
+</script>@/plugins/analytics/AnalyticsTrackerAdapter

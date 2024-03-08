@@ -84,3 +84,4 @@
     emit('updatedApplication', values)
   }
 </script>
+@/plugins/analytics/AnalyticsTrackerAdapter
