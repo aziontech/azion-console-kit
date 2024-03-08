@@ -27,13 +27,13 @@ export const searchEdgeDnsService = async ({
 }
 
 const adapt = (httpResponse) => {
-  const parsedDomains = httpResponse.body.results?.map((edgeDns) => ({
+  const parsedEdgeDns = httpResponse.body.results?.map((edgeDns) => ({
     value: edgeDns.id,
     label: edgeDns.name
   }))
 
   return {
-    body: parsedDomains,
+    body: parsedEdgeDns,
     statusCode: httpResponse.statusCode
   }
 }
