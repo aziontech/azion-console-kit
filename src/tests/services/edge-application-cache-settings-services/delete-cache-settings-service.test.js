@@ -1,6 +1,6 @@
 import { AxiosHttpClientAdapter } from '@/services/axios/AxiosHttpClientAdapter'
 import * as Errors from '@/services/axios/errors'
-import { deleteCacheSettingsService } from '@/services/edge-application-edge-cache-services'
+import { deleteEdgeCacheService } from '@/services/edge-application-edge-cache-services'
 import { describe, expect, it, vi } from 'vitest'
 
 const fixtures = {
@@ -9,12 +9,12 @@ const fixtures = {
 }
 
 const makeSut = () => {
-  const sut = deleteCacheSettingsService
+  const sut = deleteEdgeCacheService
 
   return { sut }
 }
 
-describe('EdgeApplicationCacheSettingsServices', () => {
+describe('EdgeApplicationEdgeCacheServices', () => {
   it('should call API with correct params', async () => {
     const requestSpy = vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
       statusCode: 204
@@ -43,7 +43,7 @@ describe('EdgeApplicationCacheSettingsServices', () => {
       id: fixtures.cacheSettingsId
     })
 
-    expect(feedback).toBe('Cache Settings successfully deleted')
+    expect(feedback).toBe('Edge Cache successfully deleted')
   })
 
   it('should return api validation errors on status 409', async () => {

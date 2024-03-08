@@ -88,7 +88,7 @@ const extractApiError = (httpResponse) => {
 const parseHttpResponse = (httpResponse) => {
   switch (httpResponse.statusCode) {
     case 200:
-      return 'Cache Settings successfully edited'
+      return 'Edge Cache successfully edited'
     case 400:
       throw new Error(extractApiError(httpResponse)).message
     case 401:

@@ -1,10 +1,10 @@
 import { AxiosHttpClientAdapter } from '@/services/axios/AxiosHttpClientAdapter'
-import { loadCacheSettingsService } from '@/services/edge-application-edge-cache-services'
+import { loadEdgeCacheService } from '@/services/edge-application-edge-cache-services'
 import { describe, expect, it, vi } from 'vitest'
 
 const fixtures = {
   edgeApplicationId: 4516528793898,
-  cacheSettingsMock: {
+  edgeCacheMock: {
     id: 817236,
     name: 'mockName',
     browser_cache_settings: 'mockBrowserCacheSettings',
@@ -27,7 +27,7 @@ const fixtures = {
 }
 
 const makeSut = () => {
-  const sut = loadCacheSettingsService
+  const sut = loadEdgeCacheService
 
   return { sut }
 }
@@ -37,18 +37,18 @@ describe('EdgeApplicationCacheSettingsServices', () => {
     const requestSpy = vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
       statusCode: 200,
       body: {
-        results: fixtures.cacheSettingsMock
+        results: fixtures.edgeCacheMock
       }
     })
 
     const { sut } = makeSut()
     await sut({
       edgeApplicationId: fixtures.edgeApplicationId,
-      id: fixtures.cacheSettingsMock.id
+      id: fixtures.edgeCacheMock.id
     })
 
     expect(requestSpy).toHaveBeenCalledWith({
-      url: `v3/edge_applications/${fixtures.edgeApplicationId}/cache_settings/${fixtures.cacheSettingsMock.id}`,
+      url: `v3/edge_applications/${fixtures.edgeApplicationId}/cache_settings/${fixtures.edgeCacheMock.id}`,
       method: 'GET'
     })
   })
@@ -57,14 +57,14 @@ describe('EdgeApplicationCacheSettingsServices', () => {
     vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
       statusCode: 200,
       body: {
-        results: { ...fixtures.cacheSettingsMock, device_group: [123, 456] }
+        results: { ...fixtures.edgeCacheMock, device_group: [123, 456] }
       }
     })
 
     const { sut } = makeSut()
     const results = await sut({
       edgeApplicationId: fixtures.edgeApplicationId,
-      id: fixtures.cacheSettingsMock.id
+      id: fixtures.edgeCacheMock.id
     })
 
     expect(results.deviceGroup).toEqual([
@@ -79,14 +79,14 @@ describe('EdgeApplicationCacheSettingsServices', () => {
     vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
       statusCode: 200,
       body: {
-        results: { ...fixtures.cacheSettingsMock, cookie_names: ['cookieName1', 'cookieName2'] }
+        results: { ...fixtures.edgeCacheMock, cookie_names: ['cookieName1', 'cookieName2'] }
       }
     })
 
     const { sut } = makeSut()
     const results = await sut({
       edgeApplicationId: fixtures.edgeApplicationId,
-      id: fixtures.cacheSettingsMock.id
+      id: fixtures.edgeCacheMock.id
     })
 
     expect(results.cookieNames).toEqual('cookieName1\ncookieName2')
@@ -97,7 +97,7 @@ describe('EdgeApplicationCacheSettingsServices', () => {
       statusCode: 200,
       body: {
         results: {
-          ...fixtures.cacheSettingsMock,
+          ...fixtures.edgeCacheMock,
           query_string_fields: ['queryString1', 'queryString2']
         }
       }
@@ -106,7 +106,7 @@ describe('EdgeApplicationCacheSettingsServices', () => {
     const { sut } = makeSut()
     const results = await sut({
       edgeApplicationId: fixtures.edgeApplicationId,
-      id: fixtures.cacheSettingsMock.id
+      id: fixtures.edgeCacheMock.id
     })
 
     expect(results.queryStringFields).toEqual('queryString1\nqueryString2')

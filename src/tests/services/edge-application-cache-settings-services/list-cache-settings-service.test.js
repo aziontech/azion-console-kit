@@ -1,10 +1,10 @@
 import { AxiosHttpClientAdapter } from '@/services/axios/AxiosHttpClientAdapter'
-import { listCacheSettingsService } from '@/services/edge-application-edge-cache-services'
+import { listEdgeCacheService } from '@/services/edge-application-edge-cache-services'
 import { describe, expect, it, vi } from 'vitest'
 
 const fixtures = {
   edgeApplicationId: 1920763586747,
-  cacheSettingsMock: {
+  edgeCacheMock: {
     id: '181729637',
     name: 'Cache Settings Console Kit',
     browser_cache_settings: true,
@@ -13,7 +13,7 @@ const fixtures = {
 }
 
 const makeSut = () => {
-  const sut = listCacheSettingsService
+  const sut = listEdgeCacheService
 
   return { sut }
 }
@@ -42,7 +42,7 @@ describe('EdgeApplicationCacheSettingsServices', () => {
     vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
       statusCode: 200,
       body: {
-        results: [fixtures.cacheSettingsMock]
+        results: [fixtures.edgeCacheMock]
       }
     })
 
@@ -53,10 +53,10 @@ describe('EdgeApplicationCacheSettingsServices', () => {
 
     expect(result).toEqual([
       {
-        id: fixtures.cacheSettingsMock.id,
-        name: fixtures.cacheSettingsMock.name,
-        browserCache: fixtures.cacheSettingsMock.browser_cache_settings,
-        cdnCache: fixtures.cacheSettingsMock.cdn_cache_settings
+        id: fixtures.edgeCacheMock.id,
+        name: fixtures.edgeCacheMock.name,
+        browserCache: fixtures.edgeCacheMock.browser_cache_settings,
+        cdnCache: fixtures.edgeCacheMock.cdn_cache_settings
       }
     ])
   })

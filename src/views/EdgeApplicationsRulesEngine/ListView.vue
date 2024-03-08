@@ -55,7 +55,7 @@
       required: true,
       type: Function
     },
-    listCacheSettingsService: {
+    listEdgeCacheService: {
       required: true,
       type: Function
     },
@@ -177,7 +177,7 @@
     :isDeliveryProtocolHttps="props.isDeliveryProtocolHttps"
     :listEdgeApplicationFunctionsService="props.listEdgeApplicationFunctionsService"
     :listOriginsService="props.listOriginsService"
-    :listCacheSettingsService="props.listCacheSettingsService"
+    :listEdgeCacheService="props.listEdgeCacheService"
     :edgeApplicationId="props.edgeApplicationId"
     :createRulesEngineService="props.createRulesEngineService"
     :editRulesEngineService="props.editRulesEngineService"

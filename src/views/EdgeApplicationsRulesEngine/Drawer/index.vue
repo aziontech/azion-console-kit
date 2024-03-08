@@ -42,7 +42,7 @@
       type: Function,
       required: true
     },
-    listCacheSettingsService: {
+    listEdgeCacheService: {
       required: true,
       type: Function
     },
@@ -193,7 +193,7 @@
         :isDeliveryProtocolHttps="props.isDeliveryProtocolHttps"
         :listEdgeApplicationFunctionsService="props.listEdgeApplicationFunctionsService"
         :listOriginsService="props.listOriginsService"
-        :listCacheSettingsService="props.listCacheSettingsService"
+        :listEdgeCacheService="props.listEdgeCacheService"
       />
     </template>
   </CreateDrawerBlock>
@@ -217,7 +217,7 @@
         :isDeliveryProtocolHttps="props.isDeliveryProtocolHttps"
         :listEdgeApplicationFunctionsService="props.listEdgeApplicationFunctionsService"
         :listOriginsService="props.listOriginsService"
-        :listCacheSettingsService="props.listCacheSettingsService"
+        :listEdgeCacheService="props.listEdgeCacheService"
       />
     </template>
   </EditDrawerBlock>

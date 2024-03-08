@@ -26,7 +26,7 @@
       type: Function,
       required: true
     },
-    listCacheSettingsService: {
+    listEdgeCacheService: {
       required: true,
       type: Function
     },
@@ -386,7 +386,7 @@
   const listCacheSettingsOptions = async () => {
     try {
       loadingCacheSettings.value = true
-      cacheSettingsOptions.value = await props.listCacheSettingsService({
+      cacheSettingsOptions.value = await props.listEdgeCacheService({
         id: props.edgeApplicationId
       })
     } finally {

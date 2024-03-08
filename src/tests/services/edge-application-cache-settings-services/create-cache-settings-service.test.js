@@ -1,16 +1,16 @@
 import { AxiosHttpClientAdapter } from '@/services/axios/AxiosHttpClientAdapter'
 import * as Errors from '@/services/axios/errors'
-import { createCacheSettingsService } from '@/services/edge-application-edge-cache-services'
+import { createEdgeCacheService } from '@/services/edge-application-edge-cache-services'
 import { describe, expect, it, vi } from 'vitest'
 
 const fixtures = {
   cacheSettingsMock: {
     edgeApplicationId: 3456789876,
     name: 'mockName',
-    browserCacheSettings: 'mockBrowserCacheSettings',
-    browserCacheSettingsMaximumTtl: 'mockBrowserCacheSettingsMaximumTtl',
-    cdnCacheSettings: 'mockCdnCacheSettings',
-    cdnCacheSettingsMaximumTtl: 'mockCdnCacheSettingsMaximumTtl',
+    browserEdgeCache: 'mockbrowserEdgeCache',
+    browserEdgeCacheMaximumTtl: 'mockbrowserEdgeCacheMaximumTtl',
+    cdnEdgeCache: 'mockcdnEdgeCache',
+    cdnEdgeCacheMaximumTtl: 'mockcdnEdgeCacheMaximumTtl',
     sliceConfigurationEnabled: false,
     sliceConfigurationRange: 'mockSliceConfigurationRange',
     cacheByQueryString: 'mockCacheByQueryString',
@@ -25,12 +25,12 @@ const fixtures = {
   }
 }
 const makeSut = () => {
-  const sut = createCacheSettingsService
+  const sut = createEdgeCacheService
 
   return { sut }
 }
 
-describe('EdgeApplicationCacheSettingsServices', () => {
+describe('EdgeApplicationEdgeCacheServices', () => {
   it('should be able to call Api with correct params', async () => {
     const requestSpy = vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
       statusCode: 201
@@ -44,11 +44,10 @@ describe('EdgeApplicationCacheSettingsServices', () => {
       method: 'POST',
       body: {
         name: fixtures.cacheSettingsMock.name,
-        browser_cache_settings: fixtures.cacheSettingsMock.browserCacheSettings,
-        browser_cache_settings_maximum_ttl:
-          fixtures.cacheSettingsMock.browserCacheSettingsMaximumTtl,
-        cdn_cache_settings: fixtures.cacheSettingsMock.cdnCacheSettings,
-        cdn_cache_settings_maximum_ttl: fixtures.cacheSettingsMock.cdnCacheSettingsMaximumTtl,
+        browser_cache_settings: fixtures.cacheSettingsMock.browserEdgeCache,
+        browser_cache_settings_maximum_ttl: fixtures.cacheSettingsMock.browserEdgeCacheMaximumTtl,
+        cdn_cache_settings: fixtures.cacheSettingsMock.cdnEdgeCache,
+        cdn_cache_settings_maximum_ttl: fixtures.cacheSettingsMock.cdnEdgeCacheMaximumTtl,
         is_slice_configuration_enabled: fixtures.cacheSettingsMock.sliceConfigurationEnabled,
         slice_configuration_range: fixtures.cacheSettingsMock.sliceConfigurationRange,
         cache_by_query_string: fixtures.cacheSettingsMock.cacheByQueryString,
@@ -65,7 +64,7 @@ describe('EdgeApplicationCacheSettingsServices', () => {
     })
   })
 
-  it('should return a feedback when successfully create an cache settings', async () => {
+  it('should return a feedback when successfully create an edge cache', async () => {
     vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
       statusCode: 201
     })
@@ -74,11 +73,11 @@ describe('EdgeApplicationCacheSettingsServices', () => {
     const result = await sut(fixtures.cacheSettingsMock)
 
     expect(result).toEqual({
-      feedback: 'Cache Settings successfully created'
+      feedback: 'Edge Cache successfully created'
     })
   })
 
-  it('should parse each query string use to control content at a cache settings', async () => {
+  it('should parse each query string use to control content at a edge cache', async () => {
     const cacheSettingsMock = { ...fixtures.cacheSettingsMock, queryStringFields: '' }
     const requestSpy = vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
       statusCode: 201
@@ -91,7 +90,7 @@ describe('EdgeApplicationCacheSettingsServices', () => {
     expect(apiRequestPayload).toHaveProperty('query_string_fields', [])
   })
 
-  it('should parse each cookie name used to control content at a cache settings', async () => {
+  it('should parse each cookie name used to control content at a edge cache', async () => {
     const requestSpy = vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
       statusCode: 201
     })

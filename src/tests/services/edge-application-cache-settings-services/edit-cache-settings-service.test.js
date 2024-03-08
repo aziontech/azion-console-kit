@@ -1,17 +1,17 @@
 import { AxiosHttpClientAdapter } from '@/services/axios/AxiosHttpClientAdapter'
 import * as Errors from '@/services/axios/errors'
-import { editCacheSettingsService } from '@/services/edge-application-edge-cache-services'
+import { editEdgeCacheService } from '@/services/edge-application-edge-cache-services'
 import { describe, expect, it, vi } from 'vitest'
 
 const fixtures = {
-  cacheSettingsMock: {
+  edgeCacheMock: {
     edgeApplicationId: 3456789876,
     id: 817236,
     name: 'mockName',
-    browserCacheSettings: 'mockBrowserCacheSettings',
-    browserCacheSettingsMaximumTtl: 'mockBrowserCacheSettingsMaximumTtl',
-    cdnCacheSettings: 'mockCdnCacheSettings',
-    cdnCacheSettingsMaximumTtl: 'mockCdnCacheSettingsMaximumTtl',
+    browserEdgeCache: 'mockbrowserEdgeCache',
+    browserEdgeCacheMaximumTtl: 'mockbrowserEdgeCacheMaximumTtl',
+    cdnEdgeCache: 'mockcdnEdgeCache',
+    cdnEdgeCacheMaximumTtl: 'mockcdnEdgeCacheMaximumTtl',
     sliceConfigurationEnabled: false,
     sliceConfigurationRange: 'mockSliceConfigurationRange',
     cacheByQueryString: 'mockCacheByQueryString',
@@ -27,78 +27,77 @@ const fixtures = {
 }
 
 const makeSut = () => {
-  const sut = editCacheSettingsService
+  const sut = editEdgeCacheService
 
   return { sut }
 }
 
-describe('EdgeApplicationCacheSettingsServices', () => {
+describe('EdgeApplicationEdgeCacheServices', () => {
   it('should call api with correct params', async () => {
     const requestSpy = vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
       statusCode: 200
     })
 
     const { sut } = makeSut()
-    await sut(fixtures.cacheSettingsMock)
+    await sut(fixtures.edgeCacheMock)
 
     expect(requestSpy).toHaveBeenCalledWith({
-      url: `v3/edge_applications/${fixtures.cacheSettingsMock.edgeApplicationId}/cache_settings/${fixtures.cacheSettingsMock.id}`,
+      url: `v3/edge_applications/${fixtures.edgeCacheMock.edgeApplicationId}/cache_settings/${fixtures.edgeCacheMock.id}`,
       method: 'PUT',
       body: {
-        name: fixtures.cacheSettingsMock.name,
-        browser_cache_settings: fixtures.cacheSettingsMock.browserCacheSettings,
-        browser_cache_settings_maximum_ttl:
-          fixtures.cacheSettingsMock.browserCacheSettingsMaximumTtl,
-        cdn_cache_settings: fixtures.cacheSettingsMock.cdnCacheSettings,
-        cdn_cache_settings_maximum_ttl: fixtures.cacheSettingsMock.cdnCacheSettingsMaximumTtl,
-        is_slice_configuration_enabled: fixtures.cacheSettingsMock.sliceConfigurationEnabled,
-        slice_configuration_range: fixtures.cacheSettingsMock.sliceConfigurationRange,
-        cache_by_query_string: fixtures.cacheSettingsMock.cacheByQueryString,
+        name: fixtures.edgeCacheMock.name,
+        browser_cache_settings: fixtures.edgeCacheMock.browserEdgeCache,
+        browser_cache_settings_maximum_ttl: fixtures.edgeCacheMock.browserEdgeCacheMaximumTtl,
+        cdn_cache_settings: fixtures.edgeCacheMock.cdnEdgeCache,
+        cdn_cache_settings_maximum_ttl: fixtures.edgeCacheMock.cdnEdgeCacheMaximumTtl,
+        is_slice_configuration_enabled: fixtures.edgeCacheMock.sliceConfigurationEnabled,
+        slice_configuration_range: fixtures.edgeCacheMock.sliceConfigurationRange,
+        cache_by_query_string: fixtures.edgeCacheMock.cacheByQueryString,
         query_string_fields: ['field1', 'field2', 'field3'],
-        enable_query_string_sort: fixtures.cacheSettingsMock.enableQueryStringSort,
-        enable_caching_for_post: fixtures.cacheSettingsMock.enableCachingForPost,
-        enable_caching_for_options: fixtures.cacheSettingsMock.enableCachingForOptions,
+        enable_query_string_sort: fixtures.edgeCacheMock.enableQueryStringSort,
+        enable_caching_for_post: fixtures.edgeCacheMock.enableCachingForPost,
+        enable_caching_for_options: fixtures.edgeCacheMock.enableCachingForOptions,
         enable_stale_cache: true,
-        cache_by_cookies: fixtures.cacheSettingsMock.cacheByCookies,
+        cache_by_cookies: fixtures.edgeCacheMock.cacheByCookies,
         cookie_names: ['cookie1', 'cookie2', 'cookie3'],
-        adaptive_delivery_action: fixtures.cacheSettingsMock.adaptiveDeliveryAction,
+        adaptive_delivery_action: fixtures.edgeCacheMock.adaptiveDeliveryAction,
         device_group: ['123', 456]
       }
     })
   })
 
-  it('should return a feedback when successfully edit a cache settings', async () => {
+  it('should return a feedback when successfully edit a edge cache', async () => {
     vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
       statusCode: 200
     })
 
     const { sut } = makeSut()
 
-    const result = await sut(fixtures.cacheSettingsMock)
+    const result = await sut(fixtures.edgeCacheMock)
 
-    expect(result).toBe('Cache Settings successfully edited')
+    expect(result).toBe('Edge Cache successfully edited')
   })
 
-  it('should parse each query string use to control content at a cache settings', async () => {
-    const cacheSettingsMock = { ...fixtures.cacheSettingsMock, queryStringFields: '' }
+  it('should parse each query string use to control content at a edge cache', async () => {
+    const edgeCacheMock = { ...fixtures.edgeCacheMock, queryStringFields: '' }
     const requestSpy = vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
       statusCode: 200
     })
     const { sut } = makeSut()
 
-    await sut(cacheSettingsMock)
+    await sut(edgeCacheMock)
     const apiRequestPayload = requestSpy.mock.lastCall[0].body
 
     expect(apiRequestPayload).toHaveProperty('query_string_fields', [])
   })
 
-  it('should parse each cookie name used to control content at a cache settings', async () => {
+  it('should parse each cookie name used to control content at a edge cache', async () => {
     const requestSpy = vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
       statusCode: 200
     })
     const { sut } = makeSut()
 
-    await sut({ ...fixtures.cacheSettingsMock, cookieNames: '' })
+    await sut({ ...fixtures.edgeCacheMock, cookieNames: '' })
     const apiRequestPayload = requestSpy.mock.lastCall[0].body
 
     expect(apiRequestPayload).toHaveProperty('cookie_names', [])
@@ -110,7 +109,7 @@ describe('EdgeApplicationCacheSettingsServices', () => {
     })
     const { sut } = makeSut()
 
-    await sut({ ...fixtures.cacheSettingsMock, deviceGroup: null })
+    await sut({ ...fixtures.edgeCacheMock, deviceGroup: null })
     const apiRequestPayload = requestSpy.mock.lastCall[0].body
 
     expect(apiRequestPayload).toHaveProperty('device_group', [])
@@ -128,7 +127,7 @@ describe('EdgeApplicationCacheSettingsServices', () => {
 
     const { sut } = makeSut()
 
-    const apiErrorResponse = sut(fixtures.cacheSettingsMock)
+    const apiErrorResponse = sut(fixtures.edgeCacheMock)
 
     expect(apiErrorResponse).rejects.toBe('error: api error message')
   })
@@ -163,7 +162,7 @@ describe('EdgeApplicationCacheSettingsServices', () => {
 
       const { sut } = makeSut()
 
-      const response = sut(fixtures.cacheSettingsMock)
+      const response = sut(fixtures.edgeCacheMock)
 
       expect(response).rejects.toBe(expectedError)
     }

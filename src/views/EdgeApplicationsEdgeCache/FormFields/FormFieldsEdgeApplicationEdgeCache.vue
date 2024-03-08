@@ -71,10 +71,8 @@
   ])
 
   const { value: browserEdgeCache } = useField('browserEdgeCache')
-  const {
-    value: browserEdgeCacheMaximumTtl,
-    errorMessage: browserEdgeCacheMaximumTtlError
-  } = useField('browserEdgeCacheMaximumTtl')
+  const { value: browserEdgeCacheMaximumTtl, errorMessage: browserEdgeCacheMaximumTtlError } =
+    useField('browserEdgeCacheMaximumTtl')
   const { value: cdnEdgeCache } = useField('cdnEdgeCache')
   const { value: cdnEdgeCacheMaximumTtl, errorMessage: cdnEdgeCacheMaximumTtlError } =
     useField('cdnEdgeCacheMaximumTtl')

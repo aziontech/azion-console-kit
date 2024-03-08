@@ -88,7 +88,7 @@ const extractApiError = (httpResponse) => {
 const parseHttpResponse = (httpResponse) => {
   switch (httpResponse.statusCode) {
     case 201:
-      return { feedback: 'Cache Settings successfully created' }
+      return { feedback: 'Edge Cache successfully created' }
     case 400:
       throw new Error(extractApiError(httpResponse)).message
     case 401:

@@ -47,7 +47,7 @@ const extractApiError = (httpResponse) => {
 const parseHttpResponse = (httpResponse) => {
   switch (httpResponse.statusCode) {
     case 204:
-      return 'Cache Settings successfully deleted'
+      return 'Edge Cache successfully deleted'
     case 401:
       throw new Errors.InvalidApiTokenError().message
     case 403:

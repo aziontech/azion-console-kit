@@ -227,7 +227,7 @@ describe('AzionDocumentationCatalog', () => {
     const openWindowSpy = vi.spyOn(window, 'open')
     const { sut } = makeSut()
 
-    sut.edgeApplicationCacheSettings()
+    sut.edgeApplicationEdgeCache()
 
     expect(openWindowSpy).toHaveBeenCalledWith(
       `https://www.azion.com/en/search-result/?q=cache settings&filter=doc`

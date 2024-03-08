@@ -109,7 +109,7 @@ export const edgeApplicationRoutes = {
           reorderRulesEngine: RulesEngineService.reorderRulesEngine,
           documentationService: Helpers.documentationCatalog.edgeApplicationRulesEngine,
           listOriginsService: OriginsService.listOriginsService,
-          listCacheSettingsService: EdgeCacheServices.listEdgeCacheService, //Alterar o nome do servico
+          listCacheSettingsService: EdgeCacheServices.listEdgeCacheService,
           listEdgeApplicationFunctionsService: FunctionsService.listEdgeApplicationFunctionsService
         },
         clipboardWrite: Helpers.clipboardWrite
