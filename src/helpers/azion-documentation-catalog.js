@@ -13,7 +13,7 @@ export const documentationCatalog = {
   credentials: () => openSearchResult('credentials'),
   networkLists: () => openSearchResult('network lists'),
   teamPermissions: () => openSearchResult('team permissions'),
-  dataStreaming: () => openSearchResult('data streaming'),
+  dataStream: () => openSearchResult('data streaming'),
   edgeFunctions: () => openSearchResult('edge functions'),
   edgeFirewall: () => openSearchResult('edge firewall'),
   edgeFirewallRulesEngine: () => openSearchResult('edge firewall rules engine'),
@@ -43,7 +43,8 @@ export const documentationGuideProducts = {
     openDocumentationProducts('real-time-events/#image-processor'),
   realTimeEventsTieredCache: () => openDocumentationProducts('real-time-events/#tiered-cache'),
   realTimeEventsEdgeDNS: () => openDocumentationProducts('real-time-events/#edge-dns'),
-  realTimeEventsDataStreaming: () => openDocumentationProducts('real-time-events/#data-streaming'),
+  realTimeEventsDataStream: () => openDocumentationProducts('real-time-events/#data-streaming'),
+
   realTimeEventsActivityHistory: () =>
     openDocumentationProducts('real-time-events/#activity-history'),
   edgeServicesResources: () =>

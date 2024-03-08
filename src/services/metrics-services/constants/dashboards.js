@@ -109,7 +109,7 @@ const PAGES_DASHBOARDS = {
     {
       id: 8,
       label: 'Data Stream',
-      path: 'data-streaming',
+      path: 'data-stream',
       groupId: 3,
       dashboards: [
         {

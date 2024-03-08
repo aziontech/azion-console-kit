@@ -39,10 +39,10 @@ export const realTimeEventsRoutes = {
       loadEdgeDNS: RealTimeEventsService.loadEdgeDNS,
       documentationService: Helpers.documentationGuideProducts.realTimeEventsEdgeDNS
     },
-    dataStreaming: {
-      listDataStreaming: RealTimeEventsService.listDataStreaming,
-      loadDataStreaming: RealTimeEventsService.loadDataStreaming,
-      documentationService: Helpers.documentationGuideProducts.realTimeEventsDataStreaming
+    dataStream: {
+      listDataStream: RealTimeEventsService.listDataStream,
+      loadDataStream: RealTimeEventsService.loadDataStream,
+      documentationService: Helpers.documentationGuideProducts.realTimeEventsDataStream
     },
     activityHistory: {
       listActivityHistory: RealTimeEventsService.listActivityHistory,
