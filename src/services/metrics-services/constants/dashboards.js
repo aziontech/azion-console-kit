@@ -100,7 +100,7 @@ const PAGES_DASHBOARDS = {
           id: '357549371218199119',
           label: 'Standard Queries',
           path: 'standard-queries',
-          dataset: 'ednsQueriesMetrics'
+          dataset: 'idnsQueriesMetrics'
         }
       ]
     }

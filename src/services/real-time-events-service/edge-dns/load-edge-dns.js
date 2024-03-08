@@ -18,7 +18,7 @@ export const loadEdgeDNS = async (filter) => {
 
 const adapt = (filter) => {
   const table = {
-    dataset: 'ednsQueriesEvents',
+    dataset: 'idnsQueriesEvents',
     limit: 10000,
     fields: [
       'level',
@@ -96,17 +96,17 @@ const qtypeMap = (value) => {
 
 const adaptResponse = (response) => {
   const { body } = response
-  const [ednsQueriesEvents = {}] = body.data.ednsQueriesEvents
+  const [idnsQueriesEvents = {}] = body.data.idnsQueriesEvents
 
   return {
-    level: levelMap[ednsQueriesEvents.level],
-    ts: ednsQueriesEvents.ts,
-    qtype: ednsQueriesEvents.qtype,
-    qTypeDescription: qtypeMap(ednsQueriesEvents.qtype),
-    uuid: ednsQueriesEvents.uuid,
-    zoneId: ednsQueriesEvents.zoneId,
-    statusCode: ednsQueriesEvents.statusCode,
-    resolutionType: ednsQueriesEvents.resolutionType,
-    solutionId: ednsQueriesEvents.solutionId
+    level: levelMap[idnsQueriesEvents.level],
+    ts: idnsQueriesEvents.ts,
+    qtype: idnsQueriesEvents.qtype,
+    qTypeDescription: qtypeMap(idnsQueriesEvents.qtype),
+    uuid: idnsQueriesEvents.uuid,
+    zoneId: idnsQueriesEvents.zoneId,
+    statusCode: idnsQueriesEvents.statusCode,
+    resolutionType: idnsQueriesEvents.resolutionType,
+    solutionId: idnsQueriesEvents.solutionId
   }
 }

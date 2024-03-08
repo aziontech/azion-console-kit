@@ -50,7 +50,7 @@ const MostRelevantFields = {
     'Upstream Cache Status',
     'Request Time'
   ],
-  ednsQueriesMetrics: ['Qtype', 'Requests', 'Source Loc Pop', 'Zone Id'],
+  idnsQueriesMetrics: ['Qtype', 'Requests', 'Source Loc Pop', 'Zone Id'],
   dataStreamedMetrics: ['Domain', 'Status', 'Data Streamed', 'Endpoint Type', 'Requests']
 }
 

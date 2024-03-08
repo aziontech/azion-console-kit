@@ -42,8 +42,7 @@ export const documentationGuideProducts = {
   realTimeEventsImageProcessor: () =>
     openDocumentationProducts('real-time-events/#image-processor'),
   realTimeEventsTieredCache: () => openDocumentationProducts('real-time-events/#tiered-cache'),
-  realTimeEventsEdgeDNS: () =>
-    openDocumentationProducts('real-time-events/#edge-dns'),
+  realTimeEventsEdgeDNS: () => openDocumentationProducts('real-time-events/#edge-dns'),
   realTimeEventsDataStreaming: () => openDocumentationProducts('real-time-events/#data-streaming'),
   realTimeEventsActivityHistory: () =>
     openDocumentationProducts('real-time-events/#activity-history'),

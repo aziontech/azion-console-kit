@@ -46,7 +46,7 @@
   const listEDNSResourcesRef = ref('')
   const edgeDNSID = ref(0)
   const activeTab = ref(0)
-  const selectedEdnsRecordToEdit = ref(0)
+  const selectedEdgeDnsRecordToEdit = ref(0)
   const recordListColumns = ref([
     {
       field: 'name',
@@ -164,7 +164,7 @@
     showCreateRecordDrawer.value = true
   }
   const openEditDrawerEDNSResource = (event) => {
-    selectedEdnsRecordToEdit.value = event.id
+    selectedEdgeDnsRecordToEdit.value = event.id
     showEditRecordDrawer.value = true
   }
 
@@ -358,7 +358,7 @@
 
             <EditDrawerBlock
               v-if="showEditRecordDrawer"
-              :id="selectedEdnsRecordToEdit"
+              :id="selectedEdgeDnsRecordToEdit"
               v-model:visible="showEditRecordDrawer"
               :loadService="loadRecordServiceWithEDNSIdDecorator"
               :editService="editRecordServiceWithEDNSIdDecorator"

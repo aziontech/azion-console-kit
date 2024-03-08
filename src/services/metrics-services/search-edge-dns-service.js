@@ -6,7 +6,7 @@ import { makeEdgeDNSBaseUrl } from './make-edge-dns-base-url'
 const cancelRequest = axios.CancelToken
 const source = cancelRequest.source()
 
-export const searchEdnsService = async ({
+export const searchEdgeDnsService = async ({
   orderBy = 'name',
   sort = 'asc',
   page = 1,
@@ -27,9 +27,9 @@ export const searchEdnsService = async ({
 }
 
 const adapt = (httpResponse) => {
-  const parsedDomains = httpResponse.body.results?.map((edns) => ({
-    value: edns.id,
-    label: edns.name
+  const parsedDomains = httpResponse.body.results?.map((edgeDns) => ({
+    value: edgeDns.id,
+    label: edgeDns.name
   }))
 
   return {

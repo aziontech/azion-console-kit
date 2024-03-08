@@ -1,12 +1,12 @@
 import {
   searchEdgeFunctionsService,
   searchDomainsService,
-  searchEdnsService
+  searchEdgeDnsService
 } from '@/services/metrics-services'
 
 const MAP_SERVICE_OPERATION = {
   configurationIdIn: searchDomainsService,
-  zoneIdIn: searchEdnsService,
+  zoneIdIn: searchEdgeDnsService,
   edgeFunctionIdIn: searchEdgeFunctionsService
 }
 

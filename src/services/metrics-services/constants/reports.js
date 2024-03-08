@@ -797,7 +797,7 @@ const REPORTS = [
     xAxis: 'ts',
     isTopX: false,
     rotated: false,
-    dataset: 'ednsQueriesMetrics',
+    dataset: 'idnsQueriesMetrics',
     dataUnit: 'count',
     limit: 5000,
     aggregations: [
