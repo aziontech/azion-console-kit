@@ -35,7 +35,7 @@ const PAGES_DASHBOARDS = {
     {
       id: 2,
       label: 'Tiered Cache',
-      path: 'l2-caching',
+      path: 'tiered-cache',
       groupId: 1,
       dashboards: [
         {
