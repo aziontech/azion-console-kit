@@ -145,7 +145,7 @@ describe('AzionDocumentationCatalog', () => {
     sut.dataStream()
 
     expect(openWindowSpy).toHaveBeenCalledWith(
-      `https://www.azion.com/en/search-result/?q=data stream&filter=doc`
+      `https://www.azion.com/en/search-result/?q=data streaming&filter=doc`
     )
   })
 
