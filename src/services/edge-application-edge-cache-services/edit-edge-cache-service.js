@@ -7,7 +7,7 @@ import * as Errors from '@/services/axios/errors'
  * @param {string} payload.edgeApplicationId - The cache settings Edge Application id.
  * @returns {Promise<string>} The result message based on the status code.
  */
-export const editCacheSettingsService = async ({ edgeApplicationId, ...payload }) => {
+export const editEdgeCacheService = async ({ edgeApplicationId, ...payload }) => {
   const parsedBody = adapt(payload)
   let httpResponse = await AxiosHttpClientAdapter.request({
     url: `${makeEdgeApplicationBaseUrl()}/${edgeApplicationId}/cache_settings/${payload.id}`,
@@ -39,10 +39,10 @@ const parseTextContentToArrayByBreaklines = (textContent) => {
 const adapt = (payload) => {
   return {
     name: payload.name,
-    browser_cache_settings: payload.browserCacheSettings,
-    browser_cache_settings_maximum_ttl: payload.browserCacheSettingsMaximumTtl,
-    cdn_cache_settings: payload.cdnCacheSettings,
-    cdn_cache_settings_maximum_ttl: payload.cdnCacheSettingsMaximumTtl,
+    browser_cache_settings: payload.browserEdgeCache,
+    browser_cache_settings_maximum_ttl: payload.browserEdgeCacheMaximumTtl,
+    cdn_cache_settings: payload.cdnEdgeCache,
+    cdn_cache_settings_maximum_ttl: payload.cdnEdgeCacheMaximumTtl,
     is_slice_configuration_enabled: payload.sliceConfigurationEnabled,
     slice_configuration_range: payload.sliceConfigurationRange,
     cache_by_query_string: payload.cacheByQueryString,

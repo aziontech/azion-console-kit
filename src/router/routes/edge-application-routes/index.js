@@ -1,7 +1,7 @@
 import * as Helpers from '@/helpers'
 import * as EdgeApplicationsService from '@/services/edge-application-services'
 import * as OriginsService from '@/services/edge-application-origins-services'
-import * as CacheSettingsServices from '@/services/edge-application-cache-settings-services'
+import * as EdgeCacheServices from '@/services/edge-application-edge-cache-services'
 import * as FunctionsService from '@/services/edge-application-functions-services'
 import * as DeviceGroupsService from '@/services/edge-application-device-groups-services'
 import * as ErrorResponsesService from '@/services/edge-application-error-responses-services'
@@ -71,13 +71,13 @@ export const edgeApplicationRoutes = {
           documentationService: Helpers.documentationCatalog.edgeApplicationOrigins,
           clipboardWrite: Helpers.clipboardWrite
         },
-        cacheSettingsServices: {
-          listCacheSettingsService: CacheSettingsServices.listCacheSettingsService,
-          deleteCacheSettingsService: CacheSettingsServices.deleteCacheSettingsService,
-          createCacheSettingsService: CacheSettingsServices.createCacheSettingsService,
-          loadCacheSettingsService: CacheSettingsServices.loadCacheSettingsService,
-          editCacheSettingsService: CacheSettingsServices.editCacheSettingsService,
-          documentationService: Helpers.documentationCatalog.edgeApplicationCacheSettings
+        edgeCacheServices: {
+          listEdgeCacheService: EdgeCacheServices.listEdgeCacheService,
+          deleteEdgeCacheService: EdgeCacheServices.deleteEdgeCacheService,
+          createEdgeCacheService: EdgeCacheServices.createEdgeCacheService,
+          loadEdgeCacheService: EdgeCacheServices.loadEdgeCacheService,
+          editEdgeCacheService: EdgeCacheServices.editEdgeCacheService,
+          documentationService: Helpers.documentationCatalog.edgeApplicationEdgeCache
         },
         functionsServices: {
           createFunctionService: FunctionsService.createFunctionService,
@@ -109,7 +109,7 @@ export const edgeApplicationRoutes = {
           reorderRulesEngine: RulesEngineService.reorderRulesEngine,
           documentationService: Helpers.documentationCatalog.edgeApplicationRulesEngine,
           listOriginsService: OriginsService.listOriginsService,
-          listCacheSettingsService: CacheSettingsServices.listCacheSettingsService,
+          listCacheSettingsService: EdgeCacheServices.listEdgeCacheService, //Alterar o nome do servico
           listEdgeApplicationFunctionsService: FunctionsService.listEdgeApplicationFunctionsService
         },
         clipboardWrite: Helpers.clipboardWrite

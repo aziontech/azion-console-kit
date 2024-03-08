@@ -43,10 +43,10 @@
 
   const initialValues = ref({
     name: '',
-    browserCacheSettings: 'honor',
-    browserCacheSettingsMaximumTtl: 0,
-    cdnCacheSettings: 'honor',
-    cdnCacheSettingsMaximumTtl: 60,
+    browserEdgeCache: 'honor',
+    browserEdgeCacheMaximumTtl: 0,
+    cdnEdgeCache: 'honor',
+    cdnEdgeCacheMaximumTtl: 60,
     sliceConfigurationEnabled: false,
     sliceConfigurationRange: LOCKED_SLICE_RANGE_IN_KBYTES,
     cacheByQueryString: 'ignore',
@@ -62,22 +62,22 @@
   })
   const validationSchema = yup.object({
     name: yup.string().required().label('Name'),
-    browserCacheSettings: yup.string().required().label('Browser cache settings'),
-    browserCacheSettingsMaximumTtl: yup
+    browserEdgeCache: yup.string().required().label('Browser cache settings'),
+    browserEdgeCacheMaximumTtl: yup
       .number()
       .label('Maximum TTL')
       .transform((value) => (Number.isNaN(value) ? null : value))
-      .when('browserCacheSettings', {
+      .when('browserEdgeCache', {
         is: 'honor',
         then: (schema) => schema.notRequired(),
         otherwise: (schema) => schema.min(0).max(MAX_TTL_ONE_YEAR_IN_SECONDS).required()
       }),
-    cdnCacheSettings: yup.string().required().label('Edge cache settings'),
-    cdnCacheSettingsMaximumTtl: yup
+    cdnEdgeCache: yup.string().required().label('Edge cache settings'),
+    cdnEdgeCacheMaximumTtl: yup
       .number()
       .label('Edge Maximum TTL')
       .transform((value) => (Number.isNaN(value) ? null : value))
-      .when('cdnCacheSettings', {
+      .when('cdnEdgeCache', {
         is: 'honor',
         then: (schema) => schema.notRequired(),
         otherwise: (schema) => schema.min(60).max(MAX_TTL_ONE_YEAR_IN_SECONDS).required()

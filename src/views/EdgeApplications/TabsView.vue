@@ -1,7 +1,7 @@
 <script setup>
   import ContentBlock from '@/templates/content-block'
   import PageHeadingBlock from '@/templates/page-heading-block'
-  import EdgeApplicationsCacheSettingsListView from '@/views/EdgeApplicationsCacheSettings/ListView'
+  import EdgeApplicationsEdgeCacheListView from '@/views/EdgeApplicationsEdgeCache/ListView.vue'
   import EdgeApplicationsDeviceGroupsListView from '@/views/EdgeApplicationsDeviceGroups/ListView.vue'
   import EdgeApplicationsErrorResponseEditView from '@/views/EdgeApplicationsErrorResponses/EditView'
   import EdgeApplicationsFunctionsListView from '@/views/EdgeApplicationsFunctions/ListView'
@@ -20,7 +20,7 @@
   const props = defineProps({
     edgeApplicationServices: { type: Object, required: true },
     originsServices: { type: Object, required: true },
-    cacheSettingsServices: { type: Object, required: true },
+    edgeCacheServices: { type: Object, required: true },
     clipboardWrite: { type: Function, required: true },
     deviceGroupsServices: { type: Object, required: true },
     errorResponsesServices: { type: Object, required: true },
@@ -33,7 +33,7 @@
     origins: 1,
     deviceGroups: 2,
     errorResponses: 3,
-    cacheSettings: 4,
+    edgeCache: 4,
     functions: 5,
     rulesEngine: 6
   }
@@ -66,8 +66,8 @@
     return activeTab.value === mapTabs.value?.rulesEngine
   })
 
-  const showCacheSettings = computed(() => {
-    return activeTab.value === mapTabs.value?.cacheSettings
+  const showEdgeCache = computed(() => {
+    return activeTab.value === mapTabs.value?.edgeCache
   })
 
   const showDeviceGroups = computed(() => {
@@ -234,11 +234,11 @@
             v-bind="props.errorResponsesServices"
           />
         </TabPanel>
-        <TabPanel header="Cache Settings">
-          <EdgeApplicationsCacheSettingsListView
-            v-if="showCacheSettings"
+        <TabPanel header="Edge Cache">
+          <EdgeApplicationsEdgeCacheListView
+            v-if="showEdgeCache"
             :edgeApplicationId="edgeApplicationId"
-            v-bind="props.cacheSettingsServices"
+            v-bind="props.edgeCacheServices"
           />
         </TabPanel>
         <TabPanel

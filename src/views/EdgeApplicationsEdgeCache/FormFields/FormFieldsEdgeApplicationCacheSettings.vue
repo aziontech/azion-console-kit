@@ -11,7 +11,7 @@
   import { useField, useFieldArray } from 'vee-validate'
   import { computed, ref, watch } from 'vue'
 
-  const CACHE_SETTINGS_OPTIONS = ref([
+  const EDGE_CACHE_OPTIONS = ref([
     {
       label: 'Honor Origin Cache Headers',
       value: 'honor'
@@ -70,14 +70,14 @@
     }
   ])
 
-  const { value: browserCacheSettings } = useField('browserCacheSettings')
+  const { value: browserEdgeCache } = useField('browserEdgeCache')
   const {
-    value: browserCacheSettingsMaximumTtl,
-    errorMessage: browserCacheSettingsMaximumTtlError
-  } = useField('browserCacheSettingsMaximumTtl')
-  const { value: cdnCacheSettings } = useField('cdnCacheSettings')
-  const { value: cdnCacheSettingsMaximumTtl, errorMessage: cdnCacheSettingsMaximumTtlError } =
-    useField('cdnCacheSettingsMaximumTtl')
+    value: browserEdgeCacheMaximumTtl,
+    errorMessage: browserEdgeCacheMaximumTtlError
+  } = useField('browserEdgeCacheMaximumTtl')
+  const { value: cdnEdgeCache } = useField('cdnEdgeCache')
+  const { value: cdnEdgeCacheMaximumTtl, errorMessage: cdnEdgeCacheMaximumTtlError } =
+    useField('cdnEdgeCacheMaximumTtl')
   const { value: sliceConfigurationEnabled } = useField('sliceConfigurationEnabled')
   const { value: sliceConfigurationRange } = useField('sliceConfigurationRange')
   const { value: cacheByQueryString } = useField('cacheByQueryString')
@@ -98,8 +98,8 @@
     remove: removeDeviceGroup
   } = useFieldArray('deviceGroup')
 
-  const showMaxTtl = computed(() => browserCacheSettings.value === 'override')
-  const showCdnMaxTtl = computed(() => cdnCacheSettings.value === 'override')
+  const showMaxTtl = computed(() => browserEdgeCache.value === 'override')
+  const showCdnMaxTtl = computed(() => cdnEdgeCache.value === 'override')
   const showSliceConfigurationRange = computed(() => {
     return !!sliceConfigurationEnabled.value
   })
@@ -131,7 +131,7 @@
         <FieldText
           name="name"
           label="Name *"
-          placeholder="My cache setting"
+          placeholder="My edge cache"
           description="Give a unique and descriptive name to identify the setting."
         />
       </div>
@@ -139,30 +139,30 @@
   </FormHorizontal>
 
   <FormHorizontal
-    title="Cache Expiration Policies"
+    title="Edge Cache Expiration Policies"
     description="Define how the edge should handle TTL values sent by the origin as well as how long your content should remain cached at the edge."
     :isDrawer="true"
   >
     <template #inputs>
       <div class="flex flex-col w-full sm:max-w-3xl gap-2">
-        <label class="text-color text-sm font-medium leading-5">Browser Cache Settings</label>
+        <label class="text-color text-sm font-medium leading-5">Browser Edge Cache</label>
         <div class="flex flex-col gap-4">
           <div
             class="flex no-wrap gap-2 items-center"
-            v-for="browserCacheSettingsOption in CACHE_SETTINGS_OPTIONS"
-            :key="browserCacheSettingsOption.value"
+            v-for="browserEdgeCacheOption in EDGE_CACHE_OPTIONS"
+            :key="browserEdgeCacheOption.value"
           >
             <RadioButton
-              v-model="browserCacheSettings"
-              :inputId="`browserOption-${browserCacheSettingsOption.value}`"
-              name="browserCacheSettings"
-              :value="browserCacheSettingsOption.value"
+              v-model="browserEdgeCache"
+              :inputId="`browserOption-${browserEdgeCacheOption.value}`"
+              name="browserEdgeCache"
+              :value="browserEdgeCacheOption.value"
             />
             <label
-              :for="`browserOption-${browserCacheSettingsOption.value}`"
+              :for="`browserOption-${browserEdgeCacheOption.value}`"
               class="text-color text-sm font-normal leading-tight"
             >
-              {{ browserCacheSettingsOption.label }}
+              {{ browserEdgeCacheOption.label }}
             </label>
           </div>
         </div>
@@ -176,46 +176,46 @@
         class="flex flex-col sm:max-w-xs w-full gap-2"
       >
         <label
-          for="browserCacheSettingsMaximumTtl"
+          for="browserEdgeCacheMaximumTtl"
           class="text-color text-sm font-medium"
           >Maximum TTL (seconds) *</label
         >
 
         <InputNumber
           showButtons
-          v-model="browserCacheSettingsMaximumTtl"
-          id="browserCacheSettingsMaximumTtl"
+          v-model="browserEdgeCacheMaximumTtl"
+          id="browserEdgeCacheMaximumTtl"
           :min="0"
           :max="31536000"
           :step="1"
-          :class="{ 'p-invalid': browserCacheSettingsMaximumTtlError }"
+          :class="{ 'p-invalid': browserEdgeCacheMaximumTtlError }"
         />
         <small
-          v-if="browserCacheSettingsMaximumTtlError"
+          v-if="browserEdgeCacheMaximumTtlError"
           class="p-error text-xs font-normal leading-tight"
-          >{{ browserCacheSettingsMaximumTtlError }}</small
+          >{{ browserEdgeCacheMaximumTtlError }}</small
         >
       </div>
 
       <div class="flex flex-col w-full sm:max-w-3xl gap-2">
-        <label class="text-color text-sm font-medium leading-5">Edge Cache Settings</label>
+        <label class="text-color text-sm font-medium leading-5">Edge Cache</label>
         <div class="flex flex-col gap-4">
           <div
             class="flex no-wrap gap-2 items-center"
-            v-for="cdnCacheSettingsOption in CACHE_SETTINGS_OPTIONS"
-            :key="cdnCacheSettingsOption.value"
+            v-for="browserEdgeCacheOption in EDGE_CACHE_OPTIONS"
+            :key="browserEdgeCacheOption.value"
           >
             <RadioButton
-              v-model="cdnCacheSettings"
-              :inputId="`cdnOption-${cdnCacheSettingsOption.value}`"
-              name="cdnCacheSettings"
-              :value="cdnCacheSettingsOption.value"
+              v-model="cdnEdgeCache"
+              :inputId="`cdnOption-${browserEdgeCacheOption.value}`"
+              name="cdnEdgeCache"
+              :value="browserEdgeCacheOption.value"
             />
             <label
-              :for="`cdnOption-${cdnCacheSettingsOption.value}`"
+              :for="`cdnOption-${browserEdgeCacheOption.value}`"
               class="text-color text-sm font-normal leading-tight"
             >
-              {{ cdnCacheSettingsOption.label }}
+              {{ browserEdgeCacheOption.label }}
             </label>
           </div>
         </div>
@@ -226,28 +226,28 @@
       </div>
       <div class="flex flex-col sm:max-w-xs w-full gap-2">
         <label
-          for="cdnCacheSettingsMaximumTtl"
+          for="cdnEdgeCacheMaximumTtl"
           class="text-color text-sm font-medium"
         >
           {{ showCdnMaxTtl ? 'Maximum TTL (seconds)' : 'Default TTL' }}
         </label>
         <InputNumber
           showButtons
-          v-model="cdnCacheSettingsMaximumTtl"
-          id="cdnCacheSettingsMaximumTtl"
+          v-model="cdnEdgeCacheMaximumTtl"
+          id="cdnEdgeCacheMaximumTtl"
           :min="60"
           :max="31536000"
           :step="1"
-          :class="{ 'p-invalid': cdnCacheSettingsMaximumTtlError }"
+          :class="{ 'p-invalid': cdnEdgeCacheMaximumTtlError }"
         />
         <small class="text-color-secondary text-xs font-normal leading-tight">
           Enable Application Acceleration in the Main Settings tab to use values lower than 60
           seconds. Tiered Cache requires cache TTL to be equal to or greater than 3 seconds.
         </small>
         <small
-          v-if="cdnCacheSettingsMaximumTtlError"
+          v-if="cdnEdgeCacheMaximumTtlError"
           class="p-error text-xs font-normal leading-tight"
-          >{{ cdnCacheSettingsMaximumTtlError }}</small
+          >{{ cdnEdgeCacheMaximumTtlError }}</small
         >
       </div>
     </template>

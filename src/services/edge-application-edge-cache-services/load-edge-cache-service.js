@@ -7,7 +7,7 @@ import { makeEdgeApplicationBaseUrl } from '../edge-application-services/make-ed
  * @param {string } payload.id - The id of cache settings.
  * @returns {Object} The payload with cache settings content
  */
-export const loadCacheSettingsService = async ({ edgeApplicationId, id }) => {
+export const loadEdgeCacheService = async ({ edgeApplicationId, id }) => {
   let httpResponse = await AxiosHttpClientAdapter.request({
     url: `${makeEdgeApplicationBaseUrl()}/${edgeApplicationId}/cache_settings/${id}`,
     method: 'GET'
@@ -30,10 +30,10 @@ const adapt = (httpResponse) => {
   const parseHttpResponse = {
     id: cacheSettings.id,
     name: cacheSettings.name,
-    browserCacheSettings: cacheSettings.browser_cache_settings,
-    browserCacheSettingsMaximumTtl: cacheSettings.browser_cache_settings_maximum_ttl,
-    cdnCacheSettings: cacheSettings.cdn_cache_settings,
-    cdnCacheSettingsMaximumTtl: cacheSettings.cdn_cache_settings_maximum_ttl,
+    browserEdgeCache: cacheSettings.browser_cache_settings,
+    browserEdgeCacheMaximumTtl: cacheSettings.browser_cache_settings_maximum_ttl,
+    cdnEdgeCache: cacheSettings.cdn_cache_settings,
+    cdnEdgeCacheMaximumTtl: cacheSettings.cdn_cache_settings_maximum_ttl,
     sliceConfigurationEnabled: cacheSettings.is_slice_configuration_enabled,
     sliceConfigurationRange: cacheSettings.slice_configuration_range,
     cacheByQueryString: cacheSettings.cache_by_query_string,

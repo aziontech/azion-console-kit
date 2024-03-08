@@ -10,23 +10,23 @@
       required: true,
       type: String
     },
-    listCacheSettingsService: {
+    listEdgeCacheService: {
       type: Function,
       required: true
     },
-    loadCacheSettingsService: {
+    loadEdgeCacheService: {
       type: Function,
       required: true
     },
-    editCacheSettingsService: {
+    editEdgeCacheService: {
       type: Function,
       required: true
     },
-    deleteCacheSettingsService: {
+    deleteEdgeCacheService: {
       type: Function,
       required: true
     },
-    createCacheSettingsService: {
+    createEdgeCacheService: {
       type: Function,
       required: true
     },
@@ -40,12 +40,12 @@
   const listTableBlockRef = ref('')
   const drawerRef = ref('')
 
-  const listCacheSettingsServiceWithDecorator = async () => {
-    return await props.listCacheSettingsService({ id: props.edgeApplicationId })
+  const listEdgeCacheServiceWithDecorator = async () => {
+    return await props.listEdgeCacheService({ id: props.edgeApplicationId })
   }
 
-  const deleteCacheSettingsServiceWithDecorator = async (cacheSettingsId) => {
-    return await props.deleteCacheSettingsService({
+  const deleteEdgeCacheServiceWithDecorator = async (cacheSettingsId) => {
+    return await props.deleteEdgeCacheService({
       edgeApplicationId: props.edgeApplicationId,
       id: cacheSettingsId
     })
@@ -92,27 +92,27 @@
   <Drawer
     ref="drawerRef"
     :edgeApplicationId="props.edgeApplicationId"
-    :createService="props.createCacheSettingsService"
-    :loadService="props.loadCacheSettingsService"
-    :editService="props.editCacheSettingsService"
+    :createService="props.createEdgeCacheService"
+    :loadService="props.loadEdgeCacheService"
+    :editService="props.editEdgeCacheService"
     @onSuccess="reloadList"
   />
 
   <ListTableBlock
     v-if="hasContentToList"
     ref="listTableBlockRef"
-    :listService="listCacheSettingsServiceWithDecorator"
-    :deleteService="deleteCacheSettingsServiceWithDecorator"
+    :listService="listEdgeCacheServiceWithDecorator"
+    :deleteService="deleteEdgeCacheServiceWithDecorator"
     :columns="getColumns"
-    pageTitleDelete="Cache Setting"
+    pageTitleDelete="Edge Cache"
     :editInDrawer="openEditDrawer"
     @on-load-data="handleLoadData"
-    emptyListMessage="No Cache Setting found."
+    emptyListMessage="No Edge Cache found."
   >
     <template #addButton>
       <PrimeButton
         icon="pi pi-plus"
-        label="Cache Setting"
+        label="Edge Cache"
         @click="openCreateDrawer"
       />
     </template>
@@ -120,9 +120,9 @@
 
   <EmptyResultsBlock
     v-else
-    title="No cache settings have been created"
-    description="Click the button below to initiate the setup process and create your first cache setting."
-    createButtonLabel="Cache Setting"
+    title="No edge cache have been created"
+    description="Click the button below to initiate the setup process and create your first edge cache."
+    createButtonLabel="Edge Cache"
     :documentationService="documentationService"
     :inTabs="true"
   >
@@ -130,7 +130,7 @@
       <PrimeButton
         severity="secondary"
         icon="pi pi-plus"
-        label="Cache Setting"
+        label="Edge Cache"
         @click="openCreateDrawer"
       />
     </template>

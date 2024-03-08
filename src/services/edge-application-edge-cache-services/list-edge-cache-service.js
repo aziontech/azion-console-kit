@@ -6,7 +6,7 @@ import { makeEdgeApplicationBaseUrl } from '../edge-application-services/make-ed
  * @param {string } payload.id - The id of edge application.
  * @returns {Promise<string|undefined>} The result message based on the status code.
  */
-export const listCacheSettingsService = async ({ id }) => {
+export const listEdgeCacheService = async ({ id }) => {
   let httpResponse = await AxiosHttpClientAdapter.request({
     url: `${makeEdgeApplicationBaseUrl()}/${id}/cache_settings`,
     method: 'GET'

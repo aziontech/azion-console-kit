@@ -8,7 +8,7 @@ import * as Errors from '@/services/axios/errors'
  * @param {string} payload.id - The id of cache settings.
  * @returns {Promise<string>} The result message based on the status code.
  */
-export const deleteCacheSettingsService = async ({ edgeApplicationId, id }) => {
+export const deleteEdgeCacheService = async ({ edgeApplicationId, id }) => {
   let httpResponse = await AxiosHttpClientAdapter.request({
     url: `${makeEdgeApplicationBaseUrl()}/${edgeApplicationId}/cache_settings/${id}`,
     method: 'DELETE'
