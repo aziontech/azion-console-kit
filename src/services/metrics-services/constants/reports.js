@@ -820,7 +820,7 @@ const REPORTS = [
     id: '352149351588430415',
     chartOwner: 'azion',
     label: 'Total Data Streamed',
-    description: DASHBOARDS_TEXTS.data_streaming.data_streamed.total_data.description,
+    description: DASHBOARDS_TEXTS.data_stream.data_streamed.total_data.description,
     aggregationType: 'sum',
     columns: 6,
     type: 'line',
@@ -840,13 +840,13 @@ const REPORTS = [
     orderDirection: 'ASC',
     dashboardId: '352149476039721549',
     variationType: 'regular',
-    helpCenterPath: HELP_CENTER_URLS.dataStreaming.requests.totalDataStreamed
+    helpCenterPath: HELP_CENTER_URLS.dataStream.requests.totalDataStreamed
   },
   {
     id: '352234687543902797',
     chartOwner: 'azion',
     label: 'Total Requests',
-    description: DASHBOARDS_TEXTS.data_streaming.data_streaming_requests.total_requests.description,
+    description: DASHBOARDS_TEXTS.data_stream.data_stream_requests.total_requests.description,
     aggregationType: 'sum',
     columns: 6,
     type: 'line',
@@ -866,7 +866,7 @@ const REPORTS = [
     orderDirection: 'ASC',
     dashboardId: '352149476039721549',
     variationType: 'regular',
-    helpCenterPath: HELP_CENTER_URLS.dataStreaming.requests.totalRequests
+    helpCenterPath: HELP_CENTER_URLS.dataStream.requests.totalRequests
   }
 ]
 

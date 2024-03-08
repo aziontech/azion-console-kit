@@ -3,7 +3,7 @@ import { activityHistoryRoutes } from '@routes/activity-history-routes'
 import { cliCallbackRoutes } from '@routes/cli-callback-routes'
 import { createNewRoutes } from '@routes/create-new-routes'
 import { credentialsRoutes } from '@routes/credentials-routes'
-import { dataStreamingRoutes } from '@routes/data-streaming-routes'
+import { dataStreamRoutes } from '@/router/routes/data-stream-routes'
 import { digitalCertificatesRoutes } from '@routes/digital-certificates-routes'
 import { domainsRoutes } from '@routes/domains-routes'
 import { edgeApplicationRoutes } from '@routes/edge-application-routes'
@@ -43,7 +43,7 @@ const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
     cliCallbackRoutes,
-    dataStreamingRoutes,
+    dataStreamRoutes,
     digitalCertificatesRoutes,
     domainsRoutes,
     edgeApplicationRoutes,

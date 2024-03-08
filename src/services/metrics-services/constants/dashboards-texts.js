@@ -1,12 +1,12 @@
 const DASHBOARDS_TEXTS = {
-  data_streaming: {
+  data_stream: {
     data_streamed: {
       total_data: {
         description:
           'Quantity of data streamed to the configured connectors in bytes. Displays the total data sent to the stream.'
       }
     },
-    data_streaming_requests: {
+    data_stream_requests: {
       total_requests: {
         description:
           'Quantity of requests that were processed. Displays the total amount of requests.'
