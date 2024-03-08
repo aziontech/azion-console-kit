@@ -44,11 +44,11 @@
             v-if="mapTabs.L2Cache.index === tabSelectIndex"
           />
         </TabPanel>
-        <TabPanel :header="mapTabs.IntelligentDNS.label">
-          <RealTimeEventsIntelligentDNSListView
-            v-bind="props.intelligentDNS"
+        <TabPanel :header="mapTabs.EdgeDNS.label">
+          <RealTimeEventsEdgeDNSListView
+            v-bind="props.edgeDNS"
             v-model:dateTime="timeFilter"
-            v-if="mapTabs.IntelligentDNS.index === tabSelectIndex"
+            v-if="mapTabs.EdgeDNS.index === tabSelectIndex"
           />
         </TabPanel>
         <TabPanel :header="mapTabs.DataStreaming.label">
@@ -82,7 +82,7 @@
   import RealTimeEventEdgeFunctionsConsoleListView from '@/views/RealTimeEventsEdgeFunctionsConsole/ListView'
   import RealTimeEventsDataStreamingListView from '@/views/RealTimeEventsDataStreaming/ListView'
   import RealTimeEventsActivityHistoryListView from '@/views/RealTimeEventsActivityHistory/ListView'
-  import RealTimeEventsIntelligentDNSListView from '@/views/RealTimeEventsIntelligentDNS/ListView'
+  import RealTimeEventsEdgeDNSListView from '@/views/RealTimeEventsEdgeDNS/ListView'
   import RealTimeEventsImageProcessor from '@/views/RealTimeEventsImageProcessor/ListView'
   import RealTimeEventsL2Cache from '@/views/RealTimeEventsL2Cache/ListView'
   defineOptions({ name: 'RealTimeEventsTabsView' })
@@ -108,7 +108,7 @@
       type: Object,
       required: true
     },
-    intelligentDNS: {
+    edgeDNS: {
       type: Object,
       required: true
     },
@@ -153,9 +153,9 @@
       tabName: 'l2-cache',
       label: 'Tiered Cache'
     },
-    IntelligentDNS: {
+    EdgeDNS: {
       index: 5,
-      tabName: 'intelligent-dns',
+      tabName: 'edge-dns',
       label: 'Edge DNS'
     },
     DataStreaming: {

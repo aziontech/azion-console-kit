@@ -4,7 +4,7 @@ export const documentationCatalog = {
   resources: () => openSearchResult(''),
   variables: () => openSearchResult('variables'),
   edgeServices: () => openSearchResult('edge services'),
-  intelligentDNS: () => openSearchResult('intelligent-dns'),
+  edgeDNS: () => openSearchResult('edge-dns'),
   personalTokens: () => openSearchResult('personal tokens'),
   domains: () => openSearchResult('domains'),
   realTimePurge: () => openSearchResult('real-time-purge'),
@@ -42,8 +42,8 @@ export const documentationGuideProducts = {
   realTimeEventsImageProcessor: () =>
     openDocumentationProducts('real-time-events/#image-processor'),
   realTimeEventsL2Cache: () => openDocumentationProducts('real-time-events/#tiered-cache'),
-  realTimeEventsIntelligentDNS: () =>
-    openDocumentationProducts('real-time-events/#intelligent-dns'),
+  realTimeEventsEdgeDNS: () =>
+    openDocumentationProducts('real-time-events/#edge-dns'),
   realTimeEventsDataStreaming: () => openDocumentationProducts('real-time-events/#data-streaming'),
   realTimeEventsActivityHistory: () =>
     openDocumentationProducts('real-time-events/#activity-history'),

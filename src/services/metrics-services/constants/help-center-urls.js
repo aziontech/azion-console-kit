@@ -55,9 +55,9 @@ const HELP_CENTER_URLS = {
       totalRequests: '/real-time-metrics/image-processor/requests/total-requests'
     }
   },
-  intelligentDns: {
+  edgeDns: {
     standardQueries: {
-      totalQueries: '/real-time-metrics/intelligent-dns/standard-queries/total-queries'
+      totalQueries: '/real-time-metrics/edge-dns/standard-queries/total-queries'
     }
   },
   l2Caching: {

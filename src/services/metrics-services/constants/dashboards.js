@@ -93,14 +93,14 @@ const PAGES_DASHBOARDS = {
     {
       id: 7,
       label: 'Edge DNS',
-      path: 'intelligent-dns',
+      path: 'edge-dns',
       groupId: 2,
       dashboards: [
         {
           id: '357549371218199119',
           label: 'Standard Queries',
           path: 'standard-queries',
-          dataset: 'idnsQueriesMetrics'
+          dataset: 'ednsQueriesMetrics'
         }
       ]
     }

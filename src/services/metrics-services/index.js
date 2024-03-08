@@ -2,7 +2,7 @@ import { fetchMetricsDashboardsService } from './fetch-metrics-dashboards-servic
 import BeholderService from './fetch-metrics-data-from-beholder'
 import { fetchMetricsReportsService } from './fetch-metrics-reports-service'
 import { searchDomainsService } from './search-domains-service'
-import { searchIdnsService } from './search-idns-service'
+import { searchEdnsService } from './search-edns-service'
 import { searchEdgeFunctionsService } from './search-edge-functions'
 
 export {
@@ -10,6 +10,6 @@ export {
   fetchMetricsDashboardsService,
   fetchMetricsReportsService,
   searchDomainsService,
-  searchIdnsService,
+  searchEdnsService,
   searchEdgeFunctionsService
 }
