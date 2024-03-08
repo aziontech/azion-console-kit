@@ -105,8 +105,8 @@ const adaptResponse = (response) => {
     qTypeDescription: qtypeMap(ednsQueriesEvents.qtype),
     uuid: ednsQueriesEvents.uuid,
     zoneId: ednsQueriesEvents.zoneId,
-    statusCode: endsQueriesEvents.statusCode,
-    resolutionType: endsQueriesEvents.resolutionType,
-    solutionId: endsQueriesEvents.solutionId
+    statusCode: ednsQueriesEvents.statusCode,
+    resolutionType: ednsQueriesEvents.resolutionType,
+    solutionId: ednsQueriesEvents.solutionId
   }
 }
