@@ -37,11 +37,11 @@
             v-if="mapTabs.ImageProcessor.index === tabSelectIndex"
           />
         </TabPanel>
-        <TabPanel :header="mapTabs.L2Cache.label">
-          <RealTimeEventsL2Cache
-            v-bind="props.l2Cache"
+        <TabPanel :header="mapTabs.TieredCache.label">
+          <RealTimeEventsTieredCache
+            v-bind="props.tieredCache"
             v-model:dateTime="timeFilter"
-            v-if="mapTabs.L2Cache.index === tabSelectIndex"
+            v-if="mapTabs.TieredCache.index === tabSelectIndex"
           />
         </TabPanel>
         <TabPanel :header="mapTabs.EdgeDNS.label">
@@ -84,7 +84,7 @@
   import RealTimeEventsActivityHistoryListView from '@/views/RealTimeEventsActivityHistory/ListView'
   import RealTimeEventsEdgeDNSListView from '@/views/RealTimeEventsEdgeDNS/ListView'
   import RealTimeEventsImageProcessor from '@/views/RealTimeEventsImageProcessor/ListView'
-  import RealTimeEventsL2Cache from '@/views/RealTimeEventsL2Cache/ListView'
+  import RealTimeEventsTieredCache from '@/views/RealTimeEventsTieredCache/ListView'
   defineOptions({ name: 'RealTimeEventsTabsView' })
 
   const props = defineProps({
@@ -116,7 +116,7 @@
       type: Object,
       required: true
     },
-    l2Cache: {
+    tieredCache: {
       type: Object,
       required: true
     }
@@ -148,9 +148,9 @@
       tabName: 'image-processor',
       label: 'Image Processor'
     },
-    L2Cache: {
+    TieredCache: {
       index: 4,
-      tabName: 'l2-cache',
+      tabName: 'tiered-cache',
       label: 'Tiered Cache'
     },
     EdgeDNS: {

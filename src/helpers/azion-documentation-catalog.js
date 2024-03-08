@@ -41,7 +41,7 @@ export const documentationGuideProducts = {
     openDocumentationProducts('real-time-events/#edge-functions-console'),
   realTimeEventsImageProcessor: () =>
     openDocumentationProducts('real-time-events/#image-processor'),
-  realTimeEventsL2Cache: () => openDocumentationProducts('real-time-events/#tiered-cache'),
+  realTimeEventsTieredCache: () => openDocumentationProducts('real-time-events/#tiered-cache'),
   realTimeEventsEdgeDNS: () =>
     openDocumentationProducts('real-time-events/#edge-dns'),
   realTimeEventsDataStreaming: () => openDocumentationProducts('real-time-events/#data-streaming'),

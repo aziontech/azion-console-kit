@@ -5,7 +5,7 @@ import { listEdgeFunctionsConsole, loadEdgeFunctionsConsole } from './edge-funct
 import { listHttpRequest, loadHttpRequest } from './http-request'
 import { listImageProcessor, loadImageProcessor } from './image-processor'
 import { listEdgeDNS, loadEdgeDNS } from './edge-dns'
-import { listL2Cache, loadL2Cache } from './l2-cache'
+import { listTieredCache, loadTieredCache } from './tiered-cache'
 
 export {
   listActivityHistory,
@@ -22,6 +22,6 @@ export {
   loadImageProcessor,
   listEdgeDNS,
   loadEdgeDNS,
-  listL2Cache,
-  loadL2Cache
+  listTieredCache,
+  loadTieredCache
 }
