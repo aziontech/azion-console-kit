@@ -3,7 +3,7 @@ import { AxiosHttpClientSignalDecorator } from '../../axios/AxiosHttpClientSigna
 import { makeRealTimeEventsBaseUrl } from '../make-real-time-events-service'
 import { generateCurrentTimestamp } from '@/helpers/generate-timestamp'
 
-export const listL2Cache = async (filter) => {
+export const listTieredCache = async (filter) => {
   const payload = adapt(filter)
 
   const decorator = new AxiosHttpClientSignalDecorator()
@@ -40,18 +40,18 @@ const adapt = (filter) => {
 const adaptResponse = (response) => {
   const { body } = response
 
-  return body.data.l2CacheEvents?.map((l2CacheEvents) => ({
+  return body.data.l2CacheEvents?.map((tieredCacheEvents) => ({
     id: generateCurrentTimestamp(),
-    bytesSent: l2CacheEvents.bytesSent,
+    bytesSent: tieredCacheEvents.bytesSent,
     cacheKey: {
-      content: l2CacheEvents.cacheKey
+      content: tieredCacheEvents.cacheKey
     },
-    cacheTtl: l2CacheEvents.cacheTtl,
-    clientId: l2CacheEvents.clientId,
-    configurationId: l2CacheEvents.configurationId,
-    host: l2CacheEvents.host,
-    source: l2CacheEvents.source,
-    proxyHost: l2CacheEvents.proxyHost,
-    ts: l2CacheEvents.ts
+    cacheTtl: tieredCacheEvents.cacheTtl,
+    clientId: tieredCacheEvents.clientId,
+    configurationId: tieredCacheEvents.configurationId,
+    host: tieredCacheEvents.host,
+    source: tieredCacheEvents.source,
+    proxyHost: tieredCacheEvents.proxyHost,
+    ts: tieredCacheEvents.ts
   }))
 }

@@ -7,7 +7,7 @@
   import BigNumber from '@/templates/info-drawer-block/info-labels/big-number.vue'
   import InfoDrawerBlock from '@/templates/info-drawer-block'
   import { useToast } from 'primevue/usetoast'
-  defineOptions({ name: 'drawer-events-l2-cache' })
+  defineOptions({ name: 'drawer-events-tiered-cache' })
 
   const props = defineProps({
     loadService: {
