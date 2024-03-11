@@ -164,7 +164,7 @@
 
         <small class="text-color-secondary text-sm font-normal leading-tight">
           Select an item from the list and then use the arrows to move it between the available and
-          selected domains boxes. Use the double-line arrows to move all items.
+          selected domains boxes. Use the double-line arrows to move all items or press the <code>ctrl</code> or <code>command</code> keys to select multiple items.
         </small>
       </div>
     </template>
