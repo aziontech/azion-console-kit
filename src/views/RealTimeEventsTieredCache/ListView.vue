@@ -1,12 +1,10 @@
 <script setup>
   import EmptyResultsBlock from '@/templates/empty-results-block'
   import ListTableBlock from '@/templates/list-table-block/no-header'
-  import PrimeButton from 'primevue/button'
   import { computed, ref } from 'vue'
   import IntervalFilterBlock from '@/views/RealTimeEvents/blocks/interval-filter-block'
   import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
   import Drawer from './Drawer'
-  import { useRouter } from 'vue-router'
   const emit = defineEmits(['update:dateTime'])
 
   const props = defineProps({
@@ -14,11 +12,15 @@
       type: Function,
       required: true
     },
-    loadIntelligentDNS: {
+    listTieredCache: {
       type: Function,
       required: true
     },
-    listIntelligentDNS: {
+    loadTieredCache: {
+      type: Function,
+      required: true
+    },
+    clipboardWrite: {
       type: Function,
       required: true
     },
@@ -39,15 +41,17 @@
 
   const hasContentToList = ref(true)
   const listTableBlockRef = ref('')
-  const drawerRef = ref('')
-  const router = useRouter()
 
-  const openDetailDrawer = ({ uuid, ts, source }) => {
+  const drawerRef = ref('')
+
+  const openDetailDrawer = ({ configurationId, ts, host, source, proxyHost }) => {
     drawerRef.value.openDetailDrawer({
       tsRange: filterDate.value,
-      uuid,
+      configurationId,
+      ts,
+      host,
       source,
-      ts
+      proxyHost
     })
   }
 
@@ -64,62 +68,65 @@
   }
 
   const listProvider = async () => {
-    return await props.listIntelligentDNS({ tsRange: filterDate.value })
+    return await props.listTieredCache({ tsRange: filterDate.value })
   }
 
   const getColumns = computed(() => {
     return [
       {
-        field: 'level',
-        header: 'Level',
+        field: 'bytesSent',
+        header: 'Bytes Sent'
+      },
+      {
+        field: 'cacheKey',
+        header: 'Cache Key',
         type: 'component',
-        filterPath: 'level.content',
-        component: (columnData) =>
-          columnBuilder({
+        filterPath: 'cacheKey.content',
+        component: (columnData) => {
+          return columnBuilder({
             data: columnData,
-            columnAppearance: 'tag'
+            columnAppearance: 'text-with-clipboard',
+            dependencies: {
+              copyContentService: props.clipboardWrite
+            }
           })
+        }
       },
       {
-        field: 'qtype',
-        header: 'Q Type'
+        field: 'cacheTtl',
+        header: 'Cache TTL'
       },
       {
-        field: 'resolutionType',
-        header: 'Resolution Type'
+        field: 'clientId',
+        header: 'Client ID'
       },
       {
-        field: 'solutionId',
-        header: 'Solution ID'
+        field: 'configurationId',
+        header: 'Configuration ID'
       },
       {
-        field: 'ts',
-        header: 'TS'
+        field: 'host',
+        header: 'Host'
       },
       {
-        field: 'uuid',
-        header: 'UUID'
-      },
-      {
-        field: 'zoneId',
-        header: 'Zone ID'
+        field: 'proxyHost',
+        header: 'Proxy Host'
       }
     ]
   })
-
-  const goToCreateIntelligentDNS = () => {
-    router.push({ name: 'create-edge-dns' })
-  }
 </script>
 
 <template>
   <Drawer
     ref="drawerRef"
-    :loadService="props.loadIntelligentDNS"
+    :loadService="props.loadTieredCache"
+    :clipboardWrite="props.clipboardWrite"
   />
   <div class="flex flex-col gap-8 my-4">
     <div class="flex gap-1">
-      <p class="text-xs font-medium leading-4">Logs of events from queries made to Edge DNS.</p>
+      <p class="text-xs font-medium leading-4">
+        Logs of events from requests made to edge applications using Tiered Cache.
+      </p>
     </div>
     <IntervalFilterBlock
       v-model:filterDate="filterDate"
@@ -139,17 +146,9 @@
   <EmptyResultsBlock
     v-else
     title="No logs have been found for this period."
-    description="Use the filter to change time range and variables, or create a new zone. Logs are displayed once there are incoming requests and traffic."
+    description="Use the filter to change time range and variables, or create a new edge application with Tiered Cache configurations. Logs are displayed once there are incoming requests and traffic."
+    createButtonLabel="Edge Application"
     :documentationService="documentationService"
     :inTabs="true"
-  >
-    <template #default>
-      <PrimeButton
-        severity="secondary"
-        icon="pi pi-plus"
-        label="Edge DNS"
-        @click="goToCreateIntelligentDNS"
-      />
-    </template>
-  </EmptyResultsBlock>
+  />
 </template>

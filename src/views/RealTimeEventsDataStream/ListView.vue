@@ -1,11 +1,11 @@
 <script setup>
   import EmptyResultsBlock from '@/templates/empty-results-block'
   import ListTableBlock from '@/templates/list-table-block/no-header'
+  import Drawer from './Drawer'
   import PrimeButton from 'primevue/button'
   import { computed, ref } from 'vue'
   import IntervalFilterBlock from '@/views/RealTimeEvents/blocks/interval-filter-block'
   import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
-  import Drawer from './Drawer'
   import { useRouter } from 'vue-router'
   const emit = defineEmits(['update:dateTime'])
 
@@ -14,11 +14,11 @@
       type: Function,
       required: true
     },
-    loadIntelligentDNS: {
+    loadDataStream: {
       type: Function,
       required: true
     },
-    listIntelligentDNS: {
+    listDataStream: {
       type: Function,
       required: true
     },
@@ -41,12 +41,10 @@
   const listTableBlockRef = ref('')
   const drawerRef = ref('')
   const router = useRouter()
-
-  const openDetailDrawer = ({ uuid, ts, source }) => {
+  const openDetailDrawer = ({ configurationId, ts }) => {
     drawerRef.value.openDetailDrawer({
       tsRange: filterDate.value,
-      uuid,
-      source,
+      configurationId,
       ts
     })
   }
@@ -64,16 +62,24 @@
   }
 
   const listProvider = async () => {
-    return await props.listIntelligentDNS({ tsRange: filterDate.value })
+    return await props.listDataStream({ tsRange: filterDate.value })
   }
 
   const getColumns = computed(() => {
     return [
       {
-        field: 'level',
-        header: 'Level',
+        field: 'configurationId',
+        header: 'Configuration ID'
+      },
+      {
+        field: 'dataStreamed',
+        header: 'Data Streamed'
+      },
+      {
+        field: 'endpointType',
+        header: 'Endpoint Type',
         type: 'component',
-        filterPath: 'level.content',
+        filterPath: 'endpointType.content',
         component: (columnData) =>
           columnBuilder({
             data: columnData,
@@ -81,45 +87,48 @@
           })
       },
       {
-        field: 'qtype',
-        header: 'Q Type'
+        field: 'jobName',
+        header: 'Job Name',
+        type: 'component',
+        filterPath: 'jobName.content',
+        component: (columnData) =>
+          columnBuilder({
+            data: columnData,
+            columnAppearance: 'tag'
+          })
       },
       {
-        field: 'resolutionType',
-        header: 'Resolution Type'
+        field: 'source',
+        header: 'Source'
       },
       {
-        field: 'solutionId',
-        header: 'Solution ID'
+        field: 'statusCode',
+        header: 'Status Code'
       },
       {
-        field: 'ts',
+        field: 'streamedLines',
+        header: 'Streamed Lines'
+      },
+      {
+        field: 'tsFormat',
         header: 'TS'
-      },
-      {
-        field: 'uuid',
-        header: 'UUID'
-      },
-      {
-        field: 'zoneId',
-        header: 'Zone ID'
       }
     ]
   })
 
-  const goToCreateIntelligentDNS = () => {
-    router.push({ name: 'create-edge-dns' })
+  const goToCreateDataStream = () => {
+    router.push({ name: 'create-data-stream' })
   }
 </script>
 
 <template>
   <Drawer
     ref="drawerRef"
-    :loadService="props.loadIntelligentDNS"
+    :loadService="props.loadDataStream"
   />
   <div class="flex flex-col gap-8 my-4">
     <div class="flex gap-1">
-      <p class="text-xs font-medium leading-4">Logs of events from queries made to Edge DNS.</p>
+      <p class="text-xs font-medium leading-4">Logs of data sent to endpoints by Data Stream.</p>
     </div>
     <IntervalFilterBlock
       v-model:filterDate="filterDate"
@@ -139,7 +148,7 @@
   <EmptyResultsBlock
     v-else
     title="No logs have been found for this period."
-    description="Use the filter to change time range and variables, or create a new zone. Logs are displayed once there are incoming requests and traffic."
+    description="Use the filter to change time range and variables, or create a new stream with Data Stream. Logs are displayed once there are incoming requests and traffic."
     :documentationService="documentationService"
     :inTabs="true"
   >
@@ -147,8 +156,8 @@
       <PrimeButton
         severity="secondary"
         icon="pi pi-plus"
-        label="Edge DNS"
-        @click="goToCreateIntelligentDNS"
+        label="Data Stream"
+        @click="goToCreateDataStream"
       />
     </template>
   </EmptyResultsBlock>

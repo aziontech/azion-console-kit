@@ -46,7 +46,6 @@ async function resolveReport(report, filters) {
       reportQuery: reportData.gqlQuery,
       xAxis: '',
       groupBy: [],
-      noResample: true,
       ReportsRequestTokenSource: tokenSource
     }
 
