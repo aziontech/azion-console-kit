@@ -239,9 +239,7 @@
     props.windowOpen('http://' + results.value.domain.url, '_blank')
   }
 
-  const goToAnalytics = () => {
-    //
-  }
+  const goToAnalytics = () => {}
 
   const handleTrackCreation = () => {
     const solution = JSON.parse(route.query.solution)

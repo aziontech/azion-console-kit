@@ -110,9 +110,6 @@ export class AnalyticsTrackerAdapter {
     return this
   }
 
-  //templateName = nome do template
-  //Created Edge Application
-
   /**
    * @param {Object} payload
    * @param {AzionProductsNames} payload.productName
