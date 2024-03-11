@@ -53,7 +53,7 @@
           class="w-full"
         />
         <small class="text-xs text-color-secondary font-normal leading-5">
-          Description of credential, e.g.: Credential used for clients XYZ.
+          Description of the credential.
         </small>
       </div>
     </template>

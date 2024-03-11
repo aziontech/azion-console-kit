@@ -72,7 +72,7 @@
               :class="{ 'p-invalid': nameError }"
             />
             <small class="text-xs text-color-secondary font-normal leading-5">
-              Give a unique and easy-to-remember name.</small
+              Give a unique and descriptive name to identify the function.</small
             >
             <small
               v-if="nameError"

@@ -17,7 +17,7 @@
           :class="{ 'p-invalid': nameError }"
         />
         <small class="text-xs text-color-secondary font-normal leading-5">
-          Give a unique and descriptive name to the data stream.</small
+          Give a unique and descriptive name to identify the data stream.</small
         >
         <small
           id="name-help"

@@ -47,7 +47,7 @@
           {{ nameError }}
         </small>
         <small class="text-xs text-color-secondary font-normal leading-5">
-          Give a unique and easy-to-remember name.
+          Give a unique and descriptive name to identify the service.
         </small>
       </div>
     </template>
