@@ -4,7 +4,9 @@
   import ListTableBlock from '@/templates/list-table-block/no-header'
   import DrawerOrigin from '@/views/EdgeApplicationsOrigins/Drawer'
   import PrimeButton from 'primevue/button'
-  import { computed, ref } from 'vue'
+  import { computed, ref, inject } from 'vue'
+  /**@type {import('@/plugins/adapters/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
+  const tracker = inject('tracker')
   defineOptions({ name: 'list-edge-applications-origins-tab' })
 
   const props = defineProps({
@@ -102,10 +104,21 @@
   }
 
   const openCreateOriginDrawer = () => {
+    tracker
+      .clickToCreate({
+        productName: 'Origin'
+      })
+      .track()
     drawerOriginsRef.value.openDrawerCreate()
   }
 
   const openEditOriginDrawer = (item) => {
+    tracker
+      .clickToEdit({
+        productName: 'Origin'
+      })
+      .track()
+
     drawerOriginsRef.value.openDrawerEdit(item.id)
   }
 

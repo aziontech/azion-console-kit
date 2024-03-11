@@ -4,8 +4,10 @@
   import EditDrawerBlock from '@templates/edit-drawer-block'
   import { refDebounced } from '@vueuse/core'
   import { useToast } from 'primevue/usetoast'
-  import { ref } from 'vue'
+  import { ref, inject } from 'vue'
   import * as yup from 'yup'
+  /**@type {import('@/plugins/adapters/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
+  const tracker = inject('tracker')
   defineOptions({ name: 'drawer-origin' })
 
   const emit = defineEmits(['onSuccess'])
@@ -156,8 +158,33 @@
     }
   }
 
+  const handleTrackEdit = () => {
+    tracker
+      .productEdited({
+        productName: 'Origin'
+      })
+      .track()
+
+    emit('onSuccess')
+  }
+
+  const checkError = (error) => {
+    const [fieldName, ...restOfStringArr] = error.split(':')
+    const message = restOfStringArr.join(':').trim()
+
+    return { fieldName, message }
+  }
+
   const closeDrawerEdit = () => {
     showEditOriginDrawer.value = false
+  }
+
+  const handleTrackCreation = () => {
+    tracker
+      .productCreated({
+        productName: 'Origin'
+      })
+      .track()
   }
 
   const copyToKey = async (originKey) => {
@@ -170,7 +197,34 @@
     })
   }
 
+  const handleFailedEditOrigin = (error) => {
+    const { fieldName, message } = checkError(error)
+    tracker
+      .failedToEdit({
+        productName: 'Origin',
+        errorMessage: message,
+        fieldName: fieldName,
+        errorType: 'API'
+      })
+      .track()
+
+    closeDrawerEdit()
+  }
+
+  const handleFailedCreateOrigin = (error) => {
+    const { fieldName, message } = checkError(error)
+    tracker
+      .failedToCreate({
+        productName: 'Origin',
+        errorType: 'API',
+        fieldName: fieldName.trim(),
+        errorMessage: message
+      })
+      .track()
+  }
+
   const handleCreateOrigin = (feedback) => {
+    handleTrackCreation()
     createFormDrawer.value.scrollOriginKey()
     originKey.value = feedback.originKey
     emit('onSuccess')
@@ -190,6 +244,7 @@
     :schema="validationSchema"
     :initialValues="initialValues"
     @onSuccess="handleCreateOrigin"
+    @onError="handleFailedCreateOrigin"
     :showBarGoBack="true"
     title="Create Origin"
   >
@@ -210,9 +265,9 @@
     :loadService="loadService"
     :editService="editService"
     :schema="validationSchema"
-    @onSuccess="emit('onSuccess')"
+    @onSuccess="handleTrackEdit"
     :showBarGoBack="true"
-    @onError="closeDrawerEdit"
+    @onError="handleFailedEditOrigin"
     title="Edit Origin"
   >
     <template #formFields="{ disabledFields }">

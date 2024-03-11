@@ -78,7 +78,7 @@
               </TextInfo>
               <BigNumber
                 class="flex-1"
-                label="Edge Function Time"
+                label="Edge Functions Time"
                 sufix="ms"
                 >{{ details.edgeFunctionsTime }}</BigNumber
               >

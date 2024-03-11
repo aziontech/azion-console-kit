@@ -113,7 +113,7 @@ defineExpose({
               <div class="flex flex-col gap-3 w-full sm:w-5/12 flex-1">
                 <TextInfo label="Status">{{ details.status }}</TextInfo>
                 <TextInfo label="Request Method">{{ details.requestMethod }}</TextInfo>
-                <TextInfo label="Request Uri">{{ details.requestUri }}</TextInfo>
+                <TextInfo label="Request URI">{{ details.requestUri }}</TextInfo>
               </div>
               <div class="flex flex-col gap-3 w-full sm:w-5/12 flex-1">
                 <TextInfo label="HTTP User Agent">{{ details.httpUserAgent }}</TextInfo>
@@ -144,7 +144,7 @@ defineExpose({
           </template>
         </InfoSection>
 
-        <InfoSection title="Geo-location Data">
+        <InfoSection title="Geolocation Data">
           <template #body>
             <div class="w-full flex flex-col md:flex-row md:gap-8 gap-3">
               <div class="flex flex-col gap-3 w-full sm:w-5/12 flex-1">
@@ -175,7 +175,7 @@ defineExpose({
                 <TextInfo label="SSL Protocol">{{ details.sslProtocol }}</TextInfo>
               </div>
               <div class="flex flex-col gap-3 w-full sm:w-5/12 flex-1">
-                <TextInfo label="WF Match">{{ details.wafMatch }}</TextInfo>
+                <TextInfo label="WAF Match">{{ details.wafMatch }}</TextInfo>
               </div>
             </div>
           </template>

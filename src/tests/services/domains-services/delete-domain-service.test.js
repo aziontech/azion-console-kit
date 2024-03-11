@@ -12,7 +12,7 @@ const makeSut = () => {
 }
 
 describe('DomainsServices', () => {
-  it('should return the API base url to data streaming service', async () => {
+  it('should return the API base url to data stream service', async () => {
     const requestSpy = vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
       statusCode: 204
     })

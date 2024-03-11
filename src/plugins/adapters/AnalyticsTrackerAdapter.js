@@ -23,6 +23,12 @@ export class AnalyticsTrackerAdapter {
     this.#analyticsClient = analyticsClient
   }
 
+  /**
+   * A method to identify a user.
+   *
+   * @param {type} id - The identifier of the user
+   * @return {Promise<void>}
+   */
   async identify(id) {
     if (!id) {
       return
@@ -133,12 +139,19 @@ export class AnalyticsTrackerAdapter {
   /**
    * @param {Object} payload
    * @param {AzionProductsNames} payload.productName
+   * @param {String} payload.errorType
+   * @param {String} payload.fieldName
+   * @param {String} payload.errorMessage
    * @returns {AnalyticsTrackerAdapter}
    */
   failedToCreate(payload) {
     this.#events.push({
       eventName: `Failed to Create ${payload.productName}`,
-      props: {}
+      props: {
+        errorType: payload.errorType,
+        fieldName: payload.fieldName,
+        errorMessage: payload.errorMessage
+      }
     })
     return this
   }
@@ -146,12 +159,19 @@ export class AnalyticsTrackerAdapter {
   /**
    * @param {Object} payload
    * @param {AzionProductsNames} payload.productName
+   * @param {String} payload.errorType
+   * @param {String} payload.fieldName
+   * @param {String} payload.errorMessage
    * @returns {AnalyticsTrackerAdapter}
    */
   failedToEdit(payload) {
     this.#events.push({
       eventName: `Failed to Edit ${payload.productName}`,
-      props: {}
+      props: {
+        errorType: payload.errorType,
+        fieldName: payload.fieldName,
+        errorMessage: payload.errorMessage
+      }
     })
     return this
   }
@@ -196,12 +216,21 @@ export class AnalyticsTrackerAdapter {
   }
 
   /**
+   * @param {Object} payload
+   * @param {'api'|'field'} payload.errorType
+   * @param {string} payload.fieldName
+   * @param {string} payload.errorMessage
+   *
    * @returns {AnalyticsTrackerAdapter}
    */
-  userFailedSignUp() {
+  userFailedSignUp(payload) {
     this.#events.push({
       eventName: 'User Failed to Sign Up',
-      props: {}
+      props: {
+        errorType: payload.errorType,
+        fieldName: payload.fieldName,
+        errorMessage: payload.errorMessage
+      }
     })
     return this
   }
@@ -235,12 +264,26 @@ export class AnalyticsTrackerAdapter {
   }
 
   /**
+   * @param {Object} payload
+   * @param {string} payload.templateName
+   * @param {string} payload.solutionId
+   * @param {string} payload.version
+   * @param {string} payload.versionId
+   * @param {string} payload.isv
+   * @param {string} payload.isvId
    * @returns {AnalyticsTrackerAdapter}
    */
-  clickMoreDetailsOnTemplate() {
+  clickMoreDetailsOnTemplate(payload) {
     this.#events.push({
       eventName: 'Clicked to View More Details on Template',
-      props: {}
+      props: {
+        templateName: payload.templateName,
+        solutionId: payload.solutionId,
+        version: payload.version,
+        versionId: payload.versionId,
+        isv: payload.isv,
+        isvId: payload.isvId
+      }
     })
     return this
   }

@@ -2,8 +2,8 @@
   <ContentBlock>
     <template #heading>
       <PageHeadingBlock
-        pageTitle="Intelligent DNS"
-        description="Set Azion Intelligent DNS as the authoritative DNS server for your domain by copying the nameservers values."
+        pageTitle="Edge DNS"
+        description="Set Azion Edge DNS as the authoritative DNS server for your domain by copying the nameservers values."
       >
         <template #default>
           <PrimeButton
@@ -22,10 +22,10 @@
         :listService="listIntelligentDNSService"
         :deleteService="deleteIntelligentDNSService"
         :columns="getColumns"
-        pageTitleDelete="Intelligent DNS"
+        pageTitleDelete="Edge DNS"
         addButtonLabel="Add"
-        createPagePath="intelligent-dns/create"
-        editPagePath="intelligent-dns/edit"
+        createPagePath="edge-dns/create"
+        editPagePath="edge-dns/edit"
         @on-load-data="handleLoadData"
         emptyListMessage="No Zone found."
       />
@@ -34,7 +34,7 @@
         title="No zone has been created"
         description="Click the button below to initiate the setup process and create your first zone."
         createButtonLabel="Add"
-        createPagePath="intelligent-dns/create"
+        createPagePath="edge-dns/create"
         :documentationService="documentationService"
       >
         <template #illustration>
