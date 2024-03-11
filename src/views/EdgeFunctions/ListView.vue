@@ -9,7 +9,7 @@
         :listService="props.listEdgeFunctionsService"
         :deleteService="props.deleteEdgeFunctionsService"
         :columns="getColumns"
-        pageTitleDelete="Edge Function"
+        pageTitleDelete="edge function"
         addButtonLabel="Edge Function"
         createPagePath="edge-functions/create"
         editPagePath="edge-functions/edit"

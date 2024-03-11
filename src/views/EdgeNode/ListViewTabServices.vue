@@ -101,7 +101,7 @@
         :listService="listServicesWithDecorator"
         :deleteService="deleteServicesWithDecorator"
         :columns="getColumns"
-        pageTitleDelete="Edge Node Service"
+        pageTitleDelete="edge node service"
         :editInDrawer="openEditServiceDrawer"
         @on-load-data="handleLoadData"
         emptyListMessage="No service found."

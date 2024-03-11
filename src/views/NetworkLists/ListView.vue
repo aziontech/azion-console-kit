@@ -9,7 +9,7 @@
         :listService="listNetworkListService"
         :deleteService="deleteNetworkListService"
         :columns="getColumns"
-        pageTitleDelete="Network List"
+        pageTitleDelete="network list"
         addButtonLabel="Network List"
         createPagePath="network-lists/create"
         editPagePath="network-lists/edit"

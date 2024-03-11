@@ -9,7 +9,7 @@
         :listService="listDigitalCertificatesService"
         :deleteService="deleteDigitalCertificatesService"
         :columns="getColumns"
-        pageTitleDelete="Digital Certificate"
+        pageTitleDelete="digital certificate"
         editPagePath="digital-certificates/edit"
         addButtonLabel="Digital Certificates"
         createPagePath="digital-certificates/create"

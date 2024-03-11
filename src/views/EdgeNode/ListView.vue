@@ -86,7 +86,7 @@
         :listService="props.listEdgeNodeService"
         :deleteService="props.deleteEdgeNodeService"
         :columns="getColumns"
-        pageTitleDelete="Edge Node"
+        pageTitleDelete="edge node"
         editPagePath="edge-node/edit"
         @on-load-data="handleLoadData"
         :rowActions="actionsRow"

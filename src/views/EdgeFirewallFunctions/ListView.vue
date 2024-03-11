@@ -15,7 +15,7 @@
       :deleteService="deleteFunctionsWithDecorator"
       :columns="getColumns"
       :editInDrawer="openEditFunctionDrawer"
-      pageTitleDelete="Function"
+      pageTitleDelete="function instance"
       @on-load-data="handleLoadData"
     >
       <template #addButton>
@@ -31,7 +31,7 @@
     v-else
     title="No functions have been instantiated"
     description="Click the button below to initiate the setup process and instantiate your first edge function."
-    createButtonLabel="Add"
+    createButtonLabel="Instance"
     :documentationService="props.documentationService"
     :inTabs="true"
   >

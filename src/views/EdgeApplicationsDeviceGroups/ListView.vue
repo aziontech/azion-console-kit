@@ -122,7 +122,7 @@
   <div v-if="hasContentToList">
     <ListTableBlock
       ref="listDeviceGroupsEdgeApplicationsRef"
-      pageTitleDelete="Device Group"
+      pageTitleDelete="device group"
       :listService="listDeviceGroupsWithDecorator"
       :deleteService="deleteDeviceGroupsWithDecorator"
       :editInDrawer="openEditDeviceGroupDrawer"

@@ -81,7 +81,7 @@
     <template #content>
       <ListTableBlock
         v-if="hasContentToList"
-        pageTitleDelete="Edge Application"
+        pageTitleDelete="edge application"
         addButtonLabel="Edge Application"
         createPagePath="/edge-applications/create"
         editPagePath="/edge-applications/edit"

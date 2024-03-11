@@ -22,8 +22,8 @@
         :listService="listEdgeDNSService"
         :deleteService="deleteEdgeDNSService"
         :columns="getColumns"
-        pageTitleDelete="Edge DNS"
-        addButtonLabel="Add"
+        pageTitleDelete="Edge DNS zone"
+        addButtonLabel="Zone"
         createPagePath="edge-dns/create"
         editPagePath="edge-dns/edit"
         @on-load-data="handleLoadData"
@@ -33,7 +33,7 @@
         v-else
         title="No zone has been created"
         description="Click the button below to initiate the setup process and create your first zone."
-        createButtonLabel="Add"
+        createButtonLabel="Zone"
         createPagePath="edge-dns/create"
         :documentationService="documentationService"
       >

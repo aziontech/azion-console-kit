@@ -9,7 +9,7 @@
         :listService="listCredentialsService"
         :deleteService="deleteCredentialService"
         :columns="getColumns"
-        pageTitleDelete="Credential"
+        pageTitleDelete="credential"
         addButtonLabel="Credential"
         editPagePath="credentials/edit"
         createPagePath="credentials/create"
@@ -19,7 +19,7 @@
       <EmptyResultsBlock
         v-else
         title="No credentials added"
-        description="Create your first credentials."
+        description="Create your first credential."
         createButtonLabel="Credential"
         createPagePath="credentials/create"
         :documentationService="documentationService"

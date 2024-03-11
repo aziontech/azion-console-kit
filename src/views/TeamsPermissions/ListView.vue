@@ -9,7 +9,7 @@
         :listService="pros.listTeamPermissionService"
         :deleteService="pros.deleteTeamPermissionService"
         :columns="getColumns"
-        pageTitleDelete="Team"
+        pageTitleDelete="team"
         addButtonLabel="Team"
         createPagePath="teams-permission/create"
         editPagePath="teams-permission/edit"

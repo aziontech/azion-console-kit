@@ -139,7 +139,7 @@
     :deleteService="deleteEdgeFirewallRulesEngineServiceWithDecorator"
     :columns="getColumns"
     :editInDrawer="openEditDrawer"
-    pageTitleDelete="Rule"
+    pageTitleDelete="rule"
     @on-load-data="handleLoadData"
     emptyListMessage="No rule found."
   >

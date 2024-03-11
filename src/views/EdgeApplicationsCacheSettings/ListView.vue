@@ -104,7 +104,7 @@
     :listService="listCacheSettingsServiceWithDecorator"
     :deleteService="deleteCacheSettingsServiceWithDecorator"
     :columns="getColumns"
-    pageTitleDelete="Cache Setting"
+    pageTitleDelete="cache setting"
     :editInDrawer="openEditDrawer"
     @on-load-data="handleLoadData"
     emptyListMessage="No cache setting found."

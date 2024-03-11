@@ -149,7 +149,7 @@
       :listService="listOriginsWithDecorator"
       :deleteService="deleteOriginWithDecorator"
       :columns="getColumns"
-      pageTitleDelete="Origin"
+      pageTitleDelete="origin"
       :editInDrawer="openEditOriginDrawer"
       @on-load-data="handleLoadData"
       emptyListMessage="No origin found."

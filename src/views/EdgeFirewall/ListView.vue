@@ -73,7 +73,7 @@
     <template #content>
       <ListTableBlock
         v-if="hasContentToList"
-        pageTitleDelete="Edge Firewall"
+        pageTitleDelete="edge firewall"
         addButtonLabel="Edge Firewall"
         createPagePath="/edge-firewall/create"
         editPagePath="/edge-firewall/edit"

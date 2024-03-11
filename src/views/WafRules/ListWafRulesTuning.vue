@@ -10,7 +10,7 @@
       class="w-full sm:max-w-xs"
     />
     <MultiSelect
-      placeholder="Select Domain"
+      placeholder="Select domain"
       resetFilterOnHide
       autoFilterFocus
       optionValue="id"
@@ -26,7 +26,7 @@
       appendTo="self"
       optionValue="value"
       optionLabel="name"
-      placeholder="Select Network List"
+      placeholder="Select network list"
       filter
       showClear
       :options="netWorkListOptions.options"
@@ -38,7 +38,7 @@
   </div>
   <ListTableNoHeaderBlock
     v-show="showListTable"
-    pageTitleDelete="WAF Rules tuning"
+    pageTitleDelete="WAF rules tuning"
     :columns="wafRulesAllowedColumns"
     :hasListService="true"
     :dataFilted="dataFiltedComputed"
@@ -46,7 +46,7 @@
     :cleanSelectData="cleanSelectData"
     :showselectionMode="true"
     :editInDrawer="openMoreDetails"
-    emptyListMessage="No WAF Rules tuning found."
+    emptyListMessage="No WAF rules tuning found."
   >
     <template #header>
       <advancedFilter
