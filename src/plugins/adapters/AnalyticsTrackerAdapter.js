@@ -308,12 +308,12 @@ export class AnalyticsTrackerAdapter {
    * @param {string} payload.versionId
    * @param {string} payload.isv
    */
-  eventDeployed() {
+  eventDeployed(payload) {
     this.#events.push({
       eventName: 'Deployed',
       props: {
         templateName: payload.templateName,
-        solutionid: payload.solutionId,
+        solutionId: payload.solutionId,
         version: payload.version,
         versionId: payload.versionId,
         isv: payload.isv
@@ -331,12 +331,12 @@ export class AnalyticsTrackerAdapter {
    * @param {string} payload.versionId
    * @param {string} payload.isv
    */
-  eventFailedDeployed() {
+  eventFailedDeployed(payload) {
     this.#events.push({
       eventName: 'Failed to Deploy',
       props: {
         templateName: payload.templateName,
-        solutionid: payload.solutionId,
+        solutionId: payload.solutionId,
         version: payload.version,
         versionId: payload.versionId,
         isv: payload.isv
