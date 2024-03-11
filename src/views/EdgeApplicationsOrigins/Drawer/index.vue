@@ -62,7 +62,7 @@
       disabled: !props.isLoadBalancer
     },
     {
-      label: 'Object Storage',
+      label: 'Edge Storage',
       value: 'object_storage',
       disabled: false
     },

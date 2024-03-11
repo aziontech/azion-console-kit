@@ -309,7 +309,7 @@
           label="Bucket Name *"
           name="bucketName"
           :value="bucketName"
-          description="Name of the bucket created using Azion Object Storage."
+          description="Name of the bucket created using Azion Edge Storage."
         />
       </div>
       <div class="flex flex-col sm:max-w-lg w-full gap-2" v-if="isObjectStorageOriginType">
