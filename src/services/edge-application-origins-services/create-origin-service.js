@@ -14,16 +14,25 @@ export const createOriginService = async (payload) => {
 }
 
 const adapt = (payload) => {
+  if (payload.originType === 'object_storage') {
+    return {
+      name: payload.name,
+      origin_type: payload.originType,
+      bucket: payload.bucketName,
+      prefix: payload.prefix ?? '/'
+    }
+  }
+
   return {
     name: payload.name,
     origin_type: payload.originType,
     host_header: payload.hostHeader,
     method: payload.method,
     addresses: payload.addresses?.map((addressItem) => ({
-      address: addressItem.address,
-      weight: addressItem.weight,
-      server_role: addressItem.serverRole,
-      is_active: addressItem.isActive
+      address: addressItem?.address,
+      weight: addressItem?.weight,
+      server_role: addressItem?.serverRole,
+      is_active: addressItem?.isActive
     })),
     origin_path: payload.originPath,
     origin_protocol_policy: payload.originProtocolPolicy,
