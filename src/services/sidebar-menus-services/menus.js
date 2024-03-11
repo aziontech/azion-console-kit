@@ -40,7 +40,7 @@ export const menus = [
       },
       {
         label: 'Edge DNS',
-        to: '/intelligent-dns',
+        to: '/edge-dns',
         icon: 'pi pi-sitemap'
       }
     ]
@@ -60,7 +60,7 @@ export const menus = [
     items: [
       {
         label: 'Data Stream',
-        to: '/data-streaming',
+        to: '/data-stream',
         icon: 'pi pi-play'
       },
       {

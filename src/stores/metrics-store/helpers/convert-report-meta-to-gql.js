@@ -15,7 +15,6 @@ import FiltersToGraphQLString from './filter-to-graphql-string'
  * @param {boolean} options.isTopX - Whether the obtained data is in the Top X format.
  * @param {string} options.xAxis - The X-axis variable.
  * @param {string} options.orderDirection - The direction of ordering.
- * @param {boolean} options.noResample - Whether resampling is disabled.
  */
 export default class GqlRules {
   queryBody = {}
@@ -36,8 +35,7 @@ export default class GqlRules {
     limit = 2000,
     isTopX = false,
     xAxis = 'ts',
-    orderDirection = 'ASC',
-    noResample = false
+    orderDirection = 'ASC'
   }) {
     this.dataset = dataset
     this.aggregations = aggregations
@@ -49,7 +47,6 @@ export default class GqlRules {
     this.isTopX = isTopX
     this.xAxis = xAxis
     this.orderDirection = orderDirection
-    this.noResample = noResample
   }
 
   /**
@@ -134,15 +131,9 @@ export default class GqlRules {
     if (this.groupBy !== null) fields.push(...this.groupBy)
 
     const params = this.filterDetails.map((param) => `${param.name}:${param.type}`)
-    const resampleField = `resample: {
-          function: mean
-          points: 200
-        }`
-    const resampleQuery = this.noResample ? '' : resampleField
     const query = `query (${params.join(', ')}) {
       ${this.dataset} (
         limit: ${this.limit}
-        ${resampleQuery}
         ${aggregationsText}
         groupBy: [${this.groupBy.join(', ')}]
         orderBy: [${this.orderBy}]
