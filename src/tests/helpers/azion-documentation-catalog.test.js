@@ -138,11 +138,11 @@ describe('AzionDocumentationCatalog', () => {
     )
   })
 
-  it('should open data streaming documentation with correct link', () => {
+  it('should open data stream documentation with correct link', () => {
     const openWindowSpy = vi.spyOn(window, 'open')
     const { sut } = makeSut()
 
-    sut.dataStreaming()
+    sut.dataStream()
 
     expect(openWindowSpy).toHaveBeenCalledWith(
       `https://www.azion.com/en/search-result/?q=data streaming&filter=doc`

@@ -111,10 +111,6 @@ const FIXTURES = {
       'query ($tsRange_begin:DateTime!, $tsRange_end:DateTime!) {\n' +
       '      httpMetrics (\n' +
       '        limit: 1000\n' +
-      '        resample: {\n' +
-      '          function: mean\n' +
-      '          points: 200\n' +
-      '        }\n' +
       '        \n' +
       '        groupBy: [ts, status]\n' +
       '        orderBy: [ts_ASC]\n' +
@@ -170,10 +166,6 @@ const FIXTURES = {
       'query ($tsRange_begin:DateTime!, $tsRange_end:DateTime!) {\n' +
       '      httpMetrics (\n' +
       '        limit: 1000\n' +
-      '        resample: {\n' +
-      '          function: mean\n' +
-      '          points: 200\n' +
-      '        }\n' +
       '        aggregate: {sum: dataStreamed \n' +
       '}\n' +
       '        groupBy: [ts, status]\n' +
@@ -221,10 +213,6 @@ const FIXTURES = {
       'query () {\n' +
       '      httpMetrics (\n' +
       '        limit: 1000\n' +
-      '        resample: {\n' +
-      '          function: mean\n' +
-      '          points: 200\n' +
-      '        }\n' +
       '        aggregate: {sum: dataStreamed \n' +
       '}\n' +
       '        groupBy: [ts, status]\n' +

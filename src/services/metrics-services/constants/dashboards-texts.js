@@ -1,12 +1,12 @@
 const DASHBOARDS_TEXTS = {
-  data_streaming: {
+  data_stream: {
     data_streamed: {
       total_data: {
         description:
           'Quantity of data streamed to the configured connectors in bytes. Displays the total data sent to the stream.'
       }
     },
-    data_streaming_requests: {
+    data_stream_requests: {
       total_requests: {
         description:
           'Quantity of requests that were processed. Displays the total amount of requests.'
@@ -162,13 +162,13 @@ const DASHBOARDS_TEXTS = {
       }
     }
   },
-  l2_caching: {
+  tiered_cache: {
     caching_offload: {
-      l2_caching: {
+      tiered_cache: {
         description:
           'Sum of data transferred through Tiered Cache. Displays the data in bytes divided by Data Transferred Total, Data Transferred In, and Data Transferred Out.'
       },
-      l2_offload: {
+      tiered_cache_offload: {
         description:
           'Percentage of data successfully delivered by Tiered Cache to the edge without searching for the content on the origin server. Displays the average number of data in percentages.'
       }

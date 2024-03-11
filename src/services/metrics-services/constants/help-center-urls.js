@@ -1,8 +1,8 @@
 const HELP_CENTER_URLS = {
-  dataStreaming: {
+  dataStream: {
     requests: {
-      totalDataStreamed: '/real-time-metrics/data-streaming/requests/total-data-streamed',
-      totalRequests: '/real-time-metrics/data-streaming/requests/total-requests'
+      totalDataStreamed: '/real-time-metrics/data-stream/requests/total-data-streamed',
+      totalRequests: '/real-time-metrics/data-stream/requests/total-requests'
     }
   },
   edgeApplications: {

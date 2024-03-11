@@ -72,7 +72,7 @@
     },
     {
       label: 'Data Stream',
-      to: '/data-streaming/create',
+      to: '/data-stream/create',
       description: 'Feed streamimg, SIEM, and big data platforms with the event logs from Azion.'
     },
     {
