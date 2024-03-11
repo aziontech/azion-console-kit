@@ -94,7 +94,7 @@
               class="p-error text-xs font-normal leading-tight"
               >{{ nameError }}</small
             >
-            <small class="text-xs text-color-secondary font-normal leading-tight">
+            <small class="text-xs text-color-secondary font-normal leading-5">
               Give a unique and easy-to-remember name.</small
             >
           </div>
@@ -123,7 +123,7 @@
                 readonly
               />
             </span>
-            <small class="text-xs text-color-secondary font-normal leading-tight">
+            <small class="text-xs text-color-secondary font-normal leading-5">
               Language isn't an editable field.</small
             >
           </div>

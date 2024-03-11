@@ -36,8 +36,8 @@
           type="text"
           :class="{ 'p-invalid': errorName }"
         />
-        <small class="text-xs text-color-secondary font-normal leading-tight">
-          Give a unique and easy-to-remember name.</small
+        <small class="text-xs text-color-secondary font-normal leading-5">
+          Give a unique and descriptive name.</small
         >
         <small
           v-if="errorName"
@@ -65,7 +65,7 @@
           type="text"
           :class="{ 'p-invalid': errorDomain }"
         />
-        <small class="text-xs text-color-secondary font-normal leading-tight">
+        <small class="text-xs text-color-secondary font-normal leading-5">
           Add the full domain host name. Example: <code>mydomain.com</code>.</small
         >
         <small

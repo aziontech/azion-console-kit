@@ -71,7 +71,7 @@
               class="p-error text-xs font-normal leading-tight"
               >{{ nameError }}</small
             >
-            <small class="text-color-secondary text-sm font-normal leading-tight">
+            <small class="text-xs text-color-secondary font-normal leading-5">
               The path where the resource will be saved on the edge node.
             </small>
           </div>
@@ -119,7 +119,7 @@
       >
         <div class="flex flex-col gap-2">
           <label class="text-color text-sm not-italic font-medium leading-5">Trigger Type *</label>
-          <small class="text-color-secondary text-xs not-italic font-normal leading-5">
+          <small class="text-xs text-color-secondary font-normal leading-5">
             Define the trigger for when the script is executed.
           </small>
           <div class="flex flex-col gap-3">
@@ -191,7 +191,7 @@
               >
                 {{ contentError }}
               </small>
-              <small class="text-color-secondary text-xs not-italic font-normal leading-5">
+              <small class="text-xs text-color-secondary font-normal leading-5">
                 The content of the resource.<br />
                 You can add variables to the resource content by referencing the tag
                 <code>&#123;&#123; VARNAME &#125;&#125;</code><br />

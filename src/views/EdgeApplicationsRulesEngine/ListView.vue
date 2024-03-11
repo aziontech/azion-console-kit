@@ -165,8 +165,7 @@
 
   const titleEmptyState = computed(() => `No rule in the ${selectedPhase.value} has been created`)
   const descriptionEmptyState = computed(
-    () =>
-      `Click the button below to create your first ${selectedPhase.value} rule.`
+    () => `Click the button below to create your first ${selectedPhase.value} rule.`
   )
 </script>
 

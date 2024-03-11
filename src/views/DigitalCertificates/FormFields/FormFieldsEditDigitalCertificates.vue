@@ -185,7 +185,7 @@
           rows="5"
           cols="30"
         />
-        <small class="text-color-secondary text-xs font-normal leading-tight"
+        <small class="text-xs text-color-secondary font-normal leading-5"
           >Intermediate certificates are accepted.</small
         >
         <small

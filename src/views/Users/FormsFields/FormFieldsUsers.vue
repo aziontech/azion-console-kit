@@ -327,7 +327,7 @@
           :class="{ 'p-invalid': errorTeamsIds }"
           v-model="teamsIds"
         />
-        <small class="text-xs text-color-secondary font-normal leading-tight">
+        <small class="text-xs text-color-secondary font-normal leading-5">
           Select a team for the user. You can create teams using Teams Permissions.</small
         >
       </div>

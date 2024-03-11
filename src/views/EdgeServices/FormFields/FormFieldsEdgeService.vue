@@ -46,7 +46,7 @@
         >
           {{ nameError }}
         </small>
-        <small class="text-color-secondary text-sm font-normal leading-tight">
+        <small class="text-xs text-color-secondary font-normal leading-5">
           Give a unique and easy-to-remember name.
         </small>
       </div>
@@ -72,7 +72,7 @@
         >
           {{ codeError }}
         </small>
-        <small class="text-color-secondary text-sm font-normal leading-tight">
+        <small class="text-xs text-color-secondary font-normal leading-5">
           Enter the list of variables and values for the resource. Example:
           <code>port=3306</code>.
         </small>

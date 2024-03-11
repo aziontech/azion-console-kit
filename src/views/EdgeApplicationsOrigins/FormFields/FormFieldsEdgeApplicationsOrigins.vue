@@ -399,7 +399,7 @@
               </label>
             </div>
           </div>
-          <small class="text-color-secondary text-xs not-italic font-normal leading-5">
+          <small class="text-xs text-color-secondary font-normal leading-5">
             Marking an origin as a backup server to specify that it will receive HTTP requests only
             if all primary servers are unavailable.
           </small>

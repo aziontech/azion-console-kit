@@ -72,7 +72,7 @@
           />
           <span class="p-inputgroup-addon"> .{{ edgeDNSStore.domain }} </span>
         </div>
-        <small class="text-color-secondary text-sm font-normal leading-tight">
+        <small class="text-xs text-color-secondary font-normal leading-5">
           The accepted values format vary according to the chosen record type.
         </small>
 
@@ -100,7 +100,7 @@
             :class="{ 'p-invalid': errorSelectedRecordType }"
             class="w-full"
           />
-          <small class="text-color-secondary text-sm font-normal leading-tight">
+          <small class="text-xs text-color-secondary font-normal leading-5">
             Choose the type of record being added.
           </small>
 
@@ -132,7 +132,7 @@
             :class="{ 'p-invalid': errorTtl }"
           />
 
-          <small class="text-color-secondary text-sm font-normal leading-tight">
+          <small class="text-xs text-color-secondary font-normal leading-5">
             Decide the time-to-live (TTL) value a response can be cached for on a resolver server.
           </small>
           <small
@@ -158,7 +158,7 @@
           type="text"
           :class="{ 'p-invalid': errorValue }"
         />
-        <small class="text-color-secondary text-sm font-normal leading-tight">
+        <small class="text-xs text-color-secondary font-normal leading-5">
           The accepted values format vary according to the chosen record type.
         </small>
 
@@ -193,7 +193,7 @@
             :class="{ 'p-invalid': errorSelectedPolicy }"
             class="w-full"
           />
-          <small class="text-color-secondary text-sm font-normal leading-tight">
+          <small class="text-xs text-color-secondary font-normal leading-5">
             Choose <code>Simple</code> to use the standard DNS functionality or
             <code>Weighted</code> to specify the amount of traffic sent to each record.
           </small>
@@ -223,7 +223,7 @@
             step="1"
             :class="{ 'p-invalid': errorWeight }"
           />
-          <small class="text-color-secondary text-sm font-normal leading-tight">
+          <small class="text-xs text-color-secondary font-normal leading-5">
             Specify the weight for each record. Accepts integers between 0 and 255.
           </small>
 
@@ -254,7 +254,7 @@
           type="text"
           :class="{ 'p-invalid': errorDescription }"
         />
-        <small class="text-color-secondary text-sm font-normal leading-tight">
+        <small class="text-xs text-color-secondary font-normal leading-5">
           Differentiate records with the same Name and Type by adding a description that identifies
           each one. Accepts up to 45 characters.
         </small>

@@ -186,7 +186,7 @@
         />
         <div class="flex flex-col gap-1">
           <label class="text-sm font-normal leading-tight">CNAME Access Only </label>
-          <small class="text-color-secondary text-sm font-normal leading-tight">
+          <small class="text-xs text-color-secondary font-normal leading-5">
             Check this option to make the application accessible only through the domains listed in
             the CNAME field. Attempts to access the application through the Azion domain will be
             blocked.
@@ -326,7 +326,7 @@
           placeholder="Select a certificate"
           :disabled="!mtlsIsEnabled"
         />
-        <small class="text-xs font-normal text-color-secondary leading-tight">
+        <small class="text-xs text-color-secondary font-normal leading-5">
           Mutual Authentification requires a Trusted CA Certificate, add it in Digital Certificate
           Library.
         </small>
