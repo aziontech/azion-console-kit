@@ -61,7 +61,7 @@
   <EmptyResultsBlock
     v-if="!showListTable"
     title="Select a domain to query data"
-    description="To use this feature, a domain must be associated with the Edge Firewall rule set that has a behavior running this WAF rule."
+    description="To use this feature, a domain must be associated with the edge firewall that has a behavior running this WAF rule."
     :documentationService="props.documentationServiceTuning"
     :inTabs="true"
   >

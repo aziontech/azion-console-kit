@@ -84,7 +84,7 @@
 <template>
   <FormHorizontal
     title="General"
-    description="Create a rule set to configure security logics and protect servers and applications."
+    description="Create an edge firewall to configure security logics and protect servers and applications."
   >
     <template #inputs>
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
@@ -92,15 +92,15 @@
           label="Name *"
           name="name"
           :value="name"
-          placeholder="My rule set"
-          description="Give a unique and descriptive name to identify the rule set."
+          placeholder="My edge firewall"
+          description="Give a unique and descriptive name to identify the edge firewall."
         />
       </div>
     </template>
   </FormHorizontal>
   <FormHorizontal
     title="Domains"
-    description="Define the addresses to which the rule set should apply rules by associating registered domains."
+    description="Define the addresses to which the edge firewall should apply rules by associating registered domains."
   >
     <template #inputs>
       <div class="flex flex-col sm:max-w-3xl w-full gap-2">

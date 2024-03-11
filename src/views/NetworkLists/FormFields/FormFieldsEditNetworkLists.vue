@@ -50,7 +50,7 @@
 <template>
   <FormHorizontal
     title="General"
-    description="Edit allowlists, blocklists, and even greylists based on IP addresses, geolocation (countries), or Autonomous System Number (ASN) to use with configured rule sets on Rules Engine."
+    description="Edit allowlists, blocklists, and even greylists based on IP addresses, geolocation (countries), or Autonomous System Number (ASN) to use with Rules Engine for Edge Firewall."
   >
     <template #inputs>
       <div class="flex flex-col sm:max-w-lg w-full gap-2">

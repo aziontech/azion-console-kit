@@ -94,7 +94,7 @@
       label: 'Network Lists',
       to: '/network-lists/create',
       description:
-        'Add allowlists, blocklists, and greylists to use with rule sets on Rules Engine.'
+        'Add allowlists, blocklists, and greylists to use with Rules Engine for Edge Firewall.'
     }
   ])
 

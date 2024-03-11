@@ -44,7 +44,7 @@
   <FormHorizontal
     :isDrawer="true"
     title="General"
-    description="Instantiate an edge function within your rule set. Use Rules Engine to activate the function."
+    description="Instantiate an edge function within your edge firewall. Use Rules Engine to activate the function."
   >
     <template #inputs>
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
@@ -52,8 +52,8 @@
           label="Name *"
           name="name"
           v-model="name"
-          description="Give a unique and descriptive name to identify the rule set."
-          placeholder="My rule set function instance"
+          description="Give a unique and descriptive name to identify the edge firewall function."
+          placeholder="My edge firewall function instance"
         />
       </div>
     </template>
