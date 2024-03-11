@@ -14,12 +14,12 @@
         :deleteService="deleteDomainService"
         :columns="getColumns"
         @on-load-data="handleLoadData"
-        emptyListMessage="No domain found."
+        emptyListMessage="No domains found."
       />
       <EmptyResultsBlock
         v-else
-        title="You don't have a domain created"
-        description="Create your first domain."
+        title="No domains have been created"
+        description="Click the button below to create your first domain."
         createButtonLabel="Domain"
         createPagePath="domains/create"
         :documentationService="documentationService"

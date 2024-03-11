@@ -152,7 +152,7 @@
       pageTitleDelete="origin"
       :editInDrawer="openEditOriginDrawer"
       @on-load-data="handleLoadData"
-      emptyListMessage="No origin found."
+      emptyListMessage="No origins found."
     >
       <template #addButton>
         <PrimeButton
@@ -167,7 +167,7 @@
   <EmptyResultsBlock
     v-else
     title="No origins have been created"
-    description="Click the button below to initiate the setup process and create your first origin."
+    description="Click the button below to create your first origin."
     createButtonLabel="Origin"
     :documentationService="props.documentationService"
     :inTabs="true"

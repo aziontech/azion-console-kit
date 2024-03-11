@@ -323,7 +323,7 @@
             <EmptyResultsBlock
               v-else
               title="No record has been created"
-              description=" Click the button below to initiate the setup process and create your first record."
+              description=" Click the button below to create your first record."
               createButtonLabel="Record"
               createPagePath="records/create"
               :documentationService="documentationService"

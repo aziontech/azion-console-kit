@@ -107,7 +107,7 @@
     pageTitleDelete="cache setting"
     :editInDrawer="openEditDrawer"
     @on-load-data="handleLoadData"
-    emptyListMessage="No cache setting found."
+    emptyListMessage="No cache settings found."
   >
     <template #addButton>
       <PrimeButton
@@ -121,7 +121,7 @@
   <EmptyResultsBlock
     v-else
     title="No cache settings have been created"
-    description="Click the button below to initiate the setup process and create your first cache setting."
+    description="Click the button below to create your first cache setting."
     createButtonLabel="Cache Setting"
     :documentationService="documentationService"
     :inTabs="true"

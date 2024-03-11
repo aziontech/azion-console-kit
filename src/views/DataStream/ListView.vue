@@ -88,12 +88,12 @@
         :deleteService="deleteDataStreamService"
         :columns="getColumns"
         @on-load-data="handleLoadData"
-        emptyListMessage="No stream has been created."
+        emptyListMessage="No streams found."
       ></ListTableBlock>
       <EmptyResultsBlock
         v-else
         title="No stream has been created"
-        description="Click the button below to initiate the setup process and create your first stream."
+        description="Click the button below to create your first stream."
         createButtonLabel="Stream"
         createPagePath="data-stream/create"
         :documentationService="documentationService"

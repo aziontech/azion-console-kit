@@ -113,13 +113,13 @@
         editPagePath="edge-services/edit"
         @on-load-data="handleLoadData"
         :rowActions="actionsRow"
-        emptyListMessage="No service found."
+        emptyListMessage="No services found."
       />
 
       <EmptyResultsBlock
         v-else
         title="No services have been created"
-        description="Click the button below to initiate the setup process and create your first service."
+        description="Click the button below to create your first service."
         createButtonLabel="Service"
         createPagePath="edge-services/create"
         :documentationService="props.documentationService"

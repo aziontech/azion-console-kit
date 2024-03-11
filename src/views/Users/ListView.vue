@@ -14,12 +14,12 @@
         createPagePath="users/create"
         editPagePath="users/edit"
         @on-load-data="handleLoadData"
-        emptyListMessage="No user found."
+        emptyListMessage="No users found."
       />
       <EmptyResultsBlock
         v-else
         title="No user has been created"
-        description=" Click the button below to initiate the setup process and create your first user."
+        description=" Click the button below to create your first user."
         createButtonLabel="User"
         createPagePath="users/create"
         :documentationService="props.documentationService"

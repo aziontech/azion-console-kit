@@ -14,12 +14,12 @@
         createPagePath="network-lists/create"
         editPagePath="network-lists/edit"
         @on-load-data="handleLoadData"
-        emptyListMessage="No network list found."
+        emptyListMessage="No network lists found."
       />
       <EmptyResultsBlock
         v-else
-        title="No network list added"
-        description="Create a network list based on ASNs, countries, or IP addresses."
+        title="No network lists have been added"
+        description="Click the button below to add a network list based on ASNs, countries, or IP addresses."
         createButtonLabel="Network List"
         createPagePath="network-lists/create"
         :documentationService="documentationService"

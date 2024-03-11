@@ -166,7 +166,7 @@
   const titleEmptyState = computed(() => `No rule in the ${selectedPhase.value} has been created`)
   const descriptionEmptyState = computed(
     () =>
-      `Click the button below to initiate the setup process and create your first ${selectedPhase.value} rule.`
+      `Click the button below to create your first ${selectedPhase.value} rule.`
   )
 </script>
 
@@ -209,7 +209,7 @@
         />
         <PrimeButton
           icon="pi pi-plus"
-          label="Rules Engine"
+          label="Rule"
           @click="openCreateRulesEngineDrawer"
         />
       </div>

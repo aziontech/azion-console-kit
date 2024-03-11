@@ -117,7 +117,7 @@
         pageTitleDelete="resource"
         :editInDrawer="openEditServiceDrawer"
         @on-load-data="handleLoadData"
-        emptyListMessage="No resource found."
+        emptyListMessage="No resources found."
       >
         <template #addButton>
           <PrimeButton
@@ -131,7 +131,7 @@
     <EmptyResultsBlock
       v-else
       title="No resources have been created"
-      description="Click the button below to initiate the setup process and create a resource for the service to run."
+      description="Click the button below to create a resource for the service to run."
       createButtonLabel="Resource"
       :documentationService="props.documentationServiceResource"
       :inTabs="true"

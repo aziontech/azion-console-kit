@@ -18,8 +18,8 @@
       />
       <EmptyResultsBlock
         v-else
-        title="No credentials added"
-        description="Create your first credential."
+        title="No credentials have been generated"
+        description="Click the button below to generate your first credential."
         createButtonLabel="Credential"
         createPagePath="credentials/create"
         :documentationService="documentationService"

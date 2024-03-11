@@ -9,7 +9,7 @@
     :listService="handleListWafRulesAllowedService"
     :deleteService="handleDeleteWafRulesAllowedService"
     @on-load-data="handleLoadData"
-    emptyListMessage="No allowed rule found."
+    emptyListMessage="No allowed rules found."
   >
     <template #addButton>
       <PrimeButton

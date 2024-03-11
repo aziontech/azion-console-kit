@@ -14,12 +14,12 @@
         createPagePath="variables/create"
         editPagePath="variables/edit"
         @on-load-data="handleLoadData"
-        emptyListMessage="No variable found."
+        emptyListMessage="No variables found."
       />
       <EmptyResultsBlock
         v-else
-        title="No variables added"
-        description="Create your first variable."
+        title="No variables have been created"
+        description="Click the button below to create your first variable."
         createButtonLabel="Variable"
         createPagePath="variables/create"
         :documentationService="documentationService"

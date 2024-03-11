@@ -101,15 +101,15 @@
         :listService="listServicesWithDecorator"
         :deleteService="deleteServicesWithDecorator"
         :columns="getColumns"
-        pageTitleDelete="edge node service"
+        pageTitleDelete="service"
         :editInDrawer="openEditServiceDrawer"
         @on-load-data="handleLoadData"
-        emptyListMessage="No service found."
+        emptyListMessage="No services found."
       >
         <template #addButton>
           <PrimeButton
             icon="pi pi-plus"
-            label="Services"
+            label="Service"
             @click="openCreateServiceDrawer"
           />
         </template>
@@ -117,8 +117,8 @@
     </div>
     <EmptyResultsBlock
       v-else
-      title="No services have been provisioned."
-      description="Click the button below to initiate the setup process and provision your first edge service."
+      title="No services have been provisioned"
+      description="Click the button below to provision your first service."
       :documentationService="props.documentationServiceServices"
       :inTabs="true"
     >
@@ -126,7 +126,7 @@
         <PrimeButton
           severity="secondary"
           icon="pi pi-plus"
-          label="Add"
+          label="Service"
           @click="openCreateServiceDrawer"
         />
       </template>

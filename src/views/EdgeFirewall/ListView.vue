@@ -86,7 +86,7 @@
       <EmptyResultsBlock
         v-else
         title="No edge firewall has been created."
-        description="Click the button below to initiate the setup process and create your first edge firewall."
+        description="Click the button below to create your first edge firewall."
         createButtonLabel="Edge Firewall"
         createPagePath="/edge-firewall/create"
         :documentationService="props.documentationService"

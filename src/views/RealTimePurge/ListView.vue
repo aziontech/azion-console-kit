@@ -18,8 +18,8 @@
       </ListTableBlock>
       <EmptyResultsBlock
         v-else
-        title="No purge has been created"
-        description="Click the button below to initiate the setup process and create your first purge."
+        title="No purges have been added"
+        description="Click the button below to add your first purge."
         createButtonLabel="Purge"
         createPagePath="real-time-purge/create"
         :documentationService="documentationService"

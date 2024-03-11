@@ -14,13 +14,13 @@
         createPagePath="teams-permission/create"
         editPagePath="teams-permission/edit"
         @on-load-data="handleLoadData"
-        emptyListMessage="No Teams found."
+        emptyListMessage="No teams found."
       >
       </ListTableBlock>
       <EmptyResultsBlock
         v-else
         title="No teams have been created"
-        description="Click the button below to initiate the setup process and create your team."
+        description="Click the button below to create your first team and add permissions."
         createButtonLabel="Team"
         createPagePath="teams-permission/create"
         :documentationService="documentationService"

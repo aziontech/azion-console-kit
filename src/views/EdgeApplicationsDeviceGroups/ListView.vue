@@ -128,7 +128,7 @@
       :editInDrawer="openEditDeviceGroupDrawer"
       :columns="getColumns"
       @on-load-data="handleLoadData"
-      emptyListMessage="No device group found."
+      emptyListMessage="No device groups found."
     >
       <template #addButton>
         <PrimeButton
@@ -142,7 +142,7 @@
   <EmptyResultsBlock
     v-else
     title="No device groups have been created"
-    description="Click the button below to initiate the setup process and create your first device group."
+    description="Click the button below to create your first device group."
     createButtonLabel="Device Group"
     :documentationService="props.documentationService"
     :inTabs="true"
