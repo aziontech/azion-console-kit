@@ -60,7 +60,7 @@ export const menus = [
     items: [
       {
         label: 'Data Stream',
-        to: '/data-streaming',
+        to: '/data-stream',
         icon: 'pi pi-play'
       },
       {
