@@ -34,10 +34,10 @@ export const realTimeEventsRoutes = {
       documentationService: Helpers.documentationGuideProducts.realTimeEventsTieredCache,
       clipboardWrite: Helpers.clipboardWrite
     },
-    intelligentDNS: {
-      listIntelligentDNS: RealTimeEventsService.listIntelligentDNS,
-      loadIntelligentDNS: RealTimeEventsService.loadIntelligentDNS,
-      documentationService: Helpers.documentationGuideProducts.realTimeEventsIntelligentDNS
+    edgeDNS: {
+      listEdgeDNS: RealTimeEventsService.listEdgeDNS,
+      loadEdgeDNS: RealTimeEventsService.loadEdgeDNS,
+      documentationService: Helpers.documentationGuideProducts.realTimeEventsEdgeDNS
     },
     dataStream: {
       listDataStream: RealTimeEventsService.listDataStream,
