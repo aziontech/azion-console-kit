@@ -61,13 +61,12 @@
         <InputText
           id="domain"
           v-model="domain"
-          placeholder="mydomain"
+          placeholder="mydomain.com"
           type="text"
           :class="{ 'p-invalid': errorDomain }"
         />
         <small class="text-xs text-color-secondary font-normal leading-tight">
-          Add the name of the domain. Example: <code>mydomain</code> in
-          <code>mydomain.com</code></small
+          Add the full domain host name. Example: <code>mydomain.com</code>.</small
         >
         <small
           v-if="errorDomain"
