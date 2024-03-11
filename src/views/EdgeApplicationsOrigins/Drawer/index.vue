@@ -102,17 +102,17 @@
     name: yup.string().required().label('Name'),
     originType: yup.string().required().label('Origin Type'),
     hostHeader: yup.string().required().label('Host Header'),
-    addresses: yup.array().of(
-      yup.object().shape({
-        address: yup.string().label('Address').when('originType', {
-          is: (originType) => originType !== 'object_storage',
-          then: (schema) => schema.required(),
-          otherwise: (schema) => schema.notRequired()
-        }),
-        weight: yup.number().nullable().label('Weight'),
-        isActive: yup.boolean().default(true).label('Active')
-      })
-    ),
+    addresses: yup.array().when('originType', {
+      is: (originType) => originType === 'object_storage',
+      then: (schema) => schema.optional(),
+      otherwise: (schema) => schema.of(
+        yup.object().shape({
+          address: yup.string().label('Address').required(),
+          weight: yup.number().nullable().label('Weight'),
+          isActive: yup.boolean().default(true).label('Active')
+        })
+      ),
+    }),
     originPath: yup
       .string()
       .test('valid', 'Use a valid origin path.', (value) => {
