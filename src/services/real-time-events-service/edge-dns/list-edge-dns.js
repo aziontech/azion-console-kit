@@ -54,7 +54,7 @@ const getLevelDNS = (level) => {
 
 const adapt = (filter) => {
   const table = {
-    dataset: 'ednsQueriesEvents',
+    dataset: 'idnsQueriesEvents',
     limit: 10000,
     fields: ['level', 'qtype', 'resolutionType', 'source', 'solutionId', 'ts', 'uuid', 'zoneId'],
     orderBy: 'ts_ASC'
@@ -65,15 +65,15 @@ const adapt = (filter) => {
 const adaptResponse = (response) => {
   const { body } = response
 
-  return body.data.ednsQueriesEvents?.map((ednsQueriesEvents) => ({
+  return body.data.idnsQueriesEvents?.map((edgeDnsQueriesEvents) => ({
     id: generateCurrentTimestamp(),
-    level: getLevelDNS(ednsQueriesEvents.level),
-    qtype: ednsQueriesEvents.qtype,
-    resolutionType: ednsQueriesEvents.resolutionType,
-    source: ednsQueriesEvents.source,
-    solutionId: ednsQueriesEvents.solutionId,
-    ts: ednsQueriesEvents.ts,
-    uuid: ednsQueriesEvents.uuid,
-    zoneId: ednsQueriesEvents.zoneId
+    level: getLevelDNS(edgeDnsQueriesEvents.level),
+    qtype: edgeDnsQueriesEvents.qtype,
+    resolutionType: edgeDnsQueriesEvents.resolutionType,
+    source: edgeDnsQueriesEvents.source,
+    solutionId: edgeDnsQueriesEvents.solutionId,
+    ts: edgeDnsQueriesEvents.ts,
+    uuid: edgeDnsQueriesEvents.uuid,
+    zoneId: edgeDnsQueriesEvents.zoneId
   }))
 }

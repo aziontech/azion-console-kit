@@ -27,9 +27,9 @@ export const searchEdnsService = async ({
 }
 
 const adapt = (httpResponse) => {
-  const parsedDomains = httpResponse.body.results?.map((edns) => ({
-    value: edns.id,
-    label: edns.name
+  const parsedDomains = httpResponse.body.results?.map((edgeDns) => ({
+    value: edgeDns.id,
+    label: edgeDns.name
   }))
 
   return {
