@@ -107,7 +107,7 @@
     pageTitleDelete="Cache Setting"
     :editInDrawer="openEditDrawer"
     @on-load-data="handleLoadData"
-    emptyListMessage="No Cache Setting found."
+    emptyListMessage="No cache setting found."
   >
     <template #addButton>
       <PrimeButton

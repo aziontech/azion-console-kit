@@ -9,18 +9,18 @@
         :listService="props.listUsersService"
         :deleteService="props.deleteUsersService"
         :columns="getColumns"
-        pageTitleDelete="Users"
-        addButtonLabel="Add"
+        pageTitleDelete="user"
+        addButtonLabel="User"
         createPagePath="users/create"
         editPagePath="users/edit"
         @on-load-data="handleLoadData"
-        emptyListMessage="No User found."
+        emptyListMessage="No user found."
       />
       <EmptyResultsBlock
         v-else
         title="No user has been created"
         description=" Click the button below to initiate the setup process and create your first user."
-        createButtonLabel="Add"
+        createButtonLabel="User"
         createPagePath="users/create"
         :documentationService="props.documentationService"
       >

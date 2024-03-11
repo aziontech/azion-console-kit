@@ -91,7 +91,7 @@
         @on-load-data="handleLoadData"
         @on-before-go-to-add-page="handleTrackEvent"
         @on-before-go-to-edit="handleTrackEditEvent"
-        emptyListMessage="No Edge Application found."
+        emptyListMessage="No edge application found."
       />
       <EmptyResultsBlock
         v-else

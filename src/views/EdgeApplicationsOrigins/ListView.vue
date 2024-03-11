@@ -152,7 +152,7 @@
       pageTitleDelete="Origin"
       :editInDrawer="openEditOriginDrawer"
       @on-load-data="handleLoadData"
-      emptyListMessage="No Origin found."
+      emptyListMessage="No origin found."
     >
       <template #addButton>
         <PrimeButton

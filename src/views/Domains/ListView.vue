@@ -6,7 +6,7 @@
     <template #content>
       <ListTableBlock
         v-if="hasContentToList"
-        pageTitleDelete="Domain"
+        pageTitleDelete="domain"
         addButtonLabel="Domains"
         createPagePath="domains/create"
         editPagePath="domains/edit"
@@ -14,7 +14,7 @@
         :deleteService="deleteDomainService"
         :columns="getColumns"
         @on-load-data="handleLoadData"
-        emptyListMessage="No Domain found."
+        emptyListMessage="No domain found."
       />
       <EmptyResultsBlock
         v-else

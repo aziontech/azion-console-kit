@@ -90,7 +90,7 @@
         editPagePath="edge-node/edit"
         @on-load-data="handleLoadData"
         :rowActions="actionsRow"
-        emptyListMessage="No Edge Node found."
+        emptyListMessage="No edge node found."
       />
       <EmptyEdgeNode
         v-else

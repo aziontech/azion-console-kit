@@ -14,11 +14,11 @@
         createPagePath="edge-functions/create"
         editPagePath="edge-functions/edit"
         @on-load-data="handleLoadData"
-        emptyListMessage="No Function found."
+        emptyListMessage="No edge function found."
       />
       <EmptyResultsBlock
         v-else
-        title="No Functions added"
+        title="No functions have been created"
         description="Create your first function here."
         createButtonLabel="Edge Function"
         createPagePath="edge-functions/create"

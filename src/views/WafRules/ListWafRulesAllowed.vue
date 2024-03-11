@@ -2,7 +2,7 @@
   <ListTableNoHeaderBlock
     ref="listAllowedRef"
     v-if="hasContentToList"
-    pageTitleDelete="WAF Allowed Rules"
+    pageTitleDelete="WAF allowed rule"
     addButtonLabel="Allowed Rule"
     :editInDrawer="openEditDrawerWafRulesAllowed"
     :columns="wafRulesAllowedColumns"

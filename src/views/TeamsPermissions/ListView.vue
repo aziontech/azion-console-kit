@@ -10,7 +10,7 @@
         :deleteService="pros.deleteTeamPermissionService"
         :columns="getColumns"
         pageTitleDelete="Team"
-        addButtonLabel="Add"
+        addButtonLabel="Team"
         createPagePath="teams-permission/create"
         editPagePath="teams-permission/edit"
         @on-load-data="handleLoadData"
@@ -21,7 +21,7 @@
         v-else
         title="No teams have been created"
         description="Click the button below to initiate the setup process and create your team."
-        createButtonLabel="Add"
+        createButtonLabel="Team"
         createPagePath="teams-permission/create"
         :documentationService="documentationService"
       >

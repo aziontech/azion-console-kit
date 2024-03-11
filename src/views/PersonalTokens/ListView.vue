@@ -9,12 +9,12 @@
         :listService="listPersonalTokensService"
         :deleteService="deletePersonalTokenService"
         :columns="getColumns"
-        pageTitleDelete="Personal Token"
+        pageTitleDelete="personal token"
         addButtonLabel="Personal Token"
         createPagePath="personal-tokens/create"
         @on-load-data="handleLoadData"
         :enableEditClick="false"
-        emptyListMessage="No Personal Token found." />
+        emptyListMessage="No personal token found." />
       <EmptyResultsBlock
         v-else
         title="No personal tokens found"

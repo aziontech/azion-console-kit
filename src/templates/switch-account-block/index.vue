@@ -237,7 +237,7 @@
           :headerFilter="filterSwitch"
           @onSelectedRow="onSelectedAccount"
           description="Type the account name to filter results."
-          emptyListMessage="No Account found."
+          emptyListMessage="No accounts found."
         >
           <template #headerFilters="{ filter, applyFilter }">
             <div class="flex flex-wrap justify-between gap-2 w-full rounded">

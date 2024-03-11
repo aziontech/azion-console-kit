@@ -14,7 +14,7 @@
         editPagePath="credentials/edit"
         createPagePath="credentials/create"
         @on-load-data="handleLoadData"
-        emptyListMessage="No Credential found."
+        emptyListMessage="No credentials found."
       />
       <EmptyResultsBlock
         v-else

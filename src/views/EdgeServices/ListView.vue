@@ -108,12 +108,12 @@
         :deleteService="props.deleteEdgeServiceServices"
         :columns="getColumns"
         pageTitleDelete="Service"
-        addButtonLabel="Add"
+        addButtonLabel="Service"
         createPagePath="edge-services/create"
         editPagePath="edge-services/edit"
         @on-load-data="handleLoadData"
         :rowActions="actionsRow"
-        emptyListMessage="No Service found."
+        emptyListMessage="No service found."
       />
 
       <EmptyResultsBlock

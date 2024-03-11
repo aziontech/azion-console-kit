@@ -114,10 +114,10 @@
         :listService="listResourcesServicesWithDecorator"
         :deleteService="deleteResourcesServicesWithDecorator"
         :columns="getColumns"
-        pageTitleDelete="Resource"
+        pageTitleDelete="resource"
         :editInDrawer="openEditServiceDrawer"
         @on-load-data="handleLoadData"
-        emptyListMessage="No Resource found."
+        emptyListMessage="No resource found."
       >
         <template #addButton>
           <PrimeButton

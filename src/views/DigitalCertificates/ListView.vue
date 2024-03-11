@@ -14,7 +14,7 @@
         addButtonLabel="Digital Certificates"
         createPagePath="digital-certificates/create"
         @on-load-data="handleLoadData"
-        emptyListMessage="No Digital Certificate found."
+        emptyListMessage="No digital certificates found."
       />
 
       <EmptyResultsBlock

@@ -255,7 +255,7 @@
   <ContentBlock>
     <template #heading>
       <PageHeadingBlock
-        pageTitle="Edit Edge DNS"
+        pageTitle="Edit Edge DNS Zone"
         description="Set Azion Edge DNS as the authoritative DNS server for your domain by copying the nameservers values."
       >
         <template #default>
@@ -303,13 +303,13 @@
               ref="listIDNSResourcesRef"
               v-if="hasContentToList"
               pageTitleDelete="Record"
-              addButtonLabel="Add"
+              addButtonLabel="Record"
               :editInDrawer="openEditDrawerIDNSResource"
               :columns="recordListColumns"
               :listService="listRecordsServiceIntelligentDNSDecorator"
               :deleteService="deleteRecordsServiceIntelligentDNSDecorator"
               @on-load-data="handleLoadData"
-              emptyListMessage="No Record found."
+              emptyListMessage="No records found."
             >
               <template #addButton>
                 <PrimeButton

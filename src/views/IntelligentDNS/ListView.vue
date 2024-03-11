@@ -22,12 +22,12 @@
         :listService="listIntelligentDNSService"
         :deleteService="deleteIntelligentDNSService"
         :columns="getColumns"
-        pageTitleDelete="Edge DNS"
-        addButtonLabel="Add"
+        pageTitleDelete="Edge DNS Zone"
+        addButtonLabel="Edge DNS Zone"
         createPagePath="intelligent-dns/create"
         editPagePath="intelligent-dns/edit"
         @on-load-data="handleLoadData"
-        emptyListMessage="No Zone found."
+        emptyListMessage="No zone found."
       />
       <EmptyResultsBlock
         v-else

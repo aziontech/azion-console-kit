@@ -104,7 +104,7 @@
         pageTitleDelete="Edge Node Service"
         :editInDrawer="openEditServiceDrawer"
         @on-load-data="handleLoadData"
-        emptyListMessage="No Service found."
+        emptyListMessage="No service found."
       >
         <template #addButton>
           <PrimeButton

@@ -122,13 +122,13 @@
   <div v-if="hasContentToList">
     <ListTableBlock
       ref="listDeviceGroupsEdgeApplicationsRef"
-      pageTitleDelete="Device Groups"
+      pageTitleDelete="Device Group"
       :listService="listDeviceGroupsWithDecorator"
       :deleteService="deleteDeviceGroupsWithDecorator"
       :editInDrawer="openEditDeviceGroupDrawer"
       :columns="getColumns"
       @on-load-data="handleLoadData"
-      emptyListMessage="No Device Group found."
+      emptyListMessage="No device group found."
     >
       <template #addButton>
         <PrimeButton

@@ -8,19 +8,19 @@
         v-if="hasContentToList"
         :listService="props.listRealTimePurgeService"
         :columns="getColumns"
-        addButtonLabel="Add"
+        addButtonLabel="Purge"
         createPagePath="real-time-purge/create"
         @on-load-data="handleLoadData"
         :isGraphql="true"
         :enableEditClick="false"
-        emptyListMessage="No Purge found."
+        emptyListMessage="No purge found."
       >
       </ListTableBlock>
       <EmptyResultsBlock
         v-else
         title="No purge has been created"
         description="Click the button below to initiate the setup process and create your first purge."
-        createButtonLabel="Add"
+        createButtonLabel="Purge"
         createPagePath="real-time-purge/create"
         :documentationService="documentationService"
       >

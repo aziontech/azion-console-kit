@@ -80,7 +80,7 @@
     <template #content>
       <ListTableBlock
         v-if="hasContentToList"
-        addButtonLabel="Add"
+        addButtonLabel="Data Stream"
         createPagePath="/data-streaming/create"
         editPagePath="/data-streaming/edit"
         pageTitleDelete="stream"
@@ -88,7 +88,7 @@
         :deleteService="deleteDataStreamingService"
         :columns="getColumns"
         @on-load-data="handleLoadData"
-        emptyListMessage="No stream has been created."
+        emptyListMessage="No streams found."
       ></ListTableBlock>
       <EmptyResultsBlock
         v-else
