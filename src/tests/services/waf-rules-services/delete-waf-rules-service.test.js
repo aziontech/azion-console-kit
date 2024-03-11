@@ -35,7 +35,7 @@ describe('WafRulesServices', () => {
 
     const feedbackMessage = await sut(wafRuleIdMock)
 
-    expect(feedbackMessage).toBe('Waf rule successfully deleted')
+    expect(feedbackMessage).toBe('WAF rule successfully deleted')
   })
 
   it.each([
