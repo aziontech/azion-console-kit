@@ -232,6 +232,7 @@
   import PrimeDialog from 'primevue/dialog'
   import ContentBlock from '@/templates/content-block'
   import Sidebar from 'primevue/sidebar'
+  import { useSolutionStore } from '@/stores/solution-create'
   import Skeleton from 'primevue/skeleton'
   import FormLoading from '@/templates/template-engine-block/FormLoading'
   import PageHeadingBlock from '@/templates/page-heading-block'
@@ -269,12 +270,21 @@
     }
   })
 
+  const solutionStore = useSolutionStore()
+
   const loadSolutionByVendor = async () => {
     try {
       isLoading.value = true
       solution.value = await props.loadSolutionService({
         vendor: route.params.vendor,
         solution: route.params.solution
+      })
+      solutionStore.setSolution({
+        isv: solution.value.vendor.slug,
+        version: solution.value.version,
+        versionId: solution.value.latestVersionInstallTemplate,
+        solutionId: solution.value.id,
+        templateName: solution.value.name
       })
     } catch (error) {
       toast.add({
