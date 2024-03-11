@@ -33,7 +33,7 @@ const adapt = (httpResponse) => {
     http3: body.http3,
     websocket: body.websocket,
     supportedCiphers: body.supported_ciphers,
-    applicationAcceleration: body.application_acceleration,
+    applicationAccelerator: body.application_acceleration,
     caching: body.caching,
     deviceDetection: body.device_detection,
     edgeFirewall: body.edge_firewall,
