@@ -143,7 +143,7 @@
     v-else
     title="No device groups have been created"
     description="Click the button below to initiate the setup process and create your first device group."
-    createButtonLabel="Add"
+    createButtonLabel="Device Group"
     :documentationService="props.documentationService"
     :inTabs="true"
   >
@@ -152,7 +152,7 @@
         @click="openCreateDeviceGroupDrawer"
         severity="secondary"
         icon="pi pi-plus"
-        label="Add"
+        label="Device Group"
       />
     </template>
     <template #illustration>

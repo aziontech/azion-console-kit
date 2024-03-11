@@ -132,7 +132,7 @@
       v-else
       title="No resources have been created"
       description="Click the button below to initiate the setup process and create a resource for the service to run."
-      createButtonLabel="Add"
+      createButtonLabel="Resource"
       :documentationService="props.documentationServiceResource"
       :inTabs="true"
     >
@@ -140,7 +140,7 @@
         <PrimeButton
           severity="secondary"
           icon="pi pi-plus"
-          label="Add"
+          label="Resource"
           @click="openCreateServiceDrawer"
         />
       </template>

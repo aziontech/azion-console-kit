@@ -302,19 +302,19 @@
             <ListTableNoHeaderBlock
               ref="listEDNSResourcesRef"
               v-if="hasContentToList"
-              pageTitleDelete="Record"
-              addButtonLabel="Add"
+              pageTitleDelete="record"
+              addButtonLabel="Record"
               :editInDrawer="openEditDrawerEDNSResource"
               :columns="recordListColumns"
               :listService="listRecordsServiceEdgeDNSDecorator"
               :deleteService="deleteRecordsServiceEdgeDNSDecorator"
               @on-load-data="handleLoadData"
-              emptyListMessage="No Record found."
+              emptyListMessage="No records found."
             >
               <template #addButton>
                 <PrimeButton
                   icon="pi pi-plus"
-                  label="Add"
+                  label="Record"
                   @click="openCreateDrawerEDNSResource"
                 />
               </template>
@@ -324,7 +324,7 @@
               v-else
               title="No record has been created"
               description=" Click the button below to initiate the setup process and create your first record."
-              createButtonLabel="Add"
+              createButtonLabel="Record"
               createPagePath="records/create"
               :documentationService="documentationService"
               :inTabs="true"
@@ -333,7 +333,7 @@
                 <PrimeButton
                   severity="secondary"
                   icon="pi pi-plus"
-                  label="Add"
+                  label="Record"
                   @click="openCreateDrawerEDNSResource"
                 />
               </template>

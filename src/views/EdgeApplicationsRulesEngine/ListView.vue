@@ -187,7 +187,7 @@
   />
   <ListTableBlock
     ref="listRulesEngineRef"
-    pageTitleDelete="Rules Engine"
+    pageTitleDelete="rule"
     :reorderableRows="true"
     :columns="getColumns"
     :onReorderService="reorderRulesEngineWithDecorator"
@@ -229,7 +229,7 @@
             @click="openCreateRulesEngineDrawerByPhase"
             severity="secondary"
             icon="pi pi-plus"
-            label="Add Rule"
+            label="Rule"
           />
         </template>
         <template #illustration>

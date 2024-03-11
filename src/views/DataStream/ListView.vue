@@ -80,7 +80,7 @@
     <template #content>
       <ListTableBlock
         v-if="hasContentToList"
-        addButtonLabel="Add"
+        addButtonLabel="Stream"
         createPagePath="/data-stream/create"
         editPagePath="/data-stream/edit"
         pageTitleDelete="stream"
@@ -94,7 +94,7 @@
         v-else
         title="No stream has been created"
         description="Click the button below to initiate the setup process and create your first stream."
-        createButtonLabel="Add"
+        createButtonLabel="Stream"
         createPagePath="data-stream/create"
         :documentationService="documentationService"
       >

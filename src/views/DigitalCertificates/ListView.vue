@@ -11,7 +11,7 @@
         :columns="getColumns"
         pageTitleDelete="digital certificate"
         editPagePath="digital-certificates/edit"
-        addButtonLabel="Digital Certificates"
+        addButtonLabel="Digital Certificate"
         createPagePath="digital-certificates/create"
         @on-load-data="handleLoadData"
         emptyListMessage="No digital certificates found."
@@ -21,7 +21,7 @@
         v-else
         title="No digital certificates added"
         description="Create your first digital certificates."
-        createButtonLabel="Digital Certificates"
+        createButtonLabel="Digital Certificate"
         createPagePath="digital-certificates/create"
         :documentationService="documentationService"
       >

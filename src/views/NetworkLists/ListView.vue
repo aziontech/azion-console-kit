@@ -20,7 +20,7 @@
         v-else
         title="No network list added"
         description="Create a network list based on ASNs, countries, or IP addresses."
-        createButtonLabel="Network"
+        createButtonLabel="Network List"
         createPagePath="network-lists/create"
         :documentationService="documentationService"
       >

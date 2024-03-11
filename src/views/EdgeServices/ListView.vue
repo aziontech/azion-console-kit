@@ -107,7 +107,7 @@
         :listService="props.listEdgeServiceServices"
         :deleteService="props.deleteEdgeServiceServices"
         :columns="getColumns"
-        pageTitleDelete="Service"
+        pageTitleDelete="service"
         addButtonLabel="Service"
         createPagePath="edge-services/create"
         editPagePath="edge-services/edit"
@@ -120,7 +120,7 @@
         v-else
         title="No services have been created"
         description="Click the button below to initiate the setup process and create your first service."
-        createButtonLabel="Add"
+        createButtonLabel="Service"
         createPagePath="edge-services/create"
         :documentationService="props.documentationService"
       >

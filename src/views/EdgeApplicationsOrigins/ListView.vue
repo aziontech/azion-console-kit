@@ -168,7 +168,7 @@
     v-else
     title="No origins have been created"
     description="Click the button below to initiate the setup process and create your first origin."
-    createButtonLabel="Add"
+    createButtonLabel="Origin"
     :documentationService="props.documentationService"
     :inTabs="true"
   >
@@ -176,7 +176,7 @@
       <PrimeButton
         severity="secondary"
         icon="pi pi-plus"
-        label="Add"
+        label="Origin"
         @click="openCreateOriginDrawer"
       />
     </template>

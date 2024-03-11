@@ -7,7 +7,7 @@
       <ListTableBlock
         v-if="hasContentToList"
         pageTitleDelete="domain"
-        addButtonLabel="Domains"
+        addButtonLabel="Domain"
         createPagePath="domains/create"
         editPagePath="domains/edit"
         :listService="listDomainsService"
@@ -18,9 +18,9 @@
       />
       <EmptyResultsBlock
         v-else
-        title="You don't have any Domain created"
+        title="You don't have a domain created"
         description="Create your first domain."
-        createButtonLabel="Domains"
+        createButtonLabel="Domain"
         createPagePath="domains/create"
         :documentationService="documentationService"
       >
