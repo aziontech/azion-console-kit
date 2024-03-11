@@ -42,7 +42,6 @@
 </template>
 <script setup>
   defineOptions({ name: 'ContentBlock' })
-  import { windowOpen } from '@/helpers/window-open'
 
   import Message from 'primevue/message'
   import Avatar from 'primevue/avatar'

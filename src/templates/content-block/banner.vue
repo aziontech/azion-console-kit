@@ -33,7 +33,6 @@
 </template>
 <script setup>
   defineOptions({ name: 'BannerContentBlock' })
-  import { windowOpen } from '@/helpers/window-open'
 
   import Message from 'primevue/message'
   import Avatar from 'primevue/avatar'
