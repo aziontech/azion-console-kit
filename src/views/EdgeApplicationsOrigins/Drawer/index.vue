@@ -91,8 +91,8 @@
     hmacRegionName: '',
     hmacAccessKey: '',
     hmacSecretKey: '',
-    bucketName: '',
-    prefix: ''
+    bucketName: null,
+    prefix: null
   })
 
   const createFormDrawer = ref('')
@@ -101,7 +101,10 @@
   const validationSchema = yup.object({
     name: yup.string().required().label('Name'),
     originType: yup.string().required().label('Origin Type'),
-    hostHeader: yup.string().required().label('Host Header'),
+    hostHeader: yup.string().label('Host Header').when('originType', {
+      is: (originType) => originType !== 'object_storage',
+      then: (schema) => schema.required()
+    }),
     addresses: yup.array().when('originType', {
       is: (originType) => originType === 'object_storage',
       then: (schema) => schema.optional(),
