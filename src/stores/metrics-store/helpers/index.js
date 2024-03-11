@@ -1,6 +1,7 @@
 import ConvertBeholderToChart from './convert-beholder-to-chart'
 import GqlRules from './convert-report-meta-to-gql'
 import ExtractFiltersAndVariables from './extract-filters-and-variables'
+import FillResultQuery from './fill-result-query'
 import FiltersToGraphQLString from './filter-to-graphql-string'
 import FormatDatasetFilterToGql from './format-dataset-filter-to-gql'
 import FormatDatasetVariables from './format-dataset-variables'
@@ -14,6 +15,7 @@ import VerifyWhitelistFields from './verify-whitelist-fields'
 export {
   ConvertBeholderToChart,
   ExtractFiltersAndVariables,
+  FillResultQuery,
   FiltersToGraphQLString,
   FormatDatasetFilterToGql,
   FormatDatasetVariables,
