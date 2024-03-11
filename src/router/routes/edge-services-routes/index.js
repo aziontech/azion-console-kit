@@ -68,7 +68,7 @@ export const edgeServicesRoutes = {
             to: '/edge-services'
           },
           {
-            label: 'Edit Edge Services'
+            label: 'Edit Edge Service'
           }
         ]
       }

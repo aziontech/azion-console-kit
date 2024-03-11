@@ -41,7 +41,7 @@ export const intelligentDnsRoutes = {
             to: '/intelligent-dns'
           },
           {
-            label: 'Create Edge DNS',
+            label: 'Create Edge DNS Zone',
             to: '/intelligent-dns/create'
           }
         ]
@@ -66,7 +66,7 @@ export const intelligentDnsRoutes = {
             to: '/intelligent-dns'
           },
           {
-            label: 'Edit Edge DNS'
+            label: 'Edit Edge DNS Zone'
           }
         ]
       }
@@ -93,7 +93,7 @@ export const intelligentDnsRoutes = {
             to: '/intelligent-dns'
           },
           {
-            label: 'Edit Edge DNS'
+            label: 'Edit Edge DNS Record'
           }
         ]
       }

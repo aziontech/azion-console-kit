@@ -39,7 +39,7 @@ export const variablesRoutes = {
             to: '/variables'
           },
           {
-            label: 'Create Variables',
+            label: 'Create Variable',
             to: '/variables/create'
           }
         ]
@@ -61,7 +61,7 @@ export const variablesRoutes = {
             to: '/variables'
           },
           {
-            label: 'Edit Variables'
+            label: 'Edit Variable'
           }
         ]
       }
