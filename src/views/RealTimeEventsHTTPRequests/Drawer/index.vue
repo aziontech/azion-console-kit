@@ -109,7 +109,7 @@
           :tags="serverProtocolTag"
         >
           <template #body>
-            <div class="grid grid-cols-3 w-full ml-[1px] gap-4 lg:gap-8">
+            <div class="grid grid-cols-2 lg:grid-cols-3 w-full ml-[1px] gap-4 lg:gap-8">
               <BigNumber
                 label="Request Time"
                 sufix="ms"
@@ -207,7 +207,7 @@
           :tags="secureTag"
         >
           <template #body>
-            <div class="grid grid-cols-3 w-full gap-4 ml-0 mt-0">
+            <div class="grid grid-cols-2 lg:grid-cols-3 w-full ml-[1px] gap-4 lg:gap-8 mt-0">
               <BigNumber label="WAF Block">{{ details.wafBlock }}</BigNumber>
               <BigNumber label="WAF Total Blocked">{{ details.wafTotalBlocked }}</BigNumber>
               <BigNumber label="WAF Learning">{{ details.wafLearning }}</BigNumber>
