@@ -30,7 +30,7 @@
       type: Function,
       required: true
     },
-    isEnableApplicationAcceleration: {
+    isEnableApplicationAccelerator: {
       type: Boolean,
       required: true
     },
@@ -189,7 +189,7 @@
       <FormFieldsDrawerRulesEngine
         :initialPhase="initialPhase"
         :edgeApplicationId="props.edgeApplicationId"
-        :isEnableApplicationAcceleration="props.isEnableApplicationAcceleration"
+        :isEnableApplicationAccelerator="props.isEnableApplicationAccelerator"
         :isDeliveryProtocolHttps="props.isDeliveryProtocolHttps"
         :listEdgeApplicationFunctionsService="props.listEdgeApplicationFunctionsService"
         :listOriginsService="props.listOriginsService"
@@ -213,7 +213,7 @@
       <FormFieldsDrawerRulesEngine
         :selectedRulesEngineToEdit="selectedRulesEngineToEdit"
         :edgeApplicationId="props.edgeApplicationId"
-        :isEnableApplicationAcceleration="props.isEnableApplicationAcceleration"
+        :isEnableApplicationAccelerator="props.isEnableApplicationAccelerator"
         :isDeliveryProtocolHttps="props.isDeliveryProtocolHttps"
         :listEdgeApplicationFunctionsService="props.listEdgeApplicationFunctionsService"
         :listOriginsService="props.listOriginsService"
