@@ -87,7 +87,7 @@
   const handleTrackCreation = () => {
     tracker.productCreated({
       productName: 'Edge Application',
-      from: route.params.origin,
+      from: route.query.origin,
       createdFrom: 'singleEntity'
     })
   }

@@ -90,7 +90,7 @@
   })
 
   const goToCreateEdgeApplication = () => {
-    router.push({ name: 'create-edge-application', params: { origin: 'realTimeEvents' } })
+    router.push({ name: 'create-edge-application', query: { origin: 'realTimeEvents'  } })
   }
 
   const goToCreateWAF = () => {
