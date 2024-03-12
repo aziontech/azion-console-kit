@@ -39,6 +39,7 @@
           v-model="name"
           type="text"
           :class="{ 'p-invalid': nameError }"
+          placeholder="My service"
         />
         <small
           v-if="nameError"

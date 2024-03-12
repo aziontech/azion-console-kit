@@ -141,7 +141,7 @@
           </span>
         </div>
         <small class="text-xs text-color-secondary font-normal leading-5">
-          Activate or deactivate the team permissions for all clients within the team.
+          Activate or deactivate the team permissions for all users assigned to the team.
         </small>
       </div>
     </template>

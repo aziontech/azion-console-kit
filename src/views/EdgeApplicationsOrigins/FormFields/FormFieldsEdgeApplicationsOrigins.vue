@@ -229,7 +229,10 @@
           Select an option to customize the origin.
         </small>
       </div>
-      <div class="flex flex-col w-full sm:max-w-3xl gap-2" v-if="!isObjectStorageOriginType">
+      <div
+        class="flex flex-col w-full sm:max-w-3xl gap-2"
+        v-if="!isObjectStorageOriginType"
+      >
         <label class="text-color text-sm font-medium leading-5">Protocol Policy</label>
         <div class="flex flex-col gap-4">
           <div
@@ -285,7 +288,10 @@
           description="Define an origin for the content in FQDN format or an IPv4/IPv6 address."
         />
       </div>
-      <div class="flex flex-col sm:max-w-lg w-full gap-2" v-if="!isObjectStorageOriginType">
+      <div
+        class="flex flex-col sm:max-w-lg w-full gap-2"
+        v-if="!isObjectStorageOriginType"
+      >
         <FieldText
           label="Host Header *"
           placeholder="${host}"
@@ -294,7 +300,10 @@
           description="Identify a virtualhost sent in the Host header to the origin."
         />
       </div>
-      <div class="flex flex-col sm:max-w-lg w-full gap-2" v-if="!isObjectStorageOriginType">
+      <div
+        class="flex flex-col sm:max-w-lg w-full gap-2"
+        v-if="!isObjectStorageOriginType"
+      >
         <FieldText
           label="Path"
           placeholder="/path"
@@ -304,7 +313,10 @@
           blank, Azion will use the Address as the default."
         />
       </div>
-      <div class="flex flex-col sm:max-w-lg w-full gap-2" v-if="isObjectStorageOriginType">
+      <div
+        class="flex flex-col sm:max-w-lg w-full gap-2"
+        v-if="isObjectStorageOriginType"
+      >
         <FieldText
           label="Bucket Name *"
           name="bucketName"
@@ -312,7 +324,10 @@
           description="Name of the bucket created using Azion Edge Storage."
         />
       </div>
-      <div class="flex flex-col sm:max-w-lg w-full gap-2" v-if="isObjectStorageOriginType">
+      <div
+        class="flex flex-col sm:max-w-lg w-full gap-2"
+        v-if="isObjectStorageOriginType"
+      >
         <FieldText
           label="Prefix"
           name="prefix"
@@ -389,7 +404,8 @@
             :max="10"
           />
           <small class="text-xs text-color-secondary font-normal leading-5">
-            Assign a number from 0 to 10 to determine how much traffic this origin server can handle.
+            Assign a number from 0 to 10 to determine how much traffic this origin server can
+            handle.
           </small>
         </div>
         <div
@@ -418,8 +434,7 @@
             </div>
           </div>
           <small class="text-xs text-color-secondary font-normal leading-5">
-            Backup servers only receive HTTP requests
-            if all primary servers are unavailable.
+            Backup servers only receive HTTP requests if all primary servers are unavailable.
           </small>
         </div>
         <div class="flex w-full gap-2 items-start">

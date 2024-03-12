@@ -60,7 +60,7 @@
   </FormHorizontal>
   <FormHorizontal
     title="Token"
-    description="Save the credential to visualize and copy it."
+    description="Copy the credential token to use with Edge Orchestrator."
   >
     <template #inputs>
       <div class="flex flex-col w-full gap-2">

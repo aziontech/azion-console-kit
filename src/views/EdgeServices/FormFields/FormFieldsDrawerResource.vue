@@ -192,9 +192,8 @@
                 {{ contentError }}
               </small>
               <small class="text-xs text-color-secondary font-normal leading-5">
-                The content of the resource.<br />
-                You can add variables to the resource content by referencing the tag
-                <code>&#123;&#123; VARNAME &#125;&#125;</code><br />
+                The content of the resource. You can add variables to the resource content by referencing the tag
+                <code>&#123;&#123; VARNAME &#125;&#125;</code>.<br />
                 <strong>Shell Script</strong> resources must carry a shebang in the content header.
                 In the absence of one, the POSIX-compliant shell on the device
                 (<code>/bin/sh</code>) will be used.

@@ -33,7 +33,7 @@
 <template>
   <FormHorizontal
     title="General"
-    description="Create credentials to use and authenticate Edge Orchestrator services."
+    description="Create a credential to use and authenticate Edge Orchestrator services."
   >
     <template #inputs>
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
@@ -71,14 +71,14 @@
           :disabled="props.generatedToken"
         />
         <small class="text-xs text-color-secondary font-normal leading-5">
-          Description of credential, e.g.: Credential used for clients XYZ.
+          Description and purpose of credential.
         </small>
       </div>
     </template>
   </FormHorizontal>
   <FormHorizontal
     title="Token"
-    description="Save the credential to visualize and copy it."
+    description="Save the credential to generate the token for Edge Orchestrator."
   >
     <template #inputs>
       <div class="flex flex-col w-full gap-2">

@@ -102,7 +102,7 @@
 <template>
   <FormHorizontal
     title="General"
-    description="Choose a descriptive and easy to remember name. Include a description to specify the token's purpose or usage."
+    description=""
   >
     <template #inputs>
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
@@ -125,12 +125,14 @@
             :disabled="disabledFields"
           />
         </span>
-
         <small
           v-if="errorName"
           class="p-error text-xs font-normal leading-tight"
           >{{ errorName }}
         </small>
+        <small class="text-xs text-color-secondary font-normal leading-5">
+            Give a unique and descriptive name to identify the personal token.
+          </small>
       </div>
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
         <label
@@ -158,13 +160,16 @@
           class="p-error text-xs font-normal leading-tight"
           >{{ errorDescription }}
         </small>
+        <small class="text-xs text-color-secondary font-normal leading-5">
+          Include a description to specify the token's purpose or usage.
+        </small>
       </div>
     </template>
   </FormHorizontal>
 
   <FormHorizontal
     title="Token"
-    description="Define the token expiration date by selecting one of the suggested date ranges. For security matters, you can only copy the Personal Token right after you create it. In case you need the Personal Token code after that, you must create a new one."
+    description="Define the token expiration date by selecting one of the suggested date ranges. For security matters, the personal token will only be available right after it is created."
   >
     <template #inputs>
       <div class="flex flex-col gap-2">
