@@ -63,7 +63,7 @@
       label: 'Edge Storage',
       value: 'object_storage',
       disabled: false
-    },
+    }
   ]
 
   const initialValues = ref({
@@ -99,20 +99,24 @@
   const validationSchema = yup.object({
     name: yup.string().required().label('Name'),
     originType: yup.string().required().label('Origin Type'),
-    hostHeader: yup.string().label('Host Header').when('originType', {
-      is: (originType) => originType !== 'object_storage',
-      then: (schema) => schema.required()
-    }),
+    hostHeader: yup
+      .string()
+      .label('Host Header')
+      .when('originType', {
+        is: (originType) => originType !== 'object_storage',
+        then: (schema) => schema.required()
+      }),
     addresses: yup.array().when('originType', {
       is: (originType) => originType === 'object_storage',
       then: (schema) => schema.optional(),
-      otherwise: (schema) => schema.of(
-        yup.object().shape({
-          address: yup.string().label('Address').required(),
-          weight: yup.number().nullable().label('Weight'),
-          isActive: yup.boolean().default(true).label('Active')
-        })
-      ),
+      otherwise: (schema) =>
+        schema.of(
+          yup.object().shape({
+            address: yup.string().label('Address').required(),
+            weight: yup.number().nullable().label('Weight'),
+            isActive: yup.boolean().default(true).label('Active')
+          })
+        )
     }),
     originPath: yup
       .string()
@@ -142,10 +146,13 @@
         then: (schema) => schema.required()
       })
       .label('Secret Key'),
-    bucketName: yup.string().label('Bucket Name').when('originType', {
-      is: 'object_storage',
-      then: (schema) => schema.required()
-    }),
+    bucketName: yup
+      .string()
+      .label('Bucket Name')
+      .when('originType', {
+        is: 'object_storage',
+        then: (schema) => schema.required()
+      })
   })
 
   const editService = async (payload) => {
