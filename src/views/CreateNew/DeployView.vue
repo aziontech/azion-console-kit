@@ -133,6 +133,7 @@
   import Divider from 'primevue/divider'
   import ContentBlock from '@/templates/content-block'
   import { useRoute, useRouter } from 'vue-router'
+  import { useSolutionStore } from '@/stores/solution-create'
   import PageHeadingBlock from '@/templates/page-heading-block'
   import PrimeButton from 'primevue/button'
   import ScriptRunnerBlock from '@/templates/script-runner-block'
@@ -164,6 +165,7 @@
   const seconds = ref(0)
   const intervalRef = ref()
   const deployFailed = ref(false)
+  const solutionStore = useSolutionStore()
   const failMessage =
     'There was an issue while creating the edge application. Check the Deploy Log for more details.'
   const nextSteps = ref([
@@ -196,16 +198,16 @@
         detail:
           'The edge application is being propagated through the edge nodes. This process will take a few minutes.'
       })
-      tracker.eventDeployed().track()
+      tracker.eventDeployed(solutionStore.solution).track()
     } catch (error) {
       deployFailed.value = true
       toast.add({
         closable: true,
         severity: 'error',
-        summary: 'Creation failed',
+        summary: 'Creation Failed',
         detail: failMessage
       })
-      tracker.eventFailedDeployed().track()
+      tracker.eventFailedDeployed(solutionStore.solution).track()
     }
   }
 
