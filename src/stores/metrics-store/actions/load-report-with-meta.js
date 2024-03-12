@@ -1,6 +1,6 @@
 import { useAccountStore } from '@/stores/account'
 import { BeholderService } from '@services/metrics-services'
-import { ConvertBeholderToChart, GqlRules } from '../helpers'
+import { ConvertBeholderToChart, FillResultQuery, GqlRules } from '../helpers'
 
 /**
  * Removes unfinished register from the given registers based on filterEndDatetime and currentEndDatetime.
@@ -74,6 +74,12 @@ export default async (filters, report) => {
   let resultQuery = resultQueryRaw
 
   const dataset = Object.keys(resultQueryRaw)
+
+  if (dataset) {
+    const props = { tsRangeFilter: filters.tsRange, data: resultQuery[dataset] }
+
+    resultQuery[dataset] = FillResultQuery(props)
+  }
 
   const hasDataset = dataset && resultQueryRaw[dataset].length > 1
 
