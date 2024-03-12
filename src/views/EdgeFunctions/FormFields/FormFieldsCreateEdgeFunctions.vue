@@ -70,6 +70,7 @@
               id="name"
               type="text"
               :class="{ 'p-invalid': nameError }"
+              placeholder="My function"
             />
             <small class="text-xs text-color-secondary font-normal leading-5">
               Give a unique and descriptive name to identify the function.</small

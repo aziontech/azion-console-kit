@@ -52,7 +52,7 @@
           label="Name *"
           name="name"
           v-model="name"
-          description="Give a unique and descriptive name to identify the edge firewall function."
+          description="Give a unique and descriptive name to identify the edge firewall function instance."
           placeholder="My edge firewall function instance"
         />
       </div>

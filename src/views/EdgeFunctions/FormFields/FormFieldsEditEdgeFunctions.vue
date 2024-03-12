@@ -88,6 +88,7 @@
               id="name"
               type="text"
               :class="{ 'p-invalid': nameError }"
+              placeholder="My function"
             />
             <small
               v-if="nameError"
