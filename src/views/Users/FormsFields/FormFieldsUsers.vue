@@ -153,9 +153,10 @@
 </script>
 
 <template>
-  <FormHorizontal 
+  <FormHorizontal
     title="Profile"
-    description="Provide personal information to add a new user to Azion Console.">
+    description="Provide personal information to add a new user to Azion Console."
+  >
     <template #inputs>
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
         <label
@@ -249,9 +250,10 @@
     </template>
   </FormHorizontal>
 
-  <FormHorizontal 
+  <FormHorizontal
     title="Contact Information"
-    description="Include contact information for the user to verify the account.">
+    description="Include contact information for the user to verify the account."
+  >
     <template #inputs>
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
         <label

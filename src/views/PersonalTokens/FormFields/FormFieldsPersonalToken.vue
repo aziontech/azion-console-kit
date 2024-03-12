@@ -131,8 +131,8 @@
           >{{ errorName }}
         </small>
         <small class="text-xs text-color-secondary font-normal leading-5">
-            Give a unique and descriptive name to identify the personal token.
-          </small>
+          Give a unique and descriptive name to identify the personal token.
+        </small>
       </div>
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
         <label

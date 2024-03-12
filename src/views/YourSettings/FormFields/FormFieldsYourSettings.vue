@@ -193,9 +193,10 @@
       </div>
     </template>
   </FormHorizontal>
-  <FormHorizontal 
+  <FormHorizontal
     title="Contact Information"
-    description="Modify the contact information for the account.">
+    description="Modify the contact information for the account."
+  >
     <template #inputs>
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
         <label
@@ -268,9 +269,10 @@
     </template>
   </FormHorizontal>
 
-  <FormHorizontal 
+  <FormHorizontal
     title="Security Settings"
-    description="Modify password and confirm the password to save the new settings. Account Owners can enable or disable MFA for the account.">
+    description="Modify password and confirm the password to save the new settings. Account Owners can enable or disable MFA for the account."
+  >
     <template #inputs>
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
         <label
