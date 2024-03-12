@@ -19,6 +19,25 @@
       required: true
     }
   })
+
+  const upstreamConnectTimeTooltip =
+    'Time it takes for the edge to establish a connection with the origin in milliseconds. In the case of TLS, it includes time spent on handshake.'
+  const upstreamHeaderTimeTooltip =
+    'Time it takes for the edge to receive the response header from the origin in milliseconds.'
+  const upstreamResponseTimeTooltip =
+    'Time it takes for the edge to receive a default response from the origin in milliseconds, including headers and body.'
+  const upstreamBytesReceivedTooltip =
+    'Number of bytes received by the origin’s edge if the content isn’t cached.'
+  const requestTimeTooltip =
+    'Request processing time elapsed since the first bytes were read from the client with resolution in milliseconds. This field is the result of a sum.'
+  const tcpInfoRttTooltip =
+    'Round-Trip Time (RTT) measured by the edge for the user. Available on systems that support the TCP_INFO socket option.'
+  const requestLengthTooltip =
+    'Request length, including request line, headers, and body. This field is the result of a sum.'
+  const bytesSentTooltip = 'Number of bytes sent to a client. This field is the result of a sum.'
+  const cacheTtlTooltip =
+    'Time, in seconds, the cached object is considered valid (not expired). After the time expiration, when a new request occurs, L2 Caching queries the data on the origin (upstream).'
+
   const details = ref({})
   const showDrawer = ref(false)
   const toast = useToast()
@@ -137,30 +156,35 @@
               <BigNumber
                 label="Request Time"
                 sufix="ms"
+                :tooltipMessage="requestTimeTooltip"
               >
                 {{ details.requestTime }}
               </BigNumber>
               <BigNumber
                 label="TCP Info RTT"
                 sufix="ms"
+                :tooltipMessage="tcpInfoRttTooltip"
               >
                 {{ details.tcpinfoRtt }}
               </BigNumber>
               <BigNumber
                 label="Request Length"
                 sufix="lines"
+                :tooltipMessage="requestLengthTooltip"
               >
                 {{ details.requestLength }}
               </BigNumber>
               <BigNumber
                 label="Bytes Sent"
                 sufix="ms"
+                :tooltipMessage="bytesSentTooltip"
               >
                 {{ details.bytesSent }}
               </BigNumber>
               <BigNumber
                 label="Cache TTL"
                 sufix="s"
+                :tooltipMessage="cacheTtlTooltip"
               >
                 {{ details.cacheTtl }}
               </BigNumber>
@@ -196,6 +220,7 @@
                 label="Upstream Connect Time"
                 sufix="ms"
                 class="flex-1"
+                :tooltipMessage="upstreamConnectTimeTooltip"
               >
                 {{ details.upstreamConnectTime }}
               </BigNumber>
@@ -203,6 +228,7 @@
                 label="Upstream Header Time"
                 sufix="ms"
                 class="flex-1"
+                :tooltipMessage="upstreamHeaderTimeTooltip"
               >
                 {{ details.upstreamHeaderTime }}
               </BigNumber>
@@ -210,6 +236,7 @@
                 label="Upstream Response Time"
                 sufix="ms"
                 class="flex-1"
+                :tooltipMessage="upstreamResponseTimeTooltip"
               >
                 {{ details.upstreamResponseTime }}
               </BigNumber>
@@ -217,6 +244,7 @@
                 label="Upstream Bytes Received"
                 sufix="ms"
                 class="flex-1"
+                :tooltipMessage="upstreamBytesReceivedTooltip"
               >
                 {{ details.upstreamBytesReceived }}
               </BigNumber>
