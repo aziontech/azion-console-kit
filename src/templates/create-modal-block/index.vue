@@ -57,7 +57,7 @@
     },
     {
       label: 'Edge DNS',
-      to: '/intelligent-dns/create',
+      to: '/edge-dns/create',
       description: 'Use an authoritative DNS server to host a domain.'
     },
     {

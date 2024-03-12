@@ -790,7 +790,7 @@ const REPORTS = [
     id: '357843490139298789',
     chartOwner: 'azion',
     label: 'Total Queries',
-    description: DASHBOARDS_TEXTS.intelligent_dns.standard_queries.total_queries.description,
+    description: DASHBOARDS_TEXTS.edge_dns.standard_queries.total_queries.description,
     aggregationType: 'sum',
     columns: 6,
     type: 'line',
@@ -810,7 +810,7 @@ const REPORTS = [
     orderDirection: 'ASC',
     dashboardId: '357549371218199119',
     variationType: 'regular',
-    helpCenterPath: HELP_CENTER_URLS.intelligentDns.standardQueries.totalQueries
+    helpCenterPath: HELP_CENTER_URLS.edgeDns.standardQueries.totalQueries
   },
   /**
    * OBSERVE

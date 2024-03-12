@@ -232,6 +232,7 @@
   import PrimeDialog from 'primevue/dialog'
   import ContentBlock from '@/templates/content-block'
   import Sidebar from 'primevue/sidebar'
+  import { useSolutionStore } from '@/stores/solution-create'
   import Skeleton from 'primevue/skeleton'
   import FormLoading from '@/templates/template-engine-block/FormLoading'
   import PageHeadingBlock from '@/templates/page-heading-block'
@@ -270,6 +271,8 @@
     }
   })
 
+  const solutionStore = useSolutionStore()
+
   const loadSolutionByVendor = async () => {
     try {
       isLoading.value = true
@@ -277,13 +280,15 @@
         vendor: route.params.vendor,
         solution: route.params.solution
       })
+
       solutionTrackerData.value = {
-        templateName: solution.value.name,
-        solutionId: solution.value.id,
+        isv: solution.value.vendor.slug,
         version: solution.value.version,
         versionId: solution.value.latestVersionInstallTemplate,
-        isv: solution.value.vendor.name
+        solutionId: solution.value.id,
+        templateName: solution.value.name
       }
+      solutionStore.setSolution(solutionTrackerData.value)
     } catch (error) {
       toast.add({
         closable: true,
@@ -310,8 +315,7 @@
 
   const handleInstantiate = ({ result }) => {
     router.push({
-      path: `/create/deploy/${result.uuid}`,
-      query: { solution: JSON.stringify(solutionTrackerData.value) }
+      path: `/create/deploy/${result.uuid}`
     })
   }
 
