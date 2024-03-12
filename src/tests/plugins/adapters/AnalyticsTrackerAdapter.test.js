@@ -281,12 +281,19 @@ describe('AnalyticsTrackerAdapter', () => {
 
   it('should use the deployed event with correct parameters', () => {
     const { sut, analyticsClientSpy } = makeSut()
+    const propsMock = {
+      isv: 'vendor',
+      version: '1.0',
+      versionId: '123',
+      solutionId: '123',
+      templateName: 'name'
+    }
 
-    sut.eventDeployed({})
+    sut.eventDeployed({...propsMock})
 
     sut.track()
 
-    expect(analyticsClientSpy.track).toHaveBeenCalledWith('Deployed', {})
+    expect(analyticsClientSpy.track).toHaveBeenCalledWith('Deployed', propsMock)
   })
 
   it('should track the account activation event with the correct parameters', () => {
@@ -299,12 +306,19 @@ describe('AnalyticsTrackerAdapter', () => {
 
   it('should use the failed deployed event with correct parameters', () => {
     const { sut, analyticsClientSpy } = makeSut()
+    const propsMock = {
+      isv: 'vendor',
+      version: '1.0',
+      versionId: '123',
+      solutionId: '123',
+      templateName: 'name'
+    }
 
-    sut.eventFailedDeployed({})
+    sut.eventFailedDeployed({...propsMock})
 
     sut.track()
 
-    expect(analyticsClientSpy.track).toHaveBeenCalledWith('Failed to Deploy', {})
+    expect(analyticsClientSpy.track).toHaveBeenCalledWith('Failed to Deploy', propsMock)
   })
 
   it('should be able to track click to create event with correct params', () => {
