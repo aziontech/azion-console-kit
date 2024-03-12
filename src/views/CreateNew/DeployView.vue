@@ -246,7 +246,7 @@
   const handleTrackCreation = () => {
     const trackerData = {
       productName: 'Edge Application',
-      from: 'marketplace',
+      from: 'create',
       createdFrom: 'template',
       ...solutionStore.solution
     }
