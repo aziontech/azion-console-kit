@@ -43,7 +43,7 @@
       required: true,
       type: Function
     },
-    isEnableApplicationAcceleration: {
+    isEnableApplicationAccelerator: {
       required: true,
       type: Boolean
     },
@@ -172,7 +172,7 @@
 <template>
   <DrawerRulesEngine
     ref="drawerRulesEngineRef"
-    :isEnableApplicationAcceleration="props.isEnableApplicationAcceleration"
+    :isEnableApplicationAccelerator="props.isEnableApplicationAccelerator"
     :isDeliveryProtocolHttps="props.isDeliveryProtocolHttps"
     :listEdgeApplicationFunctionsService="props.listEdgeApplicationFunctionsService"
     :listOriginsService="props.listOriginsService"

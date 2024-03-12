@@ -241,7 +241,7 @@
           :class="{ 'p-invalid': cdnCacheSettingsMaximumTtlError }"
         />
         <small class="text-color-secondary text-xs font-normal leading-5">
-          Enable Application Acceleration in the Main Settings tab to use values lower than 60
+          Enable Application Accelerator in the Main Settings tab to use values lower than 60
           seconds. Tiered Cache requires cache TTL to be equal to or greater than 3 seconds.
         </small>
         <small

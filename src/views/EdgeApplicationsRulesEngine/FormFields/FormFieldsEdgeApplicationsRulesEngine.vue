@@ -14,7 +14,7 @@
   import { useToast } from 'primevue/usetoast'
 
   const props = defineProps({
-    isEnableApplicationAcceleration: {
+    isEnableApplicationAccelerator: {
       type: Boolean,
       required: true
     },
@@ -66,18 +66,18 @@
 
   const behaviorsRequestOptions = ref([
     {
-      label: 'Add Request Cookie - requires Application Acceleration',
+      label: 'Add Request Cookie - requires Application Accelerator',
       value: 'add_request_cookie',
       requires: true
     },
     { label: 'Add Request Header', value: 'add_request_header', requires: false },
     {
-      label: 'Bypass Cache - requires Application Acceleration',
+      label: 'Bypass Cache - requires Application Accelerator',
       value: 'bypass_cache_phase',
       requires: true
     },
     {
-      label: 'Capture Match Groups - requires Application Acceleration',
+      label: 'Capture Match Groups - requires Application Accelerator',
       value: 'capture_match_groups',
       requires: true
     },
@@ -85,13 +85,13 @@
     { label: 'Deny (403 Forbidden)', value: 'deny', requires: false },
     { label: 'Enable Gzip', value: 'enable_gzip', requires: false },
     {
-      label: 'Filter Request Cookie - requires Application Acceleration',
+      label: 'Filter Request Cookie - requires Application Accelerator',
       value: 'filter_request_cookie',
       requires: true
     },
     { label: 'Filter Request Header', value: 'filter_request_header', requires: false },
     {
-      label: 'Forward Cookies - requires Application Acceleration',
+      label: 'Forward Cookies - requires Application Accelerator',
       value: 'forward_cookies',
       requires: true
     },
@@ -105,7 +105,7 @@
     { label: 'Redirect To (301 Moved Permanently)', value: 'redirect_to_301', requires: false },
     { label: 'Redirect To (302 Found)', value: 'redirect_to_302', requires: false },
     {
-      label: 'Rewrite Request - requires Application Acceleration',
+      label: 'Rewrite Request - requires Application Accelerator',
       value: 'rewrite_request',
       requires: true
     },
@@ -116,20 +116,20 @@
 
   const behaviorsResponseOptions = ref([
     {
-      label: 'Add Response Cookie - requires Application Acceleration',
+      label: 'Add Response Cookie - requires Application Accelerator',
       value: 'add_response_cookie',
       requires: true
     },
     { label: 'Add Response Header', value: 'add_response_header', requires: false },
     {
-      label: 'Capture Match Groups - requires Application Acceleration',
+      label: 'Capture Match Groups - requires Application Accelerator',
       value: 'capture_match_groups',
       requires: true
     },
     { label: 'Deliver', value: 'deliver', requires: false },
     { label: 'Enable Gzip', value: 'enable_gzip', requires: false },
     {
-      label: 'Filter Response Cookie - requires Application Acceleration',
+      label: 'Filter Response Cookie - requires Application Accelerator',
       value: 'filter_response_cookie',
       requires: true
     },
@@ -317,7 +317,7 @@
    * Updates the 'requires' property of behavior options based on component props.
    * This function checks if the behavior option is 'redirect_http_to_https' and sets the 'requires'
    * property based on the 'isDeliveryProtocolHttps' prop. For other options that have 'requires' as true,
-   * it sets the 'requires' property based on the 'isEnableApplicationAcceleration' prop.
+   * it sets the 'requires' property based on the 'isEnableApplicationAccelerator' prop.
    * @param {Array} options - The behavior options to update.
    * @returns {Array} The updated array of behavior options with the 'requires' property set accordingly.
    */
@@ -329,7 +329,7 @@
           requires:
             option.value === 'redirect_http_to_https'
               ? !props.isDeliveryProtocolHttps
-              : !props.isEnableApplicationAcceleration
+              : !props.isEnableApplicationAccelerator
         }
       }
       return option
@@ -627,7 +627,7 @@
   onMounted(() => {
     updateBehaviorsOptionsRequires()
 
-    if (props.isEnableApplicationAcceleration) {
+    if (props.isEnableApplicationAccelerator) {
       if (criteria.value[0] && !isEditDrawer.value) {
         criteria.value[0].value[0].variable = ''
       }
@@ -751,7 +751,7 @@
               <div
                 class="p-inputgroup-addon"
                 :class="{
-                  'opacity-20': !props.isEnableApplicationAcceleration || checkPhaseIsDefaultValue
+                  'opacity-20': !props.isEnableApplicationAccelerator || checkPhaseIsDefaultValue
                 }"
               >
                 <i class="pi pi-dollar"></i>
@@ -761,7 +761,7 @@
                 v-model="criteria[criteriaIndex].value[conditionalIndex].variable"
                 :suggestions="variableItems"
                 @complete="searchVariableOption"
-                :disabled="!props.isEnableApplicationAcceleration || checkPhaseIsDefaultValue"
+                :disabled="!props.isEnableApplicationAccelerator || checkPhaseIsDefaultValue"
                 :completeOnFocus="true"
               />
             </div>
@@ -790,7 +790,7 @@
 
         <div
           class="flex gap-2 mb-8"
-          v-if="props.isEnableApplicationAcceleration && !checkPhaseIsDefaultValue"
+          v-if="props.isEnableApplicationAccelerator && !checkPhaseIsDefaultValue"
         >
           <PrimeButton
             icon="pi pi-plus-circle"
@@ -811,7 +811,7 @@
         </div>
 
         <div
-          v-if="props.isEnableApplicationAcceleration && !checkPhaseIsDefaultValue"
+          v-if="props.isEnableApplicationAccelerator && !checkPhaseIsDefaultValue"
           class="flex items-center gap-2"
         >
           <Divider type="solid" />
@@ -831,7 +831,7 @@
           />
         </div>
       </div>
-      <div v-if="props.isEnableApplicationAcceleration && !checkPhaseIsDefaultValue">
+      <div v-if="props.isEnableApplicationAccelerator && !checkPhaseIsDefaultValue">
         <PrimeButton
           icon="pi pi-plus-circle"
           label="Add Criteria"
