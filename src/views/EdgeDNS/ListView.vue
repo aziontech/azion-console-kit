@@ -22,7 +22,7 @@
         :listService="listEdgeDNSService"
         :deleteService="deleteEdgeDNSService"
         :columns="getColumns"
-        pageTitleDelete="Edge DNS zone"
+        pageTitleDelete="zone"
         addButtonLabel="Zone"
         createPagePath="edge-dns/create"
         editPagePath="edge-dns/edit"

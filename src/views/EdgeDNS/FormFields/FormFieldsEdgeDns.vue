@@ -20,7 +20,7 @@
 <template>
   <FormHorizontal
     title="General"
-    description="Create zones to host your domain on Azion's distributed infrastructure."
+    description="Create zones to host your domains on Azion's distributed infrastructure."
   >
     <template #inputs>
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
@@ -37,7 +37,7 @@
           :class="{ 'p-invalid': errorName }"
         />
         <small class="text-xs text-color-secondary font-normal leading-5">
-          Give a unique and descriptive name.</small
+          Give a unique and descriptive name to identify your zone.</small
         >
         <small
           v-if="errorName"
@@ -49,7 +49,7 @@
   </FormHorizontal>
   <FormHorizontal
     title="Domain"
-    description="Provide a name to the domain you want to host."
+    description="Provide the domain name you want to host."
   >
     <template #inputs>
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
@@ -66,7 +66,7 @@
           :class="{ 'p-invalid': errorDomain }"
         />
         <small class="text-xs text-color-secondary font-normal leading-5">
-          Add the full domain host name. Example: <code>mydomain.com</code>.</small
+          Add the root domain name. Example: <code>mydomain.com</code>.</small
         >
         <small
           v-if="errorDomain"

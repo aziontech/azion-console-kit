@@ -97,6 +97,10 @@
           :options="editorOptions"
           class="min-h-[200px] overflow-clip surface-border border rounded-md"
         />
+        <small class="text-xs text-color-secondary font-normal leading-5">
+          Customize the arguments in JSON format. Once set, they can be called in code using
+          <code>event.args("arg_name")</code>.
+        </small>
       </div>
     </template>
   </FormHorizontal>

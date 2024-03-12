@@ -347,9 +347,10 @@
           :class="{ 'p-invalid': queryStringFieldsError }"
           rows="5"
           cols="30"
+          placeholder="name"
         />
-        <small class="text-color-secondary text-sm font-normal leading-5">
-          Separate fields using line breaks.
+        <small class="text-xs text-color-secondary font-normal leading-5">
+          Separate query fields using line breaks.
         </small>
         <small class="p-error">{{ queryStringFieldsError }}</small>
       </div>
@@ -469,9 +470,10 @@
           :class="{ 'p-invalid': cookieNamesError }"
           rows="5"
           cols="30"
+          placeholder="cookie_name"
         />
-        <small class="text-color-secondary text-sm font-normal leading-5">
-          Separate fields using line breaks.
+        <small class="text-xs text-color-secondary font-normal leading-5">
+          Separate cookies using line breaks.
         </small>
         <small class="p-error">{{ cookieNamesError }}</small>
       </div>
