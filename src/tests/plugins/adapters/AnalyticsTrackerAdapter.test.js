@@ -289,7 +289,7 @@ describe('AnalyticsTrackerAdapter', () => {
       templateName: 'name'
     }
 
-    sut.eventDeployed({...propsMock})
+    sut.eventDeployed({ ...propsMock })
 
     sut.track()
 
@@ -314,7 +314,7 @@ describe('AnalyticsTrackerAdapter', () => {
       templateName: 'name'
     }
 
-    sut.eventFailedDeployed({...propsMock})
+    sut.eventFailedDeployed({ ...propsMock })
 
     sut.track()
 
