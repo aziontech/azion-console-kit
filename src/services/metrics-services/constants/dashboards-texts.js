@@ -103,7 +103,7 @@ const DASHBOARDS_TEXTS = {
     waf: {
       threats_vs_requests: {
         description:
-          'Sum of attacks processed by WAF. Displays the total amount of WAF Requests Blocked, WAF Requests Threats, and WAF Requests Allowed.'
+          'Sum of attacks processed by WAF. Displays the total amount of Waf Requests Blocked, Waf Requests Threats, and Waf Requests Allowed.'
       },
       cross_site_scripting_xss_threats: {
         description:

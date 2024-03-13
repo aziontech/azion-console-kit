@@ -46,7 +46,7 @@
     :cleanSelectData="cleanSelectData"
     :showselectionMode="true"
     :editInDrawer="openMoreDetails"
-    emptyListMessage="No WAF rules tuning found."
+    emptyListMessage="No requests found."
   >
     <template #header>
       <advancedFilter

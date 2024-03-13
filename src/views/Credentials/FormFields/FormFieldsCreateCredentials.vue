@@ -71,7 +71,7 @@
           :disabled="props.generatedToken"
         />
         <small class="text-xs text-color-secondary font-normal leading-5">
-          Description and purpose of credential.
+          Description and purpose of the credential.
         </small>
       </div>
     </template>

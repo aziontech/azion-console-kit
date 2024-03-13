@@ -169,7 +169,7 @@
 
   <FormHorizontal
     title="Token"
-    description="Define the token expiration date by selecting one of the suggested date ranges. For security matters, the personal token will only be available right after it is created."
+    description="Define the token expiration date by selecting one of the suggested date ranges. For security matters, the personal token will only be available right after it's created."
   >
     <template #inputs>
       <div class="flex flex-col gap-2">
