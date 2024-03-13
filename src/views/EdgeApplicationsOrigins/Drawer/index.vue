@@ -4,7 +4,7 @@
   import EditDrawerBlock from '@templates/edit-drawer-block'
   import { refDebounced } from '@vueuse/core'
   import { useToast } from 'primevue/usetoast'
-  import { inject, ref } from 'vue'
+  import { ref, inject } from 'vue'
   import * as yup from 'yup'
   /**@type {import('@/plugins/adapters/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
