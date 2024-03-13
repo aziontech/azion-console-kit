@@ -4,8 +4,10 @@
   import EditDrawerBlock from '@templates/edit-drawer-block'
   import { refDebounced } from '@vueuse/core'
   import { useToast } from 'primevue/usetoast'
-  import { ref } from 'vue'
+  import { ref, inject } from 'vue'
   import * as yup from 'yup'
+  /**@type {import('@/plugins/adapters/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
+  const tracker = inject('tracker')
   defineOptions({ name: 'drawer-origin' })
 
   const emit = defineEmits(['onSuccess'])
@@ -203,6 +205,14 @@
     showEditOriginDrawer.value = false
   }
 
+  const handleTrackCreation = () => {
+    tracker
+      .productCreated({
+        productName: 'Origin'
+      })
+      .track()
+  }
+
   const copyToKey = async (originKey) => {
     props.clipboardWrite(originKey)
 
@@ -240,6 +250,7 @@
   }
 
   const handleCreateOrigin = (feedback) => {
+    handleTrackCreation()
     createFormDrawer.value.scrollOriginKey()
     originKey.value = feedback.originKey
     emit('onSuccess')
