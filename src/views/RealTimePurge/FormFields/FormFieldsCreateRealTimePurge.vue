@@ -2,6 +2,7 @@
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
   import RadioButton from 'primevue/radiobutton'
   import Card from 'primevue/card'
+  import PrimeButton from 'primevue/button'
   import PrimeTextarea from 'primevue/textarea'
   import { useField } from 'vee-validate'
   import { computed } from 'vue'
@@ -19,6 +20,13 @@
     }
     return 'www.example.com'
   })
+
+  const props = defineProps({
+    contactSalesRealTimePurgeService: {
+      type: Function,
+      required: true
+    }
+  })
 </script>
 
 <template>
@@ -33,9 +41,8 @@
             <label class="text-color text-base font-medium">Default Layer</label>
             <div class="flex flex-col gap-3">
               <Card
-                :class="layer === 'edge_cache' ? 'border border-orange-500' : ''"
                 :pt="{
-                  body: { class: 'p-4 rounded-md' },
+                  body: { class: 'p-4 border border-orange-500 rounded-md' },
                   title: { class: 'flex items-center gap-3 text-base m-0 font-medium' },
                   subtitle: {
                     class: 'text-sm font-normal ml-8 text-color-secondary m-0 pr-0 md:pr-[2.5rem]'
@@ -46,7 +53,8 @@
                   <RadioButton
                     inputId="inputId1"
                     name="layer"
-                    value="edge_cache"
+                    value="edge_caching"
+                    :disabled="true"
                     v-model="layer"
                   />
                   <span class="text-base">Edge Cache</span>
@@ -60,9 +68,8 @@
             <label class="text-color text-base font-medium">Subscription Layer</label>
             <div class="flex flex-col gap-3">
               <Card
-                :class="layer === 'tiered_cache' ? 'border border-orange-500' : ''"
                 :pt="{
-                  body: { class: 'p-4' },
+                  body: { class: 'p-4 opacity-50' },
                   title: { class: 'flex items-center gap-3 text-base m-0 font-medium' },
                   subtitle: {
                     class: 'text-sm font-normal ml-8 text-color-secondary m-0 pr-0 md:pr-[2.5rem]'
@@ -73,7 +80,8 @@
                   <RadioButton
                     inputId="inputId1"
                     name="layer"
-                    value="tiered_cache"
+                    :disabled="true"
+                    value="l2_caching"
                     v-model="layer"
                   />
                   <span class="text-base">Tiered Cache</span>
@@ -84,6 +92,13 @@
                 >
               </Card>
             </div>
+            <PrimeButton
+              outlined
+              icon="pi pi-shopping-cart"
+              class="max-w-[150px] mt-4"
+              label="Contact Sales"
+              @click="props.contactSalesRealTimePurgeService()"
+            />
           </div>
         </div>
       </template>

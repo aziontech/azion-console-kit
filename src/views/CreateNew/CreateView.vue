@@ -306,15 +306,7 @@
   }
 
   const openDetails = () => {
-    tracker
-      .clickMoreDetailsOnTemplate({
-        templateName: solution.value.name,
-        solutionId: solution.value.id,
-        version: solution.value.version,
-        versionId: solution.value.latestVersionInstallTemplate,
-        isv: solution.value.vendor.name
-      })
-      .track()
+    tracker.clickMoreDetailsOnTemplate().track()
     showDetails.value = true
   }
 
