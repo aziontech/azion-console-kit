@@ -216,12 +216,21 @@ export class AnalyticsTrackerAdapter {
   }
 
   /**
+   * @param {Object} payload
+   * @param {'api'|'field'} payload.errorType
+   * @param {string} payload.fieldName
+   * @param {string} payload.errorMessage
+   *
    * @returns {AnalyticsTrackerAdapter}
    */
-  userFailedSignUp() {
+  userFailedSignUp(payload) {
     this.#events.push({
       eventName: 'User Failed to Sign Up',
-      props: {}
+      props: {
+        errorType: payload.errorType,
+        fieldName: payload.fieldName,
+        errorMessage: payload.errorMessage
+      }
     })
     return this
   }
@@ -255,12 +264,26 @@ export class AnalyticsTrackerAdapter {
   }
 
   /**
+   * @param {Object} payload
+   * @param {string} payload.templateName
+   * @param {string} payload.solutionId
+   * @param {string} payload.version
+   * @param {string} payload.versionId
+   * @param {string} payload.isv
+   * @param {string} payload.isvId
    * @returns {AnalyticsTrackerAdapter}
    */
-  clickMoreDetailsOnTemplate() {
+  clickMoreDetailsOnTemplate(payload) {
     this.#events.push({
       eventName: 'Clicked to View More Details on Template',
-      props: {}
+      props: {
+        templateName: payload.templateName,
+        solutionId: payload.solutionId,
+        version: payload.version,
+        versionId: payload.versionId,
+        isv: payload.isv,
+        isvId: payload.isvId
+      }
     })
     return this
   }
