@@ -234,10 +234,15 @@ describe('AnalyticsTrackerAdapter', () => {
 
   it('should track the user failed to sign-up event with the correct parameters', () => {
     const { sut, analyticsClientSpy } = makeSut()
+    const propsMock = {
+      errorType: 'api',
+      fieldName: 'email',
+      errorMessage: 'Invalid email'
+    }
 
-    sut.userFailedSignUp().track()
+    sut.userFailedSignUp({ ...propsMock }).track()
 
-    expect(analyticsClientSpy.track).toHaveBeenCalledWith('User Failed to Sign Up', {})
+    expect(analyticsClientSpy.track).toHaveBeenCalledWith('User Failed to Sign Up', propsMock)
   })
 
   it('should track the failed additional data submit event with the correct parameters', () => {
@@ -269,13 +274,34 @@ describe('AnalyticsTrackerAdapter', () => {
   it('should use the View More Details on Template event with correct parameters', () => {
     const { sut, analyticsClientSpy } = makeSut()
 
-    sut.clickMoreDetailsOnTemplate({})
+    const templateNameMock = 'string'
+    const solutionIdMock = 'solutionId'
+    const versionMock = 'version'
+    const versionIdMock = 'versionID'
+    const isvMock = 'isv'
+    const isvIdMock = 'isvId'
+
+    sut.clickMoreDetailsOnTemplate({
+      templateName: templateNameMock,
+      solutionId: solutionIdMock,
+      version: versionMock,
+      versionId: versionIdMock,
+      isv: isvMock,
+      isvId: isvIdMock
+    })
 
     sut.track()
 
     expect(analyticsClientSpy.track).toHaveBeenCalledWith(
       'Clicked to View More Details on Template',
-      {}
+      {
+        templateName: templateNameMock,
+        solutionId: solutionIdMock,
+        version: versionMock,
+        versionId: versionIdMock,
+        isv: isvMock,
+        isvId: isvIdMock
+      }
     )
   })
 
