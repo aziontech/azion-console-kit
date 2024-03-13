@@ -185,13 +185,13 @@
       router.push({ name: 'activation', query: { email: encodeEmail(values.email) } })
     } catch (err) {
       const { message, fieldName } = JSON.parse(err)
-      tracker	
-        .userFailedSignUp({	
-          errorType: 'api',	
-          fieldName: fieldName,	
-          errorMessage: message	
-        })	
-        .track()	
+      tracker
+        .userFailedSignUp({
+          errorType: 'api',
+          fieldName: fieldName,
+          errorMessage: message
+        })
+        .track()
       loading.value = false
       toast.add({ life: 5000, severity: 'error', detail: message, summary: 'Error' })
     }
