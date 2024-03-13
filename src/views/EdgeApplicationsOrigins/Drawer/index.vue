@@ -203,6 +203,16 @@
     showEditOriginDrawer.value = false
   }
 
+  const handleTrackCreation = () => {
+    tracker
+      .productEdited({
+        productName: 'Origin'
+      })
+      .track()
+
+    emit('onSuccess')
+  }
+
   const copyToKey = async (originKey) => {
     props.clipboardWrite(originKey)
 
