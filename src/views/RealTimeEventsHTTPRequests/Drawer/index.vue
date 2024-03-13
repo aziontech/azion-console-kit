@@ -1,9 +1,9 @@
 <script setup>
-  import { ref, watch, computed } from 'vue'
-  import InfoSection from '@/templates/info-drawer-block/info-section'
-  import TextInfo from '@/templates/info-drawer-block/info-labels/text-info.vue'
   import BigNumber from '@/templates/info-drawer-block/info-labels/big-number.vue'
+  import TextInfo from '@/templates/info-drawer-block/info-labels/text-info.vue'
+  import InfoSection from '@/templates/info-drawer-block/info-section'
   import Divider from 'primevue/divider'
+  import { computed, ref, watch } from 'vue'
 
   import InfoDrawerBlock from '@/templates/info-drawer-block'
   defineOptions({ name: 'drawer-events-http-requests' })
@@ -109,7 +109,7 @@
           :tags="serverProtocolTag"
         >
           <template #body>
-            <div class="flex w-full lg:gap-8">
+            <div class="grid grid-cols-3 w-full ml-[1px] gap-4 lg:gap-8">
               <BigNumber
                 label="Request Time"
                 sufix="ms"
@@ -134,7 +134,7 @@
               <div class="flex flex-col gap-3 w-full sm:w-5/12 flex-1">
                 <TextInfo label="Status">{{ details.status }}</TextInfo>
                 <TextInfo label="Request Method">{{ details.requestMethod }}</TextInfo>
-                <TextInfo label="Request Uri">{{ details.requestUri }}</TextInfo>
+                <TextInfo label="Request URI">{{ details.requestUri }}</TextInfo>
               </div>
               <div class="flex flex-col gap-3 w-full sm:w-5/12 flex-1">
                 <TextInfo label="HTTP User Agent">{{ details.httpUserAgent }}</TextInfo>
@@ -188,7 +188,7 @@
           </template>
         </InfoSection>
 
-        <InfoSection title="Geo-location Data">
+        <InfoSection title="Geolocation Data">
           <template #body>
             <div class="w-full flex flex-col md:flex-row md:gap-8 gap-3">
               <div class="flex flex-col gap-3 w-full sm:w-5/12 flex-1">
@@ -222,7 +222,7 @@
                 <TextInfo label="SSL Protocol">{{ details.sslProtocol }}</TextInfo>
               </div>
               <div class="flex flex-col gap-3 w-full sm:w-5/12 flex-1">
-                <TextInfo label="WF Match">{{ details.wafMatch }}</TextInfo>
+                <TextInfo label="WAF Match">{{ details.wafMatch }}</TextInfo>
               </div>
             </div>
           </template>

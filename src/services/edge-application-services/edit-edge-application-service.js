@@ -10,7 +10,7 @@
  * @property {boolean} active - Whether the application is active.
  * @property {Object} debugRules - The debug rules.
  * @property {string[]} supportedCiphers - The supported ciphers.
- * @property {boolean} applicationAcceleration - Whether application acceleration is enabled.
+ * @property {boolean} applicationAccelerator - Whether application acceleration is enabled.
  * @property {boolean} deviceDetection - Whether device detection is enabled.
  * @property {boolean} edgeFunctions - Whether edge functions are enabled.
  * @property {boolean} imageOptimization - Whether image optimization is enabled.
@@ -54,7 +54,7 @@ const adapt = (payload) => {
     active: payload.active,
     debug_rules: payload.debugRules,
     supported_ciphers: payload.supportedCiphers,
-    application_acceleration: payload.applicationAcceleration,
+    application_acceleration: payload.applicationAccelerator,
     device_detection: payload.deviceDetection,
     edge_firewall: false,
     edge_functions: payload.edgeFunctions,

@@ -14,6 +14,15 @@ export const editOriginService = async (payload) => {
 }
 
 const adapt = (payload) => {
+  if (payload.originType === 'object_storage') {
+    return {
+      name: payload.name,
+      origin_type: payload.originType,
+      bucket: payload.bucketName,
+      prefix: !payload.prefix ? '/' : payload.prefix
+    }
+  }
+
   let payloadAdapted = {
     name: payload.name,
     host_header: payload.hostHeader,

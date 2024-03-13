@@ -4,8 +4,10 @@
   import EditDrawerBlock from '@templates/edit-drawer-block'
   import { refDebounced } from '@vueuse/core'
   import { useToast } from 'primevue/usetoast'
-  import { ref } from 'vue'
+  import { inject, ref } from 'vue'
   import * as yup from 'yup'
+  /**@type {import('@/plugins/adapters/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
+  const tracker = inject('tracker')
   defineOptions({ name: 'drawer-origin' })
 
   const emit = defineEmits(['onSuccess'])
@@ -58,6 +60,11 @@
       label: 'Load Balancer',
       value: 'load_balancer',
       disabled: !props.isLoadBalancer
+    },
+    {
+      label: 'Edge Storage',
+      value: 'object_storage',
+      disabled: false
     }
   ]
 
@@ -83,22 +90,36 @@
     hmacAuthentication: false,
     hmacRegionName: '',
     hmacAccessKey: '',
-    hmacSecretKey: ''
+    hmacSecretKey: '',
+    bucketName: null,
+    prefix: null
   })
 
   const createFormDrawer = ref('')
   const originKey = ref('')
+
   const validationSchema = yup.object({
     name: yup.string().required().label('Name'),
     originType: yup.string().required().label('Origin Type'),
-    hostHeader: yup.string().required().label('Host Header'),
-    addresses: yup.array().of(
-      yup.object().shape({
-        address: yup.string().required().label('Address'),
-        weight: yup.number().nullable().label('Weight'),
-        isActive: yup.boolean().default(true).label('Active')
-      })
-    ),
+    hostHeader: yup
+      .string()
+      .label('Host Header')
+      .when('originType', {
+        is: (originType) => originType !== 'object_storage',
+        then: (schema) => schema.required()
+      }),
+    addresses: yup.array().when('originType', {
+      is: (originType) => originType === 'object_storage',
+      then: (schema) => schema.optional(),
+      otherwise: (schema) =>
+        schema.of(
+          yup.object().shape({
+            address: yup.string().label('Address').required(),
+            weight: yup.number().nullable().label('Weight'),
+            isActive: yup.boolean().default(true).label('Active')
+          })
+        )
+    }),
     originPath: yup
       .string()
       .test('valid', 'Use a valid origin path.', (value) => {
@@ -126,7 +147,14 @@
         is: true,
         then: (schema) => schema.required()
       })
-      .label('Secret Key')
+      .label('Secret Key'),
+    bucketName: yup
+      .string()
+      .label('Bucket Name')
+      .when('originType', {
+        is: 'object_storage',
+        then: (schema) => schema.required()
+      })
   })
 
   const editService = async (payload) => {
@@ -156,8 +184,33 @@
     }
   }
 
+  const handleTrackEdit = () => {
+    tracker
+      .productEdited({
+        productName: 'Origin'
+      })
+      .track()
+
+    emit('onSuccess')
+  }
+
+  const checkError = (error) => {
+    const [fieldName, ...restOfStringArr] = error.split(':')
+    const message = restOfStringArr.join(':').trim()
+
+    return { fieldName, message }
+  }
+
   const closeDrawerEdit = () => {
     showEditOriginDrawer.value = false
+  }
+
+  const handleTrackCreation = () => {
+    tracker
+      .productCreated({
+        productName: 'Origin'
+      })
+      .track()
   }
 
   const copyToKey = async (originKey) => {
@@ -170,7 +223,34 @@
     })
   }
 
+  const handleFailedEditOrigin = (error) => {
+    const { fieldName, message } = checkError(error)
+    tracker
+      .failedToEdit({
+        productName: 'Origin',
+        errorMessage: message,
+        fieldName: fieldName,
+        errorType: 'API'
+      })
+      .track()
+
+    closeDrawerEdit()
+  }
+
+  const handleFailedCreateOrigin = (error) => {
+    const { fieldName, message } = checkError(error)
+    tracker
+      .failedToCreate({
+        productName: 'Origin',
+        errorType: 'API',
+        fieldName: fieldName.trim(),
+        errorMessage: message
+      })
+      .track()
+  }
+
   const handleCreateOrigin = (feedback) => {
+    handleTrackCreation()
     createFormDrawer.value.scrollOriginKey()
     originKey.value = feedback.originKey
     emit('onSuccess')
@@ -190,6 +270,7 @@
     :schema="validationSchema"
     :initialValues="initialValues"
     @onSuccess="handleCreateOrigin"
+    @onError="handleFailedCreateOrigin"
     :showBarGoBack="true"
     title="Create Origin"
   >
@@ -210,9 +291,9 @@
     :loadService="loadService"
     :editService="editService"
     :schema="validationSchema"
-    @onSuccess="emit('onSuccess')"
+    @onSuccess="handleTrackEdit"
     :showBarGoBack="true"
-    @onError="closeDrawerEdit"
+    @onError="handleFailedEditOrigin"
     title="Edit Origin"
   >
     <template #formFields="{ disabledFields }">

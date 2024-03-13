@@ -163,7 +163,7 @@
       v-if="isCustomDate"
     >
       <Calendar
-        placeholder="Select date from calendar"
+        placeholder="Select a date and time."
         class="w-full"
         v-model="dates"
         dateFormat="dd/mm/yy"
@@ -183,7 +183,7 @@
         v-if="hasError && isVisibleCalendar"
         class="p-error text-xs font-normal leading-tight"
       >
-        Select the second date.
+        Select a second date and time.
       </small>
     </div>
   </div>

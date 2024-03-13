@@ -28,21 +28,21 @@ export const realTimeEventsRoutes = {
       loadImageProcessor: RealTimeEventsService.loadImageProcessor,
       documentationService: Helpers.documentationGuideProducts.realTimeEventsImageProcessor
     },
-    l2Cache: {
-      listL2Cache: RealTimeEventsService.listL2Cache,
-      loadL2Cache: RealTimeEventsService.loadL2Cache,
-      documentationService: Helpers.documentationGuideProducts.realTimeEventsL2Cache,
+    tieredCache: {
+      listTieredCache: RealTimeEventsService.listTieredCache,
+      loadTieredCache: RealTimeEventsService.loadTieredCache,
+      documentationService: Helpers.documentationGuideProducts.realTimeEventsTieredCache,
       clipboardWrite: Helpers.clipboardWrite
     },
-    intelligentDNS: {
-      listIntelligentDNS: RealTimeEventsService.listIntelligentDNS,
-      loadIntelligentDNS: RealTimeEventsService.loadIntelligentDNS,
-      documentationService: Helpers.documentationGuideProducts.realTimeEventsIntelligentDNS
+    edgeDNS: {
+      listEdgeDNS: RealTimeEventsService.listEdgeDNS,
+      loadEdgeDNS: RealTimeEventsService.loadEdgeDNS,
+      documentationService: Helpers.documentationGuideProducts.realTimeEventsEdgeDNS
     },
-    dataStreaming: {
-      listDataStreaming: RealTimeEventsService.listDataStreaming,
-      loadDataStreaming: RealTimeEventsService.loadDataStreaming,
-      documentationService: Helpers.documentationGuideProducts.realTimeEventsDataStreaming
+    dataStream: {
+      listDataStream: RealTimeEventsService.listDataStream,
+      loadDataStream: RealTimeEventsService.loadDataStream,
+      documentationService: Helpers.documentationGuideProducts.realTimeEventsDataStream
     },
     activityHistory: {
       listActivityHistory: RealTimeEventsService.listActivityHistory,

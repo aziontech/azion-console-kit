@@ -96,7 +96,7 @@ const REPORTS = [
     label: 'Total Bandwidth Usage',
     description:
       DASHBOARDS_TEXTS.edge_applications.data_transferred.total_bandwidth_usage.description,
-    aggregationType: 'avg',
+    aggregationType: 'sum',
     columns: 6,
     type: 'line',
     xAxis: 'ts',
@@ -140,7 +140,7 @@ const REPORTS = [
     chartOwner: 'azion',
     label: 'Saved Bandwidth',
     description: DASHBOARDS_TEXTS.edge_applications.data_transferred.saved_bandwidth.description,
-    aggregationType: 'avg',
+    aggregationType: 'sum',
     columns: 6,
     type: 'line',
     xAxis: 'ts',
@@ -161,7 +161,7 @@ const REPORTS = [
     chartOwner: 'azion',
     label: 'Missed Bandwidth',
     description: DASHBOARDS_TEXTS.edge_applications.data_transferred.missed_bandwidth.description,
-    aggregationType: 'avg',
+    aggregationType: 'sum',
     columns: 6,
     type: 'line',
     xAxis: 'ts',
@@ -270,7 +270,7 @@ const REPORTS = [
     chartOwner: 'azion',
     label: 'Total Requests per Second',
     description: DASHBOARDS_TEXTS.edge_applications.requests.total_requests_per_second.description,
-    aggregationType: 'avg',
+    aggregationType: 'sum',
     columns: 6,
     type: 'line',
     xAxis: 'ts',
@@ -314,7 +314,7 @@ const REPORTS = [
     chartOwner: 'azion',
     label: 'Saved Requests per Second',
     description: DASHBOARDS_TEXTS.edge_applications.requests.saved_requests_per_second.description,
-    aggregationType: 'avg',
+    aggregationType: 'sum',
     columns: 6,
     type: 'line',
     xAxis: 'ts',
@@ -335,7 +335,7 @@ const REPORTS = [
     chartOwner: 'azion',
     label: 'Missed Requests per Second',
     description: DASHBOARDS_TEXTS.edge_applications.requests.missed_requests_per_second.description,
-    aggregationType: 'avg',
+    aggregationType: 'sum',
     columns: 6,
     type: 'line',
     xAxis: 'ts',
@@ -507,13 +507,13 @@ const REPORTS = [
   },
   /**
    * BUILD
-   * L2 Caching - Caching Offload
+   * Tiered Cache - Caching Offload
    */
   {
     id: '357826217661956693',
     chartOwner: 'azion',
     label: 'Tiered Cache',
-    description: DASHBOARDS_TEXTS.l2_caching.caching_offload.l2_caching.description,
+    description: DASHBOARDS_TEXTS.tiered_cache.caching_offload.tiered_cache.description,
     aggregationType: 'sum',
     columns: 6,
     type: 'line',
@@ -533,7 +533,7 @@ const REPORTS = [
     id: '357826288204907093',
     chartOwner: 'azion',
     label: 'Tiered Cache Offload',
-    description: DASHBOARDS_TEXTS.l2_caching.caching_offload.l2_offload.description,
+    description: DASHBOARDS_TEXTS.tiered_cache.caching_offload.tiered_cache_offload.description,
     aggregationType: 'avg',
     columns: 6,
     type: 'line',
@@ -784,13 +784,13 @@ const REPORTS = [
   },
   /**
    * SECURE
-   * Intelligent DNS - Standard Queries
+   * Edge DNS - Standard Queries
    */
   {
     id: '357843490139298789',
     chartOwner: 'azion',
     label: 'Total Queries',
-    description: DASHBOARDS_TEXTS.intelligent_dns.standard_queries.total_queries.description,
+    description: DASHBOARDS_TEXTS.edge_dns.standard_queries.total_queries.description,
     aggregationType: 'sum',
     columns: 6,
     type: 'line',
@@ -810,17 +810,17 @@ const REPORTS = [
     orderDirection: 'ASC',
     dashboardId: '357549371218199119',
     variationType: 'regular',
-    helpCenterPath: HELP_CENTER_URLS.intelligentDns.standardQueries.totalQueries
+    helpCenterPath: HELP_CENTER_URLS.edgeDns.standardQueries.totalQueries
   },
   /**
    * OBSERVE
-   * Data Streaming - Data Streamed
+   * Data Stream - Data Streamed
    */
   {
     id: '352149351588430415',
     chartOwner: 'azion',
     label: 'Total Data Streamed',
-    description: DASHBOARDS_TEXTS.data_streaming.data_streamed.total_data.description,
+    description: DASHBOARDS_TEXTS.data_stream.data_streamed.total_data.description,
     aggregationType: 'sum',
     columns: 6,
     type: 'line',
@@ -840,13 +840,13 @@ const REPORTS = [
     orderDirection: 'ASC',
     dashboardId: '352149476039721549',
     variationType: 'regular',
-    helpCenterPath: HELP_CENTER_URLS.dataStreaming.requests.totalDataStreamed
+    helpCenterPath: HELP_CENTER_URLS.dataStream.requests.totalDataStreamed
   },
   {
     id: '352234687543902797',
     chartOwner: 'azion',
     label: 'Total Requests',
-    description: DASHBOARDS_TEXTS.data_streaming.data_streaming_requests.total_requests.description,
+    description: DASHBOARDS_TEXTS.data_stream.data_stream_requests.total_requests.description,
     aggregationType: 'sum',
     columns: 6,
     type: 'line',
@@ -866,7 +866,7 @@ const REPORTS = [
     orderDirection: 'ASC',
     dashboardId: '352149476039721549',
     variationType: 'regular',
-    helpCenterPath: HELP_CENTER_URLS.dataStreaming.requests.totalRequests
+    helpCenterPath: HELP_CENTER_URLS.dataStream.requests.totalRequests
   }
 ]
 
