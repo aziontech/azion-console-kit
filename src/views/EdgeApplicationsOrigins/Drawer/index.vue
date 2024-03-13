@@ -203,6 +203,27 @@
     showEditOriginDrawer.value = false
   }
 
+  const handleTrackCreation = () => {
+    tracker
+      .productEdited({
+        productName: 'Origin'
+      })
+      .track()
+
+    emit('onSuccess')
+  }
+
+  const checkError = (error) => {
+    const [fieldName, ...restOfStringArr] = error.split(':')
+    const message = restOfStringArr.join(':').trim()
+
+    return { fieldName, message }
+  }
+
+  const closeDrawerEdit = () => {
+    showEditOriginDrawer.value = false
+  }
+
   const copyToKey = async (originKey) => {
     props.clipboardWrite(originKey)
 
