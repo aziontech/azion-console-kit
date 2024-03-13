@@ -150,11 +150,12 @@
       .label('Secret Key'),
     bucketName: yup
       .string()
-      .label('Bucket Name')
       .when('originType', {
         is: 'object_storage',
-        then: (schema) => schema.required()
+        then: (schema) => schema.required(),
+        otherwise: (schema) => schema.notRequired()
       })
+      .label('Bucket Name')
   })
 
   const editService = async (payload) => {
