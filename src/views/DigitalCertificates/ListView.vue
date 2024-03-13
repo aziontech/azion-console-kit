@@ -20,7 +20,7 @@
       <EmptyResultsBlock
         v-else
         title="No digital certificates have been added"
-        description="Click the button below to add your first digital certificates."
+        description="Click the button below to add your first digital certificate."
         createButtonLabel="Digital Certificate"
         createPagePath="digital-certificates/create"
         :documentationService="documentationService"
