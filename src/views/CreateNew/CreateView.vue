@@ -80,6 +80,7 @@
       <TemplateEngineBlock
         v-else
         @cancel="handleCancel"
+        @submitClick="handleSubmitClick"
         @instantiate="handleInstantiate"
         :getTemplateService="props.getTemplateService"
         :instantiateTemplateService="props.instantiateTemplateService"
@@ -320,6 +321,18 @@
 
   const handleInstantiate = ({ result }) => {
     router.push(`/create/deploy/${result.uuid}`)
+  }
+
+  const handleSubmitClick = () => {
+    tracker
+      .eventClickedToDeploy({
+        isv: solution.value.vendor.slug,
+        version: solution.value.version,
+        versionId: solution.value.latestVersionInstallTemplate,
+        solutionId: solution.value.id,
+        templateName: solution.value.name
+      })
+      .track()
   }
 
   onMounted(async () => {

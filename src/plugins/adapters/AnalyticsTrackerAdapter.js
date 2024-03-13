@@ -299,6 +299,29 @@ export class AnalyticsTrackerAdapter {
     return this
   }
 
+    /**
+   * @returns {AnalyticsTrackerAdapter}
+   * @param {Object} payload
+   * @param {string} payload.templateName
+   * @param {string} payload.solutionId
+   * @param {string} payload.version
+   * @param {string} payload.versionId
+   * @param {string} payload.isv
+   */
+  eventClickedToDeploy(payload) {
+    this.#events.push({
+      eventName: 'Clicked to Deploy',
+      props: {
+        templateName: payload.templateName,
+        solutionId: payload.solutionId,
+        version: payload.version,
+        versionId: payload.versionId,
+        isv: payload.isv
+      }
+    })
+    return this
+  }
+
   /**
    * @returns {AnalyticsTrackerAdapter}
    * @param {Object} payload
