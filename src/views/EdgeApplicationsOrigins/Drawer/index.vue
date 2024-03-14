@@ -231,7 +231,7 @@
         productName: 'Origin',
         errorMessage: message,
         fieldName: fieldName,
-        errorType: 'API'
+        errorType: 'api'
       })
       .track()
 
@@ -243,7 +243,7 @@
     tracker
       .failedToCreate({
         productName: 'Origin',
-        errorType: 'API',
+        errorType: 'api',
         fieldName: fieldName.trim(),
         errorMessage: message
       })

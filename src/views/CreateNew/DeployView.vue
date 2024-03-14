@@ -198,6 +198,9 @@
         detail:
           'The edge application is being propagated through the edge nodes. This process will take a few minutes.'
       })
+      if ('edge_application' in results.value) {
+        handleTrackCreation()
+      }
       tracker.eventDeployed(solutionStore.solution).track()
     } catch (error) {
       deployFailed.value = true
@@ -238,8 +241,16 @@
     props.windowOpen('http://' + results.value.domain.url, '_blank')
   }
 
-  const goToAnalytics = () => {
-    //
+  const goToAnalytics = () => {}
+
+  const handleTrackCreation = () => {
+    const trackerData = {
+      productName: 'Edge Application',
+      from: 'create',
+      createdFrom: 'template',
+      ...solutionStore.solution
+    }
+    tracker.productCreated(trackerData).track()
   }
 
   const retry = () => {
