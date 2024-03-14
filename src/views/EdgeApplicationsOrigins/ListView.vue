@@ -4,7 +4,7 @@
   import ListTableBlock from '@/templates/list-table-block/no-header'
   import DrawerOrigin from '@/views/EdgeApplicationsOrigins/Drawer'
   import PrimeButton from 'primevue/button'
-  import { computed, ref, inject } from 'vue'
+  import { computed, inject, ref } from 'vue'
   /**@type {import('@/plugins/adapters/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
   defineOptions({ name: 'list-edge-applications-origins-tab' })

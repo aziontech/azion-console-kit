@@ -1,6 +1,6 @@
+import * as Errors from '@/services/axios/errors'
 import { AxiosHttpClientAdapter } from '../axios/AxiosHttpClientAdapter'
 import { makeSignupBaseUrl } from './make-signup-base-url'
-import * as Errors from '@/services/axios/errors'
 
 export const signupService = async (payload) => {
   let httpResponse = await AxiosHttpClientAdapter.request({

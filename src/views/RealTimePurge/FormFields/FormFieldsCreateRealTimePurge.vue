@@ -1,7 +1,7 @@
 <script setup>
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
-  import RadioButton from 'primevue/radiobutton'
   import Card from 'primevue/card'
+  import RadioButton from 'primevue/radiobutton'
   import PrimeTextarea from 'primevue/textarea'
   import { useField } from 'vee-validate'
   import { computed } from 'vue'
