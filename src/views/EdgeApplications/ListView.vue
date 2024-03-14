@@ -37,6 +37,11 @@
       productName: 'Edge Application'
     })
   }
+  const handleTrackEditEvent = () => {
+    tracker.clickToEdit({
+      productName: 'Edge Application'
+    })
+  }
 
   const getColumns = computed(() => {
     return [
@@ -78,13 +83,14 @@
         v-if="hasContentToList"
         pageTitleDelete="Edge Application"
         addButtonLabel="Edge Application"
-        createPagePath="/edge-applications/create"
+        createPagePath="/edge-applications/create?origin=list"
         editPagePath="/edge-applications/edit"
         :listService="props.listEdgeApplicationsService"
         :deleteService="props.deleteEdgeApplicationService"
         :columns="getColumns"
         @on-load-data="handleLoadData"
         @on-before-go-to-add-page="handleTrackEvent"
+        @on-before-go-to-edit="handleTrackEditEvent"
         emptyListMessage="No Edge Application found."
       />
       <EmptyResultsBlock
@@ -92,7 +98,7 @@
         title="No edge applications have been created"
         description="Click the button below to initiate the setup process and create your first edge application."
         createButtonLabel="Edge Application"
-        createPagePath="/edge-applications/create"
+        createPagePath="/edge-applications/create?origin=list"
         :documentationService="props.documentationService"
       >
         <template #illustration>

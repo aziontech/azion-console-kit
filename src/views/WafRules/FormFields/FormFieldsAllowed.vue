@@ -33,8 +33,8 @@
 
   const matchZonesOptions = ref([
     { name: 'Conditional Query String', value: 'conditional_query_string' },
-    { name: 'Conditional Request Body', value: 'conditional_query_body' },
-    { name: 'Conditional Request Header', value: 'conditional_query_header' },
+    { name: 'Conditional Request Body', value: 'conditional_request_body' },
+    { name: 'Conditional Request Header', value: 'conditional_request_header' },
     { name: 'File Name (Multipart Body)', value: 'file_name' },
     { name: 'Path', value: 'path' },
     { name: 'Query String', value: 'query_string' },
@@ -61,8 +61,8 @@
   const showConditionalInputs = (value) => {
     const conditionalInputs = [
       'conditional_query_string',
-      'conditional_query_body',
-      'conditional_query_header'
+      'conditional_request_body',
+      'conditional_request_header'
     ]
     return conditionalInputs.includes(value)
   }
@@ -70,8 +70,8 @@
   const showMatchOnInputs = (value) => {
     const conditionalInputs = [
       'conditional_query_string',
-      'conditional_query_body',
-      'conditional_query_header',
+      'conditional_request_body',
+      'conditional_request_header',
       'query_string',
       'request_body',
       'request_header'

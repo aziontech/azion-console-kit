@@ -35,7 +35,7 @@
               label="Create"
               type="button"
               size="small"
-              @click="createModalStore.toggle()"
+              @click="openModalCreate"
             />
           </div>
         </div>
@@ -206,10 +206,12 @@
   import { useCreateModalStore } from '@/stores/create-modal'
   import ContentBlock from '@/templates/content-block'
   import { mapState } from 'pinia'
+  import { inject } from 'vue'
   import PrimeButton from 'primevue/button'
   import { useForm } from 'vee-validate'
   import * as yup from 'yup'
   import FormFieldsHome from './FormFields/FormFieldsHome.vue'
+  /**@type {import('@/plugins/adapters/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
 
   export default {
     name: 'home-view',
@@ -266,6 +268,7 @@
       navigateToEdgeApplications() {
         this.$router.push({ name: 'list-edge-applications' })
       },
+
       navigateToPayment() {
         const billingUrl = getStaticUrlsByEnvironment('billing')
         window.open(billingUrl, '_blank')
@@ -316,7 +319,14 @@
       }
     },
     setup() {
+      const tracker = inject('tracker')
+
       const createModalStore = useCreateModalStore()
+
+      const openModalCreate = () => {
+        tracker.createEventInHomeAndHeader({ url: '/', location: 'home' }).track()
+        createModalStore.toggle()
+      }
 
       const validationSchema = yup.object({
         name: yup.string().required('Name is a required field'),
@@ -334,7 +344,8 @@
         meta,
         resetForm,
         values,
-        createModalStore
+        createModalStore,
+        openModalCreate
       }
     }
   }

@@ -94,7 +94,6 @@ describe('HttpRequestServices', () => {
     const response = await sut(fixtures.filter)
 
     expect(response).toEqual({
-      id: '2024-02-23T18:07:25.000Z321444',
       bytesSent: fixtures.httpRequest.bytesSent,
       configurationId: fixtures.httpRequest.configurationId,
       debugLog: fixtures.httpRequest.debugLog,
@@ -118,6 +117,8 @@ describe('HttpRequestServices', () => {
       sslProtocol: fixtures.httpRequest.sslProtocol,
       stacktrace: fixtures.httpRequest.stacktrace,
       status: fixtures.httpRequest.status,
+      serverProtocol: undefined,
+      upstreamCacheStatus: undefined,
       tcpinfoRtt: fixtures.httpRequest.tcpinfoRtt,
       ts: 'February 23, 2024 at 06:07 PM',
       upstreamAddr: fixtures.httpRequest.upstreamAddr,

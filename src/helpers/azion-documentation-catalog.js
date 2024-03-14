@@ -4,7 +4,7 @@ export const documentationCatalog = {
   resources: () => openSearchResult(''),
   variables: () => openSearchResult('variables'),
   edgeServices: () => openSearchResult('edge services'),
-  intelligentDNS: () => openSearchResult('intelligent-dns'),
+  edgeDNS: () => openSearchResult('edge-dns'),
   personalTokens: () => openSearchResult('personal tokens'),
   domains: () => openSearchResult('domains'),
   realTimePurge: () => openSearchResult('real-time-purge'),
@@ -13,7 +13,7 @@ export const documentationCatalog = {
   credentials: () => openSearchResult('credentials'),
   networkLists: () => openSearchResult('network lists'),
   teamPermissions: () => openSearchResult('team permissions'),
-  dataStreaming: () => openSearchResult('data streaming'),
+  dataStream: () => openSearchResult('data streaming'),
   edgeFunctions: () => openSearchResult('edge functions'),
   edgeFirewall: () => openSearchResult('edge firewall'),
   edgeFirewallRulesEngine: () => openSearchResult('edge firewall rules engine'),
@@ -35,7 +35,18 @@ export const documentationCatalog = {
 export const documentationGuideProducts = {
   edgeApplication: () => openDocumentationProducts('guides/build/build-an-application/'),
   realTimeMetrics: () => openDocumentationProducts('guides/use-real-time-metrics/'),
-  realTimeEvents: () => openDocumentationProducts('real-time-events/'),
+  realTimeEventsHttpRequest: () => openDocumentationProducts('real-time-events/#http-requests'),
+  realTimeEventsEdgeFunctions: () => openDocumentationProducts('real-time-events/#edge-functions'),
+  realTimeEventsEdgeFunctionsConsole: () =>
+    openDocumentationProducts('real-time-events/#edge-functions-console'),
+  realTimeEventsImageProcessor: () =>
+    openDocumentationProducts('real-time-events/#image-processor'),
+  realTimeEventsTieredCache: () => openDocumentationProducts('real-time-events/#tiered-cache'),
+  realTimeEventsEdgeDNS: () => openDocumentationProducts('real-time-events/#edge-dns'),
+  realTimeEventsDataStream: () => openDocumentationProducts('real-time-events/#data-streaming'),
+
+  realTimeEventsActivityHistory: () =>
+    openDocumentationProducts('real-time-events/#activity-history'),
   edgeServicesResources: () =>
     openDocumentationProducts('edge-orchestrator/edge-services/#resources')
 }

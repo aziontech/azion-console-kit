@@ -35,7 +35,7 @@ const PAGES_DASHBOARDS = {
     {
       id: 2,
       label: 'Tiered Cache',
-      path: 'l2-caching',
+      path: 'tiered-cache',
       groupId: 1,
       dashboards: [
         {
@@ -92,8 +92,8 @@ const PAGES_DASHBOARDS = {
     },
     {
       id: 7,
-      label: 'Intelligent DNS',
-      path: 'intelligent-dns',
+      label: 'Edge DNS',
+      path: 'edge-dns',
       groupId: 2,
       dashboards: [
         {
@@ -108,8 +108,8 @@ const PAGES_DASHBOARDS = {
   observe: [
     {
       id: 8,
-      label: 'Data Streaming',
-      path: 'data-streaming',
+      label: 'Data Stream',
+      path: 'data-stream',
       groupId: 3,
       dashboards: [
         {

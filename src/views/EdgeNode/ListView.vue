@@ -24,7 +24,7 @@
     }
   })
 
-  let hasContentToList = ref(false)
+  let hasContentToList = ref(true)
 
   const getColumns = computed(() => [
     {

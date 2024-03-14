@@ -1,0 +1,242 @@
+<script setup>
+  import InfoDrawerBlock from '@/templates/info-drawer-block'
+  import BigNumber from '@/templates/info-drawer-block/info-labels/big-number.vue'
+  import TextInfo from '@/templates/info-drawer-block/info-labels/text-info.vue'
+  import InfoSection from '@/templates/info-drawer-block/info-section'
+  import PrimeButton from 'primevue/button'
+  import Divider from 'primevue/divider'
+  import { useToast } from 'primevue/usetoast'
+  import { computed, ref, watch } from 'vue'
+  defineOptions({ name: 'drawer-events-tiered-cache' })
+
+  const props = defineProps({
+    loadService: {
+      type: Function,
+      required: true
+    },
+    clipboardWrite: {
+      type: Function,
+      required: true
+    }
+  })
+  const details = ref({})
+  const showDrawer = ref(false)
+  const toast = useToast()
+
+  const openDetailDrawer = async (item) => {
+    showDrawer.value = true
+    details.value = await props.loadService(item)
+  }
+
+  const copyCacheKey = () => {
+    props.clipboardWrite(details.value.cacheKey)
+    toast.add({
+      closable: true,
+      severity: 'success',
+      summary: 'Successfully copied!'
+    })
+  }
+
+  watch(
+    () => showDrawer.value,
+    (value) => {
+      if (!value) {
+        details.value = {}
+      }
+    }
+  )
+
+  const referenceErrorTag = computed(() => {
+    const statusCode = details.value.status
+
+    const isClientError = statusCode >= 400 && statusCode < 500
+    const isServerError = statusCode >= 500 && statusCode < 600
+
+    if (isServerError || isClientError) {
+      return [{ text: 'Reference Error', severity: 'danger', icon: 'pi pi-times-circle' }]
+    }
+    return []
+  })
+
+  const upstreamCacheStatusTag = computed(() => {
+    if (details.value.upstreamCacheStatus) {
+      return [{ text: `Upstream Cache Status: ${details.value.upstreamCacheStatus}` }]
+    }
+    return []
+  })
+
+  const proxyTag = computed(() => {
+    let tags = []
+    if (details.value.scheme) {
+      tags.push({ text: `Scheme: ${details.value.scheme}` })
+    }
+    if (details.value.serverProtocol) {
+      tags.push({ text: `Server Protocol: ${details.value.serverProtocol}` })
+    }
+    return tags
+  })
+
+  defineExpose({
+    openDetailDrawer
+  })
+</script>
+
+<template>
+  <InfoDrawerBlock
+    v-model:visible="showDrawer"
+    title="More Details"
+  >
+    <template #body>
+      <div class="w-full flex flex-col gap-8">
+        <InfoSection
+          :title="details.proxyHost"
+          :date="details.ts"
+          :tags="proxyTag"
+        >
+          <template #body>
+            <div class="w-full flex sm:flex-row flex-col gap-2">
+              <TextInfo
+                class="w-full sm:w-1/2 flex-1"
+                label="Cache Key"
+                >{{ details.cacheKey }}</TextInfo
+              >
+              <div class="ml-28 sm:ml-0 w-full sm:w-1/2 flex-1 flex justify-start">
+                <PrimeButton
+                  label="Copy"
+                  icon="pi pi-copy"
+                  @click="copyCacheKey"
+                  outlined
+                />
+              </div>
+            </div>
+
+            <Divider />
+
+            <div class="flex flex-col sm:flex-row sm:gap-8 gap-3 w-full">
+              <div class="flex flex-col gap-3 w-full sm:w-5/12 flex-1">
+                <TextInfo label="Host">{{ details.host }}</TextInfo>
+                <TextInfo label="Proxy Host">{{ details.proxyHost }}</TextInfo>
+                <TextInfo label="Remote Addr">{{ details.remoteAddr }}</TextInfo>
+                <TextInfo label="Remote Port">{{ details.remotePort }}</TextInfo>
+              </div>
+              <div class="flex flex-col gap-3 w-full sm:w-5/12 flex-1">
+                <TextInfo label="Client ID">{{ details.clientId }}</TextInfo>
+                <TextInfo label="Solution">{{ details.solution }}</TextInfo>
+                <TextInfo label="Configuration ID">{{ details.configurationId }}</TextInfo>
+              </div>
+            </div>
+          </template>
+        </InfoSection>
+
+        <InfoSection
+          title="Request Data"
+          :tags="referenceErrorTag"
+        >
+          <template #body>
+            <div class="grid grid-cols-2 lg:grid-cols-3 w-full ml-[1px] gap-4 lg:gap-8">
+              <BigNumber
+                label="Request Time"
+                sufix="ms"
+              >
+                {{ details.requestTime }}
+              </BigNumber>
+              <BigNumber
+                label="TCP Info RTT"
+                sufix="ms"
+              >
+                {{ details.tcpinfoRtt }}
+              </BigNumber>
+              <BigNumber
+                label="Request Length"
+                sufix="lines"
+              >
+                {{ details.requestLength }}
+              </BigNumber>
+              <BigNumber
+                label="Bytes Sent"
+                sufix="ms"
+              >
+                {{ details.bytesSent }}
+              </BigNumber>
+              <BigNumber
+                label="Cache TTL"
+                sufix="s"
+              >
+                {{ details.cacheTtl }}
+              </BigNumber>
+            </div>
+            <Divider />
+            <div class="flex flex-col sm:flex-row sm:gap-8 gap-3 w-full">
+              <div class="flex flex-col gap-3 w-full sm:w-5/12 flex-1">
+                <TextInfo label="Reference Error">{{ details.referenceError }}</TextInfo>
+                <TextInfo label="Request Method">{{ details.requestMethod }}</TextInfo>
+                <TextInfo label="Request URI">{{ details.requestUri }}</TextInfo>
+              </div>
+              <div class="flex flex-col gap-3 w-full sm:w-5/12 flex-1">
+                <TextInfo label="Sent HTTP Content Type">{{
+                  details.sentHttpContentType
+                }}</TextInfo>
+                <TextInfo label="Proxy Upstream">{{ details.proxyUpstream }}</TextInfo>
+                <TextInfo label="Proxy Status">{{ details.proxyStatus }}</TextInfo>
+                <TextInfo label="Status">{{ details.status }}</TextInfo>
+              </div>
+            </div>
+          </template>
+        </InfoSection>
+
+        <InfoSection
+          title="Upstream Data"
+          :tags="upstreamCacheStatusTag"
+        >
+          <template #body>
+            <div class="grid grid-cols-2 lg:grid-cols-3 w-full ml-[1px] gap-4 lg:gap-8">
+              <BigNumber
+                label="Upstream Connect Time"
+                sufix="ms"
+                class="flex-1"
+              >
+                {{ details.upstreamConnectTime }}
+              </BigNumber>
+              <BigNumber
+                label="Upstream Header Time"
+                sufix="ms"
+                class="flex-1"
+              >
+                {{ details.upstreamHeaderTime }}
+              </BigNumber>
+              <BigNumber
+                label="Upstream Response Time"
+                sufix="ms"
+                class="flex-1"
+              >
+                {{ details.upstreamResponseTime }}
+              </BigNumber>
+              <BigNumber
+                label="Upstream Bytes Received"
+                sufix="ms"
+                class="flex-1"
+              >
+                {{ details.upstreamBytesReceived }}
+              </BigNumber>
+            </div>
+
+            <Divider />
+
+            <div class="w-full flex sm:flex-row flex-col gap-3">
+              <TextInfo
+                class="w-full sm:w-5/12 flex-1"
+                label="Upstream Addr"
+                >{{ details.remoteAddr }}</TextInfo
+              >
+              <TextInfo
+                class="w-full sm:w-5/12 flex-1"
+                label="Upstream Status"
+                >{{ details.upstreamStatus }}</TextInfo
+              >
+            </div>
+          </template>
+        </InfoSection>
+      </div>
+    </template>
+  </InfoDrawerBlock>
+</template>

@@ -55,7 +55,7 @@
                       v-if="isSuccessfullyFinished"
                       severity="secondary"
                       @click="goToEdgeApplicationEditView"
-                      label="Manage"
+                      label="Manage Edge Application"
                     />
                     <div class="md:ml-auto flex">
                       <PrimeButton
@@ -128,16 +128,19 @@
 </template>
 
 <script setup>
-  import { computed, onMounted, onUnmounted, ref } from 'vue'
+  import { computed, onMounted, onUnmounted, ref, inject } from 'vue'
   import Tag from 'primevue/tag'
   import Divider from 'primevue/divider'
   import ContentBlock from '@/templates/content-block'
   import { useRoute, useRouter } from 'vue-router'
+  import { useSolutionStore } from '@/stores/solution-create'
   import PageHeadingBlock from '@/templates/page-heading-block'
   import PrimeButton from 'primevue/button'
   import ScriptRunnerBlock from '@/templates/script-runner-block'
   import PrimeCard from 'primevue/card'
   import { useToast } from 'primevue/usetoast'
+  /**@type {import('@/plugins/adapters/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
+  const tracker = inject('tracker')
 
   const props = defineProps({
     getLogsService: {
@@ -162,6 +165,7 @@
   const seconds = ref(0)
   const intervalRef = ref()
   const deployFailed = ref(false)
+  const solutionStore = useSolutionStore()
   const failMessage =
     'There was an issue while creating the edge application. Check the Deploy Log for more details.'
   const nextSteps = ref([
@@ -194,14 +198,19 @@
         detail:
           'The edge application is being propagated through the edge nodes. This process will take a few minutes.'
       })
+      if ('edge_application' in results.value) {
+        handleTrackCreation()
+      }
+      tracker.eventDeployed(solutionStore.solution).track()
     } catch (error) {
       deployFailed.value = true
       toast.add({
         closable: true,
         severity: 'error',
-        summary: 'Creation failed',
+        summary: 'Creation Failed',
         detail: failMessage
       })
+      tracker.eventFailedDeployed(solutionStore.solution).track()
     }
   }
 
@@ -232,8 +241,16 @@
     props.windowOpen('http://' + results.value.domain.url, '_blank')
   }
 
-  const goToAnalytics = () => {
-    //
+  const goToAnalytics = () => {}
+
+  const handleTrackCreation = () => {
+    const trackerData = {
+      productName: 'Edge Application',
+      from: 'create',
+      createdFrom: 'template',
+      ...solutionStore.solution
+    }
+    tracker.productCreated(trackerData).track()
   }
 
   const retry = () => {

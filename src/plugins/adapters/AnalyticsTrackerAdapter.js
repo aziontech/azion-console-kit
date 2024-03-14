@@ -23,6 +23,12 @@ export class AnalyticsTrackerAdapter {
     this.#analyticsClient = analyticsClient
   }
 
+  /**
+   * A method to identify a user.
+   *
+   * @param {type} id - The identifier of the user
+   * @return {Promise<void>}
+   */
   async identify(id) {
     if (!id) {
       return
@@ -70,6 +76,19 @@ export class AnalyticsTrackerAdapter {
   }
 
   /**
+   * @param {Object} payload
+   * @param {AzionProductsNames} payload.productName
+   * @returns {AnalyticsTrackerAdapter}
+   */
+  clickToEdit(payload) {
+    this.#events.push({
+      eventName: `Clicked to Edit ${payload.productName}`,
+      props: {}
+    })
+    return this
+  }
+
+  /**
    * @returns {AnalyticsTrackerAdapter}
    */
   userSigned() {
@@ -94,12 +113,99 @@ export class AnalyticsTrackerAdapter {
   /**
    * @param {Object} payload
    * @param {AzionProductsNames} payload.productName
+   * @param {String} payload.createdFrom
+   * @param {String} payload.from
+   * @param {String} payload.templateName
+   * @param {String} payload.solutionId
+   * @param {String} payload.version
+   * @param {String} payload.versionId
+   * @param {String} payload.isv
+   * @param {String} payload.isvId
    * @returns {AnalyticsTrackerAdapter}
    */
   productCreated(payload) {
     this.#events.push({
       eventName: `Created ${payload.productName}`,
+      props: {
+        createdFrom: payload.createdFrom,
+        from: payload.from,
+        templateName: payload.templateName,
+        solutionId: payload.solutionId,
+        version: payload.version,
+        versionId: payload.versionId,
+        isv: payload.isv,
+        isvId: payload.isvId
+      }
+    })
+    return this
+  }
+
+  /**
+   * @param {Object} payload
+   * @param {AzionProductsNames} payload.productName
+   * @returns {AnalyticsTrackerAdapter}
+   */
+  productEdited(payload) {
+    this.#events.push({
+      eventName: `Edited ${payload.productName}`,
       props: {}
+    })
+    return this
+  }
+
+  /**
+   * @param {Object} payload
+   * @param {AzionProductsNames} payload.productName
+   * @param {String} payload.errorType
+   * @param {String} payload.fieldName
+   * @param {String} payload.errorMessage
+   * @returns {AnalyticsTrackerAdapter}
+   */
+  failedToCreate(payload) {
+    this.#events.push({
+      eventName: `Failed to Create ${payload.productName}`,
+      props: {
+        errorType: payload.errorType,
+        fieldName: payload.fieldName,
+        errorMessage: payload.errorMessage
+      }
+    })
+    return this
+  }
+
+  /**
+   * @param {Object} payload
+   * @param {AzionProductsNames} payload.productName
+   * @param {String} payload.errorType
+   * @param {String} payload.fieldName
+   * @param {String} payload.errorMessage
+   * @returns {AnalyticsTrackerAdapter}
+   */
+  failedToEdit(payload) {
+    this.#events.push({
+      eventName: `Failed to Edit ${payload.productName}`,
+      props: {
+        errorType: payload.errorType,
+        fieldName: payload.fieldName,
+        errorMessage: payload.errorMessage
+      }
+    })
+    return this
+  }
+
+  /**
+   * @param {Object} payload
+   * @param {string} payload.url
+   * @param {string} payload.location
+   * @returns {AnalyticsTrackerAdapter}
+   */
+  createEventInHomeAndHeader(payload) {
+    this.#events.push({
+      eventName: 'Clicked to Create',
+      props: {
+        url: payload.url,
+        location: payload.location
+      }
     })
     return this
   }
@@ -122,6 +228,159 @@ export class AnalyticsTrackerAdapter {
     this.#events.push({
       eventName: 'Submitted Additional Data',
       props: {}
+    })
+    return this
+  }
+
+  /**
+   * @param {Object} payload
+   * @param {'api'|'field'} payload.errorType
+   * @param {string} payload.fieldName
+   * @param {string} payload.errorMessage
+   *
+   * @returns {AnalyticsTrackerAdapter}
+   */
+  userFailedSignUp(payload) {
+    this.#events.push({
+      eventName: 'User Failed to Sign Up',
+      props: {
+        errorType: payload.errorType,
+        fieldName: payload.fieldName,
+        errorMessage: payload.errorMessage
+      }
+    })
+    return this
+  }
+
+  /**
+   * @returns {AnalyticsTrackerAdapter}
+   */
+  failedSubmitAdditionalData() {
+    this.#events.push({
+      eventName: 'Failed to Submit Additional Data',
+      props: {}
+    })
+    return this
+  }
+
+  /**
+   * @param {Object} payload
+   * @param {string} payload.section
+   * @param {string} payload.selection
+   * @returns {AnalyticsTrackerAdapter}
+   */
+  selectedOnCreate(payload) {
+    this.#events.push({
+      eventName: 'Selected on Create',
+      props: {
+        section: payload.section,
+        selection: payload.selection
+      }
+    })
+    return this
+  }
+
+  /**
+   * @param {Object} payload
+   * @param {string} payload.templateName
+   * @param {string} payload.solutionId
+   * @param {string} payload.version
+   * @param {string} payload.versionId
+   * @param {string} payload.isv
+   * @param {string} payload.isvId
+   * @returns {AnalyticsTrackerAdapter}
+   */
+  clickMoreDetailsOnTemplate(payload) {
+    this.#events.push({
+      eventName: 'Clicked to View More Details on Template',
+      props: {
+        templateName: payload.templateName,
+        solutionId: payload.solutionId,
+        version: payload.version,
+        versionId: payload.versionId,
+        isv: payload.isv,
+        isvId: payload.isvId
+      }
+    })
+    return this
+  }
+
+  /**
+   * @returns {AnalyticsTrackerAdapter}
+   */
+  userActivatedAccount() {
+    this.#events.push({
+      eventName: 'User Activated Account',
+      props: {}
+    })
+    return this
+  }
+
+    /**
+   * @returns {AnalyticsTrackerAdapter}
+   * @param {Object} payload
+   * @param {string} payload.templateName
+   * @param {string} payload.solutionId
+   * @param {string} payload.version
+   * @param {string} payload.versionId
+   * @param {string} payload.isv
+   */
+  eventClickedToDeploy(payload) {
+    this.#events.push({
+      eventName: 'Clicked to Deploy',
+      props: {
+        templateName: payload.templateName,
+        solutionId: payload.solutionId,
+        version: payload.version,
+        versionId: payload.versionId,
+        isv: payload.isv
+      }
+    })
+    return this
+  }
+
+  /**
+   * @returns {AnalyticsTrackerAdapter}
+   * @param {Object} payload
+   * @param {string} payload.templateName
+   * @param {string} payload.solutionId
+   * @param {string} payload.version
+   * @param {string} payload.versionId
+   * @param {string} payload.isv
+   */
+  eventDeployed(payload) {
+    this.#events.push({
+      eventName: 'Deployed',
+      props: {
+        templateName: payload.templateName,
+        solutionId: payload.solutionId,
+        version: payload.version,
+        versionId: payload.versionId,
+        isv: payload.isv
+      }
+    })
+    return this
+  }
+
+  /**
+   * @returns {AnalyticsTrackerAdapter}
+   * @param {Object} payload
+   * @param {string} payload.templateName
+   * @param {string} payload.solutionId
+   * @param {string} payload.version
+   * @param {string} payload.versionId
+   * @param {string} payload.isv
+   */
+  eventFailedDeployed(payload) {
+    this.#events.push({
+      eventName: 'Failed to Deploy',
+      props: {
+        templateName: payload.templateName,
+        solutionId: payload.solutionId,
+        version: payload.version,
+        versionId: payload.versionId,
+        isv: payload.isv
+      }
     })
     return this
   }

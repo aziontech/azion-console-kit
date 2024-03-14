@@ -99,7 +99,7 @@ describe('DigitalCertificatesServices', () => {
       issuer: '-',
       name: 'Certificate 2',
       status: {
-        content: 'Inactive',
+        content: 'Pending',
         severity: 'danger'
       },
       subjectName: '-',

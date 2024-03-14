@@ -37,25 +37,25 @@
             v-if="mapTabs.ImageProcessor.index === tabSelectIndex"
           />
         </TabPanel>
-        <TabPanel :header="mapTabs.L2Cache.label">
-          <RealTimeEventsL2Cache
-            v-bind="props.l2Cache"
+        <TabPanel :header="mapTabs.TieredCache.label">
+          <RealTimeEventsTieredCache
+            v-bind="props.tieredCache"
             v-model:dateTime="timeFilter"
-            v-if="mapTabs.L2Cache.index === tabSelectIndex"
+            v-if="mapTabs.TieredCache.index === tabSelectIndex"
           />
         </TabPanel>
-        <TabPanel :header="mapTabs.IntelligentDNS.label">
-          <RealTimeEventsIntelligentDNSListView
-            v-bind="props.intelligentDNS"
+        <TabPanel :header="mapTabs.EdgeDNS.label">
+          <RealTimeEventsEdgeDNSListView
+            v-bind="props.edgeDNS"
             v-model:dateTime="timeFilter"
-            v-if="mapTabs.IntelligentDNS.index === tabSelectIndex"
+            v-if="mapTabs.EdgeDNS.index === tabSelectIndex"
           />
         </TabPanel>
-        <TabPanel :header="mapTabs.DataStreaming.label">
-          <RealTimeEventsDataStreamingListView
-            v-bind="props.dataStreaming"
+        <TabPanel :header="mapTabs.DataStream.label">
+          <RealTimeEventsDataStreamListView
+            v-bind="props.dataStream"
             v-model:dateTime="timeFilter"
-            v-if="mapTabs.DataStreaming.index === tabSelectIndex"
+            v-if="mapTabs.DataStream.index === tabSelectIndex"
           />
         </TabPanel>
         <TabPanel :header="mapTabs.ActivityHistory.label">
@@ -80,11 +80,11 @@
   import RealTimeEventsHTTPRequestsListView from '@/views/RealTimeEventsHTTPRequests/ListView'
   import RealTimeEventEdgeFunctionsListView from '@/views/RealTimeEventsEdgeFunctions/ListView'
   import RealTimeEventEdgeFunctionsConsoleListView from '@/views/RealTimeEventsEdgeFunctionsConsole/ListView'
-  import RealTimeEventsDataStreamingListView from '@/views/RealTimeEventsDataStreaming/ListView'
+  import RealTimeEventsDataStreamListView from '@/views/RealTimeEventsDataStream/ListView'
   import RealTimeEventsActivityHistoryListView from '@/views/RealTimeEventsActivityHistory/ListView'
-  import RealTimeEventsIntelligentDNSListView from '@/views/RealTimeEventsIntelligentDNS/ListView'
+  import RealTimeEventsEdgeDNSListView from '@/views/RealTimeEventsEdgeDNS/ListView'
   import RealTimeEventsImageProcessor from '@/views/RealTimeEventsImageProcessor/ListView'
-  import RealTimeEventsL2Cache from '@/views/RealTimeEventsL2Cache/ListView'
+  import RealTimeEventsTieredCache from '@/views/RealTimeEventsTieredCache/ListView'
   defineOptions({ name: 'RealTimeEventsTabsView' })
 
   const props = defineProps({
@@ -104,11 +104,11 @@
       type: Object,
       required: true
     },
-    dataStreaming: {
+    dataStream: {
       type: Object,
       required: true
     },
-    intelligentDNS: {
+    edgeDNS: {
       type: Object,
       required: true
     },
@@ -116,7 +116,7 @@
       type: Object,
       required: true
     },
-    l2Cache: {
+    tieredCache: {
       type: Object,
       required: true
     }
@@ -148,20 +148,20 @@
       tabName: 'image-processor',
       label: 'Image Processor'
     },
-    L2Cache: {
+    TieredCache: {
       index: 4,
-      tabName: 'l2-cache',
-      label: 'L2 Cache'
+      tabName: 'tiered-cache',
+      label: 'Tiered Cache'
     },
-    IntelligentDNS: {
+    EdgeDNS: {
       index: 5,
-      tabName: 'intelligent-dns',
-      label: 'Intelligent DNS'
+      tabName: 'edge-dns',
+      label: 'Edge DNS'
     },
-    DataStreaming: {
+    DataStream: {
       index: 6,
-      tabName: 'data-streaming',
-      label: 'Data Streaming'
+      tabName: 'data-stream',
+      label: 'Data Stream'
     },
     ActivityHistory: {
       index: 7,

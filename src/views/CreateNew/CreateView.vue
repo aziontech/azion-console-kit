@@ -80,9 +80,10 @@
       <TemplateEngineBlock
         v-else
         @cancel="handleCancel"
+        @submitClick="handleSubmitClick"
         @instantiate="handleInstantiate"
-        :getTemplateService="getTemplateService"
-        :instantiateTemplateService="instantiateTemplateService"
+        :getTemplateService="props.getTemplateService"
+        :instantiateTemplateService="props.instantiateTemplateService"
         :templateId="solution.referenceId"
       />
       <PrimeDialog
@@ -225,96 +226,122 @@
     </template>
   </ContentBlock>
 </template>
-<script>
+<script setup>
+  import { useLoadingStore } from '@/stores/loading'
+  import { useSolutionStore } from '@/stores/solution-create'
+  import ContentBlock from '@/templates/content-block'
+  import PageHeadingBlock from '@/templates/page-heading-block'
   import TemplateEngineBlock from '@/templates/template-engine-block'
+  import FormLoading from '@/templates/template-engine-block/FormLoading'
   import PrimeButton from 'primevue/button'
   import PrimeDialog from 'primevue/dialog'
-  import ContentBlock from '@/templates/content-block'
   import Sidebar from 'primevue/sidebar'
   import Skeleton from 'primevue/skeleton'
-  import FormLoading from '@/templates/template-engine-block/FormLoading'
-  import PageHeadingBlock from '@/templates/page-heading-block'
-  import { useLoadingStore } from '@/stores/loading'
+  import { useToast } from 'primevue/usetoast'
+  import { inject, onMounted, ref, watchEffect } from 'vue'
+  import { useRoute, useRouter } from 'vue-router'
+  /**@type {import('@/plugins/adapters/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
+  const tracker = inject('tracker')
 
-  export default {
-    components: {
-      TemplateEngineBlock,
-      ContentBlock,
-      PageHeadingBlock,
-      PrimeButton,
-      PrimeDialog,
-      Sidebar,
-      Skeleton,
-      FormLoading
-    },
-    data: () => ({
-      isLoading: false,
-      showDetails: false,
-      solution: {}
-    }),
-    props: {
-      getTemplateService: {
-        type: Function,
-        required: true
-      },
-      instantiateTemplateService: {
-        type: Function,
-        required: true
-      },
-      loadSolutionService: {
-        type: Function,
-        required: true
-      },
-      windowOpen: {
-        type: Function,
-        required: true
-      }
-    },
+  const isLoading = ref(false)
+  const showDetails = ref(false)
+  const solution = ref({})
+  const solutionTrackerData = ref({})
+  const router = useRouter()
+  const route = useRoute()
+  const toast = useToast()
 
-    async created() {
-      const store = useLoadingStore()
-      store.startLoading()
-      await this.loadSolutionByVendor()
-      store.finishLoading()
+  const store = useLoadingStore()
+
+  const props = defineProps({
+    getTemplateService: {
+      type: Function,
+      required: true
     },
-    methods: {
-      async loadSolutionByVendor() {
-        try {
-          this.isLoading = true
-          this.solution = await this.loadSolutionService({
-            vendor: this.$route.params.vendor,
-            solution: this.$route.params.solution
-          })
-        } catch (error) {
-          this.$toast.add({
-            closable: true,
-            severity: 'error',
-            summary: error
-          })
-        } finally {
-          this.isLoading = false
-        }
-      },
-      handleCancel() {
-        this.$router.push('/')
-      },
-      goToVendorPage() {
-        this.windowOpen(this.solution.vendor.url, '_blank')
-      },
-      openDetails() {
-        this.showDetails = true
-      },
-      handleInstantiate({ result }) {
-        this.$router.push(`/create/deploy/${result.uuid}`)
-      }
+    instantiateTemplateService: {
+      type: Function,
+      required: true
     },
-    watch: {
-      $route() {
-        if (!this.$route.params.vendor || !this.$route.params.solution) {
-          return
-        }
-        this.loadSolutionByVendor()
+    loadSolutionService: {
+      type: Function,
+      required: true
+    },
+    windowOpen: {
+      type: Function,
+      required: true
+    }
+  })
+
+  const solutionStore = useSolutionStore()
+
+  const loadSolutionByVendor = async () => {
+    try {
+      isLoading.value = true
+      solution.value = await props.loadSolutionService({
+        vendor: route.params.vendor,
+        solution: route.params.solution
+      })
+
+      solutionTrackerData.value = {
+        isv: solution.value.vendor.slug,
+        version: solution.value.version,
+        versionId: solution.value.latestVersionInstallTemplate,
+        solutionId: solution.value.id,
+        templateName: solution.value.name
       }
+      solutionStore.setSolution(solutionTrackerData.value)
+    } catch (error) {
+      toast.add({
+        closable: true,
+        severity: 'error',
+        summary: error
+      })
+    } finally {
+      isLoading.value = false
     }
   }
+
+  const handleCancel = () => {
+    router.push('/')
+  }
+
+  const goToVendorPage = () => {
+    props.windowOpen(solution.value.vendor.url, '_blank')
+  }
+
+  const openDetails = () => {
+    tracker.clickMoreDetailsOnTemplate(solutionTrackerData.value).track()
+    showDetails.value = true
+  }
+
+  const handleInstantiate = ({ result }) => {
+    router.push({
+      path: `/create/deploy/${result.uuid}`
+    })
+  }
+
+  const handleSubmitClick = () => {
+    tracker
+      .eventClickedToDeploy({
+        isv: solution.value.vendor.slug,
+        version: solution.value.version,
+        versionId: solution.value.latestVersionInstallTemplate,
+        solutionId: solution.value.id,
+        templateName: solution.value.name
+      })
+      .track()
+  }
+
+  onMounted(async () => {
+    store.startLoading()
+    await loadSolutionByVendor()
+    store.finishLoading()
+  })
+
+  watchEffect(() => {
+    if (!route.params.vendor || !route.params.solution) {
+      return
+    }
+    loadSolutionByVendor()
+  })
 </script>

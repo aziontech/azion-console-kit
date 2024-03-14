@@ -18,7 +18,7 @@ const purge = [
     title: 'Purge:url  was created',
     comment: '-',
     type: 'created',
-    requestData: '"{\\"items\\": [\\"www.vicva.com\\"], \\"layer\\": \\"edge_caching\\"}"',
+    requestData: '"{\\"items\\": [\\"www.vicva.com\\"], \\"layer\\": \\"edge_cache\\"}"',
     authorName: 'Paulo Sobrinho Ferreira',
     authorEmail: 'paulo.ferreira+teste1@azion.com',
     accountId: '2515'
@@ -28,7 +28,7 @@ const purge = [
 const fixtures = {
   realTimePurgeMock: {
     arguments: ['www.vicva.com'],
-    layer: 'edge_caching',
+    layer: 'edge_cache',
     time: 'Wednesday, December 13, 2023 at 6:02 PM',
     type: 'url',
     user: 'paulo.ferreira+teste1@azion.com'

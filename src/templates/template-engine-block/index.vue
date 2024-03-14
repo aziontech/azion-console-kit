@@ -128,7 +128,7 @@
 
   defineOptions({ name: 'templateEngineBlock' })
 
-  const emit = defineEmits(['instantiate', 'cancel'])
+  const emit = defineEmits(['instantiate', 'cancel', 'submitClick'])
 
   const props = defineProps({
     getTemplateService: {
@@ -299,9 +299,9 @@
   }
 
   const validateAndSubmit = async () => {
+    emit('submitClick')
     submitLoading.value = true
     emit('loading')
-
     try {
       const payload = []
       if (inputSchema.value.fields) {

@@ -1,10 +1,10 @@
 <script setup>
-  import { ref, watch, computed } from 'vue'
-  import Divider from 'primevue/divider'
-  import InfoSection from '@/templates/info-drawer-block/info-section'
-  import TextInfo from '@/templates/info-drawer-block/info-labels/text-info.vue'
-  import BigNumber from '@/templates/info-drawer-block/info-labels/big-number.vue'
   import InfoDrawerBlock from '@/templates/info-drawer-block'
+  import BigNumber from '@/templates/info-drawer-block/info-labels/big-number.vue'
+  import TextInfo from '@/templates/info-drawer-block/info-labels/text-info.vue'
+  import InfoSection from '@/templates/info-drawer-block/info-section'
+  import Divider from 'primevue/divider'
+  import { computed, ref, watch } from 'vue'
   defineOptions({ name: 'drawer-events-image-processor' })
 
   const props = defineProps({
@@ -86,7 +86,7 @@
           :tags="referenceErrorTag"
         >
           <template #body>
-            <div class="flex w-full lg:gap-8">
+            <div class="grid grid-cols-2 lg:grid-cols-3 w-full ml-[1px] gap-4 lg:gap-8">
               <BigNumber
                 label="Request Time"
                 sufix="ms"
@@ -116,7 +116,7 @@
               </div>
               <div class="flex flex-col w-full sm:w-5/12 flex-1 gap-3">
                 <TextInfo label="Request Method">{{ details.requestMethod }}</TextInfo>
-                <TextInfo label="Request Uri">{{ details.requestUri }}</TextInfo>
+                <TextInfo label="Request URI">{{ details.requestUri }}</TextInfo>
                 <TextInfo label="Status Code">{{ details.status }}</TextInfo>
               </div>
             </div>

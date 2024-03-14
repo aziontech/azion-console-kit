@@ -24,7 +24,7 @@
       <span class="text-2xl font-bold">
         <slot></slot>
       </span>
-      <span class="text-color">{{ props.sufix }}</span>
+      <span class="text-sm text-color">{{ props.sufix }}</span>
     </div>
   </div>
 </template>

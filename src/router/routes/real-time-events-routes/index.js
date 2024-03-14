@@ -11,43 +11,43 @@ export const realTimeEventsRoutes = {
     httpRequests: {
       listHttpRequest: RealTimeEventsService.listHttpRequest,
       loadHttpRequest: RealTimeEventsService.loadHttpRequest,
-      documentationService: Helpers.documentationGuideProducts.realTimeEvents
+      documentationService: Helpers.documentationGuideProducts.realTimeEventsHttpRequest
     },
     edgeFunctions: {
       listEdgeFunctions: RealTimeEventsService.listEdgeFunctions,
       loadEdgeFunctions: RealTimeEventsService.loadEdgeFunctions,
-      documentationService: Helpers.documentationGuideProducts.realTimeEvents
+      documentationService: Helpers.documentationGuideProducts.realTimeEventsEdgeFunctions
     },
     edgeFunctionsConsole: {
       listEdgeFunctionsConsole: RealTimeEventsService.listEdgeFunctionsConsole,
       loadEdgeFunctionsConsole: RealTimeEventsService.loadEdgeFunctionsConsole,
-      documentationService: Helpers.documentationGuideProducts.realTimeEvents
+      documentationService: Helpers.documentationGuideProducts.realTimeEventsEdgeFunctionsConsole
     },
     imageProcessor: {
       listImageProcessor: RealTimeEventsService.listImageProcessor,
       loadImageProcessor: RealTimeEventsService.loadImageProcessor,
-      documentationService: Helpers.documentationGuideProducts.realTimeEvents
+      documentationService: Helpers.documentationGuideProducts.realTimeEventsImageProcessor
     },
-    l2Cache: {
-      listL2Cache: RealTimeEventsService.listL2Cache,
-      loadL2Cache: RealTimeEventsService.loadL2Cache,
-      documentationService: Helpers.documentationGuideProducts.realTimeEvents,
+    tieredCache: {
+      listTieredCache: RealTimeEventsService.listTieredCache,
+      loadTieredCache: RealTimeEventsService.loadTieredCache,
+      documentationService: Helpers.documentationGuideProducts.realTimeEventsTieredCache,
       clipboardWrite: Helpers.clipboardWrite
     },
-    intelligentDNS: {
-      listIntelligentDNS: RealTimeEventsService.listIntelligentDNS,
-      loadIntelligentDNS: RealTimeEventsService.loadIntelligentDNS,
-      documentationService: Helpers.documentationGuideProducts.realTimeEvents
+    edgeDNS: {
+      listEdgeDNS: RealTimeEventsService.listEdgeDNS,
+      loadEdgeDNS: RealTimeEventsService.loadEdgeDNS,
+      documentationService: Helpers.documentationGuideProducts.realTimeEventsEdgeDNS
     },
-    dataStreaming: {
-      listDataStreaming: RealTimeEventsService.listDataStreaming,
-      loadDataStreaming: RealTimeEventsService.loadDataStreaming,
-      documentationService: Helpers.documentationGuideProducts.realTimeEvents
+    dataStream: {
+      listDataStream: RealTimeEventsService.listDataStream,
+      loadDataStream: RealTimeEventsService.loadDataStream,
+      documentationService: Helpers.documentationGuideProducts.realTimeEventsDataStream
     },
     activityHistory: {
       listActivityHistory: RealTimeEventsService.listActivityHistory,
       loadActivityHistory: RealTimeEventsService.loadActivityHistory,
-      documentationService: Helpers.documentationGuideProducts.realTimeEvents
+      documentationService: Helpers.documentationGuideProducts.realTimeEventsActivityHistory
     }
   },
   meta: {

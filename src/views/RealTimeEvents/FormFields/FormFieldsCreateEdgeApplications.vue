@@ -71,7 +71,7 @@
   const { value: cdnCacheSettingsMaximumTtl } = useField('cdnCacheSettingsMaximumTtl')
 
   const { value: websocket } = useField('websocket')
-  const { value: applicationAcceleration } = useField('applicationAcceleration')
+  const { value: applicationAccelerator } = useField('applicationAccelerator')
   const { value: caching } = useField('caching')
   const { value: deviceDetection } = useField('deviceDetection')
   const { value: edgeFunctions } = useField('edgeFunctions')
@@ -557,8 +557,8 @@
           />
 
           <div class="text-color-secondary text-sm font-normal">
-            Enable Application Acceleration on the Main Settings tab to use values lower than 60
-            seconds. L2 Caching requires cache TTL to be equal to or greater than 3 seconds.
+            Enable Application Accelerator in the Main Settings tab to use values lower than 60
+            seconds. Tiered Cache requires cache TTL to be equal to or greater than 3 seconds.
           </div>
         </div>
       </div>
@@ -578,7 +578,7 @@
             :pt="{
               body: {
                 class: `p-4 border rounded-md ${
-                  applicationAcceleration ? 'border-orange-500' : 'border-transparent'
+                  applicationAccelerator ? 'border-orange-500' : 'border-transparent'
                 }`
               },
               title: { class: 'flex justify-between items-center text-base font-medium m-0' },
@@ -588,8 +588,8 @@
             }"
           >
             <template #title>
-              <span class="text-base">Application Acceleration</span>
-              <InputSwitch v-model="applicationAcceleration" />
+              <span class="text-base">Application Accelerator</span>
+              <InputSwitch v-model="applicationAccelerator" />
             </template>
             <template #subtitle>Optimize protocols and manage dynamic content delivery.</template>
           </Card>
@@ -603,7 +603,7 @@
             }"
           >
             <template #title>
-              <span class="text-base">Edge Caching</span>
+              <span class="text-base">Edge Cache</span>
               <InputSwitch
                 v-model="caching"
                 disabled
@@ -764,7 +764,7 @@
 
   <FormHorizontal
     title="Debug Rules"
-    description="Log executed rules created in Rules Engine. Query logs using Data Streaming, Real-Time Events, or Real-Time Events GraphQL API."
+    description="Log executed rules created in Rules Engine. Query logs using Data Stream, Real-Time Events, or Real-Time Events GraphQL API."
     v-if="handleBlock('debug-rules')"
   >
     <template #inputs>

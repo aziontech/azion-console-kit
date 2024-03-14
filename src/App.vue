@@ -15,11 +15,11 @@
   const route = useRoute()
 
   const updateTrackingTraits = () => {
-    const { kind: accountType, client_id: clientId } = accountStore.account
+    const { kind: accountType, client_id: clientId, email, name } = accountStore.account
     const isAccountTypeWithoutClientId = accountType !== 'client'
     if (isAccountTypeWithoutClientId) return
 
-    const defaultTraits = { client_id: clientId }
+    const defaultTraits = { client_id: clientId, email, name }
     tracker.assignGroupTraits(defaultTraits)
     tracker.identify(clientId)
   }

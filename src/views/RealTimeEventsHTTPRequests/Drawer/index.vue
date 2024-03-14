@@ -1,9 +1,9 @@
 <script setup>
-  import { ref, watch, computed } from 'vue'
-  import InfoSection from '@/templates/info-drawer-block/info-section'
-  import TextInfo from '@/templates/info-drawer-block/info-labels/text-info.vue'
   import BigNumber from '@/templates/info-drawer-block/info-labels/big-number.vue'
+  import TextInfo from '@/templates/info-drawer-block/info-labels/text-info.vue'
+  import InfoSection from '@/templates/info-drawer-block/info-section'
   import Divider from 'primevue/divider'
+  import { computed, ref, watch } from 'vue'
 
   import InfoDrawerBlock from '@/templates/info-drawer-block'
   defineOptions({ name: 'drawer-events-http-requests' })
@@ -32,36 +32,46 @@
   )
 
   const hostTag = computed(() => {
+    const tagHost = []
     if (details.value.scheme) {
-      return [
-        {
-          text: `Scheme: ${details.value.scheme}`
-        }
-      ]
+      tagHost.push({
+        text: `Scheme: ${details.value.scheme}`
+      })
     }
-    return []
+
+    return tagHost
   })
 
   const secureTag = computed(() => {
-    if (details.value.wafScore !== undefined) {
-      return [
-        {
-          text: `WAF Score: ${details.value.wafScore}`
-        }
-      ]
+    const tagSecure = []
+    if (details.value.wafScore) {
+      tagSecure.push({
+        text: `WAF Score: ${details.value.wafScore}`
+      })
     }
-    return []
+    return tagSecure
   })
 
   const upstreamTag = computed(() => {
+    const tagUpstream = []
     if (details.value.upstreamCacheStatus) {
-      return [
-        {
-          text: `Upstream Cache Status: ${details.value.upstreamCacheStatus}`
-        }
-      ]
+      tagUpstream.push({
+        text: `Upstream Cache Status: ${details.value.upstreamCacheStatus}`
+      })
     }
-    return []
+
+    return tagUpstream
+  })
+
+  const serverProtocolTag = computed(() => {
+    const tagProtocol = []
+    if (details.value.serverProtocol) {
+      tagProtocol.push({
+        text: `Server Protocol: ${details.value.serverProtocol}`
+      })
+    }
+
+    return tagProtocol
   })
 
   defineExpose({
@@ -94,9 +104,12 @@
           </template>
         </InfoSection>
 
-        <InfoSection title="Request and Response Data">
+        <InfoSection
+          title="Request and Response Data"
+          :tags="serverProtocolTag"
+        >
           <template #body>
-            <div class="flex w-full lg:gap-8">
+            <div class="grid grid-cols-2 lg:grid-cols-3 w-full ml-[1px] gap-4 lg:gap-8">
               <BigNumber
                 label="Request Time"
                 sufix="ms"
@@ -121,7 +134,7 @@
               <div class="flex flex-col gap-3 w-full sm:w-5/12 flex-1">
                 <TextInfo label="Status">{{ details.status }}</TextInfo>
                 <TextInfo label="Request Method">{{ details.requestMethod }}</TextInfo>
-                <TextInfo label="Request Uri">{{ details.requestUri }}</TextInfo>
+                <TextInfo label="Request URI">{{ details.requestUri }}</TextInfo>
               </div>
               <div class="flex flex-col gap-3 w-full sm:w-5/12 flex-1">
                 <TextInfo label="HTTP User Agent">{{ details.httpUserAgent }}</TextInfo>
@@ -175,7 +188,7 @@
           </template>
         </InfoSection>
 
-        <InfoSection title="Geo-location Data">
+        <InfoSection title="Geolocation Data">
           <template #body>
             <div class="w-full flex flex-col md:flex-row md:gap-8 gap-3">
               <div class="flex flex-col gap-3 w-full sm:w-5/12 flex-1">
@@ -194,7 +207,7 @@
           :tags="secureTag"
         >
           <template #body>
-            <div class="grid grid-cols-3 w-full gap-4 ml-0 mt-0">
+            <div class="grid grid-cols-2 lg:grid-cols-3 w-full ml-[1px] gap-4 lg:gap-8 mt-0">
               <BigNumber label="WAF Block">{{ details.wafBlock }}</BigNumber>
               <BigNumber label="WAF Total Blocked">{{ details.wafTotalBlocked }}</BigNumber>
               <BigNumber label="WAF Learning">{{ details.wafLearning }}</BigNumber>
@@ -209,7 +222,7 @@
                 <TextInfo label="SSL Protocol">{{ details.sslProtocol }}</TextInfo>
               </div>
               <div class="flex flex-col gap-3 w-full sm:w-5/12 flex-1">
-                <TextInfo label="WF Match">{{ details.wafMatch }}</TextInfo>
+                <TextInfo label="WAF Match">{{ details.wafMatch }}</TextInfo>
               </div>
             </div>
           </template>
