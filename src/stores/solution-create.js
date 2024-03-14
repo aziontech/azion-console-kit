@@ -1,18 +1,12 @@
 import { defineStore } from 'pinia'
 
-export const useSolutionCreate = defineStore({
+export const useSolutionStore = defineStore({
   id: 'solutionCreate',
   state: () => ({
     solution: null
   }),
-  persist: true,
-  getters: {
-    getSolution() {
-      return this.solution
-    }
-  },
   actions: {
-    addSolution(solution) {
+    setSolution(solution) {
       this.solution = solution
     },
     removeSolution() {

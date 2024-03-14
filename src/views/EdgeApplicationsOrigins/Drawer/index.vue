@@ -4,7 +4,7 @@
   import EditDrawerBlock from '@templates/edit-drawer-block'
   import { refDebounced } from '@vueuse/core'
   import { useToast } from 'primevue/usetoast'
-  import { ref, inject } from 'vue'
+  import { inject, ref } from 'vue'
   import * as yup from 'yup'
   /**@type {import('@/plugins/adapters/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
@@ -150,11 +150,12 @@
       .label('Secret Key'),
     bucketName: yup
       .string()
-      .label('Bucket Name')
       .when('originType', {
         is: 'object_storage',
-        then: (schema) => schema.required()
+        then: (schema) => schema.required(),
+        otherwise: (schema) => schema.notRequired()
       })
+      .label('Bucket Name')
   })
 
   const editService = async (payload) => {

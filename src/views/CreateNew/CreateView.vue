@@ -226,18 +226,19 @@
   </ContentBlock>
 </template>
 <script setup>
-  import { ref, onMounted, watchEffect, inject } from 'vue'
+  import { useLoadingStore } from '@/stores/loading'
+  import { useSolutionStore } from '@/stores/solution-create'
+  import ContentBlock from '@/templates/content-block'
+  import PageHeadingBlock from '@/templates/page-heading-block'
   import TemplateEngineBlock from '@/templates/template-engine-block'
+  import FormLoading from '@/templates/template-engine-block/FormLoading'
   import PrimeButton from 'primevue/button'
   import PrimeDialog from 'primevue/dialog'
-  import ContentBlock from '@/templates/content-block'
   import Sidebar from 'primevue/sidebar'
   import Skeleton from 'primevue/skeleton'
-  import FormLoading from '@/templates/template-engine-block/FormLoading'
-  import PageHeadingBlock from '@/templates/page-heading-block'
-  import { useLoadingStore } from '@/stores/loading'
-  import { useRouter, useRoute } from 'vue-router'
   import { useToast } from 'primevue/usetoast'
+  import { inject, onMounted, ref, watchEffect } from 'vue'
+  import { useRoute, useRouter } from 'vue-router'
   /**@type {import('@/plugins/adapters/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
 
@@ -269,12 +270,21 @@
     }
   })
 
+  const solutionStore = useSolutionStore()
+
   const loadSolutionByVendor = async () => {
     try {
       isLoading.value = true
       solution.value = await props.loadSolutionService({
         vendor: route.params.vendor,
         solution: route.params.solution
+      })
+      solutionStore.setSolution({
+        isv: solution.value.vendor.slug,
+        version: solution.value.version,
+        versionId: solution.value.latestVersionInstallTemplate,
+        solutionId: solution.value.id,
+        templateName: solution.value.name
       })
     } catch (error) {
       toast.add({

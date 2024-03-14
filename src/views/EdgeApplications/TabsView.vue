@@ -127,8 +127,8 @@
     return edgeApplication.value?.edgeFunctions
   })
 
-  const isEnableApplicationAcceleration = computed(() => {
-    return edgeApplication.value?.applicationAcceleration
+  const isEnableApplicationAccelerator = computed(() => {
+    return edgeApplication.value?.applicationAccelerator
   })
 
   const isLoadBalancer = computed(() => {
@@ -255,7 +255,7 @@
           <EdgeApplicationsRulesEngineListView
             v-if="showRulesEngine"
             :edgeApplicationId="edgeApplicationId"
-            :isEnableApplicationAcceleration="isEnableApplicationAcceleration"
+            :isEnableApplicationAccelerator="isEnableApplicationAccelerator"
             :isDeliveryProtocolHttps="isDeliveryProtocolHttps"
             v-bind="props.rulesEngineServices"
           />
