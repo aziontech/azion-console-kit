@@ -76,6 +76,13 @@
     debugRules: false
   })
 
+  const checkError = (error) => {
+    const [fieldName, ...restOfStringArr] = error.split(':')
+    const message = restOfStringArr.join(':').trim()
+
+    return { fieldName, message }
+  }
+
   const handleBlocks = [
     'general',
     'delivery-settings',
@@ -92,10 +99,14 @@
     })
   }
 
-  const handleTrackFailedCreation = () => {
+  const handleTrackFailedCreation = (error) => {
+    const { fieldName, message } = checkError(error)
     tracker
       .failedToCreate({
-        productName: 'Edge Application'
+        productName: 'Edge Application',
+        errorType: 'api',
+        fieldName: fieldName.trim(),
+        errorMessage: message
       })
       .track()
   }

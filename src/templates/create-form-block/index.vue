@@ -82,7 +82,7 @@
       blockViewRedirection.value = false
     } catch (error) {
       showToast('error', error)
-      emit('on-response-fail')
+      emit('on-response-fail', error)
       blockViewRedirection.value = true
     }
   })
