@@ -13,6 +13,11 @@
       required: true
     }
   })
+  const streamedLinesTooltip =
+    'Total amount of lines streamed to the configured endpoint. Maximum value of 2000. This field is the result of a sum.'
+  const dataStreamedTooltip =
+    'Total amount of data streamed, in bytes, to the configured endpoint. This field is the result of a sum.'
+
   const details = ref({})
   const showDrawer = ref(false)
 
@@ -65,6 +70,7 @@
                 label="Streamed Lines"
                 sufix="lines"
                 class="flex-1"
+                :tooltipMessage="streamedLinesTooltip"
               >
                 {{ details.streamedLines }}
               </BigNumber>
@@ -72,6 +78,7 @@
                 label="Data Streamed"
                 sufix="bytes"
                 class="flex-1"
+                :tooltipMessage="dataStreamedTooltip"
               >
                 {{ details.dataStreamed }}
               </BigNumber>
