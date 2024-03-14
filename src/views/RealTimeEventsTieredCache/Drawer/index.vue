@@ -133,7 +133,7 @@
           :tags="referenceErrorTag"
         >
           <template #body>
-            <div class="grid grid-cols-3 w-full ml-[1px] gap-4 lg:gap-8">
+            <div class="grid grid-cols-2 lg:grid-cols-3 w-full ml-[1px] gap-4 lg:gap-8">
               <BigNumber
                 label="Request Time"
                 sufix="ms"
@@ -189,9 +189,7 @@
           :tags="upstreamCacheStatusTag"
         >
           <template #body>
-            <div
-              class="flex sm:flex-row sm:flex-wrap sm:w-1/2 flex-col gap-y-4 gap-x-8 justify-between"
-            >
+            <div class="grid grid-cols-2 lg:grid-cols-3 w-full ml-[1px] gap-4 lg:gap-8">
               <BigNumber
                 label="Upstream Connect Time"
                 sufix="ms"
