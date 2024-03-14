@@ -39,6 +39,8 @@
   import PageHeadingBlock from '@/templates/page-heading-block'
   /**@type {import('@/plugins/adapters/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
+  import { useRoute } from 'vue-router'
+  const route = useRoute()
 
   const props = defineProps({
     createEdgeApplicationService: {
@@ -84,7 +86,9 @@
 
   const handleTrackCreation = () => {
     tracker.productCreated({
-      productName: 'Edge Application'
+      productName: 'Edge Application',
+      from: route.query.origin,
+      createdFrom: 'singleEntity'
     })
   }
 

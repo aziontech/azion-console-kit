@@ -83,7 +83,7 @@
         v-if="hasContentToList"
         pageTitleDelete="edge application"
         addButtonLabel="Edge Application"
-        createPagePath="/edge-applications/create"
+        createPagePath="/edge-applications/create?origin=list"
         editPagePath="/edge-applications/edit"
         :listService="props.listEdgeApplicationsService"
         :deleteService="props.deleteEdgeApplicationService"
@@ -98,7 +98,7 @@
         title="No edge applications have been created"
         description="Click the button below to create your first edge application."
         createButtonLabel="Edge Application"
-        createPagePath="/edge-applications/create"
+        createPagePath="/edge-applications/create?origin=list"
         :documentationService="props.documentationService"
       >
         <template #illustration>

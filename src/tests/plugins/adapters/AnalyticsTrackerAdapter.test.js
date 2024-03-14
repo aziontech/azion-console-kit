@@ -305,6 +305,23 @@ describe('AnalyticsTrackerAdapter', () => {
     )
   })
 
+  it('should use the clicked to deploy event with correct parameters', () => {
+    const { sut, analyticsClientSpy } = makeSut()
+    const propsMock = {
+      isv: 'vendor',
+      version: '1.0',
+      versionId: '123',
+      solutionId: '123',
+      templateName: 'name'
+    }
+
+    sut.eventClickedToDeploy({ ...propsMock })
+
+    sut.track()
+
+    expect(analyticsClientSpy.track).toHaveBeenCalledWith('Clicked to Deploy', propsMock)
+  })
+
   it('should use the deployed event with correct parameters', () => {
     const { sut, analyticsClientSpy } = makeSut()
     const propsMock = {
@@ -315,7 +332,7 @@ describe('AnalyticsTrackerAdapter', () => {
       templateName: 'name'
     }
 
-    sut.eventDeployed({...propsMock})
+    sut.eventDeployed({ ...propsMock })
 
     sut.track()
 
@@ -340,7 +357,7 @@ describe('AnalyticsTrackerAdapter', () => {
       templateName: 'name'
     }
 
-    sut.eventFailedDeployed({...propsMock})
+    sut.eventFailedDeployed({ ...propsMock })
 
     sut.track()
 
