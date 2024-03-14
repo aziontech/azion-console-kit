@@ -1,12 +1,12 @@
 <script setup>
-  import { ref, watch, computed } from 'vue'
-  import Divider from 'primevue/divider'
-  import PrimeButton from 'primevue/button'
-  import InfoSection from '@/templates/info-drawer-block/info-section'
-  import TextInfo from '@/templates/info-drawer-block/info-labels/text-info.vue'
-  import BigNumber from '@/templates/info-drawer-block/info-labels/big-number.vue'
   import InfoDrawerBlock from '@/templates/info-drawer-block'
+  import BigNumber from '@/templates/info-drawer-block/info-labels/big-number.vue'
+  import TextInfo from '@/templates/info-drawer-block/info-labels/text-info.vue'
+  import InfoSection from '@/templates/info-drawer-block/info-section'
+  import PrimeButton from 'primevue/button'
+  import Divider from 'primevue/divider'
   import { useToast } from 'primevue/usetoast'
+  import { computed, ref, watch } from 'vue'
   defineOptions({ name: 'drawer-events-tiered-cache' })
 
   const props = defineProps({
@@ -152,7 +152,7 @@
           :tags="referenceErrorTag"
         >
           <template #body>
-            <div class="grid grid-cols-3 w-full ml-[1px] gap-4 lg:gap-8">
+            <div class="grid grid-cols-2 lg:grid-cols-3 w-full ml-[1px] gap-4 lg:gap-8">
               <BigNumber
                 label="Request Time"
                 sufix="ms"
@@ -213,9 +213,7 @@
           :tags="upstreamCacheStatusTag"
         >
           <template #body>
-            <div
-              class="flex sm:flex-row sm:flex-wrap sm:w-1/2 flex-col gap-y-4 gap-x-8 justify-between"
-            >
+            <div class="grid grid-cols-2 lg:grid-cols-3 w-full ml-[1px] gap-4 lg:gap-8">
               <BigNumber
                 label="Upstream Connect Time"
                 sufix="ms"

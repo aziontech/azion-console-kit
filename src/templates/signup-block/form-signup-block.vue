@@ -96,16 +96,16 @@
 </template>
 
 <script setup>
-  import { onMounted, onUnmounted, ref, inject } from 'vue'
-  import * as yup from 'yup'
-  import { useForm, useField } from 'vee-validate'
-  import { load, getInstance } from 'recaptcha-v3'
-  import { useToast } from 'primevue/usetoast'
-  import { useRouter } from 'vue-router'
-  import InputText from 'primevue/inputtext'
-  import InputPassword from 'primevue/password'
   import PrimeButton from 'primevue/button'
   import PrimeDivider from 'primevue/divider'
+  import InputText from 'primevue/inputtext'
+  import InputPassword from 'primevue/password'
+  import { useToast } from 'primevue/usetoast'
+  import { getInstance, load } from 'recaptcha-v3'
+  import { useField, useForm } from 'vee-validate'
+  import { inject, onMounted, onUnmounted, ref } from 'vue'
+  import { useRouter } from 'vue-router'
+  import * as yup from 'yup'
   /** @type {import('@/plugins/adapters/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
 

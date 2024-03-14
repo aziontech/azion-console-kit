@@ -143,7 +143,7 @@ const DASHBOARDS_TEXTS = {
       }
     }
   },
-  intelligent_dns: {
+  edge_dns: {
     standard_queries: {
       total_queries: {
         description: 'Quantity of queries your DNS received. Displays the total amount of queries.'

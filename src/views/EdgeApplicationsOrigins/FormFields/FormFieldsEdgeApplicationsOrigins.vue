@@ -91,9 +91,12 @@
   const { value: hmacRegionName } = useField('hmacRegionName')
   const { value: hmacAccessKey } = useField('hmacAccessKey')
   const { value: hmacSecretKey } = useField('hmacSecretKey')
+  const { value: bucketName } = useField('bucketName')
+  const { value: prefix } = useField('prefix')
 
   const isSingleOriginType = computed(() => originType.value === 'single_origin')
   const isLoadBalancerOriginType = computed(() => originType.value === 'load_balancer')
+  const isObjectStorageOriginType = computed(() => originType.value === 'object_storage')
   const isHmacAuthentication = computed(() => !!hmacAuthentication.value)
   const isIpHashMethod = computed(() => method.value === 'ip_hash')
 
@@ -226,7 +229,10 @@
           Select an option to customize the origin.
         </small>
       </div>
-      <div class="flex flex-col w-full sm:max-w-3xl gap-2">
+      <div
+        class="flex flex-col w-full sm:max-w-3xl gap-2"
+        v-if="!isObjectStorageOriginType"
+      >
         <label class="text-color text-sm font-medium leading-5">Protocol Policy</label>
         <div class="flex flex-col gap-4">
           <div
@@ -282,7 +288,10 @@
           description="Define an origin for the content in FQDN format or an IPv4/IPv6 address."
         />
       </div>
-      <div class="flex flex-col sm:max-w-lg w-full gap-2">
+      <div
+        class="flex flex-col sm:max-w-lg w-full gap-2"
+        v-if="!isObjectStorageOriginType"
+      >
         <FieldText
           label="Host Header *"
           placeholder="${host}"
@@ -291,7 +300,10 @@
           description="Identify a virtualhost sent in the Host header to the origin."
         />
       </div>
-      <div class="flex flex-col sm:max-w-lg w-full gap-2">
+      <div
+        class="flex flex-col sm:max-w-lg w-full gap-2"
+        v-if="!isObjectStorageOriginType"
+      >
         <FieldText
           label="Path"
           placeholder="/path"
@@ -299,6 +311,28 @@
           :value="originPath"
           description="Specify a custom path from which edge nodes will request the origin content. If this is
           blank, Azion will use the Address as the default."
+        />
+      </div>
+      <div
+        class="flex flex-col sm:max-w-lg w-full gap-2"
+        v-if="isObjectStorageOriginType"
+      >
+        <FieldText
+          label="Bucket Name *"
+          name="bucketName"
+          :value="bucketName"
+          description="Name of the bucket created using Azion Edge Storage."
+        />
+      </div>
+      <div
+        class="flex flex-col sm:max-w-lg w-full gap-2"
+        v-if="isObjectStorageOriginType"
+      >
+        <FieldText
+          label="Prefix"
+          name="prefix"
+          :value="prefix"
+          description="Path or directory within the bucket that will serve as the origin. Leave blank if you want to use the root directory."
         />
       </div>
     </template>
@@ -496,6 +530,7 @@
     :isDrawer="true"
     title="Timeouts"
     description="Timeout settings are pre-defined by Azion and can’t be customized."
+    v-if="!isObjectStorageOriginType"
   >
     <template #inputs>
       <div class="w-full flex max-sm:flex-col gap-8 max-md:gap-6">
