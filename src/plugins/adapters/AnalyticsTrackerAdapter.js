@@ -194,12 +194,17 @@ export class AnalyticsTrackerAdapter {
   }
 
   /**
+   * @param {Object} payload
+   * @param {'api'|'field'} payload.method
+   *
    * @returns {AnalyticsTrackerAdapter}
    */
-  userSignedUp() {
+  userSignedUp(payload) {
     this.#events.push({
       eventName: 'User Signed Up',
-      props: {}
+      props: {
+        method: payload.method
+      }
     })
     return this
   }

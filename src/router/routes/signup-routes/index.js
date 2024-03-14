@@ -1,5 +1,6 @@
 import * as SignupService from '@/services/signup-services'
 import { listSocialIdpsService } from '@/services/social-idps-services'
+import { inject } from 'vue'
 import { useAccountStore } from '@/stores/account'
 import SignupView from '@/views/Signup/SignupView.vue'
 
@@ -47,7 +48,15 @@ export const signupRoutes = {
       },
       beforeEnter: (__, ___, next) => {
         const accountStore = useAccountStore()
-        if (accountStore.isFirstLogin) {
+        const isFirstLogin = accountStore.isFirstLogin
+
+        if (isFirstLogin && accountStore.ssoSignUpMethod) {
+          /** @type {import('@/plugins/adapters/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
+          const tracker = inject('tracker')
+          tracker.userSignedUp({ method: accountStore.ssoSignUpMethod })
+        }
+
+        if (isFirstLogin) {
           next()
         } else {
           next({ name: 'home' })
