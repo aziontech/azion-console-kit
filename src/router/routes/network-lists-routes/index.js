@@ -39,7 +39,7 @@ export const networkListsRoutes = {
             to: '/network-lists'
           },
           {
-            label: 'Create Network',
+            label: 'Create Network List',
             to: '/network-lists/create'
           }
         ]
@@ -62,7 +62,7 @@ export const networkListsRoutes = {
             to: '/network-lists'
           },
           {
-            label: 'Edit Network'
+            label: 'Edit Network List'
           }
         ]
       }

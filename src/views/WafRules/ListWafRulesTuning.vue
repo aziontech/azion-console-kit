@@ -10,7 +10,7 @@
       class="w-full sm:max-w-xs"
     />
     <MultiSelect
-      placeholder="Select Domain"
+      placeholder="Select domain"
       resetFilterOnHide
       autoFilterFocus
       optionValue="id"
@@ -26,7 +26,7 @@
       appendTo="self"
       optionValue="value"
       optionLabel="name"
-      placeholder="Select Network List"
+      placeholder="Select network list"
       filter
       showClear
       :options="netWorkListOptions.options"
@@ -38,7 +38,7 @@
   </div>
   <ListTableNoHeaderBlock
     v-show="showListTable"
-    pageTitleDelete="WAF Rules Tuning"
+    pageTitleDelete="WAF rules tuning"
     :columns="wafRulesAllowedColumns"
     :hasListService="true"
     :dataFilted="dataFiltedComputed"
@@ -46,7 +46,7 @@
     :cleanSelectData="cleanSelectData"
     :showselectionMode="true"
     :editInDrawer="openMoreDetails"
-    emptyListMessage="No WAF Rules Tuning found."
+    emptyListMessage="No requests found."
   >
     <template #header>
       <advancedFilter
@@ -61,7 +61,7 @@
   <EmptyResultsBlock
     v-if="!showListTable"
     title="Select a domain to query data"
-    description="To use this feature, a domain must be associated with the Edge Firewall rule set that has a behavior running this WAF rule."
+    description="To use this feature, a domain must be associated with the edge firewall that has a behavior running this WAF rule set."
     :documentationService="props.documentationServiceTuning"
     :inTabs="true"
   >

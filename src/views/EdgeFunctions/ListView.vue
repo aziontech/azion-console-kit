@@ -9,17 +9,17 @@
         :listService="props.listEdgeFunctionsService"
         :deleteService="props.deleteEdgeFunctionsService"
         :columns="getColumns"
-        pageTitleDelete="Edge Function"
+        pageTitleDelete="edge function"
         addButtonLabel="Edge Function"
         createPagePath="edge-functions/create"
         editPagePath="edge-functions/edit"
         @on-load-data="handleLoadData"
-        emptyListMessage="No Function found."
+        emptyListMessage="No edge functions found."
       />
       <EmptyResultsBlock
         v-else
-        title="No Functions added"
-        description="Create your first function here."
+        title="No functions have been created"
+        description="Click the button below to create your first function."
         createButtonLabel="Edge Function"
         createPagePath="edge-functions/create"
         :documentationService="props.documentationService"

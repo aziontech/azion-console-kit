@@ -149,10 +149,10 @@
       :listService="listOriginsWithDecorator"
       :deleteService="deleteOriginWithDecorator"
       :columns="getColumns"
-      pageTitleDelete="Origin"
+      pageTitleDelete="origin"
       :editInDrawer="openEditOriginDrawer"
       @on-load-data="handleLoadData"
-      emptyListMessage="No Origin found."
+      emptyListMessage="No origins found."
     >
       <template #addButton>
         <PrimeButton
@@ -167,8 +167,8 @@
   <EmptyResultsBlock
     v-else
     title="No origins have been created"
-    description="Click the button below to initiate the setup process and create your first origin."
-    createButtonLabel="Add"
+    description="Click the button below to create your first origin."
+    createButtonLabel="Origin"
     :documentationService="props.documentationService"
     :inTabs="true"
   >
@@ -176,7 +176,7 @@
       <PrimeButton
         severity="secondary"
         icon="pi pi-plus"
-        label="Add"
+        label="Origin"
         @click="openCreateOriginDrawer"
       />
     </template>

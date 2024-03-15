@@ -240,7 +240,7 @@
           :step="1"
           :class="{ 'p-invalid': cdnCacheSettingsMaximumTtlError }"
         />
-        <small class="text-color-secondary text-xs font-normal leading-tight">
+        <small class="text-color-secondary text-xs font-normal leading-5">
           Enable Application Accelerator in the Main Settings tab to use values lower than 60
           seconds. Tiered Cache requires cache TTL to be equal to or greater than 3 seconds.
         </small>
@@ -296,7 +296,7 @@
           />
         </span>
 
-        <small class="text-color-secondary text-xs font-normal leading-tight">
+        <small class="text-color-secondary text-xs font-normal leading-5">
           Define the range of segmentation of large files.
         </small>
       </div>
@@ -347,9 +347,10 @@
           :class="{ 'p-invalid': queryStringFieldsError }"
           rows="5"
           cols="30"
+          placeholder="name"
         />
-        <small class="text-color-secondary text-sm font-normal leading-tight">
-          Separate fields using line breaks.
+        <small class="text-xs text-color-secondary font-normal leading-5">
+          Separate query fields using line breaks.
         </small>
         <small class="p-error">{{ queryStringFieldsError }}</small>
       </div>
@@ -469,9 +470,10 @@
           :class="{ 'p-invalid': cookieNamesError }"
           rows="5"
           cols="30"
+          placeholder="cookie_name"
         />
-        <small class="text-color-secondary text-sm font-normal leading-tight">
-          Separate fields using line breaks.
+        <small class="text-xs text-color-secondary font-normal leading-5">
+          Separate cookies using line breaks.
         </small>
         <small class="p-error">{{ cookieNamesError }}</small>
       </div>

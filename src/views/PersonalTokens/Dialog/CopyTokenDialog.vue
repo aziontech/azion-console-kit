@@ -50,7 +50,7 @@
               disabled
             />
 
-            <small class="text-color-secondary">
+            <small class="text-xs text-color-secondary font-normal leading-5">
               Copy the personal token now. The token won't be retrievable once this dialog is
               closed.
             </small>

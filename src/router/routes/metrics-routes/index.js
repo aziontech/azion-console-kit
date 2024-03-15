@@ -12,7 +12,7 @@ export const metricsRoutes = {
   meta: {
     breadCrumbs: [
       {
-        label: 'Metrics',
+        label: 'Real-Time Metrics',
         to: '/real-time-metrics'
       }
     ]

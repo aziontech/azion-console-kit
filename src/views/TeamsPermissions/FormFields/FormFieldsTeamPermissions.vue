@@ -73,8 +73,8 @@
           id="name"
           :class="{ 'p-invalid': errorName }"
         />
-        <small class="text-xs text-color-secondary font-normal leading-tight">
-          Give a unique and easy-to-remember name.
+        <small class="text-xs text-color-secondary font-normal leading-5">
+          Give a unique and descriptive name to identify the team.
         </small>
         <small
           v-if="errorName"
@@ -117,7 +117,7 @@
             </div>
           </template>
         </PickList>
-        <small class="text-color-secondary text-sm font-normal leading-tight">
+        <small class="text-xs text-color-secondary font-normal leading-5">
           Select an item from the list and then use the arrows to move it between the available and
           selected permissions boxes. Use the double-line arrows to move all items or press the <code>ctrl</code> or <code>command</code> keys to select multiple items.
         </small>
@@ -140,8 +140,8 @@
             </div>
           </span>
         </div>
-        <small class="text-color-secondary text-sm font-normal leading-tight">
-          Activate or deactivate the team permissions for all clients within the team.
+        <small class="text-xs text-color-secondary font-normal leading-5">
+          Activate or deactivate the team permissions for all users assigned to the team.
         </small>
       </div>
     </template>

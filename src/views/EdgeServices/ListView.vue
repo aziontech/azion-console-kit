@@ -107,20 +107,20 @@
         :listService="props.listEdgeServiceServices"
         :deleteService="props.deleteEdgeServiceServices"
         :columns="getColumns"
-        pageTitleDelete="Service"
-        addButtonLabel="Add"
+        pageTitleDelete="service"
+        addButtonLabel="Service"
         createPagePath="edge-services/create"
         editPagePath="edge-services/edit"
         @on-load-data="handleLoadData"
         :rowActions="actionsRow"
-        emptyListMessage="No Service found."
+        emptyListMessage="No services found."
       />
 
       <EmptyResultsBlock
         v-else
         title="No services have been created"
-        description="Click the button below to initiate the setup process and create your first service."
-        createButtonLabel="Add"
+        description="Click the button below to create your first service."
+        createButtonLabel="Service"
         createPagePath="edge-services/create"
         :documentationService="props.documentationService"
       >

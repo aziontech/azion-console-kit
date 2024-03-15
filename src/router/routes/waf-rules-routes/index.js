@@ -19,7 +19,7 @@ export const wafRulesRoutes = {
       meta: {
         breadCrumbs: [
           {
-            label: 'Waf Rules',
+            label: 'WAF Rules',
             to: '/waf'
           }
         ]
@@ -35,7 +35,7 @@ export const wafRulesRoutes = {
       meta: {
         breadCrumbs: [
           {
-            label: 'Waf Rules',
+            label: 'WAF Rules',
             to: '/waf'
           },
           {
@@ -76,7 +76,7 @@ export const wafRulesRoutes = {
       meta: {
         breadCrumbs: [
           {
-            label: 'Waf Rules',
+            label: 'WAF Rules',
             to: '/waf'
           },
           {

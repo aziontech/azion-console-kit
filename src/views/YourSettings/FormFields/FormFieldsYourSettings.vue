@@ -96,7 +96,7 @@
 <template>
   <FormHorizontal
     title="Profile"
-    description="Fill in the required fields to add a new user to Azion Console."
+    description="Modify the personal information of the account."
   >
     <template #inputs>
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
@@ -112,8 +112,8 @@
           type="text"
           :class="{ 'p-invalid': errorFirstName }"
         />
-        <small class="text-xs text-color-secondary font-normal leading-tight">
-          The first name of the user. Maximum of 30 characters.</small
+        <small class="text-xs text-color-secondary font-normal leading-5">
+          The first name of the user.</small
         >
         <small
           id="name-help"
@@ -134,8 +134,8 @@
           type="text"
           :class="{ 'p-invalid': errorLastName }"
         />
-        <small class="text-xs text-color-secondary font-normal leading-tight">
-          The last name of the user. Maximum of 30 characters.</small
+        <small class="text-xs text-color-secondary font-normal leading-5">
+          The last name of the user.</small
         >
         <small
           id="name-help"
@@ -162,7 +162,7 @@
             :class="{ 'p-invalid': errorTimezone }"
             v-model="timezone"
           />
-          <small class="text-xs text-color-secondary font-normal leading-tight">
+          <small class="text-xs text-color-secondary font-normal leading-5">
             Timezone of the user.</small
           >
         </div>
@@ -182,7 +182,7 @@
             v-model="language"
             disabled
           >
-            <small class="text-xs text-color-secondary font-normal leading-tight">
+            <small class="text-xs text-color-secondary font-normal leading-5">
               Sets the Azion Console language for the user.</small
             >
             <template #dropdownicon>
@@ -193,7 +193,10 @@
       </div>
     </template>
   </FormHorizontal>
-  <FormHorizontal title="Contact Information">
+  <FormHorizontal
+    title="Contact Information"
+    description="Modify the contact information for the account."
+  >
     <template #inputs>
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
         <label
@@ -209,8 +212,8 @@
           placeholder="example@email.com"
           :class="{ 'p-invalid': errorEmail }"
         />
-        <small class="text-xs text-color-secondary font-normal leading-tight">
-          Email of the user. A confirmation email will be sent to this address.</small
+        <small class="text-xs text-color-secondary font-normal leading-5">
+          Email of the user.</small
         >
         <small
           id="name-help"
@@ -254,7 +257,7 @@
             />
           </div>
         </div>
-        <small class="text-xs text-color-secondary font-normal leading-tight">
+        <small class="text-xs text-color-secondary font-normal leading-5">
           The phone number of the user. Include country and region code.</small
         >
         <small
@@ -266,7 +269,10 @@
     </template>
   </FormHorizontal>
 
-  <FormHorizontal title="Security settings">
+  <FormHorizontal
+    title="Security Settings"
+    description="Modify password and confirm the password to save the new settings. Account Owners can enable or disable MFA for the account."
+  >
     <template #inputs>
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
         <label

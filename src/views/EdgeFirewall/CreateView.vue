@@ -45,7 +45,7 @@
 <template>
   <ContentBlock>
     <template #heading>
-      <PageHeadingBlock pageTitle="Create Rule Set"></PageHeadingBlock>
+      <PageHeadingBlock pageTitle="Create Edge Firewall"></PageHeadingBlock>
     </template>
     <template #content>
       <CreateFormBlock

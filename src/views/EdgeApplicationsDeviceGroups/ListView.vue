@@ -122,13 +122,13 @@
   <div v-if="hasContentToList">
     <ListTableBlock
       ref="listDeviceGroupsEdgeApplicationsRef"
-      pageTitleDelete="Device Groups"
+      pageTitleDelete="device group"
       :listService="listDeviceGroupsWithDecorator"
       :deleteService="deleteDeviceGroupsWithDecorator"
       :editInDrawer="openEditDeviceGroupDrawer"
       :columns="getColumns"
       @on-load-data="handleLoadData"
-      emptyListMessage="No Device Group found."
+      emptyListMessage="No device groups found."
     >
       <template #addButton>
         <PrimeButton
@@ -142,8 +142,8 @@
   <EmptyResultsBlock
     v-else
     title="No device groups have been created"
-    description="Click the button below to initiate the setup process and create your first device group."
-    createButtonLabel="Add"
+    description="Click the button below to create your first device group."
+    createButtonLabel="Device Group"
     :documentationService="props.documentationService"
     :inTabs="true"
   >
@@ -152,7 +152,7 @@
         @click="openCreateDeviceGroupDrawer"
         severity="secondary"
         icon="pi pi-plus"
-        label="Add"
+        label="Device Group"
       />
     </template>
     <template #illustration>

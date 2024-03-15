@@ -43,7 +43,7 @@ export const edgeFirewallRoutes = {
             to: '/edge-firewall'
           },
           {
-            label: 'Create New',
+            label: 'Create Edge Firewall',
             to: '/edge-firewall/create'
           }
         ]
@@ -94,7 +94,7 @@ export const edgeFirewallRoutes = {
             to: '/edge-firewall'
           },
           {
-            label: 'Edit Rule Set'
+            label: 'Edit Edge Firewall'
           }
         ]
       }

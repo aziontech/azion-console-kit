@@ -228,7 +228,7 @@
 <template>
   <ContentBlock>
     <template #heading>
-      <PageHeadingBlock pageTitle="Edit Data Stream" />
+      <PageHeadingBlock pageTitle="Edit Stream" />
     </template>
     <template #content>
       <EditFormBlock

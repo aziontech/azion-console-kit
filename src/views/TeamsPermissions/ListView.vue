@@ -9,19 +9,19 @@
         :listService="pros.listTeamPermissionService"
         :deleteService="pros.deleteTeamPermissionService"
         :columns="getColumns"
-        pageTitleDelete="Team"
-        addButtonLabel="Add"
+        pageTitleDelete="team"
+        addButtonLabel="Team"
         createPagePath="teams-permission/create"
         editPagePath="teams-permission/edit"
         @on-load-data="handleLoadData"
-        emptyListMessage="No Teams found."
+        emptyListMessage="No teams found."
       >
       </ListTableBlock>
       <EmptyResultsBlock
         v-else
         title="No teams have been created"
-        description="Click the button below to initiate the setup process and create your team."
-        createButtonLabel="Add"
+        description="Click the button below to create your first team and add permissions."
+        createButtonLabel="Team"
         createPagePath="teams-permission/create"
         :documentationService="documentationService"
       >

@@ -9,17 +9,17 @@
         :listService="listVariablesService"
         :deleteService="deleteVariablesService"
         :columns="getColumns"
-        pageTitleDelete="Variable"
+        pageTitleDelete="variable"
         addButtonLabel="Variable"
         createPagePath="variables/create"
         editPagePath="variables/edit"
         @on-load-data="handleLoadData"
-        emptyListMessage="No Variable found."
+        emptyListMessage="No variables found."
       />
       <EmptyResultsBlock
         v-else
-        title="No variables added"
-        description="Create your first variable."
+        title="No variables have been created"
+        description="Click the button below to create your first variable."
         createButtonLabel="Variable"
         createPagePath="variables/create"
         :documentationService="documentationService"

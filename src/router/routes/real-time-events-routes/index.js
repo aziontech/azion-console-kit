@@ -53,7 +53,7 @@ export const realTimeEventsRoutes = {
   meta: {
     breadCrumbs: [
       {
-        label: 'Events',
+        label: 'Real-Time Events',
         to: '/real-time-events'
       }
     ]

@@ -22,18 +22,18 @@
         :listService="listEdgeDNSService"
         :deleteService="deleteEdgeDNSService"
         :columns="getColumns"
-        pageTitleDelete="Edge DNS"
-        addButtonLabel="Add"
+        pageTitleDelete="zone"
+        addButtonLabel="Zone"
         createPagePath="edge-dns/create"
         editPagePath="edge-dns/edit"
         @on-load-data="handleLoadData"
-        emptyListMessage="No Zone found."
+        emptyListMessage="No zone found."
       />
       <EmptyResultsBlock
         v-else
-        title="No zone has been created"
-        description="Click the button below to initiate the setup process and create your first zone."
-        createButtonLabel="Add"
+        title="No zone has been added"
+        description="Click the button below to add your first zone."
+        createButtonLabel="Zone"
         createPagePath="edge-dns/create"
         :documentationService="documentationService"
       >

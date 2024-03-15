@@ -16,8 +16,8 @@
           placeholder="My stream"
           :class="{ 'p-invalid': nameError }"
         />
-        <small class="text-xs text-color-secondary font-normal leading-tight">
-          Give a unique and easy-to-remember name.</small
+        <small class="text-xs text-color-secondary font-normal leading-5">
+          Give a unique and descriptive name to identify the data stream.</small
         >
         <small
           id="name-help"
@@ -49,7 +49,7 @@
             optionValue="value"
             class="w-full"
           />
-          <small class="text-color-secondary text-xs font-normal leading-tight">
+          <small class="text-xs text-color-secondary font-normal leading-5">
             Represents the data source the data will be collected from.
           </small>
         </div>
@@ -69,7 +69,7 @@
             optionValue="value"
             class="w-full"
           />
-          <small class="text-color-secondary text-xs font-normal leading-tight">
+          <small class="text-xs text-color-secondary font-normal leading-5">
             Represents a preset of variables for specific sources or an open template to choose
             variables.
           </small>
@@ -89,7 +89,7 @@
           :options="optionsMonacoEditor"
           class="min-h-[100px] surface-border border rounded-sm overflow-hidden"
         />
-        <small class="text-color-secondary text-xs font-normal leading-tight">
+        <small class="text-xs text-color-secondary font-normal leading-5">
           Exhibits or allows writing the variables that'll be sent to the connector in a JSON
           format.
         </small>
@@ -124,8 +124,8 @@
             />
             <label class="text-color text-sm font-normal leading-tight">Filter Domains </label>
           </div>
-          <small class="text-color-secondary text-xs font-normal leading-tight"
-            >By selecting the All Current and Future Domains option, you can activate the Sampling
+          <small class="text-xs text-color-secondary font-normal leading-5">
+            By selecting the All Current and Future Domains option, you can activate the Sampling
             option.</small
           >
         </div>
@@ -162,7 +162,7 @@
           </template>
         </PickList>
 
-        <small class="text-color-secondary text-sm font-normal leading-tight">
+        <small class="text-xs text-color-secondary font-normal leading-5">
           Select an item from the list and then use the arrows to move it between the available and
           selected domains boxes. Use the double-line arrows to move all items or press the <code>ctrl</code> or <code>command</code> keys to select multiple items.
         </small>
@@ -215,7 +215,7 @@
             :max="100"
             :class="{ 'p-invalid': samplingPercentageError }"
           />
-          <small class="text-color-secondary text-xs font-normal leading-tight">
+          <small class="text-xs text-color-secondary font-normal leading-5">
             Percentage value received in return of the total data related to all domains.
           </small>
           <small
@@ -255,7 +255,7 @@
           optionValue="value"
           class="w-full"
         />
-        <small class="text-color-secondary text-sm font-normal leading-tight">
+        <small class="text-xs text-color-secondary font-normal leading-5">
           Each option represents a different platform and requires different values.
         </small>
       </div>
@@ -279,7 +279,7 @@
             placeholder="https://app.domain.com/"
             :class="{ 'p-invalid': endpointUrlError }"
           />
-          <small class="text-color-secondary text-xs font-normal leading-tight">
+          <small class="text-xs text-color-secondary font-normal leading-5">
             Specific URL that'll receive the collected data.
           </small>
           <small
@@ -345,7 +345,7 @@
             rows="5"
             cols="30"
           />
-          <small class="text-color-secondary text-xs font-normal leading-tight">
+          <small class="text-xs text-color-secondary font-normal leading-5">
             List of hosts and ports in a Kafka cluster. Separate items by comma and no space.
           </small>
           <small
@@ -368,7 +368,7 @@
             type="text"
             :class="{ 'p-invalid': kafkaTopicError }"
           />
-          <small class="text-color-secondary text-xs font-normal leading-tight">
+          <small class="text-xs text-color-secondary font-normal leading-5">
             Name of the topic in a Kafka cluster.
           </small>
           <small
@@ -391,7 +391,7 @@
               class="text-sm font-normal leading-tight"
               >Enable Transport Layer Security (TLS)</label
             >
-            <small class="text-color-secondary text-sm font-normal leading-tight">
+            <small class="text-xs text-color-secondary font-normal leading-5">
               Send encrypted data to secure communication. Make sure the receiving connector uses a
               trusted CA certificate.
             </small>
@@ -416,7 +416,7 @@
             placeholder="https://myownhost.s3.us-east-1.myprovider.com"
             :class="{ 'p-invalid': hostError }"
           />
-          <small class="text-color-secondary text-sm font-normal leading-tight">
+          <small class="text-xs text-color-secondary font-normal leading-5">
             Specific URL that'll receive the collected data. Accepts all providers that work with an
             S3 protocol.
           </small>
@@ -439,7 +439,7 @@
             placeholder="mys3bucket"
             :class="{ 'p-invalid': bucketError }"
           />
-          <small class="text-color-secondary text-sm font-normal leading-tight">
+          <small class="text-xs text-color-secondary font-normal leading-5">
             Name of the bucket to which the object will be sent.
           </small>
           <small
@@ -461,7 +461,7 @@
             placeholder="us-east-1"
             :class="{ 'p-invalid': regionError }"
           />
-          <small class="text-color-secondary text-sm font-normal leading-tight">
+          <small class="text-xs text-color-secondary font-normal leading-5">
             Region in which your bucket is hosted.
           </small>
           <small
@@ -487,7 +487,7 @@
             toggleMask
             placeholder="ORIA5ZEH9MW4NL5OITY4"
           />
-          <small class="text-color-secondary text-sm font-normal leading-tight">
+          <small class="text-xs text-color-secondary font-normal leading-5">
             Public key to access the bucket.
           </small>
           <small
@@ -513,7 +513,7 @@
             :feedback="false"
             toggleMask
           />
-          <small class="text-color-secondary text-sm font-normal leading-tight">
+          <small class="text-xs text-color-secondary font-normal leading-5">
             Secret key to access the bucket.
           </small>
           <small
@@ -539,7 +539,7 @@
             :feedback="false"
             toggleMask
           />
-          <small class="text-color-secondary text-sm font-normal leading-tight">
+          <small class="text-xs text-color-secondary font-normal leading-5">
             Prefix added to the name of the uploaded object to appear on the files that'll be sent.
             Composed of Prefix + Timestamp + UUID.
           </small>
@@ -590,7 +590,7 @@
             placeholder="mycustomGBQproject01"
             :class="{ 'p-invalid': projectIDError }"
           />
-          <small class="text-color-secondary text-sm font-normal leading-tight">
+          <small class="text-xs text-color-secondary font-normal leading-5">
             ID of the project in Google Cloud.
           </small>
 
@@ -613,7 +613,7 @@
             placeholder="myGBQdataset"
             :class="{ 'p-invalid': datasetIDError }"
           />
-          <small class="text-color-secondary text-sm font-normal leading-tight">
+          <small class="text-xs text-color-secondary font-normal leading-5">
             Name of the dataset created on Google BigQuery. Case sensitive field.
           </small>
           <small
@@ -635,7 +635,7 @@
             placeholder="mypagaviewtable01"
             :class="{ 'p-invalid': tableIDError }"
           />
-          <small class="text-color-secondary text-sm font-normal leading-tight">
+          <small class="text-xs text-color-secondary font-normal leading-5">
             Name of the table on Google BigQuery.
           </small>
           <small
@@ -658,7 +658,7 @@
             :options="optionsMonacoEditor"
             class="min-h-[100px] surface-border border rounded-md overflow-hidden"
           />
-          <small class="text-color-secondary text-sm font-normal leading-tight">
+          <small class="text-xs text-color-secondary font-normal leading-5">
             JSON file provided by Google Cloud used to authenticate with Google services.
           </small>
           <small
@@ -686,7 +686,7 @@
             placeholder="https://elasticsearch-domain.com/myindex"
             :class="{ 'p-invalid': elasticsearchUrlError }"
           />
-          <small class="text-color-secondary text-sm font-normal leading-tight">
+          <small class="text-xs text-color-secondary font-normal leading-5">
             URL address plus the Elasticsearch index that'll receive the collected data.
           </small>
           <small
@@ -710,7 +710,7 @@
             rows="5"
             cols="30"
           />
-          <small class="text-color-secondary text-sm font-normal leading-tight">
+          <small class="text-xs text-color-secondary font-normal leading-5">
             API key used for Elasticsearch authorization in base64 encode format.
           </small>
           <small
@@ -738,7 +738,7 @@
             placeholder="https://inputs.splunk-client.splunkcloud.com:123456/services/collector"
             :class="{ 'p-invalid': splunkUrlError }"
           />
-          <small class="text-color-secondary text-sm font-normal leading-tight">
+          <small class="text-xs text-color-secondary font-normal leading-5">
             URL that'll receive the collected data. If you have an alternative index to point, add
             it at the end of the URL.
           </small>
@@ -762,7 +762,7 @@
             rows="5"
             cols="30"
           />
-          <small class="text-color-secondary text-sm font-normal leading-tight">
+          <small class="text-xs text-color-secondary font-normal leading-5">
             HTTP Event Collector Token provided during the Splunk installation.
           </small>
           <small
@@ -790,7 +790,7 @@
             placeholder="MyKDFConnector"
             :class="{ 'p-invalid': streamNameError }"
           />
-          <small class="text-color-secondary text-sm font-normal leading-tight">
+          <small class="text-xs text-color-secondary font-normal leading-5">
             Delivery stream name.
           </small>
           <small
@@ -812,7 +812,7 @@
             placeholder="us-east-1"
             :class="{ 'p-invalid': awsRegionError }"
           />
-          <small class="text-color-secondary text-sm font-normal leading-tight">
+          <small class="text-xs text-color-secondary font-normal leading-5">
             Region where the Amazon Kinesis instance is running.
           </small>
           <small
@@ -838,7 +838,7 @@
             :feedback="false"
             toggleMask
           />
-          <small class="text-color-secondary text-sm font-normal leading-tight">
+          <small class="text-xs text-color-secondary font-normal leading-5">
             Public key to access the Data Firehose given by AWS.
           </small>
           <small
@@ -864,7 +864,7 @@
             :feedback="false"
             toggleMask
           />
-          <small class="text-color-secondary text-sm font-normal leading-tight">
+          <small class="text-xs text-color-secondary font-normal leading-5">
             Secret key to access the Data Firehose given by AWS.
           </small>
           <small
@@ -892,7 +892,7 @@
             placeholder="https://http-intake.logs.datadoghq.com/v1/input"
             :class="{ 'p-invalid': datadogUrlError }"
           />
-          <small class="text-color-secondary text-sm font-normal leading-tight">
+          <small class="text-xs text-color-secondary font-normal leading-5">
             URL or URI of the Datadog endpoint.
           </small>
           <small
@@ -916,7 +916,7 @@
             rows="5"
             cols="30"
           />
-          <small class="text-color-secondary text-sm font-normal leading-tight">
+          <small class="text-xs text-color-secondary font-normal leading-5">
             API key generated through the Datadog dashboard.
           </small>
           <small
@@ -944,7 +944,7 @@
             placeholder="http://137.15.824.10:14440"
             :class="{ 'p-invalid': QRadarUrlError }"
           />
-          <small class="text-color-secondary text-sm font-normal leading-tight">
+          <small class="text-xs text-color-secondary font-normal leading-5">
             Specific URL that'll receive the collected data.
           </small>
           <small
@@ -973,7 +973,7 @@
             placeholder="AzureMonitorTest"
             :class="{ 'p-invalid': logTypeError }"
           />
-          <small class="text-color-secondary text-sm font-normal leading-tight">
+          <small class="text-xs text-color-secondary font-normal leading-5">
             Record type of the data that's being submitted. Accepts only letters, numbers, and the
             underscore (_) character, and it can't exceed 100 characters.
           </small>
@@ -1000,7 +1000,7 @@
             :feedback="false"
             toggleMask
           />
-          <small class="text-color-secondary text-sm font-normal leading-tight">
+          <small class="text-xs text-color-secondary font-normal leading-5">
             Shared Key of the Workspace.
           </small>
           <small
@@ -1022,7 +1022,7 @@
             placeholder="myCustomTimeField"
             type="text"
           />
-          <small class="text-color-secondary text-sm font-normal leading-tight">
+          <small class="text-xs text-color-secondary font-normal leading-5">
             Specifies how long it’ll take for the log to be available after collection. Uses
             ingestion time if not specified.
           </small>
@@ -1041,7 +1041,7 @@
             placeholder="kik73154-0426-464c-aij3-eg6d24u87c50"
             :class="{ 'p-invalid': workspaceIDError }"
           />
-          <small class="text-color-secondary text-sm font-normal leading-tight">
+          <small class="text-xs text-color-secondary font-normal leading-5">
             ID of the Workspace.
           </small>
           <small
@@ -1070,7 +1070,7 @@
             placeholder="mystorageaccount"
             :class="{ 'p-invalid': storageAccountError }"
           />
-          <small class="text-color-secondary text-sm font-normal leading-tight">
+          <small class="text-xs text-color-secondary font-normal leading-5">
             Name of the storage account.
           </small>
           <small
@@ -1093,7 +1093,7 @@
             placeholder="mycontainer"
             :class="{ 'p-invalid': containerNameError }"
           />
-          <small class="text-color-secondary text-sm font-normal leading-tight">
+          <small class="text-xs text-color-secondary font-normal leading-5">
             Name of the container.
           </small>
           <small
@@ -1116,7 +1116,7 @@
             placeholder="sp=oiuwdl&st=2022-04-14T18:05:08Z&se=2026-03-02T02:05:08Z&sv=2020-08-04&sr=c&sig=YUi0TBEt7XTlxXex4Jui%2Fc88h6qAgMmCY4XIXeMvxa0%3F"
             :class="{ 'p-invalid': blobTokenError }"
           />
-          <small class="text-color-secondary text-sm font-normal leading-tight">
+          <small class="text-xs text-color-secondary font-normal leading-5">
             Token generated by Blob Storage. It should have create, read, write, and list accesses
             granted.
           </small>

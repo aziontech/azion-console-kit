@@ -39,7 +39,7 @@ export const edgeFunctionsRoutes = {
             to: '/edge-functions'
           },
           {
-            label: 'Create Edge Functions',
+            label: 'Create Edge Function',
             to: '/edge-functions/create'
           }
         ]
@@ -61,7 +61,7 @@ export const edgeFunctionsRoutes = {
             to: '/edge-functions'
           },
           {
-            label: 'Edit Edge Functions'
+            label: 'Edit Edge Function'
           }
         ]
       }

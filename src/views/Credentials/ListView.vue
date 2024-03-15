@@ -9,17 +9,17 @@
         :listService="listCredentialsService"
         :deleteService="deleteCredentialService"
         :columns="getColumns"
-        pageTitleDelete="Credential"
+        pageTitleDelete="credential"
         addButtonLabel="Credential"
         editPagePath="credentials/edit"
         createPagePath="credentials/create"
         @on-load-data="handleLoadData"
-        emptyListMessage="No Credential found."
+        emptyListMessage="No credentials found."
       />
       <EmptyResultsBlock
         v-else
-        title="No credentials added"
-        description="Create your first credentials."
+        title="No credentials have been generated"
+        description="Click the button below to generate your first credential."
         createButtonLabel="Credential"
         createPagePath="credentials/create"
         :documentationService="documentationService"

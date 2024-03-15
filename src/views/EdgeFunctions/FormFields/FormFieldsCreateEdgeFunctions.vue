@@ -70,9 +70,10 @@
               id="name"
               type="text"
               :class="{ 'p-invalid': nameError }"
+              placeholder="My function"
             />
-            <small class="text-xs text-color-secondary font-normal leading-tight">
-              Give a unique and easy-to-remember name.</small
+            <small class="text-xs text-color-secondary font-normal leading-5">
+              Give a unique and descriptive name to identify the function.</small
             >
             <small
               v-if="nameError"
@@ -105,7 +106,7 @@
                 readonly
               />
             </span>
-            <small class="text-xs text-color-secondary font-normal leading-tight">
+            <small class="text-xs text-color-secondary font-normal leading-5">
               Currently, only JavaScript is supported.</small
             >
           </div>

@@ -189,9 +189,9 @@
             v-model="statusAnyErrorResponse.value.timeout"
             showButtons
           />
-          <div class="text-color-secondary text-sm font-normal">
+          <small class="text-xs text-color-secondary font-normal leading-5">
             Set a TTL for all status codes in cache.
-          </div>
+          </small>
         </div>
       </div>
 
@@ -225,9 +225,9 @@
                 optionLabel="name"
                 option-value="code"
               />
-              <div class="text-color-secondary text-sm font-normal">
+              <small class="text-xs text-color-secondary font-normal leading-5">
                 Select the HTTP status code to be customized.
-              </div>
+              </small>
             </div>
             <div class="flex flex-col w-full sm:max-w-xs gap-2">
               <label
@@ -242,9 +242,9 @@
                 v-model="errorResponse.value.timeout"
                 showButtons
               />
-              <div class="text-color-secondary text-sm font-normal">
+              <small class="text-xs text-color-secondary font-normal leading-5">
                 Set a TTL for the custom response.
-              </div>
+              </small>
             </div>
           </div>
           <div class="flex flex-col sm:max-w-lg w-full gap-2">
@@ -269,9 +269,9 @@
               v-model="errorResponse.value.customStatusCode"
               showButtons
             />
-            <div class="text-color-secondary text-sm font-normal">
+            <small class="text-xs text-color-secondary font-normal leading-5">
               Change the status code sent in the response.
-            </div>
+            </small>
           </div>
         </div>
       </div>

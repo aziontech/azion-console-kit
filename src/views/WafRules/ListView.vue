@@ -9,16 +9,16 @@
         :listService="props.listWafRulesService"
         :deleteService="props.deleteWafRulesService"
         :columns="getColumns"
-        pageTitleDelete="WAF Rules"
-        addButtonLabel="WAF Rules"
+        pageTitleDelete="WAF rule"
+        addButtonLabel="WAF Rule"
         createPagePath="waf/create"
         editPagePath="waf/edit"
         @on-load-data="handleLoadData"
       />
       <EmptyResultsBlock
         v-else
-        title="No WAF rules have been added"
-        description="Click the button below to initiate the setup process and create your first WAF rule."
+        title="No WAF rules have been created"
+        description="Click the button below to create your first WAF rule."
         createButtonLabel="WAF Rule"
         createPagePath="waf/create"
         :documentationService="props.documentationService"
