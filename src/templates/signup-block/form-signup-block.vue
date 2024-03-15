@@ -182,6 +182,7 @@
       const captcha = await recaptcha.execute('signup')
       await props.signupService({ ...values, captcha })
 
+      tracker.userSignedUp({ method: 'email' })
       router.push({ name: 'activation', query: { email: encodeEmail(values.email) } })
     } catch (err) {
       const { message, fieldName } = JSON.parse(err)
