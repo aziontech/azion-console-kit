@@ -68,7 +68,6 @@
     return { fieldName, message }
   }
 
-
   const loadEdgeApplication = async () => {
     return props.edgeApplication
   }
