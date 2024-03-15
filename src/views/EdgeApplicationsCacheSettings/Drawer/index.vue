@@ -4,7 +4,9 @@
   import FormFieldsEdgeApplicationCacheSettings from '../FormFields/FormFieldsEdgeApplicationCacheSettings'
   import * as yup from 'yup'
   import { refDebounced } from '@vueuse/core'
-  import { ref } from 'vue'
+  import { ref, inject } from 'vue'
+   /**@type {import('@/plugins/adapters/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
+   const tracker = inject('tracker')
 
   defineOptions({
     name: 'edge-application-cache-settings-drawer'
@@ -158,8 +160,18 @@
     closeCreateDrawer()
   }
 
+  const handleTrackSuccessEdit = () => {
+    tracker
+      .productEdited({
+        productName: 'Edge Application',
+        tab: 'cacheSettings'
+      })
+      .track()
+  }
+
   const handleEditedCacheSettings = () => {
     emit('onSuccess')
+    handleTrackSuccessEdit()
     closeCreateDrawer()
   }
 
