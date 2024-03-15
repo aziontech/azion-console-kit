@@ -101,8 +101,8 @@
 
   const handleTrackFailedCreation = (error) => {
     const { fieldName, message } = checkError(error)
-    tracker
-      .product.failedToCreate({
+    tracker.product
+      .failedToCreate({
         productName: 'Edge Application',
         errorType: 'api',
         fieldName: fieldName.trim(),

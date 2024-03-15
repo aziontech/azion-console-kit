@@ -137,8 +137,8 @@ describe('AnalyticsTrackerAdapter', () => {
     const { sut, analyticsClientSpy } = makeSut()
     const productNameMock = 'Azion Product Name Mock'
 
-    sut
-      .product.productEdited({
+    sut.product
+      .productEdited({
         productName: productNameMock
       })
       .track()
@@ -150,8 +150,8 @@ describe('AnalyticsTrackerAdapter', () => {
     const { sut, analyticsClientSpy } = makeSut()
     const productNameMock = 'Azion Product Name Mock'
 
-    sut
-      .product.failedToCreate({
+    sut.product
+      .failedToCreate({
         productName: productNameMock
       })
       .track()
@@ -166,8 +166,8 @@ describe('AnalyticsTrackerAdapter', () => {
     const { sut, analyticsClientSpy } = makeSut()
     const productNameMock = 'Azion Product Name Mock'
 
-    sut
-      .product.failedToEdit({
+    sut.product
+      .failedToEdit({
         productName: productNameMock
       })
       .track()

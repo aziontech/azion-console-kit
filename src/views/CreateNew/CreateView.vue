@@ -321,8 +321,8 @@
   }
 
   const handleSubmitClick = () => {
-    tracker
-      .create.eventClickedToDeploy({
+    tracker.create
+      .eventClickedToDeploy({
         isv: solution.value.vendor.slug,
         version: solution.value.version,
         versionId: solution.value.latestVersionInstallTemplate,

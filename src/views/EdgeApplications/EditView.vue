@@ -65,16 +65,16 @@
   }
 
   const handleTrackSuccessEdit = () => {
-    tracker
-      .product.productEdited({
+    tracker.product
+      .productEdited({
         productName: 'Edge Application',
         tab: 'mainSettings'
       })
       .track()
   }
   const handleTrackFailEdit = () => {
-    tracker
-      .product.failedToEdit({
+    tracker.product
+      .failedToEdit({
         productName: 'Edge Application'
       })
       .track()

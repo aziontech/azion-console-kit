@@ -84,23 +84,23 @@ export class ProductTracker {
     return this.#trackerAdapter
   }
 
-    /**
+  /**
    * @param {Object} payload
    * @param {AzionProductsNames} payload.productName
    * @param {String} payload.tab
    * @returns {AnalyticsTrackerAdapter}
    */
-    productEdited(payload) {
-      this.#trackerAdapter.addEvent({
-        eventName: `Edited ${payload.productName}`,
-        props: {
-          tab: payload.tab
-        }
-      })
-      return this.#trackerAdapter
-    }
+  productEdited(payload) {
+    this.#trackerAdapter.addEvent({
+      eventName: `Edited ${payload.productName}`,
+      props: {
+        tab: payload.tab
+      }
+    })
+    return this.#trackerAdapter
+  }
 
-      /**
+  /**
    * @param {Object} payload
    * @param {AzionProductsNames} payload.productName
    * @param {String} payload.errorType
@@ -120,7 +120,7 @@ export class ProductTracker {
     return this.#trackerAdapter
   }
 
-    /**
+  /**
    * @param {Object} payload
    * @param {AzionProductsNames} payload.productName
    * @param {String} payload.errorType
@@ -128,15 +128,15 @@ export class ProductTracker {
    * @param {String} payload.errorMessage
    * @returns {AnalyticsTrackerAdapter}
    */
-    failedToEdit(payload) {
-      this.#trackerAdapter.addEvent({
-        eventName: `Failed to Edit ${payload.productName}`,
-        props: {
-          errorType: payload.errorType,
-          fieldName: payload.fieldName,
-          errorMessage: payload.errorMessage
-        }
-      })
-      return this.#trackerAdapter
-    }
+  failedToEdit(payload) {
+    this.#trackerAdapter.addEvent({
+      eventName: `Failed to Edit ${payload.productName}`,
+      props: {
+        errorType: payload.errorType,
+        fieldName: payload.fieldName,
+        errorMessage: payload.errorMessage
+      }
+    })
+    return this.#trackerAdapter
+  }
 }

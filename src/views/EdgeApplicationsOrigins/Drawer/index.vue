@@ -186,8 +186,8 @@
   }
 
   const handleTrackEdit = () => {
-    tracker
-      .product.productEdited({
+    tracker.product
+      .productEdited({
         productName: 'Origin'
       })
       .product.productEdited({
@@ -230,8 +230,8 @@
 
   const handleFailedEditOrigin = (error) => {
     const { fieldName, message } = checkError(error)
-    tracker
-      .product.failedToEdit({
+    tracker.product
+      .failedToEdit({
         productName: 'Origin',
         errorMessage: message,
         fieldName: fieldName,
@@ -244,8 +244,8 @@
 
   const handleFailedCreateOrigin = (error) => {
     const { fieldName, message } = checkError(error)
-    tracker
-      .product.failedToCreate({
+    tracker.product
+      .failedToCreate({
         productName: 'Origin',
         errorType: 'api',
         fieldName: fieldName.trim(),
