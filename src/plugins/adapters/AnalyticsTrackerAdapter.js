@@ -319,7 +319,7 @@ export class AnalyticsTrackerAdapter {
     return this
   }
 
-    /**
+  /**
    * @returns {AnalyticsTrackerAdapter}
    * @param {Object} payload
    * @param {string} payload.templateName

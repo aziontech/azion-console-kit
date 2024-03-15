@@ -13,6 +13,18 @@
       required: true
     }
   })
+
+  const requestTimeTooltip =
+    'Request processing time elapsed since the first bytes were read from the client with resolution in milliseconds. This field is the result of a sum.'
+  const tcpInfoRttTooltip =
+    'Round-Trip Time (RTT) measured by the edge for the user. Available on systems that support the TCP_INFO socket option.'
+  const bytesSentTooltip = 'Number of bytes sent to a client. This field is the result of a sum.'
+
+  const upstreamResponseTimeTooltip =
+    'Time it takes for the edge to receive a default response from the origin in milliseconds, including headers and body. This field is the result of a sum.'
+  const upstreamStatusTooltip =
+    'HTTP status code of the origin. If a server can’t be selected, the variable keeps the 502 (Bad Gateway) status code.'
+
   const details = ref({})
   const showDrawer = ref(false)
 
@@ -90,18 +102,21 @@
               <BigNumber
                 label="Request Time"
                 sufix="ms"
+                :tooltipMessage="requestTimeTooltip"
               >
                 {{ details.requestTime }}
               </BigNumber>
               <BigNumber
                 label="TCP Info RTT"
                 sufix="ms"
+                :tooltipMessage="tcpInfoRttTooltip"
               >
                 {{ details.tcpinfoRtt }}
               </BigNumber>
               <BigNumber
                 label="Bytes Sent"
                 sufix="ms"
+                :tooltipMessage="bytesSentTooltip"
               >
                 {{ details.bytesSent }}
               </BigNumber>
@@ -132,10 +147,15 @@
               <BigNumber
                 label="Upstream Response Time"
                 sufix="ms"
+                :tooltipMessage="upstreamResponseTimeTooltip"
               >
                 {{ details.upstreamResponseTime }}
               </BigNumber>
-              <TextInfo label="Upstream Status">{{ details.upstreamStatus }}</TextInfo>
+              <TextInfo
+                label="Upstream Status"
+                :tooltipMessage="upstreamStatusTooltip"
+                >{{ details.upstreamStatus }}
+              </TextInfo>
             </div>
           </template>
         </InfoSection>

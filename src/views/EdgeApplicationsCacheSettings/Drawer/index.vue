@@ -5,8 +5,8 @@
   import * as yup from 'yup'
   import { refDebounced } from '@vueuse/core'
   import { ref, inject } from 'vue'
-   /**@type {import('@/plugins/adapters/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
-   const tracker = inject('tracker')
+  /**@type {import('@/plugins/adapters/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
+  const tracker = inject('tracker')
 
   defineOptions({
     name: 'edge-application-cache-settings-drawer'
