@@ -143,12 +143,15 @@ export class AnalyticsTrackerAdapter {
   /**
    * @param {Object} payload
    * @param {AzionProductsNames} payload.productName
+   * @param {String} payload.tab
    * @returns {AnalyticsTrackerAdapter}
    */
   productEdited(payload) {
     this.#events.push({
       eventName: `Edited ${payload.productName}`,
-      props: {}
+      props: {
+        tab: payload.tab
+      }
     })
     return this
   }
@@ -316,7 +319,7 @@ export class AnalyticsTrackerAdapter {
     return this
   }
 
-    /**
+  /**
    * @returns {AnalyticsTrackerAdapter}
    * @param {Object} payload
    * @param {string} payload.templateName

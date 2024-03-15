@@ -102,7 +102,7 @@ describe('EdgeApplicationServices', () => {
       vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
         statusCode,
         body: {
-          [errorKey]: [apiErrorMock]
+          [errorKey]: apiErrorMock
         }
       })
       const { sut } = makeSut()
