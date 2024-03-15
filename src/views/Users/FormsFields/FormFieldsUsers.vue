@@ -98,7 +98,7 @@
   }
   const fetchDetailAccount = async () => {
     const account = await props.loadAccountDetailsService()
-    isForceMFA.value = account?.is_enabled_mfa_to_all_users
+    isForceMFA.value = account?.data?.is_enabled_mfa_to_all_users
 
     if (!props.isEditForm) {
       return !!isForceMFA.value
@@ -408,6 +408,7 @@
             <InputSwitch
               :class="{ 'p-invalid': errorTwoFactorEnabled }"
               :readonly="isForceMFA"
+              :disabled="isForceMFA"
               v-model="twoFactorEnabled"
               inputId="twoFactor"
             />
