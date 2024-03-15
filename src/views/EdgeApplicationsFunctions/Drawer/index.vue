@@ -20,7 +20,7 @@
     :loadService="loadService"
     :editService="editService"
     :schema="validationSchema"
-    @onSuccess="emit('onSuccess')"
+    @onSuccess="handleTrackSuccessEdit"
     :showBarGoBack="true"
     @onError="closeDrawerEdit"
     title="Edit Instance"
@@ -32,12 +32,14 @@
 </template>
 
 <script setup>
-  import { ref, onMounted, computed } from 'vue'
+  import { ref, onMounted, computed, inject } from 'vue'
   import * as yup from 'yup'
   import CreateDrawerBlock from '@templates/create-drawer-block'
   import FormFieldsDrawerFunction from '@/views/EdgeApplicationsFunctions/FormFields/FormFieldsEdgeApplicationsFunctions'
   import EditDrawerBlock from '@templates/edit-drawer-block'
   import { refDebounced } from '@vueuse/core'
+  /**@type {import('@/plugins/adapters/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
+  const tracker = inject('tracker')
 
   defineOptions({ name: 'drawer-origin' })
 
@@ -83,6 +85,17 @@
     edgeFunctionID: undefined,
     args: '{}'
   })
+  
+  const handleTrackSuccessEdit = () => {
+    tracker
+      .productEdited({
+        productName: 'Edge Application',
+        tab: 'functions'
+      })
+      .track()
+
+    emit('onSuccess')
+  }
 
   const validationSchema = yup.object({
     name: yup.string().required().label('Name'),

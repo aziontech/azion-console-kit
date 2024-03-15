@@ -1,11 +1,12 @@
 <script setup>
-  import { ref } from 'vue'
+  import { ref, inject } from 'vue'
   import CreateDrawerBlock from '@templates/create-drawer-block'
   import EditDrawerBlock from '@templates/edit-drawer-block'
   import * as yup from 'yup'
   import { refDebounced } from '@vueuse/core'
   import FormFieldsDrawerDeviceGroup from '@/views/EdgeApplicationsDeviceGroups/FormFields/FormFieldsEdgeApplicationsDeviceGroups'
-
+  /**@type {import('@/plugins/adapters/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
+  const tracker = inject('tracker')
   defineOptions({ name: 'drawer-device-groups' })
 
   const emit = defineEmits(['onSuccess'])
@@ -57,6 +58,7 @@
   })
 
   const handleSuccess = () => {
+    handleTrackSuccessEdit()
     emit('onSuccess')
   }
 
@@ -71,6 +73,14 @@
       edgeApplicationId: props.edgeApplicationId
     })
     return deviceGroup
+  }
+  const handleTrackSuccessEdit = () => {
+    tracker
+      .productEdited({
+        productName: 'Edge Application',
+        tab: 'deviceGroups'
+      })
+      .track()
   }
 
   const editService = async (payload) => {

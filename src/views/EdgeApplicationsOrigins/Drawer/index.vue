@@ -190,6 +190,10 @@
       .productEdited({
         productName: 'Origin'
       })
+      .productEdited({
+        productName: 'Edge Application',
+        tab: 'origins'
+      })
       .track()
 
     emit('onSuccess')
