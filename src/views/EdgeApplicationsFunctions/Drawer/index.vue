@@ -20,7 +20,7 @@
     :loadService="loadService"
     :editService="editService"
     :schema="validationSchema"
-    @onSuccess="handleTrackSuccessEdit"
+    @onSuccess="handleSuccess"
     :showBarGoBack="true"
     @onError="closeDrawerEdit"
     title="Edit Instance"
@@ -86,6 +86,10 @@
     args: '{}'
   })
 
+  const handleSuccess = () => {
+    handleTrackSuccessEdit()
+    emit('onSuccess')
+  }
   const handleTrackSuccessEdit = () => {
     tracker
       .productEdited({
@@ -93,8 +97,6 @@
         tab: 'functions'
       })
       .track()
-
-    emit('onSuccess')
   }
 
   const validationSchema = yup.object({
