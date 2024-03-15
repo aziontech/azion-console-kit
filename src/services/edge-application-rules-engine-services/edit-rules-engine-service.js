@@ -41,10 +41,9 @@ const adapt = (payload, reorder) => {
       order: parseInt(payload.order)
     }
   } else {
-    const { name, phase, behaviors, criteria, isActive, description } = payload
+    const { name, behaviors, criteria, isActive, description } = payload
     parsedPayload = {
       name,
-      phase: phase.content || phase,
       behaviors,
       criteria,
       is_active: isActive,

@@ -35,7 +35,6 @@ describe('EdgeApplicationRulesEnginesServices', () => {
       method: 'POST',
       body: {
         name: fixtures.ruleEngineMock.name,
-        phase: fixtures.ruleEngineMock.phase,
         criteria: fixtures.ruleEngineMock.criteria,
         behaviors: fixtures.ruleEngineMock.behaviors,
         is_active: fixtures.ruleEngineMock.isActive,

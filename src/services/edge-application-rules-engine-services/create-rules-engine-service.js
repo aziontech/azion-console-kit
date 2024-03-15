@@ -16,7 +16,6 @@ export const createRulesEngineService = async (payload) => {
 const adapt = (payload) => {
   return {
     name: payload.name,
-    phase: payload.phase,
     criteria: payload.criteria,
     behaviors: payload.behaviors,
     is_active: payload.isActive,

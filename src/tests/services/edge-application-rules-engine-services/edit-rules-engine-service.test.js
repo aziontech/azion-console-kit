@@ -44,7 +44,6 @@ describe('EdgeApplicationRulesEngineServices', () => {
         description: 'description',
         is_active: undefined,
         name: 'teste name',
-        phase: 'request'
       }
     })
   })
