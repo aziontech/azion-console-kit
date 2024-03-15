@@ -43,16 +43,7 @@ const extractErrorKey = (errorSchema, key) => {
   if (typeof errorSchema[key] === 'string') {
     return `${key}: ${errorSchema[key]}`
   }
-  const keyValuePair = []
-  errorSchema[key].forEach((obj) => {
-    for (let key in obj) {
-      // eslint-disable-next-line no-prototype-builtins
-      if (obj.hasOwnProperty(key)) {
-        keyValuePair.push({ key, value: obj[key][0] })
-      }
-    }
-  })
-  return `${keyValuePair[0].key}: ${keyValuePair[0].value}`
+  return `${key}: ${errorSchema[key][0]}`
 }
 
 /**
