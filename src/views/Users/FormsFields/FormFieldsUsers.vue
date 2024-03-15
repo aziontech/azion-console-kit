@@ -153,7 +153,10 @@
 </script>
 
 <template>
-  <FormHorizontal title="General">
+  <FormHorizontal
+    title="Profile"
+    description="Provide personal information to add a new user to Azion Console."
+  >
     <template #inputs>
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
         <label
@@ -166,12 +169,16 @@
           id="firstName"
           type="text"
           :class="{ 'p-invalid': errorFirstName }"
+          placeholder="John"
         />
         <small
           id="name-help"
           class="p-error"
           >{{ errorFirstName }}</small
         >
+        <small class="text-xs text-color-secondary font-normal leading-5">
+          The first name of the user.
+        </small>
       </div>
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
         <label
@@ -184,12 +191,16 @@
           id="lastName"
           type="text"
           :class="{ 'p-invalid': errorLastName }"
+          placeholder="Doe"
         />
         <small
           id="name-help"
           class="p-error"
           >{{ errorLastName }}</small
         >
+        <small class="text-xs text-color-secondary font-normal leading-5">
+          The last name of the user.
+        </small>
       </div>
       <div class="flex sm:flex-row w-full flex-col gap-6">
         <div class="flex flex-col w-full sm:max-w-xs gap-2">
@@ -210,6 +221,9 @@
             :class="{ 'p-invalid': errorTimezone }"
             v-model="timezone"
           />
+          <small class="text-xs text-color-secondary font-normal leading-5">
+            Timezone of the user.
+          </small>
         </div>
         <div class="flex flex-col w-full sm:max-w-xs gap-2">
           <label
@@ -236,7 +250,10 @@
     </template>
   </FormHorizontal>
 
-  <FormHorizontal title="Contact information">
+  <FormHorizontal
+    title="Contact Information"
+    description="Include contact information for the user to verify the account."
+  >
     <template #inputs>
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
         <label
@@ -251,6 +268,9 @@
           placeholder="example@email.com"
           :class="{ 'p-invalid': errorEmail }"
         />
+        <small class="text-xs text-color-secondary font-normal leading-5">
+          Email of the user. A confirmation email will be sent to this address upon sign up.
+        </small>
         <small
           id="name-help"
           class="p-error"
@@ -298,6 +318,9 @@
           class="p-error"
           >{{ errorMobile }}</small
         >
+        <small class="text-xs text-color-secondary font-normal leading-5">
+          The phone number of the user. Include country and region code.
+        </small>
       </div>
     </template>
   </FormHorizontal>
@@ -327,7 +350,7 @@
           :class="{ 'p-invalid': errorTeamsIds }"
           v-model="teamsIds"
         />
-        <small class="text-xs text-color-secondary font-normal leading-tight">
+        <small class="text-xs text-color-secondary font-normal leading-5">
           Select a team for the user. You can create teams using Teams Permissions.</small
         >
       </div>
@@ -363,7 +386,7 @@
 
           <template #content>
             <small class="text-color-secondary text-sm">
-              Account owners can add all the users and have all permissions enabled.
+              Account owners can add new users and have all permissions enabled.
             </small>
           </template>
         </Card>
@@ -398,7 +421,7 @@
           </template>
           <template #content>
             <small class="text-color-secondary text-sm">
-              Accounts with MFA enabled can enforce mobile client authentication upon login.
+              Accounts with MFA enabled will require additional client authentication upon login.
             </small>
           </template>
         </Card>

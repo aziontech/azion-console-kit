@@ -157,7 +157,7 @@
             readonly
           />
         </span>
-        <small class="text-color-secondary text-xs font-normal leading-tight">
+        <small class="text-xs text-color-secondary font-normal leading-5">
           ID of the associated account. Can't be changed. Use this value to open support tickets for
           issues related to the account.
         </small>
@@ -183,7 +183,7 @@
           type="text"
           placeholder="Company S.A."
         />
-        <small class="text-color-secondary text-xs font-normal leading-tight">
+        <small class="text-xs text-color-secondary font-normal leading-5">
           Name of the company associated with the account.
         </small>
       </div>
@@ -200,7 +200,7 @@
           type="text"
           placeholder="00.000.000/0001-00"
         />
-        <small class="text-color-secondary text-xs font-normal leading-tight">
+        <small class="text-xs text-color-secondary font-normal leading-5">
           Personal or company ID number to identify account ownership.
         </small>
       </div>
@@ -218,7 +218,7 @@
           cols="30"
           placeholder="example@email.com;holder@email.com"
         />
-        <small class="text-color-secondary text-sm font-normal leading-tight">
+        <small class="text-xs text-color-secondary font-normal leading-5">
           Billing information will be forwarded to all emails listed in this field. Separate each
           email address with a semicolon (<code>;</code>).
         </small>
@@ -245,7 +245,7 @@
             :class="{ 'p-invalid': postalCodeError }"
             placeholder="00.000.000-00"
           />
-          <small class="text-color-secondary text-sm font-normal leading-tight">
+          <small class="text-xs text-color-secondary font-normal leading-5">
             Postal code of the account owner.
           </small>
           <small
@@ -274,7 +274,7 @@
             :loading="!countriesOptions.done"
             @change="resetRegionAndCity"
           />
-          <small class="text-color-secondary text-sm font-normal leading-tight">
+          <small class="text-xs text-color-secondary font-normal leading-5">
             Account owner's country.
           </small>
           <small
@@ -303,7 +303,7 @@
             v-model="region"
             :loading="!regionsOptions.done"
           />
-          <small class="text-color-secondary text-sm font-normal leading-tight">
+          <small class="text-xs text-color-secondary font-normal leading-5">
             Account owner's state or region.
           </small>
           <small
@@ -331,7 +331,7 @@
             :class="{ 'p-invalid': cityError }"
             :loading="!citiesOptions.done"
           />
-          <small class="text-color-secondary text-sm font-normal leading-tight">
+          <small class="text-xs text-color-secondary font-normal leading-5">
             Account owner's city.
           </small>
           <small
@@ -357,7 +357,7 @@
             :class="{ 'p-invalid': addressError }"
             placeholder="123 Example Ave."
           />
-          <small class="text-color-secondary text-sm font-normal leading-tight">
+          <small class="text-xs text-color-secondary font-normal leading-5">
             Account owner's street address.
           </small>
           <small
@@ -380,7 +380,7 @@
             type="text"
             placeholder="1st floor"
           />
-          <small class="text-color-secondary text-sm font-normal leading-tight">
+          <small class="text-xs text-color-secondary font-normal leading-5">
             Additional information for the address.
           </small>
         </div>

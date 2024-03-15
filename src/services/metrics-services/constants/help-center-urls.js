@@ -1,5 +1,5 @@
 const HELP_CENTER_URLS = {
-  dataStreaming: {
+  dataStream: {
     requests: {
       totalDataStreamed: '/real-time-metrics/data-streaming/requests/total-data-streamed',
       totalRequests: '/real-time-metrics/data-streaming/requests/total-requests'
@@ -55,7 +55,7 @@ const HELP_CENTER_URLS = {
       totalRequests: '/real-time-metrics/image-processor/requests/total-requests'
     }
   },
-  intelligentDns: {
+  edgeDns: {
     standardQueries: {
       totalQueries: '/real-time-metrics/intelligent-dns/standard-queries/total-queries'
     }

@@ -245,7 +245,7 @@
       }
 
       await props.putAdditionalDataService(form)
-      tracker.signUp.userSignedUp().submittedAdditionalData()
+      tracker.signUp.submittedAdditionalData()
 
       router.push({ name: 'home' })
     } catch (err) {

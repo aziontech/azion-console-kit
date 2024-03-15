@@ -4,7 +4,7 @@
   import ListTableBlock from '@/templates/list-table-block/no-header'
   import DrawerOrigin from '@/views/EdgeApplicationsOrigins/Drawer'
   import PrimeButton from 'primevue/button'
-  import { computed, ref, inject } from 'vue'
+  import { computed, inject, ref } from 'vue'
   /**@type {import('@/plugins/adapters/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
   defineOptions({ name: 'list-edge-applications-origins-tab' })
@@ -104,7 +104,7 @@
   }
 
   const openCreateOriginDrawer = () => {
-    tracker
+    tracker.product
       .clickToCreate({
         productName: 'Origin'
       })
@@ -113,7 +113,7 @@
   }
 
   const openEditOriginDrawer = (item) => {
-    tracker
+    tracker.product
       .clickToEdit({
         productName: 'Origin'
       })
@@ -149,10 +149,10 @@
       :listService="listOriginsWithDecorator"
       :deleteService="deleteOriginWithDecorator"
       :columns="getColumns"
-      pageTitleDelete="Origin"
+      pageTitleDelete="origin"
       :editInDrawer="openEditOriginDrawer"
       @on-load-data="handleLoadData"
-      emptyListMessage="No Origin found."
+      emptyListMessage="No origins found."
     >
       <template #addButton>
         <PrimeButton
@@ -167,8 +167,8 @@
   <EmptyResultsBlock
     v-else
     title="No origins have been created"
-    description="Click the button below to initiate the setup process and create your first origin."
-    createButtonLabel="Add"
+    description="Click the button below to create your first origin."
+    createButtonLabel="Origin"
     :documentationService="props.documentationService"
     :inTabs="true"
   >
@@ -176,7 +176,7 @@
       <PrimeButton
         severity="secondary"
         icon="pi pi-plus"
-        label="Add"
+        label="Origin"
         @click="openCreateOriginDrawer"
       />
     </template>

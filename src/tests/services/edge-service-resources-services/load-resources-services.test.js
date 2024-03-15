@@ -47,12 +47,12 @@ describe('EdgeServiceResourcesServices', () => {
       body: fixtures.mock
     })
     const dnsRecordMockId = 812783
-    const intelligentDNSMockId = 7879123
+    const edgeDNSMockId = 7879123
     const { sut } = makeSut()
 
     const result = await sut({
       id: dnsRecordMockId,
-      intelligentDNSId: intelligentDNSMockId
+      edgeDNSId: edgeDNSMockId
     })
 
     expect(result).toEqual({

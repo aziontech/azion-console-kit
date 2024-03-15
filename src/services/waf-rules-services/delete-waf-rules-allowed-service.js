@@ -20,7 +20,7 @@ export const deleteWafRulesAllowedService = async ({ wafId, allowedId }) => {
 const parseHttpResponse = (httpResponse) => {
   switch (httpResponse.statusCode) {
     case 202:
-      return 'Waf rule allowed successfully deleted'
+      return 'WAF allowed rule successfully deleted'
     case 400:
       throw new Errors.NotFoundError().message
     case 401:

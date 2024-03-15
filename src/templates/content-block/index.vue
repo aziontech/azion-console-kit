@@ -16,17 +16,9 @@
           />
         </template>
         <p class="text-color-secondary">
-          <b class="text-color">Experimental stage.</b>
+          <b class="text-color">Preview stage.</b>
           This platform is under development. Expect occasional instability or bugs during this
           time.
-          <ButtonPrime
-            class="p-0"
-            label="Report an issue"
-            icon="pi pi-external-link"
-            iconPos="right"
-            link
-            @click="goToCreateIssue"
-          />
         </p>
       </Message>
       <div
@@ -50,17 +42,11 @@
 </template>
 <script setup>
   defineOptions({ name: 'ContentBlock' })
-  import { windowOpen } from '@/helpers/window-open'
 
   import Message from 'primevue/message'
   import Avatar from 'primevue/avatar'
-  import ButtonPrime from 'primevue/button'
 
   import { computed, useSlots } from 'vue'
   const slots = useSlots()
   const hasHeadingSlot = computed(() => !!slots.heading)
-
-  const goToCreateIssue = () => {
-    windowOpen('https://github.com/aziontech/azion-platform-kit/issues/new', '_blank')
-  }
 </script>

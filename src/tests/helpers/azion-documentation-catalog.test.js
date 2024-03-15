@@ -47,14 +47,14 @@ describe('AzionDocumentationCatalog', () => {
       `https://www.azion.com/en/search-result/?q=edge services&filter=doc`
     )
   })
-  it('should open intelligent DNS documentation with correct link', () => {
+  it('should open edge DNS documentation with correct link', () => {
     const openWindowSpy = vi.spyOn(window, 'open')
     const { sut } = makeSut()
 
-    sut.intelligentDNS()
+    sut.edgeDNS()
 
     expect(openWindowSpy).toHaveBeenCalledWith(
-      `https://www.azion.com/en/search-result/?q=intelligent-dns&filter=doc`
+      `https://www.azion.com/en/search-result/?q=edge-dns&filter=doc`
     )
   })
   it('should open personal tokens documentation with correct link', () => {
@@ -138,11 +138,11 @@ describe('AzionDocumentationCatalog', () => {
     )
   })
 
-  it('should open data streaming documentation with correct link', () => {
+  it('should open data stream documentation with correct link', () => {
     const openWindowSpy = vi.spyOn(window, 'open')
     const { sut } = makeSut()
 
-    sut.dataStreaming()
+    sut.dataStream()
 
     expect(openWindowSpy).toHaveBeenCalledWith(
       `https://www.azion.com/en/search-result/?q=data streaming&filter=doc`

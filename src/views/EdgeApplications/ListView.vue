@@ -33,12 +33,12 @@
     hasContentToList.value = event
   }
   const handleTrackEvent = () => {
-    tracker.clickToCreate({
+    tracker.product.clickToCreate({
       productName: 'Edge Application'
     })
   }
   const handleTrackEditEvent = () => {
-    tracker.clickToEdit({
+    tracker.product.clickToEdit({
       productName: 'Edge Application'
     })
   }
@@ -81,9 +81,9 @@
     <template #content>
       <ListTableBlock
         v-if="hasContentToList"
-        pageTitleDelete="Edge Application"
+        pageTitleDelete="edge application"
         addButtonLabel="Edge Application"
-        createPagePath="/edge-applications/create"
+        createPagePath="/edge-applications/create?origin=list"
         editPagePath="/edge-applications/edit"
         :listService="props.listEdgeApplicationsService"
         :deleteService="props.deleteEdgeApplicationService"
@@ -91,14 +91,14 @@
         @on-load-data="handleLoadData"
         @on-before-go-to-add-page="handleTrackEvent"
         @on-before-go-to-edit="handleTrackEditEvent"
-        emptyListMessage="No Edge Application found."
+        emptyListMessage="No edge applications found."
       />
       <EmptyResultsBlock
         v-else
         title="No edge applications have been created"
-        description="Click the button below to initiate the setup process and create your first edge application."
+        description="Click the button below to create your first edge application."
         createButtonLabel="Edge Application"
-        createPagePath="/edge-applications/create"
+        createPagePath="/edge-applications/create?origin=list"
         :documentationService="props.documentationService"
       >
         <template #illustration>

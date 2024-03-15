@@ -72,7 +72,7 @@
   const { value: cdnCacheSettingsMaximumTtl } = useField('cdnCacheSettingsMaximumTtl')
 
   const { value: websocket } = useField('websocket')
-  const { value: applicationAcceleration } = useField('applicationAcceleration')
+  const { value: applicationAccelerator } = useField('applicationAccelerator')
   const { value: caching } = useField('caching')
   const { value: deviceDetection } = useField('deviceDetection')
   const { value: edgeFunctions } = useField('edgeFunctions')
@@ -83,6 +83,7 @@
   const setDeliveryProtocol = (protocol, enableHttp3) => {
     deliveryProtocol.value = protocol
     http3.value = enableHttp3
+    if (deliveryProtocol.value === 'http') minimumTlsVersion.value = {}
     setDefaultHttpAndHttpsPort(enableHttp3)
   }
 
@@ -303,10 +304,10 @@
             :disabled="isHttpProtocol"
           />
 
-          <div class="text-color-secondary text-sm font-normal">
+          <small class="text-xs text-color-secondary font-normal leading-5">
             Enable HTTP and HTTPS protocols to configure the minimum TLS version the application
             supports.
-          </div>
+          </small>
         </div>
 
         <div class="flex flex-col w-full sm:max-w-xs gap-2">
@@ -324,10 +325,10 @@
             :disabled="isHttpProtocol"
           />
 
-          <div class="text-color-secondary text-sm font-normal">
+          <small class="text-xs text-color-secondary font-normal leading-5">
             Select which cipher suite the application supports. See the list of supported ciphers in
             the documentation.
-          </div>
+          </small>
         </div>
       </div>
     </template>
@@ -569,7 +570,7 @@
           />
 
           <div class="text-color-secondary text-sm font-normal">
-            Enable Application Acceleration in the Main Settings tab to use values lower than 60
+            Enable Application Accelerator in the Main Settings tab to use values lower than 60
             seconds. Tiered Cache requires cache TTL to be equal to or greater than 3 seconds.
           </div>
         </div>
@@ -590,7 +591,7 @@
             :pt="{
               body: {
                 class: `p-4 border rounded-md ${
-                  applicationAcceleration ? 'border-orange-500' : 'border-transparent'
+                  applicationAccelerator ? 'border-orange-500' : 'border-transparent'
                 }`
               },
               title: { class: 'flex justify-between items-center text-base font-medium m-0' },
@@ -600,8 +601,8 @@
             }"
           >
             <template #title>
-              <span class="text-base">Application Acceleration</span>
-              <InputSwitch v-model="applicationAcceleration" />
+              <span class="text-base">Application Accelerator</span>
+              <InputSwitch v-model="applicationAccelerator" />
             </template>
             <template #subtitle>Optimize protocols and manage dynamic content delivery.</template>
           </Card>

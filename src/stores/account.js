@@ -2,8 +2,12 @@ import { defineStore } from 'pinia'
 
 export const useAccountStore = defineStore({
   id: 'account',
+  persist: {
+    paths: ['identifySignUpProvider']
+  },
   state: () => ({
-    account: {}
+    account: {},
+    identifySignUpProvider: ''
   }),
   getters: {
     accountData(state) {
@@ -23,7 +27,10 @@ export const useAccountStore = defineStore({
     },
     accountUtcOffset(state) {
       return state.account?.utc_offset || '+0000'
-    }
+    },
+    ssoSignUpMethod(state) {
+      return state.identifySignUpProvider
+    },
   },
   actions: {
     setAccountData(account) {
@@ -37,6 +44,12 @@ export const useAccountStore = defineStore({
 
       // TODO: remove the usage of localStorage when API returns the theme
       localStorage.setItem('theme', theme)
-    }
+    },
+    setSsoSignUpMethod(method) {
+      this.identifySignUpProvider = method
+    },
+    resetSsoSignUpMethod() {
+      this.identifySignUpProvider = ''
+    },
   }
 })

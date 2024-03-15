@@ -1,6 +1,4 @@
-import { SignUpTracker } from './trackers/SignUpTracker'
-import { SignInTracker } from './trackers/SignInTracker'
-import { CreateTracker } from './trackers/CreateTracker'
+import { SignUpTracker, SignInTracker, CreateTracker, ProductTracker } from './trackers'
 
 /**
  * @typedef {Object} TrackerEvent
@@ -19,12 +17,14 @@ export class AnalyticsTrackerAdapter {
   #analyticsClient = null
   #traits = {}
 
-  /** @type {SignUpTracker} - events related to signup product */
+  /** @type {SignUpTracker} */
   #signUpTracker = null
-  /** @type {SignInTracker} - events related to signin product */
+  /** @type {SignInTracker} */
   #signInTracker = null
-  /** @type {CreateTracker} - events related to create entity */
+  /** @type {CreateTracker} */
   #createTracker = null
+  /** @type {ProductTracker} */
+  #productTracker = null
 
   /**
    * Creates an instance of AnalyticsTrackerAdapter.
@@ -36,8 +36,14 @@ export class AnalyticsTrackerAdapter {
     this.#signUpTracker = new SignUpTracker(this)
     this.#signInTracker = new SignInTracker(this)
     this.#createTracker = new CreateTracker(this)
+    this.#productTracker = new ProductTracker(this)
   }
 
+  /**
+   * A method to add an event to the events array.
+   *
+   * @param {Object} event - the event to be added
+   */
   addEvent(event) {
     this.#events.push(event)
   }
@@ -52,33 +58,6 @@ export class AnalyticsTrackerAdapter {
       await this.#analyticsClient.track(eventName, propsWithTraits)
     })
     this.#events = []
-  }
-
-  /**
-   * Getter for the signUp property.
-   *
-   * @return {SignUpTracker} SignUpTracker instance
-   */
-  get signUp() {
-    return this.#signUpTracker
-  }
-
-  /**
-   * Getter for the signIn property.
-   *
-   * @return {SignInTracker} SignInTracker instance
-   */
-  get signIn() {
-    return this.#signInTracker
-  }
-
-  /**
-   * Get for the CreateTracker property.
-   *
-   * @return {CreateTracker} CreateTracker instance
-   */
-  get create() {
-    return this.#createTracker
   }
 
   /**
@@ -106,109 +85,30 @@ export class AnalyticsTrackerAdapter {
   }
 
   /**
-   * @param {Object} payload
-   * @param {string} payload.url
-   * @returns {AnalyticsTrackerAdapter}
+   * @return {SignUpTracker}
    */
-  pageLoad(payload) {
-    this.#events.push({
-      eventName: 'Page Loaded',
-      props: {
-        url: payload.url
-      }
-    })
-    return this
+  get signUp() {
+    return this.#signUpTracker
   }
 
   /**
-   * @param {Object} payload
-   * @param {AzionProductsNames} payload.productName
-   * @returns {AnalyticsTrackerAdapter}
+   * @return {SignInTracker}
    */
-  clickToCreate(payload) {
-    this.#events.push({
-      eventName: `Clicked to Create ${payload.productName}`,
-      props: {}
-    })
-    return this
+  get signIn() {
+    return this.#signInTracker
   }
 
   /**
-   * @param {Object} payload
-   * @param {AzionProductsNames} payload.productName
-   * @returns {AnalyticsTrackerAdapter}
+   * @return {CreateTracker}
    */
-  clickToEdit(payload) {
-    this.#events.push({
-      eventName: `Clicked to Edit ${payload.productName}`,
-      props: {}
-    })
-    return this
+  get create() {
+    return this.#createTracker
   }
 
   /**
-   * @param {Object} payload
-   * @param {AzionProductsNames} payload.productName
-   * @returns {AnalyticsTrackerAdapter}
+   * @return {ProductTracker}
    */
-  productCreated(payload) {
-    this.#events.push({
-      eventName: `Created ${payload.productName}`,
-      props: {}
-    })
-    return this
-  }
-
-  /**
-   * @param {Object} payload
-   * @param {AzionProductsNames} payload.productName
-   * @returns {AnalyticsTrackerAdapter}
-   */
-  productEdited(payload) {
-    this.#events.push({
-      eventName: `Edited ${payload.productName}`,
-      props: {}
-    })
-    return this
-  }
-
-  /**
-   * @param {Object} payload
-   * @param {AzionProductsNames} payload.productName
-   * @param {String} payload.errorType
-   * @param {String} payload.fieldName
-   * @param {String} payload.errorMessage
-   * @returns {AnalyticsTrackerAdapter}
-   */
-  failedToCreate(payload) {
-    this.#events.push({
-      eventName: `Failed to Create ${payload.productName}`,
-      props: {
-        errorType: payload.errorType,
-        fieldName: payload.fieldName,
-        errorMessage: payload.errorMessage
-      }
-    })
-    return this
-  }
-
-  /**
-   * @param {Object} payload
-   * @param {AzionProductsNames} payload.productName
-   * @param {String} payload.errorType
-   * @param {String} payload.fieldName
-   * @param {String} payload.errorMessage
-   * @returns {AnalyticsTrackerAdapter}
-   */
-  failedToEdit(payload) {
-    this.#events.push({
-      eventName: `Failed to Edit ${payload.productName}`,
-      props: {
-        errorType: payload.errorType,
-        fieldName: payload.fieldName,
-        errorMessage: payload.errorMessage
-      }
-    })
-    return this
+  get product() {
+    return this.#productTracker
   }
 }

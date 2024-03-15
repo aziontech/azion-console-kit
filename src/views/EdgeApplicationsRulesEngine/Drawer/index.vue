@@ -1,11 +1,13 @@
 <script setup>
-  import { ref } from 'vue'
+  import { ref, inject } from 'vue'
   import * as yup from 'yup'
   import CreateDrawerBlock from '@templates/create-drawer-block'
   import FormFieldsDrawerRulesEngine from '@/views/EdgeApplicationsRulesEngine/FormFields/FormFieldsEdgeApplicationsRulesEngine'
   import EditDrawerBlock from '@templates/edit-drawer-block'
   import { refDebounced } from '@vueuse/core'
   defineOptions({ name: 'drawer-rules-engine' })
+  /**@type {import('@/plugins/adapters/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
+  const tracker = inject('tracker')
 
   const emit = defineEmits(['onSuccess'])
 
@@ -30,7 +32,7 @@
       type: Function,
       required: true
     },
-    isEnableApplicationAcceleration: {
+    isEnableApplicationAccelerator: {
       type: Boolean,
       required: true
     },
@@ -162,8 +164,17 @@
     emit('onSuccess')
     closeDrawerCreate()
   }
+  const handleTrackSuccessEdit = () => {
+    tracker
+      .product.productEdited({
+        productName: 'Edge Application',
+        tab: 'rulesEngine'
+      })
+      .track()
+  }
   const handleEditRulesEngine = () => {
     emit('onSuccess')
+    handleTrackSuccessEdit()
     closeDrawerEdit()
   }
 
@@ -189,7 +200,7 @@
       <FormFieldsDrawerRulesEngine
         :initialPhase="initialPhase"
         :edgeApplicationId="props.edgeApplicationId"
-        :isEnableApplicationAcceleration="props.isEnableApplicationAcceleration"
+        :isEnableApplicationAccelerator="props.isEnableApplicationAccelerator"
         :isDeliveryProtocolHttps="props.isDeliveryProtocolHttps"
         :listEdgeApplicationFunctionsService="props.listEdgeApplicationFunctionsService"
         :listOriginsService="props.listOriginsService"
@@ -213,7 +224,7 @@
       <FormFieldsDrawerRulesEngine
         :selectedRulesEngineToEdit="selectedRulesEngineToEdit"
         :edgeApplicationId="props.edgeApplicationId"
-        :isEnableApplicationAcceleration="props.isEnableApplicationAcceleration"
+        :isEnableApplicationAccelerator="props.isEnableApplicationAccelerator"
         :isDeliveryProtocolHttps="props.isDeliveryProtocolHttps"
         :listEdgeApplicationFunctionsService="props.listEdgeApplicationFunctionsService"
         :listOriginsService="props.listOriginsService"

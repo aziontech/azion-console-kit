@@ -4,7 +4,7 @@
   import EditDrawerBlock from '@templates/edit-drawer-block'
   import { refDebounced } from '@vueuse/core'
   import { useToast } from 'primevue/usetoast'
-  import { ref, inject } from 'vue'
+  import { inject, ref } from 'vue'
   import * as yup from 'yup'
   /**@type {import('@/plugins/adapters/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
@@ -60,6 +60,11 @@
       label: 'Load Balancer',
       value: 'load_balancer',
       disabled: !props.isLoadBalancer
+    },
+    {
+      label: 'Edge Storage',
+      value: 'object_storage',
+      disabled: false
     }
   ]
 
@@ -85,22 +90,36 @@
     hmacAuthentication: false,
     hmacRegionName: '',
     hmacAccessKey: '',
-    hmacSecretKey: ''
+    hmacSecretKey: '',
+    bucketName: null,
+    prefix: null
   })
 
   const createFormDrawer = ref('')
   const originKey = ref('')
+
   const validationSchema = yup.object({
     name: yup.string().required().label('Name'),
     originType: yup.string().required().label('Origin Type'),
-    hostHeader: yup.string().required().label('Host Header'),
-    addresses: yup.array().of(
-      yup.object().shape({
-        address: yup.string().required().label('Address'),
-        weight: yup.number().nullable().label('Weight'),
-        isActive: yup.boolean().default(true).label('Active')
-      })
-    ),
+    hostHeader: yup
+      .string()
+      .label('Host Header')
+      .when('originType', {
+        is: (originType) => originType !== 'object_storage',
+        then: (schema) => schema.required()
+      }),
+    addresses: yup.array().when('originType', {
+      is: (originType) => originType === 'object_storage',
+      then: (schema) => schema.optional(),
+      otherwise: (schema) =>
+        schema.of(
+          yup.object().shape({
+            address: yup.string().label('Address').required(),
+            weight: yup.number().nullable().label('Weight'),
+            isActive: yup.boolean().default(true).label('Active')
+          })
+        )
+    }),
     originPath: yup
       .string()
       .test('valid', 'Use a valid origin path.', (value) => {
@@ -128,7 +147,15 @@
         is: true,
         then: (schema) => schema.required()
       })
-      .label('Secret Key')
+      .label('Secret Key'),
+    bucketName: yup
+      .string()
+      .when('originType', {
+        is: 'object_storage',
+        then: (schema) => schema.required(),
+        otherwise: (schema) => schema.notRequired()
+      })
+      .label('Bucket Name')
   })
 
   const editService = async (payload) => {
@@ -160,8 +187,12 @@
 
   const handleTrackEdit = () => {
     tracker
-      .productEdited({
+      .product.productEdited({
         productName: 'Origin'
+      })
+      .product.productEdited({
+        productName: 'Edge Application',
+        tab: 'origins'
       })
       .track()
 
@@ -180,7 +211,7 @@
   }
 
   const handleTrackCreation = () => {
-    tracker
+    tracker.product
       .productCreated({
         productName: 'Origin'
       })
@@ -200,11 +231,11 @@
   const handleFailedEditOrigin = (error) => {
     const { fieldName, message } = checkError(error)
     tracker
-      .failedToEdit({
+      .product.failedToEdit({
         productName: 'Origin',
         errorMessage: message,
         fieldName: fieldName,
-        errorType: 'API'
+        errorType: 'api'
       })
       .track()
 
@@ -214,9 +245,9 @@
   const handleFailedCreateOrigin = (error) => {
     const { fieldName, message } = checkError(error)
     tracker
-      .failedToCreate({
+      .product.failedToCreate({
         productName: 'Origin',
-        errorType: 'API',
+        errorType: 'api',
         fieldName: fieldName.trim(),
         errorMessage: message
       })

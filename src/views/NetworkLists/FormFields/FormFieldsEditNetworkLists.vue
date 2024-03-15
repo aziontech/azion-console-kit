@@ -50,7 +50,7 @@
 <template>
   <FormHorizontal
     title="General"
-    description="Edit allowlists, blocklists, and even greylists based on IP addresses, geolocation (countries), or Autonomous System Number (ASN) to use with configured rule sets on Rules Engine."
+    description="Edit allowlists, blocklists, and even greylists based on IP addresses, geolocation (countries), or Autonomous System Number (ASN) to use with Rules Engine for Edge Firewall."
   >
     <template #inputs>
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
@@ -65,8 +65,8 @@
           type="text"
           :class="{ 'p-invalid': nameError }"
         />
-        <small class="text-xs text-color-secondary font-normal leading-tight">
-          Give a unique and easy-to-remember name.</small
+        <small class="text-xs text-color-secondary font-normal leading-5">
+          Give a unique and descriptive name to identify the network list.</small
         >
         <small
           v-if="nameError"
@@ -98,7 +98,7 @@
           optionValue="value"
           class="w-full"
         />
-        <small class="text-xs text-color-secondary font-normal leading-tight">
+        <small class="text-xs text-color-secondary font-normal leading-5">
           Each list type accepts different values.</small
         >
         <small
@@ -129,7 +129,7 @@
           class="p-error text-xs font-normal leading-tight"
           >{{ itemsValuesError }}</small
         >
-        <small class="text-xs text-color-secondary font-normal leading-tight">
+        <small class="text-xs text-color-secondary font-normal leading-5">
           Separate each ASN value by using a new line. Duplicated entries are automatically
           removed.</small
         >
@@ -157,7 +157,7 @@
           class="p-error text-xs font-normal leading-tight"
           >{{ itemsValuesError }}</small
         >
-        <small class="text-xs text-color-secondary font-normal leading-tight">
+        <small class="text-xs text-color-secondary font-normal leading-5">
           Separate each address value by using a new line and, optionally, use <code>#</code> to add
           a comment and <code>--LT</code> to add a date. Duplicated entries are automatically
           removed.
@@ -188,7 +188,7 @@
           class="p-error text-xs font-normal leading-tight"
           >{{ itemsValuesCountryError }}</small
         >
-        <small class="text-xs text-color-secondary font-normal leading-tight">
+        <small class="text-xs text-color-secondary font-normal leading-5">
           Select one or more countries.</small
         >
       </div>

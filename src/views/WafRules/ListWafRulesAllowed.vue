@@ -2,14 +2,14 @@
   <ListTableNoHeaderBlock
     ref="listAllowedRef"
     v-if="hasContentToList"
-    pageTitleDelete="WAF Allowed Rules"
+    pageTitleDelete="WAF allowed rule"
     addButtonLabel="Allowed Rule"
     :editInDrawer="openEditDrawerWafRulesAllowed"
     :columns="wafRulesAllowedColumns"
     :listService="handleListWafRulesAllowedService"
     :deleteService="handleDeleteWafRulesAllowedService"
     @on-load-data="handleLoadData"
-    emptyListMessage="No allowed rule found."
+    emptyListMessage="No allowed rules found."
   >
     <template #addButton>
       <PrimeButton

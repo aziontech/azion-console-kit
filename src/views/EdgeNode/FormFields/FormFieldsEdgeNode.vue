@@ -82,7 +82,7 @@
               :disabled="true"
             />
           </span>
-          <small class="text-color-secondary text-sm font-normal leading-tight">
+          <small class="text-xs text-color-secondary font-normal leading-5">
             The hash ID used to authenticate the edge node.
           </small>
         </div>
@@ -102,7 +102,7 @@
             class="w-full"
             display="chip"
           />
-          <small class="text-xs text-color-secondary font-normal leading-tight">
+          <small class="text-xs text-color-secondary font-normal leading-5">
             Group multiple edge nodes in your edge maps for orchestration and routing.</small
           >
         </div>

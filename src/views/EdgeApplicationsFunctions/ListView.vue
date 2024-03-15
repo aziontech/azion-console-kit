@@ -15,13 +15,13 @@
       :deleteService="deleteFunctionsWithDecorator"
       :columns="getColumns"
       :editInDrawer="openEditFunctionDrawer"
-      pageTitleDelete="Function"
+      pageTitleDelete="function instance"
       @on-load-data="handleLoadData"
     >
       <template #addButton>
         <PrimeButton
           icon="pi pi-plus"
-          label="Instance"
+          label="Function Instance"
           @click="openCreateFunctionDrawer"
         />
       </template>
@@ -30,8 +30,8 @@
   <EmptyResultsBlock
     v-else
     title="No functions have been instantiated"
-    description="Click the button below to initiate the setup process and instantiate your first edge function."
-    createButtonLabel="Add"
+    description="Click the button below to instantiate your first edge function."
+    createButtonLabel="Function Instance"
     :documentationService="props.documentationService"
     :inTabs="true"
   >
@@ -39,7 +39,7 @@
       <PrimeButton
         severity="secondary"
         icon="pi pi-plus"
-        label="Add"
+        label="Function Instance"
         @click="openCreateFunctionDrawer"
       />
     </template>

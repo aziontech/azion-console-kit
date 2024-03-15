@@ -14,12 +14,17 @@ export class SignUpTracker {
   }
 
   /**
+   * @param {Object} payload
+   * @param {'google'|'azure'|'github'|'email'} payload.method
+   *
    * @returns {AnalyticsTrackerAdapter}
    */
-  userSignedUp() {
+  userSignedUp(payload) {
     this.#trackerAdapter.addEvent({
       eventName: 'User Signed Up',
-      props: {}
+      props: {
+        method: payload.method
+      }
     })
     return this.#trackerAdapter
   }

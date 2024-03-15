@@ -74,22 +74,69 @@ export class CreateTracker {
 
   /**
    * @returns {AnalyticsTrackerAdapter}
+   * @param {Object} payload
+   * @param {string} payload.templateName
+   * @param {string} payload.solutionId
+   * @param {string} payload.version
+   * @param {string} payload.versionId
+   * @param {string} payload.isv
    */
-  eventDeployed() {
+  eventDeployed(payload) {
     this.#trackerAdapter.addEvent({
       eventName: 'Deployed',
-      props: {}
+      props: {
+        templateName: payload.templateName,
+        solutionId: payload.solutionId,
+        version: payload.version,
+        versionId: payload.versionId,
+        isv: payload.isv
+      }
     })
     return this.#trackerAdapter
   }
 
   /**
    * @returns {AnalyticsTrackerAdapter}
+   * @param {Object} payload
+   * @param {string} payload.templateName
+   * @param {string} payload.solutionId
+   * @param {string} payload.version
+   * @param {string} payload.versionId
+   * @param {string} payload.isv
    */
-  eventFailedDeployed() {
+  eventFailedDeployed(payload) {
     this.#trackerAdapter.addEvent({
       eventName: 'Failed to Deploy',
-      props: {}
+      props: {
+        templateName: payload.templateName,
+        solutionId: payload.solutionId,
+        version: payload.version,
+        versionId: payload.versionId,
+        isv: payload.isv
+      }
+    })
+    return this.#trackerAdapter
+  }
+
+  /**
+   * @returns {AnalyticsTrackerAdapter}
+   * @param {Object} payload
+   * @param {string} payload.templateName
+   * @param {string} payload.solutionId
+   * @param {string} payload.version
+   * @param {string} payload.versionId
+   * @param {string} payload.isv
+   */
+  eventClickedToDeploy(payload) {
+    this.#trackerAdapter.addEvent({
+      eventName: 'Clicked to Deploy',
+      props: {
+        templateName: payload.templateName,
+        solutionId: payload.solutionId,
+        version: payload.version,
+        versionId: payload.versionId,
+        isv: payload.isv
+      }
     })
     return this.#trackerAdapter
   }

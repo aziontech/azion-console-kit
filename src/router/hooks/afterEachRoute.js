@@ -8,7 +8,7 @@ export default function afterEachRoute(to, from, failure) {
   loadingStore.finishLoading()
   /** @type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
-  tracker
+  tracker.product
     .pageLoad({
       url: to.fullPath
     })

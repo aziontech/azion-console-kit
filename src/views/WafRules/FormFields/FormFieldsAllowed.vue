@@ -111,7 +111,7 @@
             item: { class: 'whitespace-pre-line' }
           }"
         />
-        <small class="text-color-secondary font-normal leading-tight">
+        <small class="text-xs text-color-secondary font-normal leading-5">
           Select the rule that matches the request to be allowed.
         </small>
       </div>
@@ -209,7 +209,7 @@
                 v-model="matchZones[index].zone_input"
                 type="text"
               />
-              <small class="text-color-secondary leading-tight">
+              <small class="text-xs text-color-secondary font-normal leading-5">
                 Add a specific value that represents the match option or leave it blank to consider
                 empty values.
               </small>

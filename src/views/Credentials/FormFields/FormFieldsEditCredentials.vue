@@ -52,15 +52,15 @@
           cols="30"
           class="w-full"
         />
-        <small class="text-color-secondary text-xs font-normal leading-5">
-          Description of credential, e.g.: Credential used for clients XYZ.
+        <small class="text-xs text-color-secondary font-normal leading-5">
+          Description of the credential.
         </small>
       </div>
     </template>
   </FormHorizontal>
   <FormHorizontal
     title="Token"
-    description="Save the credential to visualize and copy it."
+    description="Copy the credential token to use with Edge Orchestrator."
   >
     <template #inputs>
       <div class="flex flex-col w-full gap-2">

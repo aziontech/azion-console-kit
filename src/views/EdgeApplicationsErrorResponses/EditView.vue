@@ -3,6 +3,10 @@
   import FormFieldsErrorResponses from '@/views/EdgeApplicationsErrorResponses/FormFields/FormFieldsErrorResponses'
   import ActionBarBlockWithTeleport from '@templates/action-bar-block/action-bar-with-teleport'
   import * as yup from 'yup'
+  import { inject } from 'vue'
+
+  /**@type {import('@/plugins/adapters/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
+  const tracker = inject('tracker')
 
   const props = defineProps({
     edgeApplicationId: {
@@ -36,6 +40,14 @@
       edgeApplicationId: props.edgeApplicationId
     })
   }
+  const handleTrackSuccessEdit = () => {
+    tracker
+      .product.productEdited({
+        productName: 'Edge Application',
+        tab: 'errorResponses'
+      })
+      .track()
+  }
 
   const validationSchema = yup.object({
     originId: yup.string().required(),
@@ -56,6 +68,7 @@
     :loadService="loadService"
     :schema="validationSchema"
     :isTabs="true"
+    @on-edit-success="handleTrackSuccessEdit"
   >
     <template #form>
       <FormFieldsErrorResponses

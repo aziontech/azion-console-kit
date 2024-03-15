@@ -1,9 +1,9 @@
 <script setup>
-  import { ref, watch, computed } from 'vue'
-  import InfoSection from '@/templates/info-drawer-block/info-section'
-  import TextInfo from '@/templates/info-drawer-block/info-labels/text-info.vue'
   import BigNumber from '@/templates/info-drawer-block/info-labels/big-number.vue'
+  import TextInfo from '@/templates/info-drawer-block/info-labels/text-info.vue'
+  import InfoSection from '@/templates/info-drawer-block/info-section'
   import Divider from 'primevue/divider'
+  import { computed, ref, watch } from 'vue'
 
   import InfoDrawerBlock from '@/templates/info-drawer-block'
   defineOptions({ name: 'drawer-events-http-requests' })
@@ -14,6 +14,24 @@
       required: true
     }
   })
+
+  const requestTimeTooltip =
+    'Request processing time elapsed since the first bytes were read from the client with resolution in milliseconds. This field is the result of a sum.'
+  const bytesSentTooltip = 'Number of bytes sent to a client. This field is the result of a sum.'
+  const requestLengthTooltip =
+    'Request length in bytes, including request line, headers, and body. This field is the result of a sum.'
+  const upstreamBytesReceivedTooltip =
+    'Number of bytes received by the origin’s edge if the content isn’t cached. ´Number of bytes received by the origin’s edge if the content isn’t cached.'
+  const upstreamResponseTimeTooltip =
+    'Time it takes for the edge to receive a default response from the origin in milliseconds, including headers and body.'
+  const upstreamBytesSentTooltip = 'Number of bytes sent to the origin.'
+  const wafBlockTooltip =
+    'Informs whether WAF blocked the action or not. 0 when action wasn’t blocked; 1 when action was blocked. When in Learning Mode, it won’t be blocked regardless of the return.'
+  const wafTotalBlockedTooltip = 'Total number of blocked requests.'
+  const wafLearningTooltip =
+    'Informs if WAF is in Learning mode. Returns 0 if it isn’t and 1 if it’s.'
+  const wafTotalProcessedTooltip = 'Total number of processed requests.'
+
   const details = ref({})
   const showDrawer = ref(false)
 
@@ -109,21 +127,25 @@
           :tags="serverProtocolTag"
         >
           <template #body>
-            <div class="grid grid-cols-3 w-full ml-[1px] gap-4 lg:gap-8">
+            <div class="grid grid-cols-2 lg:grid-cols-3 w-full ml-[1px] gap-4 lg:gap-8">
               <BigNumber
                 label="Request Time"
                 sufix="ms"
-                >{{ details.requestTime }}</BigNumber
-              >
+                :tooltipMessage="requestTimeTooltip"
+                >{{ details.requestTime }}
+              </BigNumber>
 
               <BigNumber
                 label="Bytes Sent"
-                sufix="bytes"
-                >{{ details.bytesSent }}</BigNumber
-              >
+                sufix="ms"
+                :tooltipMessage="bytesSentTooltip"
+                >{{ details.bytesSent }}
+              </BigNumber>
+
               <BigNumber
                 label="Request Length"
-                sufix="lines"
+                sufix="ms"
+                :tooltipMessage="requestLengthTooltip"
                 >{{ details.requestLength }}</BigNumber
               >
             </div>
@@ -157,16 +179,19 @@
               <BigNumber
                 label="Upstream Bytes Received"
                 sufix="bytes"
+                :tooltipMessage="upstreamBytesReceivedTooltip"
                 >{{ details.upstreamBytesReceived }}</BigNumber
               >
               <BigNumber
                 label="Upstream Response Time"
                 sufix="ms"
+                :tooltipMessage="upstreamResponseTimeTooltip"
                 >{{ details.upstreamResponseTime }}</BigNumber
               >
               <BigNumber
                 label="Upstream Bytes Sent"
                 sufix="bytes"
+                :tooltipMessage="upstreamBytesSentTooltip"
                 >{{ details.upstreamBytesSent }}</BigNumber
               >
             </div>
@@ -208,10 +233,26 @@
         >
           <template #body>
             <div class="grid grid-cols-3 w-full gap-4 ml-0 mt-0">
-              <BigNumber label="WAF Block">{{ details.wafBlock }}</BigNumber>
-              <BigNumber label="WAF Total Blocked">{{ details.wafTotalBlocked }}</BigNumber>
-              <BigNumber label="WAF Learning">{{ details.wafLearning }}</BigNumber>
-              <BigNumber label="WAF Total Processed">{{ details.wafTotalProcessed }}</BigNumber>
+              <BigNumber
+                label="WAF Block"
+                :tooltipMessage="wafBlockTooltip"
+                >{{ details.wafBlock }}</BigNumber
+              >
+              <BigNumber
+                label="WAF Total Blocked"
+                :tooltipMessage="wafTotalBlockedTooltip"
+                >{{ details.wafTotalBlocked }}
+              </BigNumber>
+              <BigNumber
+                label="WAF Learning"
+                :tooltipMessage="wafLearningTooltip"
+                >{{ details.wafLearning }}</BigNumber
+              >
+              <BigNumber
+                label="WAF Total Processed"
+                :tooltipMessage="wafTotalProcessedTooltip"
+                >{{ details.wafTotalProcessed }}</BigNumber
+              >
             </div>
 
             <Divider />

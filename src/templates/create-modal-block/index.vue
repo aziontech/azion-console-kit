@@ -47,7 +47,7 @@
     },
     {
       label: 'Edge Application',
-      to: '/edge-applications/create',
+      to: '/edge-applications/create?origin=create',
       description: 'Deploy an edge application to deliver content from the edge.'
     },
     {
@@ -57,7 +57,7 @@
     },
     {
       label: 'Edge DNS',
-      to: '/intelligent-dns/create',
+      to: '/edge-dns/create',
       description: 'Use an authoritative DNS server to host a domain.'
     },
     {
@@ -72,7 +72,7 @@
     },
     {
       label: 'Data Stream',
-      to: '/data-streaming/create',
+      to: '/data-stream/create',
       description: 'Feed streamimg, SIEM, and big data platforms with the event logs from Azion.'
     },
     {
@@ -94,7 +94,7 @@
       label: 'Network Lists',
       to: '/network-lists/create',
       description:
-        'Add allowlists, blocklists, and greylists to use with rule sets on Rules Engine.'
+        'Add allowlists, blocklists, and greylists to use with Rules Engine for Edge Firewall.'
     }
   ])
 
