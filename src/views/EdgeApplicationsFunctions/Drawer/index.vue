@@ -85,7 +85,7 @@
     edgeFunctionID: undefined,
     args: '{}'
   })
-  
+
   const handleTrackSuccessEdit = () => {
     tracker
       .productEdited({
