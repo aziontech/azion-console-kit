@@ -688,7 +688,7 @@
           :key="item.value"
         >
           <div
-            v-if="!isEditDrawer.value || phase === item.value"
+            v-if="!isEditDrawer || phase === item.value"
             class="w-full border-1 rounded-md surface-border flex align-items-center justify-between p-4 gap-2"
             :class="{ 'border-radio-card-active': phase === item.value }"
           >
