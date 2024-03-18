@@ -15,7 +15,7 @@ const DASHBOARDS_TEXTS = {
   },
   edge_applications: {
     data_transferred: {
-      edge_caching: {
+      edge_cache: {
         description:
           'Sum of data transferred through Edge Cache. Displays the data in bytes divided by Data Transferred, Data Transferred In, and Data Transferred Out.'
       },
