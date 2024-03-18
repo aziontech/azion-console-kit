@@ -10,7 +10,7 @@ const REPORTS = [
     id: '356217848089018959',
     chartOwner: 'azion',
     label: 'Edge Cache',
-    description: DASHBOARDS_TEXTS.edge_applications.data_transferred.edge_caching.description,
+    description: DASHBOARDS_TEXTS.edge_applications.data_transferred.edge_cache.description,
     aggregationType: 'sum',
     columns: 6,
     type: 'line',
@@ -24,7 +24,7 @@ const REPORTS = [
     groupBy: [],
     orderDirection: 'ASC',
     dashboardId: '357548608166298191',
-    helpCenterPath: HELP_CENTER_URLS.edgeApplications.dataTransferred.edgeCaching
+    helpCenterPath: HELP_CENTER_URLS.edgeApplications.dataTransferred.edgeCache
   },
   {
     id: '356220228059791957',
@@ -527,7 +527,7 @@ const REPORTS = [
     fields: ['dataTransferredTotal', 'dataTransferredOut', 'dataTransferredIn'],
     orderDirection: 'ASC',
     dashboardId: '357549371218199219',
-    helpCenterPath: HELP_CENTER_URLS.l2Caching.cachingOffload.l2Caching
+    helpCenterPath: HELP_CENTER_URLS.tieredCache.cachingOffload.tieredCache
   },
   {
     id: '357826288204907093',
@@ -549,7 +549,7 @@ const REPORTS = [
     dashboardId: '357549371218199219',
     variationType: 'regular',
     maxYAxis: 100,
-    helpCenterPath: HELP_CENTER_URLS.l2Caching.cachingOffload.l2Offload
+    helpCenterPath: HELP_CENTER_URLS.tieredCache.cachingOffload.tieredCache
   },
   /**
    * BUILD
