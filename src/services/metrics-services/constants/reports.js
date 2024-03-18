@@ -549,7 +549,7 @@ const REPORTS = [
     dashboardId: '357549371218199219',
     variationType: 'regular',
     maxYAxis: 100,
-    helpCenterPath: HELP_CENTER_URLS.tieredCache.cachingOffload.tieredCache
+    helpCenterPath: HELP_CENTER_URLS.tieredCache.cachingOffload.tieredCacheOffload
   },
   /**
    * BUILD

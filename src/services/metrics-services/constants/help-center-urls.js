@@ -62,8 +62,8 @@ const HELP_CENTER_URLS = {
   },
   tieredCache: {
     cachingOffload: {
-      tieredCache: '/real-time-metrics/l2-caching/caching-offload/tiered-cache',
-      tieredCacheOffload: '/real-time-metrics/l2-caching/caching-offload/tiered-cache-offload'
+      tieredCache: '/real-time-metrics/tiered-cache/caching-offload/tiered-cache',
+      tieredCacheOffload: '/real-time-metrics/tiered-cache/caching-offload/tiered-cache-offload'
     }
   },
   waf: {
