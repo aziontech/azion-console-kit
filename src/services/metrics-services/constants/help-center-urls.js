@@ -1,8 +1,8 @@
 const HELP_CENTER_URLS = {
   dataStream: {
     requests: {
-      totalDataStreamed: '/real-time-metrics/data-streaming/requests/total-data-streamed',
-      totalRequests: '/real-time-metrics/data-streaming/requests/total-requests'
+      totalDataStreamed: '/real-time-metrics/data-stream/requests/total-data-streamed',
+      totalRequests: '/real-time-metrics/data-stream/requests/total-requests'
     }
   },
   edgeApplications: {
@@ -57,7 +57,7 @@ const HELP_CENTER_URLS = {
   },
   edgeDns: {
     standardQueries: {
-      totalQueries: '/real-time-metrics/intelligent-dns/standard-queries/total-queries'
+      totalQueries: '/real-time-metrics/edge-dns/standard-queries/total-queries'
     }
   },
   tieredCache: {
