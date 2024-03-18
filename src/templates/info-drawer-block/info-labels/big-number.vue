@@ -1,23 +1,23 @@
 <script setup>
-import PrimeButton from 'primevue/button'
+  import PrimeButton from 'primevue/button'
 
-defineOptions({ name: 'big-number' })
-const props = defineProps({
-  label: {
-    type: String,
-    required: true
-  },
-  sufix: {
-    type: String,
-    required: false
-  },
-  tooltipMessage: {
-    type: String,
-    required: false
-  }
-})
+  defineOptions({ name: 'big-number' })
+  const props = defineProps({
+    label: {
+      type: String,
+      required: true
+    },
+    sufix: {
+      type: String,
+      required: false
+    },
+    tooltipMessage: {
+      type: String,
+      required: false
+    }
+  })
 
-defineExpose({ props })
+  defineExpose({ props })
 </script>
 
 <template>
@@ -26,14 +26,25 @@ defineExpose({ props })
       {{ props.label }}
 
       <span class="just-hover">
-        <PrimeButton class="whitespace-nowrap max-md:hidden" icon="pi pi-question-circle" text rounded
-          v-tooltip="props.tooltipMessage" :pt="{
-            root: { class: 'shadow-none' },
-          }" />
+        <PrimeButton
+          class="whitespace-nowrap max-md:hidden"
+          icon="pi pi-question-circle"
+          text
+          rounded
+          v-tooltip="props.tooltipMessage"
+          :pt="{
+            root: { class: 'shadow-none' }
+          }"
+        />
       </span>
 
-      <PrimeButton class="whitespace-nowrap md:hidden" icon="pi pi-question-circle" text rounded
-        v-tooltip.focus="props.tooltipMessage" />
+      <PrimeButton
+        class="whitespace-nowrap md:hidden"
+        icon="pi pi-question-circle"
+        text
+        rounded
+        v-tooltip.focus="props.tooltipMessage"
+      />
     </label>
     <div class="flex gap-1 items-center">
       <span class="text-2xl font-bold">
