@@ -2,7 +2,7 @@ import {
   searchEdgeFunctionsService,
   searchDomainsService,
   searchEdgeDnsService
-} from '@/services/metrics-services'
+} from '@/services/real-time-metrics-services'
 
 const MAP_SERVICE_OPERATION = {
   configurationIdIn: searchDomainsService,

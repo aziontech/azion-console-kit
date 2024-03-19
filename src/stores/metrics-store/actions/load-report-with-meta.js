@@ -1,5 +1,5 @@
 import { useAccountStore } from '@/stores/account'
-import { BeholderService } from '@services/metrics-services'
+import { BeholderService } from '@/services/real-time-metrics-services'
 import { ConvertBeholderToChart, FillResultQuery, GqlRules } from '../helpers'
 
 /**

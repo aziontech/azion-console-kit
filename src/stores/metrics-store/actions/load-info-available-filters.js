@@ -1,4 +1,4 @@
-import BeholderService from '@services/metrics-services/fetch-metrics-data-from-beholder'
+import BeholderService from '@/services/real-time-metrics-services/fetch-metrics-data-from-beholder'
 import Axios from 'axios'
 import { DatasetListQuery } from '../gql'
 import { capitalizeFirstLetter } from '@/helpers'
