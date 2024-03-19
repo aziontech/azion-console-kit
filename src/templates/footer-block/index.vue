@@ -2,17 +2,13 @@
 <template>
   <!-- Footer -->
   <footer
-    class="z-10 flex px-3 py-6 flex-wrap flex-col justify-center items-center gap-3 lg:gap-4 surface-ground border-t surface-border lg:flex-row pr-3 lg:py-3 lg:px-8 lg:justify-center"
+    class="z-10 w-full px-3 md:px-8 py-6 md:py-3 border-t m-0 surface-border gap-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:lg:grid-cols-3 place-items-stretch items-center"
   >
-    <span class="text-sm text-normal text-color"
+    <span class="w-full text-center truncate place-items-start md:text-left text-sm text-normal text-color-secondary"
       >© Azion Technologies, Inc or its affiliates. All rights reserved.</span
     >
-
-    <div
-      class="flex flex-col gap-3 lg:gap-4 items-center lg:flex lg:flex-row flex-none md-auto md:flex-1"
-    >
-      <div class="w-full flex flex-col md:flex-row gap-3 justify-center items-center">
-        <div class="flex gap-1 lg:pl-[16%] pl-0">
+      <div class="w-full flex flex-col md:flex-row gap-3 justify-end xl:justify-center items-center">
+        <div class="flex gap-1">
           <PrimeButton
             label="About"
             link
@@ -38,28 +34,28 @@
         <div class="flex gap-2">
           <PrimeButton
             icon="pi pi-github"
-            text
+            outlined
             size="small"
             v-tooltip.top="{ value: 'Github', showDelay: 200 }"
             @click="openGitHub"
           />
           <PrimeButton
             icon="pi pi-discord"
-            text
+            outlined
             size="small"
             v-tooltip.top="{ value: 'Discord', showDelay: 200 }"
             @click="openDiscord"
           />
           <PrimeButton
             icon="ai ai-x"
-            text
+            outlined
             size="small"
             v-tooltip.top="{ value: 'X', showDelay: 200 }"
             @click="openX"
           />
         </div>
       </div>
-      <div class="flex gap-2 items-center">
+      <div class="w-full flex flex-wrap gap-2 items-center justify-center md:justify-start xl:justify-end">
         <!-- System Status -->
         <SystemStatusBarBlock v-tooltip.top="{ value: 'System status', showDelay: 200 }" />
         <div v-tooltip.top="{ value: 'Theme mode', showDelay: 200 }">
@@ -74,7 +70,7 @@
             :autoOptionFocus="false"
             :pt="{
               root: {
-                class: 'w-[7.4rem]',
+                class: 'w-32',
                 style: 'background: var(--surface-section) !important'
               },
               item: { class: 'w-full text-sm' },
@@ -99,7 +95,6 @@
           </Dropdown>
         </div>
       </div>
-    </div>
   </footer>
 </template>
 
