@@ -186,11 +186,11 @@
   }
 
   const handleTrackEdit = () => {
-    tracker
+    tracker.product
       .productEdited({
         productName: 'Origin'
       })
-      .productEdited({
+      .product.productEdited({
         productName: 'Edge Application',
         tab: 'origins'
       })
@@ -211,7 +211,7 @@
   }
 
   const handleTrackCreation = () => {
-    tracker
+    tracker.product
       .productCreated({
         productName: 'Origin'
       })
@@ -230,7 +230,7 @@
 
   const handleFailedEditOrigin = (error) => {
     const { fieldName, message } = checkError(error)
-    tracker
+    tracker.product
       .failedToEdit({
         productName: 'Origin',
         errorMessage: message,
@@ -244,7 +244,7 @@
 
   const handleFailedCreateOrigin = (error) => {
     const { fieldName, message } = checkError(error)
-    tracker
+    tracker.product
       .failedToCreate({
         productName: 'Origin',
         errorType: 'api',
