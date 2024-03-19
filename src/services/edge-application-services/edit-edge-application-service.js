@@ -74,6 +74,12 @@ const adapt = (payload) => {
  * @returns {string} The result message based on the status code.
  */
 const extractErrorKey = (errorSchema, key) => {
+  if (key === 'user_has_no_product') {
+    const noProductErrorMessage =
+      'In order to perform this action, you must first have access to the product Tiered Cache'
+    return `${key}: ${noProductErrorMessage}`
+  }
+
   if (typeof errorSchema[key] === 'string') {
     return `${key}: ${errorSchema[key]}`
   }
