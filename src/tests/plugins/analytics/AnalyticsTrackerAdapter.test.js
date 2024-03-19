@@ -229,7 +229,9 @@ describe('AnalyticsTrackerAdapter', () => {
 
     sut.signUp.userAuthorizedSso({ method: 'google' }).track()
 
-    expect(analyticsClientSpy.track).toHaveBeenCalledWith('User Authorized SSO', { method: 'google' })
+    expect(analyticsClientSpy.track).toHaveBeenCalledWith('User Authorized SSO', {
+      method: 'google'
+    })
   })
 
   it('should track the additional data submit event with the correct parameters', () => {
