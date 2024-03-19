@@ -49,7 +49,7 @@
             class="w-full"
           />
           <small class="text-xs text-color-secondary font-normal leading-5">
-          Give a unique and descriptive name to identify the edge node.</small
+            Give a unique and descriptive name to identify the edge node.</small
           >
           <small
             id="username-help"

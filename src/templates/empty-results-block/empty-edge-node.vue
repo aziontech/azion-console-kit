@@ -47,6 +47,9 @@
     props.documentationService()
   }
   function downloadOrchestrator() {
-    window.open('https://www.azion.com/en/documentation/products/guides/deploy/install-orchestrator-agent/', '_blank')
+    window.open(
+      'https://www.azion.com/en/documentation/products/guides/deploy/install-orchestrator-agent/',
+      '_blank'
+    )
   }
 </script>
