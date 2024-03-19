@@ -54,6 +54,7 @@ export const signupRoutes = {
           /** @type {import('@/plugins/adapters/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
           const tracker = inject('tracker')
           tracker.signUp.userSignedUp({ method: accountStore.ssoSignUpMethod })
+          tracker.signUp.userAuthorizedSso({ method: accountStore.ssoSignUpMethod })
         }
 
         if (isFirstLogin) {
