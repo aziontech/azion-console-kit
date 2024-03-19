@@ -37,7 +37,7 @@
 
   import ContentBlock from '@/templates/content-block'
   import PageHeadingBlock from '@/templates/page-heading-block'
-  /**@type {import('@/plugins/adapters/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
+  /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
   import { useRoute } from 'vue-router'
   const route = useRoute()
@@ -92,7 +92,7 @@
   ]
 
   const handleTrackCreation = () => {
-    tracker.productCreated({
+    tracker.product.productCreated({
       productName: 'Edge Application',
       from: route.query.origin,
       createdFrom: 'singleEntity'
@@ -101,7 +101,7 @@
 
   const handleTrackFailedCreation = (error) => {
     const { fieldName, message } = checkError(error)
-    tracker
+    tracker.product
       .failedToCreate({
         productName: 'Edge Application',
         errorType: 'api',

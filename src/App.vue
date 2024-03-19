@@ -6,7 +6,7 @@
   import { storeToRefs } from 'pinia'
   import { themeSelect } from '@/helpers'
   import '@/helpers/store-handler'
-  /** @type {import('@/plugins/adapters/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
+  /** @type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
 
   const accountStore = useAccountStore()

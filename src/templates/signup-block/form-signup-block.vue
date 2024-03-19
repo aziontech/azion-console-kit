@@ -106,7 +106,7 @@
   import { inject, onMounted, onUnmounted, ref } from 'vue'
   import { useRouter } from 'vue-router'
   import * as yup from 'yup'
-  /** @type {import('@/plugins/adapters/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
+  /** @type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
 
   defineEmits(['change-signup-method'])
@@ -182,11 +182,11 @@
       const captcha = await recaptcha.execute('signup')
       await props.signupService({ ...values, captcha })
 
-      tracker.userSignedUp({ method: 'email' })
+      tracker.signUp.userSignedUp({ method: 'email' })
       router.push({ name: 'activation', query: { email: encodeEmail(values.email) } })
     } catch (err) {
       const { message, fieldName } = JSON.parse(err)
-      tracker
+      tracker.signUp
         .userFailedSignUp({
           errorType: 'api',
           fieldName: fieldName,

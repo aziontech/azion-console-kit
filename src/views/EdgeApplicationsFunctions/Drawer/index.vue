@@ -91,7 +91,7 @@
     emit('onSuccess')
   }
   const handleTrackSuccessEdit = () => {
-    tracker
+    tracker.product
       .productEdited({
         productName: 'Edge Application',
         tab: 'functions'
