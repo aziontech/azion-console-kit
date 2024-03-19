@@ -5,7 +5,7 @@
   import { computed, onBeforeMount, ref, inject } from 'vue'
   import { useRouter } from 'vue-router'
   import { useToast } from 'primevue/usetoast'
-  /**@type {import('@/plugins/adapters/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
+  /**@type {import('@/plugins/adapters/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
   defineOptions({
     name: 'create-modal-block'
@@ -119,7 +119,7 @@
   }
 
   const redirectToSolution = (template, section) => {
-    tracker.selectedOnCreate({
+    tracker.create.selectedOnCreate({
       section,
       selection: template.name
     })
@@ -132,7 +132,7 @@
   }
 
   const redirect = (toLink, selection) => {
-    tracker.selectedOnCreate({
+    tracker.create.selectedOnCreate({
       section: 'resources',
       selection
     })

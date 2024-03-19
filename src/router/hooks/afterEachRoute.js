@@ -6,9 +6,9 @@ import { inject } from 'vue'
 export default function afterEachRoute(to, from, failure) {
   const loadingStore = useLoadingStore()
   loadingStore.finishLoading()
-  /** @type {import('@/plugins/adapters/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
+  /** @type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
-  tracker
+  tracker.product
     .pageLoad({
       url: to.fullPath
     })

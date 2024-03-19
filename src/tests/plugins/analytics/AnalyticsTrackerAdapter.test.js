@@ -1,4 +1,4 @@
-import { AnalyticsTrackerAdapter } from '@/plugins/adapters/AnalyticsTrackerAdapter'
+import { AnalyticsTrackerAdapter } from '@/plugins/analytics/AnalyticsTrackerAdapter'
 import { describe, expect, it, vi } from 'vitest'
 
 const makeSut = () => {
@@ -34,8 +34,8 @@ describe('AnalyticsTrackerAdapter', () => {
 
   it('should be able to store multiple events and track them all', () => {
     const { sut, analyticsClientSpy } = makeSut()
-    sut.pageLoad({ url: 'test-url-1' }).pageLoad({ url: 'test-url-2' })
-    sut.pageLoad({ url: 'test-url-3' })
+    sut.product.pageLoad({ url: 'test-url-1' }).product.pageLoad({ url: 'test-url-2' })
+    sut.product.pageLoad({ url: 'test-url-3' })
 
     sut.track()
 
@@ -45,7 +45,7 @@ describe('AnalyticsTrackerAdapter', () => {
   it('should be able to track page load event with correct params', () => {
     const { sut, analyticsClientSpy } = makeSut()
     const mockUrl = 'test-url-ABC/q-2/t'
-    sut.pageLoad({
+    sut.product.pageLoad({
       url: mockUrl
     })
 
@@ -71,10 +71,10 @@ describe('AnalyticsTrackerAdapter', () => {
       id: mockId,
       email: emailMock
     })
-    sut.pageLoad({
+    sut.product.pageLoad({
       url: mockUrl
     })
-    sut.pageLoad({
+    sut.product.pageLoad({
       url: secondMockUrl
     })
     sut.track()
@@ -95,7 +95,7 @@ describe('AnalyticsTrackerAdapter', () => {
     const { sut, analyticsClientSpy } = makeSut()
     const productNameMock = 'Azion Product Name'
 
-    sut.clickToCreate({
+    sut.product.clickToCreate({
       productName: productNameMock
     })
 
@@ -111,7 +111,7 @@ describe('AnalyticsTrackerAdapter', () => {
     const { sut, analyticsClientSpy } = makeSut()
     const productNameMock = 'Azion Product Name'
 
-    sut.clickToEdit({
+    sut.product.clickToEdit({
       productName: productNameMock
     })
 
@@ -124,7 +124,7 @@ describe('AnalyticsTrackerAdapter', () => {
     const { sut, analyticsClientSpy } = makeSut()
     const productNameMock = 'Azion Product Name Mock'
 
-    sut
+    sut.product
       .productCreated({
         productName: productNameMock
       })
@@ -137,7 +137,7 @@ describe('AnalyticsTrackerAdapter', () => {
     const { sut, analyticsClientSpy } = makeSut()
     const productNameMock = 'Azion Product Name Mock'
 
-    sut
+    sut.product
       .productEdited({
         productName: productNameMock
       })
@@ -150,7 +150,7 @@ describe('AnalyticsTrackerAdapter', () => {
     const { sut, analyticsClientSpy } = makeSut()
     const productNameMock = 'Azion Product Name Mock'
 
-    sut
+    sut.product
       .failedToCreate({
         productName: productNameMock
       })
@@ -166,7 +166,7 @@ describe('AnalyticsTrackerAdapter', () => {
     const { sut, analyticsClientSpy } = makeSut()
     const productNameMock = 'Azion Product Name Mock'
 
-    sut
+    sut.product
       .failedToEdit({
         productName: productNameMock
       })
@@ -181,7 +181,7 @@ describe('AnalyticsTrackerAdapter', () => {
   it('should call userSigned when valid identification is provided', () => {
     const { sut, analyticsClientSpy } = makeSut()
 
-    sut.userSigned()
+    sut.signIn.userSignedIn()
 
     sut.track()
 
@@ -191,7 +191,7 @@ describe('AnalyticsTrackerAdapter', () => {
   it('should call userFailedSignIn when valid identification is provided', () => {
     const { sut, analyticsClientSpy } = makeSut()
 
-    sut.userFailedSignIn()
+    sut.signIn.userFailedSignIn()
 
     sut.track()
 
@@ -203,7 +203,7 @@ describe('AnalyticsTrackerAdapter', () => {
     const mockUrl = 'test-url-ABC/q-2/t'
     const mockLocation = 'home'
 
-    sut.createEventInHomeAndHeader({
+    sut.create.createEventInHomeAndHeader({
       url: mockUrl,
       location: mockLocation
     })
@@ -219,7 +219,7 @@ describe('AnalyticsTrackerAdapter', () => {
   it('should track the user sign-up event with the correct parameters', () => {
     const { sut, analyticsClientSpy } = makeSut()
 
-    sut.userSignedUp({ method: 'email' }).track()
+    sut.signUp.userSignedUp({ method: 'email' }).track()
 
     expect(analyticsClientSpy.track).toHaveBeenCalledWith('User Signed Up', { method: 'email' })
   })
@@ -227,7 +227,7 @@ describe('AnalyticsTrackerAdapter', () => {
   it('should track the additional data submit event with the correct parameters', () => {
     const { sut, analyticsClientSpy } = makeSut()
 
-    sut.submittedAdditionalData().track()
+    sut.signUp.submittedAdditionalData().track()
 
     expect(analyticsClientSpy.track).toHaveBeenCalledWith('Submitted Additional Data', {})
   })
@@ -240,7 +240,7 @@ describe('AnalyticsTrackerAdapter', () => {
       errorMessage: 'Invalid email'
     }
 
-    sut.userFailedSignUp({ ...propsMock }).track()
+    sut.signUp.userFailedSignUp({ ...propsMock }).track()
 
     expect(analyticsClientSpy.track).toHaveBeenCalledWith('User Failed to Sign Up', propsMock)
   })
@@ -248,7 +248,7 @@ describe('AnalyticsTrackerAdapter', () => {
   it('should track the failed additional data submit event with the correct parameters', () => {
     const { sut, analyticsClientSpy } = makeSut()
 
-    sut.failedSubmitAdditionalData().track()
+    sut.signUp.failedSubmitAdditionalData().track()
 
     expect(analyticsClientSpy.track).toHaveBeenCalledWith('Failed to Submit Additional Data', {})
   })
@@ -258,7 +258,7 @@ describe('AnalyticsTrackerAdapter', () => {
     const selectionMock = 'cardTitle'
     const sectionMock = 'recommended'
 
-    sut.selectedOnCreate({
+    sut.create.selectedOnCreate({
       selection: selectionMock,
       section: sectionMock
     })
@@ -281,7 +281,7 @@ describe('AnalyticsTrackerAdapter', () => {
     const isvMock = 'isv'
     const isvIdMock = 'isvId'
 
-    sut.clickMoreDetailsOnTemplate({
+    sut.create.clickMoreDetailsOnTemplate({
       templateName: templateNameMock,
       solutionId: solutionIdMock,
       version: versionMock,
@@ -315,7 +315,7 @@ describe('AnalyticsTrackerAdapter', () => {
       templateName: 'name'
     }
 
-    sut.eventClickedToDeploy({ ...propsMock })
+    sut.create.eventClickedToDeploy({ ...propsMock })
 
     sut.track()
 
@@ -332,7 +332,7 @@ describe('AnalyticsTrackerAdapter', () => {
       templateName: 'name'
     }
 
-    sut.eventDeployed({ ...propsMock })
+    sut.create.eventDeployed({ ...propsMock })
 
     sut.track()
 
@@ -342,7 +342,7 @@ describe('AnalyticsTrackerAdapter', () => {
   it('should track the account activation event with the correct parameters', () => {
     const { sut, analyticsClientSpy } = makeSut()
 
-    sut.userActivatedAccount().track()
+    sut.signUp.userActivatedAccount().track()
 
     expect(analyticsClientSpy.track).toHaveBeenCalledWith('User Activated Account', {})
   })
@@ -357,7 +357,7 @@ describe('AnalyticsTrackerAdapter', () => {
       templateName: 'name'
     }
 
-    sut.eventFailedDeployed({ ...propsMock })
+    sut.create.eventFailedDeployed({ ...propsMock })
 
     sut.track()
 
@@ -368,7 +368,7 @@ describe('AnalyticsTrackerAdapter', () => {
     const { sut, analyticsClientSpy } = makeSut()
     const productNameMock = 'Origin'
 
-    sut.clickToCreate({
+    sut.product.clickToCreate({
       productName: productNameMock
     })
 
@@ -381,7 +381,7 @@ describe('AnalyticsTrackerAdapter', () => {
     const { sut, analyticsClientSpy } = makeSut()
     const productNameMock = 'Origin'
 
-    sut.productCreated({
+    sut.product.productCreated({
       productName: productNameMock
     })
 
@@ -397,7 +397,7 @@ describe('AnalyticsTrackerAdapter', () => {
     const errorTypeMock = 'API'
     const fieldName = 'detail'
 
-    sut.failedToCreate({
+    sut.product.failedToCreate({
       productName: productNameMock,
       errorMessage: errorMessageMock,
       errorType: errorTypeMock,
@@ -420,7 +420,7 @@ describe('AnalyticsTrackerAdapter', () => {
     const errorTypeMock = 'API'
     const fieldName = 'detail'
 
-    sut.failedToEdit({
+    sut.product.failedToEdit({
       productName: productNameMock,
       errorMessage: errorMessageMock,
       errorType: errorTypeMock,
