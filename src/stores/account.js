@@ -30,7 +30,7 @@ export const useAccountStore = defineStore({
     },
     ssoSignUpMethod(state) {
       return state._ssoSignUpMethod
-    },
+    }
   },
   actions: {
     setAccountData(account) {
@@ -50,6 +50,6 @@ export const useAccountStore = defineStore({
     },
     resetSsoSignUpMethod() {
       this._ssoSignUpMethod = ''
-    },
+    }
   }
 })
