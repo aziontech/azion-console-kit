@@ -73,17 +73,27 @@ const adapt = (payload) => {
  * @param {Object} httpResponse.body - The response body.
  * @returns {string} The result message based on the status code.
  */
-const extractApiError = (httpResponse) => {
-  const errorKeys = Object.keys(httpResponse.body)
-  const noProductErrorFound = errorKeys.includes('user_has_no_product')
-
-  if (noProductErrorFound) {
+const extractErrorKey = (errorSchema, key) => {
+  if (key === 'user_has_no_product') {
     const noProductErrorMessage =
       'In order to perform this action, you must first have access to the product Tiered Cache'
-    return noProductErrorMessage
+    return `${key}: ${noProductErrorMessage}`
   }
-  const [firstError] = errorKeys
-  const errorMessage = httpResponse.body[firstError]
+
+  if (typeof errorSchema[key] === 'string') {
+    return `${key}: ${errorSchema[key]}`
+  }
+  return `${key}: ${errorSchema[key][0]}`
+}
+
+/**
+ * @param {Object} httpResponse - The HTTP response object.
+ * @param {Object} httpResponse.body - The response body.
+ * @returns {string} The result message based on the status code.
+ */
+const extractApiError = (httpResponse) => {
+  const [firstKey] = Object.keys(httpResponse.body)
+  const errorMessage = extractErrorKey(httpResponse.body, firstKey)
 
   return errorMessage
 }
@@ -100,7 +110,8 @@ const parseHttpResponse = (httpResponse) => {
     case 200:
       return 'Your edge application has been updated'
     case 400:
-      throw new Error(extractApiError(httpResponse)).message
+      const apiError = extractApiError(httpResponse)
+      throw new Error(apiError).message
     case 401:
       throw new Errors.InvalidApiTokenError().message
     case 403:
@@ -108,7 +119,8 @@ const parseHttpResponse = (httpResponse) => {
     case 404:
       throw new Errors.NotFoundError().message
     case 409:
-      throw new Error(Object.keys(httpResponse.body)[0]).message
+      const apiErro = extractApiError(httpResponse)
+      throw new Error(apiErro).message
     case 500:
       throw new Errors.InternalServerError().message
     default:

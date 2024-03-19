@@ -95,7 +95,7 @@ describe('EdgeApplicationServices', () => {
 
     const result = sut(fixtures.edgeApplicationMock)
 
-    expect(result).rejects.toBe('api-error-message')
+    expect(result).rejects.toBe('user_has_no_flag: api-error-message')
   })
 
   it('should show user no product error first ', async () => {
@@ -110,9 +110,7 @@ describe('EdgeApplicationServices', () => {
 
     const result = sut(fixtures.edgeApplicationMock)
 
-    expect(result).rejects.toBe(
-      'In order to perform this action, you must first have access to the product Tiered Cache'
-    )
+    expect(result).rejects.toBe(`user_has_no_flag: api-error`)
   })
 
   it('should return first error name on conflict status code (409)', async () => {
@@ -128,7 +126,7 @@ describe('EdgeApplicationServices', () => {
 
     const result = sut(fixtures.edgeApplicationMock)
 
-    expect(result).rejects.toBe(errorKeyMock)
+    expect(result).rejects.toBe(`${errorKeyMock}: ${errorMessageMock}`)
   })
 
   it.each([
