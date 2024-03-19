@@ -224,6 +224,14 @@ describe('AnalyticsTrackerAdapter', () => {
     expect(analyticsClientSpy.track).toHaveBeenCalledWith('User Signed Up', { method: 'email' })
   })
 
+  it('should track the user authorized sso event with the correct parameters', () => {
+    const { sut, analyticsClientSpy } = makeSut()
+
+    sut.signUp.userAuthorizedSso({ method: 'google' }).track()
+
+    expect(analyticsClientSpy.track).toHaveBeenCalledWith('User Authorized SSO', { method: 'google' })
+  })
+
   it('should track the additional data submit event with the correct parameters', () => {
     const { sut, analyticsClientSpy } = makeSut()
 
