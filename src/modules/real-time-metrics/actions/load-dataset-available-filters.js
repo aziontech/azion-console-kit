@@ -1,16 +1,38 @@
 import BeholderService from '@/services/real-time-metrics-services/fetch-metrics-data-from-beholder'
 import Axios from 'axios'
-import { InputListByDatasetQuery } from '../gql'
 import { ParserObjectField, VerifyBlacklistFields, VerifyWhitelistFields } from '../helpers'
+import { capitalizeFirstLetter } from '@/helpers'
 
 let cancelRequest = null
+
+const inputListByDatasetQuery = (datasetName) => `
+query {
+__type(name: "${capitalizeFirstLetter(datasetName)}Filter") {
+  inputFields {
+    name
+    description
+    type {
+      name
+      inputFields {
+        name
+        type {
+          name
+          ofType {
+            name
+          }
+        }
+      }
+    }
+  }
+}
+}`
 
 export default async (dataset) => {
   if (cancelRequest) cancelRequest.cancel()
   const ReportsRequestToken = Axios.CancelToken
   cancelRequest = ReportsRequestToken.source()
 
-  const datasetsQuery = InputListByDatasetQuery(dataset)
+  const datasetsQuery = inputListByDatasetQuery(dataset)
 
   const graphqlQuery = {
     query: datasetsQuery
