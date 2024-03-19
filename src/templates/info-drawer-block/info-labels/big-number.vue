@@ -25,13 +25,18 @@
     <label class="flex text-sm gap-1 items-center">
       {{ props.label }}
 
-      <PrimeButton
-        class="whitespace-nowrap max-md:hidden"
-        icon="pi pi-question-circle"
-        text
-        rounded
-        v-tooltip="props.tooltipMessage"
-      />
+      <span class="just-hover">
+        <PrimeButton
+          class="whitespace-nowrap max-md:hidden"
+          icon="pi pi-question-circle"
+          text
+          rounded
+          v-tooltip="props.tooltipMessage"
+          :pt="{
+            root: { class: 'shadow-none' }
+          }"
+        />
+      </span>
 
       <PrimeButton
         class="whitespace-nowrap md:hidden"

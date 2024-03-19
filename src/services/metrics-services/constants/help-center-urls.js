@@ -1,8 +1,8 @@
 const HELP_CENTER_URLS = {
   dataStream: {
     requests: {
-      totalDataStreamed: '/real-time-metrics/data-streaming/requests/total-data-streamed',
-      totalRequests: '/real-time-metrics/data-streaming/requests/total-requests'
+      totalDataStreamed: '/real-time-metrics/data-stream/requests/total-data-streamed',
+      totalRequests: '/real-time-metrics/data-stream/requests/total-requests'
     }
   },
   edgeApplications: {
@@ -12,7 +12,7 @@ const HELP_CENTER_URLS = {
     dataTransferred: {
       bandwidthOffloaded:
         '/real-time-metrics/edge-applications/data-transferred/bandwidth-offloaded',
-      edgeCaching: '/real-time-metrics/edge-applications/data-transferred/edge-caching',
+      edgeCache: '/real-time-metrics/edge-applications/data-transferred/edge-cache',
       edgeOffload: '/real-time-metrics/edge-applications/data-transferred/edge-offload',
       missedBandwidth: '/real-time-metrics/edge-applications/data-transferred/missed-bandwidth',
       missedData: '/real-time-metrics/edge-applications/data-transferred/missed-data',
@@ -57,13 +57,13 @@ const HELP_CENTER_URLS = {
   },
   edgeDns: {
     standardQueries: {
-      totalQueries: '/real-time-metrics/intelligent-dns/standard-queries/total-queries'
+      totalQueries: '/real-time-metrics/edge-dns/standard-queries/total-queries'
     }
   },
-  l2Caching: {
+  tieredCache: {
     cachingOffload: {
-      l2Caching: '/real-time-metrics/l2-caching/caching-offload/l2-caching',
-      l2Offload: '/real-time-metrics/l2-caching/caching-offload/l2-offload'
+      tieredCache: '/real-time-metrics/tiered-cache/caching-offload/tiered-cache',
+      tieredCacheOffload: '/real-time-metrics/tiered-cache/caching-offload/tiered-cache-offload'
     }
   },
   waf: {

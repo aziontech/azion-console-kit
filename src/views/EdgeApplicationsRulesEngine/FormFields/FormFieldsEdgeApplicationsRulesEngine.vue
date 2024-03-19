@@ -8,6 +8,7 @@
   import PrimeButton from 'primevue/button'
   import PrimeMenu from 'primevue/menu'
   import InputSwitch from 'primevue/inputswitch'
+  import InlineMessage from 'primevue/inlinemessage'
   import Divider from 'primevue/divider'
   import AutoComplete from 'primevue/autocomplete'
   import { computed, ref, onMounted } from 'vue'
@@ -624,6 +625,10 @@
     return behaviors.value.length >= MAXIMUM_NUMBER
   })
 
+  const isNotTheSelectedPhase = (phaseItem) => {
+    return isEditDrawer.value && phaseItem !== phase.value
+  }
+
   onMounted(() => {
     updateBehaviorsOptionsRequires()
 
@@ -682,23 +687,35 @@
     v-if="!checkPhaseIsDefaultValue"
   >
     <template #inputs>
+      <InlineMessage
+        v-if="isEditDrawer"
+        class="p-2"
+        severity="info"
+      >
+        Once a rule is created, its phase cannot be changed. If you want to change the phase, you
+        must create a new rule.
+      </InlineMessage>
+
       <div class="flex flex-col gap-2">
         <template
           v-for="item in phasesList"
           :key="item.value"
         >
           <div
-            v-if="!isEditDrawer.value || phase === item.value"
             class="w-full border-1 rounded-md surface-border flex align-items-center justify-between p-4 gap-2"
             :class="{ 'border-radio-card-active': phase === item.value }"
           >
-            <label class="font-medium">
+            <label
+              class="font-medium"
+              :class="{ 'opacity-30': isNotTheSelectedPhase(item.value) }"
+            >
               {{ item.label }}
               <div class="text-color-secondary text-sm font-normal">{{ item.description }}</div>
             </label>
 
             <PrimeRadio
               v-model="phase"
+              :disabled="isNotTheSelectedPhase(item.value)"
               :value="item.value"
             />
           </div>
