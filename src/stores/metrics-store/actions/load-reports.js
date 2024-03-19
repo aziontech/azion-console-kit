@@ -1,4 +1,4 @@
-import { fetchMetricsReportsService } from '@/services/metrics-services'
+import { fetchMetricsReportsService } from '@/services/real-time-metrics-services'
 
 export default async () => {
   return await fetchMetricsReportsService()

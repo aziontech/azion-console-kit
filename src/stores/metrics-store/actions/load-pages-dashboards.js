@@ -1,4 +1,4 @@
-import { fetchMetricsDashboardsService } from '@services/metrics-services'
+import { fetchMetricsDashboardsService } from '@services/real-time-metrics-services'
 
 export default async () => {
   return await fetchMetricsDashboardsService()
