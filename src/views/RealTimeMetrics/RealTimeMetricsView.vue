@@ -44,11 +44,9 @@
   const metricsStore = useMetricsStore()
   const {
     setInfoAvailableFilters,
-    setGroupPage,
     setInitialPageAndDashboardCurrent,
     setInitialCurrentsByIds,
     setDatasetAvailableFilters,
-    setReports,
     loadCurrentReports
   } = metricsStore
 
@@ -60,10 +58,8 @@
 
   const loadPageInfo = async () => {
     await setInfoAvailableFilters()
-    await setGroupPage()
     setCurrentPageAndDashboard()
     await setDatasetAvailableFilters()
-    await setReports()
     updateRouter()
   }
 

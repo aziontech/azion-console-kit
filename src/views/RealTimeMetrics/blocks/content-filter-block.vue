@@ -16,14 +16,8 @@
     currentFilters
   } = storeToRefs(metricsStore)
 
-  const {
-    setTimeRange,
-    filterDatasetUpdate,
-    createAndFilter,
-    setReports,
-    loadCurrentReports,
-    resetFilters
-  } = metricsStore
+  const { setTimeRange, filterDatasetUpdate, createAndFilter, loadCurrentReports, resetFilters } =
+    metricsStore
 
   const props = defineProps({
     playgroundOpener: {
@@ -149,7 +143,6 @@
       resetFilters()
     }
 
-    await setReports()
     await loadCurrentReports()
   }
 
