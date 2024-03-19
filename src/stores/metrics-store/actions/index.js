@@ -1,4 +1,3 @@
-import LoadDatasetAvailableAggregations from './load-dataset-available-aggregations'
 import LoadDatasetAvailableFilters from './load-dataset-available-filters'
 import LoadFilters from './load-filters'
 import LoadInfoAvailableFilters from './load-info-available-filters'
@@ -9,7 +8,6 @@ import LoadReports from './load-reports'
 import LoadReportsDataBySelectedDashboard from './load-reports-data-by-selected-dashboard'
 
 export {
-  LoadDatasetAvailableAggregations,
   LoadDatasetAvailableFilters,
   LoadFilters,
   LoadInfoAvailableFilters,

@@ -1,7 +1,6 @@
 import DATE_TIME_INTERVALS from '@/stores/metrics-store/constants/date-time-interval'
 import { defineStore } from 'pinia'
 import {
-  LoadDatasetAvailableAggregations,
   LoadDatasetAvailableFilters,
   LoadFilters,
   LoadInfoAvailableFilters,
@@ -17,15 +16,12 @@ export const useMetricsStore = defineStore('metrics', {
     currentPage: {}, // Actual page selected
     currentDashboard: {}, // Selected dashboard
     reports: [], // List of all reports
-    selectFilter: {},
     isLoadingFilters: false,
     dateTimeFilterOptions: [...DATE_TIME_INTERVALS],
     filters: {},
     currentReportsData: [], // Selected reports with Meta and Data values
     datasetAvailableFilters: [], // Filter fields by dataset
-    infoAvailableFilters: [], // Filter fields by dataset
-    datasetFilterFields: [],
-    datasetAvailableAggregations: [] // All available aggregation by dataset
+    infoAvailableFilters: [] // Filter fields by dataset
   }),
   getters: {
     getDateTimeFilterOptions: (state) => state.dateTimeFilterOptions,
@@ -161,10 +157,6 @@ export const useMetricsStore = defineStore('metrics', {
     async setInfoAvailableFilters() {
       const availableFilters = await LoadInfoAvailableFilters()
       this.infoAvailableFilters = availableFilters
-    },
-    async setDatasetAvailableAggregations(dataset) {
-      const aggregationList = await LoadDatasetAvailableAggregations(dataset)
-      this.datasetAvailableAggregations = aggregationList
     },
     async setGroupPage() {
       const pagesDashboards = await LoadPagesDashboards()
@@ -352,39 +344,6 @@ export const useMetricsStore = defineStore('metrics', {
         ...this.filters.and,
         ...valueAnd,
         meta: { fieldPrefix: 'and_' }
-      }
-    },
-    editAndFilter({ filterKey }) {
-      const { value, begin, end } = this.filters.and[filterKey]
-      let valueElement = value
-
-      if (!!begin || !!end) {
-        valueElement = {
-          begin,
-          end
-        }
-      }
-
-      const filterSelect = this.datasetAvailableFilters.find((filter) => filter.label === filterKey)
-
-      this.selectFilter = {
-        ...filterSelect,
-        valueElement,
-        edit: true
-      }
-    },
-    editDatasetFilter({ datasetIdx }) {
-      const datasetField = this.filters.datasets[datasetIdx]
-
-      const filterSelect = this.datasetAvailableFilters.find(
-        (filter) => filter.label === datasetField.fieldName
-      )
-      const valueElement = datasetField.in
-
-      this.selectFilter = {
-        ...filterSelect,
-        valueElement,
-        edit: true
       }
     }
   }
