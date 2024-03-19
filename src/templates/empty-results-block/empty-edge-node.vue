@@ -7,7 +7,7 @@
       <div class="flex flex-col gap-2">
         <p class="text-center text-color text-lg font-bold">No edge nodes have been added</p>
         <p class="text-center text-color-secondary text-sm font-normal">
-          To begin the Edge Node installation process, download the correct Edge Orchestrator
+          To begin the Edge Node installation process, download the appropriate Edge Orchestrator
           installation binary.
         </p>
       </div>
