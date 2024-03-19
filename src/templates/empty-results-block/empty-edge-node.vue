@@ -5,10 +5,10 @@
     >
       <slot name="illustration" />
       <div class="flex flex-col gap-2">
-        <p class="text-center text-color text-lg font-bold">No Edge Node list added</p>
+        <p class="text-center text-color text-lg font-bold">No edge nodes have been added</p>
         <p class="text-center text-color-secondary text-sm font-normal">
-          To begin the Edge Node installation process, you must download the Edge Orchestrator
-          installation binary of your choice.
+          To begin the Edge Node installation process, download the correct Edge Orchestrator
+          installation binary.
         </p>
       </div>
       <div class="flex flex-col gap-5 items-center">
@@ -47,6 +47,6 @@
     props.documentationService()
   }
   function downloadOrchestrator() {
-    window.open('https://downloads.azion.com/darwin/x86_64/edge-orchestrator', '_blank')
+    window.open('https://www.azion.com/en/documentation/products/guides/deploy/install-orchestrator-agent/', '_blank')
   }
 </script>
