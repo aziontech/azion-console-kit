@@ -9,19 +9,19 @@
         :listService="listDigitalCertificatesService"
         :deleteService="deleteDigitalCertificatesService"
         :columns="getColumns"
-        pageTitleDelete="Digital Certificate"
+        pageTitleDelete="digital certificate"
         editPagePath="digital-certificates/edit"
-        addButtonLabel="Digital Certificates"
+        addButtonLabel="Digital Certificate"
         createPagePath="digital-certificates/create"
         @on-load-data="handleLoadData"
-        emptyListMessage="No Digital Certificate found."
+        emptyListMessage="No digital certificates found."
       />
 
       <EmptyResultsBlock
         v-else
-        title="No digital certificates added"
-        description="Create your first digital certificates."
-        createButtonLabel="Digital Certificates"
+        title="No digital certificate has been added"
+        description="Click the button below to add your first digital certificate."
+        createButtonLabel="Digital Certificate"
         createPagePath="digital-certificates/create"
         :documentationService="documentationService"
       >

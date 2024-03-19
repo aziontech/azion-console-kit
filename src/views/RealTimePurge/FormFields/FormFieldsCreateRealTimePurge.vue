@@ -12,12 +12,12 @@
 
   const computedPurgeArgumentsPlaceHolder = computed(() => {
     if (purgeType.value === 'cachekey') {
-      return 'https://www.example.com.br/index.html'
+      return 'httpswww.example.com/images/image.jpg'
     }
     if (purgeType.value === 'wildcard') {
-      return 'www.example.com/*'
+      return 'www.example.com/images/*'
     }
-    return 'www.example.com'
+    return 'www.example.com/images/image.jpg'
   })
 </script>
 
@@ -168,7 +168,7 @@
 
     <FormHorizontal
       title="Arguments"
-      description="Insert values related to cache key, URL, or wildcard expression."
+      description="Insert a list of cache keys, URLs, or wildcard expressions according to the purge type selected."
     >
       <template #inputs>
         <div class="flex flex-col sm:max-w-lg w-full gap-2">
@@ -191,9 +191,9 @@
             >{{ argumentsPurgeError }}</small
           >
 
-          <div class="text-color-secondary text-sm font-normal">
+          <small class="text-xs text-color-secondary font-normal leading-5">
             Separate each argument using a new line.
-          </div>
+          </small>
         </div>
       </template>
     </FormHorizontal>

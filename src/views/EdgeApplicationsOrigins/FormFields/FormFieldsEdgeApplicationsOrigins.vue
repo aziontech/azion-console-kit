@@ -404,8 +404,8 @@
             :max="10"
           />
           <small class="text-xs text-color-secondary font-normal leading-5">
-            Assigning to determine how much traffic a server can handle in comparison with each
-            other.
+            Assign a number from 0 to 10 to determine how much traffic this origin server can
+            handle.
           </small>
         </div>
         <div
@@ -433,9 +433,8 @@
               </label>
             </div>
           </div>
-          <small class="text-color-secondary text-xs not-italic font-normal leading-5">
-            Marking an origin as a backup server to specify that it will receive HTTP requests only
-            if all primary servers are unavailable.
+          <small class="text-xs text-color-secondary font-normal leading-5">
+            Backup servers only receive HTTP requests if all primary servers are unavailable.
           </small>
         </div>
         <div class="flex w-full gap-2 items-start">
@@ -449,7 +448,6 @@
             class="flex flex-col items-start gap-1"
           >
             <span class="text-color text-sm font-normal leading-5"> Active </span>
-            <span class="text-sm text-color-secondary font-normal leading-5"> Description</span>
           </label>
         </div>
       </div>
@@ -462,8 +460,8 @@
           icon="pi pi-plus-circle"
           outlined
           type="button"
-          aria-label="New Origin"
-          label="New Origin"
+          aria-label="Add Origin"
+          label="Add Origin"
           @click="addAddress"
         />
       </div>

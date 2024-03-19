@@ -83,6 +83,7 @@
   const setDeliveryProtocol = (protocol, enableHttp3) => {
     deliveryProtocol.value = protocol
     http3.value = enableHttp3
+    if (deliveryProtocol.value === 'http') minimumTlsVersion.value = {}
     setDefaultHttpAndHttpsPort(enableHttp3)
   }
 
@@ -303,10 +304,10 @@
             :disabled="isHttpProtocol"
           />
 
-          <div class="text-color-secondary text-sm font-normal">
+          <small class="text-xs text-color-secondary font-normal leading-5">
             Enable HTTP and HTTPS protocols to configure the minimum TLS version the application
             supports.
-          </div>
+          </small>
         </div>
 
         <div class="flex flex-col w-full sm:max-w-xs gap-2">
@@ -324,10 +325,10 @@
             :disabled="isHttpProtocol"
           />
 
-          <div class="text-color-secondary text-sm font-normal">
+          <small class="text-xs text-color-secondary font-normal leading-5">
             Select which cipher suite the application supports. See the list of supported ciphers in
             the documentation.
-          </div>
+          </small>
         </div>
       </div>
     </template>

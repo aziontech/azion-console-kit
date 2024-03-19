@@ -39,6 +39,8 @@
   import PageHeadingBlock from '@/templates/page-heading-block'
   /**@type {import('@/plugins/adapters/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
+  import { useRoute } from 'vue-router'
+  const route = useRoute()
 
   const props = defineProps({
     createEdgeApplicationService: {
@@ -74,6 +76,13 @@
     debugRules: false
   })
 
+  const checkError = (error) => {
+    const [fieldName, ...restOfStringArr] = error.split(':')
+    const message = restOfStringArr.join(':').trim()
+
+    return { fieldName, message }
+  }
+
   const handleBlocks = [
     'general',
     'delivery-settings',
@@ -84,14 +93,20 @@
 
   const handleTrackCreation = () => {
     tracker.productCreated({
-      productName: 'Edge Application'
+      productName: 'Edge Application',
+      from: route.query.origin,
+      createdFrom: 'singleEntity'
     })
   }
 
-  const handleTrackFailedCreation = () => {
+  const handleTrackFailedCreation = (error) => {
+    const { fieldName, message } = checkError(error)
     tracker
       .failedToCreate({
-        productName: 'Edge Application'
+        productName: 'Edge Application',
+        errorType: 'api',
+        fieldName: fieldName.trim(),
+        errorMessage: message
       })
       .track()
   }

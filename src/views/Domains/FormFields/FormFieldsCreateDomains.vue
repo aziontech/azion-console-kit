@@ -98,7 +98,11 @@
           id="name"
           type="text"
           :class="{ 'p-invalid': errorName }"
+          placeholder="My domain"
         />
+        <small class="text-xs text-color-secondary font-normal leading-5">
+          Give a unique and descriptive name to identify the domain.
+        </small>
         <small
           v-if="errorName"
           class="p-error text-xs font-normal leading-tight"
@@ -110,7 +114,7 @@
 
   <form-horizontal
     title="Domain"
-    description="Save the domain to visualize the Domain name attributed by Azion to this configuration."
+    description="Save the domain to visualize the domain name attributed by Azion."
   >
     <template #inputs>
       <div class="flex flex-col w-full gap-2">
@@ -186,7 +190,7 @@
         />
         <div class="flex flex-col gap-1">
           <label class="text-sm font-normal leading-tight">CNAME Access Only </label>
-          <small class="text-color-secondary text-sm font-normal leading-tight">
+          <small class="text-xs text-color-secondary font-normal leading-5">
             Check this option to make the application accessible only through the domains listed in
             the CNAME field. Attempts to access the application through the Azion domain will be
             blocked.
@@ -208,6 +212,9 @@
           cols="30"
           class="w-full"
         />
+        <small class="text-xs text-color-secondary font-normal leading-5">
+          List of CNAMEs to associate to the Azion domain. Separate each entry in a new line.
+        </small>
         <small
           v-if="errorCnames"
           class="p-error text-xs font-normal leading-tight"
@@ -256,7 +263,7 @@
         v-if="mtlsIsEnabled"
         class="flex flex-col gap-2"
       >
-        <label class="text-color text-base font-medium">Verification</label>
+        <label class="text-color text-base font-medium">Mode</label>
         <div class="flex flex-col gap-3">
           <Card
             :pt="{
@@ -278,8 +285,8 @@
               />
             </template>
             <template #subtitle>
-              This option blocks the client certificate during the TLS handshake if the uploaded
-              Trusted CA can't be validated.
+              Blocks the client certificate during the TLS handshake if the uploaded Trusted CA
+              can't be validated.
             </template>
           </Card>
 
@@ -303,9 +310,9 @@
               />
             </template>
             <template #subtitle>
-              This option attempts to verify the client certificate, but will allow the TLS
-              handshake even if the Trusted CA can't be validated. Check which client certificate
-              attempted the request in Edge Firewall, if necessary.
+              Attempts to verify the client certificate, but will allow the TLS handshake even if
+              the Trusted CA can't be validated. Check which client certificate attempted the
+              request in Edge Firewall, if necessary.
             </template>
           </Card>
         </div>
@@ -323,12 +330,12 @@
           optionLabel="name"
           optionValue="value"
           class="w-full"
-          placeholder="Select a certificate"
+          placeholder="Select a Trusted CA certificate"
           :disabled="!mtlsIsEnabled"
         />
-        <small class="text-xs font-normal text-color-secondary leading-tight">
-          Mutual Authentification requires a Trusted CA Certificate, add it in Digital Certificate
-          Library.
+        <small class="text-xs text-color-secondary font-normal leading-5">
+          Mutual Authentification requires a Trusted CA Certificate. Go to Digital Certificates to
+          upload one.
         </small>
         <small
           v-if="errorMtlsTrustedCertificate"

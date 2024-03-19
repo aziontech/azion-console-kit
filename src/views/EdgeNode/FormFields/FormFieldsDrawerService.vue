@@ -61,7 +61,7 @@
               filter
               placeholder="Select"
             />
-            <small class="text-color-secondary text-xs not-italic font-normal leading-5">
+            <small class="text-xs text-color-secondary font-normal leading-5">
               Select the service to be provisioned.
             </small>
           </div>
@@ -86,7 +86,7 @@
               >
                 {{ variablesError }}
               </small>
-              <small class="text-color-secondary text-xs not-italic font-normal leading-5">
+              <small class="text-xs text-color-secondary font-normal leading-5">
                 Customize or keep the default values of the variables required to run the service.
               </small>
             </div>

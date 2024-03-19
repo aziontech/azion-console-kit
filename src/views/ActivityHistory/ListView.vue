@@ -12,8 +12,8 @@
       </div>
       <EmptyResultsBlock
         v-else
-        title="No activity has been recorded yet."
-        description="Start using services and products to view your account's activity."
+        title="No activity has been recorded"
+        description="Start using services and products to view your account activity."
         :documentationService="documentationService"
       >
         <template #illustration>

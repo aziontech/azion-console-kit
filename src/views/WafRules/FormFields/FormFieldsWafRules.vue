@@ -56,7 +56,7 @@
           description="Give a unique and descriptive name to identify the WAF rule set."
           name="name"
           :value="name"
-          placeholder="My WAF rule set"
+          placeholder="My WAF rule"
         />
       </div>
     </template>

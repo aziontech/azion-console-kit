@@ -113,12 +113,29 @@ export class AnalyticsTrackerAdapter {
   /**
    * @param {Object} payload
    * @param {AzionProductsNames} payload.productName
+   * @param {String} payload.createdFrom
+   * @param {String} payload.from
+   * @param {String} payload.templateName
+   * @param {String} payload.solutionId
+   * @param {String} payload.version
+   * @param {String} payload.versionId
+   * @param {String} payload.isv
+   * @param {String} payload.isvId
    * @returns {AnalyticsTrackerAdapter}
    */
   productCreated(payload) {
     this.#events.push({
       eventName: `Created ${payload.productName}`,
-      props: {}
+      props: {
+        createdFrom: payload.createdFrom,
+        from: payload.from,
+        templateName: payload.templateName,
+        solutionId: payload.solutionId,
+        version: payload.version,
+        versionId: payload.versionId,
+        isv: payload.isv,
+        isvId: payload.isvId
+      }
     })
     return this
   }
@@ -126,12 +143,15 @@ export class AnalyticsTrackerAdapter {
   /**
    * @param {Object} payload
    * @param {AzionProductsNames} payload.productName
+   * @param {String} payload.tab
    * @returns {AnalyticsTrackerAdapter}
    */
   productEdited(payload) {
     this.#events.push({
       eventName: `Edited ${payload.productName}`,
-      props: {}
+      props: {
+        tab: payload.tab
+      }
     })
     return this
   }
@@ -194,12 +214,17 @@ export class AnalyticsTrackerAdapter {
   }
 
   /**
+   * @param {Object} payload
+   * @param {'api'|'field'} payload.method
+   *
    * @returns {AnalyticsTrackerAdapter}
    */
-  userSignedUp() {
+  userSignedUp(payload) {
     this.#events.push({
       eventName: 'User Signed Up',
-      props: {}
+      props: {
+        method: payload.method
+      }
     })
     return this
   }
@@ -295,6 +320,29 @@ export class AnalyticsTrackerAdapter {
     this.#events.push({
       eventName: 'User Activated Account',
       props: {}
+    })
+    return this
+  }
+
+  /**
+   * @returns {AnalyticsTrackerAdapter}
+   * @param {Object} payload
+   * @param {string} payload.templateName
+   * @param {string} payload.solutionId
+   * @param {string} payload.version
+   * @param {string} payload.versionId
+   * @param {string} payload.isv
+   */
+  eventClickedToDeploy(payload) {
+    this.#events.push({
+      eventName: 'Clicked to Deploy',
+      props: {
+        templateName: payload.templateName,
+        solutionId: payload.solutionId,
+        version: payload.version,
+        versionId: payload.versionId,
+        isv: payload.isv
+      }
     })
     return this
   }

@@ -40,7 +40,7 @@ export const dataStreamRoutes = {
             to: '/data-stream'
           },
           {
-            label: 'Create Data Stream',
+            label: 'Create Stream',
             to: '/data-stream/create'
           }
         ]
@@ -64,7 +64,7 @@ export const dataStreamRoutes = {
             to: '/data-stream'
           },
           {
-            label: 'Edit Data Stream'
+            label: 'Edit Stream'
           }
         ]
       }

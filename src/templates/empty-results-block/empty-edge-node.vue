@@ -5,7 +5,7 @@
     >
       <slot name="illustration" />
       <div class="flex flex-col gap-2">
-        <p class="text-center text-color text-lg font-bold">No Edge Node list added.</p>
+        <p class="text-center text-color text-lg font-bold">No Edge Node list added</p>
         <p class="text-center text-color-secondary text-sm font-normal">
           To begin the Edge Node installation process, you must download the Edge Orchestrator
           installation binary of your choice.

@@ -19,7 +19,7 @@ const adapt = (payload) => {
       name: payload.name,
       origin_type: payload.originType,
       bucket: payload.bucketName,
-      prefix: !payload.prefix ? '/' : payload.prefix
+      prefix: `/${payload.prefix}`.trim()
     }
   }
 

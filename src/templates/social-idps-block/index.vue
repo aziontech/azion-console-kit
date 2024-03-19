@@ -43,6 +43,7 @@
 </template>
 
 <script setup>
+  import { useAccountStore } from '@/stores/account'
   import { useLoadingStore } from '@/stores/loading'
   import PrimeButton from 'primevue/button'
   import Divider from 'primevue/divider'
@@ -109,12 +110,14 @@
   }
 
   const loadingStore = useLoadingStore()
+  const accountStore = useAccountStore()
 
   const authenticate = (idp) => {
     submittedIdp.value = idp.uuid
 
     loadingStore.startLoading()
 
+    accountStore.setSsoSignUpMethod(idp.slug)
     window.location.href = idp.loginUrl
   }
 </script>

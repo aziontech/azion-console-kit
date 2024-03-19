@@ -44,7 +44,7 @@ export const edgeNodeRoutes = {
       meta: {
         breadCrumbs: [
           {
-            label: 'Edge Nodes',
+            label: 'Edge Node',
             to: '/edge-node'
           },
           {

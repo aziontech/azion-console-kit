@@ -219,9 +219,9 @@ describe('AnalyticsTrackerAdapter', () => {
   it('should track the user sign-up event with the correct parameters', () => {
     const { sut, analyticsClientSpy } = makeSut()
 
-    sut.userSignedUp().track()
+    sut.userSignedUp({ method: 'email' }).track()
 
-    expect(analyticsClientSpy.track).toHaveBeenCalledWith('User Signed Up', {})
+    expect(analyticsClientSpy.track).toHaveBeenCalledWith('User Signed Up', { method: 'email' })
   })
 
   it('should track the additional data submit event with the correct parameters', () => {
@@ -303,6 +303,23 @@ describe('AnalyticsTrackerAdapter', () => {
         isvId: isvIdMock
       }
     )
+  })
+
+  it('should use the clicked to deploy event with correct parameters', () => {
+    const { sut, analyticsClientSpy } = makeSut()
+    const propsMock = {
+      isv: 'vendor',
+      version: '1.0',
+      versionId: '123',
+      solutionId: '123',
+      templateName: 'name'
+    }
+
+    sut.eventClickedToDeploy({ ...propsMock })
+
+    sut.track()
+
+    expect(analyticsClientSpy.track).toHaveBeenCalledWith('Clicked to Deploy', propsMock)
   })
 
   it('should use the deployed event with correct parameters', () => {

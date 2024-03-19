@@ -39,7 +39,7 @@
           placeholder="(Mobile|iP(hone|od)|BlackBerry|IEMobile)"
           name="userAgent"
           :value="userAgent"
-          description="Add the regular expression you want to match to the content of the User-Agente header."
+          description="Add the regular expression you want to match to the content of the User-Agent header."
         />
       </div>
     </template>

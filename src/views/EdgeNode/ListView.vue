@@ -24,7 +24,7 @@
     }
   })
 
-  let hasContentToList = ref(false)
+  let hasContentToList = ref(true)
 
   const getColumns = computed(() => [
     {
@@ -86,11 +86,11 @@
         :listService="props.listEdgeNodeService"
         :deleteService="props.deleteEdgeNodeService"
         :columns="getColumns"
-        pageTitleDelete="Edge Node"
+        pageTitleDelete="edge node"
         editPagePath="edge-node/edit"
         @on-load-data="handleLoadData"
         :rowActions="actionsRow"
-        emptyListMessage="No Edge Node found."
+        emptyListMessage="No edge nodes found."
       />
       <EmptyEdgeNode
         v-else

@@ -39,6 +39,7 @@
           v-model="name"
           type="text"
           :class="{ 'p-invalid': nameError }"
+          placeholder="My service"
         />
         <small
           v-if="nameError"
@@ -46,8 +47,8 @@
         >
           {{ nameError }}
         </small>
-        <small class="text-color-secondary text-sm font-normal leading-tight">
-          Give a unique and easy-to-remember name.
+        <small class="text-xs text-color-secondary font-normal leading-5">
+          Give a unique and descriptive name to identify the service.
         </small>
       </div>
     </template>
@@ -72,7 +73,7 @@
         >
           {{ codeError }}
         </small>
-        <small class="text-color-secondary text-sm font-normal leading-tight">
+        <small class="text-xs text-color-secondary font-normal leading-5">
           Enter the list of variables and values for the resource. Example:
           <code>port=3306</code>.
         </small>

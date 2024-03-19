@@ -47,7 +47,7 @@
     },
     {
       label: 'Edge Application',
-      to: '/edge-applications/create',
+      to: '/edge-applications/create?origin=create',
       description: 'Deploy an edge application to deliver content from the edge.'
     },
     {
@@ -94,7 +94,7 @@
       label: 'Network Lists',
       to: '/network-lists/create',
       description:
-        'Add allowlists, blocklists, and greylists to use with rule sets on Rules Engine.'
+        'Add allowlists, blocklists, and greylists to use with Rules Engine for Edge Firewall.'
     }
   ])
 

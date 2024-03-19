@@ -1,4 +1,6 @@
 <script setup>
+  import PrimeButton from 'primevue/button'
+
   defineOptions({ name: 'big-number' })
   const props = defineProps({
     label: {
@@ -6,6 +8,10 @@
       required: true
     },
     sufix: {
+      type: String,
+      required: false
+    },
+    tooltipMessage: {
       type: String,
       required: false
     }
@@ -18,7 +24,27 @@
   <div class="flex flex-col w-full">
     <label class="flex text-sm gap-1 items-center">
       {{ props.label }}
-      <span class="pi pi-question-circle text-color-primary" />
+
+      <span class="just-hover">
+        <PrimeButton
+          class="whitespace-nowrap max-md:hidden"
+          icon="pi pi-question-circle"
+          text
+          rounded
+          v-tooltip="props.tooltipMessage"
+          :pt="{
+            root: { class: 'shadow-none' }
+          }"
+        />
+      </span>
+
+      <PrimeButton
+        class="whitespace-nowrap md:hidden"
+        icon="pi pi-question-circle"
+        text
+        rounded
+        v-tooltip.focus="props.tooltipMessage"
+      />
     </label>
     <div class="flex gap-1 items-center">
       <span class="text-2xl font-bold">

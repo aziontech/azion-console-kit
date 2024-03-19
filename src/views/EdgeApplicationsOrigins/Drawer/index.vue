@@ -150,11 +150,12 @@
       .label('Secret Key'),
     bucketName: yup
       .string()
-      .label('Bucket Name')
       .when('originType', {
         is: 'object_storage',
-        then: (schema) => schema.required()
+        then: (schema) => schema.required(),
+        otherwise: (schema) => schema.notRequired()
       })
+      .label('Bucket Name')
   })
 
   const editService = async (payload) => {
@@ -188,6 +189,10 @@
     tracker
       .productEdited({
         productName: 'Origin'
+      })
+      .productEdited({
+        productName: 'Edge Application',
+        tab: 'origins'
       })
       .track()
 
@@ -230,7 +235,7 @@
         productName: 'Origin',
         errorMessage: message,
         fieldName: fieldName,
-        errorType: 'API'
+        errorType: 'api'
       })
       .track()
 
@@ -242,7 +247,7 @@
     tracker
       .failedToCreate({
         productName: 'Origin',
-        errorType: 'API',
+        errorType: 'api',
         fieldName: fieldName.trim(),
         errorMessage: message
       })
