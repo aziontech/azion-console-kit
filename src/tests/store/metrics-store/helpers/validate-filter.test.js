@@ -1,4 +1,4 @@
-import ValidateFilters from '@stores/metrics-store/helpers/validate-filters'
+import ValidateFilters from '@/modules/real-time-metrics/helpers/validate-filters'
 import { describe, expect, it } from 'vitest'
 import FIXTURE from './fixtures/validate-filter-fixtures'
 
