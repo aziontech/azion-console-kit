@@ -1,23 +1,24 @@
 import DATE_TIME_INTERVALS from '@modules/real-time-metrics/constants/date-time-interval'
+import GROUP_DASHBOARDS from '@modules/real-time-metrics/constants/dashboards'
+import REPORTS from '@modules/real-time-metrics/constants/reports'
+
 import { defineStore } from 'pinia'
 import {
   LoadDatasetAvailableFilters,
   LoadFilters,
   LoadInfoAvailableFilters,
-  LoadPagesDashboards,
-  LoadReports,
   LoadReportsDataBySelectedDashboard
-} from '../modules/real-time-metrics/actions'
+} from '@/modules/real-time-metrics/actions'
 
 export const useMetricsStore = defineStore('metrics', {
   state: () => ({
-    listGroupPage: [], // All pages with their dashboards
+    listGroupPage: [...GROUP_DASHBOARDS], // All pages with their dashboards
+    reports: [...REPORTS], // List of all reports
+    dateTimeFilterOptions: [...DATE_TIME_INTERVALS],
     currentGroupPage: {}, // Actual page selected
     currentPage: {}, // Actual page selected
     currentDashboard: {}, // Selected dashboard
-    reports: [], // List of all reports
     isLoadingFilters: false,
-    dateTimeFilterOptions: [...DATE_TIME_INTERVALS],
     filters: {},
     currentReportsData: [], // Selected reports with Meta and Data values
     datasetAvailableFilters: [], // Filter fields by dataset
@@ -158,10 +159,6 @@ export const useMetricsStore = defineStore('metrics', {
       const availableFilters = await LoadInfoAvailableFilters()
       this.infoAvailableFilters = availableFilters
     },
-    async setGroupPage() {
-      const pagesDashboards = await LoadPagesDashboards()
-      this.listGroupPage = pagesDashboards
-    },
     setCurrentGroupPage(groupPage) {
       this.currentGroupPage = groupPage
     },
@@ -172,10 +169,6 @@ export const useMetricsStore = defineStore('metrics', {
     },
     setCurrentDashboard(dashboard) {
       this.currentDashboard = dashboard
-    },
-    async setReports() {
-      const reports = await LoadReports()
-      this.reports = reports
     },
     setInitialPageAndDashboardCurrent() {
       if (this.listGroupPage.length) {
