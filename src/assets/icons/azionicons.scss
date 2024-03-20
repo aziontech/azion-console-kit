@@ -19,8 +19,93 @@
 
 /* Icons */
 .ai.ai-x::before {
-  content: '\0001';
+  content: '\ea02';
 }
 .ai.ai-column::before {
-  content: '\0002';
+  content: '\ea03';
 }
+.ai.ai-home::before {
+  content: '\ea04';
+}
+.ai.ai-marketplace::before {
+  content: '\ea05';
+}
+.ai.ai-domains::before {
+  content: '\ea06';
+}
+.ai.ai-edge-application::before {
+  content: '\ea08';
+}
+.ai.ai-build-pillar::before {
+  content: '\ea07';
+}
+.ai.ai-variables::before {
+  content: '\ea09';
+}
+.ai.ai-secure-pillar::before {
+  content: '\ea10';
+}
+.ai.ai-edge-firewall::before {
+  content: '\ea11';
+}
+.ai.ai-edge-dns::before {
+  content: '\ea12';
+}
+.ai.ai-deploy-pillar::before {
+  content: '\ea13';
+}
+.ai.ai-edge-nodes::before {
+  content: '\ea14';
+}
+.ai.ai-observe-pillar::before {
+  content: '\ea15';
+}
+.ai.ai-data-stream::before {
+  content: '\ea16';
+}
+.ai.ai-edge-pulse::before {
+  content: '\ea17';
+}
+.ai.ai-real-time-metrics::before {
+  content: '\ea18';
+}
+.ai.ai-real-time-events::before {
+  content: '\ea19';
+}
+.ai.ai-real-time-purge::before {
+  content: '\ea20';
+}
+.ai.ai-edge-libraries::before {
+  content: '\ea21';
+}
+.ai.ai-edge-functions::before {
+  content: '\ea22';
+}
+.ai.ai-edge-services::before {
+  content: '\ea23';
+}
+.ai.ai-digital-certificates::before {
+  content: '\ea24';
+}
+.ai.ai-network-lists::before {
+  content: '\ea25';
+}
+.ai.ai-waf-rules::before {
+  content: '\ea26';
+}
+.ai.ai-store::before {
+  content: '\ea27';
+}
+.ai.ai-edge-storage::before {
+  content: '\ea28';
+}
+.ai.ai-edge-sql::before {
+  content: '\ea29';
+}
+.ai.ai-edge-kv::before {
+  content: '\ea30';
+}
+.ai.ai-edge-orchestrator::before {
+  content: '\ea31';
+}
+
