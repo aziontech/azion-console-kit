@@ -1,4 +1,4 @@
-import DATE_TIME_INTERVALS from '@/stores/metrics-store/constants/date-time-interval'
+import DATE_TIME_INTERVALS from '@/modules/real-time-metrics/constants/date-time-interval'
 import { defineStore } from 'pinia'
 import {
   LoadDatasetAvailableAggregations,
@@ -8,7 +8,7 @@ import {
   LoadPagesDashboards,
   LoadReports,
   LoadReportsDataBySelectedDashboard
-} from './metrics-store/actions'
+} from '../modules/real-time-metrics/actions'
 
 export const useMetricsStore = defineStore('metrics', {
   state: () => ({

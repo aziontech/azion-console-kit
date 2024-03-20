@@ -1,4 +1,4 @@
-import mountFilterTypes from '@/stores/metrics-store/helpers/mount-filter-types'
+import mountFilterTypes from '@/modules/real-time-metrics/helpers/mount-filter-types'
 import { describe, expect, it } from 'vitest'
 import FIXTURE from './fixtures/mount-filter-types-fixtures'
 

@@ -1,4 +1,4 @@
-import FormatDatasetVariables from '@/stores/metrics-store/helpers/format-dataset-variables'
+import FormatDatasetVariables from '@/modules/real-time-metrics/helpers/format-dataset-variables'
 import { describe, expect, it } from 'vitest'
 import FIXTURES from './fixtures/format-dataset-variables-fixtures'
 
