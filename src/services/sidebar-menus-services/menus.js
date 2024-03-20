@@ -31,7 +31,6 @@ export const menus = [
   },
   {
     label: 'Secure',
-    icon: 'ai ai-secure',
     items: [
       {
         label: 'Edge Firewall',
