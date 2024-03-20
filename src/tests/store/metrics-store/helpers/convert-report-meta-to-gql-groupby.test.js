@@ -1,4 +1,4 @@
-import GqlRules from '@/modules/real-time-metrics/helpers/convert-report-meta-to-gql'
+import GqlRules from '@modules/real-time-metrics/helpers/convert-report-meta-to-gql'
 import { describe, expect, it } from 'vitest'
 import FIXTURES from './fixtures/convert-report-fixtures'
 

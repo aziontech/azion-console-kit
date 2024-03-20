@@ -1,4 +1,4 @@
-import FormatDatasetFilterToGQL from '@/modules/real-time-metrics/helpers/format-dataset-filter-to-gql'
+import FormatDatasetFilterToGQL from '@modules/real-time-metrics/helpers/format-dataset-filter-to-gql'
 import { describe, expect, it } from 'vitest'
 
 const makeSut = () => {

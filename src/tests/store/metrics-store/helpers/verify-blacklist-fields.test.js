@@ -1,4 +1,4 @@
-import VerifyBlackListField from '@/modules/real-time-metrics/helpers/verify-blacklist-fields'
+import VerifyBlackListField from '@modules/real-time-metrics/helpers/verify-blacklist-fields'
 import { describe, expect, it } from 'vitest'
 
 const makeSut = () => {

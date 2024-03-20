@@ -1,4 +1,4 @@
-import extractFilters from '@/modules/real-time-metrics/helpers/extract-filters-and-variables'
+import extractFilters from '@modules/real-time-metrics/helpers/extract-filters-and-variables'
 import { describe, expect, it } from 'vitest'
 import FIXTURE from './fixtures/extract-filters-and-variables-fixtures'
 

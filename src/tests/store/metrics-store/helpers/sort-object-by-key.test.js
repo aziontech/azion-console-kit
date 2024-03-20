@@ -1,4 +1,4 @@
-import SortObjectByKey from '@/modules/real-time-metrics/helpers/sort-object-by-key'
+import SortObjectByKey from '@modules/real-time-metrics/helpers/sort-object-by-key'
 import { describe, expect, it } from 'vitest'
 
 const makeSut = () => {

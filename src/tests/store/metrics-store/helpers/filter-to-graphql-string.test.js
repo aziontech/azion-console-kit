@@ -1,4 +1,4 @@
-import FiltersToGraphQLString from '@/modules/real-time-metrics/helpers/filter-to-graphql-string'
+import FiltersToGraphQLString from '@modules/real-time-metrics/helpers/filter-to-graphql-string'
 import { describe, expect, it } from 'vitest'
 
 const makeSut = () => {

@@ -1,4 +1,4 @@
-import VerifyWhitelistField from '@/modules/real-time-metrics/helpers/verify-whitelist-fields.js'
+import VerifyWhitelistField from '@modules/real-time-metrics/helpers/verify-whitelist-fields.js'
 import { describe, expect, it } from 'vitest'
 
 const makeSut = () => {
