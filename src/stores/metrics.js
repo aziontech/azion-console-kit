@@ -1,6 +1,8 @@
-import DATE_TIME_INTERVALS from '@modules/real-time-metrics/constants/date-time-interval'
-import GROUP_DASHBOARDS from '@modules/real-time-metrics/constants/dashboards'
-import REPORTS from '@modules/real-time-metrics/constants/reports'
+import {
+  GROUP_DASHBOARDS,
+  REPORTS,
+  DATE_TIME_INTERVALS
+} from '@modules/real-time-metrics/constants'
 
 import { defineStore } from 'pinia'
 import {
