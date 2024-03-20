@@ -31,6 +31,22 @@ export class SignUpTracker {
 
   /**
    * @param {Object} payload
+   * @param {'google'|'azure'|'github'} payload.method
+   *
+   * @returns {AnalyticsTrackerAdapter}
+   */
+  userAuthorizedSso(payload) {
+    this.#trackerAdapter.addEvent({
+      eventName: 'User Authorized SSO',
+      props: {
+        method: payload.method
+      }
+    })
+    return this.#trackerAdapter
+  }
+
+  /**
+   * @param {Object} payload
    * @param {'api'|'field'} payload.errorType
    * @param {string} payload.fieldName
    * @param {string} payload.errorMessage
