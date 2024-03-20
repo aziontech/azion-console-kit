@@ -1,4 +1,4 @@
-import * as ConvertFields from '@views/Metrics/utils/convert-metrics-fields'
+import * as ConvertFields from '@views/RealTimeMetrics/utils/convert-metrics-fields'
 import { describe, expect, it } from 'vitest'
 import FIXTURES from './fixtures/convert-filter-fields'
 
