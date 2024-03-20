@@ -42,9 +42,9 @@ export default async function beforeEachRoute(to, __, next) {
 
       const statusClient = accountInfo.status
 
-      if(statusToGoBilling.includes(statusClient)) {
+      if (statusToGoBilling.includes(statusClient)) {
         const billingUrl = getStaticUrlsByEnvironment('billing')
-        window.location.href = billingUrl;
+        window.location.href = billingUrl
       }
 
       accountInfo.is_account_owner = userInfo.results.is_account_owner
