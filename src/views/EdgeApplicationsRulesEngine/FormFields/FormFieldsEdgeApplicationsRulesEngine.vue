@@ -727,6 +727,9 @@
               align="left"
               type="dashed"
               class="capitalize"
+              :pt="{
+                root: { class: 'z-0' }
+              }"
             >
               {{ item.conditional }}
             </Divider>
