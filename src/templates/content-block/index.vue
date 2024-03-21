@@ -17,8 +17,8 @@
         </template>
         <p class="text-color-secondary">
           <b class="text-color">Preview Stage:</b>
-            The new Azion Console is in preview. You may encounter minor issues during this time.
-            Your feedback is valuable.
+          The new Azion Console is in preview. You may encounter minor issues during this time. Your
+          feedback is valuable.
         </p>
       </Message>
       <div
