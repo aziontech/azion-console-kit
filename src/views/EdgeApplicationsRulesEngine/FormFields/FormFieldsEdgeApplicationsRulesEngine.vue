@@ -726,10 +726,7 @@
             <Divider
               align="left"
               type="dashed"
-              class="capitalize"
-              :pt="{
-                root: { class: 'z-0' }
-              }"
+              class="capitalize z-0"
             >
               {{ item.conditional }}
             </Divider>
@@ -861,7 +858,7 @@
         <div class="flex items-center gap-2">
           <Divider
             align="left"
-            type="dashed"
+            type="dashed z-0"
           >
             {{ getBehaviorLabel(behaviorItem) }}
           </Divider>
