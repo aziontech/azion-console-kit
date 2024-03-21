@@ -174,4 +174,3 @@
     />
   </div>
 </template>
-../../../modules/real-time-metrics/constants/services-operator-in
