@@ -1,7 +1,7 @@
 <script setup>
   import c3 from 'c3'
   import { onMounted } from 'vue'
-  import FormatC3GraphProps from '../../../helpers/c3-charts'
+  import { FormatC3GraphProps } from '@modules/real-time-metrics/chart'
 
   const props = defineProps({
     chartData: Object,
@@ -35,3 +35,4 @@
     :id="`line-chart-${props.chartData?.id}`"
   />
 </template>
+../../../../../modules/real-time-metrics/c3-charts

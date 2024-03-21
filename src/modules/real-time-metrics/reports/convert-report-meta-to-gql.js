@@ -1,8 +1,10 @@
-import ExtractFiltersAndVariables from './extract-filters-and-variables'
-import FiltersToGraphQLString from './filter-to-graphql-string'
+import {
+  ExtractFiltersAndVariables,
+  FiltersToGraphQLString
+} from '@modules/real-time-metrics/filters'
 
 /**
- * Generates JSDoc for the GqlRules class.
+ * Describes the structure of the GraphQL query.
  *
  * @param {Object} options - The options object.
  * @param {string} options.dataset - The name of the dataset.

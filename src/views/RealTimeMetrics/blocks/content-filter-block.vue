@@ -5,7 +5,7 @@
   import { useMetricsStore } from '@/stores/metrics'
   import { computed, ref, watch } from 'vue'
   import { MAP_SERVICE_OPERATION } from '@modules/real-time-metrics/constants'
-  import { isRelevantField } from '../utils/convert-metrics-fields'
+  import { GetRelevantField } from '@/modules/real-time-metrics/filters'
 
   const metricsStore = useMetricsStore()
   const {
@@ -42,7 +42,7 @@
 
     const newOptions = options.map(({ label, operator, value }) => {
       const info = infoOptions[dataset][value]
-      const mostRelevant = isRelevantField(label, dataset)
+      const mostRelevant = GetRelevantField(label, dataset)
       return {
         label,
         value,

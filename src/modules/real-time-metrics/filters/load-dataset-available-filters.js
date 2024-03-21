@@ -49,8 +49,8 @@ const verifyBlacklistFields = ({ name }) => {
  */
 const verifyWhitelistFields = ({ name, type: { name: typeName } }) => {
   return (
-    FILTERS_RULES.SUPPORTED_FILTER_TYPE.includes(typeName) ||
-    FILTERS_RULES.FIELDS_LIKE.includes(name)
+    FILTERS_RULES.FILTER_WHITELIST.SUPPORTED_FILTER_TYPE.includes(typeName) ||
+    FILTERS_RULES.FILTER_WHITELIST.FIELDS_LIKE.includes(name)
   )
 }
 

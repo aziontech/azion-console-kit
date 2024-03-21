@@ -9,13 +9,13 @@ const shouldReplaceString = (value) => {
 }
 
 /**
- * Generates JSDoc for the FiltersToGraphQLString function.
+ * Generates the GraphQL string for a filter.
  *
  * @param {string} name - The name of the filter.
  * @param {any} value - The value of the filter.
  * @returns {string} - The generated GraphQL string for the filter.
  */
-function FiltersToGraphQLString(name, value) {
+export default function FiltersToGraphQLString(name, value) {
   let result = `${name}: `
   if (typeof value === 'object') {
     result += '{\n'
@@ -34,5 +34,3 @@ function FiltersToGraphQLString(name, value) {
   }
   return `${result}\n`
 }
-
-export default FiltersToGraphQLString

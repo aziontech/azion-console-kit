@@ -1,6 +1,8 @@
 import { useAccountStore } from '@/stores/account'
 import { BeholderService } from '@services/real-time-metrics-services'
-import { ConvertBeholderToChart, FillResultQuery, GqlRules } from '../helpers'
+import FillResultQuery from './fill-result-query'
+import ConvertBeholderToChart from './convert-beholder-to-chart'
+import GqlRules from './convert-report-meta-to-gql'
 
 /**
  * Removes unfinished register from the given registers based on filterEndDatetime and currentEndDatetime.
