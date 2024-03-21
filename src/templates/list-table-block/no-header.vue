@@ -69,10 +69,10 @@
           </template>
         </Column>
         <Column
-          :frozen="true"
+          :frozen="showActions"
           alignFrozen="right"
         >
-          <template #header>
+          <template #header >
             <div class="flex justify-end w-full">
               <PrimeButton
                 outlined
