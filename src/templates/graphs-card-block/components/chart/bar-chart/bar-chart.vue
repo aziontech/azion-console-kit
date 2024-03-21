@@ -33,4 +33,3 @@
     :id="`bar-chart-${props.chartData?.id}`"
   />
 </template>
-../../../../../modules/real-time-metrics/c3-charts
