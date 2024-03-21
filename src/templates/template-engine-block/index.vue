@@ -1,7 +1,7 @@
 <template>
   <FormLoading v-if="isLoading" />
   <div
-    class="w-full flex flex-col gap-8 max-md:gap-6"
+    class="w-full grow flex flex-col gap-8 max-md:gap-6"
     v-else
   >
     <FormHorizontal
@@ -22,6 +22,7 @@
             <span v-if="field.attrs"><span v-if="field.attrs.required">*</span></span></label
           >
           <Password
+            autocomplete="off"
             v-if="field.type === 'password'"
             toggleMask
             :key="`password-field-${field.name}`"
@@ -34,6 +35,7 @@
           />
           <InputText
             v-else
+            autocomplete="off"
             :key="field.name"
             :id="field.name"
             type="text"
@@ -51,7 +53,7 @@
       </template>
     </FormHorizontal>
 
-    <div v-if="inputSchema.groups">
+    <div class="w-full grow flex flex-col gap-8 max-md:gap-6" v-if="inputSchema.groups">
       <FormHorizontal
         v-for="group in inputSchema.groups"
         :key="group.name"
@@ -64,38 +66,68 @@
             v-for="field in removeHiddenFields(group.fields)"
             :key="field.name"
           >
-            <label
-              for="name"
-              class="text-color text-base font-medium"
-              >{{ field.label }}
-              <span v-if="field.attrs"><span v-if="field.attrs.required">*</span></span></label
-            >
-            <Password
-              v-if="field.type === 'password'"
-              toggleMask
-              :key="`password-field-${field.name}`"
-              v-bind="field.input"
-              v-model="field.input.value"
-              :id="field.name"
-              class="w-full"
-              :class="{ 'p-invalid': formTools.errors[field.name] }"
-              :feedback="false"
-            />
-            <InputText
-              v-else
-              :key="field.name"
-              :id="field.name"
-              type="text"
-              v-bind="field.input"
-              :class="{ 'p-invalid': formTools.errors[field.name] }"
-            />
-            <small class="tet-xs font-normal text-color-secondary">{{ field.description }}</small>
-            <small
-              v-if="formTools.errors[field.name]"
-              class="p-error text-xs font-normal leading-tight"
-            >
-              {{ formTools.errors[field.name] }}
-            </small>
+            <div v-if="field.name === 'installation_id'">
+              <PrimeButton 
+                v-if="installations.length === 0"
+                @click="authenticateVcs"
+                label="Connect with GitHub"
+                outlined
+                icon="pi pi-github"
+                iconPos="left"
+              />
+              <div v-else class="flex flex-col sm:max-w-lg w-full gap-2">
+                <label
+                  for="installation_id"
+                  class="text-color text-base font-medium"
+                  >{{ field.label }}
+                  <span v-if="field.attrs"><span v-if="field.attrs.required">*</span></span></label
+                >
+                <Dropdown
+                  appendTo="self"
+                  v-model="field.installation_id"
+                  :options="installations"
+                  optionLabel="scope"
+                  optionValue="uuid"
+                  class="w-full"
+                />
+              </div>
+            </div>
+            <div v-else class="flex flex-col sm:max-w-lg w-full gap-2">
+              <label
+                for="name"
+                class="text-color text-base font-medium"
+                >{{ field.label }}
+                <span v-if="field.attrs"><span v-if="field.attrs.required">*</span></span></label
+              >
+              <Password
+                v-if="field.type === 'password'"
+                autocomplete="off"
+                toggleMask
+                :key="`password-field-${field.name}`"
+                v-bind="field.input"
+                v-model="field.input.value"
+                :id="field.name"
+                class="w-full"
+                :class="{ 'p-invalid': formTools.errors[field.name] }"
+                :feedback="false"
+              />
+              <InputText
+                v-else
+                autocomplete="off"
+                :key="field.name"
+                :id="field.name"
+                type="text"
+                v-bind="field.input"
+                :class="{ 'p-invalid': formTools.errors[field.name] }"
+              />
+              <small class="tet-xs font-normal text-color-secondary">{{ field.description }}</small>
+              <small
+                v-if="formTools.errors[field.name]"
+                class="p-error text-xs font-normal leading-tight"
+              >
+                {{ formTools.errors[field.name] }}
+              </small>
+            </div>
           </div>
         </template>
       </FormHorizontal>
@@ -117,8 +149,10 @@
 
 <script setup>
   import Password from 'primevue/password'
+  import Dropdown from 'primevue/dropdown'
   import { ref, onBeforeMount, defineOptions, watch, onMounted } from 'vue'
   import FormHorizontal from '@templates/create-form-block/form-horizontal'
+  import PrimeButton from 'primevue/button'
   import ActionBarTemplate from '@templates/action-bar-block'
   import FormLoading from './FormLoading'
   import InputText from 'primevue/inputtext'
@@ -136,6 +170,12 @@
       required: true
     },
     instantiateTemplateService: {
+      type: Function
+    },
+    listPlatformsService: {
+      type: Function
+    },
+    listIntegrationsService: {
       type: Function
     },
     templateId: {
@@ -167,6 +207,9 @@
   const isLoading = ref(true)
   const submitLoading = ref(false)
   const isMounted = ref(false)
+  const installationUrl = ref('')
+  const intervalPopup = ref()
+  const installations = ref([])
 
   const loadTemplate = async (id) => {
     try {
@@ -193,6 +236,17 @@
       isMounted.value = true
     }, 100)
   })
+
+  const openPopupGithub = (url) => {
+      const popupGithub = window.open(url, 'page', 'width=640, height=700, top=100, left=110, popup=yes, scrollbars=no');
+      intervalPopup.value = setInterval(async() => {
+        if (popupGithub.closed) {
+          installations.value = await props.listIntegrationsService()
+          console.log(installations.value)
+          clearInterval(intervalPopup.value)
+        }
+      }, 1000);
+    }
 
   const createSchemaObject = async () => {
     const templateSchema = {}
@@ -296,6 +350,17 @@
 
   const removeHiddenFields = (fields) => {
     return fields.filter((field) => !field.hidden)
+  }
+
+  const authenticateVcs = async () => {
+    const res = await props.listPlatformsService()
+    console.log(res)
+    res.forEach((platform) => {
+      if (platform.id === 'github') { 
+        installationUrl.value =  platform.installationUrl
+      }
+    })
+    openPopupGithub(installationUrl.value)
   }
 
   const validateAndSubmit = async () => {
