@@ -1,19 +1,5 @@
 /* eslint-disable id-length */
-import {
-  BOTTOM_LEGEND_PADDING,
-  C3_TYPES,
-  DATA_VOLUME,
-  LABEL,
-  MAX_COUNT,
-  MEAN_LINE_LABEL,
-  MIN_COUNT,
-  RESET_COUNT,
-  SCREEN_SMALL_BREAKPOINT,
-  SCREEN_XSMALL_BREAKPOINT,
-  TO_FIXED_DATA_VOLUME,
-  TO_FIXED_PERCENTAGE
-} from '../constants/chart-data'
-import { LINE_PATTERNS, MEAN_LINE_PATTERN } from '../constants/color-patterns'
+import { CHART_RULES } from '@modules/real-time-metrics/constants'
 
 /**
  * Check if the input is a valid date
@@ -68,9 +54,9 @@ function formatC3XAxis(chartData, resultChart) {
   const isRotated = chartData.rotated
 
   const xAxis = {
-    type: isSeriesDate ? C3_TYPES.ts : C3_TYPES.cat,
+    type: isSeriesDate ? CHART_RULES.C3_TYPES.ts : CHART_RULES.C3_TYPES.cat,
     tick: {
-      count: isSeriesNumeric ? MAX_COUNT : MIN_COUNT,
+      count: isSeriesNumeric ? CHART_RULES.MAX_COUNT : CHART_RULES.MIN_COUNT,
       outer: false
     }
   }
@@ -79,12 +65,12 @@ function formatC3XAxis(chartData, resultChart) {
     xAxis.tick = {
       ...xAxis.tick,
       format: '%b-%d %H:%M',
-      width: LABEL.width
+      width: CHART_RULES.LABEL.width
     }
   }
 
   if (isRotated && !isSeriesDate) {
-    xAxis.min = RESET_COUNT
+    xAxis.min = CHART_RULES.RESET_COUNT
   }
 
   return xAxis
@@ -98,8 +84,8 @@ function formatC3XAxis(chartData, resultChart) {
 export function formatPercentageDataUnit(data) {
   return Intl.NumberFormat('en', {
     style: 'percent',
-    maximumFractionDigits: TO_FIXED_PERCENTAGE,
-    minimumFractionDigits: TO_FIXED_PERCENTAGE
+    maximumFractionDigits: CHART_RULES.TO_FIXED_PERCENTAGE,
+    minimumFractionDigits: CHART_RULES.TO_FIXED_PERCENTAGE
   }).format(data / 100)
 }
 
@@ -117,17 +103,17 @@ export function formatBytesDataUnit(data, chartData) {
     unit = 'bit-per-second'
   }
 
-  if (data > DATA_VOLUME.tera) {
-    value = data / DATA_VOLUME.tera
+  if (data > CHART_RULES.DATA_VOLUME.tera) {
+    value = data / CHART_RULES.DATA_VOLUME.tera
     unit = `tera${unit}`
-  } else if (data > DATA_VOLUME.giga) {
-    value = data / DATA_VOLUME.giga
+  } else if (data > CHART_RULES.DATA_VOLUME.giga) {
+    value = data / CHART_RULES.DATA_VOLUME.giga
     unit = `giga${unit}`
-  } else if (data > DATA_VOLUME.mega) {
-    value = data / DATA_VOLUME.mega
+  } else if (data > CHART_RULES.DATA_VOLUME.mega) {
+    value = data / CHART_RULES.DATA_VOLUME.mega
     unit = `mega${unit}`
-  } else if (data > DATA_VOLUME.kilo) {
-    value = data / DATA_VOLUME.kilo
+  } else if (data > CHART_RULES.DATA_VOLUME.kilo) {
+    value = data / CHART_RULES.DATA_VOLUME.kilo
     unit = `kilo${unit}`
   }
 
@@ -139,8 +125,8 @@ export function formatBytesDataUnit(data, chartData) {
     style: 'unit',
     unit,
     unitDisplay: 'narrow',
-    minimumFractionDigits: TO_FIXED_DATA_VOLUME,
-    maximumFractionDigits: TO_FIXED_DATA_VOLUME
+    minimumFractionDigits: CHART_RULES.TO_FIXED_DATA_VOLUME,
+    maximumFractionDigits: CHART_RULES.TO_FIXED_DATA_VOLUME
   })
   return byteValueNumberFormatter.format(value)
 }
@@ -189,10 +175,10 @@ export function formatC3YAxis(chartData) {
      * Configuration of the Y axis tick
      */
     tick: {
-      count: MAX_COUNT,
+      count: CHART_RULES.MAX_COUNT,
       format: (d) => formatYAxisLabels(d, chartData)
     },
-    min: !isRotated ? RESET_COUNT : undefined,
+    min: !isRotated ? CHART_RULES.RESET_COUNT : undefined,
     padding: { bottom: 0 }
   }
   if (chartData.maxYAxis) {
@@ -210,7 +196,7 @@ export function formatC3YAxis(chartData) {
  * @returns {string} - Returns the legend position based on the conditions
  */
 function setLegendPosition(chartData, resultChart) {
-  if (window.innerWidth < SCREEN_SMALL_BREAKPOINT) {
+  if (window.innerWidth < CHART_RULES.SCREEN_SMALL_BREAKPOINT) {
     return 'bottom'
   }
 
@@ -231,7 +217,7 @@ function generateMeanLineValues(resultChart, mean) {
   const numberOfSeries = withoutTsSeries[0]?.slice(1).length
   const meanValues = Array(numberOfSeries).fill(mean)
 
-  return [MEAN_LINE_LABEL, ...meanValues]
+  return [CHART_RULES.MEAN_LINE_LABEL, ...meanValues]
 }
 
 /**
@@ -258,10 +244,10 @@ function setMeanSeriesValues(serie, seriesTotal, chartData) {
   const serieMeanLineLegend = new Array(serieCount)
   const formatedLabelValue = formatYAxisLabels(serieAvg, chartData)
   const serieName = camelToTitle(serie[0])
-  serieMeanLineValues.fill(serieAvg).unshift(`${MEAN_LINE_LABEL} - ${serieName}`)
+  serieMeanLineValues.fill(serieAvg).unshift(`${CHART_RULES.MEAN_LINE_LABEL} - ${serieName}`)
   serieMeanLineLegend
     .fill(serieAvg)
-    .unshift(`${MEAN_LINE_LABEL} - ${serieName} - ${formatedLabelValue}`)
+    .unshift(`${CHART_RULES.MEAN_LINE_LABEL} - ${serieName} - ${formatedLabelValue}`)
 
   return { serieMeanLineLegend, serieMeanLineValues }
 }
@@ -314,8 +300,8 @@ function getSeriesInfos(resultChart, chartData, hasMeanLineSeries, hasMeanLineTo
   if (hasMeanLineTotal) {
     const mean = seriesAccumulator / numberOfSeries
     const formattedMeanValues = formatYAxisLabels(mean, chartData)
-    const meanLineLabel = `${MEAN_LINE_LABEL} - ${formattedMeanValues}`
-    seriesNames = { ...seriesNames, [MEAN_LINE_LABEL]: meanLineLabel }
+    const meanLineLabel = `${CHART_RULES.MEAN_LINE_LABEL} - ${formattedMeanValues}`
+    seriesNames = { ...seriesNames, [CHART_RULES.MEAN_LINE_LABEL]: meanLineLabel }
 
     meanLineTotal = generateMeanLineValues(resultChart, mean)
   }
@@ -340,7 +326,7 @@ function resetTooltipLabel(tooltipData) {
  * @returns {Object|null} - The legend padding object or null
  */
 function setLegendPadding(legendPosition) {
-  return legendPosition === 'bottom' ? BOTTOM_LEGEND_PADDING : null
+  return legendPosition === 'bottom' ? CHART_RULES.BOTTOM_LEGEND_PADDING : null
 }
 
 /**
@@ -359,7 +345,7 @@ export default function FormatC3GraphProps({
   hasMeanLineSeries = false,
   hasMeanLineTotal = false
 }) {
-  const pattern = [...LINE_PATTERNS]
+  const pattern = [...CHART_RULES.LINE_PATTERNS]
 
   const legendPosition = setLegendPosition(chartData, resultChart)
 
@@ -376,7 +362,7 @@ export default function FormatC3GraphProps({
 
   if (hasMeanLineTotal && resultChart.length > 1) {
     const meanLineIndex = resultChart.length - 1
-    pattern.splice(meanLineIndex, 0, MEAN_LINE_PATTERN)
+    pattern.splice(meanLineIndex, 0, CHART_RULES.MEAN_LINE_PATTERN)
 
     data.columns = [...data.columns, meanLineTotal]
   }
@@ -408,7 +394,7 @@ export default function FormatC3GraphProps({
       show: false
     },
     tooltip: {
-      show: window.innerWidth > SCREEN_XSMALL_BREAKPOINT,
+      show: window.innerWidth > CHART_RULES.SCREEN_XSMALL_BREAKPOINT,
       contents(d, defaultTitleFormat, defaultValueFormat, color) {
         return this.getTooltipContent(
           resetTooltipLabel(d),

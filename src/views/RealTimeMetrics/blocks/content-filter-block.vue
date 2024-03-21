@@ -4,7 +4,7 @@
   import { storeToRefs } from 'pinia'
   import { useMetricsStore } from '@/stores/metrics'
   import { computed, ref, watch } from 'vue'
-  import MAP_SERVICE_OPERATION from '../constants/services-operator-in'
+  import { MAP_SERVICE_OPERATION } from '@modules/real-time-metrics/constants'
   import { isRelevantField } from '../utils/convert-metrics-fields'
 
   const metricsStore = useMetricsStore()
@@ -174,3 +174,4 @@
     />
   </div>
 </template>
+../../../modules/real-time-metrics/constants/services-operator-in
