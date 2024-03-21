@@ -69,7 +69,7 @@
           </template>
         </Column>
         <Column
-          :frozen="true"
+          :frozen="showActions"
           alignFrozen="right"
         >
           <template #header>
