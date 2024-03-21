@@ -1,17 +1,17 @@
 export const menus = [
   {
     label: 'Home',
-    icon: 'pi pi-home',
+    icon: 'ai ai-home',
     to: '/'
   },
   {
     label: 'Marketplace',
-    icon: 'pi pi-cart-plus',
+    icon: 'ai ai-marketplace',
     to: '/marketplace'
   },
   {
     label: 'Domains',
-    icon: 'pi pi-globe',
+    icon: 'ai ai-domains',
     to: '/domains'
   },
   {
@@ -19,29 +19,28 @@ export const menus = [
     items: [
       {
         label: 'Edge Application',
-        icon: 'pi pi-th-large',
+        icon: 'ai ai-edge-application',
         to: '/edge-applications'
       },
       {
         label: 'Variables',
         to: '/variables',
-        icon: 'pi pi-box'
+        icon: 'ai ai-variables'
       }
     ]
   },
   {
     label: 'Secure',
-    icon: 'pi pi-lock',
     items: [
       {
         label: 'Edge Firewall',
         to: '/edge-firewall',
-        icon: 'pi pi-shield'
+        icon: 'ai ai-edge-firewall'
       },
       {
         label: 'Edge DNS',
         to: '/edge-dns',
-        icon: 'pi pi-sitemap'
+        icon: 'ai ai-edge-dns'
       }
     ]
   },
@@ -50,7 +49,7 @@ export const menus = [
     items: [
       {
         label: 'Edge Nodes',
-        icon: 'pi pi-database',
+        icon: 'ai ai-edge-nodes',
         to: '/edge-node'
       }
     ]
@@ -61,22 +60,22 @@ export const menus = [
       {
         label: 'Data Stream',
         to: '/data-stream',
-        icon: 'pi pi-play'
+        icon: 'ai ai-data-stream'
       },
       {
         label: 'Edge Pulse',
         to: '/edge-pulse',
-        icon: 'pi pi-wifi'
+        icon: 'ai ai-edge-pulse'
       },
       {
         label: 'Real-Time Metrics',
         to: '/real-time-metrics',
-        icon: 'pi pi-chart-line'
+        icon: 'ai ai-real-time-metrics'
       },
       {
         label: 'Real-Time Events',
         to: '/real-time-events',
-        icon: 'pi pi-chart-bar',
+        icon: 'ai ai-real-time-events',
         tag: 'Preview'
       }
     ]
@@ -87,7 +86,7 @@ export const menus = [
       {
         label: 'Real-Time Purge',
         to: '/real-time-purge',
-        icon: 'pi pi-sync'
+        icon: 'ai ai-real-time-purge'
       }
     ]
   },
@@ -97,27 +96,27 @@ export const menus = [
       {
         label: 'Edge Functions',
         to: '/edge-functions',
-        icon: 'pi pi-code'
+        icon: 'ai ai-edge-functions'
       },
       {
         label: 'Edge Services',
         to: '/edge-services',
-        icon: 'pi pi-server'
+        icon: 'ai ai-edge-services'
       },
       {
         label: 'Digital Certificates',
         to: '/digital-certificates',
-        icon: 'pi pi-check-circle'
+        icon: 'ai ai-digital-certificates'
       },
       {
         label: 'Network Lists',
         to: '/network-lists',
-        icon: 'pi pi-list'
+        icon: 'ai ai-network-lists'
       },
       {
         label: 'WAF Rules',
         to: '/waf',
-        icon: 'pi pi-sliders-h'
+        icon: 'ai ai-waf-rules'
       }
     ]
   }
