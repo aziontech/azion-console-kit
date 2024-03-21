@@ -1,3 +1,5 @@
+const SERIES_LIMIT = 16
+
 const RESET_COUNT = 0
 
 const MIN_COUNT = 4
@@ -59,6 +61,7 @@ const LINE_PATTERNS = [
 const MEAN_LINE_PATTERN = 'var(--text-color)'
 
 const CHART_RULES = {
+  SERIES_LIMIT,
   RESET_COUNT,
   MIN_COUNT,
   MAX_COUNT,

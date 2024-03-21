@@ -4,12 +4,13 @@ import {
   DATE_TIME_INTERVALS
 } from '@modules/real-time-metrics/constants'
 
-import { defineStore } from 'pinia'
+import { LoadReportsDataBySelectedDashboard } from '@modules/real-time-metrics/reports'
 import {
   LoadDatasetAvailableFilters,
-  LoadInfoAvailableFilters,
-  LoadReportsDataBySelectedDashboard
-} from '@/modules/real-time-metrics/actions'
+  LoadInfoAvailableFilters
+} from '@/modules/real-time-metrics/filters'
+
+import { defineStore } from 'pinia'
 
 export const useMetricsStore = defineStore('metrics', {
   state: () => ({

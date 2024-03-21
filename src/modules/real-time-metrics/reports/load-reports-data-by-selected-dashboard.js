@@ -1,6 +1,7 @@
 import { useMetricsStore } from '@/stores/metrics'
 import Axios from 'axios'
-import { LoadReportVariation, LoadReportWithMeta } from '.'
+import LoadReportVariation from './load-report-variation'
+import LoadReportWithMeta from './load-report-with-meta'
 
 let tokenSource = null
 

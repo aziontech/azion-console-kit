@@ -1,6 +1,21 @@
-import SortObjectByKey from './sort-object-by-key'
-
 const VARIABLES_BLACK_LIST = ['sum', 'count', 'avg', 'max', 'min', 'client_id']
+
+/**
+ * Sorts an object by its keys in ascending order.
+ * @param {Object} unsortedObj - The unsorted object to be sorted.
+ * @returns {Object} - The sorted object.
+ */
+const sortObjectByKey = (unsortedObj) => {
+  const res = Object.keys(unsortedObj)
+    .sort((prev, next) => prev.localeCompare(next))
+    .reduce((obj, key) => {
+      const newObj = { ...obj }
+      newObj[key] = unsortedObj[key]
+      return newObj
+    }, {})
+
+  return res
+}
 
 /**
  * @param {array} fields Array with the fields
@@ -18,7 +33,7 @@ export default function FormatDatasetVariables(fields) {
       }
     })
 
-    dataset[field.name] = SortObjectByKey(variables)
+    dataset[field.name] = sortObjectByKey(variables)
   })
 
   return dataset

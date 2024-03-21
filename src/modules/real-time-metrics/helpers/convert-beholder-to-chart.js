@@ -1,5 +1,4 @@
-const SERIES_LIMIT = 16
-
+import { CHART_RULES } from '@modules/real-time-metrics/constants'
 /**
  * Fills the series with zeroes to make them all the same length.
  * @param {Object} series - The series to be filled with zeroes.
@@ -116,7 +115,7 @@ const shouldHandleSeriesData = (variable, groupBy) => {
  * @returns {boolean} Whether the series is within the limit.
  */
 const isSeriesBeyondLimits = (series) => {
-  return Object.keys(series).length >= SERIES_LIMIT
+  return Object.keys(series).length >= CHART_RULES.SERIES_LIMIT
 }
 
 /**

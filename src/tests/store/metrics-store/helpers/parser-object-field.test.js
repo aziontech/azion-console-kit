@@ -1,4 +1,4 @@
-import ParserObjectField from '@modules/real-time-metrics/helpers/parser-object-field'
+import ParserObjectField from '@/modules/real-time-metrics/filters/parser-object-field'
 import { describe, expect, it } from 'vitest'
 import FIXTURE from './fixtures/parser-object-field-fixtures'
 

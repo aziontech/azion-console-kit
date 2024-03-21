@@ -1,4 +1,4 @@
-import { LoadReportWithMeta } from '.'
+import LoadReportWithMeta from './load-report-with-meta'
 
 /**
  * Asynchronously retrieves the current aggregation for a given report based on the provided filters.
