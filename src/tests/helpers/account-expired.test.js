@@ -50,19 +50,18 @@ const scenarios = {
     {
       label: 'should not redirect to billing page when client status is TRIAL in Production env',
       env: 'production',
-      status: 'TRIAL',
+      status: 'TRIAL'
     },
     {
       label: 'should not redirect to billing page when client status is TRIAL in Development env',
       env: 'development',
-      status: 'TRIAL',
+      status: 'TRIAL'
     },
     {
       label: 'should not redirect to billing page when client status is TRIAL in Stage env',
       env: 'stage',
-      status: 'TRIAL',
+      status: 'TRIAL'
     }
-
   ]
 }
 
@@ -90,7 +89,6 @@ describe('checkAccountStatus', () => {
 
     expect(spyReplace).toHaveBeenCalledWith(expected)
   })
-
 
   it.each(scenarios.withoutRedirect)('$label', ({ status, env }) => () => {
     vi.stubEnv('MODE', env)
