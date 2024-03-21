@@ -116,7 +116,6 @@
                 :popup="true"
               />
               <PrimeButton
-                v-if="hasActions"
                 v-tooltip.top="{ value: 'Actions', showDelay: 200 }"
                 size="small"
                 icon="pi pi-ellipsis-h"
@@ -269,7 +268,6 @@
   const selectedItemData = ref(null)
   const selectedColumns = ref([])
   const selectedItems = ref()
-  const menuActionsCounter = ref(0)
 
   onMounted(() => {
     loadData({ page: 1 })
@@ -307,10 +305,6 @@
     showActions.value = actionOptions.length > 0
     return actionOptions
   }
-
-  const hasActions = computed(() => {
-    return menuActionsCounter.value > 0
-  })
 
   const toast = useToast()
 
