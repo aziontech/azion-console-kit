@@ -39,7 +39,6 @@ export const useMetricsStore = defineStore('metrics', {
         !state.filters.datasetAvailable.length || !Object.keys(state.filters.infoAvailable).length
       )
     },
-    getFilterSelect: (state) => state.selectFilter,
     getGroupPages: (state) => state.group.all,
     getCurrentInfo: (state) => ({
       Page: state.group.currentPage.label,
@@ -69,13 +68,6 @@ export const useMetricsStore = defineStore('metrics', {
       const dashboards = page?.[0]?.dashboards || []
       return dashboards
     },
-    reportsBySelectedDashboard: (state) => {
-      const reports = state.reports.all.filter((report) => {
-        const dashboardId = state.group.currentDashboard?.id
-        return report.dashboardId === dashboardId
-      })
-      return reports
-    },
     currentIdPageAndDashboard: (state) => {
       const currentIds = {
         pageId: state.group.currentPage.path,
@@ -83,27 +75,8 @@ export const useMetricsStore = defineStore('metrics', {
       }
       return currentIds
     },
-    currentLabelPageAndDashboard: (state) => {
-      const currentIds = {
-        currentPage: state.group.currentPage.label,
-        currentDashboard: state.group.currentDashboard.label
-      }
-      return currentIds
-    },
     getCurrentReportsData: (state) => state.reports.current,
     currentFilters: (state) => state.filters.selected,
-    currentSelectedFilters: (state) => {
-      const filters = {}
-      if (state.filters.selected.datasets) filters.datasets = state.filters.selected.datasets
-      if (state.filters.selected.and) {
-        filters.and = {}
-        for (const andFilter in state.filters.selected.and) {
-          if (andFilter === 'meta') continue
-          filters.and[andFilter] = state.filters.selected.and[andFilter]
-        }
-      }
-      return filters
-    },
     getDatasetAvailableFilters: (state) => {
       return state.filters.datasetAvailable
     },
@@ -112,9 +85,6 @@ export const useMetricsStore = defineStore('metrics', {
     }
   },
   actions: {
-    setFilterSelect(filter) {
-      this.selectFilter = filter
-    },
     async setDatasetAvailableFilters() {
       const availableFilters = await LoadDatasetAvailableFilters(
         this.group.currentDashboard.dataset
@@ -172,21 +142,6 @@ export const useMetricsStore = defineStore('metrics', {
 
       dashboards[0].active = true
       ;[this.group.currentDashboard] = dashboards
-    },
-    setCurrentsByLabels({ labelPage, labelDashboard }) {
-      const selectPage = this.group.current.pagesDashboards.find(({ label }) => label === labelPage)
-
-      const newDashboard = selectPage.dashboards.map((dashboard) => ({
-        ...dashboard,
-        active: dashboard.label === labelDashboard
-      }))
-      const selectDashboard = newDashboard.find(({ active }) => active)
-      if (!selectDashboard) {
-        newDashboard[0].active = true
-      }
-      selectPage.dashboards = newDashboard
-      this.group.currentPage = selectPage
-      this.group.currentDashboard = selectDashboard || newDashboard[0]
     },
     setFilters(filters) {
       this.filters.selected = filters
