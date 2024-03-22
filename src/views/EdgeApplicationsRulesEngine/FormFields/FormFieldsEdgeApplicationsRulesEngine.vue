@@ -451,6 +451,7 @@
 
     let targetValue = behaviors.value[index].value.target
     if (!isEditDrawer.value) targetValue = ''
+    if (typeof targetValue == 'object' && Object.keys(targetValue).length === 0) targetValue = ''
 
     updateBehavior(index, { name: behaviorName, target: targetValue })
     setShowNewBehaviorButton(true)
