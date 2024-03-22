@@ -74,11 +74,23 @@ const MOST_RELEVANT_FIELDS = {
   dataStreamedMetrics: ['Domain', 'Status', 'Data Streamed', 'Endpoint Type', 'Requests']
 }
 
+const FILTER_LIKE_TYPE = {
+  configurationIdIn: 'ArrayObject',
+  zoneIdIn: 'ArrayObject',
+  edgeFunctionIdIn: 'ArrayObject'
+}
+
+const FILTER_LIKE_ALIAS = {
+  configurationIdIn: 'Domain'
+}
+
 const FILTERS_RULES = {
   FILTER_BLACK_LIST,
   FILTER_WHITELIST,
   OPERATORS,
-  MOST_RELEVANT_FIELDS
+  MOST_RELEVANT_FIELDS,
+  FILTER_LIKE_TYPE,
+  FILTER_LIKE_ALIAS
 }
 
 export default FILTERS_RULES

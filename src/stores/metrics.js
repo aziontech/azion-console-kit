@@ -1,9 +1,4 @@
-import {
-  GROUP_DASHBOARDS,
-  REPORTS,
-  DATE_TIME_INTERVALS
-} from '@modules/real-time-metrics/constants'
-
+import { GROUP_DASHBOARDS, REPORTS, TIME_INTERVALS } from '@modules/real-time-metrics/constants'
 import { LoadReportsDataBySelectedDashboard } from '@modules/real-time-metrics/reports'
 import {
   LoadDatasetAvailableFilters,
@@ -25,7 +20,7 @@ export const useMetricsStore = defineStore('metrics', {
       current: []
     },
     filters: {
-      dateTimeOptions: [...DATE_TIME_INTERVALS],
+      dateTimeOptions: [...TIME_INTERVALS.DATE_TIME_FILTER_INTERVALS],
       isLoading: false,
       selected: {},
       datasetAvailable: [],

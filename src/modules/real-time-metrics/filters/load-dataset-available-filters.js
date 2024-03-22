@@ -7,6 +7,12 @@ import { capitalizeFirstLetter } from '@/helpers'
 
 let cancelRequest = null
 
+/**
+ * A function to generate a GraphQL query for input fields of a given dataset.
+ *
+ * @param {string} datasetName - The name of the dataset
+ * @return {string} The GraphQL query for input fields of the dataset
+ */
 const inputListByDatasetQuery = (datasetName) => `
 query {
 __type(name: "${capitalizeFirstLetter(datasetName)}Filter") {
@@ -54,7 +60,13 @@ const verifyWhitelistFields = ({ name, type: { name: typeName } }) => {
   )
 }
 
-export default async (dataset) => {
+/**
+ * Loads the available filters for a given dataset.
+ *
+ * @param {string} dataset - The name of the dataset.
+ * @return {Promise<Array<Object>>} An array of objects representing the available filters.
+ */
+export default async function LoadDatasetAvailableFilters(dataset) {
   if (cancelRequest) cancelRequest.cancel()
   const ReportsRequestToken = Axios.CancelToken
   cancelRequest = ReportsRequestToken.source()

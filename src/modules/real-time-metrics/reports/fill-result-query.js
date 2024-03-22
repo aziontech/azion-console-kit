@@ -1,13 +1,4 @@
-const MINUTE_IN_MILLISECONDS = 60_000
-const HOUR_IN_MILLISECONDS = 3_600_000
-const DAY_IN_MILLISECONDS = 86_400_000
-const THREE_DAYS = DAY_IN_MILLISECONDS * 3
-const SIXTY_DAYS = DAY_IN_MILLISECONDS * 60
-const INTERVAL_TO_BE_ADDED = {
-  minute: MINUTE_IN_MILLISECONDS,
-  hour: HOUR_IN_MILLISECONDS,
-  day: DAY_IN_MILLISECONDS
-}
+import { TIME_INTERVALS } from '@modules/real-time-metrics/constants'
 
 /**
  * Calculate the time range difference in milliseconds.
@@ -30,8 +21,8 @@ function getTsRangeDifference(tsRange) {
  * @return {string} The determined query interval ('minute', 'day', or 'hour').
  */
 function getQueryInterval(tsRangeDifference) {
-  if (tsRangeDifference < THREE_DAYS) return 'minute'
-  if (tsRangeDifference > SIXTY_DAYS) return 'day'
+  if (tsRangeDifference < TIME_INTERVALS.RESAMPLING_INTERVALS.THREE_DAYS) return 'minute'
+  if (tsRangeDifference > TIME_INTERVALS.RESAMPLING_INTERVALS.SIXTY_DAYS) return 'day'
   return 'hour'
 }
 
@@ -81,7 +72,7 @@ function resetResult(result) {
  * @return {Array} An array of default results.
  */
 function generateDefaultResults(tsRange, result, interval) {
-  const intervalToBeAdded = INTERVAL_TO_BE_ADDED[interval]
+  const intervalToBeAdded = TIME_INTERVALS.RESAMPLING_INTERVALS.INTERVAL_TO_BE_ADDED[interval]
   const { begin, end } = tsRange
   const numberOfResults = (end - begin) / intervalToBeAdded
   const defaultResults = []

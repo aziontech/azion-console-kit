@@ -4,6 +4,12 @@ import { capitalizeFirstLetter } from '@/helpers'
 
 let cancelRequest = null
 
+/**
+ * Checks if the given name is an alias and returns the corresponding value from the aliasMapping object.
+ *
+ * @param {string} name - The name to check for alias.
+ * @return {string} The alias value if found, otherwise undefined.
+ */
 const isAlias = (name) => {
   const aliasMapping = {
     configurationId: 'domain'
@@ -32,7 +38,12 @@ const datasetListQuery = `query {
   }
 }`
 
-export default async () => {
+/**
+ * Load available filters information from the server and process it.
+ *
+ * @return {Object} The processed available filters information.
+ */
+export default async function LoadInfoAvailableFilters() {
   if (cancelRequest) cancelRequest.cancel()
   const ReportsRequestToken = Axios.CancelToken
   cancelRequest = ReportsRequestToken.source()

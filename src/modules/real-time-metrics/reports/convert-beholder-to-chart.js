@@ -1,4 +1,5 @@
 import { CHART_RULES } from '@modules/real-time-metrics/constants'
+
 /**
  * Fills the series with zeroes to make them all the same length.
  * @param {Object} series - The series to be filled with zeroes.

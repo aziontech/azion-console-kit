@@ -155,7 +155,13 @@ function extractAnd(filters) {
   return null
 }
 
-export default (pFilters) => {
+/**
+ * Extracts filters, parameters, and variables from the given filters object.
+ *
+ * @param {Object} pFilters - The filters object to extract from.
+ * @return {Object} An object containing the extracted filters, parameters, and variables.
+ */
+export default function ExtractFiltersAndVariables(pFilters) {
   const filters = {}
   const params = []
   const variables = {}

@@ -92,7 +92,6 @@ export default class GqlRules {
    *
    * @return {void}
    */
-
   setFiltersAndVariables() {
     const { filters, params, variables } = ExtractFiltersAndVariables(this.filters)
 

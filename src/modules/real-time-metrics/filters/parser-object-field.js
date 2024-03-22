@@ -1,12 +1,4 @@
-const likeType = {
-  configurationIdIn: 'ArrayObject',
-  zoneIdIn: 'ArrayObject',
-  edgeFunctionIdIn: 'ArrayObject'
-}
-
-const likeAlias = {
-  configurationIdIn: 'Domain'
-}
+import { FILTERS_RULES } from '@modules/real-time-metrics/constants'
 
 /**
  * Returns the field type and whether the field is part of an element.
@@ -16,7 +8,7 @@ const likeAlias = {
  * @return {String} The field type.
  */
 const getTypeField = (name, typeName) => {
-  return likeType[name] || typeName || 'String'
+  return FILTERS_RULES.FILTER_LIKE_TYPE[name] || typeName || 'String'
 }
 
 /**
@@ -30,8 +22,8 @@ export const formatFieldName = (text) => {
   if (words.length > 1) words.pop()
   const name = words.join('')
   const formattedWords = words.map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-  const label = likeAlias[text] || formattedWords.join(' ')
-  const group = likeAlias[text] || name
+  const label = FILTERS_RULES.FILTER_LIKE_ALIAS[text] || formattedWords.join(' ')
+  const group = FILTERS_RULES.FILTER_LIKE_ALIAS[text] || name
 
   return {
     label,

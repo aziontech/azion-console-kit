@@ -32,7 +32,7 @@ function removeUnfinishedRegister(registers, { filterEndDatetime, currentEndDate
  * @param {reportMetaTag} ReportMetaTag
  * @returns beholder GraphQL Result
  */
-export default async (filters, report) => {
+export default async function LoadReportWithMeta(filters, report) {
   const cancelRequest = report.tokenSource
   const beholderService = new BeholderService({ cancelRequest })
 
