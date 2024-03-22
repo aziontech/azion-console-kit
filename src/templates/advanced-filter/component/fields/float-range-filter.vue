@@ -65,8 +65,8 @@
   }
 </script>
 <template>
-  <div class="flex gap-6 w-full">
-    <div class="flex flex-col w-1/2 gap-2">
+  <div class="flex flex-col sm:flex-row gap-6 w-full">
+    <div class="flex flex-col w-full sm:w-1/2 gap-2">
       <label
         for="number_field_begin"
         class="text-sm font-medium leading-5 text-color"
@@ -89,7 +89,7 @@
         >{{ errorBegin }}</small
       >
     </div>
-    <div class="flex flex-col w-1/2 gap-2">
+    <div class="flex flex-col w-full sm:w-1/2 gap-2">
       <label
         for="number_field_end"
         class="text-sm font-medium leading-5 text-color"
