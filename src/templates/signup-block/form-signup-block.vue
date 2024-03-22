@@ -2,104 +2,105 @@
   <div class="w-full flex flex-col gap-8 animate-fadeIn">
     <form
       class="flex flex-col gap-8"
-      @submit.prevent="signUp"
+      @submit.prevent
     >
-      <div class="flex flex-col gap-2">
-        <label
-          for="email"
-          class="font-semibold text-sm"
-          >Email</label
-        >
-        <InputText
-          v-model="email"
-          id="email"
-          type="email"
-          class="w-full"
-          :class="{ 'p-invalid': errors.email }"
-        />
-        <small
-          v-if="errors.email"
-          class="p-error text-xs font-normal leading-tight"
-          >{{ errors.email }}</small
-        >
-      </div>
-      <div class="flex flex-col gap-2">
-        <label
-          for="name"
-          class="font-semibold text-sm"
-          >Full Name</label
-        >
-        <InputText
-          v-model="name"
-          id="name"
-          type="text"
-          class="w-full"
-          :class="{ 'p-invalid': errors.name }"
-        />
-        <small
-          v-if="errors.name"
-          class="p-error text-xs font-normal leading-tight"
-          >{{ errors.name }}</small
-        >
-      </div>
-      <div class="flex flex-col gap-2">
-        <label
-          for="password"
-          class="font-semibold text-sm"
-          >Password</label
-        >
-        <InputPassword
-          toggleMask
-          v-model="password"
-          id="password"
-          class="w-full"
-          :class="{ 'p-invalid': errors.password }"
-          :feedback="false"
-        />
-        <small class="p-error text-xs font-normal leading-tight">{{ errors.password }}</small>
-
-        <label class="font-semibold text-sm my-2">Must have at least:</label>
-        <ul class="text-color-secondary list-inside space-y-3">
-          <li
-            class="flex gap-3 items-center text-color-secondary"
-            :key="i"
-            v-for="(requirement, i) in passwordRequirementsList"
+      <div
+        v-if="showEmailForm"
+        class="flex flex-col gap-8"
+      >
+        <div class="flex flex-col gap-2">
+          <label
+            for="email"
+            class="font-semibold text-sm"
           >
-            <div class="w-3">
-              <span
-                class="pi pi-check text-sm text-success-check animate-fadeIn"
-                v-if="requirement.valid"
-              />
-              <div
-                class="w-2 h-2 bg-orange-bullet animate-fadeIn"
-                v-else
-              />
-            </div>
-            <span>{{ requirement.label }}</span>
-          </li>
-        </ul>
+            Work Email *
+          </label>
+          <InputText
+            v-model="email"
+            id="email"
+            type="email"
+            class="w-full"
+            :class="{ 'p-invalid': errors.email }"
+          />
+          <small
+            v-if="errors.email"
+            class="p-error text-xs font-normal leading-tight"
+            >{{ errors.email }}</small
+          >
+        </div>
+
+        <div class="flex flex-col gap-2">
+          <label
+            for="email"
+            class="font-semibold text-sm"
+          >
+            Password *
+          </label>
+          <Password
+            inputId="password"
+            v-model="password"
+            toggleMask
+          >
+            <template #footer>
+              <Divider />
+              <p class="mt-2">Must have at least:</p>
+              <ul
+                class="pl-2 ml-2 mt-0"
+                style="line-height: 1.5"
+              >
+                <li
+                  v-for="(requirement, i) in passwordRequirementsList"
+                  class="flex gap-3 items-center text-color-secondary"
+                  :key="i"
+                >
+                  <span>{{ requirement }}</span>
+                </li>
+              </ul>
+            </template>
+          </Password>
+        </div>
       </div>
+
       <PrimeButton
-        label="Next"
-        :disabled="!meta.valid"
-        type="submit"
-        :loading="loading"
+        label="Sign Up with Work Email"
+        v-if="!showEmailForm"
+        @click="handleSignUpEmailClick"
+      />
+      <PrimeButton
+        v-if="showEmailForm"
+        label="Sign Up"
+        @click="showEmailForm = false"
       />
     </form>
-    <PrimeDivider />
-    <PrimeButton
-      label="Other Sign Up Methods"
-      outlined
-      @click="$emit('change-signup-method')"
-    />
+
+    <p class="text-sm font-normal text-center text-color-secondary">
+      By signing up, you agree to the
+      <PrimeButton
+        label="Terms of Service"
+        link
+        class="p-0 text-sm"
+        @click="azionTermsAndServicesWindowOpener"
+      />
+      and
+      <PrimeButton
+        label="Privacy Policy."
+        link
+        class="p-0 text-sm"
+        @click="azionPrivacyPolicyWindowOpener"
+      />
+    </p>
   </div>
 </template>
 
 <script setup>
+  import { azionPrivacyPolicyWindowOpener, azionTermsAndServicesWindowOpener } from '@/helpers'
+
   import PrimeButton from 'primevue/button'
-  import PrimeDivider from 'primevue/divider'
+  import Divider from 'primevue/divider'
+  import Password from 'primevue/password'
   import InputText from 'primevue/inputtext'
-  import InputPassword from 'primevue/password'
+  import { useAccountStore } from '@/stores/account'
+
   import { useToast } from 'primevue/usetoast'
   import { getInstance, load } from 'recaptcha-v3'
   import { useField, useForm } from 'vee-validate'
@@ -116,29 +117,28 @@
   })
 
   let recaptcha
+
+  const showEmailForm = ref(false)
+
+  const handleSignUpEmailClick = () => {
+    const accountStore = useAccountStore()
+    showEmailForm.value = true
+    accountStore.resetSsoSignUpMethod()
+  }
+
   onMounted(async () => {
     recaptcha = await load(import.meta.env.VITE_RECAPTCHA_SITE_KEY)
     getInstance().showBadge()
   })
 
   const passwordRequirementsList = ref([
-    { label: '8 characters', valid: false },
-    { label: '1 uppercase letter', valid: false },
-    { label: '1 lowercase letter', valid: false },
-    { label: '1 special character (Example: !?<>@#$%)', valid: false }
+    '8 characters',
+    '1 uppercase letter',
+    '1 lowercase letter',
+    '1 special character (Example: !?<>@#$%)'
   ])
 
   const validationSchema = yup.object({
-    name: yup
-      .string()
-      .max(61, 'Exceeded number of characters.')
-      .test('invalidChars', 'Full Name contains invalid characters.', (value) => {
-        return !value?.match(/[><:/\\"&@]/g)
-      })
-      .test('invalidContent', 'Full Name contains invalid content.', (value) => {
-        return !value?.match(/[a-z\d_-]+\.[a-z\d_-]+/gi)
-      })
-      .required('Full name is a required field.'),
     email: yup
       .string()
       .max(254, 'Exceeded number of characters.')
@@ -166,7 +166,7 @@
 
   const { value: password } = useField('password')
   const { value: email } = useField('email')
-  const { value: name } = useField('name')
+
   const toast = useToast()
   const router = useRouter()
 
