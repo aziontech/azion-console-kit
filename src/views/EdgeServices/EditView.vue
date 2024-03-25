@@ -5,6 +5,9 @@
   import * as yup from 'yup'
   defineOptions({ name: 'edit-edge-service' })
 
+  const emit = defineEmits(['handleEdgeServiceUpdated'])
+
+
   const props = defineProps({
     hiddenActionBar: { type: Boolean, default: false },
     loadEdgeService: { type: Function, required: true },
@@ -23,6 +26,11 @@
     active: yup.boolean(),
     code: yup.string().test('formatInvalid', 'The format is invalid', validateCode)
   })
+
+  const formSubmit = async (onSubmit, values) => {
+    await onSubmit()
+    emit('handleEdgeServiceUpdated', values)
+  }
 </script>
 
 <template>
@@ -32,15 +40,16 @@
       :loadService="props.loadEdgeService"
       :updatedRedirect="updatedRedirect"
       :schema="validationSchema"
+      :disableRedirect="true"
       :isTabs="true"
     >
       <template #form>
         <FormCreateEdgeService />
       </template>
-      <template #action-bar="{ onSubmit, formValid, onCancel, loading }">
+      <template #action-bar="{ onSubmit, formValid, onCancel, loading, values }">
         <ActionBarTemplate
           v-if="props.hiddenActionBar"
-          @onSubmit="onSubmit"
+          @onSubmit="formSubmit(onSubmit, values)"
           @onCancel="onCancel"
           :loading="loading"
           :submitDisabled="!formValid"
