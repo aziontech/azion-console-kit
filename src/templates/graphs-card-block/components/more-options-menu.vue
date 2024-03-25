@@ -22,25 +22,18 @@
 
 <script setup>
   import { useHelpCenterStore } from '@/stores/help-center'
-  import { useMetricsStore } from '@/stores/metrics'
-  import { storeToRefs } from 'pinia'
   import PrimeButton from 'primevue/button'
   import PrimeMenu from 'primevue/menu'
-  import { computed, ref } from 'vue'
+  import { computed, ref, toRef } from 'vue'
 
   const helpCenterStore = useHelpCenterStore()
-  const metricsStore = useMetricsStore()
-  const { getCurrentReportsDataById } = storeToRefs(metricsStore)
-  const { toggleReportMeanLineStatus, toggleReportMeanLinePerSeriesStatus } = metricsStore
 
   const props = defineProps({
-    reportId: { type: String, required: true },
+    reportData: { type: Object, required: true },
     clipboardWrite: { type: Function, required: true }
   })
 
-  const reportData = computed(() => {
-    return getCurrentReportsDataById.value(props.reportId)
-  })
+  const report = toRef(props, 'reportData')
 
   const optionsMenu = ref()
 
@@ -65,16 +58,16 @@
         show: true
       },
       showMeanLine: {
-        label: `${reportData.value.showMeanLine ? 'Hide' : 'Show'} Mean Line`,
-        icon: reportData.value.showMeanLine ? 'pi pi-eye' : 'pi pi-eye-slash',
+        label: `${report.value.showMeanLine ? 'Hide' : 'Show'} Mean Line`,
+        icon: report.value.showMeanLine ? 'pi pi-eye' : 'pi pi-eye-slash',
         command: () => toggleMeanLine(),
-        show: reportData.value.hasMeanLine
+        show: report.value.hasMeanLine
       },
       showMeanLinePerSeries: {
-        label: `${reportData.value.showMeanLinePerSeries ? 'Hide' : 'Show'} Mean Line per series`,
-        icon: reportData.value.showMeanLinePerSeries ? 'pi pi-eye' : 'pi pi-eye-slash',
+        label: `${report.value.showMeanLinePerSeries ? 'Hide' : 'Show'} Mean Line per series`,
+        icon: report.value.showMeanLinePerSeries ? 'pi pi-eye' : 'pi pi-eye-slash',
         command: () => toggleMeanLinePerSeries(),
-        show: reportData.value.hasMeanLinePerSeries
+        show: report.value.hasMeanLinePerSeries
       }
     }
 
@@ -86,7 +79,7 @@
   }
 
   const openHelpCenter = async () => {
-    await helpCenterStore.setArticleContent({ url: reportData.value.helpCenterPath })
+    await helpCenterStore.setArticleContent({ url: report.value.helpCenterPath })
   }
 
   const exportCSV = () => {
@@ -97,15 +90,15 @@
     const urlStringified = window.URL.createObjectURL(blobCSVFormat)
     const elementAnchor = document.createElement('a')
     elementAnchor.setAttribute('href', urlStringified)
-    elementAnchor.setAttribute('download', `${reportData.value.label}.csv`)
+    elementAnchor.setAttribute('download', `${report.value.label}.csv`)
     elementAnchor.click()
     return true
   }
 
   const generateCSV = () => {
     const sheet = []
-    reportData.value.resultQuery[0].forEach((__, rowIdx) => {
-      const rotatedValues = reportData.value.resultQuery.reduce((prev, curr) => {
+    report.value.resultQuery[0].forEach((__, rowIdx) => {
+      const rotatedValues = report.value.resultQuery.reduce((prev, curr) => {
         let rowValue = curr[rowIdx]
         const isDate = rowValue instanceof Date && !Number.isNaN(rowValue.valueOf())
         if (isDate) {
@@ -127,7 +120,7 @@
   }
 
   const copyQuery = async () => {
-    const { query, variables } = reportData.value.reportQuery
+    const { query, variables } = report.value.reportQuery
     const clipboardQuery = formatGQL(query, variables)
     await props.clipboardWrite(clipboardQuery)
   }
@@ -161,10 +154,10 @@
   }
 
   const toggleMeanLine = () => {
-    toggleReportMeanLineStatus(props.reportId)
+    report.value.showMeanLine = !report.value.showMeanLine
   }
 
   const toggleMeanLinePerSeries = () => {
-    toggleReportMeanLinePerSeriesStatus(props.reportId)
+    report.value.showMeanLinePerSeries = !report.value.showMeanLinePerSeries
   }
 </script>
