@@ -17,6 +17,7 @@ import InviteSession from './invite-session'
 import { metricsPlaygroundOpener } from './metrics-playground-opener'
 import { parseCamelToSnake, parseSnakeToCamel } from './parse-api-body'
 import { themeSelect } from './theme-select'
+import { convertValueToDate, convertDateToLocalTimezone } from './convert-date'
 
 export {
   InviteSession,
@@ -37,5 +38,7 @@ export {
   openSearchResult,
   parseCamelToSnake,
   parseSnakeToCamel,
-  themeSelect
+  themeSelect,
+  convertValueToDate,
+  convertDateToLocalTimezone
 }

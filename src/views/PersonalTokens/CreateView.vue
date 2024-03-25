@@ -8,7 +8,6 @@
   import PageHeadingBlock from '@/templates/page-heading-block'
   import FormFieldsPersonalToken from '@/views/PersonalTokens/FormFields/FormFieldsPersonalToken'
   import CopyTokenDialog from '@/views/PersonalTokens/Dialog/CopyTokenDialog'
-  import '@/helpers/convert-date'
   import { useAccountStore } from '@/stores/account'
   import { storeToRefs } from 'pinia'
   import * as yup from 'yup'
@@ -20,6 +19,10 @@
       required: true
     },
     clipboardWrite: {
+      type: Function,
+      required: true
+    },
+    convertDateToLocalTimezone: {
       type: Function,
       required: true
     }
@@ -50,7 +53,7 @@
     const tomorrow = new Date(today)
     const userUtcOffset = account.value.utc_offset
 
-    return tomorrow.convertDateToLocalTimezone(userUtcOffset)
+    return props.convertDateToLocalTimezone(tomorrow, userUtcOffset)
   }
 
   const initialValues = {
