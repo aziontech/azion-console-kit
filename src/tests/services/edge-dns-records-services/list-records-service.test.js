@@ -39,16 +39,14 @@ describe('EdgeDnsRecordsServices', () => {
       body: { results: [] }
     })
     const dnsRecordIdMock = 1
-    const pageMock = 10
     const { sut } = makeSut()
     const version = 'v3'
     await sut({
-      page: pageMock,
       id: dnsRecordIdMock
     })
 
     expect(requestSpy).toHaveBeenCalledWith({
-      url: `${version}/intelligent_dns/${dnsRecordIdMock}/records?page=${pageMock}`,
+      url: `${version}/intelligent_dns/${dnsRecordIdMock}/records?page_size=200`,
       method: 'GET'
     })
   })
