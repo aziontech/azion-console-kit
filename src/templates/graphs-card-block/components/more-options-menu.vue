@@ -29,11 +29,11 @@
   const helpCenterStore = useHelpCenterStore()
 
   const props = defineProps({
-    reportData: { type: Object, required: true },
+    report: { type: Object, required: true },
     clipboardWrite: { type: Function, required: true }
   })
 
-  const report = toRef(props, 'reportData')
+  const reportData = toRef(props, 'report')
 
   const optionsMenu = ref()
 
@@ -58,16 +58,16 @@
         show: true
       },
       showMeanLine: {
-        label: `${report.value.showMeanLine ? 'Hide' : 'Show'} Mean Line`,
-        icon: report.value.showMeanLine ? 'pi pi-eye' : 'pi pi-eye-slash',
+        label: `${reportData.value.showMeanLine ? 'Hide' : 'Show'} Mean Line`,
+        icon: reportData.value.showMeanLine ? 'pi pi-eye' : 'pi pi-eye-slash',
         command: () => toggleMeanLine(),
-        show: report.value.hasMeanLine
+        show: reportData.value.hasMeanLine
       },
       showMeanLinePerSeries: {
-        label: `${report.value.showMeanLinePerSeries ? 'Hide' : 'Show'} Mean Line per series`,
-        icon: report.value.showMeanLinePerSeries ? 'pi pi-eye' : 'pi pi-eye-slash',
+        label: `${reportData.value.showMeanLinePerSeries ? 'Hide' : 'Show'} Mean Line per series`,
+        icon: reportData.value.showMeanLinePerSeries ? 'pi pi-eye' : 'pi pi-eye-slash',
         command: () => toggleMeanLinePerSeries(),
-        show: report.value.hasMeanLinePerSeries
+        show: reportData.value.hasMeanLinePerSeries
       }
     }
 
@@ -79,7 +79,7 @@
   }
 
   const openHelpCenter = async () => {
-    await helpCenterStore.setArticleContent({ url: report.value.helpCenterPath })
+    await helpCenterStore.setArticleContent({ url: reportData.value.helpCenterPath })
   }
 
   const exportCSV = () => {
@@ -90,15 +90,15 @@
     const urlStringified = window.URL.createObjectURL(blobCSVFormat)
     const elementAnchor = document.createElement('a')
     elementAnchor.setAttribute('href', urlStringified)
-    elementAnchor.setAttribute('download', `${report.value.label}.csv`)
+    elementAnchor.setAttribute('download', `${reportData.value.label}.csv`)
     elementAnchor.click()
     return true
   }
 
   const generateCSV = () => {
     const sheet = []
-    report.value.resultQuery[0].forEach((__, rowIdx) => {
-      const rotatedValues = report.value.resultQuery.reduce((prev, curr) => {
+    reportData.value.resultQuery[0].forEach((__, rowIdx) => {
+      const rotatedValues = reportData.value.resultQuery.reduce((prev, curr) => {
         let rowValue = curr[rowIdx]
         const isDate = rowValue instanceof Date && !Number.isNaN(rowValue.valueOf())
         if (isDate) {
@@ -120,7 +120,7 @@
   }
 
   const copyQuery = async () => {
-    const { query, variables } = report.value.reportQuery
+    const { query, variables } = reportData.value.reportQuery
     const clipboardQuery = formatGQL(query, variables)
     await props.clipboardWrite(clipboardQuery)
   }
@@ -154,10 +154,10 @@
   }
 
   const toggleMeanLine = () => {
-    report.value.showMeanLine = !report.value.showMeanLine
+    reportData.value.showMeanLine = !reportData.value.showMeanLine
   }
 
   const toggleMeanLinePerSeries = () => {
-    report.value.showMeanLinePerSeries = !report.value.showMeanLinePerSeries
+    reportData.value.showMeanLinePerSeries = !reportData.value.showMeanLinePerSeries
   }
 </script>

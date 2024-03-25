@@ -25,7 +25,7 @@
   import { computed } from 'vue'
 
   const props = defineProps({
-    reportData: { type: Object, required: true }
+    report: { type: Object, required: true }
   })
 
   const aggregationTypeLabel = computed(() => {
@@ -33,15 +33,15 @@
       sum: 'Sum',
       avg: 'Average'
     }
-    return labels[props.reportData.aggregationType] || 'Sum'
+    return labels[props.report.aggregationType] || 'Sum'
   })
 
   const displayTag = computed(() => {
-    return props.reportData.hasFeedbackTag && typeof Number(props.reportData.aggregationValue)
+    return props.report.hasFeedbackTag && typeof Number(props.report.aggregationValue)
   })
 
   const displaySkeleton = computed(() => {
-    return props.reportData.hasFeedbackTag && !typeof Number(props.reportData.aggregationValue)
+    return props.report.hasFeedbackTag && !typeof Number(props.report.aggregationValue)
   })
 
   const getTagPropsByVariation = (variation) => {
@@ -74,7 +74,7 @@
   }
 
   const variationProps = computed(() => {
-    return tagProps(props.reportData)
+    return tagProps(props.report)
   })
 
   const tagProps = (report) => {
