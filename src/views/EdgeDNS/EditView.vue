@@ -149,8 +149,8 @@
     hasContentToList.value = true
   }
 
-  const listRecordsServiceEdgeDNSDecorator = async (payload) => {
-    return await props.listRecordsService({ ...payload, id: edgeDNSID.value })
+  const listRecordsServiceEdgeDNSDecorator = async () => {
+    return await props.listRecordsService({ id: edgeDNSID.value })
   }
 
   const deleteRecordsServiceEdgeDNSDecorator = async (recordID) => {

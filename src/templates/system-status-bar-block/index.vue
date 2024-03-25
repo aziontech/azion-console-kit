@@ -1,7 +1,7 @@
 <template>
   <PrimeButton
     outlined
-    class="surface-section hover:surface-hover whitespace-nowrap"
+    class="surface-section min-w-fit hover:surface-hover whitespace-nowrap"
     icon="pi pi-circle-fill"
     size="small"
     :label="label"

@@ -77,7 +77,7 @@ describe('EdgeNodeServices', () => {
 
     const { feedback } = await sut(fixtures.mock)
 
-    expect(feedback).toBe('Service was added to an edge node')
+    expect(feedback).toBe('Service was added to the edge node')
   })
 
   it('Should return an API error to an invalid edge node name', async () => {

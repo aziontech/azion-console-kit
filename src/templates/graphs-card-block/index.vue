@@ -11,7 +11,7 @@
         <span class="font-medium overflow-ellipsis break-all line-clamp-1">{{ report.label }}</span>
       </span>
       <MoreOptionsMenu
-        :reportId="report.id"
+        :report="report"
         :clipboardWrite="clipboardWrite"
       />
     </header>
@@ -21,7 +21,7 @@
           {{ report.description }}
         </span>
         <AggregationInfo
-          :reportId="report.id"
+          :report="report"
           v-if="showAggregation"
         />
         <InlineMessage

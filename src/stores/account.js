@@ -3,11 +3,11 @@ import { defineStore } from 'pinia'
 export const useAccountStore = defineStore({
   id: 'account',
   persist: {
-    paths: ['_ssoSignUpMethod']
+    paths: ['identifySignUpProvider']
   },
   state: () => ({
     account: {},
-    _ssoSignUpMethod: ''
+    identifySignUpProvider: ''
   }),
   getters: {
     accountData(state) {
@@ -29,8 +29,8 @@ export const useAccountStore = defineStore({
       return state.account?.utc_offset || '+0000'
     },
     ssoSignUpMethod(state) {
-      return state._ssoSignUpMethod
-    },
+      return state.identifySignUpProvider
+    }
   },
   actions: {
     setAccountData(account) {
@@ -46,10 +46,10 @@ export const useAccountStore = defineStore({
       localStorage.setItem('theme', theme)
     },
     setSsoSignUpMethod(method) {
-      this._ssoSignUpMethod = method
+      this.identifySignUpProvider = method
     },
     resetSsoSignUpMethod() {
-      this._ssoSignUpMethod = ''
-    },
+      this.identifySignUpProvider = ''
+    }
   }
 })

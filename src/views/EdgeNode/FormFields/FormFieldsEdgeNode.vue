@@ -48,7 +48,9 @@
             :class="{ 'p-invalid': nameError }"
             class="w-full"
           />
-
+          <small class="text-xs text-color-secondary font-normal leading-5">
+            Give a unique and descriptive name to identify the edge node.</small
+          >
           <small
             id="username-help"
             class="p-error"
@@ -60,7 +62,7 @@
   </FormHorizontal>
   <FormHorizontal
     title="Running Settings"
-    description="Each node must run the Edge Orchestrator agent, who establishes a communication between your private node and Azion."
+    description="Each node must run the Edge Orchestrator agent, which establishes a communication between your private node and Azion."
   >
     <template #inputs>
       <div class="flex flex-col gap-5 mb-6">

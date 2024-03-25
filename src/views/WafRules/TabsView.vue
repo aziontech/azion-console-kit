@@ -76,8 +76,10 @@
 
   const title = ref('')
 
-  const updateWafRulesValue = (waf) => {
+  const updateWafRulesValue = async (waf) => {
     title.value = waf.name
+    waf.value = await getWafDat()
+    formHasUpdated.value = false
   }
 
   const renderTabCurrentRouter = async () => {

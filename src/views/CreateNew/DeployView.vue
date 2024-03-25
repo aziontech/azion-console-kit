@@ -139,7 +139,7 @@
   import ScriptRunnerBlock from '@/templates/script-runner-block'
   import PrimeCard from 'primevue/card'
   import { useToast } from 'primevue/usetoast'
-  /**@type {import('@/plugins/adapters/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
+  /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
 
   const props = defineProps({
@@ -201,7 +201,7 @@
       if ('edge_application' in results.value) {
         handleTrackCreation()
       }
-      tracker.eventDeployed(solutionStore.solution).track()
+      tracker.create.eventDeployed(solutionStore.solution).track()
     } catch (error) {
       deployFailed.value = true
       toast.add({
@@ -210,7 +210,7 @@
         summary: 'Creation Failed',
         detail: failMessage
       })
-      tracker.eventFailedDeployed(solutionStore.solution).track()
+      tracker.create.eventFailedDeployed(solutionStore.solution).track()
     }
   }
 
@@ -250,7 +250,7 @@
       createdFrom: 'template',
       ...solutionStore.solution
     }
-    tracker.productCreated(trackerData).track()
+    tracker.product.productCreated(trackerData).track()
   }
 
   const retry = () => {

@@ -451,6 +451,7 @@
 
     let targetValue = behaviors.value[index].value.target
     if (!isEditDrawer.value) targetValue = ''
+    if (typeof targetValue == 'object' && Object.keys(targetValue).length === 0) targetValue = ''
 
     updateBehavior(index, { name: behaviorName, target: targetValue })
     setShowNewBehaviorButton(true)
@@ -743,7 +744,7 @@
             <Divider
               align="left"
               type="dashed"
-              class="capitalize"
+              class="capitalize z-0"
             >
               {{ item.conditional }}
             </Divider>
@@ -875,7 +876,7 @@
         <div class="flex items-center gap-2">
           <Divider
             align="left"
-            type="dashed"
+            type="dashed z-0"
           >
             {{ getBehaviorLabel(behaviorItem) }}
           </Divider>
