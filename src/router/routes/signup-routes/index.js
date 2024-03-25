@@ -55,7 +55,7 @@ export const signupRoutes = {
           const tracker = inject('tracker')
           const signUpMethod = { method: accountStore.ssoSignUpMethod }
 
-          tracker.signUp.userSignedUp(signUpMethod).userAuthorizedSso(signUpMethod)
+          tracker.signUp.userSignedUp(signUpMethod).signUp.userAuthorizedSso(signUpMethod)
         }
 
         if (isFirstLogin) {
