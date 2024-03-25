@@ -166,20 +166,6 @@ export const useMetricsStore = defineStore('metrics', {
         ...reportInfo
       }
     },
-
-    toggleReportMeanLineStatus(reportId) {
-      const reportIdx = this.reports.current.findIndex((reportItem) => reportItem.id === reportId)
-      if (reportIdx < 0) return
-      this.reports.current[reportIdx].showMeanLine = !this.reports.current[reportIdx].showMeanLine
-    },
-
-    toggleReportMeanLinePerSeriesStatus(reportId) {
-      const reportIdx = this.reports.current.findIndex((reportItem) => reportItem.id === reportId)
-      if (reportIdx < 0) return
-      this.reports.current[reportIdx].showMeanLinePerSeries =
-        !this.reports.current[reportIdx].showMeanLinePerSeries
-    },
-
     setTimeRange({ tsRangeBegin, tsRangeEnd, meta }) {
       if (!this.filters.selected.tsRange) this.filters.selected.tsRange = {}
 
