@@ -22,6 +22,7 @@ import { install as VueMonacoEditorPlugin } from '@guolao/vue-monaco-editor'
 import * as HelpCenterServices from '@/services/help-center-services'
 
 import TrackerPlugin from '@/plugins/AnalyticsTrackerAdapterPlugin'
+import '@modules/real-time-metrics/helpers/convert-date'
 
 import App from './App.vue'
 import router from './router'
