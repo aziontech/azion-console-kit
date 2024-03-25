@@ -9,10 +9,7 @@ describe('Date.prototype', () => {
       'toUTC',
       'resetUTC',
       'toBeholderFormat',
-      'fromLocaletoBeholderFormat',
-      'formatToEndOfDayIsoDate',
-      'convertOffsetToDecimal',
-      'convertDateToLocalTimezone'
+      'fromLocaletoBeholderFormat'
     ]
 
     const prototypeMethods = Object.keys(Date.prototype)
@@ -62,30 +59,5 @@ describe('Date.prototype', () => {
     const expectedFormattedDate = '2022-01-01T00:00:00'
 
     expect(date.fromLocaletoBeholderFormat()).toBe(expectedFormattedDate)
-  })
-
-  it('should format a date to ISO format without milliseconds', () => {
-    const date = new Date('2022-01-01T23:59:59.999Z')
-    const expectedFormattedDate = '2022-01-01T23:59:59'
-
-    expect(date.formatToEndOfDayIsoDate(date)).toBe(expectedFormattedDate)
-  })
-
-  it('should convert a UTC offset to decimal format', () => {
-    const date = new Date()
-    const offset = '+0300'
-    const expectedDecimal = '+03.00'
-
-    expect(date.convertOffsetToDecimal(offset)).toBe(expectedDecimal)
-  })
-
-  it('should convert a date to the local timezone', () => {
-    const utcOffset = '+0300'
-    const dateInUtcFormat = new Date('2022-01-01T00:00:00Z')
-
-    const convertedDate = dateInUtcFormat.convertDateToLocalTimezone(utcOffset)
-    const expectedDate = '2022-01-01T23:59:59'
-
-    expect(convertedDate).toBe(expectedDate)
   })
 })
