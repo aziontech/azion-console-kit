@@ -44,7 +44,7 @@
   const getEdgeService = async () => {
     try {
       const result = await props.loadEdgeService({ id: edgeServiceId.value })
-      title.value = result.name;
+      title.value = result.name
     } catch (error) {
       toast.add({
         closable: true,
@@ -55,7 +55,7 @@
     }
   }
 
-  const updateEdgeServiceValue = async (value) => {
+  const updateEdgeServiceValue = (value) => {
     title.value = value.name
   }
 

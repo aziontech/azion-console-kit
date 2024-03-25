@@ -7,7 +7,6 @@
 
   const emit = defineEmits(['handleEdgeServiceUpdated'])
 
-
   const props = defineProps({
     hiddenActionBar: { type: Boolean, default: false },
     loadEdgeService: { type: Function, required: true },
