@@ -111,6 +111,7 @@
             :personalTokenKey="personalTokenKey"
             :copyPersonalToken="copyPersonalToken"
             :userUtcOffset="account?.utc_offset"
+            :convertDateToLocalTimezone="convertDateToLocalTimezone"
           />
           <CopyTokenDialog
             v-model:visible="showCopyTokenDialog"
