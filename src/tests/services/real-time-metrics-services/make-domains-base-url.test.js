@@ -1,5 +1,5 @@
 import { makeDomainsBaseUrl } from '@/services/real-time-metrics-services/make-domains-base-url'
-import { assert, describe, it } from 'vitest'
+import { expect, describe, it } from 'vitest'
 
 const makeSut = () => {
   const sut = makeDomainsBaseUrl
@@ -9,7 +9,7 @@ const makeSut = () => {
   }
 }
 
-describe('DomainsServices', () => {
+describe('RealTimeMetricsServices', () => {
   it('should return the API base url to domains service', () => {
     const { sut } = makeSut()
     const version = 'v3'
@@ -17,6 +17,6 @@ describe('DomainsServices', () => {
 
     const baseUrl = sut()
 
-    assert.strictEqual(baseUrl, correctApiUrl)
+    expect(baseUrl).toEqual(correctApiUrl)
   })
 })
