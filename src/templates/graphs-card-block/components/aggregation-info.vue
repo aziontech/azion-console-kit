@@ -20,20 +20,12 @@
 </template>
 
 <script setup>
-  import { useMetricsStore } from '@/stores/metrics'
-  import { storeToRefs } from 'pinia'
   import PrimeSkeleton from 'primevue/skeleton'
   import PrimeTag from 'primevue/tag'
   import { computed } from 'vue'
 
   const props = defineProps({
-    reportId: { type: String, required: true }
-  })
-
-  const { getCurrentReportsDataById } = storeToRefs(useMetricsStore())
-
-  const report = computed(() => {
-    return getCurrentReportsDataById.value(props.reportId)
+    reportData: { type: Object, required: true }
   })
 
   const aggregationTypeLabel = computed(() => {
@@ -41,15 +33,15 @@
       sum: 'Sum',
       avg: 'Average'
     }
-    return labels[report.value.aggregationType]
+    return labels[props.reportData.aggregationType] || 'Sum'
   })
 
   const displayTag = computed(() => {
-    return report.value.hasFeedbackTag && typeof Number(report.value.aggregationValue)
+    return props.reportData.hasFeedbackTag && typeof Number(props.reportData.aggregationValue)
   })
 
   const displaySkeleton = computed(() => {
-    return report.value.hasFeedbackTag && !typeof Number(report.value.aggregationValue)
+    return props.reportData.hasFeedbackTag && !typeof Number(props.reportData.aggregationValue)
   })
 
   const getTagPropsByVariation = (variation) => {
@@ -82,7 +74,7 @@
   }
 
   const variationProps = computed(() => {
-    return tagProps(report.value)
+    return tagProps(props.reportData)
   })
 
   const tagProps = (report) => {
