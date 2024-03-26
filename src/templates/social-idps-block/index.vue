@@ -1,7 +1,7 @@
 <template>
   <div
     class="flex-col gap-6 sm:gap-8 flex"
-    v-if="showSocialIdps"
+    v-if="showIdps"
   >
     <div class="flex flex-col gap-4 animate-fadeIn">
       <template v-if="showSkeleton">
@@ -39,16 +39,12 @@
   import { computed, onMounted, ref } from 'vue'
 
   defineOptions({ name: 'social-idps-block' })
-  const emit = defineEmits(['update:showSocialIdps'])
+  const emit = defineEmits(['showSocialIdps'])
 
   const props = defineProps({
     socialIdpsService: {
       type: Function,
       required: true
-    },
-    showSocialIdps: {
-      type: Boolean,
-      default: true
     }
   })
 
@@ -62,7 +58,7 @@
   })
 
   const toast = useToast()
-
+  const showIdps = ref(true)
   const loadSocialIdps = async () => {
     try {
       idps.value = await props.socialIdpsService()
@@ -73,7 +69,8 @@
         summary: error
       })
     } finally {
-      emit('update:showSocialIdps', idps.value.length > 0)
+      showIdps.value = idps.value.length > 0
+      emit('showSocialIdps', showIdps.value)
     }
   }
 

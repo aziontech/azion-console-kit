@@ -34,17 +34,36 @@
       </div>
     </div>
 
-    <AzionLogo
-      class="cursor-pointer"
-      @click="redirectToRoute('login')"
+    <div
       v-else
-    />
+      class="flex w-full flex-row justify-between items-center"
+    >
+      <AzionLogo
+        class="cursor-pointer"
+        @click="redirectToRoute('login')"
+      />
+
+      <PrimeButton
+        label="Documentation"
+        v-if="route.meta.showDocumentButton"
+        :pt="{
+          label: { class: 'text-white' },
+          icon: { class: 'text-white' }
+        }"
+        @click="redirectToDocumentation"
+        size="small"
+        iconPos="right"
+        icon="pi pi-external-link"
+        class="text-white border-header bg-header hover:bg-header-button-hover"
+      />
+    </div>
   </header>
 </template>
 
 <script setup>
   import { ref, provide, watch } from 'vue'
-  import { useRouter } from 'vue-router'
+  import PrimeButton from 'primevue/button'
+  import { useRouter, useRoute } from 'vue-router'
   import { useWindowSize } from '@vueuse/core'
 
   import AzionLogo from '@assets/svg/logo'
@@ -59,6 +78,8 @@
   defineOptions({ name: 'navbar-block' })
 
   const router = useRouter()
+  const route = useRoute()
+
   const { width } = useWindowSize()
   const currentWidth = ref()
   const openSwitchAccount = ref(false)
@@ -87,6 +108,10 @@
     } else {
       router.push({ name })
     }
+  }
+
+  const redirectToDocumentation = () => {
+    window.open('https://www.azion.com/en/documentation/', '_blank')
   }
 
   watch(

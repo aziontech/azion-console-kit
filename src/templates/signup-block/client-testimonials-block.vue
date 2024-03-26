@@ -1,41 +1,46 @@
 <template>
-  <Carousel
-    :value="listTestimonials"
-    :numVisible="1"
-    :numScroll="1"
-    circular
-    :showNavigators="false"
-    :showIndicators="false"
-    :autoplayInterval="3000"
-  >
-    <template #item="slotProps">
-      <div class="mb-3 font-medium">{{ slotProps.data.name }}</div>
-      <div class="mb-3 font-medium">{{ slotProps.data.position }}</div>
-      <div class="mb-3 font-medium">{{ slotProps.data.testimonial }}</div>
-    </template>
-  </Carousel>
+  <div class="flex flex-col gap-16 md:max-w-[672px]">
+    <p class="text-color-secondary text-center">
+      Trusted by market leaders across banking, e-commerce, tech, and other industries.
+    </p>
+    <Carousel
+      :value="listTestimonials"
+      :numVisible="1"
+      :numScroll="1"
+      circular
+      :showNavigators="false"
+      :showIndicators="false"
+      :autoplayInterval="3000"
+    >
+      <template #item="slotProps">
+        <div class="flex flex-col gap-2">
+          <div class="text-2xl md:text-3xl font-medium text-center">
+            {{ slotProps.data.testimonial }}
+          </div>
+          <div class="text-color-secondary text-center">
+            {{ slotProps.data.name }}, {{ slotProps.data.position }}
+          </div>
+        </div>
+        <div class="flex justify-center mt-16">
+          <component :is="slotProps.data.logo" />
+        </div>
+      </template>
+    </Carousel>
+  </div>
 </template>
 
 <script setup>
   import Carousel from 'primevue/carousel'
-  import { ref } from 'vue'
+  import Vtex from '@/assets/svg/vtex-logo.vue'
+  import { h, ref } from 'vue'
 
   const listTestimonials = ref([
     {
       name: 'John Doe',
       position: 'CEO',
       testimonial:
-        'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.'
-    },
-    {
-      name: 'Jane Doe',
-      position: 'CTO',
-      testimonial: 'lorem ipsum dolor sit amet, consectetur adipiscing elit.'
-    },
-    {
-      name: 'John Doe',
-      position: 'CEO',
-      testimonial: 'Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.'
+        '”Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis eu ex felis. In semper, eros vel gravida congue, eros ante commodo.”',
+      logo: h(Vtex)
     }
   ])
 </script>
