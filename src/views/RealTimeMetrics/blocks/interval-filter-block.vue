@@ -1,5 +1,4 @@
 <script setup>
-  import { removeSelectedAmountOfHours } from '@/helpers/convert-date'
   import { useAccountStore } from '@/stores/account'
   import { useMetricsStore } from '@/stores/metrics'
   import { storeToRefs } from 'pinia'
@@ -44,8 +43,7 @@
   })
 
   const maxDate = computed(() => {
-    const date = new Date()
-    const max = removeSelectedAmountOfHours(0, date)
+    const max = new Date().removeSelectedAmountOfHours(0)
     return max.toUTC(userUTC)
   })
 
@@ -103,8 +101,8 @@
 
   const removeAmountOfHours = (offset) => {
     const date = new Date()
-    const begin = removeSelectedAmountOfHours(offset, date)
-    const end = removeSelectedAmountOfHours(0, date)
+    const begin = date.removeSelectedAmountOfHours(offset)
+    const end = date.removeSelectedAmountOfHours(0)
 
     return [begin.toUTC(userUTC), end.toUTC(userUTC)]
   }
