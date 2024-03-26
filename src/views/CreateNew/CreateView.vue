@@ -79,6 +79,8 @@
       <FormLoading v-if="isLoading" />
       <TemplateEngineBlock
         v-else
+        :listIntegrationsService="props.listIntegrationsService"
+        :listPlatformsService="props.listPlatformsService"
         @cancel="handleCancel"
         @submitClick="handleSubmitClick"
         @instantiate="handleInstantiate"
@@ -189,7 +191,8 @@
             <div class="flex gap-3">
               <div class="flex gap-1">
                 <span class="text-xs font-medium text-color-primary">By</span>
-                <span class="text-xs font-medium text-color-secondary">{{
+                <span class="text-xs font-medium text-color-secondary">
+                  {{
                   solution.vendor.name
                 }}</span>
               </div>
@@ -227,7 +230,9 @@
   </ContentBlock>
 </template>
 <script setup>
-  import { useLoadingStore } from '@/stores/loading'
+  import { listIntegrationsService } from '@/services/vcs-integration-services'
+import { listPlatformsService } from '@/services/vcs-integration-services/list-platforms-service'
+import { useLoadingStore } from '@/stores/loading'
   import { useSolutionStore } from '@/stores/solution-create'
   import ContentBlock from '@/templates/content-block'
   import PageHeadingBlock from '@/templates/page-heading-block'
@@ -255,6 +260,14 @@
 
   const props = defineProps({
     getTemplateService: {
+      type: Function,
+      required: true
+    },
+    listPlatformsService: {
+      type: Function,
+      required: true
+    },
+    listIntegrationsService: {
       type: Function,
       required: true
     },
