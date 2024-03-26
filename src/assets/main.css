@@ -24,7 +24,7 @@ body.p-overflow-hidden {
 
 .grecaptcha-badge {
   bottom: 75px !important;
-  z-index: 999;
+  z-index: 11;
 }
 
 #app {
