@@ -7,7 +7,6 @@
 
   const props = defineProps({
     loading: Boolean,
-    inDrawer: Boolean,
     cancelDisabled: Boolean,
     submitDisabled: Boolean,
     primaryActionLabel: { type: String, default: 'Save' },
@@ -34,22 +33,9 @@
     return props.cancelDisabled || props.loading
   })
 
-  const inDrawerStyles = computed(() => {
-    return props.inDrawer
-  })
 </script>
 <template>
-  <div
-    class="flex flex-col w-full justify-center items-center max-h-12 border-t surface-border sticky bottom-0 surface-section z-50 sm:flex-row md:px-8 px-2 py-8 sm:justify-between"
-  >
-    <div
-      class="flex w-full justify-content-end max-w-full 3xl:mx-auto"
-      :class="{
-        '2xl:px-0': inDrawerStyles,
-        '2xl:px-0': !inDrawerStyles
-      }"
-    >
-      <div class="flex gap-4 self-stretch items-center justify-end w-full">
+  <div class="flex w-full gap-4 justify-end h-14 items-center border-t surface-border sticky bottom-0 surface-section z-50 px-2 md:px-8">
         <PrimeButton
           severity="primary"
           :label="props.secondaryActionLabel"
@@ -67,7 +53,5 @@
           :icon="calculateLoadIconByLoadingState"
           :disabled="isDisabledSubmit"
         />
-      </div>
-    </div>
   </div>
 </template>

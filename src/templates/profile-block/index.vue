@@ -20,7 +20,7 @@
     <PrimeMenu
       :model="profileMenuItems"
       :pt="{
-        root: { class: 'w-full border-none bg-transparent' },
+        root: { class: 'p-0 w-full border-none bg-transparent' },
         submenuheader: { class: 'text-base font-medium leading-none' },
         content: { class: 'text-sm' }
       }"
