@@ -22,6 +22,11 @@ body.p-overflow-hidden {
   overscroll-behavior: contain !important;
 }
 
+.grecaptcha-badge {
+  bottom: 75px !important;
+  z-index: 999;
+}
+
 #app {
   font-family: var(--font-family);
   text-rendering: optimizeLegibility;
