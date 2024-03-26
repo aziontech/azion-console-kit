@@ -15,7 +15,6 @@
 </template>
 
 <script setup>
-  import '@modules/real-time-metrics/helpers/convert-date'
   import { useMetricsStore } from '@/stores/metrics'
   import ContentBlock from '@/templates/content-block'
   import PageHeadingBlock from '@/templates/page-heading-block'
