@@ -24,8 +24,7 @@ describe('RealTimeMetricsServices', () => {
 
     expect(requestSpy).toHaveBeenCalledWith({
       url: `${version}/domains?order_by=name&sort=asc&page=1&page_size=200`,
-      method: 'GET',
-      cancelToken: expect.anything()
+      method: 'GET'
     })
   })
 

@@ -1,10 +1,6 @@
 import * as Errors from '@/services/axios/errors'
-import axios from 'axios'
 import { AxiosHttpClientAdapter } from '../axios/AxiosHttpClientAdapter'
 import { makeDomainsBaseUrl } from './make-domains-base-url'
-
-const cancelRequest = axios.CancelToken
-const source = cancelRequest.source()
 
 export const searchDomainsService = async ({
   orderBy = 'name',
@@ -12,12 +8,10 @@ export const searchDomainsService = async ({
   page = 1,
   pageSize = 200
 } = {}) => {
-  source.cancel()
   const searchParams = makeSearchParams({ orderBy, sort, page, pageSize })
   let httpResponse = await AxiosHttpClientAdapter.request({
     url: `${makeDomainsBaseUrl()}?${searchParams.toString()}`,
-    method: 'GET',
-    cancelToken: source.token
+    method: 'GET'
   })
 
   httpResponse = adapt(httpResponse)
