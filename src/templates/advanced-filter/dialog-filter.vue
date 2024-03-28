@@ -5,6 +5,7 @@
   import Dropdown from 'primevue/dropdown'
   import InlineMessage from 'primevue/inlinemessage'
   import OverlayPanel from 'primevue/overlaypanel'
+  import Sidebar from 'primevue/sidebar'
   import { useField, useForm } from 'vee-validate'
   import { computed, ref } from 'vue'
   import * as yup from 'yup'
@@ -110,8 +111,16 @@
     valueFilter.value = null
   }
 
+  const SCREEN_BREAKPOINT_MD = 768
+  const showMobileFilter = ref(false)
+
   const toggle = (event) => {
-    filterOverPanel.value.toggle(event)
+    if (window.innerWidth <= SCREEN_BREAKPOINT_MD) {
+      showMobileFilter.value = !showMobileFilter.value
+    } else {
+      filterOverPanel.value.toggle(event)
+    }
+
     inputFilterDisabled.value = false
     inputOperatorDisabled.value = false
     editFilter.value = false
@@ -176,6 +185,7 @@
     v-bind="counterFilter"
     @click="toggle"
   />
+
   <OverlayPanel
     ref="filterOverPanel"
     @show="visibleChange(true)"
@@ -321,4 +331,172 @@
       />
     </div>
   </OverlayPanel>
+
+  <!-- Mobile Overlay Filter Panel -->
+  <Sidebar
+    :visible="showMobileFilter"
+    position="bottom"
+    header="Filter"
+    :show-close-icon="false"
+    :pt="{
+      root: { class: '!h-[90%] md:hidden flex' },
+      headerContent: { class: 'w-full' },
+      mask: { class: 'md:hidden flex' },
+      content: { class: '!p-0' }
+    }"
+  >
+    <template #closeicon>
+      <div class="flex items-center justify-between">
+        <h2>Filter</h2>
+        <ButtonPrime
+          icon="pi pi-times"
+          @click="visibleChange(false)"
+          size="small"
+          class="flex-none surface-border text-sm w-8 h-8"
+          text
+        />
+      </div>
+    </template>
+    <template #container>
+      <div class="p-sidebar-header">
+        <div class="p-sidebar-header-content w-full">
+          <div class="flex items-center justify-between">
+            <h2>Filter</h2>
+            <ButtonPrime
+              icon="pi pi-times"
+              @click="toggle"
+              size="small"
+              class="flex-none surface-border text-sm w-8 h-8"
+              text
+            />
+          </div>
+        </div>
+      </div>
+
+      <form @submit.prevent>
+        <div class="p-3 pb-5 flex gap-3.5 flex-col">
+          <span class="text-color-secondary">
+            Each combination of operator can only be used once.
+          </span>
+          <div
+            class="flex sm:w-full max-sm:flex-col"
+            :class="filterSelected?.description ? 'gap-6' : 'md:pr-6'"
+          >
+            <div class="flex flex-col md:w-1/2 gap-2 sm:max-w-xs w-full">
+              <label
+                for="filter-field"
+                class="text-sm font-medium leading-5 text-color"
+              >
+                Filter
+              </label>
+              <Dropdown
+                appendTo="self"
+                id="filter-field"
+                @change="changeFilter"
+                v-model="filterSelected"
+                :options="options"
+                resetFilterOnHide
+                filter
+                autoFilterFocus
+                :disabled="inputFilterDisabled"
+                :optionDisabled="({ value }) => value.disabled && !editFilter"
+                optionLabel="label"
+                optionValue="value"
+                class="w-full"
+                placeholder="Select a field"
+                filterIcon="pi pi-search"
+              >
+                <template
+                  #dropdownicon
+                  v-if="inputFilterDisabled"
+                >
+                  <span class="pi pi-lock text-color-secondary" />
+                </template>
+              </Dropdown>
+            </div>
+
+            <div
+              class="flex flex-col w-1/2 gap-2 max-sm:w-full"
+              v-if="filterSelected"
+            >
+              <label
+                for="filter-operator"
+                class="text-sm font-medium leading-5 text-color"
+              >
+                Operator
+              </label>
+              <Dropdown
+                appendTo="self"
+                id="filter-operator"
+                @change="changeOperator"
+                v-model="operatorSelected"
+                :options="filterSelected.operator"
+                :disabled="inputOperatorDisabled"
+                :optionDisabled="({ value }) => value.disabled && !editFilter"
+                optionLabel="label"
+                optionValue="value"
+                class="w-full"
+                placeholder="Select a operator"
+              >
+                <template
+                  #dropdownicon
+                  v-if="inputOperatorDisabled"
+                >
+                  <span class="pi pi-lock text-color-secondary" />
+                </template>
+              </Dropdown>
+            </div>
+          </div>
+        </div>
+        <Divider v-if="filterSelected?.label" />
+        <div
+          class="px-3 py-5 flex flex-col"
+          v-if="filterSelected?.label"
+        >
+          <div
+            class="flex flex-col"
+            :class="{ 'gap-3.5': operatorSelected?.value }"
+          >
+            <InlineMessage
+              class="p-2"
+              severity="info"
+            >
+              {{ filterSelected?.description }}
+            </InlineMessage>
+            <div class="flex w-full">
+              <component
+                v-if="operatorSelected?.value"
+                :is="componentRender"
+                v-model:value="valueFilter"
+                v-bind="operatorSelected?.props"
+              />
+            </div>
+          </div>
+        </div>
+      </form>
+
+      <div class="mt-auto">
+        <div
+          class="p-3 border-t surface-border flex gap-2 items-center justify-end p-dialog-footer"
+        >
+          <ButtonPrime
+            type="button"
+            label="Cancel"
+            @click="toggle"
+            class="max-md:min-w-max"
+            severity="primary"
+            outlined
+          />
+          <ButtonPrime
+            type="button"
+            class="max-md:w-full"
+            label="Apply"
+            severity="secondary"
+            @click="onSubmit"
+            :disabled="disabledSubmit"
+          />
+        </div>
+      </div>
+    </template>
+  </Sidebar>
 </template>

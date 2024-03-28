@@ -1,57 +1,58 @@
 import { AxiosHttpClientAdapter } from '@/services/axios/AxiosHttpClientAdapter'
-import { getScriptRunnerResultsService } from '@/services/script-runner-service'
+import { searchEdgeDnsService } from '@/services/real-time-metrics-services'
 import { describe, expect, it, vi } from 'vitest'
-import * as Errors from '@/services/axios/errors'
-
-const fixtures = {
-  executionId: 'xx',
-  deploymentFailed: {
-    result: {
-      errors: [],
-      message: 'deploy failed'
-    }
-  }
-}
+import * as Errors from '@services/axios/errors'
 
 const makeSut = () => {
-  const sut = getScriptRunnerResultsService
+  const sut = searchEdgeDnsService
+
   return {
     sut
   }
 }
 
-describe('ScriptRunnerServices', () => {
+describe('RealTimeMetricsServices', () => {
   it('should call api with correct params', async () => {
     const requestSpy = vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
       statusCode: 200,
-      body: { result: {}, status: null }
+      body: { results: [] }
     })
-    const { sut } = makeSut()
 
-    await sut(fixtures.executionId)
+    const { sut } = makeSut()
+    const version = 'v3'
+    await sut({})
 
     expect(requestSpy).toHaveBeenCalledWith({
-      url: `script-runner/executions/${fixtures.executionId}/results`,
-      method: 'GET'
+      url: `${version}/intelligent_dns?order_by=name&sort=asc&page=1&page_size=200`,
+      method: 'GET',
+      cancelToken: expect.anything()
     })
   })
 
-  it('should throw exception when deploy result has an error', async () => {
+  it('should return a list of edge dns', async () => {
     vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
       statusCode: 200,
-      body: fixtures.deploymentFailed
+      body: {
+        results: [
+          { id: 1, name: 'test' },
+          { id: 2, name: 'test2' }
+        ]
+      }
     })
+
     const { sut } = makeSut()
+    const results = await sut({})
 
-    const result = sut(fixtures.executionId)
-
-    expect(result).rejects.toBe(fixtures.deploymentFailed.result.message)
+    expect(results).toEqual([
+      { value: 1, label: 'test' },
+      { value: 2, label: 'test2' }
+    ])
   })
 
   it.each([
     {
-      statusCode: 401,
-      expectedError: new Errors.InvalidApiTokenError().message
+      statusCode: 400,
+      expectedError: new Errors.InvalidApiRequestError().message
     },
     {
       statusCode: 403,
@@ -70,14 +71,15 @@ describe('ScriptRunnerServices', () => {
       expectedError: new Errors.UnexpectedError().message
     }
   ])(
-    'should throw when request fails with status code $statusCode',
+    'should throw when request fails with statusCode $statusCode',
     async ({ statusCode, expectedError }) => {
       vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
-        statusCode
+        statusCode,
+        body: []
       })
       const { sut } = makeSut()
 
-      const response = sut(fixtures.networkMock)
+      const response = sut({})
 
       expect(response).rejects.toBe(expectedError)
     }

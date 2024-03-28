@@ -22,6 +22,10 @@
     userUtcOffset: {
       type: String,
       default: ''
+    },
+    convertDateToLocalTimezone: {
+      type: Function,
+      required: true
     }
   })
 
@@ -70,7 +74,8 @@
   const updateSelectedExpiration = ({ value: selectedValue }) => {
     if (selectedValue === 'custom') {
       customExpiration.value = tomorrow
-      const customExpirationInUserTimezone = customExpiration.value.convertDateToLocalTimezone(
+      const customExpirationInUserTimezone = props.convertDateToLocalTimezone(
+        customExpiration.value,
         props.userUtcOffset
       )
       setExpiration(customExpirationInUserTimezone)
@@ -80,7 +85,8 @@
     const newExpirationDate = new Date()
     const daysToAdd = parseInt(selectedExpiration.value)
     newExpirationDate.setDate(newExpirationDate.getDate() + daysToAdd)
-    const newExpirationInUserTimezone = newExpirationDate.convertDateToLocalTimezone(
+    const newExpirationInUserTimezone = props.convertDateToLocalTimezone(
+      newExpirationDate,
       props.userUtcOffset
     )
     setExpiration(newExpirationInUserTimezone)
@@ -92,7 +98,8 @@
    * @param {Date} newExpirationDate - The new expiration date.
    */
   const updateExpiration = (newExpirationDate) => {
-    const newExpirationInUserTimezone = newExpirationDate.convertDateToLocalTimezone(
+    const newExpirationInUserTimezone = props.convertDateToLocalTimezone(
+      newExpirationDate,
       props.userUtcOffset
     )
     setExpiration(newExpirationInUserTimezone)

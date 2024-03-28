@@ -29,7 +29,7 @@
   }
 </script>
 <template>
-  <div class="w-1/2 pr-6">
+  <div class="w-full sm:w-1/2 sm:pr-6">
     <div class="flex flex-col w-full gap-2">
       <label
         for="number_field"

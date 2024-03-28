@@ -30,7 +30,8 @@ export const personalTokensRoutes = {
       component: () => import('@views/PersonalTokens/CreateView.vue'),
       props: {
         createPersonalTokenService: PersonalTokensService.createPersonalToken,
-        clipboardWrite: Helpers.clipboardWrite
+        clipboardWrite: Helpers.clipboardWrite,
+        convertDateToLocalTimezone: Helpers.convertDateToLocalTimezone
       },
       meta: {
         breadCrumbs: [

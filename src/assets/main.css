@@ -23,6 +23,7 @@ body.p-overflow-hidden {
 }
 
 .grecaptcha-badge {
+  bottom: 75px !important;
   z-index: 11;
 }
 

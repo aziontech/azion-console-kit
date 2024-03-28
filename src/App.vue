@@ -5,6 +5,7 @@
   import { useAccountStore } from '@/stores/account'
   import { storeToRefs } from 'pinia'
   import { themeSelect } from '@/helpers'
+  import '@modules/real-time-metrics/helpers/convert-date'
   import '@/helpers/store-handler'
   /** @type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
