@@ -80,7 +80,7 @@
       },
       {
         field: 'geolocCountryName',
-        header: 'Geloc Country Name'
+        header: 'Geoloc Country Name'
       },
       {
         field: 'geolocRegionName',

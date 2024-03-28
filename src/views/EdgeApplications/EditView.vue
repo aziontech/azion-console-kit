@@ -35,8 +35,7 @@
 
   defineOptions({ name: 'edit-edge-application' })
   const emit = defineEmits(['updatedApplication'])
-
-  /**@type {import('@/plugins/adapters/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
+  /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
 
   const props = defineProps({
@@ -61,22 +60,33 @@
     name: yup.string().required()
   })
 
+  const checkError = (error) => {
+    const [fieldName, ...restOfStringArr] = error.split(':')
+    const message = restOfStringArr.join(':').trim()
+
+    return { fieldName, message }
+  }
+
   const loadEdgeApplication = async () => {
     return props.edgeApplication
   }
 
   const handleTrackSuccessEdit = () => {
-    tracker
+    tracker.product
       .productEdited({
         productName: 'Edge Application',
         tab: 'mainSettings'
       })
       .track()
   }
-  const handleTrackFailEdit = () => {
-    tracker
+  const handleTrackFailEdit = (error) => {
+    const { fieldName, message } = checkError(error)
+    tracker.product
       .failedToEdit({
-        productName: 'Edge Application'
+        productName: 'Edge Application',
+        errorType: 'api',
+        fieldName: fieldName.trim(),
+        errorMessage: message
       })
       .track()
   }

@@ -75,7 +75,7 @@
     return deviceGroup
   }
   const handleTrackSuccessEdit = () => {
-    tracker
+    tracker.product
       .productEdited({
         productName: 'Edge Application',
         tab: 'deviceGroups'

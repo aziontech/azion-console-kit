@@ -22,25 +22,18 @@
 
 <script setup>
   import { useHelpCenterStore } from '@/stores/help-center'
-  import { useMetricsStore } from '@/stores/metrics'
-  import { storeToRefs } from 'pinia'
   import PrimeButton from 'primevue/button'
   import PrimeMenu from 'primevue/menu'
-  import { computed, ref } from 'vue'
+  import { computed, ref, toRef } from 'vue'
 
   const helpCenterStore = useHelpCenterStore()
-  const metricsStore = useMetricsStore()
-  const { getCurrentReportsDataById } = storeToRefs(metricsStore)
-  const { toggleReportMeanLineStatus, toggleReportMeanLinePerSeriesStatus } = metricsStore
 
   const props = defineProps({
-    reportId: { type: String, required: true },
+    report: { type: Object, required: true },
     clipboardWrite: { type: Function, required: true }
   })
 
-  const reportData = computed(() => {
-    return getCurrentReportsDataById.value(props.reportId)
-  })
+  const reportData = toRef(props, 'report')
 
   const optionsMenu = ref()
 
@@ -161,10 +154,10 @@
   }
 
   const toggleMeanLine = () => {
-    toggleReportMeanLineStatus(props.reportId)
+    reportData.value.showMeanLine = !reportData.value.showMeanLine
   }
 
   const toggleMeanLinePerSeries = () => {
-    toggleReportMeanLinePerSeriesStatus(props.reportId)
+    reportData.value.showMeanLinePerSeries = !reportData.value.showMeanLinePerSeries
   }
 </script>

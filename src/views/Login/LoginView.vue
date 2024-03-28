@@ -22,7 +22,7 @@
   import SignInBlock from '@/templates/sign-in-block'
   import ForgotPassword from '@/templates/sign-in-block/forgot-password.vue'
   import { useRoute, useRouter } from 'vue-router'
-  /**@type {import('@/plugins/adapters/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
+  /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
 
   const route = useRoute()
@@ -62,7 +62,7 @@
     const isActivatedEmail = !!email && !activated
 
     if (isActivatedEmail) {
-      tracker.userActivatedAccount()
+      tracker.signUp.userActivatedAccount()
 
       const newQuery = { ...route.query, activated: 'true' }
       router.replace({ query: newQuery })

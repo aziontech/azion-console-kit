@@ -557,7 +557,7 @@ $editorContentBg: #ffffff;
 
 /// Background of a password meter
 /// @group form
-$passwordMeterBg: #dee2e6;
+$passwordMeterBg: var(--surface-400);
 
 /// Background of a week password
 /// @group form
@@ -565,8 +565,8 @@ $passwordWeakBg: #e53935;
 
 /// Background of a medium password
 /// @group form
-$passwordMediumBg: #ffb300;
+$passwordMediumBg: #ffb64d;
 
 /// Background of a strong password
 /// @group form
-$passwordStrongBg: #43a047;
+$passwordStrongBg: #39e478;
