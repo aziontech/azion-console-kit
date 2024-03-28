@@ -56,34 +56,64 @@ describe('RealTimeMetricsServices', () => {
   it.each([
     {
       statusCode: 400,
+      params: {
+        orderBy: 'name',
+        sort: 'asc',
+        page: 1,
+        pageSize: 100
+      },
       expectedError: new Errors.InvalidApiRequestError().message
     },
     {
       statusCode: 403,
+      params: {
+        orderBy: 'name',
+        sort: 'desc',
+        page: 1,
+        pageSize: 100
+      },
       expectedError: new Errors.PermissionError().message
     },
     {
       statusCode: 404,
+      params: {
+        orderBy: 'name',
+        sort: 'asc',
+        page: 2,
+        pageSize: 100
+      },
       expectedError: new Errors.NotFoundError().message
     },
     {
       statusCode: 500,
+      params: {
+        orderBy: 'name',
+        sort: 'asc',
+        page: 1,
+        pageSize: 200
+      },
       expectedError: new Errors.InternalServerError().message
     },
     {
       statusCode: 'unmappedStatusCode',
+      params: {
+        orderBy: 'name',
+        sort: 'asc',
+        page: 2,
+        pageSize: 100
+      },
       expectedError: new Errors.UnexpectedError().message
     }
   ])(
     'should throw when request fails with statusCode $statusCode',
-    async ({ statusCode, expectedError }) => {
+    async ({ statusCode, params, expectedError }) => {
       vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
         statusCode,
         body: []
       })
       const { sut } = makeSut()
 
-      const response = sut({})
+      const response = sut(params)
 
       expect(response).rejects.toBe(expectedError)
     }
