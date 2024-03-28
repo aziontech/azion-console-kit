@@ -151,7 +151,6 @@
         :goBack="handleGoBack"
         v-if="showGoBack"
         :inDrawer="true"
-        class=""
       />
       <ActionBarBlock
         v-else
