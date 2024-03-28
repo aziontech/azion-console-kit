@@ -2,21 +2,40 @@ import * as Errors from '@/services/axios/errors'
 import { AxiosHttpClientAdapter } from '../axios/AxiosHttpClientAdapter'
 import { makeEdgeDNSBaseUrl } from './make-edge-dns-base-url'
 
+/*
+  Cache strategy is used to prevent making multiple calls to the same endpoint under the same conditions.
+*/
+let cache
+
+const defaultParams = {
+  orderBy: 'name',
+  sort: 'asc',
+  page: 1,
+  pageSize: 200
+}
+
 export const searchEdgeDnsService = async ({
-  orderBy = 'name',
-  sort = 'asc',
-  page = 1,
-  pageSize = 200
+  orderBy = defaultParams.orderBy,
+  sort = defaultParams.sort,
+  page = defaultParams.page,
+  pageSize = defaultParams.pageSize
 } = {}) => {
-  const searchParams = makeSearchParams({ orderBy, sort, page, pageSize })
-  let httpResponse = await AxiosHttpClientAdapter.request({
-    url: `${makeEdgeDNSBaseUrl()}?${searchParams.toString()}`,
-    method: 'GET'
-  })
+  const params = { orderBy, sort, page, pageSize }
+  const isSameParams = JSON.stringify(params) === JSON.stringify(defaultParams)
 
-  httpResponse = adapt(httpResponse)
+  if (!isSameParams || !cache) {
+    const searchParams = makeSearchParams(params)
+    let httpResponse = await AxiosHttpClientAdapter.request({
+      url: `${makeEdgeDNSBaseUrl()}?${searchParams.toString()}`,
+      method: 'GET'
+    })
 
-  return parseHttpResponse(httpResponse)
+    httpResponse = adapt(httpResponse)
+
+    return parseHttpResponse(httpResponse)
+  }
+
+  return cache
 }
 
 const adapt = (httpResponse) => {
@@ -50,8 +69,11 @@ const makeSearchParams = ({ orderBy, sort, page, pageSize }) => {
  */
 
 const parseHttpResponse = (httpResponse) => {
+  cache = null
+
   switch (httpResponse.statusCode) {
     case 200:
+      cache = httpResponse.body
       return httpResponse.body
     case 400:
       throw new Errors.InvalidApiRequestError().message

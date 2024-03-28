@@ -11,11 +11,24 @@ const makeSut = () => {
   }
 }
 
+const fixtures = {
+  apiResponse: {
+    results: [
+      { id: 1, name: 'test', value: 1 },
+      { id: 2, name: 'test2', value: 2 }
+    ]
+  },
+  formattedResponse: [
+    { value: 1, label: 'test' },
+    { value: 2, label: 'test2' }
+  ]
+}
+
 describe('RealTimeMetricsServices', () => {
   it('should call api with correct params', async () => {
     const requestSpy = vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
       statusCode: 200,
-      body: { results: [] }
+      body: fixtures.apiResponse
     })
 
     const { sut } = makeSut()
@@ -31,21 +44,13 @@ describe('RealTimeMetricsServices', () => {
   it('should return a list of edge dns', async () => {
     vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
       statusCode: 200,
-      body: {
-        results: [
-          { id: 1, name: 'test' },
-          { id: 2, name: 'test2' }
-        ]
-      }
+      body: fixtures.apiResponse
     })
 
     const { sut } = makeSut()
     const results = await sut({})
 
-    expect(results).toEqual([
-      { value: 1, label: 'test' },
-      { value: 2, label: 'test2' }
-    ])
+    expect(results).toEqual(fixtures.formattedResponse)
   })
 
   it.each([
