@@ -7,23 +7,19 @@ import { makeDomainsBaseUrl } from './make-domains-base-url'
 */
 let cache
 
-const defaultParams = {
-  orderBy: 'name',
-  sort: 'asc',
-  page: 1,
-  pageSize: 200
-}
+let prevParams = {}
 
 export const searchDomainsService = async ({
-  orderBy = defaultParams.orderBy,
-  sort = defaultParams.sort,
-  page = defaultParams.page,
-  pageSize = defaultParams.pageSize
+  orderBy = 'name',
+  sort = 'asc',
+  page = 1,
+  pageSize = 200
 } = {}) => {
   const params = { orderBy, sort, page, pageSize }
-  const isSameParams = JSON.stringify(params) === JSON.stringify(defaultParams)
+  const isSameParams = JSON.stringify(params) === JSON.stringify(prevParams)
 
   if (!isSameParams || !cache) {
+    prevParams = params
     const searchParams = makeSearchParams(params)
 
     let httpResponse = await AxiosHttpClientAdapter.request({
