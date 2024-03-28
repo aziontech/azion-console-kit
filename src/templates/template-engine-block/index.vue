@@ -22,6 +22,7 @@
             <span v-if="field.attrs"><span v-if="field.attrs.required">*</span></span></label
           >
           <Password
+            autocomplete="off"
             v-if="field.type === 'password'"
             toggleMask
             :key="`password-field-${field.name}`"
@@ -34,6 +35,7 @@
           />
           <InputText
             v-else
+            autocomplete="off"
             :key="field.name"
             :id="field.name"
             type="text"
@@ -73,6 +75,7 @@
             <Password
               v-if="field.type === 'password'"
               toggleMask
+              autocomplete="off"
               :key="`password-field-${field.name}`"
               v-bind="field.input"
               v-model="field.input.value"
@@ -84,6 +87,7 @@
             <InputText
               v-else
               :key="field.name"
+              autocomplete="off"
               :id="field.name"
               type="text"
               v-bind="field.input"
