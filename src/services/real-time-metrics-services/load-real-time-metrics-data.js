@@ -1,6 +1,6 @@
 import * as Errors from '@/services/axios/errors'
-import { AxiosHttpClientSignalDecorator } from '../axios/AxiosHttpClientSignalDecorator'
 import { makeBeholderBaseUrl } from './make-beholder-base-url'
+import { AxiosHttpClientAdapter } from '../axios/AxiosHttpClientAdapter'
 
 /**
  * Function to load metrics data.
@@ -8,13 +8,12 @@ import { makeBeholderBaseUrl } from './make-beholder-base-url'
  * @param {Object} query - The query object containing data to be loaded.
  * @return {Promise<Object>} A Promise that resolves to the parsed HTTP response.
  */
-export async function loadRealTimeMetricsData({ query }) {
-  const decorator = new AxiosHttpClientSignalDecorator()
-
-  const response = await decorator.request({
+export async function loadRealTimeMetricsData({ query, signal }) {
+  const response = await AxiosHttpClientAdapter.request({
     url: makeBeholderBaseUrl(),
     method: 'POST',
-    body: adapt(query)
+    body: adapt(query),
+    signal
   })
 
   return parseHttpResponse(response)
