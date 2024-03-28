@@ -1,3 +1,3 @@
 export const makeBeholderBaseUrl = () => {
-  return ''
+  return '/metrics/graphql'
 }

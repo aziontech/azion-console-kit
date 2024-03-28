@@ -37,6 +37,11 @@ const getConfig = () => {
           changeOrigin: true,
           rewrite: (path) => path.replace(/^\/graphql\/cities/, '/graphql')
         },
+        '/api/metrics/graphql': {
+          target: `${URLStartPrefix}manager.azion.com/metrics/graphql`,
+          changeOrigin: true,
+          rewrite: (path) => path.replace(/^\/api\/metrics\/graphql/, '')
+        },
         '/metrics/graphql': {
           target: `${URLStartPrefix}manager.azion.com/metrics/graphql`,
           changeOrigin: true,
