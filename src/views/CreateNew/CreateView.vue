@@ -79,6 +79,7 @@
       <FormLoading v-if="isLoading" />
       <TemplateEngineBlock
         v-else
+        :postCallbackService="props.postCallbackService"
         :listIntegrationsService="props.listIntegrationsService"
         :listPlatformsService="props.listPlatformsService"
         @cancel="handleCancel"
@@ -264,6 +265,10 @@ import { useLoadingStore } from '@/stores/loading'
       required: true
     },
     listPlatformsService: {
+      type: Function,
+      required: true
+    },
+    postCallbackService: {
       type: Function,
       required: true
     },

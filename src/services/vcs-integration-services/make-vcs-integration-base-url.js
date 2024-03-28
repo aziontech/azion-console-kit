@@ -1,3 +1,3 @@
 export const makeVcsIntegrationBaseUrl = () => {
-  return `vcs/`
+  return `vcs`
 }

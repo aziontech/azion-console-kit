@@ -18,6 +18,7 @@ export const createNewRoutes = {
         loadSolutionService: MarketplaceService.loadSolutionService,
         instantiateTemplateService: TemplateEngineService.instantiateTemplate,
         listPlatformsService: VcsIntegrationService.listPlatformsService,
+        postCallbackUrlService: VcsIntegrationService.postCallbackUrlService,
         listIntegrationsService: VcsIntegrationService.listIntegrationsService,
         windowOpen
       },

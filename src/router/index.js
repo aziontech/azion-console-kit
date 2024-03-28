@@ -32,7 +32,7 @@ import { usersListsRoutes } from '@routes/users-routes'
 import { variablesRoutes } from '@routes/variables-routes'
 import { wafRulesRoutes } from '@routes/waf-rules-routes'
 import { settingsRoutes } from '@routes/your-settings-routes'
-
+import { gitHubRoutes } from './routes/github-routes'
 import { createRouter, createWebHistory } from 'vue-router'
 
 import afterEachRouteGuard from './hooks/afterEachRoute'
@@ -74,6 +74,7 @@ const router = createRouter({
     settingsRoutes,
     wafRulesRoutes,
     metricsRoutes,
+    gitHubRoutes,
     realTimeEventsRoutes
   ].concat(errorRoutes)
 })

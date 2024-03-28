@@ -172,6 +172,10 @@
     instantiateTemplateService: {
       type: Function
     },
+    postCallbackService: {
+      type: Function,
+      required: true
+    },
     listPlatformsService: {
       type: Function
     },
@@ -207,8 +211,7 @@
   const isLoading = ref(true)
   const submitLoading = ref(false)
   const isMounted = ref(false)
-  const installationUrl = ref('')
-  const intervalPopup = ref()
+  const githubInstallation = ref()
   const installations = ref([])
 
   const loadTemplate = async (id) => {
@@ -235,17 +238,20 @@
     setTimeout(() => {
       isMounted.value = true
     }, 100)
+    window.onmessage = async (e) => {
+      try {
+        console.log(props)
+        props.postCallbackService(githubInstallation.value.callbackUrl, e.data)
+      } catch (e) {
+        console.log(e)
+      } finally {
+        installations.value = await props.listIntegrationsService()
+      }
+    }
   })
 
   const openPopupGithub = (url) => {
-      const popupGithub = window.open(url, 'page', 'width=640, height=700, top=100, left=110, popup=yes, scrollbars=no');
-      intervalPopup.value = setInterval(async() => {
-        if (popupGithub.closed) {
-          installations.value = await props.listIntegrationsService()
-          console.log(installations.value)
-          clearInterval(intervalPopup.value)
-        }
-      }, 1000);
+      window.open(url, 'page', 'width=640, height=700, top=100, left=110, popup=yes, scrollbars=no');
     }
 
   const createSchemaObject = async () => {
@@ -357,10 +363,10 @@
     console.log(res)
     res.forEach((platform) => {
       if (platform.id === 'github') { 
-        installationUrl.value =  platform.installationUrl
+        githubInstallation.value = platform
       }
     })
-    openPopupGithub(installationUrl.value)
+    openPopupGithub(githubInstallation.value.installationUrl)
   }
 
   const validateAndSubmit = async () => {

@@ -2,41 +2,14 @@ import { AxiosHttpClientAdapter, parseHttpResponse } from '../axios/AxiosHttpCli
 import { makeVcsIntegrationBaseUrl } from './make-vcs-integration-base-url'
 
 export const listIntegrationsService = async () => {
-  // let httpResponse = await AxiosHttpClientAdapter.request({
-  //   url: `${makeVcsIntegrationBaseUrl()}/platforms`,
-  //   method: 'GET'
-  // })
+  let httpResponse = await AxiosHttpClientAdapter.request({
+    url: `${makeVcsIntegrationBaseUrl()}/integrations`,
+    method: 'GET'
+  })
 
-  // httpResponse = adapt(httpResponse)
-  const mock = {
-    "count": 2,
-    "links": {
-      "next": null,
-      "prev": null
-    },
-    "results": [
-      {
-        "uuid": "3a8bc85d-0ccc-45c5-a666-2557107c4fb3",
-        "scope": "luizcunhaazion",
-        "platform": {
-        "id": "github",
-           "name": "GitHub"
-  }
-      },
-      {
-        "uuid":"3a8bc85d-0ccc-45c5-a666-2557107c4ff2",
-        "scope": "aziontech",
-        "platform": {
-        "id": "github",
-           "name": "GitHub"
-  }
-      }
-    ]
-  }
-  
-  
+  httpResponse = adapt(httpResponse)  
 
-  return Promise.resolve(parseHttpResponse(adapt({body: mock})))
+  return Promise.resolve(parseHttpResponse(httpResponse))
 }
 
 const adapt = (httpResponse) => {
