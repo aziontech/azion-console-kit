@@ -119,7 +119,7 @@
                 v-tooltip.top="{ value: 'Actions', showDelay: 200 }"
                 size="small"
                 icon="pi pi-ellipsis-h"
-                text
+                outlined
                 @click="(event) => toggleActionsMenu(event, rowData)"
                 class="cursor-pointer table-button"
               />
