@@ -1,9 +1,8 @@
 import { useMetricsStore } from '@/stores/metrics'
-import Axios from 'axios'
 import LoadReportVariation from './load-report-variation'
 import LoadReportWithMeta from './load-report-with-meta'
 
-let tokenSource = null
+let abortController = null
 
 /**
  * Filters the given list of reports based on the selected dashboard and returns a new list
@@ -37,7 +36,7 @@ async function resolveReport(report, filters) {
 
   const reportWithCancelation = {
     ...report,
-    tokenSource
+    signal: abortController.signal
   }
   const reportData = await LoadReportWithMeta(filters, reportWithCancelation)
 
@@ -62,7 +61,7 @@ async function resolveReport(report, filters) {
       reportQuery: reportData.gqlQuery,
       xAxis: '',
       groupBy: [],
-      ReportsRequestTokenSource: tokenSource
+      signal: abortController.signal
     }
 
     reportInfo.variationValue = await LoadReportVariation({ filters, report: clonedReport })
@@ -85,10 +84,8 @@ export default async function LoadReportsDataBySelectedDashboard(
   reports,
   currentDashboard
 ) {
-  if (tokenSource) tokenSource.cancel()
-
-  const cancelToken = Axios.CancelToken
-  tokenSource = cancelToken.source()
+  if (abortController) abortController.abort()
+  abortController = new AbortController()
 
   const availableReports = reportsBySelectedDashboard(reports, currentDashboard)
 
