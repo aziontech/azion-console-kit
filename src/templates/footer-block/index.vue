@@ -2,13 +2,17 @@
 <template>
   <!-- Footer -->
   <footer
-    class="z-10 w-full px-3 md:px-8 py-6 md:py-3 border-t m-0 surface-border gap-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:lg:grid-cols-3 place-items-stretch items-center"
+    class="z-10 w-full px-3 md:px-8 py-6 md:py-3 border-t m-0 surface-border gap-6 place-items-stretch items-center"
+    :class="classObjectRoot"
   >
     <span
       class="w-full text-center truncate place-items-start md:text-left text-sm text-normal text-color-secondary"
       >© Azion Technologies, Inc or its affiliates. All rights reserved.</span
     >
-    <div class="w-full flex flex-col md:flex-row gap-3 justify-end xl:justify-center items-center">
+    <div
+      class="w-full flex flex-col md:flex-row gap-3 justify-end xl:justify-center items-center"
+      v-if="!route.meta.hideLinksFooter"
+    >
       <div class="flex gap-1">
         <PrimeButton
           label="About"
@@ -57,10 +61,14 @@
       </div>
     </div>
     <div
-      class="w-full flex flex-wrap gap-2 items-center justify-center md:justify-start xl:justify-end"
+      class="w-full flex flex-wrap gap-2 items-center"
+      :class="classObjectOptionButton"
     >
       <!-- System Status -->
-      <SystemStatusBarBlock v-tooltip.top="{ value: 'System status', showDelay: 200 }" />
+      <SystemStatusBarBlock
+        v-tooltip.top="{ value: 'System status', showDelay: 200 }"
+        v-if="!route.meta.hideLinksFooter"
+      />
       <div v-tooltip.top="{ value: 'Theme mode', showDelay: 200 }">
         <Dropdown
           appendTo="self"
@@ -101,61 +109,71 @@
   </footer>
 </template>
 
-<script>
+<script setup>
+  import { ref, computed } from 'vue'
   import { useAccountStore } from '@/stores/account'
   import SystemStatusBarBlock from '@templates/system-status-bar-block'
-  import { mapActions, mapState } from 'pinia'
   import PrimeButton from 'primevue/button'
   import Dropdown from 'primevue/dropdown'
+  import { useRoute } from 'vue-router'
+  const accountStore = useAccountStore()
+  const setTheme = accountStore.setTheme
+  const route = useRoute()
 
-  export default {
-    name: 'FooterTemplate',
-    components: {
-      PrimeButton,
-      Dropdown,
-      SystemStatusBarBlock
-    },
-    data() {
-      return {
-        themeOptions: [
-          { name: 'Light', value: 'light', icon: 'pi pi-sun' },
-          { name: 'Dark', value: 'dark', icon: 'pi pi-moon' },
-          { name: 'System', value: 'system', icon: 'pi pi-desktop' }
-        ]
-      }
-    },
-    computed: {
-      ...mapState(useAccountStore, ['currentTheme']),
-      selectedTheme() {
-        return this.themeOptions.find((option) => option.value === this.currentTheme)
-      }
-    },
-    methods: {
-      ...mapActions(useAccountStore, ['setTheme']),
-      selectTheme(theme) {
-        this.setTheme(theme)
-      },
-      openAbout() {
-        window.open('https://www.azion.com/', '_blank')
-      },
-      openBlog() {
-        window.open('https://www.azion.com/en/blog/', '_blank')
-      },
-      openLegal() {
-        window.open('https://www.azion.com/en/documentation/agreements/privacy-policy/', '_blank')
-      },
-      openDocs() {
-        window.open('https://www.azion.com/en/documentation/', '_blank')
-      },
-      openDiscord() {
-        window.open('https://discord.com/invite/Yp9N7RMVZy', '_blank')
-      },
-      openGitHub() {
-        window.open('https://github.com/aziontech/azion-platform-kit', '_blank')
-      },
-      openX() {
-        window.open('https://x.com/aziontech', '_blank')
-      }
-    }
+  defineOptions({
+    name: 'footer-block'
+  })
+
+  const themeOptions = ref([
+    { name: 'Light', value: 'light', icon: 'pi pi-sun' },
+    { name: 'Dark', value: 'dark', icon: 'pi pi-moon' },
+    { name: 'System', value: 'system', icon: 'pi pi-desktop' }
+  ])
+
+  const currentTheme = computed(() => accountStore.currentTheme)
+  const selectedTheme = computed(() =>
+    themeOptions.value.find((option) => option.value === currentTheme.value)
+  )
+
+  const classObjectRoot = computed(() => ({
+    'flex max-md:flex-col': route.meta.hideLinksFooter,
+    'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:lg:grid-cols-3': !route.meta.hideLinksFooter
+  }))
+
+  const classObjectOptionButton = computed(() => ({
+    'justify-center md:justify-start xl:justify-end': !route.meta.hideLinksFooter,
+    'md:justify-end justify-center': route.meta.hideLinksFooter
+  }))
+
+  const selectTheme = (theme) => {
+    setTheme(theme)
+  }
+
+  const openAbout = () => {
+    window.open('https://www.azion.com/', '_blank')
+  }
+
+  const openBlog = () => {
+    window.open('https://www.azion.com/en/blog/', '_blank')
+  }
+
+  const openLegal = () => {
+    window.open('https://www.azion.com/en/documentation/agreements/privacy-policy/', '_blank')
+  }
+
+  const openDocs = () => {
+    window.open('https://www.azion.com/en/documentation/', '_blank')
+  }
+
+  const openDiscord = () => {
+    window.open('https://discord.com/invite/Yp9N7RMVZy', '_blank')
+  }
+
+  const openGitHub = () => {
+    window.open('https://github.com/aziontech/azion-platform-kit', '_blank')
+  }
+
+  const openX = () => {
+    window.open('https://x.com/aziontech', '_blank')
   }
 </script>

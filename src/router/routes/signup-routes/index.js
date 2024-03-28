@@ -15,22 +15,13 @@ export const signupRoutes = {
       component: SignupView,
       props: {
         signupService: SignupService.signupService,
-        listSocialIdpsService: listSocialIdpsService
-      },
-      meta: {
-        hideNavigation: true,
-        isPublic: true
-      }
-    },
-    {
-      path: 'activation',
-      name: 'activation',
-      component: () => import('@views/Signup/SignupActivationView.vue'),
-      props: {
+        listSocialIdpsService: listSocialIdpsService,
         resendEmailService: SignupService.resendEmailService
       },
       meta: {
         hideNavigation: true,
+        showDocumentButton: true,
+        hideLinksFooter: true,
         isPublic: true
       }
     },

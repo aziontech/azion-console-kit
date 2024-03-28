@@ -54,9 +54,18 @@
             @click="checkLoginMethod"
           />
         </div>
+        <div
+          class="flex-col gap-6 sm:gap-8 flex"
+          v-if="showSocialIdps"
+        >
+          <Divider align="center">
+            <p>or</p>
+          </Divider>
+        </div>
+
         <SocialIdpsBlock
           :socialIdpsService="listSocialIdpsService"
-          direction="top-to-bottom"
+          v-model:showSocialIdps="showSocialIdps"
         />
       </div>
 
@@ -155,6 +164,7 @@
   import { useField, useForm } from 'vee-validate'
   import { ref, inject } from 'vue'
   import { useRouter } from 'vue-router'
+  import Divider from 'primevue/divider'
   import * as yup from 'yup'
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
@@ -191,6 +201,7 @@
     }
   })
 
+  const showSocialIdps = ref(true)
   const emailValidateRegex = /^\S+@\S+\.\S+$/
 
   const validationSchema = yup.object({

@@ -45,7 +45,8 @@ export default {
       },
       animation: {
         fadeIn: 'fadeIn 220ms ease-in-out',
-        fadeOut: 'fadeOut 220ms ease-in-out'
+        fadeOut: 'fadeOut 220ms ease-in-out',
+        expandVertical: 'expandVertical 220ms ease-in-out'
       },
       keyframes: {
         fadeIn: {
@@ -55,6 +56,10 @@ export default {
         fadeOut: {
           '0%': { opacity: '1' },
           '100%': { opacity: '0' }
+        },
+        expandVertical: {
+          '0%': { transform: 'translateY(-100%) scaleY(0)',opacity: '0', height: '0' },
+          '100%': { transform: 'translateY(0) scaleY(1)', opacity: '1', height: '100%' }
         }
       }
     }
