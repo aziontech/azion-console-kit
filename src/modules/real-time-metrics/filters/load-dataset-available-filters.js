@@ -77,11 +77,11 @@ export default async function LoadDatasetAvailableFilters(dataset) {
   let data = []
 
   try {
-    const type = await loadRealTimeMetricsData({
+    const { __type: type } = await loadRealTimeMetricsData({
       query: graphqlQuery,
       signal: abortController.signal
     })
-    data = type.__type
+    data = type
   } catch {
     return []
   }
