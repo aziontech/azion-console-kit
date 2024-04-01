@@ -3,7 +3,7 @@
   <!-- Footer -->
   <footer
     class="z-10 w-full px-3 md:px-8 py-6 md:py-3 border-t m-0 surface-border gap-6 place-items-stretch items-center"
-    :class="classObjectRoot"
+    :class="dynamicClassesByRouteMeta.footer"
   >
     <span
       class="w-full text-center truncate place-items-start md:text-left text-sm text-normal text-color-secondary"
@@ -62,7 +62,7 @@
     </div>
     <div
       class="w-full flex flex-wrap gap-2 items-center"
-      :class="classObjectOptionButton"
+      :class="dynamicClassesByRouteMeta.optionButton"
     >
       <!-- System Status -->
       <SystemStatusBarBlock
@@ -145,14 +145,13 @@
     themeOptions.value.find((option) => option.value === currentTheme.value)
   )
 
-  const classObjectRoot = computed(() => ({
-    'flex max-md:flex-col': route.meta.hideLinksFooter,
-    'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:lg:grid-cols-3': !route.meta.hideLinksFooter
-  }))
-
-  const classObjectOptionButton = computed(() => ({
-    'justify-center md:justify-start xl:justify-end': !route.meta.hideLinksFooter,
-    'md:justify-end justify-center': route.meta.hideLinksFooter
+  const dynamicClassesByRouteMeta = computed(() => ({
+    footer: route.meta.hideLinksFooter
+      ? 'flex max-md:flex-col'
+      : 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:lg:grid-cols-3',
+    optionButton: route.meta.hideLinksFooter
+      ? 'md:justify-end justify-center'
+      : 'justify-center md:justify-start xl:justify-end'
   }))
 
   const selectTheme = (theme) => {
