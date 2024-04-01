@@ -1,4 +1,4 @@
-import typography from '@tailwindcss/typography';
+import typography from '@tailwindcss/typography'
 
 /** @type {import('tailwindcss').Config} */
 export default {
@@ -23,7 +23,7 @@ export default {
         'orange-base': '#F3652B'
       },
       backgroundColor: {
-        'orange-bullet': '#F3652B',
+        'orange-bullet': '#F3652B'
       },
       borderColor: {
         header: '#3e3e3e',
@@ -32,13 +32,13 @@ export default {
       },
       textColor: {
         header: '#b5b5b5',
-        'success-check': '#22C55E',
+        'success-check': '#22C55E'
       },
       transitionProperty: {
         width: 'width'
       },
       width: {
-        'slide': '384px',
+        slide: '384px'
       },
       fontFamily: {
         robotomono: ['Roboto Mono']
@@ -46,7 +46,7 @@ export default {
       animation: {
         fadeIn: 'fadeIn 220ms ease-in-out',
         fadeOut: 'fadeOut 220ms ease-in-out',
-        expandVertical: 'expandVertical 220ms ease-in-out'
+        slideDown: 'slideDown 220ms ease-in-out'
       },
       keyframes: {
         fadeIn: {
@@ -57,14 +57,12 @@ export default {
           '0%': { opacity: '1' },
           '100%': { opacity: '0' }
         },
-        expandVertical: {
-          '0%': { transform: 'translateY(-100%) scaleY(0)',opacity: '0', height: '0' },
-          '100%': { transform: 'translateY(0) scaleY(1)', opacity: '1', height: '100%' }
+        slideDown: {
+          '0%': { height: '0' },
+          '100%': { height: 'auto' }
         }
       }
     }
   },
-  plugins: [
-    typography,
-  ]
+  plugins: [typography]
 }

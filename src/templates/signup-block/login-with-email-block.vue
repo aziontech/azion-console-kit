@@ -1,6 +1,8 @@
 <template>
-  <!-- animate-fadeIn animate-delay-500 ease-in-out -->
-  <div class="flex flex-col gap-6 animate-expandVertical animate-delay-500 ease-in-out">
+  <div
+    class="flex flex-col gap-6 animate-slideDown overflow-hidden"
+    v-if="isButtonSignUp"
+  >
     <div class="flex flex-col gap-2">
       <label
         for="email"
@@ -77,7 +79,7 @@
                 v-for="requirement in passwordRequirementsList"
                 :key="requirement.text"
               >
-                <span :class="{ 'text-green-500': requirement.valid }">{{ requirement.text }}</span>
+                <span>{{ requirement.text }}</span>
               </li>
             </ul>
           </div>
@@ -93,9 +95,10 @@
   </div>
 
   <PrimeButton
-    label="Sign Up"
+    class="animate-fadeIn"
+    :label="labelButton"
     :loading="loading"
-    @click="signUp"
+    @click="eventButtonSignUp"
   />
 </template>
 
@@ -108,7 +111,9 @@
   import { useToast } from 'primevue/usetoast'
   import { getInstance, load } from 'recaptcha-v3'
   import { useField, useForm } from 'vee-validate'
-  import { inject, onMounted, onUnmounted, ref } from 'vue'
+  import { useAccountStore } from '@/stores/account'
+
+  import { computed, inject, onMounted, onUnmounted, ref } from 'vue'
   import { useRouter } from 'vue-router'
   import * as yup from 'yup'
   /** @type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
@@ -117,7 +122,8 @@
   const emit = defineEmits(['loginWithEmail'])
 
   const props = defineProps({
-    signupService: { required: true, type: Function }
+    signupService: { required: true, type: Function },
+    showLoginFromEmail: { required: true, type: Boolean }
   })
 
   let recaptcha
@@ -167,6 +173,7 @@
       })
   })
 
+  const labelButton = ref(props.showLoginFromEmail ? 'Sign Up with Work Email' : 'Sign Up')
   const { errors, handleSubmit } = useForm({ validationSchema })
 
   const { value: password } = useField('password')
@@ -175,11 +182,19 @@
 
   const toast = useToast()
   const router = useRouter()
-
   const loading = ref(false)
 
+  const isButtonSignUp = computed(() => labelButton.value === 'Sign Up')
   const encodeEmail = (email) => {
     return encodeURIComponent(email)
+  }
+
+  const eventButtonSignUp = () => {
+    if (isButtonSignUp.value) {
+      signUp()
+    } else {
+      handleSignUpEmailClick()
+    }
   }
 
   const signUp = handleSubmit(async (values) => {
@@ -205,6 +220,12 @@
       toast.add({ life: 5000, severity: 'error', detail: message, summary: 'Error' })
     }
   })
+
+  const handleSignUpEmailClick = () => {
+    const accountStore = useAccountStore()
+    accountStore.resetSsoSignUpMethod()
+    labelButton.value = 'Sign Up'
+  }
 
   onUnmounted(() => {
     getInstance()?.hideBadge()

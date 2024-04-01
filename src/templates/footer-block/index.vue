@@ -17,22 +17,22 @@
         <PrimeButton
           label="About"
           link
-          @click="openAbout"
+          @click="openAzionSite"
         />
         <PrimeButton
           label="Blog"
           link
-          @click="openBlog"
+          @click="openAzionBlog"
         />
         <PrimeButton
           label="Legal"
           link
-          @click="openLegal"
+          @click="azionPrivacyPolicyWindowOpener"
         />
         <PrimeButton
           label="Docs"
           link
-          @click="openDocs"
+          @click="openDocumentation"
         />
       </div>
       <!-- Social Buttons -->
@@ -42,21 +42,21 @@
           outlined
           size="small"
           v-tooltip.top="{ value: 'Github', showDelay: 200 }"
-          @click="openGitHub"
+          @click="openAzionGithub"
         />
         <PrimeButton
           icon="pi pi-discord"
           outlined
           size="small"
           v-tooltip.top="{ value: 'Discord', showDelay: 200 }"
-          @click="openDiscord"
+          @click="openAzionDiscord"
         />
         <PrimeButton
           icon="ai ai-x"
           outlined
           size="small"
           v-tooltip.top="{ value: 'X', showDelay: 200 }"
-          @click="openX"
+          @click="openAzionX"
         />
       </div>
     </div>
@@ -110,6 +110,16 @@
 </template>
 
 <script setup>
+  import {
+    azionPrivacyPolicyWindowOpener,
+    openAzionBlog,
+    openAzionDiscord,
+    openAzionGithub,
+    openAzionSite,
+    openAzionX,
+    openDocumentation
+  } from '@/helpers'
+
   import { ref, computed } from 'vue'
   import { useAccountStore } from '@/stores/account'
   import SystemStatusBarBlock from '@templates/system-status-bar-block'
@@ -117,7 +127,7 @@
   import Dropdown from 'primevue/dropdown'
   import { useRoute } from 'vue-router'
   const accountStore = useAccountStore()
-  const setTheme = accountStore.setTheme
+  const { setTheme } = accountStore
   const route = useRoute()
 
   defineOptions({
@@ -147,33 +157,5 @@
 
   const selectTheme = (theme) => {
     setTheme(theme)
-  }
-
-  const openAbout = () => {
-    window.open('https://www.azion.com/', '_blank')
-  }
-
-  const openBlog = () => {
-    window.open('https://www.azion.com/en/blog/', '_blank')
-  }
-
-  const openLegal = () => {
-    window.open('https://www.azion.com/en/documentation/agreements/privacy-policy/', '_blank')
-  }
-
-  const openDocs = () => {
-    window.open('https://www.azion.com/en/documentation/', '_blank')
-  }
-
-  const openDiscord = () => {
-    window.open('https://discord.com/invite/Yp9N7RMVZy', '_blank')
-  }
-
-  const openGitHub = () => {
-    window.open('https://github.com/aziontech/azion-platform-kit', '_blank')
-  }
-
-  const openX = () => {
-    window.open('https://x.com/aziontech', '_blank')
   }
 </script>

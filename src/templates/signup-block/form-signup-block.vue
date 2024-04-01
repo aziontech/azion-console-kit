@@ -1,6 +1,6 @@
 <template>
   <div class="w-full md:min-w-[380px] md:max-w-[448px]">
-    <div v-if="!showActivation">
+    <div v-if="showActivation">
       <div class="flex surface-border border rounded-md p-6">
         <div class="w-full flex flex-col gap-8 animate-fadeIn">
           <form
@@ -28,19 +28,12 @@
               >
                 <p>or</p>
               </PrimeDivider>
-              <PrimeButton
-                label="Sign Up with Work Email"
-                class="w-full"
-                v-if="!showEmailForm"
-                @click="handleSignUpEmailClick"
-              />
-              <div
-                v-if="showEmailForm"
-                class="flex flex-col gap-8 animate-fadeIn animate-delay-500 ease-in-out"
-              >
+
+              <div class="flex flex-col gap-8">
                 <LoginWithEmailBlock
+                  :showLoginFromEmail="showLoginFromEmail"
                   :signupService="props.signupService"
-                  @loginWithEmail="showActivation = true"
+                  @loginWithEmail="showActivation = false"
                 />
               </div>
             </div>
@@ -87,7 +80,6 @@
   import PrimeButton from 'primevue/button'
   import PrimeDivider from 'primevue/divider'
   import LoginWithEmailBlock from '@/templates/signup-block/login-with-email-block'
-  import { useAccountStore } from '@/stores/account'
   import { ref } from 'vue'
   import { useRouter } from 'vue-router'
 
@@ -99,20 +91,10 @@
 
   const router = useRouter()
   const showLoginFromEmail = ref(true)
-  const showEmailForm = ref(false)
-  const showActivation = ref(false)
+  const showActivation = ref(true)
 
   const updateEmailForm = (value) => {
     showLoginFromEmail.value = value
-    if (!value) {
-      handleSignUpEmailClick()
-    }
-  }
-
-  const handleSignUpEmailClick = () => {
-    const accountStore = useAccountStore()
-    showEmailForm.value = true
-    accountStore.resetSsoSignUpMethod()
   }
 
   const goToLogin = () => {

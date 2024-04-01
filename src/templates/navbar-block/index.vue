@@ -50,7 +50,7 @@
           label: { class: 'text-white' },
           icon: { class: 'text-white' }
         }"
-        @click="redirectToDocumentation"
+        @click="openDocumentation"
         size="small"
         iconPos="right"
         icon="pi pi-external-link"
@@ -74,6 +74,7 @@
   import Help from './help'
   import SwitchAccount from './switch-account'
   import ProfileBlock from '@templates/profile-block'
+  import { openDocumentation } from '@/helpers'
 
   defineOptions({ name: 'navbar-block' })
 
@@ -108,10 +109,6 @@
     } else {
       router.push({ name })
     }
-  }
-
-  const redirectToDocumentation = () => {
-    window.open('https://www.azion.com/en/documentation/', '_blank')
   }
 
   watch(
