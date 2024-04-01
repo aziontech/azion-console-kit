@@ -146,20 +146,21 @@
           :disabledFields="isSubmitting"
         />
       </form>
+    
       <div class="fixed w-full left-0 bottom-0">
-      <GoBack
-        :goBack="handleGoBack"
-        v-if="showGoBack"
-        :inDrawer="true"
-      />
-      <ActionBarBlock
-        v-else
-        @onCancel="closeDrawer"
-        @onSubmit="onSubmit"
-        :inDrawer="true"
-        :loading="isSubmitting"
-        :submitDisabled="disableFields"
-      />
+        <GoBack
+          :goBack="handleGoBack"
+          v-if="showGoBack"
+          :inDrawer="true"
+        />
+        <ActionBarBlock
+          v-else
+          @onCancel="closeDrawer"
+          @onSubmit="onSubmit"
+          :inDrawer="true"
+          :loading="isSubmitting"
+          :submitDisabled="disableFields"
+        />
       </div>
   </Sidebar>
   <DialogUnsavedBlock

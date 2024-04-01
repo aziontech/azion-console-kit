@@ -1,12 +1,12 @@
 <template>
   <section class="w-full min-h-[calc(100vh-120px)] relative">
     <div class="surface-ground w-full">
-      <div class="max-w-screen-2xl-test mx-auto">
+      <div class="mx-auto">
         <Message
           severity="warn"
           :closable="false"
           :pt="{
-            root: { class: 'mx-3 mt-4 sm:mx-8' },
+            root: { class: 'mx-3 mt-4 md:mx-8' },
             wrapper: { class: 'py-3 px-3 items-start sm:items-center' }
           }"
         >
@@ -24,9 +24,9 @@
         </Message>
       </div>
     </div>
-    <div class="w-full max-w-screen-2xl mx-auto"></div>
+    <div class="w-full mx-auto"></div>
     <slot name="heading"></slot>
-    <section class="w-full h-full flex flex-col max-w-screen-2xl-test mx-auto mb-8">
+    <section class="w-full h-full flex flex-col mx-auto mb-8">
       <slot name="content"></slot>
     </section>
   </section>

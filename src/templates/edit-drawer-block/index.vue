@@ -176,7 +176,9 @@
           :disabledFields="isLoading"
         />
       </form>
-    <div class="w-full fixed left-0 bottom-0">
+    </div>
+ <div class="w-full fixed left-0 bottom-0">
+
       <GoBack
         :goBack="handleGoBack"
         v-if="showGoBack"

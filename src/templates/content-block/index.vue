@@ -1,11 +1,11 @@
 <template>
   <section class="w-full min-h-[calc(100vh-120px)] relative">
-    <section class="w-full h-full flex flex-col max-w-screen-2xl-test mx-auto">
+    <section class="w-full h-full flex flex-col mx-auto">
       <Message
         severity="warn"
         :closable="false"
         :pt="{
-          root: { class: 'mx-3 mt-4 sm:mx-8' },
+          root: { class: 'mx-3 mt-4 md:mx-8' },
           wrapper: { class: 'py-3 px-3 items-start sm:items-center' }
         }"
       >
@@ -22,20 +22,20 @@
         </p>
       </Message>
       <div
-        class="mx-3 sm:mx-8 mt-4"
+        class="mx-3 md:mx-8 mt-4"
         v-if="hasHeadingSlot"
       >
         <slot name="heading"></slot>
       </div>
       <div
-        class="mx-3 sm:mx-8 mb-8 h-full"
-        :class="{ 'mt-4 sm:mt-8': !hasHeadingSlot, 'mt-4': hasHeadingSlot }"
+        class="mx-3 md:mx-8 mb-8 h-full"
+        :class="{ 'mt-4 md:mx-8': !hasHeadingSlot, 'mt-4': hasHeadingSlot }"
       >
         <slot name="content"></slot>
       </div>
     </section>
     <div
-      class="sticky bottom-0"
+      class="sticky bottom-0 z-[1002]"
       id="action-bar"
     ></div>
   </section>
