@@ -180,7 +180,7 @@
         />
       </form>
     </div>
-    <div class="sticky bottom-0">
+    <div class="sticky bottom-0 z-[2203]">
       <GoBack
         :goBack="handleGoBack"
         v-if="showGoBack"
