@@ -1,7 +1,7 @@
 <template>
   <div
     class="flex flex-col gap-6 animate-slideDown overflow-hidden"
-    v-if="isButtonSignUp"
+    v-if="showForm"
   >
     <div class="flex flex-col gap-2">
       <label
@@ -54,6 +54,7 @@
       </label>
       <Password
         class="col-span-1 min-w-full"
+        :class="{ 'p-invalid': errors.password }"
         toggleMask
         v-model="password"
         promptLabel="Choose a password"
@@ -113,7 +114,7 @@
   import { useField, useForm } from 'vee-validate'
   import { useAccountStore } from '@/stores/account'
 
-  import { computed, inject, onMounted, onUnmounted, ref } from 'vue'
+  import { inject, onMounted, onUnmounted, ref, watch } from 'vue'
   import { useRouter } from 'vue-router'
   import * as yup from 'yup'
   /** @type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
@@ -173,7 +174,6 @@
       })
   })
 
-  const labelButton = ref(props.showLoginFromEmail ? 'Sign Up with Work Email' : 'Sign Up')
   const { errors, handleSubmit } = useForm({ validationSchema })
 
   const { value: password } = useField('password')
@@ -183,14 +183,16 @@
   const toast = useToast()
   const router = useRouter()
   const loading = ref(false)
+  const showForm = ref(false)
 
-  const isButtonSignUp = computed(() => labelButton.value === 'Sign Up')
+  const labelButton = ref('Sign Up with Work Email')
+
   const encodeEmail = (email) => {
     return encodeURIComponent(email)
   }
 
   const eventButtonSignUp = () => {
-    if (isButtonSignUp.value) {
+    if (showForm.value) {
       signUp()
     } else {
       handleSignUpEmailClick()
@@ -224,10 +226,21 @@
   const handleSignUpEmailClick = () => {
     const accountStore = useAccountStore()
     accountStore.resetSsoSignUpMethod()
+    showForm.value = true
     labelButton.value = 'Sign Up'
   }
 
   onUnmounted(() => {
     getInstance()?.hideBadge()
   })
+
+  watch(
+    () => props.showLoginFromEmail,
+    (value) => {
+      if (!value) {
+        showForm.value = !value
+        labelButton.value = 'Sign Up'
+      }
+    }
+  )
 </script>

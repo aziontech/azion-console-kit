@@ -21,7 +21,7 @@
       <PrimeBadge
         class="rounded-md animate-fadeIn"
         :value="counter"
-        v-if="counter > 0"
+        v-if="showCounter"
       />
     </section>
     <PrimeButton
@@ -51,6 +51,7 @@
   const route = useRoute()
   const router = useRouter()
   const toast = useToast()
+  const showCounter = computed(() => counter.value > 0)
 
   const { email } = route.query
   if (!email) {
