@@ -12,7 +12,8 @@ const makeSut = () => {
 describe('RealTimeMetricsServices', () => {
   it('should return the API base url to beholder service', () => {
     const { sut } = makeSut()
-    const beholderUrl = '/metrics/graphql'
+    const version = 'v3'
+    const beholderUrl = `${version}/metrics/graphql`
 
     const baseUrl = sut()
 
