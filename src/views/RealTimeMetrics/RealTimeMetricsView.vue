@@ -4,9 +4,20 @@
       <PageHeadingBlock pageTitle="Real-Time Metrics" />
     </template>
     <template #content>
-      <TabsPageBlock />
+      <TabsPageBlock
+        v-if="groupData"
+        :moduleActions="metricsModule.actions"
+        :groupData="groupData"
+        :userUTC="userUTC"
+      />
       <div class="card surface-border border rounded-md surface-section p-3.5 flex flex-col gap-4">
-        <IntervalFilterBlock @applyTSRange="load" />
+        <IntervalFilterBlock
+          v-if="filterData"
+          @applyTSRange="load"
+          :moduleActions="metricsModule.actions"
+          :filterData="filterData"
+          :userUTC="userUTC"
+        />
         <ContentFilterBlock :playgroundOpener="playgroundOpener" />
       </div>
       <DashboardPanelBlock :clipboardWrite="clipboardWrite" />
@@ -15,11 +26,15 @@
 </template>
 
 <script setup>
-  import { useMetricsStore } from '@/stores/metrics'
+  import { useAccountStore } from '@/stores/account'
+  import RealTimeMetricsModule from '@/modules/real-time-metrics'
+  import {
+    currentIdPageAndDashboard,
+    getCurrentInfo
+  } from '@modules/real-time-metrics/helpers/getters'
   import ContentBlock from '@/templates/content-block'
   import PageHeadingBlock from '@/templates/page-heading-block'
-  import { storeToRefs } from 'pinia'
-  import { computed, onMounted, watch } from 'vue'
+  import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
   import { useRoute, useRouter } from 'vue-router'
   import ContentFilterBlock from './blocks/content-filter-block.vue'
   import DashboardPanelBlock from './blocks/dashboard-panel-block.vue'
@@ -41,19 +56,47 @@
     loadPageInfo()
   })
 
-  const metricsStore = useMetricsStore()
-  const {
-    setInfoAvailableFilters,
-    setInitialPageAndDashboardCurrent,
-    setInitialCurrentsByIds,
-    setDatasetAvailableFilters,
-    loadCurrentReports
-  } = metricsStore
+  const accountStore = useAccountStore()
+  const userUTC = accountStore.accountUtcOffset
 
-  const { currentIdPageAndDashboard, getCurrentInfo } = storeToRefs(metricsStore)
+  const metricsModule = RealTimeMetricsModule()
+  const {
+    actions: {
+      setInfoAvailableFilters,
+      setInitialCurrentsByIds,
+      setDatasetAvailableFilters,
+      loadCurrentReports
+    },
+    groupObservable,
+    filterObservable,
+    reportObservable
+  } = metricsModule
+
+  /* Module state */
+
+  const groupData = ref(null)
+  const filterData = ref(null)
+  const reportData = ref(null)
+
+  const updateGroupData = (data) => {
+    groupData.value = data
+  }
+  groupObservable.subscribe(updateGroupData)
+
+  const updateFilterData = (data) => {
+    filterData.value = data
+  }
+  filterObservable.subscribe(updateFilterData)
+
+  const updateReportData = (data) => {
+    reportData.value = data
+  }
+  reportObservable.subscribe(updateReportData)
+
+  /* ---- */
 
   const getCurrentIds = computed(() => {
-    return currentIdPageAndDashboard.value
+    return currentIdPageAndDashboard({ group: groupData.value })
   })
 
   const loadPageInfo = async () => {
@@ -64,7 +107,7 @@
   }
 
   const load = async () => {
-    await loadCurrentReports()
+    await loadCurrentReports(userUTC)
   }
 
   const route = useRoute()
@@ -72,9 +115,7 @@
   const setCurrentPageAndDashboard = () => {
     const { pageId, dashboardId } = route.params
 
-    if (!pageId || !dashboardId) {
-      return setInitialPageAndDashboardCurrent()
-    }
+    if (!pageId || !dashboardId) return
 
     return setInitialCurrentsByIds({ pageId, dashboardId })
   }
@@ -91,7 +132,18 @@
     })
   }
 
-  watch(getCurrentInfo, () => {
+  const currentInfo = computed(() => {
+    if (!groupData.value) return
+    return getCurrentInfo({ group: groupData.value })
+  })
+
+  watch(currentInfo, () => {
     updateRouter()
+  })
+
+  onUnmounted(() => {
+    groupObservable.unsubscribe(updateGroupData)
+    filterObservable.unsubscribe(updateFilterData)
+    reportObservable.unsubscribe(updateReportData)
   })
 </script>
