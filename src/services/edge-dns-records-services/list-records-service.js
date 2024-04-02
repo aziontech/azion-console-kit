@@ -1,9 +1,9 @@
 import { AxiosHttpClientAdapter, parseHttpResponse } from '../axios/AxiosHttpClientAdapter'
 import { makeEdgeDNSRecordsBaseUrl } from './make-edge-dns-records-base-url'
 
-export const listRecordsService = async ({ page, id }) => {
+export const listRecordsService = async ({ id }) => {
   let httpResponse = await AxiosHttpClientAdapter.request({
-    url: `${makeEdgeDNSRecordsBaseUrl()}/${id}/records?page=${page}`,
+    url: `${makeEdgeDNSRecordsBaseUrl()}/${id}/records?page_size=200`,
     method: 'GET'
   })
 

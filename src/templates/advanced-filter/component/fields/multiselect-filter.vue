@@ -82,7 +82,7 @@
   serviceIn()
 </script>
 <template>
-  <div class="flex flex-col w-full gap-2">
+  <div class="flex flex-col w-full sm:w-full gap-2">
     <label
       for="in_field"
       class="text-sm font-medium leading-5 text-color"

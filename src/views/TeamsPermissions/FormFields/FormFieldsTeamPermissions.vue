@@ -29,7 +29,9 @@
 
   const fetchPermissions = async () => {
     const teamPermissions = await props.listPermissionService()
-    const alreadySelectedPermissionsIds = permissions.value.map((permission) => permission.id)
+
+    const alreadySelectedPermissionsIds =
+      permissions.value?.map((permission) => permission.id) || []
 
     const alreadySelectedPermissions =
       teamPermissions.filter((permission) =>

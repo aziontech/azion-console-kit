@@ -104,7 +104,7 @@
   }
 
   const openCreateOriginDrawer = () => {
-    tracker
+    tracker.product
       .clickToCreate({
         productName: 'Origin'
       })
@@ -113,7 +113,7 @@
   }
 
   const openEditOriginDrawer = (item) => {
-    tracker
+    tracker.product
       .clickToEdit({
         productName: 'Origin'
       })

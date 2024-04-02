@@ -1,3 +1,4 @@
+import checkAccountStatus from '@/helpers/account-expired'
 import { getAccountInfoService, getUserInfoService } from '@/services/account-services'
 import { logoutService } from '@/services/auth-services'
 import { useAccountStore } from '@/stores/account'
@@ -36,6 +37,8 @@ export default async function beforeEachRoute(to, __, next) {
         getAccountInfoService(),
         getUserInfoService()
       ])
+
+      checkAccountStatus(accountInfo.status)
 
       accountInfo.is_account_owner = userInfo.results.is_account_owner
       accountInfo.client_id = userInfo.results.client_id

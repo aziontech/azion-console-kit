@@ -113,19 +113,24 @@
           :tags="proxyTag"
         >
           <template #body>
-            <div class="w-full flex sm:flex-row flex-col gap-2">
-              <TextInfo
-                class="w-full sm:w-1/2 flex-1"
-                label="Cache Key"
-                >{{ details.cacheKey }}</TextInfo
-              >
-              <div class="ml-28 sm:ml-0 w-full sm:w-1/2 flex-1 flex justify-start">
-                <PrimeButton
-                  label="Copy"
-                  icon="pi pi-copy"
-                  @click="copyCacheKey"
-                  outlined
-                />
+            <div class="flex flex-col sm:flex-row sm:gap-8 gap-3 w-full items-center">
+              <div class="flex flex-col gap-3 w-full sm:w-5/12 flex-1 items-center">
+                <TextInfo label="Cache Key">
+                  <template #default>
+                    <p>
+                      {{ details.cacheKey }}
+                    </p>
+                  </template>
+                  <template #button>
+                    <PrimeButton
+                      label="Copy"
+                      class="items-center"
+                      icon="pi pi-copy"
+                      @click="copyCacheKey"
+                      outlined
+                    />
+                  </template>
+                </TextInfo>
               </div>
             </div>
 

@@ -47,7 +47,7 @@
               <div
                 class="w-11 h-11 flex flex-shrink-0 justify-center items-center rounded-md surface-200"
               >
-                <span class="pi pi-box"></span>
+                <span class="ai ai-edge-application"></span>
               </div>
               <div class="flex flex-col gap-2">
                 <div class="text-lg sm:text-xl font-medium">Manage Applications</div>
@@ -87,7 +87,7 @@
               <div
                 class="w-11 h-11 flex flex-shrink-0 justify-center items-center rounded-md surface-200"
               >
-                <span class="pi pi-chart-line"></span>
+                <span class="ai ai-real-time-metrics"></span>
               </div>
               <div class="flex flex-col gap-2">
                 <div class="text-lg sm:text-xl font-medium">View Analytics</div>
@@ -211,7 +211,7 @@
   import { useForm } from 'vee-validate'
   import * as yup from 'yup'
   import FormFieldsHome from './FormFields/FormFieldsHome.vue'
-  /**@type {import('@/plugins/adapters/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
+  /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
 
   export default {
     name: 'home-view',
@@ -324,7 +324,7 @@
       const createModalStore = useCreateModalStore()
 
       const openModalCreate = () => {
-        tracker.createEventInHomeAndHeader({ url: '/', location: 'home' }).track()
+        tracker.create.createEventInHomeAndHeader({ url: '/', location: 'home' }).track()
         createModalStore.toggle()
       }
 

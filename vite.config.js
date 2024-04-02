@@ -20,7 +20,8 @@ const getConfig = () => {
         '@services': fileURLToPath(new URL('./src/services', import.meta.url)),
         '@stores': fileURLToPath(new URL('./src/stores', import.meta.url)),
         '@assets': fileURLToPath(new URL('./src/assets', import.meta.url)),
-        '@routes': fileURLToPath(new URL('./src/router/routes', import.meta.url))
+        '@routes': fileURLToPath(new URL('./src/router/routes', import.meta.url)),
+        '@modules': fileURLToPath(new URL('./src/modules', import.meta.url))
       }
     },
     server: {
@@ -41,11 +42,6 @@ const getConfig = () => {
           target: `${URLStartPrefix}cities.azion.com`,
           changeOrigin: true,
           rewrite: (path) => path.replace(/^\/graphql\/cities/, '/graphql')
-        },
-        '/metrics/graphql': {
-          target: `${URLStartPrefix}manager.azion.com/metrics/graphql`,
-          changeOrigin: true,
-          rewrite: (path) => path.replace(/^\/metrics\/graphql/, '')
         },
         '^/api/(account|user|token|switch-account|auth|password|totp)|^/logout': {
           target: `${URLStartPrefix}sso.azion.com`,

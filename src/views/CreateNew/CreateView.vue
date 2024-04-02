@@ -246,7 +246,7 @@ import { useLoadingStore } from '@/stores/loading'
   import { useToast } from 'primevue/usetoast'
   import { inject, onMounted, ref, watchEffect } from 'vue'
   import { useRoute, useRouter } from 'vue-router'
-  /**@type {import('@/plugins/adapters/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
+  /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
 
   const isLoading = ref(false)
@@ -328,7 +328,7 @@ import { useLoadingStore } from '@/stores/loading'
   }
 
   const openDetails = () => {
-    tracker.clickMoreDetailsOnTemplate(solutionTrackerData.value).track()
+    tracker.create.clickMoreDetailsOnTemplate(solutionTrackerData.value).track()
     showDetails.value = true
   }
 
@@ -339,7 +339,7 @@ import { useLoadingStore } from '@/stores/loading'
   }
 
   const handleSubmitClick = () => {
-    tracker
+    tracker.create
       .eventClickedToDeploy({
         isv: solution.value.vendor.slug,
         version: solution.value.version,

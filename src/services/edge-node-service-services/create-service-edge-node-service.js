@@ -68,7 +68,7 @@ const parseHttpResponse = (httpResponse) => {
   switch (httpResponse.statusCode) {
     case 201:
       return {
-        feedback: `Service was added to an edge node`,
+        feedback: `Service was added to the edge node`,
         resource: httpResponse.body
       }
     case 400:
