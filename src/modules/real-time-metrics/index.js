@@ -182,7 +182,7 @@ const RealTimeMetricsModule = () => {
   /**
    * Loads the current reports by selected dashboard. This methods has a circular dependency with the module.
    *
-   * @param {string} userUTC - The user time zone
+   * @param {string} userUTC - The user time zone. Example: "+0300".
    * @return {Promise<void>} A promise that resolves when the reports are loaded.
    */
   const loadCurrentReports = async (userUTC) => {
