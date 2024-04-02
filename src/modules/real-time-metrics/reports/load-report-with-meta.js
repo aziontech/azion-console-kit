@@ -1,4 +1,3 @@
-import { useAccountStore } from '@/stores/account'
 import { loadRealTimeMetricsData } from '@services/real-time-metrics-services'
 import FillResultQuery from './fill-result-query'
 import ConvertBeholderToChart from './convert-beholder-to-chart'
@@ -29,10 +28,12 @@ function removeUnfinishedRegister(registers, { filterEndDatetime, currentEndDate
  *
  * Join the filters
  *
- * @param {reportMetaTag} ReportMetaTag
+ * @param {Object} filters - The filters object
+ * @param {Object} report - The report object
+ * @param {string} userUTC - The user time zone
  * @returns beholder GraphQL Result
  */
-export default async function LoadReportWithMeta(filters, report) {
+export default async function LoadReportWithMeta(filters, report, userUTC) {
   const { signal } = report
 
   const newReport = { ...report }
@@ -96,9 +97,6 @@ export default async function LoadReportWithMeta(filters, report) {
   }
 
   const groupBy = report.groupBy.filter((item) => item !== report.xAxis)
-
-  const accountStore = useAccountStore()
-  const userUTC = accountStore.accountUtcOffset
 
   const resultChart = ConvertBeholderToChart({
     data: resultQuery,
