@@ -1,6 +1,7 @@
-import { useMetricsStore } from '@/stores/metrics'
 import LoadReportVariation from './load-report-variation'
 import LoadReportWithMeta from './load-report-with-meta'
+
+import RealTimeMetricsModule from '@modules/real-time-metrics'
 
 let abortController = null
 
@@ -67,8 +68,10 @@ async function resolveReport(report, filters) {
     reportInfo.variationValue = await LoadReportVariation({ filters, report: clonedReport })
   }
 
-  const metricsStore = useMetricsStore()
-  metricsStore.setCurrentReportValue(reportInfo)
+  const {
+    actions: { setCurrentReportValue }
+  } = RealTimeMetricsModule()
+  setCurrentReportValue(reportInfo)
 }
 
 /**
@@ -89,9 +92,11 @@ export default async function LoadReportsDataBySelectedDashboard(
 
   const availableReports = reportsBySelectedDashboard(reports, currentDashboard)
 
-  const metricsStore = useMetricsStore()
+  const {
+    actions: { setCurrentReports }
+  } = RealTimeMetricsModule()
 
-  metricsStore.setCurrentReports(availableReports)
+  setCurrentReports(availableReports)
 
   availableReports.forEach((report) => {
     resolveReport(report, filters)
