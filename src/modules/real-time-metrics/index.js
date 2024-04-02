@@ -6,6 +6,30 @@ import {
 } from '@/modules/real-time-metrics/filters'
 
 const RealTimeMetricsModule = () => {
+  const groupObservers = []
+  const reportObservers = []
+  const filterObservers = []
+
+  const subscribe = (observerList) => {
+    return (subscriber) => {
+      observerList.push(subscriber)
+    }
+  }
+
+  const unsubscribe = (observerList) => {
+    return (subscriber) => {
+      observerList.splice(observerList.indexOf(subscriber), 1)
+    }
+  }
+
+  const notify = (observerList, data) => {
+    return () => {
+      observerList.forEach((observer) => {
+        observer(data)
+      })
+    }
+  }
+
   const group = {
     all: [...GROUP_DASHBOARDS],
     current: {},
@@ -34,6 +58,7 @@ const RealTimeMetricsModule = () => {
   const setDatasetAvailableFilters = async () => {
     const availableFilters = await LoadDatasetAvailableFilters(group.currentDashboard.dataset)
     filters.datasetAvailable = availableFilters
+    notify(filterObservers, filters)
   }
 
   /**
@@ -44,6 +69,7 @@ const RealTimeMetricsModule = () => {
   const setInfoAvailableFilters = async () => {
     const availableFilters = await LoadInfoAvailableFilters()
     filters.infoAvailable = availableFilters
+    notify(filterObservers, filters)
   }
 
   /**
@@ -54,6 +80,7 @@ const RealTimeMetricsModule = () => {
    */
   const setCurrentGroupPage = (groupPage) => {
     group.current = groupPage
+    notify(groupObservers, group)
   }
 
   /**
@@ -65,6 +92,7 @@ const RealTimeMetricsModule = () => {
   const setCurrentPage = (page) => {
     group.currentPage = page
     ;[group.currentDashboard] = group.currentPage.dashboards
+    notify(groupObservers, group)
   }
 
   /**
@@ -74,6 +102,7 @@ const RealTimeMetricsModule = () => {
    */
   const setCurrentDashboard = (dashboard) => {
     group.currentDashboard = dashboard
+    notify(groupObservers, group)
   }
 
   /**
@@ -85,6 +114,7 @@ const RealTimeMetricsModule = () => {
     ;[group.current] = group.all
     ;[group.currentPage] = group.current.pagesDashboards
     ;[group.currentDashboard] = group.currentPage.dashboards
+    notify(groupObservers, group)
   }
 
   /**
@@ -104,6 +134,8 @@ const RealTimeMetricsModule = () => {
     group.currentDashboard = group.currentPage.dashboards.find(
       ({ path }) => `${path}` === dashboardId
     )
+
+    notify(groupObservers, group)
   }
 
   /**
@@ -120,6 +152,8 @@ const RealTimeMetricsModule = () => {
     const { dashboards } = page
 
     ;[group.currentDashboard] = dashboards
+
+    notify(groupObservers, group)
   }
 
   /**
@@ -130,6 +164,7 @@ const RealTimeMetricsModule = () => {
    */
   const setFilters = (filters) => {
     filters.selected = filters
+    notify(filterObservers, filters)
   }
 
   /**
@@ -140,6 +175,8 @@ const RealTimeMetricsModule = () => {
   const resetFilters = () => {
     const tsRange = filters.selected.tsRange
     setFilters({ tsRange })
+
+    notify(filterObservers, filters)
   }
 
   /**
@@ -149,6 +186,7 @@ const RealTimeMetricsModule = () => {
    */
   const loadCurrentReports = async () => {
     await LoadReportsDataBySelectedDashboard(filters.selected, reports.all, group.currentDashboard)
+    notify(reportObservers, reports)
   }
 
   /**
@@ -159,11 +197,12 @@ const RealTimeMetricsModule = () => {
    */
   const setCurrentReports = (availableReports) => {
     reports.current = availableReports
+    notify(reportObservers, reports)
   }
 
   /**
    * Updates the current report value based on the provided report information.
-   *
+   * This method has a circular dependency with the module.
    * @param {Object} reportInfo - The report information containing the report ID and other details.
    * @return {void} This function does not return a value.
    */
@@ -178,6 +217,8 @@ const RealTimeMetricsModule = () => {
       ...reports.current[reportIdx],
       ...reportInfo
     }
+
+    notify(reportObservers, reports)
   }
 
   /**
@@ -195,6 +236,8 @@ const RealTimeMetricsModule = () => {
     filters.selected.tsRange.meta = meta
     filters.selected.tsRange.begin = tsRangeBegin
     filters.selected.tsRange.end = tsRangeEnd
+
+    notify(filterObservers, filters)
   }
 
   /**
@@ -217,6 +260,8 @@ const RealTimeMetricsModule = () => {
     } else {
       filters.selected.datasets[filterIndex] = filterIn
     }
+
+    notify(filterObservers, filters)
   }
 
   /**
@@ -233,12 +278,23 @@ const RealTimeMetricsModule = () => {
       ...valueAnd,
       meta: { fieldPrefix: 'and_' }
     }
+
+    notify(filterObservers, filters)
   }
 
   return {
-    group,
-    reports,
-    filters,
+    group: {
+      subscribe: subscribe(groupObservers),
+      unsubscribe: unsubscribe(groupObservers)
+    },
+    reports: {
+      subscribe: subscribe(reportObservers),
+      unsubscribe: unsubscribe(reportObservers)
+    },
+    filters: {
+      subscribe: subscribe(filterObservers),
+      unsubscribe: unsubscribe(filterObservers)
+    },
     actions: {
       setDatasetAvailableFilters,
       setInfoAvailableFilters,
