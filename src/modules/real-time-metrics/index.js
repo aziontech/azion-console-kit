@@ -182,10 +182,16 @@ const RealTimeMetricsModule = () => {
   /**
    * Loads the current reports by selected dashboard. This methods has a circular dependency with the module.
    *
+   * @param {string} userUTC - The user time zone
    * @return {Promise<void>} A promise that resolves when the reports are loaded.
    */
-  const loadCurrentReports = async () => {
-    await LoadReportsDataBySelectedDashboard(filters.selected, reports.all, group.currentDashboard)
+  const loadCurrentReports = async (userUTC) => {
+    await LoadReportsDataBySelectedDashboard(
+      filters.selected,
+      reports.all,
+      group.currentDashboard,
+      userUTC
+    )
     notify(reportObservers, reports)
   }
 

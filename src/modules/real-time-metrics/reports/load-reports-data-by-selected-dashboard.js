@@ -28,9 +28,10 @@ function reportsBySelectedDashboard(reports, currentDashboard) {
  *
  * @param {Object} report - The report object containing the report details.
  * @param {Object} filters - The filters to be applied to the report.
+ * @param {string} userUTC - The user time zone
  * @return {Promise<void>} - A promise that resolves when the report is resolved and the metrics store is updated.
  */
-async function resolveReport(report, filters) {
+async function resolveReport(report, filters, userUTC) {
   const maxSeriesToDisplayTag = 2
   const minSeriesToShowMeanLine = 1
   const minSeriesToShowMeanLinePerSeries = 2
@@ -39,7 +40,7 @@ async function resolveReport(report, filters) {
     ...report,
     signal: abortController.signal
   }
-  const reportData = await LoadReportWithMeta(filters, reportWithCancelation)
+  const reportData = await LoadReportWithMeta(filters, reportWithCancelation, userUTC)
 
   const hasAggregation = reportData.resultChart.length <= maxSeriesToDisplayTag
   const hasResults = reportData.resultChart.length
@@ -65,7 +66,11 @@ async function resolveReport(report, filters) {
       signal: abortController.signal
     }
 
-    reportInfo.variationValue = await LoadReportVariation({ filters, report: clonedReport })
+    reportInfo.variationValue = await LoadReportVariation({
+      filters,
+      report: clonedReport,
+      userUTC
+    })
   }
 
   const {
@@ -80,12 +85,14 @@ async function resolveReport(report, filters) {
  * @param {Array} filters - The filters to apply to the reports.
  * @param {Array} reports - The list of reports to generate data for.
  * @param {string} currentDashboard - The current dashboard being viewed.
+ * @param {string} userUTC - The user time zone
  * @return {Promise} A promise that resolves when all reports data is loaded.
  */
 export default async function LoadReportsDataBySelectedDashboard(
   filters,
   reports,
-  currentDashboard
+  currentDashboard,
+  userUTC
 ) {
   if (abortController) abortController.abort()
   abortController = new AbortController()
@@ -99,6 +106,6 @@ export default async function LoadReportsDataBySelectedDashboard(
   setCurrentReports(availableReports)
 
   availableReports.forEach((report) => {
-    resolveReport(report, filters)
+    resolveReport(report, filters, userUTC)
   })
 }
