@@ -1,42 +1,64 @@
 <script setup>
-  import { useMetricsStore } from '@/stores/metrics'
-  import { storeToRefs } from 'pinia'
   import Dropdown from 'primevue/dropdown'
   import Skeleton from 'primevue/skeleton'
   import TabMenu from 'primevue/tabmenu'
   import { computed } from 'vue'
+  import {
+    getGroupPages,
+    groupPageCurrent,
+    getPages,
+    pageCurrent
+  } from '@/modules/real-time-metrics/helpers/getters'
 
-  const metricsStore = useMetricsStore()
-  const { getGroupPages, groupPageCurrent, getPages, pageCurrent } = storeToRefs(metricsStore)
+  const props = defineProps({
+    moduleActions: {
+      type: Object,
+      required: true
+    },
+    groupData: {
+      type: Object,
+      required: true
+    },
+    userUTC: {
+      type: String,
+      required: true
+    }
+  })
+
   const {
     setCurrentGroupPageByLabels,
     resetFilters,
     setCurrentPage,
     setDatasetAvailableFilters,
     loadCurrentReports
-  } = metricsStore
+  } = props.moduleActions
 
   const metricsGroups = computed(() => {
-    return getGroupPages.value
+    return getGroupPages({ group: props.groupData })
   })
 
   const selectedGroup = computed(() => {
-    return groupPageCurrent.value
+    return groupPageCurrent({ group: props.groupData })
   })
 
   const changeGroup = async (evt) => {
     resetFilters()
+
     setCurrentGroupPageByLabels(evt.value.label)
     await setDatasetAvailableFilters()
-    await loadCurrentReports()
+    await loadCurrentReports(props.userUTC)
   }
 
   const groupPages = computed(() => {
-    return getPages.value
+    return getPages({ group: props.groupData })
+  })
+
+  const currentPage = computed(() => {
+    return pageCurrent({ group: props.groupData })
   })
 
   const selectedPage = computed(() => {
-    return groupPages.value?.findIndex((dashboard) => dashboard.id === pageCurrent.value?.id)
+    return groupPages.value?.findIndex((dashboard) => dashboard.id === currentPage.value?.id)
   })
 
   const changePage = async (evt) => {
@@ -44,7 +66,7 @@
     const selectedPage = groupPages.value[evt.index]
     setCurrentPage(selectedPage)
     await setDatasetAvailableFilters()
-    await loadCurrentReports()
+    await loadCurrentReports(props.userUTC)
   }
 </script>
 <template>
