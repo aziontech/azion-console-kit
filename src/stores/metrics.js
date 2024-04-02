@@ -74,9 +74,6 @@ export const useMetricsStore = defineStore('metrics', {
     currentFilters: (state) => state.filters.selected,
     getDatasetAvailableFilters: (state) => {
       return state.filters.datasetAvailable
-    },
-    getCurrentReportsDataById: (state) => {
-      return (id) => state.reports.current.find((report) => report.id === id)
     }
   },
   actions: {
@@ -96,7 +93,6 @@ export const useMetricsStore = defineStore('metrics', {
     setCurrentPage(page) {
       this.group.currentPage = page
       ;[this.group.currentDashboard] = this.group.currentPage.dashboards
-      this.group.currentDashboard.active = true
     },
     setCurrentDashboard(dashboard) {
       this.group.currentDashboard = dashboard
@@ -105,7 +101,6 @@ export const useMetricsStore = defineStore('metrics', {
       ;[this.group.current] = this.group.all
       ;[this.group.currentPage] = this.group.current.pagesDashboards
       ;[this.group.currentDashboard] = this.group.currentPage.dashboards
-      this.group.currentDashboard.active = true
     },
     setInitialCurrentsByIds({ pageId, dashboardId }) {
       this.group.current = this.group.all.find((groupPage) => {
@@ -113,29 +108,17 @@ export const useMetricsStore = defineStore('metrics', {
         return this.group.currentPage
       })
 
-      const newListDashboards = this.group.currentPage.dashboards.map((dashboard) => {
-        const updateDashboard = {
-          ...dashboard,
-          active: `${dashboard.path}` === dashboardId
-        }
-        return updateDashboard
-      })
-
-      this.group.currentPage.dashboards = newListDashboards
-      this.group.currentDashboard = newListDashboards.find(({ path }) => `${path}` === dashboardId)
+      this.group.currentDashboard = this.group.currentPage.dashboards.find(
+        ({ path }) => `${path}` === dashboardId
+      )
     },
     setCurrentGroupPageByLabels(labelGroup) {
-      this.currentGroupPage = this.group.all.find(({ label }) => label === labelGroup)
+      this.group.current = this.group.all.find(({ label }) => label === labelGroup)
 
       const page = this.group.current?.pagesDashboards[0]
       this.group.currentPage = { ...page }
       const { dashboards } = page
 
-      dashboards.forEach((dash) => {
-        dash.active = false
-      })
-
-      dashboards[0].active = true
       ;[this.group.currentDashboard] = dashboards
     },
     setFilters(filters) {
