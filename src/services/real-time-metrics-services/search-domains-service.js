@@ -1,10 +1,13 @@
 import * as Errors from '@/services/axios/errors'
-import axios from 'axios'
 import { AxiosHttpClientAdapter } from '../axios/AxiosHttpClientAdapter'
 import { makeDomainsBaseUrl } from './make-domains-base-url'
 
-const cancelRequest = axios.CancelToken
-const source = cancelRequest.source()
+/*
+  Cache strategy is used to prevent making multiple calls to the same endpoint under the same conditions.
+*/
+let cache
+
+let prevParams = {}
 
 export const searchDomainsService = async ({
   orderBy = 'name',
@@ -12,17 +15,24 @@ export const searchDomainsService = async ({
   page = 1,
   pageSize = 200
 } = {}) => {
-  source.cancel()
-  const searchParams = makeSearchParams({ orderBy, sort, page, pageSize })
-  let httpResponse = await AxiosHttpClientAdapter.request({
-    url: `${makeDomainsBaseUrl()}?${searchParams.toString()}`,
-    method: 'GET',
-    cancelToken: source.token
-  })
+  const params = { orderBy, sort, page, pageSize }
+  const isSameParams = JSON.stringify(params) === JSON.stringify(prevParams)
 
-  httpResponse = adapt(httpResponse)
+  if (!isSameParams || !cache) {
+    prevParams = params
+    const searchParams = makeSearchParams(params)
 
-  return parseHttpResponse(httpResponse)
+    let httpResponse = await AxiosHttpClientAdapter.request({
+      url: `${makeDomainsBaseUrl()}?${searchParams.toString()}`,
+      method: 'GET'
+    })
+
+    httpResponse = adapt(httpResponse)
+
+    return parseHttpResponse(httpResponse)
+  }
+
+  return cache
 }
 
 const adapt = (httpResponse) => {
@@ -56,8 +66,11 @@ const makeSearchParams = ({ orderBy, sort, page, pageSize }) => {
  */
 
 const parseHttpResponse = (httpResponse) => {
+  cache = null
+
   switch (httpResponse.statusCode) {
     case 200:
+      cache = httpResponse.body
       return httpResponse.body
     case 400:
       throw new Errors.InvalidApiRequestError().message

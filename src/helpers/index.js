@@ -4,7 +4,12 @@ import {
   openContactSupport,
   openDocumentation,
   openGoogleAuthenticatorAppDocumentation,
-  openSearchResult
+  openSearchResult,
+  openAzionSite,
+  openAzionBlog,
+  openAzionDiscord,
+  openAzionGithub,
+  openAzionX
 } from './azion-documentation-window-opener'
 import { azionPrivacyPolicyWindowOpener } from './azion-privacy-policy-opener'
 import { azionTermsAndServicesWindowOpener } from './azion-terms-and-services-opener'
@@ -36,6 +41,11 @@ export {
   openDocumentation,
   openGoogleAuthenticatorAppDocumentation,
   openSearchResult,
+  openAzionSite,
+  openAzionBlog,
+  openAzionDiscord,
+  openAzionGithub,
+  openAzionX,
   parseCamelToSnake,
   parseSnakeToCamel,
   themeSelect,
