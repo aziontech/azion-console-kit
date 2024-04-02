@@ -23,11 +23,9 @@ const RealTimeMetricsModule = () => {
   }
 
   const notify = (observerList, data) => {
-    return () => {
-      observerList.forEach((observer) => {
-        observer(data)
-      })
-    }
+    observerList.forEach((observer) => {
+      observer(data)
+    })
   }
 
   const group = {
@@ -51,26 +49,19 @@ const RealTimeMetricsModule = () => {
   }
 
   /**
-   * Set the dataset available filters asynchronously.
+   * Sets the initial page and dashboard for the current group.
    *
-   * @return {Promise<void>} Promise that resolves once the filters are set
+   * @return {void} No return value.
    */
-  const setDatasetAvailableFilters = async () => {
-    const availableFilters = await LoadDatasetAvailableFilters(group.currentDashboard.dataset)
-    filters.datasetAvailable = availableFilters
-    notify(filterObservers, filters)
+  const setInitialPageAndDashboardCurrent = () => {
+    ;[group.current] = group.all
+    ;[group.currentPage] = group.current.pagesDashboards
+    ;[group.currentDashboard] = group.currentPage.dashboards
   }
 
-  /**
-   * function sets the infoAvailable filters.
-   *
-   * @return {Promise<void>} A promise that resolves once the available filters are set.
-   */
-  const setInfoAvailableFilters = async () => {
-    const availableFilters = await LoadInfoAvailableFilters()
-    filters.infoAvailable = availableFilters
-    notify(filterObservers, filters)
-  }
+  setInitialPageAndDashboardCurrent()
+
+  /* GROUP ACTIONS */
 
   /**
    * Sets the current group page to the specified value.
@@ -102,18 +93,6 @@ const RealTimeMetricsModule = () => {
    */
   const setCurrentDashboard = (dashboard) => {
     group.currentDashboard = dashboard
-    notify(groupObservers, group)
-  }
-
-  /**
-   * Sets the initial page and dashboard for the current group.
-   *
-   * @return {void} No return value.
-   */
-  const setInitialPageAndDashboardCurrent = () => {
-    ;[group.current] = group.all
-    ;[group.currentPage] = group.current.pagesDashboards
-    ;[group.currentDashboard] = group.currentPage.dashboards
     notify(groupObservers, group)
   }
 
@@ -156,6 +135,30 @@ const RealTimeMetricsModule = () => {
     notify(groupObservers, group)
   }
 
+  /* FILTER ACTIONS */
+
+  /**
+   * Set the dataset available filters asynchronously.
+   *
+   * @return {Promise<void>} Promise that resolves once the filters are set
+   */
+  const setDatasetAvailableFilters = async () => {
+    const availableFilters = await LoadDatasetAvailableFilters(group.currentDashboard.dataset)
+    filters.datasetAvailable = availableFilters
+    notify(filterObservers, filters)
+  }
+
+  /**
+   * function sets the infoAvailable filters.
+   *
+   * @return {Promise<void>} A promise that resolves once the available filters are set.
+   */
+  const setInfoAvailableFilters = async () => {
+    const availableFilters = await LoadInfoAvailableFilters()
+    filters.infoAvailable = availableFilters
+    notify(filterObservers, filters)
+  }
+
   /**
    * Sets the selected filters to the provided filters.
    *
@@ -180,12 +183,58 @@ const RealTimeMetricsModule = () => {
   }
 
   /**
+   * Updates the dataset filter with the given filter object.
+   *
+   * @param {Object} filterIn - The filter object to be added or updated.
+   * @param {string} filterIn.fieldName - The name of the field to be filtered.
+   * @return {void} This function does not return a value.
+   */
+  const filterDatasetUpdate = (filterIn) => {
+    const { fieldName } = filterIn
+    if (!filters.selected.datasets) {
+      filters.selected.datasets = []
+    }
+    const filterIndex = filters.selected.datasets.findIndex(
+      (dataset) => dataset.fieldName === fieldName
+    )
+    if (filterIndex === -1) {
+      filters.selected.datasets.push(filterIn)
+    } else {
+      filters.selected.datasets[filterIndex] = filterIn
+    }
+
+    notify(filterObservers, filters)
+  }
+
+  /**
+   * A function that creates and filters based on the provided valueAnd object.
+   *
+   * @param {Object} valueAnd - The object containing filter values for 'and' selection.
+   * @param {string} valueAnd.fieldName - The name of the field to be filtered.
+   * @param {string} valueAnd.fieldValue - The value of the field to be filtered.
+   * @return {void} This function does not return a value.
+   */
+  const createAndFilter = (valueAnd) => {
+    filters.selected.and = {
+      ...filters.selected.and,
+      ...valueAnd,
+      meta: { fieldPrefix: 'and_' }
+    }
+
+    notify(filterObservers, filters)
+  }
+
+  /* REPORT ACTIONS */
+
+  /**
    * Loads the current reports by selected dashboard. This methods has a circular dependency with the module.
    *
    * @param {string} userUTC - The user time zone. Example: "+0300".
    * @return {Promise<void>} A promise that resolves when the reports are loaded.
    */
   const loadCurrentReports = async (userUTC) => {
+    if (!userUTC) return
+
     await LoadReportsDataBySelectedDashboard(
       filters.selected,
       reports.all,
@@ -246,78 +295,35 @@ const RealTimeMetricsModule = () => {
     notify(filterObservers, filters)
   }
 
-  /**
-   * Updates the dataset filter with the given filter object.
-   *
-   * @param {Object} filterIn - The filter object to be added or updated.
-   * @param {string} filterIn.fieldName - The name of the field to be filtered.
-   * @return {void} This function does not return a value.
-   */
-  const filterDatasetUpdate = (filterIn) => {
-    const { fieldName } = filterIn
-    if (!filters.selected.datasets) {
-      filters.selected.datasets = []
-    }
-    const filterIndex = filters.selected.datasets.findIndex(
-      (dataset) => dataset.fieldName === fieldName
-    )
-    if (filterIndex === -1) {
-      filters.selected.datasets.push(filterIn)
-    } else {
-      filters.selected.datasets[filterIndex] = filterIn
-    }
-
-    notify(filterObservers, filters)
-  }
-
-  /**
-   * A function that creates and filters based on the provided valueAnd object.
-   *
-   * @param {Object} valueAnd - The object containing filter values for 'and' selection.
-   * @param {string} valueAnd.fieldName - The name of the field to be filtered.
-   * @param {string} valueAnd.fieldValue - The value of the field to be filtered.
-   * @return {void} This function does not return a value.
-   */
-  const createAndFilter = (valueAnd) => {
-    filters.selected.and = {
-      ...filters.selected.and,
-      ...valueAnd,
-      meta: { fieldPrefix: 'and_' }
-    }
-
-    notify(filterObservers, filters)
-  }
-
   return {
-    group: {
+    groupObservable: {
       subscribe: subscribe(groupObservers),
       unsubscribe: unsubscribe(groupObservers)
     },
-    reports: {
+    reportObservable: {
       subscribe: subscribe(reportObservers),
       unsubscribe: unsubscribe(reportObservers)
     },
-    filters: {
+    filterObservable: {
       subscribe: subscribe(filterObservers),
       unsubscribe: unsubscribe(filterObservers)
     },
     actions: {
-      setDatasetAvailableFilters,
-      setInfoAvailableFilters,
-      setFilters,
-      resetFilters,
-      loadCurrentReports,
-      setCurrentReports,
-      setCurrentReportValue,
-      setTimeRange,
-      filterDatasetUpdate,
-      createAndFilter,
       setCurrentDashboard,
       setCurrentPage,
       setCurrentGroupPageByLabels,
-      setInitialPageAndDashboardCurrent,
       setCurrentGroupPage,
-      setInitialCurrentsByIds
+      setInitialCurrentsByIds,
+      setDatasetAvailableFilters,
+      setInfoAvailableFilters,
+      setFilters,
+      setTimeRange,
+      createAndFilter,
+      filterDatasetUpdate,
+      resetFilters,
+      loadCurrentReports,
+      setCurrentReports,
+      setCurrentReportValue
     }
   }
 }
