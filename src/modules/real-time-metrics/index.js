@@ -234,9 +234,8 @@ const RealTimeMetricsModule = () => {
    * @param {string} userUTC - The user time zone. Example: "+0300".
    * @return {Promise<void>} A promise that resolves when the reports are loaded.
    */
+  let abortController
   const loadCurrentReports = async (userUTC) => {
-    let abortController
-
     if (abortController) {
       abortController.abort()
     }
