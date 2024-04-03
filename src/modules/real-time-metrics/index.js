@@ -187,7 +187,6 @@ const RealTimeMetricsModule = () => {
    * Updates the dataset filter with the given filter object.
    *
    * @param {Object} filterIn - The filter object to be added or updated.
-   * @param {string} filterIn.fieldName - The name of the field to be filtered.
    * @return {void} This function does not return a value.
    */
   const filterDatasetUpdate = (filterIn) => {
