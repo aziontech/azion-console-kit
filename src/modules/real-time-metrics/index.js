@@ -235,15 +235,24 @@ const RealTimeMetricsModule = () => {
    * @return {Promise<void>} A promise that resolves when the reports are loaded.
    */
   const loadCurrentReports = async (userUTC) => {
-    const { availableReports, signal } = LoadReportsDataBySelectedDashboard(
-      reports.all,
-      group.currentDashboard
-    )
+    let abortController
+
+    if (abortController) {
+      abortController.abort()
+    }
+    abortController = new AbortController()
+
+    const availableReports = LoadReportsDataBySelectedDashboard(reports.all, group.currentDashboard)
 
     setCurrentReports(availableReports)
 
     availableReports.forEach(async (report) => {
-      const reportInfo = await ResolveReport(report, filters.selected, userUTC, signal)
+      const reportInfo = await ResolveReport(
+        report,
+        filters.selected,
+        userUTC,
+        abortController.signal
+      )
       setCurrentReportValue(reportInfo)
     })
 
