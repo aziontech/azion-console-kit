@@ -6,17 +6,21 @@
     <template #content>
       <TabsPageBlock
         v-if="groupData"
+        :key="groupData.current?.id"
         :moduleActions="metricsModule.actions"
+        :moduleGetters="metricsModule.getters"
         :groupData="groupData"
         :userUTC="userUTC"
       />
       <div class="card surface-border border rounded-md surface-section p-3.5 flex flex-col gap-4">
         <IntervalFilterBlock
           v-if="filterData"
-          @applyTSRange="load"
+          :key="filterData.current?.id"
           :moduleActions="metricsModule.actions"
+          :moduleGetters="metricsModule.getters"
           :filterData="filterData"
           :userUTC="userUTC"
+          @applyTSRange="load"
         />
         <ContentFilterBlock :playgroundOpener="playgroundOpener" />
       </div>
