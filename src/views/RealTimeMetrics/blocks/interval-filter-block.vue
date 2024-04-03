@@ -1,15 +1,14 @@
 <script setup>
-  import {
-    getDateTimeFilterOptions,
-    currentFilters,
-    getIsLoadingFilters
-  } from '@modules/real-time-metrics/helpers/getters'
   import Calendar from 'primevue/calendar'
   import Dropdown from 'primevue/dropdown'
   import { computed, onBeforeMount, ref, watch } from 'vue'
 
   const props = defineProps({
     moduleActions: {
+      type: Object,
+      required: true
+    },
+    moduleGetters: {
       type: Object,
       required: true
     },
@@ -24,6 +23,8 @@
   })
 
   const { setTimeRange } = props.moduleActions
+
+  const { getDateTimeFilterOptions, currentFilters, getIsLoadingFilters } = props.moduleGetters
 
   const intervalOptions = computed(() => {
     return getDateTimeFilterOptions({ filters: props.filterData })

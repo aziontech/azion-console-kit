@@ -3,15 +3,13 @@
   import Skeleton from 'primevue/skeleton'
   import TabMenu from 'primevue/tabmenu'
   import { computed } from 'vue'
-  import {
-    getGroupPages,
-    groupPageCurrent,
-    getPages,
-    pageCurrent
-  } from '@/modules/real-time-metrics/helpers/getters'
 
   const props = defineProps({
     moduleActions: {
+      type: Object,
+      required: true
+    },
+    moduleGetters: {
       type: Object,
       required: true
     },
@@ -32,6 +30,8 @@
     setDatasetAvailableFilters,
     loadCurrentReports
   } = props.moduleActions
+
+  const { getGroupPages, groupPageCurrent, getPages, pageCurrent } = props.moduleGetters
 
   const metricsGroups = computed(() => {
     return getGroupPages({ group: props.groupData })
