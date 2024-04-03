@@ -152,7 +152,7 @@
         updatedTimeRange(value)
       }
     },
-    { deep: true }
+    { deep: true, immediate: true }
   )
 
   onBeforeMount(() => {

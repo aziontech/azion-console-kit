@@ -24,7 +24,16 @@
         />
         <ContentFilterBlock :playgroundOpener="playgroundOpener" />
       </div>
-      <DashboardPanelBlock :clipboardWrite="clipboardWrite" />
+      <DashboardPanelBlock
+        v-if="reportData"
+        :key="groupData.currentDashboard?.id"
+        :clipboardWrite="clipboardWrite"
+        :moduleActions="metricsModule.actions"
+        :moduleGetters="metricsModule.getters"
+        :reportData="reportData"
+        :groupData="groupData"
+        :userUTC="userUTC"
+      />
     </template>
   </ContentBlock>
 </template>
@@ -83,17 +92,17 @@
   const reportData = ref(null)
 
   const updateGroupData = (data) => {
-    groupData.value = data
+    groupData.value = { ...data }
   }
   groupObservable.subscribe(updateGroupData)
 
   const updateFilterData = (data) => {
-    filterData.value = data
+    filterData.value = { ...data }
   }
   filterObservable.subscribe(updateFilterData)
 
   const updateReportData = (data) => {
-    reportData.value = data
+    reportData.value = { ...data }
   }
   reportObservable.subscribe(updateReportData)
 
@@ -108,6 +117,7 @@
     setCurrentPageAndDashboard()
     await setDatasetAvailableFilters()
     updateRouter()
+    await load()
   }
 
   const load = async () => {

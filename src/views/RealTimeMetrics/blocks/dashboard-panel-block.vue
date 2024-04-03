@@ -1,43 +1,60 @@
 <script setup>
-  import { useMetricsStore } from '@/stores/metrics'
   import GraphsCardBlock from '@/templates/graphs-card-block'
-  import { storeToRefs } from 'pinia'
   import SelectButton from 'primevue/selectbutton'
   import { computed } from 'vue'
 
-  defineProps({
+  const props = defineProps({
     clipboardWrite: {
       type: Function,
+      required: true
+    },
+    moduleActions: {
+      type: Object,
+      required: true
+    },
+    moduleGetters: {
+      type: Object,
+      required: true
+    },
+    groupData: {
+      type: Object,
+      required: true
+    },
+    reportData: {
+      type: Object,
+      required: true
+    },
+    userUTC: {
+      type: String,
       required: true
     }
   })
 
-  const metricsStore = useMetricsStore()
-  const { dashboardBySelectedPage, dashboardCurrent, getCurrentReportsData } =
-    storeToRefs(metricsStore)
+  const { dashboardBySelectedPage, dashboardCurrent, getCurrentReportsData } = props.moduleGetters
 
-  const { setCurrentDashboard, loadCurrentReports, setDatasetAvailableFilters } = metricsStore
+  const { setCurrentDashboard, loadCurrentReports, setDatasetAvailableFilters } =
+    props.moduleActions
 
   const dashboards = computed(() => {
-    return dashboardBySelectedPage.value
+    return dashboardBySelectedPage({ group: props.groupData })
   })
 
   const selectedDashboard = computed(() => {
-    return dashboardCurrent.value
+    return dashboardCurrent({ group: props.groupData })
+  })
+
+  const reports = computed(() => {
+    return getCurrentReportsData({ reports: props.reportData })
   })
 
   const changeDashboard = async (evt) => {
     setCurrentDashboard(evt.value)
     await setDatasetAvailableFilters()
-    await loadCurrentReports()
+    await loadCurrentReports(props.userUTC)
   }
 
   const showTabs = computed(() => {
     return dashboards.value?.length > 1
-  })
-
-  const reports = computed(() => {
-    return getCurrentReportsData.value
   })
 </script>
 
