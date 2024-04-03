@@ -63,7 +63,6 @@
         </template>
       </Column>
 
-      
       <Column
         :frozen="true"
         :alignFrozen="'right'"

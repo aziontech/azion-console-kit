@@ -2,7 +2,7 @@
 <template>
   <!-- Footer -->
   <footer
-    class="z-10 w-full px-3 md:px-8 py-6 md:py-3 border-t m-0 surface-border gap-6 place-items-stretch items-center"
+    class="z-10 w-full px-3 md:px-8 py-6 md:py-3 border-t m-0 surface-section surface-border gap-6 place-items-stretch items-center"
     :class="dynamicClassesByRouteMeta.footer"
   >
     <span
