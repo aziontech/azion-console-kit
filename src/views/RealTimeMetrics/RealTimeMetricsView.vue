@@ -3,9 +3,11 @@
     <template #heading>
       <PageHeadingBlock pageTitle="Real-Time Metrics" />
     </template>
-    <template #content>
+    <template
+      #content
+      v-if="showContent"
+    >
       <TabsPageBlock
-        v-if="groupData"
         :key="groupData.current?.id"
         :moduleActions="metricsModule.actions"
         :moduleGetters="metricsModule.getters"
@@ -14,7 +16,6 @@
       />
       <div class="card surface-border border rounded-md surface-section p-3.5 flex flex-col gap-4">
         <IntervalFilterBlock
-          v-if="filterData"
           :key="filterData.current?.id"
           :moduleActions="metricsModule.actions"
           :moduleGetters="metricsModule.getters"
@@ -22,7 +23,15 @@
           :userUTC="userUTC"
           @applyTSRange="load"
         />
-        <ContentFilterBlock :playgroundOpener="playgroundOpener" />
+        <ContentFilterBlock
+          :key="filterData.current?.id"
+          :playgroundOpener="playgroundOpener"
+          :moduleActions="metricsModule.actions"
+          :moduleGetters="metricsModule.getters"
+          :filterData="filterData"
+          :groupData="groupData"
+          :userUTC="userUTC"
+        />
       </div>
       <DashboardPanelBlock
         v-if="reportData"
@@ -104,6 +113,10 @@
   reportObservable.subscribe(updateReportData)
 
   /* ---- */
+
+  const showContent = computed(() => {
+    return groupData.value && filterData.value
+  })
 
   const getCurrentIds = computed(() => {
     return currentIdPageAndDashboard({ group: groupData.value })
