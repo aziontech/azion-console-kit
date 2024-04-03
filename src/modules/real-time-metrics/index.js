@@ -1,5 +1,8 @@
 import { GROUP_DASHBOARDS, REPORTS, TIME_INTERVALS } from '@modules/real-time-metrics/constants'
-import { LoadReportsDataBySelectedDashboard } from '@modules/real-time-metrics/reports'
+import {
+  LoadReportsDataBySelectedDashboard,
+  ResolveReport
+} from '@modules/real-time-metrics/reports'
 import {
   LoadDatasetAvailableFilters,
   LoadInfoAvailableFilters
@@ -227,20 +230,24 @@ const RealTimeMetricsModule = () => {
   /* REPORT ACTIONS */
 
   /**
-   * Loads the current reports by selected dashboard. This methods has a circular dependency with the module.
+   * Loads the current reports by selected dashboard.
    *
    * @param {string} userUTC - The user time zone. Example: "+0300".
    * @return {Promise<void>} A promise that resolves when the reports are loaded.
    */
   const loadCurrentReports = async (userUTC) => {
-    if (!userUTC) return
-
-    await LoadReportsDataBySelectedDashboard(
-      filters.selected,
+    const { availableReports, signal } = await LoadReportsDataBySelectedDashboard(
       reports.all,
-      group.currentDashboard,
-      userUTC
+      group.currentDashboard
     )
+
+    setCurrentReports(availableReports)
+
+    availableReports.forEach((report) => {
+      const reportInfo = ResolveReport(report, filters.selected, userUTC, signal)
+      setCurrentReportValue(reportInfo)
+    })
+
     notify(reportObservers, reports)
   }
 
@@ -321,9 +328,7 @@ const RealTimeMetricsModule = () => {
       createAndFilter,
       filterDatasetUpdate,
       resetFilters,
-      loadCurrentReports,
-      setCurrentReports,
-      setCurrentReportValue
+      loadCurrentReports
     },
     getters
   }

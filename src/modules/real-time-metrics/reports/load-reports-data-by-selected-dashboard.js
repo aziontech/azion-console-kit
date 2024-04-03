@@ -1,8 +1,3 @@
-import LoadReportVariation from './load-report-variation'
-import LoadReportWithMeta from './load-report-with-meta'
-
-import RealTimeMetricsModule from '@modules/real-time-metrics'
-
 let abortController = null
 
 /**
@@ -24,88 +19,18 @@ function reportsBySelectedDashboard(reports, currentDashboard) {
 }
 
 /**
- * Resolves a report with the given filters and updates the metrics store with the report information.
- *
- * @param {Object} report - The report object containing the report details.
- * @param {Object} filters - The filters to be applied to the report.
- * @param {string} userUTC - The user time zone
- * @return {Promise<void>} - A promise that resolves when the report is resolved and the metrics store is updated.
- */
-async function resolveReport(report, filters, userUTC) {
-  const maxSeriesToDisplayTag = 2
-  const minSeriesToShowMeanLine = 1
-  const minSeriesToShowMeanLinePerSeries = 2
-
-  const reportWithCancelation = {
-    ...report,
-    signal: abortController.signal
-  }
-  const reportData = await LoadReportWithMeta(filters, reportWithCancelation, userUTC)
-
-  const hasAggregation = reportData.resultChart.length <= maxSeriesToDisplayTag
-  const hasResults = reportData.resultChart.length
-
-  const reportInfo = {
-    reportId: report.id,
-    resultQuery: reportData.resultChart,
-    reportQuery: reportData.gqlQuery,
-    error: reportData.error,
-    hasMeanLine: reportData.resultChart.length > minSeriesToShowMeanLine,
-    hasMeanLinePerSeries: reportData.resultChart.length > minSeriesToShowMeanLinePerSeries,
-    hasFeedbackTag: hasAggregation,
-    showMeanLine: false,
-    showMeanLinePerSeries: false
-  }
-
-  if (hasAggregation && hasResults) {
-    const clonedReport = {
-      ...JSON.parse(JSON.stringify(report)),
-      reportQuery: reportData.gqlQuery,
-      xAxis: '',
-      groupBy: [],
-      signal: abortController.signal
-    }
-
-    reportInfo.variationValue = await LoadReportVariation({
-      filters,
-      report: clonedReport,
-      userUTC
-    })
-  }
-
-  const {
-    actions: { setCurrentReportValue }
-  } = RealTimeMetricsModule()
-  setCurrentReportValue(reportInfo)
-}
-
-/**
  * Generate reports data based on selected dashboard filters.
  *
- * @param {Array} filters - The filters to apply to the reports.
  * @param {Array} reports - The list of reports to generate data for.
  * @param {string} currentDashboard - The current dashboard being viewed.
- * @param {string} userUTC - The user time zone
  * @return {Promise} A promise that resolves when all reports data is loaded.
  */
-export default async function LoadReportsDataBySelectedDashboard(
-  filters,
-  reports,
-  currentDashboard,
-  userUTC
-) {
+export default async function LoadReportsDataBySelectedDashboard(reports, currentDashboard) {
   if (abortController) abortController.abort()
+  const signal = abortController?.signal
   abortController = new AbortController()
 
   const availableReports = reportsBySelectedDashboard(reports, currentDashboard)
 
-  const {
-    actions: { setCurrentReports }
-  } = RealTimeMetricsModule()
-
-  setCurrentReports(availableReports)
-
-  availableReports.forEach((report) => {
-    resolveReport(report, filters, userUTC)
-  })
+  return { availableReports, signal }
 }
