@@ -3,7 +3,8 @@ import { LoadReportsDataBySelectedDashboard } from '@modules/real-time-metrics/r
 import {
   LoadDatasetAvailableFilters,
   LoadInfoAvailableFilters
-} from '@/modules/real-time-metrics/filters'
+} from '@modules/real-time-metrics/filters'
+import * as getters from '@modules/real-time-metrics/helpers/getters'
 
 const RealTimeMetricsModule = () => {
   const groupObservers = []
@@ -324,7 +325,8 @@ const RealTimeMetricsModule = () => {
       loadCurrentReports,
       setCurrentReports,
       setCurrentReportValue
-    }
+    },
+    getters
   }
 }
 
