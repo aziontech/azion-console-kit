@@ -1,7 +1,8 @@
 <script setup>
+  import { TIME_INTERVALS } from '@modules/real-time-metrics/constants'
   import Calendar from 'primevue/calendar'
   import Dropdown from 'primevue/dropdown'
-  import { computed, onBeforeMount, ref, watch } from 'vue'
+  import { computed, onMounted, ref, watch } from 'vue'
 
   const props = defineProps({
     moduleActions: {
@@ -24,11 +25,9 @@
 
   const { setTimeRange } = props.moduleActions
 
-  const { getDateTimeFilterOptions, currentFilters, getIsLoadingFilters } = props.moduleGetters
+  const { currentFilters, getIsLoadingFilters } = props.moduleGetters
 
-  const intervalOptions = computed(() => {
-    return getDateTimeFilterOptions({ filters: props.filterData })
-  })
+  const intervalOptions = ref([...TIME_INTERVALS.DATE_TIME_FILTER_INTERVALS])
 
   const getCurrentFilters = computed(() => {
     return currentFilters({ filters: props.filterData })
@@ -152,10 +151,10 @@
         updatedTimeRange(value)
       }
     },
-    { deep: true, immediate: true }
+    { deep: true }
   )
 
-  onBeforeMount(() => {
+  onMounted(() => {
     setInitialValues()
   })
 </script>
