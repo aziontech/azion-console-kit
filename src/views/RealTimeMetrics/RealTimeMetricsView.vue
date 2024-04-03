@@ -41,10 +41,6 @@
 <script setup>
   import { useAccountStore } from '@/stores/account'
   import RealTimeMetricsModule from '@/modules/real-time-metrics'
-  import {
-    currentIdPageAndDashboard,
-    getCurrentInfo
-  } from '@modules/real-time-metrics/helpers/getters'
   import ContentBlock from '@/templates/content-block'
   import PageHeadingBlock from '@/templates/page-heading-block'
   import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
@@ -74,6 +70,7 @@
 
   const metricsModule = RealTimeMetricsModule()
   const {
+    getters: { currentIdPageAndDashboard, getCurrentInfo },
     actions: {
       setInfoAvailableFilters,
       setInitialCurrentsByIds,
