@@ -81,6 +81,7 @@
   const {
     getters: { currentIdPageAndDashboard, getCurrentInfo },
     actions: {
+      setInitialPageAndDashboardCurrent,
       setInfoAvailableFilters,
       setInitialCurrentsByIds,
       setDatasetAvailableFilters,
@@ -123,11 +124,11 @@
   })
 
   const loadPageInfo = async () => {
+    setInitialPageAndDashboardCurrent()
     await setInfoAvailableFilters()
     setCurrentPageAndDashboard()
     await setDatasetAvailableFilters()
     updateRouter()
-    await load()
   }
 
   const load = async () => {

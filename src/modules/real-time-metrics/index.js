@@ -1,4 +1,4 @@
-import { GROUP_DASHBOARDS, REPORTS, TIME_INTERVALS } from '@modules/real-time-metrics/constants'
+import { GROUP_DASHBOARDS, REPORTS } from '@modules/real-time-metrics/constants'
 import {
   LoadReportsDataBySelectedDashboard,
   ResolveReport
@@ -45,12 +45,13 @@ const RealTimeMetricsModule = () => {
   }
 
   const filters = {
-    dateTimeOptions: [...TIME_INTERVALS.DATE_TIME_FILTER_INTERVALS],
     isLoading: false,
     selected: {},
     datasetAvailable: [],
     infoAvailable: []
   }
+
+  /* GROUP ACTIONS */
 
   /**
    * Sets the initial page and dashboard for the current group.
@@ -61,11 +62,9 @@ const RealTimeMetricsModule = () => {
     ;[group.current] = group.all
     ;[group.currentPage] = group.current.pagesDashboards
     ;[group.currentDashboard] = group.currentPage.dashboards
+
+    notify(groupObservers, group)
   }
-
-  setInitialPageAndDashboardCurrent()
-
-  /* GROUP ACTIONS */
 
   /**
    * Sets the current group page to the specified value.
@@ -236,15 +235,15 @@ const RealTimeMetricsModule = () => {
    * @return {Promise<void>} A promise that resolves when the reports are loaded.
    */
   const loadCurrentReports = async (userUTC) => {
-    const { availableReports, signal } = await LoadReportsDataBySelectedDashboard(
+    const { availableReports, signal } = LoadReportsDataBySelectedDashboard(
       reports.all,
       group.currentDashboard
     )
 
     setCurrentReports(availableReports)
 
-    availableReports.forEach((report) => {
-      const reportInfo = ResolveReport(report, filters.selected, userUTC, signal)
+    availableReports.forEach(async (report) => {
+      const reportInfo = await ResolveReport(report, filters.selected, userUTC, signal)
       setCurrentReportValue(reportInfo)
     })
 
@@ -258,7 +257,7 @@ const RealTimeMetricsModule = () => {
    * @return {void} This function does not return a value.
    */
   const setCurrentReports = (availableReports) => {
-    reports.current = availableReports
+    reports.current = [...availableReports]
     notify(reportObservers, reports)
   }
 
@@ -279,7 +278,6 @@ const RealTimeMetricsModule = () => {
       ...reports.current[reportIdx],
       ...reportInfo
     }
-
     notify(reportObservers, reports)
   }
 
@@ -316,6 +314,7 @@ const RealTimeMetricsModule = () => {
       unsubscribe: unsubscribe(filterObservers)
     },
     actions: {
+      setInitialPageAndDashboardCurrent,
       setCurrentDashboard,
       setCurrentPage,
       setCurrentGroupPageByLabels,

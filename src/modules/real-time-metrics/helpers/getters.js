@@ -1,7 +1,5 @@
 /* FILTER HELPERS */
 
-export const getDateTimeFilterOptions = ({ filters }) => filters?.dateTimeOptions
-
 export const infoAvailableFiltersCurrent = ({ filters }) => filters?.infoAvailable
 
 export const currentFilters = ({ filters }) => filters?.selected

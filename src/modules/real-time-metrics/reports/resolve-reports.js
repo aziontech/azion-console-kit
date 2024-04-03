@@ -8,7 +8,7 @@ import LoadReportWithMeta from './load-report-with-meta'
  * @param {Object} filters - The filters to be applied to the report.
  * @param {string} userUTC - The user time zone
  * @param {AbortSignal} signal - The signal to cancel the request.
- * @return {Promise<void>} - A promise that resolves when the report is resolved and the metrics store is updated.
+ * @returns {Promise<Object>} A promise that resolves to the report information.
  */
 export default async function ResolveReport(report, filters, userUTC, signal) {
   const maxSeriesToDisplayTag = 2

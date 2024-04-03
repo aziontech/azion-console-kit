@@ -1,4 +1,5 @@
-let abortController = null
+let abortController
+let signal
 
 /**
  * Filters the given list of reports based on the selected dashboard and returns a new list
@@ -19,18 +20,21 @@ function reportsBySelectedDashboard(reports, currentDashboard) {
 }
 
 /**
- * Generate reports data based on selected dashboard filters.
+ * Generates available reports based on the selected dashboard and aborts any ongoing data loading process.
  *
- * @param {Array} reports - The list of reports to generate data for.
- * @param {string} currentDashboard - The current dashboard being viewed.
- * @return {Promise} A promise that resolves when all reports data is loaded.
+ * @param {Array} reports - The list of all reports.
+ * @param {Object} currentDashboard - The currently selected dashboard.
+ * @return {Object} An object containing availableReports and the signal for aborting ongoing data loading.
  */
-export default async function LoadReportsDataBySelectedDashboard(reports, currentDashboard) {
-  if (abortController) abortController.abort()
-  const signal = abortController?.signal
-  abortController = new AbortController()
+export default function LoadReportsDataBySelectedDashboard(reports, currentDashboard) {
+  if (abortController) {
+    signal = abortController.signal
+    abortController.abort()
+  }
 
   const availableReports = reportsBySelectedDashboard(reports, currentDashboard)
+
+  abortController = new AbortController()
 
   return { availableReports, signal }
 }
