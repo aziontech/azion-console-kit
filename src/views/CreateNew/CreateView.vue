@@ -24,10 +24,11 @@
       </div>
       <PageHeadingBlock
         :pageTitle="solution.name"
+        :description="solution.headline"
         v-if="!isLoading"
       />
       <div
-        class="flex flex-col sm:flex-row gap-4 lg:items-center"
+        class="flex flex-col sm:flex-row gap-4 sm:gap-6 lg:items-center"
         v-if="!isLoading"
       >
         <div class="flex flex-col sm:flex-row gap-4 sm:items-center">
@@ -66,7 +67,7 @@
             </div>
           </div>
         </div>
-        <div class="flex flex-col sm:flex-row ml-0 sm:ml-auto">
+        <div class="flex flex-col sm:flex-row ml-0">
           <PrimeButton
             label="More details"
             outlined
