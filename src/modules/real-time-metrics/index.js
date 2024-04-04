@@ -184,7 +184,7 @@ const RealTimeMetricsModule = () => {
    */
   const resetFilters = () => {
     const tsRange = filters.selected.tsRange
-    setFilters({ tsRange })
+    filters.selected = { tsRange: { ...tsRange } }
 
     notify(filterObservers, filters)
   }
