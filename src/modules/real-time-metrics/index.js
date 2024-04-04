@@ -249,6 +249,16 @@ const RealTimeMetricsModule = () => {
     notify(filterObservers, filters)
   }
 
+  /**
+   * Check if the filter has changed.
+   *
+   * @return {boolean} true if the filter has changed, false otherwise
+   */
+  let newFilters = {}
+  const isFilterChanged = () => {
+    return JSON.stringify(filters.selected) !== JSON.stringify(newFilters)
+  }
+
   /* REPORT ACTIONS */
 
   /**
@@ -259,6 +269,10 @@ const RealTimeMetricsModule = () => {
    */
   let abortController
   const loadCurrentReports = async (userUTC) => {
+    if (!isFilterChanged()) return
+
+    newFilters = { ...filters.selected }
+
     if (abortController) {
       abortController.abort()
     }
