@@ -2,7 +2,7 @@ import { CHART_RULES } from '@/modules/real-time-metrics/constants'
 import { describe, expect, it } from 'vitest'
 
 describe('RealTimeMetricsModule', () => {
-  describe('Constants', () => {
+  describe('Chart rules constants', () => {
     it('should be defined', () => {
       expect(CHART_RULES).toBeDefined()
     })
