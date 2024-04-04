@@ -1,6 +1,7 @@
 <script setup>
   import GraphsCardBlock from '@/templates/graphs-card-block'
   import SelectButton from 'primevue/selectbutton'
+  import Skeleton from 'primevue/skeleton'
   import { computed } from 'vue'
 
   const props = defineProps({
@@ -81,6 +82,33 @@
           :report="report"
           :clipboardWrite="clipboardWrite"
         />
+      </template>
+    </div>
+    <div
+      class="grid grid-cols-12 gap-4 m-0"
+      v-else
+    >
+      <template
+        v-for="item of 4"
+        :key="item"
+      >
+        <div
+          class="flex flex-col rounded-md h-graph-card border surface-border lg:col-span-6 col-span-12 p-6"
+        >
+          <header class="flex w-full items-center justify-between gap-2">
+            <Skeleton class="h-6 w-64" />
+            <Skeleton class="h-8 w-8" />
+          </header>
+          <div class="flex h-full flex-col gap-6 flex-auto">
+            <div class="flex flex-col pt-3.5 gap-3.5">
+              <Skeleton class="h-6 w-96" />
+              <Skeleton class="h-6 w-8" />
+            </div>
+            <div class="flex-auto">
+              <Skeleton class="w-full h-full" />
+            </div>
+          </div>
+        </div>
       </template>
     </div>
   </div>

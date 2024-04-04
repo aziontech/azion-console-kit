@@ -40,6 +40,9 @@ export default {
       width: {
         slide: '384px'
       },
+      height: {
+        'graph-card': '552px'
+      },
       fontFamily: {
         robotomono: ['Roboto Mono']
       },

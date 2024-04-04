@@ -2,7 +2,7 @@
   <div
     :class="[
       cardColumns,
-      'flex flex-col rounded-md h-[552px] border surface-border col-span-12 p-6'
+      'flex flex-col rounded-md h-graph-card border surface-border col-span-12 p-6'
     ]"
   >
     <header class="flex w-full items-center justify-between gap-2">
