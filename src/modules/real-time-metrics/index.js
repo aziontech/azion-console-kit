@@ -48,7 +48,7 @@ const RealTimeMetricsModule = () => {
     isLoading: false,
     selected: {},
     datasetAvailable: [],
-    infoAvailable: []
+    infoAvailable: {}
   }
 
   /* GROUP ACTIONS */
