@@ -73,6 +73,7 @@ const RealTimeMetricsModule = () => {
    * @return {void} function does not return a value.
    */
   const setCurrentGroupPage = (groupPage) => {
+    resetReports()
     group.current = groupPage
     notify(groupObservers, group)
   }
@@ -84,6 +85,7 @@ const RealTimeMetricsModule = () => {
    * @return {void} function does not return a value.
    */
   const setCurrentPage = (page) => {
+    resetReports()
     group.currentPage = page
     ;[group.currentDashboard] = group.currentPage.dashboards
     notify(groupObservers, group)
@@ -95,6 +97,7 @@ const RealTimeMetricsModule = () => {
    * @param {Object<import('@modules/real-time-metrics/constants/dashboards').Dashboard>} dashboard - The new dashboard value to set.
    */
   const setCurrentDashboard = (dashboard) => {
+    resetReports()
     group.currentDashboard = dashboard
     notify(groupObservers, group)
   }
@@ -127,6 +130,7 @@ const RealTimeMetricsModule = () => {
    * @return {void} This function does not return a value.
    */
   const setCurrentGroupPageByLabels = (labelGroup) => {
+    resetReports()
     group.current = group.all.find(({ label }) => label === labelGroup)
 
     const page = group.current?.pagesDashboards[0]
@@ -181,6 +185,25 @@ const RealTimeMetricsModule = () => {
   const resetFilters = () => {
     const tsRange = filters.selected.tsRange
     setFilters({ tsRange })
+
+    notify(filterObservers, filters)
+  }
+
+  /**
+   * Set time range for filters.
+   *
+   * @param {object} params - Object containing tsRangeBegin, tsRangeEnd, and meta
+   * @param {number} params.tsRangeBegin - Start timestamp
+   * @param {number} params.tsRangeEnd - End timestamp
+   * @param {object} params.meta - Meta object
+   * @returns {void}
+   */
+  const setTimeRange = ({ tsRangeBegin, tsRangeEnd, meta }) => {
+    if (!filters.selected.tsRange) filters.selected.tsRange = {}
+
+    filters.selected.tsRange.meta = meta
+    filters.selected.tsRange.begin = tsRangeBegin
+    filters.selected.tsRange.end = tsRangeEnd
 
     notify(filterObservers, filters)
   }
@@ -271,7 +294,6 @@ const RealTimeMetricsModule = () => {
 
   /**
    * Updates the current report value based on the provided report information.
-   * This method has a circular dependency with the module.
    * @param {Object} reportInfo - The report information containing the report ID and other details.
    * @return {void} This function does not return a value.
    */
@@ -290,22 +312,12 @@ const RealTimeMetricsModule = () => {
   }
 
   /**
-   * Set time range for filters.
-   *
-   * @param {object} params - Object containing tsRangeBegin, tsRangeEnd, and meta
-   * @param {number} params.tsRangeBegin - Start timestamp
-   * @param {number} params.tsRangeEnd - End timestamp
-   * @param {object} params.meta - Meta object
+   * Set the reports array to an empty array and notify report observers.
    * @returns {void}
-   */
-  const setTimeRange = ({ tsRangeBegin, tsRangeEnd, meta }) => {
-    if (!filters.selected.tsRange) filters.selected.tsRange = {}
-
-    filters.selected.tsRange.meta = meta
-    filters.selected.tsRange.begin = tsRangeBegin
-    filters.selected.tsRange.end = tsRangeEnd
-
-    notify(filterObservers, filters)
+   **/
+  const resetReports = () => {
+    reports.current = []
+    notify(reportObservers, reports)
   }
 
   return {
