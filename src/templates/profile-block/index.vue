@@ -1,8 +1,8 @@
 <template>
   <Avatar
     @click="toggleProfile"
-    label="U"
-    class="transition-all hover:border-orange-500 hover:bg-header-button-hover cursor-pointer bg-header-avatar text-avatar"
+    icon="pi pi-user"
+    class="transition-all cursor-pointer"
     v-tooltip.bottom="{ value: 'Account', showDelay: 200 }"
   />
 
@@ -16,7 +16,7 @@
       header: { class: 'hidden' },
       content: { class: 'p-0' }
     }"
-  >
+  >  
     <PrimeMenu
       :model="profileMenuItems"
       :pt="{
