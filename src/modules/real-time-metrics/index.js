@@ -205,6 +205,8 @@ const RealTimeMetricsModule = () => {
     filters.selected.tsRange.begin = tsRangeBegin
     filters.selected.tsRange.end = tsRangeEnd
 
+    newFilters = {}
+
     notify(filterObservers, filters)
   }
 
