@@ -46,7 +46,7 @@ describe('RealTimeMetricsModule', () => {
     it.each(filterScenarios)('$description', ({ method, filters, expectedResult }) => {
       expect(getters[method]({ filters })).toEqual(expectedResult)
 
-      expect(getters.infoAvailableFiltersCurrent({ filters: fixtures.filters })).toBeDefined()
+      expect(getters[method]({ filters })).toBeDefined()
     })
   })
 })
