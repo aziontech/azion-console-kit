@@ -62,9 +62,11 @@
   })
 
   const changePage = async (evt) => {
+    if (evt.index === selectedPage.value) return
+
     resetFilters()
-    const selectedPage = groupPages.value[evt.index]
-    setCurrentPage(selectedPage)
+    const newPage = groupPages.value[evt.index]
+    setCurrentPage(newPage)
     await setDatasetAvailableFilters()
     await loadCurrentReports(props.userUTC)
   }
