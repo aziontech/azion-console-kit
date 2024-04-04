@@ -2,7 +2,7 @@
   <Avatar
     @click="toggleProfile"
     icon="pi pi-user"
-    class="transition-all cursor-pointer"
+    class="transition-all bg-header-avatar cursor-pointer"
     v-tooltip.bottom="{ value: 'Account', showDelay: 200 }"
   />
 
