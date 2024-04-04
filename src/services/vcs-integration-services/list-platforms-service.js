@@ -8,7 +8,7 @@ export const listPlatformsService = async () => {
   })
 
   httpResponse = adapt(httpResponse)
-  return Promise.resolve(parseHttpResponse(httpResponse))
+  return parseHttpResponse(httpResponse)
 }
 
 const adapt = (httpResponse) => {
@@ -23,6 +23,6 @@ const adapt = (httpResponse) => {
 
   return {
     body: parsedPlatforms,
-    statusCode: 200
+    statusCode: httpResponse.statusCode
   }
 }

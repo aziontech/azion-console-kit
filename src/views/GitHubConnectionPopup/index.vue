@@ -1,5 +1,7 @@
 <template>
+  <p>Loading....</p>
 </template>
+
 <script setup>
   import { onMounted } from 'vue'
   import { useRoute } from 'vue-router'
@@ -8,10 +10,21 @@
   const route = useRoute()
   const loading = useLoadingStore()
 
-  onMounted(async () =>{
+  defineOptions({ name: 'github-connection-popup' })
+
+  onMounted(() => {
     loading.startLoading()
-    const platformUrl = 'http://localhost:5173'
-    window.opener.postMessage(route.query , platformUrl)
-    window.parent.close()
+    sendPostMessage()
   })
+
+  const sendPostMessage = () => {
+    const platformUrl = 'http://localhost:5173'
+    const data = {
+      event: 'integration-data',
+      data: route.query
+    }
+
+    window.opener.postMessage(data, platformUrl)
+    window.parent.close()
+  }
 </script>

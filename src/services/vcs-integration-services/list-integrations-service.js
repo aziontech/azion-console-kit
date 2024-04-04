@@ -7,21 +7,21 @@ export const listIntegrationsService = async () => {
     method: 'GET'
   })
 
-  httpResponse = adapt(httpResponse)  
+  httpResponse = adapt(httpResponse)
 
-  return Promise.resolve(parseHttpResponse(httpResponse))
+  return parseHttpResponse(httpResponse)
 }
 
 const adapt = (httpResponse) => {
-  const parsedIntegrations = httpResponse.body.results.map((element) => {
+  const parsedIntegrations = httpResponse.body?.results?.map((element) => {
     return {
-      uuid: element.uuid,
-      scope: element.scope,
+      label: element.scope,
+      value: element.uuid,
     }
-  })
+  }) || []
 
   return {
     body: parsedIntegrations,
-    statusCode: 200
+    statusCode: httpResponse.statusCode
   }
 }

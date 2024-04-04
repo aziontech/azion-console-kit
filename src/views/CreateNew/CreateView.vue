@@ -79,7 +79,7 @@
       <FormLoading v-if="isLoading" />
       <TemplateEngineBlock
         v-else
-        :postCallbackService="props.postCallbackService"
+        :postCallbackUrlService="props.postCallbackUrlService"
         :listIntegrationsService="props.listIntegrationsService"
         :listPlatformsService="props.listPlatformsService"
         @cancel="handleCancel"
@@ -193,9 +193,8 @@
               <div class="flex gap-1">
                 <span class="text-xs font-medium text-color-primary">By</span>
                 <span class="text-xs font-medium text-color-secondary">
-                  {{
-                  solution.vendor.name
-                }}</span>
+                  {{ solution.vendor.name }}</span
+                >
               </div>
               <div class="flex gap-1">
                 <span class="text-xs font-medium text-color-primary">Version</span>
@@ -231,14 +230,12 @@
   </ContentBlock>
 </template>
 <script setup>
-  import { listIntegrationsService } from '@/services/vcs-integration-services'
-import { listPlatformsService } from '@/services/vcs-integration-services/list-platforms-service'
-import { useLoadingStore } from '@/stores/loading'
+  import { useLoadingStore } from '@/stores/loading'
   import { useSolutionStore } from '@/stores/solution-create'
   import ContentBlock from '@/templates/content-block'
   import PageHeadingBlock from '@/templates/page-heading-block'
   import TemplateEngineBlock from '@/templates/template-engine-block'
-  import FormLoading from '@/templates/template-engine-block/FormLoading'
+  import FormLoading from '@/templates/template-engine-block/form-loading.vue'
   import PrimeButton from 'primevue/button'
   import PrimeDialog from 'primevue/dialog'
   import Sidebar from 'primevue/sidebar'
@@ -268,7 +265,7 @@ import { useLoadingStore } from '@/stores/loading'
       type: Function,
       required: true
     },
-    postCallbackService: {
+    postCallbackUrlService: {
       type: Function,
       required: true
     },

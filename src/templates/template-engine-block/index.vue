@@ -1,5 +1,6 @@
 <template>
   <FormLoading v-if="isLoading" />
+
   <div
     class="w-full grow flex flex-col gap-8 max-md:gap-6"
     v-else
@@ -30,7 +31,7 @@
             v-model="field.input.value"
             :id="field.name"
             class="w-full"
-            :class="{ 'p-invalid': formTools.errors[field.name] }"
+            :class="renderInvalidClass(formTools.errors[`${field.name}`])"
             :feedback="false"
           />
           <InputText
@@ -40,7 +41,7 @@
             :id="field.name"
             type="text"
             v-bind="field.input"
-            :class="{ 'p-invalid': formTools.errors[field.name] }"
+            :class="renderInvalidClass(formTools.errors[`${field.name}`])"
           />
           <small class="text-xs font-normal text-color-secondary">{{ field.description }}</small>
           <small
@@ -53,7 +54,10 @@
       </template>
     </FormHorizontal>
 
-    <div class="w-full grow flex flex-col gap-8 max-md:gap-6" v-if="inputSchema.groups">
+    <div
+      class="w-full grow flex flex-col gap-8 max-md:gap-6"
+      v-if="inputSchema.groups"
+    >
       <FormHorizontal
         v-for="group in inputSchema.groups"
         :key="group.name"
@@ -67,32 +71,36 @@
             :key="field.name"
           >
             <div v-if="field.name === 'installation_id'">
-              <PrimeButton 
-                v-if="installations.length === 0"
-                @click="authenticateVcs"
-                label="Connect with GitHub"
-                outlined
-                icon="pi pi-github"
-                iconPos="left"
-              />
-              <div v-else class="flex flex-col sm:max-w-lg w-full gap-2">
-                <label
-                  for="installation_id"
-                  class="text-color text-base font-medium"
-                  >{{ field.label }}
-                  <span v-if="field.attrs"><span v-if="field.attrs.required">*</span></span></label
-                >
-                <Dropdown
-                  appendTo="self"
-                  v-model="field.installation_id"
-                  :options="installations"
-                  optionLabel="scope"
-                  optionValue="uuid"
-                  class="w-full"
+              <div
+                v-if="hasIntegrations"
+                class="flex flex-col sm:max-w-lg w-full gap-2"
+              >
+                <FieldDropdown
+                  :options="listOfIntegrations"
+                  :name="field.name"
+                  :label="field.label"
+                  :placeholder="field.placeholder"
+                  :description="field.description"
+                  :inputClass="renderInvalidClass(formTools.errors[`${field.name}`])"
+                  optionLabel="label"
+                  optionValue="value"
+                  @onChange="
+                    (installation_id) => {
+                      formTools.setFieldValue(field.name, installation_id)
+                    }
+                  "
                 />
               </div>
+              <OuthGithub
+                :listPlatformsService="listPlatformsService"
+                @callbackUrl="callbackUrl"
+                v-else
+              />
             </div>
-            <div v-else class="flex flex-col sm:max-w-lg w-full gap-2">
+            <div
+              v-else
+              class="flex flex-col sm:max-w-lg w-full gap-2"
+            >
               <label
                 for="name"
                 class="text-color text-base font-medium"
@@ -108,7 +116,7 @@
                 v-model="field.input.value"
                 :id="field.name"
                 class="w-full"
-                :class="{ 'p-invalid': formTools.errors[field.name] }"
+                :class="renderInvalidClass(formTools.errors[`${field.name}`])"
                 :feedback="false"
               />
               <InputText
@@ -118,7 +126,7 @@
                 :id="field.name"
                 type="text"
                 v-bind="field.input"
-                :class="{ 'p-invalid': formTools.errors[field.name] }"
+                :class="renderInvalidClass(formTools.errors[`${field.name}`])"
               />
               <small class="tet-xs font-normal text-color-secondary">{{ field.description }}</small>
               <small
@@ -149,16 +157,16 @@
 
 <script setup>
   import Password from 'primevue/password'
-  import Dropdown from 'primevue/dropdown'
-  import { ref, onBeforeMount, defineOptions, watch, onMounted } from 'vue'
+  import FieldDropdown from '@/templates/form-fields-inputs/fieldDropdown.vue'
+  import { ref, defineOptions, watch, onMounted, computed } from 'vue'
   import FormHorizontal from '@templates/create-form-block/form-horizontal'
-  import PrimeButton from 'primevue/button'
   import ActionBarTemplate from '@templates/action-bar-block'
-  import FormLoading from './FormLoading'
+  import FormLoading from './form-loading'
   import InputText from 'primevue/inputtext'
   import { useForm } from 'vee-validate'
   import * as yup from 'yup'
   import { useToast } from 'primevue/usetoast'
+  import OuthGithub from './oauth-github.vue'
 
   defineOptions({ name: 'templateEngineBlock' })
 
@@ -172,7 +180,7 @@
     instantiateTemplateService: {
       type: Function
     },
-    postCallbackService: {
+    postCallbackUrlService: {
       type: Function,
       required: true
     },
@@ -211,13 +219,21 @@
   const isLoading = ref(true)
   const submitLoading = ref(false)
   const isMounted = ref(false)
-  const githubInstallation = ref()
-  const installations = ref([])
+  const callbackUrl = ref()
+  const listOfIntegrations = ref([])
 
-  const loadTemplate = async (id) => {
+  onMounted(async () => {
+    await loadTemplate(props.templateId)
+    await listIntegrations()
+    isMounted.value = true
+
+    listenerOnMessage()
+  })
+
+  const loadTemplate = async () => {
     try {
-      const initialData = await props.getTemplateService(id)
-      inputSchema.value = initialData.inputSchema
+      const templateData = await props.getTemplateService(props.templateId)
+      inputSchema.value = templateData.inputSchema
       const schemaObject = await createSchemaObject()
       const isValid = await schemaObject.isValid()
       await createInputs(schemaObject, isValid)
@@ -230,29 +246,36 @@
     }
   }
 
-  onBeforeMount(async () => {
-    await loadTemplate(props.templateId)
-  })
+  const listIntegrations = async () => {
+    const data = await props.listIntegrationsService()
 
-  onMounted(() => {
-    setTimeout(() => {
-      isMounted.value = true
-    }, 100)
-    window.onmessage = async (e) => {
-      try {
-        console.log(props)
-        props.postCallbackService(githubInstallation.value.callbackUrl, e.data)
-      } catch (e) {
-        console.log(e)
-      } finally {
-        installations.value = await props.listIntegrationsService()
+    listOfIntegrations.value = data
+  }
+
+  const listenerOnMessage = () => {
+    window.addEventListener('message', (event) => {
+      if (event.data.event === 'integration-data') {
+        saveIntegration(event.data)
       }
-    }
+    })
+  }
+
+  const renderInvalidClass = (containErrorInField) => {
+    if (containErrorInField) return 'p-invalid'
+    return ''
+  }
+
+  const hasIntegrations = computed(() => {
+    if (listOfIntegrations?.value?.length > 0) return true
+    return false
   })
 
-  const openPopupGithub = (url) => {
-      window.open(url, 'page', 'width=640, height=700, top=100, left=110, popup=yes, scrollbars=no');
-    }
+  const saveIntegration = async (integration) => {
+    await props.postCallbackUrlService('/oauth/github/callback', integration.data)
+    await listIntegrations()
+  }
+
+  // Ajustes acima
 
   const createSchemaObject = async () => {
     const templateSchema = {}
@@ -327,7 +350,7 @@
       validationSchema
     })
 
-    formTools.value = { errors, meta, resetForm, values }
+    formTools.value = { errors, meta, resetForm, values, setFieldValue }
 
     inputSchema.value.fields?.forEach((field) => {
       if (field.value) {
@@ -356,17 +379,6 @@
 
   const removeHiddenFields = (fields) => {
     return fields.filter((field) => !field.hidden)
-  }
-
-  const authenticateVcs = async () => {
-    const res = await props.listPlatformsService()
-    console.log(res)
-    res.forEach((platform) => {
-      if (platform.id === 'github') { 
-        githubInstallation.value = platform
-      }
-    })
-    openPopupGithub(githubInstallation.value.installationUrl)
   }
 
   const validateAndSubmit = async () => {
