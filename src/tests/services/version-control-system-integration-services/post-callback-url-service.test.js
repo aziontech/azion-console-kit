@@ -17,14 +17,14 @@ describe('VersionControlSystemService', () => {
       body: { results: [] }
     })
 
-    const path = '/integrations/oauth/github/callback'
+    const pathMock = '/integrations/oauth/github/callback'
     const body = { data: { value: 123 } }
 
     const { sut } = makeSut()
-    await sut(path, body)
+    await sut(pathMock, body)
 
     expect(requestSpy).toHaveBeenCalledWith({
-      url: `vcs${path}`,
+      url: `v4/vcs${pathMock}`,
       method: 'POST',
       body: {
         data: { value: 123 }
