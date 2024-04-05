@@ -1,5 +1,5 @@
-import { CHART_RULES } from '@modules/real-time-metrics/constants'
 import { describe, expect, it } from 'vitest'
+import { CHART_RULES } from '@modules/real-time-metrics/constants'
 
 describe('RealTimeMetricsModule', () => {
   describe('Chart rules constants', () => {

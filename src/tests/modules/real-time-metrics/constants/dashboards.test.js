@@ -1,5 +1,5 @@
-import { GROUP_DASHBOARDS } from '@modules/real-time-metrics/constants'
 import { describe, expect, it } from 'vitest'
+import { GROUP_DASHBOARDS } from '@modules/real-time-metrics/constants'
 
 describe('RealTimeMetricsModule', () => {
   describe('Dashboard constants', () => {

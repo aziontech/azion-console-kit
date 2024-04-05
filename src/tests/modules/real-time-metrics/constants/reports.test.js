@@ -1,5 +1,5 @@
-import { REPORTS } from '@modules/real-time-metrics/constants'
 import { describe, expect, it } from 'vitest'
+import { REPORTS } from '@modules/real-time-metrics/constants'
 
 describe('RealTimeMetricsModule', () => {
   describe('Report constants', () => {

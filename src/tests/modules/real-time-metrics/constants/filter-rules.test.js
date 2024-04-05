@@ -1,5 +1,5 @@
-import { FILTERS_RULES } from '@modules/real-time-metrics/constants'
 import { describe, expect, it } from 'vitest'
+import { FILTERS_RULES } from '@modules/real-time-metrics/constants'
 
 describe('RealTimeMetricsModule', () => {
   describe('Filter rules constants', () => {
