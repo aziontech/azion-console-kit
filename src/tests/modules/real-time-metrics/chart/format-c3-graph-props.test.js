@@ -1,64 +1,7 @@
 /* eslint-disable id-length */
 import { FormatC3GraphProps } from '@modules/real-time-metrics/chart'
 import { describe, expect, it } from 'vitest'
-
-const fixtures = {
-  results: [
-    [
-      'ts',
-      '2023-01-16T11:01:00.000Z',
-      '2023-01-16T11:02:00.000Z',
-      '2023-01-16T11:03:00.000Z',
-      '2023-01-16T11:04:00.000Z',
-      '2023-01-16T11:05:00.000Z',
-      '2023-01-16T11:06:00.000Z',
-      '2023-01-16T11:07:00.000Z',
-      '2023-01-16T11:08:00.000Z',
-      '2023-01-16T11:09:00.000Z',
-      '2023-01-16T11:10:00.000Z',
-      '2023-01-16T11:11:00.000Z',
-      '2023-01-16T11:12:00.000Z',
-      '2023-01-16T11:13:00.000Z',
-      '2023-01-16T11:14:00.000Z',
-      '2023-01-16T11:15:00.000Z',
-      '2023-01-16T11:16:00.000Z'
-    ],
-    ['serieTest1', 61, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    ['serieTest2', 0, 65, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    ['serieTest3', 0, 0, 61, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    ['serieTest4', 0, 0, 0, 66, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    ['serieTest5', 0, 0, 0, 0, 61, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    ['serieTest6', 0, 0, 0, 0, 0, 65, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    ['serieTest7', 0, 0, 0, 0, 0, 0, 60, 0, 0, 0, 0, 0, 0, 0, 0],
-    ['serieTest8', 0, 0, 0, 0, 0, 0, 0, 65, 0, 0, 0, 0, 0, 0, 0],
-    ['serieTest9', 0, 0, 0, 0, 0, 0, 0, 0, 63, 0, 0, 0, 0, 0, 0],
-    ['serieTest10', 0, 0, 0, 0, 0, 0, 0, 0, 0, 65, 0, 0, 0, 0, 0],
-    ['serieTest11', 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 60, 0, 0, 0, 0],
-    ['serieTest12', 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 66, 0, 0, 0],
-    ['serieTest13', 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 65, 0, 0],
-    ['serieTest14', 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 65, 0],
-    ['serieTest15', 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 61],
-    ['serieTest16', 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 66]
-  ],
-  linePatterns: [
-    'var(--series-one-color)',
-    'var(--series-two-color)',
-    'var(--series-three-color)',
-    'var(--series-four-color)',
-    'var(--series-five-color)',
-    'var(--series-six-color)',
-    'var(--series-seven-color)',
-    'var(--series-eight-color)',
-    'var(--series-one-color)',
-    'var(--series-two-color)',
-    'var(--series-three-color)',
-    'var(--series-four-color)',
-    'var(--series-five-color)',
-    'var(--series-six-color)',
-    'var(--series-seven-color)',
-    'var(--series-eight-color)'
-  ]
-}
+import * as FIXTURES from './chart-fixtures'
 
 describe('RealTimeMetricsModule', () => {
   describe('C3 chart methods', () => {
@@ -72,36 +15,38 @@ describe('RealTimeMetricsModule', () => {
         type: 'line',
         columns: 6,
         xAxis: 'ts',
+        maxYAxis: 100,
         isTopX: false,
         rotated: false,
         dataUnit: 'perSecond',
         aggregationType: 'sum'
       }
-      const resultChart = fixtures.results
+      const resultChart = FIXTURES.RESULTS
 
       const expected = {
         data: {
           x: 'ts',
           type: 'line',
-          columns: fixtures.results,
+          columns: FIXTURES.COLUMNS_WITH_MEAN_LINE,
           xFormat: '%Y-%m-%dT%H:%M:%S.%LZ',
           names: {
-            serieTest1: 'Serie Test 1 - 61/s',
-            serieTest2: 'Serie Test 2 - 65/s',
-            serieTest3: 'Serie Test 3 - 61/s',
-            serieTest4: 'Serie Test 4 - 66/s',
-            serieTest5: 'Serie Test 5 - 61/s',
-            serieTest6: 'Serie Test 6 - 65/s',
-            serieTest7: 'Serie Test 7 - 60/s',
-            serieTest8: 'Serie Test 8 - 65/s',
-            serieTest9: 'Serie Test 9 - 63/s',
+            serieTest1: 'Serie Test 1 - 610B/s',
+            serieTest2: 'Serie Test 2 - 65B/s',
+            serieTest3: 'Serie Test 3 - 6.1B/s',
+            serieTest4: 'Serie Test 4 - 660M/s',
+            serieTest5: 'Serie Test 5 - 61M/s',
+            serieTest6: 'Serie Test 6 - 6.5M/s',
+            serieTest7: 'Serie Test 7 - 60K/s',
+            serieTest8: 'Serie Test 8 - 6.5K/s',
+            serieTest9: 'Serie Test 9 - 630/s',
             serieTest10: 'Serie Test 10 - 65/s',
-            serieTest11: 'Serie Test 11 - 60/s',
-            serieTest12: 'Serie Test 12 - 66/s',
-            serieTest13: 'Serie Test 13 - 65/s',
-            serieTest14: 'Serie Test 14 - 65/s',
-            serieTest15: 'Serie Test 15 - 61/s',
-            serieTest16: 'Serie Test 16 - 66/s'
+            serieTest11: 'Serie Test 11 - 6/s',
+            serieTest12: 'Serie Test 12 - 0.66/s',
+            serieTest13: 'Serie Test 13 - 0.065/s',
+            serieTest14: 'Serie Test 14 - 0.0065/s',
+            serieTest15: 'Serie Test 15 - 0.00061/s',
+            serieTest16: 'Serie Test 16 - 0.000066/s',
+            'Mean Line': 'Mean Line - 2.8B/s'
           }
         },
         axis: {
@@ -121,7 +66,8 @@ describe('RealTimeMetricsModule', () => {
               format: () => 'c3 tick function'
             },
             min: 0,
-            padding: { bottom: 0 }
+            padding: { bottom: 0, top: 0 },
+            max: 100
           }
         },
         legend: {
@@ -129,7 +75,7 @@ describe('RealTimeMetricsModule', () => {
         },
         padding: null,
         color: {
-          pattern: fixtures.linePatterns
+          pattern: FIXTURES.LINE_PATTERNS_WITH_MEAN_LINE
         },
         grid: {
           y: {
@@ -153,7 +99,8 @@ describe('RealTimeMetricsModule', () => {
 
       const result = FormatC3GraphProps({
         chartData,
-        resultChart
+        resultChart,
+        hasMeanLineTotal: true
       })
 
       expect(JSON.stringify(result)).toEqual(JSON.stringify(expected))
@@ -171,31 +118,47 @@ describe('RealTimeMetricsModule', () => {
         aggregationType: 'avg'
       }
 
-      const resultChart = fixtures.results
+      const resultChart = FIXTURES.RESULTS
 
       const expected = {
         data: {
           x: 'ts',
           type: 'bar',
-          columns: fixtures.results,
+          columns: FIXTURES.COLUMNS_WITH_MEAN_LINE_PER_SERIES,
           xFormat: '%Y-%m-%dT%H:%M:%S.%LZ',
           names: {
-            serieTest1: 'Serie Test 1 - 4.07%',
-            serieTest2: 'Serie Test 2 - 4.33%',
-            serieTest3: 'Serie Test 3 - 4.07%',
-            serieTest4: 'Serie Test 4 - 4.40%',
-            serieTest5: 'Serie Test 5 - 4.07%',
-            serieTest6: 'Serie Test 6 - 4.33%',
-            serieTest7: 'Serie Test 7 - 4.00%',
-            serieTest8: 'Serie Test 8 - 4.33%',
-            serieTest9: 'Serie Test 9 - 4.20%',
+            serieTest1: 'Serie Test 1 - 40,666,666,666.67%',
+            'Mean Line - Serie Test 1': 'Mean Line - Serie Test 1 - 2,711,111,111.11%',
+            serieTest2: 'Serie Test 2 - 4,333,333,333.33%',
+            'Mean Line - Serie Test 2': 'Mean Line - Serie Test 2 - 288,888,888.89%',
+            serieTest3: 'Serie Test 3 - 406,666,666.67%',
+            'Mean Line - Serie Test 3': 'Mean Line - Serie Test 3 - 27,111,111.11%',
+            serieTest4: 'Serie Test 4 - 44,000,000.00%',
+            'Mean Line - Serie Test 4': 'Mean Line - Serie Test 4 - 2,933,333.33%',
+            serieTest5: 'Serie Test 5 - 4,066,666.67%',
+            'Mean Line - Serie Test 5': 'Mean Line - Serie Test 5 - 271,111.11%',
+            serieTest6: 'Serie Test 6 - 433,333.33%',
+            'Mean Line - Serie Test 6': 'Mean Line - Serie Test 6 - 28,888.89%',
+            serieTest7: 'Serie Test 7 - 4,000.00%',
+            'Mean Line - Serie Test 7': 'Mean Line - Serie Test 7 - 266.67%',
+            serieTest8: 'Serie Test 8 - 433.33%',
+            'Mean Line - Serie Test 8': 'Mean Line - Serie Test 8 - 28.89%',
+            serieTest9: 'Serie Test 9 - 42.00%',
+            'Mean Line - Serie Test 9': 'Mean Line - Serie Test 9 - 2.80%',
             serieTest10: 'Serie Test 10 - 4.33%',
-            serieTest11: 'Serie Test 11 - 4.00%',
-            serieTest12: 'Serie Test 12 - 4.40%',
-            serieTest13: 'Serie Test 13 - 4.33%',
-            serieTest14: 'Serie Test 14 - 4.33%',
-            serieTest15: 'Serie Test 15 - 4.07%',
-            serieTest16: 'Serie Test 16 - 4.13%'
+            'Mean Line - Serie Test 10': 'Mean Line - Serie Test 10 - 0.29%',
+            serieTest11: 'Serie Test 11 - 0.40%',
+            'Mean Line - Serie Test 11': 'Mean Line - Serie Test 11 - 0.03%',
+            serieTest12: 'Serie Test 12 - 0.04%',
+            'Mean Line - Serie Test 12': 'Mean Line - Serie Test 12 - 0.00%',
+            serieTest13: 'Serie Test 13 - 0.00%',
+            'Mean Line - Serie Test 13': 'Mean Line - Serie Test 13 - 0.00%',
+            serieTest14: 'Serie Test 14 - 0.00%',
+            'Mean Line - Serie Test 14': 'Mean Line - Serie Test 14 - 0.00%',
+            serieTest15: 'Serie Test 15 - 0.00%',
+            'Mean Line - Serie Test 15': 'Mean Line - Serie Test 15 - 0.00%',
+            serieTest16: 'Serie Test 16 - 0.00%',
+            'Mean Line - Serie Test 16': 'Mean Line - Serie Test 16 - 0.00%'
           }
         },
         axis: {
@@ -222,7 +185,7 @@ describe('RealTimeMetricsModule', () => {
         },
         padding: null,
         color: {
-          pattern: fixtures.linePatterns
+          pattern: FIXTURES.LINE_PATTERNS_WITH_MEAN_LINE_PER_SERIES
         },
         grid: {
           y: {
@@ -246,7 +209,8 @@ describe('RealTimeMetricsModule', () => {
 
       const result = FormatC3GraphProps({
         chartData,
-        resultChart
+        resultChart,
+        hasMeanLineSeries: true
       })
 
       expect(JSON.stringify(result)).toEqual(JSON.stringify(expected))
@@ -264,31 +228,31 @@ describe('RealTimeMetricsModule', () => {
         aggregationType: 'sum'
       }
 
-      const resultChart = fixtures.results
+      const resultChart = FIXTURES.RESULTS
 
       const expected = {
         data: {
           x: 'ts',
           type: 'spline',
-          columns: fixtures.results,
+          columns: FIXTURES.RESULTS,
           xFormat: '%Y-%m-%dT%H:%M:%S.%LZ',
           names: {
-            serieTest1: 'Serie Test 1 - 61.0bit/s',
-            serieTest2: 'Serie Test 2 - 65.0bit/s',
-            serieTest3: 'Serie Test 3 - 61.0bit/s',
-            serieTest4: 'Serie Test 4 - 66.0bit/s',
-            serieTest5: 'Serie Test 5 - 61.0bit/s',
-            serieTest6: 'Serie Test 6 - 65.0bit/s',
-            serieTest7: 'Serie Test 7 - 60.0bit/s',
-            serieTest8: 'Serie Test 8 - 65.0bit/s',
-            serieTest9: 'Serie Test 9 - 63.0bit/s',
+            serieTest1: 'Serie Test 1 - 568.1Gb/s',
+            serieTest2: 'Serie Test 2 - 60.5Gb/s',
+            serieTest3: 'Serie Test 3 - 5.7Gb/s',
+            serieTest4: 'Serie Test 4 - 629.4Mb/s',
+            serieTest5: 'Serie Test 5 - 58.2Mb/s',
+            serieTest6: 'Serie Test 6 - 6.2Mb/s',
+            serieTest7: 'Serie Test 7 - 58.6kb/s',
+            serieTest8: 'Serie Test 8 - 6.3kb/s',
+            serieTest9: 'Serie Test 9 - 630.0bit/s',
             serieTest10: 'Serie Test 10 - 65.0bit/s',
-            serieTest11: 'Serie Test 11 - 60.0bit/s',
-            serieTest12: 'Serie Test 12 - 66.0bit/s',
-            serieTest13: 'Serie Test 13 - 65.0bit/s',
-            serieTest14: 'Serie Test 14 - 65.0bit/s',
-            serieTest15: 'Serie Test 15 - 61.0bit/s',
-            serieTest16: 'Serie Test 16 - 66.0bit/s'
+            serieTest11: 'Serie Test 11 - 6.0bit/s',
+            serieTest12: 'Serie Test 12 - 0.7bit/s',
+            serieTest13: 'Serie Test 13 - 0.1bit/s',
+            serieTest14: 'Serie Test 14 - 0.0bit/s',
+            serieTest15: 'Serie Test 15 - 0.0bit/s',
+            serieTest16: 'Serie Test 16 - 0.0bit/s'
           }
         },
         axis: {
@@ -315,7 +279,7 @@ describe('RealTimeMetricsModule', () => {
         },
         padding: null,
         color: {
-          pattern: fixtures.linePatterns
+          pattern: FIXTURES.LINE_PATTERNS
         },
         grid: {
           y: {
