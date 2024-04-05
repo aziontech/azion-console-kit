@@ -66,13 +66,11 @@
             </div>
           </div>
         </div>
-        <div class="flex flex-col sm:flex-row ml-0 sm:ml-auto">
-          <PrimeButton
-            label="More details"
-            outlined
-            @click="openDetails"
-          />
-        </div>
+        <PrimeButton
+          label="More details"
+          severity="secondary"
+          @click="openDetails"
+        />
       </div>
     </template>
     <template #content>

@@ -93,7 +93,12 @@
               </div>
               <OuthGithub
                 :listPlatformsService="listPlatformsService"
-                @callbackUrl="callbackUrl"
+                @onCallbackUrl="
+                  (uri) => {
+                    callbackUrl = uri.value
+                  }
+                "
+                :loading="isIntegrationsLoading"
                 v-else
               />
             </div>
@@ -219,8 +224,9 @@
   const isLoading = ref(true)
   const submitLoading = ref(false)
   const isMounted = ref(false)
-  const callbackUrl = ref()
+  const callbackUrl = ref('')
   const listOfIntegrations = ref([])
+  const isIntegrationsLoading = ref(false)
 
   onMounted(async () => {
     await loadTemplate(props.templateId)
@@ -247,9 +253,20 @@
   }
 
   const listIntegrations = async () => {
-    const data = await props.listIntegrationsService()
+    try {
+      isIntegrationsLoading.value = true
+      const data = await props.listIntegrationsService()
 
-    listOfIntegrations.value = data
+      listOfIntegrations.value = data
+    } catch (error) {
+      toast.add({
+        closable: true,
+        severity: 'error',
+        summary: error
+      })
+    } finally {
+      isIntegrationsLoading.value = false
+    }
   }
 
   const listenerOnMessage = () => {
@@ -271,11 +288,10 @@
   })
 
   const saveIntegration = async (integration) => {
-    await props.postCallbackUrlService('/oauth/github/callback', integration.data)
+    isIntegrationsLoading.value = true
+    await props.postCallbackUrlService(callbackUrl.value, integration.data)
     await listIntegrations()
   }
-
-  // Ajustes acima
 
   const createSchemaObject = async () => {
     const templateSchema = {}

@@ -1,9 +1,9 @@
 import { AxiosHttpClientAdapter, parseHttpResponse } from '../axios/AxiosHttpClientAdapter'
-import { makeVcsIntegrationBaseUrl } from './make-vcs-integration-base-url'
+import { makeVersionControlSystemBaseUrl } from './make-version-control-system-base-url'
 
 export const listPlatformsService = async () => {
   let httpResponse = await AxiosHttpClientAdapter.request({
-    url: `${makeVcsIntegrationBaseUrl()}/platforms`,
+    url: `${makeVersionControlSystemBaseUrl()}/platforms`,
     method: 'GET'
   })
 
@@ -12,14 +12,15 @@ export const listPlatformsService = async () => {
 }
 
 const adapt = (httpResponse) => {
-  const parsedPlatforms = httpResponse.body.results.map((element) => {
+  const parsedPlatforms = httpResponse.body.results.map((platform) => {
+    const uri = platform.callback_url.split('vcs')[1]
     return {
-      id: element.id,
-      name: element.name,
-      installationUrl: element.installation_url,
-      callbackUrl: element.callback_url
+      id: platform.id,
+      name: platform.name,
+      installationUrl: platform.installation_url,
+      callbackUrl: uri
     }
-  })
+  }) || []
 
   return {
     body: parsedPlatforms,

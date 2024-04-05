@@ -32,7 +32,7 @@ const getConfig = () => {
             path.replace(/^\/api\/(marketplace|script-runner|template-engine)/, '/$1/api')
         },
         '^/api/vcs': {
-          target: `https://stage-vcs-api.azion.net/`,
+          target: `${URLStartPrefix}vcs-api.azion.net/`,
           changeOrigin: true,
           rewrite: (path) =>
             path.replace(/^\/api\/vcs/, '/vcs/api')

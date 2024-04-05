@@ -5,18 +5,23 @@
     outlined
     icon="pi pi-github"
     iconPos="left"
+    :loading="loading"
   />
 </template>
 
 <script setup>
-  import { ref } from 'vue'
+  import { ref, watch } from 'vue'
   import PrimeButton from 'primevue/button'
 
-  const emit = defineEmits(['onGithubInstallation'])
+  const emit = defineEmits(['onCallbackUrl'])
 
   const props = defineProps({
     listPlatformsService: {
       type: Function,
+      required: true
+    },
+    loading: {
+      type: Boolean,
       required: true
     }
   })
@@ -31,7 +36,6 @@
       if (platform.id === 'github') {
         githubInstallation.value = platform
         callbackUrl.value = platform.callbackUrl
-        emitGithubInstallation()
       }
     })
 
@@ -45,6 +49,10 @@
   }
 
   const emitGithubInstallation = () => {
-    emit('callbackUrl', callbackUrl)
+    emit('onCallbackUrl', callbackUrl)
   }
+
+  watch(callbackUrl, () => {
+    emitGithubInstallation()
+  })
 </script>

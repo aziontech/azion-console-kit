@@ -1,9 +1,9 @@
 import { AxiosHttpClientAdapter, parseHttpResponse } from '../axios/AxiosHttpClientAdapter'
-import { makeVcsIntegrationBaseUrl } from './make-vcs-integration-base-url'
+import { makeVersionControlSystemBaseUrl } from './make-version-control-system-base-url'
 
 export const postCallbackUrlService = async (path, body) => {
   let httpResponse = await AxiosHttpClientAdapter.request({
-    url: `${makeVcsIntegrationBaseUrl()}${path}`,
+    url: `${makeVersionControlSystemBaseUrl()}${path}`,
     method: 'POST',
     body: body
   })
