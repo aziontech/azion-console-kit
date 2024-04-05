@@ -13,10 +13,11 @@ export const getScriptRunnerResultsService = async (executionId) => {
 const parseHttpResponse = (httpResponse) => {
   switch (httpResponse.statusCode) {
     case 200:
-      if (!httpResponse.body.result.errors) {
-        return httpResponse.body
+      const hasErrors = httpResponse.body.result.errors || httpResponse.body.result.error
+      if (hasErrors) {
+        throw new Error(httpResponse.body.result.message).message
       }
-      throw new Error(httpResponse.body.result.message).message
+      return httpResponse.body
     case 400:
       throw new Errors.NotFoundError().message
     case 401:
