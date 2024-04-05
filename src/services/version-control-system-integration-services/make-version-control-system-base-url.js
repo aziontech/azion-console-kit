@@ -1,3 +1,4 @@
 export const makeVersionControlSystemBaseUrl = () => {
-  return `vcs`
+  const version = 'v4'
+  return `${version}/vcs`
 }
