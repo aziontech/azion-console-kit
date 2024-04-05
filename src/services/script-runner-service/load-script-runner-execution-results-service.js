@@ -2,7 +2,7 @@ import { AxiosHttpClientAdapter } from '../axios/AxiosHttpClientAdapter'
 import { makeScriptRunnerBaseUrl } from './make-script-runner-base-url'
 import * as Errors from '@/services/axios/errors'
 
-export const getScriptRunnerResultsService = async (executionId) => {
+export const loadScriptRunnerExecutionResultsService = async (executionId) => {
   let httpResponse = await AxiosHttpClientAdapter.request({
     url: `${makeScriptRunnerBaseUrl()}/executions/${executionId}/results`,
     method: 'GET'
