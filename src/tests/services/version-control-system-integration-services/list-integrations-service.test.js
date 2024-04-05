@@ -4,7 +4,7 @@ import { describe, expect, it, vi } from 'vitest'
 
 const fixtures = {
   vcsMock: {
-    scope: 'lucasmendes21',
+    scope: 'scopeteste',
     uuid: '7283j-j2j3l2-82736823-j2k4m2',
     platform: {
       callback_url: 'https://api-teste.com/v4/vcs/integrations/oauth/github/callback'
