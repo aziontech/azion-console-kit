@@ -7,7 +7,7 @@ const fixtures = {
   executionId: 'xx',
   deploymentFailed: {
     result: {
-      error: true,
+      errors: [],
       message: 'deploy failed'
     }
   }

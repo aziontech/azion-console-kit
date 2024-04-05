@@ -54,9 +54,18 @@
             @click="checkLoginMethod"
           />
         </div>
+        <div
+          class="flex-col gap-6 sm:gap-8 flex"
+          v-if="showSocialIdps"
+        >
+          <Divider align="center">
+            <p>or</p>
+          </Divider>
+        </div>
+
         <SocialIdpsBlock
           :socialIdpsService="listSocialIdpsService"
-          direction="top-to-bottom"
+          v-model:showSocialIdps="showSocialIdps"
         />
       </div>
 
@@ -155,8 +164,9 @@
   import { useField, useForm } from 'vee-validate'
   import { ref, inject } from 'vue'
   import { useRouter } from 'vue-router'
+  import Divider from 'primevue/divider'
   import * as yup from 'yup'
-  /**@type {import('@/plugins/adapters/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
+  /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
 
   defineOptions({ name: 'signInBlock' })
@@ -191,6 +201,7 @@
     }
   })
 
+  const showSocialIdps = ref(true)
   const emailValidateRegex = /^\S+@\S+\.\S+$/
 
   const validationSchema = yup.object({
@@ -228,7 +239,7 @@
 
       await props.authenticationLoginService(loginData)
       const { twoFactor, trustedDevice, user_tracking_info: userInfo } = await verify()
-      tracker.userSigned()
+      tracker.signIn.userSignedIn()
       if (twoFactor) {
         const mfaRoute = trustedDevice ? 'authentication' : 'setup'
         router.push(`/mfa/${mfaRoute}`)
@@ -237,7 +248,7 @@
 
       await switchClientAccount(userInfo.props)
     } catch {
-      tracker.userFailedSignIn().track()
+      tracker.signIn.userFailedSignIn().track()
       hasRequestErrorMessage.value = new UserNotFoundError().message
       isButtonLoading.value = false
     }

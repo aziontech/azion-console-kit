@@ -17,7 +17,7 @@ import { homeRoutes } from '@routes/home-routes'
 import { edgeDnsRoutes } from '@/router/routes/edge-dns-routes'
 import { loginRoutes } from '@routes/login-routes'
 import { marketplaceRoutes } from '@routes/marketplace-routes'
-import { metricsRoutes } from '@routes/metrics-routes'
+import { realTimeMetricsRoutes } from '@routes/real-time-metrics-routes'
 import { realTimeEventsRoutes } from '@/router/routes/real-time-events-routes'
 import { mfaRoutes } from '@routes/mfa-routes'
 import { networkListsRoutes } from '@routes/network-lists-routes'
@@ -32,7 +32,7 @@ import { usersListsRoutes } from '@routes/users-routes'
 import { variablesRoutes } from '@routes/variables-routes'
 import { wafRulesRoutes } from '@routes/waf-rules-routes'
 import { settingsRoutes } from '@routes/your-settings-routes'
-import { gitHubRoutes } from './routes/github-routes'
+import { githubRoutes } from '@routes/github-routes'
 import { createRouter, createWebHistory } from 'vue-router'
 
 import afterEachRouteGuard from './hooks/afterEachRoute'
@@ -73,9 +73,9 @@ const router = createRouter({
     accountRoutes,
     settingsRoutes,
     wafRulesRoutes,
-    metricsRoutes,
-    gitHubRoutes,
-    realTimeEventsRoutes
+    realTimeMetricsRoutes,
+    realTimeEventsRoutes,
+    githubRoutes
   ].concat(errorRoutes)
 })
 

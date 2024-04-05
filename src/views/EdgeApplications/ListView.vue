@@ -9,7 +9,7 @@
   import PageHeadingBlock from '@/templates/page-heading-block'
 
   defineOptions({ name: 'list-edge-applications' })
-  /**@type {import('@/plugins/adapters/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
+  /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
 
   const props = defineProps({
@@ -33,12 +33,12 @@
     hasContentToList.value = event
   }
   const handleTrackEvent = () => {
-    tracker.clickToCreate({
+    tracker.product.clickToCreate({
       productName: 'Edge Application'
     })
   }
   const handleTrackEditEvent = () => {
-    tracker.clickToEdit({
+    tracker.product.clickToEdit({
       productName: 'Edge Application'
     })
   }

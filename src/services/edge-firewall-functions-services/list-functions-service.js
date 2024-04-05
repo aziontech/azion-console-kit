@@ -29,7 +29,7 @@ const adapt = (httpResponse) => {
       name: edgeFirewall.name,
       lastEditor: edgeFirewall.last_editor,
       lastModified: edgeFirewall.last_modified,
-      args: edgeFirewall.args
+      args: edgeFirewall.json_args
     }
   })
 

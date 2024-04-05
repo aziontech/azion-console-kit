@@ -276,7 +276,7 @@
                 <TextInfo label="Debug Log">{{ details.debugLog }}</TextInfo>
               </div>
               <div class="flex flex-col gap-3 w-full sm:w-5/12 flex-1">
-                <TextInfo label="Stack Trace">{{ details.stackTrace }}</TextInfo>
+                <TextInfo label="Stack Trace">{{ details.stacktrace }}</TextInfo>
               </div>
             </div>
           </template>

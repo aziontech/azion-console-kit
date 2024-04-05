@@ -1,33 +1,43 @@
 <template>
-  <div class="flex items-center w-auto p-10">
-    <Button class="w-fit" label="Open Modal"  @click="visible = true" />
-      <Dialog  
-      :dismissable-mask="true" 
-      v-model:visible="visible" 
-      modal 
-      :position="position"
-      header="Header"
+  <div class="grid grid-col-1 p-10">
+    <div class="">
+      <Password
+        class="col-span-1 min-w-full"
+        toggleMask
+        v-model="value"
+        promptLabel="Choose a password"
+        weakLabel="Weak"
+        mediumLabel="Medium"
+        strongLabel="Strong"
+        :pt="{
+          meter: 'rounded-md',
+          meterLabel: 'text-sm'
+        }"
       >
-          <p>
-              Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
-              Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
-          </p>
+        <template #header> </template>
         <template #footer>
-          <Button label="Ok" icon="pi pi-check" @click="visible = false" autofocus />
-          <Button label="Ok" icon="pi pi-check" @click="visible = false" autofocus />
-      </template>
-        
-      </Dialog>
+          <div class="mt-4 text-sm space-y-4">
+            <Divider />
+            <p class="font-medium">Must have at least:</p>
+          </div>
 
+          <div class="text-sm p-4 py-0 mt-2">
+            <ul class="list-square font-normal space-y-2 text-color-secondary">
+              <li>8 characters</li>
+              <li>1 uppercase letter</li>
+              <li>1 lowercase letter</li>
+              <li>1 number</li>
+              <li>1 special character (Example: !?@#$%)</li>
+            </ul>
+          </div>
+        </template>
+      </Password>
+    </div>
   </div>
 </template>
 
 <script setup>
-  import Button from 'primevue/button';
-  import Dialog from 'primevue/dialog';
-
-  import { ref } from "vue";
-
-  const visible = ref(false); 
-
+  import Password from 'primevue/password'
+  import Divider from 'primevue/divider'
+  import { ref } from 'vue'
 </script>

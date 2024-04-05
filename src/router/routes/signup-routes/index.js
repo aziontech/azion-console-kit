@@ -15,22 +15,13 @@ export const signupRoutes = {
       component: SignupView,
       props: {
         signupService: SignupService.signupService,
-        listSocialIdpsService: listSocialIdpsService
-      },
-      meta: {
-        hideNavigation: true,
-        isPublic: true
-      }
-    },
-    {
-      path: 'activation',
-      name: 'activation',
-      component: () => import('@views/Signup/SignupActivationView.vue'),
-      props: {
+        listSocialIdpsService: listSocialIdpsService,
         resendEmailService: SignupService.resendEmailService
       },
       meta: {
         hideNavigation: true,
+        showDocumentButton: true,
+        hideLinksFooter: true,
         isPublic: true
       }
     },
@@ -53,7 +44,9 @@ export const signupRoutes = {
         if (isFirstLogin && accountStore.ssoSignUpMethod) {
           /** @type {import('@/plugins/adapters/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
           const tracker = inject('tracker')
-          tracker.userSignedUp({ method: accountStore.ssoSignUpMethod })
+          const signUpMethod = { method: accountStore.ssoSignUpMethod }
+
+          tracker.signUp.userSignedUp(signUpMethod).signUp.userAuthorizedSso(signUpMethod)
         }
 
         if (isFirstLogin) {

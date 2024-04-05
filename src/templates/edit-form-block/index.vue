@@ -109,7 +109,7 @@
       }
       goBackToList()
     } catch (error) {
-      emit('on-edit-fail')
+      emit('on-edit-fail', error)
       blockViewRedirection.value = true
       showToast('error', error)
     }

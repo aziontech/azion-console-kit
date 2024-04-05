@@ -8,6 +8,7 @@
   import { ref, watch, provide, reactive } from 'vue'
   import ListViewTabResources from '@/views/EdgeServices/ListViewTabResources'
   import { generateCurrentTimestamp } from '@/helpers/generate-timestamp'
+  import { useToast } from 'primevue/usetoast'
 
   defineOptions({ name: 'tabs-edge-service' })
 
@@ -25,6 +26,8 @@
 
   const route = useRoute()
   const router = useRouter()
+  const toast = useToast()
+
   const activeTab = ref(0)
   const edgeServiceId = ref(route.params.id)
 
@@ -36,9 +39,30 @@
     resources: 1
   }
 
+  const title = ref('')
+
+  const getEdgeService = async () => {
+    try {
+      const result = await props.loadEdgeService({ id: edgeServiceId.value })
+      title.value = result.name
+    } catch (error) {
+      toast.add({
+        closable: true,
+        severity: 'error',
+        summary: 'error',
+        detail: error
+      })
+    }
+  }
+
+  const updateEdgeServiceValue = (value) => {
+    title.value = value.name
+  }
+
   const mapTabs = ref({ ...defaultTabs })
 
-  const renderTabCurrentRouter = () => {
+  const renderTabCurrentRouter = async () => {
+    await getEdgeService()
     const { resources } = route.params
     activeTab.value = resources ? 1 : 0
   }
@@ -86,7 +110,7 @@
 <template>
   <ContentBlock>
     <template #heading>
-      <PageHeadingBlock pageTitle="Edit Edge Service" />
+      <PageHeadingBlock :pageTitle="title" />
     </template>
     <template #content>
       <TabView
@@ -100,6 +124,7 @@
             :hiddenActionBar="!activeTab"
             :loadEdgeService="props.loadEdgeService"
             :editEdgeService="props.editEdgeService"
+            @handleEdgeServiceUpdated="updateEdgeServiceValue"
             :updatedRedirect="props.updatedRedirect"
             :isTab="true"
           />

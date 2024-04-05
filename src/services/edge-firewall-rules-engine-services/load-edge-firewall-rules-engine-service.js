@@ -22,7 +22,7 @@ const parseBehaviors = (behaviors) => {
       case 'run_function':
         return {
           name: behavior.name,
-          functionId: behavior.argument
+          functionId: parseInt(behavior.argument)
         }
 
       case 'set_waf_ruleset_and_waf_mode':
