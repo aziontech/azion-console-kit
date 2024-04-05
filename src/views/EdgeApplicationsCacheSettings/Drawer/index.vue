@@ -60,7 +60,9 @@
     cacheByCookies: 'ignore',
     cookieNames: '',
     adaptiveDeliveryAction: 'ignore',
-    deviceGroup: []
+    deviceGroup: [],
+    l2CachingEnabled: false,
+    isSliceL2CachingEnabled: false
   })
   const validationSchema = yup.object({
     name: yup.string().required().label('Name'),

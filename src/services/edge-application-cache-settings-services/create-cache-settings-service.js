@@ -54,7 +54,11 @@ const adapt = (payload) => {
     cache_by_cookies: payload.cacheByCookies,
     cookie_names: parseTextContentToArrayByBreaklines(payload.cookieNames),
     adaptive_delivery_action: payload.adaptiveDeliveryAction,
-    device_group: parseDeviceGroup(payload.deviceGroup)
+    device_group: parseDeviceGroup(payload.deviceGroup),
+    l2_caching_enabled: payload.l2CachingEnabled,
+    l2_region: payload.l2Region,
+    is_slice_l2_caching_enabled: payload.isSliceL2CachingEnabled
+
   }
 }
 
