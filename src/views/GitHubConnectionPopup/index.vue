@@ -18,7 +18,7 @@
   })
 
   const sendPostMessage = () => {
-    const platformUrl = 'http://localhost:5173'
+    const platformUrl = window.location.origin
     const data = {
       event: 'integration-data',
       data: route.query

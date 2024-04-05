@@ -86,7 +86,7 @@
                   optionValue="value"
                   @onChange="
                     (installation_id) => {
-                      formTools.setFieldValue(field.name, installation_id)
+                      setFieldValue(field.name, installation_id)
                     }
                   "
                 />
@@ -95,7 +95,7 @@
                 :listPlatformsService="listPlatformsService"
                 @onCallbackUrl="
                   (uri) => {
-                    callbackUrl = uri.value
+                    setCallbackUrl(uri.value)
                   }
                 "
                 :loading="isIntegrationsLoading"
@@ -145,10 +145,7 @@
         </template>
       </FormHorizontal>
     </div>
-    <Teleport
-      :to="actionBarId"
-      v-if="isMounted"
-    >
+    <Teleport :to="actionBarId">
       <ActionBarTemplate
         v-if="!isLoading"
         :loading="submitLoading"
@@ -223,7 +220,6 @@
   const formTools = ref({})
   const isLoading = ref(true)
   const submitLoading = ref(false)
-  const isMounted = ref(false)
   const callbackUrl = ref('')
   const listOfIntegrations = ref([])
   const isIntegrationsLoading = ref(false)
@@ -231,7 +227,6 @@
   onMounted(async () => {
     await loadTemplate(props.templateId)
     await listIntegrations()
-    isMounted.value = true
 
     listenerOnMessage()
   })
@@ -442,6 +437,14 @@
 
   const handleCancel = () => {
     emit('cancel')
+  }
+
+  const setFieldValue = (field, installation_id) => {
+    formTools.value.setFieldValue(field, installation_id)
+  }
+
+  const setCallbackUrl = (uri) => {
+    callbackUrl.value = uri
   }
 
   watch(
