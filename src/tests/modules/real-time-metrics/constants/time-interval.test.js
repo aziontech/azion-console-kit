@@ -1,4 +1,4 @@
-import { TIME_INTERVALS } from '@/modules/real-time-metrics/constants'
+import { TIME_INTERVALS } from '@modules/real-time-metrics/constants'
 import { describe, expect, it } from 'vitest'
 
 describe('RealTimeMetricsModule', () => {

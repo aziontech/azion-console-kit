@@ -1,6 +1,6 @@
-import { MAP_SERVICE_OPERATION } from '@/modules/real-time-metrics/constants'
+import { MAP_SERVICE_OPERATION } from '@modules/real-time-metrics/constants'
 import { describe, expect, it } from 'vitest'
-import * as services from '@/services/real-time-metrics-services'
+import * as services from '@services/real-time-metrics-services'
 
 describe('RealTimeMetricsModule', () => {
   describe('Operator in constants', () => {

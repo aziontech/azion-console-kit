@@ -1,4 +1,4 @@
-import { FILTERS_RULES } from '@/modules/real-time-metrics/constants'
+import { FILTERS_RULES } from '@modules/real-time-metrics/constants'
 import { describe, expect, it } from 'vitest'
 
 describe('RealTimeMetricsModule', () => {
