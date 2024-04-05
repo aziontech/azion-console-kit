@@ -16,7 +16,6 @@ export default {
     extend: {
       colors: {
         header: '#171717',
-        'header-input': '#292929',
         'header-button-enabled': '#ffffff32',
         'header-button-hover': 'rgba(244, 244, 244, 0.04)',
         'header-avatar': '#363636',
