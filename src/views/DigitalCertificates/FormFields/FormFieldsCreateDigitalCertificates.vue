@@ -180,7 +180,7 @@
   >
     <template #inputs>
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
-        <label>Certificate *</label>
+        <label>Certificate</label>
         <PrimeTextarea
           v-model="certificate"
           :class="{ 'p-invalid': certificateError }"
