@@ -186,7 +186,6 @@
     openCreateDrawer,
     openEditDrawer
   })
-  
 </script>
 
 <template>
@@ -197,12 +196,10 @@
     :schema="validationSchema"
     :initialValues="initialValues"
     @onSuccess="handleCreateCacheSettings"
-    
     title="Create Cache Settings"
   >
     <template #formFields>
-      
-      <FormFieldsEdgeApplicationCacheSettings :showTieredCache="props.showTieredCache"/>
+      <FormFieldsEdgeApplicationCacheSettings :showTieredCache="props.showTieredCache" />
     </template>
   </CreateDrawerBlock>
 

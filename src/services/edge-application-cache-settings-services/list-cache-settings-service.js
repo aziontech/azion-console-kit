@@ -30,7 +30,7 @@ const adapt = (httpResponse) => {
     id: cacheSettings.id.toString(),
     name: cacheSettings.name,
     browserCache: formatCacheSettings(cacheSettings.browser_cache_settings),
-    cdnCache: formatCacheSettings(cacheSettings.cdn_cache_settings) 
+    cdnCache: formatCacheSettings(cacheSettings.cdn_cache_settings)
   }))
 
   return {

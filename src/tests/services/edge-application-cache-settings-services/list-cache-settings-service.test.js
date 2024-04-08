@@ -55,8 +55,8 @@ describe('EdgeApplicationCacheSettingsServices', () => {
       {
         id: fixtures.cacheSettingsMock.id,
         name: fixtures.cacheSettingsMock.name,
-        browserCache: "Honor Origin Cache Headers",
-        cdnCache: "Override Cache Settings"
+        browserCache: 'Honor Origin Cache Headers',
+        cdnCache: 'Override Cache Settings'
       }
     ])
   })

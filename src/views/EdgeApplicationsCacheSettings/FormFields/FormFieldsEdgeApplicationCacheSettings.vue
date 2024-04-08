@@ -148,14 +148,13 @@
     }
   })
 
-  watch(l2CachingEnabled, (value)  => {
-    if(value) {
+  watch(l2CachingEnabled, (value) => {
+    if (value) {
       cdnCacheSettings.value = 'override'
     } else {
       isSliceL2CachingEnabled.value = false
     }
   })
-
 </script>
 
 <template>
@@ -289,7 +288,10 @@
           >{{ cdnCacheSettingsMaximumTtlError }}</small
         >
       </div>
-      <div class="flex gap-2 w-full items-start "  v-if="props.showTieredCache">
+      <div
+        class="flex gap-2 w-full items-start"
+        v-if="props.showTieredCache"
+      >
         <InputSwitch
           v-model="l2CachingEnabled"
           inputId="l2CachingEnabled"
@@ -300,11 +302,15 @@
         >
           <span class="text-color text-sm font-normal leading-5">Tiered Cache </span>
           <span class="text-sm text-color-secondary font-normal leading-5">
-            Enable Tiered Cache if you want to reduce the traffic to your origin and increase performance and availability.
+            Enable Tiered Cache if you want to reduce the traffic to your origin and increase
+            performance and availability.
           </span>
         </label>
       </div>
-      <div class="flex flex-col w-full sm:max-w-xs gap-2"  v-if="props.showTieredCache">
+      <div
+        class="flex flex-col w-full sm:max-w-xs gap-2"
+        v-if="props.showTieredCache"
+      >
         <label
           for="method"
           class="text-color text-sm font-medium leading-5"
@@ -362,7 +368,10 @@
               <span class="text-color text-sm font-normal leading-5">Edge Cache</span>
             </label>
           </div>
-          <div class="flex w-full gap-2 items-start"  v-if="props.showTieredCache">
+          <div
+            class="flex w-full gap-2 items-start"
+            v-if="props.showTieredCache"
+          >
             <CheckboxPrime
               v-model="isSliceL2CachingEnabled"
               name="isSliceL2CachingEnabled"
@@ -375,9 +384,9 @@
             >
               <span class="text-color text-sm font-normal leading-5">Tiered Cache</span>
             </label>
-          </div>      
+          </div>
         </div>
-      </div>      
+      </div>
       <div
         v-if="showSliceConfigurationRange"
         class="flex flex-col sm:max-w-xs w-full gap-2"

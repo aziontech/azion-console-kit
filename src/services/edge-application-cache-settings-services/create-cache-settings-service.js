@@ -37,9 +37,8 @@ const parseTextContentToArrayByBreaklines = (textContent) => {
 }
 
 const adapt = (payload) => {
-
   let region = ''
-  if(payload.l2CachingEnabled) {
+  if (payload.l2CachingEnabled) {
     region = payload.l2Region ?? 'na-united-states'
   }
 
