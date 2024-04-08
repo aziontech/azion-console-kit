@@ -11,7 +11,7 @@ const makeSut = () => {
   }
 }
 
-describe('AccountServices', () => {
+describe('AccountSettingsServices', () => {
   it('should call the API service with correct params', async () => {
     const requestSpy = vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
       statusCode: 200,
