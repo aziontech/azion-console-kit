@@ -70,7 +70,6 @@ const adapt = (payload) => {
   }
 
   return requestData
-
 }
 
 /**

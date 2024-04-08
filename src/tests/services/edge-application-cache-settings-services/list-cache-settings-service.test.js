@@ -33,7 +33,7 @@ describe('EdgeApplicationCacheSettingsServices', () => {
     })
 
     expect(requestSpy).toHaveBeenCalledWith({
-      url: `v3/edge_applications/${fixtures.edgeApplicationId}/cache_settings`,
+      url: `v3/edge_applications/${fixtures.edgeApplicationId}/cache_settings?page_size=200`,
       method: 'GET'
     })
   })

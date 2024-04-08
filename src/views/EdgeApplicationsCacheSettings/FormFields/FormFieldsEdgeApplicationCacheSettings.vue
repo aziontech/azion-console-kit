@@ -142,6 +142,15 @@
     return adaptiveDeliveryAction.value === 'whitelist'
   })
 
+  const cacheSettingsOptions = computed(() => {
+    return CACHE_SETTINGS_OPTIONS.value.map((item) => {
+      return {
+        ...item,
+        disabledItem: item.value === 'honor' && l2CachingEnabled.value
+      }
+    })
+  })
+
   watch(adaptiveDeliveryAction, (value) => {
     if (value === 'whitelist' && deviceGroup.value.length === 0) {
       addDeviceGroup({ id: '' })
@@ -151,8 +160,11 @@
   watch(l2CachingEnabled, (value) => {
     if (value) {
       cdnCacheSettings.value = 'override'
+      isSliceEdgeCachingEnabled.value = true
+      sliceConfigurationEnabled.value = true
     } else {
       isSliceL2CachingEnabled.value = false
+      isSliceEdgeCachingEnabled.value = false
     }
   })
 </script>
@@ -239,14 +251,14 @@
         <div class="flex flex-col gap-4">
           <div
             class="flex no-wrap gap-2 items-center"
-            v-for="cdnCacheSettingsOption in CACHE_SETTINGS_OPTIONS"
+            v-for="cdnCacheSettingsOption in cacheSettingsOptions"
             :key="cdnCacheSettingsOption.value"
           >
             <RadioButton
               v-model="cdnCacheSettings"
               :inputId="`cdnOption-${cdnCacheSettingsOption.value}`"
               name="cdnCacheSettings"
-              :disabled="l2CachingEnabled && cdnCacheSettingsOption.value === 'honor'"
+              :disabled="cdnCacheSettingsOption.disabledItem"
               :value="cdnCacheSettingsOption.value"
             />
             <label
@@ -343,6 +355,7 @@
         <InputSwitch
           v-model="sliceConfigurationEnabled"
           inputId="sliceConfigurationEnabled"
+          :disabled="l2CachingEnabled"
         />
         <label
           for="sliceConfigurationEnabled"
@@ -360,6 +373,7 @@
               v-model="isSliceEdgeCachingEnabled"
               name="isSliceEdgeCachingEnabled"
               binary
+              :disabled="l2CachingEnabled"
             />
             <label
               for="isSliceEdgeCachingEnabled"

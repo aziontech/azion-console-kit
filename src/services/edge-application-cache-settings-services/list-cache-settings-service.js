@@ -8,7 +8,7 @@ import { makeEdgeApplicationBaseUrl } from '../edge-application-services/make-ed
  */
 export const listCacheSettingsService = async ({ id }) => {
   let httpResponse = await AxiosHttpClientAdapter.request({
-    url: `${makeEdgeApplicationBaseUrl()}/${id}/cache_settings`,
+    url: `${makeEdgeApplicationBaseUrl()}/${id}/cache_settings?page_size=200`,
     method: 'GET'
   })
   httpResponse = adapt(httpResponse)
