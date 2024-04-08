@@ -7,8 +7,8 @@ const fixtures = {
   cacheSettingsMock: {
     id: '181729637',
     name: 'Cache Settings Console Kit',
-    browser_cache_settings: true,
-    cdn_cache_settings: false
+    browser_cache_settings: 'honor',
+    cdn_cache_settings: 'override'
   }
 }
 
@@ -55,8 +55,8 @@ describe('EdgeApplicationCacheSettingsServices', () => {
       {
         id: fixtures.cacheSettingsMock.id,
         name: fixtures.cacheSettingsMock.name,
-        browserCache: fixtures.cacheSettingsMock.browser_cache_settings,
-        cdnCache: fixtures.cacheSettingsMock.cdn_cache_settings
+        browserCache: "Honor Origin Cache Headers",
+        cdnCache: "Override Cache Settings"
       }
     ])
   })

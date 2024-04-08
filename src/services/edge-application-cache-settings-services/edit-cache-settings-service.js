@@ -37,6 +37,10 @@ const parseTextContentToArrayByBreaklines = (textContent) => {
 }
 
 const adapt = (payload) => {
+  let region = ''
+  if(payload.l2CachingEnabled) {
+    region = payload.l2Region ?? 'na-united-states'
+  }
   return {
     name: payload.name,
     browser_cache_settings: payload.browserCacheSettings,
@@ -54,7 +58,11 @@ const adapt = (payload) => {
     cache_by_cookies: payload.cacheByCookies,
     cookie_names: parseTextContentToArrayByBreaklines(payload.cookieNames),
     adaptive_delivery_action: payload.adaptiveDeliveryAction,
-    device_group: parseDeviceGroup(payload.deviceGroup)
+    device_group: parseDeviceGroup(payload.deviceGroup),
+    l2_caching_enabled: payload.l2CachingEnabled,
+    l2_region: region,
+    is_slice_l2_caching_enabled: payload.isSliceL2CachingEnabled,
+    is_slice_edge_caching_enabled: payload.isSliceEdgeCachingEnabled
   }
 }
 
