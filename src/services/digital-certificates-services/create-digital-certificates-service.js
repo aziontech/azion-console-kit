@@ -36,6 +36,13 @@ const parseHttpResponse = (httpResponse) => {
 }
 
 const adapt = (payload) => {
+  if (!payload.certificate && !payload.privateKey) {
+    return {
+      name: payload.digitalCertificateName,
+      certificate_type: payload.certificateType
+    }
+  }
+
   return {
     name: payload.digitalCertificateName,
     certificate_type: payload.certificateType,
