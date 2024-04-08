@@ -62,8 +62,7 @@
           }
         }) || []
 
-      domainsList.value = [notSelectedDomains, alreadySelectedDomains]
-
+      domainsList.value = [notSelectedDomains.filter((element) => !element.edgeFirewallId), alreadySelectedDomains]
       resetField({
         value: alreadySelectedDomains
       })
