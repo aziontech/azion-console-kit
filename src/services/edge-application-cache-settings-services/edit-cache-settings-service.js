@@ -41,7 +41,7 @@ const adapt = (payload) => {
   if (payload.l2CachingEnabled) {
     region = payload.l2Region ?? 'na-united-states'
   }
-  return {
+  const requestData = {
     name: payload.name,
     browser_cache_settings: payload.browserCacheSettings,
     browser_cache_settings_maximum_ttl: payload.browserCacheSettingsMaximumTtl,
@@ -60,10 +60,15 @@ const adapt = (payload) => {
     adaptive_delivery_action: payload.adaptiveDeliveryAction,
     device_group: parseDeviceGroup(payload.deviceGroup),
     l2_caching_enabled: payload.l2CachingEnabled,
-    l2_region: region,
     is_slice_l2_caching_enabled: payload.isSliceL2CachingEnabled,
     is_slice_edge_caching_enabled: payload.isSliceEdgeCachingEnabled
   }
+
+  if (payload.l2CachingEnabled) {
+    requestData.l2_region = region
+  }
+
+  return requestData
 }
 
 /**

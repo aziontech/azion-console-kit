@@ -64,7 +64,6 @@ describe('EdgeApplicationCacheSettingsServices', () => {
         cookie_names: ['cookie1', 'cookie2', 'cookie3'],
         adaptive_delivery_action: fixtures.cacheSettingsMock.adaptiveDeliveryAction,
         device_group: ['123', 456],
-        l2_region: '',
         l2_caching_enabled: fixtures.cacheSettingsMock.l2CachingEnabled,
         is_slice_l2_caching_enabled: fixtures.cacheSettingsMock.isSliceL2CachingEnabled,
         is_slice_edge_caching_enabled: fixtures.cacheSettingsMock.isSliceEdgeCachingEnabled
