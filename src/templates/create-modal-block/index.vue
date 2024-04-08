@@ -4,6 +4,7 @@
   import { computed, onBeforeMount, ref, inject } from 'vue'
   import { useRouter } from 'vue-router'
   import { useToast } from 'primevue/usetoast'
+  import { useAccountStore } from '@/stores/account'
   /**@type {import('@/plugins/adapters/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
   defineOptions({
@@ -29,7 +30,7 @@
   const templates = ref([])
   const browseTemplates = ref([])
   const selectedTab = ref('recommended')
-  const recommendedHeader = ref('recommended-for-you')
+
   const items = ref([
     {
       label: 'Recommended',
@@ -171,8 +172,8 @@
   const loadRecommendedSolutions = async () => {
     try {
       isLoading.value = true
-      const payload = { type: recommendedHeader.value }
-      templates.value = await props.listSolutionsService(payload)
+      const accountStore = useAccountStore().accountData
+      templates.value = await props.listSolutionsService({ type: accountStore.jobRole })
     } catch (error) {
       showToast('error', error)
     } finally {
