@@ -4,9 +4,24 @@
   import FieldDropdown from '@/templates/form-fields-inputs/fieldDropdown'
   import PrimeButton from 'primevue/button'
   import Divider from 'primevue/divider'
-
+  import OAuthGithub from '@/templates/template-engine-block/oauth-github.vue'
+  import { ref, onMounted, computed } from 'vue'
   import { useField } from 'vee-validate'
-  // import { useToast } from 'primevue/usetoast'
+  import { useToast } from 'primevue/usetoast'
+
+  const toast = useToast()
+
+  const props = defineProps({
+    listPlatformsService: {
+      type: Function
+    },
+    postCallbackUrlService: {
+      type: Function
+    },
+    listIntegrationsService: {
+      type: Function
+    }
+  })
 
   const { value: preset } = useField('preset')
   const { value: edgeApplicationName } = useField('edgeApplicationName')
@@ -28,6 +43,53 @@
   const removeVariable = (index) => {
     newVariables.value.splice(index, 1)
   }
+
+  const callbackUrl = ref('')
+  const isGithubConnectLoading = ref(false)
+
+  const setCallbackUrl = (uri) => {
+    callbackUrl.value = uri
+  }
+  const saveIntegration = async (integration) => {
+    isGithubConnectLoading.value = true
+    await props.postCallbackUrlService(callbackUrl.value, integration.data)
+  }
+
+  const listenerOnMessage = () => {
+    window.addEventListener('message', (event) => {
+      if (event.data.event === 'integration-data') {
+        saveIntegration(event.data)
+      }
+    })
+  }
+
+  const integrationsList = ref([])
+  const listIntegrations = async () => {
+    try {
+      isGithubConnectLoading.value = true
+      const data = await props.listIntegrationsService()
+
+      integrationsList.value = data
+    } catch (error) {
+      toast.add({
+        closable: true,
+        severity: 'error',
+        summary: error
+      })
+    } finally {
+      isGithubConnectLoading.value = false
+    }
+  }
+
+  const hasIntegrations = computed(() => {
+    if (integrationsList?.value?.length > 0) return true
+    return false
+  })
+
+  onMounted(async () => {
+    await listIntegrations()
+    listenerOnMessage()
+  })
 </script>
 
 <template>
@@ -36,7 +98,19 @@
     description="Provide access to GitHub to import an existing project."
   >
     <template #inputs>
-      <!-- <InputText /> -->
+      <div>
+        <div v-if="hasIntegrations">Teste</div>
+        <OAuthGithub
+          v-else
+          :listPlatformsService="listPlatformsService"
+          @onCallbackUrl="
+            (uri) => {
+              setCallbackUrl(uri.value)
+            }
+          "
+          :loading="isGithubConnectLoading"
+        />
+      </div>
     </template>
   </FormHorizontal>
 

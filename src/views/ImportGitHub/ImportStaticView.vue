@@ -6,8 +6,20 @@
   import * as yup from 'yup'
   import FormFieldsImportStatic from './FormFields/FormFieldsImportStatic'
 
-  defineProps({
-    getAccountSettingsService: {
+  const props = defineProps({
+    createVariablesService: {
+      type: Function,
+      required: true
+    },
+    listPlatformsService: {
+      type: Function,
+      required: true
+    },
+    postCallbackUrlService: {
+      type: Function,
+      required: true
+    },
+    listIntegrationsService: {
       type: Function,
       required: true
     }
@@ -17,14 +29,20 @@
     edgeApplicationName: yup.string().required().label('Edge Application Name'),
     rootDirectory: yup.string(),
     preset: yup.string(),
-    newVariables: yup.array(),
+    newVariables: yup.array()
   })
 
   const initialValues = {
     edgeApplicationName: '',
     rootDirectory: '',
     preset: '',
-    newVariables: [],
+    newVariables: []
+  }
+
+  const handleCreateStaticTemplate = async (formValues) => {
+    return await Promise.all(
+      formValues.newVariables.map((variable) => props.createVariablesService(variable))
+    )
   }
 </script>
 
@@ -35,12 +53,16 @@
     </template>
     <template #content>
       <CreateFormBlock
-        :createService="() => {}"
+        :createService="handleCreateStaticTemplate"
         :schema="validationSchema"
         :initialValues="initialValues"
       >
         <template #form>
-          <FormFieldsImportStatic />
+          <FormFieldsImportStatic
+            :listPlatformsService="listPlatformsService"
+            :listIntegrationsService="listIntegrationsService"
+            :postCallbackUrlService="postCallbackUrlService"
+          />
         </template>
         <template #action-bar="{ onSubmit, formValid, onCancel, loading }">
           <ActionBarBlockWithTeleport

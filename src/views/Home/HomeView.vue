@@ -67,7 +67,7 @@
               />
               <PrimeButton
                 type="button"
-                label="How to edit an application"
+                label="How to build an application"
                 link
                 class="w-full sm:w-auto"
                 icon="pi pi-external-link"
