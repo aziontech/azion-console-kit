@@ -53,10 +53,10 @@ const adapt = (httpResponse) => {
   })
 
   const sortParsedRulesEgine = parsedRulesEgine.sort((sortA, sortB) => {
-    if (sortA.name === "Default Rule") return -1;
-    if (sortB.name === "Default Rule") return 1;
-    return 0;
-  });
+    if (sortA.name === 'Default Rule') return -1
+    if (sortB.name === 'Default Rule') return 1
+    return 0
+  })
 
   return {
     body: sortParsedRulesEgine,
