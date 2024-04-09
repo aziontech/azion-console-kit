@@ -16,7 +16,7 @@
       header: { class: 'hidden' },
       content: { class: 'p-0' }
     }"
-  >  
+  >
     <PrimeMenu
       :model="profileMenuItems"
       :pt="{
