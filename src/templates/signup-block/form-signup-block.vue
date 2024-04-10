@@ -1,5 +1,5 @@
 <template>
-  <div class="w-full md:w-96 md:max-w-md">
+  <div class="w-auto md:max-w-md">
     <div v-if="showActivation">
       <div class="flex surface-border border rounded-md p-6">
         <div class="w-full flex flex-col gap-8 animate-fadeIn">

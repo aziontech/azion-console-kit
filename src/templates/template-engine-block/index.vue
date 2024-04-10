@@ -85,8 +85,8 @@
                   optionLabel="label"
                   optionValue="value"
                   @onChange="
-                    (installation_id) => {
-                      setFieldValue(field.name, installation_id)
+                    (installationId) => {
+                      updateValueOnChange(field.name, installationId)
                     }
                   "
                 />
@@ -149,7 +149,7 @@
       <ActionBarTemplate
         v-if="!isLoading"
         :loading="submitLoading"
-        @onSubmit="validateAndSubmit"
+        @onSubmit="handleSubmit"
         @onCancel="handleCancel"
         :submitDisabled="!formTools.meta.valid || !formTools.meta.touched"
       />
@@ -363,19 +363,20 @@
 
     formTools.value = { errors, meta, resetForm, values, setFieldValue }
 
-    inputSchema.value.fields?.forEach((field) => {
+    const registerFieldWithValueAndValidation = (field) => {
       if (field.value) {
         setFieldValue(field.name, field.value)
       }
       field.input = defineInputBinds(field.name, { validateOnInput: true })
+    }
+
+    inputSchema.value.fields?.forEach((field) => {
+      registerFieldWithValueAndValidation(field)
     })
 
-    inputSchema.value.groups?.forEach((group) => {
-      group.fields.forEach((field) => {
-        if (field.value) {
-          setFieldValue(field.name, field.value)
-        }
-        field.input = defineInputBinds(field.name, { validateOnInput: true })
+    inputSchema.value.groups?.forEach(({ fields }) => {
+      fields.forEach((field) => {
+        registerFieldWithValueAndValidation(field)
       })
     })
 
@@ -392,38 +393,40 @@
     return fields.filter((field) => !field.hidden)
   }
 
-  const validateAndSubmit = async () => {
-    emit('submitClick')
-    submitLoading.value = true
-    emit('loading')
+  const handleSubmit = async () => {
     try {
-      const payload = []
+      submitLoading.value = true
+      emit('submitClick')
+      emit('loading')
+
+      const parsedInputSchema = []
       if (inputSchema.value.fields) {
-        payload.push(...inputSchema.value.fields)
+        parsedInputSchema.push(...inputSchema.value.fields)
       }
       if (inputSchema.value.groups) {
-        inputSchema.value.groups.forEach((group) => {
-          payload.push(...group.fields)
-        })
+        const fieldsInsideTheFieldGroup = inputSchema.value.groups.flatMap((group) => group.fields)
+        parsedInputSchema.push(...fieldsInsideTheFieldGroup)
       }
-      payload.forEach((__, index) => {
-        payload[index] = JSON.parse(JSON.stringify(payload[index]))
-        const sanitizedField = {
-          field: payload[index].name,
-          instantiation_data_path: payload[index].instantiation_data_path,
-          value: payload[index].input.value ? payload[index].input.value : ''
+      const instantiateParsedPayload = parsedInputSchema.map((__, index) => {
+        const parsedField = {
+          field: parsedInputSchema[index].name,
+          instantiation_data_path: parsedInputSchema[index].instantiation_data_path,
+          value: parsedInputSchema[index].input.value ?? ''
         }
 
-        // Hidden field
-        const hiddenField = props.hiddenFields.find((field) => field.name === payload[index].name)
+        const hiddenField = props.hiddenFields.find(
+          (field) => field.name === parsedInputSchema[index].name
+        )
         if (hiddenField) {
-          sanitizedField.value = hiddenField.value
+          parsedField.value = hiddenField.value
         }
-
-        payload[index] = sanitizedField
+        return parsedField
       })
 
-      const response = await props.instantiateTemplateService(props.templateId, payload)
+      const response = await props.instantiateTemplateService(
+        props.templateId,
+        instantiateParsedPayload
+      )
       submitLoading.value = props.freezeLoading
       emit('instantiate', response)
     } catch (error) {
@@ -439,8 +442,8 @@
     emit('cancel')
   }
 
-  const setFieldValue = (field, installation_id) => {
-    formTools.value.setFieldValue(field, installation_id)
+  const updateValueOnChange = (field, installationId) => {
+    formTools.value.setFieldValue(field, installationId)
   }
 
   const setCallbackUrl = (uri) => {
@@ -450,7 +453,7 @@
   watch(
     () => props.freezeLoading,
     () => {
-      // Finished the opeations after instantiate
+      // Finished the operations after instantiate
       submitLoading.value = false
     }
   )

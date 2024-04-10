@@ -1,14 +1,20 @@
 <script setup>
   import PrimeButton from 'primevue/button'
-  import * as MarketplaceService from '@/services/marketplace-services'
-  import LoadingListTemplate from './LoadingListTemplate'
+  import LoadingState from './create-modal-block-loading-state.vue'
   import { computed, onBeforeMount, ref, inject } from 'vue'
   import { useRouter } from 'vue-router'
   import { useToast } from 'primevue/usetoast'
+  import { useAccountStore } from '@/stores/account'
   /**@type {import('@/plugins/adapters/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
   defineOptions({
     name: 'create-modal-block'
+  })
+  const props = defineProps({
+    listSolutionsService: {
+      type: Function,
+      required: true
+    }
   })
 
   const emit = defineEmits('closeModal')
@@ -24,7 +30,7 @@
   const templates = ref([])
   const browseTemplates = ref([])
   const selectedTab = ref('recommended')
-  const recommendedHeader = ref('recommended-for-you')
+
   const items = ref([
     {
       label: 'Recommended',
@@ -166,8 +172,8 @@
   const loadRecommendedSolutions = async () => {
     try {
       isLoading.value = true
-      const payload = { type: recommendedHeader.value }
-      templates.value = await MarketplaceService.listSolutionsService(payload)
+      const accountStore = useAccountStore().accountData
+      templates.value = await props.listSolutionsService({ type: accountStore.jobRole })
     } catch (error) {
       showToast('error', error)
     } finally {
@@ -178,7 +184,7 @@
   const loadBrowse = async () => {
     try {
       isLoading.value = true
-      browseTemplates.value = await MarketplaceService.listSolutionsService({})
+      browseTemplates.value = await props.listSolutionsService({})
     } catch (error) {
       showToast('error', error)
     } finally {
@@ -231,7 +237,7 @@
     </div>
 
     <div class="overflow-auto w-full flex flex-col">
-      <LoadingListTemplate v-if="isLoading" />
+      <LoadingState v-if="isLoading" />
       <div v-else>
         <div class="text-base font-medium mt-5 mb-3">
           {{ tabHeader }}
@@ -257,7 +263,7 @@
                 <img
                   class="rounded"
                   :src="template.vendor.icon"
-                  alt=""
+                  :alt="template.vendor.name"
                 />
               </div>
               <div class="flex flex-col">
@@ -293,7 +299,7 @@
                 <img
                   class="rounded"
                   :src="template.vendor.icon"
-                  alt=""
+                  :alt="template.name"
                 />
               </div>
               <div class="flex flex-col">

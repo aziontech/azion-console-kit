@@ -239,6 +239,7 @@
             v-if="showCacheSettings"
             :edgeApplicationId="edgeApplicationId"
             v-bind="props.cacheSettingsServices"
+            :showTieredCache="edgeApplication.l2Caching"
           />
         </TabPanel>
         <TabPanel

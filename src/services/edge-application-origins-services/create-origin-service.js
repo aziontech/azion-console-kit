@@ -28,12 +28,19 @@ const adapt = (payload) => {
     origin_type: payload.originType,
     host_header: payload.hostHeader,
     method: payload.method,
-    addresses: payload.addresses?.map((addressItem) => ({
-      address: addressItem?.address,
-      weight: addressItem?.weight,
-      server_role: addressItem?.serverRole,
-      is_active: addressItem?.isActive
-    })),
+    addresses: payload.addresses?.map((addressItem) => {
+      const address = {
+        address: addressItem?.address,
+        server_role: addressItem?.serverRole,
+        is_active: addressItem?.isActive
+      }
+
+      if (payload.originType === 'load_balancer') {
+        address.weight = addressItem?.weight
+      }
+
+      return address
+    }),
     origin_path: payload.originPath,
     origin_protocol_policy: payload.originProtocolPolicy,
     hmac_authentication: payload.hmacAuthentication,

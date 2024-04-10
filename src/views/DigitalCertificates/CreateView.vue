@@ -100,10 +100,9 @@
   })
 
   const certificateRequiredField = (certificateType) => {
-    const isUploadCertificate = certificateType === certificateTypes.value.EDGE_CERTIFICATE_UPLOAD
     const isTrustedCA = certificateType === certificateTypes.value.TRUSTED
 
-    return isUploadCertificate || isTrustedCA
+    return isTrustedCA
   }
   const validationSchema = yup.object({
     digitalCertificateName: yup.string().required('Name is a required field.'),

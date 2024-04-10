@@ -12,7 +12,7 @@
   import RadioButton from 'primevue/radiobutton'
   import PrimeTextarea from 'primevue/textarea'
   import { useField } from 'vee-validate'
-  import { computed, ref, watch } from 'vue'
+  import { computed } from 'vue'
 
   const props = defineProps({
     digitalCertificates: {
@@ -30,12 +30,11 @@
     }
   })
 
-  const edgeCertificate = ref(0)
   const { value: name, errorMessage: errorName } = useField('name')
   const { value: cnames, errorMessage: errorCnames } = useField('cnames')
   const { value: cnameAccessOnly, errorMessage: errorCnameAccessOnly } = useField('cnameAccessOnly')
   const { value: edgeApplication, errorMessage: errorEdgeApplication } = useField('edgeApplication')
-  const { setValue: setEdgeCertificate } = useField('edgeCertificate')
+  const { value: edgeCertificate } = useField('edgeCertificate')
   const { value: mtlsIsEnabled, errorMessage: errorMtlsIsEnabled } = useField('mtlsIsEnabled')
   const { value: active } = useField('active')
   const { value: domainName } = useField('domainName')
@@ -67,6 +66,7 @@
       name: certificate.name,
       value: certificate.id
     }))
+
     return [...defaultCertificate, ...parsedCertificates]
   })
   const trustedCACertificatesOptions = computed(() => {
@@ -76,9 +76,6 @@
     }))
   })
 
-  watch(edgeCertificate, async (newEdgeCertificate) => {
-    setEdgeCertificate(newEdgeCertificate)
-  })
 </script>
 
 <template>
