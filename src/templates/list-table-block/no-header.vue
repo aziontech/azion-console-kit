@@ -47,10 +47,14 @@
           rowReorder
           headerStyle="width: 3rem"
         >
-          <template #body="slotProps" >  
-            <i v-if="slotProps.index"  class="pi pi-bars cursor-move" data-pc-section="rowreordericon"></i>          
+          <template #body="slotProps">
+            <i
+              v-if="slotProps.index"
+              class="pi pi-bars cursor-move"
+              data-pc-section="rowreordericon"
+            ></i>
           </template>
-       </Column>
+        </Column>
 
         <Column
           v-if="showselectionMode"
