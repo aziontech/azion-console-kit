@@ -37,6 +37,10 @@
     documentationService: {
       type: Function,
       required: true
+    },
+    showTieredCache: {
+      type: Boolean,
+      required: true
     }
   })
 
@@ -100,6 +104,7 @@
     :createService="props.createCacheSettingsService"
     :loadService="props.loadCacheSettingsService"
     :editService="props.editCacheSettingsService"
+    :showTieredCache="props.showTieredCache"
     @onSuccess="reloadList"
   />
 

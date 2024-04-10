@@ -56,8 +56,18 @@ describe('DomainsServices', () => {
       statusCode: 200
     })
     const { sut } = makeSut()
-
     const feedbackMessage = await sut(fixtures.domainMock)
+
+    expect(feedbackMessage).toBe('Your domain has been edited')
+  })
+
+  it('should return a success message even when not provided a digital certificate', async () => {
+    vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
+      statusCode: 200
+    })
+    const { sut } = makeSut()
+
+    const feedbackMessage = await sut({ ...fixtures.domainMock, edgeCertificate: null })
 
     expect(feedbackMessage).toBe('Your domain has been edited')
   })
