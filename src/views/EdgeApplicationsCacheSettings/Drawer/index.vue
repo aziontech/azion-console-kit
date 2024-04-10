@@ -18,6 +18,10 @@
       type: String,
       required: true
     },
+    isEnableApplicationAccelerator: {
+      required: true,
+      type: Boolean
+    },
     createService: {
       type: Function,
       required: true
@@ -192,7 +196,7 @@
     title="Create Cache Settings"
   >
     <template #formFields>
-      <FormFieldsEdgeApplicationCacheSettings />
+      <FormFieldsEdgeApplicationCacheSettings :isEnableApplicationAccelerator="isEnableApplicationAccelerator" />
     </template>
   </CreateDrawerBlock>
 
@@ -207,7 +211,7 @@
     title="Edit Cache Settings"
   >
     <template #formFields>
-      <FormFieldsEdgeApplicationCacheSettings />
+      <FormFieldsEdgeApplicationCacheSettings :isEnableApplicationAccelerator="isEnableApplicationAccelerator"/>
     </template>
   </EditDrawerBlock>
 </template>

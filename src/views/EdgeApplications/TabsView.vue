@@ -238,6 +238,7 @@
           <EdgeApplicationsCacheSettingsListView
             v-if="showCacheSettings"
             :edgeApplicationId="edgeApplicationId"
+            :isEnableApplicationAccelerator="isEnableApplicationAccelerator"
             v-bind="props.cacheSettingsServices"
           />
         </TabPanel>
