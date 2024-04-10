@@ -1,15 +1,25 @@
-import { AxiosHttpClientAdapter } from '../axios/AxiosHttpClientAdapter'
+// import { AxiosHttpClientAdapter } from '../axios/AxiosHttpClientAdapter'
 import * as Errors from '@/services/axios/errors'
-import { makeAdditionalDataBaseUrl } from './make-additional-data-base-url'
-import { parseSnakeToCamel } from '@/helpers'
+// import { makeAdditionalDataBaseUrl } from './make-additional-data-base-url'
+import { RESPONSE } from './mock-response'
 
 export const listAdditionalDataInfoService = async () => {
-  let httpResponse = await AxiosHttpClientAdapter.request({
-    url: `${makeAdditionalDataBaseUrl()}`,
-    method: 'GET'
-  })
+  // let httpResponse = await AxiosHttpClientAdapter.request({
+  //   url: `${makeAdditionalDataBaseUrl()}`,
+  //   method: 'GET'
+  // })
 
-  return parseHttpResponse(httpResponse)
+  return parseHttpResponse({ body: RESPONSE, statusCode: 200 })
+}
+
+const addResponseFields = (response) => {
+  const fieldTypes = ['plan', 'role', 'companySize', 'name']
+  return response.map((item) => {
+    return {
+      ...item,
+      type: fieldTypes.shift()
+    }
+  })
 }
 
 /**
@@ -19,11 +29,10 @@ export const listAdditionalDataInfoService = async () => {
  * @return {Object} httpResponse.body - The response body.
  * @throws {Error} If there is an error with the response.
  */
-
 export const parseHttpResponse = (httpResponse) => {
   switch (httpResponse.statusCode) {
     case 200:
-      return parseSnakeToCamel(httpResponse.body)
+      return addResponseFields(httpResponse.body)
     case 400:
       throw new Errors.InvalidApiRequestError().message
     case 401:
