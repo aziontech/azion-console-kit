@@ -5,6 +5,7 @@
         <div class="w-full flex flex-col gap-8 animate-fadeIn">
           <form
             class="flex flex-col gap-8"
+            autocomplete="off"
             @submit.prevent
           >
             <div class="gap-3 flex flex-col">
