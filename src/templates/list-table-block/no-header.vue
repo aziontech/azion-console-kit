@@ -41,11 +41,17 @@
             </div>
           </slot>
         </template>
+
         <Column
           v-if="reorderableRows"
           rowReorder
           headerStyle="width: 3rem"
-        />
+        >
+          <template #body="slotProps" >  
+            <i v-if="slotProps.index"  class="pi pi-bars cursor-move" data-pc-section="rowreordericon"></i>          
+          </template>
+       </Column>
+
         <Column
           v-if="showselectionMode"
           selectionMode="multiple"
@@ -377,6 +383,7 @@
 
   const onRowReorder = async (event) => {
     try {
+      isLoading.value = true
       const tableData = getArrayChangedIndexes(data.value, event.value)
       await props.onReorderService(tableData)
       data.value = event.value
@@ -392,6 +399,8 @@
         severity: 'error',
         summary: error
       })
+    } finally {
+      isLoading.value = false
     }
   }
 
