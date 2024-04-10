@@ -3,6 +3,7 @@
   import FieldText from '@/templates/form-fields-inputs/fieldText'
   import FieldDropdown from '@/templates/form-fields-inputs/fieldDropdown'
   import PrimeButton from 'primevue/button'
+  import Dropdown from 'primevue/dropdown'
   import Divider from 'primevue/divider'
   import OAuthGithub from '@/templates/template-engine-block/oauth-github.vue'
   import { ref, onMounted, computed } from 'vue'
@@ -20,10 +21,21 @@
     },
     listIntegrationsService: {
       type: Function
+    },
+    listRepositoriesService: {
+      type: Function
+    },
+    listVulcanPresetsService: {
+      type: Function
+    },
+    getModesByPresetService: {
+      type: Function
     }
   })
 
   const { value: preset } = useField('preset')
+  const { value: selectedScope } = useField('selectedScope')
+  const { value: repository } = useField('repository')
   const { value: edgeApplicationName } = useField('edgeApplicationName')
   const { value: rootDirectory } = useField('rootDirectory')
   const { value: mode } = useField('mode')
@@ -86,6 +98,47 @@
     return false
   })
 
+  const presetsList = computed(() => {
+    return props.listVulcanPresetsService()
+  })
+
+  const repositoriesList = ref([])
+  const loadingRepositories = ref(false)
+  const setListRepositories = async () => {
+    try {
+      loadingRepositories.value = true
+      const data = await props.listRepositoriesService(selectedScope.value)
+      repositoriesList.value = data
+    } catch (error) {
+      toast.add({
+        closable: true,
+        severity: 'error',
+        summary: error
+      })
+    } finally {
+      loadingRepositories.value = false
+    }
+  }
+
+  const setModeByPreset = async () => {
+    mode.value = await props.getModesByPresetService(preset.value)
+  }
+  const setEdgeApplicationNameByRepository = (repositoryName) => {
+    edgeApplicationName.value = repositoryName
+  }
+
+  const oauthGithubRef = ref(null)
+  const triggerConnectWithGithub = () => {
+    if (oauthGithubRef.value) {
+      oauthGithubRef.value.connectWithGithub()
+    }
+  }
+
+  function getOptionNameByValue({ listOption, optionValue, key }) {
+    const selectedOption = listOption.find((integration) => integration[key] === optionValue)
+    return selectedOption ? selectedOption.label : ''
+  }
+
   onMounted(async () => {
     await listIntegrations()
     listenerOnMessage()
@@ -98,10 +151,9 @@
     description="Provide access to GitHub to import an existing project."
   >
     <template #inputs>
-      <div>
-        <div v-if="hasIntegrations">Teste</div>
+      <div v-show="!hasIntegrations">
         <OAuthGithub
-          v-else
+          ref="oauthGithubRef"
           :listPlatformsService="listPlatformsService"
           @onCallbackUrl="
             (uri) => {
@@ -110,6 +162,91 @@
           "
           :loading="isGithubConnectLoading"
         />
+      </div>
+      <div
+        v-if="!!hasIntegrations"
+        class="flex flex-col sm:flex-row gap-4"
+      >
+        <div class="flex flex-col sm:w-2/5 gap-2">
+          <label
+            for="gitScope"
+            class="text-color text-sm font-medium leading-5"
+            >Git Scope *</label
+          >
+          <Dropdown
+            name="gitScope"
+            v-model="selectedScope"
+            :options="integrationsList"
+            optionLabel="label"
+            optionValue="value"
+            placeholder="Select a scope"
+            class="w-full md:w-14rem"
+            @change="setListRepositories"
+          >
+            <template #value="slotProps">
+              <div
+                v-if="slotProps.value"
+                class="flex align-items-center"
+              >
+                <i class="pi pi-github mr-2"></i>
+                <div>
+                  {{
+                    getOptionNameByValue({
+                      listOption: integrationsList,
+                      optionValue: slotProps.value,
+                      key: 'value'
+                    })
+                  }}
+                </div>
+              </div>
+              <div
+                class="flex align-items-center"
+                v-else
+              >
+                <i class="pi pi-github mr-2"></i>
+                {{ slotProps.placeholder }}
+              </div>
+            </template>
+            <template #option="slotProps">
+              <div class="flex align-items-center">
+                <i class="pi pi-github mr-2"></i>
+                <div>{{ slotProps.option.label }}</div>
+              </div>
+            </template>
+            <template #footer>
+              <div class="p-dropdown-items-wrapper">
+                <ul class="p-dropdown-items">
+                  <li
+                    class="p-dropdown-item flex align-items-center"
+                    @click="triggerConnectWithGithub"
+                  >
+                    <i class="pi pi-plus-circle mr-2"></i>
+                    <div>Add GitHub Account</div>
+                  </li>
+                </ul>
+              </div>
+            </template>
+          </Dropdown>
+        </div>
+        <div class="flex flex-col sm:w-2/5 gap-2">
+          <FieldDropdown
+            :options="repositoriesList"
+            optionLabel="name"
+            optionValue="id"
+            filter
+            :disabled="!repositoriesList"
+            placeholder="Select a repository"
+            label="Repository *"
+            name="repository"
+            :value="repository"
+            :loading="loadingRepositories"
+            @onSelectOption="
+              (option) => {
+                setEdgeApplicationNameByRepository(option.name)
+              }
+            "
+          />
+        </div>
       </div>
     </template>
   </FormHorizontal>
@@ -127,18 +264,64 @@
         />
       </div>
 
-      <div class="flex flex-col sm:max-w-lg w-full gap-2">
-        <FieldDropdown
-          :options="[
-            { label: 'Public', value: 'public' },
-            { label: 'Private', value: 'private' }
-          ]"
-          optionLabel="label"
-          optionValue="value"
-          label="Preset *"
-          name="preset"
-          :value="preset"
-        />
+      <div class="flex flex-col sm:flex-row gap-4">
+        <div class="flex flex-col sm:w-2/5 gap-2">
+          <label
+            for="preset"
+            class="text-color text-sm font-medium leading-5"
+            >Preset *</label
+          >
+          <Dropdown
+            name="preset"
+            v-model="preset"
+            :options="presetsList"
+            filter
+            optionLabel="label"
+            optionValue="value"
+            placeholder="Select a framework preset"
+            class="w-full md:w-14rem"
+            @change="setModeByPreset"
+          >
+            <template #value="slotProps">
+              <div
+                v-if="slotProps.value"
+                class="flex align-items-center"
+              >
+                <i class="ai ai-vite mr-2"></i>
+                <div>
+                  {{
+                    getOptionNameByValue({
+                      listOption: presetsList,
+                      optionValue: slotProps.value,
+                      key: 'value'
+                    })
+                  }}
+                </div>
+              </div>
+              <div
+                class="flex align-items-center"
+                v-else
+              >
+                <i class="ai ai-vite mr-2"></i>
+                {{ slotProps.placeholder }}
+              </div>
+            </template>
+            <template #option="slotProps">
+              <div class="flex align-items-center">
+                <i class="ai ai-vite mr-2"></i>
+                <div>{{ slotProps.option.label }}</div>
+              </div>
+            </template>
+          </Dropdown>
+        </div>
+        <div class="flex flex-col sm:w-2/5 gap-2">
+          <FieldText
+            label="Mode *"
+            name="mode"
+            placeholder=".next"
+            :value="mode"
+          />
+        </div>
       </div>
 
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
@@ -149,14 +332,7 @@
           :value="rootDirectory"
         />
       </div>
-      <div class="flex flex-col sm:max-w-lg w-full gap-2">
-        <FieldText
-          label="Mode *"
-          name="mode"
-          placeholder=".next"
-          :value="mode"
-        />
-      </div>
+
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
         <FieldText
           label="Install Command *"

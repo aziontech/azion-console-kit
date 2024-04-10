@@ -22,6 +22,18 @@
     listIntegrationsService: {
       type: Function,
       required: true
+    },
+    listRepositoriesService: {
+      type: Function,
+      required: true
+    },
+    listVulcanPresetsService: {
+      type: Function,
+      required: true
+    },
+    getModesByPresetService: {
+      type: Function,
+      required: true
     }
   })
 
@@ -61,7 +73,10 @@
           <FormFieldsImportStatic
             :listPlatformsService="listPlatformsService"
             :listIntegrationsService="listIntegrationsService"
+            :listRepositoriesService="listRepositoriesService"
             :postCallbackUrlService="postCallbackUrlService"
+            :listVulcanPresetsService="listVulcanPresetsService"
+            :getModesByPresetService="getModesByPresetService"
           />
         </template>
         <template #action-bar="{ onSubmit, formValid, onCancel, loading }">

@@ -55,10 +55,14 @@
     disabled: {
       type: Boolean,
       default: false
+    },
+    filter: {
+      type: Boolean,
+      default: false
     }
   })
 
-  const emit = defineEmits(['onBlur', 'onChange'])
+  const emit = defineEmits(['onBlur', 'onChange', 'onSelectOption'])
 
   const name = toRef(props, 'name')
 
@@ -71,8 +75,14 @@
   }
 
   const emitChange = () => {
-    emit('onChange', inputValue.value)
+  const selectedOption = props.options.find(option => option[props.optionValue] === inputValue.value);
+
+  emit('onChange', inputValue.value);
+
+  if (selectedOption) {
+    emit('onSelectOption', selectedOption);
   }
+}
 
   /**
    * Workaround to resolve the issue described in https://github.com/primefaces/primevue/issues/4431
@@ -108,6 +118,7 @@
     :options="props.options"
     :optionLabel="props.optionLabel"
     :optionDisabled="props.optionDisabled"
+    :filter="props.filter"
     :optionValue="props.optionValue"
     :placeholder="props.placeholder"
     @change="emitChange"
