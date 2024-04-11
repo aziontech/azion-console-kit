@@ -1,0 +1,86 @@
+<template>
+  <SelectorBlock
+    v-bind="props"
+    :selected="selected"
+    :nameId="props.name"
+    @click="clickCard"
+  >
+    <template #selector>
+      <InputSwitch
+        :disabled="disabled"
+        :inputId="props.name"
+        :name="props.name"
+        @click="stopPropagation"
+        v-model="inputValue"
+      />
+    </template>
+    <template #footer>
+      <slot name="footer" />
+    </template>
+  </SelectorBlock>
+</template>
+
+<script setup>
+  import InputSwitch from 'primevue/inputswitch'
+  import SelectorBlock from '@/templates/selector-block'
+
+  import { useField } from 'vee-validate'
+  import { computed, toRefs } from 'vue'
+
+  defineOptions({ name: 'FieldSwitchBlock' })
+
+  const props = defineProps({
+    title: {
+      type: String
+    },
+    isLabel: {
+      type: Boolean,
+      default: false
+    },
+    subtitle: {
+      type: String
+    },
+    description: {
+      type: String
+    },
+    disabled: {
+      type: Boolean,
+      default: false
+    },
+    auto: {
+      type: Boolean,
+      default: false
+    },
+    isCard: {
+      type: Boolean,
+      default: true
+    },
+    hideSelector: {
+      type: Boolean,
+      default: false
+    },
+    nameField: {
+      type: String,
+      required: true
+    },
+    name: {
+      type: String,
+      required: true
+    }
+  })
+
+  const { nameField } = toRefs(props)
+
+  const { value: inputValue, setValue } = useField(nameField)
+  const selected = computed(() => inputValue.value)
+
+  const stopPropagation = (event) => {
+    event.preventDefault()
+    event.stopPropagation()
+  }
+
+  const clickCard = (event) => {
+    stopPropagation(event)
+    setValue(!inputValue.value)
+  }
+</script>
