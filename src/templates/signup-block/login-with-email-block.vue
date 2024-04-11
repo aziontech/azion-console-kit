@@ -175,11 +175,17 @@
     }
   }
 
+  const extractNameFromEmail = (email) => {
+    const [emailBeforeAt] = email.split('@')
+    return emailBeforeAt
+  }
+
   const signUp = handleSubmit(async (values) => {
     loading.value = true
     try {
+      const name = extractNameFromEmail(values.email)
       const captcha = await recaptcha.execute('signup')
-      await props.signupService({ ...values, captcha })
+      await props.signupService({ ...values, name, captcha })
 
       tracker.signUp.userSignedUp({ method: 'email' })
       router.push({ query: { email: encodeEmail(values.email) } })
