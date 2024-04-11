@@ -66,7 +66,7 @@
     </label>
     <div
       class="flex"
-      :class="[classListSelector]"
+      :class="classListSelector"
     >
       <template
         v-for="(item, index) in props.options"
