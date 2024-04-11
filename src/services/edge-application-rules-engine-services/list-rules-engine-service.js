@@ -56,9 +56,9 @@ const adapt = (httpResponse) => {
   const putItAfter = 1
   const putIfBefore = -1
 
-  const sortParsedRulesEgine = parsedRulesEgine.sort((sortA, sortB) => {
-    if (sortA.name === 'Default Rule') return putIfBefore
-    if (sortB.name === 'Default Rule') return putItAfter
+  const sortParsedRulesEgine = parsedRulesEgine.sort((currentItem, nextItem) => {
+    if (currentItem.name === 'Default Rule') return putIfBefore
+    if (nextItem.name === 'Default Rule') return putItAfter
     return keepSameOrder
   })
 
