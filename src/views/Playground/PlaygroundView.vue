@@ -9,6 +9,7 @@
           label="Checkbox Group"
           nameField="checkboxGroup"
           :options="valuesSwitchCheck"
+          v-bind="bindCheckboxGroup"
           helpText="Help text"
         />
         {{ values.checkboxGroup }}
@@ -32,7 +33,6 @@
           label="Radio Group"
           nameField="radioGroup"
           auto
-          hideSelector
           :options="valuesSwitchCheck"
           helpText="Help text"
         />
@@ -49,10 +49,10 @@
 </template>
 
 <script setup>
-  import { ref } from 'vue'
-  import FieldGroupCheckbox from '@/templates/form-fields-inputs/FieldGroupCheckbox'
-  import FieldGroupSwitch from '@/templates/form-fields-inputs/FieldGroupSwitch'
-  import FieldGroupRadio from '@/templates/form-fields-inputs/FieldGroupRadio'
+  import { ref, computed } from 'vue'
+  import FieldGroupCheckbox from '@/templates/form-fields-inputs/fieldGroupCheckbox'
+  import FieldGroupSwitch from '@/templates/form-fields-inputs/fieldGroupSwitch'
+  import FieldGroupRadio from '@/templates/form-fields-inputs/fieldGroupRadio'
   import PrimeButton from 'primevue/button'
   import { useField, useForm } from 'vee-validate'
   import * as yup from 'yup'
@@ -66,7 +66,7 @@
   const { handleSubmit, values } = useForm({
     validationSchema,
     initialValues: {
-      checkboxGroup: ['Value 1', 'Value 2'],
+      checkboxGroup: [],
       switchGroup: [
         {
           isCard: true,
@@ -92,9 +92,17 @@
     }
   })
 
-  useField('checkboxGroup')
+  const { value: checkboxGroup } = useField('checkboxGroup')
   useField('switchGroup')
   useField('radioGroup')
+
+  const bindCheckboxGroup = computed(() => ({
+    hideSelector: checkboxGroup.value.includes('hideSelector'),
+    auto: checkboxGroup.value.includes('auto'),
+    isCard: checkboxGroup.value.includes('isCard'),
+    disabled: checkboxGroup.value.includes('disabled'),
+    divider: checkboxGroup.value.includes('divider')
+  }))
 
   const onSubmit = handleSubmit((values) => {
     console.log(values)
@@ -102,16 +110,29 @@
 
   const valuesSwitchCheck = ref([
     {
-      title: 'Title 1',
-      value: 'Value 1'
+      title: 'hideSelector',
+      value: 'hideSelector',
+      subtitle: 'Hide Selector'
     },
     {
-      title: 'Title 2',
-      value: 'Value 2'
+      title: 'auto',
+      value: 'auto',
+      subtitle: 'Auto'
     },
     {
-      title: 'Title 3',
-      value: 'Value 3'
+      title: 'isCard',
+      value: 'isCard',
+      subtitle: 'Is Card'
+    },
+    {
+      title: 'disabled',
+      value: 'disabled',
+      subtitle: 'Disabled'
+    },
+    {
+      title: 'divider',
+      value: 'divider',
+      subtitle: 'Divider'
     }
   ])
 </script>
