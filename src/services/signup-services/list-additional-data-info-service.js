@@ -11,52 +11,18 @@ export const listAdditionalDataInfoService = async () => {
   return parseHttpResponse(httpResponse)
 }
 
-const addNameFieldAtIndexThree = (response) => {
-  const nameField = {
-    id: 4,
-    key: 'Full Name',
-    required: true,
-    values: []
-  }
-
-  return [...response.slice(0, 3), nameField, ...response.slice(3)]
-}
-
-const addResponseFields = (response) => {
-  response = addNameFieldAtIndexThree(response)
-
-  const fields = [
-    { type: 'plan', required: true, fieldType: 'radio' },
-    { type: 'role', required: true, fieldType: 'radio', show: false },
-    { type: 'companySize', required: true, fieldType: 'radio', show: false },
-    {
-      type: 'fullName',
-      required: true,
-      fieldType: 'text',
-      show: false,
-      values: [{ id: 1, value: '' }]
-    },
-    {
-      type: 'companyWebsite',
-      required: true,
-      fieldType: 'text',
-      show: false,
-      values: [{ id: 1, value: '' }]
-    },
-    {
-      type: 'onboardingSession',
-      required: false,
-      fieldType: 'switch',
-      show: false,
-      values: [{ id: 1, value: true }]
-    }
+const adapt = (response) => {
+  response = [
+    ...response.slice(0, 3),
+    { id: 10, key: 'Full Name', required: true, show: false },
+    ...response.slice(3)
   ]
-  return response.map((item) => {
-    return {
-      ...item,
-      ...fields.shift()
-    }
+
+  response.forEach((item, idx) => {
+    item.step = idx + 1
   })
+
+  return response
 }
 
 /**
@@ -69,7 +35,7 @@ const addResponseFields = (response) => {
 export const parseHttpResponse = (httpResponse) => {
   switch (httpResponse.statusCode) {
     case 200:
-      return addResponseFields(httpResponse.body.results)
+      return adapt(httpResponse.body.results)
     case 400:
       throw new Errors.InvalidApiRequestError().message
     case 401:
