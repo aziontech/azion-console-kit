@@ -3,16 +3,20 @@
     class="w-full flex flex-col gap-8"
     @submit.prevent="submitForm"
   >
-    <div class="flex flex-col gap-2">
+    <div
+      class="flex flex-col gap-2"
+      v-if="additionalDataInfo"
+    >
       <template
-        v-for="step in additionalDataInfo"
+        v-for="(step, stepIdx) in additionalDataInfo"
         :key="step.key"
       >
         <h4
+          v-if="!isOnboardingSession(step)"
           class="font-semibold text-sm"
           :class="{ 'text-color-secondary': !step.show }"
         >
-          {{ step.key }}{{ step.required && '*' }}
+          {{ step.key }}{{ step.required ? '*' : '' }}
         </h4>
         <div
           class="flex flex-wrap gap-3 mb-8"
@@ -22,32 +26,64 @@
             v-for="item in step.values"
             :key="item.value"
             :for="item.value"
-            class="w-fit border-1 rounded-md surface-border font-medium flex align-items-center justify-between p-4 gap-2"
-            :class="{
-              'border-radio-card-active': values[step.type]?.value === item.value
-            }"
-            >{{ item.value }}
+            class="flex items-center gap-2"
+            :class="[getOnboardingSessionClasses(step), radioClasses(step, item)]"
+            >{{ getLabelValue(step, item) }}
             <PrimeRadio
+              v-if="step.fieldType === 'radio'"
               :modelValue="values[step.type]"
-              @update:modelValue="updateValues(step, item)"
+              @update:modelValue="updateValues(step, stepIdx, item)"
               :name="step.type"
               :inputId="item.value"
               :disabled="!step.show"
               class="hidden"
             />
+            <PrimeInputText
+              v-if="step.fieldType === 'text'"
+              class="w-full"
+              :modelValue="values[step.type]?.value"
+              @update:modelValue="updateValues(step, stepIdx, { id: item.id, value: $event })"
+              :id="item.value"
+              :disabled="!step.show"
+            />
+            <PrimeInputSwitch
+              v-if="step.fieldType === 'switch'"
+              :modelValue="values[step.type]?.value"
+              @update:modelValue="
+                updateValues(step, stepIdx, { id: item.id, value: !values[step.type].value })
+              "
+              :disabled="!step.show"
+            />
           </label>
         </div>
       </template>
+    </div>
+    <div
+      class="flex flex-col gap-2"
+      v-else
+    >
+      <div
+        v-for="item in 5"
+        :key="item"
+      >
+        <div class="w-full mb-8">
+          <PrimeSkeleton class="w-2/3 h-4 mb-4" />
+          <div class="flex flex-wrap gap-3">
+            <PrimeSkeleton class="w-28 h-14" />
+            <PrimeSkeleton class="w-28 h-14" />
+            <PrimeSkeleton class="w-28 h-14" />
+          </div>
+        </div>
+      </div>
     </div>
   </form>
 </template>
 
 <script setup>
-  // import PrimeButton from 'primevue/button'
-  // import PrimeDropdown from 'primevue/dropdown'
-  // import PrimeInputText from 'primevue/inputtext'
   import PrimeRadio from 'primevue/radiobutton'
-  // import PrimeSkeleton from 'primevue/skeleton'
+  import PrimeInputSwitch from 'primevue/inputswitch'
+  import PrimeInputText from 'primevue/inputtext'
+  import PrimeSkeleton from 'primevue/skeleton'
   import { useToast } from 'primevue/usetoast'
   import { useForm } from 'vee-validate'
   import { onMounted, ref, inject } from 'vue'
@@ -73,42 +109,73 @@
 
   const additionalDataInfo = ref(null)
 
-  const fetchAdditionalDataInfo = async () => {
-    const results = await props.listAdditionalDataInfoService()
-    additionalDataInfo.value = results
-  }
-
   onMounted(() => {
     fetchAdditionalDataInfo()
   })
 
   const validationSchema = yup.object({
     plan: yup.string().required(),
-    role: yup.string().required()
-    // companyName: yup.string().when('projectTypeSelection', {
-    //   is: typeToEnableCompanyFields,
-    //   then: () =>
-    //     yup
-    //       .string()
-    //       .max(50, 'Exceeded number of characters')
-    //       .required('Company Name is a required field.')
-    // }),
-    // companySize: yup.string().when('projectTypeSelection', {
-    //   is: typeToEnableCompanyFields,
-    //   then: () => yup.string().required('Company Size is a required field.')
-    // }),
+    role: yup.string().required(),
+    companySize: yup.string().required(),
+    fullName: yup.string().required(),
+    companyWebsite: yup.string().required(),
+    onboardingSession: yup.boolean()
   })
 
   const { values, setValues, meta, errors } = useForm({ validationSchema })
 
-  const updateValues = (step, itemValues) => {
+  const setOnboardingValue = () => {
+    const onboardingSessionValue = additionalDataInfo.value[5].values[0]
+    setValues({ ...values, onboardingSession: onboardingSessionValue })
+  }
+
+  const fetchAdditionalDataInfo = async () => {
+    const results = await props.listAdditionalDataInfoService()
+    additionalDataInfo.value = results
+
+    setOnboardingValue()
+  }
+
+  const isOnboardingSession = (step) => {
+    return step.type === 'onboardingSession'
+  }
+
+  const getLabelValue = (step, item) => {
+    return isOnboardingSession(step) ? step.key : item.value
+  }
+
+  const getOnboardingSessionClasses = (step) => {
+    const defaultClasses = 'w-1/2 rounded-md font-medium'
+    const onboardingSessionClasses = 'w-fit text-sm flex-row-reverse'
+
+    return isOnboardingSession(step) ? onboardingSessionClasses : defaultClasses
+  }
+
+  const updateValues = (step, stepIdx, itemValues) => {
     const totalKeys = Object.keys(additionalDataInfo.value).length
-    const nextStep = step.id++
+    const nextStep = stepIdx + 1
     setValues({ ...values, [step.type]: itemValues })
 
     if (nextStep >= totalKeys) return
 
-    additionalDataInfo.value[nextStep].show = true
+    additionalDataInfo.value.forEach((item, idx) => {
+      additionalDataInfo.value[idx].show = idx <= nextStep
+
+      if (item.type !== 'onboardingSession' && idx > stepIdx) {
+        setValues({ ...values, [item.type]: null })
+      }
+    })
+  }
+
+  const radioClasses = (step, item) => {
+    const isRadio = step.fieldType === 'radio'
+    const hasSameValue = values[step.type]?.value === item.value
+
+    if (!isRadio) return
+
+    if (isRadio && !hasSameValue) return 'w-fit p-4 border-1 surface-border'
+
+    return 'w-fit p-4 border-1 border-radio-card-active'
   }
 
   const loading = ref(false)
