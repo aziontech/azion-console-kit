@@ -29,7 +29,7 @@
   import { useField } from 'vee-validate'
   import { toRefs } from 'vue'
 
-  defineOptions({ name: 'FieldRadiobbrBlock' })
+  defineOptions({ name: 'FieldRadioBlock' })
 
   const props = defineProps({
     title: {

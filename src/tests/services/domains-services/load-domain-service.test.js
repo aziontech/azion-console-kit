@@ -22,8 +22,8 @@ const fixtures = {
     is_active: false,
     activeSort: true,
     digital_certificate_id: null,
-    edge_application_id: 'ea1234',
-  },
+    edge_application_id: 'ea1234'
+  }
 }
 
 const makeSut = () => {

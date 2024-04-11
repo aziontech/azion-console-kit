@@ -1,7 +1,7 @@
 <template>
   <SelectorBlock
     v-bind="props"
-    :selected="selected"
+    :selected="checked"
     :nameId="props.name"
     @click="clickCard"
   >
@@ -25,7 +25,7 @@
   import SelectorBlock from '@/templates/selector-block'
 
   import { useField } from 'vee-validate'
-  import { computed, toRefs } from 'vue'
+  import { toRefs } from 'vue'
 
   defineOptions({ name: 'FieldSwitchBlock' })
 
@@ -71,8 +71,15 @@
 
   const { nameField } = toRefs(props)
 
-  const { value: inputValue, setValue } = useField(nameField)
-  const selected = computed(() => inputValue.value)
+  const {
+    value: inputValue,
+    checked,
+    handleChange
+  } = useField(nameField, undefined, {
+    type: 'checkbox',
+    checkedValue: true,
+    uncheckedValue: false
+  })
 
   const stopPropagation = (event) => {
     event.preventDefault()
@@ -81,6 +88,6 @@
 
   const clickCard = (event) => {
     stopPropagation(event)
-    setValue(!inputValue.value)
+    handleChange(!inputValue.value)
   }
 </script>
