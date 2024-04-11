@@ -14,6 +14,10 @@
       type: Function,
       required: true
     },
+    isEnableApplicationAccelerator: {
+      required: true,
+      type: Boolean
+    },
     loadCacheSettingsService: {
       type: Function,
       required: true
@@ -95,6 +99,7 @@
 <template>
   <Drawer
     ref="drawerRef"
+    :isEnableApplicationAccelerator="props.isEnableApplicationAccelerator"
     :edgeApplicationId="props.edgeApplicationId"
     :createService="props.createCacheSettingsService"
     :loadService="props.loadCacheSettingsService"

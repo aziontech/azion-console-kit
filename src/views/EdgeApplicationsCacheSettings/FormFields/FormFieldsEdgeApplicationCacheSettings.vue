@@ -15,6 +15,10 @@
   import { computed, ref, watch } from 'vue'
 
   const props = defineProps({
+    isEnableApplicationAccelerator: {
+      required: true,
+      type: Boolean
+    },
     showTieredCache: {
       type: Boolean,
       required: true
@@ -126,6 +130,18 @@
     push: addDeviceGroup,
     remove: removeDeviceGroup
   } = useFieldArray('deviceGroup')
+
+  const disabledQueryStringOptions = (option) => {
+    const isDisabled = (option.value === 'whitelist' || option.value === 'blacklist') &&
+    !props.isEnableApplicationAccelerator
+    return isDisabled
+  }
+
+  const disabledCookiesOptions = (option) => {
+    const isDisabled = (option.value === 'whitelist' || option.value === 'blacklist' || option.value === 'all') &&
+    !props.isEnableApplicationAccelerator
+    return isDisabled
+  }
 
   const showMaxTtl = computed(() => browserCacheSettings.value === 'override')
   const showCdnMaxTtl = computed(() => cdnCacheSettings.value === 'override')
@@ -448,6 +464,7 @@
           >
             <RadioButton
               v-model="cacheByQueryString"
+              :disabled="disabledQueryStringOptions(queryStringOption)"
               :inputId="queryStringOption.value"
               name="cacheByQueryString"
               :value="queryStringOption.value"
@@ -490,6 +507,7 @@
           <div class="flex w-full gap-2 items-start">
             <InputSwitch
               v-model="enableQueryStringSort"
+              :disabled="!props.isEnableApplicationAccelerator"
               inputId="enableQueryStringSort"
             />
             <label
@@ -507,6 +525,7 @@
           <Divider />
           <div class="flex w-full gap-2 items-start">
             <InputSwitch
+              :disabled="!props.isEnableApplicationAccelerator"
               v-model="enableCachingForPost"
               inputId="enableCachingForPost"
             />
@@ -525,6 +544,7 @@
           <div class="flex w-full gap-2 items-start">
             <InputSwitch
               v-model="enableCachingForOptions"
+              :disabled="!props.isEnableApplicationAccelerator"
               inputId="enableCachingForOptions"
             />
             <label
@@ -570,6 +590,7 @@
             :key="cookiesOption.value"
           >
             <RadioButton
+              :disabled="disabledCookiesOptions(cookiesOption)"
               v-model="cacheByCookies"
               :inputId="cookiesOption.value"
               name="cacheByCookies"
