@@ -7,57 +7,161 @@
       class="flex flex-col gap-2"
       v-if="additionalDataInfo"
     >
-      <template
-        v-for="(step, stepIdx) in additionalDataInfo"
-        :key="step.key"
+      <!-- Step 1: Plan -->
+      <h4 class="font-semibold text-sm">
+        {{ additionalDataInfo[0].key }}{{ additionalDataInfo[0].required ? '*' : '' }}
+      </h4>
+      <div class="flex flex-wrap gap-3 mb-8">
+        <label
+          v-for="planData in additionalDataInfo[0].values"
+          :key="planData.value"
+          :for="planData.value"
+          class="flex items-center gap-2 w-fit p-4 border-1 surface-border rounded-md font-medium"
+          :class="{ 'border-radio-card-active': plan === planData.value }"
+          >{{ planData.value }}
+          <PrimeRadio
+            v-model="plan"
+            name="plan"
+            :value="planData.value"
+            :inputId="planData.value"
+            class="hidden"
+            @change="updateStep(2)"
+          />
+        </label>
+      </div>
+
+      <!-- Step 2: Role -->
+      <h4
+        class="font-semibold text-sm"
+        :class="[disabledClass(2)]"
       >
-        <h4
-          v-if="!isOnboardingSession(step)"
-          class="font-semibold text-sm"
-          :class="{ 'text-color-secondary': !step.show }"
+        {{ additionalDataInfo[1].key }}{{ additionalDataInfo[1].required ? '*' : '' }}
+      </h4>
+      <div
+        class="flex flex-wrap gap-3 mb-8"
+        :class="[disabledClass(2)]"
+      >
+        <label
+          v-for="roleData in additionalDataInfo[1].values"
+          :key="roleData.value"
+          :for="roleData.value"
+          class="flex items-center gap-2 w-fit p-4 border-1 surface-border rounded-md font-medium"
+          :class="{ 'border-radio-card-active': role === roleData.value }"
+          >{{ roleData.value }}
+          <PrimeRadio
+            v-model="role"
+            name="role"
+            :value="roleData.value"
+            :inputId="roleData.value"
+            :disabled="isFieldDisabled(2)"
+            class="hidden"
+            @change="updateStep(3)"
+          />
+        </label>
+      </div>
+
+      <div
+        class="w-1/2 mb-8"
+        v-if="role === 'Other'"
+      >
+        <label
+          class="flex flex-col gap-3 font-semibold text-sm"
+          for="otherRole"
         >
-          {{ step.key }}{{ step.required ? '*' : '' }}
-        </h4>
-        <div
-          class="flex flex-wrap gap-3 mb-8"
-          :class="{ 'text-color-secondary': !step.show }"
+          Describe your role*
+          <PrimeInputText
+            v-model="roleDescription"
+            name="role"
+            id="otherRole"
+            @change="updateStep(3)"
+          />
+        </label>
+      </div>
+
+      <!-- Step 3: Company Size -->
+      <h4
+        class="font-semibold text-sm"
+        :class="[disabledClass(3)]"
+      >
+        {{ additionalDataInfo[2].key }}{{ additionalDataInfo[2].required ? '*' : '' }}
+      </h4>
+      <div
+        class="flex flex-wrap gap-3 mb-8"
+        :class="[disabledClass(3)]"
+      >
+        <label
+          v-for="companySizeData in additionalDataInfo[2].values"
+          :key="companySizeData.value"
+          :for="companySizeData.value"
+          class="flex items-center gap-2 w-fit p-4 border-1 surface-border rounded-md font-medium"
+          :class="{ 'border-radio-card-active': companySize === companySizeData.value }"
+          >{{ companySizeData.value }}
+          <PrimeRadio
+            v-model="companySize"
+            name="companySize"
+            :value="companySizeData.value"
+            :inputId="companySizeData.value"
+            :disabled="isFieldDisabled(3)"
+            class="hidden"
+            @change="updateStep(4)"
+          />
+        </label>
+      </div>
+
+      <!-- Step 4: Full Name -->
+      <div class="w-1/2 mb-8">
+        <label
+          class="flex flex-col gap-3 font-semibold text-sm"
+          :class="[disabledClass(4)]"
+          for="fullName"
         >
-          <label
-            v-for="item in step.values"
-            :key="item.value"
-            :for="item.value"
-            class="flex items-center gap-2"
-            :class="[getOnboardingSessionClasses(step), radioClasses(step, item)]"
-            >{{ getLabelValue(step, item) }}
-            <PrimeRadio
-              v-if="step.fieldType === 'radio'"
-              :modelValue="values[step.type]"
-              @update:modelValue="updateValues(step, stepIdx, item)"
-              :name="step.type"
-              :inputId="item.value"
-              :disabled="!step.show"
-              class="hidden"
-            />
-            <PrimeInputText
-              v-if="step.fieldType === 'text'"
-              class="w-full"
-              :modelValue="values[step.type]?.value"
-              @update:modelValue="updateValues(step, stepIdx, { id: item.id, value: $event })"
-              :id="item.value"
-              :disabled="!step.show"
-            />
-            <PrimeInputSwitch
-              v-if="step.fieldType === 'switch'"
-              :modelValue="values[step.type]?.value"
-              @update:modelValue="
-                updateValues(step, stepIdx, { id: item.id, value: !values[step.type].value })
-              "
-              :disabled="!step.show"
-            />
-          </label>
-        </div>
-      </template>
+          {{ additionalDataInfo[3].key }}{{ additionalDataInfo[3].required ? '*' : '' }}
+          <PrimeInputText
+            v-model="fullName"
+            name="fullName"
+            id="fullName"
+            :disabled="isFieldDisabled(4)"
+            @input="updateStep(5)"
+          />
+        </label>
+      </div>
+
+      <!-- Step 5: Company Website -->
+
+      <div class="w-1/2 mb-8">
+        <label
+          class="flex flex-col gap-3 font-semibold text-sm"
+          :class="[disabledClass(5)]"
+          for="companyWebsite"
+        >
+          {{ additionalDataInfo[4].key }}{{ additionalDataInfo[4].required ? '*' : '' }}
+          <PrimeInputText
+            v-model="companyWebsite"
+            name="companyWebsite"
+            id="companyWebsite"
+            :disabled="isFieldDisabled(5)"
+            @input="updateStep(6)"
+          />
+        </label>
+      </div>
+
+      <!-- Step 6: Onboarding Session -->
+      <label
+        class="w-fit mb-8 flex flex-row-reverse gap-3 text-sm"
+        :class="[disabledClass(6)]"
+        for="onboardingSession"
+      >
+        {{ additionalDataInfo[5].key }}{{ additionalDataInfo[5].required ? '*' : '' }}
+        <PrimeInputSwitch
+          v-model="onboardingSession"
+          name="onboardingSession"
+          id="onboardingSession"
+          :disabled="isFieldDisabled(6)"
+        />
+      </label>
     </div>
+
+    <!-- Empty state -->
     <div
       class="flex flex-col gap-2"
       v-else
@@ -85,8 +189,8 @@
   import PrimeInputText from 'primevue/inputtext'
   import PrimeSkeleton from 'primevue/skeleton'
   import { useToast } from 'primevue/usetoast'
-  import { useForm } from 'vee-validate'
-  import { onMounted, ref, inject } from 'vue'
+  import { useField, useForm } from 'vee-validate'
+  import { onMounted, ref, inject, watch } from 'vue'
   import { useRouter } from 'vue-router'
   import * as yup from 'yup'
   /** @type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
@@ -107,7 +211,14 @@
     }
   })
 
+  const currentStep = ref(1)
   const additionalDataInfo = ref(null)
+
+  const fetchAdditionalDataInfo = async () => {
+    const response = await props.listAdditionalDataInfoService()
+
+    additionalDataInfo.value = response
+  }
 
   onMounted(() => {
     fetchAdditionalDataInfo()
@@ -116,66 +227,41 @@
   const validationSchema = yup.object({
     plan: yup.string().required(),
     role: yup.string().required(),
+    roleDescription: yup.string().when('role', {
+      is: 'Other',
+      then: (schema) => schema.required('Role Description is a required field')
+    }),
     companySize: yup.string().required(),
-    fullName: yup.string().required(),
-    companyWebsite: yup.string().required(),
+    fullName: yup.string().required('Full Name is a required field'),
+    companyWebsite: yup.string().required('Company Website is a required field'),
     onboardingSession: yup.boolean()
   })
 
-  const { values, setValues, meta, errors } = useForm({ validationSchema })
+  const { values, setValues, meta, errors } = useForm({
+    validationSchema,
+    initialValues: {
+      onboardingSession: true
+    }
+  })
 
-  const setOnboardingValue = () => {
-    const onboardingSessionValue = additionalDataInfo.value[5].values[0]
-    setValues({ ...values, onboardingSession: onboardingSessionValue })
+  const { value: plan } = useField('plan')
+  const { value: role } = useField('role')
+  const { value: roleDescription } = useField('roleDescription')
+  const { value: companySize } = useField('companySize')
+  const { value: fullName } = useField('fullName')
+  const { value: companyWebsite } = useField('companyWebsite')
+  const { value: onboardingSession } = useField('onboardingSession')
+
+  const updateStep = (step) => {
+    currentStep.value = step
   }
 
-  const fetchAdditionalDataInfo = async () => {
-    const results = await props.listAdditionalDataInfoService()
-    additionalDataInfo.value = results
-
-    setOnboardingValue()
+  const disabledClass = (step) => {
+    return currentStep.value < step ? 'text-color-secondary' : ''
   }
 
-  const isOnboardingSession = (step) => {
-    return step.type === 'onboardingSession'
-  }
-
-  const getLabelValue = (step, item) => {
-    return isOnboardingSession(step) ? step.key : item.value
-  }
-
-  const getOnboardingSessionClasses = (step) => {
-    const defaultClasses = 'w-1/2 rounded-md font-medium'
-    const onboardingSessionClasses = 'w-fit text-sm flex-row-reverse'
-
-    return isOnboardingSession(step) ? onboardingSessionClasses : defaultClasses
-  }
-
-  const updateValues = (step, stepIdx, itemValues) => {
-    const totalKeys = Object.keys(additionalDataInfo.value).length
-    const nextStep = stepIdx + 1
-    setValues({ ...values, [step.type]: itemValues })
-
-    if (nextStep >= totalKeys) return
-
-    additionalDataInfo.value.forEach((item, idx) => {
-      additionalDataInfo.value[idx].show = idx <= nextStep
-
-      if (item.type !== 'onboardingSession' && idx > stepIdx) {
-        setValues({ ...values, [item.type]: null })
-      }
-    })
-  }
-
-  const radioClasses = (step, item) => {
-    const isRadio = step.fieldType === 'radio'
-    const hasSameValue = values[step.type]?.value === item.value
-
-    if (!isRadio) return
-
-    if (isRadio && !hasSameValue) return 'w-fit p-4 border-1 surface-border'
-
-    return 'w-fit p-4 border-1 border-radio-card-active'
+  const isFieldDisabled = (step) => {
+    return currentStep.value < step
   }
 
   const loading = ref(false)
@@ -187,10 +273,11 @@
     loading.value = true
 
     try {
-      await props.putAdditionalDataService(values)
-      tracker.signUp.submittedAdditionalData()
+      console.log(values)
+      // await props.putAdditionalDataService(values)
+      // tracker.signUp.submittedAdditionalData()
 
-      router.push({ name: 'home' })
+      // router.push({ name: 'home' })
     } catch (err) {
       toast.add({ life: 5000, severity: 'error', detail: err, summary: 'Error' })
       tracker.signUp.failedSubmitAdditionalData().track()
@@ -198,4 +285,25 @@
       loading.value = false
     }
   }
+
+  const fieldsToCleanInEachStep = {
+    1: ['role', 'roleDescription', 'companySize', 'fullName', 'companyWebsite'],
+    2: ['roleDescription', 'companySize', 'fullName', 'companyWebsite'],
+    3: ['fullName', 'companyWebsite'],
+    4: ['companyWebsite'],
+    5: []
+  }
+
+  const resetFields = () => {
+    const fields = fieldsToCleanInEachStep[currentStep.value - 1]
+    if (fields) {
+      fields.forEach((field) => {
+        setValues({ [field]: '' })
+      })
+    }
+  }
+
+  watch(values, () => {
+    resetFields()
+  })
 </script>
