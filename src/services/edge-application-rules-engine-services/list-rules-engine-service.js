@@ -52,9 +52,9 @@ const adapt = (httpResponse) => {
     }
   })
 
-  const keepSameOrder = 0;
-  const putItAfter = 1;
-  const putIfBefore = -1;
+  const keepSameOrder = 0
+  const putItAfter = 1
+  const putIfBefore = -1
 
   const sortParsedRulesEgine = parsedRulesEgine.sort((sortA, sortB) => {
     if (sortA.name === 'Default Rule') return putIfBefore
