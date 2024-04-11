@@ -34,7 +34,7 @@
             {{ props.subtitle }}
           </div>
           <p
-            class="py-3"
+            class="py-3 text-sm font-normal text-color-secondary"
             v-if="props.description"
           >
             {{ props.description }}

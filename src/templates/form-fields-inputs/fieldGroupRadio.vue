@@ -17,7 +17,7 @@
     },
     isCard: {
       type: Boolean,
-      default: false
+      default: true
     },
     label: {
       type: String,
@@ -51,6 +51,12 @@
   const classStateRoot = computed(() => ({
     'p-disabled': props.disabled
   }))
+
+  const classListSelector = computed(() => ({
+    'flex-wrap': props.auto,
+    'flex-col': !props.auto,
+    'gap-3': !props.divider
+  }))
 </script>
 
 <template>
@@ -59,8 +65,8 @@
       {{ props.label }}
     </label>
     <div
-      class="flex gap-3"
-      :class="[props.auto ? 'flex-wrap' : 'flex-col']"
+      class="flex"
+      :class="classListSelector"
     >
       <template
         v-for="(item, index) in props.options"
@@ -71,6 +77,7 @@
           :name="`${props.nameField}-radio-${index}`"
           :auto="props.auto"
           :hideSelector="props.hideSelector"
+          :isCard="props.isCard"
           v-bind="item"
         >
           <template #footer>
