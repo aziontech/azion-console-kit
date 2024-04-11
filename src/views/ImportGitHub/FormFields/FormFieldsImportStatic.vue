@@ -34,7 +34,7 @@
   })
 
   const { value: preset } = useField('preset')
-  const { value: selectedScope } = useField('selectedScope')
+  const { value: gitScope } = useField('gitScope')
   const { value: repository } = useField('repository')
   const { value: edgeApplicationName } = useField('edgeApplicationName')
   const { value: rootDirectory } = useField('rootDirectory')
@@ -63,8 +63,20 @@
     callbackUrl.value = uri
   }
   const saveIntegration = async (integration) => {
-    isGithubConnectLoading.value = true
-    await props.postCallbackUrlService(callbackUrl.value, integration.data)
+    try {
+      isGithubConnectLoading.value = true
+      await props.postCallbackUrlService(callbackUrl.value, integration.data)
+      await listIntegrations()
+    } catch (error) {
+      toast.add({
+        closable: true,
+        severity: 'error',
+        summary: 'error',
+        detail: error
+      })
+    } finally {
+      isGithubConnectLoading.value = false
+    }
   }
 
   const listenerOnMessage = () => {
@@ -107,7 +119,7 @@
   const setListRepositories = async () => {
     try {
       loadingRepositories.value = true
-      const data = await props.listRepositoriesService(selectedScope.value)
+      const data = await props.listRepositoriesService(gitScope.value)
       repositoriesList.value = data
     } catch (error) {
       toast.add({
@@ -119,10 +131,25 @@
       loadingRepositories.value = false
     }
   }
+  const modeList = ref([
+    { label: 'Deliver', value: 'deliver', disabled: false },
+    { label: 'Compute', value: 'compute', disabled: false }
+  ])
 
-  const setModeByPreset = async () => {
-    mode.value = await props.getModesByPresetService(preset.value)
+  const setModeByPreset = () => {
+    const availableModes = props.getModesByPresetService(preset.value)
+
+    mode.value = availableModes[0]
+
+    disableUnavailableModes(availableModes)
   }
+  const disableUnavailableModes = (availableModes) => {
+    modeList.value = modeList.value.map((modeOption) => ({
+      ...modeOption,
+      disabled: !availableModes.includes(modeOption.value)
+    }))
+  }
+
   const setEdgeApplicationNameByRepository = (repositoryName) => {
     edgeApplicationName.value = repositoryName
   }
@@ -134,9 +161,13 @@
     }
   }
 
-  function getOptionNameByValue({ listOption, optionValue, key }) {
+  const getOptionNameByValue = ({ listOption, optionValue, key }) => {
     const selectedOption = listOption.find((integration) => integration[key] === optionValue)
     return selectedOption ? selectedOption.label : ''
+  }
+
+  const getPresetIconClass = (preset) => {
+    return `ai ai-${preset}`
   }
 
   onMounted(async () => {
@@ -175,7 +206,7 @@
           >
           <Dropdown
             name="gitScope"
-            v-model="selectedScope"
+            v-model="gitScope"
             :options="integrationsList"
             optionLabel="label"
             optionValue="value"
@@ -186,7 +217,7 @@
             <template #value="slotProps">
               <div
                 v-if="slotProps.value"
-                class="flex align-items-center"
+                class="flex items-center"
               >
                 <i class="pi pi-github mr-2"></i>
                 <div>
@@ -200,7 +231,7 @@
                 </div>
               </div>
               <div
-                class="flex align-items-center"
+                class="flex items-center"
                 v-else
               >
                 <i class="pi pi-github mr-2"></i>
@@ -208,7 +239,7 @@
               </div>
             </template>
             <template #option="slotProps">
-              <div class="flex align-items-center">
+              <div class="flex items-center">
                 <i class="pi pi-github mr-2"></i>
                 <div>{{ slotProps.option.label }}</div>
               </div>
@@ -217,7 +248,7 @@
               <div class="p-dropdown-items-wrapper">
                 <ul class="p-dropdown-items">
                   <li
-                    class="p-dropdown-item flex align-items-center"
+                    class="p-dropdown-item flex items-center"
                     @click="triggerConnectWithGithub"
                   >
                     <i class="pi pi-plus-circle mr-2"></i>
@@ -232,9 +263,9 @@
           <FieldDropdown
             :options="repositoriesList"
             optionLabel="name"
-            optionValue="id"
+            optionValue="url"
             filter
-            :disabled="!repositoriesList"
+            :disabled="!gitScope"
             placeholder="Select a repository"
             label="Repository *"
             name="repository"
@@ -285,9 +316,12 @@
             <template #value="slotProps">
               <div
                 v-if="slotProps.value"
-                class="flex align-items-center"
+                class="flex items-center"
               >
-                <i class="ai ai-vite mr-2"></i>
+                <i
+                  :class="getPresetIconClass(slotProps.value)"
+                  class="mr-2"
+                ></i>
                 <div>
                   {{
                     getOptionNameByValue({
@@ -298,27 +332,31 @@
                   }}
                 </div>
               </div>
-              <div
-                class="flex align-items-center"
-                v-else
-              >
-                <i class="ai ai-vite mr-2"></i>
+              <div v-else>
                 {{ slotProps.placeholder }}
               </div>
             </template>
             <template #option="slotProps">
-              <div class="flex align-items-center">
-                <i class="ai ai-vite mr-2"></i>
+              <div class="flex items-center">
+                <i
+                  :class="getPresetIconClass(slotProps.option.value)"
+                  class="mr-2"
+                ></i>
                 <div>{{ slotProps.option.label }}</div>
               </div>
             </template>
           </Dropdown>
         </div>
         <div class="flex flex-col sm:w-2/5 gap-2">
-          <FieldText
+          <FieldDropdown
+            :options="modeList"
+            optionLabel="label"
+            optionValue="value"
+            optionDisabled="disabled"
+            placeholder="Select the mode"
+            :disabled="!preset"
             label="Mode *"
             name="mode"
-            placeholder=".next"
             :value="mode"
           />
         </div>

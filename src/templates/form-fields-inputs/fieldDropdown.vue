@@ -75,14 +75,16 @@
   }
 
   const emitChange = () => {
-  const selectedOption = props.options.find(option => option[props.optionValue] === inputValue.value);
+    const selectedOption = props.options.find(
+      (option) => option[props.optionValue] === inputValue.value
+    )
 
-  emit('onChange', inputValue.value);
+    emit('onChange', inputValue.value)
 
-  if (selectedOption) {
-    emit('onSelectOption', selectedOption);
+    if (selectedOption) {
+      emit('onSelectOption', selectedOption)
+    }
   }
-}
 
   /**
    * Workaround to resolve the issue described in https://github.com/primefaces/primevue/issues/4431

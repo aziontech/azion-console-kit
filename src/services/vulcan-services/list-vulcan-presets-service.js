@@ -7,39 +7,32 @@ export const listVulcanPresetsService = () => {
   const vulcanPresets = [
     {
       label: 'Next.js',
-      value: 'nextjs',
-      icon: ''
+      value: 'nextjs'
     },
     {
       label: 'Angular',
-      value: 'angular',
-      icon: ''
+      value: 'angular'
     },
     {
       label: 'Astro',
-      value: 'astro',
-      icon: ''
+      value: 'astro'
     },
     {
       label: 'Hexo',
-      value: 'hexo',
-      icon: ''
+      value: 'hexo'
     },
     {
       label: 'React',
-      value: 'react',
-      icon: ''
+      value: 'react'
     },
     {
       label: 'Vite',
-      value: 'vite',
-      icon: ''
+      value: 'vite'
     },
     {
       label: 'Vue',
-      value: 'vue',
-      icon: ''
-    },
+      value: 'vue'
+    }
   ]
 
   return vulcanPresets

@@ -7,10 +7,6 @@
   import FormFieldsImportStatic from './FormFields/FormFieldsImportStatic'
 
   const props = defineProps({
-    createVariablesService: {
-      type: Function,
-      required: true
-    },
     listPlatformsService: {
       type: Function,
       required: true
@@ -34,27 +30,42 @@
     getModesByPresetService: {
       type: Function,
       required: true
+    },
+    createScriptRunnerExecutionService: {
+      type: Function,
+      required: true
     }
   })
 
   const validationSchema = yup.object({
     edgeApplicationName: yup.string().required().label('Edge Application Name'),
-    rootDirectory: yup.string(),
-    preset: yup.string(),
-    newVariables: yup.array()
+    rootDirectory: yup.string().required().label('Root Directory'),
+    preset: yup.string().required().label('Preset'),
+    mode: yup.string().required().label('Mode'),
+    repository: yup.string().required().label('Repository'),
+    installCommand: yup.string().required().label('Install Command'),
+    gitScope: yup.string().required().label('Git Scope'),
+    newVariables: yup.array().of(
+      yup.object().shape({
+        key: yup.string().required().label('Key'),
+        value: yup.string().required().label('Value')
+      })
+    )
   })
 
   const initialValues = {
     edgeApplicationName: '',
     rootDirectory: '',
     preset: '',
-    newVariables: []
+    newVariables: [],
+    mode: '',
+    repository: '',
+    installCommand: '',
+    gitScope: ''
   }
 
-  const handleCreateStaticTemplate = async (formValues) => {
-    return await Promise.all(
-      formValues.newVariables.map((variable) => props.createVariablesService(variable))
-    )
+  const handleExecuteScriptRunner = async (formValues) => {
+    return await props.createScriptRunnerExecutionService(formValues)
   }
 </script>
 
@@ -65,7 +76,7 @@
     </template>
     <template #content>
       <CreateFormBlock
-        :createService="handleCreateStaticTemplate"
+        :createService="handleExecuteScriptRunner"
         :schema="validationSchema"
         :initialValues="initialValues"
       >

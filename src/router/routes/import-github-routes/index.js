@@ -1,6 +1,6 @@
-import * as VariablesService from '@/services/variables-services'
 import * as VersionControlSystemService from '@/services/version-control-system-integration-services'
 import * as VulcanService from '@/services/vulcan-services'
+import * as ScriptRunnerService from '@/services/script-runner-service'
 
 /** @type {import('vue-router').RouteRecordRaw} */
 export const importGithubRoutes = {
@@ -12,13 +12,13 @@ export const importGithubRoutes = {
       name: 'github-static',
       component: () => import('@views/ImportGitHub/ImportStaticView.vue'),
       props: {
-        createVariablesService: VariablesService.createVariablesService,
         listPlatformsService: VersionControlSystemService.listPlatformsService,
         postCallbackUrlService: VersionControlSystemService.postCallbackUrlService,
         listIntegrationsService: VersionControlSystemService.listIntegrationsService,
         listRepositoriesService: VersionControlSystemService.listRepositoriesService,
         listVulcanPresetsService: VulcanService.listVulcanPresetsService,
-        getModesByPresetService: VulcanService.getModesByPresetService
+        getModesByPresetService: VulcanService.getModesByPresetService,
+        createScriptRunnerExecutionService: ScriptRunnerService.createScriptRunnerExecutionService,
       },
       meta: {
         breadCrumbs: [
