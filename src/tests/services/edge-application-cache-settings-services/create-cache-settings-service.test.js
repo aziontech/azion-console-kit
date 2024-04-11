@@ -21,7 +21,10 @@ const fixtures = {
     cacheByCookies: 'mockCacheByCookies',
     cookieNames: 'cookie1\ncookie2\ncookie3',
     adaptiveDeliveryAction: 'mockAdaptiveDeliveryAction',
-    deviceGroup: [{ id: '123' }, { id: 456 }]
+    deviceGroup: [{ id: '123' }, { id: 456 }],
+    l2CachingEnabled: false,
+    isSliceL2CachingEnabled: false,
+    isSliceEdgeCachingEnabled: false
   }
 }
 const makeSut = () => {
@@ -60,7 +63,10 @@ describe('EdgeApplicationCacheSettingsServices', () => {
         cache_by_cookies: fixtures.cacheSettingsMock.cacheByCookies,
         cookie_names: ['cookie1', 'cookie2', 'cookie3'],
         adaptive_delivery_action: fixtures.cacheSettingsMock.adaptiveDeliveryAction,
-        device_group: ['123', 456]
+        device_group: ['123', 456],
+        l2_caching_enabled: fixtures.cacheSettingsMock.l2CachingEnabled,
+        is_slice_l2_caching_enabled: fixtures.cacheSettingsMock.isSliceL2CachingEnabled,
+        is_slice_edge_caching_enabled: fixtures.cacheSettingsMock.isSliceEdgeCachingEnabled
       }
     })
   })

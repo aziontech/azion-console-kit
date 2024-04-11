@@ -7,6 +7,9 @@
   import InputNumber from 'primevue/inputnumber'
   import InputSwitch from 'primevue/inputswitch'
   import RadioButton from 'primevue/radiobutton'
+  import Dropdown from 'primevue/dropdown'
+  import CheckboxPrime from 'primevue/checkbox'
+
   import TextArea from 'primevue/textarea'
   import { useField, useFieldArray } from 'vee-validate'
   import { computed, ref, watch } from 'vue'
@@ -15,8 +18,27 @@
     isEnableApplicationAccelerator: {
       required: true,
       type: Boolean
+    },
+    showTieredCache: {
+      type: Boolean,
+      required: true
     }
   })
+
+  const TIERED_CACHE_REGION = ref([
+    {
+      label: 'Select an Tiered Cache Region',
+      value: ''
+    },
+    {
+      label: 'na-united-states',
+      value: 'na-united-states'
+    },
+    {
+      label: 'sa-brazil',
+      value: 'sa-brazil'
+    }
+  ])
 
   const CACHE_SETTINGS_OPTIONS = ref([
     {
@@ -87,6 +109,7 @@
     useField('cdnCacheSettingsMaximumTtl')
   const { value: sliceConfigurationEnabled } = useField('sliceConfigurationEnabled')
   const { value: sliceConfigurationRange } = useField('sliceConfigurationRange')
+  const { value: isSliceL2CachingEnabled } = useField('isSliceL2CachingEnabled')
   const { value: cacheByQueryString } = useField('cacheByQueryString')
   const { value: queryStringFields, errorMessage: queryStringFieldsError } =
     useField('queryStringFields')
@@ -95,6 +118,9 @@
   const { value: enableCachingForPost } = useField('enableCachingForPost')
   const { value: enableCachingForOptions } = useField('enableCachingForOptions')
   const { value: enableStaleCache } = useField('enableStaleCache')
+  const { value: l2CachingEnabled } = useField('l2CachingEnabled')
+  const { value: l2Region } = useField('l2Region')
+  const { value: isSliceEdgeCachingEnabled } = useField('isSliceEdgeCachingEnabled')
 
   const { value: cacheByCookies } = useField('cacheByCookies')
   const { value: cookieNames, errorMessage: cookieNamesError } = useField('cookieNames')
@@ -132,9 +158,29 @@
     return adaptiveDeliveryAction.value === 'whitelist'
   })
 
+  const cacheSettingsOptions = computed(() => {
+    return CACHE_SETTINGS_OPTIONS.value.map((item) => {
+      return {
+        ...item,
+        disabledItem: item.value === 'honor' && l2CachingEnabled.value
+      }
+    })
+  })
+
   watch(adaptiveDeliveryAction, (value) => {
     if (value === 'whitelist' && deviceGroup.value.length === 0) {
       addDeviceGroup({ id: '' })
+    }
+  })
+
+  watch(l2CachingEnabled, (value) => {
+    if (value) {
+      cdnCacheSettings.value = 'override'
+      isSliceEdgeCachingEnabled.value = true
+      sliceConfigurationEnabled.value = true
+    } else {
+      isSliceL2CachingEnabled.value = false
+      isSliceEdgeCachingEnabled.value = false
     }
   })
 </script>
@@ -221,13 +267,14 @@
         <div class="flex flex-col gap-4">
           <div
             class="flex no-wrap gap-2 items-center"
-            v-for="cdnCacheSettingsOption in CACHE_SETTINGS_OPTIONS"
+            v-for="cdnCacheSettingsOption in cacheSettingsOptions"
             :key="cdnCacheSettingsOption.value"
           >
             <RadioButton
               v-model="cdnCacheSettings"
               :inputId="`cdnOption-${cdnCacheSettingsOption.value}`"
               name="cdnCacheSettings"
+              :disabled="cdnCacheSettingsOption.disabledItem"
               :value="cdnCacheSettingsOption.value"
             />
             <label
@@ -269,6 +316,48 @@
           >{{ cdnCacheSettingsMaximumTtlError }}</small
         >
       </div>
+      <div
+        class="flex gap-2 w-full items-start"
+        v-if="props.showTieredCache"
+      >
+        <InputSwitch
+          v-model="l2CachingEnabled"
+          inputId="l2CachingEnabled"
+        />
+        <label
+          for="l2CachingEnabled"
+          class="flex flex-col items-start gap-1"
+        >
+          <span class="text-color text-sm font-normal leading-5">Tiered Cache </span>
+          <span class="text-sm text-color-secondary font-normal leading-5">
+            Enable Tiered Cache if you want to reduce the traffic to your origin and increase
+            performance and availability.
+          </span>
+        </label>
+      </div>
+      <div
+        class="flex flex-col w-full sm:max-w-xs gap-2"
+        v-if="props.showTieredCache"
+      >
+        <label
+          for="method"
+          class="text-color text-sm font-medium leading-5"
+          >Tiered Cache Region</label
+        >
+        <Dropdown
+          appendTo="self"
+          inputId="originId"
+          v-model="l2Region"
+          :disabled="!l2CachingEnabled"
+          :options="TIERED_CACHE_REGION"
+          optionLabel="label"
+          option-value="value"
+          placeholder="Select an Tiered Cache Region"
+        />
+        <small class="text-xs text-color-secondary font-normal leading-5"
+          >Choose an Tiered Cache Region suitable for your application.</small
+        >
+      </div>
     </template>
   </FormHorizontal>
 
@@ -282,6 +371,7 @@
         <InputSwitch
           v-model="sliceConfigurationEnabled"
           inputId="sliceConfigurationEnabled"
+          :disabled="l2CachingEnabled"
         />
         <label
           for="sliceConfigurationEnabled"
@@ -291,6 +381,42 @@
         </label>
       </div>
 
+      <div class="flex flex-col w-full sm:max-w-3xl gap-2">
+        <label class="text-color text-sm font-medium leading-5">Layer</label>
+        <div class="flex flex-col gap-4">
+          <div class="flex w-full gap-2 items-start">
+            <CheckboxPrime
+              v-model="isSliceEdgeCachingEnabled"
+              name="isSliceEdgeCachingEnabled"
+              binary
+              :disabled="l2CachingEnabled"
+            />
+            <label
+              for="isSliceEdgeCachingEnabled"
+              class="flex flex-col items-start gap-1"
+            >
+              <span class="text-color text-sm font-normal leading-5">Edge Cache</span>
+            </label>
+          </div>
+          <div
+            class="flex w-full gap-2 items-start"
+            v-if="props.showTieredCache"
+          >
+            <CheckboxPrime
+              v-model="isSliceL2CachingEnabled"
+              name="isSliceL2CachingEnabled"
+              binary
+              :disabled="!l2CachingEnabled"
+            />
+            <label
+              for="isSliceL2CachingEnabled"
+              class="flex flex-col items-start gap-1"
+            >
+              <span class="text-color text-sm font-normal leading-5">Tiered Cache</span>
+            </label>
+          </div>
+        </div>
+      </div>
       <div
         v-if="showSliceConfigurationRange"
         class="flex flex-col sm:max-w-xs w-full gap-2"

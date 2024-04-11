@@ -19,7 +19,7 @@
             :domainName="domainName"
             :hasDomainName="true"
             @copyDomainName="copyDomainName"
-          ></FormFieldsEditDomains>
+          />
         </template>
         <template #action-bar="{ onSubmit, formValid, onCancel, loading }">
           <ActionBarTemplate

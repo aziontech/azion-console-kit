@@ -33,6 +33,10 @@
     editService: {
       type: Function,
       required: true
+    },
+    showTieredCache: {
+      type: Boolean,
+      required: true
     }
   })
 
@@ -64,7 +68,10 @@
     cacheByCookies: 'ignore',
     cookieNames: '',
     adaptiveDeliveryAction: 'ignore',
-    deviceGroup: []
+    deviceGroup: [],
+    l2CachingEnabled: false,
+    isSliceL2CachingEnabled: false,
+    isSliceEdgeCachingEnabled: false
   })
   const validationSchema = yup.object({
     name: yup.string().required().label('Name'),
@@ -196,7 +203,10 @@
     title="Create Cache Settings"
   >
     <template #formFields>
-      <FormFieldsEdgeApplicationCacheSettings :isEnableApplicationAccelerator="isEnableApplicationAccelerator" />
+      <FormFieldsEdgeApplicationCacheSettings
+        :isEnableApplicationAccelerator="isEnableApplicationAccelerator"
+        :showTieredCache="props.showTieredCache"
+       />
     </template>
   </CreateDrawerBlock>
 
@@ -211,7 +221,10 @@
     title="Edit Cache Settings"
   >
     <template #formFields>
-      <FormFieldsEdgeApplicationCacheSettings :isEnableApplicationAccelerator="isEnableApplicationAccelerator"/>
+      <FormFieldsEdgeApplicationCacheSettings
+        :isEnableApplicationAccelerator="isEnableApplicationAccelerator"
+        :showTieredCache="props.showTieredCache"
+      /> 
     </template>
   </EditDrawerBlock>
 </template>
