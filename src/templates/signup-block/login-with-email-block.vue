@@ -206,6 +206,7 @@
       await props.signupService({ ...values, captcha })
 
       tracker.signUp.userSignedUp({ method: 'email' })
+      tracker.signUp.userClickedSignedUp({ method: 'email' }).track()
       router.push({ query: { email: encodeEmail(values.email) } })
       loading.value = false
       emit('loginWithEmail')
