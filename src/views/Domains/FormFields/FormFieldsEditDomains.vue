@@ -75,7 +75,6 @@
       value: certificate.id
     }))
   })
-
 </script>
 
 <template>
