@@ -15,7 +15,7 @@
     isEnableApplicationAccelerator: {
       required: true,
       type: Boolean
-    },
+    }
   })
 
   const CACHE_SETTINGS_OPTIONS = ref([
@@ -106,17 +106,15 @@
   } = useFieldArray('deviceGroup')
 
   const disabledQueryStringOptions = (option) => {
-    if ((option.value === 'whitelist' || option.value === 'blacklist') && !props.isEnableApplicationAccelerator) {
-      return true
-    }
-    return false
+    const isDisabled = (option.value === 'whitelist' || option.value === 'blacklist') &&
+    !props.isEnableApplicationAccelerator
+    return isDisabled
   }
 
   const disabledCookiesOptions = (option) => {
-    if ((option.value === 'whitelist' || option.value === 'blacklist' || option.value === 'all')&& !props.isEnableApplicationAccelerator) {
-      return true
-    }
-    return false
+    const isDisabled = (option.value === 'whitelist' || option.value === 'blacklist' || option.value === 'all') &&
+    !props.isEnableApplicationAccelerator
+    return isDisabled
   }
 
   const showMaxTtl = computed(() => browserCacheSettings.value === 'override')
@@ -337,7 +335,7 @@
             class="flex no-wrap gap-2 items-center"
             v-for="queryStringOption in QUERY_STRING_OPTIONS"
             :key="queryStringOption.value"
-          > 
+          >
             <RadioButton
               v-model="cacheByQueryString"
               :disabled="disabledQueryStringOptions(queryStringOption)"
