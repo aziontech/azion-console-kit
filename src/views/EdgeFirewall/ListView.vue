@@ -11,7 +11,6 @@
 
   const tracker = inject('tracker')
 
-
   const props = defineProps({
     listEdgeFirewallService: {
       required: true,
