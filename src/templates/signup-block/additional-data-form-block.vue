@@ -8,15 +8,14 @@
       v-if="additionalDataInfo"
     >
       <!-- Step 1: Plan -->
-      <h4 class="font-semibold text-sm">
-        {{ additionalDataInfo[0].key }}{{ additionalDataInfo[0].required ? '*' : '' }}
-      </h4>
+
+      <h4 class="font-semibold text-sm">{{ additionalDataInfo[0].key }}*</h4>
       <div class="flex flex-wrap gap-3 mb-8">
         <label
           v-for="planData in additionalDataInfo[0].values"
           :key="planData.value"
           :for="planData.value"
-          class="flex items-center gap-2 w-fit p-4 border-1 surface-border rounded-md font-medium"
+          class="flex items-center gap-2 p-4 border-1 surface-border rounded-md font-medium w-full md:w-fit"
           :class="{ 'border-radio-card-active': plan === planData.value }"
           >{{ planData.value }}
           <PrimeRadio
@@ -25,17 +24,18 @@
             :value="planData.value"
             :inputId="planData.value"
             class="hidden"
-            @change="updateStep(2)"
+            @change="updateStep('plan')"
           />
         </label>
       </div>
 
       <!-- Step 2: Role -->
+
       <h4
         class="font-semibold text-sm"
         :class="[disabledClass(2)]"
       >
-        {{ additionalDataInfo[1].key }}{{ additionalDataInfo[1].required ? '*' : '' }}
+        {{ additionalDataInfo[1].key }}*
       </h4>
       <div
         class="flex flex-wrap gap-3 mb-8"
@@ -45,7 +45,7 @@
           v-for="roleData in additionalDataInfo[1].values"
           :key="roleData.value"
           :for="roleData.value"
-          class="flex items-center gap-2 w-fit p-4 border-1 surface-border rounded-md font-medium"
+          class="flex items-center gap-2 p-4 border-1 surface-border rounded-md font-medium w-full md:w-fit"
           :class="{ 'border-radio-card-active': role === roleData.value }"
           >{{ roleData.value }}
           <PrimeRadio
@@ -55,45 +55,57 @@
             :inputId="roleData.value"
             :disabled="isFieldDisabled(2)"
             class="hidden"
-            @change="updateStep(3)"
+            @change="updateStep('role')"
           />
         </label>
       </div>
 
+      <!-- Step 2: Role Description -->
+
       <div
-        class="w-1/2 mb-8"
-        v-if="role === 'Other'"
+        class="mb-8 w-full md:w-1/2"
+        v-if="showRoleDescriptionField"
       >
-        <label
-          class="flex flex-col gap-3 font-semibold text-sm"
-          for="otherRole"
-        >
-          Describe your role*
-          <PrimeInputText
-            v-model="roleDescription"
-            name="role"
-            id="otherRole"
-            @change="updateStep(3)"
-          />
-        </label>
+        <div class="w-full flex flex-col gap-2">
+          <label
+            class="flex flex-col gap-3 font-semibold text-sm"
+            for="otherRole"
+          >
+            Describe your role*
+            <PrimeInputText
+              v-model="roleDescription"
+              name="role"
+              id="otherRole"
+            />
+          </label>
+          <small
+            v-if="errors.roleDescription"
+            class="p-error text-xs font-normal leading-tight"
+          >
+            {{ errors.roleDescription }}
+          </small>
+        </div>
       </div>
 
       <!-- Step 3: Company Size -->
+
       <h4
         class="font-semibold text-sm"
         :class="[disabledClass(3)]"
+        v-if="showCompanySizeField"
       >
-        {{ additionalDataInfo[2].key }}{{ additionalDataInfo[2].required ? '*' : '' }}
+        {{ additionalDataInfo[2].key }}*
       </h4>
       <div
         class="flex flex-wrap gap-3 mb-8"
         :class="[disabledClass(3)]"
+        v-if="showCompanySizeField"
       >
         <label
           v-for="companySizeData in additionalDataInfo[2].values"
           :key="companySizeData.value"
           :for="companySizeData.value"
-          class="flex items-center gap-2 w-fit p-4 border-1 surface-border rounded-md font-medium"
+          class="flex items-center gap-2 p-4 border-1 surface-border rounded-md font-medium w-full md:w-fit"
           :class="{ 'border-radio-card-active': companySize === companySizeData.value }"
           >{{ companySizeData.value }}
           <PrimeRadio
@@ -103,65 +115,86 @@
             :inputId="companySizeData.value"
             :disabled="isFieldDisabled(3)"
             class="hidden"
-            @change="updateStep(4)"
+            @change="updateStep('companySize')"
           />
         </label>
+      </div>
+
+      <!-- Step 3 : Company Website -->
+
+      <div
+        class="mb-8 w-full md:w-1/2"
+        v-if="showCompanyWebsiteField"
+      >
+        <div class="w-full flex flex-col gap-2">
+          <label
+            class="flex flex-col gap-3 font-semibold text-sm"
+            :class="[disabledClass(3)]"
+            for="companyWebsite"
+          >
+            {{ additionalDataInfo[4].key }}*
+            <PrimeInputText
+              v-model="companyWebsite"
+              name="companyWebsite"
+              id="companyWebsite"
+              :disabled="isFieldDisabled(3)"
+            />
+          </label>
+          <small
+            v-if="errors.companyWebsite"
+            class="p-error text-xs font-normal leading-tight"
+          >
+            {{ errors.companyWebsite }}
+          </small>
+        </div>
       </div>
 
       <!-- Step 4: Full Name -->
-      <div class="w-1/2 mb-8">
-        <label
-          class="flex flex-col gap-3 font-semibold text-sm"
-          :class="[disabledClass(4)]"
-          for="fullName"
-        >
-          {{ additionalDataInfo[3].key }}{{ additionalDataInfo[3].required ? '*' : '' }}
-          <PrimeInputText
-            v-model="fullName"
-            name="fullName"
-            id="fullName"
-            :disabled="isFieldDisabled(4)"
-            @input="updateStep(5)"
-          />
-        </label>
+
+      <div class="mb-8 w-full md:w-1/2">
+        <div class="w-full flex flex-col gap-2">
+          <label
+            class="flex flex-col gap-3 font-semibold text-sm"
+            :class="[disabledClass(4)]"
+            for="fullName"
+          >
+            {{ additionalDataInfo[3].key }}*
+            <PrimeInputText
+              v-model="fullName"
+              name="fullName"
+              id="fullName"
+              :disabled="isFieldDisabled(4)"
+              @input="updateStep('fullName')"
+            />
+          </label>
+          <small
+            v-if="errors.fullName"
+            class="p-error text-xs font-normal leading-tight"
+          >
+            {{ errors.fullName }}
+          </small>
+        </div>
       </div>
 
-      <!-- Step 5: Company Website -->
+      <!-- Step 5: Onboarding Session -->
 
-      <div class="w-1/2 mb-8">
-        <label
-          class="flex flex-col gap-3 font-semibold text-sm"
-          :class="[disabledClass(5)]"
-          for="companyWebsite"
-        >
-          {{ additionalDataInfo[4].key }}{{ additionalDataInfo[4].required ? '*' : '' }}
-          <PrimeInputText
-            v-model="companyWebsite"
-            name="companyWebsite"
-            id="companyWebsite"
-            :disabled="isFieldDisabled(5)"
-            @input="updateStep(6)"
-          />
-        </label>
-      </div>
-
-      <!-- Step 6: Onboarding Session -->
       <label
         class="w-fit mb-8 flex flex-row-reverse gap-3 text-sm"
-        :class="[disabledClass(6)]"
+        :class="[disabledClass(5)]"
         for="onboardingSession"
       >
-        {{ additionalDataInfo[5].key }}{{ additionalDataInfo[5].required ? '*' : '' }}
+        {{ additionalDataInfo[5].key }}*
         <PrimeInputSwitch
           v-model="onboardingSession"
           name="onboardingSession"
           id="onboardingSession"
-          :disabled="isFieldDisabled(6)"
+          :disabled="isFieldDisabled(5)"
         />
       </label>
     </div>
 
     <!-- Empty state -->
+
     <div
       class="flex flex-col gap-2"
       v-else
@@ -171,11 +204,11 @@
         :key="item"
       >
         <div class="w-full mb-8">
-          <PrimeSkeleton class="w-2/3 h-4 mb-4" />
+          <PrimeSkeleton class="h-4 mb-4 w-2/3" />
           <div class="flex flex-wrap gap-3">
-            <PrimeSkeleton class="w-28 h-14" />
-            <PrimeSkeleton class="w-28 h-14" />
-            <PrimeSkeleton class="w-28 h-14" />
+            <PrimeSkeleton class="h-14 w-full md:w-28" />
+            <PrimeSkeleton class="h-14 w-full md:w-28" />
+            <PrimeSkeleton class="h-14 w-full md:w-28" />
           </div>
         </div>
       </div>
@@ -190,7 +223,7 @@
   import PrimeSkeleton from 'primevue/skeleton'
   import { useToast } from 'primevue/usetoast'
   import { useField, useForm } from 'vee-validate'
-  import { onMounted, ref, inject, watch } from 'vue'
+  import { onMounted, ref, inject, computed } from 'vue'
   import { useRouter } from 'vue-router'
   import * as yup from 'yup'
   /** @type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
@@ -228,16 +261,22 @@
     plan: yup.string().required(),
     role: yup.string().required(),
     roleDescription: yup.string().when('role', {
-      is: 'Other',
+      is: (val) => val === 'Other',
       then: (schema) => schema.required('Role Description is a required field')
     }),
-    companySize: yup.string().required(),
+    companySize: yup.string().when('plan', {
+      is: (val) => val === 'Work',
+      then: (schema) => schema.required()
+    }),
+    companyWebsite: yup.string().when('companySize', {
+      is: (val) => val && val !== 'Just me',
+      then: (schema) => schema.required('Company Website is a required field')
+    }),
     fullName: yup.string().required('Full Name is a required field'),
-    companyWebsite: yup.string().required('Company Website is a required field'),
     onboardingSession: yup.boolean()
   })
 
-  const { values, setValues, meta, errors } = useForm({
+  const { values, meta, errors } = useForm({
     validationSchema,
     initialValues: {
       onboardingSession: true
@@ -248,12 +287,25 @@
   const { value: role } = useField('role')
   const { value: roleDescription } = useField('roleDescription')
   const { value: companySize } = useField('companySize')
-  const { value: fullName } = useField('fullName')
   const { value: companyWebsite } = useField('companyWebsite')
+  const { value: fullName } = useField('fullName')
   const { value: onboardingSession } = useField('onboardingSession')
 
   const updateStep = (step) => {
-    currentStep.value = step
+    const updateFromStep = {
+      plan: () => (currentStep.value = 2), // role
+      role: () => {
+        if (plan.value === 'Work') {
+          currentStep.value = 3 // company size
+        } else {
+          currentStep.value = 4 // full name
+        }
+      },
+      companySize: () => (currentStep.value = 4), // full name
+      fullName: () => (currentStep.value = 5) // onboarding session
+    }
+
+    updateFromStep[step]()
   }
 
   const disabledClass = (step) => {
@@ -263,6 +315,18 @@
   const isFieldDisabled = (step) => {
     return currentStep.value < step
   }
+
+  const showRoleDescriptionField = computed(() => {
+    return role.value === 'Other'
+  })
+
+  const showCompanySizeField = computed(() => {
+    return plan.value === 'Work'
+  })
+
+  const showCompanyWebsiteField = computed(() => {
+    return companySize.value && companySize.value !== 'Just me'
+  })
 
   const loading = ref(false)
 
@@ -286,24 +350,9 @@
     }
   }
 
-  const fieldsToCleanInEachStep = {
-    1: ['role', 'roleDescription', 'companySize', 'fullName', 'companyWebsite'],
-    2: ['roleDescription', 'companySize', 'fullName', 'companyWebsite'],
-    3: ['fullName', 'companyWebsite'],
-    4: ['companyWebsite'],
-    5: []
-  }
-
-  const resetFields = () => {
-    const fields = fieldsToCleanInEachStep[currentStep.value - 1]
-    if (fields) {
-      fields.forEach((field) => {
-        setValues({ [field]: '' })
-      })
-    }
-  }
-
-  watch(values, () => {
-    resetFields()
+  defineExpose({
+    submitForm,
+    loading,
+    meta
   })
 </script>
