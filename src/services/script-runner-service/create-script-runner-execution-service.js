@@ -1,7 +1,8 @@
 import { AxiosHttpClientAdapter } from '../axios/AxiosHttpClientAdapter'
 import { makeScriptRunnerBaseUrl } from './make-script-runner-base-url'
-import { getEnvironment } from '@/helpers'
+import { getEnvironment, getScriptRunnerImage } from '@/helpers'
 import * as Errors from '@/services/axios/errors'
+const environment = getEnvironment()
 
 export const createScriptRunnerExecutionService = async (payload) => {
   const bodyRequest = adapt(payload)
@@ -28,7 +29,6 @@ const parseVariables = (variables) => {
 }
 
 const parseFormData = (formValues) => {
-  const environment = getEnvironment()
 
   return [
     {
@@ -67,9 +67,10 @@ const parseFormData = (formValues) => {
 const adapt = (payload) => {
   const parsedVariables = parseVariables(payload.newVariables)
   const parsedFormData = parseFormData(payload)
+  const scriptRunnerImage = getScriptRunnerImage()
 
   return {
-    image: 'azionedge/runner-static-website-with-cli-stage:2.1-alpine3.16',
+    image: scriptRunnerImage,
     envs: [...parsedVariables, ...parsedFormData]
   }
 }
@@ -85,7 +86,8 @@ const parseHttpResponse = (httpResponse) => {
   switch (httpResponse.statusCode) {
     case 202:
       return {
-        feedback: 'Your GitHub repository has been imported successfully, and the deployment is starting.',
+        feedback:
+          'Your GitHub repository has been imported successfully, and the deployment is starting.',
         urlToEditView: `/create/deploy/${httpResponse.body.uuid}`
       }
     case 400:

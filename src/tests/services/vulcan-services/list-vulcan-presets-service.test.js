@@ -23,7 +23,7 @@ describe('VulcanServices', () => {
     const { sut } = makeSut()
     const presets = sut.listVulcanPresetsService()
 
-    presets.forEach(preset => {
+    presets.forEach((preset) => {
       expect(preset).toHaveProperty('label')
       expect(preset).toHaveProperty('value')
     })

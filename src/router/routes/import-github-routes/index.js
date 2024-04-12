@@ -18,7 +18,7 @@ export const importGithubRoutes = {
         listRepositoriesService: VersionControlSystemService.listRepositoriesService,
         listVulcanPresetsService: VulcanService.listVulcanPresetsService,
         getModesByPresetService: VulcanService.getModesByPresetService,
-        createScriptRunnerExecutionService: ScriptRunnerService.createScriptRunnerExecutionService,
+        createScriptRunnerExecutionService: ScriptRunnerService.createScriptRunnerExecutionService
       },
       meta: {
         breadCrumbs: [

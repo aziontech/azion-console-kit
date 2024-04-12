@@ -23,7 +23,7 @@ import { metricsPlaygroundOpener } from './metrics-playground-opener'
 import { parseCamelToSnake, parseSnakeToCamel } from './parse-api-body'
 import { themeSelect } from './theme-select'
 import { convertValueToDate, convertDateToLocalTimezone } from './convert-date'
-
+import { getScriptRunnerImage } from './get-script-runner-image'
 export {
   InviteSession,
   azionPrivacyPolicyWindowOpener,
@@ -50,5 +50,6 @@ export {
   parseSnakeToCamel,
   themeSelect,
   convertValueToDate,
-  convertDateToLocalTimezone
+  convertDateToLocalTimezone,
+  getScriptRunnerImage
 }
