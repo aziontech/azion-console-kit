@@ -120,6 +120,33 @@
         </label>
       </div>
 
+      <!-- Step 4: Full Name -->
+
+      <div class="mb-8 w-full md:w-1/2">
+        <div class="w-full flex flex-col gap-2">
+          <label
+            class="flex flex-col gap-3 font-semibold text-sm"
+            :class="[disabledClass(4)]"
+            for="fullName"
+          >
+            {{ additionalDataInfo[3].key }}*
+            <PrimeInputText
+              v-model="fullName"
+              name="fullName"
+              id="fullName"
+              :disabled="isFieldDisabled(4)"
+              @input="updateStep('fullName')"
+            />
+          </label>
+          <small
+            v-if="errors.fullName"
+            class="p-error text-xs font-normal leading-tight"
+          >
+            {{ errors.fullName }}
+          </small>
+        </div>
+      </div>
+
       <!-- Step 3 : Company Website -->
 
       <div
@@ -145,33 +172,6 @@
             class="p-error text-xs font-normal leading-tight"
           >
             {{ errors.companyWebsite }}
-          </small>
-        </div>
-      </div>
-
-      <!-- Step 4: Full Name -->
-
-      <div class="mb-8 w-full md:w-1/2">
-        <div class="w-full flex flex-col gap-2">
-          <label
-            class="flex flex-col gap-3 font-semibold text-sm"
-            :class="[disabledClass(4)]"
-            for="fullName"
-          >
-            {{ additionalDataInfo[3].key }}*
-            <PrimeInputText
-              v-model="fullName"
-              name="fullName"
-              id="fullName"
-              :disabled="isFieldDisabled(4)"
-              @input="updateStep('fullName')"
-            />
-          </label>
-          <small
-            v-if="errors.fullName"
-            class="p-error text-xs font-normal leading-tight"
-          >
-            {{ errors.fullName }}
           </small>
         </div>
       </div>
@@ -223,7 +223,7 @@
   import PrimeSkeleton from 'primevue/skeleton'
   import { useToast } from 'primevue/usetoast'
   import { useField, useForm } from 'vee-validate'
-  import { onMounted, ref, inject, computed } from 'vue'
+  import { onMounted, ref, inject, computed, watch } from 'vue'
   import { useRouter } from 'vue-router'
   import * as yup from 'yup'
   /** @type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
@@ -276,7 +276,7 @@
     onboardingSession: yup.boolean()
   })
 
-  const { values, meta, errors } = useForm({
+  const { values, resetField, meta, errors } = useForm({
     validationSchema,
     initialValues: {
       onboardingSession: true
@@ -303,6 +303,11 @@
       },
       companySize: () => (currentStep.value = 4), // full name
       fullName: () => (currentStep.value = 5) // onboarding session
+    }
+
+    if (fullName.value) {
+      currentStep.value = 5
+      return
     }
 
     updateFromStep[step]()
@@ -349,6 +354,15 @@
       loading.value = false
     }
   }
+
+  watch(plan, (value) => {
+    if (value !== 'Work') {
+      resetField('companySize')
+      if (role.value) {
+        updateStep('role')
+      }
+    }
+  })
 
   defineExpose({
     submitForm,
