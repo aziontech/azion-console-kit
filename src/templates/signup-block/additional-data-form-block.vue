@@ -314,7 +314,7 @@
   }
 
   const disabledClass = (step) => {
-    return currentStep.value < step ? 'text-color-secondary' : ''
+    return currentStep.value < step ? 'p-disabled' : ''
   }
 
   const isFieldDisabled = (step) => {

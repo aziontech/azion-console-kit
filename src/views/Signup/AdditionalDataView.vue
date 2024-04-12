@@ -1,13 +1,13 @@
 <template>
   <div>
     <section
-      class="flex flex-col gap-8 px-3 surface-section py-20 overflow-y-auto md:flex-row md:h-visible-area"
+      class="flex flex-col px-3 surface-section py-20 overflow-y-auto gap-20 md:gap-8 md:flex-row md:h-visible-area"
     >
       <div
         class="flex flex-col items-center justify-start gap-16 px-20 md:w-4/5 md:sticky md:top-20"
       >
-        <div class="w-full h-64 bg-slate-500/25" />
-        <div class="w-full flex flex-col items-center text-center gap-4">
+        <PrimeSkeleton class="w-full h-64" />
+        <div class="w-full max-w-md flex flex-col items-center text-center gap-4">
           <h1 class="text-3xl font-medium">Personalize Your Experience</h1>
           <p class="text-xl font-normal text-color-secondary">
             Find opportunities to explore Azion and improve your projects following a unique
@@ -47,6 +47,7 @@
   import AdditionalDataFormBlock from '@/templates/signup-block/additional-data-form-block'
   import ActionBar from '@/templates/action-bar-block'
   import PrimeButton from 'primevue/button'
+  import PrimeSkeleton from 'primevue/skeleton'
   import { computed, ref } from 'vue'
 
   const additionalDataRef = ref(null)
