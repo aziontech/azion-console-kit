@@ -1,11 +1,11 @@
 import { AxiosHttpClientAdapter } from '../axios/AxiosHttpClientAdapter'
 import * as Errors from '@/services/axios/errors'
-import { makeAccountInfoBaseUrl } from './make-account-info-base-url'
 import { parseCamelToSnake } from '@/helpers'
+import { makePutAdditionalDataBaseUrl } from './make-put-additional-data-base-url'
 
 export const putAdditionalDataService = async (payload) => {
   let httpResponse = await AxiosHttpClientAdapter.request({
-    url: `${makeAccountInfoBaseUrl()}`,
+    url: `${makePutAdditionalDataBaseUrl(payload.id)}`,
     method: 'PUT',
     body: parseCamelToSnake(payload)
   })
