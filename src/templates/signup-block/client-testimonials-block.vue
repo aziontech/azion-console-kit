@@ -6,11 +6,10 @@
     <Carousel
       :value="listTestimonials"
       :numVisible="1"
-      :numScroll="1"
-      circular
+      :circular="false"
       :showNavigators="false"
       :showIndicators="false"
-      :autoplayInterval="3000"
+      :autoplayInterval="timeToNextSlideInMs"
     >
       <template #item="slotProps">
         <div class="flex flex-col gap-2">
@@ -33,6 +32,7 @@
   import Carousel from 'primevue/carousel'
   import Vtex from '@/assets/svg/vtex-logo.vue'
   import { h, ref } from 'vue'
+  const timeToNextSlideInMs = 10000
 
   const listTestimonials = ref([
     {
