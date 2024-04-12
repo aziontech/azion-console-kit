@@ -132,14 +132,16 @@
   } = useFieldArray('deviceGroup')
 
   const disabledQueryStringOptions = (option) => {
-    const isDisabled = (option.value === 'whitelist' || option.value === 'blacklist') &&
-    !props.isEnableApplicationAccelerator
+    const isDisabled =
+      (option.value === 'whitelist' || option.value === 'blacklist') &&
+      !props.isEnableApplicationAccelerator
     return isDisabled
   }
 
   const disabledCookiesOptions = (option) => {
-    const isDisabled = (option.value === 'whitelist' || option.value === 'blacklist' || option.value === 'all') &&
-    !props.isEnableApplicationAccelerator
+    const isDisabled =
+      (option.value === 'whitelist' || option.value === 'blacklist' || option.value === 'all') &&
+      !props.isEnableApplicationAccelerator
     return isDisabled
   }
 

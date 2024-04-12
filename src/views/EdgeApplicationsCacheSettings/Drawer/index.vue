@@ -206,7 +206,7 @@
       <FormFieldsEdgeApplicationCacheSettings
         :isEnableApplicationAccelerator="isEnableApplicationAccelerator"
         :showTieredCache="props.showTieredCache"
-       />
+      />
     </template>
   </CreateDrawerBlock>
 
@@ -224,7 +224,7 @@
       <FormFieldsEdgeApplicationCacheSettings
         :isEnableApplicationAccelerator="isEnableApplicationAccelerator"
         :showTieredCache="props.showTieredCache"
-      /> 
+      />
     </template>
   </EditDrawerBlock>
 </template>

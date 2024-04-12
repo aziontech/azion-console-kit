@@ -183,7 +183,7 @@
    */
   const extractNameFromEmail = (email) => {
     const [emailBeforeAt] = email.split('@')
-    const cleanedName = emailBeforeAt.replace(/[^a-zA-Z]/g, '')
+    const cleanedName = emailBeforeAt.replace(/[^a-zA-Z]/g, ' ').trim()
 
     return cleanedName
   }
