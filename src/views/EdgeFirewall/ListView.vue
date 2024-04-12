@@ -4,8 +4,13 @@
   import ListTableBlock from '@/templates/list-table-block'
   import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
   import PageHeadingBlock from '@/templates/page-heading-block'
-  import { computed, ref } from 'vue'
+  import { computed, ref, inject } from 'vue'
   defineOptions({ name: 'edge-firewall-view' })
+
+  /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
+
+  const tracker = inject('tracker')
+
 
   const props = defineProps({
     listEdgeFirewallService: {
@@ -63,6 +68,12 @@
   const handleLoadData = (event) => {
     hasContentToList.value = event
   }
+
+  const handleTrackEvent = () => {
+    tracker.product.clickToCreate({
+      productName: 'Edge Firewall'
+    })
+  }
 </script>
 
 <template>
@@ -82,6 +93,7 @@
         :columns="getColumns"
         @on-load-data="handleLoadData"
         emptyListMessage="No edge firewall found."
+        @on-before-go-to-add-page="handleTrackEvent"
       />
       <EmptyResultsBlock
         v-else
