@@ -4,10 +4,20 @@ import * as Errors from '@/services/axios/errors'
 import { putAdditionalDataService } from '@/services/signup-services'
 
 const additionalDataPayloadMock = {
-  project_type_selection: 'type1',
-  company_name: 'Test Company',
-  company_size: '1-10',
-  country: '1'
+  raw: {
+    id: '1',
+    projectTypeSelection: 'type1',
+    companyName: 'Test Company',
+    companySize: '1-10',
+    country: '1'
+  },
+  formatted: {
+    id: '1',
+    project_type_selection: 'type1',
+    company_name: 'Test Company',
+    company_size: '1-10',
+    country: '1'
+  }
 }
 
 const makeSut = () => {
@@ -25,12 +35,14 @@ describe('SignupServices', () => {
     })
     const { sut } = makeSut()
 
-    await sut(additionalDataPayloadMock)
+    const version = 'v4'
+
+    await sut(additionalDataPayloadMock.raw)
 
     expect(requestSpy).toHaveBeenCalledWith({
-      url: 'account/info',
+      url: `${version}/iam/${additionalDataPayloadMock.raw.id}/additional_data`,
       method: 'PUT',
-      body: additionalDataPayloadMock
+      body: additionalDataPayloadMock.formatted
     })
   })
 
@@ -40,7 +52,7 @@ describe('SignupServices', () => {
     })
     const { sut } = makeSut()
 
-    const req = await sut(additionalDataPayloadMock)
+    const req = await sut(additionalDataPayloadMock.raw)
 
     expect(req).toBeNull()
   })
@@ -74,7 +86,7 @@ describe('SignupServices', () => {
       })
       const { sut } = makeSut()
 
-      const request = sut(additionalDataPayloadMock)
+      const request = sut(additionalDataPayloadMock.raw)
 
       expect(request).rejects.toBe(expectedError)
     }
