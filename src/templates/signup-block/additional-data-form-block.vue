@@ -225,9 +225,12 @@
   import { useField, useForm } from 'vee-validate'
   import { onMounted, ref, inject, computed, watch } from 'vue'
   import { useRouter } from 'vue-router'
+  import { useAccountStore } from '@/stores/account'
   import * as yup from 'yup'
   /** @type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
+
+  const { userId } = useAccountStore()
 
   defineOptions({
     name: 'additional-data-form-block'
@@ -270,7 +273,10 @@
     }),
     companyWebsite: yup.string().when('companySize', {
       is: (val) => val && val !== 'Just me',
-      then: (schema) => schema.required('Company Website is a required field')
+      then: (schema) =>
+        schema
+          .url('Company Website must be a valid URL')
+          .required('Company Website is a required field')
     }),
     fullName: yup.string().required('Full Name is a required field'),
     onboardingSession: yup.boolean()
@@ -350,11 +356,14 @@
     loading.value = true
 
     try {
-      console.log(values)
-      // await props.putAdditionalDataService(values)
+      const payload = {
+        ...values,
+        id: userId
+      }
+      // await props.putAdditionalDataService(payload)
       // tracker.signUp.submittedAdditionalData()
 
-      // router.push({ name: 'home' })
+      // router.push({ name: 'home', query: { onboardingSession: 'true' } })
     } catch (err) {
       toast.add({ life: 5000, severity: 'error', detail: err, summary: 'Error' })
       tracker.signUp.failedSubmitAdditionalData().track()
