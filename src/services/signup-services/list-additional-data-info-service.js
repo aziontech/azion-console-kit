@@ -18,10 +18,6 @@ const adapt = (response) => {
     ...response.slice(3)
   ]
 
-  response.forEach((item, idx) => {
-    item.step = idx + 1
-  })
-
   return response
 }
 
