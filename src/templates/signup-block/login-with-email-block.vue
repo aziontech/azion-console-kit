@@ -175,9 +175,17 @@
     }
   }
 
+  /**
+   * Extracts the name from the given email.
+   *
+   * @param {string} email - the email from which to extract the name
+   * @return {string} the name extracted from the email
+   */
   const extractNameFromEmail = (email) => {
     const [emailBeforeAt] = email.split('@')
-    return emailBeforeAt
+    const cleanedName = emailBeforeAt.replace(/[^a-zA-Z]/g, ' ').trim()
+
+    return cleanedName
   }
 
   const signUp = handleSubmit(async (values) => {
@@ -226,3 +234,4 @@
     }
   )
 </script>
+import { replace } from 'cypress/types/lodash'
