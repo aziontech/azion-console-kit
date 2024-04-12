@@ -55,4 +55,8 @@
   watch(callbackUrl, () => {
     emitGithubInstallation()
   })
+
+  defineExpose({
+    connectWithGithub
+  })
 </script>

@@ -200,6 +200,17 @@
       }
     }
   }
+
+  const tabHeader = computed(() => {
+    switch (selectedTab.value) {
+      case 'new_resource':
+        return 'Select a Resource'
+      case 'import_github':
+        return 'Import from GitHub'
+      default:
+        return 'Select a Template'
+    }
+  })
 </script>
 
 <template>
@@ -229,7 +240,7 @@
       <LoadingState v-if="isLoading" />
       <div v-else>
         <div class="text-base font-medium mt-5 mb-3">
-          Select a {{ showResource ? 'Resource' : 'Template' }}
+          {{ tabHeader }}
         </div>
       </div>
 

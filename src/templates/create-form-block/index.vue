@@ -61,7 +61,8 @@
   }
 
   const showFeedback = (feedback = 'created successfully') => {
-    showToast('success', feedback)
+    const feedbackMessage = feedback || 'created successfully'
+    showToast('success', feedbackMessage)
   }
 
   const redirectToUrl = (path) => {
@@ -70,7 +71,7 @@
 
   const handleSuccess = (response) => {
     emit('on-response', response)
-    showFeedback(response.feedback)
+    showFeedback(response?.feedback)
     if (props.disabledCallback) return
     redirectToUrl(response.urlToEditView)
   }

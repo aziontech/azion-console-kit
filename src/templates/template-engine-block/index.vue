@@ -91,7 +91,7 @@
                   "
                 />
               </div>
-              <OuthGithub
+              <OAuthGithub
                 :listPlatformsService="listPlatformsService"
                 @onCallbackUrl="
                   (uri) => {
@@ -168,7 +168,7 @@
   import { useForm } from 'vee-validate'
   import * as yup from 'yup'
   import { useToast } from 'primevue/usetoast'
-  import OuthGithub from './oauth-github.vue'
+  import OAuthGithub from './oauth-github.vue'
 
   defineOptions({ name: 'templateEngineBlock' })
 
