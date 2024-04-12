@@ -33,13 +33,13 @@
 
       <h4
         class="font-semibold text-sm"
-        :class="[disabledClass(2)]"
+        :class="[disabledClass(stepOptions.role)]"
       >
         {{ additionalDataInfo[1].key }}*
       </h4>
       <div
         class="flex flex-wrap gap-3 mb-8"
-        :class="[disabledClass(2)]"
+        :class="[disabledClass(stepOptions.role)]"
       >
         <label
           v-for="roleData in additionalDataInfo[1].values"
@@ -53,7 +53,7 @@
             name="role"
             :value="roleData.value"
             :inputId="roleData.value"
-            :disabled="isFieldDisabled(2)"
+            :disabled="isFieldDisabled(stepOptions.role)"
             class="hidden"
             @change="updateStep('role')"
           />
@@ -91,14 +91,14 @@
 
       <h4
         class="font-semibold text-sm"
-        :class="[disabledClass(3)]"
+        :class="[disabledClass(stepOptions.companySize)]"
         v-if="showCompanySizeField"
       >
         {{ additionalDataInfo[2].key }}*
       </h4>
       <div
         class="flex flex-wrap gap-3 mb-8"
-        :class="[disabledClass(3)]"
+        :class="[disabledClass(stepOptions.companySize)]"
         v-if="showCompanySizeField"
       >
         <label
@@ -113,7 +113,7 @@
             name="companySize"
             :value="companySizeData.value"
             :inputId="companySizeData.value"
-            :disabled="isFieldDisabled(3)"
+            :disabled="isFieldDisabled(stepOptions.companySize)"
             class="hidden"
             @change="updateStep('companySize')"
           />
@@ -126,7 +126,7 @@
         <div class="w-full flex flex-col gap-2">
           <label
             class="flex flex-col gap-3 font-semibold text-sm"
-            :class="[disabledClass(4)]"
+            :class="[disabledClass(stepOptions.fullName)]"
             for="fullName"
           >
             {{ additionalDataInfo[3].key }}*
@@ -156,7 +156,7 @@
         <div class="w-full flex flex-col gap-2">
           <label
             class="flex flex-col gap-3 font-semibold text-sm"
-            :class="[disabledClass(3)]"
+            :class="[disabledClass(stepOptions.companySize)]"
             for="companyWebsite"
           >
             {{ additionalDataInfo[4].key }}*
@@ -164,7 +164,7 @@
               v-model="companyWebsite"
               name="companyWebsite"
               id="companyWebsite"
-              :disabled="isFieldDisabled(3)"
+              :disabled="isFieldDisabled(stepOptions.companySize)"
             />
           </label>
           <small
@@ -180,7 +180,7 @@
 
       <label
         class="w-fit mb-8 flex flex-row-reverse gap-3 text-sm"
-        :class="[disabledClass(5)]"
+        :class="[disabledClass(stepOptions.onboardingSession)]"
         for="onboardingSession"
       >
         {{ additionalDataInfo[5].key }}*
@@ -188,7 +188,7 @@
           v-model="onboardingSession"
           name="onboardingSession"
           id="onboardingSession"
-          :disabled="isFieldDisabled(5)"
+          :disabled="isFieldDisabled(stepOptions.onboardingSession)"
         />
       </label>
     </div>
@@ -291,22 +291,30 @@
   const { value: fullName } = useField('fullName')
   const { value: onboardingSession } = useField('onboardingSession')
 
+  const stepOptions = {
+    plan: 1,
+    role: 2,
+    companySize: 3,
+    fullName: 4,
+    onboardingSession: 5
+  }
+
   const updateStep = (step) => {
     const updateFromStep = {
-      plan: () => (currentStep.value = 2), // role
+      plan: () => (currentStep.value = stepOptions.role),
       role: () => {
         if (plan.value === 'Work') {
-          currentStep.value = 3 // company size
+          currentStep.value = stepOptions.companySize
         } else {
-          currentStep.value = 4 // full name
+          currentStep.value = stepOptions.fullName
         }
       },
-      companySize: () => (currentStep.value = 4), // full name
-      fullName: () => (currentStep.value = 5) // onboarding session
+      companySize: () => (currentStep.value = stepOptions.fullName),
+      fullName: () => (currentStep.value = stepOptions.onboardingSession)
     }
 
     if (fullName.value) {
-      currentStep.value = 5
+      currentStep.value = stepOptions.onboardingSession
       return
     }
 
