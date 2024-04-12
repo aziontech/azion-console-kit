@@ -4,7 +4,7 @@
       class="flex flex-col gap-8 px-3 surface-section py-20 overflow-y-auto md:flex-row md:h-visible-area"
     >
       <div
-        class="flex flex-col items-center justify-center gap-16 px-20 md:w-4/5 md:sticky md:top-20"
+        class="flex flex-col items-center justify-start gap-16 px-20 md:w-4/5 md:sticky md:top-20"
       >
         <div class="w-full h-64 bg-slate-500/25" />
         <div class="w-full flex flex-col items-center text-center gap-4">
@@ -52,7 +52,7 @@
   const additionalDataRef = ref(null)
 
   const isDisabledSubmit = computed(() => {
-    return !additionalDataRef.value?.meta?.valid || additionalDataRef.value?.loading
+    return !additionalDataRef.value?.meta.valid || additionalDataRef.value?.loading
   })
 
   const showLoading = computed(() => {
