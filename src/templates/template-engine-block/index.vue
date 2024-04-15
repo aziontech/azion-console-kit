@@ -70,7 +70,7 @@
             v-for="field in removeHiddenFields(group.fields)"
             :key="field.name"
           >
-            <div v-if="field.name === 'installation_id'">
+            <div v-if="field.name === 'platform_feature__vcs_integration__uuid'">
               <div
                 v-if="hasIntegrations"
                 class="flex flex-col sm:max-w-lg w-full gap-2"
