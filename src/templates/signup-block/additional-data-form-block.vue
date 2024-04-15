@@ -241,7 +241,7 @@
       type: Function,
       required: true
     },
-    putAdditionalDataService: {
+    postAdditionalDataService: {
       type: Function,
       required: true
     }
@@ -360,7 +360,8 @@
         ...values,
         id: userId
       }
-      // await props.putAdditionalDataService(payload)
+
+      await props.postAdditionalDataService({ payload, options: additionalDataInfo.value })
       // tracker.signUp.submittedAdditionalData()
 
       // router.push({ name: 'home', query: { onboardingSession: 'true' } })

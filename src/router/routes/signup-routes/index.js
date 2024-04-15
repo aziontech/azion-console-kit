@@ -31,7 +31,7 @@ export const signupRoutes = {
       component: () => import('@views/Signup/AdditionalDataView.vue'),
       props: {
         listAdditionalDataInfoService: SignupService.listAdditionalDataInfoService,
-        putAdditionalDataService: SignupService.putAdditionalDataService
+        postAdditionalDataService: SignupService.postAdditionalDataService
       },
       meta: {
         hideNavigation: true

@@ -4,7 +4,7 @@
       class="flex flex-col px-3 surface-section py-20 overflow-y-auto gap-20 md:gap-8 md:flex-row md:h-visible-area"
     >
       <div
-        class="flex flex-col items-center justify-start gap-16 px-20 md:w-4/5 md:pt-20 md:sticky md:top-10"
+        class="flex flex-col items-center justify-start gap-16 px-20 md:w-4/5 md:sticky md:top-10"
       >
         <PrimeSkeleton class="w-full h-64" />
         <div class="w-full max-w-md flex flex-col items-center text-center gap-4">
@@ -21,7 +21,7 @@
         >
           <AdditionalDataFormBlock
             :listAdditionalDataInfoService="listAdditionalDataInfoService"
-            :putAdditionalDataService="putAdditionalDataService"
+            :postAdditionalDataService="postAdditionalDataService"
             ref="additionalDataRef"
           />
         </div>
@@ -69,7 +69,7 @@
       type: Function,
       required: true
     },
-    putAdditionalDataService: {
+    postAdditionalDataService: {
       type: Function,
       required: true
     }
