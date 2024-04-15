@@ -136,6 +136,10 @@
         {{ getLabelBySelectedValue(slotProps.value) }}
       </span>
     </template>
+
+    <template #footer>
+      <slot name="footer" />
+    </template>
   </Dropdown>
 
   <small

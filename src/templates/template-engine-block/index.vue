@@ -71,6 +71,17 @@
             :key="field.name"
           >
             <div v-if="field.name === 'platform_feature__vcs_integration__uuid'">
+              <OAuthGithub
+                v-show="!hasIntegrations"
+                ref="oauthGithubRef"
+                :listPlatformsService="listPlatformsService"
+                @onCallbackUrl="
+                  (uri) => {
+                    setCallbackUrl(uri.value)
+                  }
+                "
+                :loading="isIntegrationsLoading"
+              />
               <div
                 v-if="hasIntegrations"
                 class="flex flex-col sm:max-w-lg w-full gap-2"
@@ -89,18 +100,22 @@
                       updateValueOnChange(field.name, installationId)
                     }
                   "
-                />
+                >
+                  <template #footer>
+                    <div class="p-dropdown-items-wrapper">
+                      <ul class="p-dropdown-items">
+                        <li
+                          class="p-dropdown-item flex items-center"
+                          @click="triggerConnectWithGithub"
+                        >
+                          <i class="pi pi-plus-circle mr-2"></i>
+                          <div>Add GitHub Account</div>
+                        </li>
+                      </ul>
+                    </div>
+                  </template>
+                </FieldDropdown>
               </div>
-              <OAuthGithub
-                :listPlatformsService="listPlatformsService"
-                @onCallbackUrl="
-                  (uri) => {
-                    setCallbackUrl(uri.value)
-                  }
-                "
-                :loading="isIntegrationsLoading"
-                v-else
-              />
             </div>
             <div
               v-else
@@ -223,6 +238,13 @@
   const callbackUrl = ref('')
   const listOfIntegrations = ref([])
   const isIntegrationsLoading = ref(false)
+  const oauthGithubRef = ref(null)
+
+  const triggerConnectWithGithub = () => {
+    if (oauthGithubRef.value) {
+      oauthGithubRef.value[0].connectWithGithub()
+    }
+  }
 
   onMounted(async () => {
     await loadTemplate(props.templateId)
