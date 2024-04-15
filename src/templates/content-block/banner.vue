@@ -43,13 +43,5 @@
   import Avatar from 'primevue/avatar'
   import PrimeButton from 'primevue/button'
 
-  const goToClassicInterface = () => {
-    const currentHost = window.location.host
-
-    if (currentHost === 'console.azion.com') {
-      window.location.href = 'https://manager.azion.com'
-    } else {
-      window.location.href = 'https://stage-manager.azion.com'
-    }
-  }
+  import { goToClassicInterface } from '@/helpers/go-to-classic-interface'
 </script>
