@@ -48,6 +48,7 @@
           <PrimeButton
             class="w-full flex-row-reverse"
             type="button"
+            data-testid="next-button"
             label="Next"
             :loading="isProccedButtonLoading"
             :disabled="!email"
@@ -128,6 +129,7 @@
           <PrimeButton
             link
             class="p-0"
+            data-testid="forgot-password"
             label="Forgot Password?"
             @click="$emit('goToForgotPassword', true)"
           />
@@ -135,6 +137,7 @@
         <PrimeButton
           class="w-full flex-row-reverse"
           :loading="isButtonLoading"
+          data-testid="submit"
           label="Sign In"
           type="button"
           @click="validateAndSubmit"

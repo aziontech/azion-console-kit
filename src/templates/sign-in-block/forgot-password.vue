@@ -40,6 +40,7 @@
             class="w-full flex-row-reverse"
             :loading="isSendingEmailLoading"
             label="Send Email"
+            data-testid="recover-password"
             severity="secondary"
             @click="sendEmail()"
             :disabled="!meta.valid"
@@ -67,12 +68,14 @@
           <p class="text-start">Didn't receive the email?</p>
           <PrimeButton
             class="p-0"
+            data-testid="resend-email"
             link
             label="Resend Email"
             @click="resendEmail()"
             :disabled="isEmailResent"
           />
           <PrimeBadge
+            data-testid="countdown"
             class="rounded-md animate-fadeIn"
             :value="counter"
             v-if="counter > 0"

@@ -14,6 +14,7 @@ module.exports = {
       extends: ['plugin:cypress/recommended']
     }
   ],
+  ignorePatterns: ['*.d.ts'],
   parserOptions: {
     ecmaVersion: 'latest'
   },

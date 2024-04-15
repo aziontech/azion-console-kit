@@ -1,5 +1,6 @@
 /* eslint-disable no-undef */
-
+/// <reference types="cypress" />
+/// <reference types="../support" />
 // ***********************************************
 // This example commands.js shows you how to
 // create various custom commands and overwrite
@@ -26,16 +27,10 @@
 // -- This will overwrite an existing command --
 // Cypress.Commands.overwrite('visit', (originalFn, url, options) => { ... })
 
-/**
- * Custom Cypress command to get an element by data-testid attribute.
- *
- * @param {string} selector - The value of the data-testid attribute to locate the element.
- * @param {...any} args - Additional arguments that can be passed to the cy.get() command.
- * @returns {Cypress.Chainable<JQuery<HTMLElement>>} - A Cypress Chainable yielding the found element.
- *
- * @example
- * cy.getByTestId('myTestId').should('be.visible');
- */
 Cypress.Commands.add('getByTestId', (selector, ...args) => {
   return cy.get(`[data-testid=${selector}]`, ...args)
+})
+
+Cypress.Commands.add('getInput', (inputType, ...args) => {
+  return cy.get(`input[type=${inputType}]`, ...args)
 })
