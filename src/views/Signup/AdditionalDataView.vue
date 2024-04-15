@@ -1,12 +1,12 @@
 <template>
   <div>
     <section
-      class="flex flex-col justify-start px-3 surface-section py-20 overflow-y-auto gap-20 md:gap-8 md:flex-row md:h-visible-area"
+      class="flex flex-col justify-start px-8 surface-section py-20 overflow-y-auto gap-20 md:gap-8 md:flex-row md:h-visible-area"
     >
       <div
-        class="flex flex-col items-center justify-start gap-16 px-20 my-auto md:w-4/5 md:sticky md:top-10"
+        class="flex flex-col items-center justify-start gap-16 px-20 md:mt-10 md:w-4/5 md:sticky md:top-0"
       >
-        <PrimeSkeleton class="w-full h-64" />
+        <PrimeSkeleton class="w-full h-72" />
         <div class="w-full max-w-md flex flex-col items-center text-center gap-4">
           <h1 class="text-3xl font-medium">Personalize Your Experience</h1>
           <p class="text-xl font-normal text-color-secondary">
@@ -15,7 +15,7 @@
           </p>
         </div>
       </div>
-      <div class="w-full flex flex-col justify-start items-center">
+      <div class="w-full flex flex-col justify-start items-center h-fit">
         <div
           class="card w-full surface-border border rounded-md surface-section p-6 flex flex-col gap-8 xl:p-8"
         >
