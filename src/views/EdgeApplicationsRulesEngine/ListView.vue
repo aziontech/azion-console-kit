@@ -62,6 +62,10 @@
     listOriginsService: {
       required: true,
       type: Function
+    },
+    showApplicationAccelerator: {
+      required: true,
+      type: Boolean
     }
   })
 
@@ -182,6 +186,7 @@
     :editRulesEngineService="props.editRulesEngineService"
     :loadRulesEngineService="props.loadRulesEngineService"
     :documentationService="props.documentationService"
+    :showApplicationAccelerator="props.showApplicationAccelerator"
     @onSuccess="reloadList"
   />
   <ListTableBlock

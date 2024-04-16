@@ -259,6 +259,7 @@
             :edgeApplicationId="edgeApplicationId"
             :isEnableApplicationAccelerator="isEnableApplicationAccelerator"
             :isDeliveryProtocolHttps="isDeliveryProtocolHttps"
+            :showApplicationAccelerator="edgeApplication.applicationAccelerator"
             v-bind="props.rulesEngineServices"
           />
         </TabPanel>

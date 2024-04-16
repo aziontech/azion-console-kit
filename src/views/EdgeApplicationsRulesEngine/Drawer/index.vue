@@ -51,6 +51,10 @@
     listOriginsService: {
       required: true,
       type: Function
+    },
+    showApplicationAccelerator: {
+      type: Boolean,
+      required: true
     }
   })
 
@@ -205,6 +209,7 @@
         :listEdgeApplicationFunctionsService="props.listEdgeApplicationFunctionsService"
         :listOriginsService="props.listOriginsService"
         :listCacheSettingsService="props.listCacheSettingsService"
+        :showApplicationAccelerator="props.showApplicationAccelerator"
       />
     </template>
   </CreateDrawerBlock>
@@ -229,6 +234,7 @@
         :listEdgeApplicationFunctionsService="props.listEdgeApplicationFunctionsService"
         :listOriginsService="props.listOriginsService"
         :listCacheSettingsService="props.listCacheSettingsService"
+        :showApplicationAccelerator="props.showApplicationAccelerator"
       />
     </template>
   </EditDrawerBlock>
