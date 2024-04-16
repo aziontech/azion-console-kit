@@ -48,7 +48,7 @@
       default: () => {}
     },
     hideApplicationAcceleratorInDescription: {
-      type: Boolean,
+      type: Boolean
     }
   })
 

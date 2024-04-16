@@ -53,7 +53,7 @@
       type: Function
     },
     hideApplicationAcceleratorInDescription: {
-      type: Boolean,
+      type: Boolean
     }
   })
 
@@ -208,9 +208,7 @@
         :listEdgeApplicationFunctionsService="props.listEdgeApplicationFunctionsService"
         :listOriginsService="props.listOriginsService"
         :listCacheSettingsService="props.listCacheSettingsService"
-        :hideApplicationAcceleratorInDescription="
-          props.hideApplicationAcceleratorInDescription
-        "
+        :hideApplicationAcceleratorInDescription="props.hideApplicationAcceleratorInDescription"
       />
     </template>
   </CreateDrawerBlock>
@@ -235,9 +233,7 @@
         :listEdgeApplicationFunctionsService="props.listEdgeApplicationFunctionsService"
         :listOriginsService="props.listOriginsService"
         :listCacheSettingsService="props.listCacheSettingsService"
-        :hideApplicationAcceleratorInDescription="
-          props.hideApplicationAcceleratorInDescription
-        "
+        :hideApplicationAcceleratorInDescription="props.hideApplicationAcceleratorInDescription"
       />
     </template>
   </EditDrawerBlock>

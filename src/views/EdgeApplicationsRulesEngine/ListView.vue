@@ -185,9 +185,7 @@
     :editRulesEngineService="props.editRulesEngineService"
     :loadRulesEngineService="props.loadRulesEngineService"
     :documentationService="props.documentationService"
-    :hideApplicationAcceleratorInDescription="
-      props.hideApplicationAcceleratorInDescription
-    "
+    :hideApplicationAcceleratorInDescription="props.hideApplicationAcceleratorInDescription"
     @onSuccess="reloadList"
   />
   <ListTableBlock
