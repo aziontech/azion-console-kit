@@ -63,7 +63,7 @@
       required: true,
       type: Function
     },
-    showApplicationAccelerator: {
+    showRequiresApplicationAcceleratorInDescription: {
       required: true,
       type: Boolean
     }
@@ -186,7 +186,7 @@
     :editRulesEngineService="props.editRulesEngineService"
     :loadRulesEngineService="props.loadRulesEngineService"
     :documentationService="props.documentationService"
-    :showApplicationAccelerator="props.showApplicationAccelerator"
+    :showRequiresApplicationAcceleratorInDescription="props.showRequiresApplicationAcceleratorInDescription"
     @onSuccess="reloadList"
   />
   <ListTableBlock

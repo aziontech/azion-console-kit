@@ -47,7 +47,7 @@
       required: false,
       default: () => {}
     },
-    showApplicationAccelerator: {
+    showRequiresApplicationAcceleratorInDescription: {
       type: Boolean,
       required: true
     }
@@ -70,7 +70,7 @@
   ])
 
   const showLabelApplicationAccelerator = computed(() => {
-    if (props.showApplicationAccelerator) return ''
+    if (props.showRequiresApplicationAcceleratorInDescription) return ''
 
     return ' - requires Application Accelerator'
   })

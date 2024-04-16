@@ -52,7 +52,7 @@
       required: true,
       type: Function
     },
-    showApplicationAccelerator: {
+    showRequiresApplicationAcceleratorInDescription: {
       type: Boolean,
       required: true
     }
@@ -209,7 +209,7 @@
         :listEdgeApplicationFunctionsService="props.listEdgeApplicationFunctionsService"
         :listOriginsService="props.listOriginsService"
         :listCacheSettingsService="props.listCacheSettingsService"
-        :showApplicationAccelerator="props.showApplicationAccelerator"
+        :showRequiresApplicationAcceleratorInDescription="props.showRequiresApplicationAcceleratorInDescription"
       />
     </template>
   </CreateDrawerBlock>
@@ -234,7 +234,7 @@
         :listEdgeApplicationFunctionsService="props.listEdgeApplicationFunctionsService"
         :listOriginsService="props.listOriginsService"
         :listCacheSettingsService="props.listCacheSettingsService"
-        :showApplicationAccelerator="props.showApplicationAccelerator"
+        :showRequiresApplicationAcceleratorInDescription="props.showRequiresApplicationAcceleratorInDescription"
       />
     </template>
   </EditDrawerBlock>
