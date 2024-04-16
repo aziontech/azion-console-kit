@@ -1,7 +1,7 @@
 <script setup>
   import FieldSwitchBlock from '@/templates/form-fields-inputs/fieldSwitchBlock'
   import { useField } from 'vee-validate'
-  import { computed, toRefs } from 'vue'
+  import { computed, ref, toRefs } from 'vue'
   import PrimeDivider from 'primevue/divider'
 
   defineOptions({ name: 'FieldGroupSwitch' })
@@ -31,10 +31,6 @@
       type: Boolean,
       default: false
     },
-    divider: {
-      type: Boolean,
-      default: false
-    },
     nameField: {
       type: String,
       required: true
@@ -43,6 +39,7 @@
 
   const { nameField } = toRefs(props)
   const { value: inputValue, errorMessage } = useField(nameField)
+  const pickListSize = ref(inputValue.value.length - 1)
 
   const classStateRoot = computed(() => ({
     'p-disabled': props.disabled
@@ -80,7 +77,10 @@
             <slot :item="item" />
           </template>
         </FieldSwitchBlock>
-        <PrimeDivider v-if="props.divider" />
+        <PrimeDivider
+          v-if="index < pickListSize && !props.isCard"
+          class="my-2"
+        />
       </template>
     </div>
     <small
@@ -92,7 +92,8 @@
     <small
       v-if="errorMessage"
       class="p-error text-xs font-normal leading-tight"
-      >{{ errorMessage }}</small
     >
+      {{ errorMessage }}
+    </small>
   </div>
 </template>
