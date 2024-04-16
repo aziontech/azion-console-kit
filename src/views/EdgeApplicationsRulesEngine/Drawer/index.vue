@@ -52,9 +52,8 @@
       required: true,
       type: Function
     },
-    showRequiresApplicationAcceleratorInDescription: {
+    hideApplicationAcceleratorInDescription: {
       type: Boolean,
-      required: true
     }
   })
 
@@ -209,8 +208,8 @@
         :listEdgeApplicationFunctionsService="props.listEdgeApplicationFunctionsService"
         :listOriginsService="props.listOriginsService"
         :listCacheSettingsService="props.listCacheSettingsService"
-        :showRequiresApplicationAcceleratorInDescription="
-          props.showRequiresApplicationAcceleratorInDescription
+        :hideApplicationAcceleratorInDescription="
+          props.hideApplicationAcceleratorInDescription
         "
       />
     </template>
@@ -236,8 +235,8 @@
         :listEdgeApplicationFunctionsService="props.listEdgeApplicationFunctionsService"
         :listOriginsService="props.listOriginsService"
         :listCacheSettingsService="props.listCacheSettingsService"
-        :showRequiresApplicationAcceleratorInDescription="
-          props.showRequiresApplicationAcceleratorInDescription
+        :hideApplicationAcceleratorInDescription="
+          props.hideApplicationAcceleratorInDescription
         "
       />
     </template>

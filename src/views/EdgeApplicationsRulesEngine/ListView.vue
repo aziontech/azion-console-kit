@@ -63,8 +63,7 @@
       required: true,
       type: Function
     },
-    showRequiresApplicationAcceleratorInDescription: {
-      required: true,
+    hideApplicationAcceleratorInDescription: {
       type: Boolean
     }
   })
@@ -186,8 +185,8 @@
     :editRulesEngineService="props.editRulesEngineService"
     :loadRulesEngineService="props.loadRulesEngineService"
     :documentationService="props.documentationService"
-    :showRequiresApplicationAcceleratorInDescription="
-      props.showRequiresApplicationAcceleratorInDescription
+    :hideApplicationAcceleratorInDescription="
+      props.hideApplicationAcceleratorInDescription
     "
     @onSuccess="reloadList"
   />

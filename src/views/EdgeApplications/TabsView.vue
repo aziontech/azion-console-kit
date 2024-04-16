@@ -259,7 +259,7 @@
             :edgeApplicationId="edgeApplicationId"
             :isEnableApplicationAccelerator="isEnableApplicationAccelerator"
             :isDeliveryProtocolHttps="isDeliveryProtocolHttps"
-            :showRequiresApplicationAcceleratorInDescription="
+            :hideApplicationAcceleratorInDescription="
               edgeApplication.applicationAccelerator
             "
             v-bind="props.rulesEngineServices"
