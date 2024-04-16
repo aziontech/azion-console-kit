@@ -506,69 +506,74 @@
       <div class="flex flex-col w-full sm:max-w-3xl gap-2">
         <label class="text-color text-sm font-medium leading-5">Enable Settings</label>
         <div class="flex flex-col gap-4">
-          <div class="flex w-full gap-2 items-start">
-            <InputSwitch
-              v-model="enableQueryStringSort"
-              :disabled="!props.isEnableApplicationAccelerator"
-              inputId="enableQueryStringSort"
-            />
-            <label
-              for="enableQueryStringSort"
-              class="flex flex-col items-start gap-1"
+          <div class="flex flex-col gap-4" v-if="props.isEnableApplicationAccelerator">            
+            <div class="flex w-full gap-2 items-start"
             >
-              <span class="text-color text-sm font-normal leading-5">Query String Sort </span>
-              <span class="text-sm text-color-secondary font-normal leading-5">
-                Consider objects with the same query strings, regardless of the order of the fields,
-                as the same cached file.
-              </span>
-            </label>
+              <InputSwitch
+                v-model="enableQueryStringSort"
+                inputId="enableQueryStringSort"
+              />
+              <label
+                for="enableQueryStringSort"
+                class="flex flex-col items-start gap-1"
+              >
+                <span class="text-color text-sm font-normal leading-5">Query String Sort </span>
+                <span class="text-sm text-color-secondary font-normal leading-5">
+                  Consider objects with the same query strings, regardless of the order of the fields,
+                  as the same cached file.
+                </span>
+              </label>
+            </div>
+  
+            <Divider />
+          </div>
+          <div class="flex flex-col gap-4" v-if="props.isEnableApplicationAccelerator">
+            <div class="flex w-full gap-2 items-start">
+              <InputSwitch
+                v-model="enableCachingForPost"
+                inputId="enableCachingForPost"
+              />
+              <label
+                for="enableCachingForPost"
+                class="flex flex-col items-start gap-1"
+              >
+                <span class="text-color text-sm font-normal leading-5">Enable Caching for POST </span>
+                <span class="text-sm text-color-secondary font-normal leading-5">
+                  Allow POST requests to be cached. The POST method will be included in the cache key.
+                </span>
+              </label>
+            </div>
+  
+            <Divider />
+          </div> 
+          <div class="flex flex-col gap-4" v-if="props.isEnableApplicationAccelerator">
+            <div>
+              <div class="flex w-full gap-2 items-start">
+                <InputSwitch
+                  v-model="enableCachingForOptions"
+                  inputId="enableCachingForOptions"
+                />
+                <label
+                  for="enableCachingForOptions"
+                  class="flex flex-col items-start gap-1"
+                >
+                  <span class="text-color text-sm font-normal leading-5"
+                    >Enable Caching for OPTIONS
+                  </span>
+                  <span class="text-sm text-color-secondary font-normal leading-5">
+                    Allow OPTIONS requests to be cached. The OPTIONS method will be included in the
+                    cache key.
+                  </span>
+                </label>
+              </div>
+            </div>
+            <Divider />
           </div>
 
-          <Divider />
-          <div class="flex w-full gap-2 items-start">
-            <InputSwitch
-              :disabled="!props.isEnableApplicationAccelerator"
-              v-model="enableCachingForPost"
-              inputId="enableCachingForPost"
-            />
-            <label
-              for="enableCachingForPost"
-              class="flex flex-col items-start gap-1"
-            >
-              <span class="text-color text-sm font-normal leading-5">Enable Caching for POST </span>
-              <span class="text-sm text-color-secondary font-normal leading-5">
-                Allow POST requests to be cached. The POST method will be included in the cache key.
-              </span>
-            </label>
-          </div>
-
-          <Divider />
-          <div class="flex w-full gap-2 items-start">
-            <InputSwitch
-              v-model="enableCachingForOptions"
-              :disabled="!props.isEnableApplicationAccelerator"
-              inputId="enableCachingForOptions"
-            />
-            <label
-              for="enableCachingForOptions"
-              class="flex flex-col items-start gap-1"
-            >
-              <span class="text-color text-sm font-normal leading-5"
-                >Enable Caching for OPTIONS
-              </span>
-              <span class="text-sm text-color-secondary font-normal leading-5">
-                Allow OPTIONS requests to be cached. The OPTIONS method will be included in the
-                cache key.
-              </span>
-            </label>
-          </div>
-
-          <Divider />
           <div class="flex w-full gap-2 items-start">
             <InputSwitch
               v-model="enableStaleCache"
               inputId="enableStaleCache"
-              disabled
             />
             <label
               for="enableStaleCache"
