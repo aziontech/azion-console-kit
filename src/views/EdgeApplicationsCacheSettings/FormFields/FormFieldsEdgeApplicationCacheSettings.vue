@@ -489,9 +489,6 @@
           class="text-color text-sm font-medium"
           >Query String Fields *</label
         >
-      <div>
-    asdas
-      </div>
         <TextArea
           id="queryStringFields"
           v-model="queryStringFields"
