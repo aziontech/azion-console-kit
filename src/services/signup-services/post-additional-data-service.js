@@ -31,8 +31,8 @@ const getOptionPayload = (options, value, otherValues = null) => {
 
 const adapt = (payload, options) => {
   return [
-    getOptionPayload(options[0].values, payload.plan),
-    getOptionPayload(options[1].values, payload.role, payload.roleDescription),
+    getOptionPayload(options[0].values, payload.use),
+    getOptionPayload(options[1].values, payload.role, payload.inputRole),
     getOptionPayload(options[2].values, payload.companySize),
     getOptionPayload(options[4].values, payload.companyWebsite),
     getOptionPayload(options[5].values, payload.onboardingSession ? 'Yes' : 'No')
