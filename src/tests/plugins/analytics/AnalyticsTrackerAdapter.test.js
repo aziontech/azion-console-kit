@@ -234,14 +234,6 @@ describe('AnalyticsTrackerAdapter', () => {
     })
   })
 
-  it('should track the additional data submit event with the correct parameters', () => {
-    const { sut, analyticsClientSpy } = makeSut()
-
-    sut.signUp.submittedAdditionalData().track()
-
-    expect(analyticsClientSpy.track).toHaveBeenCalledWith('Submitted Additional Data', {})
-  })
-
   it('should track the user failed to sign-up event with the correct parameters', () => {
     const { sut, analyticsClientSpy } = makeSut()
     const propsMock = {
@@ -255,12 +247,36 @@ describe('AnalyticsTrackerAdapter', () => {
     expect(analyticsClientSpy.track).toHaveBeenCalledWith('User Failed to Sign Up', propsMock)
   })
 
+  it('should track the additional data submit event with the correct parameters', () => {
+    const { sut, analyticsClientSpy } = makeSut()
+    const propsMock = {
+      use: 'Work',
+      role: 'Other',
+      inputRole: 'Other',
+      companySize: '2 to 100',
+      onboardingSchedule: true,
+      website: 'https://www.azion.com',
+      name: 'John Doe'
+    }
+
+    sut.signUp.submittedAdditionalData(propsMock).track()
+
+    expect(analyticsClientSpy.track).toHaveBeenCalledWith('Submitted Additional Data', propsMock)
+  })
+
   it('should track the failed additional data submit event with the correct parameters', () => {
     const { sut, analyticsClientSpy } = makeSut()
+    const propsMock = {
+      errorType: 'api',
+      errorMessage: 'Error on submit'
+    }
 
-    sut.signUp.failedSubmitAdditionalData().track()
+    sut.signUp.failedSubmitAdditionalData(propsMock).track()
 
-    expect(analyticsClientSpy.track).toHaveBeenCalledWith('Failed to Submit Additional Data', {})
+    expect(analyticsClientSpy.track).toHaveBeenCalledWith(
+      'Failed to Submit Additional Data',
+      propsMock
+    )
   })
 
   it('should use the select create event with correct parameters', () => {
