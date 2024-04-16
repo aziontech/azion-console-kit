@@ -54,6 +54,10 @@
     'flex-col': !props.auto,
     'gap-3': props.isCard
   }))
+
+  const showDivider = (position) => {
+    return position < pickListSize.value && !props.isCard
+  }
 </script>
 
 <template>
@@ -82,7 +86,7 @@
           </template>
         </FieldRadioBlock>
         <PrimeDivider
-          v-if="index < pickListSize && !props.isCard"
+          v-if="showDivider(index)"
           class="my-2"
         />
       </template>
