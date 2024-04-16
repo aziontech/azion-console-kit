@@ -68,10 +68,18 @@ export class SignUpTracker {
   /**
    * @returns {AnalyticsTrackerAdapter}
    */
-  submittedAdditionalData() {
+  submittedAdditionalData(payload) {
     this.#trackerAdapter.addEvent({
       eventName: 'Submitted Additional Data',
-      props: {}
+      props: {
+        use: payload.use,
+        role: payload.role,
+        inputRole: payload.inputRole,
+        companySize: payload.companySize,
+        onboardingSchedule: payload.onboardingSchedule,
+        website: payload.website,
+        name: payload.name
+      }
     })
     return this.#trackerAdapter
   }
@@ -79,10 +87,13 @@ export class SignUpTracker {
   /**
    * @returns {AnalyticsTrackerAdapter}
    */
-  failedSubmitAdditionalData() {
+  failedSubmitAdditionalData(payload) {
     this.#trackerAdapter.addEvent({
       eventName: 'Failed to Submit Additional Data',
-      props: {}
+      props: {
+        errorType: payload.errorType,
+        errorMessage: payload.errorMessage
+      }
     })
     return this.#trackerAdapter
   }

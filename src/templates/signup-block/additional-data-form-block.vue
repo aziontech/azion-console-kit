@@ -7,24 +7,24 @@
       class="flex flex-col gap-2"
       v-if="additionalDataInfo"
     >
-      <!-- Step 1: Plan -->
+      <!-- Step 1: Use -->
 
       <h4 class="font-semibold text-sm">{{ additionalDataInfo[0].key }}*</h4>
       <div class="flex flex-wrap gap-3 mb-8">
         <label
-          v-for="planData in additionalDataInfo[0].values"
-          :key="planData.value"
-          :for="planData.value"
+          v-for="useData in additionalDataInfo[0].values"
+          :key="useData.value"
+          :for="useData.value"
           class="flex items-center gap-2 p-4 border-1 surface-border rounded-md font-medium w-full md:w-fit"
-          :class="{ 'border-radio-card-active': plan === planData.value }"
-          >{{ planData.value }}
+          :class="{ 'border-radio-card-active': use === useData.value }"
+          >{{ useData.value }}
           <PrimeRadio
-            v-model="plan"
-            name="plan"
-            :value="planData.value"
-            :inputId="planData.value"
+            v-model="use"
+            name="use"
+            :value="useData.value"
+            :inputId="useData.value"
             class="hidden"
-            @change="updateStep('plan')"
+            @change="updateStep('use')"
           />
         </label>
       </div>
@@ -64,25 +64,25 @@
 
       <div
         class="mb-8 w-full md:w-1/2"
-        v-if="showRoleDescriptionField"
+        v-if="showInputRoleField"
       >
         <div class="w-full flex flex-col gap-2">
           <label
             class="flex flex-col gap-3 font-semibold text-sm"
-            for="otherRole"
+            for="inputRole"
           >
             Describe your role*
             <PrimeInputText
-              v-model="roleDescription"
-              name="role"
-              id="otherRole"
+              v-model="inputRole"
+              name="inputRole"
+              id="inputRole"
             />
           </label>
           <small
-            v-if="errors.roleDescription"
+            v-if="errors.inputRole"
             class="p-error text-xs font-normal leading-tight"
           >
-            {{ errors.roleDescription }}
+            {{ errors.inputRole }}
           </small>
         </div>
       </div>
@@ -261,13 +261,13 @@
   })
 
   const validationSchema = yup.object({
-    plan: yup.string().required(),
+    use: yup.string().required(),
     role: yup.string().required(),
-    roleDescription: yup.string().when('role', {
+    inputRole: yup.string().when('role', {
       is: (val) => val === 'Other',
       then: (schema) => schema.required('Role Description is a required field')
     }),
-    companySize: yup.string().when('plan', {
+    companySize: yup.string().when('use', {
       is: (val) => val === 'Work',
       then: (schema) => schema.required()
     }),
@@ -289,16 +289,16 @@
     }
   })
 
-  const { value: plan } = useField('plan')
+  const { value: use } = useField('use')
   const { value: role } = useField('role')
-  const { value: roleDescription } = useField('roleDescription')
+  const { value: inputRole } = useField('inputRole')
   const { value: companySize } = useField('companySize')
   const { value: companyWebsite } = useField('companyWebsite')
   const { value: fullName } = useField('fullName')
   const { value: onboardingSession } = useField('onboardingSession')
 
   const stepOptions = {
-    plan: 1,
+    use: 1,
     role: 2,
     companySize: 3,
     fullName: 4,
@@ -307,9 +307,9 @@
 
   const updateStep = (step) => {
     const updateFromStep = {
-      plan: () => (currentStep.value = stepOptions.role),
+      use: () => (currentStep.value = stepOptions.role),
       role: () => {
-        if (plan.value === 'Work') {
+        if (use.value === 'Work') {
           currentStep.value = stepOptions.companySize
         } else {
           currentStep.value = stepOptions.fullName
@@ -335,12 +335,12 @@
     return currentStep.value < step
   }
 
-  const showRoleDescriptionField = computed(() => {
+  const showInputRoleField = computed(() => {
     return role.value === 'Other'
   })
 
   const showCompanySizeField = computed(() => {
-    return plan.value === 'Work'
+    return use.value === 'Work'
   })
 
   const showCompanyWebsiteField = computed(() => {
@@ -362,18 +362,33 @@
       }
 
       await props.postAdditionalDataService({ payload, options: additionalDataInfo.value })
-      // tracker.signUp.submittedAdditionalData()
+      tracker.signUp
+        .submittedAdditionalData({
+          use: use.value,
+          role: role.value,
+          inputRole: inputRole.value,
+          companySize: companySize.value,
+          website: companyWebsite.value,
+          name: fullName.value,
+          onboardingSchedule: onboardingSession.value
+        })
+        .track()
 
-      // router.push({ name: 'home', query: { onboardingSession: 'true' } })
+      router.push({ name: 'home', query: { onboardingSession: 'true' } })
     } catch (err) {
       toast.add({ life: 5000, severity: 'error', detail: err, summary: 'Error' })
-      tracker.signUp.failedSubmitAdditionalData().track()
+      tracker.signUp
+        .failedSubmitAdditionalData({
+          errorType: 'api',
+          errorMessage: err.message
+        })
+        .track()
     } finally {
       loading.value = false
     }
   }
 
-  watch(plan, (value) => {
+  watch(use, (value) => {
     if (value !== 'Work') {
       resetField('companySize')
       if (role.value) {
