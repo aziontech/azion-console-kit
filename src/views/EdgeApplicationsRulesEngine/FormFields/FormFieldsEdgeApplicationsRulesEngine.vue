@@ -72,7 +72,7 @@
   const showLabelApplicationAccelerator = computed(() => {
     if (props.showRequiresApplicationAcceleratorInDescription) return ''
 
-    return ' - requires Application Accelerator'
+    return ' - Requires Application Accelerator'
   })
 
   const behaviorsRequestOptions = ref([
