@@ -209,7 +209,9 @@
         :listEdgeApplicationFunctionsService="props.listEdgeApplicationFunctionsService"
         :listOriginsService="props.listOriginsService"
         :listCacheSettingsService="props.listCacheSettingsService"
-        :showRequiresApplicationAcceleratorInDescription="props.showRequiresApplicationAcceleratorInDescription"
+        :showRequiresApplicationAcceleratorInDescription="
+          props.showRequiresApplicationAcceleratorInDescription
+        "
       />
     </template>
   </CreateDrawerBlock>
@@ -234,7 +236,9 @@
         :listEdgeApplicationFunctionsService="props.listEdgeApplicationFunctionsService"
         :listOriginsService="props.listOriginsService"
         :listCacheSettingsService="props.listCacheSettingsService"
-        :showRequiresApplicationAcceleratorInDescription="props.showRequiresApplicationAcceleratorInDescription"
+        :showRequiresApplicationAcceleratorInDescription="
+          props.showRequiresApplicationAcceleratorInDescription
+        "
       />
     </template>
   </EditDrawerBlock>
