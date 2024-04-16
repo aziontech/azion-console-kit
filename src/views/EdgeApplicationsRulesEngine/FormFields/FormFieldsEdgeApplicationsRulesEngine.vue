@@ -46,6 +46,9 @@
       type: Object,
       required: false,
       default: () => {}
+    },
+    hideApplicationAcceleratorInDescription: {
+      type: Boolean
     }
   })
 
@@ -65,20 +68,26 @@
     { label: 'does not exist', value: 'does_not_exist' }
   ])
 
+  const showLabelApplicationAccelerator = computed(() => {
+    if (props.hideApplicationAcceleratorInDescription) return ''
+
+    return ' - Requires Application Accelerator'
+  })
+
   const behaviorsRequestOptions = ref([
     {
-      label: 'Add Request Cookie - requires Application Accelerator',
+      label: `Add Request Cookie ${showLabelApplicationAccelerator.value}`,
       value: 'add_request_cookie',
       requires: true
     },
     { label: 'Add Request Header', value: 'add_request_header', requires: false },
     {
-      label: 'Bypass Cache - requires Application Accelerator',
+      label: `Bypass Cache ${showLabelApplicationAccelerator.value}`,
       value: 'bypass_cache_phase',
       requires: true
     },
     {
-      label: 'Capture Match Groups - requires Application Accelerator',
+      label: `Capture Match Groups ${showLabelApplicationAccelerator.value}`,
       value: 'capture_match_groups',
       requires: true
     },
@@ -86,13 +95,13 @@
     { label: 'Deny (403 Forbidden)', value: 'deny', requires: false },
     { label: 'Enable Gzip', value: 'enable_gzip', requires: false },
     {
-      label: 'Filter Request Cookie - requires Application Accelerator',
+      label: `Filter Request Cookie ${showLabelApplicationAccelerator.value}`,
       value: 'filter_request_cookie',
       requires: true
     },
     { label: 'Filter Request Header', value: 'filter_request_header', requires: false },
     {
-      label: 'Forward Cookies - requires Application Accelerator',
+      label: `Forward Cookies ${showLabelApplicationAccelerator.value}`,
       value: 'forward_cookies',
       requires: true
     },
@@ -106,7 +115,7 @@
     { label: 'Redirect To (301 Moved Permanently)', value: 'redirect_to_301', requires: false },
     { label: 'Redirect To (302 Found)', value: 'redirect_to_302', requires: false },
     {
-      label: 'Rewrite Request - requires Application Accelerator',
+      label: `Rewrite Request ${showLabelApplicationAccelerator.value}`,
       value: 'rewrite_request',
       requires: true
     },
@@ -117,20 +126,20 @@
 
   const behaviorsResponseOptions = ref([
     {
-      label: 'Add Response Cookie - requires Application Accelerator',
+      label: `Add Response Cookie ${showLabelApplicationAccelerator.value}`,
       value: 'add_response_cookie',
       requires: true
     },
     { label: 'Add Response Header', value: 'add_response_header', requires: false },
     {
-      label: 'Capture Match Groups - requires Application Accelerator',
+      label: `Capture Match Groups ${showLabelApplicationAccelerator.value}`,
       value: 'capture_match_groups',
       requires: true
     },
     { label: 'Deliver', value: 'deliver', requires: false },
     { label: 'Enable Gzip', value: 'enable_gzip', requires: false },
     {
-      label: 'Filter Response Cookie - requires Application Accelerator',
+      label: `Filter Response Cookie ${showLabelApplicationAccelerator.value}`,
       value: 'filter_response_cookie',
       requires: true
     },
