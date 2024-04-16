@@ -20,7 +20,7 @@ import Tooltip from 'primevue/tooltip'
 import ToastService from 'primevue/toastservice'
 import { install as VueMonacoEditorPlugin } from '@guolao/vue-monaco-editor'
 import * as HelpCenterServices from '@/services/help-center-services'
-import DialogService from 'primevue/dialogservice';
+import DialogService from 'primevue/dialogservice'
 
 import TrackerPlugin from '@/plugins/AnalyticsTrackerAdapterPlugin'
 
