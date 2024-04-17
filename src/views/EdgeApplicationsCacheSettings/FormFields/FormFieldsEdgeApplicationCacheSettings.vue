@@ -9,10 +9,13 @@
   import RadioButton from 'primevue/radiobutton'
   import Dropdown from 'primevue/dropdown'
   import CheckboxPrime from 'primevue/checkbox'
+  import { CDN_MAXIMUM_TTL_MAX_VALUE, CDN_MAXIMUM_TTL_MIN_VALUE } from '@/utils/constants'
 
   import TextArea from 'primevue/textarea'
   import { useField, useFieldArray } from 'vee-validate'
   import { computed, ref, watch } from 'vue'
+
+  const emit = defineEmits(['l2-caching-enabled'])
 
   const props = defineProps({
     isEnableApplicationAccelerator: {
@@ -27,10 +30,6 @@
 
   const TIERED_CACHE_REGION = ref([
     {
-      label: 'Select an Tiered Cache Region',
-      value: ''
-    },
-    {
       label: 'na-united-states',
       value: 'na-united-states'
     },
@@ -39,6 +38,15 @@
       value: 'sa-brazil'
     }
   ])
+
+  const cdnCacheSettingsMaximumTtlMinimumValue = computed(() => {
+    if (l2CachingEnabled.value || props.isEnableApplicationAccelerator) {
+      return CDN_MAXIMUM_TTL_MIN_VALUE
+    }
+    return CDN_MAXIMUM_TTL_MAX_VALUE
+  })
+
+  const MAX_VALUE_NUMBER_INPUT = 31536000
 
   const CACHE_SETTINGS_OPTIONS = ref([
     {
@@ -180,9 +188,11 @@
       cdnCacheSettings.value = 'override'
       isSliceEdgeCachingEnabled.value = true
       sliceConfigurationEnabled.value = true
+      emit('l2-caching-enabled', value)
     } else {
       isSliceL2CachingEnabled.value = false
       isSliceEdgeCachingEnabled.value = false
+      emit('l2-caching-enabled', value)
     }
   })
 </script>
@@ -303,8 +313,8 @@
           showButtons
           v-model="cdnCacheSettingsMaximumTtl"
           id="cdnCacheSettingsMaximumTtl"
-          :min="60"
-          :max="31536000"
+          :min="cdnCacheSettingsMaximumTtlMinimumValue"
+          :max="MAX_VALUE_NUMBER_INPUT"
           :step="1"
           :class="{ 'p-invalid': cdnCacheSettingsMaximumTtlError }"
         />
@@ -373,7 +383,6 @@
         <InputSwitch
           v-model="sliceConfigurationEnabled"
           inputId="sliceConfigurationEnabled"
-          :disabled="l2CachingEnabled"
         />
         <label
           for="sliceConfigurationEnabled"
