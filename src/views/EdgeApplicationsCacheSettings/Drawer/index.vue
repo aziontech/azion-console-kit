@@ -75,14 +75,16 @@
   })
 
   const minimumAcceptableValue = ref(60)
+  const defaultMinimumValue = 60
+  const minimumValue = 3
 
   const l2CachingEnabled = ref()
   const setNewMinimumValue = (value) => {
     l2CachingEnabled.value = value
     if (l2CachingEnabled.value || props.isEnableApplicationAccelerator) {
-      minimumAcceptableValue.value = 3
+      minimumAcceptableValue.value = minimumValue
     } else {
-      minimumAcceptableValue.value = 60
+      minimumAcceptableValue.value = defaultMinimumValue
     }
   }
 
