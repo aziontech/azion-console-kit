@@ -22,6 +22,7 @@
           <AdditionalDataFormBlock
             :listAdditionalDataInfoService="listAdditionalDataInfoService"
             :postAdditionalDataService="postAdditionalDataService"
+            :patchFullnameService="patchFullnameService"
             ref="additionalDataRef"
           />
         </div>
@@ -70,6 +71,10 @@
       required: true
     },
     postAdditionalDataService: {
+      type: Function,
+      required: true
+    },
+    patchFullnameService: {
       type: Function,
       required: true
     }

@@ -244,6 +244,10 @@
     postAdditionalDataService: {
       type: Function,
       required: true
+    },
+    patchFullnameService: {
+      type: Function,
+      required: true
     }
   })
 
@@ -356,12 +360,23 @@
     loading.value = true
 
     try {
-      const payload = {
+      const additionalDataPayload = {
         ...values,
         id: userId
       }
 
-      await props.postAdditionalDataService({ payload, options: additionalDataInfo.value })
+      const usersPayload = {
+        id: userId,
+        name: fullName.value
+      }
+
+      await props.patchFullnameService(usersPayload)
+
+      await props.postAdditionalDataService({
+        payload: additionalDataPayload,
+        options: additionalDataInfo.value
+      })
+
       // tracker.signUp
       //   .submittedAdditionalData({
       //     use: use.value,
@@ -376,16 +391,15 @@
 
       // router.push({ name: 'home', query: { onboardingSession: 'true' } })
     } catch (err) {
-      const { errorMessage, errorType, fieldName } = JSON.parse(err)
-
-      toast.add({ life: 5000, severity: 'error', detail: errorMessage, summary: 'Error' })
-      tracker.signUp
-        .failedSubmitAdditionalData({
-          errorType,
-          fieldName,
-          errorMessage
-        })
-        .track()
+      // const { errorMessage, errorType, fieldName } = JSON.parse(err)
+      // toast.add({ life: 5000, severity: 'error', detail: errorMessage, summary: 'Error' })
+      // tracker.signUp
+      //   .failedSubmitAdditionalData({
+      //     errorType,
+      //     fieldName,
+      //     errorMessage
+      //   })
+      //   .track()
     } finally {
       loading.value = false
     }
