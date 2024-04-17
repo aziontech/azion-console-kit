@@ -33,7 +33,9 @@ const makeSut = () => {
 describe('FrameworkDetectorService', () => {
   it('should call GitHub API with correct params', async () => {
     vi.spyOn(Buffer, 'from').mockReturnValueOnce(JSON.stringify(fixtures.mockPackageJson))
-    const requestSpy = vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce(fixtures.mockHttpResponse)
+    const requestSpy = vi
+      .spyOn(AxiosHttpClientAdapter, 'request')
+      .mockResolvedValueOnce(fixtures.mockHttpResponse)
     const { sut } = makeSut()
 
     await sut({ accountName: 'testAccount', repositoryName: 'testRepo' })
@@ -95,6 +97,6 @@ describe('FrameworkDetectorService', () => {
   )
 
   afterEach(() => {
-    vi.restoreAllMocks();
-  });
+    vi.restoreAllMocks()
+  })
 })

@@ -21,7 +21,7 @@ describe('getVulcanPresets', () => {
 
   it.each([
     { type: 'deliver', expected: fixtures.deliverPresets },
-    { type: 'compute', expected: fixtures.computePresets },
+    { type: 'compute', expected: fixtures.computePresets }
   ])('should return $type presets when "$type" type is provided', ({ type, expected }) => {
     const { sut } = makeSut()
     const result = sut(type)

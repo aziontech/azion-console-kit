@@ -29,7 +29,6 @@ const parseVariables = (variables) => {
 }
 
 const parseFormData = (formValues) => {
-
   return [
     {
       key: 'REPOSITORY_URL',
