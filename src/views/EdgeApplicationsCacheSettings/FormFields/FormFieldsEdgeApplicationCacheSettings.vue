@@ -46,7 +46,7 @@
     return CDN_MAXIMUM_TTL_MAX_VALUE
   })
 
-  const MAX_VALUE_NUMBER_INPUT = ref(31536000)
+  const MAX_VALUE_NUMBER_INPUT = 31536000
 
   const CACHE_SETTINGS_OPTIONS = ref([
     {
