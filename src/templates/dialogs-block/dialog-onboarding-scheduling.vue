@@ -9,7 +9,7 @@
       header: {
         class: 'flex py-5 border-b border-solid'
       },
-      content: { class: 'p-5 h-full' },
+      content: { class: 'h-full' },
       footer: {
         class: 'flex p-5 justify-end items-end border-t border-solid'
       }
