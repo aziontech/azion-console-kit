@@ -34,6 +34,7 @@
       />
       <PrimeButton
         severity="secondary"
+        @click="openOnboarding"
         icon="pi pi-calendar-plus"
         label="Schedule Now"
       />
@@ -45,7 +46,7 @@
   import PrimeButton from 'primevue/button'
   import { inject } from 'vue'
   import { useRouter } from 'vue-router'
-
+  import { azionOnboardingWindowOpener } from '@/helpers'
   const dialogRef = inject('dialogRef')
   const router = useRouter()
 
@@ -54,5 +55,10 @@
       params: {}
     })
     dialogRef.value.close()
+  }
+
+  const openOnboarding = () => {
+    azionOnboardingWindowOpener()
+    closeCallback()
   }
 </script>

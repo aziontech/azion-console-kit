@@ -12,6 +12,7 @@ import {
   openAzionX
 } from './azion-documentation-window-opener'
 import { azionPrivacyPolicyWindowOpener } from './azion-privacy-policy-opener'
+import { azionOnboardingWindowOpener } from './azion-onboarding-window-opener'
 import { azionTermsAndServicesWindowOpener } from './azion-terms-and-services-opener'
 import { capitalizeFirstLetter } from './capitalize-first-letter'
 import { clipboardWrite } from './clipboard'
@@ -27,6 +28,7 @@ import { convertValueToDate, convertDateToLocalTimezone } from './convert-date'
 export {
   InviteSession,
   azionPrivacyPolicyWindowOpener,
+  azionOnboardingWindowOpener,
   azionTermsAndServicesWindowOpener,
   capitalizeFirstLetter,
   clipboardWrite,
