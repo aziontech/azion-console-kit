@@ -346,22 +346,19 @@
    */
   const updateOptionRequires = (options) => {
     return options.map((option) => {
+      const conditionsMap = {
+        redirect_http_to_https: props.isDeliveryProtocolHttps,
+        optimize_images: props.isImageOptimization
+      }
+
       if (option.requires) {
-        if (option.value === 'redirect_http_to_https') {
-          return {
-            ...option,
-            requires: !props.isDeliveryProtocolHttps
-          }
-        } else if (option.value === 'optimize_images') {
-          return {
-            ...option,
-            requires: !props.isImageOptimization
-          }
-        } else {
-          return {
-            ...option,
-            requires: !props.isEnableApplicationAccelerator
-          }
+        const specificCondition = conditionsMap[option.value]
+        return {
+          ...option,
+          requires:
+            specificCondition !== undefined
+              ? !specificCondition
+              : !props.isEnableApplicationAccelerator
         }
       }
       return option
