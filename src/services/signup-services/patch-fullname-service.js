@@ -6,9 +6,20 @@ export const patchFullnameService = async (payload) => {
   let httpResponse = await AxiosHttpClientAdapter.request({
     url: makePatchFullnameServiceBaseUrl(payload.id),
     method: 'PATCH',
-    body: payload.data
+    body: getNameInfo(payload.name)
   })
   return parseHttpResponse(httpResponse)
+}
+
+const getNameInfo = (fullName) => {
+  const [first_name, ...last_name] = fullName.split(' ')
+  const nameInfo = { first_name }
+
+  if (last_name.length) {
+    nameInfo.last_name = last_name.join(' ')
+  }
+
+  return nameInfo
 }
 
 /**
