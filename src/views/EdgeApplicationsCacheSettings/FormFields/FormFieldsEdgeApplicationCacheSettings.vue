@@ -9,6 +9,7 @@
   import RadioButton from 'primevue/radiobutton'
   import Dropdown from 'primevue/dropdown'
   import CheckboxPrime from 'primevue/checkbox'
+  import { CDN_MAXIMUM_TTL_MAX_VALUE, CDN_MAXIMUM_TTL_MIN_VALUE } from '@/utils/constants'
 
   import TextArea from 'primevue/textarea'
   import { useField, useFieldArray } from 'vee-validate'
@@ -39,12 +40,10 @@
   ])
 
   const cdnCacheSettingsMaximumTtlMinimumValue = computed(() => {
-    const defaultMinimumValue = 60
-    const minimumValue = 3
     if (l2CachingEnabled.value || props.isEnableApplicationAccelerator) {
-      return minimumValue
+      return CDN_MAXIMUM_TTL_MIN_VALUE
     }
-    return defaultMinimumValue
+    return CDN_MAXIMUM_TTL_MAX_VALUE
   })
 
   const MAX_VALUE_NUMBER_INPUT = ref(31536000)

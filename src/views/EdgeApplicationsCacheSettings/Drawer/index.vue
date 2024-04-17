@@ -5,6 +5,8 @@
   import * as yup from 'yup'
   import { refDebounced } from '@vueuse/core'
   import { ref, inject } from 'vue'
+  import { CDN_MAXIMUM_TTL_MAX_VALUE, CDN_MAXIMUM_TTL_MIN_VALUE } from '@/utils/constants'
+
   /**@type {import('@/plugins/adapters/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
 
@@ -74,17 +76,15 @@
     isSliceEdgeCachingEnabled: false
   })
 
-  const minimumAcceptableValue = ref(60)
-  const defaultMinimumValue = 60
-  const minimumValue = 3
+  const minimumAcceptableValue = ref(CDN_MAXIMUM_TTL_MAX_VALUE)
 
   const l2CachingEnabled = ref()
   const setNewMinimumValue = (value) => {
     l2CachingEnabled.value = value
     if (l2CachingEnabled.value || props.isEnableApplicationAccelerator) {
-      minimumAcceptableValue.value = minimumValue
+      minimumAcceptableValue.value = CDN_MAXIMUM_TTL_MIN_VALUE
     } else {
-      minimumAcceptableValue.value = defaultMinimumValue
+      minimumAcceptableValue.value = CDN_MAXIMUM_TTL_MAX_VALUE
     }
   }
 
