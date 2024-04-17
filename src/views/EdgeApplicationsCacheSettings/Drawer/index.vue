@@ -73,6 +73,19 @@
     isSliceL2CachingEnabled: false,
     isSliceEdgeCachingEnabled: false
   })
+
+  const minimumAcceptableValue  =  ref(60)
+
+  const l2CachingEnabled = ref()
+  const setNewMinimumValue = (value) => {
+    l2CachingEnabled.value = value
+    if(l2CachingEnabled.value || props.isEnableApplicationAccelerator) {
+      minimumAcceptableValue.value = 3
+    } else {
+      minimumAcceptableValue.value = 60
+    }
+  }
+
   const validationSchema = yup.object({
     name: yup.string().required().label('Name'),
     browserCacheSettings: yup.string().required().label('Browser cache settings'),
@@ -93,7 +106,7 @@
       .when('cdnCacheSettings', {
         is: 'honor',
         then: (schema) => schema.notRequired(),
-        otherwise: (schema) => schema.min(60).max(MAX_TTL_ONE_YEAR_IN_SECONDS).required()
+        otherwise: (schema) => schema.min(minimumAcceptableValue.value).max(MAX_TTL_ONE_YEAR_IN_SECONDS).required()
       }),
     sliceConfigurationEnabled: yup.boolean().required(),
     sliceConfigurationRange: yup
@@ -206,6 +219,7 @@
       <FormFieldsEdgeApplicationCacheSettings
         :isEnableApplicationAccelerator="isEnableApplicationAccelerator"
         :showTieredCache="props.showTieredCache"
+        @l2-caching-enabled="setNewMinimumValue"
       />
     </template>
   </CreateDrawerBlock>
@@ -224,6 +238,7 @@
       <FormFieldsEdgeApplicationCacheSettings
         :isEnableApplicationAccelerator="isEnableApplicationAccelerator"
         :showTieredCache="props.showTieredCache"
+        @l2-caching-enabled="setNewValue"
       />
     </template>
   </EditDrawerBlock>

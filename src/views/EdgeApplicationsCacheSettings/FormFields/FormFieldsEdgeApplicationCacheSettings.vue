@@ -14,6 +14,9 @@
   import { useField, useFieldArray } from 'vee-validate'
   import { computed, ref, watch } from 'vue'
 
+  const emit = defineEmits(['l2-caching-enabled'])
+
+
   const props = defineProps({
     isEnableApplicationAccelerator: {
       required: true,
@@ -27,10 +30,6 @@
 
   const TIERED_CACHE_REGION = ref([
     {
-      label: 'Select an Tiered Cache Region',
-      value: ''
-    },
-    {
       label: 'na-united-states',
       value: 'na-united-states'
     },
@@ -39,6 +38,15 @@
       value: 'sa-brazil'
     }
   ])
+
+  const cdnCacheSettingsMaximumTtlMinimumValue = computed(() => {
+    const defaultMinimumValue = 60
+    const minimumValue = 3
+    if(l2CachingEnabled.value || props.isEnableApplicationAccelerator) {
+      return minimumValue
+    } 
+    return defaultMinimumValue
+  })
 
   const CACHE_SETTINGS_OPTIONS = ref([
     {
@@ -180,9 +188,11 @@
       cdnCacheSettings.value = 'override'
       isSliceEdgeCachingEnabled.value = true
       sliceConfigurationEnabled.value = true
+      emit('l2-caching-enabled', value)
     } else {
       isSliceL2CachingEnabled.value = false
       isSliceEdgeCachingEnabled.value = false
+      emit('l2-caching-enabled', value)
     }
   })
 </script>
@@ -303,7 +313,7 @@
           showButtons
           v-model="cdnCacheSettingsMaximumTtl"
           id="cdnCacheSettingsMaximumTtl"
-          :min="60"
+          :min="cdnCacheSettingsMaximumTtlMinimumValue"
           :max="31536000"
           :step="1"
           :class="{ 'p-invalid': cdnCacheSettingsMaximumTtlError }"
@@ -373,7 +383,6 @@
         <InputSwitch
           v-model="sliceConfigurationEnabled"
           inputId="sliceConfigurationEnabled"
-          :disabled="l2CachingEnabled"
         />
         <label
           for="sliceConfigurationEnabled"
