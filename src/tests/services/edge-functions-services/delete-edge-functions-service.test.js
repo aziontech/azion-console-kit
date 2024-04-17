@@ -42,9 +42,33 @@ describe('EdgeFunctionsServices', () => {
 
   it.each([
     {
-      statusCode: 400,
-      expectedError: new Errors.NotFoundError().message
+      error: 'edge_function_instantiated_error',
+      expectedError: ''
     },
+    {
+      error: 'unmappedError',
+      expectedError: new Errors.UnexpectedError().message
+    }
+  ])(
+    'should throw an error if the API returns a 400 status code',
+    async ({ error, expectedError }) => {
+      const result = {}
+      result [error] = expectedError
+      vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
+        statusCode: 400,
+        body: {
+          results: result
+        }
+      })
+      const mockId = 123
+
+      const { sut } = makeSut()
+
+      await expect(sut(mockId)).rejects.toThrow(expectedError)
+    }
+  )
+
+  it.each([
     {
       statusCode: 401,
       expectedError: new Errors.InvalidApiTokenError().message
