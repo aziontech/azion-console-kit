@@ -345,21 +345,16 @@
    * @returns {Array} The updated array of behavior options with the 'requires' property set accordingly.
    */
   const updateOptionRequires = (options) => {
-    return options.map((option) => {
-      const conditionsMap = {
-        redirect_http_to_https: props.isDeliveryProtocolHttps,
-        optimize_images: props.isImageOptimization
-      }
+    const conditionsMap = {
+      redirect_http_to_https: !props.isDeliveryProtocolHttps,
+      optimize_images: !props.isImageOptimization
+    }
 
+    return options.map((option) => {
       if (option.requires) {
-        const specificCondition = conditionsMap[option.value]
-        return {
-          ...option,
-          requires:
-            specificCondition !== undefined
-              ? !specificCondition
-              : !props.isEnableApplicationAccelerator
-        }
+        const requires = conditionsMap[option.value] || !props.isEnableApplicationAccelerator
+
+        return { ...option, requires }
       }
       return option
     })
