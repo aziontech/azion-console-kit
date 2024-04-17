@@ -13,20 +13,16 @@ export const postAdditionalDataService = async ({ payload, options }) => {
 
 const getOptionPayload = (options, value, otherValues = null) => {
   if (!value) return
+
   const selectedOption = options.find((option) => option.value === value)
 
-  if (!selectedOption) {
-    return {
-      value,
-      other_values: otherValues
-    }
+  const optionPayload = { value: selectedOption.id }
+
+  if (otherValues) {
+    optionPayload.other_values = otherValues
   }
 
-  return {
-    id: selectedOption.id,
-    value: selectedOption.value,
-    other_values: otherValues
-  }
+  return optionPayload
 }
 
 const adapt = (payload, options) => {

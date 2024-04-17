@@ -131,7 +131,7 @@ describe('SignupServices', () => {
     })
 
     expect(requestSpy).toHaveBeenCalledWith({
-      url: `${version}/iam/${additionalDataPayloadMock.payload.id}/additional_data`,
+      url: `${version}/iam/users/${additionalDataPayloadMock.payload.id}/additional_data`,
       method: 'POST',
       body: additionalDataPayloadMock.formatted
     })
