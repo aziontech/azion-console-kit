@@ -76,18 +76,23 @@
     </template>
     <template #content>
       <FormLoading v-if="isLoading" />
-      <TemplateEngineBlock
+      <form
+        autocomplete="off"
         v-else
-        :postCallbackUrlService="props.postCallbackUrlService"
-        :listIntegrationsService="props.listIntegrationsService"
-        :listPlatformsService="props.listPlatformsService"
-        @cancel="handleCancel"
-        @submitClick="handleSubmitClick"
-        @instantiate="handleInstantiate"
-        :getTemplateService="props.getTemplateService"
-        :instantiateTemplateService="props.instantiateTemplateService"
-        :templateId="solution.referenceId"
-      />
+      >
+        <TemplateEngineBlock
+          :postCallbackUrlService="props.postCallbackUrlService"
+          :listIntegrationsService="props.listIntegrationsService"
+          :listPlatformsService="props.listPlatformsService"
+          @cancel="handleCancel"
+          @submitClick="handleSubmitClick"
+          @instantiate="handleInstantiate"
+          :getTemplateService="props.getTemplateService"
+          :instantiateTemplateService="props.instantiateTemplateService"
+          :templateId="solution.referenceId"
+        />
+      </form>
+
       <PrimeDialog
         :draggable="false"
         modal
