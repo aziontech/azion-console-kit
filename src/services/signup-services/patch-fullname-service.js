@@ -26,7 +26,6 @@ const getNameInfo = (fullName) => {
  * @param {Object} httpResponse - The HTTP response object.
  * @param {Object} httpResponse.body - The response body.
  * @param {String} httpResponse.statusCode - The HTTP status code.
- * @returns {Object} The result message based on the status code.
  * @throws {Error} If there is an error with the response.
  */
 

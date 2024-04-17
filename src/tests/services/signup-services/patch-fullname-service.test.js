@@ -3,8 +3,22 @@ import { AxiosHttpClientAdapter } from '@/services/axios/AxiosHttpClientAdapter'
 import * as Errors from '@/services/axios/errors'
 import { patchFullnameService } from '@/services/signup-services/patch-fullname-service'
 
-const basePayloadMock = {
-  key: 'value'
+const fixtures = {
+  basePayloadMock: {
+    id: 1234,
+    name: 'Joaquin José da Silva Xavier'
+  },
+  basePayloadMockWithoutLastName: {
+    id: 1234,
+    name: 'Joaquin'
+  },
+  formattedNameWithoutLast: {
+    first_name: 'Joaquin'
+  },
+  formattedNameWithFirstAndLast: {
+    first_name: 'Joaquin',
+    last_name: 'José da Silva Xavier'
+  }
 }
 
 const makeSut = () => {
@@ -19,18 +33,52 @@ describe('SignupServices', () => {
   it('should call API with correct params', async () => {
     const requestSpy = vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
       statusCode: 200,
-      body: basePayloadMock
+      body: {}
+    })
+
+    const version = 'v4'
+
+    const { sut } = makeSut()
+
+    await sut(fixtures.basePayloadMock)
+
+    expect(requestSpy).toHaveBeenCalledWith({
+      url: `${version}/iam/users/${fixtures.basePayloadMock.id}`,
+      method: 'PATCH',
+      body: fixtures.formattedNameWithFirstAndLast
+    })
+  })
+
+  it('should parse the name correctly', async () => {
+    const requestSpy = vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
+      statusCode: 200,
+      body: {}
+    })
+
+    const version = 'v4'
+
+    const { sut } = makeSut()
+
+    await sut(fixtures.basePayloadMockWithoutLastName)
+
+    expect(requestSpy).toHaveBeenCalledWith({
+      url: `${version}/iam/users/${fixtures.basePayloadMock.id}`,
+      method: 'PATCH',
+      body: fixtures.formattedNameWithoutLast
+    })
+  })
+
+  it('should return null on success', async () => {
+    vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
+      statusCode: 200,
+      body: {}
     })
 
     const { sut } = makeSut()
 
-    await sut()
+    const result = await sut(fixtures.basePayloadMock)
 
-    expect(requestSpy).toHaveBeenCalledWith({
-      url: '',
-      method: 'GET',
-      body: basePayloadMock
-    })
+    expect(result).toBeNull()
   })
 
   it.each([
@@ -62,7 +110,7 @@ describe('SignupServices', () => {
       })
       const { sut } = makeSut()
 
-      const request = sut()
+      const request = sut(fixtures.basePayloadMock)
 
       expect(request).rejects.toBe(expectedError)
     }
