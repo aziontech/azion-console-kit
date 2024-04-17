@@ -227,9 +227,11 @@
   import { useRouter } from 'vue-router'
   import { useAccountStore } from '@/stores/account'
   import * as yup from 'yup'
+
   /** @type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
-
+  const router = useRouter()
+  const toast = useToast()
   const { userId } = useAccountStore()
 
   defineOptions({
@@ -352,9 +354,6 @@
   })
 
   const loading = ref(false)
-
-  const router = useRouter()
-  const toast = useToast()
 
   const submitForm = async () => {
     loading.value = true
