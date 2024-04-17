@@ -12,7 +12,7 @@ const fixtures = {
     }
   },
   mockAdaptedResponse: {
-    body: 'next',
+    body: 'nextjs',
     statusCode: 200
   },
   mockPackageJson: {

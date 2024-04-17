@@ -159,17 +159,11 @@
     }))
   }
 
-  const setEdgeApplicationNameByRepository = async (repositoryName) => {
-    edgeApplicationName.value = repositoryName
-    const accountName = getOptionNameByValue({
-      listOption: integrationsList.value,
-      optionValue: gitScope.value,
-      key: 'value'
-    })
-
+  const detectAndSetFrameworkPreset = async (accountName, repositoryName) => {
     try {
       const framework = await props.frameworkDetectorService({ accountName, repositoryName })
       preset.value = framework
+      setModeByPreset()
     } catch (error) {
       toast.add({
         closable: true,
@@ -178,6 +172,17 @@
         detail: error
       })
     }
+  }
+
+  const setEdgeApplicationNameByRepository = async (repositoryName) => {
+    edgeApplicationName.value = repositoryName
+    const accountName = getOptionNameByValue({
+      listOption: integrationsList.value,
+      optionValue: gitScope.value,
+      key: 'value'
+    })
+
+    await detectAndSetFrameworkPreset(accountName, repositoryName)
   }
 
   const oauthGithubRef = ref(null)
