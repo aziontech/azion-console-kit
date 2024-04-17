@@ -14,7 +14,7 @@ export const deleteEdgeFunctionsService = async (id) => {
 const mapErrorToMessage = (error) => {
   switch (error) {
     case 'edge_function_instantiated_error':
-      return 'You cannot delete a function that is being used'
+      return `Can't delete an edge function being used. Disable it in the edge application or edge firewall to delete it.`
     default:
       return new Errors.UnexpectedError().message
   }
