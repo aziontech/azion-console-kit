@@ -1,6 +1,7 @@
 import * as VersionControlSystemService from '@/services/version-control-system-integration-services'
 import * as VulcanService from '@/services/vulcan-services'
 import * as ScriptRunnerService from '@/services/script-runner-service'
+import * as GitHubServices from '@/services/github-services'
 
 /** @type {import('vue-router').RouteRecordRaw} */
 export const importGithubRoutes = {
@@ -18,7 +19,8 @@ export const importGithubRoutes = {
         listRepositoriesService: VersionControlSystemService.listRepositoriesService,
         listVulcanPresetsService: VulcanService.listVulcanPresetsService,
         getModesByPresetService: VulcanService.getModesByPresetService,
-        createScriptRunnerExecutionService: ScriptRunnerService.createScriptRunnerExecutionService
+        createScriptRunnerExecutionService: ScriptRunnerService.createScriptRunnerExecutionService,
+        frameworkDetectorService: GitHubServices.frameworkDetectorService
       },
       meta: {
         breadCrumbs: [

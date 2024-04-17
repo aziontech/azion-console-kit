@@ -8,7 +8,7 @@ import { defineConfig, loadEnv } from 'vite'
 const getConfig = () => {
   const env = loadEnv('development', process.cwd())
   const URLStartPrefix = env.VITE_ENVIRONMENT === 'PRODUCTION' ? 'https://' : 'https://stage-'
-
+  
   return {
     plugins: [vue(), vueJsx()],
     resolve: {
@@ -52,6 +52,11 @@ const getConfig = () => {
           target: `${URLStartPrefix}api.azion.com`,
           changeOrigin: true,
           rewrite: (path) => path.replace(/^\/api/, '')
+        },
+        '/api-github': {
+          target: 'https://api.github.com',
+          changeOrigin: true,
+          rewrite: (path) => path.replace(/^\/api-github/, '')
         }
       }
     }

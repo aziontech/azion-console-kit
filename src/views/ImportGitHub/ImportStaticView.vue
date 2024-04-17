@@ -34,6 +34,10 @@
     createScriptRunnerExecutionService: {
       type: Function,
       required: true
+    },
+    frameworkDetectorService: {
+      type: Function,
+      required: true
     }
   })
 
@@ -88,6 +92,7 @@
             :postCallbackUrlService="postCallbackUrlService"
             :listVulcanPresetsService="listVulcanPresetsService"
             :getModesByPresetService="getModesByPresetService"
+            :frameworkDetectorService="frameworkDetectorService"
           />
         </template>
         <template #action-bar="{ onSubmit, formValid, onCancel, loading }">

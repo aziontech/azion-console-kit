@@ -24,6 +24,9 @@ import { parseCamelToSnake, parseSnakeToCamel } from './parse-api-body'
 import { themeSelect } from './theme-select'
 import { convertValueToDate, convertDateToLocalTimezone } from './convert-date'
 import { getScriptRunnerImage } from './get-script-runner-image'
+import { windowOpen } from './window-open'
+import { getVulcanPresets } from './get-vulcan-presets'
+
 export {
   InviteSession,
   azionPrivacyPolicyWindowOpener,
@@ -51,5 +54,7 @@ export {
   themeSelect,
   convertValueToDate,
   convertDateToLocalTimezone,
-  getScriptRunnerImage
+  getScriptRunnerImage,
+  windowOpen,
+  getVulcanPresets
 }
