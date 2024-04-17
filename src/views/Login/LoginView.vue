@@ -63,6 +63,7 @@
 
     if (isActivatedEmail) {
       tracker.signUp.userActivatedAccount()
+      tracker.signUp.userSignedUp({ method: 'email' })
 
       const newQuery = { ...route.query, activated: 'true' }
       router.replace({ query: newQuery })

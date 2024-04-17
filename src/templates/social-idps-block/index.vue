@@ -36,10 +36,12 @@
   import PrimeButton from 'primevue/button'
   import Skeleton from 'primevue/skeleton'
   import { useToast } from 'primevue/usetoast'
-  import { computed, onMounted, ref } from 'vue'
+  import { computed, onMounted, ref, inject } from 'vue'
 
   defineOptions({ name: 'social-idps-block' })
   const emit = defineEmits(['showSocialIdps'])
+
+  const tracker = inject('tracker')
 
   const props = defineProps({
     socialIdpsService: {
@@ -98,5 +100,6 @@
 
     accountStore.setSsoSignUpMethod(idp.slug)
     window.location.href = idp.loginUrl
+    tracker.signUp.userClickedSignedUp({ method: idp.slug }).track()
   }
 </script>

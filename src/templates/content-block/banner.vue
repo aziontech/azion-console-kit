@@ -19,7 +19,12 @@
           <p class="text-color-secondary">
             <b class="text-color">Preview Stage:</b>
             The new Azion Console is in preview. You may encounter minor issues during this time.
-            Your feedback is valuable.
+            <PrimeButton
+              label="Switch to the classic interface"
+              link
+              class="p-0"
+              @click="goToClassicInterface()"
+            />
           </p>
         </Message>
       </div>
@@ -36,4 +41,7 @@
 
   import Message from 'primevue/message'
   import Avatar from 'primevue/avatar'
+  import PrimeButton from 'primevue/button'
+
+  import { goToClassicInterface } from '@/helpers/go-to-classic-interface'
 </script>

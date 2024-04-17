@@ -12,6 +12,7 @@
       </label>
       <InputText
         v-model="email"
+        autocomplete="off"
         id="email"
         type="email"
         class="w-full"
@@ -21,27 +22,6 @@
         v-if="errors.email"
         class="p-error text-xs font-normal leading-tight"
         >{{ errors.email }}</small
-      >
-    </div>
-
-    <div class="flex flex-col gap-2">
-      <label
-        for="name"
-        class="font-semibold text-sm"
-      >
-        Full Name *
-      </label>
-      <InputText
-        v-model="name"
-        id="name"
-        type="name"
-        class="w-full"
-        :class="{ 'p-invalid': errors.name }"
-      />
-      <small
-        v-if="errors.name"
-        class="p-error text-xs font-normal leading-tight"
-        >{{ errors.name }}</small
       >
     </div>
 
@@ -59,6 +39,7 @@
         v-model="password"
         promptLabel="Choose a password"
         weakLabel="Weak"
+        autocomplete="off"
         mediumLabel="Medium"
         strongLabel="Strong"
         required
@@ -148,10 +129,6 @@
       .max(254, 'Exceeded number of characters.')
       .email('Enter a valid email.')
       .required('Email is a required field.'),
-    name: yup
-      .string()
-      .max(254, 'Exceeded number of characters.')
-      .required('Name is a required field.'),
     password: yup
       .string()
       .required('Password is a required field.')
@@ -178,7 +155,6 @@
 
   const { value: password } = useField('password')
   const { value: email } = useField('email')
-  const { value: name } = useField('name')
 
   const toast = useToast()
   const router = useRouter()
@@ -199,13 +175,27 @@
     }
   }
 
+  /**
+   * Extracts the name from the given email.
+   *
+   * @param {string} email - the email from which to extract the name
+   * @return {string} the name extracted from the email
+   */
+  const extractNameFromEmail = (email) => {
+    const [emailBeforeAt] = email.split('@')
+    const cleanedName = emailBeforeAt.replace(/[^a-zA-Z]/g, ' ').trim()
+
+    return cleanedName
+  }
+
   const signUp = handleSubmit(async (values) => {
     loading.value = true
     try {
+      const name = extractNameFromEmail(values.email)
       const captcha = await recaptcha.execute('signup')
-      await props.signupService({ ...values, captcha })
+      await props.signupService({ ...values, name, captcha })
 
-      tracker.signUp.userSignedUp({ method: 'email' })
+      tracker.signUp.userClickedSignedUp({ method: 'email' }).track()
       router.push({ query: { email: encodeEmail(values.email) } })
       loading.value = false
       emit('loginWithEmail')

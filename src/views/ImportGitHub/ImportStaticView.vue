@@ -4,7 +4,7 @@
   import CreateFormBlock from '@/templates/create-form-block'
   import PageHeadingBlock from '@/templates/page-heading-block'
   import * as yup from 'yup'
-  import FormFieldsImportStatic from './FormFields/FormFieldsImportStatic'
+  import FormFieldsImportStatic from './FormFields/FormFieldsImportStatic.vue'
 
   const props = defineProps({
     listPlatformsService: {
