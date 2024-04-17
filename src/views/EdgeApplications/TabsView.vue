@@ -139,6 +139,10 @@
     return edgeApplication.value?.deliveryProtocol.includes('https')
   })
 
+  const isImageOptimization = computed(() => {
+    return edgeApplication.value?.imageOptimization
+  })
+
   const updatedApplication = (application) => {
     edgeApplication.value = { ...application }
     verifyTab(edgeApplication.value)
@@ -260,6 +264,7 @@
             :isEnableApplicationAccelerator="isEnableApplicationAccelerator"
             :isDeliveryProtocolHttps="isDeliveryProtocolHttps"
             :hideApplicationAcceleratorInDescription="edgeApplication.applicationAccelerator"
+            :isImageOptimization="isImageOptimization"
             v-bind="props.rulesEngineServices"
           />
         </TabPanel>

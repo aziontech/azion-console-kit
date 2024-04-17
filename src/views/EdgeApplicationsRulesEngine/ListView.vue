@@ -51,6 +51,10 @@
       required: true,
       type: Boolean
     },
+    isImageOptimization: {
+      required: true,
+      type: Boolean
+    },
     listEdgeApplicationFunctionsService: {
       required: true,
       type: Function
@@ -177,6 +181,7 @@
     ref="drawerRulesEngineRef"
     :isEnableApplicationAccelerator="props.isEnableApplicationAccelerator"
     :isDeliveryProtocolHttps="props.isDeliveryProtocolHttps"
+    :isImageOptimization="props.isImageOptimization"
     :listEdgeApplicationFunctionsService="props.listEdgeApplicationFunctionsService"
     :listOriginsService="props.listOriginsService"
     :listCacheSettingsService="props.listCacheSettingsService"

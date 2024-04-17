@@ -23,6 +23,10 @@
       type: Boolean,
       required: true
     },
+    isImageOptimization: {
+      required: true,
+      type: Boolean
+    },
     listEdgeApplicationFunctionsService: {
       type: Function,
       required: true
@@ -74,6 +78,11 @@
     return ' - Requires Application Accelerator'
   })
 
+  const showLabelImageOptimization = computed(() => {
+    if (props.isImageOptimization) return ''
+    return ' - Requires Image Processor'
+  })
+
   const behaviorsRequestOptions = ref([
     {
       label: `Add Request Cookie ${showLabelApplicationAccelerator.value}`,
@@ -106,7 +115,11 @@
       requires: true
     },
     { label: 'No Content (204)', value: 'no_content', requires: false },
-    { label: 'Optimize Images', value: 'optimize_images', requires: false },
+    {
+      label: `Optimize Images ${showLabelImageOptimization.value}`,
+      value: 'optimize_images',
+      requires: true
+    },
     {
       label: 'Redirect HTTP to HTTPS - requires Delivery Protocol with HTTPS',
       value: 'redirect_http_to_https',
@@ -334,12 +347,21 @@
   const updateOptionRequires = (options) => {
     return options.map((option) => {
       if (option.requires) {
-        return {
-          ...option,
-          requires:
-            option.value === 'redirect_http_to_https'
-              ? !props.isDeliveryProtocolHttps
-              : !props.isEnableApplicationAccelerator
+        if (option.value === 'redirect_http_to_https') {
+          return {
+            ...option,
+            requires: !props.isDeliveryProtocolHttps
+          }
+        } else if (option.value === 'optimize_images') {
+          return {
+            ...option,
+            requires: !props.isImageOptimization
+          }
+        } else {
+          return {
+            ...option,
+            requires: !props.isEnableApplicationAccelerator
+          }
         }
       }
       return option

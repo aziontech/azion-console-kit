@@ -54,6 +54,10 @@
     },
     hideApplicationAcceleratorInDescription: {
       type: Boolean
+    },
+    isImageOptimization: {
+      required: true,
+      type: Boolean
     }
   })
 
@@ -209,6 +213,7 @@
         :listOriginsService="props.listOriginsService"
         :listCacheSettingsService="props.listCacheSettingsService"
         :hideApplicationAcceleratorInDescription="props.hideApplicationAcceleratorInDescription"
+        :isImageOptimization="isImageOptimization"
       />
     </template>
   </CreateDrawerBlock>
