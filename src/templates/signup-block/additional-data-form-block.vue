@@ -269,10 +269,13 @@
   const validationSchema = yup.object({
     use: yup.string().required(),
     role: yup.string().required(),
-    inputRole: yup.string().when('role', {
-      is: (val) => val === 'Other',
-      then: (schema) => schema.required('Role Description is a required field')
-    }),
+    inputRole: yup
+      .string()
+      .trim()
+      .when('role', {
+        is: (val) => val === 'Other',
+        then: (schema) => schema.required('Role Description is a required field')
+      }),
     companySize: yup.string().when('use', {
       is: (val) => val === 'Work',
       then: (schema) => schema.required()
@@ -284,7 +287,7 @@
           .url('Company Website must be a valid URL')
           .required('Company Website is a required field')
     }),
-    fullName: yup.string().required('Full Name is a required field'),
+    fullName: yup.string().trim().required('Full Name is a required field'),
     onboardingSession: yup.boolean()
   })
 
