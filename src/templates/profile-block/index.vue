@@ -112,7 +112,7 @@
     :popup="true"
     ref="profile"
     :pt="{
-      root: { class: 'w-[280px] pb-2 pt-0 z-50 left-auto right-0 mr-9' },
+      root: { class: 'w-[280px] pb-2 pt-0 left-auto right-0 mr-9' },
       content: { class: 'text-sm' }
     }"
   >
