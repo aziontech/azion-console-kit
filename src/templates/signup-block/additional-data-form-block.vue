@@ -362,25 +362,28 @@
       }
 
       await props.postAdditionalDataService({ payload, options: additionalDataInfo.value })
-      tracker.signUp
-        .submittedAdditionalData({
-          use: use.value,
-          role: role.value,
-          inputRole: inputRole.value,
-          companySize: companySize.value,
-          website: companyWebsite.value,
-          name: fullName.value,
-          onboardingSchedule: onboardingSession.value
-        })
-        .track()
+      // tracker.signUp
+      //   .submittedAdditionalData({
+      //     use: use.value,
+      //     role: role.value,
+      //     inputRole: inputRole.value,
+      //     companySize: companySize.value,
+      //     website: companyWebsite.value,
+      //     name: fullName.value,
+      //     onboardingSchedule: onboardingSession.value
+      //   })
+      //   .track()
 
-      router.push({ name: 'home', query: { onboardingSession: 'true' } })
+      // router.push({ name: 'home', query: { onboardingSession: 'true' } })
     } catch (err) {
-      toast.add({ life: 5000, severity: 'error', detail: err, summary: 'Error' })
+      const { errorMessage, errorType, fieldName } = JSON.parse(err)
+
+      toast.add({ life: 5000, severity: 'error', detail: errorMessage, summary: 'Error' })
       tracker.signUp
         .failedSubmitAdditionalData({
-          errorType: 'api',
-          errorMessage: err.message
+          errorType,
+          fieldName,
+          errorMessage
         })
         .track()
     } finally {
