@@ -74,12 +74,12 @@
     isSliceEdgeCachingEnabled: false
   })
 
-  const minimumAcceptableValue  =  ref(60)
+  const minimumAcceptableValue = ref(60)
 
   const l2CachingEnabled = ref()
   const setNewMinimumValue = (value) => {
     l2CachingEnabled.value = value
-    if(l2CachingEnabled.value || props.isEnableApplicationAccelerator) {
+    if (l2CachingEnabled.value || props.isEnableApplicationAccelerator) {
       minimumAcceptableValue.value = 3
     } else {
       minimumAcceptableValue.value = 60
@@ -106,7 +106,8 @@
       .when('cdnCacheSettings', {
         is: 'honor',
         then: (schema) => schema.notRequired(),
-        otherwise: (schema) => schema.min(minimumAcceptableValue.value).max(MAX_TTL_ONE_YEAR_IN_SECONDS).required()
+        otherwise: (schema) =>
+          schema.min(minimumAcceptableValue.value).max(MAX_TTL_ONE_YEAR_IN_SECONDS).required()
       }),
     sliceConfigurationEnabled: yup.boolean().required(),
     sliceConfigurationRange: yup

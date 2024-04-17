@@ -16,7 +16,6 @@
 
   const emit = defineEmits(['l2-caching-enabled'])
 
-
   const props = defineProps({
     isEnableApplicationAccelerator: {
       required: true,
@@ -42,9 +41,9 @@
   const cdnCacheSettingsMaximumTtlMinimumValue = computed(() => {
     const defaultMinimumValue = 60
     const minimumValue = 3
-    if(l2CachingEnabled.value || props.isEnableApplicationAccelerator) {
+    if (l2CachingEnabled.value || props.isEnableApplicationAccelerator) {
       return minimumValue
-    } 
+    }
     return defaultMinimumValue
   })
 
