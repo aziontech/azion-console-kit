@@ -3,11 +3,13 @@ import { resendEmailService } from './resend-email-service'
 import { listAdditionalDataInfoService } from './list-additional-data-info-service'
 import { listCountriesService } from './list-countries-service'
 import { postAdditionalDataService } from './post-additional-data-service'
+import { patchFullnameService } from './patch-fullname-service'
 
 export {
   signupService,
   resendEmailService,
   listAdditionalDataInfoService,
   listCountriesService,
-  postAdditionalDataService
+  postAdditionalDataService,
+  patchFullnameService
 }
