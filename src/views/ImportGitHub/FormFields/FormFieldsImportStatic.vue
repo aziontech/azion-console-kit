@@ -202,7 +202,6 @@
   }
 
   onMounted(async () => {
-    // await props.frameworkDetectorService({ accountName: 'peterpaulodev', repositoryName: 'barbershop-app' })
     await listIntegrations()
     listenerOnMessage()
   })
