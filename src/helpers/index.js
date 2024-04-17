@@ -24,6 +24,7 @@ import { parseCamelToSnake, parseSnakeToCamel } from './parse-api-body'
 import { themeSelect } from './theme-select'
 import { convertValueToDate, convertDateToLocalTimezone } from './convert-date'
 import { getScriptRunnerImage } from './get-script-runner-image'
+import { goToClassicInterface } from './go-to-classic-interface'
 export {
   InviteSession,
   azionPrivacyPolicyWindowOpener,
@@ -51,5 +52,6 @@ export {
   themeSelect,
   convertValueToDate,
   convertDateToLocalTimezone,
-  getScriptRunnerImage
+  getScriptRunnerImage,
+  goToClassicInterface
 }

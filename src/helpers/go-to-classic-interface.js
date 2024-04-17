@@ -1,10 +1,16 @@
 import { getEnvironment } from './get-environment'
 export const goToClassicInterface = () => {
-    const environment = getEnvironment()
+  const environment = getEnvironment()
 
-    if (environment === 'production') {
-        window.open('https://manager.azion.com')
-    } else {
-        window.open('https://stage-manager.azion.com')
-    }
+  switch (environment) {
+    case 'production':
+      window.open('https://manager.azion.com')
+      break
+    case 'stage':
+    case 'development':
+      window.open('https://stage-manager.azion.com')
+      break
+    default:
+      break
+  }
 }
