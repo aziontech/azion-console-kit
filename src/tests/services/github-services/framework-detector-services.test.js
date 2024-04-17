@@ -30,7 +30,7 @@ const makeSut = () => {
   }
 }
 
-describe('FrameworkDetectorService', () => {
+describe('GithubServices', () => {
   it('should call GitHub API with correct params', async () => {
     vi.spyOn(Buffer, 'from').mockReturnValueOnce(JSON.stringify(fixtures.mockPackageJson))
     const requestSpy = vi
