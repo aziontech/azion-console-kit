@@ -10,7 +10,7 @@ const ALL_PRESETS = [...DELIVER_PRESETS, ...COMPUTE_PRESETS]
  */
 export const getVulcanPresets = (type = null) => {
   const presets = {
-    deliver: DELIVER_PRESETS,
+    deliver: DELIVER_PRESETS, 
     compute: COMPUTE_PRESETS
   }
   return presets[type] || ALL_PRESETS

@@ -20,8 +20,22 @@ const fixtures = {
       next: '^17.0.2',
       react: '^3.0.0'
     }
-  }
+  },
+  axiosInstanceMock: {
+    defaults: {
+      headers: {
+        common: {
+          Accept: 'application/json',
+          'Content-Type': 'application/json'
+        }
+      }
+    }
 }
+}
+
+vi.mock('@/services/axios/makeGithubApi', () => {
+  return { default: vi.fn(() => fixtures.axiosInstanceMock) }
+})
 
 const makeSut = () => {
   const sut = frameworkDetectorService
@@ -36,8 +50,8 @@ describe('GithubServices', () => {
     const requestSpy = vi
       .spyOn(AxiosHttpClientAdapter, 'request')
       .mockResolvedValueOnce(fixtures.mockHttpResponse)
-    const { sut } = makeSut()
 
+    const { sut } = makeSut()
     await sut({ accountName: 'testAccount', repositoryName: 'testRepo' })
 
     expect(requestSpy).toHaveBeenCalledWith(
@@ -45,7 +59,7 @@ describe('GithubServices', () => {
         url: '/repos/testAccount/testRepo/contents/package.json',
         method: 'GET'
       },
-      expect.any(Function)
+      fixtures.axiosInstanceMock
     )
   })
 

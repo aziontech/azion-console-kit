@@ -30,11 +30,10 @@ export const frameworkDetectorService = async ({ accountName, repositoryName }) 
 }
 
 const adapt = (httpResponse) => {
-  const frameworks = detectFrameworkByDependencies(httpResponse)
-  const firstFramework = frameworks && frameworks.length ? frameworks[0] : null
+  const framework = detectFrameworkByDependencies(httpResponse)
 
   return {
-    body: firstFramework,
+    body: framework,
     statusCode: httpResponse.statusCode
   }
 }
@@ -55,7 +54,9 @@ const detectFrameworkByDependencies = (httpResponse) => {
     .map((dependency) => (dependency === 'next' ? 'nextjs' : dependency))
     .filter((dependency) => allPresets.includes(dependency))
 
-  return allDetectedFrameworks
+  const hasMatchCases = allDetectedFrameworks.length > 0
+
+  return hasMatchCases ? allDetectedFrameworks[0] : null
 }
 
 /**
