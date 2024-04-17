@@ -55,7 +55,7 @@ const adapt = (payload) => {
     enable_query_string_sort: payload.enableQueryStringSort,
     enable_caching_for_post: payload.enableCachingForPost,
     enable_caching_for_options: payload.enableCachingForOptions,
-    enable_stale_cache: true,
+    enable_stale_cache: payload.enableStaleCache,
     cache_by_cookies: payload.cacheByCookies,
     cookie_names: parseTextContentToArrayByBreaklines(payload.cookieNames),
     adaptive_delivery_action: payload.adaptiveDeliveryAction,

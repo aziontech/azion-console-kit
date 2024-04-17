@@ -6,7 +6,7 @@
     >
       <div class="flex flex-col gap-4">
         <FieldGroupCheckbox
-          label="Checkbox Group"
+          label="Checkbox Group *"
           nameField="checkboxGroup"
           :options="valuesSwitchCheck"
           v-bind="bindCheckboxGroup"
@@ -16,7 +16,7 @@
       </div>
       <div class="flex flex-col gap-4">
         <FieldGroupSwitch
-          label="Switch Group"
+          label="Switch Group *"
           nameField="switchGroup"
           helpText="Help text"
         >
@@ -30,7 +30,7 @@
       </div>
       <div class="flex flex-col gap-4">
         <FieldGroupRadio
-          label="Radio Group"
+          label="Radio Group *"
           nameField="radioGroup"
           auto
           :options="valuesSwitchCheck"
@@ -66,7 +66,7 @@
   const { handleSubmit, values } = useForm({
     validationSchema,
     initialValues: {
-      checkboxGroup: [],
+      checkboxGroup: ['isCard'],
       switchGroup: [
         {
           isCard: true,
@@ -76,7 +76,6 @@
         },
         {
           isCard: true,
-          isLabel: true,
           title: 'Title 2',
           subtitle: 'Subtitle 2',
           value: false
@@ -88,7 +87,7 @@
           value: true
         }
       ],
-      radioGroup: 'Value 2'
+      radioGroup: 'disabled'
     }
   })
 
@@ -112,27 +111,30 @@
     {
       title: 'hideSelector',
       value: 'hideSelector',
-      subtitle: 'Hide Selector'
+      subtitle: 'Hide Selector',
+      description:
+        'lorem ipsum dolor sit amet consectetur adipiscing elit sed do eiusmod tempor incididunt ut labore et dolore magna aliqua'
     },
     {
       title: 'auto',
       value: 'auto',
-      subtitle: 'Auto'
+      subtitle: 'Auto',
+      description:
+        'lorem ipsum dolor sit amet consectetur adipiscing elit sed do eiusmod tempor incididunt ut labore et dolore magna aliqua'
     },
     {
       title: 'isCard',
       value: 'isCard',
-      subtitle: 'Is Card'
+      subtitle: 'Is Card',
+      description:
+        'lorem ipsum dolor sit amet consectetur adipiscing elit sed do eiusmod tempor incididunt ut labore et dolore magna aliqua'
     },
     {
       title: 'disabled',
       value: 'disabled',
-      subtitle: 'Disabled'
-    },
-    {
-      title: 'divider',
-      value: 'divider',
-      subtitle: 'Divider'
+      subtitle: 'Disabled',
+      description:
+        'lorem ipsum dolor sit amet consectetur adipiscing elit sed do eiusmod tempor incididunt ut labore et dolore magna aliqua'
     }
   ])
 </script>
