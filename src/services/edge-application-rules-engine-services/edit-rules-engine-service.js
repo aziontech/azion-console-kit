@@ -63,7 +63,6 @@ const errorMessagesMap = {
   invalid_behaviors_target: `The behavior '{value}' has a invalid target.`
 }
 
-
 /**
  * Extracts the first error message from an error object.
  * @param {Object} errorObject - The error object to extract the message from.
@@ -83,7 +82,6 @@ function getFirstErrorMessage(errorObject) {
     }
   }
 }
-
 
 /**
  * Processes an array error to extract the error message.
