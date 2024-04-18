@@ -21,10 +21,10 @@
   })
 
   watch(layer, (newValue) => {
-    if(newValue === 'tiered_cache') {
+    if (newValue === 'tiered_cache') {
       purgeType.value = 'cachekey'
     }
-  }) 
+  })
 
   const disabledPurgeType = computed(() => {
     return layer.value === 'tiered_cache'
