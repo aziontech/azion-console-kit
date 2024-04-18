@@ -375,10 +375,7 @@
         id: userId
       }
 
-      const usersPayload = {
-        id: userId,
-        name: fullName.value
-      }
+      const usersPayload = fullName.value
 
       const patchName = props.patchFullnameService(usersPayload)
 
