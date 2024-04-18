@@ -90,7 +90,7 @@
                   :options="listOfIntegrations"
                   :name="field.name"
                   :label="field.label"
-                  :placeholder="field.placeholder"
+                  placeholder="Select a scope"
                   :description="field.description"
                   :inputClass="renderInvalidClass(formTools.errors[`${field.name}`])"
                   optionLabel="label"
