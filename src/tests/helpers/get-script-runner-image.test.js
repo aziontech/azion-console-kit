@@ -1,6 +1,11 @@
 import { describe, it, expect, afterEach, vi } from 'vitest'
 import { getScriptRunnerImage } from '@/helpers/get-script-runner-image'
 
+const fixtures = {
+  stageImage: 'azionedge/azion-script-builder:edge-builder-stage-0.10.0',
+  productionImage: 'azionedge/azion-script-builder:edge-builder-stage-0.10.0'
+}
+
 const makeSut = () => {
   const sut = getScriptRunnerImage
 
@@ -14,21 +19,21 @@ describe('getScriptRunnerImage', () => {
     vi.stubEnv('MODE', 'stage')
     const { sut } = makeSut()
     const image = sut()
-    expect(image).toBe('azionedge/runner-static-website-with-cli-stage:2.1-alpine3.16')
+    expect(image).toBe(fixtures.stageImage)
   })
 
   it('should return the correct image for the production environment', () => {
     vi.stubEnv('MODE', 'production')
     const { sut } = makeSut()
     const image = sut()
-    expect(image).toBe('azionedge/runner-static-website-with-cli:2.1-alpine3.16')
+    expect(image).toBe(fixtures.productionImage)
   })
 
   it('should return the default image for an unspecified environment', () => {
     vi.stubEnv('MODE', 'test')
     const { sut } = makeSut()
     const image = sut()
-    expect(image).toBe('azionedge/runner-static-website-with-cli-stage:2.1-alpine3.16')
+    expect(image).toBe(fixtures.stageImage)
   })
 
   afterEach(() => {

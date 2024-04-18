@@ -1,8 +1,8 @@
 import { getEnvironment } from './get-environment'
 
 const imagesMap = {
-  stage: 'azionedge/runner-static-website-with-cli-stage:2.1-alpine3.16',
-  production: 'azionedge/runner-static-website-with-cli:2.1-alpine3.16'
+  stage: 'azionedge/azion-script-builder:edge-builder-stage-0.10.0',
+  production: 'azionedge/azion-script-builder:edge-builder-stage-0.10.0'
 }
 
 /**

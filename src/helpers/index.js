@@ -28,6 +28,7 @@ import { getScriptRunnerImage } from './get-script-runner-image'
 import { windowOpen } from './window-open'
 import { getVulcanPresets } from './get-vulcan-presets'
 import { goToClassicInterface } from './go-to-classic-interface'
+import { getScriptRunnerGithubEnv } from './get-script-runner-github-envs'
 
 export {
   InviteSession,
@@ -60,5 +61,6 @@ export {
   getScriptRunnerImage,
   windowOpen,
   getVulcanPresets,
-  goToClassicInterface
+  goToClassicInterface,
+  getScriptRunnerGithubEnv
 }
