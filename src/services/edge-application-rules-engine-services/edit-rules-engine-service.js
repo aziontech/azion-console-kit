@@ -55,27 +55,55 @@ const adapt = (payload, reorder) => {
   return parsedPayload
 }
 
-/**
- * @param {Object} errorSchema - The error schema.
- * @param {string} key - The error key of error schema.
- * @returns {string|undefined} The result message based on the status code.
- */
-const extractErrorKey = (errorSchema, key) => {
-  if (Array.isArray(errorSchema[key])) {
-    return errorSchema[key]?.[0]
-  }
-  return errorSchema[key]
+const errorMessagesMap = {
+  duplicated_behaviors: `The behavior '{value}' is duplicated.`,
+  blank_parameter: `The '{value}' field is empty.`,
+  incompatible_behaviors: `The behavior '{value}' is incompatible with the others.`,
+  invalid_behaviors: `The behavior '{value}' is invalid.`,
+  invalid_behaviors_target: `The behavior '{value}' has a invalid target.`
 }
 
+
 /**
- * @param {Object} httpResponse - The HTTP response object.
- * @param {Array} httpResponse.body - The response body.
- * @returns {string} The result message based on the status code.
+ * Extracts the first error message from an error object.
+ * @param {Object} errorObject - The error object to extract the message from.
+ * @returns {string} The first error message found.
  */
-const extractApiError = (httpResponse) => {
-  const errorKey = Object.keys(httpResponse.body)[0]
-  const apiError = extractErrorKey(httpResponse.body, errorKey)
-  return `${errorKey}: ${apiError}`
+function getFirstErrorMessage(errorObject) {
+  for (let key in errorObject) {
+    const errorValue = errorObject[key]
+    if (typeof errorValue === 'string') {
+      return errorValue
+    }
+    if (Array.isArray(errorValue)) {
+      return processArrayError(key, errorValue)
+    }
+    if (typeof errorValue === 'object') {
+      return getFirstErrorMessage(errorValue)
+    }
+  }
+}
+
+
+/**
+ * Processes an array error to extract the error message.
+ * @param {string} key - The key of the error in the error object.
+ * @param {Array} errorArray - The array containing the error details.
+ * @returns {string} The processed error message.
+ */
+function processArrayError(key, errorArray) {
+  const errorMessageTemplate = errorMessagesMap[key]
+  if (errorMessageTemplate) {
+    let value = errorArray[0]
+    if (key === 'incompatible_behaviors') {
+      // Extract the behavior name from the string
+      value = value.match(/\(u'(.*?)',/)[1].replace(/_/g, ' ')
+    } else {
+      value = value.replace(/_/g, ' ')
+    }
+    return errorMessageTemplate.replace('{value}', value)
+  }
+  return `${key}: ${errorArray[0]}`
 }
 
 /**
@@ -90,7 +118,7 @@ const parseHttpResponse = (httpResponse) => {
     case 200:
       return 'Your Rules Engine has been edited'
     case 400:
-      const apiError = extractApiError(httpResponse)
+      const apiError = getFirstErrorMessage(httpResponse)
       throw new Error(apiError).message
     case 401:
       throw new Errors.InvalidApiTokenError().message

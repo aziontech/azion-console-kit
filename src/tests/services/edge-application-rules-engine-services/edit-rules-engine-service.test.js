@@ -111,7 +111,11 @@ describe('EdgeApplicationRulesEngineServices', () => {
     vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
       statusCode: 400,
       body: {
-        error: 'invalid rule engine error message'
+        behaviors: {
+          incompatible_behaviors: [
+            "(u'set_cache_policy', ['deny', 'redirect_to_301', 'redirect_to_302'])"
+          ]
+        }
       }
     })
 
@@ -123,7 +127,7 @@ describe('EdgeApplicationRulesEngineServices', () => {
       reorder: false
     })
 
-    expect(result).rejects.toBe('error: invalid rule engine error message')
+    expect(result).rejects.toBe("The behavior 'set cache policy' is incompatible with the others.")
   })
 
   it('should parse correctly the API validation with multiple error messages', async () => {
