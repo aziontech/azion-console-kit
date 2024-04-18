@@ -4,9 +4,9 @@ import { makePatchFullnameServiceBaseUrl } from './make-patch-fullname-service-b
 
 export const patchFullnameService = async (payload) => {
   let httpResponse = await AxiosHttpClientAdapter.request({
-    url: makePatchFullnameServiceBaseUrl(payload.id),
+    url: makePatchFullnameServiceBaseUrl(),
     method: 'PATCH',
-    body: getNameInfo(payload.name)
+    body: getNameInfo(payload)
   })
   return parseHttpResponse(httpResponse)
 }

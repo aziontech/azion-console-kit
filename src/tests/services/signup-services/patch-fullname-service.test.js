@@ -4,14 +4,8 @@ import * as Errors from '@/services/axios/errors'
 import { patchFullnameService } from '@/services/signup-services/patch-fullname-service'
 
 const fixtures = {
-  basePayloadMock: {
-    id: 1234,
-    name: 'Joaquin José da Silva Xavier'
-  },
-  basePayloadMockWithoutLastName: {
-    id: 1234,
-    name: 'Joaquin'
-  },
+  basePayloadMock: 'Joaquin José da Silva Xavier',
+  basePayloadMockWithoutLastName: 'Joaquin',
   formattedNameWithoutLast: {
     first_name: 'Joaquin'
   },
@@ -43,7 +37,7 @@ describe('SignupServices', () => {
     await sut(fixtures.basePayloadMock)
 
     expect(requestSpy).toHaveBeenCalledWith({
-      url: `${version}/iam/users/${fixtures.basePayloadMock.id}`,
+      url: `${version}/iam/user`,
       method: 'PATCH',
       body: fixtures.formattedNameWithFirstAndLast
     })
@@ -62,7 +56,7 @@ describe('SignupServices', () => {
     await sut(fixtures.basePayloadMockWithoutLastName)
 
     expect(requestSpy).toHaveBeenCalledWith({
-      url: `${version}/iam/users/${fixtures.basePayloadMock.id}`,
+      url: `${version}/iam/user`,
       method: 'PATCH',
       body: fixtures.formattedNameWithoutLast
     })

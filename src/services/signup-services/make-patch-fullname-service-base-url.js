@@ -1,5 +1,5 @@
-export const makePatchFullnameServiceBaseUrl = (userId) => {
+export const makePatchFullnameServiceBaseUrl = () => {
   const version = 'v4'
 
-  return `${version}/iam/users/${userId}`
+  return `${version}/iam/user`
 }
