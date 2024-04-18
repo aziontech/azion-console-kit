@@ -274,7 +274,10 @@
       .trim()
       .when('role', {
         is: (val) => val === 'Other',
-        then: (schema) => schema.required('Role Description is a required field')
+        then: (schema) =>
+          schema
+            .max(255, 'Role Description must be less than 255 characters')
+            .required('Role Description is a required field')
       }),
     companySize: yup.string().when('use', {
       is: (val) => val === 'Work',
@@ -285,9 +288,14 @@
       then: (schema) =>
         schema
           .url('Company Website must be a valid URL')
+          .max(255, 'Company Website must be less than 255 characters')
           .required('Company Website is a required field')
     }),
-    fullName: yup.string().trim().required('Full Name is a required field'),
+    fullName: yup
+      .string()
+      .trim()
+      .max(61, 'Full Name must be less than 61 characters')
+      .required('Full Name is a required field'),
     onboardingSession: yup.boolean()
   })
 
@@ -372,36 +380,25 @@
         name: fullName.value
       }
 
-      await props.patchFullnameService(usersPayload)
+      const patchName = props.patchFullnameService(usersPayload)
 
-      await props.postAdditionalDataService({
+      const postAddData = props.postAdditionalDataService({
         payload: additionalDataPayload,
         options: additionalDataInfo.value
       })
 
-      // tracker.signUp
-      //   .submittedAdditionalData({
-      //     use: use.value,
-      //     role: role.value,
-      //     inputRole: inputRole.value,
-      //     companySize: companySize.value,
-      //     website: companyWebsite.value,
-      //     name: fullName.value,
-      //     onboardingSchedule: onboardingSession.value
-      //   })
-      //   .track()
+      await patchName
+      await postAddData
 
-      // router.push({ name: 'home', query: { onboardingSession: 'true' } })
+      tracker.signUp.submittedAdditionalData(values).track()
+
+      router.push({ name: 'home', query: { onboardingSession: 'true' } })
     } catch (err) {
-      // const { errorMessage, errorType, fieldName } = JSON.parse(err)
-      // toast.add({ life: 5000, severity: 'error', detail: errorMessage, summary: 'Error' })
-      // tracker.signUp
-      //   .failedSubmitAdditionalData({
-      //     errorType,
-      //     fieldName,
-      //     errorMessage
-      //   })
-      //   .track()
+      const errors = JSON.parse(err)
+
+      toast.add({ life: 5000, severity: 'error', detail: errors.errorMessage, summary: 'Error' })
+
+      tracker.signUp.failedSubmitAdditionalData(errors).track()
     } finally {
       loading.value = false
     }
