@@ -11,12 +11,18 @@ export const listAdditionalDataInfoService = async () => {
   return parseHttpResponse(httpResponse)
 }
 
-const adapt = (response) => {
-  response = [
-    ...response.slice(0, 3),
-    { id: 10, key: 'Full Name', required: true, show: false },
-    ...response.slice(3)
-  ]
+const adapt = ([...response]) => {
+  /* 
+    this adaptation is required to handle the missing fullname field in the v4 api
+    and use progressive indexes in components when rendering the ui.
+  */
+
+  const indexToInsertFullName = 3
+
+  // this id does not affect the use in the app. It is high just to avoid possible colisions
+  const fullNameField = { id: 999, key: 'Full Name', required: true, show: true }
+
+  response.splice(indexToInsertFullName, 0, fullNameField)
 
   return response
 }
