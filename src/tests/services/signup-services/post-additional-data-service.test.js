@@ -64,7 +64,7 @@ const additionalDataPayloadMock = {
     },
     {
       key: 'Question 5 - Company Website',
-      values: []
+      values: [{ id: '21', value: '', other_values: true }]
     },
     {
       key: 'Question 6 - Onboarding Session',
@@ -82,28 +82,21 @@ const additionalDataPayloadMock = {
   ],
   formatted: [
     {
-      id: '1',
-      value: 'Option 1',
-      other_values: null
+      value: '1'
     },
     {
-      id: '4',
-      value: 'Option 4',
+      value: '4',
       other_values: 'Test role'
     },
     {
-      id: '6',
-      value: 'Option 6',
-      other_values: null
+      value: '6'
     },
     {
-      value: 'https://www.azion.com',
-      other_values: null
+      value: '21',
+      other_values: 'https://www.azion.com'
     },
     {
-      id: '11',
-      value: 'Yes',
-      other_values: null
+      value: '11'
     }
   ]
 }
@@ -119,7 +112,7 @@ const makeSut = () => {
 describe('SignupServices', () => {
   it('should call API with correct params', async () => {
     const requestSpy = vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
-      statusCode: 200
+      statusCode: 201
     })
     const { sut } = makeSut()
 
@@ -139,7 +132,7 @@ describe('SignupServices', () => {
 
   it('should not return a feedback message on successfully sent', async () => {
     vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
-      statusCode: 200
+      statusCode: 201
     })
     const { sut } = makeSut()
 
@@ -151,26 +144,78 @@ describe('SignupServices', () => {
     expect(req).toBeNull()
   })
 
+  it('should return a feedback message when request fails with status 400', async () => {
+    const expectedError = new Error(
+      JSON.stringify({
+        errorMessage: 'User already has additional data',
+        errorType: 'field',
+        fieldName: 'use'
+      })
+    )
+
+    vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
+      statusCode: 400,
+      body: [
+        {
+          detail: [
+            {
+              message:
+                "User already has an additional data key: 'How are you planning to use Azion?' for the provided value id: 1."
+            }
+          ]
+        }
+      ]
+    })
+    const { sut } = makeSut()
+
+    const request = sut({
+      payload: additionalDataPayloadMock.payload,
+      options: additionalDataPayloadMock.options
+    })
+
+    expect(request).rejects.toBe(expectedError.message)
+  })
+
   it.each([
     {
-      statusCode: 400,
-      expectedError: new Errors.InvalidApiRequestError().message
-    },
-    {
       statusCode: 403,
-      expectedError: new Errors.PermissionError().message
+      expectedError: new Error(
+        JSON.stringify({
+          errorMessage: new Errors.PermissionError().message,
+          errorType: 'api',
+          fieldName: null
+        })
+      )
     },
     {
       statusCode: 404,
-      expectedError: new Errors.NotFoundError().message
+      expectedError: new Error(
+        JSON.stringify({
+          errorMessage: new Errors.NotFoundError().message,
+          errorType: 'api',
+          fieldName: null
+        })
+      )
     },
     {
       statusCode: 500,
-      expectedError: new Errors.InternalServerError().message
+      expectedError: new Error(
+        JSON.stringify({
+          errorMessage: new Errors.InternalServerError().message,
+          errorType: 'api',
+          fieldName: null
+        })
+      )
     },
     {
       statusCode: 'unmappedStatusCode',
-      expectedError: new Errors.UnexpectedError().message
+      expectedError: new Error(
+        JSON.stringify({
+          errorMessage: new Errors.UnexpectedError().message,
+          errorType: 'api',
+          fieldName: null
+        })
+      )
     }
   ])(
     'should throw when request fails with status code $statusCode',
@@ -185,7 +230,7 @@ describe('SignupServices', () => {
         options: additionalDataPayloadMock.options
       })
 
-      expect(request).rejects.toBe(expectedError)
+      expect(request).rejects.toBe(expectedError.message)
     }
   )
 })
