@@ -89,6 +89,7 @@
                 <FieldDropdown
                   :options="listOfIntegrations"
                   :name="field.name"
+                  :isRequiredField="field.attrs.required"
                   :label="field.label"
                   placeholder="Select a scope"
                   :description="field.description"
