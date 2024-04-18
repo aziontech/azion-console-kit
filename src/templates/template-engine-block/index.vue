@@ -48,7 +48,7 @@
             v-if="formTools.errors[field.name]"
             class="p-error text-xs font-normal leading-tight"
           >
-            {{ formTools.errors[field.name] }}
+            {{ unescapeErrorMessage(formTools.errors[field.name]) }}
           </small>
         </div>
       </template>
@@ -154,7 +154,7 @@
                 v-if="formTools.errors[field.name]"
                 class="p-error text-xs font-normal leading-tight"
               >
-                {{ formTools.errors[field.name] }}
+                {{ unescapeErrorMessage(formTools.errors[field.name]) }}
               </small>
             </div>
           </div>
@@ -295,6 +295,14 @@
     })
   }
 
+  const escapeErrorMessage = (errorMessage) => {
+    return errorMessage.replaceAll('${', '#$')
+  }
+
+  const unescapeErrorMessage = (errorMessage) => {
+    return errorMessage.replaceAll('#$', '${')
+  }
+
   const renderInvalidClass = (containErrorInField) => {
     if (containErrorInField) return 'p-invalid'
     return ''
@@ -356,7 +364,7 @@
 
     if (element.validators) {
       element.validators.forEach((validator) => {
-        schema = schema.test(`valid-${element.name}`, validator.errorMessage, function (value) {
+        schema = schema.test(`valid-${element.name}`, escapeErrorMessage(validator.errorMessage), function (value) {
           const domainRegex = new RegExp(validator.regex)
           return domainRegex.test(value)
         })
