@@ -30,6 +30,9 @@ export const useAccountStore = defineStore({
     },
     ssoSignUpMethod(state) {
       return state.identifySignUpProvider
+    },
+    userId(state) {
+      return state.account?.user_id
     }
   },
   actions: {
