@@ -3,148 +3,236 @@
     class="w-full flex flex-col gap-8"
     @submit.prevent="submitForm"
   >
-    <div class="flex flex-col gap-2">
-      <label class="font-semibold text-sm">I'm a</label>
-      <div class="flex flex-col gap-3 mb-8">
-        <template v-if="!jobFunctionList.length">
-          <PrimeSkeleton
-            class="w-full h-14"
-            v-for="item in 5"
-            :key="item"
+    <div
+      class="flex flex-col gap-2"
+      v-if="additionalDataInfo"
+    >
+      <!-- Step 1: Use -->
+
+      <h4 class="font-semibold text-sm">{{ additionalDataInfo[0].key }}*</h4>
+      <div class="flex flex-wrap gap-3 mb-8">
+        <label
+          v-for="useData in additionalDataInfo[0].values"
+          :key="useData.value"
+          :for="useData.value"
+          class="flex items-center gap-2 p-4 border-1 surface-border rounded-md font-medium w-full md:w-fit"
+          :class="{ 'border-radio-card-active': use === useData.value }"
+          >{{ useData.value }}
+          <PrimeRadio
+            v-model="use"
+            name="use"
+            :value="useData.value"
+            :inputId="useData.value"
+            class="hidden"
+            @change="updateStep('use')"
           />
-        </template>
-        <template v-else>
-          <label
-            v-for="item in jobFunctionList"
-            :key="item.value"
-            class="w-full border-1 rounded-md surface-border font-medium flex align-items-center justify-between p-4 gap-2"
-            :class="{ 'border-radio-card-active': jobFunction === item.value }"
-            >{{ item.label }}
-            <PrimeRadio
-              v-model="jobFunction"
-              :value="item.value"
-            />
-          </label>
-        </template>
+        </label>
       </div>
-      <label class="font-semibold text-sm">What would you like to build with Azion?</label>
-      <div class="flex flex-wrap gap-3">
-        <template v-if="!jobFunctionList.length">
-          <PrimeSkeleton
-            class="w-full h-14"
-            v-for="item in 5"
-            :key="item"
-          />
-        </template>
-        <template v-else>
-          <label
-            v-for="item in projectTypeSelectionList"
-            :key="item.value"
-            class="w-full border-1 rounded-md surface-border font-medium flex align-items-center justify-between p-4 gap-2"
-            :class="{ 'border-radio-card-active': projectTypeSelection === item.value }"
-            >{{ item.label }}
-            <PrimeRadio
-              v-model="projectTypeSelection"
-              :value="item.value"
-            />
-          </label>
-        </template>
-      </div>
-      <div
-        class="flex flex-col gap-8"
-        v-if="isInternal"
+
+      <!-- Step 2: Role -->
+
+      <h4
+        class="font-semibold text-sm"
+        :class="[disabledClass(stepOptions.role)]"
       >
-        <PrimeSkeleton
-          class="w-full h-8"
-          v-if="!countriesList.length"
-        />
-        <div v-else>
-          <label class="font-semibold text-sm gap-2 flex flex-col"
-            >Company Name
+        {{ additionalDataInfo[1].key }}*
+      </h4>
+      <div
+        class="flex flex-wrap gap-3 mb-8"
+        :class="[disabledClass(stepOptions.role)]"
+      >
+        <label
+          v-for="roleData in additionalDataInfo[1].values"
+          :key="roleData.value"
+          :for="roleData.value"
+          class="flex items-center gap-2 p-4 border-1 surface-border rounded-md font-medium w-full md:w-fit"
+          :class="{ 'border-radio-card-active': role === roleData.value }"
+          >{{ roleData.value }}
+          <PrimeRadio
+            v-model="role"
+            name="role"
+            :value="roleData.value"
+            :inputId="roleData.value"
+            :disabled="isFieldDisabled(stepOptions.role)"
+            class="hidden"
+            @change="updateStep('role')"
+          />
+        </label>
+      </div>
+
+      <!-- Step 2: Role Description -->
+
+      <div
+        class="mb-8 w-full md:w-1/2"
+        v-if="showInputRoleField"
+      >
+        <div class="w-full flex flex-col gap-2">
+          <label
+            class="flex flex-col gap-3 font-semibold text-sm"
+            for="inputRole"
+          >
+            Describe your role*
             <PrimeInputText
-              placeholder="My company"
-              v-model="companyName"
-              type="text"
+              v-model="inputRole"
+              name="inputRole"
+              id="inputRole"
             />
           </label>
           <small
-            v-if="errors.companyName"
+            v-if="errors.inputRole"
             class="p-error text-xs font-normal leading-tight"
-            >{{ errors.companyName }}</small
           >
+            {{ errors.inputRole }}
+          </small>
         </div>
-        <PrimeSkeleton
-          class="w-full h-8"
-          v-if="!countriesList.length"
-        />
-        <div
-          v-else
-          class="animate-fadeIn"
-        >
-          <label class="font-semibold text-sm gap-2 flex flex-col"
-            >Company Size
-            <PrimeDropdown
-              appendTo="self"
-              placeholder="Select an option"
-              v-model="companySize"
-              :options="companySizeList"
-              optionLabel="label"
-              optionValue="value"
+      </div>
+
+      <!-- Step 3: Company Size -->
+
+      <h4
+        class="font-semibold text-sm"
+        :class="[disabledClass(stepOptions.companySize)]"
+        v-if="showCompanySizeField"
+      >
+        {{ additionalDataInfo[2].key }}*
+      </h4>
+      <div
+        class="flex flex-wrap gap-3 mb-8"
+        :class="[disabledClass(stepOptions.companySize)]"
+        v-if="showCompanySizeField"
+      >
+        <label
+          v-for="companySizeData in additionalDataInfo[2].values"
+          :key="companySizeData.value"
+          :for="companySizeData.value"
+          class="flex items-center gap-2 p-4 border-1 surface-border rounded-md font-medium w-full md:w-fit"
+          :class="{ 'border-radio-card-active': companySize === companySizeData.value }"
+          >{{ companySizeData.value }}
+          <PrimeRadio
+            v-model="companySize"
+            name="companySize"
+            :value="companySizeData.value"
+            :inputId="companySizeData.value"
+            :disabled="isFieldDisabled(stepOptions.companySize)"
+            class="hidden"
+            @change="updateStep('companySize')"
+          />
+        </label>
+      </div>
+
+      <!-- Step 4: Full Name -->
+
+      <div class="mb-8 w-full md:w-1/2">
+        <div class="w-full flex flex-col gap-2">
+          <label
+            class="flex flex-col gap-3 font-semibold text-sm"
+            :class="[disabledClass(stepOptions.fullName)]"
+            for="fullName"
+          >
+            {{ additionalDataInfo[3].key }}*
+            <PrimeInputText
+              v-model="fullName"
+              name="fullName"
+              id="fullName"
+              :disabled="isFieldDisabled(4)"
+              @input="updateStep('fullName')"
             />
           </label>
           <small
-            v-if="errors.companySize"
+            v-if="errors.fullName"
             class="p-error text-xs font-normal leading-tight"
-            >{{ errors.companySize }}</small
           >
+            {{ errors.fullName }}
+          </small>
         </div>
-        <PrimeSkeleton
-          class="w-full h-8"
-          v-if="!countriesList.length"
-        />
-        <div v-else>
-          <label class="font-semibold text-sm gap-2 flex flex-col"
-            >Country
-            <PrimeDropdown
-              appendTo="self"
-              placeholder="Select an option"
-              v-model="country"
-              :options="countriesList"
-              optionLabel="name"
-              optionValue="name"
-              filter
+      </div>
+
+      <!-- Step 3 : Company Website -->
+
+      <div
+        class="mb-8 w-full md:w-1/2"
+        v-if="showCompanyWebsiteField"
+      >
+        <div class="w-full flex flex-col gap-2">
+          <label
+            class="flex flex-col gap-3 font-semibold text-sm"
+            :class="[disabledClass(stepOptions.companySize)]"
+            for="companyWebsite"
+          >
+            {{ additionalDataInfo[4].key }}*
+            <PrimeInputText
+              v-model="companyWebsite"
+              name="companyWebsite"
+              id="companyWebsite"
+              :disabled="isFieldDisabled(stepOptions.companySize)"
             />
           </label>
           <small
-            v-if="errors.country"
+            v-if="errors.companyWebsite"
             class="p-error text-xs font-normal leading-tight"
-            >{{ errors.country }}</small
           >
+            {{ errors.companyWebsite }}
+          </small>
+        </div>
+      </div>
+
+      <!-- Step 5: Onboarding Session -->
+
+      <label
+        class="w-fit mb-8 flex flex-row-reverse gap-3 text-sm"
+        :class="[disabledClass(stepOptions.onboardingSession)]"
+        for="onboardingSession"
+      >
+        {{ additionalDataInfo[5].key }}*
+        <PrimeInputSwitch
+          v-model="onboardingSession"
+          name="onboardingSession"
+          id="onboardingSession"
+          :disabled="isFieldDisabled(stepOptions.onboardingSession)"
+        />
+      </label>
+    </div>
+
+    <!-- Empty state -->
+
+    <div
+      class="flex flex-col gap-2"
+      v-else
+    >
+      <div
+        v-for="item in 5"
+        :key="item"
+      >
+        <div class="w-full mb-8">
+          <PrimeSkeleton class="h-4 mb-4 w-2/3" />
+          <div class="flex flex-wrap gap-3">
+            <PrimeSkeleton class="h-14 w-full md:w-28" />
+            <PrimeSkeleton class="h-14 w-full md:w-28" />
+            <PrimeSkeleton class="h-14 w-full md:w-28" />
+          </div>
         </div>
       </div>
     </div>
-    <PrimeButton
-      label="Finish Signup"
-      type="submit"
-      :disabled="!meta.valid"
-      :loading="loading"
-    />
   </form>
 </template>
 
 <script setup>
-  import PrimeButton from 'primevue/button'
-  import PrimeDropdown from 'primevue/dropdown'
-  import PrimeInputText from 'primevue/inputtext'
   import PrimeRadio from 'primevue/radiobutton'
+  import PrimeInputSwitch from 'primevue/inputswitch'
+  import PrimeInputText from 'primevue/inputtext'
   import PrimeSkeleton from 'primevue/skeleton'
   import { useToast } from 'primevue/usetoast'
   import { useField, useForm } from 'vee-validate'
-  import { computed, onMounted, ref, inject } from 'vue'
+  import { onMounted, ref, inject, computed, watch } from 'vue'
   import { useRouter } from 'vue-router'
+  import { useAccountStore } from '@/stores/account'
   import * as yup from 'yup'
+
   /** @type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
+  const router = useRouter()
+  const toast = useToast()
+  const { userId } = useAccountStore()
 
   defineOptions({
     name: 'additional-data-form-block'
@@ -155,104 +243,176 @@
       type: Function,
       required: true
     },
-    listCountriesService: {
+    postAdditionalDataService: {
       type: Function,
       required: true
     },
-    putAdditionalDataService: {
+    patchFullnameService: {
       type: Function,
       required: true
     }
   })
 
-  const fetchAdditionalDataInfo = async () => {
-    const results = await props.listAdditionalDataInfoService()
-    const { companySizes, jobFunctions } = results
-    companySizeList.value = companySizes
-    jobFunctionList.value = jobFunctions
-  }
+  const currentStep = ref(1)
+  const additionalDataInfo = ref(null)
 
-  const fetchCountries = async () => {
-    const { countries } = await props.listCountriesService()
-    countriesList.value = countries
+  const fetchAdditionalDataInfo = async () => {
+    const response = await props.listAdditionalDataInfoService()
+
+    additionalDataInfo.value = response
   }
 
   onMounted(() => {
     fetchAdditionalDataInfo()
-    fetchCountries()
   })
-
-  const companySizeList = ref([])
-  const countriesList = ref([])
-  const jobFunctionList = ref([])
-  const projectTypeSelectionList = [
-    { label: 'Just a personal project', value: 'personal' },
-    { label: 'Internal project for my company', value: 'internal' },
-    { label: 'Multiple projects for other companies', value: 'multiple_project' },
-    { label: 'Other', value: 'other' }
-  ]
-
-  const typeToEnableCompanyFields = 'internal'
 
   const validationSchema = yup.object({
-    jobFunction: yup.string().required(),
-    projectTypeSelection: yup.string().required(),
-    companyName: yup.string().when('projectTypeSelection', {
-      is: typeToEnableCompanyFields,
-      then: () =>
-        yup
-          .string()
-          .max(50, 'Exceeded number of characters')
-          .required('Company Name is a required field.')
+    use: yup.string().required(),
+    role: yup.string().required(),
+    inputRole: yup
+      .string()
+      .trim()
+      .when('role', {
+        is: (val) => val === 'Other',
+        then: (schema) =>
+          schema
+            .max(255, 'Role Description must be less than 255 characters')
+            .required('Role Description is a required field')
+      }),
+    companySize: yup.string().when('use', {
+      is: (val) => val === 'Work',
+      then: (schema) => schema.required()
     }),
-    companySize: yup.string().when('projectTypeSelection', {
-      is: typeToEnableCompanyFields,
-      then: () => yup.string().required('Company Size is a required field.')
+    companyWebsite: yup.string().when('companySize', {
+      is: (val) => val && val !== 'Just me',
+      then: (schema) =>
+        schema
+          .url('Company Website must be a valid URL')
+          .max(255, 'Company Website must be less than 255 characters')
+          .required('Company Website is a required field')
     }),
-    country: yup.string().when('projectTypeSelection', {
-      is: typeToEnableCompanyFields,
-      then: () => yup.string().required('Country is a required field.')
-    })
+    fullName: yup
+      .string()
+      .trim()
+      .max(61, 'Full Name must be less than 61 characters')
+      .required('Full Name is a required field'),
+    onboardingSession: yup.boolean()
   })
 
-  const { values, meta, errors } = useForm({ validationSchema })
-
-  const isInternal = computed(() => {
-    return projectTypeSelection.value === typeToEnableCompanyFields
+  const { values, resetField, meta, errors } = useForm({
+    validationSchema,
+    initialValues: {
+      onboardingSession: true
+    }
   })
 
-  const { value: jobFunction } = useField('jobFunction')
-  const { value: projectTypeSelection } = useField('projectTypeSelection')
+  const { value: use } = useField('use')
+  const { value: role } = useField('role')
+  const { value: inputRole } = useField('inputRole')
   const { value: companySize } = useField('companySize')
-  const { value: country } = useField('country')
-  const { value: companyName } = useField('companyName')
+  const { value: companyWebsite } = useField('companyWebsite')
+  const { value: fullName } = useField('fullName')
+  const { value: onboardingSession } = useField('onboardingSession')
+
+  const stepOptions = {
+    use: 1,
+    role: 2,
+    companySize: 3,
+    fullName: 4,
+    onboardingSession: 5
+  }
+
+  const updateStep = (step) => {
+    const updateFromStep = {
+      use: () => (currentStep.value = stepOptions.role),
+      role: () => {
+        if (use.value === 'Work') {
+          currentStep.value = stepOptions.companySize
+        } else {
+          currentStep.value = stepOptions.fullName
+        }
+      },
+      companySize: () => (currentStep.value = stepOptions.fullName),
+      fullName: () => (currentStep.value = stepOptions.onboardingSession)
+    }
+
+    if (fullName.value) {
+      currentStep.value = stepOptions.onboardingSession
+      return
+    }
+
+    updateFromStep[step]()
+  }
+
+  const disabledClass = (step) => {
+    return currentStep.value < step ? 'p-disabled' : ''
+  }
+
+  const isFieldDisabled = (step) => {
+    return currentStep.value < step
+  }
+
+  const showInputRoleField = computed(() => {
+    return role.value === 'Other'
+  })
+
+  const showCompanySizeField = computed(() => {
+    return use.value === 'Work'
+  })
+
+  const showCompanyWebsiteField = computed(() => {
+    return companySize.value && companySize.value !== 'Just me'
+  })
 
   const loading = ref(false)
-
-  const router = useRouter()
-  const toast = useToast()
 
   const submitForm = async () => {
     loading.value = true
 
     try {
-      const form = { ...values }
-
-      if (!isInternal.value) {
-        delete form.companyName
-        delete form.companySize
-        delete form.country
+      const additionalDataPayload = {
+        ...values,
+        id: userId
       }
 
-      await props.putAdditionalDataService(form)
-      tracker.signUp.submittedAdditionalData()
+      const usersPayload = fullName.value
 
-      router.push({ name: 'home' })
+      const patchName = props.patchFullnameService(usersPayload)
+
+      const postAddData = props.postAdditionalDataService({
+        payload: additionalDataPayload,
+        options: additionalDataInfo.value
+      })
+
+      await patchName
+      await postAddData
+
+      tracker.signUp.submittedAdditionalData(values).track()
+
+      router.push({ name: 'home', query: { onboardingSession: 'true' } })
     } catch (err) {
-      toast.add({ life: 5000, severity: 'error', detail: err, summary: 'Error' })
-      tracker.signUp.failedSubmitAdditionalData().track()
+      const errors = JSON.parse(err)
+
+      toast.add({ life: 5000, severity: 'error', detail: errors.errorMessage, summary: 'Error' })
+
+      tracker.signUp.failedSubmitAdditionalData(errors).track()
     } finally {
       loading.value = false
     }
   }
+
+  watch(use, (value) => {
+    if (value !== 'Work') {
+      resetField('companySize')
+      if (role.value) {
+        updateStep('role')
+      }
+    }
+  })
+
+  defineExpose({
+    submitForm,
+    loading,
+    meta
+  })
 </script>

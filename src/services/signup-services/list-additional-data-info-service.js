@@ -1,7 +1,6 @@
 import { AxiosHttpClientAdapter } from '../axios/AxiosHttpClientAdapter'
 import * as Errors from '@/services/axios/errors'
 import { makeAdditionalDataBaseUrl } from './make-additional-data-base-url'
-import { parseSnakeToCamel } from '@/helpers'
 
 export const listAdditionalDataInfoService = async () => {
   let httpResponse = await AxiosHttpClientAdapter.request({
@@ -12,6 +11,22 @@ export const listAdditionalDataInfoService = async () => {
   return parseHttpResponse(httpResponse)
 }
 
+const adapt = ([...response]) => {
+  /* 
+    this adaptation is required to handle the missing fullname field in the v4 api
+    and use progressive indexes in components when rendering the ui.
+  */
+
+  const indexToInsertFullName = 3
+
+  // this id does not affect the use in the app. It is high just to avoid possible colisions
+  const fullNameField = { id: 999, key: 'Full Name', required: true, show: true }
+
+  response.splice(indexToInsertFullName, 0, fullNameField)
+
+  return response
+}
+
 /**
  * Parses the HTTP response and handles different status codes.
  *
@@ -19,11 +34,10 @@ export const listAdditionalDataInfoService = async () => {
  * @return {Object} httpResponse.body - The response body.
  * @throws {Error} If there is an error with the response.
  */
-
 export const parseHttpResponse = (httpResponse) => {
   switch (httpResponse.statusCode) {
     case 200:
-      return parseSnakeToCamel(httpResponse.body)
+      return adapt(httpResponse.body.results)
     case 400:
       throw new Errors.InvalidApiRequestError().message
     case 401:

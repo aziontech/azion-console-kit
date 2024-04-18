@@ -39,6 +39,10 @@ export default {
       width: {
         slide: '384px'
       },
+      height: {
+        // subtract 60px for footer and 56px for header
+        'visible-area': 'calc(100vh - 60px - 56px)'
+      },
       fontFamily: {
         robotomono: ['Roboto Mono']
       },

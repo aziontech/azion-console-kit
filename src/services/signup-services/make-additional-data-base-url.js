@@ -1,4 +1,4 @@
 export const makeAdditionalDataBaseUrl = () => {
-  const version = 'v3'
-  return `${version}/iam/additional_data`
+  const version = 'v4'
+  return `${version}/iam/additional_data/v2`
 }
