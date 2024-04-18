@@ -43,12 +43,6 @@ export default {
         // subtract 60px for footer and 56px for header
         'visible-area': 'calc(100vh - 60px - 56px)'
       },
-      maxHeight: {
-        'visible-area': 'calc(100vh - 60px - 56px)'
-      },
-      minHeight: {
-        'visible-area': 'calc(100vh - 120px)'
-      },
       fontFamily: {
         robotomono: ['Roboto Mono']
       },
