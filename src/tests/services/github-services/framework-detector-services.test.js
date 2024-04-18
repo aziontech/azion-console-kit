@@ -30,7 +30,7 @@ const fixtures = {
         }
       }
     }
-}
+  }
 }
 
 vi.mock('@/services/axios/makeGithubApi', () => {
