@@ -205,7 +205,7 @@
   import { useAccountStore } from '@/stores/account'
   import { useCreateModalStore } from '@/stores/create-modal'
   import ContentBlock from '@/templates/content-block'
-  import { computed, defineAsyncComponent, inject, onMounted, ref } from 'vue'
+  import { computed, inject, onMounted, ref } from 'vue'
   import PrimeButton from 'primevue/button'
   import { useForm } from 'vee-validate'
   import * as yup from 'yup'
@@ -213,6 +213,7 @@
   import { useRoute, useRouter } from 'vue-router'
   import { useToast } from 'primevue/usetoast'
   import { useDialog } from 'primevue/usedialog'
+  import DialogOnboardingScheduling from '@/templates/dialogs-block/dialog-onboarding-scheduling.vue'
 
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
@@ -237,10 +238,6 @@
       required: true
     }
   })
-
-  const dialogOnboardingScheduling = defineAsyncComponent(() =>
-    import('@/templates/dialogs-block/dialog-onboarding-scheduling.vue')
-  )
 
   const router = useRouter()
   const route = useRoute()
@@ -346,7 +343,7 @@
 
   const showOnboardingSchedulingDialog = () => {
     if (route.query.onboardingSession) {
-      dialog.open(dialogOnboardingScheduling)
+      dialog.open(DialogOnboardingScheduling)
     }
   }
 
