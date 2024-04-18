@@ -1,7 +1,7 @@
 import * as SignupService from '@/services/signup-services'
 import { listSocialIdpsService } from '@/services/social-idps-services'
-// import { inject } from 'vue'
-// import { useAccountStore } from '@/stores/account'
+import { inject } from 'vue'
+import { useAccountStore } from '@/stores/account'
 import SignupView from '@/views/Signup/SignupView.vue'
 
 /** @type {import('vue-router').RouteRecordRaw} */
@@ -36,25 +36,25 @@ export const signupRoutes = {
       },
       meta: {
         hideNavigation: true
+      },
+      beforeEnter: (__, ___, next) => {
+        const accountStore = useAccountStore()
+        const isFirstLogin = accountStore.isFirstLogin
+
+        if (isFirstLogin && accountStore.ssoSignUpMethod) {
+          /** @type {import('@/plugins/adapters/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
+          const tracker = inject('tracker')
+          const signUpMethod = { method: accountStore.ssoSignUpMethod }
+
+          tracker.signUp.userSignedUp(signUpMethod).signUp.userAuthorizedSso(signUpMethod)
+        }
+
+        if (isFirstLogin) {
+          next()
+        } else {
+          next({ name: 'home' })
+        }
       }
-      // beforeEnter: (__, ___, next) => {
-      //   const accountStore = useAccountStore()
-      //   const isFirstLogin = accountStore.isFirstLogin
-
-      //   if (isFirstLogin && accountStore.ssoSignUpMethod) {
-      //     /** @type {import('@/plugins/adapters/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
-      //     const tracker = inject('tracker')
-      //     const signUpMethod = { method: accountStore.ssoSignUpMethod }
-
-      //     tracker.signUp.userSignedUp(signUpMethod).signUp.userAuthorizedSso(signUpMethod)
-      //   }
-
-      //   if (isFirstLogin) {
-      //     next()
-      //   } else {
-      //     next({ name: 'home' })
-      //   }
-      // }
     }
   ]
 }
