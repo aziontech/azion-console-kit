@@ -26,7 +26,7 @@
     }
   })
 
-  const disabledPurgeType = computed(() => {
+  const isDisabled = computed(() => {
     return layer.value === 'tiered_cache'
   })
 </script>
@@ -118,7 +118,7 @@
               <RadioButton
                 inputId="inputId1"
                 name="type"
-                :disabled="disabledPurgeType"
+                :disabled="isDisabled"
                 value="cachekey"
                 v-model="purgeType"
               />
@@ -140,7 +140,7 @@
               <RadioButton
                 inputId="inputId2"
                 name="type"
-                :disabled="disabledPurgeType"
+                :disabled="isDisabled"
                 value="url"
                 v-model="purgeType"
               />
@@ -164,7 +164,7 @@
               <RadioButton
                 inputId="inputId3"
                 name="type"
-                :disabled="disabledPurgeType"
+                :disabled="isDisabled"
                 value="wildcard"
                 v-model="purgeType"
               />
