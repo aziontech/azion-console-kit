@@ -89,8 +89,9 @@
                 <FieldDropdown
                   :options="listOfIntegrations"
                   :name="field.name"
+                  :isRequiredField="field.attrs.required"
                   :label="field.label"
-                  :placeholder="field.placeholder"
+                  placeholder="Select a scope"
                   :description="field.description"
                   :inputClass="renderInvalidClass(formTools.errors[`${field.name}`])"
                   optionLabel="label"
