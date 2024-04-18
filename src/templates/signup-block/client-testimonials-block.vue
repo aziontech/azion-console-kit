@@ -14,7 +14,7 @@
       <template #item="slotProps">
         <div class="flex flex-col gap-2">
           <div class="text-xl md:text-3xl font-medium text-center">
-            {{ slotProps.data.testimonial }}
+            <q> {{ slotProps.data.testimonial }} </q>
           </div>
           <div class="text-color-secondary text-center">
             {{ slotProps.data.name }}, {{ slotProps.data.position }}
@@ -36,10 +36,9 @@
 
   const listTestimonials = ref([
     {
-      name: 'John Doe',
-      position: 'CEO',
-      testimonial:
-        '”Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis eu ex felis. In semper, eros vel gravida congue, eros ante commodo.”',
+      name: 'Gustavo Franco',
+      position: 'Senior Director of Engineering',
+      testimonial: `VTEX builds ultra-low latency, serverless applications with Azion, enabling thousands of clients to boost their online sales.`,
       logo: h(Vtex)
     }
   ])

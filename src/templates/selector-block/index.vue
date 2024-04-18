@@ -6,7 +6,8 @@
   >
     <template #content>
       <label
-        class="flex gap-3 p-4"
+        class="flex gap-3"
+        :class="classStateRootItem"
         :for="props.nameId"
       >
         <div v-show="!hideSelector">
@@ -15,7 +16,7 @@
         <div>
           <div class="flex gap-3 items-center font-medium">
             <span
-              v-if="isLabel"
+              v-if="!props.isCard"
               class="text-color text-sm font-medium leading-5"
             >
               {{ props.title }}
@@ -61,10 +62,6 @@
     title: {
       type: String
     },
-    isLabel: {
-      type: Boolean,
-      default: false
-    },
     subtitle: {
       type: String
     },
@@ -104,6 +101,11 @@
     event.preventDefault()
     event.stopPropagation()
   }
+
+  const classStateRootItem = computed(() => ({
+    'p-4': props.isCard,
+    'p-2': !props.isCard
+  }))
 
   const classStateRoot = computed(() => ({
     'shadow-none': !props.isCard,

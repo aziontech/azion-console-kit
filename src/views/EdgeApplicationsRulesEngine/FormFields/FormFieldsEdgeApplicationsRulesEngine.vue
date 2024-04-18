@@ -23,6 +23,10 @@
       type: Boolean,
       required: true
     },
+    isImageOptimization: {
+      required: true,
+      type: Boolean
+    },
     listEdgeApplicationFunctionsService: {
       type: Function,
       required: true
@@ -74,6 +78,11 @@
     return ' - Requires Application Accelerator'
   })
 
+  const showLabelImageOptimization = computed(() => {
+    if (props.isImageOptimization) return ''
+    return ' - Requires Image Processor'
+  })
+
   const behaviorsRequestOptions = ref([
     {
       label: `Add Request Cookie ${showLabelApplicationAccelerator.value}`,
@@ -106,7 +115,11 @@
       requires: true
     },
     { label: 'No Content (204)', value: 'no_content', requires: false },
-    { label: 'Optimize Images', value: 'optimize_images', requires: false },
+    {
+      label: `Optimize Images ${showLabelImageOptimization.value}`,
+      value: 'optimize_images',
+      requires: true
+    },
     {
       label: 'Redirect HTTP to HTTPS - requires Delivery Protocol with HTTPS',
       value: 'redirect_http_to_https',
@@ -332,15 +345,16 @@
    * @returns {Array} The updated array of behavior options with the 'requires' property set accordingly.
    */
   const updateOptionRequires = (options) => {
+    const conditionsMap = {
+      redirect_http_to_https: !props.isDeliveryProtocolHttps,
+      optimize_images: !props.isImageOptimization
+    }
+
     return options.map((option) => {
       if (option.requires) {
-        return {
-          ...option,
-          requires:
-            option.value === 'redirect_http_to_https'
-              ? !props.isDeliveryProtocolHttps
-              : !props.isEnableApplicationAccelerator
-        }
+        const requires = conditionsMap[option.value] || !props.isEnableApplicationAccelerator
+
+        return { ...option, requires }
       }
       return option
     })

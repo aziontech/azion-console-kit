@@ -1,7 +1,7 @@
 <script setup>
   import FieldRadioBlock from '@/templates/form-fields-inputs/fieldRadioBlock'
   import { useField } from 'vee-validate'
-  import { computed, toRefs } from 'vue'
+  import { computed, ref, toRefs } from 'vue'
   import PrimeDivider from 'primevue/divider'
 
   defineOptions({ name: 'FieldGroupRadio' })
@@ -35,10 +35,6 @@
       type: Boolean,
       default: false
     },
-    divider: {
-      type: Boolean,
-      default: false
-    },
     nameField: {
       type: String,
       required: true
@@ -47,6 +43,7 @@
 
   const { nameField } = toRefs(props)
   const { errorMessage } = useField(nameField)
+  const pickListSize = ref(props.options.length - 1)
 
   const classStateRoot = computed(() => ({
     'p-disabled': props.disabled
@@ -55,8 +52,12 @@
   const classListSelector = computed(() => ({
     'flex-wrap': props.auto,
     'flex-col': !props.auto,
-    'gap-3': !props.divider
+    'gap-3': props.isCard
   }))
+
+  const showDivider = (position) => {
+    return position < pickListSize.value && !props.isCard
+  }
 </script>
 
 <template>
@@ -85,8 +86,8 @@
           </template>
         </FieldRadioBlock>
         <PrimeDivider
-          v-if="props.divider"
-          class="my-3"
+          v-if="showDivider(index)"
+          class="my-2"
         />
       </template>
     </div>
@@ -99,7 +100,8 @@
     <small
       v-if="errorMessage"
       class="p-error text-xs font-normal leading-tight"
-      >{{ errorMessage }}</small
     >
+      {{ errorMessage }}
+    </small>
   </div>
 </template>
