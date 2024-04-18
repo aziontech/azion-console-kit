@@ -22,6 +22,39 @@ const getNameInfo = (fullName) => {
   return nameInfo
 }
 
+const parseErrors = (statusCode) => {
+  const errorMap = {
+    400: {
+      errorMessage: new Errors.InvalidApiRequestError().message,
+      errorType: 'field',
+      fieldName: 'name'
+    },
+    403: {
+      errorMessage: new Errors.PermissionError().message,
+      errorType: 'api',
+      fieldName: null
+    },
+    404: {
+      errorMessage: new Errors.NotFoundError().message,
+      errorType: 'api',
+      fieldName: null
+    },
+    500: {
+      errorMessage: new Errors.InternalServerError().message,
+      errorType: 'api',
+      fieldName: null
+    }
+  }
+
+  const defaultError = {
+    errorMessage: new Errors.UnexpectedError().message,
+    errorType: 'api',
+    fieldName: null
+  }
+
+  return JSON.stringify(errorMap[statusCode] || defaultError)
+}
+
 /**
  * @param {Object} httpResponse - The HTTP response object.
  * @param {Object} httpResponse.body - The response body.
@@ -34,14 +67,14 @@ const parseHttpResponse = (httpResponse) => {
     case 200:
       return null
     case 400:
-      throw new Errors.InvalidApiRequestError().message
+      throw new Error(parseErrors(httpResponse.statusCode)).message
     case 403:
-      throw new Errors.PermissionError().message
+      throw new Error(parseErrors(httpResponse.statusCode)).message
     case 404:
-      throw new Errors.NotFoundError().message
+      throw new Error(parseErrors(httpResponse.statusCode)).message
     case 500:
-      throw new Errors.InternalServerError().message
+      throw new Error(parseErrors(httpResponse.statusCode)).message
     default:
-      throw new Errors.UnexpectedError().message
+      throw new Error(parseErrors(httpResponse.statusCode)).message
   }
 }

@@ -84,23 +84,53 @@ describe('SignupServices', () => {
   it.each([
     {
       statusCode: 400,
-      expectedError: new Errors.InvalidApiRequestError().message
+      expectedError: new Error(
+        JSON.stringify({
+          errorMessage: new Errors.InvalidApiRequestError().message,
+          errorType: 'field',
+          fieldName: 'name'
+        })
+      )
     },
     {
       statusCode: 403,
-      expectedError: new Errors.PermissionError().message
+      expectedError: new Error(
+        JSON.stringify({
+          errorMessage: new Errors.PermissionError().message,
+          errorType: 'api',
+          fieldName: null
+        })
+      )
     },
     {
       statusCode: 404,
-      expectedError: new Errors.NotFoundError().message
+      expectedError: new Error(
+        JSON.stringify({
+          errorMessage: new Errors.NotFoundError().message,
+          errorType: 'api',
+          fieldName: null
+        })
+      )
     },
     {
       statusCode: 500,
-      expectedError: new Errors.InternalServerError().message
+      expectedError: new Error(
+        JSON.stringify({
+          errorMessage: new Errors.InternalServerError().message,
+          errorType: 'api',
+          fieldName: null
+        })
+      )
     },
     {
       statusCode: 'unmappedStatusCode',
-      expectedError: new Errors.UnexpectedError().message
+      expectedError: new Error(
+        JSON.stringify({
+          errorMessage: new Errors.UnexpectedError().message,
+          errorType: 'api',
+          fieldName: null
+        })
+      )
     }
   ])(
     'should throw when request fails with status code $statusCode',
@@ -112,7 +142,7 @@ describe('SignupServices', () => {
 
       const request = sut(fixtures.basePayloadMock)
 
-      expect(request).rejects.toBe(expectedError)
+      expect(request).rejects.toBe(expectedError.message)
     }
   )
 })
