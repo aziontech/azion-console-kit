@@ -4,8 +4,8 @@
   import CreateFormBlock from '@/templates/create-form-block'
   import PageHeadingBlock from '@/templates/page-heading-block'
   import { useLoadingStore } from '@/stores/loading'
-  import { useSolutionStore } from '@/stores/solution-create'
-  import { useRouter } from 'vue-router'
+  import { ref } from 'vue'
+  import { useRoute } from 'vue-router'
   import * as yup from 'yup'
   import FormFieldsImportStatic from './FormFields/FormFieldsImportStatic.vue'
   import { useToast } from 'primevue/usetoast'
@@ -13,7 +13,7 @@
 
   const loadingStore = useLoadingStore()
   const toast = useToast()
-  const route = useRouter()
+  const route = useRoute()
 
   const props = defineProps({
     listPlatformsService: {
@@ -40,10 +40,6 @@
       type: Function,
       required: true
     },
-    createScriptRunnerExecutionService: {
-      type: Function,
-      required: true
-    },
     frameworkDetectorService: {
       type: Function,
       required: true
@@ -53,6 +49,10 @@
       required: true
     },
     instantiateTemplateService: {
+      type: Function,
+      required: true
+    },
+    loadSolutionService: {
       type: Function,
       required: true
     }
@@ -98,7 +98,7 @@
     return parsedVariables ?? []
   }
 
-  const solutionStore = useSolutionStore()
+  const templateId = ref(null)
   const handleExecuteScriptRunner = async (formValues) => {
     try {
       await Promise.all(
@@ -141,8 +141,7 @@
         ...inputVariables
       ]
 
-      const templateId = solutionStore.solution.solutionId
-      return props.instantiateTemplateService(templateId, inputSchema)
+      return props.instantiateTemplateService(templateId.value, inputSchema)
     } catch (error) {
       toast.add({
         closable: true,
@@ -160,14 +159,7 @@
         solution: route.params.solution
       })
 
-      const solutionTrackerData = {
-        isv: solution.vendor.slug,
-        version: solution.version,
-        versionId: solution.latestVersionInstallTemplate,
-        solutionId: solution.id,
-        templateName: solution.name
-      }
-      solutionStore.setSolution(solutionTrackerData)
+      templateId.value = solution.referenceId
     } catch (error) {
       toast.add({
         closable: true,

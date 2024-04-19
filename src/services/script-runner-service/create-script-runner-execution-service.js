@@ -1,6 +1,6 @@
 import { AxiosHttpClientAdapter } from '../axios/AxiosHttpClientAdapter'
 import { makeScriptRunnerBaseUrl } from './make-script-runner-base-url'
-import { getScriptRunnerImage, getScriptRunnerGithubEnv } from '@/helpers'
+import { getScriptRunnerImage } from '@/helpers'
 import * as Errors from '@/services/axios/errors'
 
 export const createScriptRunnerExecutionService = async (payload) => {
@@ -29,7 +29,7 @@ const parseVariables = (variables) => {
 
 const adapt = (payload) => {
   const parsedVariables = parseVariables(payload.newVariables)
-  const parsedFormData = getScriptRunnerGithubEnv(payload)
+  const parsedFormData = {}
   const scriptRunnerImage = getScriptRunnerImage()
 
   return {

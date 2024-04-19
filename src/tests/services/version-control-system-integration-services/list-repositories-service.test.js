@@ -20,7 +20,7 @@ const makeSut = () => {
   }
 }
 
-describe('ListRepositoriesService', () => {
+describe('VersionControlSystemService', () => {
   it('should call api with correct uuid', async () => {
     const requestSpy = vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
       statusCode: 200,
