@@ -1,14 +1,10 @@
 import * as Errors from '@/services/axios/errors'
+import axios from 'axios'
 import { AxiosHttpClientAdapter } from '../axios/AxiosHttpClientAdapter'
 import { makeEdgeFunctionsBaseUrl } from './make-edge-functions-base-url'
 
-/*  
-  Cache strategy is used to prevent making multiple calls to the same endpoint under the same conditions.
-*/
-
-let cache
-
-let prevParams = {}
+const cancelRequest = axios.CancelToken
+const source = cancelRequest.source()
 
 export const searchEdgeFunctionsService = async ({
   orderBy = 'name',
@@ -16,24 +12,18 @@ export const searchEdgeFunctionsService = async ({
   page = 1,
   pageSize = 200
 } = {}) => {
-  const params = { orderBy, sort, page, pageSize }
-  const isSameParams = JSON.stringify(params) === JSON.stringify(prevParams)
+  source.cancel()
 
-  if (!isSameParams || !cache) {
-    prevParams = params
-    const searchParams = makeSearchParams(params)
+  const searchParams = makeSearchParams({ orderBy, sort, page, pageSize })
+  let httpResponse = await AxiosHttpClientAdapter.request({
+    url: `${makeEdgeFunctionsBaseUrl()}?${searchParams.toString()}`,
+    method: 'GET',
+    cancelToken: source.token
+  })
 
-    let httpResponse = await AxiosHttpClientAdapter.request({
-      url: `${makeEdgeFunctionsBaseUrl()}?${searchParams.toString()}`,
-      method: 'GET'
-    })
+  httpResponse = adapt(httpResponse)
 
-    httpResponse = adapt(httpResponse)
-
-    return parseHttpResponse(httpResponse)
-  }
-
-  return cache
+  return parseHttpResponse(httpResponse)
 }
 
 const adapt = (httpResponse) => {
@@ -67,11 +57,8 @@ const makeSearchParams = ({ orderBy, sort, page, pageSize }) => {
  */
 
 const parseHttpResponse = (httpResponse) => {
-  cache = null
-
   switch (httpResponse.statusCode) {
     case 200:
-      cache = httpResponse.body
       return httpResponse.body
     case 400:
       throw new Errors.InvalidApiRequestError().message

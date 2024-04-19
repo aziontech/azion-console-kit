@@ -1,6 +1,5 @@
 import checkAccountStatus from '@/helpers/account-expired'
 import { getAccountInfoService, getUserInfoService } from '@/services/account-services'
-import { loadAccountJobRoleService } from '@/services/account-settings-services'
 import { logoutService } from '@/services/auth-services'
 import { useAccountStore } from '@/stores/account'
 import { useHelpCenterStore } from '@/stores/help-center'
@@ -34,10 +33,9 @@ export default async function beforeEachRoute(to, __, next) {
 
   if (!accountStore.hasActiveUserId && !to.meta.isPublic) {
     try {
-      const [accountInfo, userInfo, accountJobRole] = await Promise.all([
+      const [accountInfo, userInfo] = await Promise.all([
         getAccountInfoService(),
-        getUserInfoService(),
-        loadAccountJobRoleService()
+        getUserInfoService()
       ])
 
       checkAccountStatus(accountInfo.status)
@@ -50,7 +48,6 @@ export default async function beforeEachRoute(to, __, next) {
       accountInfo.email = userInfo.results.email
       accountInfo.user_id = userInfo.results.id
       accountInfo.colorTheme = theme || fallbackTheme
-      accountInfo.jobRole = accountJobRole.jobRole
 
       accountStore.setAccountData(accountInfo)
       return next()

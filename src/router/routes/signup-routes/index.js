@@ -15,13 +15,22 @@ export const signupRoutes = {
       component: SignupView,
       props: {
         signupService: SignupService.signupService,
-        listSocialIdpsService: listSocialIdpsService,
+        listSocialIdpsService: listSocialIdpsService
+      },
+      meta: {
+        hideNavigation: true,
+        isPublic: true
+      }
+    },
+    {
+      path: 'activation',
+      name: 'activation',
+      component: () => import('@views/Signup/SignupActivationView.vue'),
+      props: {
         resendEmailService: SignupService.resendEmailService
       },
       meta: {
         hideNavigation: true,
-        showDocumentButton: true,
-        hideLinksFooter: true,
         isPublic: true
       }
     },
@@ -31,8 +40,8 @@ export const signupRoutes = {
       component: () => import('@views/Signup/AdditionalDataView.vue'),
       props: {
         listAdditionalDataInfoService: SignupService.listAdditionalDataInfoService,
-        postAdditionalDataService: SignupService.postAdditionalDataService,
-        patchFullnameService: SignupService.patchFullnameService
+        listCountriesService: SignupService.listCountriesService,
+        putAdditionalDataService: SignupService.putAdditionalDataService
       },
       meta: {
         hideNavigation: true

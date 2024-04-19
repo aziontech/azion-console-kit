@@ -5,8 +5,6 @@
 
   import { useRouter } from 'vue-router'
 
-  const emit = defineEmits('click-to-create')
-
   const router = useRouter()
 
   const props = defineProps({
@@ -22,7 +20,6 @@
     props.documentationService()
   }
   function navigateToCreatePage() {
-    emit('click-to-create')
     router.push(props.createPagePath)
   }
 </script>

@@ -2,37 +2,33 @@
 <template>
   <!-- Footer -->
   <footer
-    class="z-10 w-full px-3 md:px-8 py-6 md:py-3 border-t m-0 surface-section surface-border gap-6 place-items-stretch items-center"
-    :class="dynamicClassesByRouteMeta.footer"
+    class="z-10 w-full px-3 md:px-8 py-6 md:py-3 border-t m-0 surface-border gap-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:lg:grid-cols-3 place-items-stretch items-center"
   >
     <span
       class="w-full text-center truncate place-items-start md:text-left text-sm text-normal text-color-secondary"
       >© Azion Technologies, Inc or its affiliates. All rights reserved.</span
     >
-    <div
-      class="w-full flex flex-col md:flex-row gap-3 justify-end xl:justify-center items-center"
-      v-if="!route.meta.hideLinksFooter"
-    >
+    <div class="w-full flex flex-col md:flex-row gap-3 justify-end xl:justify-center items-center">
       <div class="flex gap-1">
         <PrimeButton
           label="About"
           link
-          @click="openAzionSite"
+          @click="openAbout"
         />
         <PrimeButton
           label="Blog"
           link
-          @click="openAzionBlog"
+          @click="openBlog"
         />
         <PrimeButton
           label="Legal"
           link
-          @click="azionPrivacyPolicyWindowOpener"
+          @click="openLegal"
         />
         <PrimeButton
           label="Docs"
           link
-          @click="openDocumentation"
+          @click="openDocs"
         />
       </div>
       <!-- Social Buttons -->
@@ -42,33 +38,29 @@
           outlined
           size="small"
           v-tooltip.top="{ value: 'Github', showDelay: 200 }"
-          @click="openAzionGithub"
+          @click="openGitHub"
         />
         <PrimeButton
           icon="pi pi-discord"
           outlined
           size="small"
           v-tooltip.top="{ value: 'Discord', showDelay: 200 }"
-          @click="openAzionDiscord"
+          @click="openDiscord"
         />
         <PrimeButton
           icon="ai ai-x"
           outlined
           size="small"
           v-tooltip.top="{ value: 'X', showDelay: 200 }"
-          @click="openAzionX"
+          @click="openX"
         />
       </div>
     </div>
     <div
-      class="w-full flex flex-wrap gap-2 items-center"
-      :class="dynamicClassesByRouteMeta.optionButton"
+      class="w-full flex flex-wrap gap-2 items-center justify-center md:justify-start xl:justify-end"
     >
       <!-- System Status -->
-      <SystemStatusBarBlock
-        v-tooltip.top="{ value: 'System status', showDelay: 200 }"
-        v-if="!route.meta.hideLinksFooter"
-      />
+      <SystemStatusBarBlock v-tooltip.top="{ value: 'System status', showDelay: 200 }" />
       <div v-tooltip.top="{ value: 'Theme mode', showDelay: 200 }">
         <Dropdown
           appendTo="self"
@@ -109,52 +101,61 @@
   </footer>
 </template>
 
-<script setup>
-  import {
-    azionPrivacyPolicyWindowOpener,
-    openAzionBlog,
-    openAzionDiscord,
-    openAzionGithub,
-    openAzionSite,
-    openAzionX,
-    openDocumentation
-  } from '@/helpers'
-
-  import { ref, computed } from 'vue'
+<script>
   import { useAccountStore } from '@/stores/account'
   import SystemStatusBarBlock from '@templates/system-status-bar-block'
+  import { mapActions, mapState } from 'pinia'
   import PrimeButton from 'primevue/button'
   import Dropdown from 'primevue/dropdown'
-  import { useRoute } from 'vue-router'
-  const accountStore = useAccountStore()
-  const { setTheme } = accountStore
-  const route = useRoute()
 
-  defineOptions({
-    name: 'footer-block'
-  })
-
-  const themeOptions = ref([
-    { name: 'Light', value: 'light', icon: 'pi pi-sun' },
-    { name: 'Dark', value: 'dark', icon: 'pi pi-moon' },
-    { name: 'System', value: 'system', icon: 'pi pi-desktop' }
-  ])
-
-  const currentTheme = computed(() => accountStore.currentTheme)
-  const selectedTheme = computed(() =>
-    themeOptions.value.find((option) => option.value === currentTheme.value)
-  )
-
-  const dynamicClassesByRouteMeta = computed(() => ({
-    footer: route.meta.hideLinksFooter
-      ? 'flex max-md:flex-col'
-      : 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:lg:grid-cols-3',
-    optionButton: route.meta.hideLinksFooter
-      ? 'md:justify-end justify-center'
-      : 'justify-center md:justify-start xl:justify-end'
-  }))
-
-  const selectTheme = (theme) => {
-    setTheme(theme)
+  export default {
+    name: 'FooterTemplate',
+    components: {
+      PrimeButton,
+      Dropdown,
+      SystemStatusBarBlock
+    },
+    data() {
+      return {
+        themeOptions: [
+          { name: 'Light', value: 'light', icon: 'pi pi-sun' },
+          { name: 'Dark', value: 'dark', icon: 'pi pi-moon' },
+          { name: 'System', value: 'system', icon: 'pi pi-desktop' }
+        ]
+      }
+    },
+    computed: {
+      ...mapState(useAccountStore, ['currentTheme']),
+      selectedTheme() {
+        return this.themeOptions.find((option) => option.value === this.currentTheme)
+      }
+    },
+    methods: {
+      ...mapActions(useAccountStore, ['setTheme']),
+      selectTheme(theme) {
+        this.setTheme(theme)
+      },
+      openAbout() {
+        window.open('https://www.azion.com/', '_blank')
+      },
+      openBlog() {
+        window.open('https://www.azion.com/en/blog/', '_blank')
+      },
+      openLegal() {
+        window.open('https://www.azion.com/en/documentation/agreements/privacy-policy/', '_blank')
+      },
+      openDocs() {
+        window.open('https://www.azion.com/en/documentation/', '_blank')
+      },
+      openDiscord() {
+        window.open('https://discord.com/invite/Yp9N7RMVZy', '_blank')
+      },
+      openGitHub() {
+        window.open('https://github.com/aziontech/azion-platform-kit', '_blank')
+      },
+      openX() {
+        window.open('https://x.com/aziontech', '_blank')
+      }
+    }
   }
 </script>

@@ -18,14 +18,10 @@ const fixtures = {
     enableQueryStringSort: false,
     enableCachingForPost: false,
     enableCachingForOptions: false,
-    enableStaleCache: true,
     cacheByCookies: 'mockCacheByCookies',
     cookieNames: 'cookie1\ncookie2\ncookie3',
     adaptiveDeliveryAction: 'mockAdaptiveDeliveryAction',
-    deviceGroup: [{ id: '123' }, { id: 456 }],
-    l2CachingEnabled: false,
-    isSliceL2CachingEnabled: false,
-    isSliceEdgeCachingEnabled: false
+    deviceGroup: [{ id: '123' }, { id: 456 }]
   }
 }
 const makeSut = () => {
@@ -60,14 +56,11 @@ describe('EdgeApplicationCacheSettingsServices', () => {
         enable_query_string_sort: fixtures.cacheSettingsMock.enableQueryStringSort,
         enable_caching_for_post: fixtures.cacheSettingsMock.enableCachingForPost,
         enable_caching_for_options: fixtures.cacheSettingsMock.enableCachingForOptions,
-        enable_stale_cache: fixtures.cacheSettingsMock.enableStaleCache,
+        enable_stale_cache: true,
         cache_by_cookies: fixtures.cacheSettingsMock.cacheByCookies,
         cookie_names: ['cookie1', 'cookie2', 'cookie3'],
         adaptive_delivery_action: fixtures.cacheSettingsMock.adaptiveDeliveryAction,
-        device_group: ['123', 456],
-        l2_caching_enabled: fixtures.cacheSettingsMock.l2CachingEnabled,
-        is_slice_l2_caching_enabled: fixtures.cacheSettingsMock.isSliceL2CachingEnabled,
-        is_slice_edge_caching_enabled: fixtures.cacheSettingsMock.isSliceEdgeCachingEnabled
+        device_group: ['123', 456]
       }
     })
   })
