@@ -1,5 +1,5 @@
 export const handleTrackerError = (error) => {
-  if(!error.includes(':')) {
+  if (!error.includes(':')) {
     return {
       fieldName: '',
       message: error

@@ -46,7 +46,6 @@
     wafEnabled: false
   }
 
-
   const handleCreateEdgeFirewall = () => {
     tracker.product.productCreated({
       productName: 'Edge Firewall'
@@ -64,7 +63,6 @@
       })
       .track()
   }
-
 </script>
 
 <template>
