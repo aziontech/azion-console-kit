@@ -7,46 +7,9 @@
   import InputNumber from 'primevue/inputnumber'
   import InputSwitch from 'primevue/inputswitch'
   import RadioButton from 'primevue/radiobutton'
-  import Dropdown from 'primevue/dropdown'
-  import CheckboxPrime from 'primevue/checkbox'
-  import { CDN_MAXIMUM_TTL_MAX_VALUE, CDN_MAXIMUM_TTL_MIN_VALUE } from '@/utils/constants'
-
   import TextArea from 'primevue/textarea'
   import { useField, useFieldArray } from 'vee-validate'
   import { computed, ref, watch } from 'vue'
-
-  const emit = defineEmits(['l2-caching-enabled'])
-
-  const props = defineProps({
-    isEnableApplicationAccelerator: {
-      required: true,
-      type: Boolean
-    },
-    showTieredCache: {
-      type: Boolean,
-      required: true
-    }
-  })
-
-  const TIERED_CACHE_REGION = ref([
-    {
-      label: 'na-united-states',
-      value: 'na-united-states'
-    },
-    {
-      label: 'sa-brazil',
-      value: 'sa-brazil'
-    }
-  ])
-
-  const cdnCacheSettingsMaximumTtlMinimumValue = computed(() => {
-    if (l2CachingEnabled.value || props.isEnableApplicationAccelerator) {
-      return CDN_MAXIMUM_TTL_MIN_VALUE
-    }
-    return CDN_MAXIMUM_TTL_MAX_VALUE
-  })
-
-  const MAX_VALUE_NUMBER_INPUT = 31536000
 
   const CACHE_SETTINGS_OPTIONS = ref([
     {
@@ -117,7 +80,6 @@
     useField('cdnCacheSettingsMaximumTtl')
   const { value: sliceConfigurationEnabled } = useField('sliceConfigurationEnabled')
   const { value: sliceConfigurationRange } = useField('sliceConfigurationRange')
-  const { value: isSliceL2CachingEnabled } = useField('isSliceL2CachingEnabled')
   const { value: cacheByQueryString } = useField('cacheByQueryString')
   const { value: queryStringFields, errorMessage: queryStringFieldsError } =
     useField('queryStringFields')
@@ -126,9 +88,6 @@
   const { value: enableCachingForPost } = useField('enableCachingForPost')
   const { value: enableCachingForOptions } = useField('enableCachingForOptions')
   const { value: enableStaleCache } = useField('enableStaleCache')
-  const { value: l2CachingEnabled } = useField('l2CachingEnabled')
-  const { value: l2Region } = useField('l2Region')
-  const { value: isSliceEdgeCachingEnabled } = useField('isSliceEdgeCachingEnabled')
 
   const { value: cacheByCookies } = useField('cacheByCookies')
   const { value: cookieNames, errorMessage: cookieNamesError } = useField('cookieNames')
@@ -138,20 +97,6 @@
     push: addDeviceGroup,
     remove: removeDeviceGroup
   } = useFieldArray('deviceGroup')
-
-  const disabledQueryStringOptions = (option) => {
-    const isDisabled =
-      (option.value === 'whitelist' || option.value === 'blacklist') &&
-      !props.isEnableApplicationAccelerator
-    return isDisabled
-  }
-
-  const disabledCookiesOptions = (option) => {
-    const isDisabled =
-      (option.value === 'whitelist' || option.value === 'blacklist' || option.value === 'all') &&
-      !props.isEnableApplicationAccelerator
-    return isDisabled
-  }
 
   const showMaxTtl = computed(() => browserCacheSettings.value === 'override')
   const showCdnMaxTtl = computed(() => cdnCacheSettings.value === 'override')
@@ -168,31 +113,9 @@
     return adaptiveDeliveryAction.value === 'whitelist'
   })
 
-  const cacheSettingsOptions = computed(() => {
-    return CACHE_SETTINGS_OPTIONS.value.map((item) => {
-      return {
-        ...item,
-        disabledItem: item.value === 'honor' && l2CachingEnabled.value
-      }
-    })
-  })
-
   watch(adaptiveDeliveryAction, (value) => {
     if (value === 'whitelist' && deviceGroup.value.length === 0) {
       addDeviceGroup({ id: '' })
-    }
-  })
-
-  watch(l2CachingEnabled, (value) => {
-    if (value) {
-      cdnCacheSettings.value = 'override'
-      isSliceEdgeCachingEnabled.value = true
-      sliceConfigurationEnabled.value = true
-      emit('l2-caching-enabled', value)
-    } else {
-      isSliceL2CachingEnabled.value = false
-      isSliceEdgeCachingEnabled.value = false
-      emit('l2-caching-enabled', value)
     }
   })
 </script>
@@ -279,14 +202,13 @@
         <div class="flex flex-col gap-4">
           <div
             class="flex no-wrap gap-2 items-center"
-            v-for="cdnCacheSettingsOption in cacheSettingsOptions"
+            v-for="cdnCacheSettingsOption in CACHE_SETTINGS_OPTIONS"
             :key="cdnCacheSettingsOption.value"
           >
             <RadioButton
               v-model="cdnCacheSettings"
               :inputId="`cdnOption-${cdnCacheSettingsOption.value}`"
               name="cdnCacheSettings"
-              :disabled="cdnCacheSettingsOption.disabledItem"
               :value="cdnCacheSettingsOption.value"
             />
             <label
@@ -313,8 +235,8 @@
           showButtons
           v-model="cdnCacheSettingsMaximumTtl"
           id="cdnCacheSettingsMaximumTtl"
-          :min="cdnCacheSettingsMaximumTtlMinimumValue"
-          :max="MAX_VALUE_NUMBER_INPUT"
+          :min="60"
+          :max="31536000"
           :step="1"
           :class="{ 'p-invalid': cdnCacheSettingsMaximumTtlError }"
         />
@@ -326,48 +248,6 @@
           v-if="cdnCacheSettingsMaximumTtlError"
           class="p-error text-xs font-normal leading-tight"
           >{{ cdnCacheSettingsMaximumTtlError }}</small
-        >
-      </div>
-      <div
-        class="flex gap-2 w-full items-start"
-        v-if="props.showTieredCache"
-      >
-        <InputSwitch
-          v-model="l2CachingEnabled"
-          inputId="l2CachingEnabled"
-        />
-        <label
-          for="l2CachingEnabled"
-          class="flex flex-col items-start gap-1"
-        >
-          <span class="text-color text-sm font-normal leading-5">Tiered Cache </span>
-          <span class="text-sm text-color-secondary font-normal leading-5">
-            Enable Tiered Cache if you want to reduce the traffic to your origin and increase
-            performance and availability.
-          </span>
-        </label>
-      </div>
-      <div
-        class="flex flex-col w-full sm:max-w-xs gap-2"
-        v-if="props.showTieredCache"
-      >
-        <label
-          for="method"
-          class="text-color text-sm font-medium leading-5"
-          >Tiered Cache Region</label
-        >
-        <Dropdown
-          appendTo="self"
-          inputId="originId"
-          v-model="l2Region"
-          :disabled="!l2CachingEnabled"
-          :options="TIERED_CACHE_REGION"
-          optionLabel="label"
-          option-value="value"
-          placeholder="Select an Tiered Cache Region"
-        />
-        <small class="text-xs text-color-secondary font-normal leading-5"
-          >Choose an Tiered Cache Region suitable for your application.</small
         >
       </div>
     </template>
@@ -392,42 +272,6 @@
         </label>
       </div>
 
-      <div class="flex flex-col w-full sm:max-w-3xl gap-2">
-        <label class="text-color text-sm font-medium leading-5">Layer</label>
-        <div class="flex flex-col gap-4">
-          <div class="flex w-full gap-2 items-start">
-            <CheckboxPrime
-              v-model="isSliceEdgeCachingEnabled"
-              name="isSliceEdgeCachingEnabled"
-              binary
-              :disabled="l2CachingEnabled"
-            />
-            <label
-              for="isSliceEdgeCachingEnabled"
-              class="flex flex-col items-start gap-1"
-            >
-              <span class="text-color text-sm font-normal leading-5">Edge Cache</span>
-            </label>
-          </div>
-          <div
-            class="flex w-full gap-2 items-start"
-            v-if="props.showTieredCache"
-          >
-            <CheckboxPrime
-              v-model="isSliceL2CachingEnabled"
-              name="isSliceL2CachingEnabled"
-              binary
-              :disabled="!l2CachingEnabled"
-            />
-            <label
-              for="isSliceL2CachingEnabled"
-              class="flex flex-col items-start gap-1"
-            >
-              <span class="text-color text-sm font-normal leading-5">Tiered Cache</span>
-            </label>
-          </div>
-        </div>
-      </div>
       <div
         v-if="showSliceConfigurationRange"
         class="flex flex-col sm:max-w-xs w-full gap-2"
@@ -475,7 +319,6 @@
           >
             <RadioButton
               v-model="cacheByQueryString"
-              :disabled="disabledQueryStringOptions(queryStringOption)"
               :inputId="queryStringOption.value"
               name="cacheByQueryString"
               :value="queryStringOption.value"
@@ -515,85 +358,66 @@
       <div class="flex flex-col w-full sm:max-w-3xl gap-2">
         <label class="text-color text-sm font-medium leading-5">Enable Settings</label>
         <div class="flex flex-col gap-4">
-          <div
-            class="flex flex-col gap-4"
-            v-if="props.isEnableApplicationAccelerator"
-          >
-            <div class="flex w-full gap-2 items-start">
-              <InputSwitch
-                v-model="enableQueryStringSort"
-                inputId="enableQueryStringSort"
-              />
-              <label
-                for="enableQueryStringSort"
-                class="flex flex-col items-start gap-1"
-              >
-                <span class="text-color text-sm font-normal leading-5">Query String Sort </span>
-                <span class="text-sm text-color-secondary font-normal leading-5">
-                  Consider objects with the same query strings, regardless of the order of the
-                  fields, as the same cached file.
-                </span>
-              </label>
-            </div>
-
-            <Divider />
-          </div>
-          <div
-            class="flex flex-col gap-4"
-            v-if="props.isEnableApplicationAccelerator"
-          >
-            <div class="flex w-full gap-2 items-start">
-              <InputSwitch
-                v-model="enableCachingForPost"
-                inputId="enableCachingForPost"
-              />
-              <label
-                for="enableCachingForPost"
-                class="flex flex-col items-start gap-1"
-              >
-                <span class="text-color text-sm font-normal leading-5"
-                  >Enable Caching for POST
-                </span>
-                <span class="text-sm text-color-secondary font-normal leading-5">
-                  Allow POST requests to be cached. The POST method will be included in the cache
-                  key.
-                </span>
-              </label>
-            </div>
-
-            <Divider />
-          </div>
-          <div
-            class="flex flex-col gap-4"
-            v-if="props.isEnableApplicationAccelerator"
-          >
-            <div>
-              <div class="flex w-full gap-2 items-start">
-                <InputSwitch
-                  v-model="enableCachingForOptions"
-                  inputId="enableCachingForOptions"
-                />
-                <label
-                  for="enableCachingForOptions"
-                  class="flex flex-col items-start gap-1"
-                >
-                  <span class="text-color text-sm font-normal leading-5"
-                    >Enable Caching for OPTIONS
-                  </span>
-                  <span class="text-sm text-color-secondary font-normal leading-5">
-                    Allow OPTIONS requests to be cached. The OPTIONS method will be included in the
-                    cache key.
-                  </span>
-                </label>
-              </div>
-            </div>
-            <Divider />
+          <div class="flex w-full gap-2 items-start">
+            <InputSwitch
+              v-model="enableQueryStringSort"
+              inputId="enableQueryStringSort"
+            />
+            <label
+              for="enableQueryStringSort"
+              class="flex flex-col items-start gap-1"
+            >
+              <span class="text-color text-sm font-normal leading-5">Query String Sort </span>
+              <span class="text-sm text-color-secondary font-normal leading-5">
+                Consider objects with the same query strings, regardless of the order of the fields,
+                as the same cached file.
+              </span>
+            </label>
           </div>
 
+          <Divider />
+          <div class="flex w-full gap-2 items-start">
+            <InputSwitch
+              v-model="enableCachingForPost"
+              inputId="enableCachingForPost"
+            />
+            <label
+              for="enableCachingForPost"
+              class="flex flex-col items-start gap-1"
+            >
+              <span class="text-color text-sm font-normal leading-5">Enable Caching for POST </span>
+              <span class="text-sm text-color-secondary font-normal leading-5">
+                Allow POST requests to be cached. The POST method will be included in the cache key.
+              </span>
+            </label>
+          </div>
+
+          <Divider />
+          <div class="flex w-full gap-2 items-start">
+            <InputSwitch
+              v-model="enableCachingForOptions"
+              inputId="enableCachingForOptions"
+            />
+            <label
+              for="enableCachingForOptions"
+              class="flex flex-col items-start gap-1"
+            >
+              <span class="text-color text-sm font-normal leading-5"
+                >Enable Caching for OPTIONS
+              </span>
+              <span class="text-sm text-color-secondary font-normal leading-5">
+                Allow OPTIONS requests to be cached. The OPTIONS method will be included in the
+                cache key.
+              </span>
+            </label>
+          </div>
+
+          <Divider />
           <div class="flex w-full gap-2 items-start">
             <InputSwitch
               v-model="enableStaleCache"
               inputId="enableStaleCache"
+              disabled
             />
             <label
               for="enableStaleCache"
@@ -617,7 +441,6 @@
             :key="cookiesOption.value"
           >
             <RadioButton
-              :disabled="disabledCookiesOptions(cookiesOption)"
               v-model="cacheByCookies"
               :inputId="cookiesOption.value"
               name="cacheByCookies"

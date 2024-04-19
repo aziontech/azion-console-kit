@@ -1,5 +1,4 @@
 <script setup>
-  import DynamicDialog from 'primevue/dynamicdialog'
   import { computed, inject, watch } from 'vue'
   import { RouterView, useRoute } from 'vue-router'
   import ShellBlock from '@/templates/shell-block'
@@ -8,7 +7,6 @@
   import { themeSelect } from '@/helpers'
   import '@modules/real-time-metrics/helpers/convert-date'
   import '@/helpers/store-handler'
-
   /** @type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
 
@@ -41,7 +39,6 @@
 
 <template>
   <div class="flex flex-col">
-    <DynamicDialog />
     <ShellBlock
       v-slot:default="{ customClass }"
       :isLogged="isLogged"

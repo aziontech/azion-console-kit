@@ -91,7 +91,7 @@
         >
         <vue-monaco-editor
           v-model:value="args"
-          language="json"
+          language="javascript"
           :theme="theme"
           :options="editorOptions"
           class="min-h-[200px] overflow-clip surface-border border rounded-md"
