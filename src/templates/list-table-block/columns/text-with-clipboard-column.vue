@@ -2,10 +2,10 @@
   <div class="gap-2 flex items-center">
     <expand-text-column :value="content"></expand-text-column>
     <PrimeButton
-      outlined
+      text
       icon="pi pi-copy"
       @click.stop="handleCopyContent"
-      v-tooltip.top="{ value: 'Copy to clipboard', showDelay: 200 }"
+      v-tooltip.bottom="{ value: 'Copy to clipboard', showDelay: 200 }"
     />
   </div>
 </template>

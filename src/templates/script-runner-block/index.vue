@@ -127,10 +127,6 @@
         const positionY = this.$refs.runner.scrollHeight
         this.$refs.runner.scrollTo(0, positionY)
       }
-    },
-
-    beforeUnmount() {
-      clearInterval(this.polling)
     }
   }
 </script>

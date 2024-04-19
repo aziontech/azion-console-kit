@@ -52,18 +52,8 @@ const adapt = (httpResponse) => {
     }
   })
 
-  const keepSameOrder = 0
-  const putItAfter = 1
-  const putIfBefore = -1
-
-  const sortParsedRulesEgine = parsedRulesEgine.sort((currentItem, nextItem) => {
-    if (currentItem.name === 'Default Rule') return putIfBefore
-    if (nextItem.name === 'Default Rule') return putItAfter
-    return keepSameOrder
-  })
-
   return {
-    body: sortParsedRulesEgine,
+    body: parsedRulesEgine,
     statusCode: httpResponse.statusCode
   }
 }

@@ -7,25 +7,17 @@ import {
   UnexpectedError
 } from '@/services/axios/errors'
 import { createDigitalCertificatesService } from '@/services/digital-certificates-services'
+createDigitalCertificatesService
 import { describe, expect, it, vi } from 'vitest'
 
-const basePayloadMock = {
-  digitalCertificateName: 'MyWebsiteCertificate',
-  certificateType: 'SSL/TLS',
-  certificate:
-    '-----BEGIN CERTIFICATE-----\nMIIE... (certificate content) ...\n-----END CERTIFICATE-----',
-  privateKey:
-    '-----BEGIN PRIVATE KEY-----\nMIIE... (private key content) ...\n-----END PRIVATE KEY-----'
-}
-
 const fixture = {
-  payloadMock: { ...basePayloadMock },
-  payloadMockWithoutPrivateKey: { ...basePayloadMock, privateKey: '' },
-  payloadMockWithoutCertificate: { ...basePayloadMock, certificate: '' },
-  payloadMockWithoutCertificateAndPrivateKey: {
-    ...basePayloadMock,
-    certificate: '',
-    privateKey: ''
+  payloadMock: {
+    digitalCertificateName: 'MyWebsiteCertificate',
+    certificateType: 'SSL/TLS',
+    certificate:
+      '-----BEGIN CERTIFICATE-----\nMIIE... (certificate content) ...\n-----END CERTIFICATE-----',
+    privateKey:
+      '-----BEGIN PRIVATE KEY-----\nMIIE... (private key content) ...\n-----END PRIVATE KEY-----'
   },
   requestBodyMock: {
     name: 'MyWebsiteCertificate',
@@ -34,22 +26,6 @@ const fixture = {
       '-----BEGIN CERTIFICATE-----\nMIIE... (certificate content) ...\n-----END CERTIFICATE-----',
     private_key:
       '-----BEGIN PRIVATE KEY-----\nMIIE... (private key content) ...\n-----END PRIVATE KEY-----'
-  },
-  requestBodyMockWithoutPrivateKey: {
-    name: 'MyWebsiteCertificate',
-    certificate_type: 'SSL/TLS',
-    certificate:
-      '-----BEGIN CERTIFICATE-----\nMIIE... (certificate content) ...\n-----END CERTIFICATE-----'
-  },
-  requestBodyMockWithoutCertificate: {
-    name: 'MyWebsiteCertificate',
-    certificate_type: 'SSL/TLS',
-    private_key:
-      '-----BEGIN PRIVATE KEY-----\nMIIE... (private key content) ...\n-----END PRIVATE KEY-----'
-  },
-  requestBodyMockWithoutCertificateAndPrivateKey: {
-    name: 'MyWebsiteCertificate',
-    certificate_type: 'SSL/TLS'
   },
   errorMock: {
     error: ['Error Message']
@@ -88,69 +64,6 @@ describe('DigitalCertificatesServices', () => {
     expect(result).toEqual({
       feedback: 'Your digital certificate has been created!',
       urlToEditView: `/digital-certificates/edit/1`
-    })
-  })
-
-  it('should not send certificate and private key when neither is provided', async () => {
-    const requestSpy = vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
-      statusCode: 201,
-      body: {
-        results: {
-          id: 1
-        }
-      }
-    })
-
-    const { sut } = makeSut()
-    const version = 'v3'
-    await sut(fixture.payloadMockWithoutCertificateAndPrivateKey)
-
-    expect(requestSpy).toHaveBeenCalledWith({
-      method: 'POST',
-      url: `${version}/digital_certificates`,
-      body: fixture.requestBodyMockWithoutCertificateAndPrivateKey
-    })
-  })
-
-  it('should not send certificate when key is not provided', async () => {
-    const requestSpy = vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
-      statusCode: 201,
-      body: {
-        results: {
-          id: 1
-        }
-      }
-    })
-
-    const { sut } = makeSut()
-    const version = 'v3'
-    await sut(fixture.payloadMockWithoutCertificate)
-
-    expect(requestSpy).toHaveBeenCalledWith({
-      method: 'POST',
-      url: `${version}/digital_certificates`,
-      body: fixture.requestBodyMockWithoutCertificate
-    })
-  })
-
-  it('should not send private key when key is not provided', async () => {
-    const requestSpy = vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
-      statusCode: 201,
-      body: {
-        results: {
-          id: 1
-        }
-      }
-    })
-
-    const { sut } = makeSut()
-    const version = 'v3'
-    await sut(fixture.payloadMockWithoutPrivateKey)
-
-    expect(requestSpy).toHaveBeenCalledWith({
-      method: 'POST',
-      url: `${version}/digital_certificates`,
-      body: fixture.requestBodyMockWithoutPrivateKey
     })
   })
 

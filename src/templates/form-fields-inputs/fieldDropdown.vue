@@ -48,10 +48,6 @@
       type: Boolean,
       default: false
     },
-    isRequiredField: {
-      type: Boolean,
-      default: false
-    },
     enableWorkaroundLabelToDisabledOptions: {
       type: Boolean,
       default: false
@@ -59,14 +55,10 @@
     disabled: {
       type: Boolean,
       default: false
-    },
-    filter: {
-      type: Boolean,
-      default: false
     }
   })
 
-  const emit = defineEmits(['onBlur', 'onChange', 'onSelectOption'])
+  const emit = defineEmits(['onBlur', 'onChange'])
 
   const name = toRef(props, 'name')
 
@@ -79,15 +71,7 @@
   }
 
   const emitChange = () => {
-    const selectedOption = props.options.find(
-      (option) => option[props.optionValue] === inputValue.value
-    )
-
     emit('onChange', inputValue.value)
-
-    if (selectedOption) {
-      emit('onSelectOption', selectedOption)
-    }
   }
 
   /**
@@ -108,17 +92,13 @@
   /**
    * end of primevue workaround
    */
-
-  const labelSufix = computed(() => {
-    return props.isRequiredField ? '*' : ''
-  })
 </script>
 
 <template>
   <label
     :for="props.name"
-    class="text-color text-base font-medium leading-5"
-    >{{ props.label }} {{ labelSufix }}</label
+    class="text-color text-sm font-medium leading-5"
+    >{{ props.label }}</label
   >
   <Dropdown
     appendTo="self"
@@ -128,7 +108,6 @@
     :options="props.options"
     :optionLabel="props.optionLabel"
     :optionDisabled="props.optionDisabled"
-    :filter="props.filter"
     :optionValue="props.optionValue"
     :placeholder="props.placeholder"
     @change="emitChange"
@@ -143,10 +122,6 @@
       <span>
         {{ getLabelBySelectedValue(slotProps.value) }}
       </span>
-    </template>
-
-    <template #footer>
-      <slot name="footer" />
     </template>
   </Dropdown>
 

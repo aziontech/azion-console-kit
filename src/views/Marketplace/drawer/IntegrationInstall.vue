@@ -309,25 +309,23 @@
           </FormHorizontal>
 
           <template v-if="edgeApplication">
-            <form autocomplete="off">
-              <TemplateEngineBlock
-                :getTemplateService="getTemplateService"
-                :instantiateTemplateService="instantiateTemplateService"
-                :templateId="solution.latestVersionInstallTemplate"
-                :hiddenFields="hiddenFields"
-                :freezeLoading="freezeLoading"
-                :isDrawer="true"
-                actionBarId="#action-bar-integration"
-                @instantiate="handleLaunchSolution"
-                @loading="handleLoading"
-                @cancel="handleCancel"
-              />
+            <TemplateEngineBlock
+              :getTemplateService="getTemplateService"
+              :instantiateTemplateService="instantiateTemplateService"
+              :templateId="solution.latestVersionInstallTemplate"
+              :hiddenFields="hiddenFields"
+              :freezeLoading="freezeLoading"
+              :isDrawer="true"
+              actionBarId="#action-bar-integration"
+              @instantiate="handleLaunchSolution"
+              @loading="handleLoading"
+              @cancel="handleCancel"
+            />
 
-              <PermissionsFieldset
-                :permissions="solution.permission"
-                :windowOpen="props.windowOpen"
-              />
-            </form>
+            <PermissionsFieldset
+              :permissions="solution.permission"
+              :windowOpen="props.windowOpen"
+            />
           </template>
         </form>
       </div>
