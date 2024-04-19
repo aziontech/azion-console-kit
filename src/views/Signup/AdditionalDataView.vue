@@ -6,7 +6,7 @@
       <div
         class="flex flex-col items-center justify-start gap-16 px-20 md:mt-10 md:w-4/5 md:sticky md:top-0"
       >
-        <PrimeSkeleton class="w-full h-72" />
+        <div class="w-full h-72" />
         <div class="w-full max-w-md flex flex-col items-center text-center gap-4">
           <h1 class="text-3xl font-medium">Personalize Your Experience</h1>
           <p class="text-xl font-normal text-color-secondary">
@@ -48,7 +48,6 @@
   import AdditionalDataFormBlock from '@/templates/signup-block/additional-data-form-block'
   import ActionBar from '@/templates/action-bar-block'
   import PrimeButton from 'primevue/button'
-  import PrimeSkeleton from 'primevue/skeleton'
   import { computed, ref } from 'vue'
 
   const additionalDataRef = ref(null)
