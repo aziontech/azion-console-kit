@@ -17,7 +17,7 @@
       content: { class: 'p-0' }
     }"
   >
-  <!-- Mobile Menu Navigation -->
+    <!-- Mobile Menu Navigation -->
     <PrimeMenu
       :model="profileMenuItems"
       :pt="{
@@ -109,7 +109,7 @@
   </Sidebar>
 
   <PrimeMenu
-    style="position: fixed;"
+    style="position: fixed"
     :model="profileMenuItems"
     :popup="true"
     ref="profile"
