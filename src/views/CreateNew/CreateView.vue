@@ -24,10 +24,11 @@
       </div>
       <PageHeadingBlock
         :pageTitle="solution.name"
+        :description="solution.headline"
         v-if="!isLoading"
       />
       <div
-        class="flex flex-col sm:flex-row gap-4 lg:items-center"
+        class="flex flex-col sm:flex-row gap-4 sm:gap-6 lg:items-center"
         v-if="!isLoading"
       >
         <div class="flex flex-col sm:flex-row gap-4 sm:items-center">
@@ -66,26 +67,32 @@
             </div>
           </div>
         </div>
-        <div class="flex flex-col sm:flex-row ml-0 sm:ml-auto">
-          <PrimeButton
-            label="More details"
-            outlined
-            @click="openDetails"
-          />
-        </div>
+        <PrimeButton
+          label="More details"
+          severity="secondary"
+          @click="openDetails"
+        />
       </div>
     </template>
     <template #content>
       <FormLoading v-if="isLoading" />
-      <TemplateEngineBlock
+      <form
+        autocomplete="off"
         v-else
-        @cancel="handleCancel"
-        @submitClick="handleSubmitClick"
-        @instantiate="handleInstantiate"
-        :getTemplateService="props.getTemplateService"
-        :instantiateTemplateService="props.instantiateTemplateService"
-        :templateId="solution.referenceId"
-      />
+      >
+        <TemplateEngineBlock
+          :postCallbackUrlService="props.postCallbackUrlService"
+          :listIntegrationsService="props.listIntegrationsService"
+          :listPlatformsService="props.listPlatformsService"
+          @cancel="handleCancel"
+          @submitClick="handleSubmitClick"
+          @instantiate="handleInstantiate"
+          :getTemplateService="props.getTemplateService"
+          :instantiateTemplateService="props.instantiateTemplateService"
+          :templateId="solution.referenceId"
+        />
+      </form>
+
       <PrimeDialog
         :draggable="false"
         modal
@@ -189,9 +196,9 @@
             <div class="flex gap-3">
               <div class="flex gap-1">
                 <span class="text-xs font-medium text-color-primary">By</span>
-                <span class="text-xs font-medium text-color-secondary">{{
-                  solution.vendor.name
-                }}</span>
+                <span class="text-xs font-medium text-color-secondary">
+                  {{ solution.vendor.name }}</span
+                >
               </div>
               <div class="flex gap-1">
                 <span class="text-xs font-medium text-color-primary">Version</span>
@@ -232,7 +239,7 @@
   import ContentBlock from '@/templates/content-block'
   import PageHeadingBlock from '@/templates/page-heading-block'
   import TemplateEngineBlock from '@/templates/template-engine-block'
-  import FormLoading from '@/templates/template-engine-block/FormLoading'
+  import FormLoading from '@/templates/template-engine-block/form-loading.vue'
   import PrimeButton from 'primevue/button'
   import PrimeDialog from 'primevue/dialog'
   import Sidebar from 'primevue/sidebar'
@@ -255,6 +262,18 @@
 
   const props = defineProps({
     getTemplateService: {
+      type: Function,
+      required: true
+    },
+    listPlatformsService: {
+      type: Function,
+      required: true
+    },
+    postCallbackUrlService: {
+      type: Function,
+      required: true
+    },
+    listIntegrationsService: {
       type: Function,
       required: true
     },

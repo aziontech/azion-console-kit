@@ -1,14 +1,8 @@
 <template>
   <div
     class="flex-col gap-6 sm:gap-8 flex"
-    v-if="showSocialIdps"
+    v-if="showIdps"
   >
-    <Divider
-      align="center"
-      v-if="direction === 'top-to-bottom'"
-    >
-      <p>or</p>
-    </Divider>
     <div class="flex flex-col gap-4 animate-fadeIn">
       <template v-if="showSkeleton">
         <Skeleton
@@ -33,12 +27,6 @@
         />
       </template>
     </div>
-    <Divider
-      align="center"
-      v-if="direction === 'bottom-to-top'"
-    >
-      <p>or</p>
-    </Divider>
   </div>
 </template>
 
@@ -46,29 +34,23 @@
   import { useAccountStore } from '@/stores/account'
   import { useLoadingStore } from '@/stores/loading'
   import PrimeButton from 'primevue/button'
-  import Divider from 'primevue/divider'
   import Skeleton from 'primevue/skeleton'
   import { useToast } from 'primevue/usetoast'
-  import { computed, onMounted, ref } from 'vue'
+  import { computed, onMounted, ref, inject } from 'vue'
 
   defineOptions({ name: 'social-idps-block' })
+  const emit = defineEmits(['showSocialIdps'])
+
+  const tracker = inject('tracker')
 
   const props = defineProps({
     socialIdpsService: {
       type: Function,
       required: true
-    },
-    direction: {
-      type: String,
-      required: true,
-      validator: (value) => {
-        return ['top-to-bottom', 'bottom-to-top'].includes(value)
-      }
     }
   })
 
   const idps = ref([])
-  const showSocialIdps = ref(true)
   const submittedIdp = ref(null)
 
   const showSkeleton = computed(() => idps.value.length === 0)
@@ -78,7 +60,7 @@
   })
 
   const toast = useToast()
-
+  const showIdps = ref(true)
   const loadSocialIdps = async () => {
     try {
       idps.value = await props.socialIdpsService()
@@ -89,9 +71,8 @@
         summary: error
       })
     } finally {
-      if (idps.value.length === 0) {
-        showSocialIdps.value = false
-      }
+      showIdps.value = idps.value.length > 0
+      emit('showSocialIdps', showIdps.value)
     }
   }
 
@@ -119,5 +100,6 @@
 
     accountStore.setSsoSignUpMethod(idp.slug)
     window.location.href = idp.loginUrl
+    tracker.signUp.userClickedSignedUp({ method: idp.slug }).track()
   }
 </script>

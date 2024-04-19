@@ -1,48 +1,64 @@
-import { describe, expect, it, vi } from 'vitest'
+import { loadAccountJobRoleService } from '@/services/account-settings-services'
 import { AxiosHttpClientAdapter } from '@/services/axios/AxiosHttpClientAdapter'
 import * as Errors from '@/services/axios/errors'
-import { putAdditionalDataService } from '@/services/signup-services'
-
-const additionalDataPayloadMock = {
-  project_type_selection: 'type1',
-  company_name: 'Test Company',
-  company_size: '1-10',
-  country: '1'
-}
+import { describe, expect, it, vi } from 'vitest'
 
 const makeSut = () => {
-  const sut = putAdditionalDataService
+  const sut = loadAccountJobRoleService
 
   return {
     sut
   }
 }
 
-describe('SignupServices', () => {
-  it('should call API with correct params', async () => {
+describe('AccountSettingsServices', () => {
+  it('should call the API service with correct params', async () => {
     const requestSpy = vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
-      statusCode: 200
+      statusCode: 200,
+      body: {
+        data: {}
+      }
     })
     const { sut } = makeSut()
 
-    await sut(additionalDataPayloadMock)
+    await sut()
 
     expect(requestSpy).toHaveBeenCalledWith({
-      url: 'account/info',
-      method: 'PUT',
-      body: additionalDataPayloadMock
+      method: 'GET',
+      url: 'v4/iam/account'
     })
   })
 
-  it('should not return a feedback message on successfully sent', async () => {
+  it('returns a valid job role on success request', async () => {
     vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
-      statusCode: 200
+      statusCode: 200,
+      body: {
+        data: {
+          job_function: 'software-developer'
+        }
+      }
     })
     const { sut } = makeSut()
 
-    const req = await sut(additionalDataPayloadMock)
+    const result = await sut()
 
-    expect(req).toBeNull()
+    expect(result).toEqual({ jobRole: 'software-developer' })
+  })
+
+  it('returns correct job role on invalid and legacy roles with successfully request', async () => {
+    vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
+      statusCode: 200,
+      body: {
+        data: {
+          job_function: 'invalid-job-role'
+        }
+      }
+    })
+    const { sut } = makeSut()
+
+    const result = await sut()
+
+    expect(result).toEqual({ jobRole: 'other' })
   })
 
   it.each([
@@ -70,11 +86,12 @@ describe('SignupServices', () => {
     'should throw when request fails with status code $statusCode',
     async ({ statusCode, expectedError }) => {
       vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
-        statusCode
+        statusCode,
+        body: { data: { job_function: 'stub-job-role' } }
       })
       const { sut } = makeSut()
 
-      const request = sut(additionalDataPayloadMock)
+      const request = sut()
 
       expect(request).rejects.toBe(expectedError)
     }

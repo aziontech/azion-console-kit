@@ -51,6 +51,10 @@
       required: true,
       type: Boolean
     },
+    isImageOptimization: {
+      required: true,
+      type: Boolean
+    },
     listEdgeApplicationFunctionsService: {
       required: true,
       type: Function
@@ -62,6 +66,9 @@
     listOriginsService: {
       required: true,
       type: Function
+    },
+    hideApplicationAcceleratorInDescription: {
+      type: Boolean
     }
   })
 
@@ -174,6 +181,7 @@
     ref="drawerRulesEngineRef"
     :isEnableApplicationAccelerator="props.isEnableApplicationAccelerator"
     :isDeliveryProtocolHttps="props.isDeliveryProtocolHttps"
+    :isImageOptimization="props.isImageOptimization"
     :listEdgeApplicationFunctionsService="props.listEdgeApplicationFunctionsService"
     :listOriginsService="props.listOriginsService"
     :listCacheSettingsService="props.listCacheSettingsService"
@@ -182,6 +190,7 @@
     :editRulesEngineService="props.editRulesEngineService"
     :loadRulesEngineService="props.loadRulesEngineService"
     :documentationService="props.documentationService"
+    :hideApplicationAcceleratorInDescription="props.hideApplicationAcceleratorInDescription"
     @onSuccess="reloadList"
   />
   <ListTableBlock

@@ -125,7 +125,7 @@ export const useMetricsStore = defineStore('metrics', {
       this.group.currentDashboard = newListDashboards.find(({ path }) => `${path}` === dashboardId)
     },
     setCurrentGroupPageByLabels(labelGroup) {
-      this.currentGroupPage = this.group.all.find(({ label }) => label === labelGroup)
+      this.group.current = this.group.all.find(({ label }) => label === labelGroup)
 
       const page = this.group.current?.pagesDashboards[0]
       this.group.currentPage = { ...page }

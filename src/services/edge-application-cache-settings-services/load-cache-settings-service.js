@@ -45,7 +45,11 @@ const adapt = (httpResponse) => {
     cacheByCookies: cacheSettings.cache_by_cookies,
     cookieNames: parseContentToTextArea(cacheSettings.cookie_names),
     adaptiveDeliveryAction: cacheSettings.adaptive_delivery_action,
-    deviceGroup: parseDeviceGroups(cacheSettings.device_group)
+    deviceGroup: parseDeviceGroups(cacheSettings.device_group),
+    l2CachingEnabled: cacheSettings.l2_caching_enabled,
+    l2Region: cacheSettings.l2_region,
+    isSliceL2CachingEnabled: cacheSettings.is_slice_l2_caching_enabled,
+    isSliceEdgeCachingEnabled: cacheSettings.is_slice_edge_caching_enabled
   }
 
   return {

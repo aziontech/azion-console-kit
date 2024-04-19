@@ -5,6 +5,8 @@
   import * as yup from 'yup'
   import { refDebounced } from '@vueuse/core'
   import { ref, inject } from 'vue'
+  import { CDN_MAXIMUM_TTL_MAX_VALUE, CDN_MAXIMUM_TTL_MIN_VALUE } from '@/utils/constants'
+
   /**@type {import('@/plugins/adapters/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
 
@@ -18,6 +20,10 @@
       type: String,
       required: true
     },
+    isEnableApplicationAccelerator: {
+      required: true,
+      type: Boolean
+    },
     createService: {
       type: Function,
       required: true
@@ -28,6 +34,10 @@
     },
     editService: {
       type: Function,
+      required: true
+    },
+    showTieredCache: {
+      type: Boolean,
       required: true
     }
   })
@@ -60,8 +70,24 @@
     cacheByCookies: 'ignore',
     cookieNames: '',
     adaptiveDeliveryAction: 'ignore',
-    deviceGroup: []
+    deviceGroup: [],
+    l2CachingEnabled: false,
+    isSliceL2CachingEnabled: false,
+    isSliceEdgeCachingEnabled: false
   })
+
+  const minimumAcceptableValue = ref(CDN_MAXIMUM_TTL_MAX_VALUE)
+
+  const l2CachingEnabled = ref()
+  const setNewMinimumValue = (value) => {
+    l2CachingEnabled.value = value
+    if (l2CachingEnabled.value || props.isEnableApplicationAccelerator) {
+      minimumAcceptableValue.value = CDN_MAXIMUM_TTL_MIN_VALUE
+    } else {
+      minimumAcceptableValue.value = CDN_MAXIMUM_TTL_MAX_VALUE
+    }
+  }
+
   const validationSchema = yup.object({
     name: yup.string().required().label('Name'),
     browserCacheSettings: yup.string().required().label('Browser cache settings'),
@@ -82,7 +108,8 @@
       .when('cdnCacheSettings', {
         is: 'honor',
         then: (schema) => schema.notRequired(),
-        otherwise: (schema) => schema.min(60).max(MAX_TTL_ONE_YEAR_IN_SECONDS).required()
+        otherwise: (schema) =>
+          schema.min(minimumAcceptableValue.value).max(MAX_TTL_ONE_YEAR_IN_SECONDS).required()
       }),
     sliceConfigurationEnabled: yup.boolean().required(),
     sliceConfigurationRange: yup
@@ -192,7 +219,11 @@
     title="Create Cache Settings"
   >
     <template #formFields>
-      <FormFieldsEdgeApplicationCacheSettings />
+      <FormFieldsEdgeApplicationCacheSettings
+        :isEnableApplicationAccelerator="isEnableApplicationAccelerator"
+        :showTieredCache="props.showTieredCache"
+        @l2-caching-enabled="setNewMinimumValue"
+      />
     </template>
   </CreateDrawerBlock>
 
@@ -207,7 +238,11 @@
     title="Edit Cache Settings"
   >
     <template #formFields>
-      <FormFieldsEdgeApplicationCacheSettings />
+      <FormFieldsEdgeApplicationCacheSettings
+        :isEnableApplicationAccelerator="isEnableApplicationAccelerator"
+        :showTieredCache="props.showTieredCache"
+        @l2-caching-enabled="setNewValue"
+      />
     </template>
   </EditDrawerBlock>
 </template>

@@ -1,3 +1,11 @@
+<script setup>
+  import Skeleton from 'primevue/skeleton'
+
+  defineOptions({
+    name: 'create-modal-block-loading-state'
+  })
+</script>
+
 <template>
   <Skeleton class="w-52 h-8 rounded mt-4 mb-3" />
   <div class="mx-0 w-full mt-0 grid grid-cols-1 lg:grid-cols-2 2xl:grid-cols-3 gap-4">
@@ -17,7 +25,3 @@
     </div>
   </div>
 </template>
-
-<script setup>
-  import Skeleton from 'primevue/skeleton'
-</script>

@@ -1,7 +1,8 @@
 <template>
   <FormLoading v-if="isLoading" />
+
   <div
-    class="w-full flex flex-col gap-8 max-md:gap-6"
+    class="w-full grow flex flex-col gap-8 max-md:gap-6"
     v-else
   >
     <FormHorizontal
@@ -22,6 +23,7 @@
             <span v-if="field.attrs"><span v-if="field.attrs.required">*</span></span></label
           >
           <Password
+            autocomplete="off"
             v-if="field.type === 'password'"
             toggleMask
             :key="`password-field-${field.name}`"
@@ -29,29 +31,33 @@
             v-model="field.input.value"
             :id="field.name"
             class="w-full"
-            :class="{ 'p-invalid': formTools.errors[field.name] }"
+            :class="renderInvalidClass(formTools.errors[`${field.name}`])"
             :feedback="false"
           />
           <InputText
             v-else
+            autocomplete="off"
             :key="field.name"
             :id="field.name"
             type="text"
             v-bind="field.input"
-            :class="{ 'p-invalid': formTools.errors[field.name] }"
+            :class="renderInvalidClass(formTools.errors[`${field.name}`])"
           />
           <small class="text-xs font-normal text-color-secondary">{{ field.description }}</small>
           <small
             v-if="formTools.errors[field.name]"
             class="p-error text-xs font-normal leading-tight"
           >
-            {{ formTools.errors[field.name] }}
+            {{ unescapeErrorMessage(formTools.errors[field.name]) }}
           </small>
         </div>
       </template>
     </FormHorizontal>
 
-    <div v-if="inputSchema.groups">
+    <div
+      class="w-full grow flex flex-col gap-8 max-md:gap-6"
+      v-if="inputSchema.groups"
+    >
       <FormHorizontal
         v-for="group in inputSchema.groups"
         :key="group.name"
@@ -64,50 +70,102 @@
             v-for="field in removeHiddenFields(group.fields)"
             :key="field.name"
           >
-            <label
-              for="name"
-              class="text-color text-base font-medium"
-              >{{ field.label }}
-              <span v-if="field.attrs"><span v-if="field.attrs.required">*</span></span></label
-            >
-            <Password
-              v-if="field.type === 'password'"
-              toggleMask
-              :key="`password-field-${field.name}`"
-              v-bind="field.input"
-              v-model="field.input.value"
-              :id="field.name"
-              class="w-full"
-              :class="{ 'p-invalid': formTools.errors[field.name] }"
-              :feedback="false"
-            />
-            <InputText
+            <div v-if="field.name === 'platform_feature__vcs_integration__uuid'">
+              <OAuthGithub
+                v-show="!hasIntegrations"
+                ref="oauthGithubRef"
+                :listPlatformsService="listPlatformsService"
+                @onCallbackUrl="
+                  (uri) => {
+                    setCallbackUrl(uri.value)
+                  }
+                "
+                :loading="isIntegrationsLoading"
+              />
+              <div
+                v-if="hasIntegrations"
+                class="flex flex-col sm:max-w-lg w-full gap-2"
+              >
+                <FieldDropdown
+                  :options="listOfIntegrations"
+                  :name="field.name"
+                  :isRequiredField="field.attrs.required"
+                  :label="field.label"
+                  placeholder="Select a scope"
+                  :description="field.description"
+                  :inputClass="renderInvalidClass(formTools.errors[`${field.name}`])"
+                  optionLabel="label"
+                  optionValue="value"
+                  @onChange="
+                    (installationId) => {
+                      updateValueOnChange(field.name, installationId)
+                    }
+                  "
+                >
+                  <template #footer>
+                    <div class="p-dropdown-items-wrapper">
+                      <ul class="p-dropdown-items">
+                        <li
+                          class="p-dropdown-item flex items-center"
+                          @click="triggerConnectWithGithub"
+                        >
+                          <i class="pi pi-plus-circle mr-2"></i>
+                          <div>Add GitHub Account</div>
+                        </li>
+                      </ul>
+                    </div>
+                  </template>
+                </FieldDropdown>
+              </div>
+            </div>
+            <div
               v-else
-              :key="field.name"
-              :id="field.name"
-              type="text"
-              v-bind="field.input"
-              :class="{ 'p-invalid': formTools.errors[field.name] }"
-            />
-            <small class="tet-xs font-normal text-color-secondary">{{ field.description }}</small>
-            <small
-              v-if="formTools.errors[field.name]"
-              class="p-error text-xs font-normal leading-tight"
+              class="flex flex-col sm:max-w-lg w-full gap-2"
             >
-              {{ formTools.errors[field.name] }}
-            </small>
+              <label
+                for="name"
+                class="text-color text-base font-medium"
+                >{{ field.label }}
+                <span v-if="field.attrs"><span v-if="field.attrs.required">*</span></span></label
+              >
+              <Password
+                v-if="field.type === 'password'"
+                autocomplete="off"
+                toggleMask
+                :key="`password-field-${field.name}`"
+                v-bind="field.input"
+                v-model="field.input.value"
+                :id="field.name"
+                class="w-full"
+                :class="renderInvalidClass(formTools.errors[`${field.name}`])"
+                :feedback="false"
+              />
+              <InputText
+                v-else
+                autocomplete="off"
+                :key="field.name"
+                :id="field.name"
+                type="text"
+                v-bind="field.input"
+                :class="renderInvalidClass(formTools.errors[`${field.name}`])"
+              />
+              <small class="tet-xs font-normal text-color-secondary">{{ field.description }}</small>
+              <small
+                v-if="formTools.errors[field.name]"
+                class="p-error text-xs font-normal leading-tight"
+              >
+                {{ unescapeErrorMessage(formTools.errors[field.name]) }}
+              </small>
+            </div>
           </div>
         </template>
       </FormHorizontal>
     </div>
-    <Teleport
-      :to="actionBarId"
-      v-if="isMounted"
-    >
+    <Teleport :to="actionBarId">
       <ActionBarTemplate
         v-if="!isLoading"
         :loading="submitLoading"
-        @onSubmit="validateAndSubmit"
+        @onSubmit="handleSubmit"
         @onCancel="handleCancel"
         :submitDisabled="!formTools.meta.valid || !formTools.meta.touched"
       />
@@ -117,14 +175,16 @@
 
 <script setup>
   import Password from 'primevue/password'
-  import { ref, onBeforeMount, defineOptions, watch, onMounted } from 'vue'
+  import FieldDropdown from '@/templates/form-fields-inputs/fieldDropdown.vue'
+  import { ref, defineOptions, watch, onMounted, computed } from 'vue'
   import FormHorizontal from '@templates/create-form-block/form-horizontal'
   import ActionBarTemplate from '@templates/action-bar-block'
-  import FormLoading from './FormLoading'
+  import FormLoading from './form-loading'
   import InputText from 'primevue/inputtext'
   import { useForm } from 'vee-validate'
   import * as yup from 'yup'
   import { useToast } from 'primevue/usetoast'
+  import OAuthGithub from './oauth-github.vue'
 
   defineOptions({ name: 'templateEngineBlock' })
 
@@ -136,6 +196,16 @@
       required: true
     },
     instantiateTemplateService: {
+      type: Function
+    },
+    postCallbackUrlService: {
+      type: Function,
+      required: true
+    },
+    listPlatformsService: {
+      type: Function
+    },
+    listIntegrationsService: {
       type: Function
     },
     templateId: {
@@ -166,12 +236,28 @@
   const formTools = ref({})
   const isLoading = ref(true)
   const submitLoading = ref(false)
-  const isMounted = ref(false)
+  const callbackUrl = ref('')
+  const listOfIntegrations = ref([])
+  const isIntegrationsLoading = ref(false)
+  const oauthGithubRef = ref(null)
 
-  const loadTemplate = async (id) => {
+  const triggerConnectWithGithub = () => {
+    if (oauthGithubRef.value) {
+      oauthGithubRef.value[0].connectWithGithub()
+    }
+  }
+
+  onMounted(async () => {
+    await loadTemplate(props.templateId)
+    await listIntegrations()
+
+    listenerOnMessage()
+  })
+
+  const loadTemplate = async () => {
     try {
-      const initialData = await props.getTemplateService(id)
-      inputSchema.value = initialData.inputSchema
+      const templateData = await props.getTemplateService(props.templateId)
+      inputSchema.value = templateData.inputSchema
       const schemaObject = await createSchemaObject()
       const isValid = await schemaObject.isValid()
       await createInputs(schemaObject, isValid)
@@ -184,15 +270,54 @@
     }
   }
 
-  onBeforeMount(async () => {
-    await loadTemplate(props.templateId)
+  const listIntegrations = async () => {
+    try {
+      isIntegrationsLoading.value = true
+      const data = await props.listIntegrationsService()
+
+      listOfIntegrations.value = data
+    } catch (error) {
+      toast.add({
+        closable: true,
+        severity: 'error',
+        summary: error
+      })
+    } finally {
+      isIntegrationsLoading.value = false
+    }
+  }
+
+  const listenerOnMessage = () => {
+    window.addEventListener('message', (event) => {
+      if (event.data.event === 'integration-data') {
+        saveIntegration(event.data)
+      }
+    })
+  }
+
+  const escapeErrorMessage = (errorMessage) => {
+    return errorMessage.replaceAll('${', '#$')
+  }
+
+  const unescapeErrorMessage = (errorMessage) => {
+    return errorMessage.replaceAll('#$', '${')
+  }
+
+  const renderInvalidClass = (containErrorInField) => {
+    if (containErrorInField) return 'p-invalid'
+    return ''
+  }
+
+  const hasIntegrations = computed(() => {
+    if (listOfIntegrations?.value?.length > 0) return true
+    return false
   })
 
-  onMounted(() => {
-    setTimeout(() => {
-      isMounted.value = true
-    }, 100)
-  })
+  const saveIntegration = async (integration) => {
+    isIntegrationsLoading.value = true
+    await props.postCallbackUrlService(callbackUrl.value, integration.data)
+    await listIntegrations()
+  }
 
   const createSchemaObject = async () => {
     const templateSchema = {}
@@ -239,10 +364,14 @@
 
     if (element.validators) {
       element.validators.forEach((validator) => {
-        schema = schema.test(`valid-${element.name}`, validator.errorMessage, function (value) {
-          const domainRegex = new RegExp(validator.regex)
-          return domainRegex.test(value)
-        })
+        schema = schema.test(
+          `valid-${element.name}`,
+          escapeErrorMessage(validator.errorMessage),
+          function (value) {
+            const domainRegex = new RegExp(validator.regex)
+            return domainRegex.test(value)
+          }
+        )
       })
     }
 
@@ -267,21 +396,22 @@
       validationSchema
     })
 
-    formTools.value = { errors, meta, resetForm, values }
+    formTools.value = { errors, meta, resetForm, values, setFieldValue }
 
-    inputSchema.value.fields?.forEach((field) => {
+    const registerFieldWithValueAndValidation = (field) => {
       if (field.value) {
         setFieldValue(field.name, field.value)
       }
       field.input = defineInputBinds(field.name, { validateOnInput: true })
+    }
+
+    inputSchema.value.fields?.forEach((field) => {
+      registerFieldWithValueAndValidation(field)
     })
 
-    inputSchema.value.groups?.forEach((group) => {
-      group.fields.forEach((field) => {
-        if (field.value) {
-          setFieldValue(field.name, field.value)
-        }
-        field.input = defineInputBinds(field.name, { validateOnInput: true })
+    inputSchema.value.groups?.forEach(({ fields }) => {
+      fields.forEach((field) => {
+        registerFieldWithValueAndValidation(field)
       })
     })
 
@@ -298,38 +428,40 @@
     return fields.filter((field) => !field.hidden)
   }
 
-  const validateAndSubmit = async () => {
-    emit('submitClick')
-    submitLoading.value = true
-    emit('loading')
+  const handleSubmit = async () => {
     try {
-      const payload = []
+      submitLoading.value = true
+      emit('submitClick')
+      emit('loading')
+
+      const parsedInputSchema = []
       if (inputSchema.value.fields) {
-        payload.push(...inputSchema.value.fields)
+        parsedInputSchema.push(...inputSchema.value.fields)
       }
       if (inputSchema.value.groups) {
-        inputSchema.value.groups.forEach((group) => {
-          payload.push(...group.fields)
-        })
+        const fieldsInsideTheFieldGroup = inputSchema.value.groups.flatMap((group) => group.fields)
+        parsedInputSchema.push(...fieldsInsideTheFieldGroup)
       }
-      payload.forEach((__, index) => {
-        payload[index] = JSON.parse(JSON.stringify(payload[index]))
-        const sanitizedField = {
-          field: payload[index].name,
-          instantiation_data_path: payload[index].instantiation_data_path,
-          value: payload[index].input.value ? payload[index].input.value : ''
+      const instantiateParsedPayload = parsedInputSchema.map((__, index) => {
+        const parsedField = {
+          field: parsedInputSchema[index].name,
+          instantiation_data_path: parsedInputSchema[index].instantiation_data_path,
+          value: parsedInputSchema[index].input.value ?? ''
         }
 
-        // Hidden field
-        const hiddenField = props.hiddenFields.find((field) => field.name === payload[index].name)
+        const hiddenField = props.hiddenFields.find(
+          (field) => field.name === parsedInputSchema[index].name
+        )
         if (hiddenField) {
-          sanitizedField.value = hiddenField.value
+          parsedField.value = hiddenField.value
         }
-
-        payload[index] = sanitizedField
+        return parsedField
       })
 
-      const response = await props.instantiateTemplateService(props.templateId, payload)
+      const response = await props.instantiateTemplateService(
+        props.templateId,
+        instantiateParsedPayload
+      )
       submitLoading.value = props.freezeLoading
       emit('instantiate', response)
     } catch (error) {
@@ -345,10 +477,18 @@
     emit('cancel')
   }
 
+  const updateValueOnChange = (field, installationId) => {
+    formTools.value.setFieldValue(field, installationId)
+  }
+
+  const setCallbackUrl = (uri) => {
+    callbackUrl.value = uri
+  }
+
   watch(
     () => props.freezeLoading,
     () => {
-      // Finished the opeations after instantiate
+      // Finished the operations after instantiate
       submitLoading.value = false
     }
   )

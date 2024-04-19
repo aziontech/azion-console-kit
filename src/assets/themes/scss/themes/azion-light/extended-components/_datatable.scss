@@ -50,6 +50,10 @@
       }
     }
   }
+
+  .p-datatable-wrapper {
+    overscroll-behavior: revert !important;
+  }
 }
 
 .p-overlaypanel:has(.hidden-columns-panel) {

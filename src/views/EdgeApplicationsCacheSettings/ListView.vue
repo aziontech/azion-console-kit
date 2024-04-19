@@ -14,6 +14,10 @@
       type: Function,
       required: true
     },
+    isEnableApplicationAccelerator: {
+      required: true,
+      type: Boolean
+    },
     loadCacheSettingsService: {
       type: Function,
       required: true
@@ -32,6 +36,10 @@
     },
     documentationService: {
       type: Function,
+      required: true
+    },
+    showTieredCache: {
+      type: Boolean,
       required: true
     }
   })
@@ -91,10 +99,12 @@
 <template>
   <Drawer
     ref="drawerRef"
+    :isEnableApplicationAccelerator="props.isEnableApplicationAccelerator"
     :edgeApplicationId="props.edgeApplicationId"
     :createService="props.createCacheSettingsService"
     :loadService="props.loadCacheSettingsService"
     :editService="props.editCacheSettingsService"
+    :showTieredCache="props.showTieredCache"
     @onSuccess="reloadList"
   />
 
