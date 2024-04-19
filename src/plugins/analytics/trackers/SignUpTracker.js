@@ -31,22 +31,6 @@ export class SignUpTracker {
 
   /**
    * @param {Object} payload
-   * @param {'google'|'azure'|'github'|'email'} payload.method
-   *
-   * @returns {AnalyticsTrackerAdapter}
-   */
-  userClickedSignedUp(payload) {
-    this.#trackerAdapter.addEvent({
-      eventName: 'User Clicked to Sign Up',
-      props: {
-        method: payload.method
-      }
-    })
-    return this.#trackerAdapter
-  }
-
-  /**
-   * @param {Object} payload
    * @param {'google'|'azure'|'github'} payload.method
    *
    * @returns {AnalyticsTrackerAdapter}
@@ -84,18 +68,10 @@ export class SignUpTracker {
   /**
    * @returns {AnalyticsTrackerAdapter}
    */
-  submittedAdditionalData(payload) {
+  submittedAdditionalData() {
     this.#trackerAdapter.addEvent({
       eventName: 'Submitted Additional Data',
-      props: {
-        use: payload.use,
-        role: payload.role,
-        inputRole: payload.inputRole,
-        companySize: payload.companySize,
-        onboardingSchedule: payload.onboardingSession,
-        website: payload.companyWebsite,
-        name: payload.fullName
-      }
+      props: {}
     })
     return this.#trackerAdapter
   }
@@ -103,14 +79,10 @@ export class SignUpTracker {
   /**
    * @returns {AnalyticsTrackerAdapter}
    */
-  failedSubmitAdditionalData(payload) {
+  failedSubmitAdditionalData() {
     this.#trackerAdapter.addEvent({
       eventName: 'Failed to Submit Additional Data',
-      props: {
-        errorType: payload.errorType,
-        errorMessage: payload.errorMessage,
-        fieldName: payload.fieldName
-      }
+      props: {}
     })
     return this.#trackerAdapter
   }

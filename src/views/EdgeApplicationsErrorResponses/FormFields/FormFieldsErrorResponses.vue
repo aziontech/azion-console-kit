@@ -304,7 +304,6 @@
           :disabled="disableOriginKey"
           :options="originOptions"
           optionLabel="name"
-          scrollHeight="170px"
           option-value="originId"
         />
       </div>

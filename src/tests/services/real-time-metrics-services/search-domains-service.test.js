@@ -11,24 +11,11 @@ const makeSut = () => {
   }
 }
 
-const fixtures = {
-  apiResponse: {
-    results: [
-      { id: 1, name: 'test', value: 1 },
-      { id: 2, name: 'test2', value: 2 }
-    ]
-  },
-  formattedResponse: [
-    { value: 1, label: 'test' },
-    { value: 2, label: 'test2' }
-  ]
-}
-
 describe('RealTimeMetricsServices', () => {
   it('should call api with correct params', async () => {
     const requestSpy = vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
       statusCode: 200,
-      body: fixtures.apiResponse
+      body: { results: [] }
     })
 
     const { sut } = makeSut()
@@ -37,83 +24,62 @@ describe('RealTimeMetricsServices', () => {
 
     expect(requestSpy).toHaveBeenCalledWith({
       url: `${version}/domains?order_by=name&sort=asc&page=1&page_size=200`,
-      method: 'GET'
+      method: 'GET',
+      cancelToken: expect.anything()
     })
   })
 
   it('should return a list of domains', async () => {
     vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
       statusCode: 200,
-      body: fixtures.apiResponse
+      body: {
+        results: [
+          { id: 1, name: 'test' },
+          { id: 2, name: 'test2' }
+        ]
+      }
     })
 
     const { sut } = makeSut()
     const results = await sut({})
 
-    expect(results).toEqual(fixtures.formattedResponse)
+    expect(results).toEqual([
+      { value: 1, label: 'test' },
+      { value: 2, label: 'test2' }
+    ])
   })
 
   it.each([
     {
       statusCode: 400,
-      params: {
-        orderBy: 'name',
-        sort: 'asc',
-        page: 1,
-        pageSize: 100
-      },
       expectedError: new Errors.InvalidApiRequestError().message
     },
     {
       statusCode: 403,
-      params: {
-        orderBy: 'name',
-        sort: 'desc',
-        page: 1,
-        pageSize: 100
-      },
       expectedError: new Errors.PermissionError().message
     },
     {
       statusCode: 404,
-      params: {
-        orderBy: 'name',
-        sort: 'asc',
-        page: 2,
-        pageSize: 100
-      },
       expectedError: new Errors.NotFoundError().message
     },
     {
       statusCode: 500,
-      params: {
-        orderBy: 'name',
-        sort: 'asc',
-        page: 1,
-        pageSize: 200
-      },
       expectedError: new Errors.InternalServerError().message
     },
     {
       statusCode: 'unmappedStatusCode',
-      params: {
-        orderBy: 'name',
-        sort: 'asc',
-        page: 2,
-        pageSize: 100
-      },
       expectedError: new Errors.UnexpectedError().message
     }
   ])(
     'should throw when request fails with statusCode $statusCode',
-    async ({ statusCode, params, expectedError }) => {
+    async ({ statusCode, expectedError }) => {
       vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
         statusCode,
         body: []
       })
       const { sut } = makeSut()
 
-      const response = sut(params)
+      const response = sut({})
 
       expect(response).rejects.toBe(expectedError)
     }

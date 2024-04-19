@@ -23,10 +23,6 @@
       type: Boolean,
       required: true
     },
-    isImageOptimization: {
-      required: true,
-      type: Boolean
-    },
     listEdgeApplicationFunctionsService: {
       type: Function,
       required: true
@@ -50,9 +46,6 @@
       type: Object,
       required: false,
       default: () => {}
-    },
-    hideApplicationAcceleratorInDescription: {
-      type: Boolean
     }
   })
 
@@ -72,31 +65,20 @@
     { label: 'does not exist', value: 'does_not_exist' }
   ])
 
-  const showLabelApplicationAccelerator = computed(() => {
-    if (props.hideApplicationAcceleratorInDescription) return ''
-
-    return ' - Requires Application Accelerator'
-  })
-
-  const showLabelImageOptimization = computed(() => {
-    if (props.isImageOptimization) return ''
-    return ' - Requires Image Processor'
-  })
-
   const behaviorsRequestOptions = ref([
     {
-      label: `Add Request Cookie ${showLabelApplicationAccelerator.value}`,
+      label: 'Add Request Cookie - requires Application Accelerator',
       value: 'add_request_cookie',
       requires: true
     },
     { label: 'Add Request Header', value: 'add_request_header', requires: false },
     {
-      label: `Bypass Cache ${showLabelApplicationAccelerator.value}`,
+      label: 'Bypass Cache - requires Application Accelerator',
       value: 'bypass_cache_phase',
       requires: true
     },
     {
-      label: `Capture Match Groups ${showLabelApplicationAccelerator.value}`,
+      label: 'Capture Match Groups - requires Application Accelerator',
       value: 'capture_match_groups',
       requires: true
     },
@@ -104,22 +86,18 @@
     { label: 'Deny (403 Forbidden)', value: 'deny', requires: false },
     { label: 'Enable Gzip', value: 'enable_gzip', requires: false },
     {
-      label: `Filter Request Cookie ${showLabelApplicationAccelerator.value}`,
+      label: 'Filter Request Cookie - requires Application Accelerator',
       value: 'filter_request_cookie',
       requires: true
     },
     { label: 'Filter Request Header', value: 'filter_request_header', requires: false },
     {
-      label: `Forward Cookies ${showLabelApplicationAccelerator.value}`,
+      label: 'Forward Cookies - requires Application Accelerator',
       value: 'forward_cookies',
       requires: true
     },
     { label: 'No Content (204)', value: 'no_content', requires: false },
-    {
-      label: `Optimize Images ${showLabelImageOptimization.value}`,
-      value: 'optimize_images',
-      requires: true
-    },
+    { label: 'Optimize Images', value: 'optimize_images', requires: false },
     {
       label: 'Redirect HTTP to HTTPS - requires Delivery Protocol with HTTPS',
       value: 'redirect_http_to_https',
@@ -128,7 +106,7 @@
     { label: 'Redirect To (301 Moved Permanently)', value: 'redirect_to_301', requires: false },
     { label: 'Redirect To (302 Found)', value: 'redirect_to_302', requires: false },
     {
-      label: `Rewrite Request ${showLabelApplicationAccelerator.value}`,
+      label: 'Rewrite Request - requires Application Accelerator',
       value: 'rewrite_request',
       requires: true
     },
@@ -139,20 +117,20 @@
 
   const behaviorsResponseOptions = ref([
     {
-      label: `Add Response Cookie ${showLabelApplicationAccelerator.value}`,
+      label: 'Add Response Cookie - requires Application Accelerator',
       value: 'add_response_cookie',
       requires: true
     },
     { label: 'Add Response Header', value: 'add_response_header', requires: false },
     {
-      label: `Capture Match Groups ${showLabelApplicationAccelerator.value}`,
+      label: 'Capture Match Groups - requires Application Accelerator',
       value: 'capture_match_groups',
       requires: true
     },
     { label: 'Deliver', value: 'deliver', requires: false },
     { label: 'Enable Gzip', value: 'enable_gzip', requires: false },
     {
-      label: `Filter Response Cookie ${showLabelApplicationAccelerator.value}`,
+      label: 'Filter Response Cookie - requires Application Accelerator',
       value: 'filter_response_cookie',
       requires: true
     },
@@ -345,16 +323,15 @@
    * @returns {Array} The updated array of behavior options with the 'requires' property set accordingly.
    */
   const updateOptionRequires = (options) => {
-    const conditionsMap = {
-      redirect_http_to_https: !props.isDeliveryProtocolHttps,
-      optimize_images: !props.isImageOptimization
-    }
-
     return options.map((option) => {
       if (option.requires) {
-        const requires = conditionsMap[option.value] || !props.isEnableApplicationAccelerator
-
-        return { ...option, requires }
+        return {
+          ...option,
+          requires:
+            option.value === 'redirect_http_to_https'
+              ? !props.isDeliveryProtocolHttps
+              : !props.isEnableApplicationAccelerator
+        }
       }
       return option
     })

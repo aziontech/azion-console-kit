@@ -22,7 +22,7 @@ const adapt = (httpResponse) => {
     cnames: body?.cnames.join('\n'),
     cnameAccessOnly: body?.cname_access_only,
     edgeApplication: body?.edge_application_id,
-    edgeCertificate: body?.digital_certificate_id ?? 0,
+    digitalCertificate: body?.digital_certificate_id,
     mtlsIsEnabled: body?.mtls_is_enabled,
     active: body.is_active,
     mtlsVerification: body?.mtls_verification,

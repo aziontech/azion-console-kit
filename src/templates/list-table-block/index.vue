@@ -38,13 +38,11 @@
           </slot>
         </div>
       </template>
-
       <Column
         v-if="reorderableRows"
         rowReorder
         headerStyle="width: 3rem"
       />
-
       <Column
         sortable
         v-for="col of selectedColumns"
@@ -55,14 +53,13 @@
       >
         <template #body="{ data: rowData }">
           <template v-if="col.type !== 'component'">
-            <div v-html="rowData[col.field]"></div>
+            <div v-html="rowData[col.field]" />
           </template>
           <template v-else>
-            <component :is="col.component(rowData[col.field])"></component>
+            <component :is="col.component(rowData[col.field])" />
           </template>
         </template>
       </Column>
-
       <Column
         :frozen="true"
         :alignFrozen="'right'"
@@ -115,7 +112,7 @@
               v-tooltip.top="{ value: 'Actions', showDelay: 200 }"
               size="small"
               icon="pi pi-ellipsis-h"
-              outlined
+              text
               @click="(event) => toggleActionsMenu(event, rowData.id)"
               class="cursor-pointer table-button"
             />

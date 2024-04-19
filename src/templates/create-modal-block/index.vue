@@ -1,20 +1,14 @@
 <script setup>
   import PrimeButton from 'primevue/button'
-  import LoadingState from './create-modal-block-loading-state.vue'
+  import * as MarketplaceService from '@/services/marketplace-services'
+  import LoadingListTemplate from './LoadingListTemplate'
   import { computed, onBeforeMount, ref, inject } from 'vue'
   import { useRouter } from 'vue-router'
   import { useToast } from 'primevue/usetoast'
-  import { useAccountStore } from '@/stores/account'
   /**@type {import('@/plugins/adapters/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
   defineOptions({
     name: 'create-modal-block'
-  })
-  const props = defineProps({
-    listSolutionsService: {
-      type: Function,
-      required: true
-    }
   })
 
   const emit = defineEmits('closeModal')
@@ -30,7 +24,7 @@
   const templates = ref([])
   const browseTemplates = ref([])
   const selectedTab = ref('recommended')
-
+  const recommendedHeader = ref('recommended-for-you')
   const items = ref([
     {
       label: 'Recommended',
@@ -104,22 +98,6 @@
     }
   ])
 
-  const githubOptions = ref([
-    {
-      label: 'Import Static Site from GitHub',
-      icon: 'pi pi-github',
-      description: `Import an existing static project to deploy it on Azion's edge.`,
-      command: () => {
-        redirectGithubImport()
-      }
-    }
-  ])
-
-  const redirectGithubImport = () => {
-    router.push({ name: 'github-static' })
-    emit('closeModal')
-  }
-
   const showRecommended = computed(() => {
     return selectedTab.value === 'recommended'
   })
@@ -128,9 +106,6 @@
   })
   const showResource = computed(() => {
     return selectedTab.value === 'new_resource'
-  })
-  const showGithubImport = computed(() => {
-    return selectedTab.value === 'import_github'
   })
 
   const showToast = (severity, detail) => {
@@ -168,8 +143,8 @@
   const loadRecommendedSolutions = async () => {
     try {
       isLoading.value = true
-      const accountStore = useAccountStore().accountData
-      templates.value = await props.listSolutionsService({ type: accountStore.jobRole })
+      const payload = { type: recommendedHeader.value }
+      templates.value = await MarketplaceService.listSolutionsService(payload)
     } catch (error) {
       showToast('error', error)
     } finally {
@@ -180,7 +155,7 @@
   const loadBrowse = async () => {
     try {
       isLoading.value = true
-      browseTemplates.value = await props.listSolutionsService({})
+      browseTemplates.value = await MarketplaceService.listSolutionsService({})
     } catch (error) {
       showToast('error', error)
     } finally {
@@ -196,17 +171,6 @@
       }
     }
   }
-
-  const tabHeader = computed(() => {
-    switch (selectedTab.value) {
-      case 'new_resource':
-        return 'Select a Resource'
-      case 'import_github':
-        return 'Import from GitHub'
-      default:
-        return 'Select a Template'
-    }
-  })
 </script>
 
 <template>
@@ -233,10 +197,19 @@
     </div>
 
     <div class="overflow-auto w-full flex flex-col">
-      <LoadingState v-if="isLoading" />
+      <LoadingListTemplate v-if="isLoading" />
       <div v-else>
-        <div class="text-base font-medium mt-5 mb-3">
-          {{ tabHeader }}
+        <div
+          class="text-base font-medium mt-5 mb-3"
+          v-if="showResource"
+        >
+          Select a Resource
+        </div>
+        <div
+          class="text-base font-medium mt-5 mb-3"
+          v-else
+        >
+          Select a Template
         </div>
       </div>
 
@@ -259,7 +232,7 @@
                 <img
                   class="rounded"
                   :src="template.vendor.icon"
-                  :alt="template.vendor.name"
+                  alt=""
                 />
               </div>
               <div class="flex flex-col">
@@ -295,7 +268,7 @@
                 <img
                   class="rounded"
                   :src="template.vendor.icon"
-                  :alt="template.name"
+                  alt=""
                 />
               </div>
               <div class="flex flex-col">
@@ -333,41 +306,6 @@
                   class="h-10 pb-4 text-sm font-normal text-color-secondary mt-1.5 line-clamp-2"
                 >
                   {{ resource.description }}
-                </span>
-              </div>
-            </div>
-          </div>
-        </PrimeButton>
-      </div>
-      <div
-        class="mx-0 w-full mt-0 grid grid-cols-1 lg:grid-cols-2 2xl:grid-cols-3 gap-4"
-        v-if="showGithubImport"
-      >
-        <PrimeButton
-          v-for="(template, index) in githubOptions"
-          :key="index"
-          @click="template.command()"
-          class="p-6 text-left border-solid border surface-border hover:border-primary transition-all"
-          link
-        >
-          <div class="flex flex-col h-full justify-between gap-3.5 items-start">
-            <div class="flex gap-3.5 flex-col">
-              <div
-                class="w-10 h-10 rounded surface-border border flex justify-center items-center bg-black"
-              >
-                <i
-                  :class="template.icon"
-                  class="text-white text-2xl"
-                ></i>
-              </div>
-              <div class="flex flex-col">
-                <span class="line-clamp-1 h-5 text-color text-sm font-medium">
-                  {{ template.label }}
-                </span>
-                <span
-                  class="h-10 pb-4 text-sm font-normal text-color-secondary mt-1.5 line-clamp-2"
-                >
-                  {{ template.description }}
                 </span>
               </div>
             </div>
