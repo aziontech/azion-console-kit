@@ -32,7 +32,7 @@
     @update:visible="closeCreateModalStore()"
   >
     <div>
-      <MakeCreateModalBlock @closeModal="closeCreateModalStore()" />
+      <CreateModalBlock @closeModal="closeCreateModalStore()" />
     </div>
   </PrimeDialog>
 
@@ -59,7 +59,7 @@
         />
       </div>
     </template>
-    <MakeCreateModalBlock @closeModal="closeCreateModalStore()" />
+    <CreateModalBlock @closeModal="closeCreateModalStore()" />
   </Sidebar>
 </template>
 
@@ -71,7 +71,7 @@
   import PrimeButton from 'primevue/button'
   import PrimeDialog from 'primevue/dialog'
   import Sidebar from 'primevue/sidebar'
-  import MakeCreateModalBlock from '@/templates/create-modal-block/make-create-modal-block.vue'
+  import CreateModalBlock from '@/templates/create-modal-block'
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
 

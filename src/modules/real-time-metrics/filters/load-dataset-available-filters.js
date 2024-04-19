@@ -1,9 +1,11 @@
-import { loadRealTimeMetricsData } from '@/services/real-time-metrics-services'
 import { FILTERS_RULES } from '@modules/real-time-metrics/constants'
+import BeholderService from '@services/real-time-metrics-services/fetch-metrics-data-from-beholder'
+import Axios from 'axios'
 import ParserObjectField from './parser-object-field'
+
 import { capitalizeFirstLetter } from '@/helpers'
 
-let abortController = null
+let cancelRequest = null
 
 /**
  * A function to generate a GraphQL query for input fields of a given dataset.
@@ -65,8 +67,9 @@ const verifyWhitelistFields = ({ name, type: { name: typeName } }) => {
  * @return {Promise<Array<Object>>} An array of objects representing the available filters.
  */
 export default async function LoadDatasetAvailableFilters(dataset) {
-  if (abortController) abortController.abort()
-  abortController = new AbortController()
+  if (cancelRequest) cancelRequest.cancel()
+  const ReportsRequestToken = Axios.CancelToken
+  cancelRequest = ReportsRequestToken.source()
 
   const datasetsQuery = inputListByDatasetQuery(dataset)
 
@@ -74,14 +77,13 @@ export default async function LoadDatasetAvailableFilters(dataset) {
     query: datasetsQuery
   }
 
+  const beholderService = new BeholderService({ cancelRequest })
+
   let data = []
 
   try {
-    const { __type: type } = await loadRealTimeMetricsData({
-      query: graphqlQuery,
-      signal: abortController.signal
-    })
-    data = type
+    const type = await beholderService.gql(graphqlQuery)
+    data = type.__type
   } catch {
     return []
   }

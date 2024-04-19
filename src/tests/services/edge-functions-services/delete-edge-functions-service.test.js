@@ -42,31 +42,9 @@ describe('EdgeFunctionsServices', () => {
 
   it.each([
     {
-      error: 'edge_function_instantiated_error',
-      expectedError: `Can't delete an edge function being used. Disable it in the edge application or edge firewall to delete it.`
+      statusCode: 400,
+      expectedError: new Errors.NotFoundError().message
     },
-    {
-      error: 'unmappedError',
-      expectedError: new Errors.UnexpectedError().message
-    }
-  ])(
-    'should throw an error if the API returns a 400 status code',
-    async ({ error, expectedError }) => {
-      const result = {}
-      result[error] = expectedError
-      vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
-        statusCode: 400,
-        body: result
-      })
-      const mockId = 123
-
-      const { sut } = makeSut()
-
-      await expect(sut(mockId)).rejects.toThrow(expectedError)
-    }
-  )
-
-  it.each([
     {
       statusCode: 401,
       expectedError: new Errors.InvalidApiTokenError().message

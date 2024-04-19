@@ -67,7 +67,7 @@
               />
               <PrimeButton
                 type="button"
-                label="How to build an application"
+                label="How to edit an application"
                 link
                 class="w-full sm:w-auto"
                 icon="pi pi-external-link"
@@ -144,7 +144,7 @@
           </div>
           <form
             class="flex flex-col lg:flex-row justify-between gap-3 sm:gap-6"
-            @submit.prevent="onSubmit"
+            @submit.prevent="handleSubmit"
           >
             <FormFieldsHome :teams="teams"></FormFieldsHome>
             <div class="mt-auto lg:mt-7">
@@ -200,158 +200,153 @@
   </ContentBlock>
 </template>
 
-<script setup>
+<script>
   import { getStaticUrlsByEnvironment } from '@/helpers'
   import { useAccountStore } from '@/stores/account'
   import { useCreateModalStore } from '@/stores/create-modal'
   import ContentBlock from '@/templates/content-block'
-  import { computed, inject, onMounted, ref } from 'vue'
+  import { mapState } from 'pinia'
+  import { inject } from 'vue'
   import PrimeButton from 'primevue/button'
   import { useForm } from 'vee-validate'
   import * as yup from 'yup'
   import FormFieldsHome from './FormFields/FormFieldsHome.vue'
-  import { useRoute, useRouter } from 'vue-router'
-  import { useToast } from 'primevue/usetoast'
-  import { useDialog } from 'primevue/usedialog'
-  import DialogOnboardingScheduling from '@/templates/dialogs-block/dialog-onboarding-scheduling.vue'
-
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
-  const tracker = inject('tracker')
 
-  defineOptions({ name: 'home-view' })
-
-  const props = defineProps({
-    listTeamsService: {
-      type: Function,
-      required: true
+  export default {
+    name: 'home-view',
+    components: {
+      PrimeButton,
+      ContentBlock,
+      FormFieldsHome
     },
-    inviteYourTeamService: {
-      type: Function,
-      required: true
+    props: {
+      listTeamsService: {
+        type: Function,
+        required: true
+      },
+      inviteYourTeamService: {
+        type: Function,
+        required: true
+      },
+      inviteSession: {
+        type: Function,
+        required: true
+      },
+      windowManager: {
+        type: Object,
+        required: true
+      }
     },
-    inviteSession: {
-      type: Function,
-      required: true
+    data() {
+      return {
+        teams: [],
+        isLoading: false,
+        showInviteSession: this.inviteSession.show()
+      }
     },
-    windowManager: {
-      type: Object,
-      required: true
-    }
-  })
+    async created() {
+      this.teams = await this.listTeamsService()
 
-  const router = useRouter()
-  const route = useRoute()
-  const dialog = useDialog()
-  const toast = useToast()
-  const user = useAccountStore().accountData
+      if (this.inviteSession.sessionIsExpired()) {
+        this.inviteSession.turnInviteBlockVisable()
+      }
+    },
+    computed: {
+      isDisabled() {
+        return !this.meta?.valid || this.isLoading
+      },
+      ...mapState(useAccountStore, { user: 'accountData', currentTheme: 'currentTheme' }),
+      disclaimer() {
+        return this.user.disclaimer.replace(/\s<a[^>]+>[^<]+<\/a>/g, '')
+      },
+      showExperimental() {
+        return this.user.disclaimer
+      }
+    },
+    methods: {
+      navigateToEdgeApplications() {
+        this.$router.push({ name: 'list-edge-applications' })
+      },
 
-  const teams = ref([])
-  const isLoading = ref(false)
-  const showInviteSession = ref(props.inviteSession.show())
+      navigateToPayment() {
+        const billingUrl = getStaticUrlsByEnvironment('billing')
+        window.open(billingUrl, '_blank')
+      },
+      navigateToRealTimeMetrics() {
+        this.$router.push({ name: 'real-time-metrics' })
+      },
+      openDocsEdgeApplication() {
+        this.windowManager.documentationGuideProducts.edgeApplication()
+      },
+      openDocsRealTimeMetrics() {
+        this.windowManager.documentationGuideProducts.realTimeMetrics()
+      },
+      openProductDocumentation() {
+        this.windowManager.openDocumentation()
+      },
+      openAPIDocumentation() {
+        this.windowManager.openAPIDocumentation()
+      },
+      openContactSupport() {
+        this.windowManager.openContactSupport()
+      },
+      async handleSubmit() {
+        try {
+          this.isLoading = true
+          const feedback = await this.inviteYourTeamService(this.values)
+          this.handleSuccess(feedback)
+        } catch (error) {
+          this.showToast('error', error)
+        } finally {
+          this.isLoading = false
+        }
+      },
+      handleSuccess(feedback) {
+        this.resetForm()
+        this.showToast('success', feedback)
+      },
+      showToast(severity, summary) {
+        this.$toast.add({
+          closable: true,
+          severity: severity,
+          summary: summary
+        })
+      },
+      closeInviteSession() {
+        this.inviteSession.closeInviteBlock()
+        this.showInviteSession = false
+      }
+    },
+    setup() {
+      const tracker = inject('tracker')
 
-  const isDisabled = computed(() => {
-    return !meta?.valid || isLoading
-  })
+      const createModalStore = useCreateModalStore()
 
-  const disclaimer = computed(() => {
-    return user.disclaimer.replace(/\s<a[^>]+>[^<]+<\/a>/g, '')
-  })
+      const openModalCreate = () => {
+        tracker.create.createEventInHomeAndHeader({ url: '/', location: 'home' }).track()
+        createModalStore.toggle()
+      }
 
-  const showExperimental = computed(() => {
-    return user.disclaimer
-  })
+      const validationSchema = yup.object({
+        name: yup.string().required('Name is a required field'),
+        email: yup.string().email('Must be a valid email').required('E-mail is a required field'),
+        team: yup.string().required()
+      })
 
-  const navigateToEdgeApplications = () => {
-    router.push({ name: 'list-edge-applications' })
-  }
+      const { errors, meta, resetForm, values } = useForm({
+        validationSchema
+      })
 
-  const navigateToPayment = () => {
-    const billingUrl = getStaticUrlsByEnvironment('billing')
-    window.open(billingUrl, '_blank')
-  }
-
-  const navigateToRealTimeMetrics = () => {
-    router.push({ name: 'real-time-metrics' })
-  }
-
-  const openDocsEdgeApplication = () => {
-    props.windowManager.documentationGuideProducts.edgeApplication()
-  }
-
-  const openDocsRealTimeMetrics = () => {
-    props.windowManager.documentationGuideProducts.realTimeMetrics()
-  }
-
-  const openProductDocumentation = () => {
-    props.windowManager.openDocumentation()
-  }
-
-  const openAPIDocumentation = () => {
-    props.windowManager.openAPIDocumentation()
-  }
-
-  const openContactSupport = () => {
-    props.windowManager.openContactSupport()
-  }
-
-  const validationSchema = yup.object({
-    name: yup.string().required('Name is a required field'),
-    email: yup.string().email('Must be a valid email').required('E-mail is a required field'),
-    team: yup.string().required()
-  })
-
-  const { meta, resetForm, handleSubmit } = useForm({
-    validationSchema
-  })
-
-  const onSubmit = handleSubmit(async (values) => {
-    try {
-      isLoading.value = true
-      const feedback = await props.inviteYourTeamService(values)
-      handleSuccess(feedback)
-    } catch (error) {
-      showToast('error', error)
-    } finally {
-      isLoading.value = false
-    }
-  })
-
-  const handleSuccess = (feedback) => {
-    resetForm()
-    showToast('success', feedback)
-  }
-
-  const showToast = (severity, summary) => {
-    toast.add({
-      closable: true,
-      severity: severity,
-      summary: summary
-    })
-  }
-
-  const closeInviteSession = () => {
-    props.inviteSession.closeInviteBlock()
-    showInviteSession.value = false
-  }
-
-  const createModalStore = useCreateModalStore()
-
-  const openModalCreate = () => {
-    tracker.create.createEventInHomeAndHeader({ url: '/', location: 'home' }).track()
-    createModalStore.toggle()
-  }
-
-  const showOnboardingSchedulingDialog = () => {
-    if (route.query.onboardingSession) {
-      dialog.open(DialogOnboardingScheduling)
+      return {
+        validationSchema,
+        errors,
+        meta,
+        resetForm,
+        values,
+        createModalStore,
+        openModalCreate
+      }
     }
   }
-
-  onMounted(async () => {
-    teams.value = await props.listTeamsService()
-    showOnboardingSchedulingDialog()
-    if (props.inviteSession.sessionIsExpired()) {
-      props.inviteSession.turnInviteBlockVisable()
-    }
-  })
 </script>

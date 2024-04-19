@@ -4,7 +4,7 @@
   import RadioButton from 'primevue/radiobutton'
   import PrimeTextarea from 'primevue/textarea'
   import { useField } from 'vee-validate'
-  import { computed, watch } from 'vue'
+  import { computed } from 'vue'
 
   const { value: layer } = useField('layer')
   const { value: argumentsPurge, errorMessage: argumentsPurgeError } = useField('argumentsPurge')
@@ -18,16 +18,6 @@
       return 'www.example.com/images/*'
     }
     return 'www.example.com/images/image.jpg'
-  })
-
-  watch(layer, (newValue) => {
-    if (newValue === 'tiered_cache') {
-      purgeType.value = 'cachekey'
-    }
-  })
-
-  const isDisabled = computed(() => {
-    return layer.value === 'tiered_cache'
   })
 </script>
 
@@ -118,7 +108,6 @@
               <RadioButton
                 inputId="inputId1"
                 name="type"
-                :disabled="isDisabled"
                 value="cachekey"
                 v-model="purgeType"
               />
@@ -140,7 +129,6 @@
               <RadioButton
                 inputId="inputId2"
                 name="type"
-                :disabled="isDisabled"
                 value="url"
                 v-model="purgeType"
               />
@@ -164,7 +152,6 @@
               <RadioButton
                 inputId="inputId3"
                 name="type"
-                :disabled="isDisabled"
                 value="wildcard"
                 v-model="purgeType"
               />
