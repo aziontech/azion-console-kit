@@ -2,8 +2,8 @@ import { describe, it, expect, afterEach, vi } from 'vitest'
 import { getScriptRunnerImage } from '@/helpers/get-script-runner-image'
 
 const fixtures = {
-  stageImage: 'azionedge/azion-script-builder:edge-builder-stage-0.10.0',
-  productionImage: 'azionedge/azion-script-builder:edge-builder-stage-0.10.0'
+  stageImage: 'azionedge/azion-script-builder:edge-builder-stage-0.11.0',
+  productionImage: 'azionedge/azion-script-builder:edge-builder-stage-0.11.0'
 }
 
 const makeSut = () => {

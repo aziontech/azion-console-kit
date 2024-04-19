@@ -3,6 +3,7 @@ import * as VulcanService from '@/services/vulcan-services'
 import * as ScriptRunnerService from '@/services/script-runner-service'
 import * as GitHubServices from '@/services/github-services'
 import * as VariablesService from '@/services/variables-services'
+import * as TemplateEngineService from '@/services/template-engine-services'
 
 /** @type {import('vue-router').RouteRecordRaw} */
 export const importGithubRoutes = {
@@ -22,7 +23,8 @@ export const importGithubRoutes = {
         getModesByPresetService: VulcanService.getModesByPresetService,
         createScriptRunnerExecutionService: ScriptRunnerService.createScriptRunnerExecutionService,
         frameworkDetectorService: GitHubServices.frameworkDetectorService,
-        createVariablesService: VariablesService.createVariablesService
+        createVariablesService: VariablesService.createVariablesService,
+        instantiateTemplateService: TemplateEngineService.instantiateTemplate,
       },
       meta: {
         breadCrumbs: [
