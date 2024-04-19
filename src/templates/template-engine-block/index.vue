@@ -364,10 +364,14 @@
 
     if (element.validators) {
       element.validators.forEach((validator) => {
-        schema = schema.test(`valid-${element.name}`, escapeErrorMessage(validator.errorMessage), function (value) {
-          const domainRegex = new RegExp(validator.regex)
-          return domainRegex.test(value)
-        })
+        schema = schema.test(
+          `valid-${element.name}`,
+          escapeErrorMessage(validator.errorMessage),
+          function (value) {
+            const domainRegex = new RegExp(validator.regex)
+            return domainRegex.test(value)
+          }
+        )
       })
     }
 
