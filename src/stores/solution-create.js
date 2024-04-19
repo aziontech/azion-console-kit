@@ -5,6 +5,9 @@ export const useSolutionStore = defineStore({
   state: () => ({
     solution: null
   }),
+  persist: {
+    paths: ['solution']
+  },
   actions: {
     setSolution(solution) {
       this.solution = solution
