@@ -84,13 +84,14 @@
               />
               <div
                 v-if="hasIntegrations"
-                class="flex flex-col sm:max-w-lg w-full gap-2"
+                class="flex flex-col max-w-xs w-full gap-2"
               >
                 <FieldDropdown
                   :options="listOfIntegrations"
                   :name="field.name"
                   :isRequiredField="field.attrs.required"
                   :label="field.label"
+                  :value="setIntegration"
                   placeholder="Select a scope"
                   :description="field.description"
                   :inputClass="renderInvalidClass(formTools.errors[`${field.name}`])"
@@ -118,44 +119,48 @@
                 </FieldDropdown>
               </div>
             </div>
-            <div
-              v-else
-              class="flex flex-col sm:max-w-lg w-full gap-2"
-            >
-              <label
-                for="name"
-                class="text-color text-base font-medium"
-                >{{ field.label }}
-                <span v-if="field.attrs"><span v-if="field.attrs.required">*</span></span></label
+            <div v-else>
+              <div
+                class="flex flex-col sm:max-w-lg w-full gap-2"
+                v-if="isHandleField(field.name)"
               >
-              <Password
-                v-if="field.type === 'password'"
-                autocomplete="off"
-                toggleMask
-                :key="`password-field-${field.name}`"
-                v-bind="field.input"
-                v-model="field.input.value"
-                :id="field.name"
-                class="w-full"
-                :class="renderInvalidClass(formTools.errors[`${field.name}`])"
-                :feedback="false"
-              />
-              <InputText
-                v-else
-                autocomplete="off"
-                :key="field.name"
-                :id="field.name"
-                type="text"
-                v-bind="field.input"
-                :class="renderInvalidClass(formTools.errors[`${field.name}`])"
-              />
-              <small class="tet-xs font-normal text-color-secondary">{{ field.description }}</small>
-              <small
-                v-if="formTools.errors[field.name]"
-                class="p-error text-xs font-normal leading-tight"
-              >
-                {{ unescapeErrorMessage(formTools.errors[field.name]) }}
-              </small>
+                <label
+                  for="name"
+                  class="text-color text-base font-medium"
+                  >{{ field.label }}
+                  <span v-if="field.attrs"><span v-if="field.attrs.required">*</span></span></label
+                >
+                <Password
+                  v-if="field.type === 'password'"
+                  autocomplete="off"
+                  toggleMask
+                  :key="`password-field-${field.name}`"
+                  v-bind="field.input"
+                  v-model="field.input.value"
+                  :id="field.name"
+                  class="w-full"
+                  :class="renderInvalidClass(formTools.errors[`${field.name}`])"
+                  :feedback="false"
+                />
+                <InputText
+                  v-else
+                  autocomplete="off"
+                  :key="field.name"
+                  :id="field.name"
+                  type="text"
+                  v-bind="field.input"
+                  :class="renderInvalidClass(formTools.errors[`${field.name}`])"
+                />
+                <small class="tet-xs font-normal text-color-secondary">{{
+                  field.description
+                }}</small>
+                <small
+                  v-if="formTools.errors[field.name]"
+                  class="p-error text-xs font-normal leading-tight"
+                >
+                  {{ unescapeErrorMessage(formTools.errors[field.name]) }}
+                </small>
+              </div>
             </div>
           </div>
         </template>
@@ -242,6 +247,8 @@
   const oauthGithubRef = ref(null)
   const vcsIntegrationFieldName = ref('platform_feature__vcs_integration__uuid')
 
+  const setIntegration = ref('')
+
   const triggerConnectWithGithub = () => {
     if (oauthGithubRef.value) {
       oauthGithubRef.value[0].connectWithGithub()
@@ -286,6 +293,11 @@
       isIntegrationsLoading.value = true
       const data = await props.listIntegrationsService()
 
+      if (data && data.length > 0) {
+        formTools.value.setFieldValue(data[0].label, data[0].value)
+        setIntegration.value = data[0].value
+      }
+
       listOfIntegrations.value = data
     } catch (error) {
       toast.add({
@@ -326,7 +338,9 @@
   }
 
   const hasIntegrations = computed(() => {
-    if (listOfIntegrations?.value?.length > 0) return true
+    if (listOfIntegrations?.value?.length > 0) {
+      return true
+    }
     return false
   })
 
@@ -500,6 +514,14 @@
 
   const setCallbackUrl = (uri) => {
     callbackUrl.value = uri
+  }
+
+  const isHandleField = (field) => {
+    if (field === 'repository_name') {
+      if (hasIntegrations.value) return true
+      return false
+    }
+    return true
   }
 
   watch(inputSchema, async (newValue) => {
