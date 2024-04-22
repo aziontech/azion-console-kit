@@ -26,6 +26,7 @@
             :listAdditionalDataInfoService="listAdditionalDataInfoService"
             :postAdditionalDataService="postAdditionalDataService"
             :patchFullnameService="patchFullnameService"
+            :updateAccountInfoService="updateAccountInfoService"
             ref="additionalDataRef"
           />
         </div>
@@ -82,6 +83,10 @@
       required: true
     },
     patchFullnameService: {
+      type: Function,
+      required: true
+    },
+    updateAccountInfoService: {
       type: Function,
       required: true
     }
