@@ -1,7 +1,7 @@
 <template>
   <div>
     <section
-      class="flex max-xl:flex-col justify-start px-8 surface-section py-20 overflow-y-auto gap-20 md:gap-8 md:h-visible-area"
+      class="flex max-lg:flex-col justify-start px-8 surface-section py-20 overflow-y-auto gap-20 md:gap-8 md:h-visible-area"
     >
       <div
         class="w-auto flex flex-col items-center justify-start gap-16 px-20 static max-md:px-0 lg:mt-10 lg:sticky lg:top-0"
