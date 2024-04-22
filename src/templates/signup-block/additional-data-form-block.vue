@@ -5,7 +5,7 @@
   >
     <div
       class="flex flex-col gap-2"
-      v-if="additionalDataInfo"
+      v-if="additionalDataInfo?.length"
     >
       <!-- Step 1: Use -->
 
@@ -185,6 +185,7 @@
       >
         {{ additionalDataInfo[5].key }}*
         <PrimeInputSwitch
+          class="flex-shrink-0"
           v-model="onboardingSession"
           name="onboardingSession"
           id="onboardingSession"
@@ -413,6 +414,7 @@
   defineExpose({
     submitForm,
     loading,
+    hasFormValues: additionalDataInfo.value?.length,
     meta
   })
 </script>

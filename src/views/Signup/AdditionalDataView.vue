@@ -1,12 +1,12 @@
 <template>
   <div>
     <section
-      class="flex flex-col justify-start px-8 surface-section py-20 overflow-y-auto gap-20 md:gap-8 md:flex-row md:h-visible-area"
+      class="flex max-lg:flex-col justify-start px-8 surface-section py-20 overflow-y-auto gap-20 md:gap-8 md:h-visible-area"
     >
       <div
-        class="flex flex-col items-center justify-start gap-16 px-20 md:mt-10 md:w-4/5 md:sticky md:top-0"
+        class="w-auto flex flex-col items-center justify-start gap-16 px-20 max-md:px-0 md:mt-10 md:sticky md:top-0"
       >
-        <div class="w-full h-72" />
+        <AdditionalDataIllustration class="max-sm:w-full" />
         <div class="w-full max-w-md flex flex-col items-center text-center gap-4">
           <h1 class="text-3xl font-medium">Personalize Your Experience</h1>
           <p class="text-xl font-normal text-color-secondary">
@@ -15,7 +15,10 @@
           </p>
         </div>
       </div>
-      <div class="w-full flex flex-col justify-start items-center h-fit">
+      <div
+        class="flex flex-col justify-start items-center h-fit"
+        :class="[widthClass]"
+      >
         <div
           class="card w-full surface-border border rounded-md surface-section p-6 flex flex-col gap-8 xl:p-8"
         >
@@ -46,6 +49,7 @@
 
 <script setup>
   import AdditionalDataFormBlock from '@/templates/signup-block/additional-data-form-block'
+  import AdditionalDataIllustration from '@/assets/svg/additional-data-illustration'
   import ActionBar from '@/templates/action-bar-block'
   import PrimeButton from 'primevue/button'
   import { computed, ref } from 'vue'
@@ -58,6 +62,10 @@
 
   const showLoading = computed(() => {
     return additionalDataRef.value?.loading ? 'pi pi-spin pi-spinner' : ''
+  })
+
+  const widthClass = computed(() => {
+    return additionalDataRef.value?.hasFormValues ? 'w-auto' : 'w-full'
   })
 
   const onSubmit = () => {
