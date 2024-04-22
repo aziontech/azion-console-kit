@@ -130,7 +130,7 @@
     position="right"
     :pt="{
       root: { class: 'max-w-4xl w-full' },
-      content: { class: 'p-8'},
+      content: { class: 'p-8' }
     }"
   >
     <template #header>

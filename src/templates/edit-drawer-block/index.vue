@@ -162,7 +162,7 @@
     :pt="{
       root: { class: 'max-w-4xl w-full' },
       header: { class: 'flex justify-between text-xl font-medium px-8' },
-      content: {class: 'p-8'}
+      content: { class: 'p-8' }
     }"
   >
     <template #header>
