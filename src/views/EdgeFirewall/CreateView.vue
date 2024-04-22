@@ -5,9 +5,14 @@
   import PageHeadingBlock from '@/templates/page-heading-block'
   import * as yup from 'yup'
   import FormCreateEdgeFirewall from './FormFields/FormFieldsEdgeFirewall'
-  import { ref } from 'vue'
+  import { ref, inject } from 'vue'
 
   defineOptions({ name: 'create-edge-firewall' })
+
+  /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
+  import { handleTrackerError } from '@/utils/errorHandlingTracker'
+
+  const tracker = inject('tracker')
 
   const props = defineProps({
     createEdgeFirewallService: {
@@ -40,6 +45,24 @@
     networkProtectionEnabled: true,
     wafEnabled: false
   }
+
+  const handleCreateEdgeFirewall = () => {
+    tracker.product.productCreated({
+      productName: 'Edge Firewall'
+    })
+  }
+
+  const handleFailedCreateEdgeFirewall = (error) => {
+    const { fieldName, message } = handleTrackerError(error)
+    tracker.product
+      .failedToCreate({
+        productName: 'Edge Firewall',
+        errorType: 'api',
+        fieldName: fieldName.trim(),
+        errorMessage: message
+      })
+      .track()
+  }
 </script>
 
 <template>
@@ -52,6 +75,8 @@
         :createService="props.createEdgeFirewallService"
         :schema="validationSchema"
         :initialValues="initialValues"
+        @on-response="handleCreateEdgeFirewall"
+        @on-response-fail="handleFailedCreateEdgeFirewall"
       >
         <template #form>
           <FormCreateEdgeFirewall
