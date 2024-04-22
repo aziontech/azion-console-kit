@@ -141,8 +141,8 @@
     }
   }
   const modeList = ref([
-    { label: 'Deliver', value: 'deliver', disabled: false },
-    { label: 'Compute', value: 'compute', disabled: false }
+    { label: 'Deliver - Static', value: 'deliver', disabled: false },
+    { label: 'Compute - Edge processing (SSR or Back-End)', value: 'compute', disabled: false }
   ])
 
   const setModeByPreset = () => {
