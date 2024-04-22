@@ -76,7 +76,9 @@
     isSliceEdgeCachingEnabled: false
   })
 
-  const minimumAcceptableValue = computed(() => props.isEnableApplicationAccelerator ? CDN_MAXIMUM_TTL_MIN_VALUE : CDN_MAXIMUM_TTL_MAX_VALUE)
+  const minimumAcceptableValue = computed(() =>
+    props.isEnableApplicationAccelerator ? CDN_MAXIMUM_TTL_MIN_VALUE : CDN_MAXIMUM_TTL_MAX_VALUE
+  )
   const minimumAcceptableValueWhenIsHonor = ref(minimumAcceptableValue.value)
   const l2CachingEnabled = ref()
 
@@ -110,7 +112,10 @@
         is: 'honor',
         then: (schema) => schema.notRequired(),
         otherwise: (schema) =>
-          schema.min(minimumAcceptableValueWhenIsHonor.value).max(MAX_TTL_ONE_YEAR_IN_SECONDS).required()
+          schema
+            .min(minimumAcceptableValueWhenIsHonor.value)
+            .max(MAX_TTL_ONE_YEAR_IN_SECONDS)
+            .required()
       })
       .min(minimumAcceptableValue.value)
       .max(MAX_TTL_ONE_YEAR_IN_SECONDS)
