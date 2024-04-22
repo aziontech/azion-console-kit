@@ -162,14 +162,12 @@
     :pt="{
       root: { class: 'max-w-4xl w-full p-0' },
       header: { class: 'flex justify-between text-xl font-medium px-8' },
-      closeButton: { class: 'border surface-border' },
-      content: { class: '[&::-webkit-scrollbar]:hidden p-0 flex flex-col justify-between' }
     }"
   >
     <template #header>
       <h2>{{ title }}</h2>
     </template>
-    <div class="flex w-full md:p-8 pb-0">
+    <div class="pb-16 w-full space-y-8">
       <form
         @submit.prevent="handleSubmit"
         class="w-full flex flex-col gap-8"
@@ -180,7 +178,7 @@
         />
       </form>
     </div>
-    <div class="sticky bottom-0">
+    <div class="w-full fixed left-0 bottom-0">
       <GoBack
         :goBack="handleGoBack"
         v-if="showGoBack"
