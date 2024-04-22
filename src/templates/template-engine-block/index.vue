@@ -517,11 +517,8 @@
   }
 
   const isHandleField = (field) => {
-    if (field === 'repository_name') {
-      if (hasIntegrations.value) return true
-      return false
-    }
-    return true
+    if (field !== 'repository_name') return true
+    return hasIntegrations.value
   }
 
   watch(inputSchema, async (newValue) => {
