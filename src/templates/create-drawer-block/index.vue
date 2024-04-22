@@ -130,13 +130,13 @@
     position="right"
     :pt="{
       root: { class: 'max-w-4xl w-full' },
-      content: { class: 'overscroll-contain p-6 h-full -z-10' }
+      content: { class: 'p-8'},
     }"
   >
     <template #header>
       <h2>{{ title }}</h2>
     </template>
-    <div class="flex w-full md:p-8 pb-0">
+    <div class="flex w-full">
       <form
         @submit.prevent="handleSubmit"
         class="pb-16 w-full space-y-8"
