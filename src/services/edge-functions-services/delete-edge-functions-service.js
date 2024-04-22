@@ -11,6 +11,25 @@ export const deleteEdgeFunctionsService = async (id) => {
   return parseHttpResponse(httpResponse)
 }
 
+const mapErrorToMessage = (error) => {
+  switch (error) {
+    case 'edge_function_instantiated_error':
+      return `Can't delete an edge function being used. Disable it in the edge application or edge firewall to delete it.`
+    default:
+      return new Errors.UnexpectedError().message
+  }
+}
+
+/**
+ * @param {Object} httpResponse - The HTTP response object.
+ * @param {Array} httpResponse.body - The response body.
+ * @returns {string} The result message based on the status code.
+ */
+const extractApiError = (httpResponse) => {
+  const apiKeyError = Object.keys(httpResponse.body)[0]
+  return mapErrorToMessage(apiKeyError)
+}
+
 /**
  * @param {Object} httpResponse - The HTTP response object.
  * @param {String} httpResponse.statusCode - The HTTP status code.
@@ -22,7 +41,8 @@ const parseHttpResponse = (httpResponse) => {
     case 204:
       return 'Edge function successfully deleted'
     case 400:
-      throw new Errors.NotFoundError().message
+      const apiError = extractApiError(httpResponse)
+      throw new Error(apiError).message
     case 401:
       throw new Errors.InvalidApiTokenError().message
     case 403:

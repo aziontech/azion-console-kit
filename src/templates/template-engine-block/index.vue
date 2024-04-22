@@ -48,7 +48,7 @@
             v-if="formTools.errors[field.name]"
             class="p-error text-xs font-normal leading-tight"
           >
-            {{ formTools.errors[field.name] }}
+            {{ unescapeErrorMessage(formTools.errors[field.name]) }}
           </small>
         </div>
       </template>
@@ -70,7 +70,7 @@
             v-for="field in removeHiddenFields(group.fields)"
             :key="field.name"
           >
-            <div v-if="field.name === 'platform_feature__vcs_integration__uuid'">
+            <div v-if="field.name === vcsIntegrationFieldName">
               <OAuthGithub
                 v-show="!hasIntegrations"
                 ref="oauthGithubRef"
@@ -89,8 +89,9 @@
                 <FieldDropdown
                   :options="listOfIntegrations"
                   :name="field.name"
+                  :isRequiredField="field.attrs.required"
                   :label="field.label"
-                  :placeholder="field.placeholder"
+                  placeholder="Select a scope"
                   :description="field.description"
                   :inputClass="renderInvalidClass(formTools.errors[`${field.name}`])"
                   optionLabel="label"
@@ -153,7 +154,7 @@
                 v-if="formTools.errors[field.name]"
                 class="p-error text-xs font-normal leading-tight"
               >
-                {{ formTools.errors[field.name] }}
+                {{ unescapeErrorMessage(formTools.errors[field.name]) }}
               </small>
             </div>
           </div>
@@ -175,7 +176,7 @@
 <script setup>
   import Password from 'primevue/password'
   import FieldDropdown from '@/templates/form-fields-inputs/fieldDropdown.vue'
-  import { ref, defineOptions, watch, onMounted, computed } from 'vue'
+  import { ref, defineOptions, watch, onMounted, computed, onBeforeUnmount } from 'vue'
   import FormHorizontal from '@templates/create-form-block/form-horizontal'
   import ActionBarTemplate from '@templates/action-bar-block'
   import FormLoading from './form-loading'
@@ -239,6 +240,7 @@
   const listOfIntegrations = ref([])
   const isIntegrationsLoading = ref(false)
   const oauthGithubRef = ref(null)
+  const vcsIntegrationFieldName = ref('platform_feature__vcs_integration__uuid')
 
   const triggerConnectWithGithub = () => {
     if (oauthGithubRef.value) {
@@ -248,10 +250,20 @@
 
   onMounted(async () => {
     await loadTemplate(props.templateId)
-    await listIntegrations()
-
-    listenerOnMessage()
   })
+
+  onBeforeUnmount(() => {
+    removeEventListenerToGithubIntegration()
+  })
+
+  const extractFieldNames = (groups) => {
+    return groups.flatMap((group) => group.fields.map((field) => field.name))
+  }
+
+  const loadIntegrationOnShowButton = async () => {
+    await listIntegrations()
+    addEventListenerToGithubIntegration()
+  }
 
   const loadTemplate = async () => {
     try {
@@ -286,12 +298,26 @@
     }
   }
 
-  const listenerOnMessage = () => {
-    window.addEventListener('message', (event) => {
-      if (event.data.event === 'integration-data') {
-        saveIntegration(event.data)
-      }
-    })
+  const handleGithubIntegrationMessage = async (event) => {
+    if (event.data.event === 'integration-data') {
+      await saveIntegration(event.data)
+    }
+  }
+
+  const addEventListenerToGithubIntegration = () => {
+    window.addEventListener('message', handleGithubIntegrationMessage)
+  }
+
+  const removeEventListenerToGithubIntegration = () => {
+    window.removeEventListener('message', handleGithubIntegrationMessage)
+  }
+
+  const escapeErrorMessage = (errorMessage) => {
+    return errorMessage.replaceAll('${', '#$')
+  }
+
+  const unescapeErrorMessage = (errorMessage) => {
+    return errorMessage.replaceAll('#$', '${')
   }
 
   const renderInvalidClass = (containErrorInField) => {
@@ -355,10 +381,14 @@
 
     if (element.validators) {
       element.validators.forEach((validator) => {
-        schema = schema.test(`valid-${element.name}`, validator.errorMessage, function (value) {
-          const domainRegex = new RegExp(validator.regex)
-          return domainRegex.test(value)
-        })
+        schema = schema.test(
+          `valid-${element.name}`,
+          escapeErrorMessage(validator.errorMessage),
+          function (value) {
+            const domainRegex = new RegExp(validator.regex)
+            return domainRegex.test(value)
+          }
+        )
       })
     }
 
@@ -471,6 +501,15 @@
   const setCallbackUrl = (uri) => {
     callbackUrl.value = uri
   }
+
+  watch(inputSchema, async (newValue) => {
+    const groupsToCheck = newValue.groups || []
+    const fieldNames = extractFieldNames(groupsToCheck)
+
+    if (fieldNames.includes(vcsIntegrationFieldName.value)) {
+      await loadIntegrationOnShowButton()
+    }
+  })
 
   watch(
     () => props.freezeLoading,

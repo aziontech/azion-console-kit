@@ -193,10 +193,12 @@
     try {
       const name = extractNameFromEmail(values.email)
       const captcha = await recaptcha.execute('signup')
+      const formattedEmail = encodeEmail(values.email)
+
       await props.signupService({ ...values, name, captcha })
+      await router.push({ query: { email: formattedEmail } })
 
       tracker.signUp.userClickedSignedUp({ method: 'email' }).track()
-      router.push({ query: { email: encodeEmail(values.email) } })
       loading.value = false
       emit('loginWithEmail')
     } catch (err) {

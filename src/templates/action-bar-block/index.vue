@@ -50,23 +50,25 @@
       }"
     >
       <div class="flex gap-4 self-stretch items-center justify-end w-full">
-        <PrimeButton
-          severity="primary"
-          :label="props.secondaryActionLabel"
-          outlined
-          class="max-md:min-w-max"
-          @click="handleCancel"
-          :disabled="isDisabledCancel"
-        />
-        <PrimeButton
-          severity="primary"
-          :label="props.primaryActionLabel"
-          @click="handleSubmit"
-          icon-pos="right"
-          class="max-md:w-full"
-          :icon="calculateLoadIconByLoadingState"
-          :disabled="isDisabledSubmit"
-        />
+        <slot>
+          <PrimeButton
+            severity="primary"
+            :label="props.secondaryActionLabel"
+            outlined
+            class="max-md:min-w-max"
+            @click="handleCancel"
+            :disabled="isDisabledCancel"
+          />
+          <PrimeButton
+            severity="primary"
+            :label="props.primaryActionLabel"
+            @click="handleSubmit"
+            icon-pos="right"
+            class="max-md:w-full"
+            :icon="calculateLoadIconByLoadingState"
+            :disabled="isDisabledSubmit"
+          />
+        </slot>
       </div>
     </div>
   </div>

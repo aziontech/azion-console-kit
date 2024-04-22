@@ -101,6 +101,7 @@
         createButtonLabel="Edge Firewall"
         createPagePath="/edge-firewall/create"
         :documentationService="props.documentationService"
+        @click-to-create="handleTrackEvent"
       >
       </EmptyResultsBlock>
     </template>

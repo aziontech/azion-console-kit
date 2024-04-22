@@ -34,7 +34,7 @@
                 <LoginWithEmailBlock
                   :showLoginFromEmail="showLoginFromEmail"
                   :signupService="props.signupService"
-                  @loginWithEmail="showActivation = false"
+                  @loginWithEmail="showActivationEmail"
                 />
               </div>
             </div>
@@ -96,6 +96,10 @@
 
   const updateEmailForm = (value) => {
     showLoginFromEmail.value = value
+  }
+
+  const showActivationEmail = () => {
+    showActivation.value = false
   }
 
   const goToLogin = () => {

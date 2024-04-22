@@ -5,6 +5,9 @@
   import PageHeadingBlock from '@/templates/page-heading-block'
   import * as yup from 'yup'
   import FormFieldsImportStatic from './FormFields/FormFieldsImportStatic.vue'
+  import { useToast } from 'primevue/usetoast'
+
+  const toast = useToast()
 
   const props = defineProps({
     listPlatformsService: {
@@ -32,6 +35,14 @@
       required: true
     },
     createScriptRunnerExecutionService: {
+      type: Function,
+      required: true
+    },
+    frameworkDetectorService: {
+      type: Function,
+      required: true
+    },
+    createVariablesService: {
       type: Function,
       required: true
     }
@@ -65,7 +76,19 @@
   }
 
   const handleExecuteScriptRunner = async (formValues) => {
-    return await props.createScriptRunnerExecutionService(formValues)
+    try {
+      await Promise.all(
+        formValues.newVariables.map((variable) => props.createVariablesService(variable))
+      )
+      return props.createScriptRunnerExecutionService(formValues)
+    } catch (error) {
+      toast.add({
+        closable: true,
+        severity: 'error',
+        summary: 'error',
+        detail: error
+      })
+    }
   }
 </script>
 
@@ -88,6 +111,7 @@
             :postCallbackUrlService="postCallbackUrlService"
             :listVulcanPresetsService="listVulcanPresetsService"
             :getModesByPresetService="getModesByPresetService"
+            :frameworkDetectorService="frameworkDetectorService"
           />
         </template>
         <template #action-bar="{ onSubmit, formValid, onCancel, loading }">

@@ -1,5 +1,4 @@
-const DELIVER_PRESETS = ['nextjs', 'angular', 'astro', 'hexo', 'react', 'vite', 'vue']
-const COMPUTE_PRESETS = ['nextjs']
+import { getVulcanPresets } from '@/helpers'
 
 /**
  * @typedef {'nextjs'|'angular'|'astro'|'hexo'|'react'|'vite'|'vue'} PresetName
@@ -14,10 +13,10 @@ const COMPUTE_PRESETS = ['nextjs']
 export const getModesByPresetService = (presetName) => {
   const modes = []
 
-  if (DELIVER_PRESETS.includes(presetName)) {
+  if (getVulcanPresets('deliver').includes(presetName)) {
     modes.push('deliver')
   }
-  if (COMPUTE_PRESETS.includes(presetName)) {
+  if (getVulcanPresets('compute').includes(presetName)) {
     modes.push('compute')
   }
 

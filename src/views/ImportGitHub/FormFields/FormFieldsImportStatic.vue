@@ -9,8 +9,11 @@
   import { ref, onMounted, computed } from 'vue'
   import { useField } from 'vee-validate'
   import { useToast } from 'primevue/usetoast'
+  import { useRouter } from 'vue-router'
+  import { windowOpen } from '@/helpers'
 
   const toast = useToast()
+  const router = useRouter()
 
   const props = defineProps({
     listPlatformsService: {
@@ -29,6 +32,9 @@
       type: Function
     },
     getModesByPresetService: {
+      type: Function
+    },
+    frameworkDetectorService: {
       type: Function
     }
   })
@@ -98,7 +104,8 @@
       toast.add({
         closable: true,
         severity: 'error',
-        summary: error
+        summary: 'error',
+        detail: error
       })
     } finally {
       isGithubConnectLoading.value = false
@@ -118,6 +125,7 @@
   const loadingRepositories = ref(false)
   const setListRepositories = async () => {
     try {
+      repositoriesList.value = []
       loadingRepositories.value = true
       const data = await props.listRepositoriesService(gitScope.value)
       repositoriesList.value = data
@@ -125,7 +133,8 @@
       toast.add({
         closable: true,
         severity: 'error',
-        summary: error
+        summary: 'error',
+        detail: error
       })
     } finally {
       loadingRepositories.value = false
@@ -150,8 +159,30 @@
     }))
   }
 
-  const setEdgeApplicationNameByRepository = (repositoryName) => {
+  const detectAndSetFrameworkPreset = async (accountName, repositoryName) => {
+    try {
+      const framework = await props.frameworkDetectorService({ accountName, repositoryName })
+      preset.value = framework
+      setModeByPreset()
+    } catch (error) {
+      toast.add({
+        closable: true,
+        severity: 'error',
+        summary: 'error',
+        detail: error
+      })
+    }
+  }
+
+  const setEdgeApplicationNameByRepository = async (repositoryName) => {
     edgeApplicationName.value = repositoryName
+    const accountName = getOptionNameByValue({
+      listOption: integrationsList.value,
+      optionValue: gitScope.value,
+      key: 'value'
+    })
+
+    await detectAndSetFrameworkPreset(accountName, repositoryName)
   }
 
   const oauthGithubRef = ref(null)
@@ -168,6 +199,11 @@
 
   const getPresetIconClass = (preset) => {
     return `ai ai-${preset}`
+  }
+
+  const goToVariablesPage = () => {
+    const route = router.resolve({ name: 'variables' })
+    windowOpen(route.href, '_blank')
   }
 
   onMounted(async () => {
@@ -443,7 +479,7 @@
           icon-pos="right"
           icon="pi pi-external-link"
           label="View All Variables"
-          @click="addVariable"
+          @click="goToVariablesPage"
         />
       </div>
     </template>

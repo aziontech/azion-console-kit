@@ -48,6 +48,10 @@
       type: Boolean,
       default: false
     },
+    isRequiredField: {
+      type: Boolean,
+      default: false
+    },
     enableWorkaroundLabelToDisabledOptions: {
       type: Boolean,
       default: false
@@ -104,13 +108,17 @@
   /**
    * end of primevue workaround
    */
+
+  const labelSufix = computed(() => {
+    return props.isRequiredField ? '*' : ''
+  })
 </script>
 
 <template>
   <label
     :for="props.name"
-    class="text-color text-sm font-medium leading-5"
-    >{{ props.label }}</label
+    class="text-color text-base font-medium leading-5"
+    >{{ props.label }} {{ labelSufix }}</label
   >
   <Dropdown
     appendTo="self"
