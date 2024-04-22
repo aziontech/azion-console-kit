@@ -22,7 +22,9 @@
 </script>
 
 <template>
-  <div class="flex w-full gap-4 justify-end h-14 items-center border-t surface-border sticky bottom-0 surface-section z-50 px-2 md:px-8">
+  <div
+    class="flex w-full gap-4 justify-end h-14 items-center border-t surface-border sticky bottom-0 surface-section z-50 px-2 md:px-8"
+  >
     <PrimeButton
       severity="primary"
       outlined
