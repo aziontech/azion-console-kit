@@ -1,8 +1,8 @@
 <template>
   <Avatar
     @click="toggleProfile"
-    icon="pi pi-user"
-    class="transition-all bg-header-avatar cursor-pointer"
+    label="U"
+    class="transition-all hover:border-orange-500 hover:bg-header-button-hover cursor-pointer bg-header-avatar text-avatar"
     v-tooltip.bottom="{ value: 'Account', showDelay: 200 }"
   />
 
@@ -112,7 +112,7 @@
     :popup="true"
     ref="profile"
     :pt="{
-      root: { class: 'w-[280px] pb-2 pt-0 left-auto right-0 mr-9' },
+      root: { class: 'w-[280px] pb-2 pt-0 z-50 left-auto right-0 mr-9' },
       content: { class: 'text-sm' }
     }"
   >

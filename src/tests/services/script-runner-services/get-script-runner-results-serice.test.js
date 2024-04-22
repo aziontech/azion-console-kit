@@ -1,5 +1,5 @@
 import { AxiosHttpClientAdapter } from '@/services/axios/AxiosHttpClientAdapter'
-import { loadScriptRunnerExecutionResultsService } from '@/services/script-runner-service'
+import { getScriptRunnerResultsService } from '@/services/script-runner-service'
 import { describe, expect, it, vi } from 'vitest'
 import * as Errors from '@/services/axios/errors'
 
@@ -14,7 +14,7 @@ const fixtures = {
 }
 
 const makeSut = () => {
-  const sut = loadScriptRunnerExecutionResultsService
+  const sut = getScriptRunnerResultsService
   return {
     sut
   }

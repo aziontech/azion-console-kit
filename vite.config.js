@@ -32,16 +32,15 @@ const getConfig = () => {
           rewrite: (path) =>
             path.replace(/^\/api\/(marketplace|script-runner|template-engine)/, '/$1/api')
         },
-        '^/api/vcs': {
-          target: `${URLStartPrefix}vcs-api.azion.net/`,
-          changeOrigin: true,
-          rewrite: (path) =>
-            path.replace(/^\/api\/vcs/, '/vcs/api')
-        },
         '/graphql/cities': {
           target: `${URLStartPrefix}cities.azion.com`,
           changeOrigin: true,
           rewrite: (path) => path.replace(/^\/graphql\/cities/, '/graphql')
+        },
+        '/metrics/graphql': {
+          target: `${URLStartPrefix}manager.azion.com/metrics/graphql`,
+          changeOrigin: true,
+          rewrite: (path) => path.replace(/^\/metrics\/graphql/, '')
         },
         '^/api/(account|user|token|switch-account|auth|password|totp)|^/logout': {
           target: `${URLStartPrefix}sso.azion.com`,
