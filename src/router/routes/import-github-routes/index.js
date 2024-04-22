@@ -24,7 +24,7 @@ export const importGithubRoutes = {
         frameworkDetectorService: GitHubServices.frameworkDetectorService,
         createVariablesService: VariablesService.createVariablesService,
         instantiateTemplateService: TemplateEngineService.instantiateTemplate,
-        loadSolutionService: MarketplaceService.loadSolutionService,
+        loadSolutionService: MarketplaceService.loadSolutionService
       },
       meta: {
         breadCrumbs: [
