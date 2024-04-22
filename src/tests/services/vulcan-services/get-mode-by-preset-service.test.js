@@ -12,8 +12,8 @@ const makeSut = () => {
 
 describe('VulcanServices', () => {
   it.each([
-    { preset: 'nextjs', mode: 'deliver' },
-    { preset: 'nextjs', mode: 'compute' }
+    { preset: 'next', mode: 'deliver' },
+    { preset: 'next', mode: 'compute' }
   ])('should return the correct mode for a given preset', ({ preset, mode }) => {
     const { sut } = makeSut()
     const result = sut.getModesByPresetService(preset)

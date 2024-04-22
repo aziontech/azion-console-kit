@@ -50,9 +50,7 @@ const detectFrameworkByDependencies = (httpResponse) => {
   const dependencies = Object.keys(packageSchema?.dependencies || {})
 
   const allPresets = getVulcanPresets()
-  const allDetectedFrameworks = dependencies
-    .map((dependency) => (dependency === 'next' ? 'nextjs' : dependency))
-    .filter((dependency) => allPresets.includes(dependency))
+  const allDetectedFrameworks = dependencies.filter((dependency) => allPresets.includes(dependency))
 
   const hasMatchCases = allDetectedFrameworks.length > 0
 
