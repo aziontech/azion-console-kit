@@ -29,7 +29,7 @@ export const importGithubRoutes = {
       meta: {
         breadCrumbs: [
           {
-            label: 'Import Static Site from GitHub',
+            label: 'Import from GitHub',
             to: '/import-github'
           }
         ]

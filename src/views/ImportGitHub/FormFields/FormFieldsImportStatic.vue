@@ -382,6 +382,9 @@
               </div>
             </template>
           </Dropdown>
+          <small class="text-xs text-color-secondary font-normal leading-5">
+            Defines the initial settings to work with web frameworks.
+          </small>
         </div>
         <div class="flex flex-col sm:w-2/5 gap-2">
           <FieldDropdown
@@ -394,6 +397,7 @@
             label="Mode *"
             name="mode"
             :value="mode"
+            description="Defines the operational mode of application within the framework."
           />
         </div>
       </div>

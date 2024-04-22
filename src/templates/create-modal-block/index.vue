@@ -104,19 +104,7 @@
     }
   ])
 
-  // const githubOptions = ref([
-  //   {
-  //     label: 'Import Static Site from GitHub',
-  //     icon: 'pi pi-github',
-  //     description: `Import an existing static project to deploy it on Azion's edge.`,
-  //     command: () => {
-  //       redirectGithubImport()
-  //     }
-  //   }
-  // ])
-
   const redirectGithubImport = (template, section) => {
-    // const importGithubTemplateSolutionId = '74a24917-afb7-405c-a99b-3a5301b3d9e9'
     tracker.create.selectedOnCreate({
       section,
       selection: template.name
