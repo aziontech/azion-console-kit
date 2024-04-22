@@ -233,7 +233,7 @@
   const tracker = inject('tracker')
   const router = useRouter()
   const toast = useToast()
-  const { userId } = useAccountStore()
+  const { userId, accountId } = useAccountStore()
 
   defineOptions({
     name: 'additional-data-form-block'
@@ -249,6 +249,10 @@
       required: true
     },
     patchFullnameService: {
+      type: Function,
+      required: true
+    },
+    updateAccountInfoService: {
       type: Function,
       required: true
     }
@@ -381,6 +385,11 @@
 
       const usersPayload = fullName.value
 
+      const accountPayload = {
+        id: accountId,
+        jobFunction: role.value
+      }
+
       const patchName = props.patchFullnameService(usersPayload)
 
       const postAddData = props.postAdditionalDataService({
@@ -388,8 +397,11 @@
         options: additionalDataInfo.value
       })
 
+      const updateAccount = props.updateAccountInfoService(accountPayload)
+
       await patchName
       await postAddData
+      await updateAccount
 
       tracker.signUp.submittedAdditionalData(values).track()
 
