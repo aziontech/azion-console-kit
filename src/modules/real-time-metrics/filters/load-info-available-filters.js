@@ -1,8 +1,7 @@
-import BeholderService from '@services/real-time-metrics-services/fetch-metrics-data-from-beholder'
-import Axios from 'axios'
+import { loadRealTimeMetricsData } from '@/services/real-time-metrics-services'
 import { capitalizeFirstLetter } from '@/helpers'
 
-let cancelRequest = null
+let abortController = null
 
 /**
  * Checks if the given name is an alias and returns the corresponding value from the aliasMapping object.
@@ -44,16 +43,17 @@ const datasetListQuery = `query {
  * @return {Object} The processed available filters information.
  */
 export default async function LoadInfoAvailableFilters() {
-  if (cancelRequest) cancelRequest.cancel()
-  const ReportsRequestToken = Axios.CancelToken
-  cancelRequest = ReportsRequestToken.source()
+  if (abortController) abortController.abort()
+  abortController = new AbortController()
 
   const graphqlQuery = { query: datasetListQuery }
 
-  const beholderService = new BeholderService({ cancelRequest })
-  const { __type } = await beholderService.gql(graphqlQuery)
+  const { __type: type } = await loadRealTimeMetricsData({
+    query: graphqlQuery,
+    signal: abortController.signal
+  })
 
-  const availableFilters = __type.fields
+  const availableFilters = type.fields
   const newAvailableFilters = {}
 
   availableFilters.forEach((item) => {

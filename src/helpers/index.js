@@ -4,9 +4,15 @@ import {
   openContactSupport,
   openDocumentation,
   openGoogleAuthenticatorAppDocumentation,
-  openSearchResult
+  openSearchResult,
+  openAzionSite,
+  openAzionBlog,
+  openAzionDiscord,
+  openAzionGithub,
+  openAzionX
 } from './azion-documentation-window-opener'
 import { azionPrivacyPolicyWindowOpener } from './azion-privacy-policy-opener'
+import { azionOnboardingWindowOpener } from './azion-onboarding-window-opener'
 import { azionTermsAndServicesWindowOpener } from './azion-terms-and-services-opener'
 import { capitalizeFirstLetter } from './capitalize-first-letter'
 import { clipboardWrite } from './clipboard'
@@ -18,10 +24,15 @@ import { metricsPlaygroundOpener } from './metrics-playground-opener'
 import { parseCamelToSnake, parseSnakeToCamel } from './parse-api-body'
 import { themeSelect } from './theme-select'
 import { convertValueToDate, convertDateToLocalTimezone } from './convert-date'
+import { getScriptRunnerImage } from './get-script-runner-image'
+import { windowOpen } from './window-open'
+import { getVulcanPresets } from './get-vulcan-presets'
+import { goToClassicInterface } from './go-to-classic-interface'
 
 export {
   InviteSession,
   azionPrivacyPolicyWindowOpener,
+  azionOnboardingWindowOpener,
   azionTermsAndServicesWindowOpener,
   capitalizeFirstLetter,
   clipboardWrite,
@@ -36,9 +47,18 @@ export {
   openDocumentation,
   openGoogleAuthenticatorAppDocumentation,
   openSearchResult,
+  openAzionSite,
+  openAzionBlog,
+  openAzionDiscord,
+  openAzionGithub,
+  openAzionX,
   parseCamelToSnake,
   parseSnakeToCamel,
   themeSelect,
   convertValueToDate,
-  convertDateToLocalTimezone
+  convertDateToLocalTimezone,
+  getScriptRunnerImage,
+  windowOpen,
+  getVulcanPresets,
+  goToClassicInterface
 }

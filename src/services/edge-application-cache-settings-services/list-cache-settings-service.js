@@ -8,7 +8,7 @@ import { makeEdgeApplicationBaseUrl } from '../edge-application-services/make-ed
  */
 export const listCacheSettingsService = async ({ id }) => {
   let httpResponse = await AxiosHttpClientAdapter.request({
-    url: `${makeEdgeApplicationBaseUrl()}/${id}/cache_settings`,
+    url: `${makeEdgeApplicationBaseUrl()}/${id}/cache_settings?page_size=200`,
     method: 'GET'
   })
   httpResponse = adapt(httpResponse)
@@ -16,12 +16,21 @@ export const listCacheSettingsService = async ({ id }) => {
   return parseHttpResponse(httpResponse)
 }
 
+const formatCacheSettings = (value) => {
+  const CACHE_SETTINGS_OPTIONS = {
+    honor: 'Honor Origin Cache Headers',
+    override: 'Override Cache Settings'
+  }
+
+  return CACHE_SETTINGS_OPTIONS[value]
+}
+
 const adapt = (httpResponse) => {
   const parseHttpResponse = httpResponse.body.results.map((cacheSettings) => ({
     id: cacheSettings.id.toString(),
     name: cacheSettings.name,
-    browserCache: cacheSettings.browser_cache_settings,
-    cdnCache: cacheSettings.cdn_cache_settings
+    browserCache: formatCacheSettings(cacheSettings.browser_cache_settings),
+    cdnCache: formatCacheSettings(cacheSettings.cdn_cache_settings)
   }))
 
   return {

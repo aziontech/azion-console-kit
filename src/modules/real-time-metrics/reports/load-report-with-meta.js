@@ -1,5 +1,5 @@
 import { useAccountStore } from '@/stores/account'
-import { BeholderService } from '@services/real-time-metrics-services'
+import { loadRealTimeMetricsData } from '@services/real-time-metrics-services'
 import FillResultQuery from './fill-result-query'
 import ConvertBeholderToChart from './convert-beholder-to-chart'
 import GqlRules from './convert-report-meta-to-gql'
@@ -33,8 +33,7 @@ function removeUnfinishedRegister(registers, { filterEndDatetime, currentEndDate
  * @returns beholder GraphQL Result
  */
 export default async function LoadReportWithMeta(filters, report) {
-  const cancelRequest = report.tokenSource
-  const beholderService = new BeholderService({ cancelRequest })
+  const { signal } = report
 
   const newReport = { ...report }
   if (!newReport.filters) newReport.filters = {}
@@ -62,7 +61,7 @@ export default async function LoadReportWithMeta(filters, report) {
   let resultQueryRaw = null
 
   try {
-    resultQueryRaw = await beholderService.gql(query)
+    resultQueryRaw = await loadRealTimeMetricsData({ query, signal })
   } catch (beholderRequestError) {
     return {
       reportId: report.id,

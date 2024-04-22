@@ -35,11 +35,29 @@ const parseHttpResponse = (httpResponse) => {
   }
 }
 
+const validateCertificateFields = ({ certificate, privateKey }) => {
+  const hasCertificate = !!certificate?.trim()
+  const hasPrivateKey = !!privateKey?.trim()
+
+  if (!hasCertificate && !hasPrivateKey) return {}
+
+  if (!hasPrivateKey) return { certificate }
+
+  if (!hasCertificate) return { private_key: privateKey }
+
+  return {
+    certificate,
+    private_key: privateKey
+  }
+}
+
 const adapt = (payload) => {
   return {
     name: payload.digitalCertificateName,
     certificate_type: payload.certificateType,
-    certificate: payload.certificate,
-    private_key: payload.privateKey
+    ...validateCertificateFields({
+      certificate: payload.certificate,
+      privateKey: payload.privateKey
+    })
   }
 }
