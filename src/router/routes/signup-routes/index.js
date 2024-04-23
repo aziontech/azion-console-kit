@@ -32,7 +32,8 @@ export const signupRoutes = {
       props: {
         listAdditionalDataInfoService: SignupService.listAdditionalDataInfoService,
         postAdditionalDataService: SignupService.postAdditionalDataService,
-        patchFullnameService: SignupService.patchFullnameService
+        patchFullnameService: SignupService.patchFullnameService,
+        updateAccountInfoService: SignupService.updateAccountInfoService
       },
       meta: {
         hideNavigation: true
