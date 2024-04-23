@@ -42,6 +42,7 @@
         autocomplete="off"
         mediumLabel="Medium"
         strongLabel="Strong"
+        :strongRegex="strongPasswordRegex"
         required
         :pt="{
           meter: 'rounded-md',
@@ -115,6 +116,17 @@
     getInstance().showBadge()
   })
 
+  /*
+  Enforce the following rules:
+    1. Must have at least 1 special character - (?=.*[-_!@#$%^&*(),.?":{}|<>])
+    2. Must have at least 1 uppercase letter - (?=.*[A-Z])
+    3. Must have at least 1 lowercase letter - (?=.*[a-z])
+    4. Must have at least 1 number - (?=.*[0-9])
+    5. Must have at least 8 characters - (?=.{8,})
+  */
+  const strongPasswordRegex =
+    '^(?=.*[-_!@#$%^&*(),.?":{}|<>])(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9])(?=.{8,})'
+
   const passwordRequirementsList = ref([
     { text: '8 characters', valid: false },
     { text: '1 uppercase letter', valid: false },
@@ -137,7 +149,7 @@
       .test('requirements', 'Password does not meet requirements.', (value) => {
         const hasUpperCase = value && /[A-Z]/.test(value)
         const hasLowerCase = value && /[a-z]/.test(value)
-        const hasSpecialChar = value && /[!@#$%^&*(),.?":{}|<>]/.test(value)
+        const hasSpecialChar = value && /[!-_@#$%^&*(),.?":{}|<>]/.test(value)
         const hasMinLength = value?.length > 7
         const hasNumber = value && /[0-9]/.test(value)
 
