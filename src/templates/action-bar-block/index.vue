@@ -40,7 +40,7 @@
 </script>
 <template>
   <div
-    class="flex flex-col w-full justify-center items-center max-h-12 border-t surface-border sticky bottom-0 surface-section z-50 sm:flex-row md:px-8 px-2 py-8 sm:justify-between"
+    class="flex w-full gap-4 justify-end h-14 items-center border-t surface-border sticky bottom-0 surface-section z-50 px-2 md:px-8"
   >
     <div
       class="flex w-full justify-content-end max-w-full 3xl:mx-auto"

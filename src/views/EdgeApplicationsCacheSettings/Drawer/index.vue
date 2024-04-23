@@ -4,7 +4,7 @@
   import FormFieldsEdgeApplicationCacheSettings from '../FormFields/FormFieldsEdgeApplicationCacheSettings'
   import * as yup from 'yup'
   import { refDebounced } from '@vueuse/core'
-  import { ref, inject } from 'vue'
+  import { ref, inject, computed } from 'vue'
   import { CDN_MAXIMUM_TTL_MAX_VALUE, CDN_MAXIMUM_TTL_MIN_VALUE } from '@/utils/constants'
 
   /**@type {import('@/plugins/adapters/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
@@ -76,15 +76,18 @@
     isSliceEdgeCachingEnabled: false
   })
 
-  const minimumAcceptableValue = ref(CDN_MAXIMUM_TTL_MAX_VALUE)
-
+  const minimumAcceptableValue = computed(() =>
+    props.isEnableApplicationAccelerator ? CDN_MAXIMUM_TTL_MIN_VALUE : CDN_MAXIMUM_TTL_MAX_VALUE
+  )
+  const minimumAcceptableValueWhenIsHonor = ref(minimumAcceptableValue.value)
   const l2CachingEnabled = ref()
+
   const setNewMinimumValue = (value) => {
     l2CachingEnabled.value = value
     if (l2CachingEnabled.value || props.isEnableApplicationAccelerator) {
-      minimumAcceptableValue.value = CDN_MAXIMUM_TTL_MIN_VALUE
+      minimumAcceptableValueWhenIsHonor.value = CDN_MAXIMUM_TTL_MIN_VALUE
     } else {
-      minimumAcceptableValue.value = CDN_MAXIMUM_TTL_MAX_VALUE
+      minimumAcceptableValueWhenIsHonor.value = CDN_MAXIMUM_TTL_MAX_VALUE
     }
   }
 
@@ -109,8 +112,14 @@
         is: 'honor',
         then: (schema) => schema.notRequired(),
         otherwise: (schema) =>
-          schema.min(minimumAcceptableValue.value).max(MAX_TTL_ONE_YEAR_IN_SECONDS).required()
-      }),
+          schema
+            .min(minimumAcceptableValueWhenIsHonor.value)
+            .max(MAX_TTL_ONE_YEAR_IN_SECONDS)
+            .required()
+      })
+      .min(minimumAcceptableValue.value)
+      .max(MAX_TTL_ONE_YEAR_IN_SECONDS)
+      .required(),
     sliceConfigurationEnabled: yup.boolean().required(),
     sliceConfigurationRange: yup
       .number()

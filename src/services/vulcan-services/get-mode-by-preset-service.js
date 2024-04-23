@@ -1,7 +1,7 @@
 import { getVulcanPresets } from '@/helpers'
 
 /**
- * @typedef {'nextjs'|'angular'|'astro'|'hexo'|'react'|'vite'|'vue'} PresetName
+ * @typedef {'next'|'angular'|'astro'|'hexo'|'react'|'vite'|'vue'} PresetName
  */
 
 /**

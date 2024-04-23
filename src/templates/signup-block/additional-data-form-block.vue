@@ -5,7 +5,7 @@
   >
     <div
       class="flex flex-col gap-2"
-      v-if="additionalDataInfo"
+      v-if="additionalDataInfo?.length"
     >
       <!-- Step 1: Use -->
 
@@ -185,6 +185,7 @@
       >
         {{ additionalDataInfo[5].key }}*
         <PrimeInputSwitch
+          class="flex-shrink-0"
           v-model="onboardingSession"
           name="onboardingSession"
           id="onboardingSession"
@@ -250,6 +251,10 @@
     patchFullnameService: {
       type: Function,
       required: true
+    },
+    updateAccountInfoService: {
+      type: Function,
+      required: true
     }
   })
 
@@ -287,15 +292,18 @@
       is: (val) => val && val !== 'Just me',
       then: (schema) =>
         schema
-          .url('Company Website must be a valid URL')
+          .trim()
           .max(255, 'Company Website must be less than 255 characters')
-          .required('Company Website is a required field')
+          .matches(
+            /[-a-zA-Z0-9._+=]+\.[a-zA-Z0-9]+\b([-a-zA-Z0-9.]*)/,
+            'Company Website is a required field'
+          )
     }),
     fullName: yup
       .string()
       .trim()
       .max(61, 'Full Name must be less than 61 characters')
-      .required('Full Name is a required field'),
+      .matches(/[A-zÀ-ž.'-]+ [A-zÀ-ž.'-]+/, 'Full Name is a required field'),
     onboardingSession: yup.boolean()
   })
 
@@ -377,6 +385,8 @@
 
       const usersPayload = fullName.value
 
+      const accountPayload = role.value
+
       const patchName = props.patchFullnameService(usersPayload)
 
       const postAddData = props.postAdditionalDataService({
@@ -384,8 +394,11 @@
         options: additionalDataInfo.value
       })
 
+      const updateAccount = props.updateAccountInfoService(accountPayload)
+
       await patchName
       await postAddData
+      await updateAccount
 
       tracker.signUp.submittedAdditionalData(values).track()
 
@@ -413,6 +426,7 @@
   defineExpose({
     submitForm,
     loading,
+    hasFormValues: additionalDataInfo.value?.length,
     meta
   })
 </script>

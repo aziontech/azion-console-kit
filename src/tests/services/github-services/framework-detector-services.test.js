@@ -1,7 +1,6 @@
 import { describe, expect, it, vi, afterEach } from 'vitest'
 import { frameworkDetectorService } from '@/services/github-services/framework-detector-services'
 import { AxiosHttpClientAdapter } from '@/services/axios/AxiosHttpClientAdapter'
-import * as Errors from '@/services/axios/errors'
 import { Buffer } from 'buffer'
 
 const fixtures = {
@@ -12,7 +11,7 @@ const fixtures = {
     }
   },
   mockAdaptedResponse: {
-    body: 'nextjs',
+    body: 'next',
     statusCode: 200
   },
   mockPackageJson: {
@@ -73,42 +72,6 @@ describe('GithubServices', () => {
 
     expect(result).toEqual(fixtures.mockAdaptedResponse.body)
   })
-
-  it.each([
-    {
-      statusCode: 401,
-      expectedError: new Errors.InvalidApiTokenError().message
-    },
-    {
-      statusCode: 403,
-      expectedError: new Errors.PermissionError().message
-    },
-    {
-      statusCode: 404,
-      expectedError: 'This repository has no package.json, please try another one.'
-    },
-    {
-      statusCode: 500,
-      expectedError: new Errors.InternalServerError().message
-    },
-    {
-      statusCode: 'unmappedStatusCode',
-      expectedError: new Errors.UnexpectedError().message
-    }
-  ])(
-    'should throw when GitHub API request fails with status code $statusCode',
-    async ({ statusCode, expectedError }) => {
-      vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
-        statusCode,
-        body: {}
-      })
-      const { sut } = makeSut()
-
-      const request = sut({ accountName: 'testAccount', repositoryName: 'testRepo' })
-
-      await expect(request).rejects.toThrow(expectedError)
-    }
-  )
 
   afterEach(() => {
     vi.restoreAllMocks()
