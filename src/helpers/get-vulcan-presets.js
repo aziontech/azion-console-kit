@@ -1,4 +1,4 @@
-const DELIVER_PRESETS = ['next', 'angular', 'astro', 'hexo', 'react', 'vite', 'vue']
+const DELIVER_PRESETS = ['next', 'angular', 'astro', 'hexo', 'react', 'vue']
 const COMPUTE_PRESETS = ['next']
 const ALL_PRESETS = [...new Set([...DELIVER_PRESETS, ...COMPUTE_PRESETS])]
 

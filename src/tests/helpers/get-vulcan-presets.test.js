@@ -2,9 +2,9 @@ import { describe, expect, it } from 'vitest'
 import { getVulcanPresets } from '@/helpers/get-vulcan-presets'
 
 const fixtures = {
-  deliverPresets: ['next', 'angular', 'astro', 'hexo', 'react', 'vite', 'vue'],
+  deliverPresets: ['next', 'angular', 'astro', 'hexo', 'react', 'vue'],
   computePresets: ['next'],
-  allPresets: ['next', 'angular', 'astro', 'hexo', 'react', 'vite', 'vue']
+  allPresets: ['next', 'angular', 'astro', 'hexo', 'react', 'vue']
 }
 
 const makeSut = () => {
