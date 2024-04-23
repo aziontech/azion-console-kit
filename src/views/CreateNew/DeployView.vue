@@ -67,7 +67,7 @@
                           label: { class: 'grow-0' }
                         }"
                         class="md:ml-auto w-full"
-                        label="Retry"
+                        label="Back"
                         icon="pi pi-sync"
                         iconPos="left"
                       />
