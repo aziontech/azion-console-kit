@@ -199,13 +199,19 @@
   }
 
   const onTabChange = async (target) => {
-    if (!isLoading.value) {
-      selectedTab.value = target.value || selectedTab.value
-      if (target.value === 'browse' && browseTemplates.value.length === 0) {
-        await loadBrowse()
-      } else if (target.value === 'import_github' && githubTemplates.value.length === 0) {
-        await loadImportGithubSolution()
-      }
+    if (isLoading.value) {
+      return
+    }
+
+    selectedTab.value = target.value || selectedTab.value
+    if (target.value === 'browse' && browseTemplates.value.length === 0) {
+      await loadBrowse()
+      return
+    }
+
+    if (target.value === 'import_github' && githubTemplates.value.length === 0) {
+      await loadImportGithubSolution()
+      return
     }
   }
 

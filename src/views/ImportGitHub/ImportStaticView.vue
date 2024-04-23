@@ -154,6 +154,8 @@
 
   const loadSolutionByVendor = async () => {
     try {
+      loadingStore.startLoading()
+
       const solution = await props.loadSolutionService({
         vendor: route.params.vendor,
         solution: route.params.solution
@@ -166,13 +168,13 @@
         severity: 'error',
         summary: error
       })
+    } finally {
+      loadingStore.finishLoading()
     }
   }
 
   onMounted(async () => {
-    loadingStore.startLoading()
     await loadSolutionByVendor()
-    loadingStore.finishLoading()
   })
 </script>
 
