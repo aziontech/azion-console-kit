@@ -78,6 +78,14 @@
     return ' - Requires Application Accelerator'
   })
 
+  const showLabelHttps = computed(() => {
+    if(props.isEnableApplicationAccelerator || props.isDeliveryProtocolHttps) {
+      return ''
+    }
+
+    return '- requires Delivery Protocol with HTTPS'
+  })
+
   const showLabelImageOptimization = computed(() => {
     if (props.isImageOptimization) return ''
     return ' - Requires Image Processor'
@@ -121,7 +129,7 @@
       requires: true
     },
     {
-      label: 'Redirect HTTP to HTTPS - requires Delivery Protocol with HTTPS',
+      label: `Redirect HTTP to HTTPS ${showLabelHttps.value}`,
       value: 'redirect_http_to_https',
       requires: true
     },
@@ -346,14 +354,17 @@
    */
   const updateOptionRequires = (options) => {
     const conditionsMap = {
-      redirect_http_to_https: !props.isDeliveryProtocolHttps,
-      optimize_images: !props.isImageOptimization
+      redirect_http_to_https: props.isEnableApplicationAccelerator ? !props.isEnableApplicationAccelerator :  !props.isDeliveryProtocolHttps,
+      optimize_images: !props.isImageOptimization,
     }
 
     return options.map((option) => {
       if (option.requires) {
-        const requires = conditionsMap[option.value] || !props.isEnableApplicationAccelerator
-
+        let requires = conditionsMap[option.value]
+        
+        if (requires === undefined) {
+          requires = !props.isEnableApplicationAccelerator
+        }
         return { ...option, requires }
       }
       return option
