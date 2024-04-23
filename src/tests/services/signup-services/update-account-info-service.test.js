@@ -76,7 +76,7 @@ describe('SignupServices', () => {
     await sut(fixtures.basePayloadMock)
 
     expect(requestSpy).toHaveBeenCalledWith({
-      url: `${version}/iam/accounts`,
+      url: `${version}/iam/account`,
       method: 'PATCH',
       body: fixtures.formattedPayload
     })
@@ -97,7 +97,7 @@ describe('SignupServices', () => {
       await sut(jobRole)
 
       expect(requestSpy).toHaveBeenCalledWith({
-        url: `${version}/iam/accounts`,
+        url: `${version}/iam/account`,
         method: 'PATCH',
         body: { job_function: formattedJobRole, first_login: false }
       })
