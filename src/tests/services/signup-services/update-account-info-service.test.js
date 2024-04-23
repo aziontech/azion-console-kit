@@ -4,10 +4,7 @@ import * as Errors from '@/services/axios/errors'
 import { updateAccountInfoService } from '@/services/signup-services/update-account-info-service'
 
 const fixtures = {
-  basePayloadMock: {
-    id: '12345',
-    jobFunction: 'Software Developer'
-  },
+  basePayloadMock: 'Software Developer',
   formattedPayload: {
     job_function: 'software-developer',
     first_login: false
@@ -79,7 +76,7 @@ describe('SignupServices', () => {
     await sut(fixtures.basePayloadMock)
 
     expect(requestSpy).toHaveBeenCalledWith({
-      url: `${version}/iam/accounts/${fixtures.basePayloadMock.id}`,
+      url: `${version}/iam/accounts`,
       method: 'PATCH',
       body: fixtures.formattedPayload
     })
@@ -94,14 +91,13 @@ describe('SignupServices', () => {
       })
 
       const version = 'v4'
-      const id = '1234'
 
       const { sut } = makeSut()
 
-      await sut({ id, jobFunction: jobRole })
+      await sut(jobRole)
 
       expect(requestSpy).toHaveBeenCalledWith({
-        url: `${version}/iam/accounts/${id}`,
+        url: `${version}/iam/accounts`,
         method: 'PATCH',
         body: { job_function: formattedJobRole, first_login: false }
       })

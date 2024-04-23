@@ -1,5 +1,5 @@
-export const makeUpdateAccountInfoServiceBaseUrl = (accountId) => {
+export const makeUpdateAccountInfoServiceBaseUrl = () => {
   const version = 'v4'
 
-  return `${version}/iam/accounts/${accountId}`
+  return `${version}/iam/accounts`
 }

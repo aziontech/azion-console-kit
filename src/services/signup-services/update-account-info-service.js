@@ -4,7 +4,7 @@ import { makeUpdateAccountInfoServiceBaseUrl } from './make-update-account-info-
 
 export const updateAccountInfoService = async (payload) => {
   let httpResponse = await AxiosHttpClientAdapter.request({
-    url: makeUpdateAccountInfoServiceBaseUrl(payload.id),
+    url: makeUpdateAccountInfoServiceBaseUrl(),
     method: 'PATCH',
     body: adapt(payload)
   })
@@ -33,7 +33,7 @@ const adapt = (payload) => {
   }
 
   return {
-    job_function: jobRolesMap[payload.jobFunction],
+    job_function: jobRolesMap[payload],
     first_login: false
   }
 }

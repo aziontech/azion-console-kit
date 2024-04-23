@@ -33,9 +33,6 @@ export const useAccountStore = defineStore({
     },
     userId(state) {
       return state.account?.user_id
-    },
-    accountId(state) {
-      return state.account?.id
     }
   },
   actions: {
