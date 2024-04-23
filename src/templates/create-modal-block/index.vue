@@ -104,19 +104,17 @@
     }
   ])
 
-  const githubOptions = ref([
-    {
-      label: 'Import Static Site from GitHub',
-      icon: 'pi pi-github',
-      description: `Import an existing static project to deploy it on Azion's edge.`,
-      command: () => {
-        redirectGithubImport()
-      }
+  const redirectGithubImport = (template, section) => {
+    tracker.create.selectedOnCreate({
+      section,
+      selection: template.name
+    })
+    const params = {
+      vendor: template.vendor.slug,
+      solution: template.slug
     }
-  ])
 
-  const redirectGithubImport = () => {
-    router.push({ name: 'github-static' })
+    router.push({ name: 'github-repository-import', params })
     emit('closeModal')
   }
 
@@ -188,12 +186,32 @@
     }
   }
 
+  const githubTemplates = ref([])
+  const loadImportGithubSolution = async () => {
+    try {
+      isLoading.value = true
+      githubTemplates.value = await props.listSolutionsService({ type: 'import-from-github' })
+    } catch (error) {
+      showToast('error', error)
+    } finally {
+      isLoading.value = false
+    }
+  }
+
   const onTabChange = async (target) => {
-    if (!isLoading.value) {
-      selectedTab.value = target.value || selectedTab.value
-      if (target.value === 'browse' && browseTemplates.value.length === 0) {
-        await loadBrowse()
-      }
+    if (isLoading.value) {
+      return
+    }
+
+    selectedTab.value = target.value || selectedTab.value
+    if (target.value === 'browse' && browseTemplates.value.length === 0) {
+      await loadBrowse()
+      return
+    }
+
+    if (target.value === 'import_github' && githubTemplates.value.length === 0) {
+      await loadImportGithubSolution()
+      return
     }
   }
 
@@ -344,9 +362,9 @@
         v-if="showGithubImport"
       >
         <PrimeButton
-          v-for="(template, index) in githubOptions"
+          v-for="(template, index) in githubTemplates"
           :key="index"
-          @click="template.command()"
+          @click="redirectGithubImport(template, 'githubImport')"
           class="p-6 text-left border-solid border surface-border hover:border-primary transition-all"
           link
         >
@@ -355,19 +373,16 @@
               <div
                 class="w-10 h-10 rounded surface-border border flex justify-center items-center bg-black"
               >
-                <i
-                  :class="template.icon"
-                  class="text-white text-2xl"
-                ></i>
+                <i class="pi pi-github text-white text-2xl"></i>
               </div>
               <div class="flex flex-col">
                 <span class="line-clamp-1 h-5 text-color text-sm font-medium">
-                  {{ template.label }}
+                  {{ template.name }}
                 </span>
                 <span
                   class="h-10 pb-4 text-sm font-normal text-color-secondary mt-1.5 line-clamp-2"
                 >
-                  {{ template.description }}
+                  Import an existing static project to deploy it on Azion's edge.
                 </span>
               </div>
             </div>

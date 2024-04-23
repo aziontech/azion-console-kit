@@ -37,7 +37,7 @@ describe('VulcanServices', () => {
       expect.arrayContaining([
         expect.objectContaining({
           label: 'Next.js',
-          value: 'nextjs'
+          value: 'next'
         })
       ])
     )

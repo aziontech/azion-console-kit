@@ -2,9 +2,11 @@ import { AxiosHttpClientAdapter } from '../axios/AxiosHttpClientAdapter'
 import { makeVersionControlSystemBaseUrl } from './make-version-control-system-base-url'
 import * as Errors from '@/services/axios/errors'
 
-export const listRepositoriesService = async (uuid) => {
+export const listRepositoriesService = async (uuid, { pageSize = 200 } = {}) => {
+  const searchParams = makeSearchParams({ pageSize })
+
   let httpResponse = await AxiosHttpClientAdapter.request({
-    url: `${makeVersionControlSystemBaseUrl()}/integrations/${uuid}/repositories`,
+    url: `${makeVersionControlSystemBaseUrl()}/integrations/${uuid}/repositories?${searchParams.toString()}`,
     method: 'GET'
   })
 
@@ -22,6 +24,12 @@ const adapt = (httpResponse) => {
   }
 }
 
+const errorExtractor = (errorMessage) => {
+  return errorMessage === 'Invalid scope.'
+    ? 'Your scope does not contain any valid repositories.'
+    : errorMessage
+}
+
 /**
  * @param {Object} httpResponse - The HTTP response object.
  * @param {Object} httpResponse.body - The response body.
@@ -33,10 +41,10 @@ const parseHttpResponse = (httpResponse) => {
   switch (httpResponse.statusCode) {
     case 200:
       return httpResponse.body
-    case 400:
-      let errorMessage = httpResponse.body.error
-      errorMessage = errorMessage === 'Invalid scope.' ? 'Please, try another Scope.' : errorMessage
+    case 400: {
+      let errorMessage = errorExtractor(httpResponse.body.error)
       throw new Error(errorMessage).message
+    }
     case 401:
       throw new Errors.InvalidApiTokenError().message
     case 403:
@@ -48,4 +56,11 @@ const parseHttpResponse = (httpResponse) => {
     default:
       throw new Errors.UnexpectedError().message
   }
+}
+
+const makeSearchParams = ({ pageSize }) => {
+  const searchParams = new URLSearchParams()
+  searchParams.set('page_size', pageSize)
+
+  return searchParams
 }

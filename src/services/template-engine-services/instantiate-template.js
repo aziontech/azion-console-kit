@@ -16,7 +16,8 @@ const parseHttpResponse = (httpResponse) => {
     case 201:
       return {
         result: httpResponse.body,
-        feedback: 'Integration installation was successful'
+        feedback: 'Integration installation was successful',
+        urlToEditView: `/create/deploy/${httpResponse.body.uuid}`
       }
     case 400:
       const apiError = httpResponse.body.error[0]

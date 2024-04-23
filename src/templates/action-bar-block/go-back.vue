@@ -23,18 +23,14 @@
 
 <template>
   <div
-    class="flex flex-col items-start w-full justify-center p-3 border-t surface-border sticky bottom-0 surface-section z-50 sm:flex-row sm:py-3 sm:px-8 sm:justify-between"
-    :class="{ 'px-0': inDrawer }"
+    class="flex w-full gap-4 justify-end h-14 items-center border-t surface-border sticky bottom-0 surface-section z-50 px-2 md:px-8"
   >
-    <div class="flex w-full justify-content-end max-w-screen-2xl mx-auto 2xl:px-8">
-      <div class="flex gap-4 self-stretch items-center max-sm:justify-end">
-        <PrimeButton
-          severity="primary"
-          outlined
-          label="Back to list"
-          @click="handleClick"
-        />
-      </div>
-    </div>
+    <PrimeButton
+      severity="primary"
+      outlined
+      class="max-md:w-full"
+      label="Back to list"
+      @click="handleClick"
+    />
   </div>
 </template>
