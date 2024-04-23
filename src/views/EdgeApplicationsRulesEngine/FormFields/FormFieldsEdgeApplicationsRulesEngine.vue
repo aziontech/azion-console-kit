@@ -121,7 +121,7 @@
       requires: true
     },
     {
-      label: 'Redirect HTTP to HTTPS - requires Delivery Protocol with HTTPS',
+      label: 'Redirect HTTP to HTTPS - Requires Delivery Protocol with HTTPS',
       value: 'redirect_http_to_https',
       requires: true
     },
