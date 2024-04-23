@@ -250,7 +250,9 @@
     props.windowOpen('http://' + results.value.domain.url, '_blank')
   }
 
-  const goToAnalytics = () => {}
+  const goToAnalytics = () => {
+    router.push({ name: 'real-time-metrics' })
+  }
 
   const handleTrackCreation = () => {
     const trackerData = {
