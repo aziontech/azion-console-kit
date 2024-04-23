@@ -111,7 +111,6 @@
         inputVariables = parseVariables(formValues.newVariables)
       }
 
-
       const inputSchema = [
         {
           field: 'platform_feature__vcs_integration__uuid',
