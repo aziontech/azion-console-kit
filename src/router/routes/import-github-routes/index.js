@@ -7,7 +7,7 @@ import * as MarketplaceService from '@/services/marketplace-services'
 
 /** @type {import('vue-router').RouteRecordRaw} */
 export const importGithubRoutes = {
-  path: '/',
+  path: '/github',
   name: 'import-github',
   children: [
     {
