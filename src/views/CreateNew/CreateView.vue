@@ -295,7 +295,9 @@
 
   const loadSolutionByVendor = async () => {
     try {
+      store.startLoading()
       isLoading.value = true
+
       solution.value = await props.loadSolutionService({
         vendor: route.params.vendor,
         solution: route.params.solution
@@ -317,6 +319,7 @@
       })
     } finally {
       isLoading.value = false
+      store.finishLoading()
     }
   }
 
@@ -352,9 +355,7 @@
   }
 
   onMounted(async () => {
-    store.startLoading()
     await loadSolutionByVendor()
-    store.finishLoading()
   })
 
   watchEffect(() => {

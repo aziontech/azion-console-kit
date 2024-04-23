@@ -3,11 +3,17 @@
   import ContentBlock from '@/templates/content-block'
   import CreateFormBlock from '@/templates/create-form-block'
   import PageHeadingBlock from '@/templates/page-heading-block'
+  import { useLoadingStore } from '@/stores/loading'
+  import { ref } from 'vue'
+  import { useRoute } from 'vue-router'
   import * as yup from 'yup'
-  import FormFieldsImportStatic from './FormFields/FormFieldsImportStatic.vue'
   import { useToast } from 'primevue/usetoast'
+  import { onMounted } from 'vue'
+  import FormFieldsImportGithub from './FormFields/FormFieldsImportGithub.vue'
 
+  const loadingStore = useLoadingStore()
   const toast = useToast()
+  const route = useRoute()
 
   const props = defineProps({
     listPlatformsService: {
@@ -34,15 +40,19 @@
       type: Function,
       required: true
     },
-    createScriptRunnerExecutionService: {
-      type: Function,
-      required: true
-    },
     frameworkDetectorService: {
       type: Function,
       required: true
     },
     createVariablesService: {
+      type: Function,
+      required: true
+    },
+    instantiateTemplateService: {
+      type: Function,
+      required: true
+    },
+    loadSolutionService: {
       type: Function,
       required: true
     }
@@ -75,12 +85,64 @@
     gitScope: ''
   }
 
+  const parseVariables = (variables) => {
+    const lastInputSchemaEnvsIndex = 5
+    const parsedVariables = variables?.map((variable, index) => {
+      index = index + lastInputSchemaEnvsIndex
+      return {
+        field: variable.key,
+        value: variable.value,
+        instantiation_data_path: 'envs.[' + index + '].value'
+      }
+    })
+
+    return parsedVariables ?? []
+  }
+
+  const templateId = ref(null)
   const handleExecuteScriptRunner = async (formValues) => {
     try {
       await Promise.all(
         formValues.newVariables.map((variable) => props.createVariablesService(variable))
       )
-      return props.createScriptRunnerExecutionService(formValues)
+
+      const inputVariables = parseVariables(formValues.newVariables)
+
+      const inputSchema = [
+        {
+          field: 'platform_feature__vcs_integration__uuid',
+          instantiation_data_path: '',
+          value: formValues.gitScope
+        },
+        {
+          field: 'az_name',
+          instantiation_data_path: 'envs.[0].value',
+          value: formValues.edgeApplicationName
+        },
+        {
+          field: 'git_url_external',
+          instantiation_data_path: 'envs.[1].value',
+          value: formValues.repository
+        },
+        {
+          field: 'vulcan_preset',
+          instantiation_data_path: 'envs.[2].value',
+          value: formValues.preset
+        },
+        {
+          field: 'vulcan_mode',
+          instantiation_data_path: 'envs.[3].value',
+          value: formValues.mode
+        },
+        {
+          field: 'az_command',
+          instantiation_data_path: 'envs.[4].value',
+          value: formValues.installCommand
+        },
+        ...inputVariables
+      ]
+
+      return props.instantiateTemplateService(templateId.value, inputSchema)
     } catch (error) {
       toast.add({
         closable: true,
@@ -90,12 +152,37 @@
       })
     }
   }
+
+  const loadSolutionByVendor = async () => {
+    try {
+      loadingStore.startLoading()
+
+      const solution = await props.loadSolutionService({
+        vendor: route.params.vendor,
+        solution: route.params.solution
+      })
+
+      templateId.value = solution.referenceId
+    } catch (error) {
+      toast.add({
+        closable: true,
+        severity: 'error',
+        summary: error
+      })
+    } finally {
+      loadingStore.finishLoading()
+    }
+  }
+
+  onMounted(async () => {
+    await loadSolutionByVendor()
+  })
 </script>
 
 <template>
   <ContentBlock>
     <template #heading>
-      <PageHeadingBlock pageTitle="Import Static Site from GitHub" />
+      <PageHeadingBlock pageTitle="Import from GitHub" />
     </template>
     <template #content>
       <CreateFormBlock
@@ -104,7 +191,7 @@
         :initialValues="initialValues"
       >
         <template #form>
-          <FormFieldsImportStatic
+          <FormFieldsImportGithub
             :listPlatformsService="listPlatformsService"
             :listIntegrationsService="listIntegrationsService"
             :listRepositoriesService="listRepositoriesService"
