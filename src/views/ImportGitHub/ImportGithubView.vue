@@ -7,9 +7,9 @@
   import { ref } from 'vue'
   import { useRoute } from 'vue-router'
   import * as yup from 'yup'
-  import FormFieldsImportStatic from './FormFields/FormFieldsImportStatic.vue'
   import { useToast } from 'primevue/usetoast'
   import { onMounted } from 'vue'
+  import FormFieldsImportGithub from './FormFields/FormFieldsImportGithub.vue'
 
   const loadingStore = useLoadingStore()
   const toast = useToast()
@@ -86,8 +86,9 @@
   }
 
   const parseVariables = (variables) => {
+    const lastInputSchemaEnvsIndex = 5
     const parsedVariables = variables?.map((variable, index) => {
-      index = index + 5
+      index = index + lastInputSchemaEnvsIndex
       return {
         field: variable.key,
         value: variable.value,
@@ -190,7 +191,7 @@
         :initialValues="initialValues"
       >
         <template #form>
-          <FormFieldsImportStatic
+          <FormFieldsImportGithub
             :listPlatformsService="listPlatformsService"
             :listIntegrationsService="listIntegrationsService"
             :listRepositoriesService="listRepositoriesService"

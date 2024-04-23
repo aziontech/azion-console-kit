@@ -24,6 +24,12 @@ const adapt = (httpResponse) => {
   }
 }
 
+const errorExtractor = (errorMessage) => {
+  return errorMessage === 'Invalid scope.'
+    ? 'Your scope does not contain any valid repositories.'
+    : errorMessage
+}
+
 /**
  * @param {Object} httpResponse - The HTTP response object.
  * @param {Object} httpResponse.body - The response body.
@@ -35,13 +41,10 @@ const parseHttpResponse = (httpResponse) => {
   switch (httpResponse.statusCode) {
     case 200:
       return httpResponse.body
-    case 400:
-      let errorMessage = httpResponse.body.error
-      errorMessage =
-        errorMessage === 'Invalid scope.'
-          ? 'Your scope does not contain any valid repositories.'
-          : errorMessage
+    case 400: {
+      let errorMessage = errorExtractor(httpResponse.body.error)
       throw new Error(errorMessage).message
+    }
     case 401:
       throw new Errors.InvalidApiTokenError().message
     case 403:

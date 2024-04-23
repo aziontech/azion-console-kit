@@ -114,7 +114,7 @@
       solution: template.slug
     }
 
-    router.push({ name: 'github-static', params })
+    router.push({ name: 'github-repository-import', params })
     emit('closeModal')
   }
 

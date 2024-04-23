@@ -7,13 +7,13 @@ import * as MarketplaceService from '@/services/marketplace-services'
 
 /** @type {import('vue-router').RouteRecordRaw} */
 export const importGithubRoutes = {
-  path: '/static',
+  path: '/',
   name: 'import-github',
   children: [
     {
       path: ':vendor/:solution',
-      name: 'github-static',
-      component: () => import('@views/ImportGitHub/ImportStaticView.vue'),
+      name: 'github-repository-import',
+      component: () => import('@/views/ImportGitHub/ImportGithubView.vue'),
       props: {
         listPlatformsService: VersionControlSystemService.listPlatformsService,
         postCallbackUrlService: VersionControlSystemService.postCallbackUrlService,
