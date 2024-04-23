@@ -228,8 +228,8 @@
 </script>
 
 <template>
-  <div class="overflow-auto w-full h-full flex flex-col sm:flex-row p-0 sm:pl-5 sm:pr-8 gap-4 pb-4">
-    <div class="sm:min-w-[240px] mt-4">
+  <div class="overflow-auto w-full h-full flex flex-col sm:flex-row gap-4">
+    <div class="-ml-2 sm:min-w-[240px]">
       <ul class="flex flex-col gap-1 md:fixed md:w-60">
         <li
           v-for="(menuitem, index) in items"
@@ -253,13 +253,13 @@
     <div class="overflow-auto w-full flex flex-col">
       <LoadingState v-if="isLoading" />
       <div v-else>
-        <div class="text-base font-medium mt-5 mb-3">
+        <div class="text-base font-medium mb-4">
           {{ tabHeader }}
         </div>
       </div>
 
       <div
-        class="mx-0 w-full mt-0 grid grid-cols-1 lg:grid-cols-2 2xl:grid-cols-3 gap-4"
+        class="mx-0 w-full mt-0 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"
         v-if="showRecommended"
       >
         <PrimeButton
@@ -295,7 +295,7 @@
         </PrimeButton>
       </div>
       <div
-        class="mx-0 w-full mt-0 grid grid-cols-1 lg:grid-cols-2 2xl:grid-cols-3 gap-4"
+        class="mx-0 w-full mt-0 grid grid-cols-1 lg:grid-cols-3  md:grid-cols-2 gap-4"
         v-if="showBrowse"
       >
         <PrimeButton
@@ -331,7 +331,7 @@
         </PrimeButton>
       </div>
       <div
-        class="mx-0 w-full mt-0 grid grid-cols-1 lg:grid-cols-2 2xl:grid-cols-3 gap-4"
+        class="mx-0 w-full mt-0 grid grid-cols-1 lg:grid-cols-3  md:grid-cols-2 gap-4"
         v-if="showResource"
       >
         <PrimeButton
@@ -358,7 +358,7 @@
         </PrimeButton>
       </div>
       <div
-        class="mx-0 w-full mt-0 grid grid-cols-1 lg:grid-cols-2 2xl:grid-cols-3 gap-4"
+        class="mx-0 w-full mt-0 grid grid-cols-1 lg:grid-cols-3  md:grid-cols-2 gap-4"
         v-if="showGithubImport"
       >
         <PrimeButton

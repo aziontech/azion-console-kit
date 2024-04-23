@@ -4,33 +4,23 @@
     modal
     :header="`Delete ${informationForDeletion.title}`"
     :draggable="false"
-    class="md:max-w-[680px]"
-    :pt="{
-      content: { class: 'p-4 md:p-8' },
-      header: { class: 'p-4 md:p-8' },
-      footer: { class: 'p-4 md:p-8 flex' }
-    }"
+    class="max-w-2xl"
     @keyup.enter="removeItem()"
   >
-    <div class="flex flex-col gap-5">
+    <div class="flex flex-col gap-6">
       <div>
         <Message
-          class="w-100"
           severity="warn"
           :closable="false"
         >
           Once confirmed, this action can't be reversed.
         </Message>
 
-        <p class="pt-3.5 text-color-secondary">
+        <p class="pt-4 text-color-secondary">
           This {{ informationForDeletion.title }} will be deleted along with any associated settings
           or instances. Check Help Center for more details.
         </p>
       </div>
-
-      <Divider
-        class="-ml-4 w-[calc(100%+2rem)] md:-ml-8 w-[calc(100%+4rem) md:w-[calc(100%+4rem)]"
-      />
 
       <div>
         <div class="flex flex-col w-full gap-2">
@@ -56,16 +46,12 @@
     </div>
 
     <template #footer>
-      <div class="justify-end w-full flex gap-4">
         <PrimeButton
-          severity="primary"
           outlined
-          class="flex-none md:flex"
           label="Cancel"
           @click="cancelDialog()"
         ></PrimeButton>
         <PrimeButton
-          class="w-full md:w-auto"
           severity="danger"
           label="Delete"
           icon-pos="right"
@@ -73,7 +59,6 @@
           :icon="calculateLoadIconByLoadingState"
           :disabled="isDisabled"
         ></PrimeButton>
-      </div>
     </template>
   </PrimeDialog>
 </template>
@@ -81,7 +66,6 @@
 <script setup>
   import PrimeButton from 'primevue/button'
   import PrimeDialog from 'primevue/dialog'
-  import Divider from 'primevue/divider'
   import InputText from 'primevue/inputtext'
   import Message from 'primevue/message'
   import { useToast } from 'primevue/usetoast'

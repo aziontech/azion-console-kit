@@ -2,23 +2,11 @@
   <PrimeDialog
     :blockScroll="true"
     modal
+    class="max-w-xl"
     visible
     :closable="false"
-    :pt="{
-      root: { class: 'p-0 w-[576px]' },
-      header: {
-        class: 'flex py-5 border-b border-solid'
-      },
-      content: { class: 'h-full' },
-      footer: {
-        class: 'flex p-5 justify-end items-end border-t border-solid'
-      }
-    }"
+    header="Schedule an Onboarding Session"
   >
-    <template #header>
-      <h5 class="text-lg font-semibold leading-tight">Schedule an Onboarding Session</h5>
-    </template>
-
     <div class="flex flex-col">
       <p class="text-color-secondary text-sm font-normal leading-tight">
         Ready to dive in? Book an onboarding session with an Azion expert for personalized guidance
