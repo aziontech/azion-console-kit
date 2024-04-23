@@ -102,11 +102,15 @@
   const templateId = ref(null)
   const handleExecuteScriptRunner = async (formValues) => {
     try {
-      await Promise.all(
-        formValues.newVariables.map((variable) => props.createVariablesService(variable))
-      )
+      let inputVariables = []
 
-      const inputVariables = parseVariables(formValues.newVariables)
+      if (formValues.newVariables) {
+        await Promise.all(
+          formValues.newVariables.map((variable) => props.createVariablesService(variable))
+        )
+        inputVariables = parseVariables(formValues.newVariables)
+      }
+
 
       const inputSchema = [
         {
