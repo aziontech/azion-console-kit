@@ -76,11 +76,11 @@
 
   const initialValues = {
     edgeApplicationName: '',
-    rootDirectory: '',
+    rootDirectory: './',
     preset: '',
     newVariables: [],
     mode: '',
-    repository: './',
+    repository: '',
     installCommand: '',
     gitScope: ''
   }
