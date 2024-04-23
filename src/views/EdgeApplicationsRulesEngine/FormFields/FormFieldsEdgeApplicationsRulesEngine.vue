@@ -78,6 +78,14 @@
     return ' - Requires Application Accelerator'
   })
 
+  const showLabelHttps = computed(() => {
+    if (props.isEnableApplicationAccelerator || props.isDeliveryProtocolHttps) {
+      return ''
+    }
+
+    return '- Requires Delivery Protocol with HTTPS'
+  })
+
   const showLabelImageOptimization = computed(() => {
     if (props.isImageOptimization) return ''
     return ' - Requires Image Processor'
@@ -121,7 +129,7 @@
       requires: true
     },
     {
-      label: 'Redirect HTTP to HTTPS - Requires Delivery Protocol with HTTPS',
+      label: `Redirect HTTP to HTTPS ${showLabelHttps.value}`,
       value: 'redirect_http_to_https',
       requires: true
     },
@@ -336,6 +344,12 @@
 
   const behaviorsOptions = computed(() => behaviorsOptionsMap[phase.value]() || [])
 
+  const isDisabledHttps = computed(() =>
+    props.isEnableApplicationAccelerator
+      ? !props.isEnableApplicationAccelerator
+      : !props.isDeliveryProtocolHttps
+  )
+
   /**
    * Updates the 'requires' property of behavior options based on component props.
    * This function checks if the behavior option is 'redirect_http_to_https' and sets the 'requires'
@@ -346,13 +360,13 @@
    */
   const updateOptionRequires = (options) => {
     const conditionsMap = {
-      redirect_http_to_https: !props.isDeliveryProtocolHttps,
+      redirect_http_to_https: isDisabledHttps.value,
       optimize_images: !props.isImageOptimization
     }
 
     return options.map((option) => {
       if (option.requires) {
-        const requires = conditionsMap[option.value] || !props.isEnableApplicationAccelerator
+        const requires = conditionsMap[option.value] ?? !props.isEnableApplicationAccelerator
 
         return { ...option, requires }
       }
