@@ -2,16 +2,44 @@
 .p-dialog {
   margin-inline: 2rem !important;
   .p-dialog-header {
+    justify-content: space-between;
+    font-size: 1.25rem !important;
     height: 3.5rem !important;
+    font-weight: 500 !important;
+    padding-inline: 2rem !important;
+    border-bottom: 1px solid var(--surface-border) !important;
   }
   .p-dialog-footer {
     height: 3.5rem !important;
+    padding-inline: 2rem !important;
     display: flex !important;
+    flex-direction: row;
     align-items: center !important;
     justify-content: flex-end !important;
     gap: 0.75rem !important;
     button {
       margin: 0 !important;
+    }
+  }
+}
+
+@media only screen and (max-width: 768px) {
+  .p-dialog {
+    margin-inline: 0.75rem !important;
+    .p-dialog-header {
+      padding-inline: 0.75rem !important;
+    }
+    .p-dialog-content {
+      padding-inline: 0.75rem !important;
+    }
+    .p-dialog-footer {
+      button {
+        width: 100%;
+      }
+      height: auto !important ;
+      flex-direction: column;
+      padding-block: 0.75rem !important;
+      padding-inline: 0.75rem !important;
     }
   }
 }

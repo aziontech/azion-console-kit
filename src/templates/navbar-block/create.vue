@@ -21,10 +21,9 @@
     v-model:visible="createModalIsOpen"
     modal
     header="New"
-    class="w-full"
     :pt="{
-      root: { class: ' hidden w-full lg:max-w-screen-lg 2xl:max-w-screen-xl h-[640px] sm:flex' },
-      content: { class: 'overflow-auto w-full  h-full p-0' },
+      root: { class: ' hidden w-full max-w-screen-2xl h-screen sm:flex' },
+      content: { class: 'h-full' },
       mask: { class: 'hidden sm:flex' }
     }"
     position="center"

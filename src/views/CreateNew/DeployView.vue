@@ -67,7 +67,7 @@
                           label: { class: 'grow-0' }
                         }"
                         class="md:ml-auto w-full"
-                        label="Retry"
+                        label="Back"
                         icon="pi pi-sync"
                         iconPos="left"
                       />
@@ -198,10 +198,6 @@
         detail:
           'The edge application is being propagated through the edge nodes. This process will take a few minutes.'
       })
-      if ('edge_application' in results.value) {
-        handleTrackCreation()
-      }
-      tracker.create.eventDeployed(solutionStore.solution).track()
     } catch (error) {
       deployFailed.value = true
       toast.add({
@@ -210,8 +206,21 @@
         summary: 'Creation Failed',
         detail: failMessage
       })
-      tracker.create.eventFailedDeployed(solutionStore.solution).track()
     }
+
+    if (!solutionStore.solution) {
+      return
+    }
+
+    if (deployFailed.value) {
+      tracker.create.eventFailedDeployed(solutionStore.solution).track()
+      return
+    }
+
+    if ('edge_application' in results.value) {
+      handleTrackCreation()
+    }
+    tracker.create.eventDeployed(solutionStore.solution).track()
   }
 
   const severity = computed(() => {
@@ -248,7 +257,7 @@
       productName: 'Edge Application',
       from: 'create',
       createdFrom: 'template',
-      ...solutionStore.solution
+      ...solutionStore?.solution
     }
     tracker.product.productCreated(trackerData).track()
   }

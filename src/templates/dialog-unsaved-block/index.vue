@@ -123,20 +123,13 @@
       v-model:visible="visibleDialog"
       @update:visible="openDialogUnsaved"
       modal
+      class="w-full max-w-xl"
       :closable="false"
-      :pt="{
-        root: { class: 'p-0 w-[576px]' },
-        header: { class: 'flex p-5 items-center self-stretch border-b border-solid' },
-        content: { class: 'p-0 h-full' },
-        footer: {
-          class: 'flex p-5 justify-end items-end border-t border-solid'
-        }
-      }"
     >
       <template #header>
         <h5 class="text-lg not-italic font-bold leading-5">Unsaved changes</h5>
       </template>
-      <div class="flex p-5 items-center flex-1 text-secondary-color text-sm font-normal leading-5">
+      <div class="text-color-secondary text-sm font-normal leading-5">
         Your changes will be discarded if you leave the page without saving them. Do you want to
         leave?
       </div>
