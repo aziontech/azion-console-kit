@@ -162,10 +162,11 @@
   import Password from 'primevue/password'
   import SocialIdpsBlock from '@/templates/social-idps-block'
   import { useField, useForm } from 'vee-validate'
-  import { ref, inject } from 'vue'
-  import { useRouter } from 'vue-router'
+  import { ref, inject, onMounted } from 'vue'
+  import { useRoute, useRouter } from 'vue-router'
   import Divider from 'primevue/divider'
   import * as yup from 'yup'
+  import { useToast } from 'primevue/usetoast'
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
 
@@ -199,6 +200,26 @@
       type: Function,
       required: true
     }
+  })
+
+  const route = useRoute()
+  const toast = useToast()
+
+  const verifyErrorsOnUrl = () => {
+    const { error_description: errorMessage } = route.query
+
+    if (errorMessage) {
+      toast.add({
+        closable: true,
+        severity: 'error',
+        summary: 'Error',
+        detail: errorMessage
+      })
+    }
+  }
+
+  onMounted(() => {
+    verifyErrorsOnUrl()
   })
 
   const showSocialIdps = ref(true)
