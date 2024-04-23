@@ -11,6 +11,7 @@
   import { useToast } from 'primevue/usetoast'
   import { useRouter } from 'vue-router'
   import { windowOpen } from '@/helpers'
+  import { generateFormattedTimestamp } from '@/helpers/generate-formatted-timestamp'
 
   const toast = useToast()
   const router = useRouter()
@@ -175,7 +176,9 @@
   }
 
   const setEdgeApplicationNameByRepository = async (repositoryName) => {
-    edgeApplicationName.value = repositoryName
+    const timestampEdgeApplicationSufix = generateFormattedTimestamp()
+    edgeApplicationName.value = `${repositoryName}-${timestampEdgeApplicationSufix}`
+
     const accountName = getOptionNameByValue({
       listOption: integrationsList.value,
       optionValue: gitScope.value,
@@ -328,6 +331,7 @@
           label="Edge Application Name *"
           name="edgeApplicationName"
           :value="edgeApplicationName"
+          description="Give a unique name to identify the edge application."
         />
       </div>
 
