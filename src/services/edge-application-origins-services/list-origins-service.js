@@ -34,7 +34,7 @@ const adapt = (httpResponse) => {
       originKey: {
         content: origin.origin_key
       },
-      originId: origin.origin_id,
+      originId: convertOriginIdToString(origin.origin_id),
       name: origin.name,
       originType: originTypeFormat[origin.origin_type],
       addresses: formattedListOfAddresses,
@@ -66,4 +66,8 @@ const makeSearchParams = ({ orderBy, sort, page, pageSize }) => {
   searchParams.set('page_size', pageSize)
 
   return searchParams
+}
+
+const convertOriginIdToString = (originId) => {
+  return new String(originId).toString()
 }
