@@ -366,11 +366,8 @@
 
     return options.map((option) => {
       if (option.requires) {
-        let requires = conditionsMap[option.value]
+        const requires = conditionsMap[option.value] ?? !props.isEnableApplicationAccelerator
 
-        if (requires === undefined) {
-          requires = !props.isEnableApplicationAccelerator
-        }
         return { ...option, requires }
       }
       return option
