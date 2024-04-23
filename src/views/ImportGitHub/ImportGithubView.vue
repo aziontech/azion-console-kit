@@ -80,7 +80,7 @@
     preset: '',
     newVariables: [],
     mode: '',
-    repository: '',
+    repository: './',
     installCommand: '',
     gitScope: ''
   }
