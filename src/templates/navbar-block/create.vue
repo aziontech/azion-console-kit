@@ -23,7 +23,7 @@
     header="New"
     :pt="{
       root: { class: ' hidden w-full max-w-screen-2xl h-screen sm:flex' },
-      content: { class: 'h-full'},
+      content: { class: 'h-full' },
       mask: { class: 'hidden sm:flex' }
     }"
     position="center"

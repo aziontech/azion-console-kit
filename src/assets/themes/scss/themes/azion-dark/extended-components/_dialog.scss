@@ -23,23 +23,23 @@
   }
 }
 
-  @media only screen and (max-width: 768px) {
-    .p-dialog {
-      margin-inline: 0.75rem !important;
-      .p-dialog-header {
-        padding-inline: 0.75rem !important;
+@media only screen and (max-width: 768px) {
+  .p-dialog {
+    margin-inline: 0.75rem !important;
+    .p-dialog-header {
+      padding-inline: 0.75rem !important;
+    }
+    .p-dialog-content {
+      padding-inline: 0.75rem !important;
+    }
+    .p-dialog-footer {
+      button {
+        width: 100%;
       }
-      .p-dialog-content {
-        padding-inline: 0.75rem !important;
-      }
-      .p-dialog-footer {
-        button {
-          width: 100%;
-        }
-        height: auto !important ;
-        flex-direction: column;
-        padding-block: 0.75rem !important;
-        padding-inline: 0.75rem !important;
-      }
+      height: auto !important ;
+      flex-direction: column;
+      padding-block: 0.75rem !important;
+      padding-inline: 0.75rem !important;
     }
   }
+}

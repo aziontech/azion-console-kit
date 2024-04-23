@@ -295,7 +295,7 @@
         </PrimeButton>
       </div>
       <div
-        class="mx-0 w-full mt-0 grid grid-cols-1 lg:grid-cols-3  md:grid-cols-2 gap-4"
+        class="mx-0 w-full mt-0 grid grid-cols-1 lg:grid-cols-3 md:grid-cols-2 gap-4"
         v-if="showBrowse"
       >
         <PrimeButton
@@ -331,7 +331,7 @@
         </PrimeButton>
       </div>
       <div
-        class="mx-0 w-full mt-0 grid grid-cols-1 lg:grid-cols-3  md:grid-cols-2 gap-4"
+        class="mx-0 w-full mt-0 grid grid-cols-1 lg:grid-cols-3 md:grid-cols-2 gap-4"
         v-if="showResource"
       >
         <PrimeButton
@@ -358,7 +358,7 @@
         </PrimeButton>
       </div>
       <div
-        class="mx-0 w-full mt-0 grid grid-cols-1 lg:grid-cols-3  md:grid-cols-2 gap-4"
+        class="mx-0 w-full mt-0 grid grid-cols-1 lg:grid-cols-3 md:grid-cols-2 gap-4"
         v-if="showGithubImport"
       >
         <PrimeButton

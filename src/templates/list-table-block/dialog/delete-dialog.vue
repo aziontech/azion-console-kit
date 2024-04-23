@@ -46,19 +46,19 @@
     </div>
 
     <template #footer>
-        <PrimeButton
-          outlined
-          label="Cancel"
-          @click="cancelDialog()"
-        ></PrimeButton>
-        <PrimeButton
-          severity="danger"
-          label="Delete"
-          icon-pos="right"
-          @click="removeItem()"
-          :icon="calculateLoadIconByLoadingState"
-          :disabled="isDisabled"
-        ></PrimeButton>
+      <PrimeButton
+        outlined
+        label="Cancel"
+        @click="cancelDialog()"
+      ></PrimeButton>
+      <PrimeButton
+        severity="danger"
+        label="Delete"
+        icon-pos="right"
+        @click="removeItem()"
+        :icon="calculateLoadIconByLoadingState"
+        :disabled="isDisabled"
+      ></PrimeButton>
     </template>
   </PrimeDialog>
 </template>
