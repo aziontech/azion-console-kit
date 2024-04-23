@@ -344,9 +344,11 @@
 
   const behaviorsOptions = computed(() => behaviorsOptionsMap[phase.value]() || [])
 
-  const isDisabledHttps = computed(() => props.isEnableApplicationAccelerator
-        ? !props.isEnableApplicationAccelerator
-        : !props.isDeliveryProtocolHttps)
+  const isDisabledHttps = computed(() =>
+    props.isEnableApplicationAccelerator
+      ? !props.isEnableApplicationAccelerator
+      : !props.isDeliveryProtocolHttps
+  )
 
   /**
    * Updates the 'requires' property of behavior options based on component props.
