@@ -13,5 +13,5 @@ export {
   listCountriesService,
   postAdditionalDataService,
   patchFullnameService,
-	updateAccountInfoService
+  updateAccountInfoService
 }
