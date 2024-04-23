@@ -79,7 +79,7 @@
   })
 
   const showLabelHttps = computed(() => {
-    if(props.isEnableApplicationAccelerator || props.isDeliveryProtocolHttps) {
+    if (props.isEnableApplicationAccelerator || props.isDeliveryProtocolHttps) {
       return ''
     }
 
@@ -354,14 +354,16 @@
    */
   const updateOptionRequires = (options) => {
     const conditionsMap = {
-      redirect_http_to_https: props.isEnableApplicationAccelerator ? !props.isEnableApplicationAccelerator :  !props.isDeliveryProtocolHttps,
-      optimize_images: !props.isImageOptimization,
+      redirect_http_to_https: props.isEnableApplicationAccelerator
+        ? !props.isEnableApplicationAccelerator
+        : !props.isDeliveryProtocolHttps,
+      optimize_images: !props.isImageOptimization
     }
 
     return options.map((option) => {
       if (option.requires) {
         let requires = conditionsMap[option.value]
-        
+
         if (requires === undefined) {
           requires = !props.isEnableApplicationAccelerator
         }
