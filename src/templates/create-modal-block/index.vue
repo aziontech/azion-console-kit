@@ -43,6 +43,10 @@
     {
       label: 'Resources',
       value: 'new_resource'
+    },
+    {
+      label: 'Import from GitHub',
+      value: 'import_github'
     }
   ])
   const resources = ref([
