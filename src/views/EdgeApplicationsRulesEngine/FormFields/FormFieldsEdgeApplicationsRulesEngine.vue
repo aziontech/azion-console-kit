@@ -83,7 +83,7 @@
       return ''
     }
 
-    return '- requires Delivery Protocol with HTTPS'
+    return '- Requires Delivery Protocol with HTTPS'
   })
 
   const showLabelImageOptimization = computed(() => {
@@ -344,6 +344,10 @@
 
   const behaviorsOptions = computed(() => behaviorsOptionsMap[phase.value]() || [])
 
+  const isDisabledHttps = computed(() => props.isEnableApplicationAccelerator
+        ? !props.isEnableApplicationAccelerator
+        : !props.isDeliveryProtocolHttps)
+
   /**
    * Updates the 'requires' property of behavior options based on component props.
    * This function checks if the behavior option is 'redirect_http_to_https' and sets the 'requires'
@@ -354,9 +358,7 @@
    */
   const updateOptionRequires = (options) => {
     const conditionsMap = {
-      redirect_http_to_https: props.isEnableApplicationAccelerator
-        ? !props.isEnableApplicationAccelerator
-        : !props.isDeliveryProtocolHttps,
+      redirect_http_to_https: isDisabledHttps.value,
       optimize_images: !props.isImageOptimization
     }
 
