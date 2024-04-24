@@ -20,7 +20,7 @@ const adapt = ([...response]) => {
   const indexToInsertFullName = 3
 
   // this id does not affect the use in the app. It is high just to avoid possible colisions
-  const fullNameField = { id: 999, key: 'Full Name', required: true, show: true }
+  const fullNameField = { id: 999, key: 'Your Full Name', required: true, show: true }
 
   response.splice(indexToInsertFullName, 0, fullNameField)
 

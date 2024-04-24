@@ -138,7 +138,7 @@ const mockResponse = {
     },
     {
       id: 999,
-      key: 'Full Name',
+      key: 'Your Full Name',
       required: true,
       show: true
     },
