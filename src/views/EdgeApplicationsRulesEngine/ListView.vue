@@ -69,6 +69,9 @@
     },
     hideApplicationAcceleratorInDescription: {
       type: Boolean
+    },
+    isEdgeFunctionEnabled: {
+      type: Boolean
     }
   })
 
@@ -191,6 +194,7 @@
     :loadRulesEngineService="props.loadRulesEngineService"
     :documentationService="props.documentationService"
     :hideApplicationAcceleratorInDescription="props.hideApplicationAcceleratorInDescription"
+    :isEdgeFunctionEnabled="props.isEdgeFunctionEnabled"
     @onSuccess="reloadList"
   />
   <ListTableBlock

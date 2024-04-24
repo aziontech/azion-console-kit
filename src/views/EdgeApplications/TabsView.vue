@@ -143,6 +143,10 @@
     return edgeApplication.value?.imageOptimization
   })
 
+  const isEdgeFunctionEnabled = computed(() => {
+    return edgeApplication.value?.edgeFunctions
+  })
+
   const updatedApplication = (application) => {
     edgeApplication.value = { ...application }
     verifyTab(edgeApplication.value)
@@ -265,6 +269,7 @@
             :isDeliveryProtocolHttps="isDeliveryProtocolHttps"
             :hideApplicationAcceleratorInDescription="edgeApplication.applicationAccelerator"
             :isImageOptimization="isImageOptimization"
+            :isEdgeFunctionEnabled="isEdgeFunctionEnabled"
             v-bind="props.rulesEngineServices"
           />
         </TabPanel>

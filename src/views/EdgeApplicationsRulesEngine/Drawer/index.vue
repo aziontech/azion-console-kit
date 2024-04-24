@@ -58,6 +58,9 @@
     isImageOptimization: {
       required: true,
       type: Boolean
+    },
+    isEdgeFunctionEnabled: {
+      type: Boolean
     }
   })
 
@@ -214,6 +217,7 @@
         :listCacheSettingsService="props.listCacheSettingsService"
         :hideApplicationAcceleratorInDescription="props.hideApplicationAcceleratorInDescription"
         :isImageOptimization="isImageOptimization"
+        :isEdgeFunctionEnabled="props.isEdgeFunctionEnabled"
       />
     </template>
   </CreateDrawerBlock>
@@ -239,6 +243,7 @@
         :listOriginsService="props.listOriginsService"
         :listCacheSettingsService="props.listCacheSettingsService"
         :hideApplicationAcceleratorInDescription="props.hideApplicationAcceleratorInDescription"
+        :isEdgeFunctionEnabled="props.isEdgeFunctionEnabled"
       />
     </template>
   </EditDrawerBlock>
