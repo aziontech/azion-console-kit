@@ -410,7 +410,7 @@
         <FieldText
           label="Root Directory *"
           name="rootDirectory"
-          placeholder="./"
+          placeholder="/"
           :value="rootDirectory"
         />
       </div>

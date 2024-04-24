@@ -60,7 +60,13 @@
 
   const validationSchema = yup.object({
     edgeApplicationName: yup.string().required().label('Edge Application Name'),
-    rootDirectory: yup.string().required().label('Root Directory'),
+    rootDirectory: yup
+      .string()
+      .required()
+      .matches(/^\//, 'Root Directory must start with a slash (/)')
+      .matches(/^(?!.*\.\.).*$/, 'Root Directory cannot contain (..)')
+      .matches(/^\S*$/, 'Root Directory cannot contain spaces')
+      .label('Root Directory'),
     preset: yup.string().required().label('Preset'),
     mode: yup.string().required().label('Mode'),
     repository: yup.string().required().label('Repository'),
@@ -76,7 +82,7 @@
 
   const initialValues = {
     edgeApplicationName: '',
-    rootDirectory: './',
+    rootDirectory: '/',
     preset: '',
     newVariables: [],
     mode: '',
@@ -86,7 +92,7 @@
   }
 
   const parseVariables = (variables) => {
-    const lastInputSchemaEnvsIndex = 5
+    const lastInputSchemaEnvsIndex = 6
     const parsedVariables = variables?.map((variable, index) => {
       index = index + lastInputSchemaEnvsIndex
       return {
@@ -141,6 +147,11 @@
           field: 'az_command',
           instantiation_data_path: 'envs.[4].value',
           value: formValues.installCommand
+        },
+        {
+          field: 'az_root_directory',
+          instantiation_data_path: 'envs.[5].value',
+          value: formValues.rootDirectory
         },
         ...inputVariables
       ]
