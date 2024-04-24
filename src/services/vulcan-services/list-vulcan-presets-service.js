@@ -26,10 +26,6 @@ export const listVulcanPresetsService = () => {
       value: 'react'
     },
     {
-      label: 'Vite',
-      value: 'vite'
-    },
-    {
       label: 'Vue',
       value: 'vue'
     }
