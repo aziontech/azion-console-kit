@@ -234,6 +234,7 @@
   const router = useRouter()
   const toast = useToast()
   const { userId } = useAccountStore()
+  const accountStore = useAccountStore()
 
   defineOptions({
     name: 'additional-data-form-block'
@@ -393,16 +394,18 @@
         payload: additionalDataPayload,
         options: additionalDataInfo.value
       })
-
-      const updateAccount = props.updateAccountInfoService(accountPayload)
-
       await patchName
       await postAddData
-      await updateAccount
+
+      const updatedAccount = await props.updateAccountInfoService(accountPayload)
+      accountStore.setAccountData({ jobRole: updatedAccount.jobRole })
 
       tracker.signUp.submittedAdditionalData(values).track()
 
-      router.push({ name: 'home', query: { onboardingSession: 'true' } })
+      router.push({
+        name: 'home',
+        query: onboardingSession.value ? { onboardingSession: 'true' } : {}
+      })
     } catch (err) {
       const errors = JSON.parse(err)
 

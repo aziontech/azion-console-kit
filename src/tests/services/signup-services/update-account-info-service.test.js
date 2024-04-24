@@ -66,7 +66,7 @@ describe('SignupServices', () => {
   it('should call API with correct params', async () => {
     const requestSpy = vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
       statusCode: 200,
-      body: {}
+      body: { data: {} }
     })
 
     const version = 'v4'
@@ -87,7 +87,7 @@ describe('SignupServices', () => {
     async ({ jobRole, formattedJobRole }) => {
       const requestSpy = vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
         statusCode: 200,
-        body: {}
+        body: { data: {} }
       })
 
       const version = 'v4'
@@ -104,17 +104,20 @@ describe('SignupServices', () => {
     }
   )
 
-  it('should return null on success', async () => {
+  it('should return correct response on success', async () => {
+    const jobMock = 'software-developer'
     vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
       statusCode: 200,
-      body: {}
+      body: { data: { job_function: jobMock } }
     })
 
     const { sut } = makeSut()
 
     const result = await sut(fixtures.basePayloadMock)
 
-    expect(result).toBeNull()
+    expect(result).toEqual({
+      jobRole: jobMock
+    })
   })
 
   it.each([
