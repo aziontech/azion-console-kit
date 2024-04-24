@@ -302,8 +302,8 @@
     fullName: yup
       .string()
       .trim()
-      .max(61, 'Full Name must be less than 61 characters')
-      .matches(/[A-zÀ-ž.'-]+ [A-zÀ-ž.'-]+/, 'Full Name is a required field'),
+      .max(61, 'Your Full Name must be less than 61 characters')
+      .matches(/[A-zÀ-ž.'-]+ [A-zÀ-ž.'-]+/, 'Your Full Name is a required field'),
     onboardingSession: yup.boolean()
   })
 
