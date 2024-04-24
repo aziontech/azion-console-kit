@@ -44,12 +44,12 @@
     { label: 'TLS 1.2', value: 'tls_1_2' },
     { label: 'TLS 1.3', value: 'tls_1_3' }
   ]
-  const SUPPORTED_LIST_OPTIONS = [
+  const SUPPORTED_CIPHERS_LIST_OPTIONS = [
     { label: 'All', value: 'all' },
-    { label: 'TLSv1.2_2018', value: '2018' },
-    { label: 'TLSv1.2_2019', value: '2019' },
-    { label: 'TLSv1.2_2021', value: '2021' },
-    { label: 'TLSv1.3_2022', value: '2022' }
+    { label: 'TLSv1.2_2018', value: 'TLSv1.2_2018' },
+    { label: 'TLSv1.2_2019', value: 'TLSv1.2_2019' },
+    { label: 'TLSv1.2_2021', value: 'TLSv1.2_2021' },
+    { label: 'TLSv1.3_2022', value: 'TLSv1.3_2022' }
   ]
   const ORIGIN_TYPE_LIST_OPTIONS = [{ label: 'Single Origin', value: 'single_origin' }]
 
@@ -58,7 +58,7 @@
   const { value: httpPort } = useField('httpPort')
   const { value: httpsPort } = useField('httpsPort')
   const { value: minimumTlsVersion } = useField('minimumTlsVersion')
-  const { value: supportedVersion } = useField('supportedVersion')
+  const { value: supportedCiphers } = useField('supportedCiphers')
   const { value: originType } = useField('originType')
   const { value: cdnCacheSettings } = useField('cdnCacheSettings')
   const { value: browserCacheSettings } = useField('browserCacheSettings')
@@ -318,9 +318,10 @@
           >
           <Dropdown
             appendTo="self"
-            :options="SUPPORTED_LIST_OPTIONS"
-            v-model="supportedVersion"
+            :options="SUPPORTED_CIPHERS_LIST_OPTIONS"
+            v-model="supportedCiphers"
             optionLabel="label"
+            optionValue="value"
             placeholder="Select the supported cipher suite"
             :disabled="isHttpProtocol"
           />
