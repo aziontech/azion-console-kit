@@ -50,8 +50,7 @@ const adapt = (payload) => {
     http3: payload.http3,
     http_port: payload.httpPort.map((port) => port.value),
     https_port: payload.httpsPort.map((port) => port.value),
-    minimum_tls_version:
-      Object.values(payload.minimumTlsVersion).length > 0 ? payload.minimumTlsVersion.value : '',
+    minimum_tls_version: payload.minimumTlsVersion === 'none' ? '' : payload.minimumTlsVersion,
     active: payload.active,
     debug_rules: payload.debugRules,
     supported_ciphers: payload.supportedCiphers,

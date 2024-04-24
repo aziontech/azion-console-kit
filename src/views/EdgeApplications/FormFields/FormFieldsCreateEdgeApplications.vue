@@ -38,7 +38,7 @@
     { name: '9443', value: '9443' }
   ]
   const TLS_VERSIONS_OPTIONS = [
-    { label: 'None', value: '' },
+    { label: 'None', value: 'none' },
     { label: 'TLS 1.0', value: 'tls_1_0' },
     { label: 'TLS 1.1', value: 'tls_1_1' },
     { label: 'TLS 1.2', value: 'tls_1_2' },
@@ -300,6 +300,7 @@
             :options="TLS_VERSIONS_OPTIONS"
             v-model="minimumTlsVersion"
             optionLabel="label"
+            optionValue="value"
             placeholder="Select a minimum TLS Version"
             :disabled="isHttpProtocol"
           />
@@ -354,6 +355,7 @@
             :options="ORIGIN_TYPE_LIST_OPTIONS"
             v-model="originType"
             optionLabel="label"
+            optionValue="value"
             placeholder="Select an origin type"
             disabled
             class="w-full"
