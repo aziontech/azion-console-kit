@@ -9,7 +9,7 @@
  * @property {string} minimumTlsVersion - The minimum TLS version.
  * @property {boolean} active - Whether the application is active.
  * @property {Object} debugRules - The debug rules.
- * @property {string[]} supportedCiphers - The supported ciphers.
+ * @property {string} supportedCiphers - The supported ciphers.
  * @property {boolean} applicationAccelerator - Whether application acceleration is enabled.
  * @property {boolean} deviceDetection - Whether device detection is enabled.
  * @property {boolean} edgeFunctions - Whether edge functions are enabled.
@@ -50,8 +50,7 @@ const adapt = (payload) => {
     http3: payload.http3,
     http_port: payload.httpPort.map((port) => port.value),
     https_port: payload.httpsPort.map((port) => port.value),
-    minimum_tls_version:
-      Object.values(payload.minimumTlsVersion).length > 0 ? payload.minimumTlsVersion.value : '',
+    minimum_tls_version: payload.minimumTlsVersion === 'none' ? '' : payload.minimumTlsVersion,
     active: payload.active,
     debug_rules: payload.debugRules,
     supported_ciphers: payload.supportedCiphers,
