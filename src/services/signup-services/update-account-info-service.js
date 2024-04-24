@@ -82,7 +82,7 @@ const parseErrors = (statusCode) => {
 const parseHttpResponse = (httpResponse) => {
   switch (httpResponse.statusCode) {
     case 200:
-      return null
+      return { jobRole: httpResponse.body.data.job_function }
     case 400:
       throw new Error(parseErrors(httpResponse.statusCode)).message
     case 403:

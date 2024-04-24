@@ -11,10 +11,10 @@ const fixtures = {
     http3: true,
     httpPort: [{ name: '80 (Default)', value: '80' }],
     httpsPort: [{ name: '8008', value: '8008' }],
-    minimumTlsVersion: { label: 'TLS v1.2', value: 'tls_1_0' },
+    minimumTlsVersion: 'none',
     active: true,
     debugRules: ['rule1', 'rule2'],
-    supportedCiphers: ['cipher1', 'cipher2'],
+    supportedCiphers: 'mock_cipher',
     applicationAccelerator: true,
     deviceDetection: true,
     edgeFunctions: true,
@@ -52,13 +52,10 @@ describe('EdgeApplicationServices', () => {
         http3: fixtures.edgeApplicationMock.http3,
         http_port: [fixtures.edgeApplicationMock.httpPort[0].value],
         https_port: [fixtures.edgeApplicationMock.httpsPort[0].value],
-        minimum_tls_version:
-          Object.values(fixtures.edgeApplicationMock.minimumTlsVersion).length > 0
-            ? fixtures.edgeApplicationMock.minimumTlsVersion.value
-            : '',
+        minimum_tls_version: '',
         active: fixtures.edgeApplicationMock.active,
         debug_rules: ['rule1', 'rule2'],
-        supported_ciphers: ['cipher1', 'cipher2'],
+        supported_ciphers: fixtures.edgeApplicationMock.supportedCiphers,
         application_acceleration: fixtures.edgeApplicationMock.applicationAccelerator,
         device_detection: fixtures.edgeApplicationMock.deviceDetection,
         edge_firewall: false,

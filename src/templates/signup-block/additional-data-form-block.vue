@@ -234,6 +234,7 @@
   const router = useRouter()
   const toast = useToast()
   const { userId } = useAccountStore()
+  const accountStore = useAccountStore()
 
   defineOptions({
     name: 'additional-data-form-block'
@@ -302,8 +303,8 @@
     fullName: yup
       .string()
       .trim()
-      .max(61, 'Full Name must be less than 61 characters')
-      .matches(/[A-zÀ-ž.'-]+ [A-zÀ-ž.'-]+/, 'Full Name is a required field'),
+      .max(61, 'Your Full Name must be less than 61 characters')
+      .matches(/[A-zÀ-ž.'-]+ [A-zÀ-ž.'-]+/, 'Your Full Name is a required field'),
     onboardingSession: yup.boolean()
   })
 
@@ -393,16 +394,18 @@
         payload: additionalDataPayload,
         options: additionalDataInfo.value
       })
-
-      const updateAccount = props.updateAccountInfoService(accountPayload)
-
       await patchName
       await postAddData
-      await updateAccount
+
+      const updatedAccount = await props.updateAccountInfoService(accountPayload)
+      accountStore.setAccountData({ jobRole: updatedAccount.jobRole })
 
       tracker.signUp.submittedAdditionalData(values).track()
 
-      router.push({ name: 'home', query: { onboardingSession: 'true' } })
+      router.push({
+        name: 'home',
+        query: onboardingSession.value ? { onboardingSession: 'true' } : {}
+      })
     } catch (err) {
       const errors = JSON.parse(err)
 

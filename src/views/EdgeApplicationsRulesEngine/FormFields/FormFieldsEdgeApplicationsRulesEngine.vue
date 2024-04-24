@@ -53,6 +53,9 @@
     },
     hideApplicationAcceleratorInDescription: {
       type: Boolean
+    },
+    isEdgeFunctionEnabled: {
+      type: Boolean
     }
   })
 
@@ -89,6 +92,10 @@
   const showLabelImageOptimization = computed(() => {
     if (props.isImageOptimization) return ''
     return ' - Requires Image Processor'
+  })
+
+  const showLabelEdgeFunction = computed(() => {
+    return props.isEdgeFunctionEnabled ? '' : '- Requires Edge Functions'
   })
 
   const behaviorsRequestOptions = ref([
@@ -140,7 +147,7 @@
       value: 'rewrite_request',
       requires: true
     },
-    { label: 'Run Function', value: 'run_function', requires: false },
+    { label: `Run Function ${showLabelEdgeFunction.value}`, value: 'run_function', requires: true },
     { label: 'Set Cache Policy', value: 'set_cache_policy', requires: false },
     { label: 'Set Origin', value: 'set_origin', requires: false }
   ])
@@ -167,7 +174,7 @@
     { label: 'Filter Response Header', value: 'filter_response_header', requires: false },
     { label: 'Redirect To (301 Moved Permanently)', value: 'redirect_to_301', requires: false },
     { label: 'Redirect To (302 Found)', value: 'redirect_to_302', requires: false },
-    { label: 'Run Function', value: 'run_function', requires: false }
+    { label: `Run Function ${showLabelEdgeFunction.value}`, value: 'run_function', requires: true }
   ])
 
   const behaviorsDefaultOptions = ref([
@@ -355,7 +362,8 @@
   const updateOptionRequires = (options) => {
     const conditionsMap = {
       redirect_http_to_https: !props.isDeliveryProtocolHttps,
-      optimize_images: !props.isImageOptimization
+      optimize_images: !props.isImageOptimization,
+      run_function: !props.isEdgeFunctionEnabled
     }
 
     return options.map((option) => {

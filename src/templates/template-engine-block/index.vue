@@ -294,7 +294,7 @@
       const data = await props.listIntegrationsService()
 
       if (data && data.length > 0) {
-        formTools.value.setFieldValue(data[0].label, data[0].value)
+        formTools.value.setFieldValue(vcsIntegrationFieldName.value, data[0].value)
         setIntegration.value = data[0].value
       }
 
