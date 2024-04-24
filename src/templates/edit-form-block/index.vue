@@ -60,7 +60,7 @@
 
   watch(formHasChanges, () => {
     if (!props.isTabs) return
-    formHasUpdated.value = formHasChanges
+    formHasUpdated.value = formHasChanges.value
     visibleOnSaved.value = false
   })
 
