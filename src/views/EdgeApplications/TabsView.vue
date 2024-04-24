@@ -147,6 +147,10 @@
     return edgeApplication.value?.edgeFunctions
   })
 
+  const showL2CachingEnabled = computed(() => {
+    return edgeApplication.value?.l2Caching
+  })
+
   const updatedApplication = (application) => {
     edgeApplication.value = { ...application }
     verifyTab(edgeApplication.value)
@@ -248,7 +252,7 @@
             :edgeApplicationId="edgeApplicationId"
             :isEnableApplicationAccelerator="isEnableApplicationAccelerator"
             v-bind="props.cacheSettingsServices"
-            :showTieredCache="edgeApplication.l2Caching"
+            :showTieredCache="showL2CachingEnabled"
           />
         </TabPanel>
         <TabPanel

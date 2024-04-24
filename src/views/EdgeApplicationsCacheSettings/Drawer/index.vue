@@ -77,7 +77,7 @@
   })
 
   const minimumAcceptableValue = computed(() =>
-    props.isEnableApplicationAccelerator ? CDN_MAXIMUM_TTL_MIN_VALUE : CDN_MAXIMUM_TTL_MAX_VALUE
+    props.isEnableApplicationAccelerator || props.showTieredCache ? CDN_MAXIMUM_TTL_MIN_VALUE : CDN_MAXIMUM_TTL_MAX_VALUE
   )
   const minimumAcceptableValueWhenIsHonor = ref(minimumAcceptableValue.value)
   const l2CachingEnabled = ref()
@@ -250,7 +250,7 @@
       <FormFieldsEdgeApplicationCacheSettings
         :isEnableApplicationAccelerator="isEnableApplicationAccelerator"
         :showTieredCache="props.showTieredCache"
-        @l2-caching-enabled="setNewValue"
+        @l2-caching-enabled="setNewMinimumValue"
       />
     </template>
   </EditDrawerBlock>

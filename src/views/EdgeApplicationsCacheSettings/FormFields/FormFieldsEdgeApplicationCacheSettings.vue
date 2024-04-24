@@ -191,7 +191,6 @@
       emit('l2-caching-enabled', value)
     } else {
       isSliceL2CachingEnabled.value = false
-      isSliceEdgeCachingEnabled.value = false
       emit('l2-caching-enabled', value)
     }
   })
