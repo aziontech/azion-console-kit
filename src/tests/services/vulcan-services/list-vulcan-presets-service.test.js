@@ -16,7 +16,7 @@ describe('VulcanServices', () => {
     const presets = sut.listVulcanPresetsService()
 
     expect(presets).toBeInstanceOf(Array)
-    expect(presets).toHaveLength(7)
+    expect(presets).toHaveLength(6)
   })
 
   it('each preset should have the correctly properties', () => {
