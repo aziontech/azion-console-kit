@@ -185,7 +185,7 @@
 <template>
   <ContentBlock>
     <template #heading>
-      <PageHeadingBlock pageTitle="Import Static Site from GitHub" />
+      <PageHeadingBlock pageTitle="Import from GitHub" />
     </template>
     <template #content>
       <CreateFormBlock
