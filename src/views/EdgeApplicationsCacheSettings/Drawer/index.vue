@@ -77,7 +77,9 @@
   })
 
   const minimumAcceptableValue = computed(() =>
-    props.isEnableApplicationAccelerator || props.showTieredCache ? CDN_MAXIMUM_TTL_MIN_VALUE : CDN_MAXIMUM_TTL_MAX_VALUE
+    props.isEnableApplicationAccelerator || props.showTieredCache
+      ? CDN_MAXIMUM_TTL_MIN_VALUE
+      : CDN_MAXIMUM_TTL_MAX_VALUE
   )
   const minimumAcceptableValueWhenIsHonor = ref(minimumAcceptableValue.value)
   const l2CachingEnabled = ref()
