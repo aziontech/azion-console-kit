@@ -188,12 +188,17 @@
       cdnCacheSettings.value = 'override'
       isSliceEdgeCachingEnabled.value = true
       sliceConfigurationEnabled.value = true
-      emit('l2-caching-enabled', value)
     } else {
+      const hasNotApplicationAcceleratorAndExceedMinimumValue =
+        !props.isEnableApplicationAccelerator &&
+        cdnCacheSettingsMaximumTtl.value < CDN_MAXIMUM_TTL_MAX_VALUE
+      if (hasNotApplicationAcceleratorAndExceedMinimumValue) {
+        cdnCacheSettingsMaximumTtl.value = CDN_MAXIMUM_TTL_MAX_VALUE
+      }
       isSliceL2CachingEnabled.value = false
-      isSliceEdgeCachingEnabled.value = false
-      emit('l2-caching-enabled', value)
     }
+
+    emit('l2-caching-enabled', value)
   })
 </script>
 
