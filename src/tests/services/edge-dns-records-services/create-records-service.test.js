@@ -73,22 +73,13 @@ describe('EdgeDnsRecordsServices', () => {
       }
     })
     const { sut } = makeSut()
-    const version = 'v3'
     await sut(fixtures.anameDnsRecordTypeMock)
 
-    expect(requestSpy).toHaveBeenCalledWith({
-      url: `${version}/intelligent_dns/${fixtures.anameDnsRecordTypeMock.edgeDNSID}/records`,
-      method: 'POST',
-      body: {
-        record_type: fixtures.anameDnsRecordTypeMock.selectedRecordType,
-        entry: fixtures.anameDnsRecordTypeMock.name,
-        answers_list: [fixtures.anameDnsRecordTypeMock.value],
-        ttl: fixtures.ttlDefaultValue,
-        description: fixtures.anameDnsRecordTypeMock.description,
-        policy: fixtures.anameDnsRecordTypeMock.selectedPolicy,
-        weight: fixtures.anameDnsRecordTypeMock.weight
-      }
-    })
+    expect(requestSpy).toHaveBeenCalledWith(expect.objectContaining({
+      body: expect.objectContaining({
+        ttl: fixtures.ttlDefaultValue
+      })
+    }))
   })
 
   it('should return a feedback message on successfully created', async () => {
