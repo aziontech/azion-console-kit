@@ -386,7 +386,7 @@
                 <span
                   class="h-10 pb-4 text-sm font-normal text-color-secondary mt-1.5 line-clamp-2"
                 >
-                  Import an existing static project to deploy it on Azion's edge.
+                  Import an existing project to deploy it on Azion's edge.
                 </span>
               </div>
             </div>
