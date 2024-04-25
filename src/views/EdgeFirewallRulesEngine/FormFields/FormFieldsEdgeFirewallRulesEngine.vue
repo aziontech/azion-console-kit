@@ -352,7 +352,6 @@
         }`,
         disabled: runFunctionBehaviorIsAlreadySelected || !hasEdgeFunctionsModuleEnabled
       },
-      { value: 'tag_event', label: 'Tag Event', disabled: false },
       { value: 'set_custom_response', label: 'Set Custom Response', disabled: false }
     ]
   })
@@ -396,7 +395,6 @@
       case 'drop':
       case 'set_rate_limit':
       case 'set_custom_response':
-      case 'tag_event':
         removeBehaviorsFromIndex(behaviorItemIndex)
         break
       default:
