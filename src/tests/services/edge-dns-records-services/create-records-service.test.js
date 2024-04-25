@@ -13,7 +13,18 @@ const fixtures = {
     description: 'dns record description',
     selectedPolicy: { _value: 'weighted' },
     weight: 0.9
-  }
+  },
+  anameDnsRecordTypeMock: {
+    edgeDNSID: 123987902,
+    selectedRecordType: { _value: 'aname' },
+    name: 'Aname-dns-name',
+    value: 'aname-record-type',
+    ttl: 20,
+    description: 'dns anamerecord description',
+    selectedPolicy: { _value: 'weighted' },
+    weight: 0.9
+  },
+  ttlDefaultValue: 20
 }
 
 const makeSut = () => {
@@ -49,6 +60,33 @@ describe('EdgeDnsRecordsServices', () => {
         description: fixtures.dnsRecordMock.description,
         policy: fixtures.dnsRecordMock.selectedPolicy,
         weight: fixtures.dnsRecordMock.weight
+      }
+    })
+  })
+  it('should create a aname record type with default value', async () => {
+    const requestSpy = vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
+      statusCode: 201,
+      body: {
+        results: {
+          id: 1
+        }
+      }
+    })
+    const { sut } = makeSut()
+    const version = 'v3'
+    await sut(fixtures.anameDnsRecordTypeMock)
+
+    expect(requestSpy).toHaveBeenCalledWith({
+      url: `${version}/intelligent_dns/${fixtures.anameDnsRecordTypeMock.edgeDNSID}/records`,
+      method: 'POST',
+      body: {
+        record_type: fixtures.anameDnsRecordTypeMock.selectedRecordType,
+        entry: fixtures.anameDnsRecordTypeMock.name,
+        answers_list: [fixtures.anameDnsRecordTypeMock.value],
+        ttl: fixtures.ttlDefaultValue,
+        description: fixtures.anameDnsRecordTypeMock.description,
+        policy: fixtures.anameDnsRecordTypeMock.selectedPolicy,
+        weight: fixtures.anameDnsRecordTypeMock.weight
       }
     })
   })
