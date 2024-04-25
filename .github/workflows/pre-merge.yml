@@ -40,31 +40,18 @@ jobs:
             coverage/sonar-report.xml
           retention-days: 1
 
-  # sonarqube-analysis:
-  #   name: SonarQube Analysis
-  #   if: ${{ github.actor != 'dependabot[bot]' }}
-  #   needs: [run-tests]
-  #   runs-on: [self-hosted, sonarqube, stage]
-  #   timeout-minutes: 5
-  #   container:
-  #     image: ubuntu:22.04
+  sonarcloud:
+    name: SonarCloud
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
 
-  #   steps:
-  #     - name: Checkout code
-  #       uses: actions/checkout@v3
-
-  #     - name: Download coverage reports
-  #       uses: actions/download-artifact@v3
-  #       with:
-  #         name: coverage_unit_report
-
-  #     - name: Fix code coverage paths - lcov.info
-  #       run: |
-  #         sed -i 's:/__w/azion-platform-kit/azion-platform-kit/:/github/workspace/:' lcov.info
-  #         sed -i 's:/__w/azion-platform-kit/azion-platform-kit/:/github/workspace/:' sonar-report.xml
-
-  #     - name: SonarQube Scan
-  #       uses: sonarsource/sonarqube-scan-action@master
-  #       env:
-  #         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-  #         SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+      - name: SonarCloud Scan
+        uses: SonarSource/sonarcloud-github-action@master
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Needed to get PR information, if any
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
