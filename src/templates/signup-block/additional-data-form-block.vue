@@ -379,33 +379,26 @@
     loading.value = true
 
     try {
+      const usersPayload = fullName.value
+      const accountPayload = role.value
       const additionalDataPayload = {
         ...values,
         id: userId
       }
 
-      const usersPayload = fullName.value
-
-      const accountPayload = role.value
+      const updatedAccount = await props.updateAccountInfoService(accountPayload)
+      accountStore.setAccountData({ jobRole: updatedAccount.jobRole })
 
       const patchName = props.patchFullnameService(usersPayload)
-
       const postAddData = props.postAdditionalDataService({
         payload: additionalDataPayload,
         options: additionalDataInfo.value
       })
+
       await patchName
       await postAddData
 
-      const updatedAccount = await props.updateAccountInfoService(accountPayload)
-      accountStore.setAccountData({ jobRole: updatedAccount.jobRole })
-
       tracker.signUp.submittedAdditionalData(values).track()
-
-      router.push({
-        name: 'home',
-        query: onboardingSession.value ? { onboardingSession: 'true' } : {}
-      })
     } catch (err) {
       const errors = JSON.parse(err)
 
@@ -413,6 +406,10 @@
 
       tracker.signUp.failedSubmitAdditionalData(errors).track()
     } finally {
+      router.push({
+        name: 'home',
+        query: onboardingSession.value ? { onboardingSession: 'true' } : {}
+      })
       loading.value = false
     }
   }
