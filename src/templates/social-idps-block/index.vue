@@ -56,7 +56,7 @@
   const showSkeleton = computed(() => idps.value.length === 0)
 
   onMounted(() => {
-    window.addEventListener('pageshow', verifyBfcache)
+    window.addEventListener('pageshow', resetLoadingState)
     loadSocialIdps()
   })
 
@@ -106,17 +106,14 @@
 
   /*
     When user goes to social login page and then goes back, the login page is cached in the browser.
-    To reset to default state, we need to check if the page is cached.
     https://web.dev/articles/bfcache
   */
-  const verifyBfcache = (event) => {
-    if (event.persisted) {
-      loadingStore.finishLoading()
-      submittedIdp.value = null
-    }
+  const resetLoadingState = () => {
+    loadingStore.finishLoading()
+    submittedIdp.value = null
   }
 
   onUnmounted(() => {
-    window.removeEventListener('pageshow', verifyBfcache)
+    window.removeEventListener('pageshow', resetLoadingState)
   })
 </script>
