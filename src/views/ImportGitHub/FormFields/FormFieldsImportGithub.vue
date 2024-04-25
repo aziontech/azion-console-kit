@@ -228,7 +228,7 @@
         link
         icon-pos="right"
         icon="pi pi-external-link"
-        label="Want to use one of your Github project samples?"
+        label="Fork and use a sample project"
         class="w-fit p-0 text-sm"
         @click="goToAzionSamples"
       />
