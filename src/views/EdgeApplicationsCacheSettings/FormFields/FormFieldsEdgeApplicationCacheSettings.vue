@@ -190,7 +190,7 @@
       sliceConfigurationEnabled.value = true
       emit('l2-caching-enabled', value)
     } else {
-      if(!props.isEnableApplicationAccelerator && cdnCacheSettingsMaximumTtl.value < 60) {
+      if (!props.isEnableApplicationAccelerator && cdnCacheSettingsMaximumTtl.value < 60) {
         cdnCacheSettingsMaximumTtl.value = 60
       }
       isSliceL2CachingEnabled.value = false
