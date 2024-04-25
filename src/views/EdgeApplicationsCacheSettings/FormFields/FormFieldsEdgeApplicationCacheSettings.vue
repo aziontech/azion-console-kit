@@ -190,7 +190,8 @@
       sliceConfigurationEnabled.value = true
     } else {
       const hasNotApplicationAcceleratorAndExceedMinimumValue =
-        !props.isEnableApplicationAccelerator && cdnCacheSettingsMaximumTtl.value < CDN_MAXIMUM_TTL_MAX_VALUE
+        !props.isEnableApplicationAccelerator &&
+        cdnCacheSettingsMaximumTtl.value < CDN_MAXIMUM_TTL_MAX_VALUE
       if (hasNotApplicationAcceleratorAndExceedMinimumValue) {
         cdnCacheSettingsMaximumTtl.value = CDN_MAXIMUM_TTL_MAX_VALUE
       }
