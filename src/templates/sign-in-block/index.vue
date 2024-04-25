@@ -167,7 +167,6 @@
   import Divider from 'primevue/divider'
   import * as yup from 'yup'
   import { useToast } from 'primevue/usetoast'
-  import { useLoadingStore } from '@/stores/loading'
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
 
@@ -205,7 +204,6 @@
 
   const route = useRoute()
   const toast = useToast()
-  const loadingStore = useLoadingStore()
 
   const verifyErrorsOnUrl = () => {
     const { error_description: errorMessage } = route.query
@@ -221,7 +219,6 @@
   }
 
   onMounted(() => {
-    loadingStore.finishLoading()
     verifyErrorsOnUrl()
   })
 
