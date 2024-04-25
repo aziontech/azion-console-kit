@@ -189,7 +189,8 @@
       isSliceEdgeCachingEnabled.value = true
       sliceConfigurationEnabled.value = true
     } else {
-      const hasNotApplicationAcceleratorAndExceedMinimumValue = !props.isEnableApplicationAccelerator && cdnCacheSettingsMaximumTtl.value < 60
+      const hasNotApplicationAcceleratorAndExceedMinimumValue =
+        !props.isEnableApplicationAccelerator && cdnCacheSettingsMaximumTtl.value < 60
       if (hasNotApplicationAcceleratorAndExceedMinimumValue) {
         cdnCacheSettingsMaximumTtl.value = 60
       }
