@@ -40,6 +40,7 @@
     }
   })
 
+  const AZIONFORMSAMPLESLINK = ref('https://github.com/aziontech/azion-samples/fork')
   const { value: preset } = useField('preset')
   const { value: gitScope } = useField('gitScope')
   const { value: repository } = useField('repository')
@@ -209,6 +210,10 @@
     windowOpen(route.href, '_blank')
   }
 
+  const goToAzionSamples = () => {
+    windowOpen(AZIONFORMSAMPLESLINK.value, '_blank')
+  }
+
   onMounted(async () => {
     await listIntegrations()
     listenerOnMessage()
@@ -216,10 +221,18 @@
 </script>
 
 <template>
-  <FormHorizontal
-    title="GitHub Connection"
-    description="Provide access to GitHub to import an existing project."
-  >
+  <FormHorizontal title="GitHub Connection">
+    <template #description>
+      Provide access to GitHub to import an existing project.
+      <PrimeButton
+        link
+        icon-pos="right"
+        icon="pi pi-external-link"
+        label="Fork and use a sample project"
+        class="w-fit p-0 text-sm"
+        @click="goToAzionSamples"
+      />
+    </template>
     <template #inputs>
       <div v-show="!hasIntegrations">
         <OAuthGithub
