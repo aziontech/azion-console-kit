@@ -3,7 +3,7 @@
     label="Preview"
     severity="primary"
     outlined
-    class="flex md:hidden"
+    :class="[buttonClasses]"
     @click="showMobilePreview = true"
   />
   <Sidebar
@@ -35,16 +35,23 @@
 </template>
 
 <script setup>
-  import { ref } from 'vue'
+  import { computed, ref } from 'vue'
   import PrimeButton from 'primevue/button'
   import Sidebar from 'primevue/sidebar'
   import CodePreview from './code-preview.vue'
 
-  defineProps({
+  const props = defineProps({
     updateObject: {
       type: Object,
       required: true
+    },
+    language: {
+      type: String
     }
+  })
+
+  const buttonClasses = computed(() => {
+    return props.language !== 'lua' ? 'flex md:hidden' : 'hidden'
   })
 
   const showMobilePreview = ref(false)
