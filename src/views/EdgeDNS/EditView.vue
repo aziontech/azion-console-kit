@@ -20,7 +20,6 @@
   import { generateCurrentTimestamp } from '@/helpers/generate-timestamp'
   import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
 
-
   const props = defineProps({
     loadEdgeDNSService: { type: Function, required: true },
     editEdgeDNSService: { type: Function, required: true },
