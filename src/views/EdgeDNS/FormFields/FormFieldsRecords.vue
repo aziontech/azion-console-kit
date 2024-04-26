@@ -94,6 +94,9 @@
             class="text-color text-base font-medium"
             >Record Type *</label
           >
+          <pre>
+            {{ selectedRecordType }}
+          </pre>
           <Dropdown
             appendTo="self"
             v-model="selectedRecordType"
