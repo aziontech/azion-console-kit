@@ -28,7 +28,7 @@
       type: String,
       default: 'javascript',
       validator: (value) => {
-        return ['javascript', 'json'].includes(value)
+        return ['javascript', 'json', 'lua'].includes(value)
       }
     },
     errors: Boolean
