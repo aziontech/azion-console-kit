@@ -19,7 +19,8 @@
 
   const edgeDNSStore = useEdgeDNSStore()
 
-  const RECORD_TYPE_WITHOUT_TTL = 'ANAME'
+  const RECORD_TYPE_WITH_DEFAULT_TTL = 'ANAME'
+  const TTL_DEFAULT_VALUE = 20
 
   const policyList = ref([
     { label: 'Simple', value: 'simple' },
@@ -44,9 +45,13 @@
     return selectedPolicy.value === 'weighted'
   })
 
-  const showTTLField = computed(() => {
-    return selectedRecordType.value !== RECORD_TYPE_WITHOUT_TTL
+  const enableTTLField = computed(() => {
+    return selectedRecordType.value !== RECORD_TYPE_WITH_DEFAULT_TTL
   })
+
+  const setTtlByRecordType = () => {
+    if (!enableTTLField.value) ttl.value = TTL_DEFAULT_VALUE
+  }
 </script>
 
 <template>
@@ -89,9 +94,13 @@
             class="text-color text-base font-medium"
             >Record Type *</label
           >
+          <pre>
+            {{ selectedRecordType }}
+          </pre>
           <Dropdown
             appendTo="self"
             v-model="selectedRecordType"
+            @change="setTtlByRecordType"
             :options="recordsTypes"
             optionLabel="label"
             id="type"
@@ -111,10 +120,7 @@
           >
         </div>
 
-        <div
-          v-if="showTTLField"
-          class="flex flex-col sm:max-w-xs w-full gap-2"
-        >
+        <div class="flex flex-col sm:max-w-xs w-full gap-2">
           <label
             for="ttl"
             class="text-color text-base font-medium"
@@ -123,6 +129,7 @@
 
           <InputNumber
             showButtons
+            :disabled="!enableTTLField"
             placeholder="TTL (seconds):"
             v-model="ttl"
             id="ttl"
