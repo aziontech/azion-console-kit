@@ -70,9 +70,7 @@ describe('EdgeDnsRecordsServices', () => {
         id: fixtures.dnsRecordMock.record_id,
         name: fixtures.dnsRecordMock.entry,
         type: fixtures.dnsRecordMock.record_type,
-        value: `${fixtures.dnsRecordMock.answers_list.at(
-          0
-        )},${fixtures.dnsRecordMock.answers_list.at(1)}`,
+        value: fixtures.dnsRecordMock.answers_list,
         ttl: fixtures.dnsRecordMock.ttl,
         policy: fixtures.dnsRecordMock.policy,
         weight: fixtures.dnsRecordMock.weight,
@@ -82,7 +80,7 @@ describe('EdgeDnsRecordsServices', () => {
         id: fixtures.dnsRecordMissingDataMock.record_id,
         name: fixtures.dnsRecordMissingDataMock.entry,
         type: fixtures.dnsRecordMissingDataMock.record_type,
-        value: '',
+        value: [],
         ttl: fixtures.dnsRecordMissingDataMock.ttl,
         policy: fixtures.dnsRecordMissingDataMock.policy,
         description: '-'

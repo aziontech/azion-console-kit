@@ -18,6 +18,7 @@
   import FormFieldsEdgeDnsCreate from './FormFields/FormFieldsEdgeDns.vue'
   import FormFieldsRecords from './FormFields/FormFieldsRecords'
   import { generateCurrentTimestamp } from '@/helpers/generate-timestamp'
+  import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
 
   const props = defineProps({
     loadEdgeDNSService: { type: Function, required: true },
@@ -58,7 +59,11 @@
     },
     {
       field: 'value',
-      header: 'Value'
+      header: 'Value',
+      filterPath: 'value.content',
+      type: 'component',
+      component: (columnData) =>
+        columnBuilder({ data: columnData, columnAppearance: 'expand-column' })
     },
     {
       field: 'ttl',
