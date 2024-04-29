@@ -262,8 +262,8 @@
     },
     { label: 'API', link: 'https://api.azion.com', isLinkExternal: true },
     {
-      label: 'Changelog',
-      link: 'https://www.azion.com/en/documentation/products/changelog',
+      label: 'Realease Notes',
+      link: 'https://www.azion.com/en/documentation/products/release-notes/',
       isLinkExternal: true
     },
     {
