@@ -2,7 +2,7 @@
   <div>
     <section class="flex max-lg:flex-col">
       <div
-        class="w-auto flex flex-col items-center justify-center p-6 lg:p-20 max-md:px-3 max-md:pt-4 max-md:pb-8"
+        class="w-auto 2xl:w-full flex flex-col items-center justify-center p-6 lg:p-20 max-md:px-3 max-md:pt-4 max-md:pb-8"
       >
         <form-signup-block v-bind="props" />
       </div>
