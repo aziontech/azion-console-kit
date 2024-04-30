@@ -325,6 +325,7 @@
 
   const selectedItems = (events) => {
     selectedEvents.value = events
+
     cleanSelectData.value = null
   }
 
@@ -373,7 +374,7 @@
       }
 
       const payload = {
-        ruleId: event.id,
+        ruleId: event.ruleId,
         matchZone: [matchZones],
         reason
       }
