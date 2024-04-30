@@ -304,7 +304,8 @@
   }
 
   const getCurrentPath = () => {
-    return route.path
+    const match = route.path.match(/(.*\/)(edit|solution)/)
+    return match ? `${match[1]}${match[2]}` : route.path
   }
 
   const parseFilename = (filename) => {
