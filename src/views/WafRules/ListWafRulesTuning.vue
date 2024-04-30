@@ -373,7 +373,7 @@
       }
 
       const payload = {
-        ruleId: event.id,
+        ruleId: parseInt(event.ruleId),
         matchZone: [matchZones],
         reason
       }
