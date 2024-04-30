@@ -324,7 +324,11 @@
   }
 
   const selectedItems = (events) => {
-    selectedEvents.value = events
+    selectedEvents.value = events.map(event => ({
+      ruleId: event.id,
+      ...event
+    }))
+    
     cleanSelectData.value = null
   }
 
