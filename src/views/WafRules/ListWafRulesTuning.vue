@@ -324,10 +324,7 @@
   }
 
   const selectedItems = (events) => {
-    selectedEvents.value = events.map((event) => ({
-      ruleId: event.id,
-      ...event
-    }))
+    selectedEvents.value = events
 
     cleanSelectData.value = null
   }
@@ -377,7 +374,7 @@
       }
 
       const payload = {
-        ruleId: parseInt(event.ruleId),
+        ruleId: event.ruleId,
         matchZone: [matchZones],
         reason
       }
