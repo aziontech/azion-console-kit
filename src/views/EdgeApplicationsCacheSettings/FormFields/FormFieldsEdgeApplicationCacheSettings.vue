@@ -481,12 +481,12 @@
             <RadioButton
               v-model="cacheByQueryString"
               :disabled="disabledQueryStringOptions(queryStringOption)"
-              :inputId="`cbqs-${queryStringOption.value}`"
+              :inputId="`cache-by-query-string-${queryStringOption.value}`"
               name="cacheByQueryString"
               :value="queryStringOption.value"
             />
             <label
-              :for="`cbqs-${queryStringOption.value}`"
+              :for="`cache-by-query-string-${queryStringOption.value}`"
               class="text-color text-sm font-normal leading-tight"
             >
               {{ queryStringOption.label }}
@@ -624,12 +624,12 @@
             <RadioButton
               :disabled="disabledCookiesOptions(cookiesOption)"
               v-model="cacheByCookies"
-              :inputId="`cbc-${cookiesOption.value}`"
+              :inputId="`cache-by-cookie-${cookiesOption.value}`"
               name="cacheByCookies"
               :value="cookiesOption.value"
             />
             <label
-              :for="`cbc-${cookiesOption.value}`"
+              :for="`cache-by-cookie-${cookiesOption.value}`"
               class="text-color text-sm font-normal leading-tight"
             >
               {{ cookiesOption.label }}
@@ -670,12 +670,12 @@
           >
             <RadioButton
               v-model="adaptiveDeliveryAction"
-              :inputId="`ad-${deviceGroupCacheOption.value}`"
+              :inputId="`adaptative-delivery-${deviceGroupCacheOption.value}`"
               name="adaptiveDeliveryAction"
               :value="deviceGroupCacheOption.value"
             />
             <label
-              :for="`ad-${deviceGroupCacheOption.value}`"
+              :for="`adaptative-delivery-${deviceGroupCacheOption.value}`"
               class="text-color text-sm font-normal leading-tight"
             >
               {{ deviceGroupCacheOption.label }}
