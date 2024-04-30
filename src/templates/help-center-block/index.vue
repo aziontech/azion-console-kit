@@ -262,7 +262,7 @@
     },
     { label: 'API', link: 'https://api.azion.com', isLinkExternal: true },
     {
-      label: 'Realease notes',
+      label: 'Release notes',
       link: 'https://www.azion.com/en/documentation/products/release-notes/',
       isLinkExternal: true
     },
