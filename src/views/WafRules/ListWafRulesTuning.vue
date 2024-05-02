@@ -356,33 +356,32 @@
 
   const handleSubmitAllowRules = async (reason) => {
     const requestsAllowedRules = []
-    let events = []
+    let attackEvents = []
     if (allowedByAttacks.value.length) {
-      events = [...allowedByAttacks.value]
+      attackEvents = [...allowedByAttacks.value]
     } else if (selectedEvents.value.length) {
-      events = [...selectedEvents.value]
+      attackEvents = [...selectedEvents.value]
     }
 
-    for (const event of events) {
+    for (const attack of attackEvents) {
       const matchZones = {
-        zone: event.matchZone,
-        matchesOn: event.matchesOn
+        zone: attack.matchZone,
+        matchesOn: attack.matchesOn
       }
-      if (event.matchValue) {
+      if (attack.matchValue) {
         const isPathZone = matchZones.zone === 'path'
 
-        matchZones.zoneInput = event.matchValue
+        matchZones.zoneInput = attack.matchValue
+        matchZones.zone = `conditional_${matchZones.zone}`
 
         if (isPathZone) {
           matchZones.zone = 'path'
           matchZones.zoneInput = null
-        } else {
-          matchZones.zone = `conditional_${matchZones.zone}`
-        }
+        } 
       }
 
       const payload = {
-        ruleId: event.ruleId,
+        ruleId: attack.ruleId,
         matchZone: [matchZones],
         reason
       }
