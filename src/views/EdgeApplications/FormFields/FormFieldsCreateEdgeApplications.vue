@@ -83,7 +83,7 @@
   const setDeliveryProtocol = (protocol, enableHttp3) => {
     deliveryProtocol.value = protocol
     http3.value = enableHttp3
-    if (deliveryProtocol.value === 'http') minimumTlsVersion.value = {}
+    if (deliveryProtocol.value === 'http') minimumTlsVersion.value = ''
     setDefaultHttpAndHttpsPort(enableHttp3)
   }
 

@@ -6,14 +6,25 @@ import { describe, expect, it, vi } from 'vitest'
 const fixtures = {
   dnsRecordMock: {
     edgeDNSID: 123987902,
-    selectedRecordType: { _value: 'dns-record-value' },
+    selectedRecordType: 'dns-record-value',
     name: 'Az-dns-name',
     value: 'dns-answer-record-value',
     ttl: '8000',
     description: 'dns record description',
-    selectedPolicy: { _value: 'weighted' },
+    selectedPolicy: 'weighted',
     weight: 0.9
-  }
+  },
+  anameDnsRecordTypeMock: {
+    edgeDNSID: 123987902,
+    selectedRecordType: 'aname',
+    name: 'Aname-dns-name',
+    value: 'aname-record-type',
+    ttl: 20,
+    description: 'dns aname record description',
+    selectedPolicy: 'weighted',
+    weight: 0.9
+  },
+  ttlDefaultValue: 20
 }
 
 const makeSut = () => {
@@ -51,6 +62,26 @@ describe('EdgeDnsRecordsServices', () => {
         weight: fixtures.dnsRecordMock.weight
       }
     })
+  })
+  it('should create a aname record type with default value', async () => {
+    const requestSpy = vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
+      statusCode: 201,
+      body: {
+        results: {
+          id: 1
+        }
+      }
+    })
+    const { sut } = makeSut()
+    await sut(fixtures.anameDnsRecordTypeMock)
+
+    expect(requestSpy).toHaveBeenCalledWith(
+      expect.objectContaining({
+        body: expect.objectContaining({
+          ttl: fixtures.ttlDefaultValue
+        })
+      })
+    )
   })
 
   it('should return a feedback message on successfully created', async () => {

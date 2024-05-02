@@ -68,7 +68,7 @@
                         }"
                         class="md:ml-auto w-full"
                         label="Back"
-                        icon="pi pi-sync"
+                        icon="pi pi-chevron-left"
                         iconPos="left"
                       />
                     </div>

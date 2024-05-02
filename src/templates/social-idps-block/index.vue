@@ -36,7 +36,7 @@
   import PrimeButton from 'primevue/button'
   import Skeleton from 'primevue/skeleton'
   import { useToast } from 'primevue/usetoast'
-  import { computed, onMounted, ref, inject } from 'vue'
+  import { computed, onMounted, ref, inject, onUnmounted } from 'vue'
 
   defineOptions({ name: 'social-idps-block' })
   const emit = defineEmits(['showSocialIdps'])
@@ -56,6 +56,7 @@
   const showSkeleton = computed(() => idps.value.length === 0)
 
   onMounted(() => {
+    window.addEventListener('pageshow', resetLoadingState)
     loadSocialIdps()
   })
 
@@ -102,4 +103,17 @@
     window.location.href = idp.loginUrl
     tracker.signUp.userClickedSignedUp({ method: idp.slug }).track()
   }
+
+  /*
+    When user goes to social login page and then goes back, the login page is cached in the browser.
+    https://web.dev/articles/bfcache
+  */
+  const resetLoadingState = () => {
+    loadingStore.finishLoading()
+    submittedIdp.value = null
+  }
+
+  onUnmounted(() => {
+    window.removeEventListener('pageshow', resetLoadingState)
+  })
 </script>
