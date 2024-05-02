@@ -369,8 +369,16 @@
         matches_on: event.matchesOn
       }
       if (event.matchValue) {
+        const isPathZone = matchZones.zone === 'path'
+
         matchZones.zone_input = event.matchValue
-        matchZones.zone = `conditional_${matchZones.zone}`
+
+        if (isPathZone) {
+          matchZones.zone = 'path';
+          matchZones.zone_input = null
+        } else {
+          matchZones.zone = `conditional_${matchZones.zone}`;
+        }
       }
 
       const payload = {
