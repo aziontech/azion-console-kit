@@ -13,9 +13,15 @@ export const createWafRulesAllowedTuningService = async ({ payload, wafId }) => 
 }
 
 const adapt = (payload) => {
+  const matchZone = payload.matchZone.map(match => ({
+    zone: match.zone,
+    zone_input: match.zoneInput,
+    matches_on: match.matchesOn
+  }))
+
   return {
     rule_id: payload.ruleId,
-    match_zones: payload.matchZone,
+    match_zones: matchZone,
     reason: payload.reason
   }
 }

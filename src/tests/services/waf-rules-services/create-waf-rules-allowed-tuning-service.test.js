@@ -9,8 +9,8 @@ const fixtures = {
     matchZone: [
       {
         zone: 'conditional_query_string',
-        zone_input: 'arg',
-        matches_on: 'value'
+        zoneInput: 'arg',
+        matchesOn: 'value'
       }
     ],
     ruleId: '1000'
@@ -39,7 +39,11 @@ describe('WafRulesServices', () => {
       method: 'POST',
       body: {
         rule_id: fixtures.wafRulesMock.ruleId,
-        match_zones: fixtures.wafRulesMock.matchZone,
+        match_zones: [{
+          matches_on: fixtures.wafRulesMock.matchZone[0].matchesOn,
+          zone: fixtures.wafRulesMock.matchZone[0].zone,
+          zone_input: fixtures.wafRulesMock.matchZone[0].zoneInput,
+        }],
         reason: fixtures.wafRulesMock.reason
       }
     })

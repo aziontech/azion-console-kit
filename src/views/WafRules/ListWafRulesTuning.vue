@@ -366,16 +366,16 @@
     for (const event of events) {
       const matchZones = {
         zone: event.matchZone,
-        matches_on: event.matchesOn
+        matchesOn: event.matchesOn
       }
       if (event.matchValue) {
         const isPathZone = matchZones.zone === 'path'
 
-        matchZones.zone_input = event.matchValue
+        matchZones.zoneInput = event.matchValue
 
         if (isPathZone) {
           matchZones.zone = 'path'
-          matchZones.zone_input = null
+          matchZones.zoneInput = null
         } else {
           matchZones.zone = `conditional_${matchZones.zone}`
         }
