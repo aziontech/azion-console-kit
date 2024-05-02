@@ -154,14 +154,14 @@
   }
   const showNetworkListDropdownField = ({ criteriaIndex, criteriaInnerRowIndex }) => {
     const criteriaVariable = criteria.value[criteriaIndex].value[criteriaInnerRowIndex].variable
-    const isNetworkSelected = criteriaVariable === 'network'
+    const isCriteriaNetworkSelected = criteriaVariable === 'network'
     const hasNetworkOptionsToSelect = networkListOptions.value.length && loadingNetworkList.value
 
-    if (isNetworkSelected && !hasNetworkOptionsToSelect) {
+    if (isCriteriaNetworkSelected && !hasNetworkOptionsToSelect) {
       setNetworkListOptions()
     }
 
-    return isNetworkSelected
+    return isCriteriaNetworkSelected
   }
 
   const generateCriteriaVariableOptions = () => {
