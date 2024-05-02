@@ -30,7 +30,7 @@ export const importGithubRoutes = {
         breadCrumbs: [
           {
             label: 'Import from GitHub',
-            to: '/import-github'
+            to: '/github/azion/import-from-github'
           }
         ]
       }
