@@ -41,6 +41,10 @@
     edgeFirewallModules: {
       type: Object,
       required: true
+    },
+    listNetworkListService: {
+      type: Function,
+      required: true
     }
   })
 
@@ -151,6 +155,7 @@
       })
     }
   }
+
   const listWafRulesOptions = async () => {
     try {
       const result = await props.listWafRulesService()
@@ -208,6 +213,7 @@
         :enabledModules="edgeFirewallModules"
         :edgeFirewallFunctionsOptions="edgeFirewallFunctionsOptions"
         :wafRulesOptions="wafRulesOptions"
+        :listNetworkListService="listNetworkListService"
       />
     </template>
   </CreateDrawerBlock>
@@ -227,6 +233,7 @@
         :enabledModules="edgeFirewallModules"
         :edgeFirewallFunctionsOptions="edgeFirewallFunctionsOptions"
         :wafRulesOptions="wafRulesOptions"
+        :listNetworkListService="listNetworkListService"
       />
     </template>
   </EditDrawerBlock>
