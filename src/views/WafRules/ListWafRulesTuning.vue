@@ -374,10 +374,10 @@
         matchZones.zone_input = event.matchValue
 
         if (isPathZone) {
-          matchZones.zone = 'path';
+          matchZones.zone = 'path'
           matchZones.zone_input = null
         } else {
-          matchZones.zone = `conditional_${matchZones.zone}`;
+          matchZones.zone = `conditional_${matchZones.zone}`
         }
       }
 
