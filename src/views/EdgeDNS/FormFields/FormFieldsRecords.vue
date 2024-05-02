@@ -52,6 +52,45 @@
   const setTtlByRecordType = () => {
     if (!enableTTLField.value) ttl.value = TTL_DEFAULT_VALUE
   }
+
+  const RECORD_TYPES_VALUE_FIELD_INFOS = {
+    // eslint-disable-next-line id-length
+    A: 'Please, enter multiple values on separate lines. Only IPV4 formats.',
+    AAAA: 'Please, enter multiple values on separate lines. Only IPV6 formats.',
+    ANAME: 'Please, enter multiple values on separate lines. Only FQDN formats.',
+    CAA: `To add a CAA record to your hosted zone, you must specify three settings separated by spaces.
+        <strong class="block">Format:</strong>
+        [flags] [tag] ["value"]
+        <strong class="block">Example:</strong>
+        <span class="block">0 issue “ca.example.net”</span>`,
+    CNAME:
+      'Please, enter the domain name following the format FQDN. IP addresses are not acceptable for this kind of record.',
+    DS: `DS records must respect the following format: 
+        <span class="block">[tag] [algorithm_numeric_id] [digest_numeric_id] [hex_digest]</span>
+        <strong class="block">Example:</strong>
+        <span class="block">12345 3 1 49FD46...E56E5B3435C2F60CD29</span>
+        `,
+    MX: `A priority and a domain name that specifies a mail server. Enter multiple values on separate lines.
+        <strong class="block">Format:</strong>
+        [priority] [mail server host name]
+        <strong class="block">Example:</strong>
+        <span class="block">10 mailserver.example.com</span>
+        <span class="block">20 mailserver2.example.com</span>`,
+    NS: 'NS-records identify the DNS servers responsible (authoritative) for a zone. A zone should contain one NS-record for each of its own DNS servers (primary and secondaries).',
+    PTR: 'PTR records should use FQDN format. Only one answer is allowed.',
+    SRV: `As in MX records, the target in SRV records must point to hostname with an address record (A or AAAA record). Pointing to a hostname with a CNAME record is not a valid configuration.
+        <strong class="block">Format:</strong>
+        [priority] [weight] [port] [target]
+        <strong class="block">Example:</strong>
+        <span class="block">10 60 5060 bigbox.example.com</span>`,
+    TXT: 'A TXT record (short for text record) is a type of resource record in the Domain Name System (DNS) used to provide the ability to associate arbitrary text with a host or other name, such as human readable information about a server, network, data center, or other accounting information.'
+  }
+
+  const selectedRecordTypeInfo = computed(() => {
+    if (!selectedRecordType.value) return null
+
+    return RECORD_TYPES_VALUE_FIELD_INFOS[selectedRecordType.value]
+  })
 </script>
 
 <template>
@@ -162,9 +201,10 @@
           type="text"
           :class="{ 'p-invalid': errorValue }"
         />
-        <small class="text-xs text-color-secondary font-normal leading-5">
-          The accepted values format vary according to the chosen record type.
-        </small>
+        <small
+          class="text-xs text-color-secondary font-normal leading-5"
+          v-html="selectedRecordTypeInfo"
+        ></small>
 
         <small
           v-if="errorValue"
