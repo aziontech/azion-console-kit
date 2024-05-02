@@ -39,11 +39,13 @@ describe('WafRulesServices', () => {
       method: 'POST',
       body: {
         rule_id: fixtures.wafRulesMock.ruleId,
-        match_zones: [{
-          matches_on: fixtures.wafRulesMock.matchZone[0].matchesOn,
-          zone: fixtures.wafRulesMock.matchZone[0].zone,
-          zone_input: fixtures.wafRulesMock.matchZone[0].zoneInput,
-        }],
+        match_zones: [
+          {
+            matches_on: fixtures.wafRulesMock.matchZone[0].matchesOn,
+            zone: fixtures.wafRulesMock.matchZone[0].zone,
+            zone_input: fixtures.wafRulesMock.matchZone[0].zoneInput
+          }
+        ],
         reason: fixtures.wafRulesMock.reason
       }
     })
