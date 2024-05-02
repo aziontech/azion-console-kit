@@ -377,7 +377,7 @@
         if (isPathZone) {
           matchZones.zone = 'path'
           matchZones.zoneInput = null
-        } 
+        }
       }
 
       const payload = {
