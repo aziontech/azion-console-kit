@@ -68,7 +68,7 @@
     DS: `DS records must respect the following format: 
         <span class="block">[tag] [algorithm_numeric_id] [digest_numeric_id] [hex_digest]</span>
         <strong class="block">Example:</strong>
-        <span class="block">12345 3 1 49FD46...E56E5B3435C2F60CD29</span>
+        <span class="block truncate">12345 3 1 12AB34C5D6E78F90A1BC23D4E5F6A7B8C9D0E1F23456AB78C9D0123E4F56AB78</span>
         `,
     MX: `A priority and a domain name that specifies a mail server. Enter multiple values on separate lines.
         <strong class="block">Format:</strong>
@@ -171,7 +171,7 @@
             id="ttl"
             :min="0"
             :max="3600"
-            step="1"
+            :step="1"
             :class="{ 'p-invalid': errorTtl }"
           />
 
@@ -264,7 +264,7 @@
             id="weight"
             :min="0"
             :max="255"
-            step="1"
+            :step="1"
             :class="{ 'p-invalid': errorWeight }"
           />
           <small class="text-xs text-color-secondary font-normal leading-5">
