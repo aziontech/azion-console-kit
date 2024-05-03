@@ -55,35 +55,84 @@
 
   const RECORD_TYPES_VALUE_FIELD_INFOS = {
     // eslint-disable-next-line id-length
-    A: 'Please, enter multiple values on separate lines. Only IPV4 formats.',
-    AAAA: 'Please, enter multiple values on separate lines. Only IPV6 formats.',
-    ANAME: 'Please, enter multiple values on separate lines. Only FQDN formats.',
-    CAA: `To add a CAA record to your hosted zone, you must specify three settings separated by spaces.
-        <strong class="block">Format:</strong>
-        [flags] [tag] ["value"]
-        <strong class="block">Example:</strong>
-        <span class="block">0 issue “ca.example.net”</span>`,
-    CNAME:
-      'Please, enter the domain name following the format FQDN. IP addresses are not acceptable for this kind of record.',
-    DS: `DS records must respect the following format: 
-        <span class="block">[tag] [algorithm_numeric_id] [digest_numeric_id] [hex_digest]</span>
-        <strong class="block">Example:</strong>
-        <span class="block truncate">12345 3 1 12AB34C5D6E78F90A1BC23D4E5F6A7B8C9D0E1F23456AB78C9D0123E4F56AB78</span>
-        `,
-    MX: `A priority and a domain name that specifies a mail server. Enter multiple values on separate lines.
-        <strong class="block">Format:</strong>
-        [priority] [mail server host name]
-        <strong class="block">Example:</strong>
-        <span class="block">10 mailserver.example.com</span>
-        <span class="block">20 mailserver2.example.com</span>`,
-    NS: 'NS-records identify the DNS servers responsible (authoritative) for a zone. A zone should contain one NS-record for each of its own DNS servers (primary and secondaries).',
-    PTR: 'PTR records should use FQDN format. Only one answer is allowed.',
-    SRV: `As in MX records, the target in SRV records must point to hostname with an address record (A or AAAA record). Pointing to a hostname with a CNAME record is not a valid configuration.
-        <strong class="block">Format:</strong>
-        [priority] [weight] [port] [target]
-        <strong class="block">Example:</strong>
-        <span class="block">10 60 5060 bigbox.example.com</span>`,
-    TXT: 'A TXT record (short for text record) is a type of resource record in the Domain Name System (DNS) used to provide the ability to associate arbitrary text with a host or other name, such as human readable information about a server, network, data center, or other accounting information.'
+    A: {
+      typeTip: 'Stores a hostname and its corresponding IPv4 address.',
+      valueTip: `Enter multiple values on separate lines. Only IPv4 formats.
+              <strong class="block">Example:</strong>
+              <span class="block truncate">192.0.2.1</span>
+              <span class="block truncate">101.102.103.104</span>`
+    },
+    AAAA: {
+      typeTip: 'Stores a hostname and its corresponding IPv6 address.',
+      valueTip: `Enter multiple values on separate lines. Only IPv6 formats.
+              <strong class="block">Example:</strong>
+              <span class="block truncate">2001:db8:3333:4444:5555:6666:7777:8888</span>
+              <span class="block truncate">2001:db8:3333:4444:CCCC:DDDD:EEEE:FFFF</span>`
+    },
+    ANAME: {
+      typeTip:
+        'ALIAS record is a virtual record type created to provide CNAME, like behavior on apex domains.',
+      valueTip: `Enter multiple values on separate lines. Only FQDN formats.
+              <strong class="block">Example:</strong>
+              <span class="block truncate">example.com</span>
+              <span class="block truncate">mywebsite.com</span>`
+    },
+    CAA: {
+      typeTip:
+        'Allows a domain owner to choose which Certificate Authorities (CAs) can issue certificates for their domain or subdomain.',
+      valueTip: `Specify the settings separated by spaces, following the format: [flags] [tag] [“value”]
+              <strong class="block">Example:</strong>
+              <span class="block truncate">0 issue “ca.example.net”</span>`
+    },
+    CNAME: {
+      typeTip:
+        'Can be used to alias a hostname to another hostname. When a DNS client requests a record with a CNAME pointing to another hostname, it looks up the new hostname.',
+      valueTip: `Enter the domain name following the FQDN format. IP addresses aren't acceptable for this kind of record.
+              <strong class="block">Example:</strong>
+              <span class="block truncate">example.com</span>`
+    },
+    DS: {
+      typeTip:
+        "Indicates, in the DNSSEC's Chain of Trust, that the delegated zone can be trusted, by storing the hashed DNSKEY of its KSK (Key-Signing Key).",
+      valueTip: `Follow the format: [tag] [algorithm_numeric_id] [digest_numeric_id] [hex_digest]
+              <strong class="block">Example:</strong>
+              <span class="block truncate">12345 3 1 49FD46E6C4B45C55D4AC49F6C5D7C8A3D5F7A2B12179FE56E5B3435C2F60CD29</span>`
+    },
+    MX: {
+      typeTip:
+        'Specifies an SMTP email server for the domain, used to route outgoing emails to an email server.',
+      valueTip: `Enter multiple values on separate lines, following the format: [priority] [mail server host name]
+              <strong class="block">Example:</strong>
+              <span class="block truncate">10 mailserver.example.com</span>
+              <span class="block truncate">20 mailserver2.example.com</span>`
+    },
+    NS: {
+      typeTip: 'NS-records identify the DNS servers responsible (authoritative) for a zone.',
+      valueTip: `A zone should contain one NS-record for each of its own DNS servers (primary and secondaries), following the format: [domain] [class of record] [record type] [name server]
+              <strong class="block">Example:</strong>
+              <span class="block truncate">example.com IN NS ns1.example.com</span>
+              <span class="block truncate">example.com IN NS ns2.example.com</span>`
+    },
+    PTR: {
+      typeTip:
+        'Links an IP address to its domain or hostname. Each PTR record should have a matching A record. The usage of a reverse DNS setup is recommended for a mail server.',
+      valueTip: `PTR records should use FQDN format. Only one answer is allowed.
+              <strong class="block">Example:</strong>
+              <span class="block truncate">example.com</span>`
+    },
+    SRV: {
+      typeTip: 'A specification of data in the DNS defining the location.',
+      valueTip: `The target must point to hostname with an address record. Pointing to a hostname with a CNAME record isn't a valid configuration. Use the format: [priority] [weight] [port] [target]
+              <strong class="block">Example:</strong>
+              <span class="block truncate">10 60 5060 bigbox.example.com</span>`
+    },
+    TXT: {
+      typeTip:
+        'Allows adding custom text information to a host or name, useful for describing servers, networks, data centers, or other details.',
+      valueTip: `Enter the text following the format: [domain] [class of record] [record type] [text]
+              <strong class="block">Example:</strong>
+              <span class="block truncate">example.com. IN TXT "example-site-verification=abc123def456ghi"</span>`
+    }
   }
 
   const selectedRecordTypeInfo = computed(() => {
@@ -146,8 +195,8 @@
             class="w-full"
           />
           <small class="text-xs text-color-secondary font-normal leading-5">
-            Choose the type of record being added.
-          </small>
+            {{ selectedRecordTypeInfo?.typeTip }}</small
+          >
 
           <small
             v-if="errorSelectedRecordType"
@@ -203,7 +252,7 @@
         />
         <small
           class="text-xs text-color-secondary font-normal leading-5"
-          v-html="selectedRecordTypeInfo"
+          v-html="selectedRecordTypeInfo?.valueTip"
         ></small>
 
         <small
