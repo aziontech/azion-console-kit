@@ -17,7 +17,8 @@
   const props = defineProps({
     edgeFirewallServices: { type: Object, required: true },
     listDomainsService: { type: Function, required: true },
-    rulesEngineServices: { type: Function, required: true }
+    rulesEngineServices: { type: Function, required: true },
+    listNetworkListService: { type: Function, required: true }
   })
 
   const defaultTabs = {
@@ -190,6 +191,7 @@
             :edgeFirewallModules="edgeFirewallModules"
             :edgeFirewallId="edgeFirewallId"
             v-bind="props.rulesEngineServices"
+            :listNetworkListService="props.listNetworkListService"
           />
         </TabPanel>
       </TabView>
