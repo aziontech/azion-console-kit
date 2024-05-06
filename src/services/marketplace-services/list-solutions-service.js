@@ -55,6 +55,8 @@ const adapt = (httpResponse) => {
         }))
       : []
 
+  parsedServices.sort((serviceA, serviceB) => serviceA.name.localeCompare(serviceB.name))
+
   return {
     body: parsedServices,
     statusCode: httpResponse.statusCode
