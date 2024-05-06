@@ -9,6 +9,9 @@
   import PrimeMenu from 'primevue/menu'
   import { useFieldArray } from 'vee-validate'
   import { computed, ref } from 'vue'
+  import { useToast } from 'primevue/usetoast'
+
+  const toast = useToast()
 
   defineOptions({
     name: 'edge-firewall-rules-engine-form-fields'
@@ -25,6 +28,10 @@
     },
     enabledModules: {
       type: Object,
+      required: true
+    },
+    listNetworkListService: {
+      type: Function,
       required: true
     }
   })
@@ -59,8 +66,8 @@
       case 'header_user_agent':
       case 'network':
         return [
-          { label: 'matches', value: 'matches' },
-          { label: 'does not match', value: 'does_not_match' }
+          { label: 'matches', value: 'is_in_list' },
+          { label: 'does not match', value: 'is_not_in_list' }
         ]
       case 'request_method':
       case 'scheme':
@@ -136,13 +143,25 @@
     return (
       criteriaRow.operator !== 'exists' &&
       criteriaRow.operator !== 'does_not_exist' &&
-      criteriaRow.variable !== 'ssl_verification_status'
+      criteriaRow.variable !== 'ssl_verification_status' &&
+      criteriaRow.variable !== 'network'
     )
   }
   const showSSLStatusDropdownField = ({ criteriaIndex, criteriaInnerRowIndex }) => {
     const criteriaVariable = criteria.value[criteriaIndex].value[criteriaInnerRowIndex].variable
 
     return criteriaVariable === 'ssl_verification_status'
+  }
+  const showNetworkListDropdownField = ({ criteriaIndex, criteriaInnerRowIndex }) => {
+    const criteriaVariable = criteria.value[criteriaIndex].value[criteriaInnerRowIndex].variable
+    const isCriteriaNetworkSelected = criteriaVariable === 'network'
+    const hasNetworkOptionsToSelect = networkListOptions.value.length && loadingNetworkList.value
+
+    if (isCriteriaNetworkSelected && !hasNetworkOptionsToSelect) {
+      setNetworkListOptions()
+    }
+
+    return isCriteriaNetworkSelected
   }
 
   const generateCriteriaVariableOptions = () => {
@@ -437,6 +456,24 @@
 
     return !optionsThatEnableAddBehaviors.includes(lastBehavior.value.name)
   })
+
+  const networkListOptions = ref([])
+  const loadingNetworkList = ref(false)
+  const setNetworkListOptions = async () => {
+    try {
+      loadingNetworkList.value = true
+      const result = await props.listNetworkListService()
+      networkListOptions.value = result
+    } catch (error) {
+      toast.add({
+        closable: true,
+        severity: 'error',
+        summary: error
+      })
+    } finally {
+      loadingNetworkList.value = false
+    }
+  }
 </script>
 <template>
   <FormHorizontal
@@ -553,6 +590,17 @@
                 placeholder="Select an SSL Status"
                 optionLabel="label"
                 optionValue="value"
+                v-bind:value="criteria[criteriaIndex].value[criteriaInnerRowIndex].argument"
+                inputClass="w-full"
+              />
+              <FieldDropdown
+                v-if="showNetworkListDropdownField({ criteriaIndex, criteriaInnerRowIndex })"
+                :name="`criteria[${criteriaIndex}][${criteriaInnerRowIndex}].argument`"
+                :options="networkListOptions"
+                :loading="loadingNetworkList"
+                placeholder="Select a Network"
+                optionLabel="name"
+                optionValue="id"
                 v-bind:value="criteria[criteriaIndex].value[criteriaInnerRowIndex].argument"
                 inputClass="w-full"
               />

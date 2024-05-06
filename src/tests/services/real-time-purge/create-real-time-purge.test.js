@@ -46,7 +46,7 @@ describe('RealTimePurgeServices', () => {
 
     const data = await sut(fixtures.realTimePurgeMock)
 
-    expect(data.feedback).toBe('Your purge has been created')
+    expect(data.feedback).toBe('Successfully created')
   })
 
   it('Should return an API error for an 400 error status', async () => {

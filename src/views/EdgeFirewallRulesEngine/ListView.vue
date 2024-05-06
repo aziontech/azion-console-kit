@@ -50,6 +50,10 @@
     edgeFirewallModules: {
       type: Object,
       required: true
+    },
+    listNetworkListService: {
+      type: Function,
+      required: true
     }
   })
   const hasContentToList = ref(true)
@@ -129,6 +133,7 @@
     :listWafRulesService="props.listWafRulesService"
     :loadService="props.loadEdgeFirewallRulesEngineService"
     :editService="props.editEdgeFirewallRulesEngineService"
+    :listNetworkListService="props.listNetworkListService"
     @onSuccess="reloadList"
   />
 

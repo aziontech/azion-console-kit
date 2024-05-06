@@ -473,14 +473,22 @@
                 autocapitalize="characters"
                 :name="`newVariables[${index}].key`"
                 :value="newVariables[index].key"
+                placeholder="VARIABLE_KEY_NAME"
               />
+              <small class="text-xs text-color-secondary font-normal leading-5">
+                Give a name or identifier for the variable. Accepts upper-case letters, numbers, and underscore.
+              </small>
             </div>
             <div class="flex flex-col sm:max-w-lg w-full gap-2">
               <FieldText
                 label="Value *"
                 :name="`newVariables[${index}].value`"
                 :value="newVariables[index].value"
+                placeholder="VARIABLE_VALUE"
               />
+              <small class="text-xs text-color-secondary font-normal leading-5">
+                Enter the data associated with the variable key.
+              </small>
             </div>
           </div>
         </div>

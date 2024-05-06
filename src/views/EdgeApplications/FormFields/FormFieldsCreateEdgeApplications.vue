@@ -366,6 +366,9 @@
             }"
           />
         </span>
+        <small class="text-xs text-color-secondary font-normal leading-5">
+          The origin type is pre-defined and can't be customized.
+        </small>
       </div>
 
       <div class="flex flex-col gap-2">
