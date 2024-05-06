@@ -96,7 +96,6 @@
         :listService="props.listEdgeFirewallService"
         :deleteService="props.deleteEdgeFirewallService"
         @on-before-go-to-edit="handleTrackEditEvent"
-
         :columns="getColumns"
         @on-load-data="handleLoadData"
         emptyListMessage="No edge firewall found."
