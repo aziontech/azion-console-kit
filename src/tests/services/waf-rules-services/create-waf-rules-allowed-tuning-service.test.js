@@ -93,8 +93,15 @@ describe('WafRulesServices', () => {
   })
 
   it('Should return an API error for an 400 response status', async () => {
-    const errorKey = 'detail'
-    const apiErrorMock = 'This field is required.'
+    const apiErroMockBody = {
+      first: {
+        detail: [{ error: ['This field is required.'] }]
+      },
+      second: {
+        detail: 'This name field is required'
+      }
+    }
+
     const expectedErroMessage = [
       {
         reason: 'error: This field is required.',
@@ -109,15 +116,11 @@ describe('WafRulesServices', () => {
     vi.spyOn(AxiosHttpClientAdapter, 'request')
       .mockResolvedValueOnce({
         statusCode: 400,
-        body: {
-          [errorKey]: [{ error: [apiErrorMock] }]
-        }
+        body: apiErroMockBody.first
       })
       .mockResolvedValue({
         statusCode: 400,
-        body: {
-          [errorKey]: 'This name field is required'
-        }
+        body: apiErroMockBody.second
       })
 
     const { sut } = makeSut()
