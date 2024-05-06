@@ -8,43 +8,31 @@ const fixtures = {
   wafRulesMock: [
     {
       hitCount: 3,
-      topIps: [
-          "201.149.110.60"
-      ],
+      topIps: ['201.149.110.60'],
       id: 0,
       ruleId: 1010,
       ipCount: 1,
-      matchZone: "query_string",
+      matchZone: 'query_string',
       pathCount: 1,
-      topCountries: [
-          "Brazil"
-      ],
-      matchesOn: "value",
+      topCountries: ['Brazil'],
+      matchesOn: 'value',
       countryCount: 1,
-      topPaths: [
-          "/get"
-      ],
-      matchValue: "arg"
+      topPaths: ['/get'],
+      matchValue: 'arg'
     },
     {
       hitCount: 3,
-      topIps: [
-          "201.149.110.60"
-      ],
+      topIps: ['201.149.110.60'],
       id: 1,
       ruleId: 1011,
       ipCount: 1,
-      matchZone: "path",
+      matchZone: 'path',
       pathCount: 1,
-      topCountries: [
-          "Brazil"
-      ],
-      matchesOn: "value",
+      topCountries: ['Brazil'],
+      matchesOn: 'value',
       countryCount: 1,
-      topPaths: [
-          "/get"
-      ],
-      matchValue: "arg"
+      topPaths: ['/get'],
+      matchValue: 'arg'
     }
   ]
 }
@@ -59,7 +47,7 @@ const makeSut = () => {
 
 describe('WafRulesServices', () => {
   it('should call API with correct params', async () => {
-    const bodyRequest = [fixtures.wafRulesMock[0]] 
+    const bodyRequest = [fixtures.wafRulesMock[0]]
     const requestSpy = vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
       statusCode: 202,
       body: bodyRequest
@@ -73,11 +61,11 @@ describe('WafRulesServices', () => {
       body: {
         rule_id: fixtures.wafRulesMock[0].ruleId,
         reason: fixtures.reason,
-        match_zones: [ 
+        match_zones: [
           {
-            matches_on: "value",
-            zone: "conditional_query_string",
-            zone_input: "arg",
+            matches_on: 'value',
+            zone: 'conditional_query_string',
+            zone_input: 'arg'
           }
         ]
       }
@@ -95,11 +83,11 @@ describe('WafRulesServices', () => {
     const data = await sut({ attackEvents: bodyRequest, wafId: 10, reason: fixtures.reason })
 
     const expectedReturn = [
-        {
-          status: "fulfilled",
-          value: "Your waf rule allowed has been created",
-        }
-      ]
+      {
+        status: 'fulfilled',
+        value: 'Your waf rule allowed has been created'
+      }
+    ]
 
     expect(data).toStrictEqual(expectedReturn)
   })
@@ -108,31 +96,37 @@ describe('WafRulesServices', () => {
     const errorKey = 'detail'
     const apiErrorMock = 'This field is required.'
     const expectedErroMessage = [
-    {
-      reason: "error: This field is required.",
-      status: "rejected",
-    },
-    {
-      reason: "detail: This name field is required",
-      status: "rejected",
-    }]
+      {
+        reason: 'error: This field is required.',
+        status: 'rejected'
+      },
+      {
+        reason: 'detail: This name field is required',
+        status: 'rejected'
+      }
+    ]
 
-    vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
-      statusCode: 400,
-      body: {
-        [errorKey]: [{ error: [apiErrorMock] }]
-      }
-    })
-    .mockResolvedValue({
-      statusCode: 400,
-      body: {
-        [errorKey]: "This name field is required"
-      }
-    })
+    vi.spyOn(AxiosHttpClientAdapter, 'request')
+      .mockResolvedValueOnce({
+        statusCode: 400,
+        body: {
+          [errorKey]: [{ error: [apiErrorMock] }]
+        }
+      })
+      .mockResolvedValue({
+        statusCode: 400,
+        body: {
+          [errorKey]: 'This name field is required'
+        }
+      })
 
     const { sut } = makeSut()
 
-    const reason = await sut({ attackEvents: fixtures.wafRulesMock, wafId: 1, reason: fixtures.reason })
+    const reason = await sut({
+      attackEvents: fixtures.wafRulesMock,
+      wafId: 1,
+      reason: fixtures.reason
+    })
 
     expect(reason).toEqual(expectedErroMessage)
   })
@@ -161,8 +155,7 @@ describe('WafRulesServices', () => {
   ])(
     'should throw when request fails with status code $statusCode',
     async ({ statusCode, expectedError }) => {
-
-      const bodyRequest = [fixtures.wafRulesMock[0]] 
+      const bodyRequest = [fixtures.wafRulesMock[0]]
 
       vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValue({
         statusCode
@@ -171,8 +164,8 @@ describe('WafRulesServices', () => {
 
       const responses = await sut({ attackEvents: bodyRequest, id: 10, reason: fixtures.reason })
 
-      responses.forEach(({reason, status}) => {
-        if(status === 'rejected') {
+      responses.forEach(({ reason, status }) => {
+        if (status === 'rejected') {
           expect(status).toBe('rejected')
           expect(reason).toBe(expectedError)
         }

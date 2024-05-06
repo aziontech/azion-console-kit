@@ -3,7 +3,6 @@ import * as Errors from '@/services/axios/errors'
 import { makeWafRulesAllowedBaseUrl } from './make-waf-rules-allowed-base-url'
 
 export const createWafRulesAllowedTuningService = async ({ attackEvents, wafId, reason }) => {
-
   const requestsAllowedRules = attackEvents.map(async (attack) => {
     let matchZones = {
       zone: attack.matchZone,
@@ -69,7 +68,6 @@ const parseHttpResponse = (httpResponse) => {
  * @returns {string|undefined} The result message based on the status code.
  */
 const extractErrorKey = (errorSchema, key) => {
-
   if (typeof errorSchema[key][0] === 'string') {
     return `${key}: ${errorSchema[key]}`
   }
