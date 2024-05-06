@@ -204,6 +204,7 @@
     </template>
     <template #content>
       <CreateFormBlock
+        :disableAfterCreateToastFeedback="true"
         :createService="handleExecuteScriptRunner"
         :schema="validationSchema"
         :initialValues="initialValues"
