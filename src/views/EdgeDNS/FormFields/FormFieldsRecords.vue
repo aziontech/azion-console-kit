@@ -128,9 +128,8 @@
     TXT: {
       typeTip:
         'Allows adding custom text information to a host or name, useful for describing servers, networks, data centers, or other details.',
-      valueTip: `Limited to 1000 characters. Text separated by ENTER is considered as a different response.
-              <strong class="block">Example:</strong>
-              <span class="block truncate">example.com. IN TXT "example-site-verification=abc123def456ghi"</span>`
+      valueTip:
+        'Limited to 1000 characters. Text separated by ENTER is considered as a different response.'
     }
   }
 
