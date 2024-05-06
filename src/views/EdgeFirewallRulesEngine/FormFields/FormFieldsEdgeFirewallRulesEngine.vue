@@ -475,7 +475,11 @@
     }
   }
 
-  const clearCriteriaArgument = ({ selectedCriteriaVariable, criteriaIndex, criteriaInnerRowIndex }) => {
+  const clearCriteriaArgument = ({
+    selectedCriteriaVariable,
+    criteriaIndex,
+    criteriaInnerRowIndex
+  }) => {
     criteria.value[criteriaIndex].value[criteriaInnerRowIndex].variable = selectedCriteriaVariable
     criteria.value[criteriaIndex].value[criteriaInnerRowIndex].argument = ''
   }
@@ -555,7 +559,14 @@
                 <FieldDropdown
                   :id="`criteria[${criteriaIndex}][${criteriaInnerRowIndex}].variable`"
                   :options="generateCriteriaVariableOptions()"
-                  @onChange="(selectedCriteriaVariable) => clearCriteriaArgument({selectedCriteriaVariable, criteriaIndex, criteriaInnerRowIndex })"
+                  @onChange="
+                    (selectedCriteriaVariable) =>
+                      clearCriteriaArgument({
+                        selectedCriteriaVariable,
+                        criteriaIndex,
+                        criteriaInnerRowIndex
+                      })
+                  "
                   optionLabel="label"
                   optionValue="value"
                   optionDisabled="disabled"

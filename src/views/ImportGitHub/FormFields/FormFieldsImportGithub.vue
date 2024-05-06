@@ -476,7 +476,8 @@
                 placeholder="VARIABLE_KEY_NAME"
               />
               <small class="text-xs text-color-secondary font-normal leading-5">
-                Give a name or identifier for the variable. Accepts upper-case letters, numbers, and underscore.
+                Give a name or identifier for the variable. Accepts upper-case letters, numbers, and
+                underscore.
               </small>
             </div>
             <div class="flex flex-col sm:max-w-lg w-full gap-2">
