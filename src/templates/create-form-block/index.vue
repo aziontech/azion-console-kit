@@ -24,6 +24,10 @@
       type: Boolean,
       default: false
     },
+    disableAfterCreateToastFeedback: {
+      type: Boolean,
+      default: false
+    },
     cleanForm: {
       type: Boolean,
       default: true
@@ -61,7 +65,10 @@
   }
 
   const showFeedback = (feedback = 'created successfully') => {
-    const feedbackMessage = feedback || 'created successfully'
+    const feedbackMessage = feedback
+    if (props.disableAfterCreateToastFeedback) {
+      return
+    }
     showToast('success', feedbackMessage)
   }
 
@@ -78,9 +85,9 @@
 
   const onSubmit = handleSubmit(async (values) => {
     try {
+      blockViewRedirection.value = false
       const response = await props.createService(values)
       handleSuccess(response)
-      blockViewRedirection.value = false
     } catch (error) {
       showToast('error', error)
       emit('on-response-fail', error)

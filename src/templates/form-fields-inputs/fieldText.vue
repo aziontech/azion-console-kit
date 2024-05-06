@@ -67,6 +67,7 @@
     @input="handleChange"
     @blur="handleBlur"
     :class="inputClass"
+    v-bind="$attrs"
   />
   <small
     v-if="errorMessage"

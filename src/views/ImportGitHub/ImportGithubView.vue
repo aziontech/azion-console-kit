@@ -74,7 +74,11 @@
     gitScope: yup.string().required().label('Git Scope'),
     newVariables: yup.array().of(
       yup.object().shape({
-        key: yup.string().required().label('Key'),
+        key: yup
+          .string()
+          .required()
+          .label('Key')
+          .matches(/^[A-Z0-9_]+$/, 'Only accepts upper-case letters, numbers, and underscore.'),
         value: yup.string().required().label('Value')
       })
     )
@@ -200,6 +204,7 @@
     </template>
     <template #content>
       <CreateFormBlock
+        :disableAfterCreateToastFeedback="true"
         :createService="handleExecuteScriptRunner"
         :schema="validationSchema"
         :initialValues="initialValues"
