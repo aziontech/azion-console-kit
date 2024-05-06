@@ -354,8 +354,7 @@
     router.push({ name: 'list-domains' })
   }
 
-  const handleSubmitAllowRules = async (reason) => {
-    const requestsAllowedRules = []
+  const handleSubmitAllowRules = async (reasonAttack) => {
     let attackEvents = []
     if (allowedByAttacks.value.length) {
       attackEvents = [...allowedByAttacks.value]
@@ -363,41 +362,10 @@
       attackEvents = [...selectedEvents.value]
     }
 
-    for (const attack of attackEvents) {
-      const matchZones = {
-        zone: attack.matchZone,
-        matchesOn: attack.matchesOn
-      }
-      if (attack.matchValue) {
-        const isPathZone = matchZones.zone === 'path'
-
-        matchZones.zoneInput = attack.matchValue
-        matchZones.zone = `conditional_${matchZones.zone}`
-
-        if (isPathZone) {
-          matchZones.zone = 'path'
-          matchZones.zoneInput = null
-        }
-      }
-
-      const payload = {
-        ruleId: attack.ruleId,
-        matchZone: [matchZones],
-        reason
-      }
-
-      requestsAllowedRules.push(
-        props.createWafRulesAllowedTuningService({
-          payload,
-          wafId: wafRuleId.value
-        })
-      )
-    }
-
     try {
-      const [{ status, reason, value }] = await Promise.allSettled(requestsAllowedRules)
+      const [{ status, reason, value }] = await props.createWafRulesAllowedTuningService({attackEvents, wafId: wafRuleId.value, reason: reasonAttack })
       if (status === 'rejected') {
-        showToast(reason.message, 'error')
+        showToast(reason, 'error')
         return
       }
       showToast(value, 'success')
