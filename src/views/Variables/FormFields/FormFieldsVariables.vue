@@ -30,7 +30,7 @@
           :class="{ 'p-invalid': keyError }"
         />
         <small class="text-xs text-color-secondary font-normal leading-5">
-          Give a name or identifier for the variable.
+          Give a name or identifier for the variable. Accepts upper-case letters, numbers, and underscore.
         </small>
         <small
           v-if="keyError"
