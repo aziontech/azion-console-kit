@@ -73,6 +73,12 @@
       productName: 'Edge Firewall'
     })
   }
+
+  const handleTrackEditEvent = () => {
+    tracker.product.clickToEdit({
+      productName: 'Edge Firewall'
+    })
+  }
 </script>
 
 <template>
@@ -89,6 +95,8 @@
         editPagePath="/edge-firewall/edit"
         :listService="props.listEdgeFirewallService"
         :deleteService="props.deleteEdgeFirewallService"
+        @on-before-go-to-edit="handleTrackEditEvent"
+
         :columns="getColumns"
         @on-load-data="handleLoadData"
         emptyListMessage="No edge firewall found."
