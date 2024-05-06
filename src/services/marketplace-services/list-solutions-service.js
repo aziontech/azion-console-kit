@@ -41,19 +41,21 @@ const adapt = (httpResponse) => {
   const parsedServices =
     isArray && httpResponse.body.length
       ? httpResponse.body.map((element) => ({
-          id: element.id,
-          name: element.name,
-          referenceId: element.solution_reference_id,
-          vendor: element.vendor,
-          slug: element.slug,
-          headline: element.headline,
-          featured: element.featured,
-          released: element.new_release,
-          instanceType: {
-            isTemplate: element.instance_type.is_template
-          }
-        }))
+        id: element.id,
+        name: element.name,
+        referenceId: element.solution_reference_id,
+        vendor: element.vendor,
+        slug: element.slug,
+        headline: element.headline,
+        featured: element.featured,
+        released: element.new_release,
+        instanceType: {
+          isTemplate: element.instance_type.is_template
+        }
+      }))
       : []
+
+  parsedServices.sort((serviceA, serviceB) => serviceA.name.localeCompare(serviceB.name))
 
   return {
     body: parsedServices,
