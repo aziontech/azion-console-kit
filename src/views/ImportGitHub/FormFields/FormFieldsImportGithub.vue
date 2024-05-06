@@ -463,7 +463,6 @@
               icon="pi pi-trash"
               outlined
               type="button"
-              aria-label="Remove Origin"
               @click="removeVariable(index)"
             />
           </div>
@@ -471,6 +470,7 @@
             <div class="flex flex-col sm:max-w-lg w-full gap-2">
               <FieldText
                 label="Key *"
+                autocapitalize="characters"
                 :name="`newVariables[${index}].key`"
                 :value="newVariables[index].key"
               />
