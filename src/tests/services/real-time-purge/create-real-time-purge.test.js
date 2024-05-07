@@ -46,7 +46,9 @@ describe('RealTimePurgeServices', () => {
 
     const data = await sut(fixtures.realTimePurgeMock)
 
-    expect(data.feedback).toBe('The purge is queued for execution. It’ll appear in the history once completed.')
+    expect(data.feedback).toBe(
+      'The purge is queued for execution. It’ll appear in the history once completed.'
+    )
   })
 
   it('Should return an API error for an 400 error status', async () => {
