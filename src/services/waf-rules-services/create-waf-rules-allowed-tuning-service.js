@@ -2,22 +2,37 @@ import { AxiosHttpClientAdapter } from '../axios/AxiosHttpClientAdapter'
 import * as Errors from '@/services/axios/errors'
 import { makeWafRulesAllowedBaseUrl } from './make-waf-rules-allowed-base-url'
 
-export const createWafRulesAllowedTuningService = async ({ payload, wafId }) => {
-  let httpResponse = await AxiosHttpClientAdapter.request({
-    url: `${makeWafRulesAllowedBaseUrl()}/${wafId}/allowed_rules`,
-    method: 'POST',
-    body: adapt(payload)
+export const createWafRulesAllowedTuningService = async ({ attackEvents, wafId, reason }) => {
+  const requestsAllowedRules = attackEvents.map(async (attack) => {
+    let matchZones = {
+      zone: attack.matchZone,
+      matches_on: attack.matchesOn
+    }
+
+    if (attack.matchValue) {
+      const isPathZone = matchZones.zone === 'path'
+
+      matchZones.zone_input = attack.matchValue
+      matchZones.zone = isPathZone ? 'path' : `conditional_${matchZones.zone}`
+      matchZones.zone_input = isPathZone ? null : matchZones.zone_input
+    }
+
+    const payload = {
+      rule_id: attack.ruleId,
+      match_zones: [matchZones],
+      reason
+    }
+
+    const httpResponse = await AxiosHttpClientAdapter.request({
+      url: `${makeWafRulesAllowedBaseUrl()}/${wafId}/allowed_rules`,
+      method: 'POST',
+      body: payload
+    })
+
+    return parseHttpResponse(httpResponse)
   })
 
-  return parseHttpResponse(httpResponse)
-}
-
-const adapt = (payload) => {
-  return {
-    rule_id: payload.ruleId,
-    match_zones: payload.matchZone,
-    reason: payload.reason
-  }
+  return Promise.allSettled(requestsAllowedRules)
 }
 
 /**
@@ -54,7 +69,7 @@ const parseHttpResponse = (httpResponse) => {
  */
 const extractErrorKey = (errorSchema, key) => {
   if (typeof errorSchema[key][0] === 'string') {
-    return `${key}: ${errorSchema[key][0]}`
+    return `${key}: ${errorSchema[key]}`
   }
   const keyValuePair = []
   errorSchema[key].forEach((obj) => {
@@ -65,6 +80,7 @@ const extractErrorKey = (errorSchema, key) => {
       }
     }
   })
+
   return `${keyValuePair[0].key}: ${keyValuePair[0].value}`
 }
 

@@ -4,6 +4,7 @@ import * as EdgeFirewallServices from '@/services/edge-firewall-services'
 import * as EdgeFirewallFunctionsServices from '@/services/edge-firewall-functions-services'
 import * as EdgeFirewallRulesEngineServices from '@/services/edge-firewall-rules-engine-services'
 import * as WafRulesServices from '@/services/waf-rules-services'
+import * as NetworkListsService from '@/services/network-lists-services'
 
 /** @type {import('vue-router').RouteRecordRaw} */
 export const edgeFirewallRoutes = {
@@ -55,6 +56,7 @@ export const edgeFirewallRoutes = {
       component: () => import('@/views/EdgeFirewall/TabsView.vue'),
       props: {
         listDomainsService: DomainServices.listDomainsService,
+        listNetworkListService: NetworkListsService.listNetworkListService,
         edgeFirewallServices: {
           createEdgeFirewallService: EdgeFirewallServices.createEdgeFirewallService,
           loadEdgeFirewallService: EdgeFirewallServices.loadEdgeFirewallService,

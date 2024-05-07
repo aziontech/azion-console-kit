@@ -11,7 +11,6 @@
   import { useToast } from 'primevue/usetoast'
   import { useRouter } from 'vue-router'
   import { windowOpen } from '@/helpers'
-  import { generateFormattedTimestamp } from '@/helpers/generate-formatted-timestamp'
 
   const toast = useToast()
   const router = useRouter()
@@ -44,7 +43,7 @@
   const { value: preset } = useField('preset')
   const { value: gitScope } = useField('gitScope')
   const { value: repository } = useField('repository')
-  const { value: edgeApplicationName } = useField('edgeApplicationName')
+  const { value: applicationName } = useField('applicationName')
   const { value: rootDirectory } = useField('rootDirectory')
   const { value: mode } = useField('mode')
   const { value: installCommand } = useField('installCommand')
@@ -177,8 +176,7 @@
   }
 
   const setEdgeApplicationNameByRepository = async (repositoryName) => {
-    const timestampEdgeApplicationSufix = generateFormattedTimestamp()
-    edgeApplicationName.value = `${repositoryName}-${timestampEdgeApplicationSufix}`
+    applicationName.value = `${repositoryName}`
 
     const accountName = getOptionNameByValue({
       listOption: integrationsList.value,
@@ -341,10 +339,10 @@
     <template #inputs>
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
         <FieldText
-          label="Edge Application Name *"
-          name="edgeApplicationName"
-          :value="edgeApplicationName"
-          description="Give a unique name to identify the edge application."
+          label="Application Name *"
+          name="applicationName"
+          :value="applicationName"
+          description="Give a unique name to the application. It’ll also be used for the bucket for storage and the edge function."
         />
       </div>
 
@@ -463,7 +461,6 @@
               icon="pi pi-trash"
               outlined
               type="button"
-              aria-label="Remove Origin"
               @click="removeVariable(index)"
             />
           </div>
@@ -471,16 +468,26 @@
             <div class="flex flex-col sm:max-w-lg w-full gap-2">
               <FieldText
                 label="Key *"
+                autocapitalize="characters"
                 :name="`newVariables[${index}].key`"
                 :value="newVariables[index].key"
+                placeholder="VARIABLE_KEY_NAME"
               />
+              <small class="text-xs text-color-secondary font-normal leading-5">
+                Give a name or identifier for the variable. Accepts upper-case letters, numbers, and
+                underscore.
+              </small>
             </div>
             <div class="flex flex-col sm:max-w-lg w-full gap-2">
               <FieldText
                 label="Value *"
                 :name="`newVariables[${index}].value`"
                 :value="newVariables[index].value"
+                placeholder="VARIABLE_VALUE"
               />
+              <small class="text-xs text-color-secondary font-normal leading-5">
+                Enter the data associated with the variable key.
+              </small>
             </div>
           </div>
         </div>

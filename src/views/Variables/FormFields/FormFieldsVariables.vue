@@ -23,12 +23,16 @@
           >Key *
         </label>
         <InputText
-          placeholder="GITHUB_API_KEY"
+          placeholder="VARIABLE_KEY_NAME"
           v-model="key"
           type="text"
           id="key"
           :class="{ 'p-invalid': keyError }"
         />
+        <small class="text-xs text-color-secondary font-normal leading-5">
+          Give a name or identifier for the variable. Accepts upper-case letters, numbers, and
+          underscore.
+        </small>
         <small
           v-if="keyError"
           class="p-error text-xs font-normal leading-tight"
@@ -45,12 +49,15 @@
           Value *
         </label>
         <InputText
-          placeholder="MY_GITHUB_API_VALUE"
+          placeholder="VARIABLE_VALUE"
           v-model="value"
           id="value"
           type="text"
           :class="{ 'p-invalid': valueError }"
         />
+        <small class="text-xs text-color-secondary font-normal leading-5">
+          Enter the data associated with the variable key.
+        </small>
         <small
           v-if="valueError"
           class="p-error text-xs font-normal leading-tight"

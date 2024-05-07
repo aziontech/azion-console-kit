@@ -59,7 +59,7 @@
   })
 
   const validationSchema = yup.object({
-    edgeApplicationName: yup.string().required().label('Edge Application Name'),
+    applicationName: yup.string().required().label('Application Name'),
     rootDirectory: yup
       .string()
       .required()
@@ -74,14 +74,18 @@
     gitScope: yup.string().required().label('Git Scope'),
     newVariables: yup.array().of(
       yup.object().shape({
-        key: yup.string().required().label('Key'),
+        key: yup
+          .string()
+          .required()
+          .label('Key')
+          .matches(/^[A-Z0-9_]+$/, 'Only accepts upper-case letters, numbers, and underscore.'),
         value: yup.string().required().label('Value')
       })
     )
   })
 
   const initialValues = {
-    edgeApplicationName: '',
+    applicationName: '',
     rootDirectory: '/',
     preset: '',
     newVariables: [],
@@ -126,7 +130,7 @@
         {
           field: 'az_name',
           instantiation_data_path: 'envs.[0].value',
-          value: formValues.edgeApplicationName
+          value: formValues.applicationName
         },
         {
           field: 'git_url_external',
@@ -200,6 +204,7 @@
     </template>
     <template #content>
       <CreateFormBlock
+        :disableAfterCreateToastFeedback="true"
         :createService="handleExecuteScriptRunner"
         :schema="validationSchema"
         :initialValues="initialValues"

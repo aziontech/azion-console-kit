@@ -129,6 +129,8 @@ describe('MarketplaceServices', () => {
 
     const result = await sut({})
 
+    result.sort((serviceA, serviceB) => serviceA.name.localeCompare(serviceB.name))
+
     expect(result).toEqual([
       {
         headline: fixtures.solutionSample.headline,
