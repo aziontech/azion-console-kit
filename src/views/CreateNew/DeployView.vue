@@ -73,14 +73,13 @@
                       />
                     </div>
                   </div>
-                </div>          
-                  <span
-                    class="text-sm font-normal text-color-secondary"
-                    v-if="isUnfinished"
-                  >
-                    {{ elapsedTime }}
-                  </span>
-
+                </div>
+                <span
+                  class="text-sm font-normal text-color-secondary"
+                  v-if="isUnfinished"
+                >
+                  {{ elapsedTime }}
+                </span>
               </div>
               <ScriptRunnerBlock
                 title="Deploy Log"
@@ -240,18 +239,18 @@
     return results.value && !deployFailed.value
   })
 
-  const MINUTE_IN_SEC = 60 
+  const MINUTE_IN_SEC = 60
   const elapsedTime = computed(() => {
     const isGraterThanMinute = timer.value > MINUTE_IN_SEC
-  
+
     if (!isGraterThanMinute) {
       return `Project started ${timer.value}s ago`
     }
-    
+
     const seconds = timer.value % MINUTE_IN_SEC
     const minutes = Math.floor(timer.value / MINUTE_IN_SEC)
-    
-    return `Project started ${ minutes }}m${ seconds }}s ago`
+
+    return `Project started ${minutes}}m${seconds}}s ago`
   })
 
   const goToPointTraffic = () => {
