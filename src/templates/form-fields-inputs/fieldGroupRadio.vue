@@ -6,6 +6,8 @@
 
   defineOptions({ name: 'FieldGroupRadio' })
 
+  const emit = defineEmits(['onRadioChange'])
+
   const props = defineProps({
     hideSelector: {
       type: Boolean,
@@ -80,6 +82,7 @@
           :hideSelector="props.hideSelector"
           :isCard="props.isCard"
           v-bind="item"
+          @onRadioChange="emit('onRadioChange', item.value)"
         >
           <template #footer>
             <slot :item="item" />
