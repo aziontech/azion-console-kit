@@ -12,6 +12,9 @@ const fixtures = {
       }
     ]
   },
+  noLogsResult: {
+    status: 'failed',
+  },
   parsedTimeStamp: '03:16:06',
   executionId: 'xx'
 }
@@ -57,6 +60,21 @@ describe('ScriptRunnerServices', () => {
           timeStamp: fixtures.parsedTimeStamp
         }
       ]
+    })
+  })
+
+  it('should return empty array if no logs', async () => {
+    vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
+      statusCode: 200,
+      body: fixtures.noLogsResult
+    })
+    const { sut } = makeSut()
+
+    const result = await sut({})
+
+    expect(result).toEqual({
+      status: fixtures.noLogsResult.status,
+      logs: []
     })
   })
 })
