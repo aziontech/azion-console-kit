@@ -44,7 +44,7 @@
   const { value: preset } = useField('preset')
   const { value: gitScope } = useField('gitScope')
   const { value: repository } = useField('repository')
-  const { value: edgeApplicationName } = useField('edgeApplicationName')
+  const { value: applicationName } = useField('applicationName')
   const { value: rootDirectory } = useField('rootDirectory')
   const { value: mode } = useField('mode')
   const { value: installCommand } = useField('installCommand')
@@ -178,7 +178,7 @@
 
   const setEdgeApplicationNameByRepository = async (repositoryName) => {
     const timestampEdgeApplicationSufix = generateFormattedTimestamp()
-    edgeApplicationName.value = `${repositoryName}-${timestampEdgeApplicationSufix}`
+    applicationName.value = `${repositoryName}-${timestampEdgeApplicationSufix}`
 
     const accountName = getOptionNameByValue({
       listOption: integrationsList.value,
@@ -341,10 +341,10 @@
     <template #inputs>
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
         <FieldText
-          label="Edge Application Name *"
-          name="edgeApplicationName"
-          :value="edgeApplicationName"
-          description="Give a unique name to identify the edge application."
+          label="Application Name *"
+          name="applicationName"
+          :value="applicationName"
+          description="Give a unique name to the application. It’ll also be used for the bucket for storage and the edge function."
         />
       </div>
 

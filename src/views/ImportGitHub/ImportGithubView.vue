@@ -59,7 +59,7 @@
   })
 
   const validationSchema = yup.object({
-    edgeApplicationName: yup.string().required().label('Edge Application Name'),
+    applicationName: yup.string().required().label('Application Name'),
     rootDirectory: yup
       .string()
       .required()
@@ -85,7 +85,7 @@
   })
 
   const initialValues = {
-    edgeApplicationName: '',
+    applicationName: '',
     rootDirectory: '/',
     preset: '',
     newVariables: [],
@@ -130,7 +130,7 @@
         {
           field: 'az_name',
           instantiation_data_path: 'envs.[0].value',
-          value: formValues.edgeApplicationName
+          value: formValues.applicationName
         },
         {
           field: 'git_url_external',
