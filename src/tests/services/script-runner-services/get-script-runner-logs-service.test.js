@@ -13,7 +13,7 @@ const fixtures = {
     ]
   },
   noLogsResult: {
-    status: 'failed',
+    status: 'failed'
   },
   parsedTimeStamp: '03:16:06',
   executionId: 'xx'
