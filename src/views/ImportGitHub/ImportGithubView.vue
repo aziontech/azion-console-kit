@@ -95,30 +95,13 @@
     gitScope: ''
   }
 
-  const parseVariables = (variables) => {
-    const lastInputSchemaEnvsIndex = 6
-    const parsedVariables = variables?.map((variable, index) => {
-      index = index + lastInputSchemaEnvsIndex
-      return {
-        field: variable.key,
-        value: variable.value,
-        instantiation_data_path: 'envs.[' + index + '].value'
-      }
-    })
-
-    return parsedVariables ?? []
-  }
-
   const templateId = ref(null)
   const handleExecuteScriptRunner = async (formValues) => {
     try {
-      let inputVariables = []
-
       if (formValues.newVariables) {
         await Promise.all(
           formValues.newVariables.map((variable) => props.createVariablesService(variable))
         )
-        inputVariables = parseVariables(formValues.newVariables)
       }
 
       const inputSchema = [
@@ -156,8 +139,7 @@
           field: 'az_root_directory',
           instantiation_data_path: 'envs.[5].value',
           value: formValues.rootDirectory
-        },
-        ...inputVariables
+        }
       ]
 
       return props.instantiateTemplateService(templateId.value, inputSchema)
