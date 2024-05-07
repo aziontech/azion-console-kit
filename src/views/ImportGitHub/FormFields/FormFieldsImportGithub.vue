@@ -11,7 +11,6 @@
   import { useToast } from 'primevue/usetoast'
   import { useRouter } from 'vue-router'
   import { windowOpen } from '@/helpers'
-  import { generateFormattedTimestamp } from '@/helpers/generate-formatted-timestamp'
 
   const toast = useToast()
   const router = useRouter()
@@ -177,8 +176,7 @@
   }
 
   const setEdgeApplicationNameByRepository = async (repositoryName) => {
-    const timestampEdgeApplicationSufix = generateFormattedTimestamp()
-    applicationName.value = `${repositoryName}-${timestampEdgeApplicationSufix}`
+    applicationName.value = `${repositoryName}`
 
     const accountName = getOptionNameByValue({
       listOption: integrationsList.value,
