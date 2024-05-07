@@ -60,6 +60,7 @@
       currentLogs: [],
       polling: null,
       isPolling: false,
+      isLogsPolling: false,
       status: undefined,
       emptyLogs: false,
       pollEnded: false
@@ -85,9 +86,13 @@
     },
     methods: {
       startPolling() {
-        this.polling = setInterval(() => {
-          this.handlePoll()
-        }, 3000)
+        this.polling = setInterval(async () => {
+          if (!this.isLogsPolling) {
+            this.isLogsPolling = true
+            await this.handlePoll()
+            this.isLogsPolling = false
+          }
+        }, 7000)
       },
       async getlogs() {
         try {

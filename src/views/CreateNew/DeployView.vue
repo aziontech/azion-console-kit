@@ -85,7 +85,7 @@
                 title="Deploy Log"
                 :getLogsService="props.getLogsService"
                 :executionId="executionId"
-                @onFinish="handleFinish"
+                @onFinish.once="handleFinish"
               />
             </div>
           </template>
@@ -250,7 +250,7 @@
     const seconds = timer.value % MINUTE_IN_SEC
     const minutes = Math.floor(timer.value / MINUTE_IN_SEC)
 
-    return `Project started ${minutes}}m${seconds}}s ago`
+    return `Project started ${minutes}m${seconds}s ago`
   })
 
   const goToPointTraffic = () => {
