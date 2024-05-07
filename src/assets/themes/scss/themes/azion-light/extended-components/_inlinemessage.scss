@@ -1,9 +1,30 @@
-// Custom InlineMessage
-.p-inline-message .p-inline-message-icon {
-  font-size: 0.875rem !important;
+/* Custom InlineMessage */
+.p-inline-message {
+  display: flex !important;
+  gap: 0.75rem;
+  padding: 0.5rem 1rem;
+  flex-direction: row;
+
+  /* Text style */
+  .p-inline-message-text {
+    font-weight: 500 !important;
+    font-size: 0.875rem !important;
+    line-height: 160% !important;
+    width: 100%;
+  }
+
+  /* Icon style */
+  .p-inline-message-icon {
+    margin: 0px;
+    font-size: 0.875rem !important;
+  }
 }
-.p-inline-message .p-inline-message-text {
-  font-size: 0.875rem !important;
-  line-height: 100% !important;
-  width: 100%;
+
+/* Media query for smaller screens */
+@media only screen and (max-width: 768px) {
+  .p-inline-message {
+    align-items: start;
+    padding: 0.75rem;
+    flex-direction: column !important;
+  }
 }
