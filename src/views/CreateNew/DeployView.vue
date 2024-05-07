@@ -74,12 +74,20 @@
                     </div>
                   </div>
                 </div>
-                <span
-                  class="text-sm font-normal text-color-secondary"
-                  v-if="isUnfinished"
-                >
-                  Project started {{ seconds }}s ago
-                </span>
+                <div v-if="isUnfinished">                  
+                  <span
+                    class="text-sm font-normal text-color-secondary"
+                    v-if="!isGreaterThanMinute"
+                  >
+                    Project started {{ timer }}s ago
+                  </span>
+                  <span
+                    class="text-sm font-normal text-color-secondary"
+                    v-if="isGreaterThanMinute"
+                  >
+                    Project started {{ minutes }}m{{ seconds }}s ago
+                  </span>
+                </div>
               </div>
               <ScriptRunnerBlock
                 title="Deploy Log"
@@ -162,7 +170,7 @@
   const router = useRouter()
   const toast = useToast()
   const results = ref()
-  const seconds = ref(0)
+  const timer = ref(0)
   const intervalRef = ref()
   const deployFailed = ref(false)
   const solutionStore = useSolutionStore()
@@ -223,6 +231,18 @@
     tracker.create.eventDeployed(solutionStore.solution).track()
   }
 
+  const minutes = computed(() => {
+    return Math.floor(timer.value / 60)
+  })
+  
+  const seconds = computed(() => {
+    return timer.value % 60
+  })
+
+  const isGreaterThanMinute = computed(() => {
+    return timer.value > 60
+  })
+
   const severity = computed(() => {
     return !deployFailed.value ? 'success' : 'danger'
   })
@@ -278,7 +298,7 @@
 
   onMounted(() => {
     intervalRef.value = setInterval(() => {
-      seconds.value += 1
+      timer.value += 1
     }, 1000)
     executionId.value = route.params.id
   })
