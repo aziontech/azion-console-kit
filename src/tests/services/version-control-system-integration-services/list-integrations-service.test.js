@@ -31,7 +31,7 @@ describe('VersionControlSystemService', () => {
     await sut()
 
     expect(requestSpy).toHaveBeenCalledWith({
-      url: 'v4/vcs/integrations',
+      url: 'v4/vcs/integrations?page_size=200',
       method: 'GET'
     })
   })

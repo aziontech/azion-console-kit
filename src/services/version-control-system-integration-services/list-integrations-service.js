@@ -3,7 +3,7 @@ import { makeVersionControlSystemBaseUrl } from './make-version-control-system-b
 
 export const listIntegrationsService = async () => {
   let httpResponse = await AxiosHttpClientAdapter.request({
-    url: `${makeVersionControlSystemBaseUrl()}/integrations`,
+    url: `${makeVersionControlSystemBaseUrl()}/integrations?page_size=200`,
     method: 'GET'
   })
 
