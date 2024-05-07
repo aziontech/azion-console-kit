@@ -73,13 +73,14 @@
                       />
                     </div>
                   </div>
-                </div>
-                <span
-                  class="text-sm font-normal text-color-secondary"
-                  v-if="isUnfinished"
-                >
-                  Project started {{ seconds }}s ago
-                </span>
+                </div>          
+                  <span
+                    class="text-sm font-normal text-color-secondary"
+                    v-if="isUnfinished"
+                  >
+                    {{ elapsedTime }}
+                  </span>
+
               </div>
               <ScriptRunnerBlock
                 title="Deploy Log"
@@ -162,7 +163,7 @@
   const router = useRouter()
   const toast = useToast()
   const results = ref()
-  const seconds = ref(0)
+  const timer = ref(0)
   const intervalRef = ref()
   const deployFailed = ref(false)
   const solutionStore = useSolutionStore()
@@ -239,6 +240,20 @@
     return results.value && !deployFailed.value
   })
 
+  const MINUTE_IN_SEC = 60 
+  const elapsedTime = computed(() => {
+    const isGraterThanMinute = timer.value > MINUTE_IN_SEC
+  
+    if (!isGraterThanMinute) {
+      return `Project started ${timer.value}s ago`
+    }
+    
+    const seconds = timer.value % MINUTE_IN_SEC
+    const minutes = Math.floor(timer.value / MINUTE_IN_SEC)
+    
+    return `Project started ${ minutes }}m${ seconds }}s ago`
+  })
+
   const goToPointTraffic = () => {
     props.windowOpen(
       'https://www.azion.com/en/documentation/products/guides/point-domain-to-azion/',
@@ -278,7 +293,7 @@
 
   onMounted(() => {
     intervalRef.value = setInterval(() => {
-      seconds.value += 1
+      timer.value += 1
     }, 1000)
     executionId.value = route.params.id
   })
