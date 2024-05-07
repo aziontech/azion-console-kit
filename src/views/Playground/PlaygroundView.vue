@@ -45,6 +45,12 @@
         @click="onSubmit"
       />
     </form>
+    <div class="mt-10 flex flex-col gap-10">
+      <InlineMessage severity="info">Please save this secret key in a secure and easily accessible location. For security reasons, you won't be able to view it again through your Azion account. If you lose this secret key, you'll need to generate a new one.</InlineMessage>
+      <InlineMessage severity="success">Please save this secret key in a secure and easily accessible location. For security reasons, you won't be able to view it again through your Azion account. If you lose this secret key, you'll need to generate a new one.</InlineMessage>
+      <InlineMessage severity="error">Please save this secret key in a secure and easily accessible location. For security reasons, you won't be able to view it again through your Azion account. If you lose this secret key, you'll need to generate a new one.</InlineMessage>
+      <InlineMessage severity="warn">Please save this secret key in a secure and easily accessible location. For security reasons, you won't be able to view it again through your Azion account. If you lose this secret key, you'll need to generate a new one.</InlineMessage>
+    </div>
   </div>
 </template>
 
@@ -56,6 +62,8 @@
   import PrimeButton from 'primevue/button'
   import { useField, useForm } from 'vee-validate'
   import * as yup from 'yup'
+  import InlineMessage from 'primevue/inlinemessage';
+
 
   const validationSchema = yup.object({
     checkboxGroup: yup.array().min(2).required(),
