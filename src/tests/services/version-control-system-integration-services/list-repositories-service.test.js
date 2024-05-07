@@ -31,7 +31,7 @@ describe('VersionControlSystemService', () => {
     await sut(fixtures.uuid)
 
     expect(requestSpy).toHaveBeenCalledWith({
-      url: `v4/vcs/integrations/${fixtures.uuid}/repositories?page_size=200`,
+      url: `v4/vcs/integrations/${fixtures.uuid}/repositories?page_size=200&ordering=name`,
       method: 'GET'
     })
   })
