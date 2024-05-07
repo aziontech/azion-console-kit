@@ -73,21 +73,14 @@
                       />
                     </div>
                   </div>
-                </div>
-                <div v-if="isUnfinished">                  
+                </div>          
                   <span
                     class="text-sm font-normal text-color-secondary"
-                    v-if="!isGreaterThanMinute"
+                    v-if="isUnfinished"
                   >
-                    Project started {{ timer }}s ago
+                    {{ elapsedTime }}
                   </span>
-                  <span
-                    class="text-sm font-normal text-color-secondary"
-                    v-if="isGreaterThanMinute"
-                  >
-                    Project started {{ minutes }}m{{ seconds }}s ago
-                  </span>
-                </div>
+
               </div>
               <ScriptRunnerBlock
                 title="Deploy Log"
@@ -231,18 +224,6 @@
     tracker.create.eventDeployed(solutionStore.solution).track()
   }
 
-  const minutes = computed(() => {
-    return Math.floor(timer.value / 60)
-  })
-  
-  const seconds = computed(() => {
-    return timer.value % 60
-  })
-
-  const isGreaterThanMinute = computed(() => {
-    return timer.value > 60
-  })
-
   const severity = computed(() => {
     return !deployFailed.value ? 'success' : 'danger'
   })
@@ -257,6 +238,20 @@
 
   const isSuccessfullyFinished = computed(() => {
     return results.value && !deployFailed.value
+  })
+
+  const MINUTE_IN_SEC = 60 
+  const elapsedTime = computed(() => {
+    const isGraterThanMinute = timer.value > MINUTE_IN_SEC
+  
+    if (!isGraterThanMinute) {
+      return `Project started ${timer.value}s ago`
+    }
+    
+    const seconds = timer.value % MINUTE_IN_SEC
+    const minutes = Math.floor(timer.value / MINUTE_IN_SEC)
+    
+    return `Project started ${ minutes }}m${ seconds }}s ago`
   })
 
   const goToPointTraffic = () => {
