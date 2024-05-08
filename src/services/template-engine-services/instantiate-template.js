@@ -19,7 +19,7 @@ const parseHttpResponse = (httpResponse, applicationName) => {
       return {
         result: httpResponse.body,
         feedback: 'Integration installation was successful',
-        urlToEditView: `/create/deploy/${httpResponse.body.uuid}/${applicationName}`
+        urlToEditView: generateRedirectUrl(httpResponse.body.uuid, applicationName)
       }
     case 400:
       const apiError = httpResponse.body.error[0]
@@ -35,4 +35,14 @@ const parseHttpResponse = (httpResponse, applicationName) => {
     default:
       throw new Errors.UnexpectedError().message
   }
+}
+
+const generateRedirectUrl = (uuid, applicationName) => {
+  const hasApplicationName = !!applicationName
+
+  if (hasApplicationName) {
+    return `/create/deploy/${uuid}`
+  }
+
+  return `/create/deploy/${uuid}/${applicationName}`
 }
