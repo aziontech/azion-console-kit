@@ -8,6 +8,7 @@
   import * as yup from 'yup'
   /**@type {import('@/plugins/adapters/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   import { handleTrackerError } from '@/utils/errorHandlingTracker'
+  import { TOAST_LIFE } from '@/utils/constants'
 
   const tracker = inject('tracker')
   defineOptions({ name: 'drawer-origin' })
@@ -219,7 +220,8 @@
     toast.add({
       closable: true,
       severity: 'success',
-      summary: 'Origin key copied to clipboard!'
+      summary: 'Origin key copied to clipboard!',
+      life: TOAST_LIFE
     })
   }
 
