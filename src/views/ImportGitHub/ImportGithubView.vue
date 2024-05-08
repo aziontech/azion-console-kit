@@ -96,61 +96,52 @@
   }
 
   const templateId = ref(null)
-  const handleExecuteScriptRunner = async (formValues) => {
-    try {
-      if (formValues.newVariables) {
-        await Promise.all(
-          formValues.newVariables.map((variable) => props.createVariablesService(variable))
-        )
-      }
-
-      const inputSchema = [
-        {
-          field: 'platform_feature__vcs_integration__uuid',
-          instantiation_data_path: '',
-          value: formValues.gitScope
-        },
-        {
-          field: 'az_name',
-          instantiation_data_path: 'envs.[0].value',
-          value: formValues.applicationName
-        },
-        {
-          field: 'git_url_external',
-          instantiation_data_path: 'envs.[1].value',
-          value: formValues.repository
-        },
-        {
-          field: 'vulcan_preset',
-          instantiation_data_path: 'envs.[2].value',
-          value: formValues.preset
-        },
-        {
-          field: 'vulcan_mode',
-          instantiation_data_path: 'envs.[3].value',
-          value: formValues.mode
-        },
-        {
-          field: 'az_command',
-          instantiation_data_path: 'envs.[4].value',
-          value: formValues.installCommand
-        },
-        {
-          field: 'az_root_directory',
-          instantiation_data_path: 'envs.[5].value',
-          value: formValues.rootDirectory
-        }
-      ]
-
-      return props.instantiateTemplateService(templateId.value, inputSchema)
-    } catch (error) {
-      toast.add({
-        closable: true,
-        severity: 'error',
-        summary: 'error',
-        detail: error
-      })
+  const createServiceWithVariablesDecorator = async (formValues) => {
+    if (formValues.newVariables) {
+      await Promise.all(
+        formValues.newVariables.map((variable) => props.createVariablesService(variable))
+      )
     }
+
+    const inputSchema = [
+      {
+        field: 'platform_feature__vcs_integration__uuid',
+        instantiation_data_path: '',
+        value: formValues.gitScope
+      },
+      {
+        field: 'az_name',
+        instantiation_data_path: 'envs.[0].value',
+        value: formValues.applicationName
+      },
+      {
+        field: 'git_url_external',
+        instantiation_data_path: 'envs.[1].value',
+        value: formValues.repository
+      },
+      {
+        field: 'vulcan_preset',
+        instantiation_data_path: 'envs.[2].value',
+        value: formValues.preset
+      },
+      {
+        field: 'vulcan_mode',
+        instantiation_data_path: 'envs.[3].value',
+        value: formValues.mode
+      },
+      {
+        field: 'az_command',
+        instantiation_data_path: 'envs.[4].value',
+        value: formValues.installCommand
+      },
+      {
+        field: 'az_root_directory',
+        instantiation_data_path: 'envs.[5].value',
+        value: formValues.rootDirectory
+      }
+    ]
+
+    return props.instantiateTemplateService(templateId.value, inputSchema)
   }
 
   const loadSolutionByVendor = async () => {
@@ -187,7 +178,7 @@
     <template #content>
       <CreateFormBlock
         :disableAfterCreateToastFeedback="true"
-        :createService="handleExecuteScriptRunner"
+        :createService="createServiceWithVariablesDecorator"
         :schema="validationSchema"
         :initialValues="initialValues"
       >
