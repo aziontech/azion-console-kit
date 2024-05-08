@@ -222,7 +222,7 @@
       }),
     companySize: yup.string().when('use', {
       is: (val) => val === 'Work',
-      then: (schema) => schema.required()
+      then: (schema) => schema.required('Company Size is a required field')
     }),
     companyWebsite: yup.string().when('companySize', {
       is: (val) => val && val !== 'Just me',
@@ -234,12 +234,14 @@
             /[-a-zA-Z0-9._+=]+\.[a-zA-Z0-9]+\b([-a-zA-Z0-9.]*)/,
             'Company Website is a required field'
           )
+          .required()
     }),
     fullName: yup
       .string()
       .trim()
       .max(61, 'Your Full Name must be less than 61 characters')
-      .matches(/[A-zÀ-ž.'-]+ [A-zÀ-ž.'-]+/, 'Your Full Name is a required field'),
+      .matches(/[A-zÀ-ž.'-]+ [A-zÀ-ž.'-]+/, 'Your Full Name is a required field')
+      .required(),
     onboardingSession: yup.boolean()
   })
 
