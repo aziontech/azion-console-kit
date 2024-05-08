@@ -141,7 +141,11 @@
       }
     ]
 
-    return props.instantiateTemplateService(templateId.value, inputSchema)
+    return props.instantiateTemplateService(
+      templateId.value,
+      inputSchema,
+      formValues.applicationName
+    )
   }
 
   const loadSolutionByVendor = async () => {

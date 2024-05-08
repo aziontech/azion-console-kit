@@ -1,7 +1,7 @@
 <template>
   <ContentBlock>
     <template #heading>
-      <PageHeadingBlock pageTitle="Deploy" />
+      <PageHeadingBlock :pageTitle="`Deploy: ${applicationName}`" />
     </template>
     <template #content>
       <div class="flex flex-col w-full gap-8">
@@ -158,6 +158,7 @@
   })
 
   const executionId = ref('')
+  const applicationName = ref('')
   const route = useRoute()
   const router = useRouter()
   const toast = useToast()
@@ -186,6 +187,10 @@
       handle: () => goToAnalytics()
     }
   ])
+
+  onMounted(() => {
+    applicationName.value = route.params.applicationName
+  })
 
   const handleFinish = async () => {
     try {

@@ -32,7 +32,7 @@ export const createNewRoutes = {
       }
     },
     {
-      path: 'deploy/:id',
+      path: 'deploy/:id/:applicationName',
       name: 'creation-deploy',
       component: () => import('@/views/CreateNew/DeployView.vue'),
       props: {

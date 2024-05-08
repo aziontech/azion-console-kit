@@ -2,22 +2,22 @@ import { AxiosHttpClientAdapter } from '../axios/AxiosHttpClientAdapter'
 import { makeTemplateEngineBaseUrl } from './make-template-engine-base-url'
 import * as Errors from '@/services/axios/errors'
 
-export const instantiateTemplate = async (templateId, payload) => {
+export const instantiateTemplate = async (templateId, payload, applicationName) => {
   let httpResponse = await AxiosHttpClientAdapter.request({
     url: `${makeTemplateEngineBaseUrl()}/templates/${templateId}/instantiate`,
     method: 'POST',
     body: payload
   })
-  return parseHttpResponse(httpResponse)
+  return parseHttpResponse(httpResponse, applicationName)
 }
 
-const parseHttpResponse = (httpResponse) => {
+const parseHttpResponse = (httpResponse, applicationName) => {
   switch (httpResponse.statusCode) {
     case 201:
       return {
         result: httpResponse.body,
         feedback: 'Integration installation was successful',
-        urlToEditView: `/create/deploy/${httpResponse.body.uuid}`
+        urlToEditView: `/create/deploy/${httpResponse.body.uuid}/${applicationName}`
       }
     case 400:
       const apiError = httpResponse.body.error[0]
