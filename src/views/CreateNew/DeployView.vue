@@ -1,7 +1,7 @@
 <template>
   <ContentBlock>
     <template #heading>
-      <PageHeadingBlock :pageTitle="`Deploy: ${applicationName}`" />
+      <PageHeadingBlock :pageTitle="hasApplicationName" />
     </template>
     <template #content>
       <div class="flex flex-col w-full gap-8">
@@ -189,7 +189,7 @@
   ])
 
   onMounted(() => {
-    applicationName.value = route.params.applicationName
+    applicationName.value = route.params?.applicationName
   })
 
   const handleFinish = async () => {
@@ -256,6 +256,11 @@
     const minutes = Math.floor(timer.value / MINUTE_IN_SEC)
 
     return `Project started ${minutes}m${seconds}s ago`
+  })
+
+  const hasApplicationName = computed(() => {
+    if (applicationName.value) return `Deploy: ${applicationName.value}`
+    return 'Deploy'
   })
 
   const goToPointTraffic = () => {

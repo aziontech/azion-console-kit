@@ -494,10 +494,12 @@
         instantiateParsedPayload
       )
       submitLoading.value = props.freezeLoading
-      emit('instantiate', {
-        ...response,
-        applicationName: formTools.value?.values?.application_name
-      })
+
+      if (formTools.value?.values?.application_name) {
+        response.applicationName = formTools.value.values.application_name
+      }
+
+      emit('instantiate', response)
     } catch (error) {
       toast.add({
         closable: true,

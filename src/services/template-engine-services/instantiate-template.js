@@ -2,7 +2,9 @@ import { AxiosHttpClientAdapter } from '../axios/AxiosHttpClientAdapter'
 import { makeTemplateEngineBaseUrl } from './make-template-engine-base-url'
 import * as Errors from '@/services/axios/errors'
 
-export const instantiateTemplate = async (templateId, payload, applicationName) => {
+export const instantiateTemplate = async (templateId, payload) => {
+  const applicationName = payload.find(item => item.field === 'az_name').value
+
   let httpResponse = await AxiosHttpClientAdapter.request({
     url: `${makeTemplateEngineBaseUrl()}/templates/${templateId}/instantiate`,
     method: 'POST',
