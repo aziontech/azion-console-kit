@@ -234,7 +234,7 @@
             /[-a-zA-Z0-9._+=]+\.[a-zA-Z0-9]+\b([-a-zA-Z0-9.]*)/,
             'Company Website is a required field'
           )
-          .required()
+          .required('Company Website is a required field')
     }),
     fullName: yup
       .string()
@@ -363,6 +363,7 @@
   watch(use, (value) => {
     if (value !== 'Work') {
       resetField('companySize')
+      resetField('companyWebsite')
       if (role.value) {
         updateStep('role')
       }
