@@ -241,9 +241,9 @@
 
   const MINUTE_IN_SEC = 60
   const elapsedTime = computed(() => {
-    const isGraterThanMinute = timer.value > MINUTE_IN_SEC
+    const isLessThanMinute = timer.value < MINUTE_IN_SEC
 
-    if (!isGraterThanMinute) {
+    if (isLessThanMinute) {
       return `Project started ${timer.value}s ago`
     }
 
