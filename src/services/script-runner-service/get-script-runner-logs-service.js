@@ -10,14 +10,17 @@ export const getScriptRunnerLogsService = async (executionId) => {
   return parseHttpResponse(httpResponse)
 }
 
+const formatLog = (log) => ({
+  content: log?.content,
+  timeStamp: Intl.DateTimeFormat('us', {
+    timeStyle: 'medium',
+    hourCycle: 'h23'
+  }).format(new Date(log.timestamp))
+})
+
 const adapt = (httpResponse) => {
-  const parsedLogs = httpResponse.body.logs.map((log) => ({
-    content: log.content,
-    timeStamp: Intl.DateTimeFormat('us', {
-      timeStyle: 'medium',
-      hourCycle: 'h23'
-    }).format(new Date(log.timestamp))
-  }))
+  const logs = httpResponse.body.logs ?? []
+  const parsedLogs = logs.map(formatLog)
 
   return {
     body: {
