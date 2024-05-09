@@ -190,6 +190,7 @@
   import * as yup from 'yup'
   import { useToast } from 'primevue/usetoast'
   import OAuthGithub from './oauth-github.vue'
+  import { useDeploy } from '@/stores/deploy'
 
   defineOptions({ name: 'templateEngineBlock' })
 
@@ -246,7 +247,7 @@
   const isIntegrationsLoading = ref(false)
   const oauthGithubRef = ref(null)
   const vcsIntegrationFieldName = ref('platform_feature__vcs_integration__uuid')
-
+  const deployStore = useDeploy()
   const setIntegration = ref('')
 
   const triggerConnectWithGithub = () => {
@@ -496,9 +497,8 @@
       submitLoading.value = props.freezeLoading
 
       if (formTools.value?.values?.application_name) {
-        response.applicationName = formTools.value.values.application_name
+        deployStore.addApplicationName(formTools.value.values.application_name)
       }
-
       emit('instantiate', response)
     } catch (error) {
       toast.add({

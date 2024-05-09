@@ -336,9 +336,9 @@
     showDetails.value = true
   }
 
-  const handleInstantiate = ({ result, applicationName }) => {
+  const handleInstantiate = ({ result }) => {
     router.push({
-      path: `/create/deploy/${result.uuid}/${applicationName}`
+      path: `/create/deploy/${result.uuid}`
     })
   }
 

@@ -141,6 +141,7 @@
   import { useToast } from 'primevue/usetoast'
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
+  import { useDeploy } from '@/stores/deploy'
 
   const props = defineProps({
     getLogsService: {
@@ -156,6 +157,8 @@
       required: true
     }
   })
+
+  const deployStore = useDeploy()
 
   const executionId = ref('')
   const applicationName = ref('')
@@ -187,10 +190,6 @@
       handle: () => goToAnalytics()
     }
   ])
-
-  onMounted(() => {
-    applicationName.value = route.params?.applicationName
-  })
 
   const handleFinish = async () => {
     try {
@@ -305,9 +304,11 @@
       timer.value += 1
     }, 1000)
     executionId.value = route.params.id
+    applicationName.value = deployStore.getApplicationName
   })
 
   onUnmounted(() => {
     clearInterval(intervalRef.value)
+    deployStore.removeApplicationName()
   })
 </script>
