@@ -4,8 +4,11 @@
   import FormFieldsEdgeFirewallRulesEngine from '../FormFields/FormFieldsEdgeFirewallRulesEngine.vue'
   import { refDebounced } from '@vueuse/core'
   import * as yup from 'yup'
-  import { onMounted, ref } from 'vue'
+  import { onMounted, ref, inject } from 'vue'
   import { useToast } from 'primevue/usetoast'
+
+  /**@type {import('@/plugins/adapters/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
+  const tracker = inject('tracker')
 
   defineOptions({
     name: 'edge-application-cache-settings-drawer'
@@ -134,7 +137,17 @@
 
   const handleEditWithSuccess = () => {
     emit('onSuccess')
+    handleTrackSuccessEdit()
     closeEditDrawer()
+  }
+
+  const handleTrackSuccessEdit = () => {
+    tracker.product
+      .productEdited({
+        productName: 'Edge Firewall',
+        tab: 'rulesEngine'
+      })
+      .track()
   }
 
   const listFunctionsServiceWithDecorator = async () => {
