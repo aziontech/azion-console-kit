@@ -400,6 +400,7 @@
           escapeErrorMessage(validator.errorMessage),
           function (value) {
             const domainRegex = new RegExp(validator.regex)
+            if (value === undefined && !element.attrs.required) return true  //escape validation when field is empty and is not required
             return domainRegex.test(value)
           }
         )
