@@ -1,6 +1,6 @@
-const DELIVER_PRESETS = ['nextjs', 'angular', 'astro', 'hexo', 'react', 'vite', 'vue']
-const COMPUTE_PRESETS = ['nextjs']
-const ALL_PRESETS = [...DELIVER_PRESETS, ...COMPUTE_PRESETS]
+const DELIVER_PRESETS = ['next', 'angular', 'astro', 'hexo', 'react', 'vue']
+const COMPUTE_PRESETS = ['next']
+const ALL_PRESETS = [...new Set([...DELIVER_PRESETS, ...COMPUTE_PRESETS])]
 
 /**
  * Returns all presets of a specific type.

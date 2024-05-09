@@ -3,11 +3,17 @@
   import ContentBlock from '@/templates/content-block'
   import CreateFormBlock from '@/templates/create-form-block'
   import PageHeadingBlock from '@/templates/page-heading-block'
+  import { useLoadingStore } from '@/stores/loading'
+  import { ref } from 'vue'
+  import { useRoute } from 'vue-router'
   import * as yup from 'yup'
-  import FormFieldsImportStatic from './FormFields/FormFieldsImportStatic.vue'
   import { useToast } from 'primevue/usetoast'
+  import { onMounted } from 'vue'
+  import FormFieldsImportGithub from './FormFields/FormFieldsImportGithub.vue'
 
+  const loadingStore = useLoadingStore()
   const toast = useToast()
+  const route = useRoute()
 
   const props = defineProps({
     listPlatformsService: {
@@ -34,10 +40,6 @@
       type: Function,
       required: true
     },
-    createScriptRunnerExecutionService: {
-      type: Function,
-      required: true
-    },
     frameworkDetectorService: {
       type: Function,
       required: true
@@ -45,12 +47,26 @@
     createVariablesService: {
       type: Function,
       required: true
+    },
+    instantiateTemplateService: {
+      type: Function,
+      required: true
+    },
+    loadSolutionService: {
+      type: Function,
+      required: true
     }
   })
 
   const validationSchema = yup.object({
-    edgeApplicationName: yup.string().required().label('Edge Application Name'),
-    rootDirectory: yup.string().required().label('Root Directory'),
+    applicationName: yup.string().required().label('Application Name'),
+    rootDirectory: yup
+      .string()
+      .required()
+      .matches(/^\//, 'Root Directory must start with a slash (/)')
+      .matches(/^(?!.*\.\.).*$/, 'Root Directory cannot contain (..)')
+      .matches(/^\S*$/, 'Root Directory cannot contain spaces')
+      .label('Root Directory'),
     preset: yup.string().required().label('Preset'),
     mode: yup.string().required().label('Mode'),
     repository: yup.string().required().label('Repository'),
@@ -58,15 +74,19 @@
     gitScope: yup.string().required().label('Git Scope'),
     newVariables: yup.array().of(
       yup.object().shape({
-        key: yup.string().required().label('Key'),
+        key: yup
+          .string()
+          .required()
+          .label('Key')
+          .matches(/^[A-Z0-9_]+$/, 'Only accepts upper-case letters, numbers, and underscore.'),
         value: yup.string().required().label('Value')
       })
     )
   })
 
   const initialValues = {
-    edgeApplicationName: '',
-    rootDirectory: '',
+    applicationName: '',
+    rootDirectory: '/',
     preset: '',
     newVariables: [],
     mode: '',
@@ -75,36 +95,95 @@
     gitScope: ''
   }
 
-  const handleExecuteScriptRunner = async (formValues) => {
-    try {
+  const templateId = ref(null)
+  const createServiceWithVariablesDecorator = async (formValues) => {
+    if (formValues.newVariables) {
       await Promise.all(
         formValues.newVariables.map((variable) => props.createVariablesService(variable))
       )
-      return props.createScriptRunnerExecutionService(formValues)
+    }
+
+    const inputSchema = [
+      {
+        field: 'platform_feature__vcs_integration__uuid',
+        instantiation_data_path: '',
+        value: formValues.gitScope
+      },
+      {
+        field: 'az_name',
+        instantiation_data_path: 'envs.[0].value',
+        value: formValues.applicationName
+      },
+      {
+        field: 'git_url_external',
+        instantiation_data_path: 'envs.[1].value',
+        value: formValues.repository
+      },
+      {
+        field: 'vulcan_preset',
+        instantiation_data_path: 'envs.[2].value',
+        value: formValues.preset
+      },
+      {
+        field: 'vulcan_mode',
+        instantiation_data_path: 'envs.[3].value',
+        value: formValues.mode
+      },
+      {
+        field: 'az_command',
+        instantiation_data_path: 'envs.[4].value',
+        value: formValues.installCommand
+      },
+      {
+        field: 'az_root_directory',
+        instantiation_data_path: 'envs.[5].value',
+        value: formValues.rootDirectory
+      }
+    ]
+
+    return props.instantiateTemplateService(templateId.value, inputSchema)
+  }
+
+  const loadSolutionByVendor = async () => {
+    try {
+      loadingStore.startLoading()
+
+      const solution = await props.loadSolutionService({
+        vendor: route.params.vendor,
+        solution: route.params.solution
+      })
+
+      templateId.value = solution.referenceId
     } catch (error) {
       toast.add({
         closable: true,
         severity: 'error',
-        summary: 'error',
-        detail: error
+        summary: error
       })
+    } finally {
+      loadingStore.finishLoading()
     }
   }
+
+  onMounted(async () => {
+    await loadSolutionByVendor()
+  })
 </script>
 
 <template>
   <ContentBlock>
     <template #heading>
-      <PageHeadingBlock pageTitle="Import Static Site from GitHub" />
+      <PageHeadingBlock pageTitle="Import from GitHub" />
     </template>
     <template #content>
       <CreateFormBlock
-        :createService="handleExecuteScriptRunner"
+        :disableAfterCreateToastFeedback="true"
+        :createService="createServiceWithVariablesDecorator"
         :schema="validationSchema"
         :initialValues="initialValues"
       >
         <template #form>
-          <FormFieldsImportStatic
+          <FormFieldsImportGithub
             :listPlatformsService="listPlatformsService"
             :listIntegrationsService="listIntegrationsService"
             :listRepositoriesService="listRepositoriesService"

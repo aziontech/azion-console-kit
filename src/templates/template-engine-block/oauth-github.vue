@@ -45,7 +45,7 @@
   const openPopupGithub = () => {
     const url = githubInstallation.value.installationUrl
 
-    window.open(url, 'page', 'width=640, height=700, top=100, left=110, popup=yes, scrollbars=no')
+    window.open(url, 'page', 'popup=yes, scrollbars=no')
   }
 
   const emitGithubInstallation = () => {

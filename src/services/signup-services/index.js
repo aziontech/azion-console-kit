@@ -4,6 +4,7 @@ import { listAdditionalDataInfoService } from './list-additional-data-info-servi
 import { listCountriesService } from './list-countries-service'
 import { postAdditionalDataService } from './post-additional-data-service'
 import { patchFullnameService } from './patch-fullname-service'
+import { updateAccountInfoService } from './update-account-info-service'
 
 export {
   signupService,
@@ -11,5 +12,6 @@ export {
   listAdditionalDataInfoService,
   listCountriesService,
   postAdditionalDataService,
-  patchFullnameService
+  patchFullnameService,
+  updateAccountInfoService
 }

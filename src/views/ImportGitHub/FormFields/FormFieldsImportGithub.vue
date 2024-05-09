@@ -39,10 +39,11 @@
     }
   })
 
+  const AZIONFORMSAMPLESLINK = ref('https://github.com/aziontech/azion-samples/fork')
   const { value: preset } = useField('preset')
   const { value: gitScope } = useField('gitScope')
   const { value: repository } = useField('repository')
-  const { value: edgeApplicationName } = useField('edgeApplicationName')
+  const { value: applicationName } = useField('applicationName')
   const { value: rootDirectory } = useField('rootDirectory')
   const { value: mode } = useField('mode')
   const { value: installCommand } = useField('installCommand')
@@ -141,8 +142,8 @@
     }
   }
   const modeList = ref([
-    { label: 'Deliver', value: 'deliver', disabled: false },
-    { label: 'Compute', value: 'compute', disabled: false }
+    { label: 'Deliver - Static', value: 'deliver', disabled: false },
+    { label: 'Compute - Edge processing (SSR or Back-End)', value: 'compute', disabled: false }
   ])
 
   const setModeByPreset = () => {
@@ -175,7 +176,8 @@
   }
 
   const setEdgeApplicationNameByRepository = async (repositoryName) => {
-    edgeApplicationName.value = repositoryName
+    applicationName.value = `${repositoryName}`
+
     const accountName = getOptionNameByValue({
       listOption: integrationsList.value,
       optionValue: gitScope.value,
@@ -206,6 +208,10 @@
     windowOpen(route.href, '_blank')
   }
 
+  const goToAzionSamples = () => {
+    windowOpen(AZIONFORMSAMPLESLINK.value, '_blank')
+  }
+
   onMounted(async () => {
     await listIntegrations()
     listenerOnMessage()
@@ -213,10 +219,18 @@
 </script>
 
 <template>
-  <FormHorizontal
-    title="GitHub Connection"
-    description="Provide access to GitHub to import an existing project."
-  >
+  <FormHorizontal title="GitHub Connection">
+    <template #description>
+      Provide access to GitHub to import an existing project.
+      <PrimeButton
+        link
+        icon-pos="right"
+        icon="pi pi-external-link"
+        label="Fork and use a sample project"
+        class="w-fit p-0 text-sm"
+        @click="goToAzionSamples"
+      />
+    </template>
     <template #inputs>
       <div v-show="!hasIntegrations">
         <OAuthGithub
@@ -325,9 +339,10 @@
     <template #inputs>
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
         <FieldText
-          label="Edge Application Name *"
-          name="edgeApplicationName"
-          :value="edgeApplicationName"
+          label="Application Name *"
+          name="applicationName"
+          :value="applicationName"
+          description="Give a unique name to the application. It’ll also be used for the bucket for storage and the edge function."
         />
       </div>
 
@@ -382,6 +397,9 @@
               </div>
             </template>
           </Dropdown>
+          <small class="text-xs text-color-secondary font-normal leading-5">
+            Defines the initial settings to work with web frameworks.
+          </small>
         </div>
         <div class="flex flex-col sm:w-2/5 gap-2">
           <FieldDropdown
@@ -394,6 +412,7 @@
             label="Mode *"
             name="mode"
             :value="mode"
+            description="Defines the operational mode of application within the framework."
           />
         </div>
       </div>
@@ -402,7 +421,7 @@
         <FieldText
           label="Root Directory *"
           name="rootDirectory"
-          placeholder="./"
+          placeholder="/"
           :value="rootDirectory"
         />
       </div>
@@ -442,7 +461,6 @@
               icon="pi pi-trash"
               outlined
               type="button"
-              aria-label="Remove Origin"
               @click="removeVariable(index)"
             />
           </div>
@@ -450,16 +468,26 @@
             <div class="flex flex-col sm:max-w-lg w-full gap-2">
               <FieldText
                 label="Key *"
+                autocapitalize="characters"
                 :name="`newVariables[${index}].key`"
                 :value="newVariables[index].key"
+                placeholder="VARIABLE_KEY_NAME"
               />
+              <small class="text-xs text-color-secondary font-normal leading-5">
+                Give a name or identifier for the variable. Accepts upper-case letters, numbers, and
+                underscore.
+              </small>
             </div>
             <div class="flex flex-col sm:max-w-lg w-full gap-2">
               <FieldText
                 label="Value *"
                 :name="`newVariables[${index}].value`"
                 :value="newVariables[index].value"
+                placeholder="VARIABLE_VALUE"
               />
+              <small class="text-xs text-color-secondary font-normal leading-5">
+                Enter the data associated with the variable key.
+              </small>
             </div>
           </div>
         </div>

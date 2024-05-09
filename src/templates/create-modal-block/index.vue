@@ -43,6 +43,10 @@
     {
       label: 'Resources',
       value: 'new_resource'
+    },
+    {
+      label: 'Import from GitHub',
+      value: 'import_github'
     }
   ])
   const resources = ref([
@@ -104,19 +108,17 @@
     }
   ])
 
-  const githubOptions = ref([
-    {
-      label: 'Import Static Site from GitHub',
-      icon: 'pi pi-github',
-      description: `Import an existing static project to deploy it on Azion's edge.`,
-      command: () => {
-        redirectGithubImport()
-      }
+  const redirectGithubImport = (template, section) => {
+    tracker.create.selectedOnCreate({
+      section,
+      selection: template.name
+    })
+    const params = {
+      vendor: template.vendor.slug,
+      solution: template.slug
     }
-  ])
 
-  const redirectGithubImport = () => {
-    router.push({ name: 'github-static' })
+    router.push({ name: 'github-repository-import', params })
     emit('closeModal')
   }
 
@@ -188,12 +190,32 @@
     }
   }
 
+  const githubTemplates = ref([])
+  const loadImportGithubSolution = async () => {
+    try {
+      isLoading.value = true
+      githubTemplates.value = await props.listSolutionsService({ type: 'import-from-github' })
+    } catch (error) {
+      showToast('error', error)
+    } finally {
+      isLoading.value = false
+    }
+  }
+
   const onTabChange = async (target) => {
-    if (!isLoading.value) {
-      selectedTab.value = target.value || selectedTab.value
-      if (target.value === 'browse' && browseTemplates.value.length === 0) {
-        await loadBrowse()
-      }
+    if (isLoading.value) {
+      return
+    }
+
+    selectedTab.value = target.value || selectedTab.value
+    if (target.value === 'browse' && browseTemplates.value.length === 0) {
+      await loadBrowse()
+      return
+    }
+
+    if (target.value === 'import_github' && githubTemplates.value.length === 0) {
+      await loadImportGithubSolution()
+      return
     }
   }
 
@@ -210,8 +232,8 @@
 </script>
 
 <template>
-  <div class="overflow-auto w-full h-full flex flex-col sm:flex-row p-0 sm:pl-5 sm:pr-8 gap-4 pb-4">
-    <div class="sm:min-w-[240px] mt-4">
+  <div class="overflow-auto w-full h-full flex flex-col sm:flex-row gap-4">
+    <div class="-ml-2 sm:min-w-[240px]">
       <ul class="flex flex-col gap-1 md:fixed md:w-60">
         <li
           v-for="(menuitem, index) in items"
@@ -235,13 +257,13 @@
     <div class="overflow-auto w-full flex flex-col">
       <LoadingState v-if="isLoading" />
       <div v-else>
-        <div class="text-base font-medium mt-5 mb-3">
+        <div class="text-base font-medium mb-4">
           {{ tabHeader }}
         </div>
       </div>
 
       <div
-        class="mx-0 w-full mt-0 grid grid-cols-1 lg:grid-cols-2 2xl:grid-cols-3 gap-4"
+        class="mx-0 w-full mt-0 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"
         v-if="showRecommended"
       >
         <PrimeButton
@@ -277,7 +299,7 @@
         </PrimeButton>
       </div>
       <div
-        class="mx-0 w-full mt-0 grid grid-cols-1 lg:grid-cols-2 2xl:grid-cols-3 gap-4"
+        class="mx-0 w-full mt-0 grid grid-cols-1 lg:grid-cols-3 md:grid-cols-2 gap-4"
         v-if="showBrowse"
       >
         <PrimeButton
@@ -313,7 +335,7 @@
         </PrimeButton>
       </div>
       <div
-        class="mx-0 w-full mt-0 grid grid-cols-1 lg:grid-cols-2 2xl:grid-cols-3 gap-4"
+        class="mx-0 w-full mt-0 grid grid-cols-1 lg:grid-cols-3 md:grid-cols-2 gap-4"
         v-if="showResource"
       >
         <PrimeButton
@@ -340,13 +362,13 @@
         </PrimeButton>
       </div>
       <div
-        class="mx-0 w-full mt-0 grid grid-cols-1 lg:grid-cols-2 2xl:grid-cols-3 gap-4"
+        class="mx-0 w-full mt-0 grid grid-cols-1 lg:grid-cols-3 md:grid-cols-2 gap-4"
         v-if="showGithubImport"
       >
         <PrimeButton
-          v-for="(template, index) in githubOptions"
+          v-for="(template, index) in githubTemplates"
           :key="index"
-          @click="template.command()"
+          @click="redirectGithubImport(template, 'githubImport')"
           class="p-6 text-left border-solid border surface-border hover:border-primary transition-all"
           link
         >
@@ -355,19 +377,16 @@
               <div
                 class="w-10 h-10 rounded surface-border border flex justify-center items-center bg-black"
               >
-                <i
-                  :class="template.icon"
-                  class="text-white text-2xl"
-                ></i>
+                <i class="pi pi-github text-white text-2xl"></i>
               </div>
               <div class="flex flex-col">
                 <span class="line-clamp-1 h-5 text-color text-sm font-medium">
-                  {{ template.label }}
+                  {{ template.name }}
                 </span>
                 <span
                   class="h-10 pb-4 text-sm font-normal text-color-secondary mt-1.5 line-clamp-2"
                 >
-                  {{ template.description }}
+                  Import an existing project to deploy it on Azion's edge.
                 </span>
               </div>
             </div>

@@ -34,7 +34,7 @@ const parseHttpResponse = (httpResponse) => {
   switch (httpResponse.statusCode) {
     case 201:
       return {
-        feedback: 'Your purge has been created',
+        feedback: 'The purge is queued for execution. It’ll appear in the history once completed.',
         urlToEditView: `/real-time-purge`
       }
     case 400:

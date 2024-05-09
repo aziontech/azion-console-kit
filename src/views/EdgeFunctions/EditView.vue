@@ -2,7 +2,10 @@
   <ContentBlock>
     <template #heading>
       <PageHeadingBlock pageTitle="Edit Edge Function">
-        <MobileCodePreview :updateObject="updateObject" />
+        <MobileCodePreview
+          :updateObject="updateObject"
+          :language="language"
+        />
       </PageHeadingBlock>
     </template>
     <template #content>
@@ -13,7 +16,10 @@
         :schema="validationSchema"
       >
         <template #form>
-          <FormFieldsEditEdgeFunctions v-model:preview-data="updateObject" />
+          <FormFieldsEditEdgeFunctions
+            v-model:preview-data="updateObject"
+            v-model:lang="language"
+          />
         </template>
         <template #action-bar="{ onSubmit, formValid, onCancel, loading }">
           <ActionBarBlockWithTeleport
@@ -53,6 +59,7 @@
     }
   })
   const updateObject = ref({})
+  const language = ref(null)
 
   const validationSchema = yup.object({
     name: yup.string().required('Name is a required field'),

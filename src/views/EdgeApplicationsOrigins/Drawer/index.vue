@@ -7,6 +7,8 @@
   import { inject, ref } from 'vue'
   import * as yup from 'yup'
   /**@type {import('@/plugins/adapters/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
+  import { handleTrackerError } from '@/utils/errorHandlingTracker'
+
   const tracker = inject('tracker')
   defineOptions({ name: 'drawer-origin' })
 
@@ -199,13 +201,6 @@
     emit('onSuccess')
   }
 
-  const checkError = (error) => {
-    const [fieldName, ...restOfStringArr] = error.split(':')
-    const message = restOfStringArr.join(':').trim()
-
-    return { fieldName, message }
-  }
-
   const closeDrawerEdit = () => {
     showEditOriginDrawer.value = false
   }
@@ -229,7 +224,7 @@
   }
 
   const handleFailedEditOrigin = (error) => {
-    const { fieldName, message } = checkError(error)
+    const { fieldName, message } = handleTrackerError(error)
     tracker.product
       .failedToEdit({
         productName: 'Origin',
@@ -243,7 +238,7 @@
   }
 
   const handleFailedCreateOrigin = (error) => {
-    const { fieldName, message } = checkError(error)
+    const { fieldName, message } = handleTrackerError(error)
     tracker.product
       .failedToCreate({
         productName: 'Origin',

@@ -262,8 +262,8 @@
     },
     { label: 'API', link: 'https://api.azion.com', isLinkExternal: true },
     {
-      label: 'Changelog',
-      link: 'https://www.azion.com/en/documentation/products/changelog',
+      label: 'Release notes',
+      link: 'https://www.azion.com/en/documentation/products/release-notes/',
       isLinkExternal: true
     },
     {
@@ -304,7 +304,8 @@
   }
 
   const getCurrentPath = () => {
-    return route.path
+    const match = route.path.match(/(.*\/)(edit|solution)/)
+    return match ? `${match[1]}${match[2]}` : route.path
   }
 
   const parseFilename = (filename) => {

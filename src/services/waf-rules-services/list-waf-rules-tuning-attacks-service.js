@@ -28,7 +28,7 @@ const adapt = (httpResponse) => {
           hitCount: event.hit_count,
           topIps: event.top_10_ips.map((ip) => ip.ip),
           id: index,
-          ruleId: event.rule_id,
+          ruleId: parseInt(event.rule_id),
           ipCount: event.ip_count,
           matchZone: event.match_zone,
           pathCount: event.path_count,

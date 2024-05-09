@@ -4,6 +4,7 @@
   import ActionBarBlockWithTeleport from '@templates/action-bar-block/action-bar-with-teleport'
   import * as yup from 'yup'
   import { inject } from 'vue'
+  import { useRouter } from 'vue-router'
 
   /**@type {import('@/plugins/adapters/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
@@ -60,6 +61,11 @@
       })
     )
   })
+
+  const router = useRouter()
+  const gotToList = () => {
+    router.push({ name: 'list-edge-applications' })
+  }
 </script>
 
 <template>
@@ -76,10 +82,10 @@
         :listOriginsService="props.listOriginsService"
       />
     </template>
-    <template #action-bar="{ onSubmit, formValid, onCancel, loading }">
+    <template #action-bar="{ onSubmit, formValid, loading }">
       <ActionBarBlockWithTeleport
         @onSubmit="onSubmit"
-        @onCancel="onCancel"
+        @onCancel="gotToList"
         :loading="loading"
         :submitDisabled="!formValid"
       />

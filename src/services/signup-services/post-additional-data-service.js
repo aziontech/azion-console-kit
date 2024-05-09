@@ -43,7 +43,7 @@ const getFieldNameOnError = (errorList) => {
     'What best describes your role?': 'role',
     'How big is your company?': 'companySize',
     'Company website?': 'website',
-    'Do you want to schedule a onboarding session with an Azion expert?': 'onboardingSchedule'
+    'Do you want to schedule an onboarding session with an Azion expert?': 'onboardingSchedule'
   }
 
   let field

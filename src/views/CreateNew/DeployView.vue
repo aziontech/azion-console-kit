@@ -55,7 +55,7 @@
                       v-if="isSuccessfullyFinished"
                       severity="secondary"
                       @click="goToEdgeApplicationEditView"
-                      label="Manage Edge Application"
+                      label="Manage"
                     />
                     <div class="md:ml-auto flex">
                       <PrimeButton
@@ -67,8 +67,8 @@
                           label: { class: 'grow-0' }
                         }"
                         class="md:ml-auto w-full"
-                        label="Retry"
-                        icon="pi pi-sync"
+                        label="Back"
+                        icon="pi pi-chevron-left"
                         iconPos="left"
                       />
                     </div>
@@ -78,14 +78,14 @@
                   class="text-sm font-normal text-color-secondary"
                   v-if="isUnfinished"
                 >
-                  Project started {{ seconds }}s ago
+                  {{ elapsedTime }}
                 </span>
               </div>
               <ScriptRunnerBlock
                 title="Deploy Log"
                 :getLogsService="props.getLogsService"
                 :executionId="executionId"
-                @onFinish="handleFinish"
+                @onFinish.once="handleFinish"
               />
             </div>
           </template>
@@ -162,7 +162,7 @@
   const router = useRouter()
   const toast = useToast()
   const results = ref()
-  const seconds = ref(0)
+  const timer = ref(0)
   const intervalRef = ref()
   const deployFailed = ref(false)
   const solutionStore = useSolutionStore()
@@ -198,10 +198,6 @@
         detail:
           'The edge application is being propagated through the edge nodes. This process will take a few minutes.'
       })
-      if ('edge_application' in results.value) {
-        handleTrackCreation()
-      }
-      tracker.create.eventDeployed(solutionStore.solution).track()
     } catch (error) {
       deployFailed.value = true
       toast.add({
@@ -210,8 +206,21 @@
         summary: 'Creation Failed',
         detail: failMessage
       })
-      tracker.create.eventFailedDeployed(solutionStore.solution).track()
     }
+
+    if (!solutionStore.solution) {
+      return
+    }
+
+    if (deployFailed.value) {
+      tracker.create.eventFailedDeployed(solutionStore.solution).track()
+      return
+    }
+
+    if ('edge_application' in results.value) {
+      handleTrackCreation()
+    }
+    tracker.create.eventDeployed(solutionStore.solution).track()
   }
 
   const severity = computed(() => {
@@ -230,6 +239,20 @@
     return results.value && !deployFailed.value
   })
 
+  const MINUTE_IN_SEC = 60
+  const elapsedTime = computed(() => {
+    const isLessThanMinute = timer.value < MINUTE_IN_SEC
+
+    if (isLessThanMinute) {
+      return `Project started ${timer.value}s ago`
+    }
+
+    const seconds = timer.value % MINUTE_IN_SEC
+    const minutes = Math.floor(timer.value / MINUTE_IN_SEC)
+
+    return `Project started ${minutes}m${seconds}s ago`
+  })
+
   const goToPointTraffic = () => {
     props.windowOpen(
       'https://www.azion.com/en/documentation/products/guides/point-domain-to-azion/',
@@ -241,14 +264,16 @@
     props.windowOpen('http://' + results.value.domain.url, '_blank')
   }
 
-  const goToAnalytics = () => {}
+  const goToAnalytics = () => {
+    router.push({ name: 'real-time-metrics' })
+  }
 
   const handleTrackCreation = () => {
     const trackerData = {
       productName: 'Edge Application',
       from: 'create',
       createdFrom: 'template',
-      ...solutionStore.solution
+      ...solutionStore?.solution
     }
     tracker.product.productCreated(trackerData).track()
   }
@@ -267,7 +292,7 @@
 
   onMounted(() => {
     intervalRef.value = setInterval(() => {
-      seconds.value += 1
+      timer.value += 1
     }, 1000)
     executionId.value = route.params.id
   })

@@ -3,15 +3,11 @@
   .p-sidebar-header {
     justify-content: space-between;
     font-size: 1.25rem !important;
+    min-height: 3.5rem !important;
     font-weight: 500 !important;
-    height: 3.5rem !important;
-    padding-left: 32px !important;
-    padding-right: 32px !important;
+    padding-left: 2rem !important;
+    padding-right: 2rem !important;
     border-bottom: 1px solid var(--surface-border) !important;
-  }
-
-  .p-sidebar-content {
-    padding: 10rem;
   }
 }
 

@@ -5,7 +5,7 @@
   >
     <div
       class="flex flex-col gap-2"
-      v-if="additionalDataInfo"
+      v-if="additionalDataInfo?.length"
     >
       <!-- Step 1: Use -->
 
@@ -185,6 +185,7 @@
       >
         {{ additionalDataInfo[5].key }}*
         <PrimeInputSwitch
+          class="flex-shrink-0"
           v-model="onboardingSession"
           name="onboardingSession"
           id="onboardingSession"
@@ -233,6 +234,7 @@
   const router = useRouter()
   const toast = useToast()
   const { userId } = useAccountStore()
+  const accountStore = useAccountStore()
 
   defineOptions({
     name: 'additional-data-form-block'
@@ -248,6 +250,10 @@
       required: true
     },
     patchFullnameService: {
+      type: Function,
+      required: true
+    },
+    updateAccountInfoService: {
       type: Function,
       required: true
     }
@@ -287,15 +293,18 @@
       is: (val) => val && val !== 'Just me',
       then: (schema) =>
         schema
-          .url('Company Website must be a valid URL')
+          .trim()
           .max(255, 'Company Website must be less than 255 characters')
-          .required('Company Website is a required field')
+          .matches(
+            /[-a-zA-Z0-9._+=]+\.[a-zA-Z0-9]+\b([-a-zA-Z0-9.]*)/,
+            'Company Website is a required field'
+          )
     }),
     fullName: yup
       .string()
       .trim()
-      .max(61, 'Full Name must be less than 61 characters')
-      .required('Full Name is a required field'),
+      .max(61, 'Your Full Name must be less than 61 characters')
+      .matches(/[A-zÀ-ž.'-]+ [A-zÀ-ž.'-]+/, 'Your Full Name is a required field'),
     onboardingSession: yup.boolean()
   })
 
@@ -370,15 +379,17 @@
     loading.value = true
 
     try {
+      const usersPayload = fullName.value
+      const accountPayload = role.value
       const additionalDataPayload = {
         ...values,
         id: userId
       }
 
-      const usersPayload = fullName.value
+      const updatedAccount = await props.updateAccountInfoService(accountPayload)
+      accountStore.setAccountData({ jobRole: updatedAccount.jobRole })
 
       const patchName = props.patchFullnameService(usersPayload)
-
       const postAddData = props.postAdditionalDataService({
         payload: additionalDataPayload,
         options: additionalDataInfo.value
@@ -388,8 +399,6 @@
       await postAddData
 
       tracker.signUp.submittedAdditionalData(values).track()
-
-      router.push({ name: 'home', query: { onboardingSession: 'true' } })
     } catch (err) {
       const errors = JSON.parse(err)
 
@@ -397,6 +406,10 @@
 
       tracker.signUp.failedSubmitAdditionalData(errors).track()
     } finally {
+      router.push({
+        name: 'home',
+        query: onboardingSession.value ? { onboardingSession: 'true' } : {}
+      })
       loading.value = false
     }
   }
@@ -413,6 +426,7 @@
   defineExpose({
     submitForm,
     loading,
+    hasFormValues: additionalDataInfo.value?.length,
     meta
   })
 </script>

@@ -11,8 +11,8 @@
   import { useField } from 'vee-validate'
   import { computed, ref, watch } from 'vue'
 
-  defineProps(['previewData'])
-  const emit = defineEmits(['update:previewData'])
+  defineProps(['previewData', 'lang'])
+  const emit = defineEmits(['update:previewData', 'update:lang'])
 
   const SPLITTER_PROPS = {
     height: '50vh',
@@ -21,7 +21,10 @@
   }
   const ARGS_INITIAL_STATE = '{}'
 
-  const showPreview = ref(true)
+  const previewState = ref(true)
+  const showPreview = computed(() => {
+    return previewState.value && language.value !== 'lua'
+  })
 
   const { value: name, errorMessage: nameError } = useField('name')
   const { value: isProprietaryCode } = useField('isProprietaryCode')
@@ -47,6 +50,7 @@
       lua: 'Lua'
     }
 
+    emit('update:lang', language.value)
     return languageLabels[language.value]
   })
 
@@ -155,8 +159,8 @@
       <Splitter
         :style="{ height: SPLITTER_PROPS.height }"
         class="mt-8 surface-border border rounded-md hidden md:flex"
-        @resizestart="showPreview = false"
-        @resizeend="showPreview = true"
+        @resizestart="previewState = false"
+        @resizeend="previewState = true"
         :layout="SPLITTER_PROPS.layout"
       >
         <SplitterPanel
@@ -166,7 +170,7 @@
           <CodeEditor
             v-model="code"
             :initialValue="initialCodeValue"
-            language="javascript"
+            :language="language"
             :errors="hasCodeError"
             :readOnly="isProprietaryCode"
           />
@@ -178,11 +182,11 @@
           </small>
         </SplitterPanel>
 
-        <SplitterPanel :size="SPLITTER_PROPS.panelsSizes[1]">
-          <CodePreview
-            v-if="showPreview"
-            :updateObject="updateObject"
-          />
+        <SplitterPanel
+          v-if="showPreview"
+          :size="SPLITTER_PROPS.panelsSizes[1]"
+        >
+          <CodePreview :updateObject="updateObject" />
         </SplitterPanel>
       </Splitter>
 
@@ -190,7 +194,7 @@
         <CodeEditor
           v-model="code"
           :initialValue="initialCodeValue"
-          language="javascript"
+          :language="language"
           :errors="hasCodeError"
         />
         <small
@@ -206,8 +210,8 @@
       <Splitter
         :style="{ height: SPLITTER_PROPS.height }"
         class="mt-8 surface-border border rounded-md hidden md:flex"
-        @resizestart="showPreview = false"
-        @resizeend="showPreview = true"
+        @resizestart="previewState = false"
+        @resizeend="previewState = true"
         :layout="SPLITTER_PROPS.layout"
       >
         <SplitterPanel :size="SPLITTER_PROPS.panelsSizes[0]">
@@ -219,11 +223,11 @@
           />
         </SplitterPanel>
 
-        <SplitterPanel :size="SPLITTER_PROPS.panelsSizes[1]">
-          <CodePreview
-            v-if="showPreview"
-            :updateObject="updateObject"
-          />
+        <SplitterPanel
+          v-if="showPreview"
+          :size="SPLITTER_PROPS.panelsSizes[1]"
+        >
+          <CodePreview :updateObject="updateObject" />
         </SplitterPanel>
       </Splitter>
       <div class="flex flex-col mt-8 surface-border border rounded-md md:hidden h-[50vh]">

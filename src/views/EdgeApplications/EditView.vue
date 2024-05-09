@@ -4,7 +4,7 @@
     :loadService="loadEdgeApplication"
     :updatedRedirect="props.updatedRedirect"
     :schema="validationSchema"
-    @on-edit-success="handleTrackSuccessEdit"
+    @on-edit-success="[handleTrackSuccessEdit, updatedStatusUnSaved]"
     @on-edit-fail="handleTrackFailEdit"
     disableRedirect
     :isTabs="true"
@@ -36,7 +36,10 @@
   defineOptions({ name: 'edit-edge-application' })
   const emit = defineEmits(['updatedApplication'])
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
+  import { handleTrackerError } from '@/utils/errorHandlingTracker'
+
   const tracker = inject('tracker')
+  const unsavedStatus = inject('unsaved')
 
   const props = defineProps({
     editEdgeApplicationService: {
@@ -60,15 +63,12 @@
     name: yup.string().required()
   })
 
-  const checkError = (error) => {
-    const [fieldName, ...restOfStringArr] = error.split(':')
-    const message = restOfStringArr.join(':').trim()
-
-    return { fieldName, message }
-  }
-
   const loadEdgeApplication = async () => {
     return props.edgeApplication
+  }
+
+  const updatedStatusUnSaved = () => {
+    unsavedStatus.formHasUpdated = false
   }
 
   const handleTrackSuccessEdit = () => {
@@ -80,7 +80,7 @@
       .track()
   }
   const handleTrackFailEdit = (error) => {
-    const { fieldName, message } = checkError(error)
+    const { fieldName, message } = handleTrackerError(error)
     tracker.product
       .failedToEdit({
         productName: 'Edge Application',

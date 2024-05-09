@@ -7,7 +7,7 @@ export const listVulcanPresetsService = () => {
   const vulcanPresets = [
     {
       label: 'Next.js',
-      value: 'nextjs'
+      value: 'next'
     },
     {
       label: 'Angular',
@@ -24,10 +24,6 @@ export const listVulcanPresetsService = () => {
     {
       label: 'React',
       value: 'react'
-    },
-    {
-      label: 'Vite',
-      value: 'vite'
     },
     {
       label: 'Vue',

@@ -4,6 +4,12 @@
       <PageHeadingBlock pageTitle="Real-Time Purge"></PageHeadingBlock>
     </template>
     <template #content>
+      <InlineMessage
+        class="w-fit mb-8"
+        severity="info"
+        >When creating a new purge, it's queued for execution and will appear in the history once
+        completed.
+      </InlineMessage>
       <ListTableBlock
         v-if="hasContentToList"
         :listService="props.listRealTimePurgeService"
@@ -38,6 +44,7 @@
   import EmptyResultsBlock from '@/templates/empty-results-block'
   import ListTableBlock from '@/templates/list-table-block'
   import PageHeadingBlock from '@/templates/page-heading-block'
+  import InlineMessage from 'primevue/inlinemessage'
   import { computed, ref } from 'vue'
 
   const props = defineProps({

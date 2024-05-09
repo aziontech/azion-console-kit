@@ -38,6 +38,8 @@
   import ContentBlock from '@/templates/content-block'
   import PageHeadingBlock from '@/templates/page-heading-block'
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
+  import { handleTrackerError } from '@/utils/errorHandlingTracker'
+
   const tracker = inject('tracker')
   import { useRoute } from 'vue-router'
   const route = useRoute()
@@ -62,9 +64,9 @@
     http3: false,
     httpPort: [{ name: '80 (Default)', value: '80' }],
     httpsPort: [{ name: '443 (Default)', value: '443' }],
-    minimumTlsVersion: { label: 'None', value: '' },
-    supportedVersion: { label: 'All', value: 'all' },
-    originType: { label: 'Single Origin', value: 'single_origin' },
+    minimumTlsVersion: 'none',
+    supportedCiphers: 'all',
+    originType: 'single_origin',
 
     address: '',
     originProtocolPolicy: 'preserve',
@@ -75,13 +77,6 @@
     cdnCacheSettingsMaximumTtl: 60,
     debugRules: false
   })
-
-  const checkError = (error) => {
-    const [fieldName, ...restOfStringArr] = error.split(':')
-    const message = restOfStringArr.join(':').trim()
-
-    return { fieldName, message }
-  }
 
   const handleBlocks = [
     'general',
@@ -100,7 +95,7 @@
   }
 
   const handleTrackFailedCreation = (error) => {
-    const { fieldName, message } = checkError(error)
+    const { fieldName, message } = handleTrackerError(error)
     tracker.product
       .failedToCreate({
         productName: 'Edge Application',
