@@ -20,6 +20,7 @@
         :isGraphql="true"
         :enableEditClick="false"
         emptyListMessage="No purge found."
+        :rowActions="actionsRow"
       >
       </ListTableBlock>
       <EmptyResultsBlock
@@ -60,6 +61,18 @@
   const handleLoadData = (event) => {
     hasContentToList.value = event
   }
+
+  const repurgeEvent = () => {}
+
+  const actionsRow = ref([
+    {
+      label: 'Repurge',
+      icon: 'pi pi-refresh',
+      command: (item) => {
+        repurgeEvent(item)
+      }
+    }
+  ])
 
   const getColumns = computed(() => {
     return [
