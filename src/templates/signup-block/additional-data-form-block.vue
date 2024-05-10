@@ -9,22 +9,22 @@
     >
       <!-- Step 1: Plan -->
       <FieldGroupRadio
-        :label="`${additionalDataInfo[0].key}*`"
+        :label="questionLabel('use')"
         nameField="use"
         auto
         hideSelector
-        :options="adaptOptions(additionalDataInfo[0].values)"
+        :options="adaptOptions('use')"
         @onRadioChange="updateStep('use')"
       />
 
       <!-- Step 2: Role -->
       <FieldGroupRadio
-        :label="`${additionalDataInfo[1].key}*`"
+        :label="questionLabel('role')"
         nameField="role"
         auto
         hideSelector
         :disabled="isFieldDisabled(stepOptions.role)"
-        :options="adaptOptions(additionalDataInfo[1].values)"
+        :options="adaptOptions('role')"
         @onRadioChange="updateStep('role')"
       />
 
@@ -57,12 +57,12 @@
       <!-- Step 3: Company Size -->
       <FieldGroupRadio
         v-if="showCompanySizeField"
-        :label="`${additionalDataInfo[2].key}*`"
+        :label="questionLabel('companySize')"
         nameField="companySize"
         auto
         hideSelector
         :disabled="isFieldDisabled(stepOptions.companySize)"
-        :options="adaptOptions(additionalDataInfo[2].values)"
+        :options="adaptOptions('companySize')"
         @onRadioChange="updateStep('companySize')"
       />
 
@@ -74,12 +74,12 @@
             :class="[disabledClass(stepOptions.fullName)]"
             for="fullName"
           >
-            {{ additionalDataInfo[3].key }}*
+            {{ questionLabel('fullName') }}
             <PrimeInputText
               v-model="fullName"
               name="fullName"
               id="fullName"
-              :disabled="isFieldDisabled(4)"
+              :disabled="isFieldDisabled(stepOptions.fullName)"
               @input="updateStep('fullName')"
             />
           </label>
@@ -103,7 +103,7 @@
             :class="[disabledClass(stepOptions.companySize)]"
             for="companyWebsite"
           >
-            {{ additionalDataInfo[4].key }}*
+            {{ questionLabel('companyWebsite') }}
             <PrimeInputText
               v-model="companyWebsite"
               name="companyWebsite"
@@ -122,7 +122,7 @@
 
       <!-- Step 5: Onboarding Session -->
       <FieldSwitchBlock
-        :title="`${additionalDataInfo[5].key}*`"
+        :title="questionLabel('onboardingSession')"
         name="onboardingSession"
         nameField="onboardingSession"
         :isCard="false"
@@ -310,13 +310,29 @@
     return companySize.value && companySize.value !== 'Just me'
   })
 
-  const adaptOptions = (options) => {
-    return options.map((option) => {
+  const questionsMap = {
+    use: 0,
+    role: 1,
+    companySize: 2,
+    fullName: 3,
+    companyWebsite: 4,
+    onboardingSession: 5
+  }
+
+  const adaptOptions = (step) => {
+    const options = additionalDataInfo?.value[questionsMap[step]]?.values
+
+    return options?.map((option) => {
       return {
         title: option.value,
         value: option.value
       }
     })
+  }
+
+  const questionLabel = (step, required = true) => {
+    const idx = questionsMap[step]
+    return required ? `${additionalDataInfo.value[idx]?.key}*` : additionalDataInfo.value[idx]?.key
   }
 
   const loading = ref(false)
