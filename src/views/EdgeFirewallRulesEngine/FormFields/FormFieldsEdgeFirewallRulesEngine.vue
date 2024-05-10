@@ -155,7 +155,7 @@
   const showNetworkListDropdownField = ({ criteriaIndex, criteriaInnerRowIndex }) => {
     const criteriaVariable = criteria.value[criteriaIndex].value[criteriaInnerRowIndex].variable
     const isCriteriaNetworkSelected = criteriaVariable === 'network'
-    const hasNetworkOptionsToSelect = networkListOptions.value.length && loadingNetworkList.value
+    const hasNetworkOptionsToSelect = networkListOptions.value.length
 
     if (isCriteriaNetworkSelected && !hasNetworkOptionsToSelect) {
       setNetworkListOptions()
@@ -474,6 +474,15 @@
       loadingNetworkList.value = false
     }
   }
+
+  const clearCriteriaArgument = ({
+    selectedCriteriaVariable,
+    criteriaIndex,
+    criteriaInnerRowIndex
+  }) => {
+    criteria.value[criteriaIndex].value[criteriaInnerRowIndex].variable = selectedCriteriaVariable
+    criteria.value[criteriaIndex].value[criteriaInnerRowIndex].argument = ''
+  }
 </script>
 <template>
   <FormHorizontal
@@ -550,6 +559,14 @@
                 <FieldDropdown
                   :id="`criteria[${criteriaIndex}][${criteriaInnerRowIndex}].variable`"
                   :options="generateCriteriaVariableOptions()"
+                  @onChange="
+                    (selectedCriteriaVariable) =>
+                      clearCriteriaArgument({
+                        selectedCriteriaVariable,
+                        criteriaIndex,
+                        criteriaInnerRowIndex
+                      })
+                  "
                   optionLabel="label"
                   optionValue="value"
                   optionDisabled="disabled"
@@ -603,6 +620,7 @@
                 optionValue="id"
                 v-bind:value="criteria[criteriaIndex].value[criteriaInnerRowIndex].argument"
                 inputClass="w-full"
+                :filter="true"
               />
             </div>
           </div>
