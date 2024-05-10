@@ -1,7 +1,7 @@
 <template>
   <ContentBlock>
     <template #heading>
-      <PageHeadingBlock pageTitle="Deploy" />
+      <PageHeadingBlock :pageTitle="hasApplicationName" />
     </template>
     <template #content>
       <div class="flex flex-col w-full gap-8">
@@ -141,6 +141,7 @@
   import { useToast } from 'primevue/usetoast'
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
+  import { useDeploy } from '@/stores/deploy'
 
   const props = defineProps({
     getLogsService: {
@@ -157,7 +158,10 @@
     }
   })
 
+  const deployStore = useDeploy()
+
   const executionId = ref('')
+  const applicationName = ref('')
   const route = useRoute()
   const router = useRouter()
   const toast = useToast()
@@ -253,6 +257,11 @@
     return `Project started ${minutes}m${seconds}s ago`
   })
 
+  const hasApplicationName = computed(() => {
+    if (applicationName.value) return `Deploy: ${applicationName.value}`
+    return 'Deploy'
+  })
+
   const goToPointTraffic = () => {
     props.windowOpen(
       'https://www.azion.com/en/documentation/products/guides/point-domain-to-azion/',
@@ -295,9 +304,11 @@
       timer.value += 1
     }, 1000)
     executionId.value = route.params.id
+    applicationName.value = deployStore.getApplicationName
   })
 
   onUnmounted(() => {
     clearInterval(intervalRef.value)
+    deployStore.removeApplicationName()
   })
 </script>
