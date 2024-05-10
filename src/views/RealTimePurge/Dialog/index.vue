@@ -3,10 +3,11 @@
   import PrimeDialog from 'primevue/dialog'
   import PrimeButton from 'primevue/button'
   import Message from 'primevue/message'
+  import Avatar from 'primevue/avatar'
 
   defineOptions({ name: 'dialog-real-time-purge' })
 
-  const emit = defineEmits(['update:visible', 'closeDialog', 'action'])
+  const emit = defineEmits(['update:visible', 'closeDialog', 'repurge'])
 
   const props = defineProps({
     visible: {
@@ -27,7 +28,7 @@
   }
 
   const handleRealTimePurge = () => {
-    emit('action')
+    emit('repurge')
     loading.value = true
   }
 
@@ -65,7 +66,7 @@
       <template #header>
         <h5 class="text-lg not-italic font-bold leading-5">Confirme Purge</h5>
       </template>
-      <div class="py-5 px-8 flex justify-center flex-col">
+      <div class="flex justify-center flex-col gap-4">
         <Message
           severity="warn"
           :closable="false"
@@ -84,7 +85,7 @@
             This may temporarily impact some URLs, causing a minor disruption.
           </p>
         </Message>
-        <div class="text-color font-semibold text-sm mb-2">
+        <div class="text-color font-semibold text-sm mb-2 px-8">
           This may temporarily impact some URLs, causing a minor disruption. Not to worry – it's
           expected to last only a few minutes!
         </div>
