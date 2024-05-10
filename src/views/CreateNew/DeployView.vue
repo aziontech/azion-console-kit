@@ -171,7 +171,9 @@
   const deployFailed = ref(false)
   const solutionStore = useSolutionStore()
   const failMessage =
-    'There was an issue while creating the edge application. Check the Deploy Log for more details.'
+    'There was an issue during the deployment. Check the Deploy Log for more details.'
+  const successMessage =
+    'The edge application is being propagated through the edge nodes. This process will take a few minutes.'
   const nextSteps = ref([
     {
       title: 'Customize Domain',
@@ -199,8 +201,7 @@
         closable: true,
         severity: 'success',
         summary: 'Created successfully',
-        detail:
-          'The edge application is being propagated through the edge nodes. This process will take a few minutes.'
+        detail: successMessage
       })
     } catch (error) {
       deployFailed.value = true
@@ -270,7 +271,7 @@
   }
 
   const goToUrl = () => {
-    props.windowOpen('http://' + results.value.domain.url, '_blank')
+    props.windowOpen('https://' + results.value.domain.url, '_blank')
   }
 
   const goToAnalytics = () => {
