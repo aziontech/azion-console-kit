@@ -4,6 +4,7 @@
   import CreateFormBlock from '@/templates/create-form-block'
   import PageHeadingBlock from '@/templates/page-heading-block'
   import { useLoadingStore } from '@/stores/loading'
+  import { useDeploy } from '@/stores/deploy'
   import { ref } from 'vue'
   import { useRoute } from 'vue-router'
   import * as yup from 'yup'
@@ -12,6 +13,7 @@
   import FormFieldsImportGithub from './FormFields/FormFieldsImportGithub.vue'
 
   const loadingStore = useLoadingStore()
+  const deployStore = useDeploy()
   const toast = useToast()
   const route = useRoute()
 
@@ -140,7 +142,7 @@
         value: formValues.rootDirectory
       }
     ]
-
+    deployStore.addApplicationName(formValues.applicationName)
     return props.instantiateTemplateService(templateId.value, inputSchema)
   }
 

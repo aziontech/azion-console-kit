@@ -41,6 +41,15 @@
     emit('updatedFirewall', values)
   }
 
+  const handleTrackSuccessEdit = () => {
+    tracker.product
+      .productEdited({
+        productName: 'Edge Firewall',
+        tab: 'mainSettings'
+      })
+      .track()
+  }
+
   const handleFailedEditeEdgeFirewall = (error) => {
     const { fieldName, message } = handleTrackerError(error)
     tracker.product
@@ -64,6 +73,7 @@
       disableRedirect
       :isTabs="true"
       @on-edit-fail="handleFailedEditeEdgeFirewall"
+      @on-edit-success="handleTrackSuccessEdit"
     >
       <template #form>
         <FormFieldsEdgeFirewall

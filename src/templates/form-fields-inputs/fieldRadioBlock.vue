@@ -14,6 +14,7 @@
         :value="props.value"
         v-model="inputValue"
         :binary="props.binary"
+        @change="emit('onRadioChange')"
       />
     </template>
     <template #footer>
@@ -30,6 +31,7 @@
   import { toRefs } from 'vue'
 
   defineOptions({ name: 'FieldRadioBlock' })
+  const emit = defineEmits(['onRadioChange'])
 
   const props = defineProps({
     title: {
