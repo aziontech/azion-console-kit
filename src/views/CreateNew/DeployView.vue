@@ -288,6 +288,16 @@
     tracker.product.productCreated(trackerData).track()
   }
 
+  const startTimer = () => {
+    deployStartTime.value = deployStore.getStartTime
+    const MILISEC_IN_SEC = 1000
+    const timerInitialValue = Math.trunc((Date.now() - deployStartTime.value) / MILISEC_IN_SEC)
+    timer.value = timerInitialValue
+    intervalRef.value = setInterval(() => {
+      timer.value += 1
+    }, 1000)
+  }
+ 
   const retry = () => {
     router.go(-1)
   }
@@ -303,13 +313,7 @@
   onMounted(() => {
     executionId.value = route.params.id
     applicationName.value = deployStore.getApplicationName
-    deployStartTime.value = deployStore.getStartTime
-    const MILISEC_IN_SEC = 1000
-    const startingTime = Math.trunc((Date.now() - deployStartTime.value)/MILISEC_IN_SEC)
-    timer.value = startingTime
-    intervalRef.value = setInterval(() => {
-      timer.value += 1
-    }, 1000)
+    startTimer()
   })
 
   onUnmounted(() => {

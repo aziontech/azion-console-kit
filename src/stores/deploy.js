@@ -1,13 +1,13 @@
 import { defineStore } from 'pinia'
 
 export const useDeploy = defineStore('deploy', {
-  state: () => ({ 
-    applicationName: '' ,
+  state: () => ({
+    applicationName: '',
     startTime: null
   }),
   getters: {
     getApplicationName: (state) => state.applicationName,
-    getStartTime: (state) => state.startTime,
+    getStartTime: (state) => state.startTime
   },
   actions: {
     addApplicationName(applicationName) {
