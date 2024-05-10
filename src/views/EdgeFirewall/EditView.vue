@@ -2,8 +2,11 @@
   import ActionBarTemplate from '@/templates/action-bar-block/action-bar-with-teleport'
   import EditFormBlock from '@/templates/edit-form-block'
   import FormFieldsEdgeFirewall from '@/views/EdgeFirewall/FormFields/FormFieldsEdgeFirewall'
-  import { ref } from 'vue'
+  import { ref, inject } from 'vue'
   import * as yup from 'yup'
+
+  /**@type {import('@/plugins/adapters/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
+  const tracker = inject('tracker')
 
   defineOptions({ name: 'edit-edge-firewall' })
   const emit = defineEmits(['updatedFirewall'])
@@ -35,6 +38,15 @@
     await onSubmit()
     emit('updatedFirewall', values)
   }
+
+  const handleTrackSuccessEdit = () => {
+    tracker.product
+      .productEdited({
+        productName: 'Edge Firewall',
+        tab: 'mainSettings'
+      })
+      .track()
+  }
 </script>
 
 <template>
@@ -46,6 +58,7 @@
       :updatedRedirect="updatedRedirect"
       disableRedirect
       :isTabs="true"
+      @on-edit-success="handleTrackSuccessEdit"
     >
       <template #form>
         <FormFieldsEdgeFirewall
