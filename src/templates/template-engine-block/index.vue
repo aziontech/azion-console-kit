@@ -401,8 +401,9 @@
           escapeErrorMessage(validator.errorMessage),
           function (value) {
             const domainRegex = new RegExp(validator.regex)
-            const shouldEscapeEmptyAndNotRequiredFields = value === undefined && !element.attrs.required
-            if (shouldEscapeEmptyAndNotRequiredFields) return true 
+            const shouldEscapeEmptyAndNotRequiredFields =
+              value === undefined && !element.attrs.required
+            if (shouldEscapeEmptyAndNotRequiredFields) return true
             return domainRegex.test(value)
           }
         )
