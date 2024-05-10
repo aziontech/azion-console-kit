@@ -29,6 +29,7 @@
 <script>
   import ActionBarTemplate from '@/templates/action-bar-block/action-bar-with-teleport'
   import DialogUnsavedBlock from '@/templates/dialog-unsaved-block'
+  import { TOAST_LIFE } from '@/utils/constants'
 
   export default {
     name: 'edit-form-block-no-header',
@@ -76,12 +77,19 @@
     methods: {
       showToast(severity, detail) {
         if (!detail) return
-        this.$toast.add({
+
+        const options = {
           closable: true,
           severity,
           summary: severity,
           detail
-        })
+        }
+
+        if (severity === 'success') {
+          options.life = TOAST_LIFE
+        }
+
+        this.$toast.add(options)
       },
       leavePage(dialogUnsaved) {
         dialogUnsaved = false

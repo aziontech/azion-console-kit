@@ -6,6 +6,7 @@
   import GoBack from '@/templates/action-bar-block/go-back'
   import Sidebar from 'primevue/sidebar'
   import DialogUnsavedBlock from '@/templates/dialog-unsaved-block'
+  import { TOAST_LIFE } from '@/utils/constants'
 
   defineOptions({
     name: 'edit-drawer-block'
@@ -98,12 +99,19 @@
 
   const showToast = (severity, detail) => {
     if (!detail) return
-    toast.add({
+
+    const options = {
       closable: true,
       severity,
       summary: severity,
       detail
-    })
+    }
+
+    if (severity === 'success') {
+      options.life = TOAST_LIFE
+    }
+
+    toast.add(options)
   }
 
   const loadInitialData = async () => {
