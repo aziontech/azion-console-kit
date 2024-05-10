@@ -159,15 +159,15 @@
   })
 
   const deployStore = useDeploy()
-
   const executionId = ref('')
   const applicationName = ref('')
+  const deployStartTime = ref()
+  const intervalRef = ref()
   const route = useRoute()
   const router = useRouter()
   const toast = useToast()
   const results = ref()
   const timer = ref(0)
-  const intervalRef = ref()
   const deployFailed = ref(false)
   const solutionStore = useSolutionStore()
   const failMessage =
@@ -194,6 +194,7 @@
   const handleFinish = async () => {
     try {
       const response = await props.getResultsService(route.params.id)
+      deployStore.removeStartTime()
       results.value = response.result
       toast.add({
         closable: true,
@@ -300,11 +301,15 @@
   }
 
   onMounted(() => {
+    executionId.value = route.params.id
+    applicationName.value = deployStore.getApplicationName
+    deployStartTime.value = deployStore.getStartTime
+    const MILISEC_IN_SEC = 1000
+    const startingTime = Math.trunc((Date.now() - deployStartTime.value)/MILISEC_IN_SEC)
+    timer.value = startingTime
     intervalRef.value = setInterval(() => {
       timer.value += 1
     }, 1000)
-    executionId.value = route.params.id
-    applicationName.value = deployStore.getApplicationName
   })
 
   onUnmounted(() => {
