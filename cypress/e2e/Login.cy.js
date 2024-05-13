@@ -1,18 +1,6 @@
 /// <reference types="Cypress" />
 
 describe('Login Journey', () => {
-  // it('Should be able to login with email credentials', () => {
-  //   cy.visit('/login')
-
-  //   cy.getByTestId('title').should('have.text', ' Azion Console ')
-  //   cy.getInput('email').type('needToBeInjectedByEnv')
-  //   cy.getByTestId('next-button').click()
-  //   cy.getInput('password').type('needToBeInjectedByEnv')
-  //   cy.getByTestId('submit').click()
-
-  //   cy.url().should('include', '/')
-  // })
-
   it('Should not be able to sign in with invalid email credentials', () => {
     cy.visit('/login')
     const invalidEmail = 'some-invalid-email--azion.com'
@@ -28,7 +16,7 @@ describe('Login Journey', () => {
     cy.visit('/login')
 
     cy.getByTestId('title').should('have.text', ' Azion Console ')
-    cy.getInput('email').as('emailInput').type('abc@123.com')
+    cy.getInput('email').as('emailInput').type(Cypress.env('username'))
     cy.getByTestId('next-button').click()
     cy.getInput('password').type(' ')
     cy.getByTestId('submit').click()
@@ -40,7 +28,7 @@ describe('Login Journey', () => {
     cy.visit('/login')
 
     cy.getByTestId('title').should('have.text', ' Azion Console ')
-    cy.getInput('email').as('emailInput').type('abc@123.com')
+    cy.getInput('email').as('emailInput').type(Cypress.env('username'))
     cy.getByTestId('next-button').click()
     cy.getByTestId('forgot-password').click()
     cy.getInput('email').as('recoverEmailInput').type('abc@123.com')

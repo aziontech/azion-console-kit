@@ -33,6 +33,7 @@
               icon="pi pi-plus"
               class="w-full sm:w-auto"
               label="Create"
+              data-testid="create-button"
               type="button"
               size="small"
               @click="openModalCreate"

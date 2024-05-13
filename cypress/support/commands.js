@@ -34,3 +34,37 @@ Cypress.Commands.add('getByTestId', (selector, ...args) => {
 Cypress.Commands.add('getInput', (inputType, ...args) => {
   return cy.get(`input[type=${inputType}]`, ...args)
 })
+
+function loginWithEmail(email, password) {
+  cy.session(
+    [email, password],
+    () => {
+      cy.visit('/login')
+      cy.getByTestId('title').should('have.text', ' Azion Console ')
+      cy.getInput('email').type(email)
+      cy.getByTestId('next-button').click()
+      cy.getInput('password').type(password, { log: false })
+      cy.getByTestId('submit').click()
+      cy.url().should('include', '/')
+    },
+    {
+      validate: () => {
+        cy.contains('Get Started')
+      }
+    }
+  )
+}
+
+Cypress.Commands.add('loginWithEmail', (email, password) => {
+  // const log = Cypress.log({
+  //   displayName: 'AUTH',
+  //   message: [`🔐 Authenticating | ${email}`],
+  //   autoEnd: false
+  // })
+  // log.snapshot('before')
+
+  loginWithEmail(email, password)
+
+  // log.snapshot('after')
+  // log.end()
+})
