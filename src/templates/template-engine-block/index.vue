@@ -502,6 +502,7 @@
       if (formTools.value?.values?.application_name) {
         deployStore.addApplicationName(formTools.value.values.application_name)
       }
+      deployStore.addStartTime()
       emit('instantiate', response)
     } catch (error) {
       toast.add({
