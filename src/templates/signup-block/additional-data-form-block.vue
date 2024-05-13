@@ -364,7 +364,7 @@
     } catch (err) {
       const errors = JSON.parse(err)
 
-      toast.add({ life: 5000, severity: 'error', detail: errors.errorMessage, summary: 'Error' })
+      toast.add({ severity: 'error', detail: errors.errorMessage, summary: 'Error' })
 
       tracker.signUp.failedSubmitAdditionalData(errors).track()
     } finally {

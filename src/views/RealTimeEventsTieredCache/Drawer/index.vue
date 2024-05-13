@@ -7,6 +7,8 @@
   import Divider from 'primevue/divider'
   import { useToast } from 'primevue/usetoast'
   import { computed, ref, watch } from 'vue'
+  import { TOAST_LIFE } from '@/utils/constants'
+
   defineOptions({ name: 'drawer-events-tiered-cache' })
 
   const props = defineProps({
@@ -52,7 +54,8 @@
     toast.add({
       closable: true,
       severity: 'success',
-      summary: 'Successfully copied!'
+      summary: 'Successfully copied!',
+      life: TOAST_LIFE
     })
   }
 

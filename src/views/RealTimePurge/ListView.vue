@@ -54,6 +54,9 @@
   import InlineMessage from 'primevue/inlinemessage'
   import DialogPurge from './Dialog'
   import { computed, ref } from 'vue'
+  import { TOAST_LIFE } from '@/utils/constants'
+  import { useToast } from 'primevue/usetoast'
+
 
   const props = defineProps({
     listRealTimePurgeService: { required: true, type: Function },
@@ -71,6 +74,7 @@
   const showDialogPurge = ref(false)
   const isLoading = ref(false)
   const purgeToRepurge = ref()
+  const toast = useToast()
 
   const handleLoadData = (event) => {
     hasContentToList.value = event
@@ -86,6 +90,22 @@
     purgeToRepurge.value = item
   }
 
+  const showToast = (severity, detail) => {
+    if (!detail) return
+    const options = {
+      closable: true,
+      severity,
+      summary: severity,
+      detail
+    }
+
+    if (severity === 'success') {
+      options.life = TOAST_LIFE
+    }
+
+    toast.add(options)
+  }
+
   const repurgeEvent = async () => {
     const dataPurge = {
       purgeType: purgeToRepurge.value.type,
@@ -93,9 +113,10 @@
       layer: purgeToRepurge.value.layer
     }
     try {
-      await props.createRealTimePurgeService(dataPurge)
-    } catch  {
-      isLoading.value = false
+      const { feedback } = await props.createRealTimePurgeService(dataPurge)
+      showToast('success', feedback)
+    } catch (error)  {
+      showToast('error', error)
     } 
     finally {
       isLoading.value = false

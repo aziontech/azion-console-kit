@@ -5,6 +5,8 @@
   import { useRouter } from 'vue-router'
   import { useToast } from 'primevue/usetoast'
   import { useAccountStore } from '@/stores/account'
+  import { TOAST_LIFE } from '@/utils/constants'
+
   /**@type {import('@/plugins/adapters/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
   defineOptions({
@@ -137,12 +139,18 @@
 
   const showToast = (severity, detail) => {
     if (!detail) return
-    toast.add({
+    const options = {
       closable: true,
       severity,
       summary: severity,
       detail
-    })
+    }
+
+    if (severity === 'success') {
+      options.life = TOAST_LIFE
+    }
+
+    toast.add(options)
   }
 
   const redirectToSolution = (template, section) => {

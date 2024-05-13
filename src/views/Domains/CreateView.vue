@@ -38,6 +38,7 @@
   import PageHeadingBlock from '@/templates/page-heading-block'
   import FormFieldsCreateDomains from './FormFields/FormFieldsCreateDomains.vue'
   import ActionBarTemplate from '@/templates/action-bar-block/action-bar-with-teleport'
+  import { TOAST_LIFE } from '@/utils/constants'
 
   import * as yup from 'yup'
 
@@ -69,11 +70,17 @@
     digitalCertificates.value = await props.listDigitalCertificatesService({})
   }
   const showToast = (severity, summary) => {
-    toast.add({
+    const options = {
       closable: true,
       severity,
       summary
-    })
+    }
+
+    if (severity === 'success') {
+      options.life = TOAST_LIFE
+    }
+
+    toast.add(options)
   }
 
   const toastError = (error) => {

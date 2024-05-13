@@ -5,7 +5,9 @@
   import { ref, inject } from 'vue'
   import * as yup from 'yup'
 
-  /**@type {import('@/plugins/adapters/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
+  /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
+  import { handleTrackerError } from '@/utils/errorHandlingTracker'
+
   const tracker = inject('tracker')
 
   defineOptions({ name: 'edit-edge-firewall' })
@@ -47,6 +49,18 @@
       })
       .track()
   }
+
+  const handleFailedEditeEdgeFirewall = (error) => {
+    const { fieldName, message } = handleTrackerError(error)
+    tracker.product
+      .failedToEdit({
+        productName: 'Edge Firewall',
+        errorType: 'api',
+        fieldName: fieldName.trim(),
+        errorMessage: message
+      })
+      .track()
+  }
 </script>
 
 <template>
@@ -58,6 +72,7 @@
       :updatedRedirect="updatedRedirect"
       disableRedirect
       :isTabs="true"
+      @on-edit-fail="handleFailedEditeEdgeFirewall"
       @on-edit-success="handleTrackSuccessEdit"
     >
       <template #form>
