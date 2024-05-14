@@ -6,6 +6,7 @@ export default defineConfig({
   e2e: {
     specPattern: 'cypress/e2e/**/*.{cy,spec}.{js,jsx,ts,tsx}',
     baseUrl: 'http://localhost:5173',
-    defaultCommandTimeout: 8000
+    defaultCommandTimeout: 8000,
+    experimentalStudio: true
   }
 })

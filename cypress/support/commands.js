@@ -45,12 +45,10 @@ function loginWithEmail(email, password) {
       cy.getByTestId('next-button').click()
       cy.getInput('password').type(password, { log: false })
       cy.getByTestId('submit').click()
-      cy.url().should('include', '/')
+      cy.document().its('cookie').should('contain', 'ajs_user_id')
     },
     {
-      validate: () => {
-        cy.contains('Get Started')
-      }
+      cacheAcrossSpecs: true
     }
   )
 }
