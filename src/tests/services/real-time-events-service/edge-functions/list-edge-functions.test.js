@@ -12,13 +12,11 @@ const fixtures = {
   },
   edgeFunction: {
     configurationId: '123',
-    edgeFunctionsInstanceIdList: ['instance-456', 'instance-789'],
+    functionLanguage: 'JavaScript',
     edgeFunctionsInitiatorTypeList: ['typeA', 'typeB'],
     edgeFunctionsList: 'function-1; function-2; function-3',
-    edgeFunctionsSolutionId: 'solution-abc',
-    edgeFunctionsTime: new Date().toISOString(),
-    functionLanguage: 'JavaScript',
-    ts: '2024-02-23T18:07:25.000Z'
+    edgeFunctionsTime: '1000',
+    ts: '2024-02-23T18:07:25'
   }
 }
 
@@ -50,12 +48,10 @@ describe('EdgeFunctionsServices', () => {
       `    }`,
       `  ) {`,
       `    configurationId`,
-      `    edgeFunctionsInstanceIdList`,
+      `    functionLanguage`,
       `    edgeFunctionsInitiatorTypeList`,
       `    edgeFunctionsList`,
-      `    edgeFunctionsSolutionId`,
       `    edgeFunctionsTime`,
-      `    functionLanguage`,
       `    ts`,
       `  }`,
       `}`
@@ -92,13 +88,12 @@ describe('EdgeFunctionsServices', () => {
       {
         id: 'mocked-timestamp',
         configurationId: fixtures.edgeFunction.configurationId,
-        edgeFunctionsInstanceIdList: fixtures.edgeFunction.edgeFunctionsInstanceIdList,
+        functionLanguage: fixtures.edgeFunction.functionLanguage,
         edgeFunctionsInitiatorTypeList: fixtures.edgeFunction.edgeFunctionsInitiatorTypeList,
         edgeFunctionsList: ['function-1', ' function-2', ' function-3'],
-        edgeFunctionsSolutionId: fixtures.edgeFunction.edgeFunctionsSolutionId,
-        edgeFunctionsTime: fixtures.edgeFunction.edgeFunctionsTime,
-        functionLanguage: fixtures.edgeFunction.functionLanguage,
-        ts: fixtures.edgeFunction.ts
+        edgeFunctionsTime: `${fixtures.edgeFunction.edgeFunctionsTime}ms`,
+        ts: fixtures.edgeFunction.ts,
+        tsFormat: 'February 23, 2024 at 06:07 PM'
       }
     ])
   })
