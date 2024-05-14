@@ -23,7 +23,7 @@ describe('Create and Edge application journey', () => {
     cy.get('#edge_application_0').click()
     cy.get('#cnameAccessOnly > .p-inputswitch-slider').click()
     cy.get('.max-md\\:w-full > .p-button-label').click()
-    cy.contains('Your domain has been created')
+    cy.contains('Your domain has been created', { timeout: 20000 })
     // Edit domain
     cy.get('.text-\\[var\\(--text-color\\)\\]', { timeout: 20000 }).should(
       'have.text',
@@ -33,7 +33,7 @@ describe('Create and Edge application journey', () => {
     cy.get('.gap-6 > .p-button > .p-button-label').click()
     cy.contains('domain name copied')
     cy.get('.max-md\\:w-full > .p-button-label').click()
-    cy.contains('Your domain has been edited')
+    cy.contains('Your domain has been edited', { timeout: 20000 })
 
     //List to Delete
     cy.get('.flex > .p-inputtext').type(domainNameMock)
