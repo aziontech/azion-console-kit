@@ -78,7 +78,14 @@ const router = createRouter({
     realTimeEventsRoutes,
     githubRoutes,
     importGithubRoutes
-  ].concat(errorRoutes)
+  ].concat(errorRoutes),
+  scrollBehavior: (to, from, savedScrollPosition) => {
+    if (savedScrollPosition) {
+      return savedScrollPosition
+    } else {
+      return { top: 0 }
+    }
+  }
 })
 
 router.beforeEach(beforeEachRoute)
