@@ -81,7 +81,7 @@ function formatC3XAxis(chartData, resultChart) {
  * @param {number} data - The data to be formatted
  * @returns {string} - Returns the formatted data for percentage display
  */
-export function formatPercentageDataUnit(data) {
+function formatPercentageDataUnit(data) {
   return Intl.NumberFormat('en', {
     style: 'percent',
     maximumFractionDigits: CHART_RULES.TO_FIXED_PERCENTAGE,
@@ -95,7 +95,7 @@ export function formatPercentageDataUnit(data) {
  * @param {Object} chartData - The chart data
  * @returns {string} - Returns the formatted data for byte unit display
  */
-export function formatBytesDataUnit(data, chartData) {
+function formatBytesDataUnit(data, chartData) {
   let value = data
   let unit = 'byte'
 
@@ -147,7 +147,7 @@ function formatDataUnit(data) {
  * @param {Object} chartData - The chart data
  * @returns {string} - Returns the formatted Y axis labels for the C3 chart
  */
-export function formatYAxisLabels(data, chartData) {
+function formatYAxisLabels(data, chartData) {
   if (chartData.dataUnit === 'bytes' || chartData.dataUnit === 'bitsPerSecond') {
     return formatBytesDataUnit(data, chartData)
   }
@@ -168,7 +168,7 @@ export function formatYAxisLabels(data, chartData) {
  * @param {Object} chartData - The chart data
  * @returns {Object} - Returns the formatted Y axis of the C3 chart
  */
-export function formatC3YAxis(chartData) {
+function formatC3YAxis(chartData) {
   const isRotated = chartData.rotated
   const yAxis = {
     /**
