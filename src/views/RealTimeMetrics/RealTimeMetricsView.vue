@@ -9,16 +9,16 @@
     >
       <TabsPageBlock
         :key="groupData.current?.id"
-        :moduleActions="RealTimeMetricsModule.actions"
-        :moduleGetters="RealTimeMetricsModule.getters"
+        :moduleActions="metricsModule.actions"
+        :moduleGetters="metricsModule.getters"
         :groupData="groupData"
         :userUTC="userUTC"
       />
       <div class="card surface-border border rounded-md surface-section p-3.5 flex flex-col gap-4">
         <IntervalFilterBlock
           :key="filterData.current?.id"
-          :moduleActions="RealTimeMetricsModule.actions"
-          :moduleGetters="RealTimeMetricsModule.getters"
+          :moduleActions="metricsModule.actions"
+          :moduleGetters="metricsModule.getters"
           :filterData="filterData"
           :userUTC="userUTC"
           @applyTSRange="load"
@@ -26,8 +26,8 @@
         <ContentFilterBlock
           :key="filterData.current?.id"
           :playgroundOpener="playgroundOpener"
-          :moduleActions="RealTimeMetricsModule.actions"
-          :moduleGetters="RealTimeMetricsModule.getters"
+          :moduleActions="metricsModule.actions"
+          :moduleGetters="metricsModule.getters"
           :filterData="filterData"
           :groupData="groupData"
           :userUTC="userUTC"
@@ -37,8 +37,8 @@
         v-if="reportData"
         :key="groupData.currentDashboard?.id"
         :clipboardWrite="clipboardWrite"
-        :moduleActions="RealTimeMetricsModule.actions"
-        :moduleGetters="RealTimeMetricsModule.getters"
+        :moduleActions="metricsModule.actions"
+        :moduleGetters="metricsModule.getters"
         :reportData="reportData"
         :groupData="groupData"
         :userUTC="userUTC"
@@ -77,6 +77,7 @@
   const accountStore = useAccountStore()
   const userUTC = accountStore.accountUtcOffset
 
+  const metricsModule = RealTimeMetricsModule()
   const {
     getters: { currentIdPageAndDashboard, getCurrentInfo },
     actions: {
@@ -89,7 +90,7 @@
     groupObservable,
     filterObservable,
     reportObservable
-  } = RealTimeMetricsModule
+  } = metricsModule
 
   /* Module state */
 
