@@ -173,6 +173,7 @@
         @onSubmit="handleSubmit"
         @onCancel="handleCancel"
         :submitDisabled="!formTools.meta.valid || !formTools.meta.touched"
+        primaryActionLabel="Deploy"
       />
     </Teleport>
   </div>

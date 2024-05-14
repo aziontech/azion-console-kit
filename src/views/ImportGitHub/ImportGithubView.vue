@@ -201,6 +201,7 @@
             @onCancel="onCancel"
             :loading="loading"
             :submitDisabled="!formValid"
+            primaryActionLabel="Deploy"
           />
         </template>
       </CreateFormBlock>
