@@ -37,10 +37,12 @@ export const listRealTimePurgeService = async (
 }
 
 const adapt = (httpResponse) => {
-  const requestData = httpResponse.body.data.activityHistoryEvents.map((item) => {
+  const requestData = httpResponse.body.data.activityHistoryEvents.map((item, index) => {
+    const id = `${item.ts}-${index}`
     const [, type] = item.resourceType.split(':')
     const { items, layer } = JSON.parse(JSON.parse(item.requestData))
     return {
+      id,
       type,
       arguments: items,
       layer,

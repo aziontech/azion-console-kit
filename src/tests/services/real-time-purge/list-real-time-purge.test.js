@@ -98,8 +98,11 @@ describe('ListRealTimePurgeService', () => {
     })
     const { sut } = makeSut()
     const result = await sut({})
+
+    const idExpected = `${purge[0].ts}-0`
     expect(result).toEqual([
       {
+        id: idExpected,
         type: fixtures.realTimePurgeMock.type,
         arguments: fixtures.realTimePurgeMock.arguments,
         layer: fixtures.realTimePurgeMock.layer,

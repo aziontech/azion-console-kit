@@ -54,9 +54,9 @@
   import InlineMessage from 'primevue/inlinemessage'
   import DialogPurge from './Dialog'
   import { computed, ref } from 'vue'
+  import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
   import { TOAST_LIFE } from '@/utils/constants'
   import { useToast } from 'primevue/usetoast'
-
 
   const props = defineProps({
     listRealTimePurgeService: { required: true, type: Function },
@@ -72,7 +72,7 @@
 
   const hasContentToList = ref(true)
   const showDialogPurge = ref(false)
-  const isLoading = ref(false)
+  const isLoading = ref(null)
   const purgeToRepurge = ref()
   const toast = useToast()
 
@@ -115,11 +115,11 @@
     try {
       const { feedback } = await props.createRealTimePurgeService(dataPurge)
       showToast('success', feedback)
-    } catch (error)  {
+    } catch (error) {
       showToast('error', error)
-    } 
-    finally {
+    } finally {
       isLoading.value = false
+      closeDialog()
     }
   }
 
@@ -153,7 +153,11 @@
       },
       {
         field: 'arguments',
-        header: 'Arguments'
+        header: 'Arguments',
+        filterPath: 'arguments.content',
+        type: 'component',
+        component: (columnData) =>
+          columnBuilder({ data: columnData, columnAppearance: 'expand-column' })
       }
     ]
   })
