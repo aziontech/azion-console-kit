@@ -6,7 +6,6 @@
   import IntervalFilterBlock from '@/views/RealTimeEvents/blocks/interval-filter-block'
   import Drawer from './Drawer'
   import { useRouter } from 'vue-router'
-  import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
   const emit = defineEmits(['update:dateTime'])
 
   const props = defineProps({
@@ -70,10 +69,6 @@
   const getColumns = computed(() => {
     return [
       {
-        field: 'bytesSent',
-        header: 'Bytes Sent'
-      },
-      {
         field: 'configurationId',
         header: 'Configuration ID'
       },
@@ -82,24 +77,20 @@
         header: 'Host'
       },
       {
-        field: 'httpReferer',
-        header: 'HTTP Referer',
-        type: 'component',
-        filterPath: 'httpReferer',
-        component: (columnData) =>
-          columnBuilder({ data: columnData, columnAppearance: 'expand-text-column' })
+        field: 'requestUri',
+        header: 'Request Uri'
       },
       {
-        field: 'httpUserAgent',
-        header: 'HTTP User Agent',
-        type: 'component',
-        filterPath: 'httpUserAgent',
-        component: (columnData) =>
-          columnBuilder({ data: columnData, columnAppearance: 'expand-text-column' })
+        field: 'status',
+        header: 'Status'
       },
       {
-        field: 'referenceError',
-        header: 'Reference Error'
+        field: 'bytesSent',
+        header: 'Bytes Sent'
+      },
+      {
+        field: 'tsFormat',
+        header: 'TS'
       }
     ]
   })
