@@ -106,7 +106,7 @@
             v-if="showActions"
           >
             <PrimeMenu
-              :ref="(doc) => (menuRef[rowData.id] = doc)"
+              :ref="(document) => (menuRef[rowData.id] = document)"
               id="overlay_menu"
               v-bind:model="actionOptions(rowData)"
               :popup="true"
@@ -344,7 +344,7 @@
   const menuRef = ref({})
   const toggleActionsMenu = (event, selectedID) => {
     if (!selectedID) {
-      throw new Error('rowData id not found')
+      throw new Error('Please provide an id for each data item through the service adapter')
     }
     selectedId.value = selectedID
     menuRef.value[selectedID].toggle(event)
