@@ -1,44 +1,65 @@
 <script setup>
   import PrimeButton from 'primevue/button'
   import advancedFilter from '@/templates/advanced-filter'
-  import { storeToRefs } from 'pinia'
-  import { useMetricsStore } from '@/stores/metrics'
   import { computed, ref, watch } from 'vue'
   import { MAP_SERVICE_OPERATION } from '@modules/real-time-metrics/constants'
   import { GetRelevantField } from '@/modules/real-time-metrics/filters'
 
-  const metricsStore = useMetricsStore()
   const {
     getDatasetAvailableFilters,
     infoAvailableFiltersCurrent,
     getIsLoadingFilters,
     dashboardCurrent,
     currentFilters
-  } = storeToRefs(metricsStore)
+  } = props.moduleGetters
 
   const { setTimeRange, filterDatasetUpdate, createAndFilter, loadCurrentReports, resetFilters } =
-    metricsStore
+    props.moduleActions
 
   const props = defineProps({
     playgroundOpener: {
       type: Function,
+      required: true
+    },
+    moduleActions: {
+      type: Object,
+      required: true
+    },
+    moduleGetters: {
+      type: Object,
+      required: true
+    },
+    filterData: {
+      type: Object,
+      required: true
+    },
+    groupData: {
+      type: Object,
+      required: true
+    },
+    userUTC: {
+      type: String,
       required: true
     }
   })
   const refAdvancedFilter = ref('')
 
   const disabledFilter = computed(() => {
-    return getIsLoadingFilters.value
+    return getIsLoadingFilters({ filters: props.filterData })
+  })
+
+  const currentDashboard = computed(() => {
+    return dashboardCurrent({ group: props.groupData })
   })
 
   const optionsFields = computed(() => {
-    const infoOptions = infoAvailableFiltersCurrent.value
-    const options = getDatasetAvailableFilters.value
+    const infoOptions = infoAvailableFiltersCurrent({ filters: props.filterData })
+    const options = getDatasetAvailableFilters({ filters: props.filterData })
 
     if (!options.length) return []
     if (!infoOptions) return []
 
-    const { dataset } = dashboardCurrent.value
+    const { dataset } = currentDashboard.value
 
     const newOptions = options.map(({ label, operator, value }) => {
       const info = infoOptions[dataset][value]
@@ -64,7 +85,7 @@
 
   const timeFilter = computed({
     get: () => {
-      return currentFilters.value
+      return currentFilters({ filters: props.filterData })
     },
     set: ({ tsRange }) => {
       if (!tsRange?.meta) return
@@ -143,11 +164,11 @@
       resetFilters()
     }
 
-    await loadCurrentReports()
+    await loadCurrentReports(props.userUTC)
   }
 
   watch(
-    () => dashboardCurrent.value,
+    () => currentDashboard.value,
     async () => {
       refAdvancedFilter.value.clearDisplayFilter()
     }
