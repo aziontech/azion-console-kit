@@ -5,11 +5,12 @@ import LoadReportWithMeta from './load-report-with-meta'
  *
  * @param {object} filters - The filters to apply to the report aggregation.
  * @param {string} report - The name of the report to retrieve the aggregation for.
+ * @param {string} userUTC - The user time zone
  * @return {object | null} The current aggregation result for the specified report.
  */
-async function getCurrentReportAggregation({ filters, report }) {
+async function getCurrentReportAggregation({ filters, report, userUTC }) {
   try {
-    const currentReportResults = await LoadReportWithMeta(filters, report)
+    const currentReportResults = await LoadReportWithMeta(filters, report, userUTC)
 
     const currentAggregation = currentReportResults.resultQuery[report.dataset][0]
 
@@ -43,15 +44,16 @@ function getTimeRangeDifference(timeRange) {
  *
  * @param {Object} filters - The filters to be applied to the report.
  * @param {Object} report - The report object containing the reportQuery and dataset.
+ * @param {string} userUTC - The user time zone
  * @return {Object | null} The previous aggregation result.
  */
-async function getPreviousReportAggregation({ filters, report }) {
+async function getPreviousReportAggregation({ filters, report, userUTC }) {
   try {
     const previousReportFilter = getTimeRangeDifference(report.reportQuery.variables)
 
     const newFilters = { ...filters, tsRange: { ...filters.tsRange, ...previousReportFilter } }
 
-    const previousReportResults = await LoadReportWithMeta(newFilters, report)
+    const previousReportResults = await LoadReportWithMeta(newFilters, report, userUTC)
 
     const previousAggregation = previousReportResults.resultQuery[report.dataset][0]
 
@@ -87,16 +89,19 @@ function getFeedbackDifference(currentAggregation, previousAggregation) {
  *
  * @param {Object} filters - the filters to apply
  * @param {Object} report - the report data
+ * @param {string} userUTC - the user time zone
  * @return {number} the difference in feedback between current and previous aggregations
  */
-export default async function LoadReportVariation({ filters, report }) {
+export default async function LoadReportVariation({ filters, report, userUTC }) {
   const currentAggregation = await getCurrentReportAggregation({
     filters,
-    report
+    report,
+    userUTC
   })
   const previousAggregation = await getPreviousReportAggregation({
     filters,
-    report
+    report,
+    userUTC
   })
 
   return getFeedbackDifference(currentAggregation, previousAggregation)
