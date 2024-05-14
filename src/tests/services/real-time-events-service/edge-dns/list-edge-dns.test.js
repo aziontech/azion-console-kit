@@ -12,13 +12,13 @@ const fixtures = {
   },
   edgeDns: {
     level: 'ERROR',
+    zoneId: 'zone-67890',
     qtype: 'A',
     resolutionType: 'RESOLVED',
-    source: 'internal',
     solutionId: 'sol-123',
     ts: '2024-02-23T18:07:25.000Z',
-    uuid: 'uuid-12345',
-    zoneId: 'zone-67890'
+    source: 'internal',
+    uuid: 'uuid-12345'
   }
 }
 
@@ -50,13 +50,13 @@ describe('edgeDns', () => {
       `    }`,
       `  ) {`,
       `    level`,
+      `    zoneId`,
       `    qtype`,
       `    resolutionType`,
-      `    source`,
       `    solutionId`,
       `    ts`,
+      `    source`,
       `    uuid`,
-      `    zoneId`,
       `  }`,
       `}`
     ].join('\n')
@@ -101,6 +101,7 @@ describe('edgeDns', () => {
         source: fixtures.edgeDns.source,
         solutionId: fixtures.edgeDns.solutionId,
         ts: fixtures.edgeDns.ts,
+        tsFormat: 'February 23, 2024 at 06:07 PM',
         uuid: fixtures.edgeDns.uuid,
         zoneId: fixtures.edgeDns.zoneId
       }
