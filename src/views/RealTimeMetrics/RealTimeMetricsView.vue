@@ -9,16 +9,16 @@
     >
       <TabsPageBlock
         :key="groupData.current?.id"
-        :moduleActions="metricsModule.actions"
-        :moduleGetters="metricsModule.getters"
+        :moduleActions="RealTimeMetricsModule.actions"
+        :moduleGetters="RealTimeMetricsModule.getters"
         :groupData="groupData"
         :userUTC="userUTC"
       />
       <div class="card surface-border border rounded-md surface-section p-3.5 flex flex-col gap-4">
         <IntervalFilterBlock
           :key="filterData.current?.id"
-          :moduleActions="metricsModule.actions"
-          :moduleGetters="metricsModule.getters"
+          :moduleActions="RealTimeMetricsModule.actions"
+          :moduleGetters="RealTimeMetricsModule.getters"
           :filterData="filterData"
           :userUTC="userUTC"
           @applyTSRange="load"
@@ -26,8 +26,8 @@
         <ContentFilterBlock
           :key="filterData.current?.id"
           :playgroundOpener="playgroundOpener"
-          :moduleActions="metricsModule.actions"
-          :moduleGetters="metricsModule.getters"
+          :moduleActions="RealTimeMetricsModule.actions"
+          :moduleGetters="RealTimeMetricsModule.getters"
           :filterData="filterData"
           :groupData="groupData"
           :userUTC="userUTC"
@@ -37,8 +37,8 @@
         v-if="reportData"
         :key="groupData.currentDashboard?.id"
         :clipboardWrite="clipboardWrite"
-        :moduleActions="metricsModule.actions"
-        :moduleGetters="metricsModule.getters"
+        :moduleActions="RealTimeMetricsModule.actions"
+        :moduleGetters="RealTimeMetricsModule.getters"
         :reportData="reportData"
         :groupData="groupData"
         :userUTC="userUTC"
@@ -49,7 +49,7 @@
 
 <script setup>
   import { useAccountStore } from '@/stores/account'
-  import * as RealTimeMetricsModule from '@/modules/real-time-metrics'
+  import RealTimeMetricsModule from '@/modules/real-time-metrics'
   import ContentBlock from '@/templates/content-block'
   import PageHeadingBlock from '@/templates/page-heading-block'
   import { computed, onMounted, onUnmounted, ref, watch } from 'vue'

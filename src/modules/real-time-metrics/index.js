@@ -333,7 +333,7 @@ const resetReports = () => {
   notify(reportObservers, reports)
 }
 
-export default {
+const RealTimeMetricsModule = {
   groupObservable: {
     subscribe: subscribe(groupObservers),
     unsubscribe: unsubscribe(groupObservers)
@@ -364,3 +364,5 @@ export default {
   },
   getters
 }
+
+export default RealTimeMetricsModule
