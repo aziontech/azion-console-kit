@@ -97,7 +97,7 @@
         header: 'Solution ID'
       },
       {
-        field: 'ts',
+        field: 'tsFormat',
         header: 'TS'
       }
     ]

@@ -6,6 +6,7 @@
   import IntervalFilterBlock from '@/views/RealTimeEvents/blocks/interval-filter-block'
   import Drawer from './Drawer'
   import { useRouter } from 'vue-router'
+  import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
   const emit = defineEmits(['update:dateTime'])
 
   const props = defineProps({
@@ -78,7 +79,11 @@
       },
       {
         field: 'requestUri',
-        header: 'Request Uri'
+        header: 'Request Uri',
+        type: 'component',
+        filterPath: 'requestUri',
+        component: (columnData) =>
+          columnBuilder({ data: columnData, columnAppearance: 'expand-text-column' })
       },
       {
         field: 'status',
