@@ -20,6 +20,7 @@ export const listEdgeFunctionsService = async ({
 const adapt = (httpResponse) => {
   const parsedEdgeFunctions = httpResponse.body.results?.map((edgeFunction) => {
     return {
+      id: edgeFunction.id,
       value: edgeFunction.id,
       label: edgeFunction.name,
       args: JSON.stringify(edgeFunction.json_args, null, '\t'),

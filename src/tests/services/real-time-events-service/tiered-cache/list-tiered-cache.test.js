@@ -11,12 +11,11 @@ const fixtures = {
     }
   },
   tieredCache: {
-    bytesSent: 123456,
-    cacheKey: '312',
-    cacheTtl: 123,
-    clientId: 'client-123',
     configurationId: 'config-001',
     host: 'example.com',
+    requestUri: '/example',
+    requestMethod: 'GET',
+    upstreamCacheStatus: 'HIT',
     proxyHost: 'proxy.example.com',
     source: 'CDN',
     ts: '2024-02-23T18:07:25.000Z'
@@ -50,15 +49,14 @@ describe('tieredCacheServices', () => {
       `      tsRange: { begin: $tsRange_begin, end: $tsRange_end }`,
       `    }`,
       `  ) {`,
-      `    bytesSent`,
-      `    cacheKey`,
-      `    cacheTtl`,
-      `    clientId`,
       `    configurationId`,
       `    host`,
+      `    requestUri`,
+      `    requestMethod`,
+      `    upstreamCacheStatus`,
+      `    ts`,
       `    proxyHost`,
       `    source`,
-      `    ts`,
       `  }`,
       `}`
     ].join('\n')
@@ -93,17 +91,18 @@ describe('tieredCacheServices', () => {
     expect(response).toEqual([
       {
         id: 'mocked-timestamp',
-        bytesSent: fixtures.tieredCache.bytesSent,
-        cacheKey: {
-          content: fixtures.tieredCache.cacheKey
-        },
-        cacheTtl: fixtures.tieredCache.cacheTtl,
-        clientId: fixtures.tieredCache.clientId,
         configurationId: fixtures.tieredCache.configurationId,
         host: fixtures.tieredCache.host,
+        requestUri: fixtures.tieredCache.requestUri,
+        requestMethod: fixtures.tieredCache.requestMethod,
+        upstreamCacheStatus: {
+          content: fixtures.tieredCache.upstreamCacheStatus,
+          severity: 'info'
+        },
         proxyHost: fixtures.tieredCache.proxyHost,
         source: fixtures.tieredCache.source,
-        ts: fixtures.tieredCache.ts
+        ts: fixtures.tieredCache.ts,
+        tsFormat: 'February 23, 2024 at 06:07 PM'
       }
     ])
   })

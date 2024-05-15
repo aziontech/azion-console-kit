@@ -11,15 +11,15 @@ const fixtures = {
     }
   },
   imageProcessor: {
-    bytesSent: 123456,
     configurationId: 'config-001',
-    debugLog: true,
     host: 'example.com',
+    requestUri: '/image.jpg',
+    status: 200,
+    bytesSent: 123456,
     httpReferer: 'https://example.com',
     httpUserAgent:
       'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/38.0.101.76 Safari/537.36',
-    referenceError: 'error',
-    ts: '2024-02-23T18:07:25.000Z'
+    ts: '2024-02-23T18:07:25'
   }
 }
 
@@ -50,12 +50,13 @@ describe('ImageProcessorServices', () => {
       `      tsRange: { begin: $tsRange_begin, end: $tsRange_end }`,
       `    }`,
       `  ) {`,
-      `    bytesSent`,
       `    configurationId`,
       `    host`,
+      `    requestUri`,
+      `    status`,
+      `    bytesSent`,
       `    httpReferer`,
       `    httpUserAgent`,
-      `    referenceError`,
       `    ts`,
       `  }`,
       `}`
@@ -91,13 +92,15 @@ describe('ImageProcessorServices', () => {
     expect(response).toEqual([
       {
         id: 'mocked-timestamp',
-        bytesSent: fixtures.imageProcessor.bytesSent,
         configurationId: fixtures.imageProcessor.configurationId,
         host: fixtures.imageProcessor.host,
+        requestUri: fixtures.imageProcessor.requestUri,
+        status: fixtures.imageProcessor.status,
+        bytesSent: fixtures.imageProcessor.bytesSent,
         httpReferer: fixtures.imageProcessor.httpReferer,
         httpUserAgent: fixtures.imageProcessor.httpUserAgent,
-        referenceError: fixtures.imageProcessor.referenceError,
-        ts: fixtures.imageProcessor.ts
+        ts: fixtures.imageProcessor.ts,
+        tsFormat: 'February 23, 2024 at 06:07 PM'
       }
     ])
   })

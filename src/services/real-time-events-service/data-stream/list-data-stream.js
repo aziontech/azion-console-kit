@@ -1,6 +1,6 @@
 import convertGQL from '@/helpers/convert-gql'
 import { AxiosHttpClientSignalDecorator } from '../../axios/AxiosHttpClientSignalDecorator'
-import { convertValueToDate } from '@/helpers/convert-date'
+import { convertValueToDate } from '@/helpers'
 import { makeRealTimeEventsBaseUrl } from '../make-real-time-events-service'
 import { generateCurrentTimestamp } from '@/helpers/generate-timestamp'
 
@@ -24,13 +24,14 @@ const adapt = (filter) => {
     limit: 10000,
     fields: [
       'configurationId',
-      'dataStreamed',
-      'endpointType',
       'jobName',
-      'source',
+      'endpointType',
+      'url',
       'statusCode',
-      'streamedLines',
-      'ts'
+      'ts',
+      'dataStreamed',
+      'source',
+      'streamedLines'
     ],
     orderBy: 'ts_ASC'
   }
@@ -43,19 +44,20 @@ const adaptResponse = (response) => {
   return body.data.dataStreamedEvents?.map((dataStreamedEvents) => ({
     id: generateCurrentTimestamp(),
     configurationId: dataStreamedEvents.configurationId,
-    dataStreamed: dataStreamedEvents.dataStreamed,
-    endpointType: {
-      content: dataStreamedEvents.endpointType,
-      severity: 'info'
-    },
     jobName: {
       content: dataStreamedEvents.jobName,
       severity: 'info'
     },
-    source: dataStreamedEvents.source,
+    endpointType: {
+      content: dataStreamedEvents.endpointType,
+      severity: 'info'
+    },
+    url: dataStreamedEvents.url,
     statusCode: dataStreamedEvents.statusCode,
-    streamedLines: dataStreamedEvents.streamedLines,
     ts: dataStreamedEvents.ts,
+    dataStreamed: dataStreamedEvents.dataStreamed,
+    source: dataStreamedEvents.source,
+    streamedLines: dataStreamedEvents.streamedLines,
     tsFormat: convertValueToDate(dataStreamedEvents.ts)
   }))
 }

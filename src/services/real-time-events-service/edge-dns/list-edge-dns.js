@@ -2,6 +2,7 @@ import convertGQL from '@/helpers/convert-gql'
 import { AxiosHttpClientSignalDecorator } from '../../axios/AxiosHttpClientSignalDecorator'
 import { makeRealTimeEventsBaseUrl } from '../make-real-time-events-service'
 import { generateCurrentTimestamp } from '@/helpers/generate-timestamp'
+import { convertValueToDate } from '@/helpers'
 
 export const listEdgeDNS = async (filter) => {
   const payload = adapt(filter)
@@ -56,7 +57,7 @@ const adapt = (filter) => {
   const table = {
     dataset: 'idnsQueriesEvents',
     limit: 10000,
-    fields: ['level', 'qtype', 'resolutionType', 'source', 'solutionId', 'ts', 'uuid', 'zoneId'],
+    fields: ['level', 'zoneId', 'qtype', 'resolutionType', 'solutionId', 'ts', 'source', 'uuid'],
     orderBy: 'ts_ASC'
   }
   return convertGQL(filter, table)
@@ -68,12 +69,13 @@ const adaptResponse = (response) => {
   return body.data.idnsQueriesEvents?.map((edgeDnsQueriesEvents) => ({
     id: generateCurrentTimestamp(),
     level: getLevelDNS(edgeDnsQueriesEvents.level),
+    zoneId: edgeDnsQueriesEvents.zoneId,
     qtype: edgeDnsQueriesEvents.qtype,
     resolutionType: edgeDnsQueriesEvents.resolutionType,
     source: edgeDnsQueriesEvents.source,
     solutionId: edgeDnsQueriesEvents.solutionId,
     ts: edgeDnsQueriesEvents.ts,
-    uuid: edgeDnsQueriesEvents.uuid,
-    zoneId: edgeDnsQueriesEvents.zoneId
+    tsFormat: convertValueToDate(edgeDnsQueriesEvents.ts),
+    uuid: edgeDnsQueriesEvents.uuid
   }))
 }

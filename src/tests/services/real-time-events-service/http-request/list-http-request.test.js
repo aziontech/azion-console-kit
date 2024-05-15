@@ -11,15 +11,13 @@ const fixtures = {
     }
   },
   httpRequest: {
-    bytesSent: 123456,
     configurationId: 'config-001',
-    debugLog: true,
-    geolocAsn: 'AS15169',
-    geolocCountryName: 'United States',
-    geolocRegionName: 'California',
     host: 'example.com',
+    requestUri: '/api/v1',
+    requestMethod: 'GET',
+    status: 200,
     requestId: 'req-1234567890',
-    ts: '2024-02-23T18:07:25.000Z'
+    ts: '2024-02-23T18:07:25'
   }
 }
 
@@ -50,14 +48,12 @@ describe('HttpRequestServices', () => {
       `      tsRange: { begin: $tsRange_begin, end: $tsRange_end }`,
       `    }`,
       `  ) {`,
-      `    bytesSent`,
       `    configurationId`,
-      `    debugLog`,
-      `    geolocAsn`,
-      `    geolocCountryName`,
-      `    geolocRegionName`,
       `    host`,
       `    requestId`,
+      `    requestUri`,
+      `    requestMethod`,
+      `    status`,
       `    ts`,
       `  }`,
       `}`
@@ -93,15 +89,14 @@ describe('HttpRequestServices', () => {
     expect(response).toEqual([
       {
         id: 'mocked-timestamp',
-        bytesSent: fixtures.httpRequest.bytesSent,
         configurationId: fixtures.httpRequest.configurationId,
-        debugLog: fixtures.httpRequest.debugLog,
-        geolocAsn: fixtures.httpRequest.geolocAsn,
-        geolocCountryName: fixtures.httpRequest.geolocCountryName,
-        geolocRegionName: fixtures.httpRequest.geolocRegionName,
+        requestMethod: fixtures.httpRequest.requestMethod,
+        requestUri: fixtures.httpRequest.requestUri,
+        status: fixtures.httpRequest.status,
         host: fixtures.httpRequest.host,
         requestId: fixtures.httpRequest.requestId,
-        ts: fixtures.httpRequest.ts
+        ts: fixtures.httpRequest.ts,
+        tsFormat: 'February 23, 2024 at 06:07 PM'
       }
     ])
   })
