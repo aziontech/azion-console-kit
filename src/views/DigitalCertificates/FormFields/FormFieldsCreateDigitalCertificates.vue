@@ -1,9 +1,8 @@
 <script setup>
   import InputText from 'primevue/inputtext'
-  import Card from 'primevue/card'
-  import RadioButton from 'primevue/radiobutton'
   import PrimeTextarea from 'primevue/textarea'
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
+  import FieldGroupRadio from '@/templates/form-fields-inputs/fieldGroupRadio'
   import { useField } from 'vee-validate'
   import { computed, ref, watch } from 'vue'
 
@@ -52,6 +51,26 @@
     return certificateType.value === certificateTypes.value.TRUSTED
   })
 
+  const cetificateTypeRadioOptions = ref([
+    {
+      title: 'Import a server certificate',
+      subtitle: 'Upload a TLS X.509 certificate and private key in PEM format.',
+      value: certificateTypes.value.EDGE_CERTIFICATE_UPLOAD
+    },
+    {
+      title: 'Request a certificate',
+      subtitle:
+        'Generate a Certificate Singing Request (CSR) to purchase a TLS digital certificate from a CA.',
+      value: certificateTypes.value.EDGE_CERTIFICATE_CSR
+    },
+    {
+      title: 'Import a Trusted CA certificate',
+      subtitle:
+        'Upload a certificate in PEM format that can be used for mutual Transport Layer Security (mTLS).',
+      value: certificateTypes.value.TRUSTED
+    }
+  ])
+
   watch(certificateType, () => {
     emit('update:certificateSelection', certificateType.value)
     const isEdgeCertificateCSR =
@@ -99,76 +118,11 @@
   >
     <template #inputs>
       <div class="flex flex-col w-full gap-3">
-        <Card
-          :pt="{
-            body: { class: 'p-4' },
-            title: { class: 'flex justify-between  text-base m-0 font-medium' },
-            subtitle: {
-              class: 'text-sm font-normal text-color-secondary m-0 pr-0 md:pr-[2.5rem]'
-            }
-          }"
-        >
-          <template #title>
-            <span class="text-base">Import a server certificate</span>
-            <RadioButton
-              v-model="certificateType"
-              inputId="certificateType2"
-              name="certificateType"
-              :value="certificateTypes.EDGE_CERTIFICATE_UPLOAD"
-            />
-          </template>
-          <template #subtitle>
-            Upload a TLS X.509 certificate and private key in PEM format.
-          </template>
-        </Card>
-
-        <Card
-          :pt="{
-            body: { class: 'p-4' },
-            title: { class: 'flex justify-between  text-base m-0 font-medium' },
-            subtitle: {
-              class: 'text-sm font-normal text-color-secondary m-0 pr-0 md:pr-[2.5rem]'
-            }
-          }"
-        >
-          <template #title>
-            <span class="text-base">Request a certificate</span>
-            <RadioButton
-              v-model="certificateType"
-              inputId="certificateType1"
-              name="certificateType"
-              :value="certificateTypes.EDGE_CERTIFICATE_CSR"
-            />
-          </template>
-          <template #subtitle>
-            Generate a Certificate Singing Request (CSR) to purchase a TLS digital certificate from
-            a CA.
-          </template>
-        </Card>
-
-        <Card
-          :pt="{
-            body: { class: 'p-4' },
-            title: { class: 'flex justify-between  text-base m-0 font-medium' },
-            subtitle: {
-              class: 'text-sm font-normal text-color-secondary m-0 pr-0 md:pr-[2.5rem]'
-            }
-          }"
-        >
-          <template #title>
-            <span class="text-base">Import a Trusted CA certificate</span>
-            <RadioButton
-              v-model="certificateType"
-              inputId="certificateType3"
-              name="certificateType"
-              :value="certificateTypes.TRUSTED"
-            />
-          </template>
-          <template #subtitle>
-            Upload a certificate in PEM format that can be used for mutual Transport Layer Security
-            (mTLS).
-          </template>
-        </Card>
+        <FieldGroupRadio
+          nameField="certificateType"
+          :isCard="true"
+          :options="cetificateTypeRadioOptions"
+        />
       </div>
     </template>
   </FormHorizontal>
@@ -338,7 +292,7 @@
         >
       </div>
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
-        <label>Subject Alternative Names (SAN) </label>
+        <label>Subject Alternative Names (SAN) *</label>
         <PrimeTextarea
           v-model="subjectAlternativeNames"
           :class="{ 'p-invalid': subjectAlternativeNamesError }"
