@@ -133,12 +133,12 @@ function extractAnd(filters) {
         }
         params.push({
           name: `$${filters.and.meta.fieldPrefix}${andFilter}_begin`,
-          type: 'Int!',
+          type: 'Float!',
           value: begin
         })
         params.push({
           name: `$${filters.and.meta.fieldPrefix}${andFilter}_end`,
-          type: 'Int!',
+          type: 'Float!',
           value: end
         })
         variables[`${filters.and.meta.fieldPrefix}${andFilter}_begin`] = begin
