@@ -23,7 +23,7 @@ describe('SignupServices', () => {
     await sut(emailPayloadMock)
 
     expect(requestSpy).toHaveBeenCalledWith({
-      url: 'user/activation/request',
+      url: 'v4/iam/user/resend-activation-link',
       method: 'POST',
       body: emailPayloadMock
     })

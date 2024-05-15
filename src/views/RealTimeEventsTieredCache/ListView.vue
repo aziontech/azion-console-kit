@@ -74,33 +74,6 @@
   const getColumns = computed(() => {
     return [
       {
-        field: 'bytesSent',
-        header: 'Bytes Sent'
-      },
-      {
-        field: 'cacheKey',
-        header: 'Cache Key',
-        type: 'component',
-        filterPath: 'cacheKey.content',
-        component: (columnData) => {
-          return columnBuilder({
-            data: columnData,
-            columnAppearance: 'text-with-clipboard',
-            dependencies: {
-              copyContentService: props.clipboardWrite
-            }
-          })
-        }
-      },
-      {
-        field: 'cacheTtl',
-        header: 'Cache TTL'
-      },
-      {
-        field: 'clientId',
-        header: 'Client ID'
-      },
-      {
         field: 'configurationId',
         header: 'Configuration ID'
       },
@@ -109,8 +82,27 @@
         header: 'Host'
       },
       {
-        field: 'proxyHost',
-        header: 'Proxy Host'
+        field: 'requestUri',
+        header: 'Request Uri'
+      },
+      {
+        field: 'requestMethod',
+        header: 'Request Method'
+      },
+      {
+        field: 'upstreamCacheStatus',
+        header: 'Upstream Cache Status',
+        type: 'component',
+        filterPath: 'upstreamCacheStatus.content',
+        component: (columnData) =>
+          columnBuilder({
+            data: columnData,
+            columnAppearance: 'tag'
+          })
+      },
+      {
+        field: 'tsFormat',
+        header: 'TS'
       }
     ]
   })

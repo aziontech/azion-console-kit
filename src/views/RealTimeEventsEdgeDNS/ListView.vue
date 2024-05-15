@@ -81,6 +81,10 @@
           })
       },
       {
+        field: 'zoneId',
+        header: 'Zone ID'
+      },
+      {
         field: 'qtype',
         header: 'Q Type'
       },
@@ -93,16 +97,8 @@
         header: 'Solution ID'
       },
       {
-        field: 'ts',
+        field: 'tsFormat',
         header: 'TS'
-      },
-      {
-        field: 'uuid',
-        header: 'UUID'
-      },
-      {
-        field: 'zoneId',
-        header: 'Zone ID'
       }
     ]
   })

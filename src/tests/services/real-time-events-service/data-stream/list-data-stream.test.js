@@ -13,13 +13,14 @@ const fixtures = {
   },
   dataStreaming: {
     configurationId: '1',
-    dataStreamed: 'dataStreamed',
-    endpointType: 'endpointType',
     jobName: 'jobName',
-    source: 'source',
+    endpointType: 'endpointType',
+    url: 'http://url.com',
     statusCode: 'statusCode',
-    streamedLines: 'streamedLines',
-    ts: '2024-02-23T18:07:25'
+    ts: '2024-02-23T18:07:25',
+    dataStreamed: 'dataStreamed',
+    source: 'source',
+    streamedLines: 'streamedLines'
   }
 }
 
@@ -53,13 +54,14 @@ describe('DataStreamingServices', () => {
       `    }`,
       `  ) {`,
       `    configurationId`,
-      `    dataStreamed`,
-      `    endpointType`,
       `    jobName`,
-      `    source`,
+      `    endpointType`,
+      `    url`,
       `    statusCode`,
-      `    streamedLines`,
       `    ts`,
+      `    dataStreamed`,
+      `    source`,
+      `    streamedLines`,
       `  }`,
       `}`
     ].join('\n')
@@ -97,13 +99,14 @@ describe('DataStreamingServices', () => {
       {
         id: 'mocked-timestamp',
         configurationId: fixtures.dataStreaming.configurationId,
-        dataStreamed: fixtures.dataStreaming.dataStreamed,
-        endpointType: { content: fixtures.dataStreaming.endpointType, severity: 'info' },
         jobName: { content: fixtures.dataStreaming.jobName, severity: 'info' },
-        source: fixtures.dataStreaming.source,
+        endpointType: { content: fixtures.dataStreaming.endpointType, severity: 'info' },
+        url: 'http://url.com',
         statusCode: fixtures.dataStreaming.statusCode,
-        streamedLines: fixtures.dataStreaming.streamedLines,
         ts: fixtures.dataStreaming.ts,
+        dataStreamed: fixtures.dataStreaming.dataStreamed,
+        source: fixtures.dataStreaming.source,
+        streamedLines: fixtures.dataStreaming.streamedLines,
         tsFormat: 'February 23, 2024 at 06:07 PM'
       }
     ])

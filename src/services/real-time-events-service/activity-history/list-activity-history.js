@@ -2,6 +2,7 @@ import convertGQL from '@/helpers/convert-gql'
 import { AxiosHttpClientSignalDecorator } from '../../axios/AxiosHttpClientSignalDecorator'
 import { makeRealTimeEventsBaseUrl } from '../make-real-time-events-service'
 import { generateCurrentTimestamp } from '@/helpers/generate-timestamp'
+import { convertValueToDate } from '@/helpers'
 
 export const listActivityHistory = async (filter) => {
   const payload = adapt(filter)
@@ -21,8 +22,7 @@ const adapt = (filter) => {
   const table = {
     dataset: 'activityHistoryEvents',
     limit: 10000,
-    fields: ['accountId', 'authorEmail', 'authorName', 'userId', 'title', 'comment', 'ts'],
-
+    fields: ['userIp', 'authorName', 'title', 'resourceType', 'resourceId', 'userId', 'ts'],
     orderBy: 'ts_ASC'
   }
   return convertGQL(filter, table)
@@ -33,12 +33,13 @@ const adaptResponse = (response) => {
 
   return body.data.activityHistoryEvents?.map((activityHistoryEvents) => ({
     id: generateCurrentTimestamp(),
-    accountId: activityHistoryEvents.accountId,
-    authorEmail: activityHistoryEvents.authorEmail,
+    userIp: activityHistoryEvents.userIp,
     authorName: activityHistoryEvents.authorName,
-    userId: activityHistoryEvents.userId,
     title: activityHistoryEvents.title,
-    comment: activityHistoryEvents.comment,
-    ts: activityHistoryEvents.ts
+    resourceType: activityHistoryEvents.resourceType,
+    resourceId: activityHistoryEvents.resourceId,
+    userId: activityHistoryEvents.userId,
+    ts: activityHistoryEvents.ts,
+    tsFormat: convertValueToDate(activityHistoryEvents.ts)
   }))
 }

@@ -70,10 +70,6 @@
   const getColumns = computed(() => {
     return [
       {
-        field: 'bytesSent',
-        header: 'Bytes Sent'
-      },
-      {
         field: 'configurationId',
         header: 'Configuration ID'
       },
@@ -82,24 +78,24 @@
         header: 'Host'
       },
       {
-        field: 'httpReferer',
-        header: 'HTTP Referer',
+        field: 'requestUri',
+        header: 'Request Uri',
         type: 'component',
-        filterPath: 'httpReferer',
+        filterPath: 'requestUri',
         component: (columnData) =>
           columnBuilder({ data: columnData, columnAppearance: 'expand-text-column' })
       },
       {
-        field: 'httpUserAgent',
-        header: 'HTTP User Agent',
-        type: 'component',
-        filterPath: 'httpUserAgent',
-        component: (columnData) =>
-          columnBuilder({ data: columnData, columnAppearance: 'expand-text-column' })
+        field: 'status',
+        header: 'Status'
       },
       {
-        field: 'referenceError',
-        header: 'Reference Error'
+        field: 'bytesSent',
+        header: 'Bytes Sent'
+      },
+      {
+        field: 'tsFormat',
+        header: 'TS'
       }
     ]
   })

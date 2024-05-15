@@ -16,9 +16,8 @@ const fixtures = {
     level: 'INFO',
     line: 42,
     lineSource: 'test linesource',
-    solutionId: '444',
     source: 'edge-functions-console.js',
-    ts: '2024-02-23T18:07:25.000Z'
+    ts: '2024-02-23T18:07:25'
   }
 }
 
@@ -55,7 +54,6 @@ describe('EdgeFunctionsConsoleServices', () => {
       `    level`,
       `    line`,
       `    lineSource`,
-      `    solutionId`,
       `    source`,
       `    ts`,
       `  }`,
@@ -101,9 +99,9 @@ describe('EdgeFunctionsConsoleServices', () => {
         },
         line: fixtures.edgeFunctionConsole.line,
         lineSource: { content: fixtures.edgeFunctionConsole.lineSource, severity: 'info' },
-        solutionId: fixtures.edgeFunctionConsole.solutionId,
         source: fixtures.edgeFunctionConsole.source,
-        ts: fixtures.edgeFunctionConsole.ts
+        ts: fixtures.edgeFunctionConsole.ts,
+        tsFormat: 'February 23, 2024 at 06:07 PM'
       }
     ])
   })

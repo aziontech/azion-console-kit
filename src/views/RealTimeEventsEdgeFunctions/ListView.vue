@@ -73,8 +73,8 @@
         header: 'Configuration ID'
       },
       {
-        field: 'edgeFunctionsInstanceIdList',
-        header: 'Edge Functions Instance ID List'
+        field: 'functionLanguage',
+        header: 'Function Language'
       },
       {
         field: 'edgeFunctionsInitiatorTypeList',
@@ -89,16 +89,12 @@
           columnBuilder({ data: columnData, columnAppearance: 'expand-column' })
       },
       {
-        field: 'edgeFunctionsSolutionId',
-        header: 'Edge Functions Solution ID'
-      },
-      {
         field: 'edgeFunctionsTime',
         header: 'Edge Functions Time'
       },
       {
-        field: 'functionLanguage',
-        header: 'Function Language'
+        field: 'tsFormat',
+        header: 'TS'
       }
     ]
   })

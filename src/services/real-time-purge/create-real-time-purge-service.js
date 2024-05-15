@@ -15,8 +15,14 @@ export const createRealTimePurgeService = async (payload) => {
 }
 
 const adapt = (payload) => {
+  let argumentsPurge = payload.argumentsPurge
+  const isArray = Array.isArray(payload.argumentsPurge)
+  if (!isArray) {
+    argumentsPurge = payload.argumentsPurge.trim().split('\n')
+  }
+
   const request = {
-    items: payload.argumentsPurge.trim().split('\n'),
+    items: argumentsPurge,
     layer: payload.layer
   }
 

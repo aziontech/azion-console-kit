@@ -2,6 +2,7 @@ import convertGQL from '@/helpers/convert-gql'
 import { AxiosHttpClientSignalDecorator } from '../../axios/AxiosHttpClientSignalDecorator'
 import { makeRealTimeEventsBaseUrl } from '../make-real-time-events-service'
 import { generateCurrentTimestamp } from '@/helpers/generate-timestamp'
+import { convertValueToDate } from '@/helpers'
 
 export const listEdgeFunctions = async (filter) => {
   const payload = adapt(filter)
@@ -23,12 +24,10 @@ const adapt = (filter) => {
     limit: 10000,
     fields: [
       'configurationId',
-      'edgeFunctionsInstanceIdList',
+      'functionLanguage',
       'edgeFunctionsInitiatorTypeList',
       'edgeFunctionsList',
-      'edgeFunctionsSolutionId',
       'edgeFunctionsTime',
-      'functionLanguage',
       'ts'
     ],
     orderBy: 'ts_ASC'
@@ -42,12 +41,11 @@ const adaptResponse = (response) => {
   return body.data.edgeFunctionsEvents?.map((edgeFunctionsEvents) => ({
     id: generateCurrentTimestamp(),
     configurationId: edgeFunctionsEvents.configurationId,
-    edgeFunctionsInstanceIdList: edgeFunctionsEvents.edgeFunctionsInstanceIdList,
+    functionLanguage: edgeFunctionsEvents.functionLanguage,
     edgeFunctionsInitiatorTypeList: edgeFunctionsEvents.edgeFunctionsInitiatorTypeList,
     edgeFunctionsList: edgeFunctionsEvents.edgeFunctionsList.split(';'),
-    edgeFunctionsSolutionId: edgeFunctionsEvents.edgeFunctionsSolutionId,
-    edgeFunctionsTime: edgeFunctionsEvents.edgeFunctionsTime,
-    functionLanguage: edgeFunctionsEvents.functionLanguage,
-    ts: edgeFunctionsEvents.ts
+    edgeFunctionsTime: `${edgeFunctionsEvents.edgeFunctionsTime}ms`,
+    ts: edgeFunctionsEvents.ts,
+    tsFormat: convertValueToDate(edgeFunctionsEvents.ts)
   }))
 }

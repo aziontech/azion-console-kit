@@ -1,69 +1,36 @@
 <template>
   <form
-    class="w-full flex flex-col gap-8"
+    class="w-full flex flex-col"
     @submit.prevent="submitForm"
   >
     <div
-      class="flex flex-col gap-2"
+      class="flex flex-col gap-8"
       v-if="additionalDataInfo?.length"
     >
-      <!-- Step 1: Use -->
-
-      <h4 class="font-semibold text-sm">{{ additionalDataInfo[0].key }}*</h4>
-      <div class="flex flex-wrap gap-3 mb-8">
-        <label
-          v-for="useData in additionalDataInfo[0].values"
-          :key="useData.value"
-          :for="useData.value"
-          class="flex items-center gap-2 p-4 border-1 surface-border rounded-md font-medium w-full md:w-fit"
-          :class="{ 'border-radio-card-active': use === useData.value }"
-          >{{ useData.value }}
-          <PrimeRadio
-            v-model="use"
-            name="use"
-            :value="useData.value"
-            :inputId="useData.value"
-            class="hidden"
-            @change="updateStep('use')"
-          />
-        </label>
-      </div>
+      <!-- Step 1: Plan -->
+      <FieldGroupRadio
+        :label="questionLabel('use')"
+        nameField="use"
+        auto
+        hideSelector
+        :options="adaptOptions('use')"
+        @onRadioChange="updateStep('use')"
+      />
 
       <!-- Step 2: Role -->
-
-      <h4
-        class="font-semibold text-sm"
-        :class="[disabledClass(stepOptions.role)]"
-      >
-        {{ additionalDataInfo[1].key }}*
-      </h4>
-      <div
-        class="flex flex-wrap gap-3 mb-8"
-        :class="[disabledClass(stepOptions.role)]"
-      >
-        <label
-          v-for="roleData in additionalDataInfo[1].values"
-          :key="roleData.value"
-          :for="roleData.value"
-          class="flex items-center gap-2 p-4 border-1 surface-border rounded-md font-medium w-full md:w-fit"
-          :class="{ 'border-radio-card-active': role === roleData.value }"
-          >{{ roleData.value }}
-          <PrimeRadio
-            v-model="role"
-            name="role"
-            :value="roleData.value"
-            :inputId="roleData.value"
-            :disabled="isFieldDisabled(stepOptions.role)"
-            class="hidden"
-            @change="updateStep('role')"
-          />
-        </label>
-      </div>
+      <FieldGroupRadio
+        :label="questionLabel('role')"
+        nameField="role"
+        auto
+        hideSelector
+        :disabled="isFieldDisabled(stepOptions.role)"
+        :options="adaptOptions('role')"
+        @onRadioChange="updateStep('role')"
+      />
 
       <!-- Step 2: Role Description -->
-
       <div
-        class="mb-8 w-full md:w-1/2"
+        class="w-full md:w-1/2"
         v-if="showInputRoleField"
       >
         <div class="w-full flex flex-col gap-2">
@@ -88,53 +55,31 @@
       </div>
 
       <!-- Step 3: Company Size -->
-
-      <h4
-        class="font-semibold text-sm"
-        :class="[disabledClass(stepOptions.companySize)]"
+      <FieldGroupRadio
         v-if="showCompanySizeField"
-      >
-        {{ additionalDataInfo[2].key }}*
-      </h4>
-      <div
-        class="flex flex-wrap gap-3 mb-8"
-        :class="[disabledClass(stepOptions.companySize)]"
-        v-if="showCompanySizeField"
-      >
-        <label
-          v-for="companySizeData in additionalDataInfo[2].values"
-          :key="companySizeData.value"
-          :for="companySizeData.value"
-          class="flex items-center gap-2 p-4 border-1 surface-border rounded-md font-medium w-full md:w-fit"
-          :class="{ 'border-radio-card-active': companySize === companySizeData.value }"
-          >{{ companySizeData.value }}
-          <PrimeRadio
-            v-model="companySize"
-            name="companySize"
-            :value="companySizeData.value"
-            :inputId="companySizeData.value"
-            :disabled="isFieldDisabled(stepOptions.companySize)"
-            class="hidden"
-            @change="updateStep('companySize')"
-          />
-        </label>
-      </div>
+        :label="questionLabel('companySize')"
+        nameField="companySize"
+        auto
+        hideSelector
+        :disabled="isFieldDisabled(stepOptions.companySize)"
+        :options="adaptOptions('companySize')"
+        @onRadioChange="updateStep('companySize')"
+      />
 
       <!-- Step 4: Full Name -->
-
-      <div class="mb-8 w-full md:w-1/2">
+      <div class="w-full md:w-1/2">
         <div class="w-full flex flex-col gap-2">
           <label
             class="flex flex-col gap-3 font-semibold text-sm"
             :class="[disabledClass(stepOptions.fullName)]"
             for="fullName"
           >
-            {{ additionalDataInfo[3].key }}*
+            {{ questionLabel('fullName') }}
             <PrimeInputText
               v-model="fullName"
               name="fullName"
               id="fullName"
-              :disabled="isFieldDisabled(4)"
+              :disabled="isFieldDisabled(stepOptions.fullName)"
               @input="updateStep('fullName')"
             />
           </label>
@@ -148,9 +93,8 @@
       </div>
 
       <!-- Step 3 : Company Website -->
-
       <div
-        class="mb-8 w-full md:w-1/2"
+        class="w-full md:w-1/2"
         v-if="showCompanyWebsiteField"
       >
         <div class="w-full flex flex-col gap-2">
@@ -159,7 +103,7 @@
             :class="[disabledClass(stepOptions.companySize)]"
             for="companyWebsite"
           >
-            {{ additionalDataInfo[4].key }}*
+            {{ questionLabel('companyWebsite') }}
             <PrimeInputText
               v-model="companyWebsite"
               name="companyWebsite"
@@ -177,25 +121,16 @@
       </div>
 
       <!-- Step 5: Onboarding Session -->
-
-      <label
-        class="w-fit mb-8 flex flex-row-reverse gap-3 text-sm"
-        :class="[disabledClass(stepOptions.onboardingSession)]"
-        for="onboardingSession"
-      >
-        {{ additionalDataInfo[5].key }}*
-        <PrimeInputSwitch
-          class="flex-shrink-0"
-          v-model="onboardingSession"
-          name="onboardingSession"
-          id="onboardingSession"
-          :disabled="isFieldDisabled(stepOptions.onboardingSession)"
-        />
-      </label>
+      <FieldSwitchBlock
+        :title="questionLabel('onboardingSession')"
+        name="onboardingSession"
+        nameField="onboardingSession"
+        :isCard="false"
+        :disabled="isFieldDisabled(stepOptions.onboardingSession)"
+      />
     </div>
 
     <!-- Empty state -->
-
     <div
       class="flex flex-col gap-2"
       v-else
@@ -218,8 +153,6 @@
 </template>
 
 <script setup>
-  import PrimeRadio from 'primevue/radiobutton'
-  import PrimeInputSwitch from 'primevue/inputswitch'
   import PrimeInputText from 'primevue/inputtext'
   import PrimeSkeleton from 'primevue/skeleton'
   import { useToast } from 'primevue/usetoast'
@@ -228,6 +161,8 @@
   import { useRouter } from 'vue-router'
   import { useAccountStore } from '@/stores/account'
   import * as yup from 'yup'
+  import FieldGroupRadio from '@/templates/form-fields-inputs/fieldGroupRadio'
+  import FieldSwitchBlock from '@/templates/form-fields-inputs/fieldSwitchBlock'
 
   /** @type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
@@ -287,7 +222,7 @@
       }),
     companySize: yup.string().when('use', {
       is: (val) => val === 'Work',
-      then: (schema) => schema.required()
+      then: (schema) => schema.required('Company Size is a required field')
     }),
     companyWebsite: yup.string().when('companySize', {
       is: (val) => val && val !== 'Just me',
@@ -299,12 +234,14 @@
             /[-a-zA-Z0-9._+=]+\.[a-zA-Z0-9]+\b([-a-zA-Z0-9.]*)/,
             'Company Website is a required field'
           )
+          .required('Company Website is a required field')
     }),
     fullName: yup
       .string()
       .trim()
       .max(61, 'Your Full Name must be less than 61 characters')
-      .matches(/[A-zÀ-ž.'-]+ [A-zÀ-ž.'-]+/, 'Your Full Name is a required field'),
+      .matches(/[A-zÀ-ž.'-]+ [A-zÀ-ž.'-]+/, 'Your Full Name is a required field')
+      .required(),
     onboardingSession: yup.boolean()
   })
 
@@ -373,6 +310,31 @@
     return companySize.value && companySize.value !== 'Just me'
   })
 
+  const questionsMap = {
+    use: 0,
+    role: 1,
+    companySize: 2,
+    fullName: 3,
+    companyWebsite: 4,
+    onboardingSession: 5
+  }
+
+  const adaptOptions = (step) => {
+    const options = additionalDataInfo?.value[questionsMap[step]]?.values
+
+    return options?.map((option) => {
+      return {
+        title: option.value,
+        value: option.value
+      }
+    })
+  }
+
+  const questionLabel = (step, required = true) => {
+    const idx = questionsMap[step]
+    return required ? `${additionalDataInfo.value[idx]?.key}*` : additionalDataInfo.value[idx]?.key
+  }
+
   const loading = ref(false)
 
   const submitForm = async () => {
@@ -402,7 +364,7 @@
     } catch (err) {
       const errors = JSON.parse(err)
 
-      toast.add({ life: 5000, severity: 'error', detail: errors.errorMessage, summary: 'Error' })
+      toast.add({ severity: 'error', detail: errors.errorMessage, summary: 'Error' })
 
       tracker.signUp.failedSubmitAdditionalData(errors).track()
     } finally {
@@ -417,6 +379,7 @@
   watch(use, (value) => {
     if (value !== 'Work') {
       resetField('companySize')
+      resetField('companyWebsite')
       if (role.value) {
         updateStep('role')
       }

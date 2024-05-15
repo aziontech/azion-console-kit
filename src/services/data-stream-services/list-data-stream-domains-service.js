@@ -17,6 +17,7 @@ const adapt = (httpResponse) => {
 
   const parsedDomains = isArray
     ? httpResponse.body.results.map((domain) => ({
+        id: domain.domain_id,
         domainID: domain.domain_id,
         name: domain.name,
         selected: domain.selected
