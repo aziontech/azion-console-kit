@@ -2,6 +2,7 @@ import convertGQL from '@/helpers/convert-gql'
 import { AxiosHttpClientSignalDecorator } from '../../axios/AxiosHttpClientSignalDecorator'
 import { makeRealTimeEventsBaseUrl } from '../make-real-time-events-service'
 import { generateCurrentTimestamp } from '@/helpers/generate-timestamp'
+import { convertValueToDate } from '@/helpers'
 
 export const listTieredCache = async (filter) => {
   const payload = adapt(filter)
@@ -22,15 +23,14 @@ const adapt = (filter) => {
     dataset: 'l2CacheEvents',
     limit: 10000,
     fields: [
-      'bytesSent',
-      'cacheKey',
-      'cacheTtl',
-      'clientId',
       'configurationId',
       'host',
+      'requestUri',
+      'requestMethod',
+      'upstreamCacheStatus',
+      'ts',
       'proxyHost',
-      'source',
-      'ts'
+      'source'
     ],
     orderBy: 'ts_ASC'
   }
@@ -42,16 +42,17 @@ const adaptResponse = (response) => {
 
   return body.data.l2CacheEvents?.map((tieredCacheEvents) => ({
     id: generateCurrentTimestamp(),
-    bytesSent: tieredCacheEvents.bytesSent,
-    cacheKey: {
-      content: tieredCacheEvents.cacheKey
-    },
-    cacheTtl: tieredCacheEvents.cacheTtl,
-    clientId: tieredCacheEvents.clientId,
     configurationId: tieredCacheEvents.configurationId,
     host: tieredCacheEvents.host,
-    source: tieredCacheEvents.source,
+    requestUri: tieredCacheEvents.requestUri,
+    requestMethod: tieredCacheEvents.requestMethod,
+    upstreamCacheStatus: {
+      content: tieredCacheEvents.upstreamCacheStatus,
+      severity: 'info'
+    },
+    ts: tieredCacheEvents.ts,
     proxyHost: tieredCacheEvents.proxyHost,
-    ts: tieredCacheEvents.ts
+    source: tieredCacheEvents.source,
+    tsFormat: convertValueToDate(tieredCacheEvents.ts)
   }))
 }

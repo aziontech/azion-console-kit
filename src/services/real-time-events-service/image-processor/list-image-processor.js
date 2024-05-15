@@ -2,6 +2,7 @@ import convertGQL from '@/helpers/convert-gql'
 import { AxiosHttpClientSignalDecorator } from '../../axios/AxiosHttpClientSignalDecorator'
 import { makeRealTimeEventsBaseUrl } from '../make-real-time-events-service'
 import { generateCurrentTimestamp } from '@/helpers/generate-timestamp'
+import { convertValueToDate } from '@/helpers'
 
 export const listImageProcessor = async (filter) => {
   const payload = adapt(filter)
@@ -22,12 +23,13 @@ const adapt = (filter) => {
     dataset: 'imagesProcessedEvents',
     limit: 10000,
     fields: [
-      'bytesSent',
       'configurationId',
       'host',
+      'requestUri',
+      'status',
+      'bytesSent',
       'httpReferer',
       'httpUserAgent',
-      'referenceError',
       'ts'
     ],
     orderBy: 'ts_ASC'
@@ -40,12 +42,14 @@ const adaptResponse = (response) => {
 
   return body.data.imagesProcessedEvents?.map((imagesProcessedEvents) => ({
     id: generateCurrentTimestamp(),
-    bytesSent: imagesProcessedEvents.bytesSent,
     configurationId: imagesProcessedEvents.configurationId,
     host: imagesProcessedEvents.host,
+    requestUri: imagesProcessedEvents.requestUri,
+    status: imagesProcessedEvents.status,
+    bytesSent: imagesProcessedEvents.bytesSent,
     httpReferer: imagesProcessedEvents.httpReferer,
     httpUserAgent: imagesProcessedEvents.httpUserAgent,
-    referenceError: imagesProcessedEvents.referenceError,
-    ts: imagesProcessedEvents.ts
+    ts: imagesProcessedEvents.ts,
+    tsFormat: convertValueToDate(imagesProcessedEvents.ts)
   }))
 }

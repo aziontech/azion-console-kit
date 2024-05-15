@@ -72,8 +72,15 @@
         header: 'Configuration ID'
       },
       {
-        field: 'dataStreamed',
-        header: 'Data Streamed'
+        field: 'jobName',
+        header: 'Job Name',
+        type: 'component',
+        filterPath: 'jobName.content',
+        component: (columnData) =>
+          columnBuilder({
+            data: columnData,
+            columnAppearance: 'tag'
+          })
       },
       {
         field: 'endpointType',
@@ -87,27 +94,12 @@
           })
       },
       {
-        field: 'jobName',
-        header: 'Job Name',
-        type: 'component',
-        filterPath: 'jobName.content',
-        component: (columnData) =>
-          columnBuilder({
-            data: columnData,
-            columnAppearance: 'tag'
-          })
-      },
-      {
-        field: 'source',
-        header: 'Source'
+        field: 'url',
+        header: 'URL'
       },
       {
         field: 'statusCode',
         header: 'Status Code'
-      },
-      {
-        field: 'streamedLines',
-        header: 'Streamed Lines'
       },
       {
         field: 'tsFormat',

@@ -67,24 +67,29 @@
   const getColumns = computed(() => {
     return [
       {
-        field: 'bytesSent',
-        header: 'Bytes Sent'
+        field: 'configurationId',
+        header: 'Configuration ID'
       },
       {
-        field: 'debugLog',
-        header: 'Debug Log'
+        field: 'host',
+        header: 'Host'
       },
       {
-        field: 'geolocAsn',
-        header: 'Geoloc ASN'
+        field: 'requestUri',
+        header: 'Request Uri'
+      },
+
+      {
+        field: 'requestMethod',
+        header: 'Request Method'
       },
       {
-        field: 'geolocCountryName',
-        header: 'Geoloc Country Name'
+        field: 'status',
+        header: 'Status'
       },
       {
-        field: 'geolocRegionName',
-        header: 'Geoloc Region Name'
+        field: 'tsFormat',
+        header: 'TS'
       }
     ]
   })
