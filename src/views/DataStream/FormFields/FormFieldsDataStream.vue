@@ -101,34 +101,13 @@
     description="Associate domains with this stream to define the addresses from which the data will be collected."
   >
     <template #inputs>
-      <div class="flex flex-col gap-2">
-        <label class="text-color text-sm font-medium leading-tight">Option</label>
-        <div class="flex flex-col gap-3">
-          <div class="flex no-wrap gap-2 items-center">
-            <RadioButton
-              v-model="domainOption"
-              inputId="all-domain"
-              name="all domain"
-              value="1"
-            />
-            <label class="text-color text-sm font-normal leading-tight"
-              >All Current and Future Domains</label
-            >
-          </div>
-          <div class="flex no-wrap gap-2 items-center">
-            <RadioButton
-              v-model="domainOption"
-              inputId="filter-domain"
-              name="filter domain"
-              value="0"
-            />
-            <label class="text-color text-sm font-normal leading-tight">Filter Domains </label>
-          </div>
-          <small class="text-xs text-color-secondary font-normal leading-5">
-            By selecting the All Current and Future Domains option, you can activate the Sampling
-            option.</small
-          >
-        </div>
+      <div class="flex flex-col gap-4">
+        <FieldGroupRadio
+          label="Option"
+          nameField="domainOption"
+          :isCard="false"
+          :options="domainsRadioOptions"
+        />
       </div>
 
       <div
@@ -177,29 +156,15 @@
   >
     <template #inputs>
       <div class="flex flex-col w-full gap-8">
-        <div
-          class="flex gap-6 md:align-items-center max-sm:flex-col max-sm:align-items-baseline max-sm:gap-3"
-        >
-          <span class="w-full flex flex-col gap-2 pb-3 pt-2">
-            <div class="flex gap-1">
-              <InputSwitch
-                v-model="hasSampling"
-                inputId="sampling"
-              />
-              <label
-                class="text-color text-sm font-normal leading-5"
-                for="sampling"
-                >Active</label
-              >
-            </div>
-            <div class="flex-col gap-1 pl-10">
-              <p class="text-color-secondary text-sm font-normal">
-                Once enabled, you can only have one active stream in your account. If it's later
-                disabled, the Add option will become available again on the creation page.
-              </p>
-            </div>
-          </span>
-        </div>
+        <FieldSwitchBlock
+          nameField="hasSampling"
+          name="hasSampling"
+          auto
+          :isCard="false"
+          title="Active"
+          subtitle="Once enabled, you can only have one active stream in your account. If it's later disabled, the Add option will become available again on the creation page."
+        />
+
         <div
           class="flex flex-col sm:max-w-lg w-full gap-2"
           v-if="hasSampling"
@@ -1201,21 +1166,13 @@
   <FormHorizontal title="Status">
     <template #inputs>
       <div class="flex flex-col w-full gap-2">
-        <div
-          class="flex gap-6 md:align-items-center max-sm:flex-col max-sm:align-items-baseline max-sm:gap-3"
-        >
-          <span class="p-input-icon-right w-full flex max-w-lg items-start gap-2 pb-3 pt-2">
-            <InputSwitch
-              v-model="status"
-              inputId="active"
-            />
-            <label
-              class="text-color text-sm font-normal leading-5"
-              for="active"
-              >Active</label
-            >
-          </span>
-        </div>
+        <FieldSwitchBlock
+          nameField="status"
+          name="status"
+          auto
+          :isCard="false"
+          title="Active"
+        />
       </div>
     </template>
   </FormHorizontal>
@@ -1234,6 +1191,8 @@
   import PickList from 'primevue/picklist'
   import RadioButton from 'primevue/radiobutton'
   import TextArea from 'primevue/textarea'
+  import FieldGroupRadio from '@/templates/form-fields-inputs/fieldGroupRadio'
+  import FieldSwitchBlock from '@/templates/form-fields-inputs/fieldSwitchBlock'
   import { useField } from 'vee-validate'
   import { computed, onMounted, ref, watch } from 'vue'
 
@@ -1280,13 +1239,13 @@
   ])
 
   // Campos do formulário
+  useField('status')
   const { value: name, errorMessage: nameError } = useField('name')
   const { value: dataSource, errorMessage: dataSourceError } = useField('dataSource')
   const { value: template, errorMessage: templateError } = useField('template')
   const { value: domainOption } = useField('domainOption')
   const { value: domains } = useField('domains')
   const { value: endpoint } = useField('endpoint')
-  const { value: status } = useField('status')
   const { value: hasSampling } = useField('hasSampling')
   const { value: samplingPercentage, errorMessage: samplingPercentageError } =
     useField('samplingPercentage')
@@ -1508,6 +1467,19 @@
       props.resetForm({ values: initialValues })
     }
   }
+
+  const domainsRadioOptions = ref([
+    {
+      title: 'All Current and Future Domains',
+      value: '1',
+      subtitle:
+        'By selecting the All Current and Future Domains option, you can activate the Sampling option.'
+    },
+    {
+      title: 'Filter Domains',
+      value: '0'
+    }
+  ])
 
   onMounted(() => {
     initializeFormValues()
