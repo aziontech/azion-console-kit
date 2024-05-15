@@ -298,7 +298,7 @@
       timer.value += 1
     }, 1000)
   }
- 
+
   const retry = () => {
     router.go(-1)
   }

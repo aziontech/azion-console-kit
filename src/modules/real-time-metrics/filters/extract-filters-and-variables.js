@@ -131,14 +131,16 @@ function extractAnd(filters) {
           begin: `$${filters.and.meta.fieldPrefix}${andFilter}_begin`,
           end: `$${filters.and.meta.fieldPrefix}${andFilter}_end`
         }
+
+        const type = inputType === 'FloatRange' ? 'Float!' : 'Int!'
         params.push({
           name: `$${filters.and.meta.fieldPrefix}${andFilter}_begin`,
-          type: 'Float!',
+          type,
           value: begin
         })
         params.push({
           name: `$${filters.and.meta.fieldPrefix}${andFilter}_end`,
-          type: 'Float!',
+          type,
           value: end
         })
         variables[`${filters.and.meta.fieldPrefix}${andFilter}_begin`] = begin
