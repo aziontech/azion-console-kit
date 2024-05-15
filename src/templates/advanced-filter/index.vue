@@ -1,6 +1,6 @@
 <script setup>
   defineOptions({ name: 'advanced-filter' })
-  import { computed, onMounted, ref, watch, nextTick } from 'vue'
+  import { computed, onMounted, ref, watch } from 'vue'
   import dialogFilter from './dialog-filter.vue'
   import PrimeButton from 'primevue/button'
   import { useRoute, useRouter } from 'vue-router'
@@ -222,10 +222,8 @@
     async (value) => {
       if (!value) return
 
-      await nextTick(() => {
-        const adaptFilter = adapterApply(displayFilter.value)
-        updateHash(adaptFilter, value)
-      })
+      const adaptFilter = adapterApply(displayFilter.value)
+      updateHash(adaptFilter, value)
     }
   )
 

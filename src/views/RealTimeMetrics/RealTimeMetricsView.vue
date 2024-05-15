@@ -164,7 +164,9 @@
   })
 
   watch(currentInfo, () => {
-    updateRouter()
+    setTimeout(() => {
+      updateRouter()
+    }, 100)
   })
 
   onUnmounted(() => {
