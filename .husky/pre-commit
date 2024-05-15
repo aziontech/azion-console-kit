@@ -1,6 +1,7 @@
 #!/usr/bin/env sh
 . "$(dirname -- "$0")/_/husky.sh"
-
+echo "Running Cypress tests"
+yarn test:e2e:dev-run
 yarn test:unit:coverage
 yarn lint
 yarn format
