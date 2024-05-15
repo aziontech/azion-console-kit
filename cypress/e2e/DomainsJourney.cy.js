@@ -4,26 +4,25 @@ describe('Create and Edge application journey', () => {
   beforeEach(() => {
     cy.loginWithEmail(Cypress.env('username'), Cypress.env('password'))
   })
-  // after(() => {
-  //   Cypress.session.clearAllSavedSessions()
-  // })
-
   const domainNameMock = `test-ede-${Date.now()}`
 
   it.only('Should be able to visit home page and create,edit, list and delete an domain', () => {
+    // Go to domains
     cy.visit('/')
     cy.getByTestId('create-button').click()
     cy.get('.p-dialog-header-icon > .p-icon > path').click()
     cy.get('.top-0 > .w-full > .gap-3 > .p-button').click()
     cy.get('#pv_id_18_2 > .p-menuitem-content > .flex').click()
     cy.get('.p-datatable-header > .flex-wrap > .p-button > .p-button-label').click()
-    cy.get('#name').clear('n')
+    //Fill domain data
     cy.get('#name').type(domainNameMock)
     cy.get('#edge_application > .p-dropdown-label').click()
     cy.get('#edge_application_0').click()
     cy.get('#cnameAccessOnly > .p-inputswitch-slider').click()
     cy.get('.max-md\\:w-full > .p-button-label').click()
+    // Submit
     cy.contains('Your domain has been created', { timeout: 20000 })
+
     // Edit domain
     cy.get('.text-\\[var\\(--text-color\\)\\]', { timeout: 20000 }).should(
       'have.text',
@@ -47,7 +46,7 @@ describe('Create and Edge application journey', () => {
     cy.visit('/')
   })
 
-  it('Should be able to create edge application', () => {
+  it('Should be able to create domain with Cname', () => {
     cy.visit('/edge-applications')
     cy.contains('Edge Applications')
   })

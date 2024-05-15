@@ -17,6 +17,7 @@
     "test:unit:coverage": "TZ=UTC vitest run --coverage",
     "test:e2e": "start-server-and-test preview http://localhost:5173 'cypress run --e2e'",
     "test:e2e:dev": "start-server-and-test 'vite dev --port 5173' http://localhost:5173 'cypress open --e2e'",
+    "test:e2e:dev-run": "start-server-and-test 'vite dev --port 5173' http://localhost:5173 'cypress run'",
     "lint": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs --fix --ignore-path .gitignore",
     "format": "prettier --write src/",
     "prepare": "husky install"

@@ -37,7 +37,7 @@ Cypress.Commands.add('getInput', (inputType, ...args) => {
 
 function loginWithEmail(email, password) {
   cy.session(
-    [email, password],
+    ['login-with-email-session', email],
     () => {
       cy.visit('/login')
       cy.getByTestId('title').should('have.text', ' Azion Console ')
@@ -54,15 +54,15 @@ function loginWithEmail(email, password) {
 }
 
 Cypress.Commands.add('loginWithEmail', (email, password) => {
-  // const log = Cypress.log({
-  //   displayName: 'AUTH',
-  //   message: [`🔐 Authenticating | ${email}`],
-  //   autoEnd: false
-  // })
-  // log.snapshot('before')
+  const log = Cypress.log({
+    displayName: 'AUTH',
+    message: [`🔐 Authenticating | ${email}`],
+    autoEnd: false
+  })
+  log.snapshot('before')
 
   loginWithEmail(email, password)
 
-  // log.snapshot('after')
-  // log.end()
+  log.snapshot('after')
+  log.end()
 })

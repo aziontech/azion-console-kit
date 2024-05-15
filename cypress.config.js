@@ -7,6 +7,11 @@ export default defineConfig({
     specPattern: 'cypress/e2e/**/*.{cy,spec}.{js,jsx,ts,tsx}',
     baseUrl: 'http://localhost:5173',
     defaultCommandTimeout: 8000,
-    experimentalStudio: true
+    video: true,
+    experimentalStudio: true,
+    retries: {
+      runMode: 2,
+      openMode: 2
+    }
   }
 })
