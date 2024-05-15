@@ -93,7 +93,7 @@
       setTimeRange({
         tsRangeBegin: tsRange.begin,
         tsRangeEnd: tsRange.end,
-        meta: { option: 'custom' }
+        meta: tsRange.meta
       })
     }
   })
@@ -173,8 +173,6 @@
       refAdvancedFilter.value.clearDisplayFilter()
     }
   )
-
-  defineExpose({ applyFilter })
 </script>
 
 <template>

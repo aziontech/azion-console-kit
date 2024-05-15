@@ -1,6 +1,6 @@
 <script setup>
   defineOptions({ name: 'advanced-filter' })
-  import { computed, onMounted, ref, watch } from 'vue'
+  import { computed, onMounted, ref, watch, nextTick } from 'vue'
   import dialogFilter from './dialog-filter.vue'
   import PrimeButton from 'primevue/button'
   import { useRoute, useRouter } from 'vue-router'
@@ -218,12 +218,15 @@
   })
 
   watch(
-    props.externalFilter,
-    (value) => {
-      const adaptFilter = adapterApply(displayFilter.value)
-      updateHash(adaptFilter, value)
-    },
-    { immediate: false }
+    () => props.externalFilter,
+    async (value) => {
+      if (!value) return
+
+      await nextTick(() => {
+        const adaptFilter = adapterApply(displayFilter.value)
+        updateHash(adaptFilter, value)
+      })
+    }
   )
 
   onMounted(() => {
@@ -285,7 +288,7 @@
     </div>
 
     <PrimeButton
-      class="h-auto min-w-max max-sm:bg-red h-12"
+      class="h-auto min-w-max max-sm:bg-red"
       size="small"
       :disabled="disabledSearch"
       @click="searchFilter"
