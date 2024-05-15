@@ -85,7 +85,7 @@
 
   const timeFilter = computed({
     get: () => {
-      return currentFilters({ filters: props.filterData })
+      return { ...currentFilters({ filters: props.filterData }) }
     },
     set: ({ tsRange }) => {
       if (!tsRange?.meta) return
