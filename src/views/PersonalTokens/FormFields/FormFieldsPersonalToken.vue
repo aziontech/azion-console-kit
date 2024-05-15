@@ -8,6 +8,7 @@
   import PrimeTextarea from 'primevue/textarea'
   import { useField } from 'vee-validate'
   import { computed } from 'vue'
+
   defineOptions({ name: 'form-fields-personal-token' })
 
   const props = defineProps({
@@ -59,6 +60,7 @@
   const minExpirationDate = computed(() => {
     return selectedExpiration.value === 'custom' ? tomorrow : null
   })
+
   const disabledFields = computed(() => {
     return !!props.personalTokenKey
   })

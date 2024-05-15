@@ -8,9 +8,11 @@
   import PageHeadingBlock from '@/templates/page-heading-block'
   import FormFieldsPersonalToken from '@/views/PersonalTokens/FormFields/FormFieldsPersonalToken'
   import CopyTokenDialog from '@/views/PersonalTokens/Dialog/CopyTokenDialog'
+  import { useDialog } from 'primevue/usedialog'
   import { useAccountStore } from '@/stores/account'
   import { storeToRefs } from 'pinia'
   import * as yup from 'yup'
+
   defineOptions({ name: 'create-personal-token' })
 
   const props = defineProps({
@@ -29,7 +31,6 @@
   })
 
   const personalTokenKey = ref('')
-  const showCopyTokenDialog = ref(false)
 
   const validationSchema = yup.object({
     name: yup.string().required().max(100),
@@ -65,8 +66,16 @@
   }
 
   const toast = useToast()
+  const dialog = useDialog()
+
   const handleResponse = ({ token }) => {
     personalTokenKey.value = token
+    dialog.open(CopyTokenDialog, {
+      data: {
+        personalToken: personalTokenKey.value,
+        copy: copyPersonalToken
+      }
+    })
   }
 
   const copyPersonalToken = async () => {
@@ -86,10 +95,6 @@
         detail: 'The Personal Token could not be copied to clipboard. Please try again.'
       })
     }
-  }
-
-  const openCopyTokenDialog = () => {
-    showCopyTokenDialog.value = true
   }
 </script>
 
@@ -113,22 +118,16 @@
             :userUtcOffset="account?.utc_offset"
             :convertDateToLocalTimezone="convertDateToLocalTimezone"
           />
-          <CopyTokenDialog
-            v-model:visible="showCopyTokenDialog"
-            :personalToken="personalTokenKey"
-            :copy="copyPersonalToken"
-            :tokenAlreadySaved="!!personalTokenKey"
-          />
         </template>
         <template #action-bar="{ onSubmit, formValid, onCancel, loading }">
           <teleport
             to="#action-bar"
             v-if="!!personalTokenKey"
           >
-            <GoBack :goback="openCopyTokenDialog" />
+            <GoBack />
           </teleport>
           <ActionBarTemplate
-            v-if="!personalTokenKey"
+            v-else
             @onSubmit="onSubmit"
             @onCancel="onCancel"
             :loading="loading"
