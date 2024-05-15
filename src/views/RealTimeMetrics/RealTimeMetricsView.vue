@@ -77,7 +77,7 @@
   const accountStore = useAccountStore()
   const userUTC = accountStore.accountUtcOffset
 
-  const metricsModule = RealTimeMetricsModule()
+  const metricsModule = RealTimeMetricsModule
   const {
     getters: { currentIdPageAndDashboard, getCurrentInfo },
     actions: {
