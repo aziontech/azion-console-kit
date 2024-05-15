@@ -124,9 +124,8 @@
   })
 
   const loadPageInfo = async () => {
-    setInitialPageAndDashboardCurrent()
-    await setInfoAvailableFilters()
     setCurrentPageAndDashboard()
+    await setInfoAvailableFilters()
     await setDatasetAvailableFilters()
     updateRouter()
   }
@@ -140,7 +139,9 @@
   const setCurrentPageAndDashboard = () => {
     const { pageId, dashboardId } = route.params
 
-    if (!pageId || !dashboardId) return
+    if (!pageId || !dashboardId) {
+      return setInitialPageAndDashboardCurrent()
+    }
 
     return setInitialCurrentsByIds({ pageId, dashboardId })
   }
