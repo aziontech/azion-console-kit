@@ -82,12 +82,12 @@
             />
           </template>
           <p class="text-color-secondary">
-            This may temporarily impact some URLs, causing a minor disruption.
+            This action may temporarily impact some URLs, causing a minor disruption.
           </p>
         </Message>
         <div class="text-color font-semibold text-sm mb-2 px-8">
-          This may temporarily impact some URLs, causing a minor disruption. Not to worry – it's
-          expected to last only a few minutes!
+          This happens because the purge is queued for execution, and the results may take some time
+          to propagate to all edge nodes.
         </div>
       </div>
       <template #footer>
@@ -99,7 +99,7 @@
         />
         <PrimeButton
           severity="secondary"
-          label="Sure, make purge"
+          label="Confirm"
           :loading="loading"
           @click="handleRealTimePurge"
           iconPos="right"

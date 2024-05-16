@@ -5,13 +5,26 @@ import { makeRealTimePurgeBaseUrl } from './make-real-time-purge-service'
 export const createRealTimePurgeService = async (payload) => {
   const bodyRequest = adapt(payload)
 
+  const MAPTYPE = {
+    CacheKey: 'cachekey',
+    Wildcard: 'wildcard',
+    URL: 'url'
+  }
+
+  const purgeType = MAPTYPE[payload.purgeType] || payload.purgeType
+
   let httpResponse = await AxiosHttpClientAdapter.request({
-    url: `${makeRealTimePurgeBaseUrl()}/${payload.purgeType}`,
+    url: `${makeRealTimePurgeBaseUrl()}/${purgeType}`,
     method: 'POST',
     body: bodyRequest
   })
 
   return parseHttpResponse(httpResponse)
+}
+
+const MAPLAYER = {
+  'Edge Cache': 'edge_cache',
+  'Tiered Cache': 'tiered_cache'
 }
 
 const adapt = (payload) => {
@@ -21,9 +34,11 @@ const adapt = (payload) => {
     argumentsPurge = payload.argumentsPurge.trim().split('\n')
   }
 
+  const layer = MAPLAYER[payload.layer] || payload.layer
+
   const request = {
     items: argumentsPurge,
-    layer: payload.layer
+    layer
   }
 
   return request
