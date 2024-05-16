@@ -89,7 +89,7 @@
     },
     {
       label: 'Edge Functions',
-      to: '/edge-functions/create',
+      to: '/edge-functions/create?origin=create',
       description: 'Create edge functions to use with Edge Application or Edge Firewall.'
     },
     {
