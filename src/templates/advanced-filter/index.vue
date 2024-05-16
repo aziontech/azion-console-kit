@@ -218,13 +218,12 @@
   })
 
   watch(
-    () => props.externalFilter,
-    async (value) => {
-      if (!value) return
-
+    props.externalFilter,
+    (value) => {
       const adaptFilter = adapterApply(displayFilter.value)
       updateHash(adaptFilter, value)
-    }
+    },
+    { immediate: false }
   )
 
   onMounted(() => {
