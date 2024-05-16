@@ -45,7 +45,6 @@ const MAP_TYPE = {
   cachekey: 'CacheKey',
   wildcard: 'Wildcard',
   url: 'URL'
-
 }
 
 const adapt = (httpResponse) => {

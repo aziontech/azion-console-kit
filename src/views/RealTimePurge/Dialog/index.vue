@@ -86,7 +86,8 @@
           </p>
         </Message>
         <div class="text-color font-semibold text-sm mb-2 px-8">
-          This happens because the purge is queued for execution, and the results may take some time to propagate to all edge nodes.
+          This happens because the purge is queued for execution, and the results may take some time
+          to propagate to all edge nodes.
         </div>
       </div>
       <template #footer>
