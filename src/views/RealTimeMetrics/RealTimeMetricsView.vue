@@ -32,6 +32,7 @@
           :groupData="groupData"
           :userUTC="userUTC"
           :filterHash="filterHash"
+          @clearHash="clearFilterHash"
         />
       </div>
       <DashboardPanelBlock
@@ -81,6 +82,10 @@
 
   const setFilterHash = () => {
     filterHash.value = route?.query?.filters || ''
+  }
+
+  const clearFilterHash = () => {
+    filterHash.value = ''
   }
 
   const accountStore = useAccountStore()

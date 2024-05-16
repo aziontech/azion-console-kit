@@ -16,6 +16,7 @@
   const { setTimeRange, filterDatasetUpdate, createAndFilter, loadCurrentReports, resetFilters } =
     props.moduleActions
 
+  const emit = defineEmits(['clearHash'])
   const props = defineProps({
     playgroundOpener: {
       type: Function,
@@ -87,18 +88,51 @@
     return newOptions
   })
 
+  const decodeFilter = (filters) => {
+    if (!filters) return {}
+    return JSON.parse(atob(filters))
+  }
+
+  const getTimeFilterInHash = () => {
+    const { external } = decodeFilter(props.filterHash)
+    return external
+  }
+
+  const setTimeFilter = (tsRange) => {
+    const filterFromHash = getTimeFilterInHash()
+
+    if (filterFromHash) {
+      setTimeRange({
+        tsRangeBegin: filterFromHash.tsRange.begin,
+        tsRangeEnd: filterFromHash.tsRange.end,
+        meta: { option: 'custom' }
+      })
+
+      return emit('clearHash')
+    }
+
+    return setTimeRange({
+      tsRangeBegin: tsRange.begin,
+      tsRangeEnd: tsRange.end,
+      meta: tsRange.meta
+    })
+  }
+
+  const getTimeFilter = () => {
+    const { external } = decodeFilter(props.filterHash)
+
+    if (!external) return { ...currentFilters({ filters: props.filterData }) }
+
+    return { tsRange: { ...external.tsRange } }
+  }
+
   const timeFilter = computed({
     get: () => {
-      return { ...currentFilters({ filters: props.filterData }) }
+      return getTimeFilter()
     },
     set: ({ tsRange }) => {
       if (!tsRange?.meta) return
-
-      setTimeRange({
-        tsRangeBegin: tsRange.begin,
-        tsRangeEnd: tsRange.end,
-        meta: tsRange.meta
-      })
+      setTimeFilter(tsRange)
     }
   })
 
