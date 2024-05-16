@@ -5,14 +5,14 @@
   } from '@/services/digital-certificates-services'
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
   import PrimeButton from 'primevue/button'
-  import Card from 'primevue/card'
   import Dropdown from 'primevue/dropdown'
   import InputSwitch from 'primevue/inputswitch'
   import InputText from 'primevue/inputtext'
-  import RadioButton from 'primevue/radiobutton'
   import PrimeTextarea from 'primevue/textarea'
+  import FieldGroupRadio from '@/templates/form-fields-inputs/fieldGroupRadio'
+  import FieldSwitchBlock from '@/templates/form-fields-inputs/fieldSwitchBlock'
   import { useField } from 'vee-validate'
-  import { computed } from 'vue'
+  import { computed, ref } from 'vue'
 
   const props = defineProps({
     digitalCertificates: {
@@ -35,10 +35,10 @@
   const { value: cnameAccessOnly, errorMessage: errorCnameAccessOnly } = useField('cnameAccessOnly')
   const { value: edgeApplication, errorMessage: errorEdgeApplication } = useField('edgeApplication')
   const { value: edgeCertificate } = useField('edgeCertificate')
-  const { value: mtlsIsEnabled, errorMessage: errorMtlsIsEnabled } = useField('mtlsIsEnabled')
-  const { value: active } = useField('active')
+  const { value: mtlsIsEnabled } = useField('mtlsIsEnabled')
+  useField('active')
   const { value: domainName } = useField('domainName')
-  const { value: mtlsVerification } = useField('mtlsVerification')
+  useField('mtlsVerification')
   const { value: mtlsTrustedCertificate, errorMessage: errorMtlsTrustedCertificate } =
     useField('mtlsTrustedCertificate')
 
@@ -75,6 +75,21 @@
       value: certificate.id
     }))
   })
+
+  const mtlsModeRadioOptions = ref([
+    {
+      title: 'Enforce',
+      subtitle: `Blocks the client certificate during the TLS handshake if the uploaded Trusted CA can't be validated.`,
+      value: 'enforce'
+    },
+    {
+      title: 'Permissive',
+      subtitle: `Attempts to verify the client certificate, but will allow the TLS handshake even if
+              the Trusted CA can't be validated. Check which client certificate attempted the
+              request in Edge Firewall, if necessary.`,
+      value: 'permissive'
+    }
+  ])
 </script>
 
 <template>
@@ -242,77 +257,25 @@
     description="Enable Mutual Authentication (mTLS) to require that both client and server present an authentication protocol to each other."
   >
     <template #inputs>
-      <div class="flex gap-3 items-center">
-        <InputSwitch
-          id="mtls"
-          :class="{ 'p-invalid': errorMtlsIsEnabled }"
-          v-model="mtlsIsEnabled"
-        />
-        <label
-          for="mtls"
-          class="text-base"
-          >Mutual Authentication</label
-        >
-      </div>
+      <FieldSwitchBlock
+        nameField="mtlsIsEnabled"
+        name="mtlsIsEnabled"
+        auto
+        :isCard="false"
+        title="Mutual Authentication"
+      />
 
-      <div
-        v-if="mtlsIsEnabled"
-        class="flex flex-col gap-2"
-      >
-        <label class="text-color text-base font-medium">Mode</label>
+      <div v-if="mtlsIsEnabled">
         <div class="flex flex-col gap-3">
-          <Card
-            :pt="{
-              body: { class: 'p-4' },
-              title: { class: 'flex justify-between font-medium text-base m-0' },
-              subtitle: {
-                class: 'text-sm font-normal text-color-secondary m-0 pr-0 md:pr-[2.5rem]'
-              }
-            }"
-          >
-            <template #title>
-              <span class="text-base">Enforce</span>
-              <RadioButton
-                :disabled="!mtlsIsEnabled"
-                v-model="mtlsVerification"
-                inputId="enforce"
-                name="mtls-verification"
-                value="enforce"
-              />
-            </template>
-            <template #subtitle>
-              Blocks the client certificate during the TLS handshake if the uploaded Trusted CA
-              can't be validated.
-            </template>
-          </Card>
-
-          <Card
-            :pt="{
-              body: { class: 'p-4' },
-              title: { class: 'flex justify-between font-medium text-base m-0' },
-              subtitle: {
-                class: 'text-sm font-normal text-color-secondary m-0 pr-[2.5rem]'
-              }
-            }"
-          >
-            <template #title>
-              <span class="text-base">Permissive</span>
-              <RadioButton
-                :disabled="!mtlsIsEnabled"
-                v-model="mtlsVerification"
-                inputId="permissive"
-                name="mtls-verification"
-                value="permissive"
-              />
-            </template>
-            <template #subtitle>
-              Attempts to verify the client certificate, but will allow the TLS handshake even if
-              the Trusted CA can't be validated. Check which client certificate attempted the
-              request in Edge Firewall, if necessary.
-            </template>
-          </Card>
+          <FieldGroupRadio
+            nameField="mtlsVerification"
+            :isCard="true"
+            label="Mode"
+            :options="mtlsModeRadioOptions"
+          />
         </div>
       </div>
+
       <div
         v-if="mtlsIsEnabled"
         class="flex flex-col w-full sm:max-w-xs gap-2"
@@ -344,17 +307,13 @@
 
   <form-horizontal title="Status">
     <template #inputs>
-      <div class="flex gap-3 items-center">
-        <InputSwitch
-          id="active"
-          v-model="active"
-        />
-        <label
-          for="active"
-          class="text-base"
-          >Active</label
-        >
-      </div>
+      <FieldSwitchBlock
+        nameField="active"
+        name="active"
+        auto
+        :isCard="false"
+        title="Active"
+      />
     </template>
   </form-horizontal>
 </template>
