@@ -31,6 +31,7 @@
           :filterData="filterData"
           :groupData="groupData"
           :userUTC="userUTC"
+          :filterHash="filterHash"
         />
       </div>
       <DashboardPanelBlock
@@ -70,9 +71,17 @@
     }
   })
 
+  const route = useRoute()
+  const filterHash = ref(null)
+
   onMounted(() => {
     loadPageInfo()
+    setFilterHash()
   })
+
+  const setFilterHash = () => {
+    filterHash.value = route?.query?.filters || ''
+  }
 
   const accountStore = useAccountStore()
   const userUTC = accountStore.accountUtcOffset
@@ -133,8 +142,6 @@
   const load = async () => {
     await loadCurrentReports(userUTC)
   }
-
-  const route = useRoute()
 
   const setCurrentPageAndDashboard = () => {
     const { pageId, dashboardId } = route.params

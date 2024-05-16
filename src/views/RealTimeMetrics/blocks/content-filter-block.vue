@@ -40,6 +40,10 @@
     userUTC: {
       type: String,
       required: true
+    },
+    filterHash: {
+      type: String,
+      required: true
     }
   })
   const refAdvancedFilter = ref('')
@@ -181,6 +185,7 @@
       :disabled="disabledFilter"
       :fieldsInFilter="optionsFields"
       hashLess
+      :filterHash="filterHash"
       v-model:externalFilter="timeFilter"
       ref="refAdvancedFilter"
       @applyFilter="applyFilter"
