@@ -14,6 +14,8 @@
         createPagePath="edge-functions/create"
         editPagePath="edge-functions/edit"
         @on-load-data="handleLoadData"
+        @on-before-go-to-add-page="handleCreateTrackEvent"
+        @on-before-go-to-edit="handleTrackEditEvent"
         emptyListMessage="No edge functions found."
       />
       <EmptyResultsBlock
@@ -39,7 +41,10 @@
   import ListTableBlock from '@/templates/list-table-block'
   import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
   import PageHeadingBlock from '@/templates/page-heading-block'
-  import { computed, ref } from 'vue'
+  import { computed, ref, inject } from 'vue'
+  
+  /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
+  const tracker = inject('tracker')
 
   const props = defineProps({
     listEdgeFunctionsService: {
@@ -57,6 +62,19 @@
   })
 
   let hasContentToList = ref(true)
+
+
+  const handleCreateTrackEvent = () => {
+    tracker.product.clickToCreate({
+      productName: 'Edge Functions'
+    })
+  }
+
+  const handleTrackEditEvent = () => {
+    tracker.product.clickToEdit({
+      productName: 'Edge Functions'
+    })
+  }
 
   const getColumns = computed(() => [
     {
