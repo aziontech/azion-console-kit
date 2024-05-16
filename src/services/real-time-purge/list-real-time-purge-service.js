@@ -36,12 +36,12 @@ export const listRealTimePurgeService = async (
   return parseHttpResponse(httpResponse)
 }
 
-const MAP_LAYER = {
+const MAPLAYER = {
   edge_cache: 'Edge Cache',
   tiered_cache: 'Tiered Cache'
 }
 
-const MAP_TYPE = {
+const MAPTYPE = {
   cachekey: 'CacheKey',
   wildcard: 'Wildcard',
   url: 'URL'
@@ -54,9 +54,9 @@ const adapt = (httpResponse) => {
     const { items, layer } = JSON.parse(JSON.parse(item.requestData))
     return {
       id,
-      type: MAP_TYPE[type],
+      type: MAPTYPE[type],
       arguments: items,
-      layer: MAP_LAYER[layer],
+      layer: MAPLAYER[layer],
       user: item.authorEmail,
       time: new Intl.DateTimeFormat('us', {
         dateStyle: 'full',

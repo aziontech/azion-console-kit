@@ -5,14 +5,13 @@ import { makeRealTimePurgeBaseUrl } from './make-real-time-purge-service'
 export const createRealTimePurgeService = async (payload) => {
   const bodyRequest = adapt(payload)
 
-  const MAP_TYPE = {
+  const MAPTYPE = {
     CacheKey: 'cachekey',
     Wildcard: 'wildcard',
     URL: 'url'
   }
 
-  //when the action is “repurge” I need to get the value of MAP_TYPE
-  const purgeType = MAP_TYPE[payload.purgeType] || payload.purgeType
+  const purgeType = MAPTYPE[payload.purgeType] || payload.purgeType
 
   let httpResponse = await AxiosHttpClientAdapter.request({
     url: `${makeRealTimePurgeBaseUrl()}/${purgeType}`,
@@ -23,7 +22,7 @@ export const createRealTimePurgeService = async (payload) => {
   return parseHttpResponse(httpResponse)
 }
 
-const MAP_LAYER = {
+const MAPLAYER = {
   'Edge Cache': 'edge_cache',
   'Tiered Cache': 'tiered_cache'
 }
@@ -35,8 +34,7 @@ const adapt = (payload) => {
     argumentsPurge = payload.argumentsPurge.trim().split('\n')
   }
 
-  //when the action is “repurge” I need to get the value of MAP_LAYER
-  const layer = MAP_LAYER[payload.layer] || payload.layer
+  const layer = MAPLAYER[payload.layer] || payload.layer
 
   const request = {
     items: argumentsPurge,
