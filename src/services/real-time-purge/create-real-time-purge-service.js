@@ -34,7 +34,7 @@ const adapt = (payload) => {
   if (!isArray) {
     argumentsPurge = payload.argumentsPurge.trim().split('\n')
   }
-  
+
   //when the action is “repurge” I need to get the value of MAP_LAYER
   const layer = MAP_LAYER[payload.layer] || payload.layer
 
