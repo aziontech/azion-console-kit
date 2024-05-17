@@ -35,22 +35,28 @@ export const mockForbiddenError = (url) => {
 }
 
 /**
- * Mocks a server error response with a random status code
- * between 4xx and 5xx, and the given response body.
- * @template R
- * @param {RegExp} url - The URL to intercept
- * @param {R} response - The response body
+ * Mocks a failed response with a status code
+ * and the given response body.
+ * @template R The response body type
+ * @param {'GET'|'POST'|'PUT'|'PATCH'|'DELETE'} method - The HTTP method to intercept
+ * @param {string|RegExp} url - The URL to intercept
+ * @param {Object} configuration - The URL to intercept
+ * @param {R} [configuration.response] - response body
+ * @param {R} [configuration.fixture] - response fixture to be used as body response
+ * @param {Number} [configuration.statusCode] - status code 4xx or 5xx
+ * @param {string} configuration.alias - cypress alias for the request
  * @returns {void}
  */
-export const mockServerError = (url, response) => {
-  const options = [400, 402, 404, 500]
+export const mockServerError = (method, url, { response, fixture, statusCode, alias }) => {
+  const options = statusCode ?? [400, 402, 404, 500]
   const randomIndex = Math.floor(Math.random() * options.length)
-  const randomOption = options[randomIndex]
-  cy.intercept(url, {
+  const selectedStatusCode = statusCode ?? options[randomIndex]
+  cy.intercept(method, url, {
     delay: 100,
-    statusCode: randomOption,
-    body: response
-  }).as(requestAlias)
+    statusCode: selectedStatusCode,
+    body: response,
+    fixture: fixture
+  }).as(alias)
 }
 
 /**
@@ -58,11 +64,11 @@ export const mockServerError = (url, response) => {
  * and the given response body.
  * @template R The response body type
  * @param {'GET'|'POST'|'PUT'|'PATCH'|'DELETE'} method - The HTTP method to intercept
- * @param {RegExp} url - The URL to intercept
+ * @param {string|RegExp} url - The URL to intercept
  * @param {Object} configuration - The URL to intercept
  * @param {R} [configuration.response] - response body
  * @param {R} [configuration.fixture] - response fixture to be used as body response
- *  * @param {string} configuration.alias - cypress alias for the request
+ * @param {string} configuration.alias - cypress alias for the request
  * @returns {void}
  */
 export const mockOk = (method, url, { response, fixture, alias }) => {

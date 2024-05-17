@@ -1,5 +1,18 @@
 /// <reference types="Cypress" />
 
+import { mockOk, mockServerError } from '../utils/http-mocks'
+
+const DEFAULTEMAILMOCK = 'abc@test.com'
+const fillLoginEmailCredential = (email = DEFAULTEMAILMOCK) => {
+  cy.getByTestId('title').should('have.text', ' Azion Console ')
+  cy.getInput('email').as('emailInput').type(email)
+  cy.getByTestId('next-button').click()
+}
+const fillRecoveryFormWithCredentials = (email = DEFAULTEMAILMOCK) => {
+  cy.getByTestId('forgot-password').click()
+  cy.getInput('email').as('recoverEmailInput').type(email)
+}
+
 describe('Login Journey', () => {
   it('Should not be able to sign in with invalid email credentials', () => {
     cy.visit('/login')
@@ -37,20 +50,23 @@ describe('Login Journey', () => {
     cy.contains('Email sent successfully')
   })
 
-  it('Should be able to retry to recover password after countdown reset', () => {
+  it.only('Should be able to retry to recover password after countdown reset', () => {
     cy.visit('/login')
+    fillLoginEmailCredential()
+    fillRecoveryFormWithCredentials()
 
-    cy.getByTestId('title').should('have.text', ' Azion Console ')
-    cy.getInput('email').as('emailInput').type('abc@123.com')
-    cy.getByTestId('next-button').click()
-    cy.getByTestId('forgot-password').click()
-    cy.getInput('email').as('recoverEmailInput').type('abc@123.com')
+    mockOk('POST', '**/iam/user/password/request', {
+      alias: 'recover-password',
+      response: null
+    })
 
     cy.getByTestId('recover-password').click()
+    cy.wait(['@recover-password'])
     cy.contains('Email sent successfully')
 
     cy.clock()
     cy.getByTestId('resend-email').click()
+    cy.wait(['@recover-password'])
     cy.contains('Email sent successfully')
 
     const advanceOneMinute = 600 * 1000
@@ -61,8 +77,13 @@ describe('Login Journey', () => {
     })
 
     cy.tick(advanceOneMinute).then((clock) => {
+      mockServerError('POST', '**/password/request', {
+        statusCode: 400,
+        alias: 'recover-password-error'
+      })
       cy.getByTestId('resend-email').click()
-      cy.contains('Email sent successfully')
+      cy.wait(['@recover-password-error'])
+      cy.contains('Error sending email')
       clock.restore()
     })
   })

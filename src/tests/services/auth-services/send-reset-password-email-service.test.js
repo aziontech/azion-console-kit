@@ -51,9 +51,9 @@ describe('SendResetPasswordEmailService', () => {
     })
     const { sut } = makeSut()
 
-    const feedbackMessage = await sut(fixtures.validEmail)
+    const request = sut(fixtures.validEmail)
 
-    expect(feedbackMessage).toBe('Error sending email')
+    expect(request).rejects.toBe('Error sending email')
   })
 
   it.each([

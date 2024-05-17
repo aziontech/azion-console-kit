@@ -23,7 +23,7 @@ const parseHttpResponse = (httpResponse) => {
     case 200:
       return 'Email sent successfully'
     case 400:
-      return 'Error sending email'
+      throw new Error('Error sending email').message
     case 404:
       throw new Errors.NotFoundError().message
     case 500:
