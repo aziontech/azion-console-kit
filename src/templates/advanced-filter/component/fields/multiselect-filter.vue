@@ -104,6 +104,10 @@
       :optionValue="payload.value"
       class="w-full"
       :placeholder="props.placeholder"
+      :pt="{
+        panel: { class: 'w-full max-w-lg' },
+        option: { class: 'truncate' }
+      }"
     />
     <small
       v-if="errorMessage"
