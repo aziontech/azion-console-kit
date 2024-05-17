@@ -48,5 +48,6 @@ export const documentationGuideProducts = {
   realTimeEventsActivityHistory: () =>
     openDocumentationProducts('real-time-events/#activity-history'),
   edgeServicesResources: () =>
-    openDocumentationProducts('edge-orchestrator/edge-services/#resources')
+    openDocumentationProducts('edge-orchestrator/edge-services/#resources'),
+  edgeDnsRecordTypes: () => openDocumentationProducts('secure/edge-dns/#type')
 }
