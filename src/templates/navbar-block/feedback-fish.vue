@@ -2,12 +2,13 @@
   <FeedbackFish :projectId="projectId" />
 
   <PrimeButton
-    :label="currentLabel"
+    label="Feedback"
     data-feedback-fish
     :data-feedback-fish-userid="user.email"
     :pt="{
-      label: { class: 'text-white' },
-      icon: { class: 'text-white' }
+      root: { class: 'max-md:w-[2rem] max-md:h-[2rem] justify-content-center' },
+      label: { class: 'text-white max-md:hidden' },
+      icon: { class: 'text-white max-md:m-0' }
     }"
     icon="pi pi-flag"
     size="small"
@@ -17,21 +18,11 @@
 </template>
 
 <script setup>
-  import { computed, inject } from 'vue'
   import { FeedbackFish } from '@feedback-fish/vue'
   import { useAccountStore } from '@/stores/account'
   import PrimeButton from 'primevue/button'
 
   const projectId = '2566aa41e7e334'
 
-  const SCREEN_BREAKPOINT_MD = 768
-  const currentWidth = inject('currentWidth')
   const user = useAccountStore().accountData
-
-  const currentLabel = computed(() => {
-    if (currentWidth.value > SCREEN_BREAKPOINT_MD) {
-      return 'Feedback'
-    }
-    return ''
-  })
 </script>

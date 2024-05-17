@@ -8,6 +8,7 @@
   import Sidebar from 'primevue/sidebar'
   import Skeleton from 'primevue/skeleton'
   import InputText from 'primevue/inputtext'
+  import FeedbackFish from '@/templates/navbar-block/feedback-fish'
   import { TOAST_LIFE } from '@/utils/constants'
 
   defineOptions({
@@ -127,12 +128,14 @@
     :pt="{
       root: { class: 'max-w-4xl w-full p-0' },
       header: { class: 'flex justify-between text-xl font-medium px-8' },
+      headercontent: { class: 'flex justify-content-between items-center w-full pr-2' },
       closeButton: { class: 'border surface-border' },
-      content: { class: '[&::-webkit-scrollbar]:hidden p-0 flex flex-col justify-between overfol' }
+      content: { class: '[&::-webkit-scrollbar]:hidden p-0 flex flex-col justify-between overflow' }
     }"
   >
     <template #header>
       <h2>More Details</h2>
+      <FeedbackFish />
     </template>
     <div class="flex flex-col p-0 gap-6 sm:gap-8 sm:p-8">
       <div

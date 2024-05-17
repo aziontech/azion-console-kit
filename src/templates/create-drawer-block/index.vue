@@ -5,6 +5,7 @@
   import ActionBarBlock from '@/templates/action-bar-block'
   import GoBack from '@/templates/action-bar-block/go-back'
   import Sidebar from 'primevue/sidebar'
+  import FeedbackFish from '@/templates/navbar-block/feedback-fish'
   import DialogUnsavedBlock from '@/templates/dialog-unsaved-block'
   import { TOAST_LIFE } from '@/utils/constants'
   defineOptions({
@@ -136,12 +137,15 @@
     position="right"
     :pt="{
       root: { class: 'max-w-4xl w-full' },
+      headercontent: { class: 'flex justify-content-between items-center w-full pr-2' },
       content: { class: 'p-8' }
     }"
   >
     <template #header>
       <h2>{{ title }}</h2>
+      <FeedbackFish />
     </template>
+
     <div class="flex w-full">
       <form
         @submit.prevent="handleSubmit"

@@ -180,36 +180,43 @@
         }"
       >
         <template #header>
-          <div class="w-full flex flex-col gap-2">
-            <div class="flex gap-2 items-center">
-              <div class="w-10 h-10 rounded flex justify-center items-center bg-white">
-                <img
-                  class="rounded"
-                  :src="solution.vendor.icon"
-                  alt=""
-                />
+          <div class="flex">
+            <div class="w-full flex flex-col gap-2">
+              <div class="flex gap-2 items-center">
+                <div class="w-10 h-10 rounded flex justify-center items-center bg-white">
+                  <img
+                    class="rounded"
+                    :src="solution.vendor.icon"
+                    alt=""
+                  />
+                </div>
+                <span class="text-xl font-medium">
+                  {{ solution.name }}
+                </span>
               </div>
-              <span class="text-xl font-medium">
-                {{ solution.name }}
-              </span>
+              <div class="flex gap-3">
+                <div class="flex gap-1">
+                  <span class="text-xs font-medium text-color-primary">By</span>
+                  <span class="text-xs font-medium text-color-secondary">
+                    {{ solution.vendor.name }}</span
+                  >
+                </div>
+                <div class="flex gap-1">
+                  <span class="text-xs font-medium text-color-primary">Version</span>
+                  <span class="text-xs font-medium text-color-secondary">{{
+                    solution.version
+                  }}</span>
+                </div>
+                <div class="flex gap-1">
+                  <span class="text-xs font-medium text-color-primary">Last Updated</span>
+                  <span class="text-xs font-medium text-color-secondary">{{
+                    solution.lastUpdate
+                  }}</span>
+                </div>
+              </div>
             </div>
-            <div class="flex gap-3">
-              <div class="flex gap-1">
-                <span class="text-xs font-medium text-color-primary">By</span>
-                <span class="text-xs font-medium text-color-secondary">
-                  {{ solution.vendor.name }}</span
-                >
-              </div>
-              <div class="flex gap-1">
-                <span class="text-xs font-medium text-color-primary">Version</span>
-                <span class="text-xs font-medium text-color-secondary">{{ solution.version }}</span>
-              </div>
-              <div class="flex gap-1">
-                <span class="text-xs font-medium text-color-primary">Last Updated</span>
-                <span class="text-xs font-medium text-color-secondary">{{
-                  solution.lastUpdate
-                }}</span>
-              </div>
+            <div class="mr-2">
+              <FeedbackFish />
             </div>
           </div>
         </template>
@@ -243,6 +250,7 @@
   import PrimeButton from 'primevue/button'
   import PrimeDialog from 'primevue/dialog'
   import Sidebar from 'primevue/sidebar'
+  import FeedbackFish from '@/templates/navbar-block/feedback-fish'
   import Skeleton from 'primevue/skeleton'
   import { useToast } from 'primevue/usetoast'
   import { inject, onMounted, ref, watchEffect } from 'vue'
