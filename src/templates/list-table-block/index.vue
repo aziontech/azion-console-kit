@@ -29,6 +29,7 @@
           </span>
           <slot name="addButton">
             <PrimeButton
+              data-testid="add-button"
               class="max-sm:w-full"
               @click="navigateToAddPage"
               icon="pi pi-plus"
@@ -47,7 +48,7 @@
 
       <Column
         sortable
-        v-for="col of selectedColumns"
+        v-for="(col, selectedColIndex) of selectedColumns"
         :key="col.field"
         :field="col.field"
         :header="col.header"
@@ -55,10 +56,16 @@
       >
         <template #body="{ data: rowData }">
           <template v-if="col.type !== 'component'">
-            <div v-html="rowData[col.field]"></div>
+            <div
+              :data-testid="`column-${selectedColIndex}`"
+              v-html="rowData[col.field]"
+            ></div>
           </template>
           <template v-else>
-            <component :is="col.component(rowData[col.field])"></component>
+            <component
+              :data-testid="`column-${selectedColIndex}`"
+              :is="col.component(rowData[col.field])"
+            ></component>
           </template>
         </template>
       </Column>
@@ -100,18 +107,20 @@
             </OverlayPanel>
           </div>
         </template>
-        <template #body="{ data: rowData }">
+        <template #body="{ data: rowData, index: actionRowIndex }">
           <div
             class="flex justify-end"
             v-if="showActions"
           >
             <PrimeMenu
+              :data-testid="`action-menu-${actionRowIndex}`"
               ref="menuRef"
               id="overlay_menu"
               v-bind:model="actionOptions(rowData)"
               :popup="true"
             />
             <PrimeButton
+              :data-testid="`action-menu-button-${actionRowIndex}`"
               v-tooltip.top="{ value: 'Actions', showDelay: 200 }"
               size="small"
               icon="pi pi-ellipsis-h"
@@ -124,7 +133,10 @@
       </Column>
       <template #empty>
         <slot name="noRecordsFound">
-          <div class="my-4 flex flex-col gap-3 justify-center items-start">
+          <div
+            data-testid="empty-list"
+            class="my-4 flex flex-col gap-3 justify-center items-start"
+          >
             <p class="text-md font-normal text-secondary">{{ emptyListMessage }}</p>
           </div>
         </slot>
