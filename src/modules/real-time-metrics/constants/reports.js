@@ -1,6 +1,29 @@
 import REPORTS_TEXTS from './reports-texts'
 import HELP_CENTER_URLS from './help-center-urls'
 
+/**
+ * @typedef {Object} Report
+ * @property {string} id - The unique identifier of the report.
+ * @property {string} chartOwner - The owner of the chart.
+ * @property {string} label - The label of the report.
+ * @property {string} description - The description of the report.
+ * @property {string} aggregationType - The type of aggregation used in the report.
+ * @property {number} columns - The number of columns in the report.
+ * @property {string} type - The type of the report.
+ * @property {string} xAxis - The x-axis of the report.
+ * @property {boolean} isTopX - Flag to determine if the report is a top X report.
+ * @property {boolean} rotated - Flag to determine if the report is rotated.
+ * @property {string} dataUnit - The unit of data in the report.
+ * @property {string} dataset - The dataset used in the report.
+ * @property {number} limit - The limit of data points in the report.
+ * @property {Array<string>} fields - The fields used in the report.
+ * @property {Array<string>} groupBy - The fields to group by in the report.
+ * @property {string} orderDirection - The direction of ordering in the report.
+ * @property {string} dashboardId - The id of the dashboard the report belongs to.
+ * @property {string} helpCenterPath - The path to the help center for the report.
+ * @property {string} [variationType] - The type of variation in the report.
+ * @property {number} [maxYAxis] - The maximum value for the y-axis in the report.
+ */
 const REPORTS = [
   /**
    * BUILD

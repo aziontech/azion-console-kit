@@ -1,33 +1,52 @@
 <script setup>
-  import { useAccountStore } from '@/stores/account'
-  import { useMetricsStore } from '@/stores/metrics'
-  import { storeToRefs } from 'pinia'
+  import { TIME_INTERVALS } from '@modules/real-time-metrics/constants'
   import Calendar from 'primevue/calendar'
   import Dropdown from 'primevue/dropdown'
-  import { computed, onBeforeMount, ref, watch } from 'vue'
+  import { computed, onMounted, ref, watch } from 'vue'
 
-  const accountStore = useAccountStore()
-  const metricsStore = useMetricsStore()
+  const props = defineProps({
+    moduleActions: {
+      type: Object,
+      required: true
+    },
+    moduleGetters: {
+      type: Object,
+      required: true
+    },
+    filterData: {
+      type: Object,
+      required: true
+    },
+    userUTC: {
+      type: String,
+      required: true
+    }
+  })
 
-  const {
-    getDateTimeFilterOptions: intervalOptions,
-    currentFilters,
-    getIsLoadingFilters
-  } = storeToRefs(metricsStore)
-  const { setTimeRange } = metricsStore
+  const { setTimeRange } = props.moduleActions
+
+  const { currentFilters, getIsLoadingFilters } = props.moduleGetters
+
+  const intervalOptions = ref([...TIME_INTERVALS.DATE_TIME_FILTER_INTERVALS])
+
+  const getCurrentFilters = computed(() => {
+    return currentFilters({ filters: props.filterData })
+  })
+
+  const isLoading = () => {
+    return getIsLoadingFilters({ filters: props.filterData })
+  }
 
   const emit = defineEmits(['applyTSRange'])
 
   const disabledFilter = computed(() => {
-    return getIsLoadingFilters.value
+    return isLoading.value
   })
 
   const dates = ref([])
   const lastFilteredDate = ref({})
   const interval = ref(null)
   const isVisibleCalendar = ref(false)
-
-  const userUTC = accountStore.accountUtcOffset
 
   const isCustomDate = computed(() => {
     return interval.value?.code === 'custom'
@@ -44,7 +63,7 @@
 
   const maxDate = computed(() => {
     const max = new Date().removeSelectedAmountOfHours(0)
-    return max.toUTC(userUTC)
+    return max.toUTC(props.userUTC)
   })
 
   const setInitialValues = () => {
@@ -59,8 +78,8 @@
 
     const gmt0Begin = `${begin}${GMT0}`
     const gmt0End = `${end}${GMT0}`
-    const dateBegin = new Date(gmt0Begin).toUTC(userUTC)
-    const dateEnd = new Date(gmt0End).toUTC(userUTC)
+    const dateBegin = new Date(gmt0Begin).toUTC(props.userUTC)
+    const dateEnd = new Date(gmt0End).toUTC(props.userUTC)
 
     dates.value = [dateBegin, dateEnd]
     lastFilteredDate.value = { begin: dateBegin, end: dateEnd }
@@ -89,8 +108,8 @@
     if (!begin || !end) return
     const tsRange = {
       meta: { option: interval.value?.code },
-      tsRangeBegin: begin.resetUTC(userUTC).toBeholderFormat(),
-      tsRangeEnd: end.resetUTC(userUTC).toBeholderFormat()
+      tsRangeBegin: begin.resetUTC(props.userUTC).toBeholderFormat(),
+      tsRangeEnd: end.resetUTC(props.userUTC).toBeholderFormat()
     }
 
     if (lastFilteredDate.value?.begin && checkIfDatesAreEqual(begin, end)) return
@@ -104,7 +123,7 @@
     const begin = date.removeSelectedAmountOfHours(offset)
     const end = date.removeSelectedAmountOfHours(0)
 
-    return [begin.toUTC(userUTC), end.toUTC(userUTC)]
+    return [begin.toUTC(props.userUTC), end.toUTC(props.userUTC)]
   }
 
   const dropdownChange = ({ value }) => {
@@ -126,7 +145,7 @@
   }
 
   watch(
-    () => currentFilters.value?.tsRange,
+    () => getCurrentFilters.value?.tsRange,
     (value) => {
       if (value) {
         updatedTimeRange(value)
@@ -135,7 +154,7 @@
     { deep: true }
   )
 
-  onBeforeMount(() => {
+  onMounted(() => {
     setInitialValues()
   })
 </script>
