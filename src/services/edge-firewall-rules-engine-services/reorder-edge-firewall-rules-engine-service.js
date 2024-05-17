@@ -11,7 +11,12 @@ export const reorderEdgeFirewallRulesEngine = async (payload, edgeFirewallId) =>
 
 const adapt = (payload) => {
   const parsedPayload = {
-    order: payload.sort((currentEdgeFirewallRulesEngine, nextEdgeFirewallRulesEngine) => currentEdgeFirewallRulesEngine.newIndex - nextEdgeFirewallRulesEngine.newIndex).map(({ id }) => id)
+    order: payload
+      .sort(
+        (currentEdgeFirewallRulesEngine, nextEdgeFirewallRulesEngine) =>
+          currentEdgeFirewallRulesEngine.newIndex - nextEdgeFirewallRulesEngine.newIndex
+      )
+      .map(({ id }) => id)
   }
 
   return parsedPayload
