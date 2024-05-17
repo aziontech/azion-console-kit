@@ -40,6 +40,7 @@
   import { refDebounced } from '@vueuse/core'
   /**@type {import('@/plugins/adapters/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
+  import { handleTrackerError } from '@/utils/errorHandlingTracker'
 
   defineOptions({ name: 'drawer-origin' })
 
@@ -140,12 +141,26 @@
     }
   }
 
-  const closeDrawerEdit = () => {
+  const handleFailedEditEdgeFirewallFunctions = (error) => {
+    const { fieldName, message } = handleTrackerError(error)
+    tracker.product
+      .failedToEdit({
+        productName: 'Edge Firewall',
+        errorType: 'api',
+        fieldName: fieldName.trim(),
+        errorMessage: message
+      })
+      .track()
+  }
+
+  const closeDrawerEdit = (error) => {
+    handleFailedEditEdgeFirewallFunctions(error)
     showEditFunctionDrawer.value = false
   }
 
   const handleCreateFunction = () => {
     closeDrawerCreate()
+    handleTrackSuccessEdit()
     emit('onSuccess')
   }
 
