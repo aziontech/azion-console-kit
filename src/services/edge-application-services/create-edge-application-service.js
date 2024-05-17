@@ -13,13 +13,16 @@ export const createEdgeApplicationService = async (payload) => {
 }
 
 const adapt = (payload) => {
+  const deliveryProtocol =
+    payload.deliveryProtocol === 'http3' ? 'http,https' : payload.deliveryProtocol
+
   return {
     name: payload.name,
-    delivery_protocol: payload.deliveryProtocol,
+    delivery_protocol: deliveryProtocol,
     http3: payload.http3,
     http_port: payload.httpPort.map((port) => port.value),
     https_port: payload.httpsPort.map((port) => port.value),
-    minimum_tls_version: payload.minimumTlsVersion === 'none' ? '' : payload.minimumTlsVersion,
+    minimum_tls_version: payload.minimumTlsVersion,
     supported_ciphers: payload.supportedCiphers,
     origin_type: payload.originType,
     address: payload.address,

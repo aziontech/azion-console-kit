@@ -27,7 +27,7 @@ const adapt = (httpResponse) => {
     deliveryProtocol: body.delivery_protocol,
     httpPort: httpPorts,
     httpsPort: httpsPorts,
-    minimumTlsVersion: body.minimum_tls_version || 'none',
+    minimumTlsVersion: body.minimum_tls_version,
     active: body.active,
     debugRules: body.debug_rules,
     http3: body.http3,

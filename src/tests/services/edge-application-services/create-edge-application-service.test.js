@@ -10,7 +10,7 @@ const fixtures = {
     http3: false,
     httpPort: [{ name: '80 (Default)', value: '80' }],
     httpsPort: [{ name: '8008', value: '8008' }],
-    minimumTlsVersion: 'none',
+    minimumTlsVersion: '',
     supportedCiphers: 'all',
     originType: 'single_origin',
     address: '192.168.0.1',

@@ -8,8 +8,10 @@
   import InputSwitch from 'primevue/inputswitch'
   import InputText from 'primevue/inputtext'
   import MultiSelect from 'primevue/multiselect'
-  import RadioButton from 'primevue/radiobutton'
   import PrimeTag from 'primevue/tag'
+  import FieldSwitchBlock from '@/templates/form-fields-inputs/fieldSwitchBlock'
+  import FieldGroupRadio from '@/templates/form-fields-inputs/fieldGroupRadio'
+
   import { useField } from 'vee-validate'
   import { computed } from 'vue'
 
@@ -38,7 +40,7 @@
     { name: '9443', value: '9443' }
   ]
   const TLS_VERSIONS_OPTIONS = [
-    { label: 'None', value: 'none' },
+    { label: 'None', value: '' },
     { label: 'TLS 1.0', value: 'tls_1_0' },
     { label: 'TLS 1.1', value: 'tls_1_1' },
     { label: 'TLS 1.2', value: 'tls_1_2' },
@@ -62,8 +64,8 @@
   const { value: originType } = useField('originType')
   const { value: cdnCacheSettings } = useField('cdnCacheSettings')
   const { value: browserCacheSettings } = useField('browserCacheSettings')
-  const { value: originProtocolPolicy } = useField('originProtocolPolicy')
-  const { value: debugRules } = useField('debugRules')
+  useField('originProtocolPolicy')
+  useField('debugRules')
 
   const { value: name } = useField('name')
   const { value: address, errorMessage: addressError } = useField('address')
@@ -80,8 +82,9 @@
   const { value: l2Caching } = useField('l2Caching')
   const { value: loadBalancer } = useField('loadBalancer')
 
-  const setDeliveryProtocol = (protocol, enableHttp3) => {
-    deliveryProtocol.value = protocol
+  const setDeliveryProtocol = (protocol) => {
+    const enableHttp3 = protocol === 'http3'
+
     http3.value = enableHttp3
     if (deliveryProtocol.value === 'http') minimumTlsVersion.value = ''
     setDefaultHttpAndHttpsPort(enableHttp3)
@@ -102,9 +105,38 @@
     return handle
   }
 
+  const usageProtocolRadioOptions = computed(() => [
+    {
+      title: 'HTTP support',
+      subtitle: `Use only the HTTP protocol. Choose from the available HTTP ports.`,
+      value: 'http'
+    },
+    {
+      title: 'HTTP and HTTPS support',
+      subtitle: `Use both HTTP and HTTPS protocols. Choose from the available HTTP and HTTPS ports.`,
+      value: 'http,https'
+    },
+    {
+      title: 'HTTP/3 support',
+      subtitle: `Use both HTTP and HTTPS protocols and enable HTTP/3 support. Only available for HTTP port 80 and HTTPS port 443.`,
+      value: 'http3'
+    }
+  ])
+
+  const policyProtocolRadioOptions = computed(() => [
+    { title: 'Preserve HTTP/HTTPS', value: 'preserve' },
+    { title: 'Enforce HTTP', value: 'http' },
+    { title: 'Enforce HTTPS', value: 'https' }
+  ])
+
+  const cacheSettingsRadioOptions = computed(() => [
+    { title: 'Override cache settings', value: 'override' },
+    { title: 'Honor cache policies', value: 'honor' }
+  ])
+
   const isHttpProtocol = computed(() => deliveryProtocol.value === 'http')
-  const isHttpsProtocol = computed(() => deliveryProtocol.value === 'http,https' && !http3.value)
-  const isHttp3Protocol = computed(() => deliveryProtocol.value === 'http,https' && http3.value)
+  const isHttpsProtocol = computed(() => deliveryProtocol.value === 'http,https')
+  const isHttp3Protocol = computed(() => deliveryProtocol.value === 'http3')
   const isBrowserCacheTypeHonor = computed(() => browserCacheSettings.value === 'honor')
   const websocketIsEnabled = computed(() => websocket.value)
   const cdnCacheSettingsIsOverride = computed(() => cdnCacheSettings.value === 'override')
@@ -135,96 +167,13 @@
     v-if="handleBlock('delivery-settings')"
   >
     <template #inputs>
-      <div class="flex flex-col gap-2">
-        <label
-          for="city"
-          class="text-color text-base font-medium"
-          >Protocol Usage</label
-        >
-        <div class="flex flex-col gap-3">
-          <Card
-            :pt="{
-              root: { class: 'shadow-none border-b rounded-none surface-border' },
-              body: { class: 'py-4 border-0' },
-              title: { class: 'flex items-center text-base m-0 gap-3 font-medium' },
-              subtitle: {
-                class: 'text-sm font-normal text-color-secondary m-0 pr-0 md:pr-[2.5rem]'
-              }
-            }"
-          >
-            <template #title>
-              <InputSwitch
-                class="pl-10"
-                v-model="isHttpProtocol"
-                name="http"
-                value="http"
-                @click="setDeliveryProtocol('http', false)"
-              />
-              <div class="flex-col gap-1">
-                <div class="text-color text-sm font-normal">HTTP support</div>
-                <div class="self-stretch text-color-secondary text-sm font-normal">
-                  Use only the HTTP protocol. Choose from the available HTTP ports.
-                </div>
-              </div>
-            </template>
-          </Card>
-
-          <Card
-            :pt="{
-              root: { class: 'shadow-none border-b rounded-none surface-border' },
-              body: { class: 'py-4 border-0' },
-              title: { class: 'flex items-center text-base m-0 gap-3 font-medium' },
-              subtitle: {
-                class: 'text-sm font-normal text-color-secondary m-0 pr-0 md:pr-[2.5rem]'
-              }
-            }"
-          >
-            <template #title>
-              <InputSwitch
-                class="pl-10"
-                v-model="isHttpsProtocol"
-                @click="setDeliveryProtocol('http,https', false)"
-                name="http,https"
-                value="http,https"
-              />
-              <div class="flex-col gap-1">
-                <div class="text-color text-sm font-normal">HTTP and HTTPS support</div>
-                <div class="self-stretch text-color-secondary text-sm font-normal">
-                  Use both HTTP and HTTPS protocols. Choose from the available HTTP and HTTPS ports.
-                </div>
-              </div>
-            </template>
-          </Card>
-
-          <Card
-            :pt="{
-              root: { class: 'shadow-none border-b rounded-none surface-border' },
-              body: { class: 'py-4 border-0' },
-              title: { class: 'flex items-center text-base m-0 gap-3 font-medium' },
-              subtitle: {
-                class: 'text-sm font-normal text-color-secondary m-0 pr-0 md:pr-[2.5rem]'
-              }
-            }"
-          >
-            <template #title>
-              <InputSwitch
-                class="pl-10"
-                v-model="isHttp3Protocol"
-                @click="setDeliveryProtocol('http,https', true)"
-                name="http,https"
-                value="http,https"
-              />
-              <div class="flex-col gap-1">
-                <div class="text-color text-sm font-normal">HTTP/3 support</div>
-                <div class="self-stretch text-color-secondary text-sm font-normal">
-                  Use both HTTP and HTTPS protocols and enable HTTP/3 support. Only available for
-                  HTTP port 80 and HTTPS port 443.
-                </div>
-              </div>
-            </template>
-          </Card>
-        </div>
-      </div>
+      <FieldGroupRadio
+        label="Protocol Usage"
+        nameField="deliveryProtocol"
+        :isCard="false"
+        @onRadioChange="(option) => setDeliveryProtocol(option, false)"
+        :options="usageProtocolRadioOptions"
+      />
 
       <div class="flex gap-6 max-sm:flex-col">
         <div class="flex flex-col w-full sm:max-w-xs gap-2">
@@ -301,7 +250,7 @@
             v-model="minimumTlsVersion"
             optionLabel="label"
             optionValue="value"
-            placeholder="Select a minimum TLS Version"
+            placeholder="None"
             :disabled="isHttpProtocol"
           />
 
@@ -371,53 +320,13 @@
         </small>
       </div>
 
-      <div class="flex flex-col gap-2">
-        <label class="text-color text-base font-medium">Protocol Policy</label>
-        <div class="flex flex-col gap-4">
-          <div class="flex gap-2 items-center">
-            <RadioButton
-              v-model="originProtocolPolicy"
-              inputId="preserve"
-              name="preserve"
-              value="preserve"
-            />
-            <label
-              for="preserve"
-              class="text-color text-sm font-normal"
-              >Preserve HTTP/HTTPS</label
-            >
-          </div>
-          <div class="flex gap-2 items-center">
-            <RadioButton
-              v-model="originProtocolPolicy"
-              inputId="http"
-              name="http"
-              value="http"
-            />
-            <label
-              for="http"
-              class="text-color text-sm font-normal"
-              >Enforce HTTP</label
-            >
-          </div>
-          <div class="flex gap-2 items-center">
-            <RadioButton
-              v-model="originProtocolPolicy"
-              inputId="https"
-              name="https"
-              value="https"
-            />
-            <label
-              for="https"
-              class="text-color text-sm font-normal"
-              >Enforce HTTPS</label
-            >
-          </div>
-        </div>
-        <div class="text-color-secondary text-sm font-normal">
-          Select the protocol usage between the edge nodes and the origin.
-        </div>
-      </div>
+      <FieldGroupRadio
+        label="Protocol Policy"
+        nameField="originProtocolPolicy"
+        :isCard="false"
+        :options="policyProtocolRadioOptions"
+        helpText="Select the protocol usage between the edge nodes and the origin."
+      />
 
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
         <label
@@ -473,40 +382,13 @@
     v-if="handleBlock('cache-expiration-policies')"
   >
     <template #inputs>
-      <div class="flex flex-col gap-2">
-        <label class="text-color text-base font-medium">Browser Cache Settings</label>
-        <div class="flex flex-col gap-4">
-          <div class="flex gap-2 items-center">
-            <RadioButton
-              v-model="browserCacheSettings"
-              inputId="browserCacheSettings-override"
-              name="override"
-              value="override"
-            />
-            <label
-              for="browserCacheSettings-override"
-              class="text-color text-sm font-normal"
-              >Override Cache Settings</label
-            >
-          </div>
-          <div class="flex gap-2 items-center">
-            <RadioButton
-              v-model="browserCacheSettings"
-              inputId="browserCacheSettings-honor"
-              name="honor"
-              value="honor"
-            />
-            <label
-              for="browserCacheSettings-honor"
-              class="text-color text-sm font-normal"
-              >Honor Origin Cache Headers</label
-            >
-          </div>
-          <div class="text-color-secondary text-sm font-normal">
-            Honor cache policies from the origin or define a new maximum cache TTL for browsers.
-          </div>
-        </div>
-      </div>
+      <FieldGroupRadio
+        label="Browser Cache Settings"
+        nameField="browserCacheSettings"
+        :isCard="false"
+        :options="cacheSettingsRadioOptions"
+        helpText="Honor cache policies from the origin or define a new maximum cache TTL for browsers."
+      />
 
       <div
         class="flex flex-col sm:max-w-lg w-full gap-2"
@@ -526,41 +408,13 @@
         </div>
       </div>
 
-      <div class="flex flex-col gap-2">
-        <label class="text-color text-base font-medium">Edge Cache Settings</label>
-        <div class="flex flex-col gap-4">
-          <div class="flex gap-2 items-center">
-            <RadioButton
-              v-model="cdnCacheSettings"
-              inputId="cdnCacheSettings-override"
-              name="override"
-              value="override"
-            />
-            <label
-              for="cdnCacheSettings-override"
-              class="text-color text-sm font-normal"
-              >Override Cache Settings</label
-            >
-          </div>
-          <div class="flex gap-2 items-center">
-            <RadioButton
-              v-model="cdnCacheSettings"
-              inputId="cdnCacheSettings-honor"
-              name="honor"
-              value="honor"
-            />
-            <label
-              for="cdnCacheSettings-honor"
-              class="text-color text-sm font-normal"
-              >Honor Origin Cache Settings</label
-            >
-          </div>
-          <div class="text-color-secondary text-sm font-normal">
-            Honor cache policies from the origin or define a new maximum cache TTL for the edge. If
-            a TTL isn't received from the origin, cache will be maintained at a default TTL.
-          </div>
-        </div>
-      </div>
+      <FieldGroupRadio
+        label="Edge Cache Settings"
+        nameField="cdnCacheSettings"
+        :isCard="false"
+        :options="cacheSettingsRadioOptions"
+        helpText="Honor cache policies from the origin or define a new maximum cache TTL for the edge. If a TTL isn't received from the origin, cache will be maintained at a default TTL."
+      />
 
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
         <div class="flex flex-col w-full sm:max-w-xs gap-2">
@@ -800,17 +654,13 @@
           }"
         >
           <template #title>
-            <InputSwitch
-              v-model="debugRules"
-              inputId="debugRules"
+            <FieldSwitchBlock
+              nameField="debugRules"
+              name="debugRules"
+              auto
+              :isCard="false"
+              title="Active"
             />
-            <div class="flex-col gap-1">
-              <label
-                for="debugRules"
-                class="text-color text-sm font-normal"
-                >Active</label
-              >
-            </div>
           </template>
         </Card>
       </div>

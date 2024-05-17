@@ -64,7 +64,7 @@
     http3: false,
     httpPort: [{ name: '80 (Default)', value: '80' }],
     httpsPort: [{ name: '443 (Default)', value: '443' }],
-    minimumTlsVersion: 'none',
+    minimumTlsVersion: '',
     supportedCiphers: 'all',
     originType: 'single_origin',
 

@@ -11,7 +11,7 @@ const fixtures = {
     http3: true,
     httpPort: [{ name: '80 (Default)', value: '80' }],
     httpsPort: [{ name: '8008', value: '8008' }],
-    minimumTlsVersion: 'none',
+    minimumTlsVersion: '',
     active: true,
     debugRules: ['rule1', 'rule2'],
     supportedCiphers: 'mock_cipher',
