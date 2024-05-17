@@ -32,13 +32,18 @@ const createChangedItem = (item, originalIndexMap, updatedIndexMap) => {
  * @param {Object} updatedIndexMap - The updated index map.
  * @returns {Array} The changed items.
  */
-const getChangedItems = (array, originalIndexMap, updatedIndexMap) => {
+const getChangedItems = (array, originalIndexMap, updatedIndexMap, reorderAll) => {
   const changedItems = []
 
   for (const id in originalIndexMap) {
-    if (originalIndexMap[id] !== updatedIndexMap[id]) {
+    if (reorderAll) {
       const item = array.find((item) => String(item.id) === id)
       changedItems.push(createChangedItem(item, originalIndexMap, updatedIndexMap))
+    } else {
+      if (originalIndexMap[id] !== updatedIndexMap[id] && !reorderAll) {
+        const item = array.find((item) => String(item.id) === id)
+        changedItems.push(createChangedItem(item, originalIndexMap, updatedIndexMap))
+      }
     }
   }
 
@@ -51,9 +56,9 @@ const getChangedItems = (array, originalIndexMap, updatedIndexMap) => {
  * @param {Array} updatedArray - The updated array.
  * @returns {Array} The changed items with old and new indices.
  */
-export const getArrayChangedIndexes = (originalArray, updatedArray) => {
+export const getArrayChangedIndexes = (originalArray, updatedArray, reorderAll) => {
   const originalIndexMap = createIndexMap(originalArray)
   const updatedIndexMap = createIndexMap(updatedArray)
 
-  return getChangedItems(originalArray, originalIndexMap, updatedIndexMap)
+  return getChangedItems(originalArray, originalIndexMap, updatedIndexMap, reorderAll)
 }
