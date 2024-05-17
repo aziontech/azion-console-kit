@@ -41,7 +41,7 @@
   import { ref, onMounted, inject } from 'vue'
   import { useLoadingStore } from '@/stores/loading'
   import { useRoute } from 'vue-router'
-  
+
   const route = useRoute()
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
@@ -55,10 +55,10 @@
   const ARGS_INITIAL_STATE = '{}'
 
   tracker.product.productCreated({
-      productName: 'Edge Function',
-      from: route.query.origin,
-      createdFrom: 'singleEntity'
-    })
+    productName: 'Edge Functions',
+    from: route.query.origin,
+    createdFrom: 'singleEntity'
+  })
 
   onMounted(() => {
     const store = useLoadingStore()

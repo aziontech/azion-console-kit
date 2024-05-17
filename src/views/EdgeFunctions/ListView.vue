@@ -42,7 +42,7 @@
   import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
   import PageHeadingBlock from '@/templates/page-heading-block'
   import { computed, ref, inject } from 'vue'
-  
+
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
 
@@ -62,7 +62,6 @@
   })
 
   let hasContentToList = ref(true)
-
 
   const handleCreateTrackEvent = () => {
     tracker.product.clickToCreate({
