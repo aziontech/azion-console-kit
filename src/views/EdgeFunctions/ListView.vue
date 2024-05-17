@@ -11,7 +11,7 @@
         :columns="getColumns"
         pageTitleDelete="edge function"
         addButtonLabel="Edge Function"
-        createPagePath="edge-functions/create"
+        createPagePath="edge-functions/create?origin=list"
         editPagePath="edge-functions/edit"
         @on-load-data="handleLoadData"
         @on-before-go-to-add-page="handleCreateTrackEvent"
