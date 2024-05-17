@@ -49,7 +49,7 @@
         >
           <template #body="slotProps">
             <i
-              v-if="reorderAll || slotProps.index"
+              v-if="isReorderAllEnabled || slotProps.index"
               class="pi pi-bars cursor-move"
               data-pc-section="rowreordericon"
             ></i>
@@ -265,7 +265,7 @@
       type: Boolean,
       default: false
     },
-    reorderAll: {
+    isReorderAllEnabled: {
       type: Boolean,
       default: false
     }
@@ -392,7 +392,7 @@
   const onRowReorder = async (event) => {
     try {
       isLoading.value = true
-      const tableData = getArrayChangedIndexes(data.value, event.value, props.reorderAll)
+      const tableData = getArrayChangedIndexes(data.value, event.value, props.isReorderAllEnabled)
       await props.onReorderService(tableData)
       data.value = event.value
 

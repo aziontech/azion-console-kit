@@ -155,7 +155,7 @@
     :columns="getColumns"
     :editInDrawer="openEditDrawer"
     pageTitleDelete="rule"
-    :reorderAll="true"
+    :isReorderAllEnabled="true"
     @on-load-data="handleLoadData"
     emptyListMessage="No rules have been created."
   >

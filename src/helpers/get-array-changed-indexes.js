@@ -30,20 +30,18 @@ const createChangedItem = (item, originalIndexMap, updatedIndexMap) => {
  * @param {Array} array - The array to be checked.
  * @param {Object} originalIndexMap - The original index map.
  * @param {Object} updatedIndexMap - The updated index map.
+ * @param {Boolean} isReorderAllEnabled - The is reorder all enable.
  * @returns {Array} The changed items.
  */
-const getChangedItems = (array, originalIndexMap, updatedIndexMap, reorderAll) => {
+const getChangedItems = (array, originalIndexMap, updatedIndexMap, isReorderAllEnabled) => {
   const changedItems = []
 
   for (const id in originalIndexMap) {
-    if (reorderAll) {
-      const item = array.find((item) => String(item.id) === id)
+    const item = array.find((item) => String(item.id) === id)
+    const hasIndexChanged = originalIndexMap[id] !== updatedIndexMap[id]
+
+    if (isReorderAllEnabled || hasIndexChanged) {
       changedItems.push(createChangedItem(item, originalIndexMap, updatedIndexMap))
-    } else {
-      if (originalIndexMap[id] !== updatedIndexMap[id] && !reorderAll) {
-        const item = array.find((item) => String(item.id) === id)
-        changedItems.push(createChangedItem(item, originalIndexMap, updatedIndexMap))
-      }
     }
   }
 
@@ -56,9 +54,9 @@ const getChangedItems = (array, originalIndexMap, updatedIndexMap, reorderAll) =
  * @param {Array} updatedArray - The updated array.
  * @returns {Array} The changed items with old and new indices.
  */
-export const getArrayChangedIndexes = (originalArray, updatedArray, reorderAll) => {
+export const getArrayChangedIndexes = (originalArray, updatedArray, isReorderAllEnabled) => {
   const originalIndexMap = createIndexMap(originalArray)
   const updatedIndexMap = createIndexMap(updatedArray)
 
-  return getChangedItems(originalArray, originalIndexMap, updatedIndexMap, reorderAll)
+  return getChangedItems(originalArray, originalIndexMap, updatedIndexMap, isReorderAllEnabled)
 }

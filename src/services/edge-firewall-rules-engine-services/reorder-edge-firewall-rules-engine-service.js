@@ -1,5 +1,5 @@
 import { AxiosHttpClientAdapter } from '../axios/AxiosHttpClientAdapter'
-import { makeEdgeFirewallRulesEngineReorderBaseUrl } from './make-edge-firewall-rules-engine-base-url'
+import { makeEdgeFirewallRulesEngineReorderBaseUrl } from './make-edge-firewall-rules-engine-reorder-base-url'
 
 export const reorderEdgeFirewallRulesEngine = async (payload, edgeFirewallId) => {
   await AxiosHttpClientAdapter.request({
@@ -11,7 +11,7 @@ export const reorderEdgeFirewallRulesEngine = async (payload, edgeFirewallId) =>
 
 const adapt = (payload) => {
   const parsedPayload = {
-    order: payload.sort((rule1, rule2) => rule1.newIndex - rule2.newIndex).map(({ id }) => id)
+    order: payload.sort((currentEdgeFirewallRulesEngine, nextEdgeFirewallRulesEngine) => currentEdgeFirewallRulesEngine.newIndex - nextEdgeFirewallRulesEngine.newIndex).map(({ id }) => id)
   }
 
   return parsedPayload

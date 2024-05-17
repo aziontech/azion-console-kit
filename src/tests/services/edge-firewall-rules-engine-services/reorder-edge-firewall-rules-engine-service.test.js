@@ -1,6 +1,6 @@
 import { reorderEdgeFirewallRulesEngine } from '@/services/edge-firewall-rules-engine-services/reorder-edge-firewall-rules-engine-service'
 import { AxiosHttpClientAdapter } from '@/services/axios/AxiosHttpClientAdapter'
-import { makeEdgeFirewallRulesEngineReorderBaseUrl } from '@/services/edge-firewall-rules-engine-services/make-edge-firewall-rules-engine-base-url'
+import { makeEdgeFirewallRulesEngineReorderBaseUrl } from '@/services/edge-firewall-rules-engine-services/make-edge-firewall-rules-engine-reorder-base-url'
 import { describe, expect, it, vi } from 'vitest'
 
 const fixtures = {
@@ -21,8 +21,6 @@ const makeSut = () => {
 
 describe('reorderEdgeFirewallRulesEngine', () => {
   it('should call api with correct params', async () => {
-    const expectedBody = { order: [2, 1] }
-
     const requestSpy = vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
       statusCode: 200
     })
@@ -33,7 +31,7 @@ describe('reorderEdgeFirewallRulesEngine', () => {
     expect(requestSpy).toHaveBeenCalledWith({
       url: makeEdgeFirewallRulesEngineReorderBaseUrl(fixtures.edgeFirewallId),
       method: 'PUT',
-      body: expectedBody
+      body: { order: [2, 1] }
     })
   })
 })
