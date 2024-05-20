@@ -120,8 +120,12 @@
               class="flex flex-wrap p-2 align-items-center gap-3"
               v-if="!loading"
             >
-              <div class="flex-1 flex flex-column gap-2">
-                <span class="font-normal">{{ slotProps.item.name }}</span>
+              <div class="flex-1 flex flex-column gap-2 max-w-xs overflow-hidden">
+                <span
+                  class="font-normal truncate"
+                  v-tooltip.top="slotProps.item.name"
+                  >{{ slotProps.item.name }}</span
+                >
               </div>
             </div>
             <Skeleton
