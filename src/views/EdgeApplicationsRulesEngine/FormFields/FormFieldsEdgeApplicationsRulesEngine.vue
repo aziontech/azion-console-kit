@@ -4,13 +4,14 @@
   import FieldText from '@/templates/form-fields-inputs/fieldText'
   import FieldTextArea from '@/templates/form-fields-inputs/fieldTextArea'
   import FieldDropdown from '@/templates/form-fields-inputs/fieldDropdown'
-  import PrimeRadio from 'primevue/radiobutton'
   import PrimeButton from 'primevue/button'
   import PrimeMenu from 'primevue/menu'
-  import InputSwitch from 'primevue/inputswitch'
   import InlineMessage from 'primevue/inlinemessage'
   import Divider from 'primevue/divider'
   import AutoComplete from 'primevue/autocomplete'
+  import FieldGroupRadio from '@/templates/form-fields-inputs/fieldGroupRadio'
+  import FieldSwitchBlock from '@/templates/form-fields-inputs/fieldSwitchBlock'
+
   import { computed, ref, onMounted } from 'vue'
   import { useToast } from 'primevue/usetoast'
 
@@ -196,20 +197,7 @@
   } = useFieldArray('behaviors')
   const { value: phase } = useField('phase')
   const { value: description } = useField('description')
-  const { value: isActive } = useField('isActive')
-
-  const phasesList = [
-    {
-      label: 'Request Phase',
-      value: 'request',
-      description: 'Configure the requests made to the edge.'
-    },
-    {
-      label: 'Response Phase',
-      value: 'response',
-      description: 'Configure the responses delivered to end-users.'
-    }
-  ]
+  useField('isActive')
 
   const DEFAULT_OPERATOR = {
     variable: '${uri}',
@@ -665,9 +653,18 @@
     return behaviors.value.length >= MAXIMUM_NUMBER
   })
 
-  const isNotTheSelectedPhase = (phaseItem) => {
-    return isEditDrawer.value && phaseItem !== phase.value
-  }
+  const phasesRadioOptions = computed(() => [
+    {
+      title: 'Request Phase',
+      value: 'request',
+      subtitle: 'Configure the requests made to the edge.'
+    },
+    {
+      title: 'Response Phase',
+      value: 'response',
+      subtitle: 'Configure the responses delivered to end-users.'
+    }
+  ])
 
   onMounted(() => {
     updateBehaviorsOptionsRequires()
@@ -736,31 +733,11 @@
         must create a new rule.
       </InlineMessage>
 
-      <div class="flex flex-col gap-2">
-        <template
-          v-for="item in phasesList"
-          :key="item.value"
-        >
-          <div
-            class="w-full border-1 rounded-md surface-border flex align-items-center justify-between p-4 gap-2"
-            :class="{ 'border-radio-card-active': phase === item.value }"
-          >
-            <label
-              class="font-medium"
-              :class="{ 'opacity-30': isNotTheSelectedPhase(item.value) }"
-            >
-              {{ item.label }}
-              <div class="text-color-secondary text-sm font-normal">{{ item.description }}</div>
-            </label>
-
-            <PrimeRadio
-              v-model="phase"
-              :disabled="isNotTheSelectedPhase(item.value)"
-              :value="item.value"
-            />
-          </div>
-        </template>
-      </div>
+      <FieldGroupRadio
+        nameField="phase"
+        isCard
+        :options="phasesRadioOptions"
+      />
     </template>
   </FormHorizontal>
 
@@ -1047,17 +1024,13 @@
     title="Status"
   >
     <template #inputs>
-      <div class="flex gap-3 items-center">
-        <InputSwitch
-          id="active"
-          v-model="isActive"
-        />
-        <label
-          for="active"
-          class="text-base"
-          >Active</label
-        >
-      </div>
+      <FieldSwitchBlock
+        nameField="isActive"
+        name="active"
+        auto
+        :isCard="false"
+        title="Active"
+      />
     </template>
   </FormHorizontal>
 </template>
