@@ -12,10 +12,13 @@ const fillRecoveryFormWithCredentials = (email = DEFAULTEMAILMOCK) => {
   cy.getByTestId('forgot-password').click()
   cy.getInput('email').as('recoverEmailInput').type(email)
 }
+const goToLoginPage = () => {
+  cy.visit('/login')
+}
 
 describe('Login Journey', () => {
   it('Should not be able to try to sign in with invalid email credentials', () => {
-    cy.visit('/login')
+    goToLoginPage()
     const invalidEmail = 'some-invalid-email--azion.com'
 
     cy.getByTestId('title').should('have.text', ' Azion Console ')
@@ -26,7 +29,7 @@ describe('Login Journey', () => {
   })
 
   it('Should get and invalid password credential when provide invalid password', () => {
-    cy.visit('/login')
+    goToLoginPage()
 
     cy.getByTestId('title').should('have.text', ' Azion Console ')
     cy.getInput('email').as('emailInput').type(Cypress.env('username'))
@@ -38,7 +41,7 @@ describe('Login Journey', () => {
   })
 
   it('Should be able to recover the account password', () => {
-    cy.visit('/login')
+    goToLoginPage()
 
     cy.getByTestId('title').should('have.text', ' Azion Console ')
     cy.getInput('email').as('emailInput').type(Cypress.env('username'))
@@ -51,7 +54,7 @@ describe('Login Journey', () => {
   })
 
   it('Should be able to retry to recover password multiple times', () => {
-    cy.visit('/login')
+    goToLoginPage()
     fillLoginEmailCredential()
     fillRecoveryFormWithCredentials()
 
