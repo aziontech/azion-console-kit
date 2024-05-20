@@ -4,7 +4,6 @@ import { mockOk } from '../utils/http-mocks'
 
 const navigateToDomains = () => {
   cy.visit('/domains')
-  cy.wait(['@list-domains', '@list-edge-application'])
 }
 const mockDomainsList = () => {
   mockOk('GET', '/api/v3/domains*', {
@@ -72,6 +71,7 @@ describe('Domain journey', () => {
   it('should be able to paginate domains in diferente page sizes', () => {
     mockDomainsList()
     navigateToDomains()
+    cy.wait(['@list-domains', '@list-edge-application'])
 
     // navigate between pages
     cy.get('[aria-label="2"]').click()
@@ -88,10 +88,11 @@ describe('Domain journey', () => {
   it('should be able to find domains by search', () => {
     mockDomainsList()
     navigateToDomains()
+    cy.wait(['@list-domains', '@list-edge-application'])
 
     const searchText = 'angular'
     cy.get('.flex > .p-inputtext').as('searchField')
-    cy.get('@searchField').type(searchText)
+    cy.get('@searchField').type(searchText, { delay: 40 })
     cy.get('@searchField').should('have.value', searchText)
 
     cy.get('.p-datatable-tbody > [tabindex="0"] > :nth-child(1) > div').should(
@@ -103,6 +104,7 @@ describe('Domain journey', () => {
   it('Should be able to list,filter and paginate domains', () => {
     mockDomainsList()
     navigateToDomains()
+    cy.wait(['@list-domains', '@list-edge-application'])
 
     searchDomainByText('angular')
     cy.get('[data-testid="column-0"]').first().should('have.text', 'ANGULAR')
