@@ -20,7 +20,7 @@
     :loadService="loadService"
     :editService="editService"
     :schema="validationSchema"
-    @onSuccess="emit('onSuccess')"
+    @onSuccess="handleSuccessEdit"
     :showBarGoBack="true"
     @onError="closeDrawerEdit"
     title="Edit Instance"
@@ -32,12 +32,14 @@
 </template>
 
 <script setup>
-  import { ref, onMounted, computed } from 'vue'
+  import { ref, onMounted, computed, inject } from 'vue'
   import * as yup from 'yup'
   import CreateDrawerBlock from '@templates/create-drawer-block'
   import FormFieldsDrawerFunction from '@/views/EdgeFirewallFunctions/FormFields/FormFieldsEdgeApplicationsFunctions'
   import EditDrawerBlock from '@templates/edit-drawer-block'
   import { refDebounced } from '@vueuse/core'
+  /**@type {import('@/plugins/adapters/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
+  const tracker = inject('tracker')
 
   defineOptions({ name: 'drawer-origin' })
 
@@ -107,6 +109,20 @@
       functionID: selectedFunctionToEdit.value
     })
     return functions
+  }
+
+  const handleSuccessEdit = () => {
+    emit('onSuccess')
+    handleTrackSuccessEdit()
+  }
+
+  const handleTrackSuccessEdit = () => {
+    tracker.product
+      .productEdited({
+        productName: 'Edge Firewall',
+        tab: 'functions'
+      })
+      .track()
   }
 
   const openDrawerCreate = () => {

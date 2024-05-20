@@ -1,6 +1,7 @@
 <script setup>
   import { computed } from 'vue'
   import Sidebar from 'primevue/sidebar'
+  import FeedbackFish from '@/templates/navbar-block/feedback-fish'
 
   defineOptions({ name: 'info-drawer-block' })
   const emit = defineEmits(['update:visible'])
@@ -31,7 +32,8 @@
     position="right"
     :pt="{
       root: { class: 'max-w-4xl w-full p-0' },
-      header: { class: 'flex justify-between text-xl font-medium px-8' },
+      header: { class: 'flex justify-between font-medium px-8' },
+      headercontent: { class: 'flex justify-content-between items-center w-full pr-2' },
       closeButton: { class: 'border surface-border' },
       content: {
         class:
@@ -40,7 +42,8 @@
     }"
   >
     <template #header>
-      <h2>{{ props.title }}</h2>
+      <h2 class="text-xl">{{ props.title }}</h2>
+      <FeedbackFish />
     </template>
 
     <slot name="body"></slot>

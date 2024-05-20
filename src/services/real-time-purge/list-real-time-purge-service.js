@@ -36,14 +36,27 @@ export const listRealTimePurgeService = async (
   return parseHttpResponse(httpResponse)
 }
 
+const MAPLAYER = {
+  edge_cache: 'Edge Cache',
+  tiered_cache: 'Tiered Cache'
+}
+
+const MAPTYPE = {
+  cachekey: 'CacheKey',
+  wildcard: 'Wildcard',
+  url: 'URL'
+}
+
 const adapt = (httpResponse) => {
-  const requestData = httpResponse.body.data.activityHistoryEvents.map((item) => {
+  const requestData = httpResponse.body.data.activityHistoryEvents.map((item, index) => {
+    const id = `${item.ts}-${index}`
     const [, type] = item.resourceType.split(':')
     const { items, layer } = JSON.parse(JSON.parse(item.requestData))
     return {
-      type,
+      id,
+      type: MAPTYPE[type],
       arguments: items,
-      layer,
+      layer: MAPLAYER[layer],
       user: item.authorEmail,
       time: new Intl.DateTimeFormat('us', {
         dateStyle: 'full',

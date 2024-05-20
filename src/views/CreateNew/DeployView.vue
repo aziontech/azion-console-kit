@@ -1,7 +1,7 @@
 <template>
   <ContentBlock>
     <template #heading>
-      <PageHeadingBlock pageTitle="Deploy" />
+      <PageHeadingBlock :pageTitle="hasApplicationName" />
     </template>
     <template #content>
       <div class="flex flex-col w-full gap-8">
@@ -141,6 +141,7 @@
   import { useToast } from 'primevue/usetoast'
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
+  import { useDeploy } from '@/stores/deploy'
 
   const props = defineProps({
     getLogsService: {
@@ -157,17 +158,22 @@
     }
   })
 
+  const deployStore = useDeploy()
   const executionId = ref('')
+  const applicationName = ref('')
+  const deployStartTime = ref()
+  const intervalRef = ref()
   const route = useRoute()
   const router = useRouter()
   const toast = useToast()
   const results = ref()
   const timer = ref(0)
-  const intervalRef = ref()
   const deployFailed = ref(false)
   const solutionStore = useSolutionStore()
   const failMessage =
-    'There was an issue while creating the edge application. Check the Deploy Log for more details.'
+    'There was an issue during the deployment. Check the Deploy Log for more details.'
+  const successMessage =
+    'The edge application is being propagated through the edge nodes. This process will take a few minutes.'
   const nextSteps = ref([
     {
       title: 'Customize Domain',
@@ -190,13 +196,13 @@
   const handleFinish = async () => {
     try {
       const response = await props.getResultsService(route.params.id)
+      deployStore.removeStartTime()
       results.value = response.result
       toast.add({
         closable: true,
         severity: 'success',
         summary: 'Created successfully',
-        detail:
-          'The edge application is being propagated through the edge nodes. This process will take a few minutes.'
+        detail: successMessage
       })
     } catch (error) {
       deployFailed.value = true
@@ -253,6 +259,11 @@
     return `Project started ${minutes}m${seconds}s ago`
   })
 
+  const hasApplicationName = computed(() => {
+    if (applicationName.value) return `Deploy: ${applicationName.value}`
+    return 'Deploy'
+  })
+
   const goToPointTraffic = () => {
     props.windowOpen(
       'https://www.azion.com/en/documentation/products/guides/point-domain-to-azion/',
@@ -261,7 +272,7 @@
   }
 
   const goToUrl = () => {
-    props.windowOpen('http://' + results.value.domain.url, '_blank')
+    props.windowOpen('https://' + results.value.domain.url, '_blank')
   }
 
   const goToAnalytics = () => {
@@ -278,6 +289,16 @@
     tracker.product.productCreated(trackerData).track()
   }
 
+  const startTimer = () => {
+    deployStartTime.value = deployStore.getStartTime
+    const MILISEC_IN_SEC = 1000
+    const timerInitialValue = Math.trunc((Date.now() - deployStartTime.value) / MILISEC_IN_SEC)
+    timer.value = timerInitialValue
+    intervalRef.value = setInterval(() => {
+      timer.value += 1
+    }, 1000)
+  }
+
   const retry = () => {
     router.go(-1)
   }
@@ -291,13 +312,13 @@
   }
 
   onMounted(() => {
-    intervalRef.value = setInterval(() => {
-      timer.value += 1
-    }, 1000)
     executionId.value = route.params.id
+    applicationName.value = deployStore.getApplicationName
+    startTimer()
   })
 
   onUnmounted(() => {
     clearInterval(intervalRef.value)
+    deployStore.removeApplicationName()
   })
 </script>

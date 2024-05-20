@@ -79,12 +79,15 @@
         header: 'Function Id'
       },
       {
-        field: 'originalId',
-        header: 'ID',
+        field: 'lineSource',
+        header: 'Line Source',
+        filterPath: 'lineSource.content',
         type: 'component',
-        filterPath: 'originalId',
         component: (columnData) =>
-          columnBuilder({ data: columnData, columnAppearance: 'expand-text-column' })
+          columnBuilder({
+            data: columnData,
+            columnAppearance: 'tag'
+          })
       },
       {
         field: 'level',
@@ -106,19 +109,8 @@
           columnBuilder({ data: columnData, columnAppearance: 'expand-text-column' })
       },
       {
-        field: 'lineSource',
-        header: 'Line Source',
-        filterPath: 'lineSource.content',
-        type: 'component',
-        component: (columnData) =>
-          columnBuilder({
-            data: columnData,
-            columnAppearance: 'tag'
-          })
-      },
-      {
-        field: 'solutionId',
-        header: 'Solution ID'
+        field: 'tsFormat',
+        header: 'TS'
       }
     ]
   })

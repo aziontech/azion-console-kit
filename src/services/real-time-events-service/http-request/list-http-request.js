@@ -2,6 +2,7 @@ import convertGQL from '@/helpers/convert-gql'
 import { AxiosHttpClientSignalDecorator } from '../../axios/AxiosHttpClientSignalDecorator'
 import { makeRealTimeEventsBaseUrl } from '../make-real-time-events-service'
 import { generateCurrentTimestamp } from '@/helpers/generate-timestamp'
+import { convertValueToDate } from '@/helpers'
 
 export const listHttpRequest = async (filter) => {
   const payload = adapt(filter)
@@ -21,17 +22,7 @@ const adapt = (filter) => {
   const table = {
     dataset: 'httpEvents',
     limit: 10000,
-    fields: [
-      'bytesSent',
-      'configurationId',
-      'debugLog',
-      'geolocAsn',
-      'geolocCountryName',
-      'geolocRegionName',
-      'host',
-      'requestId',
-      'ts'
-    ],
+    fields: ['configurationId', 'host', 'requestId', 'requestUri', 'requestMethod', 'status', 'ts'],
     orderBy: 'ts_ASC'
   }
   return convertGQL(filter, table)
@@ -42,14 +33,13 @@ const adaptResponse = (httpResponse) => {
 
   return body.data.httpEvents?.map((httpEventItem) => ({
     id: generateCurrentTimestamp(),
-    bytesSent: httpEventItem.bytesSent,
     configurationId: httpEventItem.configurationId,
-    debugLog: httpEventItem.debugLog,
-    geolocAsn: httpEventItem.geolocAsn,
-    geolocCountryName: httpEventItem.geolocCountryName,
-    geolocRegionName: httpEventItem.geolocRegionName,
     host: httpEventItem.host,
     requestId: httpEventItem.requestId,
-    ts: httpEventItem.ts
+    requestUri: httpEventItem.requestUri,
+    requestMethod: httpEventItem.requestMethod,
+    status: httpEventItem.status,
+    ts: httpEventItem.ts,
+    tsFormat: convertValueToDate(httpEventItem.ts)
   }))
 }

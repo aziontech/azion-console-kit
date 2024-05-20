@@ -38,6 +38,7 @@
   import { useToast } from 'primevue/usetoast'
   import { computed, ref } from 'vue'
   import { useRoute, useRouter } from 'vue-router'
+  import { TOAST_LIFE } from '@/utils/constants'
 
   const SUBMIT_TIMER = 60
 
@@ -67,7 +68,6 @@
   const isEmailValid = ref(validateEmail(decodedEmail))
   if (!isEmailValid.value) {
     toast.add({
-      life: 5000,
       severity: 'error',
       detail: 'Use a valid email format.',
       summary: 'Error'
@@ -78,9 +78,9 @@
     disableSubmitByTimer(SUBMIT_TIMER)
     try {
       const res = await props.resendEmailService({ email: decodedEmail })
-      toast.add({ life: 5000, severity: 'success', detail: res, summary: 'Email sent!' })
+      toast.add({ life: TOAST_LIFE, severity: 'success', detail: res, summary: 'Email sent!' })
     } catch (err) {
-      toast.add({ life: 5000, severity: 'error', detail: err, summary: 'Error sending the email' })
+      toast.add({ severity: 'error', detail: err, summary: 'Error sending the email' })
     }
   }
 

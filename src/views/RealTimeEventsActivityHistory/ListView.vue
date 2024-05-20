@@ -65,20 +65,12 @@
   const getColumns = computed(() => {
     return [
       {
-        field: 'accountId',
-        header: 'Account ID'
-      },
-      {
-        field: 'authorEmail',
-        header: 'Author Email'
+        field: 'userIp',
+        header: 'User IP'
       },
       {
         field: 'authorName',
         header: 'Author Name'
-      },
-      {
-        field: 'userId',
-        header: 'User ID'
       },
       {
         field: 'title',
@@ -89,8 +81,16 @@
           columnBuilder({ data: columnData, columnAppearance: 'expand-text-column' })
       },
       {
-        field: 'comment',
-        header: 'Comment'
+        field: 'resourceType',
+        header: 'Resource Type'
+      },
+      {
+        field: 'resourceId',
+        header: 'Resource ID'
+      },
+      {
+        field: 'tsFormat',
+        header: 'TS'
       }
     ]
   })

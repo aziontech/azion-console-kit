@@ -9,6 +9,7 @@
       <CreateFormBlock
         :createService="props.createEdgeFunctionsService"
         :schema="validationSchema"
+        @on-response="handleTrackCreation"
         :initialValues="initialValues"
       >
         <template #form>
@@ -37,8 +38,13 @@
   import ActionBarBlockWithTeleport from '@templates/action-bar-block/action-bar-with-teleport'
   import PageHeadingBlock from '@/templates/page-heading-block'
   import MobileCodePreview from './components/mobile-code-preview.vue'
-  import { ref, onMounted } from 'vue'
+  import { ref, onMounted, inject } from 'vue'
   import { useLoadingStore } from '@/stores/loading'
+  import { useRoute } from 'vue-router'
+
+  const route = useRoute()
+  /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
+  const tracker = inject('tracker')
 
   const props = defineProps({
     createEdgeFunctionsService: {
@@ -47,6 +53,12 @@
     }
   })
   const ARGS_INITIAL_STATE = '{}'
+
+  tracker.product.productCreated({
+    productName: 'Edge Functions',
+    from: route.query.origin,
+    createdFrom: 'singleEntity'
+  })
 
   onMounted(() => {
     const store = useLoadingStore()

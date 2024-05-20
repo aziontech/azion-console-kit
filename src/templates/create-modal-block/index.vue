@@ -5,6 +5,8 @@
   import { useRouter } from 'vue-router'
   import { useToast } from 'primevue/usetoast'
   import { useAccountStore } from '@/stores/account'
+  import { TOAST_LIFE } from '@/utils/constants'
+
   /**@type {import('@/plugins/adapters/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
   defineOptions({
@@ -87,7 +89,7 @@
     },
     {
       label: 'Edge Functions',
-      to: '/edge-functions/create',
+      to: '/edge-functions/create?origin=create',
       description: 'Create edge functions to use with Edge Application or Edge Firewall.'
     },
     {
@@ -137,12 +139,18 @@
 
   const showToast = (severity, detail) => {
     if (!detail) return
-    toast.add({
+    const options = {
       closable: true,
       severity,
       summary: severity,
       detail
-    })
+    }
+
+    if (severity === 'success') {
+      options.life = TOAST_LIFE
+    }
+
+    toast.add(options)
   }
 
   const redirectToSolution = (template, section) => {

@@ -10,7 +10,7 @@
     loading: Boolean,
     cancelDisabled: Boolean,
     submitDisabled: Boolean,
-    primaryActionLabel: String
+    primaryActionLabel: { type: String, default: 'Save' }
   })
 
   const handleSubmit = () => {

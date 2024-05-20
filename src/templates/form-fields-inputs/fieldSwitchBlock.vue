@@ -3,14 +3,14 @@
     v-bind="props"
     :selected="checked"
     :nameId="props.name"
-    @click="clickCard"
+    @change="changeState"
   >
     <template #selector>
       <InputSwitch
         :disabled="disabled"
         :inputId="props.name"
         :name="props.name"
-        @click="stopPropagation"
+        @change="stopPropagation"
         v-model="inputValue"
       />
     </template>
@@ -86,7 +86,7 @@
     event.stopPropagation()
   }
 
-  const clickCard = (event) => {
+  const changeState = (event) => {
     stopPropagation(event)
     handleChange(!inputValue.value)
   }

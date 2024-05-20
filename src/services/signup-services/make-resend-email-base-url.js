@@ -1,3 +1,4 @@
 export const makeResendEmailBaseUrl = () => {
-  return 'user/activation/request'
+  const version = 'v4'
+  return `${version}/iam/user/resend-activation-link`
 }

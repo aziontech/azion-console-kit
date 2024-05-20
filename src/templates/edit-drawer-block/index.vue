@@ -5,7 +5,9 @@
   import ActionBarBlock from '@/templates/action-bar-block'
   import GoBack from '@/templates/action-bar-block/go-back'
   import Sidebar from 'primevue/sidebar'
+  import FeedbackFish from '@/templates/navbar-block/feedback-fish'
   import DialogUnsavedBlock from '@/templates/dialog-unsaved-block'
+  import { TOAST_LIFE } from '@/utils/constants'
 
   defineOptions({
     name: 'edit-drawer-block'
@@ -98,12 +100,19 @@
 
   const showToast = (severity, detail) => {
     if (!detail) return
-    toast.add({
+
+    const options = {
       closable: true,
       severity,
       summary: severity,
       detail
-    })
+    }
+
+    if (severity === 'success') {
+      options.life = TOAST_LIFE
+    }
+
+    toast.add(options)
   }
 
   const loadInitialData = async () => {
@@ -162,11 +171,13 @@
     :pt="{
       root: { class: 'max-w-4xl w-full' },
       header: { class: 'flex justify-between text-xl font-medium px-8' },
+      headercontent: { class: 'flex justify-content-between items-center w-full pr-2' },
       content: { class: 'p-8' }
     }"
   >
     <template #header>
       <h2>{{ title }}</h2>
+      <FeedbackFish />
     </template>
     <div class="pb-16 w-full space-y-8">
       <form

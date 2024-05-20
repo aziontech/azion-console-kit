@@ -1,3 +1,27 @@
+/**
+ * @typedef {Object} Dashboard
+ * @property {string} id - The unique identifier of the dashboard.
+ * @property {string} label - The display name of the dashboard.
+ * @property {string} path - The URL path of the dashboard.
+ * @property {string} dataset - The dataset the dashboard is associated with.
+ */
+
+/**
+ * @typedef {Object} Page
+ * @property {number} id - The unique identifier of the page.
+ * @property {string} label - The display name of the page.
+ * @property {string} path - The URL path of the page.
+ * @property {number} groupId - The group identifier the page belongs to.
+ * @property {Dashboard[]} dashboards - The list of dashboards in the page.
+ */
+
+/**
+ * @typedef {Object} Group
+ * @property {string} label - The display name of the group.
+ * @property {string} value - The value of the group.
+ * @property {number} id - The unique identifier of the group.
+ * @property {Page[]} pagesDashboards - The list of pages in the group.
+ */
 const PAGES_DASHBOARDS = {
   build: [
     {

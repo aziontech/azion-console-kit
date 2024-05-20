@@ -2,6 +2,7 @@ import convertGQL from '@/helpers/convert-gql'
 import { AxiosHttpClientSignalDecorator } from '../../axios/AxiosHttpClientSignalDecorator'
 import { makeRealTimeEventsBaseUrl } from '../make-real-time-events-service'
 import { generateCurrentTimestamp } from '@/helpers/generate-timestamp'
+import { convertValueToDate } from '@/helpers'
 
 export const listEdgeFunctionsConsole = async (filter) => {
   const payload = adapt(filter)
@@ -21,17 +22,7 @@ const adapt = (filter) => {
   const table = {
     dataset: 'cellsConsoleEvents',
     limit: 10000,
-    fields: [
-      'configurationId',
-      'functionId',
-      'id',
-      'level',
-      'line',
-      'lineSource',
-      'solutionId',
-      'source',
-      'ts'
-    ],
+    fields: ['configurationId', 'functionId', 'id', 'level', 'line', 'lineSource', 'source', 'ts'],
     orderBy: 'ts_ASC'
   }
   return convertGQL(filter, table)
@@ -84,8 +75,8 @@ const adaptResponse = (response) => {
       content: cellsConsoleEvents.lineSource,
       severity: 'info'
     },
-    solutionId: cellsConsoleEvents.solutionId,
     source: cellsConsoleEvents.source,
+    tsFormat: convertValueToDate(cellsConsoleEvents.ts),
     ts: cellsConsoleEvents.ts
   }))
 }

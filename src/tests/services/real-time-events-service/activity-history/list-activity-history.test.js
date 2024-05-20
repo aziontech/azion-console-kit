@@ -11,12 +11,12 @@ const fixtures = {
     }
   },
   activityHistory: {
-    accountId: '1',
-    authorEmail: 'email',
+    userIp: 'userIp',
     authorName: 'name',
-    userId: 'userId',
     title: 'title',
-    comment: 'comment',
+    resourceType: 'resourceType',
+    resourceId: 'resourceId',
+    userId: 'userId',
     ts: '2024-02-23T18:07:25.000Z'
   }
 }
@@ -49,12 +49,12 @@ describe('ActivityHistoryServices', () => {
       `      tsRange: { begin: $tsRange_begin, end: $tsRange_end }`,
       `    }`,
       `  ) {`,
-      `    accountId`,
-      `    authorEmail`,
+      `    userIp`,
       `    authorName`,
-      `    userId`,
       `    title`,
-      `    comment`,
+      `    resourceType`,
+      `    resourceId`,
+      `    userId`,
       `    ts`,
       `  }`,
       `}`
@@ -90,13 +90,15 @@ describe('ActivityHistoryServices', () => {
     expect(response).toEqual([
       {
         id: 'mocked-timestamp',
-        accountId: fixtures.activityHistory.accountId,
-        authorEmail: fixtures.activityHistory.authorEmail,
+
+        userIp: fixtures.activityHistory.userIp,
         authorName: fixtures.activityHistory.authorName,
-        userId: fixtures.activityHistory.userId,
         title: fixtures.activityHistory.title,
-        comment: fixtures.activityHistory.comment,
-        ts: fixtures.activityHistory.ts
+        resourceType: fixtures.activityHistory.resourceType,
+        resourceId: fixtures.activityHistory.resourceId,
+        userId: fixtures.activityHistory.userId,
+        ts: fixtures.activityHistory.ts,
+        tsFormat: 'February 23, 2024 at 06:07 PM'
       }
     ])
   })

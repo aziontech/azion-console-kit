@@ -26,6 +26,9 @@
     hashLess: {
       type: Boolean
     },
+    filterHash: {
+      type: String
+    },
     filterAdvanced: {
       type: Object,
       required: false
@@ -131,7 +134,8 @@
   }
 
   const getFilterInHash = () => {
-    const { filters } = route.query
+    const filters = props.filterHash || route.query.filters
+
     const decodedFilter = decodeFilter(filters)
     return decodedFilter
   }
@@ -213,17 +217,19 @@
     }
   )
 
-  watch(props.fieldsInFilter, () => {
-    updateDisplayFilter(displayFilter.value)
-  })
+  watch(
+    () => props.fieldsInFilter,
+    () => {
+      updateDisplayFilter(displayFilter.value)
+    }
+  )
 
   watch(
-    props.externalFilter,
+    () => props.externalFilter,
     (value) => {
       const adaptFilter = adapterApply(displayFilter.value)
       updateHash(adaptFilter, value)
-    },
-    { immediate: false }
+    }
   )
 
   onMounted(() => {
@@ -285,7 +291,7 @@
     </div>
 
     <PrimeButton
-      class="h-auto min-w-max max-sm:bg-red h-12"
+      class="h-auto min-w-max max-sm:bg-red"
       size="small"
       :disabled="disabledSearch"
       @click="searchFilter"
