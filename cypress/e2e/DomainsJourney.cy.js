@@ -28,7 +28,7 @@ describe('Domain journey', () => {
   })
   const domainNameMock = `domain-${Date.now()}`
 
-  it.skip('Should be able to visit home page and create,edit, list and delete an domain', () => {
+  it('Should be able to visit home page and create,edit, list and delete an domain', () => {
     // Go to domains
     cy.visit('/')
     cy.getByTestId('create-button').click()
@@ -68,7 +68,7 @@ describe('Domain journey', () => {
     cy.visit('/')
   })
 
-  it('should be able to paginate domains in diferente page sizes', () => {
+  it('should be able to use pagination', () => {
     mockDomainsList()
     navigateToDomains()
     cy.wait(['@list-domains', '@list-edge-application'])
@@ -101,28 +101,22 @@ describe('Domain journey', () => {
     )
   })
 
-  it('Should be able to list,filter and paginate domains', () => {
+  it('Should be able to use domain url from the list of domains', () => {
     mockDomainsList()
     navigateToDomains()
     cy.wait(['@list-domains', '@list-edge-application'])
 
     searchDomainByText('angular')
     cy.get('[data-testid="column-0"]').first().should('have.text', 'ANGULAR')
-    // cy.get('.p-datatable-tbody > [tabindex="0"] > :nth-child(1) > div').should(
-    //   'have.text',
-    //   'ANGULAR'
-    // )
 
-    // // should be able to copy and paste the domain url
-    // const pasteText = 'hd2qe5xgzp.map.azionedge.net'
-    // cy.get('[tabindex="0"] > :nth-child(3) > .gap-2 > .p-button').click()
-    // cy.get('@searchField').clear('angular')
-    // cy.get('@searchField').focus()
-    // cy.get('@searchField').invoke('val', pasteText).trigger('input')
+    const pasteText = 'hd2qe5xgzp.map.azionedge.net'
+    cy.get('[tabindex="0"] > :nth-child(3) > [data-testid="column-2"] > .p-button').click()
+    cy.get('@searchField').clear()
+    cy.get('@searchField').focus()
+    cy.get('@searchField').invoke('val', pasteText).trigger('input')
 
-    // // should be able to toggle the domain url format
-    // cy.get('.whitespace-pre').as('domainColumnData').should('have.text', 'hd2qe5xgzp.map....')
-    // cy.get('.underline').click()
-    // cy.get('@domainColumnData').should('have.text', pasteText)
+    cy.get('.whitespace-pre').as('domainColumnData').should('have.text', 'hd2qe5xgzp.map....')
+    cy.get('.underline').click()
+    cy.get('@domainColumnData').should('have.text', pasteText)
   })
 })
