@@ -160,7 +160,7 @@
         field: filterSelected.label,
         valueField: filterSelected.value,
         operator: operatorSelected.value,
-        value: selectedValue || { begin, end },
+        value: selectedValue ?? { begin, end },
         format: operatorSelected.format,
         edit: editFilter.value,
         type: operatorSelected.type
