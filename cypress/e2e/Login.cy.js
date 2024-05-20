@@ -14,7 +14,7 @@ const fillRecoveryFormWithCredentials = (email = DEFAULTEMAILMOCK) => {
 }
 
 describe('Login Journey', () => {
-  it('Should not be able to sign in with invalid email credentials', () => {
+  it('Should not be able to try to sign in with invalid email credentials', () => {
     cy.visit('/login')
     const invalidEmail = 'some-invalid-email--azion.com'
 
@@ -25,7 +25,7 @@ describe('Login Journey', () => {
     cy.get('small').contains('Use a valid email to sign in.')
   })
 
-  it('Should not be able to sign in with invalid password credential', () => {
+  it('Should get and invalid password credential when provide invalid password', () => {
     cy.visit('/login')
 
     cy.getByTestId('title').should('have.text', ' Azion Console ')
@@ -37,7 +37,7 @@ describe('Login Journey', () => {
     cy.get('small').contains(`E-mail and password don't match with any account.`)
   })
 
-  it('Should be able to recover password', () => {
+  it('Should be able to recover the account password', () => {
     cy.visit('/login')
 
     cy.getByTestId('title').should('have.text', ' Azion Console ')
@@ -50,7 +50,7 @@ describe('Login Journey', () => {
     cy.contains('Email sent successfully')
   })
 
-  it.only('Should be able to retry to recover password after countdown reset', () => {
+  it('Should be able to retry to recover password multiple times', () => {
     cy.visit('/login')
     fillLoginEmailCredential()
     fillRecoveryFormWithCredentials()
