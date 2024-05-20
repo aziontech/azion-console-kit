@@ -156,6 +156,8 @@
   }
 
   const applyFilter = async (filter) => {
+    resetFilters()
+
     filter?.forEach((item) => {
       const field = `${item.valueField}${item.operator}`
       const alias = `${item.operator}`
@@ -197,10 +199,6 @@
         }
       })
     })
-
-    if (!filter?.length) {
-      resetFilters()
-    }
 
     await loadCurrentReports(props.userUTC)
   }
