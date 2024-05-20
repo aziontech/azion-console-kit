@@ -32,7 +32,7 @@
         for="text_field"
         class="text-sm font-medium leading-5 text-color"
       >
-        Value *
+        Value
       </label>
       <InputText
         inputId="text_field"
