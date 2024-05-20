@@ -116,7 +116,7 @@
   <FormHorizontal
     :isDrawer="true"
     title="Settings"
-    description="Add records to specify which IPs are associated with the domain and how Edge DNS should handle requests for the domain. The accepted values format vary according to the chosen record type."
+    description="Add records to specify which IPs are associated with the domain and how Edge DNS should handle requests for the domain. The accepted value's format varies according to the chosen record type."
   >
     <template #inputs>
       <div class="flex flex-col w-full gap-2">
