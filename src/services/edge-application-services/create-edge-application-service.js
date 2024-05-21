@@ -22,7 +22,7 @@ const adapt = (payload) => {
     http3: payload.http3,
     http_port: payload.httpPort.map((port) => port.value),
     https_port: payload.httpsPort.map((port) => port.value),
-    minimum_tls_version: payload.minimumTlsVersion,
+    minimum_tls_version: payload.minimumTlsVersion === 'none' ? '' : payload.minimumTlsVersion,
     supported_ciphers: payload.supportedCiphers,
     origin_type: payload.originType,
     address: payload.address,

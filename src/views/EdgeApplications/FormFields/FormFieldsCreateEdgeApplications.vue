@@ -40,7 +40,7 @@
     { name: '9443', value: '9443' }
   ]
   const TLS_VERSIONS_OPTIONS = [
-    { label: 'None', value: '' },
+    { label: 'None', value: 'none' },
     { label: 'TLS 1.0', value: 'tls_1_0' },
     { label: 'TLS 1.1', value: 'tls_1_1' },
     { label: 'TLS 1.2', value: 'tls_1_2' },
@@ -86,7 +86,7 @@
     const enableHttp3 = protocol === 'http3'
 
     http3.value = enableHttp3
-    if (deliveryProtocol.value === 'http') minimumTlsVersion.value = ''
+    if (deliveryProtocol.value === 'http') minimumTlsVersion.value = 'none'
     setDefaultHttpAndHttpsPort(enableHttp3)
   }
 
@@ -134,9 +134,12 @@
     { title: 'Honor cache policies', value: 'honor' }
   ])
 
-  const isHttpProtocol = computed(() => deliveryProtocol.value === 'http')
-  const isHttpsProtocol = computed(() => deliveryProtocol.value === 'http,https')
-  const isHttp3Protocol = computed(() => deliveryProtocol.value === 'http3')
+  const checkIsProtocol = computed(() => ({
+    http: deliveryProtocol.value === 'http',
+    https: deliveryProtocol.value === 'http,https',
+    http3: deliveryProtocol.value === 'http3'
+  }))
+
   const isBrowserCacheTypeHonor = computed(() => browserCacheSettings.value === 'honor')
   const websocketIsEnabled = computed(() => websocket.value)
   const cdnCacheSettingsIsOverride = computed(() => cdnCacheSettings.value === 'override')
@@ -180,12 +183,12 @@
           <label
             for="port-http"
             class="text-color text-base font-medium"
-            >HTTP Ports <span v-if="isHttpProtocol || isHttpsProtocol">*</span></label
+            >HTTP Ports <span v-if="checkIsProtocol.http || checkIsProtocol.https">*</span></label
           >
           <span class="p-input-icon-right">
             <i
               class="pi pi-lock text-[var(--text-color-secondary)]"
-              v-if="isHttp3Protocol"
+              v-if="checkIsProtocol.http3"
             />
             <MultiSelect
               :options="HTTP_PORT_LIST_OPTIONS"
@@ -195,10 +198,10 @@
               placeholder="Select an HTTP port"
               class="w-full"
               display="chip"
-              :disabled="isHttp3Protocol"
+              :disabled="checkIsProtocol.http3"
               :pt="{
                 trigger: {
-                  class: `${isHttp3Protocol ? 'hidden' : ''}`
+                  class: `${checkIsProtocol.http3 ? 'hidden' : ''}`
                 }
               }"
             />
@@ -209,12 +212,12 @@
           <label
             for="port-https"
             class="text-color text-base font-medium"
-            >HTTPS Ports <span v-if="isHttpsProtocol">*</span></label
+            >HTTPS Ports <span v-if="checkIsProtocol.https">*</span></label
           >
           <span class="p-input-icon-right">
             <i
               class="pi pi-lock text-[var(--text-color-secondary)]"
-              v-if="!isHttpsProtocol"
+              v-if="!checkIsProtocol.https"
             />
             <MultiSelect
               :options="HTTPS_PORT_LIST_OPTIONS"
@@ -223,10 +226,10 @@
               display="chip"
               placeholder="Select an HTTPS port"
               class="w-full"
-              :disabled="isHttpProtocol || isHttp3Protocol"
+              :disabled="checkIsProtocol.http || checkIsProtocol.http3"
               :pt="{
                 trigger: {
-                  class: `${isHttpProtocol || isHttp3Protocol ? 'hidden' : ''}`
+                  class: `${checkIsProtocol.http || checkIsProtocol.http3 ? 'hidden' : ''}`
                 }
               }"
             />
@@ -236,7 +239,7 @@
 
       <div
         class="flex gap-6 max-sm:flex-col"
-        v-if="isHttpsProtocol || isHttp3Protocol"
+        v-if="checkIsProtocol.https || checkIsProtocol.http3"
       >
         <div class="flex flex-col w-full sm:max-w-xs gap-2">
           <label
@@ -250,8 +253,8 @@
             v-model="minimumTlsVersion"
             optionLabel="label"
             optionValue="value"
-            placeholder="None"
-            :disabled="isHttpProtocol"
+            placeholder="Select a minimum TLS Version"
+            :disabled="checkIsProtocol.http"
           />
 
           <small class="text-xs text-color-secondary font-normal leading-5">
@@ -273,7 +276,7 @@
             optionLabel="label"
             optionValue="value"
             placeholder="Select the supported cipher suite"
-            :disabled="isHttpProtocol"
+            :disabled="checkIsProtocol.http"
           />
 
           <small class="text-xs text-color-secondary font-normal leading-5">
