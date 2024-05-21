@@ -10,6 +10,7 @@
         :createService="props.createEdgeFunctionsService"
         :schema="validationSchema"
         @on-response="handleTrackCreation"
+        @on-response-fail="handleTrackFailedCreation"
         :initialValues="initialValues"
       >
         <template #form>
@@ -37,6 +38,7 @@
   import CreateFormBlock from '@/templates/create-form-block'
   import ActionBarBlockWithTeleport from '@templates/action-bar-block/action-bar-with-teleport'
   import PageHeadingBlock from '@/templates/page-heading-block'
+  import { handleTrackerError } from '@/utils/errorHandlingTracker'
   import MobileCodePreview from './components/mobile-code-preview.vue'
   import { ref, onMounted, inject } from 'vue'
   import { useLoadingStore } from '@/stores/loading'
@@ -54,11 +56,25 @@
   })
   const ARGS_INITIAL_STATE = '{}'
 
-  tracker.product.productCreated({
-    productName: 'Edge Functions',
-    from: route.query.origin,
-    createdFrom: 'singleEntity'
-  })
+  const handleTrackCreation = () => {
+    tracker.product.productCreated({
+      productName: 'Edge Functions',
+      from: route.query.origin,
+      createdFrom: 'singleEntity'
+    })
+  }
+
+  const handleTrackFailedCreation = (error) => {
+    const { fieldName, message } = handleTrackerError(error)
+    tracker.product
+      .failedToCreate({
+        productName: 'Edge Functions',
+        errorType: 'api',
+        fieldName: fieldName.trim(),
+        errorMessage: message
+      })
+      .track()
+  }
 
   onMounted(() => {
     const store = useLoadingStore()
