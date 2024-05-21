@@ -5,10 +5,6 @@ on:
     branches:
       - dev
 
-env:
- CYPRESS_EMAIL_STAGE: "playwright_email_prod+stage@zohomail.com"
- CYPRESS_PASSWORD_STAGE: "mCo#O2xW8E27"
-
 jobs:
   run-e2e-tests:
     runs-on: ubuntu-latest
@@ -21,12 +17,13 @@ jobs:
           node-version: 18
 
       - name: Install dependencies
-        run: yarn ci
+        run: yarn install
+
+      - name: Start project
+        run: yarn dev --host
 
       - name: Run Cypress tests
-        uses: cypress-io/github-action@v6
-        with:
-          build: yarn dev --host
-          start: yarn cypress run
-          wait-on: "http://localhost:5173/"
-          wait-on-timeout: 120
+        env:
+          CYPRESS_EMAIL_STAGE: "playwright_email_prod+stage@zohomail.com"
+          CYPRESS_PASSWORD_STAGE: "mCo#O2xW8E27"
+        run: yarn cypress run 
