@@ -6,8 +6,8 @@ on:
       - dev
 
 env:
- CYPRESS_EMAIL_STAGE: ${{ secrets.CYPRESS_EMAIL_STAGE }}
- CYPRESS_PASSWORD_STAGE: ${{ secrets.CYPRESS_PASSWORD_STAGE }}
+ CYPRESS_EMAIL_STAGE: "playwright_email_prod+stage@zohomail.com"
+ CYPRESS_PASSWORD_STAGE: "mCo#O2xW8E27"
 
 jobs:
   run-e2e-tests:
