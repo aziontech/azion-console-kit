@@ -24,6 +24,6 @@ jobs:
 
       - name: Run Cypress tests
         env:
-          CYPRESS_EMAIL_STAGE: "playwright_email_prod+stage@zohomail.com"
-          CYPRESS_PASSWORD_STAGE: "mCo#O2xW8E27"
+          CYPRESS_EMAIL_STAGE: ${{ secrets.CYPRESS_EMAIL_STAGE }}
+          CYPRESS_PASSWORD_STAGE: ${{ secrets.CYPRESS_PASSWORD_STAGE }}
         run: yarn cypress run 
