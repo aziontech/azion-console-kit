@@ -32,7 +32,7 @@ describe('Login Journey', () => {
     goToLoginPage()
 
     cy.getByTestId('title').should('have.text', ' Azion Console ')
-    cy.getInput('email').as('emailInput').type(Cypress.env('username'))
+    cy.getInput('email').as('emailInput').type(Cypress.env('EMAIL_STAGE'))
     cy.getByTestId('next-button').click()
     cy.getInput('password').type(' ')
     cy.getByTestId('submit').click()
@@ -44,7 +44,7 @@ describe('Login Journey', () => {
     goToLoginPage()
 
     cy.getByTestId('title').should('have.text', ' Azion Console ')
-    cy.getInput('email').as('emailInput').type(Cypress.env('username'))
+    cy.getInput('email').as('emailInput').type(Cypress.env('EMAIL_STAGE'))
     cy.getByTestId('next-button').click()
     cy.getByTestId('forgot-password').click()
     cy.getInput('email').as('recoverEmailInput').type('abc@123.com')

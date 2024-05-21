@@ -24,7 +24,7 @@ const searchDomainByText = (searchText) => {
 
 describe('Domain journey', () => {
   beforeEach(() => {
-    cy.loginWithEmail(Cypress.env('username'), Cypress.env('password'))
+    cy.loginWithEmail(Cypress.env('EMAIL_STAGE'), Cypress.env('PASSWORD_STAGE'))
   })
   const domainNameMock = `domain-${Date.now()}`
 
