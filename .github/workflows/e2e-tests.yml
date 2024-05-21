@@ -5,6 +5,10 @@ on:
     branches:
       - dev
 
+env:
+ CYPRESS_EMAIL_STAGE: ${{ secrets.CYPRESS_EMAIL_STAGE }}
+ CYPRESS_PASSWORD_STAGE: ${{ secrets.CYPRESS_PASSWORD_STAGE }}
+
 jobs:
   run-e2e-tests:
     runs-on: ubuntu-latest
@@ -17,13 +21,12 @@ jobs:
           node-version: 18
 
       - name: Install dependencies
-        run: yarn install
-
-      - name: Start project
-        run: yarn dev --host
+        run: yarn ci
 
       - name: Run Cypress tests
-        env:
-          CYPRESS_EMAIL_STAGE: ${{ secrets.CYPRESS_EMAIL_STAGE }}
-          CYPRESS_PASSWORD_STAGE: ${{ secrets.CYPRESS_PASSWORD_STAGE }}
-        run: yarn cypress run 
+        uses: cypress-io/github-action@v6
+        with:
+          build: yarn build
+          start: yarn dev
+          wait-on: "http://localhost:5173/"
+          wait-on-timeout: 120
