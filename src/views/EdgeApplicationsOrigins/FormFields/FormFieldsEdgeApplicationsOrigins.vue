@@ -5,9 +5,9 @@
   import Divider from 'primevue/divider'
   import Dropdown from 'primevue/dropdown'
   import InputNumber from 'primevue/inputnumber'
-  import InputSwitch from 'primevue/inputswitch'
   import InputText from 'primevue/inputtext'
-  import RadioButton from 'primevue/radiobutton'
+  import FieldGroupRadio from '@/templates/form-fields-inputs/fieldGroupRadio'
+  import FieldSwitchBlock from '@/templates/form-fields-inputs/fieldSwitchBlock'
   import { useField, useFieldArray } from 'vee-validate'
   import { computed, ref, watch } from 'vue'
 
@@ -44,32 +44,17 @@
       value: 'round_robin'
     }
   ]
+  const policyProtocolRadioOptions = computed(() => [
+    { title: 'Preserve HTTP/HTTPS', value: 'preserve' },
+    { title: 'Enforce HTTP', value: 'http' },
+    { title: 'Enforce HTTPS', value: 'https' }
+  ])
 
-  const ORIGIN_PROTOCOL_POLICIES = [
-    {
-      label: 'Preserve HTTP/HTTPS protocol',
-      value: 'preserve'
-    },
-    {
-      label: 'Enforce HTTP',
-      value: 'http'
-    },
-    {
-      label: 'Enforce HTTPS',
-      value: 'https'
-    }
-  ]
+  const serverRolesRadioOptions = computed(() => [
+    { title: 'Primary', value: 'primary' },
+    { title: 'Backup', value: 'backup' }
+  ])
 
-  const SERVER_ROLES = [
-    {
-      label: 'Primary',
-      value: 'primary'
-    },
-    {
-      label: 'Backup',
-      value: 'backup'
-    }
-  ]
   const originKeyInput = ref('')
 
   const { value: originKey, setValue: setOriginKey } = useField('originKey')
@@ -82,7 +67,7 @@
     fields: addresses
   } = useFieldArray('addresses')
   const { value: originType } = useField('originType')
-  const { value: originProtocolPolicy } = useField('originProtocolPolicy')
+  useField('originProtocolPolicy')
   const { value: method } = useField('method')
   const { value: originPath } = useField('originPath')
   const { value: connectionTimeout } = useField('connectionTimeout')
@@ -229,34 +214,14 @@
           Select an option to customize the origin.
         </small>
       </div>
-      <div
-        class="flex flex-col w-full sm:max-w-3xl gap-2"
-        v-if="!isObjectStorageOriginType"
-      >
-        <label class="text-color text-sm font-medium leading-5">Protocol Policy</label>
-        <div class="flex flex-col gap-4">
-          <div
-            class="flex no-wrap gap-2 items-center"
-            v-for="policy in ORIGIN_PROTOCOL_POLICIES"
-            :key="policy.value"
-          >
-            <RadioButton
-              v-model="originProtocolPolicy"
-              :inputId="policy.value"
-              name="originProtocolPolicy"
-              :value="policy.value"
-            />
-            <label
-              :for="policy.value"
-              class="text-color text-sm font-normal leading-tight"
-            >
-              {{ policy.label }}
-            </label>
-          </div>
-        </div>
-        <small class="text-color-secondary text-xs font-normal leading-5">
-          Select the protocol usage between the edge nodes and the origin.
-        </small>
+      <div v-if="!isObjectStorageOriginType">
+        <FieldGroupRadio
+          label="Protocol Policy"
+          nameField="originProtocolPolicy"
+          :isCard="false"
+          :options="policyProtocolRadioOptions"
+          helpText="Select the protocol usage between the edge nodes and the origin."
+        />
       </div>
       <div
         class="flex flex-col sm:max-w-lg w-full gap-2"
@@ -408,48 +373,23 @@
             handle.
           </small>
         </div>
-        <div
-          class="flex flex-col gap-2"
-          v-if="!isIpHashMethod"
-        >
-          <label class="text-color text-sm not-italic font-medium leading-5">Server Role</label>
-          <div class="flex flex-col gap-4">
-            <div
-              class="flex no-wrap gap-2 items-center"
-              v-for="role in SERVER_ROLES"
-              :key="role.value"
-            >
-              <RadioButton
-                v-model="address.value.serverRole"
-                :inputId="`${address.key}-${role.value}`"
-                name="serverRole"
-                :value="role.value"
-              />
-              <label
-                :for="`${address.key}-${role.value}`"
-                class="text-color text-sm font-normal leading-tight"
-              >
-                {{ role.label }}
-              </label>
-            </div>
-          </div>
-          <small class="text-xs text-color-secondary font-normal leading-5">
-            Backup servers only receive HTTP requests if all primary servers are unavailable.
-          </small>
-        </div>
-        <div class="flex w-full gap-2 items-start">
-          <InputSwitch
-            v-model="address.value.isActive"
-            :inputId="`${address.key}-active`"
+        <div v-if="!isIpHashMethod">
+          <FieldGroupRadio
+            label="Server Role"
+            :nameField="`addresses[${index}].serverRole`"
+            :isCard="false"
+            :options="serverRolesRadioOptions"
+            helpText="Backup servers only receive HTTP requests if all primary servers are unavailable."
           />
-
-          <label
-            :for="`${address.key}-active`"
-            class="flex flex-col items-start gap-1"
-          >
-            <span class="text-color text-sm font-normal leading-5"> Active </span>
-          </label>
         </div>
+
+        <FieldSwitchBlock
+          :nameField="`addresses[${index}].isActive`"
+          :name="`${address.key}-active`"
+          auto
+          :isCard="false"
+          title="Active"
+        />
       </div>
       <div class="flex flex-col w-full gap-2">
         <Divider type="dashed" />
@@ -475,23 +415,13 @@
     description="Provide HMAC authentication credentials to deliver private content."
   >
     <template #inputs>
-      <div class="flex flex-col w-full gap-2">
-        <div
-          class="flex gap-6 md:align-items-center max-sm:flex-col max-sm:align-items-baseline max-sm:gap-3"
-        >
-          <span class="p-input-icon-right w-full flex max-w-lg items-start gap-2 pb-3 pt-2">
-            <InputSwitch
-              v-model="hmacAuthentication"
-              inputId="hmacAuthentication"
-            />
-            <label
-              for="hmacAuthentication"
-              class="text-color text-sm font-normal leading-5"
-              >Active</label
-            >
-          </span>
-        </div>
-      </div>
+      <FieldSwitchBlock
+        nameField="hmacAuthentication"
+        name="hmacAuthentication"
+        auto
+        :isCard="false"
+        title="Active"
+      />
       <div
         class="max-w-3xl w-full flex flex-col gap-8 max-md:gap-6"
         v-if="isHmacAuthentication"
