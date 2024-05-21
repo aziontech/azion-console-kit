@@ -105,7 +105,7 @@
     return handle
   }
 
-  const usageProtocolRadioOptions = computed(() => [
+  const usageProtocolRadioOptions = [
     {
       title: 'HTTP support',
       subtitle: `Use only the HTTP protocol. Choose from the available HTTP ports.`,
@@ -121,18 +121,18 @@
       subtitle: `Use both HTTP and HTTPS protocols and enable HTTP/3 support. Only available for HTTP port 80 and HTTPS port 443.`,
       value: 'http3'
     }
-  ])
+  ]
 
-  const policyProtocolRadioOptions = computed(() => [
+  const policyProtocolRadioOptions = [
     { title: 'Preserve HTTP/HTTPS', value: 'preserve' },
     { title: 'Enforce HTTP', value: 'http' },
     { title: 'Enforce HTTPS', value: 'https' }
-  ])
+  ]
 
-  const cacheSettingsRadioOptions = computed(() => [
+  const cacheSettingsRadioOptions = [
     { title: 'Override cache settings', value: 'override' },
     { title: 'Honor cache policies', value: 'honor' }
-  ])
+  ]
 
   const checkIsProtocol = computed(() => ({
     http: deliveryProtocol.value === 'http',
