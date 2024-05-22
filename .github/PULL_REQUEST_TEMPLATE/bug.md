@@ -1,8 +1,6 @@
 ## Bug fix
 
-### Explain the bug.
-
-### Explain the new behavior introduced by this PR.
+### Explain what was fixed and the correct behavior
 
 ### Does this PR introduce UI changes? Add a video or screenshots here.
 
@@ -16,6 +14,7 @@
 - [ ] Commits are tagged with the right word (feat, test, refactor, etc)
 - [ ] Application responsiveness was tested to different screen sizes
 - [ ] New tests are added to prevent the same issue from happening again
+- [ ] UI changes are validated by a team designer
 - [ ] Code is formatted and linted
 - [ ] Tags are added to the PR
 
