@@ -14,6 +14,7 @@
         :deleteService="deleteDomainService"
         :columns="getColumns"
         @on-load-data="handleLoadData"
+        @on-before-go-to-add-page="handleTrackEvent"
         emptyListMessage="No domains found."
       />
       <EmptyResultsBlock
@@ -22,6 +23,7 @@
         description="Click the button below to create your first domain."
         createButtonLabel="Domain"
         createPagePath="domains/create"
+        @click-to-create="handleTrackEvent"
         :documentationService="documentationService"
       >
         <template #illustration>
@@ -39,7 +41,10 @@
   import ListTableBlock from '@/templates/list-table-block'
   import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
   import PageHeadingBlock from '@/templates/page-heading-block'
-  import { computed, ref } from 'vue'
+  import { computed, ref, inject } from 'vue'
+
+  /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
+  const tracker = inject('tracker')
 
   const props = defineProps({
     listDomainsService: {
@@ -61,6 +66,12 @@
   })
 
   const hasContentToList = ref(true)
+
+  const handleTrackEvent = () => {
+    tracker.product.clickToCreate({
+      productName: 'Domains'
+    })
+  }
 
   const getColumns = computed(() => {
     return [
