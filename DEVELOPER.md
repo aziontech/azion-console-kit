@@ -99,7 +99,7 @@ Dentro do diretório `assets/svg/` encontra-se o arquivo `logo.vue` que pode ser
 
 ### How to: usar o ambiente de stage da api
 
-Para fins de desenvolvimento do time da Azion, é possivel apontar para a api de stage e executar ações restritas em produção.
+Para fins de desenvolvimento do time da Azion, é possível apontar para a API de stage e executar ações restritas em produção.
 
 1. Altere o target da api no arquivo `vite.config.js` para `https://stage-api.azion.net`
 
@@ -129,7 +129,7 @@ Tomando como exemplo a rota de _Variables_, temos o seguinte fluxo para implemen
 3. Criação da Rota:
    - _src/router/index.js_: passagem junto da rota das properties de serviço que já foram implementadas para o componente.
 4. Adição no Menu (opcional)
-   - _src/main-menu-block_: configuração da rota, nome e ícone que serão mostrados no Sidemenu (se necessário).
+   - _src/main-menu-block_: configuração da rota, nome e ícone que serão mostrados no Side Menu (se necessário).
 
 ## Extras
 
@@ -153,8 +153,18 @@ yarn test:unit
 
 ### Executar testes e2e com [Cypress](https://www.cypress.io/)
 
+Antes de executar seus testes com Cypress, duplique o arquivo cypress.env.example.json, renomeie a cópia recém criada para cypress.env.json e preencha as variáveis com dados válidos ao ambiente que seus testes irão usar ( APIs de stage ou produção ).
+
+Para executar testes com interface
+
 ```sh
 yarn test:e2e:dev
+```
+
+Para executar os testes via terminal
+
+```sh
+yarn test:e2e:dev-run
 ```
 
 Esse comando executa os testes e2e em um servidor de desenvolvimento Vite.
