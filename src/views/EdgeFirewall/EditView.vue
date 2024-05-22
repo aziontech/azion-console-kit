@@ -50,7 +50,7 @@
       .track()
   }
 
-  const handleFailedEditeEdgeFirewall = (error) => {
+  const handleFailedEditEdgeFirewall = (error) => {
     const { fieldName, message } = handleTrackerError(error)
     tracker.product
       .failedToEdit({
@@ -72,7 +72,7 @@
       :updatedRedirect="updatedRedirect"
       disableRedirect
       :isTabs="true"
-      @on-edit-fail="handleFailedEditeEdgeFirewall"
+      @on-edit-fail="handleFailedEditEdgeFirewall"
       @on-edit-success="handleTrackSuccessEdit"
     >
       <template #form>
