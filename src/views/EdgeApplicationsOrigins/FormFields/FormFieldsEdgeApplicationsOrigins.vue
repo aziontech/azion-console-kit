@@ -44,16 +44,16 @@
       value: 'round_robin'
     }
   ]
-  const policyProtocolRadioOptions = computed(() => [
+  const policyProtocolRadioOptions = [
     { title: 'Preserve HTTP/HTTPS', value: 'preserve' },
     { title: 'Enforce HTTP', value: 'http' },
     { title: 'Enforce HTTPS', value: 'https' }
-  ])
+  ]
 
-  const serverRolesRadioOptions = computed(() => [
+  const serverRolesRadioOptions = [
     { title: 'Primary', value: 'primary' },
     { title: 'Backup', value: 'backup' }
-  ])
+  ]
 
   const originKeyInput = ref('')
 
