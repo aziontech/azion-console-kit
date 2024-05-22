@@ -1,6 +1,6 @@
 ## Bug fix
 
-### Explain what was fixed and the correct behavior
+### Explain what was fixed and the correct behavior.
 
 ### Does this PR introduce UI changes? Add a video or screenshots here.
 
