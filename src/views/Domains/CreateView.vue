@@ -40,6 +40,8 @@
   import FormFieldsCreateDomains from './FormFields/FormFieldsCreateDomains.vue'
   import ActionBarTemplate from '@/templates/action-bar-block/action-bar-with-teleport'
   import { TOAST_LIFE } from '@/utils/constants'
+  import { useRoute } from 'vue-router'
+  const route = useRoute()
 
   import * as yup from 'yup'
 
@@ -71,7 +73,7 @@
       .productCreated({
         productName: 'Domains',
         createdFrom: 'singleEntity',
-        From: 'create'
+        From: route.query.origin
       })
       .track()
   }

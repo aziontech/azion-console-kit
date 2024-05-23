@@ -22,7 +22,7 @@
         title="No domains have been created"
         description="Click the button below to create your first domain."
         createButtonLabel="Domain"
-        createPagePath="domains/create"
+        createPagePath="domains/create?origin=list"
         @click-to-create="handleTrackEvent"
         :documentationService="documentationService"
       >
