@@ -1,10 +1,8 @@
 <script setup>
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
-  import PrimeButton from 'primevue/button'
   import Calendar from 'primevue/calendar'
   import Dropdown from 'primevue/dropdown'
   import InputText from 'primevue/inputtext'
-  import PrimePassword from 'primevue/password'
   import PrimeTextarea from 'primevue/textarea'
   import { useField } from 'vee-validate'
   import { computed } from 'vue'
@@ -28,10 +26,6 @@
       type: Function,
       required: true
     }
-  })
-
-  const personalToken = computed({
-    get: () => props.personalTokenKey
   })
 
   const { value: name, errorMessage: errorName } = useField('name')
@@ -226,39 +220,6 @@
               >{{ errorCustom }}
             </small>
           </div>
-        </div>
-      </div>
-
-      <div class="flex flex-col w-full gap-2">
-        <label
-          for="personalToken"
-          class="text-color text-base font-medium"
-        >
-          Personal Token Value
-        </label>
-        <div
-          class="flex gap-6 md:align-items-center max-sm:flex-col max-sm:align-items-baseline flex-wrap max-sm:gap-3"
-        >
-          <span class="p-input-icon-right w-full flex max-w-lg flex-col items-start gap-2">
-            <PrimePassword
-              id="personalToken"
-              v-model="personalToken"
-              type="text"
-              class="flex flex-col w-full"
-              :feedback="false"
-              toggleMask
-              disabled
-            />
-          </span>
-          <PrimeButton
-            icon="pi pi-clone"
-            outlined
-            type="button"
-            aria-label="Copy Personal Token"
-            label="Copy"
-            :disabled="!disabledFields"
-            @click="copyPersonalToken"
-          />
         </div>
       </div>
     </template>

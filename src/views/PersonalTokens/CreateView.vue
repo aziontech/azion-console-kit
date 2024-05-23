@@ -12,6 +12,7 @@
   import { useAccountStore } from '@/stores/account'
   import { storeToRefs } from 'pinia'
   import * as yup from 'yup'
+  import { useRouter } from 'vue-router'
 
   defineOptions({ name: 'create-personal-token' })
 
@@ -66,6 +67,7 @@
   }
 
   const toast = useToast()
+  const router = useRouter()
   const dialog = useDialog()
 
   const handleResponse = ({ token }) => {
@@ -74,6 +76,9 @@
       data: {
         personalToken: personalTokenKey.value,
         copy: copyPersonalToken
+      },
+      onClose: () => {
+        router.push({ name: 'list-personal-tokens' })
       }
     })
   }
@@ -110,6 +115,7 @@
         :initialValues="initialValues"
         :schema="validationSchema"
         :disabledCallback="true"
+        disableAfterCreateToastFeedback
       >
         <template #form>
           <FormFieldsPersonalToken
