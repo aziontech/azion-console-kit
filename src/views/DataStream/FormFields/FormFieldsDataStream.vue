@@ -87,7 +87,7 @@
           language="json"
           :theme="theme"
           :options="optionsMonacoEditor"
-          class="min-h-[100px] surface-border border rounded-sm overflow-hidden"
+          class="min-h-[300px] surface-border border rounded-sm overflow-hidden"
         />
         <small class="text-xs text-color-secondary font-normal leading-5">
           Exhibits or allows writing the variables that'll be sent to the connector in a JSON
@@ -622,7 +622,7 @@
             language="json"
             :theme="theme"
             :options="optionsMonacoEditor"
-            class="min-h-[100px] surface-border border rounded-md overflow-hidden"
+            class="min-h-[300px] surface-border border rounded-md overflow-hidden"
           />
           <small class="text-xs text-color-secondary font-normal leading-5">
             JSON file provided by Google Cloud used to authenticate with Google services.
