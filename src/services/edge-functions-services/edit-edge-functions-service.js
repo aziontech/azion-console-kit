@@ -18,33 +18,31 @@ export const editEdgeFunctionsService = async (payload) => {
  * @param {Object} httpResponse.body - The response body.
  * @returns {string} The result message based on the status code.
  */
-const extractApiError = (httpResponse) => {
-  const definedKeys = [
-    'name',
-    'code',
-    'language',
-    'invalid_json',
-    'initiator_type',
-    'json_args',
-    'active'
-  ]
-  let key = definedKeys.find((key) => httpResponse.body[key])
-
-  // Case not found any defined key
-  if (!key) {
-    key = Object.keys(httpResponse.body)[0]
+const extractErrorKey = (errorSchema, key) => {
+  if (key === 'user_has_no_product') {
+    const noProductErrorMessage =
+      'In order to perform this action, you must first have access to the product Tiered Cache'
+    return `${key}: ${noProductErrorMessage}`
   }
 
-  const value = httpResponse.body[key]
-  const isString = typeof value === 'string'
-  const isArray = Array.isArray(value)
-
-  let message = ''
-  if (isString) message = value
-  if (isArray) message = value[0]
-
-  return `${key}: ${message}`
+  if (typeof errorSchema[key] === 'string') {
+    return `${key}: ${errorSchema[key]}`
+  }
+  return `${key}: ${errorSchema[key][0]}`
 }
+
+/**
+ * @param {Object} httpResponse - The HTTP response object.
+ * @param {Object} httpResponse.body - The response body.
+ * @returns {string} The result message based on the status code.
+ */
+const extractApiError = (httpResponse) => {
+  const [firstKey] = Object.keys(httpResponse.body)
+  const errorMessage = extractErrorKey(httpResponse.body, firstKey)
+
+  return errorMessage
+}
+
 
 /**
  * @param {Object} httpResponse - The HTTP response object.
@@ -59,7 +57,7 @@ const parseHttpResponse = (httpResponse) => {
       return 'Your edge function has been updated'
     case 400:
       const apiError400 = extractApiError(httpResponse)
-      throw new Error(apiError400)
+      throw new Error(apiError400).message
     case 401:
       throw new Errors.InvalidApiTokenError().message
     case 403:
