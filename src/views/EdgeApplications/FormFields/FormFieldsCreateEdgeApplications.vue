@@ -128,10 +128,21 @@
     { title: 'Enforce HTTPS', value: 'https' }
   ]
 
-  const cacheSettingsRadioOptions = [
-    { title: 'Override cache settings', value: 'override' },
-    { title: 'Honor cache policies', value: 'honor' }
-  ]
+  const cacheSettingsRadioOptions = (type) => {
+    const isBrowser = type === 'browser'
+
+    const browserSubtitle = 'Honor cache policies from the origin or define a new maximum cache TTL for browsers.'
+    const cdnSubtitle = `Honor cache policies from the origin or define a new maximum cache TTL for the edge. If a TTL isn't received from the origin, cache will be maintained at a default TTL.`
+
+    return [
+      { title: 'Override cache settings', value: 'override' },
+      {
+        title: 'Honor cache policies',
+        subtitle: isBrowser ? browserSubtitle : cdnSubtitle,
+        value: 'honor'
+      }
+    ]
+  }
 
   const checkIsProtocol = computed(() => ({
     http: deliveryProtocol.value === 'http',
@@ -441,8 +452,7 @@
         label="Browser Cache Settings"
         nameField="browserCacheSettings"
         :isCard="false"
-        :options="cacheSettingsRadioOptions"
-        helpText="Honor cache policies from the origin or define a new maximum cache TTL for browsers."
+        :options="cacheSettingsRadioOptions('browser')"
       />
 
       <div
@@ -467,8 +477,7 @@
         label="Edge Cache Settings"
         nameField="cdnCacheSettings"
         :isCard="false"
-        :options="cacheSettingsRadioOptions"
-        helpText="Honor cache policies from the origin or define a new maximum cache TTL for the edge. If a TTL isn't received from the origin, cache will be maintained at a default TTL."
+        :options="cacheSettingsRadioOptions('cdn')"
       />
 
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
@@ -547,6 +556,8 @@
           auto
           :isCard="false"
           title="Active"
+          subtitle="Rules that were successfully executed will be shown under the $traceback field in Data
+              Streaming and Real-Time Events or the $stacktrace variable in GraphQL."
         />
       </div>
     </template>
