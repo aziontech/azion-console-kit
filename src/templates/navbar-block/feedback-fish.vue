@@ -7,12 +7,13 @@
     :data-feedback-fish-userid="user.email"
     :pt="{
       root: { class: 'max-md:w-[2rem] max-md:h-[2rem] justify-content-center' },
-      label: { class: 'text-white max-md:hidden' },
-      icon: { class: 'text-white max-md:m-0' }
+      label: { class: 'max-md:hidden' },
+      icon: { class: 'max-md:m-0' }
     }"
     icon="pi pi-flag"
     size="small"
-    class="text-white border-header bg-header hover:bg-header-button-hover"
+    :outlined="props.outlined"
+    :class="props.class"
     v-tooltip.bottom="{ value: 'Feedback', showDelay: 200 }"
   />
 </template>
@@ -23,6 +24,16 @@
   import PrimeButton from 'primevue/button'
 
   const projectId = '2566aa41e7e334'
+
+  const props = defineProps({
+    class: {
+      type: String
+    },
+    outlined: {
+      type: Boolean,
+      default: true
+    }
+  })
 
   const user = useAccountStore().accountData
 </script>
