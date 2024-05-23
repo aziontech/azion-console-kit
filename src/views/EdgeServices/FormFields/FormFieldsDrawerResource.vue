@@ -1,9 +1,9 @@
 <script setup>
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
-  import RadioButton from 'primevue/radiobutton'
   import InputText from 'primevue/inputtext'
   import { computed } from 'vue'
   import { useAccountStore } from '@/stores/account'
+  import FieldGroupRadio from '@/templates/form-fields-inputs/fieldGroupRadio'
   import { useField } from 'vee-validate'
   defineOptions({ name: 'form-fields-drawer-resource' })
 
@@ -15,7 +15,6 @@
   })
 
   const store = useAccountStore()
-  const defaultTrigger = 'Install'
   const contentTypeShellScript = 'Shell Script'
 
   const editorOptions = computed(() => {
@@ -28,7 +27,7 @@
   })
   const { value: name, errorMessage: nameError } = useField('name')
   const { value: contentType } = useField('contentType')
-  const { value: trigger, setValue: setTrigger } = useField('trigger')
+  useField('trigger')
   const { value: content, errorMessage: contentError } = useField('content')
 
   const theme = computed(() => {
@@ -39,9 +38,31 @@
     return contentType.value === contentTypeShellScript
   })
 
-  const handleShellScriptOption = () => {
-    setTrigger(trigger.value || defaultTrigger)
-  }
+  const typeRadioOptions = [
+    {
+      title: 'Shell Script',
+      value: 'Shell Script'
+    },
+    {
+      title: 'Text',
+      value: 'Text'
+    }
+  ]
+
+  const triggerRadioOptions = [
+    {
+      title: 'Install',
+      value: 'Install'
+    },
+    {
+      title: 'Reload',
+      value: 'Reload'
+    },
+    {
+      title: 'Uninstall',
+      value: 'Uninstall'
+    }
+  ]
 </script>
 
 <template>
@@ -77,96 +98,24 @@
           </div>
         </div>
       </div>
-      <div class="flex flex-col w-full sm:max-w-3xl gap-2">
-        <div class="flex flex-col gap-2">
-          <label class="text-color text-sm not-italic font-medium leading-5">Type *</label>
-          <div class="flex flex-col gap-3">
-            <div class="flex no-wrap gap-2 items-center">
-              <RadioButton
-                v-model="contentType"
-                inputId="shell-script"
-                name="shell-script"
-                value="Shell Script"
-                :disabled="props.disabledFields"
-                @change="handleShellScriptOption"
-              />
-              <label
-                for="shell-script"
-                class="text-color text-sm font-normal leading-tight"
-                >Shell Script</label
-              >
-            </div>
-            <div class="flex no-wrap gap-2 items-center">
-              <RadioButton
-                v-model="contentType"
-                inputId="content-type-text"
-                name="content-type-text"
-                :disabled="props.disabledFields"
-                value="Text"
-              />
-              <label
-                for="content-type-text"
-                class="text-color text-sm font-normal leading-tight"
-                >Text
-              </label>
-            </div>
-          </div>
-        </div>
-      </div>
+      <FieldGroupRadio
+        label="Type"
+        nameField="contentType"
+        :isCard="false"
+        :options="typeRadioOptions"
+      />
+
       <div
         class="flex flex-col w-full sm:max-w-3xl gap-2"
         v-if="isShellScript"
       >
-        <div class="flex flex-col gap-2">
-          <label class="text-color text-sm not-italic font-medium leading-5">Trigger Type *</label>
-          <small class="text-xs text-color-secondary font-normal leading-5">
-            Define the trigger for when the script is executed.
-          </small>
-          <div class="flex flex-col gap-3">
-            <div class="flex no-wrap gap-2 items-center">
-              <RadioButton
-                v-model="trigger"
-                :disabled="props.disabledFields"
-                inputId="trigger-install"
-                name="trigger-install"
-                value="Install"
-              />
-              <label
-                for="trigger-install"
-                class="text-color text-sm font-normal leading-tight"
-                >Install</label
-              >
-            </div>
-            <div class="flex no-wrap gap-2 items-center">
-              <RadioButton
-                v-model="trigger"
-                :disabled="props.disabledFields"
-                inputId="trigger-reload"
-                name="trigger-reload"
-                value="Reload"
-              />
-              <label
-                for="trigger-reload"
-                class="text-color text-sm font-normal leading-tight"
-                >Reload
-              </label>
-            </div>
-            <div class="flex no-wrap gap-2 items-center">
-              <RadioButton
-                v-model="trigger"
-                :disabled="props.disabledFields"
-                inputId="trigger-uninstall"
-                name="trigger-uninstall"
-                value="Uninstall"
-              />
-              <label
-                for="trigger-uninstall"
-                class="text-color text-sm font-normal leading-tight"
-                >Uninstall
-              </label>
-            </div>
-          </div>
-        </div>
+        <FieldGroupRadio
+          label="Trigger Type"
+          helpText="Define the trigger for when the script is executed."
+          nameField="trigger"
+          :isCard="false"
+          :options="triggerRadioOptions"
+        />
       </div>
       <div class="flex flex-col w-full sm:max-w-3xl gap-2">
         <div class="flex flex-col gap-2">

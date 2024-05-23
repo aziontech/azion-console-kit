@@ -1,7 +1,7 @@
 <script setup>
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
+  import FieldSwitchBlock from '@/templates/form-fields-inputs/fieldSwitchBlock'
   import InputText from 'primevue/inputtext'
-  import InputSwitch from 'primevue/inputswitch'
   import { computed } from 'vue'
   import { useAccountStore } from '@/stores/account'
   import { useField } from 'vee-validate'
@@ -9,7 +9,7 @@
 
   const { value: name, errorMessage: nameError } = useField('name')
   const { value: code, errorMessage: codeError } = useField('code')
-  const { value: active } = useField('active')
+  useField('active')
 
   const editorOptions = {
     minimap: { enabled: false },
@@ -53,6 +53,7 @@
       </div>
     </template>
   </FormHorizontal>
+
   <FormHorizontal
     title="Variables"
     description="Variables are dynamic values that affect the edge services that will be orchestrated and run on Edge Nodes."
@@ -80,25 +81,16 @@
       </div>
     </template>
   </FormHorizontal>
+
   <FormHorizontal title="Status">
     <template #inputs>
-      <div class="flex flex-col w-full gap-2">
-        <div
-          class="flex gap-6 md:align-items-center max-sm:flex-col max-sm:align-items-baseline max-sm:gap-3"
-        >
-          <span class="p-input-icon-right w-full flex max-w-lg items-start gap-2 pb-3 pt-2">
-            <InputSwitch
-              v-model="active"
-              inputId="activeStatus"
-            />
-            <label
-              for="activeStatus"
-              class="text-color text-sm font-normal leading-5"
-              >Active</label
-            >
-          </span>
-        </div>
-      </div>
+      <FieldSwitchBlock
+        nameField="active"
+        name="active"
+        auto
+        :isCard="false"
+        title="Active"
+      />
     </template>
   </FormHorizontal>
 </template>

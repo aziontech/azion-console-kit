@@ -653,7 +653,7 @@
     return behaviors.value.length >= MAXIMUM_NUMBER
   })
 
-  const phasesRadioOptions = computed(() => [
+  const phasesRadioOptions = [
     {
       title: 'Request Phase',
       value: 'request',
@@ -664,7 +664,7 @@
       value: 'response',
       subtitle: 'Configure the responses delivered to end-users.'
     }
-  ])
+  ]
 
   onMounted(() => {
     updateBehaviorsOptionsRequires()
