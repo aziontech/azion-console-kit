@@ -9,7 +9,7 @@
         pageTitleDelete="domain"
         addButtonLabel="Domain"
         :createPagePath="createDomainPath"
-        editPagePath="domains/edit?origin=list"
+        editPagePath="domains/edit"
         :listService="listDomainsService"
         :deleteService="deleteDomainService"
         :columns="getColumns"
