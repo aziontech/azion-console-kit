@@ -3,6 +3,9 @@ describe('Login Test', () => {
     const email = Cypress.env('CYPRESS_EMAIL_STAGE');
     const password = Cypress.env('CYPRESS_PASSWORD_STAGE');
     const username = Cypress.env('CYPRESS_USERNAME_STAGE');
+    if (email)
+      console.log("defined");
+    console.log(email);
 
     // Arrange: Visit the login page and define user credentials
     cy.visit('/login');
