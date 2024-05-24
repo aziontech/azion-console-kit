@@ -4,7 +4,7 @@
     :class="{ 'lg:flex-nowrap xl:py-14 xl:p-14 lg:gap-16': !isDrawer }"
   >
     <!-- title and description -->
-    <div class="flex flex-col gap-2 flex-1 w-full md:min-w-[20rem]">
+    <div class="flex flex-col gap-2 flex-1 w-full md:min-w-[15rem]">
       <div class="text-color text-xl font-medium">{{ props.title }}</div>
       <div
         class="text-color-secondary text-sm font-normal flex flex-col gap-2"
