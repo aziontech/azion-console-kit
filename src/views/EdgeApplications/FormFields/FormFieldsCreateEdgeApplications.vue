@@ -63,8 +63,6 @@
   const { value: originType } = useField('originType')
   const { value: cdnCacheSettings } = useField('cdnCacheSettings')
   const { value: browserCacheSettings } = useField('browserCacheSettings')
-  useField('originProtocolPolicy')
-  useField('debugRules')
 
   const { value: name } = useField('name')
   const { value: address, errorMessage: addressError } = useField('address')
@@ -73,13 +71,6 @@
   const { value: cdnCacheSettingsMaximumTtl } = useField('cdnCacheSettingsMaximumTtl')
 
   const { value: websocket } = useField('websocket')
-  useField('applicationAccelerator')
-  useField('caching')
-  useField('deviceDetection')
-  useField('edgeFunctions')
-  useField('imageOptimization')
-  useField('l2Caching')
-  useField('loadBalancer')
 
   const setDeliveryProtocol = (protocol) => {
     const enableHttp3 = protocol === 'http3'
