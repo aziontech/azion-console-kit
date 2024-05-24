@@ -12,5 +12,10 @@ export default defineConfig({
       runMode: 2,
       openMode: 2
     }
+  },
+  env: {
+    CYPRESS_EMAIL_STAGE: process.env.CYPRESS_EMAIL_STAGE,
+    CYPRESS_PASSWORD_STAGE: process.env.CYPRESS_PASSWORD_STAGE,
+    CYPRESS_USERNAME_STAGE: process.env.CYPRESS_USERNAME_STAGE
   }
 })
