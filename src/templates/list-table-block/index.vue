@@ -190,6 +190,7 @@
   import { computed, onMounted, ref, watch } from 'vue'
   import { useRouter } from 'vue-router'
   import DeleteDialog from './dialog/delete-dialog'
+  import { TOAST_LIFE } from '@/utils/constants'
 
   defineOptions({ name: 'list-table-block' })
   const emit = defineEmits(['on-load-data', 'on-before-go-to-add-page', 'on-before-go-to-edit'])
@@ -269,6 +270,22 @@
     return [...filters, ...filtersPath]
   })
 
+  const showToast = (severity, detail) => {
+    if (!detail) return
+    const options = {
+      closable: true,
+      severity,
+      summary: severity,
+      detail
+    }
+
+    if (severity === 'success') {
+      options.life = TOAST_LIFE
+    }
+
+    toast.add(options)
+  }
+
   const showPagination = computed(() => {
     return data.value.length > MINIMUN_OF_ITEMS_PER_PAGE
   })
@@ -324,11 +341,7 @@
       data.value = response
     } catch (error) {
       data.value = []
-      toast.add({
-        closable: true,
-        severity: 'error',
-        summary: error
-      })
+      showToast('error', error)
     } finally {
       isLoading.value = false
     }
