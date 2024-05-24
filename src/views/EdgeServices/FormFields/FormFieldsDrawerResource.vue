@@ -27,7 +27,6 @@
   })
   const { value: name, errorMessage: nameError } = useField('name')
   const { value: contentType } = useField('contentType')
-  useField('trigger')
   const { value: content, errorMessage: contentError } = useField('content')
 
   const theme = computed(() => {
@@ -106,8 +105,7 @@
       />
 
       <div
-        class="flex flex-col w-full sm:max-w-3xl gap-2"
-        v-if="isShellScript"
+        v-show="isShellScript"
       >
         <FieldGroupRadio
           label="Trigger Type"

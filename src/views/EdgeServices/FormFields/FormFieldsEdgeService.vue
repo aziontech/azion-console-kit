@@ -9,7 +9,6 @@
 
   const { value: name, errorMessage: nameError } = useField('name')
   const { value: code, errorMessage: codeError } = useField('code')
-  useField('active')
 
   const editorOptions = {
     minimap: { enabled: false },
