@@ -91,7 +91,7 @@
       errorType: 'api',
       fieldName: fieldName.trim(),
       errorMessage: message
-    })
+    }).track()
   }
 
   const edgeApps = ref([])
