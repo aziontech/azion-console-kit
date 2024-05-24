@@ -11,8 +11,8 @@
         :cleanFormCallback="resetForm"
         :updatedRedirect="updatedRedirect"
         :initialValues="initialValues"
-        @on-edit-success="handleTrackEvent"
-        @on-edit-fail="handleTrackEditEvent"
+        @on-edit-success="handleTrackEditEvent"
+        @on-edit-fail="handleTrackFailEditEvent"
       >
         <template #form>
           <FormFieldsEditDomains
@@ -78,13 +78,13 @@
     }
   })
 
-  const handleTrackEvent = () => {
+  const handleTrackEditEvent = () => {
     tracker.product.productEdited({
       productName: 'Domains'
     })
   }
 
-  const handleTrackEditEvent = (error) => {
+  const handleTrackFailEditEvent = (error) => {
     const { fieldName, message } = handleTrackerError(error)
     tracker.product
       .failedToEdit({
