@@ -43,7 +43,6 @@ const extractApiError = (httpResponse) => {
   return errorMessage
 }
 
-
 /**
  * @param {Object} httpResponse - The HTTP response object.
  * @param {Object} httpResponse.body - The response body.

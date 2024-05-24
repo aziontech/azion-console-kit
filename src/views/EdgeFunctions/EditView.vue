@@ -69,7 +69,7 @@
   const handleTrackSuccessEdit = () => {
     tracker.product
       .productEdited({
-        productName: 'Edge Functions',
+        productName: 'Edge Functions'
       })
       .track()
   }
