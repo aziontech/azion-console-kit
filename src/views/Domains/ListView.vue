@@ -8,7 +8,7 @@
         v-if="hasContentToList"
         pageTitleDelete="domain"
         addButtonLabel="Domain"
-        createPagePath="domains/create?origin=list"
+        :createPagePath="createDomainPath"
         editPagePath="domains/edit?origin=list"
         :listService="listDomainsService"
         :deleteService="deleteDomainService"
@@ -22,7 +22,7 @@
         title="No domains have been created"
         description="Click the button below to create your first domain."
         createButtonLabel="Domain"
-        createPagePath="domains/create?origin=list"
+        :createPagePath="createDomainPath"
         @click-to-create="handleTrackEvent"
         :documentationService="documentationService"
       >
@@ -64,6 +64,8 @@
       type: Function
     }
   })
+
+  const createDomainPath = 'domains/create?origin=list'
 
   const hasContentToList = ref(true)
 
