@@ -68,9 +68,7 @@
       required: true
     },
     value: {
-      default: undefined,
       type: Boolean,
-      required: false
     }
   })
 
