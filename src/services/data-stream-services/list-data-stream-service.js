@@ -46,13 +46,13 @@ const adaptTemplate = (httpResponse) => {
 const parseStatusData = (status) => {
   const parsedStatus = status
     ? {
-        content: 'Active',
-        severity: 'success'
-      }
+      content: 'Active',
+      severity: 'success'
+    }
     : {
-        content: 'Inactive',
-        severity: 'danger'
-      }
+      content: 'Inactive',
+      severity: 'danger'
+    }
 
   return parsedStatus
 }
@@ -79,7 +79,7 @@ const adapt = async (httpResponse) => {
       return {
         id: dataStream.id,
         name: dataStream.name,
-        templateName: mapTemplateId[dataStream.template_id]?.name,
+        templateName: mapTemplateId[dataStream.template_id]?.name ?? 'Custom Template',
         dataSource: mapDataSourceName[dataStream.data_source],
         endpointType: dataStream.endpoint.endpoint_type,
         active: parseStatusData(dataStream.active)

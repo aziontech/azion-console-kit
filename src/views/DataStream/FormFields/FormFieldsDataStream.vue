@@ -1242,6 +1242,7 @@
   useField('status')
   const { value: name, errorMessage: nameError } = useField('name')
   const { value: dataSource, errorMessage: dataSourceError } = useField('dataSource')
+  const { value: dataSet } = useField('dataSet')
   const { value: template, errorMessage: templateError } = useField('template')
   const { value: domainOption } = useField('domainOption')
   const { value: domains } = useField('domains')
@@ -1313,7 +1314,6 @@
   const { value: blobToken, errorMessage: blobTokenError } = useField('blobToken')
 
   const listTemplates = ref([])
-  const dataSet = ref('')
 
   const loaderDataStreamTemplates = async () => {
     const templates = await props.listDataStreamTemplateService()
@@ -1343,8 +1343,10 @@
   const insertDataSet = (templateID) => {
     const index = listTemplates.value.map((el) => el.value).indexOf(templateID)
     try {
-      const dataSetJSON = JSON.parse(listTemplates.value[index].template)
-      dataSet.value = JSON.stringify(dataSetJSON, null, '\t')
+      if (props.resetForm) {
+        const dataSetJSON = JSON.parse(listTemplates.value[index].template)
+        dataSet.value = JSON.stringify(dataSetJSON, null, '\t')
+      }
     } catch (exception) {
       dataSet.value = listTemplates.value[index].template
     }
@@ -1388,8 +1390,8 @@
   )
 
   const initializeFormValues = async () => {
-    const template = await loaderDataStreamTemplates()
     const domains = await loaderDataStreamDomains()
+    const template = await loaderDataStreamTemplates()
 
     if (props.resetForm) {
       const initialValues = {
