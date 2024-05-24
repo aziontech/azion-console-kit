@@ -1,11 +1,8 @@
 describe('Login Test', () => {
   it('should successfully log in to the Azion Console', () => {
-    const email = process.env('CYPRESS_EMAIL_STAGE');
-    const password = process.env('CYPRESS_PASSWORD_STAGE');
-    const username = process.env('CYPRESS_USERNAME_STAGE');
-    if (email)
-      console.log("defined");
-    console.log(email);
+    const email = Cypress.env('CYPRESS_EMAIL_STAGE');
+    const password = Cypress.env('CYPRESS_PASSWORD_STAGE');
+    const username = Cypress.env('CYPRESS_USERNAME_STAGE');
 
     // Arrange: Visit the login page and define user credentials
     cy.visit('/login');
