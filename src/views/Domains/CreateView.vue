@@ -73,7 +73,7 @@
       .productCreated({
         productName: 'Domains',
         createdFrom: 'singleEntity',
-        From: route.query.origin
+        from: route.query.origin
       })
       .track()
   }
