@@ -86,12 +86,14 @@
 
   const handleTrackEditEvent = (error) => {
     const { fieldName, message } = handleTrackerError(error)
-    tracker.product.failedToEdit({
-      productName: 'Domains',
-      errorType: 'api',
-      fieldName: fieldName.trim(),
-      errorMessage: message
-    }).track()
+    tracker.product
+      .failedToEdit({
+        productName: 'Domains',
+        errorType: 'api',
+        fieldName: fieldName.trim(),
+        errorMessage: message
+      })
+      .track()
   }
 
   const edgeApps = ref([])
