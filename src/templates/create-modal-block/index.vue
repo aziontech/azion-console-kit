@@ -54,7 +54,7 @@
   const resources = ref([
     {
       label: 'Domains',
-      to: '/domains/create',
+      to: '/domains/create?origin=create',
       description: 'Launch an edge application and set up security with digital certificates.'
     },
     {
