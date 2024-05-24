@@ -17,10 +17,10 @@ const adapt = (httpResponse) => {
 
   const parsedTemplate = isArray
     ? httpResponse.body.results.map((template) => ({
-      label: template.name,
-      value: template.id,
-      template: template.template_model
-    }))
+        label: template.name,
+        value: template.id,
+        template: template.template_model
+      }))
     : []
 
   const customTemplate = { label: 'Custom Template', value: 'CUSTOM_TEMPLATE', template: '' }

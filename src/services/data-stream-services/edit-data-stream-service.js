@@ -14,7 +14,7 @@ export const editDataStreamService = async (payload) => {
 
 const adapt = (payload) => {
   const allDomains = payload.domains[1].length <= 0
-  let parsedPayload;
+  let parsedPayload
 
   if (payload.template === 'CUSTOM_TEMPLATE') {
     parsedPayload = {
@@ -35,7 +35,6 @@ const adapt = (payload) => {
       endpoint: getEndpoint(payload)
     }
   }
-
 
   if (payload.hasSampling) {
     parsedPayload.sampling_percentage = payload.samplingPercentage
