@@ -66,10 +66,14 @@
     name: {
       type: String,
       required: true
+    },
+    value: {
+      type: Boolean,
     }
   })
 
   const { nameField } = toRefs(props)
+  const emit = defineEmits(['onSwitchChange'])
 
   const {
     value: inputValue,
@@ -84,6 +88,7 @@
   const stopPropagation = (event) => {
     event.preventDefault()
     event.stopPropagation()
+    emit('onSwitchChange', inputValue.value)
   }
 
   const changeState = (event) => {
