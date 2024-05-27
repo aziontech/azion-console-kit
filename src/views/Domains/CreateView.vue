@@ -8,6 +8,7 @@
         :createService="createDomainService"
         :cleanFormCallback="resetForm"
         @on-response="handleTrackCreation"
+        @on-response-fail="handleTrackFailedCreation"
         :schema="validationSchema"
         :initialValues="initialValues"
       >
@@ -42,11 +43,10 @@
   import { TOAST_LIFE } from '@/utils/constants'
   import { useRoute } from 'vue-router'
   const route = useRoute()
-
   import * as yup from 'yup'
+  import { handleTrackerError } from '@/utils/errorHandlingTracker'
 
-  /**@type {import('@/plugins/adapters/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
-
+  /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
   const MTLS_VERIFICATION_ENFORCE = 'enforce'
 
@@ -74,6 +74,18 @@
       createdFrom: 'singleEntity',
       from: route.query.origin
     })
+  }
+
+  const handleTrackFailedCreation = (error) => {
+    const { fieldName, message } = handleTrackerError(error)
+    tracker.product
+      .failedToCreate({
+        productName: 'Domains',
+        errorType: 'api',
+        fieldName: fieldName.trim(),
+        errorMessage: message
+      })
+      .track()
   }
 
   const requestEdgeApplications = async () => {
