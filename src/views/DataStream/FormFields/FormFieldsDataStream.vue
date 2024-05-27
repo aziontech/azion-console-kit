@@ -1468,7 +1468,7 @@
     }
   }
 
-  const domainsRadioOptions = ref([
+  const domainsRadioOptions = [
     {
       title: 'All Current and Future Domains',
       value: '1',
@@ -1479,7 +1479,7 @@
       title: 'Filter Domains',
       value: '0'
     }
-  ])
+  ]
 
   onMounted(() => {
     initializeFormValues()

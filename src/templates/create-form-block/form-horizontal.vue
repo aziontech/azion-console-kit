@@ -16,7 +16,7 @@
       </div>
     </div>
     <!-- inputs  -->
-    <div class="max-w-3xl w-full flex flex-col gap-8 max-md:gap-6 overflow-auto">
+    <div class="max-w-3xl w-full flex flex-col gap-8 max-md:gap-6">
       <slot name="inputs"></slot>
     </div>
   </fieldset>

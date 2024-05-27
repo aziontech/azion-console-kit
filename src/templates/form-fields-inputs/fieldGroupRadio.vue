@@ -77,7 +77,7 @@
       >
         <FieldRadioBlock
           :nameField="props.nameField"
-          :name="`${props.nameField}-radio-${index}`"
+          :name="props.name ?? `${props.nameField}-radio-${index}`"
           :auto="props.auto"
           :hideSelector="props.hideSelector"
           :isCard="props.isCard"
