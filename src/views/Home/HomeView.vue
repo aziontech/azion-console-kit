@@ -250,7 +250,7 @@
   const showInviteSession = ref(props.inviteSession.show())
 
   const isDisabled = computed(() => {
-    return !meta?.valid || isLoading
+    return !meta.value?.valid || isLoading.value
   })
 
   const disclaimer = computed(() => {

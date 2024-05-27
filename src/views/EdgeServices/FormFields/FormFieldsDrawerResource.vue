@@ -104,9 +104,7 @@
         :options="typeRadioOptions"
       />
 
-      <div
-        v-show="isShellScript"
-      >
+      <div v-show="isShellScript">
         <FieldGroupRadio
           label="Trigger Type"
           helpText="Define the trigger for when the script is executed."
