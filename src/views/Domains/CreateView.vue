@@ -7,7 +7,6 @@
       <CreateFormBlock
         :createService="createDomainService"
         :cleanFormCallback="resetForm"
-        @on-response="handleTrackCreation"
         :schema="validationSchema"
         :initialValues="initialValues"
       >
@@ -31,7 +30,7 @@
 </template>
 
 <script setup>
-  import { ref, onMounted, inject } from 'vue'
+  import { ref, onMounted } from 'vue'
   import { useToast } from 'primevue/usetoast'
 
   import CreateFormBlock from '@/templates/create-form-block'
@@ -40,14 +39,9 @@
   import FormFieldsCreateDomains from './FormFields/FormFieldsCreateDomains.vue'
   import ActionBarTemplate from '@/templates/action-bar-block/action-bar-with-teleport'
   import { TOAST_LIFE } from '@/utils/constants'
-  import { useRoute } from 'vue-router'
-  const route = useRoute()
 
   import * as yup from 'yup'
 
-  /**@type {import('@/plugins/adapters/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
-
-  const tracker = inject('tracker')
   const MTLS_VERIFICATION_ENFORCE = 'enforce'
 
   const props = defineProps({
@@ -67,16 +61,6 @@
   const edgeApps = ref([])
   const digitalCertificates = ref([])
   const toast = useToast()
-
-  const handleTrackCreation = () => {
-    tracker.product
-      .productCreated({
-        productName: 'Domains',
-        createdFrom: 'singleEntity',
-        from: route.query.origin
-      })
-      .track()
-  }
 
   const requestEdgeApplications = async () => {
     edgeApps.value = await props.listEdgeApplicationsService({})
