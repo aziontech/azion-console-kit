@@ -131,7 +131,10 @@
   }
 
   const validationSchema = yup.object({
-    name: yup.string().required(),
+    name: yup.string().required().test('only-ascii', 'The name contains characters not accepted.', function(value) {
+      const nameRegex = /^[\x20-\x7E]+$/
+      return nameRegex.test(value)
+    }),
     active: yup.boolean(),
     cnames: yup
       .string()
