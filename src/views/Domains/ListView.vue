@@ -72,12 +72,12 @@
 
   const handleTrackEvent = () => {
     tracker.product.clickToCreate({
-      productName: 'Domains'
+      productName: 'Domain'
     })
   }
   const handleTrackEditEvent = () => {
     tracker.product.clickToEdit({
-      productName: 'Domains'
+      productName: 'Domain'
     })
   }
 

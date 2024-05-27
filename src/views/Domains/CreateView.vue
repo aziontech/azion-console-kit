@@ -70,7 +70,7 @@
 
   const handleTrackCreation = () => {
     tracker.product.productCreated({
-      productName: 'Domains',
+      productName: 'Domain',
       createdFrom: 'singleEntity',
       from: route.query.origin
     })
