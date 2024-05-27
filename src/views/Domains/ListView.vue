@@ -15,6 +15,7 @@
         :columns="getColumns"
         @on-load-data="handleLoadData"
         @on-before-go-to-add-page="handleTrackEvent"
+        @on-before-go-to-edit="handleTrackEditEvent"
         emptyListMessage="No domains found."
       />
       <EmptyResultsBlock
@@ -71,6 +72,11 @@
 
   const handleTrackEvent = () => {
     tracker.product.clickToCreate({
+      productName: 'Domains'
+    })
+  }
+  const handleTrackEditEvent = () => {
+    tracker.product.clickToEdit({
       productName: 'Domains'
     })
   }

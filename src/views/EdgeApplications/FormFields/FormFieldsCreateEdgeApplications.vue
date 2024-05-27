@@ -2,15 +2,14 @@
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
   import FieldText from '@/templates/form-fields-inputs/fieldText'
   import PrimeButton from 'primevue/button'
-  import Card from 'primevue/card'
   import Dropdown from 'primevue/dropdown'
   import InputNumber from 'primevue/inputnumber'
-  import InputSwitch from 'primevue/inputswitch'
   import InputText from 'primevue/inputtext'
   import MultiSelect from 'primevue/multiselect'
   import PrimeTag from 'primevue/tag'
   import FieldSwitchBlock from '@/templates/form-fields-inputs/fieldSwitchBlock'
   import FieldGroupRadio from '@/templates/form-fields-inputs/fieldGroupRadio'
+  import FieldGroupSwitch from '@/templates/form-fields-inputs/fieldGroupSwitch'
 
   import { useField } from 'vee-validate'
   import { computed } from 'vue'
@@ -64,8 +63,6 @@
   const { value: originType } = useField('originType')
   const { value: cdnCacheSettings } = useField('cdnCacheSettings')
   const { value: browserCacheSettings } = useField('browserCacheSettings')
-  useField('originProtocolPolicy')
-  useField('debugRules')
 
   const { value: name } = useField('name')
   const { value: address, errorMessage: addressError } = useField('address')
@@ -74,13 +71,6 @@
   const { value: cdnCacheSettingsMaximumTtl } = useField('cdnCacheSettingsMaximumTtl')
 
   const { value: websocket } = useField('websocket')
-  const { value: applicationAccelerator } = useField('applicationAccelerator')
-  const { value: caching } = useField('caching')
-  const { value: deviceDetection } = useField('deviceDetection')
-  const { value: edgeFunctions } = useField('edgeFunctions')
-  const { value: imageOptimization } = useField('imageOptimization')
-  const { value: l2Caching } = useField('l2Caching')
-  const { value: loadBalancer } = useField('loadBalancer')
 
   const setDeliveryProtocol = (protocol) => {
     const enableHttp3 = protocol === 'http3'
@@ -129,10 +119,21 @@
     { title: 'Enforce HTTPS', value: 'https' }
   ]
 
-  const cacheSettingsRadioOptions = [
-    { title: 'Override cache settings', value: 'override' },
-    { title: 'Honor cache policies', value: 'honor' }
-  ]
+  const cacheSettingsRadioOptions = (type) => {
+    const isBrowser = type === 'browser'
+
+    const browserSubtitle = 'Honor cache policies from the origin or define a new maximum cache TTL for browsers.'
+    const cdnSubtitle = `Honor cache policies from the origin or define a new maximum cache TTL for the edge. If a TTL isn't received from the origin, cache will be maintained at a default TTL.`
+
+    return [
+      { title: 'Override cache settings', value: 'override' },
+      {
+        title: 'Honor cache policies',
+        subtitle: isBrowser ? browserSubtitle : cdnSubtitle,
+        value: 'honor'
+      }
+    ]
+  }
 
   const checkIsProtocol = computed(() => ({
     http: deliveryProtocol.value === 'http',
@@ -143,6 +144,59 @@
   const isBrowserCacheTypeHonor = computed(() => browserCacheSettings.value === 'honor')
   const websocketIsEnabled = computed(() => websocket.value)
   const cdnCacheSettingsIsOverride = computed(() => cdnCacheSettings.value === 'override')
+
+  const defaultModulesSwitchOptions = [
+    {
+      title: 'Application Accelerator',
+      nameField: 'applicationAccelerator',
+      subtitle: 'Optimize protocols and manage dynamic content delivery.'
+    },
+    {
+      title: 'Edge Cache',
+      nameField: 'caching',
+      disabled: true,
+      subtitle: 'Customize advanced cache settings.',
+      tag: {
+        value: 'Automatically enabled in all accounts.',
+        icon: 'pi pi-lock'
+      }
+    },
+    {
+      title: 'Device Detection',
+      nameField: 'deviceDetection',
+      subtitle: 'Activate DeviceAtlas variables to configure responsive rules.'
+    },
+    {
+      title: 'Edge Functions',
+      nameField: 'edgeFunctions',
+      subtitle: 'Build ultra-low latency functions that run on the edge.'
+    },
+    {
+      title: 'Image Processor',
+      nameField: 'imageOptimization',
+      subtitle: 'Enable dynamic image editing options.'
+    },
+    {
+      title: 'Load Balancer',
+      nameField: 'loadBalancer',
+      subtitle:
+        'Balance traffic to your origins ensuring reliability and network congestion control.'
+    }
+  ]
+  const subscriptionModulesSwitchOptions = [
+    {
+      title: 'Tiered Cache',
+      nameField: 'l2Caching',
+      subtitle: 'Enable an additional cache layer at the edge.'
+    },
+    {
+      title: 'WebSocket Proxy',
+      nameField: 'websocket',
+      disabled: websocketIsEnabled.value,
+      subtitle:
+        'Enhance real-time data exchange between your edge application and backend services using the WebSocket protocol.'
+    }
+  ]
 </script>
 
 <template>
@@ -389,8 +443,7 @@
         label="Browser Cache Settings"
         nameField="browserCacheSettings"
         :isCard="false"
-        :options="cacheSettingsRadioOptions"
-        helpText="Honor cache policies from the origin or define a new maximum cache TTL for browsers."
+        :options="cacheSettingsRadioOptions('browser')"
       />
 
       <div
@@ -415,8 +468,7 @@
         label="Edge Cache Settings"
         nameField="cdnCacheSettings"
         :isCard="false"
-        :options="cacheSettingsRadioOptions"
-        helpText="Honor cache policies from the origin or define a new maximum cache TTL for the edge. If a TTL isn't received from the origin, cache will be maintained at a default TTL."
+        :options="cacheSettingsRadioOptions('cdn')"
       />
 
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
@@ -448,185 +500,29 @@
   >
     <template #inputs>
       <div class="flex flex-col gap-2">
-        <label class="text-color text-base font-medium">Default Modules</label>
-        <div class="flex flex-col gap-3">
-          <Card
-            :pt="{
-              body: {
-                class: `p-4 border rounded-md ${
-                  applicationAccelerator ? 'border-orange-500' : 'border-transparent'
-                }`
-              },
-              title: { class: 'flex justify-between items-center text-base font-medium m-0' },
-              subtitle: {
-                class: 'text-sm font-normal text-color-secondary m-0 pr-0 md:pr-[2.5rem]'
-              }
-            }"
-          >
-            <template #title>
-              <span class="text-base">Application Accelerator</span>
-              <InputSwitch v-model="applicationAccelerator" />
-            </template>
-            <template #subtitle>Optimize protocols and manage dynamic content delivery.</template>
-          </Card>
-          <Card
-            :pt="{
-              body: { class: 'p-4 border border-orange-500 rounded-md' },
-              title: { class: 'flex justify-between items-center text-base font-medium m-0' },
-              subtitle: {
-                class: 'text-sm font-normal text-color-secondary m-0 pr-0 md:pr-[2.5rem]'
-              }
-            }"
-          >
-            <template #title>
-              <span class="text-base">Edge Cache</span>
-              <InputSwitch
-                v-model="caching"
-                disabled
-              />
-            </template>
-            <template #subtitle>Customize advanced cache settings.</template>
-            <template #footer>
-              <PrimeTag
-                value="Automatically enabled in all accounts."
-                icon="pi pi-lock"
-                severity="info"
-                class="mt-3"
-              />
-            </template>
-          </Card>
-          <Card
-            :pt="{
-              body: {
-                class: `p-4 border rounded-md ${
-                  deviceDetection ? 'border-orange-500' : 'border-transparent'
-                }`
-              },
-              title: { class: 'flex justify-between items-center text-base font-medium m-0' },
-              subtitle: {
-                class: 'text-sm font-normal text-color-secondary m-0 pr-0 md:pr-[2.5rem]'
-              }
-            }"
-          >
-            <template #title>
-              <span class="text-base">Device Detection</span>
-              <InputSwitch v-model="deviceDetection" />
-            </template>
-            <template #subtitle
-              >Activate DeviceAtlas variables to configure responsive rules.</template
-            >
-          </Card>
-          <Card
-            :pt="{
-              body: {
-                class: `p-4 border rounded-md ${
-                  edgeFunctions ? 'border-orange-500' : 'border-transparent'
-                }`
-              },
-              title: { class: 'flex justify-between items-center text-base font-medium m-0' },
-              subtitle: {
-                class: 'text-sm font-normal text-color-secondary m-0 pr-0 md:pr-[2.5rem]'
-              }
-            }"
-          >
-            <template #title>
-              <span class="text-base">Edge Functions</span>
-              <InputSwitch v-model="edgeFunctions" />
-            </template>
-            <template #subtitle>Build ultra-low latency functions that run on the edge.</template>
-          </Card>
-          <Card
-            :pt="{
-              body: {
-                class: `p-4 border rounded-md ${
-                  imageOptimization ? 'border-orange-500' : 'border-transparent'
-                }`
-              },
-              title: { class: 'flex justify-between items-center text-base font-medium m-0' },
-              subtitle: {
-                class: 'text-sm font-normal text-color-secondary m-0 pr-0 md:pr-[2.5rem]'
-              }
-            }"
-          >
-            <template #title>
-              <span class="text-base">Image Processor</span>
-              <InputSwitch v-model="imageOptimization" />
-            </template>
-            <template #subtitle>Enable dynamic image editing options.</template>
-          </Card>
-          <Card
-            :pt="{
-              body: {
-                class: `p-4 border rounded-md ${
-                  loadBalancer ? 'border-orange-500' : 'border-transparent'
-                }`
-              },
-              title: { class: 'flex justify-between items-center text-base font-medium m-0' },
-              subtitle: {
-                class: 'text-sm font-normal text-color-secondary m-0 pr-0 md:pr-[2.5rem]'
-              }
-            }"
-          >
-            <template #title>
-              <span class="text-base">Load Balancer</span>
-              <InputSwitch v-model="loadBalancer" />
-            </template>
-            <template #subtitle
-              >Balance traffic to your origins ensuring reliability and network congestion
-              control.</template
-            >
-          </Card>
-        </div>
+        <FieldGroupSwitch
+          label="Default Modules"
+          isCard
+          :options="defaultModulesSwitchOptions"
+        >
+          <template #footer="{ item }">
+            <PrimeTag
+              v-if="item?.tag"
+              :value="item.tag.value"
+              :icon="item.tag.icon"
+              severity="info"
+              class="mt-3"
+            />
+          </template>
+        </FieldGroupSwitch>
       </div>
+
       <div class="flex flex-col gap-2">
-        <label class="text-color text-base font-medium">Subscription modules</label>
-        <div class="flex flex-col gap-3">
-          <Card
-            :pt="{
-              body: {
-                class: `p-4 border rounded-md ${
-                  l2Caching ? 'border-orange-500' : 'border-transparent'
-                }`
-              },
-              title: { class: 'flex justify-between items-center text-base font-medium m-0' },
-              subtitle: {
-                class: 'text-sm font-normal text-color-secondary m-0 pr-0 md:pr-[2.5rem]'
-              }
-            }"
-          >
-            <template #title>
-              <span class="text-base">Tiered Cache</span>
-              <InputSwitch v-model="l2Caching" />
-            </template>
-            <template #subtitle>Enable an additional cache layer at the edge. </template>
-          </Card>
-          <Card
-            :pt="{
-              body: {
-                class: `p-4 border rounded-md ${
-                  websocket ? 'border-orange-500' : 'border-transparent'
-                }`
-              },
-              title: { class: 'flex justify-between items-center text-base font-medium m-0' },
-              subtitle: {
-                class: 'text-sm font-normal text-color-secondary m-0 pr-0 md:pr-[2.5rem]'
-              }
-            }"
-            :class="!websocketIsEnabled ? 'opacity-50' : ''"
-          >
-            <template #title>
-              <span class="text-base">WebSocket Proxy</span>
-              <InputSwitch
-                v-model="websocket"
-                :disabled="!websocketIsEnabled"
-              />
-            </template>
-            <template #subtitle
-              >Enhance real-time data exchange between your edge application and backend services
-              using the WebSocket protocol.</template
-            >
-          </Card>
-        </div>
+        <FieldGroupSwitch
+          label="Subscription modules"
+          isCard
+          :options="subscriptionModulesSwitchOptions"
+        />
         <PrimeButton
           outlined
           icon="pi pi-shopping-cart"
@@ -645,27 +541,15 @@
   >
     <template #inputs>
       <div class="flex flex-col gap-2">
-        <Card
-          :pt="{
-            root: { class: 'shadow-none  rounded-none' },
-            body: { class: 'py-4 border-0' },
-            content: { class: 'ml-12' },
-            title: { class: 'flex items-center text-base m-0 gap-3 font-medium' },
-            subtitle: {
-              class: 'text-sm font-normal text-color-secondary m-0 pr-0 md:pr-[2.5rem]'
-            }
-          }"
-        >
-          <template #title>
-            <FieldSwitchBlock
-              nameField="debugRules"
-              name="debugRules"
-              auto
-              :isCard="false"
-              title="Active"
-            />
-          </template>
-        </Card>
+        <FieldSwitchBlock
+          nameField="debugRules"
+          name="debugRules"
+          auto
+          :isCard="false"
+          title="Active"
+          subtitle="Rules that were successfully executed will be shown under the $traceback field in Data
+              Streaming and Real-Time Events or the $stacktrace variable in GraphQL."
+        />
       </div>
     </template>
   </FormHorizontal>

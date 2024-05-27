@@ -26,6 +26,7 @@ jobs:
         env: 
           CYPRESS_EMAIL_STAGE: ${{ secrets.CYPRESS_EMAIL_STAGE }}
           CYPRESS_PASSWORD_STAGE: ${{ secrets.CYPRESS_PASSWORD_STAGE }}
+          CYPRESS_USERNAME_STAGE: ${{ secrets.CYPRESS_USERNAME_STAGE }}
         with:
           build: yarn build
           start: yarn dev
