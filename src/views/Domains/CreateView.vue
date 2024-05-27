@@ -69,13 +69,11 @@
   const toast = useToast()
 
   const handleTrackCreation = () => {
-    tracker.product
-      .productCreated({
-        productName: 'Domains',
-        createdFrom: 'singleEntity',
-        from: route.query.origin
-      })
-      .track()
+    tracker.product.productCreated({
+      productName: 'Domains',
+      createdFrom: 'singleEntity',
+      from: route.query.origin
+    })
   }
 
   const requestEdgeApplications = async () => {
