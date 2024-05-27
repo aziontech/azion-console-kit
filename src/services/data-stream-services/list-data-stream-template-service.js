@@ -23,6 +23,9 @@ const adapt = (httpResponse) => {
       }))
     : []
 
+  const customTemplate = { label: 'Custom Template', value: 'CUSTOM_TEMPLATE', template: '' }
+  parsedTemplate.push(customTemplate)
+
   return {
     body: parsedTemplate,
     statusCode: httpResponse.statusCode
