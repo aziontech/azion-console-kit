@@ -1,7 +1,6 @@
 <script setup>
   import FieldSwitchBlock from '@/templates/form-fields-inputs/fieldSwitchBlock'
-  import { useField } from 'vee-validate'
-  import { computed, ref, toRefs } from 'vue'
+  import { computed, ref } from 'vue'
   import PrimeDivider from 'primevue/divider'
 
   defineOptions({ name: 'FieldGroupSwitch' })
@@ -31,15 +30,13 @@
       type: Boolean,
       default: false
     },
-    nameField: {
-      type: String,
+    options: {
+      type: Array,
       required: true
     }
   })
 
-  const { nameField } = toRefs(props)
-  const { value: inputValue, errorMessage } = useField(nameField)
-  const pickListSize = ref(inputValue.value.length - 1)
+  const pickListSize = ref(props.options.length - 1)
 
   const classStateRoot = computed(() => ({
     'p-disabled': props.disabled
@@ -66,19 +63,22 @@
       :class="classListSelector"
     >
       <template
-        v-for="(item, index) in inputValue"
+        v-for="(item, index) in props.options"
         :key="index"
       >
         <FieldSwitchBlock
-          :nameField="`${props.nameField}[${index}].value`"
-          :name="`${props.nameField}-switch-${index}`"
+          :nameField="`${item.nameField}`"
+          :name="`${item.nameField}-switch-${index}`"
           :auto="props.auto"
           :hideSelector="props.hideSelector"
           :isCard="props.isCard"
           v-bind="item"
         >
           <template #footer>
-            <slot :item="item" />
+            <slot
+              name="footer"
+              :item="item"
+            />
           </template>
         </FieldSwitchBlock>
         <PrimeDivider

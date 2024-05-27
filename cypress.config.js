@@ -1,4 +1,5 @@
-import { defineConfig } from 'cypress'
+/* eslint-disable no-undef */
+import { defineConfig } from 'cypress';
 
 export default defineConfig({
   projectId: 'azion-console-kit',
@@ -12,5 +13,10 @@ export default defineConfig({
       runMode: 2,
       openMode: 2
     }
+  },
+  env: {
+    CYPRESS_EMAIL_STAGE: process.env.CYPRESS_EMAIL_STAGE,
+    CYPRESS_PASSWORD_STAGE: process.env.CYPRESS_PASSWORD_STAGE,
+    CYPRESS_USERNAME_STAGE: process.env.CYPRESS_USERNAME_STAGE
   }
-})
+});
