@@ -43,7 +43,7 @@
                       link
                       :pt="{
                         root: { class: 'justify-center' },
-                        label: { class: 'grow-0' }
+                        label: { class: 'grow-0 truncate' }
                       }"
                       class="px-0 py-1"
                       :label="results.domain.url"
