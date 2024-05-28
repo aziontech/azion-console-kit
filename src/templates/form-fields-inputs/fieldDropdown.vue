@@ -131,6 +131,7 @@
     :filter="props.filter"
     :optionValue="props.optionValue"
     :placeholder="props.placeholder"
+    :autoFilterFocus="props.filter"
     @change="emitChange"
     @blur="emitBlur"
     :class="inputClass"
