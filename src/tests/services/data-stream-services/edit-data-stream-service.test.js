@@ -31,7 +31,7 @@ const fixtures = {
     id: 3563,
     name: 'Data Stream Custom a Template',
     template: 'CUSTOM_TEMPLATE',
-    dataSet: "{\"session_id\":\"$session_id\"}",
+    dataSet: '{"session_id":"$session_id"}',
     dataSource: 'http',
     domains: [[], []],
     endpoint: 'qradar',

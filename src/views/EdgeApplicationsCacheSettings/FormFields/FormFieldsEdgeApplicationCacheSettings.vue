@@ -221,18 +221,17 @@
   })
 
   watch(l2CachingEnabled, (value) => {
-    if (value) {
-      cdnCacheSettings.value = 'override'
-      isSliceEdgeCachingEnabled.value = true
-      sliceConfigurationEnabled.value = true
-    } else {
-      const hasNotApplicationAcceleratorAndExceedMinimumValue =
-        !props.isEnableApplicationAccelerator &&
-        cdnCacheSettingsMaximumTtl.value < CDN_MAXIMUM_TTL_MAX_VALUE
-      if (hasNotApplicationAcceleratorAndExceedMinimumValue) {
-        cdnCacheSettingsMaximumTtl.value = CDN_MAXIMUM_TTL_MAX_VALUE
-      }
-      isSliceL2CachingEnabled.value = false
+    cdnCacheSettings.value = value ? 'override' : cdnCacheSettings.value
+    isSliceEdgeCachingEnabled.value = value
+    sliceConfigurationEnabled.value = value
+    isSliceL2CachingEnabled.value = !value
+
+    const hasNotApplicationAcceleratorAndExceedMinimumValue =
+      !props.isEnableApplicationAccelerator &&
+      cdnCacheSettingsMaximumTtl.value < CDN_MAXIMUM_TTL_MAX_VALUE
+
+    if (!value && hasNotApplicationAcceleratorAndExceedMinimumValue) {
+      cdnCacheSettingsMaximumTtl.value = CDN_MAXIMUM_TTL_MAX_VALUE
     }
 
     emit('l2-caching-enabled', value)
