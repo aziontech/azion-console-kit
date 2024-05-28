@@ -2,36 +2,38 @@
   <FeedbackFish :projectId="projectId" />
 
   <PrimeButton
-    :label="currentLabel"
+    label="Feedback"
     data-feedback-fish
     :data-feedback-fish-userid="user.email"
     :pt="{
-      label: { class: 'text-white' },
-      icon: { class: 'text-white' }
+      root: { class: 'max-md:w-[2rem] max-md:h-[2rem] justify-content-center' },
+      label: { class: 'max-md:hidden' },
+      icon: { class: 'max-md:m-0' }
     }"
     icon="pi pi-flag"
     size="small"
-    class="text-white border-header bg-header hover:bg-header-button-hover"
+    :outlined="props.outlined"
+    :class="props.class"
     v-tooltip.bottom="{ value: 'Feedback', showDelay: 200 }"
   />
 </template>
 
 <script setup>
-  import { computed, inject } from 'vue'
   import { FeedbackFish } from '@feedback-fish/vue'
   import { useAccountStore } from '@/stores/account'
   import PrimeButton from 'primevue/button'
 
   const projectId = '2566aa41e7e334'
 
-  const SCREEN_BREAKPOINT_MD = 768
-  const currentWidth = inject('currentWidth')
-  const user = useAccountStore().accountData
-
-  const currentLabel = computed(() => {
-    if (currentWidth.value > SCREEN_BREAKPOINT_MD) {
-      return 'Feedback'
+  const props = defineProps({
+    class: {
+      type: String
+    },
+    outlined: {
+      type: Boolean,
+      default: true
     }
-    return ''
   })
+
+  const user = useAccountStore().accountData
 </script>

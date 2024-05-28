@@ -108,7 +108,9 @@
           :pt="{
             sourceList: { class: [`h-80 ${classLoading}`] },
             targetList: { class: [`h-80 ${classLoading}`] },
-            buttons: { class: classLoading }
+            buttons: { class: classLoading },
+            sourceWrapper: { class: 'max-w-[340px]' },
+            targetWrapper: { class: 'max-w-[340px]' }
           }"
           :showSourceControls="false"
           :showTargetControls="false"
@@ -117,11 +119,15 @@
           <template #targetheader>Selected</template>
           <template #item="slotProps">
             <div
-              class="flex flex-wrap p-2 align-items-center gap-3"
+              class="flex flex-wrap p-2 pl-0 align-items-center gap-3 max-w-xs"
               v-if="!loading"
             >
-              <div class="flex-1 flex flex-column gap-2">
-                <span class="font-normal">{{ slotProps.item.name }}</span>
+              <div class="flex-1 flex flex-column gap-2 overflow-hidden">
+                <span
+                  class="font-normal truncate"
+                  v-tooltip.top="slotProps.item.name"
+                  >{{ slotProps.item.name }}</span
+                >
               </div>
             </div>
             <Skeleton

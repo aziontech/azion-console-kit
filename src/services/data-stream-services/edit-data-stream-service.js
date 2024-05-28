@@ -14,15 +14,26 @@ export const editDataStreamService = async (payload) => {
 
 const adapt = (payload) => {
   const allDomains = payload.domains[1].length <= 0
+  let parsedPayload
 
-  const parsedPayload = {
-    name: payload.name,
-    template_id: payload.template,
-    data_source: payload.dataSource,
-    domain_ids: allDomains ? [] : getDomains(payload.domains[1]),
-    all_domains: allDomains,
-    active: payload.status,
-    endpoint: getEndpoint(payload)
+  if (payload.template === 'CUSTOM_TEMPLATE') {
+    parsedPayload = {
+      name: payload.name,
+      template_model: payload.dataSet,
+      all_domains: allDomains,
+      domain_ids: allDomains ? [] : getDomains(payload.domains[1]),
+      endpoint: getEndpoint(payload)
+    }
+  } else {
+    parsedPayload = {
+      name: payload.name,
+      template_id: payload.template,
+      data_source: payload.dataSource,
+      domain_ids: allDomains ? [] : getDomains(payload.domains[1]),
+      all_domains: allDomains,
+      active: payload.status,
+      endpoint: getEndpoint(payload)
+    }
   }
 
   if (payload.hasSampling) {

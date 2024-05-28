@@ -41,7 +41,8 @@ export default {
       },
       height: {
         // subtract 60px for footer and 56px for header
-        'visible-area': 'calc(100vh - 60px - 56px)'
+        'visible-area': 'calc(100vh - 60px - 56px)',
+        'graph-card': '552px'
       },
       fontFamily: {
         robotomono: ['Roboto Mono']

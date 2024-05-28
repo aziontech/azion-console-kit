@@ -224,7 +224,11 @@
     }
 
     if ('edge_application' in results.value) {
-      handleTrackCreation()
+      handleTrackCreation('Edge Application')
+    }
+
+    if ('domain' in results.value) {
+      handleTrackCreation('Domain')
     }
     tracker.create.eventDeployed(solutionStore.solution).track()
   }
@@ -279,9 +283,9 @@
     router.push({ name: 'real-time-metrics' })
   }
 
-  const handleTrackCreation = () => {
+  const handleTrackCreation = (productName) => {
     const trackerData = {
-      productName: 'Edge Application',
+      productName,
       from: 'create',
       createdFrom: 'template',
       ...solutionStore?.solution

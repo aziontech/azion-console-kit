@@ -11,6 +11,7 @@ const fixtures = {
     is_active: true,
     activeSort: true,
     digital_certificate_id: '862026',
+    is_mtls_enabled: true,
     edge_application_id: 'ea1234',
     mtls_trusted_ca_certificate_id: '862026'
   },
@@ -20,6 +21,7 @@ const fixtures = {
     domain_name: 'domain B',
     cnames: ['CName 1', 'CName 2'],
     is_active: false,
+    is_mtls_enabled: false,
     activeSort: true,
     digital_certificate_id: null,
     edge_application_id: 'ea1234'
@@ -72,7 +74,7 @@ describe('DomainServices', () => {
       cnameAccessOnly: fixtures.domainMock.cname_access_only,
       edgeApplication: fixtures.domainMock.edge_application_id,
       edgeCertificate: fixtures.domainMock.digital_certificate_id,
-      mtlsIsEnabled: fixtures.domainMock.mtls_is_enabled,
+      mtlsIsEnabled: fixtures.domainMock.is_mtls_enabled,
       active: fixtures.domainMock.is_active,
       mtlsVerification: fixtures.domainMock.mtls_verification,
       mtlsTrustedCertificate: fixtures.domainMock.mtls_trusted_ca_certificate_id
@@ -98,7 +100,7 @@ describe('DomainServices', () => {
       cnameAccessOnly: fixtures.domainWithoutCertificateMock.cname_access_only,
       edgeApplication: fixtures.domainWithoutCertificateMock.edge_application_id,
       edgeCertificate: 0,
-      mtlsIsEnabled: fixtures.domainWithoutCertificateMock.mtls_is_enabled,
+      mtlsIsEnabled: fixtures.domainWithoutCertificateMock.is_mtls_enabled,
       active: fixtures.domainWithoutCertificateMock.is_active,
       mtlsVerification: fixtures.domainWithoutCertificateMock.mtls_verification
     })

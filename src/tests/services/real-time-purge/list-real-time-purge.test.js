@@ -103,9 +103,9 @@ describe('ListRealTimePurgeService', () => {
     expect(result).toEqual([
       {
         id: idExpected,
-        type: fixtures.realTimePurgeMock.type,
+        type: 'URL',
         arguments: fixtures.realTimePurgeMock.arguments,
-        layer: fixtures.realTimePurgeMock.layer,
+        layer: 'Edge Cache',
         user: fixtures.realTimePurgeMock.user,
         time: fixtures.realTimePurgeMock.time
       }

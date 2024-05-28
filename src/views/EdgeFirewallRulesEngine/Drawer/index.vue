@@ -6,6 +6,7 @@
   import * as yup from 'yup'
   import { onMounted, ref, inject } from 'vue'
   import { useToast } from 'primevue/usetoast'
+  import { handleTrackerError } from '@/utils/errorHandlingTracker'
 
   /**@type {import('@/plugins/adapters/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
@@ -132,6 +133,7 @@
 
   const handleCreateWithSuccess = () => {
     emit('onSuccess')
+    handleTrackSuccessEdit()
     closeCreateDrawer()
   }
 
@@ -148,6 +150,22 @@
         tab: 'rulesEngine'
       })
       .track()
+  }
+
+  const handleFailedEditEdgeFirewallRules = (error) => {
+    const { fieldName, message } = handleTrackerError(error)
+    tracker.product
+      .failedToEdit({
+        productName: 'Edge Firewall',
+        errorType: 'api',
+        fieldName: fieldName.trim(),
+        errorMessage: message
+      })
+      .track()
+  }
+
+  const handleErrorToTrackerEvent = (error) => {
+    handleFailedEditEdgeFirewallRules(error)
   }
 
   const listFunctionsServiceWithDecorator = async () => {
@@ -219,6 +237,7 @@
     :schema="validationSchema"
     :initialValues="initialValues"
     @onSuccess="handleCreateWithSuccess"
+    @onError="handleErrorToTrackerEvent"
     title="Create Rule"
   >
     <template #formFields>
@@ -238,6 +257,7 @@
     :loadService="loadEdgeFirewallRulesEngineServiceWithDecorator"
     :editService="editEdgeFirewallRulesEngineServiceWithDecorator"
     :schema="validationSchema"
+    @onError="handleErrorToTrackerEvent"
     @onSuccess="handleEditWithSuccess"
     title="Edit Rule"
   >

@@ -8,12 +8,14 @@
         v-if="hasContentToList"
         pageTitleDelete="domain"
         addButtonLabel="Domain"
-        createPagePath="domains/create"
+        :createPagePath="createDomainPath"
         editPagePath="domains/edit"
         :listService="listDomainsService"
         :deleteService="deleteDomainService"
         :columns="getColumns"
         @on-load-data="handleLoadData"
+        @on-before-go-to-add-page="handleTrackEvent"
+        @on-before-go-to-edit="handleTrackEditEvent"
         emptyListMessage="No domains found."
       />
       <EmptyResultsBlock
@@ -21,7 +23,8 @@
         title="No domains have been created"
         description="Click the button below to create your first domain."
         createButtonLabel="Domain"
-        createPagePath="domains/create"
+        :createPagePath="createDomainPath"
+        @click-to-create="handleTrackEvent"
         :documentationService="documentationService"
       >
         <template #illustration>
@@ -39,7 +42,10 @@
   import ListTableBlock from '@/templates/list-table-block'
   import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
   import PageHeadingBlock from '@/templates/page-heading-block'
-  import { computed, ref } from 'vue'
+  import { computed, ref, inject } from 'vue'
+
+  /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
+  const tracker = inject('tracker')
 
   const props = defineProps({
     listDomainsService: {
@@ -60,7 +66,20 @@
     }
   })
 
+  const createDomainPath = 'domains/create?origin=list'
+
   const hasContentToList = ref(true)
+
+  const handleTrackEvent = () => {
+    tracker.product.clickToCreate({
+      productName: 'Domain'
+    })
+  }
+  const handleTrackEditEvent = () => {
+    tracker.product.clickToEdit({
+      productName: 'Domain'
+    })
+  }
 
   const getColumns = computed(() => {
     return [

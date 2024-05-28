@@ -58,7 +58,7 @@
     title="More Details"
   >
     <template #body>
-      <div class="w-full flex flex-col gap-8">
+      <div class="w-full flex flex-col gap-8 max-md:gap-6">
         <InfoSection
           :title="details.url"
           :date="details.ts"
@@ -89,6 +89,7 @@
             <div class="flex flex-col sm:flex-row sm:gap-8 gap-3 w-full">
               <div class="flex flex-col gap-3 w-full sm:w-5/12 flex-1">
                 <TextInfo label="Configuration ID">{{ details.configurationId }}</TextInfo>
+                <TextInfo label="Status Code">{{ details.statusCode }}</TextInfo>
               </div>
               <div class="flex flex-col gap-3 w-full sm:w-5/12 flex-1">
                 <TextInfo label="Endpoint Type">{{ details.endpointType }}</TextInfo>

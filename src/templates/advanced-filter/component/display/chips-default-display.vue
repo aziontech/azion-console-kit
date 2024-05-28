@@ -19,6 +19,12 @@
       required: true
     }
   })
+
+  const formattedValue = (filter) => {
+    const isEmptyString = !filter?.value && filter?.type === 'String'
+
+    return `${filter.format} ${isEmptyString ? '""' : filter.value}`
+  }
 </script>
 <template>
   <Chip
@@ -29,7 +35,7 @@
   >
     <span class="p-chip-text"> {{ props.itemFilter.field }}</span>
     <span class="font-bold p-chip-text leading-5 pl-1">
-      {{ `${props.itemFilter.format} ${props.itemFilter.value}` }}</span
+      {{ formattedValue(props.itemFilter) }}</span
     >
   </Chip>
 </template>

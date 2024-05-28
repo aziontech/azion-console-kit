@@ -57,21 +57,21 @@
       :pt="{
         root: { class: 'p-0 w-[37.5rem]' },
         header: { class: 'flex py-5 px-8 items-center self-stretch border-b border-solid' },
-        content: { class: 'p-0 h-full' },
+        content: { class: 'py-5 px-8 h-full' },
         footer: {
           class: 'flex py-5 px-8 justify-end items-end border-t border-solid'
         }
       }"
     >
       <template #header>
-        <h5 class="text-lg not-italic font-bold leading-5">Confirme Purge</h5>
+        <h5 class="text-lg not-italic font-bold leading-5">Confirm Repurge</h5>
       </template>
-      <div class="flex justify-center flex-col gap-4">
+      <div class="flex flex-col gap-3.5">
         <Message
           severity="warn"
           :closable="false"
           :pt="{
-            root: { class: 'mx-3 mt-4 md:mx-8' },
+            root: { class: 'w-full' },
             wrapper: { class: 'py-3 px-3 items-start sm:items-center' }
           }"
         >
@@ -82,12 +82,12 @@
             />
           </template>
           <p class="text-color-secondary">
-            This may temporarily impact some URLs, causing a minor disruption.
+            This action may temporarily impact some URLs, causing a minor disruption.
           </p>
         </Message>
-        <div class="text-color font-semibold text-sm mb-2 px-8">
-          This may temporarily impact some URLs, causing a minor disruption. Not to worry – it's
-          expected to last only a few minutes!
+        <div class="text-color font-normal text-sm mb-2 text-color-secondary">
+          This happens because the purge is queued for execution, and the results may take some time
+          to propagate to all edge nodes.
         </div>
       </div>
       <template #footer>
@@ -99,7 +99,7 @@
         />
         <PrimeButton
           severity="secondary"
-          label="Sure, make purge"
+          label="Confirm"
           :loading="loading"
           @click="handleRealTimePurge"
           iconPos="right"

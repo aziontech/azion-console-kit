@@ -177,6 +177,10 @@
   const descriptionEmptyState = computed(
     () => `Click the button below to create your first ${selectedPhase.value} rule.`
   )
+
+  const removeReorderForRequestPhaseFirstItem = computed(
+    () => selectedPhase.value === 'Response phase'
+  )
 </script>
 
 <template>
@@ -211,6 +215,7 @@
       thead: { class: !hasContentToList && 'hidden' }
     }"
     emptyListMessage="No rules have been created."
+    :isReorderAllEnabled="removeReorderForRequestPhaseFirstItem"
   >
     <template #addButton>
       <div class="flex gap-4">

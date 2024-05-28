@@ -54,6 +54,10 @@
     listNetworkListService: {
       type: Function,
       required: true
+    },
+    reorderEdgeFirewallRulesEngine: {
+      type: Function,
+      required: true
     }
   })
   const hasContentToList = ref(true)
@@ -68,6 +72,10 @@
       edgeFirewallId: props.edgeFirewallId,
       ruleEngineId
     })
+  }
+
+  const reorderRulesEngineWithDecorator = async (tableData) => {
+    return props.reorderEdgeFirewallRulesEngine(tableData, props.edgeFirewallId)
   }
 
   const reloadList = () => {
@@ -140,11 +148,14 @@
   <ListTableBlock
     v-if="hasContentToList"
     ref="listTableBlockRef"
+    :reorderableRows="true"
     :listService="listEdgeFirewallRulesEngineServiceWithDecorator"
     :deleteService="deleteEdgeFirewallRulesEngineServiceWithDecorator"
+    :onReorderService="reorderRulesEngineWithDecorator"
     :columns="getColumns"
     :editInDrawer="openEditDrawer"
     pageTitleDelete="rule"
+    :isReorderAllEnabled="true"
     @on-load-data="handleLoadData"
     emptyListMessage="No rules have been created."
   >

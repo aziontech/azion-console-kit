@@ -32,6 +32,8 @@ coverage
 .env
 .env.*
 !.env.sample
+cypress.env.*
+!cypress.env.example.json
 
 #azion vulcan folder
 azion

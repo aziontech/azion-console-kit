@@ -7,7 +7,7 @@ import { SignUpTracker, SignInTracker, CreateTracker, ProductTracker } from './t
  */
 
 /**
- * @typedef {'Edge Application'|'Origins'|'Domains'} AzionProductsNames
+ * @typedef {'Edge Application'|'Origins'|'Domains', 'Edge Functions'} AzionProductsNames
  */
 
 export class AnalyticsTrackerAdapter {

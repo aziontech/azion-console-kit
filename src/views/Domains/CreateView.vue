@@ -7,6 +7,8 @@
       <CreateFormBlock
         :createService="createDomainService"
         :cleanFormCallback="resetForm"
+        @on-response="handleTrackCreation"
+        @on-response-fail="handleTrackFailedCreation"
         :schema="validationSchema"
         :initialValues="initialValues"
       >
@@ -30,7 +32,7 @@
 </template>
 
 <script setup>
-  import { ref, onMounted } from 'vue'
+  import { ref, onMounted, inject } from 'vue'
   import { useToast } from 'primevue/usetoast'
 
   import CreateFormBlock from '@/templates/create-form-block'
@@ -39,9 +41,13 @@
   import FormFieldsCreateDomains from './FormFields/FormFieldsCreateDomains.vue'
   import ActionBarTemplate from '@/templates/action-bar-block/action-bar-with-teleport'
   import { TOAST_LIFE } from '@/utils/constants'
-
+  import { useRoute } from 'vue-router'
+  const route = useRoute()
   import * as yup from 'yup'
+  import { handleTrackerError } from '@/utils/errorHandlingTracker'
 
+  /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
+  const tracker = inject('tracker')
   const MTLS_VERIFICATION_ENFORCE = 'enforce'
 
   const props = defineProps({
@@ -61,6 +67,26 @@
   const edgeApps = ref([])
   const digitalCertificates = ref([])
   const toast = useToast()
+
+  const handleTrackCreation = () => {
+    tracker.product.productCreated({
+      productName: 'Domain',
+      createdFrom: 'singleEntity',
+      from: route.query.origin
+    })
+  }
+
+  const handleTrackFailedCreation = (error) => {
+    const { fieldName, message } = handleTrackerError(error)
+    tracker.product
+      .failedToCreate({
+        productName: 'Domains',
+        errorType: 'api',
+        fieldName: fieldName.trim(),
+        errorMessage: message
+      })
+      .track()
+  }
 
   const requestEdgeApplications = async () => {
     edgeApps.value = await props.listEdgeApplicationsService({})
@@ -105,7 +131,17 @@
   }
 
   const validationSchema = yup.object({
-    name: yup.string().required(),
+    name: yup
+      .string()
+      .required()
+      .test(
+        'only-ascii',
+        'Invalid characters. Use letters, numbers, and standard symbols, with no accents.',
+        function (value) {
+          const nameRegex = /^[\x20-\x7E]+$/
+          return nameRegex.test(value)
+        }
+      ),
     active: yup.boolean(),
     cnames: yup
       .string()

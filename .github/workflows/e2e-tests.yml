@@ -1,0 +1,35 @@
+name: E2E Tests
+
+on:
+    pull_request:
+      types: [opened, synchronize, reopened, ready_for_review]
+    push:
+      branches:
+        - dev
+
+jobs:
+  run-e2e-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+
+      - name: Install dependencies
+        run: yarn ci
+
+      - name: Run Cypress tests
+        uses: cypress-io/github-action@v6
+        env: 
+          CYPRESS_EMAIL_STAGE: ${{ secrets.CYPRESS_EMAIL_STAGE }}
+          CYPRESS_PASSWORD_STAGE: ${{ secrets.CYPRESS_PASSWORD_STAGE }}
+          CYPRESS_USERNAME_STAGE: ${{ secrets.CYPRESS_USERNAME_STAGE }}
+        with:
+          build: yarn build
+          start: yarn dev
+          browser: chrome
+          wait-on: "http://localhost:5173/"
+          wait-on-timeout: 120

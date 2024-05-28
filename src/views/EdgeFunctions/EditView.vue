@@ -13,6 +13,8 @@
         :editService="props.editEdgeFunctionsService"
         :loadService="props.loadEdgeFunctionsService"
         :updatedRedirect="props.updatedRedirect"
+        @on-edit-success="handleTrackSuccessEdit"
+        @on-edit-fail="handleTrackFailEdit"
         :schema="validationSchema"
       >
         <template #form>
@@ -41,8 +43,11 @@
   import FormFieldsEditEdgeFunctions from './FormFields/FormFieldsEditEdgeFunctions.vue'
   import PageHeadingBlock from '@/templates/page-heading-block'
   import ActionBarBlockWithTeleport from '@templates/action-bar-block/action-bar-with-teleport'
+  import { handleTrackerError } from '@/utils/errorHandlingTracker'
   import MobileCodePreview from './components/mobile-code-preview.vue'
-  import { ref } from 'vue'
+  import { ref, inject } from 'vue'
+  /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
+  const tracker = inject('tracker')
 
   const props = defineProps({
     loadEdgeFunctionsService: {
@@ -60,6 +65,25 @@
   })
   const updateObject = ref({})
   const language = ref(null)
+
+  const handleTrackSuccessEdit = () => {
+    tracker.product
+      .productEdited({
+        productName: 'Edge Functions'
+      })
+      .track()
+  }
+  const handleTrackFailEdit = (error) => {
+    const { fieldName, message } = handleTrackerError(error)
+    tracker.product
+      .failedToEdit({
+        productName: 'Edge Functions',
+        errorType: 'api',
+        fieldName: fieldName.trim(),
+        errorMessage: message
+      })
+      .track()
+  }
 
   const validationSchema = yup.object({
     name: yup.string().required('Name is a required field'),

@@ -14,6 +14,7 @@
   import { useRouter } from 'vue-router'
   import * as yup from 'yup'
   import PermissionsFieldset from '../components/PermissionsFieldset'
+  import FeedbackFish from '@/templates/navbar-block/feedback-fish'
 
   const router = useRouter()
 
@@ -203,11 +204,13 @@
       root: { class: styleRoot },
       header: { class: 'px-8' },
       closeButton: { class: '' },
+      headercontent: { class: 'flex justify-content-between items-center w-full pr-2' },
       content: { class: '[&::-webkit-scrollbar]:hidden p-0 flex flex-col justify-between' }
     }"
   >
     <template #header>
       <div>Install an Integration</div>
+      <FeedbackFish />
     </template>
     <template #default>
       <div class="flex flex-col w-full md:p-8 pb-0 relative">

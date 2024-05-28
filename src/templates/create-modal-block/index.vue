@@ -54,7 +54,7 @@
   const resources = ref([
     {
       label: 'Domains',
-      to: '/domains/create',
+      to: '/domains/create?origin=create',
       description: 'Launch an edge application and set up security with digital certificates.'
     },
     {
@@ -89,7 +89,7 @@
     },
     {
       label: 'Edge Functions',
-      to: '/edge-functions/create',
+      to: '/edge-functions/create?origin=create',
       description: 'Create edge functions to use with Edge Application or Edge Firewall.'
     },
     {
