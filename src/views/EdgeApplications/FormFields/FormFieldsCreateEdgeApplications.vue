@@ -122,7 +122,8 @@
   const cacheSettingsRadioOptions = (type) => {
     const isBrowser = type === 'browser'
 
-    const browserSubtitle = 'Honor cache policies from the origin or define a new maximum cache TTL for browsers.'
+    const browserSubtitle =
+      'Honor cache policies from the origin or define a new maximum cache TTL for browsers.'
     const cdnSubtitle = `Honor cache policies from the origin or define a new maximum cache TTL for the edge. If a TTL isn't received from the origin, cache will be maintained at a default TTL.`
 
     return [

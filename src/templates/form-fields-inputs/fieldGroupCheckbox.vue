@@ -1,7 +1,6 @@
 <script setup>
   import FieldCheckboxBlock from '@/templates/form-fields-inputs/fieldCheckboxBlock'
-  import { useField } from 'vee-validate'
-  import { computed, ref, toRefs } from 'vue'
+  import { computed, ref } from 'vue'
   import PrimeDivider from 'primevue/divider'
 
   defineOptions({ name: 'FieldGroupCheckbox' })
@@ -34,15 +33,9 @@
     disabled: {
       type: Boolean,
       default: false
-    },
-    nameField: {
-      type: String,
-      required: true
     }
   })
 
-  const { nameField } = toRefs(props)
-  const { errorMessage } = useField(nameField)
   const pickListSize = ref(props.options.length - 1)
 
   const classStateRoot = computed(() => ({
@@ -74,8 +67,8 @@
         :key="index"
       >
         <FieldCheckboxBlock
-          :nameField="props.nameField"
-          :name="`${props.nameField}-checkbox-${index}`"
+          :nameField="item.nameField"
+          :name="`${item.nameField}-checkbox-${index}`"
           :auto="props.auto"
           :hideSelector="props.hideSelector"
           :isCard="props.isCard"

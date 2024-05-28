@@ -3,12 +3,12 @@
   import FieldInputGroup from '@/templates/form-fields-inputs/fieldInputGroup'
   import FieldText from '@/templates/form-fields-inputs/fieldText'
   import PrimeButton from 'primevue/button'
-  import Divider from 'primevue/divider'
   import InputNumber from 'primevue/inputnumber'
-  import InputSwitch from 'primevue/inputswitch'
-  import RadioButton from 'primevue/radiobutton'
+  import FieldGroupRadio from '@/templates/form-fields-inputs/fieldGroupRadio'
+  import FieldSwitchBlock from '@/templates/form-fields-inputs/fieldSwitchBlock'
+  import FieldGroupSwitch from '@/templates/form-fields-inputs/fieldGroupSwitch'
+  import FieldGroupCheckbox from '@/templates/form-fields-inputs/fieldGroupCheckbox'
   import Dropdown from 'primevue/dropdown'
-  import CheckboxPrime from 'primevue/checkbox'
   import { CDN_MAXIMUM_TTL_MAX_VALUE, CDN_MAXIMUM_TTL_MIN_VALUE } from '@/utils/constants'
 
   import TextArea from 'primevue/textarea'
@@ -48,65 +48,6 @@
 
   const MAX_VALUE_NUMBER_INPUT = 31536000
 
-  const CACHE_SETTINGS_OPTIONS = ref([
-    {
-      label: 'Honor Origin Cache Headers',
-      value: 'honor'
-    },
-    {
-      label: 'Override Cache Settings',
-      value: 'override'
-    }
-  ])
-  const DEVICE_GROUP_CACHE_OPTIONS = ref([
-    {
-      label: 'Content does not vary by Device Groups (Improves Caching)',
-      value: 'ignore'
-    },
-    {
-      label: 'Content varies by some Device Groups (Allowlist)',
-      value: 'whitelist'
-    }
-  ])
-
-  const QUERY_STRING_OPTIONS = ref([
-    {
-      label: 'Content does not vary by Query String (Improves Caching)',
-      value: 'ignore'
-    },
-    {
-      label: 'Content varies by some Query String fields (Allowlist)',
-      value: 'whitelist'
-    },
-    {
-      label: 'Content varies by Query String, except for some fields (Blocklist)',
-      value: 'blacklist'
-    },
-    {
-      label: 'Content varies by all Query String fields',
-      value: 'all'
-    }
-  ])
-
-  const COOKIES_OPTIONS = ref([
-    {
-      label: 'Content does not vary by Cookies (Improves Caching)',
-      value: 'ignore'
-    },
-    {
-      label: 'Content varies by some Cookies (Allowlist)',
-      value: 'whitelist'
-    },
-    {
-      label: 'Content varies by Cookies, with the exception of a few (Blocklist)',
-      value: 'blacklist'
-    },
-    {
-      label: 'Content varies by all Cookies',
-      value: 'all'
-    }
-  ])
-
   const { value: browserCacheSettings } = useField('browserCacheSettings')
   const {
     value: browserCacheSettingsMaximumTtl,
@@ -121,11 +62,6 @@
   const { value: cacheByQueryString } = useField('cacheByQueryString')
   const { value: queryStringFields, errorMessage: queryStringFieldsError } =
     useField('queryStringFields')
-
-  const { value: enableQueryStringSort } = useField('enableQueryStringSort')
-  const { value: enableCachingForPost } = useField('enableCachingForPost')
-  const { value: enableCachingForOptions } = useField('enableCachingForOptions')
-  const { value: enableStaleCache } = useField('enableStaleCache')
   const { value: l2CachingEnabled } = useField('l2CachingEnabled')
   const { value: l2Region } = useField('l2Region')
   const { value: isSliceEdgeCachingEnabled } = useField('isSliceEdgeCachingEnabled')
@@ -138,20 +74,6 @@
     push: addDeviceGroup,
     remove: removeDeviceGroup
   } = useFieldArray('deviceGroup')
-
-  const disabledQueryStringOptions = (option) => {
-    const isDisabled =
-      (option.value === 'whitelist' || option.value === 'blacklist') &&
-      !props.isEnableApplicationAccelerator
-    return isDisabled
-  }
-
-  const disabledCookiesOptions = (option) => {
-    const isDisabled =
-      (option.value === 'whitelist' || option.value === 'blacklist' || option.value === 'all') &&
-      !props.isEnableApplicationAccelerator
-    return isDisabled
-  }
 
   const showMaxTtl = computed(() => browserCacheSettings.value === 'override')
   const showCdnMaxTtl = computed(() => cdnCacheSettings.value === 'override')
@@ -168,13 +90,128 @@
     return adaptiveDeliveryAction.value === 'whitelist'
   })
 
-  const cacheSettingsOptions = computed(() => {
-    return CACHE_SETTINGS_OPTIONS.value.map((item) => {
-      return {
-        ...item,
-        disabledItem: item.value === 'honor' && l2CachingEnabled.value
+  const cacheSettingsRadioOptions = (type) => {
+    const isBrowser = type === 'browser'
+
+    const browserSubtitle =
+      'Honor cache policies from the origin or define a new maximum cache TTL for browsers.'
+    const cdnSubtitle = `Honor cache policies from the origin or define a new maximum cache TTL for the edge. If a TTL isn't received from the origin, cache will be maintained at a default TTL.`
+
+    return [
+      {
+        title: 'Honor cache policies',
+        subtitle: isBrowser ? browserSubtitle : cdnSubtitle,
+        value: 'honor',
+        disabled: !isBrowser && l2CachingEnabled.value
+      },
+      { title: 'Override cache settings', value: 'override' }
+    ]
+  }
+
+  const layerFileOptimizationRadioOptions = computed(() => [
+    {
+      title: 'Edge Cache',
+      value: false,
+      disabled: l2CachingEnabled.value,
+      nameField: 'isSliceEdgeCachingEnabled',
+      binary: true
+    },
+    {
+      title: 'Tiered Cache',
+      value: false,
+      disabled: !l2CachingEnabled.value,
+      nameField: 'isSliceL2CachingEnabled',
+      binary: true
+    }
+  ])
+
+  const queryStringRadioOptions = [
+    {
+      title: 'Content does not vary by Query String (Improves Caching)',
+      value: 'ignore'
+    },
+    {
+      title: 'Content varies by some Query String fields (Allowlist)',
+      value: 'whitelist',
+      disabled: !props.isEnableApplicationAccelerator
+    },
+    {
+      title: 'Content varies by Query String, except for some fields (Blocklist)',
+      value: 'blacklist',
+      disabled: !props.isEnableApplicationAccelerator
+    },
+    {
+      title: 'Content varies by all Query String fields',
+      value: 'all'
+    }
+  ]
+
+  const cookieRadioOptions = [
+    {
+      title: 'Content does not vary by Cookies (Improves Caching)',
+      value: 'ignore'
+    },
+    {
+      title: 'Content varies by some Cookies (Allowlist)',
+      value: 'whitelist',
+      disabled: !props.isEnableApplicationAccelerator
+    },
+    {
+      title: 'Content varies by Cookies, with the exception of a few (Blocklist)',
+      value: 'blacklist',
+      disabled: !props.isEnableApplicationAccelerator
+    },
+    {
+      title: 'Content varies by all Cookies',
+      value: 'all',
+      disabled: !props.isEnableApplicationAccelerator
+    }
+  ]
+
+  const adaptiveDeliveryRadioOptions = [
+    {
+      title: 'Content does not vary by Device Groups (Improves Caching)',
+      value: 'ignore'
+    },
+    {
+      title: 'Content varies by some Device Groups (Allowlist)',
+      value: 'whitelist'
+    }
+  ]
+
+  const advancedCacheSwitchOptions = computed(() => {
+    const options = [
+      {
+        title: 'Enable Stale Cache',
+        nameField: 'enableStaleCache',
+        subtitle: 'Serve stale content from the cache if origin servers are unavailable.'
       }
-    })
+    ]
+
+    if (props.isEnableApplicationAccelerator) {
+      options.push(
+        {
+          title: 'Query String Sort',
+          nameField: 'enableQueryStringSort',
+          subtitle:
+            'Consider objects with the same query strings, regardless of the order of the fields, as the same cached file.'
+        },
+        {
+          title: 'Enable Caching for POST',
+          nameField: 'enableCachingForPost',
+          subtitle:
+            'Allow POST requests to be cached. The POST method will be included in the cache key.'
+        },
+        {
+          title: 'Enable Caching for OPTIONS',
+          nameField: 'enableCachingForOptions',
+          subtitle:
+            'Allow OPTIONS requests to be cached. The OPTIONS method will be included in the cache key.'
+        }
+      )
+    }
+
+    return options
   })
 
   watch(adaptiveDeliveryAction, (value) => {
@@ -226,32 +263,12 @@
     :isDrawer="true"
   >
     <template #inputs>
-      <div class="flex flex-col w-full sm:max-w-3xl gap-2">
-        <label class="text-color text-sm font-medium leading-5">Browser Cache Settings</label>
-        <div class="flex flex-col gap-4">
-          <div
-            class="flex no-wrap gap-2 items-center"
-            v-for="browserCacheSettingsOption in CACHE_SETTINGS_OPTIONS"
-            :key="browserCacheSettingsOption.value"
-          >
-            <RadioButton
-              v-model="browserCacheSettings"
-              :inputId="`browserOption-${browserCacheSettingsOption.value}`"
-              name="browserCacheSettings"
-              :value="browserCacheSettingsOption.value"
-            />
-            <label
-              :for="`browserOption-${browserCacheSettingsOption.value}`"
-              class="text-color text-sm font-normal leading-tight"
-            >
-              {{ browserCacheSettingsOption.label }}
-            </label>
-          </div>
-        </div>
-        <small class="text-color-secondary text-xs font-normal leading-5">
-          Honor cache policies from the origin or define a new maximum cache TTL for browsers.
-        </small>
-      </div>
+      <FieldGroupRadio
+        label="Browser Cache Settings"
+        nameField="browserCacheSettings"
+        :isCard="false"
+        :options="cacheSettingsRadioOptions('browser')"
+      />
 
       <div
         v-if="showMaxTtl"
@@ -279,34 +296,13 @@
         >
       </div>
 
-      <div class="flex flex-col w-full sm:max-w-3xl gap-2">
-        <label class="text-color text-sm font-medium leading-5">Edge Cache Settings</label>
-        <div class="flex flex-col gap-4">
-          <div
-            class="flex no-wrap gap-2 items-center"
-            v-for="cdnCacheSettingsOption in cacheSettingsOptions"
-            :key="cdnCacheSettingsOption.value"
-          >
-            <RadioButton
-              v-model="cdnCacheSettings"
-              :inputId="`cdnOption-${cdnCacheSettingsOption.value}`"
-              name="cdnCacheSettings"
-              :disabled="cdnCacheSettingsOption.disabledItem"
-              :value="cdnCacheSettingsOption.value"
-            />
-            <label
-              :for="`cdnOption-${cdnCacheSettingsOption.value}`"
-              class="text-color text-sm font-normal leading-tight"
-            >
-              {{ cdnCacheSettingsOption.label }}
-            </label>
-          </div>
-        </div>
-        <small class="text-color-secondary text-xs font-normal leading-5">
-          Honor cache policies from the origin or define a new maximum cache TTL for the edge. If a
-          TTL isn't received from the origin, cache will be maintained at a default TTL.
-        </small>
-      </div>
+      <FieldGroupRadio
+        label="Edge Cache Settings"
+        nameField="cdnCacheSettings"
+        :isCard="false"
+        :options="cacheSettingsRadioOptions('cdn')"
+      />
+
       <div class="flex flex-col sm:max-w-xs w-full gap-2">
         <label
           for="cdnCacheSettingsMaximumTtl"
@@ -333,25 +329,22 @@
           >{{ cdnCacheSettingsMaximumTtlError }}</small
         >
       </div>
+
       <div
         class="flex gap-2 w-full items-start"
         v-if="props.showTieredCache"
       >
-        <InputSwitch
-          v-model="l2CachingEnabled"
-          inputId="l2CachingEnabled"
+        <FieldSwitchBlock
+          nameField="l2CachingEnabled"
+          name="l2CachingEnabled"
+          auto
+          :isCard="false"
+          title="Tiered Cache"
+          subtitle="Enable Tiered Cache if you want to reduce the traffic to your origin and increase
+            performance and availability."
         />
-        <label
-          for="l2CachingEnabled"
-          class="flex flex-col items-start gap-1"
-        >
-          <span class="text-color text-sm font-normal leading-5">Tiered Cache </span>
-          <span class="text-sm text-color-secondary font-normal leading-5">
-            Enable Tiered Cache if you want to reduce the traffic to your origin and increase
-            performance and availability.
-          </span>
-        </label>
       </div>
+
       <div
         class="flex flex-col w-full sm:max-w-xs gap-2"
         v-if="props.showTieredCache"
@@ -384,55 +377,18 @@
     :isDrawer="true"
   >
     <template #inputs>
-      <div class="flex w-full gap-2 items-start">
-        <InputSwitch
-          v-model="sliceConfigurationEnabled"
-          inputId="sliceConfigurationEnabled"
-        />
-        <label
-          for="sliceConfigurationEnabled"
-          class="flex flex-col items-start gap-1"
-        >
-          <span class="text-color text-sm font-normal leading-5">Active </span>
-        </label>
-      </div>
-
-      <div class="flex flex-col w-full sm:max-w-3xl gap-2">
-        <label class="text-color text-sm font-medium leading-5">Layer</label>
-        <div class="flex flex-col gap-4">
-          <div class="flex w-full gap-2 items-start">
-            <CheckboxPrime
-              v-model="isSliceEdgeCachingEnabled"
-              name="isSliceEdgeCachingEnabled"
-              binary
-              :disabled="l2CachingEnabled"
-            />
-            <label
-              for="isSliceEdgeCachingEnabled"
-              class="flex flex-col items-start gap-1"
-            >
-              <span class="text-color text-sm font-normal leading-5">Edge Cache</span>
-            </label>
-          </div>
-          <div
-            class="flex w-full gap-2 items-start"
-            v-if="props.showTieredCache"
-          >
-            <CheckboxPrime
-              v-model="isSliceL2CachingEnabled"
-              name="isSliceL2CachingEnabled"
-              binary
-              :disabled="!l2CachingEnabled"
-            />
-            <label
-              for="isSliceL2CachingEnabled"
-              class="flex flex-col items-start gap-1"
-            >
-              <span class="text-color text-sm font-normal leading-5">Tiered Cache</span>
-            </label>
-          </div>
-        </div>
-      </div>
+      <FieldSwitchBlock
+        nameField="sliceConfigurationEnabled"
+        name="sliceConfigurationEnabled"
+        auto
+        :isCard="false"
+        title="Active"
+      />
+      <FieldGroupCheckbox
+        label="Layer"
+        :options="layerFileOptimizationRadioOptions"
+        :isCard="false"
+      />
       <div
         v-if="showSliceConfigurationRange"
         class="flex flex-col sm:max-w-xs w-full gap-2"
@@ -470,30 +426,13 @@
     :isDrawer="true"
   >
     <template #inputs>
-      <div class="flex flex-col w-full sm:max-w-3xl gap-2">
-        <label class="text-color text-sm font-medium leading-5">Cache by Query String</label>
-        <div class="flex flex-col gap-4">
-          <div
-            class="flex no-wrap gap-2 items-center"
-            v-for="queryStringOption in QUERY_STRING_OPTIONS"
-            :key="queryStringOption.value"
-          >
-            <RadioButton
-              v-model="cacheByQueryString"
-              :disabled="disabledQueryStringOptions(queryStringOption)"
-              :inputId="`cache-by-query-string-${queryStringOption.value}`"
-              name="cacheByQueryString"
-              :value="queryStringOption.value"
-            />
-            <label
-              :for="`cache-by-query-string-${queryStringOption.value}`"
-              class="text-color text-sm font-normal leading-tight"
-            >
-              {{ queryStringOption.label }}
-            </label>
-          </div>
-        </div>
-      </div>
+      <FieldGroupRadio
+        label="Cache by Query String"
+        nameField="cacheByQueryString"
+        :isCard="false"
+        :options="queryStringRadioOptions"
+      />
+
       <div
         v-if="showQueryFields"
         class="flex flex-col sm:max-w-lg w-full gap-2"
@@ -517,126 +456,19 @@
         <small class="p-error">{{ queryStringFieldsError }}</small>
       </div>
 
-      <div class="flex flex-col w-full sm:max-w-3xl gap-2">
-        <label class="text-color text-sm font-medium leading-5">Enable Settings</label>
-        <div class="flex flex-col gap-4">
-          <div
-            class="flex flex-col gap-4"
-            v-if="props.isEnableApplicationAccelerator"
-          >
-            <div class="flex w-full gap-2 items-start">
-              <InputSwitch
-                v-model="enableQueryStringSort"
-                inputId="enableQueryStringSort"
-              />
-              <label
-                for="enableQueryStringSort"
-                class="flex flex-col items-start gap-1"
-              >
-                <span class="text-color text-sm font-normal leading-5">Query String Sort </span>
-                <span class="text-sm text-color-secondary font-normal leading-5">
-                  Consider objects with the same query strings, regardless of the order of the
-                  fields, as the same cached file.
-                </span>
-              </label>
-            </div>
+      <FieldGroupSwitch
+        label="Enable Settings"
+        :isCard="false"
+        :options="advancedCacheSwitchOptions"
+      />
 
-            <Divider />
-          </div>
-          <div
-            class="flex flex-col gap-4"
-            v-if="props.isEnableApplicationAccelerator"
-          >
-            <div class="flex w-full gap-2 items-start">
-              <InputSwitch
-                v-model="enableCachingForPost"
-                inputId="enableCachingForPost"
-              />
-              <label
-                for="enableCachingForPost"
-                class="flex flex-col items-start gap-1"
-              >
-                <span class="text-color text-sm font-normal leading-5"
-                  >Enable Caching for POST
-                </span>
-                <span class="text-sm text-color-secondary font-normal leading-5">
-                  Allow POST requests to be cached. The POST method will be included in the cache
-                  key.
-                </span>
-              </label>
-            </div>
+      <FieldGroupRadio
+        label="Cache by Cookie"
+        nameField="cacheByCookies"
+        :isCard="false"
+        :options="cookieRadioOptions"
+      />
 
-            <Divider />
-          </div>
-          <div
-            class="flex flex-col gap-4"
-            v-if="props.isEnableApplicationAccelerator"
-          >
-            <div>
-              <div class="flex w-full gap-2 items-start">
-                <InputSwitch
-                  v-model="enableCachingForOptions"
-                  inputId="enableCachingForOptions"
-                />
-                <label
-                  for="enableCachingForOptions"
-                  class="flex flex-col items-start gap-1"
-                >
-                  <span class="text-color text-sm font-normal leading-5"
-                    >Enable Caching for OPTIONS
-                  </span>
-                  <span class="text-sm text-color-secondary font-normal leading-5">
-                    Allow OPTIONS requests to be cached. The OPTIONS method will be included in the
-                    cache key.
-                  </span>
-                </label>
-              </div>
-            </div>
-            <Divider />
-          </div>
-
-          <div class="flex w-full gap-2 items-start">
-            <InputSwitch
-              v-model="enableStaleCache"
-              inputId="enableStaleCache"
-            />
-            <label
-              for="enableStaleCache"
-              class="flex flex-col items-start gap-1"
-            >
-              <span class="text-color text-sm font-normal leading-5">Enable Stale Cache </span>
-              <span class="text-sm text-color-secondary font-normal leading-5">
-                Serve stale content from the cache if origin servers are unavailable.
-              </span>
-            </label>
-          </div>
-        </div>
-      </div>
-
-      <div class="flex flex-col w-full sm:max-w-3xl gap-2">
-        <label class="text-color text-sm font-medium leading-5">Cache by Cookie</label>
-        <div class="flex flex-col gap-4">
-          <div
-            class="flex no-wrap gap-2 items-center"
-            v-for="cookiesOption in COOKIES_OPTIONS"
-            :key="cookiesOption.value"
-          >
-            <RadioButton
-              :disabled="disabledCookiesOptions(cookiesOption)"
-              v-model="cacheByCookies"
-              :inputId="`cache-by-cookie-${cookiesOption.value}`"
-              name="cacheByCookies"
-              :value="cookiesOption.value"
-            />
-            <label
-              :for="`cache-by-cookie-${cookiesOption.value}`"
-              class="text-color text-sm font-normal leading-tight"
-            >
-              {{ cookiesOption.label }}
-            </label>
-          </div>
-        </div>
-      </div>
       <div
         v-if="showCookieNames"
         class="flex flex-col sm:max-w-lg w-full gap-2"
@@ -660,29 +492,13 @@
         <small class="p-error">{{ cookieNamesError }}</small>
       </div>
 
-      <div class="flex flex-col w-full sm:max-w-3xl gap-2">
-        <label class="text-color text-sm font-medium leading-5">Adaptive Delivery</label>
-        <div class="flex flex-col gap-4">
-          <div
-            class="flex no-wrap gap-2 items-center"
-            v-for="deviceGroupCacheOption in DEVICE_GROUP_CACHE_OPTIONS"
-            :key="deviceGroupCacheOption.value"
-          >
-            <RadioButton
-              v-model="adaptiveDeliveryAction"
-              :inputId="`adaptative-delivery-${deviceGroupCacheOption.value}`"
-              name="adaptiveDeliveryAction"
-              :value="deviceGroupCacheOption.value"
-            />
-            <label
-              :for="`adaptative-delivery-${deviceGroupCacheOption.value}`"
-              class="text-color text-sm font-normal leading-tight"
-            >
-              {{ deviceGroupCacheOption.label }}
-            </label>
-          </div>
-        </div>
-      </div>
+      <FieldGroupRadio
+        label="Adaptive Delivery"
+        nameField="adaptiveDeliveryAction"
+        :isCard="false"
+        :options="adaptiveDeliveryRadioOptions"
+      />
+
       <div
         v-if="showDeviceGroupFields"
         class="flex flex-col w-full sm:max-w-3xl gap-2"
