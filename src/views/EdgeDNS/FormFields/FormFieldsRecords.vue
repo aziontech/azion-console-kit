@@ -9,6 +9,7 @@
   import { documentationGuideProducts } from '@/helpers'
   import { useField } from 'vee-validate'
   import { computed, ref } from 'vue'
+  import { TTL_MAX_VALEU_RECORDS } from '@/utils/constants'
 
   const { value: name, errorMessage: errorName } = useField('name')
   const { value: selectedPolicy, errorMessage: errorSelectedPolicy } = useField('selectedPolicy')
@@ -191,7 +192,7 @@
             v-model="ttl"
             id="ttl"
             :min="0"
-            :max="3600"
+            :max="TTL_MAX_VALEU_RECORDS"
             :step="1"
             :class="{ 'p-invalid': errorTtl }"
           />

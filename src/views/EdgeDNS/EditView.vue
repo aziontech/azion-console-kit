@@ -19,6 +19,7 @@
   import FormFieldsRecords from './FormFields/FormFieldsRecords'
   import { generateCurrentTimestamp } from '@/helpers/generate-timestamp'
   import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
+  import { TTL_MAX_VALEU_RECORDS } from '@/utils/constants'
 
   const props = defineProps({
     loadEdgeDNSService: { type: Function, required: true },
@@ -118,7 +119,7 @@
       .when('selectedRecordType', {
         is: RECORD_TYPE_WITHOUT_TTL,
         then: (schema) => schema.notRequired(),
-        otherwise: (schema) => schema.min(0).max(3600).required()
+        otherwise: (schema) => schema.min(0).max(TTL_MAX_VALEU_RECORDS).required()
       }),
     selectedPolicy: yup.string().required('Please select an option').default('simple'),
     weight: yup
@@ -139,7 +140,7 @@
     name: '',
     selectedRecordType: 'A',
     value: '',
-    ttl: 3600,
+    ttl: TTL_MAX_VALEU_RECORDS,
     selectedPolicy: 'simple',
     weight: '100',
     description: '',
