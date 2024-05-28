@@ -1,6 +1,5 @@
 import { describe, it, expect } from 'vitest'
 
-// Assuming they're exported from a module called 'constants.js'
 import * as constants from '@/utils/constants'
 
 describe('Constants Test', () => {
