@@ -10,6 +10,32 @@ const fixtures = {
       errors: [],
       message: 'deploy failed'
     }
+  },
+  bodyResponse: {
+    result: {
+      domain: {
+        id: 123,
+        url: 'abc.map.azionedge.net'
+      },
+      edge_application: {
+        id: 456,
+        name: 'my-app'
+      },
+      extras: []
+    }
+  },
+  formattedBodyResponse: {
+    result: {
+      domain: {
+        id: 123,
+        url: 'https://abc.map.azionedge.net'
+      },
+      edgeApplication: {
+        id: 456,
+        name: 'my-app'
+      },
+      extras: []
+    }
   }
 }
 
@@ -24,7 +50,7 @@ describe('ScriptRunnerServices', () => {
   it('should call api with correct params', async () => {
     const requestSpy = vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
       statusCode: 200,
-      body: { result: {}, status: null }
+      body: fixtures.bodyResponse
     })
     const { sut } = makeSut()
 
@@ -34,6 +60,18 @@ describe('ScriptRunnerServices', () => {
       url: `script-runner/executions/${fixtures.executionId}/results`,
       method: 'GET'
     })
+  })
+
+  it('should call format fields', async () => {
+    vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
+      statusCode: 200,
+      body: fixtures.bodyResponse
+    })
+    const { sut } = makeSut()
+
+    const result = await sut(fixtures.executionId)
+
+    expect(result).toEqual(fixtures.formattedBodyResponse)
   })
 
   it('should throw exception when deploy result has an error', async () => {
