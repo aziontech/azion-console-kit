@@ -13,8 +13,13 @@
     }
   })
 
+  const keyRegex = /^(_?[A-Z_]*)$/
+
   const validationSchema = yup.object({
-    key: yup.string().required(),
+    key: yup
+      .string()
+      .test('key', 'Invalid key format.', (value) => keyRegex.test(value))
+      .required(),
     value: yup.string().required(),
     secret: yup.boolean().required().default(false)
   })
