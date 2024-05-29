@@ -11,7 +11,7 @@
   import { useRoute, useRouter } from 'vue-router'
   import { useToast } from 'primevue/usetoast'
   import { useDialog } from 'primevue/usedialog'
-  import { removeHtmlTagFromText } from '@/helpers/remove-html-tag-from-text'
+  import { removeHtmlTagFromText } from '@/helpers'
   import DialogOnboardingScheduling from '@/templates/dialogs-block/dialog-onboarding-scheduling.vue'
 
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
