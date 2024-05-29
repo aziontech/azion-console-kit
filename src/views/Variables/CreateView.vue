@@ -13,7 +13,7 @@
     }
   })
 
-  const keyRegex = /^(_?[A-Z_]*)$/
+  const keyRegex = /^[A-Z_]*$/
 
   const validationSchema = yup.object({
     key: yup
