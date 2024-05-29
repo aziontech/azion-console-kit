@@ -216,7 +216,7 @@
         :listOriginsService="props.listOriginsService"
         :listCacheSettingsService="props.listCacheSettingsService"
         :hideApplicationAcceleratorInDescription="props.hideApplicationAcceleratorInDescription"
-        :isImageOptimization="isImageOptimization"
+        :isImageOptimization="props.isImageOptimization"
         :isEdgeFunctionEnabled="props.isEdgeFunctionEnabled"
       />
     </template>
@@ -241,6 +241,7 @@
         :isDeliveryProtocolHttps="props.isDeliveryProtocolHttps"
         :listEdgeApplicationFunctionsService="props.listEdgeApplicationFunctionsService"
         :listOriginsService="props.listOriginsService"
+        :isImageOptimization="props.isImageOptimization"
         :listCacheSettingsService="props.listCacheSettingsService"
         :hideApplicationAcceleratorInDescription="props.hideApplicationAcceleratorInDescription"
         :isEdgeFunctionEnabled="props.isEdgeFunctionEnabled"
