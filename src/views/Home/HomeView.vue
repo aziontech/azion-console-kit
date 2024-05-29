@@ -11,6 +11,7 @@
   import { useRoute, useRouter } from 'vue-router'
   import { useToast } from 'primevue/usetoast'
   import { useDialog } from 'primevue/usedialog'
+  import { removeHtmlTagFromText } from '@/helpers/remove-html-tag-from-text'
   import DialogOnboardingScheduling from '@/templates/dialogs-block/dialog-onboarding-scheduling.vue'
 
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
@@ -51,21 +52,8 @@
     return !meta.value?.valid || isLoading.value
   })
 
-  const removeLinkFromText = (unparsedText) => {
-    const parser = new DOMParser()
-    const parsedDisclaimer = parser.parseFromString(unparsedText, 'text/html')
-
-    const linkTags = parsedDisclaimer.querySelectorAll('a')
-
-    linkTags.forEach((linkTag) => linkTag.remove())
-
-    const disclaimerWithoutLinks = parsedDisclaimer.body.textContent
-
-    return disclaimerWithoutLinks
-  }
-
   const disclaimer = computed(() => {
-    return removeLinkFromText(user.disclaimer)
+    return removeHtmlTagFromText(user.disclaimer, 'a')
   })
 
   const showExperimental = computed(() => {
