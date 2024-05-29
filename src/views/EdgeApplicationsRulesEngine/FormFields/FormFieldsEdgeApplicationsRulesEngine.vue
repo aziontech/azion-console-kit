@@ -60,7 +60,7 @@
   })
 
   const isEditDrawer = computed(() => !!props.selectedRulesEngineToEdit)
-
+  const isImageOptimizationEnabled = computed(() => !!props.isImageOptimization)
   const checkPhaseIsDefaultValue = computed(() => phase.value === 'default')
 
   const toast = useToast()
@@ -275,7 +275,7 @@
   const updateOptionRequires = (options) => {
     const conditionsMap = {
       redirect_http_to_https: !props.isDeliveryProtocolHttps,
-      optimize_images: !props.isImageOptimization,
+      optimize_images: !isImageOptimizationEnabled.value,
       run_function: !props.isEdgeFunctionEnabled
     }
 
