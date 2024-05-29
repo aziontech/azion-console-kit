@@ -5,7 +5,6 @@
   import FieldTextArea from '@/templates/form-fields-inputs/fieldTextArea'
   import FieldDropdown from '@/templates/form-fields-inputs/fieldDropdown'
   import PrimeButton from 'primevue/button'
-  import PrimeMenu from 'primevue/menu'
   import InlineMessage from 'primevue/inlinemessage'
   import Divider from 'primevue/divider'
   import AutoComplete from 'primevue/autocomplete'
@@ -211,9 +210,6 @@
     target: {}
   }
 
-  const conditionalMenuRef = ref({})
-  const criteriaMenuRef = ref({})
-
   /**
    * Remove a specific conditional from the criteria array.
    * @param {number} criteriaIndex - The index of the criteria from which the conditional will be removed.
@@ -221,77 +217,6 @@
    */
   const removeConditional = (criteriaIndex, conditionalIndex) => {
     criteria.value[criteriaIndex].value.splice(conditionalIndex, 1)
-  }
-
-  /**
-   * Toggle the visibility of the conditional menu.
-   * @param {Event} event - The event that triggered the function.
-   * @param {number} index - The index of the criteria.
-   * @param {number} conditionalIndex - The index of the conditional.
-   */
-  const toggleConditionalMenu = (event, index, conditionalIndex) => {
-    conditionalMenuRef.value[`${index}${conditionalIndex}`].toggle(event)
-  }
-
-  /**
-   * Toggle the visibility of the criteria menu.
-   * @param {Event} event - The event that triggered the function.
-   * @param {number} index - The index of the criteria.
-   */
-  const toggleCriteriaMenu = (event, index) => {
-    criteriaMenuRef.value[index].toggle(event)
-  }
-
-  /**
-   * Generate the options for the criteria menu.
-   * @param {number} criteriaIndex - The index of the criteria.
-   * @param {number} [conditionalIndex] - The index of the conditional.
-   * @returns {Array} An array of options for the criteria menu.
-   */
-  const criteriaMenuOptions = (criteriaIndex, conditionalIndex = null) => {
-    return [
-      {
-        label: 'Delete',
-        icon: 'pi pi-fw pi-trash',
-        severity: 'error',
-        command: () => {
-          if (conditionalIndex === null) {
-            removeCriteria(criteriaIndex)
-          } else {
-            removeConditional(criteriaIndex, conditionalIndex)
-          }
-        }
-      }
-    ]
-  }
-
-  const behaviorsMenuRef = ref({})
-
-  /**
-   * Toggle the visibility of the behavior menu.
-   * @param {Event} event - The event that triggered the function.
-   * @param {number} index - The index of the behavior.
-   */
-  const toggleBehaviorMenu = (event, index) => {
-    behaviorsMenuRef.value[index].toggle(event)
-  }
-
-  /**
-   * Generate the options for the behavior menu.
-   * @param {number} index - The index of the behavior.
-   * @returns {Array} An array of options for the behavior menu.
-   */
-  const behaviorMenuOptions = (index) => {
-    return [
-      {
-        label: 'Delete',
-        icon: 'pi pi-fw pi-trash',
-        severity: 'error',
-        command: () => {
-          removeBehavior(index)
-        }
-      }
-    ]
   }
 
   /**
@@ -767,16 +692,10 @@
 
             <PrimeButton
               v-if="conditionalIndex !== 0"
-              icon="pi pi-ellipsis-h"
+              icon="pi pi-trash"
               size="small"
               outlined
-              @click="(event) => toggleConditionalMenu(event, criteriaIndex, conditionalIndex)"
-            />
-            <PrimeMenu
-              :ref="(el) => (conditionalMenuRef[`${criteriaIndex}${conditionalIndex}`] = el)"
-              id="drawer_overlay_menu"
-              :model="criteriaMenuOptions(criteriaIndex, conditionalIndex)"
-              :popup="true"
+              @click="removeConditional(criteriaIndex, conditionalIndex)"
             />
           </div>
 
@@ -852,16 +771,10 @@
 
           <PrimeButton
             v-if="isNotFirstCriteria(criteriaIndex)"
-            icon="pi pi-ellipsis-h"
+            icon="pi pi-trash"
             size="small"
             outlined
-            @click="(event) => toggleCriteriaMenu(event, criteriaIndex + 1)"
-          />
-          <PrimeMenu
-            :ref="(el) => (criteriaMenuRef[criteriaIndex + 1] = el)"
-            id="drawer_overlay_menu"
-            :model="criteriaMenuOptions(criteriaIndex + 1)"
-            :popup="true"
+            @click="removeCriteria(criteriaIndex + 1)"
           />
         </div>
       </div>
@@ -899,17 +812,10 @@
 
           <PrimeButton
             v-if="behaviorIndex !== 0"
-            icon="pi pi-ellipsis-h"
+            icon="pi pi-trash"
             size="small"
             outlined
-            @click="(event) => toggleBehaviorMenu(event, behaviorIndex)"
-          />
-
-          <PrimeMenu
-            :ref="(el) => (behaviorsMenuRef[behaviorIndex] = el)"
-            id="drawer_behavior_overlay_menu"
-            :model="behaviorMenuOptions(behaviorIndex)"
-            :popup="true"
+            @click="removeBehavior(behaviorIndex)"
           />
         </div>
 
