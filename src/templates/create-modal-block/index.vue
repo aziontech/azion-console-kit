@@ -1,5 +1,6 @@
 <script setup>
   import PrimeButton from 'primevue/button'
+  import PrimeInputText from 'primevue/inputtext'
   import LoadingState from './create-modal-block-loading-state.vue'
   import { computed, onBeforeMount, ref, inject } from 'vue'
   import { useRouter } from 'vue-router'
@@ -31,7 +32,9 @@
   const isLoading = ref(false)
   const templates = ref([])
   const browseTemplates = ref([])
+  const githubTemplates = ref([])
   const selectedTab = ref('recommended')
+  const search = ref('')
 
   const items = ref([
     {
@@ -137,6 +140,17 @@
     return selectedTab.value === 'import_github'
   })
 
+  const tabHeader = computed(() => {
+    switch (selectedTab.value) {
+      case 'new_resource':
+        return 'Select a Resource'
+      case 'import_github':
+        return 'Import from GitHub'
+      default:
+        return 'Select a Template'
+    }
+  })
+
   const showToast = (severity, detail) => {
     if (!detail) return
     const options = {
@@ -198,7 +212,6 @@
     }
   }
 
-  const githubTemplates = ref([])
   const loadImportGithubSolution = async () => {
     try {
       isLoading.value = true
@@ -227,16 +240,31 @@
     }
   }
 
-  const tabHeader = computed(() => {
-    switch (selectedTab.value) {
-      case 'new_resource':
-        return 'Select a Resource'
-      case 'import_github':
-        return 'Import from GitHub'
-      default:
-        return 'Select a Template'
+  const filterBySearchField = () => {
+    if (!search.value.trim()) return
+
+    return templates.value.filter((template) => {
+      return Object.keys(template).some((key) => {
+        const props = { template, key, filter: search.value }
+
+        if (key === 'vendor' || key === 'instance_type') {
+          return findTemplatesByFilter({ ...props, nestedKey: 'name' })
+        }
+
+        if (typeof template[key] !== 'string') return
+
+        return findTemplatesByFilter(props)
+      })
+    })
+  }
+
+  const findTemplatesByFilter = ({ template, key, filter, nestedKey = null }) => {
+    if (nestedKey) {
+      return template[key][nestedKey].toLowerCase().includes(filter.toLowerCase())
     }
-  })
+
+    return template[key].toLowerCase().includes(filter.toLowerCase())
+  }
 </script>
 
 <template>
@@ -264,10 +292,23 @@
 
     <div class="overflow-auto w-full flex flex-col">
       <LoadingState v-if="isLoading" />
-      <div v-else>
-        <div class="text-base font-medium mb-4">
+      <div
+        class="flex flex-col gap-4 mb-4 w-full"
+        v-else
+      >
+        <div class="text-base font-medium">
           {{ tabHeader }}
         </div>
+        <span class="p-input-icon-left">
+          <i class="pi pi-search" />
+          <PrimeInputText
+            class="w-full"
+            type="text"
+            placeholder="Search by name, framework, or keyword"
+            v-model="search"
+            @input="filterBySearchField"
+          />
+        </span>
       </div>
 
       <div
