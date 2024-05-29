@@ -51,8 +51,21 @@
     return !meta.value?.valid || isLoading.value
   })
 
+  const removeLinkFromText = (unparsedText) => {
+    const parser = new DOMParser()
+    const parsedDisclaimer = parser.parseFromString(unparsedText, 'text/html')
+
+    const linkTags = parsedDisclaimer.querySelectorAll('a')
+
+    linkTags.forEach((linkTag) => linkTag.remove())
+
+    const disclaimerWithoutLinks = parsedDisclaimer.body.textContent
+
+    return disclaimerWithoutLinks
+  }
+
   const disclaimer = computed(() => {
-    return user.disclaimer.replace(/\s<a[^>]+>[^<]+<\/a>/g, '')
+    return removeLinkFromText(user.disclaimer)
   })
 
   const showExperimental = computed(() => {
