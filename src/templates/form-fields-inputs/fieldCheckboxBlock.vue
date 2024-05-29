@@ -7,7 +7,7 @@
   >
     <template #selector>
       <PrimeCheckbox
-        :disabled="disabled"
+        :disabled="props.disabled"
         :inputId="props.name"
         :name="props.name"
         @click="stopPropagation"
