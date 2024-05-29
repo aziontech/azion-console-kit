@@ -13,7 +13,7 @@
         <div v-show="!hideSelector">
           <slot name="selector" />
         </div>
-        <div :class="classDisabled">
+        <div :class="{ 'p-disabled': props.disabled && hideSelector }">
           <div class="flex gap-3 items-center font-medium">
             <span
               v-if="!props.isCard"
@@ -114,9 +114,5 @@
     'border-orange-500': check.value,
     'border-orange-500/[.32]': props.disabled && check.value,
     'border rounded-md': props.isCard
-  }))
-
-  const classDisabled = computed(() => ({
-    'p-disabled': props.disabled
   }))
 </script>
