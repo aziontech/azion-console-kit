@@ -1,3 +1,159 @@
+<script setup>
+  import { getStaticUrlsByEnvironment } from '@/helpers'
+  import { useAccountStore } from '@/stores/account'
+  import { useCreateModalStore } from '@/stores/create-modal'
+  import ContentBlock from '@/templates/content-block'
+  import { computed, inject, onMounted, ref } from 'vue'
+  import PrimeButton from 'primevue/button'
+  import { useForm } from 'vee-validate'
+  import * as yup from 'yup'
+  import FormFieldsHome from './FormFields/FormFieldsHome.vue'
+  import { useRoute, useRouter } from 'vue-router'
+  import { useToast } from 'primevue/usetoast'
+  import { useDialog } from 'primevue/usedialog'
+  import DialogOnboardingScheduling from '@/templates/dialogs-block/dialog-onboarding-scheduling.vue'
+
+  /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
+  const tracker = inject('tracker')
+
+  defineOptions({ name: 'home-view' })
+
+  const props = defineProps({
+    listTeamsService: {
+      type: Function,
+      required: true
+    },
+    inviteYourTeamService: {
+      type: Function,
+      required: true
+    },
+    inviteSession: {
+      type: Function,
+      required: true
+    },
+    windowManager: {
+      type: Object,
+      required: true
+    }
+  })
+
+  const router = useRouter()
+  const route = useRoute()
+  const dialog = useDialog()
+  const toast = useToast()
+  const user = useAccountStore().accountData
+
+  const teams = ref([])
+  const isLoading = ref(false)
+  const showInviteSession = ref(props.inviteSession.show())
+
+  const isDisabled = computed(() => {
+    return !meta.value?.valid || isLoading.value
+  })
+
+  const disclaimer = computed(() => {
+    return user.disclaimer.replace(/\s<a[^>]+>[^<]+<\/a>/g, '')
+  })
+
+  const showExperimental = computed(() => {
+    return user.disclaimer
+  })
+
+  const navigateToEdgeApplications = () => {
+    router.push({ name: 'list-edge-applications' })
+  }
+
+  const navigateToPayment = () => {
+    const billingUrl = getStaticUrlsByEnvironment('billing')
+    window.open(billingUrl, '_blank')
+  }
+
+  const navigateToRealTimeMetrics = () => {
+    router.push({ name: 'real-time-metrics' })
+  }
+
+  const openDocsEdgeApplication = () => {
+    props.windowManager.documentationGuideProducts.edgeApplication()
+  }
+
+  const openDocsRealTimeMetrics = () => {
+    props.windowManager.documentationGuideProducts.realTimeMetrics()
+  }
+
+  const openProductDocumentation = () => {
+    props.windowManager.openDocumentation()
+  }
+
+  const openAPIDocumentation = () => {
+    props.windowManager.openAPIDocumentation()
+  }
+
+  const openContactSupport = () => {
+    props.windowManager.openContactSupport()
+  }
+
+  const validationSchema = yup.object({
+    name: yup.string().required('Name is a required field'),
+    email: yup.string().email('Must be a valid email').required('E-mail is a required field'),
+    team: yup.string().required()
+  })
+
+  const { meta, resetForm, handleSubmit } = useForm({
+    validationSchema
+  })
+
+  const onSubmit = handleSubmit(async (values) => {
+    try {
+      isLoading.value = true
+      const feedback = await props.inviteYourTeamService(values)
+      handleSuccess(feedback)
+    } catch (error) {
+      showToast('error', error)
+    } finally {
+      isLoading.value = false
+    }
+  })
+
+  const handleSuccess = (feedback) => {
+    resetForm()
+    showToast('success', feedback)
+  }
+
+  const showToast = (severity, summary) => {
+    toast.add({
+      closable: true,
+      severity: severity,
+      summary: summary
+    })
+  }
+
+  const closeInviteSession = () => {
+    props.inviteSession.closeInviteBlock()
+    showInviteSession.value = false
+  }
+
+  const createModalStore = useCreateModalStore()
+
+  const openModalCreate = () => {
+    tracker.create.createEventInHomeAndHeader({ url: '/', location: 'home' }).track()
+    createModalStore.toggle()
+  }
+
+  const showOnboardingSchedulingDialog = () => {
+    if (route.query.onboardingSession) {
+      dialog.open(DialogOnboardingScheduling)
+    }
+  }
+
+  onMounted(async () => {
+    teams.value = await props.listTeamsService()
+    showOnboardingSchedulingDialog()
+    if (props.inviteSession.sessionIsExpired()) {
+      props.inviteSession.turnInviteBlockVisable()
+    }
+  })
+</script>
+
 <template>
   <ContentBlock>
     <template #content>
@@ -199,159 +355,3 @@
     </template>
   </ContentBlock>
 </template>
-
-<script setup>
-  import { getStaticUrlsByEnvironment } from '@/helpers'
-  import { useAccountStore } from '@/stores/account'
-  import { useCreateModalStore } from '@/stores/create-modal'
-  import ContentBlock from '@/templates/content-block'
-  import { computed, inject, onMounted, ref } from 'vue'
-  import PrimeButton from 'primevue/button'
-  import { useForm } from 'vee-validate'
-  import * as yup from 'yup'
-  import FormFieldsHome from './FormFields/FormFieldsHome.vue'
-  import { useRoute, useRouter } from 'vue-router'
-  import { useToast } from 'primevue/usetoast'
-  import { useDialog } from 'primevue/usedialog'
-  import DialogOnboardingScheduling from '@/templates/dialogs-block/dialog-onboarding-scheduling.vue'
-
-  /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
-  const tracker = inject('tracker')
-
-  defineOptions({ name: 'home-view' })
-
-  const props = defineProps({
-    listTeamsService: {
-      type: Function,
-      required: true
-    },
-    inviteYourTeamService: {
-      type: Function,
-      required: true
-    },
-    inviteSession: {
-      type: Function,
-      required: true
-    },
-    windowManager: {
-      type: Object,
-      required: true
-    }
-  })
-
-  const router = useRouter()
-  const route = useRoute()
-  const dialog = useDialog()
-  const toast = useToast()
-  const user = useAccountStore().accountData
-
-  const teams = ref([])
-  const isLoading = ref(false)
-  const showInviteSession = ref(props.inviteSession.show())
-
-  const isDisabled = computed(() => {
-    return !meta.value?.valid || isLoading.value
-  })
-
-  const disclaimer = computed(() => {
-    return user.disclaimer.replace(/\s<a[^>]+>[^<]+<\/a>/g, '')
-  })
-
-  const showExperimental = computed(() => {
-    return user.disclaimer
-  })
-
-  const navigateToEdgeApplications = () => {
-    router.push({ name: 'list-edge-applications' })
-  }
-
-  const navigateToPayment = () => {
-    const billingUrl = getStaticUrlsByEnvironment('billing')
-    window.open(billingUrl, '_blank')
-  }
-
-  const navigateToRealTimeMetrics = () => {
-    router.push({ name: 'real-time-metrics' })
-  }
-
-  const openDocsEdgeApplication = () => {
-    props.windowManager.documentationGuideProducts.edgeApplication()
-  }
-
-  const openDocsRealTimeMetrics = () => {
-    props.windowManager.documentationGuideProducts.realTimeMetrics()
-  }
-
-  const openProductDocumentation = () => {
-    props.windowManager.openDocumentation()
-  }
-
-  const openAPIDocumentation = () => {
-    props.windowManager.openAPIDocumentation()
-  }
-
-  const openContactSupport = () => {
-    props.windowManager.openContactSupport()
-  }
-
-  const validationSchema = yup.object({
-    name: yup.string().required('Name is a required field'),
-    email: yup.string().email('Must be a valid email').required('E-mail is a required field'),
-    team: yup.string().required()
-  })
-
-  const { meta, resetForm, handleSubmit } = useForm({
-    validationSchema
-  })
-
-  const onSubmit = handleSubmit(async (values) => {
-    try {
-      isLoading.value = true
-      const feedback = await props.inviteYourTeamService(values)
-      handleSuccess(feedback)
-    } catch (error) {
-      showToast('error', error)
-    } finally {
-      isLoading.value = false
-    }
-  })
-
-  const handleSuccess = (feedback) => {
-    resetForm()
-    showToast('success', feedback)
-  }
-
-  const showToast = (severity, summary) => {
-    toast.add({
-      closable: true,
-      severity: severity,
-      summary: summary
-    })
-  }
-
-  const closeInviteSession = () => {
-    props.inviteSession.closeInviteBlock()
-    showInviteSession.value = false
-  }
-
-  const createModalStore = useCreateModalStore()
-
-  const openModalCreate = () => {
-    tracker.create.createEventInHomeAndHeader({ url: '/', location: 'home' }).track()
-    createModalStore.toggle()
-  }
-
-  const showOnboardingSchedulingDialog = () => {
-    if (route.query.onboardingSession) {
-      dialog.open(DialogOnboardingScheduling)
-    }
-  }
-
-  onMounted(async () => {
-    teams.value = await props.listTeamsService()
-    showOnboardingSchedulingDialog()
-    if (props.inviteSession.sessionIsExpired()) {
-      props.inviteSession.turnInviteBlockVisable()
-    }
-  })
-</script>
