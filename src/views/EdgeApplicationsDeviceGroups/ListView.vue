@@ -149,6 +149,7 @@
   >
     <template #default>
       <PrimeButton
+        class="max-md:w-full w-fit"
         @click="openCreateDeviceGroupDrawer"
         severity="secondary"
         icon="pi pi-plus"

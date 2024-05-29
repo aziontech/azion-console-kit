@@ -21,6 +21,7 @@
         </template>
         <template #default>
           <PrimeButton
+            class="max-md:w-full w-fit"
             severity="secondary"
             label="Go to Home"
             @click="navigateToHomePage"

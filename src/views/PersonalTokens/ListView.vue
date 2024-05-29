@@ -14,7 +14,8 @@
         createPagePath="personal-tokens/create"
         @on-load-data="handleLoadData"
         :enableEditClick="false"
-        emptyListMessage="No personal tokens found." />
+        emptyListMessage="No personal tokens found."
+      />
       <EmptyResultsBlock
         v-else
         title="No personal tokens have been generated"
@@ -25,8 +26,9 @@
       >
         <template #illustration>
           <Illustration />
-        </template> </EmptyResultsBlock
-    ></template>
+        </template>
+      </EmptyResultsBlock>
+    </template>
   </ContentBlock>
 </template>
 
