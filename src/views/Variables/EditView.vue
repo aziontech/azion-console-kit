@@ -17,7 +17,7 @@
   const validationSchema = yup.object({
     key: yup
       .string()
-      .test('key', 'Invalid key format.', (value) => keyRegex.test(value))
+      .test('key', 'Invalid key format', (value) => keyRegex.test(value))
       .required(),
     value: yup.string().required(),
     secret: yup.boolean().required().default(false)
