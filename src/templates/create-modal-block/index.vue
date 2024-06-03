@@ -110,7 +110,7 @@
   const isLoading = ref(false)
   const selectedTab = ref('recommended')
   const search = ref('')
-  const searching = computed(() => !!search.value.trim().length)
+  const isSearching = computed(() => !!search.value.trim().length)
 
   const templatesData = ref({
     recommended: [],
@@ -308,7 +308,7 @@
             />
           </span>
         </div>
-        <template v-if="searching">
+        <template v-if="isSearching">
           <template v-if="!!filteredTemplates.length">
             <div class="text-sm">
               {{ resultsText }}
