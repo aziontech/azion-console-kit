@@ -122,7 +122,7 @@
               class="flex flex-wrap p-2 pl-0 align-items-center gap-3 max-w-xs"
               v-if="!loading"
             >
-              <div class="flex-1 flex flex-column gap-2 overflow-hidden">
+              <div class="flex-1 flex flex-column gap-2 overflow-hidden pr-2">
                 <span
                   class="font-normal truncate"
                   v-tooltip.top="slotProps.item.name"
