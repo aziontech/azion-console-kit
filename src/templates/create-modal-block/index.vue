@@ -2,7 +2,7 @@
   import PrimeButton from 'primevue/button'
   import PrimeInputText from 'primevue/inputtext'
   import LoadingState from './create-modal-block-loading-state.vue'
-  import { computed, onBeforeMount, ref, inject } from 'vue'
+  import { computed, onMounted, ref, inject } from 'vue'
   import { useRouter } from 'vue-router'
   import { useToast } from 'primevue/usetoast'
   import { useAccountStore } from '@/stores/account'
@@ -20,41 +20,7 @@
     }
   })
 
-  const emit = defineEmits('closeModal')
-
-  onBeforeMount(async () => {
-    await loadRecommendedSolutions()
-  })
-
-  const router = useRouter()
-  const toast = useToast()
-
-  const isLoading = ref(false)
-  const templates = ref([])
-  const browseTemplates = ref([])
-  const githubTemplates = ref([])
-  const selectedTab = ref('recommended')
-  const search = ref('')
-
-  const items = ref([
-    {
-      label: 'Recommended',
-      value: 'recommended'
-    },
-    {
-      label: 'Templates',
-      value: 'browse'
-    },
-    {
-      label: 'Resources',
-      value: 'new_resource'
-    },
-    {
-      label: 'Import from GitHub',
-      value: 'import_github'
-    }
-  ])
-  const resources = ref([
+  const RESOURCES = [
     {
       label: 'Domains',
       to: '/domains/create?origin=create',
@@ -111,47 +77,57 @@
       description:
         'Add allowlists, blocklists, and greylists to use with Rules Engine for Edge Firewall.'
     }
-  ])
+  ]
 
-  const redirectGithubImport = (template, section) => {
-    tracker.create.selectedOnCreate({
-      section,
-      selection: template.name
-    })
-    const params = {
-      vendor: template.vendor.slug,
-      solution: template.slug
+  const TABS = [
+    {
+      label: 'Recommended',
+      value: 'recommended'
+    },
+    {
+      label: 'Templates',
+      value: 'browse'
+    },
+    {
+      label: 'Resources',
+      value: 'newResource'
+    },
+    {
+      label: 'Import from GitHub',
+      value: 'importGithub'
     }
+  ]
 
-    router.push({ name: 'github-repository-import', params })
-    emit('closeModal')
-  }
+  const emit = defineEmits('closeModal')
 
-  const showRecommended = computed(() => {
-    return selectedTab.value === 'recommended'
-  })
-  const showBrowse = computed(() => {
-    return selectedTab.value === 'browse'
-  })
-  const showResource = computed(() => {
-    return selectedTab.value === 'new_resource'
-  })
-  const showGithubImport = computed(() => {
-    return selectedTab.value === 'import_github'
+  onMounted(async () => {
+    await loadRecommendedSolutions()
   })
 
-  const tabHeader = computed(() => {
-    switch (selectedTab.value) {
-      case 'new_resource':
-        return 'Select a Resource'
-      case 'import_github':
-        return 'Import from GitHub'
-      default:
-        return 'Select a Template'
+  const router = useRouter()
+  const toast = useToast()
+
+  const isLoading = ref(false)
+  const selectedTab = ref('recommended')
+  const search = ref('')
+
+  const templatesData = ref({
+    recommended: [],
+    browse: [],
+    newResource: RESOURCES,
+    importGithub: []
+  })
+
+  const tabInfo = computed(() => {
+    return {
+      recommended: { show: selectedTab.value === 'recommended', title: 'Select a Template' },
+      browse: { show: selectedTab.value === 'browse', title: 'Select a Template' },
+      newResource: { show: selectedTab.value === 'newResource', title: 'Select a Resource' },
+      importGithub: { show: selectedTab.value === 'importGithub', title: 'Import from GitHub' }
     }
   })
 
-  const showToast = (severity, detail) => {
+  const toastBuilder = (severity, detail) => {
     if (!detail) return
     const options = {
       closable: true,
@@ -167,6 +143,39 @@
     toast.add(options)
   }
 
+  const loadSolutions = async ({ group, type = null }) => {
+    try {
+      isLoading.value = true
+      templatesData.value[group] = await props.listSolutionsService({ type })
+    } catch (error) {
+      toastBuilder('error', error)
+    } finally {
+      isLoading.value = false
+    }
+  }
+
+  const loadRecommendedSolutions = async () => {
+    const accountStore = useAccountStore().accountData
+    await loadSolutions({ group: 'recommended', type: accountStore.jobRole })
+  }
+
+  const loadBrowse = async () => {
+    await loadSolutions({ group: 'browse' })
+  }
+
+  const loadImportGithubSolution = async () => {
+    await loadSolutions({ group: 'importGithub', type: 'import-from-github' })
+  }
+
+  const redirect = (toLink, selection) => {
+    tracker.create.selectedOnCreate({
+      section: 'resources',
+      selection
+    })
+    router.push(toLink)
+    emit('closeModal')
+  }
+
   const redirectToSolution = (template, section) => {
     tracker.create.selectedOnCreate({
       section,
@@ -180,47 +189,18 @@
     emit('closeModal')
   }
 
-  const redirect = (toLink, selection) => {
+  const redirectGithubImport = (template, section) => {
     tracker.create.selectedOnCreate({
-      section: 'resources',
-      selection
+      section,
+      selection: template.name
     })
-    router.push(toLink)
+    const params = {
+      vendor: template.vendor.slug,
+      solution: template.slug
+    }
+
+    router.push({ name: 'github-repository-import', params })
     emit('closeModal')
-  }
-
-  const loadRecommendedSolutions = async () => {
-    try {
-      isLoading.value = true
-      const accountStore = useAccountStore().accountData
-      templates.value = await props.listSolutionsService({ type: accountStore.jobRole })
-    } catch (error) {
-      showToast('error', error)
-    } finally {
-      isLoading.value = false
-    }
-  }
-
-  const loadBrowse = async () => {
-    try {
-      isLoading.value = true
-      browseTemplates.value = await props.listSolutionsService({})
-    } catch (error) {
-      showToast('error', error)
-    } finally {
-      isLoading.value = false
-    }
-  }
-
-  const loadImportGithubSolution = async () => {
-    try {
-      isLoading.value = true
-      githubTemplates.value = await props.listSolutionsService({ type: 'import-from-github' })
-    } catch (error) {
-      showToast('error', error)
-    } finally {
-      isLoading.value = false
-    }
   }
 
   const onTabChange = async (target) => {
@@ -229,21 +209,21 @@
     }
 
     selectedTab.value = target.value || selectedTab.value
-    if (target.value === 'browse' && browseTemplates.value.length === 0) {
+    if (target.value === 'browse' && templatesData.value.browse.length === 0) {
       await loadBrowse()
       return
     }
 
-    if (target.value === 'import_github' && githubTemplates.value.length === 0) {
+    if (target.value === 'importGithub' && templatesData.value.importGithub.length === 0) {
       await loadImportGithubSolution()
       return
     }
   }
 
   const filterBySearchField = () => {
-    if (!search.value.trim()) return
+    if (!search.value.trim()) return templatesData.value[selectedTab.value]
 
-    return templates.value.filter((template) => {
+    return templatesData.value[selectedTab.value].filter((template) => {
       return Object.keys(template).some((key) => {
         const props = { template, key, filter: search.value }
 
@@ -265,6 +245,10 @@
 
     return template[key].toLowerCase().includes(filter.toLowerCase())
   }
+
+  const filteredTemplates = computed(() => {
+    return filterBySearchField()
+  })
 </script>
 
 <template>
@@ -272,7 +256,7 @@
     <div class="-ml-2 sm:min-w-[240px]">
       <ul class="flex flex-col gap-1 md:fixed md:w-60">
         <li
-          v-for="(menuitem, index) in items"
+          v-for="(menuitem, index) in TABS"
           :key="index"
         >
           <PrimeButton
@@ -297,7 +281,7 @@
         v-else
       >
         <div class="text-base font-medium">
-          {{ tabHeader }}
+          {{ tabInfo[selectedTab].title }}
         </div>
         <span class="p-input-icon-left">
           <i class="pi pi-search" />
@@ -313,10 +297,10 @@
 
       <div
         class="mx-0 w-full mt-0 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"
-        v-if="showRecommended"
+        v-if="tabInfo.recommended.show"
       >
         <PrimeButton
-          v-for="template in templates"
+          v-for="template in filteredTemplates"
           :key="template.id"
           @click="redirectToSolution(template, 'recommended')"
           class="p-6 text-left border-solid border surface-border hover:border-primary transition-all"
@@ -349,10 +333,10 @@
       </div>
       <div
         class="mx-0 w-full mt-0 grid grid-cols-1 lg:grid-cols-3 md:grid-cols-2 gap-4"
-        v-if="showBrowse"
+        v-if="tabInfo.browse.show"
       >
         <PrimeButton
-          v-for="template in browseTemplates"
+          v-for="template in filteredTemplates"
           :key="template.id"
           @click="redirectToSolution(template, 'templates')"
           class="p-6 text-left border-solid border surface-border hover:border-primary transition-all"
@@ -385,10 +369,10 @@
       </div>
       <div
         class="mx-0 w-full mt-0 grid grid-cols-1 lg:grid-cols-3 md:grid-cols-2 gap-4"
-        v-if="showResource"
+        v-if="tabInfo.newResource.show"
       >
         <PrimeButton
-          v-for="resource in resources"
+          v-for="resource in filteredTemplates"
           :key="resource.to"
           @click="redirect(resource.to, resource.label)"
           class="p-6 text-left border-solid border surface-border hover:border-primary transition-all"
@@ -412,10 +396,10 @@
       </div>
       <div
         class="mx-0 w-full mt-0 grid grid-cols-1 lg:grid-cols-3 md:grid-cols-2 gap-4"
-        v-if="showGithubImport"
+        v-if="tabInfo.importGithub.show"
       >
         <PrimeButton
-          v-for="(template, index) in githubTemplates"
+          v-for="(template, index) in filteredTemplates"
           :key="index"
           @click="redirectGithubImport(template, 'githubImport')"
           class="p-6 text-left border-solid border surface-border hover:border-primary transition-all"
