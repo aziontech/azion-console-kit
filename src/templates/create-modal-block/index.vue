@@ -147,7 +147,7 @@
   const loadSolutions = async ({ group, type = null }) => {
     try {
       isLoading.value = true
-      templatesData.value[group] = await props.listSolutionsService({ type })
+      templatesData.value[group] = await props.listSolutionsService({ group, type })
     } catch (error) {
       toastBuilder('error', error)
     } finally {
