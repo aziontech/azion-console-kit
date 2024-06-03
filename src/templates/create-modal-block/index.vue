@@ -110,6 +110,7 @@
   const isLoading = ref(false)
   const selectedTab = ref('recommended')
   const search = ref('')
+  const searching = computed(() => !!search.value.trim().length)
 
   const templatesData = ref({
     recommended: [],
@@ -211,12 +212,8 @@
     selectedTab.value = target.value || selectedTab.value
     if (target.value === 'browse' && templatesData.value.browse.length === 0) {
       await loadBrowse()
-      return
-    }
-
-    if (target.value === 'importGithub' && templatesData.value.importGithub.length === 0) {
+    } else if (target.value === 'importGithub' && templatesData.value.importGithub.length === 0) {
       await loadImportGithubSolution()
-      return
     }
   }
 
@@ -249,6 +246,22 @@
   const filteredTemplates = computed(() => {
     return filterBySearchField()
   })
+
+  const resetFilters = () => {
+    search.value = ''
+  }
+
+  const resultsText = computed(() => {
+    const options = {
+      zero: 'No results found.',
+      one: '1 search result for',
+      multiple: `${filteredTemplates.value.length} search results for`
+    }
+
+    if (!filteredTemplates.value.length) return options.zero
+    if (filteredTemplates.value.length === 1) return options.one
+    return options.multiple
+  })
 </script>
 
 <template>
@@ -277,22 +290,44 @@
     <div class="overflow-auto w-full flex flex-col">
       <LoadingState v-if="isLoading" />
       <div
-        class="flex flex-col gap-4 mb-4 w-full"
+        class="flex flex-col gap-5 mb-5 w-full"
         v-else
       >
-        <div class="text-base font-medium">
-          {{ tabInfo[selectedTab].title }}
+        <div class="flex flex-col gap-3">
+          <div class="text-base font-medium">
+            {{ tabInfo[selectedTab].title }}
+          </div>
+          <span class="p-input-icon-left">
+            <i class="pi pi-search" />
+            <PrimeInputText
+              class="w-full"
+              type="text"
+              placeholder="Search by name, framework, or keyword"
+              v-model="search"
+              @input="filterBySearchField"
+            />
+          </span>
         </div>
-        <span class="p-input-icon-left">
-          <i class="pi pi-search" />
-          <PrimeInputText
-            class="w-full"
-            type="text"
-            placeholder="Search by name, framework, or keyword"
-            v-model="search"
-            @input="filterBySearchField"
-          />
-        </span>
+        <template v-if="searching">
+          <template v-if="!!filteredTemplates.length">
+            <div class="text-sm">
+              {{ resultsText }}
+              <span class="font-medium">“{{ search }}”</span>
+            </div>
+          </template>
+          <template v-else>
+            <div class="text-sm">
+              <span>{{ resultsText }}</span>
+              <PrimeButton
+                label="See full integrations list."
+                link
+                class="ml-3 p-0"
+                size="small"
+                @click="resetFilters"
+              />
+            </div>
+          </template>
+        </template>
       </div>
 
       <div
