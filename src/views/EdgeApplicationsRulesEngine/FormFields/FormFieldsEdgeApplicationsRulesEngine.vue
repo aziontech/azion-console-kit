@@ -844,7 +844,6 @@
               :value="behaviors[behaviorIndex].value.name"
               inputClass="w-full"
               @onChange="(newValue) => changeBehaviorType(newValue, behaviorIndex)"
-              :disabled="checkPhaseIsDefaultValue && behaviorItem.key === 0"
             />
           </div>
 
