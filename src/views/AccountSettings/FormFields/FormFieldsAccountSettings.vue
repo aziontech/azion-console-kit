@@ -7,7 +7,7 @@
   import TextArea from 'primevue/textarea'
   import { useToast } from 'primevue/usetoast'
   import { useField } from 'vee-validate'
-  import { onMounted, ref, watch } from 'vue'
+  import { onMounted, ref, watch, computed } from 'vue'
   import { TOAST_LIFE } from '@/utils/constants'
 
   const props = defineProps({
@@ -103,20 +103,41 @@
     }
   }
 
-  watch(country, (value) => {
-    setRegionsOptions(value)
-  })
+  watch(
+    [country, countriesOptions.value],
+    (value) => {
+      const countryId = value[0]
 
-  watch(region, (value) => {
-    if (value) {
-      setCitiesOptions(value)
-    }
-  })
+      if (countryId && countriesOptions.value.options.length) {
+        setRegionsOptions(countryId)
+      }
+    },
+    { deep: true }
+  )
+
+  watch(
+    [region, regionsOptions.value],
+    (value) => {
+      const regionId = value[0]
+
+      if (regionId && regionsOptions.value.options.length) {
+        setCitiesOptions(regionId)
+      }
+    },
+    { deep: true }
+  )
 
   const resetRegionAndCity = () => {
     region.value = ''
     city.value = ''
   }
+
+  const hasNoCountryListOrNotSelected = computed(
+    () => !countriesOptions.value.options.length || !country.value
+  )
+  const hasNoRegionListOrNotSelected = computed(
+    () => !citiesOptions.value.options.length || !region.value
+  )
 </script>
 
 <template>
@@ -309,6 +330,7 @@
             :options="regionsOptions.options"
             v-model="region"
             :loading="!regionsOptions.done"
+            :disabled="hasNoCountryListOrNotSelected"
           />
           <small class="text-xs text-color-secondary font-normal leading-5">
             Account owner's state or region.
@@ -337,6 +359,7 @@
             v-model="city"
             :class="{ 'p-invalid': cityError }"
             :loading="!citiesOptions.done"
+            :disabled="hasNoRegionListOrNotSelected"
           />
           <small class="text-xs text-color-secondary font-normal leading-5">
             Account owner's city.
