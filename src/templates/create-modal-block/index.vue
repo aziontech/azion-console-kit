@@ -86,7 +86,7 @@
     },
     {
       label: 'Templates',
-      value: 'browse'
+      value: 'templates'
     },
     {
       label: 'Resources',
@@ -94,7 +94,7 @@
     },
     {
       label: 'Import from GitHub',
-      value: 'importGithub'
+      value: 'githubImport'
     }
   ]
 
@@ -114,17 +114,17 @@
 
   const templatesData = ref({
     recommended: [],
-    browse: [],
+    templates: [],
     newResource: RESOURCES,
-    importGithub: []
+    githubImport: []
   })
 
   const tabInfo = computed(() => {
     return {
       recommended: { show: selectedTab.value === 'recommended', title: 'Select a Template' },
-      browse: { show: selectedTab.value === 'browse', title: 'Select a Template' },
+      templates: { show: selectedTab.value === 'templates', title: 'Select a Template' },
       newResource: { show: selectedTab.value === 'newResource', title: 'Select a Resource' },
-      importGithub: { show: selectedTab.value === 'importGithub', title: 'Import from GitHub' }
+      githubImport: { show: selectedTab.value === 'githubImport', title: 'Import from GitHub' }
     }
   })
 
@@ -160,12 +160,12 @@
     await loadSolutions({ group: 'recommended', type: accountStore.jobRole })
   }
 
-  const loadBrowse = async () => {
-    await loadSolutions({ group: 'browse' })
+  const loadTemplates = async () => {
+    await loadSolutions({ group: 'templates' })
   }
 
-  const loadImportGithubSolution = async () => {
-    await loadSolutions({ group: 'importGithub', type: 'import-from-github' })
+  const loadGithubImportSolution = async () => {
+    await loadSolutions({ group: 'githubImport', type: 'import-from-github' })
   }
 
   const redirect = (toLink, selection) => {
@@ -210,10 +210,10 @@
     }
 
     selectedTab.value = target.value || selectedTab.value
-    if (target.value === 'browse' && templatesData.value.browse.length === 0) {
-      await loadBrowse()
-    } else if (target.value === 'importGithub' && templatesData.value.importGithub.length === 0) {
-      await loadImportGithubSolution()
+    if (target.value === 'templates' && templatesData.value.templates.length === 0) {
+      await loadTemplates()
+    } else if (target.value === 'githubImport' && templatesData.value.githubImport.length === 0) {
+      await loadGithubImportSolution()
     }
   }
 
@@ -368,7 +368,7 @@
       </div>
       <div
         class="mx-0 w-full mt-0 grid grid-cols-1 lg:grid-cols-3 md:grid-cols-2 gap-4"
-        v-if="tabInfo.browse.show"
+        v-if="tabInfo.templates.show"
       >
         <PrimeButton
           v-for="template in filteredTemplates"
@@ -431,7 +431,7 @@
       </div>
       <div
         class="mx-0 w-full mt-0 grid grid-cols-1 lg:grid-cols-3 md:grid-cols-2 gap-4"
-        v-if="tabInfo.importGithub.show"
+        v-if="tabInfo.githubImport.show"
       >
         <PrimeButton
           v-for="(template, index) in filteredTemplates"
