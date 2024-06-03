@@ -11,7 +11,7 @@
   import FieldGroupRadio from '@/templates/form-fields-inputs/fieldGroupRadio'
   import FieldSwitchBlock from '@/templates/form-fields-inputs/fieldSwitchBlock'
 
-  import { computed, ref, onMounted } from 'vue'
+  import { computed, ref, onMounted, watch } from 'vue'
   import { useToast } from 'primevue/usetoast'
 
   const props = defineProps({
@@ -44,7 +44,8 @@
       required: true
     },
     initialPhase: {
-      type: String
+      type: String,
+      default: 'default'
     },
     selectedRulesEngineToEdit: {
       type: Object,
@@ -262,7 +263,9 @@
     response: () => behaviorsResponseOptions.value
   }
 
-  const behaviorsOptions = computed(() => behaviorsOptionsMap[phase.value]() || [])
+  const behaviorsOptions = computed(() => {
+    return behaviorsOptionsMap[phase.value]() || []
+  })
 
   /**
    * Updates the 'requires' property of behavior options based on component props.
@@ -403,7 +406,9 @@
 
     let targetValue = behaviors.value[index].value.target
     if (!isEditDrawer.value) targetValue = ''
-    if (typeof targetValue == 'object' && Object.keys(targetValue).length === 0) targetValue = ''
+    if (targetValue && typeof targetValue == 'object' && Object.keys(targetValue).length === 0) {
+      targetValue = ''
+    }
 
     updateBehavior(index, { name: behaviorName, target: targetValue })
     setShowNewBehaviorButton(true)
@@ -578,18 +583,26 @@
     return behaviors.value.length >= MAXIMUM_NUMBER
   })
 
-  const phasesRadioOptions = [
-    {
-      title: 'Request Phase',
-      value: 'request',
-      subtitle: 'Configure the requests made to the edge.'
-    },
-    {
-      title: 'Response Phase',
-      value: 'response',
-      subtitle: 'Configure the responses delivered to end-users.'
+  const phasesRadioOptions = ref([])
+
+  watch(checkPhaseIsDefaultValue, () => {
+    if (!checkPhaseIsDefaultValue.value) {
+      phasesRadioOptions.value = [
+        {
+          title: 'Request Phase',
+          value: 'request',
+          subtitle: 'Configure the requests made to the edge.'
+        },
+        {
+          title: 'Response Phase',
+          value: 'response',
+          subtitle: 'Configure the responses delivered to end-users.'
+        }
+      ]
+    } else {
+      phasesRadioOptions.value = []
     }
-  ]
+  })
 
   onMounted(() => {
     updateBehaviorsOptionsRequires()
