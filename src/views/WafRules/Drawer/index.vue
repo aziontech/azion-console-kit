@@ -157,7 +157,7 @@
               <span class="w-1/2 text-color">Domain</span>
               <div class="flex flex-col w-1/2">
                 <span
-                  class="w-full text-color-secondary whitespace-pre-line"
+                  class="w-full text-color-secondary break-all"
                   v-for="(domain, index) in props.domains"
                   :key="index"
                   >{{ domain }}
@@ -248,8 +248,9 @@
                         <div class="flex flex-col text-color w-1/2">
                           <span>Top 10 Paths</span>
                         </div>
-                        <div class="flex w-1/2 flex-col">
+                        <div class="flex flex-col w-1/2">
                           <span
+                            class="break-all"
                             v-for="(path, index) in attack.topPaths"
                             :key="index"
                             :class="{
