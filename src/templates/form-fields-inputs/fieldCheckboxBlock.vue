@@ -97,7 +97,7 @@
   }
 
   const clickCard = (event) => {
-    if (props.binary) {
+    if (props.binary && !props.disabled) {
       stopPropagation(event)
       handleChange(!inputValue.value)
       return
