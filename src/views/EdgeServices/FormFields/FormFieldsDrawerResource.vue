@@ -1,5 +1,6 @@
 <script setup>
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
+  import FieldDropdown from '@/templates/form-fields-inputs/fieldDropdown.vue'
   import InputText from 'primevue/inputtext'
   import { computed } from 'vue'
   import { useAccountStore } from '@/stores/account'
@@ -97,11 +98,15 @@
           </div>
         </div>
       </div>
-      <FieldGroupRadio
+
+      <FieldDropdown
         label="Type"
-        nameField="contentType"
-        :isCard="false"
         :options="typeRadioOptions"
+        optionLabel="title"
+        optionValue="value"
+        inputClass="w-full"
+        name="contentType"
+        :value="contentType"
       />
 
       <div v-show="isShellScript">
