@@ -224,7 +224,7 @@
       return Object.keys(template).some((key) => {
         const props = { template, key, filter: search.value }
 
-        if (key === 'vendor' || key === 'instance_type') {
+        if (key === 'vendor' || key === 'instanceType') {
           return findTemplatesByFilter({ ...props, nestedKey: 'name' })
         }
 
