@@ -113,6 +113,7 @@
   }
 
   const handleSuccessEdit = () => {
+    showEditFunctionDrawer.value = false
     emit('onSuccess')
     handleTrackSuccessEdit()
   }
@@ -155,7 +156,6 @@
 
   const closeDrawerEdit = (error) => {
     handleFailedEditEdgeFirewallFunctions(error)
-    showEditFunctionDrawer.value = false
   }
 
   const handleCreateFunction = () => {

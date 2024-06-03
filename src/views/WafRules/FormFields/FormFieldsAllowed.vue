@@ -144,9 +144,7 @@
       <Divider
         align="left"
         type="dashed"
-      >
-        Then
-      </Divider>
+      ></Divider>
       <div class="flex flex-col gap-8">
         <div
           v-for="(item, index) in matchZones"
@@ -178,7 +176,7 @@
             <label
               for="ruleid"
               class="text-color text-sm font-medium"
-              >Match Zones *</label
+              >Match Zone *</label
             >
             <Dropdown
               appendTo="self"

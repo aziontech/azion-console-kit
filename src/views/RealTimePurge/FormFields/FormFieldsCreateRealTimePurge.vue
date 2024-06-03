@@ -48,19 +48,22 @@
       {
         title: 'Cache Key',
         value: 'cachekey',
+        name: 'cachekey-purge-type',
         disabled: isDisabledPurgeTypeInTieredCache,
         subtitle: `Enter a list of content cache keys to be purged.`
       },
       {
         title: 'URL',
         value: 'url',
-        disabled: isDisabledPurgeTypeInTieredCache,
+        name: 'url-purge-type',
+        hide: isDisabledPurgeTypeInTieredCache,
         subtitle: `Enter a list of content URLs to be purged. Asterisks (*) in URLs are considered characters.`
       },
       {
         title: 'Wildcard',
         value: 'wildcard',
-        disabled: isDisabledPurgeTypeInTieredCache,
+        name: 'wildcard-purge-type',
+        hide: isDisabledPurgeTypeInTieredCache,
         subtitle: `Enter a list of content URLs to be purged. Asterisks (*) are considered wildcard expressions.`
       }
     ]

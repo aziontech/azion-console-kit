@@ -138,7 +138,7 @@
         'only-ascii',
         'Invalid characters. Use letters, numbers, and standard symbols, with no accents.',
         function (value) {
-          const nameRegex = /^[\x20-\x7E]+$/
+          const nameRegex = /^[\x20-\x21\x23-\x7E]+$/
           return nameRegex.test(value)
         }
       ),
