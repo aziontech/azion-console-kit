@@ -29,7 +29,11 @@ const makeSearchParams = ({ group }) => {
     searchParams.set('group', group)
   }
 
-  return `?${searchParams.toString()}`
+  if (searchParams.toString().length) {
+    return `?${searchParams.toString()}`
+  }
+
+  return ''
 }
 
 const adapt = (httpResponse) => {
