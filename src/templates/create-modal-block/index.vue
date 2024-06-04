@@ -205,6 +205,7 @@
   }
 
   const onTabChange = async (target) => {
+    resetFilters()
     if (isLoading.value) {
       return
     }
@@ -217,12 +218,12 @@
     }
   }
 
-  const filterBySearchField = () => {
-    if (!search.value.trim()) return templatesData.value[selectedTab.value]
+  const filterBySearchField = (filter) => {
+    if (!filter?.trim()) return templatesData.value[selectedTab.value]
 
     return templatesData.value[selectedTab.value].filter((template) => {
       return Object.keys(template).some((key) => {
-        const props = { template, key, filter: search.value }
+        const props = { template, key, filter }
 
         if (key === 'vendor' || key === 'instanceType' || key === 'category') {
           return findTemplatesByFilter({ ...props, nestedKey: 'name' })
@@ -244,7 +245,7 @@
   }
 
   const filteredTemplates = computed(() => {
-    return filterBySearchField()
+    return filterBySearchField(search.value)
   })
 
   const resetFilters = () => {
@@ -297,14 +298,16 @@
           <div class="text-base font-medium">
             {{ tabInfo[selectedTab].title }}
           </div>
-          <span class="p-input-icon-left">
+          <span
+            v-if="!tabInfo.githubImport.show"
+            class="p-input-icon-left"
+          >
             <i class="pi pi-search" />
             <PrimeInputText
               class="w-full"
               type="text"
               placeholder="Search by name, framework, or keyword"
               v-model="search"
-              @input="filterBySearchField"
             />
           </span>
         </div>
