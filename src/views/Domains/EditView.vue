@@ -133,7 +133,17 @@
 
   const validationSchema = yup.object({
     id: yup.string().required(),
-    name: yup.string().required(),
+    name: yup
+      .string()
+      .required()
+      .test(
+        'only-ascii',
+        'Invalid characters. Use letters, numbers, and standard symbols, with no accents.',
+        function (value) {
+          const nameRegex = /^[\x20-\x21\x23-\x7E]+$/
+          return nameRegex.test(value)
+        }
+      ),
     domainName: yup.string().required(),
     active: yup.boolean(),
     cnames: yup

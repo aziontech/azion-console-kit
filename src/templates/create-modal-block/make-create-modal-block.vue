@@ -1,6 +1,6 @@
 <script setup>
   import CreateModalBlock from './index.vue'
-  import * as MarketplaceService from '@/services/marketplace-services'
+  import * as SolutionsService from '@/services/solutions-services'
 
   defineOptions({
     name: 'make-create-modal-block'
@@ -8,5 +8,5 @@
 </script>
 
 <template>
-  <CreateModalBlock :listSolutionsService="MarketplaceService.listSolutionsService" />
+  <CreateModalBlock :listSolutionsService="SolutionsService.listSolutionsService" />
 </template>
