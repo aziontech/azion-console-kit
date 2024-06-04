@@ -218,12 +218,12 @@
     }
   }
 
-  const filterBySearchField = (input) => {
-    if (!input?.trim()) return templatesData.value[selectedTab.value]
+  const filterBySearchField = (filter) => {
+    if (!filter?.trim()) return templatesData.value[selectedTab.value]
 
     return templatesData.value[selectedTab.value].filter((template) => {
       return Object.keys(template).some((key) => {
-        const props = { template, key, filter: search.value }
+        const props = { template, key, filter }
 
         if (key === 'vendor' || key === 'instanceType' || key === 'category') {
           return findTemplatesByFilter({ ...props, nestedKey: 'name' })
