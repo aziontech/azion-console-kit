@@ -243,6 +243,7 @@
       >
         <template #default>
           <PrimeButton
+            class="max-md:w-full w-fit"
             @click="openCreateRulesEngineDrawerByPhase"
             severity="secondary"
             icon="pi pi-plus"
