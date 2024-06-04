@@ -5,7 +5,7 @@ import { describe, expect, it, vi } from 'vitest'
 
 const fixtures = {
   solutionSample: {
-    id: 9,
+    id: 123,
     name: 'JWT',
     slug: 'jwt',
     headline: 'JSON Web Token is an Internet standard for creating data with optional signature',
@@ -17,30 +17,43 @@ const fixtures = {
     },
     category: [
       {
-        name: 'Security',
-        slug: 'security'
-      },
-      {
-        name: 'Performance',
-        slug: 'performance'
-      },
-      {
-        name: 'Networking',
-        slug: 'networking'
+        name: 'Build',
+        slug: 'build'
       }
     ],
     new_release: true,
     solution_reference_id: '123',
     featured: false,
     updated_at: '12/11/20, 13:40PM',
-    is_launched: true,
-    dependencies_by_client: [],
     instance_type: {
       name: 'Edge Function',
       slug: 'edge_function',
       is_template: false
     }
-  }
+  },
+  formattedSolutions: [
+    {
+      id: '123',
+      name: 'JWT',
+      referenceId: '123',
+      vendor: {
+        name: 'Azion',
+        slug: 'azion',
+        url: 'https://azion.com',
+        icon: 'https://azion-images-stage.s3.amazonaws.com/media/1214e.png'
+      },
+      slug: 'jwt',
+      headline: 'JSON Web Token is an Internet standard for creating data with optional signature',
+      featured: false,
+      released: true,
+      instanceType: {
+        name: 'Edge Function',
+        isTemplate: false
+      },
+      category: 'Build',
+      updatedAt: '12/11/20, 13:40PM'
+    }
+  ]
 }
 
 const makeSut = () => {
@@ -114,21 +127,7 @@ describe('SolutionsServices', () => {
 
     result.sort((serviceA, serviceB) => serviceA.name.localeCompare(serviceB.name))
 
-    expect(result).toEqual([
-      {
-        headline: fixtures.solutionSample.headline,
-        id: fixtures.solutionSample.id,
-        name: fixtures.solutionSample.name,
-        referenceId: fixtures.solutionSample.solution_reference_id,
-        vendor: fixtures.solutionSample.vendor,
-        slug: fixtures.solutionSample.slug,
-        released: fixtures.solutionSample.new_release,
-        featured: fixtures.solutionSample.featured,
-        instanceType: {
-          isTemplate: fixtures.solutionSample.instance_type.is_template
-        }
-      }
-    ])
+    expect(result).toEqual(fixtures.formattedSolutions)
   })
 
   it.each([

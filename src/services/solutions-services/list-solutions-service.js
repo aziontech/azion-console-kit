@@ -41,7 +41,7 @@ const adapt = (httpResponse) => {
   const parsedServices =
     isArray && httpResponse.body.length
       ? httpResponse.body.map((element) => ({
-          id: element.id,
+          id: `${element.id}`,
           name: element.name,
           referenceId: element.solution_reference_id,
           vendor: element.vendor,
@@ -50,8 +50,11 @@ const adapt = (httpResponse) => {
           featured: element.featured,
           released: element.new_release,
           instanceType: {
+            name: element.instance_type.name,
             isTemplate: element.instance_type.is_template
-          }
+          },
+          category: element.category[0]?.name,
+          updatedAt: element.updated_at
         }))
       : []
 
