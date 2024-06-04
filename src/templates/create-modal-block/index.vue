@@ -294,14 +294,14 @@
         class="flex flex-col gap-5 mb-5 w-full"
         v-else
       >
-        <div
-          v-if="!tabInfo.githubImport.show"
-          class="flex flex-col gap-3"
-        >
+        <div class="flex flex-col gap-3">
           <div class="text-base font-medium">
             {{ tabInfo[selectedTab].title }}
           </div>
-          <span class="p-input-icon-left">
+          <span
+            v-if="!tabInfo.githubImport.show"
+            class="p-input-icon-left"
+          >
             <i class="pi pi-search" />
             <PrimeInputText
               class="w-full"
