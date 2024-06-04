@@ -1,6 +1,7 @@
 <script setup>
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
   import PrimeTextarea from 'primevue/textarea'
+  import PrimeTag from 'primevue/tag'
   import { useField } from 'vee-validate'
   import { computed, watch } from 'vue'
   import FieldGroupRadio from '@/templates/form-fields-inputs/fieldGroupRadio'
@@ -41,29 +42,33 @@
     }
   ]
 
-  const purgeTypeRadioOptions = computed(() => {
-    const isDisabledPurgeTypeInTieredCache = layer.value === 'tiered_cache'
+  const isLayerTieredCache = computed(() => layer.value === 'tiered_cache')
 
+  const purgeTypeRadioOptions = computed(() => {
     return [
       {
         title: 'Cache Key',
         value: 'cachekey',
         name: 'cachekey-purge-type',
-        disabled: isDisabledPurgeTypeInTieredCache,
-        subtitle: `Enter a list of content cache keys to be purged.`
+        disabled: isLayerTieredCache.value,
+        subtitle: `Enter a list of content cache keys to be purged.`,
+        tag: {
+          value: 'Automatically enabled in all accounts.',
+          icon: 'pi pi-lock'
+        }
       },
       {
         title: 'URL',
         value: 'url',
         name: 'url-purge-type',
-        hide: isDisabledPurgeTypeInTieredCache,
+        hide: isLayerTieredCache.value,
         subtitle: `Enter a list of content URLs to be purged. Asterisks (*) in URLs are considered characters.`
       },
       {
         title: 'Wildcard',
         value: 'wildcard',
         name: 'wildcard-purge-type',
-        hide: isDisabledPurgeTypeInTieredCache,
+        hide: isLayerTieredCache.value,
         subtitle: `Enter a list of content URLs to be purged. Asterisks (*) are considered wildcard expressions.`
       }
     ]
@@ -101,7 +106,17 @@
         nameField="purgeType"
         isCard
         :options="purgeTypeRadioOptions"
-      />
+      >
+        <template #footer="{ item }">
+          <PrimeTag
+            v-if="item?.tag && isLayerTieredCache"
+            :value="item.tag.value"
+            :icon="item.tag.icon"
+            severity="info"
+            class="mt-3"
+          />
+        </template>
+      </FieldGroupRadio>
     </template>
   </FormHorizontal>
 

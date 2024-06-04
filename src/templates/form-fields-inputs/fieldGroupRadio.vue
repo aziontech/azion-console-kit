@@ -86,7 +86,7 @@
           @onRadioChange="emit('onRadioChange', item.value)"
         >
           <template #footer>
-            <slot :item="item" />
+            <slot name="footer" :item="item" />
           </template>
         </FieldRadioBlock>
         <PrimeDivider

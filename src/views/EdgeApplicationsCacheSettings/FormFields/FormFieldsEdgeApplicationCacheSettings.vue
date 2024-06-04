@@ -111,8 +111,8 @@
   const layerFileOptimizationRadioOptions = computed(() => [
     {
       title: 'Edge Cache',
-      value: false,
-      disabled: l2CachingEnabled.value,
+      value: true,
+      disabled: showSliceConfigurationRange.value,
       nameField: 'isSliceEdgeCachingEnabled',
       binary: true
     },
@@ -221,10 +221,16 @@
   })
 
   watch(l2CachingEnabled, (value) => {
-    cdnCacheSettings.value = value ? 'override' : cdnCacheSettings.value
-    isSliceEdgeCachingEnabled.value = value
-    sliceConfigurationEnabled.value = value
-    isSliceL2CachingEnabled.value = !value
+    emit('l2-caching-enabled', value)
+
+    if (value) {
+      cdnCacheSettings.value = 'override'
+      isSliceEdgeCachingEnabled.value = true
+      sliceConfigurationEnabled.value = true
+      return
+    }
+
+    isSliceL2CachingEnabled.value = false
 
     const hasNotApplicationAcceleratorAndExceedMinimumValue =
       !props.isEnableApplicationAccelerator &&
@@ -233,8 +239,10 @@
     if (!value && hasNotApplicationAcceleratorAndExceedMinimumValue) {
       cdnCacheSettingsMaximumTtl.value = CDN_MAXIMUM_TTL_MAX_VALUE
     }
+  })
 
-    emit('l2-caching-enabled', value)
+  watch(sliceConfigurationEnabled, (value) => {
+    isSliceEdgeCachingEnabled.value = value
   })
 </script>
 
@@ -383,7 +391,9 @@
         :isCard="false"
         title="Active"
       />
+
       <FieldGroupCheckbox
+        v-if="showSliceConfigurationRange"
         label="Layer"
         :options="layerFileOptimizationRadioOptions"
         :isCard="false"
