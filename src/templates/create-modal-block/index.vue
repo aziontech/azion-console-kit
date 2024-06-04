@@ -205,6 +205,7 @@
   }
 
   const onTabChange = async (target) => {
+    resetFilters()
     if (isLoading.value) {
       return
     }
@@ -217,8 +218,8 @@
     }
   }
 
-  const filterBySearchField = () => {
-    if (!search.value.trim()) return templatesData.value[selectedTab.value]
+  const filterBySearchField = (input) => {
+    if (!input?.trim()) return templatesData.value[selectedTab.value]
 
     return templatesData.value[selectedTab.value].filter((template) => {
       return Object.keys(template).some((key) => {
@@ -244,7 +245,7 @@
   }
 
   const filteredTemplates = computed(() => {
-    return filterBySearchField()
+    return filterBySearchField(search.value)
   })
 
   const resetFilters = () => {
@@ -293,7 +294,10 @@
         class="flex flex-col gap-5 mb-5 w-full"
         v-else
       >
-        <div class="flex flex-col gap-3">
+        <div
+          v-if="!tabInfo.githubImport.show"
+          class="flex flex-col gap-3"
+        >
           <div class="text-base font-medium">
             {{ tabInfo[selectedTab].title }}
           </div>
@@ -304,7 +308,6 @@
               type="text"
               placeholder="Search by name, framework, or keyword"
               v-model="search"
-              @input="filterBySearchField"
             />
           </span>
         </div>
