@@ -98,17 +98,17 @@
           </div>
         </div>
       </div>
-
-      <FieldDropdown
-        label="Type"
-        :options="typeRadioOptions"
-        optionLabel="title"
-        optionValue="value"
-        inputClass="w-full"
-        name="contentType"
-        :value="contentType"
-      />
-
+      <div class="flex flex-col sm:w-2/5 gap-2">
+        <FieldDropdown
+          label="Type"
+          :options="typeRadioOptions"
+          optionLabel="title"
+          optionValue="value"
+          inputClass="w-full"
+          name="contentType"
+          :value="contentType"
+        />
+      </div>
       <div v-show="isShellScript">
         <FieldGroupRadio
           label="Trigger Type"
