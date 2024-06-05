@@ -84,7 +84,7 @@
     return props.counter
       ? {
           badge: props.counter.toString(),
-          badgeClass: 'p-badge-lg text-color bg-transparent'
+          badgeClass: 'p-badge-lg text-color bg-transparent h-5 min-w-[20px]'
         }
       : null
   })
