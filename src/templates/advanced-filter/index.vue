@@ -241,7 +241,7 @@
   })
 </script>
 <template>
-  <div class="flex w-full min-w-0 flex-column gap-4 md:gap-2 md:flex-row">
+  <div class="flex w-full min-w-0 flex-column gap-2 md:flex-row">
     <dialogFilter
       :disabled="props.disabled"
       ref="refDialogFilter"
