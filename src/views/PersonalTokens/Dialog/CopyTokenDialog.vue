@@ -5,11 +5,11 @@
     visible
     :closable="false"
     class="max-w-2xl"
-    header="Your personal token has been created"
+    header="Personal token has been created"
   >
     <div class="flex flex-col gap-3.5">
       <InlineMessage severity="warn">
-        If you close this dialog, you'll no longer be able to access your personal token.
+        This token will only be displayed once. Make sure to copy and store it safely.
       </InlineMessage>
 
       <div class="flex flex-col w-full gap-2">
@@ -17,7 +17,7 @@
           for="personalToken"
           class="text-color text-base font-medium"
         >
-          Personal Token Value
+          Personal Token
         </label>
 
         <span class="p-input-icon-right w-full flex flex-col items-start gap-2">
@@ -35,7 +35,7 @@
             toggleMask
           />
           <small class="text-xs text-color-secondary font-normal leading-5">
-            Copy the personal token now. The token won't be retrievable once this dialog is closed
+            Once the dialog is closed, the token cannot be retrieved. It'll be necessary to generate a new one.
           </small>
         </span>
       </div>

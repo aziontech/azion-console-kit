@@ -54,7 +54,7 @@ describe('PersonalTokensServices', () => {
     const { feedback, token } = await sut(fixtures.personalTokenMock)
 
     expect(token).toBe('test-token')
-    expect(feedback).toBe('Your personal token has been created')
+    expect(feedback).toBe('Personal token has been created')
   })
 
   it.each([
