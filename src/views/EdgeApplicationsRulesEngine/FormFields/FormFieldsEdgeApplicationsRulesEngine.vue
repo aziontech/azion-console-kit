@@ -15,7 +15,7 @@
   import { useToast } from 'primevue/usetoast'
 
   const props = defineProps({
-    isEnableApplicationAccelerator: {
+    isApplicationAcceleratorEnabled: {
       type: Boolean,
       required: true
     },
@@ -23,7 +23,7 @@
       type: Boolean,
       required: true
     },
-    isImageOptimization: {
+    isImageOptimizationEnabled: {
       required: true,
       type: Boolean
     },
@@ -61,7 +61,7 @@
   })
 
   const isEditDrawer = computed(() => !!props.selectedRulesEngineToEdit)
-  const isImageOptimizationEnabled = computed(() => !!props.isImageOptimization)
+  const isImageOptimizationEnabled = computed(() => !!props.isImageOptimizationEnabled)
   const checkPhaseIsDefaultValue = computed(() => phase.value === 'default')
 
   const toast = useToast()
@@ -91,7 +91,7 @@
   })
 
   const showLabelImageOptimization = computed(() => {
-    if (props.isImageOptimization) return ''
+    if (props.isImageOptimizationEnabled) return ''
     return ' - Requires Image Processor'
   })
 
@@ -271,7 +271,7 @@
    * Updates the 'requires' property of behavior options based on component props.
    * This function checks if the behavior option is 'redirect_http_to_https' and sets the 'requires'
    * property based on the 'isDeliveryProtocolHttps' prop. For other options that have 'requires' as true,
-   * it sets the 'requires' property based on the 'isEnableApplicationAccelerator' prop.
+   * it sets the 'requires' property based on the 'isApplicationAcceleratorEnabled' prop.
    * @param {Array} options - The behavior options to update.
    * @returns {Array} The updated array of behavior options with the 'requires' property set accordingly.
    */
@@ -284,7 +284,7 @@
 
     return options.map((option) => {
       if (option.requires) {
-        const requires = conditionsMap[option.value] ?? !props.isEnableApplicationAccelerator
+        const requires = conditionsMap[option.value] ?? !props.isApplicationAcceleratorEnabled
 
         return { ...option, requires }
       }
@@ -607,7 +607,7 @@
   onMounted(() => {
     updateBehaviorsOptionsRequires()
 
-    if (props.isEnableApplicationAccelerator) {
+    if (props.isApplicationAcceleratorEnabled) {
       if (criteria.value[0] && !isEditDrawer.value) {
         criteria.value[0].value[0].variable = ''
       }
@@ -717,7 +717,7 @@
               <div
                 class="p-inputgroup-addon"
                 :class="{
-                  'opacity-20': !props.isEnableApplicationAccelerator || checkPhaseIsDefaultValue
+                  'opacity-20': !props.isApplicationAcceleratorEnabled || checkPhaseIsDefaultValue
                 }"
               >
                 <i class="pi pi-dollar"></i>
@@ -727,7 +727,7 @@
                 v-model="criteria[criteriaIndex].value[conditionalIndex].variable"
                 :suggestions="variableItems"
                 @complete="searchVariableOption"
-                :disabled="!props.isEnableApplicationAccelerator || checkPhaseIsDefaultValue"
+                :disabled="!props.isApplicationAcceleratorEnabled || checkPhaseIsDefaultValue"
                 :completeOnFocus="true"
               />
             </div>
@@ -756,7 +756,7 @@
 
         <div
           class="flex gap-2 mb-8"
-          v-if="props.isEnableApplicationAccelerator && !checkPhaseIsDefaultValue"
+          v-if="props.isApplicationAcceleratorEnabled && !checkPhaseIsDefaultValue"
         >
           <PrimeButton
             icon="pi pi-plus-circle"
@@ -777,7 +777,7 @@
         </div>
 
         <div
-          v-if="props.isEnableApplicationAccelerator && !checkPhaseIsDefaultValue"
+          v-if="props.isApplicationAcceleratorEnabled && !checkPhaseIsDefaultValue"
           class="flex items-center gap-2"
         >
           <Divider type="solid" />
@@ -791,7 +791,7 @@
           />
         </div>
       </div>
-      <div v-if="props.isEnableApplicationAccelerator && !checkPhaseIsDefaultValue">
+      <div v-if="props.isApplicationAcceleratorEnabled && !checkPhaseIsDefaultValue">
         <PrimeButton
           icon="pi pi-plus-circle"
           label="Add Criteria"

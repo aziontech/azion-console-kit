@@ -50,35 +50,7 @@
   const tabHasUpdate = reactive({ oldTab: null, nextTab: 0, updated: 0 })
   const formHasUpdated = ref(false)
 
-  const showMainSettings = computed(() => {
-    return activeTab.value === mapTabs.value?.mainSettings
-  })
-
-  const showErrorResponses = computed(() => {
-    return activeTab.value === mapTabs.value?.errorResponses
-  })
-
-  const showFunctions = computed(() => {
-    return activeTab.value === mapTabs.value?.functions
-  })
-
-  const showRulesEngine = computed(() => {
-    return activeTab.value === mapTabs.value?.rulesEngine
-  })
-
-  const showCacheSettings = computed(() => {
-    return activeTab.value === mapTabs.value?.cacheSettings
-  })
-
-  const showDeviceGroups = computed(() => {
-    return activeTab.value === mapTabs.value?.deviceGroups
-  })
-
-  const showOrigins = computed(() => {
-    return activeTab.value === mapTabs.value?.origins
-  })
-
-  const loaderEdgeApplication = async () => {
+  const handleLoadEdgeApplication = async () => {
     try {
       return await props.edgeApplicationServices.loadEdgeApplication({
         id: edgeApplicationId.value
@@ -93,77 +65,65 @@
     }
   }
 
-  const getTabFromValue = (selectedTabIndex) => {
-    const tabNames = Object.keys(mapTabs.value)
-    const selectedTab = tabNames.find((tabName) => mapTabs.value[tabName] === selectedTabIndex)
-    return selectedTab
+  const reindexMapTabs = () => {
+    mapTabs.value = Object.entries(mapTabs.value).reduce((acc, [key], index) => {
+      acc[key] = index
+      return acc
+    }, {})
   }
-
   const verifyTab = ({ edgeFunctions }) => {
     if (!edgeFunctions) {
       delete mapTabs.value.functions
-      mapTabs.value = Object.entries(mapTabs.value).reduce((acc, [key], index) => {
-        acc[key] = index
-        return acc
-      }, {})
+      reindexMapTabs()
       return
     }
     mapTabs.value = { ...defaultTabs }
   }
 
-  const renderTabCurrentRouter = async () => {
+  const renderTabByCurrentRouter = async () => {
     const { tab = 0 } = route.params
-    edgeApplication.value = await loaderEdgeApplication()
+
+    edgeApplication.value = await handleLoadEdgeApplication()
     verifyTab(edgeApplication.value)
+
     const activeTabIndexByRoute = mapTabs.value[tab]
-    changeRouteByClickingOnTab({ index: activeTabIndexByRoute })
+    changeTab(activeTabIndexByRoute)
   }
 
-  const title = computed(() => {
-    return edgeApplication.value?.name || ''
-  })
+  const tabTitle = computed(() => edgeApplication.value?.name || '')
 
-  const isEnableEdgeFunction = computed(() => {
-    return edgeApplication.value?.edgeFunctions
-  })
+  const isPropertyEnabled = (propertyName) => computed(() => edgeApplication.value?.[propertyName])
+  const mainSettingsOptions = {
+    isEdgeFunctionEnabled: isPropertyEnabled('edgeFunctions'),
+    isApplicationAcceleratorEnabled: isPropertyEnabled('applicationAccelerator'),
+    isLoadBalancerEnabled: isPropertyEnabled('loadBalancer'),
+    isImageOptimizationEnabled: isPropertyEnabled('imageOptimization'),
+    isTieredCacheEnabled: isPropertyEnabled('l2Caching'),
+    isDeliveryProtocolHttps: edgeApplication.value?.deliveryProtocol.includes('https')
+  }
 
-  const isEnableApplicationAccelerator = computed(() => {
-    return edgeApplication.value?.applicationAccelerator
-  })
-
-  const isLoadBalancer = computed(() => {
-    return edgeApplication.value?.loadBalancer
-  })
-
-  const isDeliveryProtocolHttps = computed(() => {
-    return edgeApplication.value?.deliveryProtocol.includes('https')
-  })
-
-  const isImageOptimization = computed(() => {
-    return edgeApplication.value?.imageOptimization
-  })
-
-  const isEdgeFunctionEnabled = computed(() => {
-    return edgeApplication.value?.edgeFunctions
-  })
-
-  const showL2CachingEnabled = computed(() => {
-    return edgeApplication.value?.l2Caching
-  })
+  const showTab = (tabName) => computed(() => activeTab.value === mapTabs.value?.[tabName])
+  const showTabs = {
+    mainSettings: showTab('mainSettings'),
+    errorResponses: showTab('errorResponses'),
+    functions: showTab('functions'),
+    rulesEngine: showTab('rulesEngine'),
+    cacheSettings: showTab('cacheSettings'),
+    deviceGroups: showTab('deviceGroups'),
+    origins: showTab('origins')
+  }
 
   const updatedApplication = (application) => {
     edgeApplication.value = { ...application }
     verifyTab(edgeApplication.value)
   }
 
-  const changeRouteByClickingOnTab = ({ index = 0 }) => {
-    changeTab(index)
+  const getTabFromIndex = (selectedTabIndex) => {
+    const tabNames = Object.keys(mapTabs.value)
+    const selectedTab = tabNames.find((tabName) => mapTabs.value[tabName] === selectedTabIndex)
+    return selectedTab
   }
-
-  const changeTab = (index) => {
-    verifyTab(edgeApplication.value)
-    const tab = getTabFromValue(index)
-    activeTab.value = index
+  const changeRouteByTab = (tab) => {
     const params = {
       id: edgeApplicationId.value,
       tab
@@ -172,6 +132,13 @@
       name: 'edit-edge-application',
       params
     })
+  }
+  const changeTab = (index) => {
+    verifyTab(edgeApplication.value)
+    const tab = getTabFromIndex(index)
+    activeTab.value = index
+
+    changeRouteByTab(tab)
   }
 
   const visibleOnSaved = ref(false)
@@ -186,95 +153,132 @@
   watch(activeTab, (newValue, oldValue) => {
     if (visibleOnSaved.value) {
       return
-    } else {
-      tabHasUpdate.oldTab = oldValue
-      tabHasUpdate.nextTab = newValue
-      tabHasUpdate.updated = generateCurrentTimestamp()
     }
+
+    tabHasUpdate.oldTab = oldValue
+    tabHasUpdate.nextTab = newValue
+    tabHasUpdate.updated = generateCurrentTimestamp()
   })
 
-  renderTabCurrentRouter()
+  const tabs = ref([
+    {
+      header: 'Main Settings',
+      component: EditView,
+      condition: true,
+      show: showTabs.mainSettings,
+      props: () => ({
+        editEdgeApplicationService: props.edgeApplicationServices.editEdgeApplication,
+        edgeApplication: edgeApplication.value,
+        updatedRedirect: props.edgeApplicationServices.updatedRedirect,
+        isTab: true,
+        updatedApplication: updatedApplication,
+        contactSalesEdgeApplicationService:
+          props.edgeApplicationServices.contactSalesEdgeApplicationService
+      })
+    },
+    {
+      header: 'Origins',
+      component: EdgeApplicationsOriginsListView,
+      condition: true,
+      show: showTabs.origins,
+      props: () => ({
+        ...mainSettingsOptions,
+        ...props.originsServices,
+        edgeApplicationId: edgeApplicationId.value,
+        clipboardWrite: props.clipboardWrite
+      })
+    },
+    {
+      header: 'Device Groups',
+      component: EdgeApplicationsDeviceGroupsListView,
+      condition: true,
+      show: showTabs.deviceGroups,
+      props: () => ({
+        ...mainSettingsOptions,
+        ...props.deviceGroupsServices,
+        edgeApplicationId: edgeApplicationId.value,
+        clipboardWrite: props.clipboardWrite
+      })
+    },
+    {
+      header: 'Error Responses',
+      component: EdgeApplicationsErrorResponseEditView,
+      condition: true,
+      show: showTabs.errorResponses,
+      props: () => ({
+        ...mainSettingsOptions,
+        ...props.errorResponsesServices,
+        edgeApplicationId: edgeApplicationId.value,
+        listOriginsService: props.originsServices.listOriginsService
+      })
+    },
+    {
+      header: 'Cache Settings',
+      component: EdgeApplicationsCacheSettingsListView,
+      condition: true,
+      show: showTabs.cacheSettings,
+      props: () => ({
+        ...mainSettingsOptions,
+        ...props.cacheSettingsServices,
+        edgeApplicationId: edgeApplicationId.value
+      })
+    },
+    {
+      header: 'Functions Instances',
+      component: EdgeApplicationsFunctionsListView,
+      condition: mainSettingsOptions.isEdgeFunctionEnabled,
+      show: showTabs.functions,
+      props: () => ({
+        edgeApplicationId: edgeApplicationId.value,
+        ...props.functionsServices
+      })
+    },
+    {
+      header: 'Rules Engine',
+      component: EdgeApplicationsRulesEngineListView,
+      condition: true,
+      show: showTabs.rulesEngine,
+      props: () => ({
+        ...mainSettingsOptions,
+        ...props.rulesEngineServices,
+        edgeApplicationId: edgeApplicationId.value,
+        hideApplicationAcceleratorInDescription: edgeApplication.value.applicationAccelerator
+      })
+    }
+  ])
+
+  const filteredTabs = computed(() => {
+    return tabs.value.filter((tab) => tab.condition)
+  })
+
+  renderTabByCurrentRouter()
 </script>
 
 <template>
   <ContentBlock>
     <template #heading>
-      <PageHeadingBlock :pageTitle="title" />
+      <PageHeadingBlock :pageTitle="tabTitle" />
     </template>
     <template #content>
+      <pre>mainSettingsOptions
+
+      {{ mainSettingsOptions }}
+      </pre>
       <TabView
         :activeIndex="activeTab"
-        @tab-click="changeRouteByClickingOnTab"
+        @tab-click="({ index = 0 }) => changeTab(index)"
         class="w-full h-full"
         v-if="edgeApplication"
       >
-        <TabPanel header="Main Settings">
-          <EditView
-            v-if="showMainSettings"
-            :editEdgeApplicationService="edgeApplicationServices.editEdgeApplication"
-            :edgeApplication="edgeApplication"
-            :updatedRedirect="edgeApplicationServices.updatedRedirect"
-            :isTab="true"
-            @updatedApplication="updatedApplication"
-            :contactSalesEdgeApplicationService="
-              edgeApplicationServices.contactSalesEdgeApplicationService
-            "
-          />
-        </TabPanel>
-        <TabPanel header="Origins">
-          <EdgeApplicationsOriginsListView
-            v-if="showOrigins"
-            :edgeApplicationId="edgeApplicationId"
-            :isLoadBalancer="isLoadBalancer"
-            v-bind="props.originsServices"
-            :clipboardWrite="props.clipboardWrite"
-          />
-        </TabPanel>
-        <TabPanel header="Device Groups">
-          <EdgeApplicationsDeviceGroupsListView
-            v-if="showDeviceGroups"
-            :edgeApplicationId="edgeApplicationId"
-            v-bind="props.deviceGroupsServices"
-            :clipboardWrite="props.clipboardWrite"
-          />
-        </TabPanel>
-        <TabPanel header="Error Responses">
-          <EdgeApplicationsErrorResponseEditView
-            v-if="showErrorResponses"
-            :edgeApplicationId="edgeApplicationId"
-            :listOriginsService="props.originsServices.listOriginsService"
-            v-bind="props.errorResponsesServices"
-          />
-        </TabPanel>
-        <TabPanel header="Cache Settings">
-          <EdgeApplicationsCacheSettingsListView
-            v-if="showCacheSettings"
-            :edgeApplicationId="edgeApplicationId"
-            :isEnableApplicationAccelerator="isEnableApplicationAccelerator"
-            v-bind="props.cacheSettingsServices"
-            :showTieredCache="showL2CachingEnabled"
-          />
-        </TabPanel>
         <TabPanel
-          header="Functions Instances"
-          v-if="isEnableEdgeFunction"
+          v-for="(tab, index) in filteredTabs"
+          :key="index"
+          :header="tab.header"
         >
-          <EdgeApplicationsFunctionsListView
-            v-if="showFunctions"
-            v-bind="props.functionsServices"
-            :edgeApplicationId="edgeApplicationId"
-          />
-        </TabPanel>
-        <TabPanel header="Rules Engine">
-          <EdgeApplicationsRulesEngineListView
-            v-if="showRulesEngine"
-            :edgeApplicationId="edgeApplicationId"
-            :isEnableApplicationAccelerator="isEnableApplicationAccelerator"
-            :isDeliveryProtocolHttps="isDeliveryProtocolHttps"
-            :hideApplicationAcceleratorInDescription="edgeApplication.applicationAccelerator"
-            :isImageOptimization="isImageOptimization"
-            :isEdgeFunctionEnabled="isEdgeFunctionEnabled"
-            v-bind="props.rulesEngineServices"
+          <component
+            :is="tab.component"
+            v-if="tab.show"
+            v-bind="tab.props()"
           />
         </TabPanel>
       </TabView>
