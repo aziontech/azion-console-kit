@@ -144,7 +144,7 @@
     toast.add(options)
   }
 
-  const loadSolutions = async ({ group, type = null }) => {
+  const loadSolutions = async ({ group, type }) => {
     try {
       isLoading.value = true
       templatesData.value[group] = await props.listSolutionsService({ group, type })
@@ -161,7 +161,7 @@
   }
 
   const loadTemplates = async () => {
-    await loadSolutions({ group: 'templates' })
+    await loadSolutions({ group: 'templates', type: 'onboarding' })
   }
 
   const loadGithubImportSolution = async () => {
