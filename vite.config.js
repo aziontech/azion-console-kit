@@ -1,16 +1,27 @@
-import { fileURLToPath, URL } from 'node:url'
-import process from 'process'
+import { fileURLToPath, URL } from 'node:url';
+import process from 'process';
 
-import vue from '@vitejs/plugin-vue'
-import vueJsx from '@vitejs/plugin-vue-jsx'
-import { defineConfig, loadEnv } from 'vite'
+import vue from '@vitejs/plugin-vue';
+import vueJsx from '@vitejs/plugin-vue-jsx';
+import { defineConfig, loadEnv } from 'vite';
+import istanbul from 'vite-plugin-istanbul';
 
 const getConfig = () => {
-  const env = loadEnv('development', process.cwd())
-  const URLStartPrefix = env.VITE_ENVIRONMENT === 'PRODUCTION' ? 'https://' : 'https://stage-'
+  const env = loadEnv('development', process.cwd());
+  const URLStartPrefix = env.VITE_ENVIRONMENT === 'PRODUCTION' ? 'https://' : 'https://stage-';
 
   return {
-    plugins: [vue(), vueJsx()],
+    plugins: [
+      vue(),
+      vueJsx(),
+      istanbul({
+        include: ['src/**'],
+        exclude: ['node_modules', 'cypress', 'coverage'],
+        extension: ['.js', '.jsx', '.ts', '.tsx', '.vue'],
+        cypress: true,
+        requireEnv: false
+      })
+    ],
     resolve: {
       extensions: ['.mjs', '.js', '.mts', '.ts', '.jsx', '.tsx', '.json', '.vue'],
       alias: {
@@ -29,14 +40,12 @@ const getConfig = () => {
         '^/api/(marketplace|script-runner|template-engine)': {
           target: `${URLStartPrefix}manager.azion.com/`,
           changeOrigin: true,
-          rewrite: (path) =>
-            path.replace(/^\/api\/(marketplace|script-runner|template-engine)/, '/$1/api')
+          rewrite: (path) => path.replace(/^\/api\/(marketplace|script-runner|template-engine)/, '/$1/api')
         },
         '^/api/vcs': {
           target: `${URLStartPrefix}vcs-api.azion.net/`,
           changeOrigin: true,
-          rewrite: (path) =>
-            path.replace(/^\/api\/vcs/, '/vcs/api')
+          rewrite: (path) => path.replace(/^\/api\/vcs/, '/vcs/api')
         },
         '/graphql/cities': {
           target: `${URLStartPrefix}cities.azion.com`,
@@ -55,7 +64,7 @@ const getConfig = () => {
         }
       }
     }
-  }
-}
+  };
+};
 
-export default defineConfig(getConfig())
+export default defineConfig(getConfig());

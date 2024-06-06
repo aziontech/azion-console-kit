@@ -35,7 +35,8 @@
             toggleMask
           />
           <small class="text-xs text-color-secondary font-normal leading-5">
-            Once the dialog is closed, the token cannot be retrieved. It'll be necessary to generate a new one.
+            Once the dialog is closed, the token cannot be retrieved. It'll be necessary to generate
+            a new one.
           </small>
         </span>
       </div>
