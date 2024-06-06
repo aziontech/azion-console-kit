@@ -62,7 +62,7 @@
 
   const isEditDrawer = computed(() => !!props.selectedRulesEngineToEdit)
   const isImageOptimizationEnabled = computed(() => !!props.isImageOptimization)
-  const checkPhaseIsDefaultValue = computed(() => phase.value === 'default')
+  const checkPhaseIsDefaultValue = ref(true)
 
   const toast = useToast()
   const criteriaOperatorOptions = ref([
@@ -585,26 +585,30 @@
 
   const phasesRadioOptions = ref([])
 
-  watch(checkPhaseIsDefaultValue, () => {
-    if (!checkPhaseIsDefaultValue.value) {
-      phasesRadioOptions.value = [
-        {
-          title: 'Request Phase',
-          value: 'request',
-          subtitle: 'Configure the requests made to the edge.'
-        },
-        {
-          title: 'Response Phase',
-          value: 'response',
-          subtitle: 'Configure the responses delivered to end-users.'
-        }
-      ]
-    } else {
-      phasesRadioOptions.value = []
-    }
-  })
+  watch(
+    checkPhaseIsDefaultValue,
+    () => {
+      if (!checkPhaseIsDefaultValue.value) {
+        phasesRadioOptions.value = [
+          {
+            title: 'Request Phase',
+            value: 'request',
+            subtitle: 'Configure the requests made to the edge.'
+          },
+          {
+            title: 'Response Phase',
+            value: 'response',
+            subtitle: 'Configure the responses delivered to end-users.'
+          }
+        ]
+      } else {
+        phasesRadioOptions.value = []
+      }
+    },
+    { immediate: true }
+  )
 
-  onMounted(() => {
+  onMounted(async () => {
     updateBehaviorsOptionsRequires()
 
     if (props.isEnableApplicationAccelerator) {
@@ -620,7 +624,8 @@
     }
 
     callOptionsServicesAtEdit()
-    processBehaviorsAtEdit()
+    await processBehaviorsAtEdit()
+    checkPhaseIsDefaultValue.value = phase.value === 'default'
   })
 </script>
 
