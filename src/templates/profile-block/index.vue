@@ -109,7 +109,7 @@
   </Sidebar>
 
   <PrimeMenu
-    style="position: fixed !important; top: 46px;"
+    style="position: fixed !important; top: 46px"
     :model="profileMenuItems"
     :popup="true"
     ref="profile"
