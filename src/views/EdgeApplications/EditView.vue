@@ -60,7 +60,15 @@
   const handleBlocks = ['general', 'delivery-settings', 'edge-application-modules', 'debug-rules']
 
   const validationSchema = yup.object({
-    name: yup.string().required()
+    name: yup.string().required(),
+    httpPort: yup.array().when('deliveryProtocol', {
+      is: (deliveryProtocol) => deliveryProtocol?.includes('http'),
+      then: (schema) => schema.min(1).required()
+    }),
+    httpsPort: yup.array().when('deliveryProtocol', {
+      is: (deliveryProtocol) => deliveryProtocol?.includes('https'),
+      then: (schema) => schema.min(1).required()
+    })
   })
 
   const loadEdgeApplication = async () => {

@@ -55,7 +55,15 @@
     name: yup.string().required(),
     address: yup.string().required(),
     hostHeader: yup.string().required(),
-    cdnCacheSettingsMaximumTtl: yup.string().required()
+    cdnCacheSettingsMaximumTtl: yup.string().required(),
+    httpPort: yup.array().when('deliveryProtocol', {
+      is: (deliveryProtocol) => deliveryProtocol?.includes('http'),
+      then: (schema) => schema.min(1).required()
+    }),
+    httpsPort: yup.array().when('deliveryProtocol', {
+      is: (deliveryProtocol) => deliveryProtocol?.includes('https'),
+      then: (schema) => schema.min(1).required()
+    })
   })
 
   const initialValues = ref({
