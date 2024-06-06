@@ -1,3 +1,4 @@
+// vite.config.js
 import { fileURLToPath, URL } from 'node:url';
 import process from 'process';
 
@@ -15,11 +16,7 @@ const getConfig = () => {
       vue(),
       vueJsx(),
       istanbul({
-        include: ['src/**'],
-        exclude: ['node_modules', 'cypress', 'coverage'],
-        extension: ['.js', '.jsx', '.ts', '.tsx', '.vue'],
-        cypress: true,
-        requireEnv: false
+        nycrcPath: '.nycrc'
       })
     ],
     resolve: {
