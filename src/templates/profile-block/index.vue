@@ -109,12 +109,12 @@
   </Sidebar>
 
   <PrimeMenu
-    style="position: fixed"
+    style="position: fixed !important; top: 46px;"
     :model="profileMenuItems"
     :popup="true"
     ref="profile"
     :pt="{
-      root: { class: 'w-[280px] top-12 z-10 pb-2 pt-0' },
+      root: { class: 'w-[280px] pb-2 pt-0' },
       content: { class: 'text-sm' }
     }"
   >
