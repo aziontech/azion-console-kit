@@ -114,7 +114,7 @@
     :popup="true"
     ref="profile"
     :pt="{
-      root: { class: 'w-[280px] absolute pb-2 pt-0 left-auto right-0 mr-9' },
+      root: { class: 'w-[280px] top-12 z-10 pb-2 pt-0' },
       content: { class: 'text-sm' }
     }"
   >
