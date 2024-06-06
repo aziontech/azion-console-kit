@@ -118,8 +118,9 @@
   <label
     :for="props.name"
     class="text-color text-sm font-medium leading-5"
-    >{{ props.label }} {{ labelSufix }}</label
   >
+    {{ props.label }} {{ labelSufix }}
+  </label>
   <Dropdown
     appendTo="self"
     :id="name"
