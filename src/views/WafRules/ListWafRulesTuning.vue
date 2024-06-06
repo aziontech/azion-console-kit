@@ -23,11 +23,12 @@
       class="w-full sm:max-w-xs"
     />
     <Dropdown
+      filter
+      autoFilterFocus
       appendTo="self"
       optionValue="value"
       optionLabel="name"
       placeholder="Select network list"
-      filter
       showClear
       :options="netWorkListOptions.options"
       v-model="valueNetwork"

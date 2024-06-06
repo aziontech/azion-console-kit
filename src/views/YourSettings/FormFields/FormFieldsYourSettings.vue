@@ -151,9 +151,10 @@
             >Timezone *</label
           >
           <Dropdown
+            filter
+            autoFilterFocus
             appendTo="self"
             id="timezone"
-            filter
             :options="optionsTimezone"
             optionLabel="label"
             optionValue="value"
@@ -231,9 +232,10 @@
         <div class="flex gap-2">
           <div class="p-inputgroup">
             <Dropdown
+              filter
+              autoFilterFocus
               appendTo="self"
               id="countryCallCode"
-              filter
               :options="filteredCountriesMobile"
               optionLabel="labelFormat"
               placeholder="Loading..."

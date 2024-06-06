@@ -71,6 +71,8 @@
           >Edge Function *</label
         >
         <Dropdown
+          filter
+          autoFilterFocus
           appendTo="self"
           inputId="edgeFunctionID"
           v-model="edgeFunctionID"
@@ -79,7 +81,6 @@
           option-value="value"
           @change="changeArgs"
           :optionDisabled="(option) => option.disabled"
-          filter
         />
       </div>
 

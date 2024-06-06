@@ -291,6 +291,7 @@
             Country *
           </label>
           <Dropdown
+            autoFilterFocus
             appendTo="self"
             id="country"
             filter
@@ -322,6 +323,7 @@
             State/Region *
           </label>
           <Dropdown
+            autoFilterFocus
             appendTo="self"
             id="region"
             filter
@@ -350,6 +352,7 @@
             City *
           </label>
           <Dropdown
+            autoFilterFocus
             appendTo="self"
             id="city"
             filter
