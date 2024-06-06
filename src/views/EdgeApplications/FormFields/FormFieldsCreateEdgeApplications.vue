@@ -56,8 +56,8 @@
 
   const { value: deliveryProtocol } = useField('deliveryProtocol')
   const { value: http3 } = useField('http3')
-  const { value: httpPort } = useField('httpPort')
-  const { value: httpsPort } = useField('httpsPort')
+  const { value: httpPort, errorMessage: httpPortError } = useField('httpPort')
+  const { value: httpsPort, errorMessage: httpsPortError } = useField('httpsPort')
   const { value: minimumTlsVersion } = useField('minimumTlsVersion')
   const { value: supportedCiphers } = useField('supportedCiphers')
   const { value: originType } = useField('originType')
@@ -250,6 +250,7 @@
               v-model="httpPort"
               filter
               optionLabel="name"
+              :class="{ 'p-invalid': httpPortError }"
               placeholder="Select an HTTP port"
               class="w-full"
               display="chip"
@@ -260,6 +261,12 @@
                 }
               }"
             />
+
+            <small
+              v-if="httpPortError"
+              class="p-error text-xs font-normal leading-tight"
+              >{{ httpPortError }}</small
+            >
           </span>
         </div>
 
@@ -279,6 +286,7 @@
               v-model="httpsPort"
               optionLabel="name"
               display="chip"
+              :class="{ 'p-invalid': httpsPortError }"
               placeholder="Select an HTTPS port"
               class="w-full"
               :disabled="checkIsProtocol.http || checkIsProtocol.http3"
@@ -288,6 +296,11 @@
                 }
               }"
             />
+            <small
+              v-if="httpsPortError"
+              class="p-error text-xs font-normal leading-tight"
+              >{{ httpsPortError }}</small
+            >
           </span>
         </div>
       </div>
