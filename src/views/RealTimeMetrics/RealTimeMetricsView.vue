@@ -14,7 +14,9 @@
         :groupData="groupData"
         :userUTC="userUTC"
       />
-      <div class="card surface-border border rounded-md surface-section p-3.5 flex flex-col gap-4">
+      <div
+        class="card surface-border border rounded-md surface-section p-3.5 flex flex-col gap-6 md:gap-4"
+      >
         <IntervalFilterBlock
           :key="filterData.current?.id"
           :moduleActions="metricsModule.actions"

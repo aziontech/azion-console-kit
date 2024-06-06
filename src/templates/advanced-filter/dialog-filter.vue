@@ -84,7 +84,7 @@
     return props.counter
       ? {
           badge: props.counter.toString(),
-          badgeClass: 'p-badge-lg text-color bg-transparent'
+          badgeClass: 'p-badge-lg text-color bg-transparent h-5 min-w-[20px]'
         }
       : null
   })
@@ -177,7 +177,7 @@
     icon="pi pi-plus"
     label="Filter"
     type="button"
-    class="flex justify-center items-center md:rounded-[6px_0px_0px_6px] min-w-max h-12"
+    class="flex justify-center items-center md:rounded-[6px_0px_0px_6px] min-w-max md:h-12"
     severity="secondary"
     badgeClass="!text-xl"
     :disabled="disabled"
