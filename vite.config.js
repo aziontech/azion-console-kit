@@ -1,4 +1,3 @@
-// vite.config.js
 import { fileURLToPath, URL } from 'node:url';
 import process from 'process';
 

@@ -1,4 +1,3 @@
-// vitest.config.js
 import { fileURLToPath } from 'node:url'
 import { mergeConfig, defineConfig } from 'vite'
 import { configDefaults } from 'vitest/config'
