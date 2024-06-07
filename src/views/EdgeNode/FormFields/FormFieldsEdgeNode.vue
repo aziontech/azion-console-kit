@@ -99,6 +99,7 @@
             v-model="groups"
             :options="groupsList"
             filter
+            autoFilterFocus
             optionLabel="name"
             placeholder="Select groups"
             class="w-full"

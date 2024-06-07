@@ -249,6 +249,7 @@
               :options="HTTP_PORT_LIST_OPTIONS"
               v-model="httpPort"
               filter
+              autoFilterFocus
               optionLabel="name"
               :class="{ 'p-invalid': httpPortError }"
               placeholder="Select an HTTP port"
