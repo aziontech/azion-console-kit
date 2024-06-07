@@ -76,8 +76,6 @@
       const firstCountry = optionsCountriesMobile.value[0].value
       return firstCountry
     }
-
-    return
   }
 
   const setCountryCallCodeForEditForm = () => {
@@ -94,7 +92,6 @@
     if (!props.isEditForm) {
       return result.defaultSelected
     }
-    return
   }
   const fetchDetailAccount = async () => {
     const account = await props.loadAccountDetailsService()
@@ -103,7 +100,6 @@
     if (!props.isEditForm) {
       return !!isForceMFA.value
     }
-    return
   }
   const fetchTeams = async () => {
     const result = await props.listTeamsService()
@@ -113,8 +109,6 @@
       const firstTeamId = result[0].value
       return firstTeamId
     }
-
-    return
   }
   const initializeFormValues = async () => {
     accountIsOwner.value = account?.is_account_owner
@@ -341,6 +335,7 @@
         <MultiSelect
           display="chip"
           filter
+          autoFilterFocus
           id="teams"
           :disabled="isAccountOwner"
           :loading="!optionsTeams.length"
@@ -352,6 +347,11 @@
           :class="{ 'p-invalid': errorTeamsIds }"
           v-model="teamsIds"
         />
+        <small
+          v-if="errorTeamsIds"
+          class="p-error"
+          >{{ errorTeamsIds }}</small
+        >
         <small class="text-xs text-color-secondary font-normal leading-5">
           Select a team for the user. You can create teams using Teams Permissions.</small
         >
