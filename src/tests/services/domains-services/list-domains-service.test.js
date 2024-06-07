@@ -20,7 +20,7 @@ const fixtures = {
     cnames: ['CName 3', 'CName 4'],
     is_active: false,
     activeSort: false,
-    digital_certificate_id: '69870',
+    digital_certificate_id: null,
     edge_application_id: 'ea5678'
   },
   edgeApplicationsMock: [
@@ -104,7 +104,7 @@ describe('DomainsServices', () => {
         },
         activeSort: false,
         edgeApplicationName: fixtures.edgeApplicationsMock[1].name,
-        digitalCertificateId: fixtures.disabledDomainMock.digital_certificate_id
+        digitalCertificateId: 'Azion (SAN)'
       }
     ])
   })

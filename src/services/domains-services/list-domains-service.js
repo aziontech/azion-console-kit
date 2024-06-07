@@ -21,7 +21,7 @@ export const listDomainsService = async ({
 
 const adapt = async (httpResponse) => {
   const edgeApplications = await listEdgeApplications()
-
+  const DEFAULT_AZION_DIGITAL_CERTIFICATE = 'Azion (SAN)'
   const parsedDomains = httpResponse.body.results?.map((domain) => {
     return {
       id: domain.id,
@@ -42,7 +42,7 @@ const adapt = async (httpResponse) => {
       cnames: domain.cnames,
       edgeFirewallId: domain.edge_firewall_id,
       edgeApplicationName: getEdgeApplication(edgeApplications, domain.edge_application_id),
-      digitalCertificateId: domain.digital_certificate_id
+      digitalCertificateId: domain.digital_certificate_id || DEFAULT_AZION_DIGITAL_CERTIFICATE
     }
   })
 
