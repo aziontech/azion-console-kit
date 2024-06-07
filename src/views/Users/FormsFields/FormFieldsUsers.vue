@@ -300,6 +300,11 @@
               :class="{ 'p-invalid': errorCountryCallCode }"
               class="surface-border border-r-0 w-1/4"
               v-model="countryCallCode"
+              :pt="{
+                filterInput: {
+                  class: 'w-full'
+                }
+              }"
             >
               <template #option="{ option }">
                 {{ option.label }}
