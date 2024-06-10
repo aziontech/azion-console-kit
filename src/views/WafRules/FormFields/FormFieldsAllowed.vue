@@ -26,7 +26,7 @@
   })
   const { value: matchZones } = useField('matchZones')
   const { value: path } = useField('path')
-  const { value: reason } = useField('reason')
+  const { value: description } = useField('description')
   const { value: status } = useField('status')
   const { value: useRegex } = useField('useRegex')
   const { value: ruleId } = useField('ruleId')
@@ -118,10 +118,10 @@
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
         <FieldText
           label="Description *"
-          name="reason"
+          name="description"
           placeholder="This rule was allowed because the path is being used in internal tests."
           description="Add a short description or comment to explain the reason this rule was allowed."
-          :value="reason"
+          :value="description"
         />
       </div>
     </template>

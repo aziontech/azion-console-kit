@@ -56,11 +56,11 @@ describe('WafRulesServices', () => {
     await sut({ attackEvents: bodyRequest, wafId: 10, reason: fixtures.reason })
 
     expect(requestSpy).toHaveBeenCalledWith({
-      url: 'v4/edge/waf/10/allowed_rules',
+      url: 'v4/edge/wafs/10/allowed_rules',
       method: 'POST',
       body: {
         rule_id: fixtures.wafRulesMock[0].ruleId,
-        reason: fixtures.reason,
+        description: fixtures.description,
         match_zones: [
           {
             matches_on: 'value',
@@ -125,13 +125,13 @@ describe('WafRulesServices', () => {
 
     const { sut } = makeSut()
 
-    const reason = await sut({
+    const description = await sut({
       attackEvents: fixtures.wafRulesMock,
       wafId: 1,
-      reason: fixtures.reason
+      description: fixtures.description
     })
 
-    expect(reason).toEqual(expectedErroMessage)
+    expect(description).toEqual(expectedErroMessage)
   })
 
   it.each([

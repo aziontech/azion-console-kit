@@ -12,7 +12,7 @@ const makeSut = () => {
 describe('WafRulesServices', () => {
   it('should return the API base url to waf rules allowed service', () => {
     const { sut } = makeSut()
-    const correctApiUrl = `v4/edge/waf`
+    const correctApiUrl = `v4/edge/wafs`
 
     const baseUrl = sut()
 

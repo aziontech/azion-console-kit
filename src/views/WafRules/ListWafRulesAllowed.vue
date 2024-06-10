@@ -138,7 +138,7 @@
   const validationSchemaAllowed = yup.object({
     matchZones: yup.array(),
     path: yup.string(),
-    reason: yup.string().required(),
+    description: yup.string().required(),
     ruleId: yup.string().required().label('rule id'),
     status: yup.boolean(),
     useRegex: yup.boolean()
@@ -147,7 +147,7 @@
   const initialValues = {
     matchZones: [{ matches_on: 'value', zone: 'path', zone_input: null }],
     path: '',
-    reason: '',
+    description: '',
     ruleId: 0,
     status: true,
     useRegex: false
@@ -164,7 +164,7 @@
         columnBuilder({ data: columnData, columnAppearance: 'expand-text-column' })
     },
     {
-      field: 'reason',
+      field: 'description',
       header: 'Description',
       type: 'component',
       component: (columnData) =>
