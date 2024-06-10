@@ -70,21 +70,18 @@
   }
 
   const fetchCountries = async () => {
-    try {
-      const countries = await props.listCountriesPhoneService()
-      setCountriesOptions(countries)
-      const firstCountry = optionsCountriesMobile.value[0].value
+    const countries = await props.listCountriesPhoneService()
+    setCountriesOptions(countries)
+    const firstCountry = optionsCountriesMobile.value[0].value
 
-      if (props.isEditForm) {
-        const userCountry = setCountryCallCodeForEditForm()
-        countryCallCode.value = userCountry || firstCountry
-        return
-      }
-
-      return firstCountry
-    } finally {
+    if (props.isEditForm) {
+      const userCountry = setCountryCallCodeForEditForm()
+      countryCallCode.value = userCountry || firstCountry
       loadingCountry.value = false
+      return
     }
+
+    return firstCountry
   }
 
   const setCountryCallCodeForEditForm = () => {
@@ -140,8 +137,8 @@
         teamsIds: [defaultTeamId],
         twoFactorEnabled: forceMfaEnabled
       }
-
       props.resetForm({ values: initialValues })
+      loadingCountry.value = false
     }
   }
 
