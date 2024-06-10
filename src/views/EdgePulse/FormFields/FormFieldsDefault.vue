@@ -37,7 +37,7 @@
   >
     <template #inputs>
       <div>
-        <div class="flex flex-col gap-2">
+        <div class="flex flex-col gap-2 w-[99.9%]">
           <vue-monaco-editor
             v-model:value="defaultTagCode"
             language="javascript"
