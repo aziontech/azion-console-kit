@@ -22,7 +22,7 @@
     <label
       for="name"
       class="text-color text-sm font-medium"
-      >Name</label
+      >Full Name</label
     >
     <InputText
       v-model="name"
