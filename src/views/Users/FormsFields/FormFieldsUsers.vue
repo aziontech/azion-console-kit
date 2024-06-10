@@ -48,7 +48,7 @@
   const filteredCountriesMobile = ref([])
   const { account } = storeToRefs(store)
   const optionsLanguage = ref([{ label: 'English', value: 'en' }])
-  const loadingInitial = ref(true)
+  const loadingCountry = ref(true)
 
   const { value: firstName, errorMessage: errorFirstName } = useField('firstName')
   const { value: lastName, errorMessage: errorLastName } = useField('lastName')
@@ -70,20 +70,26 @@
   }
 
   const fetchCountries = async () => {
-    const countries = await props.listCountriesPhoneService()
-    setCountriesOptions(countries)
-    const firstCountry = optionsCountriesMobile.value[0].value
+    try {
+      const countries = await props.listCountriesPhoneService()
+      setCountriesOptions(countries)
+      const firstCountry = optionsCountriesMobile.value[0].value
 
-    if (props.isEditForm) {
-      const userCountry = setCountryCallCodeForEditForm()
-      countryCallCode.value = userCountry || firstCountry
+      if (props.isEditForm) {
+        const userCountry = setCountryCallCodeForEditForm()
+        countryCallCode.value = userCountry || firstCountry
+        return
+      }
+
+      return firstCountry
+    } finally {
+      loadingCountry.value = false
     }
-
-    return firstCountry
   }
 
   const setCountryCallCodeForEditForm = () => {
     return filteredCountriesMobile.value.find((country) => country.value === countryCallCode.value)
+      ?.value
   }
 
   const fetchTimezone = async () => {
@@ -115,30 +121,27 @@
   const initializeFormValues = async () => {
     accountIsOwner.value = account?.is_account_owner
     isAccountOwner.value = accountIsOwner.value
-    try {
-      const defaultTeamId = await fetchTeams()
-      const initialCountry = await fetchCountries()
-      const initialTimezone = await fetchTimezone()
-      const forceMfaEnabled = await fetchDetailAccount()
 
-      if (!props.isEditForm) {
-        const initialValues = {
-          firstName: firstName.value,
-          lastName: lastName.value,
-          timezone: initialTimezone,
-          language: language.value || 'en',
-          email: email.value,
-          countryCallCode: initialCountry,
-          mobile: mobile.value,
-          isAccountOwner: accountIsOwner.value,
-          teamsIds: [defaultTeamId],
-          twoFactorEnabled: forceMfaEnabled
-        }
+    const defaultTeamId = await fetchTeams()
+    const initialCountry = await fetchCountries()
+    const initialTimezone = await fetchTimezone()
+    const forceMfaEnabled = await fetchDetailAccount()
 
-        props.resetForm({ values: initialValues })
+    if (!props.isEditForm) {
+      const initialValues = {
+        firstName: firstName.value,
+        lastName: lastName.value,
+        timezone: initialTimezone,
+        language: language.value || 'en',
+        email: email.value,
+        countryCallCode: initialCountry,
+        mobile: mobile.value,
+        isAccountOwner: accountIsOwner.value,
+        teamsIds: [defaultTeamId],
+        twoFactorEnabled: forceMfaEnabled
       }
-    } finally {
-      loadingInitial.value = false
+
+      props.resetForm({ values: initialValues })
     }
   }
 
@@ -294,8 +297,8 @@
               :options="filteredCountriesMobile"
               optionLabel="labelFormat"
               optionValue="value"
-              :loading="loadingInitial"
-              :disabled="loadingInitial"
+              :loading="loadingCountry"
+              :disabled="loadingCountry"
               :class="{ 'p-invalid': errorCountryCallCode }"
               class="surface-border border-r-0 w-1/4"
               v-model="countryCallCode"
@@ -313,7 +316,7 @@
               date="phone"
               v-model="mobile"
               class="w-full"
-              :disabled="loadingInitial"
+              :disabled="loadingCountry"
               mask="?99999999999999999999"
               placeholder="5500999999999"
               :class="{ 'p-invalid': errorMobile }"
