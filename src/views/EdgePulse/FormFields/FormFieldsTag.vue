@@ -28,13 +28,20 @@
     description="The script executes before the load event is fired. Recommended when using Content Security Policy settings that prevent the use of inline JavaScript."
   >
     <template #inputs>
-      <vue-monaco-editor
-        v-model:value="preLoadingTagCode"
-        language="javascript"
-        :theme="theme"
-        :options="editorOptions"
-        class="min-h-[56px] surface-border overflow-clip border rounded-md"
-      />
+      <div>
+        <div class="flex flex-col gap-2 w-[99.9%]">
+          <vue-monaco-editor
+            v-model:value="preLoadingTagCode"
+            language="javascript"
+            :theme="theme"
+            :options="editorOptions"
+            class="min-h-[56px] surface-border overflow-clip border rounded-md p-disabled"
+          />
+          <small class="text-xs text-color-secondary font-normal leading-5">
+            Cannot edit in read-only editor
+          </small>
+        </div>
+      </div>
       <div>
         <PrimeButton
           icon="pi pi-copy"
