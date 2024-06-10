@@ -219,8 +219,9 @@
         <small
           id="name-help"
           class="p-error"
-          >{{ errorEmail }}</small
         >
+          {{ errorEmail }}
+        </small>
       </div>
 
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
@@ -238,8 +239,8 @@
               id="countryCallCode"
               :options="filteredCountriesMobile"
               optionLabel="labelFormat"
-              placeholder="Loading..."
               :loading="isLoadingCountry"
+              :disabled="isLoadingCountry"
               :class="{ 'p-invalid': errorCountryCallCode }"
               class="w-2/3 surface-border border-r-0"
               v-model="selectedCountryCallCode"
@@ -258,20 +259,22 @@
               date="phone"
               v-model="mobile"
               class="w-full"
+              :disabled="isLoadingCountry"
               mask="?99999999999999999999"
               placeholder="5500999999999"
-              :class="{ 'p-invalid': errorMobile || !countryCallCode }"
+              :class="{ 'p-invalid': errorMobile }"
             />
           </div>
         </div>
         <small class="text-xs text-color-secondary font-normal leading-5">
-          The phone number of the user. Include country and region code.</small
-        >
+          The phone number of the user. Include country and region code.
+        </small>
         <small
           id="name-help"
           class="p-error"
-          >{{ errorMobile }}</small
         >
+          {{ errorMobile }}
+        </small>
       </div>
     </template>
   </FormHorizontal>
