@@ -48,6 +48,7 @@
   const filteredCountriesMobile = ref([])
   const { account } = storeToRefs(store)
   const optionsLanguage = ref([{ label: 'English', value: 'en' }])
+  const loadingInitial = ref(true)
 
   const { value: firstName, errorMessage: errorFirstName } = useField('firstName')
   const { value: lastName, errorMessage: errorLastName } = useField('lastName')
@@ -55,7 +56,9 @@
   const { value: language, errorMessage: errorLanguage } = useField('language')
   const { value: email, errorMessage: errorEmail } = useField('email')
   const { value: countryCallCode, errorMessage: errorCountryCallCode } = useField('countryCallCode')
-  const { value: mobile, errorMessage: errorMobile } = useField('mobile')
+  const { value: mobile, errorMessage: errorMobile } = useField('mobile', null, {
+    initialValue: ''
+  })
   const { value: isAccountOwner, errorMessage: errorisAccountOwner } = useField('isAccountOwner')
   const { value: teamsIds, errorMessage: errorTeamsIds } = useField('teamsIds')
   const { value: twoFactorEnabled, errorMessage: errorTwoFactorEnabled } =
@@ -69,20 +72,18 @@
   const fetchCountries = async () => {
     const countries = await props.listCountriesPhoneService()
     setCountriesOptions(countries)
+    const firstCountry = optionsCountriesMobile.value[0].value
 
     if (props.isEditForm) {
-      setCountryCallCodeForEditForm()
-    } else {
-      const firstCountry = optionsCountriesMobile.value[0].value
-      return firstCountry
+      const userCountry = setCountryCallCodeForEditForm()
+      countryCallCode.value = userCountry || firstCountry
     }
+
+    return firstCountry
   }
 
   const setCountryCallCodeForEditForm = () => {
-    const loadedCountryCallCode = filteredCountriesMobile.value.find(
-      (country) => country.value === countryCallCode.value
-    )
-    countryCallCode.value = loadedCountryCallCode.value
+    return filteredCountriesMobile.value.find((country) => country.value === countryCallCode.value)
   }
 
   const fetchTimezone = async () => {
@@ -110,30 +111,34 @@
       return firstTeamId
     }
   }
+
   const initializeFormValues = async () => {
     accountIsOwner.value = account?.is_account_owner
     isAccountOwner.value = accountIsOwner.value
+    try {
+      const defaultTeamId = await fetchTeams()
+      const initialCountry = await fetchCountries()
+      const initialTimezone = await fetchTimezone()
+      const forceMfaEnabled = await fetchDetailAccount()
 
-    const defaultTeamId = await fetchTeams()
-    const initialCountry = await fetchCountries()
-    const initialTimezone = await fetchTimezone()
-    const forceMfaEnabled = await fetchDetailAccount()
+      if (!props.isEditForm) {
+        const initialValues = {
+          firstName: firstName.value,
+          lastName: lastName.value,
+          timezone: initialTimezone,
+          language: language.value || 'en',
+          email: email.value,
+          countryCallCode: initialCountry,
+          mobile: mobile.value,
+          isAccountOwner: accountIsOwner.value,
+          teamsIds: [defaultTeamId],
+          twoFactorEnabled: forceMfaEnabled
+        }
 
-    if (!props.isEditForm) {
-      const initialValues = {
-        firstName: firstName.value,
-        lastName: lastName.value,
-        timezone: initialTimezone,
-        language: language.value || 'en',
-        email: email.value,
-        countryCallCode: initialCountry,
-        mobile: mobile.value,
-        isAccountOwner: accountIsOwner.value,
-        teamsIds: [defaultTeamId],
-        twoFactorEnabled: forceMfaEnabled
+        props.resetForm({ values: initialValues })
       }
-
-      props.resetForm({ values: initialValues })
+    } finally {
+      loadingInitial.value = false
     }
   }
 
@@ -288,9 +293,9 @@
               id="countryCallCode"
               :options="filteredCountriesMobile"
               optionLabel="labelFormat"
-              placeholder="Loading..."
               optionValue="value"
-              :loading="!filteredCountriesMobile.length"
+              :loading="loadingInitial"
+              :disabled="loadingInitial"
               :class="{ 'p-invalid': errorCountryCallCode }"
               class="surface-border border-r-0 w-1/4"
               v-model="countryCallCode"
@@ -308,17 +313,19 @@
               date="phone"
               v-model="mobile"
               class="w-full"
+              :disabled="loadingInitial"
               mask="?99999999999999999999"
               placeholder="5500999999999"
-              :class="{ 'p-invalid': errorMobile || !countryCallCode }"
+              :class="{ 'p-invalid': errorMobile }"
             />
           </div>
         </div>
         <small
           id="name-help"
           class="p-error"
-          >{{ errorMobile }}</small
         >
+          {{ errorMobile }}
+        </small>
         <small class="text-xs text-color-secondary font-normal leading-5">
           The phone number of the user. Include country and region code.
         </small>
