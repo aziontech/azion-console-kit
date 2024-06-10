@@ -33,3 +33,6 @@ jobs:
           browser: chrome
           wait-on: "http://localhost:5173/"
           wait-on-timeout: 120
+
+      - name: Check E2E Test Coverage
+        uses: node ./scripts/check_coverage.js ./coverage/e2e/lcov.info 20
