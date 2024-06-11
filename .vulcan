@@ -1,0 +1,6 @@
+builder=webpack
+entry=./main.js
+preset=react
+mode=deliver
+useNodePolyfills=false
+useOwnWorker=false
