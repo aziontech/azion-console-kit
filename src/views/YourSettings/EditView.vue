@@ -1,11 +1,11 @@
 <template>
   <ContentBlock>
     <template #heading>
-      <PageHeadingBlock pageTitle="Your Settings"></PageHeadingBlock>
+      <PageHeadingBlock pageTitle="Your Settings" />
     </template>
     <template #content>
       <EditFormBlock
-        :editService="props.editUsersService"
+        :editService="() => {}"
         :schema="validationSchema"
         :loadService="loadUser"
         :disableRedirect="true"
@@ -16,9 +16,9 @@
             :listCountriesPhoneService="listCountriesPhoneService"
           />
         </template>
-        <template #action-bar="{ onSubmit, formValid, onCancel, loading, values, setValues }">
+        <template #action-bar="{ formValid, onCancel, loading, values }">
           <ActionBarBlockWithTeleport
-            @onSubmit="formSubmit(onSubmit, values, setValues)"
+            @onSubmit="formSubmit(values)"
             @onCancel="onCancel"
             :loading="loading"
             :submitDisabled="!formValid"
@@ -39,6 +39,7 @@
   import { useToast } from 'primevue/usetoast'
   import * as yup from 'yup'
   import FormFieldsYourSettings from './FormFields/FormFieldsYourSettings.vue'
+  import { TOAST_LIFE } from '@/utils/constants'
 
   const toast = useToast()
 
@@ -70,17 +71,34 @@
 
     return userData
   }
-  const formSubmit = (onSubmit, values) => {
-    if (values.email !== currentEmail.value) {
-      const toastConfig = {
-        closable: true,
-        severity: 'warn',
-        summary: 'Confirmation email',
-        detail: 'We have sent you a confirmation email.'
-      }
-      toast.add({ ...toastConfig })
+
+  const showToast = (severity, detail, summary = severity) => {
+    if (!detail) return
+
+    const options = {
+      closable: true,
+      severity,
+      summary,
+      detail
     }
-    onSubmit()
+
+    if (severity === 'success') {
+      options.life = TOAST_LIFE
+    }
+
+    toast.add(options)
+  }
+
+  const formSubmit = async (values) => {
+    try {
+      const feedback = await props.editUsersService(values)
+      showToast('success', feedback)
+      if (values.email !== currentEmail.value) {
+        showToast('info', 'We have sent you a confirmation email.', 'Confirmation email')
+      }
+    } catch (error) {
+      showToast('error', error)
+    }
   }
   const passwordRequirementsList = ref([
     { label: '8 characters', valid: false },
