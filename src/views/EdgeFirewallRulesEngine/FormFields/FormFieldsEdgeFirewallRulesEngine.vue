@@ -2,7 +2,7 @@
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
   import FieldDropdown from '@/templates/form-fields-inputs/fieldDropdown.vue'
   import FieldNumber from '@/templates/form-fields-inputs/fieldNumber.vue'
-  import FieldSwitch from '@/templates/form-fields-inputs/fieldSwitch'
+  import FieldSwitchBlock from '@/templates/form-fields-inputs/fieldSwitchBlock'
   import FieldText from '@/templates/form-fields-inputs/fieldText.vue'
   import PrimeButton from 'primevue/button'
   import Divider from 'primevue/divider'
@@ -901,9 +901,13 @@
   >
     <template #inputs>
       <div class="flex w-full gap-3 items-start">
-        <FieldSwitch
+        <FieldSwitchBlock
+          nameField="active"
           name="active"
-          label="Active"
+          auto
+          :isCard="false"
+          title="Active"
+          subtitle=""
         />
       </div>
     </template>
