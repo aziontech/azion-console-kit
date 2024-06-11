@@ -6,8 +6,8 @@ const urls = {
     production: 'https://manager.azion.com'
   },
   billing: {
-    stage: 'https://stage-manager.azion.com/billing-subscriptions/bills',
-    production: 'https://manager.azion.com/billing-subscriptions/bills'
+    stage: 'https://stage-manager.azion.com/billing-subscriptions/payment-methods?active_tab=payment_methods',
+    production: 'https://manager.azion.com/billing-subscriptions/payment-methods?active_tab=payment_methods'
   },
   playground: {
     stage: 'https://stage-manager.azion.com/metrics/graphql',
