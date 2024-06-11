@@ -60,7 +60,7 @@
     {
       title: 'Request a certificate',
       subtitle:
-        'Generate a Certificate Singing Request (CSR) to purchase a TLS digital certificate from a CA.',
+        'Generate a Certificate Signing Request (CSR) to purchase a TLS digital certificate from a CA.',
       value: certificateTypes.value.EDGE_CERTIFICATE_CSR
     },
     {
