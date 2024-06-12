@@ -11,7 +11,8 @@ const fixtures = {
     network_protection_enabled: true,
     waf_enabled: true,
     debug_rules: true,
-    domains: []
+    domains: [],
+    ddosProtectionUnmetered: true
   }
 }
 
@@ -56,7 +57,8 @@ describe('EdgeFirewallServices', () => {
       networkProtectionEnabled: fixtures.mock.network_protection_enabled,
       wafEnabled: fixtures.mock.waf_enabled,
       debugRules: fixtures.mock.debug_rules,
-      domains: fixtures.mock.domains
+      domains: fixtures.mock.domains,
+      ddosProtectionUnmetered: fixtures.mock.ddosProtectionUnmetered
     })
   })
 })
