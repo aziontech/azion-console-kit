@@ -43,8 +43,6 @@
 
   const toast = useToast()
 
-  const currentEmail = ref('')
-
   const props = defineProps({
     loadUserService: {
       type: Function,
@@ -64,12 +62,12 @@
     }
   })
 
+  const userData = ref({})
+
   const loadUser = async () => {
-    const userData = await props.loadUserService()
+    userData.value = await props.loadUserService()
 
-    currentEmail.value = userData.email
-
-    return userData
+    return userData.value
   }
 
   const showToast = (severity, detail, summary = severity) => {
@@ -89,11 +87,35 @@
     toast.add(options)
   }
 
+  const isEmailChangedOnly = (values) => {
+    const keysToCheck = [
+      'firstName',
+      'lastName',
+      'timezone',
+      'language',
+      'countryCallCode',
+      'mobile',
+      'email',
+      'twoFactorEnabled',
+      'password',
+      'oldPassword',
+      'confirmPassword'
+    ]
+
+    const changedKeys = keysToCheck.filter((key) => values[key] !== userData.value[key])
+    return changedKeys.length === 1 && changedKeys[0] === 'email'
+  }
+
   const formSubmit = async (values) => {
     try {
       const feedback = await props.editUsersService(values)
+      if (isEmailChangedOnly(values)) {
+        return showToast('info', 'We have sent you a confirmation email.', 'Confirmation email')
+      }
+
       showToast('success', feedback)
-      if (values.email !== currentEmail.value) {
+
+      if (values.email !== userData.value.email) {
         showToast('info', 'We have sent you a confirmation email.', 'Confirmation email')
       }
     } catch (error) {
