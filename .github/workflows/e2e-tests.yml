@@ -11,7 +11,7 @@ jobs:
   run-e2e-tests:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v3
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -35,4 +35,4 @@ jobs:
           wait-on-timeout: 120
 
       - name: Check E2E Test Coverage
-        uses: node ./scripts/check_coverage.js ./coverage/e2e/lcov.info 20
+        run: node ./scripts/check_coverage.js ./coverage/e2e/lcov.info 20
