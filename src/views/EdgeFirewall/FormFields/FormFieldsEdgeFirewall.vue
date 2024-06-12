@@ -173,7 +173,6 @@
     <template #inputs>
       <div class="flex flex-col gap-2">
         <FieldGroupSwitch
-          label=""
           isCard
           :options="switchOptions"
         >
@@ -202,7 +201,6 @@
           auto
           :isCard="false"
           title="Active"
-          subtitle=""
         />
       </div>
     </template>
@@ -216,7 +214,6 @@
           auto
           :isCard="false"
           title="Active"
-          subtitle=""
         />
       </div>
     </template>
