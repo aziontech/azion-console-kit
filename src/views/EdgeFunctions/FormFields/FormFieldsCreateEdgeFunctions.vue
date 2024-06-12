@@ -1,6 +1,5 @@
 <script setup>
   import InputText from 'primevue/inputtext'
-  import InputSwitch from 'primevue/inputswitch'
   import Splitter from 'primevue/splitter'
   import SplitterPanel from 'primevue/splitterpanel'
   import TabView from 'primevue/tabview'
@@ -9,6 +8,8 @@
   import CodeEditor from '../components/code-editor.vue'
   import CodePreview from '../components/code-preview.vue'
   import HelloWorldSample from '@/helpers/edge-function-hello-world'
+  import FieldSwitchBlock from '@/templates/form-fields-inputs/fieldSwitchBlock'
+
   import { computed, ref } from 'vue'
   import { useField } from 'vee-validate'
   defineProps(['previewData'])
@@ -30,7 +31,6 @@
   const { value: code, errorMessage: codeError } = useField('code', null, {
     initialValue: HelloWorldSample
   })
-  const { value: active } = useField('active')
 
   const hasCodeError = computed(() => {
     return !!codeError.value
@@ -119,15 +119,14 @@
       >
         <template #inputs>
           <div class="flex w-full sm:max-w-lg gap-2">
-            <InputSwitch
-              v-model="active"
-              inputId="active"
+            <FieldSwitchBlock
+              nameField="active"
+              name="active"
+              auto
+              :isCard="false"
+              title="Active"
+              subtitle=""
             />
-            <label
-              for="active"
-              class="text-color-secondary text-sm font-normal"
-              >Active
-            </label>
           </div>
         </template>
       </FormHorizontal>
