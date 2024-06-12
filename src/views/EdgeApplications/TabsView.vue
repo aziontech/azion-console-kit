@@ -29,13 +29,13 @@
   })
 
   const defaultTabs = {
-    mainSettings: 0,
+    'main-settings': 0,
     origins: 1,
-    deviceGroups: 2,
-    errorResponses: 3,
-    cacheSettings: 4,
+    'device-groups': 2,
+    'error-responses': 3,
+    'cache-settings': 4,
     functions: 5,
-    rulesEngine: 6
+    'rules-engine': 6
   }
 
   const mapTabs = ref({ ...defaultTabs })
@@ -101,12 +101,12 @@
 
   const showTab = (tabName) => computed(() => activeTab.value === mapTabs.value?.[tabName])
   const showTabs = {
-    mainSettings: showTab('mainSettings'),
-    errorResponses: showTab('errorResponses'),
+    mainSettings: showTab('main-settings'),
+    errorResponses: showTab('error-responses'),
     functions: showTab('functions'),
-    rulesEngine: showTab('rulesEngine'),
-    cacheSettings: showTab('cacheSettings'),
-    deviceGroups: showTab('deviceGroups'),
+    rulesEngine: showTab('rules-engine'),
+    cacheSettings: showTab('cache-settings'),
+    deviceGroups: showTab('device-groups'),
     origins: showTab('origins')
   }
 
