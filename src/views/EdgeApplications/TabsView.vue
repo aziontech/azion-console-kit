@@ -81,26 +81,23 @@
   }
 
   const renderTabByCurrentRouter = async () => {
-    const { tab = 0 } = route.params
+    const { tab } = route.params
+
+    let selectedTab = tab
+    if (!tab) selectedTab = 'mainSettings'
 
     edgeApplication.value = await handleLoadEdgeApplication()
     verifyTab(edgeApplication.value)
 
-    const activeTabIndexByRoute = mapTabs.value[tab]
+    const activeTabIndexByRoute = mapTabs.value[selectedTab]
     changeTab(activeTabIndexByRoute)
   }
 
   const tabTitle = computed(() => edgeApplication.value?.name || '')
 
-  const isPropertyEnabled = (propertyName) => computed(() => edgeApplication.value?.[propertyName])
-  const mainSettingsOptions = {
-    isEdgeFunctionEnabled: isPropertyEnabled('edgeFunctions'),
-    isApplicationAcceleratorEnabled: isPropertyEnabled('applicationAccelerator'),
-    isLoadBalancerEnabled: isPropertyEnabled('loadBalancer'),
-    isImageOptimizationEnabled: isPropertyEnabled('imageOptimization'),
-    isTieredCacheEnabled: isPropertyEnabled('l2Caching'),
-    isDeliveryProtocolHttps: edgeApplication.value?.deliveryProtocol.includes('https')
-  }
+  const isHttpsEnabled = () =>
+    computed(() => edgeApplication.value?.deliveryProtocol.includes('https'))
+  const isModuleEnabled = (propertyName) => computed(() => edgeApplication.value?.[propertyName])
 
   const showTab = (tabName) => computed(() => activeTab.value === mapTabs.value?.[tabName])
   const showTabs = {
@@ -171,7 +168,6 @@
         edgeApplication: edgeApplication.value,
         updatedRedirect: props.edgeApplicationServices.updatedRedirect,
         isTab: true,
-        updatedApplication: updatedApplication,
         contactSalesEdgeApplicationService:
           props.edgeApplicationServices.contactSalesEdgeApplicationService
       })
@@ -182,8 +178,8 @@
       condition: true,
       show: showTabs.origins,
       props: () => ({
-        ...mainSettingsOptions,
         ...props.originsServices,
+        isLoadBalancerEnabled: isModuleEnabled('loadBalancer').value,
         edgeApplicationId: edgeApplicationId.value,
         clipboardWrite: props.clipboardWrite
       })
@@ -194,7 +190,6 @@
       condition: true,
       show: showTabs.deviceGroups,
       props: () => ({
-        ...mainSettingsOptions,
         ...props.deviceGroupsServices,
         edgeApplicationId: edgeApplicationId.value,
         clipboardWrite: props.clipboardWrite
@@ -206,7 +201,6 @@
       condition: true,
       show: showTabs.errorResponses,
       props: () => ({
-        ...mainSettingsOptions,
         ...props.errorResponsesServices,
         edgeApplicationId: edgeApplicationId.value,
         listOriginsService: props.originsServices.listOriginsService
@@ -218,19 +212,20 @@
       condition: true,
       show: showTabs.cacheSettings,
       props: () => ({
-        ...mainSettingsOptions,
         ...props.cacheSettingsServices,
+        isApplicationAcceleratorEnabled: isModuleEnabled('applicationAccelerator').value,
+        isTieredCacheEnabled: isModuleEnabled('l2Caching').value,
         edgeApplicationId: edgeApplicationId.value
       })
     },
     {
       header: 'Functions Instances',
       component: EdgeApplicationsFunctionsListView,
-      condition: mainSettingsOptions.isEdgeFunctionEnabled,
+      condition: isModuleEnabled('edgeFunctions'),
       show: showTabs.functions,
       props: () => ({
-        edgeApplicationId: edgeApplicationId.value,
-        ...props.functionsServices
+        ...props.functionsServices,
+        edgeApplicationId: edgeApplicationId.value
       })
     },
     {
@@ -239,8 +234,11 @@
       condition: true,
       show: showTabs.rulesEngine,
       props: () => ({
-        ...mainSettingsOptions,
         ...props.rulesEngineServices,
+        isImageOptimizationEnabled: isModuleEnabled('imageOptimization').value,
+        isDeliveryProtocolHttps: isHttpsEnabled().value,
+        isApplicationAcceleratorEnabled: isModuleEnabled('applicationAccelerator').value,
+        isEdgeFunctionEnabled: isModuleEnabled('edgeFunctions').value,
         edgeApplicationId: edgeApplicationId.value,
         hideApplicationAcceleratorInDescription: edgeApplication.value.applicationAccelerator
       })
@@ -260,10 +258,6 @@
       <PageHeadingBlock :pageTitle="tabTitle" />
     </template>
     <template #content>
-      <pre>mainSettingsOptions
-
-      {{ mainSettingsOptions }}
-      </pre>
       <TabView
         :activeIndex="activeTab"
         @tab-click="({ index = 0 }) => changeTab(index)"
@@ -278,6 +272,7 @@
           <component
             :is="tab.component"
             v-if="tab.show"
+            @updatedApplication="updatedApplication"
             v-bind="tab.props()"
           />
         </TabPanel>

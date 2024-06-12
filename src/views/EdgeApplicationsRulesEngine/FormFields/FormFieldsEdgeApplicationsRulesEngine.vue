@@ -81,7 +81,7 @@
 
     return ' - Requires Application Accelerator'
   })
-
+  props.isDeliveryProtocolHttps
   const showLabelHttps = computed(() => {
     if (props.isDeliveryProtocolHttps) {
       return ''
