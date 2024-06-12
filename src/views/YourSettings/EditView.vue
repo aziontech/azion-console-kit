@@ -106,17 +106,22 @@
     return changedKeys.length === 1 && changedKeys[0] === 'email'
   }
 
+  const showEmailToast = () => {
+    showToast('info', 'We have sent you a confirmation email.', 'Confirmation email')
+  }
+
   const formSubmit = async (values) => {
     try {
       const feedback = await props.editUsersService(values)
+
       if (isEmailChangedOnly(values)) {
-        return showToast('info', 'We have sent you a confirmation email.', 'Confirmation email')
+        return showEmailToast()
       }
 
       showToast('success', feedback)
 
       if (values.email !== userData.value.email) {
-        showToast('info', 'We have sent you a confirmation email.', 'Confirmation email')
+        showEmailToast()
       }
     } catch (error) {
       showToast('error', error)
