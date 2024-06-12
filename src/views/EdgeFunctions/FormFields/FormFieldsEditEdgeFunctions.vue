@@ -146,7 +146,6 @@
               auto
               :isCard="false"
               title="Active"
-              subtitle=""
             />
           </div>
         </template>
