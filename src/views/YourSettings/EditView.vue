@@ -16,7 +16,7 @@
             :listCountriesPhoneService="listCountriesPhoneService"
           />
         </template>
-        <template #action-bar="{ formValid, onCancel, loading, values }">
+        <template #action-bar="{ formValid, onCancel, values }">
           <ActionBarBlockWithTeleport
             @onSubmit="formSubmit(values)"
             @onCancel="onCancel"
@@ -63,6 +63,7 @@
   })
 
   const userData = ref({})
+  const loading = ref(false)
 
   const loadUser = async () => {
     userData.value = await props.loadUserService()
@@ -111,6 +112,7 @@
   }
 
   const formSubmit = async (values) => {
+    loading.value = true
     try {
       const feedback = await props.editUsersService(values)
 
@@ -125,6 +127,8 @@
       }
     } catch (error) {
       showToast('error', error)
+    } finally {
+      loading.value = false
     }
   }
   const passwordRequirementsList = ref([
