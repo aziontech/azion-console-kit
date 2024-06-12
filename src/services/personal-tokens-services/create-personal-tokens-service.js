@@ -29,7 +29,7 @@ const parseHttpResponse = (httpResponse) => {
   switch (httpResponse.statusCode) {
     case 201:
       return {
-        feedback: 'Your personal token has been created',
+        feedback: 'Personal token has been created',
         token: httpResponse.body.key,
         urlToEditView: '/personal-tokens'
       }

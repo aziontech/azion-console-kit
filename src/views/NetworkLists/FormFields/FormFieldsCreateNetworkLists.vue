@@ -199,6 +199,7 @@
           v-model="selectedCountries"
           :options="countriesList"
           filter
+          autoFilterFocus
           optionLabel="name"
           optionValue="value"
           placeholder="Select Countries"

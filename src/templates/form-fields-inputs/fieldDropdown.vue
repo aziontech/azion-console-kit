@@ -115,53 +115,52 @@
 </script>
 
 <template>
-  <div class="flex flex-col sm:w-2/5 gap-2">
-    <label
-      :for="props.name"
-      class="text-color text-sm font-medium leading-5"
-      >{{ props.label }} {{ labelSufix }}</label
+  <label
+    :for="props.name"
+    class="text-color text-sm font-medium leading-5"
+  >
+    {{ props.label }} {{ labelSufix }}
+  </label>
+  <Dropdown
+    appendTo="self"
+    :id="name"
+    :loading="loading"
+    v-model="inputValue"
+    :options="props.options"
+    :optionLabel="props.optionLabel"
+    :optionDisabled="props.optionDisabled"
+    :filter="props.filter"
+    :optionValue="props.optionValue"
+    :placeholder="props.placeholder"
+    :autoFilterFocus="props.filter"
+    @change="emitChange"
+    @blur="emitBlur"
+    :class="inputClass"
+    :disabled="disabled"
+  >
+    <template
+      v-if="enableCustomLabel"
+      #value="slotProps"
     >
-    <Dropdown
-      appendTo="self"
-      :id="name"
-      :loading="loading"
-      v-model="inputValue"
-      :options="props.options"
-      :optionLabel="props.optionLabel"
-      :optionDisabled="props.optionDisabled"
-      :filter="props.filter"
-      :optionValue="props.optionValue"
-      :placeholder="props.placeholder"
-      :autoFilterFocus="props.filter"
-      @change="emitChange"
-      @blur="emitBlur"
-      :class="inputClass"
-      :disabled="disabled"
-    >
-      <template
-        v-if="enableCustomLabel"
-        #value="slotProps"
-      >
-        <span>
-          {{ getLabelBySelectedValue(slotProps.value) }}
-        </span>
-      </template>
+      <span>
+        {{ getLabelBySelectedValue(slotProps.value) }}
+      </span>
+    </template>
 
-      <template #footer>
-        <slot name="footer" />
-      </template>
-    </Dropdown>
+    <template #footer>
+      <slot name="footer" />
+    </template>
+  </Dropdown>
 
-    <small
-      v-if="errorMessage"
-      class="p-error text-xs font-normal leading-tight"
-      >{{ errorMessage }}</small
-    >
-    <small
-      class="text-xs text-color-secondary font-normal leading-5"
-      v-if="props.description"
-    >
-      {{ props.description }}
-    </small>
-  </div>
+  <small
+    v-if="errorMessage"
+    class="p-error text-xs font-normal leading-tight"
+    >{{ errorMessage }}</small
+  >
+  <small
+    class="text-xs text-color-secondary font-normal leading-5"
+    v-if="props.description"
+  >
+    {{ props.description }}
+  </small>
 </template>

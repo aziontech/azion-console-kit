@@ -1,3 +1,4 @@
+<!-- eslint-disable vue/return-in-computed-property -->
 <script setup>
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
   import { useField, useFieldArray } from 'vee-validate'
@@ -350,16 +351,6 @@
     }
   }
 
-  const showNewBehaviorButton = ref(true)
-
-  /**
-   * Updates the 'showNewBehaviorButton' ref.
-   * @param {boolean} isShow - Whether to show the new behavior button.
-   */
-  const setShowNewBehaviorButton = (isShow) => {
-    showNewBehaviorButton.value = isShow
-  }
-
   /**
    * Updates the 'showTargetField' property of the behavior at the specified index.
    * @param {boolean} isShow - Whether to show the target field.
@@ -379,6 +370,36 @@
       removeBehavior(index)
     }
   }
+
+  const disableAddBehaviorButtonComputed = computed(() => {
+    const MAXIMUM_NUMBER_OF_BEHAVIORS = 10
+    const disableAddBehaviorButton = true
+    const behaviorHasNotBeenLoaded = !behaviors || !behaviors.value
+    if (behaviorHasNotBeenLoaded) {
+      return disableAddBehaviorButton
+    }
+    if (behaviors.value.length === 0) {
+      return disableAddBehaviorButton
+    }
+    if (behaviors.value.length >= MAXIMUM_NUMBER_OF_BEHAVIORS) {
+      return disableAddBehaviorButton
+    }
+
+    const lastBehavior = behaviors.value[behaviors.value.length - 1]
+    const isLastBehaviorEmpty = !lastBehavior.value.name
+    if (isLastBehaviorEmpty) {
+      return disableAddBehaviorButton
+    }
+    const optionsThatDisableAddBehaviors = [
+      'deliver',
+      'redirect_to_301',
+      'redirect_to_302',
+      'deny',
+      'no_content'
+    ]
+
+    return optionsThatDisableAddBehaviors.includes(lastBehavior.value.name)
+  })
 
   /**
    * Changes the type of the behavior at the specified index and updates related properties.
@@ -411,7 +432,6 @@
     }
 
     updateBehavior(index, { name: behaviorName, target: targetValue })
-    setShowNewBehaviorButton(true)
 
     switch (behaviorName) {
       case 'run_function':
@@ -434,7 +454,6 @@
         const isAddBehaviorButtonEnabled = !disableAddBehaviorButtonOptions.includes(behaviorName)
 
         setShowBehaviorTargetField(isBehaviorTargetFieldEnabled, index)
-        setShowNewBehaviorButton(isAddBehaviorButtonEnabled)
 
         if (!isAddBehaviorButtonEnabled) {
           removeBehaviorsFromIndex(index)
@@ -578,33 +597,32 @@
     return criteria.value.length >= MAXIMUM_ALLOWED
   })
 
-  const MaximumBehaviorsAllowed = computed(() => {
-    const MAXIMUM_NUMBER = 10
-    return behaviors.value.length >= MAXIMUM_NUMBER
-  })
-
   const phasesRadioOptions = ref([])
 
-  watch(checkPhaseIsDefaultValue, () => {
-    if (!checkPhaseIsDefaultValue.value) {
-      phasesRadioOptions.value = [
-        {
-          title: 'Request Phase',
-          value: 'request',
-          subtitle: 'Configure the requests made to the edge.'
-        },
-        {
-          title: 'Response Phase',
-          value: 'response',
-          subtitle: 'Configure the responses delivered to end-users.'
-        }
-      ]
-    } else {
-      phasesRadioOptions.value = []
-    }
-  })
+  watch(
+    checkPhaseIsDefaultValue,
+    () => {
+      if (!checkPhaseIsDefaultValue.value) {
+        phasesRadioOptions.value = [
+          {
+            title: 'Request Phase',
+            value: 'request',
+            subtitle: 'Configure the requests made to the edge.'
+          },
+          {
+            title: 'Response Phase',
+            value: 'response',
+            subtitle: 'Configure the responses delivered to end-users.'
+          }
+        ]
+      } else {
+        phasesRadioOptions.value = []
+      }
+    },
+    { immediate: true }
+  )
 
-  onMounted(() => {
+  onMounted(async () => {
     updateBehaviorsOptionsRequires()
 
     if (props.isApplicationAcceleratorEnabled) {
@@ -620,7 +638,8 @@
     }
 
     callOptionsServicesAtEdit()
-    processBehaviorsAtEdit()
+    await processBehaviorsAtEdit()
+    checkPhaseIsDefaultValue.value = phase.value === 'default'
   })
 </script>
 
@@ -920,20 +939,17 @@
           </div>
         </div>
       </div>
-
-      <template v-if="showNewBehaviorButton">
-        <Divider type="solid" />
-        <div>
-          <PrimeButton
-            icon="pi pi-plus-circle"
-            label="Add Behavior"
-            size="small"
-            outlined
-            :disabled="MaximumBehaviorsAllowed"
-            @click="addNewBehavior"
-          />
-        </div>
-      </template>
+      <Divider type="solid" />
+      <div>
+        <PrimeButton
+          :disabled="disableAddBehaviorButtonComputed"
+          icon="pi pi-plus-circle"
+          label="Add Behavior"
+          size="small"
+          outlined
+          @click="addNewBehavior"
+        />
+      </div>
     </template>
   </FormHorizontal>
 

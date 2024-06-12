@@ -241,7 +241,7 @@
   })
 </script>
 <template>
-  <div class="flex w-full min-w-0 flex-column gap-4 md:gap-2 md:flex-row">
+  <div class="flex w-full min-w-0 flex-column gap-2 md:flex-row">
     <dialogFilter
       :disabled="props.disabled"
       ref="refDialogFilter"
@@ -251,7 +251,7 @@
     />
 
     <div
-      class="md:-ml-2 md:border-b md:border-left-none md:border-r border-solid border-t flex items-center p-inputtext md:rounded-[0px_6px_6px_0px] w-full overflow-x-auto overflow-y-hidden h-12"
+      class="md:-ml-2 md:border-b md:border-left-none md:border-r border-solid border-t flex items-center p-inputtext md:rounded-[0px_6px_6px_0px] w-full overflow-x-auto overflow-y-hidden h-[37px] md:h-12"
     >
       <ul class="flex gap-3 align-items-center">
         <template

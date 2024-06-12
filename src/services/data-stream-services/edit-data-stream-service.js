@@ -154,9 +154,10 @@ const parseHttpResponse = (httpResponse) => {
   switch (httpResponse.statusCode) {
     case 200:
       return 'Your data stream has been updated'
-    case 400:
+    case 400: {
       const apiError = extractApiError(httpResponse)
       throw new Error(apiError)
+    }
     case 401:
       throw new Errors.InvalidApiTokenError().message
     case 403:
@@ -171,60 +172,10 @@ const parseHttpResponse = (httpResponse) => {
 }
 
 /**
- * @param {Object} errorSchema - The error schema.
- * @param {string} key - The error key of error schema.
- * @returns {string|undefined} The result message based on the status code.
- */
-const extractErrorKey = (errorSchema, key) => {
-  return errorSchema[key]
-}
-
-/**
  * @param {Object} httpResponse - The HTTP response object.
- * @param {Object} httpResponse.body - The response body.
  * @returns {string} The result message based on the status code.
  */
 const extractApiError = (httpResponse) => {
-  // flag
-  const noFlagError = extractErrorKey(httpResponse.body, 'user_has_no_flag')
-
-  // standard
-  const invalidURLError = extractErrorKey(httpResponse.body, 'invalid_url')
-  const maxSizeError = extractErrorKey(httpResponse.body, 'max_size_out_of_range')
-  const datasetError = extractErrorKey(httpResponse.body, 'payload_format_without_dataset')
-
-  // kafka
-  const invalidBootstrapServersError = extractErrorKey(
-    httpResponse.body,
-    'invalid_bootstrap_servers'
-  )
-
-  // s3
-  const invalidHostURLError = extractErrorKey(httpResponse.body, 'invalid_host_url')
-
-  // google big query
-  const invalidServiceAccountError = extractErrorKey(
-    httpResponse.body,
-    'invalid_service_account_key'
-  )
-
-  // elasticsearch
-  const elasticInvalidURLError = extractErrorKey(httpResponse.body, 'invalid_url')
-
-  // Datadog
-  const datadogInvalidURLError = extractErrorKey(httpResponse.body, 'invalid_datadog_url')
-
-  const errorMessages = [
-    noFlagError,
-    invalidURLError,
-    maxSizeError,
-    datasetError,
-    invalidBootstrapServersError,
-    invalidHostURLError,
-    invalidServiceAccountError,
-    elasticInvalidURLError,
-    datadogInvalidURLError
-  ]
-  const errorMessage = errorMessages.find((error) => !!error)
-  return errorMessage
+  const [key] = Object.keys(httpResponse.body)
+  return httpResponse.body[key]
 }
