@@ -137,14 +137,14 @@
 
               <BigNumber
                 label="Bytes Sent"
-                sufix="ms"
+                sufix="bytes"
                 :tooltipMessage="bytesSentTooltip"
                 >{{ details.bytesSent }}
               </BigNumber>
 
               <BigNumber
                 label="Request Length"
-                sufix="ms"
+                sufix="bytes"
                 :tooltipMessage="requestLengthTooltip"
                 >{{ details.requestLength }}</BigNumber
               >
