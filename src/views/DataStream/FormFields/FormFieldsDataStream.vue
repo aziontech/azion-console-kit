@@ -1114,8 +1114,8 @@
           :class="{ 'p-invalid': payloadFormatError }"
         />
         <small class="text-color-secondary text-xs font-normal leading-tight">
-          Character that'll be used at the end of each log line. The "\n" escape sequence breaks
-          values into different lines in NDJSON format.
+          The format that payload will be sent. The $dataset variable will be replaced by all logs
+          already with the log line separator applied.
         </small>
         <small
           id="data-set-help"
@@ -1136,8 +1136,8 @@
           :class="{ 'p-invalid': lineSeparatorError }"
         />
         <small class="text-color-secondary text-xs font-normal leading-tight">
-          The format that payload will be sent. The $dataset variable will be replaced by all logs
-          already with the log line separator applied.
+          Character that'll be used at the end of each log line. The "\n" escape sequence breaks
+          values into different lines in NDJSON format.
         </small>
         <small
           id="max-size-help"
