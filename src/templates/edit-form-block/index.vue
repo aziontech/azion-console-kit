@@ -104,24 +104,40 @@
     }
   }
 
-  const onSubmit = handleSubmit(async (values) => {
-    try {
-      const feedback = await props.editService(values)
-      showToast('success', feedback ?? 'edited successfully')
-      blockViewRedirection.value = false
-      emit('on-edit-success', feedback)
-      if (props.disableRedirect) {
-        resetForm({ values })
+  const onSubmit = handleSubmit(
+    async (values) => {
+      try {
+        const feedback = await props.editService(values)
+        showToast('success', feedback ?? 'edited successfully')
+        blockViewRedirection.value = false
+        emit('on-edit-success', feedback)
+        if (props.disableRedirect) {
+          resetForm({ values })
+          blockViewRedirection.value = true
+          return
+        }
+        goBackToList()
+      } catch (error) {
+        emit('on-edit-fail', error)
         blockViewRedirection.value = true
-        return
+        showToast('error', error)
       }
-      goBackToList()
-    } catch (error) {
-      emit('on-edit-fail', error)
-      blockViewRedirection.value = true
-      showToast('error', error)
+    },
+    ({ errors }) => {
+      const firstError = Object.keys(errors)[0]
+      const el = document.querySelector(`[name="${firstError}"]`)
+
+      if (el) {
+        const elementPosition = el.getBoundingClientRect().top + window.scrollY
+        const MARGIN_TOP = 150
+        const adjustedPosition = elementPosition - MARGIN_TOP
+
+        window.scrollTo({ top: adjustedPosition, behavior: 'smooth' })
+        el.focus({ preventScroll: true })
+        el.click()
+      }
     }
-  })
+  )
 
   loadInitialData()
 </script>

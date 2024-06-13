@@ -90,17 +90,33 @@
     redirectToUrl(response.urlToEditView)
   }
 
-  const onSubmit = handleSubmit(async (values) => {
-    try {
-      blockViewRedirection.value = false
-      const response = await props.createService(values)
-      handleSuccess(response)
-    } catch (error) {
-      showToast('error', error)
-      emit('on-response-fail', error)
-      blockViewRedirection.value = true
+  const onSubmit = handleSubmit(
+    async (values) => {
+      try {
+        blockViewRedirection.value = false
+        const response = await props.createService(values)
+        handleSuccess(response)
+      } catch (error) {
+        showToast('error', error)
+        emit('on-response-fail', error)
+        blockViewRedirection.value = true
+      }
+    },
+    ({ errors }) => {
+      const firstError = Object.keys(errors)[0]
+      const el = document.querySelector(`[name="${firstError}"]`)
+
+      if (el) {
+        const elementPosition = el.getBoundingClientRect().top + window.scrollY
+        const MARGIN_TOP = 150
+        const adjustedPosition = elementPosition - MARGIN_TOP
+
+        window.scrollTo({ top: adjustedPosition, behavior: 'smooth' })
+        el.focus({ preventScroll: true })
+        el.click()
+      }
     }
-  })
+  )
 </script>
 
 <template>

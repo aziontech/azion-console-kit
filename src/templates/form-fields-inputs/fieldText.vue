@@ -53,7 +53,7 @@
 <template>
   <label
     :for="props.name"
-    class="text-color text-sm font-medium leading-5"
+    class="text-color text-base font-medium leading-5"
     >{{ props.label }}</label
   >
   <InputText
