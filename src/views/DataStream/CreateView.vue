@@ -76,7 +76,7 @@
       is: 'kafka',
       then: (schema) => schema.max(150).required('Kafka Topic is a required field')
     }),
-
+    useTls: yup.boolean(),
     // s3
     host: yup.string().when('endpoint', {
       is: 's3',

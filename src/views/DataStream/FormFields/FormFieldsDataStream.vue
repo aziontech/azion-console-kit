@@ -346,14 +346,14 @@
 
         <div class="flex sm:max-w-lg w-full gap-2 items-top">
           <InputSwitch
-            v-model="tlsOption"
-            id="tlsOption"
+            v-model="useTls"
+            id="useTls"
             class="flex-shrink-0 flex-grow"
-            :class="{ 'p-invalid': tlsOptionError }"
+            :class="{ 'p-invalid': useTlsError }"
           />
           <div class="flex flex-col gap-1">
             <label
-              for="tlsOption"
+              for="useTls"
               class="text-sm font-normal leading-tight"
               >Enable Transport Layer Security (TLS)</label
             >
@@ -1262,7 +1262,7 @@
   const { value: bootstrapServers, errorMessage: bootstrapServersError } =
     useField('bootstrapServers')
   const { value: kafkaTopic, errorMessage: kafkaTopicError } = useField('kafkaTopic')
-  const { value: tlsOption, errorMessage: tlsOptionError } = useField('tlsOption')
+  const { value: useTls, errorMessage: useTlsError } = useField('useTls')
 
   // s3
   const { value: host, errorMessage: hostError } = useField('host')
@@ -1416,7 +1416,7 @@
         // Kafka
         bootstrapServers: '',
         kafkaTopic: '',
-        tlsOption: false,
+        useTls: false,
 
         // s3
         host: '',
