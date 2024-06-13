@@ -44,7 +44,7 @@
           type="button"
           aria-label="Copy"
           label="Copy"
-          :disabled="!domainValue"
+          :disabled="hasDomain"
           @click="params.copy"
         />
       </div>
@@ -80,4 +80,8 @@
   const closeDialog = () => {
     dialogRef.value.close()
   }
+
+  const hasDomain = computed(() => {
+    return !domainValue.value
+  })
 </script>
