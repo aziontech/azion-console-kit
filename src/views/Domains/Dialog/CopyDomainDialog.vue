@@ -73,9 +73,7 @@
 
   const params = dialogRef.value.data
 
-  const domainValue = computed({
-    get: () => params.domain
-  })
+  const domainValue = computed(() => params.domain)
 
   const closeDialog = () => {
     dialogRef.value.close()
