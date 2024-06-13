@@ -53,7 +53,7 @@ const getInfoByEndpoint = (payload) => {
       return {
         kafkaTopic: payload.endpoint.kafka_topic,
         bootstrapServers: payload.endpoint.bootstrap_servers,
-        useTls: payload.endpoint.use_tls,
+        useTls: payload.endpoint.use_tls
       }
     case 's3':
       return {

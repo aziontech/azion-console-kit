@@ -238,7 +238,8 @@ describe('DataStreamServices', () => {
       endpoint: 'kafka',
       values: {
         kafkaTopic: 'example_topic',
-        bootstrap_servers: 'kafka-server.com:9092,kafka-server-2.com:9092'
+        bootstrap_servers: 'kafka-server.com:9092,kafka-server-2.com:9092',
+        useTls: true,
       }
     },
     {

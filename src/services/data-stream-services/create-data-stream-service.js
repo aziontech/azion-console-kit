@@ -17,7 +17,7 @@ const adapt = (payload) => {
   let parsedPayload
 
   if (payload.template === 'CUSTOM_TEMPLATE') {
-    parsedPayload = { 
+    parsedPayload = {
       name: payload.name,
       template_model: payload.dataSet,
       all_domains: allDomains,
