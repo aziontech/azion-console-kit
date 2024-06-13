@@ -7,7 +7,8 @@
       <CreateFormBlock
         :createService="createDomainService"
         :cleanFormCallback="resetForm"
-        @on-response="handleTrackCreation"
+        :disabledCallback="true"
+        @on-response="handleResponse"
         @on-response-fail="handleTrackFailedCreation"
         :schema="validationSchema"
         :initialValues="initialValues"
@@ -40,9 +41,10 @@
   import PageHeadingBlock from '@/templates/page-heading-block'
   import FormFieldsCreateDomains from './FormFields/FormFieldsCreateDomains.vue'
   import ActionBarTemplate from '@/templates/action-bar-block/action-bar-with-teleport'
+  import CopyDomainDialog from './Dialog/CopyDomainDialog.vue'
   import { TOAST_LIFE } from '@/utils/constants'
-  import { useRoute } from 'vue-router'
-  const route = useRoute()
+  import { useRoute, useRouter } from 'vue-router'
+  import { useDialog } from 'primevue/usedialog'
   import * as yup from 'yup'
   import { handleTrackerError } from '@/utils/errorHandlingTracker'
 
@@ -59,21 +61,60 @@
       type: Function,
       required: true
     },
+    clipboardWrite: {
+      type: Function,
+      required: true
+    },
     listEdgeApplicationsService: {
       type: Function,
       required: true
     }
   })
+
+  const toast = useToast()
+  const route = useRoute()
+  const dialog = useDialog()
+  const router = useRouter()
+
   const edgeApps = ref([])
   const digitalCertificates = ref([])
-  const toast = useToast()
+  const domainName = ref('')
 
-  const handleTrackCreation = () => {
+  const handleResponse = (value) => {
+    domainName.value = value?.domainName
+    dialog.open(CopyDomainDialog, {
+      data: {
+        domain: domainName.value,
+        copy: copyDomain
+      },
+      onClose: () => {
+        router.push({ name: 'list-domains' })
+      }
+    })
     tracker.product.productCreated({
       productName: 'Domain',
       createdFrom: 'singleEntity',
       from: route.query.origin
     })
+  }
+
+  const copyDomain = async () => {
+    const toastConfig = {
+      closable: true,
+      severity: 'success',
+      summary: 'Domain copied to clipboard!'
+    }
+
+    try {
+      props.clipboardWrite(domainName.value)
+      toast.add({ ...toastConfig })
+    } catch (error) {
+      toast.add({
+        ...toastConfig,
+        severity: 'error',
+        detail: 'The Domain could not be copied to clipboard. Please try again.'
+      })
+    }
   }
 
   const handleTrackFailedCreation = (error) => {

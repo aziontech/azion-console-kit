@@ -97,6 +97,10 @@
     name: yup
       .string()
       .required('Full Name is a required field')
+      .test('non-numeric', 'Full Name must contain only alphabetic characters', (value) => {
+        const alphaRegex = /[A-zÀ-ž.'-]+[A-zÀ-ž.'-]+/
+        return alphaRegex.test(value)
+      })
       .test('full-name', 'Full Name must include first and last name', (value) => {
         const fullname = value.trim('').split(' ')
         return fullname.length >= 2
