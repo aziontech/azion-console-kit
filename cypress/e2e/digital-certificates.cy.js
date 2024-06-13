@@ -13,7 +13,7 @@ describe('Digital Certificates', () => {
     cy.getByTestId('signin-block__email-input').type(email)
     cy.getByTestId('signin-block__next-button').click()
 
-    cy.getByTestId('signin-block__password-input').type(password)
+    cy.getByTestId('signin-block__password-input').type(password, { log: false })
     cy.getByTestId('signin-block__signin-button').click()
 
     cy.wait('@setAccount')
