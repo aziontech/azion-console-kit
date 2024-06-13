@@ -38,7 +38,6 @@
   const { value: edgeApplication, errorMessage: errorEdgeApplication } = useField('edgeApplication')
   const { setValue: setEdgeCertificate } = useField('edgeCertificate')
   const { value: mtlsIsEnabled } = useField('mtlsIsEnabled')
-  useField('domainName')
   const { value: mtlsTrustedCertificate, errorMessage: errorMtlsTrustedCertificate } =
     useField('mtlsTrustedCertificate')
 
