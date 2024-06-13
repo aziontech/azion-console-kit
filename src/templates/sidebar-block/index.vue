@@ -14,6 +14,7 @@
       'bg-header hover:bg-header-button-hover': !showSidebar
     }"
     v-tooltip.bottom="{ value: 'Menu', showDelay: 200 }"
+    data-testid="sidebar-block__toggle-button"
   />
 
   <Sidebar
@@ -41,6 +42,7 @@
           class="flex h-9"
           v-bind="props.action"
           @click="redirectToRoute(item.to)"
+          :data-testid="`sidebar-block__menu-item__${item.id}`"
         >
           <span v-bind="props.icon" />
           <span v-bind="props.label">{{ label }}</span>
