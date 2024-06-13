@@ -17,7 +17,7 @@ const adapt = (payload) => {
   let parsedPayload
 
   if (payload.template === 'CUSTOM_TEMPLATE') {
-    parsedPayload = {
+    parsedPayload = { 
       name: payload.name,
       template_model: payload.dataSet,
       all_domains: allDomains,
@@ -58,7 +58,8 @@ const parseByEndpointType = (payload) => {
       return {
         endpoint_type: 'kafka',
         kafka_topic: payload.kafkaTopic,
-        bootstrap_servers: payload.bootstrapServers
+        bootstrap_servers: payload.bootstrapServers,
+        use_tls: payload.useTls
       }
     case 's3':
       return {
