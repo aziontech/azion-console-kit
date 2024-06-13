@@ -1,37 +1,3 @@
-<template>
-  <ContentBlock>
-    <template #heading>
-      <PageHeadingBlock :pageTitle="pageTitle"></PageHeadingBlock>
-    </template>
-    <template #content>
-      <ListTableBlock
-        v-if="hasContentToList"
-        :listService="props.listUsersService"
-        :deleteService="props.deleteUsersService"
-        :columns="getColumns"
-        pageTitleDelete="user"
-        addButtonLabel="User"
-        createPagePath="users/create"
-        editPagePath="users/edit"
-        @on-load-data="handleLoadData"
-        emptyListMessage="No users found."
-      />
-      <EmptyResultsBlock
-        v-else
-        title="No user has been created"
-        description=" Click the button below to create your first user."
-        createButtonLabel="User"
-        createPagePath="users/create"
-        :documentationService="props.documentationService"
-      >
-        <template #illustration>
-          <Illustration />
-        </template>
-      </EmptyResultsBlock>
-    </template>
-  </ContentBlock>
-</template>
-
 <script setup>
   import Illustration from '@/assets/svg/illustration-layers.vue'
   import ContentBlock from '@/templates/content-block'
@@ -116,3 +82,37 @@
     hasContentToList.value = event
   }
 </script>
+
+<template>
+  <ContentBlock>
+    <template #heading>
+      <PageHeadingBlock :pageTitle="pageTitle"></PageHeadingBlock>
+    </template>
+    <template #content>
+      <ListTableBlock
+        v-if="hasContentToList"
+        :listService="props.listUsersService"
+        :deleteService="props.deleteUsersService"
+        :columns="getColumns"
+        pageTitleDelete="user"
+        addButtonLabel="User"
+        createPagePath="users/create"
+        editPagePath="users/edit"
+        @on-load-data="handleLoadData"
+        emptyListMessage="No users found."
+      />
+      <EmptyResultsBlock
+        v-else
+        title="No user has been created"
+        description=" Click the button below to create your first user."
+        createButtonLabel="User"
+        createPagePath="users/create"
+        :documentationService="props.documentationService"
+      >
+        <template #illustration>
+          <Illustration />
+        </template>
+      </EmptyResultsBlock>
+    </template>
+  </ContentBlock>
+</template>
