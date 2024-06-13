@@ -12,6 +12,7 @@
         @on-response-fail="handleTrackFailedCreation"
         :schema="validationSchema"
         :initialValues="initialValues"
+        disableAfterCreateToastFeedback
       >
         <template #form>
           <FormFieldsCreateDomains
