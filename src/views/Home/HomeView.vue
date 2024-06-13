@@ -94,7 +94,13 @@
   }
 
   const validationSchema = yup.object({
-    name: yup.string().required('Name is a required field'),
+    name: yup
+      .string()
+      .required('Full Name is a required field')
+      .test('non-numeric', 'Full Name must include first and last name', (value) => {
+        const alphaRegex = /[A-zÀ-ž.'-]+ [A-zÀ-ž.'-]+/
+        return alphaRegex.test(value)
+      }),
     email: yup.string().email('Must be a valid email').required('E-mail is a required field'),
     team: yup.string().required()
   })

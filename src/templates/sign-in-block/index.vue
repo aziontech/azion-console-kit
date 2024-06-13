@@ -35,6 +35,7 @@
               @keydown.enter="checkLoginMethod"
               class="w-full"
               :class="{ 'p-invalid': errors.email }"
+              data-testid="signin-block__email-input"
             />
             <small
               class="p-error text-xs font-normal leading-tight"
@@ -49,6 +50,7 @@
             class="w-full flex-row-reverse"
             type="button"
             label="Next"
+            data-testid="signin-block__next-button"
             :loading="isProccedButtonLoading"
             :disabled="!email"
             @click="checkLoginMethod"
@@ -115,6 +117,7 @@
               :class="{ 'p-invalid': hasRequestErrorMessage }"
               @keydown.enter="validateAndSubmit"
               :feedback="false"
+              data-testid="signin-block__password-input"
             />
             <small
               class="p-error text-xs font-normal leading-tight"
@@ -139,6 +142,7 @@
           type="button"
           @click="validateAndSubmit"
           :disabled="!password"
+          data-testid="signin-block__signin-button"
         />
       </div>
 

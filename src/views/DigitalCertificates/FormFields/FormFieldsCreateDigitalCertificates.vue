@@ -60,7 +60,7 @@
     {
       title: 'Request a certificate',
       subtitle:
-        'Generate a Certificate Singing Request (CSR) to purchase a TLS digital certificate from a CA.',
+        'Generate a Certificate Signing Request (CSR) to purchase a TLS digital certificate from a CA.',
       value: certificateTypes.value.EDGE_CERTIFICATE_CSR
     },
     {
@@ -320,7 +320,7 @@
   >
     <template #inputs>
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
-        <label>Private Certificate *</label>
+        <label>Certificate *</label>
         <PrimeTextarea
           v-model="certificate"
           :class="{ 'p-invalid': certificateError }"

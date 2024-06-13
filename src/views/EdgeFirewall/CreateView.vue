@@ -43,7 +43,8 @@
     debugRules: false,
     edgeFunctionsEnabled: false,
     networkProtectionEnabled: true,
-    wafEnabled: false
+    wafEnabled: false,
+    ddosProtectionUnmetered: true
   }
 
   const handleCreateEdgeFirewall = () => {

@@ -1,11 +1,11 @@
 <template>
   <ContentBlock>
     <template #heading>
-      <PageHeadingBlock pageTitle="Your Settings"></PageHeadingBlock>
+      <PageHeadingBlock pageTitle="Your Settings" />
     </template>
     <template #content>
       <EditFormBlock
-        :editService="props.editUsersService"
+        :editService="() => {}"
         :schema="validationSchema"
         :loadService="loadUser"
         :disableRedirect="true"
@@ -16,9 +16,9 @@
             :listCountriesPhoneService="listCountriesPhoneService"
           />
         </template>
-        <template #action-bar="{ onSubmit, formValid, onCancel, loading, values, setValues }">
+        <template #action-bar="{ formValid, onCancel, values }">
           <ActionBarBlockWithTeleport
-            @onSubmit="formSubmit(onSubmit, values, setValues)"
+            @onSubmit="formSubmit(values)"
             @onCancel="onCancel"
             :loading="loading"
             :submitDisabled="!formValid"
@@ -39,10 +39,9 @@
   import { useToast } from 'primevue/usetoast'
   import * as yup from 'yup'
   import FormFieldsYourSettings from './FormFields/FormFieldsYourSettings.vue'
+  import { TOAST_LIFE } from '@/utils/constants'
 
   const toast = useToast()
-
-  const currentEmail = ref('')
 
   const props = defineProps({
     loadUserService: {
@@ -63,24 +62,74 @@
     }
   })
 
+  const userData = ref({})
+  const loading = ref(false)
+
   const loadUser = async () => {
-    const userData = await props.loadUserService()
+    userData.value = await props.loadUserService()
 
-    currentEmail.value = userData.email
-
-    return userData
+    return userData.value
   }
-  const formSubmit = (onSubmit, values) => {
-    if (values.email !== currentEmail.value) {
-      const toastConfig = {
-        closable: true,
-        severity: 'warn',
-        summary: 'Confirmation email',
-        detail: 'We have sent you a confirmation email.'
-      }
-      toast.add({ ...toastConfig })
+
+  const showToast = (severity, detail, summary = severity) => {
+    if (!detail) return
+
+    const options = {
+      closable: true,
+      severity,
+      summary,
+      detail
     }
-    onSubmit()
+
+    if (severity === 'success') {
+      options.life = TOAST_LIFE
+    }
+
+    toast.add(options)
+  }
+
+  const isEmailChangedOnly = (values) => {
+    const keysToCheck = [
+      'firstName',
+      'lastName',
+      'timezone',
+      'language',
+      'countryCallCode',
+      'mobile',
+      'email',
+      'twoFactorEnabled',
+      'password',
+      'oldPassword',
+      'confirmPassword'
+    ]
+
+    const changedKeys = keysToCheck.filter((key) => values[key] !== userData.value[key])
+    return changedKeys.length === 1 && changedKeys[0] === 'email'
+  }
+
+  const showEmailToast = () => {
+    showToast('info', 'We have sent you a confirmation email.', 'Confirmation email')
+  }
+
+  const formSubmit = async (values) => {
+    loading.value = true
+    try {
+      const feedback = await props.editUsersService(values)
+
+      if (isEmailChangedOnly(values)) {
+        return showEmailToast()
+      }
+
+      showToast('success', feedback)
+
+      if (values.email !== userData.value.email) {
+        showEmailToast()
+      }
+    } catch (error) {
+      showToast('error', error)
+    } finally {
+      loading.value = false
+    }
   }
   const passwordRequirementsList = ref([
     { label: '8 characters', valid: false },
