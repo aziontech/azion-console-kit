@@ -152,6 +152,7 @@
   <FormHorizontal
     v-if="domainOption === '1'"
     title="Sampling"
+    class="hidden"
     description="Enable this option to reduce costs of data collection and analysis."
   >
     <template #inputs>
