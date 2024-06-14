@@ -1,10 +1,11 @@
 <script setup>
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
+  import FieldText from '@/templates/form-fields-inputs/fieldText'
+  import FieldTextArea from '@/templates/form-fields-inputs/fieldTextArea'
+  import FieldDropdown from '@/templates/form-fields-inputs/fieldDropdown'
   import Divider from 'primevue/divider'
-  import Dropdown from 'primevue/dropdown'
   import InputSwitch from 'primevue/inputswitch'
   import InputText from 'primevue/inputtext'
-  import TextArea from 'primevue/textarea'
   import { useToast } from 'primevue/usetoast'
   import { useField } from 'vee-validate'
   import { onMounted, ref, watch, computed } from 'vue'
@@ -25,16 +26,16 @@
     }
   })
 
-  const { value: accountName, errorMessage: accountNameError } = useField('accountName')
+  const { value: accountName } = useField('accountName')
   const { value: clientId } = useField('clientId')
   const { value: companyName } = useField('companyName')
   const { value: uniqueIdentifier } = useField('uniqueIdentifier')
   const { value: billingEmails } = useField('billingEmails')
-  const { value: postalCode, errorMessage: postalCodeError } = useField('postalCode')
-  const { value: country, errorMessage: countryError } = useField('country')
-  const { value: region, errorMessage: regionError } = useField('region')
-  const { value: city, errorMessage: cityError } = useField('city')
-  const { value: address, errorMessage: addressError } = useField('address')
+  const { value: postalCode } = useField('postalCode')
+  const { value: country } = useField('country')
+  const { value: region } = useField('region')
+  const { value: city } = useField('city')
+  const { value: address } = useField('address')
   const { value: complement } = useField('complement')
   const { value: isSocialLoginEnabled } = useField('isSocialLoginEnabled')
   const { value: isEnabledMfaToAllUsers } = useField('isEnabledMfaToAllUsers')
@@ -147,31 +148,17 @@
   >
     <template #inputs>
       <div class="flex flex-col w-full gap-2 sm:max-w-lg">
-        <label
-          for="accountName"
-          class="text-color text-base font-medium"
-        >
-          Account Name *
-        </label>
-        <InputText
-          v-model="accountName"
-          id="accountName"
-          type="text"
-          :class="{ 'p-invalid': accountNameError }"
+        <FieldText
+          label="Account Name *"
+          name="accountName"
           placeholder="Company"
+          :value="accountName"
         />
-        <small
-          v-if="accountNameError"
-          class="p-error text-xs font-normal leading-tight"
-        >
-          {{ accountNameError }}
-        </small>
       </div>
-
       <div class="flex flex-col w-full sm:max-w-lg gap-2">
         <label
           for="clientId"
-          class="text-color text-base font-medium"
+          class="text-color text-base font-medium leading-5"
         >
           Client ID
         </label>
@@ -199,57 +186,32 @@
   >
     <template #inputs>
       <div class="flex flex-col w-full gap-2 sm:max-w-lg">
-        <label
-          for="companyName"
-          class="text-color text-base font-medium"
-        >
-          Company Name
-        </label>
-        <InputText
-          v-model="companyName"
-          id="companyName"
-          type="text"
+        <FieldText
+          label="Company Name"
+          name="companyName"
           placeholder="Company S.A."
+          :value="companyName"
+          description="Name of the company associated with the account."
         />
-        <small class="text-xs text-color-secondary font-normal leading-5">
-          Name of the company associated with the account.
-        </small>
       </div>
       <div class="flex flex-col w-full gap-2 sm:max-w-lg">
-        <label
-          for="uniqueIdentifier"
-          class="text-color text-base font-medium"
-        >
-          Company ID
-        </label>
-        <InputText
-          v-model="uniqueIdentifier"
-          id="uniqueIdentifier"
-          type="text"
+        <FieldText
+          label="Company ID"
+          name="uniqueIdentifier"
           placeholder="00.000.000/0001-00"
+          :value="uniqueIdentifier"
+          description="Personal or company ID number to identify account ownership."
         />
-        <small class="text-xs text-color-secondary font-normal leading-5">
-          Personal or company ID number to identify account ownership.
-        </small>
       </div>
       <div class="flex flex-col w-full gap-2 sm:max-w-lg">
-        <label
-          for="billingEmails"
-          class="text-color text-base font-medium"
-        >
-          Billing Emails
-        </label>
-        <TextArea
-          id="billingEmails"
-          v-model="billingEmails"
-          rows="5"
-          cols="30"
+        <FieldTextArea
+          label="Billing Emails"
           placeholder="example@email.com;holder@email.com"
+          name="billingEmails"
+          :value="billingEmails"
+          description="Billing information will be forwarded to all emails listed in this field. Separate each
+          email address with a semicolon ( ; )."
         />
-        <small class="text-xs text-color-secondary font-normal leading-5">
-          Billing information will be forwarded to all emails listed in this field. Separate each
-          email address with a semicolon (<code>;</code>).
-        </small>
       </div>
     </template>
   </FormHorizontal>
@@ -260,162 +222,80 @@
     <template #inputs>
       <div class="flex flex-col gap-6 md:gap-8 md:flex-row">
         <div class="flex flex-col w-full gap-2 sm:max-w-lg">
-          <label
-            for="postalCode"
-            class="text-color text-base font-medium"
-          >
-            Postal Code *
-          </label>
-          <InputText
-            v-model="postalCode"
-            id="postalCode"
-            type="text"
-            :class="{ 'p-invalid': postalCodeError }"
+          <FieldText
+            label="Postal Code *"
+            name="postalCode"
             placeholder="00.000.000-00"
+            :value="postalCode"
+            description="Postal code of the account owner."
           />
-          <small class="text-xs text-color-secondary font-normal leading-5">
-            Postal code of the account owner.
-          </small>
-          <small
-            v-if="postalCodeError"
-            class="p-error text-xs font-normal leading-tight"
-          >
-            {{ postalCodeError }}
-          </small>
         </div>
         <div class="flex flex-col w-full gap-2 sm:max-w-lg">
-          <label
-            for="country"
-            class="text-color text-base font-medium"
-          >
-            Country *
-          </label>
-          <Dropdown
-            autoFilterFocus
-            appendTo="self"
-            id="country"
-            filter
-            optionValue="geonameId"
-            optionLabel="name"
+          <FieldDropdown
+            label="Country *"
+            name="country"
             :options="countriesOptions.options"
-            v-model="country"
-            :class="{ 'p-invalid': countryError }"
             :loading="!countriesOptions.done"
             @change="resetRegionAndCity"
+            optionValue="geonameId"
+            optionLabel="name"
+            :value="country"
+            filter
+            appendTo="self"
+            description="Account owner's country."
           />
-          <small class="text-xs text-color-secondary font-normal leading-5">
-            Account owner's country.
-          </small>
-          <small
-            v-if="countryError"
-            class="p-error text-xs font-normal leading-tight"
-          >
-            {{ countryError }}
-          </small>
         </div>
       </div>
       <div class="flex flex-col gap-6 md:gap-8 md:flex-row">
         <div class="flex flex-col w-full gap-2 sm:max-w-lg">
-          <label
-            for="region"
-            class="text-color text-base font-medium"
-          >
-            State/Region *
-          </label>
-          <Dropdown
-            autoFilterFocus
-            appendTo="self"
-            id="region"
-            filter
-            optionValue="geonameId"
-            optionLabel="name"
+          <FieldDropdown
+            label="State/Region *"
+            name="region"
             :options="regionsOptions.options"
-            v-model="region"
             :loading="!regionsOptions.done"
-            :disabled="hasNoCountryListOrNotSelected"
-          />
-          <small class="text-xs text-color-secondary font-normal leading-5">
-            Account owner's state or region.
-          </small>
-          <small
-            v-if="regionError"
-            class="p-error text-xs font-normal leading-tight"
-          >
-            {{ regionError }}
-          </small>
-        </div>
-        <div class="flex flex-col w-full gap-2 sm:max-w-lg">
-          <label
-            for="city"
-            class="text-color text-base font-medium"
-          >
-            City *
-          </label>
-          <Dropdown
-            autoFilterFocus
-            appendTo="self"
-            id="city"
-            filter
             optionValue="geonameId"
             optionLabel="name"
-            :options="citiesOptions.options"
-            v-model="city"
-            :class="{ 'p-invalid': cityError }"
-            :loading="!citiesOptions.done"
-            :disabled="hasNoRegionListOrNotSelected"
+            :value="region"
+            filter
+            appendTo="self"
+            :disabled="hasNoCountryListOrNotSelected"
+            description="Account owner's state or region."
           />
-          <small class="text-xs text-color-secondary font-normal leading-5">
-            Account owner's city.
-          </small>
-          <small
-            v-if="cityError"
-            class="p-error text-xs font-normal leading-tight"
-          >
-            {{ cityError }}
-          </small>
+        </div>
+        <div class="flex flex-col w-full gap-2 sm:max-w-lg">
+          <FieldDropdown
+            label="City *"
+            name="city"
+            :options="citiesOptions.options"
+            :loading="!citiesOptions.done"
+            optionValue="geonameId"
+            optionLabel="name"
+            :value="city"
+            filter
+            appendTo="self"
+            :disabled="hasNoRegionListOrNotSelected"
+            description="Account owner's city."
+          />
         </div>
       </div>
       <div class="flex flex-col gap-6 md:gap-8 md:flex-row">
         <div class="flex flex-col w-full gap-2 sm:max-w-lg">
-          <label
-            for="address"
-            class="text-color text-base font-medium"
-          >
-            Address *
-          </label>
-          <InputText
-            v-model="address"
-            id="address"
-            type="text"
-            :class="{ 'p-invalid': addressError }"
+          <FieldText
+            label="Address *"
+            name="address"
             placeholder="123 Example Ave."
+            :value="address"
+            description="Account owner's street address."
           />
-          <small class="text-xs text-color-secondary font-normal leading-5">
-            Account owner's street address.
-          </small>
-          <small
-            v-if="addressError"
-            class="p-error text-xs font-normal leading-tight"
-          >
-            {{ addressError }}
-          </small>
         </div>
         <div class="flex flex-col w-full gap-2 sm:max-w-lg">
-          <label
-            for="complement"
-            class="text-color text-base font-medium"
-          >
-            Apartment, floor, etc.
-          </label>
-          <InputText
-            v-model="complement"
-            id="complement"
-            type="text"
+          <FieldText
+            label="Apartment, floor, etc."
+            name="complement"
             placeholder="1st floor"
+            :value="complement"
+            description="Additional information for the address."
           />
-          <small class="text-xs text-color-secondary font-normal leading-5">
-            Additional information for the address.
-          </small>
         </div>
       </div>
     </template>
