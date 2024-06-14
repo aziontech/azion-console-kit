@@ -1341,10 +1341,14 @@
     headers.value.splice(index, 1)
   }
 
-  const insertDataSet = (templateID) => {
+  const insertDataSet = (templateID, isFirstRender) => {
     const index = listTemplates.value.map((el) => el.value).indexOf(templateID)
     try {
-      if (props.resetForm) {
+      if (templateID === 'CUSTOM_TEMPLATE') {
+        if (!isFirstRender) {
+          dataSet.value = ''
+        }
+      } else {
         const dataSetJSON = JSON.parse(listTemplates.value[index].template)
         dataSet.value = JSON.stringify(dataSetJSON, null, '\t')
       }
@@ -1371,8 +1375,10 @@
 
   watch(
     () => template.value,
-    (templateID) => {
-      if (templateID) insertDataSet(templateID)
+    (newValue, oldValue) => {
+      const templateID = newValue
+      const isFirstRender = !oldValue
+      if (templateID) insertDataSet(templateID, isFirstRender)
     }
   )
 
