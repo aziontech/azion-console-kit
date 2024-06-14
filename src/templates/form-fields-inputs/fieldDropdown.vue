@@ -5,7 +5,7 @@
 
   const props = defineProps({
     value: {
-      type: String,
+      type: [String, Number],
       default: ''
     },
     name: {
@@ -39,10 +39,6 @@
     options: {
       type: Array,
       default: () => []
-    },
-    inputClass: {
-      type: String,
-      default: ''
     },
     loading: {
       type: Boolean,
@@ -117,13 +113,14 @@
 <template>
   <label
     :for="props.name"
-    class="text-color text-sm font-medium leading-5"
+    class="text-color text-base font-medium leading-5"
   >
     {{ props.label }} {{ labelSufix }}
   </label>
   <Dropdown
     appendTo="self"
     :id="name"
+    :name="props.name"
     :loading="loading"
     v-model="inputValue"
     :options="props.options"
@@ -135,7 +132,8 @@
     :autoFilterFocus="props.filter"
     @change="emitChange"
     @blur="emitBlur"
-    :class="inputClass"
+    :class="{ 'p-invalid': errorMessage }"
+    v-bind="$attrs"
     :disabled="disabled"
   >
     <template
@@ -155,8 +153,9 @@
   <small
     v-if="errorMessage"
     class="p-error text-xs font-normal leading-tight"
-    >{{ errorMessage }}</small
   >
+    {{ errorMessage }}
+  </small>
   <small
     class="text-xs text-color-secondary font-normal leading-5"
     v-if="props.description"

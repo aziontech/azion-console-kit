@@ -31,21 +31,17 @@
     readonly: {
       type: Boolean,
       default: false
-    },
-    inputClass: {
-      type: String,
-      default: ''
     }
   })
 
-  const name = toRef(props, 'name')
+  const nameInput = toRef(props, 'name')
 
   const {
     value: inputValue,
     errorMessage,
     handleBlur,
     handleChange
-  } = useField(name, undefined, {
+  } = useField(nameInput, undefined, {
     initialValue: props.value
   })
 </script>
@@ -54,26 +50,29 @@
   <label
     :for="props.name"
     class="text-color text-base font-medium leading-5"
-    >{{ props.label }}</label
   >
+    {{ props.label }}
+  </label>
   <InputText
-    :id="name"
+    :id="props.name"
     v-model="inputValue"
-    :name="name"
-    :readonly="readonly"
-    :disabled="disabled"
+    :name="props.name"
+    :readonly="props.readonly"
+    :disabled="props.disabled"
     type="text"
+    :class="{ 'p-invalid': errorMessage }"
     :placeholder="props.placeholder"
     @input="handleChange"
     @blur="handleBlur"
-    :class="inputClass"
     v-bind="$attrs"
   />
+
   <small
     v-if="errorMessage"
     class="p-error text-xs font-normal leading-tight"
-    >{{ errorMessage }}</small
   >
+    {{ errorMessage }}
+  </small>
   <small
     class="text-xs text-color-secondary font-normal leading-5"
     v-if="props.description"

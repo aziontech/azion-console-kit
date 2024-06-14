@@ -53,13 +53,14 @@
 <template>
   <label
     :for="props.name"
-    class="text-color text-sm font-medium leading-5"
-    >{{ props.label }}</label
+    class="text-color text-base font-medium leading-5"
   >
+    {{ props.label }}
+  </label>
   <TextArea
     :id="name"
     v-model="inputValue"
-    :name="name"
+    :name="props.name"
     type="text"
     :autoResize="props.autoResize"
     :rows="props.rows"
@@ -67,12 +68,14 @@
     :placeholder="props.placeholder"
     @input="handleChange"
     @blur="handleBlur"
+    :class="{ 'p-invalid': errorMessage }"
   />
   <small
     v-if="errorMessage"
     class="p-error text-xs font-normal leading-tight"
-    >{{ errorMessage }}</small
   >
+    {{ errorMessage }}
+  </small>
   <small
     class="text-xs text-color-secondary font-normal leading-5"
     v-if="props.description"
