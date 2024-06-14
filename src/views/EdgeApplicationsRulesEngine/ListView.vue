@@ -160,9 +160,6 @@
   }
 
   const drawerRulesEngineRef = ref('')
-  const openCreateRulesEngineDrawer = () => {
-    drawerRulesEngineRef.value.openDrawerCreate()
-  }
 
   const openCreateRulesEngineDrawerByPhase = () => {
     parsePhase[selectedPhase.value]
@@ -227,7 +224,7 @@
         <PrimeButton
           icon="pi pi-plus"
           label="Rule"
-          @click="openCreateRulesEngineDrawer"
+          @click="openCreateRulesEngineDrawerByPhase"
         />
       </div>
     </template>
