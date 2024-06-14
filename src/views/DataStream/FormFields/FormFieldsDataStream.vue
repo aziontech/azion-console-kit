@@ -1373,8 +1373,11 @@
 
   watch(
     () => template.value,
-    (templateID) => {
-      if (templateID) insertDataSet(templateID)
+    (newValue, oldValue) => {
+      const templateID = newValue
+      const isFirstRender = !oldValue
+      if (templateID) insertDataSet(templateID, isFirstRender)
+
       const isReadOnlyIfCustomTemplate = templateID !== 'CUSTOM_TEMPLATE'
       dataSetMonacoOptions.value.readOnly = isReadOnlyIfCustomTemplate
     }
