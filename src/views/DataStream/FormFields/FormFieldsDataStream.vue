@@ -1,316 +1,3 @@
-<script setup>
-  import FormHorizontal from '@/templates/create-form-block/form-horizontal'
-
-  import ButtonPrimer from 'primevue/button'
-  import Dropdown from 'primevue/dropdown'
-  import InlineMessage from 'primevue/inlinemessage'
-  import InputNumber from 'primevue/inputnumber'
-  import InputSwitch from 'primevue/inputswitch'
-  import InputText from 'primevue/inputtext'
-  import PrimePassword from 'primevue/password'
-  import PickList from 'primevue/picklist'
-  import RadioButton from 'primevue/radiobutton'
-  import TextArea from 'primevue/textarea'
-  import FieldGroupRadio from '@/templates/form-fields-inputs/fieldGroupRadio'
-  import FieldSwitchBlock from '@/templates/form-fields-inputs/fieldSwitchBlock'
-  import { useField } from 'vee-validate'
-  import { computed, onMounted, ref, watch } from 'vue'
-
-  import { useAccountStore } from '@/stores/account'
-
-  const props = defineProps({
-    listDataStreamTemplateService: {
-      type: Function,
-      required: true
-    },
-    listDataStreamDomainsService: {
-      type: Function,
-      required: true
-    },
-    resetForm: {
-      type: Function,
-      required: false
-    }
-  })
-
-  // Variables
-  const listDataSources = ref([
-    { label: 'Activity History', value: 'rtm_activity' },
-    { label: 'Edge Applications', value: 'http' },
-    { label: 'Edge Functions', value: 'cells_console' },
-    { label: 'WAF Events', value: 'waf' }
-  ])
-  const listEndpoint = ref([
-    { label: 'Standard HTTP/HTTPS POST', value: 'standard' },
-    { label: 'Apache Kafka', value: 'kafka' },
-    { label: 'Simple Storage Service (S3)', value: 's3' },
-    { label: 'Google BigQuery', value: 'big_query' },
-    { label: 'Elasticsearch', value: 'elasticsearch' },
-    { label: 'Splunk', value: 'splunk' },
-    { label: 'AWS Kinesis Data Firehose', value: 'aws_kinesis_firehose' },
-    { label: 'Datadog', value: 'datadog' },
-    { label: 'IBM QRadar', value: 'qradar' },
-    { label: 'Azure Monitor', value: 'azure_monitor' },
-    { label: 'Azure Blob Storage', value: 'azure_blob_storage' }
-  ])
-  const listContentType = ref([
-    { label: 'plain/text', value: 'plain/text' },
-    { label: 'application/gzip', value: 'application/gzip' }
-  ])
-
-  // Campos do formulário
-  useField('status')
-  const { value: name, errorMessage: nameError } = useField('name')
-  const { value: dataSource, errorMessage: dataSourceError } = useField('dataSource')
-  const { value: dataSet } = useField('dataSet')
-  const { value: template, errorMessage: templateError } = useField('template')
-  const { value: domainOption } = useField('domainOption')
-  const { value: domains } = useField('domains')
-  const { value: endpoint } = useField('endpoint')
-  const { value: hasSampling } = useField('hasSampling')
-  const { value: samplingPercentage, errorMessage: samplingPercentageError } =
-    useField('samplingPercentage')
-
-  // standard
-  const { value: endpointUrl, errorMessage: endpointUrlError } = useField('endpointUrl')
-  const { value: headers } = useField('headers')
-  const { value: maxSize } = useField('maxSize')
-  const { value: lineSeparator, errorMessage: lineSeparatorError } = useField('lineSeparator')
-  const { value: payloadFormat, errorMessage: payloadFormatError } = useField('payloadFormat')
-
-  // kafka
-  const { value: bootstrapServers, errorMessage: bootstrapServersError } =
-    useField('bootstrapServers')
-  const { value: kafkaTopic, errorMessage: kafkaTopicError } = useField('kafkaTopic')
-  const { value: useTls, errorMessage: useTlsError } = useField('useTls')
-
-  // s3
-  const { value: host, errorMessage: hostError } = useField('host')
-  const { value: bucket, errorMessage: bucketError } = useField('bucket')
-  const { value: region, errorMessage: regionError } = useField('region')
-  const { value: accessKey, errorMessage: accessKeyError } = useField('accessKey')
-  const { value: secretKey, errorMessage: secretKeyError } = useField('secretKey')
-  const { value: objectKey, errorMessage: objectKeyError } = useField('objectKey')
-  const { value: contentType, errorMessage: contentTypeError } = useField('contentType')
-
-  // google big query
-  const { value: projectID, errorMessage: projectIDError } = useField('projectID')
-  const { value: datasetID, errorMessage: datasetIDError } = useField('datasetID')
-  const { value: tableID, errorMessage: tableIDError } = useField('tableID')
-  const { value: serviceAccountKey, errorMessage: serviceAccountKeyError } =
-    useField('serviceAccountKey')
-
-  // elasticsearch
-  const { value: elasticsearchUrl, errorMessage: elasticsearchUrlError } =
-    useField('elasticsearchUrl')
-  const { value: apiKey, errorMessage: apiKeyError } = useField('apiKey')
-
-  // splunk
-  const { value: splunkUrl, errorMessage: splunkUrlError } = useField('splunkUrl')
-  const { value: splunkApiKey, errorMessage: splunkApiKeyError } = useField('splunkApiKey')
-
-  // aws_kinesis_firehose
-  const { value: streamName, errorMessage: streamNameError } = useField('streamName')
-  const { value: awsRegion, errorMessage: awsRegionError } = useField('awsRegion')
-  const { value: awsAccessKey, errorMessage: awsAccessKeyError } = useField('awsAccessKey')
-  const { value: awsSecretKey, errorMessage: awsSecretKeyError } = useField('awsSecretKey')
-
-  // datadog
-  const { value: datadogUrl, errorMessage: datadogUrlError } = useField('datadogUrl')
-  const { value: datadogApiKey, errorMessage: datadogApiKeyError } = useField('datadogApiKey')
-
-  // QRadar
-  const { value: QRadarUrl, errorMessage: QRadarUrlError } = useField('QRadarUrl')
-
-  // azure_monitor
-  const { value: logType, errorMessage: logTypeError } = useField('logType')
-  const { value: sharedKey, errorMessage: sharedKeyError } = useField('sharedKey')
-  const { value: generatedField } = useField('generatedField')
-  const { value: workspaceID, errorMessage: workspaceIDError } = useField('workspaceID')
-
-  // azure_blob_storage
-  const { value: storageAccount, errorMessage: storageAccountError } = useField('storageAccount')
-  const { value: containerName, errorMessage: containerNameError } = useField('containerName')
-  const { value: blobToken, errorMessage: blobTokenError } = useField('blobToken')
-
-  const listTemplates = ref([])
-
-  const loaderDataStreamTemplates = async () => {
-    const templates = await props.listDataStreamTemplateService()
-    listTemplates.value = templates
-
-    const hasFirstTemplates = listTemplates?.value[0]?.value
-    if (hasFirstTemplates) {
-      const firstTemplateValue = listTemplates.value[0].value
-      return firstTemplateValue
-    }
-    return ''
-  }
-
-  const loaderDataStreamDomains = async () => {
-    const domainResponse = await props.listDataStreamDomainsService()
-    return [domainResponse, []]
-  }
-
-  const addHeader = () => {
-    headers.value.push({ value: '', deleted: true })
-  }
-
-  const removeHeader = (index) => {
-    headers.value.splice(index, 1)
-  }
-
-  const insertDataSet = (templateID) => {
-    const index = listTemplates.value.map((el) => el.value).indexOf(templateID)
-    try {
-      if (props.resetForm) {
-        const dataSetJSON = JSON.parse(listTemplates.value[index].template)
-        dataSet.value = JSON.stringify(dataSetJSON, null, '\t')
-      }
-    } catch (exception) {
-      dataSet.value = listTemplates.value[index].template
-    }
-  }
-
-  // Using the store
-  const store = useAccountStore()
-
-  const theme = computed(() => {
-    return store.currentTheme === 'light' ? 'vs' : 'vs-dark'
-  })
-
-  const DEFAULT_MONACO_OPTIONS = {
-    minimap: { enabled: false },
-    wordWrap: 'on',
-    tabSize: 2,
-    formatOnPaste: true
-  }
-  const dataSetMonacoOptions = ref({ ...DEFAULT_MONACO_OPTIONS })
-  const serviceAccountMonacoOptions = ref({ ...DEFAULT_MONACO_OPTIONS })
-
-  watch(
-    () => template.value,
-    (templateID) => {
-      if (templateID) insertDataSet(templateID)
-
-      const isReadOnlyIfCustomTemplate = templateID !== 'CUSTOM_TEMPLATE'
-      dataSetMonacoOptions.value.readOnly = isReadOnlyIfCustomTemplate
-    }
-  )
-
-  watch(
-    () => domainOption.value,
-    (option) => {
-      if (option === '1') {
-        if (domains.value[1] && domains.value[1].length > 0) {
-          domains.value[1].forEach((element) => {
-            domains.value[0].push(element)
-          })
-          domains.value[1] = []
-        }
-      }
-    }
-  )
-
-  const initializeFormValues = async () => {
-    const domains = await loaderDataStreamDomains()
-    const template = await loaderDataStreamTemplates()
-
-    if (props.resetForm) {
-      const initialValues = {
-        name: name.value,
-        dataSource: 'http',
-        template: template,
-        dataSet: '',
-        domainOption: '1',
-        domains: domains,
-        endpoint: 'standard',
-        status: true,
-        hasSampling: false,
-        samplingPercentage: 0,
-
-        // standard
-        endpointUrl: '',
-        headers: [{ value: '', deleted: false }],
-        maxSize: 1000000,
-        lineSeparator: '\\n',
-        payloadFormat: '$dataset',
-
-        // Kafka
-        bootstrapServers: '',
-        kafkaTopic: '',
-        useTls: false,
-
-        // s3
-        host: '',
-        bucket: '',
-        region: '',
-        accessKey: '',
-        secretKey: '',
-        objectKey: '',
-        contentType: 'plain/text',
-
-        // google big query
-        projectID: '',
-        datasetID: '',
-        tableID: '',
-        serviceAccountKey: '',
-
-        // elasticsearch
-        elasticsearchUrl: '',
-        apiKey: '',
-
-        // splunk
-        splunkUrl: '',
-        splunkApiKey: '',
-
-        // aws_kinesis_firehose
-        streamName: '',
-        awsRegion: '',
-        awsAccessKey: '',
-        awsSecretKey: '',
-
-        // datadog
-        datadogUrl: '',
-        datadogApiKey: '',
-
-        // QRadar
-        QRadarUrl: '',
-
-        // azure_monitor
-        logType: '',
-        sharedKey: '',
-        generatedField: '',
-        workspaceID: '',
-
-        // azure_blob_storage
-        storageAccount: '',
-        containerName: '',
-        blobToken: ''
-      }
-
-      props.resetForm({ values: initialValues })
-    }
-  }
-
-  const domainsRadioOptions = [
-    {
-      title: 'All Current and Future Domains',
-      value: '1',
-      subtitle:
-        'By selecting the All Current and Future Domains option, you can activate the Sampling option.'
-    },
-    {
-      title: 'Filter Domains',
-      value: '0'
-    }
-  ]
-
-  onMounted(() => {
-    initializeFormValues()
-  })
-</script>
-
 <template>
   <FormHorizontal
     title="General"
@@ -465,6 +152,7 @@
   <FormHorizontal
     v-if="domainOption === '1'"
     title="Sampling"
+    class="hidden"
     description="Enable this option to reduce costs of data collection and analysis."
   >
     <template #inputs>
@@ -1490,3 +1178,317 @@
     </template>
   </FormHorizontal>
 </template>
+
+<script setup>
+  import FormHorizontal from '@/templates/create-form-block/form-horizontal'
+
+  import ButtonPrimer from 'primevue/button'
+  import Dropdown from 'primevue/dropdown'
+  import InlineMessage from 'primevue/inlinemessage'
+  import InputNumber from 'primevue/inputnumber'
+  import InputSwitch from 'primevue/inputswitch'
+  import InputText from 'primevue/inputtext'
+  import PrimePassword from 'primevue/password'
+  import PickList from 'primevue/picklist'
+  import RadioButton from 'primevue/radiobutton'
+  import TextArea from 'primevue/textarea'
+  import FieldGroupRadio from '@/templates/form-fields-inputs/fieldGroupRadio'
+  import FieldSwitchBlock from '@/templates/form-fields-inputs/fieldSwitchBlock'
+  import { useField } from 'vee-validate'
+  import { computed, onMounted, ref, watch } from 'vue'
+
+  import { useAccountStore } from '@/stores/account'
+
+  const props = defineProps({
+    listDataStreamTemplateService: {
+      type: Function,
+      required: true
+    },
+    listDataStreamDomainsService: {
+      type: Function,
+      required: true
+    },
+    resetForm: {
+      type: Function,
+      required: false
+    }
+  })
+
+  // Variables
+  const listDataSources = ref([
+    { label: 'Activity History', value: 'rtm_activity' },
+    { label: 'Edge Applications', value: 'http' },
+    { label: 'Edge Functions', value: 'cells_console' },
+    { label: 'WAF Events', value: 'waf' }
+  ])
+  const listEndpoint = ref([
+    { label: 'Standard HTTP/HTTPS POST', value: 'standard' },
+    { label: 'Apache Kafka', value: 'kafka' },
+    { label: 'Simple Storage Service (S3)', value: 's3' },
+    { label: 'Google BigQuery', value: 'big_query' },
+    { label: 'Elasticsearch', value: 'elasticsearch' },
+    { label: 'Splunk', value: 'splunk' },
+    { label: 'AWS Kinesis Data Firehose', value: 'aws_kinesis_firehose' },
+    { label: 'Datadog', value: 'datadog' },
+    { label: 'IBM QRadar', value: 'qradar' },
+    { label: 'Azure Monitor', value: 'azure_monitor' },
+    { label: 'Azure Blob Storage', value: 'azure_blob_storage' }
+  ])
+  const listContentType = ref([
+    { label: 'plain/text', value: 'plain/text' },
+    { label: 'application/gzip', value: 'application/gzip' }
+  ])
+
+  // Campos do formulário
+  useField('status')
+  const { value: name, errorMessage: nameError } = useField('name')
+  const { value: dataSource, errorMessage: dataSourceError } = useField('dataSource')
+  const { value: dataSet } = useField('dataSet')
+  const { value: template, errorMessage: templateError } = useField('template')
+  const { value: domainOption } = useField('domainOption')
+  const { value: domains } = useField('domains')
+  const { value: endpoint } = useField('endpoint')
+  const { value: hasSampling } = useField('hasSampling')
+  const { value: samplingPercentage, errorMessage: samplingPercentageError } =
+    useField('samplingPercentage')
+
+  // standard
+  const { value: endpointUrl, errorMessage: endpointUrlError } = useField('endpointUrl')
+  const { value: headers } = useField('headers')
+  const { value: maxSize } = useField('maxSize')
+  const { value: lineSeparator, errorMessage: lineSeparatorError } = useField('lineSeparator')
+  const { value: payloadFormat, errorMessage: payloadFormatError } = useField('payloadFormat')
+
+  // kafka
+  const { value: bootstrapServers, errorMessage: bootstrapServersError } =
+    useField('bootstrapServers')
+  const { value: kafkaTopic, errorMessage: kafkaTopicError } = useField('kafkaTopic')
+  const { value: useTls, errorMessage: useTlsError } = useField('useTls')
+
+  // s3
+  const { value: host, errorMessage: hostError } = useField('host')
+  const { value: bucket, errorMessage: bucketError } = useField('bucket')
+  const { value: region, errorMessage: regionError } = useField('region')
+  const { value: accessKey, errorMessage: accessKeyError } = useField('accessKey')
+  const { value: secretKey, errorMessage: secretKeyError } = useField('secretKey')
+  const { value: objectKey, errorMessage: objectKeyError } = useField('objectKey')
+  const { value: contentType, errorMessage: contentTypeError } = useField('contentType')
+
+  // google big query
+  const { value: projectID, errorMessage: projectIDError } = useField('projectID')
+  const { value: datasetID, errorMessage: datasetIDError } = useField('datasetID')
+  const { value: tableID, errorMessage: tableIDError } = useField('tableID')
+  const { value: serviceAccountKey, errorMessage: serviceAccountKeyError } =
+    useField('serviceAccountKey')
+
+  // elasticsearch
+  const { value: elasticsearchUrl, errorMessage: elasticsearchUrlError } =
+    useField('elasticsearchUrl')
+  const { value: apiKey, errorMessage: apiKeyError } = useField('apiKey')
+
+  // splunk
+  const { value: splunkUrl, errorMessage: splunkUrlError } = useField('splunkUrl')
+  const { value: splunkApiKey, errorMessage: splunkApiKeyError } = useField('splunkApiKey')
+
+  // aws_kinesis_firehose
+  const { value: streamName, errorMessage: streamNameError } = useField('streamName')
+  const { value: awsRegion, errorMessage: awsRegionError } = useField('awsRegion')
+  const { value: awsAccessKey, errorMessage: awsAccessKeyError } = useField('awsAccessKey')
+  const { value: awsSecretKey, errorMessage: awsSecretKeyError } = useField('awsSecretKey')
+
+  // datadog
+  const { value: datadogUrl, errorMessage: datadogUrlError } = useField('datadogUrl')
+  const { value: datadogApiKey, errorMessage: datadogApiKeyError } = useField('datadogApiKey')
+
+  // QRadar
+  const { value: QRadarUrl, errorMessage: QRadarUrlError } = useField('QRadarUrl')
+
+  // azure_monitor
+  const { value: logType, errorMessage: logTypeError } = useField('logType')
+  const { value: sharedKey, errorMessage: sharedKeyError } = useField('sharedKey')
+  const { value: generatedField } = useField('generatedField')
+  const { value: workspaceID, errorMessage: workspaceIDError } = useField('workspaceID')
+
+  // azure_blob_storage
+  const { value: storageAccount, errorMessage: storageAccountError } = useField('storageAccount')
+  const { value: containerName, errorMessage: containerNameError } = useField('containerName')
+  const { value: blobToken, errorMessage: blobTokenError } = useField('blobToken')
+
+  const listTemplates = ref([])
+
+  const loaderDataStreamTemplates = async () => {
+    const templates = await props.listDataStreamTemplateService()
+    listTemplates.value = templates
+
+    const hasFirstTemplates = listTemplates?.value[0]?.value
+    if (hasFirstTemplates) {
+      const firstTemplateValue = listTemplates.value[0].value
+      return firstTemplateValue
+    }
+    return ''
+  }
+
+  const loaderDataStreamDomains = async () => {
+    const domainResponse = await props.listDataStreamDomainsService()
+    return [domainResponse, []]
+  }
+
+  const addHeader = () => {
+    headers.value.push({ value: '', deleted: true })
+  }
+
+  const removeHeader = (index) => {
+    headers.value.splice(index, 1)
+  }
+
+  const insertDataSet = (templateID, isFirstRender) => {
+    const index = listTemplates.value.map((el) => el.value).indexOf(templateID)
+    try {
+      if (templateID === 'CUSTOM_TEMPLATE' && !isFirstRender) {
+        dataSet.value = ''
+      } else {
+        const dataSetJSON = JSON.parse(listTemplates.value[index].template)
+        dataSet.value = JSON.stringify(dataSetJSON, null, '\t')
+      }
+    } catch (exception) {
+      dataSet.value = listTemplates.value[index].template
+    }
+  }
+
+  // Using the store
+  const store = useAccountStore()
+
+  const theme = computed(() => {
+    return store.currentTheme === 'light' ? 'vs' : 'vs-dark'
+  })
+
+  const DEFAULT_MONACO_OPTIONS = {
+    minimap: { enabled: false },
+    wordWrap: 'on',
+    tabSize: 2,
+    formatOnPaste: true
+  }
+  const dataSetMonacoOptions = ref({ ...DEFAULT_MONACO_OPTIONS })
+  const serviceAccountMonacoOptions = ref({ ...DEFAULT_MONACO_OPTIONS })
+
+  watch(
+    () => template.value,
+    (templateID) => {
+      if (templateID) insertDataSet(templateID)
+      const isReadOnlyIfCustomTemplate = templateID !== 'CUSTOM_TEMPLATE'
+      dataSetMonacoOptions.value.readOnly = isReadOnlyIfCustomTemplate
+    }
+  )
+
+  watch(
+    () => domainOption.value,
+    (option) => {
+      if (option === '1') {
+        if (domains.value[1] && domains.value[1].length > 0) {
+          domains.value[1].forEach((element) => {
+            domains.value[0].push(element)
+          })
+          domains.value[1] = []
+        }
+      }
+    }
+  )
+
+  const initializeFormValues = async () => {
+    const domains = await loaderDataStreamDomains()
+    const template = await loaderDataStreamTemplates()
+
+    if (props.resetForm) {
+      const initialValues = {
+        name: name.value,
+        dataSource: 'http',
+        template: template,
+        dataSet: '',
+        domainOption: '1',
+        domains: domains,
+        endpoint: 'standard',
+        status: true,
+        hasSampling: false,
+        samplingPercentage: 0,
+
+        // standard
+        endpointUrl: '',
+        headers: [{ value: '', deleted: false }],
+        maxSize: 1000000,
+        lineSeparator: '\\n',
+        payloadFormat: '$dataset',
+
+        // Kafka
+        bootstrapServers: '',
+        kafkaTopic: '',
+        useTls: false,
+
+        // s3
+        host: '',
+        bucket: '',
+        region: '',
+        accessKey: '',
+        secretKey: '',
+        objectKey: '',
+        contentType: 'plain/text',
+
+        // google big query
+        projectID: '',
+        datasetID: '',
+        tableID: '',
+        serviceAccountKey: '',
+
+        // elasticsearch
+        elasticsearchUrl: '',
+        apiKey: '',
+
+        // splunk
+        splunkUrl: '',
+        splunkApiKey: '',
+
+        // aws_kinesis_firehose
+        streamName: '',
+        awsRegion: '',
+        awsAccessKey: '',
+        awsSecretKey: '',
+
+        // datadog
+        datadogUrl: '',
+        datadogApiKey: '',
+
+        // QRadar
+        QRadarUrl: '',
+
+        // azure_monitor
+        logType: '',
+        sharedKey: '',
+        generatedField: '',
+        workspaceID: '',
+
+        // azure_blob_storage
+        storageAccount: '',
+        containerName: '',
+        blobToken: ''
+      }
+
+      props.resetForm({ values: initialValues })
+    }
+  }
+
+  const domainsRadioOptions = [
+    {
+      title: 'All Current and Future Domains',
+      value: '1',
+      subtitle:
+        'By selecting the All Current and Future Domains option, you can activate the Sampling option.'
+    },
+    {
+      title: 'Filter Domains',
+      value: '0'
+    }
+  ]
+
+  onMounted(() => {
+    initializeFormValues()
+  })
+</script>

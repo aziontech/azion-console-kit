@@ -20,7 +20,7 @@ const adapt = async (httpResponse) => {
     id: payload.id,
     name: payload.name,
     template: payload.template_id ?? 'CUSTOM_TEMPLATE',
-    dataSet: payload.template_model,
+    dataSet: payload?.template_model,
     dataSource: payload.data_source,
     domainOption: payload.all_domains ? '1' : '0',
     status: payload.active,

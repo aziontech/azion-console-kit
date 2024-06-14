@@ -84,7 +84,7 @@
     const { tab } = route.params
 
     let selectedTab = tab
-    if (!tab) selectedTab = 'mainSettings'
+    if (!tab) selectedTab = 'main-settings'
 
     edgeApplication.value = await handleLoadEdgeApplication()
     verifyTab(edgeApplication.value)
