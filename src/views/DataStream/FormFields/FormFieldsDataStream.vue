@@ -1344,10 +1344,8 @@
   const insertDataSet = (templateID, isFirstRender) => {
     const index = listTemplates.value.map((el) => el.value).indexOf(templateID)
     try {
-      if (templateID === 'CUSTOM_TEMPLATE') {
-        if (!isFirstRender) {
-          dataSet.value = ''
-        }
+      if (templateID === 'CUSTOM_TEMPLATE' && !isFirstRender) {
+        dataSet.value = ''
       } else {
         const dataSetJSON = JSON.parse(listTemplates.value[index].template)
         dataSet.value = JSON.stringify(dataSetJSON, null, '\t')

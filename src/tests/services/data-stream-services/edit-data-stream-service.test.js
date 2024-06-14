@@ -208,7 +208,7 @@ describe('DataStreamServices', () => {
       values: {
         kafkaTopic: 'example_topic',
         bootstrap_servers: 'kafka-server.com:9092,kafka-server-2.com:9092',
-        useTls: true,
+        useTls: true
       }
     },
     {
