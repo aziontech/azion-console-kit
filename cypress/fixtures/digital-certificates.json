@@ -1,0 +1,92 @@
+{
+"results": [
+  {
+    "azion_information": "azion information one",
+    "certificate_type": "edge_certificate",
+    "id": 1,
+    "issuer": "issuer one",
+    "managed": true,
+    "name": "certificate one",
+    "status": "active",
+    "subject_name": ["subject one", "subject two"],
+    "validity": "2023-10-10T00:00:00Z"
+  },
+  {
+    "azion_information": "azion information two",
+    "certificate_type": "edge_certificate",
+    "id": 2,
+    "issuer": "issuer two",
+    "managed": false,
+    "name": "certificate two",
+    "status": "pending",
+    "subject_name": ["subject one", "subject two"],
+    "validity": "2023-10-10T00:00:00Z"
+  },
+  {
+    "azion_information": "azion information three",
+    "certificate_type": "edge_certificate",
+    "id": 3,
+    "issuer": "issuer three",
+    "managed": true,
+    "name": "certificate three",
+    "status": "active",
+    "subject_name": ["subject one", "subject two"],
+    "validity": "2023-10-10T00:00:00Z"
+  },
+  {
+    "azion_information": "azion information four",
+    "certificate_type": "edge_certificate",
+    "id": 4,
+    "issuer": "issuer four",
+    "managed": false,
+    "name": "certificate four",
+    "status": "waiting domain",
+    "subject_name": ["subject one", "subject two"],
+    "validity": "2023-10-10T00:00:00Z"
+  },
+  {
+    "azion_information": "azion information five",
+    "certificate_type": "edge_certificate",
+    "id": 5,
+    "issuer": "issuer five",
+    "managed": true,
+    "name": "certificate five",
+    "status": "active",
+    "subject_name": ["subject one", "subject two"],
+    "validity": "2023-10-10T00:00:00Z"
+  },
+  {
+    "azion_information": "azion information six",
+    "certificate_type": "edge_certificate",
+    "id": 6,
+    "issuer": "issuer six",
+    "managed": false,
+    "name": "certificate six",
+    "status": "pending",
+    "subject_name": ["subject one", "subject two"],
+    "validity": "2023-10-10T00:00:00Z"
+  },
+  {
+    "azion_information": "azion information seven",
+    "certificate_type": "edge_certificate",
+    "id": 7,
+    "issuer": "issuer seven",
+    "managed": true,
+    "name": "certificate seven",
+    "status": "active",
+    "subject_name": ["subject one", "subject two"],
+    "validity": "2023-10-10T00:00:00Z"
+  },
+  {
+    "azion_information": "azion information eight",
+    "certificate_type": "edge_certificate",
+    "id": 8,
+    "issuer": "issuer eight",
+    "managed": false,
+    "name": "certificate eight",
+    "status": "waiting domain",
+    "subject_name": ["subject one", "subject two"],
+    "validity": "2023-10-10T00:00:00Z"
+  }
+]
+}

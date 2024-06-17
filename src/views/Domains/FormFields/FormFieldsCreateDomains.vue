@@ -4,7 +4,6 @@
     TRUSTED_CA_CERTIFICATE
   } from '@/services/digital-certificates-services'
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
-  import PrimeButton from 'primevue/button'
   import Dropdown from 'primevue/dropdown'
   import InputText from 'primevue/inputtext'
   import PrimeTextarea from 'primevue/textarea'
@@ -39,7 +38,6 @@
   const { value: edgeApplication, errorMessage: errorEdgeApplication } = useField('edgeApplication')
   const { setValue: setEdgeCertificate } = useField('edgeCertificate')
   const { value: mtlsIsEnabled } = useField('mtlsIsEnabled')
-  const { value: domainName } = useField('domainName')
   const { value: mtlsTrustedCertificate, errorMessage: errorMtlsTrustedCertificate } =
     useField('mtlsTrustedCertificate')
 
@@ -123,46 +121,6 @@
           class="p-error text-xs font-normal leading-tight"
           >{{ errorName }}</small
         >
-      </div>
-    </template>
-  </form-horizontal>
-
-  <form-horizontal
-    title="Domain"
-    description="Save the domain to visualize the domain name attributed by Azion."
-  >
-    <template #inputs>
-      <div class="flex flex-col w-full gap-2">
-        <label
-          for="domainName"
-          class="text-color text-base font-medium"
-        >
-          Domain Name
-        </label>
-        <div
-          class="flex gap-6 md:align-items-center max-sm:flex-col max-sm:align-items-baseline max-sm:gap-3"
-        >
-          <span class="p-input-icon-right w-full flex max-w-lg flex-col items-start gap-2">
-            <i class="pi pi-lock" />
-            <InputText
-              id="domainName"
-              v-model="domainName"
-              type="text"
-              class="flex flex-col w-full"
-              :feedback="false"
-              disabled
-            />
-          </span>
-          <PrimeButton
-            icon="pi pi-clone"
-            outlined
-            type="button"
-            aria-label="Copy Domain Name"
-            label="Copy"
-            :disabled="!props.hasDomainName"
-            @click="$emit('copyDomainName', { name: domainName })"
-          />
-        </div>
       </div>
     </template>
   </form-horizontal>

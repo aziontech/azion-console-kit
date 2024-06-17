@@ -55,10 +55,16 @@
       >
         <template #body="{ data: rowData }">
           <template v-if="col.type !== 'component'">
-            <div v-html="rowData[col.field]"></div>
+            <div
+              v-html="rowData[col.field]"
+              :data-testid="`list-table-block__column__${col.field}__row`"
+            ></div>
           </template>
           <template v-else>
-            <component :is="col.component(rowData[col.field])"></component>
+            <component
+              :is="col.component(rowData[col.field])"
+              :data-testid="`list-table-block__column__${col.field}__row`"
+            ></component>
           </template>
         </template>
       </Column>

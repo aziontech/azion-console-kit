@@ -18,7 +18,7 @@
   const emit = defineEmits(['l2-caching-enabled'])
 
   const props = defineProps({
-    isEnableApplicationAccelerator: {
+    isApplicationAcceleratorEnabled: {
       required: true,
       type: Boolean
     },
@@ -40,7 +40,7 @@
   ])
 
   const cdnCacheSettingsMaximumTtlMinimumValue = computed(() => {
-    if (l2CachingEnabled.value || props.isEnableApplicationAccelerator) {
+    if (l2CachingEnabled.value || props.isApplicationAcceleratorEnabled) {
       return CDN_MAXIMUM_TTL_MIN_VALUE
     }
     return CDN_MAXIMUM_TTL_MAX_VALUE
@@ -188,7 +188,7 @@
       }
     ]
 
-    if (props.isEnableApplicationAccelerator) {
+    if (props.isApplicationAcceleratorEnabled) {
       options.push(
         {
           title: 'Query String Sort',
@@ -233,7 +233,7 @@
     isSliceL2CachingEnabled.value = false
 
     const hasNotApplicationAcceleratorAndExceedMinimumValue =
-      !props.isEnableApplicationAccelerator &&
+      !props.isApplicationAcceleratorEnabled &&
       cdnCacheSettingsMaximumTtl.value < CDN_MAXIMUM_TTL_MAX_VALUE
 
     if (!value && hasNotApplicationAcceleratorAndExceedMinimumValue) {

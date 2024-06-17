@@ -11,7 +11,10 @@
         :updatedRedirect="props.updatedRedirect"
       >
         <template #form>
-          <FormFieldsEditDigitalCertificates :clipboardWrite="clipboardWrite" />
+          <FormFieldsEditDigitalCertificates
+            :clipboardWrite="clipboardWrite"
+            :documentationService="documentationService"
+          />
         </template>
         <template #action-bar="{ onSubmit, formValid, onCancel, loading }">
           <ActionBarBlockWithTeleport
@@ -50,6 +53,10 @@
     clipboardWrite: {
       type: Function,
       required: true
+    },
+    documentationService: {
+      required: true,
+      type: Function
     }
   })
 
@@ -58,6 +65,11 @@
     certificateType: yup.string(),
     csr: yup.string(),
     certificate: yup.string(),
-    privateKey: yup.string()
+    privateKey: yup.string(),
+    managed: yup
+      .boolean()
+      .isFalse(
+        `This is a Let's Encrypt™ certificate automatically created and managed by Azion and can't be edited.`
+      )
   })
 </script>

@@ -54,7 +54,7 @@ describe('WafRulesServices', () => {
     await sut({ wafId: 4040 })
 
     expect(requestSpy).toHaveBeenCalledWith({
-      url: 'v4/edge/waf/4040/allowed_rules?page=1&page_size=200',
+      url: 'v4/edge/wafs/4040/allowed_rules?page=1&page_size=200',
       method: 'GET'
     })
   })
