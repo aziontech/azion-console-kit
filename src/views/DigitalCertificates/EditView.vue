@@ -16,8 +16,9 @@
             :documentationService="documentationService"
           />
         </template>
-        <template #action-bar="{ onSubmit, formValid, onCancel, loading }">
+        <template #action-bar="{ onSubmit, formValid, onCancel, loading, values }">
           <ActionBarBlockWithTeleport
+            v-if="!values.managed"
             @onSubmit="onSubmit"
             @onCancel="onCancel"
             :loading="loading"
@@ -31,7 +32,7 @@
 
 <script setup>
   import EditFormBlock from '@/templates/edit-form-block'
-  import ActionBarBlockWithTeleport from '@/templates/action-bar-block/action-bar-with-teleport'
+  import ActionBarBlockWithTeleport from '@/templates/action-bar-block/action-bar-with-teleport.vue'
   import ContentBlock from '@/templates/content-block'
   import PageHeadingBlock from '@/templates/page-heading-block'
   import FormFieldsEditDigitalCertificates from './FormFields/FormFieldsEditDigitalCertificates.vue'
