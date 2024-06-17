@@ -57,12 +57,12 @@ describe('Real Time Metrics', () => {
     cy.get('.p-datepicker-today').as('today').click()
 
     // Set the initial date with one hour less difference
-    clickMultipleTimes('[aria-label="Previous Hour"]', 1)
+    clickMultipleTimes('[aria-label="Previous Hour"]', 4)
 
     cy.get('@today').click()
 
     // Set the final date with two hours more difference
-    clickMultipleTimes('[aria-label="Next Hour"]', 2)
+    clickMultipleTimes('[aria-label="Next Hour"]', 4)
 
     // click outside of the calendar to trigger the filter
     cy.getByTestId('real-time-metrics__page-heading-block__title').as('title').click()
