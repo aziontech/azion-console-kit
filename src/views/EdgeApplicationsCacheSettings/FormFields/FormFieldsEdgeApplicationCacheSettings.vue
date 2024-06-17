@@ -101,10 +101,10 @@
       {
         title: 'Honor cache policies',
         subtitle: isBrowser ? browserSubtitle : cdnSubtitle,
-        value: 'honor',
+        inputValue: 'honor',
         disabled: !isBrowser && l2CachingEnabled.value
       },
-      { title: 'Override cache settings', value: 'override' }
+      { title: 'Override cache settings', inputValue: 'override' }
     ]
   }
 
@@ -128,42 +128,42 @@
   const queryStringRadioOptions = [
     {
       title: 'Content does not vary by Query String (Improves Caching)',
-      value: 'ignore'
+      inputValue: 'ignore'
     },
     {
       title: 'Content varies by some Query String fields (Allowlist)',
-      value: 'whitelist',
+      inputValue: 'whitelist',
       disabled: !props.isEnableApplicationAccelerator
     },
     {
       title: 'Content varies by Query String, except for some fields (Blocklist)',
-      value: 'blacklist',
+      inputValue: 'blacklist',
       disabled: !props.isEnableApplicationAccelerator
     },
     {
       title: 'Content varies by all Query String fields',
-      value: 'all'
+      inputValue: 'all'
     }
   ]
 
   const cookieRadioOptions = [
     {
       title: 'Content does not vary by Cookies (Improves Caching)',
-      value: 'ignore'
+      inputValue: 'ignore'
     },
     {
       title: 'Content varies by some Cookies (Allowlist)',
-      value: 'whitelist',
+      inputValue: 'whitelist',
       disabled: !props.isEnableApplicationAccelerator
     },
     {
       title: 'Content varies by Cookies, with the exception of a few (Blocklist)',
-      value: 'blacklist',
+      inputValue: 'blacklist',
       disabled: !props.isEnableApplicationAccelerator
     },
     {
       title: 'Content varies by all Cookies',
-      value: 'all',
+      inputValue: 'all',
       disabled: !props.isEnableApplicationAccelerator
     }
   ]
@@ -171,11 +171,11 @@
   const adaptiveDeliveryRadioOptions = [
     {
       title: 'Content does not vary by Device Groups (Improves Caching)',
-      value: 'ignore'
+      inputValue: 'ignore'
     },
     {
       title: 'Content varies by some Device Groups (Allowlist)',
-      value: 'whitelist'
+      inputValue: 'whitelist'
     }
   ]
 

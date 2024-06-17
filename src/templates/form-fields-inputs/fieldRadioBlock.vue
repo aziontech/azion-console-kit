@@ -11,7 +11,7 @@
         :inputId="props.name"
         :name="props.name"
         @click="stopPropagation"
-        :value="props.value"
+        :value="props.inputValue"
         v-model="inputValue"
         :binary="props.binary"
         @change="emit('onRadioChange')"
@@ -57,7 +57,7 @@
     },
     isCard: {
       type: Boolean,
-      default: true
+      default: false
     },
     hideSelector: {
       type: Boolean,
@@ -71,7 +71,7 @@
       type: String,
       required: true
     },
-    value: {
+    inputValue: {
       type: [Boolean, String, Object],
       default: false
     },
@@ -89,7 +89,7 @@
     handleChange
   } = useField(nameField, undefined, {
     type: 'checkbox',
-    checkedValue: props.binary ? true : props.value,
+    checkedValue: props.binary ? true : props.inputValue,
     uncheckedValue: props.binary ? false : ''
   })
 

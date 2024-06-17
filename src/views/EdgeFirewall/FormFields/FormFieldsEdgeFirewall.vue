@@ -201,6 +201,7 @@
           auto
           :isCard="false"
           title="Active"
+          subtitle="Rules that were successfully executed will be shown under the $traceback field in Data Streaming and Real-Time Events or the $stacktrace variable in GraphQL."
         />
       </div>
     </template>

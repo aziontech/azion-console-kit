@@ -606,12 +606,12 @@
         phasesRadioOptions.value = [
           {
             title: 'Request Phase',
-            value: 'request',
+            inputValue: 'request',
             subtitle: 'Configure the requests made to the edge.'
           },
           {
             title: 'Response Phase',
-            value: 'response',
+            inputValue: 'response',
             subtitle: 'Configure the responses delivered to end-users.'
           }
         ]

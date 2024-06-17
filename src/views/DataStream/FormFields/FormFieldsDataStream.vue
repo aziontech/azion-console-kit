@@ -1473,13 +1473,13 @@
   const domainsRadioOptions = [
     {
       title: 'All Current and Future Domains',
-      value: '1',
+      inputValue: '1',
       subtitle:
         'By selecting the All Current and Future Domains option, you can activate the Sampling option.'
     },
     {
       title: 'Filter Domains',
-      value: '0'
+      inputValue: '0'
     }
   ]
 

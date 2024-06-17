@@ -4,6 +4,7 @@
     :selected="checked"
     :nameId="props.name"
     @change="changeState"
+    :inputClass="props.selectorClass"
   >
     <template #selector>
       <InputSwitch
@@ -69,6 +70,9 @@
     },
     value: {
       type: Boolean
+    },
+    selectorClass: {
+      type: String
     }
   })
 
