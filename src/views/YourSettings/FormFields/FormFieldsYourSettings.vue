@@ -142,7 +142,6 @@
             optionLabel="label"
             optionValue="value"
             name="language"
-            :class="{ 'p-invalid': errorLanguage }"
             v-model="language"
             disabled
           >
