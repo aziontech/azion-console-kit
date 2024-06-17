@@ -1,13 +1,13 @@
 <script setup>
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
-  import InputSwitch from 'primevue/inputswitch'
+  import FieldSwitchBlock from '@/templates/form-fields-inputs/fieldSwitchBlock'
+
   import InputText from 'primevue/inputtext'
   import { useField } from 'vee-validate'
   defineOptions({ name: 'form-fields-variables' })
 
   const { value: key, errorMessage: keyError } = useField('key')
   const { value: value, errorMessage: valueError } = useField('value')
-  const { value: secret } = useField('secret')
 </script>
 
 <template>
@@ -65,11 +65,13 @@
         >
       </div>
       <div class="flex gap-3 items-center">
-        <InputSwitch
-          id="secret"
-          v-model="secret"
+        <FieldSwitchBlock
+          nameField="secret"
+          name="secret"
+          auto
+          :isCard="false"
+          title="Secret"
         />
-        <label for="secret">Secret</label>
       </div>
     </template>
   </FormHorizontal>

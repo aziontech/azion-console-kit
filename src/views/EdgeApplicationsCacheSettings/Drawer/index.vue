@@ -20,7 +20,7 @@
       type: String,
       required: true
     },
-    isEnableApplicationAccelerator: {
+    isApplicationAcceleratorEnabled: {
       required: true,
       type: Boolean
     },
@@ -77,7 +77,7 @@
   })
 
   const minimumAcceptableValue = computed(() =>
-    props.isEnableApplicationAccelerator || props.showTieredCache
+    props.isApplicationAcceleratorEnabled || props.showTieredCache
       ? CDN_MAXIMUM_TTL_MIN_VALUE
       : CDN_MAXIMUM_TTL_MAX_VALUE
   )
@@ -86,7 +86,7 @@
 
   const setNewMinimumValue = (value) => {
     l2CachingEnabled.value = value
-    if (l2CachingEnabled.value || props.isEnableApplicationAccelerator) {
+    if (l2CachingEnabled.value || props.isApplicationAcceleratorEnabled) {
       minimumAcceptableValueWhenIsHonor.value = CDN_MAXIMUM_TTL_MIN_VALUE
     } else {
       minimumAcceptableValueWhenIsHonor.value = CDN_MAXIMUM_TTL_MAX_VALUE
@@ -231,7 +231,7 @@
   >
     <template #formFields>
       <FormFieldsEdgeApplicationCacheSettings
-        :isEnableApplicationAccelerator="isEnableApplicationAccelerator"
+        :isApplicationAcceleratorEnabled="isApplicationAcceleratorEnabled"
         :showTieredCache="props.showTieredCache"
         @l2-caching-enabled="setNewMinimumValue"
       />
@@ -250,7 +250,7 @@
   >
     <template #formFields>
       <FormFieldsEdgeApplicationCacheSettings
-        :isEnableApplicationAccelerator="isEnableApplicationAccelerator"
+        :isApplicationAcceleratorEnabled="isApplicationAcceleratorEnabled"
         :showTieredCache="props.showTieredCache"
         @l2-caching-enabled="setNewMinimumValue"
       />
