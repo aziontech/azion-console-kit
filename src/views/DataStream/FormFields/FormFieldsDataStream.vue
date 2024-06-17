@@ -1351,7 +1351,9 @@
         dataSet.value = JSON.stringify(dataSetJSON, null, '\t')
       }
     } catch (exception) {
-      dataSet.value = listTemplates.value[index].template
+      if (!dataSet.value || templateID !== 'CUSTOM_TEMPLATE') {
+        dataSet.value = listTemplates.value[index].template
+      }
     }
   }
 
