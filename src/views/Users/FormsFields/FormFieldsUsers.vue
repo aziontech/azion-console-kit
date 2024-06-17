@@ -3,6 +3,8 @@
   import { storeToRefs } from 'pinia'
   import { useField } from 'vee-validate'
   import { ref } from 'vue'
+  import FieldText from '@/templates/form-fields-inputs/fieldText'
+  import FieldDropdown from '@/templates/form-fields-inputs/fieldDropdown'
 
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
   import Card from 'primevue/card'
@@ -10,7 +12,6 @@
   import Dropdown from 'primevue/dropdown'
   import InputMask from 'primevue/inputmask'
   import InputSwitch from 'primevue/inputswitch'
-  import InputText from 'primevue/inputtext'
   import MultiSelect from 'primevue/multiselect'
 
   const props = defineProps({
@@ -50,11 +51,11 @@
   const optionsLanguage = ref([{ label: 'English', value: 'en' }])
   const loadingCountry = ref(true)
 
-  const { value: firstName, errorMessage: errorFirstName } = useField('firstName')
-  const { value: lastName, errorMessage: errorLastName } = useField('lastName')
-  const { value: timezone, errorMessage: errorTimezone } = useField('timezone')
+  const { value: firstName } = useField('firstName')
+  const { value: lastName } = useField('lastName')
+  const { value: timezone } = useField('timezone')
   const { value: language, errorMessage: errorLanguage } = useField('language')
-  const { value: email, errorMessage: errorEmail } = useField('email')
+  const { value: email } = useField('email')
   const { value: countryCallCode, errorMessage: errorCountryCallCode } = useField('countryCallCode')
   const { value: mobile, errorMessage: errorMobile } = useField('mobile', null, {
     initialValue: ''
@@ -158,72 +159,37 @@
   >
     <template #inputs>
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
-        <label
-          for="firstName"
-          class="text-color text-base font-medium"
-          >First Name *</label
-        >
-        <InputText
-          v-model="firstName"
-          id="firstName"
-          type="text"
-          :class="{ 'p-invalid': errorFirstName }"
+        <FieldText
+          label="First Name *"
+          name="firstName"
           placeholder="John"
+          :value="firstName"
+          description="The first name of the user."
         />
-        <small
-          id="name-help"
-          class="p-error"
-          >{{ errorFirstName }}</small
-        >
-        <small class="text-xs text-color-secondary font-normal leading-5">
-          The first name of the user.
-        </small>
       </div>
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
-        <label
-          for="lastName"
-          class="text-color text-base font-medium"
-          >Last Name *</label
-        >
-        <InputText
-          v-model="lastName"
-          id="lastName"
-          type="text"
-          :class="{ 'p-invalid': errorLastName }"
+        <FieldText
+          label="Last Name *"
+          name="lastName"
           placeholder="Doe"
+          :value="lastName"
+          description="The last name of the user."
         />
-        <small
-          id="name-help"
-          class="p-error"
-          >{{ errorLastName }}</small
-        >
-        <small class="text-xs text-color-secondary font-normal leading-5">
-          The last name of the user.
-        </small>
       </div>
       <div class="flex sm:flex-row w-full flex-col gap-6">
         <div class="flex flex-col w-full sm:max-w-xs gap-2">
-          <label
-            for="timezone"
-            class="text-color text-base font-medium"
-            >Timezone *</label
-          >
-          <Dropdown
-            filter
-            autoFilterFocus
-            appendTo="self"
-            id="timezone"
+          <FieldDropdown
+            label="Timezone *"
+            name="timezone"
             :options="optionsTimezone"
+            :loading="!timezone"
             optionLabel="label"
             optionValue="value"
-            placeholder="Loading..."
-            :loading="!timezone"
-            :class="{ 'p-invalid': errorTimezone }"
-            v-model="timezone"
+            :value="timezone"
+            filter
+            appendTo="self"
+            description="Timezone of the user."
           />
-          <small class="text-xs text-color-secondary font-normal leading-5">
-            Timezone of the user.
-          </small>
         </div>
         <div class="flex flex-col w-full sm:max-w-xs gap-2">
           <label
@@ -234,6 +200,7 @@
           <Dropdown
             appendTo="self"
             id="language"
+            name="language"
             :options="optionsLanguage"
             optionLabel="label"
             optionValue="value"
@@ -256,26 +223,14 @@
   >
     <template #inputs>
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
-        <label
-          for="email"
-          class="text-color text-base font-medium"
-          >Email *</label
-        >
-        <InputText
-          v-model="email"
-          id="email"
-          type="email"
+        <FieldText
+          label="Email *"
+          name="email"
           placeholder="example@email.com"
-          :class="{ 'p-invalid': errorEmail }"
+          :value="email"
+          description="Email of the user. A confirmation email will be sent to this address upon sign up."
+          type="email"
         />
-        <small class="text-xs text-color-secondary font-normal leading-5">
-          Email of the user. A confirmation email will be sent to this address upon sign up.
-        </small>
-        <small
-          id="name-help"
-          class="p-error"
-          >{{ errorEmail }}</small
-        >
       </div>
 
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
@@ -291,6 +246,7 @@
               autoFilterFocus
               appendTo="self"
               id="countryCallCode"
+              name="countryCallCode"
               :options="filteredCountriesMobile"
               optionLabel="labelFormat"
               optionValue="value"
@@ -312,6 +268,7 @@
             <InputMask
               date="phone"
               v-model="mobile"
+              name="mobile"
               class="w-full"
               :disabled="loadingCountry"
               mask="?99999999999999999999"
