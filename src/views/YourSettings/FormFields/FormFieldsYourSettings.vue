@@ -7,8 +7,9 @@
   import Dropdown from 'primevue/dropdown'
   import InputMask from 'primevue/inputmask'
   import InputSwitch from 'primevue/inputswitch'
-  import InputText from 'primevue/inputtext'
+  import FieldText from '@/templates/form-fields-inputs/fieldText'
   import InputPassword from 'primevue/password'
+  import FieldDropdown from '@/templates/form-fields-inputs/fieldDropdown'
 
   const props = defineProps({
     listTimezonesService: {
@@ -28,11 +29,11 @@
   const optionsLanguage = ref([{ label: 'English', value: 'en' }])
   const selectedCountryCallCode = ref(null)
 
-  const { value: firstName, errorMessage: errorFirstName } = useField('firstName')
-  const { value: lastName, errorMessage: errorLastName } = useField('lastName')
-  const { value: timezone, errorMessage: errorTimezone } = useField('timezone')
+  const { value: firstName } = useField('firstName')
+  const { value: lastName } = useField('lastName')
+  const { value: timezone } = useField('timezone')
   const { value: language, errorMessage: errorLanguage } = useField('language')
-  const { value: email, errorMessage: errorEmail } = useField('email')
+  const { value: email } = useField('email')
   const { value: countryCallCode, errorMessage: errorCountryCallCode } = useField('countryCallCode')
   const { value: mobile, errorMessage: errorMobile } = useField('mobile')
   const { value: twoFactorEnabled, errorMessage: errorTwoFactorEnabled } =
@@ -100,72 +101,36 @@
   >
     <template #inputs>
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
-        <label
-          for="firstName"
-          class="text-color text-base font-medium"
-          >First Name *</label
-        >
-        <InputText
-          placeholder="John"
-          v-model="firstName"
-          id="firstName"
-          type="text"
-          :class="{ 'p-invalid': errorFirstName }"
+        <FieldText
+          label="First Name *"
+          name="firstName"
+          :value="firstName"
+          description="The first name of the user."
         />
-        <small class="text-xs text-color-secondary font-normal leading-5">
-          The first name of the user.</small
-        >
-        <small
-          id="name-help"
-          class="p-error"
-          >{{ errorFirstName }}</small
-        >
       </div>
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
-        <label
-          for="lastName"
-          class="text-color text-base font-medium"
-          >Last Name *</label
-        >
-        <InputText
-          placeholder="Smith"
-          v-model="lastName"
-          id="lastName"
-          type="text"
-          :class="{ 'p-invalid': errorLastName }"
+        <FieldText
+          label="Last Name *"
+          name="lastName"
+          :value="lastName"
+          description="The last name of the user."
         />
-        <small class="text-xs text-color-secondary font-normal leading-5">
-          The last name of the user.</small
-        >
-        <small
-          id="name-help"
-          class="p-error"
-          >{{ errorLastName }}</small
-        >
       </div>
       <div class="flex sm:flex-row w-full flex-col gap-6">
         <div class="flex flex-col w-full sm:max-w-xs gap-2">
-          <label
-            for="timezone"
-            class="text-color text-base font-medium"
-            >Timezone *</label
-          >
-          <Dropdown
-            filter
-            autoFilterFocus
-            appendTo="self"
-            id="timezone"
+          <FieldDropdown
+            label="Timezone *"
+            name="timezone"
             :options="optionsTimezone"
+            :loading="!timezone || !optionsTimezone.length"
+            :disabled="!optionsTimezone.length"
             optionLabel="label"
             optionValue="value"
-            placeholder="Loading..."
-            :loading="!timezone"
-            :class="{ 'p-invalid': errorTimezone }"
-            v-model="timezone"
+            :value="timezone"
+            filter
+            appendTo="self"
+            description="Timezone of the user."
           />
-          <small class="text-xs text-color-secondary font-normal leading-5">
-            Timezone of the user.</small
-          >
         </div>
         <div class="flex flex-col w-full sm:max-w-xs gap-2">
           <label
@@ -179,6 +144,7 @@
             :options="optionsLanguage"
             optionLabel="label"
             optionValue="value"
+            name="language"
             :class="{ 'p-invalid': errorLanguage }"
             v-model="language"
             disabled
@@ -200,28 +166,15 @@
   >
     <template #inputs>
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
-        <label
-          for="email"
-          class="text-color text-base font-medium"
-          >Email *</label
-        >
-        <InputText
-          v-model="email"
-          id="email"
+        <FieldText
+          label="Email *"
+          name="email"
+          :value="email"
           type="email"
           autocomplete="off"
           placeholder="example@email.com"
-          :class="{ 'p-invalid': errorEmail }"
+          description="Email of the user."
         />
-        <small class="text-xs text-color-secondary font-normal leading-5">
-          Email of the user.</small
-        >
-        <small
-          id="name-help"
-          class="p-error"
-        >
-          {{ errorEmail }}
-        </small>
       </div>
 
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
@@ -237,6 +190,7 @@
               autoFilterFocus
               appendTo="self"
               id="countryCallCode"
+              name="countryCallCode"
               :options="filteredCountriesMobile"
               optionLabel="labelFormat"
               :loading="isLoadingCountry"
@@ -259,6 +213,7 @@
               date="phone"
               v-model="mobile"
               class="w-full"
+              name="mobile"
               :disabled="isLoadingCountry"
               mask="?99999999999999999999"
               placeholder="5500999999999"
@@ -288,8 +243,9 @@
         <label
           for="oldPassword"
           class="text-color text-base font-medium"
-          >Old Password *</label
         >
+          Old Password *
+        </label>
         <InputPassword
           toggleMask
           v-model="oldPassword"
@@ -298,25 +254,37 @@
           autocomplete="new-password"
           :inputProps="{ autocomplete: 'new-password' }"
           :feedback="false"
+          :pt="{
+            input: {
+              name: 'oldPassword'
+            }
+          }"
         />
         <small
           id="name-help"
           class="p-error"
-          >{{ errorOldPassword }}</small
         >
+          {{ errorOldPassword }}
+        </small>
       </div>
       <div class="flex flex-col sm:max-w-lg gap-2">
         <label
           for="password"
           class="font-semibold text-sm"
-          >New Password *</label
         >
+          New Password *
+        </label>
         <InputPassword
           toggleMask
           v-model="password"
           id="password"
           autocomplete="new-password"
           class="w-full"
+          :pt="{
+            input: {
+              name: 'password'
+            }
+          }"
           :class="{ 'p-invalid': errorPassword }"
           @input="validation()"
           :feedback="false"
@@ -348,8 +316,9 @@
         <label
           for="confirmPassword"
           class="text-color text-base font-medium"
-          >Confirm Password *</label
         >
+          Confirm Password *
+        </label>
         <InputPassword
           toggleMask
           v-model="confirmPassword"
@@ -358,12 +327,18 @@
           autocomplete="off"
           :class="{ 'p-invalid': errorConfirmPassword }"
           :feedback="false"
+          :pt="{
+            input: {
+              name: 'confirmPassword'
+            }
+          }"
         />
         <small
           id="name-help"
           class="p-error"
-          >{{ errorConfirmPassword }}</small
         >
+          {{ errorConfirmPassword }}
+        </small>
       </div>
       <Card
         :pt="{
@@ -387,8 +362,9 @@
             <label
               for="twoFactor"
               class="text-color text-sm font-normal"
-              >Multi-Factor Authentication</label
             >
+              Multi-Factor Authentication
+            </label>
           </div>
         </template>
 
