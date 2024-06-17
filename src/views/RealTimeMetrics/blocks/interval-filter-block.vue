@@ -173,6 +173,7 @@
         @change="dropdownChange"
         :loading="disabledFilter"
         :disabled="disabledFilter"
+        data-testid="real-time-metrics__interval-filter-block__dropdown"
       />
     </div>
     <div
@@ -194,6 +195,8 @@
         iconDisplay="input"
         :maxDate="maxDate"
         :class="classError"
+        data-testid="real-time-metrics__interval-filter-block__calendar"
+        :aria-valuenow="dates"
       />
       <small
         v-if="hasError && isVisibleCalendar"
