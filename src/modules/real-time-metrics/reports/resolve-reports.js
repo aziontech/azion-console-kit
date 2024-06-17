@@ -21,8 +21,10 @@ export default async function ResolveReport(report, filters, userUTC, signal) {
   }
   const reportData = await LoadReportWithMeta(filters, reportWithCancelation, userUTC)
 
-  const hasAggregation = reportData.resultChart.length <= maxSeriesToDisplayTag
-  const hasResults = reportData.resultChart.length
+  if (reportData.error || !reportData?.resultChart) return {}
+
+  const hasAggregation = reportData?.resultChart?.length <= maxSeriesToDisplayTag
+  const hasResults = reportData?.resultChart?.length
 
   const reportInfo = {
     reportId: report.id,
