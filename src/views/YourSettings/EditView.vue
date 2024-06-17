@@ -108,7 +108,11 @@
   }
 
   const showEmailToast = () => {
-    showToast('info', 'Check your inbox and follow the instructions to verify this new email.', 'Confirmation email sent')
+    showToast(
+      'info',
+      'Check your inbox and follow the instructions to verify this new email.',
+      'Confirmation email sent'
+    )
   }
 
   const formSubmit = async (values) => {
