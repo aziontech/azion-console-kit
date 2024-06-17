@@ -599,28 +599,24 @@
 
   const phasesRadioOptions = ref([])
 
-  watch(
-    checkPhaseIsDefaultValue,
-    () => {
-      if (!checkPhaseIsDefaultValue.value) {
-        phasesRadioOptions.value = [
-          {
-            title: 'Request Phase',
-            value: 'request',
-            subtitle: 'Configure the requests made to the edge.'
-          },
-          {
-            title: 'Response Phase',
-            value: 'response',
-            subtitle: 'Configure the responses delivered to end-users.'
-          }
-        ]
-      } else {
-        phasesRadioOptions.value = []
-      }
-    },
-    { immediate: true }
-  )
+  watch(checkPhaseIsDefaultValue, () => {
+    if (!checkPhaseIsDefaultValue.value) {
+      phasesRadioOptions.value = [
+        {
+          title: 'Request Phase',
+          value: 'request',
+          subtitle: 'Configure the requests made to the edge.'
+        },
+        {
+          title: 'Response Phase',
+          value: 'response',
+          subtitle: 'Configure the responses delivered to end-users.'
+        }
+      ]
+    } else {
+      phasesRadioOptions.value = []
+    }
+  })
 
   onMounted(async () => {
     updateBehaviorsOptionsRequires()
