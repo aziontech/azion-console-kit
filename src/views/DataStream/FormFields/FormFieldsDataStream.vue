@@ -86,7 +86,7 @@
           v-model:value="dataSet"
           language="json"
           :theme="theme"
-          :options="optionsMonacoEditor"
+          :options="dataSetMonacoOptions"
           class="min-h-[300px] surface-border border rounded-sm overflow-hidden"
         />
         <small class="text-xs text-color-secondary font-normal leading-5">
@@ -622,7 +622,7 @@
             v-model:value="serviceAccountKey"
             language="json"
             :theme="theme"
-            :options="optionsMonacoEditor"
+            :options="serviceAccountMonacoOptions"
             class="min-h-[300px] surface-border border rounded-md overflow-hidden"
           />
           <small class="text-xs text-color-secondary font-normal leading-5">
@@ -1362,14 +1362,14 @@
     return store.currentTheme === 'light' ? 'vs' : 'vs-dark'
   })
 
-  const optionsMonacoEditor = computed(() => {
-    return {
-      minimap: { enabled: false },
-      wordWrap: 'on',
-      tabSize: 2,
-      formatOnPaste: true
-    }
-  })
+  const DEFAULT_MONACO_OPTIONS = {
+    minimap: { enabled: false },
+    wordWrap: 'on',
+    tabSize: 2,
+    formatOnPaste: true
+  }
+  const dataSetMonacoOptions = ref({ ...DEFAULT_MONACO_OPTIONS })
+  const serviceAccountMonacoOptions = ref({ ...DEFAULT_MONACO_OPTIONS })
 
   watch(
     () => template.value,
@@ -1377,6 +1377,9 @@
       const templateID = newValue
       const isFirstRender = !oldValue
       if (templateID) insertDataSet(templateID, isFirstRender)
+
+      const isReadOnlyIfCustomTemplate = templateID !== 'CUSTOM_TEMPLATE'
+      dataSetMonacoOptions.value.readOnly = isReadOnlyIfCustomTemplate
     }
   )
 
