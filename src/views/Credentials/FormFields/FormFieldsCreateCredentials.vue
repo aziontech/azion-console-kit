@@ -1,17 +1,17 @@
 <!-- eslint-disable vue/no-mutating-props -->
 <script setup>
   import { computed } from 'vue'
-
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
-  import InputText from 'primevue/inputtext'
-  import PrimeTextarea from 'primevue/textarea'
+  import FieldText from '@/templates/form-fields-inputs/fieldText'
+  import FieldTextArea from '@/templates/form-fields-inputs/fieldTextArea'
+
   import PrimePassword from 'primevue/password'
   import PrimeButton from 'primevue/button'
   import InputSwitch from 'primevue/inputswitch'
   import { useField } from 'vee-validate'
   defineEmits(['copyToken'])
 
-  const { value: name, errorMessage: nameError } = useField('name')
+  const { value: name } = useField('name')
   const { value: description } = useField('description')
   const { value: status } = useField('status')
 
@@ -37,42 +37,22 @@
   >
     <template #inputs>
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
-        <label
-          for="name"
-          class="text-color text-base font-medium"
-          >Name *</label
-        >
-        <InputText
-          v-model="name"
-          id="name"
-          type="text"
-          :disabled="props.generatedToken"
-          :class="{ 'p-invalid': nameError }"
+        <FieldText
+          label="Name *"
+          name="name"
+          :value="name"
         />
-        <small
-          v-if="nameError"
-          class="p-error text-xs font-normal leading-tight"
-          >{{ nameError }}</small
-        >
       </div>
 
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
-        <label
-          for="description"
-          class="text-color text-base font-medium"
-          >Description</label
-        >
-        <PrimeTextarea
-          v-model="description"
-          id="description"
+        <FieldTextArea
+          label="Description"
+          name="description"
+          :value="description"
+          description="Description and purpose of the credential."
           rows="2"
-          cols="30"
-          class="w-full"
           :disabled="props.generatedToken"
         />
-        <small class="text-xs text-color-secondary font-normal leading-5">
-          Description and purpose of the credential.
-        </small>
       </div>
     </template>
   </FormHorizontal>
