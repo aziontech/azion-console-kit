@@ -57,7 +57,7 @@
     },
     isCard: {
       type: Boolean,
-      default: false
+      default: true
     },
     hideSelector: {
       type: Boolean,
