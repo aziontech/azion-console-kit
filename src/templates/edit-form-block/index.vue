@@ -31,6 +31,10 @@
     schema: {
       type: Object,
       required: true
+    },
+    disableAfterCreateToastFeedback: {
+      type: Boolean,
+      default: false
     }
   })
 
@@ -108,7 +112,9 @@
     async (values) => {
       try {
         const feedback = await props.editService(values)
-        showToast('success', feedback ?? 'edited successfully')
+        if (!props.disableAfterCreateToastFeedback) {
+          showToast('success', feedback ?? 'edited successfully')
+        }
         blockViewRedirection.value = false
         emit('on-edit-success', feedback)
         if (props.disableRedirect) {
@@ -162,6 +168,7 @@
   <slot
     name="action-bar"
     :onSubmit="onSubmit"
+    :handleSubmit="handleSubmit"
     :formValid="meta.valid"
     :onCancel="onCancel"
     :errors="errors"

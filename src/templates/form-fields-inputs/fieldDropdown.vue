@@ -135,6 +135,11 @@
     :class="{ 'p-invalid': errorMessage }"
     v-bind="$attrs"
     :disabled="disabled"
+    :pt="{
+      filterInput: {
+        class: 'w-full'
+      }
+    }"
   >
     <template
       v-if="enableCustomLabel"
