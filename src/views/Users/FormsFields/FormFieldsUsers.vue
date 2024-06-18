@@ -48,7 +48,6 @@
   const optionsLanguage = ref([{ label: 'English', value: 'en' }])
   const loadingCountry = ref(true)
   const isInitializing = ref(false)
-   
 
   const { value: firstName, errorMessage: errorFirstName } = useField('firstName')
   const { value: lastName, errorMessage: errorLastName } = useField('lastName')
@@ -389,7 +388,6 @@
         >
       </div>
       <FieldGroupSwitch
-        label=""
         :isCard="false"
         input-class="w-full"
         :options="switchOptions"
