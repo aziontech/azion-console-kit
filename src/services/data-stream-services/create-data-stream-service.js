@@ -19,7 +19,7 @@ const adapt = (payload) => {
   if (payload.template === 'CUSTOM_TEMPLATE') {
     parsedPayload = {
       name: payload.name,
-      template_model: payload.dataSet,
+      template_model: payload.dataSet.replace(/,\s+/g, ',\n\t'),
       all_domains: allDomains,
       domain_ids: allDomains ? [] : getDomains(payload.domains[1]),
       endpoint: parseByEndpointType(payload)
