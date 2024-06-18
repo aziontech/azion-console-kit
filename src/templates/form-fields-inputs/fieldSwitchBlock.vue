@@ -13,6 +13,7 @@
         :name="props.name"
         @change="stopPropagation"
         v-model="inputValue"
+        :readonly="readonly"
       />
     </template>
     <template #footer>
@@ -69,6 +70,9 @@
       required: true
     },
     value: {
+      type: Boolean
+    },
+    readonly: {
       type: Boolean
     },
     selectorClass: {
