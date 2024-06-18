@@ -72,8 +72,7 @@
       type: Boolean
     },
     readonly: {
-      type: Boolean,
-      default: false
+      type: Boolean
     }
   })
 
