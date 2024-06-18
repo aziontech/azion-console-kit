@@ -31,7 +31,7 @@ const fixtures = {
     id: 3563,
     name: 'Data Stream Custom a Template',
     template: 'CUSTOM_TEMPLATE',
-    dataSet: '{"session_id":"$session_id"}',
+    dataSet: '{"session_id":"$session_id", "username":"$username"}',
     dataSource: 'http',
     domains: [[], []],
     endpoint: 'qradar',
@@ -88,7 +88,7 @@ describe('DataStreamServices', () => {
       method: 'PUT',
       body: {
         name: fixtures.dataStreamCustomTemplateMock.name,
-        template_model: fixtures.dataStreamCustomTemplateMock.dataSet,
+        template_model: fixtures.dataStreamCustomTemplateMock.dataSet.replaceAll(/,\s+/g, ',\n\t'),
         domain_ids: [],
         all_domains: true,
         endpoint: {
