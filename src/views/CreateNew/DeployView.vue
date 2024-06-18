@@ -196,7 +196,6 @@
   const handleFinish = async () => {
     try {
       const response = await props.getResultsService(route.params.id)
-      deployStore.removeStartTime()
       results.value = response.result
       toast.add({
         closable: true,
@@ -212,6 +211,8 @@
         summary: 'Creation Failed',
         detail: failMessage
       })
+    } finally {
+      deployStore.removeStartTime()
     }
 
     if (!solutionStore.solution) {
@@ -296,7 +297,11 @@
   const startTimer = () => {
     deployStartTime.value = deployStore.getStartTime
     const MILISEC_IN_SEC = 1000
-    const timerInitialValue = Math.trunc((Date.now() - deployStartTime.value) / MILISEC_IN_SEC)
+    const timerInitialValue =
+      deployStartTime.value !== null
+        ? Math.trunc((Date.now() - deployStartTime.value) / MILISEC_IN_SEC)
+        : 0
+
     timer.value = timerInitialValue
     intervalRef.value = setInterval(() => {
       timer.value += 1
@@ -316,6 +321,10 @@
   }
 
   onMounted(() => {
+    if (!deployStore.getStartTime) {
+      deployStore.addStartTime()
+    }
+
     executionId.value = route.params.id
     applicationName.value = deployStore.getApplicationName
     startTimer()

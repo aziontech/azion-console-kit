@@ -78,14 +78,14 @@
     {
       title: 'Enforce',
       subtitle: `Blocks the client certificate during the TLS handshake if the uploaded Trusted CA can't be validated.`,
-      value: 'enforce'
+      inputValue: 'enforce'
     },
     {
       title: 'Permissive',
       subtitle: `Attempts to verify the client certificate, but will allow the TLS handshake even if
               the Trusted CA can't be validated. Check which client certificate attempted the
               request in Edge Firewall, if necessary.`,
-      value: 'permissive'
+      inputValue: 'permissive'
     }
   ])
 
