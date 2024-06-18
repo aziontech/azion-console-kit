@@ -5,6 +5,7 @@
   import { computed, ref } from 'vue'
   import { useRouter } from 'vue-router'
   import { TOAST_LIFE } from '@/utils/constants'
+  import { useAttrs } from 'vue'
 
   defineOptions({ name: 'create-form-block' })
 
@@ -32,18 +33,27 @@
     cleanForm: {
       type: Boolean,
       default: true
+    },
+    unSaved: {
+      type: Boolean,
+      default: true
     }
   })
 
   const emit = defineEmits(['on-response', 'on-response-fail'])
+  const attrs = useAttrs()
 
   const router = useRouter()
   const toast = useToast()
-  const blockViewRedirection = ref(true)
+  const blockViewRedirection = ref(props.unSaved)
 
   const formHasChanges = computed(() => {
     const isDirty = useIsFormDirty()
     return blockViewRedirection.value && isDirty.value
+  })
+
+  const classForm = computed(() => {
+    return attrs.class || 'flex flex-col min-h-[calc(100vh-300px)]'
   })
 
   const { meta, errors, handleSubmit, isSubmitting, values, resetForm } = useForm({
@@ -120,7 +130,7 @@
 </script>
 
 <template>
-  <div class="flex flex-col min-h-[calc(100vh-300px)]">
+  <div :class="classForm">
     <form class="w-full grow flex flex-col gap-8 max-md:gap-6">
       <slot
         name="form"
