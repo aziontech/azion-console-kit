@@ -1,7 +1,10 @@
 <template>
   <ContentBlock>
     <template #heading>
-      <PageHeadingBlock pageTitle="Real-Time Metrics" />
+      <PageHeadingBlock
+        pageTitle="Real-Time Metrics"
+        data-testid="real-time-metrics__page-heading-block__title"
+      />
     </template>
     <template
       #content
