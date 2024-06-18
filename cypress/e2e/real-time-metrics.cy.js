@@ -38,15 +38,13 @@ describe('Real Time Metrics', () => {
       body: { data: {} }
     }).as('beholderRequest')
 
-    cy.wait('@beholderRequest')
-
     cy.get('.p-dropdown-items-wrapper ul').should('not.exist')
 
     cy.getByTestId('real-time-metrics__interval-filter-block__dropdown').as('dropdown').click()
 
     cy.get('.p-dropdown-items-wrapper ul').should('be.visible')
 
-    // Select Custom Time Range option
+    // Select Custom Time Range option and change the hour in the calendar component
     cy.get('.p-dropdown-items-wrapper li').last().should('have.text', 'Custom time range').click()
 
     cy.getByTestId('real-time-metrics__interval-filter-block__calendar')
@@ -56,18 +54,15 @@ describe('Real Time Metrics', () => {
 
     cy.get('.p-datepicker-today').as('today').click()
 
-    // Set the initial date with one hour less difference
     clickMultipleTimes('[aria-label="Previous Hour"]', 4)
 
     cy.get('@today').click()
 
-    // Set the final date with two hours more difference
     clickMultipleTimes('[aria-label="Next Hour"]', 4)
 
     // click outside of the calendar to trigger the filter
     cy.getByTestId('real-time-metrics__page-heading-block__title').as('title').click()
 
-    // filter interceptor
     cy.intercept('POST', '/api/v3/metrics/graphql').as('firstFilterRequest')
 
     cy.get('@calendar')
@@ -85,15 +80,11 @@ describe('Real Time Metrics', () => {
 
     // change time range again
     cy.get('@calendar').click()
-    clickMultipleTimes('[aria-label="Previous Hour"]', 1)
+    clickMultipleTimes('[aria-label="Previous Hour"]', 2)
 
     cy.get('@title').click()
 
-    // filter interceptor
-    cy.intercept('POST', '/api/v3/metrics/graphql', {
-      statusCode: 200,
-      body: { data: {} }
-    }).as('secondFilterRequest')
+    cy.intercept('POST', '/api/v3/metrics/graphql').as('secondFilterRequest')
 
     cy.get('@calendar')
       .invoke('attr', 'aria-valuenow')
