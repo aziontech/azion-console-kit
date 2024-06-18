@@ -57,6 +57,14 @@
         @click="closeDialog"
       />
     </template>
+
+    <template #footer>
+      <PrimeButton
+        label="Confirm"
+        severity="secondary"
+        @click="closeDialog"
+      />
+    </template>
   </PrimeDialog>
 </template>
 

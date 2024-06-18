@@ -114,7 +114,8 @@
           placeholder="My domain"
         />
         <small class="text-xs text-color-secondary font-normal leading-5">
-          Give a unique and descriptive name to identify the domain.
+          This is an identification name for the domain. Once you save the configuration, the URL
+          will be automatically generated.
         </small>
         <small
           v-if="errorName"

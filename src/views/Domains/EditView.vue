@@ -120,7 +120,7 @@
   }
   const copyDomainName = ({ name }) => {
     props.clipboardWrite(name)
-    showToast('success', 'domain name copied')
+    showToast('success', 'Domain copied to clipboard!')
   }
 
   onMounted(async () => {
