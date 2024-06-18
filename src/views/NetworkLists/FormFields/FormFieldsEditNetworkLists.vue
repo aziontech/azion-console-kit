@@ -1,9 +1,9 @@
 <script setup>
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
-  import Dropdown from 'primevue/dropdown'
-  import InputText from 'primevue/inputtext'
   import MultiSelect from 'primevue/multiselect'
-  import TextareaComponent from 'primevue/textarea'
+  import FieldText from '@/templates/form-fields-inputs/fieldText'
+  import FieldTextArea from '@/templates/form-fields-inputs/fieldTextArea'
+  import FieldDropdown from '@/templates/form-fields-inputs/fieldDropdown'
   import { useField } from 'vee-validate'
   import { computed, onMounted, ref } from 'vue'
 
@@ -21,11 +21,10 @@
   ])
   const countriesList = ref([])
 
-  const { value: name, errorMessage: nameError } = useField('name')
-  const { value: itemsValues, errorMessage: itemsValuesError } = useField('itemsValues')
-  const { value: networkListType, errorMessage: networkListTypeError } = useField('networkListType')
-  const { value: itemsValuesCountry, errorMessage: itemsValuesCountryError } =
-    useField('itemsValuesCountry')
+  const { value: name } = useField('name')
+  const { value: itemsValues } = useField('itemsValues')
+  const { value: networkListType } = useField('networkListType')
+  const { value: itemsValuesCountry } = useField('itemsValuesCountry')
 
   const fetchCountries = async () => {
     const result = await props.listCountriesService()
@@ -54,25 +53,13 @@
   >
     <template #inputs>
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
-        <label
-          for="name"
-          class="text-color text-base font-medium"
-          >Name *</label
-        >
-        <InputText
-          placeholder="My network list"
-          v-model="name"
-          type="text"
-          :class="{ 'p-invalid': nameError }"
+        <FieldText
+          label="Name *"
+          name="name"
+          placeholder="My Network List"
+          :value="name"
+          description="Give a unique and descriptive name to identify the network list."
         />
-        <small class="text-xs text-color-secondary font-normal leading-5">
-          Give a unique and descriptive name to identify the network list.</small
-        >
-        <small
-          v-if="nameError"
-          class="p-error text-xs font-normal leading-tight"
-          >{{ nameError }}</small
-        >
       </div>
     </template>
   </FormHorizontal>
@@ -82,86 +69,51 @@
   >
     <template #inputs>
       <div class="flex flex-col w-full sm:max-w-lg gap-2">
-        <label
-          for="id"
-          class="text-color text-base font-medium"
-          >Type *</label
-        >
-        <Dropdown
-          appendTo="self"
-          :class="{ 'p-invalid': networkListTypeError }"
-          v-model="networkListType"
-          disabled
-          dropdown-icon="pi pi-lock"
+        <FieldDropdown
+          label="Type"
+          name="networkListType"
           :options="options"
-          optionLabel="name"
+          @change="resetRegionAndCity"
           optionValue="value"
-          class="w-full"
+          optionLabel="name"
+          dropdown-icon="pi pi-lock"
+          disabled
+          :value="networkListType"
+          appendTo="self"
+          description="Each list type accepts different values."
         />
-        <small class="text-xs text-color-secondary font-normal leading-5">
-          Each list type accepts different values.</small
-        >
-        <small
-          v-if="networkListTypeError"
-          class="p-error text-xs font-normal leading-tight"
-          >{{ networkListTypeError }}</small
-        >
       </div>
       <div
         class="flex flex-col sm:max-w-lg w-full gap-2"
         v-if="isAsnNetWorkType"
       >
-        <label
-          for="id"
-          class="text-color text-base font-medium"
-          >List *</label
-        >
-        <TextareaComponent
-          :class="{ 'p-invalid': itemsValuesError }"
-          v-model="itemsValues"
+        <FieldTextArea
+          label="List *"
+          placeholder="1234&#10;4321"
+          name="itemsValues"
           rows="2"
           cols="30"
-          id="list"
-          placeholder="1234&#10;4321"
+          :value="itemsValues"
+          description="Separate each ASN value by using a new line. Duplicated entries are automatically
+          removed."
         />
-        <small
-          v-if="itemsValuesError"
-          class="p-error text-xs font-normal leading-tight"
-          >{{ itemsValuesError }}</small
-        >
-        <small class="text-xs text-color-secondary font-normal leading-5">
-          Separate each ASN value by using a new line. Duplicated entries are automatically
-          removed.</small
-        >
       </div>
       <div
         class="flex flex-col sm:max-w-lg w-full gap-2"
         v-if="isIpCidrNetworkType"
       >
-        <label
-          for="id"
-          class="text-color text-base font-medium"
-          >List *</label
-        >
-        <TextareaComponent
+        <FieldTextArea
+          label="List *"
           disabled
-          :class="{ 'p-invalid': itemsValuesError }"
-          v-model="itemsValues"
-          rows="16"
-          id="ipCidr"
-          cols="30"
           placeholder="185.241.208.232&#10;194.26.192.64&#10;171.25.193.25 #comment"
-        />
-        <small
-          v-if="itemsValuesError"
-          class="p-error text-xs font-normal leading-tight"
-          >{{ itemsValuesError }}</small
-        >
-        <small class="text-xs text-color-secondary font-normal leading-5">
-          Separate each address value by using a new line and, optionally, use <code>#</code> to add
+          name="itemsValues"
+          rows="16"
+          cols="30"
+          :value="itemsValues"
+          description="Separate each address value by using a new line and, optionally, use <code>#</code> to add
           a comment and <code>--LT</code> to add a date. Duplicated entries are automatically
-          removed.
-        </small>
+          removed."
+        />
       </div>
       <div
         class="flex flex-col w-full sm:max-w-3xl gap-2"
@@ -175,6 +127,7 @@
         <MultiSelect
           v-model="itemsValuesCountry"
           :options="countriesList"
+          name="itemsValuesCountry"
           filter
           autoFilterFocus
           optionLabel="name"
