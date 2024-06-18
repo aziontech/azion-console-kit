@@ -45,14 +45,14 @@
     }
   ]
   const policyProtocolRadioOptions = [
-    { title: 'Preserve HTTP/HTTPS', value: 'preserve' },
-    { title: 'Enforce HTTP', value: 'http' },
-    { title: 'Enforce HTTPS', value: 'https' }
+    { title: 'Preserve HTTP/HTTPS', inputValue: 'preserve' },
+    { title: 'Enforce HTTP', inputValue: 'http' },
+    { title: 'Enforce HTTPS', inputValue: 'https' }
   ]
 
   const serverRolesRadioOptions = [
-    { title: 'Primary', value: 'primary' },
-    { title: 'Backup', value: 'backup' }
+    { title: 'Primary', inputValue: 'primary' },
+    { title: 'Backup', inputValue: 'backup' }
   ]
 
   const originKeyInput = ref('')
