@@ -95,7 +95,11 @@ describe('DataStreamServices', () => {
       method: 'POST',
       body: {
         name: fixtures.dataStreamCustomTemplateMock.name,
-        template_model: fixtures.dataStreamCustomTemplateMock.dataSet.replaceAll(/,\s+/g, ',\n\t'),
+        template_model: JSON.stringify(
+          JSON.parse(fixtures.dataStreamCustomTemplateMock.dataSet),
+          null,
+          '\t'
+        ),
         domain_ids: [],
         all_domains: true,
         endpoint: {
