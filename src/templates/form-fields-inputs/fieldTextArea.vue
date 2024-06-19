@@ -33,8 +33,10 @@
       default: 30
     },
     autoResize: {
-      type: Boolean,
-      default: false
+      type: Boolean
+    },
+    disabled: {
+      type: Boolean
     }
   })
 
@@ -61,6 +63,7 @@
     :id="name"
     v-model="inputValue"
     :name="props.name"
+    :disabled="props.disabled"
     type="text"
     :autoResize="props.autoResize"
     :rows="props.rows"
