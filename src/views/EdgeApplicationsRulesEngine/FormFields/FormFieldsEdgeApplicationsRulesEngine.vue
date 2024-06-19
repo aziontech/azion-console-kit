@@ -599,10 +599,6 @@
 
   const phasesRadioOptions = ref([])
 
-  const isLastCriteria = (criteriaIndex) => {
-    return criteriaIndex == criteria.value.length - 1
-  }
-
   watch(
     checkPhaseIsDefaultValue,
     () => {
@@ -803,17 +799,7 @@
           v-if="props.isApplicationAcceleratorEnabled && !checkPhaseIsDefaultValue"
           class="flex items-center gap-2"
         >
-          <Divider
-            v-if="isLastCriteria(criteriaIndex)"
-            type="solid"
-          />
-          <Divider
-            v-else
-            align="left"
-            type="dashed"
-          >
-            And
-          </Divider>
+          <Divider type="solid" />
           <PrimeButton
             v-if="isNotFirstCriteria(criteriaIndex)"
             icon="pi pi-trash"
