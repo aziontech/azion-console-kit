@@ -2,16 +2,14 @@
   import { useAccountStore } from '@/stores/account'
   import { storeToRefs } from 'pinia'
   import { useField } from 'vee-validate'
-  import { ref } from 'vue'
+  import { computed, ref, watch } from 'vue'
 
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
-  import Card from 'primevue/card'
-  import Divider from 'primevue/divider'
   import Dropdown from 'primevue/dropdown'
   import InputMask from 'primevue/inputmask'
-  import InputSwitch from 'primevue/inputswitch'
   import InputText from 'primevue/inputtext'
   import MultiSelect from 'primevue/multiselect'
+  import FieldGroupSwitch from '@/templates/form-fields-inputs/fieldGroupSwitch.vue'
 
   const props = defineProps({
     loadAccountDetailsService: {
@@ -49,6 +47,7 @@
   const { account } = storeToRefs(store)
   const optionsLanguage = ref([{ label: 'English', value: 'en' }])
   const loadingCountry = ref(true)
+  const isInitializing = ref(false)
 
   const { value: firstName, errorMessage: errorFirstName } = useField('firstName')
   const { value: lastName, errorMessage: errorLastName } = useField('lastName')
@@ -59,10 +58,8 @@
   const { value: mobile, errorMessage: errorMobile } = useField('mobile', null, {
     initialValue: ''
   })
-  const { value: isAccountOwner, errorMessage: errorisAccountOwner } = useField('isAccountOwner')
+  const { value: isAccountOwner } = useField('isAccountOwner')
   const { value: teamsIds, errorMessage: errorTeamsIds } = useField('teamsIds')
-  const { value: twoFactorEnabled, errorMessage: errorTwoFactorEnabled } =
-    useField('twoFactorEnabled')
 
   const setCountriesOptions = (countries) => {
     optionsCountriesMobile.value = countries
@@ -118,6 +115,7 @@
   const initializeFormValues = async () => {
     accountIsOwner.value = account?.is_account_owner
     isAccountOwner.value = accountIsOwner.value
+    isInitializing.value = true
 
     const defaultTeamId = await fetchTeams()
     const initialCountry = await fetchCountries()
@@ -140,13 +138,34 @@
       props.resetForm({ values: initialValues })
       loadingCountry.value = false
     }
+
+    isInitializing.value = false
   }
 
-  const handleisAccountOwner = () => {
-    if (!isAccountOwner.value) {
+  const switchOptions = computed(() => [
+    {
+      title: 'Social login',
+      nameField: 'isAccountOwner',
+      readonly: accountIsOwner.value,
+      disabled: accountIsOwner.value,
+      subtitle:
+        'As an Account Owner you can enable/disable the Social Login functionality. When it is enabled, users linked to the account can authenticate to RTM using their social networks. When it is disabled, users authenticate to RTM using their email and password.'
+    },
+    {
+      title: 'Enforce Multi-Factor Authentication',
+      nameField: 'twoFactorEnabled',
+      readonly: isForceMFA.value,
+      disabled: isForceMFA.value,
+      subtitle:
+        'As an Account Owner you can enable/disable the enforce MFA functionality. MFA will be mandatory for all users of this account when enabling this item.'
+    }
+  ])
+
+  watch(isAccountOwner, (newValue) => {
+    if (!newValue && !isInitializing.value) {
       teamsIds.value = []
     }
-  }
+  })
 
   initializeFormValues()
 </script>
@@ -368,79 +387,12 @@
           Select a team for the user. You can create teams using Teams Permissions.</small
         >
       </div>
-      <div>
-        <Card
-          :pt="{
-            root: { class: 'shadow-none  rounded-none' },
-            body: { class: 'py-4 border-0' },
-            content: { class: 'ml-12' },
-            title: { class: 'flex items-center text-base m-0 gap-3 font-medium' },
-            subtitle: {
-              class: 'text-sm font-normal text-color-secondary m-0 pr-0 md:pr-[2.5rem]'
-            }
-          }"
-        >
-          <template #title>
-            <InputSwitch
-              :class="{ 'p-invalid': errorisAccountOwner }"
-              :disabled="accountIsOwner"
-              :readonly="accountIsOwner"
-              v-model="isAccountOwner"
-              @click="handleisAccountOwner"
-              inputId="accountOwner"
-            />
-            <div class="flex-col gap-1">
-              <label
-                for="accountOwner"
-                class="text-color text-sm font-normal"
-                >Account Owner</label
-              >
-            </div>
-          </template>
-
-          <template #content>
-            <small class="text-color-secondary text-sm">
-              Account owners can add new users and have all permissions enabled.
-            </small>
-          </template>
-        </Card>
-
-        <Divider></Divider>
-
-        <Card
-          :pt="{
-            root: { class: 'shadow-none  rounded-none' },
-            body: { class: 'py-4 border-0' },
-            content: { class: 'ml-12' },
-            title: { class: 'flex items-center text-base m-0 gap-3 font-medium' },
-            subtitle: {
-              class: 'text-sm font-normal text-color-secondary m-0 pr-0 md:pr-[2.5rem]'
-            }
-          }"
-        >
-          <template #title>
-            <InputSwitch
-              :class="{ 'p-invalid': errorTwoFactorEnabled }"
-              :readonly="isForceMFA"
-              :disabled="isForceMFA"
-              v-model="twoFactorEnabled"
-              inputId="twoFactor"
-            />
-            <div class="flex-col gap-1">
-              <label
-                for="twoFactor"
-                class="text-color text-sm font-normal"
-                >Multi-Factor Authentication</label
-              >
-            </div>
-          </template>
-          <template #content>
-            <small class="text-color-secondary text-sm">
-              Accounts with MFA enabled will require additional client authentication upon login.
-            </small>
-          </template>
-        </Card>
-      </div>
+      <FieldGroupSwitch
+        :isCard="false"
+        input-class="w-full"
+        :options="switchOptions"
+      >
+      </FieldGroupSwitch>
     </template>
   </FormHorizontal>
 </template>
