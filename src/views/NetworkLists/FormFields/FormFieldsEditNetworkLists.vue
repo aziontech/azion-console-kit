@@ -73,7 +73,6 @@
           label="Type"
           name="networkListType"
           :options="options"
-          @change="resetRegionAndCity"
           optionValue="value"
           optionLabel="name"
           dropdown-icon="pi pi-lock"
@@ -92,7 +91,6 @@
           placeholder="1234&#10;4321"
           name="itemsValues"
           rows="2"
-          cols="30"
           :value="itemsValues"
           description="Separate each ASN value by using a new line. Duplicated entries are automatically
           removed."
@@ -108,7 +106,6 @@
           placeholder="185.241.208.232&#10;194.26.192.64&#10;171.25.193.25 #comment"
           name="itemsValues"
           rows="16"
-          cols="30"
           :value="itemsValues"
           description="Separate each address value by using a new line and, optionally, use <code>#</code> to add
           a comment and <code>--LT</code> to add a date. Duplicated entries are automatically

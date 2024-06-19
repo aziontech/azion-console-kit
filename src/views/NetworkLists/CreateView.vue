@@ -49,7 +49,7 @@
     selectedCountries: [],
     networkListType: 'asn',
     asn: '',
-    ipCidr: '',
+    ipCidr: ''
   }
 
   const options = ref([
