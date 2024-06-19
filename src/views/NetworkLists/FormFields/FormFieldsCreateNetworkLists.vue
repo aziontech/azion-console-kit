@@ -94,7 +94,6 @@
           label="Type"
           name="networkListType"
           :options="options"
-          @change="resetRegionAndCity"
           optionValue="value"
           optionLabel="name"
           :value="networkListType"
