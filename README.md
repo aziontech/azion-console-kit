@@ -22,17 +22,17 @@ Before you begin, ensure that you have the following:
 
 1. Clone the repository and navigate to the root folder.
 
-```bash
-git clone git@github.com:aziontech/azion-console-kit.git
-cd azion-console-kit
-```
+    ```bash
+    git clone git@github.com:aziontech/azion-console-kit.git
+    cd azion-console-kit
+    ```
 
 2. Install dependencies and start the project:
 
-```bash
-  $ yarn install
-  $ yarn dev --host
-```
+    ```bash
+     $ yarn install
+     $ yarn dev --host
+    ```
 
 The webapp becomes available at [http://localhost:5173](http://localhost:5173).
 
@@ -64,45 +64,37 @@ VITE_ENVIRONMENT='PRODUCTION'
 
 ## Running on the Edge 🚀
 
-Azion Console Kit can run natively on Azion's edge using Azion CLI (version >= 0.70.0). Follow these steps:
+Azion Console Kit can run natively on Azion's edge using Azion CLI. Follow these steps:
 
-1. Download and configure Azion CLI with a personal token:
+1. [Download the Azion CLI here](https://www.azion.com/en/documentation/products/azion-cli/overview/) and configure your personal token:
 
-```bash
-curl https://downloads.azion.com/linux/x86_64/azioncli -o azioncli && chmod +x azioncli
-./azioncli configure -t PERSONALTOKEN
-```
+    ```bash
+    azion -t ${PERSONAL_TOKEN}
+    ```
 
-2. Build the bundler and copy the content from `dist` to `.edge/statics`
+2. Link project to an Azion edge application.
 
-```bash
-yarn build
-mkdir -p .edge/statics && cp -r ./dist/* .edge/statics
-```
+     ```bash
+    azion link
+    ```
 
-3. Publish the edge application:
+3. Publish your project:
 
-```bash
-azioncli edge_applications init --name azion-platform-kit --type vue --mode deliver
+    ```bash
+    azion deploy
+    ```
 
-azioncli edge_applications publish --debug
-```
+   💡 Tip: You can use the `--config-dir` argument to separate project environments. The CLI will use the reference to store application states. If you don't need two environments, don't pass the argument and it will use the original reference.
 
-After a few seconds, access your project on the domain provided by the CLI:
+4. Update your Project
 
-```bash
-$ azioncli edge_applications publish
-Uploading static files
-[##########] 100 .edge/statics/index.html Upload completed successfully!
-Created Edge Function PLATFORM-KIT-1 with ID 10908
-Created Edge Application PLATFORM-KIT-1 with ID 1694694931
-Created Domain PLATFORM-KIT-1 with ID 1694690266
-Created Cache Settings for web application
-Created Rules Engine for web application
-Your Edge Application was published successfully
+    ```bash
+    azion deploy
+    ```
 
-To visualize your application access the domain: https://ajahphrqah.map.azionedge.net
-```
+    One of the rules used in `azion.config.cjs` _(to rewrite the authentication cookie using your domain)_ needs the created domain to work. So, **after the first deploy**, just run the `Azion deploy` command again and everything should work 🚀
+
+After a few seconds, access your project on the domain provided by the CLI.
 
 ## Features 🧩
 
