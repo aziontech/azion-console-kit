@@ -1,9 +1,9 @@
-name: Deploy Console Kit (STAGE)
+name: Deploy Console Kit (PRODUCTION)
 
 on:
   push:
     branches:
-      - dev
+      - main
 env:
   HUSKY: 0
 
@@ -22,34 +22,16 @@ jobs:
       - name: Install dependencies
         run: yarn install
 
-      - name: Build
-        run: yarn build --mode stage
-        env:
-          VITE_RECAPTCHA_SITE_KEY: ${{ secrets.STAGE_RECAPTCHA_SITE_KEY }}
-
       - name: Download Azion CLI
-        run: curl https://downloads.azion.com/linux/x86_64/azioncli -o azioncli && chmod +x azioncli
-
-      - name: Create YML file to Azion CLI
-        run: mkdir ~/.config/ && touch ~/.config/azioncli.yaml
+        run: |
+          wget https://github.com/aziontech/azion/releases/download/1.28.1/azion_1.28.1_linux_amd64.apk 
+          apk add --allow-untrusted azion_1.28.1_linux_amd64.apk
 
       - name: Configure Azion CLI
-        run: ./azioncli configure -t ${{ secrets.PLATFORM_KIT_TOKEN }}
+        run: azion -t ${{ secrets.PLATFORM_KIT_TOKEN }}
 
-      - name: Define application settings
-        run: >
-          echo $(jq
-          --arg funcid ${{secrets.STAGE_EDGE_FUNCTION_ID}} 
-          --arg appid ${{secrets.STAGE_EDGE_APPLICATION_ID}} 
-          --arg domainid ${{secrets.STAGE_DOMAIN_ID}} 
-          '.name = "Console PK - Stage"
-          | .function.id = ($funcid|tonumber)
-          | .application.id = ($appid|tonumber)
-          | .domain.id = ($domainid|tonumber)'
-          azion/azion.json) > azion/azion.json
-
-      - name: Configure Repository
-        run: mkdir -p .edge/statics && cp -r ./dist/* .edge/statics
-
-      - name: Deploy Edge Application
-        run: ./azioncli edge_applications publish
+      - name: Build & Deploy
+        run: azion deploy --auto --config-dir azion/production
+        env:
+          VITE_RECAPTCHA_SITE_KEY: ${{ secrets.PROD_RECAPTCHA_SITE_KEY }}
+          NODE_ENV: stage
