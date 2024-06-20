@@ -6,6 +6,7 @@
   import { useRouter } from 'vue-router'
   import { TOAST_LIFE } from '@/utils/constants'
   import { useAttrs } from 'vue'
+  import { useScrollToError } from '@/composables/useScrollToError'
 
   defineOptions({ name: 'create-form-block' })
 
@@ -42,6 +43,8 @@
 
   const emit = defineEmits(['on-response', 'on-response-fail'])
   const attrs = useAttrs()
+  const { scrollToError } = useScrollToError()
+  const formRef = ref(null)
 
   const router = useRouter()
   const toast = useToast()
@@ -113,32 +116,17 @@
       }
     },
     ({ errors }) => {
-      const drawerOpen = document.querySelector('.p-sidebar-content[data-pc-section="content"]')
-
-      const view = drawerOpen ?? window
-      const errorKeys = Object.keys(errors)
-      const stringQuerySelector = errorKeys
-        .map((key) => {
-          return key.startsWith('monaco') ? `[name="${key}"] textarea` : `[name="${key}"]`
-        })
-        .join(', ')
-
-      const listEl = document.querySelectorAll(stringQuerySelector)
-      if (!listEl.length) return
-
-      const firstElError = listEl[0]
-      const MARGIN_TOP = 150
-      const elementPosition = firstElError.getBoundingClientRect().top + view.scrollY - MARGIN_TOP
-      view.scrollTo({ top: elementPosition, behavior: 'smooth' })
-      firstElError.focus({ preventScroll: true })
-      firstElError.click()
+      scrollToError(formRef, errors)
     }
   )
 </script>
 
 <template>
   <div :class="classForm">
-    <form class="w-full grow flex flex-col gap-8 max-md:gap-6">
+    <form
+      class="w-full grow flex flex-col gap-8 max-md:gap-6"
+      ref="formRef"
+    >
       <slot
         name="form"
         :resetForm="resetForm"

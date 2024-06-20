@@ -8,6 +8,7 @@
   import FeedbackFish from '@/templates/navbar-block/feedback-fish'
   import DialogUnsavedBlock from '@/templates/dialog-unsaved-block'
   import { TOAST_LIFE } from '@/utils/constants'
+  import { useScrollToError } from '@/composables/useScrollToError'
   defineOptions({
     name: 'create-drawer-block'
   })
@@ -40,6 +41,8 @@
     }
   })
 
+  const formRef = ref(null)
+  const { scrollToError } = useScrollToError()
   const toast = useToast()
   const showGoBack = ref(false)
   const blockViewRedirection = ref(true)
@@ -116,25 +119,7 @@
       }
     },
     ({ errors }) => {
-      const drawerOpen = document.querySelector('.p-sidebar-content[data-pc-section="content"]')
-
-      const view = drawerOpen ?? window
-      const errorKeys = Object.keys(errors)
-      const stringQuerySelector = errorKeys
-        .map((key) => {
-          return key.startsWith('monaco') ? `[name="${key}"] textarea` : `[name="${key}"]`
-        })
-        .join(', ')
-
-      const listEl = document.querySelectorAll(stringQuerySelector)
-      if (!listEl.length) return
-
-      const firstElError = listEl[0]
-      const MARGIN_TOP = 150
-      const elementPosition = firstElError.getBoundingClientRect().top + view.scrollY - MARGIN_TOP
-      view.scrollTo({ top: elementPosition, behavior: 'smooth' })
-      firstElError.focus({ preventScroll: true })
-      firstElError.click()
+      scrollToError(formRef, errors)
     }
   )
 
@@ -159,6 +144,7 @@
       headercontent: { class: 'flex justify-content-between items-center w-full pr-2' },
       content: { class: 'p-8' }
     }"
+    :ref="({ content }) => (formRef = content)"
   >
     <template #header>
       <h2>{{ title }}</h2>
