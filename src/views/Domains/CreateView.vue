@@ -121,7 +121,7 @@
 
   const renderToastDomainCreateSuccesfully = () => {
     const toastConfig = {
-      closable: false,
+      closable: true,
       severity: 'success',
       life: TOAST_LIFE,
       summary: 'Succesfully created',
