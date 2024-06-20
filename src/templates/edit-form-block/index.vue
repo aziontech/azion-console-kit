@@ -134,7 +134,12 @@
 
       const view = drawerOpen ?? window
       const errorKeys = Object.keys(errors)
-      const stringQuerySelector = errorKeys.map((key) => `[name="${key}"]`).join(', ')
+      const stringQuerySelector = errorKeys
+        .map((key) => {
+          return key.startsWith('monaco') ? `[name="${key}"] textarea` : `[name="${key}"]`
+        })
+        .join(', ')
+
       const listEl = document.querySelectorAll(stringQuerySelector)
       if (!listEl.length) return
 

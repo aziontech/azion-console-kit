@@ -145,19 +145,25 @@
       }
     },
     ({ errors }) => {
-      const firstError = Object.keys(errors)[0]
-      const drawerEl = document.querySelector('.p-sidebar-content')
-      const el = document.querySelector(`[name="${firstError}"]`)
+      const drawerOpen = document.querySelector('.p-sidebar-content[data-pc-section="content"]')
 
-      if (drawerEl && el) {
-        const elementPosition =
-          el.getBoundingClientRect().top - drawerEl.getBoundingClientRect().top
-        const MARGIN_TOP = 150
-        const adjustedPosition = elementPosition - MARGIN_TOP
-        drawerEl.scrollTop = adjustedPosition
-        el.focus({ preventScroll: true })
-        el.click()
-      }
+      const view = drawerOpen ?? window
+      const errorKeys = Object.keys(errors)
+      const stringQuerySelector = errorKeys
+        .map((key) => {
+          return key.startsWith('monaco') ? `[name="${key}"] textarea` : `[name="${key}"]`
+        })
+        .join(', ')
+
+      const listEl = document.querySelectorAll(stringQuerySelector)
+      if (!listEl.length) return
+
+      const firstElError = listEl[0]
+      const MARGIN_TOP = 150
+      const elementPosition = firstElError.getBoundingClientRect().top + view.scrollY - MARGIN_TOP
+      view.scrollTo({ top: elementPosition, behavior: 'smooth' })
+      firstElError.focus({ preventScroll: true })
+      firstElError.click()
     }
   )
 
