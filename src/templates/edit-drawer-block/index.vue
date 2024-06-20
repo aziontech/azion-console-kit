@@ -49,7 +49,7 @@
     }
   })
 
-  const { meta, resetForm, isSubmitting, handleSubmit } = useForm({
+  const { resetForm, isSubmitting, handleSubmit } = useForm({
     validationSchema: props.schema,
     initialValues: props.initialValues
   })
@@ -59,10 +59,6 @@
   const formDrawerHasUpdated = ref(false)
   const loading = ref(false)
   const showGoBack = ref(false)
-
-  const disableEdit = computed(() => {
-    return !meta.value.valid || loading.value || isSubmitting.value
-  })
 
   const isLoading = computed(() => {
     return isSubmitting.value || loading.value
@@ -128,25 +124,42 @@
     }
   }
 
-  const onSubmit = handleSubmit(async (values, formContext) => {
-    try {
-      const feedback = await props.editService(values)
-      blockViewRedirection.value = false
-      emit('onSuccess', feedback)
-      showToast('success', feedback)
-      showGoBack.value = props.showBarGoBack
-      if (showGoBack.value) {
+  const onSubmit = handleSubmit(
+    async (values, formContext) => {
+      try {
+        const feedback = await props.editService(values)
         blockViewRedirection.value = false
-        return
+        emit('onSuccess', feedback)
+        showToast('success', feedback)
+        showGoBack.value = props.showBarGoBack
+        if (showGoBack.value) {
+          blockViewRedirection.value = false
+          return
+        }
+        formContext.resetForm()
+        toggleDrawerVisibility(false)
+      } catch (error) {
+        blockViewRedirection.value = true
+        emit('onError', error)
+        showToast('error', error)
       }
-      formContext.resetForm()
-      toggleDrawerVisibility(false)
-    } catch (error) {
-      blockViewRedirection.value = true
-      emit('onError', error)
-      showToast('error', error)
+    },
+    ({ errors }) => {
+      const firstError = Object.keys(errors)[0]
+      const drawerEl = document.querySelector('.p-sidebar-content')
+      const el = document.querySelector(`[name="${firstError}"]`)
+
+      if (drawerEl && el) {
+        const elementPosition =
+          el.getBoundingClientRect().top - drawerEl.getBoundingClientRect().top
+        const MARGIN_TOP = 150
+        const adjustedPosition = elementPosition - MARGIN_TOP
+        drawerEl.scrollTop = adjustedPosition
+        el.focus({ preventScroll: true })
+        el.click()
+      }
     }
-  })
+  )
 
   const handleGoBack = () => {
     showGoBack.value = false
@@ -202,7 +215,6 @@
         @onSubmit="onSubmit"
         :inDrawer="true"
         :loading="isLoading"
-        :submitDisabled="disableEdit"
       />
     </div>
   </Sidebar>

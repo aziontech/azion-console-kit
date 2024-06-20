@@ -1,8 +1,8 @@
 <script setup>
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
   import FieldDropdown from '@/templates/form-fields-inputs/fieldDropdown.vue'
-  import InputText from 'primevue/inputtext'
-  import { computed } from 'vue'
+  import FieldText from '@/templates/form-fields-inputs/fieldText'
+  import { ref, computed } from 'vue'
   import { useAccountStore } from '@/stores/account'
   import FieldGroupRadio from '@/templates/form-fields-inputs/fieldGroupRadio'
   import { useField } from 'vee-validate'
@@ -26,7 +26,7 @@
       readOnly: props.disabledFields
     }
   })
-  const { value: name, errorMessage: nameError } = useField('name')
+  const { value: name } = useField('name')
   const { value: contentType } = useField('contentType')
   const { value: content, errorMessage: contentError } = useField('content')
 
@@ -63,40 +63,27 @@
       value: 'Uninstall'
     }
   ]
+
+  const isFieldDisabled = ref(false)
+  isFieldDisabled.value = props.disabledFields
 </script>
 
 <template>
-  <form-horizontal
+  <FormHorizontal
     :isDrawer="true"
     title="Resource"
     description="Configure the resources needed to install, uninstall, and reload your services."
   >
     <template #inputs>
-      <div class="flex flex-col w-full sm:max-w-3xl gap-2">
-        <div class="flex flex-col gap-2">
-          <div class="flex flex-col sm:max-w-lg w-full gap-2">
-            <label
-              for="name"
-              class="text-color text-sm not-italic font-medium leading-5"
-              >Path *</label
-            >
-            <InputText
-              v-model="name"
-              type="text"
-              :class="{ 'p-invalid': nameError }"
-              :disabled="props.disabledFields"
-              placeholder="/tmp/myresource"
-            />
-            <small
-              v-if="nameError"
-              class="p-error text-xs font-normal leading-tight"
-              >{{ nameError }}</small
-            >
-            <small class="text-xs text-color-secondary font-normal leading-5">
-              The path where the resource will be saved on the edge node.
-            </small>
-          </div>
-        </div>
+      <div class="flex flex-col sm:max-w-lg w-full gap-2">
+        <FieldText
+          label="Path *"
+          name="name"
+          placeholder="/tmp/myresource"
+          :disabled="isFieldDisabled"
+          :value="name"
+          description="The path where the resource will be saved on the edge node."
+        />
       </div>
       <div class="flex flex-col sm:w-2/5 gap-2">
         <FieldDropdown
@@ -129,6 +116,7 @@
             <div class="flex flex-col h-full gap-2">
               <vue-monaco-editor
                 v-model:value="content"
+                name="content"
                 language="shell"
                 :theme="theme"
                 class="min-h-[200px] overflow-clip surface-border border rounded-md"
@@ -154,5 +142,5 @@
         </div>
       </div>
     </template>
-  </form-horizontal>
+  </FormHorizontal>
 </template>
