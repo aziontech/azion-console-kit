@@ -96,6 +96,7 @@
   <form-horizontal
     title="General"
     description="Check the details of the Azion domain, including the domain address to access the application, and modify digital certificate options."
+    id="initial-edit-form"
   >
     <template #inputs>
       <div class="flex flex-col sm:max-w-lg w-full gap-2">

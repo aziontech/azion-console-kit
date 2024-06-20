@@ -69,7 +69,7 @@
 </template>
 
 <script setup>
-  import { computed, inject } from 'vue'
+  import { computed, inject, nextTick } from 'vue'
   import PrimeDialog from 'primevue/dialog'
   import InlineMessage from 'primevue/inlinemessage'
   import PrimeInputText from 'primevue/inputtext'
@@ -85,6 +85,15 @@
 
   const closeDialog = () => {
     dialogRef.value.close()
+
+    nextTick(() => {
+      scrollToInitialEditForm()
+    })
+  }
+
+  const scrollToInitialEditForm = () => {
+    const scrollForm = document.getElementById('initial-edit-form')
+    if (scrollForm) scrollForm.scrollIntoView({ behavior: 'smooth' })
   }
 
   const hasDomain = computed(() => {
