@@ -4,7 +4,6 @@
   import PrimeButton from 'primevue/button'
   import Dropdown from 'primevue/dropdown'
   import InputNumber from 'primevue/inputnumber'
-  import InputText from 'primevue/inputtext'
   import MultiSelect from 'primevue/multiselect'
   import PrimeTag from 'primevue/tag'
   import FieldSwitchBlock from '@/templates/form-fields-inputs/fieldSwitchBlock'
@@ -65,8 +64,8 @@
   const { value: browserCacheSettings } = useField('browserCacheSettings')
 
   const { value: name } = useField('name')
-  const { value: address, errorMessage: addressError } = useField('address')
-  const { value: hostHeader, errorMessage: hostHeaderError } = useField('hostHeader')
+  const { value: address } = useField('address')
+  const { value: hostHeader } = useField('hostHeader')
   const { value: browserCacheSettingsMaximumTtl } = useField('browserCacheSettingsMaximumTtl')
   const { value: cdnCacheSettingsMaximumTtl } = useField('cdnCacheSettingsMaximumTtl')
 
@@ -248,6 +247,7 @@
             <MultiSelect
               :options="HTTP_PORT_LIST_OPTIONS"
               v-model="httpPort"
+              name="httpPort"
               filter
               autoFilterFocus
               optionLabel="name"
@@ -285,6 +285,7 @@
             <MultiSelect
               :options="HTTPS_PORT_LIST_OPTIONS"
               v-model="httpsPort"
+              name="httpsPort"
               optionLabel="name"
               display="chip"
               :class="{ 'p-invalid': httpsPortError }"
@@ -401,49 +402,25 @@
       />
 
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
-        <label
-          for="address"
-          class="text-color text-base font-medium"
-          >Address *</label
-        >
-        <InputText
-          id="address"
-          v-model="address"
-          :class="{ 'p-invalid': addressError }"
+        <FieldText
+          label="Address *"
+          name="address"
           aria-describedby="address-help"
           placeholder="example.com"
+          :value="address"
+          description="Define an origin for the content in FQDN format or an IPv4/IPv6 address."
         />
-        <div class="text-color-secondary text-sm font-normal">
-          Define an origin for the content in FQDN format or an IPv4/IPv6 address.
-        </div>
-        <small
-          v-if="addressError"
-          class="p-error text-xs font-normal leading-tight"
-          >{{ addressError }}</small
-        >
       </div>
 
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
-        <label
-          for="host-header"
-          class="text-color text-base font-medium"
-          >Host Header *</label
-        >
-        <InputText
-          id="hostHeader"
-          v-model="hostHeader"
-          :class="{ 'p-invalid': hostHeaderError }"
+        <FieldText
+          label="Host Header *"
+          name="hostHeader"
           aria-describedby="hostHeader-help"
           placeholder="${host}"
+          :value="hostHeader"
+          description="Identify a virtualhost sent in the Host header to the origin."
         />
-        <div class="text-color-secondary text-sm font-normal">
-          Identify a virtualhost sent in the Host header to the origin.
-        </div>
-        <small
-          v-if="hostHeaderError"
-          class="p-error text-xs font-normal leading-tight"
-          >{{ hostHeaderError }}</small
-        >
       </div>
     </template>
   </FormHorizontal>
@@ -469,8 +446,9 @@
           <label
             for="maximun-ttl-seconds"
             class="text-color text-base font-medium"
-            >Maximum TTL (seconds)</label
           >
+            Maximum TTL (seconds)
+          </label>
 
           <InputNumber
             v-model="browserCacheSettingsMaximumTtl"
@@ -491,8 +469,9 @@
           <label
             for="cdn-maximun-ttl-seconds"
             class="text-color text-base font-medium"
-            >{{ cdnCacheSettingsIsOverride ? 'Maximum TTL (seconds)' : 'Default TTL' }}</label
           >
+            {{ cdnCacheSettingsIsOverride ? 'Maximum TTL (seconds)' : 'Default TTL' }}
+          </label>
 
           <InputNumber
             v-model="cdnCacheSettingsMaximumTtl"
