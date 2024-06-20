@@ -1,7 +1,10 @@
 
+/* if you have two environments for the same application */
+// const environment = process.env.VITE_ENVIRONMENT || 'production';
+// const config = require(`./azion/${environment}/azion.json`)
+
 /* eslint-env node */
-const environment = process.env.VITE_ENVIRONMENT || 'production';
-const config = require(`./azion/${environment}/azion.json`) ?? { domain: { domain_name: 'console.azion.com' } };
+const config = require(`./azion/azion.json`)
 const myDomain = config.domain.domain_name ?? 'console.azion.com'
 
 const commonRules = [
