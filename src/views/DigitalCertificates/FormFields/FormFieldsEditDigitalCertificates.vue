@@ -115,8 +115,6 @@
             v-model="certificate"
             :class="{ 'p-invalid': certificateError }"
             placeholder="For security purposes, the current certificate isn't exhibited, but it was correctly registered. Paste a new certificate in this field to update it."
-            rows="5"
-            cols="30"
           />
           <small
             v-if="certificateError"
@@ -130,8 +128,6 @@
             disabled
             v-model="csr"
             :class="{ 'p-invalid': csrError }"
-            rows="5"
-            cols="30"
           />
           <small
             v-if="csrError"
@@ -177,8 +173,6 @@
             v-model="certificate"
             :class="{ 'p-invalid': certificateError }"
             placeholder="For security purposes, the current certificate isn't exhibited, but it was correctly registered. Paste a new certificate in this field to update it."
-            rows="5"
-            cols="30"
           />
           <small
             v-if="certificateError"
@@ -192,8 +186,6 @@
             v-model="privateKey"
             :class="{ 'p-invalid': privateKeyError }"
             placeholder="For security purposes, the current private key isn't exhibited, but it was correctly registered. Paste a new private key in this field to update it."
-            rows="5"
-            cols="30"
           />
           <small
             v-if="privateKeyError"
@@ -225,7 +217,6 @@
             name="certificate"
             :value="certificate"
             placeholder="For security purposes, the current certificate isn't exhibited, but it was correctly registered. Paste a new certificate in this field to update it."
-            rows="5"
             description="Intermediate certificates are accepted."
           />
         </div>
