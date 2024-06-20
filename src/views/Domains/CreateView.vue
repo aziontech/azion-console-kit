@@ -6,8 +6,7 @@
     <template #content>
       <CreateFormBlock
         :createService="createDomainService"
-        :cleanFormCallback="resetForm"
-        :disabledCallback="true"
+        disabledCallback
         @on-response="handleResponse"
         @on-response-fail="handleTrackFailedCreation"
         :schema="validationSchema"
@@ -18,14 +17,13 @@
           <FormFieldsCreateDomains
             :digitalCertificates="digitalCertificates"
             :edgeApps="edgeApps"
-          ></FormFieldsCreateDomains>
+          />
         </template>
-        <template #action-bar="{ onSubmit, formValid, onCancel, loading }">
+        <template #action-bar="{ onSubmit, onCancel, loading }">
           <ActionBarTemplate
             @onSubmit="onSubmit"
             @onCancel="onCancel"
             :loading="loading"
-            :submitDisabled="!formValid"
           />
         </template>
       </CreateFormBlock>
@@ -137,6 +135,7 @@
   const requestDigitalCertificates = async () => {
     digitalCertificates.value = await props.listDigitalCertificatesService({})
   }
+
   const showToast = (severity, summary) => {
     const options = {
       closable: true,
@@ -164,17 +163,19 @@
   })
 
   const initialValues = {
+    name: '',
+    edgeApplication: null,
     cnames: '',
     cnameAccessOnly: true,
-    edgeApplication: null,
     mtlsIsEnabled: false,
-    active: true,
-    mtlsVerification: MTLS_VERIFICATION_ENFORCE
+    mtlsVerification: MTLS_VERIFICATION_ENFORCE,
+    active: true
   }
 
   const validationSchema = yup.object({
     name: yup
       .string()
+      .label('Name')
       .required()
       .test(
         'only-ascii',
@@ -184,7 +185,7 @@
           return nameRegex.test(value)
         }
       ),
-    active: yup.boolean(),
+    edgeApplication: yup.number().label('Edge Application'),
     cnames: yup
       .string()
       .label('CNAME')
@@ -198,13 +199,16 @@
         test: (value) => value?.includes(' ') === false
       }),
     cnameAccessOnly: yup.boolean(),
-    edgeApplication: yup.number(),
     edgeCertificate: yup.string().optional(),
     mtlsIsEnabled: yup.boolean(),
     mtlsVerification: yup.string(),
-    mtlsTrustedCertificate: yup.string().when('mtlsIsEnabled', {
-      is: true,
-      then: (schema) => schema.required()
-    })
+    mtlsTrustedCertificate: yup
+      .string()
+      .when('mtlsIsEnabled', {
+        is: true,
+        then: (schema) => schema.required()
+      })
+      .label('Trusted CA Certificate'),
+    active: yup.boolean()
   })
 </script>

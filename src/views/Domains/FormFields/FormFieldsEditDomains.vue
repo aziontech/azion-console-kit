@@ -5,10 +5,10 @@
   } from '@/services/digital-certificates-services'
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
   import PrimeButton from 'primevue/button'
-  import Dropdown from 'primevue/dropdown'
-  import InputSwitch from 'primevue/inputswitch'
+  import FieldText from '@/templates/form-fields-inputs/fieldText'
   import InputText from 'primevue/inputtext'
-  import PrimeTextarea from 'primevue/textarea'
+  import FieldTextArea from '@/templates/form-fields-inputs/fieldTextArea'
+  import FieldDropdown from '@/templates/form-fields-inputs/fieldDropdown'
   import FieldGroupRadio from '@/templates/form-fields-inputs/fieldGroupRadio'
   import FieldSwitchBlock from '@/templates/form-fields-inputs/fieldSwitchBlock'
   import { useField } from 'vee-validate'
@@ -30,17 +30,16 @@
     }
   })
 
-  const { value: name, errorMessage: errorName } = useField('name')
-  const { value: cnames, errorMessage: errorCnames } = useField('cnames')
-  const { value: cnameAccessOnly, errorMessage: errorCnameAccessOnly } = useField('cnameAccessOnly')
-  const { value: edgeApplication, errorMessage: errorEdgeApplication } = useField('edgeApplication')
+  const { value: name } = useField('name')
+  const { value: cnames } = useField('cnames')
+  const { value: cnameAccessOnly } = useField('cnameAccessOnly')
+  const { value: edgeApplication } = useField('edgeApplication')
   const { value: edgeCertificate } = useField('edgeCertificate')
   const { value: mtlsIsEnabled } = useField('mtlsIsEnabled')
-  useField('active')
+
   const { value: domainName } = useField('domainName')
-  useField('mtlsVerification')
-  const { value: mtlsTrustedCertificate, errorMessage: errorMtlsTrustedCertificate } =
-    useField('mtlsTrustedCertificate')
+
+  const { value: mtlsTrustedCertificate } = useField('mtlsTrustedCertificate')
 
   const CNAMELabel = computed(() => {
     return cnameAccessOnly.value ? 'CNAME *' : 'CNAME'
@@ -49,14 +48,17 @@
   const edgeCertificates = computed(() => {
     return props.digitalCertificates.filter((certificate) => certificate.type === EDGE_CERTIFICATE)
   })
+
   const trustedCACertificates = computed(() => {
     return props.digitalCertificates.filter(
       (certificate) => certificate.type === TRUSTED_CA_CERTIFICATE
     )
   })
+
   const edgeApplicationOptions = computed(() => {
     return props.edgeApps.map((edgeApp) => ({ name: edgeApp.name, value: edgeApp.id }))
   })
+
   const edgeCertificatesOptions = computed(() => {
     const defaultCertificate = [
       { name: 'Azion (SAN)', value: 0 },
@@ -69,6 +71,7 @@
 
     return [...defaultCertificate, ...parsedCertificates]
   })
+
   const trustedCACertificatesOptions = computed(() => {
     return trustedCACertificates.value.map((certificate) => ({
       name: certificate.name,
@@ -99,26 +102,13 @@
   >
     <template #inputs>
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
-        <label
-          for="name"
-          class="text-color text-base font-medium"
-          >Name *</label
-        >
-        <InputText
-          v-model="name"
-          id="name"
-          type="text"
-          :class="{ 'p-invalid': errorName }"
+        <FieldText
+          label="Name *"
+          name="name"
           placeholder="My domain"
+          :value="name"
+          description="Give a unique and descriptive name to identify the domain."
         />
-        <small class="text-xs text-color-secondary font-normal leading-5">
-          Give a unique and descriptive name to identify the domain.
-        </small>
-        <small
-          v-if="errorName"
-          class="p-error text-xs font-normal leading-tight"
-          >{{ errorName }}</small
-        >
       </div>
     </template>
   </form-horizontal>
@@ -169,83 +159,52 @@
   >
     <template #inputs>
       <div class="flex flex-col w-full sm:max-w-xs gap-2">
-        <label
-          for="edge_application"
-          class="text-color text-base font-medium"
-          >Edge Application *</label
-        >
-        <Dropdown
-          appendTo="self"
-          id="edge_application"
-          :class="{ 'p-invalid': errorEdgeApplication }"
-          v-model="edgeApplication"
+        <FieldDropdown
+          label="Edge Application *"
+          name="edgeApplication"
           :options="edgeApplicationOptions"
+          :loading="!edgeApplicationOptions.length"
+          :disabled="!edgeApplicationOptions.length"
           optionLabel="name"
           optionValue="value"
-          class="w-full"
+          :value="edgeApplication"
+          filter
+          appendTo="self"
           placeholder="Select an edge application"
         />
-        <small
-          v-if="errorEdgeApplication"
-          class="p-error text-xs font-normal leading-tight"
-          >{{ errorEdgeApplication }}</small
-        >
       </div>
 
-      <div class="flex gap-2 items-top">
-        <InputSwitch
-          id="cnameAccessOnly"
-          class="flex-shrink-0 flex-grow"
-          :class="{ 'p-invalid': errorCnameAccessOnly }"
-          v-model="cnameAccessOnly"
-        />
-        <div class="flex flex-col gap-1">
-          <label class="text-sm font-normal leading-tight">CNAME Access Only </label>
-          <small class="text-xs text-color-secondary font-normal leading-5">
-            Check this option to make the application accessible only through the domains listed in
-            the CNAME field. Attempts to access the application through the Azion domain will be
-            blocked.
-          </small>
-        </div>
-      </div>
+      <FieldSwitchBlock
+        nameField="cnameAccessOnly"
+        name="cnameAccessOnly"
+        auto
+        :isCard="false"
+        title="CNAME Access Only"
+        subtitle="Check this option to make the application accessible only through the domains listed in the CNAME field. Attempts to access the application through the Azion domain will be blocked."
+      />
 
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
-        <label
-          for="cname"
-          class="text-color text-base font-medium"
-          >{{ CNAMELabel }}</label
-        >
-        <PrimeTextarea
-          id="cname"
-          :class="{ 'p-invalid': errorCnames }"
-          v-model="cnames"
+        <FieldTextArea
+          :label="CNAMELabel"
+          name="cnames"
           rows="2"
-          cols="30"
-          class="w-full"
+          :value="cnames"
+          description="List of CNAMEs to associate to the Azion domain. Separate each entry in a new line."
         />
-        <small class="text-xs text-color-secondary font-normal leading-5">
-          List of CNAMEs to associate to the Azion domain. Separate each entry in a new line.
-        </small>
-        <small
-          v-if="errorCnames"
-          class="p-error text-xs font-normal leading-tight"
-          >{{ errorCnames }}</small
-        >
       </div>
 
       <div class="flex flex-col w-full sm:max-w-xs gap-2">
-        <label
-          for="edge_application"
-          class="text-color text-base font-medium"
-          >Digital Certificate</label
-        >
-        <Dropdown
-          appendTo="self"
-          v-model="edgeCertificate"
+        <FieldDropdown
+          label="Digital Certificate"
+          name="edgeCertificate"
           :options="edgeCertificatesOptions"
+          :loading="!edgeCertificatesOptions.length"
+          :disabled="!edgeCertificatesOptions.length"
           optionLabel="name"
           optionValue="value"
-          class="w-full"
+          :value="edgeCertificate"
+          filter
+          appendTo="self"
           placeholder="Select a certificate"
         />
       </div>
@@ -280,27 +239,19 @@
         v-if="mtlsIsEnabled"
         class="flex flex-col w-full sm:max-w-xs gap-2"
       >
-        <label class="text-color text-base font-medium">Trusted CA Certificate</label>
-        <Dropdown
-          appendTo="self"
-          :class="{ 'p-invalid': errorMtlsTrustedCertificate }"
-          v-model="mtlsTrustedCertificate"
+        <FieldDropdown
+          label="Trusted CA Certificate"
+          name="mtlsTrustedCertificate"
           :options="trustedCACertificatesOptions"
+          :loading="!trustedCACertificatesOptions.length"
+          :disabled="!mtlsIsEnabled"
           optionLabel="name"
           optionValue="value"
-          class="w-full"
+          :value="mtlsTrustedCertificate"
+          filter
           placeholder="Select a Trusted CA certificate"
-          :disabled="!mtlsIsEnabled"
+          description="Mutual Authentification requires a Trusted CA Certificate. Go to Digital Certificates to upload one."
         />
-        <small class="text-xs text-color-secondary font-normal leading-5">
-          Mutual Authentification requires a Trusted CA Certificate. Go to Digital Certificates to
-          upload one.
-        </small>
-        <small
-          v-if="errorMtlsTrustedCertificate"
-          class="p-error text-xs font-normal leading-tight"
-          >{{ errorMtlsTrustedCertificate }}</small
-        >
       </div>
     </template>
   </form-horizontal>

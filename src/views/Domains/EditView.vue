@@ -8,9 +8,7 @@
         :editService="editDomainService"
         :loadService="loadDomainService"
         :schema="validationSchema"
-        :cleanFormCallback="resetForm"
         :updatedRedirect="updatedRedirect"
-        :initialValues="initialValues"
         @on-edit-success="handleTrackEditEvent"
         @on-edit-fail="handleTrackFailEditEvent"
       >
@@ -23,12 +21,11 @@
             @copyDomainName="copyDomainName"
           />
         </template>
-        <template #action-bar="{ onSubmit, formValid, onCancel, loading }">
+        <template #action-bar="{ onSubmit, onCancel, loading }">
           <ActionBarTemplate
             @onSubmit="onSubmit"
             @onCancel="onCancel"
             :loading="loading"
-            :submitDisabled="!formValid"
           />
         </template>
       </EditFormBlock>
@@ -145,7 +142,7 @@
         }
       ),
     domainName: yup.string().required(),
-    active: yup.boolean(),
+    edgeApplication: yup.number().label('Edge Application'),
     cnames: yup
       .string()
       .label('CNAME')
@@ -159,13 +156,16 @@
         test: (value) => value?.includes(' ') === false
       }),
     cnameAccessOnly: yup.boolean(),
-    edgeApplication: yup.number(),
     edgeCertificate: yup.string().optional(),
     mtlsIsEnabled: yup.boolean(),
     mtlsVerification: yup.string(),
-    mtlsTrustedCertificate: yup.string().when('mtlsIsEnabled', {
-      is: true,
-      then: (schema) => schema.required()
-    })
+    mtlsTrustedCertificate: yup
+      .string()
+      .when('mtlsIsEnabled', {
+        is: true,
+        then: (schema) => schema.required()
+      })
+      .label('Trusted CA Certificate'),
+    active: yup.boolean()
   })
 </script>
