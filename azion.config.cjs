@@ -1,10 +1,11 @@
 
 /* eslint-env node */
 const environment = process.env.VITE_ENVIRONMENT || 'production';
-const config = require(`./azion/${environment}/azion.json`);
+const config = require(`./azion/${environment}/azion.json`) ?? { domain: { domain_name: 'console.azion.com' } };
 const myDomain = config.domain.domain_name ?? 'console.azion.com'
 
 const commonRules = [
+  
   {
     name: 'Apply Common Configuration for All Requests',
     description: 'Applies common settings for all requests, including standard headers and HTTP to HTTPS redirection.',
