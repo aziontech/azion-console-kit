@@ -130,18 +130,20 @@
       }
     },
     ({ errors }) => {
-      const firstError = Object.keys(errors)[0]
-      const el = document.querySelector(`[name="${firstError}"]`)
+      const drawerOpen = document.querySelector('.p-sidebar-content[data-pc-section="content"]')
 
-      if (el) {
-        const elementPosition = el.getBoundingClientRect().top + window.scrollY
-        const MARGIN_TOP = 150
-        const adjustedPosition = elementPosition - MARGIN_TOP
+      const view = drawerOpen ?? window
+      const errorKeys = Object.keys(errors)
+      const stringQuerySelector = errorKeys.map((key) => `[name="${key}"]`).join(', ')
+      const listEl = document.querySelectorAll(stringQuerySelector)
+      if (!listEl.length) return
 
-        window.scrollTo({ top: adjustedPosition, behavior: 'smooth' })
-        el.focus({ preventScroll: true })
-        el.click()
-      }
+      const firstElError = listEl[0]
+      const MARGIN_TOP = 150
+      const elementPosition = firstElError.getBoundingClientRect().top + view.scrollY - MARGIN_TOP
+      view.scrollTo({ top: elementPosition, behavior: 'smooth' })
+      firstElError.focus({ preventScroll: true })
+      firstElError.click()
     }
   )
 
