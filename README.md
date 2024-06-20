@@ -74,19 +74,23 @@ Azion Console Kit can run natively on Azion's edge using Azion CLI. Follow these
 
 2. Link project to an Azion edge application.
 
-     ```bash
+    ```bash
     azion link
     ```
 
-3. Publish your project:
+   Choose the Vue preset.
+
+3. Publish your project to create the application's domain:
 
     ```bash
     azion deploy
     ```
 
+    > This step is resposible for deploying your base project and creating a domain. This domain will be later on used to implement the configuration rules.
+
    💡 Tip: You can use the `--config-dir` argument to separate project environments. The CLI will use the reference to store application states. If you don't need two environments, don't pass the argument and it will use the original reference.
 
-4. Update your Project
+4. Deploy your Project
 
     ```bash
     azion deploy
