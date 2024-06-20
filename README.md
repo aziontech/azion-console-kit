@@ -86,7 +86,7 @@ Azion Console Kit can run natively on Azion's edge using Azion CLI. Follow these
     azion deploy
     ```
 
-    > This step is resposible for deploying your base project and creating a domain. This domain will be later on used to implement the configuration rules.
+    > This step is responsible for deploying your base project and creating a domain. This domain will be later on used to implement the configuration rules.
 
    💡 Tip: You can use the `--config-dir` argument to separate project environments. The CLI will use the reference to store application states. If you don't need two environments, don't pass the argument and it will use the original reference.
 
