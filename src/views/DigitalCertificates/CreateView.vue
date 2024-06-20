@@ -28,12 +28,11 @@
           />
         </template>
 
-        <template #action-bar="{ onSubmit, formValid, onCancel, loading }">
+        <template #action-bar="{ onSubmit, onCancel, loading }">
           <ActionBarBlockWithTeleport
             @onSubmit="onSubmit"
             @onCancel="onCancel"
             :loading="loading"
-            :submitDisabled="!formValid"
           />
         </template>
       </CreateFormBlock>
@@ -119,21 +118,6 @@
 
     // CSR Fields
     common: yup.string().when('certificateType', CSRConditionalValidations),
-    state: yup.string().when('certificateType', CSRConditionalValidations),
-    city: yup.string().when('certificateType', CSRConditionalValidations),
-    organization: yup.string().when('certificateType', CSRConditionalValidations),
-    organizationUnity: yup
-      .string()
-      .when('certificateType', CSRConditionalValidations)
-      .label('organization unity'),
-    privateKeyType: yup
-      .string()
-      .when('certificateType', CSRConditionalValidations)
-      .label('private key type'),
-    subjectAlternativeNames: yup
-      .string()
-      .when('certificateType', CSRConditionalValidations)
-      .label('subject alternative names (SAN)'),
     country: yup.string().when('certificateType', {
       is: certificateTypes.value.EDGE_CERTIFICATE_CSR,
       then: (schema) =>
@@ -142,10 +126,25 @@
           .max(2, 'Country/Region must be a 2-character country code.')
           .min(2, 'Country/Region must be a 2-character country code.')
     }),
+    state: yup.string().when('certificateType', CSRConditionalValidations),
+    city: yup.string().when('certificateType', CSRConditionalValidations),
+    organizationUnity: yup
+      .string()
+      .when('certificateType', CSRConditionalValidations)
+      .label('organization unity'),
+    organization: yup.string().when('certificateType', CSRConditionalValidations),
+    privateKeyType: yup
+      .string()
+      .when('certificateType', CSRConditionalValidations)
+      .label('private key type'),
     email: yup.string().when('certificateType', {
       is: certificateTypes.value.EDGE_CERTIFICATE_CSR,
       then: (schema) => schema.required('Email is a required field.').email()
-    })
+    }),
+    subjectAlternativeNames: yup
+      .string()
+      .when('certificateType', CSRConditionalValidations)
+      .label('subject alternative names (SAN)')
   })
 
   function navigateToDomains() {

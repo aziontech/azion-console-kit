@@ -1,5 +1,5 @@
 <script setup>
-  import { toRef } from 'vue'
+  import { computed, toRef } from 'vue'
   import { useField } from 'vee-validate'
   import InputText from 'primevue/inputtext'
 
@@ -31,6 +31,14 @@
     readonly: {
       type: Boolean,
       default: false
+    },
+    icon: {
+      type: String,
+      default: ''
+    },
+    iconPosition: {
+      type: String,
+      default: 'right'
     }
   })
 
@@ -44,6 +52,10 @@
   } = useField(nameInput, undefined, {
     initialValue: props.value
   })
+
+  const iconPositionClass = computed(() => {
+    return props.icon ? `p-input-icon-${props.iconPosition}` : ''
+  })
 </script>
 
 <template>
@@ -53,19 +65,30 @@
   >
     {{ props.label }}
   </label>
-  <InputText
-    :id="props.name"
-    v-model="inputValue"
-    :name="props.name"
-    :readonly="props.readonly"
-    :disabled="props.disabled"
-    type="text"
-    :class="{ 'p-invalid': errorMessage }"
-    :placeholder="props.placeholder"
-    @input="handleChange"
-    @blur="handleBlur"
-    v-bind="$attrs"
-  />
+  <span
+    class="w-full"
+    :class="iconPositionClass"
+  >
+    <i
+      v-if="props.icon"
+      :class="props.icon"
+      class="text-color-secondary"
+    />
+    <InputText
+      :id="props.name"
+      v-model="inputValue"
+      :name="props.name"
+      :readonly="props.readonly"
+      :disabled="props.disabled"
+      type="text"
+      class="w-full"
+      :class="{ 'p-invalid': errorMessage }"
+      :placeholder="props.placeholder"
+      @input="handleChange"
+      @blur="handleBlur"
+      v-bind="$attrs"
+    />
+  </span>
 
   <small
     v-if="errorMessage"
