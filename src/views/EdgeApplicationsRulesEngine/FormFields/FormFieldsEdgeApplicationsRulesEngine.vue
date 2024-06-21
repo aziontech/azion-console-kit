@@ -1,3 +1,4 @@
+<!-- eslint-disable vue/return-in-computed-property -->
 <script setup>
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
   import { useField, useFieldArray } from 'vee-validate'
@@ -15,7 +16,7 @@
   import { useToast } from 'primevue/usetoast'
 
   const props = defineProps({
-    isEnableApplicationAccelerator: {
+    isApplicationAcceleratorEnabled: {
       type: Boolean,
       required: true
     },
@@ -23,7 +24,7 @@
       type: Boolean,
       required: true
     },
-    isImageOptimization: {
+    isImageOptimizationEnabled: {
       required: true,
       type: Boolean
     },
@@ -61,8 +62,8 @@
   })
 
   const isEditDrawer = computed(() => !!props.selectedRulesEngineToEdit)
-  const isImageOptimizationEnabled = computed(() => !!props.isImageOptimization)
-  const checkPhaseIsDefaultValue = ref(true)
+  const isImageOptimizationEnabled = computed(() => !!props.isImageOptimizationEnabled)
+  const checkPhaseIsDefaultValue = computed(() => phase.value === 'default')
 
   const toast = useToast()
   const criteriaOperatorOptions = ref([
@@ -81,7 +82,7 @@
 
     return ' - Requires Application Accelerator'
   })
-
+  props.isDeliveryProtocolHttps
   const showLabelHttps = computed(() => {
     if (props.isDeliveryProtocolHttps) {
       return ''
@@ -91,7 +92,7 @@
   })
 
   const showLabelImageOptimization = computed(() => {
-    if (props.isImageOptimization) return ''
+    if (props.isImageOptimizationEnabled) return ''
     return ' - Requires Image Processor'
   })
 
@@ -271,7 +272,7 @@
    * Updates the 'requires' property of behavior options based on component props.
    * This function checks if the behavior option is 'redirect_http_to_https' and sets the 'requires'
    * property based on the 'isDeliveryProtocolHttps' prop. For other options that have 'requires' as true,
-   * it sets the 'requires' property based on the 'isEnableApplicationAccelerator' prop.
+   * it sets the 'requires' property based on the 'isApplicationAcceleratorEnabled' prop.
    * @param {Array} options - The behavior options to update.
    * @returns {Array} The updated array of behavior options with the 'requires' property set accordingly.
    */
@@ -284,7 +285,7 @@
 
     return options.map((option) => {
       if (option.requires) {
-        const requires = conditionsMap[option.value] ?? !props.isEnableApplicationAccelerator
+        const requires = conditionsMap[option.value] ?? !props.isApplicationAcceleratorEnabled
 
         return { ...option, requires }
       }
@@ -350,16 +351,6 @@
     }
   }
 
-  const showNewBehaviorButton = ref(true)
-
-  /**
-   * Updates the 'showNewBehaviorButton' ref.
-   * @param {boolean} isShow - Whether to show the new behavior button.
-   */
-  const setShowNewBehaviorButton = (isShow) => {
-    showNewBehaviorButton.value = isShow
-  }
-
   /**
    * Updates the 'showTargetField' property of the behavior at the specified index.
    * @param {boolean} isShow - Whether to show the target field.
@@ -379,6 +370,36 @@
       removeBehavior(index)
     }
   }
+
+  const disableAddBehaviorButtonComputed = computed(() => {
+    const MAXIMUM_NUMBER_OF_BEHAVIORS = 10
+    const disableAddBehaviorButton = true
+    const behaviorHasNotBeenLoaded = !behaviors || !behaviors.value
+    if (behaviorHasNotBeenLoaded) {
+      return disableAddBehaviorButton
+    }
+    if (behaviors.value.length === 0) {
+      return disableAddBehaviorButton
+    }
+    if (behaviors.value.length >= MAXIMUM_NUMBER_OF_BEHAVIORS) {
+      return disableAddBehaviorButton
+    }
+
+    const lastBehavior = behaviors.value[behaviors.value.length - 1]
+    const isLastBehaviorEmpty = !lastBehavior.value.name
+    if (isLastBehaviorEmpty) {
+      return disableAddBehaviorButton
+    }
+    const optionsThatDisableAddBehaviors = [
+      'deliver',
+      'redirect_to_301',
+      'redirect_to_302',
+      'deny',
+      'no_content'
+    ]
+
+    return optionsThatDisableAddBehaviors.includes(lastBehavior.value.name)
+  })
 
   /**
    * Changes the type of the behavior at the specified index and updates related properties.
@@ -411,7 +432,6 @@
     }
 
     updateBehavior(index, { name: behaviorName, target: targetValue })
-    setShowNewBehaviorButton(true)
 
     switch (behaviorName) {
       case 'run_function':
@@ -434,7 +454,6 @@
         const isAddBehaviorButtonEnabled = !disableAddBehaviorButtonOptions.includes(behaviorName)
 
         setShowBehaviorTargetField(isBehaviorTargetFieldEnabled, index)
-        setShowNewBehaviorButton(isAddBehaviorButtonEnabled)
 
         if (!isAddBehaviorButtonEnabled) {
           removeBehaviorsFromIndex(index)
@@ -578,11 +597,6 @@
     return criteria.value.length >= MAXIMUM_ALLOWED
   })
 
-  const MaximumBehaviorsAllowed = computed(() => {
-    const MAXIMUM_NUMBER = 10
-    return behaviors.value.length >= MAXIMUM_NUMBER
-  })
-
   const phasesRadioOptions = ref([])
 
   watch(
@@ -592,12 +606,12 @@
         phasesRadioOptions.value = [
           {
             title: 'Request Phase',
-            value: 'request',
+            inputValue: 'request',
             subtitle: 'Configure the requests made to the edge.'
           },
           {
             title: 'Response Phase',
-            value: 'response',
+            inputValue: 'response',
             subtitle: 'Configure the responses delivered to end-users.'
           }
         ]
@@ -611,7 +625,7 @@
   onMounted(async () => {
     updateBehaviorsOptionsRequires()
 
-    if (props.isEnableApplicationAccelerator) {
+    if (props.isApplicationAcceleratorEnabled) {
       if (criteria.value[0] && !isEditDrawer.value) {
         criteria.value[0].value[0].variable = ''
       }
@@ -722,7 +736,7 @@
               <div
                 class="p-inputgroup-addon"
                 :class="{
-                  'opacity-20': !props.isEnableApplicationAccelerator || checkPhaseIsDefaultValue
+                  'opacity-20': !props.isApplicationAcceleratorEnabled || checkPhaseIsDefaultValue
                 }"
               >
                 <i class="pi pi-dollar"></i>
@@ -732,7 +746,7 @@
                 v-model="criteria[criteriaIndex].value[conditionalIndex].variable"
                 :suggestions="variableItems"
                 @complete="searchVariableOption"
-                :disabled="!props.isEnableApplicationAccelerator || checkPhaseIsDefaultValue"
+                :disabled="!props.isApplicationAcceleratorEnabled || checkPhaseIsDefaultValue"
                 :completeOnFocus="true"
               />
             </div>
@@ -761,7 +775,7 @@
 
         <div
           class="flex gap-2 mb-8"
-          v-if="props.isEnableApplicationAccelerator && !checkPhaseIsDefaultValue"
+          v-if="props.isApplicationAcceleratorEnabled && !checkPhaseIsDefaultValue"
         >
           <PrimeButton
             icon="pi pi-plus-circle"
@@ -782,11 +796,10 @@
         </div>
 
         <div
-          v-if="props.isEnableApplicationAccelerator && !checkPhaseIsDefaultValue"
+          v-if="props.isApplicationAcceleratorEnabled && !checkPhaseIsDefaultValue"
           class="flex items-center gap-2"
         >
           <Divider type="solid" />
-
           <PrimeButton
             v-if="isNotFirstCriteria(criteriaIndex)"
             icon="pi pi-trash"
@@ -796,7 +809,7 @@
           />
         </div>
       </div>
-      <div v-if="props.isEnableApplicationAccelerator && !checkPhaseIsDefaultValue">
+      <div v-if="props.isApplicationAcceleratorEnabled && !checkPhaseIsDefaultValue">
         <PrimeButton
           icon="pi pi-plus-circle"
           label="Add Criteria"
@@ -925,20 +938,17 @@
           </div>
         </div>
       </div>
-
-      <template v-if="showNewBehaviorButton">
-        <Divider type="solid" />
-        <div>
-          <PrimeButton
-            icon="pi pi-plus-circle"
-            label="Add Behavior"
-            size="small"
-            outlined
-            :disabled="MaximumBehaviorsAllowed"
-            @click="addNewBehavior"
-          />
-        </div>
-      </template>
+      <Divider type="solid" />
+      <div>
+        <PrimeButton
+          :disabled="disableAddBehaviorButtonComputed"
+          icon="pi pi-plus-circle"
+          label="Add Behavior"
+          size="small"
+          outlined
+          @click="addNewBehavior"
+        />
+      </div>
     </template>
   </FormHorizontal>
 

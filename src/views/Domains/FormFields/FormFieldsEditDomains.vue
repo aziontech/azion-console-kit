@@ -80,14 +80,14 @@
     {
       title: 'Enforce',
       subtitle: `Blocks the client certificate during the TLS handshake if the uploaded Trusted CA can't be validated.`,
-      value: 'enforce'
+      inputValue: 'enforce'
     },
     {
       title: 'Permissive',
       subtitle: `Attempts to verify the client certificate, but will allow the TLS handshake even if
               the Trusted CA can't be validated. Check which client certificate attempted the
               request in Edge Firewall, if necessary.`,
-      value: 'permissive'
+      inputValue: 'permissive'
     }
   ])
 </script>
@@ -125,7 +125,7 @@
 
   <form-horizontal
     title="Domain"
-    description="The domain name attributed by Azion."
+    description="The domain URL attributed by Azion."
   >
     <template #inputs>
       <div class="flex flex-col w-full gap-2">
@@ -133,7 +133,7 @@
           for="domainName"
           class="text-color text-base font-medium"
         >
-          Domain Name
+          Domain
         </label>
         <div
           class="flex gap-6 md:align-items-center max-sm:flex-col max-sm:align-items-baseline max-sm:gap-3"
@@ -153,8 +153,8 @@
             icon="pi pi-clone"
             outlined
             type="button"
-            aria-label="Copy Domain Name"
-            label="Copy"
+            aria-label="Copy to Clipboard"
+            label="Copy to Clipboard"
             :disabled="!props.hasDomainName"
             @click="$emit('copyDomainName', { name: domainName })"
           />

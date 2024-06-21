@@ -42,7 +42,7 @@
       type: Function,
       required: true
     },
-    isLoadBalancer: {
+    isLoadBalancerEnabled: {
       type: Boolean,
       required: true
     }
@@ -140,7 +140,7 @@
     :loadOriginService="props.loadOriginService"
     :documentationService="props.documentationService"
     :clipboardWrite="props.clipboardWrite"
-    :isLoadBalancer="props.isLoadBalancer"
+    :isLoadBalancerEnabled="props.isLoadBalancerEnabled"
     @onSuccess="reloadList"
   />
   <div v-if="hasContentToList">

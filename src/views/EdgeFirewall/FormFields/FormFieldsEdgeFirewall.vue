@@ -1,12 +1,13 @@
 <script setup>
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
   import FieldText from '@/templates/form-fields-inputs/fieldText'
-  import Card from 'primevue/card'
-  import InputSwitch from 'primevue/inputswitch'
   import PickList from 'primevue/picklist'
   import Skeleton from 'primevue/skeleton'
   import PrimeTag from 'primevue/tag'
   import { useField } from 'vee-validate'
+  import FieldGroupSwitch from '@/templates/form-fields-inputs/fieldGroupSwitch.vue'
+  import FieldSwitchBlock from '@/templates/form-fields-inputs/fieldSwitchBlock'
+
   import { computed, onMounted, ref, watch } from 'vue'
 
   defineOptions({ name: 'form-fields-edge-firewall' })
@@ -24,17 +25,8 @@
   })
 
   const PICK_LIST_SKELETON = Array.from({ length: 7 }, () => ({}))
-
-  const DDosProtectionUnmetered = true
-
   const { value: name } = useField('name')
   const { value: domains, resetField } = useField('domains')
-  const { value: isActive } = useField('isActive')
-  const { value: debugRules } = useField('debugRules')
-
-  const { value: edgeFunctionsEnabled } = useField('edgeFunctionsEnabled')
-  const { value: networkProtectionEnabled } = useField('networkProtectionEnabled')
-  const { value: wafEnabled } = useField('wafEnabled')
   const domainsList = ref([PICK_LIST_SKELETON, PICK_LIST_SKELETON])
 
   const loading = computed({
@@ -75,6 +67,35 @@
     }
   }
 
+  const switchOptions = [
+    {
+      title: 'DDoS Protection Unmetered',
+      nameField: 'ddosProtectionUnmetered',
+      disabled: true,
+      value: true,
+      subtitle: 'Mitigate large and complex network and transport-layer DDoS attacks.',
+      tag: {
+        value: 'Automatically enabled in all accounts',
+        icon: 'pi pi-lock'
+      }
+    },
+    {
+      title: 'Edge Functions',
+      nameField: 'edgeFunctionsEnabled',
+      subtitle: 'Build ultra-low latency functions that run on the edge.'
+    },
+    {
+      title: 'Network Layer Protection',
+      nameField: 'networkProtectionEnabled',
+      subtitle:
+        'Create lists to configure a programmable security perimeter for inbound and outbound traffic at the edge.'
+    },
+    {
+      title: 'Web Application Firewall',
+      nameField: 'wafEnabled',
+      subtitle: 'Protect edge applications against threats and attacks.'
+    }
+  ]
   onMounted(async () => {
     await fetchDomains()
   })
@@ -151,96 +172,20 @@
   >
     <template #inputs>
       <div class="flex flex-col gap-2">
-        <div class="flex flex-col gap-3">
-          <Card
-            :pt="{
-              body: { class: 'p-4 border border-orange-500 rounded-md' },
-              title: { class: 'flex justify-between items-center text-base font-medium m-0' },
-              subtitle: {
-                class: 'text-sm font-normal text-color-secondary m-0 pr-0 md:pr-[2.5rem]'
-              }
-            }"
-          >
-            <template #title>
-              <span class="text-base">DDoS Protection Unmetered</span>
-              <InputSwitch
-                v-model="DDosProtectionUnmetered"
-                disabled
-              />
-            </template>
-            <template #subtitle>
-              Mitigate large and complex network and transport-layer DDoS attacks.
-            </template>
-            <template #footer>
-              <PrimeTag
-                value="Automatically enabled in all accounts."
-                icon="pi pi-lock"
-                severity="info"
-                class="mt-3"
-              />
-            </template>
-          </Card>
-          <Card
-            :pt="{
-              body: {
-                class: `p-4 border rounded-md ${
-                  edgeFunctionsEnabled ? 'border-orange-500' : 'border-transparent'
-                }`
-              },
-              title: { class: 'flex justify-between items-center text-base font-medium m-0' },
-              subtitle: {
-                class: 'text-sm font-normal text-color-secondary m-0 pr-0 md:pr-[2.5rem]'
-              }
-            }"
-          >
-            <template #title>
-              <span class="text-base">Edge Functions</span>
-              <InputSwitch v-model="edgeFunctionsEnabled" />
-            </template>
-            <template #subtitle> Build ultra-low latency functions that run on the edge. </template>
-          </Card>
-          <Card
-            :pt="{
-              body: {
-                class: `p-4 border rounded-md ${
-                  networkProtectionEnabled ? 'border-orange-500' : 'border-transparent'
-                }`
-              },
-              title: { class: 'flex justify-between items-center text-base font-medium m-0' },
-              subtitle: {
-                class: 'text-sm font-normal text-color-secondary m-0 pr-0 md:pr-[2.5rem]'
-              }
-            }"
-          >
-            <template #title>
-              <span class="text-base">Network Layer Protection</span>
-              <InputSwitch v-model="networkProtectionEnabled" />
-            </template>
-            <template #subtitle
-              >Create lists to configure a programmable security perimeter for inbound and outbound
-              traffic at the edge.</template
-            >
-          </Card>
-          <Card
-            :pt="{
-              body: {
-                class: `p-4 border rounded-md ${
-                  wafEnabled ? 'border-orange-500' : 'border-transparent'
-                }`
-              },
-              title: { class: 'flex justify-between items-center text-base font-medium m-0' },
-              subtitle: {
-                class: 'text-sm font-normal text-color-secondary m-0 pr-0 md:pr-[2.5rem]'
-              }
-            }"
-          >
-            <template #title>
-              <span class="text-base">Web Application Firewall</span>
-              <InputSwitch v-model="wafEnabled" />
-            </template>
-            <template #subtitle>Protect edge applications against threats and attacks.</template>
-          </Card>
-        </div>
+        <FieldGroupSwitch
+          isCard
+          :options="switchOptions"
+        >
+          <template #footer="{ item }">
+            <PrimeTag
+              v-if="item?.tag"
+              :value="item.tag.value"
+              :icon="item.tag.icon"
+              severity="info"
+              class="mt-3"
+            />
+          </template>
+        </FieldGroupSwitch>
       </div>
     </template>
   </FormHorizontal>
@@ -250,52 +195,27 @@
   >
     <template #inputs>
       <div class="flex flex-col gap-2">
-        <Card
-          :pt="{
-            root: { class: 'shadow-none  rounded-none' },
-            body: { class: 'py-4 border-0' },
-            content: { class: 'ml-12' },
-            title: { class: 'flex items-center text-base m-0 gap-3 font-medium' },
-            subtitle: {
-              class: 'text-sm font-normal text-color-secondary m-0 pr-0 md:pr-[2.5rem]'
-            }
-          }"
-        >
-          <template #title>
-            <InputSwitch
-              v-model="debugRules"
-              inputId="active"
-            />
-            <div class="flex-col gap-1">
-              <label
-                for="active"
-                class="text-color text-sm font-normal"
-                >Active</label
-              >
-            </div>
-          </template>
-        </Card>
+        <FieldSwitchBlock
+          nameField="debugRules"
+          name="debugRules"
+          auto
+          :isCard="false"
+          title="Active"
+          subtitle="Rules that were successfully executed will be shown under the $traceback field in Data Streaming and Real-Time Events or the $stacktrace variable in GraphQL."
+        />
       </div>
     </template>
   </FormHorizontal>
   <FormHorizontal title="Status">
     <template #inputs>
       <div class="flex flex-col w-full gap-2">
-        <div
-          class="flex gap-6 md:align-items-center max-sm:flex-col max-sm:align-items-baseline max-sm:gap-3"
-        >
-          <span class="p-input-icon-right w-full flex max-w-lg items-start gap-2 pb-3 pt-2">
-            <InputSwitch
-              v-model="isActive"
-              inputId="activeStatus"
-            />
-            <label
-              for="activeStatus"
-              class="text-color text-sm font-normal leading-5"
-              >Active</label
-            >
-          </span>
-        </div>
+        <FieldSwitchBlock
+          nameField="isActive"
+          name="isActive"
+          auto
+          :isCard="false"
+          title="Active"
+        />
       </div>
     </template>
   </FormHorizontal>

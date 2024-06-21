@@ -161,4 +161,15 @@ describe('AzionDocumentation', () => {
       '_blank'
     )
   })
+  it('should open Lets Encrypt Certificate guide with correct link', () => {
+    const openWindowSpy = vi.spyOn(window, 'open')
+    const { sut } = makeSut()
+
+    sut.generateLetsEncryptCertificate()
+
+    expect(openWindowSpy).toHaveBeenCalledWith(
+      `https://www.azion.com/en/documentation/products/guides/how-to-generate-a-lets-encrypt-certificate`,
+      '_blank'
+    )
+  })
 })

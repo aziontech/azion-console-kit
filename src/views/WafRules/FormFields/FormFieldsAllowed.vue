@@ -2,12 +2,12 @@
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
   import FieldText from '@/templates/form-fields-inputs/fieldText'
   import PrimeButton from 'primevue/button'
-  import Card from 'primevue/card'
   import Divider from 'primevue/divider'
   import Dropdown from 'primevue/dropdown'
-  import InputSwitch from 'primevue/inputswitch'
   import InputText from 'primevue/inputtext'
-  import RadioButton from 'primevue/radiobutton'
+  import FieldSwitchBlock from '@/templates/form-fields-inputs/fieldSwitchBlock'
+  import FieldGroupRadio from '@/templates/form-fields-inputs/fieldGroupRadio'
+
   import { ref } from 'vue'
 
   import { useField } from 'vee-validate'
@@ -27,8 +27,6 @@
   const { value: matchZones } = useField('matchZones')
   const { value: path } = useField('path')
   const { value: reason } = useField('reason')
-  const { value: status } = useField('status')
-  const { value: useRegex } = useField('useRegex')
   const { value: ruleId } = useField('ruleId')
 
   const matchZonesOptions = ref([
@@ -41,6 +39,19 @@
     { name: 'Raw Body', value: 'raw_body' },
     { name: 'Request Body', value: 'request_body' },
     { name: 'Request Header', value: 'request_header' }
+  ])
+
+  const radioOptions = ref([
+    {
+      title: 'Value',
+      subtitle: 'Adds the value into the allowed rule.',
+      inputValue: 'value'
+    },
+    {
+      title: 'Name',
+      subtitle: 'Adds the key name into the allowed rule.',
+      inputValue: 'name'
+    }
   ])
 
   const ruleIdOption = ref(props.optionsRuleIds)
@@ -217,74 +228,12 @@
             class="flex flex-col gap-2"
             v-if="showMatchOnInputs(matchZones[index].zone)"
           >
-            <label class="text-color text-sm font-medium">Matches On *</label>
-            <div class="flex flex-col gap-3">
-              <Card
-                :pt="{
-                  root: { class: 'shadow-none border-b rounded-none surface-border' },
-                  body: { class: 'py-4 border-0' },
-                  title: { class: 'flex items-center text-base m-0 gap-3 font-medium' },
-                  subtitle: {
-                    class: 'text-sm font-normal text-color-secondary m-0 pr-0 md:pr-[2.5rem]'
-                  }
-                }"
-              >
-                <template #title>
-                  <RadioButton
-                    v-model="matchZones[index].matches_on"
-                    inputId="value"
-                    name="matches_on"
-                    value="value"
-                  />
-                  <div class="flex-col gap-1">
-                    <div class="">
-                      <div
-                        class="text-color text-sm font-normal"
-                        for="value"
-                      >
-                        Value
-                      </div>
-                    </div>
-                    <div class="self-stretch text-color-secondary text-sm font-normal">
-                      Adds the value into the allowed rule.
-                    </div>
-                  </div>
-                </template>
-              </Card>
-
-              <Card
-                :pt="{
-                  root: { class: 'shadow-none rounded-none' },
-                  body: { class: 'py-4 border-0' },
-                  title: { class: 'flex items-center text-base m-0 gap-3 font-medium' },
-                  subtitle: {
-                    class: 'text-sm font-normal text-color-secondary m-0 pr-0 md:pr-[2.5rem]'
-                  }
-                }"
-              >
-                <template #title>
-                  <RadioButton
-                    v-model="matchZones[index].matches_on"
-                    inputId="name"
-                    name="matches_on"
-                    value="name"
-                  />
-                  <div class="flex-col gap-1">
-                    <div class="">
-                      <div
-                        class="text-color text-sm font-normal"
-                        for="name"
-                      >
-                        Name
-                      </div>
-                    </div>
-                    <div class="self-stretch text-color-secondary text-sm font-normal">
-                      Adds the key name into the allowed rule.
-                    </div>
-                  </div>
-                </template>
-              </Card>
-            </div>
+            <FieldGroupRadio
+              label="Matches On *"
+              :nameField="`matchZones[${index}].matches_on`"
+              :isCard="false"
+              :options="radioOptions"
+            />
           </div>
         </div>
       </div>
@@ -305,23 +254,18 @@
   </FormHorizontal>
   <FormHorizontal
     title="Regex"
-    description="Activate this option to treat conditional fields as regular expressions in all match zones."
     :isDrawer="true"
   >
     <template #inputs>
       <div class="flex gap-3 items-center">
-        <InputSwitch
-          id="regex"
-          class="flex-shrink-0"
-          v-model="useRegex"
+        <FieldSwitchBlock
+          nameField="useRegex"
+          name="useRegex"
+          auto
+          :isCard="false"
+          title="Active"
+          subtitle="Activate this option to treat conditional fields as regular expressions in all match zones."
         />
-        <div class="flex flex-col gap-1">
-          <label
-            class="text-base font-normal leading-tight"
-            for="regex"
-            >Active
-          </label>
-        </div>
       </div>
     </template>
   </FormHorizontal>
@@ -331,16 +275,13 @@
   >
     <template #inputs>
       <div class="flex gap-3 items-center">
-        <InputSwitch
-          id="status"
-          class="flex-shrink-0"
-          v-model="status"
+        <FieldSwitchBlock
+          nameField="status"
+          name="status"
+          auto
+          :isCard="false"
+          title="Active"
         />
-        <label
-          for="status"
-          class="text-base"
-          >Active</label
-        >
       </div>
     </template>
   </FormHorizontal>

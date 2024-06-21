@@ -93,6 +93,7 @@
           {
             field: 'status',
             header: 'Status',
+            sortField: 'status.content',
             type: 'component',
             component: (columnData) =>
               columnBuilder({

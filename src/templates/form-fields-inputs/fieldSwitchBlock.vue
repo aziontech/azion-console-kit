@@ -4,6 +4,7 @@
     :selected="checked"
     :nameId="props.name"
     @change="changeState"
+    :inputClass="props.selectorClass"
   >
     <template #selector>
       <InputSwitch
@@ -12,6 +13,7 @@
         :name="props.name"
         @change="stopPropagation"
         v-model="inputValue"
+        :readonly="readonly"
       />
     </template>
     <template #footer>
@@ -69,6 +71,12 @@
     },
     value: {
       type: Boolean
+    },
+    readonly: {
+      type: Boolean
+    },
+    selectorClass: {
+      type: String
     }
   })
 

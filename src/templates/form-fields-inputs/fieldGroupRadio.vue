@@ -83,7 +83,7 @@
           :hideSelector="props.hideSelector"
           :isCard="props.isCard"
           v-bind="item"
-          @onRadioChange="emit('onRadioChange', item.value)"
+          @onRadioChange="emit('onRadioChange', item.inputValue)"
         >
           <template #footer>
             <slot
