@@ -50,6 +50,7 @@
 </template>
 
 <script setup>
+  import { ref } from 'vue'
   import PrimeButton from 'primevue/button'
   import Toast from 'primevue/toast'
   import Tag from 'primevue/tag'
@@ -107,8 +108,15 @@
     return parser[severity] || severity
   }
 
-  const setToastLife = (message) => {
-    const closableTypes = {
+  const setCustomIdOnAutoCloseMessage = (message) => {
+    const customId = `${new Date().getTime()}${Math.floor(Math.random() * 1000)}`
+    message.customId = customId
+
+    return customId
+  }
+
+  const isAutoCloseable = (message) => {
+    const closeableTypes = {
       success: {
         action: TOAST_LIFE.WITH_ACTIONS,
         default: TOAST_LIFE.DEFAULT
@@ -119,15 +127,29 @@
       }
     }
 
-    const toastType = closableTypes[message.severity]
+    return closeableTypes[message.severity]
+  }
+
+  const getToastLifeTime = (message, toastType) => {
+    const ZERO_VALUE = 0
+
+    const shouldNotClose = message?.life == ZERO_VALUE
+    const hasActions = message?.action && Object.keys(message.action).length
+
+    const defaultLifeTime = hasActions ? toastType.action : toastType.default
+
+    return shouldNotClose ? ZERO_VALUE : defaultLifeTime
+  }
+
+  const setToastLife = (message) => {
+    const toastType = isAutoCloseable(message)
 
     if (toastType) {
-      const shouldNotClose = message.life === 0
-      const hasActions = message?.action && Object.keys(message.action).length
+      const customId = setCustomIdOnAutoCloseMessage(message)
 
-      const lifeTime = hasActions ? toastType.action : toastType.default
-
-      message.life = shouldNotClose ? message.life : lifeTime
+      if (customId === message.customId) {
+        message.life = getToastLifeTime(message, toastType)
+      }
     }
   }
 
