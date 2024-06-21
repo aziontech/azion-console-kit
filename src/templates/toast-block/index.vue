@@ -50,7 +50,6 @@
 </template>
 
 <script setup>
-  import { ref } from 'vue'
   import PrimeButton from 'primevue/button'
   import Toast from 'primevue/toast'
   import Tag from 'primevue/tag'
