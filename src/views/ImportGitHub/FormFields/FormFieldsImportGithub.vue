@@ -360,6 +360,7 @@
             filter
             optionLabel="label"
             optionValue="value"
+            autoFilterFocus
             placeholder="Select a framework preset"
             class="w-full md:w-14rem"
             @change="setModeByPreset"

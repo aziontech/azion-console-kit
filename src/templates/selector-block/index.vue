@@ -13,7 +13,7 @@
         <div v-show="!hideSelector">
           <slot name="selector" />
         </div>
-        <div :class="classDisabled">
+        <div :class="styleClass">
           <div class="flex gap-3 items-center font-medium">
             <span
               v-if="!props.isCard"
@@ -43,6 +43,7 @@
           <div
             @click="stopPropagation"
             v-if="slots.footer"
+            class="w-full"
           >
             <slot name="footer" />
           </div>
@@ -91,6 +92,9 @@
     nameId: {
       type: String,
       required: true
+    },
+    inputClass: {
+      type: String
     }
   })
   const slots = useSlots()
@@ -101,6 +105,12 @@
     event.preventDefault()
     event.stopPropagation()
   }
+
+  const styleClass = computed(() => {
+    const disabled = props.disabled && props.hideSelector ? 'p-disabled' : ''
+
+    return `${disabled} ${props.inputClass}`
+  })
 
   const classStateRootItem = computed(() => ({
     'p-4': props.isCard,
@@ -114,9 +124,5 @@
     'border-orange-500': check.value,
     'border-orange-500/[.32]': props.disabled && check.value,
     'border rounded-md': props.isCard
-  }))
-
-  const classDisabled = computed(() => ({
-    'p-disabled': props.disabled
   }))
 </script>

@@ -4,6 +4,9 @@
       :home="generateHomeBreadCrumb"
       :model="generateBreadCrumbs"
       class="-ml-1.5"
+      :pt="{
+        label: { class: 'whitespace-nowrap' }
+      }"
     />
     <div class="flex flex-wrap w-full py-4 items-end justify-between">
       <div

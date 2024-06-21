@@ -22,7 +22,7 @@
 
 <template>
   <div class="flex flex-col w-full">
-    <label class="flex text-sm gap-1 items-center">
+    <label class="flex text-sm gap-1 items-center font-medium">
       {{ props.label }}
 
       <span class="just-hover">

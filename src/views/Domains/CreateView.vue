@@ -7,10 +7,12 @@
       <CreateFormBlock
         :createService="createDomainService"
         :cleanFormCallback="resetForm"
-        @on-response="handleTrackCreation"
+        :disabledCallback="true"
+        @on-response="handleResponse"
         @on-response-fail="handleTrackFailedCreation"
         :schema="validationSchema"
         :initialValues="initialValues"
+        disableAfterCreateToastFeedback
       >
         <template #form>
           <FormFieldsCreateDomains
@@ -40,9 +42,10 @@
   import PageHeadingBlock from '@/templates/page-heading-block'
   import FormFieldsCreateDomains from './FormFields/FormFieldsCreateDomains.vue'
   import ActionBarTemplate from '@/templates/action-bar-block/action-bar-with-teleport'
+  import CopyDomainDialog from './Dialog/CopyDomainDialog.vue'
   import { TOAST_LIFE } from '@/utils/constants'
-  import { useRoute } from 'vue-router'
-  const route = useRoute()
+  import { useRoute, useRouter } from 'vue-router'
+  import { useDialog } from 'primevue/usedialog'
   import * as yup from 'yup'
   import { handleTrackerError } from '@/utils/errorHandlingTracker'
 
@@ -59,21 +62,72 @@
       type: Function,
       required: true
     },
+    clipboardWrite: {
+      type: Function,
+      required: true
+    },
     listEdgeApplicationsService: {
       type: Function,
       required: true
     }
   })
+
+  const toast = useToast()
+  const route = useRoute()
+  const dialog = useDialog()
+  const router = useRouter()
+
   const edgeApps = ref([])
   const digitalCertificates = ref([])
-  const toast = useToast()
+  const domainName = ref('')
 
-  const handleTrackCreation = () => {
+  const handleResponse = (value) => {
+    domainName.value = value?.domainName
+    dialog.open(CopyDomainDialog, {
+      data: {
+        domain: domainName.value,
+        copy: copyDomain
+      },
+      onClose: () => {
+        router.push({ path: value.urlToEditView })
+        renderToastDomainCreateSuccesfully()
+      }
+    })
     tracker.product.productCreated({
       productName: 'Domain',
       createdFrom: 'singleEntity',
       from: route.query.origin
     })
+  }
+
+  const copyDomain = async () => {
+    const toastConfig = {
+      closable: true,
+      severity: 'success',
+      summary: 'Domain copied to clipboard!'
+    }
+
+    try {
+      props.clipboardWrite(domainName.value)
+      toast.add({ ...toastConfig })
+    } catch (error) {
+      toast.add({
+        ...toastConfig,
+        severity: 'error',
+        detail: 'The Domain could not be copied to clipboard. Please try again.'
+      })
+    }
+  }
+
+  const renderToastDomainCreateSuccesfully = () => {
+    const toastConfig = {
+      closable: true,
+      severity: 'success',
+      life: TOAST_LIFE,
+      summary: 'Succesfully created',
+      detail: 'The domain is now available in the Domain management section.'
+    }
+    toast.add({ ...toastConfig })
   }
 
   const handleTrackFailedCreation = (error) => {
@@ -131,10 +185,17 @@
   }
 
   const validationSchema = yup.object({
-    name: yup.string().required().test('only-ascii', 'Invalid characters. Use letters, numbers, and standard symbols, with no accents.', function(value) {
-      const nameRegex = /^[\x20-\x7E]+$/
-      return nameRegex.test(value)
-    }),
+    name: yup
+      .string()
+      .required()
+      .test(
+        'only-ascii',
+        'Invalid characters. Use letters, numbers, and standard symbols, with no accents.',
+        function (value) {
+          const nameRegex = /^[\x20-\x21\x23-\x7E]+$/
+          return nameRegex.test(value)
+        }
+      ),
     active: yup.boolean(),
     cnames: yup
       .string()

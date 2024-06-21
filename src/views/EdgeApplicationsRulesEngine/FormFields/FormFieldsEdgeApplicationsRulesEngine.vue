@@ -1,3 +1,4 @@
+<!-- eslint-disable vue/return-in-computed-property -->
 <script setup>
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
   import { useField, useFieldArray } from 'vee-validate'
@@ -5,18 +6,17 @@
   import FieldTextArea from '@/templates/form-fields-inputs/fieldTextArea'
   import FieldDropdown from '@/templates/form-fields-inputs/fieldDropdown'
   import PrimeButton from 'primevue/button'
-  import PrimeMenu from 'primevue/menu'
   import InlineMessage from 'primevue/inlinemessage'
   import Divider from 'primevue/divider'
   import AutoComplete from 'primevue/autocomplete'
   import FieldGroupRadio from '@/templates/form-fields-inputs/fieldGroupRadio'
   import FieldSwitchBlock from '@/templates/form-fields-inputs/fieldSwitchBlock'
 
-  import { computed, ref, onMounted } from 'vue'
+  import { computed, ref, onMounted, watch } from 'vue'
   import { useToast } from 'primevue/usetoast'
 
   const props = defineProps({
-    isEnableApplicationAccelerator: {
+    isApplicationAcceleratorEnabled: {
       type: Boolean,
       required: true
     },
@@ -24,7 +24,7 @@
       type: Boolean,
       required: true
     },
-    isImageOptimization: {
+    isImageOptimizationEnabled: {
       required: true,
       type: Boolean
     },
@@ -45,7 +45,8 @@
       required: true
     },
     initialPhase: {
-      type: String
+      type: String,
+      default: 'default'
     },
     selectedRulesEngineToEdit: {
       type: Object,
@@ -61,7 +62,7 @@
   })
 
   const isEditDrawer = computed(() => !!props.selectedRulesEngineToEdit)
-
+  const isImageOptimizationEnabled = computed(() => !!props.isImageOptimizationEnabled)
   const checkPhaseIsDefaultValue = computed(() => phase.value === 'default')
 
   const toast = useToast()
@@ -81,7 +82,7 @@
 
     return ' - Requires Application Accelerator'
   })
-
+  props.isDeliveryProtocolHttps
   const showLabelHttps = computed(() => {
     if (props.isDeliveryProtocolHttps) {
       return ''
@@ -91,7 +92,7 @@
   })
 
   const showLabelImageOptimization = computed(() => {
-    if (props.isImageOptimization) return ''
+    if (props.isImageOptimizationEnabled) return ''
     return ' - Requires Image Processor'
   })
 
@@ -211,9 +212,6 @@
     target: {}
   }
 
-  const conditionalMenuRef = ref({})
-  const criteriaMenuRef = ref({})
-
   /**
    * Remove a specific conditional from the criteria array.
    * @param {number} criteriaIndex - The index of the criteria from which the conditional will be removed.
@@ -221,77 +219,6 @@
    */
   const removeConditional = (criteriaIndex, conditionalIndex) => {
     criteria.value[criteriaIndex].value.splice(conditionalIndex, 1)
-  }
-
-  /**
-   * Toggle the visibility of the conditional menu.
-   * @param {Event} event - The event that triggered the function.
-   * @param {number} index - The index of the criteria.
-   * @param {number} conditionalIndex - The index of the conditional.
-   */
-  const toggleConditionalMenu = (event, index, conditionalIndex) => {
-    conditionalMenuRef.value[`${index}${conditionalIndex}`].toggle(event)
-  }
-
-  /**
-   * Toggle the visibility of the criteria menu.
-   * @param {Event} event - The event that triggered the function.
-   * @param {number} index - The index of the criteria.
-   */
-  const toggleCriteriaMenu = (event, index) => {
-    criteriaMenuRef.value[index].toggle(event)
-  }
-
-  /**
-   * Generate the options for the criteria menu.
-   * @param {number} criteriaIndex - The index of the criteria.
-   * @param {number} [conditionalIndex] - The index of the conditional.
-   * @returns {Array} An array of options for the criteria menu.
-   */
-  const criteriaMenuOptions = (criteriaIndex, conditionalIndex = null) => {
-    return [
-      {
-        label: 'Delete',
-        icon: 'pi pi-fw pi-trash',
-        severity: 'error',
-        command: () => {
-          if (conditionalIndex === null) {
-            removeCriteria(criteriaIndex)
-          } else {
-            removeConditional(criteriaIndex, conditionalIndex)
-          }
-        }
-      }
-    ]
-  }
-
-  const behaviorsMenuRef = ref({})
-
-  /**
-   * Toggle the visibility of the behavior menu.
-   * @param {Event} event - The event that triggered the function.
-   * @param {number} index - The index of the behavior.
-   */
-  const toggleBehaviorMenu = (event, index) => {
-    behaviorsMenuRef.value[index].toggle(event)
-  }
-
-  /**
-   * Generate the options for the behavior menu.
-   * @param {number} index - The index of the behavior.
-   * @returns {Array} An array of options for the behavior menu.
-   */
-  const behaviorMenuOptions = (index) => {
-    return [
-      {
-        label: 'Delete',
-        icon: 'pi pi-fw pi-trash',
-        severity: 'error',
-        command: () => {
-          removeBehavior(index)
-        }
-      }
-    ]
   }
 
   /**
@@ -337,26 +264,28 @@
     response: () => behaviorsResponseOptions.value
   }
 
-  const behaviorsOptions = computed(() => behaviorsOptionsMap[phase.value]() || [])
+  const behaviorsOptions = computed(() => {
+    return behaviorsOptionsMap[phase.value]() || []
+  })
 
   /**
    * Updates the 'requires' property of behavior options based on component props.
    * This function checks if the behavior option is 'redirect_http_to_https' and sets the 'requires'
    * property based on the 'isDeliveryProtocolHttps' prop. For other options that have 'requires' as true,
-   * it sets the 'requires' property based on the 'isEnableApplicationAccelerator' prop.
+   * it sets the 'requires' property based on the 'isApplicationAcceleratorEnabled' prop.
    * @param {Array} options - The behavior options to update.
    * @returns {Array} The updated array of behavior options with the 'requires' property set accordingly.
    */
   const updateOptionRequires = (options) => {
     const conditionsMap = {
       redirect_http_to_https: !props.isDeliveryProtocolHttps,
-      optimize_images: !props.isImageOptimization,
+      optimize_images: !isImageOptimizationEnabled.value,
       run_function: !props.isEdgeFunctionEnabled
     }
 
     return options.map((option) => {
       if (option.requires) {
-        const requires = conditionsMap[option.value] ?? !props.isEnableApplicationAccelerator
+        const requires = conditionsMap[option.value] ?? !props.isApplicationAcceleratorEnabled
 
         return { ...option, requires }
       }
@@ -422,16 +351,6 @@
     }
   }
 
-  const showNewBehaviorButton = ref(true)
-
-  /**
-   * Updates the 'showNewBehaviorButton' ref.
-   * @param {boolean} isShow - Whether to show the new behavior button.
-   */
-  const setShowNewBehaviorButton = (isShow) => {
-    showNewBehaviorButton.value = isShow
-  }
-
   /**
    * Updates the 'showTargetField' property of the behavior at the specified index.
    * @param {boolean} isShow - Whether to show the target field.
@@ -451,6 +370,36 @@
       removeBehavior(index)
     }
   }
+
+  const disableAddBehaviorButtonComputed = computed(() => {
+    const MAXIMUM_NUMBER_OF_BEHAVIORS = 10
+    const disableAddBehaviorButton = true
+    const behaviorHasNotBeenLoaded = !behaviors || !behaviors.value
+    if (behaviorHasNotBeenLoaded) {
+      return disableAddBehaviorButton
+    }
+    if (behaviors.value.length === 0) {
+      return disableAddBehaviorButton
+    }
+    if (behaviors.value.length >= MAXIMUM_NUMBER_OF_BEHAVIORS) {
+      return disableAddBehaviorButton
+    }
+
+    const lastBehavior = behaviors.value[behaviors.value.length - 1]
+    const isLastBehaviorEmpty = !lastBehavior.value.name
+    if (isLastBehaviorEmpty) {
+      return disableAddBehaviorButton
+    }
+    const optionsThatDisableAddBehaviors = [
+      'deliver',
+      'redirect_to_301',
+      'redirect_to_302',
+      'deny',
+      'no_content'
+    ]
+
+    return optionsThatDisableAddBehaviors.includes(lastBehavior.value.name)
+  })
 
   /**
    * Changes the type of the behavior at the specified index and updates related properties.
@@ -478,10 +427,11 @@
 
     let targetValue = behaviors.value[index].value.target
     if (!isEditDrawer.value) targetValue = ''
-    if (typeof targetValue == 'object' && Object.keys(targetValue).length === 0) targetValue = ''
+    if (targetValue && typeof targetValue == 'object' && Object.keys(targetValue).length === 0) {
+      targetValue = ''
+    }
 
     updateBehavior(index, { name: behaviorName, target: targetValue })
-    setShowNewBehaviorButton(true)
 
     switch (behaviorName) {
       case 'run_function':
@@ -504,7 +454,6 @@
         const isAddBehaviorButtonEnabled = !disableAddBehaviorButtonOptions.includes(behaviorName)
 
         setShowBehaviorTargetField(isBehaviorTargetFieldEnabled, index)
-        setShowNewBehaviorButton(isAddBehaviorButtonEnabled)
 
         if (!isAddBehaviorButtonEnabled) {
           removeBehaviorsFromIndex(index)
@@ -648,28 +597,35 @@
     return criteria.value.length >= MAXIMUM_ALLOWED
   })
 
-  const MaximumBehaviorsAllowed = computed(() => {
-    const MAXIMUM_NUMBER = 10
-    return behaviors.value.length >= MAXIMUM_NUMBER
-  })
+  const phasesRadioOptions = ref([])
 
-  const phasesRadioOptions = [
-    {
-      title: 'Request Phase',
-      value: 'request',
-      subtitle: 'Configure the requests made to the edge.'
+  watch(
+    checkPhaseIsDefaultValue,
+    () => {
+      if (!checkPhaseIsDefaultValue.value) {
+        phasesRadioOptions.value = [
+          {
+            title: 'Request Phase',
+            inputValue: 'request',
+            subtitle: 'Configure the requests made to the edge.'
+          },
+          {
+            title: 'Response Phase',
+            inputValue: 'response',
+            subtitle: 'Configure the responses delivered to end-users.'
+          }
+        ]
+      } else {
+        phasesRadioOptions.value = []
+      }
     },
-    {
-      title: 'Response Phase',
-      value: 'response',
-      subtitle: 'Configure the responses delivered to end-users.'
-    }
-  ]
+    { immediate: true }
+  )
 
-  onMounted(() => {
+  onMounted(async () => {
     updateBehaviorsOptionsRequires()
 
-    if (props.isEnableApplicationAccelerator) {
+    if (props.isApplicationAcceleratorEnabled) {
       if (criteria.value[0] && !isEditDrawer.value) {
         criteria.value[0].value[0].variable = ''
       }
@@ -682,7 +638,8 @@
     }
 
     callOptionsServicesAtEdit()
-    processBehaviorsAtEdit()
+    await processBehaviorsAtEdit()
+    checkPhaseIsDefaultValue.value = phase.value === 'default'
   })
 </script>
 
@@ -767,16 +724,10 @@
 
             <PrimeButton
               v-if="conditionalIndex !== 0"
-              icon="pi pi-ellipsis-h"
+              icon="pi pi-trash"
               size="small"
               outlined
-              @click="(event) => toggleConditionalMenu(event, criteriaIndex, conditionalIndex)"
-            />
-            <PrimeMenu
-              :ref="(el) => (conditionalMenuRef[`${criteriaIndex}${conditionalIndex}`] = el)"
-              id="drawer_overlay_menu"
-              :model="criteriaMenuOptions(criteriaIndex, conditionalIndex)"
-              :popup="true"
+              @click="removeConditional(criteriaIndex, conditionalIndex)"
             />
           </div>
 
@@ -785,7 +736,7 @@
               <div
                 class="p-inputgroup-addon"
                 :class="{
-                  'opacity-20': !props.isEnableApplicationAccelerator || checkPhaseIsDefaultValue
+                  'opacity-20': !props.isApplicationAcceleratorEnabled || checkPhaseIsDefaultValue
                 }"
               >
                 <i class="pi pi-dollar"></i>
@@ -795,7 +746,7 @@
                 v-model="criteria[criteriaIndex].value[conditionalIndex].variable"
                 :suggestions="variableItems"
                 @complete="searchVariableOption"
-                :disabled="!props.isEnableApplicationAccelerator || checkPhaseIsDefaultValue"
+                :disabled="!props.isApplicationAcceleratorEnabled || checkPhaseIsDefaultValue"
                 :completeOnFocus="true"
               />
             </div>
@@ -824,7 +775,7 @@
 
         <div
           class="flex gap-2 mb-8"
-          v-if="props.isEnableApplicationAccelerator && !checkPhaseIsDefaultValue"
+          v-if="props.isApplicationAcceleratorEnabled && !checkPhaseIsDefaultValue"
         >
           <PrimeButton
             icon="pi pi-plus-circle"
@@ -845,27 +796,20 @@
         </div>
 
         <div
-          v-if="props.isEnableApplicationAccelerator && !checkPhaseIsDefaultValue"
+          v-if="props.isApplicationAcceleratorEnabled && !checkPhaseIsDefaultValue"
           class="flex items-center gap-2"
         >
           <Divider type="solid" />
-
           <PrimeButton
             v-if="isNotFirstCriteria(criteriaIndex)"
-            icon="pi pi-ellipsis-h"
+            icon="pi pi-trash"
             size="small"
             outlined
-            @click="(event) => toggleCriteriaMenu(event, criteriaIndex + 1)"
-          />
-          <PrimeMenu
-            :ref="(el) => (criteriaMenuRef[criteriaIndex + 1] = el)"
-            id="drawer_overlay_menu"
-            :model="criteriaMenuOptions(criteriaIndex + 1)"
-            :popup="true"
+            @click="removeCriteria(criteriaIndex + 1)"
           />
         </div>
       </div>
-      <div v-if="props.isEnableApplicationAccelerator && !checkPhaseIsDefaultValue">
+      <div v-if="props.isApplicationAcceleratorEnabled && !checkPhaseIsDefaultValue">
         <PrimeButton
           icon="pi pi-plus-circle"
           label="Add Criteria"
@@ -899,17 +843,10 @@
 
           <PrimeButton
             v-if="behaviorIndex !== 0"
-            icon="pi pi-ellipsis-h"
+            icon="pi pi-trash"
             size="small"
             outlined
-            @click="(event) => toggleBehaviorMenu(event, behaviorIndex)"
-          />
-
-          <PrimeMenu
-            :ref="(el) => (behaviorsMenuRef[behaviorIndex] = el)"
-            id="drawer_behavior_overlay_menu"
-            :model="behaviorMenuOptions(behaviorIndex)"
-            :popup="true"
+            @click="removeBehavior(behaviorIndex)"
           />
         </div>
 
@@ -925,7 +862,6 @@
               :value="behaviors[behaviorIndex].value.name"
               inputClass="w-full"
               @onChange="(newValue) => changeBehaviorType(newValue, behaviorIndex)"
-              :disabled="checkPhaseIsDefaultValue && behaviorItem.key === 0"
             />
           </div>
 
@@ -1002,20 +938,17 @@
           </div>
         </div>
       </div>
-
-      <template v-if="showNewBehaviorButton">
-        <Divider type="solid" />
-        <div>
-          <PrimeButton
-            icon="pi pi-plus-circle"
-            label="Add Behavior"
-            size="small"
-            outlined
-            :disabled="MaximumBehaviorsAllowed"
-            @click="addNewBehavior"
-          />
-        </div>
-      </template>
+      <Divider type="solid" />
+      <div>
+        <PrimeButton
+          :disabled="disableAddBehaviorButtonComputed"
+          icon="pi pi-plus-circle"
+          label="Add Behavior"
+          size="small"
+          outlined
+          @click="addNewBehavior"
+        />
+      </div>
     </template>
   </FormHorizontal>
 

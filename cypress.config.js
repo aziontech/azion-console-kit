@@ -1,5 +1,6 @@
 /* eslint-disable no-undef */
 import { defineConfig } from 'cypress';
+import codeCoverageTask from '@cypress/code-coverage/task';
 
 export default defineConfig({
   projectId: 'azion-console-kit',
@@ -12,6 +13,10 @@ export default defineConfig({
     retries: {
       runMode: 2,
       openMode: 2
+    },
+    setupNodeEvents(on, config) {
+      codeCoverageTask(on, config);
+      return config;
     }
   },
   env: {

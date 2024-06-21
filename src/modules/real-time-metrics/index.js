@@ -295,7 +295,9 @@ const setCurrentReports = (availableReports) => {
  * @return {void} This function does not return a value.
  */
 const setCurrentReportValue = (reportInfo) => {
-  const reportIdx = reports.current.findIndex((reportItem) => reportItem.id === reportInfo.reportId)
+  const reportIdx = reports?.current?.findIndex(
+    (reportItem) => reportItem.id === reportInfo.reportId
+  )
 
   if (reportIdx < 0) return
 

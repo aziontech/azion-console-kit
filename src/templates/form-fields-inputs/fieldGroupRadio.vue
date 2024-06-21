@@ -76,16 +76,20 @@
         :key="index"
       >
         <FieldRadioBlock
+          v-show="!item.hide"
           :nameField="props.nameField"
           :name="item.name ?? `${props.nameField}-radio-${index}`"
           :auto="props.auto"
           :hideSelector="props.hideSelector"
           :isCard="props.isCard"
           v-bind="item"
-          @onRadioChange="emit('onRadioChange', item.value)"
+          @onRadioChange="emit('onRadioChange', item.inputValue)"
         >
           <template #footer>
-            <slot :item="item" />
+            <slot
+              name="footer"
+              :item="item"
+            />
           </template>
         </FieldRadioBlock>
         <PrimeDivider

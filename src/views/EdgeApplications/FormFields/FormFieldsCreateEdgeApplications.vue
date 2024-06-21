@@ -56,8 +56,8 @@
 
   const { value: deliveryProtocol } = useField('deliveryProtocol')
   const { value: http3 } = useField('http3')
-  const { value: httpPort } = useField('httpPort')
-  const { value: httpsPort } = useField('httpsPort')
+  const { value: httpPort, errorMessage: httpPortError } = useField('httpPort')
+  const { value: httpsPort, errorMessage: httpsPortError } = useField('httpsPort')
   const { value: minimumTlsVersion } = useField('minimumTlsVersion')
   const { value: supportedCiphers } = useField('supportedCiphers')
   const { value: originType } = useField('originType')
@@ -99,24 +99,24 @@
     {
       title: 'HTTP support',
       subtitle: `Use only the HTTP protocol. Choose from the available HTTP ports.`,
-      value: 'http'
+      inputValue: 'http'
     },
     {
       title: 'HTTP and HTTPS support',
       subtitle: `Use both HTTP and HTTPS protocols. Choose from the available HTTP and HTTPS ports.`,
-      value: 'http,https'
+      inputValue: 'http,https'
     },
     {
       title: 'HTTP/3 support',
       subtitle: `Use both HTTP and HTTPS protocols and enable HTTP/3 support. Only available for HTTP port 80 and HTTPS port 443.`,
-      value: 'http3'
+      inputValue: 'http3'
     }
   ]
 
   const policyProtocolRadioOptions = [
-    { title: 'Preserve HTTP/HTTPS', value: 'preserve' },
-    { title: 'Enforce HTTP', value: 'http' },
-    { title: 'Enforce HTTPS', value: 'https' }
+    { title: 'Preserve HTTP/HTTPS', inputValue: 'preserve' },
+    { title: 'Enforce HTTP', inputValue: 'http' },
+    { title: 'Enforce HTTPS', inputValue: 'https' }
   ]
 
   const cacheSettingsRadioOptions = (type) => {
@@ -127,11 +127,11 @@
     const cdnSubtitle = `Honor cache policies from the origin or define a new maximum cache TTL for the edge. If a TTL isn't received from the origin, cache will be maintained at a default TTL.`
 
     return [
-      { title: 'Override cache settings', value: 'override' },
+      { title: 'Override cache settings', inputValue: 'override' },
       {
         title: 'Honor cache policies',
         subtitle: isBrowser ? browserSubtitle : cdnSubtitle,
-        value: 'honor'
+        inputValue: 'honor'
       }
     ]
   }
@@ -249,7 +249,9 @@
               :options="HTTP_PORT_LIST_OPTIONS"
               v-model="httpPort"
               filter
+              autoFilterFocus
               optionLabel="name"
+              :class="{ 'p-invalid': httpPortError }"
               placeholder="Select an HTTP port"
               class="w-full"
               display="chip"
@@ -260,6 +262,12 @@
                 }
               }"
             />
+
+            <small
+              v-if="httpPortError"
+              class="p-error text-xs font-normal leading-tight"
+              >{{ httpPortError }}</small
+            >
           </span>
         </div>
 
@@ -279,6 +287,7 @@
               v-model="httpsPort"
               optionLabel="name"
               display="chip"
+              :class="{ 'p-invalid': httpsPortError }"
               placeholder="Select an HTTPS port"
               class="w-full"
               :disabled="checkIsProtocol.http || checkIsProtocol.http3"
@@ -288,6 +297,11 @@
                 }
               }"
             />
+            <small
+              v-if="httpsPortError"
+              class="p-error text-xs font-normal leading-tight"
+              >{{ httpsPortError }}</small
+            >
           </span>
         </div>
       </div>

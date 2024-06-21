@@ -1,6 +1,8 @@
 import { AxiosHttpClientAdapter } from '@/services/axios/AxiosHttpClientAdapter'
 import { listUsersService } from '@/services/users-services'
-import { describe, expect, it, vi } from 'vitest'
+import { describe, expect, it, vi, beforeEach } from 'vitest'
+import { createPinia } from 'pinia'
+import { useAccountStore } from '@/stores/account'
 
 const fixtures = {
   userMock: {
@@ -33,6 +35,16 @@ const fixtures = {
       }
     ],
     is_account_owner: false
+  },
+  loggedUserMock: {
+    id: 10,
+    first_name: 'Logged',
+    last_name: 'User',
+    email: 'logged@example.com',
+    two_factor_enabled: true,
+    is_active: true,
+    teams: [],
+    is_account_owner: true
   }
 }
 
@@ -44,7 +56,15 @@ const makeSut = () => {
   }
 }
 
+vi.mock('@/stores/account')
 describe('UsersServices', () => {
+  beforeEach(() => {
+    createPinia()
+    useAccountStore.mockReturnValue({
+      accountData: { user_id: 10 }
+    })
+  })
+
   it('should call api with correct params', async () => {
     const requestSpy = vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
       statusCode: 200,
@@ -114,5 +134,56 @@ describe('UsersServices', () => {
         }
       }
     ])
+  })
+
+  it('should return empty array if no users found', async () => {
+    vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
+      statusCode: 200,
+      body: {
+        results: []
+      }
+    })
+    const { sut } = makeSut()
+
+    const result = await sut({})
+
+    expect(result).toEqual([])
+  })
+
+  it('should return empty array if api response is not a array', async () => {
+    vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
+      statusCode: 200,
+      body: {}
+    })
+    const { sut } = makeSut()
+
+    const result = await sut({})
+
+    expect(result).toEqual([])
+  })
+
+  it('should not return logged user in list', async () => {
+    vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
+      statusCode: 200,
+      body: {
+        results: [fixtures.userMock, fixtures.disabledUserMock, fixtures.loggedUserMock]
+      }
+    })
+    const { sut } = makeSut()
+
+    const result = await sut({})
+
+    const expectedLoggedUser = {
+      id: 11,
+      firstName: 'Logged',
+      lastName: 'User',
+      email: 'logged@example.com',
+      teams: [],
+      mfa: { content: 'Active', severity: 'success' },
+      status: { content: 'Active', severity: 'success' },
+      owner: { content: 'Yes', severity: 'success' }
+    }
+
+    expect(result).not.toContainEqual(expectedLoggedUser)
   })
 })

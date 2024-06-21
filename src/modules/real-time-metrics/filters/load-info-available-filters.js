@@ -48,12 +48,12 @@ export default async function LoadInfoAvailableFilters() {
 
   const graphqlQuery = { query: datasetListQuery }
 
-  const { __type: type } = await loadRealTimeMetricsData({
+  const result = await loadRealTimeMetricsData({
     query: graphqlQuery,
     signal: abortController.signal
   })
 
-  const availableFilters = type.fields
+  const availableFilters = result?.__type?.fields || []
   const newAvailableFilters = {}
 
   availableFilters.forEach((item) => {

@@ -1,5 +1,6 @@
 <script setup>
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
+  import FieldDropdown from '@/templates/form-fields-inputs/fieldDropdown.vue'
   import InputText from 'primevue/inputtext'
   import { computed } from 'vue'
   import { useAccountStore } from '@/stores/account'
@@ -51,15 +52,15 @@
   const triggerRadioOptions = [
     {
       title: 'Install',
-      value: 'Install'
+      inputValue: 'Install'
     },
     {
       title: 'Reload',
-      value: 'Reload'
+      inputValue: 'Reload'
     },
     {
       title: 'Uninstall',
-      value: 'Uninstall'
+      inputValue: 'Uninstall'
     }
   ]
 </script>
@@ -97,13 +98,17 @@
           </div>
         </div>
       </div>
-      <FieldGroupRadio
-        label="Type"
-        nameField="contentType"
-        :isCard="false"
-        :options="typeRadioOptions"
-      />
-
+      <div class="flex flex-col sm:w-2/5 gap-2">
+        <FieldDropdown
+          label="Type"
+          :options="typeRadioOptions"
+          optionLabel="title"
+          optionValue="value"
+          inputClass="w-full"
+          name="contentType"
+          :value="contentType"
+        />
+      </div>
       <div v-show="isShellScript">
         <FieldGroupRadio
           label="Trigger Type"

@@ -7,7 +7,7 @@ const fixtures = {
     match_zones: [{ matches_on: null, zone: 'path', zone_input: null }],
     path: '/tmp',
     rule_id: 0,
-    reason: 'test',
+    description: 'test',
     status: false,
     use_regex: false
   }
@@ -37,7 +37,7 @@ describe('WafRulesService', () => {
     await sut({ id: 4044, allowedId: { id: 10 } })
 
     expect(requestSpy).toHaveBeenCalledWith({
-      url: 'v4/edge/waf/4044/allowed_rules/10',
+      url: 'v4/edge/wafs/4044/allowed_rules/10',
       method: 'GET'
     })
   })
@@ -54,7 +54,7 @@ describe('WafRulesService', () => {
     expect(result).toEqual({
       matchZones: fixtures.wafRulesMock.match_zones,
       path: fixtures.wafRulesMock.path,
-      reason: fixtures.wafRulesMock.reason,
+      reason: fixtures.wafRulesMock.description,
       ruleId: fixtures.wafRulesMock.rule_id,
       status: fixtures.wafRulesMock.status,
       useRegex: fixtures.wafRulesMock.use_regex

@@ -157,7 +157,7 @@ function ConvertBeholderToChart({
   let lastXAxis = null
   let countValues = 0
 
-  data[dataset].forEach((item) => {
+  data[dataset]?.forEach((item) => {
     if (shouldHandleSeriesData(variable, groupBy)) {
       let key = variable
 
