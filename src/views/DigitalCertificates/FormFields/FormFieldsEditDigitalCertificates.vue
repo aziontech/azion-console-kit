@@ -3,7 +3,7 @@
   import PrimeButton from 'primevue/button'
   import FieldText from '@/templates/form-fields-inputs/fieldText'
   import FieldTextArea from '@/templates/form-fields-inputs/fieldTextArea'
-  import FieldText from '@/templates/form-fields-inputs/fieldText'
+
   import { useField } from 'vee-validate'
   import { ref, watch, computed } from 'vue'
   import Divider from 'primevue/divider'
@@ -107,7 +107,7 @@
             name="name"
             :value="name"
             placeholder="My digital certificate"
-          ></FieldText>
+          />
         </div>
         <div class="flex flex-col sm:max-w-lg w-full gap-2">
           <label>Certificate </label>
@@ -204,31 +204,32 @@
       </template>
     </FormHorizontal>
 
-  <!-- Trusted case -->
-  <FormHorizontal
-    v-if="isCertificateType.trustedCertificate"
-    title="Update Trusted CA Certificate"
-    description="Paste the PEM-encoded Trusted CA certificate in the respective field to update the certificate. The current certificate is hidden to protect sensitive information."
-  >
-    <template #inputs>
-      <div class="flex flex-col sm:max-w-lg w-full gap-2">
-        <FieldText
-          label="Name *"
-          name="name"
-          placeholder="My digital certificate"
-          :value="name"
-        />
-      </div>
-      <div class="flex flex-col sm:max-w-lg w-full gap-2">
-        <FieldTextArea
-          label="Certificate"
-          name="certificate"
-          :value="certificate"
-          placeholder="For security purposes, the current certificate isn't exhibited, but it was correctly registered. Paste a new certificate in this field to update it."
-          rows="5"
-          description="Intermediate certificates are accepted."
-        />
-      </div>
-    </template>
-  </FormHorizontal>
+    <!-- Trusted case -->
+    <FormHorizontal
+      v-if="isCertificateType.trustedCertificate"
+      title="Update Trusted CA Certificate"
+      description="Paste the PEM-encoded Trusted CA certificate in the respective field to update the certificate. The current certificate is hidden to protect sensitive information."
+    >
+      <template #inputs>
+        <div class="flex flex-col sm:max-w-lg w-full gap-2">
+          <FieldText
+            label="Name *"
+            name="name"
+            placeholder="My digital certificate"
+            :value="name"
+          />
+        </div>
+        <div class="flex flex-col sm:max-w-lg w-full gap-2">
+          <FieldTextArea
+            label="Certificate"
+            name="certificate"
+            :value="certificate"
+            placeholder="For security purposes, the current certificate isn't exhibited, but it was correctly registered. Paste a new certificate in this field to update it."
+            rows="5"
+            description="Intermediate certificates are accepted."
+          />
+        </div>
+      </template>
+    </FormHorizontal>
+  </template>
 </template>
