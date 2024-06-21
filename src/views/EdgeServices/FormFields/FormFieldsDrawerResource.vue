@@ -52,15 +52,15 @@
   const triggerRadioOptions = [
     {
       title: 'Install',
-      value: 'Install'
+      inputValue: 'Install'
     },
     {
       title: 'Reload',
-      value: 'Reload'
+      inputValue: 'Reload'
     },
     {
       title: 'Uninstall',
-      value: 'Uninstall'
+      inputValue: 'Uninstall'
     }
   ]
 

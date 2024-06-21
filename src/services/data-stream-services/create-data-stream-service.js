@@ -19,7 +19,7 @@ const adapt = (payload) => {
   if (payload.template === 'CUSTOM_TEMPLATE') {
     parsedPayload = {
       name: payload.name,
-      template_model: payload.dataSet,
+      template_model: JSON.stringify(JSON.parse(payload.dataSet), null, '\t'),
       all_domains: allDomains,
       domain_ids: allDomains ? [] : getDomains(payload.domains[1]),
       endpoint: parseByEndpointType(payload)
@@ -58,7 +58,8 @@ const parseByEndpointType = (payload) => {
       return {
         endpoint_type: 'kafka',
         kafka_topic: payload.kafkaTopic,
-        bootstrap_servers: payload.bootstrapServers
+        bootstrap_servers: payload.bootstrapServers,
+        use_tls: payload.useTls
       }
     case 's3':
       return {

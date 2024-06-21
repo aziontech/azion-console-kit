@@ -43,7 +43,7 @@
       required: true,
       type: Function
     },
-    isEnableApplicationAccelerator: {
+    isApplicationAcceleratorEnabled: {
       required: true,
       type: Boolean
     },
@@ -51,7 +51,7 @@
       required: true,
       type: Boolean
     },
-    isImageOptimization: {
+    isImageOptimizationEnabled: {
       required: true,
       type: Boolean
     },
@@ -160,9 +160,6 @@
   }
 
   const drawerRulesEngineRef = ref('')
-  const openCreateRulesEngineDrawer = () => {
-    drawerRulesEngineRef.value.openDrawerCreate()
-  }
 
   const openCreateRulesEngineDrawerByPhase = () => {
     parsePhase[selectedPhase.value]
@@ -186,9 +183,9 @@
 <template>
   <DrawerRulesEngine
     ref="drawerRulesEngineRef"
-    :isEnableApplicationAccelerator="props.isEnableApplicationAccelerator"
+    :isApplicationAcceleratorEnabled="props.isApplicationAcceleratorEnabled"
     :isDeliveryProtocolHttps="props.isDeliveryProtocolHttps"
-    :isImageOptimization="props.isImageOptimization"
+    :isImageOptimizationEnabled="props.isImageOptimizationEnabled"
     :listEdgeApplicationFunctionsService="props.listEdgeApplicationFunctionsService"
     :listOriginsService="props.listOriginsService"
     :listCacheSettingsService="props.listCacheSettingsService"
@@ -227,7 +224,7 @@
         <PrimeButton
           icon="pi pi-plus"
           label="Rule"
-          @click="openCreateRulesEngineDrawer"
+          @click="openCreateRulesEngineDrawerByPhase"
         />
       </div>
     </template>

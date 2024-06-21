@@ -29,14 +29,14 @@
   const layerRadioOptions = [
     {
       title: 'Edge Cache',
-      value: 'edge_cache',
+      inputValue: 'edge_cache',
       subtitle: `Purge content from Azion's edge cache layer.`
     }
   ]
   const subscriptionLayerRadioOptions = [
     {
       title: 'Tiered Cache',
-      value: 'tiered_cache',
+      inputValue: 'tiered_cache',
       name: 'tiered-cache-layer',
       subtitle: `Purge content from Azion's tiered cache layer. Requires subscribing to this module.`
     }
@@ -48,7 +48,7 @@
     return [
       {
         title: 'Cache Key',
-        value: 'cachekey',
+        inputValue: 'cachekey',
         name: 'cachekey-purge-type',
         disabled: isLayerTieredCache.value,
         subtitle: `Enter a list of content cache keys to be purged.`,
@@ -59,14 +59,14 @@
       },
       {
         title: 'URL',
-        value: 'url',
+        inputValue: 'url',
         name: 'url-purge-type',
         hide: isLayerTieredCache.value,
         subtitle: `Enter a list of content URLs to be purged. Asterisks (*) in URLs are considered characters.`
       },
       {
         title: 'Wildcard',
-        value: 'wildcard',
+        inputValue: 'wildcard',
         name: 'wildcard-purge-type',
         hide: isLayerTieredCache.value,
         subtitle: `Enter a list of content URLs to be purged. Asterisks (*) are considered wildcard expressions.`

@@ -111,7 +111,11 @@
   }
 
   const showEmailToast = () => {
-    showToast('info', 'We have sent you a confirmation email.', 'Confirmation email')
+    showToast(
+      'info',
+      'Check your inbox and follow the instructions to verify this new email.',
+      'Confirmation email sent'
+    )
   }
 
   const successSubmit = () => {

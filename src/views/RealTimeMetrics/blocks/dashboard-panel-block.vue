@@ -62,7 +62,7 @@
 <template>
   <div class="flex flex-column mt-8 gap-4">
     <SelectButton
-      class="w-full whitespace-nowrap overflow-x-scroll"
+      class="w-full whitespace-nowrap overflow-x-auto"
       :modelValue="selectedDashboard"
       :options="dashboards"
       optionLabel="label"

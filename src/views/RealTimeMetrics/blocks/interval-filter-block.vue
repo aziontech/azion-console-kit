@@ -89,17 +89,19 @@
   const handleSelect = (offset) => {
     const [begin, end] = removeAmountOfHours(offset)
 
-    if (checkIfDatesAreEqual(begin, end)) return true
+    if (areDatesEqual(begin, end)) return true
 
     setDateTimeFilters(begin, end)
   }
 
-  const checkIfDatesAreEqual = (begin, end) => {
-    const isoBegin = begin.toISOString().slice(0, 13)
-    const isoEnd = end.toISOString().slice(0, 13)
+  const areDatesEqual = (begin, end) => {
+    const DATE_SLICE_END = 19 // YYYY-MM-DDTHH:MM:SS
 
-    const isoLastBegin = lastFilteredDate.value.begin.toISOString().slice(0, 13)
-    const isoLastEnd = lastFilteredDate.value.end.toISOString().slice(0, 13)
+    const isoBegin = begin.toISOString().slice(0, DATE_SLICE_END)
+    const isoEnd = end.toISOString().slice(0, DATE_SLICE_END)
+
+    const isoLastBegin = lastFilteredDate.value?.begin?.toISOString().slice(0, DATE_SLICE_END)
+    const isoLastEnd = lastFilteredDate.value?.end?.toISOString().slice(0, DATE_SLICE_END)
 
     return isoBegin === isoLastBegin && isoEnd === isoLastEnd
   }
@@ -112,7 +114,7 @@
       tsRangeEnd: end.resetUTC(props.userUTC).toBeholderFormat()
     }
 
-    if (lastFilteredDate.value?.begin && checkIfDatesAreEqual(begin, end)) return
+    if (areDatesEqual(begin, end)) return
 
     lastFilteredDate.value = { begin, end }
     setTimeRange({ ...tsRange })
@@ -171,6 +173,7 @@
         @change="dropdownChange"
         :loading="disabledFilter"
         :disabled="disabledFilter"
+        data-testid="real-time-metrics__interval-filter-block__dropdown"
       />
     </div>
     <div
@@ -192,6 +195,8 @@
         iconDisplay="input"
         :maxDate="maxDate"
         :class="classError"
+        data-testid="real-time-metrics__interval-filter-block__calendar"
+        :aria-valuenow="dates"
       />
       <small
         v-if="hasError && isVisibleCalendar"

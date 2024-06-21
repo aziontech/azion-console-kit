@@ -3,11 +3,10 @@
   import { computed, onMounted, ref, watch } from 'vue'
 
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
-  import Card from 'primevue/card'
   import Dropdown from 'primevue/dropdown'
   import InputMask from 'primevue/inputmask'
-  import InputSwitch from 'primevue/inputswitch'
   import FieldText from '@/templates/form-fields-inputs/fieldText'
+  import FieldSwitchBlock from '@/templates/form-fields-inputs/fieldSwitchBlock'
   import InputPassword from 'primevue/password'
   import FieldDropdown from '@/templates/form-fields-inputs/fieldDropdown'
 
@@ -36,8 +35,6 @@
   const { value: email } = useField('email')
   const { value: countryCallCode, errorMessage: errorCountryCallCode } = useField('countryCallCode')
   const { value: mobile, errorMessage: errorMobile } = useField('mobile')
-  const { value: twoFactorEnabled, errorMessage: errorTwoFactorEnabled } =
-    useField('twoFactorEnabled')
   const { value: password, errorMessage: errorPassword } = useField('password')
   const { value: oldPassword, errorMessage: errorOldPassword } = useField('oldPassword')
   const { value: confirmPassword, errorMessage: errorConfirmPassword } = useField('confirmPassword')
@@ -340,40 +337,15 @@
           {{ errorConfirmPassword }}
         </small>
       </div>
-      <Card
-        :pt="{
-          root: { class: 'shadow-none  rounded-none' },
-          body: { class: 'py-4 border-0' },
-          content: { class: 'ml-12' },
-          title: { class: 'flex items-center text-base m-0 gap-3 font-medium' },
-          subtitle: {
-            class: 'text-sm font-normal text-color-secondary m-0 pr-0 md:pr-[2.5rem]'
-          }
-        }"
-      >
-        <template #title>
-          <InputSwitch
-            :class="{ 'p-invalid': errorTwoFactorEnabled }"
-            :readonly="isForceMFA"
-            v-model="twoFactorEnabled"
-            inputId="twoFactor"
-          />
-          <div class="flex-col gap-1">
-            <label
-              for="twoFactor"
-              class="text-color text-sm font-normal"
-            >
-              Multi-Factor Authentication
-            </label>
-          </div>
-        </template>
-
-        <template #content>
-          <small class="text-color-secondary text-sm">
-            Accounts with MFA enabled can enforce mobile client authentication upon login.
-          </small>
-        </template>
-      </Card>
+      <FieldSwitchBlock
+        nameField="twoFactorEnabled"
+        name="twoFactorEnabled"
+        auto
+        :readonly="isForceMFA"
+        :isCard="false"
+        title="Multi-Factor Authentication"
+        subtitle="Multi-factor authentication adds an extra layer of security to your account. In addition to your username and password, you will need an application like Google Authenticator on your phone to get verification codes when prompted. Enabling multi-factor authentication, you MUST set up an account on Google Authenticator on your next login."
+      />
     </template>
   </FormHorizontal>
 </template>
