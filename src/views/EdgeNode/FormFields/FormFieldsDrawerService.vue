@@ -1,7 +1,8 @@
 <script setup>
   import { useAccountStore } from '@/stores/account'
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
-  import Dropdown from 'primevue/dropdown'
+  import FieldDropdown from '@/templates/form-fields-inputs/fieldDropdown'
+
   import { useField } from 'vee-validate'
   import { computed } from 'vue'
   defineOptions({ name: 'form-fields-drawer-service' })
@@ -17,7 +18,6 @@
     }
   })
 
-  const { value: service } = useField('service')
   const { value: variables, errorMessage: variablesError } = useField('variables')
 
   const editorOptions = computed(() => {
@@ -45,26 +45,20 @@
       <div class="flex flex-col w-full sm:max-w-3xl gap-2">
         <div class="flex flex-col gap-2">
           <div class="flex w-80 sm:max-w-lg flex-col items-start gap-2">
-            <label
-              for="name"
-              class="text-color text-sm not-italic font-medium leading-5"
-              >Service *</label
-            >
-            <Dropdown
-              filter
-              autoFilterFocus
-              appendTo="self"
-              class="flex self-stretch"
-              v-model="service"
+            <FieldDropdown
+              label="Service *"
+              name="service"
               :options="props.listServices"
               :loading="props.listServices.length === 0"
+              @change="resetRegionAndCity"
               :disabled="props.disabledFields"
               optionLabel="name"
-              placeholder="Select"
+              :value="country"
+              filter
+              class="w-full"
+              appendTo="self"
+              description="Select the service to be provisioned."
             />
-            <small class="text-xs text-color-secondary font-normal leading-5">
-              Select the service to be provisioned.
-            </small>
           </div>
         </div>
       </div>
