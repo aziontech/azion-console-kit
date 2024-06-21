@@ -5,6 +5,7 @@
   import { computed, ref, watch, inject } from 'vue'
   import { useRoute, useRouter } from 'vue-router'
   import { TOAST_LIFE } from '@/utils/constants'
+  import { useScrollToError } from '@/composables/useScrollToError'
 
   defineOptions({ name: 'edit-form-block' })
 
@@ -40,6 +41,7 @@
 
   const emit = defineEmits(['on-edit-success', 'on-edit-fail'])
 
+  const { scrollToError } = useScrollToError()
   const router = useRouter()
   const route = useRoute()
   const toast = useToast()
@@ -130,25 +132,7 @@
       }
     },
     ({ errors }) => {
-      const drawerOpen = document.querySelector('.p-sidebar-content[data-pc-section="content"]')
-
-      const view = drawerOpen ?? window
-      const errorKeys = Object.keys(errors)
-      const stringQuerySelector = errorKeys
-        .map((key) => {
-          return key.startsWith('monaco') ? `[name="${key}"] textarea` : `[name="${key}"]`
-        })
-        .join(', ')
-
-      const listEl = document.querySelectorAll(stringQuerySelector)
-      if (!listEl.length) return
-
-      const firstElError = listEl[0]
-      const MARGIN_TOP = 150
-      const elementPosition = firstElError.getBoundingClientRect().top + view.scrollY - MARGIN_TOP
-      view.scrollTo({ top: elementPosition, behavior: 'smooth' })
-      firstElError.focus({ preventScroll: true })
-      firstElError.click()
+      scrollToError(errors)
     }
   )
 
