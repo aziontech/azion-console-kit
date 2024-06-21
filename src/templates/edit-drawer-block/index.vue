@@ -8,6 +8,7 @@
   import FeedbackFish from '@/templates/navbar-block/feedback-fish'
   import DialogUnsavedBlock from '@/templates/dialog-unsaved-block'
   import { TOAST_LIFE } from '@/utils/constants'
+  import { useScrollToError } from '@/composables/useScrollToError'
 
   defineOptions({
     name: 'edit-drawer-block'
@@ -54,6 +55,7 @@
     initialValues: props.initialValues
   })
 
+  const { scrollToError } = useScrollToError()
   const toast = useToast()
   const blockViewRedirection = ref(true)
   const formDrawerHasUpdated = ref(false)
@@ -145,25 +147,7 @@
       }
     },
     ({ errors }) => {
-      const drawerOpen = document.querySelector('.p-sidebar-content[data-pc-section="content"]')
-
-      const view = drawerOpen ?? window
-      const errorKeys = Object.keys(errors)
-      const stringQuerySelector = errorKeys
-        .map((key) => {
-          return key.startsWith('monaco') ? `[name="${key}"] textarea` : `[name="${key}"]`
-        })
-        .join(', ')
-
-      const listEl = document.querySelectorAll(stringQuerySelector)
-      if (!listEl.length) return
-
-      const firstElError = listEl[0]
-      const MARGIN_TOP = 150
-      const elementPosition = firstElError.getBoundingClientRect().top + view.scrollY - MARGIN_TOP
-      view.scrollTo({ top: elementPosition, behavior: 'smooth' })
-      firstElError.focus({ preventScroll: true })
-      firstElError.click()
+      scrollToError(errors)
     }
   )
 
