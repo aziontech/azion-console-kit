@@ -44,7 +44,6 @@
   const emit = defineEmits(['on-response', 'on-response-fail'])
   const attrs = useAttrs()
   const { scrollToError } = useScrollToError()
-  const formRef = ref(null)
 
   const router = useRouter()
   const toast = useToast()
@@ -116,17 +115,14 @@
       }
     },
     ({ errors }) => {
-      scrollToError(formRef, errors)
+      scrollToError(errors)
     }
   )
 </script>
 
 <template>
   <div :class="classForm">
-    <form
-      class="w-full grow flex flex-col gap-8 max-md:gap-6"
-      ref="formRef"
-    >
+    <form class="w-full grow flex flex-col gap-8 max-md:gap-6">
       <slot
         name="form"
         :resetForm="resetForm"

@@ -41,7 +41,6 @@
     }
   })
 
-  const formRef = ref(null)
   const { scrollToError } = useScrollToError()
   const toast = useToast()
   const showGoBack = ref(false)
@@ -119,7 +118,7 @@
       }
     },
     ({ errors }) => {
-      scrollToError(formRef, errors)
+      scrollToError(errors)
     }
   )
 
@@ -144,7 +143,6 @@
       headercontent: { class: 'flex justify-content-between items-center w-full pr-2' },
       content: { class: 'p-8' }
     }"
-    :ref="({ content }) => (formRef = content)"
   >
     <template #header>
       <h2>{{ title }}</h2>

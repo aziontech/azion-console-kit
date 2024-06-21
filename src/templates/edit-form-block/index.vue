@@ -42,7 +42,6 @@
   const emit = defineEmits(['on-edit-success', 'on-edit-fail'])
 
   const { scrollToError } = useScrollToError()
-  const formRef = ref(null)
   const router = useRouter()
   const route = useRoute()
   const toast = useToast()
@@ -133,7 +132,7 @@
       }
     },
     ({ errors }) => {
-      scrollToError(formRef, errors)
+      scrollToError(errors)
     }
   )
 
@@ -146,7 +145,6 @@
       @submit.prevent="handleSubmit"
       class="w-full grow flex flex-col gap-8 max-md:gap-6"
       :class="{ 'mt-4': isTabs }"
-      ref="formRef"
     >
       <slot name="form" />
 
