@@ -1,5 +1,5 @@
 <script setup>
-  import { computed, toRef } from 'vue'
+  import { computed, ref, toRef } from 'vue'
   import { useField } from 'vee-validate'
   import InputText from 'primevue/inputtext'
 
@@ -41,7 +41,7 @@
       default: 'right'
     }
   })
-
+  const inputRef = ref(null)
   const nameInput = toRef(props, 'name')
 
   const {
@@ -55,6 +55,10 @@
 
   const iconPositionClass = computed(() => {
     return props.icon ? `p-input-icon-${props.iconPosition}` : ''
+  })
+
+  defineExpose({
+    inputRef
   })
 </script>
 
@@ -75,6 +79,7 @@
       class="text-color-secondary"
     />
     <InputText
+      ref="inputRef"
       :id="props.name"
       v-model="inputValue"
       :name="props.name"

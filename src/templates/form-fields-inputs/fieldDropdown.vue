@@ -33,7 +33,7 @@
       default: ''
     },
     optionDisabled: {
-      type: String,
+      type: [String, Function],
       default: ''
     },
     options: {

@@ -15,9 +15,9 @@
         :contactSalesEdgeApplicationService="contactSalesEdgeApplicationService"
       />
     </template>
-    <template #action-bar="{ onSubmit, onCancel, loading, values }">
+    <template #action-bar="{ onSubmit, formValid, onCancel, loading, values }">
       <ActionBarBlockWithTeleport
-        @onSubmit="formSubmit(onSubmit, values)"
+        @onSubmit="formSubmit(onSubmit, values, formValid)"
         @onCancel="onCancel"
         :loading="loading"
       />
@@ -98,8 +98,9 @@
       .track()
   }
 
-  const formSubmit = async (onSubmit, values) => {
+  const formSubmit = async (onSubmit, values, formValid) => {
     await onSubmit()
+    if (!formValid) return
     emit('updatedApplication', values)
   }
 </script>

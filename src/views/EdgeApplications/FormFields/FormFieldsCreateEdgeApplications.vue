@@ -3,6 +3,7 @@
   import FieldText from '@/templates/form-fields-inputs/fieldText'
   import PrimeButton from 'primevue/button'
   import Dropdown from 'primevue/dropdown'
+  import FieldDropdown from '@/templates/form-fields-inputs/fieldDropdown'
   import InputNumber from 'primevue/inputnumber'
   import MultiSelect from 'primevue/multiselect'
   import PrimeTag from 'primevue/tag'
@@ -312,47 +313,33 @@
         v-if="checkIsProtocol.https || checkIsProtocol.http3"
       >
         <div class="flex flex-col w-full sm:max-w-xs gap-2">
-          <label
-            for="tls-version"
-            class="text-color text-base font-medium"
-            >Minimum TLS version</label
-          >
-          <Dropdown
-            appendTo="self"
+          <FieldDropdown
+            label="Minimum TLS version"
+            name="minimumTlsVersion"
             :options="TLS_VERSIONS_OPTIONS"
-            v-model="minimumTlsVersion"
             optionLabel="label"
             optionValue="value"
+            :value="minimumTlsVersion"
+            inputId="minimumTlsVersion"
             placeholder="Select a minimum TLS Version"
             :disabled="checkIsProtocol.http"
+            description="Enable HTTP and HTTPS protocols to configure the minimum TLS version the application supports."
           />
-
-          <small class="text-xs text-color-secondary font-normal leading-5">
-            Enable HTTP and HTTPS protocols to configure the minimum TLS version the application
-            supports.
-          </small>
         </div>
 
         <div class="flex flex-col w-full sm:max-w-xs gap-2">
-          <label
-            for="ciphers-list"
-            class="text-color text-base font-medium"
-            >Cipher suite</label
-          >
-          <Dropdown
-            appendTo="self"
+          <FieldDropdown
+            label="Cipher suite"
+            name="supportedCiphers"
             :options="SUPPORTED_CIPHERS_LIST_OPTIONS"
-            v-model="supportedCiphers"
             optionLabel="label"
             optionValue="value"
+            :value="supportedCiphers"
+            inputId="supportedCiphers"
             placeholder="Select the supported cipher suite"
             :disabled="checkIsProtocol.http"
+            description="Select which cipher suite the application supports. See the list of supported ciphers in the documentation."
           />
-
-          <small class="text-xs text-color-secondary font-normal leading-5">
-            Select which cipher suite the application supports. See the list of supported ciphers in
-            the documentation.
-          </small>
         </div>
       </div>
     </template>
