@@ -29,6 +29,7 @@
   const { value: certificate } = useField('certificate')
   const { value: csr } = useField('csr')
   const { value: certificateType } = useField('certificateType')
+  const { value: managed } = useField('managed')
   const { value: privateKey, setValue: setPrivateKeyValue } = useField('privateKey')
 
   async function copyCSRToclipboard() {

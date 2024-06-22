@@ -53,7 +53,7 @@
   const { value: firstName } = useField('firstName')
   const { value: lastName } = useField('lastName')
   const { value: timezone } = useField('timezone')
-  const { value: language, errorMessage: errorLanguage } = useField('language')
+  const { value: language } = useField('language')
   const { value: email } = useField('email')
   const { value: countryCallCode, errorMessage: errorCountryCallCode } = useField('countryCallCode')
   const { value: mobile, errorMessage: errorMobile } = useField('mobile', null, {
@@ -215,8 +215,9 @@
           <label
             for="language"
             class="text-color text-base font-medium"
-            >Language</label
           >
+            Language
+          </label>
           <Dropdown
             appendTo="self"
             id="language"
@@ -224,7 +225,6 @@
             :options="optionsLanguage"
             optionLabel="label"
             optionValue="value"
-            :class="{ 'p-invalid': errorLanguage }"
             v-model="language"
             disabled
           >
@@ -257,8 +257,9 @@
         <label
           for="email"
           class="text-color text-base font-medium"
-          >Phone Number *</label
         >
+          Phone Number *
+        </label>
         <div class="flex gap-2">
           <div class="p-inputgroup">
             <Dropdown
@@ -319,8 +320,9 @@
         <label
           for="teams"
           class="text-color text-base font-medium"
-          >Teams</label
         >
+          Teams
+        </label>
         <MultiSelect
           display="chip"
           filter
