@@ -4,7 +4,7 @@
   import FieldTextArea from '@/templates/form-fields-inputs/fieldTextArea'
   import FieldText from '@/templates/form-fields-inputs/fieldText'
   import { useField } from 'vee-validate'
-  import { computed, ref, watch } from 'vue'
+  import { computed, watch } from 'vue'
 
   defineProps({
     certificateSelection: String
@@ -42,25 +42,25 @@
     }
   })
 
-  const certificateTypeRadioOptions = ref([
+  const certificateTypeRadioOptions = [
     {
       title: 'Import a server certificate',
       subtitle: 'Upload a TLS X.509 certificate and private key in PEM format.',
-      value: certificateTypesMap.EDGE_CERTIFICATE_UPLOAD
+      inputValue: certificateTypesMap.EDGE_CERTIFICATE_UPLOAD
     },
     {
       title: 'Request a certificate',
       subtitle:
         'Generate a Certificate Signing Request (CSR) to purchase a TLS digital certificate from a CA.',
-      value: certificateTypesMap.EDGE_CERTIFICATE_CSR
+      inputValue: certificateTypesMap.EDGE_CERTIFICATE_CSR
     },
     {
       title: 'Import a Trusted CA certificate',
       subtitle:
         'Upload a certificate in PEM format that can be used for mutual Transport Layer Security (mTLS).',
-      value: certificateTypesMap.TRUSTED
+      inputValue: certificateTypesMap.TRUSTED
     }
-  ])
+  ]
 
   watch(certificateType, () => {
     emit('update:certificateSelection', certificateType.value)
@@ -117,7 +117,6 @@
           label="Certificate"
           placeholder="-----BEGIN CERTIFICATE-----&#10;-----END CERTIFICATE-----"
           name="certificate"
-          rows="5"
           :value="certificate"
           description="Intermediate certificates are accepted."
         />
@@ -127,7 +126,6 @@
           label="Private Key"
           placeholder="-----BEGIN PRIVATE KEY-----&#10;-----END PRIVATE KEY-----"
           name="privateKey"
-          rows="5"
           :value="privateKey"
         />
       </div>
@@ -192,6 +190,7 @@
         <FieldText
           label="Email *"
           placeholder="example@email.com"
+          type="email"
           :value="email"
           name="email"
         />
@@ -211,10 +210,8 @@
           label="Subject Alternative Names (SAN) *"
           placeholder="www.example.com&#10;example.net&#10;mail.example.com&#10;support.example.com"
           name="subjectAlternativeNames"
-          rows="5"
           :value="subjectAlternativeNames"
-          description="Use line breaks to separate each SAN. Duplicate entries will be automatically
-          removed."
+          description="Use line breaks to separate each SAN. Duplicate entries will be automatically removed."
         />
       </div>
     </template>
@@ -223,7 +220,7 @@
   <FormHorizontal
     title="Import a Trusted CA certificate"
     description="Paste the PEM-encoded public Trusted CA certificate in the respective field."
-    v-if="isCertificateType.uploadCertificate"
+    v-if="isCertificateType.trustedCertificate"
   >
     <template #inputs>
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
@@ -231,7 +228,6 @@
           label="Certificate *"
           placeholder="-----BEGIN CERTIFICATE----&#10;-----END CERTIFICATE-----"
           name="certificate"
-          rows="5"
           :value="certificate"
           description="Intermediate certificates are accepted."
         />

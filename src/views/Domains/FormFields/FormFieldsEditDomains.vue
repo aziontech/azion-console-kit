@@ -240,7 +240,7 @@
         class="flex flex-col w-full sm:max-w-xs gap-2"
       >
         <FieldDropdown
-          label="Trusted CA Certificate"
+          label="Trusted CA Certificate *"
           name="mtlsTrustedCertificate"
           :options="trustedCACertificatesOptions"
           :loading="!trustedCACertificatesOptions.length"

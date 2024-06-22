@@ -161,7 +161,7 @@
           .required()
           .test('max', 'Exceeded number of characters.', (value) => value?.length <= 128)
           .test('noSpaces', 'Spaces not allowed.', (value) => !value?.match(/\s/g))
-          .test('requirements', '', (value) => {
+          .test('requirements', 'password does not meet the requirements', (value) => {
             const hasUpperCase = value && /[A-Z]/.test(value)
             const hasLowerCase = value && /[a-z]/.test(value)
             const hasSpecialChar = value && /[!@#$%^&*(),.?":{}|<>]/.test(value)

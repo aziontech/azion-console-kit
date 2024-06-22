@@ -201,7 +201,8 @@
             label="Timezone *"
             name="timezone"
             :options="optionsTimezone"
-            :loading="!timezone"
+            :loading="!timezone && !optionsTimezone.length"
+            :disabled="!timezone && !optionsTimezone.length"
             optionLabel="label"
             optionValue="value"
             :value="timezone"
@@ -334,6 +335,7 @@
           :maxSelectedLabels="5"
           :class="{ 'p-invalid': errorTeamsIds }"
           v-model="teamsIds"
+          name="teamsIds"
         />
         <small
           v-if="errorTeamsIds"

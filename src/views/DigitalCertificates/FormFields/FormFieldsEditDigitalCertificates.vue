@@ -25,7 +25,6 @@
   }
 
   const csrCopied = ref(false)
-
   const { value: name } = useField('name')
   const { value: certificate } = useField('certificate')
   const { value: csr } = useField('csr')
@@ -105,93 +104,70 @@
           <FieldText
             label="Name *"
             name="name"
-            :value="name"
             placeholder="My digital certificate"
+            :value="name"
+          />
           />
         </div>
         <div class="flex flex-col sm:max-w-lg w-full gap-2">
-          <label>Certificate </label>
-          <PrimeTextarea
-            v-model="certificate"
-            :class="{ 'p-invalid': certificateError }"
+          <FieldTextArea
+            label="Certificate"
             placeholder="For security purposes, the current certificate isn't exhibited, but it was correctly registered. Paste a new certificate in this field to update it."
+            name="certificate"
+            :value="certificate"
           />
-          <small
-            v-if="certificateError"
-            class="p-error text-xs font-normal leading-tight"
-            >{{ certificateError }}</small
-          >
         </div>
         <div class="flex flex-col sm:max-w-lg w-full gap-2">
-          <label>Certificate Signing Request (CSR) </label>
-          <PrimeTextarea
+          <FieldTextArea
+            label="Certificate Signing Request (CSR)"
+            placeholder="For security purposes, the current certificate isn't exhibited, but it was correctly registered. Paste a new certificate in this field to update it."
+            name="csr"
             disabled
-            v-model="csr"
-            :class="{ 'p-invalid': csrError }"
+            :value="csr"
           />
-          <small
-            v-if="csrError"
-            class="p-error text-xs font-normal leading-tight"
-            >{{ csrError }}</small
-          >
         </div>
         <div class="flex flex-col sm:max-w-lg w-full gap-2">
           <PrimeButton
             class="max-sm:w-full"
             type="button"
             severity="secondary"
-            :label="'Copy'"
+            label="Copy"
             @click="copyCSRToclipboard"
           />
           <small v-if="csrCopied">Copied successfully!</small>
         </div>
       </template>
     </FormHorizontal>
+
     <FormHorizontal
-      v-if="!csr && certificateType === certificateTypes.EDGE_CERTIFICATE"
+      v-if="isCertificateType.edgeCertificate"
       title="Update a Server Certificate"
       description="Paste the PEM-encoded TLS X.509 certificate and private key in the respective fields to update the certificate. The current certificate and private key are hidden to protect sensitive information."
     >
       <template #inputs>
         <div class="flex flex-col sm:max-w-lg w-full gap-2">
-          <label>Name *</label>
-          <InputText
-            v-model="name"
-            type="text"
+          <FieldText
+            label="Name *"
+            name="name"
+            :value="name"
             placeholder="My digital certificate"
-            :class="{ 'p-invalid': nameError }"
           />
-          <small
-            v-if="nameError"
-            class="p-error text-xs font-normal leading-tight"
-            >{{ nameError }}</small
-          >
         </div>
         <div class="flex flex-col sm:max-w-lg w-full gap-2">
-          <label>Certificate </label>
-          <PrimeTextarea
-            v-model="certificate"
-            :class="{ 'p-invalid': certificateError }"
+          <FieldTextArea
+            label="Certificate"
+            name="certificate"
+            :value="certificate"
             placeholder="For security purposes, the current certificate isn't exhibited, but it was correctly registered. Paste a new certificate in this field to update it."
           />
-          <small
-            v-if="certificateError"
-            class="p-error text-xs font-normal leading-tight"
-            >{{ certificateError }}</small
-          >
         </div>
         <div class="flex flex-col sm:max-w-lg w-full gap-2">
-          <label>Private Key </label>
-          <PrimeTextarea
-            v-model="privateKey"
-            :class="{ 'p-invalid': privateKeyError }"
-            placeholder="For security purposes, the current private key isn't exhibited, but it was correctly registered. Paste a new private key in this field to update it."
+          <FieldTextArea
+            label="Private Key"
+            name="privateKey"
+            :value="privateKey"
+            placeholder="For security purposes, the current certificate isn't exhibited, but it was correctly registered. Paste a new certificate in this field to update it."
           />
-          <small
-            v-if="privateKeyError"
-            class="p-error text-xs font-normal leading-tight"
-            >{{ privateKeyError }}</small
-          >
         </div>
       </template>
     </FormHorizontal>

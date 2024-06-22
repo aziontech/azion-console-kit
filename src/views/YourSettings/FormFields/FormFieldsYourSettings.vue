@@ -285,7 +285,9 @@
           @input="validation()"
           :feedback="false"
         />
-        <small class="p-error text-xs font-normal leading-tight">{{ errorPassword }}</small>
+        <small class="p-error text-xs font-normal leading-tight">
+          {{ errorPassword }}
+        </small>
 
         <label class="font-semibold text-sm my-2">Must have at least:</label>
         <ul class="text-color-secondary list-inside space-y-3">
