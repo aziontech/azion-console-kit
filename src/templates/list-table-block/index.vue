@@ -24,6 +24,7 @@
             <InputText
               class="h-8 w-full md:min-w-[320px]"
               v-model.trim="filters.global.value"
+              :data-testid="`search_input`"
               placeholder="Search"
             />
           </span>
@@ -32,6 +33,7 @@
               class="max-sm:w-full"
               @click="navigateToAddPage"
               icon="pi pi-plus"
+              :data-testid="`create_${addButtonLabel}_button`"
               :label="addButtonLabel"
               v-if="addButtonLabel"
             />

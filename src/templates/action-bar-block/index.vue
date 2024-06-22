@@ -57,6 +57,7 @@
             outlined
             class="max-md:min-w-max"
             @click="handleCancel"
+            :data-testid="`${props.secondaryActionLabel}_button`"
             :disabled="isDisabledCancel"
           />
           <PrimeButton
@@ -66,6 +67,7 @@
             icon-pos="right"
             class="max-md:w-full"
             :icon="calculateLoadIconByLoadingState"
+            :data-testid="`${props.primaryActionLabel}_button`"
             :disabled="isDisabledSubmit"
           />
         </slot>
