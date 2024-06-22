@@ -75,14 +75,14 @@
     {
       title: 'Enforce',
       subtitle: `Blocks the client certificate during the TLS handshake if the uploaded Trusted CA can't be validated.`,
-      value: 'enforce'
+      inputValue: 'enforce'
     },
     {
       title: 'Permissive',
       subtitle: `Attempts to verify the client certificate, but will allow the TLS handshake even if
               the Trusted CA can't be validated. Check which client certificate attempted the
               request in Edge Firewall, if necessary.`,
-      value: 'permissive'
+      inputValue: 'permissive'
     }
   ])
 
@@ -103,7 +103,7 @@
           name="name"
           placeholder="My domain"
           :value="name"
-          description="Give a unique and descriptive name to identify the domain."
+          description="This is an identification name for the domain. Once you save the configuration, the URL will be automatically generated."
         />
       </div>
     </template>
@@ -192,7 +192,7 @@
         class="flex flex-col w-full sm:max-w-xs gap-2"
       >
         <FieldDropdown
-          label="Trusted CA Certificate"
+          label="Trusted CA Certificate *"
           name="mtlsTrustedCertificate"
           :options="trustedCACertificatesOptions"
           :loading="!trustedCACertificatesOptions.length"

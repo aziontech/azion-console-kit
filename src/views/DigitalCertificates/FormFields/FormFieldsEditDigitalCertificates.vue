@@ -3,11 +3,17 @@
   import PrimeButton from 'primevue/button'
   import FieldText from '@/templates/form-fields-inputs/fieldText'
   import FieldTextArea from '@/templates/form-fields-inputs/fieldTextArea'
+
   import { useField } from 'vee-validate'
   import { ref, watch, computed } from 'vue'
+  import Divider from 'primevue/divider'
 
   const props = defineProps({
     clipboardWrite: {
+      type: Function,
+      required: true
+    },
+    documentationService: {
       type: Function,
       required: true
     }
@@ -19,16 +25,20 @@
   }
 
   const csrCopied = ref(false)
-
   const { value: name } = useField('name')
   const { value: certificate } = useField('certificate')
   const { value: csr } = useField('csr')
   const { value: certificateType } = useField('certificateType')
+  const { value: managed } = useField('managed')
   const { value: privateKey, setValue: setPrivateKeyValue } = useField('privateKey')
 
   async function copyCSRToclipboard() {
     await props.clipboardWrite(csr.value)
     csrCopied.value = true
+  }
+
+  const openDocumentation = async () => {
+    props.documentationService()
   }
 
   watch(privateKey, (privateKeyValue) => {
@@ -44,111 +54,150 @@
 </script>
 
 <template>
-  <FormHorizontal
-    v-if="csr"
-    title="Update CSR"
-    description="Submit the CSR to a certificate authority. Once the certificate is signed, paste the PEM-encoded certificate in the respective field. The current certificate is hidden to protect sensitive information."
-  >
-    <template #inputs>
-      <div class="flex flex-col sm:max-w-lg w-full gap-2">
-        <FieldText
-          label="Name *"
-          name="name"
-          placeholder="My digital certificate"
-          :value="name"
-        />
-      </div>
-      <div class="flex flex-col sm:max-w-lg w-full gap-2">
-        <FieldTextArea
-          label="Certificate"
-          placeholder="For security purposes, the current certificate isn't exhibited, but it was correctly registered. Paste a new certificate in this field to update it."
-          name="certificate"
-          rows="5"
-          :value="certificate"
-        />
-      </div>
-      <div class="flex flex-col sm:max-w-lg w-full gap-2">
-        <FieldTextArea
-          label="Certificate Signing Request (CSR)"
-          placeholder="For security purposes, the current certificate isn't exhibited, but it was correctly registered. Paste a new certificate in this field to update it."
-          name="csr"
-          disabled
-          rows="5"
-          :value="csr"
-        />
-      </div>
-      <div class="flex flex-col sm:max-w-lg w-full gap-2">
-        <PrimeButton
-          class="max-sm:w-full"
-          type="button"
-          severity="secondary"
-          :label="'Copy'"
-          @click="copyCSRToclipboard"
-        />
-        <small v-if="csrCopied">Copied successfully!</small>
-      </div>
-    </template>
-  </FormHorizontal>
-  <FormHorizontal
-    v-if="isCertificateType.edgeCertificate"
-    title="Update a Server Certificate"
-    description="Paste the PEM-encoded TLS X.509 certificate and private key in the respective fields to update the certificate. The current certificate and private key are hidden to protect sensitive information."
-  >
-    <template #inputs>
-      <div class="flex flex-col sm:max-w-lg w-full gap-2">
-        <FieldText
-          label="Name *"
-          name="name"
-          :value="name"
-          placeholder="My digital certificate"
-        />
-      </div>
-      <div class="flex flex-col sm:max-w-lg w-full gap-2">
-        <FieldTextArea
-          label="Certificate"
-          name="certificate"
-          :value="certificate"
-          placeholder="For security purposes, the current certificate isn't exhibited, but it was correctly registered. Paste a new certificate in this field to update it."
-          rows="5"
-        />
-      </div>
-      <div class="flex flex-col sm:max-w-lg w-full gap-2">
-        <FieldTextArea
-          label="Private Key"
-          name="privateKey"
-          :value="privateKey"
-          placeholder="For security purposes, the current certificate isn't exhibited, but it was correctly registered. Paste a new certificate in this field to update it."
-          rows="5"
-        />
-      </div>
-    </template>
-  </FormHorizontal>
+  <template v-if="managed">
+    <FormHorizontal title="Let's encrypt certificate">
+      <template #description>
+        <p>This is a Let's Encrypt™ certificate automatically created and managed by Azion.</p>
 
-  <!-- Trusted case -->
-  <FormHorizontal
-    v-if="isCertificateType.trustedCertificate"
-    title="Update Trusted CA Certificate"
-    description="Paste the PEM-encoded Trusted CA certificate in the respective field to update the certificate. The current certificate is hidden to protect sensitive information."
-  >
-    <template #inputs>
-      <div class="flex flex-col sm:max-w-lg w-full gap-2">
-        <FieldText
-          label="Name *"
-          name="name"
-          placeholder="My digital certificate"
-          :value="name"
-        />
-      </div>
-      <div class="flex flex-col sm:max-w-lg w-full gap-2">
-        <FieldTextArea
-          label="Certificate"
-          name="certificate"
-          :value="certificate"
-          placeholder="For security purposes, the current certificate isn't exhibited, but it was correctly registered. Paste a new certificate in this field to update it."
-          rows="5"
-          description="Intermediate certificates are accepted."
-        />
-      </div>
-    </template>
-  </FormHorizontal>
+        <p>
+          Azion's Certificate Manager is currently verifying if the Domain is correctly pointed by
+          CNAME in the DNS.
+        </p>
+
+        <Divider />
+
+        <div class="flex flex-wrap items-center">
+          <p>
+            If you have not yet pointed a DNS zone, please check the
+            <PrimeButton
+              link
+              class="w-fit p-0 text-sm"
+              icon-pos="right"
+              icon="pi pi-external-link"
+              label="Documentation"
+              @click="openDocumentation"
+            />
+          </p>
+        </div>
+      </template>
+      <template #inputs>
+        <div class="flex flex-col sm:max-w-lg w-full gap-2">
+          <FieldText
+            label="Name *"
+            name="name"
+            disabled
+            :value="name"
+            placeholder="My digital certificate"
+          />
+        </div>
+      </template>
+    </FormHorizontal>
+  </template>
+
+  <template v-else>
+    <FormHorizontal
+      v-if="csr"
+      title="Update CSR"
+      description="Submit the CSR to a certificate authority. Once the certificate is signed, paste the PEM-encoded certificate in the respective field. The current certificate is hidden to protect sensitive information."
+    >
+      <template #inputs>
+        <div class="flex flex-col sm:max-w-lg w-full gap-2">
+          <FieldText
+            label="Name *"
+            name="name"
+            placeholder="My digital certificate"
+            :value="name"
+          />
+          />
+        </div>
+        <div class="flex flex-col sm:max-w-lg w-full gap-2">
+          <FieldTextArea
+            label="Certificate"
+            placeholder="For security purposes, the current certificate isn't exhibited, but it was correctly registered. Paste a new certificate in this field to update it."
+            name="certificate"
+            :value="certificate"
+          />
+        </div>
+        <div class="flex flex-col sm:max-w-lg w-full gap-2">
+          <FieldTextArea
+            label="Certificate Signing Request (CSR)"
+            placeholder="For security purposes, the current certificate isn't exhibited, but it was correctly registered. Paste a new certificate in this field to update it."
+            name="csr"
+            disabled
+            :value="csr"
+          />
+        </div>
+        <div class="flex flex-col sm:max-w-lg w-full gap-2">
+          <PrimeButton
+            class="max-sm:w-full"
+            type="button"
+            severity="secondary"
+            label="Copy"
+            @click="copyCSRToclipboard"
+          />
+          <small v-if="csrCopied">Copied successfully!</small>
+        </div>
+      </template>
+    </FormHorizontal>
+
+    <FormHorizontal
+      v-if="isCertificateType.edgeCertificate"
+      title="Update a Server Certificate"
+      description="Paste the PEM-encoded TLS X.509 certificate and private key in the respective fields to update the certificate. The current certificate and private key are hidden to protect sensitive information."
+    >
+      <template #inputs>
+        <div class="flex flex-col sm:max-w-lg w-full gap-2">
+          <FieldText
+            label="Name *"
+            name="name"
+            :value="name"
+            placeholder="My digital certificate"
+          />
+        </div>
+        <div class="flex flex-col sm:max-w-lg w-full gap-2">
+          <FieldTextArea
+            label="Certificate"
+            name="certificate"
+            :value="certificate"
+            placeholder="For security purposes, the current certificate isn't exhibited, but it was correctly registered. Paste a new certificate in this field to update it."
+          />
+        </div>
+        <div class="flex flex-col sm:max-w-lg w-full gap-2">
+          <FieldTextArea
+            label="Private Key"
+            name="privateKey"
+            :value="privateKey"
+            placeholder="For security purposes, the current certificate isn't exhibited, but it was correctly registered. Paste a new certificate in this field to update it."
+          />
+        </div>
+      </template>
+    </FormHorizontal>
+
+    <!-- Trusted case -->
+    <FormHorizontal
+      v-if="isCertificateType.trustedCertificate"
+      title="Update Trusted CA Certificate"
+      description="Paste the PEM-encoded Trusted CA certificate in the respective field to update the certificate. The current certificate is hidden to protect sensitive information."
+    >
+      <template #inputs>
+        <div class="flex flex-col sm:max-w-lg w-full gap-2">
+          <FieldText
+            label="Name *"
+            name="name"
+            placeholder="My digital certificate"
+            :value="name"
+          />
+        </div>
+        <div class="flex flex-col sm:max-w-lg w-full gap-2">
+          <FieldTextArea
+            label="Certificate"
+            name="certificate"
+            :value="certificate"
+            placeholder="For security purposes, the current certificate isn't exhibited, but it was correctly registered. Paste a new certificate in this field to update it."
+            description="Intermediate certificates are accepted."
+          />
+        </div>
+      </template>
+    </FormHorizontal>
+  </template>
 </template>

@@ -13,7 +13,8 @@
           <InlineMessage
             class="w-fit"
             severity="info"
-            >Create a Let's Encrypt™ digital certificate directly from
+          >
+            Create a Let's Encrypt™ digital certificate directly from
             <PrimeButton
               link
               size="small"
@@ -66,13 +67,13 @@
   const createDigitalCertificateService = props.createDigitalCertificatesService
   const createCSRService = props.createDigitalCertificatesCSRService
 
-  const certificateTypes = ref({
+  const certificateTypes = {
     EDGE_CERTIFICATE_UPLOAD: 'edge_certificate',
     EDGE_CERTIFICATE_CSR: 'generateCSR',
     TRUSTED: 'trusted_ca_certificate'
-  })
+  }
   const CSRConditionalValidations = {
-    is: certificateTypes.value.EDGE_CERTIFICATE_CSR,
+    is: certificateTypes.EDGE_CERTIFICATE_CSR,
     then: (schema) => schema.required('Field Required')
   }
 
@@ -99,7 +100,7 @@
   })
 
   const certificateRequiredField = (certificateType) => {
-    const isTrustedCA = certificateType === certificateTypes.value.TRUSTED
+    const isTrustedCA = certificateType === certificateTypes.TRUSTED
 
     return isTrustedCA
   }
@@ -119,7 +120,7 @@
     // CSR Fields
     common: yup.string().when('certificateType', CSRConditionalValidations),
     country: yup.string().when('certificateType', {
-      is: certificateTypes.value.EDGE_CERTIFICATE_CSR,
+      is: certificateTypes.EDGE_CERTIFICATE_CSR,
       then: (schema) =>
         schema
           .required('Country/Region is a required field.')
@@ -138,7 +139,7 @@
       .when('certificateType', CSRConditionalValidations)
       .label('private key type'),
     email: yup.string().when('certificateType', {
-      is: certificateTypes.value.EDGE_CERTIFICATE_CSR,
+      is: certificateTypes.EDGE_CERTIFICATE_CSR,
       then: (schema) => schema.required('Email is a required field.').email()
     }),
     subjectAlternativeNames: yup
@@ -153,7 +154,7 @@
 
   watch(certificateSelection, () => {
     const isEdgeCertificateCSR =
-      certificateSelection.value === certificateTypes.value.EDGE_CERTIFICATE_CSR
+      certificateSelection.value === certificateTypes.EDGE_CERTIFICATE_CSR
 
     createServiceBySelectedType.value = isEdgeCertificateCSR
       ? createCSRService

@@ -87,7 +87,8 @@
         copy: copyDomain
       },
       onClose: () => {
-        router.push({ name: 'list-domains' })
+        router.push({ path: value.urlToEditView })
+        renderToastDomainCreateSuccesfully()
       }
     })
     tracker.product.productCreated({
@@ -114,6 +115,17 @@
         detail: 'The Domain could not be copied to clipboard. Please try again.'
       })
     }
+  }
+
+  const renderToastDomainCreateSuccesfully = () => {
+    const toastConfig = {
+      closable: true,
+      severity: 'success',
+      life: TOAST_LIFE,
+      summary: 'Succesfully created',
+      detail: 'The domain is now available in the Domain management section.'
+    }
+    toast.add({ ...toastConfig })
   }
 
   const handleTrackFailedCreation = (error) => {

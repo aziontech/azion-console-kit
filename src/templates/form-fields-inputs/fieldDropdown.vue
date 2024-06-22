@@ -121,7 +121,7 @@
     appendTo="self"
     :id="name"
     :name="props.name"
-    :loading="loading"
+    :loading="props.loading"
     v-model="inputValue"
     :options="props.options"
     :optionLabel="props.optionLabel"
@@ -134,7 +134,7 @@
     @blur="emitBlur"
     :class="{ 'p-invalid': errorMessage }"
     v-bind="$attrs"
-    :disabled="disabled"
+    :disabled="props.disabled"
     :pt="{
       filterInput: {
         class: 'w-full'
