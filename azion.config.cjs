@@ -208,10 +208,12 @@ const backRules = [
     description: 'Routes GraphQL queries for cities to the specific cities origin.',
     match: '^/graphql/cities/',
     behavior: {
+      forwardCookies: true,
       setOrigin: {
         name: 'origin-cities',
         type: 'single_origin'
       },
+      rewrite: '/graphql/',
       setCache: 'Cities - Cache'
     }
   },
