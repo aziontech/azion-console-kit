@@ -128,6 +128,7 @@ export default function FillResultQuery({ tsRangeFilter, data }) {
   const tsRangeDifference = getTsRangeDifference(tsRange)
   const queryInterval = getQueryInterval(tsRangeDifference)
 
+  if (!data?.length) return []
   const resetResults = [...data].map((item) => resetResult(item))
   const defaultResults = generateDefaultResults(tsRange, resetResults[0], queryInterval)
   const filteredResults = replaceItemByTimestamp(data, defaultResults)

@@ -7,7 +7,7 @@
   >
     <template #selector>
       <PrimeCheckbox
-        :disabled="disabled"
+        :disabled="props.disabled"
         :inputId="props.name"
         :name="props.name"
         @click="stopPropagation"
@@ -97,7 +97,7 @@
   }
 
   const clickCard = (event) => {
-    if (props.binary) {
+    if (props.binary && !props.disabled) {
       stopPropagation(event)
       handleChange(!inputValue.value)
       return

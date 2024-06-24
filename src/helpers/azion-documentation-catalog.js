@@ -49,5 +49,7 @@ export const documentationGuideProducts = {
     openDocumentationProducts('real-time-events/#activity-history'),
   edgeServicesResources: () =>
     openDocumentationProducts('edge-orchestrator/edge-services/#resources'),
-  edgeDnsRecordTypes: () => openDocumentationProducts('secure/edge-dns/#type')
+  edgeDnsRecordTypes: () => openDocumentationProducts('secure/edge-dns/#type'),
+  generateLetsEncryptCertificate: () =>
+    openDocumentationProducts('guides/how-to-generate-a-lets-encrypt-certificate')
 }

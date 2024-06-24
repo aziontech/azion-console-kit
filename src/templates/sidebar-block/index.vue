@@ -14,6 +14,7 @@
       'bg-header hover:bg-header-button-hover': !showSidebar
     }"
     v-tooltip.bottom="{ value: 'Menu', showDelay: 200 }"
+    data-testid="sidebar-block__toggle-button"
   />
 
   <Sidebar

@@ -270,11 +270,6 @@
       label: 'Contact Support',
       link: `${makeContactSupportUrl()}/tickets/`,
       isLinkExternal: true
-    },
-    {
-      label: 'Send Feedback',
-      link: 'mailto:feedback@azion.com',
-      isLinkExternal: false
     }
   ])
 

@@ -141,6 +141,7 @@
   >
     <template #default>
       <PrimeButton
+        class="max-md:w-full w-fit"
         severity="secondary"
         label="Edge Application"
         @click="goToEdgeApplication"

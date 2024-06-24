@@ -77,15 +77,19 @@ export default async function LoadDatasetAvailableFilters(dataset) {
   let data = []
 
   try {
-    const { __type: type } = await loadRealTimeMetricsData({
+    const result = await loadRealTimeMetricsData({
       query: graphqlQuery,
       signal: abortController.signal
     })
-    data = type
+
+    if (result?.__type) {
+      data = result.__type
+    }
   } catch {
     return []
   }
 
+  if (!data.inputFields) return []
   const availableFilters = data.inputFields
     .filter(verifyWhitelistFields)
     .filter(verifyBlacklistFields)

@@ -4,6 +4,9 @@
       :home="generateHomeBreadCrumb"
       :model="breadcrumbs.items"
       class="-ml-1.5 overflow-auto w-full"
+      :pt="{
+        label: { class: 'whitespace-nowrap' }
+      }"
     />
     <div class="flex w-full py-4 items-center justify-between flex-wrap gap-3">
       <div

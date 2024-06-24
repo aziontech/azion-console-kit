@@ -14,7 +14,7 @@
       type: Function,
       required: true
     },
-    isEnableApplicationAccelerator: {
+    isApplicationAcceleratorEnabled: {
       required: true,
       type: Boolean
     },
@@ -38,7 +38,7 @@
       type: Function,
       required: true
     },
-    showTieredCache: {
+    isTieredCacheEnabled: {
       type: Boolean,
       required: true
     }
@@ -99,12 +99,12 @@
 <template>
   <Drawer
     ref="drawerRef"
-    :isEnableApplicationAccelerator="props.isEnableApplicationAccelerator"
+    :isApplicationAcceleratorEnabled="props.isApplicationAcceleratorEnabled"
     :edgeApplicationId="props.edgeApplicationId"
     :createService="props.createCacheSettingsService"
     :loadService="props.loadCacheSettingsService"
     :editService="props.editCacheSettingsService"
-    :showTieredCache="props.showTieredCache"
+    :showTieredCache="props.isTieredCacheEnabled"
     @onSuccess="reloadList"
   />
 
@@ -138,6 +138,7 @@
   >
     <template #default>
       <PrimeButton
+        class="max-md:w-full w-fit"
         severity="secondary"
         icon="pi pi-plus"
         label="Cache Setting"

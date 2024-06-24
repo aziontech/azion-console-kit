@@ -4,6 +4,7 @@
     :selected="checked"
     :nameId="props.name"
     @change="changeState"
+    :inputClass="props.selectorClass"
   >
     <template #selector>
       <InputSwitch
@@ -12,6 +13,7 @@
         :name="props.name"
         @change="stopPropagation"
         v-model="inputValue"
+        :readonly="readonly"
       />
     </template>
     <template #footer>
@@ -66,10 +68,20 @@
     name: {
       type: String,
       required: true
+    },
+    value: {
+      type: Boolean
+    },
+    readonly: {
+      type: Boolean
+    },
+    selectorClass: {
+      type: String
     }
   })
 
   const { nameField } = toRefs(props)
+  const emit = defineEmits(['onSwitchChange'])
 
   const {
     value: inputValue,
@@ -84,6 +96,7 @@
   const stopPropagation = (event) => {
     event.preventDefault()
     event.stopPropagation()
+    emit('onSwitchChange', inputValue.value)
   }
 
   const changeState = (event) => {

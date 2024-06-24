@@ -56,7 +56,8 @@ export const digitalCertificatesRoutes = {
         editDigitalCertificateService: DigitalCertificatesService.editDigitalCertificateService,
         loadDigitalCertificateService: DigitalCertificatesService.loadDigitalCertificateService,
         updatedRedirect: 'list-digital-certificates',
-        clipboardWrite: Helpers.clipboardWrite
+        clipboardWrite: Helpers.clipboardWrite,
+        documentationService: Helpers.documentationGuideProducts.generateLetsEncryptCertificate
       },
       meta: {
         breadCrumbs: [

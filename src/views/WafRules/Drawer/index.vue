@@ -154,10 +154,10 @@
         <div class="flex flex-col sm:flex-row w-full gap-3 sm:gap-8">
           <div class="w-full sm:w-1/2 flex flex-col gap-3">
             <div class="flex justify-between w-full gap-3">
-              <span class="w-1/2 text-color">Domain</span>
+              <span class="w-1/2 text-color font-medium">Domain</span>
               <div class="flex flex-col w-1/2">
                 <span
-                  class="w-full text-color-secondary whitespace-pre-line"
+                  class="w-full text-color-secondary break-all"
                   v-for="(domain, index) in props.domains"
                   :key="index"
                   >{{ domain }}
@@ -165,17 +165,17 @@
               </div>
             </div>
             <div class="flex justify-between w-full gap-3">
-              <span class="w-1/2 text-color">IP Address</span>
+              <span class="w-1/2 text-color font-medium">IP Address</span>
               <span class="w-1/2 text-color-secondary"></span>
             </div>
           </div>
           <div class="w-full sm:w-1/2 flex flex-col gap-3">
             <div class="flex justify-between w-full gap-3">
-              <span class="w-1/2 text-color">Network List</span>
+              <span class="w-1/2 text-color font-medium">Network List</span>
               <span class="w-1/2 text-color-secondary">{{ netWorkList }}</span>
             </div>
             <div class="flex justify-between w-full gap-3">
-              <span class="w-1/2 text-color">Country</span>
+              <span class="w-1/2 text-color font-medium">Country</span>
               <span class="w-1/2 text-color-secondary"></span>
             </div>
           </div>
@@ -233,7 +233,7 @@
                   <div class="flex flex-col sm:flex-row gap-3 sm:gap-8">
                     <div class="flex w-full sm:w-1/2 flex-col gap-3">
                       <div class="w-full flex justify-between">
-                        <div class="w-1/2 flex flex-col text-color">
+                        <div class="w-1/2 flex flex-col text-color font-medium">
                           <span>Top 10 IPs Address</span>
                         </div>
                         <div class="flex w-1/2 flex-col text-color-secondary">
@@ -245,11 +245,12 @@
                         </div>
                       </div>
                       <div class="flex justify-between">
-                        <div class="flex flex-col text-color w-1/2">
+                        <div class="flex flex-col text-color font-medium w-1/2">
                           <span>Top 10 Paths</span>
                         </div>
-                        <div class="flex w-1/2 flex-col">
+                        <div class="flex flex-col w-1/2">
                           <span
+                            class="break-all"
                             v-for="(path, index) in attack.topPaths"
                             :key="index"
                             :class="{
@@ -263,7 +264,7 @@
                     </div>
                     <div class="flex w-full sm:w-1/2 flex-col gap-3">
                       <div class="w-full flex justify-between">
-                        <div class="flex w-1/2 flex-col text-color">
+                        <div class="flex w-1/2 flex-col text-color font-medium">
                           <span>Top 10 Countries</span>
                         </div>
                         <div class="flex w-1/2 flex-col text-color-secondary">
@@ -275,7 +276,7 @@
                         </div>
                       </div>
                       <div class="w-full flex justify-between">
-                        <div class="flex w-1/2 gap-3 flex-col text-color">
+                        <div class="flex w-1/2 gap-3 flex-col text-color font-medium">
                           <span>Total Hits</span>
                           <span>Total IPs</span>
                           <span>Total Countries</span>

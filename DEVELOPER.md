@@ -153,7 +153,7 @@ yarn test:unit
 
 ### Executar testes e2e com [Cypress](https://www.cypress.io/)
 
-Antes de executar seus testes com Cypress, duplique o arquivo cypress.env.example.json, renomeie a cópia recém criada para cypress.env.json e preencha as variáveis com dados válidos ao ambiente que seus testes irão usar ( APIs de stage ou produção ).
+Antes de executar seus testes com Cypress, duplique o arquivo `cypress.env.example.json`, renomeie a cópia recém criada para `cypress.env.json` e preencha as variáveis com dados válidos ao ambiente que seus testes irão usar ( APIs de stage ou produção ).
 
 Para executar testes com interface
 

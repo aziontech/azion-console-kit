@@ -1,6 +1,6 @@
 <script setup>
   import InputText from 'primevue/inputtext'
-  import InputSwitch from 'primevue/inputswitch'
+  import FieldSwitchBlock from '@/templates/form-fields-inputs/fieldSwitchBlock'
   import Splitter from 'primevue/splitter'
   import SplitterPanel from 'primevue/splitterpanel'
   import TabView from 'primevue/tabview'
@@ -31,7 +31,6 @@
   const { value: jsonArgs, errorMessage: jsonArgsError } = useField('jsonArgs')
   const { value: code, errorMessage: codeError } = useField('code')
   const { value: language } = useField('language')
-  const { value: active } = useField('active')
 
   let initialCodeValue = ''
   let initialJsonArgsValue = ARGS_INITIAL_STATE
@@ -141,15 +140,13 @@
       >
         <template #inputs>
           <div class="flex w-full sm:max-w-lg gap-2">
-            <InputSwitch
-              v-model="active"
-              inputId="active"
+            <FieldSwitchBlock
+              nameField="active"
+              name="active"
+              auto
+              :isCard="false"
+              title="Active"
             />
-            <label
-              for="active"
-              class="text-color-secondary text-sm font-normal"
-              >Active
-            </label>
           </div>
         </template>
       </FormHorizontal>

@@ -21,10 +21,14 @@ const adapt = (httpResponse) => {
   body.https_port.forEach((port) => {
     httpsPorts.push(HTTPS_PORT_LIST_OPTIONS.find((el) => el.value == port))
   })
+
+  const isHttp3Protocol = body.delivery_protocol === 'http,https' && body.http3
+  const deliveryProtocol = isHttp3Protocol ? 'http3' : body.delivery_protocol
+
   const parsedBody = {
     id: body.id,
     name: body.name,
-    deliveryProtocol: body.delivery_protocol,
+    deliveryProtocol: deliveryProtocol,
     httpPort: httpPorts,
     httpsPort: httpsPorts,
     minimumTlsVersion: body.minimum_tls_version || 'none',

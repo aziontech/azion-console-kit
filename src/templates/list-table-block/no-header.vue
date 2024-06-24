@@ -201,6 +201,7 @@
   import DeleteDialog from './dialog/delete-dialog'
 
   defineOptions({ name: 'list-table-block' })
+  import { TOAST_LIFE } from '@/utils/constants'
 
   const emit = defineEmits(['on-load-data', 'authorize', 'on-select-data'])
   const props = defineProps({
@@ -330,11 +331,7 @@
       data.value = response
     } catch (error) {
       data.value = []
-      toast.add({
-        closable: true,
-        severity: 'error',
-        summary: error
-      })
+      showToast('error', error)
     } finally {
       isLoading.value = false
     }
@@ -385,6 +382,22 @@
     }
   }
 
+  const showToast = (severity, detail) => {
+    if (!detail) return
+    const options = {
+      closable: true,
+      severity,
+      summary: severity,
+      detail
+    }
+
+    if (severity === 'success') {
+      options.life = TOAST_LIFE
+    }
+
+    toast.add(options)
+  }
+
   const updatedTable = () => {
     loadData({ page: 1 })
   }
@@ -396,17 +409,9 @@
       await props.onReorderService(tableData)
       data.value = event.value
 
-      toast.add({
-        closable: true,
-        severity: 'success',
-        summary: 'Reorder saved'
-      })
+      showToast('success', 'Reorder saved')
     } catch (error) {
-      toast.add({
-        closable: true,
-        severity: 'error',
-        summary: error
-      })
+      showToast('error', error)
     } finally {
       isLoading.value = false
     }

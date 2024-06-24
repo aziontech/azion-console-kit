@@ -51,6 +51,8 @@
               >Service *</label
             >
             <Dropdown
+              filter
+              autoFilterFocus
               appendTo="self"
               class="flex self-stretch"
               v-model="service"
@@ -58,7 +60,6 @@
               :loading="props.listServices.length === 0"
               :disabled="props.disabledFields"
               optionLabel="name"
-              filter
               placeholder="Select"
             />
             <small class="text-xs text-color-secondary font-normal leading-5">

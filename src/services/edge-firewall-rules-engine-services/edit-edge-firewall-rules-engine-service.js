@@ -49,9 +49,11 @@ const parseBehaviors = (behaviors) => {
       case 'set_custom_response':
         return {
           name: behavior.name,
-          status_code: behavior.status_code,
-          content_type: behavior.content_type,
-          content_body: behavior.content_body
+          argument: {
+            status_code: behavior.status_code,
+            content_type: behavior.content_type,
+            content_body: behavior.content_body
+          }
         }
       default:
         return {

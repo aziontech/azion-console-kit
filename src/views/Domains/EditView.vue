@@ -11,6 +11,8 @@
         :cleanFormCallback="resetForm"
         :updatedRedirect="updatedRedirect"
         :initialValues="initialValues"
+        @on-edit-success="handleTrackEditEvent"
+        @on-edit-fail="handleTrackFailEditEvent"
       >
         <template #form>
           <FormFieldsEditDomains
@@ -35,7 +37,7 @@
 </template>
 
 <script setup>
-  import { ref, onMounted } from 'vue'
+  import { ref, onMounted, inject } from 'vue'
 
   import EditFormBlock from '@/templates/edit-form-block'
   import FormFieldsEditDomains from './FormFields/FormFieldsEditDomains.vue'
@@ -44,6 +46,10 @@
   import ActionBarTemplate from '@/templates/action-bar-block/action-bar-with-teleport'
   import * as yup from 'yup'
   import { useToast } from 'primevue/usetoast'
+  import { handleTrackerError } from '@/utils/errorHandlingTracker'
+
+  /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
+  const tracker = inject('tracker')
 
   const props = defineProps({
     editDomainService: {
@@ -72,6 +78,24 @@
     }
   })
 
+  const handleTrackEditEvent = () => {
+    tracker.product.productEdited({
+      productName: 'Domain'
+    })
+  }
+
+  const handleTrackFailEditEvent = (error) => {
+    const { fieldName, message } = handleTrackerError(error)
+    tracker.product
+      .failedToEdit({
+        productName: 'Domain',
+        errorType: 'api',
+        fieldName: fieldName.trim(),
+        errorMessage: message
+      })
+      .track()
+  }
+
   const edgeApps = ref([])
   const digitalCertificates = ref([])
   const toast = useToast()
@@ -96,7 +120,7 @@
   }
   const copyDomainName = ({ name }) => {
     props.clipboardWrite(name)
-    showToast('success', 'domain name copied')
+    showToast('success', 'Domain copied to clipboard!')
   }
 
   onMounted(async () => {
@@ -109,7 +133,17 @@
 
   const validationSchema = yup.object({
     id: yup.string().required(),
-    name: yup.string().required(),
+    name: yup
+      .string()
+      .required()
+      .test(
+        'only-ascii',
+        'Invalid characters. Use letters, numbers, and standard symbols, with no accents.',
+        function (value) {
+          const nameRegex = /^[\x20-\x21\x23-\x7E]+$/
+          return nameRegex.test(value)
+        }
+      ),
     domainName: yup.string().required(),
     active: yup.boolean(),
     cnames: yup

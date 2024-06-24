@@ -117,9 +117,10 @@
 <template>
   <label
     :for="props.name"
-    class="text-color text-base font-medium leading-5"
-    >{{ props.label }} {{ labelSufix }}</label
+    class="text-color text-sm font-medium leading-5"
   >
+    {{ props.label }} {{ labelSufix }}
+  </label>
   <Dropdown
     appendTo="self"
     :id="name"
@@ -131,6 +132,7 @@
     :filter="props.filter"
     :optionValue="props.optionValue"
     :placeholder="props.placeholder"
+    :autoFilterFocus="props.filter"
     @change="emitChange"
     @blur="emitBlur"
     :class="inputClass"

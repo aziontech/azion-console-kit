@@ -49,7 +49,10 @@
     countryCallCode: yup.string().required().label('Country'),
     mobile: yup.string().max(20).required().label('Phone Number'),
     isAccountOwner: yup.boolean(),
-    teamsIds: yup.array(),
+    teamsIds: yup.array().when('isAccountOwner', {
+      is: false,
+      then: (schema) => schema.min(1, 'Must select at least one team')
+    }),
     twoFactorEnabled: yup.boolean()
   })
 

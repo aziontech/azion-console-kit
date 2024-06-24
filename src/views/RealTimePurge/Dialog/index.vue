@@ -64,7 +64,7 @@
       }"
     >
       <template #header>
-        <h5 class="text-lg not-italic font-bold leading-5">Confirme Purge</h5>
+        <h5 class="text-lg not-italic font-bold leading-5">Confirm Repurge</h5>
       </template>
       <div class="flex flex-col gap-3.5">
         <Message

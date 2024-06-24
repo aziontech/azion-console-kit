@@ -138,6 +138,7 @@
     >
       <template #default>
         <PrimeButton
+          class="max-md:w-full w-fit"
           severity="secondary"
           icon="pi pi-plus"
           label="Resource"

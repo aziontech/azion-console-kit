@@ -3,11 +3,10 @@
   import { computed, onMounted, ref, watch } from 'vue'
 
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
-  import Card from 'primevue/card'
   import Dropdown from 'primevue/dropdown'
   import InputMask from 'primevue/inputmask'
-  import InputSwitch from 'primevue/inputswitch'
   import InputText from 'primevue/inputtext'
+  import FieldSwitchBlock from '@/templates/form-fields-inputs/fieldSwitchBlock'
   import InputPassword from 'primevue/password'
 
   const props = defineProps({
@@ -35,8 +34,6 @@
   const { value: email, errorMessage: errorEmail } = useField('email')
   const { value: countryCallCode, errorMessage: errorCountryCallCode } = useField('countryCallCode')
   const { value: mobile, errorMessage: errorMobile } = useField('mobile')
-  const { value: twoFactorEnabled, errorMessage: errorTwoFactorEnabled } =
-    useField('twoFactorEnabled')
   const { value: password, errorMessage: errorPassword } = useField('password')
   const { value: oldPassword, errorMessage: errorOldPassword } = useField('oldPassword')
   const { value: confirmPassword, errorMessage: errorConfirmPassword } = useField('confirmPassword')
@@ -151,9 +148,10 @@
             >Timezone *</label
           >
           <Dropdown
+            filter
+            autoFilterFocus
             appendTo="self"
             id="timezone"
-            filter
             :options="optionsTimezone"
             optionLabel="label"
             optionValue="value"
@@ -218,8 +216,9 @@
         <small
           id="name-help"
           class="p-error"
-          >{{ errorEmail }}</small
         >
+          {{ errorEmail }}
+        </small>
       </div>
 
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
@@ -231,16 +230,22 @@
         <div class="flex gap-2">
           <div class="p-inputgroup">
             <Dropdown
+              filter
+              autoFilterFocus
               appendTo="self"
               id="countryCallCode"
-              filter
               :options="filteredCountriesMobile"
               optionLabel="labelFormat"
-              placeholder="Loading..."
               :loading="isLoadingCountry"
+              :disabled="isLoadingCountry"
               :class="{ 'p-invalid': errorCountryCallCode }"
               class="w-2/3 surface-border border-r-0"
               v-model="selectedCountryCallCode"
+              :pt="{
+                filterInput: {
+                  class: 'w-full'
+                }
+              }"
             >
               <template #option="{ option }">
                 {{ option.label }}
@@ -251,20 +256,22 @@
               date="phone"
               v-model="mobile"
               class="w-full"
+              :disabled="isLoadingCountry"
               mask="?99999999999999999999"
               placeholder="5500999999999"
-              :class="{ 'p-invalid': errorMobile || !countryCallCode }"
+              :class="{ 'p-invalid': errorMobile }"
             />
           </div>
         </div>
         <small class="text-xs text-color-secondary font-normal leading-5">
-          The phone number of the user. Include country and region code.</small
-        >
+          The phone number of the user. Include country and region code.
+        </small>
         <small
           id="name-help"
           class="p-error"
-          >{{ errorMobile }}</small
         >
+          {{ errorMobile }}
+        </small>
       </div>
     </template>
   </FormHorizontal>
@@ -355,39 +362,15 @@
           >{{ errorConfirmPassword }}</small
         >
       </div>
-      <Card
-        :pt="{
-          root: { class: 'shadow-none  rounded-none' },
-          body: { class: 'py-4 border-0' },
-          content: { class: 'ml-12' },
-          title: { class: 'flex items-center text-base m-0 gap-3 font-medium' },
-          subtitle: {
-            class: 'text-sm font-normal text-color-secondary m-0 pr-0 md:pr-[2.5rem]'
-          }
-        }"
-      >
-        <template #title>
-          <InputSwitch
-            :class="{ 'p-invalid': errorTwoFactorEnabled }"
-            :readonly="isForceMFA"
-            v-model="twoFactorEnabled"
-            inputId="twoFactor"
-          />
-          <div class="flex-col gap-1">
-            <label
-              for="twoFactor"
-              class="text-color text-sm font-normal"
-              >Multi-Factor Authentication</label
-            >
-          </div>
-        </template>
-
-        <template #content>
-          <small class="text-color-secondary text-sm">
-            Accounts with MFA enabled can enforce mobile client authentication upon login.
-          </small>
-        </template>
-      </Card>
+      <FieldSwitchBlock
+        nameField="twoFactorEnabled"
+        name="twoFactorEnabled"
+        auto
+        :readonly="isForceMFA"
+        :isCard="false"
+        title="Multi-Factor Authentication"
+        subtitle="Multi-factor authentication adds an extra layer of security to your account. In addition to your username and password, you will need an application like Google Authenticator on your phone to get verification codes when prompted. Enabling multi-factor authentication, you MUST set up an account on Google Authenticator on your next login."
+      />
     </template>
   </FormHorizontal>
 </template>

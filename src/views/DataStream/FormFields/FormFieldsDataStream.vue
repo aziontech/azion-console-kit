@@ -86,8 +86,8 @@
           v-model:value="dataSet"
           language="json"
           :theme="theme"
-          :options="optionsMonacoEditor"
-          class="min-h-[100px] surface-border border rounded-sm overflow-hidden"
+          :options="dataSetMonacoOptions"
+          class="min-h-[300px] surface-border border rounded-sm overflow-hidden"
         />
         <small class="text-xs text-color-secondary font-normal leading-5">
           Exhibits or allows writing the variables that'll be sent to the connector in a JSON
@@ -152,6 +152,7 @@
   <FormHorizontal
     v-if="domainOption === '1'"
     title="Sampling"
+    class="hidden"
     description="Enable this option to reduce costs of data collection and analysis."
   >
     <template #inputs>
@@ -346,14 +347,14 @@
 
         <div class="flex sm:max-w-lg w-full gap-2 items-top">
           <InputSwitch
-            v-model="tlsOption"
-            id="tlsOption"
+            v-model="useTls"
+            id="useTls"
             class="flex-shrink-0 flex-grow"
-            :class="{ 'p-invalid': tlsOptionError }"
+            :class="{ 'p-invalid': useTlsError }"
           />
           <div class="flex flex-col gap-1">
             <label
-              for="tlsOption"
+              for="useTls"
               class="text-sm font-normal leading-tight"
               >Enable Transport Layer Security (TLS)</label
             >
@@ -621,8 +622,8 @@
             v-model:value="serviceAccountKey"
             language="json"
             :theme="theme"
-            :options="optionsMonacoEditor"
-            class="min-h-[100px] surface-border border rounded-md overflow-hidden"
+            :options="serviceAccountMonacoOptions"
+            class="min-h-[300px] surface-border border rounded-md overflow-hidden"
           />
           <small class="text-xs text-color-secondary font-normal leading-5">
             JSON file provided by Google Cloud used to authenticate with Google services.
@@ -1114,8 +1115,8 @@
           :class="{ 'p-invalid': payloadFormatError }"
         />
         <small class="text-color-secondary text-xs font-normal leading-tight">
-          Character that'll be used at the end of each log line. The "\n" escape sequence breaks
-          values into different lines in NDJSON format.
+          The format that payload will be sent. The $dataset variable will be replaced by all logs
+          already with the log line separator applied.
         </small>
         <small
           id="data-set-help"
@@ -1136,8 +1137,8 @@
           :class="{ 'p-invalid': lineSeparatorError }"
         />
         <small class="text-color-secondary text-xs font-normal leading-tight">
-          The format that payload will be sent. The $dataset variable will be replaced by all logs
-          already with the log line separator applied.
+          Character that'll be used at the end of each log line. The "\n" escape sequence breaks
+          values into different lines in NDJSON format.
         </small>
         <small
           id="max-size-help"
@@ -1242,6 +1243,7 @@
   useField('status')
   const { value: name, errorMessage: nameError } = useField('name')
   const { value: dataSource, errorMessage: dataSourceError } = useField('dataSource')
+  const { value: dataSet } = useField('dataSet')
   const { value: template, errorMessage: templateError } = useField('template')
   const { value: domainOption } = useField('domainOption')
   const { value: domains } = useField('domains')
@@ -1261,7 +1263,7 @@
   const { value: bootstrapServers, errorMessage: bootstrapServersError } =
     useField('bootstrapServers')
   const { value: kafkaTopic, errorMessage: kafkaTopicError } = useField('kafkaTopic')
-  const { value: tlsOption, errorMessage: tlsOptionError } = useField('tlsOption')
+  const { value: useTls, errorMessage: useTlsError } = useField('useTls')
 
   // s3
   const { value: host, errorMessage: hostError } = useField('host')
@@ -1313,7 +1315,6 @@
   const { value: blobToken, errorMessage: blobTokenError } = useField('blobToken')
 
   const listTemplates = ref([])
-  const dataSet = ref('')
 
   const loaderDataStreamTemplates = async () => {
     const templates = await props.listDataStreamTemplateService()
@@ -1340,13 +1341,19 @@
     headers.value.splice(index, 1)
   }
 
-  const insertDataSet = (templateID) => {
+  const insertDataSet = (templateID, isFirstRender) => {
     const index = listTemplates.value.map((el) => el.value).indexOf(templateID)
     try {
-      const dataSetJSON = JSON.parse(listTemplates.value[index].template)
-      dataSet.value = JSON.stringify(dataSetJSON, null, '\t')
+      if (templateID === 'CUSTOM_TEMPLATE' && !isFirstRender) {
+        dataSet.value = ''
+      } else {
+        const dataSetJSON = JSON.parse(listTemplates.value[index].template)
+        dataSet.value = JSON.stringify(dataSetJSON, null, '\t')
+      }
     } catch (exception) {
-      dataSet.value = listTemplates.value[index].template
+      if (!dataSet.value || templateID !== 'CUSTOM_TEMPLATE') {
+        dataSet.value = listTemplates.value[index].template
+      }
     }
   }
 
@@ -1357,19 +1364,24 @@
     return store.currentTheme === 'light' ? 'vs' : 'vs-dark'
   })
 
-  const optionsMonacoEditor = computed(() => {
-    return {
-      minimap: { enabled: false },
-      wordWrap: 'on',
-      tabSize: 2,
-      formatOnPaste: true
-    }
-  })
+  const DEFAULT_MONACO_OPTIONS = {
+    minimap: { enabled: false },
+    wordWrap: 'on',
+    tabSize: 2,
+    formatOnPaste: true
+  }
+  const dataSetMonacoOptions = ref({ ...DEFAULT_MONACO_OPTIONS })
+  const serviceAccountMonacoOptions = ref({ ...DEFAULT_MONACO_OPTIONS })
 
   watch(
     () => template.value,
-    (templateID) => {
-      if (templateID) insertDataSet(templateID)
+    (newValue, oldValue) => {
+      const templateID = newValue
+      const isFirstRender = !oldValue
+      if (templateID) insertDataSet(templateID, isFirstRender)
+
+      const isReadOnlyIfCustomTemplate = templateID !== 'CUSTOM_TEMPLATE'
+      dataSetMonacoOptions.value.readOnly = isReadOnlyIfCustomTemplate
     }
   )
 
@@ -1388,8 +1400,8 @@
   )
 
   const initializeFormValues = async () => {
-    const template = await loaderDataStreamTemplates()
     const domains = await loaderDataStreamDomains()
+    const template = await loaderDataStreamTemplates()
 
     if (props.resetForm) {
       const initialValues = {
@@ -1414,7 +1426,7 @@
         // Kafka
         bootstrapServers: '',
         kafkaTopic: '',
-        tlsOption: false,
+        useTls: false,
 
         // s3
         host: '',
@@ -1468,18 +1480,18 @@
     }
   }
 
-  const domainsRadioOptions = ref([
+  const domainsRadioOptions = [
     {
       title: 'All Current and Future Domains',
-      value: '1',
+      inputValue: '1',
       subtitle:
         'By selecting the All Current and Future Domains option, you can activate the Sampling option.'
     },
     {
       title: 'Filter Domains',
-      value: '0'
+      inputValue: '0'
     }
-  ])
+  ]
 
   onMounted(() => {
     initializeFormValues()

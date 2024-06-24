@@ -22,7 +22,7 @@
     modal
     header="New"
     :pt="{
-      root: { class: ' hidden w-full max-w-screen-2xl h-screen sm:flex' },
+      root: { class: 'hidden w-full max-w-screen-2xl h-screen sm:flex' },
       content: { class: 'h-full' },
       mask: { class: 'hidden sm:flex' }
     }"
@@ -31,7 +31,10 @@
     @update:visible="closeCreateModalStore()"
   >
     <div>
-      <MakeCreateModalBlock @closeModal="closeCreateModalStore()" />
+      <MakeCreateModalBlock
+        v-if="!isMobile"
+        @closeModal="closeCreateModalStore()"
+      />
     </div>
   </PrimeDialog>
 
@@ -61,7 +64,10 @@
         </div>
       </div>
     </template>
-    <MakeCreateModalBlock @closeModal="closeCreateModalStore()" />
+    <MakeCreateModalBlock
+      v-if="isMobile"
+      @closeModal="closeCreateModalStore()"
+    />
   </Sidebar>
 </template>
 
@@ -84,6 +90,7 @@
   const createModalStore = useCreateModalStore()
   const currentWidth = inject('currentWidth')
   const SCREEN_BREAKPOINT_MD = 768
+  const SCREEN_BREAKPOINT_SM = 640
 
   const openCreateModalToggle = () => {
     tracker.create.createEventInHomeAndHeader({ url: route.path, location: 'header' }).track()
@@ -99,6 +106,10 @@
       return 'Create'
     }
     return ''
+  })
+
+  const isMobile = computed(() => {
+    return currentWidth.value < SCREEN_BREAKPOINT_SM
   })
 
   const createModalIsOpen = computed(() => {

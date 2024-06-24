@@ -410,7 +410,7 @@ $calendarCellDateBorderRadius: 50%;
 
 /// Border of a calendar date cell
 /// @group form
-$calendarCellDateBorder: 1px solid transparent;
+$calendarCellDateBorder: 2px solid transparent;
 
 /// Background of a calendar date cell in hover state
 /// @group form
@@ -418,15 +418,15 @@ $calendarCellDateHoverBg: rgba($primaryColor, 0.06);
 
 /// Background of a calendar date cell indicating today
 /// @group form
-$calendarCellDateTodayBg: #f4f4f4;
+$calendarCellDateTodayBg: transparent;
 
 /// Border color of a calendar date cell indicating today
 /// @group form
-$calendarCellDateTodayBorderColor: transparent;
+$calendarCellDateTodayBorderColor: rgba($primaryColor, 1);
 
 /// Text color of a calendar date cell indicating today
 /// @group form
-$calendarCellDateTodayTextColor: #1e1e1e;
+$calendarCellDateTodayTextColor: $textColor;
 
 /// Padding of the calendar button bar
 /// @group form

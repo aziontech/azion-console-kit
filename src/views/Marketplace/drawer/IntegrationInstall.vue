@@ -234,6 +234,8 @@
                     >Edge Application *
                   </label>
                   <Dropdown
+                    filter
+                    autoFilterFocus
                     appendTo="self"
                     id="edge_application"
                     :disabled="warnToCreate"
@@ -244,7 +246,6 @@
                     optionValue="value"
                     class="w-full"
                     placeholder="Select an edge application"
-                    filter
                     filterIcon="pi pi-search"
                     emptyMessage="No edge application found with integrations to install or update."
                     :pt="{ emptyMessage: { class: 'text-sm' }, list: { class: 'pb-0' } }"

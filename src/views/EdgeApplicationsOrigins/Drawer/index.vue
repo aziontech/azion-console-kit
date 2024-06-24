@@ -40,7 +40,7 @@
       type: Function,
       required: true
     },
-    isLoadBalancer: {
+    isLoadBalancerEnabled: {
       type: Boolean,
       required: true
     }
@@ -62,7 +62,7 @@
     {
       label: 'Load Balancer',
       value: 'load_balancer',
-      disabled: !props.isLoadBalancer
+      disabled: !props.isLoadBalancerEnabled
     },
     {
       label: 'Edge Storage',

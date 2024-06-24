@@ -103,7 +103,7 @@
     title="More Details"
   >
     <template #body>
-      <div class="w-full flex flex-col gap-8">
+      <div class="w-full flex flex-col gap-8 max-md:gap-6">
         <InfoSection
           :title="details.host"
           :date="details.ts"
@@ -137,14 +137,14 @@
 
               <BigNumber
                 label="Bytes Sent"
-                sufix="ms"
+                sufix="bytes"
                 :tooltipMessage="bytesSentTooltip"
                 >{{ details.bytesSent }}
               </BigNumber>
 
               <BigNumber
                 label="Request Length"
-                sufix="ms"
+                sufix="bytes"
                 :tooltipMessage="requestLengthTooltip"
                 >{{ details.requestLength }}</BigNumber
               >

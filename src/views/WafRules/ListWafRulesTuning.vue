@@ -23,11 +23,12 @@
       class="w-full sm:max-w-xs"
     />
     <Dropdown
+      filter
+      autoFilterFocus
       appendTo="self"
       optionValue="value"
       optionLabel="name"
       placeholder="Select network list"
-      filter
       showClear
       :options="netWorkListOptions.options"
       v-model="valueNetwork"
@@ -67,6 +68,7 @@
   >
     <template #default>
       <PrimeButton
+        class="max-md:w-full w-fit"
         severity="secondary"
         icon="pi pi-plus"
         label="Domain"

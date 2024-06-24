@@ -10,14 +10,33 @@ export const loadScriptRunnerExecutionResultsService = async (executionId) => {
   return parseHttpResponse(httpResponse)
 }
 
+const adapt = (httpResponse) => {
+  const { result } = httpResponse.body
+
+  return {
+    result: {
+      domain: {
+        id: result.domain.id,
+        url: `https://${result.domain.url}`
+      },
+      edgeApplication: {
+        id: result.edge_application.id,
+        name: result.edge_application.name
+      },
+      extras: result.extras
+    }
+  }
+}
+
 const parseHttpResponse = (httpResponse) => {
   switch (httpResponse.statusCode) {
-    case 200:
+    case 200: {
       const hasErrors = httpResponse.body.result.errors || httpResponse.body.result.error
       if (hasErrors) {
         throw new Error(httpResponse.body.result.message).message
       }
-      return httpResponse.body
+      return adapt(httpResponse)
+    }
     case 400:
       throw new Errors.NotFoundError().message
     case 401:

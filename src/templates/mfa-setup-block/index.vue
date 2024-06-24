@@ -41,7 +41,7 @@
             :value="qrCode?.url"
             level="H"
             :size="250"
-            class="w-[10rem] h-[10rem] sm:w-[12.5rem] sm:h-[12.5rem] rounded-md surface-border border p-2"
+            class="bg-white w-[10rem] h-[10rem] sm:w-[12.5rem] sm:h-[12.5rem] rounded-md surface-border border p-2"
           />
         </div>
 

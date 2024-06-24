@@ -19,7 +19,8 @@ const adapt = async (httpResponse) => {
   const parsedVariable = {
     id: payload.id,
     name: payload.name,
-    template: payload.template_id,
+    template: payload.template_id ?? 'CUSTOM_TEMPLATE',
+    dataSet: payload?.template_model,
     dataSource: payload.data_source,
     domainOption: payload.all_domains ? '1' : '0',
     status: payload.active,
@@ -51,7 +52,8 @@ const getInfoByEndpoint = (payload) => {
     case 'kafka':
       return {
         kafkaTopic: payload.endpoint.kafka_topic,
-        bootstrapServers: payload.endpoint.bootstrap_servers
+        bootstrapServers: payload.endpoint.bootstrap_servers,
+        useTls: payload.endpoint.use_tls
       }
     case 's3':
       return {

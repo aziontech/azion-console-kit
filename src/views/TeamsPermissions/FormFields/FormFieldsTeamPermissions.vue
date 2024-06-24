@@ -5,8 +5,8 @@
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
   import InputText from 'primevue/inputtext'
   import PickList from 'primevue/picklist'
-  import InputSwitch from 'primevue/inputswitch'
   import { useField } from 'vee-validate'
+  import FieldSwitchBlock from '@/templates/form-fields-inputs/fieldSwitchBlock'
 
   const props = defineProps({
     listPermissionService: {
@@ -18,7 +18,6 @@
   const permissionsList = ref([])
 
   const { value: name, errorMessage: errorName } = useField('name')
-  const { value: isActive } = useField('isActive')
   const { value: permissions } = useField('permissions')
 
   const isAlreadySelected = ({ alreadySelectedPermissionsIds, id }) => {
@@ -129,24 +128,14 @@
   </FormHorizontal>
   <FormHorizontal title="Status">
     <template #inputs>
-      <div class="flex flex-col w-full gap-2">
-        <div
-          class="flex gap-6 md:align-items-center max-sm:flex-col max-sm:align-items-baseline max-sm:gap-3"
-        >
-          <span class="p-input-icon-right w-full flex max-w-lg items-start gap-2 pb-3 pt-2">
-            <InputSwitch
-              v-model="isActive"
-              id="active"
-            />
-            <div class="flex-col gap-1">
-              <span class="text-color text-sm font-normal leading-5">Active</span>
-            </div>
-          </span>
-        </div>
-        <small class="text-xs text-color-secondary font-normal leading-5">
-          Activate or deactivate the team permissions for all users assigned to the team.
-        </small>
-      </div>
+      <FieldSwitchBlock
+        nameField="isActive"
+        name="active"
+        auto
+        :isCard="false"
+        title="Active"
+        subtitle="Activate or deactivate the team permissions for all users assigned to the team."
+      />
     </template>
   </FormHorizontal>
 </template>

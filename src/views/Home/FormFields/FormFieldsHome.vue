@@ -22,7 +22,7 @@
     <label
       for="name"
       class="text-color text-sm font-medium"
-      >Name</label
+      >Full Name *</label
     >
     <InputText
       v-model="name"
@@ -42,7 +42,7 @@
     <label
       for="email"
       class="text-color text-sm font-medium"
-      >Email</label
+      >Email *</label
     >
     <InputText
       v-model="email"
@@ -62,7 +62,7 @@
     <label
       for="team"
       class="text-color text-sm font-medium"
-      >Team</label
+      >Team *</label
     >
     <Dropdown
       appendTo="self"

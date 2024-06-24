@@ -70,7 +70,13 @@
     countryCallCode: yup.string().required('Country is a required field.'),
     mobile: yup.string().required('Phone Number is a required field.').max(20),
     isAccountOwner: yup.boolean(),
-    teamsIds: yup.array(),
+    teamsIds: yup
+      .array()
+      .min(1, 'Must select at least one team')
+      .when('isAccountOwner', {
+        is: true,
+        then: () => yup.array()
+      }),
     twoFactorEnabled: yup.boolean()
   })
 </script>

@@ -36,13 +36,20 @@
     description="The script waits until the loading event is completed before downloading and running the RUM Client. The loading event isn’t interrupted and doesn’t affect the user experience."
   >
     <template #inputs>
-      <vue-monaco-editor
-        v-model:value="defaultTagCode"
-        language="javascript"
-        :theme="theme"
-        :options="editorOptions"
-        class="min-h-[200px] overflow-clip surface-border border rounded-md"
-      />
+      <div>
+        <div class="flex flex-col gap-2 w-[99.9%]">
+          <vue-monaco-editor
+            v-model:value="defaultTagCode"
+            language="javascript"
+            :theme="theme"
+            :options="editorOptions"
+            class="min-h-[200px] overflow-clip surface-border border rounded-md p-disabled"
+          />
+          <small class="text-xs text-color-secondary font-normal leading-5">
+            Cannot edit in read-only editor
+          </small>
+        </div>
+      </div>
       <div>
         <PrimeButton
           label="Copy"

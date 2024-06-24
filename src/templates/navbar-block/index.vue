@@ -29,7 +29,10 @@
       <div class="flex gap-2 items-center ml-auto">
         <Create />
         <Help />
-        <FeedbackFish />
+        <FeedbackFish
+          class="text-white border-header bg-header hover:bg-header-button-hover"
+          :outlined="false"
+        />
         <ProfileBlock />
       </div>
     </div>

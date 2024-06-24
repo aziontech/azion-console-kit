@@ -1,9 +1,15 @@
 import { AxiosHttpClientAdapter, parseHttpResponse } from '../axios/AxiosHttpClientAdapter'
 import { makeTeamPermissionBaseUrl } from './make-team-permission-base-url'
 
-export const listTeamPermissionService = async () => {
+export const listTeamPermissionService = async ({
+  orderBy = 'id',
+  sort = 'asc',
+  page = 1,
+  pageSize = 200
+} = {}) => {
+  const searchParams = makeSearchParams({ orderBy, sort, page, pageSize })
   let httpResponse = await AxiosHttpClientAdapter.request({
-    url: `${makeTeamPermissionBaseUrl()}`,
+    url: `${makeTeamPermissionBaseUrl()}?${searchParams.toString()}`,
     method: 'GET'
   })
 
@@ -47,4 +53,14 @@ const adapt = (httpResponse) => {
     body: parsedTeamPermission,
     statusCode: httpResponse.statusCode
   }
+}
+
+const makeSearchParams = ({ orderBy, sort, page, pageSize }) => {
+  const searchParams = new URLSearchParams()
+  searchParams.set('order_by', orderBy)
+  searchParams.set('sort', sort)
+  searchParams.set('page', page)
+  searchParams.set('page_size', pageSize)
+
+  return searchParams
 }

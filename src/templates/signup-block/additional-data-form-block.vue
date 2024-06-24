@@ -325,7 +325,7 @@
     return options?.map((option) => {
       return {
         title: option.value,
-        value: option.value
+        inputValue: option.value
       }
     })
   }

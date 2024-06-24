@@ -28,7 +28,7 @@
                       class="text-primary text-xl whitespace-nowrap font-medium"
                       v-else-if="isSuccessfullyFinished"
                     >
-                      {{ results.edge_application.name }}
+                      {{ results.edgeApplication.name }}
                     </span>
                     <span
                       class="text-primary text-xl font-medium whitespace-nowrap"
@@ -43,7 +43,7 @@
                       link
                       :pt="{
                         root: { class: 'justify-center' },
-                        label: { class: 'grow-0' }
+                        label: { class: 'grow-0 truncate' }
                       }"
                       class="px-0 py-1"
                       :label="results.domain.url"
@@ -196,7 +196,6 @@
   const handleFinish = async () => {
     try {
       const response = await props.getResultsService(route.params.id)
-      deployStore.removeStartTime()
       results.value = response.result
       toast.add({
         closable: true,
@@ -212,6 +211,8 @@
         summary: 'Creation Failed',
         detail: failMessage
       })
+    } finally {
+      deployStore.removeStartTime()
     }
 
     if (!solutionStore.solution) {
@@ -223,8 +224,12 @@
       return
     }
 
-    if ('edge_application' in results.value) {
-      handleTrackCreation()
+    if ('edgeApplication' in results.value) {
+      handleTrackCreation('Edge Application')
+    }
+
+    if ('domain' in results.value) {
+      handleTrackCreation('Domain')
     }
     tracker.create.eventDeployed(solutionStore.solution).track()
   }
@@ -272,16 +277,16 @@
   }
 
   const goToUrl = () => {
-    props.windowOpen('https://' + results.value.domain.url, '_blank')
+    props.windowOpen(results.value.domain.url, '_blank')
   }
 
   const goToAnalytics = () => {
     router.push({ name: 'real-time-metrics' })
   }
 
-  const handleTrackCreation = () => {
+  const handleTrackCreation = (productName) => {
     const trackerData = {
-      productName: 'Edge Application',
+      productName,
       from: 'create',
       createdFrom: 'template',
       ...solutionStore?.solution
@@ -292,7 +297,11 @@
   const startTimer = () => {
     deployStartTime.value = deployStore.getStartTime
     const MILISEC_IN_SEC = 1000
-    const timerInitialValue = Math.trunc((Date.now() - deployStartTime.value) / MILISEC_IN_SEC)
+    const timerInitialValue =
+      deployStartTime.value !== null
+        ? Math.trunc((Date.now() - deployStartTime.value) / MILISEC_IN_SEC)
+        : 0
+
     timer.value = timerInitialValue
     intervalRef.value = setInterval(() => {
       timer.value += 1
@@ -304,7 +313,7 @@
   }
 
   const goToEdgeApplicationEditView = () => {
-    router.push(`/edge-applications/edit/${results.value.edge_application.id}`)
+    router.push(`/edge-applications/edit/${results.value.edgeApplication.id}`)
   }
 
   const goToDomainEditView = () => {
@@ -312,6 +321,10 @@
   }
 
   onMounted(() => {
+    if (!deployStore.getStartTime) {
+      deployStore.addStartTime()
+    }
+
     executionId.value = route.params.id
     applicationName.value = deployStore.getApplicationName
     startTimer()

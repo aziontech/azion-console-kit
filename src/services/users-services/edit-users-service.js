@@ -45,9 +45,10 @@ const parseHttpResponse = (httpResponse) => {
       return 'Your user has been updated'
     case 401:
       throw new Errors.InvalidApiTokenError().message
-    case 400:
+    case 400: {
       const apiError = getFirstApiError(httpResponse.body)
       throw new Error(apiError).message
+    }
     case 403:
       throw new Errors.PermissionError().message
     case 404:

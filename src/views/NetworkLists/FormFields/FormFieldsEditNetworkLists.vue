@@ -176,6 +176,7 @@
           v-model="itemsValuesCountry"
           :options="countriesList"
           filter
+          autoFilterFocus
           optionLabel="name"
           optionValue="value"
           placeholder="Select Countries"

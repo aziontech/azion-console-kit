@@ -48,6 +48,7 @@
   const filteredCountriesMobile = ref([])
   const { account } = storeToRefs(store)
   const optionsLanguage = ref([{ label: 'English', value: 'en' }])
+  const loadingCountry = ref(true)
 
   const { value: firstName, errorMessage: errorFirstName } = useField('firstName')
   const { value: lastName, errorMessage: errorLastName } = useField('lastName')
@@ -55,7 +56,9 @@
   const { value: language, errorMessage: errorLanguage } = useField('language')
   const { value: email, errorMessage: errorEmail } = useField('email')
   const { value: countryCallCode, errorMessage: errorCountryCallCode } = useField('countryCallCode')
-  const { value: mobile, errorMessage: errorMobile } = useField('mobile')
+  const { value: mobile, errorMessage: errorMobile } = useField('mobile', null, {
+    initialValue: ''
+  })
   const { value: isAccountOwner, errorMessage: errorisAccountOwner } = useField('isAccountOwner')
   const { value: teamsIds, errorMessage: errorTeamsIds } = useField('teamsIds')
   const { value: twoFactorEnabled, errorMessage: errorTwoFactorEnabled } =
@@ -69,22 +72,21 @@
   const fetchCountries = async () => {
     const countries = await props.listCountriesPhoneService()
     setCountriesOptions(countries)
+    const firstCountry = optionsCountriesMobile.value[0].value
 
     if (props.isEditForm) {
-      setCountryCallCodeForEditForm()
-    } else {
-      const firstCountry = optionsCountriesMobile.value[0].value
-      return firstCountry
+      const userCountry = setCountryCallCodeForEditForm()
+      countryCallCode.value = userCountry || firstCountry
+      loadingCountry.value = false
+      return
     }
 
-    return
+    return firstCountry
   }
 
   const setCountryCallCodeForEditForm = () => {
-    const loadedCountryCallCode = filteredCountriesMobile.value.find(
-      (country) => country.value === countryCallCode.value
-    )
-    countryCallCode.value = loadedCountryCallCode.value
+    return filteredCountriesMobile.value.find((country) => country.value === countryCallCode.value)
+      ?.value
   }
 
   const fetchTimezone = async () => {
@@ -94,7 +96,6 @@
     if (!props.isEditForm) {
       return result.defaultSelected
     }
-    return
   }
   const fetchDetailAccount = async () => {
     const account = await props.loadAccountDetailsService()
@@ -103,7 +104,6 @@
     if (!props.isEditForm) {
       return !!isForceMFA.value
     }
-    return
   }
   const fetchTeams = async () => {
     const result = await props.listTeamsService()
@@ -113,9 +113,8 @@
       const firstTeamId = result[0].value
       return firstTeamId
     }
-
-    return
   }
+
   const initializeFormValues = async () => {
     accountIsOwner.value = account?.is_account_owner
     isAccountOwner.value = accountIsOwner.value
@@ -138,8 +137,8 @@
         teamsIds: [defaultTeamId],
         twoFactorEnabled: forceMfaEnabled
       }
-
       props.resetForm({ values: initialValues })
+      loadingCountry.value = false
     }
   }
 
@@ -210,9 +209,10 @@
             >Timezone *</label
           >
           <Dropdown
+            filter
+            autoFilterFocus
             appendTo="self"
             id="timezone"
-            filter
             :options="optionsTimezone"
             optionLabel="label"
             optionValue="value"
@@ -287,17 +287,23 @@
         <div class="flex gap-2">
           <div class="p-inputgroup">
             <Dropdown
+              filter
+              autoFilterFocus
               appendTo="self"
               id="countryCallCode"
-              filter
               :options="filteredCountriesMobile"
               optionLabel="labelFormat"
-              placeholder="Loading..."
               optionValue="value"
-              :loading="!filteredCountriesMobile.length"
+              :loading="loadingCountry"
+              :disabled="loadingCountry"
               :class="{ 'p-invalid': errorCountryCallCode }"
               class="surface-border border-r-0 w-1/4"
               v-model="countryCallCode"
+              :pt="{
+                filterInput: {
+                  class: 'w-full'
+                }
+              }"
             >
               <template #option="{ option }">
                 {{ option.label }}
@@ -307,17 +313,19 @@
               date="phone"
               v-model="mobile"
               class="w-full"
+              :disabled="loadingCountry"
               mask="?99999999999999999999"
               placeholder="5500999999999"
-              :class="{ 'p-invalid': errorMobile || !countryCallCode }"
+              :class="{ 'p-invalid': errorMobile }"
             />
           </div>
         </div>
         <small
           id="name-help"
           class="p-error"
-          >{{ errorMobile }}</small
         >
+          {{ errorMobile }}
+        </small>
         <small class="text-xs text-color-secondary font-normal leading-5">
           The phone number of the user. Include country and region code.
         </small>
@@ -339,6 +347,7 @@
         <MultiSelect
           display="chip"
           filter
+          autoFilterFocus
           id="teams"
           :disabled="isAccountOwner"
           :loading="!optionsTeams.length"
@@ -350,6 +359,11 @@
           :class="{ 'p-invalid': errorTeamsIds }"
           v-model="teamsIds"
         />
+        <small
+          v-if="errorTeamsIds"
+          class="p-error"
+          >{{ errorTeamsIds }}</small
+        >
         <small class="text-xs text-color-secondary font-normal leading-5">
           Select a team for the user. You can create teams using Teams Permissions.</small
         >

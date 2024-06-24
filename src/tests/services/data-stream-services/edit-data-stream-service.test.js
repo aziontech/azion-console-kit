@@ -26,6 +26,16 @@ const fixtures = {
     hasSampling: false,
     endpoint: 'qradar',
     QRadarUrl: 'https://qradar-trial-abcdef.qradar.ibmcloud.com:123456'
+  },
+  dataStreamCustomTemplateMock: {
+    id: 3563,
+    name: 'Data Stream Custom a Template',
+    template: 'CUSTOM_TEMPLATE',
+    dataSet: '{"session_id":"$session_id", "username":"$username"}',
+    dataSource: 'http',
+    domains: [[], []],
+    endpoint: 'qradar',
+    QRadarUrl: 'https://qradar-trial-abcdef.qradar.ibmcloud.com:123456'
   }
 }
 
@@ -60,6 +70,34 @@ describe('DataStreamServices', () => {
         endpoint: {
           endpoint_type: fixtures.dataStreamMockWithSampling.endpoint,
           url: fixtures.dataStreamMockWithSampling.QRadarUrl
+        }
+      }
+    })
+  })
+
+  it('should updated call API with correct params custom a template', async () => {
+    const requestSpy = vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
+      statusCode: 200
+    })
+    const { sut } = makeSut()
+    const version = 'v3'
+    await sut(fixtures.dataStreamCustomTemplateMock)
+
+    expect(requestSpy).toHaveBeenCalledWith({
+      url: `${version}/data_streaming/streamings/${fixtures.dataStreamCustomTemplateMock.id}`,
+      method: 'PUT',
+      body: {
+        name: fixtures.dataStreamCustomTemplateMock.name,
+        template_model: JSON.stringify(
+          JSON.parse(fixtures.dataStreamCustomTemplateMock.dataSet),
+          null,
+          '\t'
+        ),
+        domain_ids: [],
+        all_domains: true,
+        endpoint: {
+          endpoint_type: fixtures.dataStreamCustomTemplateMock.endpoint,
+          url: fixtures.dataStreamCustomTemplateMock.QRadarUrl
         }
       }
     })
@@ -173,7 +211,8 @@ describe('DataStreamServices', () => {
       endpoint: 'kafka',
       values: {
         kafkaTopic: 'example_topic',
-        bootstrap_servers: 'kafka-server.com:9092,kafka-server-2.com:9092'
+        bootstrap_servers: 'kafka-server.com:9092,kafka-server-2.com:9092',
+        useTls: true
       }
     },
     {

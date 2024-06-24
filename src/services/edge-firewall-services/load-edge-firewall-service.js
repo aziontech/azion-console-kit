@@ -21,7 +21,8 @@ const adapt = ({ body, statusCode }) => {
     networkProtectionEnabled: payload.network_protection_enabled,
     wafEnabled: payload.waf_enabled,
     debugRules: payload.debug_rules,
-    domains: payload.domains || []
+    domains: payload.domains || [],
+    ddosProtectionUnmetered: true
   }
 
   return {

@@ -1,8 +1,9 @@
 <script setup>
   import { useEdgeDNSStore } from '@/stores/edge-dns'
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
-  import InputSwitch from 'primevue/inputswitch'
   import InputText from 'primevue/inputtext'
+  import FieldSwitchBlock from '@/templates/form-fields-inputs/fieldSwitchBlock'
+
   import { useField } from 'vee-validate'
   import { watch } from 'vue'
 
@@ -10,7 +11,6 @@
 
   const { value: name, errorMessage: errorName } = useField('name')
   const { value: domain, errorMessage: errorDomain } = useField('domain')
-  const { value: isActive } = useField('isActive')
 
   watch(domain, () => {
     edgeDNSStore.addDomain(domain.value)
@@ -79,11 +79,13 @@
   <FormHorizontal title="Status">
     <template #inputs>
       <div class="flex gap-3 items-center">
-        <InputSwitch
-          id="active"
-          v-model="isActive"
+        <FieldSwitchBlock
+          nameField="isActive"
+          name="isActive"
+          auto
+          :isCard="false"
+          title="Active"
         />
-        <label id="active">Active</label>
       </div>
     </template>
   </FormHorizontal>

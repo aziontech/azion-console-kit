@@ -33,13 +33,13 @@
     :class="{ 'mt-4 pb-8': inTabs }"
   >
     <div
-      class="flex flex-col p-8 gap-7 justify-center items-center rounded-md"
+      class="flex flex-col gap-5 justify-center items-center rounded-md p-8 max-md:p-3"
       :class="{ 'border surface-border': !noBorder }"
     >
       <slot name="illustration">
         <Illustration />
       </slot>
-      <div class="flex flex-col gap-2">
+      <div class="flex flex-col gap-2 max-w-4xl">
         <p class="text-center text-color text-lg font-medium leading-7">
           {{ title }}
         </p>
@@ -47,12 +47,13 @@
           {{ description }}
         </p>
       </div>
-      <div class="flex flex-col gap-5 items-center">
-        <div class="flex flex-wrap gap-2">
+      <div class="flex flex-col gap-5 items-center w-full">
+        <div class="flex flex-wrap gap-2 justify-center w-full">
           <slot name="extraActionsLeft"></slot>
           <slot name="default">
             <PrimeButton
               v-if="props.createButtonLabel"
+              class="max-md:w-full w-fit"
               severity="secondary"
               icon="pi pi-plus"
               :label="createButtonLabel"
