@@ -58,7 +58,6 @@
     // actions
     toast.add({
       ...toastOptions,
-      id: 20,
       action: { primary: actions.primary, secondary: actions.secondary }
     })
 
