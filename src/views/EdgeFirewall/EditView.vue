@@ -25,11 +25,11 @@
   const validationSchema = yup.object({
     name: yup.string().required().label('Name'),
     domains: yup.array().label('Domains'),
-    isActive: yup.boolean().label('Active'),
     debugRules: yup.boolean().label('Debug Rules'),
     edgeFunctionsEnabled: yup.boolean().label('Edge Funcions Enabled'),
     networkProtectionEnabled: yup.boolean().label('Network Protection Enabled'),
-    wafEnabled: yup.boolean().label('WAF Enabled')
+    wafEnabled: yup.boolean().label('WAF Enabled'),
+    isActive: yup.boolean().label('Active')
   })
 
   const loadEdgeFirewall = async () => {
@@ -81,12 +81,12 @@
           v-model:loadingDomains="loadingServices"
         />
       </template>
-      <template #action-bar="{ onSubmit, formValid, onCancel, loading, values }">
+      <template #action-bar="{ onSubmit, onCancel, loading, values }">
         <ActionBarTemplate
           @onSubmit="formSubmit(onSubmit, values)"
           @onCancel="onCancel"
           :loading="loading"
-          :submitDisabled="!formValid || loadingServices"
+          :submitDisabled="loadingServices"
         />
       </template>
     </EditFormBlock>

@@ -736,7 +736,6 @@
               optionValue="value"
               optionDisabled="disabled"
               v-bind:value="behaviors[behaviorItemIndex].value.name"
-              inputClass="w-full"
               @onChange="
                 (selectedBehavior) =>
                   updateAndGenerateAvailableBehaviorsOptions({
@@ -756,7 +755,7 @@
                 optionLabel="name"
                 optionValue="id"
                 v-bind:value="behaviors[behaviorItemIndex].value.functionId"
-                inputClass="w-full mb-3"
+                class="w-full mb-3"
               />
             </template>
 
@@ -769,7 +768,7 @@
                 optionLabel="name"
                 optionValue="id"
                 v-bind:value="behaviors[behaviorItemIndex].value.waf_id"
-                inputClass="w-full mb-3"
+                class="w-full mb-3"
               />
               <FieldDropdown
                 :key="`${behaviorItem.key}-mode`"
@@ -788,7 +787,7 @@
                 optionLabel="label"
                 optionValue="value"
                 v-bind:value="behaviors[behaviorItemIndex].value.mode"
-                inputClass="w-full"
+                class="w-full"
               />
             </template>
 
@@ -805,7 +804,7 @@
                 optionValue="value"
                 optionDisabled="disabled"
                 v-bind:value="behaviors[behaviorItemIndex].value.type"
-                inputClass="w-full mb-3"
+                class="w-full mb-3"
               />
 
               <FieldNumber
@@ -832,7 +831,7 @@
                 optionValue="value"
                 optionDisabled="disabled"
                 v-bind:value="behaviors[behaviorItemIndex].value.limit_by"
-                inputClass="w-full mb-3"
+                class="w-full mb-3"
               />
 
               <template v-if="isRateLimitBySeconds(behaviorItemIndex)">
@@ -865,7 +864,7 @@
                 id="`behaviors[${behaviorItemIndex}].content_type`"
                 :key="`${behaviorItem.key}-content_type`"
                 placeholder="Content Type"
-                inputClass="w-full mb-3"
+                class="w-full mb-3"
                 :value="behaviors[behaviorItemIndex].value.content_type"
                 :name="`behaviors[${behaviorItemIndex}].content_type`"
               />
@@ -873,7 +872,7 @@
                 id="`behaviors[${behaviorItemIndex}].content_body`"
                 :key="`${behaviorItem.key}-content_body`"
                 placeholder="Content Body"
-                inputClass="w-full mb-3"
+                class="w-full mb-3"
                 :value="behaviors[behaviorItemIndex].value.content_body"
                 :name="`behaviors[${behaviorItemIndex}].content_body`"
               />
