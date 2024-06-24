@@ -129,7 +129,6 @@
           label="Arguments List *"
           name="argumentsPurge"
           rows="2"
-          cols="30"
           :placeholder="computedPurgeArgumentsPlaceHolder"
           description="Separate each argument using a new line."
           autoResize
