@@ -50,7 +50,7 @@
     }
 
     // only title
-    toast.add({ ...toastOptions, id: 10, detail: undefined })
+    toast.add({ ...toastOptions, detail: undefined })
 
     // title and description
     toast.add(toastOptions)
@@ -63,9 +63,9 @@
     })
 
     // link
-    toast.add({ ...toastOptions, id: 30, action: { link: actions.link } })
+    toast.add({ ...toastOptions, action: { link: actions.link } })
 
     // with custom life
-    toast.add({ ...toastOptions, id: 40, life: 0 })
+    toast.add({ ...toastOptions, life: 0 })
   }
 </script>
