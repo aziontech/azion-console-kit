@@ -19,7 +19,8 @@
   })
 
   const { value: variables, errorMessage: variablesError } = useField('variables')
-
+  const { value: service } = useField('service')
+  
   const editorOptions = computed(() => {
     return {
       minimap: { enabled: false },
@@ -50,10 +51,9 @@
               name="service"
               :options="props.listServices"
               :loading="props.listServices.length === 0"
-              @change="resetRegionAndCity"
               :disabled="props.disabledFields"
               optionLabel="name"
-              :value="country"
+              :value="service"
               filter
               class="w-full"
               appendTo="self"
