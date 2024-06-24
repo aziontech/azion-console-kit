@@ -4,7 +4,6 @@
   import { useForm, useIsFormDirty } from 'vee-validate'
   import { computed, ref, watch, inject } from 'vue'
   import { useRoute, useRouter } from 'vue-router'
-  import { TOAST_LIFE } from '@/utils/constants'
 
   defineOptions({ name: 'edit-form-block' })
 
@@ -85,10 +84,6 @@
       severity,
       summary: severity,
       detail
-    }
-
-    if (severity === 'success') {
-      options.life = TOAST_LIFE
     }
 
     toast.add(options)

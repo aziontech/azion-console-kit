@@ -41,8 +41,7 @@
     toast.add({
       closable: true,
       severity: 'success',
-      summary: 'Copied successfully!',
-      life: 6000
+      summary: 'Copied successfully!'
     })
   }
   const handleCopy = ({ code }) => {

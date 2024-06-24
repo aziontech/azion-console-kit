@@ -43,7 +43,6 @@
   import FormFieldsCreateDomains from './FormFields/FormFieldsCreateDomains.vue'
   import ActionBarTemplate from '@/templates/action-bar-block/action-bar-with-teleport'
   import CopyDomainDialog from './Dialog/CopyDomainDialog.vue'
-  import { TOAST_LIFE } from '@/utils/constants'
   import { useRoute, useRouter } from 'vue-router'
   import { useDialog } from 'primevue/usedialog'
   import * as yup from 'yup'
@@ -123,7 +122,6 @@
     const toastConfig = {
       closable: false,
       severity: 'success',
-      life: TOAST_LIFE,
       summary: 'Succesfully created',
       detail: 'The domain is now available in the Domain management section.'
     }
@@ -154,10 +152,6 @@
       closable: true,
       severity,
       summary
-    }
-
-    if (severity === 'success') {
-      options.life = TOAST_LIFE
     }
 
     toast.add(options)
