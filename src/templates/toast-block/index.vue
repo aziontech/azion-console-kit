@@ -130,14 +130,14 @@
   }
 
   const getToastLifeTime = (message, toastType) => {
+    // explicitly defined to not close the toast
     const ZERO_VALUE = 0
 
-    const shouldNotClose = message?.life == ZERO_VALUE
+    if (message?.life || message?.life == ZERO_VALUE) return message.life
+
     const hasActions = showActions(message)
 
-    const defaultLifeTime = hasActions ? toastType.action : toastType.default
-
-    return shouldNotClose ? ZERO_VALUE : defaultLifeTime
+    return hasActions ? toastType.action : toastType.default
   }
 
   const setToastLife = (message) => {
