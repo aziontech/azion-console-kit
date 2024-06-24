@@ -20,7 +20,7 @@
 
   const { value: variables, errorMessage: variablesError } = useField('variables')
   const { value: service } = useField('service')
-  
+
   const editorOptions = computed(() => {
     return {
       minimap: { enabled: false },
