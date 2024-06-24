@@ -15,7 +15,7 @@
   })
 
   const { value: groups } = useField('groups')
-  
+
   const groupsList = ref([])
 
   const fetchGroups = async () => {
