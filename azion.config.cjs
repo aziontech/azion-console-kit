@@ -9,6 +9,51 @@ const myDomain =
     ? config.domain.domain_name
     : 'console.azion.com'
 
+const cacheConfig = [
+  {
+    name: 'Statics - Cache',
+    stale: false,
+    queryStringSort: false,
+    methods: {
+      post: false,
+      options: false
+    },
+    browser: {
+      maxAgeSeconds: 1000 * 5 // 5000 seconds
+    },
+    edge: {
+      maxAgeSeconds: 60 * 60 * 24 * 5 // 5 days
+    }
+  },
+  {
+    name: 'Marketplace - Cache',
+    stale: false,
+    queryStringSort: false,
+    methods: {
+      post: false,
+      options: false
+    },
+    edge: {
+      maxAgeSeconds: 60 * 60 * 24 * 2 // 2 days
+    }
+  },
+  {
+    name: 'Cities - Cache',
+    stale: false,
+    queryStringSort: false,
+    methods: {
+      post: false,
+      options: false
+    },
+    browser: {
+      maxAgeSeconds: 1000 * 10 // 10000 seconds
+    },
+    edge: {
+      maxAgeSeconds: 60 * 60 * 24 * 7 // 7 days
+    }
+  },
+]
+
 const commonRules = [
   {
     name: 'Apply Common Configuration for All Requests',
@@ -46,6 +91,7 @@ const frontRules = [
         name: 'origin-storage-default',
         type: 'object_storage'
       },
+      setCache: 'Statics - Cache',
       deliver: true
     }
   },
@@ -55,9 +101,7 @@ const frontRules = [
       'Delivers static assets such as CSS, JS, images, and other files directly from object storage.',
     match: '^\\/',
     behavior: {
-      rewrite: {
-        set: () => `/index.html`
-      }
+      rewrite: `/index.html`
     }
   }
 ]
@@ -85,12 +129,13 @@ const backRules = [
         type: 'single_origin'
       },
       forwardCookies: true,
-      rewrite: {
+      capture: {
         match: '/api/marketplace/(.*)',
-        subject: 'request_uri',
-        set: (captured) => `/marketplace/api/${captured[1]}`
+        captured: 'captured',
+        subject: 'request_uri'
       },
-      bypassCache: true
+      rewrite: `/marketplace/api/%{captured[1]}`,
+      setCache: 'Marketplace - Cache'
     }
   },
   {
@@ -104,11 +149,12 @@ const backRules = [
         type: 'single_origin'
       },
       forwardCookies: true,
-      rewrite: {
+      capture: {
         match: '/api/template-engine/(.*)',
-        subject: 'request_uri',
-        set: (captured) => `/template-engine/api/${captured[1]}`
+        captured: 'captured',
+        subject: 'request_uri'
       },
+      rewrite: `/template-engine/api/%{captured[1]}`,
       bypassCache: true
     }
   },
@@ -123,11 +169,12 @@ const backRules = [
         type: 'single_origin'
       },
       forwardCookies: true,
-      rewrite: {
+      capture: {
         match: '/api/script-runner/(.*)',
-        subject: 'request_uri',
-        set: (captured) => `/script-runner/api/${captured[1]}`
+        captured: 'captured',
+        subject: 'request_uri'
       },
+      rewrite: `/script-runner/api/%{captured[1]}`,
       bypassCache: true
     }
   },
@@ -138,17 +185,6 @@ const backRules = [
     behavior: {
       setOrigin: {
         name: 'origin-vcs',
-        type: 'single_origin'
-      }
-    }
-  },
-  {
-    name: 'Route GraphQL City Queries to Cities Origin',
-    description: 'Routes GraphQL queries for cities to the specific cities origin.',
-    match: '^/graphql/cities',
-    behavior: {
-      setOrigin: {
-        name: 'origin-cities',
         type: 'single_origin'
       }
     }
@@ -166,10 +202,23 @@ const backRules = [
       forwardCookies: true,
       bypassCache: true
     }
-  }
+  },
+  {
+    name: 'Route GraphQL City Queries to Cities Origin',
+    description: 'Routes GraphQL queries for cities to the specific cities origin.',
+    match: '^/graphql/cities/',
+    behavior: {
+      setOrigin: {
+        name: 'origin-cities',
+        type: 'single_origin'
+      },
+      setCache: 'Cities - Cache'
+    }
+  },
 ]
 
 const AzionConfig = {
+  cache: [...cacheConfig],
   origin: [
     {
       name: 'origin-storage-default',
