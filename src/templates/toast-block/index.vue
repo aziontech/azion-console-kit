@@ -87,7 +87,7 @@
 
   const showActions = (message) => {
     if (!message?.action) return false
-    return Object.keys(message.action).length
+    return !!Object.keys(message.action).length
   }
 
   const handleSeverity = (message) => {
@@ -133,7 +133,7 @@
     const ZERO_VALUE = 0
 
     const shouldNotClose = message?.life == ZERO_VALUE
-    const hasActions = message?.action && Object.keys(message.action).length
+    const hasActions = showActions(message)
 
     const defaultLifeTime = hasActions ? toastType.action : toastType.default
 
