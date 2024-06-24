@@ -254,7 +254,6 @@
   </FormHorizontal>
   <FormHorizontal
     title="Regex"
-    description="Activate this option to treat conditional fields as regular expressions in all match zones."
     :isDrawer="true"
   >
     <template #inputs>
@@ -265,6 +264,7 @@
           auto
           :isCard="false"
           title="Active"
+          subtitle="Activate this option to treat conditional fields as regular expressions in all match zones."
         />
       </div>
     </template>

@@ -133,12 +133,12 @@
     {
       title: 'Content varies by some Query String fields (Allowlist)',
       inputValue: 'whitelist',
-      disabled: !props.isEnableApplicationAccelerator
+      disabled: !props.isApplicationAcceleratorEnabled
     },
     {
       title: 'Content varies by Query String, except for some fields (Blocklist)',
       inputValue: 'blacklist',
-      disabled: !props.isEnableApplicationAccelerator
+      disabled: !props.isApplicationAcceleratorEnabled
     },
     {
       title: 'Content varies by all Query String fields',
@@ -154,17 +154,17 @@
     {
       title: 'Content varies by some Cookies (Allowlist)',
       inputValue: 'whitelist',
-      disabled: !props.isEnableApplicationAccelerator
+      disabled: !props.isApplicationAcceleratorEnabled
     },
     {
       title: 'Content varies by Cookies, with the exception of a few (Blocklist)',
       inputValue: 'blacklist',
-      disabled: !props.isEnableApplicationAccelerator
+      disabled: !props.isApplicationAcceleratorEnabled
     },
     {
       title: 'Content varies by all Cookies',
       inputValue: 'all',
-      disabled: !props.isEnableApplicationAccelerator
+      disabled: !props.isApplicationAcceleratorEnabled
     }
   ]
 

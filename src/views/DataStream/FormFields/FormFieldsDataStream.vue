@@ -1196,6 +1196,7 @@
   import FieldSwitchBlock from '@/templates/form-fields-inputs/fieldSwitchBlock'
   import { useField } from 'vee-validate'
   import { computed, onMounted, ref, watch } from 'vue'
+  import { useRoute } from 'vue-router'
 
   import { useAccountStore } from '@/stores/account'
 
@@ -1213,6 +1214,8 @@
       required: false
     }
   })
+
+  const route = useRoute()
 
   // Variables
   const listDataSources = ref([
@@ -1492,6 +1495,27 @@
       inputValue: '0'
     }
   ]
+
+  const setDefaultValuesWhenChangeTheEndpointInEdit = (isFirstRender) => {
+    if (route.name === 'edit-data-stream' && !isFirstRender) {
+      if (endpoint.value === 'standard') {
+        maxSize.value = 1000000
+        lineSeparator.value = '\\n'
+        payloadFormat.value = '$dataset'
+        headers.value = [{ value: '', deleted: false }]
+      }
+
+      if (endpoint.value === 's3') {
+        contentType.value = 'plain/text'
+      }
+    }
+  }
+
+  // eslint-disable-next-line id-length
+  watch(endpoint, (_, oldValue) => {
+    const isFirstRender = !oldValue
+    setDefaultValuesWhenChangeTheEndpointInEdit(isFirstRender)
+  })
 
   onMounted(() => {
     initializeFormValues()
