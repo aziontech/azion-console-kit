@@ -91,7 +91,9 @@
   }
 
   const handleSeverity = (message) => {
-    setToastLife(message)
+    if (!message.customId) {
+      setToastLife(message)
+    }
 
     return parseSeverity(message)
   }
@@ -107,14 +109,12 @@
     return parser[severity] || severity
   }
 
-  const setCustomIdOnAutoCloseMessage = (message) => {
+  const setCustomId = (message) => {
     const customId = `${new Date().getTime()}${Math.floor(Math.random() * 1000)}`
-    message.customId = customId
-
-    return customId
+    message.id = message.customId = customId
   }
 
-  const isAutoCloseable = (message) => {
+  const isAutoCloseable = (severity) => {
     const closeableTypes = {
       success: {
         action: TOAST_LIFE.WITH_ACTIONS,
@@ -126,7 +126,7 @@
       }
     }
 
-    return closeableTypes[message.severity]
+    return closeableTypes[severity]
   }
 
   const getToastLifeTime = (message, toastType) => {
@@ -141,14 +141,11 @@
   }
 
   const setToastLife = (message) => {
-    const toastType = isAutoCloseable(message)
+    const toastType = isAutoCloseable(message.severity)
+    setCustomId(message)
 
     if (toastType) {
-      const customId = setCustomIdOnAutoCloseMessage(message)
-
-      if (customId === message.customId) {
-        message.life = getToastLifeTime(message, toastType)
-      }
+      message.life = getToastLifeTime(message, toastType)
     }
   }
 
