@@ -15,7 +15,7 @@
   })
 
   const { value: groups } = useField('groups')
-  const { value: hashId } = useField('hashId')
+  
   const groupsList = ref([])
 
   const fetchGroups = async () => {
@@ -39,7 +39,6 @@
           label="Name *"
           description="Give a unique and descriptive name to identify the edge node."
           name="name"
-          :value="name"
           placeholder="My edge node"
         />
       </div>
@@ -56,7 +55,6 @@
             label="Hash ID"
             description="The hash ID used to authenticate the edge node."
             name="hashId"
-            :value="hashId"
             disabled
             placeholder="Hash ID"
             filled
