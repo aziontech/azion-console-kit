@@ -2,7 +2,8 @@
   import { useAccountStore } from '@/stores/account'
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
   import FieldText from '@/templates/form-fields-inputs/fieldText'
-  import Dropdown from 'primevue/dropdown'
+  import FieldDropdown from '@/templates/form-fields-inputs/fieldDropdown'
+
   import { useField } from 'vee-validate'
   import { computed } from 'vue'
 
@@ -65,23 +66,18 @@
   >
     <template #inputs>
       <div class="flex w-80 flex-col gap-2 sm:max-w-lg max-sm:w-full">
-        <label
-          for="edgeFunctionID"
-          class="text-color text-sm font-medium leading-5"
-          >Edge Function *</label
-        >
-        <Dropdown
-          filter
-          autoFilterFocus
-          appendTo="self"
-          inputId="edgeFunctionID"
-          v-model="edgeFunctionID"
+        <FieldDropdown
+          label="Edge Function *"
+          name="edgeFunctionID"
           :options="edgeFunctionsList"
           optionLabel="label"
-          option-value="value"
+          optionValue="value"
+          :value="edgeFunctionID"
+          inputId="edgeFunctionID"
           @change="changeArgs"
+          filter
           :optionDisabled="(option) => option.disabled"
-        />
+        />        
       </div>
 
       <div class="flex flex-col gap-2 w-full">
