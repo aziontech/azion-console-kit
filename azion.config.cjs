@@ -1,13 +1,13 @@
 /* if you have two environments for the same application */
-// const environment = process.env.VITE_ENVIRONMENT || 'production';
-// const config = require(`./azion/${environment}/azion.json`)
+//const environment = process.env.VITE_ENVIRONMENT || 'production';
+//const config = require(`./azion/${environment}/azion.json`)
 
 /* eslint-env node */
-const config = require(`./azion/azion.json`) ?? null
-const myDomain =
-  config.domain.domain_name && config.domain.domain_name.trim() !== ''
-    ? config.domain.domain_name
-    : 'console.azion.com'
+//const config = require(`./azion/azion.json`) ?? null
+//const myDomain =
+//  config.domain.domain_name && config.domain.domain_name.trim() !== ''
+//    ? config.domain.domain_name
+//    : 'console.azion.com'
 
 const cacheConfig = [
   {
@@ -290,7 +290,7 @@ const AzionConfig = {
             captured: 'azrt_arr',
             subject: 'upstream_cookie__azrt'
           },
-          setCookie: `_azrt=%{azrt_arr[0]}; Domain=${myDomain}; Max-Age=1209600; Path=/; SameSite=Lax; Secure`,
+          setCookie: `_azrt=%{azrt_arr[0]}; Max-Age=1209600; Path=/; SameSite=Lax; Secure`,
           filterCookie: '_azrt'
         }
       },
@@ -306,7 +306,7 @@ const AzionConfig = {
             captured: 'azsid_arr',
             subject: 'upstream_cookie_azsid'
           },
-          setCookie: `azsid=%{azsid_arr[0]}; Domain=${myDomain}; Max-Age=1209600; Path=/; SameSite=Lax; Secure`,
+          setCookie: `azsid=%{azsid_arr[0]}; Max-Age=1209600; Path=/; SameSite=Lax; Secure`,
           filterCookie: 'azsid'
         }
       },
@@ -322,7 +322,7 @@ const AzionConfig = {
             captured: 'azat_arr',
             subject: 'upstream_cookie__azat'
           },
-          setCookie: `_azat=%{azat_arr[0]}; Domain=${myDomain}; Max-Age=1209600; Path=/; SameSite=Lax; Secure`,
+          setCookie: `_azat=%{azat_arr[0]}; Max-Age=1209600; Path=/; SameSite=Lax; Secure`,
           filterCookie: '_azat'
         }
       },

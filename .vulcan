@@ -1,6 +1,6 @@
 builder=webpack
 entry=./main.js
-preset=react
+preset=vue
 mode=deliver
 useNodePolyfills=false
 useOwnWorker=false
