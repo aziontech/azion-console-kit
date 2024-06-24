@@ -68,7 +68,7 @@
 
   const toastOptions = {
     root: {
-      class: 'pl-3 pr-3 w-full md:w-[25rem] md:pl-0 md:pr-0 !right-0 md:right-8 top-[68px]'
+      class: 'pl-3 pr-3 w-full md:w-[25rem] md:pl-0 md:pr-0 !right-0 md:right-8 top-[4.25rem]'
     },
     content: {
       class: 'relative'
