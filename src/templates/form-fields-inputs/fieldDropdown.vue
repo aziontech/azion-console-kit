@@ -135,6 +135,7 @@
     :class="{ 'p-invalid': errorMessage }"
     v-bind="$attrs"
     :disabled="props.disabled"
+    class="w-full"
     :pt="{
       filterInput: {
         class: 'w-full'

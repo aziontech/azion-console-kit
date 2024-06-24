@@ -77,7 +77,7 @@
           @change="changeArgs"
           filter
           :optionDisabled="(option) => option.disabled"
-        />        
+        />
       </div>
 
       <div class="flex flex-col gap-2 w-full">

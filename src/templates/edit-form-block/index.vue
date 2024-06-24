@@ -146,9 +146,15 @@
       class="w-full grow flex flex-col gap-8 max-md:gap-6"
       :class="{ 'mt-4': isTabs }"
     >
-      <slot name="form" />
+      <slot
+        name="form"
+        :errors="errors"
+      />
 
-      <slot name="raw-form" />
+      <slot
+        name="raw-form"
+        :errors="errors"
+      />
     </form>
   </div>
 

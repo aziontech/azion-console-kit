@@ -206,7 +206,7 @@
     :showBarGoBack="true"
     title="Create Rule"
   >
-    <template #formFields>
+    <template #formFields="{ errors }">
       <FormFieldsDrawerRulesEngine
         :initialPhase="initialPhase"
         :edgeApplicationId="props.edgeApplicationId"
@@ -218,6 +218,7 @@
         :hideApplicationAcceleratorInDescription="props.hideApplicationAcceleratorInDescription"
         :isImageOptimizationEnabled="props.isImageOptimizationEnabled"
         :isEdgeFunctionEnabled="props.isEdgeFunctionEnabled"
+        :errors="errors"
       />
     </template>
   </CreateDrawerBlock>
@@ -233,7 +234,7 @@
     @onError="closeDrawerEdit"
     title="Edit Rule"
   >
-    <template #formFields>
+    <template #formFields="{ errors }">
       <FormFieldsDrawerRulesEngine
         :selectedRulesEngineToEdit="selectedRulesEngineToEdit"
         :edgeApplicationId="props.edgeApplicationId"
@@ -245,6 +246,7 @@
         :listCacheSettingsService="props.listCacheSettingsService"
         :hideApplicationAcceleratorInDescription="props.hideApplicationAcceleratorInDescription"
         :isEdgeFunctionEnabled="props.isEdgeFunctionEnabled"
+        :errors="errors"
       />
     </template>
   </EditDrawerBlock>

@@ -4,11 +4,12 @@
   import { useField, useFieldArray } from 'vee-validate'
   import FieldText from '@/templates/form-fields-inputs/fieldText'
   import FieldTextArea from '@/templates/form-fields-inputs/fieldTextArea'
+  import fieldAutoComplete from '@/templates/form-fields-inputs/fieldAutoComplete'
   import FieldDropdown from '@/templates/form-fields-inputs/fieldDropdown'
   import PrimeButton from 'primevue/button'
   import InlineMessage from 'primevue/inlinemessage'
   import Divider from 'primevue/divider'
-  import AutoComplete from 'primevue/autocomplete'
+
   import FieldGroupRadio from '@/templates/form-fields-inputs/fieldGroupRadio'
   import FieldSwitchBlock from '@/templates/form-fields-inputs/fieldSwitchBlock'
 
@@ -58,6 +59,9 @@
     },
     isEdgeFunctionEnabled: {
       type: Boolean
+    },
+    errors: {
+      type: Object
     }
   })
 
@@ -82,7 +86,7 @@
 
     return ' - Requires Application Accelerator'
   })
-  props.isDeliveryProtocolHttps
+
   const showLabelHttps = computed(() => {
     if (props.isDeliveryProtocolHttps) {
       return ''
@@ -198,7 +202,6 @@
   } = useFieldArray('behaviors')
   const { value: phase } = useField('phase')
   const { value: description } = useField('description')
-  useField('isActive')
 
   const DEFAULT_OPERATOR = {
     variable: '${uri}',
@@ -645,7 +648,7 @@
 
 <template>
   <FormHorizontal
-    :isDrawer="true"
+    isDrawer
     title="General"
     description="Create a rule to handle the conditional execution of behaviors through logical operators."
   >
@@ -732,22 +735,16 @@
           </div>
 
           <div class="flex gap-2 mt-6 mb-8">
-            <div class="p-inputgroup">
-              <div
-                class="p-inputgroup-addon"
-                :class="{
-                  'opacity-20': !props.isApplicationAcceleratorEnabled || checkPhaseIsDefaultValue
-                }"
-              >
-                <i class="pi pi-dollar"></i>
-              </div>
-              <AutoComplete
+            <div class="w-full">
+              <fieldAutoComplete
                 :id="`criteria[${criteriaIndex}][${conditionalIndex}].variable`"
-                v-model="criteria[criteriaIndex].value[conditionalIndex].variable"
+                :name="`criteria[${criteriaIndex}][${conditionalIndex}].variable`"
+                :value="criteria[criteriaIndex].value[conditionalIndex].variable"
                 :suggestions="variableItems"
-                @complete="searchVariableOption"
+                :onComplete="searchVariableOption"
+                icon="pi pi-search"
                 :disabled="!props.isApplicationAcceleratorEnabled || checkPhaseIsDefaultValue"
-                :completeOnFocus="true"
+                completeOnFocus
               />
             </div>
 
@@ -755,21 +752,22 @@
               :options="criteriaOperatorOptions"
               optionLabel="label"
               optionValue="value"
-              inputClass="w-full"
+              class="h-fit"
               :name="`criteria[${criteriaIndex}][${conditionalIndex}].operator`"
               :value="criteria[criteriaIndex].value[conditionalIndex].operator"
               :disabled="checkPhaseIsDefaultValue"
             />
-            <FieldText
-              v-if="
-                criteria[criteriaIndex].value[conditionalIndex].operator !== 'exists' &&
-                criteria[criteriaIndex].value[conditionalIndex].operator !== 'does_not_exist'
-              "
-              :name="`criteria[${criteriaIndex}][${conditionalIndex}].input_value`"
-              :value="criteria[criteriaIndex].value[conditionalIndex].input_value"
-              inputClass="w-full"
-              :disabled="checkPhaseIsDefaultValue"
-            />
+            <div class="w-full">
+              <FieldText
+                v-if="
+                  criteria[criteriaIndex].value[conditionalIndex].operator !== 'exists' &&
+                  criteria[criteriaIndex].value[conditionalIndex].operator !== 'does_not_exist'
+                "
+                :name="`criteria[${criteriaIndex}][${conditionalIndex}].input_value`"
+                :value="criteria[criteriaIndex].value[conditionalIndex].input_value"
+                :disabled="checkPhaseIsDefaultValue"
+              />
+            </div>
           </div>
         </div>
 
@@ -860,7 +858,6 @@
               optionValue="value"
               optionDisabled="requires"
               :value="behaviors[behaviorIndex].value.name"
-              inputClass="w-full"
               @onChange="(newValue) => changeBehaviorType(newValue, behaviorIndex)"
             />
           </div>
@@ -873,7 +870,6 @@
                 :options="functionsInstanceOptions"
                 optionLabel="name.text"
                 optionValue="id"
-                inputClass="w-full"
                 :key="behaviorItem.key"
                 :value="behaviors[behaviorIndex].value.target"
               />
@@ -885,7 +881,6 @@
                 :options="originsOptions"
                 optionLabel="name"
                 optionValue="originId"
-                inputClass="w-full"
                 :key="behaviorItem.key"
                 :value="behaviors[behaviorIndex].value.target"
               />
@@ -897,7 +892,6 @@
                 :options="cacheSettingsOptions"
                 optionLabel="name"
                 optionValue="id"
-                inputClass="w-full"
                 :key="behaviorItem.key"
                 :value="behaviors[behaviorIndex].value.target"
               />
@@ -906,21 +900,21 @@
               <div class="flex flex-col w-full">
                 <FieldText
                   placeholder="Captured Array"
-                  inputClass="w-full mb-3"
+                  class="w-full mb-3"
                   :name="`behaviors[${behaviorIndex}].target.captured_array`"
                   :key="behaviorItem.key"
                   :value="behaviors[behaviorIndex].value.target.captured_array"
                 />
                 <FieldText
                   placeholder="Subject"
-                  inputClass="w-full mb-3"
+                  class="w-full mb-3"
                   :name="`behaviors[${behaviorIndex}].target.subject`"
                   :key="behaviorItem.key"
                   :value="behaviors[behaviorIndex].value.target.subject"
                 />
                 <FieldText
                   placeholder="Regex"
-                  inputClass="w-full"
+                  class="w-full"
                   :name="`behaviors[${behaviorIndex}].target.regex`"
                   :key="behaviorItem.key"
                   :value="behaviors[behaviorIndex].value.target.regex"
@@ -929,7 +923,6 @@
             </template>
             <template v-else-if="behaviors[behaviorIndex]?.showTargetField">
               <FieldText
-                inputClass="w-full"
                 :name="`behaviors[${behaviorIndex}].target`"
                 :key="behaviorItem.key"
                 :value="behaviors[behaviorIndex].value.target"

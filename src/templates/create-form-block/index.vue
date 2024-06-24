@@ -126,8 +126,12 @@
       <slot
         name="form"
         :resetForm="resetForm"
+        :errors="errors"
       />
-      <slot name="raw-form" />
+      <slot
+        name="raw-form"
+        :errors="errors"
+      />
     </form>
     <DialogUnsavedBlock :blockRedirectUnsaved="formHasChanges" />
     <slot

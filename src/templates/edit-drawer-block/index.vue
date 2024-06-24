@@ -50,7 +50,7 @@
     }
   })
 
-  const { resetForm, isSubmitting, handleSubmit } = useForm({
+  const { resetForm, isSubmitting, handleSubmit, errors } = useForm({
     validationSchema: props.schema,
     initialValues: props.initialValues
   })
@@ -189,6 +189,7 @@
       >
         <slot
           name="formFields"
+          :errors="errors"
           :disabledFields="isLoading"
         />
       </form>

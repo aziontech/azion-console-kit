@@ -1,5 +1,5 @@
 <script setup>
-  import { toRef } from 'vue'
+  import { toRef, useSlots } from 'vue'
   import { useField } from 'vee-validate'
   import InputText from 'primevue/inputtext'
 
@@ -40,6 +40,9 @@
 
   const name = toRef(props, 'name')
 
+  const slots = useSlots()
+  const hasIconSlot = !!slots.icon
+
   const {
     value: inputValue,
     errorMessage,
@@ -57,7 +60,10 @@
     >{{ props.label }}</label
   >
   <div class="p-inputgroup">
-    <div class="p-inputgroup-addon">
+    <div
+      class="p-inputgroup-addon"
+      v-if="hasIconSlot"
+    >
       <slot name="icon"></slot>
     </div>
 
