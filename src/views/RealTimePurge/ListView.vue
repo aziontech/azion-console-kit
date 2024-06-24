@@ -55,7 +55,6 @@
   import DialogPurge from './Dialog'
   import { computed, ref } from 'vue'
   import { columnBuilder } from '@/templates/list-table-block/columns/column-builder'
-  import { TOAST_LIFE } from '@/utils/constants'
   import { useToast } from 'primevue/usetoast'
 
   const props = defineProps({
@@ -97,10 +96,6 @@
       severity,
       summary: severity,
       detail
-    }
-
-    if (severity === 'success') {
-      options.life = TOAST_LIFE
     }
 
     toast.add(options)

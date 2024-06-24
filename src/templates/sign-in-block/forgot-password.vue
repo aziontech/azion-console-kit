@@ -128,10 +128,10 @@
     try {
       isSendingEmailLoading.value = true
       const res = await props.sendResetPasswordEmailService(values)
-      toast.add({ life: 5000, severity: 'success', detail: res, summary: 'Email sent' })
+      toast.add({ severity: 'success', detail: res, summary: 'Email sent' })
       emailSended.value = true
     } catch (err) {
-      toast.add({ life: 5000, severity: 'error', detail: err, summary: 'Error' })
+      toast.add({ severity: 'error', detail: err, summary: 'Error' })
     } finally {
       isSendingEmailLoading.value = false
     }
@@ -141,9 +141,9 @@
     disableSubmitByTimer(SUBMIT_TIMER)
     try {
       const res = await props.sendResetPasswordEmailService(values)
-      toast.add({ life: 5000, severity: 'success', detail: res, summary: 'Email sent' })
+      toast.add({ severity: 'success', detail: res, summary: 'Email sent' })
     } catch (err) {
-      toast.add({ life: 5000, severity: 'error', detail: err, summary: 'Error' })
+      toast.add({ severity: 'error', detail: err, summary: 'Error' })
     }
   }
 

@@ -9,7 +9,6 @@
   import Skeleton from 'primevue/skeleton'
   import InputText from 'primevue/inputtext'
   import FeedbackFish from '@/templates/navbar-block/feedback-fish'
-  import { TOAST_LIFE } from '@/utils/constants'
 
   defineOptions({
     name: 'more-details'
@@ -60,10 +59,6 @@
       closable: true,
       severity: severity,
       summary: summary
-    }
-
-    if (severity === 'success') {
-      options.life = TOAST_LIFE
     }
 
     toast.add(options)
