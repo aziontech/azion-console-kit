@@ -38,7 +38,7 @@
   const triggerToasts = (type) => {
     const toastOptions = {
       severity: type,
-      summary: 'Title (limited to 20 characters)',
+      summary: 'Title (limited to 100 characters)',
       detail:
         'Description. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam consectetur leo tortor (limited to 125 characters).'
     }

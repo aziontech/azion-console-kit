@@ -57,7 +57,8 @@
   defineOptions({ name: 'ToastBlock' })
 
   const CHAR_LIMITS = {
-    SUMMARY: 20,
+    // TODO: revert Summary to 20 when the writing team review the titles in other parts of the application
+    SUMMARY: 100,
     DETAIL: 125
   }
 
