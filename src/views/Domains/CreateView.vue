@@ -120,7 +120,7 @@
 
   const renderToastDomainCreateSuccesfully = () => {
     const toastConfig = {
-      closable: false,
+      closable: true,
       severity: 'success',
       summary: 'Succesfully created',
       detail: 'The domain is now available in the Domain management section.'
