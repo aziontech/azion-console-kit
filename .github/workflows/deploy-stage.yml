@@ -35,3 +35,4 @@ jobs:
         env:
           VITE_RECAPTCHA_SITE_KEY: ${{ secrets.PROD_RECAPTCHA_SITE_KEY }}
           NODE_ENV: stage
+          VITE_ENVIRONMENT: stage
