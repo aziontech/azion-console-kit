@@ -2,7 +2,7 @@
   import { useAccountStore } from '@/stores/account'
   import Calendar from 'primevue/calendar'
   import Dropdown from 'primevue/dropdown'
-  import { computed, onMounted, ref } from 'vue'
+  import { computed, onMounted, onUnmounted, ref } from 'vue'
   import DATE_TIME_INTERVALS from './constants/date-time-interval'
 
   const accountStore = useAccountStore()
@@ -25,7 +25,8 @@
     get: () => props.filterDate.value,
     set: (value) => emit('update:filterDate', value)
   })
-
+  const timer = ref()
+  const maxDate = ref()
   const dates = ref([])
   const lastFilteredDate = ref({})
   const interval = ref(null)
@@ -46,11 +47,6 @@
     return hasError.value ? 'p-invalid' : ''
   })
 
-  const maxDate = computed(() => {
-    const max = new Date().removeSelectedAmountOfHours(0)
-    return max.toUTC(userUTC)
-  })
-
   const minDate = computed(() => {
     const sevenDaysInHours = 7 * 24
     const min = new Date().removeSelectedAmountOfHours(sevenDaysInHours)
@@ -66,6 +62,11 @@
     dates.value = [dateBegin, dateEnd]
     lastFilteredDate.value = { begin: dateBegin, end: dateEnd }
     interval.value = intervalOptions.find((element) => element.code === meta.option)
+  }
+
+  const updateCurrentTime = () => {
+    const max = new Date().removeSelectedAmountOfHours(0)
+    maxDate.value = max.toUTC(userUTC)
   }
 
   const setInitialValues = () => {
@@ -138,7 +139,12 @@
   }
 
   onMounted(() => {
+    updateCurrentTime()
+    timer.value = setInterval(updateCurrentTime, 60000)
     setInitialValues()
+  })
+  onUnmounted(() => {
+    clearInterval(timer.value)
   })
 </script>
 
