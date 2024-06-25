@@ -1,6 +1,6 @@
 /* eslint-disable no-undef */
-import { defineConfig } from 'cypress';
-import codeCoverageTask from '@cypress/code-coverage/task';
+import { defineConfig } from 'cypress'
+import codeCoverageTask from '@cypress/code-coverage/task'
 
 export default defineConfig({
   projectId: 'azion-console-kit',
@@ -11,8 +11,8 @@ export default defineConfig({
     video: true,
     experimentalStudio: true,
     setupNodeEvents(on, config) {
-      codeCoverageTask(on, config);
-      return config;
+      codeCoverageTask(on, config)
+      return config
     }
   },
   env: {
@@ -20,4 +20,4 @@ export default defineConfig({
     CYPRESS_PASSWORD_STAGE: process.env.CYPRESS_PASSWORD_STAGE,
     CYPRESS_USERNAME_STAGE: process.env.CYPRESS_USERNAME_STAGE
   }
-});
+})

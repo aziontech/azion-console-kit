@@ -76,7 +76,10 @@
 <template>
   <ContentBlock data-testid="edge-applications-content-block">
     <template #heading>
-      <PageHeadingBlock pageTitle="Edge Applications" data-testid="edge-applications-heading" />
+      <PageHeadingBlock
+        pageTitle="Edge Applications"
+        data-testid="edge-applications-heading"
+      />
     </template>
     <template #content>
       <ListTableBlock

@@ -5,13 +5,13 @@ First off, thanks for taking the time to contribute!
 All types of contributions are encouraged and valued. See the Table of Contents for different ways to help and details about how this project handles them. 🎉
 
 ## Table of Contents
+
 - [Code of Conduct](#code-of-conduct)
 - [I Have a Question](#i-have-a-question)
 - [I Want To Contribute](#i-want-to-contribute)
   - [Reporting Bugs](#reporting-bugs)
   - [Suggesting Enhancements](#suggesting-enhancements)
   - [Your First Code Contribution](#your-first-code-contribution)
-
 
 ## Code of Conduct
 
@@ -35,6 +35,7 @@ We will then take care of the issue as soon as possible.
 ## I Want To Contribute
 
 > ### Legal Notice
+>
 > When contributing to this project, you must agree that you have authored 100% of the content, that you have the necessary rights to the content, and that the content you contribute may be provided under the project license.
 
 ### Reporting Bugs
@@ -57,7 +58,7 @@ We use GitHub issues to track bugs and errors. If you run into an issue with the
 
 - Open an [Issue](https://github.com/aziontech/azion-platform-kit/issues/new). (Since we can't be sure at this point whether it is a bug or not, we ask you not to talk about a bug yet and not to label the issue.)
 - Explain the behavior you would expect and the actual behavior.
-- Please provide as much context as possible and describe the *reproduction steps* that someone else can follow to recreate the issue on their own. This usually includes your code. For good bug reports you should isolate the problem and create a reduced test case.
+- Please provide as much context as possible and describe the _reproduction steps_ that someone else can follow to recreate the issue on their own. This usually includes your code. For good bug reports you should isolate the problem and create a reduced test case.
 - Provide the information you collected in the previous section.
 
 ### Suggesting Enhancements
@@ -69,8 +70,8 @@ This section guides you through submitting an enhancement suggestion for Azion C
 - Make sure that you are using the latest version.
 - Perform a [search](https://github.com/aziontech/azion-platform-kit/issues) to see if the enhancement has already been suggested. If it has, add a comment to the existing issue instead of opening a new one.
 - If your enhancement is nontrivial,
-please open an [Issue](https://github.com/aziontech/azion-platform-kit/issues/new) to discuss the
-idea and implementation strategy before submitting a PR.
+  please open an [Issue](https://github.com/aziontech/azion-platform-kit/issues/new) to discuss the
+  idea and implementation strategy before submitting a PR.
 
 #### How Do I Submit a Good Enhancement Suggestion?
 

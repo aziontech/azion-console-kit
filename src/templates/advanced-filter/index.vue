@@ -241,7 +241,10 @@
   })
 </script>
 <template>
-  <div class="flex w-full min-w-0 flex-column gap-2 md:flex-row" data-testid="search-filter-container">
+  <div
+    class="flex w-full min-w-0 flex-column gap-2 md:flex-row"
+    data-testid="search-filter-container"
+  >
     <dialogFilter
       :disabled="props.disabled"
       ref="refDialogFilter"
@@ -255,12 +258,18 @@
       class="md:-ml-2 md:border-b md:border-left-none md:border-r border-solid border-t flex items-center p-inputtext md:rounded-[0px_6px_6px_0px] w-full overflow-x-auto overflow-y-hidden h-[37px] md:h-12"
       data-testid="search-filter-chips-container"
     >
-      <ul class="flex gap-3 align-items-center" data-testid="search-filter-chips-list">
+      <ul
+        class="flex gap-3 align-items-center"
+        data-testid="search-filter-chips-list"
+      >
         <template
           v-for="(itemFilter, index) in displayFilter"
           :key="itemFilter"
         >
-          <li v-if="!DEFAULT_FORMAT.includes(itemFilter.operator)" data-testid="search-filter-chip-item">
+          <li
+            v-if="!DEFAULT_FORMAT.includes(itemFilter.operator)"
+            data-testid="search-filter-chip-item"
+          >
             <chipsDefaultDisplay
               :itemFilter="itemFilter"
               :position="index"
@@ -269,7 +278,10 @@
               data-testid="search-filter-chip-default"
             />
           </li>
-          <li v-if="itemFilter.operator === FORMAT_RANGE" data-testid="search-filter-chip-item">
+          <li
+            v-if="itemFilter.operator === FORMAT_RANGE"
+            data-testid="search-filter-chip-item"
+          >
             <chipsRangeDisplay
               :itemFilter="itemFilter"
               :position="index"
@@ -291,7 +303,12 @@
               data-testid="search-filter-chip-in"
             />
           </li>
-          <li v-if="displayFilter.length > index + 1" data-testid="search-filter-chip-item">and</li>
+          <li
+            v-if="displayFilter.length > index + 1"
+            data-testid="search-filter-chip-item"
+          >
+            and
+          </li>
         </template>
       </ul>
     </div>

@@ -1,7 +1,10 @@
 <template>
   <ContentBlock data-testid="create-edge-application-content-block">
     <template #heading>
-      <PageHeadingBlock pageTitle="Create Edge Application" data-testid="create-edge-application-heading" />
+      <PageHeadingBlock
+        pageTitle="Create Edge Application"
+        data-testid="create-edge-application-heading"
+      />
     </template>
     <template #content>
       <CreateFormBlock
@@ -13,7 +16,10 @@
         data-testid="create-edge-application-form-block"
       >
         <template #form>
-          <FormFieldsCreateEdgeApplications :handleBlock="handleBlocks" data-testid="create-edge-application-form-fields" />
+          <FormFieldsCreateEdgeApplications
+            :handleBlock="handleBlocks"
+            data-testid="create-edge-application-form-fields"
+          />
         </template>
 
         <template #action-bar="{ onSubmit, formValid, onCancel, loading }">

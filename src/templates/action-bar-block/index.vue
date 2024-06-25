@@ -51,7 +51,10 @@
       }"
       data-testid="form-actions-content"
     >
-      <div class="flex gap-4 self-stretch items-center justify-end w-full" data-testid="form-actions-buttons">
+      <div
+        class="flex gap-4 self-stretch items-center justify-end w-full"
+        data-testid="form-actions-buttons"
+      >
         <slot>
           <PrimeButton
             severity="primary"

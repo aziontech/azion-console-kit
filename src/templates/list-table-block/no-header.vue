@@ -1,6 +1,9 @@
 <template>
   <div data-testid="data-table-container">
-    <div class="max-w-full cursor-pointer mt-4" data-testid="data-table-wrapper">
+    <div
+      class="max-w-full cursor-pointer mt-4"
+      data-testid="data-table-wrapper"
+    >
       <DataTable
         v-if="!isLoading"
         scrollable
@@ -21,8 +24,14 @@
       >
         <template #header>
           <slot name="header">
-            <div class="flex flex-wrap justify-between gap-2 w-full" data-testid="data-table-header">
-              <span class="flex flex-row p-input-icon-left max-sm:w-full" data-testid="data-table-search-container">
+            <div
+              class="flex flex-wrap justify-between gap-2 w-full"
+              data-testid="data-table-header"
+            >
+              <span
+                class="flex flex-row p-input-icon-left max-sm:w-full"
+                data-testid="data-table-search-container"
+              >
                 <i class="pi pi-search" />
                 <InputText
                   class="w-full md:min-w-[320px]"
@@ -78,7 +87,10 @@
         >
           <template #body="{ data: rowData }">
             <template v-if="col.type !== 'component'">
-              <div v-html="rowData[col.field]" data-testid="data-table-column-cell" />
+              <div
+                v-html="rowData[col.field]"
+                data-testid="data-table-column-cell"
+              />
             </template>
             <template v-else>
               <component :is="col.component(rowData[col.field])" />
@@ -91,7 +103,10 @@
           data-testid="data-table-actions-column"
         >
           <template #header>
-            <div class="flex justify-end w-full" data-testid="data-table-actions-column-header">
+            <div
+              class="flex justify-end w-full"
+              data-testid="data-table-actions-column-header"
+            >
               <PrimeButton
                 outlined
                 icon="ai ai-column"
@@ -152,7 +167,10 @@
         </Column>
         <template #empty>
           <slot name="noRecordsFound">
-            <div class="my-4 flex flex-col gap-3 justify-center items-start" data-testid="data-table-empty-message-container">
+            <div
+              class="my-4 flex flex-col gap-3 justify-center items-start"
+              data-testid="data-table-empty-message-container"
+            >
               <p class="text-md font-normal text-secondary">{{ emptyListMessage }}</p>
             </div>
           </slot>
@@ -168,7 +186,10 @@
         data-testid="data-table-loading-skeleton"
       >
         <template #header>
-          <div class="flex self-start" data-testid="data-table-loading-skeleton-header">
+          <div
+            class="flex self-start"
+            data-testid="data-table-loading-skeleton-header"
+          >
             <span class="flex flex-row p-input-icon-left">
               <i class="pi pi-search" />
               <InputText

@@ -8,7 +8,10 @@
     @keyup.enter="removeItem()"
     data-testid="delete-dialog"
   >
-    <div class="flex flex-col gap-6" data-testid="delete-dialog-content">
+    <div
+      class="flex flex-col gap-6"
+      data-testid="delete-dialog-content"
+    >
       <div data-testid="delete-dialog-warning">
         <Message
           severity="warn"
@@ -18,19 +21,25 @@
           Once confirmed, this action can't be reversed.
         </Message>
 
-        <p class="pt-4 text-color-secondary" data-testid="delete-dialog-warning-message-details">
+        <p
+          class="pt-4 text-color-secondary"
+          data-testid="delete-dialog-warning-message-details"
+        >
           This {{ informationForDeletion.title }} will be deleted along with any associated settings
           or instances. Check Help Center for more details.
         </p>
       </div>
 
       <div data-testid="delete-dialog-confirmation">
-        <div class="flex flex-col w-full gap-2" data-testid="delete-dialog-confirmation-input">
+        <div
+          class="flex flex-col w-full gap-2"
+          data-testid="delete-dialog-confirmation-input"
+        >
           <label
             for="confirm-input"
             class="font-semibold text-sm"
             data-testid="delete-dialog-confirmation-input-label"
-          >Type “delete” to confirm:</label
+            >Type “delete” to confirm:</label
           >
           <InputText
             id="confirm-input"
@@ -44,13 +53,15 @@
             v-if="errors.confirmation"
             class="p-error text-xs font-normal leading-tight"
             data-testid="delete-dialog-confirmation-input-error"
-          >{{ errors.confirmation }}</small
+            >{{ errors.confirmation }}</small
           >
         </div>
       </div>
     </div>
 
-    <template #footer data-testid="delete-dialog-footer">
+    <template
+      #footer
+    >
       <PrimeButton
         outlined
         label="Cancel"

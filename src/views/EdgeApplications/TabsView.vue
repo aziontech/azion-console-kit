@@ -255,7 +255,10 @@
 <template>
   <ContentBlock data-testid="edge-application-details-content-block">
     <template #heading>
-      <PageHeadingBlock :pageTitle="tabTitle" data-testid="edge-application-details-heading" />
+      <PageHeadingBlock
+        :pageTitle="tabTitle"
+        data-testid="edge-application-details-heading"
+      />
     </template>
     <template #content>
       <TabView

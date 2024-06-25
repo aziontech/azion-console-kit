@@ -143,7 +143,7 @@
     timer.value = setInterval(updateCurrentTime, 60000)
     setInitialValues()
   })
-  onUnmounted(()=> {
+  onUnmounted(() => {
     clearInterval(timer.value)
   })
 </script>

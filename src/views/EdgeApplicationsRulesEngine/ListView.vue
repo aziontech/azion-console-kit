@@ -217,7 +217,10 @@
     data-testid="rules-engine-list"
   >
     <template #addButton>
-      <div class="flex gap-4" data-testid="rules-engine-add-button">
+      <div
+        class="flex gap-4"
+        data-testid="rules-engine-add-button"
+      >
         <SelectButton
           v-model="selectedPhase"
           :options="phaseOptions"

@@ -1,26 +1,9 @@
-
 {
-  "reporter": [
-    "lcov",
-    "text",
-    "html" 
-  ],
+  "reporter": ["lcov", "text", "html"],
   "report-dir": "./coverage/e2e",
-  "include": [
-    "src/**"
-  ],
-  "exclude": [
-    "node_modules",
-    "cypress",
-    "coverage"
-  ],
-  "extension": [
-    ".js",
-    ".jsx",
-    ".ts",
-    ".tsx",
-    ".vue"
-  ],
+  "include": ["src/**"],
+  "exclude": ["node_modules", "cypress", "coverage"],
+  "extension": [".js", ".jsx", ".ts", ".tsx", ".vue"],
   "cypress": true,
   "requireEnv": false
 }

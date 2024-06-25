@@ -346,7 +346,10 @@
             data-testid="form-horizontal-delivery-settings-tls-version-dropdown"
           />
 
-          <small class="text-xs text-color-secondary font-normal leading-5" data-testid="form-horizontal-delivery-settings-tls-version-description">
+          <small
+            class="text-xs text-color-secondary font-normal leading-5"
+            data-testid="form-horizontal-delivery-settings-tls-version-description"
+          >
             Enable HTTP and HTTPS protocols to configure the minimum TLS version the application
             supports.
           </small>
@@ -371,7 +374,10 @@
             data-testid="form-horizontal-delivery-settings-cipher-suite-dropdown"
           />
 
-          <small class="text-xs text-color-secondary font-normal leading-5" data-testid="form-horizontal-delivery-settings-cipher-suite-description">
+          <small
+            class="text-xs text-color-secondary font-normal leading-5"
+            data-testid="form-horizontal-delivery-settings-cipher-suite-description"
+          >
             Select which cipher suite the application supports. See the list of supported ciphers in
             the documentation.
           </small>
@@ -414,7 +420,10 @@
             data-testid="form-horizontal-default-origin-type-dropdown"
           />
         </span>
-        <small class="text-xs text-color-secondary font-normal leading-5" data-testid="form-horizontal-default-origin-type-description">
+        <small
+          class="text-xs text-color-secondary font-normal leading-5"
+          data-testid="form-horizontal-default-origin-type-description"
+        >
           The origin type is pre-defined and can't be customized.
         </small>
       </div>
@@ -444,7 +453,10 @@
           placeholder="example.com"
           data-testid="form-horizontal-default-origin-address-input"
         />
-        <div class="text-color-secondary text-sm font-normal" data-testid="form-horizontal-default-origin-address-description">
+        <div
+          class="text-color-secondary text-sm font-normal"
+          data-testid="form-horizontal-default-origin-address-description"
+        >
           Define an origin for the content in FQDN format or an IPv4/IPv6 address.
         </div>
         <small
@@ -472,7 +484,10 @@
           placeholder="${host}"
           data-testid="form-horizontal-default-origin-host-header-input"
         />
-        <div class="text-color-secondary text-sm font-normal" data-testid="form-horizontal-default-origin-host-header-description">
+        <div
+          class="text-color-secondary text-sm font-normal"
+          data-testid="form-horizontal-default-origin-host-header-description"
+        >
           Identify a virtualhost sent in the Host header to the origin.
         </div>
         <small
@@ -531,7 +546,10 @@
         data-testid="form-horizontal-cache-expiration-policies-edge-cache-settings"
       />
 
-      <div class="flex flex-col sm:max-w-lg w-full gap-2" data-testid="form-horizontal-cache-expiration-policies-edge-cache-settings-maximum-ttl">
+      <div
+        class="flex flex-col sm:max-w-lg w-full gap-2"
+        data-testid="form-horizontal-cache-expiration-policies-edge-cache-settings-maximum-ttl"
+      >
         <div class="flex flex-col w-full sm:max-w-xs gap-2">
           <label
             for="cdn-maximun-ttl-seconds"
@@ -547,7 +565,10 @@
             data-testid="form-horizontal-cache-expiration-policies-edge-cache-settings-maximum-ttl-input"
           />
 
-          <div class="text-color-secondary text-sm font-normal" data-testid="form-horizontal-cache-expiration-policies-edge-cache-settings-maximum-ttl-description">
+          <div
+            class="text-color-secondary text-sm font-normal"
+            data-testid="form-horizontal-cache-expiration-policies-edge-cache-settings-maximum-ttl-description"
+          >
             Enable Application Accelerator in the Main Settings tab to use values lower than 60
             seconds. Tiered Cache requires cache TTL to be equal to or greater than 3 seconds.
           </div>
@@ -563,7 +584,10 @@
     data-testid="form-horizontal-modules"
   >
     <template #inputs>
-      <div class="flex flex-col gap-2" data-testid="form-horizontal-modules-default">
+      <div
+        class="flex flex-col gap-2"
+        data-testid="form-horizontal-modules-default"
+      >
         <FieldGroupSwitch
           label="Default Modules"
           isCard
@@ -583,7 +607,10 @@
         </FieldGroupSwitch>
       </div>
 
-      <div class="flex flex-col gap-2" data-testid="form-horizontal-modules-subscription">
+      <div
+        class="flex flex-col gap-2"
+        data-testid="form-horizontal-modules-subscription"
+      >
         <FieldGroupSwitch
           label="Subscription modules"
           isCard

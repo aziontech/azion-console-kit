@@ -199,8 +199,14 @@
     }"
     data-testid="filter-overlay-panel"
   >
-    <div class="border-b px-8 py-3.5 surface-border flex" data-testid="filter-header">
-      <h5 class="text-color text-[17.5px] align-self-center w-full text-xl font-medium leading-7" data-testid="filter-title">
+    <div
+      class="border-b px-8 py-3.5 surface-border flex"
+      data-testid="filter-header"
+    >
+      <h5
+        class="text-color text-[17.5px] align-self-center w-full text-xl font-medium leading-7"
+        data-testid="filter-title"
+      >
         Filter
       </h5>
       <ButtonPrime
@@ -212,9 +218,18 @@
         data-testid="filter-close-button"
       />
     </div>
-    <form @submit.prevent data-testid="filter-form">
-      <div class="px-8 py-5 flex gap-3.5 flex-col" data-testid="filter-options-container">
-        <span class="text-color-secondary" data-testid="filter-description">
+    <form
+      @submit.prevent
+      data-testid="filter-form"
+    >
+      <div
+        class="px-8 py-5 flex gap-3.5 flex-col"
+        data-testid="filter-options-container"
+      >
+        <span
+          class="text-color-secondary"
+          data-testid="filter-description"
+        >
           Each combination of operator can only be used once.
         </span>
         <div
@@ -222,7 +237,10 @@
           :class="filterSelected?.description ? 'gap-6' : 'md:pr-6'"
           data-testid="filter-fields-container"
         >
-          <div class="flex flex-col md:w-1/2 gap-2 sm:max-w-xs w-full" data-testid="filter-field-container">
+          <div
+            class="flex flex-col md:w-1/2 gap-2 sm:max-w-xs w-full"
+            data-testid="filter-field-container"
+          >
             <label
               for="filter-field"
               class="text-sm font-medium leading-5 text-color"
@@ -252,7 +270,10 @@
                 #dropdownicon
                 v-if="inputFilterDisabled"
               >
-                <span class="pi pi-lock text-color-secondary" data-testid="filter-field-disabled-icon" />
+                <span
+                  class="pi pi-lock text-color-secondary"
+                  data-testid="filter-field-disabled-icon"
+                />
               </template>
             </Dropdown>
           </div>
@@ -287,13 +308,19 @@
                 #dropdownicon
                 v-if="inputOperatorDisabled"
               >
-                <span class="pi pi-lock text-color-secondary" data-testid="filter-operator-disabled-icon" />
+                <span
+                  class="pi pi-lock text-color-secondary"
+                  data-testid="filter-operator-disabled-icon"
+                />
               </template>
             </Dropdown>
           </div>
         </div>
       </div>
-      <Divider v-if="filterSelected?.label" data-testid="filter-divider" />
+      <Divider
+        v-if="filterSelected?.label"
+        data-testid="filter-divider"
+      />
       <div
         class="px-8 py-5 flex flex-col"
         v-if="filterSelected?.label"
@@ -311,7 +338,10 @@
           >
             {{ filterSelected?.description }}
           </InlineMessage>
-          <div class="flex w-full" data-testid="filter-value-input">
+          <div
+            class="flex w-full"
+            data-testid="filter-value-input"
+          >
             <component
               v-if="operatorSelected?.value"
               :is="componentRender"
@@ -362,7 +392,10 @@
     data-testid="filter-sidebar"
   >
     <template #closeicon>
-      <div class="flex items-center justify-between" data-testid="filter-sidebar-close-icon">
+      <div
+        class="flex items-center justify-between"
+        data-testid="filter-sidebar-close-icon"
+      >
         <h2 data-testid="filter-sidebar-title">Filter</h2>
         <ButtonPrime
           icon="pi pi-times"
@@ -375,8 +408,14 @@
       </div>
     </template>
     <template #container>
-      <div class="p-sidebar-header" data-testid="filter-sidebar-header">
-        <div class="p-sidebar-header-content w-full" data-testid="filter-sidebar-header-content">
+      <div
+        class="p-sidebar-header"
+        data-testid="filter-sidebar-header"
+      >
+        <div
+          class="p-sidebar-header-content w-full"
+          data-testid="filter-sidebar-header-content"
+        >
           <div class="flex items-center justify-between">
             <h2 data-testid="filter-sidebar-title">Filter</h2>
             <ButtonPrime
@@ -391,9 +430,18 @@
         </div>
       </div>
 
-      <form @submit.prevent data-testid="filter-sidebar-form">
-        <div class="p-3 pb-5 flex gap-3.5 flex-col" data-testid="filter-sidebar-options-container">
-          <span class="text-color-secondary" data-testid="filter-sidebar-description">
+      <form
+        @submit.prevent
+        data-testid="filter-sidebar-form"
+      >
+        <div
+          class="p-3 pb-5 flex gap-3.5 flex-col"
+          data-testid="filter-sidebar-options-container"
+        >
+          <span
+            class="text-color-secondary"
+            data-testid="filter-sidebar-description"
+          >
             Each combination of operator can only be used once.
           </span>
           <div
@@ -401,7 +449,10 @@
             :class="filterSelected?.description ? 'gap-6' : 'md:pr-6'"
             data-testid="filter-sidebar-fields-container"
           >
-            <div class="flex flex-col md:w-1/2 gap-2 sm:max-w-xs w-full" data-testid="filter-sidebar-field-container">
+            <div
+              class="flex flex-col md:w-1/2 gap-2 sm:max-w-xs w-full"
+              data-testid="filter-sidebar-field-container"
+            >
               <label
                 for="filter-field"
                 class="text-sm font-medium leading-5 text-color"
@@ -431,7 +482,10 @@
                   #dropdownicon
                   v-if="inputFilterDisabled"
                 >
-                  <span class="pi pi-lock text-color-secondary" data-testid="filter-sidebar-field-disabled-icon" />
+                  <span
+                    class="pi pi-lock text-color-secondary"
+                    data-testid="filter-sidebar-field-disabled-icon"
+                  />
                 </template>
               </Dropdown>
             </div>
@@ -466,13 +520,19 @@
                   #dropdownicon
                   v-if="inputOperatorDisabled"
                 >
-                  <span class="pi pi-lock text-color-secondary" data-testid="filter-sidebar-operator-disabled-icon" />
+                  <span
+                    class="pi pi-lock text-color-secondary"
+                    data-testid="filter-sidebar-operator-disabled-icon"
+                  />
                 </template>
               </Dropdown>
             </div>
           </div>
         </div>
-        <Divider v-if="filterSelected?.label" data-testid="filter-sidebar-divider" />
+        <Divider
+          v-if="filterSelected?.label"
+          data-testid="filter-sidebar-divider"
+        />
         <div
           class="px-3 py-5 flex flex-col"
           v-if="filterSelected?.label"
@@ -490,7 +550,10 @@
             >
               {{ filterSelected?.description }}
             </InlineMessage>
-            <div class="flex w-full" data-testid="filter-sidebar-value-input">
+            <div
+              class="flex w-full"
+              data-testid="filter-sidebar-value-input"
+            >
               <component
                 v-if="operatorSelected?.value"
                 :is="componentRender"
@@ -502,7 +565,10 @@
         </div>
       </form>
 
-      <div class="mt-auto" data-testid="filter-sidebar-buttons-container">
+      <div
+        class="mt-auto"
+        data-testid="filter-sidebar-buttons-container"
+      >
         <div
           class="p-3 border-t surface-border flex gap-2 items-center justify-end p-dialog-footer"
         >

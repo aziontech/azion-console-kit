@@ -261,9 +261,18 @@
 </script>
 
 <template>
-  <div class="overflow-auto w-full h-full flex flex-col sm:flex-row gap-4" data-testid="integrations-list-container">
-    <div class="-ml-2 sm:min-w-[240px]" data-testid="integrations-list-menu">
-      <ul class="flex flex-col gap-1 md:fixed md:w-60" data-testid="integrations-list-menu-items">
+  <div
+    class="overflow-auto w-full h-full flex flex-col sm:flex-row gap-4"
+    data-testid="integrations-list-container"
+  >
+    <div
+      class="-ml-2 sm:min-w-[240px]"
+      data-testid="integrations-list-menu"
+    >
+      <ul
+        class="flex flex-col gap-1 md:fixed md:w-60"
+        data-testid="integrations-list-menu-items"
+      >
         <li
           v-for="(menuitem, index) in TABS"
           :key="index"
@@ -284,14 +293,20 @@
       </ul>
     </div>
 
-    <div class="overflow-auto w-full flex flex-col" data-testid="integrations-list-content">
+    <div
+      class="overflow-auto w-full flex flex-col"
+      data-testid="integrations-list-content"
+    >
       <LoadingState v-if="isLoading" />
       <div
         class="flex flex-col gap-5 mb-5 w-full"
         v-else
         data-testid="integrations-list-content-body"
       >
-        <div class="flex flex-col gap-3" data-testid="integrations-list-content-header">
+        <div
+          class="flex flex-col gap-3"
+          data-testid="integrations-list-content-header"
+        >
           <div class="text-base font-medium">
             {{ tabInfo[selectedTab].title }}
           </div>
@@ -309,7 +324,9 @@
             />
           </span>
         </div>
-        <template v-if="isSearching" data-testid="integrations-list-content-search-results">
+        <template
+          v-if="isSearching"
+        >
           <template v-if="!!filteredTemplates.length">
             <div class="text-sm">
               {{ resultsText }}

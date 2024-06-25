@@ -1,8 +1,17 @@
 <template>
-  <div class="flex h-full w-full" data-testid="events-container">
-    <Card class="w-full mb-10" data-testid="events-card">
+  <div
+    class="flex h-full w-full"
+    data-testid="events-container"
+  >
+    <Card
+      class="w-full mb-10"
+      data-testid="events-card"
+    >
       <template #header>
-        <div class="border-b surface-border w-full p-3.5 flex" data-testid="events-header">
+        <div
+          class="border-b surface-border w-full p-3.5 flex"
+          data-testid="events-header"
+        >
           <span class="p-input-icon-left">
             <i class="pi pi-search" />
             <InputText
@@ -11,7 +20,10 @@
               data-testid="events-search-input"
             />
           </span>
-          <span class="flex items-center ml-auto text-sm font-normal leading-5" data-testid="events-date-range">
+          <span
+            class="flex items-center ml-auto text-sm font-normal leading-5"
+            data-testid="events-date-range"
+          >
             Records from the last 30 days
           </span>
         </div>
@@ -71,15 +83,30 @@
               />
             </template>
             <template #content="{ item }">
-              <div class="flex flex-col" data-testid="events-timeline-content">
-                <div class="text-color-secondary text-xs font-bold" data-testid="events-timeline-date">
+              <div
+                class="flex flex-col"
+                data-testid="events-timeline-content"
+              >
+                <div
+                  class="text-color-secondary text-xs font-bold"
+                  data-testid="events-timeline-date"
+                >
                   {{ item.date }}
                 </div>
-                <div class="flex items-baseline max-md:flex-col" data-testid="events-timeline-event">
-                  <div class="text-color text-lg flex" data-testid="events-timeline-event-name">
+                <div
+                  class="flex items-baseline max-md:flex-col"
+                  data-testid="events-timeline-event"
+                >
+                  <div
+                    class="text-color text-lg flex"
+                    data-testid="events-timeline-event-name"
+                  >
                     {{ item.event }}
                   </div>
-                  <div class="text-color-secondary text-xs font-normal flex ml-1 max-md:mb-4" data-testid="events-timeline-event-editor">
+                  <div
+                    class="text-color-secondary text-xs font-normal flex ml-1 max-md:mb-4"
+                    data-testid="events-timeline-event-editor"
+                  >
                     by {{ item.editor }}
                   </div>
                 </div>
