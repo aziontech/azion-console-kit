@@ -13,14 +13,26 @@ export const listErrorResponsesService = async ({ edgeApplicationId }) => {
 
 const adapt = (httpResponse) => {
   const response = httpResponse.body.results[0]
+
+  const firstCode = response.error_responses.find((element, index) => {
+    const notCodeAny = element.code !== 'any'
+
+    if (notCodeAny) return
+
+    response.error_responses.splice(index, 1)
+    return !notCodeAny
+  })
+
+  response.error_responses.unshift({ ...firstCode })
+
   const parsedErrorResponses = {
     id: response.id,
     name: response.name,
-    originId: response.origin_id,
+    originId: response.origin_id?.toString(),
     errorResponses: response.error_responses.map((element) => {
       return {
-        code: element.code.toString(),
-        timeout: element.timeout,
+        code: element.code?.toString(),
+        timeout: element.timeout || 0,
         uri: element.uri,
         customStatusCode: element.custom_status_code
           ? Number(element.custom_status_code)
@@ -28,6 +40,7 @@ const adapt = (httpResponse) => {
       }
     })
   }
+
   return {
     statusCode: httpResponse.statusCode,
     body: parsedErrorResponses

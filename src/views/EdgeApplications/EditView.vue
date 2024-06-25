@@ -7,7 +7,7 @@
     @on-edit-success="[handleTrackSuccessEdit, updatedStatusUnSaved]"
     @on-edit-fail="handleTrackFailEdit"
     disableRedirect
-    :isTabs="true"
+    isTabs
   >
     <template #form>
       <FormFieldsCreateEdgeApplications
