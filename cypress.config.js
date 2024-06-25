@@ -10,10 +10,6 @@ export default defineConfig({
     defaultCommandTimeout: 8000,
     video: true,
     experimentalStudio: true,
-    retries: {
-      runMode: 2,
-      openMode: 2
-    },
     setupNodeEvents(on, config) {
       codeCoverageTask(on, config);
       return config;

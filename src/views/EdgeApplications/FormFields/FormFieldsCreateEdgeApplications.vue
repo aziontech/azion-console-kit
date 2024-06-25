@@ -205,6 +205,7 @@
     title="General"
     description="Create an edge application to deliver your content from the edge."
     v-if="handleBlock('general')"
+    data-testid="form-horizontal-general"
   >
     <template #inputs>
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
@@ -214,6 +215,7 @@
           placeholder="My edge application"
           :value="name"
           description="Give a unique and descriptive name to identify the edge application."
+          data-testid="form-horizontal-general-name"
         />
       </div>
     </template>
@@ -223,6 +225,7 @@
     title="Delivery Settings"
     description="Choose the protocols used between the edge application and users."
     v-if="handleBlock('delivery-settings')"
+    data-testid="form-horizontal-delivery-settings"
   >
     <template #inputs>
       <FieldGroupRadio
@@ -231,6 +234,7 @@
         :isCard="false"
         @onRadioChange="(option) => setDeliveryProtocol(option, false)"
         :options="usageProtocolRadioOptions"
+        data-testid="form-horizontal-delivery-settings-protocol-usage"
       />
 
       <div class="flex gap-6 max-sm:flex-col">
@@ -238,12 +242,15 @@
           <label
             for="port-http"
             class="text-color text-base font-medium"
-            >HTTP Ports <span v-if="checkIsProtocol.http || checkIsProtocol.https">*</span></label
+            data-testid="form-horizontal-delivery-settings-http-ports-label"
           >
+            HTTP Ports <span v-if="checkIsProtocol.http || checkIsProtocol.https">*</span>
+          </label>
           <span class="p-input-icon-right">
             <i
               class="pi pi-lock text-[var(--text-color-secondary)]"
               v-if="checkIsProtocol.http3"
+              data-testid="form-horizontal-delivery-settings-http-ports-lock-icon"
             />
             <MultiSelect
               :options="HTTP_PORT_LIST_OPTIONS"
@@ -261,13 +268,16 @@
                   class: `${checkIsProtocol.http3 ? 'hidden' : ''}`
                 }
               }"
+              data-testid="form-horizontal-delivery-settings-http-ports-multi-select"
             />
 
             <small
               v-if="httpPortError"
               class="p-error text-xs font-normal leading-tight"
-              >{{ httpPortError }}</small
+              data-testid="form-horizontal-delivery-settings-http-ports-error"
             >
+              {{ httpPortError }}
+            </small>
           </span>
         </div>
 
@@ -275,12 +285,15 @@
           <label
             for="port-https"
             class="text-color text-base font-medium"
-            >HTTPS Ports <span v-if="checkIsProtocol.https">*</span></label
+            data-testid="form-horizontal-delivery-settings-https-ports-label"
           >
+            HTTPS Ports <span v-if="checkIsProtocol.https">*</span>
+          </label>
           <span class="p-input-icon-right">
             <i
               class="pi pi-lock text-[var(--text-color-secondary)]"
               v-if="!checkIsProtocol.https"
+              data-testid="form-horizontal-delivery-settings-https-ports-lock-icon"
             />
             <MultiSelect
               :options="HTTPS_PORT_LIST_OPTIONS"
@@ -296,12 +309,15 @@
                   class: `${checkIsProtocol.http || checkIsProtocol.http3 ? 'hidden' : ''}`
                 }
               }"
+              data-testid="form-horizontal-delivery-settings-https-ports-multi-select"
             />
             <small
               v-if="httpsPortError"
               class="p-error text-xs font-normal leading-tight"
-              >{{ httpsPortError }}</small
+              data-testid="form-horizontal-delivery-settings-https-ports-error"
             >
+              {{ httpsPortError }}
+            </small>
           </span>
         </div>
       </div>
@@ -309,13 +325,16 @@
       <div
         class="flex gap-6 max-sm:flex-col"
         v-if="checkIsProtocol.https || checkIsProtocol.http3"
+        data-testid="form-horizontal-delivery-settings-tls-ciphers"
       >
         <div class="flex flex-col w-full sm:max-w-xs gap-2">
           <label
             for="tls-version"
             class="text-color text-base font-medium"
-            >Minimum TLS version</label
+            data-testid="form-horizontal-delivery-settings-tls-version-label"
           >
+            Minimum TLS version
+          </label>
           <Dropdown
             appendTo="self"
             :options="TLS_VERSIONS_OPTIONS"
@@ -324,9 +343,10 @@
             optionValue="value"
             placeholder="Select a minimum TLS Version"
             :disabled="checkIsProtocol.http"
+            data-testid="form-horizontal-delivery-settings-tls-version-dropdown"
           />
 
-          <small class="text-xs text-color-secondary font-normal leading-5">
+          <small class="text-xs text-color-secondary font-normal leading-5" data-testid="form-horizontal-delivery-settings-tls-version-description">
             Enable HTTP and HTTPS protocols to configure the minimum TLS version the application
             supports.
           </small>
@@ -336,8 +356,10 @@
           <label
             for="ciphers-list"
             class="text-color text-base font-medium"
-            >Cipher suite</label
+            data-testid="form-horizontal-delivery-settings-cipher-suite-label"
           >
+            Cipher suite
+          </label>
           <Dropdown
             appendTo="self"
             :options="SUPPORTED_CIPHERS_LIST_OPTIONS"
@@ -346,9 +368,10 @@
             optionValue="value"
             placeholder="Select the supported cipher suite"
             :disabled="checkIsProtocol.http"
+            data-testid="form-horizontal-delivery-settings-cipher-suite-dropdown"
           />
 
-          <small class="text-xs text-color-secondary font-normal leading-5">
+          <small class="text-xs text-color-secondary font-normal leading-5" data-testid="form-horizontal-delivery-settings-cipher-suite-description">
             Select which cipher suite the application supports. See the list of supported ciphers in
             the documentation.
           </small>
@@ -361,14 +384,17 @@
     title="Default Origin"
     description="Customize settings related to origin servers and hosts."
     v-if="handleBlock('default-origins')"
+    data-testid="form-horizontal-default-origin"
   >
     <template #inputs>
       <div class="flex flex-col w-full sm:max-w-xs gap-2">
         <label
           for="origin-type"
           class="text-color text-base font-medium"
-          >Type *</label
+          data-testid="form-horizontal-default-origin-type-label"
         >
+          Type *
+        </label>
         <span class="p-input-icon-right">
           <i class="pi pi-lock text-[var(--text-color-secondary)]" />
           <Dropdown
@@ -385,9 +411,10 @@
                 class: 'hidden'
               }
             }"
+            data-testid="form-horizontal-default-origin-type-dropdown"
           />
         </span>
-        <small class="text-xs text-color-secondary font-normal leading-5">
+        <small class="text-xs text-color-secondary font-normal leading-5" data-testid="form-horizontal-default-origin-type-description">
           The origin type is pre-defined and can't be customized.
         </small>
       </div>
@@ -398,52 +425,63 @@
         :isCard="false"
         :options="policyProtocolRadioOptions"
         helpText="Select the protocol usage between the edge nodes and the origin."
+        data-testid="form-horizontal-default-origin-protocol-policy"
       />
 
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
         <label
           for="address"
           class="text-color text-base font-medium"
-          >Address *</label
+          data-testid="form-horizontal-default-origin-address-label"
         >
+          Address *
+        </label>
         <InputText
           id="address"
           v-model="address"
           :class="{ 'p-invalid': addressError }"
           aria-describedby="address-help"
           placeholder="example.com"
+          data-testid="form-horizontal-default-origin-address-input"
         />
-        <div class="text-color-secondary text-sm font-normal">
+        <div class="text-color-secondary text-sm font-normal" data-testid="form-horizontal-default-origin-address-description">
           Define an origin for the content in FQDN format or an IPv4/IPv6 address.
         </div>
         <small
           v-if="addressError"
           class="p-error text-xs font-normal leading-tight"
-          >{{ addressError }}</small
+          data-testid="form-horizontal-default-origin-address-error"
         >
+          {{ addressError }}
+        </small>
       </div>
 
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
         <label
           for="host-header"
           class="text-color text-base font-medium"
-          >Host Header *</label
+          data-testid="form-horizontal-default-origin-host-header-label"
         >
+          Host Header *
+        </label>
         <InputText
           id="hostHeader"
           v-model="hostHeader"
           :class="{ 'p-invalid': hostHeaderError }"
           aria-describedby="hostHeader-help"
           placeholder="${host}"
+          data-testid="form-horizontal-default-origin-host-header-input"
         />
-        <div class="text-color-secondary text-sm font-normal">
+        <div class="text-color-secondary text-sm font-normal" data-testid="form-horizontal-default-origin-host-header-description">
           Identify a virtualhost sent in the Host header to the origin.
         </div>
         <small
           v-if="hostHeaderError"
           class="p-error text-xs font-normal leading-tight"
-          >{{ hostHeaderError }}</small
+          data-testid="form-horizontal-default-origin-host-header-error"
         >
+          {{ hostHeaderError }}
+        </small>
       </div>
     </template>
   </FormHorizontal>
@@ -452,6 +490,7 @@
     title="Cache Expiration Policies"
     description="Define how the edge should handle TTL values sent by the origin as well as how long your content should remain cached at the edge."
     v-if="handleBlock('cache-expiration-policies')"
+    data-testid="form-horizontal-cache-expiration-policies"
   >
     <template #inputs>
       <FieldGroupRadio
@@ -459,22 +498,27 @@
         nameField="browserCacheSettings"
         :isCard="false"
         :options="cacheSettingsRadioOptions('browser')"
+        data-testid="form-horizontal-cache-expiration-policies-browser-cache-settings"
       />
 
       <div
         class="flex flex-col sm:max-w-lg w-full gap-2"
         v-if="!isBrowserCacheTypeHonor"
+        data-testid="form-horizontal-cache-expiration-policies-browser-cache-settings-maximum-ttl"
       >
         <div class="flex flex-col w-full sm:max-w-xs gap-2">
           <label
             for="maximun-ttl-seconds"
             class="text-color text-base font-medium"
-            >Maximum TTL (seconds)</label
+            data-testid="form-horizontal-cache-expiration-policies-browser-cache-settings-maximum-ttl-label"
           >
+            Maximum TTL (seconds)
+          </label>
 
           <InputNumber
             v-model="browserCacheSettingsMaximumTtl"
             showButtons
+            data-testid="form-horizontal-cache-expiration-policies-browser-cache-settings-maximum-ttl-input"
           />
         </div>
       </div>
@@ -484,22 +528,26 @@
         nameField="cdnCacheSettings"
         :isCard="false"
         :options="cacheSettingsRadioOptions('cdn')"
+        data-testid="form-horizontal-cache-expiration-policies-edge-cache-settings"
       />
 
-      <div class="flex flex-col sm:max-w-lg w-full gap-2">
+      <div class="flex flex-col sm:max-w-lg w-full gap-2" data-testid="form-horizontal-cache-expiration-policies-edge-cache-settings-maximum-ttl">
         <div class="flex flex-col w-full sm:max-w-xs gap-2">
           <label
             for="cdn-maximun-ttl-seconds"
             class="text-color text-base font-medium"
-            >{{ cdnCacheSettingsIsOverride ? 'Maximum TTL (seconds)' : 'Default TTL' }}</label
+            data-testid="form-horizontal-cache-expiration-policies-edge-cache-settings-maximum-ttl-label"
           >
+            {{ cdnCacheSettingsIsOverride ? 'Maximum TTL (seconds)' : 'Default TTL' }}
+          </label>
 
           <InputNumber
             v-model="cdnCacheSettingsMaximumTtl"
             showButtons
+            data-testid="form-horizontal-cache-expiration-policies-edge-cache-settings-maximum-ttl-input"
           />
 
-          <div class="text-color-secondary text-sm font-normal">
+          <div class="text-color-secondary text-sm font-normal" data-testid="form-horizontal-cache-expiration-policies-edge-cache-settings-maximum-ttl-description">
             Enable Application Accelerator in the Main Settings tab to use values lower than 60
             seconds. Tiered Cache requires cache TTL to be equal to or greater than 3 seconds.
           </div>
@@ -512,13 +560,15 @@
     title="Modules"
     description="Activate modules to extend the configuration possibilities of the application. Some modules require subscription."
     v-if="handleBlock('edge-application-modules')"
+    data-testid="form-horizontal-modules"
   >
     <template #inputs>
-      <div class="flex flex-col gap-2">
+      <div class="flex flex-col gap-2" data-testid="form-horizontal-modules-default">
         <FieldGroupSwitch
           label="Default Modules"
           isCard
           :options="defaultModulesSwitchOptions"
+          data-testid="form-horizontal-modules-default-switch"
         >
           <template #footer="{ item }">
             <PrimeTag
@@ -527,16 +577,18 @@
               :icon="item.tag.icon"
               severity="info"
               class="mt-3"
+              data-testid="form-horizontal-modules-default-switch-tag"
             />
           </template>
         </FieldGroupSwitch>
       </div>
 
-      <div class="flex flex-col gap-2">
+      <div class="flex flex-col gap-2" data-testid="form-horizontal-modules-subscription">
         <FieldGroupSwitch
           label="Subscription modules"
           isCard
           :options="subscriptionModulesSwitchOptions"
+          data-testid="form-horizontal-modules-subscription-switch"
         />
         <PrimeButton
           outlined
@@ -544,6 +596,7 @@
           class="max-w-[150px]"
           label="Contact sales"
           @click="props.contactSalesEdgeApplicationService()"
+          data-testid="form-horizontal-modules-subscription-contact-sales-button"
         />
       </div>
     </template>
@@ -553,6 +606,7 @@
     title="Debug Rules"
     description="Log executed rules created in Rules Engine. Query logs using Data Stream, Real-Time Events, or Real-Time Events GraphQL API."
     v-if="handleBlock('debug-rules')"
+    data-testid="form-horizontal-debug-rules"
   >
     <template #inputs>
       <div class="flex flex-col gap-2">
@@ -564,6 +618,7 @@
           title="Active"
           subtitle="Rules that were successfully executed will be shown under the $traceback field in Data
               Streaming and Real-Time Events or the $stacktrace variable in GraphQL."
+          data-testid="form-horizontal-debug-rules-switch"
         />
       </div>
     </template>

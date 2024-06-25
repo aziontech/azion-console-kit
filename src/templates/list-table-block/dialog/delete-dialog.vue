@@ -6,28 +6,31 @@
     :draggable="false"
     class="max-w-2xl"
     @keyup.enter="removeItem()"
+    data-testid="delete-dialog"
   >
-    <div class="flex flex-col gap-6">
-      <div>
+    <div class="flex flex-col gap-6" data-testid="delete-dialog-content">
+      <div data-testid="delete-dialog-warning">
         <Message
           severity="warn"
           :closable="false"
+          data-testid="delete-dialog-warning-message"
         >
           Once confirmed, this action can't be reversed.
         </Message>
 
-        <p class="pt-4 text-color-secondary">
+        <p class="pt-4 text-color-secondary" data-testid="delete-dialog-warning-message-details">
           This {{ informationForDeletion.title }} will be deleted along with any associated settings
           or instances. Check Help Center for more details.
         </p>
       </div>
 
-      <div>
-        <div class="flex flex-col w-full gap-2">
+      <div data-testid="delete-dialog-confirmation">
+        <div class="flex flex-col w-full gap-2" data-testid="delete-dialog-confirmation-input">
           <label
             for="confirm-input"
             class="font-semibold text-sm"
-            >Type “delete” to confirm:</label
+            data-testid="delete-dialog-confirmation-input-label"
+          >Type “delete” to confirm:</label
           >
           <InputText
             id="confirm-input"
@@ -35,21 +38,24 @@
             autofocus
             v-model="confirmation"
             :class="{ 'p-invalid': errors.confirmation }"
+            data-testid="delete-dialog-confirmation-input-field"
           />
           <small
             v-if="errors.confirmation"
             class="p-error text-xs font-normal leading-tight"
-            >{{ errors.confirmation }}</small
+            data-testid="delete-dialog-confirmation-input-error"
+          >{{ errors.confirmation }}</small
           >
         </div>
       </div>
     </div>
 
-    <template #footer>
+    <template #footer data-testid="delete-dialog-footer">
       <PrimeButton
         outlined
         label="Cancel"
         @click="cancelDialog()"
+        data-testid="delete-dialog-footer-cancel-button"
       ></PrimeButton>
       <PrimeButton
         severity="danger"
@@ -58,6 +64,7 @@
         @click="removeItem()"
         :icon="calculateLoadIconByLoadingState"
         :disabled="isDisabled"
+        data-testid="delete-dialog-footer-delete-button"
       ></PrimeButton>
     </template>
   </PrimeDialog>

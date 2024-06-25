@@ -1,16 +1,17 @@
 <template>
-  <div class="flex h-full w-full">
-    <Card class="w-full mb-10">
+  <div class="flex h-full w-full" data-testid="events-container">
+    <Card class="w-full mb-10" data-testid="events-card">
       <template #header>
-        <div class="border-b surface-border w-full p-3.5 flex">
+        <div class="border-b surface-border w-full p-3.5 flex" data-testid="events-header">
           <span class="p-input-icon-left">
             <i class="pi pi-search" />
             <InputText
               placeholder="Search by event"
               v-model="search"
+              data-testid="events-search-input"
             />
           </span>
-          <span class="flex items-center ml-auto text-sm font-normal leading-5">
+          <span class="flex items-center ml-auto text-sm font-normal leading-5" data-testid="events-date-range">
             Records from the last 30 days
           </span>
         </div>
@@ -19,11 +20,13 @@
         <div
           v-if="isLoading"
           class="flex flex-col"
+          data-testid="events-loading"
         >
           <div
             v-for="skeletonItem in 10"
             :key="skeletonItem"
             class="animate-pulse flex space-x-4 px-6 py-3 items-center"
+            data-testid="events-loading-item"
           >
             <div class="bg-gray-200 rounded-full h-9 w-9"></div>
             <div class="flex py-1 flex-col">
@@ -38,10 +41,12 @@
         <div
           class="p-6"
           v-else
+          data-testid="events-content"
         >
           <span
             v-if="noEventsFound"
             class="text-primary"
+            data-testid="events-no-events-message"
             >No events found.</span
           >
           <Timeline
@@ -52,6 +57,7 @@
             :pt="{
               opposite: { class: 'hidden' }
             }"
+            data-testid="events-timeline"
           >
             <template #marker="{ item }">
               <Tag
@@ -61,18 +67,19 @@
                   root: { class: 'p-2.5 h-8 rounded-full' },
                   icon: { class: 'mr-0' }
                 }"
+                data-testid="events-timeline-marker"
               />
             </template>
             <template #content="{ item }">
-              <div class="flex flex-col">
-                <div class="text-color-secondary text-xs font-bold">
+              <div class="flex flex-col" data-testid="events-timeline-content">
+                <div class="text-color-secondary text-xs font-bold" data-testid="events-timeline-date">
                   {{ item.date }}
                 </div>
-                <div class="flex items-baseline max-md:flex-col">
-                  <div class="text-color text-lg flex">
+                <div class="flex items-baseline max-md:flex-col" data-testid="events-timeline-event">
+                  <div class="text-color text-lg flex" data-testid="events-timeline-event-name">
                     {{ item.event }}
                   </div>
-                  <div class="text-color-secondary text-xs font-normal flex ml-1 max-md:mb-4">
+                  <div class="text-color-secondary text-xs font-normal flex ml-1 max-md:mb-4" data-testid="events-timeline-event-editor">
                     by {{ item.editor }}
                   </div>
                 </div>

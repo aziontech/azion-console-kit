@@ -74,9 +74,9 @@
 </script>
 
 <template>
-  <ContentBlock>
+  <ContentBlock data-testid="edge-applications-content-block">
     <template #heading>
-      <PageHeadingBlock pageTitle="Edge Applications"></PageHeadingBlock>
+      <PageHeadingBlock pageTitle="Edge Applications" data-testid="edge-applications-heading" />
     </template>
     <template #content>
       <ListTableBlock
@@ -92,6 +92,7 @@
         @on-before-go-to-add-page="handleTrackEvent"
         @on-before-go-to-edit="handleTrackEditEvent"
         emptyListMessage="No edge applications found."
+        data-testid="edge-applications-list-table-block"
       />
       <EmptyResultsBlock
         v-else
@@ -100,6 +101,7 @@
         createButtonLabel="Edge Application"
         createPagePath="/edge-applications/create?origin=list"
         :documentationService="props.documentationService"
+        data-testid="edge-applications-empty-results-block"
       >
         <template #illustration>
           <Illustration />

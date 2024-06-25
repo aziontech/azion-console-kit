@@ -197,6 +197,7 @@
     :hideApplicationAcceleratorInDescription="props.hideApplicationAcceleratorInDescription"
     :isEdgeFunctionEnabled="props.isEdgeFunctionEnabled"
     @onSuccess="reloadList"
+    data-testid="rules-engine-drawer"
   />
   <ListTableBlock
     ref="listRulesEngineRef"
@@ -213,18 +214,21 @@
     }"
     emptyListMessage="No rules have been created."
     :isReorderAllEnabled="removeReorderForRequestPhaseFirstItem"
+    data-testid="rules-engine-list"
   >
     <template #addButton>
-      <div class="flex gap-4">
+      <div class="flex gap-4" data-testid="rules-engine-add-button">
         <SelectButton
           v-model="selectedPhase"
           :options="phaseOptions"
           :unselectable="true"
+          data-testid="rules-engine-select-phase"
         />
         <PrimeButton
           icon="pi pi-plus"
           label="Rule"
           @click="openCreateRulesEngineDrawerByPhase"
+          data-testid="rules-engine-create-button"
         />
       </div>
     </template>
@@ -237,6 +241,7 @@
         :documentationService="props.documentationService"
         :inTabs="true"
         :noBorder="true"
+        data-testid="rules-engine-empty-results"
       >
         <template #default>
           <PrimeButton
@@ -245,6 +250,7 @@
             severity="secondary"
             icon="pi pi-plus"
             label="Rule"
+            data-testid="rules-engine-empty-results-create-button"
           />
         </template>
         <template #illustration>

@@ -41,3 +41,4 @@ azion
 .edge
 
 src/views/Playground/PlaygroundView.vue
+/cypress/downloads

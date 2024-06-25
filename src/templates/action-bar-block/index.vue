@@ -41,6 +41,7 @@
 <template>
   <div
     class="flex w-full gap-4 justify-end h-14 items-center border-t surface-border sticky bottom-0 surface-section z-50 px-2 md:px-8"
+    data-testid="form-actions-container"
   >
     <div
       class="flex w-full justify-content-end max-w-full 3xl:mx-auto"
@@ -48,8 +49,9 @@
         '2xl:px-0': inDrawerStyles,
         '2xl:px-0': !inDrawerStyles
       }"
+      data-testid="form-actions-content"
     >
-      <div class="flex gap-4 self-stretch items-center justify-end w-full">
+      <div class="flex gap-4 self-stretch items-center justify-end w-full" data-testid="form-actions-buttons">
         <slot>
           <PrimeButton
             severity="primary"
@@ -57,8 +59,8 @@
             outlined
             class="max-md:min-w-max"
             @click="handleCancel"
-            :data-testid="`${props.secondaryActionLabel}_button`"
             :disabled="isDisabledCancel"
+            data-testid="form-actions-cancel-button"
           />
           <PrimeButton
             severity="primary"
@@ -67,8 +69,8 @@
             icon-pos="right"
             class="max-md:w-full"
             :icon="calculateLoadIconByLoadingState"
-            :data-testid="`${props.primaryActionLabel}_button`"
             :disabled="isDisabledSubmit"
+            data-testid="form-actions-submit-button"
           />
         </slot>
       </div>
