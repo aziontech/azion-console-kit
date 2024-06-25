@@ -4,7 +4,7 @@
   "preset": "vue",
   "mode": "deliver",
   "env": "production",
-  "prefix": "20240624174251",
+  "prefix": "20240625173345",
   "not-first-run": true,
   "function": {
     "id": 25650,
