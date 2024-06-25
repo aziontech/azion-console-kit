@@ -1,14 +1,12 @@
 <script setup>
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
-  import Divider from 'primevue/divider'
   import Dropdown from 'primevue/dropdown'
-  import InputSwitch from 'primevue/inputswitch'
+  import FieldGroupSwitch from '@/templates/form-fields-inputs/fieldGroupSwitch.vue'
   import InputText from 'primevue/inputtext'
   import TextArea from 'primevue/textarea'
   import { useToast } from 'primevue/usetoast'
   import { useField } from 'vee-validate'
   import { onMounted, ref, watch, computed } from 'vue'
-  import { TOAST_LIFE } from '@/utils/constants'
 
   const props = defineProps({
     listCountriesService: {
@@ -36,8 +34,6 @@
   const { value: city, errorMessage: cityError } = useField('city')
   const { value: address, errorMessage: addressError } = useField('address')
   const { value: complement } = useField('complement')
-  const { value: isSocialLoginEnabled } = useField('isSocialLoginEnabled')
-  const { value: isEnabledMfaToAllUsers } = useField('isEnabledMfaToAllUsers')
 
   const countriesOptions = ref({ options: [], done: true })
   const regionsOptions = ref({ options: [], done: true })
@@ -49,10 +45,6 @@
       severity,
       summary,
       closable: true
-    }
-
-    if (severity === 'success') {
-      options.life = TOAST_LIFE
     }
 
     return toast.add(options)
@@ -102,6 +94,21 @@
       citiesOptions.value.done = true
     }
   }
+
+  const switchOptions = computed(() => [
+    {
+      title: 'Allow Social Login',
+      nameField: 'isSocialLoginEnabled',
+      subtitle:
+        'When enabled, users linked to the account can log in using their social network credentials.'
+    },
+    {
+      title: 'Enforce Multi-Factor Authentication',
+      nameField: 'isEnabledMfaToAllUsers',
+      subtitle:
+        'When enabled, MFA will be enforced upon login for all users linked to this account.'
+    }
+  ])
 
   watch(
     [country, countriesOptions.value],
@@ -426,46 +433,12 @@
   >
     <template #inputs>
       <div class="w-full flex flex-col gap-2">
-        <div class="w-full flex flex-col gap-2 pt-2 pb-3">
-          <div class="flex gap-1">
-            <InputSwitch
-              v-model="isSocialLoginEnabled"
-              inputId="isSocialLoginEnabled"
-            />
-            <label
-              class="text-color text-sm font-normal leading-5"
-              for="isSocialLoginEnabled"
-            >
-              Allow Social Login
-            </label>
-          </div>
-          <div class="flex-col gap-1 pl-10">
-            <p class="text-color-secondary text-sm font-normal">
-              When enabled, users linked to the account can log in using their social network
-              credentials.
-            </p>
-          </div>
-        </div>
-        <Divider />
-        <div class="w-full flex flex-col gap-2 pt-2 pb-3">
-          <div class="flex gap-1">
-            <InputSwitch
-              v-model="isEnabledMfaToAllUsers"
-              inputId="isEnabledMfaToAllUsers"
-            />
-            <label
-              class="text-color text-sm font-normal leading-5"
-              for="isEnabledMfaToAllUsers"
-            >
-              Enforce Multi-Factor Authentication
-            </label>
-          </div>
-          <div class="flex-col gap-1 pl-10">
-            <p class="text-color-secondary text-sm font-normal">
-              When enabled, MFA will be enforced upon login for all users linked to this account.
-            </p>
-          </div>
-        </div>
+        <FieldGroupSwitch
+          :isCard="false"
+          input-class="w-full"
+          :options="switchOptions"
+        >
+        </FieldGroupSwitch>
       </div>
     </template>
   </FormHorizontal>

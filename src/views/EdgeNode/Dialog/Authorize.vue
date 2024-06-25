@@ -59,8 +59,7 @@
           this.$toast.add({
             closable: true,
             severity: 'info',
-            summary: 'Processing request',
-            life: 2000
+            summary: 'Processing request'
           })
           await EdgeNodeService.authorizeEdgeNodeService(this.authorize.edgeNodeID)
         } catch (error) {

@@ -1,55 +1,47 @@
 <template>
-  <Toast :pt="toast">
-    <template #message="slotProps">
+  <Toast :pt="toastOptions">
+    <template #message="{ message }">
       <div class="flex flex-column flex-grow">
-        <header class="flex gap-2 items-center justify-between">
-          <div class="flex gap-2 items-center">
-            <Tag
-              :icon="composeIconStyle(slotProps.message.severity)"
-              :severity="parseSeverity(slotProps.message.severity)"
-              :pt="{ icon: { class: 'mr-0' }, root: { class: 'w-6 h-6' } }"
-            />
-            <h5 class="text-color text-base font-semibold">
-              {{ getTitle(slotProps.message.summary) }}
-            </h5>
-          </div>
+        <header class="flex gap-2 items-center h-8 w-[calc(100%-2.5em)] max-w-2xl">
+          <Tag
+            :icon="composeIconStyle(message.severity)"
+            :severity="handleSeverity(message)"
+            :pt="{ icon: { class: 'mr-0' }, root: { class: 'w-6 h-6' } }"
+          />
+          <h5 class="text-color text-base font-semibold truncate">
+            {{ parseText(message.summary, CHAR_LIMITS.SUMMARY) }}
+          </h5>
         </header>
         <p
-          class="text-sm font-normal mt-3"
-          v-if="slotProps.message.detail"
+          class="text-sm text-color-secondary font-normal mt-3"
+          v-if="message.detail"
         >
-          {{ slotProps.message.detail }}
+          {{ parseText(message.detail, CHAR_LIMITS.DETAIL) }}
         </p>
-
-        <!-- Link -->
-        <PrimeButton
-          v-if="slotProps.message.link"
-          :label="slotProps.message.link.label"
-          size="small"
-          link
-          class="align-self-end"
-          @click="handleClick(slotProps.message, slotProps.message.link.callback)"
-        />
-
         <div
           class="flex flex-row gap-2 align-self-end mt-5"
-          v-if="slotProps.message.primary || slotProps.message.secondary"
+          v-if="showActions(message)"
         >
-          <!-- Secondary Button -->
           <PrimeButton
-            v-if="slotProps.message.secondary"
+            v-if="message.action.link"
+            link
+            size="small"
+            :label="message.action.link.label"
+            @click="handleClick(message, 'link')"
+          />
+          <PrimeButton
+            v-if="message.action.secondary"
             outlined
             size="small"
-            :label="slotProps.message.secondary.label"
-            @click="handleClick(slotProps.message, slotProps.message.secondary.callback)"
+            :label="message.action.secondary.label"
+            @click="handleClick(message, 'secondary')"
           />
-          <!-- Primary Button -->
           <PrimeButton
             severity="secondary"
-            v-if="slotProps.message.primary"
+            v-if="message.action.primary"
             size="small"
-            :label="slotProps.message.primary.label"
-            @click="handleClick(slotProps.message, slotProps.message.primary.callback)"
+            :label="message.action.primary.label"
+            @click="handleClick(message, 'primary')"
           />
         </div>
       </div>
@@ -57,80 +49,119 @@
   </Toast>
 </template>
 
-<script>
+<script setup>
   import PrimeButton from 'primevue/button'
   import Toast from 'primevue/toast'
   import Tag from 'primevue/tag'
 
-  export default {
-    name: 'ToastBlock',
-    components: {
-      PrimeButton,
-      Toast,
-      Tag
-    },
-    data() {
-      return {
-        progress: [],
-        toast: {
-          root: {
-            class: 'pl-3 pr-3 w-full md:w-[25rem] md:pl-0 md:pr-0 !right-0 md:right-8 top-[68px]'
-          },
-          content: {
-            class: 'relative'
-          },
-          closeButton: {
-            class: 'absolute right-4 top-3'
-          },
-          closeIcon: {
-            class: 'text-color'
-          }
-        }
-      }
-    },
-    methods: {
-      getValue({ id }) {
-        return this.progress.find((toastProgress) => toastProgress.id === id)?.value || 0
-      },
-      getProgressBarStyle({ severity }) {
-        let color = 'black'
-        if (severity === 'error') color = 'var(--button-danger-button-bg, #C4170B)'
-        if (severity === 'warn') color = 'var(--button-warning-button-bg, #E9AE18)'
-        if (severity === 'success') color = 'var(--button-success-button-bg, #198236)'
-        if (severity === 'info') color = 'var(--button-button-bg, #282828)'
+  defineOptions({ name: 'ToastBlock' })
 
-        return { value: { style: { background: color } } }
-      },
-      parseSeverity(severity) {
-        if (severity === 'error') return 'danger'
-        if (severity === 'warn') return 'warning'
+  const CHAR_LIMITS = {
+    // TODO: revert Summary to 20 when the writing team review the titles in other parts of the application
+    SUMMARY: 100,
+    DETAIL: 125
+  }
 
-        return severity
+  const toastOptions = {
+    root: {
+      class: 'pl-3 pr-3 w-full md:w-[25rem] md:pl-0 md:pr-0 !right-0 md:right-8 top-[4.25rem]'
+    },
+    content: {
+      class: 'relative'
+    },
+    closeButton: {
+      class: 'absolute right-5 top-5'
+    },
+    closeIcon: {
+      class: 'text-color'
+    }
+  }
+
+  const parseText = (text, charLimit) => {
+    return text.substring(0, charLimit)
+  }
+
+  const showActions = (message) => {
+    if (!message?.action) return false
+    return !!Object.keys(message.action).length
+  }
+
+  const handleSeverity = (message) => {
+    if (!message.customId) {
+      setToastLife(message)
+    }
+
+    return parseSeverity(message)
+  }
+
+  const parseSeverity = (message) => {
+    const severity = message.severity
+
+    const parser = {
+      error: 'danger',
+      warn: 'warning'
+    }
+
+    return parser[severity] || severity
+  }
+
+  const setCustomId = (message) => {
+    const customId = `${new Date().getTime()}${Math.floor(Math.random() * 1000)}`
+    message.id = message.customId = customId
+  }
+
+  const isAutoCloseable = (severity) => {
+    const TOAST_LIFE = {
+      WITH_ACTIONS: 10000,
+      DEFAULT: 5000
+    }
+
+    const closeableTypes = {
+      success: {
+        action: TOAST_LIFE.WITH_ACTIONS,
+        default: TOAST_LIFE.DEFAULT
       },
-      composeIconStyle(severity) {
-        if (severity === 'error') return 'pi pi-times text-xs'
-        if (severity === 'warn') return 'pi pi-exclamation-triangle text-xs'
-        if (severity === 'success') return 'pi pi-check text-xs'
-        if (severity === 'info') return 'pi pi-info-circle text-xs'
-        return 'pi pi-check text-xs'
-      },
-      handleClick(message, callback) {
-        callback()
-        this.closeMessage(message)
-      },
-      closeMessage(message) {
-        this.$toast.remove(message)
-      },
-      getTitle(str) {
-        return str
-      },
-      getSubtitle(str) {
-        const maxcharacters = 125
-        if (str.length > maxcharacters) {
-          return str.substring(0, maxcharacters)
-        }
-        return str
+      info: {
+        action: TOAST_LIFE.WITH_ACTIONS,
+        default: TOAST_LIFE.DEFAULT
       }
     }
+
+    return closeableTypes[severity]
+  }
+
+  const getToastLifeTime = (message, toastType) => {
+    // explicitly defined to not close the toast
+    const ZERO_VALUE = 0
+
+    if (message?.life || message?.life == ZERO_VALUE) return message.life
+
+    const hasActions = showActions(message)
+
+    return hasActions ? toastType.action : toastType.default
+  }
+
+  const setToastLife = (message) => {
+    const toastType = isAutoCloseable(message.severity)
+    setCustomId(message)
+
+    if (toastType) {
+      message.life = getToastLifeTime(message, toastType)
+    }
+  }
+
+  const composeIconStyle = (severity) => {
+    const parser = {
+      error: 'pi pi-times text-xs',
+      warn: 'pi pi-exclamation-triangle text-xs',
+      success: 'pi pi-check text-xs',
+      info: 'pi pi-info-circle text-xs'
+    }
+
+    return parser[severity] || 'pi pi-check text-xs'
+  }
+
+  const handleClick = (message, action) => {
+    message.action[action].callback()
   }
 </script>
