@@ -2,7 +2,7 @@
   import { TIME_INTERVALS } from '@modules/real-time-metrics/constants'
   import Calendar from 'primevue/calendar'
   import Dropdown from 'primevue/dropdown'
-  import { computed, onMounted, ref, watch } from 'vue'
+  import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
 
   const props = defineProps({
     moduleActions: {
@@ -44,6 +44,8 @@
   })
 
   const dates = ref([])
+  const maxDate = ref()
+  const timer = ref()
   const lastFilteredDate = ref({})
   const interval = ref(null)
   const isVisibleCalendar = ref(false)
@@ -61,10 +63,10 @@
     return hasError.value ? 'p-invalid' : ''
   })
 
-  const maxDate = computed(() => {
+  const updateCurrentTime = () => {
     const max = new Date().removeSelectedAmountOfHours(0)
-    return max.toUTC(props.userUTC)
-  })
+    maxDate.value = max.toUTC(props.userUTC)
+  }
 
   const setInitialValues = () => {
     interval.value = intervalOptions?.value[0]
@@ -157,7 +159,12 @@
   )
 
   onMounted(() => {
+    updateCurrentTime()
+    timer.value = setInterval(updateCurrentTime, 60000)
     setInitialValues()
+  })
+  onUnmounted(() => {
+    clearInterval(timer.value)
   })
 </script>
 

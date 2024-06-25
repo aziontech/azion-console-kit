@@ -7,7 +7,7 @@
   import Sidebar from 'primevue/sidebar'
   import FeedbackFish from '@/templates/navbar-block/feedback-fish'
   import DialogUnsavedBlock from '@/templates/dialog-unsaved-block'
-  import { TOAST_LIFE } from '@/utils/constants'
+
   import { useScrollToError } from '@/composables/useScrollToError'
   defineOptions({
     name: 'create-drawer-block'
@@ -88,10 +88,6 @@
       severity: severity,
       summary: severity,
       detail: summary
-    }
-
-    if (severity === 'success') {
-      options.life = TOAST_LIFE
     }
 
     toast.add(options)

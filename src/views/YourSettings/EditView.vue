@@ -40,7 +40,6 @@
   import { useToast } from 'primevue/usetoast'
   import * as yup from 'yup'
   import FormFieldsYourSettings from './FormFields/FormFieldsYourSettings.vue'
-  import { TOAST_LIFE } from '@/utils/constants'
 
   const toast = useToast()
 
@@ -80,10 +79,6 @@
       severity,
       summary,
       detail
-    }
-
-    if (severity === 'success') {
-      options.life = TOAST_LIFE
     }
 
     toast.add(options)

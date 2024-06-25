@@ -4,7 +4,6 @@
   import { useForm, useIsFormDirty } from 'vee-validate'
   import { computed, ref } from 'vue'
   import { useRouter } from 'vue-router'
-  import { TOAST_LIFE } from '@/utils/constants'
   import { useAttrs } from 'vue'
   import { useScrollToError } from '@/composables/useScrollToError'
 
@@ -74,10 +73,6 @@
       severity,
       summary: severity,
       detail
-    }
-
-    if (severity === 'success') {
-      options.life = TOAST_LIFE
     }
 
     toast.add(options)

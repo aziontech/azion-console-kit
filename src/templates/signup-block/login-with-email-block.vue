@@ -223,7 +223,7 @@
         })
         .track()
       loading.value = false
-      toast.add({ life: 5000, severity: 'error', detail: message, summary: 'Error' })
+      toast.add({ severity: 'error', detail: message, summary: 'Error' })
     }
   })
 

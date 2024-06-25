@@ -1,5 +1,5 @@
 <script setup>
-  import { ref, toRef } from 'vue'
+  import { computed, toRef } from 'vue'
   import { useField } from 'vee-validate'
   import InputText from 'primevue/inputtext'
 
@@ -31,51 +31,71 @@
     readonly: {
       type: Boolean,
       default: false
+    },
+    icon: {
+      type: String,
+      default: ''
+    },
+    iconPosition: {
+      type: String,
+      default: 'right'
     }
   })
-  const inputRef = ref(null)
-  const name = toRef(props, 'name')
+
+  const nameInput = toRef(props, 'name')
 
   const {
     value: inputValue,
     errorMessage,
     handleBlur,
     handleChange
-  } = useField(name, undefined, {
+  } = useField(nameInput, undefined, {
     initialValue: props.value
   })
 
-  defineExpose({
-    inputRef
+  const iconPositionClass = computed(() => {
+    return props.icon ? `p-input-icon-${props.iconPosition}` : ''
   })
 </script>
 
 <template>
   <label
     :for="props.name"
-    class="text-color text-sm font-medium leading-5"
+    class="text-color text-base font-medium leading-5"
   >
     {{ props.label }}
   </label>
-  <InputText
-    ref="inputRef"
-    :id="name"
-    v-model="inputValue"
-    :name="name"
-    :readonly="readonly"
-    :disabled="disabled"
-    type="text"
-    :placeholder="props.placeholder"
-    @input="handleChange"
-    :class="{ 'p-invalid': errorMessage }"
-    @blur="handleBlur"
-    v-bind="$attrs"
-  />
+  <span
+    class="w-full"
+    :class="iconPositionClass"
+  >
+    <i
+      v-if="props.icon"
+      :class="props.icon"
+      class="text-color-secondary"
+    />
+    <InputText
+      :id="props.name"
+      v-model="inputValue"
+      :name="props.name"
+      :readonly="props.readonly"
+      :disabled="props.disabled"
+      type="text"
+      class="w-full"
+      :class="{ 'p-invalid': errorMessage }"
+      :placeholder="props.placeholder"
+      @input="handleChange"
+      @blur="handleBlur"
+      v-bind="$attrs"
+    />
+  </span>
+
   <small
     v-if="errorMessage"
     class="p-error text-xs font-normal leading-tight"
-    >{{ errorMessage }}</small
   >
+    {{ errorMessage }}
+  </small>
   <small
     class="text-xs text-color-secondary font-normal leading-5"
     v-if="props.description"

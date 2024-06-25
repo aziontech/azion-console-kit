@@ -201,7 +201,6 @@
   import DeleteDialog from './dialog/delete-dialog'
 
   defineOptions({ name: 'list-table-block' })
-  import { TOAST_LIFE } from '@/utils/constants'
 
   const emit = defineEmits(['on-load-data', 'authorize', 'on-select-data'])
   const props = defineProps({
@@ -389,10 +388,6 @@
       severity,
       summary: severity,
       detail
-    }
-
-    if (severity === 'success') {
-      options.life = TOAST_LIFE
     }
 
     toast.add(options)

@@ -1,41 +1,3 @@
-<template>
-  <ContentBlock>
-    <template #heading>
-      <PageHeadingBlock pageTitle="Edit Edge Function">
-        <MobileCodePreview
-          :updateObject="updateObject"
-          :language="language"
-        />
-      </PageHeadingBlock>
-    </template>
-    <template #content>
-      <EditFormBlock
-        :editService="props.editEdgeFunctionsService"
-        :loadService="props.loadEdgeFunctionsService"
-        :updatedRedirect="props.updatedRedirect"
-        @on-edit-success="handleTrackSuccessEdit"
-        @on-edit-fail="handleTrackFailEdit"
-        :schema="validationSchema"
-      >
-        <template #form>
-          <FormFieldsEditEdgeFunctions
-            v-model:preview-data="updateObject"
-            v-model:lang="language"
-          />
-        </template>
-        <template #action-bar="{ onSubmit, formValid, onCancel, loading }">
-          <ActionBarBlockWithTeleport
-            @onSubmit="onSubmit"
-            @onCancel="onCancel"
-            :loading="loading"
-            :submitDisabled="!formValid"
-          />
-        </template>
-      </EditFormBlock>
-    </template>
-  </ContentBlock>
-</template>
-
 <script setup>
   import * as yup from 'yup'
   import ContentBlock from '@/templates/content-block'
@@ -101,3 +63,40 @@
     language: yup.string()
   })
 </script>
+
+<template>
+  <ContentBlock>
+    <template #heading>
+      <PageHeadingBlock pageTitle="Edit Edge Function">
+        <MobileCodePreview
+          :updateObject="updateObject"
+          :language="language"
+        />
+      </PageHeadingBlock>
+    </template>
+    <template #content>
+      <EditFormBlock
+        :editService="props.editEdgeFunctionsService"
+        :loadService="props.loadEdgeFunctionsService"
+        :updatedRedirect="props.updatedRedirect"
+        @on-edit-success="handleTrackSuccessEdit"
+        @on-edit-fail="handleTrackFailEdit"
+        :schema="validationSchema"
+      >
+        <template #form>
+          <FormFieldsEditEdgeFunctions
+            v-model:preview-data="updateObject"
+            v-model:lang="language"
+          />
+        </template>
+        <template #action-bar="{ onSubmit, onCancel, loading }">
+          <ActionBarBlockWithTeleport
+            @onSubmit="onSubmit"
+            @onCancel="onCancel"
+            :loading="loading"
+          />
+        </template>
+      </EditFormBlock>
+    </template>
+  </ContentBlock>
+</template>
