@@ -65,11 +65,11 @@ describe('Variables spec', () => {
     cy.get(selectors.variables.tableRowKey).should('be.visible').should('have.text', keyName)
 
     // Cleanup
-    cy.get(selectors.variables.actionsButton).click();
-    cy.get(selectors.variables.deleteButton).click();
-    cy.get(selectors.variables.deleteInput).clear();
-    cy.get(selectors.variables.deleteInput).type('delete');
-    cy.get(selectors.variables.confirmDeleteButton).click();
-    cy.get(selectors.variables.successMessage).should('have.text', 'Variable successfully deleted');
+    cy.get(selectors.variables.actionsButton).click()
+    cy.get(selectors.variables.deleteButton).click()
+    cy.get(selectors.variables.deleteInput).clear()
+    cy.get(selectors.variables.deleteInput).type('delete')
+    cy.get(selectors.variables.confirmDeleteButton).click()
+    cy.get(selectors.variables.successMessage).should('have.text', 'Variable successfully deleted')
   });
 });
