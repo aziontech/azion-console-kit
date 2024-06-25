@@ -102,6 +102,7 @@
           id="name"
           placeholder="My digital certificate"
           :class="{ 'p-invalid': digitalCertificateNameError }"
+          data-testid="digital_certificate__name_field"
         />
         <small
           v-if="digitalCertificateNameError"

@@ -37,7 +37,7 @@
  * cy.getByTestId('myTestId').should('be.visible');
  */
 Cypress.Commands.add('getByTestId', (selector, ...args) => {
-  return cy.get(`[data-testid=${selector}]`, ...args)
+  return cy.get(`[data-testid="${selector}"]`, ...args)
 })
 
 function login(email, password, username) {
