@@ -20,6 +20,7 @@ module.exports = {
   rules: {
     'no-case-declarations': 0,
     'no-console': 'error',
-    'id-length': ['error', { min: 2 }]
+    'id-length': ['error', { min: 2 }],
+    'semi': 2
   }
 }
