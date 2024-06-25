@@ -71,7 +71,7 @@ describe('Edge Application', () => {
 
     // Verify the edge application was created
     cy.get(selectors.edgeApplication.searchInput).type(edgeApplicationName)
-    cy.get(selectors.edgeApplication.tableRowName).should('be.visible')
+    cy.get(selectors.edgeApplication.tableRowName).should('be.visible').should('have.text', edgeApplicationName)
 
     // Navigate to Rules Engine Tab
     cy.get(selectors.edgeApplication.tableRowLastEditor).click()
@@ -91,12 +91,12 @@ describe('Edge Application', () => {
 
     // Verify the rule was created
     cy.get(selectors.edgeApplication.searchInput).type(rulesEngineName)
-    cy.get(selectors.edgeApplication.ruleTable).should('be.visible')
+    cy.get(selectors.edgeApplication.ruleTable).should('be.visible').should('have.text', rulesEngineName)
 
     // Delete the edge application
     cy.visit('/edge-applications')
     cy.get(selectors.edgeApplication.searchInput).type(edgeApplicationName)
-    cy.get(selectors.edgeApplication.tableRowName).should('be.visible')
+    cy.get(selectors.edgeApplication.tableRowName).should('be.visible').should('have.text', edgeApplicationName)
     cy.get(selectors.edgeApplication.actionsButton).click()
     cy.get(selectors.edgeApplication.deleteButton).click()
     cy.get(selectors.edgeApplication.confirmDelete).click()
