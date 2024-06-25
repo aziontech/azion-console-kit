@@ -3,7 +3,7 @@
   import FieldGroupRadio from '@/templates/form-fields-inputs/fieldGroupRadio'
   import FieldTextArea from '@/templates/form-fields-inputs/fieldTextArea'
   import FieldText from '@/templates/form-fields-inputs/fieldText'
-  import FieldTextIcon from '@/templates/form-fields-inputs/FieldTextIcon'
+  import FieldTextIcon from '@/templates/form-fields-inputs/fieldTextIcon'
   import { useField } from 'vee-validate'
   import { computed, watch } from 'vue'
 
