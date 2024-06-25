@@ -744,7 +744,7 @@
         <FieldText
           label="Payload Log Line Separator *"
           name="lineSeparator"
-          :description="textPlaceholder"
+          :description="placeholderLineSeparator"
         />
       </div>
 
@@ -925,8 +925,8 @@
   // Using the store
   const store = useAccountStore()
 
-  const textPlaceholder = computed(() => {
-    const text = '"\n"'
+  const placeholderLineSeparator = computed(() => {
+    const text = '"\\n"'
     return `Character that'll be used at the end of each log line. The ${text}  escape sequence breaks values into different lines in NDJSON format.`
   })
 
