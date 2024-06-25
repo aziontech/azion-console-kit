@@ -44,8 +44,8 @@ describe('Variables spec', () => {
     cy.get(selectors.login.signInButton).click()
 
     // Navegar até a tela de Variáveis
-    cy.get(selectors.sidebar.menuToggleButton).click();
-    cy.get(selectors.sidebar.variablesMenuItem).click();
+    cy.get(selectors.sidebar.menuToggleButton).click()
+    cy.get(selectors.sidebar.variablesMenuItem).click()
     cy.get('.text-\\[var\\(--text-color\\)\\]').should('be.visible').should('have.text', 'Variables');
   });
 
